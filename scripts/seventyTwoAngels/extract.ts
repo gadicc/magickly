@@ -81,7 +81,9 @@ scan shows disagrees, say so in "uncertain".
 
 5. Fill "scanned" with what this page LITERALLY PRINTS, even where it contradicts the \
 values you were given. This is how errors get found, so do not silently correct it \
-here. Where the entry omits something, use "" or an empty array.
+here, and do not convert anything: for the invocation, give the hour and the minute as \
+printed and whether it says "matin" or "soir", not a total. Where the entry omits \
+something, use "" or an empty array.
 
 6. Put anything you could not resolve in "uncertain", in your own words. An empty \
 array is a claim that the entry came through cleanly.`;

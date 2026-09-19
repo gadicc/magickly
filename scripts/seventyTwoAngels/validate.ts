@@ -99,12 +99,20 @@ export function disagreements(angel: AngelExtraction): Disagreement[] {
   if (asPrinted.join(", ") !== asDerived.join(", "))
     note("presidingDays", asPrinted.join(", "), asDerived.join(", "));
 
+  const printed = scanned.invocationFrom;
+  const asMinutes = (printed.hour * 60 + printed.minute) % (24 * 60);
+  // Lenain writes "du matin" or "du soir"; where he writes neither, which half
+  // of the day he means cannot be read off the page, so both are accepted.
+  const evening = /soir|midi/i.test(printed.partOfDay);
+  const readings = printed.partOfDay.trim()
+    ? [evening && printed.hour < 12 ? asMinutes + 12 * 60 : asMinutes]
+    : [asMinutes, (asMinutes + 12 * 60) % (24 * 60)];
   const invocation = invocationOf(no);
-  if (scanned.invocationFromMinutes !== invocation.from)
+  if (!readings.includes(invocation.from))
     note(
       "invocation",
-      String(scanned.invocationFromMinutes),
-      String(invocation.from),
+      `${printed.hour}:${String(printed.minute).padStart(2, "0")}${printed.partOfDay ? ` ${printed.partOfDay}` : ""}`,
+      `${Math.floor(invocation.from / 60)}:${String(invocation.from % 60).padStart(2, "0")}`,
     );
 
   return found;

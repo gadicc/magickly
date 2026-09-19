@@ -17,6 +17,16 @@ const bilingual = z.object({
   fr: z.string().min(1),
 });
 
+/**
+ * The entries run to a thousand characters and more, and a model asked for a
+ * long string under a schema will sometimes fill it with "placeholder" and move
+ * on. A floor turns that from a value we would have shipped into a retry.
+ */
+const entryProse = z.object({
+  en: z.string().min(300),
+  fr: z.string().min(300),
+});
+
 export const angelExtraction = z.object({
   no: z.number().int().min(1).max(72),
 
@@ -46,7 +56,7 @@ export const angelExtraction = z.object({
   contrary: z.object({ en: z.string().min(1) }),
 
   /** The whole entry: repaired French, and English translated from it. */
-  text: bilingual,
+  text: entryProse,
 
   scanned: z.object({
     degrees: z.object({
@@ -67,8 +77,17 @@ export const angelExtraction = z.object({
         day: z.number().int().min(1).max(31),
       }),
     ),
-    /** The invocation's opening time, in minutes after midnight. */
-    invocationFromMinutes: z.number().int(),
+    /**
+     * The invocation's opening time exactly as the entry prints it. Asking for
+     * minutes after midnight asked the model to do arithmetic, and it mostly
+     * reported the minute hand instead; this asks only what it can read.
+     */
+    invocationFrom: z.object({
+      hour: z.number().int().min(0).max(24),
+      minute: z.number().int().min(0).max(59),
+      /** "matin", "soir", or "" where the entry says neither. */
+      partOfDay: z.string(),
+    }),
   }),
 
   /** Anything the model could not resolve, in its own words. */
