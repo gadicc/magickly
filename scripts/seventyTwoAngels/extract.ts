@@ -57,7 +57,9 @@ interleaved mid-sentence.
 
 Your tasks, in order:
 
-1. Repair the French into "text.fr". Rejoin split words, drop the page furniture, and \
+1. Repair the French into "text.fr". This is the whole entry, and it is long: expect \
+roughly as many characters as the scan region you are given, typically 1200 to 2500. \
+Reproduce all of it. Rejoin split words, drop the page furniture, and \
 restore what Lenain wrote. Do NOT modernise his spelling, rewrite his sentences, \
 summarise, or add anything. Keep his paragraph breaks as blank lines. If the entry has \
 a footnote, put it last, on its own line, keeping its "(1)" marker.
@@ -127,6 +129,12 @@ async function extractOne(
 ): Promise<AngelExtraction> {
   const { object } = await generateObject({
     model,
+    // Restoring a scan is transcription, not reasoning, and thinking tokens
+    // come out of the same budget as the answer: left on, the model spent
+    // almost all of it thinking and truncated the French mid-sentence.
+    providerOptions: { anthropic: { thinking: { type: "disabled" } } },
+    // The two prose fields run past a thousand characters each.
+    maxOutputTokens: 16000,
     schema: angelExtraction,
     system: INSTRUCTIONS,
     prompt: promptFor(region),

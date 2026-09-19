@@ -23,8 +23,10 @@ const bilingual = z.object({
  * on. A floor turns that from a value we would have shipped into a retry.
  */
 const entryProse = z.object({
-  en: z.string().min(300),
+  // French first: the model is asked to repair it and then translate what it
+  // repaired, and a schema's field order is the order it writes them in.
   fr: z.string().min(300),
+  en: z.string().min(300),
 });
 
 export const angelExtraction = z.object({
