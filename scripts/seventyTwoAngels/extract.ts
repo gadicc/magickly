@@ -77,10 +77,16 @@ never "she". The genius itself he treats as « il »; keep that as "he".
 "governs", "bornUnder", "contrary") are short English summaries drawn from the entry, \
 one or two sentences each.
 
-Where the entry does not say something, leave that field as an empty string. An empty \
-string is a CORRECT answer and the expected one. Not every entry describes the people \
-born under its genius, names a nation, or cites a psalm — when it does not, say \
-nothing rather than assembling something plausible out of the rest of the entry. \
+"people" is the nation the genius rules. Nearly every entry names one, either as \
+« Il domine sur les Hébreux » or as « d'après la langue des Mongols ». Give the nation \
+alone, as a short noun phrase — "the Mongols", "Turkey" — never the sentence around \
+it, and never the name of God, which belongs in "godName". Where an entry gives a \
+godName it almost always gives a people too.
+
+Where the entry genuinely does not say something, leave that field as an empty string. \
+An empty string is a CORRECT answer. This applies most often to "bornUnder": plenty of \
+entries never describe the character of a person born under their genius, and for \
+those the field must be empty. Do not assemble one out of the rest of the entry. \
 Inventing a field is the worst thing you can do here, worse than leaving it blank.
 
 4. For "name.he", give the traditional five Hebrew letters — a triad of the Shem \
