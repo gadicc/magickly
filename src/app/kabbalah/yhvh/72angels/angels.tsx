@@ -282,9 +282,24 @@ function SevenyTwo() {
             <a href="/docs/Lenain%20-%20La%20Science%20Cabalistique%20(1823)%20-%20Google.txt">
               output.txt
             </a>
-            ), and translated with Google Translate. This was done in an effort
-            to provide a Copyright-free version of this material, however, a
-            much better translation exists:
+            ). That scan is damaged, so each entry was restored and then
+            translated from the restoration, one at a time, and checked against
+            Lenain&apos;s own four tables — which is how the handful of places
+            where the book contradicts itself came to light. The French shown
+            beside each translation is that restoration, so you can read what
+            the English was made from.
+          </p>
+          <p>
+            Lenain died in 1832, so his text is public domain, and no rights are
+            asserted over it. The restoration, the translation and the
+            arrangement are{" "}
+            <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>{" "}
+            with the rest of the{" "}
+            <a href="https://github.com/gadicc/magickly/tree/main/data">data</a>
+            , and no rights are claimed where none subsist. Nothing here draws
+            on any modern published translation. This was done in an effort to
+            provide a Copyright-free version of this material, however, a much
+            better translation exists:
           </p>
           <p>
             We highly recommend the{" "}
