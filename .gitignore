@@ -9,6 +9,9 @@
 /coverage
 /output/
 
+# generated data tables (data/build.mts)
+/data/dist/
+
 # next.js
 /.next/
 /out/

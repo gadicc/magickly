@@ -31,6 +31,8 @@ export default defineConfig({
   },
   test: {
     environment: "node",
+    // The data tables are generated; a test file run on its own builds them.
+    globalSetup: ["./data/build.mts"],
     exclude: [...configDefaults.exclude, "output/**"],
     coverage: {
       provider: "v8",
