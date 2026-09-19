@@ -24,8 +24,7 @@ import { type AngelRegion, findRegions } from "./source";
  */
 
 const DEFAULT_MODEL = "anthropic/claude-opus-5";
-/** Low, because the stronger models rate-limit under a sustained fan-out. */
-const CONCURRENCY = 2;
+const CONCURRENCY = 4;
 const OUT_DIR = "output/seventyTwoAngelsReview";
 
 const INSTRUCTIONS = `You are checking someone else's restoration of one entry from \

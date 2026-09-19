@@ -87,9 +87,12 @@ export function disagreements(angel: AngelExtraction): Disagreement[] {
   }
 
   if (scanned.choir) {
+    // The entry names a choir as "le chœur des trônes", so the reading is
+    // whether the name is in what was printed, not whether it is all of it.
     const choir = christianChoirs[choirOf(no) - 1];
     const accepted = [...names(choir.name.en), ...names(choir.name.fr)];
-    if (!accepted.includes(plain(scanned.choir)))
+    const printedChoir = plain(scanned.choir);
+    if (!accepted.some((name) => printedChoir.includes(name)))
       note("choir", scanned.choir, choir.name.en);
   }
 
