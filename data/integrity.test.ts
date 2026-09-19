@@ -41,7 +41,7 @@ const EXPECTED_WITHOUT_TABLE = [
 ];
 
 /** Tables the barrel never walks, because `insertRefs` skips arrays. */
-const EXPECTED_ARRAY_TABLES = ["house", "geomanicHouse"];
+const EXPECTED_ARRAY_TABLES = ["house"];
 
 interface Audit {
   resolved: string[];

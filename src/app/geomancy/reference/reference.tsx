@@ -223,11 +223,11 @@ export default function Geomancy() {
         </Typography>
 
         <div style={{ textAlign: "justify" }}>
-          {houses.slice(1).map((house, i) => (
-            <p key={i}>
+          {Object.values(houses).map((house) => (
+            <p key={house.id}>
               <b>
-                {i + 1}
-                {nth(i + 1)} House:
+                {house.id}
+                {nth(house.id)} House:
               </b>{" "}
               {house.meaning.en}
             </p>
@@ -245,8 +245,8 @@ export default function Geomancy() {
             <i> {tetragram.meaning.en}</i>
             <br />
             <ol>
-              {tetragram.meanings.slice(1).map((meaning, i) => (
-                <li key={i}>{meaning.en}</li>
+              {Object.entries(tetragram.meanings).map(([houseNo, meaning]) => (
+                <li key={houseNo}>{meaning.en}</li>
               ))}
             </ol>
           </div>

@@ -9,8 +9,7 @@ import data from "./data";
  * discover it later.
  *
  * The sampled row is each table's first, named so the sample is reproducible;
- * for the two array tables that is index `0`, which for the geomanic houses
- * is the `{}` that pads the array to one-based.
+ * for the astrology houses, which are still an array, that is index `0`.
  */
 const SAMPLE: Record<string, { row: string; keys: string[] }> = {
   planet: { row: "primum-mobile", keys: ["id", "name"] },
@@ -71,7 +70,7 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "element",
     ],
   },
-  geomanicHouse: { row: "0", keys: [] },
+  geomanicHouse: { row: "1", keys: ["id", "meaning"] },
   gdGrade: {
     row: "0=0",
     keys: ["id", "name", "orderId", "degreeId", "nextId"],

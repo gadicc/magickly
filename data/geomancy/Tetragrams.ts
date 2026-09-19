@@ -1,6 +1,7 @@
 import { ElementId } from "../alchemy/Elements";
 import { PlanetId } from "../astrology/Planets";
 import { ZodiacId } from "../astrology/Zodiac";
+import type { HouseId } from "./Houses";
 import _tetragrams from "./tetragrams.json5" with { type: "json" };
 
 type TetragramID =
@@ -29,7 +30,7 @@ interface Tetragram {
   title: LangObject;
   translation: LangObject;
   meaning: LangObject;
-  meanings: LangObject[];
+  meanings: Record<HouseId, LangObject>;
   zodiacId: ZodiacId | null;
   elementId: ElementId;
   rulerIds: string[]; // TODO

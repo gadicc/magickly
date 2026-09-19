@@ -1,77 +1,76 @@
 // The Golden Dawn Journal: Book 1: Divination, Ciceros, pg 162
 
-[
-  {},
-  {
+{
+  "1": {
     id: 1,
     meaning: {
       en: "Personality of the Querent, his life, health, habits, behavior and other personal characteristics.",
     },
   },
-  {
+  "2": {
     id: 2,
     meaning: {
       en: "Money, property, finances, possible theft through negligence or loss.",
     },
   },
-  {
+  "3": {
     id: 3,
     meaning: {
       en: "Communication, relatives by blood, letters, news, short journeys, writing, other pursuits associated with Mercury.",
     },
   },
-  {
+  "4": {
     id: 4,
     meaning: {
       en: "Home, inheritance, possessions, hidden treasure, environment, retirement, the conclusion of any matter. Information about theft or thieves.",
     },
   },
-  {
+  "5": {
     id: 5,
     meaning: {
       en: "Women, luxury, drinking, procreation, creation, artistic work. Gambling and speculation.",
     },
   },
-  {
+  "6": {
     id: 6,
     meaning: {
       en: "Employees, sickness, which body parts are most likely to suffer illness or injury. Domestic animals and close relatives other than immediate family.",
     },
   },
-  {
+  "7": {
     id: 7,
     meaning: {
       en: "Love, marriage, prostitution, partnerships. Public enemies, lawsuits, war opponents, thieves and dishonor.",
     },
   },
-  {
+  "8": {
     id: 8,
     meaning: {
       en: "Death, Wills, legacies. Poverty.",
     },
   },
-  {
+  "9": {
     id: 9,
     meaning: {
       en: "Long journeys, relationships with foreigners, science, the church, art, religion dreams and divinations.",
     },
   },
-  {
+  "10": {
     id: 10,
     meaning: {
       en: "Fame, reputation, honor, mother, trade authority.",
     },
   },
-  {
+  "11": {
     id: 11,
     meaning: {
       en: "Friends, social contacts, altruistic organizations.",
     },
   },
-  {
+  "12": {
     id: 12,
     meaning: {
       en: "Sorrow, hospitals, intrigue, prisons, restrictions, unseen dangers, fears.",
     },
   },
-]
+}

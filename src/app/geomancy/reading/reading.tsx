@@ -291,8 +291,7 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
   React.useEffect(
     () => {
       for (const interpretation of interpretations) {
-        const meaning =
-          interpretation.tetragram?.meanings[parseInt(houseNoStr)].en;
+        const meaning = interpretation.tetragram?.meanings[houseNoStr].en;
         const isGood = !!meaning?.match(/good|happy|success/i);
         interpretation.goodState[1](isGood);
       }
@@ -622,7 +621,7 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
             setHouseNoStr(event.target.value as string)
           }
         >
-          {houses.slice(1).map((house) => (
+          {Object.values(houses).map((house) => (
             <MenuItem key={house.id} value={house.id}>
               <div
                 style={{
@@ -671,7 +670,7 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
                   </div>
                 );
               })()}
-              {interpretation.tetragram?.meanings[parseInt(houseNoStr)].en}
+              {interpretation.tetragram?.meanings[houseNoStr].en}
             </div>
             <ToggleButtonGroup
               value={interpretation.goodState[0]}
