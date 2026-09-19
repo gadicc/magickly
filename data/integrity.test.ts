@@ -1,4 +1,6 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import type { PlanetId } from "./astrology/Planets";
 import { checkIntegrity, type Failure } from "./integrity";
 import { type Tables, tables } from "./tables";
 
@@ -13,8 +15,33 @@ import { type Tables, tables } from "./tables";
  *
  * The checks live in [integrity.ts](./integrity.ts) so that
  * [check.ts](./check.ts) can run them from the command line before a build.
- * Half of these tests break the data on purpose to prove each one bites.
+ * Half of these tests break the data on purpose to prove each one bites, and
+ * the last two are about that command rather than the data: that it says
+ * everything wrong at once, and that both builds run it.
  */
+
+/**
+ * What `PlanetId` means today: the planet rows, as against the three spheres
+ * of the Tree the table also holds. It is derived from carrying a `symbol`
+ * (plan 032, decisions), which is a fact of the data rather than a declared
+ * one, so the list is written out here and typed, and the test below says
+ * the derivation still picks exactly it. Step 3 gives the rows an explicit
+ * kind and this becomes redundant.
+ */
+const PLANETS: PlanetId[] = [
+  "sol",
+  "mercury",
+  "venus",
+  "earth",
+  "luna",
+  "mars",
+  "jupiter",
+  "saturn",
+  "uranus",
+  "neptune",
+  "rahu",
+  "ketu",
+];
 
 /** The real tables with one of them replaced by something wrong. */
 const broken = (name: keyof Tables, table: unknown) =>
@@ -40,7 +67,21 @@ describe("the data against the graph", () => {
       },
     });
     expect(of("undeclared", failures)).toEqual([
-      "kerub.wizardId: no link, pending target, external one or enumeration",
+      "kerub.earth.wizardId: no link, pending target, external one or enumeration",
+    ]);
+  });
+
+  it("names the row an undeclared field is on, not only the table", () => {
+    // Keter's row once spelled its key `archangelIdId` (`1cfdb0c`); the
+    // table it hid in has eleven rows, and the seventy-two have seventy-two.
+    // Two rows carry it here, and the first is the one named.
+    const failures = broken("sephirah", {
+      keter: tables.sephirah.keter,
+      chochmah: { ...tables.sephirah.chochmah, archangelIdId: "ratziel" },
+      binah: { ...tables.sephirah.binah, archangelIdId: "tzaphkiel" },
+    });
+    expect(of("undeclared", failures)).toEqual([
+      "sephirah.chochmah.archangelIdId: no link, pending target, external one or enumeration",
     ]);
   });
 
@@ -48,6 +89,28 @@ describe("the data against the graph", () => {
     const failures = broken("gdDegree", { "1st": { id: "1st" } });
     expect(of("not-in-the-data", failures)).toEqual([
       "gdDegree.pillarId: declared, but no row has it",
+    ]);
+  });
+
+  it("excuses an external field from that only where it is not id-shaped", () => {
+    // `enochianLetter`'s two are "planet/element" and "tarot", which no rule
+    // could find in the data; `tolPath.external["hermetic.tarotId"]` is
+    // id-shaped, so a typo in it has to fail the same way a link would.
+    const kept = broken("enochianLetter", {
+      A: { id: "A", enochian: "un", title: "Un", english: "A" },
+    });
+    expect(of("not-in-the-data", kept)).toEqual([]);
+
+    const noTarot = Object.fromEntries(
+      Object.entries(tables.tolPath).map(([id, path]) => {
+        const { hermetic, ...rest } = path as Record<string, unknown>;
+        if (!hermetic) return [id, rest];
+        const { tarotId, ...block } = hermetic as Record<string, unknown>;
+        return [id, { ...rest, hermetic: block }];
+      }),
+    );
+    expect(of("not-in-the-data", broken("tolPath", noTarot))).toEqual([
+      "tolPath.hermetic.tarotId: declared, but no row has it",
     ]);
   });
 
@@ -112,6 +175,13 @@ describe("the data against the graph", () => {
     ]);
   });
 
+  it("gives a symbol to exactly the twelve planets, and to no sphere", () => {
+    const withSymbol = Object.entries(tables.planet)
+      .filter(([, row]) => "symbol" in row)
+      .map(([id]) => id);
+    expect(withSymbol).toEqual(PLANETS);
+  });
+
   it("leaves only Da'at outside a chain", () => {
     // Folded in from the chain walk that came with step 1: the check itself
     // proves each chain whole, and this says which rows are not in one.
@@ -134,5 +204,28 @@ describe("the data against the graph", () => {
     expect(tables.alchemySymbol.sulphur.gdGrade).toBe(1);
     expect(tables.alchemyTerm.king.gdGrade).toBe(1);
     expect(checkIntegrity()).toEqual([]);
+  });
+});
+
+describe("pnpm data:check", () => {
+  it("says everything that is wrong, not the first thing", () => {
+    // What [check.ts](./check.ts) prints before it exits, and the reason it
+    // collects rather than throws: one run is meant to be the whole list.
+    const failures = broken("kerub", {
+      earth: { id: "earth", zodiacId: ["taurus"], elementId: "quintessence" },
+    });
+    expect([...new Set(failures.map((f) => f.check))].sort()).toEqual([
+      "arity",
+      "link",
+      "schema",
+    ]);
+  });
+
+  it("runs before both of the builds that read the data", () => {
+    const { scripts } = JSON.parse(
+      readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+    );
+    for (const task of ["build", "check:turbopack"])
+      expect(scripts[task]).toContain("pnpm data:check");
   });
 });

@@ -1,8 +1,10 @@
 /**
  * `pnpm data:check`: [the integrity checks](./integrity.ts) on the command
- * line, exiting non-zero on the first thing that is wrong. `pnpm build` runs
- * it after `data:build`, so a build stops before Next reads data the graph
- * disagrees with; `integrity.test.ts` is the same list in CI.
+ * line, printing everything that is wrong and then exiting non-zero if
+ * anything was, so that one run says the whole of it. `pnpm build` and
+ * `pnpm check:turbopack` run it after `data:build`, so a build stops before
+ * Next reads data the graph disagrees with; `integrity.test.ts` is the same
+ * list in CI.
  */
 import { checkIntegrity } from "./integrity";
 import { tables } from "./tables";

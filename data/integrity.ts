@@ -48,17 +48,25 @@ function rowsOf(table: unknown): Array<[string, Row]> {
     : Object.entries(table as Record<string, Row>);
 }
 
-/** Every id-shaped field the rows carry, a nested one by its dotted path. */
+/**
+ * Every id-shaped field the rows carry, a nested one by its dotted path,
+ * each against the first row that has it. A field with no `link` is reported
+ * against that row, because "some row of this table" is not enough to find a
+ * typo in a table of seventy-two.
+ */
 function idFields(table: unknown) {
-  const found = new Set<string>();
-  for (const [, row] of rowsOf(table))
+  const found = new Map<string, string>();
+  for (const [id, row] of rowsOf(table))
     for (const [key, value] of Object.entries(row)) {
-      if (isIdField(key)) found.add(key);
-      else if (plain(value))
-        for (const nested of Object.keys(value as Row))
-          if (isIdField(nested)) found.add(`${key}.${nested}`);
+      if (isIdField(key)) {
+        if (!found.has(key)) found.set(key, id);
+      } else if (plain(value))
+        for (const nested of Object.keys(value as Row)) {
+          const path = `${key}.${nested}`;
+          if (isIdField(nested) && !found.has(path)) found.set(path, id);
+        }
     }
-  return [...found];
+  return found;
 }
 
 /** Every field a table's spec accounts for, however it accounts for it. */
@@ -134,19 +142,25 @@ export function checkIntegrity(input: Tables = realTables): Failure[] {
     const declared = declaredFields(spec);
     const fields = idFields(table);
 
-    for (const field of fields)
+    for (const [field, row] of fields)
       if (!declared.includes(field))
         failures.push({
           check: "undeclared",
-          where: `${name}.${field}`,
+          where: `${name}.${row}.${field}`,
           detail: "no link, pending target, external one or enumeration",
         });
 
-    // An external field need not be id-shaped: that is how the polymorphic
-    // Enochian ones are parked.
+    // An `external` field is exempt only where it is not id-shaped, which is
+    // how the two polymorphic Enochian ones ("planet/element", "tarot") are
+    // parked. An id-shaped one must still be in the data, so that a typo in
+    // `tolPath.external["hermetic.tarotId"]` fails here rather than sitting
+    // in the graph naming nothing.
     const external = Object.keys(spec.external ?? {});
     for (const field of declared)
-      if (!fields.includes(field) && !external.includes(field))
+      if (
+        !fields.has(field) &&
+        !(external.includes(field) && !isIdField(field))
+      )
         failures.push({
           check: "not-in-the-data",
           where: `${name}.${field}`,
