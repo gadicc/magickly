@@ -7,32 +7,36 @@ import data from "./data";
  * pinned this against the barrel's in-place mutation; step 2 replaced that
  * mutation, and this is the delta, table by table.
  *
- * Five tables are new — `enochianTablet`, `gdDegree`, `christianChoir`,
- * `tribeOfIsrael` and `seventyTwoAngel` — because the barrel now holds every
- * table but the Enochian dictionary and the Keys. Of the rest:
+ * Two tables are new, `gdDegree` and `tribeOfIsrael`, both of them link
+ * targets the barrel never held. The barrel is 23 of the 26 tables:
+ * `seventyTwoAngel`, `enochianTablet` and `christianChoir` declare no link in
+ * either direction, so assembling them would add nothing to any row and only
+ * put their JSON in every barrel route's chunk ([data.ts](./data.ts)).
  *
- * - `planet` gains `hebrewLetter`, `godName` and `archangel`, which the
- *   mutation only made for rows that had the ids, and `sephirot`, derived.
- * - `zodiac` gains `tribeOfIsrael`, a link that was typed and never made.
- * - `house` gains `zodiac`: the astrology houses are an array, which the
- *   mutation skipped entirely.
- * - `tetragram` gains `planets`, a list the `Id` rule could not see.
- * - `gdGrade` gains `element`, `planet`, `sephirah` and `degree` — the last
- *   because `gd/degrees.json5` is a table now — and `next` and `prev`.
- * - `archangel` gains `sephirah`, a back-link the data stores both ways.
- * - `sephirah`, `tolPath` and `gdGrade` gain `next` and `prev`, which name
- *   their own table and so were invisible to a rule reading field names.
- * - `element` gains `tetragrams` and `zodiacs`, derived.
- * - `alchemySymbol` gains `planet`.
- * - `tolPath`'s `hermetic` and `hebrew` blocks gain `hebrewLetter` inside
- *   them, at the nesting level of the id.
+ * The old `insertRefs` did recurse into nested blocks, so these are the
+ * accessors it made and which are now an own key of every row of the table
+ * rather than only of the rows that carried the id: `planet.hebrewLetter`,
+ * `godName` and `archangel`; `gdGrade.element`, `planet` and `sephirah`;
+ * `archangel.sephirah`; `alchemySymbol.planet`; and `hebrewLetter` inside
+ * `tolPath`'s `hermetic` and `hebrew` blocks. What is genuinely new is:
+ *
+ * - `planet.sephirot`, `element.tetragrams` and `element.zodiacs`, derived
+ *   back-links nobody hand-maintains.
+ * - `zodiac.tribeOfIsrael`, typed since 2023 and never made: the tribes were
+ *   not in the barrel.
+ * - `house.zodiac`: the astrology houses are an array, which `insertRefs`
+ *   skipped entirely.
+ * - `tetragram.planets`, a list of ids, which the `Id` rule could not see.
+ * - `gdGrade.degree`, because `gd/degrees.json5` is a table now.
+ * - `next` and `prev` on `gdGrade`, `sephirah` and `tolPath`: a field naming
+ *   its own table is invisible to a rule that reads field names.
  *
  * Nothing is lost, and every accessor is on every row of its table, holding
  * `undefined` where the row has no id: Keter's `prev` below is the first of
  * those.
  *
  * The sampled row is each table's first, named so the sample is reproducible;
- * for the three array tables that is index `0`.
+ * for the one array table left in the barrel that is index `0`.
  */
 const SAMPLE: Record<string, { row: string; keys: string[] }> = {
   planet: {
@@ -80,7 +84,6 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "gematria",
     ],
   },
-  enochianTablet: { row: "earth", keys: ["id", "grid"] },
   tetragram: {
     row: "acquisitio",
     keys: [
@@ -122,7 +125,6 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
     keys: ["id", "name", "planetId", "planet", "sephirah"],
   },
   angelicOrder: { row: "chayot-hakodesh", keys: ["name"] },
-  christianChoir: { row: "0", keys: ["id", "name"] },
   fourWorlds: {
     row: "atzilut",
     keys: ["id", "name", "desc", "residentsTitle"],
@@ -169,22 +171,6 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
   },
   soul: { row: "yechidah", keys: ["id", "name"] },
   tribeOfIsrael: { row: "reuben", keys: ["id", "name"] },
-  seventyTwoAngel: {
-    row: "0",
-    keys: [
-      "no",
-      "name",
-      "printedPages",
-      "attribute",
-      "people",
-      "godName",
-      "psalm",
-      "invokedFor",
-      "governs",
-      "bornUnder",
-      "contrary",
-    ],
-  },
   chakra: {
     row: "root",
     keys: [
