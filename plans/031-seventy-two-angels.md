@@ -285,6 +285,40 @@ has neither name nor attribute. The attribute is empty, which is honest. The
 name cannot be, and the model has offered "Yeiayel" and "Yezalel" on different
 runs, the second being the thirteenth's name.
 
+## Reading the scan instead of its OCR
+
+The sidecar could not give us the Hebrew, and no amount of prompting was going
+to change that: it renders Lenain's Hebrew as scrambled Latin, so the names
+were being reconstructed rather than read. At 200 dpi the scan behind it is
+clean, and the first genius's name is `והויה`, letter for letter.
+
+It settles more than the Hebrew. "inclusivement" is plainly that, where the OCR
+broke it across lines as `-מ1 / clusivement`. "31 avril" is plainly printed, so
+the impossible date is Lenain's and not the scanner's. And the twenty-second's
+heading, which the OCR lost at a page break, is simply there.
+
+Each page is read into JSON5 — prose in blocks, footnotes kept apart from the
+sentences they were printed under, tables kept as tables, running heads and the
+Google watermark marked as furniture so nothing is silently dropped — and
+Markdown is generated from that. The PDF stays out of the repository;
+`LENAIN_PDF` points at a copy.
+
+### Still to do with it
+
+1. Re-run the angel extraction against the transcription rather than the OCR,
+   which should collapse both the disagreement list and the corrections file.
+2. Take the Hebrew names from it, and the twenty-second's name and attribute.
+3. Adjudicate the remaining disagreements: with the page readable, "14 aoüt"
+   can be shown to be the scan misreading or Lenain misprinting.
+4. The four cabalistic tables and the sacred calendar, printed pages 25-44.
+   The first of them — 72 rows of name, nation and divine name — survives in
+   the OCR only for its last ten rows, and is an independent third source for
+   exactly the fields that have been hardest to pin down.
+5. Read the remaining pages, so the whole book is transcribed rather than the
+   chapter.
+6. **Publish it.** A searchable, linkable, indexable edition of the book on the
+   site, generated from the JSON5 — the last of these, once the rest is done.
+
 ## Follow-ups
 
 - **Sigils.** The page promises them. Vaughan's blog images are his own work and
