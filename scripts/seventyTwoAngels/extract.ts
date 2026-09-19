@@ -66,6 +66,11 @@ a footnote, put it last, on its own line, keeping its "(1)" marker.
 the French you just repaired. Do not draw on any modern published translation of this \
 work. Match Lenain's register: plain, a little archaic, not smoothed out.
 
+Grammatical gender is not a statement about a person. Every entry describes « la \
+personne qui est née sous cette influence », and Lenain then writes « elle » because \
+that noun is feminine — not because the person is a woman. Translate those as "they", \
+never "she". The genius itself he treats as « il »; keep that as "he".
+
 3. Fill the structured fields from the entry. The prose fields ("invokedFor", \
 "governs", "bornUnder", "contrary") are short English summaries drawn from the entry, \
 one or two sentences each.

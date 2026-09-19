@@ -54,7 +54,7 @@ so with an empty issues array and the verdict "clean".
 
 Use "rework" only where the entry is wrong enough to be worth extracting again; \
 "minor" for small fixes; "clean" for none. Where you are confident of the correct \
-value, put it in "suggested".`;
+value, put it in "suggested"; where you are not, make it an empty string.`;
 
 function promptFor(region: AngelRegion) {
   const angel = readExtraction(region.no);

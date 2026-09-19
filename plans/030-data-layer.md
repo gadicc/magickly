@@ -255,9 +255,54 @@ which is the class of silence this removes.
 
 Run at xhigh by Opus 5 against the repo's TypeScript 6.0.3 and tsconfig
 (`strict: false`, `strictNullChecks: true`), on JSON converted from the real
-data with the renames applied; the spike files are in the session scratchpad
-(`scratchpad/spike/`: `graph.ts`, `types.ts`, `assemble.ts`,
-`assertions.ts`, `run.ts`, `report.md`) and the implementation lifts them.
+data with the renames applied. The spike itself was not kept; the form that
+worked is recorded here and step 2 rebuilds from it.
+
+```ts
+// One flat mapped type per row. The key set comes from the JSON and the
+// graph literal only — it never recurses — so the recursion lives in
+// property positions, which TypeScript instantiates lazily.
+type RowKeys<I, T extends TableName> =
+  | UnionKeys<Rows<Tables[T]>>            // own fields, unioned across rows
+  | (keyof TopLinks<T, I> & string)       // link accessors whose target is in I
+  | (keyof Inverses<T, I> & string);      // derived back-links whose source is in I
+
+export type Row<I, T extends TableName> = {
+  [K in RowKeys<I, T>]: K extends keyof TopLinks<T, I>
+    ? LinkValue<I, T, Lookup<TopLinks<T, I>, K>>
+    : K extends keyof Inverses<T, I>
+      ? InverseValue<I, Lookup<Inverses<T, I>, K>>
+      : K extends NestKey<T>
+        ? NestValue<I, T, K>
+        : Simplify<UnionField<Rows<Tables[T]>, K>>;
+};
+
+// Uniform rows per table: union the keys, `undefined` where a row lacks one.
+type UnionKeys<RU> = RU extends unknown ? keyof RU & string : never;
+type UnionField<RU, K> = RU extends unknown ? (K extends keyof RU ? RU[K] : undefined) : never;
+
+// TS refuses to index a deferred key-remapped mapped type with a constrained
+// key (TS2536); inside a one-parameter helper the key is naked and it works.
+type Lookup<M, K> = K extends keyof M ? M[K] : never;
+
+// Accessor from the field name; anchored at the end, so `Ids` never matches `Id`.
+type AccessorName<F extends string, D> = D extends { as: infer A extends string } ? A
+  : F extends `${infer B}Ids` ? `${B}s`
+  : F extends `${infer B}Id` ? B
+  : never;
+
+export type Assembled<I extends TableName | "*"> = { [T in Included<I>]: Table<I, T> };
+export function assemble(t: Tables): Assembled<"*">;
+export function assemble<K extends TableName>(t: Pick<Tables, K>): Assembled<K>;
+```
+
+`Graph` and `Tables` are bound into the module, not passed as type
+parameters, and `"*"` stands for "every table" — see below for why. The
+runtime is ~130 lines: `structuredClone` each row, index by id, attach
+accessors per the graph (nested paths, lists, absent | `null` → `undefined`),
+fill inverses, deep-freeze through a `WeakSet`, cache by sorted table set,
+and collect data problems (`dangling`, `inverse-not-unique`,
+`accessor-collision`) rather than throw.
 
 The recursive `Assembled` type worked in the first form tried: one flat
 mapped type per row over a pre-computed key union, so the key set never

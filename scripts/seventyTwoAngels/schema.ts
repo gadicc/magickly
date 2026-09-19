@@ -93,8 +93,11 @@ export const angelReview = z.object({
       field: z.string().min(1),
       severity: z.enum(["minor", "major"]),
       what: z.string().min(1),
-      /** A corrected value, where the reviewer is confident of one. */
-      suggested: z.string().optional(),
+      /**
+       * A corrected value, or "" where the reviewer is not sure of one.
+       * Not optional: OpenAI's structured output requires every property.
+       */
+      suggested: z.string(),
     }),
   ),
 });
