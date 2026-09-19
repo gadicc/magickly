@@ -29,7 +29,7 @@
     soulId: "yechidah",
     angelicOrderId: "chayot-hakodesh",
     gdGradeId: "10=1",
-    next: "chochmah",
+    nextId: "chochmah",
   },
 
   chochmah: {
@@ -62,8 +62,8 @@
     soulId: "chaya",
     angelicOrderId: "auphanim",
     gdGradeId: "9=2",
-    prev: "keter",
-    next: "binah",
+    prevId: "keter",
+    nextId: "binah",
   },
 
   binah: {
@@ -92,8 +92,8 @@
     soulId: "neshama",
     angelicOrderId: "aralim",
     gdGradeId: "8=3",
-    prev: "chochmah",
-    next: "hesed",
+    prevId: "chochmah",
+    nextId: "hesed",
   },
 
   hesed: {
@@ -122,8 +122,8 @@
     soulId: null,
     angelicOrderId: "chashmalim",
     gdGradeId: "7=4",
-    prev: "binah",
-    next: "gevurah",
+    prevId: "binah",
+    nextId: "gevurah",
   },
 
   gevurah: {
@@ -151,8 +151,8 @@
     soulId: null,
     angelicOrderId: "seraphim",
     gdGradeId: "6=5",
-    prev: "hesed",
-    next: "tiferet",
+    prevId: "hesed",
+    nextId: "tiferet",
   },
 
   tiferet: {
@@ -180,8 +180,8 @@
     soulId: "ruach",
     angelicOrderId: "malachim",
     gdGradeId: "5=6",
-    prev: "gevurah",
-    next: "netzach",
+    prevId: "gevurah",
+    nextId: "netzach",
   },
 
   netzach: {
@@ -209,8 +209,8 @@
     soulId: null,
     angelicOrderId: "elohim",
     gdGradeId: "4=7",
-    prev: "tiferet",
-    next: "hod",
+    prevId: "tiferet",
+    nextId: "hod",
   },
 
   hod: {
@@ -238,8 +238,8 @@
     soulId: null,
     angelicOrderId: "bnei-elohim",
     gdGradeId: "3=8",
-    prev: "netzach",
-    next: "yesod",
+    prevId: "netzach",
+    nextId: "yesod",
   },
 
   yesod: {
@@ -268,8 +268,8 @@
     soulId: "nephesh",
     angelicOrderId: "kerubim",
     gdGradeId: "2=9",
-    prev: "hod",
-    next: "malchut",
+    prevId: "hod",
+    nextId: "malchut",
   },
 
   malchut: {
@@ -303,7 +303,7 @@
     soulId: "guph",
     angelicOrderId: "ishim",
     gdGradeId: "1=10",
-    prev: "yesod",
+    prevId: "yesod",
   },
 
   daat: {

@@ -4,7 +4,7 @@
     name: "Neophyte",
     orderId: "1st",
     degreeId: "1st",
-    next: "1=10",
+    nextId: "1=10",
   },
 
   "1=10": {
@@ -15,8 +15,8 @@
     orderId: "1st",
     degreeId: "1st",
     sephirahId: "malchut",
-    prev: "0=0",
-    next: "2=9",
+    prevId: "0=0",
+    nextId: "2=9",
   },
 
   "2=9": {
@@ -27,8 +27,8 @@
     orderId: "1st",
     degreeId: "1st",
     sephirahId: "yesod",
-    prev: "1=10",
-    next: "3=8",
+    prevId: "1=10",
+    nextId: "3=8",
   },
 
   "3=8": {
@@ -39,8 +39,8 @@
     orderId: "1st",
     degreeId: "1st",
     sephirahId: "hod",
-    prev: "2=9",
-    next: "4=7",
+    prevId: "2=9",
+    nextId: "4=7",
   },
 
   "4=7": {
@@ -51,8 +51,8 @@
     orderId: "1st",
     degreeId: "1st",
     sephirahId: "netzach",
-    prev: "3=8",
-    next: "portal",
+    prevId: "3=8",
+    nextId: "portal",
   },
 
   portal: {
@@ -60,8 +60,8 @@
     name: "Portal",
     elementId: "spirit",
     degreeId: "2nd",
-    prev: "4=7",
-    next: "5=6",
+    prevId: "4=7",
+    nextId: "5=6",
   },
 
   "5=6": {
@@ -71,8 +71,8 @@
     orderId: "2nd",
     degreeId: "3rd",
     sephirahId: "tiferet",
-    prev: "portal",
-    next: "6=5",
+    prevId: "portal",
+    nextId: "6=5",
   },
 
   "6=5": {
@@ -82,8 +82,8 @@
     orderId: "2nd",
     degreeId: "3rd",
     sephirahId: "gevurah",
-    prev: "5=6",
-    next: "7=4",
+    prevId: "5=6",
+    nextId: "7=4",
   },
 
   "7=4": {
@@ -93,8 +93,8 @@
     orderId: "2nd",
     degreeId: "3rd",
     sephirahId: "hesed",
-    prev: "6=5",
-    next: "8=3",
+    prevId: "6=5",
+    nextId: "8=3",
   },
 
   "8=3": {
@@ -103,8 +103,8 @@
     planetId: "saturn",
     orderId: "3rd",
     sephirahId: "binah",
-    prev: "7=4",
-    next: "9=2",
+    prevId: "7=4",
+    nextId: "9=2",
   },
 
   "9=2": {
@@ -112,8 +112,8 @@
     name: "Magus",
     orderId: "3rd",
     sephirahId: "chochmah",
-    prev: "8=3",
-    next: "10=1",
+    prevId: "8=3",
+    nextId: "10=1",
   },
 
   "10=1": {
@@ -121,6 +121,6 @@
     name: "Ipsissimus",
     orderId: "3rd",
     sephirahId: "keter",
-    prev: "9=2",
+    prevId: "9=2",
   },
 }

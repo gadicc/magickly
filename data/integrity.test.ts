@@ -29,12 +29,16 @@ const EXPECTED_LISTS = ["tetragram.planetIds"];
  * Id-shaped fields named after no table in the barrel. They are not failures:
  * the spirits, intelligences and rulers have no table yet, the tarot deck is
  * its own module, the tribes are not exported by the barrel, and a grade's
- * order and degree are enumerations rather than links.
+ * order and degree are enumerations rather than links. `nextId` and `prevId`
+ * point into their own table, which a rule reading the field name cannot
+ * express; step 2's graph names their target, and chains.test.ts walks them.
  */
 const EXPECTED_WITHOUT_TABLE = [
   "degreeId",
   "intelligenceId",
+  "nextId",
   "orderId",
+  "prevId",
   "rulerIds",
   "spiritId",
   "tarotId",

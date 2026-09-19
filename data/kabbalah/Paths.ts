@@ -16,6 +16,11 @@ interface Path {
     hebrewLetter?: HebrewLetter;
     hebrewLetterId: HebrewLetterId;
   };
+  // The chain runs in hermetic path order and ends with the two paths the
+  // Hermetic tradition does not number, so its first and last row have one
+  // neighbour each.
+  nextId?: PathId;
+  prevId?: PathId;
 }
 
 type Paths = Record<PathId, Path>;

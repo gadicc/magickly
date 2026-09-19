@@ -44,8 +44,8 @@ interface Sephirah {
   angelicOrderId: AngelicOrderId;
   angelicOrder?: AngelicOrder;
   gdGradeId: string;
-  next?: SephirahId;
-  prev?: SephirahId;
+  nextId?: SephirahId;
+  prevId?: SephirahId;
 }
 
 type Sephirot = Record<SephirahId, Sephirah>;

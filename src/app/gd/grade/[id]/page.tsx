@@ -50,8 +50,8 @@ export default async function Grade({ params }: PageProps<"/gd/grade/[id]">) {
         <Box sx={{ my: 4 }}>
           <div className="nav">
             <div className="prevNext">
-              {grade.prev && (
-                <Link href={grade.prev} underline="none">
+              {grade.prevId && (
+                <Link href={grade.prevId} underline="none">
                   ❮
                 </Link>
               )}
@@ -68,8 +68,8 @@ export default async function Grade({ params }: PageProps<"/gd/grade/[id]">) {
               )}
             </div>
             <div className="prevNext">
-              {grade.next && (
-                <Link href={grade.next} underline="none">
+              {grade.nextId && (
+                <Link href={grade.nextId} underline="none">
                   ❯
                 </Link>
               )}

@@ -31,8 +31,9 @@ interface GDGrade {
   degreeId: "1st" | "2nd" | "3rd";
   sephirah?: Sephirah;
   sephirahId: SephirahId;
-  prev: GDGradeId;
-  next: GDGradeId;
+  // The Neophyte has no grade before it, and the Ipsissimus none after.
+  prevId?: GDGradeId;
+  nextId?: GDGradeId;
 }
 
 const grades: GDGrades = _grades as GDGrades;

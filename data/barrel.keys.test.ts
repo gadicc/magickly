@@ -72,7 +72,10 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
     ],
   },
   geomanicHouse: { row: "0", keys: [] },
-  gdGrade: { row: "0=0", keys: ["id", "name", "orderId", "degreeId", "next"] },
+  gdGrade: {
+    row: "0=0",
+    keys: ["id", "name", "orderId", "degreeId", "nextId"],
+  },
   archangel: { row: "cassiel", keys: ["id", "name", "planetId", "planet"] },
   angelicOrder: { row: "chayot-hakodesh", keys: ["name"] },
   fourWorlds: {
@@ -103,7 +106,7 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "soulId",
       "angelicOrderId",
       "gdGradeId",
-      "next",
+      "nextId",
       "chakra",
       "godName",
       "planet",
@@ -113,7 +116,7 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "gdGrade",
     ],
   },
-  tolPath: { row: "1_2", keys: ["id", "hermetic", "hebrew"] },
+  tolPath: { row: "1_2", keys: ["id", "hermetic", "hebrew", "nextId"] },
   soul: { row: "yechidah", keys: ["id", "name"] },
   chakra: {
     row: "root",

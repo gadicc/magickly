@@ -16,7 +16,7 @@ export default function Path({ id }: { id: string }) {
   if (!path) return null;
 
   const otherLabels = Object.keys(path).filter(
-    (x) => !["id", "hermetic", "hebrew"].includes(x),
+    (x) => !["id", "hermetic", "hebrew", "nextId", "prevId"].includes(x),
   );
 
   const [from, to] = path.id
@@ -43,6 +43,18 @@ export default function Path({ id }: { id: string }) {
           line-height: 0.8em;
         }
 
+        div.nav {
+          display: table;
+          width: 100%;
+        }
+        div.nav > div {
+          display: table-cell;
+          vertical-align: middle;
+        }
+        div.prevNext {
+          font-size: 150%;
+        }
+
         table.main {
           width: 100%;
           border-collapse: separate;
@@ -57,8 +69,8 @@ export default function Path({ id }: { id: string }) {
         <Box sx={{ my: 4 }}>
           <div className="nav">
             <div className="prevNext">
-              {"prev" in path && (
-                <Link href={path.prev as string} underline="none">
+              {path.prevId && (
+                <Link href={path.prevId} underline="none">
                   ❮
                 </Link>
               )}
@@ -67,8 +79,8 @@ export default function Path({ id }: { id: string }) {
               <TreeOfLife height="150px" topText="" activePath={path.id} />
             </div>
             <div className="prevNext">
-              {"next" in path && (
-                <Link href={path.next as string} underline="none">
+              {path.nextId && (
+                <Link href={path.nextId} underline="none">
                   ❯
                 </Link>
               )}

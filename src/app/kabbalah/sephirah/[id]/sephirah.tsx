@@ -15,6 +15,7 @@ export default function Sephirah({ id }: { id: string }) {
   const sephirah = sephirot.find((sephirah) => sephirah.id === id);
   if (!sephirah) return null;
 
+  // Everything the page does not lay out itself, listed as it comes.
   const otherLabels = Object.keys(sephirah).filter(
     (x) =>
       ![
@@ -29,6 +30,8 @@ export default function Sephirah({ id }: { id: string }) {
         "chakraId",
         "gdGrade",
         "gdGradeId",
+        "nextId",
+        "prevId",
       ].includes(x),
   );
 
@@ -122,8 +125,8 @@ export default function Sephirah({ id }: { id: string }) {
 
           <div className="nav">
             <div className="prevNext">
-              {sephirah.prev && (
-                <Link href={sephirah.prev} underline="none">
+              {sephirah.prevId && (
+                <Link href={sephirah.prevId} underline="none">
                   ❮
                 </Link>
               )}
@@ -132,8 +135,8 @@ export default function Sephirah({ id }: { id: string }) {
               <TreeOfLife height="150px" topText="" active={sephirah.id} />
             </div>
             <div className="prevNext">
-              {sephirah.next && (
-                <Link href={sephirah.next} underline="none">
+              {sephirah.nextId && (
+                <Link href={sephirah.nextId} underline="none">
                   ❯
                 </Link>
               )}
