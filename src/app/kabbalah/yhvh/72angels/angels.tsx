@@ -281,11 +281,11 @@ function SevenyTwo() {
       <Container sx={{ fontSize: "80%", textAlign: "justify" }}>
         Magick.ly is open-source. You can see the code used to generate this
         page{" "}
-        <a href="https://github.com/gadicc/magick.ly/blob/master/pages/kabbalah/yhvh/72angels.tsx">
+        <a href="https://github.com/gadicc/magickly/blob/main/src/app/kabbalah/yhvh/72angels/angels.tsx">
           here
         </a>
         . Additionally, see the{" "}
-        <a href="https://github.com/gadicc/magick.ly/blob/master/data/kabbalah/seventyTwoAngels.json5">
+        <a href="https://github.com/gadicc/magickly/blob/main/data/kabbalah/seventyTwoAngels.json5">
           data file
         </a>{" "}
         and{" "}
