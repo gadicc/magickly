@@ -21,9 +21,10 @@ import {
 } from "@mui/material";
 import React from "react";
 import zodiacs from "@/../data/astrology/Zodiac";
-import angelicOrders from "@/../data/kabbalah/AngelicOrders";
+import christianChoirs from "@/../data/kabbalah/ChristianChoirs";
 import angels, { type Angel } from "@/../data/kabbalah/SeventyTwoAngels";
 import {
+  choirOf,
   governedDaysOf,
   type MonthDay,
   presidingDaysOf,
@@ -97,8 +98,7 @@ function Angel({
   no: number;
   astrologySystem: AstrologySystem;
 }) {
-  const angelicOrder =
-    angel.angelicOrderId && angelicOrders[angel.angelicOrderId];
+  const choir = christianChoirs[choirOf(no) - 1];
 
   return (
     <Accordion>
@@ -137,16 +137,12 @@ function Angel({
                 </TableCell>
                 <TableCell>{angel.attribute.en}</TableCell>
               </TableRow>
-              {angelicOrder && (
-                <TableRow>
-                  <TableCell component="th" scope="row">
-                    Angelic order:
-                  </TableCell>
-                  <TableCell>
-                    {angelicOrder.name.roman} | {angelicOrder.name.he}
-                  </TableCell>
-                </TableRow>
-              )}
+              <TableRow>
+                <TableCell component="th" scope="row">
+                  Choir:
+                </TableCell>
+                <TableCell>{choir.name.en}</TableCell>
+              </TableRow>
               <TableRow>
                 <TableCell>Governs:</TableCell>
                 <TableCell>

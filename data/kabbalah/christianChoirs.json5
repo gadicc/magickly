@@ -1,0 +1,42 @@
+// The nine choirs of Pseudo-Dionysius, in the order Lenain declares them
+// through the 72 genii, with his own French beside them. These are not the ten
+// Kabbalistic orders in angelicOrders.json5, which belong to the sephirot and
+// overlap these in only three places.
+[
+  {
+    id: "seraphim",
+    name: { en: "Seraphim", fr: "Séraphins" },
+  },
+  {
+    id: "cherubim",
+    name: { en: "Cherubim", fr: "Chérubins" },
+  },
+  {
+    id: "thrones",
+    name: { en: "Thrones", fr: "Trônes" },
+  },
+  {
+    id: "dominations",
+    name: { en: "Dominations", fr: "Dominations" },
+  },
+  {
+    id: "powers",
+    name: { en: "Powers", fr: "Puissances" },
+  },
+  {
+    id: "virtues",
+    name: { en: "Virtues", fr: "Vertus" },
+  },
+  {
+    id: "principalities",
+    name: { en: "Principalities", fr: "Principautés" },
+  },
+  {
+    id: "archangels",
+    name: { en: "Archangels", fr: "Archanges" },
+  },
+  {
+    id: "angels",
+    name: { en: "Angels", fr: "Anges" },
+  },
+]

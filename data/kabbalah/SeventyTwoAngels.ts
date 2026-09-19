@@ -5,8 +5,6 @@ interface Angel {
   text: { en: string; fr: string };
   attribute: { en: string };
   godName?: string;
-  angelicOrderId: string;
-  // angelicOrder: AngelicOrder;
 }
 
 type Angels = Angel[];
