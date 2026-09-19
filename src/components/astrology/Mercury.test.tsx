@@ -16,15 +16,19 @@ afterEach(() => {
   Settings.defaultZone = defaultZone;
 });
 
-/** Lets the widget's dynamic import and its state update settle. */
+/**
+ * Lets the widget's dynamic import and its state update settle. The import
+ * pulls in the ephemeris, which takes longer than half a second when the
+ * whole suite is running, so the wait is generous.
+ */
 async function settle(container: HTMLElement) {
-  for (let tries = 0; tries < 50; tries++) {
+  for (let tries = 0; tries < 300; tries++) {
     if (container.textContent?.trim()) return;
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 10));
     });
   }
-  throw new Error("The widget's label stayed blank for 500ms");
+  throw new Error("The widget's label stayed blank for 3s");
 }
 
 describe("MercuryWidget", () => {
