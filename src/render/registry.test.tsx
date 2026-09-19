@@ -38,11 +38,12 @@ describe("component image registry", () => {
     const image = await render("tree-of-life", reference);
     expect(image.identity.profile).toBe(TREE_IMAGE_PROFILE);
     expect(image.identity.fonts).toHaveLength(5);
-    // Profile v2: the v1 bytes recorded in plans/009 (142,962, 00c82f49…)
-    // changed when Keter, Chochmah and Malchut gained their archangels.
-    expect(image.byteSize).toBe(151_079);
+    // Profile v3: v1 was 142,962 bytes (plans/009), v2 151,079 once Keter,
+    // Chochmah and Malchut gained their archangels, and v3 is shorter again
+    // because the path data is rounded to three decimals (plans/030).
+    expect(image.byteSize).toBe(150_736);
     expect(image.sha256).toBe(
-      "b66fab61bf2f1c4015440bff9d6875a380b48cb1159d69f75c8b50459b6cfed5",
+      "96516a75ce13374a234de855bf596ce1a50d1e9adf7340b398e4b3a2b7e4858a",
     );
     expect(await validate(image.bytes)).toMatchObject({ status: "validated" });
   });

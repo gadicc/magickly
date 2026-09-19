@@ -1,6 +1,7 @@
 import React from "react";
 
 import Data from "@/../data/data";
+import { svgCoordinate } from "../svgCoordinate";
 import { readFieldPath } from "./fieldPath";
 
 const _sephirot = Object.values(Data.sephirah);
@@ -59,6 +60,11 @@ const orderedPaths = {
   ],
 };
 
+/** `x,y` for SVG path data, rounded so every engine writes the same digits. */
+function point(x: number, y: number) {
+  return `${svgCoordinate(x)},${svgCoordinate(y)}`;
+}
+
 function LineOutline({ x1, y1, x2, y2, offset = 5, ...args }) {
   const theta = Math.PI / 2 - Math.atan((x2 - x1) / (y2 - y1));
   const xd = Math.sin(theta) * offset;
@@ -68,8 +74,8 @@ function LineOutline({ x1, y1, x2, y2, offset = 5, ...args }) {
     <path
       {...args}
       d={
-        `M ${x1 - xd},${y1 + yd} L ${x1 + xd},${y1 - yd} ` +
-        `L ${x2 + xd},${y2 - yd} L ${x2 - xd},${y2 + yd} z`
+        `M ${point(x1 - xd, y1 + yd)} L ${point(x1 + xd, y1 - yd)} ` +
+        `L ${point(x2 + xd, y2 - yd)} L ${point(x2 - xd, y2 + yd)} z`
       }
     />
   );
@@ -529,7 +535,10 @@ function TreeOfLife({
                         strokeWidth: 1.568,
                       }}
                       opacity={sephirahOpacity(s)}
-                      d={`M ${s.x},${s.y} L ${from.x},${from.y} A ${r},${r} 0 0,1 ${to.x},${to.y} z`}
+                      d={
+                        `M ${point(s.x, s.y)} L ${point(from.x, from.y)} ` +
+                        `A ${r},${r} 0 0,1 ${point(to.x, to.y)} z`
+                      }
                     />,
                   );
                 }
@@ -636,10 +645,9 @@ function TreeOfLife({
                   <path
                     id={"topTextPath" + i}
                     d={
-                      `M ${s.x - radius},${
-                        s.y
-                      } c ${xValueInset},-${yValueOffset} ` +
-                      `${diameter - xValueInset},-${yValueOffset} ${diameter},0`
+                      `M ${point(s.x - radius, s.y)} ` +
+                      `c ${point(xValueInset, -yValueOffset)} ` +
+                      `${point(diameter - xValueInset, -yValueOffset)} ${diameter},0`
                     }
                     style={{ fill: "none", stroke: "none" }}
                   />
@@ -674,10 +682,9 @@ function TreeOfLife({
                   <path
                     id={"bottomTextPath" + i}
                     d={
-                      `M ${s.x - radius},${
-                        s.y
-                      } c ${xValueInset},${yValueOffset} ` +
-                      `${diameter - xValueInset},${yValueOffset} ${diameter},0`
+                      `M ${point(s.x - radius, s.y)} ` +
+                      `c ${point(xValueInset, yValueOffset)} ` +
+                      `${point(diameter - xValueInset, yValueOffset)} ${diameter},0`
                     }
                     style={{ fill: "none", stroke: "none" }}
                   />
