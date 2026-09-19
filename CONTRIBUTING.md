@@ -2,7 +2,7 @@
 
 Bug reports, fixes, data corrections and new correspondences are all welcome.
 Open an issue or a pull request at
-[github.com/gadicc/magick.ly](https://github.com/gadicc/magick.ly).
+[github.com/gadicc/magickly](https://github.com/gadicc/magickly).
 
 ## Licensing of contributions
 

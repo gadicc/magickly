@@ -1,12 +1,12 @@
 import { Box } from "@mui/material";
 import React from "react";
 
-const github = "https://github.com/gadicc/magick.ly/";
+const github = "https://github.com/gadicc/magickly/";
 function url(str: string) {
   if (str.startsWith("http")) return str;
   return (
     github +
-    "blob/master/" +
+    "blob/main/" +
     str
       .replace(/^@\//, "src/")
       .replace(/^@magick-data\//, "data/")

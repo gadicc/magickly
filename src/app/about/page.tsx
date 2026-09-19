@@ -7,8 +7,8 @@ export const metadata = pageMetadata("/about");
 // The AGPL asks that whoever uses this app can get the source it runs.
 const commit = process.env.VERCEL_GIT_COMMIT_SHA;
 const sourceUrl = commit
-  ? `https://github.com/gadicc/magick.ly/tree/${commit}`
-  : "https://github.com/gadicc/magick.ly";
+  ? `https://github.com/gadicc/magickly/tree/${commit}`
+  : "https://github.com/gadicc/magickly";
 
 export default function Sequence() {
   return (
@@ -36,8 +36,8 @@ export default function Sequence() {
         <p>
           For questions, comments, feature requests, source code or to get
           involved, see{" "}
-          <a href="https://github.com/gadicc/magick.ly">
-            github.com/gadicc/magick.ly
+          <a href="https://github.com/gadicc/magickly">
+            github.com/gadicc/magickly
           </a>
           .
         </p>
@@ -51,14 +51,14 @@ export default function Sequence() {
             </li>
             <li>
               Publish useful magick{" "}
-              <a href="https://github.com/gadicc/magick.ly/tree/master/data">
+              <a href="https://github.com/gadicc/magickly/tree/main/data">
                 data
               </a>{" "}
               in JSON format with types.
             </li>
             <li>
               Publish useful magick{" "}
-              <a href="https://github.com/gadicc/magick.ly/tree/master/src/components">
+              <a href="https://github.com/gadicc/magickly/tree/main/src/components">
                 react components
               </a>
               .
@@ -85,14 +85,12 @@ export default function Sequence() {
 
         <p>
           Two parts are deliberately freer. The{" "}
-          <a href="https://github.com/gadicc/magick.ly/tree/master/data">
-            data
-          </a>{" "}
+          <a href="https://github.com/gadicc/magickly/tree/main/data">data</a>{" "}
           is{" "}
           <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>,
           as are the images this app draws, such as the Tree of Life, sigils,
           tablets and lamens: use them anywhere, with credit. The marked{" "}
-          <a href="https://github.com/gadicc/magick.ly/tree/master/src/components">
+          <a href="https://github.com/gadicc/magickly/tree/main/src/components">
             components
           </a>{" "}
           are MIT.
