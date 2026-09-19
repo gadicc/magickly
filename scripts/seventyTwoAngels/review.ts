@@ -16,7 +16,11 @@ import { type AngelRegion, findRegions } from "./source";
  *
  *   pnpm exec loom env -- pnpm exec tsx scripts/seventyTwoAngels/review.ts
  *   … --only 22,42            just those genii
- *   … --model anthropic/claude-fable-5.1
+ *   … --model anthropic/claude-opus-5
+ *   … --force                 review again, e.g. once a better model is free
+ *
+ * Reviewing again is safe and worth doing when a stronger model becomes
+ * available: it writes no data, only a better opinion of it.
  */
 
 const DEFAULT_MODEL = "anthropic/claude-opus-5";
@@ -103,6 +107,7 @@ export function readReview(no: number): AngelReview {
 
 async function main() {
   const args = process.argv.slice(2);
+  const force = args.includes("--force");
   const modelAt = args.indexOf("--model");
   const model = modelAt < 0 ? DEFAULT_MODEL : args[modelAt + 1];
   const onlyAt = args.indexOf("--only");
@@ -115,7 +120,7 @@ async function main() {
   const todo = findRegions().filter(
     (region) =>
       (!only || only.has(region.no)) &&
-      !existsSync(pathFor(region.no)) &&
+      (force || !existsSync(pathFor(region.no))) &&
       existsSync(
         `output/seventyTwoAngels/${String(region.no).padStart(2, "0")}.json`,
       ),

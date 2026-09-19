@@ -79,10 +79,13 @@ walking every linked field in the data:
   `magickli-tree-image-outlines-v2`; offline bundles keep their stored bytes.
 
 Three rows resolve correctly and are still wrong; referential integrity is
-not correctness, and nothing below claims otherwise. They need the owner's
+not correctness, and nothing below claims otherwise. They needed the owner's
 call, not a script: `zodiac.cancer.planetId` is `sol` and `scorpio`'s is
-`jupiter` (the traditional rulers are Luna and Mars; Leo is also `sol`), and
-`tribesOfIsrael.manasseh.name.he` is `בנימין`, byte-identical to Benjamin's.
+`jupiter` (the traditional rulers are Luna and Mars; Luna rules nothing in
+the data, and Sol and Jupiter each rule two signs), and
+`tribesOfIsrael.manasseh.name.he` is `בנימין`, byte-identical to Benjamin's,
+so the Table of Shewbread prints Benjamin twice. Decided on 19 September
+([data fixes](#data-fixes)).
 
 ## Alternatives considered
 
@@ -129,8 +132,8 @@ Settled between 18 and 19 September:
 4. **1:1 pairs are stored in both directions and verified** (`mirrors`), so
    the raw JSON stays self-contained for non-JS consumers. This applies to
    `sephirah ↔ archangel`, `sephirah ↔ gdGrade`, `element ↔ elemental`,
-   `planet ↔ archangel`, and to `nextId ↔ prevId` on sephirot and grades
-   (`next`/`prev` renamed to `nextId`/`prevId`; the nav arrows use
+   `planet ↔ archangel`, and to `nextId ↔ prevId` on sephirot, grades and
+   paths (`next`/`prev` renamed to `nextId`/`prevId`; the nav arrows use
    `href={sephirah.nextId}`, today's code with the field renamed). The two
    broken archangel back-links are *fixed*, not deleted; symmetry is asserted
    per row. **1:many back-links are derived** (`inverse`): `element.zodiacs`,
@@ -309,14 +312,19 @@ All in step 1 below; each is a data patch unless marked.
 | Drop `""` sentinels; delete the `""` angelic-order row | None: every consumer uses `?.`, and the Tree joins `undefined` as `""` |
 | Geomancy houses and `meanings` keyed `"1"`–`"12"`; two pages | None, pinned by snapshots |
 | `enochian/letters.json5` `pesces` → `pisces` | None today (polymorphic field, external) |
+| `zodiac.cancer.planetId` → `luna`; `scorpio` → `mars` | The "ruled by" links on `/astrology/zodiac` ([zodiac.tsx:44](../src/app/astrology/zodiac/zodiac.tsx)) change; no image contract reads `zodiac.planet` |
+| Three dictionary entries: IZAZAZ (Key 2, "have framed"), BIAB (Key 3, "stand"), VOMZARG (Key 3, "unto every one of you"), with `source: "Keys"` and `source2: "Key N"`, the file's own provenance pattern | Those rows on `/enochian/keys` gain their meaning |
+| `paths.json5` gains mirrored `nextId`/`prevId` in hermetic `pathNo` order 11–32, then `2_5` and `3_4`, which have no number; the path page's arrows read `nextId`/`prevId` | The arrows on `/kabbalah/path/<id>` render for the first time: they test `"prev" in path` today ([path.tsx:62](../src/app/kabbalah/path/[id]/path.tsx)), and paths have no such fields |
 | Delete the hand-written id unions; derive from JSON (code, step 2) | `typeof data.hebrewLetter.aleph` in [sets.tsx](../src/study/sets.tsx) becomes a type error (it is `alef`); fix the four references |
+| **Step 3, not step 1:** `tribesOfIsrael.manasseh` → `he: "מנשה"`, `en: "Manasseh"` | The Table of Shewbread's Gemini label changes ([TableOfShewbread.tsx:49](../src/components/gd/TableOfShewbread.tsx)), so its golden bytes move. It waits for `resolvedInputsHash` (decision 10) so that only the shewbread's identity changes, not the shared `magickli-component-image-outlines-v1` profile that every registry component publishes under |
 
-Not fixed here, listed for the owner: the Cancer/Scorpio rulers and
-Manasseh's Hebrew above; seven Enochian key words missing from the dictionary
-(URBS, GRSAM, IZAZAZ, CASARMA, GIUI, BIAB, VOMZARG — the page already falls
-back); and the dead `prev`/`next` arrows on
-[path.tsx:62](../src/app/kabbalah/path/[id]/path.tsx), which test
-`"prev" in path` although paths have no such fields and never render.
+Also decided on 19 September, code rather than data: the keys page's
+dictionary lookup ([keys.tsx:37](../src/app/enochian/keys/keys.tsx))
+normalises U↔V and strips hyphens, which finds four more of the seven missing
+words (`URBS` is filed as `VRBS`, `GIUI` as `GIVI`, `CASARMA` as `CASARM`,
+`GRSAM` as `G-RSAM`), and it stops rendering a literal `0` in the
+pronunciation cell for a word with none (`{dict.pronounciations.length && …}`).
+Both land in step 3 with the rest of that page.
 
 The Tree image identity must **not** move: none of these changes a sephirah
 field in `TREE_IMAGE_FIELDS`. If a golden moves, something else changed.
@@ -348,8 +356,10 @@ final tree. Commit footers name every model that worked on the change.
    move.
 3. **Consumers.** Typed-module importers move to the JSON tables or a scoped
    `assemble`; `[id]` routes use the typed lookup helpers; Server Components
-   pass ids; `/enochian/keys` resolves its dictionary subset on the server
-   and the dictionary stops being a JSON import; `pathTarget()` and its test
+   pass ids; `/enochian/keys` resolves its dictionary subset on the server,
+   normalises its lookup and drops the `0`, and the dictionary stops being a
+   JSON import; `resolvedInputsHash` (decision 10) lands, and Manasseh's
+   Hebrew is fixed once it has; `pathTarget()` and its test
    over `TREE_IMAGE_FIELDS`, the study sets and the ritual documents; the
    `TableOfShewbread` hand-join and the `Array.isArray` branches go. The
    JSON5 loaders in `next.config.ts` and `vitest.config.mts` are removed once
@@ -413,8 +423,6 @@ the migration.
   `ZodiacId` from the typed wrappers. It lands first. Step 2 here deletes the
   hand-written unions, so it must keep exporting those names from the
   JSON-derived ones.
-- The owner's calls on Cancer, Scorpio and Manasseh; the seven missing
-  dictionary words; the path page's dead arrows.
 - Pinning implementation subagents at xhigh needs a `.claude/agents/`
   definition; the session itself runs at xhigh and built-in agents inherit
   it, so none was added.
