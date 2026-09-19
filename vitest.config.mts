@@ -117,6 +117,7 @@ export default defineConfig({
         "src/seo/pages.ts",
         "src/seo/site.ts",
         "src/components/gd/roseSigilGeometry.ts",
+        "src/components/svgCoordinate.ts",
         "src/app/geomancy/tetragrams.ts",
         "src/app/chat/train/access.ts",
         "src/app/chat/train/ingestPdf.ts",

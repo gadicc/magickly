@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { SVG_COORDINATE_DECIMALS, svgCoordinate } from "../svgCoordinate";
 import {
   largeArc,
   letterIJ,
@@ -8,9 +9,7 @@ import {
   type Point,
   pathFromPoints,
   pointsToArray,
-  SVG_COORDINATE_DECIMALS,
   sigilPoints,
-  svgCoordinate,
 } from "./roseSigilGeometry";
 
 /** One or two doubles away from zero: the size of a Node/Chromium trig difference. */
