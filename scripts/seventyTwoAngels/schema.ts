@@ -48,7 +48,11 @@ export const angelExtraction = z.object({
     /** Five Hebrew letters: a triad of the Shem, then יה or אל. */
     he: z.string().min(1),
   }),
-  attribute: bilingual,
+  /**
+   * Empty for the twenty-second, whose heading the scan lost at a page break
+   * — and the heading is where Lenain prints the attribute.
+   */
+  attribute: saidOrNot,
   /** The nation this genius rules, and that nation's name for God. */
   people: saidOrNot,
   godName: z.string(),
