@@ -1,8 +1,8 @@
 # Data layer
 
 Assessment, adversarial review, type spike and decisions, 17–19 September
-2026. Read [current status](000-current-status.md) first. Steps 0 and 1 have
-landed ([Commits](#commits)); steps 2–4 are not yet implemented. The
+2026. Read [current status](000-current-status.md) first. Steps 0, 1 and 2
+have landed ([Commits](#commits)); steps 3 and 4 are not yet implemented. The
 long-term goal is to publish `data/` as its own npm package.
 
 Decision taken on 19 September: keep the data as plain JSON tables, describe
@@ -312,10 +312,12 @@ sephirah` cycle and an 8-table walk pass without a depth error. Every
 negative is a live error, proved by `TS2578` on a deliberately wrong
 `@ts-expect-error`: a link whose table was not assembled, a many-link used as
 single, an optional without `?.`, a wrong table name, an unknown id, a
-pending target, an enum, an external. The resolved type is a concrete object
-— the hover is `Row<"*", "sephirah">` with
-`archangel: Row<"*", "archangel"> | undefined` — so completion and `.d.ts`
-emit are usable.
+pending target, an enum, an external. The resolved type is a concrete object,
+so completion and `.d.ts` emit are usable — but it is not printed as the
+alias: a hover or an error gives the expanded `Simplify<…>` intersection of
+the row's own fields with its links, a screenful per row, and
+`archangel` reads as that expansion rather than as `Row<"*", "archangel">`.
+A wrapper that keeps the name is a follow-up ([below](#follow-ups)).
 
 | Configuration | Types | Instantiations | Check |
 | --- | ---: | ---: | ---: |
@@ -417,6 +419,8 @@ final tree. Commit footers name every model that worked on the change.
 
 ## Commits
 
+### Steps 0 and 1
+
 Steps 0 and 1, on `gate/data-layer` from `112562f`. Each was checked on its
 own tree with `pnpm check`, `pnpm typecheck` and `pnpm test`; the whole
 branch was then gated as [below](#results).
@@ -436,7 +440,28 @@ branch was then gated as [below](#results).
 A tenth commit, `docs(plan): Record the data layer's first steps`, adds this
 section and the next; it is not in the table, which it would have to predict.
 
+### Step 2
+
+Step 2, on `gate/data-layer-2` from `8e982ef`, checked the same way and gated
+as [below](#step-2-1).
+
+| Commit | Change | Tests |
+| --- | --- | --- |
+| `eada83f` build(data): Emit JSON tables from the JSON5 sources | `data/build.mts` converts all 28 sources into gitignored `data/dist`, and `data:build` chains ahead of `dev`, `typecheck`, `build`, `check:turbopack` and the test scripts; it is also vitest's globalSetup, so a lone `vitest run <file>` builds what it needs. Nothing imports `data/dist` yet | 4,615 |
+| `e79fa81` feat(data): Declare the graph | `graph.ts` and its `GraphSpec`, over all 26 tables — five of which the barrel never had — with `tables.ts` as the registry it is typed against, and a test that walks the data for the inventory both ways | 4,670 |
+| `9b23046` feat(data): Type rows from the JSON and assemble links | `types.ts` and `assemble.ts` with their unit tests and the `@ts-expect-error` assertions. Nothing uses them yet | 4,698 |
+| `aa51292` test(data): Check the graph against the data | `integrity.ts`, `schemas.ts` and `check.ts` replace the step-0 audit; `chains.test.ts` folds in; `pnpm build` runs the check | 4,648 |
+| `ad144ce` refactor(data): Build the barrel with assemble() | The typed modules derive their types from the JSON, `data.ts` becomes `assemble(tables)`, the mutation and `window.magickData` go, and eight consumers follow | 4,650 |
+| `591e8e6` fix(data): Keep unlinked tables out of the barrel | The barrel assembles 23 tables rather than 26: `seventyTwoAngel`, `enochianTablet` and `christianChoir` appear in no link, and carrying them cost every barrel route about 69 KB raw and 19 KB gzipped ([below](#cost)) | 4,650 |
+| `af48cca` test(data): Tighten the graph checks | An inventory failure names the row it is on; `mirrors` is asserted reciprocal at the graph level, before any data is walked; an id-shaped `external` field must still be in the data; the twelve planets `PlanetId` means are written down; and `check:turbopack` runs `data:check`, as `build` does | 4,657 |
+
+The last two came from the adversarial review on the first five. An eighth
+commit, `docs(plan): Record the data layer's second step`, adds the sections
+below; as in step 1 it is not in the table, which it would have to predict.
+
 ## Results
+
+### Steps 0 and 1
 
 The gate ran on the final tree in the `gate/data-layer` worktree with the
 symlinked `node_modules` removed and a fresh `pnpm install --frozen-lockfile`,
@@ -513,6 +538,192 @@ which is what the rekey could have changed; the path page's new arrows were
 read from the markup and the CSS they need was copied from the sephirah
 page, not verified in a browser.
 
+### Step 2
+
+The gate ran on the final tree in the `gate/data-layer-2` worktree with the
+symlinked `node_modules` removed and a fresh `pnpm install --frozen-lockfile`,
+on Node 24.18.0 and pnpm 10.18.0, under CI's placeholder environment (no
+database or network), in [ci.yml](../.github/workflows/ci.yml)'s order:
+
+| Step | Outcome |
+| --- | --- |
+| `pnpm install --frozen-lockfile` | clean; no dependency was added |
+| `loom init` | already matches the bootstrap defaults |
+| `loom check` | good, with the standing pnpm 11 advisory |
+| `loom check --production` | good, same advisory |
+| `pnpm check` | no errors, and the same 37 warnings as before |
+| `pnpm typecheck` | clean |
+| `pnpm test:coverage` | 4,657 passed, 16 skipped, thresholds met |
+| `pnpm build` | webpack, 215 pages prerendered |
+| `pnpm check:turbopack` | Turbopack, 215 pages prerendered, and the data check first |
+
+Nothing a reader sees changed. Both geomancy pages are byte-identical, the
+`/kabbalah/path/<id>` markup is the same (the Tarot block is drawn when the
+hermetic block resolves, as before), and every one of the six pinned component
+images was re-rendered and compared:
+
+| Image | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `tree-of-life`, the 2=9 ritual's query | 150,736 | `96516a75ce13374a234de855bf596ce1a50d1e9adf7340b398e4b3a2b7e4858a` |
+| `table-of-shewbread` | 136,294 | `df3c37911f14c3e81040d62d74892b97fdb0c72027ef390323f907e795ceb516` |
+| `astro-geomancy-chart` | 52,476 | `eb2f1b6fe2fef2f563ee164de6e403ca9f398ec4706c9ad331195bc34286bffa` |
+| `astro-geomancy-chart?m=2222111122221111&width=256` | 56,498 | `18ecbf9feea69d75bb979319087b74d12d04a7399e3051f685893d6fbf328821` |
+| `seven-branched-candlestick` | 52,363 | `5d8b637f7ceb159014b1bf7322b51456a8bd2b730bdb699883288ed6bf063331` |
+| `enochian-tablet` | 120,471 | `a35f3c18a3a61d17c48d81e7e7b27def96fc43b896837297039a6ab8c20024e8` |
+
+Byte for byte what step 1 left, and both render identities are unchanged, so
+published rituals are untouched. The Tree is the sharp one again: the 2=9
+ritual draws `angelicOrder.name.he`, `godName.name.he` and
+`archangel.name.he`, all of them through the barrel, so the same bytes mean
+the same joins.
+
+#### What the barrel's rows gained
+
+The step-0 `Object.keys` snapshot moved deliberately, and
+[barrel.keys.test.ts](../data/barrel.keys.test.ts) carries the same list. Two
+tables are new, `gdDegree` and `tribeOfIsrael`, both of them link targets the
+barrel never held; the barrel is 23 of the 26, for the reason
+[below](#the-three-tables-the-barrel-does-not-hold).
+
+The old `insertRefs` did recurse into nested blocks, and `gdGrade`,
+`archangel` and the rest of the tables the barrel already had were walked like
+any other, so much of what looks new is not. These accessors were all made
+before, for the rows that carried the id, and are now an own key of every row
+of the table:
+
+| Table | Was already made |
+| --- | --- |
+| `planet` | `hebrewLetter`, `godName`, `archangel` |
+| `gdGrade` | `element`, `planet`, `sephirah` |
+| `archangel` | `sephirah` |
+| `alchemySymbol` | `planet` |
+| `tolPath.hermetic`, `tolPath.hebrew` | `hebrewLetter`, inside the block |
+
+What is genuinely new is this, and nothing else:
+
+| Table | Gained | Why it was missing |
+| --- | --- | --- |
+| `planet` | `sephirot` | Derived, and nobody hand-maintains it |
+| `element` | `zodiacs`, `tetragrams` | Derived, the same way |
+| `zodiac` | `tribeOfIsrael` | Typed since 2023 and never made: the tribes were not in the barrel |
+| `house` | `zodiac` | The astrology houses are an array, which `insertRefs` skipped |
+| `tetragram` | `planets` | A list of ids, which the `Id` rule could not see |
+| `gdGrade` | `degree` | `degrees.json5` is a table now |
+| `gdGrade`, `sephirah`, `tolPath` | `next`, `prev` | A field naming its own table is invisible to a rule that reads field names |
+
+Nothing was lost, and every accessor is an own key of every row of its table,
+holding `undefined` where that row has no id: Keter has a `prev`, Da'at has
+all eight of its links, and the two are what make `Object.keys` honest.
+
+#### The three tables the barrel does not hold
+
+`data.ts` first assembled all 26 tables, which was wrong and measurable.
+`seventyTwoAngel`, `enochianTablet` and `christianChoir` appear in no link in
+the graph, in either direction, so assembling them adds no accessor to any
+row, and the one page that reads the seventy-two imports the typed module
+directly. All it did was put their JSON — 62,671 bytes once minified, for the
+seventy-two alone — in the shared client chunk of every route that reads the
+barrel. `591e8e6` leaves them out; `gdDegree` and `tribeOfIsrael` stay,
+because they are link targets.
+
+The barrel imports its 23 tables itself rather than taking them from
+[tables.ts](../data/tables.ts), and never reaches that module at runtime.
+`const { seventyTwoAngel, ...linked } = tables` was tried and measured first
+and changed nothing: a module brings every JSON it imports into every bundle
+that reaches it, whether or not the value is used, and the repository declares
+no `sideEffects`. The registry still holds all 26, for the graph, the schemas
+and the check, and `satisfies Omit<Tables, …>` keeps the two lists from
+drifting.
+
+#### Cost
+
+`tsc --noEmit --incremental false --extendedDiagnostics` over the whole
+repository, after `data:build` and `next typegen`, each tree measured in the
+same worktree on the same machine:
+
+| Tree | Types | Instantiations | Check |
+| --- | ---: | ---: | ---: |
+| `main` at `8e982ef` | 389,184 | 1,751,879 | 6.45 s |
+| `ad144ce` | 406,085 | 1,895,956 | 6.67 s |
+| `591e8e6` | 406,933 | 1,919,250 | 6.83 s |
+| `af48cca` | 407,204 | 1,919,962 | 6.73 s |
+
+144,077 instantiations for the whole layer, against a budget of 5,000,000 and
+the spike's ~50,000 for the graph in isolation; the rest is the uniform row
+types over every row of every table, which the spike did not have to build.
+Of the 24,006 on top of that, 23,294 are `591e8e6`'s
+`satisfies Omit<Tables, …>`, which holds the barrel's list of tables to the
+registry's by instantiating every row type once more; the checks `af48cca`
+adds cost 712. `pnpm check` and the test suite are unchanged in cost.
+
+The bundles are the cost the step got wrong at first. `next build --webpack`
+under [ci.yml](../.github/workflows/ci.yml)'s environment, the chunks read
+from the prerendered HTML under `.next/server/app`, raw bytes and then
+gzipped:
+
+| Tree | Barrel chunk | Also loaded | `/kabbalah/tree` total |
+| --- | ---: | ---: | ---: |
+| `main` at `8e982ef` | 50,856 / 14,366 | — | 1,355,571 / 434,388 |
+| `ad144ce` | 54,031 / 15,753 | 67,338 / 18,394 | 1,426,089 / 454,171 |
+| `591e8e6` | 55,842 / 16,099 | — | 1,360,557 / 436,123 |
+
+The barrel's chunk is on the same 56 routes in all three; the second chunk
+`ad144ce` added was on those 56 and on the seventy-two's own page. So step 2
+as first built grew what every barrel route loads by about 69 KB raw and
+19 KB gzipped, and `591e8e6` gave 64 KB and 18 KB of that back. The route
+total is every client chunk `/kabbalah/tree` loads, and the 5 KB still above
+`main` is the graph literal, `assemble()` and the two tables the barrel
+gained. The seventy-two's JSON is back in its own page's chunk, 79,207 bytes,
+where `main` had it.
+
+#### What was decided while building it
+
+- **`build.mts` and `check.ts`, not `build.ts`.** The repository's packages
+  are CommonJS, so tsx compiles a `.ts` to CJS, where neither
+  `import.meta.url` nor top-level await exists. The build wants both and is
+  `.mts`; the check needs neither and stays `.ts`. Both run under
+  `node --import tsx`.
+- **No `.d.ts` is emitted.** The plan has the build write "the id-union
+  `.d.ts`", and there is none: the build writes the JSON and `graph.json`
+  only, and an id is `keyof typeof <table>` off the JSON import (decision 1),
+  which is exact by construction and costs no generated file to keep in step.
+  The `.d.ts` comes back with step 4, where the package emits one.
+- **There is no `retrograde` table.** Mercury's stations are computed in
+  [mercuryRetrograde.ts](../src/components/astrology/mercuryRetrograde.ts) from
+  `astronomy-engine`, not stored. `christianChoir` is a table instead, and the
+  72 angels page imports it; that is 26 in the registry, of which the barrel
+  assembles 23 ([above](#the-three-tables-the-barrel-does-not-hold)).
+- **`PlanetId` is the rows with a symbol, not every key.** The planet table
+  also holds `primum-mobile`, `zodiac` and `olam-yesodot`, which the sephirot
+  point at but which are spheres of the Tree with a name and nothing else.
+  Everything that uses `PlanetId` means a planet — the geomancy pages, the
+  candlestick, the decades of the 72 angels, and
+  `scripts/seventyTwoAngels/validate.ts`, whose `Record<PlanetId, string[]>`
+  names exactly those twelve. `PlanetKey` is every row. The twelve are written
+  out in [integrity.test.ts](../data/integrity.test.ts) and asserted against
+  the table, so the derivation cannot quietly pick up a thirteenth; making the
+  criterion explicit is a follow-up.
+- **Rows are uniform at every depth, and a key some rows lack is optional.**
+  The spike only unioned the top-level keys; this data needs more, because the
+  sephirot have four shapes of `color` between them and five planets have no
+  Hebrew name. Optional rather than required-and-undefined so that a row of
+  the raw JSON is still assignable to the type its table exports, which
+  `/kabbalah/yhvh/72angels` relies on.
+- **The schemas derive their id fields from the graph and declare the rest by
+  hand.** Optionality is the data's, so it cannot be derived without making
+  the check tautological; it is read off the sources and written down.
+- **The typed modules export the raw rows unfrozen.** `assemble()` freezes its
+  own clones; nothing mutates the sources any more, and freezing twenty
+  modules at import would cost startup for a guarantee no test needs.
+- **`ChristianChoirId` is gone.** An array table has no key union to derive
+  and nothing imported it. Every other id union and row interface kept its
+  name.
+
+Browsers were not opened. Both geomancy pages and every component image are
+pinned by server-rendered bytes, which is what this step could have changed,
+and the two markup edits (the path page's Tarot block, the reading page's
+archangel) are covered by those pins.
+
 ## Adversarial review
 
 Run on 18 September at xhigh by Fable 5.1 against the design as it stood
@@ -556,27 +767,57 @@ the migration.
 
 ## Follow-ups
 
-- [Plan 031](031-seventy-two-angels.md) landed first and touches the same
-  directory: it fills `seventyTwoAngels.json5` (an array table whose rows
-  link `angelicOrderId`) and adds `data/kabbalah/seventyTwoAngelsDerived.ts`,
-  which imports `PlanetId` and `ZodiacId` from the typed wrappers. Step 2
-  here deletes the hand-written unions, so it must keep exporting those names
-  from the JSON-derived ones.
-- Two more accessor collisions for step 2's check, alongside
-  `seventyTwoAngel.godName`: `alchemySymbol` and `alchemyTerm` rows carry a
-  numeric `gdGrade` field, which is the name a `gdGradeId` link would take.
-  Neither table has such a link today, so nothing collides yet.
+Four of these are step 3's, and each came out of the adversarial review on
+step 2:
+
+- **`Readonly<>` on `Row` and `Table`.** `assemble()` deep-freezes what it
+  returns, and the types say nothing about it, so `data.sephirah.keter.scent
+  = "x"` compiles and throws at runtime. A `Readonly` mapped type through
+  `Row`, `Table` and the nested blocks makes the freeze a compile error
+  instead, and a test that the assignment no longer type-checks says so.
+- **A per-table wrapper interface, so the name survives.** `Row<I, T>` is a
+  `Simplify<…>` intersection, so a hover, an error and step 4's `.d.ts` all
+  print the whole expansion rather than `Row<"*", "sephirah">`. An interface
+  per table extending it would keep the name in every position that matters,
+  at the cost of one declaration per table, generated or written by hand.
+- **An explicit kind on the three spheres.** `PlanetId` is "a planet row has
+  a symbol", which is a fact about the data doing the work of a declared one.
+  A `kind: "planet" | "sphere"` (or the equivalent) on `primum-mobile`,
+  `zodiac` and `olam-yesodot` makes the criterion the data's own statement,
+  turns the derivation into `Extract` on that field, and lets
+  [sets.tsx](../src/study/sets.tsx)'s `"symbol" in planet` filter say what it
+  means. The twelve are pinned by a test until then.
+- **Three small gaps in the checks, from the re-check.** The graph-level test
+  that `mirrors` is declared on both sides lives only in `graph.test.ts`, so
+  `pnpm data:check`, and with it `pnpm build` on its own, accepts a one-sided
+  declaration the test suite rejects; it belongs in `integrity.ts` as a
+  `mirror` kind, so the script and the test share it. The twelve-planet pin
+  types its list as `PlanetId[]`, which constrains only one direction at
+  compile time; `Record<PlanetId, true>` would make both exact. And an
+  inventory failure on an array row names it by `id` or index, while the
+  seventy-two carry `no`, so a fault there reads `seventyTwoAngel.0.…`.
+- **A watcher for the JSON5 sources.** `pnpm dev` builds `data/dist` once, at
+  start; editing a JSON5 while the server is running changes nothing until
+  `pnpm data:build` runs again. The build is a few milliseconds over all 28
+  files, so watching them and rebuilding is small work, and Turbopack picks
+  the JSON up from there on its own.
+- **Done in step 2.** [Plan 031](031-seventy-two-angels.md)'s
+  `seventyTwoAngelsDerived.ts` still imports `PlanetId` and `ZodiacId`, which
+  are derived now and compile unchanged; `PlanetId` is the rows with a symbol
+  (see [above](#what-was-decided-while-building-it)). The two `gdGrade`
+  collisions are not collisions: `alchemySymbol` and `alchemyTerm` carry a
+  numeric field named after a table they do not link to, and the check is
+  about accessors, not names, with a test saying so. The `hermetic` block is
+  typed as absent on the two paths that have none, and `GDGradeId` has its
+  Portal.
 - `dictionary.BIAB` was written as part of its neighbour's meaning: `BIA`
   reads "voices, yourBIAB stand", two entries run together in the WE source.
   The new `BIAB` row makes the join visible; fixing `BIA` belongs with the
   rest of the keys page in step 3.
-- A duplicate key is invisible to step 2's valibot schemas, which see the
+- A duplicate key is invisible to the valibot schemas, which see the
   parsed object and never the source. `amissio`'s first `title`, dead
   because JSON5 keeps the last, was found by hand and is gone in the table
   above; the sources still want a lint of their own.
-- The `hermetic` block of a path is typed as always present, and two paths
-  have none; `GDGradeId` still lacks `portal`, which the data has. Both are
-  hand-written unions that step 2 derives from the JSON.
 - Pinning implementation subagents at xhigh needs a `.claude/agents/`
   definition; the session itself runs at xhigh and built-in agents inherit
   it, so none was added.

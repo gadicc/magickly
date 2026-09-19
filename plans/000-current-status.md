@@ -110,15 +110,40 @@ Follow-ups are separate from the completed migration work:
   rituals published across the deploy.
 - The data layer is being rebuilt: `data/` keeps plain JSON tables, one
   declared graph describes every relation, and an eager `assemble()` replaces
-  the barrel's in-place linking. See
-  [plan 032](032-data-layer.md). Its step 0 pins the pages the data changes
-  touch and step 1 repairs the links, sentinels and field names the audit
-  found; both have landed, and Luna's god name and the rulers of Cancer and
-  Scorpio changed with them.
-- TODO: data findings parked for the later steps of
-  [plan 032](032-data-layer.md#follow-ups): two `gdGrade` accessor
-  collisions, the run-together `BIA`/`BIAB` dictionary entry, and two
-  hand-written id unions that disagree with the data.
+  the barrel's in-place linking. See [plan 032](032-data-layer.md). Steps 0
+  to 2 have landed. Step 0 pinned the pages the data changes touch, step 1
+  repaired the links, sentinels and field names the audit found (Luna's god
+  name and the rulers of Cancer and Scorpio changed with it), and step 2
+  built the layer itself: JSON emitted from the JSON5 sources into gitignored
+  `data/dist`, a declared graph over all 26 tables, row types derived from
+  the JSON rather than copied by hand, `assemble()` over the 23 tables the
+  graph links in place of the mutation, and a check that the data says what
+  the graph says. Nothing a reader sees changed with step 2, no rendered
+  image moved, and what a barrel route loads is within 5 KB of what it was.
+- TODO: the JSON5 sources have no watcher. `pnpm dev` builds `data/dist`
+  once, so a JSON5 edit while the server runs needs `pnpm data:build`; see
+  [plan 032](032-data-layer.md#follow-ups).
+- TODO: three type follow-ups for step 3 of
+  [plan 032](032-data-layer.md#follow-ups): `Readonly<>` on `Row` and
+  `Table`, since `assemble()` freezes its rows at runtime while the types let
+  `data.sephirah.keter.scent = "x"` compile and then throw; a per-table
+  wrapper interface, so that a hover and step 4's `.d.ts` print `Row<…>`
+  rather than its whole expansion; and an explicit kind on the three spheres
+  of the Tree that sit in the planet table, so that `PlanetId` derives from a
+  declared fact rather than from a row having a `symbol`, with
+  `src/study/sets.tsx`'s `"symbol" in planet` filter switched to it.
+- TODO: three small gaps in the data checks, for step 3 of
+  [plan 032](032-data-layer.md#follow-ups): the reciprocal-`mirrors` test
+  runs only under vitest, not `pnpm data:check`; the twelve-planet pin is
+  typed `PlanetId[]` rather than `Record<PlanetId, true>`; and inventory
+  failures name array rows by `id` or index, which the seventy-two, keyed
+  `no`, lack.
+- TODO: data findings parked for step 3 of
+  [plan 032](032-data-layer.md#follow-ups): the run-together `BIA`/`BIAB`
+  dictionary entry, and a lint for duplicate keys in the JSON5 sources, which
+  the schemas cannot see because they read the parsed object. The two
+  `gdGrade` accessor collisions and the drifted id unions were settled in
+  step 2.
 - Not yet released: from the next release, anonymous `/api/session` checks
   return 200 with a null user instead of 401 (changed 17 September). An
   anonymous tab left open across that release shows a study load error until
