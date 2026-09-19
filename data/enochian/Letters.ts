@@ -1,38 +1,18 @@
-import _letters from "./letters.json5" with { type: "json" };
+import rows from "../dist/enochian/letters.json";
+import type { Links, Raw } from "../types";
 
-type LetterId =
-  | "A"
-  | "B"
-  | "C"
-  | "D"
-  | "E"
-  | "F"
-  | "G"
-  | "H"
-  | "I"
-  | "L"
-  | "M"
-  | "N"
-  | "O"
-  | "P"
-  | "Q"
-  | "R"
-  | "S"
-  | "T"
-  | "V"
-  | "X"
-  | "Z";
+/** A letter's key, which is its Latin transliteration. */
+type LetterId = keyof typeof rows;
 
-type EnochianLetters = {
-  [key in LetterId]: EnochianLetter;
-};
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type EnochianLetter = Raw<"enochianLetter"> &
+  Partial<Links<"*", "enochianLetter">>;
 
-interface EnochianLetter {
-  id: LetterId;
-  grid: string[][]; // 12x13 grid of letters
-}
+/** Every Enochian letter, by key. */
+type EnochianLetters = Record<LetterId, EnochianLetter>;
 
-const letters: EnochianLetters = _letters as EnochianLetters;
-
-export default letters;
 export type { EnochianLetter, EnochianLetters, LetterId };
+export default rows;

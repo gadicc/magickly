@@ -40,7 +40,7 @@ function id2title(str: string) {
 const nth = (n) =>
   ["st", "nd", "rd"][((((n + 90) % 100) - 10) % 10) - 1] || "th";
 
-const rowsToBinary = (rows: (1 | 2)[]) =>
+const rowsToBinary = (rows: number[]) =>
   parseInt(rows.map((r) => (r === 1 ? "0" : "1")).join(""), 2);
 export default function Geomancy() {
   const [showAssoc, setShowAssoc] = React.useState(false);

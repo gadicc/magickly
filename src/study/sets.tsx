@@ -156,7 +156,7 @@ const sets: Record<string, StudySetData<unknown>> = {
     answer: "letter.latin",
     gdGrade: "0=0",
     tags: ["hebrew"],
-  } as StudySetData<typeof data.hebrewLetter.aleph>,
+  } as StudySetData<typeof data.hebrewLetter.alef>,
   "hebrew-name": {
     id: "hebrew-name",
     data: data.hebrewLetter,
@@ -164,7 +164,7 @@ const sets: Record<string, StudySetData<unknown>> = {
     answer: "letter.name",
     gdGrade: "0=0",
     tags: ["hebrew"],
-  } as StudySetData<typeof data.hebrewLetter.aleph>,
+  } as StudySetData<typeof data.hebrewLetter.alef>,
   "hebrew-value": {
     id: "hebrew-value",
     data: data.hebrewLetter,
@@ -172,7 +172,7 @@ const sets: Record<string, StudySetData<unknown>> = {
     answer: "value",
     gdGrade: "0=0",
     tags: ["hebrew"],
-  } as StudySetData<typeof data.hebrewLetter.aleph>,
+  } as StudySetData<typeof data.hebrewLetter.alef>,
   "hebrew-meaning": {
     id: "hebrew-meaning",
     data: data.hebrewLetter,
@@ -180,7 +180,7 @@ const sets: Record<string, StudySetData<unknown>> = {
     answer: "meaning.en",
     gdGrade: "0=0",
     tags: ["hebrew"],
-  } as StudySetData<typeof data.hebrewLetter.aleph>,
+  } as StudySetData<typeof data.hebrewLetter.alef>,
   "planet-signs": {
     id: "planet-signs",
     data: filter(data.planet, ([id, planet]) => "symbol" in planet),
@@ -408,7 +408,7 @@ const sets: Record<string, StudySetData<unknown>> = {
       if (sephirah?.tenHeavens?.en)
         return sephirah.tenHeavens.en + " / " + sephirah.tenHeavens.roman;
       const planet = sephirah?.planet;
-      return "Sphere of " + planet?.name.en.en + " / " + planet?.name.he.roman;
+      return "Sphere of " + planet?.name.en.en + " / " + planet?.name.he?.roman;
     },
     gdGrade: "1=10",
     tags: ["kabbalah"],

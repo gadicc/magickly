@@ -1,27 +1,17 @@
-import _angelicOrders from "./angelicOrders.json5" with { type: "json" };
+import rows from "../dist/kabbalah/angelicOrders.json";
+import type { Links, Raw } from "../types";
 
-type AngelicOrderId =
-  | "chayot-hakodesh"
-  | "auphanim"
-  | "aralim"
-  | "chashmalim"
-  | "seraphim"
-  | "malachim"
-  | "elohim"
-  | "bnei-elohim"
-  | "kerubim"
-  | "ishim";
+/** An order's key. */
+type AngelicOrderId = keyof typeof rows;
 
-type LangObject = { he: string; en: string; roman: string };
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type AngelicOrder = Raw<"angelicOrder"> & Partial<Links<"*", "angelicOrder">>;
 
-interface AngelicOrder {
-  id: AngelicOrderId;
-  name: LangObject;
-}
-
+/** Every angelic order, by key. */
 type AngelicOrders = Record<AngelicOrderId, AngelicOrder>;
 
-const angelicOrders: AngelicOrders = _angelicOrders as AngelicOrders;
-
 export type { AngelicOrder, AngelicOrderId, AngelicOrders };
-export default angelicOrders;
+export default rows;

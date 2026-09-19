@@ -29,7 +29,7 @@ import { compute, tetragramFromRows } from "../tetragrams";
 import AstroGeomancyChart from "./AstroGeomancyChart";
 import { type GeomancyReadingState, readingSearchParams } from "./readingState";
 
-const { planet: planets, archangel: archangels } = data;
+const { planet: planets } = data;
 
 // https://blog.stevenlevithan.com/archives/javascript-roman-numeral-converter
 function romanize(num) {
@@ -301,7 +301,7 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
   );
 
   const planet = planets[planetId];
-  const archangel = archangels[planet.archangelId];
+  const archangel = planet.archangel;
 
   return (
     <>
@@ -501,7 +501,7 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
           mighty and power angel URIEL (אוּרִיאֵל), come forth and invest this
           divination with Truth. I invoke thee, choir of Angels known as ASHIM
           (אֲשִׁים), thou Souls of Flame, I invoke thee{" "}
-          <u>{archangel.name.roman.toUpperCase()}</u>, thou Archangel (of
+          <u>{archangel?.name.roman.toUpperCase()}</u>, thou Archangel (of
           Malkuth?) who rules the day and hour of the Planet{" "}
           <u>{planet.name.en.en}</u>. Come forth{" "}
           <u>{planet.intelligenceId?.toLocaleUpperCase()}</u> to manifest the

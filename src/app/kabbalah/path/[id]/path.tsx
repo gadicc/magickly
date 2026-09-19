@@ -24,9 +24,13 @@ export default function Path({ id }: { id: string }) {
     .map(Number)
     .map((i) => Object.values(Data.sephirah).find((s) => s.index === i));
 
-  const tarotCard =
-    path.hermetic && tarotDeck.getByRank(Number(path.hermetic.tarotId));
-  const tarotImg = path.hermetic && RWSPath(path.hermetic.tarotId);
+  // Both paths of the Hebrew tree that the Hermetic tradition does not number
+  // have no hermetic block at all, and so no trump.
+  const hermetic = path.hermetic;
+  const tarot = hermetic && {
+    card: tarotDeck.getByRank(Number(hermetic.tarotId)),
+    img: RWSPath(hermetic.tarotId),
+  };
 
   return (
     <>
@@ -101,24 +105,24 @@ export default function Path({ id }: { id: string }) {
 
           <h2>Hermetic Tradition</h2>
 
-          {path.hermetic ? (
+          {hermetic && tarot ? (
             <table className="main">
               <tbody>
                 <tr>
                   <td>Path No:</td>
-                  <td>{path.hermetic.pathNo}</td>
+                  <td>{hermetic.pathNo}</td>
                 </tr>
 
                 <tr>
                   <td>Hebrew Letter:</td>
                   <td>
                     <div className="hebrewLetter">
-                      <div>{path.hermetic.hebrewLetter?.letter.he}</div>
+                      <div>{hermetic.hebrewLetter?.letter.he}</div>
                       <div>
-                        {path.hermetic.hebrewLetter?.letter.name} (&quot;
+                        {hermetic.hebrewLetter?.letter.name} (&quot;
                         {
                           // @ts-expect-error: later
-                          path.hermetic.hebrewLetter?.letter.mathers
+                          hermetic.hebrewLetter?.letter.mathers
                         }
                         &quot;)
                       </div>
@@ -132,14 +136,14 @@ export default function Path({ id }: { id: string }) {
                     <div>
                       <div>
                         <Image
-                          src={tarotImg}
-                          alt={tarotCard.name}
+                          src={tarot.img}
+                          alt={tarot.card.name}
                           width={100}
                           height={176}
                         />
                       </div>
                       <div>
-                        {tarotCard.name} ({tarotCard.rank})
+                        {tarot.card.name} ({tarot.card.rank})
                       </div>
                     </div>
                   </td>

@@ -1,42 +1,17 @@
-import type { Element, ElementId } from "../alchemy/Elements";
-import type { Planet, PlanetId } from "../astrology/Planets";
-import type { Sephirah, SephirahId } from "../kabbalah/Sephirot";
-import _grades from "./grades.json5" with { type: "json" };
+import rows from "../dist/gd/grades.json";
+import type { Links, Raw } from "../types";
 
-type GDGradeId =
-  | "0=0"
-  | "1=10"
-  | "2=9"
-  | "3=8"
-  | "4=7"
-  | "5=6"
-  | "6=5"
-  | "7=4"
-  | "8=3"
-  | "9=2"
-  | "10=1";
+/** A grade's key, Portal included. */
+type GDGradeId = keyof typeof rows;
 
-type GDGrades = {
-  [key in GDGradeId]: GDGrade;
-};
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type GDGrade = Raw<"gdGrade"> & Partial<Links<"*", "gdGrade">>;
 
-interface GDGrade {
-  id: GDGradeId;
-  name: string;
-  orderId: "1st" | "2nd" | "3rd";
-  element?: Element;
-  elementId: ElementId;
-  planet?: Planet;
-  planetId: PlanetId;
-  degreeId: "1st" | "2nd" | "3rd";
-  sephirah?: Sephirah;
-  sephirahId: SephirahId;
-  // The Neophyte has no grade before it, and the Ipsissimus none after.
-  prevId?: GDGradeId;
-  nextId?: GDGradeId;
-}
+/** Every grade, by key. */
+type GDGrades = Record<GDGradeId, GDGrade>;
 
-const grades: GDGrades = _grades as GDGrades;
-
-export default grades;
 export type { GDGrade, GDGradeId, GDGrades };
+export default rows;

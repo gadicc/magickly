@@ -1,31 +1,17 @@
-import { HebrewLetter, HebrewLetterId } from "../HebrewLetters";
-import _paths from "./paths.json5" with { type: "json" };
+import rows from "../dist/kabbalah/paths.json";
+import type { Links, Raw } from "../types";
 
-// TODO
-type PathId = string;
+/** A path's key, `<from>_<to>` by the sephirot it joins. */
+type PathId = keyof typeof rows;
 
-interface Path {
-  id: PathId;
-  hermetic: {
-    hebrewLetter?: HebrewLetter;
-    hebrewLetterId: HebrewLetterId;
-    pathNo: number;
-    tarotId: string; // TODO
-  };
-  hebrew: {
-    hebrewLetter?: HebrewLetter;
-    hebrewLetterId: HebrewLetterId;
-  };
-  // The chain runs in hermetic path order and ends with the two paths the
-  // Hermetic tradition does not number, so its first and last row have one
-  // neighbour each.
-  nextId?: PathId;
-  prevId?: PathId;
-}
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type Path = Raw<"tolPath"> & Partial<Links<"*", "tolPath">>;
 
+/** Every path, by key. */
 type Paths = Record<PathId, Path>;
 
-const paths: Paths = _paths as Paths;
-
 export type { Path, PathId, Paths };
-export default paths;
+export default rows;

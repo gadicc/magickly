@@ -1,30 +1,17 @@
-import _houses from "./houses.json5" with { type: "json" };
-
-type LangObject = { en: string };
+import rows from "../dist/geomancy/houses.json";
+import type { Links, Raw } from "../types";
 
 /** A house of a reading, keyed by its own number rather than an index. */
-type HouseId =
-  | "1"
-  | "2"
-  | "3"
-  | "4"
-  | "5"
-  | "6"
-  | "7"
-  | "8"
-  | "9"
-  | "10"
-  | "11"
-  | "12";
+type HouseId = keyof typeof rows;
 
-interface House {
-  id: number;
-  meaning: LangObject;
-}
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type House = Raw<"geomanicHouse"> & Partial<Links<"*", "geomanicHouse">>;
 
+/** Every house, by number. */
 type Houses = Record<HouseId, House>;
 
-const houses: Houses = _houses as Houses;
-
 export type { House, HouseId, Houses };
-export default houses;
+export default rows;

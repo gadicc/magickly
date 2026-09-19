@@ -1,35 +1,18 @@
-import { PlanetId } from "../astrology/Planets";
-import _alchemySymbols from "./symbols.json5" with { type: "json" };
+import rows from "../dist/alchemy/symbols.json";
+import type { Links, Raw } from "../types";
 
-type AlchemySymbolID =
-  | "sulphur"
-  | "mercury"
-  | "salt"
-  | "lead"
-  | "tin"
-  | "iron"
-  | "gold"
-  | "copper"
-  | "quicksilver"
-  | "silver";
+/** A symbol's key. */
+type AlchemySymbolID = keyof typeof rows;
 
-interface AlchemySymbol {
-  id: AlchemySymbolID;
-  symbol: string; // "🜩",
-  altSymbol: string; // "♃",
-  name: {
-    en: string;
-  };
-  category: "planets" | "principles";
-  planetId?: PlanetId;
-  gdGrade?: number; // 1,
-}
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type AlchemySymbol = Raw<"alchemySymbol"> &
+  Partial<Links<"*", "alchemySymbol">>;
 
-type AlchemySymbols = {
-  [key in AlchemySymbolID]: AlchemySymbol;
-};
-
-const alchemySymbols: AlchemySymbols = _alchemySymbols as AlchemySymbols;
+/** Every alchemical symbol, by key. */
+type AlchemySymbols = Record<AlchemySymbolID, AlchemySymbol>;
 
 export type { AlchemySymbol, AlchemySymbolID, AlchemySymbols };
-export default alchemySymbols;
+export default rows;

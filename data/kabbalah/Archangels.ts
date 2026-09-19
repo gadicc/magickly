@@ -1,29 +1,17 @@
-import type { Planet, PlanetId } from "../astrology/Planets";
-import _archangels from "./archangels.json5" with { type: "json" };
+import rows from "../dist/kabbalah/archangels.json";
+import type { Links, Raw } from "../types";
 
-type ArchangelId =
-  | "kassiel"
-  | "sachiel"
-  | "zamael"
-  | "michael"
-  | "anael"
-  | "raphael"
-  | "gabriel"
-  | "uriel";
+/** An archangel's key. */
+type ArchangelId = keyof typeof rows;
 
-type LangObject = { he: string; roman: string };
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type Archangel = Raw<"archangel"> & Partial<Links<"*", "archangel">>;
 
-interface Archangel {
-  id: ArchangelId;
-  name: LangObject;
-  planetId: PlanetId;
-  planet?: Planet;
-  sephirahId?: string;
-}
-
+/** Every archangel, by key. */
 type Archangels = Record<ArchangelId, Archangel>;
 
-const archangels: Archangels = _archangels as Archangels;
-
 export type { Archangel, ArchangelId, Archangels };
-export default archangels;
+export default rows;

@@ -1,48 +1,28 @@
-import { HebrewLetter, HebrewLetterId } from "../HebrewLetters";
-import { Archangel, ArchangelId } from "../kabbalah/Archangels";
-import { GodNameId } from "../kabbalah/GodNames";
-import _planets from "./planets.json5" with { type: "json" };
+import rows from "../dist/astrology/planets.json";
+import type { Links, Raw } from "../types";
 
-type PlanetId =
-  | "sol"
-  | "mercury"
-  | "venus"
-  | "earth"
-  | "luna"
-  | "mars"
-  | "jupiter"
-  | "saturn"
-  | "uranus"
-  | "neptune"
-  | "rahu"
-  | "ketu";
+/** Every key of the table, the three spheres of the Tree included. */
+type PlanetKey = keyof typeof rows;
 
-type LangObject = { en?: string; roman?: string; he?: string };
+/**
+ * A planet's key. The table also holds `primum-mobile`, `zodiac` and
+ * `olam-yesodot`, which the sephirot point at through `planetId` but which
+ * are spheres of the Tree rather than planets: they have a name and nothing
+ * else, no symbol among it. Derived from that, so a row joins by carrying
+ * one, rather than from a list that would drift.
+ */
+type PlanetId = {
+  [K in PlanetKey]: (typeof rows)[K] extends { symbol: string } ? K : never;
+}[PlanetKey];
 
-interface Planet {
-  id: PlanetId;
-  symbol: string;
-  hebrewLetterId: HebrewLetterId;
-  hebrewLetter?: HebrewLetter;
-  name: {
-    en: LangObject;
-    he: LangObject;
-  };
-  godNameId: GodNameId;
-  archangelId: ArchangelId;
-  archangel?: Archangel;
-  intelligenceId?: string;
-  spiritId?: string;
-  magickTypes?: {
-    en: string;
-  };
-}
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type Planet = Raw<"planet"> & Partial<Links<"*", "planet">>;
 
-type Planets = {
-  [key in PlanetId]: Planet;
-};
+/** Every row of the table, by key, spheres included. */
+type Planets = Record<PlanetKey, Planet>;
 
-const planets: Planets = _planets as Planets;
-
-export type { Planet, PlanetId, Planets };
-export default planets;
+export type { Planet, PlanetId, PlanetKey, Planets };
+export default rows;

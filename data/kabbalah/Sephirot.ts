@@ -1,56 +1,17 @@
-import { Planet, PlanetId } from "../astrology/Planets";
-import { AngelicOrder, AngelicOrderId } from "./AngelicOrders";
-import { Archangel, ArchangelId } from "./Archangels";
-import { GodName, GodNameId } from "./GodNames";
-import _sephirot from "./sephirot.json5" with { type: "json" };
+import rows from "../dist/kabbalah/sephirot.json";
+import type { Links, Raw } from "../types";
 
-type SephirahId =
-  | "keter"
-  | "chochmah"
-  | "binah"
-  | "hesed"
-  | "gevurah"
-  | "tiferet"
-  | "netzach"
-  | "hod"
-  | "yesod"
-  | "malchut";
+/** A sephirah's key, Da'at included. */
+type SephirahId = keyof typeof rows;
 
-interface Sephirah {
-  id: SephirahId;
-  index: number;
-  name: { en: string; he: string; roman: string };
-  color: {
-    king: string;
-    kingWeb: string;
-    kingWebText?: string;
-    queen: string;
-    queenWeb: string;
-    queenWebText: string;
-  };
-  chakraId?: string; // TODO, ChakraId
-  godNameId: GodNameId;
-  godName?: GodName;
-  scent: string;
-  body: string;
-  bodyPos: string;
-  planetId: PlanetId;
-  planet?: Planet;
-  tenHeavens: { en: string; he: string; roman: string };
-  stone: string;
-  archangelId?: ArchangelId;
-  archangel?: Archangel;
-  soulId?: string;
-  angelicOrderId?: AngelicOrderId;
-  angelicOrder?: AngelicOrder;
-  gdGradeId: string;
-  nextId?: SephirahId;
-  prevId?: SephirahId;
-}
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type Sephirah = Raw<"sephirah"> & Partial<Links<"*", "sephirah">>;
 
+/** Every sephirah, by key. */
 type Sephirot = Record<SephirahId, Sephirah>;
 
-const sephirot: Sephirot = _sephirot as Sephirot;
-
 export type { Sephirah, SephirahId, Sephirot };
-export default sephirot;
+export default rows;

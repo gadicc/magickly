@@ -1,105 +1,22 @@
-// biome-ignore assist/source/organizeImports: organized by hand
-import planet from "./astrology/Planets";
-import zodiac from "./astrology/Zodiac";
-import house from "./astrology/Houses";
+/**
+ * Every table, assembled: the app's one import of the whole data set.
+ *
+ * It was a hand-written object whose rows were mutated in place at module
+ * load — for each key ending in `Id`, if a table of that name existed, the
+ * row it named was assigned onto the row — which made a link a guess from a
+ * field name, left the result order-dependent, and put the whole set on
+ * `window.magickData`. It is now [assemble()](./assemble.ts) over
+ * [the tables](./tables.ts), with [the graph](./graph.ts) saying what links
+ * to what. The keys are the same, plus the five tables the barrel never had.
+ *
+ * A page that wants one table should import that table, not this: the barrel
+ * pulls in everything it can reach.
+ */
+import { assemble } from "./assemble";
+import { tables } from "./tables";
 
-import chakra from "./chakras.json5" with { type: "json" };
-import enochianLetter from "./enochian/Letters";
+const data = assemble(tables);
 
-import gdGrade from "./gd/Grades";
+export default data;
 
-import tetragram from "./geomancy/Tetragrams";
-import geomanicHouse from "./geomancy/Houses";
-
-import angelicOrder from "./kabbalah/AngelicOrders";
-import archangel from "./kabbalah/Archangels";
-import fourWorlds from "./kabbalah/FourWorlds";
-import godName from "./kabbalah/GodNames";
-import kerub from "./kabbalah/Kerubim";
-import tolPath from "./kabbalah/Paths";
-import sephirah from "./kabbalah/Sephirot";
-import soul from "./kabbalah/souls.json5" with { type: "json" };
-
-import alchemySymbol from "./alchemy/Symbols";
-import alchemyTerm from "./alchemy/Terms";
-import element from "./alchemy/Elements";
-import elemental from "./alchemy/Elementals";
-
-import hebrewLetter from "./HebrewLetters";
-
-const allData = {
-  // ASTROLOGY
-  planet,
-  zodiac,
-  house,
-
-  hebrewLetter,
-
-  // ENOCHIAN
-  enochianLetter,
-
-  // GEOMANCY
-  tetragram,
-  geomanicHouse,
-
-  gdGrade,
-
-  // KABBALAH
-  archangel,
-  angelicOrder,
-  fourWorlds,
-  godName,
-  kerub,
-  sephirah,
-  tolPath,
-  soul,
-
-  chakra,
-
-  // ALCHEMY
-  alchemySymbol,
-  alchemyTerm,
-  element,
-  elemental,
-};
-
-function insertRefs(row) {
-  Object.keys(row).forEach((key) => {
-    if (key.substr(key.length - 2) == "Id") {
-      const name = key.substr(0, key.length - 2);
-      const value = row[key];
-      if (allData[name] && allData[name][value]) {
-        row[name] = allData[name][value];
-
-        // move to end
-        //let tmp = sephirah[key];
-        //delete sephirah[key];
-        //sephirah[key] = tmp;
-      }
-    } else if (
-      typeof row[key + "Id"] === "undefined" &&
-      typeof row[key] === "object"
-    ) {
-      insertRefs(row[key]);
-    }
-  });
-}
-
-for (const [set, data] of Object.entries(allData)) {
-  if (Array.isArray(data)) continue;
-  if (data) {
-    for (const row of Object.values(data)) {
-      insertRefs(row);
-    }
-  } else {
-    console.warn("No data for", set);
-  }
-}
-
-// @ts-expect-error: ok
-if (typeof window !== "undefined") window.magickData = allData;
-
-// module.exports = allData;
-export default allData;
-
-export { geomanicHouse, tetragram };
+export const { geomanicHouse, tetragram } = data;

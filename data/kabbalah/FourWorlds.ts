@@ -1,17 +1,17 @@
-import _fourWorlds from "./fourWorlds.json5" with { type: "json" };
+import rows from "../dist/kabbalah/fourWorlds.json";
+import type { Links, Raw } from "../types";
 
-type FourWorldId = "atzilut" | "briah" | "yetzirah" | "assiah";
+/** A world's key. */
+type FourWorldId = keyof typeof rows;
 
-interface FourWorld {
-  id: FourWorldId;
-  name: { en: string; he: string; roman: string };
-  desc: { en: string };
-  residentsTitle: { en: string };
-}
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type FourWorld = Raw<"fourWorlds"> & Partial<Links<"*", "fourWorlds">>;
 
+/** Every world, by key. */
 type FourWorlds = Record<FourWorldId, FourWorld>;
 
-const fourWorlds: FourWorlds = _fourWorlds as FourWorlds;
-
 export type { FourWorld, FourWorldId, FourWorlds };
-export default fourWorlds;
+export default rows;

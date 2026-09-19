@@ -1,22 +1,17 @@
-import type { Element, ElementId } from "../alchemy/Elements";
-import type { Zodiac, ZodiacId } from "../astrology/Zodiac";
-import _kerubim from "./kerubim.json5" with { type: "json" };
+import rows from "../dist/kabbalah/kerubim.json";
+import type { Links, Raw } from "../types";
 
-type KerubId = "earth" | "air" | "water" | "fire";
+/** A kerub's key, which is its element. */
+type KerubId = keyof typeof rows;
 
-interface Kerub {
-  id: KerubId;
-  title: { en: string };
-  face: { en: string; he: string; roman: string };
-  zodiacId: ZodiacId;
-  zodiac?: Zodiac;
-  elementId: ElementId;
-  element?: Element;
-}
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type Kerub = Raw<"kerub"> & Partial<Links<"*", "kerub">>;
 
+/** Every kerub, by key. */
 type Kerubim = Record<KerubId, Kerub>;
 
-const kerubim: Kerubim = _kerubim as Kerubim;
-
 export type { Kerub, KerubId, Kerubim };
-export default kerubim;
+export default rows;

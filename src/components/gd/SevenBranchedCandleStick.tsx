@@ -52,7 +52,7 @@ function Branch({ index }: { index: number }) {
   const texts = [
     planet.archangel?.name.he,
     planet.hebrewLetter?.letter?.he,
-    planet.name.he.he,
+    planet.name.he?.he,
   ];
 
   // With extend radius so text is offset from the side of the triangle

@@ -1,23 +1,17 @@
-import type { Elemental, ElementalId } from "./Elementals";
-import _elements from "./elements.json5" with { type: "json" };
+import rows from "../dist/alchemy/elements.json";
+import type { Links, Raw } from "../types";
 
-type ElementId = "earth" | "air" | "fire" | "water";
+/** An element's key: the four, and spirit. */
+type ElementId = keyof typeof rows;
 
-type LangObject = { en: string };
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type Element = Raw<"element"> & Partial<Links<"*", "element">>;
 
-interface Element {
-  id: ElementId;
-  name: LangObject;
-  symbol: string;
-  elementalId?: ElementalId;
-  elemental?: Elemental;
-}
-
-type Elements = {
-  [key in ElementId]: Element;
-};
-
-const elements: Elements = _elements as Elements;
+/** Every element, by key. */
+type Elements = Record<ElementId, Element>;
 
 export type { Element, ElementId, Elements };
-export default elements;
+export default rows;

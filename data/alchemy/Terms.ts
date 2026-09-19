@@ -1,28 +1,17 @@
-import _alchemyTerms from "./terms.json5" with { type: "json" };
+import rows from "../dist/alchemy/terms.json";
+import type { Links, Raw } from "../types";
 
-type AlchemyTermID =
-  | "sol-philosophorum"
-  | "luna-philosophorum"
-  | "green-lion"
-  | "black-dragon"
-  | "king"
-  | "queen";
+/** A term's key. */
+type AlchemyTermID = keyof typeof rows;
 
-type LangObject = { en: string };
-type LangObjectArray = { en: string[] };
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type AlchemyTerm = Raw<"alchemyTerm"> & Partial<Links<"*", "alchemyTerm">>;
 
-interface AlchemyTerm {
-  id: AlchemyTermID;
-  name: LangObject;
-  terms: LangObjectArray;
-  gdGrade?: number; // 1,
-}
-
-type AlchemyTerms = {
-  [key in AlchemyTermID]: AlchemyTerm;
-};
-
-const alchemyTerms: AlchemyTerms = _alchemyTerms as AlchemyTerms;
+/** Every alchemical term, by key. */
+type AlchemyTerms = Record<AlchemyTermID, AlchemyTerm>;
 
 export type { AlchemyTerm, AlchemyTermID, AlchemyTerms };
-export default alchemyTerms;
+export default rows;

@@ -132,19 +132,20 @@ export function pathPage(id: string): EntityPage | null {
     );
   const joins = `${from}–${to}`;
   const hebrewLetter = path.hebrew?.hebrewLetter?.letter.name;
-  const pathNo = path.hermetic?.pathNo;
-  if (!pathNo)
+  const hermetic = path.hermetic;
+  if (!hermetic)
     return {
       path: `/kabbalah/path/${id}`,
       title: `Tree of Life Path ${joins}`,
       description: `The path joining ${from} and ${to} exists only on the Hebrew Tree of Life, where it carries the letter ${hebrewLetter}; the Hermetic tree omits it.`,
     };
-  const card = tarotDeck.getByRank(Number(path.hermetic.tarotId));
+  const pathNo = hermetic.pathNo;
+  const card = tarotDeck.getByRank(Number(hermetic.tarotId));
   const hebrew = hebrewLetter ? `; Hebrew attribution: ${hebrewLetter}` : "";
   return {
     path: `/kabbalah/path/${id}`,
     title: `Tree of Life Path ${pathNo}: ${joins}`,
-    description: `Path ${pathNo} of the Tree of Life joins ${from} and ${to}. Hermetic attribution: the letter ${path.hermetic.hebrewLetter?.letter.name} and ${card.name}${hebrew}.`,
+    description: `Path ${pathNo} of the Tree of Life joins ${from} and ${to}. Hermetic attribution: the letter ${hermetic.hebrewLetter?.letter.name} and ${card.name}${hebrew}.`,
   };
 }
 

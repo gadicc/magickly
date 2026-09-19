@@ -1,25 +1,15 @@
-import _christianChoirs from "./christianChoirs.json5" with { type: "json" };
+import rows from "../dist/kabbalah/christianChoirs.json";
+import type { Links, Raw } from "../types";
 
-type ChristianChoirId =
-  | "seraphim"
-  | "cherubim"
-  | "thrones"
-  | "dominations"
-  | "powers"
-  | "virtues"
-  | "principalities"
-  | "archangels"
-  | "angels";
-
-interface ChristianChoir {
-  id: ChristianChoirId;
-  name: { en: string; fr: string };
-}
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type ChristianChoir = Raw<"christianChoir"> &
+  Partial<Links<"*", "christianChoir">>;
 
 /** In Lenain's order, so that the nth choir is at index n - 1. */
 type ChristianChoirs = ChristianChoir[];
 
-const christianChoirs: ChristianChoirs = _christianChoirs as ChristianChoirs;
-
-export type { ChristianChoir, ChristianChoirId, ChristianChoirs };
-export default christianChoirs;
+export type { ChristianChoir, ChristianChoirs };
+export default rows;

@@ -21,7 +21,7 @@ function Tetragram({
   x,
   y,
 }: {
-  rows: (1 | 2)[];
+  rows: number[];
   width?: number;
   height?: number;
   x?: number;
@@ -37,7 +37,7 @@ function Tetragram({
   y,
 }: {
   id?: string;
-  rows?: (1 | 2)[];
+  rows?: number[];
   width?: number;
   height?: number;
   x?: number;

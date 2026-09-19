@@ -1,50 +1,17 @@
-// import type { AngelicOrder } from "./AngelicOrders";
+import rows from "./dist/hebrewLetters.json";
+import type { Links, Raw } from "./types";
 
-// type LangObject = { he: string; roman: string };
+/** A letter's key, derived from the JSON: the twenty-two, and the five final forms. */
+type HebrewLetterId = keyof typeof rows;
 
-import _hebrewLetters from "./hebrewLetters.json5" with { type: "json" };
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type HebrewLetter = Raw<"hebrewLetter"> & Partial<Links<"*", "hebrewLetter">>;
 
-type HebrewLetterId =
-  | "aleph"
-  | "beth"
-  | "gimel"
-  | "daleth"
-  | "he"
-  | "vau"
-  | "zayin"
-  | "heth"
-  | "teth"
-  | "yod"
-  | "kaph"
-  | "lamed"
-  | "mem"
-  | "nun"
-  | "samekh"
-  | "ayin"
-  | "pe"
-  | "tsade"
-  | "qoph"
-  | "resh"
-  | "shin"
-  | "tav";
-
-interface HebrewLetter {
-  id: HebrewLetterId;
-  letter: {
-    he: string;
-    name: string;
-    latin: string;
-  };
-  index: number;
-  value: number;
-  meaning: {
-    en: string;
-  };
-}
-
+/** Every letter, by key. */
 type HebrewLetters = Record<HebrewLetterId, HebrewLetter>;
 
-const hebrewLetters: HebrewLetters = _hebrewLetters as HebrewLetters;
-
 export type { HebrewLetter, HebrewLetterId, HebrewLetters };
-export default hebrewLetters;
+export default rows;

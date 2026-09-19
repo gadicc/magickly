@@ -1,27 +1,17 @@
-import _godNames from "./godNames.json5" with { type: "json" };
+import rows from "../dist/kabbalah/godNames.json";
+import type { Links, Raw } from "../types";
 
-type GodNameId =
-  | "ehiyeh"
-  | "yah"
-  | "yhvh-elohim"
-  | "el"
-  | "elohim-gibor"
-  | "yhvh-eloha-vedaat"
-  | "yhvh-tzvaot"
-  | "elohim-tzvaot"
-  | "shadai-el-chai"
-  | "adonai-haaretz";
+/** A name's key. */
+type GodNameId = keyof typeof rows;
 
-type LangObject = { en: string; he: string; roman: string };
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type GodName = Raw<"godName"> & Partial<Links<"*", "godName">>;
 
-interface GodName {
-  id: GodNameId;
-  name: LangObject;
-}
-
+/** Every god name, by key. */
 type GodNames = Record<GodNameId, GodName>;
 
-const godNames: GodNames = _godNames as GodNames;
-
 export type { GodName, GodNameId, GodNames };
-export default godNames;
+export default rows;

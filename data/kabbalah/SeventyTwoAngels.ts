@@ -1,4 +1,5 @@
-import _angels from "./seventyTwoAngels.json5" with { type: "json" };
+import rows from "../dist/kabbalah/seventyTwoAngels.json";
+import type { Links, Raw } from "../types";
 
 /**
  * One of Lenain's seventy-two genii, as his entry gives it. Everything his
@@ -9,30 +10,15 @@ import _angels from "./seventyTwoAngels.json5" with { type: "json" };
  * Several fields are empty where an entry simply does not say: not every one
  * names a nation, cites a psalm, or describes the character of a person born
  * under its genius. The twenty-second has no attribute at all, its heading
- * having vanished at a page break.
- *
- * There is no Hebrew name. The scan cannot supply one; see plan 031.
+ * having vanished at a page break. Twenty entries have no Hebrew name, so
+ * `name.he` is `string | undefined`; `psalm.psalm` is `0` where the entry
+ * cites something else, or nothing; and `godName` is that nation's name for
+ * God, not a link to the god names of the Tree.
  */
-interface Angel {
-  no: number;
-  name: { en: string };
-  attribute: { en: string; fr: string };
-  /** The nation this genius rules. */
-  people: { en: string; fr: string };
-  /** That nation's name for God. */
-  godName: string;
-  /** `psalm` is 0 where the entry cites something else, or nothing. */
-  psalm: { psalm: number; verse: number; la: string };
-  invokedFor: { en: string };
-  governs: { en: string };
-  bornUnder: { en: string };
-  /** What the contrary genius rules. */
-  contrary: { en: string };
-}
+type Angel = Raw<"seventyTwoAngel"> & Partial<Links<"*", "seventyTwoAngel">>;
 
+/** The seventy-two in Lenain's order, so that the nth is at index n - 1. */
 type Angels = Angel[];
 
-const angels: Angels = _angels as Angels;
-
 export type { Angel, Angels };
-export default angels;
+export default rows;

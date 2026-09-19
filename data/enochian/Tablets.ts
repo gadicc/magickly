@@ -1,17 +1,18 @@
-import _tablets from "./tablets.json5" with { type: "json" };
+import rows from "../dist/enochian/tablets.json";
+import type { Links, Raw } from "../types";
 
-type EnochianTabletID = "earth" | "air" | "water" | "fire";
+/** A tablet's key. Only the two with grid data are here. */
+type EnochianTabletID = keyof typeof rows;
 
-type EnochianTablets = {
-  [key in EnochianTabletID]: EnochianTablet;
-};
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type EnochianTablet = Raw<"enochianTablet"> &
+  Partial<Links<"*", "enochianTablet">>;
 
-interface EnochianTablet {
-  id: EnochianTabletID;
-  grid: string[][]; // 12x13 grid of letters
-}
+/** Every tablet the data has, by key. */
+type EnochianTablets = Record<EnochianTabletID, EnochianTablet>;
 
-const tablets: EnochianTablets = _tablets as EnochianTablets;
-
-export default tablets;
 export type { EnochianTablet, EnochianTabletID, EnochianTablets };
+export default rows;

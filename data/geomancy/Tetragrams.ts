@@ -1,47 +1,17 @@
-import { ElementId } from "../alchemy/Elements";
-import { PlanetId } from "../astrology/Planets";
-import { ZodiacId } from "../astrology/Zodiac";
-import type { HouseId } from "./Houses";
-import _tetragrams from "./tetragrams.json5" with { type: "json" };
+import rows from "../dist/geomancy/tetragrams.json";
+import type { Links, Raw } from "../types";
 
-type TetragramID =
-  | "acquisitio"
-  | "amissio"
-  | "albus"
-  | "rubeus"
-  | "puella"
-  | "puer"
-  | "laetitia"
-  | "tristitia"
-  | "caput_draconis"
-  | "cauda_draconis"
-  | "populus"
-  | "via"
-  | "conjunctio"
-  | "carcer"
-  | "fortuna_minor"
-  | "fortuna_major";
+/** A figure's key. */
+type TetragramID = keyof typeof rows;
 
-type LangObject = { en: string };
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type Tetragram = Raw<"tetragram"> & Partial<Links<"*", "tetragram">>;
 
-interface Tetragram {
-  id: TetragramID;
-  rows: (1 | 2)[];
-  title: LangObject;
-  translation: LangObject;
-  meaning: LangObject;
-  meanings: Record<HouseId, LangObject>;
-  zodiacId: ZodiacId | null;
-  elementId: ElementId;
-  rulerIds: string[]; // TODO
-  planetIds: PlanetId[];
-}
-
-type Tetragrams = {
-  [key in TetragramID]: Tetragram;
-};
-
-const tetragrams: Tetragrams = _tetragrams as Tetragrams;
+/** Every figure, by key. */
+type Tetragrams = Record<TetragramID, Tetragram>;
 
 export type { Tetragram, TetragramID, Tetragrams };
-export default tetragrams;
+export default rows;

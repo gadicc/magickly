@@ -1,29 +1,18 @@
-import _tribesOfIsrael from "./tribesOfIsrael.json5" with { type: "json" };
+import rows from "../dist/kabbalah/tribesOfIsrael.json";
+import type { Links, Raw } from "../types";
 
-type TribeOfIsraelId =
-  | "reuben"
-  | "simeon"
-  | "levi"
-  | "judah"
-  | "dan"
-  | "naphtali"
-  | "gad"
-  | "asher"
-  | "issachar"
-  | "zabulon"
-  | "joseph"
-  | "benjamin";
+/** A tribe's key, Ephraim and Manasseh included. */
+type TribeOfIsraelId = keyof typeof rows;
 
-type LangObject = { he: string; en: string };
+/**
+ * A row, which may carry the links `assemble()` makes: the barrel's rows have
+ * them and a bare import's do not, and both are read through this type.
+ */
+type TribeOfIsrael = Raw<"tribeOfIsrael"> &
+  Partial<Links<"*", "tribeOfIsrael">>;
 
-interface TribeOfIsrael {
-  id: TribeOfIsraelId;
-  name: LangObject;
-}
-
+/** Every tribe, by key. */
 type TribesOfIsrael = Record<TribeOfIsraelId, TribeOfIsrael>;
 
-const tribesOfIsrael: TribesOfIsrael = _tribesOfIsrael as TribesOfIsrael;
-
 export type { TribeOfIsrael, TribeOfIsraelId, TribesOfIsrael };
-export default tribesOfIsrael;
+export default rows;

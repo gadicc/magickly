@@ -502,10 +502,9 @@ function TreeOfLife({
                 // Override a:visited * { inherit } from style.
                 fill: s.color.match(",") ? null : s.color,
               }}
-              // @ts-expect-error: later
+              // Only Da'at is drawn dashed, and only it has these.
               stroke={s.data.color.strokeColor || "#000"}
               strokeWidth="1.568"
-              // @ts-expect-error: later
               strokeDasharray={s.data.color.strokeDasharray}
               opacity={sephirahOpacity(s)}
             ></circle>
