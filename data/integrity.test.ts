@@ -7,15 +7,10 @@ type Row = Record<string, unknown>;
  * The links the barrel cannot make, as `table.row.field = value`. Every one is
  * a data bug that fails silently today: [data.ts](./data.ts) looks the value
  * up in the table its field is named after and, finding nothing, leaves the
- * row without its link. Plan 032's step 1 empties this list; the assertion is
- * exact, so a repair that forgets to shorten it fails here.
+ * row without its link. Plan 032's step 1 emptied this list; the assertion is
+ * exact, so a link that starts dangling fails here.
  */
-const EXPECTED_UNRESOLVED = [
-  'element.spirit.elementalId = ""',
-  'sephirah.daat.archangelId = ""',
-  'sephirah.daat.chakraId = ""',
-  'sephirah.daat.soulId = ""',
-];
+const EXPECTED_UNRESOLVED: string[] = [];
 
 /**
  * Fields naming a table whose value is a list of ids. Every id in them
@@ -125,7 +120,7 @@ function audit(): Audit {
 }
 
 describe("data integrity", () => {
-  it("fails to link exactly the rows plan 032 lists", () => {
+  it("resolves every link it names", () => {
     expect(audit().unresolved).toEqual(EXPECTED_UNRESOLVED);
   });
 

@@ -321,14 +321,10 @@
       strokeDasharray: 2,
       strokeColor: "#000000AA",
     },
-    chakraId: "",
     godNameId: "yhvh-elohim",
     scent: "",
     body: "throat", // double check in Golden Dawn Magick
     bodyPos: "throat",
     stone: "",
-    archangelId: "",
-    soulId: "",
-    angelicOrderId: "",
   },
 }

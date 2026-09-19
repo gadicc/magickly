@@ -28,7 +28,7 @@ interface Sephirah {
     queenWeb: string;
     queenWebText: string;
   };
-  chakraId: string; // TODO, ChakraId
+  chakraId?: string; // TODO, ChakraId
   godNameId: GodNameId;
   godName?: GodName;
   scent: string;
@@ -38,10 +38,10 @@ interface Sephirah {
   planet?: Planet;
   tenHeavens: { en: string; he: string; roman: string };
   stone: string;
-  archangelId: ArchangelId;
+  archangelId?: ArchangelId;
   archangel?: Archangel;
-  soulId: string;
-  angelicOrderId: AngelicOrderId;
+  soulId?: string;
+  angelicOrderId?: AngelicOrderId;
   angelicOrder?: AngelicOrder;
   gdGradeId: string;
   nextId?: SephirahId;

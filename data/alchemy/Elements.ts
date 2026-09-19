@@ -9,7 +9,7 @@ interface Element {
   id: ElementId;
   name: LangObject;
   symbol: string;
-  elementalId: ElementalId;
+  elementalId?: ElementalId;
   elemental?: Elemental;
 }
 
