@@ -23,29 +23,39 @@ import React from "react";
 import zodiacs from "@/../data/astrology/Zodiac";
 import angelicOrders from "@/../data/kabbalah/AngelicOrders";
 import angels, { type Angel } from "@/../data/kabbalah/SeventyTwoAngels";
+import {
+  governedDaysOf,
+  type MonthDay,
+  presidingDaysOf,
+  signOf,
+} from "@/../data/kabbalah/seventyTwoAngelsDerived";
+
+type AstrologySystem = "tropical" | "sidereal";
 
 const formatter = new Intl.DateTimeFormat("default", {
   month: "short",
   day: "numeric",
 });
-function dateToMonthAndDay(date) {
-  return formatter.format(date);
-}
-function formatMonthDayArray(monthDayArray) {
-  return dateToMonthAndDay(new Date(0, monthDayArray[0] - 1, monthDayArray[1]));
+
+/** Lenain's days belong to the year, not to one of them; 2001 is a common year. */
+function formatMonthDay([month, day]: MonthDay) {
+  return formatter.format(new Date(2001, month - 1, day));
 }
 
-// start of Aries from https://masteringthezodiac.com/sidereal-astrology
-const startDayBySystem = {
-  tropical: 80, // 21 March
-  sidereal: 105, // 15 April (Fagan-Bradley)
+/**
+ * Lenain's year opens at the first degree of Aries on 20 March, which is where
+ * the tropical zodiac puts it. Fagan-Bradley puts that degree 26 days later, so
+ * a sidereal reading shifts the whole circle by as much.
+ * https://masteringthezodiac.com/sidereal-astrology
+ */
+const shiftDaysBySystem: Record<AstrologySystem, number> = {
+  tropical: 0,
+  sidereal: 26, // 15 April
 };
 
-function dateFromAngelIndex(index: number, startDay = 79) {
-  const degrees = index * 5;
-  const dayOfYear = (365 / 360) * degrees;
-  const date = new Date(0, 0, startDay + dayOfYear); // avoid leap years
-  return date;
+function governedRange(no: number, astrologySystem: AstrologySystem) {
+  const { from, to } = governedDaysOf(no, shiftDaysBySystem[astrologySystem]);
+  return `${formatMonthDay(from)} - ${formatMonthDay(to)}`;
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/PluralRules
@@ -56,56 +66,49 @@ const suffixes = new Map([
   ["few", "rd"],
   ["other", "th"],
 ]);
-const formatOrdinals = (n) => {
-  const rule = enOrdinalRules.select(n);
-  const suffix = suffixes.get(rule);
-  return `${n}${suffix}`;
-};
+const formatOrdinals = (n: number) =>
+  `${n}${suffixes.get(enOrdinalRules.select(n))}`;
 
-function Governs({ index, astrologySystem }) {
-  const degrees = index * 5;
-  const signIndex = degrees % 12;
-  const sign = Object.values(zodiacs)[signIndex];
-  const signDegrees = degrees % 30;
-  const quinant = Math.floor(signDegrees / 5);
-
-  const startDay = dateFromAngelIndex(index, startDayBySystem[astrologySystem]);
-  const endDay = new Date(startDay).setDate(startDay.getDate() + 4);
+function Governs({
+  no,
+  astrologySystem,
+}: {
+  no: number;
+  astrologySystem: AstrologySystem;
+}) {
+  const sign = signOf(no);
 
   return (
     <>
-      {signDegrees}-{signDegrees + 5}° of {sign.name.en} (
-      {formatOrdinals(quinant + 1)} quinant)
+      {sign.from}-{sign.to}° of {zodiacs[sign.zodiacId].name.en} (
+      {formatOrdinals(sign.quinance)} quinance)
       <br />
-      {dateToMonthAndDay(startDay)} - {dateToMonthAndDay(endDay)}
+      {governedRange(no, astrologySystem)}
     </>
   );
 }
 
 function Angel({
   angel,
-  i,
+  no,
   astrologySystem,
 }: {
   angel: Angel;
-  i: number;
-  astrologySystem: string;
+  no: number;
+  astrologySystem: AstrologySystem;
 }) {
   const angelicOrder =
     angel.angelicOrderId && angelicOrders[angel.angelicOrderId];
-  const startDay = dateFromAngelIndex(i, startDayBySystem[astrologySystem]);
-  const endDay = new Date(startDay).setDate(startDay.getDate() + 4);
 
   return (
-    <Accordion key={i}>
+    <Accordion>
       <AccordionSummary
         expandIcon={<ExpandMore />}
         aria-controls="panel1a-content"
         id="panel1a-header"
       >
         <Typography>
-          {i + 1}. {angel.name.en} ({dateToMonthAndDay(startDay)} -{" "}
-          {dateToMonthAndDay(endDay)})
+          {no}. {angel.name.en} ({governedRange(no, astrologySystem)})
         </Typography>
       </AccordionSummary>
       <AccordionDetails>
@@ -147,15 +150,13 @@ function Angel({
               <TableRow>
                 <TableCell>Governs:</TableCell>
                 <TableCell>
-                  <Governs index={i} astrologySystem={astrologySystem} />
+                  <Governs no={no} astrologySystem={astrologySystem} />
                 </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Presiding Days:</TableCell>
                 <TableCell>
-                  {angel.presidesOver
-                    .map((monthDay) => formatMonthDayArray(monthDay))
-                    .join(", ")}
+                  {presidingDaysOf(no).map(formatMonthDay).join(", ")}
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -181,7 +182,8 @@ function Angel({
 }
 
 function SevenyTwo() {
-  const [astrologySystem, setAstrologySystem] = React.useState("tropical");
+  const [astrologySystem, setAstrologySystem] =
+    React.useState<AstrologySystem>("tropical");
 
   return (
     <>
@@ -248,7 +250,9 @@ function SevenyTwo() {
             row
             aria-labelledby="astrology-radio-buttons-group"
             value={astrologySystem}
-            onChange={(e) => setAstrologySystem(e.target.value)}
+            onChange={(e) =>
+              setAstrologySystem(e.target.value as AstrologySystem)
+            }
           >
             <FormControlLabel
               value="tropical"
@@ -266,9 +270,9 @@ function SevenyTwo() {
       <div style={{ marginTop: "1em" }}>
         {angels.map((angel, i) => (
           <Angel
-            key={i}
+            key={angel.name.en}
             angel={angel}
-            i={i}
+            no={i + 1}
             astrologySystem={astrologySystem}
           />
         ))}

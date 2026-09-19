@@ -4,7 +4,6 @@ interface Angel {
   name: { en: string; he: string };
   text: { en: string; fr: string };
   attribute: { en: string };
-  presidesOver: [number, number][];
   godName?: string;
   angelicOrderId: string;
   // angelicOrder: AngelicOrder;
