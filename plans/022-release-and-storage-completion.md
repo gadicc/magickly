@@ -58,6 +58,27 @@ Credential-free review and guarded runner are under
 `/tmp/magickli-trusted-sources-*`; the decision ledger is
 `/tmp/magickli-modernization-approval-decisions.json`.
 
+### Correction, 19 September 2026
+
+Two branch names recorded above do not match live state, read back today
+without changing anything. The Vercel Trusted Sources rule binds
+`refs/heads/main`, not branch `master`, and names the repository by its
+canonical `gadicc/magickly` rather than the redirecting `gadicc/magick.ly`.
+Its label reads `GitHub Production release (gadicc/magickly)` and its
+`workflow_ref` claim pins
+`gadicc/magickly/.github/workflows/release.yml@refs/heads/main`. GitHub's
+`Production` environment likewise has exactly one custom deployment policy,
+branch `main`, not `master`. Immutable repository ID `271738405`, GitHub
+environment `Production`, audience `https://github.com/gadicc` and the
+production-only destination are as recorded.
+
+Nothing is broken by this: `.github/workflows/release.yml` triggers on
+`branches: [main]` under environment `Production`, so the claims a release
+run presents satisfy the rule. Whether the rule was applied as `main` from
+the start and described here wrongly, or applied as `master` and corrected
+later, is not recorded; the text above is left as written rather than
+rewritten under it.
+
 ## Existing files and consolidation
 
 Fresh read-only Vercel Production inspection confirms that existing uploads use
