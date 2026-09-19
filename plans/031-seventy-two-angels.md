@@ -197,16 +197,31 @@ original-text block gains an EN/FR toggle, which is the payoff for storing both.
 
 ## Commits
 
-Each gated on a clean worktree, in order:
+Each gated on a clean worktree, and each landed in this order:
 
 1. Vehuiah's presiding days, a one-line correction independent of everything else
 2. the derivation module and its test, proved against the existing three angels
 3. the four page fixes, the date scheme now coming from the derivation
 4. the nine Christian choirs as data
-5. the extraction pipeline
-6. all seventy-two angels, and the three-file split
-7. the page showing the new fields
-8. this plan and the [current status](000-current-status.md) follow-ups
+5. the extraction pipeline, then the review, then a run of fixes to both as
+   each round found what the last had hidden
+6. all seventy-two angels, the three-file split and the page's new fields
+7. the provenance and licensing, which the page had never stated and which
+   still credited Google Translate
+
+### Corrections
+
+Eleven, applied at assembly from `corrections.json5`, each verified against the
+scan by hand and each carrying its reason. They are for damage the model
+restored wrongly and kept restoring wrongly, where re-extracting is a lottery
+and the right reading is not in doubt — the twenty-fourth preserving thieves
+rather than preserving against them, the sixteenth's god name left as OCR
+debris for the word "nom", the thirty-eighth's left as "Acta \baR" where its
+own text spells AGLA twice further down.
+
+Every `from` must match exactly once or the assembly fails, so a re-extraction
+that words a passage differently surfaces a stale correction rather than
+silently skipping it.
 
 ## What the pipeline found
 
@@ -281,6 +296,16 @@ runs, the second being the thirteenth's name.
 - **The duplicated OCR file.** `public/docs/…Google.txt` ships the book twice,
   at a cost of about 264 KB. Trimming it changes a linked public URL's contents,
   so it wants its own decision.
-- **Deriving the Hebrew.** Each name is a triad of the Shem HaMephorash plus יה
-  or אל. With Exodus 14:19–21 in the repo, all 72 Hebrew names could be derived
-  and checked rather than read off a damaged scan.
+- **The Hebrew names**, which are not in the data at all. Each is a triad of the
+  Shem HaMephorash plus יה or אל, so with Exodus 14:19–21 in the repo all 72
+  could be derived and checked rather than read off a scan that cannot supply
+  them. Two checks would guard a text entered from memory: each of those verses
+  has exactly 72 letters, and the 72 derived names should match the
+  romanisations the scan gave independently.
+- **The twenty-second's name.** Taken from the sequence Lenain, Agrippa and
+  Kircher share, or left out. Its heading is gone and nothing in this scan
+  decides it.
+- **The remaining disagreements.** Thirty-five stand between the entries and
+  Lenain's tables, and a tail of minor review findings stands beneath them.
+  They are recorded rather than resolved: most are the scan, some are the book,
+  and telling which is per-entry work against the plates.

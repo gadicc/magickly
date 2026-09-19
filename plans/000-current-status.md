@@ -114,4 +114,24 @@ Follow-ups are separate from the completed migration work:
   it reloads; see
   [plan 013](013-sql-auth-runtime.md#runtime-entrypoints-prepared).
 
+- The 72 angels of the Shem HaMephorash are complete as of 19 September:
+  all seventy-two entries restored from the 1823 scan and translated, with the
+  prose split by language and loaded only when a reader opens one. See
+  [plan 031](031-seventy-two-angels.md). TODO: the Hebrew names are absent,
+  because the scan cannot supply them and a wrong one passes every check we
+  have; they want deriving from Exodus 14:19-21, or a named source. TODO: the
+  twenty-second entry's name comes from the model rather than the scan, whose
+  heading is gone. TODO: thirty-five disagreements between the entries and
+  Lenain's own tables are recorded but not resolved, and telling the scan's
+  errors from the book's is per-entry work against the plates.
+- TODO: the sigils the 72 angels page has promised since 2023. The plates in
+  the public-domain scan would serve, but only the OCR sidecar is in the repo,
+  not the PDF. Vaughan's blog images are his own work.
+- TODO: `public/docs/Lenain - La Science Cabalistique (1823) - Google.txt`
+  ships the book twice, byte for byte, at a cost of about 264 kB. Trimming it
+  changes the contents of a URL the page links, so it wants its own decision.
+- TODO: several GitHub links in the about page and `OpenSource.tsx` name a
+  `master` branch this repository does not have. The 72 angels page's own two
+  were fixed on 19 September.
+
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.
