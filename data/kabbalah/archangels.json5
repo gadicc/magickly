@@ -47,7 +47,7 @@
       roman: "Raphael",
     },
     planetId: "mercury",
-    sephirahId: "raphael",
+    sephirahId: "tiferet",
   },
   gabriel: {
     id: "gabriel",
@@ -88,7 +88,7 @@
       he: "צדקיאל",
       roman: "Tzadkiel",
     },
-    sephirahId: "chesed",
+    sephirahId: "hesed",
   },
   haniel: {
     id: "haniel",

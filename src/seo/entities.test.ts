@@ -19,9 +19,11 @@ describe("entity pages", () => {
         "letter Tav, god name YHVH Elohim, archangel Kassiel, intelligence " +
         "Agiel, spirit Zazel.",
     });
+    // Luna's god name arrived with its id's spelling fix (plans/032).
     expect(planetPage("luna")?.description).toBe(
       "Correspondences of Luna (Hebrew לבנה, Levanah): symbol ☾, letter " +
-        "Gimel, archangel Gavriel, intelligence Shelachel, spirit Chasmodai.",
+        "Gimel, god name Shaddai El Chai, archangel Gavriel, intelligence " +
+        "Shelachel, spirit Chasmodai.",
     );
     expect(planetPage("primum-mobile")).toMatchObject({
       title: "Primum Mobile Correspondences",

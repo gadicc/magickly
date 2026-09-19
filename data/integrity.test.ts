@@ -11,10 +11,7 @@ type Row = Record<string, unknown>;
  * exact, so a repair that forgets to shorten it fails here.
  */
 const EXPECTED_UNRESOLVED = [
-  'archangel.raphael.sephirahId = "raphael"',
-  'archangel.tzadkiel.sephirahId = "chesed"',
   'element.spirit.elementalId = ""',
-  'planet.luna.godNameId = "shaddai-el-chai"',
   'sephirah.daat.archangelId = ""',
   'sephirah.daat.chakraId = ""',
   'sephirah.daat.soulId = ""',
