@@ -29,6 +29,9 @@ export default function useGeoIP() {
         json.latitude = Number(json.latitude);
         json.longitude = Number(json.longitude);
         setGeoData(json);
+      })
+      .catch(() => {
+        // Offline, blocked or down: callers keep their own default.
       });
   }, []);
 
