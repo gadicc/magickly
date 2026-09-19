@@ -68,9 +68,6 @@
   },
   amissio: {
     id: "amissio",
-    title: {
-      en: "Amissio",
-    },
     rows: [1, 2, 1, 2],
     title: {
       en: "Amissio",
