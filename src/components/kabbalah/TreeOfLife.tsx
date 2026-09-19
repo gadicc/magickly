@@ -465,7 +465,11 @@ function TreeOfLife({
             : null;
 
           return (
-            <SvgLink key={path.id} id={"path" + path.id} href={pathHref(path)}>
+            <SvgLink
+              key={path.id}
+              id={"pathLetter" + path.id}
+              href={pathHref(path)}
+            >
               <text
                 key={path.id}
                 style={style || undefined}
