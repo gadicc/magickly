@@ -108,6 +108,12 @@ Follow-ups are separate from the completed migration work:
   stop a hydration mismatch; the drawing is unchanged, within 0.000633 px. See
   [plan 030](030-tree-coordinate-rounding.md), including what it means for
   rituals published across the deploy.
+- The data layer is being rebuilt: `data/` keeps plain JSON tables, one
+  declared graph describes every relation, and an eager `assemble()` replaces
+  the barrel's in-place linking. See
+  [plan 032](032-data-layer.md). Its step 0 pins the pages the data changes
+  touch and step 1 repairs the links, sentinels and field names the audit
+  found.
 - Not yet released: from the next release, anonymous `/api/session` checks
   return 200 with a null user instead of 401 (changed 17 September). An
   anonymous tab left open across that release shows a study load error until
