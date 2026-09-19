@@ -1,142 +1,138 @@
 import { describe, expect, it } from "vitest";
-import data from "./data";
-
-type Row = Record<string, unknown>;
-
-/**
- * The links the barrel cannot make, as `table.row.field = value`. Every one is
- * a data bug that fails silently today: [data.ts](./data.ts) looks the value
- * up in the table its field is named after and, finding nothing, leaves the
- * row without its link. Plan 032's step 1 emptied this list; the assertion is
- * exact, so a link that starts dangling fails here.
- */
-const EXPECTED_UNRESOLVED: string[] = [];
+import { checkIntegrity, type Failure } from "./integrity";
+import { type Tables, tables } from "./tables";
 
 /**
- * Fields naming a table whose value is a list of ids. Every id in them
- * resolves, but the barrel matches the `Id` suffix alone, so it makes no link
- * at all here and the rows carry no accessor; step 2's graph gives them one.
- * Listed by field rather than by row, since every row of the table has it.
+ * The data against the graph: every id-shaped field declared, every link
+ * resolving, the arity as named, the mirrors symmetric, the chains whole, no
+ * accessor shadowing a field, and every row through its schema. This replaces
+ * the step-0 audit, which walked the barrel's mutation and listed the links
+ * it could not make; plan 032's step 1 emptied that list and step 2 makes the
+ * question a real one. Whether the graph names every table, and matches the
+ * `graph.json` the build emits, is [graph.test.ts](./graph.test.ts)'s.
+ *
+ * The checks live in [integrity.ts](./integrity.ts) so that
+ * [check.ts](./check.ts) can run them from the command line before a build.
+ * Half of these tests break the data on purpose to prove each one bites.
  */
-const EXPECTED_LISTS = ["tetragram.planetIds"];
 
-/**
- * Id-shaped fields named after no table in the barrel. They are not failures:
- * the spirits, intelligences and rulers have no table yet, the tarot deck is
- * its own module, the tribes are not exported by the barrel, and a grade's
- * order and degree are enumerations rather than links. `nextId` and `prevId`
- * point into their own table, which a rule reading the field name cannot
- * express; step 2's graph names their target, and chains.test.ts walks them.
- */
-const EXPECTED_WITHOUT_TABLE = [
-  "degreeId",
-  "intelligenceId",
-  "nextId",
-  "orderId",
-  "prevId",
-  "rulerIds",
-  "spiritId",
-  "tarotId",
-  "tribeOfIsraelId",
-];
+/** The real tables with one of them replaced by something wrong. */
+const broken = (name: keyof Tables, table: unknown) =>
+  checkIntegrity({ ...tables, [name]: table } as Tables);
 
-/** Tables the barrel never walks, because `insertRefs` skips arrays. */
-const EXPECTED_ARRAY_TABLES = ["house"];
+const of = (check: Failure["check"], failures: Failure[]) =>
+  failures
+    .filter((f) => f.check === check)
+    .map((f) => `${f.where}: ${f.detail}`);
 
-interface Audit {
-  resolved: string[];
-  unresolved: string[];
-  lists: string[];
-  withoutTable: string[];
-  arrayTables: string[];
-}
-
-/**
- * Walks the barrel the way `insertRefs` does: a key ending in `Id` names a
- * table, and any other object-valued key whose `<key>Id` is absent is recursed
- * into, which is how the paths' `hermetic` and `hebrew` blocks are reached.
- * `null` and an absent key are how the data says "no link", so neither is
- * reported. It also looks at the `Ids` suffix, which the barrel does not: the
- * plural names a list, and each id in it is checked on its own.
- */
-function audit(): Audit {
-  const tables = data as Record<string, unknown>;
-  const result: Audit = {
-    resolved: [],
-    unresolved: [],
-    lists: [],
-    withoutTable: [],
-    arrayTables: [],
-  };
-
-  const check = (target: Row, value: unknown, where: string) => {
-    const found = typeof value === "string" && Object.hasOwn(target, value);
-    const report = `${where} = ${JSON.stringify(value)}`;
-    (found ? result.resolved : result.unresolved).push(report);
-  };
-
-  const visit = (row: Row, table: string, where: string) => {
-    for (const [key, value] of Object.entries(row)) {
-      const list = key.endsWith("Ids");
-      if (list || key.endsWith("Id")) {
-        if (value === null || value === undefined) continue;
-        const target = tables[key.slice(0, list ? -3 : -2)] as Row | undefined;
-        if (!target) {
-          if (!result.withoutTable.includes(key)) result.withoutTable.push(key);
-          continue;
-        }
-        if (!list) {
-          check(target, value, `${where}.${key}`);
-          continue;
-        }
-        const field = `${table}.${key}`;
-        if (!result.lists.includes(field)) result.lists.push(field);
-        (value as unknown[]).forEach((id, i) =>
-          check(target, id, `${where}.${key}[${i}]`),
-        );
-      } else if (
-        row[`${key}Id`] === undefined &&
-        typeof value === "object" &&
-        value !== null
-      ) {
-        visit(value as Row, table, where);
-      }
-    }
-  };
-
-  for (const [name, table] of Object.entries(tables)) {
-    if (Array.isArray(table)) {
-      result.arrayTables.push(name);
-      continue;
-    }
-    for (const [id, row] of Object.entries(table as Row))
-      visit(row as Row, name, `${name}.${id}`);
-  }
-
-  result.unresolved.sort();
-  result.lists.sort();
-  result.withoutTable.sort();
-  return result;
-}
-
-describe("data integrity", () => {
-  it("resolves every link it names", () => {
-    expect(audit().unresolved).toEqual(EXPECTED_UNRESOLVED);
+describe("the data against the graph", () => {
+  it("has nothing wrong with it", () => {
+    expect(checkIntegrity()).toEqual([]);
   });
 
-  it("makes no link at all for a list of ids", () => {
-    expect(audit().lists).toEqual(EXPECTED_LISTS);
+  it("counts an id-shaped field the graph does not name", () => {
+    const failures = broken("kerub", {
+      earth: {
+        id: "earth",
+        zodiacId: "taurus",
+        elementId: "earth",
+        wizardId: "gandalf",
+      },
+    });
+    expect(of("undeclared", failures)).toEqual([
+      "kerub.wizardId: no link, pending target, external one or enumeration",
+    ]);
   });
 
-  it("accounts for every id-shaped field with no table", () => {
-    expect(audit().withoutTable).toEqual(EXPECTED_WITHOUT_TABLE);
+  it("counts a field the graph names that no row has", () => {
+    const failures = broken("gdDegree", { "1st": { id: "1st" } });
+    expect(of("not-in-the-data", failures)).toEqual([
+      "gdDegree.pillarId: declared, but no row has it",
+    ]);
   });
 
-  it("leaves the array tables unlinked", () => {
-    expect(audit().arrayTables).toEqual(EXPECTED_ARRAY_TABLES);
+  it("counts a list where the graph says one, and one where it says a list", () => {
+    const failures = broken("kerub", {
+      earth: { id: "earth", zodiacId: ["taurus"], elementId: "earth" },
+    });
+    expect(of("arity", failures)).toEqual([
+      "kerub.earth.zodiacId: a singular field whose value is a list",
+    ]);
+    const plural = broken("tetragram", {
+      via: {
+        ...tables.tetragram.via,
+        planetIds: "luna",
+        rulerIds: ["taphthartharath"],
+      },
+    });
+    expect(of("arity", plural)).toEqual([
+      "tetragram.via.planetIds: a plural field whose value is not a list",
+    ]);
   });
 
-  it("links the rest, so an empty walk cannot pass", () => {
-    expect(audit().resolved.length).toBeGreaterThan(100);
+  it("counts an id no row is keyed by", () => {
+    const failures = broken("kerub", {
+      earth: { id: "earth", zodiacId: "taurus", elementId: "quintessence" },
+    });
+    expect(of("link", failures)).toEqual([
+      'kerub.earth.elementId: dangling: no element is keyed "quintessence"',
+    ]);
+  });
+
+  it("counts a mirror that does not point back", () => {
+    const failures = broken("elemental", {
+      ...tables.elemental,
+      gnome: { ...tables.elemental.gnome, elementId: "air" },
+    });
+    expect(of("link", failures)).toContain(
+      'element.earth.elementalId: mirror-asymmetric: elemental.gnome.elementId is "air", not "earth"',
+    );
+  });
+
+  it("counts a chain with two heads, or one that does not reach every row", () => {
+    const headless = broken("gdGrade", {
+      ...tables.gdGrade,
+      "2=9": { ...tables.gdGrade["2=9"], prevId: undefined },
+    });
+    expect(of("chain", headless)).toEqual([
+      "gdGrade: 2 rows have no prevId, not one head",
+    ]);
+  });
+
+  it("counts a row its schema rejects", () => {
+    const failures = broken("soul", {
+      guph: {
+        id: "guph",
+        name: { en: "body", he: "גוף", roman: "guph" },
+        extra: true,
+      },
+    });
+    expect(of("schema", failures)).toEqual([
+      'soul.guph.extra: Invalid key: Expected never but received "extra"',
+    ]);
+  });
+
+  it("leaves only Da'at outside a chain", () => {
+    // Folded in from the chain walk that came with step 1: the check itself
+    // proves each chain whole, and this says which rows are not in one.
+    const loose = (table: Record<string, object>) =>
+      Object.entries(table)
+        .filter(
+          ([, row]) =>
+            !Object.hasOwn(row, "nextId") && !Object.hasOwn(row, "prevId"),
+        )
+        .map(([id]) => id);
+    expect(loose(tables.sephirah)).toEqual(["daat"]);
+    expect(loose(tables.gdGrade)).toEqual([]);
+    expect(loose(tables.tolPath)).toEqual([]);
+  });
+
+  it("allows a field named after a table, which is not an accessor", () => {
+    // `alchemySymbol` and `alchemyTerm` rows carry a numeric `gdGrade`, which
+    // is the name a `gdGradeId` link would take. Neither table has such a
+    // link, so nothing collides: the check is about accessors, not names.
+    expect(tables.alchemySymbol.sulphur.gdGrade).toBe(1);
+    expect(tables.alchemyTerm.king.gdGrade).toBe(1);
+    expect(checkIntegrity()).toEqual([]);
   });
 });

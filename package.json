@@ -9,9 +9,10 @@
   },
   "scripts": {
     "data:build": "node --import tsx data/build.mts",
+    "data:check": "node --import tsx data/check.ts",
     "dev": "pnpm data:build && next dev",
     "dev:webpack": "pnpm data:build && next dev --webpack",
-    "build": "pnpm data:build && next build --webpack",
+    "build": "pnpm data:build && pnpm data:check && next build --webpack",
     "check:turbopack": "pnpm data:build && SERWIST_SUPPRESS_TURBOPACK_WARNING=1 next build --turbopack",
     "start": "next start",
     "check": "biome check .",
