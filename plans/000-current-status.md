@@ -113,7 +113,12 @@ Follow-ups are separate from the completed migration work:
   the barrel's in-place linking. See
   [plan 032](032-data-layer.md). Its step 0 pins the pages the data changes
   touch and step 1 repairs the links, sentinels and field names the audit
-  found.
+  found; both have landed, and Luna's god name and the rulers of Cancer and
+  Scorpio changed with them.
+- TODO: data findings parked for the later steps of
+  [plan 032](032-data-layer.md#follow-ups): two `gdGrade` accessor
+  collisions, the run-together `BIA`/`BIAB` dictionary entry, and two
+  hand-written id unions that disagree with the data.
 - Not yet released: from the next release, anonymous `/api/session` checks
   return 200 with a null user instead of 401 (changed 17 September). An
   anonymous tab left open across that release shows a study load error until

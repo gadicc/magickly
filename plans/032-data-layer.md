@@ -1,8 +1,8 @@
 # Data layer
 
 Assessment, adversarial review, type spike and decisions, 17–19 September
-2026. Read [current status](000-current-status.md) first. Nothing here is
-implemented yet; this is the record the implementation works against. The
+2026. Read [current status](000-current-status.md) first. Steps 0 and 1 have
+landed ([Commits](#commits)); steps 2–4 are not yet implemented. The
 long-term goal is to publish `data/` as its own npm package.
 
 Decision taken on 19 September: keep the data as plain JSON tables, describe
@@ -352,9 +352,9 @@ All in step 1 below; each is a data patch unless marked.
 | --- | --- |
 | `planets.luna.godNameId` → `shadai-el-chai` | `/astrology/planet/luna` gains its god name; its search description ([entities.ts](../src/seo/entities.ts)) changes; check the card list |
 | `archangels.raphael.sephirahId` → `tiferet`; `tzadkiel` → `hesed` | None rendered today; `archangel.sephirah` is not a Tree field |
-| Tetragram `planetIds`/`rulerIds` arrays; `albus` ruler → `taphthartharath` | Caput and Cauda Draconis show their planets (blank today) |
-| `next`/`prev` → `nextId`/`prevId` (sephirot, grades); two pages | None |
-| Drop `""` sentinels; delete the `""` angelic-order row | None: every consumer uses `?.`, and the Tree joins `undefined` as `""` |
+| Tetragram `planetIds`/`rulerIds` arrays; `albus` ruler → `taphthartharath` | None: the pages read the ids directly and always showed both planets |
+| `next`/`prev` → `nextId`/`prevId` (sephirot, grades); two pages | The sephirah page's field table loses its Next/Prev rows (the arrows are the same links); the grade page's two dump rows are relabelled `prevId`/`nextId` |
+| Drop `""` sentinels; delete the `""` angelic-order row | `/kabbalah/sephirah/daat` drops its two empty `ArchangelId`/`SoulId` rows; nothing else, since every other consumer uses `?.` and the Tree joins `undefined` as `""` |
 | Geomancy houses and `meanings` keyed `"1"`–`"12"`; two pages | None, pinned by snapshots |
 | `enochian/letters.json5` `pesces` → `pisces` | None today (polymorphic field, external) |
 | `zodiac.cancer.planetId` → `luna`; `scorpio` → `mars` | The "ruled by" links on `/astrology/zodiac` ([zodiac.tsx:44](../src/app/astrology/zodiac/zodiac.tsx)) change; no image contract reads `zodiac.planet` |
@@ -415,6 +415,104 @@ final tree. Commit footers name every model that worked on the change.
    field: major; new rows or fields: minor; corrected values: patch);
    `resolvedInputsHash`; table renames.
 
+## Commits
+
+Steps 0 and 1, on `gate/data-layer` from `112562f`. Each was checked on its
+own tree with `pnpm check`, `pnpm typecheck` and `pnpm test`; the whole
+branch was then gated as [below](#results).
+
+| Commit | Change | Tests |
+| --- | --- | --- |
+| `67258be` docs(plan): Renumber the data layer plan to 032 | This plan takes 032, since the Tree rounding note reached `main` with 030 first, and the status page gains its pointer. The plan file itself arrived in `f681f10` and last grew in `424342e`, both swept in with the seventy-two angels work | 4,599 |
+| `3eaf185` test(data): Pin the data pages before the data changes | Step 0. Render snapshots of both geomancy pages, the barrel's key surface, the integrity audit and its expected failures | 4,611 |
+| `8a549f8` fix(data): Repair the links that never resolved | Luna's god name, Raphael's and Tzadkiel's sephirot, Cancer's and Scorpio's rulers, the letter R's `pisces`, Albus's ruler | 4,611 |
+| `ee6722f` fix(enochian): Add the three key words the dictionary lacks | IZAZAZ, BIAB and VOMZARG, sourced to Keys 2 and 3 | 4,611 |
+| `a92b108` refactor(data): Name list ids in the plural | `planetIds` and `rulerIds`, always arrays; three consumers lose `Array.isArray` | 4,612 |
+| `875d6d9` refactor(data): Name the chain links nextId and prevId | Sephirot, grades and, for the first time, paths; three nav pages; a chain test | 4,615 |
+| `416c7b3` fix(data): Omit ids that point nowhere instead of storing "" | Da'at's four, `elements.spirit`, and the `""` angelic order that existed for them | 4,615 |
+| `577d71a` refactor(geomancy): Key the houses and meanings by house number | Houses and `tetragram.meanings` keyed `"1"`–`"12"`; both pages lose the index arithmetic | 4,615 |
+| `86895ad` fix(geomancy): Drop amissio's dead duplicate title | The first of the row's two `title` keys, which JSON5 had already discarded | 4,615 |
+
+A tenth commit, `docs(plan): Record the data layer's first steps`, adds this
+section and the next; it is not in the table, which it would have to predict.
+
+## Results
+
+The gate ran on the final tree in the `gate/data-layer` worktree with the
+symlinked `node_modules` removed and a fresh `pnpm install --frozen-lockfile`,
+on Node 24.18.0 and pnpm 10.18.0, under CI's placeholder environment (no
+database or network). It is [ci.yml](../.github/workflows/ci.yml)'s sequence:
+
+| Step | Outcome |
+| --- | --- |
+| `pnpm install --frozen-lockfile` | clean |
+| `loom init` | already matches the bootstrap defaults |
+| `loom check` | good, with the standing pnpm 11 advisory |
+| `loom check --production` | good, same advisory |
+| `pnpm check` | no errors, and 37 warnings: the repository stood at 39, and the geomancy rekey removed the two `key={i}` array-index keys in `reference.tsx` |
+| `pnpm typecheck` | clean |
+| `pnpm test:coverage` | 4,615 passed, 16 skipped, thresholds met |
+| `pnpm build` | webpack, 215 pages prerendered |
+| `pnpm check:turbopack` | Turbopack, 215 pages prerendered |
+
+What a reader sees change:
+
+- `/astrology/planet/luna` gains its god name, Shaddai El Chai, in the page
+  and in the search description [entities.ts](../src/seo/entities.ts) builds.
+- `/astrology/zodiac` rules Cancer by Luna and Scorpio by Mars.
+- `/enochian/keys` gives IZAZAZ, BIAB and VOMZARG their meaning instead of
+  the Dee translation alone.
+- `/kabbalah/path/<id>` draws its previous and next arrows for the first
+  time; the page also gained the three nav rules its siblings already had.
+- `/kabbalah/sephirah/<id>` no longer lists Next and Prev among its
+  remaining fields, since the arrows above are the same two links, and
+  `/gd/grade/<id>`, which dumps every field it has, now shows `prevId` and
+  `nextId` there.
+- `/kabbalah/sephirah/daat` drops two empty rows, `ArchangelId:` and
+  `SoulId:`. That page tables every key it does not lay out itself, and
+  those two were not in its exclusion list, so their `""` printed as empty
+  rows; `chakraId` and `angelicOrderId` were excluded and never showed.
+- Nothing else. The two geomancy pages are byte-identical, and Caput and
+  Cauda Draconis show both their planets exactly as before: the barrel's
+  `tetragram.planet` link never resolved for those two rows, and no page
+  read it.
+
+The social cards draw a section, a title and their art, and no title moved,
+so no card's bytes moved; `/og/astrology/planet/luna.png` in particular is
+unchanged, because the description is not on the card.
+
+No rendered image moved. Every component image was rendered from `efe97ce`,
+the branch point at the time, and from the final tree and compared; the
+registry test pins the same bytes on the rebased tip:
+
+| Image | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `tree-of-life`, the 2=9 ritual's query | 150,736 | `96516a75ce13374a234de855bf596ce1a50d1e9adf7340b398e4b3a2b7e4858a` |
+| `table-of-shewbread` | 136,294 | `df3c37911f14c3e81040d62d74892b97fdb0c72027ef390323f907e795ceb516` |
+| `astro-geomancy-chart` | 52,476 | `eb2f1b6fe2fef2f563ee164de6e403ca9f398ec4706c9ad331195bc34286bffa` |
+| `astro-geomancy-chart?m=2222111122221111&width=256` | 56,498 | `18ecbf9feea69d75bb979319087b74d12d04a7399e3051f685893d6fbf328821` |
+| `seven-branched-candlestick` | 52,363 | `5d8b637f7ceb159014b1bf7322b51456a8bd2b730bdb699883288ed6bf063331` |
+| `enochian-tablet` | 120,471 | `a35f3c18a3a61d17c48d81e7e7b27def96fc43b896837297039a6ab8c20024e8` |
+
+The Tree keeps `magickli-tree-image-outlines-v3` and the rest
+`magickli-component-image-outlines-v1`; neither identity moved, so published
+rituals are untouched. The Tree image is the sharpest of these: the 2=9
+ritual draws `angelicOrder.name.he`, which is exactly the field Da'at read
+from the deleted `""` row, and its bytes are the same either way because
+`Array.join` writes `undefined` and `""` alike.
+
+The step-0 snapshots did their job. The reference page is 62,119 bytes,
+SHA-256 `863e323249bc2ba11753bf0ba7b675bc0aaebff526d5d343b451657d4374d161`,
+and the reading page 80,698, 80,649 and 80,630 bytes in the first, seventh
+and twelfth houses, through all seven data commits. They pin MUI's and
+styled-jsx's markup along with the data, so a dependency upgrade will move
+them; re-render and read the diff before accepting one.
+
+Browsers were not opened. Both pages are pinned by server-rendered bytes,
+which is what the rekey could have changed; the path page's new arrows were
+read from the markup and the CSS they need was copied from the sephirah
+page, not verified in a browser.
+
 ## Adversarial review
 
 Run on 18 September at xhigh by Fable 5.1 against the design as it stood
@@ -458,16 +556,27 @@ the migration.
 
 ## Follow-ups
 
-- Add this plan's pointer to [current status](000-current-status.md) with the
-  first landing commit; its working copy has uncommitted edits at the time of
-  writing.
-- [Plan 031](031-seventy-two-angels.md) is in progress alongside this one and
-  touches the same directory: it fills `seventyTwoAngels.json5` (an array
-  table whose rows link `angelicOrderId`) and adds
-  `data/kabbalah/seventyTwoAngelsDerived.ts`, which imports `PlanetId` and
-  `ZodiacId` from the typed wrappers. It lands first. Step 2 here deletes the
-  hand-written unions, so it must keep exporting those names from the
-  JSON-derived ones.
+- [Plan 031](031-seventy-two-angels.md) landed first and touches the same
+  directory: it fills `seventyTwoAngels.json5` (an array table whose rows
+  link `angelicOrderId`) and adds `data/kabbalah/seventyTwoAngelsDerived.ts`,
+  which imports `PlanetId` and `ZodiacId` from the typed wrappers. Step 2
+  here deletes the hand-written unions, so it must keep exporting those names
+  from the JSON-derived ones.
+- Two more accessor collisions for step 2's check, alongside
+  `seventyTwoAngel.godName`: `alchemySymbol` and `alchemyTerm` rows carry a
+  numeric `gdGrade` field, which is the name a `gdGradeId` link would take.
+  Neither table has such a link today, so nothing collides yet.
+- `dictionary.BIAB` was written as part of its neighbour's meaning: `BIA`
+  reads "voices, yourBIAB stand", two entries run together in the WE source.
+  The new `BIAB` row makes the join visible; fixing `BIA` belongs with the
+  rest of the keys page in step 3.
+- A duplicate key is invisible to step 2's valibot schemas, which see the
+  parsed object and never the source. `amissio`'s first `title`, dead
+  because JSON5 keeps the last, was found by hand and is gone in the table
+  above; the sources still want a lint of their own.
+- The `hermetic` block of a path is typed as always present, and two paths
+  have none; `GDGradeId` still lacks `portal`, which the data has. Both are
+  hand-written unions that step 2 derives from the JSON.
 - Pinning implementation subagents at xhigh needs a `.claude/agents/`
   definition; the session itself runs at xhigh and built-in agents inherit
   it, so none was added.
