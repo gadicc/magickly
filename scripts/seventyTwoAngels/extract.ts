@@ -184,7 +184,11 @@ async function main() {
             `[${done}/${todo.length}] ${region.no}. ${angel.name.en}${flag}`,
           );
         } catch (error) {
-          const why = error instanceof Error ? error.message : String(error);
+          // A schema rejection says which field, but only in the cause.
+          const cause = (error as { cause?: unknown })?.cause;
+          const why =
+            (error instanceof Error ? error.message : String(error)) +
+            (cause ? ` | ${String((cause as Error).message ?? cause)}` : "");
           failures.push(`${region.no}: ${why}`);
           console.error(`[!] ${region.no} failed: ${why}`);
         }
