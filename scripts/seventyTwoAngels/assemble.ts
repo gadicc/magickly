@@ -1,7 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import JSON5 from "json5";
 import { ANGEL_COUNT } from "../../data/kabbalah/seventyTwoAngelsDerived";
-import { type AngelExtraction, angelExtraction } from "./schema";
+import { readExtraction, type StoredExtraction } from "./extract";
+import { hebrewReadings } from "./hebrew";
 import { disagreements, hebrewProblems, shapeProblems } from "./validate";
 
 /**
@@ -49,7 +50,7 @@ const corrections: Correction[] = JSON5.parse(
  * exactly once: a re-extraction that words the passage differently then fails
  * here rather than quietly dropping the correction on the floor.
  */
-function correct(angel: AngelExtraction) {
+function correct(angel: StoredExtraction) {
   for (const fix of corrections.filter((c) => c.no === angel.no)) {
     const [head, tail] = fix.field.split(".");
     const fields = angel as unknown as Record<string, unknown>;
@@ -65,23 +66,22 @@ function correct(angel: AngelExtraction) {
   return angel;
 }
 
-function read(no: number): AngelExtraction {
-  return correct(
-    angelExtraction.parse(JSON.parse(readFileSync(pathFor(no), "utf8"))),
-  );
+function read(no: number): StoredExtraction {
+  return correct(readExtraction(no));
 }
 
 /** Only what the page shows; the prose and the `scanned` readings stay out. */
-function record(angel: AngelExtraction) {
+function record(angel: StoredExtraction) {
   return {
     no: angel.no,
-    // The Hebrew is deliberately not carried through. It is the most damaged
-    // part of the scan and the model reconstructs it differently every run —
-    // 27 of 72 malformed on the last one, a different 27 each time, twice
-    // returning the Tetragrammaton. A wrong name that is five letters ending
-    // in אל passes every check we have, so the field is left unsourced rather
-    // than filled with something that looks right. See plan 031.
-    name: { en: angel.name.en },
+    // The Hebrew is carried through where two independent readings of the page
+    // agree on it, and left out where they do not. Lenain's Hebrew is small
+    // and the scan is two centuries old; fifty-two names are corroborated and
+    // the rest are held back rather than guessed at. See plan 031.
+    name: agreedHebrew.has(angel.no)
+      ? { en: angel.name.en, he: agreedHebrew.get(angel.no) as string }
+      : { en: angel.name.en },
+    printedPages: angel.printedPages,
     attribute: angel.attribute,
     people: angel.people,
     godName: angel.godName,
@@ -99,6 +99,8 @@ function write(path: string, value: unknown) {
   console.log(`${path} — ${(bytes / 1024).toFixed(1)} kB`);
 }
 
+let agreedHebrew = new Map<number, string>();
+
 function main() {
   const reportOnly = process.argv.includes("--report");
   // Reporting works on whatever has been extracted, so it is useful while a
@@ -111,12 +113,20 @@ function main() {
   if (reportOnly && angels.length < ANGEL_COUNT)
     console.log(`${angels.length} of ${ANGEL_COUNT} extracted so far.\n`);
 
+  const readings = hebrewReadings(
+    new Map(angels.map((angel) => [angel.no, angel.name.he])),
+  );
+  agreedHebrew = readings.agreed;
+
+  // Shape no longer decides what ships — two readings agreeing does — but a
+  // corroborated name of an unexpected shape is worth saying out loud.
+  const oddlyShaped = [...readings.agreed].filter(
+    ([, he]) => hebrewProblems({ name: { en: "", he } }).length,
+  );
+
   const clashes = angels.flatMap(disagreements);
   const shapes = angels.flatMap((angel) =>
     shapeProblems(angel).map((problem) => `${angel.no}: ${problem}`),
-  );
-  const hebrew = angels.flatMap((angel) =>
-    hebrewProblems(angel).map((problem) => `${angel.no}: ${problem}`),
   );
   const unsure = angels.flatMap((angel) =>
     angel.uncertain.map((note) => `${angel.no}: ${note}`),
@@ -124,8 +134,10 @@ function main() {
 
   console.log(
     `${clashes.length} disagreements with the tables, ` +
-      `${shapes.length} shape problems, ${hebrew.length} Hebrew names ` +
-      `unusable (not shipped), ${unsure.length} notes.\n`,
+      `${shapes.length} shape problems, ${readings.agreed.size} Hebrew names ` +
+      `corroborated (${oddlyShaped.length} oddly shaped) and ` +
+      `${readings.doubtful.size} held back, ` +
+      `${unsure.length} notes.\n`,
   );
   for (const c of clashes)
     console.log(`  ${c.no} ${c.field}: scan "${c.scanned}" vs "${c.derived}"`);
@@ -137,11 +149,14 @@ function main() {
 
   mkdirSync(TEXT_DIR, { recursive: true });
   write(`${DATA_DIR}/seventyTwoAngels.json5`, angels.map(record));
-  for (const lang of ["en", "fr"] as const)
-    write(
-      `${TEXT_DIR}/${lang}.json5`,
-      angels.map((angel) => angel.text[lang]),
-    );
+  write(
+    `${TEXT_DIR}/fr.json5`,
+    angels.map((angel) => angel.french),
+  );
+  write(
+    `${TEXT_DIR}/en.json5`,
+    angels.map((angel) => angel.translation),
+  );
 }
 
 if (process.argv[1]?.endsWith("assemble.ts")) main();

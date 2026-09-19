@@ -1,99 +1,17 @@
 // Corrections applied at assembly, each verified against the scan by hand.
 //
-// These are for damage the model restored wrongly and kept restoring wrongly
-// across runs, where re-extracting is a lottery and the right reading is not
-// in doubt. Every `from` must appear exactly once or assembly fails, so a
-// re-extraction that changes the text surfaces a stale correction rather than
-// silently skipping it. See plan 031.
-[
-  {
-    no: 16,
-    field: "godName",
-    from: "תסם",
-    to: "Dieu",
-    // « et correspond au תסם Dieu, d'après la langue de cette nation »: the
-    // Hebrew-looking run is the scan's shape for the word "nom". The nation is
-    // France, so the name it gives God is the French word for him.
-    why: "OCR debris for the word 'nom'; the name this entry gives is Dieu.",
-  },
-  {
-    no: 16,
-    field: "text.fr",
-    from: "jusqu'au 80°., exclusivement",
-    to: "jusqu'au 80°., inclusivement",
-    // The scan breaks the word across lines as « -מ1 / clusivement », and מ1
-    // is "in". Lenain ends every one of these ranges inclusively.
-    why: "The broken word is 'inclusivement'; every range in the book is inclusive.",
-  },
-  {
-    no: 24,
-    field: "text.fr",
-    from: "il préserve les voleurs et les assassins",
-    to: "il préserve des voleurs et des assassins",
-    // The scan reads « il préserve 465 voleurs », and 465 is this scan's shape
-    // for "des", as 165 is "les" and 06 is "de". Reversed, it had the genius
-    // protecting thieves rather than protecting against them.
-    why: "The scan's 465 is 'des', not 'les'; the genius protects against thieves.",
-  },
-  {
-    no: 24,
-    field: "text.en",
-    from: "he preserves thieves and murderers",
-    to: "he preserves from thieves and murderers",
-    why: "Follows the French correction above.",
-  },
-  {
-    no: 24,
-    field: "governs.en",
-    from: "preserves thieves and murderers",
-    to: "preserves from thieves and murderers",
-    why: "Follows the French correction above.",
-  },
-  {
-    no: 38,
-    field: "godName",
-    from: "Acta \\baR (Dieu triple et un)",
-    to: "AGLA",
-    // The entry's own text names AGLA twice further down, so the debris is
-    // that name and not another.
-    why: "OCR debris for AGLA, which this same entry names twice elsewhere.",
-  },
-  {
-    no: 58,
-    field: "text.fr",
-    from: "\n\n(1)",
-    to: "",
-    // The instruction to put a footnote last, keeping its marker, moved the
-    // marker even though this entry's footnote is on another page and never
-    // reached the region. The call stays inline where the scan has it.
-    why: "A footnote marker moved to the end with no footnote to go with it.",
-  },
-  {
-    no: 58,
-    field: "text.en",
-    from: "\n\n(1)",
-    to: "",
-    why: "As above, in the translation.",
-  },
-  {
-    no: 16,
-    field: "text.fr",
-    from: "correspond au תסם Dieu",
-    to: "correspond au nom Dieu",
-    why: "The same OCR debris for 'nom', left in the prose as well as the field.",
-  },
-  {
-    no: 16,
-    field: "text.en",
-    from: "corresponds to the name תסם, God",
-    to: "corresponds to the name Dieu",
-    why: "Follows the French correction above.",
-  },
-  {
-    no: 16,
-    field: "text.en",
-    from: "up to the 80th, exclusively",
-    to: "up to the 80th, inclusively",
-    why: "Follows the French correction above.",
-  },
-]
+// Empty, and that is the point. Eleven lived here while the entries came from
+// the OCR: a genius who preserved thieves rather than preserving against them,
+// a god name left as the debris "Acta \baR", a range ending "exclusivement"
+// where the book ends every range inclusively. Reading the pages instead made
+// all of them unnecessary — the scan says "des voleurs", "Agla" and
+// "inclusivement" plainly. See plan 031.
+//
+// Lenain's own mistakes are not corrected here. They belong to the editorial
+// apparatus: the text is published as he set it, with a note saying what is
+// wrong and what it should be, and our own tables use the corrected value.
+//
+// The mechanism stays for anything the pages genuinely cannot settle. Each
+// `from` must appear exactly once or the assembly fails, so a correction whose
+// text has moved on is found rather than silently skipped.
+[]

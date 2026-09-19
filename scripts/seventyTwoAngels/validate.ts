@@ -126,7 +126,9 @@ export function disagreements(angel: AngelExtraction): Disagreement[] {
  * of the data because the scan cannot supply it — see plan 031 — so these are
  * a measure of that damage rather than a gate on writing.
  */
-export function hebrewProblems(angel: AngelExtraction): string[] {
+export function hebrewProblems(angel: {
+  name: { en: string; he: string };
+}): string[] {
   const problems: string[] = [];
   const he = [...angel.name.he].filter((c) => /\p{Script=Hebrew}/u.test(c));
 
@@ -138,18 +140,24 @@ export function hebrewProblems(angel: AngelExtraction): string[] {
 }
 
 /** Shape checks on what actually reaches the data files. */
-export function shapeProblems(angel: AngelExtraction): string[] {
+export function shapeProblems(angel: {
+  name: { en: string; he: string };
+  french: string;
+  translation: string;
+}): string[] {
   const problems: string[] = [];
 
   if (!/^[A-Z]/.test(angel.name.en))
     problems.push(`name.en is not capitalised: ${angel.name.en}`);
-  if (angel.text.fr.length < 400)
-    problems.push(`text.fr is only ${angel.text.fr.length} characters`);
-  if (angel.text.en.length < 400)
-    problems.push(`text.en is only ${angel.text.en.length} characters`);
+  if (angel.french.length < 400)
+    problems.push(`the French is only ${angel.french.length} characters`);
+  if (angel.translation.length < 400)
+    problems.push(
+      `the translation is only ${angel.translation.length} characters`,
+    );
   // A repaired entry should have no page furniture left in it.
-  if (/\(\s*\d{1,3}\s*\)\s*$/m.test(angel.text.fr))
-    problems.push("text.fr still has a page number in it");
+  if (/\(\s*\d{1,3}\s*\)\s*$/m.test(angel.french))
+    problems.push("the French still has a page number in it");
 
   return problems;
 }

@@ -76,11 +76,11 @@ ${region.french}
 </scan>
 
 <restored-french>
-${angel.text.fr}
+${angel.french}
 </restored-french>
 
 <english>
-${angel.text.en}
+${angel.translation}
 </english>
 
 <fields>

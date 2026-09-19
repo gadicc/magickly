@@ -22,18 +22,6 @@ const saidOrNot = z.object({
   fr: z.string(),
 });
 
-/**
- * The entries run to a thousand characters and more, and a model asked for a
- * long string under a schema will sometimes fill it with "placeholder" and move
- * on. A floor turns that from a value we would have shipped into a retry.
- */
-const entryProse = z.object({
-  // French first: the model is asked to repair it and then translate what it
-  // repaired, and a schema's field order is the order it writes them in.
-  fr: z.string().min(300),
-  en: z.string().min(300),
-});
-
 export const angelExtraction = z.object({
   no: z.number().int().min(1).max(72),
 
@@ -64,8 +52,15 @@ export const angelExtraction = z.object({
   bornUnder: z.object({ en: z.string() }),
   contrary: z.object({ en: z.string() }),
 
-  /** The whole entry: repaired French, and English translated from it. */
-  text: entryProse,
+  /**
+   * The entry in English, translated from the French it was given. The French
+   * is not asked for: it is read off the page and passed in, so there is
+   * nothing for a model to reconstruct and nothing to drift.
+   *
+   * The floor is there because a model asked for a long string under a schema
+   * will sometimes fill it with "placeholder" and move on; ten entries did.
+   */
+  translation: z.string().min(300),
 
   scanned: z.object({
     degrees: z.object({

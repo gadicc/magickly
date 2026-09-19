@@ -12,24 +12,28 @@ import {
   presidingDaysOf,
   signOf,
 } from "../../data/kabbalah/seventyTwoAngelsDerived";
+import { type PlateEntry, plateEntries } from "./plateSource";
 import { type AngelExtraction, angelExtraction } from "./schema";
-import { type AngelRegion, findRegions } from "./source";
 
 /**
- * Restores one entry of Lenain per call, repairing the OCR and translating the
- * repaired French in the same pass, so the English renders something legible
- * rather than something garbled.
+ * Turns each genius's entry into the fields the page shows, and an English
+ * translation of it.
  *
- * Resumable: each genius is written to its own file and skipped if it is
- * already there, so a failed run costs only what it had not finished.
+ * The French is not asked for. It is read off the scan by transcribe.ts and
+ * passed in, so there is nothing here for a model to reconstruct and nothing
+ * to drift: the French a reader sees is the French the translation was made
+ * from. That was not true of the OCR, which could not give the Hebrew at all
+ * and read digits as letters, and the inventions it forced — an attribute for
+ * the entry whose heading it dropped, five corrupted names, three impossible
+ * psalms — are why this reads the page instead. See plan 031.
  *
  *   pnpm exec loom env -- pnpm exec tsx scripts/seventyTwoAngels/extract.ts
  *   … --only 22,42      just those genii
  *   … --force           redo ones already written
+ *   … --model <id>      recorded in each entry
  */
 
-/** Overridable with --model, so a run records which model produced it. */
-const DEFAULT_MODEL = "anthropic/claude-opus-5";
+const DEFAULT_MODEL = "anthropic/claude-sonnet-5";
 const CONCURRENCY = 4;
 const OUT_DIR = "output/seventyTwoAngels";
 
@@ -44,72 +48,54 @@ const christianChoirs: ChristianChoirs = JSON5.parse(
 const MINUTES = (total: number) =>
   `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
 
-const INSTRUCTIONS = `You are restoring one entry from Lazare Lenain's "La Science \
-Cabalistique" (Angers, 1823). Lenain died in 1832, so the work is public domain. What \
-you are given is an OCR of a Google Books scan, and it is damaged.
+const INSTRUCTIONS = `You are working on one entry from Lazare Lenain's "La Science \
+Cabalistique" (Angers, 1823). Lenain died in 1832, so the work is public domain. The \
+French you are given was read off the original scan, page by page, so it is what he \
+printed. Trust it, and do not silently repair it.
 
-How the scan is damaged, consistently:
-- Digits are read as letters: "16" for "le", "165" for "les", "06" for "de", "11" for \
-"Il", "1.1" for "La", "$" for "5", "£" for "4". Hebrew is often scrambled into Latin.
-- Words are split across line ends with hyphens: "do-\\nmine" is "domine".
-- Page headers like "( 47 )", running heads, printer's marks and footnote blocks are \
-interleaved mid-sentence.
-
-Your tasks, in order:
-
-1. Repair the French into "text.fr". This is the whole entry, and it is long: expect \
-roughly as many characters as the scan region you are given, typically 1200 to 2500. \
-Reproduce all of it. Rejoin split words, drop the page furniture, and \
-restore what Lenain wrote. Do NOT modernise his spelling, rewrite his sentences, \
-summarise, or add anything. Keep his paragraph breaks as blank lines. If the entry has \
-a footnote, put it last, on its own line, keeping its "(1)" marker.
-
-2. Translate that repaired French into English, into "text.en". Translate ONLY from \
-the French you just repaired. Do not draw on any modern published translation of this \
-work. Match Lenain's register: plain, a little archaic, not smoothed out.
+1. Translate the entry into English. Translate ONLY the French in front of you. A \
+modern published translation of this work exists; this must not be derived from it, so \
+do not draw on one if you know it. Match Lenain's register: plain, a little archaic, \
+not smoothed out.
 
 Grammatical gender is not a statement about a person. Every entry describes « la \
 personne qui est née sous cette influence », and Lenain then writes « elle » because \
 that noun is feminine — not because the person is a woman. Translate those as "they", \
 never "she". The genius itself he treats as « il »; keep that as "he".
 
-3. Fill the structured fields from the entry. The prose fields ("invokedFor", \
+2. Fill the structured fields from the entry. The prose fields ("invokedFor", \
 "governs", "bornUnder", "contrary") are short English summaries drawn from the entry, \
 one or two sentences each.
 
 "people" is the nation the genius rules. Nearly every entry names one, either as \
 « Il domine sur les Hébreux » or as « d'après la langue des Mongols ». Give the nation \
-alone, as a short noun phrase — "the Mongols", "Turkey" — never the sentence around \
-it, and never the name of God, which belongs in "godName". Where an entry gives a \
-godName it almost always gives a people too.
+alone, as a short noun phrase — "the Mongols", "Turkey" — never the sentence around it, \
+and never the name of God, which belongs in "godName".
 
 Where the entry genuinely does not say something, leave that field as an empty string. \
 An empty string is a CORRECT answer. This applies most often to "bornUnder": plenty of \
-entries never describe the character of a person born under their genius, and for \
-those the field must be empty. Do not assemble one out of the rest of the entry. \
-Inventing a field is the worst thing you can do here, worse than leaving it blank.
+entries never describe the character of a person born under their genius. Do not \
+assemble one out of the rest of the entry, and never supply a fact you know from \
+elsewhere. If it is not on the page, it is not in the answer.
 
-4. For "name.he", give the traditional five Hebrew letters — a triad of the Shem \
-HaMephorash followed by יה or אל — not the scan's scrambled characters. If what the \
-scan shows disagrees, say so in "uncertain".
+3. "name.he" is the Hebrew as the entry prints it. Copy it from the French you are \
+given, letter for letter. Do not substitute a spelling you know.
 
-5. Fill "scanned" with what this page LITERALLY PRINTS, even where it contradicts the \
-values you were given. This is how errors get found, so do not silently correct it \
-here, and do not convert anything: for the invocation, give the hour and the minute as \
-printed and whether it says "matin" or "soir", not a total. Where the entry omits \
-something, use "" or an empty array.
+4. Fill "scanned" with what the entry SAYS, even where it contradicts the values you \
+were given. Lenain makes mistakes and this is how they are found, so do not correct \
+them here, and do not convert anything: for the invocation give the hour, the minute \
+and whether it says "matin" or "soir", not a total.
 
-6. Put anything you could not resolve in "uncertain", in your own words. An empty \
-array is a claim that the entry came through cleanly.`;
+5. Put anything doubtful in "uncertain". An empty array is a claim that the entry is \
+straightforward.`;
 
 function derivedContext(no: number) {
   const degrees = degreesOf(no);
   const sign = signOf(no);
   const invocation = invocationOf(no);
   return `Genius ${no} of 72. These follow from Lenain's own four tables, and are given \
-so you can tell which reading of a mangled digit is right. They are NOT content: never \
-write them into text.fr or text.en. If the entry does not state a degree range, a \
-quinance, a decade or a planet, the restored French must not state one either.
+only so you can see where the entry departs from them. They are NOT content: never \
+write them into the translation.
 - Degrees of the sphere: ${degrees.from} to ${degrees.to}
 - Sign: ${sign.zodiacId}, ${sign.from}-${sign.to}° of it, quinance ${sign.quinance}
 - Decade ${decadeOf(no)} of 36, under ${planetOf(no)}
@@ -120,41 +106,40 @@ quinance, a decade or a planet, the restored French must not state one either.
 - Invocation: ${MINUTES(invocation.from)} to ${MINUTES(invocation.to)}`;
 }
 
-function promptFor(region: AngelRegion) {
-  const which = region.headingFound
-    ? ""
-    : `\n\nNOTE: the scan lost this entry's opening line, so the region below spans its \
-neighbours. Take ONLY genius ${region.no} from it — it begins where the previous \
-entry's closing sentence about the contrary genius ends.`;
+function promptFor(entry: PlateEntry) {
+  const ordinal =
+    entry.printedOrdinal === undefined
+      ? ""
+      : `\n\nNOTE: the heading prints "${entry.printedOrdinal}e", but by its place in \
+the book this is the ${entry.no}th genius. Use ${entry.no}.`;
 
-  return `${derivedContext(region.no)}${which}
+  const footnotes = entry.footnotes.length
+    ? `\n\n<footnotes>\n${entry.footnotes.join("\n\n")}\n</footnotes>`
+    : "";
 
-The region may include the tail of the previous entry and the head of the next. \
-Extract only genius ${region.no}.
+  return `${derivedContext(entry.no)}${ordinal}
 
-<scan>
-${region.french}
-</scan>`;
+Printed on page${entry.printedPages.length > 1 ? "s" : ""} \
+${entry.printedPages.join(" and ")} of the 1823 edition.
+
+<entry>
+${entry.french}
+</entry>${footnotes}`;
 }
 
-async function extractOne(
-  region: AngelRegion,
-  model: string,
-): Promise<AngelExtraction> {
+async function extractOne(entry: PlateEntry, model: string) {
   const { object } = await generateObject({
     model,
-    // Restoring a scan is transcription, not reasoning, and thinking tokens
-    // come out of the same budget as the answer: left on, the model spent
-    // almost all of it thinking and truncated the French mid-sentence.
+    // Reading an entry is not reasoning, and thinking tokens come out of the
+    // same budget as the answer.
     providerOptions: { anthropic: { thinking: { type: "disabled" } } },
-    // The two prose fields run past a thousand characters each.
     maxOutputTokens: 16000,
     schema: angelExtraction,
     system: INSTRUCTIONS,
-    prompt: promptFor(region),
+    prompt: promptFor(entry),
   });
-  if (object.no !== region.no)
-    throw new Error(`Asked for genius ${region.no}, got ${object.no}`);
+  if (object.no !== entry.no)
+    throw new Error(`Asked for genius ${entry.no}, got ${object.no}`);
   return object;
 }
 
@@ -162,8 +147,17 @@ function pathFor(no: number) {
   return join(OUT_DIR, `${String(no).padStart(2, "0")}.json`);
 }
 
-export function readExtraction(no: number) {
-  return angelExtraction.parse(JSON.parse(readFileSync(pathFor(no), "utf8")));
+export interface StoredExtraction extends AngelExtraction {
+  /** The French as printed, from the transcription rather than from a model. */
+  french: string;
+  printedPages: number[];
+  /** Which model translated it, so the data can say. */
+  model: string;
+}
+
+export function readExtraction(no: number): StoredExtraction {
+  const raw = JSON.parse(readFileSync(pathFor(no), "utf8"));
+  return { ...raw, ...angelExtraction.parse(raw) };
 }
 
 async function main() {
@@ -178,43 +172,46 @@ async function main() {
       : new Set(args[onlyAt + 1].split(",").map((n) => Number(n.trim())));
 
   mkdirSync(OUT_DIR, { recursive: true });
-  const todo = findRegions().filter(
-    (region) =>
-      (!only || only.has(region.no)) &&
-      (force || !existsSync(pathFor(region.no))),
+  const todo = plateEntries().filter(
+    (entry) =>
+      (!only || only.has(entry.no)) &&
+      (force || !existsSync(pathFor(entry.no))),
   );
   if (!todo.length) return console.log("Nothing to do.");
-  console.log(`Extracting ${todo.length} of 72 with ${model}.`);
+  console.log(`Reading ${todo.length} of 72 entries with ${model}.`);
 
   const queue = [...todo];
   let done = 0;
   const failures: string[] = [];
   await Promise.all(
     Array.from({ length: CONCURRENCY }, async () => {
-      for (let region = queue.shift(); region; region = queue.shift()) {
+      for (let entry = queue.shift(); entry; entry = queue.shift()) {
         try {
-          const angel = await extractOne(region, model);
-          // Which model produced this, for the review pass and for provenance.
-          // Zod drops the key on the way back in.
+          const angel = await extractOne(entry, model);
+          const stored: StoredExtraction = {
+            ...angel,
+            french: entry.french,
+            printedPages: entry.printedPages,
+            model,
+          };
           writeFileSync(
-            pathFor(region.no),
-            `${JSON.stringify({ ...angel, _model: model }, null, 2)}\n`,
+            pathFor(entry.no),
+            `${JSON.stringify(stored, null, 2)}\n`,
           );
           done++;
           const flag = angel.uncertain.length
             ? ` ⚠ ${angel.uncertain.length}`
             : "";
           console.log(
-            `[${done}/${todo.length}] ${region.no}. ${angel.name.en}${flag}`,
+            `[${done}/${todo.length}] ${entry.no}. ${angel.name.en}${flag}`,
           );
         } catch (error) {
-          // A schema rejection says which field, but only in the cause.
           const cause = (error as { cause?: unknown })?.cause;
           const why =
             (error instanceof Error ? error.message : String(error)) +
             (cause ? ` | ${String((cause as Error).message ?? cause)}` : "");
-          failures.push(`${region.no}: ${why}`);
-          console.error(`[!] ${region.no} failed: ${why}`);
+          failures.push(`${entry.no}: ${why}`);
+          console.error(`[!] ${entry.no} failed: ${why}`);
         }
       }
     }),
