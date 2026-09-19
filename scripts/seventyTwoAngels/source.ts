@@ -27,8 +27,13 @@ const FIRST_COPY_LINES = 6503;
  */
 const CONTEXT_LINES = 0;
 
-/** The last entry runs to the chapter's end rather than to another heading. */
-const END_OF_LAST_ENTRY_LINES = 30;
+/**
+ * The last entry runs to the chapter's end rather than to another heading, so
+ * its length is guessed. Thirty lines stopped one paragraph short and dropped
+ * the seventy-second's contrary genius; the chapter's remaining text is well
+ * within sixty.
+ */
+const END_OF_LAST_ENTRY_LINES = 60;
 
 /**
  * Ordinals the scan mangled past recognition, and what the sequence shows they

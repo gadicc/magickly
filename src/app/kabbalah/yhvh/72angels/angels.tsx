@@ -194,8 +194,8 @@ function Angel({
     <Accordion slotProps={{ transition: { unmountOnExit: true } }}>
       <AccordionSummary
         expandIcon={<ExpandMore />}
-        aria-controls="panel1a-content"
-        id="panel1a-header"
+        aria-controls={`angel-${no}-content`}
+        id={`angel-${no}-header`}
       >
         <Typography>
           {no}. {angel.name.en} ({governedRange(no, astrologySystem)})
@@ -348,7 +348,7 @@ function SevenyTwo() {
       <div style={{ marginTop: "1em" }}>
         {angels.map((angel, i) => (
           <Angel
-            key={angel.name.en}
+            key={angel.no}
             angel={angel}
             no={i + 1}
             astrologySystem={astrologySystem}

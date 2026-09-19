@@ -142,9 +142,15 @@ the English is a translation of French the model has already made sense of.
 Nothing new is installed. `ai@7.0.102` is already a direct dependency and
 bundles `@ai-sdk/gateway@4.0.82`, so a bare model string routes through the
 Vercel AI Gateway; `zod`, `tsx`, `json5` and `vitest` are direct dependencies
-too. The model is `anthropic/claude-opus-5` at temperature 0, reached through
-`loom env` with `AI_GATEWAY_API_KEY`. A smoke call succeeded on 19 September.
-The whole job is roughly 110K input and 80K output tokens.
+too. Everything is reached through `loom env` with `AI_GATEWAY_API_KEY`.
+
+What actually ran, which is not what this plan first said: **Sonnet 5** for the
+extraction and the transcription, with extended thinking disabled, and
+**gpt-6-astra** for the review. Opus 5 was the intention and the committed
+default, but the gateway refused it for anything larger than a trivial request
+— 0 of 8 identical probes, against 8 of 8 for Sonnet 5 — with credit to spare
+and no provider ever attempted. No temperature is set anywhere: Opus 5 does not
+accept one, and the option was removed rather than left to be ignored.
 
 | File | Role |
 | --- | --- |
@@ -152,7 +158,8 @@ The whole job is roughly 110K input and 80K output tokens.
 | `scripts/seventyTwoAngels/schema.ts` | the Zod schema shared by extraction and validation |
 | `scripts/seventyTwoAngels/extract.ts` | the gateway pass, one angel at a time, resumable |
 | `data/kabbalah/seventyTwoAngelsDerived.ts` | the invariants, used by page, script and test |
-| `data/kabbalah/seventyTwoAngels.test.ts` | the validator, needing no API key |
+| `scripts/seventyTwoAngels/validate.ts` | the invariant checks, needing no API key |
+| `scripts/seventyTwoAngels/corrections.json5` | hand-verified corrections, applied at assembly |
 
 **Slicing.** Headings are detected where the OCR left them legible; each slice
 runs from one heading to the next, with a little lead-in and run-out so nothing
@@ -170,8 +177,22 @@ mismatch is a review item, never an accepted value. The check ships as a vitest
 test so the invariants keep holding in CI long after the extraction is done, and
 so a future re-run is measured against the same bar.
 
-Prompt, model id and temperature are committed, so the derivation is
-reproducible and reviewable rather than a one-off nobody can audit.
+The prompt and the schema are committed. The derivation is **not** otherwise
+reproducible, and saying so is better than implying otherwise:
+
+- Which model produced each entry is recorded only in `output/`, which is
+  gitignored. The committed default names a model that never ran.
+- The extractions are not committed either, so the corrections in
+  `corrections.json5` are string matches against text nobody else has. A re-run
+  rewords passages, and a correction whose `from` no longer matches fails the
+  assembly loudly — which is the right failure, but it means the corrections
+  are tied to one unrepeatable run.
+- The validator runs at assembly rather than in CI, so nothing tests the
+  shipped data. A check on the psalm references would have caught three
+  impossible ones; it did not exist.
+
+Committing the per-entry extractions, or at least their model and a hash, would
+close most of this.
 
 ## Page fixes
 

@@ -27,7 +27,10 @@ describe("the nine choirs", () => {
   it("is indexed by the choir number the derivation gives", () => {
     for (let no = 1; no <= ANGEL_COUNT; no++)
       expect(christianChoirs[choirOf(no) - 1]).toBeDefined();
-    // The entries that declare a choir, and what Lenain calls it there.
+    // The eight entries that do declare a choir, and what Lenain calls it
+    // there. He declares no ninth: the sixty-fourth opens the angels, not the
+    // sixty-fifth, so the last of these is deliberately absent rather than
+    // asserted under his authority.
     expect(christianChoirs[choirOf(1) - 1].name.fr).toBe("Séraphins");
     expect(christianChoirs[choirOf(9) - 1].name.fr).toBe("Chérubins");
     expect(christianChoirs[choirOf(17) - 1].name.fr).toBe("Trônes");
@@ -36,6 +39,16 @@ describe("the nine choirs", () => {
     expect(christianChoirs[choirOf(41) - 1].name.fr).toBe("Vertus");
     expect(christianChoirs[choirOf(49) - 1].name.fr).toBe("Principautés");
     expect(christianChoirs[choirOf(57) - 1].name.fr).toBe("Archanges");
+  });
+
+  it("puts the angels where the pattern does, not where the book does", () => {
+    // Ours, not Lenain's. He opens the ninth choir in the sixty-fourth entry
+    // and ends the eighth "jusqu'au 63e", making one choir of seven and one of
+    // nine against the eight his own first eight declarations set. The page
+    // shows the sixty-fourth as an archangel on that reasoning; a reader
+    // comparing it with the book will find this note. See plan 031.
+    expect(choirOf(64)).toBe(8);
+    expect(choirOf(65)).toBe(9);
     expect(christianChoirs[choirOf(65) - 1].name.fr).toBe("Anges");
   });
 });
