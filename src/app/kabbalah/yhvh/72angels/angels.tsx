@@ -24,6 +24,10 @@ import zodiacs from "@/../data/astrology/Zodiac";
 import christianChoirs from "@/../data/kabbalah/ChristianChoirs";
 import angels, { type Angel } from "@/../data/kabbalah/SeventyTwoAngels";
 import {
+  loadAngelTexts,
+  type TextLanguage,
+} from "@/../data/kabbalah/SeventyTwoAngelsText";
+import {
   choirOf,
   governedDaysOf,
   type MonthDay,
@@ -89,6 +93,92 @@ function Governs({
   );
 }
 
+function Said({
+  label,
+  children,
+  width,
+}: {
+  label: string;
+  children: React.ReactNode;
+  width?: number;
+}) {
+  if (!children) return null;
+  return (
+    <TableRow>
+      <TableCell component="th" scope="row" sx={width ? { width } : undefined}>
+        {label}
+      </TableCell>
+      <TableCell>{children}</TableCell>
+    </TableRow>
+  );
+}
+
+/**
+ * The entries run to about 88kB a language, so they load when a reader opens
+ * one rather than with the page, as the Mercury widget's ephemeris does.
+ */
+function OriginalText({ no }: { no: number }) {
+  const [open, setOpen] = React.useState(false);
+  const [language, setLanguage] = React.useState<TextLanguage>("en");
+  const [texts, setTexts] = React.useState<string[]>();
+
+  React.useEffect(() => {
+    if (!open) return;
+    let current = true;
+    setTexts(undefined);
+    loadAngelTexts(language)
+      .then((loaded) => {
+        if (current) setTexts(loaded);
+      })
+      .catch((error) => {
+        console.error(error);
+        if (current) setTexts([]);
+      });
+    return () => {
+      current = false;
+    };
+  }, [open, language]);
+
+  return (
+    <details
+      style={{ fontSize: "80%" }}
+      onToggle={(event) => setOpen(event.currentTarget.open)}
+    >
+      <summary>Original text</summary>
+      {open && (
+        <>
+          <RadioGroup
+            row
+            value={language}
+            onChange={(e) => setLanguage(e.target.value as TextLanguage)}
+            sx={{ mt: 1 }}
+          >
+            <FormControlLabel
+              value="en"
+              control={<Radio size="small" />}
+              label="English"
+            />
+            <FormControlLabel
+              value="fr"
+              control={<Radio size="small" />}
+              label="Français (Lenain)"
+            />
+          </RadioGroup>
+          <div
+            style={{
+              marginTop: ".8em",
+              whiteSpace: "pre-wrap",
+              textAlign: "justify",
+            }}
+          >
+            {texts ? (texts[no - 1] ?? "") : "Loading…"}
+          </div>
+        </>
+      )}
+    </details>
+  );
+}
+
 function Angel({
   angel,
   no,
@@ -101,7 +191,7 @@ function Angel({
   const choir = christianChoirs[choirOf(no) - 1];
 
   return (
-    <Accordion>
+    <Accordion slotProps={{ transition: { unmountOnExit: true } }}>
       <AccordionSummary
         expandIcon={<ExpandMore />}
         aria-controls="panel1a-content"
@@ -115,63 +205,40 @@ function Angel({
         <TableContainer component={Paper}>
           <Table aria-label="simple table" size="small">
             <TableBody>
-              <TableRow>
-                <TableCell component="th" scope="row" sx={{ width: 150 }}>
-                  Angel (genius):
-                </TableCell>
-                <TableCell>
-                  {angel.name.en} | {angel.name.he}
-                </TableCell>
-              </TableRow>
-              {angel.godName && (
-                <TableRow>
-                  <TableCell component="th" scope="row" sx={{ width: 150 }}>
-                    God Name:
-                  </TableCell>
-                  <TableCell>{angel.godName}</TableCell>
-                </TableRow>
-              )}
-              <TableRow>
-                <TableCell component="th" scope="row" sx={{ width: 150 }}>
-                  Attribute:
-                </TableCell>
-                <TableCell>{angel.attribute.en}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell component="th" scope="row">
-                  Choir:
-                </TableCell>
-                <TableCell>{choir.name.en}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Governs:</TableCell>
-                <TableCell>
-                  <Governs no={no} astrologySystem={astrologySystem} />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Presiding Days:</TableCell>
-                <TableCell>
-                  {presidingDaysOf(no).map(formatMonthDay).join(", ")}
-                </TableCell>
-              </TableRow>
+              <Said label="Angel (genius):" width={150}>
+                {angel.name.en}
+              </Said>
+              <Said label="Attribute:" width={150}>
+                {angel.attribute.en}
+              </Said>
+              <Said label="Rules:" width={150}>
+                {angel.people.en}
+              </Said>
+              <Said label="God Name:" width={150}>
+                {angel.godName}
+              </Said>
+              <Said label="Choir:">{choir.name.en}</Said>
+              <Said label="Governs:">
+                <Governs no={no} astrologySystem={astrologySystem} />
+              </Said>
+              <Said label="Presiding Days:">
+                {presidingDaysOf(no).map(formatMonthDay).join(", ")}
+              </Said>
+              <Said label="Invoked for:">{angel.invokedFor.en}</Said>
+              <Said label="Influences:">{angel.governs.en}</Said>
+              <Said label="Born under:">{angel.bornUnder.en}</Said>
+              <Said label="Contrary genius:">{angel.contrary.en}</Said>
+              <Said label="Psalm:">
+                {angel.psalm.psalm > 0 &&
+                  `${angel.psalm.psalm}:${angel.psalm.verse}${
+                    angel.psalm.la ? ` — ${angel.psalm.la}` : ""
+                  }`}
+              </Said>
             </TableBody>
           </Table>
         </TableContainer>
         <br />
-        <details style={{ fontSize: "80%" }}>
-          <summary>Original text</summary>
-
-          <div
-            style={{
-              marginTop: ".8em",
-              whiteSpace: "pre-wrap",
-              textAlign: "justify",
-            }}
-          >
-            {angel.text.en}
-          </div>
-        </details>
+        <OriginalText no={no} />
       </AccordionDetails>
     </Accordion>
   );

@@ -12,11 +12,6 @@ import { z } from "zod";
  * printed reading instead, contradictions included.
  */
 
-const bilingual = z.object({
-  en: z.string().min(1),
-  fr: z.string().min(1),
-});
-
 /**
  * For what an entry may simply not say. Requiring a non-empty string here
  * asked the model to invent, and it did: four entries came back with a

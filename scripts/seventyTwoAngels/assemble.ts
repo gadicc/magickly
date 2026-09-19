@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import JSON5 from "json5";
 import { ANGEL_COUNT } from "../../data/kabbalah/seventyTwoAngelsDerived";
 import { type AngelExtraction, angelExtraction } from "./schema";
-import { disagreements, shapeProblems } from "./validate";
+import { disagreements, hebrewProblems, shapeProblems } from "./validate";
 
 /**
  * Turns the per-genius extractions into the three committed data files, and
@@ -32,15 +32,56 @@ function pathFor(no: number) {
   return `${IN_DIR}/${String(no).padStart(2, "0")}.json`;
 }
 
+interface Correction {
+  no: number;
+  field: string;
+  from: string;
+  to: string;
+  why: string;
+}
+
+const corrections: Correction[] = JSON5.parse(
+  readFileSync(`${__dirname}/corrections.json5`, "utf8"),
+);
+
+/**
+ * Applies the hand-verified corrections to one entry. Each `from` must appear
+ * exactly once: a re-extraction that words the passage differently then fails
+ * here rather than quietly dropping the correction on the floor.
+ */
+function correct(angel: AngelExtraction) {
+  for (const fix of corrections.filter((c) => c.no === angel.no)) {
+    const [head, tail] = fix.field.split(".");
+    const fields = angel as unknown as Record<string, unknown>;
+    const holder = (tail ? fields[head] : fields) as Record<string, string>;
+    const key = tail ?? head;
+    const occurrences = holder[key].split(fix.from).length - 1;
+    if (occurrences !== 1)
+      throw new Error(
+        `Correction for ${angel.no} ${fix.field} matches ${occurrences} times, not once: "${fix.from}"`,
+      );
+    holder[key] = holder[key].replace(fix.from, fix.to);
+  }
+  return angel;
+}
+
 function read(no: number): AngelExtraction {
-  return angelExtraction.parse(JSON.parse(readFileSync(pathFor(no), "utf8")));
+  return correct(
+    angelExtraction.parse(JSON.parse(readFileSync(pathFor(no), "utf8"))),
+  );
 }
 
 /** Only what the page shows; the prose and the `scanned` readings stay out. */
 function record(angel: AngelExtraction) {
   return {
     no: angel.no,
-    name: angel.name,
+    // The Hebrew is deliberately not carried through. It is the most damaged
+    // part of the scan and the model reconstructs it differently every run —
+    // 27 of 72 malformed on the last one, a different 27 each time, twice
+    // returning the Tetragrammaton. A wrong name that is five letters ending
+    // in אל passes every check we have, so the field is left unsourced rather
+    // than filled with something that looks right. See plan 031.
+    name: { en: angel.name.en },
     attribute: angel.attribute,
     people: angel.people,
     godName: angel.godName,
@@ -66,6 +107,7 @@ function main() {
     (no) => reportOnly === false || existsSync(pathFor(no)),
   );
   const angels = numbers.map(read);
+  console.log(`${corrections.length} hand-verified corrections applied.`);
   if (reportOnly && angels.length < ANGEL_COUNT)
     console.log(`${angels.length} of ${ANGEL_COUNT} extracted so far.\n`);
 
@@ -73,13 +115,17 @@ function main() {
   const shapes = angels.flatMap((angel) =>
     shapeProblems(angel).map((problem) => `${angel.no}: ${problem}`),
   );
+  const hebrew = angels.flatMap((angel) =>
+    hebrewProblems(angel).map((problem) => `${angel.no}: ${problem}`),
+  );
   const unsure = angels.flatMap((angel) =>
     angel.uncertain.map((note) => `${angel.no}: ${note}`),
   );
 
   console.log(
     `${clashes.length} disagreements with the tables, ` +
-      `${shapes.length} shape problems, ${unsure.length} notes.\n`,
+      `${shapes.length} shape problems, ${hebrew.length} Hebrew names ` +
+      `unusable (not shipped), ${unsure.length} notes.\n`,
   );
   for (const c of clashes)
     console.log(`  ${c.no} ${c.field}: scan "${c.scanned}" vs "${c.derived}"`);

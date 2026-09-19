@@ -121,8 +121,12 @@ export function disagreements(angel: AngelExtraction): Disagreement[] {
   return found;
 }
 
-/** Shape checks on the parts no arithmetic can confirm. */
-export function shapeProblems(angel: AngelExtraction): string[] {
+/**
+ * How the Hebrew name reads, reported but not shipped. The field is left out
+ * of the data because the scan cannot supply it — see plan 031 — so these are
+ * a measure of that damage rather than a gate on writing.
+ */
+export function hebrewProblems(angel: AngelExtraction): string[] {
   const problems: string[] = [];
   const he = [...angel.name.he].filter((c) => /\p{Script=Hebrew}/u.test(c));
 
@@ -130,6 +134,13 @@ export function shapeProblems(angel: AngelExtraction): string[] {
     problems.push(`name.he has ${he.length} Hebrew letters, not 5`);
   if (!/(יה|אל)$/.test(angel.name.he))
     problems.push(`name.he does not end in יה or אל: ${angel.name.he}`);
+  return problems;
+}
+
+/** Shape checks on what actually reaches the data files. */
+export function shapeProblems(angel: AngelExtraction): string[] {
+  const problems: string[] = [];
+
   if (!/^[A-Z]/.test(angel.name.en))
     problems.push(`name.en is not capitalised: ${angel.name.en}`);
   if (angel.text.fr.length < 400)
