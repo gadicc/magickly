@@ -26,6 +26,7 @@ import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import JSON5 from "json5";
+import { graph } from "./graph";
 
 const DATA_DIR = fileURLToPath(new URL(".", import.meta.url));
 const DIST_DIR = join(DATA_DIR, "dist");
@@ -74,10 +75,12 @@ async function emitted(dir = DIST_DIR): Promise<string[]> {
 export async function buildData() {
   const written: string[] = [];
   const expected = new Set<string>();
+  let tables = 0;
 
   for (const name of await sources()) {
     const out = name.replace(/\.json5$/, ".json");
     expected.add(out);
+    tables++;
     const parsed = JSON5.parse(await readFile(join(DATA_DIR, name), "utf8"));
     // Source order is insertion order through both parse and stringify, so a
     // diff of the output reads like a diff of the source.
@@ -85,10 +88,17 @@ export async function buildData() {
     if (await writeIfChanged(join(DIST_DIR, out), json)) written.push(out);
   }
 
+  // The graph, for a reader that is not TypeScript. `as const satisfies`
+  // leaves an ordinary object behind, so this is the same literal.
+  expected.add("graph.json");
+  const graphJson = `${JSON.stringify(graph, null, 2)}\n`;
+  if (await writeIfChanged(join(DIST_DIR, "graph.json"), graphJson))
+    written.push("graph.json");
+
   const stale = (await emitted()).filter((name) => !expected.has(name));
   for (const name of stale) await rm(join(DIST_DIR, name));
 
-  return { tables: expected.size, written, stale };
+  return { tables, written, stale };
 }
 
 /** vitest's globalSetup, so a test file run on its own still has its data. */
