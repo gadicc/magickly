@@ -141,14 +141,24 @@ export default function Sequence() {
             <a href="https://www.svgrepo.com/svg/322283/eye-of-horus">
               Eye of Horus
             </a>{" "}
-            from SVG Repo, under CC BY, redrawn as a single path.
+            by <a href="https://game-icons.net/">game-icons.net</a>, from the
+            Game Interface Icons collection on SVG Repo, under a{" "}
+            <a href="https://www.svgrepo.com/page/licensing/#CC%20Attribution">
+              CC Attribution licence
+            </a>
+            , redrawn as a single path.
           </li>
           <li>
             The Kerux&apos;s caduceus on the officer lamens:{" "}
             <a href="https://www.svgrepo.com/svg/482800/caduceus-staff-icon">
               Caduceus staff
             </a>{" "}
-            from SVG Repo, which is public domain.
+            by Icooon Mono, from the Health Icooon Mono collection on SVG Repo,
+            which is{" "}
+            <a href="https://www.svgrepo.com/page/licensing/#PD">
+              public domain
+            </a>
+            .
           </li>
           <li>
             The <Link href="/kabbalah/tree">Tree of Life</Link> glyph is our
