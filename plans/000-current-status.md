@@ -108,10 +108,5 @@ Follow-ups are separate from the completed migration work:
   anonymous tab left open across that release shows a study load error until
   it reloads; see
   [plan 013](013-sql-auth-runtime.md#runtime-entrypoints-prepared).
-- TODO: size tiles from the space they have, for the UX pass. `Tiles` takes
-  MUI Grid breakpoints, which follow the viewport, so a page whose tiles sit
-  in a narrower container has to pass its own `size`, as /astrology/planets
-  now does. A CSS grid with `repeat(auto-fill, minmax(...))`, or container
-  queries, would size each tile from its container instead.
 
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.

@@ -42,7 +42,11 @@ describe("Tiles", () => {
     expect(getComputedStyle(tile).position).toBe("absolute");
     expect(tile.closest("[inert]")).toBeNull();
     expect(tile.nextElementSibling?.hasAttribute("inert")).toBe(true);
-    expect(tile.parentElement?.className).toContain("MuiGrid-grid-md-3");
+    // The row fits as many tiles as the width allows, whatever that width is.
+    const row = tile.parentElement?.parentElement;
+    const style = row && getComputedStyle(row);
+    expect(style?.display).toBe("grid");
+    expect(style?.gridTemplateColumns).toContain("auto-fill");
     const about = screen.getByRole("link", { name: "About" });
     expect(about.nextElementSibling?.querySelector("img")).not.toBeNull();
   });
@@ -50,7 +54,6 @@ describe("Tiles", () => {
   it("leaves an informative preview readable, after its title", () => {
     render(
       <Tiles
-        size={{ xs: 6 }}
         tiles={[
           {
             Component: () => <div>Waxing Crescent</div>,
@@ -66,7 +69,5 @@ describe("Tiles", () => {
     const preview = tile.nextElementSibling;
     expect(preview?.textContent).toBe("Waxing Crescent");
     expect(preview?.hasAttribute("inert")).toBe(false);
-    expect(tile.parentElement?.className).toContain("MuiGrid-grid-xs-6");
-    expect(tile.parentElement?.className).not.toContain("MuiGrid-grid-md");
   });
 });

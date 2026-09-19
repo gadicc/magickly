@@ -1,36 +1,33 @@
-import { Box, Grid, type GridProps, ImageListItemBar } from "@mui/material";
+import { Box, ImageListItemBar } from "@mui/material";
 import Image from "next/image";
 import Link from "./Link";
-
-/**
- * Tile widths for a full-width page. The breakpoints follow the viewport, so
- * a page that puts Tiles in a narrower container passes its own `size`.
- */
-const FULL_WIDTH_SIZE: GridProps["size"] = { xs: 6, sm: 4, md: 3 };
 
 /**
  * Linked tiles, each previewing its destination with `img` or `Component`.
  * Mark a tile `informative` when its preview shows information rather than
  * decoration and has no links of its own, so screen readers read it.
+ *
+ * Tiles fill the width they are given, so a page can put them in any
+ * container without telling them how wide to be.
  */
-function Tiles({
-  tiles,
-  size = FULL_WIDTH_SIZE,
-}: {
-  tiles;
-  size?: GridProps["size"];
-}) {
+function Tiles({ tiles }) {
   return (
-    <Grid container spacing={0}>
+    <Box
+      sx={{
+        display: "grid",
+        // As many tiles as fit, at least two, each at most 200px before the
+        // row grows another column.
+        gridTemplateColumns: "repeat(auto-fill, minmax(min(45%, 200px), 1fr))",
+      }}
+    >
       {tiles.map((tile) => (
-        <Grid
+        <Box
           key={tile.to}
           sx={{
             height: 180,
             position: "relative",
             overflow: "hidden",
           }}
-          size={size}
         >
           {/*
             A preview can draw its own links (GradeTree does), and links
@@ -97,9 +94,9 @@ function Tiles({
               )
             ) : null}
           </Box>
-        </Grid>
+        </Box>
       ))}
-    </Grid>
+    </Box>
   );
 }
 
