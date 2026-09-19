@@ -51,10 +51,19 @@ describe("cutting it into genii", () => {
   });
 
   it("widens the region where a heading is missing", () => {
-    // 22 must still be inside its region, between 21 and 23.
+    // 22 has no heading of its own, so its region opens on 21's and runs to
+    // where 23's begins: 22 is certainly inside it, and 23 is certainly not.
     expect(regions[21].french).toContain("Nelchael");
-    expect(regions[21].french).toContain("Melahel");
+    expect(regions[21].french).not.toContain("Melahel");
     expect(regions[41].french).toContain("Mikael");
+  });
+
+  it("cuts on the headings themselves, taking in no neighbour", () => {
+    // Padding the edges fed four entries the previous genius's closing
+    // paragraph about its contrary, and they absorbed it as their own.
+    for (let i = 1; i < regions.length; i++)
+      if (regions[i].headingFound)
+        expect(regions[i - 1].to).toBe(regions[i].from);
   });
 
   it("starts and ends where the chapter does", () => {

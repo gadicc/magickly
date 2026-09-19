@@ -20,8 +20,12 @@ export const SOURCE_PATH =
  */
 const FIRST_COPY_LINES = 6503;
 
-/** How much of the neighbouring entries to keep around a region's edges. */
-const CONTEXT_LINES = 3;
+/**
+ * A heading is an exact boundary, so a region that has one starts on it and
+ * stops before the next. Padding the edges imported the previous entry's
+ * closing paragraph about its contrary genius, and four entries absorbed one.
+ */
+const CONTEXT_LINES = 0;
 
 /** The last entry runs to the chapter's end rather than to another heading. */
 const END_OF_LAST_ENTRY_LINES = 30;
