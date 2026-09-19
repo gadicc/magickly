@@ -18,6 +18,16 @@ const bilingual = z.object({
 });
 
 /**
+ * For what an entry may simply not say. Requiring a non-empty string here
+ * asked the model to invent, and it did: four entries came back with a
+ * description of people born under a genius that their entry never mentions.
+ */
+const saidOrNot = z.object({
+  en: z.string(),
+  fr: z.string(),
+});
+
+/**
  * The entries run to a thousand characters and more, and a model asked for a
  * long string under a schema will sometimes fill it with "placeholder" and move
  * on. A floor turns that from a value we would have shipped into a retry.
@@ -40,22 +50,20 @@ export const angelExtraction = z.object({
   }),
   attribute: bilingual,
   /** The nation this genius rules, and that nation's name for God. */
-  people: bilingual,
-  godName: z.string().min(1),
+  people: saidOrNot,
+  godName: z.string(),
   psalm: z.object({
-    psalm: z.number().int().min(1).max(150),
-    verse: z.number().int().min(1),
+    /** 0 where the entry cites something other than a psalm, or nothing. */
+    psalm: z.number().int().min(0).max(150),
+    verse: z.number().int().min(0),
     /** The Latin incipit as the entry prints it, repaired. */
-    la: z.string().min(1),
+    la: z.string(),
   }),
-  /** What the entry says the genius is invoked for. */
-  invokedFor: z.object({ en: z.string().min(1) }),
-  /** What it says the genius dominates or influences. */
-  governs: z.object({ en: z.string().min(1) }),
-  /** The character of a person born under it. */
-  bornUnder: z.object({ en: z.string().min(1) }),
-  /** What the contrary genius rules. */
-  contrary: z.object({ en: z.string().min(1) }),
+  /** Each of these is "" where the entry does not say. Never invented. */
+  invokedFor: z.object({ en: z.string() }),
+  governs: z.object({ en: z.string() }),
+  bornUnder: z.object({ en: z.string() }),
+  contrary: z.object({ en: z.string() }),
 
   /** The whole entry: repaired French, and English translated from it. */
   text: entryProse,

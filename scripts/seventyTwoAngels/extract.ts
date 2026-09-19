@@ -77,6 +77,12 @@ never "she". The genius itself he treats as « il »; keep that as "he".
 "governs", "bornUnder", "contrary") are short English summaries drawn from the entry, \
 one or two sentences each.
 
+Where the entry does not say something, leave that field as an empty string. An empty \
+string is a CORRECT answer and the expected one. Not every entry describes the people \
+born under its genius, names a nation, or cites a psalm — when it does not, say \
+nothing rather than assembling something plausible out of the rest of the entry. \
+Inventing a field is the worst thing you can do here, worse than leaving it blank.
+
 4. For "name.he", give the traditional five Hebrew letters — a triad of the Shem \
 HaMephorash followed by יה or אל — not the scan's scrambled characters. If what the \
 scan shows disagrees, say so in "uncertain".
@@ -95,7 +101,9 @@ function derivedContext(no: number) {
   const sign = signOf(no);
   const invocation = invocationOf(no);
   return `Genius ${no} of 72. These follow from Lenain's own four tables, and are given \
-so you can repair mangled digits in the prose against them:
+so you can tell which reading of a mangled digit is right. They are NOT content: never \
+write them into text.fr or text.en. If the entry does not state a degree range, a \
+quinance, a decade or a planet, the restored French must not state one either.
 - Degrees of the sphere: ${degrees.from} to ${degrees.to}
 - Sign: ${sign.zodiacId}, ${sign.from}-${sign.to}° of it, quinance ${sign.quinance}
 - Decade ${decadeOf(no)} of 36, under ${planetOf(no)}
