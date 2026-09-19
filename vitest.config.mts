@@ -121,6 +121,7 @@ export default defineConfig({
         "src/components/gd/roseSigilGeometry.ts",
         "src/components/svgCoordinate.ts",
         "src/app/geomancy/tetragrams.ts",
+        "data/assemble.ts",
         "data/kabbalah/seventyTwoAngelsDerived.ts",
         "src/app/chat/train/access.ts",
         "src/app/chat/train/ingestPdf.ts",

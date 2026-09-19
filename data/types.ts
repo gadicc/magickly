@@ -1,0 +1,243 @@
+/**
+ * Row types, derived from the JSON and [the graph](./graph.ts) together.
+ *
+ * Ids are `keyof typeof <table>`, so they are exact by construction and no
+ * union is copied by hand. A link is a property on the row whose type is the
+ * target table's row, so a four-hop read type-checks, and a table that was
+ * not assembled has no accessor at all — reading it is a compile error rather
+ * than `undefined` at runtime.
+ *
+ * Shape, from the spike recorded in plan 032: one flat mapped type per row
+ * over a key union computed from the JSON and the graph literal. The key set
+ * never recurses, so the cycles (sephirah → archangel → sephirah) live only
+ * in property positions, which TypeScript instantiates lazily. `Graph` and
+ * `Tables` are bound in rather than passed as type parameters, and `"*"`
+ * stands for "every table"; the fully generic form checks identically and
+ * prints the whole graph literal in every hover.
+ *
+ * Rows are uniform per table: the keys are unioned across the table's rows
+ * and an absent one is typed `undefined`, so a partial relation reads
+ * `hod.gdGrade?.planet?.hebrewLetter?.letter.he`. Per-row precision would
+ * make hop two an error, because a link's target is the union of the target
+ * table's rows.
+ */
+import type { Graph } from "./graph";
+import type { TableName, Tables } from "./tables";
+
+/** The tables an assembled object holds: some of them, or all of them. */
+export type Scope = TableName | "*";
+
+type Included<I extends Scope> = "*" extends I
+  ? TableName
+  : Extract<I, TableName>;
+
+/** A table's rows as a union: an object table by key, an array table by index. */
+export type Rows<T extends TableName> = Tables[T] extends readonly (infer R)[]
+  ? R
+  : Tables[T][keyof Tables[T]];
+
+/** Every key any row of the table has. */
+type UnionKeys<RU> = RU extends unknown ? keyof RU & string : never;
+
+/** That key's type across the rows, `undefined` where a row lacks it. */
+type UnionField<RU, K> = RU extends unknown
+  ? K extends keyof RU
+    ? RU[K]
+    : undefined
+  : never;
+
+type Defined<V> = Exclude<V, undefined | null>;
+
+/** The keys some of them lack. JSON stores `null`, never `undefined`. */
+type Missing<RU> = {
+  [K in UnionKeys<RU>]: undefined extends UnionField<RU, K> ? K : never;
+}[UnionKeys<RU>];
+
+/**
+ * One shape per object at every depth, not only at the top: the keys unioned,
+ * and optional where one of them lacks it. Nested blocks differ row by row —
+ * the sephirot have four shapes of `color` between them, five planets have no
+ * Hebrew name — and without this a read of a key only some of them carry is
+ * an error rather than a `string | undefined`. Arrays and primitives are left
+ * as they are.
+ */
+type Uniform<V> = [Defined<V>] extends [never]
+  ? V
+  : [Defined<V>] extends [object]
+    ? [Defined<V>] extends [readonly unknown[]]
+      ? V
+      :
+          | Simplify<
+              {
+                [K in Exclude<
+                  UnionKeys<Defined<V>>,
+                  Missing<Defined<V>>
+                >]: Uniform<UnionField<Defined<V>, K>>;
+              } & {
+                [K in Missing<Defined<V>>]?: Uniform<UnionField<Defined<V>, K>>;
+              }
+            >
+          | Extract<V, undefined | null>
+    : V;
+
+/**
+ * TypeScript refuses to index a deferred key-remapped mapped type with a
+ * constrained key (TS2536); inside a one-parameter helper the key is naked
+ * and it works.
+ */
+type Lookup<M, K> = K extends keyof M ? M[K] : never;
+
+/** Flattens an intersection into one object, for a readable hover. */
+type Simplify<T> = { [K in keyof T]: T[K] };
+
+type LinksOf<T extends TableName> = Graph[T] extends { links: infer L }
+  ? L
+  : Record<never, never>;
+
+type LinkFields<T extends TableName> = keyof LinksOf<T> & string;
+
+/**
+ * The accessor a field name gives, anchored at the end so that `Ids` never
+ * matches `Id`: `planetId` → `planet`, `planetIds` → `planets`.
+ */
+type AccessorName<F extends string, D> = D extends {
+  as: infer A extends string;
+}
+  ? A
+  : F extends `${infer B}Ids`
+    ? `${B}s`
+    : F extends `${infer B}Id`
+      ? B
+      : never;
+
+/** The raw value of a field, dotted paths included. */
+type FieldValue<
+  T extends TableName,
+  F extends string,
+> = F extends `${infer P}.${infer Rest}`
+  ? UnionField<Exclude<UnionField<Rows<T>, P>, undefined | null>, Rest>
+  : UnionField<Rows<T>, F>;
+
+/** A link is optional exactly where the data leaves it out or nulls it. */
+type Absent<T extends TableName, F extends string> =
+  undefined extends FieldValue<T, F>
+    ? undefined
+    : null extends FieldValue<T, F>
+      ? undefined
+      : never;
+
+type LinkValue<I extends Scope, T extends TableName, F extends string> =
+  Lookup<LinksOf<T>, F> extends { to: infer To extends TableName }
+    ?
+        | (Lookup<LinksOf<T>, F> extends { many: true }
+            ? Row<I, To>[]
+            : Row<I, To>)
+        | Absent<T, F>
+    : never;
+
+/** Accessors from this table's own link fields, where the target is in scope. */
+type TopLinks<T extends TableName, I extends Scope> = {
+  [F in LinkFields<T> as F extends `${string}.${string}`
+    ? never
+    : Lookup<LinksOf<T>, F> extends { to: infer To }
+      ? To extends Included<I>
+        ? AccessorName<F, Lookup<LinksOf<T>, F>>
+        : never
+      : never]: F;
+};
+
+/** The prefix of a dotted link field, where its accessor lands. */
+type NestKey<T extends TableName> = {
+  [F in LinkFields<T>]: F extends `${infer P}.${string}` ? P : never;
+}[LinkFields<T>];
+
+type NestLinks<T extends TableName, I extends Scope, P extends string> = {
+  [F in LinkFields<T> as F extends `${P}.${infer Rest}`
+    ? Lookup<LinksOf<T>, F> extends { to: infer To }
+      ? To extends Included<I>
+        ? AccessorName<Rest, Lookup<LinksOf<T>, F>>
+        : never
+      : never
+    : never]: F;
+};
+
+type NestValue<I extends Scope, T extends TableName, P extends string> =
+  | Simplify<
+      Uniform<Defined<UnionField<Rows<T>, P>>> & {
+        [K in keyof NestLinks<T, I, P>]: LinkValue<
+          I,
+          T,
+          Lookup<NestLinks<T, I, P>, K> & string
+        >;
+      }
+    >
+  | (undefined extends UnionField<Rows<T>, P> ? undefined : never);
+
+/** The inverse accessors `S` declares on `T`'s rows. */
+type InverseName<S extends TableName, T extends TableName> = {
+  [F in LinkFields<S>]: Lookup<LinksOf<S>, F> extends {
+    to: T;
+    inverse: infer N extends string;
+  }
+    ? N
+    : never;
+}[LinkFields<S>];
+
+type InverseIsMany<S extends TableName, T extends TableName> = {
+  [F in LinkFields<S>]: Lookup<LinksOf<S>, F> extends { to: T; inverse: string }
+    ? Lookup<LinksOf<S>, F> extends { inverseMany: true }
+      ? true
+      : false
+    : never;
+}[LinkFields<S>];
+
+/** Back-links derived on this table, by the accessor name they take. */
+type Inverses<T extends TableName, I extends Scope> = {
+  [S in Included<I> as InverseName<S, T>]: S;
+};
+
+type InverseValue<I extends Scope, T extends TableName, S extends TableName> = [
+  InverseIsMany<S, T>,
+] extends [true]
+  ? Row<I, S>[]
+  : Row<I, S> | undefined;
+
+/** Everything `assemble()` adds to a row of `T`, and nothing it already had. */
+export type Links<I extends Scope, T extends TableName> = {
+  [K in
+    | (keyof TopLinks<T, I> & string)
+    | (keyof Inverses<T, I> & string)]: K extends keyof TopLinks<T, I>
+    ? LinkValue<I, T, Lookup<TopLinks<T, I>, K> & string>
+    : InverseValue<I, T, Lookup<Inverses<T, I>, K> & TableName>;
+};
+
+/** One of a row's own fields, which for a nested block carries its accessor. */
+type OwnField<I extends Scope, T extends TableName, K extends string> =
+  K extends NestKey<T> ? NestValue<I, T, K> : Uniform<UnionField<Rows<T>, K>>;
+
+/**
+ * An assembled row of `T`: its own fields, and its links into `I`. The links
+ * are always there, because `assemble()` gives every row of the table the
+ * accessor and leaves it `undefined` where the id is not.
+ */
+export type Row<I extends Scope, T extends TableName> = Simplify<
+  {
+    [K in Exclude<UnionKeys<Rows<T>>, Missing<Rows<T>>>]: OwnField<I, T, K>;
+  } & {
+    [K in Missing<Rows<T>>]?: OwnField<I, T, K>;
+  } & Links<I, T>
+>;
+
+/** A row as the JSON has it, uniform across the table and with no links. */
+export type Raw<T extends TableName> = Uniform<Rows<T>>;
+
+/** An assembled table: keyed as the JSON keys it, or an array where it is one. */
+export type Table<
+  I extends Scope,
+  T extends TableName,
+> = Tables[T] extends readonly unknown[]
+  ? Row<I, T>[]
+  : { [K in keyof Tables[T]]: Row<I, T> };
+
+/** What `assemble()` returns: the tables asked for, linked to each other. */
+export type Assembled<I extends Scope> = { [T in Included<I>]: Table<I, T> };
