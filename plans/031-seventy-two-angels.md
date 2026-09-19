@@ -208,6 +208,68 @@ Each gated on a clean worktree, in order:
 7. the page showing the new fields
 8. this plan and the [current status](000-current-status.md) follow-ups
 
+## What the pipeline found
+
+Written up after running it. The arithmetic and the review between them caught
+the following, none of which the extraction reported as a problem.
+
+### Faults in the scaffolding, not the model
+
+Every serious defect came from how the work was set up rather than from the
+model, which mostly did what it was asked:
+
+- **Required fields forced invention.** Every field wanted a non-empty string,
+  so where an entry was silent the only way to answer was to assemble something
+  from the rest of it. Four entries came back describing the character of people
+  born under a genius that their entry never mentions. An invented sentence of
+  that kind is fluent, in register, and indistinguishable from the real thing.
+- **Letting them be empty caused the opposite.** Sixty-two of seventy-one
+  entries then reported no people at all, while sixty-seven reported a god name
+  — which cannot both hold, since Lenain gives the two together.
+- **Padded regions merged entries.** Three lines of lead-in imported the
+  previous genius's closing paragraph, which is exactly what sits before a
+  heading. Four entries absorbed one; the thirty-fourth answered `contrary`
+  with its neighbour's.
+- **Derived values leaked into the prose.** Given so the model could choose
+  between readings of a damaged digit, they were written into the French as
+  though the scan said them.
+- **Reasoning tokens came out of the answer's budget.** With thinking on, a
+  probe spent 7,705 of 8,000 tokens thinking and returned 538 characters; the
+  entries truncated mid-sentence, and short prose came back as the literal
+  string `"placeholder"`.
+- **Field order is emission order.** With `en` before `fr`, the model wrote the
+  translation before the French it was translating from.
+
+### Faults in the book
+
+- The first genius presides on 31 April, which is not a day. The third table
+  gives 31 May.
+- Seven consecutive entries, the fifth to the eleventh, print an August day one
+  behind their own third table.
+- The seventeenth opens its hour at five o'clock where the fourth table gives
+  twenty past.
+- The fifty-seventh ends the archangels "jusqu'au 63e" and the sixty-fourth
+  opens the angels, making one choir of seven and one of nine against his own
+  pattern of eight.
+
+## Two fields this scan cannot supply
+
+Neither is a defect to fix by iterating; both need a source.
+
+**`name.he`, for all seventy-two.** The Hebrew is the most damaged part of the
+scan, and the model reconstructs it differently on every run: the malformed
+count moved 10 → 20 → 21 → 27 across runs, landing on different entries each
+time, once with vowel points and twice returning the Tetragrammaton itself. The
+shape check only catches malformed output — five well-formed letters ending in
+אל that are the wrong name pass silently — so the true error rate is higher than
+whatever it reports. The field should be derived from the Shem HaMephorash
+triads rather than read, or left out.
+
+**The twenty-second's name.** Its heading vanished at a page break, so the scan
+has neither name nor attribute. The attribute is empty, which is honest. The
+name cannot be, and the model has offered "Yeiayel" and "Yezalel" on different
+runs, the second being the thirteenth's name.
+
 ## Follow-ups
 
 - **Sigils.** The page promises them. Vaughan's blog images are his own work and
