@@ -662,18 +662,12 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
                 return (
                   <div style={{ fontSize: "80%" }}>
                     {tetragram.zodiacId &&
-                      (Array.isArray(tetragram.zodiacId)
-                        ? tetragram.zodiacId
-                            .map((z) => data.zodiac[z].symbol)
-                            .join("/")
-                        : data.zodiac[tetragram.zodiacId].symbol)}
+                      data.zodiac[tetragram.zodiacId].symbol}
                     {data.element[tetragram.elementId]?.symbol}
-                    {/* tetragram.rulerId */}
-                    {Array.isArray(tetragram.planetId)
-                      ? tetragram.planetId
-                          .map((p) => data.planet[p].symbol)
-                          .join("/")
-                      : data.planet[tetragram.planetId].symbol}
+                    {/* tetragram.rulerIds */}
+                    {tetragram.planetIds
+                      .map((p) => data.planet[p].symbol)
+                      .join("/")}
                   </div>
                 );
               })()}

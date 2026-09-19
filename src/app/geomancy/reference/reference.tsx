@@ -158,20 +158,14 @@ export default function Geomancy() {
                         }}
                       >
                         {tetragram.zodiacId &&
-                          (Array.isArray(tetragram.zodiacId)
-                            ? tetragram.zodiacId
-                                .map((z) => data.zodiac[z].symbol)
-                                .join("/")
-                            : data.zodiac[tetragram.zodiacId].symbol)}
+                          data.zodiac[tetragram.zodiacId].symbol}
                         <br />
                         {data.element[tetragram.elementId]?.symbol}
                         <br />
-                        {/* tetragram.rulerId */}
-                        {Array.isArray(tetragram.planetId)
-                          ? tetragram.planetId
-                              .map((p) => data.planet[p].symbol)
-                              .join("/")
-                          : data.planet[tetragram.planetId].symbol}
+                        {/* tetragram.rulerIds */}
+                        {tetragram.planetIds
+                          .map((p) => data.planet[p].symbol)
+                          .join("/")}
                       </div>
                     )}
                   </Stack>

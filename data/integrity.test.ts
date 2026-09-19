@@ -15,9 +15,15 @@ const EXPECTED_UNRESOLVED = [
   'sephirah.daat.archangelId = ""',
   'sephirah.daat.chakraId = ""',
   'sephirah.daat.soulId = ""',
-  'tetragram.caput_draconis.planetId = ["venus","jupiter"]',
-  'tetragram.cauda_draconis.planetId = ["saturn","mars"]',
 ];
+
+/**
+ * Fields naming a table whose value is a list of ids. Every id in them
+ * resolves, but the barrel matches the `Id` suffix alone, so it makes no link
+ * at all here and the rows carry no accessor; step 2's graph gives them one.
+ * Listed by field rather than by row, since every row of the table has it.
+ */
+const EXPECTED_LISTS = ["tetragram.planetIds"];
 
 /**
  * Id-shaped fields named after no table in the barrel. They are not failures:
@@ -29,7 +35,7 @@ const EXPECTED_WITHOUT_TABLE = [
   "degreeId",
   "intelligenceId",
   "orderId",
-  "rulerId",
+  "rulerIds",
   "spiritId",
   "tarotId",
   "tribeOfIsraelId",
@@ -41,45 +47,60 @@ const EXPECTED_ARRAY_TABLES = ["house", "geomanicHouse"];
 interface Audit {
   resolved: string[];
   unresolved: string[];
+  lists: string[];
   withoutTable: string[];
   arrayTables: string[];
 }
 
 /**
- * Walks the barrel exactly as `insertRefs` does: every key ending in `Id`
- * names a table, and any other object-valued key whose `<key>Id` is absent is
- * recursed into, which is how the paths' `hermetic` and `hebrew` blocks are
- * reached. `null` and an absent key are how the data says "no link", so
- * neither is reported; an array is reported, because the barrel indexes the
- * table with the whole array and never matches.
+ * Walks the barrel the way `insertRefs` does: a key ending in `Id` names a
+ * table, and any other object-valued key whose `<key>Id` is absent is recursed
+ * into, which is how the paths' `hermetic` and `hebrew` blocks are reached.
+ * `null` and an absent key are how the data says "no link", so neither is
+ * reported. It also looks at the `Ids` suffix, which the barrel does not: the
+ * plural names a list, and each id in it is checked on its own.
  */
 function audit(): Audit {
   const tables = data as Record<string, unknown>;
   const result: Audit = {
     resolved: [],
     unresolved: [],
+    lists: [],
     withoutTable: [],
     arrayTables: [],
   };
 
-  const visit = (row: Row, where: string) => {
+  const check = (target: Row, value: unknown, where: string) => {
+    const found = typeof value === "string" && Object.hasOwn(target, value);
+    const report = `${where} = ${JSON.stringify(value)}`;
+    (found ? result.resolved : result.unresolved).push(report);
+  };
+
+  const visit = (row: Row, table: string, where: string) => {
     for (const [key, value] of Object.entries(row)) {
-      if (key.endsWith("Id")) {
+      const list = key.endsWith("Ids");
+      if (list || key.endsWith("Id")) {
         if (value === null || value === undefined) continue;
-        const target = tables[key.slice(0, -2)] as Row | undefined;
+        const target = tables[key.slice(0, list ? -3 : -2)] as Row | undefined;
         if (!target) {
           if (!result.withoutTable.includes(key)) result.withoutTable.push(key);
           continue;
         }
-        const found = typeof value === "string" && Object.hasOwn(target, value);
-        const report = `${where}.${key} = ${JSON.stringify(value)}`;
-        (found ? result.resolved : result.unresolved).push(report);
+        if (!list) {
+          check(target, value, `${where}.${key}`);
+          continue;
+        }
+        const field = `${table}.${key}`;
+        if (!result.lists.includes(field)) result.lists.push(field);
+        (value as unknown[]).forEach((id, i) =>
+          check(target, id, `${where}.${key}[${i}]`),
+        );
       } else if (
         row[`${key}Id`] === undefined &&
         typeof value === "object" &&
         value !== null
       ) {
-        visit(value as Row, where);
+        visit(value as Row, table, where);
       }
     }
   };
@@ -90,10 +111,11 @@ function audit(): Audit {
       continue;
     }
     for (const [id, row] of Object.entries(table as Row))
-      visit(row as Row, `${name}.${id}`);
+      visit(row as Row, name, `${name}.${id}`);
   }
 
   result.unresolved.sort();
+  result.lists.sort();
   result.withoutTable.sort();
   return result;
 }
@@ -101,6 +123,10 @@ function audit(): Audit {
 describe("data integrity", () => {
   it("fails to link exactly the rows plan 032 lists", () => {
     expect(audit().unresolved).toEqual(EXPECTED_UNRESOLVED);
+  });
+
+  it("makes no link at all for a list of ids", () => {
+    expect(audit().lists).toEqual(EXPECTED_LISTS);
   });
 
   it("accounts for every id-shaped field with no table", () => {

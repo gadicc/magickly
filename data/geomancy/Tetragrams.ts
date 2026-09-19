@@ -32,8 +32,8 @@ interface Tetragram {
   meanings: LangObject[];
   zodiacId: ZodiacId | null;
   elementId: ElementId;
-  rulerId: string | string[]; // TODO
-  planetId: PlanetId | PlanetId[];
+  rulerIds: string[]; // TODO
+  planetIds: PlanetId[];
 }
 
 type Tetragrams = {
