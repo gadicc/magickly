@@ -165,9 +165,11 @@ async function main() {
       for (let region = queue.shift(); region; region = queue.shift()) {
         try {
           const angel = await extractOne(region, model);
+          // Which model produced this, for the review pass and for provenance.
+          // Zod drops the key on the way back in.
           writeFileSync(
             pathFor(region.no),
-            `${JSON.stringify(angel, null, 2)}\n`,
+            `${JSON.stringify({ ...angel, _model: model }, null, 2)}\n`,
           );
           done++;
           const flag = angel.uncertain.length

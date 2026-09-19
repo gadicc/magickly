@@ -76,3 +76,27 @@ export const angelExtraction = z.object({
 });
 
 export type AngelExtraction = z.infer<typeof angelExtraction>;
+
+/**
+ * A second, stronger model's verdict on one restored entry. The bulk pass is
+ * cheap and reliable; this is what catches the places it was quietly wrong,
+ * which the arithmetic cannot reach — a dropped clause, an invented one, a
+ * translation that drifts, a field the entry does not actually support.
+ */
+export const angelReview = z.object({
+  no: z.number().int().min(1).max(72),
+  /** clean: ship it. minor: small fixes. rework: extract it again. */
+  verdict: z.enum(["clean", "minor", "rework"]),
+  issues: z.array(
+    z.object({
+      /** The field at fault, as a path: "text.fr", "psalm.verse", "name.he". */
+      field: z.string().min(1),
+      severity: z.enum(["minor", "major"]),
+      what: z.string().min(1),
+      /** A corrected value, where the reviewer is confident of one. */
+      suggested: z.string().optional(),
+    }),
+  ),
+});
+
+export type AngelReview = z.infer<typeof angelReview>;
