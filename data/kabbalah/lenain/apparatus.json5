@@ -28,6 +28,14 @@
     why: 'Five revolutions of 72 days are 360, as the same page says twice elsewhere and as the third table sets out row by row.',
   },
   {
+    no: 1,
+    kind: 'correction',
+    field: 'presidingDays',
+    printed: '20/3, 31/4, 11/8, 22/10, 2/1',
+    used: '20/3, 31/5, 11/8, 22/10, 2/1',
+    why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+  },
+  {
     no: 5,
     kind: 'correction',
     field: 'presidingDays',

@@ -195,6 +195,14 @@ function notesOfPage(page: PageTranscription): PageNote[] {
  * Gives each note to the entry that calls for it. The marker names it and the
  * page narrows it: two entries may each print a note "(1)", and only one of
  * them runs across the page this one is set on.
+ *
+ * A note no entry calls is not an entry's. The first genius begins halfway
+ * down page 46, under the tail of the chapter before it — "une liaison entre
+ * les êtres spirituels et les êtres matériels (1)" — and that line is what the
+ * Thrëicie note answers. Handing it to the only entry on the page gave Vehuiah
+ * a note he never called, and the translation then set a "(1)" after "le 31
+ * avril" to have somewhere to put it. Such a note stays with its page, where
+ * the edition prints it either way.
  */
 function attachNotes(entries: PlateEntry[], notes: PageNote[]) {
   for (const entry of entries) entry.footnotes = [];
@@ -204,16 +212,14 @@ function attachNotes(entries: PlateEntry[], notes: PageNote[]) {
     const onPage = entries.filter((entry) =>
       entry.printedPages.includes(note.printedPage),
     );
-    const wants = onPage.find((entry) => call.test(entry.french)) ?? onPage[0];
+    const wants = onPage.find((entry) => call.test(entry.french));
     if (!wants) continue;
 
     // A long note runs across pages, and its later pages carry no marker of
-    // their own — the seventieth's fills three. Same marker, or none, joins
-    // what the entry already holds.
-    // A long note runs across pages, and its later pages carry no marker of
-    // their own — or carry one misread from the page, as the thirty-eighth's
-    // second note does, resuming "ON," where it broke off at "le mot". A note
-    // that does not end in terminal punctuation has not ended.
+    // their own — the seventieth's fills three — or carry one misread from the
+    // page, as the thirty-eighth's second note does, resuming "ON," where it
+    // broke off at "le mot". A note that does not end in terminal punctuation
+    // has not ended.
     const held = wants.footnotes[wants.footnotes.length - 1];
     // A stop may be followed by a closing bracket: "(Voyez le Frontispice.)"
     // has ended.
