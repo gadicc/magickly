@@ -6,6 +6,19 @@ import type {
 
 /** Server resolution evidence only; this is neither an authorization grant nor a download manifest. */
 export interface RitualAssetPlanMetadata {
+  /**
+   * v5 still. Plan 032 step 3b added the hash of the data an image drew to
+   * every renderer identity, which reaches a plan twice over — inside
+   * `assets[].provenance.renderer` and through `generatedCatalogSha256` — but
+   * changes no key of this envelope, which is what the profile names and what
+   * [ritualBundles.ts](../db/schema/ritualBundles.ts)'s check constraint and
+   * [ritualBundleRecords.ts](./ritualBundleRecords.ts) read. A publication
+   * begun before that deploy and retried after it is replayed: a retry is
+   * matched on manifest and policy rather than on this plan hash, and its
+   * stored plan keeps the identity it was validated under; only a manifest
+   * change is refused. That is the same path the Tree's profile took from
+   * v2 to v3, which did not bump this one either.
+   */
   readonly profile: "magickli-ritual-asset-plan-v5";
   readonly sha256: string;
   readonly contentSha256: string;

@@ -104,6 +104,10 @@ describe("generated ritual image captures", () => {
         renderer: expect.objectContaining({
           profile: "magickli-tree-image-outlines-v3",
           fonts: [{ file: "NotoSans-Regular.ttf", sha256: "b".repeat(64) }],
+          inputs: {
+            spec: "magickli-image-inputs-v1",
+            sha256: "c".repeat(64),
+          },
         }),
       }),
     ]);
@@ -114,6 +118,37 @@ describe("generated ritual image captures", () => {
     expect(sha256).toBe(hash(JSON.stringify(identity)));
     expect(JSON.stringify(catalog.metadata)).not.toContain(ref);
     expect(supplied[0].every((byte) => byte === 0)).toBe(true);
+  });
+
+  // The other half of a render identity (plan 032, decision 10). The catalog
+  // does not interpret it: it copies the identity it was given, which is what
+  // makes the same reference, redrawn after a data edit, a different capture.
+  it("records the hash of the data the image drew, and hashes it in", async () => {
+    const first = await capture();
+    mocks.render.mockImplementation((slug: string, params: URLSearchParams) => {
+      const rendered = render(slug, params);
+      return {
+        ...rendered,
+        identity: {
+          ...rendered.identity,
+          inputs: { spec: "magickli-image-inputs-v1", sha256: "d".repeat(64) },
+        },
+      };
+    });
+    const second = await capture();
+    const entry = (catalog: GeneratedRitualImageCatalog) => {
+      const [first] = catalog.metadata.entries;
+      if (first.kind !== "available") throw Error("Unresolved capture");
+      return first;
+    };
+    expect(entry(second).renderer.inputs).toEqual({
+      spec: "magickli-image-inputs-v1",
+      sha256: "d".repeat(64),
+    });
+    // Same bytes, same reference, same profile: only the data moved.
+    expect(entry(second).sha256).toBe(entry(first).sha256);
+    expect(entry(second).renderer.profile).toBe(entry(first).renderer.profile);
+    expect(second.metadata.sha256).not.toBe(first.metadata.sha256);
   });
 
   it("fully decodes PNG and returns native facts", async () => {

@@ -11,6 +11,12 @@ export interface GeneratedRitualImageProvenance {
   readonly sourceSha256: string;
   /** Only the Tree is a ritual reference; other registry slugs are never generated assets. */
   readonly request: ComponentImageRequest<"tree-of-life">;
+  /**
+   * The renderer, and since plan 032 step 3b the hash of the data the image
+   * drew ([dataInputs.ts](../render/dataInputs.ts)) under its own version
+   * string. Both are recorded verbatim, so the catalog's `sha256` — and the
+   * plan's through it — moves when either half of an identity moves.
+   */
   readonly renderer: Awaited<ReturnType<typeof outlineTreeImage>>["identity"];
 }
 
@@ -33,6 +39,12 @@ export type GeneratedRitualImageEntry =
 
 /** Validated capture evidence; no authorization, durable publication or download readiness. */
 export interface GeneratedRitualImageCatalogMetadata {
+  /**
+   * v1 still: the envelope keeps every key it had, in the same place, with the
+   * same meaning. What 3b added sits inside `renderer`, which this catalog has
+   * always copied verbatim and no reader keys on, and it carries a version
+   * string of its own.
+   */
   readonly profile: "magickli-generated-image-catalog-v1";
   readonly validationSha256: string;
   readonly sha256: string;

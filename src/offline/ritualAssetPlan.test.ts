@@ -231,6 +231,7 @@ function privateCatalog(reference: string): PrivateRitualImageCatalog {
 // real-font/native-codec suite. Requests use the production closed parser.
 function generated(
   references = ["/api/render/tree-of-life?fmt=png&field=name.roman"],
+  inputsSha256 = hash("synthetic inputs"),
 ): GeneratedRitualImageCatalog {
   const entries = references.map((reference) => {
     const request = parseComponentImageRequest(
@@ -261,10 +262,7 @@ function generated(
         wasmSha256: hash("synthetic WASM"),
         fonts: [{ file: "synthetic-font.ttf", sha256: hash("synthetic font") }],
         defaultFontSize: 16,
-        inputs: {
-          spec: "magickli-image-inputs-v1",
-          sha256: hash("synthetic inputs"),
-        },
+        inputs: { spec: "magickli-image-inputs-v1", sha256: inputsSha256 },
       },
     };
   });
@@ -888,6 +886,46 @@ it("resolves exact generated aliases while retaining source URLs, fragments and 
     width: 450,
     height: 300,
   });
+});
+
+// Plan 032, decision 10: a data edit moves the drawn image's inputs hash, and
+// that reaches a plan through the capture it was taken from.
+it("carries the hash of the data a generated image drew into the plan identity", async () => {
+  const reference = "/api/render/tree-of-life?fmt=png&field=name.roman";
+  const before = generated([reference]),
+    after = generated([reference], hash("data edited"));
+  const source = doc(reference);
+  const first = await plan(source, {
+    staticCatalog: catalog,
+    generatedCatalog: before,
+  });
+  const second = await plan(source, {
+    staticCatalog: catalog,
+    generatedCatalog: after,
+  });
+  const renderer = (result: Awaited<ReturnType<typeof plan>>) => {
+    const { provenance } = result.metadata.assets[0];
+    if (provenance.kind !== "generated") throw Error("Not a generated asset");
+    return provenance.renderer;
+  };
+  expect(renderer(first).inputs).toEqual({
+    spec: "magickli-image-inputs-v1",
+    sha256: hash("synthetic inputs"),
+  });
+  expect(renderer(second).inputs.sha256).toBe(hash("data edited"));
+  // The profile string is untouched, and the bytes are the same fixture, so
+  // the identity moved for one reason only.
+  expect(renderer(second).profile).toBe(renderer(first).profile);
+  expect(second.metadata.assets[0].sha256).toBe(
+    first.metadata.assets[0].sha256,
+  );
+  expect(second.metadata.profile).toBe("magickli-ritual-asset-plan-v5");
+  expect(second.metadata.generatedCatalogSha256).not.toBe(
+    first.metadata.generatedCatalogSha256,
+  );
+  // A retry is matched on manifest and policy, not on this digest, so a
+  // publication begun before the deploy is replayed; the digest still moves.
+  expect(second.metadata.sha256).not.toBe(first.metadata.sha256);
 });
 
 it("does not substitute equivalent query spelling, order, route alias or another origin for a generated capture", async () => {
