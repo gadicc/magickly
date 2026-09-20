@@ -1,4 +1,12 @@
-import { readFileSync } from "node:fs";
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { PLANET_IDS } from "./astrology/Planets";
 import type { TableSpec } from "./graphSpec";
@@ -212,6 +220,38 @@ describe("the data against the graph", () => {
     expect(of("schema", failures)).toEqual([
       'soul.guph.extra: Invalid key: Expected never but received "extra"',
     ]);
+  });
+
+  it("counts a key one of the sources writes twice", () => {
+    // The lint itself is [duplicateKeys.test.ts](./duplicateKeys.test.ts)'s;
+    // this is its wiring into the check, which the real sources cannot
+    // exercise because they are clean and have to stay so. The sources are
+    // therefore read from a copy, with `amissio` put back the way `86895ad`
+    // found it: the title JSON5 kept, and above it the one it had already
+    // thrown away.
+    const dir = mkdtempSync(join(tmpdir(), "magickli-sources-"));
+    try {
+      const source = readFileSync(
+        new URL("./geomancy/tetragrams.json5", import.meta.url),
+        "utf8",
+      );
+      const planted = source.replace(
+        "\n  amissio: {\n",
+        '\n  amissio: {\n    title: { en: "Loss" },\n',
+      );
+      expect(planted).not.toBe(source);
+      mkdirSync(join(dir, "geomancy"));
+      writeFileSync(join(dir, "geomancy", "tetragrams.json5"), planted);
+
+      expect(of("duplicate", checkIntegrity(tables, dir))).toEqual([
+        "geomancy/tetragrams.json5: amissio: title: written twice in one " +
+          "object; JSON5 keeps the last silently",
+      ]);
+      // And the tables themselves are still clean, so nothing else moved.
+      expect(of("duplicate", checkIntegrity())).toEqual([]);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it("holds twelve planets and three spheres of the Tree", () => {

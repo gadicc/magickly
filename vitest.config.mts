@@ -124,6 +124,7 @@ export default defineConfig({
         "src/components/svgCoordinate.ts",
         "src/app/geomancy/tetragrams.ts",
         "data/assemble.ts",
+        "data/duplicateKeys.ts",
         "data/integrity.ts",
         "data/schemas.ts",
         "data/kabbalah/seventyTwoAngelsDerived.ts",

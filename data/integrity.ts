@@ -5,8 +5,10 @@
  * every id-shaped field declared, and is everything declared there; is every
  * `mirrors` declared from both ends; do the links resolve; does the arity
  * match; are the chains whole; does every row pass its
- * [schema](./schemas.ts); and do the few lists TypeScript has to hold by hand
- * still say what the data says? Nothing throws and nothing is fatal here —
+ * [schema](./schemas.ts); do the few lists TypeScript has to hold by hand
+ * still say what the data says; and does any source
+ * [write a key twice](./duplicateKeys.ts)? Nothing throws and nothing is
+ * fatal here —
  * [integrity.test.ts](./integrity.test.ts) asserts the list is empty, and
  * [check.ts](./check.ts) is the same list on the command line, which
  * `pnpm build` runs before Next sees the data.
@@ -17,6 +19,7 @@
 import * as v from "valibot";
 import { assemble, problemsOf } from "./assemble";
 import { PLANET_IDS } from "./astrology/Planets";
+import { duplicateKeysInSources } from "./duplicateKeys";
 import { graph } from "./graph";
 import type { TableSpec } from "./graphSpec";
 import { schemas } from "./schemas";
@@ -34,6 +37,8 @@ export interface Failure {
     | "schema"
     /** A `mirrors` the graph declares from one end only. */
     | "mirror"
+    /** A key written twice in one object of a JSON5 source. */
+    | "duplicate"
     /** A list written in TypeScript that the data no longer agrees with. */
     | "derived";
   /** `table`, `table.row` or `table.row.field`. */
@@ -209,8 +214,20 @@ function checkPlanetIds(table: unknown): Failure[] {
   return failures;
 }
 
-/** Everything wrong with the data, as the graph and the schemas see it. */
-export function checkIntegrity(input: Tables = realTables): Failure[] {
+/**
+ * Everything wrong with the data, as the graph and the schemas see it.
+ *
+ * `sources` is where the duplicate-key lint reads the JSON5 from, and is
+ * `data/` unless a test says otherwise; the real sources are clean, so a
+ * planted one is the only way that branch is ever walked
+ * ([integrity.test.ts](./integrity.test.ts)). The default lives in
+ * [duplicateKeys.ts](./duplicateKeys.ts), which is where the directory is
+ * known.
+ */
+export function checkIntegrity(
+  input: Tables = realTables,
+  sources?: string,
+): Failure[] {
   const failures: Failure[] = checkMirrors();
   const names = Object.keys(input) as TableName[];
 
@@ -276,6 +293,15 @@ export function checkIntegrity(input: Tables = realTables): Failure[] {
   }
 
   failures.push(...checkPlanetIds(input.planet));
+
+  // The sources as text, which is the only place a repeated key is visible:
+  // JSON5 keeps the last of them, so everything downstream sees one.
+  for (const { file, path, key } of duplicateKeysInSources(sources))
+    failures.push({
+      check: "duplicate",
+      where: `${file}: ${path ? `${path}: ` : ""}${key}`,
+      detail: "written twice in one object; JSON5 keeps the last silently",
+    });
 
   // Everything assembling the tables found: an id no row is keyed by, a
   // mirror that does not point back, a back-link two rows claim, and an
