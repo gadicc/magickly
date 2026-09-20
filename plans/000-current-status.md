@@ -107,11 +107,13 @@ Follow-ups are separate from the completed migration work:
   19 September, when the Tree's path data began rounding to three decimals to
   stop a hydration mismatch; the drawing is unchanged, within 0.000633 px. See
   [plan 030](030-tree-coordinate-rounding.md), including what it means for
-  rituals published across the deploy.
+  rituals published across the deploy. Since 20 September that profile names
+  the renderer alone: the data an image draws is hashed beside it, so a data
+  fix no longer bumps it (step 3b of [plan 032](032-data-layer.md#step-3b-1)).
 - The data layer is being rebuilt: `data/` keeps plain JSON tables, one
   declared graph describes every relation, and an eager `assemble()` replaces
   the barrel's in-place linking. See [plan 032](032-data-layer.md). Steps 0
-  to 2 have landed. Step 0 pinned the pages the data changes touch, step 1
+  to 3b have landed. Step 0 pinned the pages the data changes touch, step 1
   repaired the links, sentinels and field names the audit found (Luna's god
   name and the rulers of Cancer and Scorpio changed with it), and step 2
   built the layer itself: JSON emitted from the JSON5 sources into gitignored
@@ -136,10 +138,27 @@ Follow-ups are separate from the completed migration work:
   instantiations *below* `main`. Two things a reader sees: a `kind` row in the
   field dump on `/astrology/planet/<id>`, and BIA's meaning on
   `/enochian/dictionary` and `/enochian/keys`.
-- TODO: step 3b, render identity. `resolvedInputsHash`, which hashes the
-  fields an image actually reads rather than whole tables, and with it the
-  accepted one-time re-identification of every data-dependent component
-  image; then Manasseh's Hebrew, whose fix moves the Table of Shewbread.
+  Step 3b, render identity, has landed too. A rendered image's identity named
+  its renderer alone, so a data fix had to be published by bumping a shared
+  profile string by hand, which re-identified every image under it. Each
+  registered component now declares the fields of the data its render reads,
+  and the resolved values of exactly those fields are hashed into
+  `identity.inputs.sha256`; the profiles from here on name the renderer and
+  move only when it does, and the rule they stand under is that bytes must not
+  change under (profile, inputs hash, query). Links are resolved before they
+  are hashed, so an edit two hops away is covered without a spec naming the
+  table it is in. With that in place, `tribesOfIsrael.manasseh.name.he` stopped
+  being Benjamin's, byte for byte, and became מנשה: the Table of Shewbread's
+  bytes and inputs hash moved, every other image's bytes *and* hash did not,
+  and that is asserted rather than observed. A reader sees the Gemini position
+  on `/gd/symbols/shewbread` read מנשה. Every data-dependent image's identity
+  changed once, bytes unchanged, which is the accepted one-time cost; published
+  rituals keep their stored bytes and re-render at their next publication, and
+  a publication begun before the deploy and retried after it is replayed,
+  matched on manifest and policy, with its stored plan keeping the identity it
+  was validated under; only a manifest change is refused. The
+  `RENDER_INPUT_SWEEP=1` test behind it changed all 3,721 fields of the data in
+  turn and found no image that could be redrawn without its hash moving.
 - TODO: step 3c, consumers. Typed `get(id)` lookups on the `[id]` routes,
   Server Components passing ids, `/enochian/keys` resolving its dictionary
   subset on the server with the dictionary out of the JSON imports, that
@@ -148,6 +167,13 @@ Follow-ups are separate from the completed migration work:
   once nothing imports JSON5. The dump-page redesign, and `decycle` with it,
   comes after. The two `gdGrade` accessor collisions and the drifted id
   unions were settled in step 2.
+- TODO: two small ones left by step 3b
+  ([plan 032](032-data-layer.md#follow-ups)): two tribes' Hebrew names are
+  hashed into the Table of Shewbread's identity although no sign points at
+  them, because an inputs spec takes a whole table rather than the set the
+  data selects; and the `RENDER_INPUT_SWEEP=1` sweep compares the JSX handed
+  to the outliner rather than the outlined bytes, which is stricter but not
+  the published artefact.
 - TODO: two small ones left by step 3a
   ([plan 032](032-data-layer.md#follow-ups)): what `pnpm dev` does not pick up
   until it restarts — a source directory added while it runs, since the watch

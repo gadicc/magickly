@@ -1,8 +1,8 @@
 # Data layer
 
 Assessment, adversarial review, type spike and decisions, 17–19 September
-2026. Read [current status](000-current-status.md) first. Steps 0, 1, 2 and
-3a have landed ([Commits](#commits)); 3b, 3c and step 4 are not yet
+2026. Read [current status](000-current-status.md) first. Steps 0, 1, 2, 3a
+and 3b have landed ([Commits](#commits)); 3c and step 4 are not yet
 implemented. The long-term goal is to publish `data/` as its own npm package.
 
 Decision taken on 19 September: keep the data as plain JSON tables, describe
@@ -401,7 +401,7 @@ All in step 1 below; each is a data patch unless marked.
 | Three dictionary entries: IZAZAZ (Key 2, "have framed"), BIAB (Key 3, "stand"), VOMZARG (Key 3, "unto every one of you"), with `source: "Keys"` and `source2: "Key N"`, the file's own provenance pattern | Those rows on `/enochian/keys` gain their meaning |
 | `paths.json5` gains mirrored `nextId`/`prevId` in hermetic `pathNo` order 11–32, then `2_5` and `3_4`, which have no number; the path page's arrows read `nextId`/`prevId` | The arrows on `/kabbalah/path/<id>` render for the first time: they test `"prev" in path` today ([path.tsx:62](../src/app/kabbalah/path/[id]/path.tsx)), and paths have no such fields |
 | Delete the hand-written id unions; derive from JSON (code, step 2) | `typeof data.hebrewLetter.aleph` in [sets.tsx](../src/study/sets.tsx) becomes a type error (it is `alef`); fix the four references |
-| **Step 3, not step 1:** `tribesOfIsrael.manasseh` → `he: "מנשה"`, `en: "Manasseh"` | The Table of Shewbread's Gemini label changes ([TableOfShewbread.tsx:49](../src/components/gd/TableOfShewbread.tsx)), so its golden bytes move. It waits for `resolvedInputsHash` (decision 10) so that only the shewbread's identity changes, not the shared `magickli-component-image-outlines-v1` profile that every registry component publishes under |
+| **Step 3b, not step 1:** `tribesOfIsrael.manasseh` → `he: "מנשה"`, `en: "Manasseh"` | The Table of Shewbread's Gemini label changes ([TableOfShewbread.tsx:49](../src/components/gd/TableOfShewbread.tsx)), so its golden bytes move. It waited for the resolved-inputs hash (decision 10) so that only the shewbread's identity would change, not the shared `magickli-component-image-outlines-v1` profile that every registry component publishes under. Done ([below](#step-3b-1)) |
 
 Also decided on 19 September, code rather than data: the keys page's
 dictionary lookup ([keys.tsx:37](../src/app/enochian/keys/keys.tsx))
@@ -542,6 +542,23 @@ lint, `BIAB`'s WE meaning into the parting, and the moved key-surface pin into
 A ninth commit, `docs(plan): Record the data layer's third step`, adds the
 sections below; as in the earlier steps it is not in the table, which it would
 have to predict.
+
+### Step 3b
+
+Step 3b — render identity, the second of the three branches — on
+`gate/data-layer-3b` from `0049677`. Each commit was checked on its own tree
+with `pnpm check`, `pnpm typecheck` and `pnpm test`, `data/dist` wiped before
+each; the branch was then gated as [below](#step-3b-1).
+
+| Commit | Change | Tests |
+| --- | --- | --- |
+| `74aa199` feat(render): Hash the data an image draws into its identity | `dataInputs.ts`, an inputs spec on every registry entry, `identity.inputs` on every rendered image, and the three tests that bound the specs from both sides. No image's bytes move | 4,696 |
+| `8fdf0f1` feat(offline): Bind the image inputs hash into catalogs and plans | Where the hash is recorded, said out loud and held there by tests; neither profile string bumped, with the reason written down beside each | 4,698 |
+| `d419f9d` fix(kabbalah): Give Manasseh his own Hebrew name | The data fix step 3b was waiting for. One image's bytes and one image's inputs hash move | 4,698 |
+
+A fourth commit, `docs(plan): Record the data layer's third step, part b`,
+adds the sections below; as in the earlier steps it is not in the table, which
+it would have to predict.
 
 ## Results
 
@@ -983,6 +1000,254 @@ which raises `'error'` and never `'exit'`, so without a handler it would take
 the wrapper down and leave the watcher running — each left nothing behind in
 `ps`.
 
+### Step 3b
+
+The gate ran on the final tree in the `gate/data-layer-3b` worktree with the
+symlinked `node_modules` removed and a fresh `pnpm install --frozen-lockfile`,
+on Node 24.18.0 and pnpm 10.18.0, under CI's placeholder environment (no
+database or network), in [ci.yml](../.github/workflows/ci.yml)'s order:
+
+| Step | Outcome |
+| --- | --- |
+| `pnpm install --frozen-lockfile` | clean; no dependency was added |
+| `loom init` | already matches the bootstrap defaults |
+| `loom check` | good, with the standing pnpm 11 advisory |
+| `loom check --production` | good, same advisory |
+| `pnpm check` | no errors, and the same 37 warnings as before |
+| `pnpm typecheck` | clean |
+| `pnpm test:coverage` | 4,698 passed, 17 skipped, thresholds met; `dataInputs.ts` joins the coverage list and covers 100 % of statements, branches, functions and lines, as do `registry.tsx`, `outlineTreeImage.ts` and `componentImage.tsx` beside it |
+| `pnpm build` | webpack, 215 pages prerendered |
+| `pnpm check:turbopack` | Turbopack, 215 pages prerendered |
+
+What a reader sees change is one label: the Gemini position on
+[/gd/symbols/shewbread](../src/app/gd/symbols/shewbread/shewbread.tsx) reads
+מנשה, where it read בנימין — the same name Sagittarius carries, since
+Manasseh's Hebrew was Benjamin's byte for byte ([data fixes](#data-fixes)).
+Nothing else: the tribes are in no search description, no study set and no
+other component.
+
+Every pinned component image was re-rendered at the tip. One moved:
+
+| Image | Bytes | SHA-256 | Inputs |
+| --- | ---: | --- | --- |
+| `tree-of-life`, the 2=9 ritual's query | 150,736 | `96516a75ce13374a234de855bf596ce1a50d1e9adf7340b398e4b3a2b7e4858a` | `2591a504…` |
+| `table-of-shewbread` | 136,643 | `34e0fce138e4b50930aac5b226e71fbe452eb1ba7db5a9bb1929e0300e106e1b` | `dfd57ffb…` |
+| `astro-geomancy-chart` | 52,476 | `eb2f1b6fe2fef2f563ee164de6e403ca9f398ec4706c9ad331195bc34286bffa` | `c89a608f…` |
+| `astro-geomancy-chart?m=2222111122221111&width=256` | 56,498 | `18ecbf9feea69d75bb979319087b74d12d04a7399e3051f685893d6fbf328821` | `c89a608f…` |
+| `seven-branched-candlestick` | 52,363 | `5d8b637f7ceb159014b1bf7322b51456a8bd2b730bdb699883288ed6bf063331` | `a8a08155…` |
+| `enochian-tablet` | 120,471 | `a35f3c18a3a61d17c48d81e7e7b27def96fc43b896837297039a6ab8c20024e8` | `63b83840…` |
+| `rose-sigil?text=גדי` | 13,454 | `6edd6bd2b48b513facf72cd6a9d5e036338f4d698df6f24967163e5ee340e137` | `f88d8766…` |
+
+The shewbread was 136,294 bytes, SHA-256
+`df3c37911f14c3e81040d62d74892b97fdb0c72027ef390323f907e795ceb516`, inputs
+`9b1eb246…`, through steps 1, 2 and 3a, and both of its figures moved with
+Manasseh's name. The other six are byte for byte what step 3a left, and their
+inputs hashes did not move either — which is the whole of decision 10 in one
+table, and is asserted rather than observed for all six inputs hashes and
+five of the seven byte figures, pinned in
+[registry.test.tsx](../src/render/registry.test.tsx); the earth tablet, the
+chart at `m=2222…` and the rose sigil at `text=גדי` are recorded from the
+gate's own renders and pinned nowhere. A data edit that reached further than
+it should would still fail the suite, through the hashes.
+
+One social card draws that art, and no other:
+`/og/gd/symbols/shewbread.png` goes from 48,416 bytes, SHA-256
+`783f0cc120381106aba2297e85fe8a7a22e82836e9b6e6ffd1e241674468fa72`, to
+46,691 bytes,
+`f7c94fbfc5e1f8eaca151ce903639e527b2be9acd9c152c7a4645f4b4d2fe5ac`. The card
+art alone — the PNG fitted to the frame — goes from 61,755 bytes,
+`e7886ce3…`, to 61,793, `e7cd4b33…`. As in step 1, no card's section or title
+moved, so nothing else on any card did.
+
+#### Render identities and the data they draw
+
+An image's identity named its renderer: the outline profile, the resvg
+version, the WASM digest, the font digests and the default font size. The
+data it drew was not in it, so publishing a data fix meant bumping the profile
+by hand — and the profile is shared, so plan 028's archangel fix moved
+`magickli-tree-image-outlines-v1` to `v2` and with it every Tree ever
+published. Decision 10 replaces that with a second half:
+
+```
+identity.inputs = { spec: "magickli-image-inputs-v1", sha256 }
+```
+
+`sha256` is over the *resolved* value of every field the component's render
+reads. Each registry entry declares those fields as groups of
+`{ table, rows, fields }` — the same dotted paths the render passes to
+`readFieldPath` — and [dataInputs.ts](../src/render/dataInputs.ts) resolves
+them over the barrel, writes them in a canonical form (object keys sorted,
+array and row order kept because both are drawn, `undefined` distinct from
+absent and from the string `"undefined"`, every row named so a rename counts)
+and hashes that. The rule the profiles now stand under is that **bytes must
+not change under (profile, inputs hash, query)**; the profile moves when the
+renderer moves, and nothing else. [Plan 027](027-component-exports.md)'s
+"do not bump the outline profile unless bytes change" is superseded there.
+
+Resolving before hashing is what makes the spec short and complete at once.
+The Tree's spec names two tables, `sephirah` and `tolPath`, but the labels it
+draws reach nine more through links, and an edit in any of them moves the
+resolved value and so the hash: renaming Metatron, or repointing Keter's
+`godNameId`, moves the Tree's hash and no other image's. The rose sigil is the
+other end of the same idea — its letters are geometry in
+[roseSigilGeometry.ts](../src/components/gd/roseSigilGeometry.ts), not a
+table, so its spec is empty and no data edit can ever move it.
+
+What each component declares:
+
+| Image | Tables, rows and fields |
+| --- | --- |
+| `tree-of-life` | `sephirah`, every row in the table's own order (it is drawn by position), `id`, the four web colours and their text colours, `color.strokeColor`, `color.strokeDasharray`, and all thirty of `TREE_IMAGE_FIELDS`; `tolPath`, the twenty-four of `TREE_PATHS`, `id`, `hermetic.hebrewLetter.letter.he`, `hebrew.hebrewLetter.letter.he`, `hermetic.pathNo`, `hermetic.tarotId` |
+| `table-of-shewbread` | `zodiac`, every row in order, `symbol`, `tetragrammatonPermutation`, `tribeOfIsraelId`; `tribeOfIsrael`, every row, `name.he` |
+| `astro-geomancy-chart` | `tetragram`, every row, `rows`, `zodiacId`, `planetIds`; `zodiac`, every row, `symbol`; `planet`, every row, `symbol` |
+| `seven-branched-candlestick` | `planet`, the seven branches in drawing order, `symbol`, `archangel.name.he`, `hebrewLetter.letter.he`, `name.he.he` |
+| `enochian-tablet` | `enochianTablet`, `earth` and `air`, `grid` |
+| `rose-sigil` | nothing |
+
+`id`, `hermetic.pathNo` and `hermetic.tarotId` reach the source SVG — element
+ids, `<a>` hrefs and a `<title>` — and not the outlined bytes, which strip all
+three. They are hashed anyway: `sourceSha256` is recorded per capture too, and
+an identity that did not move with it would be a smaller version of the same
+problem.
+
+#### Proving the specs, both ways
+
+A spec is wrong in two directions, and each has its own test.
+
+- **Nothing listed is unread.** Every `(component, table, row, field)` the six
+  specs name — 682 of them — is changed in a copy of the data and must move
+  that component's hash
+  ([dataInputs.test.ts](../src/render/dataInputs.test.ts)). `setProperty`
+  builds intermediate objects, so a field a row lacks today (Da'at's soul,
+  Keter's dash pattern) is proved to be read rather than skipped.
+- **Nothing drawn is unlisted.** `RENDER_INPUT_SWEEP=1` changes every field of
+  every row of every one of the 26 tables in turn, redraws all six components
+  at every query that draws anything different, and requires a component whose
+  drawing moved to have moved its hash
+  ([dataInputs.sweep.test.ts](../src/render/dataInputs.sweep.test.ts)). It
+  takes minutes, so the normal suite skips it; it was run once on this branch
+  ([below](#the-sweep)).
+
+Both run the real pipeline over changed tables rather than a mock of it. The
+tables are JSON modules and `assemble()` freezes its clones, so a changed
+table has to arrive as a different module:
+[renderWithTables.ts](../tests/renderWithTables.ts) mocks each emitted JSON
+file and re-imports the registry, the contracts and `dataInputs` on top of it.
+What it compares is the JSX the outliner is handed rather than the outlined
+bytes. That is the same claim made more strictly — the outliner is a pure
+function of that string, so equal source is equal bytes, while the source can
+move when the bytes do not — and it is milliseconds rather than a full
+render, which is what makes a sweep of this size possible at all.
+
+Four named cases sit between the two
+([dataInputs.mutation.test.ts](../src/render/dataInputs.mutation.test.ts)): a
+tribe's Hebrew name reaches the shewbread and nothing else, an archangel's
+Hebrew name reaches the Tree through a link the spec never names, a repointed
+`godNameId` does the same, and four fields no component draws —
+`sephirah.tenHeavens`, `zodiac.emoji`, `tribeOfIsrael.name.en`,
+`planet.scent` — move neither bytes nor hash.
+
+#### The sweep
+
+Run on the branch tip, `RENDER_INPUT_SWEEP=1 vitest run
+src/render/dataInputs.sweep.test.ts`, on Node 24.18.0: **3,721 changes,
+1,001 redrawn images, 99 seconds, no failure.** Every change that moved a
+component's drawing had moved that component's inputs hash.
+
+Every one of those changes is to a leaf value: the sweep adds, removes,
+renames and reorders no row, and fills no empty array. The spec covers those
+by other means, since rows are named, key order is kept and links are
+resolved, and probing them by hand moved source and hash together: a
+sephirah reorder, a tribe rename, a `hermetic` block removed. An unlinked
+archangel row added moved neither.
+
+| Image | Changes that redrew it |
+| --- | ---: |
+| `tree-of-life` | 531 |
+| `enochian-tablet` | 312 |
+| `astro-geomancy-chart` | 68 |
+| `table-of-shewbread` | 48 |
+| `seven-branched-candlestick` | 42 |
+| `rose-sigil` | 0 |
+
+The counts are the mechanism written out. The tablet's 312 are exactly its two
+grids, 13 by 12 each, and nothing else in that table — not even the row's own
+`id`. The shewbread's 48 are twelve signs times three fields plus the twelve
+tribes the signs point at; the two tribes no sign names, Joseph and Levi,
+redrew nothing, which is the over-inclusion `rows: "*"` buys and the reason it
+is worth buying. The candlestick's 42 are seven planets times four own fields
+plus the seven archangels' and seven letters' Hebrew, reached through links
+its spec never names. The rose sigil's zero is the point: 3,721 changes to the
+data and not one of them can move it.
+
+Two more over-inclusions of the same kind: the tablet hashes both grids for
+either slug's render, so an air-grid edit re-identifies the earth image; and
+the chart hashes every planet and sign symbol and their key order although it
+looks them up by key, so reordering `tetragram` or `planet` moves its hash
+with the source unchanged. Each is a re-identification that could have been
+avoided, never a missed one.
+
+The other 2,720 changes moved nothing anywhere, which is the everyday case
+decision 10 exists for — a `scent` typo, a meaning reworded, an angel of the
+seventy-two corrected — and none of them now re-identifies a published image.
+
+#### Effects on publications
+
+As in [plan 028](028-seo.md#archangel-data), and for the same reasons:
+
+- Offline bundles already published keep their stored bytes. Each ritual's
+  next publication draws its images and builds its own manifest.
+- Every data-dependent image's identity changes once with the first of these
+  commits, bytes unchanged, which is the one-time cost
+  [decision 15](#decided-on-20-september) accepts. From here on only the
+  images an edit can reach are re-identified.
+- A publication that starts before the deploy and is retried after it is
+  replayed, not refused: since 16 September a retry is matched on manifest and
+  policy rather than on the plan digest, so its stored plan keeps the identity
+  it was validated under, and only a manifest change, which means bytes moved,
+  is an operation conflict. The first two commits move no bytes. The plan has
+  always carried the renderer identity; the digest moves, and nothing keys on
+  it.
+
+#### What was decided while building it
+
+- **Neither the catalog nor the plan profile is bumped.**
+  `magickli-generated-image-catalog-v1` and `magickli-ritual-asset-plan-v5`
+  name their own envelopes, and every key of both is where it was and means
+  what it did; what 3b adds sits inside `renderer`, which the catalog copies
+  verbatim, which no reader keys on, and which carries its own version string.
+  Bumping the plan would also need a migration of the check constraint in
+  [ritualBundles.ts](../src/db/schema/ritualBundles.ts) for a change no reader
+  can see. The Tree's own move from `v2` to `v3` (plan 030) bumped neither.
+- **`rows: "*"` where the drawn set is data, a list where the code names it.**
+  The candlestick's seven planets and the two tablets are named in code, so
+  the spec names them; the twelve signs and the sixteen figures are drawn from
+  whatever the table holds, in the order it holds them, so the spec takes the
+  table. Being exact would have meant deriving the row set from the data — for
+  instance the twelve tribes the signs point at, rather than all fourteen —
+  and a derived row set goes stale silently, which is the failure that
+  matters. Two tribes' Hebrew names are therefore hashed by an image that does
+  not draw them; the cost is a re-identification that could have been avoided,
+  never a missed one.
+- **The spec lives on the registry entry.** The registry is what "binds the
+  renderer identity" ([plan 027](027-component-exports.md)), and a component
+  that starts reading a new field is edited next to the entry that declares
+  it. `dataInputs.ts` holds only the resolver and the encoding.
+- **`enochianTablet` is not in the barrel**, being named in no link
+  ([above](#the-three-tables-the-barrel-does-not-hold)), so the source a spec
+  resolves against is the barrel plus that one table. Its rows are the raw
+  JSON either way.
+- **The hash is resolved once per process.** The data is frozen for the life
+  of the process, so `componentInputsHash(slug)` memoises; the tests that hash
+  changed data call `resolvedInputsHash` with tables of their own.
+- **The encoder refuses what it cannot write down.** A function, a symbol or a
+  cycle throws rather than hashing to something arbitrary. A spec names leaf
+  fields, so nothing reaches it today — but a spec that named a whole
+  assembled row would otherwise walk the entire graph.
+
+Browsers were not opened. The one visible change is a label inside a component
+pinned by server-rendered bytes, and its card is pinned the same way.
+
 ## Adversarial review
 
 Run on 18 September at xhigh by Fable 5.1 against the design as it stood
@@ -1032,7 +1297,10 @@ the migration.
 Everything step 3a was given is done ([above](#step-3a)): `readonly` row
 types, the per-table wrapper interfaces, the explicit `kind` with
 `PLANET_IDS`, the three gaps in the checks, the duplicate-key lint, `BIA`,
-and the watcher. What is left of step 3 is 3b and 3c
+and the watcher. So is everything step 3b was given ([above](#step-3b-1)):
+`resolvedInputsHash` with a spec on every registry entry, the inputs hash in
+every image identity and through the catalogs and plans, and Manasseh's
+Hebrew. What is left of step 3 is 3c
 ([decision 13](#decided-on-20-september)). The rest:
 
 - **Done in step 2.** [Plan 031](031-seventy-two-angels.md)'s
@@ -1044,6 +1312,14 @@ and the watcher. What is left of step 3 is 3b and 3c
   about accessors, not names, with a test saying so. The `hermetic` block is
   typed as absent on the two paths that have none, and `GDGradeId` has its
   Portal.
+- **New, from step 3b.** Two tribes' Hebrew names are hashed into the Table of
+  Shewbread's identity although no sign points at them, because `rows: "*"`
+  takes the whole table rather than the set the data selects
+  ([above](#what-was-decided-while-building-it-1)). A row selector that followed
+  a link would be exact; it is not worth the machinery until a spec needs it.
+  And the sweep compares the JSX handed to the outliner rather than the
+  outlined bytes, which is stricter but not the published artefact; a slower
+  variant that outlines would close the last gap between the two.
 - **New, from step 3a.** Two things `pnpm dev` does not pick up until the task
   restarts: a source directory added while it runs, because the watch is one
   watcher per directory, and `dist/graph.json` after an edit to `graph.ts`,

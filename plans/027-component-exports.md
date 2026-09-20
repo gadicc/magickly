@@ -146,6 +146,15 @@ Verified in Chromium 152 against a local dev server unless marked otherwise.
 > it the generated catalog digest. The v1 figures in this record stay as the
 > record of what was published; see [plan 028](028-seo.md#archangel-data).
 
+> **20 September 2026:** "do not bump the outline profile unless bytes change"
+> above is superseded. An identity is now (profile, inputs hash, query): the
+> profile names the renderer and moves only when the renderer changes, and the
+> data an image draws is hashed into `identity.inputs.sha256` beside it, so a
+> data fix moves the identity of exactly the images that draw it rather than
+> every image under the profile — which is what the v2 bump above did. The
+> rule to keep is that bytes must not change under the whole triple. See
+> [plan 032](032-data-layer.md#render-identities-and-the-data-they-draw).
+
 ## Architecture options
 
 1. **Explicit registry (recommended).** Pure per-slug contract modules
