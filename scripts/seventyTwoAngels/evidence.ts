@@ -34,8 +34,14 @@ const HEADER = `// What each of the seventy-two entries says, as printed: the re
 
 export interface AngelEvidence {
   no: number;
-  /** The Hebrew as a machine read it, kept for the corroboration comparison. */
+  /** The Hebrew as a machine read it from the whole page. */
   nameHe: string;
+  /**
+   * The same name read again from a close crop at 280 dpi. A name ships only
+   * where these two agree, so both halves of that comparison are evidence and
+   * both are committed.
+   */
+  crop: { he: string; legible: boolean };
   /** The readings as printed, for validate.ts to check against the tables. */
   scanned: AngelExtraction["scanned"];
   /** Whatever the reading was unsure of, in its own words. */
@@ -46,11 +52,16 @@ export interface AngelEvidence {
 
 export function writeEvidence(
   entries: (AngelExtraction & { model: string })[],
+  crops: Map<number, { hebrew: string; legible: boolean }>,
 ) {
   const evidence: AngelEvidence[] = entries
     .map((entry) => ({
       no: entry.no,
       nameHe: entry.name.he,
+      crop: {
+        he: crops.get(entry.no)?.hebrew ?? "",
+        legible: crops.get(entry.no)?.legible ?? false,
+      },
       scanned: entry.scanned,
       uncertain: entry.uncertain,
       model: entry.model,

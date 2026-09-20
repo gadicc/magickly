@@ -92,8 +92,15 @@ function fromOrdinals(): Note[] {
 
 /** Where two readings of the Hebrew cannot be made to agree. */
 function fromHebrew(): Note[] {
+  const evidence = readEvidence();
   const { doubtful } = hebrewReadings(
-    new Map(readEvidence().map((row) => [row.no, row.nameHe])),
+    new Map(evidence.map((row) => [row.no, row.nameHe])),
+    new Map(
+      evidence.map((row) => [
+        row.no,
+        { hebrew: row.crop.he, legible: row.crop.legible },
+      ]),
+    ),
   );
 
   const byHand = handReadings();

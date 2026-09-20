@@ -252,24 +252,53 @@ function romanKey(name: string) {
  * dropped out of the doubtful set and lost the note saying who had read them.
  * They are set aside here instead, and answered for by `handReadings`.
  */
-export function hebrewReadings(pageOf: Map<number, string>): HebrewReadings {
-  const byHand = handReadings();
-  // Keyed by the roman name, not the printed ordinal: the forty-sixth is set
-  // as "36e", so keying on the ordinal silently dropped its reading into the
-  // real thirty-sixth's place and left the forty-sixth with none.
-  const crop = new Map<string, { hebrew: string; legible: boolean }>();
+/**
+ * The close-crop readings, resolved to the genius each belongs to.
+ *
+ * Keyed by the roman name, not the printed ordinal: the forty-sixth is set as
+ * "36e", so keying on the ordinal silently dropped its reading into the real
+ * thirty-sixth's place and left the forty-sixth with none.
+ *
+ * This is the only reader of output/seventyTwoAngelsHebrew, and it runs when
+ * the evidence file is written. Everything afterwards compares the committed
+ * readings instead. See plan 033.
+ */
+export function cropReadings(): Map<
+  number,
+  { hebrew: string; legible: boolean }
+> {
+  const byRoman = new Map<string, { hebrew: string; legible: boolean }>();
   for (const file of readdirSync(OUT_DIR).sort()) {
     const { headings } = reading.parse(
       JSON.parse(readFileSync(join(OUT_DIR, file), "utf8")),
     );
     for (const h of headings) {
       const key = romanKey(h.roman);
-      if (key && !crop.has(key))
-        crop.set(key, { hebrew: h.hebrew, legible: h.legible });
+      if (key && !byRoman.has(key))
+        byRoman.set(key, { hebrew: h.hebrew, legible: h.legible });
     }
   }
 
-  const namesByNo = new Map(plateEntries().map((e) => [e.no, e.name]));
+  const byNo = new Map<number, { hebrew: string; legible: boolean }>();
+  for (const entry of plateEntries()) {
+    const found = byRoman.get(romanKey(entry.name));
+    if (found) byNo.set(entry.no, found);
+  }
+  return byNo;
+}
+
+/**
+ * Two readings compared. A name is only as good as its corroboration, so one
+ * that both readings agree on is kept and one they differ over is held back.
+ *
+ * It takes both readings rather than fetching one itself, so the comparison
+ * can be made from the committed evidence as readily as from a fresh pass.
+ */
+export function hebrewReadings(
+  pageOf: Map<number, string>,
+  cropOf: Map<number, { hebrew: string; legible: boolean }>,
+): HebrewReadings {
+  const byHand = handReadings();
   const agreed = new Map<number, string>();
   const doubtful = new Map<
     number,
@@ -277,7 +306,7 @@ export function hebrewReadings(pageOf: Map<number, string>): HebrewReadings {
   >();
   for (const [no, fromPage] of pageOf) {
     if (byHand.has(no)) continue;
-    const fromCrop = crop.get(romanKey(namesByNo.get(no) ?? ""));
+    const fromCrop = cropOf.get(no);
     const a = fromCrop ? hebrewLetters(fromCrop.hebrew) : "";
     const b = hebrewLetters(fromPage);
     if (a && a === b && fromCrop?.legible) agreed.set(no, a);

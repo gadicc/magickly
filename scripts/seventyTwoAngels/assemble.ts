@@ -3,7 +3,7 @@ import JSON5 from "json5";
 import { ANGEL_COUNT } from "../../data/kabbalah/seventyTwoAngelsDerived";
 import { writeEvidence } from "./evidence";
 import { published, readExtraction, type StoredExtraction } from "./extract";
-import { handReadings, hebrewReadings } from "./hebrew";
+import { cropReadings, handReadings, hebrewReadings } from "./hebrew";
 import { disagreements, hebrewProblems, shapeProblems } from "./validate";
 
 /**
@@ -127,8 +127,10 @@ function main() {
   if (reportOnly && angels.length < ANGEL_COUNT)
     console.log(`${angels.length} of ${ANGEL_COUNT} extracted so far.\n`);
 
+  const crops = cropReadings();
   const readings = hebrewReadings(
     new Map(angels.map((angel) => [angel.no, angel.name.he])),
+    crops,
   );
   agreedHebrew = readings.agreed;
   byHand = handReadings();
@@ -142,7 +144,7 @@ function main() {
   // The readings the apparatus is derived from, committed so that a correction
   // can be checked against the page instead of taken on trust.
   if (!reportOnly) {
-    const written = writeEvidence(angels);
+    const written = writeEvidence(angels, crops);
     console.log(`${written.path} — ${written.count} readings`);
   }
 

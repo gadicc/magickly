@@ -7,6 +7,10 @@
   {
     no: 1,
     nameHe: 'והויה',
+    crop: {
+      he: 'והויה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 1,
@@ -54,6 +58,10 @@
   {
     no: 2,
     nameHe: 'יליאל',
+    crop: {
+      he: 'ילִיאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 6,
@@ -101,6 +109,10 @@
   {
     no: 3,
     nameHe: 'סיטאל',
+    crop: {
+      he: 'סיטאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 11,
@@ -148,6 +160,10 @@
   {
     no: 4,
     nameHe: 'עלמיה',
+    crop: {
+      he: 'עלמיה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 16,
@@ -194,6 +210,10 @@
   {
     no: 5,
     nameHe: 'מהשיה',
+    crop: {
+      he: 'מהשיה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 21,
@@ -241,6 +261,10 @@
   {
     no: 6,
     nameHe: 'לׄלּׄהאׄלּׄ',
+    crop: {
+      he: 'ללהאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 26,
@@ -288,6 +312,10 @@
   {
     no: 7,
     nameHe: 'אכאיה',
+    crop: {
+      he: 'אכאיה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 31,
@@ -336,6 +364,10 @@
   {
     no: 8,
     nameHe: 'כהתאל',
+    crop: {
+      he: 'כהתאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 36,
@@ -384,6 +416,10 @@
   {
     no: 9,
     nameHe: 'הזיאל',
+    crop: {
+      he: 'הזיאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 41,
@@ -430,6 +466,10 @@
   {
     no: 10,
     nameHe: 'אלדיה',
+    crop: {
+      he: 'אלדיה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 41,
@@ -476,6 +516,10 @@
   {
     no: 11,
     nameHe: 'לאויה',
+    crop: {
+      he: 'לאויה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 51,
@@ -523,6 +567,10 @@
   {
     no: 12,
     nameHe: 'הַהַעיה',
+    crop: {
+      he: 'ההעיה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 56,
@@ -569,6 +617,10 @@
   {
     no: 13,
     nameHe: 'יזּלּׄאׄלּ',
+    crop: {
+      he: 'יזלאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 61,
@@ -616,6 +668,10 @@
   {
     no: 14,
     nameHe: 'מבהאל',
+    crop: {
+      he: 'מבהאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 66,
@@ -663,6 +719,10 @@
   {
     no: 15,
     nameHe: 'הריאל',
+    crop: {
+      he: 'הריאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 71,
@@ -710,6 +770,10 @@
   {
     no: 16,
     nameHe: 'הקמיה',
+    crop: {
+      he: 'הקמיה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 76,
@@ -757,6 +821,10 @@
   {
     no: 17,
     nameHe: 'לאויה',
+    crop: {
+      he: 'לאויה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 81,
@@ -803,6 +871,10 @@
   {
     no: 18,
     nameHe: 'כליאל',
+    crop: {
+      he: 'כליאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 86,
@@ -849,6 +921,10 @@
   {
     no: 19,
     nameHe: 'לּׄוויׄה',
+    crop: {
+      he: 'לויה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 91,
@@ -895,6 +971,10 @@
   {
     no: 20,
     nameHe: 'פהליה',
+    crop: {
+      he: 'פהליה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 95,
@@ -942,6 +1022,10 @@
   {
     no: 21,
     nameHe: '.נלכאל',
+    crop: {
+      he: 'נלכאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 101,
@@ -988,6 +1072,10 @@
   {
     no: 22,
     nameHe: 'יׄיׄיׄאׄלּׄ',
+    crop: {
+      he: 'לאיוי',
+      legible: false,
+    },
     scanned: {
       degrees: {
         from: 106,
@@ -1036,6 +1124,10 @@
   {
     no: 23,
     nameHe: '.מלּׄהאׄלּׄ',
+    crop: {
+      he: 'כלהאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 111,
@@ -1082,6 +1174,10 @@
   {
     no: 24,
     nameHe: 'ההויה',
+    crop: {
+      he: 'ההויה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 116,
@@ -1128,6 +1224,10 @@
   {
     no: 25,
     nameHe: 'נתהיה',
+    crop: {
+      he: 'נתהיה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 121,
@@ -1174,6 +1274,10 @@
   {
     no: 26,
     nameHe: 'האאיה',
+    crop: {
+      he: 'האאיה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 126,
@@ -1220,6 +1324,10 @@
   {
     no: 27,
     nameHe: '.ירתאל',
+    crop: {
+      he: 'ירתאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 131,
@@ -1266,6 +1374,10 @@
   {
     no: 28,
     nameHe: 'שאׄהיׄה',
+    crop: {
+      he: 'שאהוה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 136,
@@ -1312,6 +1424,10 @@
   {
     no: 29,
     nameHe: '.ריׄיׄאׄלּׄ',
+    crop: {
+      he: 'ריאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 141,
@@ -1358,6 +1474,10 @@
   {
     no: 30,
     nameHe: 'ומאאל',
+    crop: {
+      he: 'ומאאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 146,
@@ -1405,6 +1525,10 @@
   {
     no: 31,
     nameHe: 'לכבאל',
+    crop: {
+      he: 'לכבאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 151,
@@ -1452,6 +1576,10 @@
   {
     no: 32,
     nameHe: 'ושריה',
+    crop: {
+      he: 'ושריה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 156,
@@ -1498,6 +1626,10 @@
   {
     no: 33,
     nameHe: 'יהויה',
+    crop: {
+      he: 'יהויה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 161,
@@ -1544,6 +1676,10 @@
   {
     no: 34,
     nameHe: 'לּׄההיׄה',
+    crop: {
+      he: 'לההיח',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 166,
@@ -1590,6 +1726,10 @@
   {
     no: 35,
     nameHe: 'כוקיה',
+    crop: {
+      he: 'כוקיה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 171,
@@ -1633,6 +1773,10 @@
   {
     no: 36,
     nameHe: 'מנדאל',
+    crop: {
+      he: 'מנדאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 176,
@@ -1679,6 +1823,10 @@
   {
     no: 37,
     nameHe: 'אׄנואלּ',
+    crop: {
+      he: 'אנואל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 181,
@@ -1725,6 +1873,10 @@
   {
     no: 38,
     nameHe: 'העמיה',
+    crop: {
+      he: 'העמיה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 186,
@@ -1772,6 +1924,10 @@
   {
     no: 39,
     nameHe: 'רהעאׄלּׄ',
+    crop: {
+      he: 'רהאעל',
+      legible: false,
+    },
     scanned: {
       degrees: {
         from: 191,
@@ -1820,6 +1976,10 @@
   {
     no: 40,
     nameHe: 'יׄיׄזּאׄלּׄ',
+    crop: {
+      he: 'ייזאל',
+      legible: false,
+    },
     scanned: {
       degrees: {
         from: 196,
@@ -1866,6 +2026,10 @@
   {
     no: 41,
     nameHe: 'הההאׄלּׄ',
+    crop: {
+      he: 'ההאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 201,
@@ -1912,6 +2076,10 @@
   {
     no: 42,
     nameHe: 'מיכאל',
+    crop: {
+      he: 'מיכאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 216,
@@ -1959,6 +2127,10 @@
   {
     no: 43,
     nameHe: 'וולּּׄיׄה',
+    crop: {
+      he: 'וולויה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 211,
@@ -2005,6 +2177,10 @@
   {
     no: 44,
     nameHe: 'יְלָהִיָה',
+    crop: {
+      he: 'ילהיה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 216,
@@ -2051,6 +2227,10 @@
   {
     no: 45,
     nameHe: 'סאׄלּׄיׄה',
+    crop: {
+      he: 'סאליה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 221,
@@ -2097,6 +2277,10 @@
   {
     no: 46,
     nameHe: 'עריׄאׄלּׄ',
+    crop: {
+      he: 'עריאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 226,
@@ -2145,6 +2329,10 @@
   {
     no: 47,
     nameHe: 'עּשלּׄיׄה',
+    crop: {
+      he: 'עשליה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 231,
@@ -2192,6 +2380,10 @@
   {
     no: 48,
     nameHe: 'מיהאל',
+    crop: {
+      he: 'מיהאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 236,
@@ -2238,6 +2430,10 @@
   {
     no: 49,
     nameHe: 'והואל',
+    crop: {
+      he: 'והואל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 241,
@@ -2284,6 +2480,10 @@
   {
     no: 50,
     nameHe: 'דניאל',
+    crop: {
+      he: 'דניאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 246,
@@ -2331,6 +2531,10 @@
   {
     no: 51,
     nameHe: 'ההשיה',
+    crop: {
+      he: 'ההשיה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 251,
@@ -2377,6 +2581,10 @@
   {
     no: 52,
     nameHe: 'עּממיׄה',
+    crop: {
+      he: 'עמכמוה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 256,
@@ -2424,6 +2632,10 @@
   {
     no: 53,
     nameHe: 'ננאׄאׄלּׄ',
+    crop: {
+      he: 'נכאאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 216,
@@ -2471,6 +2683,10 @@
   {
     no: 54,
     nameHe: 'ניׄתאׄלׄ',
+    crop: {
+      he: 'ניתהאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 266,
@@ -2518,6 +2734,10 @@
   {
     no: 55,
     nameHe: 'מבהיה',
+    crop: {
+      he: 'מבהיה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 271,
@@ -2565,6 +2785,10 @@
   {
     no: 56,
     nameHe: 'פוֹיאל',
+    crop: {
+      he: 'פויאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 276,
@@ -2611,6 +2835,10 @@
   {
     no: 57,
     nameHe: 'נממיה',
+    crop: {
+      he: 'נמחיה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 281,
@@ -2657,6 +2885,10 @@
   {
     no: 58,
     nameHe: 'יׄיׄלּׄאׄלּׄ',
+    crop: {
+      he: 'ייאל',
+      legible: false,
+    },
     scanned: {
       degrees: {
         from: 286,
@@ -2703,6 +2935,10 @@
   {
     no: 59,
     nameHe: 'הרהאל',
+    crop: {
+      he: 'הרהאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 291,
@@ -2749,6 +2985,10 @@
   {
     no: 60,
     nameHe: 'מצראל',
+    crop: {
+      he: 'מצראל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 296,
@@ -2795,6 +3035,10 @@
   {
     no: 61,
     nameHe: 'ומבאל',
+    crop: {
+      he: 'ומבאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 301,
@@ -2841,6 +3085,10 @@
   {
     no: 62,
     nameHe: 'יההאל',
+    crop: {
+      he: 'יההאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 306,
@@ -2887,6 +3135,10 @@
   {
     no: 63,
     nameHe: 'ענואל',
+    crop: {
+      he: 'ענואל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 311,
@@ -2933,6 +3185,10 @@
   {
     no: 64,
     nameHe: 'מהיאל',
+    crop: {
+      he: 'מהיאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 316,
@@ -2981,6 +3237,10 @@
   {
     no: 65,
     nameHe: 'דמביה',
+    crop: {
+      he: 'דמביה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 321,
@@ -3027,6 +3287,10 @@
   {
     no: 66,
     nameHe: 'מנקאה',
+    crop: {
+      he: 'מנקאה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 326,
@@ -3073,6 +3337,10 @@
   {
     no: 67,
     nameHe: 'אׄיעּאׄלּׄ',
+    crop: {
+      he: 'אויאל',
+      legible: false,
+    },
     scanned: {
       degrees: {
         from: 331,
@@ -3119,6 +3387,10 @@
   {
     no: 68,
     nameHe: 'הבויׄה',
+    crop: {
+      he: 'הבויה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 337,
@@ -3166,6 +3438,10 @@
   {
     no: 69,
     nameHe: 'ראחאל',
+    crop: {
+      he: 'ראחאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 341,
@@ -3212,6 +3488,10 @@
   {
     no: 70,
     nameHe: 'יׄבמיׄה',
+    crop: {
+      he: 'יבמיה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 346,
@@ -3259,6 +3539,10 @@
   {
     no: 71,
     nameHe: 'היׄיׄאׄלּׄ',
+    crop: {
+      he: 'היאאל',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 351,
@@ -3305,6 +3589,10 @@
   {
     no: 72,
     nameHe: 'מומיה',
+    crop: {
+      he: 'מומיה',
+      legible: true,
+    },
     scanned: {
       degrees: {
         from: 356,
