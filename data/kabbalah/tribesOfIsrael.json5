@@ -93,8 +93,8 @@
   manasseh: {
     id: "manasseh",
     name: {
-      en: "Menasseh",
-      he: "בנימין",
+      en: "Manasseh",
+      he: "מנשה",
     },
   },
 }

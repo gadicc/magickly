@@ -55,17 +55,14 @@ beforeAll(async () => {
 
 describe("a data change and the images it can reach", () => {
   it("moves one image's bytes and only that image's inputs hash", async () => {
-    // Manasseh's Hebrew name, the fix step 3b was waiting for. The Table of
-    // Shewbread prints it in the Gemini branch and nothing else reads it.
-    const after = await withChange("tribeOfIsrael", (rows) => {
-      (rows.manasseh as { name: { he: string } }).name.he = "מנשה";
-    });
+    // A tribe's Hebrew name, which is what Manasseh's fix changed. The Table
+    // of Shewbread prints it in that sign's branch and nothing else reads it.
+    const rename = (rows: Record<string, unknown>) => {
+      (rows.manasseh as { name: { he: string } }).name.he = "שבט";
+    };
+    const after = await withChange("tribeOfIsrael", rename);
     expect([...changedSlugs(base, after)]).toEqual(["table-of-shewbread"]);
-    const renderer = await loadWithTables(
-      changeTable("tribeOfIsrael", (rows) => {
-        (rows.manasseh as { name: { he: string } }).name.he = "מנשה";
-      }),
-    );
+    const renderer = await loadWithTables(changeTable("tribeOfIsrael", rename));
     for (const slug of COMPONENT_IMAGE_SLUGS)
       if (slug === "table-of-shewbread")
         expect(renderer.inputsHash(slug)).not.toBe(baseHashes[slug]);
@@ -111,7 +108,7 @@ describe("a data change and the images it can reach", () => {
       [
         "tribeOfIsrael",
         (rows) => {
-          (rows.manasseh as { name: { en: string } }).name.en = "Manasseh";
+          (rows.manasseh as { name: { en: string } }).name.en = "Menasseh";
         },
       ],
       [

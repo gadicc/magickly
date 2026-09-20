@@ -54,9 +54,11 @@ describe("component image registry", () => {
       "seven-branched-candlestick",
       "a8a081550bbcdd43f319e960754eae84e56a384a1fe1b11474c850b5c256cad9",
     ],
+    // Moved once, by Manasseh's Hebrew name (plan 032's data fixes); the five
+    // above did not, which is what decision 10 is for.
     [
       "table-of-shewbread",
-      "9b1eb2469672eef59e34f5f090850c91b6f94494e203c816b184bcec9f178ded",
+      "dfd57ffbab8f4194e4c7702966d5cd887c44f1e68523247ec6195d38f5be90ab",
     ],
     // No table at all, so no data edit can ever move this one.
     [
@@ -174,11 +176,13 @@ describe("component image registry", () => {
       223_771,
       "53514ca864d7f13b59c90bf048a462c6d56c65b11c306c53a569a6684c3c81fe",
     ],
+    // 136,294 bytes and df3c3791… until Manasseh's Hebrew name stopped being
+    // Benjamin's; the Gemini branch is one glyph shorter and one wider.
     [
       "table-of-shewbread",
       "",
-      136_294,
-      "df3c37911f14c3e81040d62d74892b97fdb0c72027ef390323f907e795ceb516",
+      136_643,
+      "34e0fce138e4b50930aac5b226e71fbe452eb1ba7db5a9bb1929e0300e106e1b",
     ],
     [
       "seven-branched-candlestick",
