@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { PLANET_IDS } from "./astrology/Planets";
-import { checkIntegrity, type Failure } from "./integrity";
+import type { TableSpec } from "./graphSpec";
+import { checkIntegrity, checkMirrors, type Failure } from "./integrity";
 import { type Tables, tables } from "./tables";
 
 /**
@@ -127,6 +128,67 @@ describe("the data against the graph", () => {
     expect(of("link", failures)).toContain(
       'element.earth.elementalId: mirror-asymmetric: elemental.gnome.elementId is "air", not "earth"',
     );
+  });
+
+  it("counts a mirror the other table does not declare back", () => {
+    // The graph on its own, before any data is walked: a `mirrors` that only
+    // one side declares has `assemble()` assert symmetry in one direction,
+    // and the data would pass. This used to run only under vitest; it is a
+    // check now, so `pnpm data:check` and `pnpm build` reject it too.
+    const missing = {
+      sephirah: { links: { archangelId: { to: "archangel" } } },
+      archangel: { links: { sephirahId: { to: "sephirah" } } },
+    } satisfies Record<string, TableSpec>;
+    const oneWay = {
+      sephirah: {
+        links: { archangelId: { to: "archangel", mirrors: "sephirahId" } },
+      },
+      archangel: { links: { sephirahId: { to: "sephirah" } } },
+    } satisfies Record<string, TableSpec>;
+    const crossed = {
+      sephirah: {
+        links: { archangelId: { to: "archangel", mirrors: "sephirahId" } },
+      },
+      archangel: {
+        links: { sephirahId: { to: "sephirah", mirrors: "gdGradeId" } },
+      },
+    } satisfies Record<string, TableSpec>;
+
+    expect(checkMirrors(missing)).toEqual([]);
+    expect(of("mirror", checkMirrors(oneWay))).toEqual([
+      "sephirah.archangelId: mirrors archangel.sephirahId, which does not mirror it back",
+    ]);
+    expect(of("mirror", checkMirrors(crossed))).toEqual([
+      "sephirah.archangelId: mirrors archangel.sephirahId, which does not mirror it back",
+      "archangel.sephirahId: mirrors sephirah.gdGradeId, which does not mirror it back",
+    ]);
+  });
+
+  it("names an array row by its id, then its no, then its index", () => {
+    // The seventy-two are keyed `no` and carry no `id`, and their index is
+    // one less than it, so an index sends a reader to the wrong entry.
+    const angels = tables.seventyTwoAngel.map((angel, i) =>
+      i === 3 ? { ...angel, wizardId: "gandalf" } : angel,
+    );
+    expect(of("undeclared", broken("seventyTwoAngel", angels))).toEqual([
+      "seventyTwoAngel.4.wizardId: no link, pending target, external one or enumeration",
+    ]);
+
+    // The astrology houses carry neither, so the index is all there is.
+    const houses = tables.house.map((house, i) =>
+      i === 2 ? { ...house, wizardId: "gandalf" } : house,
+    );
+    expect(of("undeclared", broken("house", houses))).toEqual([
+      "house.2.wizardId: no link, pending target, external one or enumeration",
+    ]);
+
+    // An `id` comes first, which is the key `assemble()` indexes by.
+    const named = [
+      { ...tables.seventyTwoAngel[0], id: "vehuiah", wizardId: "gandalf" },
+    ];
+    expect(of("undeclared", broken("seventyTwoAngel", named))).toEqual([
+      "seventyTwoAngel.vehuiah.wizardId: no link, pending target, external one or enumeration",
+    ]);
   });
 
   it("counts a chain with two heads, or one that does not reach every row", () => {

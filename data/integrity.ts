@@ -2,11 +2,11 @@
  * Whether the data says what [the graph](./graph.ts) says it says.
  *
  * A handful of questions, and a list of everything that answers wrongly: is
- * every id-shaped field declared, and is everything declared there; do the
- * links resolve; does the arity match; are the chains whole; does every row
- * pass its [schema](./schemas.ts); and do the few lists TypeScript has to
- * hold by hand still say what the data says? Nothing throws and nothing is
- * fatal here —
+ * every id-shaped field declared, and is everything declared there; is every
+ * `mirrors` declared from both ends; do the links resolve; does the arity
+ * match; are the chains whole; does every row pass its
+ * [schema](./schemas.ts); and do the few lists TypeScript has to hold by hand
+ * still say what the data says? Nothing throws and nothing is fatal here —
  * [integrity.test.ts](./integrity.test.ts) asserts the list is empty, and
  * [check.ts](./check.ts) is the same list on the command line, which
  * `pnpm build` runs before Next sees the data.
@@ -32,6 +32,8 @@ export interface Failure {
     | "link"
     | "chain"
     | "schema"
+    /** A `mirrors` the graph declares from one end only. */
+    | "mirror"
     /** A list written in TypeScript that the data no longer agrees with. */
     | "derived";
   /** `table`, `table.row` or `table.row.field`. */
@@ -46,10 +48,18 @@ const isIdField = (key: string) => key.endsWith("Id") || key.endsWith("Ids");
 const plain = (value: unknown) =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-/** A table's rows with their keys, an array table by `id` or by index. */
+/**
+ * A table's rows with the name a failure should call them by: an object
+ * table's key, and for an array table the row's own `id`, or its `no`, or
+ * failing both its index. The seventy-two carry `no` and no `id`, and their
+ * index is one less than it, which would send a reader to the wrong entry.
+ */
 function rowsOf(table: unknown): Array<[string, Row]> {
   return Array.isArray(table)
-    ? table.map((row, i) => [String((row as Row).id ?? i), row as Row])
+    ? table.map((row, i) => [
+        String((row as Row).id ?? (row as Row).no ?? i),
+        row as Row,
+      ])
     : Object.entries(table as Record<string, Row>);
 }
 
@@ -137,6 +147,34 @@ function checkChain(
 }
 
 /**
+ * Every `mirrors` the table it names does not declare back: the target must
+ * carry a link of that name, to this table, whose own `mirrors` is this
+ * field. A one-sided declaration would have `assemble()` assert symmetry in
+ * one direction only, and the data would pass; it is caught here, before any
+ * data is walked, so that `pnpm data:check` rejects it as the test suite does.
+ *
+ * The spec is an argument because this is the one check with no data in it,
+ * and a test has to hand it a graph that is wrong.
+ */
+export function checkMirrors(
+  spec: Readonly<Record<string, TableSpec>> = graph,
+): Failure[] {
+  const failures: Failure[] = [];
+  for (const [name, table] of Object.entries(spec))
+    for (const [field, link] of Object.entries(table.links ?? {})) {
+      if (!link.mirrors) continue;
+      const back = spec[link.to]?.links?.[link.mirrors];
+      if (back?.to !== name || back.mirrors !== field)
+        failures.push({
+          check: "mirror",
+          where: `${name}.${field}`,
+          detail: `mirrors ${link.to}.${link.mirrors}, which does not mirror it back`,
+        });
+    }
+  return failures;
+}
+
+/**
  * [`PLANET_IDS`](./astrology/Planets.ts) against the table it names: the rows
  * of kind `"planet"`, exactly, in both directions. The list is written out
  * because a JSON import widens `"planet"` to `string`, so the twelve cannot
@@ -173,7 +211,7 @@ function checkPlanetIds(table: unknown): Failure[] {
 
 /** Everything wrong with the data, as the graph and the schemas see it. */
 export function checkIntegrity(input: Tables = realTables): Failure[] {
-  const failures: Failure[] = [];
+  const failures: Failure[] = checkMirrors();
   const names = Object.keys(input) as TableName[];
 
   for (const name of names) {
