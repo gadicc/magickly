@@ -221,6 +221,33 @@ step 1 rather than before it.
 7. **Print stylesheet.** None exists in `src/` today: `break-before` at chapters,
    the fixed bar hidden.
 
+## Commits
+
+| SHA | What |
+| --- | --- |
+| `254c8f5` | This plan |
+| `2eca0da` | Gather split from render; the leaf gains an identity and an anchor |
+| `95e31d3` | `evidence.json5`: the readings every correction is derived from |
+| *(next)* | The second Hebrew reading committed; reproducibility proven |
+
+### What step 1 found that this plan did not anticipate
+
+The plan named one gitignored dependency. There were three, and the other two
+were worse than the first, because they were the *evidence*: `scanned` — what
+each entry prints, from which all 33 correction notes are derived — and the
+close-crop Hebrew reading, which is half of what "two independent readings
+agree" means. A scholarly edition whose corrections cannot be checked against
+the readings behind them is not one, and the repository held neither.
+
+Both are committed as `data/kabbalah/lenain/evidence.json5`. The test that
+found this is the one worth keeping: check the branch out into a worktree with
+no `output/` at all and rebuild. It failed twice before it passed, and each
+failure named the next thing missing. It now rebuilds the apparatus and the
+272 KB Markdown byte for byte from the repository alone.
+
+`assemble.ts` still reads the extractions, by design: it is a gather step like
+`gatherPages.ts`, run after a re-extraction, and what it writes is committed.
+
 ## Follow-ups
 
 - **72 per-genius routes**, English-led, under the angels page — the real SEO
