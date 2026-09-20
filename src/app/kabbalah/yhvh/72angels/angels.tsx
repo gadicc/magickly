@@ -345,16 +345,22 @@ function SevenyTwo() {
           </RadioGroup>
         </FormControl>
       </Container>
-      <div style={{ marginTop: "1em" }}>
-        {angels.map((angel, i) => (
+      {/*
+        The list runs edge to edge on a phone, which is what it was drawn for,
+        and lines up with the prose above it from a tablet upwards — where a
+        full-bleed row otherwise leaves the name and its chevron at opposite
+        ends of the window.
+      */}
+      <Container disableGutters sx={{ mt: "1em", px: { xs: 0, sm: 2 } }}>
+        {angels.map((angel) => (
           <Angel
             key={angel.no}
             angel={angel}
-            no={i + 1}
+            no={angel.no}
             astrologySystem={astrologySystem}
           />
         ))}
-      </div>
+      </Container>
       <br />
       <Container sx={{ fontSize: "80%", textAlign: "justify" }}>
         Magick.ly is open-source. You can see the code used to generate this
