@@ -11,6 +11,7 @@
       "**",
       "!tests/fixtures/http/**",
       "!.vscode/**",
+      "!.claude/worktrees/**",
       "!archive/**",
       "!dump/**",
       "!drizzle/meta/**",

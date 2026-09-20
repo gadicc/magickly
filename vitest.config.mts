@@ -33,7 +33,9 @@ export default defineConfig({
     environment: "node",
     // The data tables are generated; a test file run on its own builds them.
     globalSetup: ["./data/build.mts"],
-    exclude: [...configDefaults.exclude, "output/**"],
+    // Agent sessions register git worktrees under .claude/, each a full
+    // checkout whose test files this glob would otherwise collect and run.
+    exclude: [...configDefaults.exclude, "output/**", ".claude/**"],
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "json-summary"],
