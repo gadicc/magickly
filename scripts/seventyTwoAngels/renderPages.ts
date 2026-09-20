@@ -118,8 +118,11 @@ function main() {
   };
   const outAt = args.indexOf("--out-dir");
   const outDir = outAt < 0 ? "" : `${args[outAt + 1]}/`;
-  const from = value("--from", 61);
-  const to = value("--to", 113);
+  // The whole book, from its title page. Pages 1 to 6 of the PDF are the
+  // scan's own front matter — cover, library plates, blanks, and Google's
+  // notice about the digitisation, which is theirs and not Lenain's.
+  const from = value("--from", 7);
+  const to = value("--to", 174);
 
   const pages: PageTranscription[] = [];
   for (let page = from; page <= to; page++) {
