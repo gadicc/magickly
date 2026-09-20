@@ -1,6 +1,11 @@
 import { existsSync } from "node:fs";
 import { ANGEL_COUNT } from "../../data/kabbalah/seventyTwoAngelsDerived";
-import type { PageTranscription } from "./pageSchema";
+import {
+  continuesParagraph,
+  isBelowTheRule,
+  type PageBlock,
+  type PageTranscription,
+} from "./pageSchema";
 import { readPage } from "./transcribe";
 
 /**
@@ -36,10 +41,23 @@ export interface PlateEntry {
   printedOrdinal?: number;
   /** The entry's French, as printed, paragraphs separated by blank lines. */
   french: string;
-  /** Lenain's own footnotes from the pages the entry spans. */
-  footnotes: string[];
+  /** Lenain's own footnotes, with the marker each answers to. */
+  footnotes: { marker: string; text: string }[];
   /** The printed pages it runs across. */
   printedPages: number[];
+}
+
+/**
+ * Adds a block to what an entry has so far. A paragraph the footnote rule or a
+ * page break cut across carries on rather than starting again, and a word it
+ * cut in half is made whole.
+ */
+function join(sofar: string, block: PageBlock) {
+  if (!sofar) return block.text;
+  if (!continuesParagraph(sofar, block)) return `${sofar}\n\n${block.text}`;
+  return sofar.endsWith("-")
+    ? sofar.slice(0, -1) + block.text
+    : `${sofar} ${block.text}`;
 }
 
 function chapterPages(): PageTranscription[] {
@@ -69,12 +87,20 @@ export function plateEntries(): PlateEntry[] {
   let expected = 1;
 
   for (const page of chapterPages()) {
-    for (const block of page.blocks) {
-      if (block.kind === "furniture" || block.kind === "table") continue;
+    page.blocks.forEach((block, index) => {
+      if (block.kind === "furniture" || block.kind === "table") return;
 
-      if (block.kind === "footnote") {
-        current?.footnotes.push(block.text);
-        continue;
+      // Nothing of the body follows the rule, so a paragraph down there is a
+      // long note carrying on rather than the text resuming.
+      if (block.kind === "footnote" || isBelowTheRule(page.blocks, index)) {
+        const notes = current?.footnotes;
+        const last = notes?.[notes.length - 1];
+        if (block.kind !== "footnote" && last)
+          last.text = continuesParagraph(last.text, block)
+            ? `${last.text} ${block.text}`
+            : `${last.text}\n\n${block.text}`;
+        else notes?.push({ marker: block.marker, text: block.text });
+        return;
       }
 
       // An entry is recognised by its shape and taken in sequence, because the
@@ -93,14 +119,14 @@ export function plateEntries(): PlateEntry[] {
         };
         entries.set(expected, current);
         expected += 1;
-        continue;
+        return;
       }
 
-      if (!current) continue;
-      current.french += `\n\n${block.text}`;
+      if (!current) return;
+      current.french = join(current.french, block);
       if (!current.printedPages.includes(page.printedPage))
         current.printedPages.push(page.printedPage);
-    }
+    });
   }
 
   const missing = Array.from({ length: ANGEL_COUNT }, (_, i) => i + 1).filter(

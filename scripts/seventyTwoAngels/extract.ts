@@ -114,7 +114,9 @@ function promptFor(entry: PlateEntry) {
 the book this is the ${entry.no}th genius. Use ${entry.no}.`;
 
   const footnotes = entry.footnotes.length
-    ? `\n\n<footnotes>\n${entry.footnotes.join("\n\n")}\n</footnotes>`
+    ? `\n\n<footnotes>\n${entry.footnotes
+        .map((note) => `(${note.marker}) ${note.text}`)
+        .join("\n\n")}\n</footnotes>`
     : "";
 
   return `${derivedContext(entry.no)}${ordinal}

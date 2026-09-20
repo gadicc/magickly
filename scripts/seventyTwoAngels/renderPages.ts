@@ -1,7 +1,11 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import JSON5 from "json5";
-import type { PageBlock, PageTranscription } from "./pageSchema";
+import {
+  continuesParagraph,
+  type PageBlock,
+  type PageTranscription,
+} from "./pageSchema";
 import { readPage } from "./transcribe";
 
 /**
@@ -65,13 +69,43 @@ function blockToMarkdown(block: PageBlock) {
   if (block.kind === "furniture") return "";
   if (block.kind === "table") return table(block.rows);
   if (block.kind === "heading") return `## ${block.text}`;
-  if (block.kind === "footnote")
-    return `> ${block.text.replace(/\n/g, "\n> ")}`;
+  // Lenain's own notes, set as he set them and marked as his. Our editorial
+  // notes are a separate apparatus and must never be mistaken for these.
+  if (block.kind === "footnote") {
+    const marker = block.marker ? `**(${block.marker})** ` : "";
+    return `> ${marker}${block.text.replace(/\n/g, "\n> ")}`;
+  }
   return block.text;
 }
 
+/**
+ * A paragraph the footnote rule or the page end cut across is one paragraph,
+ * so its continuation is folded back into it rather than set as a new one.
+ */
+function fold(blocks: PageTranscription["blocks"]) {
+  const folded: PageTranscription["blocks"] = [];
+  for (const block of blocks) {
+    const last = folded[folded.length - 1];
+    if (
+      last &&
+      last.kind === block.kind &&
+      continuesParagraph(last.text, block)
+    ) {
+      last.text = last.text.endsWith("-")
+        ? last.text.slice(0, -1) + block.text
+        : `${last.text} ${block.text}`;
+      continue;
+    }
+    folded.push({ ...block });
+  }
+  return folded;
+}
+
 function pageToMarkdown(page: PageTranscription) {
-  const body = page.blocks.map(blockToMarkdown).filter(Boolean).join("\n\n");
+  const body = fold(page.blocks)
+    .map(blockToMarkdown)
+    .filter(Boolean)
+    .join("\n\n");
   const number = page.printedPage > 0 ? `p. ${page.printedPage}` : "unnumbered";
   return `---\n\n<small>**[${number}]**</small>\n\n${body}`;
 }

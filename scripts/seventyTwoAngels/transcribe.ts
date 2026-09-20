@@ -41,9 +41,17 @@ join words that are merely at a line end without a hyphen.
 reason for reading the page rather than its OCR, so take care over it. If a letter is \
 genuinely illegible, say so in "uncertain" rather than guessing.
 - Each paragraph is its own block. Keep Lenain's paragraphing; do not merge or split.
+- A paragraph does not end because something interrupted it. The rule above the \
+footnotes cuts across the page, and the page itself ends mid-sentence; in both cases \
+the paragraph carries on. Give the continuation as its own block with \
+"continuesPrevious" true, so the two can be rejoined — and if the break falls inside a \
+hyphenated word, leave the hyphen on the first part so the join can be made. Everything \
+else has "continuesPrevious" false.
 - Footnotes are printed below a rule at the foot of the page. They are their own \
-blocks, of kind "footnote", and they keep their "(1)" markers. The marker's call stays \
-inline in the paragraph where it appears.
+blocks, of kind "footnote", with their number in "marker" — "1", "2" — and the call \
+stays inline in the paragraph where it appears. A footnote is often long and often \
+looks like ordinary prose: what makes it a footnote is that it sits below the rule, not \
+what it says. Do not let one become a paragraph.
 - Tables are blocks of kind "table", with their contents in "rows" — one array per row, \
 one string per cell — and "text" left empty. Preserve the columns as printed, including \
 empty cells. Do not flatten a table into prose.
@@ -52,6 +60,8 @@ Google" watermark are blocks of kind "furniture". Include them, so nothing on th
 is silently dropped, but keep them out of the body blocks.
 - "printedPage" is the number printed on the page, which is not the page of the PDF. \
 Use 0 if the page carries no number.
+- "marker" is empty and "continuesPrevious" is false for anything that is neither a \
+footnote nor a continuation.
 
 Put anything illegible or doubtful in "uncertain". An empty array is a claim that the \
 page came through cleanly.`;
