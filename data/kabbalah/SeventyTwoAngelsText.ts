@@ -15,12 +15,12 @@ export function loadAngelTexts(language: TextLanguage): Promise<string[]> {
   const already = loading.get(language);
   if (already) return already;
 
-  // Both bundlers key their JSON5 rule off the extension, and neither can
-  // follow a computed path, so each language names its own module.
+  // No bundler can follow a computed path, so each language names its own
+  // module; both are the JSON the build emits from the JSON5 sources.
   const texts = (
     language === "fr"
-      ? import("./seventyTwoAngelsText/fr.json5")
-      : import("./seventyTwoAngelsText/en.json5")
+      ? import("../dist/kabbalah/seventyTwoAngelsText/fr.json")
+      : import("../dist/kabbalah/seventyTwoAngelsText/en.json")
   ).then((module) => module.default as unknown as string[]);
 
   loading.set(language, texts);
