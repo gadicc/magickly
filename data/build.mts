@@ -12,16 +12,17 @@
  * gives it a declared record type instead.
  *
  * `data/dist` is generated and gitignored, so every task that reads it runs
- * this first: `data:build` chains ahead of `dev`, `typecheck`, `build`,
- * `check:turbopack` and the test scripts, and this module is also vitest's
- * globalSetup, so a bare `vitest run <file>` works. A missing table is a
- * module resolution error rather than a silent `any`, because nothing
- * declares `*.json`.
+ * this first: `data:build` chains ahead of `typecheck`, `build`,
+ * `check:turbopack` and the test scripts, `pnpm dev` runs it in `--watch`
+ * ([below](#watchData)), and this module is also vitest's globalSetup, so a
+ * bare `vitest run <file>` works. A missing table is a module resolution
+ * error rather than a silent `any`, because nothing declares `*.json`.
  *
  * It is `.mts` because the repository is CommonJS: tsx compiles a `.ts` here
  * to CJS, where neither `import.meta.url` nor top-level await exists, and
  * this build wants both.
  */
+import { watch } from "node:fs";
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -71,6 +72,16 @@ async function emitted(dir = DIST_DIR): Promise<string[]> {
   return found;
 }
 
+/** Converts one source, and says whether its JSON changed. */
+async function buildOne(name: string) {
+  const out = name.replace(/\.json5$/, ".json");
+  const parsed = JSON5.parse(await readFile(join(DATA_DIR, name), "utf8"));
+  // Source order is insertion order through both parse and stringify, so a
+  // diff of the output reads like a diff of the source.
+  const json = `${JSON.stringify(parsed, null, 2)}\n`;
+  return (await writeIfChanged(join(DIST_DIR, out), json)) ? out : null;
+}
+
 /** Converts every source, and removes output a source no longer explains. */
 export async function buildData() {
   const written: string[] = [];
@@ -78,14 +89,10 @@ export async function buildData() {
   let tables = 0;
 
   for (const name of await sources()) {
-    const out = name.replace(/\.json5$/, ".json");
-    expected.add(out);
+    expected.add(name.replace(/\.json5$/, ".json"));
     tables++;
-    const parsed = JSON5.parse(await readFile(join(DATA_DIR, name), "utf8"));
-    // Source order is insertion order through both parse and stringify, so a
-    // diff of the output reads like a diff of the source.
-    const json = `${JSON.stringify(parsed, null, 2)}\n`;
-    if (await writeIfChanged(join(DIST_DIR, out), json)) written.push(out);
+    const out = await buildOne(name);
+    if (out) written.push(out);
   }
 
   // The graph, for a reader that is not TypeScript. `as const satisfies`
@@ -106,11 +113,76 @@ export async function setup() {
   await buildData();
 }
 
+/**
+ * `--watch`: builds, then rebuilds a source as it is edited, so that a JSON5
+ * edit reaches a running `pnpm dev` (which starts this beside `next dev`
+ * through [dev.mts](./dev.mts)). Turbopack and webpack both pick the JSON up
+ * from `data/dist` on their own once it is written.
+ *
+ * Nothing here is fatal. A file caught half-written is a parse error that
+ * the next save fixes, and a file that has gone sends the whole build round
+ * again, which is what prunes the JSON it explained.
+ *
+ * What is watched is the JSON5 sources and nothing else, so an edit to
+ * [graph.ts](./graph.ts) while the task runs leaves `dist/graph.json` as the
+ * first build wrote it. That file is for a reader that is not TypeScript —
+ * nothing under `src/` imports it, and the graph reaches the app as a module,
+ * which Next reloads itself — so the staleness shows up nowhere; restarting
+ * the task rewrites it.
+ */
+async function watchData() {
+  const { tables } = await buildData();
+
+  const rebuild = async (name: string) => {
+    try {
+      const out = await buildOne(name);
+      if (out) console.log(`data: ${out}`);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") await buildData();
+      else console.error(`data: ${name}: ${(error as Error).message}`);
+    }
+  };
+
+  // An editor writes in bursts, and one save raises several events; a save
+  // that renames a new file over the old one raises them for both names.
+  const dirty = new Set<string>();
+  let soon: NodeJS.Timeout | undefined;
+  const flush = () => {
+    const names = [...dirty];
+    dirty.clear();
+    for (const name of names) void rebuild(name);
+  };
+
+  // One watcher per directory, and deliberately not one recursive watcher
+  // over `data/`: a recursive watch on Linux follows the file, so an editor
+  // that saves by writing a new file and renaming it over the old one — sed,
+  // vim, VS Code — is invisible to it from the second save on. Measured, not
+  // assumed. A directory's watch survives a rename inside it, because the
+  // directory is what it holds.
+  const dirs = [
+    ...new Set((await sources()).map((name) => dirname(join(DATA_DIR, name)))),
+  ];
+  for (const dir of dirs)
+    watch(dir, (_event, file) => {
+      if (!file) return;
+      const name = relative(DATA_DIR, join(dir, file.toString()));
+      if (!name.endsWith(".json5") || SKIP.has(name)) return;
+      dirty.add(name);
+      clearTimeout(soon);
+      soon = setTimeout(flush, 30);
+    });
+
+  console.log(`data: watching ${tables} sources in ${dirs.length} directories`);
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const { tables, written, stale } = await buildData();
-  const changed = written.length + stale.length;
-  console.log(
-    `data: ${tables} tables in data/dist` +
-      (changed ? `, ${written.length} written, ${stale.length} removed` : ""),
-  );
+  if (process.argv.includes("--watch")) await watchData();
+  else {
+    const { tables, written, stale } = await buildData();
+    const changed = written.length + stale.length;
+    console.log(
+      `data: ${tables} tables in data/dist` +
+        (changed ? `, ${written.length} written, ${stale.length} removed` : ""),
+    );
+  }
 }
