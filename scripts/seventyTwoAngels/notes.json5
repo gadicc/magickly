@@ -1,0 +1,38 @@
+// Notes no rule can derive, each checked against the page by hand. Everything
+// else in the apparatus is computed — see apparatus.ts.
+//
+// `no` is 0 for a note about the book at large rather than one genius.
+[
+  {
+    no: 0,
+    kind: "correction",
+    field: "p. 35",
+    printed: "pour les 260 jours",
+    used: "360",
+    why: "Five revolutions of 72 days are 360, as the same page says twice elsewhere and as the third table sets out row by row.",
+  },
+  {
+    no: 0,
+    kind: "reading",
+    field: "name.he",
+    printed: "",
+    used: "U+05C4",
+    why: "Lenain dots his Hebrew above the letter bodies, not within them and not beneath. Those dots are encoded here as U+05C4 HEBREW MARK UPPER DOT, which is what that position means; whether he intended the biblical punctum extraordinarium or a device of his own is not something the type can settle.",
+  },
+  {
+    no: 0,
+    kind: "reconstruction",
+    field: "first cabalistic table",
+    printed: "",
+    used: "",
+    why: "The table is a fold-out leaf, and the scan photographed it folded: only its last eleven rows were captured, and the page behind it is blank. Rows 1 to 61 are in no image of this copy. Every column it carries — name, nation, divine name — is also given in the entry for each genius, so nothing it held is lost, only its arrangement.",
+  },
+  {
+    no: 64,
+    kind: "correction",
+    field: "choir",
+    printed: "le chœur des anges",
+    used: "Archangels",
+    why: "Lenain opens the ninth choir here and ends the eighth at the sixty-third, making one of seven and one of nine. His own first eight declarations fall on the first, ninth, seventeenth and so on — eight apiece — and Agrippa and Kircher have it so. The pattern is followed and the departure noted.",
+  },
+]
