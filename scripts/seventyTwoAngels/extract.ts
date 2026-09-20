@@ -49,7 +49,7 @@ const MINUTES = (total: number) =>
   `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
 
 const INSTRUCTIONS = `You are working on one entry from Lazare Lenain's "La Science \
-Cabalistique" (Angers, 1823). Lenain died in 1832, so the work is public domain. The \
+Cabalistique" (Amiens, 1823). Lenain died in 1877, so the work is public domain. The \
 French you are given was read off the original scan, page by page, so it is what he \
 printed. Trust it, and do not silently repair it.
 
@@ -57,6 +57,28 @@ printed. Trust it, and do not silently repair it.
 modern published translation of this work exists; this must not be derived from it, so \
 do not draw on one if you know it. Match Lenain's register: plain, a little archaic, \
 not smoothed out.
+
+His French is of 1823, and several words do not mean what they look like. Read them as \
+he meant them:
+- « vers le midi » is a direction — facing south. It is not the time of day; the hour \
+  of invocation is given separately.
+- « du soir » means after noon, so « 1 heure 20 minutes du soir » is twenty past one in \
+  the afternoon, not in the evening. « du matin » is before noon.
+- « les lumières » is knowledge or enlightenment, and « la propagation des lumières » \
+  is the spread of learning, not of light.
+- « dilapidations » is the squandering of money or property, not disrepair.
+- « le génie militaire » is military engineering, and « les villes de guerre » are \
+  fortified towns.
+- « le sexe », used alone, means women.
+- « la mémoire heureuse » is a retentive memory, not a happy one.
+- « Dieu qui réjouit » is God who gives joy, not God who rejoices.
+- « obtenir la grâce de ceux… » is obtaining pardon FOR them, not from them.
+
+Translate what he printed, including where he is wrong. « le 31 avril » is an \
+impossible date and it is translated "the 31st of April"; a Latin verse he misquotes is \
+copied as he set it. Saying what is wrong is the apparatus's work, done elsewhere and \
+from the printed reading — a translation that quietly mends him destroys the evidence \
+it would be based on.
 
 Grammatical gender is not a statement about a person. Every entry describes « la \
 personne qui est née sous cette influence », and Lenain then writes « elle » because \
@@ -77,9 +99,12 @@ one or two sentences each.
 and they do it in three ways: « Il domine sur les Hébreux », « suivant la langue des \
 peuples du Congo », and — easily missed — as an adjective, « d'après la langue \
 espagnole », « suivant la langue irlandaise ». That last form names a nation as much as \
-the others do. Give the nation alone, as a short noun phrase — "the Mongols", "Turkey", \
-"Spain" — never the sentence around it, and never the name of God, which belongs in \
-"godName". The formula « la langue de X » always names the people, whether or not they \
+the others do. Name the PEOPLE, as Lenain does, not the territory: « les Grecs » is \
+"the Greeks" and not "Greece", « la langue espagnole » is "the Spanish" and not "Spain", \
+« les Crétois » is "the Cretans" and not "Crete". Give them alone, as a short noun \
+phrase — "the Mongols", "the Hebrews" — never the sentence around it, and never the name of God, which belongs in \
+"godName". "godName" is the divine name the entry gives for that people — Jehovah, \
+Théos, Orsy, Bogo — and never the genius's own name, which is already in "name". The formula « la langue de X » always names the people, whether or not they \
 are a nation on a modern map: « les anciens Béthuliens » and « les Mages » belong there \
 as much as « les Grecs ». Where the opening names no language and no nation, as a few \
 entries do, leave it empty.
@@ -95,6 +120,13 @@ is its opposite, and belongs in "contrary". Turbulent men and anger are not what
 Vehuiah governs — they are what his contrary governs — so nothing from those sentences \
 may appear in "governs".
 
+"invokedFor" is what the entry says the genius is invoked FOR — « on l'invoque \
+pour… », « pour obtenir des lumières », « il sert à… ». Fewer than half the entries say. \
+Where one only sets out what the genius governs and protects, that is "governs", and \
+"invokedFor" is empty; restating the same matter under both is not a second fact. The \
+manner of invoking — the hour, the direction, which psalm to recite — is not a purpose \
+either.
+
 "bornUnder" is what the entry says of a person born under the genius, which Lenain \
 writes as « La personne qui est née sous cette influence… ». Where he writes no such \
 sentence, "bornUnder" is empty. Those the genius merely influences are not those born \
@@ -102,7 +134,9 @@ under it, and neither are « ceux qui sont nés le jour où il préside », who 
 one of its days.
 
 Where the entry genuinely does not say something, leave that field as an empty string. \
-An empty string is a CORRECT answer. Do not assemble one out of the rest of the entry, \
+An empty string is a CORRECT answer. Leave it actually empty: a sentence explaining \
+that the entry gives no such thing is not an empty field, and it reaches the reader as \
+though Lenain had written it. Do not assemble one out of the rest of the entry, \
 and never supply a fact you know from elsewhere. If it is not on the page, it is not in \
 the answer.
 
@@ -110,9 +144,16 @@ the answer.
 given, letter for letter. Do not substitute a spelling you know.
 
 4. Fill "scanned" with what the entry SAYS, even where it contradicts the values you \
-were given. Lenain makes mistakes and this is how they are found, so do not correct \
-them here, and do not convert anything: for the invocation give the hour, the minute \
-and whether it says "matin" or "soir", not a total.
+were given. This half is the evidence: Lenain's mistakes are found by comparing it \
+against his tables, so nothing here may be corrected, completed or converted.
+
+For the invocation give the hour and the minute as printed, never a total. \
+"partOfDay" is "matin" or "soir" ONLY where that word is on the page. Many entries \
+give the hour and no more — « L'heure favorable commence depuis 1 heure 40 minutes \
+jusqu'à 2 heures » — and for those it is an empty string. Which half of the day he \
+meant is then not something the page says, and supplying it invents evidence: a \
+"soir" that is not printed turns an entry that agrees with his tables into one that \
+contradicts them, or hides one that does.
 
 5. Put anything doubtful in "uncertain". An empty array is a claim that the entry is \
 straightforward.`;

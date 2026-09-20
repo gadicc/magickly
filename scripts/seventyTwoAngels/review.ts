@@ -36,7 +36,7 @@ const CONCURRENCY = 4;
 const OUT_DIR = "output/seventyTwoAngelsReview";
 
 const INSTRUCTIONS = `You are checking someone else's work on one entry from Lazare \
-Lenain's "La Science Cabalistique" (Angers, 1823), a public-domain French work.
+Lenain's "La Science Cabalistique" (Amiens, 1823), a public-domain French work.
 
 The French is the page. It was read off the original scan block by block, and Lenain's \
 own notes set after the entry they belong to, each opening with its marker. It is not a \

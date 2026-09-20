@@ -12,6 +12,14 @@
     why: "Five revolutions of 72 days are 360, as the same page says twice elsewhere and as the third table sets out row by row.",
   },
   {
+    no: 45,
+    kind: "correction",
+    field: "psalm.la",
+    printed: "misericordia tua Domine adjuvebat me",
+    used: "adjuvabat",
+    why: "The page prints \"adjuvebat\" in italic, plainly and not as scan damage; the Vulgate reads \"adiuvabat\" at Psalm 93:18. The entry's French keeps his spelling and this field gives the verse as the psalter has it.",
+  },
+  {
     no: 0,
     kind: "reading",
     field: "name.he",

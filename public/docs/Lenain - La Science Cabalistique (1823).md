@@ -1,9 +1,16 @@
 # La Science Cabalistique
 
-**Lazare Lenain**, Angers, 1823. [Digitised by Google Books](https://www.google.co.uk/books/edition/La_science_cabalistique/ZqgpxTZ43HkC).
+**Lazare Lenain**, Amiens, 1823. [Digitised by Google Books](https://www.google.co.uk/books/edition/La_science_cabalistique/ZqgpxTZ43HkC).
 
-Lenain died in 1832, so this text is public domain and no rights are asserted
-over it. This reading of it was made for [magick.ly](https://magick.ly) from the
+The scan is not of the 1823 printing itself but of a later reissue, which
+reproduces Lenain's title page — *A Amiens, chez l'Auteur, au Cabinet de
+lecture, place Saint-Firmin, N. 1. 1823* — and adds a preface by Papus for the
+Ordre Kabbalistique de la Rose-Croix, calling it "la réédition du rarissime
+opuscule de Lenain". The volume does not date itself; the first reprint is
+recorded as Dujols and Thomas, 1909.
+
+Lenain died in 1877 and Papus in 1916, so both texts are public domain and no
+rights are asserted over either. This reading of it was made for [magick.ly](https://magick.ly) from the
 scan, page by page, and is offered under
 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) along with the rest of
 the site's data. It replaces an earlier OCR, which could not read the Hebrew and
@@ -1748,6 +1755,7 @@ Le génie contraire domine sur l'atmosphère ; il provoque les grandes chaleurs 
 **Editorial notes**
 
 - **name.he** · סאׄלּׄיׄה → סאליה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **psalm.la** · misericordia tua Domine adjuvebat me → adjuvabat — The page prints "adjuvebat" in italic, plainly and not as scan damage; the Vulgate reads "adiuvabat" at Psalm 93:18. The entry's French keeps his spelling and this field gives the verse as the psalter has it.
 - **degrees** · 226-130 → 226-230 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
 - **name.he** · עריׄאׄלּׄ → עריאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 - **ordinal** · 36e → 46 — The entry stands between the 45th and the 47th, and the first cabalistic table numbers it 46.
@@ -1817,14 +1825,6 @@ minutes du soir jusqu'à 4 heures 40 minutes, en récitant le 8e. verset du psau
 Le génie contraire influe sur les chevaliers d'industrie, et sur tous ceux qui n'aiment point le travail et cherchent à vivre par des moyens illicites...
 
 51e. Hahasiah .ההשיה Son attribut (Dieu caché). Il correspond au saint nom de Dieu Bila, suivant la langue des Barsiens. Son rayon commence depuis le 251e. degré de la sphère jusqu'au 255e., inclusivement, correspondant à la 26e. décade et au génie nommé Sesmé, sous l'influence de la Lune. Il préside aux cinq jours suivants : 9 mai, 20 juillet, 30 septembre, 11 décembre, 21 février. L'invocation se fait depuis 4 heures 40 minutes jusqu'à 5 heures, en prononçant la 32e. verset du psaume 103. (Sit gloria Domini in sæculum : lætabitur Dominus in operibus suis.) Il sert pour élever son âme à la contemplation des choses divines, et pour découvrir les mystères de la sagesse. Ce génie domine sur la chimie et la physique ; il révèle les plus grands secrets de la nature, notamment la pierre philosophale et la médecine universelle. La personne qui est née sous cette influence aimera les sciences abstraites ; elle s'attachera particulièrement à connaître les propriétés et les vertus attribuées aux animaux, aux végétaux, et aux
-
-<small>
-
-**Editorial notes**
-
-- **planet** · Luna (Moon) → luna — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-
-</small>
 
 ---
 
@@ -1923,15 +1923,6 @@ Le génie contraire domine la colère; il influe sur les méchants et les homici
 
 > **(1)** (1) Voyez à ce sujet l'Enchiridion du pape Léon, page 4.
 
-<small>
-
-**Editorial notes**
-
-- **invocation** · 7:20 matin → 19:20 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **planet** · Soleil (Sun) → sol — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-
-</small>
-
 ---
 
 <small>**[p. 87]**</small>
@@ -1981,7 +1972,7 @@ Le génie contraire domine la folie et la prodigalité ; il influe sur tous ceux
 **Editorial notes**
 
 - **choir** · le chœur des anges → Archangels — Lenain opens the ninth choir here and ends the eighth at the sixty-third, making one of seven and one of nine. His own first eight declarations fall on the first, ninth, seventeenth and so on — eight apiece — and Agrippa and Kircher have it so. The pattern is followed and the departure noted.
-- **choir** · the choir of angels (9th order) → Archangels — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **choir** · angels → Archangels — Lenain's own tables give otherwise, and the rest of the book keeps to them.
 - **degrees** · 316-220 → 316-320 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
 
 </small>

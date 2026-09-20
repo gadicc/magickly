@@ -27,7 +27,7 @@ const CHAPTER_FROM = 61;
 const CHAPTER_TO = 113;
 
 const INSTRUCTIONS = `You are transcribing one page of Lazare Lenain's "La Science \
-Cabalistique" (Angers, 1823). Lenain died in 1832, so the work is public domain. You \
+Cabalistique" (Amiens, 1823). Lenain died in 1877, so the work is public domain. You \
 are given a photograph of the page. Read it.
 
 Transcribe what is printed, exactly. Do not modernise Lenain's spelling, correct his \

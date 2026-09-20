@@ -13,7 +13,7 @@ defects the investigation turned up along the way.
 
 `public/docs/Lenain - La Science Cabalistique (1823) - Google.txt` is an
 OCRmyPDF sidecar of the Google Books scan of Lazare Lenain's *La Science
-Cabalistique* (Angers, 1823). Lenain died in 1832, so the French is public
+Cabalistique* (Amiens, 1823). Lenain died in 1877, so the French is public
 domain, and a faithful scan of a public-domain work creates no new copyright in
 the text.
 

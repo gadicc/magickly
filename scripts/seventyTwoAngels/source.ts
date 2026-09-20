@@ -4,7 +4,7 @@ import { ANGEL_COUNT } from "../../data/kabbalah/seventyTwoAngelsDerived";
 /**
  * Cuts the OCR of Lenain's 1823 scan into one French region per genius.
  *
- * The scan is public domain — Lenain died in 1832 — but it is damaged, so this
+ * The scan is public domain — Lenain died in 1877 — but it is damaged, so this
  * is deliberately conservative: it finds the headings it can read, refuses to
  * guess at the ones it cannot, and hands the extraction a widened window there
  * instead. Nothing here repairs text; that is the model's job, and everything

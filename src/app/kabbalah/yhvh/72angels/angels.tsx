@@ -312,9 +312,20 @@ function SevenyTwo() {
             given both as Lenain points it and as its bare letters.
           </p>
           <p>
-            Lenain died in 1832, so his text is public domain, and no rights are
-            asserted over it. The reading, the translation and the arrangement
-            are{" "}
+            The scan is not of the 1823 printing but of a later reissue, which
+            reproduces Lenain&apos;s title page &mdash;{" "}
+            <i>
+              A Amiens, chez l&apos;Auteur, au Cabinet de lecture, place
+              Saint-Firmin, N. 1. 1823
+            </i>{" "}
+            &mdash; and adds a preface by Papus for the Ordre Kabbalistique de
+            la Rose-Croix. The volume does not date itself; the first reprint is
+            recorded as Dujols and Thomas, 1909.
+          </p>
+          <p>
+            Lenain died in 1877 and Papus in 1916, so both texts are public
+            domain, and no rights are asserted over either. The reading, the
+            translation and the arrangement are{" "}
             <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>{" "}
             with the rest of the{" "}
             <a href="https://github.com/gadicc/magickly/tree/main/data">data</a>

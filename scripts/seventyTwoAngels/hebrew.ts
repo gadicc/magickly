@@ -60,7 +60,7 @@ const reading = z.object({
 });
 
 const INSTRUCTIONS = `These are close crops of one page of Lazare Lenain's "La Science \
-Cabalistique" (Angers, 1823), a public-domain book. Each genius's entry opens with its \
+Cabalistique" (Amiens, 1823), a public-domain book. Each genius's entry opens with its \
 ordinal, its name in roman letters, and its name in Hebrew — for example "1er. génie, \
 Vehuiah והויה." or "40e. Ieiazel. ייזאל".
 
