@@ -95,13 +95,20 @@ function fromHebrew(): Note[] {
 
   const byHand = handReadings();
 
-  return [...doubtful.entries()]
-    .sort(([a], [b]) => a - b)
-    .map(([no, reading]) => {
+  // Every name a person read gets a note, whether or not the machines still
+  // disagree about it — the note records who read it, and that does not stop
+  // being true when a later pass happens to match.
+  const concerned = new Set([...doubtful.keys(), ...byHand.keys()]);
+
+  return [...concerned]
+    .sort((a, b) => a - b)
+    .map((no) => {
+      const reading = doubtful.get(no) ?? { crop: "", page: "", legible: true };
       const hand = byHand.get(no);
-      const disagreed =
-        `Two readings of the scan differed — ${reading.crop || "nothing"} ` +
-        `closer in, ${reading.page || "nothing"} from the whole page.`;
+      const disagreed = reading.crop
+        ? `Two readings of the scan differed — ${reading.crop} closer in, ` +
+          `${reading.page || "nothing"} from the whole page.`
+        : "Two readings of the scan could not settle this name.";
 
       if (!hand)
         return {

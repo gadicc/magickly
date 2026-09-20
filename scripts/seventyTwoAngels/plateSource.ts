@@ -1,8 +1,9 @@
 import { existsSync } from "node:fs";
 import { ANGEL_COUNT } from "../../data/kabbalah/seventyTwoAngelsDerived";
+import { handReadings } from "./hebrew";
 import {
   continuesParagraph,
-  isBelowTheRule,
+  isNoteAt,
   type PageBlock,
   type PageTranscription,
 } from "./pageSchema";
@@ -92,16 +93,8 @@ export function plateEntries(): PlateEntry[] {
 
       // Nothing of the body follows the rule, so a paragraph down there is a
       // long note carrying on rather than the text resuming.
-      if (block.kind === "footnote" || isBelowTheRule(page.blocks, index)) {
-        const notes = current?.footnotes;
-        const last = notes?.[notes.length - 1];
-        if (block.kind !== "footnote" && last)
-          last.text = continuesParagraph(last.text, block)
-            ? `${last.text} ${block.text}`
-            : `${last.text}\n\n${block.text}`;
-        else notes?.push({ marker: block.marker, text: block.text });
-        return;
-      }
+      // Notes are gathered a page at a time and given out afterwards.
+      if (isNoteAt(page.blocks, index)) return;
 
       // An entry is recognised by its shape and taken in sequence, because the
       // ordinal it prints is not always the one it is: the forty-sixth is set
@@ -135,11 +128,128 @@ export function plateEntries(): PlateEntry[] {
   if (missing.length)
     throw new Error(`No heading found for genius ${missing.join(", ")}`);
 
-  return Array.from({ length: ANGEL_COUNT }, (_, i) => {
+  const all = Array.from({ length: ANGEL_COUNT }, (_, i) => {
     const entry = entries.get(i + 1);
     if (!entry) throw new Error(`Missing genius ${i + 1}`);
     return entry;
   });
+  return withReadHebrew(attachNotes(all, chapterPages().flatMap(notesOfPage)));
+}
+
+/**
+ * Gives each note to the entry whose prose calls for it.
+ *
+ * A note is set at the foot of its page, which may be below the next genius's
+ * heading: the fifth's note sits under the sixth's opening, so collecting them
+ * as they come attaches it to the sixth, which never asked for it, and leaves
+ * the fifth with a "(1)" pointing at nothing. The call in the prose says whose
+ * it is.
+ */
+/** A stand-in so a note's text can be tested with the block rules. */
+const EMPTY_BLOCK = {
+  kind: "footnote" as const,
+  text: "",
+  rows: [],
+  continuesPrevious: true,
+  marker: "",
+};
+
+interface PageNote {
+  marker: string;
+  text: string;
+  printedPage: number;
+}
+
+/**
+ * The notes of one page, whole.
+ *
+ * A note runs to several blocks and only the first carries a marker, so
+ * gathering them as the entries are walked fragments any note a heading falls
+ * inside — the seventieth's ran to three pieces, two of which ended up on the
+ * seventy-second. Within a page the order is plain, so they are made whole
+ * here and given out afterwards.
+ */
+function notesOfPage(page: PageTranscription): PageNote[] {
+  const notes: PageNote[] = [];
+  page.blocks.forEach((block, index) => {
+    if (block.kind === "furniture" || block.kind === "table") return;
+    if (!isNoteAt(page.blocks, index)) return;
+
+    const last = notes[notes.length - 1];
+    if (last && (!block.marker || block.marker === last.marker)) {
+      last.text = continuesParagraph(last.text, block)
+        ? `${last.text} ${block.text}`
+        : `${last.text}\n\n${block.text}`;
+      return;
+    }
+    notes.push({
+      marker: block.marker,
+      text: block.text,
+      printedPage: page.printedPage,
+    });
+  });
+  return notes;
+}
+
+/**
+ * Gives each note to the entry that calls for it. The marker names it and the
+ * page narrows it: two entries may each print a note "(1)", and only one of
+ * them runs across the page this one is set on.
+ */
+function attachNotes(entries: PlateEntry[], notes: PageNote[]) {
+  for (const entry of entries) entry.footnotes = [];
+
+  for (const note of notes) {
+    const call = new RegExp(`\\(${note.marker || "\\d"}\\)`);
+    const onPage = entries.filter((entry) =>
+      entry.printedPages.includes(note.printedPage),
+    );
+    const wants = onPage.find((entry) => call.test(entry.french)) ?? onPage[0];
+    if (!wants) continue;
+
+    // A long note runs across pages, and its later pages carry no marker of
+    // their own — the seventieth's fills three. Same marker, or none, joins
+    // what the entry already holds.
+    // A long note runs across pages, and its later pages carry no marker of
+    // their own — or carry one misread from the page, as the thirty-eighth's
+    // second note does, resuming "ON," where it broke off at "le mot". A note
+    // that does not end in terminal punctuation has not ended.
+    const held = wants.footnotes[wants.footnotes.length - 1];
+    // A stop may be followed by a closing bracket: "(Voyez le Frontispice.)"
+    // has ended.
+    const unfinished = held && !/[.!?»][)\]"'»]?\s*$/.test(held.text);
+    if (held && (unfinished || !note.marker || note.marker === held.marker))
+      held.text = continuesParagraph(held.text, {
+        ...EMPTY_BLOCK,
+        text: note.text,
+      })
+        ? `${held.text} ${note.text}`
+        : `${held.text}\n\n${note.text}`;
+    else wants.footnotes.push({ marker: note.marker, text: note.text });
+  }
+  return entries;
+}
+
+/**
+ * Puts the Hebrew a person read into the entry's own prose.
+ *
+ * The heading's Hebrew was read by a machine along with the rest of the page,
+ * and where a person has since read it the two disagree — the fifty-fourth's
+ * prose said one thing while the name above it said another. Only the first
+ * run of Hebrew is touched, which is the name in the heading; any further
+ * Hebrew belongs to the entry's argument and is left alone.
+ */
+function withReadHebrew(entries: PlateEntry[]) {
+  const byHand = handReadings();
+  for (const entry of entries) {
+    const hand = byHand.get(entry.no);
+    if (!hand) continue;
+    entry.french = entry.french.replace(
+      /[\u0590-\u05FF][\u0590-\u05FF\u0591-\u05C7]*/,
+      hand.pointed,
+    );
+  }
+  return entries;
 }
 
 /** Whether the chapter has been read, so callers can fall back to the OCR. */

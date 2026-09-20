@@ -277,29 +277,50 @@ function SevenyTwo() {
             <a href="https://www.google.co.uk/books/edition/La_science_cabalistique/ZqgpxTZ43HkC?hl=en&gbpv=0">
               The Science of the Kabbalah
             </a>{" "}
-            (English title) by Lazare Lenain (1823; digitized by Google Books),
-            passed through OCRmyPDF (
+            (English title) by Lazare Lenain (1823; digitized by Google Books).
+            It is read from the scan itself, page by page, rather than from an{" "}
             <a href="/docs/Lenain%20-%20La%20Science%20Cabalistique%20(1823)%20-%20Google.txt">
-              output.txt
+              OCR of it
             </a>
-            ). That scan is damaged, so each entry was restored and then
-            translated from the restoration, one at a time, and checked against
-            Lenain&apos;s own four tables — which is how the handful of places
-            where the book contradicts itself came to light. The French shown
-            beside each translation is that restoration, so you can read what
-            the English was made from.
+            : that OCR could not read Lenain&apos;s Hebrew at all, and read many
+            of his digits as letters. The whole book is here as a{" "}
+            <a href="/docs/Lenain%20-%20La%20Science%20Cabalistique%20(1823).md">
+              reading edition
+            </a>
+            , footnotes, tables and all.
+          </p>
+          <p>
+            The French beside each translation is what he printed, so you can
+            read what the English was made from. The English is translated from
+            that French and from nothing else.
+          </p>
+          <p>
+            Lenain makes mistakes, and where he does the text keeps his words
+            and a note says what is wrong — an impossible 31 April, a genius
+            numbered 36 in the middle of the forties, five revolutions of 72
+            days called 260. The tables on this page use the corrected value.
+            Most of those notes found themselves: his own four tables say what
+            each entry should contain, so a disagreement is arithmetic rather
+            than opinion.
+          </p>
+          <p>
+            The Hebrew was the hard part. He dots his letters above rather than
+            within, and a machine reading those dots as vowel points loses
+            letters or invents them. Forty-seven names are given here because
+            two independent readings of the scan agree on them; the other
+            twenty-five were read by a person who reads Hebrew. Each name is
+            given both as Lenain points it and as its bare letters.
           </p>
           <p>
             Lenain died in 1832, so his text is public domain, and no rights are
-            asserted over it. The restoration, the translation and the
-            arrangement are{" "}
+            asserted over it. The reading, the translation and the arrangement
+            are{" "}
             <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>{" "}
             with the rest of the{" "}
             <a href="https://github.com/gadicc/magickly/tree/main/data">data</a>
-            , and no rights are claimed where none subsist. Nothing here draws
-            on any modern published translation. This was done in an effort to
-            provide a Copyright-free version of this material, however, a much
-            better translation exists:
+            , and no rights are claimed where none subsist. This was done in an
+            effort to provide a Copyright-free version of this material,
+            however, a much better translation exists:
           </p>
           <p>
             We highly recommend the{" "}
@@ -316,7 +337,9 @@ function SevenyTwo() {
             <a href="https://rosecirclebooks.com/levi-seals-for-shemhamephorash/">
               this post
             </a>
-            .
+            . Nothing here is derived from his translation; it was consulted
+            only to check names against Lenain&apos;s own first table, whose
+            fold-out leaf this scan photographed folded.
           </p>
         </details>
         <p>The sigils will be added at a later time.</p>

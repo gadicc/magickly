@@ -243,7 +243,17 @@ function romanKey(name: string) {
     .replace(/[^a-z]/g, "");
 }
 
+/**
+ * A name a person read is not corroborated by a machine agreeing with it.
+ *
+ * Their readings are put into the entry's prose, so the model reads them back
+ * out — and comparing that against the closer crop then compares a reading
+ * with itself. Eight names counted as corroborated on that basis, and worse,
+ * dropped out of the doubtful set and lost the note saying who had read them.
+ * They are set aside here instead, and answered for by `handReadings`.
+ */
 export function hebrewReadings(pageOf: Map<number, string>): HebrewReadings {
+  const byHand = handReadings();
   // Keyed by the roman name, not the printed ordinal: the forty-sixth is set
   // as "36e", so keying on the ordinal silently dropped its reading into the
   // real thirty-sixth's place and left the forty-sixth with none.
@@ -266,6 +276,7 @@ export function hebrewReadings(pageOf: Map<number, string>): HebrewReadings {
     { crop: string; page: string; legible: boolean }
   >();
   for (const [no, fromPage] of pageOf) {
+    if (byHand.has(no)) continue;
     const fromCrop = crop.get(romanKey(namesByNo.get(no) ?? ""));
     const a = fromCrop ? hebrewLetters(fromCrop.hebrew) : "";
     const b = hebrewLetters(fromPage);

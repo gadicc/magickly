@@ -165,13 +165,32 @@ function main() {
 
   mkdirSync(TEXT_DIR, { recursive: true });
   write(`${DATA_DIR}/seventyTwoAngels.json5`, angels.map(record));
+  // Lenain's notes go with his text. A reader who meets "(1)" in an entry has
+  // to be able to read what it points at, and for five entries the call was
+  // there while the note was held somewhere they would never see.
+  const withNotes = (
+    prose: string,
+    notes: { marker: string; text: string }[],
+  ) =>
+    notes.length
+      ? `${prose}\n\n${notes.map((note) => `(${note.marker}) ${note.text}`).join("\n\n")}`
+      : prose;
+
   write(
     `${TEXT_DIR}/fr.json5`,
-    angels.map((angel) => angel.french),
+    angels.map((angel) => withNotes(angel.french, angel.footnotesFr)),
   );
   write(
     `${TEXT_DIR}/en.json5`,
-    angels.map((angel) => angel.translation),
+    angels.map((angel) =>
+      withNotes(
+        angel.translation,
+        angel.footnotes.map((note) => ({
+          marker: note.marker,
+          text: note.en,
+        })),
+      ),
+    ),
   );
 }
 

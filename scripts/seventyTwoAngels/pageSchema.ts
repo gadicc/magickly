@@ -79,5 +79,24 @@ export function continuesParagraph(sofar: string, block: PageBlock) {
  * abbé de Villars came to interrupt the thirty-eighth genius mid-word.
  */
 export function isBelowTheRule(blocks: PageBlock[], index: number) {
-  return blocks.slice(0, index).some((block) => block.kind === "footnote");
+  return blocks.slice(0, index).some(isFootnote);
+}
+
+/**
+ * Whether a block is a note rather than the text.
+ *
+ * Its declared kind is not enough on its own. A long note runs to several
+ * paragraphs and only the first tends to be typed as one; and where the first
+ * is mistyped, nothing below it looks like a note either. The marker settles
+ * it — a block that answers to "(1)" is part of note one whatever it calls
+ * itself — and position settles the rest, since nothing of the body is set
+ * below the rule.
+ */
+export function isFootnote(block: PageBlock) {
+  return block.kind === "footnote" || block.marker !== "";
+}
+
+export function isNoteAt(blocks: PageBlock[], index: number) {
+  const block = blocks[index];
+  return isFootnote(block) || isBelowTheRule(blocks, index);
 }

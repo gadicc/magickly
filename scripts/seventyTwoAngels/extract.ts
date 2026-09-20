@@ -63,6 +63,12 @@ personne qui est née sous cette influence », and Lenain then writes « elle »
 that noun is feminine — not because the person is a woman. Translate those as "they", \
 never "she". The genius itself he treats as « il »; keep that as "he".
 
+Lenain's own footnotes are given after the entry, each with its marker. \
+Translate every one of them into "footnotes", keeping its marker, on the same \
+terms: from the French in front of you and nothing else. They are his text, not \
+commentary on it, and a reader who meets "(1)" in the entry must be able to read \
+what it points at. Where no footnotes are given, the array is empty.
+
 2. Fill the structured fields from the entry. The prose fields ("invokedFor", \
 "governs", "bornUnder", "contrary") are short English summaries drawn from the entry, \
 one or two sentences each.
@@ -152,6 +158,8 @@ function pathFor(no: number) {
 export interface StoredExtraction extends AngelExtraction {
   /** The French as printed, from the transcription rather than from a model. */
   french: string;
+  /** Lenain's notes in French, likewise read from the page. */
+  footnotesFr: { marker: string; text: string }[];
   printedPages: number[];
   /** Which model translated it, so the data can say. */
   model: string;
@@ -193,6 +201,7 @@ async function main() {
           const stored: StoredExtraction = {
             ...angel,
             french: entry.french,
+            footnotesFr: entry.footnotes,
             printedPages: entry.printedPages,
             model,
           };

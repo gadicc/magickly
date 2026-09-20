@@ -49,7 +49,7 @@
     field: 'name.he',
     printed: 'לׄלּׄהאׄלּׄ',
     used: 'ללהאל',
-    why: 'Two readings of the scan differed — ללהאל closer in, להאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 6,
@@ -81,14 +81,6 @@
     field: 'presidingDays',
     printed: '27/3, 7/6, 17/8, 29/10, 9/1',
     used: '27/3, 7/6, 18/8, 29/10, 9/1',
-    why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
-  },
-  {
-    no: 9,
-    kind: 'correction',
-    field: 'planet',
-    printed: 'la lune',
-    used: 'luna',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
   },
   {
@@ -129,7 +121,7 @@
     field: 'name.he',
     printed: 'יזּלּׄאׄלּ',
     used: 'יזלאל',
-    why: 'Two readings of the scan differed — יזלאל closer in, ידלאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 13,
@@ -169,7 +161,7 @@
     field: 'name.he',
     printed: 'לּׄוויׄה',
     used: 'לוויה',
-    why: 'Two readings of the scan differed — לויה closer in, לוויה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 20,
@@ -185,7 +177,7 @@
     field: 'name.he',
     printed: 'יׄיׄיׄאׄלּׄ',
     used: 'יייאל',
-    why: 'Two readings of the scan differed — לאיוי closer in, ייאיאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 22,
@@ -201,7 +193,7 @@
     field: 'name.he',
     printed: 'מלּׄהאׄלּׄ',
     used: 'מלהאל',
-    why: 'Two readings of the scan differed — כלהאל closer in, מלהאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 28,
@@ -209,7 +201,7 @@
     field: 'name.he',
     printed: 'שאׄהיׄה',
     used: 'שאהיה',
-    why: 'Two readings of the scan differed — שאהוה closer in, שאהיה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 29,
@@ -217,7 +209,7 @@
     field: 'name.he',
     printed: 'ריׄיׄאׄלּׄ',
     used: 'רייאל',
-    why: 'Two readings of the scan differed — ריאל closer in, רויאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 30,
@@ -236,20 +228,12 @@
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
   },
   {
-    no: 31,
-    kind: 'correction',
-    field: 'planet',
-    printed: 'Soleil (Sun)',
-    used: 'sol',
-    why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
-  },
-  {
     no: 34,
     kind: 'reading',
     field: 'name.he',
     printed: 'לּׄההיׄה',
     used: 'לההיה',
-    why: 'Two readings of the scan differed — לההיח closer in, לההיוח from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 37,
@@ -257,7 +241,7 @@
     field: 'name.he',
     printed: 'אׄנואלּ',
     used: 'אנואל',
-    why: 'Two readings of the scan differed — אנואל closer in, אניאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 38,
@@ -273,7 +257,7 @@
     field: 'name.he',
     printed: 'רהעאׄלּׄ',
     used: 'רהעאל',
-    why: 'Two readings of the scan differed — רהאעל closer in, רהעאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 40,
@@ -281,7 +265,7 @@
     field: 'name.he',
     printed: 'יׄיׄזּאׄלּׄ',
     used: 'ייזאל',
-    why: 'Two readings of the scan differed — ייזאל closer in, יזיאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 41,
@@ -289,7 +273,7 @@
     field: 'name.he',
     printed: 'הההאׄלּׄ',
     used: 'הההאל',
-    why: 'Two readings of the scan differed — ההאל closer in, ההאהל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 42,
@@ -305,7 +289,15 @@
     field: 'name.he',
     printed: 'וולּּׄיׄה',
     used: 'ווליה',
-    why: 'Two readings of the scan differed — וולויה closer in, וולוה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+  },
+  {
+    no: 44,
+    kind: 'correction',
+    field: 'invocation',
+    printed: '0:00',
+    used: '14:20',
+    why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
   },
   {
     no: 45,
@@ -313,15 +305,7 @@
     field: 'name.he',
     printed: 'סאׄלּׄיׄה',
     used: 'סאליה',
-    why: 'Two readings of the scan differed — סאליה closer in, סאלוה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
-  },
-  {
-    no: 45,
-    kind: 'correction',
-    field: 'planet',
-    printed: 'Sol (the Sun)',
-    used: 'sol',
-    why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 46,
@@ -337,7 +321,7 @@
     field: 'name.he',
     printed: 'עריׄאׄלּׄ',
     used: 'עריאל',
-    why: 'Two readings of the scan differed — עריאל closer in, עוריאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 46,
@@ -353,15 +337,7 @@
     field: 'name.he',
     printed: 'עּשלּׄיׄה',
     used: 'עשליה',
-    why: 'Two readings of the scan differed — עשליה closer in, השלוה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
-  },
-  {
-    no: 49,
-    kind: 'correction',
-    field: 'invocation',
-    printed: '9:00 soir',
-    used: '16:00',
-    why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 50,
@@ -372,12 +348,20 @@
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
   },
   {
+    no: 51,
+    kind: 'correction',
+    field: 'planet',
+    printed: 'Luna (Moon)',
+    used: 'luna',
+    why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+  },
+  {
     no: 52,
     kind: 'reading',
     field: 'name.he',
     printed: 'עּממיׄה',
     used: 'עממיה',
-    why: 'Two readings of the scan differed — עמכמוה closer in, עמביה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 53,
@@ -393,7 +377,7 @@
     field: 'name.he',
     printed: 'ננאׄאׄלּׄ',
     used: 'ננאאל',
-    why: 'Two readings of the scan differed — נכאאל closer in, ננאאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 54,
@@ -401,7 +385,7 @@
     field: 'name.he',
     printed: 'ניׄתאׄלׄ',
     used: 'ניתאל',
-    why: 'Two readings of the scan differed — ניתהאל closer in, צוהיאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 57,
@@ -409,7 +393,7 @@
     field: 'name.he',
     printed: 'נממיה',
     used: 'נממיה',
-    why: 'Two readings of the scan differed — נמחיה closer in, נמכויה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 58,
@@ -417,7 +401,23 @@
     field: 'name.he',
     printed: 'יׄיׄלּׄאׄלּׄ',
     used: 'יילאל',
-    why: 'Two readings of the scan differed — ייאל closer in, יהיאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+  },
+  {
+    no: 59,
+    kind: 'correction',
+    field: 'invocation',
+    printed: '7:20 matin',
+    used: '19:20',
+    why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+  },
+  {
+    no: 59,
+    kind: 'correction',
+    field: 'planet',
+    printed: 'Soleil (Sun)',
+    used: 'sol',
+    why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
   },
   {
     no: 62,
@@ -457,7 +457,7 @@
     field: 'name.he',
     printed: 'אׄיעּאׄלּׄ',
     used: 'איעאל',
-    why: 'Two readings of the scan differed — אויאל closer in, איעאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 68,
@@ -473,7 +473,7 @@
     field: 'name.he',
     printed: 'הבויׄה',
     used: 'הבויה',
-    why: 'Two readings of the scan differed — הבויה closer in, הבוה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 70,
@@ -481,7 +481,7 @@
     field: 'name.he',
     printed: 'יׄבמיׄה',
     used: 'יבמיה',
-    why: 'Two readings of the scan differed — יבמיה closer in, יבמויה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 71,
@@ -489,7 +489,7 @@
     field: 'name.he',
     printed: 'היׄיׄאׄלּׄ',
     used: 'הייאל',
-    why: 'Two readings of the scan differed — היאאל closer in, היוייאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
   },
   {
     no: 71,

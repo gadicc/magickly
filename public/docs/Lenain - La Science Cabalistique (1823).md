@@ -1240,7 +1240,7 @@ Le génie contraire domine l'ignorance, le libertinage, et toutes les mauvaises 
 **Editorial notes**
 
 - **presidingDays** · 24/3, 4/6, 14/8, 26/10, 6/1 → 24/3, 4/6, 15/8, 26/10, 6/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **name.he** · לׄלּׄהאׄלּׄ → ללהאל — Two readings of the scan differed — ללהאל closer in, להאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · לׄלּׄהאׄלּׄ → ללהאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 - **presidingDays** · 25/3, 5/6, 15/8, 27/10, 7/1 → 25/3, 5/6, 16/8, 27/10, 7/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
 
 </small>
@@ -1283,7 +1283,6 @@ Le mauvais génie provoque tout ce qui est nuisible aux productions de la terre;
 
 **Editorial notes**
 
-- **planet** · la lune → luna — Lenain's own tables give otherwise, and the rest of the book keeps to them.
 - **presidingDays** · 28/3, 8/6, 18/8, 30/10, 10/1 → 28/3, 8/6, 19/8, 30/10, 10/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
 
 </small>
@@ -1330,7 +1329,7 @@ Le génie contraire domine l'indiscrétion et le mensonge ; il influe sur tous c
 
 **Editorial notes**
 
-- **name.he** · יזּלּׄאׄלּ → יזלאל — Two readings of the scan differed — יזלאל closer in, ידלאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · יזּלּׄאׄלּ → יזלאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 - **presidingDays** · 1/4, 12/6, 23/8, 3/9, 14/1 → 1/4, 12/6, 23/8, 3/11, 14/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
 
 </small>
@@ -1404,7 +1403,7 @@ Le génie contraire domine sur les procès scandaleux, il influe sur les hommes 
 
 **Editorial notes**
 
-- **name.he** · לּׄוויׄה → לוויה — Two readings of the scan differed — לויה closer in, לוויה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · לּׄוויׄה → לוויה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 
 </small>
 
@@ -1448,9 +1447,9 @@ Le génie contraire domine sur les pirates, les corsaires et les esclaves; il in
 
 **Editorial notes**
 
-- **name.he** · יׄיׄיׄאׄלּׄ → יייאל — Two readings of the scan differed — לאיוי closer in, ייאיאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · יׄיׄיׄאׄלּׄ → יייאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 - **presidingDays** · 10/4, 21/6, 1/9, 12/11, 22/1 → 10/4, 21/6, 1/9, 12/11, 23/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **name.he** · מלּׄהאׄלּׄ → מלהאל — Two readings of the scan differed — כלהאל closer in, מלהאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · מלּׄהאׄלּׄ → מלהאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 
 </small>
 
@@ -1510,8 +1509,8 @@ Le génie contraire domine sur les catastrophes, les accidents, et cause les apo
 
 **Editorial notes**
 
-- **name.he** · שאׄהיׄה → שאהיה — Two readings of the scan differed — שאהוה closer in, שאהיה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
-- **name.he** · ריׄיׄאׄלּׄ → רייאל — Two readings of the scan differed — ריאל closer in, רויאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · שאׄהיׄה → שאהיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · ריׄיׄאׄלּׄ → רייאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 
 </small>
 
@@ -1548,14 +1547,6 @@ Le génie contraire domine l'avarice et l'usure; il influe sur tous ceux qui s'e
 
 32e. Vasariah .ושריה Son attribut (Dieu juste.) Il correspond au nom Anot, suivant la langue des Tartares. Son rayon commence depuis le 156e. degré de la sphère jusqu'au 160e., inclusivement, correspondant à la 16e. décade et au génie nommé Thumis. Il préside les jours
 
-<small>
-
-**Editorial notes**
-
-- **planet** · Soleil (Sun) → sol — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-
-</small>
-
 ---
 
 <small>**[p. 66]**</small>
@@ -1586,7 +1577,7 @@ Le génie contraire domine la discorde; il provoque la guerre, les trahisons, et
 
 **Editorial notes**
 
-- **name.he** · לּׄההיׄה → לההיה — Two readings of the scan differed — לההיח closer in, לההיוח from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · לּׄההיׄה → לההיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 
 </small>
 
@@ -1618,7 +1609,7 @@ Le génie contraire domine sur les esprits pervers; il influe sur les charlatans
 
 **Editorial notes**
 
-- **name.he** · אׄנואלּ → אנואל — Two readings of the scan differed — אנואל closer in, אניאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · אׄנואלּ → אנואל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 - **invocation** · 0:00 → 12:20 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
 
 </small>
@@ -1657,7 +1648,7 @@ Le génie contraire domine l'erreur et le mensonge, et influe sur tous ceux qui 
 
 **Editorial notes**
 
-- **name.he** · רהעאׄלּׄ → רהעאל — Two readings of the scan differed — רהאעל closer in, רהעאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · רהעאׄלּׄ → רהעאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 
 </small>
 
@@ -1677,7 +1668,7 @@ Le mauvais génie domine toutes les mauvaises qualités
 
 **Editorial notes**
 
-- **name.he** · יׄיׄזּאׄלּׄ → ייזאל — Two readings of the scan differed — ייזאל closer in, יזיאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · יׄיׄזּאׄלּׄ → ייזאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 
 </small>
 
@@ -1697,7 +1688,7 @@ Le génie contraire influe sur les apostats, les renégats, et sur tous ceux qui
 
 **Editorial notes**
 
-- **name.he** · הההאׄלּׄ → הההאל — Two readings of the scan differed — ההאל closer in, ההאהל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · הההאׄלּׄ → הההאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 
 </small>
 
@@ -1716,7 +1707,7 @@ Le génie contraire domine sur les traîtres ; il influe sur la malveillance, et
 **Editorial notes**
 
 - **degrees** · 216-210 → 206-210 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **name.he** · וולּּׄיׄה → ווליה — Two readings of the scan differed — וולויה closer in, וולוה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · וולּּׄיׄה → ווליה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 
 </small>
 
@@ -1731,6 +1722,14 @@ Le mauvais génie met la discorde entre les princes ; il influe sur la destructi
 44e. Ielahiah .יְלָהִיָה Son attribut (Dieu éternel). Il correspond au saint nom Bosa, d'après la langue des Mexicains. Son rayon commence depuis le 216e. dégré de la sphère jusqu'au 220e., inclusivement, correspondant à la 22e. décade et au génie nommé Sentacer. Il préside les jours suivants : 2 mai, 13 juillet, 23 septembre, 4 décembre, 14 février. L'on invoque ce génie pour obtenir la réussite d'une entreprise utile ; il faut prononcer la demande avec les noms divins et le 108e. verset du psaume 118. (Voluntaria oris mei bene placita fac Domine : et judicia tua doce me.) Il est bon pour avoir la protection des magistrats et pour gagner un procès. Ce génie protège contre les armes ; il donne la victoire. La personne qui est née sous cette influence aimera à voyager pour s'instruire, et toutes ses entreprises lui réussiront ; elle se distinguera par ses talents militaires et sa bravoure, et son nom deviendra célèbre dans les fastes de la gloire.
 
 Le génie contraire préside à la guerre, et cause tous les fléaux qui en sont la suite ; il influe sur tous ceux qui vio-
+
+<small>
+
+**Editorial notes**
+
+- **invocation** · 0:00 → 14:20 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
 
 ---
 
@@ -1748,10 +1747,9 @@ Le génie contraire domine sur l'atmosphère ; il provoque les grandes chaleurs 
 
 **Editorial notes**
 
-- **name.he** · סאׄלּׄיׄה → סאליה — Two readings of the scan differed — סאליה closer in, סאלוה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
-- **planet** · Sol (the Sun) → sol — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **name.he** · סאׄלּׄיׄה → סאליה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 - **degrees** · 226-130 → 226-230 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **name.he** · עריׄאׄלּׄ → עריאל — Two readings of the scan differed — עריאל closer in, עוריאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · עריׄאׄלּׄ → עריאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 - **ordinal** · 36e → 46 — The entry stands between the 45th and the 47th, and the first cabalistic table numbers it 46.
 
 </small>
@@ -1772,7 +1770,7 @@ Le génie contraire domine sur les actions immorales et
 
 **Editorial notes**
 
-- **name.he** · עּשלּׄיׄה → עשליה — Two readings of the scan differed — עשליה closer in, השלוה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · עּשלּׄיׄה → עשליה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 
 </small>
 
@@ -1789,14 +1787,6 @@ Le génie contraire domine sur le luxe, la stérilité et l'inconstance; il met 
 49e. Vehuel .והואל Son attribut (Dieu grand et élevé). Il correspond au saint nom de Dieu Mara, d'après la langue des habitants des îles Philippines. Son rayon commence depuis le 241e. degré de la sphère jusqu'au 245e., inclusive-
 
 > **(1)** (1) Le saint nom Zaca correspond au nom Zacael et au psaume 41, quemadmodum, etc. (Voyez à ce sujet la cabale des psaumes.) Il sert pour délivrer les âmes du purgatoire, pour acquérir tous les biens spirituels et temporels, et pour avoir des révélations en songe. Il faut que la demande soit juste et qu'elle soit agréable à Dieu.
-
-<small>
-
-**Editorial notes**
-
-- **invocation** · 9:00 soir → 16:00 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-
-</small>
 
 ---
 
@@ -1828,6 +1818,14 @@ Le génie contraire influe sur les chevaliers d'industrie, et sur tous ceux qui 
 
 51e. Hahasiah .ההשיה Son attribut (Dieu caché). Il correspond au saint nom de Dieu Bila, suivant la langue des Barsiens. Son rayon commence depuis le 251e. degré de la sphère jusqu'au 255e., inclusivement, correspondant à la 26e. décade et au génie nommé Sesmé, sous l'influence de la Lune. Il préside aux cinq jours suivants : 9 mai, 20 juillet, 30 septembre, 11 décembre, 21 février. L'invocation se fait depuis 4 heures 40 minutes jusqu'à 5 heures, en prononçant la 32e. verset du psaume 103. (Sit gloria Domini in sæculum : lætabitur Dominus in operibus suis.) Il sert pour élever son âme à la contemplation des choses divines, et pour découvrir les mystères de la sagesse. Ce génie domine sur la chimie et la physique ; il révèle les plus grands secrets de la nature, notamment la pierre philosophale et la médecine universelle. La personne qui est née sous cette influence aimera les sciences abstraites ; elle s'attachera particulièrement à connaître les propriétés et les vertus attribuées aux animaux, aux végétaux, et aux
 
+<small>
+
+**Editorial notes**
+
+- **planet** · Luna (Moon) → luna — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
+
 ---
 
 <small>**[p. 81]**</small>
@@ -1846,9 +1844,9 @@ Le génie contraire domine l'orgueil, le blasphême et la méchanceté; il influ
 
 **Editorial notes**
 
-- **name.he** · עּממיׄה → עממיה — Two readings of the scan differed — עמכמוה closer in, עמביה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · עּממיׄה → עממיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 - **degrees** · 216-265 → 261-265 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **name.he** · ננאׄאׄלּׄ → ננאאל — Two readings of the scan differed — נכאאל closer in, ננאאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · ננאׄאׄלּׄ → ננאאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 
 </small>
 
@@ -1868,7 +1866,7 @@ Le génie contraire domine l'ignorance et toutes les mauvaises qualités du corp
 
 **Editorial notes**
 
-- **name.he** · ניׄתאׄלׄ → ניתאל — Two readings of the scan differed — ניתהאל closer in, צוהיאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · ניׄתאׄלׄ → ניתאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 
 </small>
 
@@ -1908,8 +1906,8 @@ Le génie contraire domine sur les trahisons, cause la mésintelligence entre le
 
 **Editorial notes**
 
-- **name.he** · נממיה → נממיה — Two readings of the scan differed — נמחיה closer in, נמכויה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
-- **name.he** · יׄיׄלּׄאׄלּׄ → יילאל — Two readings of the scan differed — ייאל closer in, יהיאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · נממיה → נממיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · יׄיׄלּׄאׄלּׄ → יילאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 
 </small>
 
@@ -1924,6 +1922,15 @@ Le génie contraire domine la colère; il influe sur les méchants et les homici
 59e. Harahel. הרהאל Son attribut (Dieu qui connaît toutes choses). Il correspond au saint nom de Dieu Ella, d'après la langue des Mésopotamiens. Son rayon commence depuis le 291e. degré de la sphère jusqu'au 295e., inclusivement, correspondant à la 30e. décade et au génie nommé Isrô, sous l'influence du Soleil. Il préside les jours suivants : 17 mai, 28 juillet, 8 octobre, 19 décembre, 1 mars. L'heure favorable commence depuis 7 heures 20 minutes jusqu'à 7 heures 40; il faut prononcer le nom du génie, avec ses attributs, et le 3e. verset du psaume 112 (A solis ortu usque ad occasum, laudabile nomen Domini.) Il sert contre la stérilité des femmes, et pour rendre les enfants soumis et respectueux envers leurs parents. Ce génie domine sur les trésors, les agents de change. les fonds publics, les archives, les bibliothèques, et tous les cabinets rares et précieux; il influe sur l'imprimerie, la librairie, et sur tous ceux qui en font le commerce. La personne qui est née sous cette influence
 
 > **(1)** (1) Voyez à ce sujet l'Enchiridion du pape Léon, page 4.
+
+<small>
+
+**Editorial notes**
+
+- **invocation** · 7:20 matin → 19:20 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **planet** · Soleil (Sun) → sol — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
 
 ---
 
@@ -2007,7 +2014,7 @@ Le génie contraire influe sur toutes les mauvaises qualités physiques et moral
 
 **Editorial notes**
 
-- **name.he** · אׄיעּאׄלּׄ → איעאל — Two readings of the scan differed — אויאל closer in, איעאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · אׄיעּאׄלּׄ → איעאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 
 </small>
 
@@ -2028,7 +2035,7 @@ Le génie contraire domine sur la stérilité ; il cause la
 **Editorial notes**
 
 - **degrees** · 337-340 → 336-340 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **name.he** · הבויׄה → הבויה — Two readings of the scan differed — הבויה closer in, הבוה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · הבויׄה → הבויה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 
 </small>
 
@@ -2050,7 +2057,7 @@ Le génie contraire domine sur les procès, les testaments et les legs qui se fo
 
 **Editorial notes**
 
-- **name.he** · יׄבמיׄה → יבמיה — Two readings of the scan differed — יבמיה closer in, יבמויה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · יׄבמיׄה → יבמיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 
 </small>
 
@@ -2082,7 +2089,7 @@ Le génie contraire domine l'athéisme, et tous ceux qui propagent des écrits d
 
 **Editorial notes**
 
-- **name.he** · היׄיׄאׄלּׄ → הייאל — Two readings of the scan differed — היאאל closer in, היוייאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · היׄיׄאׄלּׄ → הייאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 - **presidingDays** · 29/5, 9/8, 20/10, 31/12, 14/3 → 29/5, 9/8, 20/10, 31/12, 13/3 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
 
 </small>

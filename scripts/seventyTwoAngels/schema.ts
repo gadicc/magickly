@@ -62,6 +62,18 @@ export const angelExtraction = z.object({
    */
   translation: z.string().min(300),
 
+  /**
+   * Lenain's own footnotes, in English, one per note he sets. The French is
+   * read off the page and passed in; only the translation is asked for, and
+   * the marker ties it back to the call in the prose.
+   */
+  footnotes: z.array(
+    z.object({
+      marker: z.string(),
+      en: z.string().min(1),
+    }),
+  ),
+
   scanned: z.object({
     degrees: z.object({
       from: z.number().int(),
