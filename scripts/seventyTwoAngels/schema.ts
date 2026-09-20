@@ -13,9 +13,14 @@ import { z } from "zod";
  */
 
 /**
- * For what an entry may simply not say. Requiring a non-empty string here
- * asked the model to invent, and it did: four entries came back with a
- * description of people born under a genius that their entry never mentions.
+ * An English reading and the French it was read from, for what an entry may
+ * simply not say. Requiring a non-empty string here asked the model to invent,
+ * and it did: four entries came back with a description of people born under a
+ * genius that their entry never mentions.
+ *
+ * Both halves or neither. Ten entries carried an English reading with an empty
+ * French beside it — a claim about the page with nothing of the page behind
+ * it — which no schema can forbid but the instructions now ask for.
  */
 const saidOrNot = z.object({
   en: z.string(),
@@ -31,12 +36,13 @@ export const angelExtraction = z.object({
     /** Five Hebrew letters: a triad of the Shem, then יה or אל. */
     he: z.string().min(1),
   }),
-  /**
-   * Empty for the twenty-second, whose heading the scan lost at a page break
-   * — and the heading is where Lenain prints the attribute.
-   */
+  /** Lenain sets it in the heading, in brackets after the name. */
   attribute: saidOrNot,
-  /** The nation this genius rules, and that nation's name for God. */
+  /**
+   * The nation this genius rules. A few entries name none, and those are left
+   * empty; the twenty-second names one, though the OCR's lost heading once
+   * made it look otherwise.
+   */
   people: saidOrNot,
   godName: z.string(),
   psalm: z.object({

@@ -10,9 +10,17 @@ import { type AngelReview, angelReview } from "./schema";
  * that did the bulk.
  *
  * The arithmetic in validate.ts catches wrong numbers, but nothing there can
- * tell whether the French dropped a clause, gained one, or whether the English
- * drifted from it. That is what this is for. It only reports; fixing is a
- * separate, deliberate step.
+ * tell whether the English drifted from the French, whether a field claims
+ * more than the entry says, or whether an entry was cut in the wrong place.
+ * That is what this is for. It only reports; fixing is a separate, deliberate
+ * step.
+ *
+ * It is shown the page once. It used to be shown it twice, as <scan> and
+ * <restored-french>, from the days when a model repaired the OCR and the two
+ * could differ; once the French came off the plates they were the same text,
+ * differing only in that one carried Lenain's notes. Asked to find what the
+ * restoration had added, it duly found the notes. A reviewer given two copies
+ * of one thing will explain the difference it was promised.
  *
  *   pnpm exec loom env -- pnpm exec tsx scripts/seventyTwoAngels/review.ts
  *   … --only 22,42            just those genii
@@ -27,25 +35,29 @@ const DEFAULT_MODEL = "anthropic/claude-opus-5";
 const CONCURRENCY = 4;
 const OUT_DIR = "output/seventyTwoAngelsReview";
 
-const INSTRUCTIONS = `You are checking someone else's restoration of one entry from \
-Lazare Lenain's "La Science Cabalistique" (Angers, 1823), a public-domain French work. \
-They were given the page, read from the scan itself, and asked to translate it and pull \
-out some fields. The French is not theirs to have invented: it is what the page prints, \
-so judge the translation and the fields against it rather than doubting the French.
+const INSTRUCTIONS = `You are checking someone else's work on one entry from Lazare \
+Lenain's "La Science Cabalistique" (Angers, 1823), a public-domain French work.
 
-Judge three things, against the scan:
+The French is the page. It was read off the original scan block by block, and Lenain's \
+own notes set after the entry they belong to, each opening with its marker. It is not a \
+reconstruction and it is not the thing under review: you have no second copy to compare \
+it against, so do not report words as added or dropped. What you can judge about it is \
+whether it holds together — a sentence that breaks off mid-clause, a paragraph that \
+plainly belongs to a different entry, a marker called in the prose with no note \
+answering it, or a note answering a marker the prose never calls. Those are faults in \
+the cutting, and worth reporting. An entry runs across printed pages and a note may run \
+across them too, so length alone is not a fault.
 
-1. text.fr — is it coherent French, with Lenain's own spelling and phrasing left alone? \
-His notes are set after the entry they belong to, each opening with its marker, which \
-is where a reader meets them. An entry may span several printed pages and a note may \
-run across pages, so material you cannot see on one page is not therefore invented.
+Judge:
 
-2. text.en — is it a faithful translation of THAT French? Look for meaning changed, \
-omitted or added, and for register smoothed into something more modern than the \
-French. Do not compare it against any published translation you may know; compare it \
-against the French in front of you.
+1. text.en — is it a faithful translation of that French, notes included? Look for \
+meaning changed, omitted or added, and for register smoothed into something more modern \
+than the French. Do not compare it against any published translation you may know; \
+compare it against the French in front of you.
 
-3. The structured fields — is each one actually supported by the entry?
+2. The structured fields — is each one actually supported by the entry? An empty field \
+is a claim that the entry does not say, and is correct where the entry does not; a \
+filled one is a claim that it does. Check both directions.
 
 Be specific and be sparing. Report what you would change, not what you would have \
 written differently. A difference of taste is not an issue. If the entry is sound, say \
@@ -71,13 +83,9 @@ function promptFor(region: PlateEntry) {
 
   return `Genius ${region.no} of 72.
 
-<scan>
-${region.french}
-</scan>
-
-<restored-french>
-${published(angel.french, angel.footnotesFr)}
-</restored-french>
+<page>
+${published(region.french, region.footnotes)}
+</page>
 
 <english>
 ${published(

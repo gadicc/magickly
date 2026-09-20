@@ -1183,14 +1183,6 @@ une liaison entre les êtres spirituels et les êtres matériels (1).
 
 > **(1)** (1) Voyez le livre intitulé la Thrëicie, ou la seule Voie des Sciences divines et humaines, édition de l'an 7, page 226.
 
-<small>
-
-**Editorial notes**
-
-- **presidingDays** · 20/3, 31/4, 11/8, 22/10, 2/1 → 20/3, 31/5, 11/8, 22/10, 2/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-
-</small>
-
 ---
 
 <small>**[p. 47]**</small>

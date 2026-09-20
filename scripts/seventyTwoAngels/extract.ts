@@ -73,16 +73,38 @@ what it points at. Where no footnotes are given, the array is empty.
 "governs", "bornUnder", "contrary") are short English summaries drawn from the entry, \
 one or two sentences each.
 
-"people" is the nation the genius rules. Nearly every entry names one, either as \
-« Il domine sur les Hébreux » or as « d'après la langue des Mongols ». Give the nation \
-alone, as a short noun phrase — "the Mongols", "Turkey" — never the sentence around it, \
-and never the name of God, which belongs in "godName".
+"people" is the nation the genius rules. Most entries name one in the opening formula, \
+and they do it in three ways: « Il domine sur les Hébreux », « suivant la langue des \
+peuples du Congo », and — easily missed — as an adjective, « d'après la langue \
+espagnole », « suivant la langue irlandaise ». That last form names a nation as much as \
+the others do. Give the nation alone, as a short noun phrase — "the Mongols", "Turkey", \
+"Spain" — never the sentence around it, and never the name of God, which belongs in \
+"godName". The formula « la langue de X » always names the people, whether or not they \
+are a nation on a modern map: « les anciens Béthuliens » and « les Mages » belong there \
+as much as « les Grecs ». Where the opening names no language and no nation, as a few \
+entries do, leave it empty.
+
+"attribute" and "people" each have an "en" and an "fr". The "fr" is Lenain's own words, \
+copied from the entry — « Dieu élevé et exalté au-dessus de toutes choses », « les \
+Hébreux » — and the "en" is your rendering of them. Fill both or leave both empty; one \
+without the other is a reading with nothing behind it.
+
+Every entry has two genii, and they must not be mixed. « Il domine… », « Il gouverne… » \
+is the genius, and belongs in "governs"; « Le mauvais génie… », « Le génie contraire… » \
+is its opposite, and belongs in "contrary". Turbulent men and anger are not what \
+Vehuiah governs — they are what his contrary governs — so nothing from those sentences \
+may appear in "governs".
+
+"bornUnder" is what the entry says of a person born under the genius, which Lenain \
+writes as « La personne qui est née sous cette influence… ». Where he writes no such \
+sentence, "bornUnder" is empty. Those the genius merely influences are not those born \
+under it, and neither are « ceux qui sont nés le jour où il préside », who are born on \
+one of its days.
 
 Where the entry genuinely does not say something, leave that field as an empty string. \
-An empty string is a CORRECT answer. This applies most often to "bornUnder": plenty of \
-entries never describe the character of a person born under their genius. Do not \
-assemble one out of the rest of the entry, and never supply a fact you know from \
-elsewhere. If it is not on the page, it is not in the answer.
+An empty string is a CORRECT answer. Do not assemble one out of the rest of the entry, \
+and never supply a fact you know from elsewhere. If it is not on the page, it is not in \
+the answer.
 
 3. "name.he" is the Hebrew as the entry prints it. Copy it from the French you are \
 given, letter for letter. Do not substitute a spelling you know.
