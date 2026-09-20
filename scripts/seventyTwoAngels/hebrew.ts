@@ -233,24 +233,39 @@ export interface HebrewReadings {
  * is held back — the type is small enough that picking a side would be a
  * guess dressed as a fact.
  */
+/** A romanised name reduced to letters, so spellings can be matched loosely. */
+function romanKey(name: string) {
+  return name
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z]/g, "");
+}
+
 export function hebrewReadings(pageOf: Map<number, string>): HebrewReadings {
-  const crop = new Map<number, { hebrew: string; legible: boolean }>();
+  // Keyed by the roman name, not the printed ordinal: the forty-sixth is set
+  // as "36e", so keying on the ordinal silently dropped its reading into the
+  // real thirty-sixth's place and left the forty-sixth with none.
+  const crop = new Map<string, { hebrew: string; legible: boolean }>();
   for (const file of readdirSync(OUT_DIR).sort()) {
     const { headings } = reading.parse(
       JSON.parse(readFileSync(join(OUT_DIR, file), "utf8")),
     );
-    for (const h of headings)
-      if (!crop.has(h.ordinal))
-        crop.set(h.ordinal, { hebrew: h.hebrew, legible: h.legible });
+    for (const h of headings) {
+      const key = romanKey(h.roman);
+      if (key && !crop.has(key))
+        crop.set(key, { hebrew: h.hebrew, legible: h.legible });
+    }
   }
 
+  const namesByNo = new Map(plateEntries().map((e) => [e.no, e.name]));
   const agreed = new Map<number, string>();
   const doubtful = new Map<
     number,
     { crop: string; page: string; legible: boolean }
   >();
   for (const [no, fromPage] of pageOf) {
-    const fromCrop = crop.get(no);
+    const fromCrop = crop.get(romanKey(namesByNo.get(no) ?? ""));
     const a = fromCrop ? hebrewLetters(fromCrop.hebrew) : "";
     const b = hebrewLetters(fromPage);
     if (a && a === b && fromCrop?.legible) agreed.set(no, a);

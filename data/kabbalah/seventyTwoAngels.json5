@@ -1647,6 +1647,7 @@
     no: 46,
     name: {
       en: 'Ariel',
+      he: 'עריאל',
     },
     printedPages: [
       76,
