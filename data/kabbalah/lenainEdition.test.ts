@@ -1,6 +1,13 @@
 import { readFileSync } from "node:fs";
 import JSON5 from "json5";
 import { describe, expect, it } from "vitest";
+import {
+  bookLeaves,
+  divisionOfLeaf,
+  divisions,
+  LAST_LEAF,
+  leavesOf,
+} from "./lenain/volume";
 
 /**
  * The edition as a document: the checks `pnpm data:check` cannot make.
@@ -148,6 +155,40 @@ describe("the volume", () => {
     expect(evidence.map((row) => row.no)).toEqual(
       Array.from({ length: 72 }, (_, i) => i + 1),
     );
+  });
+});
+
+describe("the divisions", () => {
+  it("covers every leaf of the book proper exactly once", () => {
+    const covered = divisions.flatMap((division) =>
+      leavesOf(division).map((leaf) => leaf.pdfPage),
+    );
+    expect(covered).toEqual([...new Set(covered)].sort((a, b) => a - b));
+    expect(covered).toEqual(bookLeaves().map((leaf) => leaf.pdfPage));
+    for (const leaf of bookLeaves())
+      expect(
+        divisionOfLeaf(leaf.pdfPage)?.slug,
+        `pdf ${leaf.pdfPage}`,
+      ).toBeDefined();
+  });
+
+  it("leaves the reissue's advertisements out", () => {
+    // pdf 170 onwards are blanks and the 1909 publisher's adverts for
+    // Paracelsus and Lancelin, which are not Lenain's book.
+    expect(leaves.some((leaf) => leaf.pdfPage > LAST_LEAF)).toBe(true);
+    expect(bookLeaves().every((leaf) => leaf.pdfPage <= LAST_LEAF)).toBe(true);
+  });
+
+  it("names each division from Lenain, and gives a distinct slug", () => {
+    const slugs = divisions.map((division) => division.slug);
+    expect(new Set(slugs).size).toBe(slugs.length);
+    for (const slug of slugs) expect(slug).toMatch(/^[a-z0-9-]+$/);
+    for (const division of divisions.filter((d) => d.slug !== "preliminaires"))
+      expect(division.heading, division.slug).toMatch(/^CHAPITRE/);
+    // Titles become route titles, so they have to fit what the SEO tests
+    // require of every other page.
+    for (const division of divisions)
+      expect(division.title.length, division.title).toBeLessThanOrEqual(48);
   });
 });
 
