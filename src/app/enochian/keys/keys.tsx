@@ -14,9 +14,12 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import dictionary from "@/../data/enochian/Dictionary";
+import type { EnochianEntry } from "@/../data/enochian/dictionaryEntry";
 import keys, { EnochianKey } from "@/../data/enochian/Keys";
 import useEnochianFont, { EnochianFont } from "../useEnochianFont";
+
+/** The entries the page was given, by the word as the Keys spell it. */
+type Entries = Readonly<Record<string, EnochianEntry>>;
 
 const s = {
   keyParagraph: {
@@ -28,16 +31,15 @@ const s = {
 };
 
 function Dictionary({
+  entries,
   selectedKey,
 }: {
+  entries: Entries;
   selectedKey: { key: number; subkey: number };
 }) {
   const key = keys[selectedKey.key];
   const sub = key.subkeys[selectedKey.subkey];
-  const dict = dictionary[sub.enochianLatin] || {
-    meanings: [],
-    pronounciations: [],
-  };
+  const dict = entries[sub.enochianLatin];
   return (
     <table width="100%">
       <tbody>
@@ -46,8 +48,8 @@ function Dictionary({
             {sub.enochianLatin}
           </td>
           <td style={{ width: "33%", textAlign: "center" }}>
-            {dict.pronounciations.length &&
-              dict.pronounciations[0].pronounciation}
+            {/* A word with no pronunciation printed the length, a literal 0. */}
+            {dict?.pronounciations[0]?.pronounciation}
           </td>
           <td
             style={{ width: "33%", textAlign: "right", ...EnochianFont.style }}
@@ -55,7 +57,7 @@ function Dictionary({
             {sub.enochianLatin}
           </td>
         </tr>
-        {dict.meanings.map((meaning, i) => (
+        {dict?.meanings.map((meaning, i) => (
           <tr key={i}>
             <td colSpan={3} style={{ textAlign: "center" }}>
               {meaning.meaning} ({meaning.source}) {meaning.source2}{" "}
@@ -74,7 +76,7 @@ function Dictionary({
           </td>
           <td></td>
           <td style={{ textAlign: "right" }}>
-            {dict.gematria ? "Gematria " + dict.gematria.join(", ") : ""}
+            {dict?.gematria ? "Gematria " + dict.gematria.join(", ") : ""}
           </td>
         </tr>
       </tbody>
@@ -187,7 +189,7 @@ function KeyText({
 
 type EnochianLang = "enochian" | "english" | "both";
 
-export default function Keys() {
+export default function Keys({ entries }: { entries: Entries }) {
   const [lang, setLang] = React.useState<EnochianLang>("english");
   const { enochianFont, EnochianFontToggle } = useEnochianFont();
   const [selectedKey, setSelectedKey] = React.useState<{
@@ -262,7 +264,7 @@ export default function Keys() {
           }}
           onClick={() => setSelectedKey(null)}
         >
-          <Dictionary selectedKey={selectedKey} />
+          <Dictionary entries={entries} selectedKey={selectedKey} />
         </Box>
       )}
     </>

@@ -124,6 +124,7 @@ export default defineConfig({
         "src/components/gd/roseSigilGeometry.ts",
         "src/components/svgCoordinate.ts",
         "src/app/geomancy/tetragrams.ts",
+        "src/app/enochian/keys/keyEntries.ts",
         "data/assemble.ts",
         "data/duplicateKeys.ts",
         "data/integrity.ts",
