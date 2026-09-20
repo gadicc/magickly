@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import JSON5 from "json5";
 import { ANGEL_COUNT } from "../../data/kabbalah/seventyTwoAngelsDerived";
 import { readExtraction, type StoredExtraction } from "./extract";
-import { hebrewReadings } from "./hebrew";
+import { handReadings, hebrewReadings } from "./hebrew";
 import { disagreements, hebrewProblems, shapeProblems } from "./validate";
 
 /**
@@ -78,9 +78,7 @@ function record(angel: StoredExtraction) {
     // agree on it, and left out where they do not. Lenain's Hebrew is small
     // and the scan is two centuries old; fifty-two names are corroborated and
     // the rest are held back rather than guessed at. See plan 031.
-    name: agreedHebrew.has(angel.no)
-      ? { en: angel.name.en, he: agreedHebrew.get(angel.no) as string }
-      : { en: angel.name.en },
+    name: hebrewFor(angel.no, angel.name.en),
     printedPages: angel.printedPages,
     attribute: angel.attribute,
     people: angel.people,
@@ -100,6 +98,21 @@ function write(path: string, value: unknown) {
 }
 
 let agreedHebrew = new Map<number, string>();
+let byHand = new Map<number, { plain: string; pointed: string }>();
+
+/**
+ * A name read by a person outranks one two machines happened to agree on, and
+ * the data says which it was. Lenain's dots are kept apart from the letters:
+ * `he` identifies the name, `hePointed` is what he printed.
+ */
+function hebrewFor(no: number, en: string) {
+  const hand = byHand.get(no);
+  if (hand)
+    return { en, he: hand.plain, hePointed: hand.pointed, heSource: "hand" };
+  const agreed = agreedHebrew.get(no);
+  if (agreed) return { en, he: agreed, heSource: "corroborated" };
+  return { en };
+}
 
 function main() {
   const reportOnly = process.argv.includes("--report");
@@ -117,6 +130,7 @@ function main() {
     new Map(angels.map((angel) => [angel.no, angel.name.he])),
   );
   agreedHebrew = readings.agreed;
+  byHand = handReadings();
 
   // Shape no longer decides what ships — two readings agreeing does — but a
   // corroborated name of an unexpected shape is worth saying out loud.
@@ -135,8 +149,10 @@ function main() {
   console.log(
     `${clashes.length} disagreements with the tables, ` +
       `${shapes.length} shape problems, ${readings.agreed.size} Hebrew names ` +
-      `corroborated (${oddlyShaped.length} oddly shaped) and ` +
-      `${readings.doubtful.size} held back, ` +
+      `corroborated (${oddlyShaped.length} oddly shaped), ` +
+      `${byHand.size} read by hand, ` +
+      `${[...readings.doubtful.keys()].filter((no) => !byHand.has(no)).length} ` +
+      `still held back, ` +
       `${unsure.length} notes.\n`,
   );
   for (const c of clashes)

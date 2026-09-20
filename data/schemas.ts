@@ -314,8 +314,19 @@ export const schemas = {
   }),
   seventyTwoAngel: v.strictObject({
     no: v.number(),
-    /** The scan gives twenty of the seventy-two no Hebrew name. */
-    name: v.strictObject({ en: v.string(), he: v.optional(v.string()) }),
+    /**
+     * Every genius has a Hebrew name: forty-seven where two readings of the
+     * scan agree, twenty-five read by a person because they never would. The
+     * letters and Lenain's marks are kept apart — `he` identifies the name,
+     * `hePointed` is what he printed — and `heSource` says which reading it
+     * came from, so a machine pass cannot quietly displace a human one.
+     */
+    name: v.strictObject({
+      en: v.string(),
+      he: v.optional(v.string()),
+      hePointed: v.optional(v.string()),
+      heSource: v.optional(v.picklist(["hand", "corroborated"])),
+    }),
     printedPages: v.array(v.number()),
     attribute: v.strictObject({ en: v.string(), fr: v.string() }),
     people: v.strictObject({ en: v.string(), fr: v.string() }),

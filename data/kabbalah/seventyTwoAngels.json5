@@ -11,6 +11,7 @@
     name: {
       en: 'Vehuiah',
       he: 'והויה',
+      heSource: 'corroborated',
     },
     printedPages: [
       46,
@@ -48,6 +49,7 @@
     name: {
       en: 'Jeliel',
       he: 'יליאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       47,
@@ -84,6 +86,7 @@
     name: {
       en: 'Sitaël',
       he: 'סיטאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       47,
@@ -121,6 +124,7 @@
     name: {
       en: 'Elemiah',
       he: 'עלמיה',
+      heSource: 'corroborated',
     },
     printedPages: [
       48,
@@ -157,6 +161,7 @@
     name: {
       en: 'Mahasiah',
       he: 'מהשיה',
+      heSource: 'corroborated',
     },
     printedPages: [
       49,
@@ -192,6 +197,9 @@
     no: 6,
     name: {
       en: 'Lelahel',
+      he: 'ללהאל',
+      hePointed: 'לׄלּׄהאׄלּׄ',
+      heSource: 'hand',
     },
     printedPages: [
       49,
@@ -229,6 +237,7 @@
     name: {
       en: 'Achaiah',
       he: 'אכאיה',
+      heSource: 'corroborated',
     },
     printedPages: [
       50,
@@ -265,6 +274,7 @@
     name: {
       en: 'Cahethel',
       he: 'כהתאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       50,
@@ -302,6 +312,7 @@
     name: {
       en: 'Haziel',
       he: 'הזיאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       51,
@@ -339,6 +350,7 @@
     name: {
       en: 'Aladiah',
       he: 'אלדיה',
+      heSource: 'corroborated',
     },
     printedPages: [
       52,
@@ -375,6 +387,7 @@
     name: {
       en: 'Lauviah',
       he: 'לאויה',
+      heSource: 'corroborated',
     },
     printedPages: [
       52,
@@ -412,6 +425,7 @@
     name: {
       en: 'Hahaiah',
       he: 'ההעיה',
+      heSource: 'corroborated',
     },
     printedPages: [
       53,
@@ -447,6 +461,9 @@
     no: 13,
     name: {
       en: 'Iezalel',
+      he: 'יזלאל',
+      hePointed: 'יזּלּׄאׄלּ',
+      heSource: 'hand',
     },
     printedPages: [
       53,
@@ -484,6 +501,7 @@
     name: {
       en: 'Mebahel',
       he: 'מבהאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       54,
@@ -520,6 +538,7 @@
     name: {
       en: 'Hariel',
       he: 'הריאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       54,
@@ -557,6 +576,7 @@
     name: {
       en: 'Hakamiah',
       he: 'הקמיה',
+      heSource: 'corroborated',
     },
     printedPages: [
       55,
@@ -594,6 +614,7 @@
     name: {
       en: 'Lauviah',
       he: 'לאויה',
+      heSource: 'corroborated',
     },
     printedPages: [
       56,
@@ -630,6 +651,7 @@
     name: {
       en: 'Caliel',
       he: 'כליאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       56,
@@ -666,6 +688,9 @@
     no: 19,
     name: {
       en: 'Leuviah',
+      he: 'לוויה',
+      hePointed: 'לּׄוויׄה',
+      heSource: 'hand',
     },
     printedPages: [
       57,
@@ -703,6 +728,7 @@
     name: {
       en: 'Pahaliah',
       he: 'פהליה',
+      heSource: 'corroborated',
     },
     printedPages: [
       58,
@@ -739,6 +765,7 @@
     name: {
       en: 'Nelchael',
       he: 'נלכאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       58,
@@ -775,6 +802,9 @@
     no: 22,
     name: {
       en: 'Ieiaiel',
+      he: 'יייאל',
+      hePointed: 'יׄיׄיׄאׄלּׄ',
+      heSource: 'hand',
     },
     printedPages: [
       59,
@@ -810,6 +840,9 @@
     no: 23,
     name: {
       en: 'Melahel',
+      he: 'מלהאל',
+      hePointed: 'מלּׄהאׄלּׄ',
+      heSource: 'hand',
     },
     printedPages: [
       59,
@@ -847,6 +880,7 @@
     name: {
       en: 'Hahiuiah',
       he: 'ההויה',
+      heSource: 'corroborated',
     },
     printedPages: [
       60,
@@ -884,6 +918,7 @@
     name: {
       en: 'Nith-Haiah',
       he: 'נתהיה',
+      heSource: 'corroborated',
     },
     printedPages: [
       61,
@@ -921,6 +956,7 @@
     name: {
       en: 'Haaiah',
       he: 'האאיה',
+      heSource: 'corroborated',
     },
     printedPages: [
       62,
@@ -957,6 +993,7 @@
     name: {
       en: 'Ierathel',
       he: 'ירתאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       62,
@@ -993,6 +1030,9 @@
     no: 28,
     name: {
       en: 'Séheiah',
+      he: 'שאהיה',
+      hePointed: 'שאׄהיׄה',
+      heSource: 'hand',
     },
     printedPages: [
       63,
@@ -1028,6 +1068,9 @@
     no: 29,
     name: {
       en: 'Reiiel',
+      he: 'רייאל',
+      hePointed: 'ריׄיׄאׄלּׄ',
+      heSource: 'hand',
     },
     printedPages: [
       63,
@@ -1065,6 +1108,7 @@
     name: {
       en: 'Omael',
       he: 'ומאאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       64,
@@ -1102,6 +1146,7 @@
     name: {
       en: 'Lecabel',
       he: 'לכבאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       65,
@@ -1138,6 +1183,7 @@
     name: {
       en: 'Vasariah',
       he: 'ושריה',
+      heSource: 'corroborated',
     },
     printedPages: [
       65,
@@ -1175,6 +1221,7 @@
     name: {
       en: 'Iehuiah',
       he: 'יהויה',
+      heSource: 'corroborated',
     },
     printedPages: [
       66,
@@ -1211,6 +1258,9 @@
     no: 34,
     name: {
       en: 'Lehahiah',
+      he: 'לההיה',
+      hePointed: 'לּׄההיׄה',
+      heSource: 'hand',
     },
     printedPages: [
       67,
@@ -1247,6 +1297,7 @@
     name: {
       en: 'Chavakiah',
       he: 'כוקיה',
+      heSource: 'corroborated',
     },
     printedPages: [
       67,
@@ -1284,6 +1335,7 @@
     name: {
       en: 'Menadel',
       he: 'מנדאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       68,
@@ -1320,6 +1372,9 @@
     no: 37,
     name: {
       en: 'Aniel',
+      he: 'אנואל',
+      hePointed: 'אׄנואלּ',
+      heSource: 'hand',
     },
     printedPages: [
       69,
@@ -1356,6 +1411,7 @@
     name: {
       en: 'Haamiah',
       he: 'העמיה',
+      heSource: 'corroborated',
     },
     printedPages: [
       69,
@@ -1393,6 +1449,9 @@
     no: 39,
     name: {
       en: 'Rehael',
+      he: 'רהעאל',
+      hePointed: 'רהעאׄלּׄ',
+      heSource: 'hand',
     },
     printedPages: [
       71,
@@ -1429,6 +1488,9 @@
     no: 40,
     name: {
       en: 'Ieiazel',
+      he: 'ייזאל',
+      hePointed: 'יׄיׄזּאׄלּׄ',
+      heSource: 'hand',
     },
     printedPages: [
       72,
@@ -1465,6 +1527,9 @@
     no: 41,
     name: {
       en: 'Hahahel',
+      he: 'הההאל',
+      hePointed: 'הההאׄלּׄ',
+      heSource: 'hand',
     },
     printedPages: [
       73,
@@ -1501,6 +1566,7 @@
     name: {
       en: 'Mikael',
       he: 'מיכאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       74,
@@ -1536,6 +1602,9 @@
     no: 43,
     name: {
       en: 'Veualiah',
+      he: 'ווליה',
+      hePointed: 'וולּּׄיׄה',
+      heSource: 'hand',
     },
     printedPages: [
       74,
@@ -1573,6 +1642,7 @@
     name: {
       en: 'Ielahiah',
       he: 'ילהיה',
+      heSource: 'corroborated',
     },
     printedPages: [
       75,
@@ -1609,6 +1679,9 @@
     no: 45,
     name: {
       en: 'Sealiah',
+      he: 'סאליה',
+      hePointed: 'סאׄלּׄיׄה',
+      heSource: 'hand',
     },
     printedPages: [
       76,
@@ -1644,6 +1717,9 @@
     no: 46,
     name: {
       en: 'Ariel',
+      he: 'עריאל',
+      hePointed: 'עריׄאׄלּׄ',
+      heSource: 'hand',
     },
     printedPages: [
       76,
@@ -1680,6 +1756,9 @@
     no: 47,
     name: {
       en: 'Asaliah',
+      he: 'עשליה',
+      hePointed: 'עּשלּׄיׄה',
+      heSource: 'hand',
     },
     printedPages: [
       77,
@@ -1717,6 +1796,7 @@
     name: {
       en: 'Mihael',
       he: 'מיהאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       78,
@@ -1753,6 +1833,7 @@
     name: {
       en: 'Vehuel',
       he: 'והואל',
+      heSource: 'corroborated',
     },
     printedPages: [
       78,
@@ -1790,6 +1871,7 @@
     name: {
       en: 'Daniel',
       he: 'דניאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       79,
@@ -1827,6 +1909,7 @@
     name: {
       en: 'Hahasiah',
       he: 'ההשיה',
+      heSource: 'corroborated',
     },
     printedPages: [
       80,
@@ -1863,6 +1946,9 @@
     no: 52,
     name: {
       en: 'Imamiah',
+      he: 'עממיה',
+      hePointed: 'עּממיׄה',
+      heSource: 'hand',
     },
     printedPages: [
       81,
@@ -1898,6 +1984,9 @@
     no: 53,
     name: {
       en: 'Nanael',
+      he: 'ננאאל',
+      hePointed: 'ננאׄאׄלּׄ',
+      heSource: 'hand',
     },
     printedPages: [
       81,
@@ -1934,6 +2023,9 @@
     no: 54,
     name: {
       en: 'Nithael',
+      he: 'ניתאל',
+      hePointed: 'ניׄתאׄלׄ',
+      heSource: 'hand',
     },
     printedPages: [
       82,
@@ -1971,6 +2063,7 @@
     name: {
       en: 'Mebahiah',
       he: 'מבהיה',
+      heSource: 'corroborated',
     },
     printedPages: [
       83,
@@ -2008,6 +2101,7 @@
     name: {
       en: 'Poiel',
       he: 'פויאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       84,
@@ -2043,6 +2137,9 @@
     no: 57,
     name: {
       en: 'Nemamiah',
+      he: 'נממיה',
+      hePointed: 'נממיה',
+      heSource: 'hand',
     },
     printedPages: [
       85,
@@ -2078,6 +2175,9 @@
     no: 58,
     name: {
       en: 'Ieialel',
+      he: 'יילאל',
+      hePointed: 'יׄיׄלּׄאׄלּׄ',
+      heSource: 'hand',
     },
     printedPages: [
       85,
@@ -2115,6 +2215,7 @@
     name: {
       en: 'Harahel',
       he: 'הרהאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       86,
@@ -2152,6 +2253,7 @@
     name: {
       en: 'Mitzrael',
       he: 'מצראל',
+      heSource: 'corroborated',
     },
     printedPages: [
       87,
@@ -2188,6 +2290,7 @@
     name: {
       en: 'Umabel',
       he: 'ומבאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       87,
@@ -2225,6 +2328,7 @@
     name: {
       en: 'Iah-hel',
       he: 'יההאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       88,
@@ -2262,6 +2366,7 @@
     name: {
       en: 'Anauel',
       he: 'ענואל',
+      heSource: 'corroborated',
     },
     printedPages: [
       89,
@@ -2298,6 +2403,7 @@
     name: {
       en: 'Mehiel',
       he: 'מהיאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       89,
@@ -2335,6 +2441,7 @@
     name: {
       en: 'Damabiah',
       he: 'דמביה',
+      heSource: 'corroborated',
     },
     printedPages: [
       90,
@@ -2372,6 +2479,7 @@
     name: {
       en: 'Manakel',
       he: 'מנקאה',
+      heSource: 'corroborated',
     },
     printedPages: [
       91,
@@ -2407,6 +2515,9 @@
     no: 67,
     name: {
       en: 'Eïael',
+      he: 'איעאל',
+      hePointed: 'אׄיעּאׄלּׄ',
+      heSource: 'hand',
     },
     printedPages: [
       91,
@@ -2443,6 +2554,9 @@
     no: 68,
     name: {
       en: 'Habuhiah',
+      he: 'הבויה',
+      hePointed: 'הבויׄה',
+      heSource: 'hand',
     },
     printedPages: [
       92,
@@ -2480,6 +2594,7 @@
     name: {
       en: 'Rochel',
       he: 'ראחאל',
+      heSource: 'corroborated',
     },
     printedPages: [
       93,
@@ -2515,6 +2630,9 @@
     no: 70,
     name: {
       en: 'Jabamiah',
+      he: 'יבמיה',
+      hePointed: 'יׄבמיׄה',
+      heSource: 'hand',
     },
     printedPages: [
       93,
@@ -2552,6 +2670,9 @@
     no: 71,
     name: {
       en: 'Haiaiel',
+      he: 'הייאל',
+      hePointed: 'היׄיׄאׄלּׄ',
+      heSource: 'hand',
     },
     printedPages: [
       95,
@@ -2589,6 +2710,7 @@
     name: {
       en: 'Mumiah',
       he: 'מומיה',
+      heSource: 'corroborated',
     },
     printedPages: [
       96,

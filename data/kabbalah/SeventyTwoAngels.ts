@@ -10,10 +10,16 @@ import type { Links, Raw } from "../types";
  * Several fields are empty where an entry simply does not say: not every one
  * names a nation, cites a psalm, or describes the character of a person born
  * under its genius. The twenty-second has no attribute at all, its heading
- * having vanished at a page break. Twenty entries have no Hebrew name, so
- * `name.he` is `string | undefined`; `psalm.psalm` is `0` where the entry
- * cites something else, or nothing; and `godName` is that nation's name for
- * God, not a link to the god names of the Tree.
+ * having vanished at a page break. `psalm.psalm` is `0` where the entry cites
+ * something else, or nothing, and `godName` is that nation's name for God,
+ * rather than a link to the god names of the Tree.
+ *
+ * Every genius has a Hebrew name, but they did not come the same way:
+ * `heSource` says whether two readings of the scan agreed on it or a person
+ * read it, and `hePointed` carries Lenain's marks where one did. He dots his
+ * Hebrew above the letters, which is what defeated the machine — a reading
+ * that took the dots for vowel points returned four letters where the page
+ * prints five.
  */
 type Angel = Raw<"seventyTwoAngel"> & Partial<Links<"*", "seventyTwoAngel">>;
 

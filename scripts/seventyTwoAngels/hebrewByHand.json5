@@ -1,0 +1,41 @@
+// Hebrew names read from the scan by Gadi Cohen, who reads Hebrew, where two
+// machine readings could not be made to agree.
+//
+// They were not going to agree. Lenain dots his Hebrew above the letters, and
+// a reading that took those dots for vowel points returned four letters and
+// three marks where the page prints five plain ones. The machine dropped a
+// letter from the sixth and invented one in the seventieth — wrong in both
+// directions, and no amount of re-reading fixed it.
+//
+// `plain` is the consonantal name: five letters, a triad of the Shem
+// HaMephorash and then יה or אל. `pointed` is what Lenain actually printed,
+// dots and all, encoded with U+05C4 for the marks above the letters and
+// U+05BC for those within. The pattern of the marks is not known; some names
+// carry several, some one, and the fifty-seventh none at all.
+[
+  { no: 6, plain: "ללהאל", pointed: "לׄלּׄהאׄלּׄ" },
+  { no: 13, plain: "יזלאל", pointed: "יזּלּׄאׄלּ" },
+  { no: 19, plain: "לוויה", pointed: "לּׄוויׄה" },
+  { no: 22, plain: "יייאל", pointed: "יׄיׄיׄאׄלּׄ" },
+  { no: 23, plain: "מלהאל", pointed: "מלּׄהאׄלּׄ" },
+  { no: 28, plain: "שאהיה", pointed: "שאׄהיׄה" },
+  { no: 29, plain: "רייאל", pointed: "ריׄיׄאׄלּׄ" },
+  { no: 34, plain: "לההיה", pointed: "לּׄההיׄה" },
+  { no: 37, plain: "אנואל", pointed: "אׄנואלּ" },
+  { no: 39, plain: "רהעאל", pointed: "רהעאׄלּׄ" },
+  { no: 40, plain: "ייזאל", pointed: "יׄיׄזּאׄלּׄ" },
+  { no: 41, plain: "הההאל", pointed: "הההאׄלּׄ" },
+  { no: 43, plain: "ווליה", pointed: "וולּּׄיׄה" },
+  { no: 45, plain: "סאליה", pointed: "סאׄלּׄיׄה" },
+  { no: 46, plain: "עריאל", pointed: "עריׄאׄלּׄ" },
+  { no: 47, plain: "עשליה", pointed: "עּשלּׄיׄה" },
+  { no: 52, plain: "עממיה", pointed: "עּממיׄה" },
+  { no: 53, plain: "ננאאל", pointed: "ננאׄאׄלּׄ" },
+  { no: 54, plain: "ניתאל", pointed: "ניׄתאׄלׄ" },
+  { no: 57, plain: "נממיה", pointed: "נממיה" },
+  { no: 58, plain: "יילאל", pointed: "יׄיׄלּׄאׄלּׄ" },
+  { no: 67, plain: "איעאל", pointed: "אׄיעּאׄלּׄ" },
+  { no: 68, plain: "הבויה", pointed: "הבויׄה" },
+  { no: 70, plain: "יבמיה", pointed: "יׄבמיׄה" },
+  { no: 71, plain: "הייאל", pointed: "היׄיׄאׄלּׄ" },
+]

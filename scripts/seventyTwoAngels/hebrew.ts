@@ -8,6 +8,7 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 import { generateObject } from "ai";
+import JSON5 from "json5";
 import { z } from "zod";
 import { PDF_PATH } from "./pages";
 import { plateEntries } from "./plateSource";
@@ -277,4 +278,51 @@ export function hebrewReadings(pageOf: Map<number, string>): HebrewReadings {
       });
   }
   return { agreed, doubtful };
+}
+
+export interface HandReading {
+  no: number;
+  /** The consonantal name: five letters, a triad and then יה or אל. */
+  plain: string;
+  /** What Lenain prints, marks and all. */
+  pointed: string;
+}
+
+/**
+ * The names read by a person, which outrank anything a machine read.
+ *
+ * They are kept in the repository rather than in `output/`, so that re-running
+ * the extraction cannot quietly overwrite them — the machine writes only to
+ * `output/`, and this is checked into the tree beside the code. Each is
+ * validated on load: an unknown genius, a name that is not five letters, or a
+ * pointed form that does not strip to its plain one stops the build rather
+ * than being taken on trust.
+ */
+export function handReadings(
+  path = "scripts/seventyTwoAngels/hebrewByHand.json5",
+): Map<number, HandReading> {
+  const rows: HandReading[] = JSON5.parse(readFileSync(path, "utf8"));
+  const byNo = new Map<number, HandReading>();
+
+  for (const row of rows) {
+    if (!Number.isInteger(row.no) || row.no < 1 || row.no > 72)
+      throw new Error(
+        `Hand reading for a genius that is not one of 72: ${row.no}`,
+      );
+    if (byNo.has(row.no))
+      throw new Error(`Two hand readings for genius ${row.no}`);
+    const plain = hebrewLetters(row.plain);
+    if (plain.length !== 5)
+      throw new Error(
+        `Hand reading ${row.no} is ${plain.length} letters, not 5`,
+      );
+    if (!/(יה|אל)$/.test(plain))
+      throw new Error(`Hand reading ${row.no} does not end in יה or אל`);
+    if (hebrewLetters(row.pointed) !== plain)
+      throw new Error(
+        `Hand reading ${row.no}: the pointed form strips to ${hebrewLetters(row.pointed)}, not ${plain}`,
+      );
+    byNo.set(row.no, row);
+  }
+  return byNo;
 }
