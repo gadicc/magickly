@@ -1,9 +1,23 @@
 import React from "react";
 
-import zodiacs, { Zodiac } from "@/../data/astrology/Zodiac";
-import tribesOfIsrael from "@/../data/kabbalah/TribesOfIsrael";
+import { assemble } from "@/../data/assemble";
+import zodiacRows from "@/../data/astrology/Zodiac";
+import tribeRows from "@/../data/kabbalah/TribesOfIsrael";
 
-const zodiacArray = Object.values(zodiacs);
+/**
+ * Two tables, joined: the table draws each sign's tribe, and used to index
+ * the tribes with `tribesOfIsrael[zodiac.tribeOfIsraelId]` by hand, which is
+ * the join `tribeOfIsraelId` has declared in the graph since step 2. Scoped
+ * rather than the barrel on purpose — the barrel would put all 23 of its
+ * tables in this route's chunk, and this needs two.
+ */
+const { zodiac } = assemble({
+  zodiac: zodiacRows,
+  tribeOfIsrael: tribeRows,
+});
+
+const zodiacArray = Object.values(zodiac);
+type ZodiacRow = (typeof zodiacArray)[number];
 
 interface Point {
   x: number;
@@ -35,7 +49,7 @@ const transToHeb = (str: string) =>
     .map((c) => yhvH[c] || c)
     .join("");
 
-function Branch({ zodiac, index }: { zodiac: Zodiac; index: number }) {
+function Branch({ zodiac, index }: { zodiac: ZodiacRow; index: number }) {
   const numBranches = 12;
   const radius = 8; // TODO, work it out properly
   const center = degreesToPointOnCircle(
@@ -46,7 +60,7 @@ function Branch({ zodiac, index }: { zodiac: Zodiac; index: number }) {
   const texts = [
     transToHeb(zodiac.tetragrammatonPermutation),
     "הוזחטילנסעצק"[index],
-    tribesOfIsrael[zodiac.tribeOfIsraelId].name.he,
+    zodiac.tribeOfIsrael?.name.he,
     // planet.archangel?.name.he,
     // planet.hebrewLetter?.letter?.he,
     // planet.name.he.he,
