@@ -9,8 +9,14 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { PLANET_IDS } from "./astrology/Planets";
+import dictionary, { type EnochianDictionary } from "./enochian/Dictionary";
 import type { TableSpec } from "./graphSpec";
-import { checkIntegrity, checkMirrors, type Failure } from "./integrity";
+import {
+  checkDictionary,
+  checkIntegrity,
+  checkMirrors,
+  type Failure,
+} from "./integrity";
 import { type Tables, tables } from "./tables";
 
 /**
@@ -252,6 +258,79 @@ describe("the data against the graph", () => {
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
+  });
+
+  it("counts a meaning or pronunciation an entry lists twice", () => {
+    // The dictionary is no table, so this is the one check neither the
+    // graph nor a schema has a part in. Seventy-seven entries did this
+    // (plan 032, the dictionary after step 3): one object per row of the
+    // sources, and a word EMPM prints once per gematria value came through
+    // twice. A repeat that differs is two attestations and stays: ZON's
+    // second "form" by its note, BIAB's second "stand" by its source.
+    const { ZON, BIAB, APOPHRASZ } = dictionary;
+    expect(ZON.meanings[1].meaning).toBe(ZON.meanings[0].meaning);
+    expect(ZON.meanings[1].note).toBeDefined();
+    expect(BIAB.meanings[1].meaning).toBe(BIAB.meanings[0].meaning);
+    expect(BIAB.meanings[1].source).not.toBe(BIAB.meanings[0].source);
+    expect(of("repeat", checkIntegrity())).toEqual([]);
+
+    // Planted after the real objects: the meaning with its keys in the
+    // other order, which is not a difference, and the pronunciation as it
+    // stands. Through checkIntegrity(), since that is the wiring.
+    const [meaning] = APOPHRASZ.meanings;
+    const [sound] = APOPHRASZ.pronounciations;
+    const repeat = (where: string, text: string, source: string) =>
+      `${where}: ${JSON.stringify(text)} (${source}) a second time, identically`;
+    const planted = {
+      ...dictionary,
+      APOPHRASZ: {
+        ...APOPHRASZ,
+        meanings: [
+          ...APOPHRASZ.meanings,
+          Object.fromEntries(
+            Object.entries(meaning).reverse(),
+          ) as typeof meaning,
+        ],
+        pronounciations: [...APOPHRASZ.pronounciations, sound],
+      },
+    };
+    expect(of("repeat", checkIntegrity(tables, undefined, planted))).toEqual([
+      repeat(
+        `dictionary.APOPHRASZ.meanings.${APOPHRASZ.meanings.length}`,
+        meaning.meaning,
+        meaning.source,
+      ),
+      repeat(
+        `dictionary.APOPHRASZ.pronounciations.${APOPHRASZ.pronounciations.length}`,
+        sound.pronounciation,
+        sound.source,
+      ),
+    ]);
+
+    // A citation makes it another attestation.
+    const cited = {
+      ...dictionary,
+      APOPHRASZ: {
+        ...APOPHRASZ,
+        meanings: [...APOPHRASZ.meanings, { ...meaning, source2: "Key 1" }],
+      },
+    };
+    expect(of("repeat", checkDictionary(cited))).toEqual([]);
+
+    // And a shape the dictionary's type forbids is said, not thrown at: the
+    // dictionary has no schema, and check.ts is meant to list everything.
+    const malformed = {
+      ...dictionary,
+      APOPHRASZ: {
+        ...APOPHRASZ,
+        meanings: [...APOPHRASZ.meanings, meaning.meaning],
+        pronounciations: undefined,
+      },
+    } as unknown as EnochianDictionary;
+    expect(of("schema", checkDictionary(malformed))).toEqual([
+      `dictionary.APOPHRASZ.meanings.${APOPHRASZ.meanings.length}: not an object`,
+      "dictionary.APOPHRASZ.pronounciations: not a list",
+    ]);
   });
 
   it("holds twelve planets and three spheres of the Tree", () => {

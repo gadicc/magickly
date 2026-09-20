@@ -13,7 +13,7 @@ const failures = checkIntegrity();
 for (const { check, where, detail } of failures)
   console.error(`${check}: ${where} — ${detail}`);
 
-const counted = `${Object.keys(tables).length} tables`;
+const counted = `${Object.keys(tables).length} tables and the dictionary`;
 if (failures.length) {
   console.error(`data: ${failures.length} problems in ${counted}`);
   process.exit(1);

@@ -6,9 +6,10 @@
  * `mirrors` declared from both ends; do the links resolve; does the arity
  * match; are the chains whole; does every row pass its
  * [schema](./schemas.ts); do the few lists TypeScript has to hold by hand
- * still say what the data says; and does any source
- * [write a key twice](./duplicateKeys.ts)? Nothing throws and nothing is
- * fatal here —
+ * still say what the data says; does any source
+ * [write a key twice](./duplicateKeys.ts); and does the Enochian dictionary,
+ * which is no table, list a meaning or pronunciation twice? Nothing throws
+ * and nothing is fatal here —
  * [integrity.test.ts](./integrity.test.ts) asserts the list is empty, and
  * [check.ts](./check.ts) is the same list on the command line, which
  * `pnpm build` runs before Next sees the data.
@@ -20,6 +21,7 @@ import * as v from "valibot";
 import { assemble, problemsOf } from "./assemble";
 import { PLANET_IDS } from "./astrology/Planets";
 import { duplicateKeysInSources } from "./duplicateKeys";
+import realDictionary, { type EnochianDictionary } from "./enochian/Dictionary";
 import { graph } from "./graph";
 import type { TableSpec } from "./graphSpec";
 import { schemas } from "./schemas";
@@ -39,9 +41,14 @@ export interface Failure {
     | "mirror"
     /** A key written twice in one object of a JSON5 source. */
     | "duplicate"
+    /** An object one entry of the Enochian dictionary lists twice. */
+    | "repeat"
     /** A list written in TypeScript that the data no longer agrees with. */
     | "derived";
-  /** `table`, `table.row` or `table.row.field`. */
+  /**
+   * `table`, `table.row` or `table.row.field`; for a source, its file and
+   * the path within it; for the dictionary, `dictionary.word.list.index`.
+   */
   where: string;
   detail: string;
 }
@@ -50,7 +57,7 @@ type Row = Record<string, unknown>;
 
 const isIdField = (key: string) => key.endsWith("Id") || key.endsWith("Ids");
 
-const plain = (value: unknown) =>
+const plain = (value: unknown): value is Row =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
 /**
@@ -215,6 +222,66 @@ function checkPlanetIds(table: unknown): Failure[] {
 }
 
 /**
+ * A meaning or pronunciation an entry of the Enochian dictionary lists
+ * twice, identically. The dictionary is no table, so neither the graph nor
+ * a schema ever reads it; it was typed one row of its sources at a time, and
+ * a word EMPM prints once per gematria value came through as two objects
+ * saying the same thing, which `/enochian/dictionary` printed twice
+ * (plan 032, follow-ups). Two objects that differ in anything — the source,
+ * its citation, a note — are two attestations, and stay. The dictionary has
+ * no schema, so the little shape this needs is asked for here, and said
+ * rather than thrown at, since the list is meant to be the whole of it.
+ *
+ * The dictionary is an argument so that a test can hand it a repeat. The
+ * real one is the module [the build](./build.mts) emits, as the tables are
+ * the JSON it emits: what ships is what is checked.
+ */
+export function checkDictionary(
+  dictionary: EnochianDictionary = realDictionary,
+): Failure[] {
+  const failures: Failure[] = [];
+  for (const [word, entry] of Object.entries(dictionary))
+    for (const list of ["meanings", "pronounciations"] as const) {
+      const items: unknown = entry[list];
+      if (!Array.isArray(items)) {
+        failures.push({
+          check: "schema",
+          where: `dictionary.${word}.${list}`,
+          detail: "not a list",
+        });
+        continue;
+      }
+      const seen = new Set<string>();
+      for (let i = 0; i < items.length; i++) {
+        const item: unknown = items[i];
+        if (!plain(item)) {
+          failures.push({
+            check: "schema",
+            where: `dictionary.${word}.${list}.${i}`,
+            detail: "not an object",
+          });
+          continue;
+        }
+        // The order the keys were written in is not a difference; anything
+        // else, at any depth, is.
+        const written = JSON.stringify(
+          Object.fromEntries(Object.entries(item).sort()),
+        );
+        if (seen.has(written)) {
+          const text = "meaning" in item ? item.meaning : item.pronounciation;
+          failures.push({
+            check: "repeat",
+            where: `dictionary.${word}.${list}.${i}`,
+            detail: `${JSON.stringify(text)} (${item.source}) a second time, identically`,
+          });
+        }
+        seen.add(written);
+      }
+    }
+  return failures;
+}
+
+/**
  * Everything wrong with the data, as the graph and the schemas see it.
  *
  * `sources` is where the duplicate-key lint reads the JSON5 from, and is
@@ -222,11 +289,13 @@ function checkPlanetIds(table: unknown): Failure[] {
  * planted one is the only way that branch is ever walked
  * ([integrity.test.ts](./integrity.test.ts)). The default lives in
  * [duplicateKeys.ts](./duplicateKeys.ts), which is where the directory is
- * known.
+ * known. `dictionary` is the same arrangement for the one source that is no
+ * table: the emitted module unless a test hands one over.
  */
 export function checkIntegrity(
   input: Tables = realTables,
   sources?: string,
+  dictionary?: EnochianDictionary,
 ): Failure[] {
   const failures: Failure[] = checkMirrors();
   const names = Object.keys(input) as TableName[];
@@ -302,6 +371,9 @@ export function checkIntegrity(
       where: `${file}: ${path ? `${path}: ` : ""}${key}`,
       detail: "written twice in one object; JSON5 keeps the last silently",
     });
+
+  // The one source that is no table, which nothing above reaches.
+  failures.push(...checkDictionary(dictionary));
 
   // Everything assembling the tables found: an id no row is keyed by, a
   // mirror that does not point back, a back-link two rows claim, and an
