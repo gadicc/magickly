@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import JSON5 from "json5";
 import { ANGEL_COUNT } from "../../data/kabbalah/seventyTwoAngelsDerived";
-import { readExtraction, type StoredExtraction } from "./extract";
+import { published, readExtraction, type StoredExtraction } from "./extract";
 import { handReadings, hebrewReadings } from "./hebrew";
 import { disagreements, hebrewProblems, shapeProblems } from "./validate";
 
@@ -168,22 +168,16 @@ function main() {
   // Lenain's notes go with his text. A reader who meets "(1)" in an entry has
   // to be able to read what it points at, and for five entries the call was
   // there while the note was held somewhere they would never see.
-  const withNotes = (
-    prose: string,
-    notes: { marker: string; text: string }[],
-  ) =>
-    notes.length
-      ? `${prose}\n\n${notes.map((note) => `(${note.marker}) ${note.text}`).join("\n\n")}`
-      : prose;
-
+  // `published` is shared with the review, so what is judged and what is
+  // shipped cannot drift apart.
   write(
     `${TEXT_DIR}/fr.json5`,
-    angels.map((angel) => withNotes(angel.french, angel.footnotesFr)),
+    angels.map((angel) => published(angel.french, angel.footnotesFr)),
   );
   write(
     `${TEXT_DIR}/en.json5`,
     angels.map((angel) =>
-      withNotes(
+      published(
         angel.translation,
         angel.footnotes.map((note) => ({
           marker: note.marker,

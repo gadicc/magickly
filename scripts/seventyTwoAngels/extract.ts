@@ -165,6 +165,28 @@ export interface StoredExtraction extends AngelExtraction {
   model: string;
 }
 
+/**
+ * An entry as a reader meets it: the prose with Lenain's notes after it.
+ *
+ * The prose and the notes are stored apart, and for a while the review was
+ * shown only the prose — so it reported notes missing that the published text
+ * has, and could not have seen the ones that were genuinely malformed. A
+ * reviewer has to be shown what is published.
+ *
+ * The marker comes back as "1" from the page and "(1)" from a translation, so
+ * it is stripped to the bare number before being set in brackets.
+ */
+export function published(
+  prose: string,
+  notes: { marker: string; text: string }[],
+) {
+  if (!notes.length) return prose;
+  const set = notes
+    .map((note) => `(${note.marker.replace(/[()]/g, "")}) ${note.text}`)
+    .join("\n\n");
+  return `${prose}\n\n${set}`;
+}
+
 export function readExtraction(no: number): StoredExtraction {
   const raw = JSON.parse(readFileSync(pathFor(no), "utf8"));
   return { ...raw, ...angelExtraction.parse(raw) };

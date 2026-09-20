@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { generateObject } from "ai";
-import { readExtraction } from "./extract";
+import { published, readExtraction } from "./extract";
 import { type AngelReview, angelReview } from "./schema";
 import { type AngelRegion, findRegions } from "./source";
 
@@ -76,11 +76,14 @@ ${region.french}
 </scan>
 
 <restored-french>
-${angel.french}
+${published(angel.french, angel.footnotesFr)}
 </restored-french>
 
 <english>
-${angel.translation}
+${published(
+  angel.translation,
+  angel.footnotes.map((n) => ({ marker: n.marker, text: n.en })),
+)}
 </english>
 
 <fields>
