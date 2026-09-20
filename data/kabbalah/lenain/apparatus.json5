@@ -22,7 +22,8 @@
   {
     no: 0,
     kind: 'correction',
-    field: 'p. 35',
+    field: 'revolutions',
+    page: 'p35',
     printed: 'pour les 260 jours',
     used: '360',
     why: 'Five revolutions of 72 days are 360, as the same page says twice elsewhere and as the third table sets out row by row.',

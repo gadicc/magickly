@@ -34,8 +34,18 @@ export interface Note {
   /** The genius it concerns, or 0 for a note about the book at large. */
   no: number;
   kind: "correction" | "reading" | "reconstruction";
-  /** Where it applies: a field, a table, a page. */
+  /** Which field it applies to. Not a page: that is what `page` is for. */
   field: string;
+  /**
+   * The leaf it concerns, as that leaf's anchor — "p35", "p-IV". A note about
+   * the book at large may still concern a page, and one that concerns none is
+   * set in "About this edition" instead.
+   *
+   * It used to be smuggled into `field` as "p. 35", which is why the note
+   * about the five revolutions reached no reader at all: it had no genius to
+   * hang on, and nothing looked at `field` for a page.
+   */
+  page?: string;
   /** What the book prints, as it prints it. */
   printed: string;
   /** What this edition uses instead — empty where it uses nothing. */
