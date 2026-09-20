@@ -1,9 +1,13 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import JSON5 from "json5";
+import {
+  type Piece,
+  piecesOf,
+  segmentsOf,
+} from "../../data/kabbalah/lenain/pieces";
 import type { Note } from "./apparatus";
-import { type BookPage, bookPages, pageLabel } from "./bookPage";
-import { continuesParagraph, type PageBlock } from "./pageSchema";
+import { type BookPage, bookPages } from "./bookPage";
 import { plateEntries } from "./plateSource";
 
 /**
@@ -58,91 +62,6 @@ function table(rows: string[][]) {
     `|${" --- |".repeat(width)}`,
     ...rows.map(line),
   ].join("\n");
-}
-
-/**
- * One piece of the book as a reader meets it, with every leaf it runs across.
- *
- * The volume is rendered as a stream rather than leaf by leaf, because a
- * paragraph does not stop at the foot of a page: 84 of the 168 leaves open
- * mid-sentence, and rendering each in isolation began a broken paragraph on
- * every one of them. The marker for a leaf that opens inside a paragraph is
- * set inside that paragraph, where the break actually falls, as EPUB does.
- */
-interface Piece {
-  kind: PageBlock["kind"];
-  text: string;
-  rows: string[][];
-  marker: string;
-  /** Anchors of the leaves this piece runs across, in order. */
-  pages: string[];
-}
-
-/** The leaf marker, which is also the permalink and the page-break landmark. */
-function pageMarker(page: BookPage) {
-  return `<small id="${page.page.anchor}">**[${pageLabel(page.page)}]**</small>`;
-}
-
-/**
- * The whole volume as pieces, folding paragraphs across leaves.
- *
- * A leaf's marker is emitted before its first piece where that piece starts
- * afresh, and inside the piece where it carries one on.
- */
-function piecesOf(pages: BookPage[]): Piece[] {
-  const pieces: Piece[] = [];
-  for (const page of pages) {
-    let first = true;
-    for (const block of page.blocks) {
-      if (block.kind === "furniture") continue;
-      const last = pieces[pieces.length - 1];
-      const carriesOn =
-        last &&
-        last.kind === block.kind &&
-        block.kind === "paragraph" &&
-        continuesParagraph(last.text, block);
-
-      if (carriesOn) {
-        const marker = first ? pageMarker(page) : "";
-        if (last.text.endsWith("-")) {
-          // A word the leaf broke in half is made whole and the marker set
-          // after it: the break falls mid-word, but "mi[p. 11] nistère" is
-          // not a word, and a reader searching for ministère should find it.
-          const [, word, rest] = block.text.match(/^(\S*)([\s\S]*)$/) ?? [
-            "",
-            block.text,
-            "",
-          ];
-          last.text =
-            last.text.slice(0, -1) + word + (marker ? ` ${marker}` : "") + rest;
-        } else {
-          last.text = `${last.text}${marker ? ` ${marker} ` : " "}${block.text}`;
-        }
-        last.pages.push(page.page.anchor);
-        first = false;
-        continue;
-      }
-
-      pieces.push({
-        kind: block.kind,
-        text: first ? `${pageMarker(page)}\n\n${block.text}` : block.text,
-        rows: block.rows,
-        marker: block.marker,
-        pages: [page.page.anchor],
-      });
-      first = false;
-    }
-    // A leaf whose every block was furniture still deserves its marker.
-    if (first)
-      pieces.push({
-        kind: "paragraph",
-        text: pageMarker(page),
-        rows: [],
-        marker: "",
-        pages: [page.page.anchor],
-      });
-  }
-  return pieces;
 }
 
 /**
@@ -203,14 +122,31 @@ function editionNotes(): Note[] {
   return notes.filter((note) => note.no === 0 && !note.page);
 }
 
+/** The leaf marker, which is also the permalink and the page-break landmark. */
+function pageMarker(anchor: string, label: string) {
+  return `<small id="${anchor}">**[${label ? `p. ${label}` : "unnumbered"}]**</small>`;
+}
+
 function pieceToMarkdown(piece: Piece) {
   if (piece.kind === "table") return table(piece.rows);
-  if (piece.kind === "heading") return `## ${piece.text}`;
+
+  // The marker for a leaf that opens inside a paragraph is set inside it,
+  // where the break falls; one that opens the piece is set above it.
+  const text = segmentsOf(piece)
+    .map(({ before, text: segment }, index) => {
+      if (!before) return segment;
+      const marker = pageMarker(before.anchor, before.label);
+      return index === 0 ? `${marker}\n\n${segment}` : `${marker} ${segment}`;
+    })
+    .join("");
+
+  if (piece.kind === "heading")
+    return text.replace(/^((?:<small[^>]*>.*?<\/small>\n\n)?)/, "$1## ");
   if (piece.kind === "footnote") {
     const marker = piece.marker ? `**(${piece.marker})** ` : "";
-    return `> ${marker}${piece.text.replace(/\n/g, "\n> ")}`;
+    return `> ${marker}${text.replace(/\n/g, "\n> ")}`;
   }
-  return piece.text;
+  return text;
 }
 
 function main() {
@@ -229,7 +165,7 @@ function main() {
   const pieces = piecesOf(pages);
   const lastPiece = new Map<string, number>();
   pieces.forEach((piece, index) => {
-    for (const anchor of piece.pages) lastPiece.set(anchor, index);
+    for (const { anchor } of piece.breaks) lastPiece.set(anchor, index);
   });
   const closingAt = new Map<number, string[]>();
   for (const [anchor, index] of lastPiece)

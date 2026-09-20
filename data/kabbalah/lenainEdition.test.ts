@@ -1,12 +1,14 @@
 import { readFileSync } from "node:fs";
 import JSON5 from "json5";
 import { describe, expect, it } from "vitest";
+import { piecesOf, segmentsOf } from "./lenain/pieces";
 import {
   bookLeaves,
   divisionOfLeaf,
   divisions,
   LAST_LEAF,
   leavesOf,
+  leaves as volumeLeaves,
 } from "./lenain/volume";
 
 /**
@@ -189,6 +191,49 @@ describe("the divisions", () => {
     // require of every other page.
     for (const division of divisions)
       expect(division.title.length, division.title).toBeLessThanOrEqual(48);
+  });
+});
+
+describe("folding the leaves into pieces", () => {
+  it("loses no letter of the book", () => {
+    // The fold rejoins paragraphs across leaves and mends words a leaf broke
+    // in half, so it changes where text sits — never how much of it there is.
+    // Letters rather than words: the fold declines to join a paragraph to a
+    // footnote that interrupts it, and any naive comparison by word token
+    // reads that correct refusal as a difference.
+    const letters = (text: string) => text.replace(/[\s-]+/g, "");
+    const fromBlocks = volumeLeaves
+      .flatMap((leaf) =>
+        leaf.blocks.filter((b) => b.kind !== "furniture").map((b) => b.text),
+      )
+      .join(" ");
+    const fromPieces = piecesOf(volumeLeaves)
+      .map((piece) => piece.text)
+      .join(" ");
+    expect(letters(fromPieces)).toBe(letters(fromBlocks));
+  });
+
+  it("cuts every piece into segments that rejoin to it", () => {
+    // A paragraph carrying on from the leaf before has no break at offset 0,
+    // and slicing from its first break silently dropped the opening words of
+    // 52 pieces. Rejoining is the invariant that caught it.
+    const broken = piecesOf(volumeLeaves)
+      .filter(
+        (piece) =>
+          segmentsOf(piece)
+            .map((segment) => segment.text)
+            .join("") !== piece.text,
+      )
+      .map((piece) => `${piece.kind} at ${piece.breaks[0]?.anchor}`);
+    expect(broken).toEqual([]);
+  });
+
+  it("marks every leaf exactly once", () => {
+    const marked = piecesOf(volumeLeaves).flatMap((piece) =>
+      piece.breaks.map((pageBreak) => pageBreak.anchor),
+    );
+    expect(marked.length).toBe(volumeLeaves.length);
+    expect(new Set(marked).size).toBe(volumeLeaves.length);
   });
 });
 
