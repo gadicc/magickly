@@ -60,7 +60,9 @@ function names(word: string) {
   return bare.endsWith("s") ? [bare, bare.slice(0, -1)] : [bare, `${bare}s`];
 }
 
-export function disagreements(angel: AngelExtraction): Disagreement[] {
+export function disagreements(
+  angel: Pick<AngelExtraction, "no" | "scanned">,
+): Disagreement[] {
   const { no, scanned } = angel;
   const found: Disagreement[] = [];
   const note = (field: string, scannedAs: string, derived: string) =>

@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import JSON5 from "json5";
-import { readExtraction } from "./extract";
+import { readEvidence } from "./evidence";
 import { handReadings, hebrewReadings } from "./hebrew";
 import { plateEntries } from "./plateSource";
 import { disagreements } from "./validate";
@@ -52,8 +52,14 @@ function handNotes(): Note[] {
 /** Where an entry departs from the tables the rest of the book keeps. */
 function fromArithmetic(): Note[] {
   const notes: Note[] = [];
+  const evidence = new Map(readEvidence().map((row) => [row.no, row]));
   for (const entry of plateEntries()) {
-    for (const clash of disagreements(readExtraction(entry.no))) {
+    const reading = evidence.get(entry.no);
+    if (!reading) continue;
+    for (const clash of disagreements({
+      no: reading.no,
+      scanned: reading.scanned,
+    })) {
       notes.push({
         no: entry.no,
         kind: "correction",
@@ -86,11 +92,8 @@ function fromOrdinals(): Note[] {
 
 /** Where two readings of the Hebrew cannot be made to agree. */
 function fromHebrew(): Note[] {
-  const entries = plateEntries();
   const { doubtful } = hebrewReadings(
-    new Map(
-      entries.map((entry) => [entry.no, readExtraction(entry.no).name.he]),
-    ),
+    new Map(readEvidence().map((row) => [row.no, row.nameHe])),
   );
 
   const byHand = handReadings();

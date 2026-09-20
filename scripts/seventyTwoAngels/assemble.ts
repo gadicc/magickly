@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import JSON5 from "json5";
 import { ANGEL_COUNT } from "../../data/kabbalah/seventyTwoAngelsDerived";
+import { writeEvidence } from "./evidence";
 import { published, readExtraction, type StoredExtraction } from "./extract";
 import { handReadings, hebrewReadings } from "./hebrew";
 import { disagreements, hebrewProblems, shapeProblems } from "./validate";
@@ -137,6 +138,13 @@ function main() {
   const oddlyShaped = [...readings.agreed].filter(
     ([, he]) => hebrewProblems({ name: { en: "", he } }).length,
   );
+
+  // The readings the apparatus is derived from, committed so that a correction
+  // can be checked against the page instead of taken on trust.
+  if (!reportOnly) {
+    const written = writeEvidence(angels);
+    console.log(`${written.path} — ${written.count} readings`);
+  }
 
   const clashes = angels.flatMap(disagreements);
   const shapes = angels.flatMap((angel) =>
