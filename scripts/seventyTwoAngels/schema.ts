@@ -49,7 +49,14 @@ export const angelExtraction = z.object({
     /** 0 where the entry cites something other than a psalm, or nothing. */
     psalm: z.number().int().min(0).max(150),
     verse: z.number().int().min(0),
-    /** The Latin incipit as the entry prints it, repaired. */
+    /**
+     * The Latin incipit, with scan damage mended — page 54 sets "Ut qui.l" for
+     * "Ut quid" — and his own misquotations given as the psalter has them:
+     * page 76 reads "adjuvebat" for "adiuvabat". This is a field of ours, so
+     * it carries the corrected value and the apparatus carries the note, while
+     * the French keeps what he printed. Any difference between the two is
+     * caught by comparing this against the bracketed Latin in the entry.
+     */
     la: z.string(),
   }),
   /** Each of these is "" where the entry does not say. Never invented. */

@@ -1336,6 +1336,7 @@ Le génie contraire domine l'indiscrétion et le mensonge ; il influe sur tous c
 
 **Editorial notes**
 
+- **psalm.la** · Ut qui.l Domine recessisti longè → quid — The italic d of "quid" has printed as a dot and a broken stroke, so the page reads "qui.l". At 500 dpi it is plainly damaged type rather than a spelling: the verse is Psalm 9:22, "Ut quid Domine recessisti longe".
 - **name.he** · יזּלּׄאׄלּ → יזלאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 - **presidingDays** · 1/4, 12/6, 23/8, 3/9, 14/1 → 1/4, 12/6, 23/8, 3/11, 14/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
 
@@ -1755,7 +1756,7 @@ Le génie contraire domine sur l'atmosphère ; il provoque les grandes chaleurs 
 **Editorial notes**
 
 - **name.he** · סאׄלּׄיׄה → סאליה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
-- **psalm.la** · misericordia tua Domine adjuvebat me → adjuvabat — The page prints "adjuvebat" in italic, plainly and not as scan damage; the Vulgate reads "adiuvabat" at Psalm 93:18. The entry's French keeps his spelling and this field gives the verse as the psalter has it.
+- **psalm.la** · misericordia tua Domine adjuvebat me → adjuvabat — The page prints "adjuvebat" in italic, plainly and not as scan damage, where the psalter reads "adiuvabat" at Psalm 93:18. The entry's French keeps his spelling; this field gives the verse as the psalter has it.
 - **degrees** · 226-130 → 226-230 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
 - **name.he** · עריׄאׄלּׄ → עריאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
 - **ordinal** · 36e → 46 — The entry stands between the 45th and the 47th, and the first cabalistic table numbers it 46.

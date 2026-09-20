@@ -116,6 +116,14 @@
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
   },
   {
+    no: 12,
+    kind: 'reading',
+    field: 'psalm.la',
+    printed: 'Ut qui.l Domine recessisti longè',
+    used: 'quid',
+    why: 'The italic d of "quid" has printed as a dot and a broken stroke, so the page reads "qui.l". At 500 dpi it is plainly damaged type rather than a spelling: the verse is Psalm 9:22, "Ut quid Domine recessisti longe".',
+  },
+  {
     no: 13,
     kind: 'reading',
     field: 'name.he',
@@ -313,7 +321,7 @@
     field: 'psalm.la',
     printed: 'misericordia tua Domine adjuvebat me',
     used: 'adjuvabat',
-    why: 'The page prints "adjuvebat" in italic, plainly and not as scan damage; the Vulgate reads "adiuvabat" at Psalm 93:18. The entry\'s French keeps his spelling and this field gives the verse as the psalter has it.',
+    why: 'The page prints "adjuvebat" in italic, plainly and not as scan damage, where the psalter reads "adiuvabat" at Psalm 93:18. The entry\'s French keeps his spelling; this field gives the verse as the psalter has it.',
   },
   {
     no: 46,

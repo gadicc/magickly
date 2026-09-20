@@ -431,7 +431,7 @@
       53,
     ],
     attribute: {
-      en: 'God refuge.',
+      en: 'God, refuge.',
       fr: 'Dieu refuge.',
     },
     people: {
@@ -445,16 +445,16 @@
       la: 'Ut quid Domine recessisti longè, despicis in opportunitatibus, in tribulatione.',
     },
     invokedFor: {
-      en: 'To obtain help against adversities.',
+      en: 'His help is invoked against adversities.',
     },
     governs: {
-      en: 'Dreams, and the revealing of mysteries hidden from mortals; also influences wise, spiritual and discreet persons.',
+      en: 'He governs dreams, and reveals mysteries hidden from mortals. He has influence over wise, clever and discreet persons.',
     },
     bornUnder: {
       en: 'They have gentle manners, an amiable countenance, and pleasing ways.',
     },
     contrary: {
-      en: 'The contrary genius governs indiscretion and lying, and influences all those who abuse the trust of others.',
+      en: 'The contrary genius governs indiscretion and lying; he has influence over all those who abuse the trust of others.',
     },
   },
   {
@@ -583,11 +583,11 @@
       56,
     ],
     attribute: {
-      en: 'God who erects the universe.',
-      fr: "Dieu qui érige l'univers.",
+      en: 'God who erects the universe',
+      fr: "Dieu qui érige l'univers",
     },
     people: {
-      en: 'the French',
+      en: 'the French nation',
       fr: 'la France',
     },
     godName: 'Dieu',
@@ -597,13 +597,13 @@
       la: 'Domine Deus salutis meæ, in die clamavi, et nocte coram te.',
     },
     invokedFor: {
-      en: 'Invoked against traitors, to obtain victory over the enemy, and to be delivered from those who wish to oppress us.',
+      en: 'He is invoked against traitors, to obtain victory over the enemy, and to be delivered from those who wish to oppress us.',
     },
     governs: {
-      en: 'Governs crowned heads and great captains; gives victory and forestalls seditions; has influence over iron, arsenals, and all that pertains to military engineering.',
+      en: 'This genius governs crowned heads and great captains; he gives victory, and prevents seditions; he has influence over iron, arsenals, and all that pertains to the art of war.',
     },
     bornUnder: {
-      en: 'A person born under this influence is of a frank, loyal and brave character, sensitive on the point of honor, faithful to their oath, and passionate for Venus.',
+      en: 'They are of a frank, loyal and brave character, sensitive on the point of honour, faithful to their oath, and passionate for Venus.',
     },
     contrary: {
       en: 'The contrary genius governs traitors; he provokes betrayals, sedition and revolt.',
@@ -1311,17 +1311,17 @@
       en: '',
       fr: '',
     },
-    godName: '',
+    godName: 'Anup',
     psalm: {
       psalm: 114,
       verse: 1,
       la: 'Dilexi quoniam exaudiet Dominus vocem orationis meæ.',
     },
     invokedFor: {
-      en: 'For obtaining pardon for those one has offended, in order to be restored to their favour.',
+      en: 'To be restored to the good graces of those one has offended; for this one must utter the request, the divine names, and name the person, then say the verse of the psalm daily until reconciled with the person.',
     },
     governs: {
-      en: 'Wills, inheritances, and all divisions of property made amicably; he maintains peace and harmony in families.',
+      en: 'Wills, successions, and all divisions of property made amicably; he maintains peace and harmony within families.',
     },
     bornUnder: {
       en: 'They love to live in peace with everyone, even at the expense of their own interests, and make it a duty to reward the fidelity and good care of those attached to their service.',
@@ -1436,13 +1436,13 @@
       en: 'To acquire all the treasures of heaven and earth.',
     },
     governs: {
-      en: 'He governs all religious worship and all that relates to God, and protects all those who seek the truth.',
+      en: 'He governs all religious worship and all that pertains to God; he protects all who seek the truth.',
     },
     bornUnder: {
       en: '',
     },
     contrary: {
-      en: 'The contrary genius governs error and lying, and influences all those who hold no principle of religion.',
+      en: 'The contrary genius governs error and lying, and influences all who have no principle of religion.',
     },
   },
   {
@@ -1691,7 +1691,7 @@
       fr: 'Moteur de toutes choses.',
     },
     people: {
-      en: 'the people of Quito',
+      en: 'the peoples of Quito',
       fr: 'les peuples de Quito',
     },
     godName: 'Hobo',
@@ -1701,16 +1701,16 @@
       la: 'Si dicebam, motus est pes meus : misericordia tua Domine adjuvabat me.',
     },
     invokedFor: {
-      en: 'He serves to confound the wicked and the proud; he raises up those who are humbled and fallen.',
+      en: 'To confound the wicked and the proud, and to raise up those who are humbled and fallen.',
     },
     governs: {
-      en: 'This genius rules over vegetation; he carries life and health into all that breathes, and influences the chief agents of nature.',
+      en: 'He governs vegetation, bringing life and health into all that breathes, and influences the principal agents of nature.',
     },
     bornUnder: {
-      en: 'The person born under this influence will love to learn; they will have great abilities and much facility.',
+      en: 'They will love to learn, and will have great means and much ease in doing so.',
     },
     contrary: {
-      en: 'The contrary genius rules over the atmosphere; he provokes great heat or great cold, great droughts or excessive humidity.',
+      en: 'The contrary genius governs the atmosphere, provoking great heat or great cold, great drought or excessive dampness.',
     },
   },
   {
@@ -2145,11 +2145,11 @@
       85,
     ],
     attribute: {
-      en: 'God worthy of praise',
+      en: 'God praiseworthy',
       fr: 'Dieu louable',
     },
     people: {
-      en: 'Cyrenians',
+      en: 'the Cirenians',
       fr: 'les Ciréniens',
     },
     godName: 'Popa',
@@ -2165,10 +2165,10 @@
       en: 'Great captains, admirals, generals, and all who fight for a just cause.',
     },
     bornUnder: {
-      en: 'They will love the military life; they will be distinguished by their activity, bravery, and greatness of soul, and will bear fatigue with great courage.',
+      en: 'They will love the military life; they will distinguish themselves by their activity, bravery and greatness of soul, and will bear hardships with great courage.',
     },
     contrary: {
-      en: 'Betrayals, causing discord among leaders; it influences pusillanimous men, and those who attack defenseless persons.',
+      en: 'The contrary genius governs treasons, causes discord between leaders, and influences pusillanimous men and those who attack defenceless persons.',
     },
   },
   {
@@ -2184,11 +2184,11 @@
       86,
     ],
     attribute: {
-      en: 'God who hears the generations',
+      en: 'God who grants the prayers of the generations',
       fr: 'Dieu qui exauce les générations',
     },
     people: {
-      en: 'Elamites',
+      en: 'the Celamites',
       fr: 'les Célamites',
     },
     godName: 'Para',
@@ -2198,16 +2198,16 @@
       la: 'Et anima turbata est valde; sed tu Domine usque quo ?',
     },
     invokedFor: {
-      en: 'It serves against griefs and cures illnesses, chiefly the malady of the eyes; it confounds the wicked and false witnesses.',
+      en: 'Invoked against sorrows and to cure illnesses, principally ailments of the eyes.',
     },
     governs: {
-      en: 'This genius governs iron; he has influence over armourers, locksmiths, cutlers, and all who trade in it.',
+      en: 'This genius governs iron; he influences armourers, locksmiths, cutlers, and all who trade in it; he confounds the wicked and false witnesses.',
     },
     bornUnder: {
-      en: 'They will be distinguished by their bravery and frankness, and will be passionate for Venus.',
+      en: 'The person born under this influence will be distinguished by their bravery and frankness, and will be passionate for Venus.',
     },
     contrary: {
-      en: 'The contrary genius governs anger; it has influence over the wicked and homicides.',
+      en: 'The contrary genius governs anger; he influences the wicked and murderers.',
     },
   },
   {
@@ -2414,7 +2414,7 @@
       fr: 'Dieu qui vivifie toutes choses',
     },
     people: {
-      en: 'Mongols',
+      en: 'the Mongols',
       fr: 'les Mongols',
     },
     godName: 'Alli',
@@ -2424,16 +2424,16 @@
       la: 'Ecce oculi Domini super metuentes eum : et in eis, qui sperant super misericordiam ejus.',
     },
     invokedFor: {
-      en: "Invoked by pronouncing the divine names with the 18th verse of Psalm 32, which is good against adversities and answers the prayers and wishes of those who hope in God's mercy.",
+      en: '',
     },
     governs: {
-      en: 'This genius protects against rabies and fierce animals; he rules over scholars, teachers, orators and authors; he has influence over printing and bookselling, and over all who trade in it.',
+      en: 'This genius protects against rabies and ferocious animals; he rules over scholars, professors, orators and authors; he has influence over printing and bookselling, and over all who trade in it.',
     },
     bornUnder: {
-      en: 'The person born under this influence will distinguish themselves in literature.',
+      en: 'They will distinguish themself in literature.',
     },
     contrary: {
-      en: 'The contrary genius rules over false scholars; he has influence over controversies, literary disputes, and criticism.',
+      en: 'The contrary genius rules over false scholars; it has influence over controversies, literary disputes and criticism.',
     },
   },
   {
@@ -2644,7 +2644,7 @@
       fr: 'Verbe qui produit toutes choses',
     },
     people: {
-      en: 'the Boeotians',
+      en: 'the Béotians',
       fr: 'les Béotiens',
     },
     godName: 'Aris',
@@ -2657,13 +2657,13 @@
       en: '',
     },
     governs: {
-      en: "This genius governs the generation of beings and the phenomena of nature; he protects those who wish to regenerate themselves and restore within them the harmony broken by Adam's disobedience, which is achieved by exalting oneself toward God and purifying, through the elements, those who compose the nature of man; it is then that the wise man returns to the principle of creation, recovers his rights and his first dignity, becomes once more the master of nature, and enjoys all the prerogatives that God gave him at his creation.",
+      en: "This genius governs the generation of beings and the phenomena of nature; he protects those who wish to regenerate themselves and re-establish within themselves the harmony broken by Adam's disobedience, which is done by exalting oneself toward God and purifying, through the elements, those things that compose the nature of man; it is then that the wise man re-enters into the principle of creation, recovers his rights and his first dignity, becomes again the master of nature, and enjoys all the prerogatives that God gave him in creating him.",
     },
     bornUnder: {
-      en: 'They will be distinguished by their genius; they will be esteemed by the learned of all nations, and will become one of the foremost lights of philosophy.',
+      en: 'They will be distinguished by their genius; they will be considered by the learned men of all nations, and will become one of the foremost lights of philosophy.',
     },
     contrary: {
-      en: 'The contrary genius governs atheism and all those who spread dangerous writings; he has influence over critics and literary disputes.',
+      en: 'The contrary genius governs atheism and all those who spread dangerous writings; it influences critics and literary disputes.',
     },
   },
   {
@@ -2718,29 +2718,29 @@
     ],
     attribute: {
       en: 'His attribute is figured by the omega, which denotes the end of all things',
-      fr: "Son attribut est figuré par l'ôméga, qui désigne la fin de toutes choses",
+      fr: "figuré par l'ôméga, qui désigne la fin de toutes choses",
     },
     people: {
       en: 'Thrace or Roumelia',
       fr: 'la Thrace ou la Roumélie',
     },
-    godName: '',
+    godName: 'alpha et ôméga',
     psalm: {
       psalm: 114,
       verse: 7,
       la: 'Convertere anima mea in requiem tuam : quia Dominus benefecit tibi.',
     },
     invokedFor: {
-      en: '',
+      en: 'To invoke in mysterious operations, to succeed in all things, and to bring every experiment to its end.',
     },
     governs: {
-      en: 'This genius protects mysterious operations; he brings success in all things and carries every experiment to its end; he governs chemistry, physics, and medicine, and influences health and longevity of life.',
+      en: 'This genius protects in mysterious operations; he makes one succeed in all things and brings every experiment to its conclusion; he governs chemistry, physics and medicine, and influences health and length of life.',
     },
     bornUnder: {
-      en: 'They will distinguish themselves in medicine, will become celebrated for their marvellous cures, will unveil several secrets of nature that will bring happiness to the children of the earth, and will devote their vigils and their care to relieving the poor and the sick.',
+      en: 'They will distinguish themself in medicine, becoming famous for their marvellous cures, will unveil several secrets of nature that will bring happiness to the children of the earth, and will devote their nights and their cares to relieving the poor and the sick.',
     },
     contrary: {
-      en: 'The contrary genius causes despair and suicide; he influences all those who detest their existence and the day that saw them born.',
+      en: 'The contrary genius causes despair and suicide, and influences all those who detest their existence and the day that saw them born.',
     },
   },
 ]

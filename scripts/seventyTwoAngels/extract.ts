@@ -70,8 +70,11 @@ he meant them:
 - « les lumières » is knowledge or enlightenment, and « la propagation des lumières » \
   is the spread of learning, not of light.
 - « dilapidations » is the squandering of money or property, not disrepair.
-- « le génie militaire » is military engineering, and « les villes de guerre » are \
-  fortified towns.
+- « le génie militaire » is military engineering, the corps, and « les villes de \
+  guerre » are fortified towns. « Le génie de la guerre » is not that narrower thing: \
+  it is the spirit or art of war at large.
+- « spirituel », of a person, is witty or clever, not spiritual.
+- « exaucer » is to grant a prayer, not merely to hear it.
 - « le sexe », used alone, means women.
 - « la mémoire heureuse » is a retentive memory, not a happy one.
 - « Dieu qui réjouit » is God who gives joy, not God who rejoices.
@@ -111,8 +114,11 @@ is "the Greeks" and not "Greece", « la langue espagnole » is "the Spanish", «
 Crétois » is "the Cretans" — and where he names a country, keep the country, as in \
 « il domine sur la Thrace ou la Roumélie », which is "Thrace or Roumelia" and not "the \
 Thracians". Give it alone, as a short noun phrase, never the sentence around it, and never the name of God, which belongs in \
-"godName". "godName" is the divine name the entry gives for that people — Jehovah, \
-Théos, Orsy, Bogo — and never the genius's own name, which is already in "name". The formula « la langue de X » always names the people, whether or not they \
+"godName". "godName" is the divine name the entry gives — Jehovah, Théos, Orsy, Bogo \
+— and never the genius's own name, which is already in "name". He gives it as « Il \
+correspond au saint nom X » or « Il correspond au nom X », with or without a people \
+attached, and sometimes in the invocation instead: « il faut prononcer les noms divins, \
+savoir, alpha et ôméga ». Take it from wherever in the entry it is said. The formula « la langue de X » always names the people, whether or not they \
 are a nation on a modern map: « les anciens Béthuliens » and « les Mages » belong there \
 as much as « les Grecs ». Where the opening names no language and no nation, as a few \
 entries do, leave it empty.
@@ -147,6 +153,11 @@ that the entry gives no such thing is not an empty field, and it reaches the rea
 though Lenain had written it. Do not assemble one out of the rest of the entry, \
 and never supply a fact you know from elsewhere. If it is not on the page, it is not in \
 the answer.
+
+Names of peoples and of gods are given as he spells them, never modernised or \
+identified: « les Célamites » are the Celamites, not "the Elamites", and no bracketed \
+gloss is added saying who they might be. Saying who they were is a reader's work, or a \
+note's, and both need to see what he wrote first.
 
 3. "name.he" is the Hebrew as the entry prints it. Copy it from the French you are \
 given, letter for letter. Do not substitute a spelling you know.
