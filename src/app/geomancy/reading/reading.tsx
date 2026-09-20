@@ -660,13 +660,10 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
                 if (!tetragram) return null;
                 return (
                   <div style={{ fontSize: "80%" }}>
-                    {tetragram.zodiacId &&
-                      data.zodiac[tetragram.zodiacId].symbol}
-                    {data.element[tetragram.elementId]?.symbol}
+                    {tetragram.zodiac?.symbol}
+                    {tetragram.element?.symbol}
                     {/* tetragram.rulerIds */}
-                    {tetragram.planetIds
-                      .map((p) => data.planet[p].symbol)
-                      .join("/")}
+                    {tetragram.planets.map((p) => p.symbol).join("/")}
                   </div>
                 );
               })()}

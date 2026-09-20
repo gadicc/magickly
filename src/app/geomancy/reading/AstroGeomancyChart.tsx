@@ -1,8 +1,7 @@
 import React, { CSSProperties } from "react";
-import planets from "@/../data/astrology/Planets";
-// import houses from "@/../data/astrology/Houses";
-import zodiacs from "@/../data/astrology/Zodiac";
-import type { Tetragram } from "@/../data/geomancy/Tetragrams";
+// The figures arrive assembled, so the sign and planets each one names are
+// on the row: this component looked both tables up by hand until step 3c.
+import type { TetragramRow } from "@/../data/rows";
 import TetragramRender from "../Tetragram";
 
 // type Point = { x: number; y: number };
@@ -118,7 +117,7 @@ export default React.forwardRef(function AstroGeomancyChart(
     width,
     height,
   }: {
-    tetragrams: (Tetragram | null)[];
+    tetragrams: (TetragramRow | null)[];
     width?: CSSProperties["width"];
     height?: CSSProperties["width"];
   },
@@ -171,13 +170,9 @@ export default React.forwardRef(function AstroGeomancyChart(
         const tetragram = tetragrams[layout.geoFigIdx - 1];
         if (!tetragram) return null;
 
-        // const houseZodiac = zodiacs[house.zodiacId];
-        const tetragramZodiac =
-          tetragram.zodiacId && zodiacs[tetragram.zodiacId];
-
-        const tetragramPlanets = tetragram.planetIds.map(
-          (planetId) => planets[planetId],
-        );
+        // const houseZodiac = house.zodiac;
+        const tetragramZodiac = tetragram.zodiac;
+        const tetragramPlanets = tetragram.planets;
 
         return (
           <g key={layout.index}>
