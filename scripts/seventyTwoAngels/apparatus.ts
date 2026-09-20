@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import JSON5 from "json5";
 import { readExtraction } from "./extract";
-import { hebrewReadings } from "./hebrew";
+import { handReadings, hebrewReadings } from "./hebrew";
 import { plateEntries } from "./plateSource";
 import { disagreements } from "./validate";
 
@@ -60,7 +60,7 @@ function fromArithmetic(): Note[] {
         field: clash.field,
         printed: clash.scanned,
         used: clash.derived,
-        why: `The entry prints ${clash.scanned}; Lenain's own tables give ${clash.derived}.`,
+        why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
       });
     }
   }
@@ -78,9 +78,9 @@ function fromOrdinals(): Note[] {
       printed: `${entry.printedOrdinal}e`,
       used: String(entry.no),
       why:
-        `The heading is set "${entry.printedOrdinal}e", but the entry stands ` +
-        `between the ${entry.no - 1}th and the ${entry.no + 1}th, and the ` +
-        `first cabalistic table numbers it ${entry.no}.`,
+        `The entry stands between the ${entry.no - 1}th and the ` +
+        `${entry.no + 1}th, and the first cabalistic table numbers it ` +
+        `${entry.no}.`,
     }));
 }
 
@@ -93,21 +93,37 @@ function fromHebrew(): Note[] {
     ),
   );
 
+  const byHand = handReadings();
+
   return [...doubtful.entries()]
     .sort(([a], [b]) => a - b)
-    .map(([no, reading]) => ({
-      no,
-      kind: "reading" as const,
-      field: "name.he",
-      printed: reading.crop || reading.page || "",
-      used: "",
-      why:
-        `Read twice from the scan and differently each time — ` +
-        `${reading.crop || "nothing"} closer in, ${reading.page || "nothing"} ` +
-        `from the whole page. Lenain's Hebrew is small, dotted above the ` +
-        `letters, and two centuries old; no name is given here rather than ` +
-        `a guess between them.`,
-    }));
+    .map(([no, reading]) => {
+      const hand = byHand.get(no);
+      const disagreed =
+        `Two readings of the scan differed — ${reading.crop || "nothing"} ` +
+        `closer in, ${reading.page || "nothing"} from the whole page.`;
+
+      if (!hand)
+        return {
+          no,
+          kind: "reading" as const,
+          field: "name.he",
+          printed: reading.crop || reading.page || "",
+          used: "",
+          why: `${disagreed} No name is given rather than a guess between them.`,
+        };
+
+      return {
+        no,
+        kind: "reading" as const,
+        field: "name.he",
+        printed: hand.pointed,
+        used: hand.plain,
+        why:
+          `${disagreed} Read from the scan by Gadi Cohen, who reads Hebrew. ` +
+          `The dots sit above the letters, not within them.`,
+      };
+    });
 }
 
 function main() {

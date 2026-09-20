@@ -1183,6 +1183,14 @@ une liaison entre les êtres spirituels et les êtres matériels (1).
 
 > **(1)** (1) Voyez le livre intitulé la Thrëicie, ou la seule Voie des Sciences divines et humaines, édition de l'an 7, page 226.
 
+<small>
+
+**Editorial notes**
+
+- **presidingDays** · 20/3, 31/4, 11/8, 22/10, 2/1 → 20/3, 31/5, 11/8, 22/10, 2/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
+
 ---
 
 <small>**[p. 47]**</small>
@@ -1227,6 +1235,16 @@ Le génie contraire domine l'ignorance, le libertinage, et toutes les mauvaises 
 
 > **(1)** (1) Ce nom s'écrit avec quatre lettres en caractères égyptiens. L'h n'est point une lettre, et ne marque qu'une aspiration; et le théta grec ne forme qu'une lettre.
 
+<small>
+
+**Editorial notes**
+
+- **presidingDays** · 24/3, 4/6, 14/8, 26/10, 6/1 → 24/3, 4/6, 15/8, 26/10, 6/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **name.he** · לׄלּׄהאׄלּׄ → ללהאל — Two readings of the scan differed — ללהאל closer in, להאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **presidingDays** · 25/3, 5/6, 15/8, 27/10, 7/1 → 25/3, 5/6, 16/8, 27/10, 7/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
+
 ---
 
 <small>**[p. 50]**</small>
@@ -1241,6 +1259,16 @@ Le génie contraire est l'ennemi des lumières; il domine la négligence, la par
 
 8e. Cahethel .כהתאל Son attribut (Dieu adorable). Il correspond au saint nom Moti, d'après la langue des Géorgiens. Son rayon commence depuis le 36e. degré de la sphère jusqu'au 40e., inclusivement, correspondant à la quatrième décade et au génie nommé Asicat; il préside les jours suivants ; les 27 mars, 7 juin, 17 août, 29 octobre,
 
+<small>
+
+**Editorial notes**
+
+- **presidingDays** · 26/3, 6/6, 16/8, 28/10, 8/1 → 26/3, 6/6, 17/8, 28/10, 8/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **invocation** · 0:00 → 2:20 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **presidingDays** · 27/3, 7/6, 17/8, 29/10, 9/1 → 27/3, 7/6, 18/8, 29/10, 9/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
+
 ---
 
 <small>**[p. 51]**</small>
@@ -1250,6 +1278,15 @@ Le génie contraire est l'ennemi des lumières; il domine la négligence, la par
 Le mauvais génie provoque tout ce qui est nuisible aux productions de la terre; il porte l'homme à blasphémer contre Dieu.
 
 9e. Haziel. הזיאל Son attribut (Dieu de miséricorde). Il correspond au saint nom Agzi, d'après la langue des Abyssiniens. Son rayon commence depuis le 41e. degré jusqu'au 45e., inclusivement, correspondant à la cinquième décade et au génie nommé Erò; sous l'influence de la lune. Ce génie et ceux qui suivent, jusqu'au 16e., appartiennent au 2e. ordre des anges, que les orthodoxes appellent le chœur des chérubins. Il préside les jours suivants : 28 mars, 8 juin, 18 août, 30 octobre, 10 janvier. L'invocation se fait depuis 2 heures 40 minutes du matin jusqu'à 3 heures, en récitant le 6e. verset du psaume 24. (Reminiscere miserationum tuarum, Domine, et misericordiarum tuarum quæ à sæculo sunt.) Il sert pour obtenir la miséricorde de Dieu, l'amitié et les faveurs des grands, et l'exécution d'une promesse faite par une personne. Il domine la bonne foi et la réconciliation. Ceux qui sont nés sous cette influence seront sincères dans leurs promesses, et par-
+
+<small>
+
+**Editorial notes**
+
+- **planet** · la lune → luna — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **presidingDays** · 28/3, 8/6, 18/8, 30/10, 10/1 → 28/3, 8/6, 19/8, 30/10, 10/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
 
 ---
 
@@ -1265,6 +1302,16 @@ Le génie contraire influe sur ceux qui négligent leur santé et leurs affaires
 
 11°. Lauviah .לאויה Son attribut (Dieu loué et exalté). Il correspond au saint nom Deus, d'après la langue des Latins. Son rayon commence depuis le 51°. degré de la sphère jusqu'au 55°., inclusivement, correspondant à la 6°. décade et au génie nommé Rombomaré, sous l'influence de Saturne. Il préside les jours suivants : 30 mars, 10 juin, 20 août, 1 novembre, 12 janvier. L'heure favorable commence depuis 3 heures 20 minutes jusqu'à 4 heures. L'on prononce le 50°. verset du psaume 17. (Vivit Dominus et benedictus Deus meus, et exultatur Deus salutis meæ.)
 
+<small>
+
+**Editorial notes**
+
+- **degrees** · 41-50 → 46-50 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **presidingDays** · 29/3, 9/6, 19/8, 31/10, 11/1 → 29/3, 9/6, 20/8, 31/10, 11/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **presidingDays** · 30/3, 10/6, 20/8, 1/11, 12/1 → 30/3, 10/6, 21/8, 1/11, 12/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
+
 ---
 
 <small>**[p. 53]**</small>
@@ -1279,6 +1326,15 @@ Le génie contraire domine l'indiscrétion et le mensonge ; il influe sur tous c
 
 13°. Iezalel .יַדְלֻאל Son attribut (Dieu glorifié sur toutes choses). Il correspond au saint nom de Dieu Boog, d'après la langue des Illyriens. Son rayon commence depuis le 61°. degré de la sphère jusqu'au 65°., inclusivement, correspondant à la 7°. décade et au génie nommé Théosolk, sous l'influence de Jupiter. Il préside les jours ci-après : les 1 avril, 12 juin, 23 août, 3 septembre, 14 janvier. L'heure favorable commence depuis 4 heures jusqu'à 4 heures 20
 
+<small>
+
+**Editorial notes**
+
+- **name.he** · יזּלּׄאׄלּ → יזלאל — Two readings of the scan differed — יזלאל closer in, ידלאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **presidingDays** · 1/4, 12/6, 23/8, 3/9, 14/1 → 1/4, 12/6, 23/8, 3/11, 14/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
+
 ---
 
 <small>**[p. 54]**</small>
@@ -1292,6 +1348,14 @@ Le génie contraire domine l'ignorance, l'erreur et le mensonge, influe sur les 
 Le génie contraire domine la calomnie, les faux témoignages et les procédures.
 
 15e. Hariel הריאל Son attribut (Dieu créateur). Il correspond aux noms divins Idio ou Iddio, d'après la langue italienne. Son rayon commence depuis le 71e. degré jusqu'au 75e., inclusivement, correspondant à la 8e. décade et au génie nommé Ouêrê, sous l'influence de Mars. Il préside les jours suivants : 3 avril, 14 juin, 25 août, 5 no-
+
+<small>
+
+**Editorial notes**
+
+- **degrees** · 66-10 → 66-70 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
 
 ---
 
@@ -1317,6 +1381,15 @@ Le génie contraire domine l'athéisme, les philosophes impies et tous ceux qui 
 
 18e. Caliel. כליאל Son attribut est interprété (Dieu prompt à exaucer). Il correspond au nom Boog, suivant la
 
+<small>
+
+**Editorial notes**
+
+- **invocation** · 5:00 matin → 5:20 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **presidingDays** · 6/4, 17/6, 28/8, 8/11, 18/1 → 6/4, 17/6, 28/8, 8/11, 19/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
+
 ---
 
 <small>**[p. 57]**</small>
@@ -1326,6 +1399,14 @@ langue des Polonais. Son rayon commence depuis le 86e. degré de la sphère jusq
 Le génie contraire domine sur les procès scandaleux, il influe sur les hommes vils, bas et rampants, et sur ceux qui cherchent à embrouiller les affaires et à s'enrichir aux dépens de leurs clients.
 
 19e Leuviah. לוויה. Son attribut (Dieu qui exauce les pécheurs). Il correspond au nom Bogy, suivant la langue des Hongrois. Il gouverne le premier rayon du midi, qui commence depuis le 91e. degré de la sphère jusqu'au 95e., inclusivement, correspondant à la dixième décade et au génie nommé Sotis, sous l'influence de Vénus; il préside les jours suivants : les 7 avril, 18 juin, 29 août, 9 novembre, 20 janvier. L'on invoque le secours de ce génie vers le midi, depuis 6 heures du matin jusqu'à 6 heures 20 minutes, en récitant le 1er. verset du psaume 39. (Expectans expectavi Dominum, et intendit mihi.) Il sert pour obtenir la grâce de Dieu. Ce génie domine la mémoire et l'intelligence de l'homme. La personne qui est née sous
+
+<small>
+
+**Editorial notes**
+
+- **name.he** · לּׄוויׄה → לוויה — Two readings of the scan differed — לויה closer in, לוויה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+
+</small>
 
 ---
 
@@ -1341,6 +1422,14 @@ Le génie contraire domine l'irréligion, les apostats, les libertins et les ren
 
 21e Nelchael .נלכאל Son attribut (Dieu seul et unique). Il correspond au nom Bueg, suivant la langue des Bohémiens. Son rayon commence depuis le 101e. degré de la sphère jusqu'au 105e., inclusivement, correspondant à la 11e. décade et au génie nommé Sith, sous l'influence de Mercure. Il préside les jours ci-après : 9 avril, 20 juin, 31 août, 11 novembre, 22 janvier. L'invocation se fait depuis 6 heures 40 minutes du matin jusqu'à 7 heures. Il faut prononcer le 18e. verset du psaume 30. (Ego autem
 
+<small>
+
+**Editorial notes**
+
+- **degrees** · 95-100 → 96-100 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
+
 ---
 
 <small>**[p. 59]**</small>
@@ -1354,6 +1443,16 @@ Le mauvais génie domine l'ignorance, l'erreur et les préjugés.
 Le génie contraire domine sur les pirates, les corsaires et les esclaves; il influe sur les expéditions maritimes.
 
 23e. Melahel .מלהאל Son attribut (Dieu qui délivrez des maux). Il correspond au nom Dieh, d'après la langue des Hibernais. Son rayon commence depuis le 111e. degré
+
+<small>
+
+**Editorial notes**
+
+- **name.he** · יׄיׄיׄאׄלּׄ → יייאל — Two readings of the scan differed — לאיוי closer in, ייאיאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **presidingDays** · 10/4, 21/6, 1/9, 12/11, 22/1 → 10/4, 21/6, 1/9, 12/11, 23/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **name.he** · מלּׄהאׄלּׄ → מלהאל — Two readings of the scan differed — כלהאל closer in, מלהאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+
+</small>
 
 ---
 
@@ -1407,6 +1506,15 @@ Le génie contraire domine sur les catastrophes, les accidents, et cause les apo
 
 > **(1)** (1) Le nom Adad signifie seul; il vient du mot sol, qui désigne le soleil, auquel il correspond.
 
+<small>
+
+**Editorial notes**
+
+- **name.he** · שאׄהיׄה → שאהיה — Two readings of the scan differed — שאהוה closer in, שאהיה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · ריׄיׄאׄלּׄ → רייאל — Two readings of the scan differed — ריאל closer in, רויאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+
+</small>
+
 ---
 
 <small>**[p. 64]**</small>
@@ -1416,6 +1524,15 @@ et correspond au saint nom Zimi, d'après la langue des Péruviens. Son rayon co
 Le génie contraire domine le fanatisme et l'hypocrisie; il influe sur tous ceux qui propagent l'irréligion par des écrits et des maximes dangereuses.
 
 30°. Omael. ומאאל Son attribut (Dieu patient.) Il correspond au nom Tura, d'après la langue des Indiens. Son rayon commence depuis le 146°. degré de la sphère jusqu'au 150°., inclusivement, correspondant à la 9°. décade et au génie nommé Phuonisié. Il préside les jours suivants : 28 avril, 29 juin, 9 septembre, 20 novembre, 3ł janvier. L'invocation se fait depuis 9 heures 40 minutes du matin jusqu'à 10 heures : on prononce les noms divins et le 6°. verset du psaume 70. (Quoniam tu es patientia mea Domine : Domine spes mea à juventute mea.) Il sert contre les chagrins, le désespoir, et pour avoir de la patience. Ce génie domine sur le règne animal; il surveille la géné-
+
+<small>
+
+**Editorial notes**
+
+- **decade** · 9 → 15 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **presidingDays** · 28/4, 29/6, 9/9, 20/11, 31/1 → 18/4, 29/6, 9/9, 20/11, 31/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
 
 ---
 
@@ -1430,6 +1547,14 @@ Le génie contraire est l'ennemi de la propagation des êtres; il influe sur les
 Le génie contraire domine l'avarice et l'usure; il influe sur tous ceux qui s'enrichissent par des moyens illicites.
 
 32e. Vasariah .ושריה Son attribut (Dieu juste.) Il correspond au nom Anot, suivant la langue des Tartares. Son rayon commence depuis le 156e. degré de la sphère jusqu'au 160e., inclusivement, correspondant à la 16e. décade et au génie nommé Thumis. Il préside les jours
+
+<small>
+
+**Editorial notes**
+
+- **planet** · Soleil (Sun) → sol — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
 
 ---
 
@@ -1457,6 +1582,14 @@ Le génie contraire domine la discorde; il provoque la guerre, les trahisons, et
 
 35e. Chavakiah .כוקיה Son attribut (Dieu qui donne la joie.) Il correspond au nom Anup. Son rayon commence depuis le 171e. degré jusqu'au 175e., inclusivement, correspondant à la 18e. décade et au génie nommé Aphoso,
 
+<small>
+
+**Editorial notes**
+
+- **name.he** · לּׄההיׄה → לההיה — Two readings of the scan differed — לההיח closer in, לההיוח from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+
+</small>
+
 ---
 
 <small>**[p. 68]**</small>
@@ -1480,6 +1613,15 @@ Le génie contraire protège tous ceux qui cherchent à fuir à l'étranger pour
 Le génie contraire domine sur les esprits pervers; il influe sur les charlatans et sur tous ceux qui excellent dans l'art de tromper les hommes.
 
 38°. Haamiah .העמיה Son attribut (Dieu, l'espérance de tous les enfants de la terre). Il correspond au grand nom de Dieu Agla אֶגְלָא (Dieu triple et un). Suivant les cabalistes, ce nom est tiré de ce verset mystérieux de l'Écriture אתה גיבר לעולם אדני, qui signifie en français : Tu es
+
+<small>
+
+**Editorial notes**
+
+- **name.he** · אׄנואלּ → אנואל — Two readings of the scan differed — אנואל closer in, אניאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **invocation** · 0:00 → 12:20 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
 
 ---
 
@@ -1511,6 +1653,14 @@ Le génie contraire domine l'erreur et le mensonge, et influe sur tous ceux qui 
 
 > Comme chacun connaît l'analogie de la figure circulaire avec l'unité qui est le symbole parfait de Dieu, c'est pour cette raison qu'il faut se renfermer dans ce caractère mystérieux et au milieu d'un triangle, chaque fois que l'on procède aux évocations. (Voyez le Frontispice.)
 
+<small>
+
+**Editorial notes**
+
+- **name.he** · רהעאׄלּׄ → רהעאל — Two readings of the scan differed — רהאעל closer in, רהעאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+
+</small>
+
 ---
 
 <small>**[p. 72]**</small>
@@ -1522,6 +1672,14 @@ Le génie contraire est nommé Terre-Morte ou Terre-Damnée, suivant l'expressio
 40e. Ieiazel. יזיאל Son attribut (Dieu qui réjouit). Il correspond au saint nom Goed, d'après la langue des Belges. Son rayon commence depuis le 196e. degré de la sphère jusqu'au 200e., inclusivement, correspondant à la 20e. décade et au génie nommé Aterchinis. Il préside aux cinq jours suivants : 28 avril, 9 juillet, 19 septembre, 30 novembre, 10 février. L'invocation se fait depuis 1 heure du soir jusqu'à 1 heure 20 minutes. On prononce la demande avec les noms divins et le 15e. verset du psaume 87. (Ut quid Domine repellis orationem meam : avertis faciem tuam à me.) Ce psaume a des propriétés merveilleuses ; il sert pour délivrer les prisonniers, pour avoir des consolations, et pour être délivré de ses ennemis. Ce génie domine sur l'imprimerie et la librairie ; il influe sur les hommes de lettres et les artistes. La personne qui est née sous cette influence aimera la lecture, le dessin, et toutes les sciences en général.
 
 Le mauvais génie domine toutes les mauvaises qualités
+
+<small>
+
+**Editorial notes**
+
+- **name.he** · יׄיׄזּאׄלּׄ → ייזאל — Two readings of the scan differed — ייזאל closer in, יזיאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+
+</small>
 
 ---
 
@@ -1535,6 +1693,14 @@ Le génie contraire influe sur les apostats, les renégats, et sur tous ceux qui
 
 > **(1)** (1) Notez que ceux qui ont recours à ce génie dans leurs prières, doivent bien faire attention à son attribut et à son influence; car si vous lui faites une demande contraire à ses attributs, elle ne réussira pas.
 
+<small>
+
+**Editorial notes**
+
+- **name.he** · הההאׄלּׄ → הההאל — Two readings of the scan differed — ההאל closer in, ההאהל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+
+</small>
+
 ---
 
 <small>**[p. 74]**</small>
@@ -1544,6 +1710,15 @@ Le génie contraire influe sur les apostats, les renégats, et sur tous ceux qui
 Le génie contraire domine sur les traîtres ; il influe sur la malveillance, et sur tous ceux qui propagent de fausses nouvelles.
 
 43e. Veualiah וולוה. Son attribut (Roi dominateur). Il correspond au saint nom Solu, d'après la langue des Californiens. Son rayon commence depuis le 211e. degré de la sphère jusqu'au 215e., inclusivement, correspondant à la 22e. décade et au génie nommé Stochêné, sous l'influence de Mars. Il préside les jours suivants : 1 mai, 12 juillet, 22 septembre, 3 décembre, 13 février. L'invocation se fait depuis 2 heures du soir jusqu'à 2 heures 20 minutes en prononçant le 14e. verset du psaume 87. (Et ego ad te
+
+<small>
+
+**Editorial notes**
+
+- **degrees** · 216-210 → 206-210 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **name.he** · וולּּׄיׄה → ווליה — Two readings of the scan differed — וולויה closer in, וולוה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+
+</small>
 
 ---
 
@@ -1569,6 +1744,18 @@ Le génie contraire domine sur l'atmosphère ; il provoque les grandes chaleurs 
 
 36e. Ariel עוריאל. Son attribut (Dieu révélateur). Il correspond au saint nom Pino, d'après la langue des peuples du Paraguay. Son rayon commence depuis le 226e. degré de la sphère jusqu'au 130e., inclusivement, correspondant à la 23e. décade et au génie nommé Tépiseuth. Il préside les jours suivants : 4 mai, 15 juillet, 25 septembre, 6 décembre, 16 février. L'on invoque ce génie pour avoir des révélations ; on prononce la demande avec les noms divins et le 9e. verset du psaume 144. (Suavis Dominus universis : et miserationes ejus super omnia opera ejus.) Il
 
+<small>
+
+**Editorial notes**
+
+- **name.he** · סאׄלּׄיׄה → סאליה — Two readings of the scan differed — סאליה closer in, סאלוה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **planet** · Sol (the Sun) → sol — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **degrees** · 226-130 → 226-230 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **name.he** · עריׄאׄלּׄ → עריאל — Two readings of the scan differed — עריאל closer in, עוריאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **ordinal** · 36e → 46 — The entry stands between the 45th and the 47th, and the first cabalistic table numbers it 46.
+
+</small>
+
 ---
 
 <small>**[p. 77]**</small>
@@ -1580,6 +1767,14 @@ Le génie contraire cause les tribulations d'esprit; il porte les hommes à comm
 47e. Asaliah .השׁלוה Son attribut (Dieu juste, qui indique la vérité). Il correspond au nom Hana, d'après la langue des peuples du Chili. Son rayon commence depuis le 231e. degré jusqu'au 235e., inclusivement, correspondant à la 24e. décade et au génie nommé Siêmé, sous l'influence de Vénus. Il préside les jours suivants : 5 mai, 16 juillet, 26 septembre, 7 décembre, 17 février. L'invocation se fait depuis 3 heures 20 minutes du soir jusqu'à 3 heures 40, en prononçant le 25e. verset du psaume 104. (Quàm magnificata sunt opera tua Domine! omnia in sapientia fecisti : impleta est terra possessione tua.) Il sert pour louer Dieu et pour s'élever vers lui lorsqu'il nous envoie des lumières. Ce génie domine sur la justice, et fait connaître la vérité dans les procédures ; il influue sur les hommes probes, et sur ceux qui élèvent leur esprit à la contemplation des choses divines. La personne qui est née sous cette influence est douée d'un caractère agréable; elle sera passionnée pour acquérir des lumières secrètes.
 
 Le génie contraire domine sur les actions immorales et
+
+<small>
+
+**Editorial notes**
+
+- **name.he** · עּשלּׄיׄה → עשליה — Two readings of the scan differed — עשליה closer in, השלוה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+
+</small>
 
 ---
 
@@ -1595,6 +1790,14 @@ Le génie contraire domine sur le luxe, la stérilité et l'inconstance; il met 
 
 > **(1)** (1) Le saint nom Zaca correspond au nom Zacael et au psaume 41, quemadmodum, etc. (Voyez à ce sujet la cabale des psaumes.) Il sert pour délivrer les âmes du purgatoire, pour acquérir tous les biens spirituels et temporels, et pour avoir des révélations en songe. Il faut que la demande soit juste et qu'elle soit agréable à Dieu.
 
+<small>
+
+**Editorial notes**
+
+- **invocation** · 9:00 soir → 16:00 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
+
 ---
 
 <small>**[p. 79]**</small>
@@ -1606,6 +1809,14 @@ Le génie contraire influue sur les hommes égoïstes ; il domine sur la haine e
 50e. Daniel דניאל. Son attribut (le Signe des miséricordes), et suivant d'autres, l'Ange des confessions (1). Il correspond au saint nom Pola, d'après la langue des Samaritains. Son rayon commence depuis le 246e. degré de la sphère jusqu'au 145e., inclusivement, correspond à la 25e. décade et au génie nommé Eregbuo. Il préside les jours suivants : 8 mai, 19 juillet, 29 septembre, 10 décembre, 20 février. L'invocation se fait depuis 4 heures 20
 
 > **(1)** Kircher, Œdipus Égyptiacus, tome 2e., pages 266 et 267.
+
+<small>
+
+**Editorial notes**
+
+- **degrees** · 246-145 → 246-250 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
 
 ---
 
@@ -1631,6 +1842,16 @@ Le génie contraire domine l'orgueil, le blasphême et la méchanceté; il influ
 
 53e. Nanael. ננאאל Son attribut (Dieu qui abaisse les or-
 
+<small>
+
+**Editorial notes**
+
+- **name.he** · עּממיׄה → עממיה — Two readings of the scan differed — עמכמוה closer in, עמביה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **degrees** · 216-265 → 261-265 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **name.he** · ננאׄאׄלּׄ → ננאאל — Two readings of the scan differed — נכאאל closer in, ננאאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+
+</small>
+
 ---
 
 <small>**[p. 82]**</small>
@@ -1642,6 +1863,14 @@ Le génie contraire domine l'ignorance et toutes les mauvaises qualités du corp
 54e. Nithael צוֹהיאֵל Son attribut (Roi des cieux). Il
 
 > **(1)** (1) Le saint nom Obra correspond au psaume 132, d'après la cabale. Ce psaume nous apprend que tous les hommes doivent s'aimer comme des frères, qu'ils doivent être unis entre eux, et doivent vivre tous ensemble. Il sert pour obtenir l'amitié et les faveurs de ceux que l'on désire, et pour vivre en paix avec tout le monde.
+
+<small>
+
+**Editorial notes**
+
+- **name.he** · ניׄתאׄלׄ → ניתאל — Two readings of the scan differed — ניתהאל closer in, צוהיאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+
+</small>
 
 ---
 
@@ -1674,6 +1903,15 @@ Le génie contraire domine l'ambition et l'orgueil : il influe sur tous ceux qui
 Le génie contraire domine sur les trahisons, cause la mésintelligence entre les chefs ; il influe sur les hommes pusillanimes, et ceux qui attaquent les personnes sans défense.
 
 58e. Ieialel .יהיאל Son attribut (Dieu qui exauce les générations). Il correspond au saint nom Para, suivant la langue des Célamites. Son rayon commence depuis le 286e. degré de la sphère jusqu'au 290e., inclusivement, correspondant à la 29e. décade et au génie nommé Epima. Il préside aux cinq jours suivants : 16 mai, 27 juillet, 7 octobre, 18 décembre, 28 février. L'invocation se fait depuis 7 heures du soir jusqu'à 7 heures 20 minutes.
+
+<small>
+
+**Editorial notes**
+
+- **name.he** · נממיה → נממיה — Two readings of the scan differed — נמחיה closer in, נמכויה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **name.he** · יׄיׄלּׄאׄלּׄ → יילאל — Two readings of the scan differed — ייאל closer in, יהיאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+
+</small>
 
 ---
 
@@ -1711,6 +1949,14 @@ Le génie contraire influe sur les libertins, et particulièrement ceux qui se l
 
 62e. Iah-hel .יההאל Son attribut (Être suprême). Il correspond au nom Suna, suivant la langue des anciens Carmaniens. Son rayon commence depuis le 306e. degré de la sphère jusqu'au 301e., inclusivement, correspondant à la 31e. décade et au génie nommé Oroasoer. Il préside les jours suivants : 20 mai, 31 juillet, 11 octobre, 22 décembre, 4 mars. L'invocation se fait depuis 8 heures 20 minutes du soir jusqu'à 8 heures 40; il faut prononcer le 159e. verset du psaume 118. (Vide quoniam mandata tua dilexi Domine, in misericordiâ tuâ vivifica me.) Il sert pour acquérir la sagesse. Ce génie domine sur les philosophes, les illuminés et tous ceux qui veulent se retirer du monde. La personne qui est née sous cette influence aimera la tranquillité et la solitude ; elle remplira exactement les devoirs de son état, et elle se distinguera par sa modestie et ses vertus.
 
+<small>
+
+**Editorial notes**
+
+- **degrees** · 306-301 → 306-310 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
+
 ---
 
 <small>**[p. 89]**</small>
@@ -1722,6 +1968,16 @@ Le génie contraire influe sur tout ce qui porte au scandale ; il domine sur le 
 Le génie contraire domine la folie et la prodigalité ; il influe sur tous ceux qui se ruinent par leur mauvaise conduite.
 
 64e. Mehiel מהיאל. Son attribut (Dieu qui vivifie toutes choses). Il correspond au saint nom Alli, d'après la langue des Mongols. Son rayon commence depuis le 316e. degré de la sphère jusqu'au 220e., inclusivement, correspondant à la 32e. décade et au génie nommé Astiro. Il préside les jours suivants : 22 mai, 2 août, 13 octobre, 24 décembre, 6 mars. L'invocation se fait depuis 9 heures du soir jusqu'à 9 heures 20 minutes, en prononçant les
+
+<small>
+
+**Editorial notes**
+
+- **choir** · le chœur des anges → Archangels — Lenain opens the ninth choir here and ends the eighth at the sixty-third, making one of seven and one of nine. His own first eight declarations fall on the first, ninth, seventeenth and so on — eight apiece — and Agrippa and Kircher have it so. The pattern is followed and the departure noted.
+- **choir** · the choir of angels (9th order) → Archangels — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **degrees** · 316-220 → 316-320 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
 
 ---
 
@@ -1747,6 +2003,14 @@ Le génie contraire influe sur toutes les mauvaises qualités physiques et moral
 
 67e. Eïael איעאל. Son attribut (Dieu, délice des enfants des hommes). Il correspond au nom Bogo, suivant la langue des Albanais. Son rayon commence depuis le 331e. degré jusqu'au 335e., inclusivement, correspondant à la 34e., décade et au génie nommé Abiou, sous l'influence de Saturne. Il préside les jours suivants : 25 mai, 5 août, 16 octobre, 27 décembre, 9 mars. L'on invoque ce génie
 
+<small>
+
+**Editorial notes**
+
+- **name.he** · אׄיעּאׄלּׄ → איעאל — Two readings of the scan differed — אויאל closer in, איעאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+
+</small>
+
 ---
 
 <small>**[p. 92]**</small>
@@ -1758,6 +2022,15 @@ Le génie contraire domine l'erreur, les préjugés, et ceux qui propagent des s
 68e. Habuhiah הבוה. Son attribut (Dieu qui donne avec libéralité.). Il correspond au saint nom Dépos, d'après la langue des Péloponésiens. Son rayon commence depuis le 337e. degré de la sphère jusqu'au 340e., inclusivement, correspondant à la 34e. décade et au génie nommé Archatapias. Il préside les jours suivants : 26 mai, 6 août, 17 octobre, 28 décembre, 10 mars. L'invocation se fait depuis 10 heures 20 minutes du soir jusqu'à 10 heures 40, en récitant le 1er. verset du psaume 105. Confitemini Domino, quoniam bonus : quoniam in sæculum misericordia ejus.) Il sert pour conserver la santé et pour guérir les maladies. Ce génie domine sur l'agriculture et la fécondité. La personne qui est née sous cette influence aimera la campagne, la chasse, les jardins, et tout ce qui se rapporte à l'agriculture.
 
 Le génie contraire domine sur la stérilité ; il cause la
+
+<small>
+
+**Editorial notes**
+
+- **degrees** · 337-340 → 336-340 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **name.he** · הבויׄה → הבויה — Two readings of the scan differed — הבויה closer in, הבוה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+
+</small>
 
 ---
 
@@ -1772,6 +2045,14 @@ Le génie contraire domine sur les procès, les testaments et les legs qui se fo
 70e. Jabamiah יבמויה (1). Son attribut (Verbe qui pro-
 
 > **(1)** (1) L'Abbé de Villars dit que ce nom exprime l'éternelle fécondité de Dieu (voyez le comte de Gabalis, 4e. entretien). On trouve cet ouvrage dans le Recueil des voyages imaginaires et romans cabalistiques, tome 34. L'auteur raconte à ce sujet une histoire singulière : « Lorsque Noé errait sur les flots vengeurs qui inon- » daient l'univers, les femmes étaient alors réduites à un petit
+
+<small>
+
+**Editorial notes**
+
+- **name.he** · יׄבמיׄה → יבמיה — Two readings of the scan differed — יבמיה closer in, יבמויה from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+
+</small>
 
 ---
 
@@ -1796,6 +2077,15 @@ Le génie contraire domine l'athéisme, et tous ceux qui propagent des écrits d
 > » son entier. Cette histoire, mal entendue, a fait dire aux Grecs » que le plus vieux des Dieux avait été châtré par un de ses » enfants. »
 
 > L'on voit, dans les Lettres cabalistiques, que le salut des cabalistes se faisait en Jabamiah et par Jabamiah.
+
+<small>
+
+**Editorial notes**
+
+- **name.he** · היׄיׄאׄלּׄ → הייאל — Two readings of the scan differed — היאאל closer in, היוייאל from the whole page. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **presidingDays** · 29/5, 9/8, 20/10, 31/12, 14/3 → 29/5, 9/8, 20/10, 31/12, 13/3 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+
+</small>
 
 ---
 

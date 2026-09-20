@@ -1,11 +1,13 @@
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import JSON5 from "json5";
+import type { Note } from "./apparatus";
 import {
   continuesParagraph,
   type PageBlock,
   type PageTranscription,
 } from "./pageSchema";
+import { plateEntries } from "./plateSource";
 import { readPage } from "./transcribe";
 
 /**
@@ -101,13 +103,52 @@ function fold(blocks: PageTranscription["blocks"]) {
   return folded;
 }
 
-function pageToMarkdown(page: PageTranscription) {
+/**
+ * Our notes, set apart from Lenain's own. His are blockquotes, as he printed
+ * them; ours are a list under a heading that says whose they are, so a reader
+ * can always tell 1823 from now. Keeping the two apparatus separate is the
+ * whole point of having one.
+ */
+function notesToMarkdown(notes: Note[]) {
+  if (!notes.length) return "";
+  const lines = notes.map((note) => {
+    const change = note.printed
+      ? note.used
+        ? `${note.printed} → ${note.used}`
+        : `${note.printed}, kept as printed`
+      : note.used;
+    return `- **${note.field}**${change ? ` · ${change}` : ""} — ${note.why}`;
+  });
+  return `<small>\n\n**Editorial notes**\n\n${lines.join("\n")}\n\n</small>`;
+}
+
+function pageToMarkdown(page: PageTranscription, notes: Note[]) {
   const body = fold(page.blocks)
     .map(blockToMarkdown)
     .filter(Boolean)
     .join("\n\n");
   const number = page.printedPage > 0 ? `p. ${page.printedPage}` : "unnumbered";
-  return `---\n\n<small>**[${number}]**</small>\n\n${body}`;
+  const apparatus = notesToMarkdown(notes);
+  return `---\n\n<small>**[${number}]**</small>\n\n${body}${apparatus ? `\n\n${apparatus}` : ""}`;
+}
+
+/** Which notes belong to which printed page, by way of the genius they concern. */
+function notesByPage(): Map<number, Note[]> {
+  const notes: Note[] = JSON5.parse(
+    readFileSync("data/kabbalah/lenain/apparatus.json5", "utf8"),
+  );
+  const pageOf = new Map(
+    plateEntries().map((entry) => [entry.no, entry.printedPages[0]]),
+  );
+
+  const byPage = new Map<number, Note[]>();
+  for (const note of notes) {
+    // A note about the book at large belongs to no single page.
+    const page = note.no === 0 ? undefined : pageOf.get(note.no);
+    if (page === undefined) continue;
+    byPage.set(page, [...(byPage.get(page) ?? []), note]);
+  }
+  return byPage;
 }
 
 function main() {
@@ -134,6 +175,7 @@ function main() {
   }
   if (!pages.length) throw new Error("No pages have been read yet");
 
+  const byPage = notesByPage();
   const dataPath = `${outDir}${DATA_PATH}`;
   const markdownPath = `${outDir}${MARKDOWN_PATH}`;
   for (const path of [dataPath, markdownPath])
@@ -143,7 +185,9 @@ function main() {
   writeFileSync(dataPath, `${HEADER}${JSON5.stringify(pages, null, 2)}\n`);
   writeFileSync(
     markdownPath,
-    `${MARKDOWN_HEADER}${pages.map(pageToMarkdown).join("\n\n")}\n`,
+    `${MARKDOWN_HEADER}${pages
+      .map((page) => pageToMarkdown(page, byPage.get(page.printedPage) ?? []))
+      .join("\n\n")}\n`,
   );
 
   const blocks = pages.flatMap((page) => page.blocks);
