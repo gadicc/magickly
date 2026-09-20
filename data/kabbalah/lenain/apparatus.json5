@@ -423,7 +423,7 @@
     no: 64,
     kind: 'correction',
     field: 'choir',
-    printed: 'angels',
+    printed: 'anges',
     used: 'Archangels',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
   },

@@ -1972,7 +1972,7 @@ Le génie contraire domine la folie et la prodigalité ; il influe sur tous ceux
 **Editorial notes**
 
 - **choir** · le chœur des anges → Archangels — Lenain opens the ninth choir here and ends the eighth at the sixty-third, making one of seven and one of nine. His own first eight declarations fall on the first, ninth, seventeenth and so on — eight apiece — and Agrippa and Kircher have it so. The pattern is followed and the departure noted.
-- **choir** · angels → Archangels — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **choir** · anges → Archangels — Lenain's own tables give otherwise, and the rest of the book keeps to them.
 - **degrees** · 316-220 → 316-320 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
 
 </small>

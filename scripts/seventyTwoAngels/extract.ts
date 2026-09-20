@@ -62,8 +62,11 @@ His French is of 1823, and several words do not mean what they look like. Read t
 he meant them:
 - « vers le midi » is a direction — facing south. It is not the time of day; the hour \
   of invocation is given separately.
-- « du soir » means after noon, so « 1 heure 20 minutes du soir » is twenty past one in \
-  the afternoon, not in the evening. « du matin » is before noon.
+- « du soir » covers everything after noon, not the evening alone, so the hour decides \
+  the English: « 1 heure 20 minutes du soir » is twenty past one in the afternoon, \
+  « 7 heures du soir » is seven in the evening, « 11 heures 40 minutes du soir » is \
+  twenty to midnight. Say what an English speaker would say of that hour. « du matin » \
+  is before noon.
 - « les lumières » is knowledge or enlightenment, and « la propagation des lumières » \
   is the spread of learning, not of light.
 - « dilapidations » is the squandering of money or property, not disrepair.
@@ -73,6 +76,10 @@ he meant them:
 - « la mémoire heureuse » is a retentive memory, not a happy one.
 - « Dieu qui réjouit » is God who gives joy, not God who rejoices.
 - « obtenir la grâce de ceux… » is obtaining pardon FOR them, not from them.
+- « perdre sa postérité » is to bring ruin on one's descendants, not to mislay them.
+- the pronoun « en » points back at the thing just named: after « Ce génie domine sur le \
+  fer », « tous ceux qui en font le commerce » is all who trade in IT, the iron — not \
+  in the armourers and locksmiths listed between.
 
 Translate what he printed, including where he is wrong. « le 31 avril » is an \
 impossible date and it is translated "the 31st of April"; a Latin verse he misquotes is \
@@ -99,10 +106,11 @@ one or two sentences each.
 and they do it in three ways: « Il domine sur les Hébreux », « suivant la langue des \
 peuples du Congo », and — easily missed — as an adjective, « d'après la langue \
 espagnole », « suivant la langue irlandaise ». That last form names a nation as much as \
-the others do. Name the PEOPLE, as Lenain does, not the territory: « les Grecs » is \
-"the Greeks" and not "Greece", « la langue espagnole » is "the Spanish" and not "Spain", \
-« les Crétois » is "the Cretans" and not "Crete". Give them alone, as a short noun \
-phrase — "the Mongols", "the Hebrews" — never the sentence around it, and never the name of God, which belongs in \
+the others do. Follow him: where he names a people, name that people — « les Grecs » \
+is "the Greeks" and not "Greece", « la langue espagnole » is "the Spanish", « les \
+Crétois » is "the Cretans" — and where he names a country, keep the country, as in \
+« il domine sur la Thrace ou la Roumélie », which is "Thrace or Roumelia" and not "the \
+Thracians". Give it alone, as a short noun phrase, never the sentence around it, and never the name of God, which belongs in \
 "godName". "godName" is the divine name the entry gives for that people — Jehovah, \
 Théos, Orsy, Bogo — and never the genius's own name, which is already in "name". The formula « la langue de X » always names the people, whether or not they \
 are a nation on a modern map: « les anciens Béthuliens » and « les Mages » belong there \
