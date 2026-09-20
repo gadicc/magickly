@@ -41,7 +41,15 @@ import data from "./data";
 const SAMPLE: Record<string, { row: string; keys: string[] }> = {
   planet: {
     row: "primum-mobile",
-    keys: ["id", "name", "hebrewLetter", "godName", "archangel", "sephirot"],
+    keys: [
+      "id",
+      "kind",
+      "name",
+      "hebrewLetter",
+      "godName",
+      "archangel",
+      "sephirot",
+    ],
   },
   zodiac: {
     row: "aries",

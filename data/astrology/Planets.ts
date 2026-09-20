@@ -5,15 +5,35 @@ import type { Links, Raw } from "../types";
 type PlanetKey = keyof typeof rows;
 
 /**
- * A planet's key. The table also holds `primum-mobile`, `zodiac` and
- * `olam-yesodot`, which the sephirot point at through `planetId` but which
- * are spheres of the Tree rather than planets: they have a name and nothing
- * else, no symbol among it. Derived from that, so a row joins by carrying
- * one, rather than from a list that would drift.
+ * The planets, as against the three spheres of the Tree the table also holds:
+ * `primum-mobile`, `zodiac` and `olam-yesodot`, which the sephirot point at
+ * through `planetId` but which have a name and nothing else. Which a row is,
+ * it now says itself, in `kind` (plan 032, decision 14).
+ *
+ * The twelve are nonetheless written out here, because a JSON import widens
+ * `"planet"` to `string`: no literal type can be read back off the field, so
+ * `kind` cannot do this half of the work. `satisfies` checks every member
+ * against the table's keys, and [the integrity check](../integrity.ts)
+ * asserts the other direction — that these are exactly the rows of kind
+ * `"planet"` — so the list and the data cannot drift apart.
  */
-type PlanetId = {
-  [K in PlanetKey]: (typeof rows)[K] extends { symbol: string } ? K : never;
-}[PlanetKey];
+const PLANET_IDS = [
+  "sol",
+  "mercury",
+  "venus",
+  "earth",
+  "luna",
+  "mars",
+  "jupiter",
+  "saturn",
+  "uranus",
+  "neptune",
+  "rahu",
+  "ketu",
+] as const satisfies readonly PlanetKey[];
+
+/** A planet's key: one of the twelve above, never one of the three spheres. */
+type PlanetId = (typeof PLANET_IDS)[number];
 
 /**
  * A row, which may carry the links `assemble()` makes: the barrel's rows have
@@ -25,4 +45,5 @@ type Planet = Raw<"planet"> & Partial<Links<"*", "planet">>;
 type Planets = Record<PlanetKey, Planet>;
 
 export type { Planet, PlanetId, PlanetKey, Planets };
+export { PLANET_IDS };
 export default rows;

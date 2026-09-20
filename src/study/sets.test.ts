@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { PLANET_IDS } from "../../data/astrology/Planets";
 import getSet, { sets } from "./sets";
 
 // The study API route loads these sets, and Turbopack gives route handlers no
@@ -12,6 +13,13 @@ describe("study sets", () => {
     for (const id of Object.keys(sets))
       expect(Object.keys(getSet(id).data).length, id).toBeGreaterThan(0);
     expect(() => getSet("missing")).toThrow("No such set");
+  });
+
+  it("ask the twelve planets' signs, and no sphere of the Tree", () => {
+    // The set filters the planet table by the `kind` its rows now declare,
+    // where it used to ask whether the row had a `symbol`; the cards are the
+    // same twelve either way (plan 032, decision 14).
+    expect(Object.keys(getSet("planet-signs").data)).toEqual([...PLANET_IDS]);
   });
 
   it("name the Enochian question font", () => {

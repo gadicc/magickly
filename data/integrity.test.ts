@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import type { PlanetId } from "./astrology/Planets";
+import { PLANET_IDS } from "./astrology/Planets";
 import { checkIntegrity, type Failure } from "./integrity";
 import { type Tables, tables } from "./tables";
 
@@ -19,29 +19,6 @@ import { type Tables, tables } from "./tables";
  * the last two are about that command rather than the data: that it says
  * everything wrong at once, and that both builds run it.
  */
-
-/**
- * What `PlanetId` means today: the planet rows, as against the three spheres
- * of the Tree the table also holds. It is derived from carrying a `symbol`
- * (plan 032, decisions), which is a fact of the data rather than a declared
- * one, so the list is written out here and typed, and the test below says
- * the derivation still picks exactly it. Step 3 gives the rows an explicit
- * kind and this becomes redundant.
- */
-const PLANETS: PlanetId[] = [
-  "sol",
-  "mercury",
-  "venus",
-  "earth",
-  "luna",
-  "mars",
-  "jupiter",
-  "saturn",
-  "uranus",
-  "neptune",
-  "rahu",
-  "ketu",
-];
 
 /** The real tables with one of them replaced by something wrong. */
 const broken = (name: keyof Tables, table: unknown) =>
@@ -175,11 +152,38 @@ describe("the data against the graph", () => {
     ]);
   });
 
-  it("gives a symbol to exactly the twelve planets, and to no sphere", () => {
-    const withSymbol = Object.entries(tables.planet)
-      .filter(([, row]) => "symbol" in row)
-      .map(([id]) => id);
-    expect(withSymbol).toEqual(PLANETS);
+  it("holds twelve planets and three spheres of the Tree", () => {
+    const byKind = (kind: string) =>
+      Object.entries(tables.planet)
+        .filter(([, row]) => row.kind === kind)
+        .map(([id]) => id);
+    expect(byKind("planet")).toEqual([...PLANET_IDS]);
+    expect(byKind("sphere")).toEqual([
+      "primum-mobile",
+      "zodiac",
+      "olam-yesodot",
+    ]);
+  });
+
+  it("counts a row PLANET_IDS and the data disagree about", () => {
+    // The twelve are a list in TypeScript because a JSON import widens
+    // `"planet"` to `string`, so `PlanetId` cannot be read off `kind`. This
+    // check is the other direction, and it has to bite in both.
+    const failures = broken("planet", {
+      ...tables.planet,
+      zodiac: { ...tables.planet.zodiac, kind: "planet" },
+      ketu: { ...tables.planet.ketu, kind: "sphere" },
+    });
+    expect(of("derived", failures)).toEqual([
+      'planet.zodiac: of kind "planet", and not in PLANET_IDS',
+      'planet.ketu: of kind "sphere", and in PLANET_IDS',
+    ]);
+
+    const gone = { ...tables.planet } as Record<string, unknown>;
+    delete gone.ketu;
+    expect(of("derived", broken("planet", gone))).toEqual([
+      "planet.ketu: in PLANET_IDS, and not a row of the table",
+    ]);
   });
 
   it("leaves only Da'at outside a chain", () => {

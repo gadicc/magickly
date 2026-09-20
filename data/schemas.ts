@@ -76,6 +76,8 @@ function ids(
 export const schemas = {
   planet: v.strictObject({
     id: v.string(),
+    /** Which of the two things this table holds the row is: required of both. */
+    kind: v.picklist(["planet", "sphere"]),
     name: v.strictObject({
       en,
       he: v.optional(

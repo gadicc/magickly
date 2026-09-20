@@ -1,10 +1,12 @@
 /**
  * Whether the data says what [the graph](./graph.ts) says it says.
  *
- * Six questions, and a list of everything that answers wrongly: is every
- * id-shaped field declared, and is everything declared there; do the links
- * resolve; does the arity match; are the chains whole; and does every row
- * pass its [schema](./schemas.ts)? Nothing throws and nothing is fatal here —
+ * A handful of questions, and a list of everything that answers wrongly: is
+ * every id-shaped field declared, and is everything declared there; do the
+ * links resolve; does the arity match; are the chains whole; does every row
+ * pass its [schema](./schemas.ts); and do the few lists TypeScript has to
+ * hold by hand still say what the data says? Nothing throws and nothing is
+ * fatal here —
  * [integrity.test.ts](./integrity.test.ts) asserts the list is empty, and
  * [check.ts](./check.ts) is the same list on the command line, which
  * `pnpm build` runs before Next sees the data.
@@ -14,6 +16,7 @@
 
 import * as v from "valibot";
 import { assemble, problemsOf } from "./assemble";
+import { PLANET_IDS } from "./astrology/Planets";
 import { graph } from "./graph";
 import type { TableSpec } from "./graphSpec";
 import { schemas } from "./schemas";
@@ -28,7 +31,9 @@ export interface Failure {
     | "arity"
     | "link"
     | "chain"
-    | "schema";
+    | "schema"
+    /** A list written in TypeScript that the data no longer agrees with. */
+    | "derived";
   /** `table`, `table.row` or `table.row.field`. */
   where: string;
   detail: string;
@@ -131,6 +136,41 @@ function checkChain(
   return failures;
 }
 
+/**
+ * [`PLANET_IDS`](./astrology/Planets.ts) against the table it names: the rows
+ * of kind `"planet"`, exactly, in both directions. The list is written out
+ * because a JSON import widens `"planet"` to `string`, so the twelve cannot
+ * be an `Extract` over the field the way they would be off an `as const`
+ * module; this is the half of the guarantee the type system cannot give
+ * (plan 032, decision 14).
+ */
+function checkPlanetIds(table: unknown): Failure[] {
+  const failures: Failure[] = [];
+  const listed = new Set<string>(PLANET_IDS);
+  const rows = new Map(rowsOf(table));
+
+  for (const [id, row] of rows)
+    if ((row.kind === "planet") !== listed.has(id))
+      failures.push({
+        check: "derived",
+        where: `planet.${id}`,
+        detail:
+          row.kind === "planet"
+            ? 'of kind "planet", and not in PLANET_IDS'
+            : `of kind ${JSON.stringify(row.kind)}, and in PLANET_IDS`,
+      });
+
+  for (const id of listed)
+    if (!rows.has(id))
+      failures.push({
+        check: "derived",
+        where: `planet.${id}`,
+        detail: "in PLANET_IDS, and not a row of the table",
+      });
+
+  return failures;
+}
+
 /** Everything wrong with the data, as the graph and the schemas see it. */
 export function checkIntegrity(input: Tables = realTables): Failure[] {
   const failures: Failure[] = [];
@@ -196,6 +236,8 @@ export function checkIntegrity(input: Tables = realTables): Failure[] {
         });
     }
   }
+
+  failures.push(...checkPlanetIds(input.planet));
 
   // Everything assembling the tables found: an id no row is keyed by, a
   // mirror that does not point back, a back-link two rows claim, and an
