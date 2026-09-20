@@ -21,7 +21,7 @@ printed on, as he set them.
 
 ---
 
-<small>**[unnumbered]**</small>
+<small id="leaf-7">**[unnumbered]**</small>
 
 ## LA SCIENCE
 
@@ -29,7 +29,7 @@ printed on, as he set them.
 
 ---
 
-<small>**[unnumbered]**</small>
+<small id="leaf-8">**[unnumbered]**</small>
 
 ## A PARIS,
 
@@ -43,7 +43,7 @@ Les exemplaires de cet Ouvrage ont été déposés à la Bibliothèque royale. J
 
 ---
 
-<small>**[unnumbered]**</small>
+<small id="leaf-9">**[unnumbered]**</small>
 
 ## LA SCIENCE
 
@@ -69,13 +69,13 @@ Chez L'AUTEUR, au Cabinet de lecture, place Saint-Firmin, N. I.
 
 ---
 
-<small>**[unnumbered]**</small>
+<small id="leaf-10">**[unnumbered]**</small>
 
 
 
 ---
 
-<small>**[unnumbered]**</small>
+<small id="leaf-11">**[unnumbered]**</small>
 
 Aucune publication ne pouvait davantage profiter au progrès des études kabbalistiques que la réédition du rarissime opuscule de Lenain.
 
@@ -89,7 +89,7 @@ Mais je ne saurais trop répéter que, sans l'assistance
 
 ---
 
-<small>**[p. 4]**</small>
+<small id="p-IV">**[p. IV]**</small>
 
 du plan invisible, aucun progrès réel ne peut être accompli dans ces études.
 
@@ -99,7 +99,7 @@ Pour la Chambre de Direction de l'Ordre, Dr Papus, Grand-Maître de l'ordre Kabb
 
 ---
 
-<small>**[unnumbered]**</small>
+<small id="leaf-13">**[unnumbered]**</small>
 
 ## AVERTISSEMENT.
 
@@ -111,7 +111,7 @@ Je me suis donc borné à écrire le plus clairement et le plus simplement possi
 
 ---
 
-<small>**[p. 6]**</small>
+<small id="p-vj">**[p. vj]**</small>
 
 J'ai remarqué, en outre, que tous ceux qui ont écrit sur les Sciences occultes ont tous voilé leurs écrits, les uns par des énigmes, les autres par des symboles et des emblêmes ; d'autres se sont servi des fables de la Mythologie (*), afin de cacher leurs mystères aux profanes : de manière que leurs secrets n'étaient connus que de leurs adeptes.
 
@@ -123,7 +123,7 @@ Enfin, le fruit de mes recherches et de mes veilles m'a conduit à la connaissan
 
 ---
 
-<small>**[p. 7]**</small>
+<small id="p-vij">**[p. vij]**</small>
 
 cation et la manière de les composer, pour qu'ils soient favorables à ceux qui les invoquent ; à cet effet, je les ai distribués par ordre, dans la sphère cabalistique.
 
@@ -133,13 +133,13 @@ Voici, Lecteur, le produit de mes recherches ; je désire qu'elles vous soient a
 
 ---
 
-<small>**[unnumbered]**</small>
+<small id="leaf-16">**[unnumbered]**</small>
 
 
 
 ---
 
-<small>**[p. 1]**</small>
+<small id="p1">**[p. 1]**</small>
 
 ## LA SCIENCE CABALISTIQUE.
 
@@ -157,7 +157,7 @@ La première proportion du compas, c'est-à-dire la première figure géométriq
 
 ---
 
-<small>**[p. 2]**</small>
+<small id="p2">**[p. 2]**</small>
 
 bre 10. Il faut nécessairement s'appuyer sur un point sans lequel on ne peut agir; si vous prolongez ce point, vous en faites une ligne; en prolongeant cette ligne, vous en faites une surface, et en parcourant cette surface, vous en faites un corps qui a la même forme que le zéro. Le point de centre forme l'unité qui donne le nombre 1; la valeur de ces deux chiffres donne 10, symbole de Dieu et de l'univers (1).
 
@@ -179,7 +179,7 @@ Le troisième est la matière, qui se divise et se subdivise à l'infini par le 
 
 ---
 
-<small>**[p. 3]**</small>
+<small id="p3">**[p. 3]**</small>
 
 Tout ce qui existe dans la nature passe par ce triangle mystique, c'est-à-dire que tout croît, se détruit et se reproduit (1).
 
@@ -199,7 +199,7 @@ La première lettre initiale iod, י du nom Jehovah יהוה, exprime le Père o
 
 ---
 
-<small>**[p. 4]**</small>
+<small id="p4">**[p. 4]**</small>
 
 » voyelles i, e, o, u, que se forma ce nom sacré dans » l'Orient ; les uns prononçaient ïeoh, en aspirant ïeova, » les autres yeaou, il fallait toujours quatre lettres, quoi- » que nous en mettions ici cinq, faute de pouvoir expri- » mer ces quatre caractères. »
 
@@ -217,7 +217,7 @@ Les cabalistes hébreux disent que Dieu communiqua à Moïse la véritable prono
 
 ---
 
-<small>**[p. 5]**</small>
+<small id="p5">**[p. 5]**</small>
 
 » nom sacré ne fût entendu que de ceux qui avaient droit » de l'entendre, car tout autre, disent les juifs, eût été » incontinent frappé de mort. »
 
@@ -246,7 +246,7 @@ La première lettre du triangle se nomme iod י ; c'est le nom du Dieu d'Abraham
 
 ---
 
-<small>**[p. 6]**</small>
+<small id="p6">**[p. 6]**</small>
 
 Le deuxième nom est composé de deux lettres יה, qui signifient iah (Dieu) ; c'est le nom du Dieu d'Isaac, c'est-à-dire le vrai Dieu, attribué au Fils, seconde personne, qui a été produite et engendrée, dont la faculté est de produire (1).
 
@@ -264,7 +264,7 @@ Le quatrième nom se compose de quatre lettres יהוה ; il renferme en lui tou
 
 ---
 
-<small>**[p. 7]**</small>
+<small id="p7">**[p. 7]**</small>
 
 ## CHAPITRE II.
 
@@ -284,7 +284,7 @@ Les anciens rabbins, les philosophes et les cabalistes expliquent, selon leurs s
 
 ---
 
-<small>**[p. 8]**</small>
+<small id="p8">**[p. 8]**</small>
 
 Voici maintenant l'explication des mystères que renferme cet alphabet.
 
@@ -300,7 +300,7 @@ Je vais maintenant expliquer séparément les vingt-deux lettres hébraïques, a
 
 ---
 
-<small>**[p. 9]**</small>
+<small id="p9">**[p. 9]**</small>
 
 nom de Dieu, Eheieh אהיה, que l'on interprète essence divine. Les cabalistes l'appellent celui que l'œil n'a point vu, parce qu'il s'élève à la plus sublime élévation, même au-dessus des séraphins ; il siège dans le monde appelé (aïn-soph אין־סוף), qui signifie l'infini.
 
@@ -316,7 +316,7 @@ La troisième lettre est nommée guimel ג ; elle correspond au nom gadol גדו
 
 ---
 
-<small>**[p. 10]**</small>
+<small id="p10">**[p. 10]**</small>
 
 fluide. Sa numération est appelée binah בינה, qui signifie providence et intelligence.
 
@@ -330,7 +330,7 @@ Zain ז, septième lettre, d'où vient le nom zakai זכי (purus, mundus), elle
 
 ---
 
-<small>**[p. 11]**</small>
+<small id="p11">**[p. 11]**</small>
 
 nistère que Dieu, Tétragrammaton-Sabaoth, produit les plantes, et tout ce qui existe dans le règne végétal. Son attribut se nomme netzah נצה, qui est interprété triomphe et justice.
 
@@ -344,7 +344,7 @@ La dixième lettre est nommée iod י, d'où vient le nom Iah יה (Deus), qui s
 
 ---
 
-<small>**[p. 12]**</small>
+<small id="p12">**[p. 12]**</small>
 
 hiérarchies... C'est par leur ministère que les hommes reçoivent l'intelligence, l'industrie, et la connaissance des choses divines. Ici finit le monde angélique.
 
@@ -358,7 +358,7 @@ Caph, lettre finale, ך ainsi figurée, correspond aux deux grands noms de Dieu,
 
 ---
 
-<small>**[p. 13]**</small>
+<small id="p13">**[p. 13]**</small>
 
 gence du deuxième ciel est nommée Raziel רציאל. Son attribut signifie vision de Dieu, et courrier de Dieu ; il a sous lui plusieurs princes ; ils se nomment Magriel, Tsaphiel et Matmoniel.
 
@@ -372,7 +372,7 @@ Lamed ל, douxième lettre, d'où vient le nom limmud למד (doctus), correspon
 
 ---
 
-<small>**[p. 14]**</small>
+<small id="p14">**[p. 14]**</small>
 
 Dieu ; d'autres l'appellent vérité de Dieu, ou Dieu caché ; il a sous lui plusieurs princes, qui sont nommés Zaphkiel, Uriel, Cassiel et Agiel : les cabalistes disent que Zaphkiel fut le gouverneur de Noé, et Uriel celui d'Esdras.
 
@@ -388,7 +388,7 @@ L'intelligence souveraine qui gouverne l'étoile de mars se nomme Camaël כמא
 
 ---
 
-<small>**[p. 15]**</small>
+<small id="p15">**[p. 15]**</small>
 
 Noun ג, quatorzième lettre, ainsi figurée, d'où vient le nom nora נורא (formidabilis), c'est-à-dire Dieu formidable ; cette lettre correspond également au nom I'mmanuël עמנואל (nobiscum Deus), et au sixième nom de Dieu El-Gibor אל־גיבור, composés chacun de six lettres, qui signifient le Dieu fort ; ils dominent le sixième ciel, qui est celui du soleil, nommé par les Hébreux schemesch שמש. La première intelligence souveraine qui gouverne le soleil est nommée Raphaël רפאל (1)..Son attribut signifie maison de Dieu ; il a sous lui plusieurs princes, savoir : Peliel, Nachiel, Eaphuel et Tardiel. Les cabalistes disent que Raphaël était le gouverneur d'Isaac et du jeune Tobie, et l'ange Peliel celui de Jacob. Raphaël reçoit les influences et les vertus de Dieu par l'intermédiaire de Camaël, pour les transmettre ensuite aux intelligences du neuvième ordre.
 
@@ -400,7 +400,7 @@ Noun, lettre finale ן, ainsi figurée, se rapporte au septième nom de Dieu, Ar
 
 ---
 
-<small>**[p. 16]**</small>
+<small id="p16">**[p. 16]**</small>
 
 Cerviel et Hagiel ; les sages philosophes disent que Cerviel était le gouverneur de David. Haniel reçoit les influences de Dieu par l'intermédiaire de Raphaël, pour les transmettre aux intelligences du huitième ordre.
 
@@ -414,7 +414,7 @@ La dix-septième lettre se nomme phé פ, ainsi figurée ; le dix-huitième nom 
 
 ---
 
-<small>**[p. 17]**</small>
+<small id="p17">**[p. 17]**</small>
 
 phé désigne le feu, premier élément où habitent les Salamandres(1) L'intelligence souveraine qui domine le feu est nommée, par les Hébreux (2), Séraphim שרפים. Il a sous lui plusieurs princes; savoir : Ménéalop et Arathon; leurs principaux ministres, ou chefs subalternes, sont ainsi nommés : Casmaran, Gargatel, Tariel, Tabiel, Gaviel et Festativi. Chaque secte a ses noms différents, car, d'après les mages, l'intelligence du feu est nommée Milaïm; les adeptes la nomment Phtah ou Ardarel (3); d'après les Égyptiens c'est Némiphtah (4); les Arabes l'appellent Phelmanim (5); les Perses le nomment Tascheter (6). Les intelligences du feu président en été vers le sud ou le midi.
 
@@ -434,7 +434,7 @@ Phé final, ainsi figuré ף; cette lettre désigne l'air où
 
 ---
 
-<small>**[p. 18]**</small>
+<small id="p18">**[p. 18]**</small>
 
 habitent les Sylphes ; l'intelligence souveraine qui gouverne cet élément est nommée par les Hébreux Chérubim כרוביס ; elle a sous elle les princes Amadich et Agiathon. Les principaux chefs en sous ordre sont appelés Talvi, Caracasa, Amatiel, Comisoros, Spugliguel et Amadaï. Les intelligences de l'air dominent, dans la saison du printemps, vers l'occident ou l'ouest.
 
@@ -448,7 +448,7 @@ Schin, vingt-unième lettre, ainsi figurée ש, d'où vient
 
 ---
 
-<small>**[p. 19]**</small>
+<small id="p19">**[p. 19]**</small>
 
 le nom Schadaï שדי (omnipotens), qui signifie Dieu tout-puissant; cette lettre est attribuée au second principe de Dieu, qui donne le germe à toutes les substances végétales.
 
@@ -483,7 +483,7 @@ D'après cet exposé, la première série indique les unités; la deuxième, les
 
 ---
 
-<small>**[p. 20]**</small>
+<small id="p20">**[p. 20]**</small>
 
 ## CHAPITRE III
 
@@ -499,7 +499,7 @@ C'est pour cette raison que j'ai dit précédemment, au chapitre premier, que so
 
 ---
 
-<small>**[p. 21]**</small>
+<small id="p21">**[p. 21]**</small>
 
 Le tétragramme Jehovah, ainsi figuré, est composé de dix lettres, dont la première est iod י.
 
@@ -537,7 +537,7 @@ C'est par cette échelle que les influences de Dieu descendent et se communiquen
 
 ---
 
-<small>**[p. 22]**</small>
+<small id="p22">**[p. 22]**</small>
 
 furent envoyés dans toutes les parties du monde, pour annoncer la parole de Dieu aux nations.
 
@@ -553,7 +553,7 @@ Ecrivez d'abord séparement ces versets, formez-en trois lignes, composées chac
 
 ---
 
-<small>**[p. 23]**</small>
+<small id="p23">**[p. 23]**</small>
 
 lui le nom de Dieu, suivant ce verset de l'Ecriture. (Mon ange marchera devant vous ; observez-le, car il porte mon nom en lui.)
 
@@ -573,13 +573,13 @@ Je pense que le lecteur est suffisamment éclairé sur la formation des noms div
 
 ---
 
-<small>**[p. 24]**</small>
+<small id="p24">**[p. 24]**</small>
 
 tenant parler des noms, des influences, et des attributs des 72 génies, et entrer dans les plus grands détails sur leurs mystères ; d'abord le chapitre suivant contient mes tables cabalistiques, qui se rapportent aux 72 génies : la première contient leurs noms, avec leurs attributs : la deuxième, les 72 parties de la sphère qui sont sous l'influence de ces génies ; la troisième indique quels sont les jours qu'ils dominent ; et la quatrième indique les jours qu'ils président.
 
 ---
 
-<small>**[p. 25]**</small>
+<small id="p25">**[p. 25]**</small>
 
 ## CHAPITRE IV.
 
@@ -605,13 +605,13 @@ Notez que cette table est la plus exacte, en comparaison de celles qui se trouve
 
 ---
 
-<small>**[unnumbered]**</small>
+<small id="leaf-42">**[unnumbered]**</small>
 
 
 
 ---
 
-<small>**[p. 27]**</small>
+<small id="p27">**[p. 27]**</small>
 
 Suivant la tradition cabalistique, la confusion de la tour de Babel fit naître 72 langues d'après le nombre des familles qui s'y trouvèrent, elles se séparèrent ensuite, et se répandirent sur toute la surface de la terre pour y habiter. Par la suite des temps, toutes ces familles peuplèrent les diverses contrées de la terre, et devinrent après des nations.
 
@@ -623,7 +623,7 @@ Comme le nombre quatre est le symbole de la Croix qui préside à la terre, il a
 
 ---
 
-<small>**[p. 28]**</small>
+<small id="p28">**[p. 28]**</small>
 
 ## DEUXIEME TABLE CABALISTIQUE.
 
@@ -655,7 +655,7 @@ Le 9.e idem. du 29 avril au 3 mai.
 
 ---
 
-<small>**[p. 29]**</small>
+<small id="p29">**[p. 29]**</small>
 
 Le 10.e Génie domine du 4 mai au 8 dudit.
 
@@ -723,7 +723,7 @@ Le 41.e idem. du 6 oct. au 10 dudit.
 
 ---
 
-<small>**[p. 30]**</small>
+<small id="p30">**[p. 30]**</small>
 
 Le 42.e Génie domine du 11 octobre au 15 dudit.
 
@@ -789,7 +789,7 @@ Le 72.e idem du 10 mars au 14 dudit.
 
 ---
 
-<small>**[p. 31]**</small>
+<small id="p31">**[p. 31]**</small>
 
 Par la table ci-dessus l'on connaît le nom du génie qui domine sur le physique de l'homme. Ces 72 noms se composent chacun de 5 lettres hébraïques, qui font 72 fois 5 lettres, ou 5 fois 72; lesquels nombres additionnés donnent 360, qui sont le nombre des 360 degrés de la sphère.
 
@@ -807,7 +807,7 @@ Orphée, dans sa théologie, admettait 360 dieux ou génies, autant qu'il y a de
 
 ---
 
-<small>**[p. 32]**</small>
+<small id="p32">**[p. 32]**</small>
 
 Il y avait 360 urnes à l'usage des prêtres d'Egypte, pour faire des libations en l'honneur d'Osiris; de là vient l'origine des 360 divisions du cercle qui ornait le tombeau d'Osymandias; les prêtres égyptiens faisaient des libations dans la ville d'Achante, au delà du Nil, vers la Lybie, à 20 stades de Memphis : là était un tonneau percé, dans lequel le prêtre versait 365 coupes d'eau du Nil, pour l'année, c'est-à-dire, une chaque jour.
 
@@ -834,7 +834,7 @@ Il y avait 360 urnes à l'usage des prêtres d'Egypte, pour faire des libations 
 
 ---
 
-<small>**[p. 33]**</small>
+<small id="p33">**[p. 33]**</small>
 
 Le 15e Génie domine le 3 avril, 14 juin, 25 août, 16 nov., 16 janvier.
 
@@ -874,7 +874,7 @@ Le 15e Génie domine le 3 avril, 14 juin, 25 août, 16 nov., 16 janvier.
 
 ---
 
-<small>**[p. 34]**</small>
+<small id="p34">**[p. 34]**</small>
 
 | | | | | | | | | | |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -909,7 +909,7 @@ Monsieur d'Odoucet, successeur d'Etteilla, dans son ouvrage intitulé la Science
 
 ---
 
-<small>**[p. 35]**</small>
+<small id="p35">**[p. 35]**</small>
 
 » et sur les heures, se fait de 72 en 72 depuis la créa-
 » tion (1). »
@@ -927,7 +927,7 @@ Par le calcul de la table précédente, la première révolution des 72 génies 
 
 ---
 
-<small>**[p. 36]**</small>
+<small id="p36">**[p. 36]**</small>
 
 jusqu'au 31 mai; la deuxième, depuis le 31 mai jusqu'au 11 août; la troisième, depuis le 11 août jusqu'au 22 octobre; la quatrième, part du 22 octobre jusqu'au 2 janvier, et ainsi de suite; voyez la troisième table.
 
@@ -953,7 +953,7 @@ Contenant la révolution des 72 génies, qui s'opère tous les 24 heures; elle s
 
 ---
 
-<small>**[p. 37]**</small>
+<small id="p37">**[p. 37]**</small>
 
 Le 10e Génie domine depuis 3 heures précis à 3 heures 20 minutes.
 
@@ -993,7 +993,7 @@ Le 10e Génie domine depuis 3 heures précis à 3 heures 20 minutes.
 
 ---
 
-<small>**[p. 38]**</small>
+<small id="p38">**[p. 38]**</small>
 
 Le 42e Génie domine depuis 1 heures 40 miuutes jusqu'à 2 heures.
 
@@ -1032,7 +1032,7 @@ Le 42e Génie domine depuis 1 heures 40 miuutes jusqu'à 2 heures.
 
 ---
 
-<small>**[p. 39]**</small>
+<small id="p39">**[p. 39]**</small>
 
 ## PROCÉDÉ
 
@@ -1050,7 +1050,7 @@ Le troisième génie émane du monde élémentaire; il domine sur le physique de
 
 ---
 
-<small>**[p. 40]**</small>
+<small id="p40">**[p. 40]**</small>
 
 ## EXEMPLE :
 
@@ -1062,7 +1062,7 @@ Voici le moyen que j'emploie pour obvier à cet inconvénient : l'on voit par la
 
 ---
 
-<small>**[p. 41]**</small>
+<small id="p41">**[p. 41]**</small>
 
 ## CHAPITRE V.
 
@@ -1080,7 +1080,7 @@ Les deux premiers génies sont nommés Chontaré et Asi-
 
 ---
 
-<small>**[p. 42]**</small>
+<small id="p42">**[p. 42]**</small>
 
 can (1) ; ils dominent depuis le 20 mars à minuit jusqu'au 29 mars, inclusivement, sous l'influence de Mars, et ainsi de suite pour les autres, en suivant le même ordre.
 
@@ -1112,7 +1112,7 @@ can (1) ; ils dominent depuis le 20 mars à minuit jusqu'au 29 mars, inclusiveme
 
 ---
 
-<small>**[p. 43]**</small>
+<small id="p43">**[p. 43]**</small>
 
 14. Hépê et Sithacer, du 28 juillet au 6 août, sous l'influence de Jupiter.
 
@@ -1148,7 +1148,7 @@ can (1) ; ils dominent depuis le 20 mars à minuit jusqu'au 29 mars, inclusiveme
 
 ---
 
-<small>**[p. 44]**</small>
+<small id="p44">**[p. 44]**</small>
 
 30. Isrô et Homoth, du 4 janvier au 13, sous l'influence du Soleil.
 
@@ -1166,7 +1166,7 @@ can (1) ; ils dominent depuis le 20 mars à minuit jusqu'au 29 mars, inclusiveme
 
 ---
 
-<small>**[p. 45]**</small>
+<small id="p45">**[p. 45]**</small>
 
 ## CHAPITRE VI.
 
@@ -1182,7 +1182,7 @@ C’est ainsi que les anciens sages des premières nations du monde admettaient 
 
 ---
 
-<small>**[p. 46]**</small>
+<small id="p46">**[p. 46]**</small>
 
 une liaison entre les êtres spirituels et les êtres matériels (1).
 
@@ -1200,7 +1200,7 @@ une liaison entre les êtres spirituels et les êtres matériels (1).
 
 ---
 
-<small>**[p. 47]**</small>
+<small id="p47">**[p. 47]**</small>
 
 Le mauvais génie influe sur les hommes turbulents; il domine la promptitude et la colère.
 
@@ -1216,7 +1216,7 @@ Le génie contraire domine tout ce qui est nuisible aux êtres animés; il se pl
 
 ---
 
-<small>**[p. 48]**</small>
+<small id="p48">**[p. 48]**</small>
 
 vants : les 22 mars, 2 juin, 13 août, 24 octobre, 4 janvier. L'on invoque ce génie contre les adversités ; l'on prononce la demande avec les noms divins et le 2e verset du psaume 90. (Dicet Domino : susceptor meus es tu et refugium meum : Deus meus, sperabo in eum.) L'heure favorable commence depuis minuit 40 minutes jusqu'à une heure. Il domine sur la noblesse, la magnanimité et les grands emplois; il protège contre les armes et les bêtes féroces. La personne qui est née sous cette influence aime la vérité; elle tiendra à sa parole, et elle se fera un plaisir d'obliger ceux qui auront besoin de ses services.
 
@@ -1230,7 +1230,7 @@ Le génie contraire domine la mauvaise éducation, les découvertes dangereuses 
 
 ---
 
-<small>**[p. 49]**</small>
+<small id="p49">**[p. 49]**</small>
 
 5e. Mahasiah .מהשיה Son attribut (Dieu sauveur). Il correspond au saint nom Teut ou Theuth (1), d'après la langue des Égyptiens. Son rayon commence depuis le 21e. degré jusqu'au 25e., inclusivement, correspondant à la troisième décade et au génie nommé Seket, sous l'influence de Vénus; il préside les cinq jours suivants : 24 mars, 4 juin, 14 août, 26 octobre, 6 janvier. L'invocation se fait depuis une heure 20 minutes jusqu'à une heure 40.
 
@@ -1254,7 +1254,7 @@ Le génie contraire domine l'ignorance, le libertinage, et toutes les mauvaises 
 
 ---
 
-<small>**[p. 50]**</small>
+<small id="p50">**[p. 50]**</small>
 
 40 minutes jusqu'à 2 heures. Ce génie domine l'amour, la renommée, les sciences, les arts et la fortune. La personne qui est née sous cette influence aimera à faire parler d'elle, et elle acquerra de la célébrité par ses talents et ses actions.
 
@@ -1278,7 +1278,7 @@ Le génie contraire est l'ennemi des lumières; il domine la négligence, la par
 
 ---
 
-<small>**[p. 51]**</small>
+<small id="p51">**[p. 51]**</small>
 
 9 janvier. L'on invoque le secours de ce génie en prononçant le 6e. verset du psaume 94. (Venite adoremus, et procidamus : et ploremus ante Dominum, qui fecit nos.) Il sert pour obtenir la bénédiction de Dieu et pour chasser les mauvais esprits. Ce génie domine sur toutes les productions agricoles, et principalement celles qui sont nécessaires à l'existence des hommes et des animaux. Il inspire l'homme à s'élever vers Dieu, pour le remercier de tous les biens qu'il envoie sur la terre. La personne qui est née sous cette influence aimera le travail, l'agriculture, la campagne et la chasse, et elle aura beaucoup d'activité dans les affaires.
 
@@ -1296,7 +1296,7 @@ Le mauvais génie provoque tout ce qui est nuisible aux productions de la terre;
 
 ---
 
-<small>**[p. 52]**</small>
+<small id="p52">**[p. 52]**</small>
 
 donneront facilement à ceux qui les auront offensés.
 
@@ -1320,7 +1320,7 @@ Le génie contraire influe sur ceux qui négligent leur santé et leurs affaires
 
 ---
 
-<small>**[p. 53]**</small>
+<small id="p53">**[p. 53]**</small>
 
 Il sert contre la foudre, et pour obtenir la victoire. Ce génie domine la renommée ; il influe sur les grands personnages, les savants, et sur tous ceux qui deviennent célèbres par leurs talents.
 
@@ -1344,7 +1344,7 @@ Le génie contraire domine l'indiscrétion et le mensonge ; il influe sur tous c
 
 ---
 
-<small>**[p. 54]**</small>
+<small id="p54">**[p. 54]**</small>
 
 minutes. Il faut réciter le 6e. verset du psaume 97. (Jubilate Deo omnis terra : cantate, et exultate, et psallite ) Il domine l'amitié, la réconciliation, et la fidélité conjugale. La personne qui est née sous cette influence apprendra tout ce qu'elle voudra avec facilité; elle aura la mémoire heureuse, et se distinguera par son adresse.
 
@@ -1366,7 +1366,7 @@ Le génie contraire domine la calomnie, les faux témoignages et les procédures
 
 ---
 
-<small>**[p. 55]**</small>
+<small id="p55">**[p. 55]**</small>
 
 vembre, 16 janvier. L'on invoque ce génie contre les impies de la religion; on prononce leurs noms avec les noms divins et le 22e. verset du psaume 93. (Et factus est mihi Dominus in refugium : et Deus meus in adjutorium spei meæ.) L'heure favorable commence depuis 4 heures 40 minutes jusqu'à 5 heures. Ce génie domine sur les sciences et les arts; il influe sur les découvertes utiles et les nouvelles méthodes. La personne qui est née sous cette influence aimera la société des gens de bien; elle aura des sentiments religieux, et elle se distinguera par la pureté de ses mœurs.
 
@@ -1376,7 +1376,7 @@ Le génie contraire domine les schismes, les guerres de religion; il influe sur 
 
 ---
 
-<small>**[p. 56]**</small>
+<small id="p56">**[p. 56]**</small>
 
 tournée vers l'orient, depuis 5 heures du matin jusqu'à 5 heures 20 minutes. Ce génie domine sur les têtes couronnées et les grands capitaines ; il donne la victoire, et prévient les séditions ; il influe sur le fer, les arsenaux, et tout ce qui a rapport au génie de la guerre. L'homme qui est né sous cette influence est d'un caractère franc, loyal et brave, susceptible sur le point d'honneur, fidèle à son serment, et passionné pour Vénus.
 
@@ -1399,7 +1399,7 @@ Le génie contraire domine l'athéisme, les philosophes impies et tous ceux qui 
 
 ---
 
-<small>**[p. 57]**</small>
+<small id="p57">**[p. 57]**</small>
 
 langue des Polonais. Son rayon commence depuis le 86e. degré de la sphère jusqu'au 90e., correspondant à la neuvième décade et au génie nommé Tepisatosoa; il préside les jours suivants, savoir : les 6 avril, 17 juin, 28 août, 8 novembre, 18 janvier. L'on invoque ce génie pour obtenir un prompt secours lors qu'il arrive quelques adversités; il faut réciter le 9e. verset du psaume 7. (Judica me Domine secundum justitiam meam, et secundum innocentiam meam super me.) L'heure favorable commence depuis cinq heures 40 minutes du matin jusqu'à 6 heures. Ce génie fait connaître la vérité dans les procédures, il fait triompher l'innocence, il confond les coupables et les faux témoins. La personne qui est née sous cette influence sera juste et intègre, aimera la vérité, et elle se distinguera dans la magistrature.
 
@@ -1417,7 +1417,7 @@ Le génie contraire domine sur les procès scandaleux, il influe sur les hommes 
 
 ---
 
-<small>**[p. 58]**</small>
+<small id="p58">**[p. 58]**</small>
 
 cette influence sera aimable et enjouée, modeste dans ses paroles, et simple dans sa manière d'être, elle supportera les adversités avec résignation et beaucoup de patience.
 
@@ -1439,7 +1439,7 @@ Le génie contraire domine l'irréligion, les apostats, les libertins et les ren
 
 ---
 
-<small>**[p. 59]**</small>
+<small id="p59">**[p. 59]**</small>
 
 in te speravi Domine : dixi Deus meus es tu : in manibus tuis sortes meæ.) Il sert contre les calomniateurs, les charmes, et pour détruire la puissance des mauvais esprits. Ce génie domine sur l'astronomie, les mathématiques, la géographie, et toutes les sciences abstraites; il influe sur les savants et les philosophes. La personne qui est née sous cette influence aimera la poésie, la littérature, et sera passionnée pour l'étude; elle se distinguera dans les mathématiques et la géométrie.
 
@@ -1463,7 +1463,7 @@ Le génie contraire domine sur les pirates, les corsaires et les esclaves; il in
 
 ---
 
-<small>**[p. 60]**</small>
+<small id="p60">**[p. 60]**</small>
 
 de la sphère jusqu'au 115°. inclusivement, correspondant à la 12°. décade et au génie nommé Chumis, sous l'influence de la Lune. Il préside les jours suivants : 11 avril, 22 juin, 2 septembre, 13 novembre, 24 janvier. L'invocation se fait depuis 7 heures 20 minutes du matin jusqu'à 7 heures 40, en récitant le 8°. verset du psaume 120. (Dominus custodiat introïtum tuum, et exitum tuum : et ex hoc nunc, et in sæculum.) Il sert contre les armes, et pour voyager en sûreté. Ce génie domine l'eau, toutes les productions de la terre, et principalement les plantes qui sont nécessaires à la guérison des maladies. La personne qui est née sous cette influence est d'un naturel hardi, et capable d'entreprendre les expéditions les plus périlleuses ; elle se distinguera par des actions honorables.
 
@@ -1473,7 +1473,7 @@ Le génie contraire influe sur tout ce qui est nuisible à la végétation ; il 
 
 ---
 
-<small>**[p. 61]**</small>
+<small id="p61">**[p. 61]**</small>
 
 les animaux nuisibles, et il préserve des voleurs et des assassins. Ceux qui sont nés sous cette influence aiment la vérité, les sciences exactes; ils sont sincères dans leurs paroles et leurs actions.
 
@@ -1487,7 +1487,7 @@ Le génie contraire domine la magie noire, qui est celle du mauvais principe, le
 
 ---
 
-<small>**[p. 62]**</small>
+<small id="p62">**[p. 62]**</small>
 
 pacte avec lui, par lequel on s'engage à renoncer à Dieu, à faire du mal aux hommes, aux animaux, et aux productions de la terre.
 
@@ -1499,7 +1499,7 @@ Le génie contraire domine les traîtres, les ambitieux et les conspirations.
 
 ---
 
-<small>**[p. 63]**</small>
+<small id="p63">**[p. 63]**</small>
 
 psaume 139. (Eripe me Domine ab homine malo, à viro iniquo eripe me.) Il sert pour confondre les méchants et les calomniateurs, et pour être délivrés de nos ennemis. Ce génie protège contre ceux qui nous provoquent et nous attaquent injustement. Il domine sur la propagation des lumières, la civilisation et la liberté. La personne qui est née sous cette influence aimera la paix, la justice, les sciences et les arts, et elle se distinguera dans la littérature.
 
@@ -1524,7 +1524,7 @@ Le génie contraire domine sur les catastrophes, les accidents, et cause les apo
 
 ---
 
-<small>**[p. 64]**</small>
+<small id="p64">**[p. 64]**</small>
 
 et correspond au saint nom Zimi, d'après la langue des Péruviens. Son rayon commence depuis le 141°. degré de la sphère jusqu'au 145°., inclusivement, correspondant à la 15°. décade et au génie nommé Phupé, sous l'influence de Mars. Il préside les jours suivants : 17 avril, 28 juin, 8 septembre, 19 novembre, 30 janvier. L'invocation se fait depuis 9 heures 20 minutes du matin jusqu'à 9 heures 40. On doit prononcer les noms divins avec la demande et le 4°. verset du psaume 53. (Ecce enim Deus adjuvat me : et Dominus susceptor est animæ meæ.) Il sert contre les impies et les ennemis de la religion, et pour être délivrés de tous ses ennemis tant visibles qu'invisibles. Ce génie domine tous les sentiments religieux, la philosophie divine et la méditation. La personne qui est née sous cette influence se distinguera par ses vertus et son zèle pour propager la vérité; elle fera tous ses efforts pour détruire l'impiété par ses écrits et par son exemple.
 
@@ -1543,7 +1543,7 @@ Le génie contraire domine le fanatisme et l'hypocrisie; il influe sur tous ceux
 
 ---
 
-<small>**[p. 65]**</small>
+<small id="p65">**[p. 65]**</small>
 
 ration des êtres, afin d'en multiplier les espèces et d'en perpétuer les races; il influe sur les chimistes, les médecins et les chirurgiens. La personne qui est née sous cette influence se distinguera dans l'anatomie et la médecine.
 
@@ -1557,7 +1557,7 @@ Le génie contraire domine l'avarice et l'usure; il influe sur tous ceux qui s'e
 
 ---
 
-<small>**[p. 66]**</small>
+<small id="p66">**[p. 66]**</small>
 
 suivants : 20 avril, 1 juillet, 11 septembre, 22 novembre, 2 février : L'on invoque le secours de ce génie contre ceux qui nous attaquent en justice (1), et pour obtenir la grâce de ceux qui ont recours à la clémence des rois; il faut pour ce sujet nommer le nom de la personne qui vous attaque, et citer le motif; ensuite prononcer les noms divins avec le 4e. verset du psaume 32. (Quia rectum est verbum Domini, et omnia opera ejus in fide.) L'heure favorable commence depuis 10 heures 20 minutes du matin jusqu'à 10 heures 40. Ce génie domine la justice ; il influe sur la noblesse, les jurisconsultes, les magistrats et les avocats. La personne qui est née sous cette influence aura la mémoire heureuse et parlera avec facilité, elle sera aimable, spirituelle et modeste.
 
@@ -1569,7 +1569,7 @@ Le génie contraire domine toutes les mauvaises qualités du corps et de l'âme.
 
 ---
 
-<small>**[p. 67]**</small>
+<small id="p67">**[p. 67]**</small>
 
 cogitationes hominum quoniam vanæ sunt.) Il sert pour connaître les traîtres, pour détruire leurs projets et leurs machinations. Ce génie protège tous les princes chrétiens; il maintient leurs sujets dans l'obéissance. La personne qui est née sous cette influence aimera à remplir ous les devoirs de son état.
 
@@ -1591,7 +1591,7 @@ Le génie contraire domine la discorde; il provoque la guerre, les trahisons, et
 
 ---
 
-<small>**[p. 68]**</small>
+<small id="p68">**[p. 68]**</small>
 
 sous l'influence de Mercure. Il préside les jours ci-après : 23 avril, 4 juillet, 14 septembre, 25 novembre, 5 février. L'on invoque le secours de ce génie pour rentrer en grâce avec ceux que l'on a offensés ; il faut pour ce sujet prononcer la demande, les noms divins, et citer la personne ; ensuite vous direz le 1er verset du psaume 114. (Dilexi quoniam exaudiet Dominus vocem orationis meæ.) Il faut le réciter tous les jours, jusqu'à ce que vous soyez réconcilié avec la personne. L'heure favorable commence depuis 11 heures 20 minutes du matin jusqu'à 11 heures 40. Ce génie domine sur les testaments, les successions, et tous les partages qui se font à l'amiable ; il entretient la paix et l'harmonie dans les familles. La personne qui est née sous cette influence aime à vivre en paix avec tout le monde, même aux dépens de ses intérêts; elle se fait un devoir de récompenser la fidélité et les bons soins de ceux qui sont attachés à son service.
 
@@ -1601,7 +1601,7 @@ Le génie contraire cause la discorde dans les arrangements de famille ; il prov
 
 ---
 
-<small>**[p. 69]**</small>
+<small id="p69">**[p. 69]**</small>
 
 minutes du matin jusqu'à midi précis. Ce génie donne des lumières sur les personnes éloignées dont on n'a point reçu de nouvelles depuis longtemps; il fait rentrer les exilés dans leur patrie, et découvre les biens égarés ou distraits.
 
@@ -1624,7 +1624,7 @@ Le génie contraire domine sur les esprits pervers; il influe sur les charlatans
 
 ---
 
-<small>**[p. 70]**</small>
+<small id="p70">**[p. 70]**</small>
 
 le Dieu fort durant l'éternité (1). Il est composé des premières lettres de ces quatre dictions, en commençant de droite à gauche (2). Le rayon de ce génie commence de-
 
@@ -1640,7 +1640,7 @@ Les cabalistes écrivent ce nom sur la baguette mystérieuse qui sert dans les e
 
 ---
 
-<small>**[p. 71]**</small>
+<small id="p71">**[p. 71]**</small>
 
 puis le 186e. degré de la sphère jusqu'au 190e., inclusivement, correspondant à la 19e décade et au génie nommé Serucuth. Il préside les jours suivants : 26 avril, 7 juillet, 17 septembre, 28 novembre, 8 février. L'on invoque ces noms divins pour acquérir tous les trésors du ciel et de la terre ; il faut réciter le 9e. verset du psaume 90. (Quoniam tu es Domine spes mea : altissimum posuisti refugium tuum.) Les cabalistes disent que ce psaume sert contre la foudre, les armes, les animaux féroces, et les esprits internaux. (Voyez la cabale des psaumes.) Ce génie domine sur tous les cultes religieux, et sur tout ce qui se rapporte à Dieu ; il protège tous ceux qui cherchent la vérité.
 
@@ -1662,7 +1662,7 @@ Le génie contraire domine l'erreur et le mensonge, et influe sur tous ceux qui 
 
 ---
 
-<small>**[p. 72]**</small>
+<small id="p72">**[p. 72]**</small>
 
 l'influence de Saturne. Il préside les jours suivants : 27 avril, 8 juillet, 18 septembre, 29 novembre, 9 février. L'invocation se fait depuis midi 40 minutes jusqu'à une heure. Il faut réciter le 13 verset du psaume 29. (Audivit Dominus, et misertus est mei : Dominus factus est meus adjutor.) Il sert pour la guérison des maladies et pour obtenir la miséricorde de Dieu. Ce génie domine la santé et la longévité de la vie ; il influe sur l'amour paternel et filial, sur l'obéissance et le respect des enfants envers leurs parents.
 
@@ -1682,7 +1682,7 @@ Le mauvais génie domine toutes les mauvaises qualités
 
 ---
 
-<small>**[p. 73]**</small>
+<small id="p73">**[p. 73]**</small>
 
 du corps et de l'âme; il influe sur les esprits sombres et ceux qui fuient la société.
 
@@ -1702,7 +1702,7 @@ Le génie contraire influe sur les apostats, les renégats, et sur tous ceux qui
 
 ---
 
-<small>**[p. 74]**</small>
+<small id="p74">**[p. 74]**</small>
 
 42e. Mikael מיכאל. Les cabalistes lui donnent les attributs suivants : vertu de Dieu, maison de Dieu, semblable à Dieu. Il correspond au nom Biub ou Biud, d'après la langue des Canadiens. Son rayon commence depuis le 216e. degré de la sphère jusqu'au 210e. inclusivement, correspondant à la 21e. décade et au génie nommé Arpien. Il préside les jours suivants : 30 avril, 11. juillet, 21 septembre, 2 décembre, 12 février. L'invocation se fait depuis 1 heure 40 minutes jusqu'à 2 heures juste ; on prononce la demande avec les noms divins et le 7e. verset du psaume 120 (Dominus custodit te ab omni malo; custodiat animam tuam Dominus.) Il sert pour voyager en sûreté. Ce génie influe sur les monarques, les princes et les nobles ; il maintient leurs sujets dans l'obéissance, découvre les conspirations, et tous ceux qui cherchent à détruire leurs personnes et leurs gouvernements. La personne qui est née sous cette influence s'occupera des affaires politiques; elle sera curieuse, voudra connaître les secrets des cabinets et les nouvelles étrangères, et elle se distinguera dans les affaires d'état par ses connaissances dans la diplomatie.
 
@@ -1721,7 +1721,7 @@ Le génie contraire domine sur les traîtres ; il influe sur la malveillance, et
 
 ---
 
-<small>**[p. 75]**</small>
+<small id="p75">**[p. 75]**</small>
 
 Domine clamavi : et manè oratio mea prœveniet te.) Il sert pour détruire l'ennemi et pour être délivré de l'esclavage. Ce génie préside à la paix, et influe sur la prospérité des empires ; il affermit les trônes chancelants et la puissance des rois. La personne qui est née sous cette influence aimera l'état militaire et la gloire ; elle s'occupera constamment des sciences qui sont en rapport avec le génie de la guerre ; elle deviendra célèbre par ses faits d'armes, et acquerra la confiance de son prince par les services qu'elle lui rendra.
 
@@ -1741,7 +1741,7 @@ Le génie contraire préside à la guerre, et cause tous les fléaux qui en sont
 
 ---
 
-<small>**[p. 76]**</small>
+<small id="p76">**[p. 76]**</small>
 
 lent les capitulations et massacrent leurs prisonniers sans pitié.
 
@@ -1765,7 +1765,7 @@ Le génie contraire domine sur l'atmosphère ; il provoque les grandes chaleurs 
 
 ---
 
-<small>**[p. 77]**</small>
+<small id="p77">**[p. 77]**</small>
 
 sert pour remercier Dieu des biens qu'il nous envoie. L'heure favorable commence depuis 3 heures du soir jusqu'à 3 heures 20 minutes. Ce génie découvre les trésors cachés; il révèle les plus grands secrets de la nature, et il fait voir en songe les objets que l'on désire. La personne qui est née sous cette influence est douée d'un esprit fort et subtil ; elle aura des idées neuves et des pensées sublimes; elle parviendra à résoudre les problèmes les plus difficiles ; elle sera discrète et agira avec beaucoup de circonspection.
 
@@ -1785,7 +1785,7 @@ Le génie contraire domine sur les actions immorales et
 
 ---
 
-<small>**[p. 78]**</small>
+<small id="p78">**[p. 78]**</small>
 
 scandaleuses, et sur tous ceux qui propagent des systèmes dangereux et chimériques.
 
@@ -1799,7 +1799,7 @@ Le génie contraire domine sur le luxe, la stérilité et l'inconstance; il met 
 
 ---
 
-<small>**[p. 79]**</small>
+<small id="p79">**[p. 79]**</small>
 
 ment, correspondant à la 25e. décade et au génie nommé Rêuo, sous l'influence de Mercure. Il préside aux cinq jours suivants : 7 mai, 18 juillet, 28 septembre, 9 décembre, 19 février. Ce génie et ceux qui suivent, jusqu'au 56e., appartiennent au 7e. ordre des anges, que les orthodoxes appellent le chœur des principautés. L'invocation se fait depuis ♆ heures du soir jusqu'à ♆ heures 20 minutes; on prononce la demande avec les noms divins et le 3e. verset du psaume 144. (Magnus Dominus et laudabilis nimis et magnitudinis ejus non est finis.) L'on doit réciter ce psaume en entier, lorsque l'on éprouve des chagrins et quand on a l'esprit contrarié. Il sert pour s'exalter vers Dieu, pour le bénir et le glorifier, quand on est touché d'admiration. Ce génie domine sur les grands personnages, et sur tous ceux qui s'élèvent et se distinguent par leurs talents et leurs vertus. La personne qui est née sous cette influence aura l'âme sensible et généreuse ; elle sera estimée de tous les gens de bien pour ses vertus et ses bienfaits ; elle se distinguera dans la littérature, la jurisprudence et la diplomatie.
 
@@ -1819,7 +1819,7 @@ Le génie contraire influue sur les hommes égoïstes ; il domine sur la haine e
 
 ---
 
-<small>**[p. 80]**</small>
+<small id="p80">**[p. 80]**</small>
 
 minutes du soir jusqu'à 4 heures 40 minutes, en récitant le 8e. verset du psaume 102. (Miserator et misericors Dominus : longanimis et misericors.) Il sert pour obtenir la miséricorde de Dieu, et pour avoir des consolations. Ce génie domine sur la justice, les avocats, les avoués, et tous les magistrats en général. Il donne des inspirations à ceux qui sont embarrassés sur plusieurs choses, et ne savent point pour laquelle ils doivent se décider. La personne qui est née sous cette influence sera industrieuse et active dans les affaires ; elle aimera la littérature, et elle se distinguera par son éloquence.
 
@@ -1829,7 +1829,7 @@ Le génie contraire influe sur les chevaliers d'industrie, et sur tous ceux qui 
 
 ---
 
-<small>**[p. 81]**</small>
+<small id="p81">**[p. 81]**</small>
 
 minéraux; elle se distinguera dans la médecine par ses cures merveilleuses, et elle fera plusieurs découvertes utiles à la société.
 
@@ -1853,7 +1853,7 @@ Le génie contraire domine l'orgueil, le blasphême et la méchanceté; il influ
 
 ---
 
-<small>**[p. 82]**</small>
+<small id="p82">**[p. 82]**</small>
 
 gueilleux). Il correspond au saint nom Obra (1), suivant la langue des Maltais. Son rayon commence depuis le 216e. degré de la sphère jusqu'au 265e., inclusivement correspondant à la 27e. décade et au génie nommé Chommé, sous l'influence de Saturne. Il préside les jours suivants : 11 mai, 22 juillet, 2 octobre, 13 décembre, 23 février. L'invocation se fait depuis 5 heures 20 minutes du soir jusqu'à 5 heures 40 minutes, en prononçant les noms divins avec le 75e. verset du psaume 118. (Cognovi Domine quia æquitas judicia tua : et in veritate tua humiliasti me.) Ce psaume est divisé en 22 parties égales, correspondant aux 22 lettres hébraïques et aux 22 noms sacrés de Dieu, qui correspondent à chacune de ces lettres, et qui indiquent l'échelle par laquelle les sages montent à la contemplation de Dieu. Les cabalistes prétendent que la sainte Vierge le récitait tous les jours (voyez la Cabale des psaumes). Ce génie domine sur les hautes sciences; il influe sur les ecclésiastiques, les professeurs, les magistrats, et les hommes de loi. La personne qui est née sous cette influence aura l'humeur mélancolique; elle aimera la vie privée, le repos et la méditation ; et elle se distinguera par ses connaissances dans les sciences abstraites.
 
@@ -1873,7 +1873,7 @@ Le génie contraire domine l'ignorance et toutes les mauvaises qualités du corp
 
 ---
 
-<small>**[p. 83]**</small>
+<small id="p83">**[p. 83]**</small>
 
 correspond au saint nom Bora, d'après la langue des Zaflaniens, Son rayon commence depuis le 266e. degré de la sphère jusqu'au 270e., inclusivement, correspondant à la 27e. décade et au génie nommé Chénon. Il préside aux cinq jours suivants : 12 mai, 23 juillet, 3 octobre, 14 décembre, 24 février. L'invocation se fait depuis 5 heures 40 minutes du soir jusqu'à 6 heures précis, en prononçant le 19e. verset du psaume 102 (Dominus in cœlo paravit sedem suam : et regnum ipsius omnibus dominabitur.) Il sert pour obtenir la miséricorde de Dieu et pour vivre longtemps. Ce génie domine sur les empereurs, les rois, les princes, et toutes les dignités civiles et ecclésiastiques. Il veille sur les dynasties légitimes, et sur la stabilité des empires ; il donne un règne long et paisible aux princes qui ont recours à lui, et protège tous ceux qui veulent se maintenir dans leurs emplois. La personne qui est née sous cette influence deviendra célèbre par ses écrits et son éloquence ; elle aura beaucoup de réputation parmi les savants, se distinguera par ses vertus et méritera la confiance de son prince.
 
@@ -1883,7 +1883,7 @@ Le génie contraire domine sur la ruine des empires ; il cause les révolutions 
 
 ---
 
-<small>**[p. 84]**</small>
+<small id="p84">**[p. 84]**</small>
 
 nutes ; on prononce la demande avec les noms divins et le 13e. verset du psaume 101. (Tu autem Domine in æternum permanes : et memoriale tuum in generationem). Il est bon pour avoir des consolations, et pour ceux qui désirent d'avoir des enfants. Ce génie domine sur la morale et la religion ; il influe sur ceux qui la protègent de tout leur pouvoir, et la propagent par tous les moyens possibles. La personne qui est née sous cette influence se distinguera par ses bienfaits, sa piété, et par son zèle à remplir ses devoirs envers Dieu et les hommes.
 
@@ -1895,7 +1895,7 @@ Le génie contraire domine l'ambition et l'orgueil : il influe sur tous ceux qui
 
 ---
 
-<small>**[p. 85]**</small>
+<small id="p85">**[p. 85]**</small>
 
 57e. Nemamiah .נמכויה Son attribut (Dieu louable). Il correspond au saint nom Popa, d'après la langue des Ciréniens. Son rayon commence depuis le 281e. degré de la sphère jusqu'au 285e., inclusivement, correspondant à la 29e. décade et au génie nommé Srô, sous l'influence de Mars. Il préside les cinq jours ci-aprés : 15 mai, 26 juillet, 6 octobre, 17 décembre, 27 février. Ce génie et ceux qui suivent, jusqu'au 63e., appartiennent au 8e. ordre, que les orthodoxes appellent le chœur des archanges. L'invocation se fait depuis 6 heures 40 minutes du soir jusqu'à 7 heures, en récitant le 19e. verset du psaume 113. (Qui timent Dominum speraverunt in Domino : adjutor eorum et protector eorum est.) Il sert pour prospérer en toutes choses, et pour délivrer les prisonniers. Ce génie domine sur les grands capitaines, les amiraux, les généraux, et tous ceux qui combattent pour une cause juste. La personne qui est née sous cette influence aimera l'état militaire; elle se distinguera par son activité, sa bravoure et sa grandeur d'âme, et elle supportera les fatigues avec beaucoup de courage.
 
@@ -1914,7 +1914,7 @@ Le génie contraire domine sur les trahisons, cause la mésintelligence entre le
 
 ---
 
-<small>**[p. 86]**</small>
+<small id="p86">**[p. 86]**</small>
 
 L'on prononce les noms divins et le 3e. verset du psaume 6. (Et anima turbata est valde; sed tu Domine usque quo ?) Il sert contre les chagrins et guérit les maladies, principalement le mal des yeux (1). Ce génie domine sur le fer; il influe sur les armuriers, les serruriers, les couteliers, et tous ceux qui en font le commerce; il confond les méchants et les faux témoins. La personne qui est née sous cette influence se distinguera par sa bravoure et sa franchise, et elle sera passionnée pour Vénus.
 
@@ -1926,7 +1926,7 @@ Le génie contraire domine la colère; il influe sur les méchants et les homici
 
 ---
 
-<small>**[p. 87]**</small>
+<small id="p87">**[p. 87]**</small>
 
 aimera à s'instruire sur toutes les sciences en général; elle fera beaucoup d'affaires suivra les opérations de la bourse, spéculera avec avantage, et se distinguera par sa probité, ses talents et sa fortune.
 
@@ -1940,7 +1940,7 @@ Le génie contraire domine sur tous les êtres insubordonnés, et influe sur tou
 
 ---
 
-<small>**[p. 88]**</small>
+<small id="p88">**[p. 88]**</small>
 
 le 301e. degré jusqu'au 305e., inclusivement, correspondant à la 31e. décade et au génie nommé Ptiau, sous l'influence de Vénus. Il préside les jours ci-après : 19 mai, 30 juillet, 10 octobre, 21 décembre, 3 mars. L'on doit faire l'invocation depuis huit heures du soir jusqu'à 8 heures 20 minutes ; l'on prononce les noms divins et le 2e. verset du psaume 112. (Sit nomen Domini benedictum, ex hoc nunc et usque in sæculum.) Il sert pour obtenir l'amitié d'une personne. Ce génie domine sur l'astronomie et la physique ; il influe sur tous ceux qui se distinguent dans cette partie. La personne qui est née sous cette influence aimera les voyages, et tous les plaisirs honnêtes ; elle aura le cœur sensible, et l'amour lui causera des chagrins.
 
@@ -1958,7 +1958,7 @@ Le génie contraire influe sur les libertins, et particulièrement ceux qui se l
 
 ---
 
-<small>**[p. 89]**</small>
+<small id="p89">**[p. 89]**</small>
 
 Le génie contraire influe sur tout ce qui porte au scandale ; il domine sur le luxe, l'inconstance et le divorce ; il provoque la désunion entre les époux.
 
@@ -1980,7 +1980,7 @@ Le génie contraire domine la folie et la prodigalité ; il influe sur tous ceux
 
 ---
 
-<small>**[p. 90]**</small>
+<small id="p90">**[p. 90]**</small>
 
 noms divins avec le 18e. verset du psaume 32. (Ecce oculi Domini super metuentes eum : et in eis, qui sperant super misericordiam ejus.) Ce psaume est bon contre les adversités; il exauce les prières et les vœux de ceux qui espèrent en la miséricorde de Dieu. Ce génie et ceux qui suivent, jusqu'au 72e., appartiennent au 9e. ordre, que les orthodoxes appellent le chœur des anges. Ce génie protège contre la rage et les animaux féroces; il domine sur les savants, les professeurs, les orateurs et les auteurs; il influe sur l'imprimerie et la librairie, et sur tous ceux qui en font le commerce. La personne qui est née sous cette influence se distinguera dans la littérature.
 
@@ -1990,7 +1990,7 @@ Le génie contraire domine sur les faux savants; il influe sur les controverses,
 
 ---
 
-<small>**[p. 91]**</small>
+<small id="p91">**[p. 91]**</small>
 
 sous cette influence se distinguera dans la marine par ses expéditions et ses découvertes et elle amassera une fortune considérable.
 
@@ -2012,7 +2012,7 @@ Le génie contraire influe sur toutes les mauvaises qualités physiques et moral
 
 ---
 
-<small>**[p. 92]**</small>
+<small id="p92">**[p. 92]**</small>
 
 depuis 10 heures du soir jusqu'à 10 heures 20 minutes; on prononce la demande avec les noms divins et le 4°. verset du psaume 36. (Delectare in Domino et dabit tibi petitiones cordis tui.) Il sert pour avoir des consolations dans les adversités, et pour acquérir la sagesse. Ce génie domine sur les changements, sur la conservation des monuments, et sur la longévité de la vie; il influe sur les sciences occultes; il fait connaître la vérité à ceux qui ont recours à lui dans leurs travaux. La personne qui est née sous cette influence deviendra illuminée de l'esprit de Dieu; elle aimera la solitude, et elle se distinguera dans les hautes sciences; principalement l'astronomie, la physique et la philosophie.
 
@@ -2033,7 +2033,7 @@ Le génie contraire domine sur la stérilité ; il cause la
 
 ---
 
-<small>**[p. 93]**</small>
+<small id="p93">**[p. 93]**</small>
 
 famine et la peste; il influe sur les insectes qui nuisent aux productions de la terre.
 
@@ -2055,7 +2055,7 @@ Le génie contraire domine sur les procès, les testaments et les legs qui se fo
 
 ---
 
-<small>**[p. 94]**</small>
+<small id="p94">**[p. 94]**</small>
 
 duit toutes choses). Il correspond au saint nom Aris, suivant la langue des Béotiens. Son rayon commence depuis le 346e. degré de la sphère jusqu'au 350e., inclusivement, correspondant a la 35e. décade et au génie
 
@@ -2065,7 +2065,7 @@ duit toutes choses). Il correspond au saint nom Aris, suivant la langue des Béo
 
 ---
 
-<small>**[p. 95]**</small>
+<small id="p95">**[p. 95]**</small>
 
 nommé Thopibui. Il préside aux cinq jours suivants : 28 mai, 8 août, 19 octobre, 30 décembre, 12 mars. L'invocation se fait tous les jours depuis 11 heures du soir jusqu'à 11 heures 20 minutes. Il faut prononcer la demande avec les noms divins et le 1er verset de la Genèse : (Au commencement Dieu créa le ciel et la terre). Ce génie domine sur la génération des êtres, et sur les phénomènes de la nature; il protège ceux qui veulent se régénérer, et rétablir chez eux l'harmonie qui a été rompue par la désobéissance d'Adam, laquelle se fait en s'exaltant vers Dieu, et en purifiant par les éléments ceux qui composent la nature de l'homme : c'est alors que le sage rentre dans le principe de la création; qu'il recouvre ses droits, sa première dignité ; qu'il revient le maître de la nature, et qu'il jouit de toutes les prérogatives que Dieu lui donna en le créant. La personne qui est née sous cette influence se distinguera par son génie; elle sera considérée par les savants de toutes les nations, et elle deviendra une des premières lumières de la philosophie.
 
@@ -2088,7 +2088,7 @@ Le génie contraire domine l'athéisme, et tous ceux qui propagent des écrits d
 
 ---
 
-<small>**[p. 96]**</small>
+<small id="p96">**[p. 96]**</small>
 
 de la sphère jusqu'au 355e., inclusivement, correspondant à la 36e. décade et au génie nommé Ptibiou, sous l'influence de Mars. Il préside les cinq jours ci-après : 29 mai, 9 août, 20 octobre, 31 décembre, 14 mars. L'invocation se fait depuis 11 heures 20 minutes du soir jusqu'à 11 heures 40, en prononçant le 29e verset du psaume 108. (Confitebor Domino nimis in ore meo : et in medio multorum laudabo eum.) Il sert pour confondre les méchants, et pour se délivrer de ceux qui veulent nous opprimer. Ce génie protège tous ceux qui ont recours à lui; il donne la victoire et la paix, il influe sur le fer, les arsenaux, les villes de guerre, et tout ce qui se rapporte au génie militaire. La personne qui est née sous cette influence aura beaucoup d'énergie; elle aimera l'état militaire, et elle se distinguera par sa bravoure, ses talents et son activité.
 
@@ -2098,7 +2098,7 @@ Le génie contraire domine la discorde; il influe sur les traîtres, et sur tous
 
 ---
 
-<small>**[p. 97]**</small>
+<small id="p97">**[p. 97]**</small>
 
 talisman qui est sur le frontispice, avec celui du génie écrit sur l'autre côté, lequel doit être préparé sous des influences favorables indiquées dans le chapitre de l'Astrologie cabalistique. Ce génie protège dans les opérations mystérieuses ; il fait réussir en toutes choses, et conduit toute expérience à sa fin ; il domine sur la chimie, la physique et la médecine , il influe sur la santé et la longévité de la vie. La personne qui est née sous cette influence se distinguera dans la médecine ; elle se rendra célèbre par ses cures merveilleuses, dévoilera plusieurs secrets de la nature qui feront le bonheur des enfants de la terre, et elle consacrera ses veilles et ses soins à soulager les pauvres et les malades.
 
@@ -2108,7 +2108,7 @@ J'ai indiqué, dans les chapitres précédents, la manière de connaître les g�
 
 ---
 
-<small>**[p. 98]**</small>
+<small id="p98">**[p. 98]**</small>
 
 Chacun sait que les anciens philosophes n'admettaient que quatre éléments, savoir : le feu, l'air, l'eau et la terre; lesquelles correspondaient, suivant leur doctrine, aux quatre premiers nombres, 1, 2, 3, 4, aux quatre saisons, savoir : le printemps, l'été, l'automne et l'hiver, et aux quatre points cardinaux, qui sont : l'orient ou l'est, le midi ou le sud, l'occident ou l'ouest, et le septentrion ou le nord. C'est d'après toutes les conséquences de ces principes que les invocations des génies doivent se faire dans la saison qui correspond avec leur élément, en se tournant vers la partie du monde où ils président. Il est donc essentiel de connaître ce point important, si l'on veut procéder aux évocations avec succès; voici le procédé que j'emploie à ce sujet :
 
@@ -2120,7 +2120,7 @@ Je divise premièrement 49 par 4; il reste 1, qui indique le feu, premier élém
 
 ---
 
-<small>**[p. 99]**</small>
+<small id="p99">**[p. 99]**</small>
 
 ## CHAPITRE VII.
 
@@ -2130,7 +2130,7 @@ AYANT fait connaître au chapitre 2 les diverses hiérarchies célestes qui comp
 
 ---
 
-<small>**[p. 100]**</small>
+<small id="p100">**[p. 100]**</small>
 
 faites qui existent dans les éléments, parce qu'elles sont composées dans les plus subtiles parties du feu, conglobées et organisées par l'action du feu universel, qui est le principe de tous les mouvements de la nature.
 
@@ -2146,7 +2146,7 @@ O immortel, éternel, ineffable et sacré père de toutes choses, qui es porté 
 
 ---
 
-<small>**[p. 101]**</small>
+<small id="p101">**[p. 101]**</small>
 
 tournent toujours; dominateur des campagnes éthériennes; où est élevé le trône de ta puissance, du haut duquel tes yeux redoutables découvrent tout, et tes belles et saintes oreilles écoutent tout, exauce tes enfants que tu as aimés dès la naissance des siècles; car ta durée est grande, et ton éternelle majesté resplendit au-dessus du monde et du ciel des étoiles; tu es élevé sur elles, ô feu étincelant; là, tu t'allumes et t'entretiens toi-même par ta propre splendeur, et il sort de ton essence des sources intarissables de lumière qui nourrissent ton esprit infini. Cet esprit produit toutes choses, et fait ce trésor inépuisable de matière qui ne peut manquer à la génération qui l'environne toujours, à cause des formes sans nombre dont elle est enceinte, et dont tu l'as rempli au commencement; de cet esprit tirent aussi leur origine ces rois très saints qui sont debout autour de ton trône, et qui composent ta cour. O père universel! ô unique! ô père des bienheureux mortels et immortels! tu as créé en particulier des puissances qui sont merveilleusement semblables à ton éternelle pensée et à ton essence adorable; tu les as établies supérieures aux anges qui annoncent au monde tes volontés; enfin, tu nous as créé une troisième sorte (1) de souverains dans les éléments. Notre continuel exercice est de te louer et d'adorer tes désirs; nous brûlons du désir de te posséder. O père! ô mère la plus tendre des mères! ô l'exemplaire admirable des sentiments de la tendresse des mères! ô fils, la fleur de tous les fils! ô forme de toutes les formes! âme, esprit, harmonie et nombre de toutes choses, nous t'adorons.
 
@@ -2156,7 +2156,7 @@ C'est ainsi que les peuples élémentaires adorent l'Être Suprême, sans avoir 
 
 ---
 
-<small>**[p. 102]**</small>
+<small id="p102">**[p. 102]**</small>
 
 dant ils vivent plusieurs siècles, n'étant point sujets à la corruption, et n'ayant aucun mauvais principe en eux, parce qu'ils ne sont composés que d'un seul élément ; mais qu'est-ce que le temps en comparaison de l'éternité ? Il y avait beaucoup d'analogie entre Adam et ces créatures, parce qu'étant composé de ce qu'il y avait de plus pur dans les éléments, il renfermait en lui toutes les perfections de ces quatre espèces de peuples, et il était leur roi naturel. Mais Adam donna dans le piège du serpent, qui le persuada aisément, en lui disant qu'Ève ayant trouvé le principe de sa vie dans son côté, il devait chercher la durée de la sienne dans le sein d'Ève. C'est ainsi qu'Adam goûta le fruit défendu en se donnant à Ève, et qu'il a désobéi grossièrement à Dieu, d'après l'ordre formel qu'il avait reçu de lui de ne pas y toucher ; alors ils négligèrent l'alliance des peuples élémentaires pour lesquels Dieu les avait spécialement créés (1).
 
@@ -2166,7 +2166,7 @@ Depuis ce moment l'harmonie fut rompue par sa désobéissance ; il n'eut plus de
 
 ---
 
-<small>**[p. 103]**</small>
+<small id="p103">**[p. 103]**</small>
 
 était sage et régulière, et principalement ceux qui consacrent tous leurs soins à la recherche de la vérité.
 
@@ -2178,7 +2178,7 @@ Ainsi, l'homme qui veut se régénérer et recouvrer sa première dignité et so
 
 ---
 
-<small>**[p. 104]**</small>
+<small id="p104">**[p. 104]**</small>
 
 A l'égard des sylphes, des nymphes, et des gnomes, il est plus facile de les attirer à soi, leur existence étant beaucoup plus courte que celle des salamandres ; ils recherchent l'alliance des sages avec plus d'empressement. Il n'y a qu'à fermer un verre plein d'air conglobé, d'eau ou de terre, et le laisser exposé au soleil pendant un mois, puis séparer les éléments suivant les principes de la science hermétique. Chacun de ces éléments, ainsi purifié, est appellé par les philosophes la matière première, qui est celle, suivant eux, avec laquelle Dieu créa l'univers; cette matière devient un aimant merveilleux pour attirer les nymphes, les sylphes et les gnomes, si l'on en prend une certaine petite dose tous les jours pendant quelque temps, alors les sylphes, habitants des airs, deviendront visibles à vos yeux, et les nymphes et les gnomes, gardiens des trésors, sortiront de la terre et vous offriront leurs richesses. De sorte que, sans caractère, sans cérémonies, et sans mots mystérieux, l'on devient absolu sur tous ces peuples; ils n'exigent aucun culte du sage, sachant bien qu'il est plus noble qu'eux. C'est ainsi que la nature apprend à ses enfants à réparer les éléments par les éléments, parce que l'homme peut tout dans les éléments.
 
@@ -2188,7 +2188,7 @@ Agrippa rapporte trois manières d'évoquer les génies : la première est natur
 
 ---
 
-<small>**[p. 105]**</small>
+<small id="p105">**[p. 105]**</small>
 
 mixtes, avec lesquels ils ont de la sympathie; la seconde se fait par les astres, lorsque leurs influences sont favorables; la troisième est divine; elle se fait par le secours de Dieu, des noms divins, et des cérémonies sacrées.
 
@@ -2206,7 +2206,7 @@ Du safran, bois de baume, graine de laurier, d'aloës, de girofle, de myrrhe et 
 
 ---
 
-<small>**[p. 106]**</small>
+<small id="p106">**[p. 106]**</small>
 
 ## Parfum de la Lune correspondant au lundi et à la Terre.
 
@@ -2224,7 +2224,7 @@ On le compose de mastic, de l'encens, bois d'aloës, du
 
 ---
 
-<small>**[p. 107]**</small>
+<small id="p107">**[p. 107]**</small>
 
 bon storax et du benjoin; on y ajoute des girofles, de la quintefeuille, de la poudre de pierre d'agathe; il faut mêler tout cela avec de la cervelle de renard, ou de cerf, et du sang de pie; ensuite faites-en des petits grains.
 
@@ -2244,7 +2244,7 @@ Tous les parfums doivent se faire dans un petit réchaud de terre neuf, ayant la
 
 ---
 
-<small>**[p. 108]**</small>
+<small id="p108">**[p. 108]**</small>
 
 composé de bois de laurier, ou de coudrier; il faut que tout ce que vous emploierez, savoir : les drogues, le bois, l'amadou, l'allumette et la bougie soient neufs, et qu'ils n'aient servi à aucun usage profane ; c'est pour cette raison que vous devez vous les procurer vous-même. Il faut en outre que le feu soit neuf, car les parfums du jour doivent être allumés par les rayons du soleil ; il faut les concentrer avec un verre ardent, et pour la nuit vous vous servirez d'un caillou, qui soit bon à cet usage, que vous ramasserez vous-même dans un champ ; c'est ainsi que tous ceux qui sont initiés dans quelques rites mystiques, brûlent des parfums en l'honneur de tous les agents de la nature.
 
@@ -2254,7 +2254,7 @@ Voici ce que l'auteur de la Thréicie (1) nous apprend à ce sujet, page 361. «
 
 ---
 
-<small>**[p. 109]**</small>
+<small id="p109">**[p. 109]**</small>
 
 » fierez aux dieux ; vous les invoquerez, soit qu'elles » soient de peine ou de plaisir ; vous n'aborderez pas un » pays sans invoquer le génie du lieu (1), et tous les dieux » qui y président ; quand vous verrez une ville, vous en » prierez les dieux tutélaires de vous être propices, ainsi » qu'à ceux qui l'habitent ; vous ne verrez une forêt sans » adorer les faunes et les nymphes qui l'habitent ; vous » ne verrez pas une plaine, une montagne, sans adorer les » dieux qui y président (2). La terre est au ciel ; des » philosophes m'entendront bien ; mais pour des philo- » sophistes ils ne m'entendront pas : mais ce n'est pas à » eux que je parle. Vous ne gâterez ni les puits, ni les » fontaines ; vous ne souillerez point les éléments ; vous » ne détruirez aucun arbre fruitier, et vous n'abattrez les » autres que pour la nécessité, de peur de déformer la » nature que vous embrassez, puisque vous êtes dans » l'unité ; le foyer de votre maison vous sera sacré ; c'est » votre autel domestique ; c'est là que réside la puissance » de Vesta et de vos dieux tutélaires ; gardez-vous de » commettre aucune indécence à votre foyer, les dieux la » puniraient : Prends garde de relever indécemment ta robe » devant ton foyer, dit Hésiode, les dieux y résident ; c'est là » que vous ferez les sacrifices et les libations de votre fa- » mille. Qu'y-a-t-il de plus saint, de plus muni de toute
 
@@ -2264,7 +2264,7 @@ Voici ce que l'auteur de la Thréicie (1) nous apprend à ce sujet, page 361. «
 
 ---
 
-<small>**[p. 110]**</small>
+<small id="p110">**[p. 110]**</small>
 
 » religion, dit Cicéron, que la maison de chaque citoyen ? » Là, sont les autels, les foyers, les dieux pénates ; là, sont » contenues les choses sacrées de la famille, les religions, » les cérémonies. Si je ne vous disais pas que je vous donne » la religion qui est émanée du sein de la Divinité, je vous » dirais : Je vous donne la religion des héros. Je me jette » hors du lit, dit Enée, et, poussant un cri de joie, je » tends les mains suppliantes vers le ciel ; je verse au foyer » des présents purs, intemerata dona, et, joyeux de m'être » acquitté de ce devoir, je vais annoncer à mon père la vision » des dieux... » Et ailleurs : « Disant cela, il allume les » feux couverts au foyer ; sapitos ignes ne veut pas dire » éteints, autrement, il aurait fallu les rallumer : il ré- » veille le lares de Pergame, le sanctuaire de la chaste » Vesta; il y fait un sacrifice de pure farine , et, remplis- » sant un encensoir de parfums, il y fait fumer l'encens » en l'honneur des dieux : c'est cet encensoir que j'ai dit » que chaque maison devait avoir pour cet usage ; c'est » là que vous exercerez tous vos rites, en attendant que » la vérité ait des temples publics...
 
@@ -2272,7 +2272,7 @@ Voici ce que l'auteur de la Thréicie (1) nous apprend à ce sujet, page 361. «
 
 ---
 
-<small>**[p. 111]**</small>
+<small id="p111">**[p. 111]**</small>
 
 » sapience, qui la sanctifiera ; vous sanctifierez la table » par l’apposition du sel ; vous n’omettrez le sel d’au- » cun de vos sacrifices. Pour adorer, vous vous présen- » terez d’abord devant les dieux, tourné le matin du » côté de l’orient, à midi et le soir du côté du midi et du » couchant ; là est le cœur du monde et le foyer : c’est » ainsi que Déjanire, dans Sophocle, envoyant à son époux Hercule la robe qui devait lui être si funeste, » dit : qu’il se présentera devant les dieux avec cet habit ; » vous porterez ensuite la main droite, qui est la main de » la puissance, le pouce appuyé sur l’index, ce qui la dé- » signe, à votre bouche, parce que c’est votre verbe qui » doit adorer le verbe des dieux et leur parler leur lan- » gage, ob ore orare ; puis vous vous prosternerez devant » eux ; vous tournerez ensuite en rond, en traçant un » cercle : les Romains tournaient de droite à gauche ; les » Celtes, vos ancêtres, ô Européens ! tournaient de gauche » à droite ; je vous dirais, choisissez ; mais vous avez vu » que ce sont les rites romains que vous devez avoir ; vous » n’êtes que des démembrements de l’empire romain ; » ainsi vous verrez tous les dieux et vous en serez vu ; et » vous vous assoierez ensuite dans leur repos et dans leur » unité : grande déesse, je ne crois pas divulguer vos mys- » tères en disant ces choses ; et soit que vous offriez des » parfums, soit les parties de la victime que vous devez » brûler, qui sont les graisses et les intestins, vous les » agiterez en croix de l’orient à l’occident, du midi au » septentrion ; vous tracerez une croix (1) par qui tout se
 
@@ -2280,7 +2280,7 @@ Voici ce que l'auteur de la Thréicie (1) nous apprend à ce sujet, page 361. «
 
 ---
 
-<small>**[p. 112]**</small>
+<small id="p112">**[p. 112]**</small>
 
 » fait, qui est le symbole de la puissance des dieux, de la » vie future et éternelle, la croix dans la capacité du cercle » faisant quatre angles droits ; c'est ce que les anciens » nommaient ferctum obmovere (1). »
 
@@ -2292,7 +2292,7 @@ Il résulte de là que la religion des mages est l'expression et l'adoration de 
 
 ---
 
-<small>**[p. 113]**</small>
+<small id="p113">**[p. 113]**</small>
 
 ## CHAPITRE VIII
 
@@ -2302,7 +2302,7 @@ Les philosophes disent que le ciel domine sur la terre, et que tous les astres i
 
 ---
 
-<small>**[p. 114]**</small>
+<small id="p114">**[p. 114]**</small>
 
 cités sous le signe du bélier, où elles ont doublé leur cercle en l'année de l'ère vulgaire 1585 ; il résulte de là que si l'on veut bien se donner la peine de comparer les époques, à partir depuis 1585, en remontant de 796 ans en 796 ans, on se rendra raison des causes qui ont opéré de grands changements sur la terre à toutes ces époques remarquables ; car si l'on en fait la comparaison avec l'Histoire ancienne et moderne, l'on verra que toutes ces conjonctions correspondent d'abord à l'empire d'Auguste, à la révolution romaine, à la fondation de Rome, à l'empire d'Alexandre, à celui de Cyrus ; ensuite les commencements des monarchies mède et assyrienne, de même que la division de l'empire des Assyriens sous Sardanapale, et, de cette époque jusqu'à celle où l'on place le grand cataclysme du monde (le déluge). On trouve le double cercle des triplicités et de ce grand cataclysme, à l'époque où l'on fixe la création du monde actuel ; on trouve encore le double cercle.
 
@@ -2312,7 +2312,7 @@ Il n'est pas étonnant que ces monarchies, achevant leur double cercle, aient é
 
 ---
 
-<small>**[p. 115]**</small>
+<small id="p115">**[p. 115]**</small>
 
 ## De la division du Temps.
 
@@ -2322,7 +2322,7 @@ Les sages de toutes les nations ont observé que le nombre des planètes corresp
 
 ---
 
-<small>**[p. 116]**</small>
+<small id="p116">**[p. 116]**</small>
 
 ## TABLE DES CYCLES,
 
@@ -2340,7 +2340,7 @@ Le mercredi correspond au 4e quaternaire, dont la première heure commence par M
 
 ---
 
-<small>**[p. 117]**</small>
+<small id="p117">**[p. 117]**</small>
 
 Le jeudi correspond au 5e. quaternaire, dont la première heure du jour commence par Jupiter, la 7e. Saturne, la 13e. la Lune, et la 19e. Mercure.
 
@@ -2371,7 +2371,7 @@ Ces deux premières tables sont la base et le fondement de toute l'Astronomie ca
 
 ---
 
-<small>**[p. 118]**</small>
+<small id="p118">**[p. 118]**</small>
 
 les jours de la Lune, les influences sont mauvaises ; conséquemment cette lune-là est malheureuse ; et remarquez bien que, toutes les fois que la Lune se renouvellera par un dimanche, ce mois-là est heureux, parce qu'alors les planètes sont en rapport avec la Lune ; et faites bien attention surtout que toutes les fois que la Lune se rencontrera en nombre égal avec le Soleil, c'est-à-dire lorsqu'elle se renouvellera le jour où le Soleil entre dans un des douze signes du zodiaque, et que ce jour-là soit un dimanche, alors il se rencontrera un concours d'influences favorables, pour opérer dans les mystères de la planète qui est en rapport avec le signe qui domine le mois. Le sage doit l'observer, et se préparer en conséquence, suivant les principes du rit cabalistique, afin d'en profiter et s'en servir dans le plus grand secret...
 
@@ -2379,7 +2379,7 @@ C'est d'après cette doctrine que les mages, et tous ceux qui étaient initiés 
 
 ---
 
-<small>**[p. 119]**</small>
+<small id="p119">**[p. 119]**</small>
 
 parce qu'alors les jours sont plus longs que les nuits, cette âme remontait de suite sans obstacle vers le principe qui l'avait créée.
 
@@ -2397,7 +2397,7 @@ La première maison de la Lune commence depuis le 1er. degré du bélier jusqu'a
 
 ---
 
-<small>**[p. 120]**</small>
+<small id="p120">**[p. 120]**</small>
 
 Aiah איה, qui signifie Dieu infini. Les génies qui gouvernent cette maison sont nommés, suivant les cabalistes, Enediel (1), et selon les Perses, Ormuzd (2).
 
@@ -2417,7 +2417,7 @@ La 6e. maison commence au 4e. degré 17 minutes et 9 secondes des gémeaux, jusq
 
 ---
 
-<small>**[p. 121]**</small>
+<small id="p121">**[p. 121]**</small>
 
 La 7e. maison commence au 17e. degré 8 minutes et 34 secondes des gémeaux, jusqu'à la fin du même signe ; elle correspond à la lettre zain ז, d'où vient le nom Ziah זיה ; son attribut Dieu éclatant et lumineux. Le 7e. jour est sous l'influence de Seheliel, Scheliel et Murdad.
 
@@ -2433,7 +2433,7 @@ La 12e. maison commence depuis le 21e. degré 25 minutes et 43 secondes du lion,
 
 ---
 
-<small>**[p. 122]**</small>
+<small id="p122">**[p. 122]**</small>
 
 Les génies correspondant au 12e. jour de la Lune sont nommés Abdiziel, Abdizuel et Mâh.
 
@@ -2451,7 +2451,7 @@ La 17e. maison commmence depuis le 25e. degré 42
 
 ---
 
-<small>**[p. 123]**</small>
+<small id="p123">**[p. 123]**</small>
 
 minutes et 51 secondes de la balance, jusqu'au 8e. degré du scorpion ; elle correspond à la lettre phé פ; d'où vient le nom Piah פיוה; son attribut Dieu des louanges. Les génies correspondant au 17e. jour de la Lune sont nommés Adriël et Sarûsh.
 
@@ -2467,7 +2467,7 @@ La 22e. maison commence au dernier quartier de lune, c'est-à-dire, depuis le 1e
 
 ---
 
-<small>**[p. 124]**</small>
+<small id="p124">**[p. 124]**</small>
 
 terpreté la Fin de toutes choses. Les génies dominant le 22e. jour de la Lune sont nommés Geliël et Bâd.
 
@@ -2485,7 +2485,7 @@ La 28e. et dernière maison de la Lune commence de-
 
 ---
 
-<small>**[p. 125]**</small>
+<small id="p125">**[p. 125]**</small>
 
 puis le 17e. degré 8 minutes et 34 secondes des poissons, jusqu'à la fin du même signe; elle correspond à la lettre O, qui désigne le cercle et la fin de la révolution de la Lune, d'où vient le nom Oiah יויה; son attribut Dieu qui contient tout ce qui est. Les génies de la 28e. maison sont nommés Amnixiel et Zamyâd.
 
@@ -2499,7 +2499,7 @@ Les anciens mages ont reconnu que le nombre douze divisait le ciel, d'autant plu
 
 ---
 
-<small>**[p. 126]**</small>
+<small id="p126">**[p. 126]**</small>
 
 suivant, savoir : supposons que le jour où l'on désire connaître l'influence des planètes soit de quinze heures, on multiplie le nombre des heures par cinq, ce qui donne 75 minutes, c'est-à-dire, la 12e. partie du jour ; conséquemment les 12 heures planétaires de ce jour-là se composent chacune de 75 minutes. Il reste donc 9 heures pour la nuit ; multipliez ce nombre par 5, il donne 45 ; c'est-à-dire, les 12 heures de la nuit se composent chacune de 45 minutes ; et vous suivrez le même procédé en tout temps et en tout lieu.
 
@@ -2517,7 +2517,7 @@ La 1re. heure domine Jupiter, la 2e. Mars, la 3e. le Soleil, la 4e. Vénus, la 5
 
 ---
 
-<small>**[p. 127]**</small>
+<small id="p127">**[p. 127]**</small>
 
 ## Lundi, les heures du jour.
 
@@ -2545,7 +2545,7 @@ La 1re. heure domine le Soleil, la 2e. Vénus, la 3e.
 
 ---
 
-<small>**[p. 128]**</small>
+<small id="p128">**[p. 128]**</small>
 
 Mercure, la 4e. la Lune, la 5e. Saturne, la 6e. Jupiter, la 7e. Mars, la 8e. le Soleil, la 9e. Vénus, la 10e. Mercure, la 11e. la Lune, la 12e. Saturne.
 
@@ -2571,7 +2571,7 @@ La 1re. heure domine Saturne, la 2e. Jupiter, la 3e. Mars, la 4e. le Soleil, la 
 
 ---
 
-<small>**[p. 129]**</small>
+<small id="p129">**[p. 129]**</small>
 
 ## Samedi, les heures de la nuit.
 
@@ -2615,7 +2615,7 @@ Le taureau, etc. (voyez les heures du jour).
 
 ---
 
-<small>**[p. 130]**</small>
+<small id="p130">**[p. 130]**</small>
 
 Les philosophes modernes disent que la première heure signaire doit toujours commencer par le signe qui domine le mois, et la saison où l'on est, en observant ce qui suit :
 
@@ -2643,7 +2643,7 @@ A partir du 14 janvier jusqu'au 12 février, la 1re.
 
 ---
 
-<small>**[p. 131]**</small>
+<small id="p131">**[p. 131]**</small>
 
 heure commence par le verseau, et la 12e. finit par la capricorne.
 
@@ -2665,7 +2665,7 @@ Il correspond au Midi et à la saison d'été ; elle est chaude et sèche, et in
 
 ---
 
-<small>**[p. 132]**</small>
+<small id="p132">**[p. 132]**</small>
 
 ## Triangle de l'Eau.
 
@@ -2685,7 +2685,7 @@ Suivant Dupuis (1), l'exaltation d'une planète est le lieu du ciel où son infl
 
 ---
 
-<small>**[p. 133]**</small>
+<small id="p133">**[p. 133]**</small>
 
 Saturne arrive au 21e. degré de la balance, qui est le lieu de son exaltation, correspondant au 6 octobre ; la fête de Jupiter arrive au 15e. degré de l'écrevisse, correspondant au 2 juillet ; la fête de Mars arrive au 18e. degré du capricorne, qui correspond au 1er. janvier ; la fête du Soleil arrive le 20 mars, qui est le point équinoxial ou le lieu de son exaltation ; la fête de Vénus arrive au 27e. degré des poissons, correspondant au 11 mars ; la fête de Mercure arrive au 15e. degré de la vierge, correspondant au 31 août ; la fête de la Lune arrive au 3e. degré du taureau, correspondant au 21 avril.
 
@@ -2707,7 +2707,7 @@ La Lune a son trône dans l'écrevisse ; elle domine l'eau et le flegme : le bla
 
 ---
 
-<small>**[p. 134]**</small>
+<small id="p134">**[p. 134]**</small>
 
 ## Puissance et force des planètes.
 
@@ -2731,7 +2731,7 @@ Saturne est triste dans l'écrevisse, et infortuné dans le bélier ; Jupiter da
 
 ---
 
-<small>**[p. 135]**</small>
+<small id="p135">**[p. 135]**</small>
 
 le verseau, et la balance ; Vénus dans le bélier, le scorpion et la vierge ; Mercure dans le sagittaire et les poissons ; la Lune dans le capricorne et la balance.
 
@@ -2753,7 +2753,7 @@ Saturne influe sur l'âne, la taupe, le chameau, le loup et le serpent ; Jupiter
 
 ---
 
-<small>**[p. 136]**</small>
+<small id="p136">**[p. 136]**</small>
 
 cynocéphale, le lion, le bélier et le cheval ; Vénus sur le bouc, le veau, le taureau et le lapin ; Mercure sur le chien, le lièvre, le renard et le singe ; la Lune sur le caméléon, la panthère, la biche et le chat.
 
@@ -2771,7 +2771,7 @@ Vénus influe sur la verveine, la violette, les cheveux
 
 ---
 
-<small>**[p. 137]**</small>
+<small id="p137">**[p. 137]**</small>
 
 de Vénus, l'orange, la valériane, le thym, la coriandre, le santal, le myrte et le buis ; et toutes les fleurs odoriférantes, comme les roses, etc.
 
@@ -2791,7 +2791,7 @@ Les mages ont reconnu trois couleurs principales en
 
 ---
 
-<small>**[p. 138]**</small>
+<small id="p138">**[p. 138]**</small>
 
 décomposant la lumière, savoir : le bleu, le rouge et le jaune; les couleurs intermédiaires ne sont que des nuances formées par le mélange de deux couleurs réunies : le rouge et le jaune donnent la couleur orange, le bleu et le rouge composent le violet, le jaune et le bleu forment le vert. Ils disent que le blanc n'est point une couleur, que c'est seulement l'emblème de la lumière, de même que le noir représente les ténèbres et le chaos ; cette couleur est attribuée à Saturne ; le brillant et la couleur d'azur à Jupiter ; le rouge et la couleur du feu à Mars ; la couleur d'or et le jaune au Soleil. Vénus porte l'empreinte de l'étoile du matin ; on lui attribue la couleur de rose et le vert : le varié ou le nuancé est attribué à Mercure, et le blanc à la Lune.
 
@@ -2807,7 +2807,7 @@ Jupiter, dieu de la foudre, est le roi des cieux ; il préside à l'âge où l'h
 
 ---
 
-<small>**[p. 139]**</small>
+<small id="p139">**[p. 139]**</small>
 
 de sa raison ; il donne le don d'intelligence ; il est naturellement chaud et humide, mais tellement tempéré qu'il contribue singulièrement à la propagation et à la conservation de l'espèce humaine ; il domine sur la puissance divine, et ce qui concerne le sacerdoce ; il influe sur la piété, la modestie, la fidélité, tout ce qui caractérise l'âme généreuse et vertueuse ; sous le rapport du mauvais principe, il domine l'orgueil, la disgrâce, le déshonneur, la jalousie, la vengeance, et toutes les actions immorales.
 
@@ -2819,7 +2819,7 @@ Vénus, déesse des amours, des plaisirs, et de la fécondité ; elle répand un
 
 ---
 
-<small>**[p. 140]**</small>
+<small id="p140">**[p. 140]**</small>
 
 influe sur la stérilité, la jalousie, l'inceste, l'adultère, et tout ce qui appartient à la volupté.
 
@@ -2831,7 +2831,7 @@ Il résulte de tout ce qui est indiqué dans ce chapitre que, toutes les fois qu
 
 ---
 
-<small>**[p. 141]**</small>
+<small id="p141">**[p. 141]**</small>
 
 ## CHAPITRE IX
 
@@ -2849,7 +2849,7 @@ Le talisman contient 6 colonnes qui représentent le nombre 6, renfermé dans un
 
 ---
 
-<small>**[p. 142]**</small>
+<small id="p142">**[p. 142]**</small>
 
 blème de l'unité et du cercle (voyez le chapitre 1er.), chaque colonne contient 6 carrés, dont la totalité est 36, correspondant aux 36 faces du ciel. et aux 36 génies dominant sur la sphère, d'après le système des Égyptiens.
 
@@ -2869,7 +2869,7 @@ Voici le passage d'Abenpharagi, sur ce sceau, avec la manière dont les astrolog
 
 ---
 
-<small>**[p. 143]**</small>
+<small id="p143">**[p. 143]**</small>
 
 « l'heure où le Soleil se trouve au lieu de son exaltation, « qui est vers le 16e. degré d'aries ou le bélier ; cela fait, « vous le chaufferez à la vapeur du safran ; vous le lave- « rez d'eau de rose, dans laquelle vous aurez mis une disso- « lution de musc et de camphre ; ensuite vous l'envelop- « perez dans un morceau d'étoffe de soie de couleur de « safran, et le porterez sur vous ; il vous rendra heureux « dans toutes vos entreprises ; tout le monde vous crain- « dra ; vous obtiendrez, des princes et des rois, tout ce « que vous voudrez, soit en demandant vous-même, soit « par l'entremise de celui qu'il vous plaira de leur envoyer ; « vous retrouverez ce que vous avez perdu, et Dieu ré- « pandra sa bénédiction sur vous et sur tout ce qui vous « appartient : cette figure du Soleil est son sceau ; son « caractère, qui doit être gravé sur le revers, contient « un grand secret (est magnum secretum) ; on l'appelle « créateur, lumière, parfait, puissant, glorieux, vie, « vertu, brillant, radieux : les anges du Soleil sont « Anaël et Raphaël (1).
 
@@ -2877,7 +2877,7 @@ Voici le passage d'Abenpharagi, sur ce sceau, avec la manière dont les astrolog
 
 ---
 
-<small>**[p. 144]**</small>
+<small id="p144">**[p. 144]**</small>
 
 ## DESCRIPTION
 
@@ -2893,7 +2893,7 @@ Il faut que la Lune se renouvelle un dimanche,
 
 ---
 
-<small>**[p. 145]**</small>
+<small id="p145">**[p. 145]**</small>
 
 le Soleil faisant son entrée au 1er. degré du bélier ; alors l'heure favorable commence au moment où la conjonction a lieu, c'est-à-dire à l'heure où la Lune se renouvelle ; il peut arriver dans ce moment une éclipse du Soleil, et, tant qu'elle durera, l'instant sera favorable pour écrire le talisman.
 
@@ -2911,7 +2911,7 @@ La première influence favorable de Mars arrive lorsque la Lune se renouvelle un
 
 ---
 
-<small>**[p. 146]**</small>
+<small id="p146">**[p. 146]**</small>
 
 qu'elle soit à son 18e. jour, qui sera un mardi, parce que sa 18e. maison correspond au scorpion, qui est le domicile de Mars ; alors le Soleil et la Lune se trouveront en nombre égal au 18e. degré du capricorne, qui est le lieu de son exaltation.
 
@@ -2929,7 +2929,7 @@ La première influence de Jupiter arrive lorsque la Lune se renouvelle un dimanc
 
 ---
 
-<small>**[p. 147]**</small>
+<small id="p147">**[p. 147]**</small>
 
 La seconde influence arrive lorsque la Lune se renouvelle un dimanche, le Soleil faisant son entrée au 1er. degré du sagittaire; ensuite il faut attendre qu'elle soit dans sa 19e. maison, qui correspond au sagittaire et à Jupiter (voyez page 123).
 
@@ -2947,7 +2947,7 @@ La seconde influence a lieu lorsque la Lune se renouvelle un dimanche, le Soleil
 
 ---
 
-<small>**[p. 148]**</small>
+<small id="p148">**[p. 148]**</small>
 
 sant son entrée dans sa 21e. maison, qui correspond au capricorne.
 
@@ -2955,7 +2955,7 @@ Il résulte de tout ce que je viens de dire que les sages doivent observer les i
 
 ---
 
-<small>**[p. 149]**</small>
+<small id="p149">**[p. 149]**</small>
 
 ## CHAPITRE X
 
@@ -2969,7 +2969,7 @@ AYANT commencé mon premier chapitre par l'alpha, je finis le dernier par l'ôm�
 
 ---
 
-<small>**[p. 150]**</small>
+<small id="p150">**[p. 150]**</small>
 
 « J.-C., qui est, qui a été, qui sera. Il n'est aucun nom « dans aucune langue des autres nations qui réponde par- « faitement à celui-ci, qui exprime l'essence selon toutes « les différences des temps ; car, comme a dit Aben-Ezra, « sur le psaume 50, verset 1, il marque l'éternité et « l'immutabilité de Dieu. Ce nom est, nous le répétons, « de tous ceux de Dieu, celui qui lui est le plus propre, et « le seul qui désigne expressément et absolument l'essence « de la Majesté divine. יהוה Jehovah est composé des « seules lettres que les Hébreux appellent quiescentes, « qui se reposent, qui n'ont point de mouvement, pour « montrer que l'on ne trouve le repos qu'en Dieu, et que « l'on peut se reposer sur lui.
 
@@ -2983,7 +2983,7 @@ C'est par ce nom que Jésus-Christ faisait des miracles, chassait les démons, e
 
 ---
 
-<small>**[p. 151]**</small>
+<small id="p151">**[p. 151]**</small>
 
 grand nom mystérieux est la parole de M.·., qui n'a jamais été perdue. Cette parole est universelle, et elle produit toutes choses ; enfin c'est le Verbe (1), par lequel Dieu créa les cieux, la terre, et tout ce qui est contenu dans l'espace de son cercle infini, et il est formé du commencement du Verbe, c'est-à-dire des premières lettres des quatre premières dictions du premier verset de la Genèse, chapitre II, d'après le texte hébreu.
 
@@ -3001,7 +3001,7 @@ L'anagramme de ce nom en forme douze autres, appelés par les cabalistes les dou
 
 ---
 
-<small>**[p. 152]**</small>
+<small id="p152">**[p. 152]**</small>
 
 | | | |
 | --- | --- | --- |
@@ -3026,7 +3026,7 @@ L'on voit sur le frontispice de ce livre la première face du talisman de Jehova
 
 ---
 
-<small>**[p. 153]**</small>
+<small id="p153">**[p. 153]**</small>
 
 Ces quatre caractères mystérieux מכבי sont formés des premières lettres des quatre dictions de ce verset de l'Exode מי כמין בעלים יהוה. Il signifie en latin quis similis tibi in fortibus, Domine ; et en français, qui est semblable à vous parmi les forts, ô Seigneur ? Ces quatre lettres, réduites en nombre, donnent le nombre 72, qui est le nombre du triangle de Jehovah, et des 72 génies qui sont revêtus des 72 attributs de Dieu.
 
@@ -3044,25 +3044,25 @@ Ensuite renfermez le tout dans un cercle, autour duquel vous écrirez le verset 
 
 ---
 
-<small>**[unnumbered]**</small>
+<small id="leaf-170">**[unnumbered]**</small>
 
 
 
 ---
 
-<small>**[unnumbered]**</small>
+<small id="leaf-171">**[unnumbered]**</small>
 
 
 
 ---
 
-<small>**[unnumbered]**</small>
+<small id="leaf-172">**[unnumbered]**</small>
 
 
 
 ---
 
-<small>**[unnumbered]**</small>
+<small id="leaf-173">**[unnumbered]**</small>
 
 ## PARACELSE
 
@@ -3084,7 +3084,7 @@ On conçoit fort bien qu'avec la science et les pouvoirs psychiques qu'il possé
 
 ---
 
-<small>**[unnumbered]**</small>
+<small id="leaf-174">**[unnumbered]**</small>
 
 ## Charles LANCELIN
 

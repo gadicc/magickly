@@ -1,13 +1,8 @@
 import { existsSync } from "node:fs";
 import { ANGEL_COUNT } from "../../data/kabbalah/seventyTwoAngelsDerived";
+import { type BookPage, bookPagesBetween } from "./bookPage";
 import { handReadings } from "./hebrew";
-import {
-  continuesParagraph,
-  isNoteAt,
-  type PageBlock,
-  type PageTranscription,
-} from "./pageSchema";
-import { readPage } from "./transcribe";
+import { continuesParagraph, isNoteAt, type PageBlock } from "./pageSchema";
 
 /**
  * Each genius's entry, taken from the pages read off the scan rather than from
@@ -61,18 +56,12 @@ function join(sofar: string, block: PageBlock) {
     : `${sofar} ${block.text}`;
 }
 
-function chapterPages(): PageTranscription[] {
-  const pages: PageTranscription[] = [];
-  for (let page = CHAPTER_FROM; page <= CHAPTER_TO; page++) {
-    try {
-      pages.push(readPage(page));
-    } catch {
-      // A page that has not been read is simply absent.
-    }
-  }
+function chapterPages(): BookPage[] {
+  const pages = bookPagesBetween(CHAPTER_FROM, CHAPTER_TO);
   if (!pages.length)
     throw new Error(
-      "No pages have been read. Run transcribe.ts over the genii chapter first.",
+      "No leaves of the genii chapter in data/kabbalah/lenain/pages.json5. " +
+        "Run gatherPages.ts after transcribing.",
     );
   return pages;
 }
@@ -108,7 +97,7 @@ export function plateEntries(): PlateEntry[] {
           ...(printed === expected ? {} : { printedOrdinal: printed }),
           french: block.text,
           footnotes: [],
-          printedPages: [page.printedPage],
+          printedPages: [page.page.number],
         };
         entries.set(expected, current);
         expected += 1;
@@ -117,8 +106,8 @@ export function plateEntries(): PlateEntry[] {
 
       if (!current) return;
       current.french = join(current.french, block);
-      if (!current.printedPages.includes(page.printedPage))
-        current.printedPages.push(page.printedPage);
+      if (!current.printedPages.includes(page.page.number))
+        current.printedPages.push(page.page.number);
     });
   }
 
@@ -169,7 +158,7 @@ interface PageNote {
  * seventy-second. Within a page the order is plain, so they are made whole
  * here and given out afterwards.
  */
-function notesOfPage(page: PageTranscription): PageNote[] {
+function notesOfPage(page: BookPage): PageNote[] {
   const notes: PageNote[] = [];
   page.blocks.forEach((block, index) => {
     if (block.kind === "furniture" || block.kind === "table") return;
@@ -185,7 +174,7 @@ function notesOfPage(page: PageTranscription): PageNote[] {
     notes.push({
       marker: block.marker,
       text: block.text,
-      printedPage: page.printedPage,
+      printedPage: page.page.number,
     });
   });
   return notes;
