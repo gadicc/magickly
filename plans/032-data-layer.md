@@ -1,9 +1,9 @@
 # Data layer
 
 Assessment, adversarial review, type spike and decisions, 17–19 September
-2026. Read [current status](000-current-status.md) first. Steps 0, 1, 2, 3a
-and 3b have landed ([Commits](#commits)); 3c and step 4 are not yet
-implemented. The long-term goal is to publish `data/` as its own npm package.
+2026. Read [current status](000-current-status.md) first. Steps 0 to 3 have
+landed ([Commits](#commits)), 3c with them; step 4 is not yet implemented.
+The long-term goal is to publish `data/` as its own npm package.
 
 Decision taken on 19 September: keep the data as plain JSON tables, describe
 every relation in one declared graph, and materialise links with an eager,
@@ -557,6 +557,28 @@ each; the branch was then gated as [below](#step-3b-1).
 | `d419f9d` fix(kabbalah): Give Manasseh his own Hebrew name | The data fix step 3b was waiting for. One image's bytes and one image's inputs hash move | 4,698 |
 
 A fourth commit, `docs(plan): Record the data layer's third step, part b`,
+adds the sections below; as in the earlier steps it is not in the table, which
+it would have to predict.
+
+### Step 3c
+
+Step 3c — consumers, the last of the three branches — on
+`gate/data-layer-3c` from `827cf5e`. Each commit was checked on its own tree
+with `pnpm check`, `pnpm typecheck` and `pnpm test`, `data/dist` wiped before
+each; the branch was then gated as [below](#step-3c-1).
+
+| Commit | Change | Tests |
+| --- | --- | --- |
+| `40272a5` feat(data): Look rows up by a string id without losing the type | `rowOf(table, id)`, the four `[id]` routes and the two client components behind them, and `entities.ts`'s local `own()` with the four casts that went with it; a route-level test pins which ids render and which 404 | 4,711 |
+| `d13b76c` feat(data): Validate dotted field paths against the graph | `pathTarget(table, path)`, walking the graph rather than a row, and the test that reads every public path from the file that owns it | 4,726 |
+| `a6c9fea` refactor(gd): Read the tribes through the zodiac's link | The Table of Shewbread's hand-join, over a scoped `assemble()` of the two tables it draws | 4,726 |
+| `6b641af` refactor(geomancy): Read a figure's sign and planets off the row | The chart's two raw table imports and the judge's three lookups; a figure is typed as what it is, `TetragramRow` | 4,726 |
+| `88724fa` build(data): Emit the Enochian dictionary as a typed module | `data/dist/enochian/dictionary.mjs`, with a generated `.d.mts` naming one hand-written type: 19 types where a JSON import costs 19,300 | 4,726 |
+| `4fddfb9` feat(enochian): Resolve the keys' dictionary entries on the server | 180 entries for the 181 words the Keys use, the U↔V and hyphen normalisation, and the literal `0` | 4,732 |
+| `d35f69e` refactor(kabbalah): Load the angels' text from the emitted JSON | The last JSON5 import; dynamic and one per language, as before | 4,732 |
+| `f818eff` build: Retire the JSON5 loaders | The webpack rule, the Turbopack rule and the loader it named, vitest's transform, and `*.json5` in `types/global.d.ts` | 4,732 |
+
+A ninth commit, `docs(plan): Record the data layer's third step, part c`,
 adds the sections below; as in the earlier steps it is not in the table, which
 it would have to predict.
 
@@ -1248,6 +1270,266 @@ As in [plan 028](028-seo.md#archangel-data), and for the same reasons:
 Browsers were not opened. The one visible change is a label inside a component
 pinned by server-rendered bytes, and its card is pinned the same way.
 
+### Step 3c
+
+The gate ran on the final tree in the `gate/data-layer-3c` worktree with the
+symlinked `node_modules` removed and a fresh `pnpm install --frozen-lockfile`,
+on Node 24.18.0 and pnpm 10.18.0, under CI's placeholder environment (no
+database or network), in [ci.yml](../.github/workflows/ci.yml)'s order:
+
+| Step | Outcome |
+| --- | --- |
+| `pnpm install --frozen-lockfile` | clean; no dependency was added |
+| `loom init` | already matches the bootstrap defaults |
+| `loom check` | good, with the standing pnpm 11 advisory |
+| `loom check --production` | good, same advisory |
+| `pnpm check` | no errors, and the same 37 warnings as before |
+| `pnpm typecheck` | clean |
+| `pnpm test:coverage` | 4,732 passed, 17 skipped, thresholds met; the three new modules join the coverage list — `rowOf.ts` and `keyEntries.ts` at 100 % of statements, branches, functions and lines, `pathTarget.ts` at 98.30 %, 98.03 %, 100 % and 100 %, its one uncovered line the `as` accessor name no link in this graph uses |
+| `pnpm build` | webpack, 215 pages prerendered |
+| `pnpm check:turbopack` | Turbopack, 215 pages prerendered |
+
+What a reader sees change is on one page. `/enochian/keys` gives `URBS`,
+`GIUI` and `GRSAM` their dictionary meanings, which it never found before
+([below](#casarma-is-not-a-lookup-problem)), and the pronunciation cell of a
+word with no pronunciation is empty where it printed a literal `0`:
+`{dict.pronounciations.length && …}` renders the zero. Nothing else. The four
+`[id]` routes render the same pages and refuse the same ids, the Table of
+Shewbread and the geomancy pages are byte-identical, and every pinned image
+keeps its bytes and its inputs hash:
+
+| Image | Bytes | SHA-256 | Inputs |
+| --- | ---: | --- | --- |
+| `tree-of-life`, the 2=9 ritual's query | 150,736 | `96516a75ce13374a234de855bf596ce1a50d1e9adf7340b398e4b3a2b7e4858a` | `2591a504…` |
+| `table-of-shewbread` | 136,643 | `34e0fce138e4b50930aac5b226e71fbe452eb1ba7db5a9bb1929e0300e106e1b` | `dfd57ffb…` |
+| `astro-geomancy-chart` | 52,476 | `eb2f1b6fe2fef2f563ee164de6e403ca9f398ec4706c9ad331195bc34286bffa` | `c89a608f…` |
+| `astro-geomancy-chart?m=2222111122221111&width=256` | 56,498 | `18ecbf9feea69d75bb979319087b74d12d04a7399e3051f685893d6fbf328821` | `c89a608f…` |
+| `seven-branched-candlestick` | 52,363 | `5d8b637f7ceb159014b1bf7322b51456a8bd2b730bdb699883288ed6bf063331` | `a8a08155…` |
+| `enochian-tablet` | 120,471 | `a35f3c18a3a61d17c48d81e7e7b27def96fc43b896837297039a6ab8c20024e8` | `63b83840…` |
+| `rose-sigil?text=גדי` | 13,454 | `6edd6bd2b48b513facf72cd6a9d5e036338f4d698df6f24967163e5ee340e137` | `f88d8766…` |
+
+Byte for byte what step 3b left, under the unchanged
+`magickli-tree-image-outlines-v3` and `magickli-component-image-outlines-v1`.
+The shewbread is the sharp one here: its component stopped joining the tribes
+by hand and reads the link instead, and the same bytes mean the same join.
+
+#### Typed lookups, and the hole they close
+
+`data.sephirah[someId]` with a `string` id is `any` under the repository's
+`strict: false`: the fields, the links and their optionality are all erased at
+the one place a dynamic route reaches the data, and an unknown id reads as a
+row rather than as `undefined`. [rowOf.ts](../data/rowOf.ts) is an
+`Object.hasOwn` lookup returning `Row | undefined`, and decision 9 is closed
+with it.
+
+It takes the table rather than living on it, because a table is a frozen plain
+object that crosses the Server → Client boundary and a method would not
+([alternatives](#alternatives-considered)). The four `[id]` routes now 404 on
+its `undefined` rather than on a search description rebuilt to test
+existence — the same condition, since `planetPage(id)` was `own(Data.planet,
+id)` — and the sephirah and path client components look their row up by key
+instead of scanning `Object.values(...)` for it.
+[entityRoutes.test.tsx](../src/app/entityRoutes.test.tsx) renders all four and
+asserts the 404 for `missing`, `constructor` and `__proto__`, which is the
+inherited-property hole `Object.hasOwn` is there for.
+
+#### `pathTarget`, and what it covers
+
+[pathTarget.ts](../data/pathTarget.ts) is the static half of decision 8.
+Given a table and a dotted path it walks [the graph](../data/graph.ts) — a
+segment that is a link's accessor is a hop, including one declared inside a
+nested block such as `hermetic.hebrewLetterId`, and a list is walked through
+only by an index, as dot-prop would — and answers the table and field the path
+lands on, or `undefined`. A segment that is no accessor must be a field some
+row of the current table has, so the walk reads the tables as well as the
+graph; that is also why it is a build-time and test-time helper rather than
+something a page imports, since it brings the tables with it.
+`readFieldPath` is untouched: the runtime stays dot-prop.
+
+[fieldPaths.test.ts](../src/fieldPaths.test.ts) reads each list from the file
+that owns it rather than copying it, so a path added anywhere is a path it
+checks. What it covers, and all of it resolves:
+
+| Where the paths come from | How many | Read from |
+| --- | ---: | --- |
+| `TREE_IMAGE_FIELDS`, from `sephirah` | 30 | [treeOfLife.ts](../src/render/contracts/treeOfLife.ts) |
+| `GradeTree`'s `field`, `topText` and `bottomText` | 5 | the component's source |
+| `field=`, `topText=` and `bottomText=` in the ritual documents | 5 | `src/doc/*.jade` |
+| Both blocks `letterAttr=` can name, from `tolPath` | 2 | the Tree's contract |
+| The study sets' string `question` and `answer` | 45 | [sets.tsx](../src/study/sets.tsx) |
+
+The five the documents ask for are `name.roman`, `godName.name.he`,
+`angelicOrder.name.he`, `index` and `archangel.name.he`, all in the 2=9
+ritual's one `/api/treeOfLife` query; no document names a `letterAttr`, so
+both values the contract allows are checked instead. Each study set is matched
+to its table by the identity of the rows it holds — `filter()` and
+`omit()` keep the barrel's own row objects — and the three sets that build
+their cards rather than take a table (`alchemy-basic-terms`, `kerubim-face`,
+`kerubim-zodiac`) are named in the test and have their two fields checked on
+the objects instead. A set whose `question` or `answer` is a function
+(`ten-heavens`, and `geomancy-symbol-names`'s question) reads its fields in
+code and has no path to check; that is the one gap.
+
+Nothing is rejected today. The negatives are asserted in
+[pathTarget.test.ts](../data/pathTarget.test.ts) instead: an unknown field, a
+field under a link that has none, an id used where its accessor belongs
+(`godNameId.name`), a list without an index (`planets.symbol`), the accessor
+of a nested link read at the top level (`tolPath.hebrewLetter`), an empty
+path, and a link whose target the caller did not hand over.
+
+#### The dictionary leaves the JSON imports
+
+A JSON import of the dictionary costs TypeScript about 19,300 types, because
+it infers the literal type of a 1,903-key object, and a cast after the import
+does not undo an inference that has already happened (decision 1). So it is
+the one source the build emits as a module rather than as JSON:
+`data/dist/enochian/dictionary.mjs`, with `dictionary.d.mts` beside it naming
+`EnochianDictionary` from the hand-written
+[dictionaryEntry.ts](../data/enochian/dictionaryEntry.ts) and nothing else.
+`tsc --listFiles` reads the declaration and never the module, and the whole
+file costs 19 types and 21 instantiations ([below](#cost-2)).
+
+The value is written as `JSON.parse` of a string literal, which is what a
+bundler makes of a JSON import anyway and what an engine parses fastest at
+this size, so the page that wants the whole of it pays nothing for the
+change: `/enochian/dictionary` loads 1,547,045 bytes of client chunks at the
+tip where `main` loaded 1,547,250, and 451,464 gzipped where `main` was
+450,069 — the 1.4 KB is chunk splitting, since the module is now reached from
+one route rather than two.
+
+The build owns three kinds of output under `data/dist` now — `.json`, `.mjs`
+and `.d.mts` — and prunes all three; the watcher picks the dictionary up as it
+picks up a table, which it did not before, since the file was skipped outright.
+
+#### What the keys page ships
+
+`/enochian/keys` reads 181 words and shipped all 1,903, because the lookup was
+in the client component. The page is a Server Component, so it resolves them
+there ([keyEntries.ts](../src/app/enochian/keys/keyEntries.ts)) and hands the
+client a map of word to entry. `next build --webpack` under
+[ci.yml](../.github/workflows/ci.yml)'s environment, the chunks read from the
+prerendered HTML under `.next/server/app`, raw bytes and then gzipped:
+
+| `/enochian/keys` | Client chunks | Flight payload | Prerendered HTML |
+| --- | ---: | ---: | ---: |
+| `main` at `d769d56` | 1,565,433 / 455,391 | 16,208 / 2,863 | 109,468 / 15,343 |
+| The tip | 1,322,020 / 423,623 | 42,582 / 7,387 | 140,203 / 20,166 |
+
+The chunk that goes is the dictionary's own, 243,702 bytes raw and 31,896
+gzipped, which is the figure the assessment recorded. What replaces it is the
+180 entries in the route's Flight payload, 26 KB raw and about 4.5 KB gzipped,
+which the prerendered HTML carries too. Taking the HTML and the chunks
+together, a first visit is 212,678 bytes lighter, 25,944 of them gzipped. (The
+two commits that made the change quote their own trees' figures, which are
+within a hundred bytes of these; the chunk hashes move as the later commits
+land.)
+
+The Table of Shewbread's scoped `assemble()` is the other side of the ledger,
+and is what the scope is for: `/gd/symbols/shewbread` grows by 4,346 bytes
+raw and 2,592 gzipped — `assemble()` and the graph literal — where importing
+the barrel would have added its 55,842 raw and 16,099 gzipped. `/gd/symbols`
+is unchanged either way, being within 76 bytes: the candlestick on that page
+reads the barrel already.
+
+#### CASARMA is not a lookup problem
+
+The lookup tries the exact key, then U for V and V for U, then the
+dictionary's keys with their hyphens stripped — the normalisation decided in
+step 1 ([data fixes](#data-fixes)). Three of the four words that decision
+named are found by it: `URBS` is filed as `VRBS`, `GIUI` as `GIVI`, `GRSAM` as
+`G-RSAM`. The fourth is not, and no normalisation would find it. The plan read
+`CASARMA` as filed under `CASARM`; what is actually there is `CASARM`'s second
+meaning with `CASARMA`'s entry run into the text —
+
+```
+{ "meaning": "whom, unto whomCASARMA whom", "source": "WE" }
+```
+
+— which is the transcription fault step 3a parted `BIA` and `BIAB` on. It is
+one of a family: `G-RSAM`'s meaning reads "ADMIRATION, WITHGRU DEED, FACT",
+with `GRU`'s entry run into it the same way. The dictionary's contents are
+another session's to fix ([follow-ups](#follow-ups)), so the words are
+recorded here and nothing in `dictionary.json5` was touched. Of the seven
+words the assessment found missing, three were added as data in step 1
+(`IZAZAZ`, `BIAB`, `VOMZARG`), three are found by the normalisation, and
+`CASARMA` is the one still missing: the page ships 180 entries for 181 words.
+
+#### Cost
+
+`tsc --noEmit --incremental false --extendedDiagnostics` over the whole
+repository, after `data:build` and `next typegen`, each tree measured in the
+same worktree on the same machine:
+
+| Tree | Files | Types | Instantiations | Check |
+| --- | ---: | ---: | ---: | ---: |
+| `main` at `d769d56` | 5,560 | 408,304 | 1,867,325 | 6.73 s |
+| `6b641af`, through the two refactors | 5,566 | 408,957 | 1,869,060 | 6.64 s |
+| `88724fa`, the dictionary module | 5,568 | 408,976 | 1,869,081 | 6.49 s |
+| `d35f69e`, through the angels' text | 5,572 | 409,385 | 1,869,176 | 6.68 s |
+| `f818eff`, the tip | 5,572 | 408,979 | 1,868,770 | 6.71 s |
+
+The branch is 675 types and 1,445 instantiations above `main`, against a
+budget of 5,000,000. The row this step existed to watch is the third: the
+dictionary as an emitted module costs **19 types**, where the JSON import the
+spike measured cost 19,300. The 409 types on the row after it are the keys
+page and the angels' text as JSON — a `string[]`, which is cheap for 88 kB of
+prose — and the tip gives 406 of them back by deleting the `*.json5` module
+declaration.
+
+#### What was decided while building it
+
+- **The shewbread assembles two tables; the chart uses the barrel.** The Table
+  of Shewbread is drawn on `/gd/symbols` and `/gd/symbols/shewbread`, neither
+  of which reads the barrel, so importing it would have put all 23 tables in
+  those routes' chunk for the sake of one link. It calls `assemble()` on the
+  two tables it draws instead, and keeps the two JSON imports it always had.
+  The astro-geomancy chart is the other way round: every figure it is handed
+  already comes from the barrel, so reading `tetragram.zodiac` and
+  `tetragram.planets` removes two raw imports and adds nothing.
+- **The four routes 404 on the row, not on the description.** `planetPage(id)`
+  built a whole search snippet to answer whether the id existed. The condition
+  is the same either way, since that function's first act was the same
+  own-property lookup.
+- **The emitted declaration is generated, not committed.** `data/dist` is
+  gitignored, so the `.d.mts` is written by the build beside the module it
+  describes, and the hand-written type it names lives with the sources. A
+  checkout without `data/dist` fails to resolve it, exactly as it fails to
+  resolve the tables; every task that type-checks runs `data:build` first.
+- **The entries cross as a prop, not as a fetch.** The page is prerendered, so
+  the 180 entries are in the Flight payload and the HTML that carries it, and
+  there is no second request and nothing to load. A word the dictionary does
+  not have is simply absent from the map, and the component renders the same
+  blank for it as for an entry with nothing in it.
+- **The keys page's gematria cell is left as it was.** `{dict.gematria ? …}`
+  prints "Gematria " with nothing after it for a word whose gematria is an
+  empty array, which is most of them; `/enochian/dictionary` guards the same
+  cell with `?.length`. It is the same family of blemish as the `0`, and is
+  not what this step was asked for ([follow-ups](#follow-ups)).
+- **`SevenBranchedCandleStick` and `Tablet` keep their raw imports.** The
+  candlestick names its seven planets in code and reads them off the barrel by
+  a typed `PlanetId`, so there is no join to remove; the Enochian tablets are
+  in no link in either direction and are not in the barrel at all, which is why
+  [dataInputs.ts](../src/render/dataInputs.ts) imports that one table beside it.
+
+#### Both bundlers, in development
+
+Browsers were not opened; the dev servers were driven with `curl`, on a fresh
+port each (a reused port keeps its Serwist caches). This is the step that
+takes the JSON5 rules out of both bundlers, so both were run with a real
+`node_modules` in the worktree rather than the symlink, which is what
+Turbopack needs — it refuses a symlinked one, "points out of the filesystem
+root", which is why step 3a could only check webpack. `pnpm dev` on Turbopack
+and `pnpm dev:webpack` each served `/enochian/dictionary` with a word only the
+emitted module can supply, `/enochian/keys` with a meaning only the
+server-side normalisation finds, and `/gd/symbols/shewbread` with Manasseh's
+Hebrew; Turbopack also served the four `[id]` routes.
+
+The watcher covers the dictionary now, where the file used to be skipped
+outright. A key added to `dictionary.json5` while the Turbopack server ran was
+logged as `data: enochian/dictionary.mjs`, was in the next render of
+`/enochian/dictionary`, and left the emitted module byte for byte as it was
+when the edit was reverted.
+
 ## Adversarial review
 
 Run on 18 September at xhigh by Fable 5.1 against the design as it stood
@@ -1300,8 +1582,32 @@ types, the per-table wrapper interfaces, the explicit `kind` with
 and the watcher. So is everything step 3b was given ([above](#step-3b-1)):
 `resolvedInputsHash` with a spec on every registry entry, the inputs hash in
 every image identity and through the catalogs and plans, and Manasseh's
-Hebrew. What is left of step 3 is 3c
-([decision 13](#decided-on-20-september)). The rest:
+Hebrew. So is everything step 3c was given ([above](#step-3c-1)): the typed
+lookups, `pathTarget()` with its field-path test, the hand-joins, the
+dictionary out of the JSON imports and off the keys page, that page's
+normalisation and its literal `0`, and the JSON5 loaders. Step 3 is done;
+step 4 is [a plan of its own](#migration). The rest:
+
+- **New, from step 3c.** `CASARMA` has no dictionary entry and no spelling
+  finds one: `CASARM`'s second meaning carries it run into the text, as
+  `G-RSAM`'s carries `GRU`'s, which is the fault step 3a parted `BIA` and
+  `BIAB` on ([above](#casarma-is-not-a-lookup-problem)). Both belong with the
+  dictionary contents below. `/enochian/keys` still prints "Gematria " with
+  nothing after it for a word whose gematria is empty, where
+  `/enochian/dictionary` guards the same cell with `?.length`. A study set
+  whose `question` or `answer` is a function has no dotted path for
+  `pathTarget()` to check, which is the one gap in that test's coverage. And
+  the dump-page redesign ([plan 028](028-seo.md#follow-ups)) is what `decycle`
+  is still waiting for: four pages import it to print a row, and 3c left them
+  alone by [decision 13](#decided-on-20-september).
+- **Twenty-one dictionary entries file a number as a meaning.** The re-check
+  found `meanings[].meaning` holding a number in 21 entries, every one a
+  `WE`-sourced gematria value filed as a meaning: ACAM, AF, CIAI, CLA, DAOX,
+  DARG, EMOD, ERAN, FAXS, MAPM, MIAN, NI, OL (its fifth), OP, OS (twice), OX,
+  P (its second), PD, PEOAL, QUAR and VX. `OL` is a Keys word, so
+  `/enochian/keys` prints "24 (WE)" as a meaning. Nothing checks the
+  dictionary against `EnochianEntry`; the values want moving into `gematria`,
+  and a shape assertion over the shipped entries would keep them there.
 
 - **Done in step 2.** [Plan 031](031-seventy-two-angels.md)'s
   `seventyTwoAngelsDerived.ts` still imports `PlanetId` and `ZodiacId`, which

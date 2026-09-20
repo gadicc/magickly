@@ -113,7 +113,7 @@ Follow-ups are separate from the completed migration work:
 - The data layer is being rebuilt: `data/` keeps plain JSON tables, one
   declared graph describes every relation, and an eager `assemble()` replaces
   the barrel's in-place linking. See [plan 032](032-data-layer.md). Steps 0
-  to 3b have landed. Step 0 pinned the pages the data changes touch, step 1
+  to 3 have landed. Step 0 pinned the pages the data changes touch, step 1
   repaired the links, sentinels and field names the audit found (Luna's god
   name and the rulers of Cancer and Scorpio changed with it), and step 2
   built the layer itself: JSON emitted from the JSON5 sources into gitignored
@@ -159,14 +159,43 @@ Follow-ups are separate from the completed migration work:
   was validated under; only a manifest change is refused. The
   `RENDER_INPUT_SWEEP=1` test behind it changed all 3,721 fields of the data in
   turn and found no image that could be redrawn without its hash moving.
-- TODO: step 3c, consumers. Typed `get(id)` lookups on the `[id]` routes,
-  Server Components passing ids, `/enochian/keys` resolving its dictionary
-  subset on the server with the dictionary out of the JSON imports, that
-  page's lookup normalisation and its literal `0`, the `TableOfShewbread`
-  hand-join, `pathTarget()` with its field-path test, and the JSON5 loaders
-  once nothing imports JSON5. The dump-page redesign, and `decycle` with it,
-  comes after. The two `gdGrade` accessor collisions and the drifted id
-  unions were settled in step 2.
+  Step 3c, the consumers, has landed, and with it step 3. A row is looked up
+  by a string id through a helper that keeps its type, so the four `[id]`
+  routes no longer cast an id into `keyof` and 404 on a typed `undefined`
+  instead; a dotted field path can be checked against the graph without
+  rendering anything, and every path the app treats as public — the Tree's
+  thirty fields, the grade tree's, the ritual documents' and the study sets'
+  forty-five — is checked by a test that reads each list from the file that
+  owns it; the Table of Shewbread and the geomancy chart read their links
+  rather than indexing another table by hand; and nothing imports a `.json5`
+  any more, so the webpack rule, the Turbopack rule and its loader, vitest's
+  transform and the `*.json5` declaration that started all this are gone. The
+  Enochian dictionary is emitted as a module with a hand-written type beside
+  it, 19 types where a JSON import cost 19,300, and `/enochian/keys` resolves
+  the 180 entries its 181 words need on the server: that page loads 243,702
+  fewer bytes of JavaScript, 31,896 of them gzipped, and is 212,678 bytes
+  lighter over the whole first visit. What a reader sees is on that page:
+  `URBS`, `GIUI` and `GRSAM` gain the meanings the dictionary files under
+  other spellings, and the pronunciation cell of a word with none is empty
+  where it printed a literal `0`. Nothing else moved — every pinned image
+  keeps its bytes and its inputs hash. See
+  [plan 032](032-data-layer.md#step-3c-1).
+- TODO: three small ones left by step 3c
+  ([plan 032](032-data-layer.md#follow-ups)): `CASARMA` has no dictionary
+  entry at all — `CASARM`'s second meaning carries it run into the text, as
+  `G-RSAM`'s carries `GRU`'s, the same fault step 3a parted `BIA` and `BIAB`
+  on — so it wants fixing with the dictionary's contents below;
+  `/enochian/keys` still prints "Gematria " with nothing after it for a word
+  whose gematria is empty; and a study set whose question or answer is a
+  function has no dotted path for the new field-path test to check.
+- TODO: 21 Enochian dictionary entries file a `WE` gematria number as a
+  meaning (ACAM, AF, CIAI, CLA, DAOX, DARG, EMOD, ERAN, FAXS, MAPM, MIAN, NI,
+  OL, OP, OS, OX, P, PD, PEOAL, QUAR, VX; `OL` shows on `/enochian/keys` as
+  "24 (WE)"); move them into `gematria` and assert the shipped entries'
+  shape, per [plan 032](032-data-layer.md#follow-ups).
+- TODO: the dump-page redesign ([plan 028](028-seo.md#follow-ups)), which is
+  what `decycle` is still waiting for: four pages import it to print a row,
+  and step 3c left them alone deliberately. It wants a design pass of its own.
 - TODO: two small ones left by step 3b
   ([plan 032](032-data-layer.md#follow-ups)): two tribes' Hebrew names are
   hashed into the Table of Shewbread's identity although no sign points at

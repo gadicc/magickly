@@ -216,3 +216,6 @@ wording.
 - Drop the `webpack` devDependency when Serwist's webpack plugin goes.
 - The `/gd/sigils` hydration warning was flagged on 17 September and started
   as a separate task.
+- 20 September 2026: the JSON5 rule and `loaders/json5-loader.mjs` in the
+  table above were retired by [plan 032](032-data-layer.md) step 3c once
+  nothing imported `.json5`; the row records the 17 September state.
