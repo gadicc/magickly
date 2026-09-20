@@ -121,24 +121,21 @@ Follow-ups are separate from the completed migration work:
   the graph says. Nothing a reader sees changed with step 2, no rendered
   image moved, and what a barrel route loads is within 5 KB of what it was.
   Step 3 is three gated branches, decided on 20 September; see
-  [plan 032](032-data-layer.md#decided-on-20-september).
-- TODO: step 3a, types and checks. An explicit kind on the three spheres of
-  the Tree that sit in the planet table, so that `PlanetId` derives from a
-  declared fact rather than from a row having a `symbol`, with
-  `src/study/sets.tsx`'s `"symbol" in planet` filter switched to it;
-  `Readonly<>` on `Row` and `Table`, since `assemble()` freezes its rows at
-  runtime while the types let `data.sephirah.keter.scent = "x"` compile and
-  then throw; a per-table wrapper interface, so that a hover and step 4's
-  `.d.ts` print `Row<…>` rather than its whole expansion; the three gaps the
-  step-2 re-check left in the checks (the reciprocal-`mirrors` test runs only
-  under vitest, not `pnpm data:check`; the twelve-planet pin is typed
-  `PlanetId[]`, which constrains one direction only; and inventory failures
-  name array rows by `id` or index, which the seventy-two, keyed `no`, lack);
-  a lint for duplicate keys in the JSON5 sources, which the schemas cannot see
-  because they read the parsed object; the run-together `BIA`/`BIAB`
-  dictionary entry; and a watcher for the JSON5 sources, since `pnpm dev`
-  builds `data/dist` once and a JSON5 edit while the server runs needs
-  `pnpm data:build`.
+  [plan 032](032-data-layer.md#decided-on-20-september). Step 3a, types and
+  checks, has landed with it: the three spheres of the Tree in the planet
+  table say so in their own `kind`, so `PlanetId` is a declared fact rather
+  than "the row has a symbol"; the row types are `readonly`, as the rows
+  themselves have been frozen all along; every row the barrel hands out is a
+  named interface rather than a mapped type, without which a package cannot
+  emit a `.d.ts` for one at all; the reciprocal-`mirrors` check and a
+  duplicate-key lint over the JSON5 sources run under `pnpm data:check`, so
+  `pnpm build` rejects both; `dictionary.BIA` no longer carries `BIAB`'s
+  meaning, which `BIAB` now holds from its own source; and `pnpm dev` builds
+  the tables before the server starts and watches the sources after, so an
+  edit reaches the running server. The whole branch type-checks 55,608
+  instantiations *below* `main`. Two things a reader sees: a `kind` row in the
+  field dump on `/astrology/planet/<id>`, and BIA's meaning on
+  `/enochian/dictionary` and `/enochian/keys`.
 - TODO: step 3b, render identity. `resolvedInputsHash`, which hashes the
   fields an image actually reads rather than whole tables, and with it the
   accepted one-time re-identification of every data-dependent component
@@ -151,6 +148,17 @@ Follow-ups are separate from the completed migration work:
   once nothing imports JSON5. The dump-page redesign, and `decycle` with it,
   comes after. The two `gdGrade` accessor collisions and the drifted id
   unions were settled in step 2.
+- TODO: two small ones left by step 3a
+  ([plan 032](032-data-layer.md#follow-ups)): what `pnpm dev` does not pick up
+  until it restarts — a source directory added while it runs, since the watch
+  is one watcher per directory, and `dist/graph.json` after a `graph.ts` edit,
+  since only the build writes it; and a build emitting `as const` TypeScript
+  modules rather than JSON, which would make `kind` and the other closed
+  fields literal types and let `PlanetId` be derived rather than written out —
+  that one belongs with step 4's package.
+- TODO: seventy-six Enochian dictionary entries repeat a meaning object
+  verbatim (same text, source and citation); dedupe them and add a check, per
+  [plan 032](032-data-layer.md#follow-ups).
 - Not yet released: from the next release, anonymous `/api/session` checks
   return 200 with a null user instead of 401 (changed 17 September). An
   anonymous tab left open across that release shows a study load error until

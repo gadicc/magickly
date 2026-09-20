@@ -1,9 +1,9 @@
 # Data layer
 
 Assessment, adversarial review, type spike and decisions, 17–19 September
-2026. Read [current status](000-current-status.md) first. Steps 0, 1 and 2
-have landed ([Commits](#commits)); steps 3 and 4 are not yet implemented. The
-long-term goal is to publish `data/` as its own npm package.
+2026. Read [current status](000-current-status.md) first. Steps 0, 1, 2 and
+3a have landed ([Commits](#commits)); 3b, 3c and step 4 are not yet
+implemented. The long-term goal is to publish `data/` as its own npm package.
 
 Decision taken on 19 September: keep the data as plain JSON tables, describe
 every relation in one declared graph, and materialise links with an eager,
@@ -508,6 +508,41 @@ The last two came from the adversarial review on the first five. An eighth
 commit, `docs(plan): Record the data layer's second step`, adds the sections
 below; as in step 1 it is not in the table, which it would have to predict.
 
+### Step 3a
+
+Step 3a — types and checks, the first of the three branches
+[decision 13](#decided-on-20-september) splits step 3 into — on
+`gate/data-layer-3a` from `b0d8d74`. Each commit was checked on its own tree
+with `pnpm check`, `pnpm typecheck` and `pnpm test`, `data/dist` wiped before
+each so that the wiring is proved rather than assumed; the branch was then
+gated as [below](#step-3a-1).
+
+| Commit | Change | Tests |
+| --- | --- | --- |
+| `a1508b7` docs(plan): Record the owner's decisions for step 3 | Decisions 13 to 16 above, the step-3 split under Migration, and the status page's TODOs regrouped as 3a, 3b and 3c | 4,657 |
+| `dbdc7d8` feat(data): Let the planet rows say which they are | `kind: "planet"` or `"sphere"` on all fifteen rows, required by the schema as that enum; `PLANET_IDS` in `Planets.ts` with a check that the list and the data agree in both directions; `sets.tsx` reads the field instead of asking for a `symbol`, and step 0's key-surface pin gains it | 4,659 |
+| `e579dac` feat(data): Say in the types that the rows are frozen | `readonly` through `Row`, `Table`, the nested blocks and the arrays, with eight `@ts-expect-error` assertions each paired with the `TypeError` the same line raises | 4,660 |
+| `066f5f0` feat(data): Give every table's rows a name of their own | `rows.ts`, one interface per table, and `types.ts` resolving a row through them wherever the scope leaves no link out — the barrel included, which is what makes a `.d.ts` for a row possible at all | 4,662 |
+| `a796822` test(data): Close the last two gaps in the checks | The reciprocal-`mirrors` check moves from `graph.test.ts` into `integrity.ts`; an array row is named by `id`, then `no`, then its index | 4,662 |
+| `2e2a0aa` test(data): Lint the JSON5 sources for a repeated key | `duplicateKeys.ts`, a scan of the source text rather than the parse, run by `data:check` over every `*.json5` under `data/`; the check takes the directory to read them from, so a planted duplicate walks the wiring the clean sources never do | 4,672 |
+| `bcae1f9` fix(enochian): Part BIA's meaning from BIAB's | "voices, yourBIAB stand" becomes "voices, your", and `BIAB` gains the WE attestation that string carried | 4,672 |
+| `cfe677b` build(data): Watch the JSON5 sources while dev runs | `build.mts --watch`, one watcher per directory, and `data/dev.mts` building the tables before it starts the watcher and `next dev` beside each other, so that both stop together | 4,672 |
+
+An adversarial review of the eight, at xhigh, found the branch sound and one
+thing wrong: the wrapper interfaces did not reach the barrel, only a full
+`assemble()`, so the one object that needed a name still had none
+([below](#the-wrapper-interfaces-work-and-reach-the-barrel)). Each of its
+findings was amended into the commit that introduced the thing rather than
+appended, so each commit stands on its own: the scope rule and its assertion
+into the interfaces, the awaited first build and the `'error'` handler into
+the watcher, the injectable source directory and a planted duplicate into the
+lint, `BIAB`'s WE meaning into the parting, and the moved key-surface pin into
+`kind`'s message.
+
+A ninth commit, `docs(plan): Record the data layer's third step`, adds the
+sections below; as in the earlier steps it is not in the table, which it would
+have to predict.
+
 ## Results
 
 ### Steps 0 and 1
@@ -751,7 +786,8 @@ where `main` had it.
   names exactly those twelve. `PlanetKey` is every row. The twelve are written
   out in [integrity.test.ts](../data/integrity.test.ts) and asserted against
   the table, so the derivation cannot quietly pick up a thirteenth; making the
-  criterion explicit is a follow-up.
+  criterion explicit was a follow-up, and is step 3a's `kind`
+  ([below](#kind-is-data-the-types-cannot-read)).
 - **Rows are uniform at every depth, and a key some rows lack is optional.**
   The spike only unioned the top-level keys; this data needs more, because the
   sephirot have four shapes of `color` between them and five planets have no
@@ -772,6 +808,180 @@ Browsers were not opened. Both geomancy pages and every component image are
 pinned by server-rendered bytes, which is what this step could have changed,
 and the two markup edits (the path page's Tarot block, the reading page's
 archangel) are covered by those pins.
+
+### Step 3a
+
+The gate ran on the final tree in the `gate/data-layer-3a` worktree with the
+symlinked `node_modules` removed and a fresh `pnpm install --frozen-lockfile`,
+on Node 24.18.0 and pnpm 10.18.0, under CI's placeholder environment (no
+database or network), in [ci.yml](../.github/workflows/ci.yml)'s order:
+
+| Step | Outcome |
+| --- | --- |
+| `pnpm install --frozen-lockfile` | clean; no dependency was added |
+| `loom init` | already matches the bootstrap defaults |
+| `loom check` | good, with the standing pnpm 11 advisory |
+| `loom check --production` | good, same advisory |
+| `pnpm check` | no errors, and the same 37 warnings as before |
+| `pnpm typecheck` | clean |
+| `pnpm test:coverage` | 4,672 passed, 16 skipped, thresholds met; `data/` covers 99.65 % of statements and 98.42 % of branches |
+| `pnpm build` | webpack, 215 pages prerendered |
+| `pnpm check:turbopack` | Turbopack, 215 pages prerendered |
+
+What a reader sees change is two things, both small:
+
+- `/astrology/planet/<id>` tables every key of the row it does not lay out
+  itself, so each of the fifteen now shows a `kind` row. The dump is plan
+  028's to replace.
+- `/enochian/dictionary` gives `BIA` the meaning "voices, your" rather than
+  "voices, yourBIAB stand", and `BIAB` reads "stand" twice, once for the Keys
+  and once for WE, whose attestation the run-together string was carrying.
+  `/enochian/keys` shows `BIA` under the second key and `BIAB` under the third.
+
+Nothing else. Both geomancy pages are byte-identical — they are pinned by
+`renderToStaticMarkup` snapshots — and every one of the six pinned component
+images was re-rendered at the tip and compared:
+
+| Image | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `tree-of-life`, the 2=9 ritual's query | 150,736 | `96516a75ce13374a234de855bf596ce1a50d1e9adf7340b398e4b3a2b7e4858a` |
+| `table-of-shewbread` | 136,294 | `df3c37911f14c3e81040d62d74892b97fdb0c72027ef390323f907e795ceb516` |
+| `astro-geomancy-chart` | 52,476 | `eb2f1b6fe2fef2f563ee164de6e403ca9f398ec4706c9ad331195bc34286bffa` |
+| `astro-geomancy-chart?m=2222111122221111&width=256` | 56,498 | `18ecbf9feea69d75bb979319087b74d12d04a7399e3051f685893d6fbf328821` |
+| `seven-branched-candlestick` | 52,363 | `5d8b637f7ceb159014b1bf7322b51456a8bd2b730bdb699883288ed6bf063331` |
+| `enochian-tablet` | 120,471 | `a35f3c18a3a61d17c48d81e7e7b27def96fc43b896837297039a6ab8c20024e8` |
+
+Byte for byte what steps 1 and 2 left, under the unchanged
+`magickli-tree-image-outlines-v3` and `magickli-component-image-outlines-v1`,
+so published rituals are untouched. The one-time move every data-dependent
+identity takes is 3b's ([decision 15](#decided-on-20-september)).
+
+#### The wrapper interfaces work, and reach the barrel
+
+`interface SephirahRow extends Row<"*", "sephirah"> {}` is legal — the
+instantiated mapped type has statically known members, so there is no TS2312 —
+and [types.ts](../data/types.ts) resolves a row through
+[rows.ts](../data/rows.ts)'s map, so the links inside a row are named too.
+
+Which rows those are is the part that had to be got right. The barrel is not a
+full `assemble()`: it holds 23 of the 26 tables
+([above](#the-three-tables-the-barrel-does-not-hold)), so a rule that named
+rows only where the scope is `"*"` would have named the rows of
+`assemble(tables)`, which nothing but the test suite builds, and left
+[data.ts](../data/data.ts) — the object step 4's package emits a declaration
+for — printing the whole expansion. The rule is instead that a scope is
+*complete* when it holds every table a link names at either end: a table
+outside such a scope declares no link into the scope and derives no back-link
+on it, so its absence changes no row, and `Row<I, T>` is `Row<"*", T>` member
+for member. The three the barrel leaves out are named in no link in either
+direction — which is why they are left out — so the barrel is complete and its
+rows are named. A narrower `assemble()` keeps the mapped type, since its rows
+really do have fewer links than the name would promise.
+
+`tsc --declaration` over the barrel, with a probe beside it exporting one of
+its rows, emitting to a scratch directory:
+
+| | Before | After |
+| --- | --- | --- |
+| `data/data.d.ts` | not emitted at all: TS4023, `tetragram` "has or is using name 'Simplify' from external module … but cannot be named" | `readonly acquisitio: import("./rows").TetragramRow;` through both tables it exports by name |
+| `export const keter = data.sephirah.keter` | the same TS4023, on `keter` | `export declare const keter: import("./rows").SephirahRow;` |
+| An assignment error on a link | `Type 'Simplify<{ readonly id: string; … } & { readonly planetId?: … } & Links<...>> \| undefined' is not assignable…` | `Type 'ArchangelRow \| undefined' is not assignable to type 'ArchangelRow'` |
+
+The first two lines are what matters for step 4: a package cannot emit a
+`.d.ts` for the barrel at all without either these interfaces or exporting
+`Simplify`. Because a link declared to one of the three left-out tables would
+narrow the barrel's scope and quietly take the names away again,
+[types.test.ts](../data/types.test.ts) asserts that `data.sephirah.keter` off
+the barrel is `SephirahRow` exactly — type equality, not assignability — while
+the scoped `@ts-expect-error`s on the other side keep the mapped-type branch
+live.
+
+The name is `<Table>Row` and not `<Table>` because the typed modules beside
+each JSON file already export `Sephirah`, `Planet` and the rest as
+`Raw & Partial<Links>`, the shape that accepts a raw row and an assembled one
+alike; that meaning is kept.
+
+#### `kind` is data the types cannot read
+
+A JSON import widens `"planet"` to `string`, so no literal type survives the
+import and `PlanetId` cannot be an `Extract` over `kind` the way it could be
+over a field of an `as const` TypeScript module. The twelve are therefore
+written out in [Planets.ts](../data/astrology/Planets.ts) —
+`as const satisfies readonly PlanetKey[]`, which checks every member against
+the table's keys — and the other direction, that they are exactly the rows of
+kind `"planet"`, is an integrity check, so `pnpm data:check` and `pnpm build`
+reject a drift rather than a test alone.
+
+A later build could emit `as const` TypeScript modules instead of JSON and
+make `kind`, `category`, `quadruplicity` and the other closed fields literal
+types. It was not done now because the JSON is the thing other languages and
+step 4's package read, `resolveJsonModule` costs nothing to keep, and an
+emitted `.ts` per table would have to be type-checked on every build; it is
+worth revisiting when the package is built.
+
+#### Cost
+
+`tsc --noEmit --incremental false --extendedDiagnostics` over the whole
+repository, after `data:build` and `next typegen`, each tree measured in the
+same worktree on the same machine:
+
+| Tree | Types | Instantiations | Check |
+| --- | ---: | ---: | ---: |
+| `main` at `4a29f41` | 396,700 | 1,893,175 | 6.60 s |
+| `dbdc7d8`, `kind` | 396,759 | 1,893,406 | 6.73 s |
+| `e579dac`, `readonly` | 396,643 | 1,866,069 | 6.65 s |
+| `066f5f0`, the wrapper interfaces | 395,564 | 1,837,250 | 6.75 s |
+| `cfe677b`, the tip | 395,990 | 1,837,567 | 6.54 s |
+
+The branch rows were measured before the rebases that followed, on the trees
+as they stood on `4a29f41`; `main`'s later commits shift every row by the same
+small constant (86 types and 481 instantiations at `6224bca`), so the delta of
+55,608 is unchanged and a re-measurement of a row on today's base will not
+reproduce its number exactly.
+
+The whole branch is 55,608 instantiations *below* `main`, which was not the
+expectation: `readonly` was assumed to cost and the interfaces to save, and in
+fact both saved — the modifiers by 27,337 and the interfaces, which give
+TypeScript one named target to resolve a row to rather than an intersection to
+rebuild at every link, by a further 28,819. Most of that second figure is the
+barrel: the names reach it only because the scope rule above asks whether the
+scope is complete rather than whether it is `"*"`, and that alone is 22,052 of
+it. `kind` costs 231 and the checks, the lint and the watcher 317 between them.
+
+#### The watcher, and what Linux does with a rename
+
+`fs.watch(dir, { recursive: true })` over `data/` was written first and is
+wrong here: on Linux it follows the file, so an editor that saves by writing a
+new file and renaming it over the old one — `sed -i`, vim, VS Code — is
+invisible to it from the *second* save on. Measured with a scratch script: the
+first save raised three events and every save after it none. One watcher per
+directory, non-recursively, keeps firing, because the directory is what it
+watches; that is what [build.mts](../data/build.mts) does, over the nine
+directories that hold sources. A directory added later is not watched until
+the task restarts, which is one of the two things given up. The other is
+`dist/graph.json`: the watch is over the JSON5 and nothing else, so an edit to
+[graph.ts](../data/graph.ts) leaves that file as the first build wrote it.
+Nothing under `src/` reads it — it is there for a reader that is not
+TypeScript — and the graph itself reaches the app as a module, which Next
+reloads on its own, so nothing stale is ever served.
+
+`pnpm dev` and `pnpm dev:webpack` run through [dev.mts](../data/dev.mts),
+which builds the tables, *awaits* that, and only then spawns the watcher and
+`next dev`, stopping both together. `data/dist` is gitignored, so without the
+await a fresh checkout has `next dev` racing the first build: with the
+directory emptied and a stub in `next`'s place, the concurrent version's
+server started on nothing and this one's on all 31 files.
+
+Verified by hand on the webpack dev server (Turbopack refuses the worktree's
+symlinked `node_modules`, "points out of the filesystem root"), on a fresh
+port: three consecutive `sed -i` saves of `planets.json5` each logged one
+rebuild and each reached `/astrology/planets` in the markup — "Sol" to "Sol
+Invictus" to "Sol Invictus II" and back to "Sol". A syntax error mid-save is
+reported and the watch goes on. SIGINT to the process group (Ctrl-C), SIGTERM
+to the wrapper alone, either child exiting, and `next` missing from PATH —
+which raises `'error'` and never `'exit'`, so without a handler it would take
+the wrapper down and leave the watcher running — each left nothing behind in
+`ps`.
 
 ## Adversarial review
 
@@ -819,57 +1029,37 @@ the migration.
 
 ## Follow-ups
 
-Four of these are step 3's, and each came out of the adversarial review on
-step 2:
+Everything step 3a was given is done ([above](#step-3a)): `readonly` row
+types, the per-table wrapper interfaces, the explicit `kind` with
+`PLANET_IDS`, the three gaps in the checks, the duplicate-key lint, `BIA`,
+and the watcher. What is left of step 3 is 3b and 3c
+([decision 13](#decided-on-20-september)). The rest:
 
-- **`Readonly<>` on `Row` and `Table`.** `assemble()` deep-freezes what it
-  returns, and the types say nothing about it, so `data.sephirah.keter.scent
-  = "x"` compiles and throws at runtime. A `Readonly` mapped type through
-  `Row`, `Table` and the nested blocks makes the freeze a compile error
-  instead, and a test that the assignment no longer type-checks says so.
-- **A per-table wrapper interface, so the name survives.** `Row<I, T>` is a
-  `Simplify<…>` intersection, so a hover, an error and step 4's `.d.ts` all
-  print the whole expansion rather than `Row<"*", "sephirah">`. An interface
-  per table extending it would keep the name in every position that matters,
-  at the cost of one declaration per table, generated or written by hand.
-- **An explicit kind on the three spheres.** `PlanetId` is "a planet row has
-  a symbol", which is a fact about the data doing the work of a declared one.
-  A `kind: "planet" | "sphere"` (or the equivalent) on `primum-mobile`,
-  `zodiac` and `olam-yesodot` makes the criterion the data's own statement,
-  turns the derivation into `Extract` on that field, and lets
-  [sets.tsx](../src/study/sets.tsx)'s `"symbol" in planet` filter say what it
-  means. The twelve are pinned by a test until then.
-- **Three small gaps in the checks, from the re-check.** The graph-level test
-  that `mirrors` is declared on both sides lives only in `graph.test.ts`, so
-  `pnpm data:check`, and with it `pnpm build` on its own, accepts a one-sided
-  declaration the test suite rejects; it belongs in `integrity.ts` as a
-  `mirror` kind, so the script and the test share it. The twelve-planet pin
-  types its list as `PlanetId[]`, which constrains only one direction at
-  compile time; `Record<PlanetId, true>` would make both exact. And an
-  inventory failure on an array row names it by `id` or index, while the
-  seventy-two carry `no`, so a fault there reads `seventyTwoAngel.0.…`.
-- **A watcher for the JSON5 sources.** `pnpm dev` builds `data/dist` once, at
-  start; editing a JSON5 while the server is running changes nothing until
-  `pnpm data:build` runs again. The build is a few milliseconds over all 28
-  files, so watching them and rebuilding is small work, and Turbopack picks
-  the JSON up from there on its own.
 - **Done in step 2.** [Plan 031](031-seventy-two-angels.md)'s
   `seventyTwoAngelsDerived.ts` still imports `PlanetId` and `ZodiacId`, which
-  are derived now and compile unchanged; `PlanetId` is the rows with a symbol
-  (see [above](#what-was-decided-while-building-it)). The two `gdGrade`
+  are derived now and compile unchanged; `PlanetId` was the rows with a
+  symbol, and is the rows of kind `"planet"` since 3a. The two `gdGrade`
   collisions are not collisions: `alchemySymbol` and `alchemyTerm` carry a
   numeric field named after a table they do not link to, and the check is
   about accessors, not names, with a test saying so. The `hermetic` block is
   typed as absent on the two paths that have none, and `GDGradeId` has its
   Portal.
-- `dictionary.BIAB` was written as part of its neighbour's meaning: `BIA`
-  reads "voices, yourBIAB stand", two entries run together in the WE source.
-  The new `BIAB` row makes the join visible; fixing `BIA` belongs with the
-  rest of the keys page in step 3.
-- A duplicate key is invisible to the valibot schemas, which see the
-  parsed object and never the source. `amissio`'s first `title`, dead
-  because JSON5 keeps the last, was found by hand and is gone in the table
-  above; the sources still want a lint of their own.
+- **New, from step 3a.** Two things `pnpm dev` does not pick up until the task
+  restarts: a source directory added while it runs, because the watch is one
+  watcher per directory, and `dist/graph.json` after an edit to `graph.ts`,
+  because only the build writes it
+  ([above](#the-watcher-and-what-linux-does-with-a-rename)). Neither is visible
+  anywhere a reader can see. And a build that emitted `as const` TypeScript
+  modules rather than JSON would make `kind` and the other closed fields
+  literal types, which is what would let `PlanetId` be derived rather than
+  written down; it belongs with step 4's package, where the emit is being
+  designed anyway ([above](#kind-is-data-the-types-cannot-read)).
+- **Seventy-six dictionary entries repeat a meaning verbatim.** The re-check
+  counted 92 entries that list one meaning text twice: 12 from two different
+  sources, 8 differing only in `source2`, and 76 exact duplicate objects, the
+  same source and citation twice. The duplicate-key lint cannot see them, since
+  they are array elements rather than keys; a check for a repeated meaning
+  object would, and the 76 want deduplicating.
 - Pinning implementation subagents at xhigh needs a `.claude/agents/`
   definition; the session itself runs at xhigh and built-in agents inherit
   it, so none was added.
