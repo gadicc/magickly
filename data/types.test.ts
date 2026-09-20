@@ -51,6 +51,48 @@ describe("the row types", () => {
     expect(dash).toBeUndefined();
   });
 
+  it("is readonly wherever assemble() froze it", () => {
+    // Each of these used to compile and then throw, because `assemble()`
+    // deep-freezes and the types said nothing about it. They are now compile
+    // errors, and the `toThrow` beside each says what the freeze does with
+    // the same line at runtime — modules are strict mode, so writing through
+    // a frozen object raises rather than failing quietly.
+    const frozen = (change: () => void) => expect(change).toThrow(TypeError);
+
+    frozen(() => {
+      // @ts-expect-error a row's own field
+      data.sephirah.keter.scent = "x";
+    });
+    frozen(() => {
+      // @ts-expect-error a field of a nested block
+      data.sephirah.keter.color.queen = "x";
+    });
+    frozen(() => {
+      // @ts-expect-error a link
+      data.sephirah.keter.archangel = undefined;
+    });
+    frozen(() => {
+      // @ts-expect-error a list of links is a readonly array
+      data.tetragram.via.planets.push(data.planet.sol);
+    });
+    frozen(() => {
+      // @ts-expect-error so is a list the JSON itself holds
+      data.tetragram.via.rows.push(1);
+    });
+    frozen(() => {
+      // @ts-expect-error a row of a table
+      data.sephirah.keter = data.sephirah.hod;
+    });
+    frozen(() => {
+      // @ts-expect-error a row of an array table
+      data.house[0] = data.house[1];
+    });
+    frozen(() => {
+      // @ts-expect-error and a whole table
+      data.sephirah = data.sephirah;
+    });
+  });
+
   it("has no accessor for a table that was not assembled", () => {
     // @ts-expect-error only the sephirot were assembled
     expect(scoped.sephirah.keter.archangel).toBeUndefined();

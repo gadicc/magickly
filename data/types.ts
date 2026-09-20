@@ -55,26 +55,29 @@ type Missing<RU> = {
 
 /**
  * One shape per object at every depth, not only at the top: the keys unioned,
- * and optional where one of them lacks it. Nested blocks differ row by row —
+ * optional where one of them lacks it, and `readonly` throughout because
+ * `assemble()` deep-freezes what it returns. Nested blocks differ row by row —
  * the sephirot have four shapes of `color` between them, five planets have no
  * Hebrew name — and without this a read of a key only some of them carry is
- * an error rather than a `string | undefined`. Arrays and primitives are left
- * as they are.
+ * an error rather than a `string | undefined`. An array becomes a
+ * `readonly` array of the same, uniformly; a primitive is left as it is.
  */
 type Uniform<V> = [Defined<V>] extends [never]
   ? V
   : [Defined<V>] extends [object]
-    ? [Defined<V>] extends [readonly unknown[]]
-      ? V
+    ? [Defined<V>] extends [readonly (infer E)[]]
+      ? readonly Uniform<E>[] | Extract<V, undefined | null>
       :
           | Simplify<
               {
-                [K in Exclude<
+                readonly [K in Exclude<
                   UnionKeys<Defined<V>>,
                   Missing<Defined<V>>
                 >]: Uniform<UnionField<Defined<V>, K>>;
               } & {
-                [K in Missing<Defined<V>>]?: Uniform<UnionField<Defined<V>, K>>;
+                readonly [K in Missing<Defined<V>>]?: Uniform<
+                  UnionField<Defined<V>, K>
+                >;
               }
             >
           | Extract<V, undefined | null>
@@ -130,7 +133,7 @@ type LinkValue<I extends Scope, T extends TableName, F extends string> =
   Lookup<LinksOf<T>, F> extends { to: infer To extends TableName }
     ?
         | (Lookup<LinksOf<T>, F> extends { many: true }
-            ? Row<I, To>[]
+            ? readonly Row<I, To>[]
             : Row<I, To>)
         | Absent<T, F>
     : never;
@@ -164,7 +167,7 @@ type NestLinks<T extends TableName, I extends Scope, P extends string> = {
 type NestValue<I extends Scope, T extends TableName, P extends string> =
   | Simplify<
       Uniform<Defined<UnionField<Rows<T>, P>>> & {
-        [K in keyof NestLinks<T, I, P>]: LinkValue<
+        readonly [K in keyof NestLinks<T, I, P>]: LinkValue<
           I,
           T,
           Lookup<NestLinks<T, I, P>, K> & string
@@ -199,12 +202,12 @@ type Inverses<T extends TableName, I extends Scope> = {
 type InverseValue<I extends Scope, T extends TableName, S extends TableName> = [
   InverseIsMany<S, T>,
 ] extends [true]
-  ? Row<I, S>[]
+  ? readonly Row<I, S>[]
   : Row<I, S> | undefined;
 
 /** Everything `assemble()` adds to a row of `T`, and nothing it already had. */
 export type Links<I extends Scope, T extends TableName> = {
-  [K in
+  readonly [K in
     | (keyof TopLinks<T, I> & string)
     | (keyof Inverses<T, I> & string)]: K extends keyof TopLinks<T, I>
     ? LinkValue<I, T, Lookup<TopLinks<T, I>, K> & string>
@@ -219,12 +222,21 @@ type OwnField<I extends Scope, T extends TableName, K extends string> =
  * An assembled row of `T`: its own fields, and its links into `I`. The links
  * are always there, because `assemble()` gives every row of the table the
  * accessor and leaves it `undefined` where the id is not.
+ *
+ * Every property is `readonly`, at every depth and through the arrays,
+ * because the object `assemble()` returns is deep-frozen: an assignment used
+ * to compile and throw, and is now the compile error it always was at
+ * runtime ([types.test.ts](./types.test.ts)).
  */
 export type Row<I extends Scope, T extends TableName> = Simplify<
   {
-    [K in Exclude<UnionKeys<Rows<T>>, Missing<Rows<T>>>]: OwnField<I, T, K>;
+    readonly [K in Exclude<UnionKeys<Rows<T>>, Missing<Rows<T>>>]: OwnField<
+      I,
+      T,
+      K
+    >;
   } & {
-    [K in Missing<Rows<T>>]?: OwnField<I, T, K>;
+    readonly [K in Missing<Rows<T>>]?: OwnField<I, T, K>;
   } & Links<I, T>
 >;
 
@@ -236,8 +248,10 @@ export type Table<
   I extends Scope,
   T extends TableName,
 > = Tables[T] extends readonly unknown[]
-  ? Row<I, T>[]
-  : { [K in keyof Tables[T]]: Row<I, T> };
+  ? readonly Row<I, T>[]
+  : { readonly [K in keyof Tables[T]]: Row<I, T> };
 
 /** What `assemble()` returns: the tables asked for, linked to each other. */
-export type Assembled<I extends Scope> = { [T in Included<I>]: Table<I, T> };
+export type Assembled<I extends Scope> = {
+  readonly [T in Included<I>]: Table<I, T>;
+};

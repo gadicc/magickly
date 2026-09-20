@@ -263,7 +263,13 @@ export function assemble(tables: Tables): Assembled<"*">;
 export function assemble<K extends TableName>(
   tables: Pick<Tables, K>,
 ): Assembled<K>;
-export function assemble(tables: Record<string, unknown>) {
+// The implementation says only "an object of tables", because what it builds
+// is mutable until the freeze at the end while what the overloads promise is
+// `readonly` through and through, and a `readonly` array is assignable to
+// neither of the shapes this one holds.
+export function assemble(
+  tables: Record<string, unknown>,
+): Record<string, unknown> {
   const input = tables as Record<string, RawTable>;
   const names = Object.keys(input).sort();
   const key = names.join(",");
