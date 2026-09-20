@@ -1,6 +1,5 @@
 import { realpathSync } from "node:fs";
 import path from "node:path";
-import JSON5 from "json5";
 import type { NextConfig } from "next";
 import {
   PHASE_DEVELOPMENT_SERVER,
@@ -71,11 +70,6 @@ export default async function (phase: string): Promise<NextConfig> {
     // need no rule here: Turbopack reads `with { type: "text" }` itself.
     turbopack: {
       rules: {
-        // `as: "*.json"` keeps the `with { type: "json" }` imports valid.
-        "*.json5": {
-          loaders: ["./loaders/json5-loader.mjs"],
-          as: "*.json",
-        },
         "*.svg": { loaders: ["@svgr/webpack"], as: "*.js" },
       },
       resolveAlias: {
@@ -87,12 +81,6 @@ export default async function (phase: string): Promise<NextConfig> {
       // https://stackoverflow.com/questions/64926174/module-not-found-cant-resolve-fs-in-next-js-application
       // ./node_modules/nlopt-js/dist/index.js; Module not found: Can't resolve 'fs'
       config.resolve.fallback = { fs: false };
-
-      config.module.rules.push({
-        test: /\.json5$/i,
-        type: "json", // emit as JSON module
-        parser: { parse: JSON5.parse },
-      });
 
       // Built-in ritual sources are imported `with { type: "text" }`. Next's
       // webpack (5.98) ignores that attribute, so match the extension.

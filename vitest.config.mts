@@ -1,21 +1,7 @@
 import { fileURLToPath } from "node:url";
-import JSON5 from "json5";
 import { configDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
-  plugins: [
-    {
-      // Mirror next.config's JSON5 rules so tests can render components over the data set.
-      name: "magickli-json5",
-      transform(code, id) {
-        if (!id.endsWith(".json5")) return null;
-        return {
-          code: `export default ${JSON.stringify(JSON5.parse(code))};`,
-          map: null,
-        };
-      },
-    },
-  ],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
