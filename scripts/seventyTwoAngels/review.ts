@@ -2,8 +2,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { generateObject } from "ai";
 import { published, readExtraction } from "./extract";
+import { type PlateEntry, plateEntries } from "./plateSource";
 import { type AngelReview, angelReview } from "./schema";
-import { type AngelRegion, findRegions } from "./source";
 
 /**
  * A second opinion on each restored entry, from a stronger model than the one
@@ -29,16 +29,16 @@ const OUT_DIR = "output/seventyTwoAngelsReview";
 
 const INSTRUCTIONS = `You are checking someone else's restoration of one entry from \
 Lazare Lenain's "La Science Cabalistique" (Angers, 1823), a public-domain French work. \
-They were given a damaged OCR of a Google Books scan and asked to repair the French, \
-translate it, and pull out some fields.
+They were given the page, read from the scan itself, and asked to translate it and pull \
+out some fields. The French is not theirs to have invented: it is what the page prints, \
+so judge the translation and the fields against it rather than doubting the French.
 
 Judge three things, against the scan:
 
-1. text.fr — does it restore what the scan shows, and only that? Look for dropped \
-clauses, invented ones, sentences merged or split, page furniture left in, and \
-hyphenated words rejoined wrongly. The scan reads digits as letters ("16" for "le", \
-"165" for "les", "06" for "de"), so check the numbers it chose. Lenain's own spelling \
-and phrasing should be left alone: modernising it is a fault.
+1. text.fr — is it coherent French, with Lenain's own spelling and phrasing left alone? \
+His notes are set after the entry they belong to, each opening with its marker, which \
+is where a reader meets them. An entry may span several printed pages and a note may \
+run across pages, so material you cannot see on one page is not therefore invented.
 
 2. text.en — is it a faithful translation of THAT French? Look for meaning changed, \
 omitted or added, and for register smoothed into something more modern than the \
@@ -55,7 +55,7 @@ Use "rework" only where the entry is wrong enough to be worth extracting again; 
 "minor" for small fixes; "clean" for none. Where you are confident of the correct \
 value, put it in "suggested"; where you are not, make it an empty string.`;
 
-function promptFor(region: AngelRegion) {
+function promptFor(region: PlateEntry) {
   const angel = readExtraction(region.no);
   const fields = {
     name: angel.name,
@@ -90,13 +90,11 @@ ${published(
 ${JSON.stringify(fields, null, 2)}
 </fields>
 
-${
-  region.headingFound
-    ? "The scan region may include the tail of the previous entry and the head of the next; judge only genius " +
-      region.no +
-      "."
-    : `NOTE: the scan lost this entry's opening line, so the region spans its neighbours. Judge only genius ${region.no}.`
-}`;
+Printed on page${region.printedPages.length > 1 ? "s" : ""} ${region.printedPages.join(" and ")}.${
+    region.printedOrdinal === undefined
+      ? ""
+      : ` The heading is set "${region.printedOrdinal}e", which is a misprint: by its place in the book this is the ${region.no}th.`
+  }`;
 }
 
 function pathFor(no: number) {
@@ -119,7 +117,7 @@ async function main() {
       : new Set(args[onlyAt + 1].split(",").map((n) => Number(n.trim())));
 
   mkdirSync(OUT_DIR, { recursive: true });
-  const todo = findRegions().filter(
+  const todo = plateEntries().filter(
     (region) =>
       (!only || only.has(region.no)) &&
       (force || !existsSync(pathFor(region.no))) &&

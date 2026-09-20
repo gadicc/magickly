@@ -182,7 +182,13 @@ export function published(
 ) {
   if (!notes.length) return prose;
   const set = notes
-    .map((note) => `(${note.marker.replace(/[()]/g, "")}) ${note.text}`)
+    .map((note) => {
+      const marker = note.marker.replace(/[()]/g, "");
+      // The page prints the marker at the head of its own note, so setting
+      // another gave "(1) (1) Ce nom s'écrit…".
+      const text = note.text.replace(/^\s*\(\d+\)\s*/, "");
+      return `(${marker}) ${text}`;
+    })
     .join("\n\n");
   return `${prose}\n\n${set}`;
 }
