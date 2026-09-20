@@ -170,6 +170,44 @@ Settled between 18 and 19 September:
 12. **`gd/degrees.json5` becomes a table** (`gdDegree`); `gdGrade.degreeId`
     links to it and `orderId` stays an enum. Its `pillarId` is pending.
 
+### Decided on 20 September
+
+Taken by the owner on the step-2 tree, before step 3 was started. They are
+recorded here rather than argued again:
+
+13. **Step 3 is three gated branches, not one.** *3a* is types and checks: the
+    explicit `kind` below, `Readonly<>` on the row types, a per-table wrapper
+    interface, the three gaps the step-2 re-check left in the checks, a
+    duplicate-key lint over the JSON5 sources, the run-together `BIA` entry,
+    and a watcher for the sources in `pnpm dev`. *3b* is render identity:
+    `resolvedInputsHash` (decision 10), and Manasseh's Hebrew once it is in,
+    in that order, so that only the shewbread's own identity moves. *3c* is
+    the consumers, which is what [step 3 below](#migration) describes: typed
+    `get(id)` lookups on the `[id]` routes, Server Components passing ids,
+    `/enochian/keys` resolving its dictionary subset on the server with the
+    dictionary out of the JSON imports, that page's lookup normalisation and
+    its literal `0`, the `TableOfShewbread` hand-join, `pathTarget()` with its
+    field-path test, and the JSON5 loaders once nothing imports JSON5. The
+    dump-page redesign ([plan 028](028-seo.md#follow-ups)) stays separate and
+    comes after 3c with a design pass of its own, so `decycle` stays until
+    then.
+14. **The three spheres declare a kind, in the planet table.** `primum-mobile`,
+    `zodiac` and `olam-yesodot` take `kind: "sphere"` and the twelve planets
+    `kind: "planet"`, rather than moving to a table of their own: the sephirot
+    reach them through `planetId`, and splitting the table would need a
+    polymorphic link the graph format does not have (deferred, below).
+15. **The one-time image-identity change decision 10 implies is accepted.**
+    Hashing resolved inputs rather than whole tables re-identifies every
+    data-dependent component image once, by construction. It happens in 3b;
+    published rituals keep their stored bytes, as they always have.
+16. **Step 4's package lives in this repository**, as a pnpm workspace package,
+    until there is a reason to move it out. The names lean `magick-data` and
+    `magick-components` or `magick-react-components` (all three free on npm on
+    20 September); it ships the JSON, `graph.json`, the `assemble()` runtime
+    and the types, with the dictionary as an entry point of its own, and
+    starts at 0.x. The data is CC BY 4.0
+    ([data/LICENSE.txt](../data/LICENSE.txt)); the app stays AGPL.
+
 ## The graph
 
 Authored as a typed literal in `data/graph.ts`; the build emits `graph.json`
@@ -401,21 +439,32 @@ final tree. Commit footers name every model that worked on the change.
    `Object.keys` snapshot must show only the expected delta (links now
    include `next`, `prev` and the derived inverses); the goldens must not
    move.
-3. **Consumers.** Typed-module importers move to the JSON tables or a scoped
-   `assemble`; `[id]` routes use the typed lookup helpers; Server Components
-   pass ids; `/enochian/keys` resolves its dictionary subset on the server,
-   normalises its lookup and drops the `0`, and the dictionary stops being a
-   JSON import; `resolvedInputsHash` (decision 10) lands, and Manasseh's
-   Hebrew is fixed once it has; `pathTarget()` and its test
-   over `TREE_IMAGE_FIELDS`, the study sets and the ritual documents; the
-   `TableOfShewbread` hand-join and the `Array.isArray` branches go. The
-   JSON5 loaders in `next.config.ts` and `vitest.config.mts` are removed once
-   nothing imports JSON5. `decycle` leaves with the dump-page redesign
-   ([plan 028 follow-ups](028-seo.md#follow-ups)), not before.
-4. **Package extraction** — a separate plan: a workspace package emitting
-   JSON, ESM and `.d.ts` with `graph.json`; semver (rename or remove an id or
-   field: major; new rows or fields: minor; corrected values: patch);
-   `resolvedInputsHash`; table renames.
+3. **Types, identity and consumers**, in three gated branches
+   ([decision 13](#decided-on-20-september)):
+   - **3a, types and checks.** `kind` on the planet rows, with `PLANET_IDS`
+     and an integrity check replacing the "has a symbol" pin;
+     `Readonly<>` on `Row` and `Table`; a per-table wrapper interface so the
+     name survives a hover; the reciprocal-`mirrors` check moved into
+     `integrity.ts`; inventory failures naming an array row by `id` or `no`;
+     a duplicate-key lint over the JSON5 sources; `BIA`'s meaning split from
+     `BIAB`'s; and a watcher for the sources in `pnpm dev`.
+   - **3b, render identity.** `resolvedInputsHash` (decision 10), then
+     Manasseh's Hebrew, in that order.
+   - **3c, consumers.** Typed-module importers move to the JSON tables or a
+     scoped `assemble`; `[id]` routes use the typed lookup helpers; Server
+     Components pass ids; `/enochian/keys` resolves its dictionary subset on
+     the server, normalises its lookup and drops the `0`, and the dictionary
+     stops being a JSON import; `pathTarget()` and its test over
+     `TREE_IMAGE_FIELDS`, the study sets and the ritual documents; the
+     `TableOfShewbread` hand-join and the `Array.isArray` branches go. The
+     JSON5 loaders in `next.config.ts` and `vitest.config.mts` are removed
+     once nothing imports JSON5. `decycle` leaves with the dump-page redesign
+     ([plan 028 follow-ups](028-seo.md#follow-ups)), not before.
+4. **Package extraction** — a separate plan: a pnpm workspace package in this
+   repository ([decision 16](#decided-on-20-september)) emitting JSON, ESM and
+   `.d.ts` with `graph.json`; semver (rename or remove an id or field: major;
+   new rows or fields: minor; corrected values: patch); `resolvedInputsHash`;
+   table renames.
 
 ## Commits
 
@@ -763,7 +812,10 @@ the migration.
   rulers their `{/* tetragram.rulerId */}` comments intended.
 - **Polymorphic links** (`enochianLetter["planet/element"]`), which need a
   `to: [...]` form with a tagged-union accessor.
-- **Package publishing** (step 4).
+- **Package publishing** (step 4). A pnpm workspace package inside this
+  repository to begin with, leaning on the names `magick-data` and
+  `magick-components` or `magick-react-components`, at 0.x
+  ([decision 16](#decided-on-20-september)).
 
 ## Follow-ups
 
