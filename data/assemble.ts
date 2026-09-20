@@ -57,7 +57,7 @@ const problemsByData = new WeakMap<object, Problem[]>();
  * The accessor a link takes: `as` if it names one, else the field name
  * without its suffix, pluralised for a list.
  */
-function accessorName(field: string, link: LinkSpec) {
+export function accessorName(field: string, link: LinkSpec) {
   if (link.as) return link.as;
   const leaf = field.slice(field.lastIndexOf(".") + 1);
   return leaf.endsWith("Ids") ? `${leaf.slice(0, -3)}s` : leaf.slice(0, -2);
