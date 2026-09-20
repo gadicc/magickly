@@ -14,6 +14,15 @@
         "export ROOT_URL=http://localhost:3124 BETTER_AUTH_URL=http://localhost:3124 NEXTAUTH_URL=http://localhost:3124 && exec pnpm exec next dev --webpack --port 3124"
       ],
       "port": 3124
+    },
+    {
+      "name": "magickli-dev-lenain-3137",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "export ROOT_URL=http://localhost:3137 BETTER_AUTH_URL=http://localhost:3137 NEXTAUTH_URL=http://localhost:3137 && exec pnpm exec next dev --port 3137"
+      ],
+      "port": 3137
     }
   ]
 }

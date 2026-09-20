@@ -275,10 +275,15 @@ function SevenyTwo() {
           <p>
             The material here is taken from{" "}
             <a href="https://www.google.co.uk/books/edition/La_science_cabalistique/ZqgpxTZ43HkC?hl=en&gbpv=0">
-              The Science of the Kabbalah
+              <i>La Science Cabalistique</i>
             </a>{" "}
-            (English title) by Lazare Lenain (1823; digitized by Google Books).
-            It is read from the scan itself, page by page, rather than from an{" "}
+            by Lazare Lenain (1823; digitized by Google Books), or, as his title
+            page has it in full,{" "}
+            <i>
+              the Cabalistic Science, or the Art of Knowing the Good Genii who
+              influence the destiny of men
+            </i>
+            . It is read from the scan itself, page by page, rather than from an{" "}
             <a href="/docs/Lenain%20-%20La%20Science%20Cabalistique%20(1823)%20-%20Google.txt">
               OCR of it
             </a>

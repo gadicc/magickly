@@ -208,7 +208,7 @@ export const PUBLIC_PAGES = {
     title: "The 72 Angels of the Shem HaMephorash",
     description:
       "The 72 angels of the Shem HaMephorash with their Hebrew names, dates " +
-      "and attributes, from Lazare Lenain's The Science of the Kabbalah.",
+      "and attributes, from Lazare Lenain's La Science Cabalistique (1823).",
   },
   "/study": {
     title: "Magick Flashcards",
