@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import Data from "@/../data/data";
+import { rowOf } from "@/../data/rowOf";
 import { entityIds, pathPage } from "@/seo/entities";
 import { seoMetadata } from "@/seo/metadata";
 import Path from "./path";
@@ -22,6 +24,8 @@ export default async function PathPage({
   params,
 }: PageProps<"/kabbalah/path/[id]">) {
   const { id } = await params;
-  if (!pathPage(id)) notFound();
+  // The row is looked up for the 404 only; the client component takes the id,
+  // which is the DTO here — the data ships in both bundles (plan 032, 7).
+  if (!rowOf(Data.tolPath, id)) notFound();
   return <Path id={id} />;
 }

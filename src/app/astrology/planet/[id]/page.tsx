@@ -1,4 +1,5 @@
 import data from "@magick-data/data";
+import { rowOf } from "@magick-data/rowOf";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
@@ -28,8 +29,9 @@ export default async function Planet({
   params,
 }: PageProps<"/astrology/planet/[id]">) {
   const { id } = await params;
-  if (!planetPage(id)) notFound();
-  const planet = planets[id as keyof typeof planets];
+  // The same lookup the page's description is built from, and the same 404.
+  const planet = rowOf(planets, id);
+  if (!planet) notFound();
 
   return (
     <Container maxWidth="sm">

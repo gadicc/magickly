@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import Data from "@/../data/data";
+import { rowOf } from "@/../data/rowOf";
 import { entityIds, sephirahPage } from "@/seo/entities";
 import { seoMetadata } from "@/seo/metadata";
 import Sephirah from "./sephirah";
@@ -22,6 +24,8 @@ export default async function SephirahPage({
   params,
 }: PageProps<"/kabbalah/sephirah/[id]">) {
   const { id } = await params;
-  if (!sephirahPage(id)) notFound();
+  // The row is looked up for the 404 only; the client component takes the id,
+  // which is the DTO here — the data ships in both bundles (plan 032, 7).
+  if (!rowOf(Data.sephirah, id)) notFound();
   return <Sephirah id={id} />;
 }

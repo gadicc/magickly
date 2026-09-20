@@ -5,14 +5,13 @@ import Container from "@mui/material/Container";
 import { decycle } from "cycle";
 import Image from "next/legacy/image";
 import Data from "@/../data/data";
+import { rowOf } from "@/../data/rowOf";
 import TreeOfLife from "@/components/kabbalah/TreeOfLife";
 import { RWSPath, tarotDeck } from "@/tarot";
 
-const paths = Object.values(Data.tolPath);
-
 /** The page resolves unknown ids to a 404 before rendering this. */
 export default function Path({ id }: { id: string }) {
-  const path = paths.find((path) => path.id === id);
+  const path = rowOf(Data.tolPath, id);
   if (!path) return null;
 
   const otherLabels = Object.keys(path).filter(

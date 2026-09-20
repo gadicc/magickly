@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import { decycle } from "cycle";
 import { notFound } from "next/navigation";
 import Data from "@/../data/data";
+import { rowOf } from "@/../data/rowOf";
 import GradeTree from "@/components/gd/GradeTree";
 import { entityIds, gradePage } from "@/seo/entities";
 import { seoMetadata } from "@/seo/metadata";
@@ -28,8 +29,9 @@ export async function generateMetadata({
 
 export default async function Grade({ params }: PageProps<"/gd/grade/[id]">) {
   const id = decodeURIComponent((await params).id);
-  if (!gradePage(id)) notFound();
-  const grade = grades[id as keyof typeof grades];
+  // The same lookup the page's description is built from, and the same 404.
+  const grade = rowOf(grades, id);
+  if (!grade) notFound();
 
   return (
     <>

@@ -1,4 +1,5 @@
 import Data from "@/../data/data";
+import { rowOf } from "@/../data/rowOf";
 import { tarotDeck } from "@/tarot";
 import type { SeoPage } from "./pages";
 
@@ -8,10 +9,6 @@ export interface EntityPage extends SeoPage {
 }
 
 const MAX_DESCRIPTION = 160;
-
-interface Named {
-  name?: { en?: string; he?: string; roman?: string };
-}
 
 /**
  * Joins as many correspondences as fit a search snippet, in order, so rows
@@ -30,21 +27,9 @@ function correspondences(lead: string, fields: (string | false | undefined)[]) {
   return text;
 }
 
-function own<T>(record: Record<string, T>, id: string): T | undefined {
-  return Object.hasOwn(record, id) ? record[id] : undefined;
-}
-
 /** `/astrology/planet/<id>`, including the Kabbalistic heavens. */
 export function planetPage(id: string): EntityPage | null {
-  const planet = own(
-    Data.planet as Record<
-      string,
-      (typeof Data.planet)[keyof typeof Data.planet] & {
-        godName?: Named;
-      }
-    >,
-    id,
-  );
+  const planet = rowOf(Data.planet, id);
   if (!planet) return null;
   const name = planet.name.en.en ?? id;
   const hebrew = planet.name.he?.he
@@ -56,7 +41,7 @@ export function planetPage(id: string): EntityPage | null {
     description: correspondences(`Correspondences of ${name}${hebrew}`, [
       planet.symbol && `symbol ${planet.symbol}`,
       planet.hebrewLetter && `letter ${planet.hebrewLetter.letter.name}`,
-      planet.godName?.name?.roman && `god name ${planet.godName.name.roman}`,
+      planet.godName?.name.roman && `god name ${planet.godName.name.roman}`,
       planet.archangel && `archangel ${planet.archangel.name.roman}`,
       planet.intelligenceId &&
         `intelligence ${capitalize(planet.intelligenceId)}`,
@@ -67,13 +52,13 @@ export function planetPage(id: string): EntityPage | null {
 
 /** `/gd/grade/<id>`; the id keeps its `=`, as the sitemap always listed it. */
 export function gradePage(id: string): EntityPage | null {
-  const grade = own(Data.gdGrade as Record<string, GradeRow>, id);
+  const grade = rowOf(Data.gdGrade, id);
   if (!grade) return null;
   const numbered = /=/.test(grade.id) ? ` ${grade.id}` : "";
   const place = grade.sephirah
     ? `, attributed to ${grade.sephirah.name.roman} on the Tree of Life`
     : "";
-  const element = grade.element?.name?.en
+  const element = grade.element?.name.en
     ? ` and the element of ${grade.element.name.en}`
     : "";
   return {
@@ -83,22 +68,9 @@ export function gradePage(id: string): EntityPage | null {
   };
 }
 
-type GradeRow = (typeof Data.gdGrade)[keyof typeof Data.gdGrade] & {
-  element?: Named;
-};
-
 /** `/kabbalah/sephirah/<id>`, including Da'at. */
 export function sephirahPage(id: string): EntityPage | null {
-  const sephirah = own(
-    Data.sephirah as Record<
-      string,
-      (typeof Data.sephirah)[keyof typeof Data.sephirah] & {
-        godName?: Named;
-        angelicOrder?: Named;
-      }
-    >,
-    id,
-  );
+  const sephirah = rowOf(Data.sephirah, id);
   if (!sephirah) return null;
   const { en, he, roman } = sephirah.name;
   const position = sephirah.index
@@ -108,11 +80,10 @@ export function sephirahPage(id: string): EntityPage | null {
     path: `/kabbalah/sephirah/${id}`,
     title: `${roman} (${en}) on the Tree of Life`,
     description: correspondences(`${roman} (${he}), "${en}", is ${position}`, [
-      sephirah.godName?.name?.roman &&
-        `god name ${sephirah.godName.name.roman}`,
+      sephirah.godName?.name.roman && `god name ${sephirah.godName.name.roman}`,
       sephirah.archangel?.name.roman &&
         `archangel ${sephirah.archangel.name.roman}`,
-      sephirah.angelicOrder?.name?.roman &&
+      sephirah.angelicOrder?.name.roman &&
         `angelic host ${sephirah.angelicOrder.name.roman}`,
       sephirah.color && "King and Queen scale colours",
     ]),
@@ -121,7 +92,7 @@ export function sephirahPage(id: string): EntityPage | null {
 
 /** `/kabbalah/path/<from>_<to>`; two paths exist only on the Hebrew tree. */
 export function pathPage(id: string): EntityPage | null {
-  const path = own(Data.tolPath, id);
+  const path = rowOf(Data.tolPath, id);
   if (!path) return null;
   const [from, to] = path.id
     .split("_")

@@ -127,6 +127,7 @@ export default defineConfig({
         "data/assemble.ts",
         "data/duplicateKeys.ts",
         "data/integrity.ts",
+        "data/rowOf.ts",
         "data/schemas.ts",
         "data/kabbalah/seventyTwoAngelsDerived.ts",
         "src/app/chat/train/access.ts",

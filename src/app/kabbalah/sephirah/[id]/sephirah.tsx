@@ -5,14 +5,13 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import { decycle } from "cycle";
 import Data from "@/../data/data";
+import { rowOf } from "@/../data/rowOf";
 import Chakras from "@/components/chakras/Chakras";
 import TreeOfLife from "@/components/kabbalah/TreeOfLife";
 
-const sephirot = Object.values(Data.sephirah);
-
 /** The page resolves unknown ids to a 404 before rendering this. */
 export default function Sephirah({ id }: { id: string }) {
-  const sephirah = sephirot.find((sephirah) => sephirah.id === id);
+  const sephirah = rowOf(Data.sephirah, id);
   if (!sephirah) return null;
 
   // Everything the page does not lay out itself, listed as it comes.
