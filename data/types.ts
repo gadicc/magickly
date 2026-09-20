@@ -22,6 +22,7 @@
  * table's rows.
  */
 import type { Graph } from "./graph";
+import type { NamedRows } from "./rows";
 import type { TableName, Tables } from "./tables";
 
 /** The tables an assembled object holds: some of them, or all of them. */
@@ -129,12 +130,53 @@ type Absent<T extends TableName, F extends string> =
       ? undefined
       : never;
 
+/** Every table a link of `T` points at. */
+type LinkTargets<T extends TableName> = {
+  [F in LinkFields<T>]: Lookup<LinksOf<T>, F> extends {
+    to: infer To extends TableName;
+  }
+    ? To
+    : never;
+}[LinkFields<T>];
+
+/**
+ * Every table either end of a link names. A scope that holds all of them gives
+ * its rows every accessor `"*"` would, since a table outside it declares no
+ * link into it and derives no back-link on it.
+ */
+type LinkedTables = {
+  [T in TableName]: [LinkFields<T>] extends [never]
+    ? never
+    : T | LinkTargets<T>;
+}[TableName];
+
+/**
+ * A row as it is printed: the interface [rows.ts](./rows.ts) declares for the
+ * table, where the scope leaves no link out, and the mapped type itself where
+ * a narrower `assemble()` gives its rows fewer links than that name means. The
+ * two are structurally the same type; this only decides what a hover, an
+ * error and a `.d.ts` say.
+ *
+ * The barrel is the case this is for. It assembles 23 of the 26 tables, the
+ * three [data.ts](./data.ts) leaves out being named in no link either way, so
+ * its rows are `Row<"*", T>` in everything but the scope written on them —
+ * and without this they would print, and fail to be named in a `.d.ts`, as
+ * the whole expansion. A link added to one of those three narrows the scope
+ * and takes the names away again, which
+ * [types.test.ts](./types.test.ts) asserts against.
+ */
+type Named<I extends Scope, T extends TableName> = "*" extends I
+  ? NamedRows[T]
+  : [Exclude<LinkedTables, I>] extends [never]
+    ? NamedRows[T]
+    : Row<I, T>;
+
 type LinkValue<I extends Scope, T extends TableName, F extends string> =
   Lookup<LinksOf<T>, F> extends { to: infer To extends TableName }
     ?
         | (Lookup<LinksOf<T>, F> extends { many: true }
-            ? readonly Row<I, To>[]
-            : Row<I, To>)
+            ? readonly Named<I, To>[]
+            : Named<I, To>)
         | Absent<T, F>
     : never;
 
@@ -202,8 +244,8 @@ type Inverses<T extends TableName, I extends Scope> = {
 type InverseValue<I extends Scope, T extends TableName, S extends TableName> = [
   InverseIsMany<S, T>,
 ] extends [true]
-  ? readonly Row<I, S>[]
-  : Row<I, S> | undefined;
+  ? readonly Named<I, S>[]
+  : Named<I, S> | undefined;
 
 /** Everything `assemble()` adds to a row of `T`, and nothing it already had. */
 export type Links<I extends Scope, T extends TableName> = {
@@ -248,8 +290,8 @@ export type Table<
   I extends Scope,
   T extends TableName,
 > = Tables[T] extends readonly unknown[]
-  ? readonly Row<I, T>[]
-  : { readonly [K in keyof Tables[T]]: Row<I, T> };
+  ? readonly Named<I, T>[]
+  : { readonly [K in keyof Tables[T]]: Named<I, T> };
 
 /** What `assemble()` returns: the tables asked for, linked to each other. */
 export type Assembled<I extends Scope> = {

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { assemble } from "./assemble";
+import barrel from "./data";
+import type { ArchangelRow, SephirahRow } from "./rows";
 import { tables } from "./tables";
-import type { Links, Raw } from "./types";
+import type { Links, Raw, Row } from "./types";
 
 /**
  * The row types, asserted where they matter: a link is a property typed as
@@ -14,6 +16,16 @@ import type { Links, Raw } from "./types";
 
 const data = assemble(tables);
 const scoped = assemble({ sephirah: tables.sephirah });
+
+/**
+ * Whether two types are the same one, rather than merely assignable to each
+ * other. `SephirahRow` and the mapped type it extends are assignable both
+ * ways, and telling them apart is the whole of the assertion below.
+ */
+type Same<A, B> =
+  (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
+    ? true
+    : false;
 
 describe("the row types", () => {
   it("follows links as far as the data goes", () => {
@@ -49,6 +61,34 @@ describe("the row types", () => {
     // stroke, and the others still have the key.
     const dash: number | undefined = data.sephirah.keter.color.strokeDasharray;
     expect(dash).toBeUndefined();
+  });
+
+  it("gives every table's rows a name of their own", () => {
+    // The interfaces in rows.ts add nothing to `Row<"*", T>`, so a row is
+    // assignable in both directions and no consumer's annotation changes
+    // meaning. What they buy is the printing: a hover, an error and step 4's
+    // `.d.ts` say `SephirahRow` where they used to expand the whole row, and
+    // a link inside one is named too.
+    const named: SephirahRow = data.sephirah.keter;
+    const structural: Row<"*", "sephirah"> = named;
+    const back: SephirahRow = structural;
+    expect(back).toBe(data.sephirah.keter);
+
+    const archangel: ArchangelRow | undefined = named.archangel;
+    expect(archangel?.name.roman).toBe("Metatron");
+    expect(archangel?.sephirah).toBe(named);
+  });
+
+  it("names the barrel's rows, and not only a full assemble()'s", () => {
+    // The barrel is the object step 4's package emits a `.d.ts` for, and it
+    // assembles 23 of the 26 tables rather than all of them. Its rows are
+    // named because the three it leaves out are named in no link, either as
+    // a source or as a target, so the scope leaves nothing out; a link
+    // declared to one of the three would narrow it and drop every row of the
+    // barrel back to the expansion, which is what this line would catch.
+    const named: Same<typeof barrel.sephirah.keter, SephirahRow> = true;
+    expect(named).toBe(true);
+    expect(barrel.sephirah.keter.archangel?.name.roman).toBe("Metatron");
   });
 
   it("is readonly wherever assemble() froze it", () => {
