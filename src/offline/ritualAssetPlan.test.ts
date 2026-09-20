@@ -261,6 +261,10 @@ function generated(
         wasmSha256: hash("synthetic WASM"),
         fonts: [{ file: "synthetic-font.ttf", sha256: hash("synthetic font") }],
         defaultFontSize: 16,
+        inputs: {
+          spec: "magickli-image-inputs-v1",
+          sha256: hash("synthetic inputs"),
+        },
       },
     };
   });

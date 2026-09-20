@@ -4,8 +4,17 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { initWasm, Resvg } from "@resvg/resvg-wasm";
 import { TREE_VIEWBOX } from "./contracts/treeOfLife";
+import { IMAGE_INPUTS_PROFILE } from "./dataInputs";
 
-/** Identity of existing generated Tree of Life assets; bytes must not change under it. */
+/**
+ * Identity of existing generated Tree of Life assets. Bytes must not change
+ * under (profile, inputs hash, query): the profile names the *renderer* — the
+ * engine, the fonts and this module's normalisation — and moves only when the
+ * renderer changes, while an edit to the data an image draws moves that
+ * image's `inputs.sha256` instead (plan 032, decision 10). Until 3b the
+ * profile carried both, and a data fix was published by bumping it by hand,
+ * which re-identified every image under it (plan 028).
+ */
 export const TREE_IMAGE_PROFILE = "magickli-tree-image-outlines-v3";
 /** The other registered components share the same fonts and normalisation. */
 export const COMPONENT_IMAGE_PROFILE = "magickli-component-image-outlines-v1";
@@ -102,6 +111,12 @@ async function loadResources(files: readonly string[]) {
 
 export interface OutlineOptions {
   profile: string;
+  /**
+   * SHA-256 of the resolved data the component drew
+   * ([dataInputs.ts](./dataInputs.ts)). It is the half of the identity that a
+   * data edit moves, leaving the profile to the renderer.
+   */
+  inputsSha256: string;
   /** The root viewBox the component must have rendered. */
   viewBox: readonly [number, number, number, number];
   /** Mirror horizontally after outlining, around the centred coordinates. */
@@ -167,6 +182,10 @@ export async function outlineComponentImage(
         wasmSha256,
         fonts: structuredClone(fontIdentity),
         defaultFontSize: 16,
+        inputs: {
+          spec: IMAGE_INPUTS_PROFILE,
+          sha256: options.inputsSha256,
+        },
       },
       sourceSha256: sha256(Buffer.from(svg)),
     };
@@ -176,9 +195,14 @@ export async function outlineComponentImage(
 }
 
 /** The Tree's existing outline contract, unchanged for saved ritual references. */
-export function outlineTreeImage(svg: string, flip: boolean) {
+export function outlineTreeImage(
+  svg: string,
+  flip: boolean,
+  inputsSha256: string,
+) {
   return outlineComponentImage(svg, {
     profile: TREE_IMAGE_PROFILE,
+    inputsSha256,
     viewBox: TREE_VIEWBOX,
     flip,
   });

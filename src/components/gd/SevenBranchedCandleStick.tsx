@@ -32,7 +32,8 @@ const branches: PlanetId[] = [
 ];
 */
 
-const branches: PlanetId[] = [
+/** The seven branches, in drawing order; the image's inputs name these rows. */
+export const CANDLESTICK_PLANETS = [
   "venus",
   "mercury",
   "sol",
@@ -40,7 +41,9 @@ const branches: PlanetId[] = [
   "jupiter",
   "saturn",
   "luna",
-];
+] as const satisfies readonly PlanetId[];
+
+const branches: readonly PlanetId[] = CANDLESTICK_PLANETS;
 
 function Branch({ index }: { index: number }) {
   const radius = 7.4; // TODO, work it out properly

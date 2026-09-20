@@ -21,6 +21,8 @@ async function load(initError: Error | null) {
 
 const source =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-170.5 0 341 598" width="100%"><circle cx="0" cy="100" r="40"/></svg>';
+/** The caller's; this module hashes fonts and WASM, never the data. */
+const INPUTS_SHA256 = "0".repeat(64);
 
 afterEach(() => {
   vi.doUnmock("@resvg/resvg-wasm");
@@ -33,6 +35,7 @@ describe("bundled font loading", () => {
     await expect(
       outlineComponentImage(source, {
         profile: TREE_IMAGE_PROFILE,
+        inputsSha256: INPUTS_SHA256,
         viewBox: [-170.5, 0, 341, 598],
         fonts: ["../secret.ttf" as never],
       }),
@@ -60,6 +63,7 @@ describe("bundled font loading", () => {
     );
     const options = {
       profile: COMPONENT_IMAGE_PROFILE,
+      inputsSha256: INPUTS_SHA256,
       viewBox: [-170.5, 0, 341, 598] as const,
       fonts: ["EnochianPlain.ttf" as const],
     };
@@ -88,7 +92,7 @@ describe("WASM initialisation guard", () => {
         "Already initialized. The `initWasm()` function can be used only once.",
       ),
     );
-    const result = await outlineTreeImage(source, false);
+    const result = await outlineTreeImage(source, false, INPUTS_SHA256);
     expect(result.bytes.toString()).toContain('viewBox="-170.5 0 341 598"');
     expect(result.identity.profile).toBe("magickli-tree-image-outlines-v3");
   });
@@ -97,13 +101,13 @@ describe("WASM initialisation guard", () => {
     const { outlineTreeImage, initWasm } = await load(
       new Error("wasm load failed"),
     );
-    await expect(outlineTreeImage(source, false)).rejects.toThrow(
-      "wasm load failed",
-    );
+    await expect(
+      outlineTreeImage(source, false, INPUTS_SHA256),
+    ).rejects.toThrow("wasm load failed");
     // The failed load is not cached; the next call tries again.
-    await expect(outlineTreeImage(source, false)).rejects.toThrow(
-      "wasm load failed",
-    );
+    await expect(
+      outlineTreeImage(source, false, INPUTS_SHA256),
+    ).rejects.toThrow("wasm load failed");
     expect(initWasm).toHaveBeenCalledTimes(2);
   });
 });

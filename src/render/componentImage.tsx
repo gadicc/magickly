@@ -7,7 +7,7 @@ import {
 } from "./componentImageRequest";
 import { CONTRACTS, type ComponentImageSlug } from "./contracts";
 import { outlineComponentImage } from "./outlineTreeImage";
-import { COMPONENT_IMAGE_REGISTRY } from "./registry";
+import { COMPONENT_IMAGE_REGISTRY, componentInputsHash } from "./registry";
 
 type Outlined = Awaited<ReturnType<typeof outlineComponentImage>>;
 
@@ -48,6 +48,7 @@ export async function renderComponentImage(
   );
   const outlined = await outlineComponentImage(svg, {
     profile: registration.profile,
+    inputsSha256: componentInputsHash(request.slug),
     viewBox: contract.viewBox,
     flip: registration.flip?.(request.props as never) ?? false,
     fonts: registration.fonts,

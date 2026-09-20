@@ -57,6 +57,7 @@ function render(_slug: string, params: URLSearchParams) {
       wasmSha256: "a".repeat(64),
       fonts: [{ file: "NotoSans-Regular.ttf", sha256: "b".repeat(64) }],
       defaultFontSize: 16,
+      inputs: { spec: "magickli-image-inputs-v1", sha256: "c".repeat(64) },
     },
   };
 }

@@ -94,6 +94,7 @@ export default defineConfig({
         "src/render/componentImage.tsx",
         "src/render/componentImageResponse.ts",
         "src/render/outlineTreeImage.ts",
+        "src/render/dataInputs.ts",
         "src/render/registry.tsx",
         "src/render/contracts/index.ts",
         "src/render/contracts/types.ts",

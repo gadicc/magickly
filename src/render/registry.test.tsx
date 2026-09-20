@@ -8,11 +8,12 @@ vi.mock("server-only", () => ({}));
 import { createRitualSvgValidator } from "@/files/validateRitualSvg";
 import { renderComponentImage } from "./componentImage";
 import { COMPONENT_IMAGE_SLUGS, CONTRACTS } from "./contracts";
+import { IMAGE_INPUTS_PROFILE } from "./dataInputs";
 import {
   COMPONENT_IMAGE_PROFILE,
   TREE_IMAGE_PROFILE,
 } from "./outlineTreeImage";
-import { COMPONENT_IMAGE_REGISTRY } from "./registry";
+import { COMPONENT_IMAGE_REGISTRY, componentInputsHash } from "./registry";
 
 const hash = (bytes: Uint8Array) =>
   createHash("sha256").update(bytes).digest("hex");
@@ -31,6 +32,41 @@ describe("component image registry", () => {
     );
   });
 
+  // The other half of an image's identity: the data it draws (plan 032,
+  // decision 10). These move when that data changes and the profiles above do
+  // not, so a value here moving with no byte hash below moving means a field
+  // was added to a spec that the component does not draw; the reverse means a
+  // spec is missing something the component does.
+  it.each([
+    [
+      "tree-of-life",
+      "2591a504c3be2507d88e46bff86ea4ec09b4e1557dd14bda5d4d2034cc077d76",
+    ],
+    [
+      "astro-geomancy-chart",
+      "c89a608fb92e2f9b43ff58bdd53b7dc4259ab6a2530d861a8f78f7bb7bdee093",
+    ],
+    [
+      "enochian-tablet",
+      "63b83840b8a165223df3f3e8c12afcb74a49132c8f4f5fa56e92bb9829a75e3e",
+    ],
+    [
+      "seven-branched-candlestick",
+      "a8a081550bbcdd43f319e960754eae84e56a384a1fe1b11474c850b5c256cad9",
+    ],
+    [
+      "table-of-shewbread",
+      "9b1eb2469672eef59e34f5f090850c91b6f94494e203c816b184bcec9f178ded",
+    ],
+    // No table at all, so no data edit can ever move this one.
+    [
+      "rose-sigil",
+      "f88d8766945579ec0fffa38d7271d4f59717f79dac05c9ae57cc7ab1c9dabc28",
+    ],
+  ] as const)("pins the data %s draws", (slug, sha256) => {
+    expect(componentInputsHash(slug)).toBe(sha256);
+  });
+
   it("reproduces the published ritual Tree of Life bytes under the unchanged profile", async () => {
     const jade = await readFile("src/doc/2=9.jade", "utf8");
     const reference = jade.match(/\/api\/treeOfLife\?([^"'\s)]+)/)?.[1];
@@ -38,6 +74,10 @@ describe("component image registry", () => {
     const image = await render("tree-of-life", reference);
     expect(image.identity.profile).toBe(TREE_IMAGE_PROFILE);
     expect(image.identity.fonts).toHaveLength(5);
+    expect(image.identity.inputs).toEqual({
+      spec: IMAGE_INPUTS_PROFILE,
+      sha256: componentInputsHash("tree-of-life"),
+    });
     // Profile v3: v1 was 142,962 bytes (plans/009), v2 151,079 once Keter,
     // Chochmah and Malchut gained their archangels, and v3 is shorter again
     // because the path data is rounded to three decimals (plans/030).
@@ -68,6 +108,11 @@ describe("component image registry", () => {
       const svg = await render(slug, query);
       expect(svg.contentType).toBe("image/svg+xml");
       expect(svg.identity.profile).toBe(COMPONENT_IMAGE_PROFILE);
+      // The query is the third part of the identity, not part of the inputs.
+      expect(svg.identity.inputs).toEqual({
+        spec: IMAGE_INPUTS_PROFILE,
+        sha256: componentInputsHash(slug),
+      });
       const text = svg.bytes.toString();
       expect(text).not.toMatch(/<text|<style|href=|font-family|<image/);
       expect((text.match(/<path/g) ?? []).length).toBeGreaterThanOrEqual(

@@ -7,7 +7,19 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 
 import { createRitualSvgValidator } from "@/files/validateRitualSvg";
-import { outlineTreeImage, TREE_IMAGE_PROFILE } from "./outlineTreeImage";
+import { IMAGE_INPUTS_PROFILE } from "./dataInputs";
+import {
+  outlineTreeImage as outline,
+  TREE_IMAGE_PROFILE,
+} from "./outlineTreeImage";
+
+/**
+ * The outliner is handed the hash of the data the component drew; it never
+ * resolves that data itself, and nothing below depends on which hash it is.
+ */
+const INPUTS_SHA256 = "0".repeat(64);
+const outlineTreeImage = (svg: string, flip: boolean) =>
+  outline(svg, flip, INPUTS_SHA256);
 
 const hash = (bytes: Uint8Array | string) =>
   createHash("sha256").update(bytes).digest("hex");
@@ -101,6 +113,16 @@ describe("bundled Tree of Life outlines", () => {
     }
     expect(identity.defaultFontSize).toBe(16);
     expect(identity.resvg).toBe("2.6.2");
+    // The data the component drew is hashed elsewhere and carried through
+    // here verbatim, under its own encoding version.
+    expect(identity.inputs).toEqual({
+      spec: IMAGE_INPUTS_PROFILE,
+      sha256: INPUTS_SHA256,
+    });
+    expect(
+      (await outline(source("a"), false, "1".repeat(64))).identity.inputs
+        .sha256,
+    ).toBe("1".repeat(64));
   });
 
   it("mirrors the entire image around the centered viewBox without CSS 3D transforms", async () => {
