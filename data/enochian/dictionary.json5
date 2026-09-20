@@ -3591,7 +3591,7 @@
         "source": "EMPM"
       },
       {
-        "meaning": "voices, yourBIAB stand",
+        "meaning": "voices, your",
         "source": "WE"
       }
     ],
@@ -3609,6 +3609,10 @@
         "meaning": "stand",
         "source": "Keys",
         "source2": "Key 3"
+      },
+      {
+        "meaning": "stand",
+        "source": "WE"
       }
     ],
     "pronounciations": []
