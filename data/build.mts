@@ -22,8 +22,10 @@
  * error rather than a silent `any`, because nothing declares `*.json`.
  *
  * It is `.mts` because the repository is CommonJS: tsx compiles a `.ts` here
- * to CJS, where neither `import.meta.url` nor top-level await exists, and
- * this build wants both.
+ * to CJS, which cannot await at the top level, and this build does, at the
+ * end. `import.meta.url` alone would not have needed it — tsx shims that
+ * into the CJS it emits, and [duplicateKeys.ts](./duplicateKeys.ts) reads it
+ * that way under `pnpm data:check`.
  */
 import { watch } from "node:fs";
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
