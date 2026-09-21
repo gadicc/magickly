@@ -1,5 +1,5 @@
 "use client";
-import { ExpandMore } from "@mui/icons-material";
+import { ExpandMore, OpenInNew } from "@mui/icons-material";
 
 import {
   Accordion,
@@ -9,6 +9,7 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
+  Link as MuiLink,
   Paper,
   Radio,
   RadioGroup,
@@ -199,22 +200,40 @@ function Angel({
         aria-controls={`angel-${no}-content`}
         id={`angel-${no}-header`}
       >
-        <Typography>
-          {no}. {angel.name.en} ({governedRange(no, astrologySystem)}) {/*
-           * The accordion's contents unmount when it is closed, so the summary
-           * is the only part of this page a crawler ever sees — and the only
-           * place a link to the angel's own page can be found. Its click must
-           * not also toggle the accordion it sits in.
-           */}
-          <Link
-            href={`/kabbalah/angel/${angelSlug(no)}`}
-            onClick={(event) => event.stopPropagation()}
-            style={{ fontSize: "85%", marginLeft: ".4em" }}
-            aria-label={`${angel.name.en}, full entry`}
-          >
-            →
-          </Link>
+        <Typography sx={{ flexGrow: 1 }}>
+          {no}. {angel.name.en} ({governedRange(no, astrologySystem)})
         </Typography>
+        {/*
+         * The accordion's contents unmount when it is closed, so the summary
+         * is the only part of this page a crawler ever sees — and the only
+         * place a link to the angel's own page can be found.
+         *
+         * It sits beside the chevron rather than against the name, where a
+         * bare arrow read as part of the title. The icon promises a new tab
+         * and so the link opens one: an icon that says one thing while the
+         * link does another is worse than no icon. It also keeps a reader's
+         * place, which down a list of seventy-two is the point.
+         *
+         * Its click must not also toggle the accordion it sits in.
+         */}
+        <MuiLink
+          component={Link}
+          href={`/kabbalah/angel/${angelSlug(no)}`}
+          target="_blank"
+          rel="noopener"
+          onClick={(event: React.MouseEvent) => event.stopPropagation()}
+          aria-label={`${angel.name.en}: full entry, opens in a new tab`}
+          title={`${angel.name.en}: full entry`}
+          sx={{
+            display: "inline-flex",
+            alignItems: "center",
+            color: "text.secondary",
+            mr: 1,
+            "&:hover": { color: "primary.main" },
+          }}
+        >
+          <OpenInNew fontSize="small" />
+        </MuiLink>
       </AccordionSummary>
       <AccordionDetails>
         <TableContainer component={Paper}>
