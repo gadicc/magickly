@@ -1,8 +1,10 @@
 /**
- * Lenain's entries in full: the scan repaired, and translated from that
- * repair. The seventy-two run to about 88 kB a language, and a reader only
- * wants one when they open it, so they load here rather than with the page —
- * as the Mercury widget's ephemeris does.
+ * Lenain's entries in full: read from the plates page by page, and translated
+ * from that reading. Nothing here is repaired OCR — that is what plan 031
+ * replaced, and what plan 033 finally deleted. The seventy-two run to about
+ * 88 kB a language, and the list page only wants one when a reader opens it,
+ * so they load here rather than with it. Each genius's own page renders them
+ * on the server instead.
  *
  * Indexed by the angel's number less one.
  */

@@ -65,7 +65,15 @@ export function piecesOf(leaves: Leaf[] = allLeaves): Piece[] {
 
     for (const block of leaf.blocks) {
       if (block.kind === "furniture") continue;
-      const last = pieces[pieces.length - 1];
+      // A footnote set below the rule interrupts the paragraph it belongs to
+      // without ending it: the text resumes above the rule on the next leaf,
+      // often mid-word. Looking only at the piece immediately before would
+      // find the note and start afresh, stranding "de-" with its hyphen. The
+      // paragraph to carry on is the last one, whatever notes came between.
+      const last =
+        block.kind === "paragraph"
+          ? [...pieces].reverse().find((piece) => piece.kind === "paragraph")
+          : pieces[pieces.length - 1];
       const carriesOn =
         last !== undefined &&
         last.kind === block.kind &&

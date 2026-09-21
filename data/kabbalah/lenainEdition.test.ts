@@ -196,21 +196,36 @@ describe("the divisions", () => {
 
 describe("folding the leaves into pieces", () => {
   it("loses no letter of the book", () => {
-    // The fold rejoins paragraphs across leaves and mends words a leaf broke
-    // in half, so it changes where text sits — never how much of it there is.
-    // Letters rather than words: the fold declines to join a paragraph to a
-    // footnote that interrupts it, and any naive comparison by word token
-    // reads that correct refusal as a difference.
+    // The fold rejoins paragraphs across leaves, mends words a leaf broke in
+    // half, and carries a paragraph past a footnote set below the rule — so it
+    // changes where text sits, and in what order, but never how much of it
+    // there is. Compared within each kind, because carrying a paragraph past a
+    // note is precisely a reordering between kinds: prose that was printed
+    // after the note now reads before it, joined to the sentence it belongs
+    // to. Eleven words were left holding a hyphen before that.
     const letters = (text: string) => text.replace(/[\s-]+/g, "");
-    const fromBlocks = volumeLeaves
-      .flatMap((leaf) =>
-        leaf.blocks.filter((b) => b.kind !== "furniture").map((b) => b.text),
-      )
-      .join(" ");
-    const fromPieces = piecesOf(volumeLeaves)
-      .map((piece) => piece.text)
-      .join(" ");
-    expect(letters(fromPieces)).toBe(letters(fromBlocks));
+    const pieces = piecesOf(volumeLeaves);
+    for (const kind of ["paragraph", "footnote", "heading"] as const) {
+      const fromBlocks = volumeLeaves
+        .flatMap((leaf) => leaf.blocks.filter((b) => b.kind === kind))
+        .map((b) => b.text)
+        .join(" ");
+      const fromPieces = pieces
+        .filter((piece) => piece.kind === kind)
+        .map((piece) => piece.text)
+        .join(" ");
+      expect(letters(fromPieces), kind).toBe(letters(fromBlocks));
+    }
+  });
+
+  it("leaves no word holding a hyphen", () => {
+    // A leaf, or a footnote rule, can break a word in half. Either way the
+    // word is made whole; a paragraph that still ends in a hyphen is one whose
+    // other half was dropped.
+    const stranded = piecesOf(volumeLeaves)
+      .filter((piece) => piece.kind === "paragraph" && /-\s*$/.test(piece.text))
+      .map((piece) => piece.text.slice(-40));
+    expect(stranded).toEqual([]);
   });
 
   it("cuts every piece into segments that rejoin to it", () => {
