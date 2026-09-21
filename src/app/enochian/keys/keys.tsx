@@ -76,7 +76,10 @@ function Dictionary({
           </td>
           <td></td>
           <td style={{ textAlign: "right" }}>
-            {dict?.gematria ? "Gematria " + dict.gematria.join(", ") : ""}
+            {/* An empty list is still a list: the label printed alone. */}
+            {dict?.gematria.length
+              ? "Gematria " + dict.gematria.join(", ")
+              : ""}
           </td>
         </tr>
       </tbody>
