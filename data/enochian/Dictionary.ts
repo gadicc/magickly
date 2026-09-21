@@ -1,5 +1,5 @@
 /**
- * The Enochian dictionary: 1,904 words, each with its meanings, its
+ * The Enochian dictionary: 1,905 words, each with its meanings, its
  * pronunciations and its gematria.
  *
  * It is not a table — it is named in no link, in either direction, though

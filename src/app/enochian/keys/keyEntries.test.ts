@@ -74,8 +74,8 @@ describe("the Keys' dictionary entries", () => {
     const missing = words.filter((word) => !(word in KEY_ENTRIES));
     expect(missing).toEqual([]);
     expect(Object.keys(KEY_ENTRIES)).toHaveLength(181);
-    // The whole dictionary is 1,904 words; the page ships these.
-    expect(Object.keys(dictionary).length).toBe(1904);
+    // The whole dictionary is 1,905 words; the page ships these.
+    expect(Object.keys(dictionary).length).toBe(1905);
     expect(KEY_ENTRIES.URBS).toBe(dictionary.VRBS);
   });
 });
