@@ -19,6 +19,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import Link from "next/link";
 import React from "react";
 import zodiacs from "@/../data/astrology/Zodiac";
 import christianChoirs from "@/../data/kabbalah/ChristianChoirs";
@@ -283,16 +284,15 @@ function SevenyTwo() {
               the Cabalistic Science, or the Art of Knowing the Good Genii who
               influence the destiny of men
             </i>
-            . It is read from the scan itself, page by page, rather than from an{" "}
-            <a href="/docs/Lenain%20-%20La%20Science%20Cabalistique%20(1823)%20-%20Google.txt">
-              OCR of it
+            . It is read from the scan itself, page by page, rather than from an
+            OCR of it: that OCR could not read Lenain&apos;s Hebrew at all, and
+            read many of his digits as letters. The whole book is here as a{" "}
+            <Link href="/books/la-science-cabalistique">reading edition</Link>,
+            footnotes, tables and all, and{" "}
+            <a href="/docs/Lenain - La Science Cabalistique (1823).md">
+              as Markdown
             </a>
-            : that OCR could not read Lenain&apos;s Hebrew at all, and read many
-            of his digits as letters. The whole book is here as a{" "}
-            <a href="/docs/Lenain%20-%20La%20Science%20Cabalistique%20(1823).md">
-              reading edition
-            </a>
-            , footnotes, tables and all.
+            .
           </p>
           <p>
             The French beside each translation is what he printed, so you can
@@ -411,11 +411,9 @@ function SevenyTwo() {
         <a href="https://github.com/gadicc/magickly/blob/main/data/kabbalah/seventyTwoAngels.json5">
           data file
         </a>{" "}
-        and{" "}
-        <a href="/docs/Lenain - La Science Cabalistique (1823) - Google.txt">
-          text extraction
-        </a>{" "}
-        from the original book (with OCRmyPDF).
+        and the full{" "}
+        <Link href="/books/la-science-cabalistique">reading edition</Link> of
+        the book.
       </Container>
     </>
   );

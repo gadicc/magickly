@@ -8,22 +8,6 @@
  * the text is HTML. See plan 033.
  */
 
-/*
- * The app bar is fixed and 56px on a phone, 64px above that, so a page anchor
- * scrolled to the top of the viewport lands underneath it: #p53 put the marker
- * at top 0 with the bar covering it. Scoped to this stylesheet, which the
- * router loads only on the book's routes.
- */
-:global(html) {
-  scroll-padding-top: 4.5rem;
-}
-
-@media (min-width: 600px) {
-  :global(html) {
-    scroll-padding-top: 5rem;
-  }
-}
-
 .reading {
   max-width: 42rem;
   margin: 0 auto;

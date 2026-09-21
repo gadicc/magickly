@@ -1,0 +1,55 @@
+/*
+ * The app bar is fixed and 56px on a phone, 64px above that, so a page anchor
+ * scrolled to the top of the viewport lands underneath it: #p53 put the marker
+ * at top 0 with the bar covering it.
+ *
+ * Plain CSS rather than a module, because a CSS module's selectors must be
+ * pure — must carry a local class or id — and this one sets a property on the
+ * scrolling element itself. Imported by the book's layout, so it loads on the
+ * book's routes and nowhere else.
+ */
+html {
+  scroll-padding-top: 4.5rem;
+}
+
+@media (min-width: 600px) {
+  html {
+    scroll-padding-top: 5rem;
+  }
+}
+
+/*
+ * Printing the book. The app bar is fixed, so it would otherwise print on
+ * every sheet; the navigation between chapters means nothing on paper; and a
+ * heading stranded at the foot of a sheet is the one thing worth forbidding.
+ */
+@media print {
+  header.MuiAppBar-root,
+  .MuiAppBar-root,
+  nav[aria-label="Chapters"] {
+    display: none !important;
+  }
+
+  main {
+    padding-top: 0 !important;
+  }
+
+  h1,
+  h2 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  p,
+  blockquote,
+  table {
+    orphans: 2;
+    widows: 2;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    word-break: break-all;
+  }
+}

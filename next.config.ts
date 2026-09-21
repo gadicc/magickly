@@ -1,4 +1,5 @@
-import { realpathSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { readdirSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 import type { NextConfig } from "next";
 import {
@@ -10,6 +11,29 @@ import { RITUAL_PUBLICATION_STATIC_PATHS } from "./src/files/ritualPublicationSt
 
 // Vercel standalone can retain this package symlink while dropping a file traced
 // through it. Trace the physical target while the runtime keeps the stable alias.
+/**
+ * Everything under public/ except the docs, which are downloads rather than
+ * part of the app shell. Mirrors what @serwist/next would have globbed, minus
+ * the directory it gives no way to exclude.
+ */
+function precacheEntries() {
+  const publicDir = path.join(process.cwd(), "public");
+  const skip = /^(docs\/|sw\.js|sw\.js\.map|swe-worker-)/;
+  const walk = (dir: string, prefix = ""): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+      const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) return walk(path.join(dir, entry.name), rel);
+      return skip.test(rel) ? [] : [rel];
+    });
+
+  return walk(publicDir).map((file) => ({
+    url: `/${file}`,
+    revision: createHash("md5")
+      .update(readFileSync(path.join(publicDir, file)))
+      .digest("hex"),
+  }));
+}
+
 const resvgWasmTraceFile = `./${path
   .relative(
     process.cwd(),
@@ -42,6 +66,19 @@ const ritualPublicationTraceFiles = [
 
 export default async function (phase: string): Promise<NextConfig> {
   const nextConfig: NextConfig = {
+    /**
+     * The raw files under /docs are downloads, not pages. The Markdown edition
+     * is the same text as the HTML routes, so indexing it would set a plain
+     * file against the edition it duplicates. A header rather than a
+     * robots.txt Disallow: disallowing it would stop a crawler ever reading
+     * the noindex.
+     */
+    headers: async () => [
+      {
+        source: "/docs/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex" }],
+      },
+    ],
     redirects: () =>
       Object.entries(legacyStaticImageAliases).map(([source, destination]) => ({
         source,
@@ -109,6 +146,19 @@ export default async function (phase: string): Promise<NextConfig> {
       // use something else that works, such as "service-worker/index.ts".
       swSrc: "src/app/sw.ts",
       swDest: "public/sw.js",
+
+      // @serwist/next precaches public/**/* by default, and public/docs holds
+      // the Markdown edition of Lenain — 279 KB that every service worker
+      // would download on install, and again after every reading correction.
+      // The book has routes; the file is a download, not part of the shell.
+      //
+      // globPublicPatterns cannot express this: it is passed straight to
+      // glob's pattern argument, where a leading "!" has meant nothing since
+      // glob 9 — ["**/*", "!docs/**"] matches exactly what ["**/*"] does, as
+      // the package itself confirms. Only glob's separate `ignore` option
+      // excludes, and Serwist hardcodes that. Supplying the manifest instead
+      // replaces the glob altogether, which is the documented hook for it.
+      additionalPrecacheEntries: precacheEntries(),
 
       //   reloadOnOnline: true,
 
