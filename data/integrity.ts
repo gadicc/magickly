@@ -8,8 +8,8 @@
  * [schema](./schemas.ts); do the few lists TypeScript has to hold by hand
  * still say what the data says; does any source
  * [write a key twice](./duplicateKeys.ts); and does the Enochian dictionary,
- * which is no table, list a meaning or pronunciation twice? Nothing throws
- * and nothing is fatal here —
+ * which is no table, hold an entry its type does not admit, or list a
+ * meaning or pronunciation twice? Nothing throws and nothing is fatal here —
  * [integrity.test.ts](./integrity.test.ts) asserts the list is empty, and
  * [check.ts](./check.ts) is the same list on the command line, which
  * `pnpm build` runs before Next sees the data.
@@ -24,7 +24,7 @@ import { duplicateKeysInSources } from "./duplicateKeys";
 import realDictionary, { type EnochianDictionary } from "./enochian/Dictionary";
 import { graph } from "./graph";
 import type { TableSpec } from "./graphSpec";
-import { schemas } from "./schemas";
+import { enochianEntry, schemas } from "./schemas";
 import { tables as realTables, type TableName, type Tables } from "./tables";
 
 /** One thing that is wrong, named so a reader knows where to look. */
@@ -47,7 +47,8 @@ export interface Failure {
     | "derived";
   /**
    * `table`, `table.row` or `table.row.field`; for a source, its file and
-   * the path within it; for the dictionary, `dictionary.word.list.index`.
+   * the path within it; for the dictionary, the word and the path within
+   * its entry.
    */
   where: string;
   detail: string;
@@ -59,6 +60,10 @@ const isIdField = (key: string) => key.endsWith("Id") || key.endsWith("Ids");
 
 const plain = (value: unknown): value is Row =>
   typeof value === "object" && value !== null && !Array.isArray(value);
+
+/** Where a schema issue is, dotted and led by a dot; empty at the root. */
+const dotted = (issue: v.BaseIssue<unknown>) =>
+  issue.path ? `.${issue.path.map((p) => String(p.key)).join(".")}` : "";
 
 /**
  * A table's rows with the name a failure should call them by: an object
@@ -222,15 +227,16 @@ function checkPlanetIds(table: unknown): Failure[] {
 }
 
 /**
- * A meaning or pronunciation an entry of the Enochian dictionary lists
- * twice, identically. The dictionary is no table, so neither the graph nor
- * a schema ever reads it; it was typed one row of its sources at a time, and
- * a word EMPM prints once per gematria value came through as two objects
- * saying the same thing, which `/enochian/dictionary` printed twice
+ * The Enochian dictionary against its type, and against itself. The
+ * dictionary is no table, so the graph never reads it; every entry is held
+ * to [its schema](./schemas.ts) here, since the type is written by hand and
+ * the module emitted, and nothing else would notice a number where a string
+ * should be. And a meaning or pronunciation an entry lists twice,
+ * identically, is a repeat: the file was typed one row of its sources at a
+ * time, and a word EMPM prints once per gematria value came through as two
+ * objects saying the same thing, which `/enochian/dictionary` printed twice
  * (plan 032, follow-ups). Two objects that differ in anything — the source,
- * its citation, a note — are two attestations, and stay. The dictionary has
- * no schema, so the little shape this needs is asked for here, and said
- * rather than thrown at, since the list is meant to be the whole of it.
+ * its citation, a note — are two attestations, and stay.
  *
  * The dictionary is an argument so that a test can hand it a repeat. The
  * real one is the module [the build](./build.mts) emits, as the tables are
@@ -240,28 +246,26 @@ export function checkDictionary(
   dictionary: EnochianDictionary = realDictionary,
 ): Failure[] {
   const failures: Failure[] = [];
-  for (const [word, entry] of Object.entries(dictionary))
+  for (const [word, entry] of Object.entries(dictionary)) {
+    const result = v.safeParse(enochianEntry, entry);
+    for (const issue of result.issues ?? [])
+      failures.push({
+        check: "schema",
+        where: `dictionary.${word}${dotted(issue)}`,
+        detail: issue.message,
+      });
+
+    // An entry that is no object, a list that is no list, an item that is no
+    // object: the schema has just said so, and it is passed over here rather
+    // than thrown at.
+    if (!plain(entry)) continue;
     for (const list of ["meanings", "pronounciations"] as const) {
       const items: unknown = entry[list];
-      if (!Array.isArray(items)) {
-        failures.push({
-          check: "schema",
-          where: `dictionary.${word}.${list}`,
-          detail: "not a list",
-        });
-        continue;
-      }
+      if (!Array.isArray(items)) continue;
       const seen = new Set<string>();
       for (let i = 0; i < items.length; i++) {
         const item: unknown = items[i];
-        if (!plain(item)) {
-          failures.push({
-            check: "schema",
-            where: `dictionary.${word}.${list}.${i}`,
-            detail: "not an object",
-          });
-          continue;
-        }
+        if (!plain(item)) continue;
         // The order the keys were written in is not a difference; anything
         // else, at any depth, is.
         const written = JSON.stringify(
@@ -278,6 +282,7 @@ export function checkDictionary(
         seen.add(written);
       }
     }
+  }
   return failures;
 }
 
@@ -355,7 +360,7 @@ export function checkIntegrity(
       for (const issue of result.issues ?? [])
         failures.push({
           check: "schema",
-          where: `${name}.${id}${issue.path ? `.${issue.path.map((p) => String(p.key)).join(".")}` : ""}`,
+          where: `${name}.${id}${dotted(issue)}`,
           detail: issue.message,
         });
     }

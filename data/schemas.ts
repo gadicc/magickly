@@ -1,5 +1,6 @@
 /**
- * What a row of each table must look like, as a valibot schema.
+ * What a row of each table must look like, as a valibot schema; and, at the
+ * end, what an entry of the Enochian dictionary must, which is no table.
  *
  * `strictObject` throughout, deliberately: plain `object()` silently strips a
  * key it was not told about, which is the class of silence this whole layer
@@ -396,3 +397,24 @@ export const schemas = {
     ...ids("elemental"),
   }),
 } satisfies Record<TableName, v.GenericSchema>;
+
+/**
+ * One entry of the Enochian dictionary, which is no table: what
+ * [dictionaryEntry.ts](./enochian/dictionaryEntry.ts) declares by hand, as a
+ * schema, so that [the integrity check](./integrity.ts) can hold the shipped
+ * entries to it — twenty-two numerals sat there as numbers until it did.
+ * `source2` is a citation within the source and `note` a transcriber's
+ * remark; a pronunciation may carry both, as a meaning may.
+ */
+const attested = {
+  source: v.string(),
+  source2: v.optional(v.string()),
+  note: v.optional(v.string()),
+};
+export const enochianEntry = v.strictObject({
+  gematria: v.array(v.number()),
+  meanings: v.array(v.strictObject({ meaning: v.string(), ...attested })),
+  pronounciations: v.array(
+    v.strictObject({ pronounciation: v.string(), ...attested }),
+  ),
+});

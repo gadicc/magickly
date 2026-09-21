@@ -2,8 +2,9 @@
  * The Enochian dictionary: 1,903 words, each with its meanings, its
  * pronunciations and its gematria.
  *
- * It is not a table — it is named in no link, in either direction, and
- * nothing checks it against a schema — and it is the one source
+ * It is not a table — it is named in no link, in either direction, though
+ * [the integrity check](../integrity.ts) holds every entry to its type — and
+ * it is the one source
  * [the build](../build.mts) emits as a module rather than as JSON, because a
  * JSON import of it costs TypeScript about 19,300 types (plan 032,
  * decision 1). The emitted declaration names

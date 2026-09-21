@@ -7,9 +7,13 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import * as v from "valibot";
 import { describe, expect, it } from "vitest";
 import { PLANET_IDS } from "./astrology/Planets";
-import dictionary, { type EnochianDictionary } from "./enochian/Dictionary";
+import dictionary, {
+  type EnochianDictionary,
+  type EnochianEntry,
+} from "./enochian/Dictionary";
 import type { TableSpec } from "./graphSpec";
 import {
   checkDictionary,
@@ -17,6 +21,7 @@ import {
   checkMirrors,
   type Failure,
 } from "./integrity";
+import { enochianEntry } from "./schemas";
 import { type Tables, tables } from "./tables";
 
 /**
@@ -317,8 +322,8 @@ describe("the data against the graph", () => {
     };
     expect(of("repeat", checkDictionary(cited))).toEqual([]);
 
-    // And a shape the dictionary's type forbids is said, not thrown at: the
-    // dictionary has no schema, and check.ts is meant to list everything.
+    // And a shape the type forbids is the schema's to say, not this loop's
+    // to throw at: check.ts is meant to list everything.
     const malformed = {
       ...dictionary,
       APOPHRASZ: {
@@ -328,9 +333,44 @@ describe("the data against the graph", () => {
       },
     } as unknown as EnochianDictionary;
     expect(of("schema", checkDictionary(malformed))).toEqual([
-      `dictionary.APOPHRASZ.meanings.${APOPHRASZ.meanings.length}: not an object`,
-      "dictionary.APOPHRASZ.pronounciations: not a list",
+      `dictionary.APOPHRASZ.meanings.${APOPHRASZ.meanings.length}: Invalid type: Expected Object but received "motion"`,
+      "dictionary.APOPHRASZ.pronounciations: Invalid type: Expected Array but received undefined",
     ]);
+    expect(of("repeat", checkDictionary(malformed))).toEqual([]);
+  });
+
+  it("holds every dictionary entry to its type", () => {
+    // The type is written by hand and the module emitted, so nothing else
+    // would notice a number where a string should be: twenty-two numerals
+    // sat there as numbers until 4640b6a (plan 032, step 3c follow-ups). The
+    // schema and the type say the same thing, in both directions.
+    const typed: EnochianEntry = v.parse(enochianEntry, dictionary.OL);
+    const back: v.InferInput<typeof enochianEntry> = dictionary.OL;
+    expect(typed).toEqual(back);
+    expect(of("schema", checkIntegrity())).toEqual([]);
+
+    const planted = {
+      ...dictionary,
+      OS: { ...dictionary.OS, meanings: [{ meaning: 12, source: "WE" }] },
+      ZON: {
+        ...dictionary.ZON,
+        pronounciations: [
+          { pronounciation: "zodoh-en", source: "EMPM", page: 83 },
+        ],
+      },
+    } as unknown as EnochianDictionary;
+    expect(of("schema", checkDictionary(planted))).toEqual([
+      "dictionary.OS.meanings.0.meaning: Invalid type: Expected string but received 12",
+      'dictionary.ZON.pronounciations.0.page: Invalid key: Expected never but received "page"',
+    ]);
+
+    // An entry that is no object at all is the schema's to say, once; the
+    // repeat loop passes it over rather than reading lists off it.
+    const gone = { ...dictionary, FOO: null } as unknown as EnochianDictionary;
+    expect(of("schema", checkDictionary(gone))).toEqual([
+      "dictionary.FOO: Invalid type: Expected Object but received null",
+    ]);
+    expect(of("repeat", checkDictionary(gone))).toEqual([]);
   });
 
   it("holds twelve planets and three spheres of the Tree", () => {

@@ -9,10 +9,11 @@
  * generated declaration that says only this, so the whole file costs the
  * `Record` below.
  *
- * It is a type and not a schema: nothing checks the dictionary against it,
- * as [the integrity check](../integrity.ts) checks the tables. The dictionary
- * is not a table — it is in no link, in neither direction — and its entries
- * are transcriptions from several sources rather than rows.
+ * It is a type, and [schemas.ts](../schemas.ts) says the same thing as a
+ * schema, which [the integrity check](../integrity.ts) holds every entry to
+ * as it holds a row to its table's. The dictionary is not a table — it is in
+ * no link, in neither direction — and its entries are transcriptions from
+ * several sources rather than rows.
  */
 
 /** One word, as the dictionary files it. */
@@ -26,10 +27,15 @@ export interface EnochianEntry {
     source2?: string;
     note?: string;
   }[];
-  /** Each attested pronunciation; often empty. */
+  /**
+   * Each attested pronunciation; often empty. A citation and a note, as a
+   * meaning carries them.
+   */
   pronounciations: {
     pronounciation: string;
     source: string;
+    source2?: string;
+    note?: string;
   }[];
 }
 
