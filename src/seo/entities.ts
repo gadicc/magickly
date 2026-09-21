@@ -185,10 +185,3 @@ const ORDINAL_SUFFIX: Record<string, string> = {
 function ordinal(n: number) {
   return `${n}${ORDINAL_SUFFIX[ORDINAL.select(n)]}`;
 }
-
-/** Every genius, in Lenain's order. */
-export function angelPages(): EntityPage[] {
-  return angelSlugs()
-    .map(angelPage)
-    .filter((page): page is EntityPage => page !== null);
-}
