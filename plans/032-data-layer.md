@@ -582,6 +582,23 @@ A ninth commit, `docs(plan): Record the data layer's third step, part c`,
 adds the sections below; as in the earlier steps it is not in the table, which
 it would have to predict.
 
+### The dictionary, after step 3
+
+The two dictionary findings step 3 left, on a branch from `a6a4c7f`
+fast-forwarded into `main`, checked commit by commit the same way and gated
+as [below](#the-dictionary-after-step-3-1):
+
+| Commit | Change | Tests |
+| --- | --- | --- |
+| `96f9fa9` fix(enochian): Drop the dictionary's 128 repeats | Every meaning or pronunciation object identical to an earlier one in its entry: 81 meanings and 47 pronunciations across 77 entries, 513 lines deleted and none added. Whatever differs in its source, citation or note stays | 4,743 |
+| `c5855df` test(data): Check the dictionary for repeats | `checkDictionary()` in `integrity.ts`, over the one source that is no table, read from the module the build emits; a `repeat` failure kind; the dictionary is an argument to `checkIntegrity()` as the sources directory is, so that the test can plant one | 4,744 |
+| `34a8fb9` fix(enochian): File the numerals as strings | The twenty-two numbers among the meanings become the strings the type says they are; they are the Enochian numerals, not gematria | 4,744 |
+| `8646f0a` test(data): Hold the dictionary to its type | A strict valibot schema for an entry beside the tables', parsed by the check; `source2` and `note` declared on a pronunciation; a test that the schema and the type agree both ways | 4,745 |
+| `c47d6cc` docs(data): Say why build.mts is .mts, correctly | The header's claim about `import.meta.url` under tsx, which a probe refuted | 4,745 |
+
+A sixth, `docs(plan): Record the dictionary's repeats and numerals`, adds
+this table and that section.
+
 ## Results
 
 ### Steps 0 and 1
@@ -1530,6 +1547,158 @@ logged as `data: enochian/dictionary.mjs`, was in the next render of
 `/enochian/dictionary`, and left the emitted module byte for byte as it was
 when the edit was reverted.
 
+### The dictionary, after step 3
+
+Step 3a's re-check left one finding of the dictionary's own, seventy-six
+entries listing one meaning twice with the same source and citation, and
+3c's left another, twenty-one entries with a number for a meaning
+([follow-ups](#follow-ups)). Both are done, on a branch of five commits
+from `a6a4c7f` ([above](#the-dictionary-after-step-3)), with a check that
+holds the dictionary to its type from now on.
+
+Enumerated by a script over the parse and cross-checked against a scan of
+the file's lines, the file had 1,903 entries, 93 of them listing one meaning
+text more than once: 13 from two different sources, 9 differing only in a
+`source2` or a `note`, and 75 groups in which every repeat was the same
+object — 43 from EMPM, 32 from WE, none more than twice. The seventy-sixth
+was ZON, whose second "form" carries a note. Six of the thirteen mixed
+groups held an identical pair inside them as well, and 47 entries repeated
+a pronunciation object the same way.
+
+Where they came from is in the file's shape. Every one of the 43 EMPM groups
+has exactly two gematria values, 42 of them repeat the pronunciation object
+verbatim, and ZON's note says the book lists the word once per gematria
+value: the file was typed one row of its sources at a time, and a word the
+book prints twice came through as two objects saying the same thing, with
+only the gematria merged into a list. The 32 WE groups carry no WE
+pronunciation, and gematria only where EMPM has the word too, and BAGLE
+repeats three of its four glosses, so WE too lists those words in two
+places. Both pages map the array straight to rows, so a reader saw "motion
+(EMPM)" twice; the pronunciation cell shows only the first, so the 47 were
+invisible.
+
+The owner's decision, 20 September: an identical repeat is an artefact of
+the transcription, not a second attestation — the file records attestation
+by source, not by row, and the gematria list already holds what the second
+row said — so both kinds go, and the check goes in now. `96f9fa9` drops
+every meaning or pronunciation object identical to an earlier one in its
+entry: 81 meanings and 47 pronunciations, 128 objects across 77 entries,
+513 lines and nothing else, verified by parsing both files and comparing
+the new to the old with identical objects dropped. Whatever differs in
+anything stays: the 13 words two sources gloss alike keep one object per
+source, the 9 whose repeat carries a citation or a note keep both, and so
+does ZON.
+
+`c5855df` asks the question in `integrity.ts`, as the one check the graph
+has no part in: `checkDictionary()` reads the module the build emits, as the
+tables are read from the JSON it emits, so that what ships is what is
+checked, and compares whole objects with their keys sorted, so that the
+order they were written in is not a difference while a `source2` or a `note`
+is. `pnpm data:check`, and with it `pnpm build`, now rejects a repeat; the
+test proves it on ZON and BIAB, which pass, and on a repeat planted after
+APOPHRASZ's real objects, which does not.
+
+The numbers were not what 3c's re-check took them for. The twenty-two —
+OS twice, OL, OP, OX, P, NI, PD, VX, AF, CLA, EMOD, QUAR, MIAN, DAOX, ERAN,
+DARG, FAXS, ACAM, MAPM, CIAI and PEOAL — are the Enochian numerals, and the
+number is what WE says the word means: nineteen of the twenty-one have no
+other meaning and no gematria at all, OL's own gematria is 38, and P's is
+unfiled. They are not gematria values in the wrong list, so they do not
+move into `gematria`; the owner's decision, 21 September, was strings, and
+`34a8fb9` makes them so, "12" for 12. `/enochian/keys` shows OL as
+"24 (WE)" as before.
+
+What let both sit there is that `EnochianEntry` was a type and not a
+schema: the dictionary is emitted as a module, and nothing checked the
+shipped entries against it. An audit of the whole file against the type,
+made before the numerals were touched, found the twenty-two, seven
+pronunciations carrying a `source2` the type did not declare (AKELE, AZDOBN,
+E, ESE, IANA, ME, STIMCUL: page citations), ZON's pronunciation carrying a
+note, and entry `I` giving two of its objects — "(name of an angel, sol)"
+and the pronunciation "Ee" — an empty `source`. `8646f0a` gives the
+dictionary a strict valibot schema beside the tables' in
+[schemas.ts](../data/schemas.ts), which `checkDictionary()` parses every
+entry with, so that a `schema` failure names the entry and the field as it
+does for a row; the type gains the citation and the note a pronunciation
+may carry, and the test proves the schema and the type say the same thing
+in both directions before planting a number, a stray key and a `null`
+entry, which the loop threw on until the second review found it. The empty
+sources pass the schema, since a string is what the type asks for, and are
+listed as a follow-up: what they should say is not in the repository.
+
+`c47d6cc` is a comment. The review of the dedupe found
+[build.mts](../data/build.mts) saying tsx compiles a `.ts` here to CJS
+where neither `import.meta.url` nor top-level await exists; a two-line
+probe run both ways showed the second half true and the first not — tsx
+shims `import.meta.url` into the CJS it emits, which is what
+`duplicateKeys.ts` relies on under `pnpm data:check` — and the header now
+says so.
+
+The series was built on `f0cfe74`, step 3a's tip, and rebased twice as
+`main` moved under it — onto `b170693`, then onto `a6a4c7f` once steps 3b and
+3c had landed, where the check's type import moved to `dictionaryEntry.ts`
+and the three later commits were added. Each commit was checked on its own
+tree with `pnpm check`, `typecheck`, `data:check` and `test`, `data/dist`
+wiped before each: 4,743 tests on the first, 4,744 on the second and third,
+4,745 on the last two, all passing; the first commit's only failure, a
+five-second timeout in `readRitualBundleAsset.test.ts` while three suites
+ran at once under a load average of 45, passed alone.
+
+The gate ran on `c47d6cc` in a sibling worktree with a fresh
+`pnpm install --frozen-lockfile`, on Node 24.18.0 and pnpm 10.18.0, under
+CI's placeholder environment, in [ci.yml](../.github/workflows/ci.yml)'s
+order:
+
+| Step | Outcome |
+| --- | --- |
+| `pnpm install --frozen-lockfile` | clean; no dependency was added |
+| `loom init` | already matches the bootstrap defaults |
+| `loom check` | good, with the standing pnpm 11 advisory |
+| `loom check --production` | good, same advisory |
+| `pnpm check` | no errors, and the same 35 warnings as `main` |
+| `pnpm typecheck` | clean |
+| `pnpm test:coverage` | 4,745 passed, 17 skipped; `data/` covers 99.73 % of statements and 99.05 % of branches. **The step fails**, on the functions threshold of `src/seo/entities.ts` — 87.5 % against 95 %, lines 191–193, `angelPages()` — which `22ca738` added to `main` this morning without a test; `main` fails it identically, at 4,743 tests, and nothing here touches that file |
+| `pnpm build` | webpack, 386 pages prerendered |
+| `pnpm check:turbopack` | Turbopack, 386 pages prerendered |
+
+The two builds ran by hand after the coverage step stopped the script, in
+the same worktree and environment.
+
+What a reader sees change: on `/enochian/dictionary` and `/enochian/keys`,
+each meaning once where seventy-seven entries printed one twice, and the
+numerals as they were. Both pages render the meanings on the client once a
+word is chosen, so the prerendered HTML holds only the word list and cannot
+show it; in a browser against `pnpm dev`, APOPHRASZ shows one "motion
+(EMPM)" row under "ah-poh-peh-rah-seh-zod" with "Gematria 171, 177", and
+ZON still shows "form (EMPM)" twice, the second with its note. Nothing
+else: no image reads the dictionary, and the registry test that pins four
+of the six component images — the Tree, the shewbread, the geomancy chart
+and the candlestick — passed unchanged.
+
+Two adversarial reviews, both at xhigh. The first, on the dedupe and the
+repeat check as they stood on `f0cfe74`, ran every checkable claim — the
+patch parses and equals the old file with identical objects dropped; the
+check bites on a repeat in either key order and passes one that differs in
+`source`, `source2` or `note`; nothing client-side imports it — and found
+five things, each amended in: the first message counted the seventy-five
+groups where the patch counts objects; the check threw on an entry with no
+list; the test pinned ZON's wording and APOPHRASZ's literal objects; the
+key allowlist `JSON.stringify(item, keys)` would have ignored a difference
+below the top level; and the plans were still open. The second, on the five
+commits as rebased onto `a6a4c7f`, confirmed the numerals reading from the
+data — PEOAL's 69636 cannot be a gematria of a five-letter word, and OL's
+own 38 is filed — and that the schema and the type are equal in both
+directions, and found no blocker and five things: a `null` entry still threw
+past the schema's report, guarded now; the plans said the opposite of what
+shipped, which is this commit; the check re-parsed the JSON5 where the
+module the build emits is what ships, and reads the module now, which also
+took `JSON5`, `readFileSync` and `import.meta.url` out of `integrity.ts`;
+the `where` doc named a shape the schema failures do not take, reworded; and
+`I`'s empty sources, which are the follow-up above. It left the third
+positional argument to `checkIntegrity()` as it is, and noted that the tables'
+schemas accept an empty string too, so the dictionary's does the same.
+
+
 ## Adversarial review
 
 Run on 18 September at xhigh by Fable 5.1 against the design as it stood
@@ -1600,14 +1769,20 @@ step 4 is [a plan of its own](#migration). The rest:
   the dump-page redesign ([plan 028](028-seo.md#follow-ups)) is what `decycle`
   is still waiting for: four pages import it to print a row, and 3c left them
   alone by [decision 13](#decided-on-20-september).
-- **Twenty-one dictionary entries file a number as a meaning.** The re-check
-  found `meanings[].meaning` holding a number in 21 entries, every one a
-  `WE`-sourced gematria value filed as a meaning: ACAM, AF, CIAI, CLA, DAOX,
-  DARG, EMOD, ERAN, FAXS, MAPM, MIAN, NI, OL (its fifth), OP, OS (twice), OX,
-  P (its second), PD, PEOAL, QUAR and VX. `OL` is a Keys word, so
-  `/enochian/keys` prints "24 (WE)" as a meaning. Nothing checks the
-  dictionary against `EnochianEntry`; the values want moving into `gematria`,
-  and a shape assertion over the shipped entries would keep them there.
+- **Done, after step 3: the twenty-one entries with a number for a meaning.**
+  The re-check found `meanings[].meaning` holding a number in 21 entries —
+  ACAM, AF, CIAI, CLA, DAOX, DARG, EMOD, ERAN, FAXS, MAPM, MIAN, NI, OL (its
+  fifth), OP, OS (twice), OX, P (its second), PD, PEOAL, QUAR and VX — and took
+  them for `WE` gematria values filed as meanings. They are the Enochian
+  numerals, and the number is the meaning: nineteen of the twenty-one have no
+  other meaning and no gematria, and OL's own gematria is 38. They are strings
+  since `34a8fb9`, and `8646f0a` is the shape assertion the bullet asked for
+  ([above](#the-dictionary-after-step-3-1)).
+- **Entry `I` gives two objects an empty source.** "(name of an angel, sol)"
+  and the pronunciation "Ee" carry `source: ""`, since the 2023 transcription;
+  the schema passes them, a string being what the type asks for, and the page
+  prints "()" after the meaning. What they should say is not in the
+  repository.
 
 - **Done in step 2.** [Plan 031](031-seventy-two-angels.md)'s
   `seventyTwoAngelsDerived.ts` still imports `PlanetId` and `ZodiacId`, which
@@ -1636,12 +1811,15 @@ step 4 is [a plan of its own](#migration). The rest:
   literal types, which is what would let `PlanetId` be derived rather than
   written down; it belongs with step 4's package, where the emit is being
   designed anyway ([above](#kind-is-data-the-types-cannot-read)).
-- **Seventy-six dictionary entries repeat a meaning verbatim.** The re-check
-  counted 92 entries that list one meaning text twice: 12 from two different
-  sources, 8 differing only in `source2`, and 76 exact duplicate objects, the
-  same source and citation twice. The duplicate-key lint cannot see them, since
-  they are array elements rather than keys; a check for a repeated meaning
-  object would, and the 76 want deduplicating.
+- **Done, after step 3: the seventy-six entries that repeat a meaning
+  verbatim.** The re-check counted 92 entries that list one meaning text twice
+  — 12 from two different sources, 8 differing only in `source2`, and 76 exact
+  duplicate objects — which the duplicate-key lint cannot see, since they are
+  array elements rather than keys. Counted again, the 76 were 75: ZON's second
+  "form" carries a note, and stays. Six more identical pairs sat inside the
+  groups two sources share, and 47 pronunciations were repeated the same way,
+  so 128 objects across 77 entries went in `96f9fa9`, and `c5855df` is the
+  check that none returns ([above](#the-dictionary-after-step-3-1)).
 - Pinning implementation subagents at xhigh needs a `.claude/agents/`
   definition; the session itself runs at xhigh and built-in agents inherit
   it, so none was added.

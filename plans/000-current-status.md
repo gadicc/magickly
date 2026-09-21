@@ -180,6 +180,14 @@ Follow-ups are separate from the completed migration work:
   where it printed a literal `0`. Nothing else moved — every pinned image
   keeps its bytes and its inputs hash. See
   [plan 032](032-data-layer.md#step-3c-1).
+- After step 3, the two dictionary findings it left are done: the 128
+  repeated meaning and pronunciation objects are gone, the twenty-two
+  numerals filed as numbers are strings, and the dictionary is held to its
+  type — a strict schema beside the tables', and a check for a repeat — under
+  `pnpm data:check`, so `pnpm build` rejects either returning. What a reader
+  sees: on `/enochian/dictionary` and `/enochian/keys`, each meaning once
+  where seventy-seven entries printed one twice. See
+  [plan 032](032-data-layer.md#the-dictionary-after-step-3-1).
 - TODO: three small ones left by step 3c
   ([plan 032](032-data-layer.md#follow-ups)): `CASARMA` has no dictionary
   entry at all — `CASARM`'s second meaning carries it run into the text, as
@@ -188,11 +196,10 @@ Follow-ups are separate from the completed migration work:
   `/enochian/keys` still prints "Gematria " with nothing after it for a word
   whose gematria is empty; and a study set whose question or answer is a
   function has no dotted path for the new field-path test to check.
-- TODO: 21 Enochian dictionary entries file a `WE` gematria number as a
-  meaning (ACAM, AF, CIAI, CLA, DAOX, DARG, EMOD, ERAN, FAXS, MAPM, MIAN, NI,
-  OL, OP, OS, OX, P, PD, PEOAL, QUAR, VX; `OL` shows on `/enochian/keys` as
-  "24 (WE)"); move them into `gematria` and assert the shipped entries'
-  shape, per [plan 032](032-data-layer.md#follow-ups).
+- TODO: the Enochian dictionary's entry `I` gives two of its objects an
+  empty source, "(name of an angel, sol)" and the pronunciation "Ee", so the
+  page prints "()" after the meaning; what they should cite is not in the
+  repository. See [plan 032](032-data-layer.md#follow-ups).
 - TODO: the dump-page redesign ([plan 028](028-seo.md#follow-ups)), which is
   what `decycle` is still waiting for: four pages import it to print a row,
   and step 3c left them alone deliberately. It wants a design pass of its own.
@@ -211,9 +218,6 @@ Follow-ups are separate from the completed migration work:
   modules rather than JSON, which would make `kind` and the other closed
   fields literal types and let `PlanetId` be derived rather than written out —
   that one belongs with step 4's package.
-- TODO: seventy-six Enochian dictionary entries repeat a meaning object
-  verbatim (same text, source and citation); dedupe them and add a check, per
-  [plan 032](032-data-layer.md#follow-ups).
 - Not yet released: from the next release, anonymous `/api/session` checks
   return 200 with a null user instead of 401 (changed 17 September). An
   anonymous tab left open across that release shows a study load error until
