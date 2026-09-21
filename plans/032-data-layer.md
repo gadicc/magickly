@@ -599,6 +599,60 @@ as [below](#the-dictionary-after-step-3-1):
 A sixth, `docs(plan): Record the dictionary's repeats and numerals`, adds
 this table and that section.
 
+### The dictionary's run-together entries
+
+The two entries step 3c found run into their neighbours' text, and the
+gematria line it left beside them, on `gate/dictionary-runons` from `84c5bf2`,
+21 September. Each commit was checked on its own tree with `pnpm check`,
+`pnpm typecheck` and `pnpm test`, `data/dist` wiped before each:
+
+| Commit | Change | Tests |
+| --- | --- | --- |
+| `fcf0754` fix(enochian): Part CASARMA's meaning from CASARM's | "whom, unto whomCASARMA whom" becomes "whom, unto whom", and `CASARMA` is an entry of its own: the WE "whom" the string carried, and the second Key's "whome" beside it | 4,749 |
+| `542e65c` fix(enochian): Part GRU's meaning from G-RSAM's | "ADMIRATION, WITHGRU DEED, FACT" becomes "ADMIRATION, WITH", and `GRU` gains the WE "DEED, FACT" the string carried; no Key says the word, so it gains nothing else | 4,749 |
+| `38eaf12` fix(enochian): Show the gematria line only when there is one | The keys page's `{dict?.gematria ? …}` becomes `?.length`, which is what `/enochian/dictionary` has always asked; 130 of the page's 181 words printed the label alone | 4,749 |
+
+The test count does not move: the one that pinned `CASARMA` as missing is
+inverted rather than replaced. The dictionary's own count does, 1,903 words
+before and 1,905 after, and moves with each commit in that test and in the
+two doc comments that say how big the file is.
+
+A fourth, `docs(plan): Record the dictionary's run-together entries`, adds
+this table and the notes above; as in the earlier steps it is not in the
+table, which it would have to predict.
+
+The gate ran on the tip in the `gate/dictionary-runons` worktree with the
+symlinked `node_modules` removed and a fresh `pnpm install --frozen-lockfile`,
+on Node 24.18.0 and pnpm 10.18.0, under CI's placeholder environment, in
+[ci.yml](../.github/workflows/ci.yml)'s order:
+
+| Step | Outcome |
+| --- | --- |
+| `pnpm install --frozen-lockfile` | clean; no dependency was added |
+| `loom init` | already matches the bootstrap defaults |
+| `loom check` | good, with the standing pnpm 11 advisory |
+| `loom check --production` | good, same advisory |
+| `pnpm check` | no errors, and 739 files and 35 warnings, which is what `main` gives today |
+| `pnpm typecheck` | clean |
+| `pnpm test:coverage` | 4,749 passed, 17 skipped. **The step fails**, on the functions threshold `main` has failed since `22ca738` — `src/seo/entities.ts` at 87.5 % against 95 %, lines 191–193, `angelPages()`, added without a test — and nothing here touches that file |
+| `pnpm build` | webpack, 386 pages prerendered |
+| `pnpm check:turbopack` | Turbopack, 386 pages prerendered |
+
+A backup job held a core for the whole gate, at a load average above 20, and
+three coverage runs each lost one test to the five-second timeout — twice
+`readRitualBundleAsset.test.ts`, once `legacyImportValue.test.ts`, neither of
+them anything to do with this branch. Both pass alone in two seconds, and the
+run in the table is the suite under `--testTimeout=20000`, which is the only
+way the thresholds were reached at all; `pnpm test` without coverage passed
+whole every time.
+
+The six component images and their six inputs hashes were recomputed at the
+tip and none moved, which is what [decision 10](#decided-on-20-september)
+expects of a data change no image draws: no image reads the dictionary. Nor
+does any card — [cards.ts](../src/seo/cards.ts) gives `/enochian/keys` and
+`/enochian/dictionary` a file each, drawn from no table — and neither page's
+description in [pages.ts](../src/seo/pages.ts) names a word.
+
 ## Results
 
 ### Steps 0 and 1
@@ -1471,6 +1525,16 @@ words the assessment found missing, three were added as data in step 1
 (`IZAZAZ`, `BIAB`, `VOMZARG`), three are found by the normalisation, and
 `CASARMA` is the one still missing: the page ships 180 entries for 181 words.
 
+**Parted, 21 September.** `fcf0754` gives `CASARMA` the entry `CASARM`'s
+second meaning carried: the WE "whom" the string held, and beside it the
+"whome" the second Key glosses its thirteenth word with, which is the shape
+step 1 gave `IZAZAZ`, `BIAB` and `VOMZARG`. `542e65c` gives `GRU` the WE
+"DEED, FACT" that `G-RSAM`'s meaning carried; `GRU` is in none of the Keys,
+so it gains nothing beside it. The page ships 181 entries for 181 words now,
+and every figure above was measured when it shipped 180. The family is larger
+than the two: a scan of every meaning in the file for the same shape found ten
+more, which are [a follow-up](#follow-ups) of their own.
+
 #### Cost
 
 `tsc --noEmit --incremental false --extendedDiagnostics` over the whole
@@ -1757,18 +1821,44 @@ dictionary out of the JSON imports and off the keys page, that page's
 normalisation and its literal `0`, and the JSON5 loaders. Step 3 is done;
 step 4 is [a plan of its own](#migration). The rest:
 
-- **New, from step 3c.** `CASARMA` has no dictionary entry and no spelling
-  finds one: `CASARM`'s second meaning carries it run into the text, as
-  `G-RSAM`'s carries `GRU`'s, which is the fault step 3a parted `BIA` and
-  `BIAB` on ([above](#casarma-is-not-a-lookup-problem)). Both belong with the
-  dictionary contents below. `/enochian/keys` still prints "Gematria " with
-  nothing after it for a word whose gematria is empty, where
-  `/enochian/dictionary` guards the same cell with `?.length`. A study set
-  whose `question` or `answer` is a function has no dotted path for
-  `pathTarget()` to check, which is the one gap in that test's coverage. And
-  the dump-page redesign ([plan 028](028-seo.md#follow-ups)) is what `decycle`
-  is still waiting for: four pages import it to print a row, and 3c left them
-  alone by [decision 13](#decided-on-20-september).
+- **New, from step 3c.** A study set whose `question` or `answer` is a
+  function has no dotted path for `pathTarget()` to check, which is the one
+  gap in that test's coverage. And the dump-page redesign
+  ([plan 028](028-seo.md#follow-ups)) is what `decycle` is still waiting for:
+  four pages import it to print a row, and 3c left them alone by
+  [decision 13](#decided-on-20-september).
+- **New, from the parting: ten more entries run into their neighbours.**
+  Closing `CASARMA` and `GRU` was the occasion to ask how many more of the
+  fault there are, and the file was scanned twice over: for a lowercase
+  letter or a closing mark followed by two or more capitals, which is the
+  shape `CASARM`'s string had, and for a word ending in a dictionary key of
+  three letters or more, with three or more letters before it, that is not
+  the last word of its meaning, which is the shape `G-RSAM`'s had, where
+  both halves are capitals. Ten meanings come out, all `WE`, each a word's
+  own gloss with another entry glued to its end:
+
+  | Entry | The meaning as it stands | Runs into |
+  | --- | --- | --- |
+  | `BAMS` | "forget, let them forgetBANAA Kerubic Archangel WATER OF FIRE" | `BANAA`, which has no entry |
+  | `ES` | "FOURTHESE DAUGHTER OF LIGHT" | `ESE`, which EMPM glosses "(name of an angel)" |
+  | `ICZHIHAL` | "ELEMENTAL KING OF EARTHICZHIHL KING OF EARTH TABLET (VAR)" | `ICZHIHL`, which has no entry |
+  | `IZAZAS` | "FRAME, HAVE FRAMEDIZED DAUGHTER OF DAUGHTER OF LIGHT" | `IZED`, which has no entry |
+  | `LONDOH` | "KINGDOMSLONSA POWER" | `LONSA`, which EMPM glosses "everyone" |
+  | `MOMAO` | "crown, the crownsMOMAR crown, to crown" | `MOMAR`, which has no entry |
+  | `NOR` | "SONS, YOUNOR SONS" | `NOR` itself, so this one is a reading, not a parting |
+  | `ORMN` | "Servient Angel AIR OF EARTHORO A GOD-NAME OF AIR TABLET" | `ORO`, which WE glosses twice already |
+  | `PI` | "SHEPIAD YOUR GOD (alt.sp.)" | `PIAD`, which has no entry |
+  | `ZIRDO` | "I AMZIRENAIAD I AM THE LORD YOUR GOD" | `ZIRENAIAD`, which has no entry |
+  | `THAHEBIOBEE` | "ATAN GREAT ELEMENTAL KING OF WATER" | the key itself, cut short: the Water king is `THAHEBYOBEEATAN`, and the lost tail begins the gloss (found by the review) |
+
+  Where to cut each is a reading of the source rather than a mechanical
+  edit — six of the first ten name a word the dictionary does not have at
+  all, three name one it already files, `NOR`'s names itself, and the
+  eleventh is the opposite fault, a key cut short —
+  so they are the owner's to decide, one at a time, as `CASARM`'s and
+  `G-RSAM`'s were. Neither scan is exhaustive: a run-on whose halves are
+  both lowercase, or whose second half is a word the dictionary never files,
+  is invisible to both.
 - **Done, after step 3: the twenty-one entries with a number for a meaning.**
   The re-check found `meanings[].meaning` holding a number in 21 entries —
   ACAM, AF, CIAI, CLA, DAOX, DARG, EMOD, ERAN, FAXS, MAPM, MIAN, NI, OL (its
@@ -1778,6 +1868,16 @@ step 4 is [a plan of its own](#migration). The rest:
   other meaning and no gematria, and OL's own gematria is 38. They are strings
   since `34a8fb9`, and `8646f0a` is the shape assertion the bullet asked for
   ([above](#the-dictionary-after-step-3-1)).
+- **Done, after step 3c: `CASARMA`, `GRU` and the gematria line.** `CASARM`'s
+  second meaning carried the whole of `CASARMA`'s entry and `G-RSAM`'s
+  carried `GRU`'s, which is the fault step 3a parted `BIA` and `BIAB` on.
+  Both are parted, in `fcf0754` and `542e65c`, and `CASARMA` gains the second
+  Key's "whome" beside the WE meaning the string held, so `/enochian/keys`
+  resolves all 181 of the words it uses where it resolved 180. `38eaf12` is
+  the gematria cell beside them: it asks `?.length` now, as
+  `/enochian/dictionary` always has, so the label no longer prints alone for
+  the 130 words of the Keys that have no gematria
+  ([above](#the-dictionarys-run-together-entries)).
 - **Entry `I` gives two objects an empty source.** "(name of an angel, sol)"
   and the pronunciation "Ee" carry `source: ""`, since the 2023 transcription;
   the schema passes them, a string being what the type asks for, and the page

@@ -188,14 +188,30 @@ Follow-ups are separate from the completed migration work:
   sees: on `/enochian/dictionary` and `/enochian/keys`, each meaning once
   where seventy-seven entries printed one twice. See
   [plan 032](032-data-layer.md#the-dictionary-after-step-3-1).
-- TODO: three small ones left by step 3c
-  ([plan 032](032-data-layer.md#follow-ups)): `CASARMA` has no dictionary
-  entry at all — `CASARM`'s second meaning carries it run into the text, as
-  `G-RSAM`'s carries `GRU`'s, the same fault step 3a parted `BIA` and `BIAB`
-  on — so it wants fixing with the dictionary's contents below;
-  `/enochian/keys` still prints "Gematria " with nothing after it for a word
-  whose gematria is empty; and a study set whose question or answer is a
-  function has no dotted path for the new field-path test to check.
+- Both entries step 3c found run together are parted: `CASARM`'s second
+  meaning carried the whole of `CASARMA`'s entry and `G-RSAM`'s carried
+  `GRU`'s — the fault step 3a parted `BIA` and `BIAB` on — and both are
+  parted, so `CASARMA` and `GRU` are words of their own, `CASARMA` with the
+  second Key's "whome" beside the meaning the string held. What a reader
+  sees: on `/enochian/dictionary`, `CASARM`'s second meaning reads "whom,
+  unto whom" and `CASARMA` and `GRU` are rows of their own; on
+  `/enochian/keys`, `CASARMA` shows its meanings where it showed none — the
+  page resolves all 181 of the words its Keys use, where it resolved 180 —
+  and the gematria cell no longer prints "Gematria " with nothing after it
+  for the 130 of those words that have none. See
+  [plan 032](032-data-layer.md#the-dictionarys-run-together-entries).
+- TODO: ten more entries run into their neighbours the same way, found by
+  scanning the whole dictionary while parting those two: `BAMS`, `ES`,
+  `ICZHIHAL`, `IZAZAS`, `LONDOH`, `MOMAO`, `NOR`, `ORMN`, `PI` and `ZIRDO`,
+  all `WE`, plus `THAHEBIOBEE`, whose key is cut short with its lost tail
+  beginning the gloss. Where to cut each is a reading of the source — six name a word
+  the dictionary does not have at all, three name one it already files, and
+  `NOR`'s names itself — so each wants deciding on its own. See
+  [plan 032](032-data-layer.md#follow-ups).
+- TODO: one small one left by step 3c
+  ([plan 032](032-data-layer.md#follow-ups)): a study set whose question or
+  answer is a function has no dotted path for the new field-path test to
+  check.
 - TODO: the Enochian dictionary's entry `I` gives two of its objects an
   empty source, "(name of an angel, sol)" and the pronunciation "Ee", so the
   page prints "()" after the meaning; what they should cite is not in the
