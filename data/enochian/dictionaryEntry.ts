@@ -4,7 +4,7 @@
  * The dictionary is the one source [the build](../build.mts) does not emit as
  * JSON. As a JSON import it costs TypeScript about 19,300 types — more than
  * every table in `data/` combined, and casting after the import does not
- * avoid it, because the cost is in inferring the literal type of a 1,903-key
+ * avoid it, because the cost is in inferring the literal type of a 1,904-key
  * object (plan 032, decision 1). It is emitted as a module instead, with a
  * generated declaration that says only this, so the whole file costs the
  * `Record` below.

@@ -19,10 +19,11 @@ import keys from "@/../data/enochian/Keys";
  * `GIVI`, `GRSAM` is `G-RSAM` (plan 032, data fixes). U and V are one letter
  * in the sources, and a hyphen in a dictionary key is a reading aid rather
  * than part of the word, so both are tried after the exact key fails.
- * `CASARMA` is still not found: the dictionary has no such entry, and what
- * looks like one is `CASARM`'s second meaning running into it —
- * "whom, unto whomCASARMA whom" — the same transcription fault `BIA` and
- * `BIAB` had before step 3a parted them.
+ * `CASARMA` wanted neither in the end. No spelling of it found an entry,
+ * because `CASARM`'s second meaning carried it run into the text —
+ * "whom, unto whomCASARMA whom" — the transcription fault `BIA` and `BIAB`
+ * had before step 3a parted them. Parted in its turn, it is a word of its
+ * own and is found exactly, and every word of the Keys is in the book.
  */
 
 /** A word's spellings to try, in order, the word itself first. */
@@ -86,8 +87,9 @@ export function entriesFor(
 }
 
 /**
- * What the page ships: 180 of the 181 words the Keys use. Resolved once, at
- * import, since the dictionary does not change while the process runs.
+ * What the page ships: every one of the 181 words the Keys use. Resolved
+ * once, at import, since the dictionary does not change while the process
+ * runs.
  */
 export const KEY_ENTRIES: Readonly<Record<string, EnochianEntry>> = entriesFor(
   keyWords(),

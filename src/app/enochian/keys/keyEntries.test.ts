@@ -29,13 +29,15 @@ describe("the Keys' dictionary entries", () => {
     expect(findWord(dictionary, "NOSUCHWORD")).toBeUndefined();
   });
 
-  it("does not find CASARMA, which the book does not have", () => {
-    // `CASARM` is a different word; what looks like CASARMA's entry is
-    // CASARM's second meaning with it run into the text.
-    expect(findWord(dictionary, "CASARMA")).toBeUndefined();
-    expect(dictionary.CASARM.meanings[1].meaning).toBe(
-      "whom, unto whomCASARMA whom",
-    );
+  it("finds CASARMA, which CASARM's meaning used to carry", () => {
+    // `CASARM` is a different word, and its second meaning read
+    // "whom, unto whomCASARMA whom" until the two were parted.
+    expect(findWord(dictionary, "CASARMA")).toBe("CASARMA");
+    expect(dictionary.CASARM.meanings[1].meaning).toBe("whom, unto whom");
+    expect(dictionary.CASARMA.meanings.map((one) => one.meaning)).toEqual([
+      "whom",
+      "whome",
+    ]);
   });
 
   it("prefers an exact key to a normalised one", () => {
@@ -65,15 +67,15 @@ describe("the Keys' dictionary entries", () => {
     });
   });
 
-  it("covers every word of the nineteen Keys but one", () => {
+  it("covers every word of the nineteen Keys", () => {
     const words = keyWords();
     expect(words).toHaveLength(181);
     expect(words).toContain("OL");
     const missing = words.filter((word) => !(word in KEY_ENTRIES));
-    expect(missing).toEqual(["CASARMA"]);
-    expect(Object.keys(KEY_ENTRIES)).toHaveLength(180);
-    // The whole dictionary is 1,903 words; the page ships these.
-    expect(Object.keys(dictionary).length).toBe(1903);
+    expect(missing).toEqual([]);
+    expect(Object.keys(KEY_ENTRIES)).toHaveLength(181);
+    // The whole dictionary is 1,904 words; the page ships these.
+    expect(Object.keys(dictionary).length).toBe(1904);
     expect(KEY_ENTRIES.URBS).toBe(dictionary.VRBS);
   });
 });
