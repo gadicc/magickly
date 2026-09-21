@@ -443,12 +443,15 @@ describe("bounded encoding and parsing", () => {
       serialize({ ["雪".repeat(Math.floor(limits.bytes / 3) + 1)]: null }),
     );
   });
+  // Two million-element arrays built and walked: 3.4-4.5s of real work in a
+  // full-suite run, so the 5s default gave it no room. The framing-bytes test
+  // below already carries this budget; this is the slower of the two.
   it("charges repeated references against logical node budget in both directions", () => {
     const shared = {};
     const value = Array(limits.nodes).fill(shared);
     invalid(() => serialize(value));
     invalid(() => parse(wire(["array", Array(limits.nodes).fill(null)])));
-  });
+  }, 30_000);
   it("rejects oversized sparse array without expanding its missing values", () => {
     const array: unknown[] = [];
     array.length = limits.nodes + 1;

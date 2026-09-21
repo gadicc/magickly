@@ -624,6 +624,11 @@ describe("asset-read cancellation and deadlines", () => {
   });
 });
 
+// The only test here that builds its own database; every other PGlite user in
+// this repository creates the harness at module scope or in a hook, outside any
+// test's clock. Starting Postgres, applying the schema, seeding and driving the
+// real R2 adapter is 1.1s on a quiet machine and 3.6-5.8s in a loaded full-suite
+// run, so the 5s default was racing the machine rather than catching a hang.
 it("delivers published PNG/SVG through actual SQL and R2 adapters, then wipes after revocation during GET", async () => {
   vi.useRealTimers();
   const harness = await createMemoryPgliteHarness({ schema: bundleSchema });
@@ -849,4 +854,4 @@ it("delivers published PNG/SVG through actual SQL and R2 adapters, then wipes af
     seeded?.dispose();
     await harness.client.close();
   }
-});
+}, 30_000);
