@@ -1,3 +1,11 @@
+import {
+  acceptClientDataIdentitySignal,
+  activeClientDataOwner,
+  type ClientDataIdentitySignalDecision,
+  type ClientDataIdentityState,
+  transitionClientDataActivation,
+  transitionClientDataSignOut,
+} from "@gadicc/loom/client-data";
 import Dexie, { type DexieOptions, type Table } from "dexie";
 import { createUuidV7, isUuidV7 } from "../lib/ids";
 import {
@@ -28,6 +36,23 @@ interface StudyDeviceState {
 
 function identityRevisionOf(device: StudyDeviceState | undefined) {
   return device?.identityRevision ?? 0;
+}
+
+function clientDataIdentityStateOf(
+  device: StudyDeviceState | undefined,
+): ClientDataIdentityState<string> {
+  const lastOwnerId = device?.lastAccountId ?? null;
+  return {
+    lastOwnerId,
+    status:
+      device?.explicitlySignedOut === true
+        ? "signed-out"
+        : device?.explicitlySignedOut === false && lastOwnerId !== null
+          ? "active"
+          : "unknown",
+    revision: identityRevisionOf(device),
+    explicitSignOutRevision: device?.explicitSignOutRevision ?? 0,
+  };
 }
 
 export interface StoredStudySnapshot {
@@ -66,11 +91,30 @@ export interface ClaimedStudyReview {
 /**
  * `revision` is the device revision the signal was written at; the sign-out
  * fence announced before its write has none. `explicit` marks a sign-out the
- * user asked for, which no activation may overrule.
+ * user asked for, so an activation check begun before it can be refused.
  */
 export type StudyIdentitySignal =
   | { type: "signed-out"; explicit: boolean; revision?: number }
   | { type: "account"; accountId: string; revision?: number };
+
+/** Orders the existing study wire signal through Loom's portable identity core. */
+export function acceptStudyIdentitySignal(
+  appliedRevision: number,
+  signal: StudyIdentitySignal,
+): ClientDataIdentitySignalDecision {
+  if (signal.type === "account") {
+    // Older study tabs did not number account announcements. Preserve their
+    // acceptance until Magickli deliberately retires that compatibility path.
+    if (signal.revision === undefined)
+      return { accepted: true, appliedRevision };
+    return acceptClientDataIdentitySignal(appliedRevision, {
+      type: "owner-active",
+      ownerId: signal.accountId,
+      revision: signal.revision,
+    });
+  }
+  return acceptClientDataIdentitySignal(appliedRevision, signal);
+}
 
 /** Study data uses a separate database so legacy quarantine and ritual leases stay isolated. */
 export class StudyDatabase extends Dexie {
@@ -292,9 +336,7 @@ export class StudyRepository {
   /** Offline fallback never guesses a new owner; it returns only the last verified account. */
   async lastLocalAccountId() {
     const device = await this.storage.device.get("active");
-    return device?.explicitlySignedOut === false
-      ? (device.lastAccountId ?? null)
-      : null;
+    return activeClientDataOwner(clientDataIdentityStateOf(device));
   }
 
   async isExplicitlySignedOut() {
@@ -329,27 +371,28 @@ export class StudyRepository {
       this.storage.device,
       async () => {
         const device = await this.ensureDevice();
-        const revision = identityRevisionOf(device);
-        if (expectedRevision !== undefined && revision !== expectedRevision)
-          return "stale" as const;
-        if (device.explicitlySignedOut === true && !explicit)
-          return "unchanged" as const;
+        const transition = transitionClientDataSignOut(
+          clientDataIdentityStateOf(device),
+          { expectedRevision, explicit },
+        );
+        if (transition.outcome !== "applied") return transition;
         await this.storage.device.put({
           ...device,
           explicitlySignedOut: true,
-          identityRevision: revision + 1,
-          ...(explicit ? { explicitSignOutRevision: revision + 1 } : {}),
+          identityRevision: transition.state.revision,
+          ...(explicit
+            ? {
+                explicitSignOutRevision:
+                  transition.state.explicitSignOutRevision,
+              }
+            : {}),
         });
-        return revision + 1;
+        return transition;
       },
     );
-    if (typeof result === "number")
-      this.notifyIdentity({
-        type: "signed-out",
-        explicit,
-        revision: result,
-      });
-    return result;
+    if (result.outcome !== "applied") return result.outcome;
+    this.notifyIdentity(result.signal);
+    return result.revision;
   }
 
   /**
@@ -364,21 +407,19 @@ export class StudyRepository {
       throw new Error("Study account identity must be a canonical UUIDv7.");
     return this.storage.transaction("rw", this.storage.device, async () => {
       const device = await this.ensureDevice();
-      if (
-        baselineRevision !== undefined &&
-        (device.explicitSignOutRevision ?? 0) > baselineRevision
-      )
-        return null;
-      // Always counts, even for the same account: a session answer that
-      // started before this activation must not sign it out.
-      const revision = identityRevisionOf(device) + 1;
+      const transition = transitionClientDataActivation(
+        clientDataIdentityStateOf(device),
+        accountId,
+        { baselineRevision },
+      );
+      if (transition.outcome === "blocked") return null;
       await this.storage.device.put({
         ...device,
-        lastAccountId: accountId,
+        lastAccountId: transition.signal.ownerId,
         explicitlySignedOut: false,
-        identityRevision: revision,
+        identityRevision: transition.state.revision,
       });
-      return revision;
+      return transition.revision;
     });
   }
 
