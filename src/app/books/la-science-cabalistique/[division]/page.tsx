@@ -65,6 +65,7 @@ export default async function DivisionPage({
         leaves={leavesOf(division)}
         notesByPage={notesByPage()}
         label={`${division.heading} — ${division.title}`}
+        omit={[division.heading, division.subtitle]}
       />
 
       {/* The fold-out belongs to Chapter IV, whose content is its tables. */}

@@ -188,12 +188,25 @@ export default function Reading({
   leaves,
   notesByPage,
   label,
+  omit = [],
 }: {
   leaves: Leaf[];
   notesByPage: Map<string, Note[]>;
   label: string;
+  /**
+   * Headings the page around this already shows. A chapter's own route gives
+   * its heading and subtitle above the text, and the leaf that opens the
+   * chapter prints both again immediately below — as it prints its running
+   * head, which is dropped as furniture for the same reason. This is a
+   * reading edition, not a facsimile; the marker on every page links to the
+   * facsimile for anyone who wants the leaf as set.
+   */
+  omit?: string[];
 }) {
-  const pieces = piecesOf(leaves);
+  const skip = new Set(omit.map((text) => text.trim()).filter(Boolean));
+  const pieces = piecesOf(leaves).filter(
+    (piece) => piece.kind !== "heading" || !skip.has(piece.text.trim()),
+  );
   const sequences = new Map(
     leaves.map((leaf) => [leaf.page.anchor, leaf.page.sequence]),
   );
