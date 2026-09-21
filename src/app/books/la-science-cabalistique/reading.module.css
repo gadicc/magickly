@@ -1,0 +1,169 @@
+/*
+ * The reading surface.
+ *
+ * Plain CSS on plain elements, because every @mui/material component is a
+ * client component and a chapter of this book is 94 KB of prose: rendering it
+ * through 700 Typography and 1,000 TableCell client references would ship a
+ * large flight payload and make a phone hydrate a book. MUI keeps the chrome;
+ * the text is HTML. See plan 033.
+ */
+
+/*
+ * The app bar is fixed and 56px on a phone, 64px above that, so a page anchor
+ * scrolled to the top of the viewport lands underneath it: #p53 put the marker
+ * at top 0 with the bar covering it. Scoped to this stylesheet, which the
+ * router loads only on the book's routes.
+ */
+:global(html) {
+  scroll-padding-top: 4.5rem;
+}
+
+@media (min-width: 600px) {
+  :global(html) {
+    scroll-padding-top: 5rem;
+  }
+}
+
+.reading {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 0 1rem 4rem;
+  /* Not justified: ragged right is easier to read and avoids the rivers that
+     justification opens in a narrow measure. */
+  text-align: left;
+  line-height: 1.7;
+}
+
+.reading p {
+  margin: 0 0 1.1em;
+}
+
+.reading h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 2.2em 0 0.8em;
+  line-height: 1.35;
+}
+
+.reading h2:first-of-type {
+  margin-top: 0.5em;
+}
+
+/* Lenain's own notes, as he set them: below the text, smaller, marked. */
+.footnote {
+  font-size: 0.86rem;
+  margin: 0 0 1.1em;
+  padding-left: 1rem;
+  border-left: 2px solid currentColor;
+  opacity: 0.85;
+}
+
+.marker {
+  font-weight: 600;
+}
+
+/*
+ * The page break. A screen reader announces it and can navigate by it; a
+ * sighted reader gets a small superscript that links to the scan of that leaf.
+ */
+.pagebreak {
+  font-size: 0.72rem;
+  vertical-align: super;
+  opacity: 0.55;
+  margin: 0 0.15em;
+  white-space: nowrap;
+}
+
+.pagebreak a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.pagebreak a:hover,
+.pagebreak a:focus {
+  text-decoration: underline;
+  opacity: 1;
+}
+
+/* Lenain's tables carry no header row; the third alone is 523 cells. */
+.tableWrap {
+  overflow-x: auto;
+  margin: 0 0 1.4em;
+}
+
+.tableWrap table {
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  min-width: 100%;
+}
+
+.tableWrap caption {
+  text-align: left;
+  font-size: 0.8rem;
+  opacity: 0.7;
+  padding-bottom: 0.4em;
+}
+
+.tableWrap td {
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  padding: 0.25em 0.5em;
+  vertical-align: top;
+}
+
+/* Our apparatus, never to be mistaken for his footnotes. */
+.apparatus {
+  font-size: 0.82rem;
+  margin: 1.2em 0 1.6em;
+  padding: 0.6em 0.9em;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  border-radius: 4px;
+}
+
+.apparatus > p {
+  font-weight: 600;
+  margin: 0 0 0.5em;
+}
+
+.apparatus ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.apparatus li {
+  margin-bottom: 0.4em;
+}
+
+.kind {
+  font-variant: small-caps;
+  opacity: 0.7;
+  margin-left: 0.3em;
+}
+
+.doubts {
+  font-size: 0.82rem;
+  margin: 0 0 1.6em;
+  opacity: 0.8;
+}
+
+.doubts summary {
+  cursor: pointer;
+}
+
+/* Hebrew runs, which Roboto cannot set: see the font import on the route. */
+.hebrew {
+  font-family: "Frank Ruehl CLM", "Noto Sans Hebrew", serif;
+  font-size: 1.08em;
+}
+
+@media print {
+  .reading {
+    max-width: none;
+    padding: 0;
+  }
+  .pagebreak a {
+    text-decoration: none;
+  }
+  .doubts {
+    display: none;
+  }
+}

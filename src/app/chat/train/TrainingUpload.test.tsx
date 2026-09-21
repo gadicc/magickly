@@ -8,7 +8,6 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { FileStatus, find } from "filepond";
-import React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import TrainingUpload from "./TrainingUpload";
 

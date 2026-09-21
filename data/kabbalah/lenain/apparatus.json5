@@ -35,6 +35,7 @@
     printed: '20/3, 31/4, 11/8, 22/10, 2/1',
     used: '20/3, 31/5, 11/8, 22/10, 2/1',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p46',
   },
   {
     no: 5,
@@ -43,6 +44,7 @@
     printed: '24/3, 4/6, 14/8, 26/10, 6/1',
     used: '24/3, 4/6, 15/8, 26/10, 6/1',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p49',
   },
   {
     no: 6,
@@ -51,6 +53,7 @@
     printed: 'לׄלּׄהאׄלּׄ',
     used: 'ללהאל',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p49',
   },
   {
     no: 6,
@@ -59,6 +62,7 @@
     printed: '25/3, 5/6, 15/8, 27/10, 7/1',
     used: '25/3, 5/6, 16/8, 27/10, 7/1',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p49',
   },
   {
     no: 7,
@@ -67,6 +71,7 @@
     printed: '26/3, 6/6, 16/8, 28/10, 8/1',
     used: '26/3, 6/6, 17/8, 28/10, 8/1',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p50',
   },
   {
     no: 8,
@@ -75,6 +80,7 @@
     printed: '0:00',
     used: '2:20',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p50',
   },
   {
     no: 8,
@@ -83,6 +89,7 @@
     printed: '27/3, 7/6, 17/8, 29/10, 9/1',
     used: '27/3, 7/6, 18/8, 29/10, 9/1',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p50',
   },
   {
     no: 9,
@@ -91,6 +98,7 @@
     printed: '28/3, 8/6, 18/8, 30/10, 10/1',
     used: '28/3, 8/6, 19/8, 30/10, 10/1',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p51',
   },
   {
     no: 10,
@@ -99,6 +107,7 @@
     printed: '41-50',
     used: '46-50',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p52',
   },
   {
     no: 10,
@@ -107,6 +116,7 @@
     printed: '29/3, 9/6, 19/8, 31/10, 11/1',
     used: '29/3, 9/6, 20/8, 31/10, 11/1',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p52',
   },
   {
     no: 11,
@@ -115,6 +125,7 @@
     printed: '30/3, 10/6, 20/8, 1/11, 12/1',
     used: '30/3, 10/6, 21/8, 1/11, 12/1',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p52',
   },
   {
     no: 12,
@@ -123,6 +134,7 @@
     printed: 'Ut qui.l Domine recessisti longè',
     used: 'quid',
     why: 'The italic d of "quid" has printed as a dot and a broken stroke, so the page reads "qui.l". At 500 dpi it is plainly damaged type rather than a spelling: the verse is Psalm 9:22, "Ut quid Domine recessisti longe".',
+    page: 'p53',
   },
   {
     no: 13,
@@ -131,6 +143,7 @@
     printed: 'יזּלּׄאׄלּ',
     used: 'יזלאל',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p53',
   },
   {
     no: 13,
@@ -139,6 +152,7 @@
     printed: '1/4, 12/6, 23/8, 3/9, 14/1',
     used: '1/4, 12/6, 23/8, 3/11, 14/1',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p53',
   },
   {
     no: 14,
@@ -147,6 +161,7 @@
     printed: '66-10',
     used: '66-70',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p54',
   },
   {
     no: 17,
@@ -155,6 +170,7 @@
     printed: '5:00 matin',
     used: '5:20',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p56',
   },
   {
     no: 18,
@@ -163,6 +179,7 @@
     printed: '6/4, 17/6, 28/8, 8/11, 18/1',
     used: '6/4, 17/6, 28/8, 8/11, 19/1',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p56',
   },
   {
     no: 19,
@@ -171,6 +188,7 @@
     printed: 'לּׄוויׄה',
     used: 'לוויה',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p57',
   },
   {
     no: 20,
@@ -179,6 +197,7 @@
     printed: '95-100',
     used: '96-100',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p58',
   },
   {
     no: 22,
@@ -187,6 +206,7 @@
     printed: 'יׄיׄיׄאׄלּׄ',
     used: 'יייאל',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p59',
   },
   {
     no: 22,
@@ -195,6 +215,7 @@
     printed: '10/4, 21/6, 1/9, 12/11, 22/1',
     used: '10/4, 21/6, 1/9, 12/11, 23/1',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p59',
   },
   {
     no: 23,
@@ -203,6 +224,7 @@
     printed: 'מלּׄהאׄלּׄ',
     used: 'מלהאל',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p59',
   },
   {
     no: 28,
@@ -211,6 +233,7 @@
     printed: 'שאׄהיׄה',
     used: 'שאהיה',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p63',
   },
   {
     no: 29,
@@ -219,6 +242,7 @@
     printed: 'ריׄיׄאׄלּׄ',
     used: 'רייאל',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p63',
   },
   {
     no: 30,
@@ -227,6 +251,7 @@
     printed: '9',
     used: '15',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p64',
   },
   {
     no: 30,
@@ -235,6 +260,7 @@
     printed: '28/4, 29/6, 9/9, 20/11, 31/1',
     used: '18/4, 29/6, 9/9, 20/11, 31/1',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p64',
   },
   {
     no: 34,
@@ -243,6 +269,7 @@
     printed: 'לּׄההיׄה',
     used: 'לההיה',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p67',
   },
   {
     no: 37,
@@ -251,6 +278,7 @@
     printed: 'אׄנואלּ',
     used: 'אנואל',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p69',
   },
   {
     no: 38,
@@ -259,6 +287,7 @@
     printed: '0:00',
     used: '12:20',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p69',
   },
   {
     no: 39,
@@ -267,6 +296,7 @@
     printed: 'רהעאׄלּׄ',
     used: 'רהעאל',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p71',
   },
   {
     no: 40,
@@ -275,6 +305,7 @@
     printed: 'יׄיׄזּאׄלּׄ',
     used: 'ייזאל',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p72',
   },
   {
     no: 41,
@@ -283,6 +314,7 @@
     printed: 'הההאׄלּׄ',
     used: 'הההאל',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p73',
   },
   {
     no: 42,
@@ -291,6 +323,7 @@
     printed: '216-210',
     used: '206-210',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p74',
   },
   {
     no: 43,
@@ -299,6 +332,7 @@
     printed: 'וולּּׄיׄה',
     used: 'ווליה',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p74',
   },
   {
     no: 44,
@@ -307,6 +341,7 @@
     printed: '0:00',
     used: '14:20',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p75',
   },
   {
     no: 45,
@@ -315,6 +350,7 @@
     printed: 'סאׄלּׄיׄה',
     used: 'סאליה',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p76',
   },
   {
     no: 45,
@@ -323,6 +359,7 @@
     printed: 'misericordia tua Domine adjuvebat me',
     used: 'adjuvabat',
     why: 'The page prints "adjuvebat" in italic, plainly and not as scan damage, where the psalter reads "adiuvabat" at Psalm 93:18. The entry\'s French keeps his spelling; this field gives the verse as the psalter has it.',
+    page: 'p76',
   },
   {
     no: 46,
@@ -331,6 +368,7 @@
     printed: '226-130',
     used: '226-230',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p76',
   },
   {
     no: 46,
@@ -339,6 +377,7 @@
     printed: 'עריׄאׄלּׄ',
     used: 'עריאל',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p76',
   },
   {
     no: 46,
@@ -347,6 +386,7 @@
     printed: '36e',
     used: '46',
     why: 'The entry stands between the 45th and the 47th, and the first cabalistic table numbers it 46.',
+    page: 'p76',
   },
   {
     no: 47,
@@ -355,6 +395,7 @@
     printed: 'עּשלּׄיׄה',
     used: 'עשליה',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p77',
   },
   {
     no: 50,
@@ -363,6 +404,7 @@
     printed: '246-145',
     used: '246-250',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p79',
   },
   {
     no: 52,
@@ -371,6 +413,7 @@
     printed: 'עּממיׄה',
     used: 'עממיה',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p81',
   },
   {
     no: 53,
@@ -379,6 +422,7 @@
     printed: '216-265',
     used: '261-265',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p81',
   },
   {
     no: 53,
@@ -387,6 +431,7 @@
     printed: 'ננאׄאׄלּׄ',
     used: 'ננאאל',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p81',
   },
   {
     no: 54,
@@ -395,6 +440,7 @@
     printed: 'ניׄתאׄלׄ',
     used: 'ניתאל',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p82',
   },
   {
     no: 57,
@@ -403,6 +449,7 @@
     printed: 'נממיה',
     used: 'נממיה',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p85',
   },
   {
     no: 58,
@@ -411,6 +458,7 @@
     printed: 'יׄיׄלּׄאׄלּׄ',
     used: 'יילאל',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p85',
   },
   {
     no: 62,
@@ -419,6 +467,7 @@
     printed: '306-301',
     used: '306-310',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p88',
   },
   {
     no: 64,
@@ -427,6 +476,7 @@
     printed: 'le chœur des anges',
     used: 'Archangels',
     why: 'Lenain opens the ninth choir here and ends the eighth at the sixty-third, making one of seven and one of nine. His own first eight declarations fall on the first, ninth, seventeenth and so on — eight apiece — and Agrippa and Kircher have it so. The pattern is followed and the departure noted.',
+    page: 'p89',
   },
   {
     no: 64,
@@ -435,6 +485,7 @@
     printed: 'anges',
     used: 'Archangels',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p89',
   },
   {
     no: 64,
@@ -443,6 +494,7 @@
     printed: '316-220',
     used: '316-320',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p89',
   },
   {
     no: 67,
@@ -451,6 +503,7 @@
     printed: 'אׄיעּאׄלּׄ',
     used: 'איעאל',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p91',
   },
   {
     no: 68,
@@ -459,6 +512,7 @@
     printed: '337-340',
     used: '336-340',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p92',
   },
   {
     no: 68,
@@ -467,6 +521,7 @@
     printed: 'הבויׄה',
     used: 'הבויה',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p92',
   },
   {
     no: 70,
@@ -475,6 +530,7 @@
     printed: 'יׄבמיׄה',
     used: 'יבמיה',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p93',
   },
   {
     no: 71,
@@ -483,6 +539,7 @@
     printed: 'היׄיׄאׄלּׄ',
     used: 'הייאל',
     why: 'Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.',
+    page: 'p95',
   },
   {
     no: 71,
@@ -491,5 +548,6 @@
     printed: '29/5, 9/8, 20/10, 31/12, 14/3',
     used: '29/5, 9/8, 20/10, 31/12, 13/3',
     why: "Lenain's own tables give otherwise, and the rest of the book keeps to them.",
+    page: 'p95',
   },
 ]

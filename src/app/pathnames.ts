@@ -21,6 +21,10 @@ const pathnames: Pathnames = {
     planets: "Planets",
     zodiac: "Zodiac",
   },
+  books: {
+    "/": "Books",
+    "la-science-cabalistique": "La Science Cabalistique",
+  },
   chat: "Chat (MagickGPT)",
   enochian: {
     "/": "Enochian",

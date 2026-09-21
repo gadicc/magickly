@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
 import { entityPages } from "./entities";
+import { lenainPages } from "./lenain";
 import { PUBLIC_PAGES } from "./pages";
 
 describe("sitemap", () => {
@@ -9,13 +10,18 @@ describe("sitemap", () => {
 
   it("lists every public and entity page once, as its canonical", () => {
     expect(urls).toHaveLength(
-      Object.keys(PUBLIC_PAGES).length + entityPages().length,
+      Object.keys(PUBLIC_PAGES).length +
+        entityPages().length +
+        lenainPages().length,
     );
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls[0]).toBe("https://magick.ly");
     expect(urls).toContain("https://magick.ly/gd/grade/0=0");
     expect(urls).toContain("https://magick.ly/kabbalah/sephirah/daat");
     expect(urls).toContain("https://magick.ly/kabbalah/path/9_10");
+    expect(urls).toContain(
+      "https://magick.ly/books/la-science-cabalistique/chapitre-6",
+    );
   });
 
   it("leaves out private pages and query variants", () => {

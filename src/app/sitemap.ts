@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { entityPages } from "@/seo/entities";
+import { lenainPages } from "@/seo/lenain";
 import { PUBLIC_PAGES } from "@/seo/pages";
 import { SITE_URL } from "@/seo/site";
 
@@ -12,5 +13,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...Object.keys(PUBLIC_PAGES),
     ...entityPages().map((page) => page.path),
+    ...lenainPages().map((page) => page.path),
   ].map((path) => ({ url: path === "/" ? SITE_URL : SITE_URL + path }));
 }

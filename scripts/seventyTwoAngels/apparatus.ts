@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import JSON5 from "json5";
+import { bookPages } from "./bookPage";
 import { readEvidence } from "./evidence";
 import { handReadings, hebrewReadings } from "./hebrew";
 import { plateEntries } from "./plateSource";
@@ -153,13 +154,34 @@ function fromHebrew(): Note[] {
     });
 }
 
+/**
+ * Every note that concerns a genius gets that genius's leaf, so the reading
+ * side does not have to find the entry again. Doing it here is doing it once,
+ * in the script that already cut the entries.
+ */
+function withLeaves(notes: Note[]): Note[] {
+  const anchorOf = new Map<number, string>();
+  const leafOf = new Map(
+    plateEntries().map((entry) => [entry.no, entry.printedPages[0]]),
+  );
+  for (const page of bookPages())
+    if (page.page.sequence === "body")
+      anchorOf.set(page.page.number, page.page.anchor);
+
+  return notes.map((note) => {
+    if (note.page || !note.no) return note;
+    const anchor = anchorOf.get(leafOf.get(note.no) ?? -1);
+    return anchor ? { ...note, page: anchor } : note;
+  });
+}
+
 function main() {
-  const notes = [
+  const notes = withLeaves([
     ...handNotes(),
     ...fromOrdinals(),
     ...fromArithmetic(),
     ...fromHebrew(),
-  ].sort((a, b) => a.no - b.no || a.field.localeCompare(b.field));
+  ]).sort((a, b) => a.no - b.no || a.field.localeCompare(b.field));
 
   writeFileSync(OUT_PATH, `${HEADER}${JSON5.stringify(notes, null, 2)}\n`);
 

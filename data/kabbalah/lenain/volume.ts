@@ -104,7 +104,10 @@ function headingAt(pdfPage: number) {
     .map((block) => block.text);
   // The first leaf of the body repeats the book's own title above Chapter I.
   const at = headings.findIndex((text) => /^CHAPITRE/i.test(text));
-  if (at < 0) return { heading: headings[0] ?? "", subtitle: "" };
+  // The preliminaries open on the half-title, whose first line is "LA
+  // SCIENCE" — the book's own title broken across two lines, and no name for
+  // the division. It is called what it is instead.
+  if (at < 0) return { heading: "Préliminaires", subtitle: "" };
   // A subtitle is the line under the chapter line, unless that line is itself
   // a table's title — Chapter IV's content is its four tables.
   const next = headings[at + 1] ?? "";

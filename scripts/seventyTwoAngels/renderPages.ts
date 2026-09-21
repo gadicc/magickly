@@ -2,6 +2,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import JSON5 from "json5";
 import {
+  footnoteText,
+  leafClosings,
   type Piece,
   piecesOf,
   segmentsOf,
@@ -132,7 +134,9 @@ function pieceToMarkdown(piece: Piece) {
 
   // The marker for a leaf that opens inside a paragraph is set inside it,
   // where the break falls; one that opens the piece is set above it.
-  const text = segmentsOf(piece)
+  const text = segmentsOf(
+    piece.kind === "footnote" ? { ...piece, text: footnoteText(piece) } : piece,
+  )
     .map(({ before, text: segment }, index) => {
       if (!before) return segment;
       const marker = pageMarker(before.anchor, before.label);
@@ -163,13 +167,7 @@ function main() {
   // A leaf's notes are set once every piece that runs across it has been
   // rendered, so a paragraph spanning two leaves is not cut in half by them.
   const pieces = piecesOf(pages);
-  const lastPiece = new Map<string, number>();
-  pieces.forEach((piece, index) => {
-    for (const { anchor } of piece.breaks) lastPiece.set(anchor, index);
-  });
-  const closingAt = new Map<number, string[]>();
-  for (const [anchor, index] of lastPiece)
-    closingAt.set(index, [...(closingAt.get(index) ?? []), anchor]);
+  const closingAt = leafClosings(pieces);
 
   const body: string[] = [];
   pieces.forEach((piece, index) => {

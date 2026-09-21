@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
-import React from "react";
 import sharp from "sharp";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 

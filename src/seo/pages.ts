@@ -204,6 +204,19 @@ export const PUBLIC_PAGES = {
       "The Shem HaMephorash, the 72-fold name of God drawn from Exodus " +
       "14:19–21, and the 72 angels named after it.",
   },
+  "/books": {
+    title: "Books",
+    description:
+      "Public-domain works of the Western esoteric tradition, read from their " +
+      "original scans and published in full with an editorial apparatus.",
+  },
+  "/books/la-science-cabalistique": {
+    title: "La Science Cabalistique (1823)",
+    description:
+      "Lazare Lenain's La Science Cabalistique, Amiens 1823, complete: the 72 " +
+      "angels of the Kabbalah, their attributes, seals and hours, read from " +
+      "the original scan.",
+  },
   "/kabbalah/yhvh/72angels": {
     title: "The 72 Angels of the Shem HaMephorash",
     description:

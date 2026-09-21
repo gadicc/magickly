@@ -149,3 +149,41 @@ export function segmentsOf(piece: Piece): {
     })),
   );
 }
+
+/**
+ * A footnote's text without the marker the page prints at its head.
+ *
+ * Lenain sets the marker at the start of the note, and a renderer that sets
+ * another in front of it gives "(1) (1) Les premiers Égyptiens…" — which the
+ * Markdown edition did 51 times. The marker is the renderer's to draw, so the
+ * text hands it over.
+ */
+export function footnoteText(piece: Piece) {
+  if (piece.kind !== "footnote" || !piece.marker) return piece.text;
+  const marker = piece.marker.replace(/[()]/g, "");
+  return piece.text.replace(new RegExp(`^\\s*\\(${marker}\\)\\s*`), "");
+}
+
+/**
+ * Which leaf is in effect at each piece, and where each leaf's last piece is.
+ *
+ * Only the first piece of a leaf carries that leaf's break, so asking which
+ * pieces carry a break answers where a leaf *opens*, not where it ends. Notes
+ * set at the opening landed between a chapter's heading and its first
+ * paragraph. This walks the pieces keeping the current leaf, so a leaf closes
+ * at the last piece actually belonging to it.
+ */
+export function leafClosings(pieces: Piece[]) {
+  const lastOf = new Map<string, number>();
+  let current: string | undefined;
+  pieces.forEach((piece, index) => {
+    const opens = piece.breaks[piece.breaks.length - 1];
+    if (opens) current = opens.anchor;
+    if (current) lastOf.set(current, index);
+  });
+
+  const closesAt = new Map<number, string[]>();
+  for (const [anchor, index] of lastOf)
+    closesAt.set(index, [...(closesAt.get(index) ?? []), anchor]);
+  return closesAt;
+}

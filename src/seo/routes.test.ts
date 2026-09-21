@@ -7,6 +7,7 @@ const appDir = path.join(import.meta.dirname, "../app");
 
 /** Dynamic routes whose `generateMetadata` decides per row. */
 const ENTITY_ROUTES = [
+  "/books/la-science-cabalistique/[division]",
   "/astrology/planet/[id]",
   "/doc/[_id]",
   "/gd/grade/[id]",
@@ -16,6 +17,9 @@ const ENTITY_ROUTES = [
 
 /** Account, administration, offline and test pages: `noindex`. */
 const PRIVATE_ROUTES = [
+  // Not private, but deliberately not indexed: a duplicate of the eleven
+  // chapter routes, kept for find-in-page and printing. See plan 033.
+  "/books/la-science-cabalistique/texte-integral",
   "/admin",
   "/chat/train",
   "/doc/[_id]/edit",
