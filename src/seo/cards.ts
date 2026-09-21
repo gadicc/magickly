@@ -78,6 +78,7 @@ const SECTIONS: [prefix: string, section: string, art: CardArt][] = [
   ["/geomancy/reading", "Geomancy", ART.geomancyChart],
   ["/geomancy/reference", "Geomancy", ART.geomancyReference],
   ["/geomancy", "Geomancy", ART.geomancy],
+  ["/kabbalah/angel", "Kabbalah", ART.kabbalah],
   ["/kabbalah/tree", "Kabbalah", ART.tree],
   ["/kabbalah/sephirah", "Kabbalah", ART.tree],
   ["/kabbalah/path", "Kabbalah", ART.tree],

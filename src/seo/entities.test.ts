@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { ANGEL_COUNT } from "@/../data/kabbalah/seventyTwoAngelsDerived";
 import {
   entityIds,
   entityPages,
@@ -115,7 +116,8 @@ describe("entity pages", () => {
     const pages = entityPages();
     const routes = ["planet", "gdGrade", "sephirah", "tolPath"] as const;
     expect(pages).toHaveLength(
-      routes.reduce((sum, kind) => sum + entityIds(kind).length, 0),
+      routes.reduce((sum, kind) => sum + entityIds(kind).length, 0) +
+        ANGEL_COUNT,
     );
     const publicTitles = Object.values(PUBLIC_PAGES).map((page) => page.title);
     const titles = new Set([

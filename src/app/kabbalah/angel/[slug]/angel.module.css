@@ -1,0 +1,82 @@
+/* One genius. Semantic HTML so the content is in the markup, where the list
+   page's accordions kept it from being. */
+
+.angel {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 0 1rem 4rem;
+  line-height: 1.6;
+}
+
+.trail {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  margin: 0.5em 0 0;
+}
+
+.angel h1 {
+  font-size: 1.7rem;
+  margin: 0.3em 0 0.2em;
+}
+
+.angel h2 {
+  font-size: 1.05rem;
+  margin: 2em 0 0.6em;
+}
+
+.attribute {
+  font-size: 1.05rem;
+  margin: 0 0 1.4em;
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.92rem;
+}
+
+.table th,
+.table td {
+  border-top: 1px solid rgba(128, 128, 128, 0.3);
+  padding: 0.45em 0.6em 0.45em 0;
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th {
+  width: 12rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Lenain's own words, run on as he sets them. */
+.said {
+  white-space: pre-wrap;
+  font-size: 0.93rem;
+}
+
+.notes {
+  font-size: 0.88rem;
+  padding-left: 1.2em;
+}
+
+.notes li {
+  margin-bottom: 0.5em;
+}
+
+.kind {
+  font-variant: small-caps;
+  opacity: 0.7;
+}
+
+.hebrew {
+  font-family: "Frank Ruehl CLM", "Noto Sans Hebrew", serif;
+  font-size: 1.15em;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2.5em;
+  font-size: 0.9rem;
+}

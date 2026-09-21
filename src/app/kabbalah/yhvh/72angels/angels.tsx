@@ -22,6 +22,7 @@ import {
 import Link from "next/link";
 import React from "react";
 import zodiacs from "@/../data/astrology/Zodiac";
+import { angelSlug } from "@/../data/kabbalah/angelSlugs";
 import christianChoirs from "@/../data/kabbalah/ChristianChoirs";
 import angels, { type Angel } from "@/../data/kabbalah/SeventyTwoAngels";
 import {
@@ -199,7 +200,20 @@ function Angel({
         id={`angel-${no}-header`}
       >
         <Typography>
-          {no}. {angel.name.en} ({governedRange(no, astrologySystem)})
+          {no}. {angel.name.en} ({governedRange(no, astrologySystem)}) {/*
+           * The accordion's contents unmount when it is closed, so the summary
+           * is the only part of this page a crawler ever sees — and the only
+           * place a link to the angel's own page can be found. Its click must
+           * not also toggle the accordion it sits in.
+           */}
+          <Link
+            href={`/kabbalah/angel/${angelSlug(no)}`}
+            onClick={(event) => event.stopPropagation()}
+            style={{ fontSize: "85%", marginLeft: ".4em" }}
+            aria-label={`${angel.name.en}, full entry`}
+          >
+            →
+          </Link>
         </Typography>
       </AccordionSummary>
       <AccordionDetails>

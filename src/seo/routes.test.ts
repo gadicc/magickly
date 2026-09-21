@@ -7,6 +7,7 @@ const appDir = path.join(import.meta.dirname, "../app");
 
 /** Dynamic routes whose `generateMetadata` decides per row. */
 const ENTITY_ROUTES = [
+  "/kabbalah/angel/[slug]",
   "/books/la-science-cabalistique/[division]",
   "/astrology/planet/[id]",
   "/doc/[_id]",

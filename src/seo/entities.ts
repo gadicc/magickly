@@ -1,4 +1,5 @@
 import Data from "@/../data/data";
+import { angelBySlug, angelSlugs } from "@/../data/kabbalah/angelSlugs";
 import { rowOf } from "@/../data/rowOf";
 import { tarotDeck } from "@/tarot";
 import type { SeoPage } from "./pages";
@@ -131,6 +132,7 @@ export function entityPages(): EntityPage[] {
     ...Object.keys(Data.gdGrade).map(gradePage),
     ...Object.keys(Data.sephirah).map(sephirahPage),
     ...Object.keys(Data.tolPath).map(pathPage),
+    ...angelSlugs().map(angelPage),
   ].filter((page): page is EntityPage => page !== null);
 }
 
@@ -139,4 +141,54 @@ export function entityIds(
   kind: "planet" | "gdGrade" | "sephirah" | "tolPath",
 ): { id: string }[] {
   return Object.keys(Data[kind]).map((id) => ({ id }));
+}
+
+/**
+ * `/kabbalah/angel/<name>`, one for each of the seventy-two.
+ *
+ * These exist because the list page hides everything a searcher wants. Its
+ * accordions unmount when closed and its prose loads on the client, so
+ * production serves "Vehuiah" three times and "God elevated and exalted" not
+ * at all — a page about seventy-two angels with none of them in its HTML. A
+ * 94 KB French chapter will not rank for them either. English here, French on
+ * the book's routes, each linking to the other. See plan 033.
+ */
+export function angelPage(slug: string): EntityPage | null {
+  const angel = angelBySlug(slug);
+  if (!angel) return null;
+  const name = angel.name.en;
+  const hebrew = angel.name.he ? ` (${angel.name.he})` : "";
+  return {
+    path: `/kabbalah/angel/${slug}`,
+    title: `${name}, Angel ${angel.no} of the Shem HaMephorash`,
+    description: correspondences(
+      `${name}${hebrew}, the ${ordinal(angel.no)} angel of the Shem HaMephorash`,
+      [
+        angel.attribute.en && `"${angel.attribute.en}"`,
+        angel.people.en && `rules ${angel.people.en}`,
+        angel.godName && `god name ${angel.godName}`,
+        angel.psalm.psalm > 0 &&
+          `psalm ${angel.psalm.psalm}:${angel.psalm.verse}`,
+      ],
+    ),
+  };
+}
+
+const ORDINAL = new Intl.PluralRules("en-US", { type: "ordinal" });
+const ORDINAL_SUFFIX: Record<string, string> = {
+  one: "st",
+  two: "nd",
+  few: "rd",
+  other: "th",
+};
+
+function ordinal(n: number) {
+  return `${n}${ORDINAL_SUFFIX[ORDINAL.select(n)]}`;
+}
+
+/** Every genius, in Lenain's order. */
+export function angelPages(): EntityPage[] {
+  return angelSlugs()
+    .map(angelPage)
+    .filter((page): page is EntityPage => page !== null);
 }

@@ -52,6 +52,7 @@ const pathnames: Pathnames = {
   },
   kabbalah: {
     "/": "Kabbalah",
+    angel: "The 72 Angels",
     yhvh: {
       "/": "Shem HaMephorash",
       "72angels": "72 Angels",

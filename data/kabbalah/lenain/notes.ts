@@ -49,3 +49,13 @@ export function notesByPage(): Map<string, Note[]> {
 export function editionNotes() {
   return notes.filter((note) => note.no === 0 && !note.page);
 }
+
+/** The notes concerning one genius, in the order the apparatus holds them. */
+export function notesOfGenius(no: number) {
+  return notes.filter((note) => note.no === no);
+}
+
+/** The leaf a genius's entry opens on, for a link into the book. */
+export function anchorOfGenius(no: number) {
+  return notes.find((note) => note.no === no && note.page)?.page;
+}
