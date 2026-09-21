@@ -63,6 +63,7 @@ const SECTIONS: [prefix: string, section: string, art: CardArt][] = [
   ["/astrology/planetary-hours", "Astrology", ART.planetaryHours],
   ["/astrology/planet", "Astrology", ART.planets],
   ["/astrology", "Astrology", ART.astrology],
+  ["/books", "Books", ART.kabbalah],
   ["/chat", "MagickGPT", ART.chat],
   ["/enochian/keys", "Enochian Magick", ART.enochianKey],
   ["/enochian/tablets", "Enochian Magick", ART.tablet],

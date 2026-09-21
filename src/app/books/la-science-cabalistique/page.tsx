@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { editionNotes } from "@/../data/kabbalah/lenain/notes";
 import { bookLeaves, divisions } from "@/../data/kabbalah/lenain/volume";
+import JsonLd from "@/seo/JsonLd";
+import { bookJsonLd } from "@/seo/lenain";
 import { pageMetadata } from "@/seo/metadata";
+import { SITE_URL } from "@/seo/site";
 import styles from "./reading.module.css";
 
 const PATH = "/books/la-science-cabalistique";
@@ -11,6 +14,7 @@ export const metadata = pageMetadata("/books/la-science-cabalistique");
 export default function BookPage() {
   return (
     <div className={styles.reading}>
+      <JsonLd data={bookJsonLd(SITE_URL)} />
       <h1>La Science Cabalistique</h1>
       <p lang="fr">
         <em>

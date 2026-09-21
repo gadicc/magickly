@@ -1,4 +1,4 @@
-import { divisions } from "@/../data/kabbalah/lenain/volume";
+import { divisions, leavesOf } from "@/../data/kabbalah/lenain/volume";
 import type { EntityPage } from "./entities";
 
 /**
@@ -37,6 +37,21 @@ export function lenainChapterPage(slug: string): EntityPage | null {
   };
 }
 
+/** The printed pages a division runs across, as the volume numbers them. */
+function printedRange(slug: string) {
+  const division = divisions.find((entry) => entry.slug === slug);
+  if (!division) return {};
+  const numbered = leavesOf(division).filter((leaf) => leaf.page.label);
+  const first = numbered[0]?.page.label;
+  const last = numbered[numbered.length - 1]?.page.label;
+  if (!first || !last) return {};
+  return {
+    pageStart: first,
+    pageEnd: last,
+    pagination: first === last ? first : `${first}-${last}`,
+  };
+}
+
 /** Every chapter, in the book's order, for the sitemap. */
 export function lenainPages(): EntityPage[] {
   return divisions
@@ -47,4 +62,95 @@ export function lenainPages(): EntityPage[] {
 /** Static params for the chapter route. */
 export function lenainSlugs() {
   return divisions.map((division) => ({ division: division.slug }));
+}
+
+/**
+ * Structured data for the edition.
+ *
+ * The licence goes on the *edition*, never on the Book. Lenain's text is
+ * public domain and nothing may be claimed over it; what is CC BY 4.0 is the
+ * reading of it — the transcription, the translation, the apparatus. Putting
+ * `license` on the `Book` would assert a right over a public-domain work,
+ * which is the one thing this whole edition exists not to do.
+ *
+ * Expect no rich result from `Book`: Google's requires a feed. The visible win
+ * is `BreadcrumbList`, which the site has nowhere else. See plan 033.
+ */
+
+const SCAN_URL = "https://books.google.com/books?id=ZqgpxTZ43HkC";
+const CC_BY = "https://creativecommons.org/licenses/by/4.0/";
+
+const LENAIN = {
+  "@type": "Person",
+  name: "Lazare Lenain",
+  birthDate: "1793",
+  deathDate: "1877",
+};
+
+/** The book itself, with its chapters as parts. */
+export function bookJsonLd(siteUrl: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: "La Science Cabalistique: a reading of the 1823 edition",
+    url: `${siteUrl}${BOOK_PATH}`,
+    license: CC_BY,
+    creditText: "magick.ly",
+    isBasedOn: {
+      "@type": "Book",
+      name: "La Science Cabalistique, ou l'art de connaître les bons génies qui influent sur la destinée des hommes",
+      author: LENAIN,
+      datePublished: "1823",
+      inLanguage: "fr",
+      locationCreated: { "@type": "Place", name: "Amiens" },
+      sameAs: SCAN_URL,
+      hasPart: divisions.map((division) => ({
+        "@type": "Chapter",
+        name: division.heading,
+        alternateName: division.title,
+        url: `${siteUrl}${BOOK_PATH}/${division.slug}`,
+        // Lenain's own pages, not the scan's: a bibliographic pagination that
+        // cites the PDF is no use to anyone holding the book.
+        ...printedRange(division.slug),
+      })),
+    },
+  };
+}
+
+/** One chapter, and the trail that leads to it. */
+export function chapterJsonLd(siteUrl: string, slug: string) {
+  const division = divisions.find((entry) => entry.slug === slug);
+  if (!division) return null;
+  const url = `${siteUrl}${BOOK_PATH}/${division.slug}`;
+
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "Chapter",
+      name: division.heading,
+      alternateName: division.title,
+      url,
+      inLanguage: "fr",
+      isPartOf: {
+        "@type": "Book",
+        name: "La Science Cabalistique",
+        author: LENAIN,
+        datePublished: "1823",
+        url: `${siteUrl}${BOOK_PATH}`,
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { name: "Books", item: `${siteUrl}/books` },
+        { name: "La Science Cabalistique", item: `${siteUrl}${BOOK_PATH}` },
+        { name: division.title, item: url },
+      ].map((crumb, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        ...crumb,
+      })),
+    },
+  ];
 }

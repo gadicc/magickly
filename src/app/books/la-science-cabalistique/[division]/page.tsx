@@ -6,8 +6,10 @@ import {
   divisions,
   leavesOf,
 } from "@/../data/kabbalah/lenain/volume";
-import { lenainChapterPage } from "@/seo/lenain";
+import JsonLd from "@/seo/JsonLd";
+import { chapterJsonLd, lenainChapterPage } from "@/seo/lenain";
 import { seoMetadata } from "@/seo/metadata";
+import { SITE_URL } from "@/seo/site";
 import Reading from "../Reading";
 import styles from "../reading.module.css";
 
@@ -39,6 +41,9 @@ export default async function DivisionPage({
 
   return (
     <>
+      {(chapterJsonLd(SITE_URL, slug) ?? []).map((data) => (
+        <JsonLd key={data["@type"]} data={data} />
+      ))}
       <header className={styles.reading}>
         <p>
           <Link href="/books/la-science-cabalistique">
