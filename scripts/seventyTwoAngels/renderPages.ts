@@ -2,6 +2,11 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import JSON5 from "json5";
 import {
+  firstTable,
+  firstTableCounts,
+  PRINTED_FROM,
+} from "../../data/kabbalah/lenain/firstTable";
+import {
   footnoteText,
   leafClosings,
   type Piece,
@@ -49,18 +54,22 @@ printed on, as he set them.
 
 `;
 
-/** A table as Markdown, padded to its widest row so the columns line up. */
-function table(rows: string[][]) {
+/**
+ * A table as Markdown, padded to its widest row so the columns line up.
+ *
+ * `head` is for our own tables only. Lenain's carry no header row, so his are
+ * rendered with the rule above an empty one and the first row left as data —
+ * giving his first row a heading it does not have would be an edit.
+ */
+function table(rows: string[][], head?: string[]) {
   const width = Math.max(0, ...rows.map((row) => row.length));
   if (!width) return "";
   const cell = (value: string) => value.replace(/\|/g, "\\|").trim();
   const line = (row: string[]) =>
     `| ${Array.from({ length: width }, (_, i) => cell(row[i] ?? "")).join(" | ")} |`;
 
-  // Lenain's tables carry no header row, so the first row is left as data and
-  // the rule sits above it.
   return [
-    `|${" |".repeat(width)}`,
+    head ? line(head) : `|${" |".repeat(width)}`,
     `|${" --- |".repeat(width)}`,
     ...rows.map(line),
   ].join("\n");
@@ -181,13 +190,30 @@ function main() {
     }
   });
 
+  // The fold-out's lost rows, put back from the entries and marked as such.
+  const counts = firstTableCounts();
+  const reconstruction = [
+    "## The first cabalistic table, reconstructed",
+    `The plate is a fold-out and the scan caught it folded: only rows ${PRINTED_FROM} to 72 are legible. The ${counts.reconstructed} rows marked *reconstructed* below are **not from the plate** — they are put back from each genius's own entry, which gives the same three columns. Checked against the ${counts.printed} rows that survive, the method recovers the divine name and the nation for ten and the name for eight.`,
+    table(
+      firstTable().map((row) => [
+        String(row.no),
+        row.name,
+        row.nation,
+        row.godName,
+        row.source === "printed" ? "on the plate" : "reconstructed",
+      ]),
+      ["#", "Genius", "Peuple", "Name of God", "Source"],
+    ),
+  ].join("\n\n");
+
   const edition = notesToMarkdown(editionNotes(), "About this edition");
   const markdownPath = `${outDir}${MARKDOWN_PATH}`;
   if (!existsSync(dirname(markdownPath)))
     mkdirSync(dirname(markdownPath), { recursive: true });
   writeFileSync(
     markdownPath,
-    `${MARKDOWN_HEADER}${edition ? `${edition}\n\n` : ""}${body.join("\n\n")}\n`,
+    `${MARKDOWN_HEADER}${edition ? `${edition}\n\n` : ""}${body.join("\n\n")}\n\n---\n\n${reconstruction}\n`,
   );
 
   const blocks = pages.flatMap((page) => page.blocks);

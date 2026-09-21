@@ -24,6 +24,7 @@ printed on, as he set them.
 **About this edition**
 
 - **first cabalistic table** (reconstruction) — The table is a fold-out leaf, and the scan photographed it folded: only its last eleven rows were captured, and the page behind it is blank. Rows 1 to 61 are in no image of this copy. Every column it carries — name, nation, divine name — is also given in the entry for each genius, so nothing it held is lost, only its arrangement.
+- **first cabalistic table, rows 1-61** (reconstruction) — Rows 62 to 72 are on the plate; 1 to 61 are in no image of this copy. They are put back from each genius's own entry, which carries the same three columns, and are marked as reconstructed wherever they are shown — never written into the transcription, which is what the page prints. The method can be checked against the eleven rows that survive: it recovers the divine name and the nation for ten of them and the genius's name for eight, the misses being places Lenain disagrees with himself, spelling Mogols, Eiael, Habuiah and Haiuiel in the table where his entries have Mongols, Eiael, Habuhiah and Haiaiel. He names his own sources under the table — Kircher's Oedipus Aegyptiacus, tome 2, pages 273 and 287, and Agrippa's Occult Philosophy, book 3, pages 109 and 110, The Hague 1727 — both public domain, and neither yet consulted here.
 - **name.he** (reading) · U+05C4 — Lenain dots his Hebrew above the letter bodies, not within them and not beneath. Those dots are encoded here as U+05C4 HEBREW MARK UPPER DOT, which is what that position means; whether he intended the biblical punctum extraordinarium or a device of his own is not something the type can settle.
 
 </small>
@@ -731,6 +732,14 @@ Qui indique les noms des 72 Génies, avec leurs attributs, les 72 premiers peupl
 | 72. | Mumiah .  . | La Thrace  .  .  . | KALO. |
 
 Notez que cette table est la plus exacte, en comparaison de celles qui se trouvent dans différents ouvrages, imprimés et manuscrits, car la plus grande partie de leurs noms sont défigurés et l'ordre numérique travesti. Le père Kircher donne leurs noms et leurs attributs, d'après le texte hébreu ; voyez Œdipus Égyptiacus, tome 2°, p. 273 et 287. Je m'en rapporte entièrement à sa table ; je la regarde comme la plus exacte. Agrippa la donne également dans sa Philosophie occulte, livre 3°, p. 109 et 110 ; à la Haye, édition de 1727  Il est parfaitement d'accord avec Kircher, pour le texte hébreu et l'ordre numérique des noms ; mais il ne parle point de leurs attributs, et ne donne aucun détail. Les trois tables qui suivent sont de mon invention.
+
+<small>
+
+**Editorial notes**
+
+- **genius 72, godName** (correction) · KALO → Kalo — The entry gives no name for God, so this is taken from the first cabalistic table, where the column is that nation's own name for Him. The alpha and omega the invocation says to pronounce are divine names but not Thrace's.
+
+</small>
 
 <small>
 
@@ -3530,3 +3539,84 @@ La Sorcellerie des Campagnes est un ouvrage de science très sérieuse et une œ
 </details>
 
 </small>
+
+---
+
+## The first cabalistic table, reconstructed
+
+The plate is a fold-out and the scan caught it folded: only rows 62 to 72 are legible. The 61 rows marked *reconstructed* below are **not from the plate** — they are put back from each genius's own entry, which gives the same three columns. Checked against the 11 rows that survive, the method recovers the divine name and the nation for ten and the name for eight.
+
+| # | Genius | Peuple | Name of God | Source |
+| --- | --- | --- | --- | --- |
+| 1 | Vehuiah | Les Hébreux | JEHOVAH | reconstructed |
+| 2 | Jeliel | La Turquie | AYDY | reconstructed |
+| 3 | Sitaël |  |  | reconstructed |
+| 4 | Elemiah | Les Arabes | ALLAH | reconstructed |
+| 5 | Mahasiah | Les Égyptiens | TEUT OU THEUTH | reconstructed |
+| 6 | Lelahel | Les Éthiopiens | ABGD | reconstructed |
+| 7 | Achaiah |  |  | reconstructed |
+| 8 | Cahethel | Les Géorgiens | MOTI | reconstructed |
+| 9 | Haziel | Les Abyssiniens | AGZI | reconstructed |
+| 10 | Aladiah | La langue des Perses | SIRÉ ET EIPI | reconstructed |
+| 11 | Lauviah | Les Latins | DEUS | reconstructed |
+| 12 | Hahaiah | Les Grecs | THÉOS | reconstructed |
+| 13 | Iezalel | Les Illyriens | BOOG | reconstructed |
+| 14 | Mebahel | La langue espagnole | DIOS | reconstructed |
+| 15 | Hariel | La langue italienne | IDIO OU IDDIO | reconstructed |
+| 16 | Hakamiah | La France | DIEU | reconstructed |
+| 17 | Lauviah | Les Germains | GOTH | reconstructed |
+| 18 | Caliel | Les Polonais | BOOG | reconstructed |
+| 19 | Leuviah | Les Hongrois | BOGY | reconstructed |
+| 20 | Pahaliah | Langue des Moscovites | TIOS | reconstructed |
+| 21 | Nelchael | Les Bohémiens | BUEG | reconstructed |
+| 22 | Ieiaiel | La langue anglaise | GOOD | reconstructed |
+| 23 | Melahel | Les Hibernais | DIEH | reconstructed |
+| 24 | Hahiuiah | Les Etrusques | ESAR | reconstructed |
+| 25 | Nith-Haiah | Les Mages | ORSY | reconstructed |
+| 26 | Haaiah | Les Sarrazins | AGDY ET ABDI | reconstructed |
+| 27 | Ierathel | Les Cophtes | TÉOS | reconstructed |
+| 28 | Séheiah | Les Assyriens | ADAD | reconstructed |
+| 29 | Reiiel | Les Péruviens | ZIMI | reconstructed |
+| 30 | Omael | Les Indiens | TURA | reconstructed |
+| 31 | Lecabel | Les Chinois | TELI | reconstructed |
+| 32 | Vasariah | Les Tartares | ANOT | reconstructed |
+| 33 | Iehuiah | Les Hespérides | AGAD | reconstructed |
+| 34 | Lehahiah | Les peuples du Congo | ANEB | reconstructed |
+| 35 | Chavakiah |  | ANUP | reconstructed |
+| 36 | Menadel | Les Maures | ALLA | reconstructed |
+| 37 | Aniel |  | ABDA | reconstructed |
+| 38 | Haamiah |  | AGLA | reconstructed |
+| 39 | Rehael | Les Écossais | GOOT | reconstructed |
+| 40 | Ieiazel | Les Belges | GOED | reconstructed |
+| 41 | Hahahel | La langue irlandaise | GUDI | reconstructed |
+| 42 | Mikael | Les Canadiens | BIUB OU BIUD | reconstructed |
+| 43 | Veualiah | Les Californiens | SOLU | reconstructed |
+| 44 | Ielahiah | Les Mexicains | BOSA | reconstructed |
+| 45 | Sealiah | Les peuples de Quito | HOBO | reconstructed |
+| 46 | Ariel | Les peuples du Paraguay | PINO | reconstructed |
+| 47 | Asaliah | Les peuples du Chili | HANA | reconstructed |
+| 48 | Mihael | Les Japonais | ZACA | reconstructed |
+| 49 | Vehuel | Les habitants des îles Philippines | MARA | reconstructed |
+| 50 | Daniel | Les Samaritains | POLA | reconstructed |
+| 51 | Hahasiah | Les Barsiens | BILA | reconstructed |
+| 52 | Imamiah | Les Melindais | ABAG | reconstructed |
+| 53 | Nanael | Les Maltais | OBRA | reconstructed |
+| 54 | Nithael | Les Zaflaniens | BORA | reconstructed |
+| 55 | Mebahiah | Les peuples d'Ormuz | ALAY | reconstructed |
+| 56 | Poiel | Les peuple d'Aden | ILLI | reconstructed |
+| 57 | Nemamiah | Les Ciréniens | POPA | reconstructed |
+| 58 | Ieialel | Les Célamites | PARA | reconstructed |
+| 59 | Harahel | Les Mésopotamiens | ELLA | reconstructed |
+| 60 | Mitzrael | Les peuples du Thibet | GÉNA | reconstructed |
+| 61 | Umabel | Les anciens Béthuliens | SILA | reconstructed |
+| 62 |  | Les Carmaniens | SUNA | on the plate |
+| 63 | Anauel | Les Camboens | MIRI | on the plate |
+| 64 | Mehiel | Les Mogols | ALLI | on the plate |
+| 65 | Damabiah | Les Gymnosophes | TARA | on the plate |
+| 66 | Manakel | Les Brahmanes | PORA | on the plate |
+| 67 | Eiael | Les Albanais | BOGO | on the plate |
+| 68 | Habuiah | Les Péloponésiens | DÉPOS | on the plate |
+| 69 | Rochel | Les Crétois | DÉOS | on the plate |
+| 70 | Jabamiah | Les Béotiens | ARIS | on the plate |
+| 71 | Haiuiel | Les Phrygiens | ZEUT | on the plate |
+| 72 | Mumiah | La Thrace | KALO | on the plate |

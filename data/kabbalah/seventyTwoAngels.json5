@@ -2724,14 +2724,14 @@
       en: 'Thrace or Roumelia',
       fr: 'la Thrace ou la Roumélie',
     },
-    godName: 'alpha et ôméga',
+    godName: 'Kalo',
     psalm: {
       psalm: 114,
       verse: 7,
       la: 'Convertere anima mea in requiem tuam : quia Dominus benefecit tibi.',
     },
     invokedFor: {
-      en: 'To invoke in mysterious operations, to succeed in all things, and to bring every experiment to its end.',
+      en: '',
     },
     governs: {
       en: 'This genius protects in mysterious operations; he makes one succeed in all things and brings every experiment to its conclusion; he governs chemistry, physics and medicine, and influences health and length of life.',

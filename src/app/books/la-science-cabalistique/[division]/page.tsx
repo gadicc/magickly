@@ -10,6 +10,7 @@ import JsonLd from "@/seo/JsonLd";
 import { chapterJsonLd, lenainChapterPage } from "@/seo/lenain";
 import { seoMetadata } from "@/seo/metadata";
 import { SITE_URL } from "@/seo/site";
+import FirstTable from "../FirstTable";
 import Reading from "../Reading";
 import styles from "../reading.module.css";
 
@@ -65,6 +66,9 @@ export default async function DivisionPage({
         notesByPage={notesByPage()}
         label={`${division.heading} — ${division.title}`}
       />
+
+      {/* The fold-out belongs to Chapter IV, whose content is its tables. */}
+      {slug === "chapitre-4" ? <FirstTable /> : null}
 
       <nav className={styles.reading} aria-label="Chapters">
         {previous ? (

@@ -123,6 +123,19 @@
   margin-left: 0.3em;
 }
 
+.reconstruction {
+  max-width: 42rem;
+  margin: 2.5em auto 0;
+  padding: 0 1rem;
+}
+
+.reconstruction th {
+  font-weight: 600;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  padding: 0.25em 0.5em;
+  text-align: left;
+}
+
 .doubts {
   font-size: 0.82rem;
   margin: 0 0 1.6em;
@@ -147,6 +160,19 @@
   .pagebreak a {
     text-decoration: none;
   }
+  .reconstruction {
+    max-width: 42rem;
+    margin: 2.5em auto 0;
+    padding: 0 1rem;
+  }
+
+  .reconstruction th {
+    font-weight: 600;
+    border: 1px solid rgba(128, 128, 128, 0.35);
+    padding: 0.25em 0.5em;
+    text-align: left;
+  }
+
   .doubts {
     display: none;
   }

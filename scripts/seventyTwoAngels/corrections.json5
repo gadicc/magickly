@@ -11,7 +11,22 @@
 // apparatus: the text is published as he set it, with a note saying what is
 // wrong and what it should be, and our own tables use the corrected value.
 //
-// The mechanism stays for anything the pages genuinely cannot settle. Each
+// The mechanism stays for anything the entry genuinely cannot settle. Each
 // `from` must appear exactly once or the assembly fails, so a correction whose
 // text has moved on is found rather than silently skipped.
-[]
+[
+  {
+    no: 72,
+    field: "godName",
+    from: "alpha et ôméga",
+    to: "Kalo",
+    why: "godName is that nation's name for God in all seventy-two rows — Jehovah for the Hebrews, Allah for the Arabs, Théos for the Greeks. The seventy-second's entry names none; the first cabalistic table gives KALO for Thrace, and it is his own table. The alpha and omega his invocation says to pronounce are divine names, but not Thrace's, and the omega is separately his attribute; taking them for this field was a reading of one sentence against the sense of the column.",
+  },
+  {
+    no: 72,
+    field: "invokedFor.en",
+    from: "To invoke in mysterious operations, to succeed in all things, and to bring every experiment to its end.",
+    to: "",
+    why: "A restatement of what the genius governs is not a second fact, and this is very nearly word for word: governs already says he protects in mysterious operations, makes one succeed in all things and brings every experiment to its conclusion. The entry gives the manner of invoking — the hour, the divine names, the verse — and no purpose. Two extraction passes read it as one; the rule is the other way.",
+  },
+]
