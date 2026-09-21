@@ -228,7 +228,15 @@ step 1 rather than before it.
 | `254c8f5` | This plan |
 | `2eca0da` | Gather split from render; the leaf gains an identity and an anchor |
 | `95e31d3` | `evidence.json5`: the readings every correction is derived from |
-| *(next)* | The second Hebrew reading committed; reproducibility proven |
+| `99d4e1a` | The second Hebrew reading committed; reproducibility proven |
+| `988c8f9` | The apparatus and the reading's doubts reach a reader |
+| `4107a51` | The edition checked as a document |
+| `8f3bb9c` | The volume divided as it divides itself |
+| `827cf5e` | One fold for both renderers |
+| `b3f56a8` | The routes |
+| `b484fb5` | Structured data |
+| `7ec78ea` | The OCR retired; the book out of the app shell |
+| `22ca738` | Seventy-two per-genius routes (follow-up) |
 
 ### What step 1 found that this plan did not anticipate
 
@@ -250,10 +258,12 @@ failure named the next thing missing. It now rebuilds the apparatus and the
 
 ## Follow-ups
 
-- **72 per-genius routes**, English-led, under the angels page — the real SEO
-  opportunity, since a 94 KB French chapter will never rank for "Vehuiah" and
-  nothing of ours currently does. French on book routes, English on angel
-  routes, cross-linked.
+- ~~**72 per-genius routes**~~ — done, `22ca738`. `/kabbalah/angel/<name>`,
+  seventy-two static pages at about 9.5 KB brotli each, all in the sitemap.
+  The slug is the bare name except for Lauviah, who is both the eleventh
+  genius and the seventeenth and so carries a number; a URL disambiguates
+  what is ambiguous and nothing else. The link to each sits in the accordion's
+  *summary*, since its contents are the part no crawler sees.
 - A client-side search index (JSON + minisearch), deliberately deferred.
 - A typeset PDF from the Markdown via pandoc, committed beside it.
 - The angels page's accordions hide all 72 entries from crawlers. Fixing that is
