@@ -2972,7 +2972,7 @@
         "source": "EMPM"
       },
       {
-        "meaning": "forget, let them forgetBANAA Kerubic Archangel WATER OF FIRE",
+        "meaning": "forget, let them forget",
         "source": "WE"
       }
     ],
@@ -2982,6 +2982,16 @@
         "source": "EMPM"
       }
     ]
+  },
+  "BANAA": {
+    "gematria": [],
+    "meanings": [
+      {
+        "meaning": "Kerubic Archangel WATER OF FIRE",
+        "source": "WE"
+      }
+    ],
+    "pronounciations": []
   },
   "BANSSZE": {
     "gematria": [],
@@ -7049,7 +7059,7 @@
         "source": "EMPM"
       },
       {
-        "meaning": "FOURTHESE DAUGHTER OF LIGHT",
+        "meaning": "FOURTH",
         "source": "WE"
       }
     ],
@@ -7067,6 +7077,10 @@
         "meaning": "(name of an angel)",
         "source": "EMPM",
         "source2": "pg 25"
+      },
+      {
+        "meaning": "DAUGHTER OF LIGHT",
+        "source": "WE"
       }
     ],
     "pronounciations": [
@@ -10040,7 +10054,17 @@
     "gematria": [],
     "meanings": [
       {
-        "meaning": "ELEMENTAL KING OF EARTHICZHIHL KING OF EARTH TABLET (VAR)",
+        "meaning": "ELEMENTAL KING OF EARTH",
+        "source": "WE"
+      }
+    ],
+    "pronounciations": []
+  },
+  "ICZHIHL": {
+    "gematria": [],
+    "meanings": [
+      {
+        "meaning": "KING OF EARTH TABLET (VAR)",
         "source": "WE"
       }
     ],
@@ -10465,7 +10489,7 @@
     "gematria": [],
     "meanings": [
       {
-        "meaning": "FRAME, HAVE FRAMEDIZED DAUGHTER OF DAUGHTER OF LIGHT",
+        "meaning": "FRAME, HAVE FRAMED",
         "source": "WE"
       }
     ],
@@ -10478,6 +10502,16 @@
         "meaning": "have framed",
         "source": "Keys",
         "source2": "Key 2"
+      }
+    ],
+    "pronounciations": []
+  },
+  "IZED": {
+    "gematria": [],
+    "meanings": [
+      {
+        "meaning": "DAUGHTER OF DAUGHTER OF LIGHT",
+        "source": "WE"
       }
     ],
     "pronounciations": []
@@ -11439,10 +11473,6 @@
       {
         "meaning": "KINGDOMS",
         "source": "WE"
-      },
-      {
-        "meaning": "KINGDOMSLONSA POWER",
-        "source": "WE"
       }
     ],
     "pronounciations": [
@@ -11460,6 +11490,10 @@
       {
         "meaning": "everyone",
         "source": "EMPM"
+      },
+      {
+        "meaning": "POWER",
+        "source": "WE"
       }
     ],
     "pronounciations": [
@@ -12661,7 +12695,17 @@
     "gematria": [],
     "meanings": [
       {
-        "meaning": "crown, the crownsMOMAR crown, to crown",
+        "meaning": "crown, the crowns",
+        "source": "WE"
+      }
+    ],
+    "pronounciations": []
+  },
+  "MOMAR": {
+    "gematria": [],
+    "meanings": [
+      {
+        "meaning": "crown, to crown",
         "source": "WE"
       }
     ],
@@ -13805,7 +13849,11 @@
     "gematria": [],
     "meanings": [
       {
-        "meaning": "SONS, YOUNOR SONS",
+        "meaning": "SONS, YOU",
+        "source": "WE"
+      },
+      {
+        "meaning": "SONS",
         "source": "WE"
       }
     ],
@@ -15307,7 +15355,7 @@
     "gematria": [],
     "meanings": [
       {
-        "meaning": "Servient Angel AIR OF EARTHORO A GOD-NAME OF AIR TABLET",
+        "meaning": "Servient Angel AIR OF EARTH",
         "source": "WE"
       }
     ],
@@ -15334,6 +15382,10 @@
       },
       {
         "meaning": "IBAH AOZPI GOD-NAMES OF AIR TABLET",
+        "source": "WE"
+      },
+      {
+        "meaning": "A GOD-NAME OF AIR TABLET",
         "source": "WE"
       }
     ],
@@ -16723,7 +16775,17 @@
         "source": "WE"
       },
       {
-        "meaning": "SHEPIAD YOUR GOD (alt.sp.)",
+        "meaning": "SHE",
+        "source": "WE"
+      }
+    ],
+    "pronounciations": []
+  },
+  "PIAD": {
+    "gematria": [],
+    "meanings": [
+      {
+        "meaning": "YOUR GOD (alt.sp.)",
         "source": "WE"
       }
     ],
@@ -19255,11 +19317,11 @@
     ],
     "pronounciations": []
   },
-  "THAHEBIOBEE": {
+  "THAHEBIOBEEATAN": {
     "gematria": [],
     "meanings": [
       {
-        "meaning": "ATAN GREAT ELEMENTAL KING OF WATER",
+        "meaning": "GREAT ELEMENTAL KING OF WATER",
         "source": "WE"
       }
     ],
@@ -21873,7 +21935,17 @@
     "gematria": [],
     "meanings": [
       {
-        "meaning": "I AMZIRENAIAD I AM THE LORD YOUR GOD",
+        "meaning": "I AM",
+        "source": "WE"
+      }
+    ],
+    "pronounciations": []
+  },
+  "ZIRENAIAD": {
+    "gematria": [],
+    "meanings": [
+      {
+        "meaning": "I AM THE LORD YOUR GOD",
         "source": "WE"
       }
     ],
