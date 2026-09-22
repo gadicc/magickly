@@ -653,6 +653,50 @@ does any card — [cards.ts](../src/seo/cards.ts) gives `/enochian/keys` and
 `/enochian/dictionary` a file each, drawn from no table — and neither page's
 description in [pages.ts](../src/seo/pages.ts) names a word.
 
+### The eleven partings
+
+The eleven more of the same fault the scan above found, on
+`gate/dictionary-runons-2` from `1063cca`, 22 September. Both commits were
+checked on their own tree with `pnpm check`, `pnpm typecheck` and
+`pnpm test`, `data/dist` wiped first:
+
+| Commit | Change | Tests |
+| --- | --- | --- |
+| `994892f` fix(enochian): Part the eleven entries still run together | Ten `WE` glosses give back the entry glued to their end and the eleventh key gets back the tail that began its gloss: six words become entries of their own, three entries that already existed gain the meaning the string carried, one meaning is dropped whole and one key is renamed | 4,749 |
+
+A second, `docs(plan): Record the eleven partings`, turns the follow-up's
+table into the record [below](#follow-ups) and adds this one; as in the
+earlier steps it is not in the table, which it would have to predict.
+
+The test count does not move: no test named any of the eleven, and the
+`CASARMA` one beside them is untouched. The dictionary's own count does,
+1,905 words before and 1,911 after, and moves in that test and in the two
+doc comments that say how big the file is.
+
+The gate ran on the tip in the `gate/dictionary-runons-2` worktree with the
+symlinked `node_modules` removed and a fresh `pnpm install --frozen-lockfile`,
+on Node 24.18.0 and pnpm 10.18.0, under CI's placeholder environment, in
+[ci.yml](../.github/workflows/ci.yml)'s order:
+
+| Step | Outcome |
+| --- | --- |
+| `pnpm install --frozen-lockfile` | clean; no dependency was added |
+| `loom init` | already matches the bootstrap defaults |
+| `loom check` | good, with the standing pnpm 11 advisory |
+| `loom check --production` | good, same advisory |
+| `pnpm check` | no errors, and 739 files and 35 warnings, which is what `main` gives today |
+| `pnpm typecheck` | clean |
+| `pnpm test:coverage` | 4,749 passed, 17 skipped, and the thresholds met. The step failed at the last parting on `src/seo/entities.ts`'s functions; `ca7e555` dropped the untested `angelPages()` it failed on, so the suite is whole again |
+| `pnpm build` | webpack, 386 pages prerendered |
+| `pnpm check:turbopack` | Turbopack, 386 pages prerendered |
+
+The six component images and their six inputs hashes were recomputed at the
+tip and none moved, as at the last parting and for the same reason: no image
+reads the dictionary. Nor does any card — [cards.ts](../src/seo/cards.ts)
+gives `/enochian/keys` and `/enochian/dictionary` a file each, drawn from no
+table — and neither page's description in [pages.ts](../src/seo/pages.ts)
+names a word.
+
 ## Results
 
 ### Steps 0 and 1
@@ -1533,7 +1577,8 @@ step 1 gave `IZAZAZ`, `BIAB` and `VOMZARG`. `542e65c` gives `GRU` the WE
 so it gains nothing beside it. The page ships 181 entries for 181 words now,
 and every figure above was measured when it shipped 180. The family is larger
 than the two: a scan of every meaning in the file for the same shape found ten
-more, which are [a follow-up](#follow-ups) of their own.
+more, and the review an eleventh; all eleven are parted in their turn
+([above](#the-eleven-partings)).
 
 #### Cost
 
@@ -1827,38 +1872,6 @@ step 4 is [a plan of its own](#migration). The rest:
   ([plan 028](028-seo.md#follow-ups)) is what `decycle` is still waiting for:
   four pages import it to print a row, and 3c left them alone by
   [decision 13](#decided-on-20-september).
-- **New, from the parting: ten more entries run into their neighbours.**
-  Closing `CASARMA` and `GRU` was the occasion to ask how many more of the
-  fault there are, and the file was scanned twice over: for a lowercase
-  letter or a closing mark followed by two or more capitals, which is the
-  shape `CASARM`'s string had, and for a word ending in a dictionary key of
-  three letters or more, with three or more letters before it, that is not
-  the last word of its meaning, which is the shape `G-RSAM`'s had, where
-  both halves are capitals. Ten meanings come out, all `WE`, each a word's
-  own gloss with another entry glued to its end:
-
-  | Entry | The meaning as it stands | Runs into |
-  | --- | --- | --- |
-  | `BAMS` | "forget, let them forgetBANAA Kerubic Archangel WATER OF FIRE" | `BANAA`, which has no entry |
-  | `ES` | "FOURTHESE DAUGHTER OF LIGHT" | `ESE`, which EMPM glosses "(name of an angel)" |
-  | `ICZHIHAL` | "ELEMENTAL KING OF EARTHICZHIHL KING OF EARTH TABLET (VAR)" | `ICZHIHL`, which has no entry |
-  | `IZAZAS` | "FRAME, HAVE FRAMEDIZED DAUGHTER OF DAUGHTER OF LIGHT" | `IZED`, which has no entry |
-  | `LONDOH` | "KINGDOMSLONSA POWER" | `LONSA`, which EMPM glosses "everyone" |
-  | `MOMAO` | "crown, the crownsMOMAR crown, to crown" | `MOMAR`, which has no entry |
-  | `NOR` | "SONS, YOUNOR SONS" | `NOR` itself, so this one is a reading, not a parting |
-  | `ORMN` | "Servient Angel AIR OF EARTHORO A GOD-NAME OF AIR TABLET" | `ORO`, which WE glosses twice already |
-  | `PI` | "SHEPIAD YOUR GOD (alt.sp.)" | `PIAD`, which has no entry |
-  | `ZIRDO` | "I AMZIRENAIAD I AM THE LORD YOUR GOD" | `ZIRENAIAD`, which has no entry |
-  | `THAHEBIOBEE` | "ATAN GREAT ELEMENTAL KING OF WATER" | the key itself, cut short: the Water king is `THAHEBYOBEEATAN`, and the lost tail begins the gloss (found by the review) |
-
-  Where to cut each is a reading of the source rather than a mechanical
-  edit — six of the first ten name a word the dictionary does not have at
-  all, three name one it already files, `NOR`'s names itself, and the
-  eleventh is the opposite fault, a key cut short —
-  so they are the owner's to decide, one at a time, as `CASARM`'s and
-  `G-RSAM`'s were. Neither scan is exhaustive: a run-on whose halves are
-  both lowercase, or whose second half is a word the dictionary never files,
-  is invisible to both.
 - **Done, after step 3: the twenty-one entries with a number for a meaning.**
   The re-check found `meanings[].meaning` holding a number in 21 entries —
   ACAM, AF, CIAI, CLA, DAOX, DARG, EMOD, ERAN, FAXS, MAPM, MIAN, NI, OL (its
@@ -1878,6 +1891,45 @@ step 4 is [a plan of its own](#migration). The rest:
   `/enochian/dictionary` always has, so the label no longer prints alone for
   the 130 words of the Keys that have no gematria
   ([above](#the-dictionarys-run-together-entries)).
+- **Done, 22 September: the eleven the scan brought back.** Closing
+  `CASARMA` and `GRU` was the occasion to ask how many more of the fault
+  there are, and the file was scanned twice over: for a lowercase letter or
+  a closing mark followed by two or more capitals, which is the shape
+  `CASARM`'s string had, and for a word ending in a dictionary key of three
+  letters or more, with three or more letters before it, that is not the
+  last word of its meaning, which is the shape `G-RSAM`'s had. Ten meanings
+  came out, all `WE`, each a word's own gloss with another entry glued to
+  its end, and the review found an eleventh where the fault runs the other
+  way. The owner read each one; `994892f` is what was done
+  ([above](#the-eleven-partings)):
+
+  | Entry | What it read | What was done |
+  | --- | --- | --- |
+  | `BAMS` | "forget, let them forgetBANAA Kerubic Archangel WATER OF FIRE" | reads "forget, let them forget"; `BANAA` is an entry of its own, "Kerubic Archangel WATER OF FIRE" |
+  | `ES` | "FOURTHESE DAUGHTER OF LIGHT" | reads "FOURTH"; `ESE` gains the WE "DAUGHTER OF LIGHT" beside the EMPM "(name of an angel)" |
+  | `ICZHIHAL` | "ELEMENTAL KING OF EARTHICZHIHL KING OF EARTH TABLET (VAR)" | reads "ELEMENTAL KING OF EARTH" — the "TABLET" is the other word's — and `ICZHIHL` is an entry of its own, "KING OF EARTH TABLET (VAR)" |
+  | `IZAZAS` | "FRAME, HAVE FRAMEDIZED DAUGHTER OF DAUGHTER OF LIGHT" | reads "FRAME, HAVE FRAMED"; `IZED` is an entry of its own, "DAUGHTER OF DAUGHTER OF LIGHT" |
+  | `LONDOH` | "KINGDOMSLONSA POWER" | dropped whole: parted, its first half would be an exact repeat of the WE "KINGDOMS" beside it, which `checkDictionary()` refuses. `LONSA` gains the WE "POWER" the string carried |
+  | `MOMAO` | "crown, the crownsMOMAR crown, to crown" | reads "crown, the crowns"; `MOMAR` is an entry of its own, "crown, to crown" |
+  | `NOR` | "SONS, YOUNOR SONS" | reads as two WE meanings, "SONS, YOU" and "SONS": the word run into it is itself, listed twice from different texts, which is no repeat of a meaning |
+  | `ORMN` | "Servient Angel AIR OF EARTHORO A GOD-NAME OF AIR TABLET" | reads "Servient Angel AIR OF EARTH"; `ORO` gains the WE "A GOD-NAME OF AIR TABLET" beside the WE "IBAH AOZPI GOD-NAMES OF AIR TABLET" |
+  | `PI` | "SHEPIAD YOUR GOD (alt.sp.)" | its second meaning reads "SHE"; `PIAD` is an entry of its own, "YOUR GOD (alt.sp.)" |
+  | `ZIRDO` | "I AMZIRENAIAD I AM THE LORD YOUR GOD" | reads "I AM"; `ZIRENAIAD` is an entry of its own, "I AM THE LORD YOUR GOD" |
+  | `THAHEBIOBEE` | "ATAN GREAT ELEMENTAL KING OF WATER" | the key is `THAHEBIOBEEATAN` now and the meaning "GREAT ELEMENTAL KING OF WATER". The spelling is WE's own, with the I: the standard `THAHEBYOBEEATAN` with a Y is not used, because the file follows WE |
+
+  Six of the words are entries the file did not have, so it is 1,911 words
+  where it was 1,905, each new one with an empty `gematria`, no
+  pronunciation, source `WE` and no `source2`, filed where the file's own
+  order puts it. None of the six, and not the renamed key either, is a word
+  of the nineteen Keys, so none gains a Keys gloss beside the WE meaning as
+  `CASARMA` did; of the three entries that already existed only `LONSA` is
+  a word of the Keys, and what it gains is WE's. The eleventh reads as its
+  three siblings do now: the file's Great Elemental Kings are
+  `OHOOOHAATAN` of Fire, `TAHAOELOI` of Air, `THAHAAOTAHE` of Earth and
+  `THAHEBIOBEEATAN` of Water, each a whole name with nothing of it left in
+  the gloss. Neither scan was exhaustive: a run-on whose halves are both
+  lowercase, or whose second half is a word the dictionary never files, is
+  invisible to both.
 - **Entry `I` gives two objects an empty source.** "(name of an angel, sol)"
   and the pronunciation "Ee" carry `source: ""`, since the 2023 transcription;
   the schema passes them, a string being what the type asks for, and the page

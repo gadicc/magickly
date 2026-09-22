@@ -200,14 +200,19 @@ Follow-ups are separate from the completed migration work:
   and the gematria cell no longer prints "Gematria " with nothing after it
   for the 130 of those words that have none. See
   [plan 032](032-data-layer.md#the-dictionarys-run-together-entries).
-- TODO: ten more entries run into their neighbours the same way, found by
-  scanning the whole dictionary while parting those two: `BAMS`, `ES`,
-  `ICZHIHAL`, `IZAZAS`, `LONDOH`, `MOMAO`, `NOR`, `ORMN`, `PI` and `ZIRDO`,
-  all `WE`, plus `THAHEBIOBEE`, whose key is cut short with its lost tail
-  beginning the gloss. Where to cut each is a reading of the source — six name a word
-  the dictionary does not have at all, three name one it already files, and
-  `NOR`'s names itself — so each wants deciding on its own. See
-  [plan 032](032-data-layer.md#follow-ups).
+- The eleven more that a scan of the whole file found while those two were
+  parted are parted in their turn: ten `WE` glosses carried the entry after
+  them run into the end — `BAMS`, `ES`, `ICZHIHAL`, `IZAZAS`, `LONDOH`,
+  `MOMAO`, `NOR`, `ORMN`, `PI` and `ZIRDO` — and `THAHEBIOBEE` was the
+  opposite fault, a key cut short with its own tail at the head of its
+  gloss. What a reader sees: on `/enochian/dictionary`, each of the eleven
+  reads as its own word, `BANAA`, `ICZHIHL`, `IZED`, `MOMAR`, `PIAD` and
+  `ZIRENAIAD` are rows of their own, `ESE`, `LONSA` and `ORO` gain the
+  meaning the string carried, and the key `THAHEBIOBEE` is
+  `THAHEBIOBEEATAN`; on `/enochian/keys`, where `LONDOH`, `LONSA` and
+  `ZIRDO` are words the Keys say, `LONDOH` loses the run-on row, `LONSA`
+  gains "POWER" and `ZIRDO` reads "I AM". See
+  [plan 032](032-data-layer.md#the-eleven-partings).
 - TODO: one small one left by step 3c
   ([plan 032](032-data-layer.md#follow-ups)): a study set whose question or
   answer is a function has no dotted path for the new field-path test to
