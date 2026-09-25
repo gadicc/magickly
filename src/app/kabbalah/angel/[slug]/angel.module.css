@@ -1,53 +1,7 @@
 /* One genius. Semantic HTML so the content is in the markup, where the list
-   page's accordions kept it from being. */
-
-.angel {
-  max-width: 44rem;
-  margin: 0 auto;
-  padding: 0 1rem 4rem;
-  line-height: 1.6;
-}
-
-.trail {
-  font-size: 0.85rem;
-  opacity: 0.75;
-  margin: 0.5em 0 0;
-}
-
-.angel h1 {
-  font-size: 1.7rem;
-  margin: 0.3em 0 0.2em;
-}
-
-.angel h2 {
-  font-size: 1.05rem;
-  margin: 2em 0 0.6em;
-}
-
-.attribute {
-  font-size: 1.05rem;
-  margin: 0 0 1.4em;
-}
-
-.table {
-  border-collapse: collapse;
-  width: 100%;
-  font-size: 0.92rem;
-}
-
-.table th,
-.table td {
-  border-top: 1px solid rgba(128, 128, 128, 0.3);
-  padding: 0.45em 0.6em 0.45em 0;
-  text-align: left;
-  vertical-align: top;
-}
-
-.table th {
-  width: 12rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
+   page's accordions kept it from being. The frame, the table, the trail, the
+   Hebrew and the nav are the entity pages' (src/components/entity); these
+   rules are this page's own. */
 
 /* Lenain's own words, run on as he sets them. */
 .said {
@@ -67,16 +21,4 @@
 .kind {
   font-variant: small-caps;
   opacity: 0.7;
-}
-
-.hebrew {
-  font-family: "Frank Ruehl CLM", "Noto Sans Hebrew", serif;
-  font-size: 1.15em;
-}
-
-.nav {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 2.5em;
-  font-size: 0.9rem;
 }

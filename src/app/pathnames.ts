@@ -10,6 +10,12 @@ export interface Pathnames {
   [key: string]: PathnameValue | Pathnames;
 }
 
+/**
+ * Every path here has a page: the drawer links each one, and the bar takes a
+ * path's title for the page's heading. A route below a section with no entry
+ * of its own, such as `/kabbalah/sephirah/<id>` or `/kabbalah/angel/<slug>`,
+ * gets the section's breadcrumb and the page names itself.
+ */
 const pathnames: Pathnames = {
   "/": "Magick.ly",
   about: "About",
@@ -52,7 +58,6 @@ const pathnames: Pathnames = {
   },
   kabbalah: {
     "/": "Kabbalah",
-    angel: "The 72 Angels",
     yhvh: {
       "/": "Shem HaMephorash",
       "72angels": "72 Angels",
