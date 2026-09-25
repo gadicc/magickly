@@ -1,6 +1,6 @@
 import { statSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { RWSPath, tarotDeck } from "./tarot";
+import { RWSName, RWSPath, tarotDeck, trumpNumeral } from "./tarot";
 
 describe("tarot package integration", () => {
   it("exposes the card lookup API used by the Kabbalah path page", () => {
@@ -48,5 +48,55 @@ describe("tarot package integration", () => {
       return imagePath;
     });
     expect(new Set(imagePaths).size).toBe(22);
+  });
+});
+
+describe("the trumps as the Rider-Waite cards print them", () => {
+  it("names the three the deck names otherwise, and keeps the rest", () => {
+    expect(RWSName(2)).toBe("The High Priestess");
+    expect(RWSName("5")).toBe("The Hierophant");
+    expect(RWSName(10)).toBe("Wheel of Fortune");
+    expect(RWSName(0)).toBe("The Fool");
+    expect(RWSName(12)).toBe("The Hanged Man");
+  });
+
+  it("names every trump as its image file does, bar the article", () => {
+    // The bundled files are named for the printed cards, so the two agree.
+    for (let rank = 0; rank < 22; rank++) {
+      const file = RWSPath(rank).replace(/^.*RWS_Tarot_\d\d_|\.jpg$/g, "");
+      expect(RWSName(rank).replace(/^The /, ""), String(rank)).toBe(
+        file.replaceAll("_", " "),
+      );
+    }
+  });
+
+  it("numbers them in Roman numerals from the Fool's 0", () => {
+    expect(Array.from({ length: 22 }, (_, rank) => trumpNumeral(rank))).toEqual(
+      [
+        "0",
+        "I",
+        "II",
+        "III",
+        "IV",
+        "V",
+        "VI",
+        "VII",
+        "VIII",
+        "IX",
+        "X",
+        "XI",
+        "XII",
+        "XIII",
+        "XIV",
+        "XV",
+        "XVI",
+        "XVII",
+        "XVIII",
+        "XIX",
+        "XX",
+        "XXI",
+      ],
+    );
+    expect(trumpNumeral("2")).toBe("II");
   });
 });
