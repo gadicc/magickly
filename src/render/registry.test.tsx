@@ -38,9 +38,11 @@ describe("component image registry", () => {
   // was added to a spec that the component does not draw; the reverse means a
   // spec is missing something the component does.
   it.each([
+    // 2591a504… until Netzach's and Hod's god names spelt Tzva'ot as the
+    // hosts, צבאות, rather than צבעות (plan 036); only this hash moved.
     [
       "tree-of-life",
-      "2591a504c3be2507d88e46bff86ea4ec09b4e1557dd14bda5d4d2034cc077d76",
+      "8d5f06b8e648998b8ba7e3fe97b1f3c6a967281916e3b2c3ad5b5f7ff2f17530",
     ],
     [
       "astro-geomancy-chart",
@@ -82,10 +84,13 @@ describe("component image registry", () => {
     });
     // Profile v3: v1 was 142,962 bytes (plans/009), v2 151,079 once Keter,
     // Chochmah and Malchut gained their archangels, and v3 is shorter again
-    // because the path data is rounded to three decimals (plans/030).
-    expect(image.byteSize).toBe(150_736);
+    // because the path data is rounded to three decimals (plans/030). It
+    // was 150,736 bytes, 96516a75…, until the ritual's god names spelt
+    // Tzva'ot צבאות (plan 036): a data fix, which moves the inputs hash and
+    // the bytes together under the same profile.
+    expect(image.byteSize).toBe(150_785);
     expect(image.sha256).toBe(
-      "96516a75ce13374a234de855bf596ce1a50d1e9adf7340b398e4b3a2b7e4858a",
+      "a1fe82b8007671767c635763bbe47ad0a15ac4663c78650386d6bc803233176f",
     );
     expect(await validate(image.bytes)).toMatchObject({ status: "validated" });
   });
