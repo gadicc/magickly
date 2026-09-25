@@ -17,11 +17,13 @@ const spirits = {
 };
 
 export default function PlanetarySpirit(props) {
-  const { id, ...rest } = props;
+  // Everything but the id and `aria-hidden` is style, as its callers pass it.
+  const { id, "aria-hidden": ariaHidden, ...rest } = props;
   const Spirit = spirits[id];
   if (!Spirit) return null;
   return (
     <div
+      aria-hidden={ariaHidden}
       style={{
         // padding: "0.1em",
         display: "flex",

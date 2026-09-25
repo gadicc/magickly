@@ -1,0 +1,6 @@
+/* The planet page's own rules; the frame, the table, the trail and the
+   Hebrew are the entity pages' (src/components/entity). */
+
+.seeAlso {
+  margin-top: 1.5em;
+}
