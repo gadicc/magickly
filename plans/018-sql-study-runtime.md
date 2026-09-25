@@ -39,3 +39,38 @@ Evidence: `/tmp/magickli-study-runtime-{tests,types,biome,build}.log`.
 The frozen isolated runtime passes all 53 focused tests, TypeScript, targeted
 Biome, ordinary Loom check and a production build. No live SQL or provider
 requests were made.
+
+## Loom client-data extraction checkpoint
+
+The 21 September 2026 consumer adapter preserves the study database schema and
+wire messages while routing identity transitions and revision ordering through
+`@gadicc/loom/client-data`. It deliberately does not strengthen two existing
+activation policies during the mechanical extraction.
+
+First, `accountViewsFenced` and the ritual runtime's corresponding refresh fence
+live only for the current JavaScript runtime. If explicit local sign-out becomes
+durable but the server cookie remains valid, a reload creates a new runtime. Its
+automatic mount, online or visibility refresh reads the identity baseline after
+the sign-out and can reactivate the cookie's account. The shared explicit
+sign-out revision orders a session check that began before sign-out; it does not
+decide whether a later verified session came from intentional reauthentication.
+
+A separate app policy change should durably require explicit sign-in intent
+after requested sign-out, set that requirement before the auth request, and
+clear it only after the app observes a successful user-initiated sign-in for the
+verified owner. Automatic session refresh may confirm connectivity but must not
+clear that requirement. The study and ritual browser runtimes must enforce the
+same decision so one cannot reopen while the other remains fenced.
+
+Second, a generation token orders checks inside one runtime, but cannot order
+competing activations in different tabs. The current transaction preserves the
+historical last-writer behavior. A later fix needs durable activation-attempt
+ordering or an equivalent compare-and-swap protocol. Rejecting every revision
+change is not equivalent because the existing policy intentionally allows a
+verified activation to follow another tab's anonymous answer.
+
+The adapter is now validated against the exact published
+`@gadicc/loom@1.30.0` dependency with no local package override. Its focused
+storage tests, TypeScript check, targeted Biome check and production Loom gate
+pass. The earlier production browser build used the package-equivalent artifact
+from the same Loom release commit.

@@ -4,7 +4,12 @@ import * as React from "react";
 import { isUuidV7 } from "../lib/ids";
 import { refreshStudyProgress, syncStudyProgress } from "./clientTransport";
 import type { StudyMode } from "./reviewContract";
-import { StudyDatabase, StudyRepository, type StudyScope } from "./storage";
+import {
+  acceptStudyIdentitySignal,
+  StudyDatabase,
+  StudyRepository,
+  type StudyScope,
+} from "./storage";
 import type { StudyRuntimeSetStats } from "./types";
 
 let singleton: StudyRepository | undefined;
@@ -61,13 +66,12 @@ function repository() {
       // Identity writes are numbered, so a signal that another tab stored
       // before the newest one this tab applied is already superseded. The
       // sign-out fence carries no revision and always applies.
-      if (
-        signal.revision !== undefined &&
-        signal.revision < appliedIdentityRevision
-      )
-        return;
-      if (signal.revision !== undefined)
-        appliedIdentityRevision = signal.revision;
+      const decision = acceptStudyIdentitySignal(
+        appliedIdentityRevision,
+        signal,
+      );
+      if (!decision.accepted) return;
+      appliedIdentityRevision = decision.appliedRevision;
       if (signal.type === "signed-out" && signal.explicit) explicitSignOuts++;
       accountActivation =
         signal.type === "signed-out" ? null : signal.accountId;

@@ -8,7 +8,11 @@ import {
   studySnapshotFromWire,
   studySnapshotToWire,
 } from "./reviewContract";
-import { StudyDatabase, StudyRepository } from "./storage";
+import {
+  acceptStudyIdentitySignal,
+  StudyDatabase,
+  StudyRepository,
+} from "./storage";
 
 const A = "01993000-0000-7000-8000-000000000001";
 const B = "01993000-0000-7000-8000-000000000002";
@@ -74,6 +78,35 @@ function serverSnapshot(
 }
 
 describe("study Dexie scopes and outbox", () => {
+  it("adapts study identity signals to Loom revision ordering", () => {
+    expect(
+      acceptStudyIdentitySignal(4, {
+        type: "account",
+        accountId: A,
+        revision: 3,
+      }),
+    ).toEqual({ accepted: false, appliedRevision: 4 });
+    expect(
+      acceptStudyIdentitySignal(4, {
+        type: "account",
+        accountId: B,
+        revision: 5,
+      }),
+    ).toEqual({ accepted: true, appliedRevision: 5 });
+    expect(
+      acceptStudyIdentitySignal(5, {
+        type: "signed-out",
+        explicit: true,
+      }),
+    ).toEqual({ accepted: true, appliedRevision: 5 });
+    expect(
+      acceptStudyIdentitySignal(5, {
+        type: "account",
+        accountId: A,
+      }),
+    ).toEqual({ accepted: true, appliedRevision: 5 });
+  });
+
   it("rejects wire dates outside the JavaScript date range", () => {
     expect(
       studySnapshotFromWire({
