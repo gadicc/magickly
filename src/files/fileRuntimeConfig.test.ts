@@ -29,6 +29,14 @@ const minio = {
   FILES_S3_ACCESS_KEY_ID: "LOCALONLY",
   FILES_S3_SECRET_ACCESS_KEY: "synthetic-only",
 };
+const development = {
+  ...minio,
+  NODE_ENV: "development",
+  MAGICKLI_LOCAL_ACCEPTANCE: undefined,
+  BETTER_AUTH_URL: "http://localhost:3004",
+  FILES_S3_ENDPOINT: "http://127.0.0.1:9000",
+  FILES_S3_BUCKET: "magickly-dev",
+};
 
 describe("file runtime configuration", () => {
   it("maps Loom's explicit Cloudflare provider configuration to the closed R2 adapter", () => {
@@ -86,6 +94,29 @@ describe("file runtime configuration", () => {
       stagingPrefix: "ritual-staging",
       canonicalPrefix: "ritual-files",
     });
+  });
+
+  it("uses local MinIO in ordinary development without the acceptance flag", () => {
+    expect(readRitualUploadStorageConfig(development)).toMatchObject({
+      kind: "minio",
+      endpoint: "http://127.0.0.1:9000",
+      bucket: "magickly-dev",
+    });
+  });
+
+  it.each([
+    { NODE_ENV: "production" },
+    { MAGICKLI_LOCAL_ACCEPTANCE: "0" },
+    { VERCEL: "1" },
+    { VERCEL_ENV: "development" },
+    { BETTER_AUTH_URL: "http://localhost.evil.test:3004" },
+    { BETTER_AUTH_URL: "https://localhost:3004" },
+    { FILES_S3_ENDPOINT: "http://172.17.0.1:9000" },
+    { DATABASE_URL: "postgresql://local:pass@remote.example:5432/local" },
+  ])("rejects unsafe ordinary development storage %#", (override) => {
+    expect(() =>
+      readRitualUploadStorageConfig({ ...development, ...override }),
+    ).toThrow("not configured");
   });
 
   it.each([

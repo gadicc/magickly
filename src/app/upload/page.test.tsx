@@ -120,11 +120,11 @@ describe("private ritual image upload", () => {
     });
   });
 
-  it("uploads and finalizes an exact same-host numeric-loopback capability", async () => {
-    vi.stubGlobal(
-      "location",
-      new URL("http://127.0.0.1:3115/upload#selected-file"),
-    );
+  it.each([
+    "http://127.0.0.1:3115/upload#selected-file",
+    "http://localhost:3004/upload#selected-file",
+  ])("uploads and finalizes a loopback capability from %s", async (page) => {
+    vi.stubGlobal("location", new URL(page));
     const capability = {
       kind: "presigned-put" as const,
       url: "http://127.0.0.1:9125/private/capability?signature=synthetic",
@@ -175,14 +175,19 @@ describe("private ritual image upload", () => {
       "http://127.0.0.1:9125/private/capability",
     ],
     [
-      "named loopback page",
-      "http://localhost:3115/upload",
-      "http://127.0.0.1:9125/private/capability",
-    ],
-    [
       "different loopback host",
       "http://127.0.0.1:3115/upload",
       "http://[::1]:9125/private/capability",
+    ],
+    [
+      "named upload host",
+      "http://localhost:3004/upload",
+      "http://localhost:9000/private/capability",
+    ],
+    [
+      "non-loopback page",
+      "http://localhost.evil.test:3004/upload",
+      "http://127.0.0.1:9000/private/capability",
     ],
     [
       "shorthand IP",

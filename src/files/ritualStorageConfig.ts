@@ -22,12 +22,16 @@ function required(environment: RuntimeEnvironment, key: string) {
   return value;
 }
 
-function loopbackOrigin(value: string) {
+function loopbackOrigin(value: string, allowLocalhost = false) {
   try {
     const url = new URL(value);
+    const localHost =
+      url.hostname === "127.0.0.1" ||
+      url.hostname === "[::1]" ||
+      (allowLocalhost && url.hostname === "localhost");
     if (
       url.protocol !== "http:" ||
-      (url.hostname !== "127.0.0.1" && url.hostname !== "[::1]") ||
+      !localHost ||
       !url.port ||
       value !== url.origin
     )
@@ -62,21 +66,26 @@ function loopbackDatabaseUrl(value: string) {
 }
 
 /**
- * MinIO is permitted only for an explicit, wholly loopback local runtime. The
- * boundary uses configured origins rather than request-controlled host headers.
+ * MinIO is limited to a loopback database and storage endpoint in an explicit
+ * acceptance run or an ordinary Next development process. Only development
+ * permits localhost as the browser auth origin; acceptance stays numeric-only.
  */
 export function assertLocalRitualStorageBoundary(
   environment: RuntimeEnvironment,
 ) {
+  const acceptance = environment[LOCAL_ACCEPTANCE_FLAG] === "1";
+  const development =
+    environment.NODE_ENV === "development" &&
+    environment[LOCAL_ACCEPTANCE_FLAG] === undefined;
   if (
-    required(environment, LOCAL_ACCEPTANCE_FLAG) !== "1" ||
+    (!acceptance && !development) ||
     Object.entries(environment).some(
       ([key, value]) =>
         value !== undefined && (key === "VERCEL" || key.startsWith("VERCEL_")),
     )
   )
     throw new Error("Local ritual storage is not configured");
-  loopbackOrigin(required(environment, "BETTER_AUTH_URL"));
+  loopbackOrigin(required(environment, "BETTER_AUTH_URL"), development);
   loopbackOrigin(required(environment, "FILES_S3_ENDPOINT"));
   const configuredDatabaseUrls = RUNTIME_DATABASE_URL_ENV_NAMES.map((key) =>
     environment[key]?.trim(),
