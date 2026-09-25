@@ -1,0 +1,35 @@
+/* One grade. The frame, the table, the trail and the nav are the entity
+   pages' (src/components/entity); these rules are this page's own. */
+
+/* Zelator's alchemy: three short groups in one cell, each under a caption,
+   read as the lecture's three lists rather than as a run of the table. */
+.alchemy > * + * {
+  margin-top: 0.7em;
+}
+
+.caption {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  /* MUI's text.secondary, as entity.module.css has it. */
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.alchemy ul {
+  list-style: none;
+  margin: 0.1em 0 0;
+  padding: 0;
+}
+
+/* Three short names fit on a line, and wrap on a phone. */
+.principles {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1.4em;
+}
+
+/* Each term runs on into its gloss, as a glossary sets them. */
+.terms li {
+  margin-bottom: 0.3em;
+}

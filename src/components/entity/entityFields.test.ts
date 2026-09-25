@@ -94,6 +94,7 @@ const DECLARED = [
   "../../app/kabbalah/sephirah/[id]/fields.ts",
   "../../app/kabbalah/path/[id]/fields.ts",
   "../../app/astrology/planet/[id]/fields.ts",
+  "../../app/gd/grade/[id]/fields.ts",
 ];
 
 describe("each entity page's declaration", () => {
