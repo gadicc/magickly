@@ -15,10 +15,11 @@ import Grade from "./page";
  *
  * Each page is held to what every entity page must hold, and the cases
  * below pin what a reader sees on the grades whose rows differ: the one
- * with no sephirah and a ritual, the one that teaches alchemy, the plan's
- * own example, the one in no order, one of the Second Order, and the last. The built-in rituals are
- * found by the grade's name (decision 6), and that mapping is held both
- * ways: each ritual names one grade, and only those grades link one.
+ * with no sephirah and a ritual, the first on the Tree, the plan's own
+ * example, the one in no order, one of the Second Order, and the last. The
+ * built-in rituals are found by the grade's name (decision 6), and that
+ * mapping is held both ways: each ritual names one grade, and only those
+ * grades link one.
  */
 const props = (id: string) => ({
   params: Promise.resolve({ id }),
@@ -104,16 +105,6 @@ describe("every grade's page", () => {
       expect(html, grade.id).not.toContain("(no sephirah)");
     }
   });
-
-  it("gives an Alchemy row to the Zelator alone", async () => {
-    // The alchemy tables number the grade that teaches each entry, and only
-    // 1=10 teaches any; a row anywhere else would be a mismatched number.
-    const withAlchemy: string[] = [];
-    for (const grade of grades)
-      if (rowsOf(await page(grade.id)).has("Alchemy"))
-        withAlchemy.push(grade.id);
-    expect(withAlchemy).toEqual(["1=10"]);
-  });
 });
 
 describe("the built-in rituals", () => {
@@ -160,9 +151,9 @@ describe("what a reader sees", () => {
     expect(spheres.filter((opacity) => opacity !== "0.1")).toEqual([]);
   });
 
-  it("Zelator: Malchut lit, Earth, the Gnomes, and the alchemy it teaches", async () => {
-    // The one grade with an Alchemy row, and the first whose element names
-    // its elementals. Its Tree is the contrast to Neophyte's: one sphere lit,
+  it("Zelator: Malchut lit, Earth and the Gnomes", async () => {
+    // The first grade on the Tree, and the first whose element names its
+    // elementals. Its Tree is the contrast to Neophyte's: one sphere lit,
     // Malchut, and the other nine dimmed.
     const html = await page("1=10");
     expect(rowText(html, "Sephirah")).toBe("Malchut");
@@ -175,42 +166,10 @@ describe("what a reader sees", () => {
     expect(sphereOpacities(html).filter((o) => o === "1")).toHaveLength(1);
     expect(sphereOpacities(html).filter((o) => o === "0.1")).toHaveLength(9);
 
-    const alchemy = rowsOf(html).get("Alchemy") ?? "";
-    const entries = [...alchemy.matchAll(/<li\b[^>]*>[\s\S]*?<\/li>/g)].map(
-      ([item]) => item,
-    );
-    const entry = (name: string) =>
-      entries.find((item) => textOf(item).includes(name)) ?? "";
-    // Lead is Saturn's metal, the first of the seven; the Green Lion is a
-    // term, so between them they cover both halves of the row.
-    expect(textOf(entry("Lead"))).toContain("🜪 Lead · ♄ Saturn");
-    expect(hrefsOf(entry("Lead"))).toEqual(["/astrology/planet/saturn"]);
-    expect(textOf(entry("Green Lion"))).toContain(
-      "Green Lion — Stem and Root of Radical Essence of Metals",
-    );
-
-    // And nothing the tables file under the Zelator is left out: the ten
-    // symbols by symbol and name, each metal linking to its planet, and the
-    // six terms with each of their glosses.
-    const symbols = Object.values(Data.alchemySymbol).filter(
-      (symbol) => symbol.gdGrade === 1,
-    );
-    const terms = Object.values(Data.alchemyTerm).filter(
-      (term) => term.gdGrade === 1,
-    );
-    expect([symbols.length, terms.length]).toEqual([10, 6]);
-    for (const symbol of symbols) {
-      const named = `${symbol.symbol} ${symbol.name.en}`;
-      expect(textOf(entry(named)), symbol.id).toContain(named);
-      expect(hrefsOf(entry(named)), symbol.id).toEqual(
-        symbol.planet ? [`/astrology/planet/${symbol.planet.id}`] : [],
-      );
-    }
-    for (const term of terms) {
-      expect(textOf(entry(term.name.en)), term.id).toContain(
-        `${term.name.en} — ${term.terms.en.join("; ")}`,
-      );
-    }
+    // The Zelator's knowledge lecture teaches the alchemical principles,
+    // metals and terms, but they are study material for the grade, not its
+    // attributions, so the page lists none of them.
+    expect(rowsOf(html).has("Alchemy")).toBe(false);
   });
 
   it("Theoricus: the plan's own example, lede and neighbours", async () => {

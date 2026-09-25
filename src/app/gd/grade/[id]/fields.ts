@@ -4,8 +4,7 @@ import type { EntityFields } from "@/components/entity/fields";
 export const fields: EntityFields = {
   table: "gdGrade",
   shown: [
-    // The heading's numbers, "Theoricus 2=9", and the key the Alchemy row
-    // is found by: the grade that teaches a symbol is its first number.
+    // The heading's numbers, "Theoricus 2=9".
     "id",
     // The heading, and the key the Ritual row is found by.
     "name",

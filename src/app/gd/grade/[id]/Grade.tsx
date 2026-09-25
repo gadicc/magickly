@@ -1,12 +1,10 @@
 import Link from "@magick-components/Link";
-import Data from "@/../data/data";
 import type { GDGradeRow } from "@/../data/rows";
 import {
   EntityFrame,
   EntityTable,
   FigureNav,
   Lede,
-  Muted,
   type Neighbour,
   PrevNext,
   Row,
@@ -15,13 +13,11 @@ import {
 import GradeTree from "@/components/gd/GradeTree";
 import { isPublicRitualId } from "@/doc/publicRituals";
 import { PUBLIC_PAGES } from "@/seo/pages";
-import styles from "./grade.module.css";
 
 /**
  * One grade of the Golden Dawn, laid out from its row (plan 036, "Grade"):
  * the grade tree with its sephirah lit, then its order, degree, sephirah,
- * planet and element, the ritual where the site has it, and the alchemy
- * the grade teaches.
+ * planet and element, and the ritual where the site has it.
  */
 
 /** The orders' and the degrees' ids, as words. */
@@ -55,15 +51,6 @@ function neighbour(grade: GDGradeRow | undefined): Neighbour | undefined {
   return grade && { href: `/gd/grade/${grade.id}`, label: title(grade) };
 }
 
-/**
- * The grade that teaches an alchemy symbol or term, as those tables number
- * it: the first number of the grade's id, the 1 of 1=10. The Portal has none.
- */
-function taughtAt(grade: GDGradeRow) {
-  const numbers = /^(\d+)=\d+$/.exec(grade.id);
-  return numbers ? Number(numbers[1]) : undefined;
-}
-
 function GradeLede({ grade }: { grade: GDGradeRow }) {
   if (!grade.orderId) {
     // The Portal alone is in no order; its neighbours are the two it joins.
@@ -93,73 +80,6 @@ function GradeLede({ grade }: { grade: GDGradeRow }) {
   );
 }
 
-/** The symbols and terms the grade teaches, in the tables' order. */
-function alchemyOf(grade: GDGradeRow) {
-  const taught = taughtAt(grade);
-  return {
-    symbols: Object.values(Data.alchemySymbol).filter(
-      (s) => s.gdGrade === taught,
-    ),
-    terms: Object.values(Data.alchemyTerm).filter((t) => t.gdGrade === taught),
-  };
-}
-
-/**
- * The alchemy a grade teaches, which is the Zelator's (decision 7): the
- * principles and the metals by symbol and name, each metal beside the
- * planet it is attributed to, and the terms with their glosses. Three short
- * groups under captions in one cell, so that sixteen entries read as the
- * three lists they are rather than as sixteen rows of the table.
- */
-function Alchemy({ symbols, terms }: ReturnType<typeof alchemyOf>) {
-  const principles = symbols.filter((s) => s.category === "principles");
-  const metals = symbols.filter((s) => s.category === "planets");
-  return (
-    <div className={styles.alchemy}>
-      {principles.length ? (
-        <div>
-          <div className={styles.caption}>Principles</div>
-          <ul className={styles.principles}>
-            {principles.map((s) => (
-              <li key={s.id}>{`${s.symbol} ${s.name.en}`}</li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-      {metals.length ? (
-        <div>
-          <div className={styles.caption}>Metals</div>
-          <ul>
-            {metals.map((s) => (
-              <li key={s.id}>
-                {`${s.symbol} ${s.name.en} · `}
-                {s.planet ? (
-                  <Link href={`/astrology/planet/${s.planet.id}`}>
-                    {`${s.planet.symbol} ${s.planet.name.en.en}`}
-                  </Link>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-      {terms.length ? (
-        <div>
-          <div className={styles.caption}>Terms</div>
-          <ul className={styles.terms}>
-            {terms.map((t) => (
-              <li key={t.id}>
-                {t.name.en}
-                <Muted>{` — ${t.terms.en.join("; ")}`}</Muted>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
 /** The page body, synchronous so that `renderToString` can render it. */
 export default function GradePage({ grade }: { grade: GDGradeRow }) {
   const prev = neighbour(grade.prev);
@@ -168,7 +88,6 @@ export default function GradePage({ grade }: { grade: GDGradeRow }) {
   // The built-in rituals are keyed by the grade's name in lower case, which
   // is the mapping the data already carries (decision 6).
   const ritual = grade.name.toLowerCase();
-  const alchemy = alchemyOf(grade);
 
   return (
     <EntityFrame>
@@ -226,11 +145,6 @@ export default function GradePage({ grade }: { grade: GDGradeRow }) {
             <Link href={`/doc/${ritual}`}>
               {PUBLIC_PAGES[`/doc/${ritual}` as const].title}
             </Link>
-          ) : null}
-        </Row>
-        <Row label="Alchemy">
-          {alchemy.symbols.length || alchemy.terms.length ? (
-            <Alchemy {...alchemy} />
           ) : null}
         </Row>
       </EntityTable>
