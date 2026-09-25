@@ -95,13 +95,8 @@ export function sephirahPage(id: string): EntityPage | null {
 export function pathPage(id: string): EntityPage | null {
   const path = rowOf(Data.tolPath, id);
   if (!path) return null;
-  const [from, to] = path.id
-    .split("_")
-    .map(Number)
-    .map(
-      (index) =>
-        Object.values(Data.sephirah).find((s) => s.index === index)?.name.roman,
-    );
+  const from = path.from.name.roman;
+  const to = path.to.name.roman;
   const joins = `${from}–${to}`;
   const hebrewLetter = path.hebrew?.hebrewLetter?.letter.name;
   const hermetic = path.hermetic;

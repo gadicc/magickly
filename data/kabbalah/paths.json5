@@ -9,6 +9,8 @@
 {
   "1_2": {
     id: "1_2",
+    fromId: "keter",
+    toId: "chochmah",
     hermetic: {
       hebrewLetterId: "alef",
       pathNo: 11,
@@ -22,6 +24,8 @@
 
   "1_3": {
     id: "1_3",
+    fromId: "keter",
+    toId: "binah",
     hermetic: {
       hebrewLetterId: "bet",
       pathNo: 12,
@@ -36,6 +40,8 @@
 
   "1_6": {
     id: "1_6",
+    fromId: "keter",
+    toId: "tiferet",
     hermetic: {
       hebrewLetterId: "gimel",
       pathNo: 13,
@@ -50,6 +56,8 @@
 
   "2_3": {
     id: "2_3",
+    fromId: "chochmah",
+    toId: "binah",
     hermetic: {
       hebrewLetterId: "dalet",
       pathNo: 14,
@@ -64,6 +72,8 @@
 
   "2_4": {
     id: "2_4",
+    fromId: "chochmah",
+    toId: "hesed",
     hermetic: {
       hebrewLetterId: "vav",
       pathNo: 16,
@@ -78,6 +88,8 @@
 
   "2_5": {
     id: "2_5",
+    fromId: "chochmah",
+    toId: "gevurah",
     hebrew: {
       hebrewLetterId: "zayin",
     },
@@ -87,6 +99,8 @@
 
   "2_6": {
     id: "2_6",
+    fromId: "chochmah",
+    toId: "tiferet",
     hermetic: {
       hebrewLetterId: "he",
       pathNo: 15,
@@ -101,6 +115,8 @@
 
   "3_4": {
     id: "3_4",
+    fromId: "binah",
+    toId: "hesed",
     hebrew: {
       hebrewLetterId: "qof",
     },
@@ -109,6 +125,8 @@
 
   "3_5": {
     id: "3_5",
+    fromId: "binah",
+    toId: "gevurah",
     hermetic: {
       hebrewLetterId: "het",
       pathNo: 18,
@@ -123,6 +141,8 @@
 
   "3_6": {
     id: "3_6",
+    fromId: "binah",
+    toId: "tiferet",
     hermetic: {
       hebrewLetterId: "zayin",
       pathNo: 17,
@@ -137,6 +157,8 @@
 
   "4_5": {
     id: "4_5",
+    fromId: "hesed",
+    toId: "gevurah",
     hermetic: {
       hebrewLetterId: "tet",
       pathNo: 19,
@@ -151,6 +173,8 @@
 
   "4_6": {
     id: "4_6",
+    fromId: "hesed",
+    toId: "tiferet",
     hermetic: {
       hebrewLetterId: "yod",
       pathNo: 20,
@@ -165,6 +189,8 @@
 
   "4_7": {
     id: "4_7",
+    fromId: "hesed",
+    toId: "netzach",
     hermetic: {
       hebrewLetterId: "kaf",
       pathNo: 21,
@@ -179,6 +205,8 @@
 
   "5_6": {
     id: "5_6",
+    fromId: "gevurah",
+    toId: "tiferet",
     hermetic: {
       hebrewLetterId: "lamed",
       pathNo: 22,
@@ -193,6 +221,8 @@
 
   "5_8": {
     id: "5_8",
+    fromId: "gevurah",
+    toId: "hod",
     hermetic: {
       hebrewLetterId: "mem",
       pathNo: 23,
@@ -207,6 +237,8 @@
 
   "6_7": {
     id: "6_7",
+    fromId: "tiferet",
+    toId: "netzach",
     hermetic: {
       hebrewLetterId: "nun",
       pathNo: 24,
@@ -221,6 +253,8 @@
 
   "6_8": {
     id: "6_8",
+    fromId: "tiferet",
+    toId: "hod",
     hermetic: {
       hebrewLetterId: "ayin",
       pathNo: 26,
@@ -235,6 +269,8 @@
 
   "6_9": {
     id: "6_9",
+    fromId: "tiferet",
+    toId: "yesod",
     hermetic: {
       hebrewLetterId: "samekh",
       pathNo: 25,
@@ -249,6 +285,8 @@
 
   "7_8": {
     id: "7_8",
+    fromId: "netzach",
+    toId: "hod",
     hermetic: {
       hebrewLetterId: "pe",
       pathNo: 27,
@@ -263,6 +301,8 @@
 
   "7_9": {
     id: "7_9",
+    fromId: "netzach",
+    toId: "yesod",
     hermetic: {
       hebrewLetterId: "tsadi",
       pathNo: 28,
@@ -277,6 +317,8 @@
 
   "7_10": {
     id: "7_10",
+    fromId: "netzach",
+    toId: "malchut",
     hermetic: {
       hebrewLetterId: "qof",
       pathNo: 29,
@@ -288,6 +330,8 @@
 
   "8_9": {
     id: "8_9",
+    fromId: "hod",
+    toId: "yesod",
     hermetic: {
       hebrewLetterId: "resh",
       pathNo: 30,
@@ -302,6 +346,8 @@
 
   "8_10": {
     id: "8_10",
+    fromId: "hod",
+    toId: "malchut",
     hermetic: {
       hebrewLetterId: "shin",
       pathNo: 31,
@@ -313,6 +359,8 @@
 
   "9_10": {
     id: "9_10",
+    fromId: "yesod",
+    toId: "malchut",
     hermetic: {
       hebrewLetterId: "tav",
       pathNo: 32,

@@ -242,6 +242,26 @@ describe("the data against the graph", () => {
     ]);
   });
 
+  it("counts a path whose id does not spell the spheres it joins", () => {
+    // `1_6` is Keter to Tiferet by index, and the Tree and the URLs read the
+    // id while the pages read the pair, so the two must not drift. The ends
+    // go in the id's order, so a pair written the wrong way round is wrong
+    // too; an end that names no sephirah is the link check's.
+    const failures = broken("tolPath", {
+      ...tables.tolPath,
+      "1_6": { ...tables.tolPath["1_6"], toId: "hod" },
+      "2_3": { ...tables.tolPath["2_3"], fromId: "binah", toId: "chochmah" },
+      "2_6": { ...tables.tolPath["2_6"], toId: "nowhere" },
+    });
+    expect(of("ends", failures)).toEqual([
+      "tolPath.1_6: names keter and hod, which spell 1_8",
+      "tolPath.2_3: names binah and chochmah, which spell 3_2",
+    ]);
+    expect(of("link", failures)).toEqual([
+      'tolPath.2_6.toId: dangling: no sephirah is keyed "nowhere"',
+    ]);
+  });
+
   it("counts a row its schema rejects", () => {
     const failures = broken("soul", {
       guph: {

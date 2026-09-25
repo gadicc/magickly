@@ -128,6 +128,25 @@ describe("the row types", () => {
     expect(resh.hebrewPath?.hebrew?.hebrewLetter).toBe(resh);
   });
 
+  it("names a path's two sephirot, and each sephirah's paths", () => {
+    // Every one of the twenty-four paths carries both ends, so neither
+    // accessor is optional; Da'at, on no path, has two empty lists.
+    const path = data.tolPath["1_6"];
+    const tiferet = data.sephirah.tiferet;
+    const exact: [
+      Same<typeof path.from, SephirahRow>,
+      Same<typeof path.to, SephirahRow>,
+      Same<typeof tiferet.pathsFrom, readonly TolPathRow[]>,
+      Same<typeof tiferet.pathsTo, readonly TolPathRow[]>,
+    ] = [true, true, true, true];
+    expect(exact).not.toContain(false);
+
+    const joins: string = `${path.from.name.roman}–${path.to.name.roman}`;
+    expect(joins).toBe("Keter–Tiferet");
+    expect(tiferet.pathsTo).toContain(path);
+    expect(data.sephirah.daat.pathsFrom).toEqual([]);
+  });
+
   it("is readonly wherever assemble() froze it", () => {
     // Each of these used to compile and then throw, because `assemble()`
     // deep-freezes and the types said nothing about it. They are now compile

@@ -132,6 +132,10 @@ export const graph = {
         inverse: "hermeticPath",
       },
       "hebrew.hebrewLetterId": { to: "hebrewLetter", inverse: "hebrewPath" },
+      // The two spheres a path joins, in the order its id spells them, which
+      // the integrity check holds the id to. One pair serves both trees.
+      fromId: { to: "sephirah", inverse: "pathsFrom", inverseMany: true },
+      toId: { to: "sephirah", inverse: "pathsTo", inverseMany: true },
       nextId: { to: "tolPath", mirrors: "prevId" },
       prevId: { to: "tolPath", mirrors: "nextId" },
     },
