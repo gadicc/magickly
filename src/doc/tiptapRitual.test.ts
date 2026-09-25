@@ -66,4 +66,36 @@ describe("Tiptap semantic adapter", () => {
       children: [{ text: "New" }],
     });
   });
+
+  it("joins newly typed plain text while retaining imported text boundaries", () => {
+    const original = semanticFromJrt({
+      children: [
+        {
+          type: "task",
+          do: true,
+          role: "keryx",
+          children: [
+            { type: "text", value: "Open" },
+            { type: "text", value: " the door" },
+          ],
+        },
+      ],
+    });
+    const editor = semanticToTiptap(original);
+    expect(semanticToJrt(semanticFromTiptap(editor))).toEqual(
+      semanticToJrt(original),
+    );
+    editor.content![0].content![0].content!.push({
+      type: "text",
+      text: ".",
+    });
+    const changed = semanticFromTiptap(editor);
+    expect(changed.nodes[0]).toMatchObject({
+      tag: "task",
+      children: [
+        { kind: "text", text: "Open" },
+        { kind: "text", text: " the door." },
+      ],
+    });
+  });
 });

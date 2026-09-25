@@ -18,6 +18,9 @@ const mock = vi.hoisted(() => ({
   clear: vi.fn(),
   send: vi.fn(),
   permissionDenied: false,
+  phase: "ready" as "ready" | "locked",
+  activateOnRefresh: false,
+  transientLockOnRefresh: false,
   owner: "",
   listeners: [] as Array<() => void>,
 }));
@@ -42,14 +45,27 @@ vi.mock("@/offline/browserRuntime", () => ({
   getBrowserOfflineRuntime: () => ({
     coordinator: {
       state: {
-        phase: "ready",
+        get phase() {
+          return mock.phase;
+        },
         get account() {
-          return { ownerId: mock.owner };
+          return mock.phase === "ready" ? { ownerId: mock.owner } : null;
         },
       },
     },
     start: async () => {},
-    refreshVerifiedAccount: async () => {},
+    refreshVerifiedAccount: async () => {
+      if (mock.transientLockOnRefresh) {
+        mock.phase = "locked";
+        for (const listener of mock.listeners) listener();
+        mock.phase = "ready";
+        for (const listener of mock.listeners) listener();
+      }
+      if (mock.activateOnRefresh) {
+        mock.phase = "ready";
+        for (const listener of mock.listeners) listener();
+      }
+    },
     subscribeState: (listener: () => void) => {
       mock.listeners.push(listener);
       return () => {
@@ -85,6 +101,9 @@ afterEach(() => {
   cleanup();
   vi.clearAllMocks();
   mock.owner = "";
+  mock.phase = "ready";
+  mock.activateOnRefresh = false;
+  mock.transientLockOnRefresh = false;
   mock.permissionDenied = false;
   mock.listeners = [];
 });
@@ -133,6 +152,45 @@ it("applies a compact source shortcut and saves semantic JSON through v3", async
     { tag: "task", attrs: { say: true, role: "hiero" } },
     { tag: "task", attrs: { do: true, role: "keryx" } },
   ]);
+  await screen.findByText("Saved as a semantic revision.");
+  const writesAfterSave = mock.saveDraft.mock.calls.length;
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  expect(mock.saveDraft).toHaveBeenCalledTimes(writesAfterSave);
+  fireEvent.change(source, {
+    target: {
+      value: `${(source as HTMLTextAreaElement).value}* Keryx Closes the door\n`,
+    },
+  });
+  await waitFor(
+    () =>
+      expect(mock.saveDraft.mock.calls.length).toBeGreaterThan(writesAfterSave),
+    { timeout: 1500 },
+  );
+});
+
+it("waits for initial account activation before deciding access is locked", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  mock.phase = "locked";
+  mock.activateOnRefresh = true;
+  render(<SemanticEditor {...setup} />);
+  await screen.findByRole("button", { name: "Save" });
+  expect(screen.queryByText(/Editor access changed/)).toBeNull();
+});
+
+it("survives the coordinator's temporary lock during a verified refresh", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  mock.transientLockOnRefresh = true;
+  render(<SemanticEditor {...setup} />);
+  await screen.findByRole("button", { name: "Save" });
+  await act(async () => {
+    fireEvent.focus(window);
+  });
+  await screen.findByRole("button", { name: "Save" });
+  expect(screen.queryByText(/Editor access changed/)).toBeNull();
 });
 
 it("retries an unknown save with the identical operation and payload", async () => {
@@ -250,4 +308,25 @@ it("confirms a pending receipt after the server revision has advanced", async ()
   );
   await screen.findByText(/pending save is confirmed/i);
   expect(mock.clear).toHaveBeenCalledWith(setup.actorId, setup.ritualId);
+});
+
+it("reports a confirmed save when local draft cleanup fails", async () => {
+  mock.load.mockResolvedValue(undefined);
+  mock.saveDraft.mockResolvedValue(undefined);
+  mock.clear.mockRejectedValue(new Error("IndexedDB unavailable"));
+  const setup = props();
+  mock.owner = setup.actorId;
+  mock.send.mockResolvedValue({
+    ok: true,
+    replayed: false,
+    ritualId: setup.ritualId,
+    revisionId: createUuidV7(),
+    version: 8,
+    updatedAt: new Date().toISOString(),
+  });
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "Save" }));
+  await screen.findByText("Saved as a semantic revision.");
+  expect(screen.getByText(/local draft could not be cleared/i)).toBeTruthy();
+  expect(mock.send).toHaveBeenCalledTimes(1);
 });

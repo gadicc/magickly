@@ -169,6 +169,7 @@ export const ritualTiptapExtensions = [
     horizontalRule: false,
     listItem: false,
     orderedList: false,
+    trailingNode: false,
   }),
   RitualBlock,
   RitualSpan,
@@ -304,7 +305,29 @@ function fromBlocks(nodes: JSONContent[]): RitualSemanticNode[] {
           tag: "br",
           attrs: {},
         });
-      result.push(...(node.content ?? []).map(fromInline));
+      let previousSegment: string | null = null;
+      for (const part of node.content ?? []) {
+        const converted = fromInline(part);
+        const segment = part.marks?.find(
+          (mark) => mark.type === "ritualSegment",
+        )?.attrs?.id;
+        const last = result.at(-1);
+        if (
+          converted.kind === "text" &&
+          converted.text !== "" &&
+          last?.kind === "text" &&
+          last.text !== "" &&
+          (typeof segment !== "string" ||
+            previousSegment === null ||
+            segment === previousSegment)
+        )
+          last.text += converted.text;
+        else result.push(converted);
+        previousSegment =
+          converted.kind === "text" && typeof segment === "string"
+            ? segment
+            : null;
+      }
       previousParagraph = true;
       continue;
     }

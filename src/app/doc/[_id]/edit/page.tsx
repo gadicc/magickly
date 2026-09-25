@@ -1,4 +1,4 @@
-import { Alert, Button } from "@mui/material";
+import { Alert } from "@mui/material";
 import Link from "next/link";
 import { connection } from "next/server";
 import { resolveSqlRitualRouteId } from "@/doc/sqlRuntime";
@@ -19,9 +19,9 @@ export default async function DocEditPage({
   return ritualId ? (
     <>
       {process.env.RITUAL_SEMANTIC_EDITOR === "1" && (
-        <Button component={Link} href={`/doc/${ritualId}/edit/semantic`}>
+        <Link href={`/doc/${ritualId}/edit/semantic`}>
           Try the new ritual editor
-        </Button>
+        </Link>
       )}
       <SqlDocEdit key={ritualId} ritualId={ritualId} />
     </>

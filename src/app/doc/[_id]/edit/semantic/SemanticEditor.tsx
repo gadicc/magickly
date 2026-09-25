@@ -90,7 +90,25 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   const [role, setRole] = React.useState("all");
   const skipPersist = React.useRef(true);
   const liveDraft = React.useRef<SemanticDraft | null>(null);
+  const confirmedSave = React.useRef<{
+    revisionId: string;
+    version: number;
+    title: string;
+    documentJson: string;
+  } | null>(null);
+  const draftWrites = React.useRef<Promise<void>>(Promise.resolve());
   const accessGeneration = React.useRef(0);
+
+  const queueDraftWrite = React.useCallback(
+    (operation: () => Promise<unknown>) => {
+      const next = draftWrites.current.then(async () => {
+        await operation();
+      });
+      draftWrites.current = next.catch(() => {});
+      return next;
+    },
+    [],
+  );
 
   const editor = useEditor({
     extensions: ritualTiptapExtensions,
@@ -106,6 +124,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     onUpdate({ editor: changed }) {
       try {
         const next = semanticFromTiptap(changed.getJSON());
+        if (confirmedSave.current?.documentJson === stringify(next)) return;
         skipPersist.current = false;
         setDocument(next);
         setSource((current) =>
@@ -148,12 +167,14 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     if (!editor) return;
     let active = true;
     let seenReady = false;
-    let permissionReady = false;
+    let permanentlyLocked = false;
+    let verifying = false;
     let unsubscribe = () => {};
     let runtime: ReturnType<typeof getBrowserOfflineRuntime> | null = null;
     const requests = new Set<AbortController>();
     const lock = () => {
-      if (!active) return;
+      if (!active || permanentlyLocked) return;
+      permanentlyLocked = true;
       seenReady = true;
       accessGeneration.current++;
       const recovery = liveDraft.current;
@@ -174,18 +195,16 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       setAccess("locked");
     };
     const checkState = () => {
-      if (!active || !runtime) return;
+      if (!active || !runtime || permanentlyLocked) return;
       const state = runtime.coordinator.state;
-      if (
-        state.phase === "locked" ||
-        (state.phase === "ready" && state.account?.ownerId !== props.actorId)
-      ) {
+      if (state.phase === "ready" && state.account?.ownerId !== props.actorId) {
         lock();
         return;
       }
-      if (!seenReady && permissionReady && state.phase === "ready") {
-        seenReady = true;
-        setAccess("ready");
+      if (state.phase === "locked" && seenReady) {
+        // A verified account refresh also emits a temporary locked state.
+        setAccess("checking");
+        if (!verifying) void recheck().catch(lock);
       }
     };
     const verifyPermission = async () => {
@@ -211,20 +230,29 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       }
     };
     const recheck = async () => {
-      if (!active || !runtime) return;
-      await runtime.refreshVerifiedAccount();
-      if (!active) return;
-      const state = runtime.coordinator.state;
-      if (
-        state.phase !== "ready" ||
-        state.account?.ownerId !== props.actorId ||
-        !(await verifyPermission())
-      ) {
-        lock();
-        return;
+      if (!active || !runtime || permanentlyLocked || verifying) return;
+      verifying = true;
+      setAccess("checking");
+      try {
+        await runtime.refreshVerifiedAccount();
+        if (!active || permanentlyLocked) return;
+        const state = runtime.coordinator.state;
+        if (
+          state.phase !== "ready" ||
+          state.account?.ownerId !== props.actorId ||
+          !(await verifyPermission()) ||
+          runtime.coordinator.state.phase !== "ready" ||
+          runtime.coordinator.state.account?.ownerId !== props.actorId
+        ) {
+          lock();
+          return;
+        }
+        if (!active || permanentlyLocked) return;
+        seenReady = true;
+        setAccess("ready");
+      } finally {
+        verifying = false;
       }
-      permissionReady = true;
-      checkState();
     };
     try {
       runtime = getBrowserOfflineRuntime();
@@ -253,7 +281,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   }, [editor, props.actorId, props.ritualId]);
 
   React.useEffect(() => {
-    if (!editor || access !== "ready") return;
+    if (!editor || access !== "ready" || ready) return;
     let active = true;
     loadSemanticDraft(props.actorId, props.ritualId)
       .then((draft) => {
@@ -300,6 +328,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   }, [
     editor,
     access,
+    ready,
     props.actorId,
     props.ritualId,
     props.revisionId,
@@ -320,6 +349,18 @@ export default function SemanticEditor(props: SemanticEditorProps) {
 
   React.useEffect(() => {
     if (access !== "ready" || !ready || skipPersist.current) return;
+    const confirmed = confirmedSave.current;
+    if (
+      confirmed &&
+      confirmed.revisionId === base.revisionId &&
+      confirmed.version === base.version &&
+      confirmed.title === title &&
+      confirmed.documentJson === stringify(document) &&
+      !source.dirty &&
+      !source.conflict &&
+      !pending
+    )
+      return;
     liveDraft.current = {
       ownerId: props.actorId,
       ritualId: props.ritualId,
@@ -347,7 +388,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         pending,
         updatedAt: Date.now(),
       };
-      void saveSemanticDraft(draft).catch(() =>
+      void queueDraftWrite(() => saveSemanticDraft(draft)).catch(() =>
         setError(
           "The local draft could not be saved. Download a recovery copy.",
         ),
@@ -364,6 +405,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     document,
     source,
     pending,
+    queueDraftWrite,
   ]);
 
   const currentDraft = (): SemanticDraft => ({
@@ -516,7 +558,9 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     setPending(request);
     setNotice(null);
     try {
-      await saveSemanticDraft({ ...currentDraft(), pending: request });
+      await queueDraftWrite(() =>
+        saveSemanticDraft({ ...currentDraft(), pending: request }),
+      );
       const result = await sendSqlRitualWrite(
         request,
         new AbortController().signal,
@@ -532,10 +576,25 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         return;
       }
       skipPersist.current = true;
+      confirmedSave.current = {
+        revisionId: result.revisionId,
+        version: result.version,
+        title,
+        documentJson: request.source,
+      };
+      liveDraft.current = null;
       setBase({ revisionId: result.revisionId, version: result.version });
       setPending(null);
-      await clearSemanticDraft(props.actorId, props.ritualId);
-      setError(null);
+      try {
+        await queueDraftWrite(() =>
+          clearSemanticDraft(props.actorId, props.ritualId),
+        );
+        setError(null);
+      } catch {
+        setError(
+          "The revision was saved, but its local draft could not be cleared. Reload to recover or discard that draft.",
+        );
+      }
       setNotice(
         result.replayed
           ? "Save confirmed after retry."
