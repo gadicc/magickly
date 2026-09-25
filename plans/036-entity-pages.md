@@ -5,7 +5,8 @@ Assessment, design and decisions, 21–25 September 2026. Read
 [plan 032](032-data-layer.md), whose barrel hands every page a row with its
 links resolved, and closes the follow-up both that plan and
 [plan 028](028-seo.md#follow-ups) deferred: the four pages that print a row
-as JSON. Approved for implementation on 25 September.
+as JSON. Approved on 25 September and built the same day on
+`gate/entity-pages` ([Commits](#commits), [Results](#results)).
 
 Decision taken on 22 September: each of the four pages lays out its row's
 correspondences by hand, in one order, as a Server Component, with every
@@ -544,11 +545,222 @@ rendered the Tree three times — `active="tiferet"`, `activePath="1_6"`, and
 - `renderToString(await Page(props))` in vitest, as the route test does it,
   passes on the spike page.
 
+## Commits
+
+On `gate/entity-pages` from `558d1b4`. Each commit was checked on its own
+tree with `pnpm check`, `pnpm typecheck`, `pnpm data:check` and `pnpm test`,
+`data/dist` wiped before each, by a script that records every step's exit
+status ([below](#the-checks-and-a-shell-that-ignores-set--e)); the branch was
+then gated as [below](#results).
+
+| Commit | Change | Tests |
+| --- | --- | ---: |
+| `ceae007` docs(plan): Plan the entity pages | This plan as approved, and the status page's pointer | — |
+| `6e6e5b4` refactor(data): Print the dumps' links by id | The four dumps print a linked row by its id, through one helper, so the back-links below cannot grow them; `decycle` goes | 4,754 |
+| `e7c413e` chore(deps): Retire cycle | The package nothing imports any more; the lockfile loses its three entries and nothing else | 4,754 |
+| `393268f` feat(data): Declare the entity pages' back-links | The seven inverses of decision 1, the pins, and a planted uniqueness test through a nested link | 4,757 |
+| `40d3ad1` feat(data): Name each path's two sephirot | `fromId`/`toId` on the 24 paths, `pathsFrom`/`pathsTo`, the `ends` rule; `pathPage()` reads the links | 4,759 |
+| `d033ad4` fix(data): Spell brilliance and lavender | Decision 14, and the `tenHeavens` comment | 4,759 |
+| `fcab8c1` fix(data): Spell Draconis and putrefaction | Ketu's name, the Black Dragon's gloss, the Enochian letter F's planet, and a comment | 4,759 |
+| `11d7fcb` refactor(kabbalah): Share the angel page's table | `src/components/entity/`, the row declarations and their test, the page assertion and its test, the angel page moved onto them with a golden, `pathnames.kabbalah.angel` removed | 4,772 |
+| `ca0f822` feat(tarot): Name trumps as the cards print them | `RWSName()` and `trumpNumeral()` beside `RWSPath()` | 4,775 |
+| `85e0ca4` feat(kabbalah): Show a sephirah's correspondences | The page, decision 18, and Da'at's one colour scale in its description | 4,784 |
+| `c203251` feat(kabbalah): Show a path's correspondences | The page | 4,791 |
+| `923748a` feat(astrology): Show a planet's correspondences | The page, the sigil's mock in the route test, `aria-hidden` through `PlanetarySpirit` | 4,803 |
+| `c408beb` feat(gd): Show a grade's correspondences | The page, `GradeTree` without `"use client"`, and the dump helper deleted with the last dump | 4,812 |
+
+A fourteenth commit, `docs(plan): Record the entity pages`, adds this
+section and the ones after it; as in plan 032 it is not in the table, which
+it would have to predict.
+
+The design ran on Fable 5.1 at xhigh, and so did the adversarial review
+of the implementation. The implementation ran on Opus 5.5 at xhigh: the
+three planned data commits, the shared pieces and each of the four pages
+in a subagent of its own, the four pages at once in four worktrees from
+one tip; the dump helper, the dependency, the second spelling fix, the
+trump names, the stacking of the four pages and the review's fixes in
+the session that orchestrated them.
+
 ## Results
 
-Pending the gate.
+The gate ran on `c408beb`, the implementation's tip, in the
+`gate/entity-pages` worktree with the symlinked `node_modules` removed and
+a fresh `pnpm install --frozen-lockfile`, on Node 24.18.0 and pnpm 10.18.0,
+under CI's placeholder environment, in
+[ci.yml](../.github/workflows/ci.yml)'s order, from a script file whose
+every step's status was read:
+
+| Step | Outcome |
+| --- | --- |
+| `pnpm install --frozen-lockfile` | clean; no dependency added, `cycle` removed |
+| `loom init` | already matches the bootstrap defaults |
+| `loom check` | good, with the standing advisory |
+| `loom check --production` | good, same advisory |
+| `pnpm check` | no errors, and the same 35 warnings as `main` |
+| `pnpm typecheck` | clean |
+| `pnpm test:coverage` | 4,812 passed, 17 skipped, thresholds met |
+| `pnpm build` | webpack, 386 pages prerendered |
+| `pnpm check:turbopack` | Turbopack, 386 pages prerendered |
+
+What a reader sees change:
+
+- The four entity pages lay out their correspondences instead of printing
+  their rows as JSON, as the sections above sketch them. Every value with a
+  page links to it; the Tree, the grade tree and the chakra figure draw on
+  the server. The path page's letter reads "Aleph · 1 · “ox”" where it read
+  `Aleph ("")`; Da'at's Tree draws Da'at; Neophyte's and the Portal's grade
+  trees are dimmed where "(no sephirah)" was.
+- The angel page sits in the site's frame, 600px rather than 44rem, with its
+  links in the site's colour, one heading where the bar added a second, and
+  its text otherwise unchanged, which a golden captured before the move
+  proves; on a phone the labels of every entity table wrap.
+- The drawer no longer offers "The 72 Angels" under Kabbalah, which linked
+  to `/kabbalah/angel`, a 404.
+- Search: Da'at's description calls it the hidden Sephirah and promises its
+  Queen scale alone; Ketu's title and description say Cauda Draconis. The
+  entity pages' titles, descriptions and cards are otherwise byte for byte
+  what they were, 134 of them compared by the review, and only Ketu's card
+  is redrawn, for its title.
+- Keter's King scale reads "brilliance" and Da'at's Queen scale "lavender";
+  the alchemy flashcards and the Zelator page read "putrefaction".
+
+No rendered image moved: the registry test pins every component image's
+bytes and inputs hash and passed unchanged on every commit, and no image
+contract names a back-link, a path's ends, a colour's name, a planet's
+English name or an alchemy gloss.
+
+### What the pages ship
+
+`next build --webpack` under CI's environment, the client chunks read from
+the prerendered HTML under `.next/server/app`, raw bytes and then gzipped,
+on `main` at `558d1b4` and on `c000d61`, the page commits as the review saw
+them; the review's fixes after it change no client code these routes
+load:
+
+| Page | Chunks, `558d1b4` | Chunks, `c000d61` | HTML, `558d1b4` | HTML, `c000d61` |
+| --- | ---: | ---: | ---: | ---: |
+| `/astrology/planet/sol` | 1,258,969 / 404,179 | 1,264,887 / 406,374 | 438,756 / 54,072 | 56,385 / 10,583 |
+| `/gd/grade/5=6` | 1,336,029 / 427,988 | 1,264,887 / 406,374 | 856,672 / 100,120 | 111,039 / 15,945 |
+| `/kabbalah/sephirah/tiferet` | 1,345,774 / 431,148 | 1,264,887 / 406,374 | 533,141 / 60,058 | 129,280 / 20,031 |
+| `/kabbalah/path/1_6` | 1,441,018 / 464,747 | 1,264,887 / 406,374 | 120,465 / 14,482 | 111,762 / 16,053 |
+| `/kabbalah/angel/achaiah` | 1,258,969 / 404,179 | 1,264,887 / 406,374 | 55,961 / 10,507 | 58,336 / 10,826 |
+| `/gd/grades` | 1,348,069 / 432,246 | 1,280,510 / 411,889 | 85,363 / 12,706 | 120,180 / 16,150 |
+
+The grade, sephirah and path routes no longer load the barrel's chunk
+(`3636-*.js`, 56 KB raw): the five entity routes now load the same 28
+chunks, none of which holds a table. That is 21 to 58 KB of gzipped
+JavaScript fewer on those three, and the dumps' removal takes 40 to 84 KB
+of gzipped HTML off the planet, grade and sephirah pages. The planet and
+angel routes gain one chunk, 2.2 KB gzipped, most likely the site's MUI
+`Link`, which the planet page did not use before and which replaced
+`next/link` on the angel page; the chunk was not identified by name.
+`/gd/grades` sheds the barrel with `GradeTree`'s
+directive, and its HTML, like the path page's, grows by the Tree's markup
+travelling in the page's server payload as well as its HTML, 3.4 and 1.6 KB
+gzipped; `/gd` alike. `/kabbalah/tree` is a client page and keeps the
+barrel, as it should.
+
+In the browser, against `next start` on a production build of `c000d61`
+on a fresh port: the Tiferet, Zelator, Sol and Ariel pages render as
+sketched at the pane's width and Binah at a phone's, with no console error
+but the placeholder database's `/api/auth/get-session` 503s and no
+hydration warning; the spirit's sigil, an SVGR import that every test
+mocks, renders inside the Server Component on Sol's page, which is the one
+thing the spike had not covered. No Safari.
+
+### Type cost
+
+`tsc --noEmit --incremental false --extendedDiagnostics` over the whole
+repository, after `data:build` and `next typegen`:
+
+| Tree | Files | Types | Instantiations |
+| --- | ---: | ---: | ---: |
+| `558d1b4`, `main` | 5,523 | 407,608 | 1,849,397 |
+| `c4a2415`, the page commits after the review's fixes | 5,539 | 410,187 | 1,867,724 |
+
+18,327 instantiations, against a budget of 5,000,000. The data commits were
+also measured one by one before the dump helper went under them, on the
+trees as first written: the seven inverses cost 5,212 instantiations and
+the paths' ends 3,762, and the colour fix nothing. Check times were 7 to
+15 s and moved with the machine's load, so none is quoted. `c4a2415` is not
+on the branch: it is the page commits before Da'at's colour scale, which
+changes one string.
+
+### What was decided while building it
+
+- **The dumps print links by id before anything else lands.** The
+  back-links let a planet's or a letter's links reach most of the data, and
+  the dumps printed a linked row whole: measured on the data commits as
+  first written, the 62 pages went from 14.3 MB of markup to 143.7 MB, Sol's
+  from 235 kB to 4.3 MB, for every commit until each page's own replaced
+  its dump. `6e6e5b4` makes the dumps print a linked row by its id first
+  (1.4 MB for the 62), which leaves `decycle` nothing to do, so `cycle` is
+  retired second rather than ninth, and the helper goes with the last dump.
+- **`pathnames.kabbalah.angel` is removed, not made a section** (decision
+  15). There is no `/kabbalah/angel` page, so a section would have given
+  the bar a breadcrumb to a 404, and the drawer already linked the entry to
+  one. With the entry gone, the bar treats an angel's page as it treats a
+  sephirah's, and `pathnames.test.ts` holds every path the bar names to a
+  `page.tsx`.
+- **Decision 13's exceptions are two, and Da'at's is wider.** Ketu's title
+  and description change with the Draconis fix, and Da'at's description
+  promises its one colour scale where it promised both. Nothing else.
+- **Three more misspellings, one commit.** Ketu's "Cauda Draconic" and
+  the Black Dragon's "Putrafaction" were found by the page implementers
+  where the new pages print them, and the Enochian letter F's "Cauda
+  Draonis" by the search that followed. Hesed's stone, "saphire", is left:
+  it is one of the Tree's image fields, so the fix re-identifies every Tree
+  image.
+- **Trumps are named as their Rider-Waite cards print them.** tarot-deck
+  says "The Papess/High Priestess", "The Pope/Hierophant" and "The Wheel";
+  `RWSName()` gives the printed names and `trumpNumeral()` the numerals,
+  beside `RWSPath()`, for both pages that name trumps. The search
+  descriptions keep the deck's names ([follow-ups](#follow-ups)).
+- **Every Tree page passes `flip={false}`.** The Tree appends
+  `flip && "…"` to its stylesheet, so leaving `flip` out wrote "undefined"
+  there, which the page assertion refuses; `false` is what the Tree page
+  and the image registry already write. The Tree's own fix,
+  `flip ? "…" : ""`, changes the source the image registry outlines, which
+  makes it a render-identity decision, and is a follow-up.
+- **The page assertion knows a same-page reference.** The Tree lays its
+  labels along curves it names `#topTextPath0`; `expectEntityPage` holds
+  such a reference to an element the page has, rather than taking it for a
+  route, and its own test proves it on a whole Tree.
+- **The shared pieces are more than the sketch named.** `EntityFrame`,
+  `FigureNav`, `EntityTable`, `Hebrew`, `Lede` and `Muted` beside `Trail`,
+  `Row`, `Name` and `PrevNext`; every table page's lede is a `Lede` and
+  ends with a full stop, and the angel page's attribute line is set as
+  one.
+- **Each page tests its own ids.** The route test stays at its four ids and
+  gains only the sigil's mock; each page's test renders every id of its
+  table through `expectEntityPage`, and `entityFields.test.ts` names all
+  five declarations it must find.
+- **Choices in the pages the sketches did not settle.** The sephirah's
+  paths are a list, not a second table, since a row's label column is
+  12rem for a two-digit number; a sphere's page is its lede, with no table;
+  God names carry their English meaning, archangels do not, Gabriel's
+  `name.en` being the English form of the name; a chakra reads its English
+  name, its Sanskrit, the romanisation and the meaning; Neophyte is "not
+  attributed to a Sephirah"; the metals link through the planet they are
+  attributed to rather than their own name.
+- **`pathTarget()` does walk a derived inverse.** Plan 036 deferred that as
+  missing; it has walked `planet.sephirot` since step 3c, and the nine new
+  accessors resolve as field paths from the first data commit.
+
+### The checks, and a shell that ignores `set -e`
+
+Midway through, one page implementer found that the per-commit check line
+every brief had given, `( set -eo pipefail; …; pnpm typecheck; … ); echo
+"exit=$?"`, printed `exit=0` with a failing typecheck: in the Claude Code
+Bash tool `set -e` and `pipefail` are ignored, at top level and inside a
+subshell, while `bash -c` and a script file honour them. Every commit was
+checked again by a script run with `bash`, one step at a time, each exit
+status written beside the step, and every step of every commit passed; the
+counts above are that script's. The gate had always been a script file.
 
 ## Adversarial review
+
+### Of the design, 22 September
 
 Run on 22 September at xhigh by Fable 5.1 against the plan as first written,
 using `loom-torvalds-review` and scratch scripts over the real data under
@@ -598,6 +810,40 @@ Not checked: the provenance of `magickTypes`, which needs the books; the
 SVGR sigil inside a Server Component, which the gate proves on
 `/astrology/planet/sol`; production chunk sizes and any browser rendering.
 
+### Of the implementation, 25 September
+
+Run at xhigh by Fable 5.1 on `c000d61`, the page commits before its fixes,
+using `loom-torvalds-review`: all 62 pages rendered and read as text, the
+branch's tests, `data:check`, `tsc`, the golden recomputed from `558d1b4`,
+a planted second grade on Sol, and `entityPages()` compared at both ends.
+No blocker. Its findings and their disposition:
+
+| Finding | Disposition |
+| --- | --- |
+| The planet page quoted Gabriel's English name as a meaning, "Gavriel “Gabriel”", where the sephirah page gives none | Dropped; Luna's archangel pinned |
+| Decisions 13 and 15 no longer describe the tree: the angel entry was removed, not made a section, and Ketu's title moved | Recorded [above](#what-was-decided-while-building-it) |
+| `flip={false}` writes "false" into the Tree's stylesheet where "undefined" was; the fix is one line in the Tree | Kept, since the Tree's fix moves its source bytes; a follow-up |
+| Data the pages now set side by side disagrees: Keter's heaven "Roshit haGilgulim" against its sphere's "Roshit HaGilgulim", Malchut's "Olam Yesodoth" against "Olam haYesodot"; the god names spell Tzva'ot צבעות where Lenain's pages print צבאות; the body values read as slugs, "Left-face"; Hesed's "saphire" | [Follow-ups](#follow-ups); the Tzva'ot spelling is an error, not a variant |
+| Neophyte's lede, "attributed to no Sephirah", read oddly | "not attributed to a Sephirah" |
+| `entityFields.test.ts` named only the angel's declaration as found, so a table page's moved `fields.ts` would drop out silently | All five named, each by its own commit |
+| The spirit's sigil had no accessible name beside the name it draws | `aria-hidden`, passed through `PlanetarySpirit` to its wrapper |
+| The planet commit said its only client module was the site's `Link`; MUI's frame is too | Corrected |
+| The dump helper's commit is scoped `data` and touches only `src/` | Kept: it is about how the pages print the data's rows |
+| The planet page imports the Chaldean order from the planetary hours' utilities, which bring `suncalc` and `date-fns` | Server-only on a static page; a follow-up |
+
+It verified, with scripts: the SEO difference is exactly Da'at's
+description and Ketu's title and description; the lockfile change is
+exactly `cycle`; the golden equals the text of `558d1b4`'s angel page byte
+for byte; `data:check` refuses a second grade on Sol; the `ends` rule and
+its planted cases; every shown key of all five declarations renders and
+nothing rendered is undeclared; no page or shared piece has a directive or
+a hook, and the client components receive strings, plain objects and
+children; one `h1`, `scope="row"`, `alt`, and every Hebrew and Devanagari
+run in its `lang`. It refuted this plan's "Tests" on the route test's
+sixty-two ids, which live in the pages' own tests. It could not check the
+sigil under the RSC runtime, the chunks or a browser, which the gate and
+the browser check above did. The sephirah implementer had found Da'at's
+description promising a King scale; that was fixed after the review.
 
 ## Deferred
 
@@ -608,14 +854,37 @@ SVGR sigil inside a Server Component, which the gate proves on
   here needs structured data to say what the tables say.
 - Anchors on `/geomancy/reference` for each figure, so a planet's Geomantic
   figures row can land on the figure rather than the page.
-- `pathTarget()` does not walk a derived inverse; no public dotted path
-  uses one, and the Tree's field list is the place it would first matter.
 
 ## Follow-ups
 
-- The source of `magickTypes` ([assessment](#assessment-before)); once named,
-  the editorial-summary note becomes a citation.
-- The alchemy row and the angel page refactor are the owner's to review
-  specifically once rendered (decisions 7 and 8).
-- `/books/la-science-cabalistique/<division>` renders two `h1`s for the
-  reason the angel route did (decision 15); plan 033's to fix.
+- **The owner's review** of the Zelator page's alchemy row and of the angel
+  page in its new frame (decisions 7 and 8).
+- **The source of `magickTypes`** ([assessment](#assessment-before)); once
+  named, the editorial-summary note becomes a citation.
+- **The Tree's stylesheet.** `TreeOfLife.tsx` appends `flip && "…"`, which
+  writes "false" or "undefined" into the `<style>` of every unflipped Tree;
+  `flip ? "…" : ""` is the fix. It changes the source SVG the image registry
+  outlines, so it waits for a decision on the Tree's render identity: a
+  profile bump re-identifies every published Tree.
+- **Data the pages now show side by side.** The god names spell Tzva'ot
+  צבעות, "colours", on Netzach's and Hod's, where Lenain's pages in this
+  repository print צבאות, "hosts": an error, and `godName.name.he` is one of
+  the Tree's image fields, so the fix moves the Tree's inputs hash. Hesed's
+  stone, "saphire", is an image field too. Keter's heaven, "Roshit
+  haGilgulim", and its sphere's, "Roshit HaGilgulim", disagree in case, and
+  Malchut's, "Olam Yesodoth", and its sphere's, "Olam haYesodot", in
+  spelling. The body values are slugs, so the table reads "Left-face" and
+  "Loins; hips".
+- **The search descriptions name trumps as tarot-deck does**, "The
+  Papess/High Priestess", where the pages name the Rider-Waite cards. Moving
+  them to `RWSName()` changes three descriptions, paths 13, 16 and 21.
+- **The planet page's Chaldean order** comes from the planetary hours'
+  utilities, which import `suncalc` and `date-fns`; the page is static, so
+  it costs only the build, but the seven ids belong in a module of their
+  own.
+- **In [types.ts](../data/types.ts), a derived back-link's arity** is decided
+  per pair of tables rather than per link: a table declaring a list
+  back-link and a single one onto the same target would type both as
+  single. The two pairs that exist agree, so nothing is wrong today.
+- **`/books/la-science-cabalistique/<division>`** renders two `h1`s for the
+  reason the angel route did; plan 033's to fix.
