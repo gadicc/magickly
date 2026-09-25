@@ -27,10 +27,11 @@ import { type Tables, tables } from "./tables";
 /**
  * The data against the graph: every id-shaped field declared, every link
  * resolving, the arity as named, the mirrors symmetric, the chains whole, no
- * accessor shadowing a field, and every row through its schema. This replaces
- * the step-0 audit, which walked the barrel's mutation and listed the links
- * it could not make; plan 032's step 1 emptied that list and step 2 makes the
- * question a real one. Whether the graph names every table, and matches the
+ * singular back-link claimed twice, no accessor shadowing a field, and every
+ * row through its schema. This replaces the step-0 audit, which walked the
+ * barrel's mutation and listed the links it could not make; plan 032's step 1
+ * emptied that list and step 2 makes the question a real one. Whether the
+ * graph names every table, and matches the
  * `graph.json` the build emits, is [graph.test.ts](./graph.test.ts)'s.
  *
  * The checks live in [integrity.ts](./integrity.ts) so that
@@ -147,6 +148,27 @@ describe("the data against the graph", () => {
     expect(of("link", failures)).toContain(
       'element.earth.elementalId: mirror-asymmetric: elemental.gnome.elementId is "air", not "earth"',
     );
+  });
+
+  it("counts a back-link two rows claim where the graph says there is one", () => {
+    // A singular back-link is a claim about the data — one grade per planet,
+    // one metal per planet, one planet per double letter, one path per letter
+    // on each tree (plan 036) — and this is where it is held. Here the
+    // Hermetic tree deals Resh to Netzach–Malchut as well as to Hod–Yesod,
+    // through a link inside a nested block.
+    const failures = broken("tolPath", {
+      ...tables.tolPath,
+      "7_10": {
+        ...tables.tolPath["7_10"],
+        hermetic: {
+          ...tables.tolPath["7_10"].hermetic,
+          hebrewLetterId: "resh",
+        },
+      },
+    });
+    expect(of("link", failures)).toEqual([
+      'hebrewLetter.resh.hermeticPath: inverse-not-unique: more than one tolPath names it, "8_9" among them',
+    ]);
   });
 
   it("counts a mirror the other table does not declare back", () => {
