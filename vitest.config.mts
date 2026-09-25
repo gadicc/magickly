@@ -21,7 +21,12 @@ export default defineConfig({
     globalSetup: ["./data/build.mts"],
     // Agent sessions register git worktrees under .claude/, each a full
     // checkout whose test files this glob would otherwise collect and run.
-    exclude: [...configDefaults.exclude, "output/**", ".claude/**"],
+    exclude: [
+      ...configDefaults.exclude,
+      "output/**",
+      ".claude/**",
+      "editor-trial/**",
+    ],
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "json-summary"],

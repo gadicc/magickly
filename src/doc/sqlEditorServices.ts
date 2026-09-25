@@ -4,6 +4,7 @@ import { asc } from "drizzle-orm";
 import { temples, userGroups } from "../db/schema/memberships";
 import { parseRitualPermissionRequest } from "../offline/permissionContract";
 import { createSqlRitualPermissionChecker } from "../offline/sqlPermissionCheck";
+import { RITUAL_SOURCE_FORMAT } from "./compileContract";
 import type {
   SqlRitualCreationOptionsV1,
   SqlRitualSourceDeliveryV1,
@@ -44,7 +45,8 @@ export function createSqlRitualSourceDeliveryFromServices(
         latest.grant.sourceEdit &&
         latest.editor?.currentRevisionId === selected.currentRevisionId &&
         latest.editor.parentVersion === selected.version &&
-        selected.revision.id === selected.currentRevisionId
+        selected.revision.id === selected.currentRevisionId &&
+        selected.revision.sourceFormat === RITUAL_SOURCE_FORMAT
       )
         source = {
           title: selected.ritual.title,

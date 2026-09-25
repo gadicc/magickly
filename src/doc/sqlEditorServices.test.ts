@@ -11,6 +11,7 @@ import {
 import { userAccess } from "../db/schema/userProfile";
 import { createUuidV7 } from "../lib/ids";
 import type { RitualPermissionResponseV1 } from "../offline/permissionContract";
+import { RITUAL_SOURCE_FORMAT } from "./compileContract";
 import {
   createSqlRitualCreationOptionsReader,
   createSqlRitualSourceDeliveryFromServices,
@@ -50,7 +51,11 @@ const source = {
   ritual: { title: "Protected title" },
   currentRevisionId: revisionId,
   version: 4,
-  revision: { id: revisionId, source: "p Protected" },
+  revision: {
+    id: revisionId,
+    source: "p Protected",
+    sourceFormat: RITUAL_SOURCE_FORMAT,
+  },
 } as Awaited<
   ReturnType<
     ReturnType<
@@ -88,6 +93,19 @@ describe("SQL source delivery race fence", () => {
       },
     });
     expect(check).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not deliver semantic JSON to the legacy Pug editor", async () => {
+    const check = vi.fn().mockResolvedValue(granted());
+    const semantic = {
+      ...source!,
+      revision: { ...source!.revision, sourceFormat: "magickli-semantic-json" },
+    };
+    const deliver = createSqlRitualSourceDeliveryFromServices(
+      check,
+      vi.fn().mockResolvedValue(semantic),
+    );
+    await expect(deliver(request)).resolves.toMatchObject({ source: null });
   });
 
   it("returns the latest denial without source after revocation during the read", async () => {

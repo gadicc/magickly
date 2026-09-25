@@ -1,0 +1,30 @@
+{
+  "name": "magickli-ritual-editor-trial",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.18.0",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@lexical/history": "0.51.0",
+    "@lexical/react": "0.51.0",
+    "@lexical/rich-text": "0.51.0",
+    "@tiptap/core": "3.31.3",
+    "@tiptap/pm": "3.31.3",
+    "@tiptap/react": "3.31.3",
+    "@tiptap/starter-kit": "3.31.3",
+    "lexical": "0.51.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "slate": "0.126.2",
+    "slate-dom": "0.126.0",
+    "slate-history": "0.113.1",
+    "slate-react": "0.127.1"
+  },
+  "devDependencies": {
+    "vite": "8.3.1"
+  }
+}

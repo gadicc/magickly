@@ -14,7 +14,9 @@ let runtime: ReturnType<typeof createSqlRitualEditorHttpHandlers> | undefined;
 export function getSqlRitualEditorRuntime() {
   return (runtime ??= createSqlRitualEditorHttpHandlers({
     source: createSqlRitualSourceDelivery(db, getCurrentSqlUserId),
-    write: createSqlRitualWriter(db, getCurrentSqlUserId),
+    write: createSqlRitualWriter(db, getCurrentSqlUserId, {
+      enableSemanticWrites: process.env.RITUAL_SEMANTIC_EDITOR === "1",
+    }),
     creationOptions: createSqlRitualCreationOptionsReader(
       db,
       getCurrentSqlUserId,

@@ -1,7 +1,7 @@
 import type { RitualScope } from "./access";
 
 interface Base {
-  version: 2;
+  version: 2 | 3;
   operationId: string;
   /** Account-switch guard only; verified session and persisted grants supply authorship/access. */
   expectedActorId: string;
@@ -11,7 +11,7 @@ export interface SqlRitualExpectedState {
   expectedRevisionId: string;
   expectedVersion: number;
 }
-/** Immutable SQL-v2 operation. Legacy ObjectIds/timestamps are never converted by this boundary. */
+/** Immutable SQL-v2 Pug or SQL-v3 semantic operation. The protocol selects the source format. */
 export type SqlRitualWriteRequest =
   | (Base & {
       kind: "create";
@@ -21,7 +21,7 @@ export type SqlRitualWriteRequest =
     })
   | (Base &
       SqlRitualExpectedState & { kind: "save"; source: string; title?: string })
-  | (Base & SqlRitualExpectedState & { kind: "publish" });
+  | (Base & SqlRitualExpectedState & { kind: "publish"; version: 2 });
 export const SQL_RITUAL_WRITE_MESSAGES = {
   UPGRADE_REQUIRED:
     "This pending operation uses an unsupported ritual protocol. Preserve it for recovery; do not change its identity or retry it as a new operation.",

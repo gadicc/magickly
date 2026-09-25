@@ -1,0 +1,181 @@
+{
+  "children": [
+    {
+      "type": "declareVar",
+      "name": "myRole",
+      "label": "My role",
+      "varType": "select",
+      "default": "member",
+      "children": [
+        {
+          "type": "option",
+          "value": "member",
+          "label": "Member",
+          "children": []
+        },
+        {
+          "type": "option",
+          "value": "hierophant",
+          "label": "Hierophant",
+          "children": []
+        },
+        {
+          "type": "option",
+          "value": "keryx",
+          "label": "Keryx",
+          "children": []
+        }
+      ]
+    },
+    {
+      "type": "declareVar",
+      "name": "candidateName",
+      "label": "Candidate name",
+      "varType": "text",
+      "default": "Candidate",
+      "children": []
+    },
+    {
+      "type": "title",
+      "text": "Opening of the Hall",
+      "children": [
+        {
+          "type": "text",
+          "value": "Opening of the Hall"
+        }
+      ]
+    },
+    {
+      "type": "task",
+      "say": true,
+      "role": "hiero,keryx",
+      "children": [
+        {
+          "type": "text",
+          "value": "Welcome "
+        },
+        {
+          "type": "text",
+          "value": ""
+        },
+        {
+          "type": "var",
+          "name": "candidateName",
+          "children": []
+        },
+        {
+          "type": "text",
+          "value": ""
+        },
+        {
+          "type": "text",
+          "value": "\n"
+        },
+        {
+          "type": "text",
+          "value": " to "
+        },
+        {
+          "type": "text",
+          "value": "\n"
+        },
+        {
+          "type": "text",
+          "value": ""
+        },
+        {
+          "type": "grade",
+          "grade": "0=0",
+          "children": []
+        },
+        {
+          "type": "text",
+          "value": ". שלום עולם"
+        }
+      ]
+    },
+    {
+      "type": "task",
+      "do": true,
+      "role": "all-officers",
+      "children": [
+        {
+          "type": "text",
+          "value": "Rise and face east."
+        }
+      ]
+    },
+    {
+      "type": "task",
+      "do": true,
+      "role": "all-except-candidate",
+      "children": [
+        {
+          "type": "text",
+          "value": "Make the sign."
+        }
+      ]
+    },
+    {
+      "type": "task",
+      "say": true,
+      "role": "all-officers-except-keryx",
+      "children": [
+        {
+          "type": "text",
+          "value": "Respond together."
+        }
+      ]
+    },
+    {
+      "type": "note",
+      "children": [
+        {
+          "type": "b",
+          "children": [
+            {
+              "type": "text",
+              "value": "Use the traditional pronunciation."
+            }
+          ]
+        },
+        {
+          "type": "summary",
+          "summary": "Pronunciation",
+          "children": [
+            {
+              "type": "text",
+              "value": "Hebrew: שָׁלוֹם; Enochian: OL SONF"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "footnote",
+      "children": [
+        {
+          "type": "text",
+          "value": "Synthetic reference, not a source citation."
+        }
+      ]
+    },
+    {
+      "type": "img",
+      "src": "/temple.svg",
+      "alt": "Synthetic temple diagram",
+      "width": "320",
+      "children": []
+    },
+    {
+      "type": "title",
+      "text": "Closing",
+      "children": [
+        {
+          "type": "text",
+          "value": "Closing"
+        }
+      ]
+    }
+  ]
+}

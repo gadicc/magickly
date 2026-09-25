@@ -24,6 +24,7 @@ import {
   type RitualPolicy,
 } from "./access";
 import { compileRitualSource } from "./compileContract";
+import { compileSemanticSource } from "./semanticCompile";
 import {
   loadSqlRitualPrincipal,
   type SqlRitualParentRow,
@@ -84,9 +85,11 @@ function sqlText(value: unknown): value is string {
   );
 }
 function parse(input: unknown): SqlRitualWriteRequest {
-  if (!record(input) || input.version !== 2) fail("UPGRADE_REQUIRED");
+  if (!record(input) || (input.version !== 2 && input.version !== 3))
+    fail("UPGRADE_REQUIRED");
   if (!["save", "create", "publish"].includes(input.kind as string))
     fail("INVALID_REQUEST");
+  if (input.version === 3 && input.kind === "publish") fail("INVALID_REQUEST");
   const fields = [
     "version",
     "operationId",
@@ -113,7 +116,7 @@ function parse(input: unknown): SqlRitualWriteRequest {
   )
     fail("INVALID_REQUEST");
   const base = {
-    version: 2 as const,
+    version: input.version as 2 | 3,
     operationId: input.operationId,
     expectedActorId: input.expectedActorId,
   };
@@ -161,7 +164,7 @@ function parse(input: unknown): SqlRitualWriteRequest {
     expectedVersion: input.expectedVersion,
   };
   return input.kind === "publish"
-    ? { ...base, ...expected, kind: "publish" }
+    ? { ...base, version: 2, ...expected, kind: "publish" }
     : {
         ...base,
         ...expected,
@@ -217,7 +220,7 @@ function expected(row: SqlRitualParentRow, request: Expected) {
 }
 
 /**
- * Canonical SQL-v2 writes only; no route or legacy retry rejection is activated.
+ * Canonical SQL-v2 Pug and SQL-v3 semantic writes.
  * The operation lock precedes receipt reads under READ COMMITTED, so a waiter sees
  * a just-committed receipt. Current grants are share-locked and the parent is
  * update-locked through commit. A revocation committed first is observed; one
@@ -229,11 +232,17 @@ function expected(row: SqlRitualParentRow, request: Expected) {
 export function createSqlRitualWriter(
   db: SqlRitualWriteDatabase,
   getVerifiedActorId: () => Promise<string | null>,
-  options: { now?: () => Date; generateId?: () => string } = {},
+  options: {
+    now?: () => Date;
+    generateId?: () => string;
+    enableSemanticWrites?: boolean;
+  } = {},
 ) {
   return async (input: unknown): Promise<SqlRitualWriteResult> => {
     try {
       const request = parse(input);
+      if (request.version === 3 && !options.enableSemanticWrites)
+        fail("UPGRADE_REQUIRED");
       const verified = await getVerifiedActorId();
       if (!isUuidV7(verified)) fail("NOT_AUTHENTICATED");
       const actorId = verified.toLowerCase();
@@ -330,7 +339,10 @@ export function createSqlRitualWriter(
           let revisionId = current?.currentRevisionId;
           let artifactId = current?.currentCompiledArtifactId;
           if (request.kind !== "publish") {
-            const compiled = compileRitualSource(request.source);
+            const compiled =
+              request.version === 3
+                ? compileSemanticSource(request.source)
+                : compileRitualSource(request.source);
             if (!compiled) fail("INVALID_SOURCE");
             revisionId = generateId();
             artifactId = generateId();

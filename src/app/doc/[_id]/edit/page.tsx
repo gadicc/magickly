@@ -1,4 +1,5 @@
-import { Alert } from "@mui/material";
+import { Alert, Button } from "@mui/material";
+import Link from "next/link";
 import { connection } from "next/server";
 import { resolveSqlRitualRouteId } from "@/doc/sqlRuntime";
 import { privateMetadata } from "@/seo/metadata";
@@ -16,7 +17,14 @@ export default async function DocEditPage({
     () => null,
   );
   return ritualId ? (
-    <SqlDocEdit key={ritualId} ritualId={ritualId} />
+    <>
+      {process.env.RITUAL_SEMANTIC_EDITOR === "1" && (
+        <Button component={Link} href={`/doc/${ritualId}/edit/semantic`}>
+          Try the new ritual editor
+        </Button>
+      )}
+      <SqlDocEdit key={ritualId} ritualId={ritualId} />
+    </>
   ) : (
     <Alert severity="info">Ritual source is unavailable.</Alert>
   );
