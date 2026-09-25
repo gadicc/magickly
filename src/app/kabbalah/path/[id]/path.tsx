@@ -2,11 +2,11 @@
 import Link from "@magick-components/Link";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
-import { decycle } from "cycle";
 import Image from "next/legacy/image";
 import Data from "@/../data/data";
 import { rowOf } from "@/../data/rowOf";
 import TreeOfLife from "@/components/kabbalah/TreeOfLife";
+import { dumpValue } from "@/lib/dumpValue";
 import { RWSPath, tarotDeck } from "@/tarot";
 
 /** The page resolves unknown ids to a 404 before rendering this. */
@@ -162,7 +162,7 @@ export default function Path({ id }: { id: string }) {
                     {typeof path[key] === "string"
                       ? path[key].substr(0, 1).toUpperCase() +
                         path[key].substr(1)
-                      : JSON.stringify(decycle(path[key]))}
+                      : dumpValue(path[key])}
                   </td>
                 </tr>
               ))}

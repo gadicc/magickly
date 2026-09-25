@@ -3,8 +3,8 @@ import { rowOf } from "@magick-data/rowOf";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
-import { decycle } from "cycle";
 import { notFound } from "next/navigation";
+import { dumpValue } from "@/lib/dumpValue";
 import { entityIds, planetPage } from "@/seo/entities";
 import { seoMetadata } from "@/seo/metadata";
 
@@ -45,7 +45,7 @@ export default async function Planet({
             {Object.keys(planet).map((key) => (
               <tr key={key}>
                 <td>{key}</td>
-                <td>{JSON.stringify(decycle(planet[key]))}</td>
+                <td>{dumpValue(planet[key])}</td>
               </tr>
             ))}
           </tbody>

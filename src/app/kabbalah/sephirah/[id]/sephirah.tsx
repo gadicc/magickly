@@ -3,11 +3,11 @@ import Link from "@magick-components/Link";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
-import { decycle } from "cycle";
 import Data from "@/../data/data";
 import { rowOf } from "@/../data/rowOf";
 import Chakras from "@/components/chakras/Chakras";
 import TreeOfLife from "@/components/kabbalah/TreeOfLife";
+import { dumpValue } from "@/lib/dumpValue";
 
 /** The page resolves unknown ids to a 404 before rendering this. */
 export default function Sephirah({ id }: { id: string }) {
@@ -251,7 +251,7 @@ export default function Sephirah({ id }: { id: string }) {
                     {typeof sephirah[key] === "string"
                       ? sephirah[key].substr(0, 1).toUpperCase() +
                         sephirah[key].substr(1)
-                      : JSON.stringify(decycle(sephirah[key]))}
+                      : dumpValue(sephirah[key])}
                   </td>
                 </tr>
               ))}

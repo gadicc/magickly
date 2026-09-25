@@ -2,11 +2,11 @@ import Link from "@magick-components/Link";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
-import { decycle } from "cycle";
 import { notFound } from "next/navigation";
 import Data from "@/../data/data";
 import { rowOf } from "@/../data/rowOf";
 import GradeTree from "@/components/gd/GradeTree";
+import { dumpValue } from "@/lib/dumpValue";
 import { entityIds, gradePage } from "@/seo/entities";
 import { seoMetadata } from "@/seo/metadata";
 
@@ -86,13 +86,7 @@ export default async function Grade({ params }: PageProps<"/gd/grade/[id]">) {
           <table>
             <tbody>
               {Object.keys(grade).map((key) => {
-                let json;
-                try {
-                  json = JSON.stringify(decycle(grade[key]));
-                } catch (error) {
-                  console.warn(error);
-                  return;
-                }
+                const json = dumpValue(grade[key]);
                 return (
                   json && (
                     <tr key={key}>
