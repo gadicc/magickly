@@ -1,6 +1,7 @@
 import Data from "@/../data/data";
 import { angelBySlug, angelSlugs } from "@/../data/kabbalah/angelSlugs";
 import { rowOf } from "@/../data/rowOf";
+import type { SephirahRow } from "@/../data/rows";
 import { tarotDeck } from "@/tarot";
 import type { SeoPage } from "./pages";
 
@@ -69,14 +70,28 @@ export function gradePage(id: string): EntityPage | null {
   };
 }
 
+/**
+ * Whether a sephirah is the hidden one, Da'at (plan 036, decision 18).
+ *
+ * The table numbers it 11, which is its place in the file and not a number
+ * the tradition gives it: the Tree counts ten, and Da'at is the one sphere
+ * outside the chain they make, with neither a next nor a previous. That is
+ * the criterion, so that the sephirah page's lede and its search description,
+ * which both call it the hidden Sephirah, say so from the data rather than
+ * from an id or an index.
+ */
+export function isHiddenSephirah(sephirah: Pick<SephirahRow, "next" | "prev">) {
+  return !sephirah.next && !sephirah.prev;
+}
+
 /** `/kabbalah/sephirah/<id>`, including Da'at. */
 export function sephirahPage(id: string): EntityPage | null {
   const sephirah = rowOf(Data.sephirah, id);
   if (!sephirah) return null;
   const { en, he, roman } = sephirah.name;
-  const position = sephirah.index
-    ? `Sephirah ${sephirah.index} of the Tree of Life`
-    : "a Sephirah of the Tree of Life";
+  const position = isHiddenSephirah(sephirah)
+    ? "the hidden Sephirah of the Tree of Life"
+    : `Sephirah ${sephirah.index} of the Tree of Life`;
   return {
     path: `/kabbalah/sephirah/${id}`,
     title: `${roman} (${en}) on the Tree of Life`,
@@ -86,7 +101,10 @@ export function sephirahPage(id: string): EntityPage | null {
         `archangel ${sephirah.archangel.name.roman}`,
       sephirah.angelicOrder?.name.roman &&
         `angelic host ${sephirah.angelicOrder.name.roman}`,
-      sephirah.color && "King and Queen scale colours",
+      // Da'at is drawn on the Queen scale alone.
+      sephirah.color.king
+        ? "King and Queen scale colours"
+        : "Queen scale colour",
     ]),
   };
 }

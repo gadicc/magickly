@@ -1,0 +1,58 @@
+/* One sephirah. The frame, the table, the trail, the Hebrew and the nav are
+   the entity pages' (src/components/entity); these rules are this page's
+   own. */
+
+/* The King and Queen scales side by side, as the page has drawn them. Two
+   columns whether or not there are two swatches, so Da'at's Queen scale
+   alone keeps a swatch's width rather than taking the row's. Below MUI's sm
+   breakpoint the value column is about 200px, so the padding is kept small
+   and a long colour name may break rather than overflow its swatch. */
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.swatch {
+  border: 1px solid #ccc;
+  padding: 0.6em 0.5em;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* A line of its own above the colour's name. */
+.scale {
+  display: block;
+  font-weight: 600;
+}
+
+/* The chakra's names, then the figure with it lit, which drops below the
+   names where the column is too narrow for both. */
+.chakra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em 1em;
+}
+
+/* One path a line, ruled as the table's rows are: the Hermetic number in a
+   column of its own so that the numbers read down the list, then the
+   letter, the sphere at the other end and the trump, wrapping beside it. */
+.paths {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.92rem;
+}
+
+.paths li {
+  display: grid;
+  grid-template-columns: 2.2em minmax(0, 1fr);
+  border-top: 1px solid rgba(128, 128, 128, 0.3);
+  padding: 0.45em 0;
+}
+
+.pathNo {
+  font-variant-numeric: tabular-nums;
+}

@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
+import Data from "@/../data/data";
 import { ANGEL_COUNT } from "@/../data/kabbalah/seventyTwoAngelsDerived";
 import {
   entityIds,
   entityPages,
   gradePage,
+  isHiddenSephirah,
   pathPage,
   planetPage,
   sephirahPage,
@@ -67,12 +69,26 @@ describe("entity pages", () => {
     expect(sephirahPage("malchut")?.description).toContain(
       "archangel Sandalphon",
     );
-    expect(sephirahPage("daat")).toMatchObject({
+    // The table numbers Da'at 11; the Tree does not (plan 036, decision 18).
+    // Only the description says so: the title is as it was. Da'at has a
+    // Queen scale and no King scale, so the description promises the one.
+    expect(sephirahPage("daat")).toEqual({
       path: "/kabbalah/sephirah/daat",
+      title: "Da'at (Knowledge) on the Tree of Life",
       description:
-        'Da\'at (דעת), "Knowledge", is Sephirah 11 of the Tree of Life: god ' +
-        "name YHVH Elohim, King and Queen scale colours.",
+        'Da\'at (דעת), "Knowledge", is the hidden Sephirah of the Tree of ' +
+        "Life: god name YHVH Elohim, Queen scale colour.",
     });
+  });
+
+  it("finds the hidden Sephirah by the chain, and only Da'at", () => {
+    // Outside the chain is the criterion, so it must pick out exactly one
+    // sphere, and the one the description and the page call hidden.
+    expect(
+      Object.values(Data.sephirah)
+        .filter(isHiddenSephirah)
+        .map((sephirah) => sephirah.id),
+    ).toEqual(["daat"]);
   });
 
   it("drops the fields that would overflow a snippet", () => {

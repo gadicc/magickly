@@ -84,12 +84,19 @@ describe("the key walk", () => {
   });
 });
 
+/**
+ * Every entity page that declares its row. The glob would pass a page whose
+ * `fields.ts` was renamed or deleted by no longer finding it, so each page's
+ * declaration is named here as well, and must be found.
+ */
+const DECLARED = [
+  "../../app/kabbalah/angel/[slug]/fields.ts",
+  "../../app/kabbalah/sephirah/[id]/fields.ts",
+];
+
 describe("each entity page's declaration", () => {
-  it("is found", () => {
-    // The glob matching nothing would pass every test below.
-    expect(Object.keys(declarations)).toContain(
-      "../../app/kabbalah/angel/[slug]/fields.ts",
-    );
+  it("is found, every one of them", () => {
+    expect(Object.keys(declarations).sort()).toEqual([...DECLARED].sort());
   });
 
   for (const [file, module] of Object.entries(declarations))
