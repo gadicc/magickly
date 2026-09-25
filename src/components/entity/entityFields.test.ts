@@ -92,6 +92,7 @@ describe("the key walk", () => {
 const DECLARED = [
   "../../app/kabbalah/angel/[slug]/fields.ts",
   "../../app/kabbalah/sephirah/[id]/fields.ts",
+  "../../app/kabbalah/path/[id]/fields.ts",
 ];
 
 describe("each entity page's declaration", () => {

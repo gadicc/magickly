@@ -1,0 +1,26 @@
+/* One path. The frame, the table, the trail and the nav are the entity
+   pages' (src/components/entity); these rules are this page's own. */
+
+/* The letter block the page has always had, now wide enough for the name,
+   value and meaning under the letter rather than exactly 100px. */
+.letter {
+  display: inline-block;
+  min-width: 100px;
+  border: 1px outset;
+  background: #eee;
+  text-align: center;
+  padding: 5px;
+}
+
+/* The Hebrew face sets its letters at 1.15em, so 435% of the text here is
+   the letter at five times it, as the block had it. */
+.glyph {
+  font-size: 435%;
+  line-height: 0.8em;
+}
+
+/* The card above its name. */
+.trump {
+  display: block;
+  margin-bottom: 0.3em;
+}
