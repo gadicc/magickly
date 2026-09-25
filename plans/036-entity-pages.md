@@ -133,7 +133,10 @@ approved with the plan on 25 September, as was 18:
 7. **Alchemy at Zelator.** The 1=10 page lists the ten symbols and six terms
    whose `gdGrade` is 1: the Second Knowledge Lecture's alchemy, with the
    seven metals linking to their planets. The owner reviews the result
-   specifically.
+   specifically. *Withdrawn on review, 25 September:* the tables file those
+   entries under the grade because the Zelator knowledge lecture teaches
+   them, which makes them study material, not attributions of the grade, so
+   the page lists none ([after the owner's review](#after-the-owners-review)).
 8. **The angel page moves onto the shared pieces**, in this branch, and every
    entity page sits in the site's `Container maxWidth="sm"` frame, which
    narrows the angel page from 44rem. Every link on the five pages is
@@ -573,6 +576,29 @@ A fourteenth commit, `docs(plan): Record the entity pages`, adds this
 section and the ones after it; as in plan 032 it is not in the table, which
 it would have to predict.
 
+### After the owner's review
+
+The owner reviewed the pages on 25 September, confirmed the Tzva'ot
+spelling the implementation review had found, and withdrew the Zelator's
+alchemy. Two commits followed the fourteenth, checked the same way, and the
+gate passed again on the second of them:
+
+| Commit | Change | Tests |
+| --- | --- | ---: |
+| `bc81d17` fix(data): Spell the god names' Tzva'ot | YHVH Tzva'ot and Elohim Tzva'ot as צבאות, "hosts", where they read צבעות, "colours"; the Tree's two registry pins | 4,812 |
+| `8c876c0` fix(gd): Drop the alchemy from the Zelator page | Decision 7 withdrawn: the row, its helpers, its stylesheet and its tests | 4,811 |
+
+The Tzva'ot fix is the first data fix to move a drawn image since plan
+032's render identities: the Tree's inputs hash goes from `2591a504…` to
+`8d5f06b8…`, and the Theoricus ritual's Tree, which draws the god names,
+from 150,736 bytes, `96516a75…`, to 150,785, `a1fe82b8…`, under the same
+`magickli-tree-image-outlines-v3` profile. Every other component image
+kept its bytes and inputs hash. Published rituals keep the bytes they were
+published with and draw the corrected Tree at their next publication.
+
+A seventeenth commit, `docs(plan): Record the owner's review`, adds this
+subsection and amends the sections it changes.
+
 The design ran on Fable 5.1 at xhigh, and so did the adversarial review
 of the implementation. The implementation ran on Opus 5.5 at xhigh: the
 three planned data commits, the shared pieces and each of the four pages
@@ -622,12 +648,17 @@ What a reader sees change:
   what they were, 134 of them compared by the review, and only Ketu's card
   is redrawn, for its title.
 - Keter's King scale reads "brilliance" and Da'at's Queen scale "lavender";
-  the alchemy flashcards and the Zelator page read "putrefaction".
+  the alchemy flashcards read "putrefaction".
+- After the owner's review, Netzach's and Hod's god names read צבאות, on
+  their pages, on Venus's and Mercury's, in the Hebrew god-name flashcards
+  and in the Tree wherever it shows them; the Zelator page lists no
+  alchemy.
 
-No rendered image moved: the registry test pins every component image's
-bytes and inputs hash and passed unchanged on every commit, and no image
-contract names a back-link, a path's ends, a colour's name, a planet's
-English name or an alchemy gloss.
+Through `c408beb` no rendered image moved: the registry test pins every
+component image's bytes and inputs hash and passed unchanged on every
+commit, and no image contract names a back-link, a path's ends, a colour's
+name, a planet's English name or an alchemy gloss. The Tzva'ot fix after
+it moves the Tree's, as [above](#after-the-owners-review).
 
 ### What the pages ship
 
@@ -741,8 +772,7 @@ changes one string.
   God names carry their English meaning, archangels do not, Gabriel's
   `name.en` being the English form of the name; a chakra reads its English
   name, its Sanskrit, the romanisation and the meaning; Neophyte is "not
-  attributed to a Sephirah"; the metals link through the planet they are
-  attributed to rather than their own name.
+  attributed to a Sephirah".
 - **`pathTarget()` does walk a derived inverse.** Plan 036 deferred that as
   missing; it has walked `planet.sephirot` since step 3c, and the nine new
   accessors resolve as field paths from the first data commit.
@@ -823,7 +853,7 @@ No blocker. Its findings and their disposition:
 | The planet page quoted Gabriel's English name as a meaning, "Gavriel “Gabriel”", where the sephirah page gives none | Dropped; Luna's archangel pinned |
 | Decisions 13 and 15 no longer describe the tree: the angel entry was removed, not made a section, and Ketu's title moved | Recorded [above](#what-was-decided-while-building-it) |
 | `flip={false}` writes "false" into the Tree's stylesheet where "undefined" was; the fix is one line in the Tree | Kept, since the Tree's fix moves its source bytes; a follow-up |
-| Data the pages now set side by side disagrees: Keter's heaven "Roshit haGilgulim" against its sphere's "Roshit HaGilgulim", Malchut's "Olam Yesodoth" against "Olam haYesodot"; the god names spell Tzva'ot צבעות where Lenain's pages print צבאות; the body values read as slugs, "Left-face"; Hesed's "saphire" | [Follow-ups](#follow-ups); the Tzva'ot spelling is an error, not a variant |
+| Data the pages now set side by side disagrees: Keter's heaven "Roshit haGilgulim" against its sphere's "Roshit HaGilgulim", Malchut's "Olam Yesodoth" against "Olam haYesodot"; the god names spell Tzva'ot צבעות where Lenain's pages print צבאות; the body values read as slugs, "Left-face"; Hesed's "saphire" | [Follow-ups](#follow-ups); the Tzva'ot spelling, an error rather than a variant, fixed in `bc81d17` after the owner confirmed it |
 | Neophyte's lede, "attributed to no Sephirah", read oddly | "not attributed to a Sephirah" |
 | `entityFields.test.ts` named only the angel's declaration as found, so a table page's moved `fields.ts` would drop out silently | All five named, each by its own commit |
 | The spirit's sigil had no accessible name beside the name it draws | `aria-hidden`, passed through `PlanetarySpirit` to its wrapper |
@@ -857,8 +887,6 @@ description promising a King scale; that was fixed after the review.
 
 ## Follow-ups
 
-- **The owner's review** of the Zelator page's alchemy row and of the angel
-  page in its new frame (decisions 7 and 8).
 - **The source of `magickTypes`** ([assessment](#assessment-before)); once
   named, the editorial-summary note becomes a citation.
 - **The Tree's stylesheet.** `TreeOfLife.tsx` appends `flip && "…"`, which
@@ -866,11 +894,9 @@ description promising a King scale; that was fixed after the review.
   `flip ? "…" : ""` is the fix. It changes the source SVG the image registry
   outlines, so it waits for a decision on the Tree's render identity: a
   profile bump re-identifies every published Tree.
-- **Data the pages now show side by side.** The god names spell Tzva'ot
-  צבעות, "colours", on Netzach's and Hod's, where Lenain's pages in this
-  repository print צבאות, "hosts": an error, and `godName.name.he` is one of
-  the Tree's image fields, so the fix moves the Tree's inputs hash. Hesed's
-  stone, "saphire", is an image field too. Keter's heaven, "Roshit
+- **Data the pages now show side by side.** Hesed's stone, "saphire", is
+  one of the Tree's image fields, so its fix moves the Tree's inputs hash,
+  as the Tzva'ot fix did. Keter's heaven, "Roshit
   haGilgulim", and its sphere's, "Roshit HaGilgulim", disagree in case, and
   Malchut's, "Olam Yesodoth", and its sphere's, "Olam haYesodot", in
   spelling. The body values are slugs, so the table reads "Left-face" and

@@ -222,21 +222,20 @@ Follow-ups are separate from the completed migration work:
   empty source, "(name of an angel, sol)" and the pronunciation "Ee", so the
   page prints "()" after the meaning; what they should cite is not in the
   repository. See [plan 032](032-data-layer.md#follow-ups).
-- Built on 25 September on `gate/entity-pages`, awaiting the owner's
-  fast-forward: the four entity pages that printed a row as JSON — planet,
-  grade, sephirah and path — lay out their correspondences, as Server
-  Components, with seven back-links and each path's two sephirot added to
-  the graph for them and a test holding each page to its whole row;
-  `decycle` and the `cycle` dependency are gone, the angel page shares the
-  pieces, and the grade, sephirah and path routes stop shipping the data
-  barrel to the browser. Da'at's description calls it the hidden Sephirah
-  and Ketu's title reads Cauda Draconis; no other title, description,
-  card or image moved. See [plan 036](036-entity-pages.md#results).
-  TODO: the owner's review of the Zelator alchemy row and the angel page;
-  the Tree's `flip` stylesheet fix, which waits on a render-identity
-  decision; the god names' Tzva'ot spelling (צבעות for צבאות) and the other
-  data the new pages set side by side; the search descriptions' trump
-  names; the source of `magickTypes`. See
+- Done on 25 September: the four entity pages that printed a row as JSON
+  — planet, grade, sephirah and path — lay out their correspondences, as
+  Server Components, with seven back-links and each path's two sephirot
+  added to the graph for them and a test holding each page to its whole
+  row; `decycle` and the `cycle` dependency are gone, the angel page shares
+  the pieces, and the grade, sephirah and path routes stop shipping the
+  data barrel to the browser. Da'at's description calls it the hidden
+  Sephirah and Ketu's title reads Cauda Draconis. Netzach's and Hod's god
+  names spell Tzva'ot צבאות, which moved the Tree's inputs hash and the
+  Theoricus ritual's Tree bytes under the same profile. See
+  [plan 036](036-entity-pages.md#results). TODO: the Tree's `flip`
+  stylesheet fix, which waits on a render-identity decision; Hesed's
+  "saphire" and the other data the new pages set side by side; the search
+  descriptions' trump names; the source of `magickTypes`. See
   [plan 036](036-entity-pages.md#follow-ups).
 - TODO: two small ones left by step 3b
   ([plan 032](032-data-layer.md#follow-ups)): two tribes' Hebrew names are
