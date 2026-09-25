@@ -49,7 +49,7 @@ export const graph = {
   // ENOCHIAN
   enochianLetter: {
     external: {
-      // Three namespaces in one field — `taurus`, `fire`, `Cauda Draonis` —
+      // Three namespaces in one field — `taurus`, `fire`, `Cauda Draconis` —
       // which the format cannot express; a polymorphic `to` is deferred.
       "planet/element": "polymorphic",
       // The trump by name, where a path of the Tree names it by rank.
