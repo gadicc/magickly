@@ -221,9 +221,13 @@ Follow-ups are separate from the completed migration work:
   empty source, "(name of an angel, sol)" and the pronunciation "Ee", so the
   page prints "()" after the meaning; what they should cite is not in the
   repository. See [plan 032](032-data-layer.md#follow-ups).
-- TODO: the dump-page redesign ([plan 028](028-seo.md#follow-ups)), which is
-  what `decycle` is still waiting for: four pages import it to print a row,
-  and step 3c left them alone deliberately. It wants a design pass of its own.
+- In progress: the four entity pages that print a row as JSON — planet,
+  grade, sephirah and path — are redesigned to lay out their
+  correspondences, as Server Components, with the back-links the graph
+  gains for them and a test holding each page to its whole row; `decycle`
+  and the `cycle` dependency go with them. Designed and reviewed on 21–22
+  September, approved on 25 September, being built on
+  `gate/entity-pages`. See [plan 036](036-entity-pages.md).
 - TODO: two small ones left by step 3b
   ([plan 032](032-data-layer.md#follow-ups)): two tribes' Hebrew names are
   hashed into the Table of Shewbread's identity although no sign points at
