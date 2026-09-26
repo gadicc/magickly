@@ -3,10 +3,11 @@ set -euo pipefail
 
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 
-pnpm install --frozen-lockfile
-pnpm exec loom db local setup
-pnpm exec loom files local check
-pnpm local-development:migrate
-pnpm local-development:seed
+if [[ "${1:-}" == "--init" ]]; then
+  shift
+  pnpm local-development:init
+else
+  pnpm local-development:check
+fi
 
 exec pnpm dev:webpack -H localhost -p 3004 "$@"

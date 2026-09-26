@@ -22,10 +22,10 @@ On another machine, use an existing local PostgreSQL service with `pg_uuidv7`
 available. Loom 1.34.0's `loom db local setup` provisions a project database and
 restricted role, installs the extension when the migrations require it, and
 updates the configured URL candidates in owner-only `.env.local`. The command
-is also run by `./dev`. `loom db local check` authenticates and verifies the
-target without changing it. Keep the URL private; never reuse an acceptance or
-cloud credential. Database migrations and the Magickli seed remain separate app
-tasks.
+is also run by `./dev --init`. `loom db local check` authenticates and verifies
+the target without changing it. Keep the URL private; never reuse an acceptance
+or cloud credential. Database migrations and the Magickli seed remain separate
+app tasks.
 
 Use these nonsecret settings in `.env.local` alongside the bucket-scoped
 `FILES_S3_ACCESS_KEY_ID` and `FILES_S3_SECRET_ACCESS_KEY`:
@@ -48,15 +48,22 @@ under `features.files.config.storage.provider.directUpload` in `loom.json`.
 Keep other legitimate local origins in that policy. The bucket remains private.
 
 With the shared PostgreSQL and MinIO services running and local credentials in
-ignored `.env.local`, start ordinary development with one command:
+ignored `.env.local`, launch ordinary development on the provisioned main
+checkout with:
 
 ```sh
 ./dev
 ```
 
-The launcher installs the locked dependencies, runs Loom's local database setup
-and Files check, then applies the existing migrations and seeds Creator and
-Reader before starting Next dev on port 3004. Database setup reuses the checked
+The launcher runs read-only database identity and Files checks before Next, so
+it refuses an acceptance database or a misconfigured development bucket. It
+does not install dependencies, migrate, or seed on normal starts.
+
+For a new checkout, after pulling migrations, or after changing local database
+configuration, run `./dev --init`. This installs locked dependencies, runs
+Loom's local database setup and Files check, applies migrations, seeds Creator
+and Reader, then launches Next dev on port 3004. `pnpm local-development:init`
+performs the same setup without starting Next. Database setup reuses the checked
 credentials on this machine; a new database prompts for an administrator
 password. The migration task runs `local-development:verify-db` before
 `db:migrate`. The seed repeats the live identity check and is safe to rerun; it
@@ -67,7 +74,7 @@ Leave `MAGICKLI_LOCAL_ACCEPTANCE` unset in ordinary development. The separate
 numeric-loopback production-build acceptance path is documented in
 `scripts/local-acceptance/README.md`.
 
-The launcher verifies the bucket with `pnpm exec loom files local check`. Attach
+Initialization verifies the bucket with `pnpm exec loom files local check`. Attach
 a small synthetic PNG at `/upload` to a ritual you edit. Paste the returned
 source reference into the ritual editor's **Attached image source reference**
 field,
