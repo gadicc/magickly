@@ -262,7 +262,10 @@ export const schemas = {
     scent: v.string(),
     body: v.string(),
     bodyPos: v.string(),
-    /** Only the three supernal spheres name a heaven. */
+    /**
+     * Only Keter, Chochmah and Malchut name a heaven: the three whose `planet`
+     * is of kind `"sphere"` rather than a planet.
+     */
     tenHeavens: v.optional(
       v.strictObject({
         en: v.string(),

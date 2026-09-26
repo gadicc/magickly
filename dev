@@ -1,0 +1,3 @@
+#!/bin/bash
+
+vc dev --listen 3004

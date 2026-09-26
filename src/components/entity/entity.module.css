@@ -1,0 +1,109 @@
+/* What the entity pages share, taken from the angel page (plan 036): the
+   frame's headings, the trail, the figure between its arrows, the table,
+   Hebrew and the names, and the nav that closes a page. */
+
+.frame {
+  line-height: 1.6;
+}
+
+.frame h1 {
+  font-size: 1.7rem;
+  margin: 0.3em 0 0.2em;
+}
+
+.frame h2 {
+  font-size: 1.05rem;
+  margin: 2em 0 0.6em;
+}
+
+.lede {
+  font-size: 1.05rem;
+  margin: 0 0 1.4em;
+}
+
+.trail {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  margin: 0.5em 0 0;
+}
+
+/* The arrows' columns are fixed rather than sized to the arrows, so that
+   where one is absent the figure stays in the middle. The Tree draws at 100%
+   of its column and centres itself; anything narrower is centred here. */
+.figureNav {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) 2rem;
+  align-items: center;
+  margin: 0 0 1rem;
+}
+
+.figure {
+  text-align: center;
+}
+
+.arrow {
+  font-size: 150%;
+}
+
+.arrow:last-child {
+  text-align: end;
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.92rem;
+}
+
+.table th,
+.table td {
+  border-top: 1px solid rgba(128, 128, 128, 0.3);
+  padding: 0.45em 0.6em 0.45em 0;
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th {
+  width: 12rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Below MUI's sm breakpoint the frame is narrower than two 12rem columns, so
+   a fixed, unwrapped label would squeeze the value column: "Angelic order ·
+   Yetzirah" alone is about 12rem. Let the labels take a share and wrap. */
+@media (max-width: 599.95px) {
+  .table th {
+    width: 40%;
+    white-space: normal;
+  }
+}
+
+/* MUI's text.secondary in the light palette src/theme.ts sets; the theme
+   has no CSS variables for a module to read it from. */
+.secondary {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.note {
+  display: block;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.85em;
+}
+
+.aside {
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 400;
+}
+
+.hebrew {
+  font-family: "Frank Ruehl CLM", "Noto Sans Hebrew", serif;
+  font-size: 1.15em;
+}
+
+.prevNext {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2.5em;
+  font-size: 0.9rem;
+}

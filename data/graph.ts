@@ -23,7 +23,9 @@ export const graph = {
   // ASTROLOGY
   planet: {
     links: {
-      hebrewLetterId: { to: "hebrewLetter" },
+      // Singular, so the check proves one planet per letter: the seven double
+      // letters carry a planet each, and no two planets share one.
+      hebrewLetterId: { to: "hebrewLetter", inverse: "planet" },
       godNameId: { to: "godName" },
       archangelId: { to: "archangel", mirrors: "planetId" },
     },
@@ -33,7 +35,7 @@ export const graph = {
   },
   zodiac: {
     links: {
-      planetId: { to: "planet" },
+      planetId: { to: "planet", inverse: "zodiacs", inverseMany: true },
       elementId: { to: "element", inverse: "zodiacs", inverseMany: true },
       tribeOfIsraelId: { to: "tribeOfIsrael" },
     },
@@ -47,7 +49,7 @@ export const graph = {
   // ENOCHIAN
   enochianLetter: {
     external: {
-      // Three namespaces in one field — `taurus`, `fire`, `Cauda Draonis` —
+      // Three namespaces in one field — `taurus`, `fire`, `Cauda Draconis` —
       // which the format cannot express; a polymorphic `to` is deferred.
       "planet/element": "polymorphic",
       // The trump by name, where a path of the Tree names it by rank.
@@ -61,7 +63,12 @@ export const graph = {
     links: {
       zodiacId: { to: "zodiac" },
       elementId: { to: "element", inverse: "tetragrams", inverseMany: true },
-      planetIds: { to: "planet", many: true },
+      planetIds: {
+        to: "planet",
+        many: true,
+        inverse: "tetragrams",
+        inverseMany: true,
+      },
     },
     pending: { rulerIds: "spirit" },
   },
@@ -71,7 +78,9 @@ export const graph = {
   gdGrade: {
     links: {
       elementId: { to: "element" },
-      planetId: { to: "planet" },
+      // Singular, so the check proves one grade per planet: no two grades
+      // are attributed to the same one.
+      planetId: { to: "planet", inverse: "gdGrade" },
       sephirahId: { to: "sephirah", mirrors: "gdGradeId" },
       degreeId: { to: "gdDegree" },
       nextId: { to: "gdGrade", mirrors: "prevId" },
@@ -116,8 +125,17 @@ export const graph = {
   },
   tolPath: {
     links: {
-      "hermetic.hebrewLetterId": { to: "hebrewLetter" },
-      "hebrew.hebrewLetterId": { to: "hebrewLetter" },
+      // Singular, so the check proves one path per letter on each tree: the
+      // twenty-two letters are dealt to the paths once in each attribution.
+      "hermetic.hebrewLetterId": {
+        to: "hebrewLetter",
+        inverse: "hermeticPath",
+      },
+      "hebrew.hebrewLetterId": { to: "hebrewLetter", inverse: "hebrewPath" },
+      // The two spheres a path joins, in the order its id spells them, which
+      // the integrity check holds the id to. One pair serves both trees.
+      fromId: { to: "sephirah", inverse: "pathsFrom", inverseMany: true },
+      toId: { to: "sephirah", inverse: "pathsTo", inverseMany: true },
       nextId: { to: "tolPath", mirrors: "prevId" },
       prevId: { to: "tolPath", mirrors: "nextId" },
     },
@@ -132,7 +150,9 @@ export const graph = {
 
   // ALCHEMY
   alchemySymbol: {
-    links: { planetId: { to: "planet" } },
+    // Singular, so the check proves one metal per planet: only the seven
+    // metals carry a planet, and no two of them the same one.
+    links: { planetId: { to: "planet", inverse: "alchemySymbol" } },
   },
   alchemyTerm: {},
   element: {

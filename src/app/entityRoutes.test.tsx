@@ -1,9 +1,15 @@
 import { renderToString } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import Planet from "./astrology/planet/[id]/page";
 import Grade from "./gd/grade/[id]/page";
 import PathPage from "./kabbalah/path/[id]/page";
 import SephirahPage from "./kabbalah/sephirah/[id]/page";
+
+// The planet page draws its spirit's sigil, an SVG import: a component under
+// SVGR and a data URL under vitest, which React refuses as a tag name.
+vi.mock("@/components/astrology/planetarySpirits", () => ({
+  default: () => null,
+}));
 
 /**
  * The four routes that take an id out of the URL and read a row with it.
@@ -42,7 +48,7 @@ describe("entity routes", () => {
   }
 
   it("renders the rows the links resolve, not the ids", async () => {
-    // Luna's god name is a link the barrel resolves; the page dumps the row.
+    // Luna's god name is a link the barrel resolves; the page lays it out.
     expect(renderToString(await Planet(props("luna")))).toContain(
       "Shaddai El Chai",
     );

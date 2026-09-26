@@ -20,7 +20,6 @@ describe("local ritual storage database boundary", () => {
     const acceptance = {
       ...development,
       NODE_ENV: "production",
-      MAGICKLI_LOCAL_ACCEPTANCE: "1",
       BETTER_AUTH_URL: "http://127.0.0.1:3115",
     };
     expect(() => assertLocalRitualStorageBoundary(acceptance)).toThrow();

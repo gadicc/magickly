@@ -35,6 +35,15 @@ import data from "./data";
  * `undefined` where the row has no id: Keter's `prev` below is the first of
  * those.
  *
+ * Plan 036 derived the back-links its entity pages read: the planet's
+ * `alchemySymbol`, `gdGrade`, `tetragrams` and `zodiacs`, and the letter's
+ * `planet`, `hermeticPath` and `hebrewPath`, with no JSON touched.
+ * Back-links follow a row's own links, in the order of the names of the
+ * tables that declare them, so the planet's four fall either side of
+ * `sephirot` rather than after it. A path also names its two sephirot now,
+ * `fromId` and `toId` in the JSON with `from` and `to` beside them, and the
+ * sephirah derives `pathsFrom` and `pathsTo` from those.
+ *
  * The sampled row is each table's first, named so the sample is reproducible;
  * for the one array table left in the barrel that is index `0`.
  */
@@ -48,7 +57,11 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "hebrewLetter",
       "godName",
       "archangel",
+      "alchemySymbol",
+      "gdGrade",
       "sephirot",
+      "tetragrams",
+      "zodiacs",
     ],
   },
   zodiac: {
@@ -77,7 +90,16 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
   },
   hebrewLetter: {
     row: "alef",
-    keys: ["id", "letter", "index", "value", "meaning"],
+    keys: [
+      "id",
+      "letter",
+      "index",
+      "value",
+      "meaning",
+      "planet",
+      "hermeticPath",
+      "hebrewPath",
+    ],
   },
   enochianLetter: {
     row: "A",
@@ -171,11 +193,24 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "gdGrade",
       "next",
       "prev",
+      "pathsFrom",
+      "pathsTo",
     ],
   },
   tolPath: {
     row: "1_2",
-    keys: ["id", "hermetic", "hebrew", "nextId", "next", "prev"],
+    keys: [
+      "id",
+      "fromId",
+      "toId",
+      "hermetic",
+      "hebrew",
+      "nextId",
+      "from",
+      "to",
+      "next",
+      "prev",
+    ],
   },
   soul: { row: "yechidah", keys: ["id", "name"] },
   tribeOfIsrael: { row: "reuben", keys: ["id", "name"] },
@@ -267,8 +302,11 @@ describe("data barrel", () => {
       "gdGrade",
       "next",
       "prev",
+      "pathsFrom",
+      "pathsTo",
     ]);
     expect(daat.planet).toBeUndefined();
+    expect(daat.pathsFrom).toEqual([]);
     expect(daat.godName?.name.he).toBe("יהוה אלוהים");
   });
 

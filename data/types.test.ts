@@ -1,7 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { assemble } from "./assemble";
 import barrel from "./data";
-import type { ArchangelRow, SephirahRow } from "./rows";
+import type {
+  AlchemySymbolRow,
+  ArchangelRow,
+  GDGradeRow,
+  PlanetRow,
+  SephirahRow,
+  TetragramRow,
+  TolPathRow,
+  ZodiacRow,
+} from "./rows";
 import { tables } from "./tables";
 import type { Links, Raw, Row } from "./types";
 
@@ -91,6 +100,53 @@ describe("the row types", () => {
     expect(barrel.sephirah.keter.archangel?.name.roman).toBe("Metatron");
   });
 
+  it("types the back-links the entity pages read", () => {
+    // Plan 036's seven, none of them in the JSON: a list where the graph says
+    // `inverseMany`, and otherwise the one row or nothing, which the
+    // integrity check proves unique. Type equality, as above, so that a
+    // back-link that lost its name or widened would fail here rather than
+    // still be assignable.
+    const sol = data.planet.sol;
+    const resh = data.hebrewLetter.resh;
+    const exact: [
+      Same<typeof sol.zodiacs, readonly ZodiacRow[]>,
+      Same<typeof sol.tetragrams, readonly TetragramRow[]>,
+      Same<typeof sol.gdGrade, GDGradeRow | undefined>,
+      Same<typeof sol.alchemySymbol, AlchemySymbolRow | undefined>,
+      Same<typeof resh.planet, PlanetRow | undefined>,
+      Same<typeof resh.hermeticPath, TolPathRow | undefined>,
+      Same<typeof resh.hebrewPath, TolPathRow | undefined>,
+    ] = [true, true, true, true, true, true, true];
+    expect(exact).not.toContain(false);
+
+    expect(sol.zodiacs.map((z) => z.id)).toEqual(["leo"]);
+    expect(sol.gdGrade?.id).toBe("5=6");
+    expect(sol.alchemySymbol?.name.en).toBe("Gold");
+    expect(resh.planet).toBe(sol);
+    // A nested link's back-link lands at the top of the row it points at.
+    expect(resh.hermeticPath?.hermetic?.hebrewLetter).toBe(resh);
+    expect(resh.hebrewPath?.hebrew?.hebrewLetter).toBe(resh);
+  });
+
+  it("names a path's two sephirot, and each sephirah's paths", () => {
+    // Every one of the twenty-four paths carries both ends, so neither
+    // accessor is optional; Da'at, on no path, has two empty lists.
+    const path = data.tolPath["1_6"];
+    const tiferet = data.sephirah.tiferet;
+    const exact: [
+      Same<typeof path.from, SephirahRow>,
+      Same<typeof path.to, SephirahRow>,
+      Same<typeof tiferet.pathsFrom, readonly TolPathRow[]>,
+      Same<typeof tiferet.pathsTo, readonly TolPathRow[]>,
+    ] = [true, true, true, true];
+    expect(exact).not.toContain(false);
+
+    const joins: string = `${path.from.name.roman}–${path.to.name.roman}`;
+    expect(joins).toBe("Keter–Tiferet");
+    expect(tiferet.pathsTo).toContain(path);
+    expect(data.sephirah.daat.pathsFrom).toEqual([]);
+  });
+
   it("is readonly wherever assemble() froze it", () => {
     // Each of these used to compile and then throw, because `assemble()`
     // deep-freezes and the types said nothing about it. They are now compile
@@ -137,6 +193,12 @@ describe("the row types", () => {
     // @ts-expect-error only the sephirot were assembled
     expect(scoped.sephirah.keter.archangel).toBeUndefined();
     expect(scoped.sephirah.keter.next?.id).toBe("chochmah");
+
+    // A back-link belongs to the table that declares it, so it is there only
+    // where that table was assembled too.
+    const planets = assemble({ planet: tables.planet });
+    // @ts-expect-error the signs were not assembled
+    expect(planets.planet.sol.zodiacs).toBeUndefined();
   });
 
   it("has no accessor for anything the graph does not link", () => {
@@ -155,6 +217,10 @@ describe("the row types", () => {
     expect(data.tetragram.acquisitio.planets.symbol).toBeUndefined();
     // @ts-expect-error nine of the eleven sephirot have a grade, so it needs ?.
     expect(data.sephirah.hod.gdGrade.name).toBe("Practicus");
+    // @ts-expect-error a back-link derived for many rows is a list
+    expect(data.planet.sol.zodiacs.id).toBeUndefined();
+    // @ts-expect-error seven of the letters have a planet, so it needs ?.
+    expect(data.hebrewLetter.resh.planet.id).toBe("sol");
   });
 
   it("knows the tables and the ids the JSON has", () => {

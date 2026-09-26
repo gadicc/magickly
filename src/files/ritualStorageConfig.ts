@@ -13,8 +13,6 @@ export type RitualStorageConfig =
   | R2RitualStorageConfig
   | MinioRitualStorageConfig;
 
-const LOCAL_ACCEPTANCE_FLAG = "MAGICKLI_LOCAL_ACCEPTANCE";
-
 function required(environment: RuntimeEnvironment, key: string) {
   const value = environment[key]?.trim();
   if (!value || value.includes("\0"))
@@ -69,20 +67,18 @@ function loopbackDatabaseUrl(value: string, development: boolean) {
 }
 
 /**
- * MinIO is limited to local database and storage endpoints in an explicit
- * acceptance run or an ordinary Next development process. Development also
+ * MinIO is limited to local database and storage endpoints in a local
+ * production build or ordinary Next development process. Development also
  * permits db.localtest.me for the shared local Neon proxy; acceptance stays
  * numeric-only with no database URL query.
  */
 export function assertLocalRitualStorageBoundary(
   environment: RuntimeEnvironment,
 ) {
-  const acceptance = environment[LOCAL_ACCEPTANCE_FLAG] === "1";
   const development =
     environment.NODE_ENV === "development" &&
-    environment[LOCAL_ACCEPTANCE_FLAG] === undefined;
+    environment.MAGICKLI_LOCAL_ACCEPTANCE === undefined;
   if (
-    (!acceptance && !development) ||
     Object.entries(environment).some(
       ([key, value]) =>
         value !== undefined && (key === "VERCEL" || key.startsWith("VERCEL_")),

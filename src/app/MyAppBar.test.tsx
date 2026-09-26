@@ -6,6 +6,7 @@ const navigation = vi.hoisted(() => ({
   pathname: "/",
   segment: null as string | null,
 }));
+const drawer = vi.hoisted(() => ({ inline: false }));
 
 vi.mock("next/navigation", () => ({
   usePathname: () => navigation.pathname,
@@ -22,6 +23,26 @@ vi.mock("@/auth/browserLifecycle", () => ({ sqlBrowserLifecycle: {} }));
 vi.mock("./clientProviders", () => ({
   useLegacyRecoveryGate: () => ({ state: "checking", retry: () => {} }),
 }));
+// The drawer is a portal, which renders nothing on the server, and each of
+// its sections mounts its list only when opened. Laid out inline, every
+// link the drawer can show is in the markup, for the one test that asks.
+vi.mock("@mui/material", async (importOriginal) => {
+  const mui = await importOriginal<typeof import("@mui/material")>();
+  const { createElement } = await import("react");
+  const inline =
+    <P extends { children?: React.ReactNode }>(
+      Original: React.ComponentType<P>,
+    ) =>
+    (props: P) =>
+      drawer.inline
+        ? createElement("div", null, props.children)
+        : createElement(Original, props);
+  return {
+    ...mui,
+    Drawer: inline(mui.Drawer),
+    Collapse: inline(mui.Collapse),
+  };
+});
 
 function serverRender(pathname: string, segment: string | null = null) {
   navigation.pathname = pathname;
@@ -32,6 +53,7 @@ function serverRender(pathname: string, segment: string | null = null) {
 afterEach(() => {
   navigation.pathname = "/";
   navigation.segment = null;
+  drawer.inline = false;
 });
 
 describe("MyAppBar on the server", () => {
@@ -72,8 +94,30 @@ describe("MyAppBar on the server", () => {
   });
 
   it("shows the site name below a titled section", () => {
-    const html = serverRender("/kabbalah/sephirah/keter");
-    expect(html).not.toContain("<h1");
-    expect(html).toContain('<span style="vertical-align:top">Magick.ly</span>');
+    // The angel pages have no list page of their own, so no title either:
+    // the page's heading is the page's, and the bar shows the breadcrumb.
+    for (const pathname of [
+      "/kabbalah/sephirah/keter",
+      "/kabbalah/angel/vehuiah",
+    ]) {
+      const html = serverRender(pathname);
+      expect(html, pathname).not.toContain("<h1");
+      expect(html, pathname).toContain(
+        '<span style="vertical-align:top">Magick.ly</span>',
+      );
+    }
+  });
+
+  it("offers no link in the drawer to a page that does not exist", () => {
+    drawer.inline = true;
+    const hrefs = [
+      ...serverRender("/").matchAll(/<a\b[^>]*\shref="([^"]*)"/g),
+    ].map(([, href]) => href);
+    // The Kabbalah section is there, so its absence below means something.
+    expect(hrefs).toEqual(
+      expect.arrayContaining(["/kabbalah/tree", "/kabbalah/yhvh"]),
+    );
+    // There is no /kabbalah/angel page, only the pages below it.
+    expect(hrefs).not.toContain("/kabbalah/angel");
   });
 });

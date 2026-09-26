@@ -49,7 +49,7 @@
 
   "yhvh-tzvaot": {
     name: {
-      he: "יהוה צבעות",
+      he: "יהוה צבאות",
       roman: "YHVH Tzva-oht",
       en: "Lord of Armies",
     },
@@ -57,7 +57,7 @@
 
   "elohim-tzvaot": {
     name: {
-      he: "אלוהים צבעות",
+      he: "אלוהים צבאות",
       roman: "Elohim Tzvaot",
       en: "God of Armies",
     },

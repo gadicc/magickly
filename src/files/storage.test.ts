@@ -25,7 +25,6 @@ const environment = {
 };
 const minioEnvironment = {
   NODE_ENV: "production",
-  MAGICKLI_LOCAL_ACCEPTANCE: "1",
   BETTER_AUTH_URL: "http://127.0.0.1:3115",
   DATABASE_URL:
     "postgresql://local:synthetic@127.0.0.1:5432/magickli_acceptance_20260914",

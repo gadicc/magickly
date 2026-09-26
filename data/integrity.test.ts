@@ -27,10 +27,11 @@ import { type Tables, tables } from "./tables";
 /**
  * The data against the graph: every id-shaped field declared, every link
  * resolving, the arity as named, the mirrors symmetric, the chains whole, no
- * accessor shadowing a field, and every row through its schema. This replaces
- * the step-0 audit, which walked the barrel's mutation and listed the links
- * it could not make; plan 032's step 1 emptied that list and step 2 makes the
- * question a real one. Whether the graph names every table, and matches the
+ * singular back-link claimed twice, no accessor shadowing a field, and every
+ * row through its schema. This replaces the step-0 audit, which walked the
+ * barrel's mutation and listed the links it could not make; plan 032's step 1
+ * emptied that list and step 2 makes the question a real one. Whether the
+ * graph names every table, and matches the
  * `graph.json` the build emits, is [graph.test.ts](./graph.test.ts)'s.
  *
  * The checks live in [integrity.ts](./integrity.ts) so that
@@ -149,6 +150,27 @@ describe("the data against the graph", () => {
     );
   });
 
+  it("counts a back-link two rows claim where the graph says there is one", () => {
+    // A singular back-link is a claim about the data — one grade per planet,
+    // one metal per planet, one planet per double letter, one path per letter
+    // on each tree (plan 036) — and this is where it is held. Here the
+    // Hermetic tree deals Resh to Netzach–Malchut as well as to Hod–Yesod,
+    // through a link inside a nested block.
+    const failures = broken("tolPath", {
+      ...tables.tolPath,
+      "7_10": {
+        ...tables.tolPath["7_10"],
+        hermetic: {
+          ...tables.tolPath["7_10"].hermetic,
+          hebrewLetterId: "resh",
+        },
+      },
+    });
+    expect(of("link", failures)).toEqual([
+      'hebrewLetter.resh.hermeticPath: inverse-not-unique: more than one tolPath names it, "8_9" among them',
+    ]);
+  });
+
   it("counts a mirror the other table does not declare back", () => {
     // The graph on its own, before any data is walked: a `mirrors` that only
     // one side declares has `assemble()` assert symmetry in one direction,
@@ -217,6 +239,26 @@ describe("the data against the graph", () => {
     });
     expect(of("chain", headless)).toEqual([
       "gdGrade: 2 rows have no prevId, not one head",
+    ]);
+  });
+
+  it("counts a path whose id does not spell the spheres it joins", () => {
+    // `1_6` is Keter to Tiferet by index, and the Tree and the URLs read the
+    // id while the pages read the pair, so the two must not drift. The ends
+    // go in the id's order, so a pair written the wrong way round is wrong
+    // too; an end that names no sephirah is the link check's.
+    const failures = broken("tolPath", {
+      ...tables.tolPath,
+      "1_6": { ...tables.tolPath["1_6"], toId: "hod" },
+      "2_3": { ...tables.tolPath["2_3"], fromId: "binah", toId: "chochmah" },
+      "2_6": { ...tables.tolPath["2_6"], toId: "nowhere" },
+    });
+    expect(of("ends", failures)).toEqual([
+      "tolPath.1_6: names keter and hod, which spell 1_8",
+      "tolPath.2_3: names binah and chochmah, which spell 3_2",
+    ]);
+    expect(of("link", failures)).toEqual([
+      'tolPath.2_6.toId: dangling: no sephirah is keyed "nowhere"',
     ]);
   });
 

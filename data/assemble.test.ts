@@ -99,10 +99,10 @@ describe("assemble", () => {
     ]);
   });
 
-  it("reports a second row claiming a back-link that must be unique", () => {
+  it("derives a list back-link, and an empty one where nothing points at the row", () => {
     const data = assemble(tables);
-    // Every inverse in the real graph is a list, and an empty one where
-    // nothing points at the row.
+    // A singular back-link, and a second row claiming one, are
+    // [assemble.declared.test.ts](./assemble.declared.test.ts)'s.
     expect(data.element.spirit.zodiacs).toEqual([]);
     expect(data.element.fire.zodiacs.map((z) => z.id)).toEqual([
       "aries",

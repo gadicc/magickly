@@ -60,9 +60,9 @@ The seed repeats the live identity check and is safe to rerun; it adds no admin
 grant, file row, or bucket object. `LOOM_LOCAL_TEST_LOGIN=1` exposes Creator
 and Reader buttons at `/signin` without Google. Set
 `RITUAL_SEMANTIC_EDITOR=1` for the opt-in semantic editor pilot.
-There is no `MAGICKLI_LOCAL_ACCEPTANCE` flag in ordinary development; that
-flag retains the separate numeric-loopback production-build acceptance path
-documented in `scripts/local-acceptance/README.md`.
+Leave `MAGICKLI_LOCAL_ACCEPTANCE` unset in ordinary development. The separate
+numeric-loopback production-build acceptance path is documented in
+`scripts/local-acceptance/README.md`.
 
 Verify the bucket with `pnpm exec loom files r2 check`, then attach a small
 synthetic PNG at `/upload` to a ritual you edit. Paste the returned source

@@ -4,14 +4,14 @@
  * A handful of questions, and a list of everything that answers wrongly: is
  * every id-shaped field declared, and is everything declared there; is every
  * `mirrors` declared from both ends; do the links resolve; does the arity
- * match; are the chains whole; does every row pass its
- * [schema](./schemas.ts); do the few lists TypeScript has to hold by hand
- * still say what the data says; does any source
- * [write a key twice](./duplicateKeys.ts); and does the Enochian dictionary,
- * which is no table, hold an entry its type does not admit, or list a
- * meaning or pronunciation twice? Nothing throws and nothing is fatal here —
- * [integrity.test.ts](./integrity.test.ts) asserts the list is empty, and
- * [check.ts](./check.ts) is the same list on the command line, which
+ * match; are the chains whole; does each path's id spell the two spheres it
+ * joins; does every row pass its [schema](./schemas.ts); do the few lists
+ * TypeScript has to hold by hand still say what the data says; does any
+ * source [write a key twice](./duplicateKeys.ts); and does the Enochian
+ * dictionary, which is no table, hold an entry its type does not admit, or
+ * list a meaning or pronunciation twice? Nothing throws and nothing is fatal
+ * here — [integrity.test.ts](./integrity.test.ts) asserts the list is empty,
+ * and [check.ts](./check.ts) is the same list on the command line, which
  * `pnpm build` runs before Next sees the data.
  *
  * The tables are an argument so that a test can hand it a broken one.
@@ -36,6 +36,8 @@ export interface Failure {
     | "arity"
     | "link"
     | "chain"
+    /** A path whose id does not spell the indices of the spheres it names. */
+    | "ends"
     | "schema"
     /** A `mirrors` the graph declares from one end only. */
     | "mirror"
@@ -160,6 +162,32 @@ function checkChain(
       where: name,
       detail: `the walk along ${forward} reaches ${visited.length} of ${chained.length} rows`,
     });
+  return failures;
+}
+
+/**
+ * A path's id against the two sephirot it names: `1_6` is Keter to Tiferet,
+ * by their `index`, in the order `fromId` and `toId` give them. The id is
+ * what the Tree draws and every URL carries, and the pair says the same thing
+ * in words, so the two must not drift. An end that names no sephirah is the
+ * link check's to report, and is passed over here.
+ */
+function checkPathEnds(paths: unknown, sephirot: unknown): Failure[] {
+  const failures: Failure[] = [];
+  const index = new Map(rowsOf(sephirot).map(([id, row]) => [id, row.index]));
+
+  for (const [id, row] of rowsOf(paths)) {
+    const from = index.get(String(row.fromId));
+    const to = index.get(String(row.toId));
+    if (from === undefined || to === undefined) continue;
+    const spelled = `${from}_${to}`;
+    if (id !== spelled)
+      failures.push({
+        check: "ends",
+        where: `tolPath.${id}`,
+        detail: `names ${row.fromId} and ${row.toId}, which spell ${spelled}`,
+      });
+  }
   return failures;
 }
 
@@ -367,6 +395,7 @@ export function checkIntegrity(
   }
 
   failures.push(...checkPlanetIds(input.planet));
+  failures.push(...checkPathEnds(input.tolPath, input.sephirah));
 
   // The sources as text, which is the only place a repeated key is visible:
   // JSON5 keeps the last of them, so everything downstream sees one.

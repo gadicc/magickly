@@ -1,12 +1,9 @@
 import data from "@magick-data/data";
 import { rowOf } from "@magick-data/rowOf";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import Typography from "@mui/material/Typography";
-import { decycle } from "cycle";
 import { notFound } from "next/navigation";
 import { entityIds, planetPage } from "@/seo/entities";
 import { seoMetadata } from "@/seo/metadata";
+import PlanetPage from "./Planet";
 
 const planets = data.planet;
 
@@ -33,24 +30,5 @@ export default async function Planet({
   const planet = rowOf(planets, id);
   if (!planet) notFound();
 
-  return (
-    <Container maxWidth="sm">
-      <Box sx={{ my: 4 }}>
-        <Typography variant="h5" component="h1" gutterBottom>
-          {planet.name.en.en} {planet.symbol}
-        </Typography>
-
-        <table>
-          <tbody>
-            {Object.keys(planet).map((key) => (
-              <tr key={key}>
-                <td>{key}</td>
-                <td>{JSON.stringify(decycle(planet[key]))}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Box>
-    </Container>
-  );
+  return <PlanetPage planet={planet} />;
 }
