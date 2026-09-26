@@ -15,7 +15,7 @@ type MagickliLocalTestIdentity = BetterAuthLocalTestLoginIdentity & {
 
 const [creator, reader, admin] = LOCAL_ACCEPTANCE_USERS;
 
-/** Fixed identities prepared by the dedicated local acceptance seeder. */
+/** Fixed identities prepared by the local development or acceptance seeder. */
 export const MAGICKLI_LOCAL_TEST_IDENTITIES = {
   admin: {
     ...admin,
@@ -37,7 +37,7 @@ export const MAGICKLI_LOCAL_TEST_FIXTURE_SETUP_REQUIRED =
 export class MagickliLocalTestFixtureSetupError extends Error {
   constructor() {
     super(
-      `${MAGICKLI_LOCAL_TEST_FIXTURE_SETUP_REQUIRED}: run pnpm local-acceptance:seed first`,
+      `${MAGICKLI_LOCAL_TEST_FIXTURE_SETUP_REQUIRED}: run the matching local fixture seed first`,
     );
     this.name = "MagickliLocalTestFixtureSetupError";
   }
@@ -55,8 +55,8 @@ function fixtureSetupRequired(): never {
 /**
  * Rotate only the credential for one exact preseeded identity.
  *
- * User creation and every application grant, including global admin, remain
- * exclusively owned by the dedicated local acceptance fixture.
+ * User creation and every application grant remain owned by the applicable
+ * local fixture. This route only rotates a password for a preseeded user.
  */
 export async function provisionMagickliLocalTestIdentity({
   identity,

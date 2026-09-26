@@ -1,0 +1,19 @@
+declareVar(name="myRole", label="My role", varType="select", default="member")
+  option(value="member", label="Member")
+  option(value="hierophant", label="Hierophant")
+  option(value="keryx", label="Keryx")
+declareVar(name="candidateName", label="Candidate name", varType="text", default="Candidate")
+title(text="Opening of the Hall")
+  | Opening of the Hall
+Hiero,Keryx: Welcome ${candidateName} to 0=0. שלום עולם
+* All-officers Rise and face east.
+do(role="all-except-candidate") Make the sign.
+say(role="all-officers-except-keryx") Respond together.
+note
+  b Use the traditional pronunciation.
+  summary(summary="Pronunciation")
+    | Hebrew: שָׁלוֹם; Enochian: OL SONF
+footnote Synthetic reference, not a source citation.
+img(src="/temple.svg", alt="Synthetic temple diagram", width="320")
+title(text="Closing")
+  | Closing

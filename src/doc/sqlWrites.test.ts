@@ -22,6 +22,8 @@ import {
 import { userAccess } from "../db/schema/userProfile";
 import { createUuidV7 } from "../lib/ids";
 import * as compiler from "./compileContract";
+import { semanticFromJrt } from "./semantic";
+import * as semanticCompiler from "./semanticCompile";
 import { createSqlRitualReader } from "./sqlReads";
 import type { SqlRitualWriteRequest } from "./sqlWriteContract";
 import {
@@ -236,7 +238,7 @@ const writer = (
   createSqlRitualWriter(
     database,
     async () => (name === null ? null : actor[name]),
-    { now: () => new Date(when) },
+    { now: () => new Date(when), enableSemanticWrites: true },
   );
 function save(
   name = "group",
@@ -274,7 +276,7 @@ function publish(
   by = "global",
 ): Extract<SqlRitualWriteRequest, { kind: "publish" }> {
   const { source: _, ...base } = save(name, by);
-  return { ...base, kind: "publish" };
+  return { ...base, version: 2, kind: "publish" };
 }
 async function counts() {
   return {
@@ -290,6 +292,132 @@ async function current(id = ritualIds.group) {
 }
 
 describe("atomic canonical SQL-v2 ritual writes", () => {
+  it("keeps v3 writes disabled until the pilot flag is enabled", async () => {
+    const command = {
+      ...save(),
+      version: 3 as const,
+      source: JSON.stringify(semanticFromJrt({ children: [] })),
+    };
+    const disabled = createSqlRitualWriter(db, async () => actor.creator);
+    const before = await counts();
+    expect(await disabled(command)).toMatchObject({
+      ok: false,
+      code: "UPGRADE_REQUIRED",
+    });
+    expect(await counts()).toEqual(before);
+  });
+
+  it("accepts SQL-v3 semantic JSON with exact source/artifact binding and replay", async () => {
+    const command = save();
+    command.version = 3;
+    const jrt = {
+      children: [
+        {
+          type: "task",
+          say: true,
+          role: "hiero",
+          children: [{ type: "text", value: "שלום 🌍" }],
+        },
+      ],
+    };
+    command.source = JSON.stringify(semanticFromJrt(jrt), null, 2);
+    const first = await writer()(command);
+    expect(first).toMatchObject({ ok: true, replayed: false, version: 8 });
+    if (!first.ok) throw new Error("Expected semantic save");
+    const second = await writer()(command);
+    expect(second).toMatchObject({ ...first, replayed: true });
+    const parent = await current();
+    const [revision] = await db
+      .select()
+      .from(ritualRevisions)
+      .where(eq(ritualRevisions.id, first.revisionId));
+    expect(revision).toMatchObject({
+      source: command.source,
+      sourceSha256: hash(command.source),
+      sourceFormat: semanticCompiler.SEMANTIC_SOURCE_FORMAT,
+      sourceFormatVersion: semanticCompiler.SEMANTIC_SOURCE_FORMAT_VERSION,
+    });
+    const [artifact] = await db
+      .select()
+      .from(ritualCompiledArtifacts)
+      .where(eq(ritualCompiledArtifacts.id, parent.currentCompiledArtifactId!));
+    expect(artifact).toMatchObject({
+      revisionId: first.revisionId,
+      sourceSha256: hash(command.source),
+      compilerVersion: semanticCompiler.SEMANTIC_COMPILER_VERSION,
+      outputFormat: compiler.RITUAL_OUTPUT_FORMAT,
+      outputFormatVersion: compiler.RITUAL_OUTPUT_FORMAT_VERSION,
+    });
+    expect(JSON.parse(artifact.contentJson)).toEqual(jrt);
+    expect(
+      await reader(actor.member).getRendered(command.ritualId),
+    ).toMatchObject({
+      contentJson: artifact.contentJson,
+    });
+  });
+
+  it("creates a semantic ritual with a selected profile-1 artifact", async () => {
+    const command = create();
+    command.version = 3;
+    command.source = JSON.stringify(
+      semanticFromJrt({
+        children: [
+          {
+            type: "task",
+            do: true,
+            role: "all",
+            children: [{ type: "text", value: "Begin." }],
+          },
+        ],
+      }),
+    );
+    const result = await writer("global")(command);
+    expect(result).toMatchObject({ ok: true, version: 1, replayed: false });
+    if (!result.ok) throw new Error("Expected semantic create");
+    const [revision] = await db
+      .select()
+      .from(ritualRevisions)
+      .where(eq(ritualRevisions.id, result.revisionId));
+    expect(revision).toMatchObject({
+      source: command.source,
+      sourceFormat: semanticCompiler.SEMANTIC_SOURCE_FORMAT,
+    });
+    expect(
+      await reader(actor.global).getRendered(result.ritualId),
+    ).toMatchObject({
+      contentJson: expect.stringContaining('"role":"all"'),
+    });
+  });
+
+  it("rejects invalid semantic source without changing revision or receipt state", async () => {
+    const command = save();
+    command.version = 3;
+    command.source = '{"format":"magickli-ritual","version":1,"nodes":[{}]}';
+    const before = await counts();
+    const parent = await current();
+    expect(await writer()(command)).toMatchObject({
+      ok: false,
+      code: "INVALID_SOURCE",
+    });
+    expect(await current()).toEqual(parent);
+    expect(await counts()).toEqual(before);
+  });
+
+  it("keeps a v2 operation ID distinct from a v3 payload", async () => {
+    const command = save();
+    const first = await writer()(command);
+    expect(first.ok).toBe(true);
+    const semantic = {
+      ...command,
+      version: 3 as const,
+      source: JSON.stringify(semanticFromJrt({ children: [] })),
+    };
+    expect(await writer()(semantic)).toMatchObject({
+      ok: false,
+      code: "IDEMPOTENCY_KEY_REUSED",
+    });
+  });
+
   it("appends exact source and a selected versioned artifact with parent CAS/receipt in one commit", async () => {
     const command = save();
     command.source = "\uFEFFp Exact e\u0301 é 🌍\r\n\r\n";

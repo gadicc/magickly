@@ -94,9 +94,11 @@ function receipt(value: unknown): value is RitualUploadReceipt {
   );
 }
 
-function exactLoopbackHttp(value: string) {
+function exactLoopbackHttp(value: string, allowLocalhost = false) {
   const authority =
-    /^http:\/\/(127\.0\.0\.1|\[::1\]):([1-9]\d{0,4})(?=\/|\?|$)/.exec(value);
+    /^http:\/\/(127\.0\.0\.1|\[::1\]|localhost):([1-9]\d{0,4})(?=\/|\?|$)/.exec(
+      value,
+    );
   if (!authority) return null;
   let url: URL;
   try {
@@ -108,6 +110,7 @@ function exactLoopbackHttp(value: string) {
   if (
     url.protocol !== "http:" ||
     url.hostname !== authority[1] ||
+    (!allowLocalhost && url.hostname === "localhost") ||
     url.port !== authority[2] ||
     !Number.isSafeInteger(port) ||
     port > 65_535 ||
@@ -124,9 +127,14 @@ function allowedUploadUrl(value: string) {
   const upload = exactLoopbackHttp(value);
   const page =
     typeof globalThis.location?.origin === "string"
-      ? exactLoopbackHttp(globalThis.location.origin)
+      ? exactLoopbackHttp(globalThis.location.origin, true)
       : null;
-  return !!upload && !!page && upload.hostname === page.hostname;
+  return (
+    !!upload &&
+    !!page &&
+    (upload.hostname === page.hostname ||
+      (page.hostname === "localhost" && upload.hostname === "127.0.0.1"))
+  );
 }
 
 async function command(

@@ -93,7 +93,9 @@
             "jurisdiction": "default",
             "kind": "cloudflare-r2",
             "localDevelopment": {
-              "kind": "none"
+              "bucket": "magickly-dev",
+              "endpoint": "http://127.0.0.1:9000",
+              "kind": "minio"
             },
             "locationHint": "weur",
             "publicUrl": null,

@@ -8,9 +8,13 @@ import { useLegacyRecoveryGate } from "../clientProviders";
 export default function SignInButton({
   callbackURL,
   localTestLoginEnabled = false,
+  showLocalTestAdmin = false,
+  localTestSeedCommand = "local-development:seed",
 }: {
   callbackURL: string;
   localTestLoginEnabled?: boolean;
+  showLocalTestAdmin?: boolean;
+  localTestSeedCommand?: "local-development:seed" | "local-acceptance:seed";
 }) {
   const [pending, setPending] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -48,7 +52,7 @@ export default function SignInButton({
         <>
           <Divider>Local development</Divider>
           <Typography variant="body2">
-            Uses the fixed identities prepared by pnpm local-acceptance:seed.
+            Uses the fixed identities prepared by pnpm {localTestSeedCommand}.
           </Typography>
           <form action="/api/dev/test-login" method="post">
             <input name="callbackURL" type="hidden" value={callbackURL} />
@@ -69,14 +73,16 @@ export default function SignInButton({
               >
                 Reader
               </Button>
-              <Button
-                disabled={recovery.state !== "ready"}
-                name="identity"
-                type="submit"
-                value="admin"
-              >
-                Test admin
-              </Button>
+              {showLocalTestAdmin && (
+                <Button
+                  disabled={recovery.state !== "ready"}
+                  name="identity"
+                  type="submit"
+                  value="admin"
+                >
+                  Test admin
+                </Button>
+              )}
             </Stack>
           </form>
         </>

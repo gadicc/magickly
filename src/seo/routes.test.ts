@@ -24,6 +24,7 @@ const PRIVATE_ROUTES = [
   "/admin",
   "/chat/train",
   "/doc/[_id]/edit",
+  "/doc/[_id]/edit/semantic",
   "/gd/components",
   "/offline/ritual",
   "/signin",

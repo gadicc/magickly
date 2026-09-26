@@ -27,6 +27,12 @@ export default async function SignInPage({
       <SignInButton
         callbackURL={callbackURL}
         localTestLoginEnabled={isBetterAuthLocalTestLoginEnabled(process.env)}
+        showLocalTestAdmin={process.env.MAGICKLI_LOCAL_ACCEPTANCE === "1"}
+        localTestSeedCommand={
+          process.env.MAGICKLI_LOCAL_ACCEPTANCE === "1"
+            ? "local-acceptance:seed"
+            : "local-development:seed"
+        }
       />
     </Container>
   );

@@ -1,0 +1,24 @@
+@font-face { font-family: "Trial Hebrew"; src: url("../../public/fonts/FrankRuehlCLM-Medium.woff2") format("woff2"); }
+@font-face { font-family: "Trial Enochian"; src: url("../../assets/fonts/EnochianPlain.ttf") format("truetype"); }
+*:lang(he) { font-family: "Trial Hebrew", serif; }
+*:lang(x-enochian) { font-family: "Trial Enochian", serif; }
+* { box-sizing: border-box; } body { margin: 0; background: #f8f5ee; color: #252321; font: 16px/1.45 system-ui, sans-serif; }
+main { max-width: 1450px; margin: auto; padding: 1rem 1.5rem 4rem; } header h1 { margin-bottom: 0; } header p { margin-top: .25rem; color: #666; }
+.columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.5rem; }
+.columns > section { min-width: 0; } .toolbar { display: flex; gap: .4rem; flex-wrap: wrap; align-items: center; margin: .8rem 0; }
+button, select, input { font: inherit; padding: .4rem .6rem; } button { cursor: pointer; background: white; border: 1px solid #887e70; border-radius: .3rem; }
+button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid #2d66b4; outline-offset: 2px; }
+.editor, .reader article, textarea { min-height: 600px; background: white; border: 1px solid #b9b1a3; border-radius: .25rem; padding: 1rem; }
+.editor:focus-within { outline: 2px solid #2d66b4; } .editor p, .reader p { margin: .5rem 0; }
+.task, .reader-task { border-left: 4px solid #60876c; padding: .5rem .8rem; margin: .7rem 0; background: #f0f8ed; }
+.lexical-task::before { content: attr(data-label); display: block; color: #38563d; font-size: .85rem; text-transform: uppercase; }
+.task-label { color: #38563d; font-size: .85rem; text-transform: uppercase; letter-spacing: .03em; }
+.note, .reader-note { background: #f6f1e5; padding: .6rem; margin: .6rem 0; }
+.summary, .footnote, .reader-footnote { border: 1px solid #b9b1a3; padding: .5rem; margin: .5rem 0; }
+.atom { display: inline-block; padding: .15rem .35rem; background: #e7e2f5; border-radius: .2rem; }
+div.atom { display: block; margin: .4rem 0; } .legacy { background: #fff0d1; } .grade { border: 1px solid #725b25; border-radius: 50%; }
+.reader label { display: inline-flex; gap: .4rem; margin: 0 .8rem .6rem 0; align-items: center; } .reader article { min-height: 400px; }
+.reader img { max-width: 100%; } .substitution { background: #fff3b6; }
+textarea { width: 100%; font: 13px/1.4 ui-monospace, monospace; resize: vertical; }
+.message { padding: .5rem; background: #ffe3bd; } pre { overflow: auto; max-height: 400px; font-size: 12px; }
+@media (max-width: 850px) { .columns { grid-template-columns: 1fr; } }

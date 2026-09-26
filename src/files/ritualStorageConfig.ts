@@ -20,12 +20,16 @@ function required(environment: RuntimeEnvironment, key: string) {
   return value;
 }
 
-function loopbackOrigin(value: string) {
+function loopbackOrigin(value: string, allowLocalhost = false) {
   try {
     const url = new URL(value);
+    const localHost =
+      url.hostname === "127.0.0.1" ||
+      url.hostname === "[::1]" ||
+      (allowLocalhost && url.hostname === "localhost");
     if (
       url.protocol !== "http:" ||
-      (url.hostname !== "127.0.0.1" && url.hostname !== "[::1]") ||
+      !localHost ||
       !url.port ||
       value !== url.origin
     )
@@ -36,7 +40,7 @@ function loopbackOrigin(value: string) {
   }
 }
 
-function loopbackDatabaseUrl(value: string) {
+function loopbackDatabaseUrl(value: string, development: boolean) {
   try {
     const url = new URL(value);
     const authority = value
@@ -46,11 +50,14 @@ function loopbackDatabaseUrl(value: string) {
       .at(-1);
     if (
       !["postgres:", "postgresql:"].includes(url.protocol) ||
-      (url.hostname !== "127.0.0.1" && url.hostname !== "[::1]") ||
+      (url.hostname !== "127.0.0.1" &&
+        url.hostname !== "[::1]" &&
+        !(development && url.hostname === "db.localtest.me")) ||
       !url.port ||
       authority !== url.host ||
       url.pathname.length < 2 ||
-      url.search !== "" ||
+      (url.search !== "" &&
+        !(development && url.search === "?sslmode=disable")) ||
       url.hash !== ""
     )
       throw new Error();
@@ -60,12 +67,17 @@ function loopbackDatabaseUrl(value: string) {
 }
 
 /**
- * MinIO is permitted only for an explicit, wholly loopback local runtime. The
- * boundary uses configured origins rather than request-controlled host headers.
+ * MinIO is limited to local database and storage endpoints in a local
+ * production build or ordinary Next development process. Development also
+ * permits db.localtest.me for the shared local Neon proxy; acceptance stays
+ * numeric-only with no database URL query.
  */
 export function assertLocalRitualStorageBoundary(
   environment: RuntimeEnvironment,
 ) {
+  const development =
+    environment.NODE_ENV === "development" &&
+    environment.MAGICKLI_LOCAL_ACCEPTANCE === undefined;
   if (
     Object.entries(environment).some(
       ([key, value]) =>
@@ -73,14 +85,15 @@ export function assertLocalRitualStorageBoundary(
     )
   )
     throw new Error("Local ritual storage is not configured");
-  loopbackOrigin(required(environment, "BETTER_AUTH_URL"));
+  loopbackOrigin(required(environment, "BETTER_AUTH_URL"), development);
   loopbackOrigin(required(environment, "FILES_S3_ENDPOINT"));
   const configuredDatabaseUrls = RUNTIME_DATABASE_URL_ENV_NAMES.map((key) =>
     environment[key]?.trim(),
   ).filter((value): value is string => Boolean(value));
   if (configuredDatabaseUrls.length === 0)
     throw new Error("Local ritual storage is not configured");
-  for (const value of configuredDatabaseUrls) loopbackDatabaseUrl(value);
+  for (const value of configuredDatabaseUrls)
+    loopbackDatabaseUrl(value, development);
 }
 
 /** Reads only Loom's canonical S3 variables; no ambient AWS fallback. */
