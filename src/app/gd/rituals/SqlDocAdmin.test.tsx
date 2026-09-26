@@ -166,6 +166,71 @@ it("retains an exact SQL-v2 create before sending and navigates only after ackno
   });
 });
 
+it("creates a semantic ritual from ritual text and retries the exact v3 request", async () => {
+  mock.write.mockResolvedValueOnce(null).mockResolvedValueOnce(success);
+  render(<SqlDocAdmin semanticEnabled />);
+  fireEvent.change(await screen.findByLabelText("Title"), {
+    target: { value: "New semantic ritual" },
+  });
+  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Source format" }));
+  fireEvent.click(await screen.findByRole("option", { name: "Ritual text" }));
+  fireEvent.change(screen.getByLabelText("Ritual text"), {
+    target: { value: "ritual 1\nHiero: Welcome.\n* Keryx Open the door\n" },
+  });
+  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Visibility" }));
+  fireEvent.click(
+    await screen.findByRole("option", { name: "Synthetic temple" }),
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Create" }));
+  await screen.findByRole("button", { name: "Retry creation" });
+  const request = mock.write.mock.calls[0][0];
+  expect(request).toMatchObject({
+    version: 3,
+    kind: "create",
+    title: "New semantic ritual",
+  });
+  expect(JSON.parse(request.source).nodes).toMatchObject([
+    { tag: "task", attrs: { say: true, role: "hiero" } },
+    { tag: "task", attrs: { do: true, role: "keryx" } },
+  ]);
+  expect(JSON.parse(localStorage.getItem(key) ?? "null")).toEqual(request);
+  cleanup();
+  render(<SqlDocAdmin semanticEnabled />);
+  await screen.findByRole("button", { name: "Retry creation" });
+  fireEvent.click(screen.getByRole("button", { name: "Retry creation" }));
+  await waitFor(() => expect(mock.push).toHaveBeenCalledOnce());
+  expect(mock.write.mock.calls[1][0]).toEqual(request);
+  expect(mock.push).toHaveBeenCalledWith(`/doc/${ids.ritual}/edit/semantic`);
+  expect(localStorage.getItem(key)).toBeNull();
+  expect(
+    JSON.parse(
+      localStorage.getItem(
+        creationPublicationHandoffKey(ids.actor, ids.ritual),
+      ) ?? "null",
+    ),
+  ).toMatchObject({ write: request, result: success });
+});
+
+it("keeps invalid ritual text local instead of sending a create request", async () => {
+  render(<SqlDocAdmin semanticEnabled />);
+  fireEvent.change(await screen.findByLabelText("Title"), {
+    target: { value: "Invalid semantic ritual" },
+  });
+  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Source format" }));
+  fireEvent.click(await screen.findByRole("option", { name: "Ritual text" }));
+  fireEvent.change(screen.getByLabelText("Ritual text"), {
+    target: { value: "not a ritual" },
+  });
+  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Visibility" }));
+  fireEvent.click(
+    await screen.findByRole("option", { name: "Synthetic temple" }),
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Create" }));
+  expect(await screen.findByText(/Line 1: expected ritual 1/)).toBeTruthy();
+  expect(mock.write).not.toHaveBeenCalled();
+  expect(localStorage.getItem(key)).toBeNull();
+});
+
 it("retries an uncertain create with the same retained operation after remount", async () => {
   mock.write.mockResolvedValueOnce(null).mockResolvedValueOnce(success);
   await fill();

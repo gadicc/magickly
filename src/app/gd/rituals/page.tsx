@@ -102,7 +102,9 @@ export default async function Rituals() {
         <p>
           <Link href="/offline/ritual">Open downloaded rituals</Link>
         </p>
-        <SqlDocAdmin />
+        <SqlDocAdmin
+          semanticEnabled={process.env.RITUAL_SEMANTIC_EDITOR === "1"}
+        />
         <br />
         <p>
           To share private rituals with temple members, open{" "}

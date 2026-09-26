@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { parseRitualText, printRitualText } from "@/doc/ritualText";
+import type { RitualSemanticDocument } from "@/doc/semantic";
 import {
   fetchSqlRitualCreationOptions,
   sendSqlRitualWrite,
@@ -35,6 +37,8 @@ interface FormState {
   scopeKey: string;
   minGrade: number;
   source: string;
+  semanticSource: string;
+  format: "pug" | "semantic";
 }
 
 interface CreationIdentity {
@@ -53,6 +57,8 @@ const emptyForm = (): FormState => ({
   scopeKey: "",
   minGrade: 0,
   source: "",
+  semanticSource: "ritual 1\n",
+  format: "pug",
 });
 const storageKey = (ownerId: string) => `magickli:ritual-create:v2:${ownerId}`;
 const unavailable = (): SqlRitualWriteResult => ({
@@ -74,7 +80,11 @@ const scopeStillAuthorized = (
   );
 };
 
-export default function SqlDocAdmin() {
+export default function SqlDocAdmin({
+  semanticEnabled = false,
+}: {
+  semanticEnabled?: boolean;
+}) {
   const router = useRouter();
   const [options, setOptions] =
     React.useState<SqlRitualCreationOptionsV1 | null>(null);
@@ -242,12 +252,21 @@ export default function SqlDocAdmin() {
                 : retained.scope.kind === "group"
                   ? `group:${retained.scope.groupId}`
                   : `temple:${retained.scope.templeId}`;
+            let semanticSource = "ritual 1\n";
+            if (retained.version === 3) {
+              const document = JSON.parse(
+                retained.source,
+              ) as RitualSemanticDocument;
+              semanticSource = printRitualText(document);
+            }
             replaceForm({
               title: retained.title,
               scopeKey: key,
               minGrade:
                 retained.scope.kind === "temple" ? retained.scope.minGrade : 0,
-              source: retained.source,
+              source: retained.version === 2 ? retained.source : "",
+              semanticSource,
+              format: retained.version === 3 ? "semantic" : "pug",
             });
             replacePending(retained);
           } catch {
@@ -303,16 +322,27 @@ export default function SqlDocAdmin() {
       setError("Choose a valid visibility and minimum grade.");
       return;
     }
+    let source = form.source;
+    if (!pending && form.format === "semantic") {
+      try {
+        source = JSON.stringify(parseRitualText(form.semanticSource));
+      } catch (cause) {
+        setError(
+          cause instanceof Error ? cause.message : "Invalid ritual text.",
+        );
+        return;
+      }
+    }
     const request =
       pending ??
       parseSqlRitualCreateRequest({
-        version: 2,
+        version: form.format === "semantic" ? 3 : 2,
         operationId: createUuidV7(),
         expectedActorId: options.ownerId,
         kind: "create",
         scope,
         title: form.title,
-        source: form.source,
+        source,
       });
     if (!request) {
       setError("Enter a valid title and ritual source.");
@@ -359,7 +389,9 @@ export default function SqlDocAdmin() {
         );
         return;
       }
-      router.push(`/doc/${result.ritualId}/edit`);
+      router.push(
+        `/doc/${result.ritualId}/edit${request.version === 3 ? "/semantic" : ""}`,
+      );
     } catch {
       if (currentIdentity(identity))
         setError(SQL_RITUAL_WRITE_MESSAGES.UNAVAILABLE);
@@ -447,6 +479,25 @@ export default function SqlDocAdmin() {
         </Button>
       )}
       <form onSubmit={submit}>
+        {semanticEnabled && (
+          <TextField
+            select
+            label="Source format"
+            size="small"
+            value={form.format}
+            disabled={busy || !!pending || !!blockedRecovery}
+            onChange={(event) =>
+              updateForm((current) => ({
+                ...current,
+                format: event.target.value as FormState["format"],
+              }))
+            }
+            sx={{ minWidth: 180 }}
+          >
+            <MenuItem value="pug">Pug source</MenuItem>
+            <MenuItem value="semantic">Ritual text</MenuItem>
+          </TextField>
+        )}{" "}
         <TextField
           label="Title"
           size="small"
@@ -503,20 +554,28 @@ export default function SqlDocAdmin() {
           />
         )}
         <TextField
-          label="Ritual source"
+          label={form.format === "semantic" ? "Ritual text" : "Ritual source"}
           multiline
           minRows={4}
           fullWidth
-          value={form.source}
+          value={form.format === "semantic" ? form.semanticSource : form.source}
           disabled={busy || !!pending || !!blockedRecovery}
           onChange={(event) =>
             updateForm((current) => ({
               ...current,
-              source: event.target.value,
+              [current.format === "semantic" ? "semanticSource" : "source"]:
+                event.target.value,
             }))
           }
           sx={{ mt: 1 }}
         />
+        {form.format === "semantic" && (
+          <Typography variant="body2">
+            Start with <code>ritual 1</code>, then add lines such as{" "}
+            <code>Hiero: words</code> or <code>* Keryx action</code>. The visual
+            editor opens after creation.
+          </Typography>
+        )}
         <Button
           type="submit"
           disabled={
