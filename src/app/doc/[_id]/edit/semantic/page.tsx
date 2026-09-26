@@ -9,6 +9,10 @@ import {
 } from "@/doc/semantic";
 import { SEMANTIC_SOURCE_FORMAT } from "@/doc/semanticCompile";
 import { hasDirectNestedTask } from "@/doc/semanticEditorCompatibility";
+import {
+  createSemanticImportReport,
+  type SemanticImportReport,
+} from "@/doc/semanticImportReport";
 import { resolveSqlRitualRouteId, sqlRitualReader } from "@/doc/sqlRuntime";
 import { privateMetadata } from "@/seo/metadata";
 import SemanticEditorShell from "./SemanticEditorShell";
@@ -34,6 +38,7 @@ export default async function SemanticEditPage({
   if (!actorId || !current || !current.ritual.canEdit)
     return <Alert severity="info">Ritual editing is unavailable.</Alert>;
   let document: RitualSemanticDocument;
+  let importReport: SemanticImportReport | undefined;
   try {
     if (current.revision.sourceFormat === SEMANTIC_SOURCE_FORMAT) {
       const value: unknown = JSON.parse(current.revision.source);
@@ -59,7 +64,16 @@ export default async function SemanticEditPage({
             current revision.
           </Alert>
         );
-      document = semanticFromJrt(JSON.parse(rendered.contentJson));
+      const jrt: unknown = JSON.parse(rendered.contentJson);
+      document = semanticFromJrt(jrt);
+      importReport = createSemanticImportReport(jrt, document);
+      if (!importReport.lossless)
+        return (
+          <Alert severity="error">
+            This ritual could not be converted without changing its reader tree.
+            Its saved revision is unchanged.
+          </Alert>
+        );
     } else {
       return (
         <Alert severity="info">
@@ -88,6 +102,7 @@ export default async function SemanticEditPage({
       revisionId={current.currentRevisionId}
       parentVersion={current.version}
       initialDocument={document}
+      importReport={importReport}
       importedFromLegacy={
         current.revision.sourceFormat === RITUAL_SOURCE_FORMAT
       }
