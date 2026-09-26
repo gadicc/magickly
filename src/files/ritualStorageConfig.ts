@@ -42,7 +42,7 @@ function loopbackOrigin(value: string, allowLocalhost = false) {
   }
 }
 
-function loopbackDatabaseUrl(value: string) {
+function loopbackDatabaseUrl(value: string, development: boolean) {
   try {
     const url = new URL(value);
     const authority = value
@@ -52,11 +52,14 @@ function loopbackDatabaseUrl(value: string) {
       .at(-1);
     if (
       !["postgres:", "postgresql:"].includes(url.protocol) ||
-      (url.hostname !== "127.0.0.1" && url.hostname !== "[::1]") ||
+      (url.hostname !== "127.0.0.1" &&
+        url.hostname !== "[::1]" &&
+        !(development && url.hostname === "db.localtest.me")) ||
       !url.port ||
       authority !== url.host ||
       url.pathname.length < 2 ||
-      url.search !== "" ||
+      (url.search !== "" &&
+        !(development && url.search === "?sslmode=disable")) ||
       url.hash !== ""
     )
       throw new Error();
@@ -66,9 +69,10 @@ function loopbackDatabaseUrl(value: string) {
 }
 
 /**
- * MinIO is limited to a loopback database and storage endpoint in an explicit
- * acceptance run or an ordinary Next development process. Only development
- * permits localhost as the browser auth origin; acceptance stays numeric-only.
+ * MinIO is limited to local database and storage endpoints in an explicit
+ * acceptance run or an ordinary Next development process. Development also
+ * permits db.localtest.me for the shared local Neon proxy; acceptance stays
+ * numeric-only with no database URL query.
  */
 export function assertLocalRitualStorageBoundary(
   environment: RuntimeEnvironment,
@@ -92,7 +96,8 @@ export function assertLocalRitualStorageBoundary(
   ).filter((value): value is string => Boolean(value));
   if (configuredDatabaseUrls.length === 0)
     throw new Error("Local ritual storage is not configured");
-  for (const value of configuredDatabaseUrls) loopbackDatabaseUrl(value);
+  for (const value of configuredDatabaseUrls)
+    loopbackDatabaseUrl(value, development);
 }
 
 /** Reads only Loom's canonical S3 variables; no ambient AWS fallback. */

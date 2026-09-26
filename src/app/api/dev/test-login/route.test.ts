@@ -19,6 +19,20 @@ vi.mock("@/auth/localTestLogin", () => ({
   MAGICKLI_LOCAL_TEST_FIXTURE_SETUP_REQUIRED:
     "LOCAL_TEST_FIXTURE_SETUP_REQUIRED",
   MAGICKLI_LOCAL_TEST_IDENTITIES: {
+    creator: {
+      defaultCallbackURL: "/temples",
+      email: "creator@local-acceptance.test",
+      id: "019a0000-0000-7000-8000-000000000001",
+      name: "Synthetic Creator",
+      role: "creator",
+    },
+    reader: {
+      defaultCallbackURL: "/study",
+      email: "reader@local-acceptance.test",
+      id: "019a0000-0000-7000-8000-000000000002",
+      name: "Synthetic Reader",
+      role: "reader",
+    },
     admin: {
       defaultCallbackURL: "/admin",
       email: "admin@local-acceptance.test",
@@ -39,11 +53,11 @@ vi.mock("@/auth/runtime", () => ({
 
 const route = await import("./route");
 
-function request(method: "GET" | "POST" = "POST") {
+function request(method: "GET" | "POST" = "POST", identity = "creator") {
   return new Request("http://127.0.0.1:3116/api/dev/test-login", {
     body:
       method === "POST"
-        ? new URLSearchParams({ identity: "admin", callbackURL: "/admin" })
+        ? new URLSearchParams({ identity, callbackURL: "/admin" })
         : undefined,
     headers: {
       host: "127.0.0.1:3116",
@@ -60,6 +74,22 @@ afterAll(() => vi.unstubAllEnvs());
 beforeEach(() => vi.clearAllMocks());
 
 describe("Magickli local developer login route", () => {
+  it.each(["creator", "reader"])(
+    "allows a seeded %s in ordinary development",
+    async (identity) => {
+      const response = await route.POST(request("POST", identity));
+      expect(response.status).toBe(303);
+      expect(mocks.provision).toHaveBeenCalledOnce();
+      expect(mocks.signIn).toHaveBeenCalledOnce();
+    },
+  );
+
+  it("rejects the acceptance admin identity in ordinary development", async () => {
+    const response = await route.POST(request("POST", "admin"));
+    expect(response.status).toBe(400);
+    expect(mocks.provision).not.toHaveBeenCalled();
+  });
+
   it("keeps unsupported GET probes hidden before hashing or provisioning", async () => {
     const response = await route.GET(request("GET"));
     expect(response.status).toBe(404);
@@ -74,8 +104,24 @@ describe("Magickli local developer login route", () => {
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({
       error: "LOCAL_TEST_FIXTURE_SETUP_REQUIRED",
-      message: "Run pnpm local-acceptance:seed before local developer login.",
+      message: "Run pnpm local-development:seed before local developer login.",
     });
     expect(mocks.signIn).not.toHaveBeenCalled();
+  });
+
+  it("preserves the acceptance seed hint in an acceptance run", async () => {
+    const previous = process.env.MAGICKLI_LOCAL_ACCEPTANCE;
+    process.env.MAGICKLI_LOCAL_ACCEPTANCE = "1";
+    try {
+      mocks.provision.mockRejectedValueOnce(new mocks.FixtureSetupError());
+      const response = await route.POST(request("POST", "admin"));
+      expect(response.status).toBe(503);
+      expect(await response.json()).toMatchObject({
+        message: "Run pnpm local-acceptance:seed before local developer login.",
+      });
+    } finally {
+      if (previous === undefined) delete process.env.MAGICKLI_LOCAL_ACCEPTANCE;
+      else process.env.MAGICKLI_LOCAL_ACCEPTANCE = previous;
+    }
   });
 });
