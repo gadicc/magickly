@@ -5,6 +5,11 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
@@ -39,6 +44,7 @@ import type { SemanticEditorProps } from "./SemanticEditorShell";
 
 type SaveRequest = Extract<SqlRitualWriteRequest, { kind: "save" }>;
 type Mode = "visual" | "source" | "split";
+type InsertKind = "title" | "summary" | "todo" | "var";
 interface SourceState {
   text: string;
   dirty: boolean;
@@ -89,6 +95,9 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     mode: "say" | "do";
   } | null>(null);
   const [role, setRole] = React.useState("all");
+  const [insertKind, setInsertKind] = React.useState<InsertKind | null>(null);
+  const [insertValue, setInsertValue] = React.useState("");
+  const [insertError, setInsertError] = React.useState<string | null>(null);
   const skipPersist = React.useRef(true);
   const liveDraft = React.useRef<SemanticDraft | null>(null);
   const confirmedSave = React.useRef<{
@@ -487,6 +496,65 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       .run();
   };
 
+  const insertStructure = () => {
+    if (
+      !editor ||
+      !insertKind ||
+      pending ||
+      stale ||
+      saving ||
+      access !== "ready"
+    )
+      return;
+    const value = insertValue.trim();
+    if (
+      insertKind !== "todo" &&
+      (!value || !value.isWellFormed() || value.includes("\0"))
+    ) {
+      setInsertError("Enter a valid label or variable name.");
+      return;
+    }
+    if (insertKind === "var" && !/^[A-Za-z0-9_=]+$/.test(value)) {
+      setInsertError(
+        "Use letters, numbers, underscores or equals in a variable name.",
+      );
+      return;
+    }
+    const attrs =
+      insertKind === "title"
+        ? { text: value }
+        : insertKind === "summary"
+          ? { summary: value }
+          : insertKind === "var"
+            ? { name: value }
+            : {};
+    const content =
+      insertKind === "var"
+        ? {
+            type: "ritualInline",
+            attrs: { id: createUuidV7(), tag: insertKind, attrs },
+          }
+        : {
+            type: "ritualBlock",
+            attrs: { id: createUuidV7(), tag: insertKind, attrs },
+            content: [
+              {
+                type: "paragraph",
+                ...(insertKind === "title"
+                  ? { content: [{ type: "text", text: value }] }
+                  : {}),
+              },
+            ],
+          };
+    if (!editor.chain().focus().insertContent(content).run()) {
+      setInsertError("This structure could not be inserted here.");
+      return;
+    }
+    setInsertKind(null);
+    setInsertValue("");
+    setInsertError(null);
+  };
+
   const applyRole = () => {
     if (!editor || !selectedTask || pending) return;
     const node = editor.state.doc.nodeAt(selectedTask.pos);
@@ -730,6 +798,61 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           Download draft
         </Button>
       </Box>
+      <Dialog
+        open={insertKind !== null}
+        onClose={() => {
+          setInsertKind(null);
+          setInsertError(null);
+        }}
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle>Insert ritual structure</DialogTitle>
+        <DialogContent sx={{ display: "grid", gap: 2, pt: 2 }}>
+          <TextField
+            select
+            label="Structure"
+            value={insertKind ?? "title"}
+            onChange={(event) => {
+              setInsertKind(event.target.value as InsertKind);
+              setInsertValue("");
+              setInsertError(null);
+            }}
+          >
+            <MenuItem value="title">Section title</MenuItem>
+            <MenuItem value="summary">Summary</MenuItem>
+            <MenuItem value="todo">To-do</MenuItem>
+            <MenuItem value="var">Variable reference</MenuItem>
+          </TextField>
+          {insertKind !== "todo" && (
+            <TextField
+              label={
+                insertKind === "var"
+                  ? "Variable name"
+                  : insertKind === "summary"
+                    ? "Summary heading"
+                    : "Section title"
+              }
+              value={insertValue}
+              onChange={(event) => {
+                setInsertValue(event.target.value);
+                setInsertError(null);
+              }}
+              error={!!insertError}
+            />
+          )}
+          {insertError && <Alert severity="error">{insertError}</Alert>}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setInsertKind(null)}>Cancel</Button>
+          <Button
+            disabled={saving || !!pending || !!stale}
+            onClick={insertStructure}
+          >
+            Insert
+          </Button>
+        </DialogActions>
+      </Dialog>
       {pending && (
         <Alert severity="warning">
           A save is pending. Retry it unchanged before making another edit.
@@ -762,6 +885,17 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                 disabled={!!pending || !!stale}
               >
                 Note
+              </Button>
+              <Button
+                size="small"
+                onClick={() => {
+                  setInsertKind("title");
+                  setInsertValue("");
+                  setInsertError(null);
+                }}
+                disabled={!!pending || !!stale}
+              >
+                Insert structure
               </Button>
               <Button
                 size="small"

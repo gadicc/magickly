@@ -13,6 +13,16 @@ import { createUuidV7 } from "@/lib/ids";
 import SemanticEditor from "./SemanticEditor";
 import type { SemanticEditorProps } from "./SemanticEditorShell";
 
+// jsdom has no range layout; Tiptap asks for it when the insert command focuses.
+Object.defineProperty(Range.prototype, "getClientRects", {
+  configurable: true,
+  value: () => [],
+});
+Object.defineProperty(Range.prototype, "getBoundingClientRect", {
+  configurable: true,
+  value: () => new DOMRect(0, 0, 0, 0),
+});
+
 const mock = vi.hoisted(() => ({
   load: vi.fn(),
   saveDraft: vi.fn(),
@@ -167,6 +177,70 @@ it("applies a compact source shortcut and saves semantic JSON through v3", async
       expect(mock.saveDraft.mock.calls.length).toBeGreaterThan(writesAfterSave),
     { timeout: 1500 },
   );
+});
+
+it("inserts structural blocks and a variable reference from the visual toolbar", async () => {
+  mock.load.mockResolvedValue(undefined);
+  mock.saveDraft.mockResolvedValue(undefined);
+  mock.clear.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  mock.send.mockResolvedValue({
+    ok: true,
+    replayed: false,
+    ritualId: setup.ritualId,
+    revisionId: createUuidV7(),
+    version: 8,
+    updatedAt: new Date().toISOString(),
+  });
+  render(<SemanticEditor {...setup} />);
+  const insert = async (kind: string, label?: string, value?: string) => {
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Insert structure" }),
+    );
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: "Structure" }));
+    fireEvent.click(await screen.findByRole("option", { name: kind }));
+    if (label && value)
+      fireEvent.change(screen.getByRole("textbox", { name: label }), {
+        target: { value },
+      });
+    fireEvent.click(screen.getByRole("button", { name: /^Insert$/ }));
+    await screen.findByRole("button", { name: "Save" });
+  };
+  await insert("Summary", "Summary heading", "Pronunciation");
+  await insert("Section title", "Section title", "Opening");
+  await insert("To-do");
+  await insert("Variable reference", "Variable name", "candidate");
+  fireEvent.click(await screen.findByRole("button", { name: "Save" }));
+  await waitFor(() => expect(mock.send).toHaveBeenCalledOnce());
+  const saved = JSON.parse(mock.send.mock.calls[0][0].source);
+  const findTag = (nodes: typeof saved.nodes, tag: string): unknown => {
+    for (const node of nodes) {
+      if (node.tag === tag) return node;
+      const nested = node.children && findTag(node.children, tag);
+      if (nested) return nested;
+    }
+    return null;
+  };
+  expect(findTag(saved.nodes, "summary")).toMatchObject({
+    kind: "element",
+    tag: "summary",
+    attrs: { summary: "Pronunciation" },
+  });
+  expect(findTag(saved.nodes, "title")).toMatchObject({
+    kind: "element",
+    tag: "title",
+    attrs: { text: "Opening" },
+  });
+  expect(findTag(saved.nodes, "todo")).toMatchObject({
+    kind: "element",
+    tag: "todo",
+  });
+  expect(findTag(saved.nodes, "var")).toMatchObject({
+    kind: "element",
+    tag: "var",
+    attrs: { name: "candidate" },
+  });
 });
 
 it("clears a local draft identical to the confirmed server revision", async () => {
