@@ -3,6 +3,7 @@ import { getSchema } from "@tiptap/core";
 import { describe, expect, it } from "vitest";
 import { prepare } from "./prepare";
 import { semanticFromJrt, semanticToJrt } from "./semantic";
+import { hasDirectNestedTask } from "./semanticEditorCompatibility";
 import {
   ritualTiptapExtensions,
   semanticFromTiptap,
@@ -97,5 +98,29 @@ describe("Tiptap semantic adapter", () => {
         { kind: "text", text: " the door." },
       ],
     });
+  });
+
+  it("refuses direct nested tasks without changing the semantic source", () => {
+    const jrt = {
+      children: [
+        {
+          type: "task",
+          say: true,
+          role: "hiero",
+          children: [
+            {
+              type: "task",
+              do: true,
+              role: "keryx",
+              children: [{ type: "text", value: "Open the door." }],
+            },
+          ],
+        },
+      ],
+    };
+    const semantic = semanticFromJrt(jrt);
+    expect(hasDirectNestedTask(semantic.nodes)).toBe(true);
+    expect(semanticToJrt(semantic)).toEqual(jrt);
+    expect(() => semanticToTiptap(semantic)).toThrow(/Nested tasks/);
   });
 });

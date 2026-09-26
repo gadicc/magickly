@@ -27,6 +27,7 @@ import {
 } from "@/doc/sqlEditorClient";
 import type { SqlRitualWriteRequest } from "@/doc/sqlWriteContract";
 import {
+  normalizeTiptapNodeIds,
   ritualTiptapExtensions,
   semanticFromTiptap,
   semanticToTiptap,
@@ -97,6 +98,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     documentJson: string;
   } | null>(null);
   const draftWrites = React.useRef<Promise<void>>(Promise.resolve());
+  const draftWriteVersion = React.useRef(0);
   const accessGeneration = React.useRef(0);
 
   const queueDraftWrite = React.useCallback(
@@ -123,6 +125,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     },
     onUpdate({ editor: changed }) {
       try {
+        if (normalizeTiptapNodeIds(changed)) return;
         const next = semanticFromTiptap(changed.getJSON());
         if (confirmedSave.current?.documentJson === stringify(next)) return;
         skipPersist.current = false;
@@ -145,7 +148,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       const position = selected.state.selection.$from;
       for (let depth = position.depth; depth > 0; depth--) {
         const node = position.node(depth);
-        if (node.type.name === "ritualBlock" && node.attrs.tag === "task") {
+        if (node.type.name === "ritualTask") {
           const next = {
             pos: position.before(depth),
             role: String(node.attrs.attrs.role ?? "all"),
@@ -284,7 +287,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     if (!editor || access !== "ready" || ready) return;
     let active = true;
     loadSemanticDraft(props.actorId, props.ritualId)
-      .then((draft) => {
+      .then(async (draft) => {
         if (!active || !draft) return;
         if (
           draft.baseRevisionId !== props.revisionId ||
@@ -297,6 +300,17 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           const parsed: unknown = JSON.parse(draft.documentJson);
           const errors = validateRitualSemantic(parsed);
           if (errors.length) throw new Error(errors[0]);
+          if (
+            !draft.pending &&
+            !draft.sourceDirty &&
+            !draft.sourceConflict &&
+            draft.title === props.title &&
+            draft.documentJson === stringify(props.initialDocument) &&
+            draft.sourceBuffer === printRitualText(props.initialDocument)
+          ) {
+            await clearSemanticDraft(props.actorId, props.ritualId);
+            return;
+          }
           const restored = parsed as RitualSemanticDocument;
           editor.commands.setContent(semanticToTiptap(restored), {
             emitUpdate: false,
@@ -333,6 +347,8 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     props.ritualId,
     props.revisionId,
     props.parentVersion,
+    props.title,
+    props.initialDocument,
   ]);
 
   React.useEffect(() => {
@@ -374,7 +390,10 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       pending,
       updatedAt: Date.now(),
     };
+    const writeVersion = draftWriteVersion.current;
     const timer = setTimeout(() => {
+      if (skipPersist.current || writeVersion !== draftWriteVersion.current)
+        return;
       const draft: SemanticDraft = {
         ownerId: props.actorId,
         ritualId: props.ritualId,
@@ -444,7 +463,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       .chain()
       .focus()
       .insertContent({
-        type: "ritualBlock",
+        type: "ritualTask",
         attrs: {
           id: createUuidV7(),
           tag: "task",
@@ -576,6 +595,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         return;
       }
       skipPersist.current = true;
+      draftWriteVersion.current++;
       confirmedSave.current = {
         revisionId: result.revisionId,
         version: result.version,

@@ -8,6 +8,7 @@ import {
   validateRitualSemantic,
 } from "@/doc/semantic";
 import { SEMANTIC_SOURCE_FORMAT } from "@/doc/semanticCompile";
+import { hasDirectNestedTask } from "@/doc/semanticEditorCompatibility";
 import { resolveSqlRitualRouteId, sqlRitualReader } from "@/doc/sqlRuntime";
 import { privateMetadata } from "@/seo/metadata";
 import SemanticEditorShell from "./SemanticEditorShell";
@@ -71,6 +72,13 @@ export default async function SemanticEditPage({
       <Alert severity="error">The ritual could not be converted safely.</Alert>
     );
   }
+  if (hasDirectNestedTask(document.nodes))
+    return (
+      <Alert severity="info">
+        This ritual contains nested tasks that the pilot visual editor cannot
+        represent yet. Its saved revision is unchanged.
+      </Alert>
+    );
   return (
     <SemanticEditorShell
       key={ritualId}

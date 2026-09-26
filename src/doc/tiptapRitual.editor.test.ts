@@ -23,7 +23,7 @@ it("does not append an unsaved paragraph after a ritual task", () => {
   try {
     editor.commands.setContent(content);
     expect(editor.getJSON().content).toHaveLength(1);
-    expect(editor.getJSON().content?.[0].type).toBe("ritualBlock");
+    expect(editor.getJSON().content?.[0].type).toBe("ritualTask");
   } finally {
     editor.destroy();
   }

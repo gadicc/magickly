@@ -8,6 +8,7 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
+import { printRitualText } from "@/doc/ritualText";
 import { createUuidV7 } from "@/lib/ids";
 import SemanticEditor from "./SemanticEditor";
 import type { SemanticEditorProps } from "./SemanticEditorShell";
@@ -166,6 +167,29 @@ it("applies a compact source shortcut and saves semantic JSON through v3", async
       expect(mock.saveDraft.mock.calls.length).toBeGreaterThan(writesAfterSave),
     { timeout: 1500 },
   );
+});
+
+it("clears a local draft identical to the confirmed server revision", async () => {
+  const setup = props();
+  mock.owner = setup.actorId;
+  mock.load.mockResolvedValue({
+    ownerId: setup.actorId,
+    ritualId: setup.ritualId,
+    baseRevisionId: setup.revisionId,
+    baseVersion: setup.parentVersion,
+    title: setup.title,
+    documentJson: JSON.stringify(setup.initialDocument, null, 2),
+    sourceBuffer: printRitualText(setup.initialDocument),
+    sourceDirty: false,
+    sourceConflict: false,
+    pending: null,
+    updatedAt: Date.now(),
+  });
+  mock.clear.mockResolvedValue(undefined);
+  render(<SemanticEditor {...setup} />);
+  await screen.findByRole("button", { name: "Save" });
+  expect(mock.clear).toHaveBeenCalledWith(setup.actorId, setup.ritualId);
+  expect(screen.queryByText("Recovered the local draft.")).toBeNull();
 });
 
 it("waits for initial account activation before deciding access is locked", async () => {
