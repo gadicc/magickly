@@ -10,7 +10,8 @@ both `magickli_dev`. Native PostgreSQL is reached through
 `db.localtest.me:5432`, which resolves to loopback here; Loom's local Neon HTTP
 adapter uses the proxy at `db.localtest.me:4444`. The application role URL is
 in ignored `.env.local`. No Magickli-specific PostgreSQL container is needed.
-The setup and migration preflight reject a host that does not resolve to loopback.
+The setup and migration preflight reject a host that does not resolve to
+loopback.
 The shared server currently publishes its port beyond loopback. Its listener,
 `pg_hba.conf`, and `PUBLIC CONNECT` grants are machine-wide policy: the new role
 cannot read acceptance tables, but PostgreSQL's default grants still let it
@@ -18,13 +19,13 @@ connect to the acceptance database. Strict network and database-connect
 isolation would require a coordinated shared-server change.
 
 On another machine, use an existing local PostgreSQL service with `pg_uuidv7`
-available. Loom's new `loom db local setup` provisions a project database and
+available. Loom 1.34.0's `loom db local setup` provisions a project database and
 restricted role, installs the extension when the migrations require it, and
 updates the configured URL candidates in owner-only `.env.local`. The command
-is in Loom source pending a package release. `loom db local check` authenticates
-and verifies the target without changing it. Keep the URL private and do not
-reuse an acceptance or cloud credential. Database migrations and the Magickli
-seed remain separate app tasks.
+is also run by `./dev`. `loom db local check` authenticates and verifies the
+target without changing it. Keep the URL private; never reuse an acceptance or
+cloud credential. Database migrations and the Magickli seed remain separate app
+tasks.
 
 Use these nonsecret settings in `.env.local` alongside the bucket-scoped
 `FILES_S3_ACCESS_KEY_ID` and `FILES_S3_SECRET_ACCESS_KEY`:
@@ -46,27 +47,30 @@ CORS policy must allow `http://localhost:3004`, `PUT`, and the headers declared
 under `features.files.config.storage.provider.directUpload` in `loom.json`.
 Keep other legitimate local origins in that policy. The bucket remains private.
 
-From this checkout, verify the exact database identity before applying the
-existing migrations, seed the fixed Creator and Reader, then start the app:
+With the shared PostgreSQL and MinIO services running and local credentials in
+ignored `.env.local`, start ordinary development with one command:
 
 ```sh
-pnpm local-development:migrate
-pnpm local-development:seed
-pnpm dev:webpack -H localhost -p 3004
+./dev
 ```
 
-The migration task runs `local-development:verify-db` before `db:migrate`.
-The seed repeats the live identity check and is safe to rerun; it adds no admin
-grant, file row, or bucket object. `LOOM_LOCAL_TEST_LOGIN=1` exposes Creator
-and Reader buttons at `/signin` without Google. Set
+The launcher installs the locked dependencies, runs Loom's local database setup
+and Files check, then applies the existing migrations and seeds Creator and
+Reader before starting Next dev on port 3004. Database setup reuses the checked
+credentials on this machine; a new database prompts for an administrator
+password. The migration task runs `local-development:verify-db` before
+`db:migrate`. The seed repeats the live identity check and is safe to rerun; it
+adds no admin grant, file row, or bucket object. `LOOM_LOCAL_TEST_LOGIN=1`
+exposes Creator and Reader buttons at `/signin` without Google. Set
 `RITUAL_SEMANTIC_EDITOR=1` for the opt-in semantic editor pilot.
 Leave `MAGICKLI_LOCAL_ACCEPTANCE` unset in ordinary development. The separate
 numeric-loopback production-build acceptance path is documented in
 `scripts/local-acceptance/README.md`.
 
-Verify the bucket with `pnpm exec loom files r2 check`, then attach a small
-synthetic PNG at `/upload` to a ritual you edit. Paste the returned source
-reference into the ritual editor's **Attached image source reference** field,
+The launcher verifies the bucket with `pnpm exec loom files local check`. Attach
+a small synthetic PNG at `/upload` to a ritual you edit. Paste the returned
+source reference into the ritual editor's **Attached image source reference**
+field,
 insert the image, and save. Wait for **Published for download** before testing
 with a Reader who has a matching temple membership. The private `/api/files`
 reference should serve the image only to an authorized reader; opening the

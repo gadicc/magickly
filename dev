@@ -1,3 +1,12 @@
 #!/bin/bash
+set -euo pipefail
 
-vc dev --listen 3004
+cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
+
+pnpm install --frozen-lockfile
+pnpm exec loom db local setup
+pnpm exec loom files local check
+pnpm local-development:migrate
+pnpm local-development:seed
+
+exec pnpm dev:webpack -H localhost -p 3004 "$@"
