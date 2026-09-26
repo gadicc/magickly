@@ -86,7 +86,6 @@ local("real local MinIO ritual protocol", () => {
     );
     environment = {
       NODE_ENV: "production",
-      MAGICKLI_LOCAL_ACCEPTANCE: "1",
       BETTER_AUTH_URL: settings.appOrigin,
       DATABASE_URL: settings.databaseUrl,
       FILES_STORAGE_PROVIDER: "minio",

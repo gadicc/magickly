@@ -18,7 +18,6 @@ const localDatabase =
   "postgresql://local:synthetic@127.0.0.1:5432/magickli_acceptance_20260914";
 const minio = {
   NODE_ENV: "production",
-  MAGICKLI_LOCAL_ACCEPTANCE: "1",
   BETTER_AUTH_URL: "http://127.0.0.1:3115",
   DATABASE_URL: localDatabase,
   FILES_STORAGE_PROVIDER: "minio",
@@ -74,7 +73,7 @@ describe("file runtime configuration", () => {
     ).toThrow("not configured");
   });
 
-  it("maps explicit production-build local acceptance to MinIO", () => {
+  it("maps loopback production-build storage to MinIO without an extra flag", () => {
     expect(readRitualUploadStorageConfig(minio)).toEqual({
       kind: "minio",
       endpoint: "http://127.0.0.1:9125",
@@ -89,7 +88,6 @@ describe("file runtime configuration", () => {
   });
 
   it.each([
-    { MAGICKLI_LOCAL_ACCEPTANCE: undefined },
     { VERCEL: "1" },
     { VERCEL_ENV: "development" },
     { BETTER_AUTH_URL: "http://localhost:3115" },

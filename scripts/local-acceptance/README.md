@@ -46,7 +46,7 @@ Private upload, finalized-file reads, bundle publication and offline downloads
 use the dedicated local MinIO bucket. Read its endpoint, bucket and credentials
 from the private `0600` settings file and configure Loom's canonical variables
 with `FILES_STORAGE_PROVIDER=minio`, `FILES_S3_REGION=auto` and
-`FILES_S3_FORCE_PATH_STYLE=true`. Set `MAGICKLI_LOCAL_ACCEPTANCE=1` explicitly.
+`FILES_S3_FORCE_PATH_STYLE=true`.
 MinIO CORS must allow the exact `http://127.0.0.1:3115` origin, `PUT`, and the
 headers declared in `loom.json`.
 

@@ -13,8 +13,6 @@ export type RitualStorageConfig =
   | R2RitualStorageConfig
   | MinioRitualStorageConfig;
 
-const LOCAL_ACCEPTANCE_FLAG = "MAGICKLI_LOCAL_ACCEPTANCE";
-
 function required(environment: RuntimeEnvironment, key: string) {
   const value = environment[key]?.trim();
   if (!value || value.includes("\0"))
@@ -69,7 +67,6 @@ export function assertLocalRitualStorageBoundary(
   environment: RuntimeEnvironment,
 ) {
   if (
-    required(environment, LOCAL_ACCEPTANCE_FLAG) !== "1" ||
     Object.entries(environment).some(
       ([key, value]) =>
         value !== undefined && (key === "VERCEL" || key.startsWith("VERCEL_")),
