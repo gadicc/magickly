@@ -135,7 +135,8 @@ function TreeOfLife({
   pathHref?;
   sephirahHref?;
   activePath?;
-  flip?;
+  /** Seen from behind, the body's view; the stylesheet mirrors the figure. */
+  flip?: boolean;
   showDaat?;
   fontSize?;
   ref?: React.RefObject<SVGSVGElement>;
@@ -387,7 +388,7 @@ function TreeOfLife({
         a:visited * {
           fill: inherit;
         }
-      ` + (flip && "svg#TreeOfLife { transform: rotateY(180deg) }")}
+      ` + (flip ? "svg#TreeOfLife { transform: rotateY(180deg) }" : "")}
       </style>
       {/* Paths */}
       <g

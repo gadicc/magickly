@@ -77,15 +77,12 @@ export default function Path({ path }: { path: TolPathRow }) {
       <Trail href="/kabbalah/tree">Tree of Life</Trail>
 
       <FigureNav prev={prev} next={next}>
-        {/* Drawn on the tree the path belongs to, so that it is on it.
-            `flip` is passed because the Tree appends `flip && …` to its
-            stylesheet, which writes "undefined" there when it is left out. */}
+        {/* Drawn on the tree the path belongs to, so that it is on it. */}
         <TreeOfLife
           height="150px"
           topText=""
           activePath={path.id}
           letterAttr={hermetic ? "hermetic" : "hebrew"}
-          flip={false}
         />
       </FigureNav>
 

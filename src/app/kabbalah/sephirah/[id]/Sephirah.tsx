@@ -144,14 +144,11 @@ export default function Sephirah({ sephirah }: { sephirah: SephirahRow }) {
       <Trail href="/kabbalah/tree">Tree of Life</Trail>
 
       <FigureNav prev={prev} next={next}>
-        {/* `flip` is passed because the Tree appends `flip && …` to its
-            stylesheet, which writes "undefined" there when it is left out. */}
         <TreeOfLife
           height="150px"
           topText=""
           active={sephirah.id}
           showDaat={hidden}
-          flip={false}
         />
       </FigureNav>
 

@@ -36,6 +36,21 @@ describe("TreeOfLife", () => {
     for (const number of numbers) expect(number).toMatch(/^-?\d+(\.\d{1,3})?$/);
   });
 
+  it("writes only real rules into its stylesheet", () => {
+    // It appended `flip && "…"`, so an unflipped Tree's stylesheet ended in
+    // the word "undefined", or "false" where a caller passed it; the entity
+    // pages' check refuses the first, and both are junk CSS (plan 036).
+    const style = (html: string) =>
+      html.match(/<style[^>]*>([\s\S]*?)<\/style>/)?.[1] ?? "";
+    for (const flip of [undefined, false])
+      expect(style(renderToString(<TreeOfLife flip={flip} />))).not.toMatch(
+        /undefined|false|rotateY/,
+      );
+    expect(style(renderToString(<TreeOfLife flip />))).toContain(
+      "transform: rotateY(180deg)",
+    );
+  });
+
   it("links every path and sephirah by default", () => {
     const html = renderToString(<TreeOfLife />);
     // 22 path outlines, 22 path letters and 10 sephirot.
