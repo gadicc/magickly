@@ -107,6 +107,13 @@ describe("entity pages", () => {
         "Path 11 of the Tree of Life joins Keter and Chochmah. Hermetic " +
         "attribution: the letter Aleph and The Fool; Hebrew attribution: He.",
     });
+    // The trump as its Rider–Waite card prints it, as the page names it:
+    // tarot-deck's "The Papess/High Priestess" is two decks at once.
+    expect(pathPage("1_6")?.description).toBe(
+      "Path 13 of the Tree of Life joins Keter and Tiferet. Hermetic " +
+        "attribution: the letter Gimel and The High Priestess; Hebrew " +
+        "attribution: Dalet.",
+    );
     expect(pathPage("8_10")?.description).toBe(
       "Path 31 of the Tree of Life joins Hod and Malchut. Hermetic " +
         "attribution: the letter Shin and Judgement.",

@@ -2,7 +2,7 @@ import Data from "@/../data/data";
 import { angelBySlug, angelSlugs } from "@/../data/kabbalah/angelSlugs";
 import { rowOf } from "@/../data/rowOf";
 import type { SephirahRow } from "@/../data/rows";
-import { tarotDeck } from "@/tarot";
+import { RWSName } from "@/tarot";
 import type { SeoPage } from "./pages";
 
 /** An indexable page generated from one row of the data set. */
@@ -125,12 +125,13 @@ export function pathPage(id: string): EntityPage | null {
       description: `The path joining ${from} and ${to} exists only on the Hebrew Tree of Life, where it carries the letter ${hebrewLetter}; the Hermetic tree omits it.`,
     };
   const pathNo = hermetic.pathNo;
-  const card = tarotDeck.getByRank(Number(hermetic.tarotId));
+  // As the Rider–Waite card the page shows prints it, not as tarot-deck has it.
+  const trump = RWSName(hermetic.tarotId);
   const hebrew = hebrewLetter ? `; Hebrew attribution: ${hebrewLetter}` : "";
   return {
     path: `/kabbalah/path/${id}`,
     title: `Tree of Life Path ${pathNo}: ${joins}`,
-    description: `Path ${pathNo} of the Tree of Life joins ${from} and ${to}. Hermetic attribution: the letter ${hermetic.hebrewLetter?.letter.name} and ${card.name}${hebrew}.`,
+    description: `Path ${pathNo} of the Tree of Life joins ${from} and ${to}. Hermetic attribution: the letter ${hermetic.hebrewLetter?.letter.name} and ${trump}${hebrew}.`,
   };
 }
 

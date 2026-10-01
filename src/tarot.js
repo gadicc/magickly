@@ -56,4 +56,6 @@ function trumpNumeral(rank) {
   return out;
 }
 
-export { RWSName, RWSPath, tarotDeck, trumpNumeral };
+// The deck itself is not exported: a page names a trump through RWSName(),
+// which is what the Rider-Waite card beside it prints.
+export { RWSName, RWSPath, trumpNumeral };

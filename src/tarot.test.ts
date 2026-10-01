@@ -1,6 +1,7 @@
 import { statSync } from "node:fs";
+import * as tarotDeck from "tarot-deck";
 import { describe, expect, it } from "vitest";
-import { RWSName, RWSPath, tarotDeck, trumpNumeral } from "./tarot";
+import { RWSName, RWSPath, trumpNumeral } from "./tarot";
 
 describe("tarot package integration", () => {
   it("exposes the card lookup API used by the Kabbalah path page", () => {
