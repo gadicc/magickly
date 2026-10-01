@@ -746,13 +746,16 @@ changes one string.
   says "The Papess/High Priestess", "The Pope/Hierophant" and "The Wheel";
   `RWSName()` gives the printed names and `trumpNumeral()` the numerals,
   beside `RWSPath()`, for both pages that name trumps. The search
-  descriptions keep the deck's names ([follow-ups](#follow-ups)).
+  descriptions kept the deck's names until 1 October
+  ([follow-ups](#follow-ups)).
 - **Every Tree page passes `flip={false}`.** The Tree appends
   `flip && "…"` to its stylesheet, so leaving `flip` out wrote "undefined"
   there, which the page assertion refuses; `false` is what the Tree page
   and the image registry already write. The Tree's own fix,
-  `flip ? "…" : ""`, changes the source the image registry outlines, which
-  makes it a render-identity decision, and is a follow-up.
+  `flip ? "…" : ""`, was held back as a render-identity question, and
+  landed on 1 October in `b601d5b`, with the three `flip={false}`
+  workarounds removed: the images keep their bytes and inputs hash, and
+  only the source digest moves ([follow-ups](#follow-ups)).
 - **The page assertion knows a same-page reference.** The Tree lays its
   labels along curves it names `#topTextPath0`; `expectEntityPage` holds
   such a reference to an element the page has, rather than taking it for a
@@ -889,11 +892,16 @@ description promising a King scale; that was fixed after the review.
 
 - **The source of `magickTypes`** ([assessment](#assessment-before)); once
   named, the editorial-summary note becomes a citation.
-- **The Tree's stylesheet.** `TreeOfLife.tsx` appends `flip && "…"`, which
-  writes "false" or "undefined" into the `<style>` of every unflipped Tree;
-  `flip ? "…" : ""` is the fix. It changes the source SVG the image registry
-  outlines, so it waits for a decision on the Tree's render identity: a
-  profile bump re-identifies every published Tree.
+- **Done, 1 October: the Tree's stylesheet.** `TreeOfLife.tsx` appended
+  `flip && "…"`, writing "false" or "undefined" into every unflipped Tree's
+  `<style>`. `b601d5b` makes it `flip ? "…" : ""`, types `flip` and removes
+  the three workarounds. The outlined image carries no `<style>`, so every
+  Tree image keeps its bytes and its inputs hash, which the registry test
+  pins. The source digest each capture records does move, since the
+  registry's source ended in "false"; it reaches the generated catalog's
+  hash and a ritual asset plan's hash, which move once, as they did for
+  step 3b's data fixes, and a publication retried across the deploy is
+  matched on its unchanged manifest and replayed. No profile moves.
 - **Data the pages now show side by side.** Hesed's stone, "saphire", is
   one of the Tree's image fields, so its fix moves the Tree's inputs hash,
   as the Tzva'ot fix did. Keter's heaven, "Roshit
@@ -901,9 +909,11 @@ description promising a King scale; that was fixed after the review.
   Malchut's, "Olam Yesodoth", and its sphere's, "Olam haYesodot", in
   spelling. The body values are slugs, so the table reads "Left-face" and
   "Loins; hips".
-- **The search descriptions name trumps as tarot-deck does**, "The
-  Papess/High Priestess", where the pages name the Rider-Waite cards. Moving
-  them to `RWSName()` changes three descriptions, paths 13, 16 and 21.
+- **Done, 1 October: the search descriptions' trumps.** They named
+  trumps as tarot-deck does, "The Papess/High Priestess"; `c7c614e` names them
+  as the Rider-Waite cards print them, as the pages do, changing the
+  descriptions of paths 13, 16 and 21 and nothing else, and `src/tarot.js`
+  stops exporting the deck.
 - **The planet page's Chaldean order** comes from the planetary hours'
   utilities, which import `suncalc` and `date-fns`; the page is static, so
   it costs only the build, but the seven ids belong in a module of their

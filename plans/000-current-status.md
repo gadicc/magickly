@@ -232,11 +232,11 @@ Follow-ups are separate from the completed migration work:
   Sephirah and Ketu's title reads Cauda Draconis. Netzach's and Hod's god
   names spell Tzva'ot צבאות, which moved the Tree's inputs hash and the
   Theoricus ritual's Tree bytes under the same profile. See
-  [plan 036](036-entity-pages.md#results). TODO: the Tree's `flip`
-  stylesheet fix, which waits on a render-identity decision; Hesed's
-  "saphire" and the other data the new pages set side by side; the search
-  descriptions' trump names; the source of `magickTypes`. See
-  [plan 036](036-entity-pages.md#follow-ups).
+  [plan 036](036-entity-pages.md#results). The Tree's stylesheet and the
+  descriptions' trump names followed on 1 October. TODO: Hesed's "saphire"
+  and the other data the new pages set side by side, which a plan of its
+  own takes up with tables for stones, scents and body parts; the source of
+  `magickTypes`. See [plan 036](036-entity-pages.md#follow-ups).
 - TODO: two small ones left by step 3b
   ([plan 032](032-data-layer.md#follow-ups)): two tribes' Hebrew names are
   hashed into the Table of Shewbread's identity although no sign points at
