@@ -22,6 +22,28 @@ describe("study sets", () => {
     expect(Object.keys(getSet("planet-signs").data)).toEqual([...PLANET_IDS]);
   });
 
+  it("deal every set's cards, reading each string path off its rows", () => {
+    // A path that finds nothing throws, so a set broken by a data change
+    // fails here rather than dealing a blank card.
+    for (const id of Object.keys(sets))
+      for (const card of getSet(id).generateCards())
+        expect(card.answer, `${id} ${card.id}`).toBeTruthy();
+  });
+
+  it("answer the stones from the stone rows, joined", () => {
+    // A sephirah's stones are linked rows since plan 039, read through the
+    // wildcard as the Tree reads them: lower case, joined with "; ".
+    const answers = Object.fromEntries(
+      getSet("sephirot-stones")
+        .generateCards()
+        .map((card) => [card.id, card.answer]),
+    );
+    expect(answers.chochmah).toBe("star ruby; turquoise");
+    expect(answers.hesed).toBe("sapphire; amethyst");
+    expect(answers.hod).toBe("quartz");
+    expect(answers.daat).toBeUndefined();
+  });
+
   it("name the Enochian question font", () => {
     expect(sets["enochian-letters-latin"].questionFont).toBe("enochian");
     expect(sets["enochian-letter-names"].questionFont).toBe("enochian");

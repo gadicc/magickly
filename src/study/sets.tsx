@@ -1,5 +1,6 @@
 import Paper from "@mui/material/Paper";
 import Tetragram from "@/app/geomancy/Tetragram";
+import { readFieldPath } from "@/components/kabbalah/fieldPath";
 import data from "../../data/data";
 
 // https://stackoverflow.com/a/56773391/1839099
@@ -124,18 +125,17 @@ const setDefaults = {
   generateCards,
 };
 
-function dotProps(item, object) {
-  const keys = item.split(".");
-  for (const key of keys) {
-    if (object[key]) object = object[key];
-    else {
-      console.error(object);
-      throw new Error(
-        `No such key "${key}" of path "${item}" in ${JSON.stringify(object)}`,
-      );
-    }
-  }
-  return object;
+/**
+ * A set's string question or answer, read off a card's row as the Tree reads
+ * its labels, so that `stones.*.name.en` reads "pearl; star sapphire". A path
+ * that finds nothing is a broken set, and fails loudly rather than dealing a
+ * blank card.
+ */
+function dotProps(item: string, object: { id?: string }) {
+  const value = readFieldPath(object, item);
+  if (!value)
+    throw new Error(`No value at path "${item}" of ${String(object?.id)}`);
+  return value;
 }
 
 type UnwrapRecord<T> = T extends Record<string, infer U> ? U : T;
@@ -417,7 +417,7 @@ const sets: Record<string, StudySetData<unknown>> = {
     id: "sephirot-stones",
     data: omit("daat", data.sephirah),
     question: "name.roman",
-    answer: "stone",
+    answer: "stones.*.name.en",
     gdGrade: "1=10",
     tags: ["kabbalah"],
   } as StudySetData<typeof data.sephirah>,

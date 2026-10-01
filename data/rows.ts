@@ -54,6 +54,13 @@ export interface SeventyTwoAngelRow extends Row<"*", "seventyTwoAngel"> {}
 
 export interface ChakraRow extends Row<"*", "chakra"> {}
 
+// BODY
+export interface BodyPartRow extends Row<"*", "bodyPart"> {}
+
+// MATERIA
+export interface StoneRow extends Row<"*", "stone"> {}
+export interface ScentRow extends Row<"*", "scent"> {}
+
 // ALCHEMY
 export interface AlchemySymbolRow extends Row<"*", "alchemySymbol"> {}
 export interface AlchemyTermRow extends Row<"*", "alchemyTerm"> {}
@@ -94,6 +101,11 @@ export interface NamedRows {
   seventyTwoAngel: SeventyTwoAngelRow;
 
   chakra: ChakraRow;
+
+  bodyPart: BodyPartRow;
+
+  stone: StoneRow;
+  scent: ScentRow;
 
   alchemySymbol: AlchemySymbolRow;
   alchemyTerm: AlchemyTermRow;

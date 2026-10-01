@@ -15,7 +15,7 @@ import SephirahPage from "./page";
  * page must hold, and then the cases the row makes differ: Keter at the top
  * of the chain with a heaven and a sphere for a planet, Tiferet with the most
  * paths and every world, Da'at outside the chain with almost nothing, Malchut
- * at the bottom with an empty scent, and the two spheres on each tree's odd
+ * at the bottom with no scent, and the two spheres on each tree's odd
  * path out. What is asserted is what a reader sees, by its text.
  */
 
@@ -173,20 +173,36 @@ describe("the sephirah page", () => {
   });
 
   it("gives Malchut its heaven and no scent", async () => {
-    // The bottom of the chain, whose scent is an empty string in the data,
-    // and whose Queen scale is the quartered disc.
+    // The bottom of the chain, which has no scent in the data, and whose
+    // Queen scale is the quartered disc.
     const html = await render("malchut");
     expect(valueOf(html, "Heaven")).toBe(
       "עולם יסודות Olam Yesodoth “Sphere of the Elements”",
     );
     expect(labelsOf(html)).not.toContain("Scent");
-    expect(labelsOf(html)).toContain("Stone");
+    expect(valueOf(html, "Stone")).toBe("Rock crystal");
     expect(rowMarkup(html, "Colours")).toContain(
       "background:conic-gradient(#80461B,#ba0,#880,#000000)",
     );
     expect(valueOf(html, "Colours")).toBe(
       "King scale yellow Queen scale russet, citrine, olive, black",
     );
+  });
+
+  it("names the body parts, stones and scents a sphere links", async () => {
+    // Rows of their own tables since plan 039, joined as the data once wrote
+    // them by hand, with the first letter capitalised as before.
+    const hesed = await render("hesed");
+    expect(valueOf(hesed, "Body")).toBe("Left arm");
+    expect(valueOf(hesed, "Stone")).toBe("Sapphire; amethyst");
+    expect(valueOf(hesed, "Scent")).toBe("Cedar");
+    const netzach = await render("netzach");
+    expect(valueOf(netzach, "Body")).toBe("Loins; hips");
+    expect(valueOf(netzach, "Scent")).toBe("Rose; red sandal");
+    expect(valueOf(await render("chochmah"), "Stone")).toBe(
+      "Star ruby; turquoise",
+    );
+    expect(valueOf(await render("daat"), "Body")).toBe("Throat");
   });
 
   it("marks Chochmah's path to Gevurah as the Hebrew tree's", async () => {

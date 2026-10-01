@@ -1,0 +1,63 @@
+// Parts of the body, as the sephirot are laid on it (`sephirah.bodyPartIds`).
+// Names are lower case, as they are read in a sentence; a page capitalises.
+{
+  cranium: {
+    id: "cranium",
+    name: { en: "cranium" },
+  },
+
+  "left-face": {
+    id: "left-face",
+    name: { en: "left face" },
+  },
+
+  "right-face": {
+    id: "right-face",
+    name: { en: "right face" },
+  },
+
+  "left-arm": {
+    id: "left-arm",
+    name: { en: "left arm" },
+  },
+
+  "right-arm": {
+    id: "right-arm",
+    name: { en: "right arm" },
+  },
+
+  breast: {
+    id: "breast",
+    name: { en: "breast" },
+  },
+
+  loins: {
+    id: "loins",
+    name: { en: "loins" },
+  },
+
+  hips: {
+    id: "hips",
+    name: { en: "hips" },
+  },
+
+  legs: {
+    id: "legs",
+    name: { en: "legs" },
+  },
+
+  genitals: {
+    id: "genitals",
+    name: { en: "genitals" },
+  },
+
+  feet: {
+    id: "feet",
+    name: { en: "feet" },
+  },
+
+  throat: {
+    id: "throat",
+    name: { en: "throat" },
+  },
+}

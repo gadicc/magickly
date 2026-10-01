@@ -4,9 +4,12 @@ import barrel from "./data";
 import type {
   AlchemySymbolRow,
   ArchangelRow,
+  BodyPartRow,
   GDGradeRow,
   PlanetRow,
+  ScentRow,
   SephirahRow,
+  StoneRow,
   TetragramRow,
   TolPathRow,
   ZodiacRow,
@@ -90,7 +93,7 @@ describe("the row types", () => {
 
   it("names the barrel's rows, and not only a full assemble()'s", () => {
     // The barrel is the object step 4's package emits a `.d.ts` for, and it
-    // assembles 23 of the 26 tables rather than all of them. Its rows are
+    // assembles 26 of the 29 tables rather than all of them. Its rows are
     // named because the three it leaves out are named in no link, either as
     // a source or as a target, so the scope leaves nothing out; a link
     // declared to one of the three would narrow it and drop every row of the
@@ -147,6 +150,32 @@ describe("the row types", () => {
     expect(data.sephirah.daat.pathsFrom).toEqual([]);
   });
 
+  it("types a sephirah's body parts, stones and scents as lists of rows", () => {
+    // Plan 039's three `many` links. Every sephirah has a body part, so that
+    // list is certain; Da'at has no stone or scent and Malchut no scent, and
+    // an absent key is an absent list, so those two need `?.`.
+    const hesed = data.sephirah.hesed;
+    const exact: [
+      Same<typeof hesed.bodyParts, readonly BodyPartRow[]>,
+      Same<typeof hesed.stones, readonly StoneRow[] | undefined>,
+      Same<typeof hesed.scents, readonly ScentRow[] | undefined>,
+    ] = [true, true, true];
+    expect(exact).not.toContain(false);
+
+    const stones: string[] | undefined = hesed.stones?.map((s) => s.name.en);
+    expect(stones).toEqual(["sapphire", "amethyst"]);
+    expect(data.sephirah.netzach.scents?.map((s) => s.id)).toEqual([
+      "rose",
+      "red-sandal",
+    ]);
+    // Hod and Yesod share quartz, which is one row.
+    expect(data.sephirah.hod.stones?.[0]).toBe(data.sephirah.yesod.stones?.[0]);
+    expect(
+      // @ts-expect-error Da'at has no stones, so the list needs ?.
+      () => data.sephirah.daat.stones.length,
+    ).toThrow(TypeError);
+  });
+
   it("is readonly wherever assemble() froze it", () => {
     // Each of these used to compile and then throw, because `assemble()`
     // deep-freezes and the types said nothing about it. They are now compile
@@ -157,7 +186,7 @@ describe("the row types", () => {
 
     frozen(() => {
       // @ts-expect-error a row's own field
-      data.sephirah.keter.scent = "x";
+      data.sephirah.keter.bodyPos = "x";
     });
     frozen(() => {
       // @ts-expect-error a field of a nested block

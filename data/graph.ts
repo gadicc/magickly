@@ -121,6 +121,11 @@ export const graph = {
       gdGradeId: { to: "gdGrade", mirrors: "sephirahId" },
       nextId: { to: "sephirah", mirrors: "prevId" },
       prevId: { to: "sephirah", mirrors: "nextId" },
+      // Lists, though most sephirot have one of each: Netzach's scents are
+      // rose and red sandal, and Hod and Yesod share quartz.
+      bodyPartIds: { to: "bodyPart", many: true },
+      stoneIds: { to: "stone", many: true },
+      scentIds: { to: "scent", many: true },
     },
   },
   tolPath: {
@@ -147,6 +152,13 @@ export const graph = {
   seventyTwoAngel: {},
 
   chakra: {},
+
+  // BODY
+  bodyPart: {},
+
+  // MATERIA
+  stone: {},
+  scent: {},
 
   // ALCHEMY
   alchemySymbol: {

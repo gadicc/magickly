@@ -376,6 +376,14 @@ export function checkIntegrity(
               ? "a plural field whose value is not a list"
               : "a singular field whose value is a list",
           });
+        // A row with none leaves the key out (plan 032, decision 5), so that
+        // "none" is spelt one way; an empty list would be a second.
+        else if (Array.isArray(value) && value.length === 0)
+          failures.push({
+            check: "arity",
+            where: `${name}.${id}.${field}`,
+            detail: "an empty list, where a row with none leaves the key out",
+          });
       }
 
     for (const [field, link] of Object.entries(spec.links ?? {}))

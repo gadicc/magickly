@@ -8,7 +8,7 @@
  * `window.magickData`. It is now [assemble()](./assemble.ts) over the tables
  * below, with [the graph](./graph.ts) saying what links to what.
  *
- * Three of the 26 in [the registry](./tables.ts) are missing, which is why
+ * Three of the 29 in [the registry](./tables.ts) are missing, which is why
  * the imports are repeated here rather than taken from it. `seventyTwoAngel`,
  * `enochianTablet` and `christianChoir` are named nowhere in the graph, in
  * either direction, so assembling them adds no accessor to any row, and the
@@ -54,6 +54,11 @@ import tribeOfIsrael from "./dist/kabbalah/tribesOfIsrael.json";
 
 import chakra from "./dist/chakras.json";
 
+import bodyPart from "./dist/body/parts.json";
+
+import stone from "./dist/materia/stones.json";
+import scent from "./dist/materia/scents.json";
+
 import alchemySymbol from "./dist/alchemy/symbols.json";
 import alchemyTerm from "./dist/alchemy/terms.json";
 import element from "./dist/alchemy/elements.json";
@@ -90,6 +95,13 @@ const barrel = {
   tribeOfIsrael,
 
   chakra,
+
+  // BODY
+  bodyPart,
+
+  // MATERIA
+  stone,
+  scent,
 
   // ALCHEMY
   alchemySymbol,

@@ -165,9 +165,10 @@ function isEmpty(node: ReactNode): boolean {
  * `<span lang="he-Latn">`.
  *
  * The row is not rendered when its children are empty (see `isEmpty`), so a
- * page can write `<Row label="Stone">{sephirah.stone}</Row>` whether or not
- * the row has a stone. It cannot see inside a component: pass `<Name>` or a
- * fragment only where there is something in it, as `value ? <Name … /> : null`.
+ * page can write `<Row label="Chakra">{sephirah.chakra?.name.en}</Row>`
+ * whether or not the row has a chakra. It cannot see inside a component:
+ * pass `<Name>` or a fragment only where there is something in it, as
+ * `value ? <Name … /> : null`.
  */
 export function Row({
   label,

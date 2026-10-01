@@ -129,6 +129,14 @@ describe("the data against the graph", () => {
     expect(of("arity", plural)).toEqual([
       "tetragram.via.planetIds: a plural field whose value is not a list",
     ]);
+    // None is an absent key, as for a singular link, not an empty list.
+    const empty = broken("sephirah", {
+      ...tables.sephirah,
+      hesed: { ...tables.sephirah.hesed, stoneIds: [] },
+    });
+    expect(of("arity", empty)).toEqual([
+      "sephirah.hesed.stoneIds: an empty list, where a row with none leaves the key out",
+    ]);
   });
 
   it("counts an id no row is keyed by", () => {

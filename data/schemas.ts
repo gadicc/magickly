@@ -259,8 +259,6 @@ export const schemas = {
       strokeColor: v.optional(v.string()),
       strokeDasharray: v.optional(v.number()),
     }),
-    scent: v.string(),
-    body: v.string(),
     bodyPos: v.string(),
     /**
      * Only Keter, Chochmah and Malchut name a heaven: the three whose `planet`
@@ -273,9 +271,9 @@ export const schemas = {
         roman: v.string(),
       }),
     ),
-    stone: v.string(),
     // Da'at is not a sephirah of the Tree and has almost none of these; four
-    // of the lower spheres share no part of the soul.
+    // of the lower spheres share no part of the soul. Da'at has no stone or
+    // scent, and Malchut no scent.
     ...ids(
       "sephirah",
       [
@@ -287,6 +285,8 @@ export const schemas = {
         "gdGradeId",
         "nextId",
         "prevId",
+        "stoneIds",
+        "scentIds",
       ],
       ["soulId"],
     ),
@@ -366,6 +366,23 @@ export const schemas = {
     seed: v.optional(v.string()),
     seedMeaning: v.optional(en),
     ...ids("chakra"),
+  }),
+
+  bodyPart: v.strictObject({
+    id: v.string(),
+    name: en,
+    ...ids("bodyPart"),
+  }),
+
+  stone: v.strictObject({
+    id: v.string(),
+    name: en,
+    ...ids("stone"),
+  }),
+  scent: v.strictObject({
+    id: v.string(),
+    name: en,
+    ...ids("scent"),
   }),
 
   alchemySymbol: v.strictObject({

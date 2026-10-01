@@ -45,6 +45,9 @@ export const TABLE_FILES = {
   tribeOfIsrael: "kabbalah/tribesOfIsrael.json",
   seventyTwoAngel: "kabbalah/seventyTwoAngels.json",
   chakra: "chakras.json",
+  bodyPart: "body/parts.json",
+  stone: "materia/stones.json",
+  scent: "materia/scents.json",
   alchemySymbol: "alchemy/symbols.json",
   alchemyTerm: "alchemy/terms.json",
   element: "alchemy/elements.json",
@@ -114,7 +117,7 @@ export const DRAWING_QUERIES: Record<ComponentImageSlug, readonly string[]> = {
     ...Array.from({ length: Math.ceil(TREE_IMAGE_FIELDS.length / 4) }, (_, i) =>
       TREE_IMAGE_FIELDS.slice(i * 4, i * 4 + 4).join(","),
     ).map((fields) => `field=${fields}&showDaat=true`),
-    "colorScale=king&topText=name.he&bottomText=scent",
+    "colorScale=king&topText=name.he&bottomText=scents.*.name.en",
     "letterAttr=hebrew&activePath=2_5&field=gdGrade.id",
   ],
   "astro-geomancy-chart": ["", "m=2222111122221111"],

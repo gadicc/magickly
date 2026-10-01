@@ -1,0 +1,58 @@
+// Perfumes and incenses, as the sephirot are given them (`sephirah.scentIds`).
+// Names are lower case, as they are read in a sentence; a page capitalises.
+{
+  ambergris: {
+    id: "ambergris",
+    name: { en: "ambergris" },
+  },
+
+  musk: {
+    id: "musk",
+    name: { en: "musk" },
+  },
+
+  myrrh: {
+    id: "myrrh",
+    name: { en: "myrrh" },
+  },
+
+  civet: {
+    id: "civet",
+    name: { en: "civet" },
+  },
+
+  cedar: {
+    id: "cedar",
+    name: { en: "cedar" },
+  },
+
+  tobacco: {
+    id: "tobacco",
+    name: { en: "tobacco" },
+  },
+
+  olibanum: {
+    id: "olibanum",
+    name: { en: "olibanum" },
+  },
+
+  rose: {
+    id: "rose",
+    name: { en: "rose" },
+  },
+
+  "red-sandal": {
+    id: "red-sandal",
+    name: { en: "red sandal" },
+  },
+
+  storax: {
+    id: "storax",
+    name: { en: "storax" },
+  },
+
+  jasmine: {
+    id: "jasmine",
+    name: { en: "jasmine" },
+  },
+}

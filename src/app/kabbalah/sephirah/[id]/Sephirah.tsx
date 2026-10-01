@@ -14,6 +14,7 @@ import {
   Row,
   Trail,
 } from "@/components/entity";
+import { FIELD_PATH_LIST_SEPARATOR } from "@/components/kabbalah/fieldPath";
 import TreeOfLife from "@/components/kabbalah/TreeOfLife";
 import { isHiddenSephirah } from "@/seo/entities";
 import { RWSName } from "@/tarot";
@@ -45,6 +46,16 @@ const ORDINALS = [
 /** The data keeps these in lower case, as slugs are; a row reads as words. */
 function capitalise(text: string) {
   return text && text[0].toUpperCase() + text.slice(1);
+}
+
+/**
+ * A list of linked rows as one value, "Sapphire; amethyst", joined as the Tree
+ * joins `stones.*.name.en`; empty, and so an omitted row, where there are none.
+ */
+function names(rows: readonly { name: { en: string } }[] | undefined) {
+  return capitalise(
+    (rows ?? []).map((row) => row.name.en).join(FIELD_PATH_LIST_SEPARATOR),
+  );
 }
 
 function neighbour(sephirah?: SephirahRow): Neighbour | undefined {
@@ -257,9 +268,9 @@ export default function Sephirah({ sephirah }: { sephirah: SephirahRow }) {
             </div>
           ) : null}
         </Row>
-        <Row label="Body">{capitalise(sephirah.body)}</Row>
-        <Row label="Stone">{capitalise(sephirah.stone)}</Row>
-        <Row label="Scent">{capitalise(sephirah.scent)}</Row>
+        <Row label="Body">{names(sephirah.bodyParts)}</Row>
+        <Row label="Stone">{names(sephirah.stones)}</Row>
+        <Row label="Scent">{names(sephirah.scents)}</Row>
         <Row label="Grade">
           {gdGrade ? (
             <Link href={`/gd/grade/${gdGrade.id}`}>

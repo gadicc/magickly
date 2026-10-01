@@ -1,0 +1,63 @@
+// Precious stones, as the sephirot are given them (`sephirah.stoneIds`).
+// Names are lower case, as they are read in a sentence; a page capitalises.
+{
+  diamond: {
+    id: "diamond",
+    name: { en: "diamond" },
+  },
+
+  "star-ruby": {
+    id: "star-ruby",
+    name: { en: "star ruby" },
+  },
+
+  turquoise: {
+    id: "turquoise",
+    name: { en: "turquoise" },
+  },
+
+  pearl: {
+    id: "pearl",
+    name: { en: "pearl" },
+  },
+
+  "star-sapphire": {
+    id: "star-sapphire",
+    name: { en: "star sapphire" },
+  },
+
+  sapphire: {
+    id: "sapphire",
+    name: { en: "sapphire" },
+  },
+
+  amethyst: {
+    id: "amethyst",
+    name: { en: "amethyst" },
+  },
+
+  ruby: {
+    id: "ruby",
+    name: { en: "ruby" },
+  },
+
+  topaz: {
+    id: "topaz",
+    name: { en: "topaz" },
+  },
+
+  emerald: {
+    id: "emerald",
+    name: { en: "emerald" },
+  },
+
+  quartz: {
+    id: "quartz",
+    name: { en: "quartz" },
+  },
+
+  "rock-crystal": {
+    id: "rock-crystal",
+    name: { en: "rock crystal" },
+  },
+}

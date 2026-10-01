@@ -14,7 +14,7 @@ describe("pathTarget", () => {
       many: false,
     });
     // A field only some rows carry is still a field.
-    expect(pathTarget("sephirah", "scent")?.field).toBe("scent");
+    expect(pathTarget("sephirah", "color.king")?.field).toBe("color.king");
   });
 
   it("hops through a link, and through two", () => {
@@ -70,6 +70,29 @@ describe("pathTarget", () => {
   // `*` reads every element of a list and joins what it finds into one
   // string (plan 039, decision 4), so it is held to a list, and a path
   // through it is never `many`.
+  it("reads a sephirah's body parts, stones and scents through *", () => {
+    // The Tree's three list fields (plan 039): a `many` link each, read as one
+    // joined string, so never `many` themselves.
+    for (const [accessor, table] of [
+      ["bodyParts", "bodyPart"],
+      ["stones", "stone"],
+      ["scents", "scent"],
+    ] as const)
+      expect(pathTarget("sephirah", `${accessor}.*.name.en`)).toEqual({
+        table,
+        field: "name.en",
+        many: false,
+      });
+    expect(pathTarget("sephirah", "stones")).toEqual({
+      table: "stone",
+      field: null,
+      many: true,
+    });
+    // The fields they replaced are gone.
+    for (const old of ["body", "stone", "scent"])
+      expect(pathTarget("sephirah", old)).toBeUndefined();
+  });
+
   it("reads every element of a list link through *", () => {
     expect(pathTarget("tetragram", "planets.*.symbol")).toEqual({
       table: "planet",

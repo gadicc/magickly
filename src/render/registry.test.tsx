@@ -40,9 +40,12 @@ describe("component image registry", () => {
   it.each([
     // 2591a504… until Netzach's and Hod's god names spelt Tzva'ot as the
     // hosts, צבאות, rather than צבעות (plan 036); only this hash moved.
+    // 8d5f06b8… until the body parts, stones and scents became rows of their
+    // own tables, read as `stones.*.name.en` and the like (plan 039): the
+    // field names moved with the values, and no other hash did.
     [
       "tree-of-life",
-      "8d5f06b8e648998b8ba7e3fe97b1f3c6a967281916e3b2c3ad5b5f7ff2f17530",
+      "edab0be8f4cd897bd721e576cfabe7676ef7dcca817f01bdf1592df03518e3b5",
     ],
     [
       "astro-geomancy-chart",

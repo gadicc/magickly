@@ -39,6 +39,11 @@ import seventyTwoAngel from "./dist/kabbalah/seventyTwoAngels.json";
 
 import chakra from "./dist/chakras.json";
 
+import bodyPart from "./dist/body/parts.json";
+
+import stone from "./dist/materia/stones.json";
+import scent from "./dist/materia/scents.json";
+
 import alchemySymbol from "./dist/alchemy/symbols.json";
 import alchemyTerm from "./dist/alchemy/terms.json";
 import element from "./dist/alchemy/elements.json";
@@ -78,6 +83,13 @@ export const tables = {
   seventyTwoAngel,
 
   chakra,
+
+  // BODY
+  bodyPart,
+
+  // MATERIA
+  stone,
+  scent,
 
   // ALCHEMY
   alchemySymbol,

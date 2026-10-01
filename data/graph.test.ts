@@ -45,6 +45,9 @@ describe("the graph", () => {
       "tribeOfIsrael",
       "seventyTwoAngel",
       "chakra",
+      "bodyPart",
+      "stone",
+      "scent",
       "alchemyTerm",
     ]);
   });

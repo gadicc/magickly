@@ -157,7 +157,7 @@ type LinkedTables = {
  * two are structurally the same type; this only decides what a hover, an
  * error and a `.d.ts` say.
  *
- * The barrel is the case this is for. It assembles 23 of the 26 tables, the
+ * The barrel is the case this is for. It assembles 26 of the 29 tables, the
  * three [data.ts](./data.ts) leaves out being named in no link either way, so
  * its rows are `Row<"*", T>` in everything but the scope written on them —
  * and without this they would print, and fail to be named in a `.d.ts`, as

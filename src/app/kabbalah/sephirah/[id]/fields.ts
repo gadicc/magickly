@@ -26,9 +26,9 @@ export const fields: EntityFields = {
     "color.queenWebText",
     "soul",
     "chakra",
-    "body",
-    "stone",
-    "scent",
+    "bodyParts",
+    "stones",
+    "scents",
     "gdGrade",
     // The Paths list.
     "pathsFrom",
@@ -50,6 +50,9 @@ export const fields: EntityFields = {
     "gdGradeId",
     "nextId",
     "prevId",
+    "bodyPartIds",
+    "stoneIds",
+    "scentIds",
     // A slug for the Tree's body labels; the Body row says it in words.
     "bodyPos",
     // Da'at's dashed outline on the Tree, which is drawing, not a colour.

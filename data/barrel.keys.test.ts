@@ -8,7 +8,7 @@ import data from "./data";
  * mutation, and this is the delta, table by table.
  *
  * Two tables are new, `gdDegree` and `tribeOfIsrael`, both of them link
- * targets the barrel never held. The barrel is 23 of the 26 tables:
+ * targets the barrel never held. The barrel is 26 of the 29 tables:
  * `seventyTwoAngel`, `enochianTablet` and `christianChoir` declare no link in
  * either direction, so assembling them would add nothing to any row and only
  * put their JSON in every barrel route's chunk ([data.ts](./data.ts)).
@@ -43,6 +43,13 @@ import data from "./data";
  * `sephirot` rather than after it. A path also names its two sephirot now,
  * `fromId` and `toId` in the JSON with `from` and `to` beside them, and the
  * sephirah derives `pathsFrom` and `pathsTo` from those.
+ *
+ * Plan 039 made the sephirot's body parts, stones and scents rows of three
+ * tables of their own, `bodyPart`, `stone` and `scent`, which the barrel holds
+ * because a sephirah links them: `bodyPartIds`, `stoneIds` and `scentIds`
+ * replace the strings `body`, `stone` and `scent`, with `bodyParts`, `stones`
+ * and `scents` beside them. Malchut has no scent and Da'at neither stone nor
+ * scent, so those keys are absent, and the accessors are there all the same.
  *
  * The sampled row is each table's first, named so the sample is reproducible;
  * for the one array table left in the barrel that is index `0`.
@@ -173,12 +180,12 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "color",
       "chakraId",
       "godNameId",
-      "scent",
-      "body",
+      "scentIds",
+      "bodyPartIds",
       "bodyPos",
       "planetId",
       "tenHeavens",
-      "stone",
+      "stoneIds",
       "archangelId",
       "soulId",
       "angelicOrderId",
@@ -193,6 +200,9 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "gdGrade",
       "next",
       "prev",
+      "bodyParts",
+      "stones",
+      "scents",
       "pathsFrom",
       "pathsTo",
     ],
@@ -227,6 +237,9 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "seedMeaning",
     ],
   },
+  bodyPart: { row: "cranium", keys: ["id", "name"] },
+  stone: { row: "diamond", keys: ["id", "name"] },
+  scent: { row: "ambergris", keys: ["id", "name"] },
   alchemySymbol: {
     row: "sulphur",
     keys: [
@@ -289,10 +302,8 @@ describe("data barrel", () => {
       "name",
       "color",
       "godNameId",
-      "scent",
-      "body",
+      "bodyPartIds",
       "bodyPos",
-      "stone",
       "chakra",
       "godName",
       "planet",
@@ -302,10 +313,15 @@ describe("data barrel", () => {
       "gdGrade",
       "next",
       "prev",
+      "bodyParts",
+      "stones",
+      "scents",
       "pathsFrom",
       "pathsTo",
     ]);
     expect(daat.planet).toBeUndefined();
+    expect(daat.stones).toBeUndefined();
+    expect(daat.bodyParts?.map((part) => part.name.en)).toEqual(["throat"]);
     expect(daat.pathsFrom).toEqual([]);
     expect(daat.godName?.name.he).toBe("יהוה אלוהים");
   });
