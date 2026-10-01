@@ -63,7 +63,7 @@ describe("entity pages", () => {
       title: "Keter (Crown) on the Tree of Life",
       description:
         'Keter (כתר), "Crown", is Sephirah 1 of the Tree of Life: god name ' +
-        "Ehiyeh, archangel Metatron, angelic host Chayot Hakodesh, King and " +
+        "Ehiyeh, archangel Metatron, angelic host Chayot HaKodesh, King and " +
         "Queen scale colours.",
     });
     expect(sephirahPage("malchut")?.description).toContain(

@@ -12,6 +12,15 @@ it can travel.
 Facts themselves belong to nobody. What is licensed here is the collecting,
 wording and arrangement.
 
+## Romanised Hebrew
+
+A romanised Hebrew name writes the article as Israel's official romanisation
+does, the Academy of the Hebrew Language's system that BGN/PCGN adopted in
+2018: capitalised and joined to its word, "Roshit HaGilgulim", "Chayot
+HaKodesh". Where that word begins with an aleph, its vowel is capitalised in
+the same way, "Adonai HaAretz". The library standard, ALA-LC, writes the
+article in lower case with a hyphen instead; the data keeps to one of the two.
+
 ## Sources
 
 Most of this is correspondences, which belong to nobody. One set is derived

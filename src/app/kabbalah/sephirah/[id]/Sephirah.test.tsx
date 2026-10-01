@@ -187,7 +187,7 @@ describe("the sephirah page", () => {
     // Hebrew name's gloss differ, and the row gives both.
     const html = await render("malchut");
     expect(valueOf(html, "Sphere · Assiah")).toBe(
-      "World of Foundations · עולם היסודות Olam haYesodot “Sphere of the Elements”",
+      "World of Foundations · עולם היסודות Olam HaYesodot “Sphere of the Elements”",
     );
     expect(labelsOf(html)).not.toContain("Heaven");
     expect(labelsOf(html)).not.toContain("Scent");

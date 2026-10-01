@@ -43,9 +43,12 @@ describe("component image registry", () => {
     // 8d5f06b8… until the body parts, stones and scents became rows of their
     // own tables, read as `stones.*.name.en` and the like (plan 039): the
     // field names moved with the values, and no other hash did.
+    // edab0be8… until the romanised article was capitalised and joined, as
+    // Israel's official romanisation writes it (plan 039): Olam HaYesodot,
+    // Chayot HaKodesh, Adonai HaAretz. The Tree can draw all three.
     [
       "tree-of-life",
-      "edab0be8f4cd897bd721e576cfabe7676ef7dcca817f01bdf1592df03518e3b5",
+      "2b895fc2e600c594af0c2e361df6bf4b8b3b70880c559dd17ed44abeeebff751",
     ],
     [
       "astro-geomancy-chart",

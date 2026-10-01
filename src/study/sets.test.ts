@@ -55,7 +55,7 @@ describe("study sets", () => {
     );
     expect(answers.keter).toBe("First Swirlings / Roshit HaGilgulim");
     expect(answers.chochmah).toBe("The Zodiac / Mazalot");
-    expect(answers.malchut).toBe("Sphere of the Elements / Olam haYesodot");
+    expect(answers.malchut).toBe("Sphere of the Elements / Olam HaYesodot");
     expect(answers.tiferet).toBe("Sphere of Sol / Shemesh");
   });
 
