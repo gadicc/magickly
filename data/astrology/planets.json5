@@ -70,6 +70,14 @@
     magickTypes: {
       en: "Career success and progression, establishing harmony, healing and improving health, leadership skills, acquiring money and resources, promotion, strengthening willpower",
     },
+    // The Key of Solomon, after S. L. MacGregor Mathers' translation (1888),
+    // Book I, chapter II, as the planetary hours page holds it: what the
+    // planet's days and hours serve for, a fragment that follows the
+    // planet's name. Copied from that page character for character; it may
+    // abridge Mathers lightly and has not yet been checked against a scan.
+    keyOfSolomon: {
+      en: "temporal wealth, hope, gain, fortune, divination, the favour of princes, to dissolve hostile feeling, to make friends",
+    },
   },
 
   mercury: {
@@ -93,6 +101,9 @@
     magickTypes: {
       en: "Business success, improving communication skills, developing knowledge and memory, diplomacy, exam success, divination, developing influence, protection when traveling by air and land, learning music",
     },
+    keyOfSolomon: {
+      en: "eloquence and intelligence; promptitude in business; science and divination; wonders; apparitions; and answers regarding the future. Thou canst also operate under this Planet for thefts; writings; deceit; and merchandise.",
+    },
   },
 
   venus: {
@@ -115,6 +126,9 @@
     spiritId: "kedemel",
     magickTypes: {
       en: "Increasing attractiveness and self-confidence, beauty and passion, enhancing creativity, improving fertility, developing friendships, obtaining love",
+    },
+    keyOfSolomon: {
+      en: "forming friendships; for kindness and love; for joyous and pleasant undertakings, and for travelling.",
     },
   },
 
@@ -151,6 +165,9 @@
     magickTypes: {
       en: "Developing clairvoyance and other psychic skills, ensuring safe childbirth, divination, glamour and illusions, lucid dreaming, protection when traveling by sea",
     },
+    keyOfSolomon: {
+      en: "embassies; voyages envoys; messages; navigation; reconciliation; love; and the acquisition of merchandise by water.",
+    },
   },
 
   mars: {
@@ -173,6 +190,9 @@
     spiritId: "bartzabel",
     magickTypes: {
       en: "Controlling anger, increasing courage, enhancing energy and passion, increasing vigour and sex drive",
+    },
+    keyOfSolomon: {
+      en: "War; to arrive at military honour; to acquire courage; to overthrow enemies; and further to cause ruin, slaughter, cruelty, discord; to wound and to give death.",
     },
   },
 
@@ -198,6 +218,9 @@
     magickTypes: {
       en: "Career success, developing ambition and enthusiasm, improving fortune and luck, general health, acquiring honour, improving sense of humour, legal matters and dealing with the establishment, developing leadership skills",
     },
+    keyOfSolomon: {
+      en: "obtaining honours, acquiring riches; contracting friendships, preserving health; and arriving at all that thou canst desire.",
+    },
   },
 
   saturn: {
@@ -220,6 +243,9 @@
     spiritId: "zazel",
     magickTypes: {
       en: "Performing duty, establishing balance and equilibrium, dispelling illusions, protecting the home, legal matters, developing patience and self-discipline",
+    },
+    keyOfSolomon: {
+      en: "summon the Souls from Hades, but only of those who have died a natural death. Similarly on these days and hours thou canst operate to bring either good or bad fortune to buildings; to have familiar Spirits attend thee in sleep; to cause good or ill success to business, possessions, goods, seeds, fruits, and similar things, in order to acquire learning; to bring destruction and to give death, and to sow hatred and discord.",
     },
   },
 

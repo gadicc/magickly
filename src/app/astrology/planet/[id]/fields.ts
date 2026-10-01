@@ -22,6 +22,7 @@ export const fields: EntityFields = {
     "zodiacs",
     "tetragrams",
     "gdGrade",
+    "keyOfSolomon.en",
     "magickTypes.en",
   ],
   omitted: [

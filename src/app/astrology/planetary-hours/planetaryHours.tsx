@@ -89,7 +89,38 @@ function PlanetaryHoursForDayAndLocation({ date, geo, planet }) {
     </div>
   );
 }
-export default function PlanetaryHours() {
+
+/**
+ * The seven planets of the hours, in the Chaldean order from Sol, as the
+ * select has always listed them.
+ */
+const SELECT_ORDER = [
+  "sol",
+  "venus",
+  "mercury",
+  "luna",
+  "saturn",
+  "jupiter",
+  "mars",
+] as const;
+
+/** One of the seven planets the hours cycle through. */
+export type HourPlanet = (typeof SELECT_ORDER)[number];
+
+/**
+ * The planetary hours, with a select of the seven planets that each gives
+ * what the Key of Solomon says its days and hours serve for.
+ *
+ * The texts are the planet data's `keyOfSolomon`, which the server page reads
+ * and passes down, so that this client component imports no data table and
+ * its bundle carries none.
+ */
+export default function PlanetaryHours({
+  keyOfSolomon,
+}: {
+  /** Each planet's `keyOfSolomon.en`, a fragment that follows its name. */
+  keyOfSolomon: Record<HourPlanet, string>;
+}) {
   const geo = useGeoIP();
   const [planet, setPlanet] = React.useState("");
   const [_upcomingHours, setUpcomingHours] = React.useState<
@@ -108,43 +139,10 @@ export default function PlanetaryHours() {
     (d, i) => new Date(now.getTime() + d * DAY_IN_MS),
   );
 
-  const planetSelect = [
-    {
-      value: "sol",
-      label:
-        "temporal wealth, hope, gain, fortune, divination, the favour of princes, to dissolve hostile feeling, to make friends",
-    },
-    {
-      value: "venus",
-      label:
-        "forming friendships; for kindness and love; for joyous and pleasant undertakings, and for travelling.",
-    },
-    {
-      value: "mercury",
-      label:
-        "eloquence and intelligence; promptitude in business; science and divination; wonders; apparitions; and answers regarding the future. Thou canst also operate under this Planet for thefts; writings; deceit; and merchandise.",
-    },
-    {
-      value: "luna",
-      label:
-        "embassies; voyages envoys; messages; navigation; reconciliation; love; and the acquisition of merchandise by water.",
-    },
-    {
-      value: "saturn",
-      label:
-        "summon the Souls from Hades, but only of those who have died a natural death. Similarly on these days and hours thou canst operate to bring either good or bad fortune to buildings; to have familiar Spirits attend thee in sleep; to cause good or ill success to business, possessions, goods, seeds, fruits, and similar things, in order to acquire learning; to bring destruction and to give death, and to sow hatred and discord.",
-    },
-    {
-      value: "jupiter",
-      label:
-        "obtaining honours, acquiring riches; contracting friendships, preserving health; and arriving at all that thou canst desire.",
-    },
-    {
-      value: "mars",
-      label:
-        "War; to arrive at military honour; to acquire courage; to overthrow enemies; and further to cause ruin, slaughter, cruelty, discord; to wound and to give death.",
-    },
-  ];
+  const planetSelect = SELECT_ORDER.map((value) => ({
+    value,
+    label: keyOfSolomon[value],
+  }));
 
   return (
     <Container sx={{ my: 1 }}>

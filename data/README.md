@@ -23,8 +23,8 @@ article in lower case with a hyphen instead; the data keeps to one of the two.
 
 ## Sources
 
-Most of this is correspondences, which belong to nobody. One set is derived
-from an identified work and is worth naming:
+Most of this is correspondences, which belong to nobody. Two sets are derived
+from identified works and are worth naming:
 
 **`seventyTwoAngels.json5`, `seventyTwoAngelsText/` and `lenain/`** come from
 Lazare Lenain, *La Science Cabalistique* (Amiens, 1823), read page by page from
@@ -44,3 +44,13 @@ The Hebrew names are given both as Lenain points them and as bare letters.
 Forty-seven are there because two independent readings of the scan agree;
 twenty-five were read by a person who reads Hebrew, and each of those carries a
 note saying so. See [plan 031](../plans/031-seventy-two-angels.md).
+
+**`keyOfSolomon` in `astrology/planets.json5`**, on the seven classical
+planets, is what *The Key of Solomon the King* says each planet's days and
+hours serve for, after S. L. MacGregor Mathers' translation (London, 1888),
+Book I, chapter II. Mathers died in 1918, so the translation is in the public
+domain and **no rights are asserted over the text**. The text is held as the
+planetary hours page has always shown it, which may abridge Mathers lightly
+(Luna's "voyages envoys", Sol's list with no "and") and has not yet been
+checked against a scan; until it is, it is cited as "after" Mathers. See
+[plan 039](../plans/039-correspondence-tables.md).

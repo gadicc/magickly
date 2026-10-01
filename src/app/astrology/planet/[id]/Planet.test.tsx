@@ -52,6 +52,7 @@ const LABELS = [
   "Rules",
   "Geomantic figures",
   "Grade",
+  "Key of Solomon",
   "Magical operations",
 ];
 
@@ -133,6 +134,11 @@ describe("the planet page", () => {
       text: "5=6 Adeptus Minor",
       hrefs: ["/gd/grade/5=6"],
     });
+    // Plan 039, decision 6: the Key's fragment, framed and cited "after"
+    // Mathers until it is checked against a scan.
+    expect(row(html, "Key of Solomon").text).toBe(
+      "Its days and hours serve for: temporal wealth, hope, gain, fortune, divination, the favour of princes, to dissolve hostile feeling, to make friends After Mathers' translation (1888), Book I, chapter II.",
+    );
     // Decision 3: shown, and said to be unsourced.
     const operations = row(html, "Magical operations").text;
     expect(operations).toMatch(/^Career success and progression, /);
@@ -244,6 +250,34 @@ describe("the planet page", () => {
           .map(([key]) => key),
         sphere.id,
       ).toEqual(["id", "kind", "name", "sephirot"]);
+  });
+
+  it("cites the Key of Solomon on the seven planets, and on no other row", async () => {
+    // The Key gives the operations of the seven planets' days and hours; Earth,
+    // the moderns, the nodes and the spheres have none, and `Row` omits the
+    // label rather than printing it empty. Each row reads its own planet's
+    // text, the one the planetary hours page shows.
+    const cited: string[] = [];
+    for (const id of ids) {
+      const found = rowsOf(await page(id)).find(
+        (each) => each.label === "Key of Solomon",
+      );
+      if (!found) continue;
+      cited.push(id);
+      const planet = Data.planet[id as keyof typeof Data.planet];
+      expect(found.text, id).toContain(
+        `Its days and hours serve for: ${planet.keyOfSolomon?.en} `,
+      );
+    }
+    expect(cited).toEqual([
+      "sol",
+      "mercury",
+      "venus",
+      "luna",
+      "mars",
+      "jupiter",
+      "saturn",
+    ]);
   });
 
   it("links the planetary hours from the seven planets they are kept for", async () => {

@@ -40,7 +40,8 @@ function hasOnlyItsSymbol(planet: PlanetRow) {
     planet.tetragrams.length ||
     planet.gdGrade ||
     planet.alchemySymbol ||
-    planet.magickTypes
+    planet.magickTypes ||
+    planet.keyOfSolomon
   );
 }
 
@@ -210,6 +211,19 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
               <Link href={`/gd/grade/${grade.id}`}>
                 {grade.id} {grade.name}
               </Link>
+            ) : null}
+          </Row>
+          <Row label="Key of Solomon">
+            {planet.keyOfSolomon ? (
+              <>
+                {/* The text is a fragment that follows "Planet:" in the
+                    hours page's select, so it is given a frame of its own. */}
+                Its days and hours serve for: {planet.keyOfSolomon.en}{" "}
+                {/* Plan 039, decision 6: "after" until checked on a scan. */}
+                <Muted block>
+                  After Mathers' translation (1888), Book I, chapter II.
+                </Muted>
+              </>
             ) : null}
           </Row>
           <Row label="Magical operations">
