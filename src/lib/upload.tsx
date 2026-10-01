@@ -285,10 +285,13 @@ export default function Upload({
   expectedActorId,
   rituals,
   onResult,
+  concealed = false,
 }: {
   expectedActorId: string;
   rituals: EditableRitualOption[];
   onResult?: (result: RitualUploadReceipt) => void;
+  /** Hide nested menu portals while their parent verifies account access. */
+  concealed?: boolean;
 }) {
   const [ritualId, setRitualId] = React.useState(rituals[0]?.id ?? "");
   const [file, setFile] = React.useState<File | null>(null);
@@ -333,6 +336,7 @@ export default function Upload({
       <FormControl fullWidth margin="normal">
         <InputLabel id="ritual-upload-label">Ritual</InputLabel>
         <Select
+          MenuProps={{ sx: { visibility: concealed ? "hidden" : undefined } }}
           labelId="ritual-upload-label"
           label="Ritual"
           value={ritualId}

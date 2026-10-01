@@ -65,7 +65,10 @@ export function printRitualText(document: RitualSemanticDocument): string {
       if (
         (node.tag === "var" || node.tag === "grade") &&
         keys.length === 1 &&
-        typeof node.attrs[node.tag === "var" ? "name" : "grade"] === "string"
+        typeof node.attrs[node.tag === "var" ? "name" : "grade"] === "string" &&
+        /^[A-Za-z0-9_=]+$/.test(
+          String(node.attrs[node.tag === "var" ? "name" : "grade"]),
+        )
       ) {
         const value = node.attrs[node.tag === "var" ? "name" : "grade"];
         lines.push(

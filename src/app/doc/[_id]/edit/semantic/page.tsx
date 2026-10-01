@@ -1,4 +1,4 @@
-import { Alert } from "@mui/material";
+import { Alert, Button } from "@mui/material";
 import { connection } from "next/server";
 import { getCurrentSqlUserId } from "@/auth/session";
 import { RITUAL_SOURCE_FORMAT } from "@/doc/compileContract";
@@ -8,7 +8,6 @@ import {
   validateRitualSemantic,
 } from "@/doc/semantic";
 import { SEMANTIC_SOURCE_FORMAT } from "@/doc/semanticCompile";
-import { hasDirectNestedTask } from "@/doc/semanticEditorCompatibility";
 import {
   createSemanticImportReport,
   type SemanticImportReport,
@@ -25,8 +24,6 @@ export default async function SemanticEditPage({
   params: Promise<{ _id: string }>;
 }) {
   await connection();
-  if (process.env.RITUAL_SEMANTIC_EDITOR !== "1")
-    return <Alert severity="info">The new editor is not enabled.</Alert>;
   const ritualId = await resolveSqlRitualRouteId((await params)._id).catch(
     () => null,
   );
@@ -72,6 +69,9 @@ export default async function SemanticEditPage({
           <Alert severity="error">
             This ritual could not be converted without changing its reader tree.
             Its saved revision is unchanged.
+            <Button href={`/doc/${ritualId}/edit?legacy=1`}>
+              Open Pug editor
+            </Button>
           </Alert>
         );
     } else {
@@ -83,16 +83,16 @@ export default async function SemanticEditPage({
     }
   } catch {
     return (
-      <Alert severity="error">The ritual could not be converted safely.</Alert>
-    );
-  }
-  if (hasDirectNestedTask(document.nodes))
-    return (
-      <Alert severity="info">
-        This ritual contains nested tasks that the pilot visual editor cannot
-        represent yet. Its saved revision is unchanged.
+      <Alert severity="error">
+        The ritual could not be converted safely.
+        {current.revision.sourceFormat === RITUAL_SOURCE_FORMAT && (
+          <Button href={`/doc/${ritualId}/edit?legacy=1`}>
+            Open Pug editor
+          </Button>
+        )}
       </Alert>
     );
+  }
   return (
     <SemanticEditorShell
       key={ritualId}

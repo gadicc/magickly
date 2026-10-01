@@ -1,6 +1,10 @@
 "use client";
 
 import Dexie, { type Table } from "dexie";
+import {
+  parseRitualPublicationRequest,
+  type RitualPublicationRequestV1,
+} from "../offline/ritualPublicationContract";
 import type { SqlRitualWriteRequest } from "./sqlWriteContract";
 
 export interface SemanticDraft {
@@ -20,10 +24,21 @@ export interface SemanticDraft {
 
 class SemanticDraftDatabase extends Dexie {
   drafts!: Table<SemanticDraft, [string, string]>;
+  publications!: Table<RitualPublicationRequestV1, [string, string]>;
+  confirmations!: Table<RitualPublicationRequestV1, [string, string]>;
 
   constructor() {
     super("magickli-semantic-editor-v1");
     this.version(1).stores({ drafts: "[ownerId+ritualId]" });
+    this.version(2).stores({
+      drafts: "[ownerId+ritualId]",
+      publications: "[expectedActorId+ritualId]",
+    });
+    this.version(3).stores({
+      drafts: "[ownerId+ritualId]",
+      publications: "[expectedActorId+ritualId]",
+      confirmations: "[expectedActorId+ritualId]",
+    });
   }
 }
 
@@ -43,4 +58,85 @@ export function saveSemanticDraft(draft: SemanticDraft) {
 /** A confirmed server receipt is the only automatic deletion path. */
 export function clearSemanticDraft(ownerId: string, ritualId: string) {
   return db().drafts.delete([ownerId, ritualId]);
+}
+
+/** Clear the confirmed draft and retain its publication in one browser transaction. */
+export async function confirmSemanticSave(request: RitualPublicationRequestV1) {
+  const valid = parseRitualPublicationRequest(request);
+  if (!valid) throw new TypeError("Invalid publication");
+  const database = db();
+  return database.transaction(
+    "rw",
+    database.drafts,
+    database.publications,
+    database.confirmations,
+    async () => {
+      const key: [string, string] = [valid.expectedActorId, valid.ritualId];
+      const confirmed = await database.confirmations.get(key);
+      const pending = await database.publications.get(key);
+      const draft = await database.drafts.get(key);
+      // A delayed acknowledgement from another tab must not roll back recovery.
+      if (
+        (confirmed && confirmed.expectedVersion > valid.expectedVersion) ||
+        (pending &&
+          (pending.expectedVersion > valid.expectedVersion ||
+            (pending.expectedVersion === valid.expectedVersion &&
+              pending.operationId !== valid.operationId))) ||
+        (draft &&
+          draft.baseVersion >= valid.expectedVersion &&
+          draft.pending?.operationId !== valid.operationId)
+      )
+        return false;
+      await database.confirmations.put(valid);
+      await database.publications.put(valid);
+      if (draft?.pending?.operationId === valid.operationId)
+        await database.drafts.delete(key);
+      return true;
+    },
+  );
+}
+
+/** Owner-scoped online publication recovery is independent of authoring drafts. */
+export function loadSemanticPublication(ownerId: string, ritualId: string) {
+  return db().publications.get([ownerId, ritualId]);
+}
+export async function saveSemanticPublication(
+  request: RitualPublicationRequestV1,
+  replacesOperationId?: string,
+) {
+  const valid = parseRitualPublicationRequest(request);
+  if (!valid) throw new TypeError("Invalid publication");
+  const database = db();
+  await database.transaction(
+    "rw",
+    database.publications,
+    database.confirmations,
+    async () => {
+      const key: [string, string] = [valid.expectedActorId, valid.ritualId];
+      const confirmed = await database.confirmations.get(key);
+      const current = await database.publications.get(key);
+      if (
+        (confirmed && confirmed.expectedVersion > valid.expectedVersion) ||
+        (current &&
+          (current.expectedVersion > valid.expectedVersion ||
+            (current.expectedVersion === valid.expectedVersion &&
+              current.operationId !== valid.operationId &&
+              replacesOperationId !== current.operationId)))
+      )
+        throw new Error("Publication was superseded");
+      await database.publications.put(valid);
+    },
+  );
+}
+/** A delayed acknowledgement must never remove a newer saved version's request. */
+export async function clearSemanticPublication(
+  request: RitualPublicationRequestV1,
+) {
+  const database = db();
+  await database.transaction("rw", database.publications, async () => {
+    const key: [string, string] = [request.expectedActorId, request.ritualId];
+    const current = await database.publications.get(key);
+    if (JSON.stringify(current) === JSON.stringify(request))
+      await database.publications.delete(key);
+  });
 }

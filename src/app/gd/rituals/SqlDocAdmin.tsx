@@ -8,6 +8,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { parseRitualText, printRitualText } from "@/doc/ritualText";
@@ -31,6 +32,14 @@ import {
   createCreationPublicationHandoff,
   retainCreationPublicationHandoff,
 } from "@/offline/ritualPublicationHandoff";
+
+const RitualCreationEditor = dynamic(
+  () => import("@/doc/RitualCreationEditor"),
+  {
+    ssr: false,
+    loading: () => <p>Loading ritual editor…</p>,
+  },
+);
 
 interface FormState {
   title: string;
@@ -58,7 +67,7 @@ const emptyForm = (): FormState => ({
   minGrade: 0,
   source: "",
   semanticSource: "ritual 1\n",
-  format: "pug",
+  format: "semantic",
 });
 const storageKey = (ownerId: string) => `magickli:ritual-create:v2:${ownerId}`;
 const unavailable = (): SqlRitualWriteResult => ({
@@ -80,11 +89,7 @@ const scopeStillAuthorized = (
   );
 };
 
-export default function SqlDocAdmin({
-  semanticEnabled = false,
-}: {
-  semanticEnabled?: boolean;
-}) {
+export default function SqlDocAdmin() {
   const router = useRouter();
   const [options, setOptions] =
     React.useState<SqlRitualCreationOptionsV1 | null>(null);
@@ -96,6 +101,7 @@ export default function SqlDocAdmin({
   const [error, setError] = React.useState<string | null>(null);
   const [terminal, setTerminal] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
+  const [composerValid, setComposerValid] = React.useState(true);
   const [blockedRecovery, setBlockedRecovery] = React.useState<string | null>(
     null,
   );
@@ -326,6 +332,10 @@ export default function SqlDocAdmin({
     if (!pending && form.format === "semantic") {
       try {
         source = JSON.stringify(parseRitualText(form.semanticSource));
+        if (!composerValid) {
+          setError("Correct the visual document before creating this ritual.");
+          return;
+        }
       } catch (cause) {
         setError(
           cause instanceof Error ? cause.message : "Invalid ritual text.",
@@ -479,7 +489,7 @@ export default function SqlDocAdmin({
         </Button>
       )}
       <form onSubmit={submit}>
-        {semanticEnabled && (
+        {
           <TextField
             select
             label="Source format"
@@ -497,7 +507,7 @@ export default function SqlDocAdmin({
             <MenuItem value="pug">Pug source</MenuItem>
             <MenuItem value="semantic">Ritual text</MenuItem>
           </TextField>
-        )}{" "}
+        }{" "}
         <TextField
           label="Title"
           size="small"
@@ -553,28 +563,32 @@ export default function SqlDocAdmin({
             sx={{ width: 100 }}
           />
         )}
-        <TextField
-          label={form.format === "semantic" ? "Ritual text" : "Ritual source"}
-          multiline
-          minRows={4}
-          fullWidth
-          value={form.format === "semantic" ? form.semanticSource : form.source}
-          disabled={busy || !!pending || !!blockedRecovery}
-          onChange={(event) =>
-            updateForm((current) => ({
-              ...current,
-              [current.format === "semantic" ? "semanticSource" : "source"]:
-                event.target.value,
-            }))
-          }
-          sx={{ mt: 1 }}
-        />
-        {form.format === "semantic" && (
-          <Typography variant="body2">
-            Start with <code>ritual 1</code>, then add lines such as{" "}
-            <code>Hiero: words</code> or <code>* Keryx action</code>. The visual
-            editor opens after creation.
-          </Typography>
+        {form.format === "semantic" ? (
+          <RitualCreationEditor
+            key={options.ownerId}
+            source={form.semanticSource}
+            onChange={(semanticSource) =>
+              updateForm((current) => ({ ...current, semanticSource }))
+            }
+            onValidityChange={setComposerValid}
+            disabled={busy || !!pending || !!blockedRecovery}
+          />
+        ) : (
+          <TextField
+            label="Ritual source"
+            multiline
+            minRows={4}
+            fullWidth
+            value={form.source}
+            disabled={busy || !!pending || !!blockedRecovery}
+            onChange={(event) =>
+              updateForm((current) => ({
+                ...current,
+                source: event.target.value,
+              }))
+            }
+            sx={{ mt: 1 }}
+          />
         )}
         <Button
           type="submit"

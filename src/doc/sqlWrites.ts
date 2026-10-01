@@ -235,14 +235,11 @@ export function createSqlRitualWriter(
   options: {
     now?: () => Date;
     generateId?: () => string;
-    enableSemanticWrites?: boolean;
   } = {},
 ) {
   return async (input: unknown): Promise<SqlRitualWriteResult> => {
     try {
       const request = parse(input);
-      if (request.version === 3 && !options.enableSemanticWrites)
-        fail("UPGRADE_REQUIRED");
       const verified = await getVerifiedActorId();
       if (!isUuidV7(verified)) fail("NOT_AUTHENTICATED");
       const actorId = verified.toLowerCase();

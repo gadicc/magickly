@@ -17,6 +17,7 @@
 /out/
 
 # production
+.private/
 /build
 
 # misc

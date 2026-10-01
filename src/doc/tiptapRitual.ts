@@ -1,10 +1,18 @@
-import { type Editor, type JSONContent, Mark, Node } from "@tiptap/core";
+import {
+  type Editor,
+  getSchema,
+  type JSONContent,
+  Mark,
+  Node,
+} from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
+import { parseRitualFileLocator } from "../files/ritualFileLocator";
 import { createUuidV7, isUuidV7 } from "../lib/ids";
 import {
   type JsonValue,
   type RitualSemanticDocument,
   type RitualSemanticNode,
+  semanticToJrt,
   validateRitualSemantic,
 } from "./semantic";
 import { hasDirectNestedTask } from "./semanticEditorCompatibility";
@@ -210,6 +218,25 @@ const RitualAtom = Node.create({
           : tag === "declareVar"
             ? `Variable · ${String(attrs.label ?? attrs.name ?? "")}`
             : label(tag, attrs);
+    if (tag === "img" && parseRitualFileLocator(attrs.src))
+      return [
+        "div",
+        {
+          "data-ritual-atom": tag,
+          "data-ritual-meta": clipboardMeta(node),
+          class: "ritual-atom",
+          contenteditable: "false",
+        },
+        [
+          "img",
+          {
+            src: String(attrs.src),
+            alt: String(attrs.alt || "Attached ritual image"),
+            style: "max-width:100%;max-height:360px;object-fit:contain",
+          },
+        ],
+        ["div", {}, value],
+      ];
     return [
       "div",
       {
@@ -246,6 +273,10 @@ const RitualSegment = Mark.create({
 /** Editor-only schema. The saved semantic document never depends on Tiptap JSON. */
 export const ritualTiptapExtensions = [
   StarterKit.configure({
+    code: false,
+    link: false,
+    strike: false,
+    underline: false,
     blockquote: false,
     bulletList: false,
     codeBlock: false,
@@ -263,6 +294,34 @@ export const ritualTiptapExtensions = [
   RitualAtom,
   RitualSegment,
 ];
+
+const ritualSchema = getSchema(ritualTiptapExtensions);
+
+/** Refuse visual edits when ProseMirror would alter the semantic reader tree. */
+export function visualRitualState(input: RitualSemanticDocument): {
+  content: JSONContent;
+  issue: string | null;
+} {
+  try {
+    const content = semanticToTiptap(input);
+    const parsed = ritualSchema.nodeFromJSON(content);
+    parsed.check();
+    if (
+      JSON.stringify(semanticToJrt(input)) !==
+      JSON.stringify(semanticToJrt(semanticFromTiptap(parsed.toJSON())))
+    )
+      throw new Error(
+        "This structure cannot round-trip through visual editing.",
+      );
+    return { content, issue: null };
+  } catch {
+    return {
+      content: { type: "doc", content: [{ type: "paragraph" }] },
+      issue:
+        "This ritual contains structures that require source editing. Its content is preserved.",
+    };
+  }
+}
 
 /** Keep pasted identities stable in ProseMirror, not just in a derived snapshot. */
 export function normalizeTiptapNodeIds(editor: Editor): boolean {
@@ -368,7 +427,11 @@ export function semanticToTiptap(input: RitualSemanticDocument): JSONContent {
   if (errors.length) throw new Error(errors[0]);
   if (hasDirectNestedTask(input.nodes))
     throw new Error("Nested tasks are not supported by the visual editor");
-  return { type: "doc", content: toBlocks(input.nodes) };
+  const content = toBlocks(input.nodes);
+  return {
+    type: "doc",
+    content: content.length ? content : [{ type: "paragraph" }],
+  };
 }
 
 function fromInline(node: JSONContent): RitualSemanticNode {

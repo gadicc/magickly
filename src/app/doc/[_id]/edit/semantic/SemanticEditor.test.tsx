@@ -9,6 +9,7 @@ import {
 } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import { printRitualText } from "@/doc/ritualText";
+import { semanticFromJrt } from "@/doc/semantic";
 import { createUuidV7 } from "@/lib/ids";
 import SemanticEditor from "./SemanticEditor";
 import type { SemanticEditorProps } from "./SemanticEditorShell";
@@ -34,12 +35,18 @@ const mock = vi.hoisted(() => ({
   transientLockOnRefresh: false,
   owner: "",
   listeners: [] as Array<() => void>,
+  refreshGate: null as Promise<void> | null,
 }));
 vi.mock("@/doc/semanticDraft", () => ({
   loadSemanticDraft: mock.load,
   saveSemanticDraft: mock.saveDraft,
   clearSemanticDraft: mock.clear,
+  confirmSemanticSave: (request: {
+    expectedActorId: string;
+    ritualId: string;
+  }) => mock.clear(request.expectedActorId, request.ritualId),
 }));
+vi.mock("@/doc/SemanticPublication", () => ({ default: () => null }));
 vi.mock("@/doc/sqlEditorClient", () => ({
   sendSqlRitualWrite: mock.send,
   fetchSqlRitualSource: vi.fn(async (request) => ({
@@ -66,6 +73,7 @@ vi.mock("@/offline/browserRuntime", () => ({
     },
     start: async () => {},
     refreshVerifiedAccount: async () => {
+      if (mock.refreshGate) await mock.refreshGate;
       if (mock.transientLockOnRefresh) {
         mock.phase = "locked";
         for (const listener of mock.listeners) listener();
@@ -117,6 +125,160 @@ afterEach(() => {
   mock.transientLockOnRefresh = false;
   mock.permissionDenied = false;
   mock.listeners = [];
+  mock.refreshGate = null;
+});
+
+it("retains and saves a visual undo back to the confirmed document", async () => {
+  mock.load.mockResolvedValue(undefined);
+  mock.saveDraft.mockResolvedValue(undefined);
+  mock.clear.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  mock.send.mockResolvedValue({
+    ok: true,
+    replayed: false,
+    ritualId: setup.ritualId,
+    revisionId: createUuidV7(),
+    version: 8,
+    updatedAt: new Date().toISOString(),
+  });
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "Save" }));
+  await screen.findByText("Saved as a semantic revision.");
+  const element = screen.getByRole("textbox", {
+    name: "Ritual visual editor",
+  }) as HTMLElement & { editor: import("@tiptap/core").Editor };
+  act(() => {
+    element.editor.commands.insertContent("WRONG");
+  });
+  await waitFor(() =>
+    expect(mock.saveDraft.mock.lastCall?.[0].documentJson).toContain("WRONG"),
+  );
+  act(() => {
+    element.editor.commands.undo();
+  });
+  expect(element.textContent).not.toContain("WRONG");
+  await waitFor(() =>
+    expect(mock.saveDraft.mock.lastCall?.[0].documentJson).not.toContain(
+      "WRONG",
+    ),
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Save" }));
+  await waitFor(() => expect(mock.send).toHaveBeenCalledTimes(2));
+  expect(mock.send.mock.calls[1][0].source).not.toContain("WRONG");
+});
+
+it("conceals private content, dialogs and upload menu portals during verification", async () => {
+  mock.load.mockResolvedValue(undefined);
+  mock.saveDraft.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "Image" }));
+  const dialog = screen.getByRole("dialog", { name: "Insert image" });
+  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Ritual" }));
+  await screen.findByRole("option", { name: setup.title });
+  let verified!: () => void;
+  mock.refreshGate = new Promise<void>((resolve) => {
+    verified = resolve;
+  });
+  act(() => {
+    mock.phase = "locked";
+    for (const listener of mock.listeners) listener();
+  });
+  expect(screen.queryByRole("textbox", { name: "Title" })).toBeNull();
+  expect(screen.queryByRole("dialog", { name: "Insert image" })).toBeNull();
+  expect(screen.queryByRole("option", { name: setup.title })).toBeNull();
+  await act(async () => {
+    mock.phase = "ready";
+    verified();
+  });
+  const option = await screen.findByRole("option", { name: setup.title });
+  fireEvent.keyDown(option, { key: "Escape" });
+  expect(await screen.findByRole("dialog", { name: "Insert image" })).toBe(
+    dialog,
+  );
+});
+
+it("clears a source parse error after discarding the invalid buffer", async () => {
+  mock.load.mockResolvedValue(undefined);
+  mock.saveDraft.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "source" }));
+  fireEvent.change(
+    screen.getByRole("textbox", { name: "Ritual semantic source" }),
+    {
+      target: { value: "broken" },
+    },
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Apply source" }));
+  fireEvent.click(
+    screen.getByRole("button", { name: "Discard source changes" }),
+  );
+  expect(
+    (screen.getByRole("button", { name: "Save" }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(false);
+});
+
+it("keeps an open image dialog mounted across a same-account focus verification", async () => {
+  mock.load.mockResolvedValue(undefined);
+  mock.saveDraft.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "Image" }));
+  const dialog = screen.getByRole("dialog", { name: "Insert image" });
+  await act(async () => {
+    fireEvent.focus(window);
+  });
+  expect(screen.getByRole("dialog", { name: "Insert image" })).toBe(dialog);
+});
+
+it("saves an unsupported visual shape losslessly from its source-only fallback", async () => {
+  mock.load.mockResolvedValue(undefined);
+  mock.saveDraft.mockResolvedValue(undefined);
+  mock.clear.mockResolvedValue(undefined);
+  const setup = props();
+  setup.initialDocument = semanticFromJrt({
+    children: [
+      {
+        type: "task",
+        say: true,
+        role: "hiero",
+        children: [
+          {
+            type: "task",
+            do: true,
+            role: "all",
+            children: [{ type: "text", value: "Nested" }],
+          },
+        ],
+      },
+    ],
+  });
+  mock.owner = setup.actorId;
+  mock.send.mockResolvedValue({
+    ok: true,
+    replayed: false,
+    ritualId: setup.ritualId,
+    revisionId: createUuidV7(),
+    version: 8,
+    updatedAt: new Date().toISOString(),
+  });
+  render(<SemanticEditor {...setup} />);
+  await screen.findByRole("textbox", { name: "Ritual semantic source" });
+  expect(
+    (screen.getByRole("button", { name: "visual" }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(true);
+  fireEvent.click(screen.getByRole("button", { name: "Save" }));
+  await waitFor(() => expect(mock.send).toHaveBeenCalledOnce());
+  expect(JSON.parse(mock.send.mock.calls[0][0].source)).toEqual(
+    setup.initialDocument,
+  );
 });
 
 it("applies a compact source shortcut and saves semantic JSON through v3", async () => {

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import SemanticEditorShell, {
   type SemanticEditorProps,
@@ -27,13 +27,8 @@ const props: SemanticEditorProps = {
   },
 };
 
-it("requires an explicit conversion choice before mounting the editor", () => {
+it("automatically mounts the editor after a lossless conversion", () => {
   render(<SemanticEditorShell {...props} />);
-  expect(screen.queryByText("Semantic editor mounted")).toBeNull();
-  expect(screen.getByText(/1 unsupported legacy nodes/)).toBeTruthy();
-  fireEvent.click(
-    screen.getByRole("button", { name: "Start editing conversion" }),
-  );
   expect(screen.getByText("Semantic editor mounted")).toBeTruthy();
 });
 
@@ -45,6 +40,6 @@ it("does not offer editing when the import changes the reader tree", () => {
     />,
   );
   expect(screen.queryByText("Semantic editor mounted")).toBeNull();
-  expect(screen.queryByRole("button")).toBeNull();
+  expect(screen.getByRole("link", { name: "Open Pug editor" })).toBeTruthy();
   expect(screen.getByText(/could not be converted/)).toBeTruthy();
 });

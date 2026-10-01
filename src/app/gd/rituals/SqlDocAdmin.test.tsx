@@ -7,6 +7,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
+import type { Editor } from "@tiptap/core";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { creationPublicationHandoffKey } from "@/offline/ritualPublicationHandoff";
 import SqlDocAdmin from "./SqlDocAdmin";
@@ -107,6 +108,8 @@ async function fill() {
   fireEvent.change(await screen.findByLabelText("Title"), {
     target: { value: "New ritual" },
   });
+  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Source format" }));
+  fireEvent.click(await screen.findByRole("option", { name: "Pug source" }));
   fireEvent.change(screen.getByLabelText("Ritual source"), {
     target: { value: "p Exact source" },
   });
@@ -168,12 +171,13 @@ it("retains an exact SQL-v2 create before sending and navigates only after ackno
 
 it("creates a semantic ritual from ritual text and retries the exact v3 request", async () => {
   mock.write.mockResolvedValueOnce(null).mockResolvedValueOnce(success);
-  render(<SqlDocAdmin semanticEnabled />);
+  render(<SqlDocAdmin />);
   fireEvent.change(await screen.findByLabelText("Title"), {
     target: { value: "New semantic ritual" },
   });
   fireEvent.mouseDown(screen.getByRole("combobox", { name: "Source format" }));
   fireEvent.click(await screen.findByRole("option", { name: "Ritual text" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Ritual text" }));
   fireEvent.change(screen.getByLabelText("Ritual text"), {
     target: { value: "ritual 1\nHiero: Welcome.\n* Keryx Open the door\n" },
   });
@@ -195,7 +199,7 @@ it("creates a semantic ritual from ritual text and retries the exact v3 request"
   ]);
   expect(JSON.parse(localStorage.getItem(key) ?? "null")).toEqual(request);
   cleanup();
-  render(<SqlDocAdmin semanticEnabled />);
+  render(<SqlDocAdmin />);
   await screen.findByRole("button", { name: "Retry creation" });
   fireEvent.click(screen.getByRole("button", { name: "Retry creation" }));
   await waitFor(() => expect(mock.push).toHaveBeenCalledOnce());
@@ -211,13 +215,38 @@ it("creates a semantic ritual from ritual text and retries the exact v3 request"
   ).toMatchObject({ write: request, result: success });
 });
 
+it("creates a valid semantic ritual from the default visual composer", async () => {
+  render(<SqlDocAdmin />);
+  fireEvent.change(await screen.findByLabelText("Title"), {
+    target: { value: "Visual creation" },
+  });
+  const dom = await screen.findByRole("textbox", {
+    name: "New ritual visual editor",
+  });
+  const editor = (dom as HTMLElement & { editor: Editor }).editor;
+  act(() => {
+    editor.commands.insertContent("Visual words");
+  });
+  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Visibility" }));
+  fireEvent.click(
+    await screen.findByRole("option", { name: "Synthetic temple" }),
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Create" }));
+  await waitFor(() => expect(mock.write).toHaveBeenCalledOnce());
+  expect(mock.write.mock.calls[0][0].version).toBe(3);
+  expect(JSON.parse(mock.write.mock.calls[0][0].source).nodes).toMatchObject([
+    { kind: "text", text: "Visual words" },
+  ]);
+});
+
 it("keeps invalid ritual text local instead of sending a create request", async () => {
-  render(<SqlDocAdmin semanticEnabled />);
+  render(<SqlDocAdmin />);
   fireEvent.change(await screen.findByLabelText("Title"), {
     target: { value: "Invalid semantic ritual" },
   });
   fireEvent.mouseDown(screen.getByRole("combobox", { name: "Source format" }));
   fireEvent.click(await screen.findByRole("option", { name: "Ritual text" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Ritual text" }));
   fireEvent.change(screen.getByLabelText("Ritual text"), {
     target: { value: "not a ritual" },
   });
@@ -386,9 +415,10 @@ it("does not reveal an unsubmitted form to a different owner", async () => {
   expect(
     ((await screen.findByLabelText("Title")) as HTMLInputElement).value,
   ).toBe("");
+  expect(screen.queryByLabelText("Ritual source")).toBeNull();
   expect(
-    (screen.getByLabelText("Ritual source") as HTMLTextAreaElement).value,
-  ).toBe("");
+    await screen.findByRole("textbox", { name: "New ritual visual editor" }),
+  ).toBeDefined();
   expect(screen.queryByDisplayValue("New ritual")).toBeNull();
   expect(screen.queryByDisplayValue("p Exact source")).toBeNull();
 });
@@ -417,9 +447,10 @@ it("discards an unsubmitted form when its selected scope is revoked", async () =
   expect(
     ((await screen.findByLabelText("Title")) as HTMLInputElement).value,
   ).toBe("");
+  expect(screen.queryByLabelText("Ritual source")).toBeNull();
   expect(
-    (screen.getByLabelText("Ritual source") as HTMLTextAreaElement).value,
-  ).toBe("");
+    await screen.findByRole("textbox", { name: "New ritual visual editor" }),
+  ).toBeDefined();
   expect(screen.queryByLabelText("Min Grade")).toBeNull();
 });
 
