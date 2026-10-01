@@ -71,25 +71,48 @@ The operator approved implementation after the [editor decision](037-ritual-edit
 - Independent Astra High review and final Astra xhigh adversarial review found and reproduced delayed-upload, account-concealment, unsupported-mark, source-projection, publication retry, stale acknowledgement and undo/save defects. Fixes have targeted regressions; final review found no residual actionable defects in its scoped recheck.
 - The final production build repeated keyboard access to the upload menu, split-mode authoring, save and automatic publication. Both synthetic rituals, their temple, dependent SQL history/receipts, attachment metadata and all five owned MinIO keys were removed after testing. External test-utility sessions were retired; seeded development identities remain. Production/Preview configuration and the supplied backup were untouched.
 
+### Focus/resume follow-up (1 October)
+
+- The reported Production revision `d25f8d92beff56b1f506fca2a40aac28b029fdc3`
+  uses a closing focus/visibility refresh, which unmounts the legacy editor and
+  preview. The fallback now restores CodeMirror state, cursor, Undo history,
+  both pane positions and root position only after authorization confirms the
+  same owner, account epoch, ritual, draft and exact source. Hard locks discard
+  the presentation on sign-out, expiry, clock or storage failure; private
+  source, title, preview and script access still disappear while access is
+  uncertain. The locked shell keeps its height.
+- Resume retains the last displayed preview while compilation catches up,
+  restores expanded summaries before scroll, and retries when unsized images
+  load. User scrolling, touch, pointer or keyboard input stops those retries.
+  Observers/listeners are removed on lock or unmount. Repeated focus events
+  cannot discard a pending replacement-view, CodeMirror measurement or
+  image-scroll restoration. Same-owner account verification and cross-tab
+  broadcasts can retain opaque presentation in memory; they cannot reveal it
+  without a fresh capability and matching owner/epoch/draft/source.
+- Real Chromium checks dispatched the window focus event through a temporary
+  development-only control restricted to the synthetic fixtures. A second
+  pass simulated visibility hide/return plus focus, exercising the application's
+  account verification too: root scroll 72.5px, source scroll 6,086.5px,
+  horizontal scroll 212.5px and preview scroll 2,160px all survived, and Undo
+  returned the draft to clean. Source scroll and Undo survived actual
+  CodeMirror recreation; an expanded summary stayed
+  open at preview scroll 2,160px. Focus immediately after an edit also retained
+  both positions. Semantic split kept page scroll 14,275px, source scroll
+  3,161.5px and source selection, and visual Undo removed the inserted note.
+  This exercises the actual browser lifecycle, not a physical OS window switch
+  or the deployed revision. The temporary controls were removed; test-owned
+  drafts and SQL fixtures were cleaned up.
+- Focused regressions cover delayed remounts, precompile blur, expired/revoked
+  capability locks, new account epochs, expanded summaries, delayed image
+  geometry, user interaction cancellation and semantic split state. Final
+  Astra xhigh review found no remaining actionable defect after the timing
+  fixes. All 59 affected regressions passed; changed-file Biome, TypeScript and
+  the production build passed. A brief authorization concealment remains
+  intentional; manually switching real windows is still a useful release
+  smoke check.
+
 ## Follow-up scope
 
-- **Focus/resume flicker and scroll reset (reported 1 October):** the operator
-  reports that Production at `d25f8d92beff56b1f506fca2a40aac28b029fdc3`
-  flickers when switching windows and returning, and both source and preview
-  return to the top. Initial code tracing at that revision shows
-  `OfflineLifecycleCoordinator` focus/visibility resume calling a closing
-  refresh, followed by `SqlDocEdit` hiding/clearing its view and rendering the
-  locked branch instead of the editor panes. Reauthorization rebuilds those
-  panes, plausibly explaining the scroll reset without a full navigation.
-  This diagnosis has not yet been reproduced against the reported deployed
-  revision. The new semantic editor retains mounted panes during transient
-  checking, but briefly conceals them and still needs explicit scroll/cursor
-  regression coverage. Next: reproduce a scrolled, dirty ritual in the legacy
-  fallback and semantic split modes; preserve each pane's scroll and selection
-  for same-account rechecks; verify draft/undo preservation, failed/expired
-  permissions and cross-tab account changes. Reduce the visual flash while
-  retaining fail-closed access checks. Keep this separate from the completed
-  default-editor rollout.
 - Full offline authoring needs a versioned semantic source envelope, repository storage tagged with its format, lifecycle recovery and a draft adapter. Fresh permission checks remain required; weakening them would bypass existing lease/account protections. Reader offline bundles remain supported.
 - Physical iOS/Android keyboards, real IME composition, assistive-technology usability and further mobile polish need hands-on checks. Keyboard controls, dialog labels, account concealment and the narrow layout have automated/browser coverage.
 - Future collaboration can use the stable semantic element IDs and Tiptap/ProseMirror model, but revision CAS is currently the concurrency policy; no CRDT merge or simultaneous collaborative authoring is promised.

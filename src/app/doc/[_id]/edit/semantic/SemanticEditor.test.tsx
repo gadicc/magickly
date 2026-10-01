@@ -237,6 +237,58 @@ it("keeps an open image dialog mounted across a same-account focus verification"
   expect(screen.getByRole("dialog", { name: "Insert image" })).toBe(dialog);
 });
 
+it("preserves split pane identity, scroll, source selection and visual Undo across a focus check", async () => {
+  mock.load.mockResolvedValue(undefined);
+  mock.saveDraft.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "split" }));
+  const visual = screen.getByRole("textbox", {
+    name: "Ritual visual editor",
+  }) as HTMLElement & { editor: import("@tiptap/core").Editor };
+  act(() => {
+    visual.editor.commands.insertContent("DIRTY");
+  });
+  const source = screen.getByRole("textbox", {
+    name: "Ritual semantic source",
+  }) as HTMLTextAreaElement;
+  source.setSelectionRange(3, 8);
+  source.scrollTop = 240;
+  const panel = screen.getByLabelText("Visual editor panel");
+  panel.scrollTop = 480;
+  const selection = visual.editor.state.selection.toJSON();
+  let release!: () => void;
+  mock.refreshGate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  act(() => {
+    fireEvent.focus(window);
+  });
+  expect(visual.isConnected).toBe(true);
+  expect(source.isConnected).toBe(true);
+  await act(async () => {
+    release();
+  });
+  await screen.findByRole("button", { name: "Save" });
+  expect(screen.getByRole("textbox", { name: "Ritual visual editor" })).toBe(
+    visual,
+  );
+  expect(screen.getByRole("textbox", { name: "Ritual semantic source" })).toBe(
+    source,
+  );
+  expect(source.scrollTop).toBe(240);
+  expect(source.selectionStart).toBe(3);
+  expect(source.selectionEnd).toBe(8);
+  expect(panel.scrollTop).toBe(480);
+  expect(visual.editor.state.selection.toJSON()).toEqual(selection);
+  expect(visual.textContent).toContain("DIRTY");
+  act(() => {
+    expect(visual.editor.commands.undo()).toBe(true);
+  });
+  expect(visual.textContent).not.toContain("DIRTY");
+});
+
 it("saves an unsupported visual shape losslessly from its source-only fallback", async () => {
   mock.load.mockResolvedValue(undefined);
   mock.saveDraft.mockResolvedValue(undefined);

@@ -1,4 +1,6 @@
 // @vitest-environment jsdom
+
+import type { EditorState, TransactionSpec } from "@codemirror/state";
 import {
   act,
   cleanup,
@@ -7,6 +9,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
+import type { EditorView } from "@uiw/react-codemirror";
 import React from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { formatRitualFileLocator } from "@/files/ritualFileLocator";
@@ -63,8 +66,13 @@ const mock = vi.hoisted(() => ({
   download: vi.fn(),
   commitAllowed: true,
   deferEditorView: false,
+  deferEditorScroll: false,
+  flushEditorScroll: null as null | (() => void),
   releaseEditorView: null as null | (() => void),
   readEditorValue: null as null | (() => string),
+  readEditorState: null as null | (() => EditorState),
+  selectEditor: null as null | ((anchor: number) => void),
+  undoEditor: null as null | (() => boolean),
 }));
 
 let recoveryQueue = new LockedRecoveryQueue();
@@ -153,7 +161,10 @@ vi.mock("@/doc/sqlEditorClient", () => ({
 vi.mock("@/doc/drafts", () => ({
   downloadRitualRecovery: (...args: unknown[]) => mock.download(...args),
 }));
-vi.mock("@uiw/react-codemirror", async () => {
+vi.mock("@uiw/react-codemirror", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@uiw/react-codemirror")>();
+  const { EditorState, StateEffect } = await import("@codemirror/state");
+  const scrollEffect = StateEffect.define<{ top: number; left: number }>();
   const { useCallback, useEffect, useMemo, useRef, useState } = await import(
     "react"
   );
@@ -165,22 +176,49 @@ vi.mock("@uiw/react-codemirror", async () => {
       const container = useRef<HTMLElement | null>(null);
       const textarea = useRef<HTMLTextAreaElement | null>(null);
       const editor = useMemo(() => {
-        let value = "";
+        let pendingScroll: { top: number; left: number } | null = null;
         const result = {
-          state: {
-            doc: {
-              get length() {
-                return value.length;
-              },
-              toString: () => value,
-            },
+          get scrollDOM() {
+            return textarea.current ?? document.createElement("div");
           },
-          dispatch: (update?: { changes?: { insert: string } }) => {
-            if (!update?.changes) return;
-            value = update.changes.insert;
-            if (textarea.current) textarea.current.value = value;
-            change.current(value);
+          state: EditorState.create({
+            extensions: actual.getDefaultExtensions({}),
+          }),
+          setState: (state: EditorState) => {
+            result.state = state;
+            if (textarea.current) textarea.current.value = state.doc.toString();
           },
+          scrollSnapshot: () =>
+            scrollEffect.of({
+              top: textarea.current?.scrollTop ?? 0,
+              left: textarea.current?.scrollLeft ?? 0,
+            }),
+          dispatch: (update?: TransactionSpec) => {
+            if (!update) return;
+            const transaction = result.state.update(update);
+            result.state = transaction.state;
+            if (textarea.current) {
+              textarea.current.value = result.state.doc.toString();
+              for (const effect of transaction.effects) {
+                if (effect.is(scrollEffect)) {
+                  if (mock.deferEditorScroll) pendingScroll = effect.value;
+                  else {
+                    textarea.current.scrollTop = effect.value.top;
+                    textarea.current.scrollLeft = effect.value.left;
+                  }
+                }
+              }
+            }
+            if (transaction.docChanged)
+              change.current(result.state.doc.toString());
+          },
+        };
+        mock.flushEditorScroll = () => {
+          if (!textarea.current || !pendingScroll) return;
+          textarea.current.scrollTop = pendingScroll.top;
+          textarea.current.scrollLeft = pendingScroll.left;
+          pendingScroll = null;
+          textarea.current.dispatchEvent(new Event("scroll"));
         };
         return result;
       }, []);
@@ -193,7 +231,13 @@ vi.mock("@uiw/react-codemirror", async () => {
           input.setAttribute("aria-label", "Ritual source");
           input.value = editor.state.doc.toString();
           input.oninput = () =>
-            editor.dispatch({ changes: { insert: input.value } });
+            editor.dispatch({
+              changes: {
+                from: 0,
+                to: editor.state.doc.length,
+                insert: input.value,
+              },
+            });
           node.replaceChildren(input);
           textarea.current = input;
         }
@@ -201,6 +245,15 @@ vi.mock("@uiw/react-codemirror", async () => {
       useEffect(() => {
         mock.releaseEditorView = activate;
         mock.readEditorValue = () => editor.state.doc.toString();
+        mock.readEditorState = () => editor.state;
+        mock.selectEditor = (anchor) =>
+          editor.dispatch({ selection: { anchor } });
+        mock.undoEditor = () =>
+          editor.state
+            .facet(actual.keymap)
+            .flat()
+            .find((binding) => binding.key === "Mod-z")
+            ?.run?.(editor as unknown as EditorView) ?? false;
         return () => {
           if (mock.releaseEditorView === activate)
             mock.releaseEditorView = null;
@@ -212,12 +265,15 @@ vi.mock("@uiw/react-codemirror", async () => {
           container.current = node;
           if (!node) {
             textarea.current = null;
+            setView(undefined);
             return;
           }
-          if (view) activate();
-          else if (!mock.deferEditorView) activate();
+          editor.setState(
+            EditorState.create({ extensions: actual.getDefaultExtensions({}) }),
+          );
+          if (!mock.deferEditorView) activate();
         },
-        [activate, view],
+        [activate, editor],
       );
       return { view, setContainer };
     },
@@ -259,6 +315,7 @@ beforeEach(() => {
   runtimeStateListeners.clear();
   mock.commitAllowed = true;
   mock.deferEditorView = false;
+  mock.deferEditorScroll = false;
   mock.releaseEditorView = null;
   mock.readEditorValue = null;
   mock.registered = null;
@@ -445,6 +502,7 @@ it("never creates a delayed view with locked source and hydrates only the regran
   act(() => mock.registered?.available());
 
   expect(await screen.findByText("Protected regrant")).toBeDefined();
+  act(() => mock.releaseEditorView?.());
   const source = (await screen.findByLabelText(
     "Ritual source",
   )) as HTMLTextAreaElement;
@@ -504,6 +562,232 @@ it("clears source, title, preview, and script access when the capability locks",
     expect.objectContaining({ source: "p Unsaved A" }),
     expect.any(Number),
   );
+});
+
+it("restores dirty source, both pane positions, selection and Undo after a same-account resume", async () => {
+  render(<SqlDocEdit ritualId={ids.ritualA} />);
+  await screen.findByText("Protected A");
+  const input = screen.getByLabelText("Ritual source") as HTMLTextAreaElement;
+  fireEvent.input(input, { target: { value: "p Unsaved A" } });
+  await waitFor(() =>
+    expect(screen.getByLabelText("Preview").textContent).toContain("Unsaved A"),
+  );
+  act(() => mock.selectEditor?.(7));
+  input.scrollTop = 480;
+  input.scrollLeft = 35;
+  screen.getByLabelText("Ritual editor panes").scrollTop = 120;
+  screen.getByLabelText("Ritual preview pane").scrollTop = 700;
+  const state = mock.readEditorState?.();
+  const recovery = mock.registered?.captureRecovery?.();
+  act(() => {
+    mock.registered?.hide("hidden", { retainUncapturedDraft: false });
+    mock.registered?.hide("resume", { retainUncapturedDraft: false });
+  });
+  expect(mock.readEditorValue?.()).toBe("");
+  expect(screen.queryByLabelText("Preview")).toBeNull();
+  await recovery?.persist();
+  mock.drafts.mockResolvedValue([
+    {
+      ...mock.preserve.mock.calls.at(-1)?.[0],
+      id: "01995100-0000-7000-8000-000000000008",
+      localVersion: 1,
+      conflictOf: null,
+    },
+  ]);
+  act(() => mock.registered?.available());
+  await screen.findByText("Protected A");
+  expect(mock.readEditorState?.().toJSON()).toEqual(state?.toJSON());
+  expect(mock.readEditorState?.().selection.main.anchor).toBe(7);
+  expect(
+    (screen.getByLabelText("Ritual source") as HTMLTextAreaElement).scrollTop,
+  ).toBe(480);
+  expect(
+    (screen.getByLabelText("Ritual source") as HTMLTextAreaElement).scrollLeft,
+  ).toBe(35);
+  expect(screen.getByLabelText("Ritual editor panes").scrollTop).toBe(120);
+  expect(screen.getByLabelText("Ritual preview pane").scrollTop).toBe(700);
+  expect(screen.getByLabelText("Preview").textContent).toContain("Unsaved A");
+  act(() => expect(mock.undoEditor?.()).toBe(true));
+  expect(mock.readEditorValue?.()).toBe("p Source A");
+});
+
+it.each(["expiry", "clock", "signout", "storage"])(
+  "drops retained presentation on %s, even after a visibility hide",
+  async (reason) => {
+    render(<SqlDocEdit ritualId={ids.ritualA} />);
+    await screen.findByText("Protected A");
+    act(() => mock.selectEditor?.(7));
+    const state = mock.readEditorState?.();
+    act(() => {
+      mock.registered?.hide("hidden", { retainUncapturedDraft: false });
+      mock.registered?.hide(reason, { retainUncapturedDraft: false });
+      mock.registered?.available();
+    });
+    await screen.findByText("Protected A");
+    expect(mock.readEditorState?.()).not.toBe(state);
+    expect(mock.readEditorState?.().selection.main.anchor).not.toBe(7);
+  },
+);
+
+it.each(["resume", "account", "change"])(
+  "does not restore presentation into a new account epoch after %s",
+  async (reason) => {
+    render(<SqlDocEdit ritualId={ids.ritualA} />);
+    await screen.findByText("Protected A");
+    act(() => mock.selectEditor?.(7));
+    const state = mock.readEditorState?.();
+    act(() => mock.registered?.hide(reason, { retainUncapturedDraft: false }));
+    runtimeState = {
+      ...runtimeState,
+      account: { ...account, epoch: ids.claim },
+    };
+    act(() => mock.registered?.available());
+    await screen.findByText("Protected A");
+    expect(mock.readEditorState?.()).not.toBe(state);
+    expect(mock.readEditorState?.().selection.main.anchor).not.toBe(7);
+  },
+);
+
+it("restores presentation after visibility return re-verifies the same account and broadcasts a change", async () => {
+  render(<SqlDocEdit ritualId={ids.ritualA} />);
+  await screen.findByText("Protected A");
+  act(() => mock.selectEditor?.(7));
+  (screen.getByLabelText("Ritual source") as HTMLTextAreaElement).scrollTop =
+    480;
+  act(() => {
+    mock.registered?.hide("hidden", { retainUncapturedDraft: false });
+    mock.registered?.hide("resume", { retainUncapturedDraft: false });
+    mock.registered?.hide("account", { retainUncapturedDraft: false });
+    mock.registered?.hide("change", { retainUncapturedDraft: false });
+    mock.registered?.available();
+  });
+  await screen.findByText("Protected A");
+  expect(mock.readEditorState?.().selection.main.anchor).toBe(7);
+  expect(
+    (screen.getByLabelText("Ritual source") as HTMLTextAreaElement).scrollTop,
+  ).toBe(480);
+});
+
+it("retains the source scroll target when account verification interrupts CodeMirror's pending measurement", async () => {
+  render(<SqlDocEdit ritualId={ids.ritualA} />);
+  await screen.findByText("Protected A");
+  (screen.getByLabelText("Ritual source") as HTMLTextAreaElement).scrollTop =
+    480;
+  mock.deferEditorScroll = true;
+  act(() => mock.registered?.hide("hidden", { retainUncapturedDraft: false }));
+  act(() => mock.registered?.available());
+  await screen.findByText("Protected A");
+  expect(
+    (screen.getByLabelText("Ritual source") as HTMLTextAreaElement).scrollTop,
+  ).toBe(0);
+  act(() => mock.registered?.hide("account", { retainUncapturedDraft: false }));
+  act(() => mock.registered?.available());
+  await screen.findByText("Protected A");
+  act(() => mock.flushEditorScroll?.());
+  expect(
+    (screen.getByLabelText("Ritual source") as HTMLTextAreaElement).scrollTop,
+  ).toBe(480);
+});
+
+it.each(["account", "change"])(
+  "rejects presentation from a different owner after %s",
+  async (reason) => {
+    render(<SqlDocEdit ritualId={ids.ritualA} />);
+    await screen.findByText("Protected A");
+    act(() => mock.selectEditor?.(7));
+    const prior = mock.readEditorState?.();
+    act(() => mock.registered?.hide(reason, { retainUncapturedDraft: false }));
+    runtimeState = {
+      ...runtimeState,
+      account: { ownerId: ids.file, epoch: ids.claim },
+    };
+    mock.source.mockResolvedValue({
+      ownerId: ids.file,
+      ritualId: ids.ritualA,
+      revisionId: ids.revision,
+      parentVersion: 4,
+      title: "Other owner",
+      source: "p Source A",
+    });
+    act(() => mock.registered?.available());
+    await screen.findByText("Other owner");
+    expect(mock.readEditorState?.()).not.toBe(prior);
+    expect(mock.readEditorState?.().selection.main.anchor).not.toBe(7);
+  },
+);
+
+it("keeps retained presentation closed when a broadcast is followed by a denied commit", async () => {
+  render(<SqlDocEdit ritualId={ids.ritualA} />);
+  await screen.findByText("Protected A");
+  act(() => mock.selectEditor?.(7));
+  act(() => mock.registered?.hide("hidden", { retainUncapturedDraft: false }));
+  mock.commitAllowed = false;
+  await act(async () => {
+    mock.registered?.hide("change", { retainUncapturedDraft: false });
+    mock.registered?.available();
+  });
+  expect(screen.queryByLabelText("Preview")).toBeNull();
+  expect(screen.queryByLabelText("Ritual source")).toBeNull();
+  expect(mock.readEditorValue?.()).toBe("");
+  expect((window as Window & { doc?: unknown }).doc).toBeUndefined();
+  mock.commitAllowed = true;
+  act(() => mock.registered?.available());
+  await screen.findByText("Protected A");
+  expect(mock.readEditorState?.().selection.main.anchor).toBe(7);
+});
+
+it("retains the last visible preview when focus interrupts an unfinished compile", async () => {
+  render(<SqlDocEdit ritualId={ids.ritualA} />);
+  await screen.findByText("Protected A");
+  await waitFor(() =>
+    expect(screen.getByLabelText("Preview").textContent).toContain("Source A"),
+  );
+  screen.getByLabelText("Ritual preview pane").scrollTop = 700;
+  fireEvent.input(screen.getByLabelText("Ritual source"), {
+    target: { value: "p Just typed" },
+  });
+  const recovery = mock.registered?.captureRecovery?.();
+  act(() => mock.registered?.hide("hidden", { retainUncapturedDraft: false }));
+  await recovery?.persist();
+  mock.drafts.mockResolvedValue([
+    {
+      ...mock.preserve.mock.calls.at(-1)?.[0],
+      id: "01995100-0000-7000-8000-000000000008",
+      localVersion: 1,
+      conflictOf: null,
+    },
+  ]);
+  act(() => mock.registered?.available());
+  await screen.findByText("Protected A");
+  expect(screen.getByLabelText("Preview").textContent).toContain("Source A");
+  expect(screen.getByLabelText("Ritual preview pane").scrollTop).toBe(700);
+  act(() => mock.registered?.hide("resume", { retainUncapturedDraft: false }));
+  act(() => mock.registered?.available());
+  await screen.findByText("Protected A");
+  expect(screen.getByLabelText("Preview").textContent).toContain("Source A");
+  expect(screen.getByLabelText("Ritual preview pane").scrollTop).toBe(700);
+  await waitFor(() =>
+    expect(screen.getByLabelText("Preview").textContent).toContain(
+      "Just typed",
+    ),
+  );
+});
+
+it("retains pending restoration when another focus event interrupts a delayed replacement view", async () => {
+  render(<SqlDocEdit ritualId={ids.ritualA} />);
+  await screen.findByText("Protected A");
+  act(() => mock.selectEditor?.(7));
+  mock.deferEditorView = true;
+  act(() => mock.registered?.hide("hidden", { retainUncapturedDraft: false }));
+  act(() => mock.registered?.available());
+  await screen.findByText("Protected A");
+  expect(screen.queryByLabelText("Ritual source")).toBeNull();
+  act(() => mock.registered?.hide("resume", { retainUncapturedDraft: false }));
+  act(() => mock.registered?.available());
+  await screen.findByText("Protected A");
+  act(() => mock.releaseEditorView?.());
+  expect(mock.readEditorValue?.()).toBe("p Source A");
+  expect(mock.readEditorState?.().selection.main.anchor).toBe(7);
 });
 
 it("keeps an inserted attachment in CodeMirror and in the following edit", async () => {
