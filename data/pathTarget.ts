@@ -23,6 +23,13 @@
  * can walk a table it makes up; the default is every table, raw, so importing
  * this module brings the data with it — it is a build-time and test-time
  * helper, not something a page should reach for.
+ *
+ * A `*` segment reads every element of a list, as
+ * [readFieldPath](../src/components/kabbalah/fieldPath.ts) does (plan 039,
+ * decision 4): it is valid only directly after a list, a `many` link's
+ * accessor or a list-valued field, and the walk carries on inside the
+ * elements. What such a path reads is one joined string, so its target is
+ * never `many`.
  */
 import { accessorName } from "./assemble";
 import { graph } from "./graph";
@@ -35,12 +42,18 @@ export interface PathTarget {
   table: TableName;
   /** The field inside that table's row, or `null` where the path is the row. */
   field: string | null;
-  /** Whether the value is a list, because the last hop was a `many` link. */
+  /**
+   * Whether the value is a list, because the last hop was a `many` link and
+   * no `*` on the way joined it into one string.
+   */
   many: boolean;
 }
 
 /** A table's rows as a list, however the table holds them. */
 type AnyRow = Record<string, unknown>;
+
+/** The segment that reads every element of a list. */
+const EVERY = "*";
 type RawTable = Readonly<Record<string, unknown>> | readonly unknown[];
 
 const spec = graph as Readonly<
@@ -71,27 +84,37 @@ function rowsOf(table: RawTable): unknown[] {
   return Array.isArray(table) ? [...table] : Object.values(table);
 }
 
+/**
+ * Whether `value` carries the chain of keys, where a `*` is any element of a
+ * list and must stand on one.
+ */
+function carries(value: unknown, keys: readonly string[]): boolean {
+  if (keys.length === 0) return true;
+  const [key, ...rest] = keys;
+  if (key === EVERY)
+    return (
+      Array.isArray(value) &&
+      (rest.length === 0 || value.some((element) => carries(element, rest)))
+    );
+  if (!value || typeof value !== "object") return false;
+  if (!Object.hasOwn(value, key)) return false;
+  return carries((value as AnyRow)[key], rest);
+}
+
 /** Whether any row of the table carries the whole chain of keys. */
 function fieldExists(table: RawTable, path: string) {
   const keys = path.split(".");
-  return rowsOf(table).some((row) => {
-    let value: unknown = row;
-    for (const key of keys) {
-      if (!value || typeof value !== "object") return false;
-      if (!Object.hasOwn(value, key)) return false;
-      value = (value as AnyRow)[key];
-    }
-    return true;
-  });
+  return rowsOf(table).some((row) => carries(row, keys));
 }
 
 /**
  * The table and field `path` reaches from `table`, or `undefined` if some
  * segment is neither a declared link's accessor nor a field of the data.
  *
- * A list link is only walked through with an index — `planets.0.symbol` —
- * since that is what dot-prop would read; a path that ends on the list itself
- * is a target of its own, with `many`.
+ * A list link is walked through with an index — `planets.0.symbol` — as
+ * dot-prop reads it, or with `*` — `planets.*.symbol` — as `readFieldPath`
+ * reads every element; a path that ends on the list itself is a target of its
+ * own, with `many`.
  */
 export function pathTarget(
   table: TableName,
@@ -101,7 +124,12 @@ export function pathTarget(
   let at: TableName = table;
   let prefix = "";
   let many = false;
+  // A `*` on the way joins whatever follows into one string.
+  let joined = false;
   const segments = path.split(".");
+  // One `*` per path, as readFieldPath reads it: each multiplies the work.
+  if (segments.filter((segment) => segment === EVERY).length > 1)
+    return undefined;
 
   for (let i = 0; i < segments.length; i++) {
     const segment = segments[i];
@@ -116,23 +144,39 @@ export function pathTarget(
       at = inverse.to;
       prefix = "";
       many = inverse.many;
-      // A list is read through an index, as dot-prop reads it.
+      // A list is read through an index, as dot-prop reads it, or through
+      // `*`, as readFieldPath reads every element of it.
       if (many && i + 1 < segments.length) {
         const index = segments[i + 1];
-        if (!/^\d+$/.test(index)) return undefined;
+        if (index === EVERY) joined = true;
+        else if (!/^\d+$/.test(index)) return undefined;
         i++;
         many = false;
       }
       continue;
     }
 
+    // A `*` here follows a field rather than a link; `fieldExists` holds it
+    // to a list. At the start of a path it would follow the row, which is not
+    // one.
+    if (segment === EVERY) {
+      if (prefix === "") return undefined;
+      joined = true;
+    }
     const next = prefix ? `${prefix}.${segment}` : segment;
     if (!fieldExists(sources[at], next)) return undefined;
     prefix = next;
     many = false;
   }
 
-  return { table: at, field: prefix === "" ? null : prefix, many };
+  // Through `*`, a path must end on a field: the elements are joined as
+  // text, and a row or a list joined as text reads "[object Object]".
+  if (joined && prefix === "") return undefined;
+  return {
+    table: at,
+    field: prefix === "" ? null : prefix,
+    many: many && !joined,
+  };
 }
 
 export default pathTarget;

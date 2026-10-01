@@ -1,4 +1,4 @@
-import { setProperty } from "dot-prop";
+import { getProperty, parsePath, setProperty } from "dot-prop";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
@@ -13,6 +13,46 @@ import {
   resolvedInputsHash,
 } from "./dataInputs";
 import { COMPONENT_IMAGE_REGISTRY } from "./registry";
+
+type Segments = (string | number)[];
+
+/**
+ * `setProperty`, taught the `*` segment `readFieldPath` reads (plan 039).
+ * dot-prop gives `*` no meaning and would write a literal `"*"` key, which no
+ * reader ever reads, so a listed `stones.*.name.en` would look unread. This
+ * changes every element the path reaches instead, and where the list is
+ * absent or empty — Da'at has no stones — makes one of a single element, so
+ * that a field missing today is still proved to be read, as `setProperty`
+ * proves it for a missing plain field.
+ */
+function setEveryProperty(target: object, path: string, value: unknown) {
+  const segments = parsePath(path);
+  if (!segments.includes("*")) setProperty(target, path, value);
+  else setSegments(target, segments, value);
+}
+
+function setSegments(target: object, segments: Segments, value: unknown) {
+  const at = segments.indexOf("*");
+  if (at === -1) {
+    setProperty(target, segments, value);
+    return;
+  }
+  const head = segments.slice(0, at);
+  const rest = segments.slice(at + 1);
+  let list = head.length === 0 ? target : getProperty(target, head);
+  if (!Array.isArray(list) || list.length === 0) {
+    list = [rest.length === 0 ? value : {}];
+    setProperty(target, head, list);
+  }
+  const elements = list as unknown[];
+  for (let i = 0; i < elements.length; i++) {
+    if (rest.length === 0) elements[i] = value;
+    else {
+      if (!elements[i] || typeof elements[i] !== "object") elements[i] = {};
+      setSegments(elements[i] as object, rest, value);
+    }
+  }
+}
 
 const sources = (tables: Record<string, Record<string, unknown>>) =>
   tables as DataInputSources;
@@ -145,6 +185,58 @@ describe("the canonical form of resolved inputs", () => {
   });
 });
 
+describe("changing a listed field through a wildcard", () => {
+  // What the test below writes for a `*` path, which dot-prop alone would
+  // write under a literal `"*"` key where nothing reads it.
+  it("changes every element the path reaches", () => {
+    const row = {
+      stones: [{ name: { en: "pearl" } }, { name: {} }, "loose"],
+      nested: [{ parts: [{ id: "a" }] }, { parts: [] }],
+    };
+    setEveryProperty(row, "stones.*.name.en", "swept");
+    expect(row.stones).toEqual([
+      { name: { en: "swept" } },
+      { name: { en: "swept" } },
+      { name: { en: "swept" } },
+    ]);
+    setEveryProperty(row, "nested.*.parts.*.id", "swept");
+    expect(row.nested).toEqual([
+      { parts: [{ id: "swept" }] },
+      { parts: [{ id: "swept" }] },
+    ]);
+    expect(Object.hasOwn(row.stones, "*")).toBe(false);
+  });
+
+  it("makes a one-element list where there is none, or an empty one", () => {
+    const daat: Record<string, unknown> = { name: { en: "Knowledge" } };
+    setEveryProperty(daat, "stones.*.name.en", "swept");
+    expect(daat.stones).toEqual([{ name: { en: "swept" } }]);
+    setEveryProperty(daat, "words.*", "swept");
+    expect(daat.words).toEqual(["swept"]);
+  });
+
+  it("moves a hash that reads a list through the wildcard", () => {
+    const tables = {
+      t: { a: { stones: [{ name: { en: "pearl" } }] }, b: {} },
+    };
+    const group = spec({
+      table: "t" as never,
+      rows: "*",
+      fields: ["stones.*.name.en"],
+    });
+    const base = resolvedInputsHash(group, sources(tables));
+    for (const id of ["a", "b"]) {
+      const changed = structuredClone(tables);
+      setEveryProperty(changed.t[id as "a" | "b"], "stones.*.name.en", "swept");
+      expect(resolvedInputsHash(group, sources(changed))).not.toBe(base);
+      // What dot-prop alone writes moves nothing, which is the trap.
+      const literal = structuredClone(tables);
+      setProperty(literal.t[id as "a" | "b"], "stones.*.name.en", "swept");
+      expect(resolvedInputsHash(group, sources(literal))).toBe(base);
+    }
+  });
+});
+
 describe("what each registered component declares it draws", () => {
   it("names only tables the barrel and the tablets hold", () => {
     for (const slug of COMPONENT_IMAGE_SLUGS)
@@ -168,8 +260,8 @@ describe("what each registered component declares it draws", () => {
             ) as unknown as Record<string, Record<string, unknown>>;
             // dot-prop builds the intermediate objects, so a field that is
             // absent today — Da'at's soul, Keter's dash pattern — is still
-            // proved to be read.
-            setProperty(
+            // proved to be read; a `*` path changes every element it reaches.
+            setEveryProperty(
               changed[group.table][id] as Record<string, unknown>,
               field,
               `swept ${slug} ${group.table}.${id}.${field}`,

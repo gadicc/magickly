@@ -67,6 +67,69 @@ describe("pathTarget", () => {
     expect(pathTarget("tetragram", "planets.symbol")).toBeUndefined();
   });
 
+  // `*` reads every element of a list and joins what it finds into one
+  // string (plan 039, decision 4), so it is held to a list, and a path
+  // through it is never `many`.
+  it("reads every element of a list link through *", () => {
+    expect(pathTarget("tetragram", "planets.*.symbol")).toEqual({
+      table: "planet",
+      field: "symbol",
+      many: false,
+    });
+    // It must end on a field: a row joined as text is "[object Object]".
+    expect(pathTarget("tetragram", "planets.*")).toBeUndefined();
+    // A back-link list is a list as well.
+    expect(pathTarget("planet", "sephirot.*.name.roman")).toEqual({
+      table: "sephirah",
+      field: "name.roman",
+      many: false,
+    });
+    // So must a list reached after it, and a second wildcard is refused.
+    expect(
+      pathTarget("sephirah", "planet.tetragrams.*.planets"),
+    ).toBeUndefined();
+    expect(
+      pathTarget("sephirah", "planet.tetragrams.*.planets.*.symbol"),
+    ).toBeUndefined();
+    expect(pathTarget("sephirah", "planet.tetragrams.*.title.en")).toEqual({
+      table: "tetragram",
+      field: "title.en",
+      many: false,
+    });
+    expect(pathTarget("tetragram", "planets.*.nosuch")).toBeUndefined();
+  });
+
+  it("reads every element of a list field through *", () => {
+    expect(pathTarget("tetragram", "rows.*")).toEqual({
+      table: "tetragram",
+      field: "rows.*",
+      many: false,
+    });
+    const sources = {
+      sephirah: {
+        keter: { id: "keter", parts: [{ name: { en: "cranium" } }] },
+        daat: { id: "daat" },
+      },
+    };
+    expect(pathTarget("sephirah", "parts.*.name.en", sources)).toEqual({
+      table: "sephirah",
+      field: "parts.*.name.en",
+      many: false,
+    });
+    expect(pathTarget("sephirah", "parts.*.name.he", sources)).toBeUndefined();
+  });
+
+  it("holds * to a list", () => {
+    // After a single link, a field that is not a list, the row itself.
+    expect(pathTarget("sephirah", "godName.*")).toBeUndefined();
+    expect(pathTarget("sephirah", "godName.*.name.he")).toBeUndefined();
+    expect(pathTarget("sephirah", "name.*")).toBeUndefined();
+    expect(pathTarget("sephirah", "name.en.*")).toBeUndefined();
+    expect(pathTarget("sephirah", "*")).toBeUndefined();
+    expect(pathTarget("sephirah", "*.name")).toBeUndefined();
+    expect(pathTarget("tetragram", "planets.*.*")).toBeUndefined();
+  });
+
   it("walks a table the data holds as an array", () => {
     // The astrology houses are rows in a list, and link to a sign all the same.
     expect(pathTarget("house", "zodiac.symbol")).toEqual({
