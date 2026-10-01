@@ -73,6 +73,23 @@ The operator approved implementation after the [editor decision](037-ritual-edit
 
 ## Follow-up scope
 
+- **Focus/resume flicker and scroll reset (reported 1 October):** the operator
+  reports that Production at `d25f8d92beff56b1f506fca2a40aac28b029fdc3`
+  flickers when switching windows and returning, and both source and preview
+  return to the top. Initial code tracing at that revision shows
+  `OfflineLifecycleCoordinator` focus/visibility resume calling a closing
+  refresh, followed by `SqlDocEdit` hiding/clearing its view and rendering the
+  locked branch instead of the editor panes. Reauthorization rebuilds those
+  panes, plausibly explaining the scroll reset without a full navigation.
+  This diagnosis has not yet been reproduced against the reported deployed
+  revision. The new semantic editor retains mounted panes during transient
+  checking, but briefly conceals them and still needs explicit scroll/cursor
+  regression coverage. Next: reproduce a scrolled, dirty ritual in the legacy
+  fallback and semantic split modes; preserve each pane's scroll and selection
+  for same-account rechecks; verify draft/undo preservation, failed/expired
+  permissions and cross-tab account changes. Reduce the visual flash while
+  retaining fail-closed access checks. Keep this separate from the completed
+  default-editor rollout.
 - Full offline authoring needs a versioned semantic source envelope, repository storage tagged with its format, lifecycle recovery and a draft adapter. Fresh permission checks remain required; weakening them would bypass existing lease/account protections. Reader offline bundles remain supported.
 - Physical iOS/Android keyboards, real IME composition, assistive-technology usability and further mobile polish need hands-on checks. Keyboard controls, dialog labels, account concealment and the narrow layout have automated/browser coverage.
 - Future collaboration can use the stable semantic element IDs and Tiptap/ProseMirror model, but revision CAS is currently the concurrency policy; no CRDT merge or simultaneous collaborative authoring is promised.
