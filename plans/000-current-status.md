@@ -233,10 +233,14 @@ Follow-ups are separate from the completed migration work:
   names spell Tzva'ot צבאות, which moved the Tree's inputs hash and the
   Theoricus ritual's Tree bytes under the same profile. See
   [plan 036](036-entity-pages.md#results). The Tree's stylesheet and the
-  descriptions' trump names followed on 1 October. TODO: Hesed's "saphire"
-  and the other data the new pages set side by side, which
-  [plan 039](039-correspondence-tables.md) takes up with tables for stones,
-  scents and body parts; the source of `magickTypes`. See [plan 036](036-entity-pages.md#follow-ups).
+  descriptions' trump names followed on 1 October, and so did
+  [plan 039](039-correspondence-tables.md#results): body parts, stones and
+  scents are tables linked by id, read through a `*` wildcard in field
+  paths; the heavens are the planet rows; romanised Hebrew writes the
+  article as Israel's official romanisation does; and the planets cite the
+  Key of Solomon. TODO: the source of `magickTypes`; the Key of Solomon's
+  text against a scan of Mathers; two god-name romanisations the article
+  rule does not cover. See [plan 039](039-correspondence-tables.md#follow-ups).
 - TODO: two small ones left by step 3b
   ([plan 032](032-data-layer.md#follow-ups)): two tribes' Hebrew names are
   hashed into the Table of Shewbread's identity although no sign points at

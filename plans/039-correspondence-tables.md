@@ -4,7 +4,8 @@ Assessment and decisions, 1 October 2026. Read
 [current status](000-current-status.md) first. This takes up the data
 follow-ups [plan 036](036-entity-pages.md#follow-ups) left: the entity pages
 set fields side by side that had only ever been read one at a time, and set
-side by side they disagree. Approved for implementation on 1 October.
+side by side they disagree. Approved and built on 1 October
+([Commits](#commits), [Results](#results)).
 
 Decision taken on 1 October: the body parts, stones and scents of the
 sephirot become rows of their own tables, linked by id, read through a new
@@ -264,7 +265,125 @@ the glosses are not Tree fields); only the release moves it for readers,
 once. The Theoricus ritual's Tree bytes are expected to stay, since it draws
 none of the changed fields.
 
+## Commits
+
+On `gate/correspondence-tables` from `d25f8d9`. Each commit was checked on
+its own tree with `pnpm check`, `pnpm typecheck`, `pnpm data:check` and
+`pnpm test`, `data/dist` wiped before each, by a script that records every
+step's exit status; the branch was then gated as [below](#results).
+
+| Commit | Change | Tests |
+| --- | --- | ---: |
+| `7fcab69` docs(plan): Plan the correspondence tables | This plan, as approved, and the status page's pointer | — |
+| `ede421d` feat(data): Read a list in a field path | The wildcard in `readFieldPath()` and `pathTarget()`, one per path; the mutation test taught it | 4,898 |
+| `3682c85` feat(data): Give body parts, stones and scents tables | The three tables and their wiring, the paths moved in place, the sephirah page and the stones flashcards; an empty id list refused | 4,903 |
+| `bce09f5` refactor(data): Let the planet rows be the heavens | `tenHeavens` removed; the spheres' glosses; `glossBeside()` shared by the sephirah and planet pages; the ten-heavens flashcards | 4,905 |
+| `138f4d5` fix(data): Write the Hebrew article as Israel does | Three romanisations and the README's rule | 4,905 |
+| `147865f` feat(astrology): Cite the Key of Solomon on the planets | The field on the seven planets, the hours page's props, the planet page's row, the README's source | 4,908 |
+
+A seventh commit, `docs(plan): Record the correspondence tables`, adds this
+section and the ones after it; as in plans 032 and 036 it is not in the
+table, which it would have to predict.
+
+The plan, the reviews and the stacking ran in the orchestrating session on
+Opus 5.5 at xhigh; the commits in three Opus 5.5 subagents, the Key of
+Solomon in parallel with the tables; the design review and the final review
+on Fable 5.1, and an independent review on a fresh Opus 5.5. The model
+policy of 1 October asks for High on all but the orchestration; the agent
+definitions that pin it load only in a new session, so this branch ran at
+the session's xhigh throughout.
+
+## Results
+
+The gate ran on `147865f` in the `gate/correspondence-tables` worktree with
+a fresh `pnpm install --frozen-lockfile`, on Node 24.18.0 and pnpm 10.18.0,
+under CI's placeholder environment, in
+[ci.yml](../.github/workflows/ci.yml)'s order, from a script file whose
+every step's status was read:
+
+| Step | Outcome |
+| --- | --- |
+| `pnpm install --frozen-lockfile` | clean; no dependency added |
+| `loom init`, `loom check`, `loom check --production` | good, with the standing pnpm 11 advisory |
+| `pnpm check` | no errors, the same 35 warnings as `main` |
+| `pnpm typecheck` | clean |
+| `pnpm test:coverage` | 4,908 passed, 17 skipped, thresholds met |
+| `pnpm build`, `pnpm check:turbopack` | 386 pages prerendered by each |
+
+What a reader sees change:
+
+- **Sephirah pages.** Body, Stone and Scent read the new tables' names:
+  "Sapphire; amethyst" on Chesed, "Star ruby; turquoise" and "Left face" on
+  Chochmah, "Rose; red sandal" on Netzach. The Heaven row is gone; the
+  "Planet · Assiah" or "Sphere · Assiah" row names the planet's Hebrew after
+  it, "♃ Jupiter · צדק Tzedek “Justice”", and Malchut's reads "World of
+  Foundations · עולם היסודות Olam HaYesodot “Sphere of the Elements”".
+- **Planet pages.** The seven classical planets gain a "Key of Solomon" row
+  above "Magical operations", "Its days and hours serve for: …", cited after
+  Mathers. The sphere pages' ledes end with their gloss where it does not
+  repeat the heading.
+- **The Tree.** Stones, scents and body parts are drawn from the tables, in
+  lower case, through the new paths, which the Tree page's menus now list:
+  `stones.*.name.en`, `scents.*.name.en`, `bodyParts.*.name.en`. Chochmah's
+  "star ruby; turquoise" wraps after "star". An image URL that still names
+  `stone`, `scent` or `body` is refused with a 400.
+- **The article.** "Olam HaYesodot", "Chayot HaKodesh" and "Adonai HaAretz"
+  wherever they are shown, and three search descriptions with them:
+  Keter's, Malchut's and the `olam-yesodot` planet page's. No title changes.
+- **Flashcards.** Four sets answer differently, as compared card by card at
+  both ends: the stones (Chesed, Chochmah), the ten heavens (Keter,
+  Malchut), the planets' romanised names (the world of foundations) and the
+  sephirot's romanised god names (Malchut). No card was added or lost, and
+  saved progress, keyed by card id, survives.
+- **The planetary hours page** looks as it did; its seven texts now come
+  from the planet data, passed down by its server page.
+
+Render identity: only the Tree's inputs hash moved, `8d5f06b8…` to
+`edab0be8…` with the tables and to `2b895fc2…` with the article. Every other
+image kept its bytes and inputs hash, and the Theoricus ritual's Tree kept
+its 150,785 bytes, `a1fe82b8…`. The whole-data render sweep passed over the
+new tables. Published rituals keep their stored images until they are
+republished.
+
+In the browser, against `next start` on a production build of `7249dc7`
+(the branch before the wildcard scanner below, which changes nothing a
+page renders): the Malchut, Chesed and Saturn pages and the Tree page with
+the new paths render as listed; no Safari.
+
+### What was decided while building it
+
+- **One wildcard per path.** The independent review measured a crafted Tree
+  page link chaining `*` through links that loop back: 214 ms at six levels,
+  growing tenfold a level, so a 240-character link would freeze the tab.
+  The Tree page takes its paths from the query string unchecked; only the
+  image route validates them. One `*` is all the data needs, and with one
+  the cost is linear; `readFieldPath()` reads a path with two as
+  `undefined`, `pathTarget()` refuses it, and a test proves the crafted
+  path returns at once.
+- **An escaped `\*` is a key, and the detection is a scanner.** dot-prop's
+  backslash escapes the next character. The first fix detected a wildcard
+  with a regular expression and a lookbehind; the final review found it
+  inexact in one corner, and a lookbehind is a parse error to Safari before
+  16.4, which would have broken the Tree and flashcard pages there. A
+  twenty-line scanner that follows dot-prop's rule replaces it.
+- **A path through `*` must end on a field**, since a row joined as text
+  reads "[object Object]"; `pathTarget()` refuses one that does not.
+- **An empty id list fails the data check.** A row with none leaves the key
+  out (plan 032, decision 5), so that "none" is spelt one way.
+- **`glossBeside()`** in the shared entity pieces decides, for both the
+  sephirah and the planet page, when a Hebrew name's gloss only repeats the
+  English name and is left out: the zodiac's "The Zodiac".
+- **The flashcards read paths through `readFieldPath()`**, where they had a
+  walker of their own that could not read `*`.
+- **The Key of Solomon's text is held character for character** as the hours
+  page had it, "voyages envoys" included, and cited "after" Mathers until
+  it is checked against a scan; no copy of the 1888 text could be fetched.
+- **`bodyPos`** is a selectable Tree label, not the layout key the plan
+  called it; it is unchanged.
+
 ## Review
+
+### Of the draft
 
 The draft was reviewed adversarially by Fable 5.1 on 1 October. Its
 findings and their disposition:
@@ -281,6 +400,29 @@ findings and their disposition:
 | Reading the barrel would put the data chunk on the hours route | The server page passes the strings as props |
 | Smaller: `*`'s `many`, a stale test comment, lower-case Tree labels, the `materia` directory | Folded in; the directory stands, as the owner approved it |
 
+### Of the implementation
+
+An independent review by a fresh Opus 5.5, given the plan, the diff and the
+code, found nothing critical or high. Its findings and their disposition:
+
+| Finding | Disposition |
+| --- | --- |
+| Medium: chained `*` through looping links grows tenfold a level, and the Tree page takes paths from the query string | One `*` per path ([above](#what-was-decided-while-building-it)) |
+| An escaped `\*` read as a wildcard | Only an unescaped, whole segment counts |
+| `pathTarget()` accepted a path through `*` that ends on a row | Refused |
+| An empty id list passed `data:check` | Refused |
+| One commit message counted five names and listed four; three long lines | Corrected |
+
+It verified the data row by row for all eleven sephirot, every flashcard
+card at both ends, the three search descriptions, the render identity by
+mutating a stone, a scent, a body part and a relink, and the hours page's
+seven strings against the old labels.
+
+The final review, on Fable 5.1, found nothing of substance on `7249dc7` and
+confirmed each of those fixes, with two low notes: the wildcard's regular
+expression differed from dot-prop's escaping in one corner and used a
+lookbehind, which became the scanner; and a README line ran long, rewrapped.
+
 ## Deferred
 
 - Pictures of stones and scents (decision 7).
@@ -290,3 +432,9 @@ findings and their disposition:
 ## Follow-ups
 
 - The source of magickTypes, should it turn up.
+- The Key of Solomon's text against a scan of Mathers' 1888 translation;
+  once checked, "after Mathers" can become a plain citation.
+- Two god-name romanisations the article rule does not cover, "YHVH
+  Tzva-oht" beside "Elohim Tzvaot", and the hyphenated conjunction in "YHVH
+  Eloah Ve-da'at"; both are Tree fields, so their fix moves the Tree's
+  inputs hash once more.
