@@ -260,17 +260,6 @@ export const schemas = {
       strokeDasharray: v.optional(v.number()),
     }),
     bodyPos: v.string(),
-    /**
-     * Only Keter, Chochmah and Malchut name a heaven: the three whose `planet`
-     * is of kind `"sphere"` rather than a planet.
-     */
-    tenHeavens: v.optional(
-      v.strictObject({
-        en: v.string(),
-        he: v.string(),
-        roman: v.string(),
-      }),
-    ),
     // Da'at is not a sephirah of the Tree and has almost none of these; four
     // of the lower spheres share no part of the soul. Da'at has no stone or
     // scent, and Malchut no scent.

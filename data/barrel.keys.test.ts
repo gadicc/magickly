@@ -184,7 +184,6 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "bodyPartIds",
       "bodyPos",
       "planetId",
-      "tenHeavens",
       "stoneIds",
       "archangelId",
       "soulId",

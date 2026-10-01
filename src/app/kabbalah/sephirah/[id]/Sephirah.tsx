@@ -5,6 +5,7 @@ import {
   EntityFrame,
   EntityTable,
   FigureNav,
+  glossBeside,
   Hebrew,
   Lede,
   Muted,
@@ -178,15 +179,6 @@ export default function Sephirah({ sephirah }: { sephirah: SephirahRow }) {
         <Row label="Name">
           <Name original={name.he} roman={name.roman} meaning={name.en} />
         </Row>
-        <Row label="Heaven">
-          {sephirah.tenHeavens ? (
-            <Name
-              original={sephirah.tenHeavens.he}
-              roman={sephirah.tenHeavens.roman}
-              meaning={sephirah.tenHeavens.en}
-            />
-          ) : null}
-        </Row>
         <Row label="God name" aside={<World>Atziluth</World>}>
           {sephirah.godName ? (
             <Name
@@ -213,16 +205,29 @@ export default function Sephirah({ sephirah }: { sephirah: SephirahRow }) {
             />
           ) : null}
         </Row>
-        {/* Keter, Chochmah and Malchut have a sphere here, not a planet. */}
+        {/* Keter, Chochmah and Malchut have a sphere here, not a planet: the
+            heaven the sephirah is, as the planet is for the other seven. */}
         <Row
           label={planet?.kind === "sphere" ? "Sphere" : "Planet"}
           aside={<World>Assiah</World>}
         >
           {planet ? (
-            <Link href={`/astrology/planet/${planet.id}`}>
-              {planet.symbol ? `${planet.symbol} ` : null}
-              {planet.name.en.en}
-            </Link>
+            <>
+              <Link href={`/astrology/planet/${planet.id}`}>
+                {planet.symbol ? `${planet.symbol} ` : null}
+                {planet.name.en.en}
+              </Link>
+              {planet.name.he ? (
+                <>
+                  {" · "}
+                  <Name
+                    original={planet.name.he.he}
+                    roman={planet.name.he.roman}
+                    meaning={glossBeside(planet.name.en.en, planet.name.he.en)}
+                  />
+                </>
+              ) : null}
+            </>
           ) : null}
         </Row>
         <Row label="Colours">

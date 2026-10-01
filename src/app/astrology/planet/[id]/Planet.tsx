@@ -6,6 +6,7 @@ import PlanetarySpirit from "@/components/astrology/planetarySpirits";
 import {
   EntityFrame,
   EntityTable,
+  glossBeside,
   Hebrew,
   Lede,
   Muted,
@@ -43,12 +44,18 @@ function hasOnlyItsSymbol(planet: PlanetRow) {
   );
 }
 
-/** "in Hebrew שמש, Shemesh, “Sun”", after whatever the lede leads with. */
-function inHebrew(he: NonNullable<PlanetRow["name"]["he"]>) {
+/**
+ * "in Hebrew שמש, Shemesh, “Sun”", after whatever the lede leads with; the
+ * gloss is left out where it only repeats the heading, as the zodiac's would.
+ */
+function inHebrew(planet: PlanetRow) {
+  const he = planet.name.he;
+  if (!he) return null;
+  const meaning = glossBeside(planet.name.en.en, he.en);
   return (
     <>
       <Hebrew>{he.he}</Hebrew>, <span lang="he-Latn">{he.roman}</span>
-      {he.en ? <>, “{he.en}”</> : null}
+      {meaning ? <>, “{meaning}”</> : null}
     </>
   );
 }
@@ -71,10 +78,10 @@ function PlanetLede({ planet }: { planet: PlanetRow }) {
     return (
       <Lede>
         The sphere of {sephirotOf(planet, " and ")}
-        {he ? <>, in Hebrew {inHebrew(he)}</> : null}.
+        {he ? <>, in Hebrew {inHebrew(planet)}</> : null}.
       </Lede>
     );
-  if (he) return <Lede>In Hebrew {inHebrew(he)}.</Lede>;
+  if (he) return <Lede>In Hebrew {inHebrew(planet)}.</Lede>;
   if (hasOnlyItsSymbol(planet))
     return (
       <Lede>

@@ -9,9 +9,6 @@ export const fields: EntityFields = {
     "name.he",
     "name.roman",
     "name.en",
-    "tenHeavens.he",
-    "tenHeavens.roman",
-    "tenHeavens.en",
     // The four worlds, Atziluth to Assiah.
     "godName",
     "archangel",

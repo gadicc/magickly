@@ -203,6 +203,17 @@ export function Hebrew({ children }: { children: ReactNode }) {
 }
 
 /**
+ * A Hebrew name's gloss where it follows the English name it glosses, or
+ * nothing where it would only repeat it, less case and a leading "The":
+ * "Zodiac · מזלות Mazalot", not “The Zodiac” after it as well. For `Name`'s
+ * `meaning`, and anywhere else a gloss follows its name.
+ */
+export function glossBeside(name: string, meaning?: string | null) {
+  const bare = (text: string) => text.toLowerCase().replace(/^the /, "");
+  return meaning && bare(meaning) !== bare(name) ? meaning : undefined;
+}
+
+/**
  * A name in its own script, then its romanisation in the secondary colour,
  * then its meaning in quotes: תפארת Tiferet “Beauty”. Each part is left out
  * where it is absent or empty, and nothing is rendered when all three are.

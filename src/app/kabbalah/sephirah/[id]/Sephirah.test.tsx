@@ -13,10 +13,9 @@ import SephirahPage from "./page";
  *
  * Every sephirah is rendered through the route and held to what every entity
  * page must hold, and then the cases the row makes differ: Keter at the top
- * of the chain with a heaven and a sphere for a planet, Tiferet with the most
- * paths and every world, Da'at outside the chain with almost nothing, Malchut
- * at the bottom with no scent, and the two spheres on each tree's odd
- * path out. What is asserted is what a reader sees, by its text.
+ * of the chain with a sphere for a planet, Tiferet with the most paths and
+ * every world, Da'at outside the chain with almost nothing, Malchut at the
+ * bottom with no scent, and the two spheres on each tree's odd path out. What is asserted is what a reader sees, by its text.
  */
 
 const props = (id: string) => ({
@@ -84,13 +83,15 @@ describe("the sephirah page", () => {
     }
   });
 
-  it("gives Keter its heaven, its sphere and no previous", async () => {
+  it("gives Keter its sphere, named in Hebrew, and no previous", async () => {
     // The top of the chain, and one of the three whose planet is a sphere.
+    // The sphere is its heaven: since plan 039 the row names it in Hebrew
+    // with the gloss the sphere's row carries, and there is no Heaven row.
     const html = await render("keter");
-    expect(valueOf(html, "Heaven")).toBe(
-      "ראשית הגלגולים Roshit haGilgulim “1st Swirlings / Primum Mobile”",
+    expect(valueOf(html, "Sphere · Assiah")).toBe(
+      "Primum Mobile · ראשית הגלגולים Roshit HaGilgulim “First Swirlings”",
     );
-    expect(labelsOf(html)).toContain("Sphere · Assiah");
+    expect(labelsOf(html)).not.toContain("Heaven");
     expect(labelsOf(html)).not.toContain("Planet · Assiah");
     expect(hrefsOf(rowMarkup(html, "Sphere · Assiah") ?? "")).toEqual([
       "/astrology/planet/primum-mobile",
@@ -100,6 +101,14 @@ describe("the sephirah page", () => {
     );
     expect(html).not.toContain('aria-label="Previous:');
     expect(navOf(html)).toEqual(["/kabbalah/sephirah/chochmah"]);
+  });
+
+  it("gives Chochmah's sphere no gloss that repeats its name", async () => {
+    // Mazalot's gloss is "The Zodiac", the sphere's English name with its
+    // article, so the row does not read "Zodiac · מזלות Mazalot “The Zodiac”".
+    const html = await render("chochmah");
+    expect(valueOf(html, "Sphere · Assiah")).toBe("Zodiac · מזלות Mazalot");
+    expect(labelsOf(html)).not.toContain("Heaven");
   });
 
   it("lists Tiferet's eight paths in Hermetic order, with every world", async () => {
@@ -141,7 +150,7 @@ describe("the sephirah page", () => {
       "Scent",
       "Grade",
     ]);
-    expect(valueOf(html, "Planet · Assiah")).toBe("☉ Sol");
+    expect(valueOf(html, "Planet · Assiah")).toBe("☉ Sol · שמש Shemesh “Sun”");
     expect(valueOf(html, "Chakra")).toBe("Heart अनाहत Anahata “Unstruck”");
     expect(valueOf(html, "Grade")).toBe("5=6 Adeptus Minor");
     expect(hrefsOf(rowMarkup(html, "Grade") ?? "")).toEqual(["/gd/grade/5=6"]);
@@ -172,13 +181,15 @@ describe("the sephirah page", () => {
     expect(html).not.toContain("<nav");
   });
 
-  it("gives Malchut its heaven and no scent", async () => {
+  it("gives Malchut its sphere and no scent", async () => {
     // The bottom of the chain, which has no scent in the data, and whose
-    // Queen scale is the quartered disc.
+    // Queen scale is the quartered disc. Its sphere's English name and its
+    // Hebrew name's gloss differ, and the row gives both.
     const html = await render("malchut");
-    expect(valueOf(html, "Heaven")).toBe(
-      "עולם יסודות Olam Yesodoth “Sphere of the Elements”",
+    expect(valueOf(html, "Sphere · Assiah")).toBe(
+      "World of Foundations · עולם היסודות Olam haYesodot “Sphere of the Elements”",
     );
+    expect(labelsOf(html)).not.toContain("Heaven");
     expect(labelsOf(html)).not.toContain("Scent");
     expect(valueOf(html, "Stone")).toBe("Rock crystal");
     expect(rowMarkup(html, "Colours")).toContain(

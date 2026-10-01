@@ -44,6 +44,21 @@ describe("study sets", () => {
     expect(answers.daat).toBeUndefined();
   });
 
+  it("answer the ten heavens from the planet rows", () => {
+    // Since plan 039 a sephirah's heaven is the planet row it links: a sphere
+    // answers with its Hebrew name's gloss, a planet as "Sphere of" itself.
+    // Progress is keyed by the card's id, the sephirah's, not by this text.
+    const answers = Object.fromEntries(
+      getSet("ten-heavens")
+        .generateCards()
+        .map((card) => [card.id, card.answer]),
+    );
+    expect(answers.keter).toBe("First Swirlings / Roshit HaGilgulim");
+    expect(answers.chochmah).toBe("The Zodiac / Mazalot");
+    expect(answers.malchut).toBe("Sphere of the Elements / Olam haYesodot");
+    expect(answers.tiferet).toBe("Sphere of Sol / Shemesh");
+  });
+
   it("name the Enochian question font", () => {
     expect(sets["enochian-letters-latin"].questionFont).toBe("enochian");
     expect(sets["enochian-letter-names"].questionFont).toBe("enochian");

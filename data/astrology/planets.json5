@@ -13,6 +13,7 @@
       he: {
         he: "ראשית הגלגולים",
         roman: "Roshit HaGilgulim",
+        en: "First Swirlings",
       },
     },
   },
@@ -27,6 +28,7 @@
       he: {
         he: "מזלות",
         roman: "Mazalot",
+        en: "The Zodiac",
       },
     },
   },
@@ -41,6 +43,7 @@
       he: {
         he: "עולם היסודות",
         roman: "Olam haYesodot",
+        en: "Sphere of the Elements",
       },
     },
   },

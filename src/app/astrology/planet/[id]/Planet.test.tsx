@@ -198,10 +198,11 @@ describe("the planet page", () => {
 
   it("names a sphere's sephirah in its lede, and draws no table", async () => {
     // The three spheres are the sephirot's `planet` and have nothing but a
-    // name; the inverse that already existed gives each its sephirah.
+    // name; the inverse that already existed gives each its sephirah. The
+    // gloss is the one Keter's own row once held as its heaven (plan 039).
     const html = await page("primum-mobile");
     expect(textOf(html)).toContain(
-      "The sphere of Keter, in Hebrew ראשית הגלגולים, Roshit HaGilgulim",
+      "The sphere of Keter, in Hebrew ראשית הגלגולים, Roshit HaGilgulim, “First Swirlings”.",
     );
     expect(hrefsOf(html)).toContain("/kabbalah/sephirah/keter");
     expect(html).not.toContain("<table");
@@ -214,6 +215,11 @@ describe("the planet page", () => {
       expect(hrefsOf(await page(id)), id).toContain(
         `/kabbalah/sephirah/${sephirah}`,
       );
+    // A gloss that only repeats the heading is left out, as on the sephirah
+    // page: the zodiac's "The Zodiac" under "Zodiac".
+    expect(textOf(await page("zodiac"))).toContain(
+      "The sphere of Chochmah, in Hebrew מזלות, Mazalot.",
+    );
   });
 
   it("loses nothing by drawing no table for a sphere", () => {

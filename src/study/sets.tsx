@@ -404,11 +404,14 @@ const sets: Record<string, StudySetData<unknown>> = {
     id: "ten-heavens",
     data: omit("daat", data.sephirah),
     question: (sephirah) => sephirah.index + ". " + sephirah.name.roman,
+    // A sephirah's heaven is its planet row: a sphere, for Keter, Chochmah
+    // and Malchut, answers with its Hebrew name's gloss where it has one,
+    // since "Sphere of World of Foundations" is not a name.
     answer: (sephirah) => {
-      if (sephirah?.tenHeavens?.en)
-        return sephirah.tenHeavens.en + " / " + sephirah.tenHeavens.roman;
       const planet = sephirah?.planet;
-      return "Sphere of " + planet?.name.en.en + " / " + planet?.name.he?.roman;
+      if (planet?.kind === "sphere")
+        return `${planet.name.he?.en ?? planet.name.en.en} / ${planet.name.he?.roman}`;
+      return `Sphere of ${planet?.name.en.en} / ${planet?.name.he?.roman}`;
     },
     gdGrade: "1=10",
     tags: ["kabbalah"],

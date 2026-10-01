@@ -86,17 +86,20 @@ describe("a data change and the images it can reach", () => {
   }, 120_000);
 
   it("leaves both bytes and hash alone for a field no component draws", async () => {
-    // `tenHeavens` is on every sephirah and is in no image's inputs; `emoji`
-    // sits beside the sign symbol the shewbread and the chart do draw; a
-    // tribe's English name is beside the Hebrew one.
+    // A sphere's gloss, `name.he.en`, sits beside the Hebrew and its
+    // romanisation that the Tree can draw, and is in no image's inputs;
+    // `emoji` sits beside the sign symbol the shewbread and the chart do
+    // draw; a tribe's English name is beside the Hebrew one.
     const untouched: [
       TableFileName,
       (rows: Record<string, unknown>) => void,
     ][] = [
       [
-        "sephirah",
+        "planet",
         (rows) => {
-          (rows.keter as { tenHeavens: unknown }).tenHeavens = "swept";
+          (
+            rows["primum-mobile"] as { name: { he: { en: string } } }
+          ).name.he.en = "First Swirling";
         },
       ],
       [
