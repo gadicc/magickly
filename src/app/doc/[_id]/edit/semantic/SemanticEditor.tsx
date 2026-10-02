@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { EditorContent, useEditor } from "@tiptap/react";
 import React from "react";
+import EditorActionButton from "@/doc/EditorActionButton";
 import { retainsOnlineEditorIdentity } from "@/doc/onlineEditorIdentity";
 import RitualSourceEditor from "@/doc/RitualSourceEditor";
 import RitualVisualControls from "@/doc/RitualVisualControls";
@@ -458,7 +459,8 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         !saving &&
         !pending &&
         !stale &&
-        !source.dirty,
+        !source.dirty &&
+        !sourceComposing,
     );
   }, [
     editor,
@@ -470,6 +472,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     stale,
     visualIssue,
     source.dirty,
+    sourceComposing,
   ]);
 
   React.useEffect(() => {
@@ -727,7 +730,8 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       !ready ||
       access !== "ready" ||
       stale ||
-      (!pending && (source.dirty || source.conflict || error))
+      (!pending &&
+        (source.dirty || sourceComposing || source.conflict || error))
     )
       return;
     const generation = accessGeneration.current;
@@ -826,6 +830,9 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       setSaving(false);
     }
   };
+
+  const sourceProblem = source.conflict || (!!sourceError && source.dirty);
+  const sourceSyncing = source.dirty || sourceComposing;
 
   if (access === "locked")
     return <Alert severity="info">{lockedMessage}</Alert>;
@@ -965,24 +972,30 @@ export default function SemanticEditor(props: SemanticEditorProps) {
               disabled={
                 access !== "ready" || (!!visualIssue && item !== "source")
               }
-              onClick={() => setMode(item)}
+              onClick={() => {
+                // Removing the source panel can interrupt IME without compositionend.
+                if (item === "visual") setSourceComposing(false);
+                setMode(item);
+              }}
             >
               {item}
             </Button>
           ))}
         </ButtonGroup>
-        <Button
+        <EditorActionButton
           variant="contained"
           disabled={
             access !== "ready" ||
             saving ||
             !!stale ||
-            (!pending && (!!error || source.dirty || source.conflict))
+            (!pending && (!!error || sourceProblem))
           }
+          inactive={!pending && sourceSyncing}
+          inactiveReason="The visual panel is catching up with ritual source."
           onClick={save}
         >
           {pending ? "Retry save" : "Save"}
-        </Button>
+        </EditorActionButton>
         <Button
           disabled={access !== "ready"}
           onClick={() => downloadDraft(currentDraft())}
@@ -1068,7 +1081,13 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                   Apply source
                 </Button>
               )}
-              <Button
+              <EditorActionButton
+                inactive={!source.dirty || sourceComposing}
+                inactiveReason={
+                  sourceComposing
+                    ? "Finish composing ritual source first."
+                    : "There are no unapplied source changes."
+                }
                 onClick={() => {
                   setSourceError(null);
                   setSource({
@@ -1089,12 +1108,10 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                     );
                   }
                 }}
-                disabled={
-                  access !== "ready" || !source.dirty || !!pending || !!stale
-                }
+                disabled={access !== "ready" || !!pending || !!stale}
               >
                 Discard source changes
-              </Button>
+              </EditorActionButton>
             </Box>
           </section>
         )}
@@ -1102,6 +1119,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           <section
             className={styles.visualPanel}
             aria-label="Visual editor panel"
+            aria-busy={(sourceSyncing && !sourceProblem) || undefined}
           >
             <RitualVisualControls
               editor={editor}
@@ -1111,8 +1129,9 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                 saving ||
                 !!pending ||
                 !!stale ||
-                source.dirty
+                sourceProblem
               }
+              syncingSource={sourceSyncing}
               actorId={props.actorId}
               ritualId={props.ritualId}
               title={title}

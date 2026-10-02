@@ -17,6 +17,7 @@ import { useEditorState } from "@tiptap/react";
 import React from "react";
 import { formatRitualFileLocator } from "@/files/ritualFileLocator";
 import Upload from "@/lib/upload";
+import EditorActionButton from "./EditorActionButton";
 import { createRitualNodeId } from "./ritualNodeIds";
 import {
   type JsonValue,
@@ -126,6 +127,7 @@ function fieldsFor(target: Target): Fields {
 export default function RitualVisualControls({
   editor,
   disabled,
+  syncingSource = false,
   concealed = false,
   actorId,
   ritualId,
@@ -133,11 +135,16 @@ export default function RitualVisualControls({
 }: {
   editor: Editor;
   disabled: boolean;
+  /** Source owns the document until its debounced parse applies; keep command presentation steady. */
+  syncingSource?: boolean;
   concealed?: boolean;
   actorId?: string;
   ritualId?: string;
   title?: string;
 }) {
+  const blocked = disabled || syncingSource;
+  const sourceWaitReason =
+    "The visual panel is catching up with ritual source.";
   const selected = useEditorState({
     editor,
     selector: ({ editor: current }) => selectionTarget(current),
@@ -179,6 +186,7 @@ export default function RitualVisualControls({
     setImageOpen(false);
   }, []);
   const openImage = () => {
+    if (blocked) return;
     imageAttempt.current = {
       token: ++nextImageToken.current,
       pos: editor.state.selection.from,
@@ -188,7 +196,7 @@ export default function RitualVisualControls({
     setImageOpen(true);
   };
   React.useEffect(() => {
-    if (!uploadedImage || disabled) return;
+    if (!uploadedImage || blocked) return;
     const attempt = imageAttempt.current;
     const receipt = uploadedImage.receipt;
     if (
@@ -228,10 +236,10 @@ export default function RitualVisualControls({
       );
       closeImage();
     }
-  }, [uploadedImage, disabled, editor, actorId, ritualId, closeImage]);
+  }, [uploadedImage, blocked, editor, actorId, ritualId, closeImage]);
 
   const open = (kind: Kind, edit: Target | null = null) => {
-    if (disabled) return;
+    if (blocked) return;
     setTarget(edit);
     const next = edit ? fieldsFor(edit) : freshFields(kind);
     if (kind === "a" && !edit) {
@@ -252,7 +260,7 @@ export default function RitualVisualControls({
   };
 
   const insertBlock = (tag: "task" | "note", mode?: "say" | "do") => {
-    if (disabled) return;
+    if (blocked) return;
     const id = createRitualNodeId();
     const attrs =
       tag === "task" ? { [mode!]: true, role: role.trim() || "all" } : {};
@@ -284,7 +292,7 @@ export default function RitualVisualControls({
   };
 
   const apply = () => {
-    if (!fields || disabled) return;
+    if (!fields || blocked) return;
     const previous = target ? editor.state.doc.nodeAt(target.pos) : null;
     if (target && previous?.attrs.id !== target.id) {
       setError(
@@ -537,31 +545,45 @@ export default function RitualVisualControls({
           alignItems: "center",
         }}
       >
-        <Button
+        <EditorActionButton
+          inactive={syncingSource}
+          inactiveReason={sourceWaitReason}
           size="small"
           disabled={disabled}
           onClick={() => insertBlock("task", "say")}
         >
           Speech
-        </Button>
-        <Button
+        </EditorActionButton>
+        <EditorActionButton
+          inactive={syncingSource}
+          inactiveReason={sourceWaitReason}
           size="small"
           disabled={disabled}
           onClick={() => insertBlock("task", "do")}
         >
           Action
-        </Button>
-        <Button
+        </EditorActionButton>
+        <EditorActionButton
+          inactive={syncingSource}
+          inactiveReason={sourceWaitReason}
           size="small"
           disabled={disabled}
           onClick={() => insertBlock("note")}
         >
           Note
-        </Button>
-        <Button size="small" disabled={disabled} onClick={() => open("title")}>
+        </EditorActionButton>
+        <EditorActionButton
+          inactive={syncingSource}
+          inactiveReason={sourceWaitReason}
+          size="small"
+          disabled={disabled}
+          onClick={() => open("title")}
+        >
           Insert structure
-        </Button>
-        <Button
+        </EditorActionButton>
+        <EditorActionButton
+          inactive={syncingSource}
+          inactiveReason={sourceWaitReason}
           size="small"
           disabled={disabled}
           onClick={() =>
@@ -569,15 +591,19 @@ export default function RitualVisualControls({
           }
         >
           Link
-        </Button>
-        <Button
+        </EditorActionButton>
+        <EditorActionButton
+          inactive={syncingSource}
+          inactiveReason={sourceWaitReason}
           size="small"
           disabled={disabled || !actorId || !ritualId}
           onClick={openImage}
         >
           Image
-        </Button>
-        <Button
+        </EditorActionButton>
+        <EditorActionButton
+          inactive={syncingSource}
+          inactiveReason={sourceWaitReason}
           size="small"
           disabled={disabled || !selected}
           onClick={() =>
@@ -585,35 +611,43 @@ export default function RitualVisualControls({
           }
         >
           Edit properties
-        </Button>
-        <Button
+        </EditorActionButton>
+        <EditorActionButton
+          inactive={syncingSource}
+          inactiveReason={sourceWaitReason}
           size="small"
           disabled={disabled}
           onClick={() => editor.chain().focus().toggleBold().run()}
         >
           Bold
-        </Button>
-        <Button
+        </EditorActionButton>
+        <EditorActionButton
+          inactive={syncingSource}
+          inactiveReason={sourceWaitReason}
           size="small"
           disabled={disabled}
           onClick={() => editor.chain().focus().toggleItalic().run()}
         >
           Italic
-        </Button>
-        <Button
+        </EditorActionButton>
+        <EditorActionButton
+          inactive={syncingSource}
+          inactiveReason={sourceWaitReason}
           size="small"
           disabled={disabled}
           onClick={() => editor.chain().focus().undo().run()}
         >
           Undo
-        </Button>
-        <Button
+        </EditorActionButton>
+        <EditorActionButton
+          inactive={syncingSource}
+          inactiveReason={sourceWaitReason}
           size="small"
           disabled={disabled}
           onClick={() => editor.chain().focus().redo().run()}
         >
           Redo
-        </Button>
+        </EditorActionButton>
         <TextField
           size="small"
           label="Role for new task"
@@ -837,9 +871,14 @@ export default function RitualVisualControls({
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setFields(null)}>Cancel</Button>
-          <Button disabled={disabled} onClick={apply}>
+          <EditorActionButton
+            disabled={disabled}
+            inactive={syncingSource}
+            inactiveReason={sourceWaitReason}
+            onClick={apply}
+          >
             {target ? "Apply properties" : "Insert"}
-          </Button>
+          </EditorActionButton>
         </DialogActions>
       </Dialog>
       <Dialog
@@ -854,7 +893,7 @@ export default function RitualVisualControls({
           {actorId && ritualId && (
             <Upload
               concealed={concealed}
-              disabled={disabled}
+              disabled={blocked}
               expectedActorId={actorId}
               rituals={[{ id: ritualId, title: title ?? "Current ritual" }]}
               onResult={(receipt) => {

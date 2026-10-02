@@ -403,9 +403,10 @@ it("applies a compact source shortcut and saves semantic JSON through v3", async
   });
   await waitFor(() =>
     expect(
-      (screen.getByRole("button", { name: "Save" }) as HTMLButtonElement)
-        .disabled,
-    ).toBe(false),
+      screen
+        .getByRole("button", { name: "Save" })
+        .getAttribute("aria-disabled"),
+    ).not.toBe("true"),
   );
   fireEvent.click(screen.getByRole("button", { name: "Save" }));
   await waitFor(() => expect(mock.send).toHaveBeenCalledTimes(1));
@@ -1064,6 +1065,56 @@ it("updates the visual panel automatically without rewriting typed source or its
   ).toBe(false);
 });
 
+it("keeps toolbar presentation stable while guarding commands against unapplied source", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "split" }));
+  const source = screen.getByRole("textbox", {
+    name: "Ritual semantic source",
+  }) as HTMLTextAreaElement;
+  const visual = screen.getByRole("textbox", { name: "Ritual visual editor" });
+  const save = screen.getByRole("button", {
+    name: "Save",
+  }) as HTMLButtonElement;
+  const speech = screen.getByRole("button", {
+    name: "Speech",
+  }) as HTMLButtonElement;
+  const discard = screen.getByRole("button", {
+    name: "Discard source changes",
+  }) as HTMLButtonElement;
+  const classes = [save.className, speech.className, discard.className];
+  expect(discard.getAttribute("aria-disabled")).toBe("true");
+  fireEvent.change(source, {
+    target: { value: source.value.replace("Welcome.", "Greetings.") },
+  });
+  for (const command of [save, speech]) {
+    expect(command.disabled).toBe(false);
+    expect(command.getAttribute("aria-disabled")).toBe("true");
+    fireEvent.click(command);
+  }
+  expect(mock.send).not.toHaveBeenCalled();
+  expect(visual.textContent).toContain("Welcome.");
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(
+    (screen.getByLabelText("Role for new task") as HTMLInputElement).disabled,
+  ).toBe(false);
+  expect(discard.getAttribute("aria-disabled")).toBeNull();
+  expect([save.className, speech.className, discard.className]).toEqual(
+    classes,
+  );
+  await waitFor(() => expect(visual.textContent).toContain("Greetings."));
+  expect(save.getAttribute("aria-disabled")).toBeNull();
+  expect(speech.getAttribute("aria-disabled")).toBeNull();
+  expect(discard.getAttribute("aria-disabled")).toBe("true");
+  expect([save.className, speech.className, discard.className]).toEqual(
+    classes,
+  );
+  fireEvent.click(speech);
+  expect(source.value).toContain('role="all"');
+});
+
 it("keeps the last valid visual document while source is incomplete and catches up when repaired", async () => {
   mock.load.mockResolvedValue(undefined);
   const setup = props();
@@ -1075,7 +1126,12 @@ it("keeps the last valid visual document while source is incomplete and catches 
   }) as HTMLTextAreaElement;
   const visual = screen.getByRole("textbox", { name: "Ritual visual editor" });
   const valid = source.value;
+  const speech = screen.getByRole("button", {
+    name: "Speech",
+  }) as HTMLButtonElement;
   fireEvent.change(source, { target: { value: 'ritual 1\n@note {"' } });
+  expect(speech.disabled).toBe(false);
+  expect(speech.getAttribute("aria-disabled")).toBe("true");
   await screen.findByText(/last valid source/);
   expect(source.getAttribute("data-diagnostic-source")).toBe(source.value);
   expect(visual.textContent).toContain("Welcome.");
@@ -1084,35 +1140,55 @@ it("keeps the last valid visual document while source is incomplete and catches 
     (screen.getByRole("button", { name: "Save" }) as HTMLButtonElement)
       .disabled,
   ).toBe(true);
+  expect(speech.disabled).toBe(true);
   fireEvent.change(source, {
     target: { value: valid.replace("Welcome.", "Repaired.") },
   });
+  expect(speech.disabled).toBe(true);
   await waitFor(() => expect(visual.textContent).toContain("Repaired."));
   expect(screen.queryByText(/last valid source/)).toBeNull();
   expect(source.getAttribute("data-diagnostic-source")).toBeNull();
+  expect(speech.disabled).toBe(false);
+  expect(speech.getAttribute("aria-disabled")).toBeNull();
 });
 
-it("waits for source IME composition to finish before updating the visual panel", async () => {
-  mock.load.mockResolvedValue(undefined);
-  const setup = props();
-  mock.owner = setup.actorId;
-  render(<SemanticEditor {...setup} />);
-  fireEvent.click(await screen.findByRole("button", { name: "split" }));
-  const source = screen.getByRole("textbox", {
-    name: "Ritual semantic source",
-  }) as HTMLTextAreaElement;
-  const visual = screen.getByRole("textbox", { name: "Ritual visual editor" });
-  fireEvent.compositionStart(source);
-  fireEvent.change(source, {
-    target: { value: source.value.replace("Welcome.", "שלום") },
-  });
-  await act(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 250));
-  });
-  expect(visual.textContent).toContain("Welcome.");
-  fireEvent.compositionEnd(source);
-  await waitFor(() => expect(visual.textContent).toContain("שלום"));
-});
+it.each(["compositionend", "visual layout"] as const)(
+  "waits for source IME composition and recovers on %s",
+  async (finish) => {
+    mock.load.mockResolvedValue(undefined);
+    const setup = props();
+    mock.owner = setup.actorId;
+    render(<SemanticEditor {...setup} />);
+    fireEvent.click(await screen.findByRole("button", { name: "split" }));
+    const source = screen.getByRole("textbox", {
+      name: "Ritual semantic source",
+    }) as HTMLTextAreaElement;
+    const visual = screen.getByRole("textbox", {
+      name: "Ritual visual editor",
+    });
+    const save = screen.getByRole("button", {
+      name: "Save",
+    }) as HTMLButtonElement;
+    fireEvent.compositionStart(source);
+    expect(visual.getAttribute("contenteditable")).toBe("false");
+    expect(save.disabled).toBe(false);
+    expect(save.getAttribute("aria-disabled")).toBe("true");
+    fireEvent.click(save);
+    expect(mock.send).not.toHaveBeenCalled();
+    fireEvent.change(source, {
+      target: { value: source.value.replace("Welcome.", "שלום") },
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    });
+    expect(visual.textContent).toContain("Welcome.");
+    if (finish === "compositionend") fireEvent.compositionEnd(source);
+    else fireEvent.click(screen.getByRole("button", { name: "visual" }));
+    await waitFor(() => expect(visual.textContent).toContain("שלום"));
+    expect(save.getAttribute("aria-disabled")).toBeNull();
+    expect(visual.getAttribute("contenteditable")).toBe("true");
+  },
+);
 
 it("retains an editable split through routine revalidation and conceals on a hard lock", async () => {
   mock.load.mockResolvedValue(undefined);

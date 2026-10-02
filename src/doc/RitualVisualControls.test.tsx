@@ -88,29 +88,34 @@ it("retires uploads when their image dialog closes", async () => {
   expect(doc).toContain("hello world");
   expect(doc).not.toContain('"img"');
 });
-it("queues upload completion during permission verification and uses its captured position", async () => {
-  const { editor, receipt, props, rendered } = setup();
-  act(() => {
-    editor.commands.setTextSelection(1);
-  });
-  fireEvent.click(screen.getByRole("button", { name: "Image" }));
-  await screen.findByText("Upload fixture");
-  rendered.rerender(<RitualVisualControls {...props} disabled />);
-  act(() => {
-    editor.commands.setTextSelection({ from: 7, to: 12 });
-    mock.receipt!(receipt);
-  });
-  expect(JSON.stringify(semanticFromTiptap(editor.getJSON()))).not.toContain(
-    '"img"',
-  );
-  rendered.rerender(<RitualVisualControls {...props} />);
-  expect(JSON.stringify(semanticFromTiptap(editor.getJSON()))).toContain(
-    "hello world",
-  );
-  expect(JSON.stringify(semanticFromTiptap(editor.getJSON()))).toContain(
-    '"img"',
-  );
-});
+it.each(["disabled", "syncingSource"] as const)(
+  "queues upload completion while %s and uses its captured position",
+  async (blocked) => {
+    const { editor, receipt, props, rendered } = setup();
+    act(() => {
+      editor.commands.setTextSelection(1);
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Image" }));
+    await screen.findByText("Upload fixture");
+    rendered.rerender(
+      <RitualVisualControls {...props} {...{ [blocked]: true }} />,
+    );
+    act(() => {
+      editor.commands.setTextSelection({ from: 7, to: 12 });
+      mock.receipt!(receipt);
+    });
+    expect(JSON.stringify(semanticFromTiptap(editor.getJSON()))).not.toContain(
+      '"img"',
+    );
+    rendered.rerender(<RitualVisualControls {...props} />);
+    expect(JSON.stringify(semanticFromTiptap(editor.getJSON()))).toContain(
+      "hello world",
+    );
+    expect(JSON.stringify(semanticFromTiptap(editor.getJSON()))).toContain(
+      '"img"',
+    );
+  },
+);
 it("rejects a link range when the document changes while its dialog is open", () => {
   const { editor } = setup();
   act(() => {
