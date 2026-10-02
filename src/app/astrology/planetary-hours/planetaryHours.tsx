@@ -118,7 +118,7 @@ export type HourPlanet = (typeof SELECT_ORDER)[number];
 export default function PlanetaryHours({
   keyOfSolomon,
 }: {
-  /** Each planet's `keyOfSolomon.en`, a fragment that follows its name. */
+  /** Each planet's `keyOfSolomon.en`, Mathers' sentence on its days and hours. */
   keyOfSolomon: Record<HourPlanet, string>;
 }) {
   const geo = useGeoIP();

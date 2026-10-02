@@ -70,13 +70,12 @@
     magickTypes: {
       en: "Career success and progression, establishing harmony, healing and improving health, leadership skills, acquiring money and resources, promotion, strengthening willpower",
     },
-    // The Key of Solomon, after S. L. MacGregor Mathers' translation (1888),
-    // Book I, chapter II, as the planetary hours page holds it: what the
-    // planet's days and hours serve for, a fragment that follows the
-    // planet's name. Copied from that page character for character; it may
-    // abridge Mathers lightly and has not yet been checked against a scan.
+    // The Key of Solomon in S. L. MacGregor Mathers' translation (1888),
+    // Book I, chapter II, p. 12: his sentence on what the planet's days and
+    // hours serve for, verbatim, checked against sacred-texts' transcription
+    // of his edition. "Voyages envoys", on the Moon, is his.
     keyOfSolomon: {
-      en: "temporal wealth, hope, gain, fortune, divination, the favour of princes, to dissolve hostile feeling, to make friends",
+      en: "The Days and Hours of the Sun are very good for perfecting experiments regarding temporal wealth, hope, gain, fortune, divination, the favour of princes, to dissolve hostile feeling, and to make friends.",
     },
   },
 
@@ -102,7 +101,7 @@
       en: "Business success, improving communication skills, developing knowledge and memory, diplomacy, exam success, divination, developing influence, protection when traveling by air and land, learning music",
     },
     keyOfSolomon: {
-      en: "eloquence and intelligence; promptitude in business; science and divination; wonders; apparitions; and answers regarding the future. Thou canst also operate under this Planet for thefts; writings; deceit; and merchandise.",
+      en: "The Days and Hours of Mercury are good to operate for eloquence and intelligence; promptitude in business; science and divination; wonders; apparitions; and answers regarding the future. Thou canst also operate under this Planet for thefts; writings; deceit; and merchandise.",
     },
   },
 
@@ -128,7 +127,7 @@
       en: "Increasing attractiveness and self-confidence, beauty and passion, enhancing creativity, improving fertility, developing friendships, obtaining love",
     },
     keyOfSolomon: {
-      en: "forming friendships; for kindness and love; for joyous and pleasant undertakings, and for travelling.",
+      en: "The Days and Hours of Venus are good for forming friendships; for kindness and love; for joyous and pleasant undertakings, and for travelling.",
     },
   },
 
@@ -166,7 +165,7 @@
       en: "Developing clairvoyance and other psychic skills, ensuring safe childbirth, divination, glamour and illusions, lucid dreaming, protection when traveling by sea",
     },
     keyOfSolomon: {
-      en: "embassies; voyages envoys; messages; navigation; reconciliation; love; and the acquisition of merchandise by water.",
+      en: "The Days and Hours of the Moon are good for embassies; voyages envoys; messages; navigation; reconciliation; love; and the acquisition of merchandise by water.",
     },
   },
 
@@ -192,7 +191,7 @@
       en: "Controlling anger, increasing courage, enhancing energy and passion, increasing vigour and sex drive",
     },
     keyOfSolomon: {
-      en: "War; to arrive at military honour; to acquire courage; to overthrow enemies; and further to cause ruin, slaughter, cruelty, discord; to wound and to give death.",
+      en: "In the Days and Hours of Mars thou canst make experiments regarding War; to arrive at military honour; to acquire courage; to overthrow enemies; and further to cause ruin, slaughter, cruelty, discord; to wound and to give death.",
     },
   },
 
@@ -219,7 +218,7 @@
       en: "Career success, developing ambition and enthusiasm, improving fortune and luck, general health, acquiring honour, improving sense of humour, legal matters and dealing with the establishment, developing leadership skills",
     },
     keyOfSolomon: {
-      en: "obtaining honours, acquiring riches; contracting friendships, preserving health; and arriving at all that thou canst desire.",
+      en: "The Days and Hours of Jupiter are proper for obtaining honours, acquiring riches; contracting friendships, preserving health; and arriving at all that thou canst desire.",
     },
   },
 
@@ -245,7 +244,7 @@
       en: "Performing duty, establishing balance and equilibrium, dispelling illusions, protecting the home, legal matters, developing patience and self-discipline",
     },
     keyOfSolomon: {
-      en: "summon the Souls from Hades, but only of those who have died a natural death. Similarly on these days and hours thou canst operate to bring either good or bad fortune to buildings; to have familiar Spirits attend thee in sleep; to cause good or ill success to business, possessions, goods, seeds, fruits, and similar things, in order to acquire learning; to bring destruction and to give death, and to sow hatred and discord.",
+      en: "In the Days and Hours of Saturn thou canst perform experiments to summon the Souls from Hades, but only of those who have died a natural death. Similarly on these days and hours thou canst operate to bring either good or bad fortune to buildings; to have familiar Spirits attend thee in sleep; to cause good or ill success to business, possessions, goods, seeds, fruits, and similar things, in order to acquire learning; to bring destruction and to give death, and to sow hatred and discord.",
     },
   },
 

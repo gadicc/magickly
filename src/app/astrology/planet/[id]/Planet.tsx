@@ -216,12 +216,9 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
           <Row label="Key of Solomon">
             {planet.keyOfSolomon ? (
               <>
-                {/* The text is a fragment that follows "Planet:" in the
-                    hours page's select, so it is given a frame of its own. */}
-                Its days and hours serve for: {planet.keyOfSolomon.en}{" "}
-                {/* Plan 039, decision 6: "after" until checked on a scan. */}
+                “{planet.keyOfSolomon.en}”{" "}
                 <Muted block>
-                  After Mathers' translation (1888), Book I, chapter II.
+                  Mathers' translation (1888), Book I, chapter II.
                 </Muted>
               </>
             ) : null}

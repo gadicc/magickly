@@ -134,10 +134,10 @@ describe("the planet page", () => {
       text: "5=6 Adeptus Minor",
       hrefs: ["/gd/grade/5=6"],
     });
-    // Plan 039, decision 6: the Key's fragment, framed and cited "after"
-    // Mathers until it is checked against a scan.
+    // Mathers' sentence verbatim, quoted and cited (plan 039, after the
+    // owner's review).
     expect(row(html, "Key of Solomon").text).toBe(
-      "Its days and hours serve for: temporal wealth, hope, gain, fortune, divination, the favour of princes, to dissolve hostile feeling, to make friends After Mathers' translation (1888), Book I, chapter II.",
+      "“The Days and Hours of the Sun are very good for perfecting experiments regarding temporal wealth, hope, gain, fortune, divination, the favour of princes, to dissolve hostile feeling, and to make friends.” Mathers' translation (1888), Book I, chapter II.",
     );
     // Decision 3: shown, and said to be unsourced.
     const operations = row(html, "Magical operations").text;
@@ -265,9 +265,7 @@ describe("the planet page", () => {
       if (!found) continue;
       cited.push(id);
       const planet = Data.planet[id as keyof typeof Data.planet];
-      expect(found.text, id).toContain(
-        `Its days and hours serve for: ${planet.keyOfSolomon?.en} `,
-      );
+      expect(found.text, id).toContain(`“${planet.keyOfSolomon?.en}” `);
     }
     expect(cited).toEqual([
       "sol",

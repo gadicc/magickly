@@ -49,10 +49,8 @@ note saying so. See [plan 031](../plans/031-seventy-two-angels.md).
 
 **`keyOfSolomon` in `astrology/planets.json5`**, on the seven classical
 planets, is what *The Key of Solomon the King* says each planet's days and
-hours serve for, after S. L. MacGregor Mathers' translation (London, 1888),
-Book I, chapter II. Mathers died in 1918, so the translation is in the public
-domain and **no rights are asserted over the text**. The text is held as the
-planetary hours page has always shown it, which may abridge Mathers lightly
-(Luna's "voyages envoys", Sol's list with no "and") and has not yet been
-checked against a scan; until it is, it is cited as "after" Mathers. See
-[plan 039](../plans/039-correspondence-tables.md).
+hours serve for, in S. L. MacGregor Mathers' translation (London, 1888),
+Book I, chapter II, p. 12: his sentences verbatim, checked against
+sacred-texts' transcription of his edition. Mathers died in 1918, so the
+translation is in the public domain and **no rights are asserted over the
+text**. See [plan 039](../plans/039-correspondence-tables.md).
