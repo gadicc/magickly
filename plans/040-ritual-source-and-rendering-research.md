@@ -8,6 +8,10 @@ Semantic JSON and Tiptap remain the current architecture. No application codec,
 reader, editor UI, saved document, database or dependency was changed here.
 These findings are a decision aid, not an accepted source-format rollout.
 
+Follow-up: the operator subsequently chose 16-character alphanumeric Nano IDs.
+See [the implemented identity policy and retained-source assessment](041-ritual-node-identities.md).
+The measurements below retain their original full-UUID baseline.
+
 Code and public synthetic samples live in
 [`editor-trial/source-formats`](../editor-trial/source-formats/README.md).
 The five unchanged rituals from the operator's approved private Mongo backup

@@ -1,4 +1,4 @@
-import { createUuidV7, isUuidV7 } from "../lib/ids";
+import { createRitualNodeId, isRitualNodeId } from "./ritualNodeIds";
 
 type JsonScalar = string | number | boolean | null;
 export type JsonValue = JsonScalar | JsonValue[] | { [key: string]: JsonValue };
@@ -114,7 +114,7 @@ function validImageStyle(value: unknown): boolean {
 /** Import compiled legacy content without dropping unknown nodes or attributes. */
 export function semanticFromJrt(
   input: unknown,
-  createId: () => string = createUuidV7,
+  createId: () => string = createRitualNodeId,
 ): RitualSemanticDocument {
   if (!record(input) || !Array.isArray(input.children))
     throw new Error("Invalid JRT root");
@@ -128,7 +128,7 @@ export function semanticFromJrt(
     )
       return { kind: "text", text: node.value };
     const id = createId();
-    if (!isUuidV7(id)) throw new Error("Invalid semantic node identity");
+    if (!isRitualNodeId(id)) throw new Error("Invalid semantic node identity");
     if (typeof node.type !== "string" || !knownTags.has(node.type))
       return { kind: "legacy", id, raw: cloneJson(node) };
     const { type, children, ...attrs } = node;
@@ -187,8 +187,7 @@ export function validateRitualSemantic(input: unknown): string[] {
         errors.push(`${path}: invalid text`);
       return;
     }
-    if (!isUuidV7(node.id) || node.id !== node.id.toLowerCase())
-      errors.push(`${path}: invalid id`);
+    if (!isRitualNodeId(node.id)) errors.push(`${path}: invalid id`);
     else if (ids.has(node.id)) errors.push(`${path}: duplicate id`);
     else ids.add(node.id);
     if (node.kind === "legacy") {

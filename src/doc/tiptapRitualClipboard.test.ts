@@ -3,6 +3,7 @@
 import { Editor, getSchema } from "@tiptap/core";
 import { DOMParser, DOMSerializer } from "@tiptap/pm/model";
 import { expect, it } from "vitest";
+import { createUuidV7 } from "../lib/ids";
 import { semanticFromJrt, semanticToJrt } from "./semantic";
 import {
   normalizeTiptapNodeIds,
@@ -121,6 +122,36 @@ it("keeps ID repair out of the paste undo step", () => {
     editor.commands.redo();
     normalizeTiptapNodeIds(editor);
     expect(semanticFromTiptap(editor.getJSON()).nodes).toHaveLength(2);
+  } finally {
+    editor.destroy();
+  }
+});
+
+it("preserves mixed UUID and short IDs while repairing a pasted duplicate", () => {
+  const uuid = createUuidV7();
+  const ids = [uuid, "Ab3k9Qp7Zx2Mn5Rs", "ab3k9qp7zx2mn5rs"];
+  const original = semanticFromJrt(
+    {
+      children: ids.map(() => ({ type: "note", children: [] })),
+    },
+    () => ids.shift()!,
+  );
+  const content = semanticToTiptap(original);
+  content.content!.push(structuredClone(content.content![0]));
+  const editor = new Editor({
+    element: document.createElement("div"),
+    extensions: ritualTiptapExtensions,
+    content,
+  });
+  try {
+    expect(normalizeTiptapNodeIds(editor)).toBe(true);
+    expect(normalizeTiptapNodeIds(editor)).toBe(false);
+    const result = semanticFromTiptap(editor.getJSON());
+    expect(result.nodes.slice(0, 3)).toEqual(original.nodes);
+    expect(result.nodes[3]).toMatchObject({
+      id: expect.stringMatching(/^[A-Za-z0-9]{16}$/),
+    });
+    expect(semanticFromTiptap(editor.getJSON())).toEqual(result);
   } finally {
     editor.destroy();
   }

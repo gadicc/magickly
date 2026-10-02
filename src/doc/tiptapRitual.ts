@@ -7,7 +7,7 @@ import {
 } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { parseRitualFileLocator } from "../files/ritualFileLocator";
-import { createUuidV7, isUuidV7 } from "../lib/ids";
+import { createRitualNodeId, isRitualNodeId } from "./ritualNodeIds";
 import {
   type JsonValue,
   type RitualSemanticDocument,
@@ -339,11 +339,11 @@ export function normalizeTiptapNodeIds(editor: Editor): boolean {
     )
       return;
     const id = node.attrs.id;
-    if (typeof id === "string" && isUuidV7(id) && !seen.has(id)) {
+    if (typeof id === "string" && isRitualNodeId(id) && !seen.has(id)) {
       seen.add(id);
       return;
     }
-    const fresh = createUuidV7();
+    const fresh = createRitualNodeId();
     seen.add(fresh);
     tr.setNodeMarkup(pos, undefined, { ...node.attrs, id: fresh }, node.marks);
   });
@@ -359,11 +359,13 @@ function toInline(node: RitualSemanticNode): JSONContent {
       ? {
           type: "text",
           text: node.text,
-          marks: [{ type: "ritualSegment", attrs: { id: createUuidV7() } }],
+          marks: [
+            { type: "ritualSegment", attrs: { id: createRitualNodeId() } },
+          ],
         }
       : {
           type: "ritualInline",
-          attrs: { id: createUuidV7(), tag: "emptyText", attrs: {} },
+          attrs: { id: createRitualNodeId(), tag: "emptyText", attrs: {} },
         };
   if (node.kind !== "element")
     throw new Error("Opaque content cannot be inline");
@@ -443,7 +445,7 @@ function fromInline(node: JSONContent): RitualSemanticNode {
         throw new Error(`Unsupported text mark ${mark.type}`);
       result = {
         kind: "element",
-        id: createUuidV7(),
+        id: createRitualNodeId(),
         tag: mark.type === "bold" ? "b" : "i",
         attrs: {},
         children: [result],
@@ -482,7 +484,7 @@ function fromBlocks(nodes: JSONContent[]): RitualSemanticNode[] {
       if (previousParagraph)
         result.push({
           kind: "element",
-          id: createUuidV7(),
+          id: createRitualNodeId(),
           tag: "br",
           attrs: {},
         });
@@ -568,7 +570,7 @@ export function semanticFromTiptap(input: JSONContent): RitualSemanticDocument {
   const normalize = (nodes: RitualSemanticNode[]) => {
     for (const node of nodes) {
       if (node.kind === "text") continue;
-      if (ids.has(node.id)) node.id = createUuidV7();
+      if (ids.has(node.id)) node.id = createRitualNodeId();
       ids.add(node.id);
       if (node.kind === "element" && node.children) normalize(node.children);
     }

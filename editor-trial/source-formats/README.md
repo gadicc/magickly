@@ -44,6 +44,8 @@ absent versus empty children and adjacent text nodes. The original historical
 Pug bytes are context only: they have no IDs and are not an equivalent canonical
 projection. Sizes are properties of these printers, not lower bounds for the
 formats or evidence of editor performance.
+The measurement runner explicitly retains the original UUID baseline after the
+app adopted shorter node IDs; the trial parsers accept both identity forms.
 
 The prototypes intentionally omit production error UX, incremental parsing,
 resource limits, formatting/comment retention, source selection mapping, draft

@@ -236,10 +236,10 @@ export const compact = {
       if (!full) continue;
       const indent = full.match(/^ */)[0];
       const line = full.slice(indent.length);
-      const speech = /^([a-z][a-z0-9,-]*)~([0-9a-f-]+): (.*)$/.exec(line);
-      const action = /^\* ([a-z][a-z0-9,-]*)~([0-9a-f-]+) (.*)$/.exec(line);
+      const speech = /^([a-z][a-z0-9,-]*)~([A-Za-z0-9-]+): (.*)$/.exec(line);
+      const action = /^\* ([a-z][a-z0-9,-]*)~([A-Za-z0-9-]+) (.*)$/.exec(line);
       const match = speech ?? action;
-      const title = /^title~([0-9a-f-]+) (?![{])(.*)$/.exec(line);
+      const title = /^title~([A-Za-z0-9-]+) (?![{])(.*)$/.exec(line);
       if (title) expanded.push(`${indent}@title~${title[1]} ${json(title[2])}`);
       else if (match)
         expanded.push(

@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { createUuidV7 } from "../lib/ids";
 import { prepare } from "./prepare";
 import { semanticFromJrt } from "./semantic";
 import {
@@ -13,6 +14,17 @@ const hash = (value: string) =>
   createHash("sha256").update(value, "utf8").digest("hex");
 
 describe("semantic compiler", () => {
+  it("accepts mixed identity generations without putting identities in reader output", () => {
+    const ids = [createUuidV7(), "Ab3k9Qp7Zx2Mn5Rs"];
+    const jrt = {
+      children: [{ type: "note" }, { type: "unknown-widget", payload: "keep" }],
+    };
+    const document = semanticFromJrt(jrt, () => ids.shift()!);
+    const source = JSON.stringify(document);
+    const compiled = compileSemanticSource(source);
+    expect(compiled?.sourceSha256).toBe(hash(source));
+    expect(JSON.parse(compiled!.contentJson)).toEqual(jrt);
+  });
   it("binds its identity to the reviewed model and implementation bytes", () => {
     expect(
       hash(readFileSync(new URL("./semantic.ts", import.meta.url), "utf8")),
@@ -25,6 +37,11 @@ describe("semantic compiler", () => {
         ),
       ),
     ).toBe(SEMANTIC_COMPILER_COMPONENTS.semanticCompilerImplSha256);
+    expect(
+      hash(
+        readFileSync(new URL("./ritualNodeIds.ts", import.meta.url), "utf8"),
+      ),
+    ).toBe(SEMANTIC_COMPILER_COMPONENTS.ritualNodeIdsSha256);
   });
   for (const name of ["0=0", "1=10", "2=9"]) {
     it(`emits JRT profile 1 parity for ${name}`, () => {

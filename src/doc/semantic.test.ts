@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { createUuidV7 } from "../lib/ids";
 import { prepare } from "./prepare";
+import { createRitualNodeId } from "./ritualNodeIds";
 import {
   semanticFromJrt,
   semanticToJrt,
@@ -55,7 +56,7 @@ describe("semantic legacy import", () => {
     expect(() => semanticToJrt(semantic)).toThrow("duplicate id");
   });
 
-  it("keeps new IDs canonical UUIDv7", () => {
+  it("preserves existing canonical UUIDv7 identities", () => {
     const id = createUuidV7();
     const semantic = semanticFromJrt(
       {
@@ -66,5 +67,35 @@ describe("semantic legacy import", () => {
       () => id,
     );
     expect(semantic.nodes[0]).toMatchObject({ id, kind: "element" });
+  });
+
+  it("keeps distinct case-sensitive short identities in a mixed document", () => {
+    const ids = [createUuidV7(), "Ab3k9Qp7Zx2Mn5Rs", "ab3k9qp7zx2mn5rs"];
+    const jrt = {
+      children: [
+        { type: "note", children: [] },
+        { type: "var", name: "candidate" },
+        { type: "unknown-widget" },
+      ],
+    };
+    const semantic = semanticFromJrt(jrt, () => ids.shift()!);
+    expect(validateRitualSemantic(semantic)).toEqual([]);
+    expect(semanticToJrt(semantic)).toEqual(jrt);
+    semantic.nodes.push(structuredClone(semantic.nodes[1]));
+    expect(validateRitualSemantic(semantic)).toContain(
+      "nodes[3]: duplicate id",
+    );
+  });
+
+  it("uses short IDs for legacy imports and rejects malformed injected identities", () => {
+    const jrt = { children: [{ type: "note" }] };
+    const document = semanticFromJrt(jrt);
+    expect(document.nodes[0]).toMatchObject({
+      id: expect.stringMatching(/^[A-Za-z0-9]{16}$/),
+    });
+    expect(() => semanticFromJrt(jrt, () => "bad-id")).toThrow(
+      "Invalid semantic node identity",
+    );
+    expect(semanticFromJrt(jrt, createRitualNodeId).nodes).toHaveLength(1);
   });
 });

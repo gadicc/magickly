@@ -1,6 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { isDeepStrictEqual } from "node:util";
 import { createHash } from "node:crypto";
+import { createUuidV7 } from "../../src/lib/ids.ts";
 import { candidates } from "./codecs.mjs";
 import { fixture } from "./fixture.mjs";
 import { semanticFromJrt, semanticToJrt } from "../../src/doc/semantic.ts";
@@ -34,7 +35,7 @@ async function main() {
       const doc =
         row.sourceFormat === "magickli-semantic-json"
           ? JSON.parse(row.source)
-          : semanticFromJrt(jrt);
+          : semanticFromJrt(jrt, createUuidV7);
       if (!isDeepStrictEqual(semanticToJrt(doc), jrt))
         throw new Error("Invalid corpus tree");
       docs.push(doc);

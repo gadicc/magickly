@@ -16,8 +16,8 @@ import type { Editor, JSONContent } from "@tiptap/core";
 import { useEditorState } from "@tiptap/react";
 import React from "react";
 import { formatRitualFileLocator } from "@/files/ritualFileLocator";
-import { createUuidV7 } from "@/lib/ids";
 import Upload from "@/lib/upload";
+import { createRitualNodeId } from "./ritualNodeIds";
 import {
   type JsonValue,
   type RitualSemanticNode,
@@ -212,7 +212,7 @@ export default function RitualVisualControls({
       .insertContentAt(attempt.pos, {
         type: "ritualAtom",
         attrs: {
-          id: createUuidV7(),
+          id: createRitualNodeId(),
           tag: "img",
           attrs: { src: formatRitualFileLocator(receipt), alt: "" },
           children: null,
@@ -253,7 +253,7 @@ export default function RitualVisualControls({
 
   const insertBlock = (tag: "task" | "note", mode?: "say" | "do") => {
     if (disabled) return;
-    const id = createUuidV7();
+    const id = createRitualNodeId();
     const attrs =
       tag === "task" ? { [mode!]: true, role: role.trim() || "all" } : {};
     if (
@@ -422,7 +422,7 @@ export default function RitualVisualControls({
           );
       }
     }
-    const id = target?.id ?? createUuidV7();
+    const id = target?.id ?? createRitualNodeId();
     const errors = validateRitualSemantic({
       format: "magickli-ritual",
       version: 1,
@@ -822,7 +822,7 @@ export default function RitualVisualControls({
                         ...fields,
                         options: [
                           ...fields.options,
-                          { id: createUuidV7(), value: "", label: "" },
+                          { id: createRitualNodeId(), value: "", label: "" },
                         ],
                       })
                     }

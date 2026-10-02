@@ -1,4 +1,4 @@
-import { createUuidV7 } from "../lib/ids";
+import { createRitualNodeId } from "./ritualNodeIds";
 import {
   type JsonValue,
   type RitualSemanticDocument,
@@ -122,7 +122,7 @@ export function parseRitualText(source: string): RitualSemanticDocument {
         throw new Error(`Line ${lineNumber}: text must be a JSON string`);
       node = { kind: "text", text: value };
     } else if (line.startsWith("?~")) {
-      const match = /^\?~([0-9a-f-]+) (.+)$/.exec(line);
+      const match = /^\?~([A-Za-z0-9-]+) (.+)$/.exec(line);
       if (!match) throw new Error(`Line ${lineNumber}: invalid opaque node`);
       node = {
         kind: "legacy",
@@ -133,7 +133,7 @@ export function parseRitualText(source: string): RitualSemanticDocument {
       const match = /^\* ([A-Za-z][A-Za-z0-9,-]*) (.*)$/.exec(line)!;
       node = {
         kind: "element",
-        id: createUuidV7(),
+        id: createRitualNodeId(),
         tag: "task",
         attrs: { do: true, role: match[1].toLowerCase() },
         children: [{ kind: "text", text: match[2] }],
@@ -142,14 +142,14 @@ export function parseRitualText(source: string): RitualSemanticDocument {
       const match = /^([A-Za-z][A-Za-z0-9,-]*):(?: ?)(.*)$/.exec(line)!;
       node = {
         kind: "element",
-        id: createUuidV7(),
+        id: createRitualNodeId(),
         tag: "task",
         attrs: { say: true, role: match[1].toLowerCase() },
         children: [{ kind: "text", text: match[2] }],
       };
     } else if (line.startsWith("@")) {
       const shortcut =
-        /^@(say|do)(?:~([0-9a-f-]+))? ([A-Za-z][A-Za-z0-9,-]*) (".*")$/.exec(
+        /^@(say|do)(?:~([A-Za-z0-9-]+))? ([A-Za-z][A-Za-z0-9,-]*) (".*")$/.exec(
           line,
         );
       if (shortcut) {
@@ -158,24 +158,24 @@ export function parseRitualText(source: string): RitualSemanticDocument {
           throw new Error(`Line ${lineNumber}: task text must be a string`);
         node = {
           kind: "element",
-          id: shortcut[2] ?? createUuidV7(),
+          id: shortcut[2] ?? createRitualNodeId(),
           tag: "task",
           attrs: { [shortcut[1]]: true, role: shortcut[3] },
           children: [{ kind: "text", text: value }],
         };
       } else {
-        const label = /^@(summary|title)(?:~([0-9a-f-]+))? (".*")(:?)$/.exec(
+        const label = /^@(summary|title)(?:~([A-Za-z0-9-]+))? (".*")(:?)$/.exec(
           line,
         );
         const inlineAtom =
-          /^@(var|grade)(?:~([0-9a-f-]+))? ([A-Za-z0-9_=]+)(:?)$/.exec(line);
+          /^@(var|grade)(?:~([A-Za-z0-9-]+))? ([A-Za-z0-9_=]+)(:?)$/.exec(line);
         if (label) {
           const value = parseJson(label[3], lineNumber);
           if (typeof value !== "string")
             throw new Error(`Line ${lineNumber}: label must be a string`);
           node = {
             kind: "element",
-            id: label[2] ?? createUuidV7(),
+            id: label[2] ?? createRitualNodeId(),
             tag: label[1],
             attrs: { [label[1] === "summary" ? "summary" : "text"]: value },
             ...(label[4]
@@ -187,7 +187,7 @@ export function parseRitualText(source: string): RitualSemanticDocument {
         } else if (inlineAtom) {
           node = {
             kind: "element",
-            id: inlineAtom[2] ?? createUuidV7(),
+            id: inlineAtom[2] ?? createRitualNodeId(),
             tag: inlineAtom[1],
             attrs: {
               [inlineAtom[1] === "var" ? "name" : "grade"]: inlineAtom[3],
@@ -196,7 +196,7 @@ export function parseRitualText(source: string): RitualSemanticDocument {
           };
         } else {
           const match =
-            /^@([A-Za-z][A-Za-z0-9]*)(?:~([0-9a-f-]+))?(?: (\{.*\}))?(:?)$/.exec(
+            /^@([A-Za-z][A-Za-z0-9]*)(?:~([A-Za-z0-9-]+))?(?: (\{.*\}))?(:?)$/.exec(
               line,
             );
           if (!match)
@@ -210,7 +210,7 @@ export function parseRitualText(source: string): RitualSemanticDocument {
             throw new Error(`Line ${lineNumber}: attributes must be an object`);
           node = {
             kind: "element",
-            id: match[2] ?? createUuidV7(),
+            id: match[2] ?? createRitualNodeId(),
             tag: match[1],
             attrs: attrs as Record<string, JsonValue>,
             ...(match[4] ? { children: [] } : {}),
