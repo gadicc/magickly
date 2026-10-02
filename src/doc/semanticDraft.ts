@@ -5,6 +5,7 @@ import {
   parseRitualPublicationRequest,
   type RitualPublicationRequestV1,
 } from "../offline/ritualPublicationContract";
+import type { RitualSourceDialect } from "./ritualSource";
 import type { SqlRitualWriteRequest } from "./sqlWriteContract";
 
 export interface SemanticDraft {
@@ -16,6 +17,8 @@ export interface SemanticDraft {
   /** Last valid semantic document, independent of an invalid source buffer. */
   documentJson: string;
   sourceBuffer: string;
+  /** Missing on pre-Pug drafts; their explicit header identifies Ritual Text. */
+  sourceDialect?: RitualSourceDialect;
   sourceDirty: boolean;
   sourceConflict: boolean;
   pending: Extract<SqlRitualWriteRequest, { kind: "save" }> | null;

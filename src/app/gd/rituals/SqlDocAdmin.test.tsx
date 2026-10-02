@@ -8,8 +8,9 @@ import {
   waitFor,
 } from "@testing-library/react";
 import type { Editor } from "@tiptap/core";
+import React from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { ritualTextStarter } from "@/doc/ritualTextExamples";
+import { ritualPugStarter } from "@/doc/ritualTextExamples";
 import { creationPublicationHandoffKey } from "@/offline/ritualPublicationHandoff";
 import SqlDocAdmin from "./SqlDocAdmin";
 
@@ -121,7 +122,9 @@ async function fill() {
     target: { value: "New ritual" },
   });
   fireEvent.mouseDown(screen.getByRole("combobox", { name: "Source format" }));
-  fireEvent.click(await screen.findByRole("option", { name: "Pug source" }));
+  fireEvent.click(
+    await screen.findByRole("option", { name: "Legacy Pug source" }),
+  );
   fireEvent.change(screen.getByLabelText("Ritual source"), {
     target: { value: "p Exact source" },
   });
@@ -188,9 +191,11 @@ it("creates a semantic ritual from ritual text and retries the exact v3 request"
     target: { value: "New semantic ritual" },
   });
   fireEvent.mouseDown(screen.getByRole("combobox", { name: "Source format" }));
-  fireEvent.click(await screen.findByRole("option", { name: "Ritual text" }));
-  fireEvent.click(await screen.findByRole("button", { name: "Ritual text" }));
-  fireEvent.change(screen.getByLabelText("Ritual text"), {
+  fireEvent.click(
+    await screen.findByRole("option", { name: "Visual / Ritual Pug" }),
+  );
+  fireEvent.click(await screen.findByRole("button", { name: "Ritual source" }));
+  fireEvent.change(screen.getByLabelText("New ritual source"), {
     target: { value: "ritual 1\nHiero: Welcome.\n* Keryx Open the door\n" },
   });
   fireEvent.mouseDown(screen.getByRole("combobox", { name: "Visibility" }));
@@ -263,13 +268,13 @@ it("creates a valid semantic ritual from the default visual composer", async () 
 it("prefills source with the starter and links to help without leaving the draft", async () => {
   render(<SqlDocAdmin />);
   await screen.findByLabelText("Title");
-  const guide = await screen.findByRole("link", { name: /Ritual Text guide/ });
-  expect(guide.getAttribute("href")).toBe("/help/ritual-text");
+  const guide = await screen.findByRole("link", { name: /Ritual Pug guide/ });
+  expect(guide.getAttribute("href")).toBe("/help/ritual-pug");
   expect(guide.getAttribute("target")).toBe("_blank");
-  fireEvent.click(screen.getByRole("button", { name: "Ritual text" }));
+  fireEvent.click(screen.getByRole("button", { name: "Ritual source" }));
   expect(
-    (screen.getByLabelText("Ritual text") as HTMLTextAreaElement).value,
-  ).toBe(ritualTextStarter);
+    (screen.getByLabelText("New ritual source") as HTMLTextAreaElement).value,
+  ).toBe(ritualPugStarter);
   expect(mock.write).not.toHaveBeenCalled();
 });
 
@@ -310,16 +315,16 @@ it("keeps the creation source mode and draft on a successful focus recheck", asy
   fireEvent.change(await screen.findByLabelText("Title"), {
     target: { value: "Unsaved" },
   });
-  fireEvent.click(await screen.findByRole("button", { name: "Ritual text" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Ritual source" }));
   const text = "ritual 1\nHiero: My unsaved words.\n";
-  fireEvent.change(screen.getByLabelText("Ritual text"), {
+  fireEvent.change(screen.getByLabelText("New ritual source"), {
     target: { value: text },
   });
   act(() => emitState({ ...runtimeState, phase: "locked", generation: 2 }));
   expect(screen.queryByDisplayValue(text)).toBeNull();
   act(() => emitState({ ...runtimeState, phase: "ready", generation: 3 }));
   expect(
-    ((await screen.findByLabelText("Ritual text")) as HTMLTextAreaElement)
+    ((await screen.findByLabelText("New ritual source")) as HTMLTextAreaElement)
       .value,
   ).toBe(text);
   expect((screen.getByLabelText("Title") as HTMLInputElement).value).toBe(
@@ -333,7 +338,7 @@ it("keeps source mode for an exact pending creation after a same-account check",
   fireEvent.change(await screen.findByLabelText("Title"), {
     target: { value: "Pending draft" },
   });
-  fireEvent.click(await screen.findByRole("button", { name: "Ritual text" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Ritual source" }));
   fireEvent.mouseDown(screen.getByRole("combobox", { name: "Visibility" }));
   fireEvent.click(
     await screen.findByRole("option", { name: "Synthetic temple" }),
@@ -343,7 +348,7 @@ it("keeps source mode for an exact pending creation after a same-account check",
   const request = localStorage.getItem(key);
   act(() => emitState({ ...runtimeState, phase: "locked", generation: 2 }));
   act(() => emitState({ ...runtimeState, phase: "ready", generation: 3 }));
-  const source = await screen.findByLabelText("Ritual text");
+  const source = await screen.findByLabelText("New ritual source");
   expect((source as HTMLTextAreaElement).disabled).toBe(true);
   expect(localStorage.getItem(key)).toBe(request);
   fireEvent.click(screen.getByRole("button", { name: "Retry creation" }));
@@ -381,9 +386,11 @@ it("keeps invalid ritual text local instead of sending a create request", async 
     target: { value: "Invalid semantic ritual" },
   });
   fireEvent.mouseDown(screen.getByRole("combobox", { name: "Source format" }));
-  fireEvent.click(await screen.findByRole("option", { name: "Ritual text" }));
-  fireEvent.click(await screen.findByRole("button", { name: "Ritual text" }));
-  fireEvent.change(screen.getByLabelText("Ritual text"), {
+  fireEvent.click(
+    await screen.findByRole("option", { name: "Visual / Ritual Pug" }),
+  );
+  fireEvent.click(await screen.findByRole("button", { name: "Ritual source" }));
+  fireEvent.change(screen.getByLabelText("New ritual source"), {
     target: { value: "not a ritual" },
   });
   fireEvent.mouseDown(screen.getByRole("combobox", { name: "Visibility" }));
@@ -391,7 +398,9 @@ it("keeps invalid ritual text local instead of sending a create request", async 
     await screen.findByRole("option", { name: "Synthetic temple" }),
   );
   fireEvent.click(screen.getByRole("button", { name: "Create" }));
-  expect(await screen.findByText(/Line 1: expected ritual 1/)).toBeTruthy();
+  expect(
+    await screen.findByText(/Line 1: expected \/\/- magickli-ritual-pug 1/),
+  ).toBeTruthy();
   expect(mock.write).not.toHaveBeenCalled();
   expect(localStorage.getItem(key)).toBeNull();
 });
@@ -906,3 +915,22 @@ it("conceals creation after a confirmed missing-actor response", async () => {
   expect(screen.queryByDisplayValue("p Exact source")).toBeNull();
   expect(screen.queryByText("Synthetic temple")).toBeNull();
 });
+
+vi.mock("@/doc/RitualSourceEditor", () => ({
+  default: ({
+    value,
+    onChange,
+    disabled,
+    label = "Ritual semantic source",
+    onCompositionChange,
+  }) =>
+    React.createElement("textarea", {
+      "aria-label": label,
+      value,
+      disabled,
+      onChange: (event) =>
+        onChange((event.target as HTMLTextAreaElement).value),
+      onCompositionStart: () => onCompositionChange?.(true),
+      onCompositionEnd: () => onCompositionChange?.(false),
+    }),
+}));

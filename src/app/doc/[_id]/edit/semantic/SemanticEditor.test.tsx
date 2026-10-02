@@ -7,6 +7,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
+import React from "react";
 import { afterEach, expect, it, vi } from "vitest";
 import { printRitualText } from "@/doc/ritualText";
 import { semanticFromJrt } from "@/doc/semantic";
@@ -240,7 +241,7 @@ it("clears a source parse error after discarding the invalid buffer", async () =
       target: { value: "broken" },
     },
   );
-  await screen.findByText(/Line 1: expected ritual 1/);
+  await screen.findByText(/Line 1: expected \/\/- magickli-ritual-pug 1/);
   fireEvent.click(
     screen.getByRole("button", { name: "Discard source changes" }),
   );
@@ -289,10 +290,8 @@ it("preserves split pane identity, scroll, source selection and visual Undo acro
       Node.DOCUMENT_POSITION_FOLLOWING,
   ).toBeTruthy();
   expect(
-    screen
-      .getByRole("link", { name: /Ritual Text guide/ })
-      .getAttribute("href"),
-  ).toBe("/help/ritual-text");
+    screen.getByRole("link", { name: /Ritual Pug guide/ }).getAttribute("href"),
+  ).toBe("/help/ritual-pug");
   panel.scrollTop = 480;
   const selection = visual.editor.state.selection.toJSON();
   let release!: () => void;
@@ -392,7 +391,7 @@ it("applies a compact source shortcut and saves semantic JSON through v3", async
   });
   fireEvent.change(source, {
     target: {
-      value: `${(source as HTMLTextAreaElement).value}* Keryx Opens the door\n`,
+      value: `${(source as HTMLTextAreaElement).value}do(role=\"keryx\") Opens the door\n`,
     },
   });
   await waitFor(() =>
@@ -419,7 +418,7 @@ it("applies a compact source shortcut and saves semantic JSON through v3", async
   expect(mock.saveDraft).toHaveBeenCalledTimes(writesAfterSave);
   fireEvent.change(source, {
     target: {
-      value: `${(source as HTMLTextAreaElement).value}* Keryx Closes the door\n`,
+      value: `${(source as HTMLTextAreaElement).value}do(role=\"keryx\") Closes the door\n`,
     },
   });
   await waitFor(
@@ -514,6 +513,104 @@ it("clears a local draft identical to the confirmed server revision", async () =
   await screen.findByRole("button", { name: "Save" });
   expect(mock.clear).toHaveBeenCalledWith(setup.actorId, setup.ritualId);
   expect(screen.queryByText("Recovered the local draft.")).toBeNull();
+});
+
+it("recovers an incomplete old source buffer and switches syntax only after discard", async () => {
+  const setup = props();
+  mock.owner = setup.actorId;
+  const oldBuffer = 'ritual 1\n@say hiero "Unfinished';
+  mock.load.mockResolvedValue({
+    ownerId: setup.actorId,
+    ritualId: setup.ritualId,
+    baseRevisionId: setup.revisionId,
+    baseVersion: setup.parentVersion,
+    title: setup.title,
+    documentJson: JSON.stringify(setup.initialDocument),
+    sourceBuffer: oldBuffer,
+    sourceDirty: true,
+    sourceConflict: false,
+    pending: null,
+    updatedAt: Date.now(),
+  });
+  mock.saveDraft.mockResolvedValue(undefined);
+  render(<SemanticEditor {...setup} />);
+  await screen.findByText("Recovered the local draft.");
+  fireEvent.click(screen.getByRole("button", { name: "source" }));
+  const buffer = screen.getByRole("textbox", {
+    name: "Ritual semantic source",
+  }) as HTMLTextAreaElement;
+  expect(buffer.value).toBe(oldBuffer);
+  expect(
+    (
+      screen.getByRole("button", {
+        name: "Pug",
+      }) as HTMLButtonElement
+    ).disabled,
+  ).toBe(true);
+  fireEvent.click(
+    screen.getByRole("button", { name: /Discard source changes/ }),
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Pug" }));
+  expect(buffer.value).toContain("//- magickli-ritual-pug 1");
+  const first = setup.initialDocument.nodes[0];
+  expect(first.kind).not.toBe("text");
+  if (first.kind !== "text") expect(buffer.value).toContain(`#${first.id}`);
+  expect(buffer.value).toContain("Welcome.");
+  await waitFor(() => expect(mock.saveDraft).toHaveBeenCalled());
+  expect(mock.saveDraft.mock.lastCall?.[0].sourceDialect).toBe("pug");
+});
+
+it("retains a restored pending request and old source bytes exactly", async () => {
+  const setup = props();
+  mock.owner = setup.actorId;
+  const pending = {
+    version: 3 as const,
+    kind: "save" as const,
+    operationId: createUuidV7(),
+    expectedActorId: setup.actorId,
+    ritualId: setup.ritualId,
+    expectedRevisionId: setup.revisionId,
+    expectedVersion: setup.parentVersion,
+    title: setup.title,
+    source: JSON.stringify(setup.initialDocument),
+  };
+  const sourceBuffer = printRitualText(setup.initialDocument);
+  mock.load.mockResolvedValue({
+    ownerId: setup.actorId,
+    ritualId: setup.ritualId,
+    baseRevisionId: setup.revisionId,
+    baseVersion: setup.parentVersion,
+    title: setup.title,
+    documentJson: pending.source,
+    sourceBuffer,
+    sourceDirty: false,
+    sourceConflict: false,
+    pending,
+    updatedAt: Date.now(),
+  });
+  mock.saveDraft.mockResolvedValue(undefined);
+  mock.send.mockResolvedValue(null);
+  render(<SemanticEditor {...setup} />);
+  await screen.findByRole("button", { name: "Retry save" });
+  fireEvent.click(screen.getByRole("button", { name: "source" }));
+  expect(
+    (
+      screen.getByRole("textbox", {
+        name: "Ritual semantic source",
+      }) as HTMLTextAreaElement
+    ).value,
+  ).toBe(sourceBuffer);
+  expect(
+    (
+      screen.getByRole("button", {
+        name: "Pug",
+      }) as HTMLButtonElement
+    ).disabled,
+  ).toBe(true);
+  fireEvent.click(screen.getByRole("button", { name: "Retry save" }));
+  await waitFor(() =>
+    expect(mock.send).toHaveBeenCalledWith(pending, expect.any(AbortSignal)),
+  );
 });
 
 it("waits for initial account activation before deciding access is locked", async () => {
@@ -943,3 +1040,22 @@ it("keeps editing after a background timeout and ignores its late denial", async
     vi.useRealTimers();
   }
 });
+
+vi.mock("@/doc/RitualSourceEditor", () => ({
+  default: ({
+    value,
+    onChange,
+    disabled,
+    label = "Ritual semantic source",
+    onCompositionChange,
+  }) =>
+    React.createElement("textarea", {
+      "aria-label": label,
+      value,
+      disabled,
+      onChange: (event) =>
+        onChange((event.target as HTMLTextAreaElement).value),
+      onCompositionStart: () => onCompositionChange?.(true),
+      onCompositionEnd: () => onCompositionChange?.(false),
+    }),
+}));

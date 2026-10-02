@@ -13,8 +13,14 @@ import {
 import { EditorContent, useEditor } from "@tiptap/react";
 import React from "react";
 import { retainsOnlineEditorIdentity } from "@/doc/onlineEditorIdentity";
+import RitualSourceEditor from "@/doc/RitualSourceEditor";
 import RitualVisualControls from "@/doc/RitualVisualControls";
-import { parseRitualText, printRitualText } from "@/doc/ritualText";
+import {
+  detectRitualSourceDialect,
+  parseRitualSource,
+  printRitualSource,
+  type RitualSourceDialect,
+} from "@/doc/ritualSource";
 import SemanticPublication from "@/doc/SemanticPublication";
 import {
   type RitualSemanticDocument,
@@ -47,6 +53,7 @@ type SaveRequest = Extract<SqlRitualWriteRequest, { kind: "save" }>;
 type Mode = "visual" | "source" | "split";
 interface SourceState {
   text: string;
+  dialect: RitualSourceDialect;
   dirty: boolean;
   conflict: boolean;
 }
@@ -67,11 +74,12 @@ function downloadDraft(draft: SemanticDraft) {
 
 export default function SemanticEditor(props: SemanticEditorProps) {
   const [document, setDocument] = React.useState(props.initialDocument);
-  const [source, setSource] = React.useState<SourceState>({
-    text: printRitualText(props.initialDocument),
+  const [source, setSource] = React.useState<SourceState>(() => ({
+    text: printRitualSource(props.initialDocument),
+    dialect: "pug",
     dirty: false,
     conflict: false,
-  });
+  }));
   const [title, setTitle] = React.useState(props.title);
   const [mode, setMode] = React.useState<Mode>("visual");
   const [base, setBase] = React.useState({
@@ -138,7 +146,12 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         setSource((current) =>
           current.dirty
             ? { ...current, conflict: true }
-            : { text: printRitualText(next), dirty: false, conflict: false },
+            : {
+                text: printRitualSource(next, current.dialect),
+                dialect: current.dialect,
+                dirty: false,
+                conflict: false,
+              },
         );
         setError(null);
       } catch (cause) {
@@ -179,7 +192,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         { emitUpdate: false },
       );
       setDocument({ format: "magickli-ritual", version: 1, nodes: [] });
-      setSource({ text: "", dirty: false, conflict: false });
+      setSource({ text: "", dialect: "pug", dirty: false, conflict: false });
       setTitle("");
       setPending(null);
       setReady(false);
@@ -328,6 +341,12 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           return;
         }
         try {
+          const draftDialect =
+            draft.sourceDialect ??
+            detectRitualSourceDialect(draft.sourceBuffer) ??
+            "ritual-text";
+          if (!draftDialect || !["pug", "ritual-text"].includes(draftDialect))
+            throw new Error("Unsupported draft source dialect");
           const parsed: unknown = JSON.parse(draft.documentJson);
           const errors = validateRitualSemantic(parsed);
           if (errors.length) throw new Error(errors[0]);
@@ -337,7 +356,8 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             !draft.sourceConflict &&
             draft.title === props.title &&
             draft.documentJson === stringify(props.initialDocument) &&
-            draft.sourceBuffer === printRitualText(props.initialDocument)
+            draft.sourceBuffer ===
+              printRitualSource(props.initialDocument, draftDialect)
           ) {
             await clearSemanticDraft(props.actorId, props.ritualId);
             return;
@@ -352,6 +372,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           setTitle(draft.title);
           setSource({
             text: draft.sourceBuffer,
+            dialect: draftDialect,
             dirty: draft.sourceDirty,
             conflict: draft.sourceConflict,
           });
@@ -418,6 +439,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       title,
       documentJson: stringify(document),
       sourceBuffer: source.text,
+      sourceDialect: source.dialect,
       sourceDirty: source.dirty,
       sourceConflict: source.conflict,
       pending,
@@ -435,6 +457,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         title,
         documentJson: stringify(document),
         sourceBuffer: source.text,
+        sourceDialect: source.dialect,
         sourceDirty: source.dirty,
         sourceConflict: source.conflict,
         pending,
@@ -468,6 +491,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     title,
     documentJson: stringify(document),
     sourceBuffer: source.text,
+    sourceDialect: source.dialect,
     sourceDirty: source.dirty,
     sourceConflict: source.conflict,
     pending,
@@ -485,7 +509,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     )
       return;
     try {
-      const next = parseRitualText(source.text);
+      const next = parseRitualSource(source.text, source.dialect);
       const visual = visualRitualState(next);
       editor.commands.setContent(visual.content, { emitUpdate: false });
       setVisualIssue(visual.issue);
@@ -499,7 +523,16 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         cause instanceof Error ? cause.message : "The source is invalid.",
       );
     }
-  }, [editor, pending, saving, stale, access, source.text, sourceComposing]);
+  }, [
+    editor,
+    pending,
+    saving,
+    stale,
+    access,
+    source.text,
+    source.dialect,
+    sourceComposing,
+  ]);
 
   React.useEffect(() => {
     if (!ready || !source.dirty || source.conflict) return;
@@ -815,29 +848,65 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           >
             <Typography variant="h6">Ritual source</Typography>
             <Typography variant="body2">
-              Each line is a ritual command or a quoted text fragment. Try{" "}
-              <code>Hiero: words</code>, <code>* Keryx action</code>, or{" "}
-              <code>@note:</code>. Valid edits update the visual panel as you
-              type.{" "}
+              {source.dialect === "pug"
+                ? "Pug uses indentation for blocks and #[…] for inline formatting."
+                : "Ritual Text uses command lines and quoted text fragments."}{" "}
+              Valid edits update the visual panel as you type.{" "}
               <Link
-                href="/help/ritual-text"
+                href={
+                  source.dialect === "pug"
+                    ? "/help/ritual-pug"
+                    : "/help/ritual-text"
+                }
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Read the Ritual Text guide (opens in a new tab)
+                Read the{" "}
+                {source.dialect === "pug" ? "Ritual Pug" : "Ritual Text"} guide
+                (opens in a new tab)
               </Link>
             </Typography>
-            <textarea
-              aria-label="Ritual semantic source"
-              spellCheck={false}
+            <ButtonGroup size="small" aria-label="Source syntax">
+              {(["pug", "ritual-text"] as const).map((dialect) => (
+                <Button
+                  key={dialect}
+                  variant={
+                    source.dialect === dialect ? "contained" : "outlined"
+                  }
+                  disabled={
+                    access !== "ready" ||
+                    source.dirty ||
+                    sourceComposing ||
+                    saving ||
+                    source.conflict ||
+                    !!pending ||
+                    !!stale
+                  }
+                  onClick={() => {
+                    skipPersist.current = false;
+                    setSource({
+                      text: printRitualSource(document, dialect),
+                      dialect,
+                      dirty: false,
+                      conflict: false,
+                    });
+                    setSourceError(null);
+                  }}
+                >
+                  {dialect === "pug" ? "Pug" : "Ritual Text"}
+                </Button>
+              ))}
+            </ButtonGroup>
+            <RitualSourceEditor
               value={source.text}
+              dialect={source.dialect}
               disabled={access !== "ready" || !!pending || !!stale}
-              onCompositionStart={() => setSourceComposing(true)}
-              onCompositionEnd={() => setSourceComposing(false)}
-              onChange={(event) => {
+              onCompositionChange={setSourceComposing}
+              onChange={(text) => {
                 skipPersist.current = false;
                 setSource({
-                  text: event.target.value,
+                  text,
+                  dialect: source.dialect,
                   dirty: true,
                   conflict: source.conflict,
                 });
@@ -869,7 +938,8 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                 onClick={() => {
                   setSourceError(null);
                   setSource({
-                    text: printRitualText(document),
+                    text: printRitualSource(document, source.dialect),
+                    dialect: source.dialect,
                     dirty: false,
                     conflict: false,
                   });

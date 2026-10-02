@@ -28,6 +28,11 @@ export default function RitualTextGuide() {
     <Container maxWidth="md" sx={{ py: 3 }}>
       <h1>Ritual Text guide</h1>
       <p>
+        This guide covers the earlier source syntax, still available for
+        existing drafts and source editing. New rituals use{" "}
+        <Link href="/help/ritual-pug">Ritual Pug</Link>.
+      </p>
+      <p>
         Ritual Text is Magickly’s custom source format for visual ritual
         editing. It describes speech, actions, rich text and ritual controls.
         The editor saves a structured ritual document and gives you this
@@ -35,15 +40,14 @@ export default function RitualTextGuide() {
         legacy workflows.
       </p>
       <p>
-        Choose <strong>Ritual text</strong> when creating a ritual. You can edit
-        visually or switch to source. In an existing ritual,{" "}
-        <strong>split</strong>
-        shows source on the left and the editable visual panel on the right.
-        Visual edits update source immediately; valid source edits update the
-        visual panel after a short typing pause. Incomplete syntax keeps the
-        last valid preview visible and pauses visual editing until corrected. If
-        both panels have changed, resolve the warning by applying or discarding
-        your source edits.
+        Choose <strong>Ritual Text</strong> in the source syntax selector of an
+        existing ritual. In <strong>split</strong> mode, the editor shows source
+        on the left and the editable visual panel on the right. Visual edits
+        update source immediately; valid source edits update the visual panel
+        after a short typing pause. Incomplete syntax keeps the last valid
+        preview visible and pauses visual editing until corrected. If both
+        panels have changed, resolve the warning by applying or discarding your
+        source edits.
       </p>
       <nav aria-label="Guide sections">
         <p>
@@ -56,7 +60,7 @@ export default function RitualTextGuide() {
       </nav>
       <h2 id="starter">Start here</h2>
       <p>
-        New rituals start with this editable example. Replace the words, rename
+        This editable example uses the earlier syntax. Replace the words, rename
         the sections, and delete anything you do not need. The separate Title
         field names the ritual in the list; <code>@title</code> is a heading
         inside its content.

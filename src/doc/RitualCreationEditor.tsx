@@ -1,12 +1,17 @@
 "use client";
 
 import Link from "@magick-components/Link";
-import { Alert, Box, Button, ButtonGroup, TextField } from "@mui/material";
+import { Alert, Box, Button, ButtonGroup } from "@mui/material";
 import { EditorContent, useEditor } from "@tiptap/react";
 import React from "react";
 import styles from "@/app/doc/[_id]/edit/semantic/SemanticEditor.module.css";
+import RitualSourceEditor from "./RitualSourceEditor";
 import RitualVisualControls from "./RitualVisualControls";
-import { parseRitualText, printRitualText } from "./ritualText";
+import {
+  detectRitualSourceDialect,
+  parseRitualSource,
+  printRitualSource,
+} from "./ritualSource";
 import {
   normalizeTiptapNodeIds,
   ritualTiptapExtensions,
@@ -16,11 +21,13 @@ import {
 
 const initialView = (source: string) => {
   try {
-    return visualRitualState(parseRitualText(source));
+    return visualRitualState(
+      parseRitualSource(source, detectRitualSourceDialect(source) ?? "pug"),
+    );
   } catch {
     return {
       content: { type: "doc", content: [{ type: "paragraph" }] },
-      issue: "Correct the ritual text before using visual editing.",
+      issue: "Correct the ritual source before using visual editing.",
     };
   }
 };
@@ -44,6 +51,7 @@ export default function RitualCreationEditor({
   const [initial] = React.useState(() => initialView(source));
   const [issue, setIssue] = React.useState(initial.issue);
   const [visualError, setVisualError] = React.useState<string | null>(null);
+  const [sourceComposing, setSourceComposing] = React.useState(false);
   const [mode, setMode] = React.useState(initialMode);
   const chooseMode = (next: "visual" | "source") => {
     setMode(next);
@@ -65,7 +73,10 @@ export default function RitualCreationEditor({
       if (!transaction.docChanged) return;
       try {
         if (normalizeTiptapNodeIds(changed)) return;
-        const next = printRitualText(semanticFromTiptap(changed.getJSON()));
+        const next = printRitualSource(
+          semanticFromTiptap(changed.getJSON()),
+          detectRitualSourceDialect(source) ?? "pug",
+        );
         lastEmission.current = next;
         onChange(next);
         setIssue(null);
@@ -80,7 +91,7 @@ export default function RitualCreationEditor({
     },
   });
   React.useEffect(() => {
-    if (!editor) return;
+    if (!editor || sourceComposing) return;
     if (source === lastEmission.current) {
       lastEmission.current = null;
       return;
@@ -92,12 +103,12 @@ export default function RitualCreationEditor({
     setVisualError(null);
     // Source-only shapes are still valid semantic documents.
     try {
-      parseRitualText(source);
+      parseRitualSource(source, detectRitualSourceDialect(source) ?? "pug");
       onValidityChange(true);
     } catch {
       onValidityChange(false);
     }
-  }, [editor, source, onValidityChange]);
+  }, [editor, source, sourceComposing, onValidityChange]);
   React.useEffect(() => {
     editor?.setEditable(!disabled && !issue, false);
   }, [editor, disabled, issue]);
@@ -118,23 +129,33 @@ export default function RitualCreationEditor({
           variant={mode === "source" || issue ? "contained" : "outlined"}
           onClick={() => chooseMode("source")}
         >
-          Ritual text
+          Ritual source
         </Button>
       </ButtonGroup>
-      <Link href="/help/ritual-text" target="_blank" rel="noopener noreferrer">
-        Ritual Text guide (opens in a new tab)
+      <Link
+        href={
+          detectRitualSourceDialect(source) === "ritual-text"
+            ? "/help/ritual-text"
+            : "/help/ritual-pug"
+        }
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {detectRitualSourceDialect(source) === "ritual-text"
+          ? "Ritual Text"
+          : "Ritual Pug"}{" "}
+        guide (opens in a new tab)
       </Link>
       {issue && <Alert severity="warning">{issue}</Alert>}
       {visualError && <Alert severity="error">{visualError}</Alert>}
       {mode === "source" || issue ? (
-        <TextField
-          label="Ritual text"
-          multiline
-          minRows={6}
-          fullWidth
+        <RitualSourceEditor
+          label="New ritual source"
           value={source}
+          dialect={detectRitualSourceDialect(source) ?? "pug"}
           disabled={disabled}
-          onChange={(event) => onChange(event.target.value)}
+          onCompositionChange={setSourceComposing}
+          onChange={onChange}
         />
       ) : editor ? (
         <section

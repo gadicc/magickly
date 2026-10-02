@@ -39,18 +39,20 @@ it("recovers when source is restored to its previous visual projection", async (
     );
   });
   const emitted = latest;
-  fireEvent.click(screen.getByRole("button", { name: "Ritual text" }));
-  fireEvent.change(screen.getByRole("textbox", { name: "Ritual text" }), {
+  fireEvent.click(screen.getByRole("button", { name: "Ritual source" }));
+  fireEvent.change(screen.getByRole("textbox", { name: "New ritual source" }), {
     target: { value: "broken" },
   });
   await screen.findByText(
-    "Correct the ritual text before using visual editing.",
+    "Correct the ritual source before using visual editing.",
   );
-  fireEvent.change(screen.getByRole("textbox", { name: "Ritual text" }), {
+  fireEvent.change(screen.getByRole("textbox", { name: "New ritual source" }), {
     target: { value: emitted },
   });
   expect(
-    screen.queryByText("Correct the ritual text before using visual editing."),
+    screen.queryByText(
+      "Correct the ritual source before using visual editing.",
+    ),
   ).toBeNull();
   expect(valid).toHaveBeenLastCalledWith(true);
   expect(
@@ -58,3 +60,22 @@ it("recovers when source is restored to its previous visual projection", async (
       .disabled,
   ).toBe(false);
 });
+
+vi.mock("@/doc/RitualSourceEditor", () => ({
+  default: ({
+    value,
+    onChange,
+    disabled,
+    label = "Ritual semantic source",
+    onCompositionChange,
+  }) =>
+    React.createElement("textarea", {
+      "aria-label": label,
+      value,
+      disabled,
+      onChange: (event) =>
+        onChange((event.target as HTMLTextAreaElement).value),
+      onCompositionStart: () => onCompositionChange?.(true),
+      onCompositionEnd: () => onCompositionChange?.(false),
+    }),
+}));

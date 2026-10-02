@@ -12,8 +12,12 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { retainsOnlineEditorIdentity } from "@/doc/onlineEditorIdentity";
-import { parseRitualText, printRitualText } from "@/doc/ritualText";
-import { pugRitualStarter, ritualTextStarter } from "@/doc/ritualTextExamples";
+import {
+  detectRitualSourceDialect,
+  parseRitualSource,
+  printRitualSource,
+} from "@/doc/ritualSource";
+import { pugRitualStarter, ritualPugStarter } from "@/doc/ritualTextExamples";
 import type { RitualSemanticDocument } from "@/doc/semantic";
 import {
   checkSqlRitualCreationOptions,
@@ -69,7 +73,7 @@ const emptyForm = (): FormState => ({
   scopeKey: "",
   minGrade: 0,
   source: pugRitualStarter,
-  semanticSource: ritualTextStarter,
+  semanticSource: ritualPugStarter,
   format: "semantic",
   editorMode: "visual",
 });
@@ -361,12 +365,12 @@ export default function SqlDocAdmin() {
                   : retained.scope.kind === "group"
                     ? `group:${retained.scope.groupId}`
                     : `temple:${retained.scope.templeId}`;
-              let semanticSource = "ritual 1\n";
+              let semanticSource = ritualPugStarter;
               if (retained.version === 3) {
                 const document = JSON.parse(
                   retained.source,
                 ) as RitualSemanticDocument;
-                semanticSource = printRitualText(document);
+                semanticSource = printRitualSource(document);
               }
               replaceForm({
                 title: retained.title,
@@ -470,14 +474,19 @@ export default function SqlDocAdmin() {
     let source = form.source;
     if (!pending && form.format === "semantic") {
       try {
-        source = JSON.stringify(parseRitualText(form.semanticSource));
+        source = JSON.stringify(
+          parseRitualSource(
+            form.semanticSource,
+            detectRitualSourceDialect(form.semanticSource) ?? "pug",
+          ),
+        );
         if (!composerValid) {
           setError("Correct the visual document before creating this ritual.");
           return;
         }
       } catch (cause) {
         setError(
-          cause instanceof Error ? cause.message : "Invalid ritual text.",
+          cause instanceof Error ? cause.message : "Invalid ritual source.",
         );
         return;
       }
@@ -666,8 +675,8 @@ export default function SqlDocAdmin() {
               }
               sx={{ minWidth: 180 }}
             >
-              <MenuItem value="pug">Pug source</MenuItem>
-              <MenuItem value="semantic">Ritual text</MenuItem>
+              <MenuItem value="pug">Legacy Pug source</MenuItem>
+              <MenuItem value="semantic">Visual / Ritual Pug</MenuItem>
             </TextField>
           }{" "}
           <TextField
