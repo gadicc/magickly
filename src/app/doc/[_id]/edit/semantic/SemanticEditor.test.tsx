@@ -36,6 +36,8 @@ const mock = vi.hoisted(() => ({
   owner: "",
   listeners: [] as Array<() => void>,
   refreshGate: null as Promise<void> | null,
+  revalidating: false,
+  refreshResult: true,
 }));
 vi.mock("@/doc/semanticDraft", () => ({
   loadSemanticDraft: mock.load,
@@ -66,8 +68,13 @@ vi.mock("@/offline/browserRuntime", () => ({
         get phase() {
           return mock.phase;
         },
+        get revalidating() {
+          return mock.revalidating;
+        },
         get account() {
-          return mock.phase === "ready" ? { ownerId: mock.owner } : null;
+          return mock.phase === "ready" || mock.revalidating
+            ? { ownerId: mock.owner, epoch: "same-epoch" }
+            : null;
         },
       },
     },
@@ -75,15 +82,18 @@ vi.mock("@/offline/browserRuntime", () => ({
     refreshVerifiedAccount: async () => {
       if (mock.refreshGate) await mock.refreshGate;
       if (mock.transientLockOnRefresh) {
+        mock.revalidating = true;
         mock.phase = "locked";
         for (const listener of mock.listeners) listener();
         mock.phase = "ready";
+        mock.revalidating = false;
         for (const listener of mock.listeners) listener();
       }
       if (mock.activateOnRefresh) {
         mock.phase = "ready";
         for (const listener of mock.listeners) listener();
       }
+      return mock.refreshResult;
     },
     subscribeState: (listener: () => void) => {
       mock.listeners.push(listener);
@@ -126,6 +136,8 @@ afterEach(() => {
   mock.permissionDenied = false;
   mock.listeners = [];
   mock.refreshGate = null;
+  mock.revalidating = false;
+  mock.refreshResult = true;
 });
 
 it("retains and saves a visual undo back to the confirmed document", async () => {
@@ -168,14 +180,13 @@ it("retains and saves a visual undo back to the confirmed document", async () =>
   expect(mock.send.mock.calls[1][0].source).not.toContain("WRONG");
 });
 
-it("conceals private content, dialogs and upload menu portals during verification", async () => {
+it("conceals private content and portals immediately on a hard lock", async () => {
   mock.load.mockResolvedValue(undefined);
   mock.saveDraft.mockResolvedValue(undefined);
   const setup = props();
   mock.owner = setup.actorId;
   render(<SemanticEditor {...setup} />);
   fireEvent.click(await screen.findByRole("button", { name: "Image" }));
-  const dialog = screen.getByRole("dialog", { name: "Insert image" });
   fireEvent.mouseDown(screen.getByRole("combobox", { name: "Ritual" }));
   await screen.findByRole("option", { name: setup.title });
   let verified!: () => void;
@@ -193,11 +204,8 @@ it("conceals private content, dialogs and upload menu portals during verificatio
     mock.phase = "ready";
     verified();
   });
-  const option = await screen.findByRole("option", { name: setup.title });
-  fireEvent.keyDown(option, { key: "Escape" });
-  expect(await screen.findByRole("dialog", { name: "Insert image" })).toBe(
-    dialog,
-  );
+  expect(screen.queryByRole("dialog", { name: "Insert image" })).toBeNull();
+  expect(screen.getByText(/Editor access changed/)).toBeTruthy();
 });
 
 it("clears a source parse error after discarding the invalid buffer", async () => {
@@ -213,7 +221,7 @@ it("clears a source parse error after discarding the invalid buffer", async () =
       target: { value: "broken" },
     },
   );
-  fireEvent.click(screen.getByRole("button", { name: "Apply source" }));
+  await screen.findByText(/Line 1: expected ritual 1/);
   fireEvent.click(
     screen.getByRole("button", { name: "Discard source changes" }),
   );
@@ -368,7 +376,6 @@ it("applies a compact source shortcut and saves semantic JSON through v3", async
       value: `${(source as HTMLTextAreaElement).value}* Keryx Opens the door\n`,
     },
   });
-  fireEvent.click(screen.getByRole("button", { name: "Apply source" }));
   await waitFor(() =>
     expect(
       (screen.getByRole("button", { name: "Save" }) as HTMLButtonElement)
@@ -651,4 +658,188 @@ it("reports a confirmed save when local draft cleanup fails", async () => {
   await screen.findByText("Saved as a semantic revision.");
   expect(screen.getByText(/local draft could not be cleared/i)).toBeTruthy();
   expect(mock.send).toHaveBeenCalledTimes(1);
+});
+
+it("updates the visual panel automatically without rewriting typed source or its selection", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "split" }));
+  const source = screen.getByRole("textbox", {
+    name: "Ritual semantic source",
+  }) as HTMLTextAreaElement;
+  const visual = screen.getByRole("textbox", { name: "Ritual visual editor" });
+  const text = source.value.replace("Welcome.", "Welcome to the temple.");
+  fireEvent.change(source, { target: { value: text } });
+  source.setSelectionRange(12, 15);
+  source.scrollTop = 200;
+  expect(visual.getAttribute("contenteditable")).toBe("false");
+  await waitFor(() =>
+    expect(visual.textContent).toContain("Welcome to the temple."),
+  );
+  expect(source.value).toBe(text);
+  expect(source.selectionStart).toBe(12);
+  expect(source.selectionEnd).toBe(15);
+  expect(source.scrollTop).toBe(200);
+  expect(visual.getAttribute("contenteditable")).toBe("true");
+  expect(
+    (screen.getByRole("button", { name: "Save" }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(false);
+});
+
+it("keeps the last valid visual document while source is incomplete and catches up when repaired", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "split" }));
+  const source = screen.getByRole("textbox", {
+    name: "Ritual semantic source",
+  }) as HTMLTextAreaElement;
+  const visual = screen.getByRole("textbox", { name: "Ritual visual editor" });
+  const valid = source.value;
+  fireEvent.change(source, { target: { value: 'ritual 1\n@note {"' } });
+  await screen.findByText(/last valid source/);
+  expect(visual.textContent).toContain("Welcome.");
+  expect(visual.getAttribute("contenteditable")).toBe("false");
+  expect(
+    (screen.getByRole("button", { name: "Save" }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(true);
+  fireEvent.change(source, {
+    target: { value: valid.replace("Welcome.", "Repaired.") },
+  });
+  await waitFor(() => expect(visual.textContent).toContain("Repaired."));
+  expect(screen.queryByText(/last valid source/)).toBeNull();
+});
+
+it("waits for source IME composition to finish before updating the visual panel", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "split" }));
+  const source = screen.getByRole("textbox", {
+    name: "Ritual semantic source",
+  }) as HTMLTextAreaElement;
+  const visual = screen.getByRole("textbox", { name: "Ritual visual editor" });
+  fireEvent.compositionStart(source);
+  fireEvent.change(source, {
+    target: { value: source.value.replace("Welcome.", "שלום") },
+  });
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  });
+  expect(visual.textContent).toContain("Welcome.");
+  fireEvent.compositionEnd(source);
+  await waitFor(() => expect(visual.textContent).toContain("שלום"));
+});
+
+it("retains a visible read-only split through routine revalidation and conceals on a hard lock", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "split" }));
+  const source = screen.getByRole("textbox", {
+    name: "Ritual semantic source",
+  });
+  let release!: () => void;
+  mock.refreshGate = new Promise((resolve) => {
+    release = resolve;
+  });
+  act(() => {
+    mock.revalidating = true;
+    mock.phase = "locked";
+    for (const listener of mock.listeners) listener();
+  });
+  expect(screen.getByRole("textbox", { name: "Ritual semantic source" })).toBe(
+    source,
+  );
+  expect((source as HTMLTextAreaElement).disabled).toBe(true);
+  expect(
+    getComputedStyle(source.parentElement!.parentElement!).visibility,
+  ).not.toBe("hidden");
+  expect(
+    (screen.getByRole("button", { name: "Save" }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(true);
+  act(() => {
+    mock.revalidating = false;
+    for (const listener of mock.listeners) listener();
+  });
+  expect(
+    screen.queryByRole("textbox", { name: "Ritual semantic source" }),
+  ).toBeNull();
+  await act(async () => {
+    mock.phase = "ready";
+    release();
+  });
+  expect(
+    screen.queryByRole("textbox", { name: "Ritual semantic source" }),
+  ).toBeNull();
+});
+
+it("uses fresh source authorization when session refresh reports an overlapping generation change", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  mock.refreshResult = false;
+  render(<SemanticEditor {...setup} />);
+  const save = (await screen.findByRole("button", {
+    name: "Save",
+  })) as HTMLButtonElement;
+  expect(save.disabled).toBe(false);
+  await act(async () => {
+    fireEvent.focus(window);
+  });
+  expect(screen.getByRole("button", { name: "Save" })).toBe(save);
+  expect(save.disabled).toBe(false);
+  mock.permissionDenied = true;
+  await act(async () => {
+    fireEvent.focus(window);
+  });
+  await screen.findByText(/Editor access changed/);
+});
+
+it("pauses stale draft recovery mutations and exports while permission is revalidated", async () => {
+  const setup = props();
+  mock.owner = setup.actorId;
+  mock.load.mockResolvedValue({
+    ownerId: setup.actorId,
+    ritualId: setup.ritualId,
+    baseRevisionId: createUuidV7(),
+    baseVersion: 6,
+    title: setup.title,
+    documentJson: JSON.stringify(setup.initialDocument),
+    sourceBuffer: printRitualText(setup.initialDocument),
+    sourceDirty: false,
+    sourceConflict: false,
+    pending: null,
+    updatedAt: Date.now(),
+  });
+  render(<SemanticEditor {...setup} />);
+  const discard = (await screen.findByRole("button", {
+    name: "Discard local draft",
+  })) as HTMLButtonElement;
+  let release!: () => void;
+  mock.refreshGate = new Promise((resolve) => {
+    release = resolve;
+  });
+  act(() => {
+    fireEvent.focus(window);
+  });
+  expect(discard.disabled).toBe(true);
+  for (const download of screen.getAllByRole("button", {
+    name: "Download draft",
+  }))
+    expect((download as HTMLButtonElement).disabled).toBe(true);
+  fireEvent.click(discard);
+  expect(mock.clear).not.toHaveBeenCalled();
+  await act(async () => {
+    release();
+  });
+  expect(discard.disabled).toBe(false);
 });

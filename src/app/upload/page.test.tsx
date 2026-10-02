@@ -441,3 +441,25 @@ describe("private ritual image upload", () => {
     ).toBe(false);
   });
 });
+
+it("pauses file selection and rejects a submitted upload during parent revalidation", () => {
+  const fetcher = vi.fn();
+  vi.stubGlobal("fetch", fetcher);
+  const rituals = [{ id: ritualId, title: "Synthetic upload ritual" }];
+  const view = render(<Upload expectedActorId={actorId} rituals={rituals} />);
+  const file = screen.getByLabelText("Image file") as HTMLInputElement;
+  fireEvent.change(file, { target: { files: [image()] } });
+  view.rerender(
+    <Upload expectedActorId={actorId} rituals={rituals} disabled />,
+  );
+  expect(file.disabled).toBe(true);
+  expect(
+    (
+      screen.getByRole("button", {
+        name: "Upload and attach",
+      }) as HTMLButtonElement
+    ).disabled,
+  ).toBe(true);
+  fireEvent.submit(file.closest("form")!);
+  expect(fetcher).not.toHaveBeenCalled();
+});

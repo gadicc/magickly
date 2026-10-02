@@ -129,6 +129,7 @@ export default function SqlDocAdmin() {
     editorMode: FormState["editorMode"];
   } | null>(null);
   const [reservedHeight, setReservedHeight] = React.useState(0);
+  const [revalidating, setRevalidating] = React.useState(false);
 
   const replaceForm = React.useCallback((next: FormState) => {
     formRef.current = next;
@@ -167,8 +168,16 @@ export default function SqlDocAdmin() {
     let lastStateKey = "";
     let loadGeneration = 0;
     let unsubscribe = () => {};
+    let displayIdentity: CreationIdentity | null = null;
+    let retainingPresentation = false;
+    let retentionTimeout: number | null = null;
 
     const lock = (message: string | null = null) => {
+      retainingPresentation = false;
+      displayIdentity = null;
+      setRevalidating(false);
+      if (retentionTimeout !== null) window.clearTimeout(retentionTimeout);
+      retentionTimeout = null;
       const identity = identityRef.current;
       // Remove private form content while checking access, but keep its space
       // so the browser cannot clamp the ritual-list scroll to a shorter page.
@@ -214,6 +223,39 @@ export default function SqlDocAdmin() {
       unsubscribe = runtime.subscribeState((state) => {
         if (disposed) return;
         if (state.phase !== "ready" || !state.account) {
+          if (
+            state.revalidating &&
+            displayIdentity &&
+            state.account &&
+            displayIdentity.ownerId === state.account.ownerId &&
+            displayIdentity.epoch === state.account.epoch
+          ) {
+            retainingPresentation = true;
+            setRevalidating(true);
+            if (
+              retentionTimeout === null &&
+              document.visibilityState !== "hidden"
+            )
+              retentionTimeout = window.setTimeout(() => {
+                if (!disposed)
+                  lock(
+                    "Ritual creation is unavailable. Reconnect and try again.",
+                  );
+              }, 10_000);
+            if (!pendingRef.current)
+              preservedFormRef.current = {
+                ownerId: displayIdentity.ownerId,
+                form: { ...formRef.current },
+              };
+            loadGeneration++;
+            lastStateKey = "";
+            optionsRequestRef.current?.abort();
+            writeRequestRef.current?.abort();
+            identityRef.current = null;
+            busyRef.current = false;
+            setBusy(false);
+            return;
+          }
           lock();
           const presentation = presentationRef.current;
           if (
@@ -229,7 +271,11 @@ export default function SqlDocAdmin() {
         }
         const stateKey = `${state.generation}:${state.account.ownerId}:${state.account.epoch}`;
         if (stateKey === lastStateKey) return;
-        lock();
+        const continuing =
+          retainingPresentation &&
+          displayIdentity?.ownerId === state.account.ownerId &&
+          displayIdentity.epoch === state.account.epoch;
+        if (!continuing) lock();
         lastStateKey = stateKey;
         const load = ++loadGeneration;
         const expected: CreationIdentity = {
@@ -249,100 +295,134 @@ export default function SqlDocAdmin() {
         const controller = new AbortController();
         optionsRequestRef.current = controller;
         void (async () => {
-          const next = await fetchSqlRitualCreationOptions(controller.signal);
-          if (disposed || controller.signal.aborted || load !== loadGeneration)
-            return;
-          const current = runtime.coordinator.state;
-          if (
-            current.phase !== "ready" ||
-            current.generation !== expected.generation ||
-            current.account?.ownerId !== expected.ownerId ||
-            current.account.epoch !== expected.epoch
-          ) {
-            lock(
-              "Ritual creation access changed. Reconnect with the authorized account.",
-            );
-            return;
-          }
-          setLoaded(true);
-          if (!next) {
-            presentationRef.current = null;
-            setReservedHeight(0);
-            setError(
-              "Ritual creation is unavailable. Reconnect and try again.",
-            );
-            return;
-          }
-          if (next.ownerId !== expected.ownerId) {
-            lock(
-              "Ritual creation access changed. Reconnect with the authorized account.",
-            );
-            return;
-          }
-          identityRef.current = expected;
-          if (!next.public && !next.groups.length && !next.temples.length) {
-            presentationRef.current = null;
-            setReservedHeight(0);
-          }
-          setOptions(next);
-          let serialized: string | null = null;
+          const timeout = window.setTimeout(() => {
+            if (!disposed && load === loadGeneration)
+              lock("Ritual creation is unavailable. Reconnect and try again.");
+          }, 5_000);
           try {
-            serialized = localStorage.getItem(storageKey(next.ownerId));
-            if (!serialized) {
-              const preserved = preservedFormRef.current;
-              if (preserved?.ownerId === next.ownerId) {
-                preservedFormRef.current = null;
-                if (!scopeStillAuthorized(next, preserved.form.scopeKey)) {
-                  presentationRef.current = null;
-                  setReservedHeight(0);
+            const next = await fetchSqlRitualCreationOptions(controller.signal);
+            if (
+              disposed ||
+              controller.signal.aborted ||
+              load !== loadGeneration
+            )
+              return;
+            const current = runtime.coordinator.state;
+            if (
+              current.phase !== "ready" ||
+              current.generation !== expected.generation ||
+              current.account?.ownerId !== expected.ownerId ||
+              current.account.epoch !== expected.epoch
+            ) {
+              lock(
+                "Ritual creation access changed. Reconnect with the authorized account.",
+              );
+              return;
+            }
+            setLoaded(true);
+            if (!next) {
+              lock("Ritual creation is unavailable. Reconnect and try again.");
+              return;
+            }
+            if (next.ownerId !== expected.ownerId) {
+              lock(
+                "Ritual creation access changed. Reconnect with the authorized account.",
+              );
+              return;
+            }
+            identityRef.current = expected;
+            displayIdentity = expected;
+            retainingPresentation = false;
+            setRevalidating(false);
+            if (retentionTimeout !== null)
+              window.clearTimeout(retentionTimeout);
+            retentionTimeout = null;
+            if (!next.public && !next.groups.length && !next.temples.length) {
+              presentationRef.current = null;
+              setReservedHeight(0);
+            }
+            setOptions(next);
+            if (continuing) {
+              preservedFormRef.current = null;
+              if (!scopeStillAuthorized(next, formRef.current.scopeKey)) {
+                if (pendingRef.current) {
+                  setBlockedRecovery(JSON.stringify(pendingRef.current));
+                } else {
+                  replaceForm(emptyForm());
                 }
-                replaceForm(
-                  scopeStillAuthorized(next, preserved.form.scopeKey)
-                    ? { ...preserved.form }
-                    : emptyForm(),
+                setError(
+                  pendingRef.current
+                    ? "The pending request's visibility is no longer authorized. Download the retained request; retry when access is restored."
+                    : "The selected visibility is no longer authorized. Choose an available visibility.",
                 );
+              } else if (pendingRef.current) {
+                setBlockedRecovery(null);
               }
               return;
             }
-            const retained = parseSqlRitualCreateRequest(
-              JSON.parse(serialized),
-              next.ownerId,
-            );
-            if (!retained || JSON.stringify(retained) !== serialized)
-              throw new Error("invalid retained request");
-            const key =
-              retained.scope.kind === "public"
-                ? "public"
-                : retained.scope.kind === "group"
-                  ? `group:${retained.scope.groupId}`
-                  : `temple:${retained.scope.templeId}`;
-            let semanticSource = "ritual 1\n";
-            if (retained.version === 3) {
-              const document = JSON.parse(
-                retained.source,
-              ) as RitualSemanticDocument;
-              semanticSource = printRitualText(document);
+            let serialized: string | null = null;
+            try {
+              serialized = localStorage.getItem(storageKey(next.ownerId));
+              if (!serialized) {
+                const preserved = preservedFormRef.current;
+                if (preserved?.ownerId === next.ownerId) {
+                  preservedFormRef.current = null;
+                  if (!scopeStillAuthorized(next, preserved.form.scopeKey)) {
+                    presentationRef.current = null;
+                    setReservedHeight(0);
+                  }
+                  replaceForm(
+                    scopeStillAuthorized(next, preserved.form.scopeKey)
+                      ? { ...preserved.form }
+                      : emptyForm(),
+                  );
+                }
+                return;
+              }
+              const retained = parseSqlRitualCreateRequest(
+                JSON.parse(serialized),
+                next.ownerId,
+              );
+              if (!retained || JSON.stringify(retained) !== serialized)
+                throw new Error("invalid retained request");
+              const key =
+                retained.scope.kind === "public"
+                  ? "public"
+                  : retained.scope.kind === "group"
+                    ? `group:${retained.scope.groupId}`
+                    : `temple:${retained.scope.templeId}`;
+              let semanticSource = "ritual 1\n";
+              if (retained.version === 3) {
+                const document = JSON.parse(
+                  retained.source,
+                ) as RitualSemanticDocument;
+                semanticSource = printRitualText(document);
+              }
+              replaceForm({
+                title: retained.title,
+                scopeKey: key,
+                minGrade:
+                  retained.scope.kind === "temple"
+                    ? retained.scope.minGrade
+                    : 0,
+                source: retained.version === 2 ? retained.source : "",
+                semanticSource,
+                format: retained.version === 3 ? "semantic" : "pug",
+                editorMode:
+                  presentationRef.current?.ownerId === next.ownerId &&
+                  presentationRef.current.epoch === expected.epoch
+                    ? presentationRef.current.editorMode
+                    : "visual",
+              });
+              replacePending(retained);
+            } catch {
+              setBlockedRecovery(serialized ?? "unreadable");
+              setError(
+                "The retained creation request is unavailable. Preserve browser recovery before clearing it.",
+              );
             }
-            replaceForm({
-              title: retained.title,
-              scopeKey: key,
-              minGrade:
-                retained.scope.kind === "temple" ? retained.scope.minGrade : 0,
-              source: retained.version === 2 ? retained.source : "",
-              semanticSource,
-              format: retained.version === 3 ? "semantic" : "pug",
-              editorMode:
-                presentationRef.current?.ownerId === next.ownerId &&
-                presentationRef.current.epoch === expected.epoch
-                  ? presentationRef.current.editorMode
-                  : "visual",
-            });
-            replacePending(retained);
-          } catch {
-            setBlockedRecovery(serialized ?? "unreadable");
-            setError(
-              "The retained creation request is unavailable. Preserve browser recovery before clearing it.",
-            );
+          } finally {
+            window.clearTimeout(timeout);
           }
         })();
       });
@@ -355,6 +435,7 @@ export default function SqlDocAdmin() {
     }
     return () => {
       disposed = true;
+      if (retentionTimeout !== null) window.clearTimeout(retentionTimeout);
       unsubscribe();
       optionsRequestRef.current?.abort();
       writeRequestRef.current?.abort();
@@ -523,14 +604,17 @@ export default function SqlDocAdmin() {
       return;
     }
     replacePending(null);
+    setBlockedRecovery(null);
     setTerminal(false);
     setError(null);
   };
 
   const downloadBlockedRecovery = () => {
+    const retained =
+      blockedRecovery ?? (pending ? JSON.stringify(pending) : null);
     const identity = identityRef.current;
     if (
-      !blockedRecovery ||
+      !retained ||
       !options ||
       !identity ||
       options.ownerId !== identity.ownerId ||
@@ -538,7 +622,7 @@ export default function SqlDocAdmin() {
     )
       return;
     const url = URL.createObjectURL(
-      new Blob([blockedRecovery], { type: "application/json" }),
+      new Blob([retained], { type: "application/json" }),
     );
     const link = document.createElement("a");
     link.href = url;
@@ -566,12 +650,21 @@ export default function SqlDocAdmin() {
       </Alert>
     ) : null;
   if (!options.public && !options.groups.length && !options.temples.length)
-    return null;
+    return pending || blockedRecovery ? (
+      <Alert severity="warning" sx={{ my: 2 }}>
+        No creation visibility is currently authorized. Download the retained
+        request for recovery; retry when access is restored.
+        <Button disabled={revalidating} onClick={downloadBlockedRecovery}>
+          Download retained request
+        </Button>
+      </Alert>
+    ) : null;
 
   return (
     <Box
       ref={rootRef}
       aria-label="Ritual creation area"
+      aria-busy={revalidating}
       sx={{ my: 2, minHeight: reservedHeight }}
     >
       <div ref={contentRef}>
@@ -584,7 +677,7 @@ export default function SqlDocAdmin() {
           </Alert>
         )}
         {blockedRecovery && (
-          <Button onClick={downloadBlockedRecovery}>
+          <Button disabled={revalidating} onClick={downloadBlockedRecovery}>
             Download retained request
           </Button>
         )}
@@ -595,7 +688,7 @@ export default function SqlDocAdmin() {
               label="Source format"
               size="small"
               value={form.format}
-              disabled={busy || !!pending || !!blockedRecovery}
+              disabled={revalidating || busy || !!pending || !!blockedRecovery}
               onChange={(event) =>
                 updateForm((current) => ({
                   ...current,
@@ -612,7 +705,7 @@ export default function SqlDocAdmin() {
             label="Title"
             size="small"
             value={form.title}
-            disabled={busy || !!pending || !!blockedRecovery}
+            disabled={revalidating || busy || !!pending || !!blockedRecovery}
             onChange={(event) =>
               updateForm((current) => ({
                 ...current,
@@ -625,7 +718,7 @@ export default function SqlDocAdmin() {
             label="Visibility"
             size="small"
             value={form.scopeKey}
-            disabled={busy || !!pending || !!blockedRecovery}
+            disabled={revalidating || busy || !!pending || !!blockedRecovery}
             onChange={(event) =>
               updateForm((current) => ({
                 ...current,
@@ -653,7 +746,7 @@ export default function SqlDocAdmin() {
               size="small"
               type="number"
               value={form.minGrade}
-              disabled={busy || !!pending || !!blockedRecovery}
+              disabled={revalidating || busy || !!pending || !!blockedRecovery}
               onChange={(event) =>
                 updateForm((current) => ({
                   ...current,
@@ -675,7 +768,7 @@ export default function SqlDocAdmin() {
               onModeChange={(editorMode) =>
                 updateForm((current) => ({ ...current, editorMode }))
               }
-              disabled={busy || !!pending || !!blockedRecovery}
+              disabled={revalidating || busy || !!pending || !!blockedRecovery}
             />
           ) : (
             <TextField
@@ -684,7 +777,7 @@ export default function SqlDocAdmin() {
               minRows={4}
               fullWidth
               value={form.source}
-              disabled={busy || !!pending || !!blockedRecovery}
+              disabled={revalidating || busy || !!pending || !!blockedRecovery}
               onChange={(event) =>
                 updateForm((current) => ({
                   ...current,
@@ -697,13 +790,17 @@ export default function SqlDocAdmin() {
           <Button
             type="submit"
             disabled={
-              busy || !!blockedRecovery || !form.title.trim() || !form.scopeKey
+              revalidating ||
+              busy ||
+              !!blockedRecovery ||
+              !form.title.trim() ||
+              !form.scopeKey
             }
           >
             {pending ? "Retry creation" : "Create"}
           </Button>
           {pending && terminal && (
-            <Button onClick={startNew} disabled={busy}>
+            <Button onClick={startNew} disabled={revalidating || busy}>
               Edit and start a new request
             </Button>
           )}

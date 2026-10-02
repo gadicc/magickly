@@ -106,7 +106,7 @@ export default function RitualCreationEditor({
       <ButtonGroup size="small" aria-label="New ritual editor layout">
         <Button
           type="button"
-          disabled={!!issue}
+          disabled={disabled || !!issue}
           variant={mode === "visual" && !issue ? "contained" : "outlined"}
           onClick={() => chooseMode("visual")}
         >
@@ -114,6 +114,7 @@ export default function RitualCreationEditor({
         </Button>
         <Button
           type="button"
+          disabled={disabled}
           variant={mode === "source" || issue ? "contained" : "outlined"}
           onClick={() => chooseMode("source")}
         >

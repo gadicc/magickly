@@ -854,6 +854,7 @@ export default function RitualVisualControls({
           {actorId && ritualId && (
             <Upload
               concealed={concealed}
+              disabled={disabled}
               expectedActorId={actorId}
               rituals={[{ id: ritualId, title: title ?? "Current ritual" }]}
               onResult={(receipt) => {

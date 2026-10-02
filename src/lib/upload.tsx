@@ -286,12 +286,15 @@ export default function Upload({
   rituals,
   onResult,
   concealed = false,
+  disabled = false,
 }: {
   expectedActorId: string;
   rituals: EditableRitualOption[];
   onResult?: (result: RitualUploadReceipt) => void;
   /** Hide nested menu portals while their parent verifies account access. */
   concealed?: boolean;
+  /** Pause new file operations while an existing parent view revalidates. */
+  disabled?: boolean;
 }) {
   const [ritualId, setRitualId] = React.useState(rituals[0]?.id ?? "");
   const [file, setFile] = React.useState<File | null>(null);
@@ -309,7 +312,7 @@ export default function Upload({
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (inFlight.current || !file || !ritualId) return;
+    if (disabled || concealed || inFlight.current || !file || !ritualId) return;
     inFlight.current = true;
     const key = `${ritualId}\0${file.name}\0${file.size}\0${file.type}\0${file.lastModified}`;
     const current =
@@ -340,9 +343,9 @@ export default function Upload({
           labelId="ritual-upload-label"
           label="Ritual"
           value={ritualId}
-          disabled={isUploading}
+          disabled={disabled || isUploading}
           onChange={(event) => {
-            if (inFlight.current) return;
+            if (disabled || inFlight.current) return;
             setRitualId(event.target.value);
             setAttempt(null);
             setResult(null);
@@ -360,15 +363,19 @@ export default function Upload({
         type="file"
         accept={RITUAL_IMAGE_TYPES.join(",")}
         required
-        disabled={isUploading}
+        disabled={disabled || isUploading}
         onChange={(event) => {
-          if (inFlight.current) return;
+          if (disabled || inFlight.current) return;
           setFile(event.target.files?.[0] ?? null);
           setAttempt(null);
           setResult(null);
         }}
       />
-      <Button type="submit" variant="contained" disabled={isUploading || !file}>
+      <Button
+        type="submit"
+        variant="contained"
+        disabled={disabled || isUploading || !file}
+      >
         {isUploading
           ? "Uploading…"
           : result && !result.ok && result.retryable

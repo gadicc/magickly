@@ -138,6 +138,40 @@ The operator approved implementation after the [editor decision](037-ritual-edit
   build preserved the running development server. Astra xhigh adversarial
   review found no remaining actionable findings after targeted fixes.
 
+### Routine revalidation and live source (2 October)
+
+- The operator chose to retain previously authorized content visibly but
+  read-only during routine revalidation. Creation and semantic editors now keep
+  their mounted presentation through same-owner/epoch visibility, focus and
+  account verification. This supersedes immediate concealment for those routine
+  transitions only. Sign-out, changed identity/epoch, explicit hard locks,
+  denied authorization and failed/timed-out checks conceal the content.
+- The coordinator's `revalidating` field is a presentation hint, never an
+  operation grant. Existing protected reads and offline views retain their
+  guards. Revalidating an identical persisted account no longer broadcasts a
+  false authority change to other tabs. Recovery exports/mutations and new
+  uploads pause along with authoring operations; pending requests stay immutable.
+- Unsubmitted creation drafts survive failed checks in owner-bound memory.
+  Revoked-scope pending requests remain downloadable and can resume their exact
+  retry when scope returns. Visible retention has a bounded verification timeout.
+- Valid semantic source edits apply after a 200ms typing pause without rewriting
+  the typed buffer, selection or scroll. Incomplete syntax leaves the last valid
+  visual document visible and disables visual editing/save; IME composition
+  waits for completion. Recovered two-panel conflicts still require resolution.
+- Read-only measurement of the five supplied private backup rituals found
+  183,349 original Pug bytes versus 298,115 generated Ritual Text bytes. Removing
+  ID suffixes for measurement alone gives 235,770 bytes. Individual size ratios
+  are 1.47–1.83 with IDs, or 1.22–1.40 without. The comparison includes compiled
+  legacy shapes and opaque payloads, so it is not a benchmark of newly authored
+  compact shortcuts. No source content or ritual names were exported to logs.
+- Verification passed 79 affected suites and 1,793 tests (14 skipped), TypeScript,
+  Loom production validation, and the 387-page production build in the detached
+  worktree. Final Astra xhigh review found no actionable residual defect after
+  concurrency and recovery fixes. A fresh browser smoke attempt was blocked by
+  the running local server's `SQL_AUTH_ERROR` before the editor loaded; the two
+  synthetic SQL rituals and their temple were removed afterward. This pass has
+  not verified a physical OS window switch or mobile keyboard behavior.
+
 ## Follow-up scope
 
 - Full offline authoring needs a versioned semantic source envelope, repository storage tagged with its format, lifecycle recovery and a draft adapter. Fresh permission checks remain required; weakening them would bypass existing lease/account protections. Reader offline bundles remain supported.

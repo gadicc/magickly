@@ -33,6 +33,7 @@ const mock = vi.hoisted(() => ({
 let runtimeState = {
   phase: "ready" as "ready" | "locked",
   generation: 1,
+  revalidating: false,
   account: { ownerId: ids.actor, epoch: ids.epoch } as {
     ownerId: string;
     epoch: string;
@@ -89,6 +90,7 @@ beforeEach(() => {
   runtimeState = {
     phase: "ready",
     generation: 1,
+    revalidating: false,
     account: { ownerId: ids.actor, epoch: ids.epoch },
     cleanupPending: false,
     recovery: { pending: 0, saving: 0, failed: 0 },
@@ -626,4 +628,211 @@ it("ignores an old create acknowledgement after an account switch", async () => 
   ).toBeNull();
   expect(localStorage.getItem(key)).not.toBeNull();
   expect(screen.queryByLabelText("Ritual source")).toBeNull();
+});
+
+it("keeps the creation composer visible read-only during routine checks and resumes the same DOM", async () => {
+  await fill();
+  const source = screen.getByLabelText("Ritual source") as HTMLTextAreaElement;
+  let release!: (value: unknown) => void;
+  mock.options.mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        release = resolve;
+      }),
+  );
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "locked",
+      generation: 2,
+      revalidating: true,
+    }),
+  );
+  expect(screen.getByLabelText("Ritual source")).toBe(source);
+  expect(source.value).toBe("p Exact source");
+  expect(source.disabled).toBe(true);
+  expect(
+    (screen.getByRole("button", { name: "Create" }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(true);
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "ready",
+      generation: 3,
+      revalidating: false,
+    }),
+  );
+  expect(source.disabled).toBe(true);
+  await act(async () => {
+    release(options);
+  });
+  expect(screen.getByLabelText("Ritual source")).toBe(source);
+  expect(source.disabled).toBe(false);
+  expect((screen.getByLabelText("Title") as HTMLInputElement).value).toBe(
+    "New ritual",
+  );
+});
+
+it("preserves a concealed unsubmitted draft after a routine options check fails", async () => {
+  await fill();
+  mock.options.mockResolvedValueOnce(null);
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "locked",
+      generation: 2,
+      revalidating: true,
+    }),
+  );
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "ready",
+      generation: 3,
+      revalidating: false,
+    }),
+  );
+  await screen.findByText(/creation is unavailable/);
+  expect(screen.queryByDisplayValue("p Exact source")).toBeNull();
+  act(() => emitState({ ...runtimeState, phase: "ready", generation: 4 }));
+  expect(
+    ((await screen.findByLabelText("Ritual source")) as HTMLTextAreaElement)
+      .value,
+  ).toBe("p Exact source");
+});
+
+it("keeps a revoked-scope pending request downloadable and retries it exactly after scope returns", async () => {
+  await fill();
+  mock.write.mockResolvedValue(null);
+  fireEvent.click(screen.getByRole("button", { name: "Create" }));
+  await screen.findByRole("button", { name: "Retry creation" });
+  const request = localStorage.getItem(key);
+  mock.options.mockResolvedValueOnce({ ...options, public: true, temples: [] });
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "locked",
+      generation: 2,
+      revalidating: true,
+    }),
+  );
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "ready",
+      generation: 3,
+      revalidating: false,
+    }),
+  );
+  await screen.findByText(
+    /pending request's visibility is no longer authorized/,
+  );
+  expect(
+    screen.getByRole("button", { name: "Download retained request" }),
+  ).toBeTruthy();
+  expect(
+    (
+      screen.getByRole("button", {
+        name: "Retry creation",
+      }) as HTMLButtonElement
+    ).disabled,
+  ).toBe(true);
+  expect(localStorage.getItem(key)).toBe(request);
+  expect((screen.getByLabelText("Title") as HTMLInputElement).value).toBe(
+    "New ritual",
+  );
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "locked",
+      generation: 4,
+      revalidating: true,
+    }),
+  );
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "ready",
+      generation: 5,
+      revalidating: false,
+    }),
+  );
+  await waitFor(() =>
+    expect(
+      (
+        screen.getByRole("button", {
+          name: "Retry creation",
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(false),
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Retry creation" }));
+  await waitFor(() => expect(mock.write).toHaveBeenCalledTimes(2));
+  expect(mock.write.mock.calls[1][0]).toEqual(mock.write.mock.calls[0][0]);
+});
+
+it("conceals a retained creation when coordinator verification stalls and recovers the draft later", async () => {
+  await fill();
+  vi.useFakeTimers();
+  try {
+    act(() =>
+      emitState({
+        ...runtimeState,
+        phase: "locked",
+        generation: 2,
+        revalidating: true,
+      }),
+    );
+    expect(screen.getByLabelText("Ritual source")).toBeTruthy();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10_000);
+    });
+    expect(screen.queryByDisplayValue("p Exact source")).toBeNull();
+    expect(screen.getByText(/creation is unavailable/)).toBeTruthy();
+  } finally {
+    vi.useRealTimers();
+  }
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "ready",
+      generation: 3,
+      revalidating: false,
+    }),
+  );
+  expect(
+    ((await screen.findByLabelText("Ritual source")) as HTMLTextAreaElement)
+      .value,
+  ).toBe("p Exact source");
+});
+
+it("allows recovery of an exact pending request when every creation grant is removed", async () => {
+  await fill();
+  mock.write.mockResolvedValue(null);
+  fireEvent.click(screen.getByRole("button", { name: "Create" }));
+  await screen.findByRole("button", { name: "Retry creation" });
+  const request = localStorage.getItem(key);
+  mock.options.mockResolvedValueOnce({ ...options, temples: [] });
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "locked",
+      generation: 2,
+      revalidating: true,
+    }),
+  );
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "ready",
+      generation: 3,
+      revalidating: false,
+    }),
+  );
+  await screen.findByText(/No creation visibility is currently authorized/);
+  expect(
+    screen.getByRole("button", { name: "Download retained request" }),
+  ).toBeTruthy();
+  expect(localStorage.getItem(key)).toBe(request);
 });

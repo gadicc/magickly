@@ -39,10 +39,11 @@ export default function RitualTextGuide() {
         visually or switch to source. In an existing ritual,{" "}
         <strong>split</strong>
         shows source on the left and the editable visual panel on the right.
-        Visual edits update source; after typing source edits, choose
-        <strong> Apply source</strong> before saving. If both panels have
-        changed, resolve the warning by applying or discarding your source
-        edits.
+        Visual edits update source immediately; valid source edits update the
+        visual panel after a short typing pause. Incomplete syntax keeps the
+        last valid preview visible and pauses visual editing until corrected. If
+        both panels have changed, resolve the warning by applying or discarding
+        your source edits.
       </p>
       <nav aria-label="Guide sections">
         <p>

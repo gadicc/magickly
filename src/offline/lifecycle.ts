@@ -76,6 +76,9 @@ interface Operation {
 /** Public state contains counts/identity only, never held editor text or recovery handles. */
 export interface OfflineLifecycleState {
   phase: "locked" | "checking" | "ready" | "disposed";
+  /** Presentation hint only: retain an existing same-account view read-only.
+   * It never permits an operation or a protected read. Hard locks clear it. */
+  revalidating?: boolean;
   generation: number;
   account: OfflineAccount | null;
   cleanupPending: boolean;
@@ -104,6 +107,7 @@ export class OfflineLifecycleCoordinator {
   private inspection = 0;
   private nextView = 0;
   private phase: OfflineLifecycleState["phase"] = "locked";
+  private revalidating = false;
   private snapshot: OfflineRuntimeState | null = null;
   private timer: unknown = null;
   private observedAtMs: number | null = null;
@@ -123,6 +127,7 @@ export class OfflineLifecycleCoordinator {
     return {
       phase: this.phase,
       generation: this.generation,
+      revalidating: this.revalidating,
       account: this.snapshot?.account ? { ...this.snapshot.account } : null,
       cleanupPending: this.snapshot?.cleanupPending ?? false,
       recovery: this.recovery.state,
@@ -251,8 +256,13 @@ export class OfflineLifecycleCoordinator {
         this.urls.delete(url);
       }
   }
-  private invalidate(reason: OfflineLockReason) {
+  private invalidate(reason: OfflineLockReason, sameAccountCheck = false) {
     if (this.disposed) return;
+    this.revalidating =
+      (reason === "hidden" || reason === "resume" || sameAccountCheck) &&
+      (this.phase === "ready" || this.revalidating) &&
+      !!this.snapshot?.account &&
+      !this.snapshot.cleanupPending;
     this.generation++;
     this.inspection++;
     this.phase = "locked";
@@ -404,6 +414,13 @@ export class OfflineLifecycleCoordinator {
       if (changed && !close) this.invalidate("change");
       this.snapshot = snapshot;
       this.phase = blocked ? "locked" : "ready";
+      this.revalidating =
+        this.revalidating &&
+        this.changing &&
+        !changed &&
+        !snapshot.cleanupPending &&
+        !!snapshot.account &&
+        !this.closingEpochs.has(snapshot.account.epoch);
       this.emit();
       this.arm();
       if (!blocked && (close || changed || before !== "ready"))
@@ -625,7 +642,7 @@ export class OfflineLifecycleCoordinator {
     if (!id(ownerId)) return Promise.resolve(false);
     const action = ++this.transitionId;
     this.changing = true;
-    this.invalidate("account");
+    this.invalidate("account", this.snapshot?.account?.ownerId === ownerId);
     if (this.snapshot?.account?.ownerId !== ownerId)
       this.closeEpoch(this.snapshot?.account ?? null);
     return this.enqueueTransition(async () => {
@@ -642,8 +659,11 @@ export class OfflineLifecycleCoordinator {
           await this.repository.signOut(old);
         }
         if (this.disposed || action !== this.transitionId) return false;
-        await this.repository.activateAccount(ownerId);
-        this.post("changed");
+        const activated = await this.repository.activateAccount(ownerId);
+        // Revalidating the identical persisted account is not a cross-tab
+        // authority change. Real epoch/owner transitions still notify peers.
+        if (old?.ownerId !== activated.ownerId || old.epoch !== activated.epoch)
+          this.post("changed");
         success = true;
       } catch {
         this.report("repository");

@@ -807,3 +807,53 @@ describe("separate non-authorizing permission check tokens", () => {
     expect(f.registration.beginPermissionCheck()).toBeNull();
   });
 });
+
+it("keeps only a presentation hint during overlapping same-account activation and resume", async () => {
+  const f = fixture();
+  await f.controller.start();
+  const activation = deferred<NonNullable<OfflineRuntimeState["account"]>>();
+  vi.mocked(f.repo.activateAccount).mockReturnValueOnce(activation.promise);
+  const pending = f.controller.activateVerifiedAccount(A);
+  await settle();
+  expect(f.controller.state.revalidating).toBe(true);
+  expect(f.registration.begin()).toBeNull();
+  f.event("focus");
+  await settle();
+  expect(f.controller.state.phase).toBe("locked");
+  expect(f.controller.state.revalidating).toBe(true);
+  expect(f.registration.begin()).toBeNull();
+  activation.resolve(f.data.account!);
+  expect(await pending).toBe(true);
+  expect(f.controller.state.revalidating).toBe(false);
+});
+
+it("never converts a hard sign-out lock into a retained presentation on later focus", async () => {
+  const f = fixture();
+  await f.controller.start();
+  const signout = deferred<void>();
+  vi.mocked(f.repo.signOut).mockReturnValueOnce(signout.promise);
+  const pending = f.controller.signOut();
+  expect(f.controller.state.revalidating).toBe(false);
+  await settle();
+  f.event("focus");
+  await settle();
+  expect(f.controller.state.revalidating).toBe(false);
+  expect(f.registration.begin()).toBeNull();
+  signout.resolve();
+  await pending;
+});
+
+it("does not broadcast an identical-account verification as a peer authority change", async () => {
+  const messages = bus();
+  const f = fixture(undefined, messages);
+  const peer = fixture({ repo: f.repo, data: f.data }, messages);
+  await f.controller.start();
+  await peer.controller.start();
+  vi.mocked(f.repo.activateAccount).mockResolvedValueOnce(f.data.account!);
+  peer.states.mockClear();
+  expect(await f.controller.activateVerifiedAccount(A)).toBe(true);
+  await settle();
+  expect(messages.post).not.toHaveBeenCalled();
+  expect(peer.controller.state.phase).toBe("ready");
+  expect(peer.states).not.toHaveBeenCalled();
+});

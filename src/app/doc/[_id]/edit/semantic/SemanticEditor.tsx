@@ -82,11 +82,13 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   const [reloadRequired, setReloadRequired] = React.useState(false);
   const [recoveryBlocked, setRecoveryBlocked] = React.useState(false);
   const [ready, setReady] = React.useState(false);
-  const [access, setAccess] = React.useState<"checking" | "ready" | "locked">(
-    "checking",
-  );
+  const [access, setAccess] = React.useState<
+    "checking" | "verifying" | "ready" | "locked"
+  >("checking");
   const [saving, setSaving] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [sourceError, setSourceError] = React.useState<string | null>(null);
+  const [sourceComposing, setSourceComposing] = React.useState(false);
   const [notice, setNotice] = React.useState<string | null>(null);
   const [initialVisual] = React.useState(() =>
     visualRitualState(props.initialDocument),
@@ -149,6 +151,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     if (!editor) return;
     let active = true;
     let seenReady = false;
+    let authorizedEpoch: string | undefined;
     let permanentlyLocked = false;
     let verifying = false;
     let unsubscribe = () => {};
@@ -175,18 +178,33 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       setPending(null);
       setReady(false);
       setAccess("locked");
+      for (const controller of requests) controller.abort();
     };
     const checkState = () => {
       if (!active || !runtime || permanentlyLocked) return;
       const state = runtime.coordinator.state;
-      if (state.phase === "ready" && state.account?.ownerId !== props.actorId) {
+      if (
+        state.phase === "ready" &&
+        (state.account?.ownerId !== props.actorId ||
+          (authorizedEpoch !== undefined &&
+            state.account.epoch !== authorizedEpoch))
+      ) {
         lock();
         return;
       }
-      if (state.phase === "locked" && seenReady) {
-        // A verified account refresh also emits a temporary locked state.
-        setAccess("checking");
-        if (!verifying) void recheck().catch(lock);
+      if (state.phase !== "ready" && seenReady) {
+        if (
+          !state.revalidating ||
+          state.account?.ownerId !== props.actorId ||
+          (authorizedEpoch !== undefined &&
+            state.account.epoch !== authorizedEpoch)
+        ) {
+          lock();
+          return;
+        }
+        setAccess("verifying");
+        if (!verifying && globalThis.document.visibilityState !== "hidden")
+          void recheck().catch(lock);
       }
     };
     const verifyPermission = async () => {
@@ -214,8 +232,11 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     const recheck = async () => {
       if (!active || !runtime || permanentlyLocked || verifying) return;
       verifying = true;
-      setAccess("checking");
+      setAccess(seenReady ? "verifying" : "checking");
+      const timeout = window.setTimeout(lock, 10_000);
       try {
+        // False can mean an overlapping generation change. The fresh source
+        // delivery below independently authenticates and authorizes this actor.
         await runtime.refreshVerifiedAccount();
         if (!active || permanentlyLocked) return;
         const state = runtime.coordinator.state;
@@ -224,15 +245,18 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           state.account?.ownerId !== props.actorId ||
           !(await verifyPermission()) ||
           runtime.coordinator.state.phase !== "ready" ||
-          runtime.coordinator.state.account?.ownerId !== props.actorId
+          runtime.coordinator.state.account?.ownerId !== props.actorId ||
+          runtime.coordinator.state.account?.epoch !== state.account.epoch
         ) {
           lock();
           return;
         }
         if (!active || permanentlyLocked) return;
         seenReady = true;
+        authorizedEpoch = state.account.epoch;
         setAccess("ready");
       } finally {
+        window.clearTimeout(timeout);
         verifying = false;
       }
     };
@@ -249,14 +273,17 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       lock();
     }
     const refresh = () => {
-      void recheck().catch(lock);
+      if (globalThis.document.visibilityState !== "hidden")
+        void recheck().catch(lock);
     };
     window.addEventListener("focus", refresh);
+    globalThis.document.addEventListener("visibilitychange", refresh);
     const interval = window.setInterval(refresh, 60_000);
     return () => {
       active = false;
       unsubscribe();
       window.removeEventListener("focus", refresh);
+      globalThis.document.removeEventListener("visibilitychange", refresh);
       window.clearInterval(interval);
       for (const controller of requests) controller.abort();
     };
@@ -341,7 +368,8 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         !recoveryBlocked &&
         !saving &&
         !pending &&
-        !stale,
+        !stale &&
+        !source.dirty,
     );
   }, [
     editor,
@@ -352,6 +380,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     pending,
     stale,
     visualIssue,
+    source.dirty,
   ]);
 
   React.useEffect(() => {
@@ -420,8 +449,16 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     updatedAt: Date.now(),
   });
 
-  const applySource = () => {
-    if (!editor || pending) return;
+  const applySource = React.useCallback(() => {
+    if (
+      !editor ||
+      pending ||
+      saving ||
+      stale ||
+      sourceComposing ||
+      access !== "ready"
+    )
+      return;
     try {
       const next = parseRitualText(source.text);
       const visual = visualRitualState(next);
@@ -429,14 +466,23 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       setVisualIssue(visual.issue);
       setDocument(next);
       setSource((current) => ({ ...current, dirty: false, conflict: false }));
+      setSourceError(null);
       setError(null);
       skipPersist.current = false;
     } catch (cause) {
-      setError(
+      setSourceError(
         cause instanceof Error ? cause.message : "The source is invalid.",
       );
     }
-  };
+  }, [editor, pending, saving, stale, access, source.text, sourceComposing]);
+
+  React.useEffect(() => {
+    if (!ready || !source.dirty || source.conflict) return;
+    // Keep the typed buffer intact. Incomplete syntax leaves the last valid
+    // document visible; visual editing waits until this source catches up.
+    const timer = window.setTimeout(applySource, 200);
+    return () => window.clearTimeout(timer);
+  }, [ready, source.dirty, source.conflict, applySource]);
 
   const confirmStalePending = async () => {
     const request = stale?.pending;
@@ -601,6 +647,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   return (
     <Box
       className={styles.root}
+      aria-busy={access === "verifying"}
       sx={{ visibility: access === "checking" ? "hidden" : undefined }}
       aria-hidden={access === "checking"}
     >
@@ -637,15 +684,26 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         <Alert severity="warning">
           A local draft needs recovery or belongs to an older revision. Review
           it before editing this ritual.{" "}
-          <Button onClick={() => downloadDraft(stale)}>Download draft</Button>{" "}
+          <Button
+            disabled={access !== "ready"}
+            onClick={() => {
+              if (access === "ready") downloadDraft(stale);
+            }}
+          >
+            Download draft
+          </Button>{" "}
           {stale.pending && (
-            <Button disabled={saving} onClick={confirmStalePending}>
+            <Button
+              disabled={access !== "ready" || saving}
+              onClick={confirmStalePending}
+            >
               Confirm pending save
             </Button>
           )}{" "}
           <Button
-            disabled={saving}
+            disabled={access !== "ready" || saving}
             onClick={() => {
+              if (access !== "ready") return;
               void clearSemanticDraft(props.actorId, props.ritualId).then(
                 () => {
                   setStale(null);
@@ -661,7 +719,12 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       {error && (
         <Alert severity="error">
           {error}{" "}
-          <Button onClick={() => downloadDraft(stale ?? currentDraft())}>
+          <Button
+            disabled={access !== "ready"}
+            onClick={() => {
+              if (access === "ready") downloadDraft(stale ?? currentDraft());
+            }}
+          >
             Download draft
           </Button>
         </Alert>
@@ -702,6 +765,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         <Button
           variant="contained"
           disabled={
+            access !== "ready" ||
             saving ||
             !!stale ||
             (!pending && (!!error || source.dirty || source.conflict))
@@ -710,7 +774,10 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         >
           {pending ? "Retry save" : "Save"}
         </Button>
-        <Button onClick={() => downloadDraft(currentDraft())}>
+        <Button
+          disabled={access !== "ready"}
+          onClick={() => downloadDraft(currentDraft())}
+        >
           Download draft
         </Button>
       </Box>
@@ -729,7 +796,8 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             <Typography variant="body2">
               Each line is a ritual command or a quoted text fragment. Try{" "}
               <code>Hiero: words</code>, <code>* Keryx action</code>, or{" "}
-              <code>@note:</code>. Apply changes to update the visual panel.{" "}
+              <code>@note:</code>. Valid edits update the visual panel as you
+              type.{" "}
               <Link
                 href="/help/ritual-text"
                 target="_blank"
@@ -743,6 +811,8 @@ export default function SemanticEditor(props: SemanticEditorProps) {
               spellCheck={false}
               value={source.text}
               disabled={access !== "ready" || !!pending || !!stale}
+              onCompositionStart={() => setSourceComposing(true)}
+              onCompositionEnd={() => setSourceComposing(false)}
               onChange={(event) => {
                 skipPersist.current = false;
                 setSource({
@@ -752,6 +822,11 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                 });
               }}
             />
+            {sourceError && (
+              <Alert severity="warning">
+                {sourceError}. The visual panel shows the last valid source.
+              </Alert>
+            )}
             {source.conflict && (
               <Alert severity="warning">
                 Both panels changed. Apply source to replace visual changes, or
@@ -759,16 +834,19 @@ export default function SemanticEditor(props: SemanticEditorProps) {
               </Alert>
             )}
             <Box className={styles.sourceActions}>
-              <Button
-                onClick={applySource}
-                disabled={
-                  access !== "ready" || !source.dirty || !!pending || !!stale
-                }
-              >
-                Apply source
-              </Button>
+              {source.conflict && (
+                <Button
+                  onClick={applySource}
+                  disabled={
+                    access !== "ready" || !source.dirty || !!pending || !!stale
+                  }
+                >
+                  Apply source
+                </Button>
+              )}
               <Button
                 onClick={() => {
+                  setSourceError(null);
                   setSource({
                     text: printRitualText(document),
                     dirty: false,
@@ -802,8 +880,14 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           >
             <RitualVisualControls
               editor={editor}
-              concealed={access !== "ready"}
-              disabled={access !== "ready" || saving || !!pending || !!stale}
+              concealed={access === "checking"}
+              disabled={
+                access !== "ready" ||
+                saving ||
+                !!pending ||
+                !!stale ||
+                source.dirty
+              }
               actorId={props.actorId}
               ritualId={props.ritualId}
               title={title}
