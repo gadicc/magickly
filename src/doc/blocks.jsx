@@ -1,6 +1,6 @@
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import { Node, Render } from "json-rich-text";
+import { Node, Render } from "json-rich-text/lib/esm/index.js";
 import React from "react";
 import { roleAliases } from "@/app/doc/[_id]/DocRender";
 import DocContext from "../../src/doc/context.js";
@@ -105,6 +105,7 @@ class Img extends Node {
         height={this.block.height}
         style={style}
         src={this.block.src}
+        alt={this.block.alt}
       />
     );
   }

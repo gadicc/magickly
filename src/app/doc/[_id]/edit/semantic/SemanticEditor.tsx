@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "@magick-components/Link";
+
 import {
   Alert,
   Box,
@@ -718,22 +720,6 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         </Alert>
       )}
       <Box className={styles.panels}>
-        {displayMode !== "source" && (
-          <section
-            className={styles.visualPanel}
-            aria-label="Visual editor panel"
-          >
-            <RitualVisualControls
-              editor={editor}
-              concealed={access !== "ready"}
-              disabled={access !== "ready" || saving || !!pending || !!stale}
-              actorId={props.actorId}
-              ritualId={props.ritualId}
-              title={title}
-            />
-            <EditorContent editor={editor} className={styles.editor} />
-          </section>
-        )}
         {displayMode !== "visual" && (
           <section
             className={styles.sourcePanel}
@@ -743,7 +729,14 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             <Typography variant="body2">
               Each line is a ritual command or a quoted text fragment. Try{" "}
               <code>Hiero: words</code>, <code>* Keryx action</code>, or{" "}
-              <code>@note:</code>. Apply changes to update the visual panel.
+              <code>@note:</code>. Apply changes to update the visual panel.{" "}
+              <Link
+                href="/help/ritual-text"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Read the Ritual Text guide (opens in a new tab)
+              </Link>
             </Typography>
             <textarea
               aria-label="Ritual semantic source"
@@ -800,6 +793,22 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                 Discard source changes
               </Button>
             </Box>
+          </section>
+        )}
+        {displayMode !== "source" && (
+          <section
+            className={styles.visualPanel}
+            aria-label="Visual editor panel"
+          >
+            <RitualVisualControls
+              editor={editor}
+              concealed={access !== "ready"}
+              disabled={access !== "ready" || saving || !!pending || !!stale}
+              actorId={props.actorId}
+              ritualId={props.ritualId}
+              title={title}
+            />
+            <EditorContent editor={editor} className={styles.editor} />
           </section>
         )}
       </Box>

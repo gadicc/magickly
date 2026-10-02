@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "@magick-components/Link";
 import { Alert, Box, Button, ButtonGroup, TextField } from "@mui/material";
 import { EditorContent, useEditor } from "@tiptap/react";
 import React from "react";
@@ -30,16 +31,24 @@ export default function RitualCreationEditor({
   onChange,
   disabled,
   onValidityChange,
+  initialMode = "visual",
+  onModeChange,
 }: {
   source: string;
   onChange(source: string): void;
   disabled: boolean;
   onValidityChange(valid: boolean): void;
+  initialMode?: "visual" | "source";
+  onModeChange?(mode: "visual" | "source"): void;
 }) {
   const [initial] = React.useState(() => initialView(source));
   const [issue, setIssue] = React.useState(initial.issue);
   const [visualError, setVisualError] = React.useState<string | null>(null);
-  const [mode, setMode] = React.useState<"visual" | "source">("visual");
+  const [mode, setMode] = React.useState(initialMode);
+  const chooseMode = (next: "visual" | "source") => {
+    setMode(next);
+    onModeChange?.(next);
+  };
   const lastEmission = React.useRef<string | null>(null);
   const editor = useEditor({
     extensions: ritualTiptapExtensions,
@@ -99,18 +108,21 @@ export default function RitualCreationEditor({
           type="button"
           disabled={!!issue}
           variant={mode === "visual" && !issue ? "contained" : "outlined"}
-          onClick={() => setMode("visual")}
+          onClick={() => chooseMode("visual")}
         >
           Visual
         </Button>
         <Button
           type="button"
           variant={mode === "source" || issue ? "contained" : "outlined"}
-          onClick={() => setMode("source")}
+          onClick={() => chooseMode("source")}
         >
           Ritual text
         </Button>
       </ButtonGroup>
+      <Link href="/help/ritual-text" target="_blank" rel="noopener noreferrer">
+        Ritual Text guide (opens in a new tab)
+      </Link>
       {issue && <Alert severity="warning">{issue}</Alert>}
       {visualError && <Alert severity="error">{visualError}</Alert>}
       {mode === "source" || issue ? (

@@ -256,6 +256,16 @@ it("preserves split pane identity, scroll, source selection and visual Undo acro
   source.setSelectionRange(3, 8);
   source.scrollTop = 240;
   const panel = screen.getByLabelText("Visual editor panel");
+  const sourcePanel = screen.getByLabelText("Semantic source panel");
+  expect(
+    sourcePanel.compareDocumentPosition(panel) &
+      Node.DOCUMENT_POSITION_FOLLOWING,
+  ).toBeTruthy();
+  expect(
+    screen
+      .getByRole("link", { name: /Ritual Text guide/ })
+      .getAttribute("href"),
+  ).toBe("/help/ritual-text");
   panel.scrollTop = 480;
   const selection = visual.editor.state.selection.toJSON();
   let release!: () => void;

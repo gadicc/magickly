@@ -9,6 +9,7 @@ import {
 } from "@testing-library/react";
 import type { Editor } from "@tiptap/core";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { ritualTextStarter } from "@/doc/ritualTextExamples";
 import { creationPublicationHandoffKey } from "@/offline/ritualPublicationHandoff";
 import SqlDocAdmin from "./SqlDocAdmin";
 
@@ -235,8 +236,132 @@ it("creates a valid semantic ritual from the default visual composer", async () 
   await waitFor(() => expect(mock.write).toHaveBeenCalledOnce());
   expect(mock.write.mock.calls[0][0].version).toBe(3);
   expect(JSON.parse(mock.write.mock.calls[0][0].source).nodes).toMatchObject([
-    { kind: "text", text: "Visual words" },
+    { tag: "title" },
+    { tag: "summary" },
+    { tag: "task" },
+    { tag: "task" },
+    {
+      tag: "summary",
+      children: [
+        { children: [{ text: "The ritual is concluded.Visual words" }] },
+      ],
+    },
   ]);
+});
+
+it("prefills source with the starter and links to help without leaving the draft", async () => {
+  render(<SqlDocAdmin />);
+  await screen.findByLabelText("Title");
+  const guide = await screen.findByRole("link", { name: /Ritual Text guide/ });
+  expect(guide.getAttribute("href")).toBe("/help/ritual-text");
+  expect(guide.getAttribute("target")).toBe("_blank");
+  fireEvent.click(screen.getByRole("button", { name: "Ritual text" }));
+  expect(
+    (screen.getByLabelText("Ritual text") as HTMLTextAreaElement).value,
+  ).toBe(ritualTextStarter);
+  expect(mock.write).not.toHaveBeenCalled();
+});
+
+it("conceals content while reserving page height through repeated same-account checks", async () => {
+  await fill();
+  const area = screen.getByLabelText("Ritual creation area");
+  vi.spyOn(area, "getBoundingClientRect").mockReturnValue(
+    new DOMRect(0, 0, 500, 1200),
+  );
+  let resolve!: (value: unknown) => void;
+  mock.options.mockImplementationOnce(
+    () =>
+      new Promise((done) => {
+        resolve = done;
+      }),
+  );
+  act(() => emitState({ ...runtimeState, phase: "locked", generation: 2 }));
+  expect(screen.queryByLabelText("Title")).toBeNull();
+  expect(screen.queryByDisplayValue("p Exact source")).toBeNull();
+  expect(
+    getComputedStyle(screen.getByLabelText("Ritual creation area")).minHeight,
+  ).toBe("1200px");
+  act(() => emitState({ ...runtimeState, phase: "ready", generation: 3 }));
+  expect(screen.queryByLabelText("Title")).toBeNull();
+  expect(
+    getComputedStyle(screen.getByLabelText("Ritual creation area")).minHeight,
+  ).toBe("1200px");
+  await act(async () => resolve(options));
+  expect(
+    ((await screen.findByLabelText("Title")) as HTMLInputElement).value,
+  ).toBe("New ritual");
+  expect(mock.options).toHaveBeenCalledTimes(2);
+  expect(mock.write).not.toHaveBeenCalled();
+});
+
+it("keeps the creation source mode and draft on a successful focus recheck", async () => {
+  render(<SqlDocAdmin />);
+  fireEvent.change(await screen.findByLabelText("Title"), {
+    target: { value: "Unsaved" },
+  });
+  fireEvent.click(await screen.findByRole("button", { name: "Ritual text" }));
+  const text = "ritual 1\nHiero: My unsaved words.\n";
+  fireEvent.change(screen.getByLabelText("Ritual text"), {
+    target: { value: text },
+  });
+  act(() => emitState({ ...runtimeState, phase: "locked", generation: 2 }));
+  expect(screen.queryByDisplayValue(text)).toBeNull();
+  act(() => emitState({ ...runtimeState, phase: "ready", generation: 3 }));
+  expect(
+    ((await screen.findByLabelText("Ritual text")) as HTMLTextAreaElement)
+      .value,
+  ).toBe(text);
+  expect((screen.getByLabelText("Title") as HTMLInputElement).value).toBe(
+    "Unsaved",
+  );
+});
+
+it("keeps source mode for an exact pending creation after a same-account check", async () => {
+  mock.write.mockResolvedValue(null);
+  render(<SqlDocAdmin />);
+  fireEvent.change(await screen.findByLabelText("Title"), {
+    target: { value: "Pending draft" },
+  });
+  fireEvent.click(await screen.findByRole("button", { name: "Ritual text" }));
+  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Visibility" }));
+  fireEvent.click(
+    await screen.findByRole("option", { name: "Synthetic temple" }),
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Create" }));
+  await screen.findByRole("button", { name: "Retry creation" });
+  const request = localStorage.getItem(key);
+  act(() => emitState({ ...runtimeState, phase: "locked", generation: 2 }));
+  act(() => emitState({ ...runtimeState, phase: "ready", generation: 3 }));
+  const source = await screen.findByLabelText("Ritual text");
+  expect((source as HTMLTextAreaElement).disabled).toBe(true);
+  expect(localStorage.getItem(key)).toBe(request);
+  fireEvent.click(screen.getByRole("button", { name: "Retry creation" }));
+  await waitFor(() => expect(mock.write).toHaveBeenCalledTimes(2));
+  expect(mock.write.mock.calls[1][0]).toEqual(mock.write.mock.calls[0][0]);
+});
+
+it("releases the reserved page height when the account is signed out", async () => {
+  await fill();
+  vi.spyOn(
+    screen.getByLabelText("Ritual creation area"),
+    "getBoundingClientRect",
+  ).mockReturnValue(new DOMRect(0, 0, 500, 1200));
+  act(() => emitState({ ...runtimeState, phase: "locked", generation: 2 }));
+  expect(
+    getComputedStyle(screen.getByLabelText("Ritual creation area")).minHeight,
+  ).toBe("1200px");
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "locked",
+      generation: 3,
+      account: null,
+    }),
+  );
+  expect(
+    getComputedStyle(screen.getByLabelText("Ritual creation area")).minHeight,
+  ).toBe("0px");
+  expect(screen.queryByDisplayValue("p Exact source")).toBeNull();
 });
 
 it("keeps invalid ritual text local instead of sending a create request", async () => {

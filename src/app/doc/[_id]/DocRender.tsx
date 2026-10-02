@@ -574,10 +574,10 @@ export function DocView({
           <DocContext.Provider value={context}>
             {wrapWithErrorBoundary ? (
               <ErrorBoundary>
-                <Render doc={doc} />
+                <Render doc={doc} onChange={undefined} />
               </ErrorBoundary>
             ) : (
-              <Render doc={doc} />
+              <Render doc={doc} onChange={undefined} />
             )}
           </DocContext.Provider>
         </div>

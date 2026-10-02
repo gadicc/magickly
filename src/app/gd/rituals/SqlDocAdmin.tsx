@@ -12,6 +12,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { parseRitualText, printRitualText } from "@/doc/ritualText";
+import { pugRitualStarter, ritualTextStarter } from "@/doc/ritualTextExamples";
 import type { RitualSemanticDocument } from "@/doc/semantic";
 import {
   fetchSqlRitualCreationOptions,
@@ -48,6 +49,7 @@ interface FormState {
   source: string;
   semanticSource: string;
   format: "pug" | "semantic";
+  editorMode: "visual" | "source";
 }
 
 interface CreationIdentity {
@@ -65,9 +67,10 @@ const emptyForm = (): FormState => ({
   title: "",
   scopeKey: "",
   minGrade: 0,
-  source: "",
-  semanticSource: "ritual 1\n",
+  source: pugRitualStarter,
+  semanticSource: ritualTextStarter,
   format: "semantic",
+  editorMode: "visual",
 });
 const storageKey = (ownerId: string) => `magickli:ritual-create:v2:${ownerId}`;
 const unavailable = (): SqlRitualWriteResult => ({
@@ -117,6 +120,15 @@ export default function SqlDocAdmin() {
     typeof parseSqlRitualCreateRequest
   > | null>(null);
   const preservedFormRef = React.useRef<PreservedForm | null>(null);
+  const rootRef = React.useRef<HTMLDivElement | null>(null);
+  const contentRef = React.useRef<HTMLDivElement | null>(null);
+  const presentationRef = React.useRef<{
+    ownerId: string;
+    epoch: string;
+    height: number;
+    editorMode: FormState["editorMode"];
+  } | null>(null);
+  const [reservedHeight, setReservedHeight] = React.useState(0);
 
   const replaceForm = React.useCallback((next: FormState) => {
     formRef.current = next;
@@ -124,6 +136,8 @@ export default function SqlDocAdmin() {
   }, []);
   const updateForm = React.useCallback(
     (change: (current: FormState) => FormState) => {
+      presentationRef.current = null;
+      setReservedHeight(0);
       replaceForm(change(formRef.current));
     },
     [replaceForm],
@@ -156,6 +170,21 @@ export default function SqlDocAdmin() {
 
     const lock = (message: string | null = null) => {
       const identity = identityRef.current;
+      // Remove private form content while checking access, but keep its space
+      // so the browser cannot clamp the ritual-list scroll to a shorter page.
+      if (identity && rootRef.current) {
+        const height = rootRef.current.getBoundingClientRect().height;
+        presentationRef.current = {
+          ...identity,
+          height,
+          editorMode: formRef.current.editorMode,
+        };
+        setReservedHeight(height);
+      }
+      if (message) {
+        presentationRef.current = null;
+        setReservedHeight(0);
+      }
       if (identity && !pendingRef.current)
         preservedFormRef.current = {
           ownerId: identity.ownerId,
@@ -186,6 +215,16 @@ export default function SqlDocAdmin() {
         if (disposed) return;
         if (state.phase !== "ready" || !state.account) {
           lock();
+          const presentation = presentationRef.current;
+          if (
+            presentation &&
+            (!state.account ||
+              presentation.ownerId !== state.account.ownerId ||
+              presentation.epoch !== state.account.epoch)
+          ) {
+            presentationRef.current = null;
+            setReservedHeight(0);
+          }
           return;
         }
         const stateKey = `${state.generation}:${state.account.ownerId}:${state.account.epoch}`;
@@ -198,6 +237,15 @@ export default function SqlDocAdmin() {
           epoch: state.account.epoch,
           generation: state.generation,
         };
+        const presentation = presentationRef.current;
+        if (
+          presentation &&
+          (presentation.ownerId !== expected.ownerId ||
+            presentation.epoch !== expected.epoch)
+        ) {
+          presentationRef.current = null;
+          setReservedHeight(0);
+        }
         const controller = new AbortController();
         optionsRequestRef.current = controller;
         void (async () => {
@@ -218,6 +266,8 @@ export default function SqlDocAdmin() {
           }
           setLoaded(true);
           if (!next) {
+            presentationRef.current = null;
+            setReservedHeight(0);
             setError(
               "Ritual creation is unavailable. Reconnect and try again.",
             );
@@ -230,6 +280,10 @@ export default function SqlDocAdmin() {
             return;
           }
           identityRef.current = expected;
+          if (!next.public && !next.groups.length && !next.temples.length) {
+            presentationRef.current = null;
+            setReservedHeight(0);
+          }
           setOptions(next);
           let serialized: string | null = null;
           try {
@@ -238,6 +292,10 @@ export default function SqlDocAdmin() {
               const preserved = preservedFormRef.current;
               if (preserved?.ownerId === next.ownerId) {
                 preservedFormRef.current = null;
+                if (!scopeStillAuthorized(next, preserved.form.scopeKey)) {
+                  presentationRef.current = null;
+                  setReservedHeight(0);
+                }
                 replaceForm(
                   scopeStillAuthorized(next, preserved.form.scopeKey)
                     ? { ...preserved.form }
@@ -273,6 +331,11 @@ export default function SqlDocAdmin() {
               source: retained.version === 2 ? retained.source : "",
               semanticSource,
               format: retained.version === 3 ? "semantic" : "pug",
+              editorMode:
+                presentationRef.current?.ownerId === next.ownerId &&
+                presentationRef.current.epoch === expected.epoch
+                  ? presentationRef.current.editorMode
+                  : "visual",
             });
             replacePending(retained);
           } catch {
@@ -299,6 +362,32 @@ export default function SqlDocAdmin() {
       runtimeRef.current = null;
     };
   }, [replaceForm, replacePending]);
+
+  React.useLayoutEffect(() => {
+    const content = contentRef.current;
+    const presentation = presentationRef.current;
+    if (!reservedHeight || !options || !content || !presentation) return;
+    const finish = () => {
+      const identity = identityRef.current;
+      if (
+        identity &&
+        presentationRef.current === presentation &&
+        currentIdentity(identity) &&
+        identity.ownerId === presentation.ownerId &&
+        identity.epoch === presentation.epoch &&
+        content.getBoundingClientRect().height >= presentation.height - 1
+      ) {
+        presentationRef.current = null;
+        setReservedHeight(0);
+      }
+    };
+    finish();
+    // The lazy composer and autosizing textareas finish layout after the form.
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(finish);
+    observer.observe(content);
+    return () => observer.disconnect();
+  }, [options, reservedHeight, currentIdentity]);
 
   const permitted = React.useCallback(
     (scopeKey: string) =>
@@ -460,9 +549,15 @@ export default function SqlDocAdmin() {
 
   if (!loaded)
     return (
-      <Typography sx={{ my: 2 }} color="text.secondary">
-        Loading ritual creation access...
-      </Typography>
+      <Box
+        ref={rootRef}
+        aria-label="Ritual creation area"
+        sx={{ my: 2, minHeight: reservedHeight }}
+      >
+        <Typography sx={{ my: 2 }} color="text.secondary">
+          Loading ritual creation access...
+        </Typography>
+      </Box>
     );
   if (!options)
     return error ? (
@@ -474,136 +569,146 @@ export default function SqlDocAdmin() {
     return null;
 
   return (
-    <Box sx={{ my: 2 }}>
-      <Typography variant="h6">Create ritual</Typography>
-      {error && <Alert severity="warning">{error}</Alert>}
-      {pending && (
-        <Alert severity="info">
-          This exact creation request is retained. Retry it to resolve an
-          uncertain result without creating a duplicate.
-        </Alert>
-      )}
-      {blockedRecovery && (
-        <Button onClick={downloadBlockedRecovery}>
-          Download retained request
-        </Button>
-      )}
-      <form onSubmit={submit}>
-        {
+    <Box
+      ref={rootRef}
+      aria-label="Ritual creation area"
+      sx={{ my: 2, minHeight: reservedHeight }}
+    >
+      <div ref={contentRef}>
+        <Typography variant="h6">Create ritual</Typography>
+        {error && <Alert severity="warning">{error}</Alert>}
+        {pending && (
+          <Alert severity="info">
+            This exact creation request is retained. Retry it to resolve an
+            uncertain result without creating a duplicate.
+          </Alert>
+        )}
+        {blockedRecovery && (
+          <Button onClick={downloadBlockedRecovery}>
+            Download retained request
+          </Button>
+        )}
+        <form onSubmit={submit}>
+          {
+            <TextField
+              select
+              label="Source format"
+              size="small"
+              value={form.format}
+              disabled={busy || !!pending || !!blockedRecovery}
+              onChange={(event) =>
+                updateForm((current) => ({
+                  ...current,
+                  format: event.target.value as FormState["format"],
+                }))
+              }
+              sx={{ minWidth: 180 }}
+            >
+              <MenuItem value="pug">Pug source</MenuItem>
+              <MenuItem value="semantic">Ritual text</MenuItem>
+            </TextField>
+          }{" "}
           <TextField
-            select
-            label="Source format"
+            label="Title"
             size="small"
-            value={form.format}
+            value={form.title}
             disabled={busy || !!pending || !!blockedRecovery}
             onChange={(event) =>
               updateForm((current) => ({
                 ...current,
-                format: event.target.value as FormState["format"],
+                title: event.target.value,
+              }))
+            }
+          />{" "}
+          <TextField
+            select
+            label="Visibility"
+            size="small"
+            value={form.scopeKey}
+            disabled={busy || !!pending || !!blockedRecovery}
+            onChange={(event) =>
+              updateForm((current) => ({
+                ...current,
+                scopeKey: event.target.value,
               }))
             }
             sx={{ minWidth: 180 }}
           >
-            <MenuItem value="pug">Pug source</MenuItem>
-            <MenuItem value="semantic">Ritual text</MenuItem>
+            <MenuItem value="">Choose visibility</MenuItem>
+            {options.public && <MenuItem value="public">Public</MenuItem>}
+            {options.temples.map((temple) => (
+              <MenuItem value={`temple:${temple.id}`} key={temple.id}>
+                {temple.name}
+              </MenuItem>
+            ))}
+            {options.groups.map((group) => (
+              <MenuItem value={`group:${group.id}`} key={group.id}>
+                {group.name}
+              </MenuItem>
+            ))}
           </TextField>
-        }{" "}
-        <TextField
-          label="Title"
-          size="small"
-          value={form.title}
-          disabled={busy || !!pending || !!blockedRecovery}
-          onChange={(event) =>
-            updateForm((current) => ({
-              ...current,
-              title: event.target.value,
-            }))
-          }
-        />{" "}
-        <TextField
-          select
-          label="Visibility"
-          size="small"
-          value={form.scopeKey}
-          disabled={busy || !!pending || !!blockedRecovery}
-          onChange={(event) =>
-            updateForm((current) => ({
-              ...current,
-              scopeKey: event.target.value,
-            }))
-          }
-          sx={{ minWidth: 180 }}
-        >
-          <MenuItem value="">Choose visibility</MenuItem>
-          {options.public && <MenuItem value="public">Public</MenuItem>}
-          {options.temples.map((temple) => (
-            <MenuItem value={`temple:${temple.id}`} key={temple.id}>
-              {temple.name}
-            </MenuItem>
-          ))}
-          {options.groups.map((group) => (
-            <MenuItem value={`group:${group.id}`} key={group.id}>
-              {group.name}
-            </MenuItem>
-          ))}
-        </TextField>
-        {form.scopeKey.startsWith("temple:") && (
-          <TextField
-            label="Min Grade"
-            size="small"
-            type="number"
-            value={form.minGrade}
-            disabled={busy || !!pending || !!blockedRecovery}
-            onChange={(event) =>
-              updateForm((current) => ({
-                ...current,
-                minGrade: Number(event.target.value),
-              }))
+          {form.scopeKey.startsWith("temple:") && (
+            <TextField
+              label="Min Grade"
+              size="small"
+              type="number"
+              value={form.minGrade}
+              disabled={busy || !!pending || !!blockedRecovery}
+              onChange={(event) =>
+                updateForm((current) => ({
+                  ...current,
+                  minGrade: Number(event.target.value),
+                }))
+              }
+              sx={{ width: 100 }}
+            />
+          )}
+          {form.format === "semantic" ? (
+            <RitualCreationEditor
+              key={options.ownerId}
+              source={form.semanticSource}
+              onChange={(semanticSource) =>
+                updateForm((current) => ({ ...current, semanticSource }))
+              }
+              onValidityChange={setComposerValid}
+              initialMode={form.editorMode}
+              onModeChange={(editorMode) =>
+                updateForm((current) => ({ ...current, editorMode }))
+              }
+              disabled={busy || !!pending || !!blockedRecovery}
+            />
+          ) : (
+            <TextField
+              label="Ritual source"
+              multiline
+              minRows={4}
+              fullWidth
+              value={form.source}
+              disabled={busy || !!pending || !!blockedRecovery}
+              onChange={(event) =>
+                updateForm((current) => ({
+                  ...current,
+                  source: event.target.value,
+                }))
+              }
+              sx={{ mt: 1 }}
+            />
+          )}
+          <Button
+            type="submit"
+            disabled={
+              busy || !!blockedRecovery || !form.title.trim() || !form.scopeKey
             }
-            sx={{ width: 100 }}
-          />
-        )}
-        {form.format === "semantic" ? (
-          <RitualCreationEditor
-            key={options.ownerId}
-            source={form.semanticSource}
-            onChange={(semanticSource) =>
-              updateForm((current) => ({ ...current, semanticSource }))
-            }
-            onValidityChange={setComposerValid}
-            disabled={busy || !!pending || !!blockedRecovery}
-          />
-        ) : (
-          <TextField
-            label="Ritual source"
-            multiline
-            minRows={4}
-            fullWidth
-            value={form.source}
-            disabled={busy || !!pending || !!blockedRecovery}
-            onChange={(event) =>
-              updateForm((current) => ({
-                ...current,
-                source: event.target.value,
-              }))
-            }
-            sx={{ mt: 1 }}
-          />
-        )}
-        <Button
-          type="submit"
-          disabled={
-            busy || !!blockedRecovery || !form.title.trim() || !form.scopeKey
-          }
-        >
-          {pending ? "Retry creation" : "Create"}
-        </Button>
-        {pending && terminal && (
-          <Button onClick={startNew} disabled={busy}>
-            Edit and start a new request
+          >
+            {pending ? "Retry creation" : "Create"}
           </Button>
-        )}
-      </form>
+          {pending && terminal && (
+            <Button onClick={startNew} disabled={busy}>
+              Edit and start a new request
+            </Button>
+          )}
+        </form>
+      </div>
     </Box>
   );
 }

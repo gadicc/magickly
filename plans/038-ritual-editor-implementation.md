@@ -111,6 +111,33 @@ The operator approved implementation after the [editor decision](037-ritual-edit
   intentional; manually switching real windows is still a useful release
   smoke check.
 
+### Source guidance and creation-page resume (2 October)
+
+- Ritual Text remains the readable projection of semantic JSON; Pug is kept
+  for legacy compatibility. The public `/help/ritual-text` guide explains the
+  syntax, IDs, opaque legacy nodes and source/visual synchronization. Both
+  creation and existing editors link to it in a new tab to preserve drafts.
+- New rituals include equivalent editable Ritual Text and Pug starters. Split
+  mode now places source first, on the left, with the visual editor on the right.
+- Creation permission checks still run on refocus. While private form contents
+  are concealed, the creation area reserves its prior height; fresh same-owner
+  authorization restores source mode and the draft without collapsing page
+  scroll. Sign-out, changed identity and unavailable/revoked access release that
+  reservation. Pending retries retain their exact immutable request.
+- The actual reader now forwards image alt text. Shared guide examples have
+  parser/round-trip tests, and an image example is rendered through the real
+  reader in a regression test.
+- Browser lifecycle checks preserved page scroll at 2,720.5px and a 5,021-byte
+  unsubmitted source draft through repeated visibility/focus verification.
+  This exercised the actual coordinator through a temporary fixture-only dev
+  control, not a physical OS window switch. The control was removed, synthetic
+  SQL fixtures were deleted and the test session was logged out.
+- Final affected checks passed: 40 test files, 625 tests (14 skipped),
+  TypeScript, changed-file Biome, Loom production validation and a production
+  build with 387 pages. These checks used Node 24.21.0; the detached worktree
+  build preserved the running development server. Astra xhigh adversarial
+  review found no remaining actionable findings after targeted fixes.
+
 ## Follow-up scope
 
 - Full offline authoring needs a versioned semantic source envelope, repository storage tagged with its format, lifecycle recovery and a draft adapter. Fresh permission checks remain required; weakening them would bypass existing lease/account protections. Reader offline bundles remain supported.
