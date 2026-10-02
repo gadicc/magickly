@@ -100,6 +100,49 @@ describe("SQL editor transport contracts", () => {
     expect(parseSqlRitualCreateRequest(request, createUuidV7())).toBeNull();
   });
 
+  it("retains only valid SQL-v3 semantic creation source", () => {
+    const request = {
+      version: 3,
+      operationId,
+      expectedActorId: actorId,
+      kind: "create",
+      scope: { kind: "public" },
+      title: "Semantic ritual",
+      source: JSON.stringify({
+        format: "magickli-ritual",
+        version: 1,
+        nodes: [],
+      }),
+    } as const;
+    expect(parseSqlRitualCreateRequest(request, actorId)).toEqual(request);
+    expect(
+      parseSqlRitualCreateRequest({ ...request, source: "{}" }, actorId),
+    ).toBeNull();
+    expect(
+      parseSqlRitualCreateRequest({ ...request, source: "not JSON" }, actorId),
+    ).toBeNull();
+    expect(
+      parseSqlRitualCreateRequest(
+        {
+          ...request,
+          source: JSON.stringify({
+            format: "magickli-ritual",
+            version: 1,
+            nodes: [
+              {
+                kind: "element",
+                id: createUuidV7(),
+                tag: "unknown",
+                attrs: {},
+              },
+            ],
+          }),
+        },
+        actorId,
+      ),
+    ).toBeNull();
+  });
+
   it("binds write acknowledgements to the exact next CAS version", () => {
     const request: SqlRitualWriteRequest = {
       version: 2,

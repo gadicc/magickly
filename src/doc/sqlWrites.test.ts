@@ -238,7 +238,7 @@ const writer = (
   createSqlRitualWriter(
     database,
     async () => (name === null ? null : actor[name]),
-    { now: () => new Date(when), enableSemanticWrites: true },
+    { now: () => new Date(when) },
   );
 function save(
   name = "group",
@@ -292,19 +292,16 @@ async function current(id = ritualIds.group) {
 }
 
 describe("atomic canonical SQL-v2 ritual writes", () => {
-  it("keeps v3 writes disabled until the pilot flag is enabled", async () => {
+  it("accepts v3 writes by default through the normal permission boundary", async () => {
     const command = {
       ...save(),
       version: 3 as const,
       source: JSON.stringify(semanticFromJrt({ children: [] })),
     };
-    const disabled = createSqlRitualWriter(db, async () => actor.creator);
+    const enabled = createSqlRitualWriter(db, async () => actor.creator);
     const before = await counts();
-    expect(await disabled(command)).toMatchObject({
-      ok: false,
-      code: "UPGRADE_REQUIRED",
-    });
-    expect(await counts()).toEqual(before);
+    expect(await enabled(command)).toMatchObject({ ok: true });
+    expect(await counts()).not.toEqual(before);
   });
 
   it("accepts SQL-v3 semantic JSON with exact source/artifact binding and replay", async () => {

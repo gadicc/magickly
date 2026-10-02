@@ -8,8 +8,11 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { parseRitualText, printRitualText } from "@/doc/ritualText";
+import type { RitualSemanticDocument } from "@/doc/semantic";
 import {
   fetchSqlRitualCreationOptions,
   sendSqlRitualWrite,
@@ -30,11 +33,21 @@ import {
   retainCreationPublicationHandoff,
 } from "@/offline/ritualPublicationHandoff";
 
+const RitualCreationEditor = dynamic(
+  () => import("@/doc/RitualCreationEditor"),
+  {
+    ssr: false,
+    loading: () => <p>Loading ritual editor…</p>,
+  },
+);
+
 interface FormState {
   title: string;
   scopeKey: string;
   minGrade: number;
   source: string;
+  semanticSource: string;
+  format: "pug" | "semantic";
 }
 
 interface CreationIdentity {
@@ -53,6 +66,8 @@ const emptyForm = (): FormState => ({
   scopeKey: "",
   minGrade: 0,
   source: "",
+  semanticSource: "ritual 1\n",
+  format: "semantic",
 });
 const storageKey = (ownerId: string) => `magickli:ritual-create:v2:${ownerId}`;
 const unavailable = (): SqlRitualWriteResult => ({
@@ -86,6 +101,7 @@ export default function SqlDocAdmin() {
   const [error, setError] = React.useState<string | null>(null);
   const [terminal, setTerminal] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
+  const [composerValid, setComposerValid] = React.useState(true);
   const [blockedRecovery, setBlockedRecovery] = React.useState<string | null>(
     null,
   );
@@ -242,12 +258,21 @@ export default function SqlDocAdmin() {
                 : retained.scope.kind === "group"
                   ? `group:${retained.scope.groupId}`
                   : `temple:${retained.scope.templeId}`;
+            let semanticSource = "ritual 1\n";
+            if (retained.version === 3) {
+              const document = JSON.parse(
+                retained.source,
+              ) as RitualSemanticDocument;
+              semanticSource = printRitualText(document);
+            }
             replaceForm({
               title: retained.title,
               scopeKey: key,
               minGrade:
                 retained.scope.kind === "temple" ? retained.scope.minGrade : 0,
-              source: retained.source,
+              source: retained.version === 2 ? retained.source : "",
+              semanticSource,
+              format: retained.version === 3 ? "semantic" : "pug",
             });
             replacePending(retained);
           } catch {
@@ -303,16 +328,31 @@ export default function SqlDocAdmin() {
       setError("Choose a valid visibility and minimum grade.");
       return;
     }
+    let source = form.source;
+    if (!pending && form.format === "semantic") {
+      try {
+        source = JSON.stringify(parseRitualText(form.semanticSource));
+        if (!composerValid) {
+          setError("Correct the visual document before creating this ritual.");
+          return;
+        }
+      } catch (cause) {
+        setError(
+          cause instanceof Error ? cause.message : "Invalid ritual text.",
+        );
+        return;
+      }
+    }
     const request =
       pending ??
       parseSqlRitualCreateRequest({
-        version: 2,
+        version: form.format === "semantic" ? 3 : 2,
         operationId: createUuidV7(),
         expectedActorId: options.ownerId,
         kind: "create",
         scope,
         title: form.title,
-        source: form.source,
+        source,
       });
     if (!request) {
       setError("Enter a valid title and ritual source.");
@@ -359,7 +399,9 @@ export default function SqlDocAdmin() {
         );
         return;
       }
-      router.push(`/doc/${result.ritualId}/edit`);
+      router.push(
+        `/doc/${result.ritualId}/edit${request.version === 3 ? "/semantic" : ""}`,
+      );
     } catch {
       if (currentIdentity(identity))
         setError(SQL_RITUAL_WRITE_MESSAGES.UNAVAILABLE);
@@ -447,6 +489,25 @@ export default function SqlDocAdmin() {
         </Button>
       )}
       <form onSubmit={submit}>
+        {
+          <TextField
+            select
+            label="Source format"
+            size="small"
+            value={form.format}
+            disabled={busy || !!pending || !!blockedRecovery}
+            onChange={(event) =>
+              updateForm((current) => ({
+                ...current,
+                format: event.target.value as FormState["format"],
+              }))
+            }
+            sx={{ minWidth: 180 }}
+          >
+            <MenuItem value="pug">Pug source</MenuItem>
+            <MenuItem value="semantic">Ritual text</MenuItem>
+          </TextField>
+        }{" "}
         <TextField
           label="Title"
           size="small"
@@ -502,21 +563,33 @@ export default function SqlDocAdmin() {
             sx={{ width: 100 }}
           />
         )}
-        <TextField
-          label="Ritual source"
-          multiline
-          minRows={4}
-          fullWidth
-          value={form.source}
-          disabled={busy || !!pending || !!blockedRecovery}
-          onChange={(event) =>
-            updateForm((current) => ({
-              ...current,
-              source: event.target.value,
-            }))
-          }
-          sx={{ mt: 1 }}
-        />
+        {form.format === "semantic" ? (
+          <RitualCreationEditor
+            key={options.ownerId}
+            source={form.semanticSource}
+            onChange={(semanticSource) =>
+              updateForm((current) => ({ ...current, semanticSource }))
+            }
+            onValidityChange={setComposerValid}
+            disabled={busy || !!pending || !!blockedRecovery}
+          />
+        ) : (
+          <TextField
+            label="Ritual source"
+            multiline
+            minRows={4}
+            fullWidth
+            value={form.source}
+            disabled={busy || !!pending || !!blockedRecovery}
+            onChange={(event) =>
+              updateForm((current) => ({
+                ...current,
+                source: event.target.value,
+              }))
+            }
+            sx={{ mt: 1 }}
+          />
+        )}
         <Button
           type="submit"
           disabled={

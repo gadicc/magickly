@@ -1,12 +1,21 @@
-import { type JSONContent, Mark, Node } from "@tiptap/core";
+import {
+  type Editor,
+  getSchema,
+  type JSONContent,
+  Mark,
+  Node,
+} from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
-import { createUuidV7 } from "../lib/ids";
+import { parseRitualFileLocator } from "../files/ritualFileLocator";
+import { createUuidV7, isUuidV7 } from "../lib/ids";
 import {
   type JsonValue,
   type RitualSemanticDocument,
   type RitualSemanticNode,
+  semanticToJrt,
   validateRitualSemantic,
 } from "./semantic";
+import { hasDirectNestedTask } from "./semanticEditorCompatibility";
 
 const inlineAtoms = new Set(["br", "grade", "var"]);
 const inlineSpans = new Set(["a", "b", "i"]);
@@ -31,6 +40,58 @@ const nodeAttrs = {
   children: { default: null },
 };
 
+// Clipboard HTML must carry the semantic identity and attributes. Without this,
+// ProseMirror reparses a copied task as an untyped container and can nest it in
+// the task at the paste position.
+function clipboardAttrs(element: HTMLElement) {
+  const value = element.getAttribute("data-ritual-meta");
+  if (!value) return false;
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
+      return false;
+    const meta = parsed as Record<string, unknown>;
+    const tag =
+      element.getAttribute("data-ritual-block") ??
+      element.getAttribute("data-ritual-span") ??
+      element.getAttribute("data-ritual-inline") ??
+      element.getAttribute("data-ritual-atom");
+    if (
+      typeof meta.id !== "string" ||
+      meta.tag !== tag ||
+      !meta.attrs ||
+      typeof meta.attrs !== "object" ||
+      Array.isArray(meta.attrs)
+    )
+      return false;
+    return meta;
+  } catch {
+    return false;
+  }
+}
+
+function clipboardMeta(node: { attrs: Record<string, unknown> }) {
+  return JSON.stringify(node.attrs);
+}
+
+function blockHTML(node: { attrs: Record<string, unknown> }) {
+  const attrs = node.attrs.attrs as Record<string, JsonValue>;
+  return [
+    "section",
+    {
+      "data-ritual-block": node.attrs.tag,
+      "data-ritual-meta": clipboardMeta(node),
+      class: `ritual-block ritual-${node.attrs.tag}`,
+    },
+    [
+      "div",
+      { class: "ritual-label", contenteditable: "false" },
+      label(String(node.attrs.tag), attrs),
+    ],
+    ["div", { class: "ritual-content" }, 0],
+  ] as const;
+}
+
 const RitualBlock = Node.create({
   name: "ritualBlock",
   group: "block",
@@ -38,22 +99,36 @@ const RitualBlock = Node.create({
   defining: true,
   isolating: true,
   addAttributes: () => nodeAttrs,
-  parseHTML: () => [{ tag: "section[data-ritual-block]" }],
+  parseHTML: () => [
+    {
+      tag: "section[data-ritual-block]:not([data-ritual-block='task'])",
+      getAttrs: clipboardAttrs,
+      contentElement: ".ritual-content",
+    },
+  ],
   renderHTML({ node }) {
-    const attrs = node.attrs.attrs as Record<string, JsonValue>;
-    return [
-      "section",
-      {
-        "data-ritual-block": node.attrs.tag,
-        class: `ritual-block ritual-${node.attrs.tag}`,
-      },
-      [
-        "div",
-        { class: "ritual-label", contenteditable: "false" },
-        label(node.attrs.tag, attrs),
-      ],
-      ["div", { class: "ritual-content" }, 0],
-    ];
+    return blockHTML(node);
+  },
+});
+
+const RitualTask = Node.create({
+  name: "ritualTask",
+  group: "block",
+  // A task can contain notes and other structural blocks, but never a task.
+  // This forces whole-task paste beside the current task, not inside it.
+  content: "(paragraph | ritualBlock | ritualAtom)*",
+  defining: true,
+  isolating: true,
+  addAttributes: () => nodeAttrs,
+  parseHTML: () => [
+    {
+      tag: "section[data-ritual-block='task']",
+      getAttrs: clipboardAttrs,
+      contentElement: ".ritual-content",
+    },
+  ],
+  renderHTML({ node }) {
+    return blockHTML(node);
   },
 });
 
@@ -63,13 +138,16 @@ const RitualSpan = Node.create({
   inline: true,
   content: "inline*",
   addAttributes: () => nodeAttrs,
-  parseHTML: () => [{ tag: "span[data-ritual-span]" }],
+  parseHTML: () => [
+    { tag: "span[data-ritual-span]", getAttrs: clipboardAttrs },
+  ],
   renderHTML({ node }) {
     const tag = node.attrs.tag as string;
     return [
       "span",
       {
         "data-ritual-span": tag,
+        "data-ritual-meta": clipboardMeta(node),
         class:
           tag === "b"
             ? "ritual-bold"
@@ -90,7 +168,9 @@ const RitualInline = Node.create({
   atom: true,
   selectable: true,
   addAttributes: () => nodeAttrs,
-  parseHTML: () => [{ tag: "span[data-ritual-inline]" }],
+  parseHTML: () => [
+    { tag: "span[data-ritual-inline]", getAttrs: clipboardAttrs },
+  ],
   renderHTML({ node }) {
     const tag = node.attrs.tag as string;
     const attrs = node.attrs.attrs as Record<string, JsonValue>;
@@ -104,6 +184,7 @@ const RitualInline = Node.create({
       "span",
       {
         "data-ritual-inline": tag,
+        "data-ritual-meta": clipboardMeta(node),
         class: "ritual-inline",
         contenteditable: "false",
       },
@@ -125,7 +206,7 @@ const RitualAtom = Node.create({
       raw: { default: null },
     };
   },
-  parseHTML: () => [{ tag: "div[data-ritual-atom]" }],
+  parseHTML: () => [{ tag: "div[data-ritual-atom]", getAttrs: clipboardAttrs }],
   renderHTML({ node }) {
     const tag = node.attrs.tag as string;
     const attrs = node.attrs.attrs as Record<string, JsonValue>;
@@ -137,10 +218,30 @@ const RitualAtom = Node.create({
           : tag === "declareVar"
             ? `Variable · ${String(attrs.label ?? attrs.name ?? "")}`
             : label(tag, attrs);
+    if (tag === "img" && parseRitualFileLocator(attrs.src))
+      return [
+        "div",
+        {
+          "data-ritual-atom": tag,
+          "data-ritual-meta": clipboardMeta(node),
+          class: "ritual-atom",
+          contenteditable: "false",
+        },
+        [
+          "img",
+          {
+            src: String(attrs.src),
+            alt: String(attrs.alt || "Attached ritual image"),
+            style: "max-width:100%;max-height:360px;object-fit:contain",
+          },
+        ],
+        ["div", {}, value],
+      ];
     return [
       "div",
       {
         "data-ritual-atom": tag,
+        "data-ritual-meta": clipboardMeta(node),
         class: "ritual-atom",
         contenteditable: "false",
       },
@@ -154,13 +255,28 @@ const RitualSegment = Mark.create({
   name: "ritualSegment",
   inclusive: false,
   addAttributes: () => ({ id: { default: null } }),
-  parseHTML: () => [{ tag: "span[data-ritual-segment]" }],
-  renderHTML: () => ["span", { "data-ritual-segment": "" }, 0],
+  parseHTML: () => [
+    {
+      tag: "span[data-ritual-segment]",
+      getAttrs: (element) => ({
+        id: element.getAttribute("data-ritual-segment"),
+      }),
+    },
+  ],
+  renderHTML: ({ mark }) => [
+    "span",
+    { "data-ritual-segment": mark.attrs.id },
+    0,
+  ],
 });
 
 /** Editor-only schema. The saved semantic document never depends on Tiptap JSON. */
 export const ritualTiptapExtensions = [
   StarterKit.configure({
+    code: false,
+    link: false,
+    strike: false,
+    underline: false,
     blockquote: false,
     bulletList: false,
     codeBlock: false,
@@ -172,11 +288,70 @@ export const ritualTiptapExtensions = [
     trailingNode: false,
   }),
   RitualBlock,
+  RitualTask,
   RitualSpan,
   RitualInline,
   RitualAtom,
   RitualSegment,
 ];
+
+const ritualSchema = getSchema(ritualTiptapExtensions);
+
+/** Refuse visual edits when ProseMirror would alter the semantic reader tree. */
+export function visualRitualState(input: RitualSemanticDocument): {
+  content: JSONContent;
+  issue: string | null;
+} {
+  try {
+    const content = semanticToTiptap(input);
+    const parsed = ritualSchema.nodeFromJSON(content);
+    parsed.check();
+    if (
+      JSON.stringify(semanticToJrt(input)) !==
+      JSON.stringify(semanticToJrt(semanticFromTiptap(parsed.toJSON())))
+    )
+      throw new Error(
+        "This structure cannot round-trip through visual editing.",
+      );
+    return { content, issue: null };
+  } catch {
+    return {
+      content: { type: "doc", content: [{ type: "paragraph" }] },
+      issue:
+        "This ritual contains structures that require source editing. Its content is preserved.",
+    };
+  }
+}
+
+/** Keep pasted identities stable in ProseMirror, not just in a derived snapshot. */
+export function normalizeTiptapNodeIds(editor: Editor): boolean {
+  const seen = new Set<string>();
+  const tr = editor.state.tr;
+  editor.state.doc.descendants((node, pos) => {
+    if (
+      ![
+        "ritualBlock",
+        "ritualTask",
+        "ritualSpan",
+        "ritualInline",
+        "ritualAtom",
+      ].includes(node.type.name)
+    )
+      return;
+    const id = node.attrs.id;
+    if (typeof id === "string" && isUuidV7(id) && !seen.has(id)) {
+      seen.add(id);
+      return;
+    }
+    const fresh = createUuidV7();
+    seen.add(fresh);
+    tr.setNodeMarkup(pos, undefined, { ...node.attrs, id: fresh }, node.marks);
+  });
+  if (!tr.docChanged) return false;
+  tr.setMeta("addToHistory", false);
+  editor.view.dispatch(tr);
+  return true;
+}
 
 function toInline(node: RitualSemanticNode): JSONContent {
   if (node.kind === "text")
@@ -237,7 +412,7 @@ function toBlocks(nodes: RitualSemanticNode[]): JSONContent[] {
       });
     else
       result.push({
-        type: "ritualBlock",
+        type: node.tag === "task" ? "ritualTask" : "ritualBlock",
         attrs,
         content: toBlocks(node.children ?? []),
       });
@@ -250,7 +425,13 @@ function toBlocks(nodes: RitualSemanticNode[]): JSONContent[] {
 export function semanticToTiptap(input: RitualSemanticDocument): JSONContent {
   const errors = validateRitualSemantic(input);
   if (errors.length) throw new Error(errors[0]);
-  return { type: "doc", content: toBlocks(input.nodes) };
+  if (hasDirectNestedTask(input.nodes))
+    throw new Error("Nested tasks are not supported by the visual editor");
+  const content = toBlocks(input.nodes);
+  return {
+    type: "doc",
+    content: content.length ? content : [{ type: "paragraph" }],
+  };
 }
 
 function fromInline(node: JSONContent): RitualSemanticNode {
@@ -351,7 +532,7 @@ function fromBlocks(nodes: JSONContent[]): RitualSemanticNode[] {
         });
       continue;
     }
-    if (node.type === "ritualBlock") {
+    if (node.type === "ritualBlock" || node.type === "ritualTask") {
       const children = fromBlocks(node.content ?? []);
       const attrs = { ...(node.attrs?.attrs ?? {}) };
       if (

@@ -5,6 +5,12 @@ import { parseRitualText, printRitualText } from "./ritualText";
 import { semanticFromJrt } from "./semantic";
 
 describe("ritual text projection", () => {
+  it("uses generic attributes for imported variable names outside shortcut syntax", () => {
+    const original = semanticFromJrt({
+      children: [{ type: "var", name: "my name" }],
+    });
+    expect(parseRitualText(printRitualText(original))).toEqual(original);
+  });
   for (const name of ["0=0", "1=10", "2=9"]) {
     it(`round-trips the complete ${name} semantic tree`, () => {
       const source = readFileSync(

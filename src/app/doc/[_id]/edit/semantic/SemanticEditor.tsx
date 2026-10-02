@@ -10,13 +10,16 @@ import {
 } from "@mui/material";
 import { EditorContent, useEditor } from "@tiptap/react";
 import React from "react";
+import RitualVisualControls from "@/doc/RitualVisualControls";
 import { parseRitualText, printRitualText } from "@/doc/ritualText";
+import SemanticPublication from "@/doc/SemanticPublication";
 import {
   type RitualSemanticDocument,
   validateRitualSemantic,
 } from "@/doc/semantic";
 import {
   clearSemanticDraft,
+  confirmSemanticSave,
   loadSemanticDraft,
   type SemanticDraft,
   saveSemanticDraft,
@@ -27,9 +30,10 @@ import {
 } from "@/doc/sqlEditorClient";
 import type { SqlRitualWriteRequest } from "@/doc/sqlWriteContract";
 import {
+  normalizeTiptapNodeIds,
   ritualTiptapExtensions,
   semanticFromTiptap,
-  semanticToTiptap,
+  visualRitualState,
 } from "@/doc/tiptapRitual";
 import { createUuidV7 } from "@/lib/ids";
 import { getBrowserOfflineRuntime } from "@/offline/browserRuntime";
@@ -82,29 +86,24 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   const [saving, setSaving] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [notice, setNotice] = React.useState<string | null>(null);
-  const [selectedTask, setSelectedTask] = React.useState<{
-    pos: number;
-    role: string;
-    mode: "say" | "do";
-  } | null>(null);
-  const [role, setRole] = React.useState("all");
+  const [initialVisual] = React.useState(() =>
+    visualRitualState(props.initialDocument),
+  );
+  const [visualIssue, setVisualIssue] = React.useState(initialVisual.issue);
+  const displayMode = visualIssue ? "source" : mode;
   const skipPersist = React.useRef(true);
   const liveDraft = React.useRef<SemanticDraft | null>(null);
-  const confirmedSave = React.useRef<{
-    revisionId: string;
-    version: number;
-    title: string;
-    documentJson: string;
-  } | null>(null);
   const draftWrites = React.useRef<Promise<void>>(Promise.resolve());
+  const draftWriteVersion = React.useRef(0);
   const accessGeneration = React.useRef(0);
 
   const queueDraftWrite = React.useCallback(
     (operation: () => Promise<unknown>) => {
-      const next = draftWrites.current.then(async () => {
-        await operation();
-      });
-      draftWrites.current = next.catch(() => {});
+      const next = draftWrites.current.then(operation);
+      draftWrites.current = next.then(
+        () => {},
+        () => {},
+      );
       return next;
     },
     [],
@@ -112,7 +111,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
 
   const editor = useEditor({
     extensions: ritualTiptapExtensions,
-    content: semanticToTiptap(props.initialDocument),
+    content: initialVisual.content,
     immediatelyRender: false,
     editorProps: {
       attributes: {
@@ -121,10 +120,11 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         "aria-multiline": "true",
       },
     },
-    onUpdate({ editor: changed }) {
+    onUpdate({ editor: changed, transaction }) {
+      if (!transaction.docChanged) return;
       try {
+        if (normalizeTiptapNodeIds(changed)) return;
         const next = semanticFromTiptap(changed.getJSON());
-        if (confirmedSave.current?.documentJson === stringify(next)) return;
         skipPersist.current = false;
         setDocument(next);
         setSource((current) =>
@@ -140,26 +140,6 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             : "The visual document is invalid.",
         );
       }
-    },
-    onSelectionUpdate({ editor: selected }) {
-      const position = selected.state.selection.$from;
-      for (let depth = position.depth; depth > 0; depth--) {
-        const node = position.node(depth);
-        if (node.type.name === "ritualBlock" && node.attrs.tag === "task") {
-          const next = {
-            pos: position.before(depth),
-            role: String(node.attrs.attrs.role ?? "all"),
-            mode:
-              node.attrs.attrs.say === true
-                ? ("say" as const)
-                : ("do" as const),
-          };
-          setSelectedTask(next);
-          setRole(next.role);
-          return;
-        }
-      }
-      setSelectedTask(null);
     },
   });
 
@@ -284,7 +264,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     if (!editor || access !== "ready" || ready) return;
     let active = true;
     loadSemanticDraft(props.actorId, props.ritualId)
-      .then((draft) => {
+      .then(async (draft) => {
         if (!active || !draft) return;
         if (
           draft.baseRevisionId !== props.revisionId ||
@@ -297,8 +277,21 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           const parsed: unknown = JSON.parse(draft.documentJson);
           const errors = validateRitualSemantic(parsed);
           if (errors.length) throw new Error(errors[0]);
+          if (
+            !draft.pending &&
+            !draft.sourceDirty &&
+            !draft.sourceConflict &&
+            draft.title === props.title &&
+            draft.documentJson === stringify(props.initialDocument) &&
+            draft.sourceBuffer === printRitualText(props.initialDocument)
+          ) {
+            await clearSemanticDraft(props.actorId, props.ritualId);
+            return;
+          }
           const restored = parsed as RitualSemanticDocument;
-          editor.commands.setContent(semanticToTiptap(restored), {
+          const visual = visualRitualState(restored);
+          setVisualIssue(visual.issue);
+          editor.commands.setContent(visual.content, {
             emitUpdate: false,
           });
           setDocument(restored);
@@ -333,34 +326,34 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     props.ritualId,
     props.revisionId,
     props.parentVersion,
+    props.title,
+    props.initialDocument,
   ]);
 
   React.useEffect(() => {
     if (!editor) return;
     editor.setEditable(
-      access === "ready" &&
+      !visualIssue &&
+        access === "ready" &&
         ready &&
         !recoveryBlocked &&
         !saving &&
         !pending &&
         !stale,
     );
-  }, [editor, access, ready, recoveryBlocked, saving, pending, stale]);
+  }, [
+    editor,
+    access,
+    ready,
+    recoveryBlocked,
+    saving,
+    pending,
+    stale,
+    visualIssue,
+  ]);
 
   React.useEffect(() => {
     if (access !== "ready" || !ready || skipPersist.current) return;
-    const confirmed = confirmedSave.current;
-    if (
-      confirmed &&
-      confirmed.revisionId === base.revisionId &&
-      confirmed.version === base.version &&
-      confirmed.title === title &&
-      confirmed.documentJson === stringify(document) &&
-      !source.dirty &&
-      !source.conflict &&
-      !pending
-    )
-      return;
     liveDraft.current = {
       ownerId: props.actorId,
       ritualId: props.ritualId,
@@ -374,7 +367,10 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       pending,
       updatedAt: Date.now(),
     };
+    const writeVersion = draftWriteVersion.current;
     const timer = setTimeout(() => {
+      if (skipPersist.current || writeVersion !== draftWriteVersion.current)
+        return;
       const draft: SemanticDraft = {
         ownerId: props.actorId,
         ritualId: props.ritualId,
@@ -426,7 +422,9 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     if (!editor || pending) return;
     try {
       const next = parseRitualText(source.text);
-      editor.commands.setContent(semanticToTiptap(next), { emitUpdate: false });
+      const visual = visualRitualState(next);
+      editor.commands.setContent(visual.content, { emitUpdate: false });
+      setVisualIssue(visual.issue);
       setDocument(next);
       setSource((current) => ({ ...current, dirty: false, conflict: false }));
       setError(null);
@@ -436,49 +434,6 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         cause instanceof Error ? cause.message : "The source is invalid.",
       );
     }
-  };
-
-  const insertTask = (kind: "say" | "do") => {
-    if (!editor || pending) return;
-    editor
-      .chain()
-      .focus()
-      .insertContent({
-        type: "ritualBlock",
-        attrs: {
-          id: createUuidV7(),
-          tag: "task",
-          attrs: { [kind]: true, role: role.trim() || "all" },
-        },
-        content: [{ type: "paragraph" }],
-      })
-      .run();
-  };
-
-  const insertNote = () => {
-    if (!editor || pending) return;
-    editor
-      .chain()
-      .focus()
-      .insertContent({
-        type: "ritualBlock",
-        attrs: { id: createUuidV7(), tag: "note", attrs: {} },
-        content: [{ type: "paragraph" }],
-      })
-      .run();
-  };
-
-  const applyRole = () => {
-    if (!editor || !selectedTask || pending) return;
-    const node = editor.state.doc.nodeAt(selectedTask.pos);
-    if (!node) return;
-    const updated = {
-      ...node.attrs,
-      attrs: { ...node.attrs.attrs, role: role.trim() },
-    };
-    editor.view.dispatch(
-      editor.state.tr.setNodeMarkup(selectedTask.pos, undefined, updated),
-    );
   };
 
   const confirmStalePending = async () => {
@@ -513,7 +468,14 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         setError(result.message);
         return;
       }
-      await clearSemanticDraft(props.actorId, props.ritualId);
+      await confirmSemanticSave({
+        version: 1,
+        operationId: request.operationId,
+        expectedActorId: props.actorId,
+        ritualId: props.ritualId,
+        expectedRevisionId: result.revisionId,
+        expectedVersion: result.version,
+      });
       setStale(null);
       setReloadRequired(true);
       setNotice(
@@ -576,19 +538,25 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         return;
       }
       skipPersist.current = true;
-      confirmedSave.current = {
-        revisionId: result.revisionId,
-        version: result.version,
-        title,
-        documentJson: request.source,
-      };
+      draftWriteVersion.current++;
       liveDraft.current = null;
       setBase({ revisionId: result.revisionId, version: result.version });
       setPending(null);
       try {
-        await queueDraftWrite(() =>
-          clearSemanticDraft(props.actorId, props.ritualId),
+        const retained = await queueDraftWrite(() =>
+          confirmSemanticSave({
+            version: 1,
+            operationId: request.operationId,
+            expectedActorId: props.actorId,
+            ritualId: props.ritualId,
+            expectedRevisionId: result.revisionId,
+            expectedVersion: result.version,
+          }),
         );
+        if (retained === false) {
+          setReloadRequired(true);
+          return;
+        }
         setError(null);
       } catch {
         setError(
@@ -626,10 +594,17 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         The local draft could not be loaded. Reload this page before editing.
       </Alert>
     );
-  if (!editor || !ready || access !== "ready")
+  if (!editor || !ready)
     return <p>Verifying account and loading local draft…</p>;
   return (
-    <Box className={styles.root}>
+    <Box
+      className={styles.root}
+      sx={{ visibility: access === "checking" ? "hidden" : undefined }}
+      aria-hidden={access === "checking"}
+    >
+      {access === "checking" && (
+        <Alert severity="info">Verifying editor access…</Alert>
+      )}
       <Typography variant="h4" component="h1">
         Ritual editor
       </Typography>
@@ -637,6 +612,23 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         <Alert severity="info">
           This is a semantic conversion of the current Pug revision. Saving
           creates a new revision; the original source remains in history.
+        </Alert>
+      )}
+      {props.importReport && props.importReport.opaqueCount > 0 && (
+        <Alert severity="warning">
+          {props.importReport.opaqueCount} unsupported legacy blocks are
+          preserved. Inspect them in ritual source; they cannot be edited
+          visually.
+        </Alert>
+      )}
+      {visualIssue && (
+        <Alert severity="warning">
+          {visualIssue}
+          {props.importedFromLegacy && (
+            <Button href={`/doc/${props.ritualId}/edit?legacy=1`}>
+              Open Pug editor
+            </Button>
+          )}
         </Alert>
       )}
       {stale && (
@@ -673,12 +665,19 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         </Alert>
       )}
       {notice && <Alert severity="success">{notice}</Alert>}
+      <SemanticPublication
+        actorId={props.actorId}
+        ritualId={props.ritualId}
+        revisionId={base.revisionId}
+        version={base.version}
+        enabled={access === "ready" && !saving && !pending && !stale}
+      />
       <Box className={styles.topbar}>
         <TextField
           label="Title"
           size="small"
           value={title}
-          disabled={!!pending || !!stale}
+          disabled={access !== "ready" || !!pending || !!stale}
           onChange={(event) => {
             skipPersist.current = false;
             setTitle(event.target.value);
@@ -688,7 +687,10 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           {(["visual", "source", "split"] as const).map((item) => (
             <Button
               key={item}
-              variant={mode === item ? "contained" : "outlined"}
+              variant={displayMode === item ? "contained" : "outlined"}
+              disabled={
+                access !== "ready" || (!!visualIssue && item !== "source")
+              }
               onClick={() => setMode(item)}
             >
               {item}
@@ -716,82 +718,23 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         </Alert>
       )}
       <Box className={styles.panels}>
-        {mode !== "source" && (
+        {displayMode !== "source" && (
           <section
             className={styles.visualPanel}
             aria-label="Visual editor panel"
           >
-            <Box className={styles.toolbar}>
-              <Button
-                size="small"
-                onClick={() => insertTask("say")}
-                disabled={!!pending || !!stale}
-              >
-                Speech
-              </Button>
-              <Button
-                size="small"
-                onClick={() => insertTask("do")}
-                disabled={!!pending || !!stale}
-              >
-                Action
-              </Button>
-              <Button
-                size="small"
-                onClick={insertNote}
-                disabled={!!pending || !!stale}
-              >
-                Note
-              </Button>
-              <Button
-                size="small"
-                onClick={() => editor.chain().focus().toggleBold().run()}
-                disabled={!!pending || !!stale}
-              >
-                Bold
-              </Button>
-              <Button
-                size="small"
-                onClick={() => editor.chain().focus().toggleItalic().run()}
-                disabled={!!pending || !!stale}
-              >
-                Italic
-              </Button>
-              <Button
-                size="small"
-                onClick={() => editor.chain().focus().undo().run()}
-                disabled={!!pending || !!stale}
-              >
-                Undo
-              </Button>
-              <Button
-                size="small"
-                onClick={() => editor.chain().focus().redo().run()}
-                disabled={!!pending || !!stale}
-              >
-                Redo
-              </Button>
-            </Box>
-            <Box className={styles.rolebar}>
-              <TextField
-                label={
-                  selectedTask ? "Selected task role" : "Role for new task"
-                }
-                size="small"
-                value={role}
-                disabled={!!pending || !!stale}
-                onChange={(event) => setRole(event.target.value)}
-              />
-              {selectedTask && (
-                <Button onClick={applyRole} disabled={!!pending || !!stale}>
-                  Apply role
-                </Button>
-              )}
-            </Box>
+            <RitualVisualControls
+              editor={editor}
+              concealed={access !== "ready"}
+              disabled={access !== "ready" || saving || !!pending || !!stale}
+              actorId={props.actorId}
+              ritualId={props.ritualId}
+              title={title}
+            />
             <EditorContent editor={editor} className={styles.editor} />
           </section>
         )}
-        {mode !== "visual" && (
+        {displayMode !== "visual" && (
           <section
             className={styles.sourcePanel}
             aria-label="Semantic source panel"
@@ -806,7 +749,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
               aria-label="Ritual semantic source"
               spellCheck={false}
               value={source.text}
-              disabled={!!pending || !!stale}
+              disabled={access !== "ready" || !!pending || !!stale}
               onChange={(event) => {
                 skipPersist.current = false;
                 setSource({
@@ -825,19 +768,34 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             <Box className={styles.sourceActions}>
               <Button
                 onClick={applySource}
-                disabled={!source.dirty || !!pending || !!stale}
+                disabled={
+                  access !== "ready" || !source.dirty || !!pending || !!stale
+                }
               >
                 Apply source
               </Button>
               <Button
-                onClick={() =>
+                onClick={() => {
                   setSource({
                     text: printRitualText(document),
                     dirty: false,
                     conflict: false,
-                  })
+                  });
+                  try {
+                    // A source error can be cleared only if the other panel is valid.
+                    if (!visualIssue) semanticFromTiptap(editor.getJSON());
+                    setError(null);
+                  } catch (cause) {
+                    setError(
+                      cause instanceof Error
+                        ? cause.message
+                        : "The visual document is invalid.",
+                    );
+                  }
+                }}
+                disabled={
+                  access !== "ready" || !source.dirty || !!pending || !!stale
                 }
-                disabled={!source.dirty || !!pending || !!stale}
               >
                 Discard source changes
               </Button>

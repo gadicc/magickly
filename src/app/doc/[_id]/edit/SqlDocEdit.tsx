@@ -3,6 +3,7 @@
 import { StreamLanguage } from "@codemirror/language";
 import { pug } from "@codemirror/legacy-modes/mode/pug";
 import { type Diagnostic, setDiagnostics } from "@codemirror/lint";
+import { type EditorState, Transaction } from "@codemirror/state";
 import { Save } from "@mui/icons-material";
 import {
   Alert,
@@ -49,6 +50,11 @@ import type {
 import type { DocNode } from "@/schemas";
 import DocRender from "../DocRender";
 import { checkSrc } from "./checkSrc";
+import {
+  capturePreview,
+  type PreviewPresentation,
+  restorePreview,
+} from "./previewResume";
 import SourceMapConsumer from "./SourceMapConsumer";
 import scripts from "./scripts";
 import { shortcutHighlighters, transformAndMapShortcuts } from "./shortcuts";
@@ -75,6 +81,22 @@ type ScriptHandle = {
   transformed: string;
   run(script: string): void;
   view?: EditorView;
+};
+
+type ResumePresentation = {
+  ownerId: string;
+  epoch: string;
+  ritualId: string;
+  draftId: string;
+  source: string;
+  state: EditorState;
+  scroll: ReturnType<EditorView["scrollSnapshot"]>;
+  sourceTop: number;
+  sourceLeft: number;
+  doc: DocNode;
+  rootTop: number;
+  rootLeft: number;
+  preview: PreviewPresentation;
 };
 
 function toPos(value: string, line: number, column: number) {
@@ -141,6 +163,22 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
   const generation = React.useRef(0);
   const compilationGeneration = React.useRef(0);
   const viewRef = React.useRef<EditorView | undefined>(undefined);
+  const rootRef = React.useRef<HTMLDivElement | null>(null);
+  const previewRef = React.useRef<HTMLDivElement | null>(null);
+  const displayRef = React.useRef(display);
+  displayRef.current = display;
+  // Held only across visibility/focus checks, never used as an access grant.
+  const resumeRef = React.useRef<ResumePresentation | null>(null);
+  const restoreRef = React.useRef<ResumePresentation | null>(null);
+  const previewRestoreRef = React.useRef<ReturnType<
+    typeof restorePreview
+  > | null>(null);
+  const sourceRestoreRef = React.useRef<{
+    view: EditorView;
+    saved: ResumePresentation;
+    pending(): boolean;
+    stop(): void;
+  } | null>(null);
   const synchronizingViewRef = React.useRef(false);
   const compileTimer = React.useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
@@ -346,11 +384,70 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
       currentDraft.ritualId === ritualId
         ? currentDraft.source
         : "";
+    const restore = restoreRef.current;
+    if (visibleRef.current && displayedDraft && restore) {
+      restoreRef.current = null;
+      synchronizingViewRef.current = true;
+      try {
+        view.setState(restore.state);
+        sourceRestoreRef.current?.stop();
+        // CM applies its snapshot during a later measurement. IdentityBridge
+        // can reclose the view before then; retain the original target until
+        // the scroll event confirms it or the user interacts.
+        const scroller = view.scrollDOM;
+        const events = [
+          "wheel",
+          "touchstart",
+          "pointerdown",
+          "keydown",
+        ] as const;
+        let stopped = false;
+        const stop = () => {
+          stopped = true;
+          scroller.removeEventListener("scroll", check);
+          for (const event of events) scroller.removeEventListener(event, stop);
+        };
+        const check = () => {
+          if (
+            !stopped &&
+            Math.abs(scroller.scrollTop - restore.sourceTop) < 1 &&
+            Math.abs(scroller.scrollLeft - restore.sourceLeft) < 1
+          )
+            stop();
+        };
+        scroller.addEventListener("scroll", check);
+        for (const event of events)
+          scroller.addEventListener(event, stop, { passive: true });
+        sourceRestoreRef.current = {
+          view,
+          saved: restore,
+          pending: () => !stopped,
+          stop,
+        };
+        view.dispatch({ effects: restore.scroll });
+        check();
+        if (rootRef.current) {
+          rootRef.current.scrollTop = restore.rootTop;
+          rootRef.current.scrollLeft = restore.rootLeft;
+        }
+        if (previewRef.current) {
+          previewRestoreRef.current?.stop();
+          previewRestoreRef.current = restorePreview(
+            previewRef.current,
+            restore.preview,
+          );
+        }
+      } finally {
+        synchronizingViewRef.current = false;
+      }
+      return;
+    }
     if (view.state.doc.toString() === source) return;
     synchronizingViewRef.current = true;
     try {
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: source },
+        annotations: Transaction.addToHistory.of(false),
       });
     } finally {
       synchronizingViewRef.current = false;
@@ -482,6 +579,17 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
           };
         }
         runtime.coordinator.commit(operation, () => {
+          const held = resumeRef.current;
+          const resume =
+            held?.ownerId === account.ownerId &&
+            held.epoch === account.epoch &&
+            held.ritualId === ritualId &&
+            held.draftId === draft.id &&
+            held.source === draft.source
+              ? held
+              : null;
+          resumeRef.current = null;
+          restoreRef.current = resume;
           visibleRef.current = true;
           draftRef.current = draft;
           setDisplay({
@@ -489,7 +597,7 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
             ritualId,
             title: source.title,
             draft,
-            doc: emptyDoc(),
+            doc: resume?.doc ?? emptyDoc(),
           });
           setError(
             handoffWarning ??
@@ -633,6 +741,64 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
           },
           hide: (reason) => {
             if (reason === "account") syncPending = true;
+            // IdentityBridge re-verifies the account on visibility return;
+            // another tab may broadcast the same persisted account/lease.
+            const transient =
+              reason === "hidden" ||
+              reason === "resume" ||
+              reason === "account" ||
+              reason === "change";
+            const account = runtime.coordinator.state.account;
+            const currentDraft = draftRef.current;
+            const currentView = viewRef.current;
+            const currentDisplay = displayRef.current;
+            if (
+              transient &&
+              visibleRef.current &&
+              currentView &&
+              account &&
+              currentDraft &&
+              currentDraft.ownerId === account.ownerId &&
+              currentDraft.ritualId === ritualId &&
+              currentView.state.doc.toString() === currentDraft.source &&
+              currentDisplay.kind === "ready"
+            ) {
+              const pendingScroll = sourceRestoreRef.current;
+              const scroll =
+                pendingScroll?.pending() &&
+                pendingScroll.view === currentView &&
+                pendingScroll.saved.draftId === currentDraft.id &&
+                pendingScroll.saved.source === currentDraft.source
+                  ? pendingScroll.saved
+                  : null;
+              resumeRef.current = {
+                ...account,
+                ritualId,
+                draftId: currentDraft.id,
+                source: currentDraft.source,
+                state: currentView.state,
+                scroll: scroll?.scroll ?? currentView.scrollSnapshot(),
+                sourceTop: scroll?.sourceTop ?? currentView.scrollDOM.scrollTop,
+                sourceLeft:
+                  scroll?.sourceLeft ?? currentView.scrollDOM.scrollLeft,
+                // The preview may lag a just-typed edit. Keep its existing
+                // height until compilation catches up, so scroll cannot clamp.
+                doc: currentDisplay.doc,
+                rootTop: rootRef.current?.scrollTop ?? 0,
+                rootLeft: rootRef.current?.scrollLeft ?? 0,
+                preview: previewRestoreRef.current?.pending()
+                  ? previewRestoreRef.current.saved
+                  : capturePreview(previewRef.current),
+              };
+            } else if (transient && restoreRef.current) {
+              // Focus/pageshow can interrupt before uiw creates its new view.
+              resumeRef.current = restoreRef.current;
+            } else if (!transient) resumeRef.current = null;
+            restoreRef.current = null;
+            previewRestoreRef.current?.stop();
+            previewRestoreRef.current = null;
+            sourceRestoreRef.current?.stop();
+            sourceRestoreRef.current = null;
             visibleRef.current = false;
             generation.current++;
             compilationGeneration.current++;
@@ -643,7 +809,6 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
             setPublicationNotice(null);
             setAssetLocator("");
             hideScriptHandle();
-            const currentView = viewRef.current;
             currentView?.dispatch({
               changes: {
                 from: 0,
@@ -687,6 +852,12 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
       syncRef.current = async () => {};
       hideScriptHandle();
       runtimeRef.current = null;
+      resumeRef.current = null;
+      restoreRef.current = null;
+      previewRestoreRef.current?.stop();
+      previewRestoreRef.current = null;
+      sourceRestoreRef.current?.stop();
+      sourceRestoreRef.current = null;
     };
   }, [hideScriptHandle, load, preserveWithRuntime, ritualId]);
 
@@ -1164,7 +1335,7 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
     currentDisplay.draft.source !== currentDisplay.draft.savedSource;
   if (currentDisplay.kind !== "ready")
     return (
-      <div style={{ padding: 16 }}>
+      <div style={{ padding: 16, height: "calc(100vh - 64px)" }}>
         {currentDisplay.kind === "loading" ? (
           <div>Loading ritual source...</div>
         ) : (
@@ -1179,6 +1350,8 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
 
   return (
     <div
+      ref={rootRef}
+      aria-label="Ritual editor panes"
       style={{
         height: "calc(100vh - 64px)",
         maxWidth: "100%",
@@ -1266,6 +1439,8 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
           </Tooltip>
         </div>
         <div
+          ref={previewRef}
+          aria-label="Ritual preview pane"
           style={{
             width: "50%",
             minWidth: 100,

@@ -7,6 +7,7 @@ import {
   type RitualPermissionResponseV1,
 } from "../offline/permissionContract";
 import { parseRitualScope, type RitualScope } from "./access";
+import { validateRitualSemantic } from "./semantic";
 import {
   SQL_RITUAL_WRITE_MESSAGES,
   type SqlRitualWriteRequest,
@@ -248,7 +249,7 @@ export function parseSqlRitualCreateRequest(
     const row = value as Record<string, unknown>;
     const scope = parseRitualScope(row.scope);
     if (
-      row.version !== 2 ||
+      (row.version !== 2 && row.version !== 3) ||
       row.kind !== "create" ||
       !id(row.operationId) ||
       !id(row.expectedActorId) ||
@@ -265,8 +266,12 @@ export function parseSqlRitualCreateRequest(
       !text(row.source, SOURCE_BYTES)
     )
       return null;
+    if (row.version === 3) {
+      const semantic: unknown = JSON.parse(row.source);
+      if (validateRitualSemantic(semantic).length) return null;
+    }
     return {
-      version: 2,
+      version: row.version,
       operationId: row.operationId,
       expectedActorId: row.expectedActorId,
       kind: "create",

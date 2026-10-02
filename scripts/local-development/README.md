@@ -68,21 +68,22 @@ credentials on this machine; a new database prompts for an administrator
 password. The migration task runs `local-development:verify-db` before
 `db:migrate`. The seed repeats the live identity check and is safe to rerun; it
 adds no admin grant, file row, or bucket object. `LOOM_LOCAL_TEST_LOGIN=1`
-exposes Creator and Reader buttons at `/signin` without Google. Set
-`RITUAL_SEMANTIC_EDITOR=1` for the opt-in semantic editor pilot.
+exposes Creator and Reader buttons at `/signin` without Google. The ritual
+editor is enabled by default; it needs no feature flag or database migration.
 Leave `MAGICKLI_LOCAL_ACCEPTANCE` unset in ordinary development. The separate
 numeric-loopback production-build acceptance path is documented in
 `scripts/local-acceptance/README.md`.
 
-Initialization verifies the bucket with `pnpm exec loom files local check`. Attach
-a small synthetic PNG at `/upload` to a ritual you edit. Paste the returned
-source reference into the ritual editor's **Attached image source reference**
-field,
-insert the image, and save. Wait for **Published for download** before testing
+Initialization verifies the bucket with `pnpm exec loom files local check`.
+Create a test-owned temple as Creator, then create a ritual on `/gd/rituals`.
+Use **Image** in the visual editor to upload a small synthetic PNG, then save.
+The standalone `/upload` flow also remains available. Wait for **Published for download** before testing
 with a Reader who has a matching temple membership. The private `/api/files`
 reference should serve the image only to an authorized reader; opening the
 ritual online should add it to that reader's `/offline/ritual` catalog. The
-semantic editor remains opt-in.
+editor opens automatically. Legacy Pug can be opened with `?legacy=1` when
+conversion cannot preserve the reader tree. Unsupported visual shapes use
+ritual source, and opaque legacy blocks remain preserved.
 
 Changing these settings does not copy objects or rewrite SQL locations. The
 local acceptance database contains a synthetic file and bundle assets bound to
