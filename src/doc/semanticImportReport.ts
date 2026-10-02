@@ -28,7 +28,7 @@ export function createSemanticImportReport(
     for (const node of nodes) {
       if (node.kind === "text") report.textCount++;
       else if (node.kind === "legacy") report.opaqueCount++;
-      else {
+      else if (node.kind === "element") {
         report.elementCount++;
         if (node.children) visit(node.children);
       }

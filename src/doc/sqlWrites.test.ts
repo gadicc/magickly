@@ -317,7 +317,16 @@ describe("atomic canonical SQL-v2 ritual writes", () => {
         },
       ],
     };
-    command.source = JSON.stringify(semanticFromJrt(jrt), null, 2);
+    const document = semanticFromJrt(jrt);
+    document.nodes.unshift(
+      {
+        kind: "annotation",
+        style: "comment",
+        text: "Synthetic author comment",
+      },
+      { kind: "annotation", style: "blank", text: "" },
+    );
+    command.source = JSON.stringify(document, null, 2);
     const first = await writer()(command);
     expect(first).toMatchObject({ ok: true, replayed: false, version: 8 });
     if (!first.ok) throw new Error("Expected semantic save");
@@ -346,6 +355,9 @@ describe("atomic canonical SQL-v2 ritual writes", () => {
       outputFormatVersion: compiler.RITUAL_OUTPUT_FORMAT_VERSION,
     });
     expect(JSON.parse(artifact.contentJson)).toEqual(jrt);
+    expect(JSON.parse(revision.source).nodes.slice(0, 2)).toEqual(
+      document.nodes.slice(0, 2),
+    );
     expect(
       await reader(actor.member).getRendered(command.ritualId),
     ).toMatchObject({

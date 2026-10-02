@@ -20,6 +20,7 @@ import {
   parseRitualSource,
   printRitualSource,
   type RitualSourceDialect,
+  restorePugDraftAnnotations,
 } from "@/doc/ritualSource";
 import SemanticPublication from "@/doc/SemanticPublication";
 import {
@@ -88,6 +89,8 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   });
   const [pending, setPending] = React.useState<SaveRequest | null>(null);
   const [stale, setStale] = React.useState<SemanticDraft | null>(null);
+  const [manualRecoveryDraft, setManualRecoveryDraft] =
+    React.useState<SemanticDraft | null>(null);
   const [reloadRequired, setReloadRequired] = React.useState(false);
   const [recoveryBlocked, setRecoveryBlocked] = React.useState(false);
   const [ready, setReady] = React.useState(false);
@@ -362,7 +365,16 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             await clearSemanticDraft(props.actorId, props.ritualId);
             return;
           }
-          const restored = parsed as RitualSemanticDocument;
+          let restored = parsed as RitualSemanticDocument;
+          // Older clean Pug buffers retain trivia that their saved JSON dropped.
+          // The pending request itself remains immutable; recovered annotations
+          // can become an unsaved follow-up after its receipt is confirmed.
+          if (
+            draftDialect === "pug" &&
+            !draft.sourceDirty &&
+            !draft.sourceConflict
+          )
+            restored = restorePugDraftAnnotations(restored, draft.sourceBuffer);
           const visual = visualRitualState(restored);
           setVisualIssue(visual.issue);
           editor.commands.setContent(visual.content, {
@@ -544,7 +556,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
 
   const confirmStalePending = async () => {
     const request = stale?.pending;
-    if (!request || saving || access !== "ready") return;
+    if (!stale || !request || saving || access !== "ready") return;
     if (
       request.version !== 3 ||
       request.expectedActorId !== props.actorId ||
@@ -574,14 +586,58 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         setError(result.message);
         return;
       }
-      await confirmSemanticSave({
-        version: 1,
-        operationId: request.operationId,
-        expectedActorId: props.actorId,
-        ritualId: props.ritualId,
-        expectedRevisionId: result.revisionId,
-        expectedVersion: result.version,
-      });
+      let followUp: SemanticDraft | undefined;
+      if (
+        (stale.sourceDialect ??
+          detectRitualSourceDialect(stale.sourceBuffer)) === "pug" &&
+        !stale.sourceDirty &&
+        !stale.sourceConflict
+      ) {
+        const restored = restorePugDraftAnnotations(
+          JSON.parse(stale.documentJson),
+          stale.sourceBuffer,
+        );
+        if (
+          JSON.stringify(JSON.parse(request.source)) !==
+          JSON.stringify(restored)
+        ) {
+          if (
+            result.revisionId !== props.revisionId ||
+            result.version !== props.parentVersion
+          ) {
+            setError(
+              "The pending save is confirmed, but a newer server revision exists. Download this draft to recover its author annotations before discarding it.",
+            );
+            return;
+          }
+          const current = restorePugDraftAnnotations(
+            props.initialDocument,
+            stale.sourceBuffer,
+          );
+          followUp = {
+            ...stale,
+            baseRevisionId: result.revisionId,
+            baseVersion: result.version,
+            documentJson: stringify(current),
+            pending: null,
+            updatedAt: Date.now(),
+          };
+        }
+      }
+      setManualRecoveryDraft(followUp ?? null);
+      const retained = await confirmSemanticSave(
+        {
+          version: 1,
+          operationId: request.operationId,
+          expectedActorId: props.actorId,
+          ritualId: props.ritualId,
+          expectedRevisionId: result.revisionId,
+          expectedVersion: result.version,
+        },
+        followUp,
+      );
+      if (retained !== false) setManualRecoveryDraft(null);
+      else setManualRecoveryDraft(followUp ?? stale);
       setStale(null);
       setReloadRequired(true);
       setNotice(
@@ -643,26 +699,42 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         if (!result.retryable) setPending(null);
         return;
       }
+      const followUp: SemanticDraft | undefined =
+        JSON.stringify(JSON.parse(request.source)) !== JSON.stringify(document)
+          ? {
+              ...currentDraft(),
+              baseRevisionId: result.revisionId,
+              baseVersion: result.version,
+              pending: null,
+              updatedAt: Date.now(),
+            }
+          : undefined;
       skipPersist.current = true;
       draftWriteVersion.current++;
+      // Rejected recovery must never become the access-lock persistence snapshot.
       liveDraft.current = null;
+      setManualRecoveryDraft(followUp ?? null);
       setBase({ revisionId: result.revisionId, version: result.version });
       setPending(null);
       try {
         const retained = await queueDraftWrite(() =>
-          confirmSemanticSave({
-            version: 1,
-            operationId: request.operationId,
-            expectedActorId: props.actorId,
-            ritualId: props.ritualId,
-            expectedRevisionId: result.revisionId,
-            expectedVersion: result.version,
-          }),
+          confirmSemanticSave(
+            {
+              version: 1,
+              operationId: request.operationId,
+              expectedActorId: props.actorId,
+              ritualId: props.ritualId,
+              expectedRevisionId: result.revisionId,
+              expectedVersion: result.version,
+            },
+            followUp,
+          ),
         );
         if (retained === false) {
           setReloadRequired(true);
           return;
         }
+        setManualRecoveryDraft(null);
         setError(null);
       } catch {
         setError(
@@ -670,9 +742,11 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         );
       }
       setNotice(
-        result.replayed
-          ? "Save confirmed after retry."
-          : "Saved as a semantic revision.",
+        followUp
+          ? "Save confirmed. Recovered author annotations remain in your local draft; save again to include them."
+          : result.replayed
+            ? "Save confirmed after retry."
+            : "Saved as a semantic revision.",
       );
     } catch {
       setError("The save result is unknown. Retry the same pending request.");
@@ -686,8 +760,17 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   if (reloadRequired)
     return (
       <Alert severity="success">
-        The pending save is confirmed. Reload this page to open the current
-        revision.
+        {manualRecoveryDraft
+          ? "The pending save is confirmed, but local recovery changed. Download this draft before reloading."
+          : "The pending save is confirmed. Reload this page to open the current revision."}
+        {manualRecoveryDraft && (
+          <Button
+            disabled={access !== "ready"}
+            onClick={() => downloadDraft(manualRecoveryDraft)}
+          >
+            Download recovered draft
+          </Button>
+        )}
       </Alert>
     );
   if (recoveryBlocked)

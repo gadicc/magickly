@@ -62,19 +62,36 @@ export default function RitualPugGuide() {
         </li>
       </ul>
       <p>
-        Comments and your chosen spacing remain while editing source, but are
-        not stored in the semantic tree. A visual edit or syntax switch
-        regenerates canonical source and removes comments. Includes, JavaScript,
-        mixins, loops, raw HTML and arbitrary tags are unsupported.
+        Author comments and blank separator lines are stored with the tree and
+        survive visual edits, saving and syntax switches. They appear as small
+        annotation items in the visual editor, and are omitted from the reader.
+        Edit their wording in source. Blank lines within Pug literal text or
+        between consecutive pipe-text lines keep Pug’s content whitespace
+        behavior. Use <code>br/</code> for an explicit reader line break.
+        Indentation and other formatting are regenerated consistently. Multiline
+        comments may use a generated
+        <code> ritualComment(value="…")/</code> wrapper for exact preservation.
+        Includes, JavaScript, mixins, loops, raw HTML and arbitrary tags are
+        unsupported.
       </p>
       <h2>Speech, actions and inline content</h2>
       <p>
-        <code>say(role="hiero")</code> creates speech;{" "}
-        <code>do(role="keryx")</code>
-        creates an action. Roles can be comma-separated, <code>all</code>,
+        <code>hiero: Welcome.</code> creates speech;{" "}
+        <code>* keryx Open the door.</code> creates an action. These shortcuts
+        are the default generated spelling for tasks with inline content.
+        Explicit <code>say(role="hiero")</code> and{" "}
+        <code>do(role="keryx")</code> also work, and are used for more complex
+        tasks. Roles can be comma-separated, <code>all</code>,
         <code>all-officers</code> or <code>all-except-hiero</code>.
       </p>
       <Example source={ritualPugExamples.inline} />
+      <p>
+        Shortcuts lower-case the first letter of each role, like the original
+        ritual shortcuts. Names of supported Pug tags, such as <code>note</code>
+        , keep Pug’s colon expansion syntax; use explicit{" "}
+        <code>say(role="note")</code>
+        for a role with that name.
+      </p>
       <p>
         Use <code>b</code>, <code>i</code> and{" "}
         <code>a(href="https://example.com")</code>
@@ -104,10 +121,10 @@ export default function RitualPugGuide() {
       <h2>IDs and exact preservation</h2>
       <p>
         Canonical source includes <code>#id</code>, for example
-        <code> say#Ab3k9Qp7Zx2Mn5Rs(role="hiero") Welcome.</code> IDs are folded
-        into small <code>#…</code> markers by default. Click one to reveal it,
-        or choose <strong>Show IDs</strong>. Copying source and downloading
-        drafts include the complete IDs. Existing UUID IDs are valid too.
+        <code> hiero#Ab3k9Qp7Zx2Mn5Rs: Welcome.</code> IDs are folded into small{" "}
+        <code>#…</code> markers by default. Click one to reveal it, or choose{" "}
+        <strong>Show IDs</strong>. Copying source and downloading drafts include
+        the complete IDs. Existing UUID IDs are valid too.
       </p>
       <p>
         Keep IDs when editing or moving existing blocks. New tags can omit IDs;

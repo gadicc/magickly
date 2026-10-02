@@ -43,7 +43,7 @@ describe("Tiptap semantic adapter", () => {
     const copied = semanticFromTiptap(editor);
     expect(copied.nodes).toHaveLength(2);
     expect(original.nodes[0].kind).toBe("element");
-    if (original.nodes[0].kind === "text") throw new Error("Expected task");
+    if (original.nodes[0].kind !== "element") throw new Error("Expected task");
     expect(copied.nodes[0]).toMatchObject({ id: original.nodes[0].id });
     expect(copied.nodes[1]).not.toMatchObject({ id: original.nodes[0].id });
   });

@@ -43,8 +43,8 @@ it("preserves task identity, roles, and inline content through clipboard HTML", 
   pasted.check();
   const result = semanticFromTiptap(pasted.toJSON());
   expect(semanticToJrt(result)).toEqual(semanticToJrt(original));
-  expect(result.nodes.map((node) => node.kind !== "text" && node.id)).toEqual(
-    original.nodes.map((node) => node.kind !== "text" && node.id),
+  expect(result.nodes.map((node) => "id" in node && node.id)).toEqual(
+    original.nodes.map((node) => "id" in node && node.id),
   );
 });
 
@@ -87,7 +87,7 @@ it("gives pasted blocks stable new IDs in the live editor document", () => {
     const first = semanticFromTiptap(editor.getJSON());
     const second = semanticFromTiptap(editor.getJSON());
     const originalTask = original.nodes[0];
-    if (originalTask.kind === "text") throw new Error("Expected task");
+    if (originalTask.kind !== "element") throw new Error("Expected task");
     expect(first).toEqual(second);
     expect(first.nodes[0]).toMatchObject(originalTask);
     expect(first.nodes[1]).not.toMatchObject({ id: originalTask.id });

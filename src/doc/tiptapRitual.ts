@@ -211,13 +211,30 @@ const RitualAtom = Node.create({
     const tag = node.attrs.tag as string;
     const attrs = node.attrs.attrs as Record<string, JsonValue>;
     const value =
-      tag === "legacy"
-        ? "Unsupported legacy content · preserved"
-        : tag === "img"
-          ? `Image · ${String(attrs.alt ?? attrs.src ?? "")}`
-          : tag === "declareVar"
-            ? `Variable · ${String(attrs.label ?? attrs.name ?? "")}`
-            : label(tag, attrs);
+      tag === "sourceAnnotation"
+        ? attrs.style === "blank"
+          ? "Source separator · omitted from reader"
+          : `Author comment · ${String(attrs.text ?? "")}`
+        : tag === "legacy"
+          ? "Unsupported legacy content · preserved"
+          : tag === "img"
+            ? `Image · ${String(attrs.alt ?? attrs.src ?? "")}`
+            : tag === "declareVar"
+              ? `Variable · ${String(attrs.label ?? attrs.name ?? "")}`
+              : label(tag, attrs);
+    if (tag === "sourceAnnotation")
+      return [
+        "div",
+        {
+          "data-ritual-atom": tag,
+          "data-ritual-meta": clipboardMeta(node),
+          class: "ritual-atom",
+          contenteditable: "false",
+          style:
+            "font-size:0.8em;opacity:0.75;white-space:pre-wrap;padding:0.2rem 0.4rem",
+        },
+        value,
+      ];
     if (tag === "img" && parseRitualFileLocator(attrs.src))
       return [
         "div",
@@ -398,6 +415,17 @@ function toBlocks(nodes: RitualSemanticNode[]): JSONContent[] {
       continue;
     }
     flush();
+    if (node.kind === "annotation") {
+      result.push({
+        type: "ritualAtom",
+        attrs: {
+          id: createRitualNodeId(),
+          tag: "sourceAnnotation",
+          attrs: { style: node.style, text: node.text },
+        },
+      });
+      continue;
+    }
     if (node.kind === "legacy") {
       result.push({
         type: "ritualAtom",
@@ -516,7 +544,13 @@ function fromBlocks(nodes: JSONContent[]): RitualSemanticNode[] {
     }
     previousParagraph = false;
     if (node.type === "ritualAtom") {
-      if (node.attrs?.tag === "legacy")
+      if (node.attrs?.tag === "sourceAnnotation")
+        result.push({
+          kind: "annotation",
+          style: node.attrs.attrs?.style,
+          text: node.attrs.attrs?.text,
+        });
+      else if (node.attrs?.tag === "legacy")
         result.push({
           kind: "legacy",
           id: node.attrs?.id,
@@ -569,7 +603,7 @@ export function semanticFromTiptap(input: JSONContent): RitualSemanticDocument {
   const ids = new Set<string>();
   const normalize = (nodes: RitualSemanticNode[]) => {
     for (const node of nodes) {
-      if (node.kind === "text") continue;
+      if (node.kind === "text" || node.kind === "annotation") continue;
       if (ids.has(node.id)) node.id = createRitualNodeId();
       ids.add(node.id);
       if (node.kind === "element" && node.children) normalize(node.children);

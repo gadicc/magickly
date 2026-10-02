@@ -21,7 +21,9 @@ describe("semantic legacy import", () => {
       expect(validateRitualSemantic(semantic)).toEqual([]);
       expect(semanticToJrt(semantic)).toEqual(compiled);
       expect(
-        semantic.nodes.every((node) => node.kind === "text" || node.id),
+        semantic.nodes.every(
+          (node) => node.kind === "text" || ("id" in node && node.id),
+        ),
       ).toBe(true);
     });
   }

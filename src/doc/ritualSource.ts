@@ -1,6 +1,10 @@
 import { parseRitualPug, printRitualPug, RITUAL_PUG_HEADER } from "./ritualPug";
 import { parseRitualText, printRitualText } from "./ritualText";
-import type { RitualSemanticDocument } from "./semantic";
+import {
+  type RitualSemanticDocument,
+  type RitualSemanticNode,
+  semanticToJrt,
+} from "./semantic";
 
 /** Draft source dialect; saved revisions continue to contain semantic JSON. */
 export type RitualSourceDialect = "pug" | "ritual-text";
@@ -31,4 +35,42 @@ export function printRitualSource(
   return dialect === "pug"
     ? printRitualPug(document)
     : printRitualText(document);
+}
+
+/** Recover annotations from a clean pre-annotation Pug draft without replacing its identities. */
+export function restorePugDraftAnnotations(
+  document: RitualSemanticDocument,
+  source: string,
+): RitualSemanticDocument {
+  const parsed = parseRitualPug(source);
+  const canonical = (value: unknown) =>
+    JSON.stringify(value, (_key, entry) =>
+      entry && typeof entry === "object" && !Array.isArray(entry)
+        ? Object.fromEntries(
+            Object.keys(entry)
+              .sort()
+              .map((key) => [key, entry[key]]),
+          )
+        : entry,
+    );
+  if (canonical(semanticToJrt(parsed)) !== canonical(semanticToJrt(document)))
+    throw new Error("The saved source and document need manual recovery");
+  const restore = (
+    current: RitualSemanticNode[],
+    previous: RitualSemanticNode[],
+  ) => {
+    const retained = previous.filter((node) => node.kind !== "annotation");
+    let index = 0;
+    for (const node of current) {
+      if (node.kind === "annotation") continue;
+      const old = retained[index++];
+      if (!old || old.kind !== node.kind)
+        throw new Error("Draft structure needs manual recovery");
+      if ("id" in node && "id" in old) node.id = old.id;
+      if (node.kind === "element" && old.kind === "element")
+        restore(node.children ?? [], old.children ?? []);
+    }
+  };
+  restore(parsed.nodes, document.nodes);
+  return parsed;
 }

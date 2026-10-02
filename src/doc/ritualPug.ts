@@ -1,6 +1,7 @@
 import parse from "pug-parser";
 import { createRitualNodeId, isRitualNodeId } from "./ritualNodeIds";
 import { lexRitualPug, RITUAL_PUG_MAX_SOURCE_LENGTH } from "./ritualPugLex";
+import { canPrintRoleShortcut } from "./ritualPugSurface";
 import {
   type JsonValue,
   type RitualSemanticDocument,
@@ -130,6 +131,13 @@ export function printRitualPug(doc: RitualSemanticDocument): string {
   const lines = [RITUAL_PUG_HEADER];
   const visit = (node: RitualSemanticNode, depth: number) => {
     const indent = "  ".repeat(depth);
+    if (node.kind === "annotation") {
+      if (node.style === "blank") lines.push(indent);
+      else if (!/[\r\n]/.test(node.text))
+        lines.push(`${indent}//- ${node.text}`);
+      else lines.push(`${indent}ritualComment(value=${json(node.text)})/`);
+      return;
+    }
     if (node.kind === "text") {
       // Pug inserts newlines between consecutive pipe-text lines. Literal
       // wrappers preserve text-node boundaries and all unusual whitespace.
@@ -150,7 +158,12 @@ export function printRitualPug(doc: RitualSemanticDocument): string {
     const header = `${indent}${tag}#${node.id}${attributeText(attributes)}`;
     const inline = node.children?.length ? inlineChildren(node.children) : null;
     if (inline !== null) {
-      lines.push(`${header} ${inline}`);
+      const role = attributes.role;
+      if (speech && typeof role === "string" && canPrintRoleShortcut(role))
+        lines.push(
+          `${indent}${node.attrs.say ? `${role}#${node.id}:` : `* ${role}#${node.id}`} ${inline}`,
+        );
+      else lines.push(`${header} ${inline}`);
     } else {
       lines.push(header + (node.children === undefined ? "/" : ""));
       node.children?.forEach((child) => visit(child, depth + 1));
@@ -201,6 +214,21 @@ export function parseRitualPug(source: string): RitualSemanticDocument {
       if (Object.keys(attrs).join() !== "value" || !node.selfClosing)
         throw new Error("Invalid text wrapper");
       return { kind: "text", text: attrs.value as string };
+    }
+    if (node.name === "ritualComment" || node.name === "ritualBlank") {
+      if (
+        !node.selfClosing ||
+        (node.name === "ritualComment"
+          ? Object.keys(attrs).join() !== "value" ||
+            typeof attrs.value !== "string"
+          : Object.keys(attrs).length !== 0)
+      )
+        throw new Error("Invalid source annotation");
+      return {
+        kind: "annotation",
+        style: node.name === "ritualComment" ? "comment" : "blank",
+        text: node.name === "ritualComment" ? (attrs.value as string) : "",
+      };
     }
     const { id: suppliedId, ...rest } = attrs;
     const id = suppliedId === undefined ? createRitualNodeId() : suppliedId;

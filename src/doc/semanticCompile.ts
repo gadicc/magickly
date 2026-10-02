@@ -5,7 +5,7 @@ export const SEMANTIC_SOURCE_FORMAT_VERSION = "1";
 /** Frozen compiler inputs. Changing validation or compilation requires a parity review. */
 export const SEMANTIC_COMPILER_COMPONENTS = {
   semanticModelSha256:
-    "1ec7444f8138161e4efbd306d64b6f8ea5ffda1599cf18ea3a1fe020619741fd",
+    "041fa6dc16bc12815735e992fc2b0b358de22a97ea47f708dc110d586e04073e",
   semanticCompilerImplSha256:
     "3108b1d0bdbb52ae83d70b54c018a90317c63999c4da7191b0332a08cccb654d",
   ritualNodeIdsSha256:

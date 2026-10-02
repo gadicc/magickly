@@ -9,6 +9,7 @@ import {
 } from "@testing-library/react";
 import React from "react";
 import { afterEach, expect, it, vi } from "vitest";
+import { printRitualPug } from "@/doc/ritualPug";
 import { printRitualText } from "@/doc/ritualText";
 import { semanticFromJrt } from "@/doc/semantic";
 import { createUuidV7 } from "@/lib/ids";
@@ -49,10 +50,16 @@ vi.mock("@/doc/semanticDraft", () => ({
   loadSemanticDraft: mock.load,
   saveSemanticDraft: mock.saveDraft,
   clearSemanticDraft: mock.clear,
-  confirmSemanticSave: (request: {
-    expectedActorId: string;
-    ritualId: string;
-  }) => mock.clear(request.expectedActorId, request.ritualId),
+  confirmSemanticSave: (
+    request: {
+      expectedActorId: string;
+      ritualId: string;
+    },
+    followUp?: unknown,
+  ) =>
+    followUp
+      ? mock.saveDraft(followUp)
+      : mock.clear(request.expectedActorId, request.ritualId),
 }));
 vi.mock("@/doc/SemanticPublication", () => ({ default: () => null }));
 vi.mock("@/doc/sqlEditorClient", () => ({
@@ -554,7 +561,7 @@ it("recovers an incomplete old source buffer and switches syntax only after disc
   expect(buffer.value).toContain("//- magickli-ritual-pug 1");
   const first = setup.initialDocument.nodes[0];
   expect(first.kind).not.toBe("text");
-  if (first.kind !== "text") expect(buffer.value).toContain(`#${first.id}`);
+  if ("id" in first) expect(buffer.value).toContain(`#${first.id}`);
   expect(buffer.value).toContain("Welcome.");
   await waitFor(() => expect(mock.saveDraft).toHaveBeenCalled());
   expect(mock.saveDraft.mock.lastCall?.[0].sourceDialect).toBe("pug");
@@ -708,52 +715,74 @@ it("blocks editing when the local draft cannot be inspected", async () => {
   expect(screen.queryByRole("button", { name: "Save" })).toBeNull();
 });
 
-it("confirms a pending receipt after the server revision has advanced", async () => {
-  const setup = props();
-  mock.owner = setup.actorId;
-  mock.clear.mockResolvedValue(undefined);
-  const pending = {
-    version: 3 as const,
-    kind: "save" as const,
-    operationId: createUuidV7(),
-    expectedActorId: setup.actorId,
-    ritualId: setup.ritualId,
-    expectedRevisionId: createUuidV7(),
-    expectedVersion: 6,
-    title: setup.title,
-    source: JSON.stringify(setup.initialDocument),
-  };
-  mock.load.mockResolvedValue({
-    ownerId: setup.actorId,
-    ritualId: setup.ritualId,
-    baseRevisionId: pending.expectedRevisionId,
-    baseVersion: 6,
-    title: setup.title,
-    documentJson: pending.source,
-    sourceBuffer: "ritual 1\n",
-    sourceDirty: false,
-    sourceConflict: false,
-    pending,
-    updatedAt: Date.now(),
-  });
-  mock.send.mockResolvedValue({
-    ok: true,
-    replayed: true,
-    ritualId: setup.ritualId,
-    revisionId: setup.revisionId,
-    version: 7,
-    updatedAt: new Date().toISOString(),
-  });
-  render(<SemanticEditor {...setup} />);
-  fireEvent.click(
-    await screen.findByRole("button", { name: "Confirm pending save" }),
-  );
-  await waitFor(() =>
-    expect(mock.send).toHaveBeenCalledWith(pending, expect.any(AbortSignal)),
-  );
-  await screen.findByText(/pending save is confirmed/i);
-  expect(mock.clear).toHaveBeenCalledWith(setup.actorId, setup.ritualId);
-});
+it.each([false, true])(
+  "confirms a pending receipt after the server revision has advanced (annotations: %s)",
+  async (annotations) => {
+    const setup = props();
+    mock.owner = setup.actorId;
+    mock.clear.mockResolvedValue(undefined);
+    const pending = {
+      version: 3 as const,
+      kind: "save" as const,
+      operationId: createUuidV7(),
+      expectedActorId: setup.actorId,
+      ritualId: setup.ritualId,
+      expectedRevisionId: createUuidV7(),
+      expectedVersion: 6,
+      title: setup.title,
+      source: JSON.stringify(setup.initialDocument),
+    };
+    mock.load.mockResolvedValue({
+      ownerId: setup.actorId,
+      ritualId: setup.ritualId,
+      baseRevisionId: pending.expectedRevisionId,
+      baseVersion: 6,
+      title: setup.title,
+      documentJson: pending.source,
+      sourceBuffer: annotations
+        ? printRitualPug(setup.initialDocument).replace(
+            "\n",
+            "\n//- Stale pending comment\n\n",
+          )
+        : "ritual 1\n",
+      sourceDirty: false,
+      sourceConflict: false,
+      pending,
+      updatedAt: Date.now(),
+    });
+    mock.send.mockResolvedValue({
+      ok: true,
+      replayed: true,
+      ritualId: setup.ritualId,
+      revisionId: setup.revisionId,
+      version: 7,
+      updatedAt: new Date().toISOString(),
+    });
+    render(<SemanticEditor {...setup} />);
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Confirm pending save" }),
+    );
+    await waitFor(() =>
+      expect(mock.send).toHaveBeenCalledWith(pending, expect.any(AbortSignal)),
+    );
+    await screen.findByText(/pending save is confirmed/i);
+    if (annotations) {
+      expect(mock.clear).not.toHaveBeenCalled();
+      const retained = mock.saveDraft.mock.lastCall?.[0];
+      expect(retained).toMatchObject({
+        baseRevisionId: setup.revisionId,
+        baseVersion: 7,
+        pending: null,
+      });
+      expect(JSON.parse(retained.documentJson).nodes[0]).toEqual({
+        kind: "annotation",
+        style: "comment",
+        text: "Stale pending comment",
+      });
+    } else
+      expect(mock.clear).toHaveBeenCalledWith(setup.actorId, setup.ritualId);
+  },
+);
 
 it("reports a confirmed save when local draft cleanup fails", async () => {
   mock.load.mockResolvedValue(undefined);
@@ -1059,3 +1088,167 @@ vi.mock("@/doc/RitualSourceEditor", () => ({
       onCompositionEnd: () => onCompositionChange?.(false),
     }),
 }));
+
+it("recovers annotations from a clean pre-upgrade Pug draft before visual regeneration", async () => {
+  const setup = props();
+  mock.owner = setup.actorId;
+  const sourceBuffer = printRitualPug(setup.initialDocument).replace(
+    "\n",
+    "\n//- Old author comment\n\n",
+  );
+  mock.load.mockResolvedValue({
+    ownerId: setup.actorId,
+    ritualId: setup.ritualId,
+    baseRevisionId: setup.revisionId,
+    baseVersion: setup.parentVersion,
+    title: setup.title,
+    documentJson: JSON.stringify(setup.initialDocument),
+    sourceBuffer,
+    sourceDialect: "pug",
+    sourceDirty: false,
+    sourceConflict: false,
+    pending: null,
+    updatedAt: Date.now(),
+  });
+  mock.saveDraft.mockResolvedValue(undefined);
+  render(<SemanticEditor {...setup} />);
+  await screen.findByText("Recovered the local draft.");
+  expect(screen.getByText("Author comment · Old author comment")).toBeTruthy();
+  fireEvent.click(
+    await screen.findByRole("button", { name: "Insert structure" }),
+  );
+  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Structure" }));
+  fireEvent.click(await screen.findByRole("option", { name: "To-do" }));
+  fireEvent.click(screen.getByRole("button", { name: /^Insert$/ }));
+  fireEvent.click(await screen.findByRole("button", { name: "source" }));
+  const buffer = screen.getByRole("textbox", {
+    name: "Ritual semantic source",
+  }) as HTMLTextAreaElement;
+  expect(buffer.value).toContain("//- Old author comment\n\n");
+  const task = setup.initialDocument.nodes[0];
+  if ("id" in task) expect(buffer.value).toContain(`#${task.id}`);
+  await waitFor(() => expect(mock.saveDraft).toHaveBeenCalled());
+  expect(
+    JSON.parse(mock.saveDraft.mock.lastCall?.[0].documentJson).nodes,
+  ).toContainEqual({
+    kind: "annotation",
+    style: "comment",
+    text: "Old author comment",
+  });
+});
+
+it("retains recovered annotations after confirming an immutable older pending Pug save", async () => {
+  const setup = props();
+  mock.owner = setup.actorId;
+  const pending = {
+    version: 3 as const,
+    kind: "save" as const,
+    operationId: createUuidV7(),
+    expectedActorId: setup.actorId,
+    ritualId: setup.ritualId,
+    expectedRevisionId: setup.revisionId,
+    expectedVersion: setup.parentVersion,
+    title: setup.title,
+    source: JSON.stringify(setup.initialDocument),
+  };
+  const sourceBuffer = printRitualPug(setup.initialDocument).replace(
+    "\n",
+    "\n//- Pending author note\n\n",
+  );
+  mock.load.mockResolvedValue({
+    ownerId: setup.actorId,
+    ritualId: setup.ritualId,
+    baseRevisionId: setup.revisionId,
+    baseVersion: setup.parentVersion,
+    title: setup.title,
+    documentJson: pending.source,
+    sourceBuffer,
+    sourceDialect: "pug",
+    sourceDirty: false,
+    sourceConflict: false,
+    pending,
+    updatedAt: Date.now(),
+  });
+  const revisionId = createUuidV7();
+  mock.saveDraft.mockResolvedValue(undefined);
+  mock.send.mockResolvedValue({
+    ok: true,
+    replayed: true,
+    ritualId: setup.ritualId,
+    revisionId,
+    version: 8,
+    updatedAt: new Date().toISOString(),
+  });
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "Retry save" }));
+  await screen.findByText(/Recovered author annotations remain/);
+  expect(mock.send.mock.calls[0][0]).toEqual(pending);
+  expect(mock.clear).not.toHaveBeenCalled();
+  const retained = mock.saveDraft.mock.lastCall?.[0];
+  expect(retained).toMatchObject({
+    baseRevisionId: revisionId,
+    baseVersion: 8,
+    pending: null,
+    sourceBuffer,
+  });
+  expect(JSON.parse(retained.documentJson).nodes[0]).toEqual({
+    kind: "annotation",
+    style: "comment",
+    text: "Pending author note",
+  });
+});
+
+it("offers superseded recovered annotations for download without persisting them again on access lock", async () => {
+  const setup = props();
+  mock.owner = setup.actorId;
+  const pending = {
+    version: 3 as const,
+    kind: "save" as const,
+    operationId: createUuidV7(),
+    expectedActorId: setup.actorId,
+    ritualId: setup.ritualId,
+    expectedRevisionId: setup.revisionId,
+    expectedVersion: setup.parentVersion,
+    title: setup.title,
+    source: JSON.stringify(setup.initialDocument),
+  };
+  mock.load.mockResolvedValue({
+    ownerId: setup.actorId,
+    ritualId: setup.ritualId,
+    baseRevisionId: setup.revisionId,
+    baseVersion: setup.parentVersion,
+    title: setup.title,
+    documentJson: pending.source,
+    sourceBuffer: printRitualPug(setup.initialDocument).replace(
+      "\n",
+      "\n//- Recover me\n",
+    ),
+    sourceDialect: "pug",
+    sourceDirty: false,
+    sourceConflict: false,
+    pending,
+    updatedAt: Date.now(),
+  });
+  mock.saveDraft.mockResolvedValue(false);
+  mock.send.mockResolvedValue({
+    ok: true,
+    replayed: true,
+    ritualId: setup.ritualId,
+    revisionId: createUuidV7(),
+    version: 8,
+    updatedAt: new Date().toISOString(),
+  });
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "Retry save" }));
+  await screen.findByRole("button", { name: "Download recovered draft" });
+  const calls = mock.saveDraft.mock.calls.length;
+  mock.phase = "locked";
+  mock.lockReason = "signout";
+  act(() => mock.listeners.forEach((listener) => listener()));
+  await waitFor(() =>
+    expect(
+      screen.queryByRole("button", { name: "Download recovered draft" }),
+    ).toBeNull(),
+  );
+  expect(mock.saveDraft).toHaveBeenCalledTimes(calls);
+});

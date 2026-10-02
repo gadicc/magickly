@@ -63,10 +63,22 @@ export function clearSemanticDraft(ownerId: string, ritualId: string) {
   return db().drafts.delete([ownerId, ritualId]);
 }
 
-/** Clear the confirmed draft and retain its publication in one browser transaction. */
-export async function confirmSemanticSave(request: RitualPublicationRequestV1) {
+/** Confirm atomically, retaining optional recovered edits against the newly saved revision. */
+export async function confirmSemanticSave(
+  request: RitualPublicationRequestV1,
+  followUp?: SemanticDraft,
+) {
   const valid = parseRitualPublicationRequest(request);
   if (!valid) throw new TypeError("Invalid publication");
+  if (
+    followUp &&
+    (followUp.ownerId !== valid.expectedActorId ||
+      followUp.ritualId !== valid.ritualId ||
+      followUp.baseRevisionId !== valid.expectedRevisionId ||
+      followUp.baseVersion !== valid.expectedVersion ||
+      followUp.pending)
+  )
+    throw new TypeError("Invalid follow-up draft");
   const database = db();
   return database.transaction(
     "rw",
@@ -79,6 +91,9 @@ export async function confirmSemanticSave(request: RitualPublicationRequestV1) {
       const pending = await database.publications.get(key);
       const draft = await database.drafts.get(key);
       // A delayed acknowledgement from another tab must not roll back recovery.
+      // A follow-up can replace only the exact pending slot that it resolves.
+      if (followUp && draft?.pending?.operationId !== valid.operationId)
+        return false;
       if (
         (confirmed && confirmed.expectedVersion > valid.expectedVersion) ||
         (pending &&
@@ -92,8 +107,10 @@ export async function confirmSemanticSave(request: RitualPublicationRequestV1) {
         return false;
       await database.confirmations.put(valid);
       await database.publications.put(valid);
-      if (draft?.pending?.operationId === valid.operationId)
-        await database.drafts.delete(key);
+      if (draft?.pending?.operationId === valid.operationId) {
+        if (followUp) await database.drafts.put(followUp);
+        else await database.drafts.delete(key);
+      }
       return true;
     },
   );

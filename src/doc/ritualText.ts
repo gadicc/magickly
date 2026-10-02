@@ -14,6 +14,12 @@ export function printRitualText(document: RitualSemanticDocument): string {
   const print = (nodes: RitualSemanticNode[], depth: number) => {
     const indent = "  ".repeat(depth);
     for (const node of nodes) {
+      if (node.kind === "annotation") {
+        lines.push(
+          `${indent}${node.style === "blank" ? "~blank" : `; ${JSON.stringify(node.text)}`}`,
+        );
+        continue;
+      }
       if (node.kind === "text") {
         lines.push(`${indent}= ${JSON.stringify(node.text)}`);
         continue;
@@ -116,7 +122,17 @@ export function parseRitualText(source: string): RitualSemanticDocument {
     const line = full.slice(spaces);
     const lineNumber = index + 2;
     let node: RitualSemanticNode;
-    if (line.startsWith("= ")) {
+    if (line === "~blank" || line.startsWith("; ")) {
+      const text =
+        line === "~blank" ? "" : parseJson(line.slice(2), lineNumber);
+      if (typeof text !== "string")
+        throw new Error(`Line ${lineNumber}: invalid comment`);
+      node = {
+        kind: "annotation",
+        style: line === "~blank" ? "blank" : "comment",
+        text,
+      };
+    } else if (line.startsWith("= ")) {
       const value = parseJson(line.slice(2), lineNumber);
       if (typeof value !== "string")
         throw new Error(`Line ${lineNumber}: text must be a JSON string`);

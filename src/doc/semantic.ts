@@ -6,6 +6,8 @@ export type JsonValue = JsonScalar | JsonValue[] | { [key: string]: JsonValue };
 /** Persisted content excludes editor selection, DOM refs, and reader-specific state. */
 export type RitualSemanticNode =
   | { kind: "text"; text: string }
+  // Source annotations survive editing but are omitted from the reader profile.
+  | { kind: "annotation"; style: "comment" | "blank"; text: string }
   | {
       kind: "element";
       id: string;
@@ -187,6 +189,18 @@ export function validateRitualSemantic(input: unknown): string[] {
         errors.push(`${path}: invalid text`);
       return;
     }
+    if (node.kind === "annotation") {
+      if (
+        Object.keys(node).length !== 3 ||
+        !["comment", "blank"].includes(node.style as string) ||
+        typeof node.text !== "string" ||
+        !node.text.isWellFormed() ||
+        node.text.includes("\0") ||
+        (node.style === "blank" && node.text !== "")
+      )
+        errors.push(`${path}: invalid source annotation`);
+      return;
+    }
     if (!isRitualNodeId(node.id)) errors.push(`${path}: invalid id`);
     else if (ids.has(node.id)) errors.push(`${path}: duplicate id`);
     else ids.add(node.id);
@@ -274,7 +288,11 @@ export function validateRitualSemantic(input: unknown): string[] {
 export function semanticToJrt(input: RitualSemanticDocument): JsonValue {
   const errors = validateRitualSemantic(input);
   if (errors.length) throw new Error(errors[0]);
+  const children = (nodes: RitualSemanticNode[]) =>
+    nodes.filter((node) => node.kind !== "annotation").map(convert);
   const convert = (node: RitualSemanticNode): JsonValue => {
+    if (node.kind === "annotation")
+      throw new Error("Source annotation cannot be rendered");
     if (node.kind === "text") return { type: "text", value: node.text };
     if (node.kind === "legacy") return cloneJson(node.raw);
     return {
@@ -282,8 +300,8 @@ export function semanticToJrt(input: RitualSemanticDocument): JsonValue {
       ...cloneJson(node.attrs),
       ...(node.children === undefined
         ? {}
-        : { children: node.children.map(convert) }),
+        : { children: children(node.children) }),
     };
   };
-  return { children: input.nodes.map(convert) };
+  return { children: children(input.nodes) };
 }

@@ -5,6 +5,9 @@ import { createUuidV7 } from "../lib/ids";
 import { prepare } from "./prepare";
 import { createRitualNodeId } from "./ritualNodeIds";
 import { parseRitualPug, printRitualPug, RITUAL_PUG_HEADER } from "./ritualPug";
+import { ritualPugIdRanges } from "./ritualPugIds";
+import { restorePugDraftAnnotations } from "./ritualSource";
+import { parseRitualText, printRitualText } from "./ritualText";
 import {
   type RitualSemanticDocument,
   type RitualSemanticNode,
@@ -101,7 +104,7 @@ describe("bounded semantic Pug", () => {
     expect(target.executed).toBeUndefined();
   });
 
-  it("sanitizes lexer diagnostics and preserves unbuffered comments only in source", () => {
+  it("sanitizes lexer diagnostics and retains author comments in the tree", () => {
     const marker = "SYNTHETIC_PRIVATE_MARKER";
     try {
       parseRitualPug(`${RITUAL_PUG_HEADER}\nnote(value="${marker}`);
@@ -111,8 +114,17 @@ describe("bounded semantic Pug", () => {
     const document = parseRitualPug(
       `${RITUAL_PUG_HEADER}\n//- Author note\nnote Content\n`,
     );
-    expect(document.nodes).toHaveLength(1);
-    expect(printRitualPug(document)).not.toContain("Author note");
+    expect(document.nodes[0]).toEqual({
+      kind: "annotation",
+      style: "comment",
+      text: "Author note",
+    });
+    expect(printRitualPug(document)).toContain("//- Author note");
+    expect(semanticToJrt(document)).toEqual({
+      children: [
+        { type: "note", children: [{ type: "text", value: "Content" }] },
+      ],
+    });
   });
 
   it("bounds recursive inline nesting before lexing or parsing can exhaust the stack", () => {
@@ -191,4 +203,173 @@ describe("bounded semantic Pug", () => {
       ),
     ).toThrow("attributes must be JSON literals");
   });
+});
+
+describe("Pug surface conveniences", () => {
+  it("expands shortcuts, retains IDs and inline content, and prints shortcuts by default", () => {
+    const source = `${RITUAL_PUG_HEADER}\nHiero#Ab3k9Qp7Zx2Mn5Rs: Hi #[b#Other00000000001 there].\n* Keryx#Third00000000001 Open the door.\n`;
+    const document = parseRitualPug(source);
+    expect(document.nodes[0]).toMatchObject({
+      id: "Ab3k9Qp7Zx2Mn5Rs",
+      attrs: { say: true, role: "hiero" },
+    });
+    expect(document.nodes[1]).toMatchObject({
+      id: "Third00000000001",
+      attrs: { do: true, role: "keryx" },
+    });
+    const printed = printRitualPug(document);
+    expect(printed).toContain(
+      "hiero#Ab3k9Qp7Zx2Mn5Rs: Hi #[b#Other00000000001 there].",
+    );
+    expect(printed).toContain("* keryx#Third00000000001 Open the door.");
+    expect(parseRitualPug(printed)).toEqual(document);
+    const ranges = ritualPugIdRanges(source)!;
+    expect(ranges.map((range) => source.slice(range.from, range.to))).toEqual([
+      "#Ab3k9Qp7Zx2Mn5Rs",
+      "#Other00000000001",
+      "#Third00000000001",
+    ]);
+  });
+
+  it("assigns IDs to fresh tasks, supports groups and retains explicit fallbacks", () => {
+    const document = parseRitualPug(
+      `${RITUAL_PUG_HEADER}\nhiero:hi\n* All-officers Rise.\nHiero,Keryx: Ready.\nsay(role="Hiero") Case-sensitive role.\ndo(role="keryx")\n  note Complex content\n`,
+    );
+    expect(document.nodes[0]).toMatchObject({
+      id: expect.stringMatching(/^[A-Za-z0-9]{16}$/),
+      children: [{ text: "hi" }],
+    });
+    expect(document.nodes[1]).toMatchObject({
+      attrs: { role: "all-officers" },
+    });
+    expect(document.nodes[2]).toMatchObject({ attrs: { role: "hiero,keryx" } });
+    const printed = printRitualPug(document);
+    expect(printed).toContain('(role="Hiero")');
+    expect(printed).toContain('(role="keryx")\n');
+    expect(parseRitualPug(printed)).toEqual(document);
+  });
+
+  it("retains comments and section separators through both source dialects", () => {
+    const document = parseRitualPug(
+      `${RITUAL_PUG_HEADER}\n//- Preparation\n\nsummary(summary="Opening")\n  //- Quietly\n  hiero: Welcome.\n  \n  * keryx Open.\n\n//- Closing\nhiero: Done.\n\n`,
+    );
+    const printed = printRitualPug(document);
+    expect(printed).toContain("//- Preparation\n\nsummary");
+    expect(printed).toContain("\n\n//- Closing");
+    expect(parseRitualPug(printed)).toEqual(document);
+    expect(parseRitualText(printRitualText(document))).toEqual(document);
+    expect(JSON.stringify(semanticToJrt(document))).not.toMatch(
+      /Preparation|Quietly|Closing|annotation/,
+    );
+  });
+
+  it("retains multiline comments, literal annotation payloads and correct following ID spans", () => {
+    const source = `${RITUAL_PUG_HEADER}\n//- Author note\n  nested comment\n    deeper line\nhiero#Ab3k9Qp7Zx2Mn5Rs: Hi.\n`;
+    const document = parseRitualPug(source);
+    expect(document.nodes[0]).toEqual({
+      kind: "annotation",
+      style: "comment",
+      text: "Author note\nnested comment\n  deeper line",
+    });
+    expect(parseRitualPug(printRitualPug(document))).toEqual(document);
+    const range = ritualPugIdRanges(source)![0];
+    expect(source.slice(range.from, range.to)).toBe("#Ab3k9Qp7Zx2Mn5Rs");
+  });
+
+  it.each([
+    "hiero: #{execute()}",
+    "* keryx !{execute()}",
+    "hiero#bad: Hi.",
+    "ritualComment(value=execute())/",
+    "ritualBlank(value=1)/",
+    "ritualComment(value=2)/",
+  ])("rejects unsafe or malformed convenience source: %s", (line) => {
+    expect(() => parseRitualPug(`${RITUAL_PUG_HEADER}\n${line}\n`)).toThrow();
+  });
+});
+
+it.each([
+  "note.\n  hiero: literal line\n\n  //- literal comment\n  * keryx literal action",
+  'say(\n  role="hiero"\n\n) Hello.',
+  "note: b bold",
+  "note#Ab3k9Qp7Zx2Mn5Rs: b bold",
+  "note\n  | Hello\n\n  | world",
+  'summary(summary="x")\n  note\n  \n    b text',
+])(
+  "preserves pre-existing Pug literal, attribute and expansion contexts: %s",
+  (body) => {
+    const document = parseRitualPug(`${RITUAL_PUG_HEADER}\n${body}\n`);
+    const reference = /^note(?:#[A-Za-z0-9]+)?: b bold$/.test(body)
+      ? "note\n  b bold"
+      : body;
+    const jrt = prepare(reference);
+    const stripGeneratedEmptyText = (node) => ({
+      ...node,
+      ...(node.children
+        ? {
+            children: node.children
+              .filter((child) => child.type !== "text" || child.value !== "")
+              .map(stripGeneratedEmptyText),
+          }
+        : {}),
+    });
+    expect(semanticToJrt(document)).toEqual(stripGeneratedEmptyText(jrt));
+    expect(parseRitualPug(printRitualPug(document))).toEqual(document);
+  },
+);
+
+it("preserves comment paragraphs separated by unindented blank lines", () => {
+  const document = parseRitualPug(
+    `${RITUAL_PUG_HEADER}\n//- First\n  Paragraph one\n\n  Paragraph two\nnote Visible\n`,
+  );
+  expect(document.nodes[0]).toMatchObject({
+    kind: "annotation",
+    style: "comment",
+    text: "First\nParagraph one\n\nParagraph two",
+  });
+  expect(parseRitualPug(printRitualPug(document))).toEqual(document);
+});
+
+it("keeps a comment followed by trailing blank separators as separate annotations", () => {
+  const document: RitualSemanticDocument = {
+    format: "magickli-ritual",
+    version: 1,
+    nodes: [
+      { kind: "annotation", style: "comment", text: "x" },
+      { kind: "annotation", style: "blank", text: "" },
+      { kind: "annotation", style: "blank", text: "" },
+    ],
+  };
+  expect(parseRitualPug(printRitualPug(document))).toEqual(document);
+});
+
+it("recovers clean older Pug draft annotations while retaining all previous identities", () => {
+  const document = semanticFromJrt({
+    children: [
+      {
+        type: "task",
+        say: true,
+        role: "hiero",
+        children: [
+          { type: "text", value: "Hi " },
+          { type: "b", children: [{ type: "text", value: "there" }] },
+        ],
+      },
+    ],
+  });
+  const recovered = restorePugDraftAnnotations(
+    document,
+    `${RITUAL_PUG_HEADER}\n//- Retain this\n\nsay(role="hiero") Hi #[b there]\n`,
+  );
+  expect(recovered.nodes.slice(0, 2)).toEqual([
+    { kind: "annotation", style: "comment", text: "Retain this" },
+    { kind: "annotation", style: "blank", text: "" },
+  ]);
+  expect(recovered.nodes.slice(2)).toEqual(document.nodes);
+  expect(() =>
+    restorePugDraftAnnotations(
+      document,
+      `${RITUAL_PUG_HEADER}\nhiero: Changed\n`,
+    ),
+  ).toThrow(/manual recovery/);
 });

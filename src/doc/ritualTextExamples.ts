@@ -15,19 +15,21 @@ export const ritualPugStarter = `//- magickli-ritual-pug 1
 title(text="Opening") Opening
 summary(summary="Preparation")
   note Replace this note with preparations for your ritual.
-say(role="hiero") Welcome.
-do(role="keryx") Open the door.
+hiero: Welcome.
+* keryx Open the door.
 summary(summary="Closing")
-  say(role="hiero") The ritual is concluded.
+  hiero: The ritual is concluded.
 `;
 
 /** Public guide examples parsed in tests, including the exact literal/opaque fallbacks. */
 export const ritualPugExamples = {
   inline: `//- magickli-ritual-pug 1
-say(role="hiero") Welcome, #[var(name="candidate")/]. Speak #[b clearly].
-do(role="keryx") Open the door.
+hiero: Welcome, #[var(name="candidate")/]. Speak #[b clearly].
+* keryx Open the door.
 `,
   structure: `//- magickli-ritual-pug 1
+//- Notes for authors; omitted from the reader.
+
 title(text="Preparation") Preparation
 summary(summary="Before starting")
   note Prepare the space.
@@ -42,7 +44,7 @@ declareVar(name="candidate", label="Candidate name", varType="text", default="Gu
 declareVar(name="direction", label="Direction", varType="select", default="east")
   option(value="east", label="East")/
   option(value="west", label="West")/
-say(role="hiero") Welcome, #[var(name="candidate")/].
+hiero: Welcome, #[var(name="candidate")/].
 grade(grade="0=0")/
 `,
   image: `//- magickli-ritual-pug 1

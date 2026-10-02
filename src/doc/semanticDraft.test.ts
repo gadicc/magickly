@@ -105,3 +105,107 @@ it("rejects stale confirmations and competing requests without deleting newer dr
   await saveSemanticPublication(competing, newer.operationId);
   expect(await loadSemanticPublication(ownerId, ritualId)).toEqual(competing);
 });
+
+it("atomically retains recovered annotations after an older pending save is confirmed", async () => {
+  const ownerId = createUuidV7(),
+    ritualId = createUuidV7(),
+    revisionId = createUuidV7(),
+    operationId = createUuidV7();
+  const draft = {
+    ownerId,
+    ritualId,
+    baseRevisionId: revisionId,
+    baseVersion: 1,
+    title: "Synthetic annotations",
+    documentJson: "{}",
+    sourceBuffer: "//- retain\n\n",
+    sourceDialect: "pug" as const,
+    sourceDirty: false,
+    sourceConflict: false,
+    pending: {
+      version: 3 as const,
+      kind: "save" as const,
+      operationId,
+      expectedActorId: ownerId,
+      ritualId,
+      expectedRevisionId: revisionId,
+      expectedVersion: 1,
+      title: "Synthetic annotations",
+      source: "{}",
+    },
+    updatedAt: 1,
+  };
+  await saveSemanticDraft(draft);
+  const receipt = {
+    version: 1 as const,
+    operationId,
+    expectedActorId: ownerId,
+    ritualId,
+    expectedRevisionId: createUuidV7(),
+    expectedVersion: 2,
+  };
+  const followUp = {
+    ...draft,
+    baseRevisionId: receipt.expectedRevisionId,
+    baseVersion: 2,
+    pending: null,
+    documentJson: '{"annotation":"retained"}',
+    updatedAt: 2,
+  };
+  await confirmSemanticSave(receipt, followUp);
+  expect(await loadSemanticDraft(ownerId, ritualId)).toEqual(followUp);
+  expect(await loadSemanticPublication(ownerId, ritualId)).toEqual(receipt);
+  await expect(
+    confirmSemanticSave(receipt, { ...followUp, ownerId: createUuidV7() }),
+  ).rejects.toThrow("Invalid follow-up draft");
+  const delayed = {
+    ...receipt,
+    operationId: createUuidV7(),
+    expectedVersion: 1,
+  };
+  expect(
+    await confirmSemanticSave(delayed, { ...followUp, baseVersion: 1 }),
+  ).toBe(false);
+  expect(await loadSemanticDraft(ownerId, ritualId)).toEqual(followUp);
+});
+
+it.each(["missing", "replaced"])(
+  "refuses to silently lose a follow-up when its pending slot is %s",
+  async (state) => {
+    const ownerId = createUuidV7(),
+      ritualId = createUuidV7(),
+      revisionId = createUuidV7();
+    const receipt = {
+      version: 1 as const,
+      operationId: createUuidV7(),
+      expectedActorId: ownerId,
+      ritualId,
+      expectedRevisionId: revisionId,
+      expectedVersion: 8,
+    };
+    const draft = {
+      ownerId,
+      ritualId,
+      baseRevisionId: createUuidV7(),
+      baseVersion: 7,
+      title: "Other-tab draft",
+      documentJson: "{}",
+      sourceBuffer: "other",
+      sourceDirty: false,
+      sourceConflict: false,
+      pending: null,
+      updatedAt: 1,
+    };
+    if (state === "replaced") await saveSemanticDraft(draft);
+    const followUp = {
+      ...draft,
+      baseRevisionId: revisionId,
+      baseVersion: 8,
+      sourceBuffer: "Recovered comment",
+    };
+    expect(await confirmSemanticSave(receipt, followUp)).toBe(false);
+    expect(await loadSemanticDraft(ownerId, ritualId)).toEqual(
+      state === "replaced" ? draft : undefined,
+    );
+  },
+);

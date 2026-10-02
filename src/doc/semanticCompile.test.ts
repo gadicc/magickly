@@ -14,6 +14,38 @@ const hash = (value: string) =>
   createHash("sha256").update(value, "utf8").digest("hex");
 
 describe("semantic compiler", () => {
+  it("stores annotations in source bytes while excluding them from reader artifacts", () => {
+    const document = semanticFromJrt({
+      children: [
+        { type: "note", children: [{ type: "text", value: "Visible" }] },
+      ],
+    });
+    document.nodes.unshift(
+      {
+        kind: "annotation",
+        style: "comment",
+        text: "Author-only instructions",
+      },
+      { kind: "annotation", style: "blank", text: "" },
+    );
+    const compiled = compileSemanticSource(JSON.stringify(document));
+    expect(JSON.parse(compiled!.contentJson)).toEqual({
+      children: [
+        { type: "note", children: [{ type: "text", value: "Visible" }] },
+      ],
+    });
+    expect(compiled!.sourceSha256).toBe(hash(JSON.stringify(document)));
+    expect(compiled!.contentJson).not.toContain("Author-only instructions");
+    for (const bad of [
+      { kind: "annotation", style: "blank", text: "x" },
+      { kind: "annotation", style: "other", text: "" },
+      { kind: "annotation", style: "comment", text: 12 },
+    ]) {
+      expect(
+        compileSemanticSource(JSON.stringify({ ...document, nodes: [bad] })),
+      ).toBeNull();
+    }
+  });
   it("accepts mixed identity generations without putting identities in reader output", () => {
     const ids = [createUuidV7(), "Ab3k9Qp7Zx2Mn5Rs"];
     const jrt = {

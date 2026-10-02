@@ -49,9 +49,10 @@ request bytes and operation IDs remain unchanged. Unsupported future dialects
 use manual recovery.
 
 New rituals have a Pug starter. `/help/ritual-pug` explains the syntax, identity
-folding, literal preservation, comments, and compatibility. Comments and chosen
-spacing are source-buffer conveniences; visual regeneration/syntax switching
-produces canonical source and does not retain comments in the semantic tree.
+folding, literal preservation, comments, and compatibility. The original
+implementation retained comments and chosen spacing only in the source buffer.
+Plan 043 adds semantic annotations for comments and blank section separators,
+preserving them through visual regeneration and syntax switching.
 
 ## Evidence
 
