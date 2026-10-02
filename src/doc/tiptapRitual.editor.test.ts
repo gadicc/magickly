@@ -55,7 +55,7 @@ it("retains author comments and section separators through a real visual edit an
     const changed = semanticFromTiptap(editor.getJSON());
     expect(changed.nodes.slice(0, 2)).toEqual(document.nodes.slice(0, 2));
     expect(printRitualPug(changed)).toContain(
-      "hiero#Ab3k9Qp7Zx2Mn5Rs: Welcome. Hello.",
+      "Hiero#Ab3k9Qp7Zx2Mn5Rs: Welcome. Hello.",
     );
     expect(printRitualPug(changed)).toContain("//- Quietly");
     expect(parseRitualPug(printRitualPug(changed))).toEqual(changed);

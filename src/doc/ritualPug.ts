@@ -176,11 +176,16 @@ export function printRitualPug(doc: RitualSemanticDocument): string {
     const inline = node.children?.length ? inlineChildren(node.children) : null;
     if (inline !== null) {
       const role = attributes.role;
-      if (speech && typeof role === "string" && canPrintRoleShortcut(role))
+      if (speech && typeof role === "string" && canPrintRoleShortcut(role)) {
+        // Capitalize the source label while retaining the reader's role keys.
+        const label = role
+          .split(",")
+          .map((part) => part[0].toUpperCase() + part.slice(1))
+          .join(",");
         lines.push(
-          `${indent}${node.attrs.say ? `${role}#${node.id}:` : `* ${role}#${node.id}`} ${inline}`,
+          `${indent}${node.attrs.say ? `${label}#${node.id}:` : `* ${label}#${node.id}`} ${inline}`,
         );
-      else lines.push(`${header} ${inline}`);
+      } else lines.push(`${header} ${inline}`);
     } else {
       lines.push(header + (node.children === undefined ? "/" : ""));
       node.children?.forEach((child) => visit(child, depth + 1));

@@ -43,7 +43,7 @@ const role = "[A-Za-z][A-Za-z0-9,-]*";
 const speech = new RegExp(`^(${role})(#[A-Za-z0-9-]+)?: ?(.*)$`);
 const action = new RegExp(`^\\* (${role})(#[A-Za-z0-9-]+)?(?: (.*))?$`);
 
-/** Match the historic role shorthand without changing explicitly authored Pug roles. */
+/** Accept either initial case while retaining reader role keys and explicit Pug roles. */
 export function shortcutRole(value: string): string {
   return value
     .split(",")

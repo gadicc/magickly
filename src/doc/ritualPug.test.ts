@@ -271,9 +271,9 @@ describe("Pug surface conveniences", () => {
     });
     const printed = printRitualPug(document);
     expect(printed).toContain(
-      "hiero#Ab3k9Qp7Zx2Mn5Rs: Hi #[b#Other00000000001 there].",
+      "Hiero#Ab3k9Qp7Zx2Mn5Rs: Hi #[b#Other00000000001 there].",
     );
-    expect(printed).toContain("* keryx#Third00000000001 Open the door.");
+    expect(printed).toContain("* Keryx#Third00000000001 Open the door.");
     expect(parseRitualPug(printed)).toEqual(document);
     const ranges = ritualPugIdRanges(source)!;
     expect(ranges.map((range) => source.slice(range.from, range.to))).toEqual([
@@ -299,6 +299,21 @@ describe("Pug surface conveniences", () => {
     expect(printed).toContain('(role="Hiero")');
     expect(printed).toContain('(role="keryx")\n');
     expect(parseRitualPug(printed)).toEqual(document);
+  });
+
+  it("prints capitalized role labels without changing reader keys or explicit spelling", () => {
+    const document = parseRitualPug(
+      `${RITUAL_PUG_HEADER}\nhiero#Ab3k9Qp7Zx2Mn5Rs: Hello.\n* pastHiero,keryx#Other00000000001 Rise.\nAll-officers#Third00000000001: Ready.\nsay#Fourth0000000001(role="Hiero") Exact case.\n`,
+    );
+    const printed = printRitualPug(document);
+    expect(printed).toContain("Hiero#Ab3k9Qp7Zx2Mn5Rs: Hello.");
+    expect(printed).toContain("* PastHiero,Keryx#Other00000000001 Rise.");
+    expect(printed).toContain("All-officers#Third00000000001: Ready.");
+    expect(printed).toContain('say#Fourth0000000001(role="Hiero") Exact case.');
+    expect(parseRitualPug(printed)).toEqual(document);
+    expect(parseRitualPug(printed.replace("Hiero#Ab3", "hiero#Ab3"))).toEqual(
+      document,
+    );
   });
 
   it("retains comments and section separators through both source dialects", () => {

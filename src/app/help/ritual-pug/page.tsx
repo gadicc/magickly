@@ -87,21 +87,23 @@ export default function RitualPugGuide() {
       </p>
       <h2>Speech, actions and inline content</h2>
       <p>
-        <code>hiero: Welcome.</code> creates speech;{" "}
-        <code>* keryx Open the door.</code> creates an action. These shortcuts
+        <code>Hiero: Welcome.</code> creates speech;{" "}
+        <code>* Keryx Open the door.</code> creates an action. These shortcuts
         are the default generated spelling for tasks with inline content.
         Explicit <code>say(role="hiero")</code> and{" "}
         <code>do(role="keryx")</code> also work, and are used for more complex
-        tasks. Roles can be comma-separated, <code>all</code>,
-        <code>all-officers</code> or <code>all-except-hiero</code>.
+        tasks. Roles can be comma-separated, <code>All</code>,
+        <code>All-officers</code> or <code>All-except-hiero</code>.
       </p>
       <Example source={ritualPugExamples.inline} />
       <p>
-        Shortcuts lower-case the first letter of each role, like the original
-        ritual shortcuts. Names of supported Pug tags, such as <code>note</code>
-        , keep Pug’s colon expansion syntax; use explicit{" "}
-        <code>say(role="note")</code>
-        for a role with that name.
+        Generated shortcuts capitalize the first letter of each role. Lowercase
+        initials work too: <code>Hiero:</code> and <code>hiero:</code> refer to
+        the same role. Explicit <code>say(role="…")</code> and{" "}
+        <code>do(role="…")</code> preserve the exact role spelling. Names of
+        supported Pug tags, such as <code>note</code>, keep Pug’s colon
+        expansion syntax; use explicit <code>say(role="note")</code> for a role
+        with that name.
       </p>
       <p>
         Use <code>b</code>, <code>i</code> and{" "}
@@ -132,7 +134,7 @@ export default function RitualPugGuide() {
       <h2>IDs and exact preservation</h2>
       <p>
         Canonical source includes <code>#id</code>, for example
-        <code> hiero#Ab3k9Qp7Zx2Mn5Rs: Welcome.</code> IDs are folded into small{" "}
+        <code> Hiero#Ab3k9Qp7Zx2Mn5Rs: Welcome.</code> IDs are folded into small{" "}
         <code>#…</code> markers by default. Click one to reveal it, or choose{" "}
         <strong>Show IDs</strong>. Copying source and downloading drafts include
         the complete IDs. Existing UUID IDs are valid too.
