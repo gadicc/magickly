@@ -28,9 +28,8 @@ export default function RitualTextGuide() {
     <Container maxWidth="md" sx={{ py: 3 }}>
       <h1>Ritual Text guide</h1>
       <p>
-        This guide covers the earlier source syntax, still available for
-        existing drafts and source editing. New rituals use{" "}
-        <Link href="/help/ritual-pug">Ritual Pug</Link>.
+        This guide is retained to help recover older drafts. Normal authoring
+        now uses <Link href="/help/ritual-pug">Ritual Pug</Link>.
       </p>
       <p>
         Ritual Text is Magickly’s custom source format for visual ritual
@@ -40,14 +39,16 @@ export default function RitualTextGuide() {
         legacy workflows.
       </p>
       <p>
-        Choose <strong>Ritual Text</strong> in the source syntax selector of an
-        existing ritual. In <strong>split</strong> mode, the editor shows source
-        on the left and the editable visual panel on the right. Visual edits
-        update source immediately; valid source edits update the visual panel
-        after a short typing pause. Incomplete syntax keeps the last valid
-        preview visible and pauses visual editing until corrected. If both
-        panels have changed, resolve the warning by applying or discarding your
-        source edits.
+        Valid recovered drafts convert to Pug automatically. Incomplete or
+        conflicting source stays in this syntax until repaired or explicitly
+        applied; pending saves resolve first. Download the draft to retain its
+        recovery buffer before editing. In <strong>split</strong> mode, the
+        editor shows source on the left and the editable visual panel on the
+        right. Visual edits update source immediately; valid source edits update
+        the visual panel after a short typing pause. Incomplete syntax keeps the
+        last valid preview visible and pauses visual editing until corrected. If
+        both panels have changed, resolve the warning by applying or discarding
+        your source edits.
       </p>
       <nav aria-label="Guide sections">
         <p>

@@ -16,7 +16,9 @@ it("recovers when source is restored to its previous visual projection", async (
   let latest = "";
   const valid = vi.fn();
   function Host() {
-    const [source, setSource] = React.useState('ritual 1\n= "hello"\n');
+    const [source, setSource] = React.useState(
+      "//- magickli-ritual-pug 1\nhiero: hello\n",
+    );
     return (
       <RitualCreationEditor
         source={source}

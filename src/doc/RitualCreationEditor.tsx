@@ -7,11 +7,7 @@ import React from "react";
 import styles from "@/app/doc/[_id]/edit/semantic/SemanticEditor.module.css";
 import RitualSourceEditor from "./RitualSourceEditor";
 import RitualVisualControls from "./RitualVisualControls";
-import {
-  detectRitualSourceDialect,
-  parseRitualSource,
-  printRitualSource,
-} from "./ritualSource";
+import { parseRitualSource, printRitualSource } from "./ritualSource";
 import { ritualSourceDiagnostic } from "./ritualSourceDiagnostics";
 import {
   normalizeTiptapNodeIds,
@@ -23,9 +19,7 @@ import {
 const initialView = (source: string) => {
   try {
     return {
-      ...visualRitualState(
-        parseRitualSource(source, detectRitualSourceDialect(source) ?? "pug"),
-      ),
+      ...visualRitualState(parseRitualSource(source, "pug")),
       diagnostic: null,
     };
   } catch (cause) {
@@ -81,10 +75,7 @@ export default function RitualCreationEditor({
       if (!transaction.docChanged) return;
       try {
         if (normalizeTiptapNodeIds(changed)) return;
-        const next = printRitualSource(
-          semanticFromTiptap(changed.getJSON()),
-          detectRitualSourceDialect(source) ?? "pug",
-        );
+        const next = printRitualSource(semanticFromTiptap(changed.getJSON()));
         lastEmission.current = next;
         onChange(next);
         setIssue(null);
@@ -137,19 +128,8 @@ export default function RitualCreationEditor({
           Ritual source
         </Button>
       </ButtonGroup>
-      <Link
-        href={
-          detectRitualSourceDialect(source) === "ritual-text"
-            ? "/help/ritual-text"
-            : "/help/ritual-pug"
-        }
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {detectRitualSourceDialect(source) === "ritual-text"
-          ? "Ritual Text"
-          : "Ritual Pug"}{" "}
-        guide (opens in a new tab)
+      <Link href="/help/ritual-pug" target="_blank" rel="noopener noreferrer">
+        Ritual Pug guide (opens in a new tab)
       </Link>
       {issue && <Alert severity="warning">{issue}</Alert>}
       {visualError && <Alert severity="error">{visualError}</Alert>}
@@ -158,7 +138,7 @@ export default function RitualCreationEditor({
           diagnostic={sourceDiagnostic}
           label="New ritual source"
           value={source}
-          dialect={detectRitualSourceDialect(source) ?? "pug"}
+          dialect="pug"
           disabled={disabled}
           onCompositionChange={setSourceComposing}
           onChange={onChange}

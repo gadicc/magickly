@@ -32,11 +32,12 @@ export default function RitualPugGuide() {
       </p>
       <p>
         Choose <strong>Visual / Ritual Pug</strong> when creating a ritual.
-        Existing Ritual Text drafts reopen in their original syntax. Apply or
-        discard their source changes before selecting Pug. Switching syntax
-        preserves block IDs. Source Undo covers typing in the current view;
-        visual regeneration, discarding source, and switching syntax start a
-        fresh source history.
+        Older Ritual Text drafts are recovered and converted automatically when
+        valid. Incomplete or conflicting buffers remain available to repair,
+        apply or download; pending saves must resolve before conversion. Block
+        IDs and annotations are preserved. Source Undo covers typing in the
+        current view; visual regeneration, discarding source, and recovery
+        conversion start a fresh source history.
       </p>
       <h2>Finding and fixing errors</h2>
       <p>

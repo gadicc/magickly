@@ -42,7 +42,16 @@ export function restorePugDraftAnnotations(
   document: RitualSemanticDocument,
   source: string,
 ): RitualSemanticDocument {
-  const parsed = parseRitualPug(source);
+  return restoreDraftSourceAnnotations(document, source, "pug");
+}
+
+/** Recover clean source trivia while retaining the authoritative document's identities. */
+export function restoreDraftSourceAnnotations(
+  document: RitualSemanticDocument,
+  source: string,
+  dialect: RitualSourceDialect,
+): RitualSemanticDocument {
+  const parsed = parseRitualSource(source, dialect);
   const canonical = (value: unknown) =>
     JSON.stringify(value, (_key, entry) =>
       entry && typeof entry === "object" && !Array.isArray(entry)

@@ -522,7 +522,118 @@ it("clears a local draft identical to the confirmed server revision", async () =
   expect(screen.queryByText("Recovered the local draft.")).toBeNull();
 });
 
-it("recovers an incomplete old source buffer and switches syntax only after discard", async () => {
+it("converts clean Ritual Text drafts to Pug with identities and trivia intact", async () => {
+  const setup = props();
+  mock.owner = setup.actorId;
+  const document = {
+    ...setup.initialDocument,
+    nodes: [
+      {
+        kind: "annotation" as const,
+        style: "comment" as const,
+        text: "Keep this",
+      },
+      { kind: "annotation" as const, style: "blank" as const, text: "" },
+      ...setup.initialDocument.nodes,
+    ],
+  };
+  mock.load.mockResolvedValue({
+    ownerId: setup.actorId,
+    ritualId: setup.ritualId,
+    baseRevisionId: setup.revisionId,
+    baseVersion: setup.parentVersion,
+    title: "Recovered title",
+    // Older draft JSON might not contain source annotations.
+    documentJson: JSON.stringify(setup.initialDocument),
+    sourceBuffer: printRitualText(document),
+    sourceDialect: "ritual-text",
+    sourceDirty: false,
+    sourceConflict: false,
+    pending: null,
+    updatedAt: Date.now(),
+  });
+  mock.saveDraft.mockResolvedValue(undefined);
+  render(<SemanticEditor {...setup} />);
+  const buffer = await screen.findByRole("textbox", {
+    name: "Ritual semantic source",
+  });
+  expect((buffer as HTMLTextAreaElement).value).toBe(printRitualPug(document));
+  expect(
+    screen.queryByText(/older Ritual Text draft is being recovered/),
+  ).toBeNull();
+  await waitFor(() => expect(mock.saveDraft).toHaveBeenCalled());
+  expect(JSON.parse(mock.saveDraft.mock.lastCall?.[0].documentJson)).toEqual(
+    document,
+  );
+  expect(mock.saveDraft.mock.lastCall?.[0].sourceDialect).toBe("pug");
+});
+
+it("automatically applies valid dirty Ritual Text before converting to Pug", async () => {
+  const setup = props();
+  mock.owner = setup.actorId;
+  const document = structuredClone(setup.initialDocument);
+  const task = document.nodes[0];
+  if (task.kind === "element")
+    task.children = [{ kind: "text", text: "Recovered edits." }];
+  mock.load.mockResolvedValue({
+    ownerId: setup.actorId,
+    ritualId: setup.ritualId,
+    baseRevisionId: setup.revisionId,
+    baseVersion: setup.parentVersion,
+    title: setup.title,
+    documentJson: JSON.stringify(setup.initialDocument),
+    sourceBuffer: printRitualText(document),
+    sourceDialect: "ritual-text",
+    sourceDirty: true,
+    sourceConflict: false,
+    pending: null,
+    updatedAt: Date.now(),
+  });
+  mock.saveDraft.mockResolvedValue(undefined);
+  render(<SemanticEditor {...setup} />);
+  const buffer = await screen.findByRole("textbox", {
+    name: "Ritual semantic source",
+  });
+  await waitFor(() =>
+    expect((buffer as HTMLTextAreaElement).value).toBe(
+      printRitualPug(document),
+    ),
+  );
+  await waitFor(() => expect(mock.saveDraft).toHaveBeenCalled());
+  expect(JSON.parse(mock.saveDraft.mock.lastCall?.[0].documentJson)).toEqual(
+    document,
+  );
+});
+
+it("keeps conflicting Ritual Text bytes until the author resolves them", async () => {
+  const setup = props();
+  mock.owner = setup.actorId;
+  const sourceBuffer = 'ritual 1\n@say hiero "Different source"\n';
+  mock.load.mockResolvedValue({
+    ownerId: setup.actorId,
+    ritualId: setup.ritualId,
+    baseRevisionId: setup.revisionId,
+    baseVersion: setup.parentVersion,
+    title: setup.title,
+    documentJson: JSON.stringify(setup.initialDocument),
+    sourceBuffer,
+    sourceDirty: true,
+    sourceConflict: true,
+    pending: null,
+    updatedAt: Date.now(),
+  });
+  mock.saveDraft.mockResolvedValue(undefined);
+  render(<SemanticEditor {...setup} />);
+  const buffer = await screen.findByRole("textbox", {
+    name: "Ritual semantic source",
+  });
+  await waitFor(() => expect(mock.saveDraft).toHaveBeenCalled());
+  expect((buffer as HTMLTextAreaElement).value).toBe(sourceBuffer);
+  expect(mock.saveDraft.mock.lastCall?.[0].sourceDialect).toBe("ritual-text");
+  expect(mock.saveDraft.mock.lastCall?.[0].sourceConflict).toBe(true);
+});
+
+it("retains incomplete Ritual Text only for recovery and uses Pug after discard", async () => {
   const setup = props();
   mock.owner = setup.actorId;
   const oldBuffer = 'ritual 1\n@say hiero "Unfinished';
@@ -547,17 +658,13 @@ it("recovers an incomplete old source buffer and switches syntax only after disc
     name: "Ritual semantic source",
   }) as HTMLTextAreaElement;
   expect(buffer.value).toBe(oldBuffer);
+  expect(screen.queryByRole("group", { name: "Source syntax" })).toBeNull();
   expect(
-    (
-      screen.getByRole("button", {
-        name: "Pug",
-      }) as HTMLButtonElement
-    ).disabled,
-  ).toBe(true);
+    screen.getByText(/older Ritual Text draft is being recovered/),
+  ).toBeTruthy();
   fireEvent.click(
     screen.getByRole("button", { name: /Discard source changes/ }),
   );
-  fireEvent.click(screen.getByRole("button", { name: "Pug" }));
   expect(buffer.value).toContain("//- magickli-ritual-pug 1");
   const first = setup.initialDocument.nodes[0];
   expect(first.kind).not.toBe("text");
@@ -607,17 +714,135 @@ it("retains a restored pending request and old source bytes exactly", async () =
       }) as HTMLTextAreaElement
     ).value,
   ).toBe(sourceBuffer);
+  expect(screen.queryByRole("group", { name: "Source syntax" })).toBeNull();
   expect(
-    (
-      screen.getByRole("button", {
-        name: "Pug",
-      }) as HTMLButtonElement
-    ).disabled,
-  ).toBe(true);
+    screen.getByText(/older Ritual Text draft is being recovered/),
+  ).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Retry save" }));
   await waitFor(() =>
     expect(mock.send).toHaveBeenCalledWith(pending, expect.any(AbortSignal)),
   );
+});
+
+it("converts a confirmed pending Ritual Text draft without regenerating missing source IDs", async () => {
+  const setup = props();
+  mock.owner = setup.actorId;
+  const pending = {
+    version: 3 as const,
+    kind: "save" as const,
+    operationId: createUuidV7(),
+    expectedActorId: setup.actorId,
+    ritualId: setup.ritualId,
+    expectedRevisionId: setup.revisionId,
+    expectedVersion: setup.parentVersion,
+    title: setup.title,
+    source: JSON.stringify(setup.initialDocument),
+  };
+  const sourceBuffer =
+    'ritual 1\n; "Keep after retry"\n@say hiero "Welcome."\n';
+  mock.load.mockResolvedValue({
+    ownerId: setup.actorId,
+    ritualId: setup.ritualId,
+    baseRevisionId: setup.revisionId,
+    baseVersion: setup.parentVersion,
+    title: setup.title,
+    documentJson: pending.source,
+    sourceBuffer,
+    sourceDialect: "ritual-text",
+    sourceDirty: false,
+    sourceConflict: false,
+    pending,
+    updatedAt: Date.now(),
+  });
+  mock.saveDraft.mockResolvedValue(undefined);
+  mock.send.mockResolvedValue({
+    ok: true,
+    replayed: true,
+    ritualId: setup.ritualId,
+    revisionId: createUuidV7(),
+    version: 8,
+    updatedAt: new Date().toISOString(),
+  });
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "Retry save" }));
+  const buffer = screen.getByRole("textbox", {
+    name: "Ritual semantic source",
+  });
+  await waitFor(() =>
+    expect((buffer as HTMLTextAreaElement).value).toContain(
+      "//- magickli-ritual-pug 1",
+    ),
+  );
+  const expected = {
+    ...setup.initialDocument,
+    nodes: [
+      { kind: "annotation", style: "comment", text: "Keep after retry" },
+      ...setup.initialDocument.nodes,
+    ],
+  };
+  expect((buffer as HTMLTextAreaElement).value).toBe(
+    printRitualPug(expected as typeof setup.initialDocument),
+  );
+  expect(mock.send).toHaveBeenCalledWith(pending, expect.any(AbortSignal));
+  await waitFor(() =>
+    expect(mock.saveDraft.mock.lastCall?.[0].sourceDialect).toBe("pug"),
+  );
+  expect(JSON.parse(mock.saveDraft.mock.lastCall?.[0].documentJson)).toEqual(
+    expected,
+  );
+});
+
+it("retains mismatching clean Ritual Text recovery after confirming its pending save", async () => {
+  const setup = props();
+  mock.owner = setup.actorId;
+  const pending = {
+    version: 3 as const,
+    kind: "save" as const,
+    operationId: createUuidV7(),
+    expectedActorId: setup.actorId,
+    ritualId: setup.ritualId,
+    expectedRevisionId: setup.revisionId,
+    expectedVersion: setup.parentVersion,
+    title: setup.title,
+    source: JSON.stringify(setup.initialDocument),
+  };
+  const sourceBuffer = 'ritual 1\n@say hiero "Different source"\n';
+  mock.load.mockResolvedValue({
+    ownerId: setup.actorId,
+    ritualId: setup.ritualId,
+    baseRevisionId: setup.revisionId,
+    baseVersion: setup.parentVersion,
+    title: setup.title,
+    documentJson: pending.source,
+    sourceBuffer,
+    sourceDialect: "ritual-text",
+    sourceDirty: false,
+    sourceConflict: false,
+    pending,
+    updatedAt: Date.now(),
+  });
+  mock.saveDraft.mockResolvedValue(undefined);
+  mock.send.mockResolvedValue({
+    ok: true,
+    replayed: true,
+    ritualId: setup.ritualId,
+    revisionId: createUuidV7(),
+    version: 8,
+    updatedAt: new Date().toISOString(),
+  });
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "Retry save" }));
+  await screen.findByText(/Unapplied source changes remain/);
+  expect(mock.clear).not.toHaveBeenCalled();
+  const retained = mock.saveDraft.mock.lastCall?.[0];
+  expect(retained).toMatchObject({
+    sourceBuffer,
+    sourceDirty: true,
+    sourceConflict: true,
+    pending: null,
+    baseVersion: 8,
+  });
+  expect(JSON.parse(retained.documentJson)).toEqual(setup.initialDocument);
 });
 
 it("waits for initial account activation before deciding access is locked", async () => {
@@ -715,9 +940,10 @@ it("blocks editing when the local draft cannot be inspected", async () => {
   expect(screen.queryByRole("button", { name: "Save" })).toBeNull();
 });
 
-it.each([false, true])(
+it.each(["none", "pug", "ritual-text"])(
   "confirms a pending receipt after the server revision has advanced (annotations: %s)",
-  async (annotations) => {
+  async (dialect) => {
+    const annotations = dialect !== "none";
     const setup = props();
     mock.owner = setup.actorId;
     mock.clear.mockResolvedValue(undefined);
@@ -739,12 +965,16 @@ it.each([false, true])(
       baseVersion: 6,
       title: setup.title,
       documentJson: pending.source,
-      sourceBuffer: annotations
-        ? printRitualPug(setup.initialDocument).replace(
-            "\n",
-            "\n//- Stale pending comment\n\n",
-          )
-        : "ritual 1\n",
+      sourceBuffer:
+        dialect === "pug"
+          ? printRitualPug(setup.initialDocument).replace(
+              "\n",
+              "\n//- Stale pending comment\n\n",
+            )
+          : printRitualText(setup.initialDocument).replace(
+              "\n",
+              annotations ? '\n; "Stale pending comment"\n' : "\n",
+            ),
       sourceDirty: false,
       sourceConflict: false,
       pending,

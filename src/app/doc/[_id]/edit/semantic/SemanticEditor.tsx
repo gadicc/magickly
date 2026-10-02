@@ -20,6 +20,7 @@ import {
   parseRitualSource,
   printRitualSource,
   type RitualSourceDialect,
+  restoreDraftSourceAnnotations,
   restorePugDraftAnnotations,
 } from "@/doc/ritualSource";
 import {
@@ -155,8 +156,8 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           current.dirty
             ? { ...current, conflict: true }
             : {
-                text: printRitualSource(next, current.dialect),
-                dialect: current.dialect,
+                text: printRitualSource(next),
+                dialect: "pug",
                 dirty: false,
                 conflict: false,
               },
@@ -380,6 +381,36 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             !draft.sourceConflict
           )
             restored = restorePugDraftAnnotations(restored, draft.sourceBuffer);
+          let restoredSource: SourceState = {
+            text: draft.sourceBuffer,
+            dialect: draftDialect,
+            dirty: draft.sourceDirty,
+            conflict: draft.sourceConflict,
+          };
+          if (draftDialect === "ritual-text") {
+            setMode("source");
+            // Pending requests and conflicted/incomplete buffers retain their
+            // bytes. Only clean, reconciled source can migrate immediately.
+            if (!draft.sourceDirty && !draft.sourceConflict) {
+              try {
+                restored = restoreDraftSourceAnnotations(
+                  restored,
+                  draft.sourceBuffer,
+                  "ritual-text",
+                );
+                if (!draft.pending)
+                  restoredSource = {
+                    text: printRitualSource(restored),
+                    dialect: "pug",
+                    dirty: false,
+                    conflict: false,
+                  };
+              } catch {
+                restoredSource.dirty = true;
+                restoredSource.conflict = true;
+              }
+            }
+          }
           const visual = visualRitualState(restored);
           setVisualIssue(visual.issue);
           editor.commands.setContent(visual.content, {
@@ -387,12 +418,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           });
           setDocument(restored);
           setTitle(draft.title);
-          setSource({
-            text: draft.sourceBuffer,
-            dialect: draftDialect,
-            dirty: draft.sourceDirty,
-            conflict: draft.sourceConflict,
-          });
+          setSource(restoredSource);
           setPending(draft.pending);
           setNotice("Recovered the local draft.");
           skipPersist.current = false;
@@ -526,12 +552,26 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     )
       return;
     try {
-      const next = parseRitualSource(source.text, source.dialect);
+      const next =
+        source.dialect === "ritual-text" && !source.dirty
+          ? restoreDraftSourceAnnotations(document, source.text, "ritual-text")
+          : parseRitualSource(source.text, source.dialect);
       const visual = visualRitualState(next);
       editor.commands.setContent(visual.content, { emitUpdate: false });
       setVisualIssue(visual.issue);
       setDocument(next);
-      setSource((current) => ({ ...current, dirty: false, conflict: false }));
+      setSource((current) =>
+        current.dialect === "ritual-text"
+          ? {
+              text: printRitualSource(next),
+              dialect: "pug",
+              dirty: false,
+              conflict: false,
+            }
+          : { ...current, dirty: false, conflict: false },
+      );
+      if (source.dialect === "ritual-text")
+        setNotice("Recovered Ritual Text source converted to Pug.");
       setSourceError(null);
       setError(null);
       skipPersist.current = false;
@@ -546,16 +586,23 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     access,
     source.text,
     source.dialect,
+    source.dirty,
     sourceComposing,
+    document,
   ]);
 
   React.useEffect(() => {
-    if (!ready || !source.dirty || source.conflict) return;
+    if (
+      !ready ||
+      (!source.dirty && source.dialect !== "ritual-text") ||
+      source.conflict
+    )
+      return;
     // Keep the typed buffer intact. Incomplete syntax leaves the last valid
     // document visible; visual editing waits until this source catches up.
     const timer = window.setTimeout(applySource, 200);
     return () => window.clearTimeout(timer);
-  }, [ready, source.dirty, source.conflict, applySource]);
+  }, [ready, source.dirty, source.dialect, source.conflict, applySource]);
 
   const confirmStalePending = async () => {
     const request = stale?.pending;
@@ -590,15 +637,32 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         return;
       }
       let followUp: SemanticDraft | undefined;
-      if (
-        (stale.sourceDialect ??
-          detectRitualSourceDialect(stale.sourceBuffer)) === "pug" &&
-        !stale.sourceDirty &&
-        !stale.sourceConflict
-      ) {
-        const restored = restorePugDraftAnnotations(
+      const dialect =
+        stale.sourceDialect ??
+        detectRitualSourceDialect(stale.sourceBuffer) ??
+        "ritual-text";
+      if (stale.sourceDirty || stale.sourceConflict) {
+        if (
+          result.revisionId !== props.revisionId ||
+          result.version !== props.parentVersion
+        ) {
+          setError(
+            "The pending save is confirmed, but a newer server revision exists. Download this draft to recover its source changes before discarding it.",
+          );
+          return;
+        }
+        followUp = {
+          ...stale,
+          baseRevisionId: result.revisionId,
+          baseVersion: result.version,
+          pending: null,
+          updatedAt: Date.now(),
+        };
+      } else {
+        const restored = restoreDraftSourceAnnotations(
           JSON.parse(stale.documentJson),
           stale.sourceBuffer,
+          dialect,
         );
         if (
           JSON.stringify(JSON.parse(request.source)) !==
@@ -613,9 +677,10 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             );
             return;
           }
-          const current = restorePugDraftAnnotations(
+          const current = restoreDraftSourceAnnotations(
             props.initialDocument,
             stale.sourceBuffer,
+            dialect,
           );
           followUp = {
             ...stale,
@@ -703,6 +768,8 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         return;
       }
       const followUp: SemanticDraft | undefined =
+        source.dirty ||
+        source.conflict ||
         JSON.stringify(JSON.parse(request.source)) !== JSON.stringify(document)
           ? {
               ...currentDraft(),
@@ -746,7 +813,9 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       }
       setNotice(
         followUp
-          ? "Save confirmed. Recovered author annotations remain in your local draft; save again to include them."
+          ? source.dirty || source.conflict
+            ? "Save confirmed. Unapplied source changes remain in your local draft; resolve them before saving again."
+            : "Save confirmed. Recovered author annotations remain in your local draft; save again to include them."
           : result.replayed
             ? "Save confirmed after retry."
             : "Saved as a semantic revision.",
@@ -952,37 +1021,14 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                 (opens in a new tab)
               </Link>
             </Typography>
-            <ButtonGroup size="small" aria-label="Source syntax">
-              {(["pug", "ritual-text"] as const).map((dialect) => (
-                <Button
-                  key={dialect}
-                  variant={
-                    source.dialect === dialect ? "contained" : "outlined"
-                  }
-                  disabled={
-                    access !== "ready" ||
-                    source.dirty ||
-                    sourceComposing ||
-                    saving ||
-                    source.conflict ||
-                    !!pending ||
-                    !!stale
-                  }
-                  onClick={() => {
-                    skipPersist.current = false;
-                    setSource({
-                      text: printRitualSource(document, dialect),
-                      dialect,
-                      dirty: false,
-                      conflict: false,
-                    });
-                    setSourceError(null);
-                  }}
-                >
-                  {dialect === "pug" ? "Pug" : "Ritual Text"}
-                </Button>
-              ))}
-            </ButtonGroup>
+            {source.dialect === "ritual-text" && (
+              <Alert severity="info">
+                This older Ritual Text draft is being recovered. Correct or
+                resolve its source changes to convert it to Pug. Pending saves
+                must be confirmed first. Download the draft to keep its original
+                recovery buffer before changing it.
+              </Alert>
+            )}
             <RitualSourceEditor
               diagnostic={sourceError}
               value={source.text}
@@ -1026,8 +1072,8 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                 onClick={() => {
                   setSourceError(null);
                   setSource({
-                    text: printRitualSource(document, source.dialect),
-                    dialect: source.dialect,
+                    text: printRitualSource(document),
+                    dialect: "pug",
                     dirty: false,
                     conflict: false,
                   });
