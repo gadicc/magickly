@@ -127,6 +127,58 @@ describe("bounded semantic Pug", () => {
     });
   });
 
+  it("maps syntax error coordinates to shortcuts and preserves locations after comment expansion", () => {
+    const source = `${RITUAL_PUG_HEADER}\n//- section\n  detail\nnote\n  hiero: hi #[b(value=someCall()) bold]\n`;
+    try {
+      parseRitualPug(source);
+      throw new Error("Expected invalid literal");
+    } catch (error) {
+      expect(error).toMatchObject({ line: 5, column: 17 });
+      expect((error as Error).message).not.toContain("someCall");
+    }
+    const body = "  hiero: hi #[b bold";
+    const expanded = '  say(role="hiero") hi #[b bold';
+    const failure = (line: string) => {
+      try {
+        parseRitualPug(`${RITUAL_PUG_HEADER}\nnote\n${line}`);
+      } catch (cause) {
+        return cause as { line: number; column: number };
+      }
+      throw new Error("Expected syntax error");
+    };
+    const shortcutError = failure(body);
+    const explicitError = failure(expanded);
+    expect(shortcutError.line).toBe(3);
+    expect(shortcutError.column).toBe(
+      explicitError.column - (expanded.length - body.length),
+    );
+  });
+
+  it.each([
+    ["note good\nnotte typo", 3, 1, "unsupported node"],
+    ["note good\nimg(src=123)/", 3, undefined, "invalid attribute value"],
+    ["hiero: Hello #{danger()}", 2, 14, "Template programs are unsupported"],
+    ["note#bad text", 2, 5, "invalid node ID"],
+    [
+      "note#Ab3k9Qp7Zx2Mn5Rs first\nnote#Ab3k9Qp7Zx2Mn5Rs second",
+      3,
+      5,
+      "duplicate id",
+    ],
+  ])(
+    "locates ordinary semantic errors in authored source: %s",
+    (body, line, column, message) => {
+      try {
+        parseRitualPug(`${RITUAL_PUG_HEADER}\n${body}\n`);
+        throw new Error("Expected rejection");
+      } catch (cause) {
+        expect(cause).toMatchObject({ line, column });
+        expect((cause as Error).message).toContain(message);
+        expect((cause as Error).message).not.toContain("danger()");
+      }
+    },
+  );
+
   it("bounds recursive inline nesting before lexing or parsing can exhaust the stack", () => {
     expect(() =>
       parseRitualPug(

@@ -22,6 +22,10 @@ import {
   type RitualSourceDialect,
   restorePugDraftAnnotations,
 } from "@/doc/ritualSource";
+import {
+  type RitualSourceDiagnostic,
+  ritualSourceDiagnostic,
+} from "@/doc/ritualSourceDiagnostics";
 import SemanticPublication from "@/doc/SemanticPublication";
 import {
   type RitualSemanticDocument,
@@ -102,7 +106,8 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   );
   const [saving, setSaving] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const [sourceError, setSourceError] = React.useState<string | null>(null);
+  const [sourceError, setSourceError] =
+    React.useState<RitualSourceDiagnostic | null>(null);
   const [sourceComposing, setSourceComposing] = React.useState(false);
   const [notice, setNotice] = React.useState<string | null>(null);
   const [initialVisual] = React.useState(() =>
@@ -531,9 +536,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       setError(null);
       skipPersist.current = false;
     } catch (cause) {
-      setSourceError(
-        cause instanceof Error ? cause.message : "The source is invalid.",
-      );
+      setSourceError(ritualSourceDiagnostic(cause, source.text));
     }
   }, [
     editor,
@@ -981,6 +984,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
               ))}
             </ButtonGroup>
             <RitualSourceEditor
+              diagnostic={sourceError}
               value={source.text}
               dialect={source.dialect}
               disabled={access !== "ready" || !!pending || !!stale}
@@ -995,9 +999,10 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                 });
               }}
             />
-            {sourceError && (
+            {sourceError?.source === source.text && (
               <Alert severity="warning">
-                {sourceError}. The visual panel shows the last valid source.
+                {sourceError.message}. The visual panel shows the last valid
+                source.
               </Alert>
             )}
             {source.conflict && (

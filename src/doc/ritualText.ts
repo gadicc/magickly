@@ -1,5 +1,9 @@
 import { createRitualNodeId } from "./ritualNodeIds";
 import {
+  type RitualSourceLocation,
+  semanticSourceError,
+} from "./ritualSourceDiagnostics";
+import {
   type JsonValue,
   type RitualSemanticDocument,
   type RitualSemanticNode,
@@ -108,6 +112,7 @@ export function parseRitualText(source: string): RitualSemanticDocument {
   if (lines.shift() !== "ritual 1")
     throw new Error("Line 1: expected ritual 1");
   const root: RitualSemanticNode[] = [];
+  const locations = new WeakMap<RitualSemanticNode, RitualSourceLocation>();
   const parents: Array<RitualSemanticNode[] | null> = [root];
   for (let index = 0; index < lines.length; index++) {
     const full = lines[index];
@@ -235,6 +240,7 @@ export function parseRitualText(source: string): RitualSemanticDocument {
       }
     } else throw new Error(`Line ${lineNumber}: unknown ritual line`);
     parent.push(node);
+    locations.set(node, { line: lineNumber, column: spaces + 1 });
     parents.length = depth + 1;
     parents.push(node.kind === "element" ? (node.children ?? null) : null);
   }
@@ -244,6 +250,6 @@ export function parseRitualText(source: string): RitualSemanticDocument {
     nodes: root,
   };
   const errors = validateRitualSemantic(document);
-  if (errors.length) throw new Error(errors[0]);
+  if (errors.length) throw semanticSourceError(document, errors[0], locations);
   return document;
 }

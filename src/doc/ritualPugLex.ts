@@ -32,6 +32,10 @@ export function lexRitualPug(source: string): lex.Token[] {
     }
   }
   const protectedLines = new Set<number>();
+  const contextSurfaces = new Map<
+    number,
+    { indent: number; surface: ReturnType<typeof ritualPugSurface> }
+  >();
   class ContextLexer extends BoundedLexer {
     override callLexerFunction(func: string, ...args: unknown[]) {
       // Pug owns literal/attribute contexts: their contents never reach advance.
@@ -44,8 +48,9 @@ export function lexRitualPug(source: string): lex.Token[] {
         const end = this.input.indexOf("\n");
         const line = this.input.slice(0, end < 0 ? undefined : end);
         if (/^(?:[A-Za-z][A-Za-z0-9,-]*(?:#[A-Za-z0-9-]+)?:|\* )/.test(line)) {
-          const expanded = ritualPugSurface(line).source;
-          this.input = expanded + (end < 0 ? "" : this.input.slice(end));
+          const surface = ritualPugSurface(line);
+          contextSurfaces.set(this.lineno, { indent: this.colno - 1, surface });
+          this.input = surface.source + (end < 0 ? "" : this.input.slice(end));
         }
       }
       return Reflect.apply(super.callLexerFunction, this, [func, ...args]);
@@ -67,7 +72,17 @@ export function lexRitualPug(source: string): lex.Token[] {
       return result;
     }
   }
-  const contextTokens = new ContextLexer(source).getTokens();
+  let contextTokens: lex.Token[];
+  try {
+    contextTokens = new ContextLexer(source).getTokens();
+  } catch (error) {
+    const record = contextSurfaces.get(error?.line);
+    if (record && typeof error?.column === "number")
+      error.column =
+        record.indent +
+        record.surface.location(1, error.column - record.indent).column;
+    throw error;
+  }
   if (contextTokens.length > 200_000)
     throw new Error("Ritual source is too large");
   // Adjacent pipe-text lines have reader-significant newline semantics in Pug,
@@ -91,8 +106,11 @@ export function lexRitualPug(source: string): lex.Token[] {
   try {
     tokens = new BoundedLexer(surface.source).getTokens();
   } catch (error) {
-    if (typeof error?.line === "number")
-      error.line = surface.location(error.line, 1).line;
+    if (typeof error?.line === "number") {
+      const mapped = surface.location(error.line, error.column ?? 1);
+      error.line = mapped.line;
+      if (typeof error?.column === "number") error.column = mapped.column;
+    }
     throw error;
   }
   for (const token of tokens) {

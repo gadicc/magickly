@@ -38,6 +38,16 @@ export default function RitualPugGuide() {
         visual regeneration, discarding source, and switching syntax start a
         fresh source history.
       </p>
+      <h2>Finding and fixing errors</h2>
+      <p>
+        Source errors have red underlines and a marker beside their line number.
+        Hover over either for details, or choose <strong>Go to error</strong>.
+        <kbd>F8</kbd> jumps to an error; <kbd>Shift+F8</kbd> goes backwards.
+        <strong> Problems</strong> opens the error list, also available with
+        <kbd> Ctrl+Shift+M</kbd> (<kbd>Cmd+Shift+M</kbd> on Mac). A folded ID is
+        revealed when you jump to its error. Where only the line is known, the
+        editor underlines that line’s content. Errors clear when corrected.
+      </p>
       <h2>Starter</h2>
       <Example source={ritualPugStarter} />
       <h2>Basic syntax</h2>

@@ -51,6 +51,12 @@ export default function RitualTextGuide() {
       </p>
       <nav aria-label="Guide sections">
         <p>
+          Red underlines and gutter markers locate source errors. Hover for
+          details, choose <strong>Go to error</strong> or press <kbd>F8</kbd>.
+          <strong> Problems</strong> opens the error list; its keyboard shortcut
+          is <kbd>Ctrl+Shift+M</kbd> (<kbd>Cmd+Shift+M</kbd> on Mac).
+        </p>
+        <p>
           <a href="#starter">Starter</a> · <a href="#syntax">Basic syntax</a> ·{" "}
           <a href="#roles">Speech and actions</a> ·{" "}
           <a href="#structure">Structure and formatting</a> ·{" "}
@@ -71,7 +77,11 @@ export default function RitualTextGuide() {
         <li>
           The first line must be exactly <code>ritual 1</code>.
         </li>
-        <li>Blank lines are allowed. There is no comment syntax.</li>
+        <li>
+          Blank lines are allowed. Author comments use <code>; "comment"</code>;
+          <code> ~blank</code> preserves a source section separator through
+          visual edits. Both are omitted from the reader.
+        </li>
         <li>
           Use two spaces for each nesting level, with no tabs. A command ending
           in <code>:</code> opens a group of indented child lines.

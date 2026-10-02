@@ -1,4 +1,6 @@
 // @vitest-environment jsdom
+
+import { diagnosticCount, forEachDiagnostic } from "@codemirror/lint";
 import {
   act,
   cleanup,
@@ -9,8 +11,12 @@ import {
 import { EditorState, EditorView } from "@uiw/react-codemirror";
 import { afterEach, expect, it, vi } from "vitest";
 import RitualSourceEditor, { ritualIdFolding } from "./RitualSourceEditor";
-import { RITUAL_PUG_HEADER } from "./ritualPug";
+import { parseRitualPug, RITUAL_PUG_HEADER } from "./ritualPug";
 import { ritualPugIdRanges } from "./ritualPugIds";
+import {
+  RitualSourceError,
+  ritualSourceDiagnostic,
+} from "./ritualSourceDiagnostics";
 
 const id = "Ab3k9Qp7Zx2Mn5Rs";
 const secondId = "Other00000000001";
@@ -24,6 +30,210 @@ Object.defineProperty(Range.prototype, "getBoundingClientRect", {
   value: () => new DOMRect(),
 });
 afterEach(cleanup);
+
+it("marks the authored attribute after multiline comments and exposes accessible error navigation", () => {
+  const invalid = `${RITUAL_PUG_HEADER}\n//- section\n  more detail\nnote(value=someCall()) text\n`;
+  let diagnostic;
+  try {
+    parseRitualPug(invalid);
+  } catch (cause) {
+    diagnostic = ritualSourceDiagnostic(cause, invalid);
+  }
+  expect(diagnostic).toMatchObject({ line: 4, column: 6 });
+  const changed = vi.fn();
+  const { container } = render(
+    <RitualSourceEditor
+      value={invalid}
+      dialect="pug"
+      disabled={false}
+      onChange={changed}
+      diagnostic={diagnostic}
+    />,
+  );
+  const view = EditorView.findFromDOM(container.querySelector(".cm-editor")!)!;
+  const positions: number[][] = [];
+  forEachDiagnostic(view.state, (_diagnostic, from, to) =>
+    positions.push([from, to]),
+  );
+  expect(positions).toEqual([
+    [invalid.indexOf("value="), invalid.indexOf("value=") + 5],
+  ]);
+  expect(container.querySelector(".cm-lintRange-error")?.textContent).toBe(
+    "value",
+  );
+  expect(container.querySelector(".cm-lint-marker-error")).toBeTruthy();
+  expect(view.contentDOM.getAttribute("aria-invalid")).toBe("true");
+  fireEvent.click(screen.getByRole("button", { name: "Go to error" }));
+  expect(view.state.selection.main.from).toBe(invalid.indexOf("value="));
+  fireEvent.click(screen.getByRole("button", { name: "Problems" }));
+  expect(container.querySelector(".cm-panel-lint")?.textContent).toContain(
+    "attributes must be JSON literals",
+  );
+  expect(changed).not.toHaveBeenCalled();
+});
+
+it("preserves diagnostics across ID visibility/read-only changes and clears stale source snapshots", () => {
+  const invalid = `${source}note(value=someCall()) text\n`;
+  const diagnostic = ritualSourceDiagnostic(
+    new RitualSourceError("Line 3: invalid literal", 3, 6),
+    invalid,
+  );
+  const props = {
+    value: invalid,
+    dialect: "pug" as const,
+    onChange: vi.fn(),
+    diagnostic,
+  };
+  const { container, rerender } = render(
+    <RitualSourceEditor {...props} disabled={false} />,
+  );
+  const view = EditorView.findFromDOM(container.querySelector(".cm-editor")!)!;
+  fireEvent.click(screen.getByRole("button", { name: "Problems" }));
+  expect(container.querySelector(".cm-panel-lint")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "Show IDs" }));
+  expect(diagnosticCount(view.state)).toBe(1);
+  expect(container.querySelector(".cm-panel-lint")).toBeTruthy();
+  rerender(<RitualSourceEditor {...props} disabled />);
+  expect(diagnosticCount(view.state)).toBe(1);
+  expect(container.querySelector(".cm-panel-lint")).toBeTruthy();
+  const repaired = invalid.replace("someCall()", '"fixed"');
+  rerender(<RitualSourceEditor {...props} value={repaired} disabled={false} />);
+  expect(diagnosticCount(view.state)).toBe(0);
+  expect(view.contentDOM.getAttribute("aria-invalid")).toBe("false");
+  expect(screen.queryByRole("button", { name: "Go to error" })).toBeNull();
+  expect(props.onChange).not.toHaveBeenCalled();
+});
+
+it("reveals the offending folded identity through F8 and keeps Problems open during typing", () => {
+  const invalid = `${RITUAL_PUG_HEADER}\nnote#${id} first\nnote#${id} second\n`;
+  let diagnostic;
+  try {
+    parseRitualPug(invalid);
+  } catch (cause) {
+    diagnostic = ritualSourceDiagnostic(cause, invalid);
+  }
+  const props = {
+    value: invalid,
+    dialect: "pug" as const,
+    disabled: false,
+    onChange: vi.fn(),
+    diagnostic,
+  };
+  const { container, rerender } = render(<RitualSourceEditor {...props} />);
+  const view = EditorView.findFromDOM(container.querySelector(".cm-editor")!)!;
+  expect(
+    screen.getAllByRole("button", { name: `Show block ID ${id}` }),
+  ).toHaveLength(2);
+  act(() => {
+    view.focus();
+    fireEvent.keyDown(view.contentDOM, { key: "F8", code: "F8" });
+  });
+  expect(view.state.selection.main.from).toBe(invalid.lastIndexOf(`#${id}`));
+  expect(
+    screen.queryByRole("button", { name: `Show block ID ${id}` }),
+  ).toBeNull();
+  expect(container.querySelector(".cm-lintRange-error")?.textContent).toBe(
+    `#${id}`,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Show IDs" }));
+  fireEvent.click(screen.getByRole("button", { name: "Fold IDs" }));
+  expect(
+    screen.getAllByRole("button", { name: `Show block ID ${id}` }),
+  ).toHaveLength(2);
+  act(() => {
+    view.focus();
+    fireEvent.keyDown(view.contentDOM, { key: "F8", code: "F8" });
+  });
+  expect(
+    screen.queryByRole("button", { name: `Show block ID ${id}` }),
+  ).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "Show IDs" }));
+  fireEvent.click(screen.getByRole("button", { name: "Fold IDs" }));
+  fireEvent.click(screen.getByRole("button", { name: "Go to error" }));
+  expect(
+    screen.queryByRole("button", { name: `Show block ID ${id}` }),
+  ).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "Problems" }));
+  act(() =>
+    view.dispatch({
+      changes: { from: view.state.doc.length, insert: "note more\n" },
+      userEvent: "input.type",
+    }),
+  );
+  const typed = `${invalid}note more\n`;
+  rerender(<RitualSourceEditor {...props} value={typed} />);
+  expect(container.querySelector(".cm-panel-lint")).toBeTruthy();
+  expect(diagnosticCount(view.state)).toBe(0);
+  expect(view.state.doc.toString()).toBe(typed);
+});
+
+it("reveals an offending folded ID when selecting its Problems entry", () => {
+  const invalid = `${RITUAL_PUG_HEADER}\nnote#${id} first\nnote#${id} second\n`;
+  let diagnostic;
+  try {
+    parseRitualPug(invalid);
+  } catch (cause) {
+    diagnostic = ritualSourceDiagnostic(cause, invalid);
+  }
+  const { container } = render(
+    <RitualSourceEditor
+      value={invalid}
+      dialect="pug"
+      disabled={false}
+      onChange={vi.fn()}
+      diagnostic={diagnostic}
+    />,
+  );
+  expect(
+    screen.getAllByRole("button", { name: `Show block ID ${id}` }),
+  ).toHaveLength(2);
+  fireEvent.click(screen.getByRole("button", { name: "Problems" }));
+  fireEvent.click(container.querySelector(".cm-panel-lint li")!);
+  expect(
+    screen.queryByRole("button", { name: `Show block ID ${id}` }),
+  ).toBeNull();
+  expect(container.querySelector(".cm-lintRange-error")?.textContent).toBe(
+    `#${id}`,
+  );
+});
+
+it("underlines line-only Ritual Text errors and safely represents an empty end-of-line error", () => {
+  const text = "ritual 1\n  @bad\n";
+  const props = {
+    value: text,
+    dialect: "ritual-text" as const,
+    disabled: false,
+    onChange: vi.fn(),
+  };
+  const { container, rerender } = render(
+    <RitualSourceEditor
+      {...props}
+      diagnostic={ritualSourceDiagnostic(
+        new Error("Line 2: invalid indentation"),
+        text,
+      )}
+    />,
+  );
+  const view = EditorView.findFromDOM(container.querySelector(".cm-editor")!)!;
+  expect(container.querySelector(".cm-lintRange-error")?.textContent).toBe(
+    "@bad",
+  );
+  rerender(
+    <RitualSourceEditor
+      {...props}
+      diagnostic={ritualSourceDiagnostic(
+        new RitualSourceError("Line 3: incomplete source", 3, 999),
+        text,
+      )}
+    />,
+  );
+  const positions: number[][] = [];
+  forEachDiagnostic(view.state, (_diagnostic, from, to) =>
+    positions.push([from, to]),
+  );
+  expect(positions).toEqual([[text.length, text.length]]);
+  expect(diagnosticCount(view.state)).toBe(1);
+});
 
 it("folds lexer-owned identities without hiding quoted payloads or plain text", () => {
   const sample = `${source}ritualText(value="#[b#${id} literal]")/\nnote Literal #${id}\n`;

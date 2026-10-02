@@ -12,6 +12,7 @@ import {
   parseRitualSource,
   printRitualSource,
 } from "./ritualSource";
+import { ritualSourceDiagnostic } from "./ritualSourceDiagnostics";
 import {
   normalizeTiptapNodeIds,
   ritualTiptapExtensions,
@@ -21,13 +22,17 @@ import {
 
 const initialView = (source: string) => {
   try {
-    return visualRitualState(
-      parseRitualSource(source, detectRitualSourceDialect(source) ?? "pug"),
-    );
-  } catch {
+    return {
+      ...visualRitualState(
+        parseRitualSource(source, detectRitualSourceDialect(source) ?? "pug"),
+      ),
+      diagnostic: null,
+    };
+  } catch (cause) {
     return {
       content: { type: "doc", content: [{ type: "paragraph" }] },
       issue: "Correct the ritual source before using visual editing.",
+      diagnostic: ritualSourceDiagnostic(cause, source),
     };
   }
 };
@@ -50,6 +55,9 @@ export default function RitualCreationEditor({
 }) {
   const [initial] = React.useState(() => initialView(source));
   const [issue, setIssue] = React.useState(initial.issue);
+  const [sourceDiagnostic, setSourceDiagnostic] = React.useState(
+    initial.diagnostic,
+  );
   const [visualError, setVisualError] = React.useState<string | null>(null);
   const [sourceComposing, setSourceComposing] = React.useState(false);
   const [mode, setMode] = React.useState(initialMode);
@@ -80,6 +88,7 @@ export default function RitualCreationEditor({
         lastEmission.current = next;
         onChange(next);
         setIssue(null);
+        setSourceDiagnostic(null);
         setVisualError(null);
         onValidityChange(true);
       } catch {
@@ -100,14 +109,10 @@ export default function RitualCreationEditor({
     const next = initialView(source);
     editor.commands.setContent(next.content, { emitUpdate: false });
     setIssue(next.issue);
+    setSourceDiagnostic(next.diagnostic);
     setVisualError(null);
     // Source-only shapes are still valid semantic documents.
-    try {
-      parseRitualSource(source, detectRitualSourceDialect(source) ?? "pug");
-      onValidityChange(true);
-    } catch {
-      onValidityChange(false);
-    }
+    onValidityChange(!next.diagnostic);
   }, [editor, source, sourceComposing, onValidityChange]);
   React.useEffect(() => {
     editor?.setEditable(!disabled && !issue, false);
@@ -150,6 +155,7 @@ export default function RitualCreationEditor({
       {visualError && <Alert severity="error">{visualError}</Alert>}
       {mode === "source" || issue ? (
         <RitualSourceEditor
+          diagnostic={sourceDiagnostic}
           label="New ritual source"
           value={source}
           dialect={detectRitualSourceDialect(source) ?? "pug"}

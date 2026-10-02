@@ -847,6 +847,7 @@ it("keeps the last valid visual document while source is incomplete and catches 
   const valid = source.value;
   fireEvent.change(source, { target: { value: 'ritual 1\n@note {"' } });
   await screen.findByText(/last valid source/);
+  expect(source.getAttribute("data-diagnostic-source")).toBe(source.value);
   expect(visual.textContent).toContain("Welcome.");
   expect(visual.getAttribute("contenteditable")).toBe("false");
   expect(
@@ -858,6 +859,7 @@ it("keeps the last valid visual document while source is incomplete and catches 
   });
   await waitFor(() => expect(visual.textContent).toContain("Repaired."));
   expect(screen.queryByText(/last valid source/)).toBeNull();
+  expect(source.getAttribute("data-diagnostic-source")).toBeNull();
 });
 
 it("waits for source IME composition to finish before updating the visual panel", async () => {
@@ -1077,9 +1079,11 @@ vi.mock("@/doc/RitualSourceEditor", () => ({
     disabled,
     label = "Ritual semantic source",
     onCompositionChange,
+    diagnostic,
   }) =>
     React.createElement("textarea", {
       "aria-label": label,
+      "data-diagnostic-source": diagnostic?.source,
       value,
       disabled,
       onChange: (event) =>

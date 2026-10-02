@@ -3,6 +3,11 @@ import { createRitualNodeId, isRitualNodeId } from "./ritualNodeIds";
 import { lexRitualPug, RITUAL_PUG_MAX_SOURCE_LENGTH } from "./ritualPugLex";
 import { canPrintRoleShortcut } from "./ritualPugSurface";
 import {
+  RitualSourceError,
+  type RitualSourceLocation,
+  semanticSourceError,
+} from "./ritualSourceDiagnostics";
+import {
   type JsonValue,
   type RitualSemanticDocument,
   type RitualSemanticNode,
@@ -19,14 +24,18 @@ function attributeText(attrs: Record<string, JsonValue>): string {
 function preflight(source: string): void {
   if (source.length > RITUAL_PUG_MAX_SOURCE_LENGTH)
     throw new Error("Ritual source is too large");
-  for (const line of source.split("\n")) {
+  for (const [index, line] of source.split("\n").entries()) {
     const indentation = line.match(/^[ \t]*/)![0];
     if (
       indentation.includes("\t") ||
       indentation.length % 2 ||
       indentation.length > 200
     )
-      throw new Error("Use two-space indentation, up to 100 levels");
+      throw new RitualSourceError(
+        `Line ${index + 1}: use two-space indentation, up to 100 levels`,
+        index + 1,
+        1,
+      );
   }
 }
 
@@ -36,9 +45,15 @@ const document = (nodes: RitualSemanticNode[]): RitualSemanticDocument => ({
   nodes,
 });
 const json = JSON.stringify;
-function checked(doc: RitualSemanticDocument) {
+function checked(
+  doc: RitualSemanticDocument,
+  locations?: WeakMap<RitualSemanticNode, RitualSourceLocation>,
+) {
   const errors = validateRitualSemantic(doc);
-  if (errors.length) throw new Error("Invalid semantic document");
+  if (errors.length)
+    throw locations
+      ? semanticSourceError(doc, errors[0], locations)
+      : new Error("Invalid semantic document");
   return doc;
 }
 const plain = (s: string) =>
@@ -64,8 +79,10 @@ function pugAttrs(ast, shorthandIds: ReadonlyMap<string, string>) {
         shorthandIds.get(`${attr.line}:${attr.column}`) ??
         (attr.val === true ? true : JSON.parse(attr.val));
     } catch {
-      throw new Error(
+      throw new RitualSourceError(
         `Line ${attr.line + 1}: attributes must be JSON literals`,
+        attr.line + 1,
+        attr.column,
       );
     }
   }
@@ -177,7 +194,7 @@ export function printRitualPug(doc: RitualSemanticDocument): string {
 export function parseRitualPug(source: string): RitualSemanticDocument {
   const [header, ...lines] = source.replace(/\r\n?/g, "\n").split("\n");
   if (header !== RITUAL_PUG_HEADER)
-    throw new Error(`Line 1: expected ${RITUAL_PUG_HEADER}`);
+    throw new RitualSourceError(`Line 1: expected ${RITUAL_PUG_HEADER}`, 1);
   preflight(source);
   let ast;
   const shorthandIds = new Map<string, string>();
@@ -194,15 +211,22 @@ export function parseRitualPug(source: string): RitualSemanticDocument {
     ast = parse(tokens);
   } catch (error) {
     const line = typeof error?.line === "number" ? error.line + 1 : 1;
-    throw new Error(`Line ${line}: invalid Pug syntax`);
+    throw new RitualSourceError(
+      `Line ${line}: invalid Pug syntax`,
+      line,
+      typeof error?.column === "number" ? error.column : undefined,
+    );
   }
   let count = 0;
-  const visit = (node, depth = 0): RitualSemanticNode => {
+  const locations = new WeakMap<RitualSemanticNode, RitualSourceLocation>();
+  const convert = (node, depth = 0): RitualSemanticNode => {
     if (++count > 20_000 || depth > 100)
       throw new Error("Ritual is too large or deeply nested");
     if (node.code)
-      throw new Error(
+      throw new RitualSourceError(
         `Line ${node.line + 1}: template programs are unsupported`,
+        node.line + 1,
+        node.column,
       );
     if (node.type === "Text") return { kind: "text", text: node.val };
     if (node.type !== "Tag")
@@ -232,8 +256,14 @@ export function parseRitualPug(source: string): RitualSemanticDocument {
     }
     const { id: suppliedId, ...rest } = attrs;
     const id = suppliedId === undefined ? createRitualNodeId() : suppliedId;
-    if (!isRitualNodeId(id))
-      throw new Error(`Line ${node.line + 1}: invalid node ID`);
+    if (!isRitualNodeId(id)) {
+      const identity = node.attrs?.find((attr) => attr.name === "id") ?? node;
+      throw new RitualSourceError(
+        `Line ${identity.line + 1}: invalid node ID`,
+        identity.line + 1,
+        identity.column,
+      );
+    }
     if (node.name === "ritualLegacy") {
       if (Object.keys(rest).join() !== "raw" || !node.selfClosing)
         throw new Error("Invalid legacy wrapper");
@@ -255,11 +285,33 @@ export function parseRitualPug(source: string): RitualSemanticDocument {
     else if (node.block.nodes.length) throw new Error("Leaf has children");
     return result;
   };
+  const visit = (node, depth = 0): RitualSemanticNode => {
+    try {
+      const result = convert(node, depth);
+      const identity = node.attrs?.find((attr) => attr.name === "id");
+      locations.set(result, {
+        line: node.line + 1,
+        column: node.column,
+        ...(identity
+          ? { id: { line: identity.line + 1, column: identity.column } }
+          : {}),
+      });
+      return result;
+    } catch (cause) {
+      if (cause instanceof RitualSourceError) throw cause;
+      throw new RitualSourceError(
+        cause instanceof Error ? cause.message : "Invalid ritual node",
+        node.line + 1,
+        node.column,
+      );
+    }
+  };
   return checked(
     document(
       ast.nodes
         .filter((node) => node.type !== "Comment" || node.buffer !== false)
         .map((node) => visit(node)),
     ),
+    locations,
   );
 }

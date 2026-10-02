@@ -2,6 +2,18 @@
 
 import { StreamLanguage } from "@codemirror/language";
 import { pug } from "@codemirror/legacy-modes/mode/pug";
+import {
+  type Diagnostic,
+  diagnosticCount,
+  forEachDiagnostic,
+  linter,
+  lintGutter,
+  lintKeymap,
+  nextDiagnostic,
+  openLintPanel,
+  previousDiagnostic,
+  setDiagnostics,
+} from "@codemirror/lint";
 import { Button } from "@mui/material";
 import {
   basicSetup,
@@ -9,6 +21,7 @@ import {
   type DecorationSet,
   EditorState,
   EditorView,
+  keymap,
   StateEffect,
   StateField,
   WidgetType,
@@ -16,8 +29,25 @@ import {
 import React from "react";
 import { ritualPugIdRanges } from "./ritualPugIds";
 import type { RitualSourceDialect } from "./ritualSource";
+import type { RitualSourceDiagnostic } from "./ritualSourceDiagnostics";
 
 const revealId = StateEffect.define<string>();
+function navigateDiagnostic(
+  view: EditorView,
+  command: (view: EditorView) => boolean,
+) {
+  if (command(view)) return true;
+  const selection = view.state.selection.main;
+  let alreadySelected = false;
+  forEachDiagnostic(view.state, (_diagnostic, from, to) => {
+    if (selection.from === from && selection.to === to) alreadySelected = true;
+  });
+  if (!alreadySelected) return false;
+  // Native navigation is a no-op when the sole error is already selected.
+  // Re-dispatch that selection so a newly folded ID becomes visible again.
+  view.dispatch({ selection: view.state.selection, scrollIntoView: true });
+  return true;
+}
 class IdWidget extends WidgetType {
   constructor(readonly id: string) {
     super();
@@ -78,6 +108,19 @@ export function ritualIdFolding() {
           expanded.add(effect.value);
           reveal = true;
         }
+      // Diagnostic navigation includes F8, Problems clicks and panel arrows.
+      // Reveal selected error text in the same transaction as its selection.
+      if (transaction.selection && !transaction.docChanged) {
+        const selection = transaction.state.selection.main;
+        forEachDiagnostic(transaction.state, (_diagnostic, from, to) => {
+          if (selection.from !== from || selection.to !== to) return;
+          value.decorations.between(from, to, (start, end, decoration) => {
+            if (from < start || from >= end) return;
+            expanded.add((decoration.spec.widget as IdWidget).id);
+            reveal = true;
+          });
+        });
+      }
       if (!transaction.docChanged && !reveal) return value;
       return {
         expanded,
@@ -110,6 +153,7 @@ export default function RitualSourceEditor({
   disabled,
   label = "Ritual semantic source",
   onCompositionChange,
+  diagnostic,
 }: {
   value: string;
   dialect: RitualSourceDialect;
@@ -117,6 +161,7 @@ export default function RitualSourceEditor({
   disabled: boolean;
   label?: string;
   onCompositionChange?(composing: boolean): void;
+  diagnostic?: RitualSourceDiagnostic | null;
 }) {
   const [foldIds, setFoldIds] = React.useState(true);
   const host = React.useRef<HTMLDivElement>(null);
@@ -126,6 +171,16 @@ export default function RitualSourceEditor({
   const previousDialect = React.useRef(dialect);
   const extensions = React.useMemo(
     () => [
+      linter(null),
+      lintGutter(),
+      keymap.of([
+        ...lintKeymap.filter((binding) => binding.key !== "F8"),
+        { key: "F8", run: (view) => navigateDiagnostic(view, nextDiagnostic) },
+        {
+          key: "Shift-F8",
+          run: (view) => navigateDiagnostic(view, previousDiagnostic),
+        },
+      ]),
       basicSetup({ foldGutter: false }),
       EditorView.lineWrapping,
       EditorState.readOnly.of(disabled),
@@ -147,11 +202,12 @@ export default function RitualSourceEditor({
           return false;
         },
       }),
-      EditorView.contentAttributes.of({
+      EditorView.contentAttributes.of((editor) => ({
         "aria-label": label,
         "aria-multiline": "true",
+        "aria-invalid": diagnosticCount(editor.state) ? "true" : "false",
         spellcheck: "false",
-      }),
+      })),
       EditorView.theme({
         "&": {
           minHeight: "25rem",
@@ -235,17 +291,98 @@ export default function RitualSourceEditor({
       instance.dispatch({ effects: StateEffect.reconfigure.of(extensions) });
     }
   }, [value, dialect, extensions]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: projections and reconfiguration can replace the CodeMirror state; reapply its diagnostics afterward.
+  React.useLayoutEffect(() => {
+    const instance = view.current;
+    if (!instance) return;
+    const active =
+      diagnostic?.source === instance.state.doc.toString() ? diagnostic : null;
+    const diagnostics: Diagnostic[] = [];
+    if (active) {
+      const line = instance.state.doc.line(
+        Math.max(1, Math.min(active.line ?? 1, instance.state.doc.lines)),
+      );
+      const hasColumn = active.column !== undefined;
+      const from =
+        active.line === undefined
+          ? 0
+          : line.from +
+            (hasColumn
+              ? Math.max(0, Math.min(active.column! - 1, line.length))
+              : line.text.search(/\S|$/));
+      const to =
+        active.line === undefined
+          ? 0
+          : hasColumn
+            ? Math.min(
+                line.to,
+                from +
+                  (line.text
+                    .slice(from - line.from)
+                    .match(/^#?[A-Za-z0-9_-]+/)?.[0].length ??
+                    ((line.text.codePointAt(from - line.from) ?? 0) > 0xffff
+                      ? 2
+                      : 1)),
+              )
+            : line.to;
+      diagnostics.push({
+        from,
+        to,
+        severity: "error",
+        message: active.message,
+        source:
+          active.column === undefined ? undefined : `Column ${active.column}`,
+      });
+    }
+    instance.dispatch(setDiagnostics(instance.state, diagnostics));
+  }, [diagnostic, value, extensions]);
+  const hasDiagnostic = diagnostic?.source === value;
   return (
     <>
-      {dialect === "pug" && (
-        <Button
-          size="small"
-          type="button"
-          aria-pressed={!foldIds}
-          onClick={() => setFoldIds((current) => !current)}
+      {(dialect === "pug" || hasDiagnostic) && (
+        <div
+          role="group"
+          aria-label="Source editor tools"
+          style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}
         >
-          {foldIds ? "Show IDs" : "Fold IDs"}
-        </Button>
+          {dialect === "pug" && (
+            <Button
+              size="small"
+              type="button"
+              aria-pressed={!foldIds}
+              onClick={() => setFoldIds((current) => !current)}
+            >
+              {foldIds ? "Show IDs" : "Fold IDs"}
+            </Button>
+          )}
+          {hasDiagnostic && (
+            <>
+              <Button
+                size="small"
+                type="button"
+                title="F8; Shift+F8 for the previous error"
+                onClick={() => {
+                  if (view.current) {
+                    navigateDiagnostic(view.current, nextDiagnostic);
+                    view.current.focus();
+                  }
+                }}
+              >
+                Go to error
+              </Button>
+              <Button
+                size="small"
+                type="button"
+                title="Ctrl+Shift+M (Cmd+Shift+M on Mac)"
+                onClick={() => {
+                  if (view.current) openLintPanel(view.current);
+                }}
+              >
+                Problems
+              </Button>
+            </>
+          )}
+        </div>
       )}
       <div ref={host} />
     </>

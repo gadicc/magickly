@@ -46,6 +46,11 @@ it("recovers when source is restored to its previous visual projection", async (
   await screen.findByText(
     "Correct the ritual source before using visual editing.",
   );
+  expect(
+    screen
+      .getByRole("textbox", { name: "New ritual source" })
+      .getAttribute("data-diagnostic-source"),
+  ).toBe("broken");
   fireEvent.change(screen.getByRole("textbox", { name: "New ritual source" }), {
     target: { value: emitted },
   });
@@ -55,6 +60,11 @@ it("recovers when source is restored to its previous visual projection", async (
     ),
   ).toBeNull();
   expect(valid).toHaveBeenLastCalledWith(true);
+  expect(
+    screen
+      .getByRole("textbox", { name: "New ritual source" })
+      .getAttribute("data-diagnostic-source"),
+  ).toBeNull();
   expect(
     (screen.getByRole("button", { name: "Visual" }) as HTMLButtonElement)
       .disabled,
@@ -68,9 +78,11 @@ vi.mock("@/doc/RitualSourceEditor", () => ({
     disabled,
     label = "Ritual semantic source",
     onCompositionChange,
+    diagnostic,
   }) =>
     React.createElement("textarea", {
       "aria-label": label,
+      "data-diagnostic-source": diagnostic?.source,
       value,
       disabled,
       onChange: (event) =>
