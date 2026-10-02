@@ -46,9 +46,11 @@ describe("component image registry", () => {
     // edab0be8… until the romanised article was capitalised and joined, as
     // Israel's official romanisation writes it (plan 039): Olam HaYesodot,
     // Chayot HaKodesh, Adonai HaAretz. The Tree can draw all three.
+    // 2b895fc2… until the rule took in the other prefixes and Netzach's god
+    // name lost its stray hyphen: YHVH Eloah VeDa'at, YHVH Tzvaot.
     [
       "tree-of-life",
-      "2b895fc2e600c594af0c2e361df6bf4b8b3b70880c559dd17ed44abeeebff751",
+      "30011c0c38449bc12018b9b4edce68e5727758261d4d43ad9a825137235961ca",
     ],
     [
       "astro-geomancy-chart",

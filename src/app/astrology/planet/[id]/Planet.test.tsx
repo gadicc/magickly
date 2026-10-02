@@ -119,7 +119,7 @@ describe("the planet page", () => {
       hrefs: ["/kabbalah/sephirah/tiferet"],
     });
     expect(row(html, "God name").text).toBe(
-      "יהוה אלוה ודעת YHVH Eloah Ve-da'at “Lord God of Knowledge”",
+      "יהוה אלוה ודעת YHVH Eloah VeDa'at “Lord God of Knowledge”",
     );
     expect(row(html, "Archangel").text).toBe("מיכאל Michael");
     expect(row(html, "Intelligence").text).toBe("Nakhiel");

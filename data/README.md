@@ -14,12 +14,14 @@ wording and arrangement.
 
 ## Romanised Hebrew
 
-A romanised Hebrew name writes the article as Israel's official romanisation
-does, the Academy of the Hebrew Language's system that BGN/PCGN adopted in
-2018: capitalised and joined to its word, "Roshit HaGilgulim", "Chayot
-HaKodesh". Where that word begins with an aleph, its vowel is capitalised in
-the same way, "Adonai HaAretz". The library standard, ALA-LC, writes the
-article in lower case with a hyphen instead; the data keeps to one of the two.
+A romanised Hebrew name writes its prefixes as Israel's official
+romanisation does, the Academy of the Hebrew Language's system that BGN/PCGN
+adopted in 2018: the article, the conjunction and the prepositions written
+as prefixes in Hebrew are capitalised and joined to their word, "Roshit
+HaGilgulim", "Chayot HaKodesh", "YHVH Eloah VeDa'at". Where that word begins
+with an aleph, its vowel is capitalised in the same way, "Adonai HaAretz".
+The library standard, ALA-LC, writes prefixes in lower case with a hyphen
+instead; the data keeps to one of the two.
 
 ## Sources
 

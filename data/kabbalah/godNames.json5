@@ -42,7 +42,7 @@
   "yhvh-eloha-vedaat": {
     name: {
       he: "יהוה אלוה ודעת",
-      roman: "YHVH Eloah Ve-da'at",
+      roman: "YHVH Eloah VeDa'at",
       en: "Lord God of Knowledge",
     },
   },
@@ -50,7 +50,7 @@
   "yhvh-tzvaot": {
     name: {
       he: "יהוה צבאות",
-      roman: "YHVH Tzva-oht",
+      roman: "YHVH Tzvaot",
       en: "Lord of Armies",
     },
   },
