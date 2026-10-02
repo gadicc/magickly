@@ -1,0 +1,44 @@
+.block {
+  position: relative;
+  min-width: 0;
+}
+.block[data-edit-active],
+.atom[data-edit-active],
+.token[data-edit-active],
+.grade[data-edit-active] {
+  outline: 2px solid #53699d;
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+.block :global([data-node-view-content]) {
+  min-height: 1.4em;
+}
+.fallback {
+  border: 1px solid #aab5cb;
+  border-radius: 0.4rem;
+  margin: 0.55rem 0;
+  padding: 0.4rem;
+}
+.label {
+  color: #36465c;
+  font-size: 0.82rem;
+  font-weight: 500;
+  user-select: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.atom {
+  margin: 0.5rem 0;
+  padding: 0.3rem;
+  border: 1px dashed #8b95a6;
+  border-radius: 0.35rem;
+}
+.token {
+  background: #e8eef8;
+  border-radius: 0.25rem;
+  padding: 0 0.2rem;
+  font-style: normal;
+}
+.grade {
+  display: inline;
+}

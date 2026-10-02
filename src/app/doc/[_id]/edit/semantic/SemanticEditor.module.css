@@ -42,43 +42,13 @@
 }
 .editor :global(.tiptap) {
   min-height: 25rem;
-  padding: 0.5rem;
+  padding: 1rem;
+  background: #efeae2;
   outline: none;
 }
 .editor :global(.tiptap:focus-visible) {
   outline: 2px solid #53699d;
   outline-offset: -2px;
-}
-.editor :global(.ritual-block) {
-  border: 1px solid #aab5cb;
-  border-radius: 0.4rem;
-  margin: 0.55rem 0;
-  padding: 0.4rem;
-}
-.editor :global(.ritual-task) {
-  border-inline-start: 0.35rem solid #607e9c;
-}
-.editor :global(.ritual-note) {
-  background: #f6f4ef;
-}
-.editor :global(.ritual-label) {
-  color: #36465c;
-  font-size: 0.82rem;
-  font-weight: 700;
-  margin-bottom: 0.35rem;
-  user-select: none;
-}
-.editor :global(.ritual-inline) {
-  background: #e8eef8;
-  border-radius: 0.25rem;
-  padding: 0 0.2rem;
-}
-.editor :global(.ritual-atom) {
-  background: #f0f2f6;
-  border: 1px dashed #8b95a6;
-  border-radius: 0.35rem;
-  margin: 0.5rem 0;
-  padding: 0.45rem;
 }
 .editor :global(.ritual-bold) {
   font-weight: 700;

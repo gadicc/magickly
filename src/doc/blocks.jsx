@@ -1,74 +1,32 @@
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
 import { Node, Render } from "json-rich-text/lib/esm/index.js";
 import React from "react";
-import { roleAliases } from "@/app/doc/[_id]/DocRender";
 import DocContext from "../../src/doc/context.js";
+import {
+  GradeFrame,
+  ImageFrame,
+  NoteFrame,
+  SummaryFrame,
+  TaskBody,
+  TaskFrame,
+  TitleFrame,
+} from "./ritualBlocks/Frames";
+import { roleAliases } from "./ritualBlocks/roles";
 
 class Title extends Node {
   render(key) {
     return (
-      <Paper key={key} sx={{ p: 1, mb: 1, background: "#fff" }}>
-        <a name={this.block.text.replace(/ /g, "_")}></a>
-        <Typography variant="h5">
-          {(this.children && this.renderChildren()) ||
-            this.block.value ||
-            this.block.text}
-        </Typography>
-      </Paper>
+      <TitleFrame key={key} anchor={this.block.text.replace(/ /g, "_")}>
+        {(this.children && this.renderChildren()) ||
+          this.block.value ||
+          this.block.text}
+      </TitleFrame>
     );
   }
 }
 
 class Grade extends Node {
   render(key) {
-    const parts = this.block.grade.split("=");
-
-    return (
-      <span
-        key={key}
-        className="grade"
-        style={{
-          display: "inline-block",
-          position: "relative",
-          textIndent: "0px",
-        }}
-      >
-        {/* eslint-disable-next-line react/no-unknown-property */}
-        <style jsx global>{`
-          [style*="font-style: italic"] .grade {
-            // Doesn't seem to work with descendant selectors
-            color: red;
-          }
-          .note .grade,
-          .do .grade {
-            transform: skew(-20deg);
-            font-style: normal;
-          }
-        `}</style>
-        <style jsx>{`
-          .circled {
-            border: 1px solid;
-            border-radius: 50%;
-            width: 2.5ch;
-            display: inline-block;
-            text-align: center;
-          }
-          .squared {
-            border: 1px solid;
-            width: 2.5ch;
-            display: inline-block;
-            text-align: center;
-          }
-          .equals {
-            padding: 0 5px 0 5px;
-          }
-        `}</style>
-        <span className="circled">{parts[0]}</span>
-        <span className="equals">=</span>
-        <span className="squared">{parts[1]}</span>
-      </span>
-    );
+    return <GradeFrame key={key} grade={this.block.grade} />;
   }
 }
 
@@ -98,8 +56,7 @@ class Img extends Node {
     if (!style.width && !this.block.style) style.width = "100%";
 
     return (
-      // biome-ignore lint/performance/noImgElement: dynamic src
-      <img
+      <ImageFrame
         key={key}
         width={this.block.width}
         height={this.block.height}
@@ -143,7 +100,7 @@ class hr extends Node {
 
 class Var extends Node {
   render(key) {
-    // eslint-disable-next-line
+    // biome-ignore lint/correctness/useHookAtTopLevel: JRT invokes render as its React component
     const context = React.useContext(DocContext);
     const variable = context.vars[this.block.name];
     return (
@@ -162,26 +119,16 @@ class DeclareVar extends Node {
 
 class Note extends Node {
   render(key) {
-    return (
-      <Paper
-        key={key}
-        className="note"
-        style={{ fontStyle: "italic" }}
-        sx={{ p: 1, mb: 1, mx: 2.5, background: "#f4f4f4" }}
-      >
-        {this.renderChildren()}
-      </Paper>
-    );
+    return <NoteFrame key={key}>{this.renderChildren()}</NoteFrame>;
   }
 }
 
 class Summary extends Node {
   render(key) {
     return (
-      <details key={key}>
-        <summary>{this.block.summary}</summary>
+      <SummaryFrame key={key} title={this.block.summary}>
         {this.renderChildren()}
-      </details>
+      </SummaryFrame>
     );
   }
 }
@@ -191,7 +138,7 @@ class Task extends Node {
 
   render(key) {
     const block = this.block;
-    // eslint-disable-next-line
+    // biome-ignore lint/correctness/useHookAtTopLevel: JRT invokes render as its React component
     const context = React.useContext(DocContext);
     const vars = context.vars;
     const roles = context.roles;
@@ -245,9 +192,9 @@ class Task extends Node {
 
     const samePreviousRole = this.prev() && this.prev().block.role === role;
 
-    // eslint-disable-next-line
+    // biome-ignore lint/correctness/useHookAtTopLevel: JRT invokes render as its React component
     const ref = React.useRef();
-    // eslint-disable-next-line
+    // biome-ignore lint/correctness/useHookAtTopLevel: JRT invokes render as its React component
     React.useEffect(() => {
       this.block.ref = ref;
       this.block.forMe = forMe;
@@ -261,126 +208,44 @@ class Task extends Node {
       return children ? children.map((child, i) => child.render(i)) : null;
     }
 
+    // Render the body first: inline footnotes register themselves on this task.
+    const body = (
+      <>
+        {block.say && (
+          <TaskBody action={false}>
+            {renderChildren(
+              this,
+              this.children.filter((node) => node.block.type !== "footnotes"),
+            )}
+          </TaskBody>
+        )}
+        {block.do && (
+          <TaskBody action>
+            {renderChildren(
+              this,
+              this.children.filter((node) => node.block.type !== "footnotes"),
+            )}
+          </TaskBody>
+        )}
+      </>
+    );
+    let footnotes = this.children.find((node) => node instanceof Footnotes);
+    if (!footnotes && this.footnotes) {
+      footnotes = new Footnotes({ type: "footnotes" });
+      footnotes.footnotes = this.footnotes;
+    }
     return (
       <div key={key} ref={ref}>
-        <Paper
-          sx={{
-            px: 2,
-            pt: 1,
-            pb: 1,
-            mb: 1.6,
-            mt: samePreviousRole ? -1.0 : 0,
-            ml: forMe ? 5 : 0,
-            mr: forMe ? 0 : 5,
-            background: forMe && "#d9fdd3",
-            position: "relative",
-          }}
+        <TaskFrame
+          role={role}
+          roles={roles}
+          audience={forMe ? "self" : "other"}
+          samePreviousRole={samePreviousRole}
+          page={key}
+          footer={footnotes && footnotes.render()}
         >
-          <style jsx>{`
-            .say::before {
-              content: open-quote;
-              font-size: 120%;
-            }
-            .say::after {
-              content: close-quote;
-              font-size: 120%;
-            }
-            .say {
-              quotes: "“" "”" "‘" "’";
-              text-indent: -0.45em;
-              margin-block-start: 0;
-              margin-block-end: 0.5em;
-              margin-inline-start: 5px;
-              margin-inline-end: 0;
-            }
-            .do {
-              font-style: italic;
-            }
-            .do::before {
-              content: "*";
-            }
-            .do::after {
-              content: "*";
-            }
-            .role {
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              /* margin-bottom: 5px; */
-            }
-            .role > div {
-              height: 100%;
-              display: inline-block;
-            }
-            .roleSymbol > * {
-              margin-right: 3px;
-              vertical-align: top;
-            }
-            .roleName {
-              vertical-align: top;
-            }
-            .pg {
-              position: absolute;
-              right: 8px;
-              top: 6px;
-              color: #ddd;
-            }
-          `}</style>
-          {
-            /* role !== myRole && */ !samePreviousRole && (
-              <div className="role">
-                <div className="roleSymbol">
-                  {role.split(",").map((role, i) => (
-                    <span key={i}>{roles[role]?.symbol}</span>
-                  ))}
-                </div>{" "}
-                <div className="roleName">
-                  {role.split(",").map((role, i) => (
-                    <span
-                      key={i}
-                      style={{ color: roles[role]?.color, marginRight: 3 }}
-                    >
-                      {roles[role]?.name ||
-                        role.substr(0, 1).toUpperCase() + role.substr(1)}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )
-          }
-          <span className="pg">{key}</span>
-          {block.say && (
-            <div className="say">
-              {renderChildren(
-                this,
-                this.children.filter((node) => node.block.type != "footnotes"),
-              )}
-            </div>
-          )}
-          {block.do && (
-            <div className="do">
-              {renderChildren(
-                this,
-                this.children.filter((node) => node.block.type != "footnotes"),
-              )}
-            </div>
-          )}
-          {(() => {
-            let footnotes = this.children.find(
-              (node) => node instanceof Footnotes,
-            );
-
-            // This section needs to happen after renderChildren above, otherwise
-            // this.footnotes won't exist yet.
-            if (!footnotes && this.footnotes) {
-              footnotes = new Footnotes({ type: "footnotes" });
-              footnotes.footnotes = this.footnotes;
-              // console.log(2, { footnotes });
-            }
-
-            return footnotes && footnotes.render();
-          })()}
-        </Paper>
+          {body}
+        </TaskFrame>
       </div>
     );
   }

@@ -1,7 +1,7 @@
 import pugInlineTags from "pug-parser/lib/inline-tags";
 import type { SourceMapConsumer } from "source-map";
 import { blocks } from "@/doc/blocks";
-import { roles } from "../DocRender";
+import { roles } from "@/doc/ritualBlocks/roles";
 
 interface PugAttribute {
   column: number;

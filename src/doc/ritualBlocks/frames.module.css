@@ -1,0 +1,103 @@
+.task {
+  overflow-wrap: anywhere;
+}
+.role {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.role > div {
+  height: 100%;
+  display: inline-block;
+}
+.roleSymbol > span > * {
+  margin-right: 3px;
+  vertical-align: top;
+}
+.roleName {
+  vertical-align: top;
+}
+.page {
+  position: absolute;
+  right: 8px;
+  top: 6px;
+  color: #ddd;
+}
+.speech {
+  quotes: "“" "”" "‘" "’";
+  text-indent: -0.45em;
+  margin-block: 0 0.5em;
+  margin-inline: 5px 0;
+}
+.speech::before {
+  content: open-quote;
+  font-size: 120%;
+}
+.speech::after {
+  content: close-quote;
+  font-size: 120%;
+}
+.action,
+.note {
+  font-style: italic;
+}
+.action::before,
+.action::after {
+  content: "*";
+}
+.grade {
+  display: inline-block;
+  position: relative;
+  text-indent: 0;
+  font-style: normal;
+}
+.note .grade,
+.action .grade {
+  transform: skew(-20deg);
+}
+.circled,
+.squared {
+  border: 1px solid;
+  width: 2.5ch;
+  display: inline-block;
+  text-align: center;
+}
+.circled {
+  border-radius: 50%;
+}
+.equals {
+  padding: 0 5px;
+}
+.summary {
+  margin-block: 0.5em;
+}
+.summaryHeading {
+  font-style: normal;
+}
+.editImage {
+  max-width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+}
+/* Tiptap owns these wrapper elements. Inline paragraphs preserve the reader's
+   quotes and action markers on the same line; later paragraphs remain separate. */
+.speech > :global([data-node-view-content]),
+.speech > :global([data-node-view-content]) > div,
+.action > :global([data-node-view-content]),
+.action > :global([data-node-view-content]) > div {
+  display: inline;
+}
+.speech > :global([data-node-view-content]) > div > p:first-child,
+.action > :global([data-node-view-content]) > div > p:first-child {
+  display: inline;
+  margin: 0;
+}
+.title :global([data-node-view-content]) p {
+  margin: 0;
+}
+.note :global([data-node-view-content]) p:first-child {
+  margin-top: 0;
+}
+.note :global([data-node-view-content]) p:last-child {
+  margin-bottom: 0;
+}

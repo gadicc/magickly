@@ -46,10 +46,10 @@ import {
 import type { SqlRitualWriteRequest } from "@/doc/sqlWriteContract";
 import {
   normalizeTiptapNodeIds,
-  ritualTiptapExtensions,
   semanticFromTiptap,
   visualRitualState,
 } from "@/doc/tiptapRitual";
+import { ritualTiptapClientExtensions } from "@/doc/tiptapRitualClient";
 import { createUuidV7 } from "@/lib/ids";
 import { getBrowserOfflineRuntime } from "@/offline/browserRuntime";
 import styles from "./SemanticEditor.module.css";
@@ -135,7 +135,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   );
 
   const editor = useEditor({
-    extensions: ritualTiptapExtensions,
+    extensions: ritualTiptapClientExtensions,
     content: initialVisual.content,
     immediatelyRender: false,
     editorProps: {

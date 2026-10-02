@@ -5,13 +5,13 @@ import { Alert, Box, Button, ButtonGroup } from "@mui/material";
 import { EditorContent, useEditor } from "@tiptap/react";
 import React from "react";
 import styles from "@/app/doc/[_id]/edit/semantic/SemanticEditor.module.css";
+import { ritualTiptapClientExtensions } from "@/doc/tiptapRitualClient";
 import RitualSourceEditor from "./RitualSourceEditor";
 import RitualVisualControls from "./RitualVisualControls";
 import { parseRitualSource, printRitualSource } from "./ritualSource";
 import { ritualSourceDiagnostic } from "./ritualSourceDiagnostics";
 import {
   normalizeTiptapNodeIds,
-  ritualTiptapExtensions,
   semanticFromTiptap,
   visualRitualState,
 } from "./tiptapRitual";
@@ -61,7 +61,7 @@ export default function RitualCreationEditor({
   };
   const lastEmission = React.useRef<string | null>(null);
   const editor = useEditor({
-    extensions: ritualTiptapExtensions,
+    extensions: ritualTiptapClientExtensions,
     content: initial.content,
     immediatelyRender: false,
     editorProps: {

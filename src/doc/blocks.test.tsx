@@ -1,13 +1,13 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, expect, it, vi } from "vitest";
+import { afterEach, expect, it } from "vitest";
 import { Render } from "./blocks";
+import DocContext from "./context";
+import { roles } from "./ritualBlocks/roles";
 import { parseRitualText } from "./ritualText";
 import { ritualTextExamples } from "./ritualTextExamples";
 import { semanticToJrt } from "./semantic";
 
-// The image block is real; role rendering is unrelated to image attributes.
-vi.mock("@/app/doc/[_id]/DocRender", () => ({ roleAliases: {} }));
 afterEach(cleanup);
 
 it("carries the guide's alternative text through the semantic reader", () => {
@@ -16,4 +16,105 @@ it("carries the guide's alternative text through the semantic reader", () => {
   const image = screen.getByRole("img", { name: "Describe the image" });
   expect(image.getAttribute("src")).toBe("/image.svg");
   expect(image.getAttribute("width")).toBe("320");
+});
+
+it("retains reader role grouping, audience state, navigation refs and footnote order", () => {
+  const first = {
+    type: "task",
+    role: "hierophant",
+    say: true,
+    children: [
+      { type: "text", value: "Welcome " },
+      {
+        type: "footnote",
+        children: [{ type: "text", value: "First footnote" }],
+      },
+    ],
+  };
+  const second = {
+    type: "task",
+    role: "hierophant",
+    do: true,
+    children: [{ type: "text", value: "Open door" }],
+  };
+  const doc = { children: [first, second] };
+  const view = render(
+    <DocContext.Provider
+      value={{ vars: { myRole: { value: "hiero" } }, roles }}
+    >
+      <Render doc={doc} onChange={undefined} />
+    </DocContext.Provider>,
+  );
+  expect(screen.getAllByText("Hierophant")).toHaveLength(1);
+  expect(screen.getByText("First footnote")).toBeTruthy();
+  expect(view.container.querySelector("sup")?.textContent).toBe("1");
+  expect(
+    view.container.querySelectorAll('[data-audience="self"]'),
+  ).toHaveLength(2);
+  expect(
+    (
+      first as typeof first & {
+        forMe?: boolean;
+        ref?: { current: Element | null };
+      }
+    ).forMe,
+  ).toBe(true);
+  expect(
+    (first as typeof first & { ref?: { current: Element | null } }).ref
+      ?.current,
+  ).toBeTruthy();
+  view.unmount();
+  expect("ref" in first).toBe(false);
+  expect("forMe" in first).toBe(false);
+});
+
+it("retains explicit footnote destinations and native summary collapse", () => {
+  const doc = {
+    children: [
+      {
+        type: "task",
+        role: "keryx",
+        say: true,
+        children: [
+          { type: "text", value: "Instruction" },
+          {
+            type: "footnote",
+            children: [{ type: "text", value: "Destination text" }],
+          },
+          { type: "footnotes" },
+        ],
+      },
+      {
+        type: "summary",
+        summary: "More",
+        children: [{ type: "text", value: "Details" }],
+      },
+    ],
+  };
+  const view = render(
+    <DocContext.Provider value={{ vars: {}, roles }}>
+      <Render doc={doc} onChange={undefined} />
+    </DocContext.Provider>,
+  );
+  expect(screen.getByText("Destination text")).toBeTruthy();
+  const details = view.container.querySelector('[data-ritual-frame="summary"]');
+  expect(details?.tagName).toBe("DETAILS");
+  expect(details?.hasAttribute("open")).toBe(false);
+});
+
+it("retains reader section heading semantics and navigation anchors", () => {
+  const doc = {
+    children: [
+      {
+        type: "title",
+        text: "Opening section",
+        children: [{ type: "text", value: "Opening section" }],
+      },
+    ],
+  };
+  const view = render(<Render doc={doc} onChange={undefined} />);
+  expect(
+    screen.getByRole("heading", { name: "Opening section", level: 5 }).tagName,
+  ).toBe("H5");
+  expect(view.container.querySelector("#Opening_section")).toBeTruthy();
 });
