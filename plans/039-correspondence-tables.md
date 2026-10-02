@@ -423,6 +423,28 @@ confirmed each of those fixes, with two low notes: the wildcard's regular
 expression differed from dot-prop's escaping in one corner and used a
 lookbehind, which became the scanner; and a README line ran long, rewrapped.
 
+## After the owner's review
+
+The owner reviewed the pages on 2 October, with the Tree page's new paths.
+Three commits followed, checked the same way and gated together:
+
+| Commit | Change |
+| --- | --- |
+| `b9a2141` fix(data): Romanise Hebrew prefixes as Israel does | The README's rule widened from the article to every prefix, as the official romanisation has it: "YHVH Eloah VeDa'at", and "YHVH Tzvaot" without its stray hyphen; four search descriptions change with them |
+| `d91ecde` fix(kabbalah): Set a Tree label's lines closer | A label's lines 1.2 font sizes apart where they were a fixed 22, and a list broken per item, "star ruby" over "turquoise"; the Tree's profile moves to `magickli-tree-image-outlines-v4` |
+| `176ee0c` feat(astrology): Quote the Key of Solomon verbatim | Mathers' full sentences, checked against sacred-texts' transcription of his edition, which the owner supplied, and cited plainly |
+
+The Key of Solomon question settled itself once the text was in hand:
+each fragment the hours page held was the tail of Mathers' sentence word
+for word, "voyages envoys" included, which is his; only Sol's had lost an
+"and". Decision 6's "after Mathers" is withdrawn.
+
+The profile move is the Tree's first since plan 030. It re-identifies every
+Tree image once, which the two romanisation fixes did in any case through
+the inputs hash; bytes move only for a Tree whose middle labels have more
+than one word, and the Theoricus ritual's Tree and the social cards keep
+theirs.
+
 ## Deferred
 
 - Pictures of stones and scents (decision 7).
@@ -431,10 +453,8 @@ lookbehind, which became the scanner; and a README line ran long, rewrapped.
 
 ## Follow-ups
 
-- The source of magickTypes, should it turn up.
-- The Key of Solomon's text against a scan of Mathers' 1888 translation;
-  once checked, "after Mathers" can become a plain citation.
-- Two god-name romanisations the article rule does not cover, "YHVH
-  Tzva-oht" beside "Elohim Tzvaot", and the hyphenated conjunction in "YHVH
-  Eloah Ve-da'at"; both are Tree fields, so their fix moves the Tree's
-  inputs hash once more.
+- The source of magickTypes is deferred indefinitely, by the owner's
+  decision of 2 October; the planet page keeps the editorial-summary note.
+- Done, 2 October: the Key of Solomon checked against Mathers and quoted
+  verbatim, and the two god-name romanisations
+  ([above](#after-the-owners-review)).

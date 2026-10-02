@@ -236,11 +236,12 @@ Follow-ups are separate from the completed migration work:
   descriptions' trump names followed on 1 October, and so did
   [plan 039](039-correspondence-tables.md#results): body parts, stones and
   scents are tables linked by id, read through a `*` wildcard in field
-  paths; the heavens are the planet rows; romanised Hebrew writes the
-  article as Israel's official romanisation does; and the planets cite the
-  Key of Solomon. TODO: the source of `magickTypes`; the Key of Solomon's
-  text against a scan of Mathers; two god-name romanisations the article
-  rule does not cover. See [plan 039](039-correspondence-tables.md#follow-ups).
+  paths; the heavens are the planet rows; romanised Hebrew writes its
+  prefixes as Israel's official romanisation does; and the planets quote
+  the Key of Solomon verbatim from Mathers. On 2 October the Tree's labels
+  were set closer, moving its profile to v4
+  ([plan 039](039-correspondence-tables.md#after-the-owners-review)). The
+  source of `magickTypes` is deferred indefinitely.
 - TODO: two small ones left by step 3b
   ([plan 032](032-data-layer.md#follow-ups)): two tribes' Hebrew names are
   hashed into the Table of Shewbread's identity although no sign points at
