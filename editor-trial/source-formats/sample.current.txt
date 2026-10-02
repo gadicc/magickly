@@ -1,0 +1,22 @@
+ritual 1
+@title~01995000-0000-7000-8000-000000000001 "Opening"
+@declareVar~01995000-0000-7000-8000-000000000002 {"name":"candidate","label":"Candidate","varType":"text","default":"Guest"}:
+@summary~01995000-0000-7000-8000-000000000004 "Preparation":
+  @note~01995000-0000-7000-8000-000000000003:
+    = "Prepare the space."
+@say~01995000-0000-7000-8000-000000000005 hiero "Welcome."
+@do~01995000-0000-7000-8000-000000000006 keryx "Open the door."
+@task~01995000-0000-7000-8000-000000000009 {"say":true,"role":"hiero"}:
+  = "Welcome, "
+  @var~01995000-0000-7000-8000-000000000007 candidate
+  = ". Speak "
+  @b~01995000-0000-7000-8000-000000000008:
+    = "clearly"
+  = "."
+@ul~01995000-0000-7000-8000-000000000012:
+  @li~01995000-0000-7000-8000-000000000010:
+    = "First item"
+  @li~01995000-0000-7000-8000-000000000011:
+    = "Second item"
+@img~01995000-0000-7000-8000-000000000013 {"src":"/synthetic-ritual.png","alt":"Synthetic diagram","width":320}
+?~01995000-0000-7000-8000-000000000014 {"type":"synthetic-widget","mode":"preserve","children":[{"type":"text","value":"Unusual content"}]}

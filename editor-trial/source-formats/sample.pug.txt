@@ -1,0 +1,13 @@
+//- semantic-pug-trial 1
+title(nodeId="01995000-0000-7000-8000-000000000001", text="Opening") Opening
+declareVar(nodeId="01995000-0000-7000-8000-000000000002", name="candidate", label="Candidate", varType="text", default="Guest")
+summary(nodeId="01995000-0000-7000-8000-000000000004", summary="Preparation")
+  note(nodeId="01995000-0000-7000-8000-000000000003") Prepare the space.
+say(nodeId="01995000-0000-7000-8000-000000000005", role="hiero") Welcome.
+do(nodeId="01995000-0000-7000-8000-000000000006", role="keryx") Open the door.
+task(nodeId="01995000-0000-7000-8000-000000000009", say=true, role="hiero") Welcome, #[var(nodeId="01995000-0000-7000-8000-000000000007", name="candidate")/]. Speak #[b(nodeId="01995000-0000-7000-8000-000000000008") clearly].
+ul(nodeId="01995000-0000-7000-8000-000000000012")
+  li(nodeId="01995000-0000-7000-8000-000000000010") First item
+  li(nodeId="01995000-0000-7000-8000-000000000011") Second item
+img(nodeId="01995000-0000-7000-8000-000000000013", src="/synthetic-ritual.png", alt="Synthetic diagram", width=320)/
+ritualLegacy(nodeId="01995000-0000-7000-8000-000000000014", raw={"type":"synthetic-widget","mode":"preserve","children":[{"type":"text","value":"Unusual content"}]})/

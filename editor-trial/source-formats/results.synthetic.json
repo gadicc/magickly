@@ -1,0 +1,30 @@
+{
+  "documents": 1,
+  "originalBytes": 0,
+  "totals": {
+    "current": {
+      "passed": 1,
+      "failed": 0,
+      "bytes": 1091,
+      "lines": 22
+    },
+    "pug": {
+      "passed": 1,
+      "failed": 0,
+      "bytes": 1221,
+      "lines": 13
+    },
+    "compact": {
+      "passed": 1,
+      "failed": 0,
+      "bytes": 1048,
+      "lines": 18
+    },
+    "directives": {
+      "passed": 1,
+      "failed": 0,
+      "bytes": 1300,
+      "lines": 36
+    }
+  }
+}
