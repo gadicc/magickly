@@ -1,7 +1,7 @@
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import GradeTree from "../gd/GradeTree";
-import TreeOfLife from "./TreeOfLife";
+import TreeOfLife, { labelLines } from "./TreeOfLife";
 
 const count = (html: string, pattern: RegExp) =>
   html.match(pattern)?.length ?? 0;
@@ -34,6 +34,64 @@ describe("TreeOfLife", () => {
     );
     expect(numbers.length).toBeGreaterThan(200);
     for (const number of numbers) expect(number).toMatch(/^-?\d+(\.\d{1,3})?$/);
+  });
+
+  it("breaks a list per item, and anything else at its first space", () => {
+    expect(labelLines("pearl; star sapphire")).toEqual([
+      "pearl",
+      "star sapphire",
+    ]);
+    expect(labelLines("star ruby; turquoise")).toEqual([
+      "star ruby",
+      "turquoise",
+    ]);
+    expect(labelLines("YHVH Eloah VeDa'at")).toEqual(["YHVH", "Eloah VeDa'at"]);
+    expect(labelLines("a; b; c")).toEqual(["a", "b", "c"]);
+    expect(labelLines("a; ; b")).toEqual(["a", "b"]);
+    expect(labelLines("Keter")).toEqual(["Keter"]);
+    expect(labelLines("  ")).toEqual([]);
+  });
+
+  it("sets a label's lines a little more than a font size apart", () => {
+    // They were a fixed 22 apart, more than twice the usual font size.
+    const html = renderToString(<TreeOfLife field="stones.*.name.en" />);
+    const y = (word: string) =>
+      Number(
+        html.match(
+          new RegExp(`<text[^>]* y="([\\d.-]+)"[^>]*>${word}</text>`),
+        )?.[1],
+      );
+    expect(y("star sapphire") - y("pearl")).toBeCloseTo(12, 3);
+    expect(y("turquoise") - y("star ruby")).toBeCloseTo(12, 3);
+    // Centred on the sphere: Binah's two lines sit either side of the
+    // centre a one-line label would take.
+    const single = renderToString(<TreeOfLife field="name.roman" />);
+    const centre = Number(
+      single.match(/<text[^>]* y="([\d.-]+)"[^>]*>Binah<\/text>/)?.[1],
+    );
+    expect((y("pearl") + y("star sapphire")) / 2).toBeCloseTo(centre, 3);
+  });
+
+  it("spaces lines by a CSS font size, and by 10 where there is none", () => {
+    // The Tree page passes its query's text through, and "12px" is a valid
+    // SVG font size; multiplying it as it stood drew the lines at NaN.
+    for (const [fontSize, gap] of [
+      ["12px", 14.4],
+      ["20", 24],
+      ["large", 12],
+    ] as const) {
+      const html = renderToString(
+        <TreeOfLife field="stones.*.name.en" fontSize={fontSize} />,
+      );
+      expect(html, fontSize).not.toContain("NaN");
+      const y = (word: string) =>
+        Number(
+          html.match(
+            new RegExp(`<text[^>]* y="([\\d.-]+)"[^>]*>${word}</text>`),
+          )?.[1],
+        );
+      expect(y("star sapphire") - y("pearl"), fontSize).toBeCloseTo(gap, 3);
+    }
   });
 
   it("writes only real rules into its stylesheet", () => {

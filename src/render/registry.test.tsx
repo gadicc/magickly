@@ -90,9 +90,12 @@ describe("component image registry", () => {
       spec: IMAGE_INPUTS_PROFILE,
       sha256: componentInputsHash("tree-of-life"),
     });
-    // Profile v3: v1 was 142,962 bytes (plans/009), v2 151,079 once Keter,
-    // Chochmah and Malchut gained their archangels, and v3 is shorter again
-    // because the path data is rounded to three decimals (plans/030). It
+    // Profile v4 since a sphere's label lines were set closer and a list broke
+    // per item (plan 039); this query's labels are single words, so its
+    // bytes did not move. Profile v3: v1 was 142,962 bytes (plans/009), v2
+    // 151,079 once Keter, Chochmah and Malchut gained their archangels, and
+    // v3 is shorter again because the path data is rounded to three decimals
+    // (plans/030). It
     // was 150,736 bytes, 96516a75…, until the ritual's god names spelt
     // Tzva'ot צבאות (plan 036): a data fix, which moves the inputs hash and
     // the bytes together under the same profile.

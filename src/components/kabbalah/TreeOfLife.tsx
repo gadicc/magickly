@@ -2,7 +2,7 @@ import React from "react";
 
 import Data from "@/../data/data";
 import { svgCoordinate } from "../svgCoordinate";
-import { readFieldPath } from "./fieldPath";
+import { FIELD_PATH_LIST_SEPARATOR, readFieldPath } from "./fieldPath";
 
 const _sephirot = Object.values(Data.sephirah);
 const _paths = Data.tolPath;
@@ -59,6 +59,37 @@ const orderedPaths = {
     "8_10", // paths specific to hermetic tree
   ],
 };
+
+/** A label's line height, as a multiple of its font size. */
+const LINE_PITCH = 1.2;
+
+/**
+ * A font size as a number of user units. The Tree page passes its query's
+ * text through, and a CSS size such as "12px" is a valid SVG `font-size`, so
+ * it is read leniently; anything without a number in it spaces the lines as
+ * the usual 10 would.
+ */
+function fontSizeNumber(size: unknown): number {
+  const value = Number.parseFloat(String(size));
+  return Number.isFinite(value) && value > 0 ? value : 10;
+}
+
+/**
+ * A sphere's label as the lines it is drawn on. A list, which field paths
+ * join with "; " (`stones.*.name.en`), takes a line per item, so "star ruby;
+ * turquoise" breaks between the stones and not inside one; anything else
+ * breaks at its first space, as the Tree always has. Blank words are
+ * dropped, as they always were.
+ */
+export function labelLines(text: string): string[] {
+  if (text.includes(FIELD_PATH_LIST_SEPARATOR))
+    return text
+      .split(FIELD_PATH_LIST_SEPARATOR)
+      .map((item) => item.trim())
+      .filter((item) => item !== "");
+  const words = text.split(" ").filter((word) => word !== "");
+  return words.length > 1 ? [words[0], words.slice(1).join(" ")] : words;
+}
 
 /** `x,y` for SVG path data, rounded so every engine writes the same digits. */
 function point(x: number, y: number) {
@@ -597,7 +628,7 @@ function TreeOfLife({
               </g>
             ) : (
               (function () {
-                const texts = s.text.split(" ").filter((s) => s !== "");
+                const texts = labelLines(s.text);
                 const style = {
                   // We repeat in "style" to override a:visited * { color }
                   style: { fill: s.textColor || "black" },
@@ -613,14 +644,25 @@ function TreeOfLife({
                   wordSpacing: 0,
                 };
                 if (texts.length > 1) {
+                  // Lines a little more than a font size apart, the block
+                  // centred on the sphere: ±6 at the usual 10, where a fixed
+                  // ±11 left a line's height of gap between two.
+                  const pitch = LINE_PITCH * fontSizeNumber(fontSize);
                   return (
                     <g>
-                      <text x={s.x} y={s.y - 11} {...style}>
-                        {texts[0]}
-                      </text>
-                      <text x={s.x} y={s.y + 11} {...style}>
-                        {texts.slice(1).join(" ")}
-                      </text>
+                      {texts.map((line, n) => (
+                        <text
+                          // biome-ignore lint/suspicious/noArrayIndexKey: a line's place is its identity, and two items of a list may be the same word
+                          key={n}
+                          x={s.x}
+                          y={svgCoordinate(
+                            s.y + (n - (texts.length - 1) / 2) * pitch,
+                          )}
+                          {...style}
+                        >
+                          {line}
+                        </text>
+                      ))}
                     </g>
                   );
                 } else {

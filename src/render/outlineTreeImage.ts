@@ -15,7 +15,7 @@ import { IMAGE_INPUTS_PROFILE } from "./dataInputs";
  * profile carried both, and a data fix was published by bumping it by hand,
  * which re-identified every image under it (plan 028).
  */
-export const TREE_IMAGE_PROFILE = "magickli-tree-image-outlines-v3";
+export const TREE_IMAGE_PROFILE = "magickli-tree-image-outlines-v4";
 /** The other registered components share the same fonts and normalisation. */
 export const COMPONENT_IMAGE_PROFILE = "magickli-component-image-outlines-v1";
 

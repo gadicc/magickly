@@ -94,7 +94,7 @@ describe("WASM initialisation guard", () => {
     );
     const result = await outlineTreeImage(source, false, INPUTS_SHA256);
     expect(result.bytes.toString()).toContain('viewBox="-170.5 0 341 598"');
-    expect(result.identity.profile).toBe("magickli-tree-image-outlines-v3");
+    expect(result.identity.profile).toBe("magickli-tree-image-outlines-v4");
   });
 
   it("surfaces other initialisation failures and retries on the next call", async () => {
