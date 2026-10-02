@@ -49,11 +49,15 @@ function exact(
   }
 }
 
-async function boundedJson(response: Response, maxBytes: number) {
+async function boundedJson(
+  response: Response,
+  maxBytes: number,
+  invalid: unknown = null,
+) {
   const length = response.headers.get("content-length");
   if (length !== null && (!/^\d+$/.test(length) || Number(length) > maxBytes))
-    return null;
-  if (!response.body) return null;
+    return invalid;
+  if (!response.body) return invalid;
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = [];
   let size = 0;
@@ -64,12 +68,12 @@ async function boundedJson(response: Response, maxBytes: number) {
       size += next.value.byteLength;
       if (size > maxBytes) {
         await reader.cancel();
-        return null;
+        return invalid;
       }
       chunks.push(next.value);
     }
   } catch {
-    return null;
+    return invalid;
   } finally {
     reader.releaseLock();
   }
@@ -82,7 +86,7 @@ async function boundedJson(response: Response, maxBytes: number) {
   try {
     return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
   } catch {
-    return null;
+    return invalid;
   }
 }
 
@@ -148,10 +152,18 @@ export async function sendSqlRitualWrite(
     : parseSqlRitualWriteResult(request, delivery.body);
 }
 
-export async function fetchSqlRitualCreationOptions(
+/** Distinguishes a confirmed missing actor from an unavailable background check. */
+export type SqlRitualCreationOptionsCheck =
+  | { kind: "granted"; options: SqlRitualCreationOptionsV1 }
+  | { kind: "authentication-required" }
+  | { kind: "temporarily-unavailable" };
+
+/** Only a fresh, exact 200 JSON null from this route confirms the actor is absent. */
+export async function checkSqlRitualCreationOptions(
   signal: AbortSignal,
   fetcher: typeof fetch = fetch,
-): Promise<SqlRitualCreationOptionsV1 | null> {
+): Promise<SqlRitualCreationOptionsCheck> {
+  const unavailable = { kind: "temporarily-unavailable" } as const;
   try {
     const response = await fetcher(OPTIONS_PATH, {
       method: "GET",
@@ -161,13 +173,26 @@ export async function fetchSqlRitualCreationOptions(
       signal,
       headers: { Accept: "application/json" },
     });
-    if (!exact(response, OPTIONS_PATH)) return null;
-    return parseSqlRitualCreationOptions(
-      await boundedJson(response, 256 * 1024),
+    if (!exact(response, OPTIONS_PATH)) return unavailable;
+    const body = await boundedJson(
+      response,
+      256 * 1024,
+      Symbol("invalid-json"),
     );
+    if (body === null) return { kind: "authentication-required" };
+    const options = parseSqlRitualCreationOptions(body);
+    return options ? { kind: "granted", options } : unavailable;
   } catch {
-    return null;
+    return unavailable;
   }
+}
+
+export async function fetchSqlRitualCreationOptions(
+  signal: AbortSignal,
+  fetcher: typeof fetch = fetch,
+): Promise<SqlRitualCreationOptionsV1 | null> {
+  const result = await checkSqlRitualCreationOptions(signal, fetcher);
+  return result.kind === "granted" ? result.options : null;
 }
 
 export async function sendRitualPublication(

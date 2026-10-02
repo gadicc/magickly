@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { EditorContent, useEditor } from "@tiptap/react";
 import React from "react";
+import { retainsOnlineEditorIdentity } from "@/doc/onlineEditorIdentity";
 import RitualVisualControls from "@/doc/RitualVisualControls";
 import { parseRitualText, printRitualText } from "@/doc/ritualText";
 import SemanticPublication from "@/doc/SemanticPublication";
@@ -82,9 +83,12 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   const [reloadRequired, setReloadRequired] = React.useState(false);
   const [recoveryBlocked, setRecoveryBlocked] = React.useState(false);
   const [ready, setReady] = React.useState(false);
-  const [access, setAccess] = React.useState<
-    "checking" | "verifying" | "ready" | "locked"
-  >("checking");
+  const [access, setAccess] = React.useState<"checking" | "ready" | "locked">(
+    "checking",
+  );
+  const [lockedMessage, setLockedMessage] = React.useState(
+    "Editor access changed. Reload to verify this account again.",
+  );
   const [saving, setSaving] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [sourceError, setSourceError] = React.useState<string | null>(null);
@@ -157,7 +161,9 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     let unsubscribe = () => {};
     let runtime: ReturnType<typeof getBrowserOfflineRuntime> | null = null;
     const requests = new Set<AbortController>();
-    const lock = () => {
+    const lock = (
+      message = "Editor access changed. Reload to verify this account again.",
+    ) => {
       if (!active || permanentlyLocked) return;
       permanentlyLocked = true;
       seenReady = true;
@@ -177,6 +183,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       setTitle("");
       setPending(null);
       setReady(false);
+      setLockedMessage(message);
       setAccess("locked");
       for (const controller of requests) controller.abort();
     };
@@ -184,80 +191,95 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       if (!active || !runtime || permanentlyLocked) return;
       const state = runtime.coordinator.state;
       if (
-        state.phase === "ready" &&
-        (state.account?.ownerId !== props.actorId ||
-          (authorizedEpoch !== undefined &&
-            state.account.epoch !== authorizedEpoch))
+        seenReady &&
+        !retainsOnlineEditorIdentity(state, {
+          ownerId: props.actorId,
+          epoch: authorizedEpoch,
+        })
       ) {
         lock();
-        return;
-      }
-      if (state.phase !== "ready" && seenReady) {
-        if (
-          !state.revalidating ||
-          state.account?.ownerId !== props.actorId ||
-          (authorizedEpoch !== undefined &&
-            state.account.epoch !== authorizedEpoch)
-        ) {
-          lock();
-          return;
-        }
-        setAccess("verifying");
-        if (!verifying && globalThis.document.visibilityState !== "hidden")
-          void recheck().catch(lock);
       }
     };
-    const verifyPermission = async () => {
-      const controller = new AbortController();
-      requests.add(controller);
-      try {
-        const delivery = await fetchSqlRitualSource(
-          {
-            version: 1,
-            requestId: createUuidV7(),
-            expectedActorId: props.actorId,
-            ritualId: props.ritualId,
-          },
-          controller.signal,
-        );
-        return (
-          delivery?.permission.kind === "granted" &&
-          delivery.permission.ownerId === props.actorId &&
-          delivery.permission.grant.sourceEdit === true
-        );
-      } finally {
-        requests.delete(controller);
-      }
+    const verifyPermission = async (controller: AbortController) => {
+      const delivery = await fetchSqlRitualSource(
+        {
+          version: 1,
+          requestId: createUuidV7(),
+          expectedActorId: props.actorId,
+          ritualId: props.ritualId,
+        },
+        controller.signal,
+      );
+      return delivery?.permission;
     };
     const recheck = async () => {
       if (!active || !runtime || permanentlyLocked || verifying) return;
       verifying = true;
-      setAccess(seenReady ? "verifying" : "checking");
-      const timeout = window.setTimeout(lock, 10_000);
+      const controller = new AbortController();
+      requests.add(controller);
+      const timeout = window.setTimeout(() => controller.abort(), 10_000);
+      // A deadline must also release the check if another session refresh stalls.
+      const deadline = new Promise<void>((resolve) =>
+        controller.signal.addEventListener("abort", () => resolve(), {
+          once: true,
+        }),
+      );
       try {
-        // False can mean an overlapping generation change. The fresh source
-        // delivery below independently authenticates and authorizes this actor.
-        await runtime.refreshVerifiedAccount();
-        if (!active || permanentlyLocked) return;
+        await Promise.race([runtime.refreshVerifiedAccount(), deadline]);
+        if (!active || permanentlyLocked || controller.signal.aborted) return;
         const state = runtime.coordinator.state;
         if (
-          state.phase !== "ready" ||
-          state.account?.ownerId !== props.actorId ||
-          !(await verifyPermission()) ||
-          runtime.coordinator.state.phase !== "ready" ||
-          runtime.coordinator.state.account?.ownerId !== props.actorId ||
-          runtime.coordinator.state.account?.epoch !== state.account.epoch
+          seenReady &&
+          !retainsOnlineEditorIdentity(state, {
+            ownerId: props.actorId,
+            epoch: authorizedEpoch,
+          })
         ) {
           lock();
           return;
         }
-        if (!active || permanentlyLocked) return;
+        const permission = await Promise.race([
+          verifyPermission(controller),
+          deadline,
+        ]);
+        if (!active || permanentlyLocked || controller.signal.aborted) return;
+        if (
+          permission &&
+          (permission.kind === "denied" ||
+            permission.kind === "authentication-required" ||
+            (permission.kind === "granted" && !permission.grant.sourceEdit))
+        ) {
+          lock();
+          return;
+        }
+        if (
+          permission?.kind !== "granted" ||
+          permission.ownerId !== props.actorId
+        )
+          return;
+        const current = runtime.coordinator.state;
+        if (
+          !retainsOnlineEditorIdentity(current, {
+            ownerId: props.actorId,
+            epoch: authorizedEpoch,
+          }) ||
+          (!seenReady && current.phase !== "ready")
+        )
+          return;
         seenReady = true;
-        authorizedEpoch = state.account.epoch;
+        authorizedEpoch = current.account!.epoch;
         setAccess("ready");
+      } catch {
+        // A transport failure says nothing about the previously granted access.
       } finally {
         window.clearTimeout(timeout);
+        controller.abort();
+        requests.delete(controller);
         verifying = false;
+        if (active && !seenReady && !permanentlyLocked)
+          lock(
+            "Editor access could not be verified. Reconnect and reload to try again.",
+          );
       }
     };
     try {
@@ -268,13 +290,16 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         if (!active) return;
         unsubscribe = current.subscribeState(checkState);
         await recheck();
-      })().catch(lock);
+      })().catch(() =>
+        lock(
+          "Editor access could not be verified. Reconnect and reload to try again.",
+        ),
+      );
     } catch {
       lock();
     }
     const refresh = () => {
-      if (globalThis.document.visibilityState !== "hidden")
-        void recheck().catch(lock);
+      if (globalThis.document.visibilityState !== "hidden") void recheck();
     };
     window.addEventListener("focus", refresh);
     globalThis.document.addEventListener("visibilitychange", refresh);
@@ -624,11 +649,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   };
 
   if (access === "locked")
-    return (
-      <Alert severity="info">
-        Editor access changed. Reload to verify this account again.
-      </Alert>
-    );
+    return <Alert severity="info">{lockedMessage}</Alert>;
   if (reloadRequired)
     return (
       <Alert severity="success">
@@ -647,7 +668,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   return (
     <Box
       className={styles.root}
-      aria-busy={access === "verifying"}
+      aria-busy={access === "checking"}
       sx={{ visibility: access === "checking" ? "hidden" : undefined }}
       aria-hidden={access === "checking"}
     >

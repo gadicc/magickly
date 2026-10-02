@@ -76,9 +76,11 @@ interface Operation {
 /** Public state contains counts/identity only, never held editor text or recovery handles. */
 export interface OfflineLifecycleState {
   phase: "locked" | "checking" | "ready" | "disposed";
-  /** Presentation hint only: retain an existing same-account view read-only.
-   * It never permits an operation or a protected read. Hard locks clear it. */
+  /** Presentation hint for existing same-account content.
+   * It never grants an offline operation or protected read. Hard locks clear it. */
   revalidating?: boolean;
+  /** Last invalidation reason; online editors distinguish identity fences from cache checks. */
+  lockReason?: OfflineLockReason;
   generation: number;
   account: OfflineAccount | null;
   cleanupPending: boolean;
@@ -108,6 +110,7 @@ export class OfflineLifecycleCoordinator {
   private nextView = 0;
   private phase: OfflineLifecycleState["phase"] = "locked";
   private revalidating = false;
+  private lockReason: OfflineLockReason = "startup";
   private snapshot: OfflineRuntimeState | null = null;
   private timer: unknown = null;
   private observedAtMs: number | null = null;
@@ -128,6 +131,7 @@ export class OfflineLifecycleCoordinator {
       phase: this.phase,
       generation: this.generation,
       revalidating: this.revalidating,
+      lockReason: this.lockReason,
       account: this.snapshot?.account ? { ...this.snapshot.account } : null,
       cleanupPending: this.snapshot?.cleanupPending ?? false,
       recovery: this.recovery.state,
@@ -260,9 +264,11 @@ export class OfflineLifecycleCoordinator {
     if (this.disposed) return;
     this.revalidating =
       (reason === "hidden" || reason === "resume" || sameAccountCheck) &&
-      (this.phase === "ready" || this.revalidating) &&
+      (this.phase === "ready" || this.revalidating || sameAccountCheck) &&
       !!this.snapshot?.account &&
-      !this.snapshot.cleanupPending;
+      !this.snapshot.cleanupPending &&
+      !this.closingEpochs.has(this.snapshot.account.epoch);
+    this.lockReason = reason;
     this.generation++;
     this.inspection++;
     this.phase = "locked";
@@ -667,7 +673,9 @@ export class OfflineLifecycleCoordinator {
         success = true;
       } catch {
         this.report("repository");
-        this.closeEpoch(old);
+        // A same-owner cache transaction failure is not an account revocation.
+        // A fresh repository inspection below still gates every offline view.
+        if (old?.ownerId !== ownerId) this.closeEpoch(old);
       } finally {
         if (action === this.transitionId) {
           this.changing = false;

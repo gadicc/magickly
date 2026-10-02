@@ -30,6 +30,11 @@ const mock = vi.hoisted(() => ({
   clear: vi.fn(),
   send: vi.fn(),
   permissionDenied: false,
+  permissionUnavailable: false,
+  permissionGate: null as Promise<void> | null,
+  lockReason: undefined as
+    | import("@/offline/lifecycle").OfflineLockReason
+    | undefined,
   phase: "ready" as "ready" | "locked",
   activateOnRefresh: false,
   transientLockOnRefresh: false,
@@ -51,15 +56,20 @@ vi.mock("@/doc/semanticDraft", () => ({
 vi.mock("@/doc/SemanticPublication", () => ({ default: () => null }));
 vi.mock("@/doc/sqlEditorClient", () => ({
   sendSqlRitualWrite: mock.send,
-  fetchSqlRitualSource: vi.fn(async (request) => ({
-    permission: mock.permissionDenied
-      ? { kind: "denied", ownerId: request.expectedActorId }
-      : {
-          kind: "granted",
-          ownerId: request.expectedActorId,
-          grant: { sourceEdit: true },
-        },
-  })),
+  fetchSqlRitualSource: vi.fn(async (request) => {
+    if (mock.permissionGate) await mock.permissionGate;
+    return {
+      permission: mock.permissionUnavailable
+        ? { kind: "temporarily-unavailable" }
+        : mock.permissionDenied
+          ? { kind: "denied", ownerId: request.expectedActorId }
+          : {
+              kind: "granted",
+              ownerId: request.expectedActorId,
+              grant: { sourceEdit: true },
+            },
+    };
+  }),
 }));
 vi.mock("@/offline/browserRuntime", () => ({
   getBrowserOfflineRuntime: () => ({
@@ -68,11 +78,17 @@ vi.mock("@/offline/browserRuntime", () => ({
         get phase() {
           return mock.phase;
         },
+        get lockReason() {
+          return mock.lockReason;
+        },
         get revalidating() {
           return mock.revalidating;
         },
         get account() {
-          return mock.phase === "ready" || mock.revalidating
+          return mock.phase === "ready" ||
+            mock.revalidating ||
+            mock.lockReason === "storage" ||
+            mock.lockReason === "change"
             ? { ownerId: mock.owner, epoch: "same-epoch" }
             : null;
         },
@@ -136,6 +152,9 @@ afterEach(() => {
   mock.permissionDenied = false;
   mock.listeners = [];
   mock.refreshGate = null;
+  mock.permissionUnavailable = false;
+  mock.permissionGate = null;
+  mock.lockReason = undefined;
   mock.revalidating = false;
   mock.refreshResult = true;
 });
@@ -737,7 +756,7 @@ it("waits for source IME composition to finish before updating the visual panel"
   await waitFor(() => expect(visual.textContent).toContain("שלום"));
 });
 
-it("retains a visible read-only split through routine revalidation and conceals on a hard lock", async () => {
+it("retains an editable split through routine revalidation and conceals on a hard lock", async () => {
   mock.load.mockResolvedValue(undefined);
   const setup = props();
   mock.owner = setup.actorId;
@@ -758,14 +777,14 @@ it("retains a visible read-only split through routine revalidation and conceals 
   expect(screen.getByRole("textbox", { name: "Ritual semantic source" })).toBe(
     source,
   );
-  expect((source as HTMLTextAreaElement).disabled).toBe(true);
+  expect((source as HTMLTextAreaElement).disabled).toBe(false);
   expect(
     getComputedStyle(source.parentElement!.parentElement!).visibility,
   ).not.toBe("hidden");
   expect(
     (screen.getByRole("button", { name: "Save" }) as HTMLButtonElement)
       .disabled,
-  ).toBe(true);
+  ).toBe(false);
   act(() => {
     mock.revalidating = false;
     for (const listener of mock.listeners) listener();
@@ -804,7 +823,7 @@ it("uses fresh source authorization when session refresh reports an overlapping 
   await screen.findByText(/Editor access changed/);
 });
 
-it("pauses stale draft recovery mutations and exports while permission is revalidated", async () => {
+it("keeps stale draft recovery controls enabled during a background check", async () => {
   const setup = props();
   mock.owner = setup.actorId;
   mock.load.mockResolvedValue({
@@ -831,15 +850,96 @@ it("pauses stale draft recovery mutations and exports while permission is revali
   act(() => {
     fireEvent.focus(window);
   });
-  expect(discard.disabled).toBe(true);
+  expect(discard.disabled).toBe(false);
   for (const download of screen.getAllByRole("button", {
     name: "Download draft",
   }))
-    expect((download as HTMLButtonElement).disabled).toBe(true);
-  fireEvent.click(discard);
-  expect(mock.clear).not.toHaveBeenCalled();
+    expect((download as HTMLButtonElement).disabled).toBe(false);
   await act(async () => {
     release();
   });
   expect(discard.disabled).toBe(false);
+});
+
+it("ignores unavailable permission responses and cache locks during background checks", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  const save = await screen.findByRole("button", { name: "Save" });
+  mock.permissionUnavailable = true;
+  await act(async () => {
+    fireEvent.focus(window);
+  });
+  act(() => {
+    mock.lockReason = "storage";
+    mock.phase = "locked";
+    for (const listener of mock.listeners) listener();
+  });
+  await act(async () => {
+    fireEvent.focus(window);
+  });
+  expect(screen.getByRole("button", { name: "Save" })).toBe(save);
+  expect((save as HTMLButtonElement).disabled).toBe(false);
+  expect(screen.queryByText(/Editor access changed/)).toBeNull();
+});
+
+it("accepts a granted permission response despite overlapping coordinator checks", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  const save = await screen.findByRole("button", { name: "Save" });
+  let release!: () => void;
+  mock.permissionGate = new Promise((resolve) => {
+    release = resolve;
+  });
+  act(() => {
+    fireEvent.focus(window);
+  });
+  act(() => {
+    mock.revalidating = true;
+    mock.phase = "locked";
+    for (const listener of mock.listeners) listener();
+  });
+  await act(async () => {
+    release();
+  });
+  expect(screen.getByRole("button", { name: "Save" })).toBe(save);
+  expect((save as HTMLButtonElement).disabled).toBe(false);
+});
+
+it("keeps editing after a background timeout and ignores its late denial", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  const save = await screen.findByRole("button", { name: "Save" });
+  let release!: () => void;
+  mock.permissionGate = new Promise((resolve) => {
+    release = resolve;
+  });
+  vi.useFakeTimers();
+  try {
+    await act(async () => {
+      fireEvent.focus(window);
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10_000);
+    });
+    expect((save as HTMLButtonElement).disabled).toBe(false);
+    mock.permissionDenied = true;
+    await act(async () => {
+      release();
+    });
+    expect(screen.getByRole("button", { name: "Save" })).toBe(save);
+    expect(screen.queryByText(/Editor access changed/)).toBeNull();
+    mock.permissionGate = null;
+    await act(async () => {
+      fireEvent.focus(window);
+    });
+    expect(screen.getByText(/Editor access changed/)).toBeTruthy();
+  } finally {
+    vi.useRealTimers();
+  }
 });

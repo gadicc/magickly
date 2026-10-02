@@ -24,6 +24,7 @@ const ids = vi.hoisted(() => ({
 }));
 const mock = vi.hoisted(() => ({
   options: vi.fn(),
+  authLost: false,
   write: vi.fn(),
   push: vi.fn(),
   start: vi.fn(),
@@ -61,7 +62,14 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mock.push }),
 }));
 vi.mock("@/doc/sqlEditorClient", () => ({
-  fetchSqlRitualCreationOptions: (...args: unknown[]) => mock.options(...args),
+  checkSqlRitualCreationOptions: async (...args: unknown[]) => {
+    const options = await mock.options(...args);
+    return mock.authLost
+      ? { kind: "authentication-required" }
+      : options
+        ? { kind: "granted", options }
+        : { kind: "temporarily-unavailable" };
+  },
   sendSqlRitualWrite: (...args: unknown[]) => mock.write(...args),
 }));
 vi.mock("@/offline/browserRuntime", () => ({
@@ -95,6 +103,7 @@ beforeEach(() => {
     cleanupPending: false,
     recovery: { pending: 0, saving: 0, failed: 0 },
   };
+  mock.authLost = false;
   mock.stateListener = null;
   mock.start.mockReset().mockResolvedValue(undefined);
   mock.options.mockReset().mockResolvedValue(options);
@@ -630,7 +639,7 @@ it("ignores an old create acknowledgement after an account switch", async () => 
   expect(screen.queryByLabelText("Ritual source")).toBeNull();
 });
 
-it("keeps the creation composer visible read-only during routine checks and resumes the same DOM", async () => {
+it("keeps the creation composer editable during routine checks and resumes the same DOM", async () => {
   await fill();
   const source = screen.getByLabelText("Ritual source") as HTMLTextAreaElement;
   let release!: (value: unknown) => void;
@@ -650,11 +659,11 @@ it("keeps the creation composer visible read-only during routine checks and resu
   );
   expect(screen.getByLabelText("Ritual source")).toBe(source);
   expect(source.value).toBe("p Exact source");
-  expect(source.disabled).toBe(true);
+  expect(source.disabled).toBe(false);
   expect(
     (screen.getByRole("button", { name: "Create" }) as HTMLButtonElement)
       .disabled,
-  ).toBe(true);
+  ).toBe(false);
   act(() =>
     emitState({
       ...runtimeState,
@@ -663,7 +672,7 @@ it("keeps the creation composer visible read-only during routine checks and resu
       revalidating: false,
     }),
   );
-  expect(source.disabled).toBe(true);
+  expect(source.disabled).toBe(false);
   await act(async () => {
     release(options);
   });
@@ -674,7 +683,7 @@ it("keeps the creation composer visible read-only during routine checks and resu
   );
 });
 
-it("preserves a concealed unsubmitted draft after a routine options check fails", async () => {
+it("preserves an editable unsubmitted draft after a routine options check fails", async () => {
   await fill();
   mock.options.mockResolvedValueOnce(null);
   act(() =>
@@ -693,8 +702,9 @@ it("preserves a concealed unsubmitted draft after a routine options check fails"
       revalidating: false,
     }),
   );
-  await screen.findByText(/creation is unavailable/);
-  expect(screen.queryByDisplayValue("p Exact source")).toBeNull();
+  await act(async () => {});
+  expect(screen.getByDisplayValue("p Exact source")).toBeTruthy();
+  expect(screen.queryByText(/creation is unavailable/)).toBeNull();
   act(() => emitState({ ...runtimeState, phase: "ready", generation: 4 }));
   expect(
     ((await screen.findByLabelText("Ritual source")) as HTMLTextAreaElement)
@@ -772,7 +782,7 @@ it("keeps a revoked-scope pending request downloadable and retries it exactly af
   expect(mock.write.mock.calls[1][0]).toEqual(mock.write.mock.calls[0][0]);
 });
 
-it("conceals a retained creation when coordinator verification stalls and recovers the draft later", async () => {
+it("keeps creation editable when coordinator verification stalls", async () => {
   await fill();
   vi.useFakeTimers();
   try {
@@ -788,8 +798,11 @@ it("conceals a retained creation when coordinator verification stalls and recove
     await act(async () => {
       await vi.advanceTimersByTimeAsync(10_000);
     });
-    expect(screen.queryByDisplayValue("p Exact source")).toBeNull();
-    expect(screen.getByText(/creation is unavailable/)).toBeTruthy();
+    expect(screen.getByDisplayValue("p Exact source")).toBeTruthy();
+    expect(
+      (screen.getByLabelText("Ritual source") as HTMLTextAreaElement).disabled,
+    ).toBe(false);
+    expect(screen.queryByText(/creation is unavailable/)).toBeNull();
   } finally {
     vi.useRealTimers();
   }
@@ -835,4 +848,61 @@ it("allows recovery of an exact pending request when every creation grant is rem
     screen.getByRole("button", { name: "Download retained request" }),
   ).toBeTruthy();
   expect(localStorage.getItem(key)).toBe(request);
+});
+
+it("accepts a creation acknowledgement across routine account checks", async () => {
+  await fill();
+  let release!: (value: unknown) => void;
+  mock.write.mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        release = resolve;
+      }),
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Create" }));
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "locked",
+      generation: 2,
+      revalidating: true,
+    }),
+  );
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "ready",
+      generation: 3,
+      revalidating: false,
+    }),
+  );
+  await act(async () => {
+    release(success);
+  });
+  expect(mock.push).toHaveBeenCalledWith(`/doc/${ids.ritual}/edit`);
+  expect(localStorage.getItem(key)).toBeNull();
+});
+
+it("allows submitting creation while a routine check is in progress", async () => {
+  await fill();
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "locked",
+      generation: 2,
+      revalidating: true,
+    }),
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Create" }));
+  await waitFor(() => expect(mock.write).toHaveBeenCalledOnce());
+  expect(mock.push).toHaveBeenCalledWith(`/doc/${ids.ritual}/edit`);
+});
+
+it("conceals creation after a confirmed missing-actor response", async () => {
+  await fill();
+  mock.authLost = true;
+  act(() => emitState({ ...runtimeState, phase: "ready", generation: 2 }));
+  await screen.findByText(/creation access changed/);
+  expect(screen.queryByDisplayValue("p Exact source")).toBeNull();
+  expect(screen.queryByText("Synthetic temple")).toBeNull();
 });

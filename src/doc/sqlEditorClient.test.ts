@@ -4,6 +4,7 @@ import { createUuidV7 } from "../lib/ids";
 import { failedRitualPublication } from "../offline/ritualPublicationContract";
 import { createRitualPublicationHttpHandler } from "../offline/ritualPublicationHttp";
 import {
+  checkSqlRitualCreationOptions,
   fetchSqlRitualCreationOptions,
   fetchSqlRitualSource,
   sendRitualPublication,
@@ -244,4 +245,35 @@ it("rejects a canonical publication failure sent with the wrong HTTP status", as
         ),
     ),
   ).resolves.toBeNull();
+});
+
+it("distinguishes fresh null creation authority from malformed, cached and unavailable responses", async () => {
+  const signal = new AbortController().signal;
+  const check = (result: Response) =>
+    checkSqlRitualCreationOptions(signal, vi.fn().mockResolvedValue(result));
+  expect(await check(response("/api/rituals/creation-options", null))).toEqual({
+    kind: "authentication-required",
+  });
+  for (const result of [
+    response("/api/rituals/creation-options", null, {
+      "cache-control": "private, max-age=60",
+    }),
+    response("/api/rituals/creation-options", {
+      error: "temporarily-unavailable",
+    }),
+    response("/api/rituals/creation-options", null, {
+      "content-length": "999999",
+    }),
+  ])
+    expect(await check(result)).toEqual({ kind: "temporarily-unavailable" });
+  const malformed = new Response("{", {
+    headers: {
+      "content-type": "application/json",
+      "cache-control": "no-store",
+    },
+  });
+  Object.defineProperty(malformed, "url", {
+    value: `${location.origin}/api/rituals/creation-options`,
+  });
+  expect(await check(malformed)).toEqual({ kind: "temporarily-unavailable" });
 });

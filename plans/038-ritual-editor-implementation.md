@@ -138,7 +138,7 @@ The operator approved implementation after the [editor decision](037-ritual-edit
   build preserved the running development server. Astra xhigh adversarial
   review found no remaining actionable findings after targeted fixes.
 
-### Routine revalidation and live source (2 October)
+### Routine revalidation and live source (2 October; initial policy)
 
 - The operator chose to retain previously authorized content visibly but
   read-only during routine revalidation. Creation and semantic editors now keep
@@ -171,6 +171,35 @@ The operator approved implementation after the [editor decision](037-ritual-edit
   the running local server's `SQL_AUTH_ERROR` before the editor loaded; the two
   synthetic SQL rituals and their temple were removed afterward. This pass has
   not verified a physical OS window switch or mobile keyboard behavior.
+
+### Background checks without control flicker (2 October)
+
+- The operator superseded the read-only policy: already authorized online
+  authoring stays visible and editable during background checks. Semantic and
+  creation controls no longer toggle disabled state on refocus. Server writes
+  still authenticate and authorize each immutable request independently.
+- Online UI identity retention is separate from offline operation grants.
+  Cache/lease checks and failures do not revoke an online grant; changed
+  owner/epoch, sign-out, cleanup and confirmed server denial still close the UI.
+  Initial display still needs fresh authorization. Existing protected offline
+  reads retain their lifecycle guards.
+- Temporary source-check failures, deadlines and overlapping coordinator checks
+  no longer become permanent “access changed” errors. Same-owner cache
+  activation failures no longer manufacture account-closing broadcasts.
+  Fresh 200/null creation-options responses explicitly conceal a missing actor;
+  malformed, cached, oversized and failed responses remain unavailable checks.
+- Same-owner background checks preserve the creation request's identity so an
+  authenticated acknowledgement can complete during a check; actual account
+  changes still abort and fence it. Revoked scopes retain exact pending recovery.
+- Verification: 79 affected suites passed with 1,801 tests (14 skipped), followed
+  by the semantic editor suite including one additional timeout/late-denial
+  regression (26 tests). TypeScript, changed-file formatting and Loom production
+  checks passed. Final independent Astra xhigh review found no actionable residual
+  defects. A browser smoke attempt remained blocked at seeded local sign-in:
+  the browser stayed unauthenticated, so physical refocus is not live-verified.
+- Pug as a semantic text projection, a terser Ritual Text grammar, and reader-like
+  visual styling were investigated only. No source grammar or visual rendering
+  decision was implemented in this pass.
 
 ## Follow-up scope
 

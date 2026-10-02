@@ -11,11 +11,12 @@ import {
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { retainsOnlineEditorIdentity } from "@/doc/onlineEditorIdentity";
 import { parseRitualText, printRitualText } from "@/doc/ritualText";
 import { pugRitualStarter, ritualTextStarter } from "@/doc/ritualTextExamples";
 import type { RitualSemanticDocument } from "@/doc/semantic";
 import {
-  fetchSqlRitualCreationOptions,
+  checkSqlRitualCreationOptions,
   sendSqlRitualWrite,
 } from "@/doc/sqlEditorClient";
 import {
@@ -129,7 +130,6 @@ export default function SqlDocAdmin() {
     editorMode: FormState["editorMode"];
   } | null>(null);
   const [reservedHeight, setReservedHeight] = React.useState(0);
-  const [revalidating, setRevalidating] = React.useState(false);
 
   const replaceForm = React.useCallback((next: FormState) => {
     formRef.current = next;
@@ -156,10 +156,8 @@ export default function SqlDocAdmin() {
     const state = runtime?.coordinator.state;
     return (
       identityRef.current === expected &&
-      state?.phase === "ready" &&
-      state.generation === expected.generation &&
-      state.account?.ownerId === expected.ownerId &&
-      state.account.epoch === expected.epoch
+      !!state &&
+      retainsOnlineEditorIdentity(state, expected)
     );
   }, []);
 
@@ -169,15 +167,9 @@ export default function SqlDocAdmin() {
     let loadGeneration = 0;
     let unsubscribe = () => {};
     let displayIdentity: CreationIdentity | null = null;
-    let retainingPresentation = false;
-    let retentionTimeout: number | null = null;
 
     const lock = (message: string | null = null) => {
-      retainingPresentation = false;
       displayIdentity = null;
-      setRevalidating(false);
-      if (retentionTimeout !== null) window.clearTimeout(retentionTimeout);
-      retentionTimeout = null;
       const identity = identityRef.current;
       // Remove private form content while checking access, but keep its space
       // so the browser cannot clamp the ritual-list scroll to a shorter page.
@@ -224,38 +216,10 @@ export default function SqlDocAdmin() {
         if (disposed) return;
         if (state.phase !== "ready" || !state.account) {
           if (
-            state.revalidating &&
             displayIdentity &&
-            state.account &&
-            displayIdentity.ownerId === state.account.ownerId &&
-            displayIdentity.epoch === state.account.epoch
-          ) {
-            retainingPresentation = true;
-            setRevalidating(true);
-            if (
-              retentionTimeout === null &&
-              document.visibilityState !== "hidden"
-            )
-              retentionTimeout = window.setTimeout(() => {
-                if (!disposed)
-                  lock(
-                    "Ritual creation is unavailable. Reconnect and try again.",
-                  );
-              }, 10_000);
-            if (!pendingRef.current)
-              preservedFormRef.current = {
-                ownerId: displayIdentity.ownerId,
-                form: { ...formRef.current },
-              };
-            loadGeneration++;
-            lastStateKey = "";
-            optionsRequestRef.current?.abort();
-            writeRequestRef.current?.abort();
-            identityRef.current = null;
-            busyRef.current = false;
-            setBusy(false);
+            retainsOnlineEditorIdentity(state, displayIdentity)
+          )
             return;
-          }
           lock();
           const presentation = presentationRef.current;
           if (
@@ -272,17 +236,19 @@ export default function SqlDocAdmin() {
         const stateKey = `${state.generation}:${state.account.ownerId}:${state.account.epoch}`;
         if (stateKey === lastStateKey) return;
         const continuing =
-          retainingPresentation &&
           displayIdentity?.ownerId === state.account.ownerId &&
           displayIdentity.epoch === state.account.epoch;
         if (!continuing) lock();
         lastStateKey = stateKey;
         const load = ++loadGeneration;
-        const expected: CreationIdentity = {
-          ownerId: state.account.ownerId,
-          epoch: state.account.epoch,
-          generation: state.generation,
-        };
+        const expected: CreationIdentity =
+          continuing && identityRef.current
+            ? identityRef.current
+            : {
+                ownerId: state.account.ownerId,
+                epoch: state.account.epoch,
+                generation: state.generation,
+              };
         const presentation = presentationRef.current;
         if (
           presentation &&
@@ -293,14 +259,18 @@ export default function SqlDocAdmin() {
           setReservedHeight(0);
         }
         const controller = new AbortController();
+        optionsRequestRef.current?.abort();
         optionsRequestRef.current = controller;
         void (async () => {
           const timeout = window.setTimeout(() => {
-            if (!disposed && load === loadGeneration)
+            controller.abort();
+            if (!disposed && load === loadGeneration && !continuing)
               lock("Ritual creation is unavailable. Reconnect and try again.");
           }, 5_000);
           try {
-            const next = await fetchSqlRitualCreationOptions(controller.signal);
+            const result = await checkSqlRitualCreationOptions(
+              controller.signal,
+            );
             if (
               disposed ||
               controller.signal.aborted ||
@@ -308,22 +278,27 @@ export default function SqlDocAdmin() {
             )
               return;
             const current = runtime.coordinator.state;
-            if (
-              current.phase !== "ready" ||
-              current.generation !== expected.generation ||
-              current.account?.ownerId !== expected.ownerId ||
-              current.account.epoch !== expected.epoch
-            ) {
+            if (!retainsOnlineEditorIdentity(current, expected)) {
               lock(
                 "Ritual creation access changed. Reconnect with the authorized account.",
               );
               return;
             }
             setLoaded(true);
-            if (!next) {
-              lock("Ritual creation is unavailable. Reconnect and try again.");
+            if (result.kind === "authentication-required") {
+              lock(
+                "Ritual creation access changed. Sign in to the authorized account again.",
+              );
               return;
             }
+            if (result.kind !== "granted") {
+              if (!continuing)
+                lock(
+                  "Ritual creation is unavailable. Reconnect and try again.",
+                );
+              return;
+            }
+            const next = result.options;
             if (next.ownerId !== expected.ownerId) {
               lock(
                 "Ritual creation access changed. Reconnect with the authorized account.",
@@ -332,11 +307,6 @@ export default function SqlDocAdmin() {
             }
             identityRef.current = expected;
             displayIdentity = expected;
-            retainingPresentation = false;
-            setRevalidating(false);
-            if (retentionTimeout !== null)
-              window.clearTimeout(retentionTimeout);
-            retentionTimeout = null;
             if (!next.public && !next.groups.length && !next.temples.length) {
               presentationRef.current = null;
               setReservedHeight(0);
@@ -435,7 +405,6 @@ export default function SqlDocAdmin() {
     }
     return () => {
       disposed = true;
-      if (retentionTimeout !== null) window.clearTimeout(retentionTimeout);
       unsubscribe();
       optionsRequestRef.current?.abort();
       writeRequestRef.current?.abort();
@@ -654,7 +623,7 @@ export default function SqlDocAdmin() {
       <Alert severity="warning" sx={{ my: 2 }}>
         No creation visibility is currently authorized. Download the retained
         request for recovery; retry when access is restored.
-        <Button disabled={revalidating} onClick={downloadBlockedRecovery}>
+        <Button onClick={downloadBlockedRecovery}>
           Download retained request
         </Button>
       </Alert>
@@ -664,7 +633,7 @@ export default function SqlDocAdmin() {
     <Box
       ref={rootRef}
       aria-label="Ritual creation area"
-      aria-busy={revalidating}
+      aria-busy={busy}
       sx={{ my: 2, minHeight: reservedHeight }}
     >
       <div ref={contentRef}>
@@ -677,7 +646,7 @@ export default function SqlDocAdmin() {
           </Alert>
         )}
         {blockedRecovery && (
-          <Button disabled={revalidating} onClick={downloadBlockedRecovery}>
+          <Button onClick={downloadBlockedRecovery}>
             Download retained request
           </Button>
         )}
@@ -688,7 +657,7 @@ export default function SqlDocAdmin() {
               label="Source format"
               size="small"
               value={form.format}
-              disabled={revalidating || busy || !!pending || !!blockedRecovery}
+              disabled={busy || !!pending || !!blockedRecovery}
               onChange={(event) =>
                 updateForm((current) => ({
                   ...current,
@@ -705,7 +674,7 @@ export default function SqlDocAdmin() {
             label="Title"
             size="small"
             value={form.title}
-            disabled={revalidating || busy || !!pending || !!blockedRecovery}
+            disabled={busy || !!pending || !!blockedRecovery}
             onChange={(event) =>
               updateForm((current) => ({
                 ...current,
@@ -718,7 +687,7 @@ export default function SqlDocAdmin() {
             label="Visibility"
             size="small"
             value={form.scopeKey}
-            disabled={revalidating || busy || !!pending || !!blockedRecovery}
+            disabled={busy || !!pending || !!blockedRecovery}
             onChange={(event) =>
               updateForm((current) => ({
                 ...current,
@@ -746,7 +715,7 @@ export default function SqlDocAdmin() {
               size="small"
               type="number"
               value={form.minGrade}
-              disabled={revalidating || busy || !!pending || !!blockedRecovery}
+              disabled={busy || !!pending || !!blockedRecovery}
               onChange={(event) =>
                 updateForm((current) => ({
                   ...current,
@@ -768,7 +737,7 @@ export default function SqlDocAdmin() {
               onModeChange={(editorMode) =>
                 updateForm((current) => ({ ...current, editorMode }))
               }
-              disabled={revalidating || busy || !!pending || !!blockedRecovery}
+              disabled={busy || !!pending || !!blockedRecovery}
             />
           ) : (
             <TextField
@@ -777,7 +746,7 @@ export default function SqlDocAdmin() {
               minRows={4}
               fullWidth
               value={form.source}
-              disabled={revalidating || busy || !!pending || !!blockedRecovery}
+              disabled={busy || !!pending || !!blockedRecovery}
               onChange={(event) =>
                 updateForm((current) => ({
                   ...current,
@@ -790,17 +759,13 @@ export default function SqlDocAdmin() {
           <Button
             type="submit"
             disabled={
-              revalidating ||
-              busy ||
-              !!blockedRecovery ||
-              !form.title.trim() ||
-              !form.scopeKey
+              busy || !!blockedRecovery || !form.title.trim() || !form.scopeKey
             }
           >
             {pending ? "Retry creation" : "Create"}
           </Button>
           {pending && terminal && (
-            <Button onClick={startNew} disabled={revalidating || busy}>
+            <Button onClick={startNew} disabled={busy}>
               Edit and start a new request
             </Button>
           )}

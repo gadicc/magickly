@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { retainsOnlineEditorIdentity } from "../doc/onlineEditorIdentity";
 import { createUuidV7 } from "../lib/ids";
 import {
   OfflineLifecycleCoordinator,
@@ -856,4 +857,44 @@ it("does not broadcast an identical-account verification as a peer authority cha
   expect(messages.post).not.toHaveBeenCalled();
   expect(peer.controller.state.phase).toBe("ready");
   expect(peer.states).not.toHaveBeenCalled();
+});
+
+it("retains online identity through storage failure and subsequent same-owner verification", async () => {
+  const f = fixture();
+  await f.controller.start();
+  const expected = { ...f.controller.state.account! };
+  vi.mocked(f.repo.runtimeState).mockRejectedValueOnce(
+    new Error("temporary cache failure"),
+  );
+  f.event("focus");
+  await settle();
+  expect(f.controller.state.lockReason).toBe("storage");
+  expect(retainsOnlineEditorIdentity(f.controller.state, expected)).toBe(true);
+  vi.mocked(f.repo.activateAccount).mockResolvedValueOnce(f.data.account!);
+  const verification = f.controller.activateVerifiedAccount(A);
+  expect(retainsOnlineEditorIdentity(f.controller.state, expected)).toBe(true);
+  expect(f.registration.begin()).toBeNull();
+  expect(await verification).toBe(true);
+  expect(retainsOnlineEditorIdentity(f.controller.state, expected)).toBe(true);
+  const signout = f.controller.signOut();
+  expect(f.controller.state.lockReason).toBe("signout");
+  expect(retainsOnlineEditorIdentity(f.controller.state, expected)).toBe(false);
+  await signout;
+});
+
+it("does not broadcast account closure after a same-owner cache activation failure", async () => {
+  const messages = bus();
+  const f = fixture(undefined, messages);
+  const peer = fixture({ repo: f.repo, data: f.data }, messages);
+  await f.controller.start();
+  await peer.controller.start();
+  const expected = { ...f.controller.state.account! };
+  vi.mocked(f.repo.activateAccount).mockRejectedValueOnce(
+    new Error("temporary transaction failure"),
+  );
+  expect(await f.controller.activateVerifiedAccount(A)).toBe(false);
+  expect(retainsOnlineEditorIdentity(f.controller.state, expected)).toBe(true);
+  expect(messages.post).not.toHaveBeenCalled();
+  expect(peer.controller.state.phase).toBe("ready");
+  expect(f.errors).toHaveBeenCalledWith("repository");
 });
