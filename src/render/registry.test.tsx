@@ -68,9 +68,12 @@ describe("component image registry", () => {
     ],
     // Moved once, by Manasseh's Hebrew name (plan 032's data fixes); the five
     // above did not, which is what decision 10 is for.
+    // dfd57ffb… until the spec read the tribes through the signs' links, so
+    // the two tribes no sign names — Levi and Joseph — stopped being hashed
+    // (plan 052); no byte moved.
     [
       "table-of-shewbread",
-      "dfd57ffbab8f4194e4c7702966d5cd887c44f1e68523247ec6195d38f5be90ab",
+      "02b9422812bc7b475a7bf847b935c31434651fe7790f4af8fb93895db0d2653b",
     ],
     // No table at all, so no data edit can ever move this one.
     [

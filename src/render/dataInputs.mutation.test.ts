@@ -69,6 +69,31 @@ describe("a data change and the images it can reach", () => {
       else expect(renderer.inputsHash(slug)).toBe(baseHashes[slug]);
   }, 120_000);
 
+  it("hashes only the tribes a sign names", async () => {
+    // Levi and Joseph are tribes no sign links to, so the Shewbread never
+    // draws them and their names are in no image's inputs (plan 052). Gad
+    // is Aries's tribe, so the same change to it moves the Shewbread alone.
+    const renameTribe = (id: string) => (rows: Record<string, unknown>) => {
+      (rows[id] as { name: { he: string } }).name.he = "שבט";
+    };
+    for (const id of ["levi", "joseph"]) {
+      const renderer = await loadWithTables(
+        changeTable("tribeOfIsrael", renameTribe(id)),
+      );
+      for (const slug of COMPONENT_IMAGE_SLUGS)
+        expect(`${id} ${slug} ${renderer.inputsHash(slug)}`).toBe(
+          `${id} ${slug} ${baseHashes[slug]}`,
+        );
+    }
+    const renderer = await loadWithTables(
+      changeTable("tribeOfIsrael", renameTribe("gad")),
+    );
+    const moved = COMPONENT_IMAGE_SLUGS.filter(
+      (slug) => renderer.inputsHash(slug) !== baseHashes[slug],
+    );
+    expect(moved).toEqual(["table-of-shewbread"]);
+  }, 120_000);
+
   it("reaches through a link: an archangel's name is a Tree label", async () => {
     // The Tree names no archangel table; it prints `archangel.name.he` off a
     // sephirah, which is exactly what hashing resolved values covers.

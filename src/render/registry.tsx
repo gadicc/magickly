@@ -146,15 +146,20 @@ export const COMPONENT_IMAGE_REGISTRY: {
     render: () => <TableOfShewbread />,
     profile: COMPONENT_IMAGE_PROFILE,
     fonts: ["NotoEmoji-Variable.ttf"],
-    // The signs are drawn by position, so their key order counts; the tribes
-    // are reached through `tribeOfIsraelId`, so every tribe's name is hashed.
+    // The signs are drawn by position, so their key order counts. Each
+    // sign's tribe is read through its link, as the component reads it, so
+    // only the twelve tribes the signs name are hashed: Levi and Joseph,
+    // whom no sign names and the table never draws, are not (plan 052).
     inputs: [
       {
         table: "zodiac",
         rows: "*",
-        fields: ["symbol", "tetragrammatonPermutation", "tribeOfIsraelId"],
+        fields: [
+          "symbol",
+          "tetragrammatonPermutation",
+          "tribeOfIsrael.name.he",
+        ],
       },
-      { table: "tribeOfIsrael", rows: "*", fields: ["name.he"] },
     ],
   },
   "rose-sigil": {
