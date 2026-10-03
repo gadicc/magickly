@@ -1,39 +1,38 @@
 # Visual commands and future shared editor — 3 October 2026
 
-Status: proposal and future extraction notes. No slash commands, keyboard
-bindings, shared package changes or Markdown migration are implemented by this
-note. The current ritual authoring/storage contracts remain in place.
+Status: visual Say/Do commands and task deletion implemented locally. Future
+Loom extraction, dedicated modifier bindings, duplicate/move actions and drag
+reordering remain follow-ups. The ritual authoring/storage contracts remain in
+place; no shared package changes or Markdown migration.
 
 ## Visual typing commands
 
-Proposed fast path: typing `/say hiero ` or `/do keryx ` at the start of a fresh
+Implemented fast path: typing `/say hiero ` or `/do keryx ` at the start of a fresh
 paragraph converts the command into a speech/action card on the final space,
 places the caret in its empty body, and lets the author continue typing. The
 command text is an editing gesture: saved JSON/Pug contain an ordinary task,
 with the usual generated node ID. Source keeps its existing `Hiero:` and
 `* Keryx` shortcuts.
 
-Recommend a small `/` menu for discoverability: Speech and Action initially,
-then their role choices using the existing catalog and assignment picker.
-Arrow keys, Enter and Escape should work, with clickable/tappable choices.
-Menus and typing shortcuts should run the same validated document command as
-the toolbar. Additional commands such as Note can follow demonstrated demand.
+The small `/` menu offers Speech and Action, then role choices from the
+existing catalog. Arrow keys, Enter and Escape work, with clickable/tappable
+choices. Menus and typing shortcuts share validated task construction with the
+toolbar; slash insertion additionally checks its paragraph and container. Additional commands such as Note can follow demonstrated demand.
 No dedicated modifier-key bindings are chosen yet; avoid browser/OS conflicts.
 
-### Behavior to resolve and verify before implementing
+### Interaction contract and implementation boundaries
 
 - Match a complete command paragraph, not a slash in existing prose. Preserve
   literal text on Escape, incomplete input or an unavailable command.
 - Accept standard role keys/aliases and declared or already-used custom keys. Preserve exact
   case-sensitive custom identities before matching standard names/aliases.
-  Unknown custom keys and ambiguous labels should require explicit choice
-  rather than quietly converting a typo into a new assignment. Decide how
-  much of the existing group/exclusion grammar belongs in the first fast path.
+  Unknown custom keys stay literal. The fast path supports one known role,
+  `all`, or `all-officers`; detailed include/exclude assignments use the cog.
 - A role label containing spaces should be chosen from the menu; the inline
   fast path uses a role key as its argument. Reuse semantic role validation.
 - Never create nested tasks. At a paragraph outside a task, insert only where
-  the parent schema accepts a task. At the end of an existing task, consider
-  removing the command paragraph and inserting a sibling task. Mid-task
+  the parent schema accepts a task. A final direct task paragraph is removed
+  and replaced with a sibling task. Mid-task
   paragraphs need an explicit split policy; do not silently redistribute the
   remaining content. Handle notes, lists and footnote projections deliberately.
 - One undo restores the literal command; immediate Backspace should undo the
@@ -43,10 +42,27 @@ No dedicated modifier-key bindings are chosen yet; avoid browser/OS conflicts.
   composition, preserve existing content/selection, and avoid conversion on
   pasted literal command text by default. Test native typing and mobile IME.
 
+The implementation uses a visual-only ProseMirror plugin for the menu and
+native single-space typing, and the same validated task constructor as toolbar
+insertion. Conversion gets a separate canonical history step; immediate
+Backspace invokes that step's Undo only while the canonical document has not
+changed. Selection mirrors that leave the cursor unchanged retain recovery.
+Mid-task splitting and list insertion are deliberately deferred. Within a
+collected footnote, ancestry outside the projected note also constrains task
+insertion. Pasted command strings and composition do not trigger conversion.
+
+Delete task lives at the bottom of the cog, separate from Apply. It locates the
+current task by ID, deletes its complete subtree, places the cursor nearby and
+creates one canonical undo step. A six-second notification offers Undo only
+while that deletion remains the latest edit. No confirmation is needed for this
+recoverable edit; deletion does not remove stored assets. Source synchronization
+and access locks gate both actions.
+
 Tiptap input rules support typed-pattern transformations and undo. Our installed
 3.31.3 core exposes `InputRule`, `addInputRules()` and `undoInputRule()`; its rule
-runner skips active composition. The app still needs its own schema-aware
-transaction, role resolution and footnote/history integration.
+runner skips active composition. This app uses an explicit plugin transaction
+instead, to control role resolution, container boundaries and canonical
+footnote history together.
 
 References: [input rules](https://tiptap.dev/docs/editor/api/input-rules) and
 [undoInputRule](https://tiptap.dev/docs/editor/api/commands/nodes-and-marks/undo-input-rule).
@@ -101,3 +117,38 @@ set, then add opt-in adapters. Evaluate actual mobile behavior, reader bundle
 cost and round-trip fidelity before calling an extraction complete. Consult
 Loom repository instructions and feature/API contracts when that work starts.
 Shared package publication or deployment requires separate approval.
+
+## Block actions follow-up
+
+Add Duplicate and Move actions when needed, likely in a block actions overflow
+menu shared with Delete. Duplicate must allocate fresh identities throughout
+the copied subtree and define how references/footnotes follow the copy. Move
+must retain IDs and annotations and be one undoable operation.
+
+Explore visual drag reordering at paragraph/top-block level first. Provide
+keyboard Move up/down and accessible touch alternatives; do not rely solely on
+a small drag handle. Respect container schemas and canonical footnote locations,
+prevent accidental nesting, and preserve source annotations and selection.
+Nested moves, collaborative ordering and cross-document moves require separate
+scope. Keep these app-level semantics out of the future minimal Loom editor;
+a shared layer may provide handles/commands while apps validate transformations.
+
+
+## Verification
+
+193 relevant tests pass across the editor, task controls, Pug/clipboard adapters
+and shared rendering. Typecheck, scoped Biome checks, Loom checks and the
+production build pass. The sandbox build's TypeScript subprocess returned
+empty output; the same project build outside the sandbox completed normally.
+
+Desktop browser checks with a synthetic, unsaved fixture cover native slash
+typing, continued body typing, immediate Backspace, trailing task sibling
+insertion, keyboard/click menu choices, deletion, keyboard and notification
+Undo (including restored IDs and focus), and collected-footnote sibling
+conversion/Backspace. Test-only route and browser tab are removed. No database
+fixtures, uploads or production records were changed. Real mobile keyboards,
+IME interaction and assistive technology remain manual follow-ups.
+
+Independent Sol xhigh and final/adversarial Astra xhigh reviews are clear after
+fixing projected/local ancestor boundaries, canonical footnote history recovery,
+reserved group labels, stale notification clicks, and menu scroll retention.

@@ -18,7 +18,9 @@ import React from "react";
 import { formatRitualFileLocator } from "@/files/ritualFileLocator";
 import Upload from "@/lib/upload";
 import EditorActionButton from "./EditorActionButton";
+import { RitualTaskDeletionNotice } from "./RitualTaskDeletionNotice";
 import { createRitualNodeId } from "./ritualNodeIds";
+import { ritualTaskContent } from "./ritualTaskCommands";
 import {
   type JsonValue,
   type RitualSemanticNode,
@@ -261,9 +263,18 @@ export default function RitualVisualControls({
 
   const insertBlock = (tag: "task" | "note", mode?: "say" | "do") => {
     if (blocked) return;
+    const task =
+      tag === "task" ? ritualTaskContent(mode!, role.trim() || "all") : null;
+    if (tag === "task") {
+      if (task) editor.chain().focus().insertContent(task).run();
+      else
+        setError(
+          "Use a comma-separated role list, all, all-officers, or all-except-roles.",
+        );
+      return;
+    }
     const id = createRitualNodeId();
-    const attrs =
-      tag === "task" ? { [mode!]: true, role: role.trim() || "all" } : {};
+    const attrs = {};
     if (
       validateRitualSemantic({
         format: "magickli-ritual",
@@ -280,7 +291,7 @@ export default function RitualVisualControls({
       .chain()
       .focus()
       .insertContent({
-        type: tag === "task" ? "ritualTask" : "ritualBlock",
+        type: "ritualBlock",
         attrs: {
           id,
           tag,
@@ -655,6 +666,7 @@ export default function RitualVisualControls({
         </Typography>
       )}
       {error && !fields && <Alert severity="error">{error}</Alert>}
+      <RitualTaskDeletionNotice editor={editor} blocked={blocked} />
       {taskSettings && (
         <TaskSettingsPopover
           editor={editor}

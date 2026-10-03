@@ -12,6 +12,7 @@ import type { Editor } from "@tiptap/core";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { afterEach, expect, it, vi } from "vitest";
 import RitualVisualControls from "./RitualVisualControls";
+import { ritualSlashCommandsKey } from "./ritualSlashCommands";
 import { printRitualSource } from "./ritualSource";
 import { semanticFromJrt } from "./semantic";
 import { semanticFromTiptap, semanticToTiptap } from "./tiptapRitual";
@@ -357,3 +358,173 @@ it("closes a nested task portal when its parent becomes read-only", async () => 
   act(() => editor.setEditable(true));
   expect(screen.queryByRole("dialog")).toBeNull();
 });
+
+it("deletes independently of unfinished settings and restores the complete task with Undo", async () => {
+  const { editor } = await setup();
+  const beforeTyping = editor.getJSON();
+  act(() => editor.commands.insertContentAt(locate(editor).pos + 2, "Typed "));
+  const before = editor.getJSON();
+  await openCog();
+  chooseBasis("Everyone");
+  chooseBasis("Selected roles"); // An invalid form draft must not block deletion.
+  fireEvent.click(screen.getByRole("button", { name: "Delete task" }));
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  expect(editor.state.doc.textContent).not.toContain("Body");
+  expect(await screen.findByText("Task deleted")).toBeTruthy();
+  fireEvent.click(
+    within(screen.getByRole("alert")).getByRole("button", { name: /^Undo$/ }),
+  );
+  expect(editor.getJSON()).toEqual(before);
+  act(() => editor.commands.undo());
+  expect(editor.getJSON()).toEqual(beforeTyping);
+});
+
+it("withdraws deletion Undo when a later document edit would be undone instead", async () => {
+  const { editor } = await setup();
+  await openCog();
+  fireEvent.click(screen.getByRole("button", { name: "Delete task" }));
+  await screen.findByText("Task deleted");
+  act(() =>
+    editor.commands.insertContentAt(editor.state.doc.content.size, {
+      type: "paragraph",
+      content: [{ type: "text", text: "Later" }],
+    }),
+  );
+  await waitFor(() => expect(screen.queryByText("Task deleted")).toBeNull());
+});
+
+it("deletes the sole task inside a collected footnote with canonical Undo", async () => {
+  const document = semanticFromJrt({
+    children: [
+      declaration(),
+      { type: "footnote", children: [task()] },
+      { type: "footnotes", children: [] },
+    ],
+  });
+  const { editor, dom } = await setup(document);
+  const before = semanticFromTiptap(editor.getJSON());
+  fireEvent.click(dom.querySelector("button[data-footnote-reference]")!);
+  const footnote = await screen.findByRole("textbox", {
+    name: "Footnote 1 editor",
+  });
+  await openCog(within(footnote));
+  fireEvent.click(screen.getByRole("button", { name: "Delete task" }));
+  await screen.findByText("Task deleted");
+  expect(editor.state.doc.textContent).not.toContain("Body");
+  fireEvent.click(
+    within(screen.getByRole("alert")).getByRole("button", { name: /^Undo$/ }),
+  );
+  expect(semanticFromTiptap(editor.getJSON())).toEqual(before);
+});
+
+it.each([
+  ["undo", false],
+  ["Backspace", false],
+  ["undo", true],
+  ["Backspace", true],
+])(
+  "restores a collected footnote slash conversion through %s (task sibling: %s)",
+  async (operation, sibling) => {
+    const document = semanticFromJrt({
+      children: [
+        declaration(),
+        { type: "footnote", children: [task()] },
+        { type: "footnotes", children: [] },
+      ],
+    });
+    const { editor, dom } = await setup(document);
+    fireEvent.click(dom.querySelector("button[data-footnote-reference]")!);
+    const footnote = await screen.findByRole("textbox", {
+      name: "Footnote 1 editor",
+    });
+    const inner = (footnote as HTMLElement & { editor: Editor }).editor;
+    act(() => {
+      inner.commands.insertContentAt(
+        sibling
+          ? inner.state.doc.firstChild!.nodeSize - 1
+          : inner.state.doc.content.size,
+        { type: "paragraph" },
+      );
+      inner.commands.setTextSelection(
+        sibling
+          ? inner.state.doc.firstChild!.nodeSize - 2
+          : inner.state.doc.content.size - 1,
+      );
+      for (const char of "/do keryx ") {
+        const { from, to } = inner.state.selection;
+        const handled = inner.view.someProp("handleTextInput", (handler) =>
+          handler(inner.view, from, to, char, () =>
+            inner.state.tr.insertText(char, from, to),
+          ),
+        );
+        if (!handled)
+          inner.view.dispatch(inner.state.tr.insertText(char, from, to));
+      }
+    });
+    expect(inner.state.doc.lastChild?.type.name).toBe("ritualTask");
+    act(() => {
+      if (operation === "undo") editor.commands.undo();
+      else {
+        const plugin = ritualSlashCommandsKey.get(inner.state)!;
+        expect(
+          plugin.props.handleKeyDown?.call(
+            plugin,
+            inner.view,
+            new KeyboardEvent("keydown", { key: "Backspace" }),
+          ),
+        ).toBe(true);
+      }
+    });
+    const restored = sibling
+      ? inner.state.doc.lastChild?.lastChild
+      : inner.state.doc.lastChild;
+    expect(restored?.textContent).toBe("/do keryx ");
+    if (sibling) {
+      expect(inner.state.doc.childCount).toBe(1);
+      expect(inner.state.doc.firstChild?.firstChild?.textContent).toBe("Body");
+    }
+    expect(editor.state.doc.textContent).toContain("/do keryx ");
+  },
+);
+
+it.each(["task", "list"])(
+  "keeps slash commands literal in a collected footnote inside a %s",
+  async (context) => {
+    const note = {
+      type: "footnote",
+      children: [{ type: "text", value: "Note" }],
+    };
+    const document = semanticFromJrt({
+      children: [
+        context === "task"
+          ? { ...task(), children: [note] }
+          : { type: "ul", children: [{ type: "li", children: [note] }] },
+        { type: "footnotes", children: [] },
+      ],
+    });
+    const { editor, dom } = await setup(document);
+    fireEvent.click(dom.querySelector("button[data-footnote-reference]")!);
+    const footnote = await screen.findByRole("textbox", {
+      name: "Footnote 1 editor",
+    });
+    const inner = (footnote as HTMLElement & { editor: Editor }).editor;
+    act(() => {
+      inner.commands.insertContentAt(inner.state.doc.content.size, {
+        type: "paragraph",
+      });
+      inner.commands.setTextSelection(inner.state.doc.content.size - 1);
+      for (const char of "/do keryx ") {
+        const { from, to } = inner.state.selection;
+        const handled = inner.view.someProp("handleTextInput", (handler) =>
+          handler(inner.view, from, to, char, () =>
+            inner.state.tr.insertText(char, from, to),
+          ),
+        );
+        if (!handled)
+          inner.view.dispatch(inner.state.tr.insertText(char, from, to));
+      }
+    });
+    expect(inner.state.doc.lastChild?.type.name).toBe("paragraph");
+    expect(editor.state.doc.textContent).toContain("/do keryx ");
+  },
+);

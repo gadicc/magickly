@@ -63,6 +63,37 @@ export default function RitualPugGuide() {
         Apply updates the source and keeps the task’s body and ID; the role and
         speech/action change undo together. Cancel leaves the task unchanged.
       </p>
+      <p>
+        <strong>Delete task</strong> at the bottom of the cog removes the whole
+        card immediately, independently of unfinished settings. Use the brief
+        <strong> Undo</strong> notification or <kbd>Ctrl/Cmd+Z</kbd> to restore
+        its contents and IDs. The notification stops offering Undo after a later
+        edit; normal editor history remains available.
+      </p>
+      <h2>Visual typing commands</h2>
+      <p>
+        In a fresh, unformatted paragraph, type <code>/say hiero </code> or
+        <code> /do keryx </code>. The final space creates a speech or action
+        card and puts the cursor in its body so you can keep typing. Standard
+        role keys and shortcuts match without case sensitivity; declared and
+        already-used custom role keys keep their exact case. Unknown keys stay
+        as text. Everyone and all officers use <code>all</code> and
+        <code> all-officers</code>; edit more detailed assignments with the cog.
+      </p>
+      <p>
+        Typing <code>/</code> opens a menu. Use arrow keys and Enter, or tap a
+        choice, to select Say/Do and a role. Search by role name or shortcut.
+        Escape dismisses the menu and keeps that paragraph literal. Undo or
+        immediate Backspace restores the command after conversion. Pasted
+        commands stay literal.
+      </p>
+      <p>
+        A command in the final paragraph of a task creates a sibling card.
+        Commands midway through a task, inside a list, or inside a note within a
+        task stay literal. Collected footnotes outside tasks support the same
+        commands and canonical undo history. Commands create ordinary tasks in
+        source; they do not introduce a new saved format.
+      </p>
       <h2>Finding and fixing errors</h2>
       <p>
         Source errors have red underlines and a marker beside their line number.

@@ -16,6 +16,7 @@ import {
   type EditorFootnote,
   ritualFootnotesKey,
 } from "../ritualFootnotesClient";
+import { RITUAL_TASK_DELETED } from "../ritualTaskCommands";
 import { semanticToJrt } from "../semantic";
 import { semanticFromTiptap } from "../tiptapRitual";
 import { ritualTiptapClientExtensions } from "../tiptapRitualClient";
@@ -247,7 +248,12 @@ function FootnoteEditor({
       );
       if (transaction.getMeta(RITUAL_SETTINGS_CHANGE)) {
         parent.view.dispatch(
-          closeHistory(tr).setMeta(RITUAL_SETTINGS_CHANGE, true),
+          closeHistory(tr)
+            .setMeta(RITUAL_SETTINGS_CHANGE, true)
+            .setMeta(
+              RITUAL_TASK_DELETED,
+              transaction.getMeta(RITUAL_TASK_DELETED),
+            ),
         );
         parent.view.dispatch(
           closeHistory(parent.state.tr).setMeta("addToHistory", false),

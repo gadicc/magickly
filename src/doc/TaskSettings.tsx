@@ -1,10 +1,12 @@
 "use client";
 
+import DeleteOutline from "@mui/icons-material/DeleteOutlineOutlined";
 import SettingsOutlined from "@mui/icons-material/SettingsOutlined";
 import Alert from "@mui/material/Alert";
 import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
 import Popover from "@mui/material/Popover";
@@ -20,7 +22,7 @@ import React from "react";
 import styles from "./ritualBlocks/editing.module.css";
 import { roles } from "./ritualBlocks/roles";
 import { RITUAL_SETTINGS_CHANGE } from "./ritualEditorHistory";
-import { ritualEditorOwner } from "./ritualEditorOwner";
+import { ritualRoleCatalog } from "./ritualRoleCatalog";
 import type { RitualRoleAssignment } from "./ritualRoles";
 import {
   canonicalRole,
@@ -29,6 +31,7 @@ import {
   roleAliases,
   roleAssignmentLabel,
 } from "./ritualRoles";
+import { deleteRitualTask } from "./ritualTaskCommands";
 import { validateRitualSemantic } from "./semantic";
 
 function findTask(editor: Editor, id: string) {
@@ -40,37 +43,6 @@ function findTask(editor: Editor, id: string) {
     }
   });
   return result;
-}
-
-function roleCatalog(editor: Editor, assignment: RitualRoleAssignment) {
-  const names = new Map(
-    Object.entries(roles).map(([key, role]) => [canonicalRole(key), role.name]),
-  );
-  const add = (value: unknown, label?: unknown) => {
-    if (typeof value !== "string" || !/^[A-Za-z][A-Za-z0-9]*$/.test(value))
-      return;
-    const key = canonicalRole(value);
-    if (!names.has(key))
-      names.set(key, key.slice(0, 1).toUpperCase() + key.slice(1));
-    if (!Object.hasOwn(roles, key) && typeof label === "string" && label.trim())
-      names.set(key, label.trim());
-  };
-  assignment.roles.forEach((value) => add(value));
-  ritualEditorOwner(editor).state.doc.descendants((node) => {
-    if (node.attrs.tag === "task")
-      parseRoleAssignment(String(node.attrs.attrs?.role))?.roles.forEach(
-        (value) => add(value),
-      );
-    if (
-      node.attrs.tag === "declareVar" &&
-      node.attrs.attrs?.name === "myRole" &&
-      Array.isArray(node.attrs.children)
-    )
-      for (const option of node.attrs.children)
-        if (option?.kind === "element" && option.tag === "option")
-          add(option.attrs?.value, option.attrs?.label);
-  });
-  return names;
 }
 
 function SettingsForm({
@@ -96,7 +68,7 @@ function SettingsForm({
   const [roleChanged, setRoleChanged] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const catalog = React.useMemo(
-    () => roleCatalog(editor, assignment),
+    () => ritualRoleCatalog(editor, assignment),
     [editor, assignment],
   );
   const roleName = (value: string) =>
@@ -278,11 +250,23 @@ function SettingsForm({
           "Choose the roles for this task."}
       </Typography>
       {error && <Alert severity="error">{error}</Alert>}
-      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button type="submit" variant="contained">
-          Apply
+      <Divider />
+      <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1 }}>
+        <Button
+          color="error"
+          startIcon={<DeleteOutline />}
+          onClick={() => {
+            if (deleteRitualTask(editor, taskId)) onClose();
+          }}
+        >
+          Delete task
         </Button>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button type="submit" variant="contained">
+            Apply
+          </Button>
+        </Box>
       </Box>
     </Box>
   );

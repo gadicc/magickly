@@ -8,6 +8,7 @@ import {
   RitualInlineForEditing,
 } from "./ritualBlocks/renderForEditing";
 import { RitualFootnotesPresentation } from "./ritualFootnotesClient";
+import { RitualSlashCommands } from "./ritualSlashCommands";
 import { ritualTiptapExtensions } from "./tiptapRitual";
 
 /** Client presentation only; schema, clipboard HTML and saved JSON remain unchanged. */
@@ -45,4 +46,5 @@ export const ritualTiptapClientExtensions = [
     return extension;
   }),
   RitualFootnotesPresentation,
+  RitualSlashCommands,
 ];
