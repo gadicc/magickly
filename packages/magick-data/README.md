@@ -6,9 +6,11 @@ geomantic figures and the rest — as 29 tables of plain rows, a graph that
 says how they link, and the code that joins them. It is the data layer of
 [magick.ly](https://magick.ly), which consumes it as anyone else would.
 
-The tables are written as JSON5 in `src/` and built into a JavaScript
-module, a declaration and a JSON file each. A row is a plain object; a link
-between tables is an id, and `assemble()` turns ids into the rows they name.
+The tables are written as JSON5, which lives in the package's `src/` in
+[the repository](https://github.com/gadicc/magickly/tree/main/packages/magick-data)
+and is not published, and each is built into a JavaScript module, a
+declaration and a JSON file. A row is a plain object; a link between tables
+is an id, and `assemble()` turns ids into the rows they name.
 
 ## Licences
 
@@ -22,8 +24,9 @@ path, and [LICENSE.txt](./LICENSE.txt) says which file is which:
   written as TypeScript. Use it anywhere, including commercially, as long as
   you credit [magick.ly](https://magick.ly).
 
-The app that reads it is [AGPL-3.0-or-later](../../LICENSE.txt); this
-package is deliberately freer, so that it can travel.
+The app that reads it is
+[AGPL-3.0-or-later](https://github.com/gadicc/magickly/blob/main/LICENSE.txt);
+this package is deliberately freer, so that it can travel.
 
 The Enochian dictionary is neither. Its entries cite two works whose rights
 are not ours to give:
@@ -50,13 +53,27 @@ npm install magick-data
 
 It has no runtime dependencies.
 
+A maintainer publishing it must make the tarball with `pnpm pack` or
+`pnpm publish`, never `npm publish` from this directory: the published
+`exports` come from `publishConfig.exports`, which only pnpm applies, and
+npm would publish the `exports` that point at `./src/*.ts`. A tarball pnpm
+has packed can then be published by either.
+
 ## Three ways in
 
 There are three ways to read the tables, and each costs something
-different. The figures were measured on the built package at `dc6f732`, in
-a consumer compiled with TypeScript 6.0.3: type instantiations, and the
-bundle minified and gzipped by esbuild 0.28.2 (webpack 5.111.0 came within
-a few per cent).
+different. Two kinds of figure are given, and each says where it came from:
+
+- **Type instantiations measured by the smoke test**
+  (`pnpm --filter magick-data smoke`, which prints them): the packed
+  tarball, read by a consumer compiled with TypeScript 6.0.3 under
+  `bundler`, with `lib: ["es2022"]` and `skipLibCheck`. Each of its reads
+  loads the same 93 files, the lib's included.
+- **Measured on the prototype at `dc6f732`**: the bundle sizes, minified
+  and gzipped by esbuild 0.28.2 (webpack 5.111.0 came within a few per
+  cent), and the instantiations of a scoped `assemble()`, in a consumer
+  compiled with TypeScript 6.0.3. These have not been measured on the
+  shipped package.
 
 **The barrel**, assembled, with every link resolved:
 
@@ -66,11 +83,12 @@ import data from "magick-data";
 data.sephirah.tiferet.planet?.symbol; // "☉"
 ```
 
-It holds 26 of the 29 tables: `seventyTwoAngel`, `enochianTablet` and
-`christianChoir` link to nothing and nothing links to them, so they are left
-out and read through their own subpaths. Reading one field costs 7,740
-instantiations and 17,290 bytes gzipped; a four-hop read, 17,537
-instantiations. Whatever imports it carries all 26 tables.
+It holds 26 of the 29 tables: `enochianTablet`, `christianChoir` and
+`seventyTwoAngel` link to nothing and nothing links to them, so they are
+left out and read through their own subpaths. Reading one field costs 7,824
+instantiations, and a four-hop read 17,621 (smoke test); the bundle is
+17,290 bytes gzipped (`dc6f732`). Whatever imports it carries all 26
+tables.
 
 **One raw table**, by its subpath:
 
@@ -81,7 +99,8 @@ sephirot.tiferet.planetId; // "sol", an id rather than a row
 ```
 
 The rows are as authored, with no links. Reading a field costs no
-instantiations, and `sephirot` is 1,650 bytes gzipped.
+instantiations (smoke test), and `sephirot` is 1,650 bytes gzipped
+(`dc6f732`).
 
 **A scoped `assemble()`**, over the tables you name:
 
@@ -95,12 +114,12 @@ scoped.sephirah.tiferet.planet?.symbol; // "☉"
 ```
 
 Only the links between the named tables are made, and reading one that
-leads outside them is a type error. Two tables cost 5,637 instantiations.
-Sephirah and everything one hop from it, twelve tables, cost 11,588
-instantiations and 8,838 bytes gzipped: more types than the barrel, because
-a partial scope's rows are a mapped type where the barrel's are named
-interfaces, and about half its bytes. A scoped `assemble()` is a bundle
-saving, not a type saving.
+leads outside them is a type error. At `dc6f732`, two tables cost 5,637
+instantiations, and sephirah and everything one hop from it, twelve tables,
+cost 11,588 instantiations and 8,838 bytes gzipped: more types than the
+barrel, because a partial scope's rows are a mapped type where the barrel's
+are named interfaces, and about half its bytes. A scoped `assemble()` is a
+bundle saving, not a type saving.
 
 `assemble()` cannot be tree-shaken, since it is one call over the tables it
 is given; what bounds a bundle is which subpaths are imported. Calling it
@@ -148,10 +167,16 @@ is what a link's `to` names.
 
 Most tables are objects keyed by id; `astrologicalHouse`, `christianChoir`
 and `seventyTwoAngel` are arrays. Each subpath's default export is the rows,
-and it exports the row's type and the id's type by name (`Sephirah`,
-`SephirahId`). `magick-data/tables` exports all 29 raw, with the `Tables`
-and `TableName` types, and `magick-data/types` and `magick-data/rows` the
-row types derived from the tables and the graph.
+and it exports the row's type and the table's by name (`Sephirah`,
+`Sephirot`). An object table's module exports its id's type as well, mostly
+as the row's name with `Id` (`SephirahId`). The exceptions are
+`TetragramID`, `AlchemySymbolID`, `AlchemyTermID` and `EnochianTabletID`;
+`LetterId` for `enochianLetter`; and `planet`, whose `PlanetKey` is every
+row's id while `PlanetId` names only the twelve whose `kind` is
+`"planet"`. The three array tables' modules export no id type.
+`magick-data/tables` exports all 29 raw, with the `Tables` and `TableName`
+types, and `magick-data/types` and `magick-data/rows` the row types derived
+from the tables and the graph.
 
 ## The graph
 
@@ -268,11 +293,13 @@ from identified works and are worth naming:
 
 **`seventyTwoAngels.json5`, `seventyTwoAngelsText/` and `lenain/`** come from
 Lazare Lenain, *La Science Cabalistique* (Amiens, 1823), read page by page from
-the Google Books scan in [`public/docs/`](../../public/docs). That scan is of a
-later reissue: it reproduces the 1823 title page and adds a preface by Papus
-for the Ordre Kabbalistique de la Rose-Croix. The volume does not date itself;
-the first reprint is recorded as Dujols and Thomas, 1909. Lenain died in 1877
-and Papus in 1916, so **no rights are asserted over either text**.
+the Google Books scan in the repository's
+[`public/docs/`](https://github.com/gadicc/magickly/tree/main/public/docs).
+That scan is of a later reissue: it reproduces the 1823 title page and adds
+a preface by Papus for the Ordre Kabbalistique de la Rose-Croix. The volume
+does not date itself; the first reprint is recorded as Dujols and Thomas,
+1909. Lenain died in 1877 and Papus in 1916, so **no rights are asserted
+over either text**.
 
 What is offered under CC BY 4.0 is the work done on top: the English translated
 from that French, the choice and arrangement of fields, the editorial apparatus,
@@ -283,7 +310,8 @@ exercise was a copyright-free rendering of the same public-domain material.
 The Hebrew names are given both as Lenain points them and as bare letters.
 Forty-seven are there because two independent readings of the scan agree;
 twenty-five were read by a person who reads Hebrew, and each of those carries a
-note saying so. See [plan 031](../../plans/031-seventy-two-angels.md).
+note saying so. See
+[plan 031](https://github.com/gadicc/magickly/blob/main/plans/031-seventy-two-angels.md).
 
 **`keyOfSolomon` in `astrology/planets.json5`**, on the seven classical
 planets, is what *The Key of Solomon the King* says each planet's days and
@@ -291,4 +319,5 @@ hours serve for, in S. L. MacGregor Mathers' translation (London, 1888),
 Book I, chapter II, p. 12: his sentences verbatim, checked against
 sacred-texts' transcription of his edition. Mathers died in 1918, so the
 translation is in the public domain and **no rights are asserted over the
-text**. See [plan 039](../../plans/039-correspondence-tables.md).
+text**. See
+[plan 039](https://github.com/gadicc/magickly/blob/main/plans/039-correspondence-tables.md).

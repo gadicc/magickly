@@ -254,6 +254,37 @@ describe("dist/", () => {
 });
 
 /**
+ * A program of one file, `lines`, compiled with the repository's options.
+ * The file sits beside this one but exists only in memory, so that its
+ * relative imports resolve as a module of the package's would.
+ */
+function compile(lines: readonly string[]): ts.Program {
+  const fixture = join(SRC, "__declarations__.ts");
+  const options: ts.CompilerOptions = {
+    target: ts.ScriptTarget.ES2022,
+    lib: ["lib.es2022.d.ts"],
+    types: [],
+    module: ts.ModuleKind.ESNext,
+    moduleResolution: ts.ModuleResolutionKind.Bundler,
+    resolveJsonModule: true,
+    esModuleInterop: true,
+    strict: false,
+    strictNullChecks: true,
+    skipLibCheck: true,
+    noEmit: true,
+  };
+  const host = ts.createCompilerHost(options);
+  const read = host.getSourceFile.bind(host);
+  host.getSourceFile = (path, language, ...rest) =>
+    path === fixture
+      ? ts.createSourceFile(path, lines.join("\n"), language)
+      : read(path, language, ...rest);
+  const exists = host.fileExists.bind(host);
+  host.fileExists = (path) => path === fixture || exists(path);
+  return ts.createProgram([fixture], options, host);
+}
+
+/**
  * Each table's generated declaration against the type TypeScript infers from
  * its JSON, compiled as a program of its own with the repository's options.
  *
@@ -292,32 +323,7 @@ describe("the generated declarations", () => {
       );
     });
 
-    // A file beside this one that exists only in memory, so that its
-    // relative imports resolve as a module of the package's would.
-    const fixture = join(SRC, "__declarations__.ts");
-    const options: ts.CompilerOptions = {
-      target: ts.ScriptTarget.ES2022,
-      lib: ["lib.es2022.d.ts"],
-      types: [],
-      module: ts.ModuleKind.ESNext,
-      moduleResolution: ts.ModuleResolutionKind.Bundler,
-      resolveJsonModule: true,
-      esModuleInterop: true,
-      strict: false,
-      strictNullChecks: true,
-      skipLibCheck: true,
-      noEmit: true,
-    };
-    const host = ts.createCompilerHost(options);
-    const read = host.getSourceFile.bind(host);
-    host.getSourceFile = (path, language, ...rest) =>
-      path === fixture
-        ? ts.createSourceFile(path, lines.join("\n"), language)
-        : read(path, language, ...rest);
-    const exists = host.fileExists.bind(host);
-    host.fileExists = (path) => path === fixture || exists(path);
-
-    const program = ts.createProgram([fixture], options, host);
+    const program = compile(lines);
     const errors = ts.getPreEmitDiagnostics(program).map((diagnostic) => {
       const where = diagnostic.file?.getLineAndCharacterOfPosition(
         diagnostic.start ?? 0,
@@ -330,5 +336,151 @@ describe("the generated declarations", () => {
     expect(errors).toEqual([
       "export const harness: Same<1, 2> = true;: Type 'true' is not assignable to type 'false'.",
     ]);
+  }, 60_000);
+});
+
+/**
+ * What `Widen` above cannot see: that a picklist's literal is the right one.
+ * For every path `picklistPaths` finds, the literals the declaration states
+ * at it, read off the declaration's type by the compiler, must be the values
+ * the JSON holds there — row by row for an object table, whose rows the
+ * declaration keeps by id, and over a list's elements as a set, since a list
+ * is declared as one element type.
+ *
+ * An array table is declared as the union of its distinct row shapes, which
+ * says nothing about which row is which, so for `seventyTwoAngel` the
+ * literals across the union are held to the values across the rows. A wrong
+ * literal shows as a value no row holds or one no member states; where
+ * another row of the same shape holds the wrong value, the declared type is
+ * the same one either way, so there is nothing for a type to get wrong.
+ *
+ * Each path must find a value in some row, so that two empty lists, from a
+ * path that leads nowhere on either side, cannot pass for agreement.
+ */
+describe("the generated declarations' picklist literals", () => {
+  type Literal = string | number | null;
+
+  /** The values at `path` in a JSON row; nothing where a key is absent. */
+  function valuesAt(value: unknown, segments: readonly string[]): Literal[] {
+    if (segments.length === 0) return [value as Literal];
+    if (value === null || typeof value !== "object") return [];
+    const [head, ...rest] = segments;
+    const many = head.endsWith("[]");
+    const field = (value as Record<string, unknown>)[head.replace(/\[\]$/, "")];
+    if (field === undefined) return [];
+    if (!many) return valuesAt(field, rest);
+    if (!Array.isArray(field)) return [];
+    return field.flatMap((item) => valuesAt(item, rest));
+  }
+
+  /**
+   * The literals a declared type states at `path`, through unions; anything
+   * at the end that is not a literal is named, so that it cannot match.
+   */
+  function literalsAt(
+    checker: ts.TypeChecker,
+    type: ts.Type,
+    segments: readonly string[],
+  ): Literal[] {
+    const members = type.isUnion() ? type.types : [type];
+    if (segments.length === 0)
+      return members.map((member) => {
+        if (member.isLiteral() && typeof member.value !== "object")
+          return member.value;
+        if (member.flags & ts.TypeFlags.Null) return null;
+        return `not a literal: ${checker.typeToString(member)}`;
+      });
+    const [head, ...rest] = segments;
+    const many = head.endsWith("[]");
+    return members.flatMap((member) => {
+      if (member.flags & ts.TypeFlags.Null) return [];
+      const property = member.getProperty(head.replace(/\[\]$/, ""));
+      if (!property) return [];
+      const field = checker.getTypeOfSymbol(property);
+      if (!many) return literalsAt(checker, field, rest);
+      return (field.isUnion() ? field.types : [field]).flatMap((list) => {
+        if (list.flags & ts.TypeFlags.Null) return [];
+        const item = checker.getIndexTypeOfType(list, ts.IndexKind.Number);
+        return item
+          ? literalsAt(checker, item, rest)
+          : [`not a list: ${checker.typeToString(list)}`];
+      });
+    });
+  }
+
+  /** A set of literals, in an order two sets can be compared in. */
+  const distinct = (values: readonly Literal[]) =>
+    [...new Set(values)].sort((a, b) =>
+      JSON.stringify(a).localeCompare(JSON.stringify(b)),
+    );
+
+  it("are each row's own values in the JSON", () => {
+    const picked = (Object.keys(schemas) as TableName[])
+      .map((name) => [name, picklistPaths(schemas[name])] as const)
+      .filter(([, paths]) => paths.length);
+    // Every picklist the first test above lists, so none is skipped here.
+    expect(picked.flatMap(([, paths]) => paths)).toHaveLength(6);
+
+    const program = compile(
+      picked.map(
+        ([name], i) =>
+          `import g${i} from "../dist/${TABLE_FILES[name]}.js"; export const t${i} = g${i};`,
+      ),
+    );
+    const checker = program.getTypeChecker();
+    const fixture = program.getRootFileNames()[0];
+    const source = program.getSourceFile(fixture);
+    if (!source) throw new Error("the fixture did not compile");
+    const exported = checker.getExportsOfModule(
+      checker.getSymbolAtLocation(source) as ts.Symbol,
+    );
+
+    // How many values each path found in the JSON.
+    const found: Record<string, number> = {};
+    picked.forEach(([name, paths], i) => {
+      const symbol = exported.find((entry) => entry.name === `t${i}`);
+      if (!symbol) throw new Error(`${name}: not exported`);
+      const declared = checker.getTypeOfSymbol(symbol);
+      const json = JSON.parse(
+        readFileSync(join(DIST, `${TABLE_FILES[name]}.json`), "utf8"),
+      );
+      for (const path of paths) {
+        const segments = path.split(".");
+        found[`${name}.${path}`] = (
+          Array.isArray(json) ? json : Object.values(json)
+        ).flatMap((row: unknown) => valuesAt(row, segments)).length;
+        if (Array.isArray(json)) {
+          const item = checker.getIndexTypeOfType(
+            declared,
+            ts.IndexKind.Number,
+          );
+          if (!item) throw new Error(`${name}: not declared a list`);
+          expect([
+            name,
+            path,
+            distinct(literalsAt(checker, item, segments)),
+          ]).toEqual([
+            name,
+            path,
+            distinct(json.flatMap((row) => valuesAt(row, segments))),
+          ]);
+          continue;
+        }
+        for (const [id, row] of Object.entries(json)) {
+          const property = declared.getProperty(id);
+          if (!property) throw new Error(`${name}.${id}: not declared`);
+          const rowType = checker.getTypeOfSymbol(property);
+          expect([
+            `${name}.${id}.${path}`,
+            distinct(literalsAt(checker, rowType, segments)),
+          ]).toEqual([
+            `${name}.${id}.${path}`,
+            distinct(valuesAt(row, segments)),
+          ]);
+        }
+      }
+    });
+    for (const [path, count] of Object.entries(found))
+      expect([path, count > 0]).toEqual([path, true]);
   }, 60_000);
 });

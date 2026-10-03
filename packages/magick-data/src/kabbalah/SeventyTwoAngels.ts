@@ -24,7 +24,7 @@ import type { Links, Raw } from "../types.ts";
 type Angel = Raw<"seventyTwoAngel"> & Partial<Links<"*", "seventyTwoAngel">>;
 
 /** The seventy-two in Lenain's order, so that the nth is at index n - 1. */
-type Angels = Angel[];
+type Angels = readonly Angel[];
 
 export type { Angel, Angels };
 export default rows;

@@ -30,7 +30,9 @@
  * Ctrl-C reaches both anyway, since they share the terminal's process group;
  * the handlers below are for the rest — a `kill`, an editor stopping the
  * task, either child exiting on its own, and a child that never starts at
- * all.
+ * all. A `kill` must reach this node process: measured, `kill -TERM` on the
+ * `pnpm dev` process leaves all three running, because pnpm 10.18 does not
+ * forward SIGTERM, while a kill of this wrapper, or a Ctrl-C, stops them all.
  *
  * Arguments are passed through to `next dev`, which is how `dev:webpack`
  * gives it `--webpack`.

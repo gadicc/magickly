@@ -23,6 +23,11 @@
  *
  * Every step throws on failure and the process exits non-zero; the temporary
  * directory is removed either way.
+ *
+ * A release must be packed the same way, with `pnpm pack` or `pnpm publish`
+ * and never `npm publish` from the package: `publishConfig.exports` is a
+ * pnpm feature, and npm would publish the `exports` that point at
+ * `./src/*.ts`. A tarball pnpm packed can be published by either.
  */
 import { spawnSync } from "node:child_process";
 import {
@@ -323,13 +328,21 @@ export const g = data.seventyTwoAngel;
 
   // What the consumer pays, for the record: not asserted, since a number
   // that moves is not a failure.
-  for (const [name, source] of [
+  // The README's figures for the barrel and a table are these.
+  for (const [name, label, source] of [
     [
       "barrel",
+      "barrel, one field",
       `import data from "magick-data";\nexport const r = data.sephirah.hod.name.roman;\n`,
     ],
     [
+      "hops",
+      "barrel, four hops",
+      `import data from "magick-data";\nexport const r = data.sephirah.hod.gdGrade?.planet?.hebrewLetter?.letter.he;\n`,
+    ],
+    [
       "table",
+      "table, one field",
       `import s from "magick-data/kabbalah/sephirot";\nexport const r = s.hod.name.roman;\n`,
     ],
   ]) {
@@ -342,7 +355,7 @@ export const g = data.seventyTwoAngel;
     const files = output.match(/^Files:\s+(\d+)/m)?.[1];
     const instantiations = output.match(/^Instantiations:\s+(\d+)/m)?.[1];
     console.log(
-      `   ${name}, one field: ${files} files, ${instantiations} instantiations`,
+      `   ${label}: ${files} files, ${instantiations} instantiations`,
     );
   }
 

@@ -349,9 +349,18 @@ importers:
 
   packages/magick-data:
     devDependencies:
+      '@types/node':
+        specifier: 24.13.5
+        version: 24.13.5
       json5:
         specifier: ^2.2.3
         version: 2.2.3
+      tsx:
+        specifier: ^4.23.1
+        version: 4.23.13
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
       valibot:
         specifier: 1.5.0
         version: 1.5.0(typescript@6.0.3)

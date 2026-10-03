@@ -9,7 +9,7 @@ type ChristianChoir = Raw<"christianChoir"> &
   Partial<Links<"*", "christianChoir">>;
 
 /** In Lenain's order, so that the nth choir is at index n - 1. */
-type ChristianChoirs = ChristianChoir[];
+type ChristianChoirs = readonly ChristianChoir[];
 
 export type { ChristianChoir, ChristianChoirs };
 export default rows;

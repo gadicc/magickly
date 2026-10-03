@@ -9,7 +9,7 @@ type House = Raw<"astrologicalHouse"> &
   Partial<Links<"*", "astrologicalHouse">>;
 
 /** The twelve houses, in order. */
-type Houses = House[];
+type Houses = readonly House[];
 
 export type { House, Houses };
 export default rows;
