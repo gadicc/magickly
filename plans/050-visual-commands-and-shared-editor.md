@@ -152,3 +152,23 @@ IME interaction and assistive technology remain manual follow-ups.
 Independent Sol xhigh and final/adversarial Astra xhigh reviews are clear after
 fixing projected/local ancestor boundaries, canonical footnote history recovery,
 reserved group labels, stale notification clicks, and menu scroll retention.
+
+
+## Empty task caret slots — 3 October 2026
+
+A follow-up fixed empty Say/Do cards that could not receive a mouse caret.
+Imported empty semantic tasks now receive one empty paragraph in the editor;
+that slot projects back to the original empty semantic children. Empty body
+slots override inline reader formatting with a full clickable line and a quiet
+CSS-only speech/action hint. Populated cards retain their reader-like layout.
+
+Pointer entry can also repair a raw zero-child task from clipboard/history,
+without recording a content edit. The collected-footnote bridge forwards that
+nonhistory policy to its canonical owner. Current task identity and root/owner
+editability are checked before changing selection or materializing the slot.
+
+79 relevant tests pass, including semantic equivalence, Say/Do click/typing,
+Undo to empty, raw-zero/read-only behavior and collected-footnote repair without
+an extra canonical Undo step. Native desktop browser clicks and typing into
+both empty body types succeed without modifying the following populated task;
+Undo restores the empty hint. Temporary fixture and tab are removed.

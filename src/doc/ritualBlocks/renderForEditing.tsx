@@ -1,12 +1,14 @@
 "use client";
 
 import type { NodeViewProps } from "@tiptap/core";
+import { TextSelection } from "@tiptap/pm/state";
 import {
   NodeViewContent,
   NodeViewWrapper,
   useEditorState,
 } from "@tiptap/react";
 import { parseRitualFileLocator } from "@/files/ritualFileLocator";
+import { ritualEditorOwner } from "../ritualEditorOwner";
 import { ritualFootnotesKey } from "../ritualFootnotesClient";
 import { TaskSettingsTrigger } from "../TaskSettings";
 import styles from "./editing.module.css";
@@ -68,9 +70,51 @@ export function RitualBlockForEditing({
     },
   });
   const collected = presentation.reference?.host != null;
+  const emptyTask =
+    tag === "task" &&
+    (node.childCount === 0 ||
+      (node.childCount === 1 &&
+        node.firstChild?.type.name === "paragraph" &&
+        !node.firstChild.content.size));
   const content = (
     <NodeViewContent
-      className="ritual-content"
+      className={`ritual-content${emptyTask ? ` ${styles.emptyTaskContent}` : ""}`}
+      data-placeholder={
+        emptyTask && presentation.isEditable
+          ? attrs.do === true
+            ? "Type an action…"
+            : "Type speech…"
+          : undefined
+      }
+      onPointerDown={(event) => {
+        if (
+          !emptyTask ||
+          event.button !== 0 ||
+          !editor.isEditable ||
+          !ritualEditorOwner(editor).isEditable
+        )
+          return;
+        const pos = getPos();
+        if (typeof pos !== "number") return;
+        const current = editor.state.doc.nodeAt(pos);
+        if (!current || current.attrs.id !== node.attrs.id) return;
+        // Raw clipboard/undo content can still contain a zero-child task.
+        // Repair only this empty slot, never redirect clicks in a populated body.
+        if (current.childCount === 0) {
+          const tr = editor.state.tr.insert(
+            pos + 1,
+            editor.schema.nodes.paragraph.create(),
+          );
+          tr.setSelection(TextSelection.create(tr.doc, pos + 2));
+          editor.view.dispatch(tr.setMeta("addToHistory", false));
+        } else if (
+          current.childCount === 1 &&
+          current.firstChild?.type.name === "paragraph" &&
+          !current.firstChild.content.size
+        ) {
+          editor.commands.setTextSelection(pos + 2);
+        }
+      }}
       style={collected || tag === "footnotes" ? { display: "none" } : undefined}
     />
   );

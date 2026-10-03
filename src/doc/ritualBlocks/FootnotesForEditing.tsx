@@ -246,6 +246,10 @@ function FootnoteEditor({
           parent.schema.markFromJSON(mark.toJSON()),
         ) ?? null,
       );
+      // Empty editor slots are structural repairs, not author edits. Retain
+      // that history policy when forwarding them to the canonical document.
+      if (transaction.getMeta("addToHistory") === false)
+        tr.setMeta("addToHistory", false);
       if (transaction.getMeta(RITUAL_SETTINGS_CHANGE)) {
         parent.view.dispatch(
           closeHistory(tr)

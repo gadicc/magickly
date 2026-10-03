@@ -13,6 +13,35 @@
 .block :global([data-node-view-content]) {
   min-height: 1.4em;
 }
+/* Reader-style inline slots otherwise collapse to just the quotes/asterisks.
+   Give empty editor bodies a real line that native click/touch caret placement
+   can target. The hint is CSS-only and never enters clipboard/source content. */
+.block .emptyTaskContent:global([data-node-view-content]) {
+  display: inline-block;
+  position: relative;
+  min-height: 1.6em;
+  width: calc(100% - 1.5em);
+  vertical-align: top;
+  cursor: text;
+  text-indent: 0;
+}
+.block .emptyTaskContent:global([data-node-view-content]) > div,
+.block
+  .emptyTaskContent:global([data-node-view-content])
+  > div
+  > p:first-child {
+  display: block;
+  min-height: 1.6em;
+  margin: 0;
+}
+.emptyTaskContent::before {
+  content: attr(data-placeholder);
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  opacity: 0.45;
+  pointer-events: none;
+}
 .fallback {
   border: 1px solid #aab5cb;
   border-radius: 0.4rem;

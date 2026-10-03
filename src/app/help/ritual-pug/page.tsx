@@ -70,6 +70,12 @@ export default function RitualPugGuide() {
         its contents and IDs. The notification stops offering Undo after a later
         edit; normal editor history remains available.
       </p>
+      <p>
+        Empty speech and action cards have a full clickable body line, marked
+        <strong> Type speech…</strong> or <strong>Type an action…</strong>.
+        Click that line to place the cursor and start typing. These hints are
+        editor-only and are never included in saved source or reader output.
+      </p>
       <h2>Visual typing commands</h2>
       <p>
         In a fresh, unformatted paragraph, type <code>/say hiero </code> or

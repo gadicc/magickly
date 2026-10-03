@@ -9,6 +9,7 @@ import {
 } from "@testing-library/react";
 import type { Editor } from "@tiptap/core";
 import { getSchema } from "@tiptap/core";
+import { undoDepth } from "@tiptap/pm/history";
 import { DOMParser, DOMSerializer } from "@tiptap/pm/model";
 import { NodeSelection, TextSelection } from "@tiptap/pm/state";
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -726,4 +727,122 @@ it("remounts an inactive reader preview when its hookful task shape changes", as
   expect(dom.querySelector("[data-footnote-footer]")?.textContent).toContain(
     "First task",
   );
+});
+
+it.each(["say", "do"])(
+  "gives an empty %s task a caret slot without changing source, then routes clicks and typing into it",
+  async (mode) => {
+    Object.defineProperty(window, "PointerEvent", {
+      configurable: true,
+      value: MouseEvent,
+    });
+    const document = semanticFromJrt({
+      children: [
+        { type: "task", role: "hiero", [mode]: true, children: [] },
+        {
+          type: "task",
+          role: "keryx",
+          do: true,
+          children: [{ type: "text", value: "Following body" }],
+        },
+      ],
+    });
+    render(<Host document={document} />);
+    const { dom, editor } = await editorFromScreen();
+    expect(editor.state.doc.firstChild?.firstChild?.type.name).toBe(
+      "paragraph",
+    );
+    expect(semanticFromTiptap(editor.getJSON())).toEqual(document);
+    const slot = dom.querySelector("[data-placeholder]")!;
+    expect(slot.getAttribute("data-placeholder")).toBe(
+      mode === "say" ? "Type speech…" : "Type an action…",
+    );
+    act(() =>
+      editor.commands.setTextSelection(editor.state.doc.content.size - 2),
+    );
+    const before = editor.getJSON();
+    fireEvent.pointerDown(slot, { button: 0 });
+    expect(editor.state.selection.from).toBe(2);
+    expect(editor.getJSON()).toEqual(before);
+    act(() => editor.commands.insertContent("New body"));
+    expect(editor.state.doc.firstChild?.textContent).toBe("New body");
+    expect(editor.state.doc.lastChild?.textContent).toBe("Following body");
+    await waitFor(() =>
+      expect(dom.querySelector("[data-placeholder]")).toBeNull(),
+    );
+    act(() => editor.commands.undo());
+    expect(semanticFromTiptap(editor.getJSON())).toEqual(document);
+  },
+);
+
+it("repairs a raw zero-child task on body click and refuses the same mutation while read-only", async () => {
+  Object.defineProperty(window, "PointerEvent", {
+    configurable: true,
+    value: MouseEvent,
+  });
+  const document = semanticFromJrt({
+    children: [{ type: "task", role: "hiero", say: true, children: [] }],
+  });
+  render(<Host document={document} />);
+  const { dom, editor } = await editorFromScreen();
+  const clear = () =>
+    editor.view.dispatch(
+      editor.state.tr
+        .delete(1, editor.state.doc.firstChild!.nodeSize - 1)
+        .setMeta("addToHistory", false),
+    );
+  act(clear);
+  expect(editor.state.doc.firstChild?.childCount).toBe(0);
+  act(() => editor.setEditable(false));
+  const before = editor.getJSON();
+  fireEvent.pointerDown(dom.querySelector("[data-node-view-content]")!, {
+    button: 0,
+  });
+  expect(editor.getJSON()).toEqual(before);
+  act(() => editor.setEditable(true));
+  fireEvent.pointerDown(dom.querySelector("[data-placeholder]")!, {
+    button: 0,
+  });
+  expect(editor.state.doc.firstChild?.firstChild?.type.name).toBe("paragraph");
+  expect(editor.state.selection.from).toBe(2);
+  expect(semanticFromTiptap(editor.getJSON())).toEqual(document);
+});
+
+it("repairs an empty task in a collected footnote without adding a canonical Undo step", async () => {
+  Object.defineProperty(window, "PointerEvent", {
+    configurable: true,
+    value: MouseEvent,
+  });
+  const document = semanticFromJrt({
+    children: [
+      {
+        type: "footnote",
+        children: [{ type: "task", role: "hiero", say: true, children: [] }],
+      },
+      { type: "footnotes", children: [] },
+    ],
+  });
+  render(<Host document={document} />);
+  const { dom, editor } = await editorFromScreen();
+  fireEvent.click(dom.querySelector("button[data-footnote-reference]")!);
+  const note = await screen.findByRole("textbox", {
+    name: "Footnote 1 editor",
+  });
+  const inner = (note as HTMLElement & { editor: Editor }).editor;
+  act(() =>
+    inner.view.dispatch(
+      inner.state.tr
+        .delete(1, inner.state.doc.firstChild!.nodeSize - 1)
+        .setMeta("addToHistory", false),
+    ),
+  );
+  expect(inner.state.doc.firstChild?.childCount).toBe(0);
+  const depth = undoDepth(editor.state);
+  fireEvent.pointerDown(note.querySelector("[data-placeholder]")!, {
+    button: 0,
+  });
+  expect(inner.state.doc.firstChild?.firstChild?.type.name).toBe("paragraph");
+  expect(inner.state.selection.from).toBe(2);
+  expect(undoDepth(editor.state)).toBe(depth);
+  expect(semanticFromTiptap(editor.getJSON())).toEqual(document);
 });

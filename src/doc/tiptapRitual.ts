@@ -440,12 +440,19 @@ function toBlocks(nodes: RitualSemanticNode[]): JSONContent[] {
         type: "ritualAtom",
         attrs: { ...attrs, children: node.children ?? null },
       });
-    else
+    else {
+      const children = toBlocks(node.children ?? []);
       result.push({
         type: node.tag === "task" ? "ritualTask" : "ritualBlock",
         attrs,
-        content: toBlocks(node.children ?? []),
+        // An empty task needs a real caret slot. One empty paragraph projects
+        // back to no semantic children, so source and reader output stay empty.
+        content:
+          node.tag === "task" && !children.length
+            ? [{ type: "paragraph" }]
+            : children,
       });
+    }
   }
   flush();
   return result;
