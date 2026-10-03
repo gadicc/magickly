@@ -5,8 +5,10 @@ This licence covers the files in this directory and its subdirectories: the
 components themselves, which import no app code and can be used on their own.
 The tools around them, such as the image export, belong to the app.
 
-The data these components read, in ../../data, is CC BY 4.0, and images they
-draw are CC BY 4.0; see ../../README.md.
+The data these components read, in ../../packages/magick-data, is CC BY 4.0
+(../../packages/magick-data/LICENSE-DATA.txt; its LICENSE.txt says which
+files are data and which are code), and images they draw are CC BY 4.0; see
+../../README.md.
 
 ---
 
