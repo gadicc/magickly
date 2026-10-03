@@ -15,8 +15,8 @@ import {
   TitleFrame,
   TodoFrame,
 } from "./ritualBlocks/Frames";
-import { roleAliases } from "./ritualBlocks/roles";
 import { planRitualFootnotes } from "./ritualFootnotes";
+import { roleAssignmentIncludes } from "./ritualRoles";
 
 class Title extends Node {
   render(key) {
@@ -168,24 +168,8 @@ class Task extends Node {
       } else
         throw new Error("Unknown role type: " + JSON.stringify(block.role));
       */
-    const myRole = (function () {
-      const role = vars.myRole?.value; // "hierophant"
-      return roleAliases[role] || role;
-    })();
-
-    let forMe,
-      role = block.role;
-
-    if (role === myRole || role === "all") forMe = true;
-    else if (role === "all-officers")
-      forMe = !["candidate", "member"].includes(myRole);
-    else if (role.startsWith("all-except-"))
-      forMe = !role.substr(11).split(",").includes(myRole);
-    else if (role.startsWith("all-officers-except-"))
-      forMe =
-        !["candidate", "member"].includes(myRole) &&
-        !role.substr(20).split(",").includes(myRole);
-    else if (role.match(",")) forMe = role.split(",").includes(myRole);
+    const role = block.role;
+    const forMe = roleAssignmentIncludes(role, vars.myRole?.value);
 
     /*
     // we show this in the builtin editor now anyway

@@ -23,7 +23,7 @@ export const ritualTiptapClientExtensions = [
             stopEvent: ({ event }) => {
               if (!(event.target instanceof Element)) return false;
               const control = event.target.closest(
-                "[data-footnote-footer], button[data-footnote-reference]",
+                "[data-footnote-footer], button[data-footnote-reference], [data-task-settings]",
               );
               return !!control && owner.view.dom.contains(control);
             },

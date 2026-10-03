@@ -10,6 +10,42 @@ import { semanticToJrt } from "./semantic";
 
 afterEach(cleanup);
 
+it.each([
+  ["hiero", "hierophant", true],
+  ["hierophant", "hiero", true],
+  ["all-except-hiero,keryx", "hierophant", false],
+  ["all-officers-except-phylax", "sentinel", false],
+  ["all-officers", "candidate", false],
+  ["all-officers", "aspirant", true],
+])(
+  "matches reader assignment %s for selected role %s",
+  (role, selected, included) => {
+    const doc = {
+      children: [
+        {
+          type: "task",
+          role,
+          say: true,
+          children: [{ type: "text", value: "Instruction" }],
+        },
+      ],
+    };
+    const view = render(
+      <DocContext.Provider
+        value={{ vars: { myRole: { value: selected } }, roles }}
+      >
+        <Render doc={doc} onChange={undefined} />
+      </DocContext.Provider>,
+    );
+    expect(
+      view.container
+        .querySelector('[data-ritual-frame="task"]')
+        ?.getAttribute("data-audience"),
+    ).toBe(included ? "self" : "other");
+    expect(view.container.querySelector("[data-task-settings]")).toBeNull();
+  },
+);
+
 it("carries the guide's alternative text through the semantic reader", () => {
   const doc = semanticToJrt(parseRitualText(ritualTextExamples.image));
   render(<Render doc={doc} onChange={undefined} />);

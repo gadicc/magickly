@@ -94,3 +94,19 @@
 .block[data-task-collection] {
   display: none;
 }
+
+.taskSettings {
+  opacity: 0;
+  vertical-align: middle;
+  margin-inline-start: 0.25rem;
+}
+.block[data-ritual-block="task"]:hover .taskSettings,
+.block[data-ritual-block="task"]:focus-within .taskSettings,
+.taskSettings:focus-visible {
+  opacity: 1;
+}
+@media (hover: none) {
+  .taskSettings {
+    opacity: 0.65;
+  }
+}

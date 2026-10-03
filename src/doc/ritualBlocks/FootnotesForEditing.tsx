@@ -1,6 +1,7 @@
 "use client";
 
 import { type Editor, Extension } from "@tiptap/core";
+import { closeHistory } from "@tiptap/pm/history";
 import { Mark } from "@tiptap/pm/model";
 import { NodeSelection, TextSelection } from "@tiptap/pm/state";
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
@@ -9,6 +10,8 @@ import { parseRitualFileLocator } from "@/files/ritualFileLocator";
 import { Render } from "../blocks";
 import DocContext from "../context";
 import EditorActionButton from "../EditorActionButton";
+import { RITUAL_SETTINGS_CHANGE } from "../ritualEditorHistory";
+import { registerRitualEditorOwner } from "../ritualEditorOwner";
 import {
   type EditorFootnote,
   ritualFootnotesKey,
@@ -195,7 +198,7 @@ function FootnoteEditor({
       if (!transaction.docChanged && transaction.storedMarksSet)
         mirrorSelection(editor);
     },
-    onUpdate: ({ editor }) => {
+    onUpdate: ({ editor, transaction }) => {
       if (bridging.current) return;
       const current = locate(parent, id);
       if (!current) return;
@@ -242,9 +245,19 @@ function FootnoteEditor({
           parent.schema.markFromJSON(mark.toJSON()),
         ) ?? null,
       );
-      parent.view.dispatch(tr);
+      if (transaction.getMeta(RITUAL_SETTINGS_CHANGE)) {
+        parent.view.dispatch(
+          closeHistory(tr).setMeta(RITUAL_SETTINGS_CHANGE, true),
+        );
+        parent.view.dispatch(
+          closeHistory(parent.state.tr).setMeta("addToHistory", false),
+        );
+      } else parent.view.dispatch(tr);
     },
   });
+  React.useEffect(() => {
+    if (inner) return registerRitualEditorOwner(inner, parent);
+  }, [inner, parent]);
   React.useEffect(() => {
     if (!inner) return;
     let synchronizing = false;

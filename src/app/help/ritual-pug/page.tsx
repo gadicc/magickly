@@ -39,6 +39,24 @@ export default function RitualPugGuide() {
         current view; visual regeneration, discarding source, and recovery
         conversion start a fresh source history.
       </p>
+      <h2>Task settings in the visual editor</h2>
+      <p>
+        Hover over a speech or action card, or tab to its role heading, to
+        reveal the settings cog. On touch screens the cog stays visible. The
+        same form opens from <strong>Edit properties</strong> when a task is
+        selected. Choose <strong>Say / Speech</strong> or{" "}
+        <strong>Do / Action</strong>, then assign selected roles, everyone, or
+        all officers. For a group, the role picker lists optional exceptions.
+        Search by full name or shortcut, or enter a custom role key using
+        letters and numbers, beginning with a letter. Roles declared in the
+        ritual are included too.
+      </p>
+      <p>
+        <strong>All officers</strong> retains the existing ritual convention: it
+        excludes Candidate and Member, and includes Aspirant and custom roles.
+        Apply updates the source and keeps the task’s body and ID; the role and
+        speech/action change undo together. Cancel leaves the task unchanged.
+      </p>
       <h2>Finding and fixing errors</h2>
       <p>
         Source errors have red underlines and a marker beside their line number.

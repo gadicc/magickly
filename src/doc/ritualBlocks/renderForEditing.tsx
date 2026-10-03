@@ -8,6 +8,7 @@ import {
 } from "@tiptap/react";
 import { parseRitualFileLocator } from "@/files/ritualFileLocator";
 import { ritualFootnotesKey } from "../ritualFootnotesClient";
+import { TaskSettingsTrigger } from "../TaskSettings";
 import styles from "./editing.module.css";
 import { FootnotesForEditing } from "./FootnotesForEditing";
 import {
@@ -90,6 +91,14 @@ export function RitualBlockForEditing({
           roles={roles}
           audience="author"
           footer={footer}
+          headerActions={
+            <TaskSettingsTrigger
+              editor={editor}
+              taskId={String(node.attrs.id)}
+              editable={presentation.isEditable}
+              role={String(attrs.role ?? "all")}
+            />
+          }
         >
           <TaskBody action={attrs.do === true}>{content}</TaskBody>
         </TaskFrame>

@@ -1,6 +1,11 @@
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import type { CSSProperties, ReactNode } from "react";
+import {
+  canonicalRole,
+  parseRoleAssignment,
+  roleAssignmentLabel,
+} from "../ritualRoles";
 import styles from "./frames.module.css";
 import type { RitualRolePresentation } from "./roles";
 
@@ -13,6 +18,7 @@ export function TaskFrame({
   page,
   children,
   footer,
+  headerActions,
 }: {
   role: string;
   roles: Record<string, RitualRolePresentation>;
@@ -22,7 +28,14 @@ export function TaskFrame({
   page?: ReactNode;
   children: ReactNode;
   footer?: ReactNode;
+  /** Editor controls are a slot; the reader graph remains independent of editor code. */
+  headerActions?: ReactNode;
 }) {
+  const assignment = parseRoleAssignment(role);
+  const individualRoles =
+    assignment?.basis === "roles"
+      ? [...new Set(assignment.roles.map(canonicalRole))]
+      : [];
   return (
     <Paper
       className={styles.task}
@@ -43,21 +56,32 @@ export function TaskFrame({
       {!samePreviousRole && (
         <div className={styles.role} contentEditable={false}>
           <div className={styles.roleSymbol}>
-            {Array.from(new Set(role.split(","))).map((entry) => (
-              <span key={entry}>{roles[entry]?.symbol}</span>
+            {individualRoles.map((entry) => (
+              <span key={entry}>
+                {Object.hasOwn(roles, entry) ? roles[entry].symbol : undefined}
+              </span>
             ))}
           </div>{" "}
           <div className={styles.roleName}>
-            {Array.from(new Set(role.split(","))).map((entry) => (
-              <span
-                key={entry}
-                style={{ color: roles[entry]?.color, marginRight: 3 }}
-              >
-                {roles[entry]?.name ||
-                  entry.slice(0, 1).toUpperCase() + entry.slice(1)}
-              </span>
-            ))}
+            {individualRoles.length
+              ? individualRoles.map((entry, index) => (
+                  <span
+                    key={entry}
+                    style={{
+                      color: Object.hasOwn(roles, entry)
+                        ? roles[entry].color
+                        : undefined,
+                    }}
+                  >
+                    {index > 0 &&
+                      (index === individualRoles.length - 1 ? " and " : ", ")}
+                    {(Object.hasOwn(roles, entry) && roles[entry].name) ||
+                      entry.slice(0, 1).toUpperCase() + entry.slice(1)}
+                  </span>
+                ))
+              : roleAssignmentLabel(role, roles)}
           </div>
+          {headerActions}
         </div>
       )}
       {page !== undefined && (

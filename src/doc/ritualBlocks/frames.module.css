@@ -2,9 +2,10 @@
   overflow-wrap: anywhere;
 }
 .role {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem;
 }
 .role > div {
   height: 100%;
@@ -16,6 +17,7 @@
 }
 .roleName {
   vertical-align: top;
+  min-width: 0;
 }
 .page {
   position: absolute;

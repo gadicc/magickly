@@ -24,6 +24,7 @@ import {
   type RitualSemanticNode,
   validateRitualSemantic,
 } from "./semantic";
+import { TaskSettingsPopover } from "./TaskSettings";
 
 type Kind =
   | "title"
@@ -44,8 +45,6 @@ interface Fields {
   varType: "text" | "select";
   defaultValue: string;
   options: Option[];
-  role: string;
-  taskMode: "say" | "do";
   href: string;
   linkText: string;
   alt: string;
@@ -72,8 +71,6 @@ const freshFields = (kind: Kind): Fields => ({
   varType: "text",
   defaultValue: "",
   options: [],
-  role: "all",
-  taskMode: "say",
   href: "",
   linkText: "",
   alt: "",
@@ -106,8 +103,6 @@ function fieldsFor(target: Target): Fields {
     label: String(attrs.label ?? ""),
     varType: attrs.varType === "select" ? "select" : "text",
     defaultValue: String(attrs.default ?? ""),
-    role: String(attrs.role ?? "all"),
-    taskMode: attrs.do === true ? "do" : "say",
     href: String(attrs.href ?? ""),
     alt: String(attrs.alt ?? ""),
     options: (target.node.attrs?.children ?? [])
@@ -149,6 +144,11 @@ export default function RitualVisualControls({
     editor,
     selector: ({ editor: current }) => selectionTarget(current),
   });
+  const [taskSettings, setTaskSettings] = React.useState<{
+    id: string;
+    anchor: HTMLElement;
+  } | null>(null);
+  const closeTaskSettings = React.useCallback(() => setTaskSettings(null), []);
   const [role, setRole] = React.useState("all");
   const [fields, setFields] = React.useState<Fields | null>(null);
   const [target, setTarget] = React.useState<Target | null>(null);
@@ -343,16 +343,6 @@ export default function RitualVisualControls({
       attrs.name = name;
     }
     if (fields.kind === "img") attrs.alt = fields.alt;
-    if (fields.kind === "task") {
-      if (!/^[A-Za-z][A-Za-z0-9,-]*$/.test(fields.role.trim())) {
-        setError("Enter a valid task role.");
-        return;
-      }
-      delete attrs.say;
-      delete attrs.do;
-      attrs[fields.taskMode] = true;
-      attrs.role = fields.role.trim();
-    }
     if (fields.kind === "a") {
       const href = fields.href.trim();
       if (
@@ -606,9 +596,12 @@ export default function RitualVisualControls({
           inactiveReason={sourceWaitReason}
           size="small"
           disabled={disabled || !selected}
-          onClick={() =>
-            selected && open(selected.node.attrs?.tag as Kind, selected)
-          }
+          onClick={(event) => {
+            if (!selected || blocked) return;
+            if (selected.node.attrs?.tag === "task")
+              setTaskSettings({ id: selected.id, anchor: event.currentTarget });
+            else open(selected.node.attrs?.tag as Kind, selected);
+          }}
         >
           Edit properties
         </EditorActionButton>
@@ -662,6 +655,15 @@ export default function RitualVisualControls({
         </Typography>
       )}
       {error && !fields && <Alert severity="error">{error}</Alert>}
+      {taskSettings && (
+        <TaskSettingsPopover
+          editor={editor}
+          taskId={taskSettings.id}
+          anchor={taskSettings.anchor}
+          onClose={closeTaskSettings}
+          blocked={blocked || concealed}
+        />
+      )}
       <Dialog
         sx={{ visibility: concealed ? "hidden" : undefined }}
         open={!!fields}
@@ -718,31 +720,6 @@ export default function RitualVisualControls({
                 )
               }
             />
-          )}
-          {fields?.kind === "task" && (
-            <>
-              <TextField
-                label="Task role"
-                value={fields.role}
-                onChange={(event) => change("role", event.target.value)}
-              />
-              <TextField
-                select
-                slotProps={{
-                  select: {
-                    MenuProps: {
-                      sx: { visibility: concealed ? "hidden" : undefined },
-                    },
-                  },
-                }}
-                label="Task type"
-                value={fields.taskMode}
-                onChange={(event) => change("taskMode", event.target.value)}
-              >
-                <MenuItem value="say">Speech</MenuItem>
-                <MenuItem value="do">Action</MenuItem>
-              </TextField>
-            </>
           )}
           {fields?.kind === "a" && (
             <>

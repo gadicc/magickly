@@ -1,4 +1,8 @@
 import type { ReactNode } from "react";
+import { roleAliases } from "../ritualRoles";
+
+export { roleAliases } from "../ritualRoles";
+
 import Lamen from "@/app/gd/components/lamen";
 
 /** Shared officer presentation; reader context may supply its own role map. */
@@ -72,12 +76,6 @@ export const roles: Record<string, RitualRolePresentation> = {
   aspirant: { name: "Aspirant", symbol: "🤒", color: "#fcf" },
   member: { name: "Member", color: "#ccc" },
   psaltis: { name: "Psaltis", symbol: "🎵", color: "#c55" },
-};
-
-export const roleAliases: Record<string, string> = {
-  hiero: "hierophant",
-  pastHiero: "pastHierophant",
-  phylax: "sentinel",
 };
 
 for (const [alias, role] of Object.entries(roleAliases)) {
