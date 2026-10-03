@@ -1,4 +1,4 @@
-import rows from "../../dist/kabbalah/fourWorlds.json";
+import rows from "../../dist/kabbalah/fourWorlds.js";
 import type { Links, Raw } from "../types";
 
 /** A world's key. */

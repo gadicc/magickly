@@ -1,4 +1,4 @@
-import rows from "../../dist/alchemy/terms.json";
+import rows from "../../dist/alchemy/terms.js";
 import type { Links, Raw } from "../types";
 
 /** A term's key. */

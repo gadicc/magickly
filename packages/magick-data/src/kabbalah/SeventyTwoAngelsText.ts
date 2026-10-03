@@ -18,12 +18,13 @@ export function loadAngelTexts(language: TextLanguage): Promise<string[]> {
   if (already) return already;
 
   // No bundler can follow a computed path, so each language names its own
-  // module; both are the JSON the build emits from the JSON5 sources.
+  // module; both are what the build emits from the JSON5 sources, declared
+  // `unknown` because they are texts rather than tables, and typed here.
   const texts = (
     language === "fr"
-      ? import("../../dist/kabbalah/seventyTwoAngelsText/fr.json")
-      : import("../../dist/kabbalah/seventyTwoAngelsText/en.json")
-  ).then((module) => module.default as unknown as string[]);
+      ? import("../../dist/kabbalah/seventyTwoAngelsText/fr.js")
+      : import("../../dist/kabbalah/seventyTwoAngelsText/en.js")
+  ).then((module) => module.default as string[]);
 
   loading.set(language, texts);
   return texts;

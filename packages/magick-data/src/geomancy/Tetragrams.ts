@@ -1,4 +1,4 @@
-import rows from "../../dist/geomancy/tetragrams.json";
+import rows from "../../dist/geomancy/tetragrams.js";
 import type { Links, Raw } from "../types";
 
 /** A figure's key. */

@@ -1,4 +1,4 @@
-import rows from "../../dist/kabbalah/tribesOfIsrael.json";
+import rows from "../../dist/kabbalah/tribesOfIsrael.js";
 import type { Links, Raw } from "../types";
 
 /** A tribe's key, Ephraim and Manasseh included. */

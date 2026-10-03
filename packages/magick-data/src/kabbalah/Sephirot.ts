@@ -1,4 +1,4 @@
-import rows from "../../dist/kabbalah/sephirot.json";
+import rows from "../../dist/kabbalah/sephirot.js";
 import type { Links, Raw } from "../types";
 
 /** A sephirah's key, Da'at included. */

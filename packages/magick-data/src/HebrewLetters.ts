@@ -1,4 +1,4 @@
-import rows from "../dist/hebrewLetters.json";
+import rows from "../dist/hebrewLetters.js";
 import type { Links, Raw } from "./types";
 
 /** A letter's key, derived from the JSON: the twenty-two, and the five final forms. */

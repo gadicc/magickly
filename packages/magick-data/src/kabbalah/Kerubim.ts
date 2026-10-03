@@ -1,4 +1,4 @@
-import rows from "../../dist/kabbalah/kerubim.json";
+import rows from "../../dist/kabbalah/kerubim.js";
 import type { Links, Raw } from "../types";
 
 /** A kerub's key, which is its element. */

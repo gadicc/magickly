@@ -4,7 +4,7 @@
  * The data tables are generated (packages/magick-data/src/build.ts), and
  * development used to build them once, at start: editing a JSON5 while the
  * server ran changed nothing until `pnpm data:build` was run again. The
- * watcher rebuilds the file that changed, and Next picks the JSON up from
+ * watcher rebuilds the file that changed, and Next picks the module up from
  * `packages/magick-data/dist` as it would any other import.
  *
  * The build runs here, and is awaited, before either child is spawned:

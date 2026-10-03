@@ -1,4 +1,4 @@
-import rows from "../../dist/kabbalah/christianChoirs.json";
+import rows from "../../dist/kabbalah/christianChoirs.js";
 import type { Links, Raw } from "../types";
 
 /**

@@ -1,4 +1,4 @@
-import rows from "../../dist/alchemy/symbols.json";
+import rows from "../../dist/alchemy/symbols.js";
 import type { Links, Raw } from "../types";
 
 /** A symbol's key. */

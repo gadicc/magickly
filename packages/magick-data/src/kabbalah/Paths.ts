@@ -1,4 +1,4 @@
-import rows from "../../dist/kabbalah/paths.json";
+import rows from "../../dist/kabbalah/paths.js";
 import type { Links, Raw } from "../types";
 
 /** A path's key, `<from>_<to>` by the sephirot it joins. */

@@ -1,4 +1,4 @@
-import apparatus from "../../../dist/kabbalah/lenain/apparatus.json";
+import apparatus from "../../../dist/kabbalah/lenain/apparatus.js";
 
 /**
  * The editorial apparatus: everywhere this edition departs from the book, or

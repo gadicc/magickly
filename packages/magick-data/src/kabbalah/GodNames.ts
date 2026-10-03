@@ -1,4 +1,4 @@
-import rows from "../../dist/kabbalah/godNames.json";
+import rows from "../../dist/kabbalah/godNames.js";
 import type { Links, Raw } from "../types";
 
 /** A name's key. */

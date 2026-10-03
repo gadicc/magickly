@@ -1,13 +1,13 @@
 /**
  * What one word of the Enochian dictionary holds, written by hand.
  *
- * The dictionary is the one source [the build](../build.ts) does not emit as
- * JSON. As a JSON import it costs TypeScript about 19,300 types — more than
- * every table in the package combined, and casting after the import does not
- * avoid it, because the cost is in inferring the literal type of a 1,911-key
- * object (plan 032, decision 1). It is emitted as a module instead, with a
- * generated declaration that says only this, so the whole file costs the
- * `Record` below.
+ * As a JSON import the dictionary costs TypeScript about 19,300 types — more
+ * than every table in the package combined, and casting after the import does
+ * not avoid it, because the cost is in inferring the literal type of a
+ * 1,911-key object (plan 032, decision 1). [The build](../build.ts) emits it
+ * as a module declared `unknown` instead, and
+ * [Dictionary.ts](./Dictionary.ts) casts that to this, so the whole file
+ * costs the `Record` below.
  *
  * It is a type, and [schemas.ts](../schemas.ts) says the same thing as a
  * schema, which [the integrity check](../integrity.ts) holds every entry to

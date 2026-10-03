@@ -5,9 +5,8 @@
  * every id-shaped field declared, and is everything declared there; is every
  * `mirrors` declared from both ends; do the links resolve; does the arity
  * match; are the chains whole; does each path's id spell the two spheres it
- * joins; does every row pass its [schema](./schemas.ts); do the few lists
- * TypeScript has to hold by hand still say what the data says; does any
- * source [write a key twice](./duplicateKeys.ts); and does the Enochian
+ * joins; does every row pass its [schema](./schemas.ts); does any source
+ * [write a key twice](./duplicateKeys.ts); and does the Enochian
  * dictionary, which is no table, hold an entry its type does not admit, or
  * list a meaning or pronunciation twice? Nothing throws and nothing is fatal
  * here — [integrity.test.ts](./integrity.test.ts) asserts the list is empty,
@@ -19,7 +18,6 @@
 
 import * as v from "valibot";
 import { assemble, problemsOf } from "./assemble";
-import { PLANET_IDS } from "./astrology/Planets";
 import { duplicateKeysInSources } from "./duplicateKeys";
 import realDictionary, { type EnochianDictionary } from "./enochian/Dictionary";
 import { graph } from "./graph";
@@ -44,9 +42,7 @@ export interface Failure {
     /** A key written twice in one object of a JSON5 source. */
     | "duplicate"
     /** An object one entry of the Enochian dictionary lists twice. */
-    | "repeat"
-    /** A list written in TypeScript that the data no longer agrees with. */
-    | "derived";
+    | "repeat";
   /**
    * `table`, `table.row` or `table.row.field`; for a source, its file and
    * the path within it; for the dictionary, the word and the path within
@@ -220,41 +216,6 @@ export function checkMirrors(
 }
 
 /**
- * [`PLANET_IDS`](./astrology/Planets.ts) against the table it names: the rows
- * of kind `"planet"`, exactly, in both directions. The list is written out
- * because a JSON import widens `"planet"` to `string`, so the twelve cannot
- * be an `Extract` over the field the way they would be off an `as const`
- * module; this is the half of the guarantee the type system cannot give
- * (plan 032, decision 14).
- */
-function checkPlanetIds(table: unknown): Failure[] {
-  const failures: Failure[] = [];
-  const listed = new Set<string>(PLANET_IDS);
-  const rows = new Map(rowsOf(table));
-
-  for (const [id, row] of rows)
-    if ((row.kind === "planet") !== listed.has(id))
-      failures.push({
-        check: "derived",
-        where: `planet.${id}`,
-        detail:
-          row.kind === "planet"
-            ? 'of kind "planet", and not in PLANET_IDS'
-            : `of kind ${JSON.stringify(row.kind)}, and in PLANET_IDS`,
-      });
-
-  for (const id of listed)
-    if (!rows.has(id))
-      failures.push({
-        check: "derived",
-        where: `planet.${id}`,
-        detail: "in PLANET_IDS, and not a row of the table",
-      });
-
-  return failures;
-}
-
-/**
  * The Enochian dictionary against its type, and against itself. The
  * dictionary is no table, so the graph never reads it; every entry is held
  * to [its schema](./schemas.ts) here, since the type is written by hand and
@@ -402,7 +363,6 @@ export function checkIntegrity(
     }
   }
 
-  failures.push(...checkPlanetIds(input.planet));
   failures.push(...checkPathEnds(input.treeOfLifePath, input.sephirah));
 
   // The sources as text, which is the only place a repeated key is visible:

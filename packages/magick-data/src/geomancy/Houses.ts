@@ -1,4 +1,4 @@
-import rows from "../../dist/geomancy/houses.json";
+import rows from "../../dist/geomancy/houses.js";
 import type { Links, Raw } from "../types";
 
 /** A house of a reading, keyed by its own number rather than an index. */

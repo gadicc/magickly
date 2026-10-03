@@ -1,4 +1,4 @@
-import rows from "../../dist/kabbalah/angelicOrders.json";
+import rows from "../../dist/kabbalah/angelicOrders.js";
 import type { Links, Raw } from "../types";
 
 /** An order's key. */

@@ -1,4 +1,4 @@
-import rows from "../../dist/gd/grades.json";
+import rows from "../../dist/gd/grades.js";
 import type { Links, Raw } from "../types";
 
 /** A grade's key, Portal included. */

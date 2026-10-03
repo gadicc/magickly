@@ -1,4 +1,4 @@
-import rows from "../../dist/astrology/zodiac.json";
+import rows from "../../dist/astrology/zodiac.js";
 import type { Links, Raw } from "../types";
 
 /** A sign's key. */

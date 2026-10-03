@@ -7,11 +7,13 @@ import { TREE_IMAGE_FIELDS } from "@/render/contracts/treeOfLife";
 /**
  * Render a registered component over a changed copy of the data.
  *
- * The tables are JSON modules, so nothing can mutate them once they are
- * loaded: `assemble()` clones and freezes, and the typed modules hand out the
+ * The tables are modules, so nothing can mutate them once they are loaded:
+ * `assemble()` clones and freezes, and the typed modules hand out the
  * import. A changed table therefore has to arrive as a different module, which
- * is what this does — one `vi.doMock` per emitted JSON file, then a fresh
- * import of the registry, the contracts and `dataInputs` on top of them.
+ * is what this does — one `vi.doMock` per table's generated module, the
+ * `dist/….js` that the typed modules, `tables.ts` and the barrel all import,
+ * then a fresh import of the registry, the contracts and `dataInputs` on top
+ * of them. The rows themselves are read from the `.json` emitted beside it.
  *
  * What is compared is the *source* SVG rather than the outlined bytes. The
  * outliner is a pure function of that string, so identical source means
@@ -21,37 +23,40 @@ import { TREE_IMAGE_FIELDS } from "@/render/contracts/treeOfLife";
 
 const DIST = path.join(process.cwd(), "packages/magick-data/dist");
 
-/** Every table, by the name the graph and the barrel use for it. */
+/**
+ * Every table, by the name the graph and the barrel use for it: where under
+ * `dist/` it is emitted, without the extension.
+ */
 export const TABLE_FILES = {
-  planet: "astrology/planets.json",
-  zodiac: "astrology/zodiac.json",
-  astrologicalHouse: "astrology/houses.json",
-  hebrewLetter: "hebrewLetters.json",
-  enochianLetter: "enochian/letters.json",
-  enochianTablet: "enochian/tablets.json",
-  tetragram: "geomancy/tetragrams.json",
-  geomanticHouse: "geomancy/houses.json",
-  gdGrade: "gd/grades.json",
-  gdDegree: "gd/degrees.json",
-  archangel: "kabbalah/archangels.json",
-  angelicOrder: "kabbalah/angelicOrders.json",
-  christianChoir: "kabbalah/christianChoirs.json",
-  fourWorlds: "kabbalah/fourWorlds.json",
-  godName: "kabbalah/godNames.json",
-  kerub: "kabbalah/kerubim.json",
-  sephirah: "kabbalah/sephirot.json",
-  treeOfLifePath: "kabbalah/paths.json",
-  soul: "kabbalah/souls.json",
-  tribeOfIsrael: "kabbalah/tribesOfIsrael.json",
-  seventyTwoAngel: "kabbalah/seventyTwoAngels.json",
-  chakra: "chakras.json",
-  bodyPart: "body/parts.json",
-  stone: "materia/stones.json",
-  scent: "materia/scents.json",
-  alchemySymbol: "alchemy/symbols.json",
-  alchemyTerm: "alchemy/terms.json",
-  element: "alchemy/elements.json",
-  elemental: "alchemy/elementals.json",
+  planet: "astrology/planets",
+  zodiac: "astrology/zodiac",
+  astrologicalHouse: "astrology/houses",
+  hebrewLetter: "hebrewLetters",
+  enochianLetter: "enochian/letters",
+  enochianTablet: "enochian/tablets",
+  tetragram: "geomancy/tetragrams",
+  geomanticHouse: "geomancy/houses",
+  gdGrade: "gd/grades",
+  gdDegree: "gd/degrees",
+  archangel: "kabbalah/archangels",
+  angelicOrder: "kabbalah/angelicOrders",
+  christianChoir: "kabbalah/christianChoirs",
+  fourWorlds: "kabbalah/fourWorlds",
+  godName: "kabbalah/godNames",
+  kerub: "kabbalah/kerubim",
+  sephirah: "kabbalah/sephirot",
+  treeOfLifePath: "kabbalah/paths",
+  soul: "kabbalah/souls",
+  tribeOfIsrael: "kabbalah/tribesOfIsrael",
+  seventyTwoAngel: "kabbalah/seventyTwoAngels",
+  chakra: "chakras",
+  bodyPart: "body/parts",
+  stone: "materia/stones",
+  scent: "materia/scents",
+  alchemySymbol: "alchemy/symbols",
+  alchemyTerm: "alchemy/terms",
+  element: "alchemy/elements",
+  elemental: "alchemy/elementals",
 } as const;
 
 export type TableFileName = keyof typeof TABLE_FILES;
@@ -62,7 +67,7 @@ const loaded = new Map<string, Rows>();
 
 /** The emitted table, parsed once and shared; callers clone before changing it. */
 export function readTable(table: TableFileName): Rows {
-  const file = path.join(DIST, TABLE_FILES[table]);
+  const file = path.join(DIST, `${TABLE_FILES[table]}.json`);
   let rows = loaded.get(file);
   if (!rows) {
     rows = JSON.parse(readFileSync(file, "utf8")) as Rows;
@@ -89,7 +94,9 @@ export async function loadWithTables(
   vi.resetModules();
   for (const name of Object.keys(TABLE_FILES) as TableFileName[]) {
     const rows = changed[name] ?? readTable(name);
-    vi.doMock(path.join(DIST, TABLE_FILES[name]), () => ({ default: rows }));
+    vi.doMock(path.join(DIST, `${TABLE_FILES[name]}.js`), () => ({
+      default: rows,
+    }));
   }
   const registry = await import("@/render/registry");
   const { CONTRACTS } = await import("@/render/contracts");

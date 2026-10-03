@@ -1,4 +1,4 @@
-import rows from "../../dist/enochian/letters.json";
+import rows from "../../dist/enochian/letters.js";
 import type { Links, Raw } from "../types";
 
 /** A letter's key, which is its Latin transliteration. */

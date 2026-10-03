@@ -27,41 +27,41 @@
 import { assemble } from "./assemble";
 import type { Tables } from "./tables";
 
-import planet from "../dist/astrology/planets.json";
-import zodiac from "../dist/astrology/zodiac.json";
-import astrologicalHouse from "../dist/astrology/houses.json";
+import planet from "../dist/astrology/planets.js";
+import zodiac from "../dist/astrology/zodiac.js";
+import astrologicalHouse from "../dist/astrology/houses.js";
 
-import hebrewLetter from "../dist/hebrewLetters.json";
+import hebrewLetter from "../dist/hebrewLetters.js";
 
-import enochianLetter from "../dist/enochian/letters.json";
+import enochianLetter from "../dist/enochian/letters.js";
 
-import tetragramRows from "../dist/geomancy/tetragrams.json";
-import geomanticHouseRows from "../dist/geomancy/houses.json";
+import tetragramRows from "../dist/geomancy/tetragrams.js";
+import geomanticHouseRows from "../dist/geomancy/houses.js";
 
-import gdGrade from "../dist/gd/grades.json";
-import gdDegree from "../dist/gd/degrees.json";
+import gdGrade from "../dist/gd/grades.js";
+import gdDegree from "../dist/gd/degrees.js";
 
-import archangel from "../dist/kabbalah/archangels.json";
-import angelicOrder from "../dist/kabbalah/angelicOrders.json";
-import fourWorlds from "../dist/kabbalah/fourWorlds.json";
-import godName from "../dist/kabbalah/godNames.json";
-import kerub from "../dist/kabbalah/kerubim.json";
-import sephirah from "../dist/kabbalah/sephirot.json";
-import treeOfLifePath from "../dist/kabbalah/paths.json";
-import soul from "../dist/kabbalah/souls.json";
-import tribeOfIsrael from "../dist/kabbalah/tribesOfIsrael.json";
+import archangel from "../dist/kabbalah/archangels.js";
+import angelicOrder from "../dist/kabbalah/angelicOrders.js";
+import fourWorlds from "../dist/kabbalah/fourWorlds.js";
+import godName from "../dist/kabbalah/godNames.js";
+import kerub from "../dist/kabbalah/kerubim.js";
+import sephirah from "../dist/kabbalah/sephirot.js";
+import treeOfLifePath from "../dist/kabbalah/paths.js";
+import soul from "../dist/kabbalah/souls.js";
+import tribeOfIsrael from "../dist/kabbalah/tribesOfIsrael.js";
 
-import chakra from "../dist/chakras.json";
+import chakra from "../dist/chakras.js";
 
-import bodyPart from "../dist/body/parts.json";
+import bodyPart from "../dist/body/parts.js";
 
-import stone from "../dist/materia/stones.json";
-import scent from "../dist/materia/scents.json";
+import stone from "../dist/materia/stones.js";
+import scent from "../dist/materia/scents.js";
 
-import alchemySymbol from "../dist/alchemy/symbols.json";
-import alchemyTerm from "../dist/alchemy/terms.json";
-import element from "../dist/alchemy/elements.json";
-import elemental from "../dist/alchemy/elementals.json";
+import alchemySymbol from "../dist/alchemy/symbols.js";
+import alchemyTerm from "../dist/alchemy/terms.js";
+import element from "../dist/alchemy/elements.js";
+import elemental from "../dist/alchemy/elementals.js";
 
 const barrel = {
   // ASTROLOGY

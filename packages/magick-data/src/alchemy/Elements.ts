@@ -1,4 +1,4 @@
-import rows from "../../dist/alchemy/elements.json";
+import rows from "../../dist/alchemy/elements.js";
 import type { Links, Raw } from "../types";
 
 /** An element's key: the four, and spirit. */

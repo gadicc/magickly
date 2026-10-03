@@ -1,4 +1,4 @@
-import pages from "../../../dist/kabbalah/lenain/pages.json";
+import pages from "../../../dist/kabbalah/lenain/pages.js";
 
 /**
  * The volume's own divisions, derived from its headings rather than listed by

@@ -1,4 +1,4 @@
-import rows from "../../dist/alchemy/elementals.json";
+import rows from "../../dist/alchemy/elementals.js";
 import type { Links, Raw } from "../types";
 
 /** An elemental's key. */

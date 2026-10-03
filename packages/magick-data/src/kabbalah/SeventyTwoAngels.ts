@@ -1,4 +1,4 @@
-import rows from "../../dist/kabbalah/seventyTwoAngels.json";
+import rows from "../../dist/kabbalah/seventyTwoAngels.js";
 import type { Links, Raw } from "../types";
 
 /**

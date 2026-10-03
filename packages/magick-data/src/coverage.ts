@@ -30,9 +30,9 @@ const CHECKED_ELSEWHERE: Record<string, string> = {
   "kabbalah/lenain/apparatus.json5": "lenainEdition.test.ts",
   "kabbalah/lenain/evidence.json5": "lenainQuotations.test.ts",
   "kabbalah/seventyTwoAngelsText/fr.json5": "lenainQuotations.test.ts",
-  // Not a table and never was: it is emitted as a module, which tables.ts
-  // says in as many words.
-  "enochian/dictionary.json5": "its own module build",
+  // Not a table and never was, which tables.ts says in as many words; the
+  // integrity check holds every entry to its schema instead.
+  "enochian/dictionary.json5": "integrity.ts",
 };
 
 function sources(dir: string, prefix = ""): string[] {
@@ -56,7 +56,7 @@ function sources(dir: string, prefix = ""): string[] {
  */
 function covered(dir: string) {
   const source = readFileSync(path.join(dir, "tables.ts"), "utf8");
-  const imports = source.matchAll(/from\s+"\.\.\/dist\/(.+?)\.json"/g);
+  const imports = source.matchAll(/from\s+"\.\.\/dist\/(.+?)\.js"/g);
   return new Set([...imports].map((match) => `${match[1]}.json5`));
 }
 

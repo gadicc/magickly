@@ -1,4 +1,4 @@
-import rows from "../../dist/kabbalah/archangels.json";
+import rows from "../../dist/kabbalah/archangels.js";
 import type { Links, Raw } from "../types";
 
 /** An archangel's key. */

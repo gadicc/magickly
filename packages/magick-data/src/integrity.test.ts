@@ -428,36 +428,18 @@ describe("the data against the graph", () => {
   });
 
   it("holds twelve planets and three spheres of the Tree", () => {
+    // `PLANET_IDS` is read off `kind`, as `PlanetId` is, so there is no list
+    // to hold to the data any more; what is left to assert is the data.
     const byKind = (kind: string) =>
       Object.entries(tables.planet)
         .filter(([, row]) => row.kind === kind)
         .map(([id]) => id);
     expect(byKind("planet")).toEqual([...PLANET_IDS]);
+    expect(PLANET_IDS).toHaveLength(12);
     expect(byKind("sphere")).toEqual([
       "primum-mobile",
       "zodiac",
       "olam-yesodot",
-    ]);
-  });
-
-  it("counts a row PLANET_IDS and the data disagree about", () => {
-    // The twelve are a list in TypeScript because a JSON import widens
-    // `"planet"` to `string`, so `PlanetId` cannot be read off `kind`. This
-    // check is the other direction, and it has to bite in both.
-    const failures = broken("planet", {
-      ...tables.planet,
-      zodiac: { ...tables.planet.zodiac, kind: "planet" },
-      ketu: { ...tables.planet.ketu, kind: "sphere" },
-    });
-    expect(of("derived", failures)).toEqual([
-      'planet.zodiac: of kind "planet", and not in PLANET_IDS',
-      'planet.ketu: of kind "sphere", and in PLANET_IDS',
-    ]);
-
-    const gone = { ...tables.planet } as Record<string, unknown>;
-    delete gone.ketu;
-    expect(of("derived", broken("planet", gone))).toEqual([
-      "planet.ketu: in PLANET_IDS, and not a row of the table",
     ]);
   });
 

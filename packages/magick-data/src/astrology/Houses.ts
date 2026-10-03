@@ -1,4 +1,4 @@
-import rows from "../../dist/astrology/houses.json";
+import rows from "../../dist/astrology/houses.js";
 import type { Links, Raw } from "../types";
 
 /**
