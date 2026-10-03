@@ -36,7 +36,7 @@ describe("the graph", () => {
     expect(bare).toEqual([
       "hebrewLetter",
       "enochianTablet",
-      "geomanicHouse",
+      "geomanticHouse",
       "angelicOrder",
       "christianChoir",
       "fourWorlds",

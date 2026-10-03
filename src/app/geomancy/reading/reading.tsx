@@ -16,7 +16,7 @@ import {
   Typography,
 } from "@mui/material";
 import { format } from "date-fns";
-import data, { geomanicHouse as houses } from "magick-data";
+import data from "magick-data";
 import { PlanetId } from "magick-data/astrology/planets";
 import React from "react";
 import { upcomingHoursForPlanetAtLocation } from "@/app/astrology/planetary-hours/utils";
@@ -30,6 +30,7 @@ import AstroGeomancyChart from "./AstroGeomancyChart";
 import { type GeomancyReadingState, readingSearchParams } from "./readingState";
 
 const { planet: planets } = data;
+const houses = data.geomanticHouse;
 
 // https://blog.stevenlevithan.com/archives/javascript-roman-numeral-converter
 function romanize(num) {

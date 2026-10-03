@@ -92,7 +92,7 @@ describe("the data against the graph", () => {
 
   it("excuses an external field from that only where it is not id-shaped", () => {
     // `enochianLetter`'s two are "planet/element" and "tarot", which no rule
-    // could find in the data; `tolPath.external["hermetic.tarotId"]` is
+    // could find in the data; `treeOfLifePath.external["hermetic.tarotId"]` is
     // id-shaped, so a typo in it has to fail the same way a link would.
     const kept = broken("enochianLetter", {
       A: { id: "A", enochian: "un", title: "Un", english: "A" },
@@ -100,15 +100,15 @@ describe("the data against the graph", () => {
     expect(of("not-in-the-data", kept)).toEqual([]);
 
     const noTarot = Object.fromEntries(
-      Object.entries(tables.tolPath).map(([id, path]) => {
+      Object.entries(tables.treeOfLifePath).map(([id, path]) => {
         const { hermetic, ...rest } = path as Record<string, unknown>;
         if (!hermetic) return [id, rest];
         const { tarotId, ...block } = hermetic as Record<string, unknown>;
         return [id, { ...rest, hermetic: block }];
       }),
     );
-    expect(of("not-in-the-data", broken("tolPath", noTarot))).toEqual([
-      "tolPath.hermetic.tarotId: declared, but no row has it",
+    expect(of("not-in-the-data", broken("treeOfLifePath", noTarot))).toEqual([
+      "treeOfLifePath.hermetic.tarotId: declared, but no row has it",
     ]);
   });
 
@@ -164,18 +164,18 @@ describe("the data against the graph", () => {
     // on each tree (plan 036) — and this is where it is held. Here the
     // Hermetic tree deals Resh to Netzach–Malchut as well as to Hod–Yesod,
     // through a link inside a nested block.
-    const failures = broken("tolPath", {
-      ...tables.tolPath,
+    const failures = broken("treeOfLifePath", {
+      ...tables.treeOfLifePath,
       "7_10": {
-        ...tables.tolPath["7_10"],
+        ...tables.treeOfLifePath["7_10"],
         hermetic: {
-          ...tables.tolPath["7_10"].hermetic,
+          ...tables.treeOfLifePath["7_10"].hermetic,
           hebrewLetterId: "resh",
         },
       },
     });
     expect(of("link", failures)).toEqual([
-      'hebrewLetter.resh.hermeticPath: inverse-not-unique: more than one tolPath names it, "8_9" among them',
+      'hebrewLetter.resh.hermeticPath: inverse-not-unique: more than one treeOfLifePath names it, "8_9" among them',
     ]);
   });
 
@@ -224,11 +224,11 @@ describe("the data against the graph", () => {
     ]);
 
     // The astrology houses carry neither, so the index is all there is.
-    const houses = tables.house.map((house, i) =>
+    const houses = tables.astrologicalHouse.map((house, i) =>
       i === 2 ? { ...house, wizardId: "gandalf" } : house,
     );
-    expect(of("undeclared", broken("house", houses))).toEqual([
-      "house.2.wizardId: no link, pending target, external one or enumeration",
+    expect(of("undeclared", broken("astrologicalHouse", houses))).toEqual([
+      "astrologicalHouse.2.wizardId: no link, pending target, external one or enumeration",
     ]);
 
     // An `id` comes first, which is the key `assemble()` indexes by.
@@ -255,18 +255,22 @@ describe("the data against the graph", () => {
     // id while the pages read the pair, so the two must not drift. The ends
     // go in the id's order, so a pair written the wrong way round is wrong
     // too; an end that names no sephirah is the link check's.
-    const failures = broken("tolPath", {
-      ...tables.tolPath,
-      "1_6": { ...tables.tolPath["1_6"], toId: "hod" },
-      "2_3": { ...tables.tolPath["2_3"], fromId: "binah", toId: "chochmah" },
-      "2_6": { ...tables.tolPath["2_6"], toId: "nowhere" },
+    const failures = broken("treeOfLifePath", {
+      ...tables.treeOfLifePath,
+      "1_6": { ...tables.treeOfLifePath["1_6"], toId: "hod" },
+      "2_3": {
+        ...tables.treeOfLifePath["2_3"],
+        fromId: "binah",
+        toId: "chochmah",
+      },
+      "2_6": { ...tables.treeOfLifePath["2_6"], toId: "nowhere" },
     });
     expect(of("ends", failures)).toEqual([
-      "tolPath.1_6: names keter and hod, which spell 1_8",
-      "tolPath.2_3: names binah and chochmah, which spell 3_2",
+      "treeOfLifePath.1_6: names keter and hod, which spell 1_8",
+      "treeOfLifePath.2_3: names binah and chochmah, which spell 3_2",
     ]);
     expect(of("link", failures)).toEqual([
-      'tolPath.2_6.toId: dangling: no sephirah is keyed "nowhere"',
+      'treeOfLifePath.2_6.toId: dangling: no sephirah is keyed "nowhere"',
     ]);
   });
 
@@ -469,7 +473,7 @@ describe("the data against the graph", () => {
         .map(([id]) => id);
     expect(loose(tables.sephirah)).toEqual(["daat"]);
     expect(loose(tables.gdGrade)).toEqual([]);
-    expect(loose(tables.tolPath)).toEqual([]);
+    expect(loose(tables.treeOfLifePath)).toEqual([]);
   });
 
   it("allows a field named after a table, which is not an accessor", () => {

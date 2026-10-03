@@ -51,7 +51,7 @@ function linksTo(html: string, href: string) {
 
 describe("the path page", () => {
   it("holds every path to what every entity page must hold", async () => {
-    for (const path of Object.values(Data.tolPath)) {
+    for (const path of Object.values(Data.treeOfLifePath)) {
       const html = await render(path.id);
       const pair = `${path.from.name.roman} – ${path.to.name.roman}`;
       expectEntityPage(

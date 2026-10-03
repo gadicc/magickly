@@ -29,15 +29,14 @@ import type { Tables } from "./tables";
 
 import planet from "../dist/astrology/planets.json";
 import zodiac from "../dist/astrology/zodiac.json";
-import house from "../dist/astrology/houses.json";
+import astrologicalHouse from "../dist/astrology/houses.json";
 
 import hebrewLetter from "../dist/hebrewLetters.json";
 
 import enochianLetter from "../dist/enochian/letters.json";
 
-// The two the barrel also exports by name, so the exports below can have it.
 import tetragramRows from "../dist/geomancy/tetragrams.json";
-import geomanicHouseRows from "../dist/geomancy/houses.json";
+import geomanticHouseRows from "../dist/geomancy/houses.json";
 
 import gdGrade from "../dist/gd/grades.json";
 import gdDegree from "../dist/gd/degrees.json";
@@ -48,7 +47,7 @@ import fourWorlds from "../dist/kabbalah/fourWorlds.json";
 import godName from "../dist/kabbalah/godNames.json";
 import kerub from "../dist/kabbalah/kerubim.json";
 import sephirah from "../dist/kabbalah/sephirot.json";
-import tolPath from "../dist/kabbalah/paths.json";
+import treeOfLifePath from "../dist/kabbalah/paths.json";
 import soul from "../dist/kabbalah/souls.json";
 import tribeOfIsrael from "../dist/kabbalah/tribesOfIsrael.json";
 
@@ -68,7 +67,7 @@ const barrel = {
   // ASTROLOGY
   planet,
   zodiac,
-  house,
+  astrologicalHouse,
 
   hebrewLetter,
 
@@ -77,7 +76,7 @@ const barrel = {
 
   // GEOMANCY
   tetragram: tetragramRows,
-  geomanicHouse: geomanicHouseRows,
+  geomanticHouse: geomanticHouseRows,
 
   // GOLDEN DAWN
   gdGrade,
@@ -90,7 +89,7 @@ const barrel = {
   godName,
   kerub,
   sephirah,
-  tolPath,
+  treeOfLifePath,
   soul,
   tribeOfIsrael,
 
@@ -116,5 +115,3 @@ const barrel = {
 const data = assemble(barrel);
 
 export default data;
-
-export const { geomanicHouse, tetragram } = data;

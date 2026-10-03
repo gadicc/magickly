@@ -48,9 +48,11 @@ describe("component image registry", () => {
     // Chayot HaKodesh, Adonai HaAretz. The Tree can draw all three.
     // 2b895fc2… until the rule took in the other prefixes and Netzach's god
     // name lost its stray hyphen: YHVH Eloah VeDa'at, YHVH Tzvaot.
+    // 30011c0c… until the paths' table was renamed treeOfLifePath (plan 052):
+    // the table's name is part of the hashed text; no byte moved.
     [
       "tree-of-life",
-      "30011c0c38449bc12018b9b4edce68e5727758261d4d43ad9a825137235961ca",
+      "8db079d7e1413ea4b2fc522efc5af9f630f6376e4e5f07528501d42824d42051",
     ],
     [
       "astro-geomancy-chart",

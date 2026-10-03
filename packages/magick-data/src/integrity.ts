@@ -184,7 +184,7 @@ function checkPathEnds(paths: unknown, sephirot: unknown): Failure[] {
     if (id !== spelled)
       failures.push({
         check: "ends",
-        where: `tolPath.${id}`,
+        where: `treeOfLifePath.${id}`,
         detail: `names ${row.fromId} and ${row.toId}, which spell ${spelled}`,
       });
   }
@@ -350,8 +350,8 @@ export function checkIntegrity(
     // An `external` field is exempt only where it is not id-shaped, which is
     // how the two polymorphic Enochian ones ("planet/element", "tarot") are
     // parked. An id-shaped one must still be in the data, so that a typo in
-    // `tolPath.external["hermetic.tarotId"]` fails here rather than sitting
-    // in the graph naming nothing.
+    // `treeOfLifePath.external["hermetic.tarotId"]` fails here rather than
+    // sitting in the graph naming nothing.
     const external = Object.keys(spec.external ?? {});
     for (const field of declared)
       if (
@@ -403,7 +403,7 @@ export function checkIntegrity(
   }
 
   failures.push(...checkPlanetIds(input.planet));
-  failures.push(...checkPathEnds(input.tolPath, input.sephirah));
+  failures.push(...checkPathEnds(input.treeOfLifePath, input.sephirah));
 
   // The sources as text, which is the only place a repeated key is visible:
   // JSON5 keeps the last of them, so everything downstream sees one.

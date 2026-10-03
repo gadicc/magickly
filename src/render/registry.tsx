@@ -64,7 +64,7 @@ const TREE_INPUTS: DataInputsSpec = [
     ],
   },
   {
-    table: "tolPath",
+    table: "treeOfLifePath",
     rows: TREE_PATHS,
     fields: [
       "id",

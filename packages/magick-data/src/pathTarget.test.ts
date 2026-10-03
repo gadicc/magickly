@@ -31,18 +31,22 @@ describe("pathTarget", () => {
   });
 
   it("hops through a link declared inside a nested block", () => {
-    expect(pathTarget("tolPath", "hermetic.hebrewLetter.letter.he")).toEqual({
+    expect(
+      pathTarget("treeOfLifePath", "hermetic.hebrewLetter.letter.he"),
+    ).toEqual({
       table: "hebrewLetter",
       field: "letter.he",
       many: false,
     });
-    expect(pathTarget("tolPath", "hebrew.hebrewLetter.letter.name")).toEqual({
+    expect(
+      pathTarget("treeOfLifePath", "hebrew.hebrewLetter.letter.name"),
+    ).toEqual({
       table: "hebrewLetter",
       field: "letter.name",
       many: false,
     });
     // The block is a field of the row; the accessor is only inside it.
-    expect(pathTarget("tolPath", "hebrewLetter")).toBeUndefined();
+    expect(pathTarget("treeOfLifePath", "hebrewLetter")).toBeUndefined();
   });
 
   it("ends on the row where the path is a link", () => {
@@ -155,12 +159,14 @@ describe("pathTarget", () => {
 
   it("walks a table the data holds as an array", () => {
     // The astrology houses are rows in a list, and link to a sign all the same.
-    expect(pathTarget("house", "zodiac.symbol")).toEqual({
+    expect(pathTarget("astrologicalHouse", "zodiac.symbol")).toEqual({
       table: "zodiac",
       field: "symbol",
       many: false,
     });
-    expect(pathTarget("house", "motto")?.table).toBe("house");
+    expect(pathTarget("astrologicalHouse", "motto")?.table).toBe(
+      "astrologicalHouse",
+    );
   });
 
   it("follows a derived back-link", () => {
@@ -195,7 +201,7 @@ describe("pathTarget", () => {
     // `orderId` is an enum and `hermetic.tarotId` is external; both are read
     // as fields, and neither makes an accessor.
     expect(pathTarget("gdGrade", "orderId")?.table).toBe("gdGrade");
-    expect(pathTarget("tolPath", "hermetic.tarotId")?.field).toBe(
+    expect(pathTarget("treeOfLifePath", "hermetic.tarotId")?.field).toBe(
       "hermetic.tarotId",
     );
   });

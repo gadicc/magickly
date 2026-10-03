@@ -17,15 +17,15 @@ import {
   TableRow,
 } from "@mui/material";
 import Typography from "@mui/material/Typography";
-import data, {
-  tetragram as _tetragrams,
-  geomanicHouse as houses,
-} from "magick-data";
+import data from "magick-data";
 import { PlanetId } from "magick-data/astrology/planets";
 import React from "react";
 import PlanetarySpirit from "@/components/astrology/planetarySpirits";
 import { capitalizeFirstLetter } from "@/lib/utils";
 import Tetragram from "../Tetragram";
+
+const _tetragrams = data.tetragram;
+const houses = data.geomanticHouse;
 
 /*
 function id2title(str: string) {

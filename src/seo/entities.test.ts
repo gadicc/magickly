@@ -137,7 +137,7 @@ describe("entity pages", () => {
 
   it("lists one page per row with unique, sized copy", () => {
     const pages = entityPages();
-    const routes = ["planet", "gdGrade", "sephirah", "tolPath"] as const;
+    const routes = ["planet", "gdGrade", "sephirah", "treeOfLifePath"] as const;
     expect(pages).toHaveLength(
       routes.reduce((sum, kind) => sum + entityIds(kind).length, 0) +
         ANGEL_COUNT,
@@ -159,6 +159,6 @@ describe("entity pages", () => {
   it("exposes static params by data set", () => {
     expect(entityIds("gdGrade")).toContainEqual({ id: "portal" });
     expect(entityIds("sephirah")).toHaveLength(11);
-    expect(entityIds("tolPath")).toHaveLength(24);
+    expect(entityIds("treeOfLifePath")).toHaveLength(24);
   });
 });

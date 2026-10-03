@@ -111,7 +111,7 @@ export function sephirahPage(id: string): EntityPage | null {
 
 /** `/kabbalah/path/<from>_<to>`; two paths exist only on the Hebrew tree. */
 export function pathPage(id: string): EntityPage | null {
-  const path = rowOf(Data.tolPath, id);
+  const path = rowOf(Data.treeOfLifePath, id);
   if (!path) return null;
   const from = path.from.name.roman;
   const to = path.to.name.roman;
@@ -145,14 +145,14 @@ export function entityPages(): EntityPage[] {
     ...Object.keys(Data.planet).map(planetPage),
     ...Object.keys(Data.gdGrade).map(gradePage),
     ...Object.keys(Data.sephirah).map(sephirahPage),
-    ...Object.keys(Data.tolPath).map(pathPage),
+    ...Object.keys(Data.treeOfLifePath).map(pathPage),
     ...angelSlugs().map(angelPage),
   ].filter((page): page is EntityPage => page !== null);
 }
 
 /** Static params for a dynamic entity route. */
 export function entityIds(
-  kind: "planet" | "gdGrade" | "sephirah" | "tolPath",
+  kind: "planet" | "gdGrade" | "sephirah" | "treeOfLifePath",
 ): { id: string }[] {
   return Object.keys(Data[kind]).map((id) => ({ id }));
 }

@@ -9,7 +9,7 @@ import Path from "./Path";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return entityIds("tolPath");
+  return entityIds("treeOfLifePath");
 }
 
 export async function generateMetadata({
@@ -26,7 +26,7 @@ export default async function PathPage({
   const { id } = await params;
   // The body is a Server Component and takes the row itself, so the barrel
   // stays on the server and the browser gets what it renders (plan 036).
-  const path = rowOf(Data.tolPath, id);
+  const path = rowOf(Data.treeOfLifePath, id);
   if (!path) notFound();
   return <Path path={path} />;
 }

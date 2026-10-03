@@ -1,5 +1,5 @@
 import Link from "@magick-components/Link";
-import type { SephirahRow, TolPathRow } from "magick-data/rows";
+import type { SephirahRow, TreeOfLifePathRow } from "magick-data/rows";
 import Chakras from "@/components/chakras/Chakras";
 import {
   EntityFrame,
@@ -105,7 +105,13 @@ function Swatch({
  * One path from this sphere: its Hermetic number, the letter it carries on
  * the tree it is drawn on, the sphere at its other end, and its trump.
  */
-function PathItem({ path, from }: { path: TolPathRow; from: SephirahRow }) {
+function PathItem({
+  path,
+  from,
+}: {
+  path: TreeOfLifePathRow;
+  from: SephirahRow;
+}) {
   const other = path.fromId === from.id ? path.to : path.from;
   const hermetic = path.hermetic;
   const letter = (hermetic ?? path.hebrew)?.hebrewLetter?.letter;

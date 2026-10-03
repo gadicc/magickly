@@ -40,7 +40,7 @@ export const graph = {
       tribeOfIsraelId: { to: "tribeOfIsrael" },
     },
   },
-  house: {
+  astrologicalHouse: {
     links: { zodiacId: { to: "zodiac" } },
   },
 
@@ -72,7 +72,7 @@ export const graph = {
     },
     pending: { rulerIds: "spirit" },
   },
-  geomanicHouse: {},
+  geomanticHouse: {},
 
   // GOLDEN DAWN
   gdGrade: {
@@ -128,7 +128,7 @@ export const graph = {
       scentIds: { to: "scent", many: true },
     },
   },
-  tolPath: {
+  treeOfLifePath: {
     links: {
       // Singular, so the check proves one path per letter on each tree: the
       // twenty-two letters are dealt to the paths once in each attribution.
@@ -141,8 +141,8 @@ export const graph = {
       // the integrity check holds the id to. One pair serves both trees.
       fromId: { to: "sephirah", inverse: "pathsFrom", inverseMany: true },
       toId: { to: "sephirah", inverse: "pathsTo", inverseMany: true },
-      nextId: { to: "tolPath", mirrors: "prevId" },
-      prevId: { to: "tolPath", mirrors: "nextId" },
+      nextId: { to: "treeOfLifePath", mirrors: "prevId" },
+      prevId: { to: "treeOfLifePath", mirrors: "nextId" },
     },
     // The trump by rank; the deck is its own package.
     external: { "hermetic.tarotId": "tarot-deck" },

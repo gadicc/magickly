@@ -4,7 +4,7 @@ import { svgCoordinate } from "../svgCoordinate";
 import { FIELD_PATH_LIST_SEPARATOR, readFieldPath } from "./fieldPath";
 
 const _sephirot = Object.values(Data.sephirah);
-const _paths = Data.tolPath;
+const _paths = Data.treeOfLifePath;
 
 // Draw order, which paths are "on top" of which, for clarity
 // prettier-ignore

@@ -23,7 +23,7 @@ import type { Row } from "./types";
 // ASTROLOGY
 export interface PlanetRow extends Row<"*", "planet"> {}
 export interface ZodiacRow extends Row<"*", "zodiac"> {}
-export interface HouseRow extends Row<"*", "house"> {}
+export interface AstrologicalHouseRow extends Row<"*", "astrologicalHouse"> {}
 
 export interface HebrewLetterRow extends Row<"*", "hebrewLetter"> {}
 
@@ -33,7 +33,7 @@ export interface EnochianTabletRow extends Row<"*", "enochianTablet"> {}
 
 // GEOMANCY
 export interface TetragramRow extends Row<"*", "tetragram"> {}
-export interface GeomanicHouseRow extends Row<"*", "geomanicHouse"> {}
+export interface GeomanticHouseRow extends Row<"*", "geomanticHouse"> {}
 
 // GOLDEN DAWN
 export interface GDGradeRow extends Row<"*", "gdGrade"> {}
@@ -47,7 +47,7 @@ export interface FourWorldsRow extends Row<"*", "fourWorlds"> {}
 export interface GodNameRow extends Row<"*", "godName"> {}
 export interface KerubRow extends Row<"*", "kerub"> {}
 export interface SephirahRow extends Row<"*", "sephirah"> {}
-export interface TolPathRow extends Row<"*", "tolPath"> {}
+export interface TreeOfLifePathRow extends Row<"*", "treeOfLifePath"> {}
 export interface SoulRow extends Row<"*", "soul"> {}
 export interface TribeOfIsraelRow extends Row<"*", "tribeOfIsrael"> {}
 export interface SeventyTwoAngelRow extends Row<"*", "seventyTwoAngel"> {}
@@ -75,7 +75,7 @@ export interface ElementalRow extends Row<"*", "elemental"> {}
 export interface NamedRows {
   planet: PlanetRow;
   zodiac: ZodiacRow;
-  house: HouseRow;
+  astrologicalHouse: AstrologicalHouseRow;
 
   hebrewLetter: HebrewLetterRow;
 
@@ -83,7 +83,7 @@ export interface NamedRows {
   enochianTablet: EnochianTabletRow;
 
   tetragram: TetragramRow;
-  geomanicHouse: GeomanicHouseRow;
+  geomanticHouse: GeomanticHouseRow;
 
   gdGrade: GDGradeRow;
   gdDegree: GDDegreeRow;
@@ -95,7 +95,7 @@ export interface NamedRows {
   godName: GodNameRow;
   kerub: KerubRow;
   sephirah: SephirahRow;
-  tolPath: TolPathRow;
+  treeOfLifePath: TreeOfLifePathRow;
   soul: SoulRow;
   tribeOfIsrael: TribeOfIsraelRow;
   seventyTwoAngel: SeventyTwoAngelRow;

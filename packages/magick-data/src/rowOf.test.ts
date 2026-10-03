@@ -5,7 +5,7 @@ import { rowOf } from "./rowOf";
 describe("rowOf", () => {
   it("returns the row an id names", () => {
     expect(rowOf(data.sephirah, "keter")).toBe(data.sephirah.keter);
-    expect(rowOf(data.tolPath, "1_2")?.id).toBe("1_2");
+    expect(rowOf(data.treeOfLifePath, "1_2")?.id).toBe("1_2");
   });
 
   it("returns undefined for an id the table does not have", () => {

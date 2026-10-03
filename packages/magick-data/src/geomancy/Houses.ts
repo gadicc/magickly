@@ -8,7 +8,7 @@ type HouseId = keyof typeof rows;
  * A row, which may carry the links `assemble()` makes: the barrel's rows have
  * them and a bare import's do not, and both are read through this type.
  */
-type House = Raw<"geomanicHouse"> & Partial<Links<"*", "geomanicHouse">>;
+type House = Raw<"geomanticHouse"> & Partial<Links<"*", "geomanticHouse">>;
 
 /** Every house, by number. */
 type Houses = Record<HouseId, House>;

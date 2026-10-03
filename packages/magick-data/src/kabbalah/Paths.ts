@@ -8,7 +8,7 @@ type PathId = keyof typeof rows;
  * A row, which may carry the links `assemble()` makes: the barrel's rows have
  * them and a bare import's do not, and both are read through this type.
  */
-type Path = Raw<"tolPath"> & Partial<Links<"*", "tolPath">>;
+type Path = Raw<"treeOfLifePath"> & Partial<Links<"*", "treeOfLifePath">>;
 
 /** Every path, by key. */
 type Paths = Record<PathId, Path>;

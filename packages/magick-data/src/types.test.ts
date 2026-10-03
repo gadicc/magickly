@@ -11,7 +11,7 @@ import type {
   SephirahRow,
   StoneRow,
   TetragramRow,
-  TolPathRow,
+  TreeOfLifePathRow,
   ZodiacRow,
 } from "./rows";
 import { tables } from "./tables";
@@ -58,10 +58,10 @@ describe("the row types", () => {
     expect(planets).toEqual(["venus", "jupiter"]);
 
     const nested: string | undefined =
-      data.tolPath["1_2"].hermetic?.hebrewLetter?.letter.name;
+      data.treeOfLifePath["1_2"].hermetic?.hebrewLetter?.letter.name;
     expect(nested).toBe("Aleph");
 
-    const house: string = data.house[0].zodiac.name.en;
+    const house: string = data.astrologicalHouse[0].zodiac.name.en;
     expect(house).toBe("Aries");
   });
 
@@ -117,8 +117,8 @@ describe("the row types", () => {
       Same<typeof sol.gdGrade, GDGradeRow | undefined>,
       Same<typeof sol.alchemySymbol, AlchemySymbolRow | undefined>,
       Same<typeof resh.planet, PlanetRow | undefined>,
-      Same<typeof resh.hermeticPath, TolPathRow | undefined>,
-      Same<typeof resh.hebrewPath, TolPathRow | undefined>,
+      Same<typeof resh.hermeticPath, TreeOfLifePathRow | undefined>,
+      Same<typeof resh.hebrewPath, TreeOfLifePathRow | undefined>,
     ] = [true, true, true, true, true, true, true];
     expect(exact).not.toContain(false);
 
@@ -134,13 +134,13 @@ describe("the row types", () => {
   it("names a path's two sephirot, and each sephirah's paths", () => {
     // Every one of the twenty-four paths carries both ends, so neither
     // accessor is optional; Da'at, on no path, has two empty lists.
-    const path = data.tolPath["1_6"];
+    const path = data.treeOfLifePath["1_6"];
     const tiferet = data.sephirah.tiferet;
     const exact: [
       Same<typeof path.from, SephirahRow>,
       Same<typeof path.to, SephirahRow>,
-      Same<typeof tiferet.pathsFrom, readonly TolPathRow[]>,
-      Same<typeof tiferet.pathsTo, readonly TolPathRow[]>,
+      Same<typeof tiferet.pathsFrom, readonly TreeOfLifePathRow[]>,
+      Same<typeof tiferet.pathsTo, readonly TreeOfLifePathRow[]>,
     ] = [true, true, true, true];
     expect(exact).not.toContain(false);
 
@@ -210,7 +210,7 @@ describe("the row types", () => {
     });
     frozen(() => {
       // @ts-expect-error a row of an array table
-      data.house[0] = data.house[1];
+      data.astrologicalHouse[0] = data.astrologicalHouse[1];
     });
     frozen(() => {
       // @ts-expect-error and a whole table
@@ -236,7 +236,7 @@ describe("the row types", () => {
     // @ts-expect-error nor is an enum
     expect(data.gdGrade["0=0"].order).toBeUndefined();
     // @ts-expect-error nor is something external
-    expect(data.tolPath["1_2"].hermetic?.tarot).toBeUndefined();
+    expect(data.treeOfLifePath["1_2"].hermetic?.tarot).toBeUndefined();
   });
 
   it("knows a list from a row, and an absent link from a certain one", () => {

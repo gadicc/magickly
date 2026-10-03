@@ -1,4 +1,6 @@
-import { tetragram as tetragrams } from "magick-data";
+import data from "magick-data";
+
+const tetragrams = data.tetragram;
 
 function Tetragram({
   id,

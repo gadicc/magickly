@@ -18,18 +18,18 @@ import data from "./data";
  * rather than only of the rows that carried the id: `planet.hebrewLetter`,
  * `godName` and `archangel`; `gdGrade.element`, `planet` and `sephirah`;
  * `archangel.sephirah`; `alchemySymbol.planet`; and `hebrewLetter` inside
- * `tolPath`'s `hermetic` and `hebrew` blocks. What is genuinely new is:
+ * `treeOfLifePath`'s `hermetic` and `hebrew` blocks. What is genuinely new is:
  *
  * - `planet.sephirot`, `element.tetragrams` and `element.zodiacs`, derived
  *   back-links nobody hand-maintains.
  * - `zodiac.tribeOfIsrael`, typed since 2023 and never made: the tribes were
  *   not in the barrel.
- * - `house.zodiac`: the astrology houses are an array, which `insertRefs`
- *   skipped entirely.
+ * - `astrologicalHouse.zodiac`: the astrology houses are an array, which
+ *   `insertRefs` skipped entirely.
  * - `tetragram.planets`, a list of ids, which the `Id` rule could not see.
  * - `gdGrade.degree`, because `gd/degrees.json5` is a table now.
- * - `next` and `prev` on `gdGrade`, `sephirah` and `tolPath`: a field naming
- *   its own table is invisible to a rule that reads field names.
+ * - `next` and `prev` on `gdGrade`, `sephirah` and `treeOfLifePath`: a field
+ *   naming its own table is invisible to a rule that reads field names.
  *
  * Nothing is lost, and every accessor is on every row of its table, holding
  * `undefined` where the row has no id: Keter's `prev` below is the first of
@@ -91,7 +91,7 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "tribeOfIsrael",
     ],
   },
-  house: {
+  astrologicalHouse: {
     row: "0",
     keys: ["index", "zodiacId", "motto", "name", "interpretation", "zodiac"],
   },
@@ -139,7 +139,7 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "planets",
     ],
   },
-  geomanicHouse: { row: "1", keys: ["id", "meaning"] },
+  geomanticHouse: { row: "1", keys: ["id", "meaning"] },
   gdGrade: {
     row: "0=0",
     keys: [
@@ -206,7 +206,7 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "pathsTo",
     ],
   },
-  tolPath: {
+  treeOfLifePath: {
     row: "1_2",
     keys: [
       "id",
@@ -326,13 +326,13 @@ describe("data barrel", () => {
   });
 
   it("puts a nested accessor at the nesting level of its id", () => {
-    expect(Object.keys(data.tolPath["1_2"].hermetic ?? {})).toEqual([
+    expect(Object.keys(data.treeOfLifePath["1_2"].hermetic ?? {})).toEqual([
       "hebrewLetterId",
       "pathNo",
       "tarotId",
       "hebrewLetter",
     ]);
-    expect(Object.keys(data.tolPath["1_2"].hebrew ?? {})).toEqual([
+    expect(Object.keys(data.treeOfLifePath["1_2"].hebrew ?? {})).toEqual([
       "hebrewLetterId",
       "hebrewLetter",
     ]);

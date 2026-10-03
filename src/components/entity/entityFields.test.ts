@@ -65,7 +65,7 @@ const repeated = (list: readonly string[]) =>
 
 describe("the key walk", () => {
   it("steps into a block, onto its nested accessors, and not into a link", () => {
-    const paths = keysOf("tolPath");
+    const paths = keysOf("treeOfLifePath");
     expect(paths).toContain("hermetic.tarotId");
     expect(paths).toContain("hermetic.hebrewLetter");
     expect(paths).toContain("next");

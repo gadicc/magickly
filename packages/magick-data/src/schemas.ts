@@ -121,12 +121,12 @@ export const schemas = {
     tetragrammatonPermutation: v.string(),
     ...ids("zodiac"),
   }),
-  house: v.strictObject({
+  astrologicalHouse: v.strictObject({
     index: v.number(),
     motto: v.strictObject({ la: v.string(), en: v.string() }),
     name: en,
     interpretation: en,
-    ...ids("house"),
+    ...ids("astrologicalHouse"),
   }),
 
   hebrewLetter: v.strictObject({
@@ -168,10 +168,10 @@ export const schemas = {
     meanings: v.strictObject(byHouse(en)),
     ...ids("tetragram", [], ["zodiacId"]),
   }),
-  geomanicHouse: v.strictObject({
+  geomanticHouse: v.strictObject({
     id: v.number(),
     meaning: en,
-    ...ids("geomanicHouse"),
+    ...ids("geomanticHouse"),
   }),
 
   gdGrade: v.strictObject({
@@ -285,7 +285,7 @@ export const schemas = {
       ["soulId"],
     ),
   }),
-  tolPath: v.strictObject({
+  treeOfLifePath: v.strictObject({
     id: v.string(),
     /** Two paths of the Hebrew tree are not on the Hermetic one. */
     hermetic: v.optional(
@@ -296,7 +296,7 @@ export const schemas = {
       }),
     ),
     hebrew: v.optional(v.strictObject({ hebrewLetterId: v.string() })),
-    ...ids("tolPath", ["nextId", "prevId"]),
+    ...ids("treeOfLifePath", ["nextId", "prevId"]),
   }),
   soul: v.strictObject({
     id: v.string(),

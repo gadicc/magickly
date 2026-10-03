@@ -88,7 +88,7 @@ describe("public field paths", () => {
     // No document names one today; both values the contract allows resolve.
     expect(letters).toEqual([]);
     expect(
-      unresolved("tolPath", [
+      unresolved("treeOfLifePath", [
         "hermetic.hebrewLetter.letter.he",
         "hebrew.hebrewLetter.letter.he",
       ]),

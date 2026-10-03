@@ -81,9 +81,13 @@ describe("assemble", () => {
   it("puts a nested accessor beside its id, and none where the block is absent", () => {
     // Real paths: two of the twenty-four are on the Hebrew tree only.
     const data = assemble(tables);
-    expect(data.tolPath["1_2"].hermetic?.hebrewLetter?.letter.he).toBe("א");
-    expect(data.tolPath["2_5"].hermetic).toBeUndefined();
-    expect(data.tolPath["2_5"].hebrew?.hebrewLetter?.letter.name).toBe("Zayin");
+    expect(data.treeOfLifePath["1_2"].hermetic?.hebrewLetter?.letter.he).toBe(
+      "א",
+    );
+    expect(data.treeOfLifePath["2_5"].hermetic).toBeUndefined();
+    expect(data.treeOfLifePath["2_5"].hebrew?.hebrewLetter?.letter.name).toBe(
+      "Zayin",
+    );
   });
 
   it("reports a mirror that does not point back", () => {
@@ -164,15 +168,15 @@ describe("assemble", () => {
 
   it("keys an array table by its rows' ids, or by their index where they have none", () => {
     const data = assemble(tables);
-    expect(data.house[0].zodiac?.id).toBe("aries");
+    expect(data.astrologicalHouse[0].zodiac?.id).toBe("aries");
     expect(data.christianChoir[0].id).toBe("seraphim");
     expect(data.seventyTwoAngel[0].no).toBe(1);
     const linked = fake({
-      house: [{ index: 1, zodiacId: "aries" }],
+      astrologicalHouse: [{ index: 1, zodiacId: "aries" }],
       zodiac: { aries: { id: "aries" } },
       christianChoir: [{ id: "seraphim" }],
     });
-    expect((linked.house[0].zodiac as Fake).id).toBe("aries");
+    expect((linked.astrologicalHouse[0].zodiac as Fake).id).toBe("aries");
   });
 
   it("clones a row that refers to itself", () => {

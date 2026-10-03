@@ -1,5 +1,5 @@
 import Link from "@magick-components/Link";
-import type { HebrewLetterRow, TolPathRow } from "magick-data/rows";
+import type { HebrewLetterRow, TreeOfLifePathRow } from "magick-data/rows";
 import Image from "next/image";
 import {
   EntityFrame,
@@ -32,14 +32,14 @@ import styles from "./path.module.css";
  * Keter – Tiferet" with the Hermetic number, or "Path Chochmah – Gevurah" for
  * the two the Hermetic tree does not number.
  */
-function headingOf(path: TolPathRow) {
+function headingOf(path: TreeOfLifePathRow) {
   const pair = `${path.from.name.roman} – ${path.to.name.roman}`;
   return path.hermetic
     ? `Path ${path.hermetic.pathNo}: ${pair}`
     : `Path ${pair}`;
 }
 
-function neighbour(path: TolPathRow | undefined): Neighbour | undefined {
+function neighbour(path: TreeOfLifePathRow | undefined): Neighbour | undefined {
   return path && { href: `/kabbalah/path/${path.id}`, label: headingOf(path) };
 }
 
@@ -62,7 +62,7 @@ function Letter({ letter }: { letter: HebrewLetterRow }) {
 }
 
 /** The page body. Synchronous, so that `renderToString` can render it. */
-export default function Path({ path }: { path: TolPathRow }) {
+export default function Path({ path }: { path: TreeOfLifePathRow }) {
   const { hermetic, hebrew } = path;
   // Named as the Rider–Waite card beside it prints it.
   const trump = hermetic && RWSName(hermetic.tarotId);

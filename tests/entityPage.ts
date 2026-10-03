@@ -71,7 +71,7 @@ const ROUTES = new Set<string>([
   ...Object.keys(Data.planet).map((id) => `/astrology/planet/${id}`),
   ...Object.keys(Data.gdGrade).map((id) => `/gd/grade/${id}`),
   ...Object.keys(Data.sephirah).map((id) => `/kabbalah/sephirah/${id}`),
-  ...Object.keys(Data.tolPath).map((id) => `/kabbalah/path/${id}`),
+  ...Object.keys(Data.treeOfLifePath).map((id) => `/kabbalah/path/${id}`),
   ...angelSlugs().map((slug) => `/kabbalah/angel/${slug}`),
   ...Object.keys(publicRitualQueryKeys).map((id) => `/doc/${id}`),
   // What the book's route generates its params from.

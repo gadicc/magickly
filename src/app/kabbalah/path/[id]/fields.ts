@@ -2,7 +2,7 @@ import type { EntityFields } from "@/components/entity/fields";
 
 /** The path page's row, as [Path.tsx](./Path.tsx) lays it out. */
 export const fields: EntityFields = {
-  table: "tolPath",
+  table: "treeOfLifePath",
   shown: [
     // The path the Tree lights; the pair it spells is read through the links.
     "id",

@@ -49,10 +49,10 @@ function sources(dir: string, prefix = ""): string[] {
 /**
  * The sources the graph covers, read from what `tables.ts` imports.
  *
- * By path and not by name: the table called `sephirah` is `sephirot.json5` and
- * `tolPath` is `paths.json5`, so matching a table's name against a file's name
- * reports seven covered tables as uncovered, which is how the first attempt at
- * this went.
+ * By path and not by name: the table called `sephirah` is `sephirot.json5`
+ * and `treeOfLifePath` is `paths.json5`, so matching a table's name against a
+ * file's name reports seven covered tables as uncovered, which is how the
+ * first attempt at this went.
  */
 function covered(dir: string) {
   const source = readFileSync(path.join(dir, "tables.ts"), "utf8");
