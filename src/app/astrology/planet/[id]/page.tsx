@@ -1,5 +1,5 @@
-import data from "@magick-data/data";
-import { rowOf } from "@magick-data/rowOf";
+import data from "magick-data";
+import { rowOf } from "magick-data/rowOf";
 import { notFound } from "next/navigation";
 import { entityIds, planetPage } from "@/seo/entities";
 import { seoMetadata } from "@/seo/metadata";

@@ -1,6 +1,6 @@
+import Data from "magick-data";
+import { ANGEL_COUNT } from "magick-data/kabbalah/seventyTwoAngels/derived";
 import { describe, expect, it } from "vitest";
-import Data from "@/../data/data";
-import { ANGEL_COUNT } from "@/../data/kabbalah/seventyTwoAngelsDerived";
 import {
   entityIds,
   entityPages,

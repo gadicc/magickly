@@ -10,7 +10,6 @@
     "incremental": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@magick-data/*": ["./data/*"],
       "@magick-components/*": ["./src/components/*"]
     },
     "types": ["@serwist/next/typings"],

@@ -5,6 +5,10 @@ Assessment, adversarial review, type spike and decisions, 17–19 September
 landed ([Commits](#commits)), 3c with them; step 4 is not yet implemented.
 The long-term goal is to publish `data/` as its own npm package.
 
+Since [plan 052](052-data-package.md) the layer lives in
+`packages/magick-data/` as the `magick-data` package; links point there, and
+the prose describes it as it was.
+
 Decision taken on 19 September: keep the data as plain JSON tables, describe
 every relation in one declared graph, and materialise links with an eager,
 scoped, non-mutating `assemble()` whose types make an unlinked table a compile
@@ -14,7 +18,7 @@ error. `view()` (lazy getters) is deferred ([below](#deferred)).
 
 `data/` holds ~25 hand-edited JSON5 datasets (668 KB, of which 394 KB is the
 Enochian dictionary), each with a hand-written TypeScript wrapper that casts
-the JSON5 (`_sephirot as Sephirot`). [data/data.ts](../data/data.ts) imports
+the JSON5 (`_sephirot as Sephirot`). [data/data.ts](../packages/magick-data/src/data.ts) imports
 21 of them and, at module load, mutates every row in place: for each key ending
 in `Id`, if a table of that name exists in the barrel, it assigns the linked
 row. It recurses into nested objects, skips top-level arrays, and sets
@@ -206,7 +210,7 @@ recorded here rather than argued again:
     20 September); it ships the JSON, `graph.json`, the `assemble()` runtime
     and the types, with the dictionary as an entry point of its own, and
     starts at 0.x. The data is CC BY 4.0
-    ([data/LICENSE.txt](../data/LICENSE.txt)); the app stays AGPL.
+    ([data/LICENSE.txt](../packages/magick-data/LICENSE.txt)); the app stays AGPL.
 
 ## The graph
 
@@ -433,7 +437,7 @@ final tree. Commit footers name every model that worked on the change.
    `data/dist/*.json`, `graph.json` and the id-union `.d.ts` (gitignored; the
    `dev`, `typecheck`, `test` and `build` tasks run it first). `graph.ts`,
    `types.ts` and `assemble.ts` come in from the spike. The integrity check
-   lands here. [data/data.ts](../data/data.ts) becomes
+   lands here. [data/data.ts](../packages/magick-data/src/data.ts) becomes
    `assemble(allTables)` with the same table keys, so the nineteen importers
    compile unchanged; the mutation and `window.magickData` go. The step-0
    `Object.keys` snapshot must show only the expected delta (links now
@@ -818,7 +822,7 @@ the same joins.
 #### What the barrel's rows gained
 
 The step-0 `Object.keys` snapshot moved deliberately, and
-[barrel.keys.test.ts](../data/barrel.keys.test.ts) carries the same list. Two
+[barrel.keys.test.ts](../packages/magick-data/src/barrel.keys.test.ts) carries the same list. Two
 tables are new, `gdDegree` and `tribeOfIsrael`, both of them link targets the
 barrel never held; the barrel is 23 of the 26, for the reason
 [below](#the-three-tables-the-barrel-does-not-hold).
@@ -865,7 +869,7 @@ barrel. `591e8e6` leaves them out; `gdDegree` and `tribeOfIsrael` stay,
 because they are link targets.
 
 The barrel imports its 23 tables itself rather than taking them from
-[tables.ts](../data/tables.ts), and never reaches that module at runtime.
+[tables.ts](../packages/magick-data/src/tables.ts), and never reaches that module at runtime.
 `const { seventyTwoAngel, ...linked } = tables` was tried and measured first
 and changed nothing: a module brings every JSON it imports into every bundle
 that reaches it, whether or not the value is used, and the repository declares
@@ -938,7 +942,7 @@ where `main` had it.
   candlestick, the decades of the 72 angels, and
   `scripts/seventyTwoAngels/validate.ts`, whose `Record<PlanetId, string[]>`
   names exactly those twelve. `PlanetKey` is every row. The twelve are written
-  out in [integrity.test.ts](../data/integrity.test.ts) and asserted against
+  out in [integrity.test.ts](../packages/magick-data/src/integrity.test.ts) and asserted against
   the table, so the derivation cannot quietly pick up a thirteenth; making the
   criterion explicit was a follow-up, and is step 3a's `kind`
   ([below](#kind-is-data-the-types-cannot-read)).
@@ -1014,15 +1018,15 @@ identity takes is 3b's ([decision 15](#decided-on-20-september)).
 
 `interface SephirahRow extends Row<"*", "sephirah"> {}` is legal — the
 instantiated mapped type has statically known members, so there is no TS2312 —
-and [types.ts](../data/types.ts) resolves a row through
-[rows.ts](../data/rows.ts)'s map, so the links inside a row are named too.
+and [types.ts](../packages/magick-data/src/types.ts) resolves a row through
+[rows.ts](../packages/magick-data/src/rows.ts)'s map, so the links inside a row are named too.
 
 Which rows those are is the part that had to be got right. The barrel is not a
 full `assemble()`: it holds 23 of the 26 tables
 ([above](#the-three-tables-the-barrel-does-not-hold)), so a rule that named
 rows only where the scope is `"*"` would have named the rows of
 `assemble(tables)`, which nothing but the test suite builds, and left
-[data.ts](../data/data.ts) — the object step 4's package emits a declaration
+[data.ts](../packages/magick-data/src/data.ts) — the object step 4's package emits a declaration
 for — printing the whole expansion. The rule is instead that a scope is
 *complete* when it holds every table a link names at either end: a table
 outside such a scope declares no link into the scope and derives no back-link
@@ -1045,7 +1049,7 @@ The first two lines are what matters for step 4: a package cannot emit a
 `.d.ts` for the barrel at all without either these interfaces or exporting
 `Simplify`. Because a link declared to one of the three left-out tables would
 narrow the barrel's scope and quietly take the names away again,
-[types.test.ts](../data/types.test.ts) asserts that `data.sephirah.keter` off
+[types.test.ts](../packages/magick-data/src/types.test.ts) asserts that `data.sephirah.keter` off
 the barrel is `SephirahRow` exactly — type equality, not assignability — while
 the scoped `@ts-expect-error`s on the other side keep the mapped-type branch
 live.
@@ -1060,7 +1064,7 @@ alike; that meaning is kept.
 A JSON import widens `"planet"` to `string`, so no literal type survives the
 import and `PlanetId` cannot be an `Extract` over `kind` the way it could be
 over a field of an `as const` TypeScript module. The twelve are therefore
-written out in [Planets.ts](../data/astrology/Planets.ts) —
+written out in [Planets.ts](../packages/magick-data/src/astrology/Planets.ts) —
 `as const satisfies readonly PlanetKey[]`, which checks every member against
 the table's keys — and the other direction, that they are exactly the rows of
 kind `"planet"`, is an integrity check, so `pnpm data:check` and `pnpm build`
@@ -1110,16 +1114,16 @@ new file and renaming it over the old one — `sed -i`, vim, VS Code — is
 invisible to it from the *second* save on. Measured with a scratch script: the
 first save raised three events and every save after it none. One watcher per
 directory, non-recursively, keeps firing, because the directory is what it
-watches; that is what [build.mts](../data/build.mts) does, over the nine
+watches; that is what [build.mts](../packages/magick-data/src/build.ts) does, over the nine
 directories that hold sources. A directory added later is not watched until
 the task restarts, which is one of the two things given up. The other is
 `dist/graph.json`: the watch is over the JSON5 and nothing else, so an edit to
-[graph.ts](../data/graph.ts) leaves that file as the first build wrote it.
+[graph.ts](../packages/magick-data/src/graph.ts) leaves that file as the first build wrote it.
 Nothing under `src/` reads it — it is there for a reader that is not
 TypeScript — and the graph itself reaches the app as a module, which Next
 reloads on its own, so nothing stale is ever served.
 
-`pnpm dev` and `pnpm dev:webpack` run through [dev.mts](../data/dev.mts),
+`pnpm dev` and `pnpm dev:webpack` run through [dev.mts](../scripts/dev.mts),
 which builds the tables, *awaits* that, and only then spawns the watcher and
 `next dev`, stopping both together. `data/dist` is gitignored, so without the
 await a fresh checkout has `next dev` racing the first build: with the
@@ -1433,7 +1437,7 @@ by hand and reads the link instead, and the same bytes mean the same join.
 `data.sephirah[someId]` with a `string` id is `any` under the repository's
 `strict: false`: the fields, the links and their optionality are all erased at
 the one place a dynamic route reaches the data, and an unknown id reads as a
-row rather than as `undefined`. [rowOf.ts](../data/rowOf.ts) is an
+row rather than as `undefined`. [rowOf.ts](../packages/magick-data/src/rowOf.ts) is an
 `Object.hasOwn` lookup returning `Row | undefined`, and decision 9 is closed
 with it.
 
@@ -1450,8 +1454,8 @@ inherited-property hole `Object.hasOwn` is there for.
 
 #### `pathTarget`, and what it covers
 
-[pathTarget.ts](../data/pathTarget.ts) is the static half of decision 8.
-Given a table and a dotted path it walks [the graph](../data/graph.ts) — a
+[pathTarget.ts](../packages/magick-data/src/pathTarget.ts) is the static half of decision 8.
+Given a table and a dotted path it walks [the graph](../packages/magick-data/src/graph.ts) — a
 segment that is a link's accessor is a hop, including one declared inside a
 nested block such as `hermetic.hebrewLetterId`, and a list is walked through
 only by an index, as dot-prop would — and answers the table and field the path
@@ -1486,7 +1490,7 @@ the objects instead. A set whose `question` or `answer` is a function
 code and has no path to check; that is the one gap.
 
 Nothing is rejected today. The negatives are asserted in
-[pathTarget.test.ts](../data/pathTarget.test.ts) instead: an unknown field, a
+[pathTarget.test.ts](../packages/magick-data/src/pathTarget.test.ts) instead: an unknown field, a
 field under a link that has none, an id used where its accessor belongs
 (`godNameId.name`), a list without an index (`planets.symbol`), the accessor
 of a nested link read at the top level (`tolPath.hebrewLetter`), an empty
@@ -1500,7 +1504,7 @@ does not undo an inference that has already happened (decision 1). So it is
 the one source the build emits as a module rather than as JSON:
 `data/dist/enochian/dictionary.mjs`, with `dictionary.d.mts` beside it naming
 `EnochianDictionary` from the hand-written
-[dictionaryEntry.ts](../data/enochian/dictionaryEntry.ts) and nothing else.
+[dictionaryEntry.ts](../packages/magick-data/src/enochian/dictionaryEntry.ts) and nothing else.
 `tsc --listFiles` reads the declaration and never the module, and the whole
 file costs 19 types and 21 instantiations ([below](#cost-2)).
 
@@ -1726,7 +1730,7 @@ E, ESE, IANA, ME, STIMCUL: page citations), ZON's pronunciation carrying a
 note, and entry `I` giving two of its objects — "(name of an angel, sol)"
 and the pronunciation "Ee" — an empty `source`. `8646f0a` gives the
 dictionary a strict valibot schema beside the tables' in
-[schemas.ts](../data/schemas.ts), which `checkDictionary()` parses every
+[schemas.ts](../packages/magick-data/src/schemas.ts), which `checkDictionary()` parses every
 entry with, so that a `schema` failure names the entry and the field as it
 does for a row; the type gains the citation and the note a pronunciation
 may carry, and the test proves the schema and the type say the same thing
@@ -1736,7 +1740,7 @@ sources pass the schema, since a string is what the type asks for, and are
 listed as a follow-up: what they should say is not in the repository.
 
 `c47d6cc` is a comment. The review of the dedupe found
-[build.mts](../data/build.mts) saying tsx compiles a `.ts` here to CJS
+[build.mts](../packages/magick-data/src/build.ts) saying tsx compiles a `.ts` here to CJS
 where neither `import.meta.url` nor top-level await exists; a two-line
 probe run both ways showed the second half true and the first not — tsx
 shims `import.meta.url` into the CJS it emits, which is what

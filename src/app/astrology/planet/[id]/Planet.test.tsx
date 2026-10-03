@@ -1,6 +1,6 @@
+import Data from "magick-data";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import Data from "@/../data/data";
 import {
   expectEntityPage,
   hrefsOf,

@@ -26,7 +26,7 @@ import { readPage } from "./transcribe";
  *   … --out-dir output     where to write, for a partial run
  */
 
-export const DATA_PATH = "data/kabbalah/lenain/pages.json5";
+export const DATA_PATH = "packages/magick-data/src/kabbalah/lenain/pages.json5";
 
 /**
  * Pages 1 to 6 of the PDF are the scan's own front matter — cover, library

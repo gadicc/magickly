@@ -1,11 +1,11 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { notesByPage } from "@/../data/kabbalah/lenain/notes";
+import { notesByPage } from "magick-data/kabbalah/lenain/notes";
 import {
   divisionBySlug,
   divisions,
   leavesOf,
-} from "@/../data/kabbalah/lenain/volume";
+} from "magick-data/kabbalah/lenain/volume";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import JsonLd from "@/seo/JsonLd";
 import { chapterJsonLd, lenainChapterPage } from "@/seo/lenain";
 import { seoMetadata } from "@/seo/metadata";

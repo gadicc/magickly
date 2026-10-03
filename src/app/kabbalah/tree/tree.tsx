@@ -3,9 +3,9 @@
 import Link from "@magick-components/Link";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
+import Data from "magick-data";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
-import Data from "@/../data/data";
 import Tree from "@/components/kabbalah/TreeOfLife";
 import ExportControls from "@/export/ExportControls";
 import { type TreeSettings, treeImageLink, treeSettings } from "./treeSettings";

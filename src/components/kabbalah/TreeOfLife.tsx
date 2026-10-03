@@ -1,6 +1,5 @@
+import Data from "magick-data";
 import React from "react";
-
-import Data from "@/../data/data";
 import { svgCoordinate } from "../svgCoordinate";
 import { FIELD_PATH_LIST_SEPARATOR, readFieldPath } from "./fieldPath";
 

@@ -1,6 +1,6 @@
+import { assemble } from "magick-data/assemble";
+import { tables } from "magick-data/tables";
 import { describe, expect, it } from "vitest";
-import { assemble } from "@/../data/assemble";
-import { tables } from "@/../data/tables";
 import type { EntityFields } from "./fields";
 
 /**
@@ -16,7 +16,7 @@ import type { EntityFields } from "./fields";
  *
  * The rows are the full registry's, assembled, so a table the barrel does
  * not hold (`seventyTwoAngel`) is walked with its accessors like any other.
- * One level deep is what [integrity.ts](../../../data/integrity.ts)'s
+ * One level deep is what [integrity.ts](../../../packages/magick-data/src/integrity.ts)'s
  * `idFields` walks: a field the JSON gives as an object contributes its keys,
  * `color.king`, and the accessors a nested link puts beside them,
  * `hermetic.hebrewLetter`; a link's accessor and an inverse are keys in

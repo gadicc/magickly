@@ -1,4 +1,4 @@
-import planets from "@magick-data/astrology/Planets";
+import planets from "magick-data/astrology/planets";
 import { pageMetadata } from "@/seo/metadata";
 import PlanetaryHours, { type HourPlanet } from "./planetaryHours";
 

@@ -90,6 +90,9 @@ export default async function (phase: string): Promise<NextConfig> {
     // css-tree's ESM data entry uses createRequire(import.meta.url). Keep the
     // package native so its relative data paths remain runtime-relative.
     serverExternalPackages: ["pdf-parse", "@resvg/resvg-wasm", "css-tree"],
+    // The data package's exports are its TypeScript sources, compiled here as
+    // the app's own code is.
+    transpilePackages: ["magick-data"],
     outputFileTracingIncludes: {
       // The legacy alias only renders the Tree, which uses the public base fonts.
       "/api/treeOfLife": ["./public/fonts/*.ttf", resvgWasmTraceFile],

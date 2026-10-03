@@ -1,6 +1,6 @@
+import data from "magick-data";
+import { PlanetId } from "magick-data/astrology/planets";
 import React from "react";
-import { PlanetId } from "@/../data/astrology/Planets";
-import data from "@/../data/data";
 
 interface Point {
   x: number;

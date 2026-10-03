@@ -1,16 +1,16 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import data from "magick-data";
+import { pathTarget } from "magick-data/pathTarget";
+import type { TableName } from "magick-data/tables";
 import { describe, expect, it } from "vitest";
 import { TREE_IMAGE_FIELDS } from "@/render/contracts/treeOfLife";
 import { sets } from "@/study/sets";
-import data from "../data/data";
-import { pathTarget } from "../data/pathTarget";
-import type { TableName } from "../data/tables";
 
 /**
  * Every dotted field path the app treats as public, checked against the
  * graph and the data without rendering anything
- * ([pathTarget](../data/pathTarget.ts)).
+ * ([pathTarget](../packages/magick-data/src/pathTarget.ts)).
  *
  * These paths are read with dot-prop at runtime, which answers `undefined`
  * for a path that no longer resolves, so until now a renamed field or a

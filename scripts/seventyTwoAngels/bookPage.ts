@@ -141,7 +141,7 @@ export function pageLabel(page: PrintedPage) {
  * apparatus read — not `output/`, which only `gatherPages.ts` touches.
  */
 export function bookPages(
-  path = "data/kabbalah/lenain/pages.json5",
+  path = "packages/magick-data/src/kabbalah/lenain/pages.json5",
 ): BookPage[] {
   const pages: BookPage[] = JSON5.parse(readFileSync(path, "utf8"));
   if (!pages.length) throw new Error(`No leaves in ${path}`);

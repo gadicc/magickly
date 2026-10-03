@@ -1,13 +1,13 @@
-import { Fragment, type ReactNode } from "react";
-import type { Note } from "@/../data/kabbalah/lenain/notes";
+import type { Note } from "magick-data/kabbalah/lenain/notes";
 import {
   footnoteText,
   leafClosings,
   type Piece,
   piecesOf,
   segmentsOf,
-} from "@/../data/kabbalah/lenain/pieces";
-import type { Leaf } from "@/../data/kabbalah/lenain/volume";
+} from "magick-data/kabbalah/lenain/pieces";
+import type { Leaf } from "magick-data/kabbalah/lenain/volume";
+import { Fragment, type ReactNode } from "react";
 // Roboto has no Hebrew, and the volume runs 1,223 Hebrew letters through its
 // French. Frank Ruehl CLM is already in public/fonts and covers U+05C4, the
 // upper dot Lenain points his letters with; without this it falls back to

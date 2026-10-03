@@ -19,7 +19,7 @@ import { TREE_IMAGE_FIELDS } from "@/render/contracts/treeOfLife";
  * catalog records; it is a few milliseconds instead of a few hundred.
  */
 
-const DIST = path.join(process.cwd(), "data/dist");
+const DIST = path.join(process.cwd(), "packages/magick-data/dist");
 
 /** Every table, by the name the graph and the barrel use for it. */
 export const TABLE_FILES = {

@@ -5,14 +5,14 @@ import {
   firstTable,
   firstTableCounts,
   PRINTED_FROM,
-} from "../../data/kabbalah/lenain/firstTable";
+} from "magick-data/kabbalah/lenain/firstTable";
 import {
   footnoteText,
   leafClosings,
   type Piece,
   piecesOf,
   segmentsOf,
-} from "../../data/kabbalah/lenain/pieces";
+} from "magick-data/kabbalah/lenain/pieces";
 import type { Note } from "./apparatus";
 import { type BookPage, bookPages } from "./bookPage";
 import { plateEntries } from "./plateSource";
@@ -105,7 +105,10 @@ function doubtsToMarkdown(doubts: string[]) {
 /** Which notes belong to which leaf, by its anchor. */
 function notesByPage(pages: BookPage[]): Map<string, Note[]> {
   const notes: Note[] = JSON5.parse(
-    readFileSync("data/kabbalah/lenain/apparatus.json5", "utf8"),
+    readFileSync(
+      "packages/magick-data/src/kabbalah/lenain/apparatus.json5",
+      "utf8",
+    ),
   );
   const anchorOf = new Map<number, string>();
   for (const page of pages) anchorOf.set(page.page.number, page.page.anchor);
@@ -128,7 +131,10 @@ function notesByPage(pages: BookPage[]): Map<string, Note[]> {
 /** Notes that concern no single leaf: they belong to the edition, not a page. */
 function editionNotes(): Note[] {
   const notes: Note[] = JSON5.parse(
-    readFileSync("data/kabbalah/lenain/apparatus.json5", "utf8"),
+    readFileSync(
+      "packages/magick-data/src/kabbalah/lenain/apparatus.json5",
+      "utf8",
+    ),
   );
   return notes.filter((note) => note.no === 0 && !note.page);
 }

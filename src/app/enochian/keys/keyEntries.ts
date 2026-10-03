@@ -1,9 +1,9 @@
 import type {
   EnochianDictionary,
   EnochianEntry,
-} from "@/../data/enochian/Dictionary";
-import dictionary from "@/../data/enochian/Dictionary";
-import keys from "@/../data/enochian/Keys";
+} from "magick-data/enochian/dictionary";
+import dictionary from "magick-data/enochian/dictionary";
+import keys from "magick-data/enochian/keys";
 
 /**
  * The dictionary entries the nineteen Keys need, resolved on the server.

@@ -1,5 +1,5 @@
 import Link from "@magick-components/Link";
-import type { PlanetRow } from "@magick-data/rows";
+import type { PlanetRow } from "magick-data/rows";
 import { Fragment } from "react";
 import { chaldean } from "@/app/astrology/planetary-hours/utils";
 import PlanetarySpirit from "@/components/astrology/planetarySpirits";

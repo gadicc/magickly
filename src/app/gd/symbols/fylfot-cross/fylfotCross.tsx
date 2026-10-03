@@ -9,9 +9,8 @@ import {
   FormGroup,
   Grid,
 } from "@mui/material";
+import data from "magick-data";
 import React from "react";
-
-import data from "@/../data/data";
 import FylfotCross, {
   fylfot,
   typeFromId,

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import JSON5 from "json5";
-import type { PlanetId } from "../../data/astrology/Planets";
-import type { ChristianChoirs } from "../../data/kabbalah/ChristianChoirs";
+import type { PlanetId } from "magick-data/astrology/planets";
+import type { ChristianChoirs } from "magick-data/kabbalah/christianChoirs";
 import {
   choirOf,
   decadeOf,
@@ -9,7 +9,7 @@ import {
   invocationOf,
   planetOf,
   presidingDaysOf,
-} from "../../data/kabbalah/seventyTwoAngelsDerived";
+} from "magick-data/kabbalah/seventyTwoAngels/derived";
 import type { AngelExtraction } from "./schema";
 
 /**
@@ -19,7 +19,10 @@ import type { AngelExtraction } from "./schema";
  */
 
 const christianChoirs: ChristianChoirs = JSON5.parse(
-  readFileSync("data/kabbalah/christianChoirs.json5", "utf8"),
+  readFileSync(
+    "packages/magick-data/src/kabbalah/christianChoirs.json5",
+    "utf8",
+  ),
 );
 
 /** What the book calls each planet, in Lenain's French and in English. */

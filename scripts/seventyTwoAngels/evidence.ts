@@ -23,7 +23,7 @@ import type { AngelExtraction } from "./schema";
  * plan 033.
  */
 
-const PATH = "data/kabbalah/lenain/evidence.json5";
+const PATH = "packages/magick-data/src/kabbalah/lenain/evidence.json5";
 
 const HEADER = `// What each of the seventy-two entries says, as printed: the reading the
 // editorial apparatus is derived from, so that every correction can be checked

@@ -1,5 +1,5 @@
+import { PLANET_IDS } from "magick-data/astrology/planets";
 import { describe, expect, it, vi } from "vitest";
-import { PLANET_IDS } from "../../data/astrology/Planets";
 import getSet, { sets } from "./sets";
 
 // The study API route loads these sets, and Turbopack gives route handlers no

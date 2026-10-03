@@ -1,6 +1,5 @@
+import enochianTablets, { EnochianTablet } from "magick-data/enochian/tablets";
 import React, { type CSSProperties } from "react";
-
-import enochianTablets, { EnochianTablet } from "@/../data/enochian/Tablets";
 
 function isCrossFromPosition(x: number, y: number) {
   if (x === 2 || x === 5 || x === 6 || x === 9) return true;

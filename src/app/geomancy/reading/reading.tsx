@@ -16,9 +16,9 @@ import {
   Typography,
 } from "@mui/material";
 import { format } from "date-fns";
+import data, { geomanicHouse as houses } from "magick-data";
+import { PlanetId } from "magick-data/astrology/planets";
 import React from "react";
-import { PlanetId } from "@/../data/astrology/Planets";
-import data, { geomanicHouse as houses } from "@/../data/data";
 import { upcomingHoursForPlanetAtLocation } from "@/app/astrology/planetary-hours/utils";
 import PlanetarySpirit from "@/components/astrology/planetarySpirits";
 import ExportControls from "@/export/ExportControls";

@@ -6,7 +6,6 @@ export default defineConfig({
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
       // The other tsconfig paths.
-      "@magick-data": fileURLToPath(new URL("./data", import.meta.url)),
       "@magick-components": fileURLToPath(
         new URL("./src/components", import.meta.url),
       ),
@@ -18,7 +17,7 @@ export default defineConfig({
   test: {
     environment: "node",
     // The data tables are generated; a test file run on its own builds them.
-    globalSetup: ["./data/build.mts"],
+    globalSetup: ["./packages/magick-data/src/build.ts"],
     // Agent sessions register git worktrees under .claude/, each a full
     // checkout whose test files this glob would otherwise collect and run.
     exclude: [
@@ -116,13 +115,13 @@ export default defineConfig({
         "src/components/svgCoordinate.ts",
         "src/app/geomancy/tetragrams.ts",
         "src/app/enochian/keys/keyEntries.ts",
-        "data/assemble.ts",
-        "data/duplicateKeys.ts",
-        "data/integrity.ts",
-        "data/pathTarget.ts",
-        "data/rowOf.ts",
-        "data/schemas.ts",
-        "data/kabbalah/seventyTwoAngelsDerived.ts",
+        "packages/magick-data/src/assemble.ts",
+        "packages/magick-data/src/duplicateKeys.ts",
+        "packages/magick-data/src/integrity.ts",
+        "packages/magick-data/src/pathTarget.ts",
+        "packages/magick-data/src/rowOf.ts",
+        "packages/magick-data/src/schemas.ts",
+        "packages/magick-data/src/kabbalah/seventyTwoAngelsDerived.ts",
         "src/app/chat/train/access.ts",
         "src/app/chat/train/ingestPdf.ts",
         "src/app/chat/train/upload/route.ts",

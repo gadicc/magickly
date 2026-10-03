@@ -1,7 +1,7 @@
 import "server-only";
 import { createHash } from "node:crypto";
-import data from "@/../data/data";
-import enochianTablet from "@/../data/enochian/Tablets";
+import data from "magick-data";
+import enochianTablet from "magick-data/enochian/tablets";
 import { readFieldPath } from "@/components/kabbalah/fieldPath";
 
 /**
@@ -28,7 +28,7 @@ export const IMAGE_INPUTS_PROFILE = "magickli-image-inputs-v1";
  * The tables a spec may read: the barrel, plus the one table a registered
  * component draws that the barrel leaves out. `enochianTablet` is named in no
  * link in either direction, so the barrel does not assemble it
- * ([data.ts](../../data/data.ts)) and its rows are the raw JSON either way.
+ * ([data.ts](../../packages/magick-data/src/data.ts)) and its rows are the raw JSON either way.
  */
 export const DATA_INPUT_TABLES = { ...data, enochianTablet };
 

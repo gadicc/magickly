@@ -1,4 +1,4 @@
-import { divisions, leavesOf } from "@/../data/kabbalah/lenain/volume";
+import { divisions, leavesOf } from "magick-data/kabbalah/lenain/volume";
 import type { EntityPage } from "./entities";
 
 /**

@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { ANGEL_COUNT } from "../../data/kabbalah/seventyTwoAngelsDerived";
+import { ANGEL_COUNT } from "magick-data/kabbalah/seventyTwoAngels/derived";
 import { type BookPage, bookPagesBetween } from "./bookPage";
 import { handReadings } from "./hebrew";
 import { continuesParagraph, isNoteAt, type PageBlock } from "./pageSchema";
@@ -60,7 +60,7 @@ function chapterPages(): BookPage[] {
   const pages = bookPagesBetween(CHAPTER_FROM, CHAPTER_TO);
   if (!pages.length)
     throw new Error(
-      "No leaves of the genii chapter in data/kabbalah/lenain/pages.json5. " +
+      "No leaves of the genii chapter in packages/magick-data/src/kabbalah/lenain/pages.json5. " +
         "Run gatherPages.ts after transcribing.",
     );
   return pages;

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import Data from "magick-data";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import Data from "@/../data/data";
 import PlanetaryHoursPage from "./page";
 
 // The GeoIP lookup is a fetch; a fixed place stands in for it, since the

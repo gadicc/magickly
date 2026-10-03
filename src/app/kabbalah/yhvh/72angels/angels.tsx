@@ -20,23 +20,23 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import Link from "next/link";
-import React from "react";
-import zodiacs from "@/../data/astrology/Zodiac";
-import { angelSlug } from "@/../data/kabbalah/angelSlugs";
-import christianChoirs from "@/../data/kabbalah/ChristianChoirs";
-import angels, { type Angel } from "@/../data/kabbalah/SeventyTwoAngels";
-import {
-  loadAngelTexts,
-  type TextLanguage,
-} from "@/../data/kabbalah/SeventyTwoAngelsText";
+import zodiacs from "magick-data/astrology/zodiac";
+import christianChoirs from "magick-data/kabbalah/christianChoirs";
+import angels, { type Angel } from "magick-data/kabbalah/seventyTwoAngels";
 import {
   choirOf,
   governedDaysOf,
   type MonthDay,
   presidingDaysOf,
   signOf,
-} from "@/../data/kabbalah/seventyTwoAngelsDerived";
+} from "magick-data/kabbalah/seventyTwoAngels/derived";
+import {
+  loadAngelTexts,
+  type TextLanguage,
+} from "magick-data/kabbalah/seventyTwoAngels/text";
+import Link from "next/link";
+import React from "react";
+import { angelSlug } from "@/lib/angelSlugs";
 
 type AstrologySystem = "tropical" | "sidereal";
 
@@ -366,7 +366,9 @@ function SevenyTwo() {
             translation and the arrangement are{" "}
             <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>{" "}
             with the rest of the{" "}
-            <a href="https://github.com/gadicc/magickly/tree/main/data">data</a>
+            <a href="https://github.com/gadicc/magickly/tree/main/packages/magick-data">
+              data
+            </a>
             , and no rights are claimed where none subsist. This was done in an
             effort to provide a Copyright-free version of this material,
             however, a much better translation exists:
@@ -441,7 +443,7 @@ function SevenyTwo() {
           here
         </a>
         . Additionally, see the{" "}
-        <a href="https://github.com/gadicc/magickly/blob/main/data/kabbalah/seventyTwoAngels.json5">
+        <a href="https://github.com/gadicc/magickly/blob/main/packages/magick-data/src/kabbalah/seventyTwoAngels.json5">
           data file
         </a>{" "}
         and the full{" "}

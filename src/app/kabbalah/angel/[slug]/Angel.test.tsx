@@ -1,10 +1,10 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import angels from "magick-data/kabbalah/seventyTwoAngels";
+import { loadAngelTexts } from "magick-data/kabbalah/seventyTwoAngels/text";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { angelBySlug, angelSlug } from "@/../data/kabbalah/angelSlugs";
-import angels from "@/../data/kabbalah/SeventyTwoAngels";
-import { loadAngelTexts } from "@/../data/kabbalah/SeventyTwoAngelsText";
+import { angelBySlug, angelSlug } from "@/lib/angelSlugs";
 import { expectEntityPage, textOf } from "../../../../../tests/entityPage";
 import AngelPage from "./Angel";
 import AngelRoute from "./page";

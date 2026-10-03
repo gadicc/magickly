@@ -1,6 +1,6 @@
+import { notesByPage } from "magick-data/kabbalah/lenain/notes";
+import { bookLeaves, divisions } from "magick-data/kabbalah/lenain/volume";
 import Link from "next/link";
-import { notesByPage } from "@/../data/kabbalah/lenain/notes";
-import { bookLeaves, divisions } from "@/../data/kabbalah/lenain/volume";
 import { privateMetadata } from "@/seo/metadata";
 import Reading from "../Reading";
 import styles from "../reading.module.css";

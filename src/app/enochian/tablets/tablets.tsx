@@ -68,7 +68,7 @@ export default function Tablets() {
           files={[
             "/src/app/enochian/tablets/tablets.tsx",
             "/src/components/enochian/Tablet.tsx",
-            "/data/enochian/tablets.json5",
+            "/packages/magick-data/src/enochian/tablets.json5",
           ]}
         />
       </Container>

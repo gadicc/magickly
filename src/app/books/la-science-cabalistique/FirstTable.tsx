@@ -2,7 +2,7 @@ import {
   firstTable,
   firstTableCounts,
   PRINTED_FROM,
-} from "@/../data/kabbalah/lenain/firstTable";
+} from "magick-data/kabbalah/lenain/firstTable";
 import styles from "./reading.module.css";
 
 /**

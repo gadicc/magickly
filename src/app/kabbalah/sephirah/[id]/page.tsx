@@ -1,6 +1,6 @@
+import Data from "magick-data";
+import { rowOf } from "magick-data/rowOf";
 import { notFound } from "next/navigation";
-import Data from "@/../data/data";
-import { rowOf } from "@/../data/rowOf";
 import { entityIds, sephirahPage } from "@/seo/entities";
 import { seoMetadata } from "@/seo/metadata";
 import Sephirah from "./Sephirah";

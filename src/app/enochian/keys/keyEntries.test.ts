@@ -1,5 +1,5 @@
+import dictionary from "magick-data/enochian/dictionary";
 import { describe, expect, it } from "vitest";
-import dictionary from "@/../data/enochian/Dictionary";
 import {
   entriesFor,
   findWord,

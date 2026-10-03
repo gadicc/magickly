@@ -1,6 +1,6 @@
+import { loadAngelTexts } from "magick-data/kabbalah/seventyTwoAngels/text";
 import { notFound } from "next/navigation";
-import { angelBySlug, angelSlugs } from "@/../data/kabbalah/angelSlugs";
-import { loadAngelTexts } from "@/../data/kabbalah/SeventyTwoAngelsText";
+import { angelBySlug, angelSlugs } from "@/lib/angelSlugs";
 import { angelPage } from "@/seo/entities";
 import { seoMetadata } from "@/seo/metadata";
 import Angel from "./Angel";

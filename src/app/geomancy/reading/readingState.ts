@@ -1,5 +1,5 @@
-import type { PlanetId } from "@/../data/astrology/Planets";
-import data from "@/../data/data";
+import data from "magick-data";
+import type { PlanetId } from "magick-data/astrology/planets";
 import {
   DEFAULT_MOTHERS,
   mothersFromString,

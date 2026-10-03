@@ -1,8 +1,7 @@
+import { assemble } from "magick-data/assemble";
+import zodiacRows from "magick-data/astrology/zodiac";
+import tribeRows from "magick-data/kabbalah/tribesOfIsrael";
 import React from "react";
-
-import { assemble } from "@/../data/assemble";
-import zodiacRows from "@/../data/astrology/Zodiac";
-import tribeRows from "@/../data/kabbalah/TribesOfIsrael";
 
 /**
  * Two tables, joined: the table draws each sign's tribe, and used to index

@@ -1,4 +1,4 @@
-import { tetragram as tetragrams } from "@/../data/data";
+import { tetragram as tetragrams } from "magick-data";
 
 function Tetragram({
   id,

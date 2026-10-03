@@ -1,6 +1,6 @@
+import { editionNotes } from "magick-data/kabbalah/lenain/notes";
+import { bookLeaves, divisions } from "magick-data/kabbalah/lenain/volume";
 import Link from "next/link";
-import { editionNotes } from "@/../data/kabbalah/lenain/notes";
-import { bookLeaves, divisions } from "@/../data/kabbalah/lenain/volume";
 import JsonLd from "@/seo/JsonLd";
 import { bookJsonLd } from "@/seo/lenain";
 import { pageMetadata } from "@/seo/metadata";

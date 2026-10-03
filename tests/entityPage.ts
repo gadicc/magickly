@@ -1,8 +1,8 @@
+import Data from "magick-data";
+import { divisions } from "magick-data/kabbalah/lenain/volume";
 import { expect } from "vitest";
-import Data from "@/../data/data";
-import { angelSlugs } from "@/../data/kabbalah/angelSlugs";
-import { divisions } from "@/../data/kabbalah/lenain/volume";
 import { publicRitualQueryKeys } from "@/doc/publicRituals";
+import { angelSlugs } from "@/lib/angelSlugs";
 import { PUBLIC_PAGES } from "@/seo/pages";
 
 /**

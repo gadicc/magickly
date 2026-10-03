@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { generateObject } from "ai";
 import JSON5 from "json5";
-import type { ChristianChoirs } from "../../data/kabbalah/ChristianChoirs";
+import type { ChristianChoirs } from "magick-data/kabbalah/christianChoirs";
 import {
   choirOf,
   decadeOf,
@@ -11,7 +11,7 @@ import {
   planetOf,
   presidingDaysOf,
   signOf,
-} from "../../data/kabbalah/seventyTwoAngelsDerived";
+} from "magick-data/kabbalah/seventyTwoAngels/derived";
 import { type PlateEntry, plateEntries } from "./plateSource";
 import { type AngelExtraction, angelExtraction } from "./schema";
 
@@ -42,7 +42,10 @@ const OUT_DIR = "output/seventyTwoAngels";
  * parses the same file itself rather than keeping a second copy of the names.
  */
 const christianChoirs: ChristianChoirs = JSON5.parse(
-  readFileSync("data/kabbalah/christianChoirs.json5", "utf8"),
+  readFileSync(
+    "packages/magick-data/src/kabbalah/christianChoirs.json5",
+    "utf8",
+  ),
 );
 
 const MINUTES = (total: number) =>

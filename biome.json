@@ -16,7 +16,7 @@
       "!dump/**",
       "!editor-trial/**",
       "!drizzle/meta/**",
-      "!data/dist/**",
+      "!packages/magick-data/dist/**",
       "!public/fonts/**",
       "!assets/fonts/**",
       "!**/*.svg",

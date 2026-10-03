@@ -1,7 +1,7 @@
-import React, { CSSProperties } from "react";
 // The figures arrive assembled, so the sign and planets each one names are
 // on the row: this component looked both tables up by hand until step 3c.
-import type { TetragramRow } from "@/../data/rows";
+import type { TetragramRow } from "magick-data/rows";
+import React, { CSSProperties } from "react";
 import TetragramRender from "../Tetragram";
 
 // type Point = { x: number; y: number };

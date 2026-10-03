@@ -157,7 +157,7 @@ approved with the plan on 25 September, as was 18:
 12. **Each page declares its row.** A module beside each page exports the
     fields it shows and the fields it deliberately omits, one level deep —
     `color.king` and `hermetic.tarotId` are keys, not `color` and `hermetic`,
-    the way [integrity.ts](../data/integrity.ts)'s `idFields` walks a block —
+    the way [integrity.ts](../packages/magick-data/src/integrity.ts)'s `idFields` walks a block —
     and a test asserts the two lists together are exactly the union of its
     table's keys at that depth, disjoint. A link, inverse or nested field
     added to the data then fails a test until a page decides about it, which
@@ -413,7 +413,7 @@ goes.
 
 ## The data
 
-In [graph.ts](../data/graph.ts), no JSON touched:
+In [graph.ts](../packages/magick-data/src/graph.ts), no JSON touched:
 
 ```ts
 zodiac:        { links: { planetId: { to: "planet", inverse: "zodiacs", inverseMany: true }, … } },
@@ -439,12 +439,12 @@ integrity check gains one rule beside the chain check: a path's id is
 `${from.index}_${to.index}`. The singular inverses are proved unique by the
 existing `inverse-not-unique` rule, and the accessor-collision rule stands
 guard over the nine new names. The barrel keys pin
-([barrel.keys.test.ts](../data/barrel.keys.test.ts)) moves by nine names,
+([barrel.keys.test.ts](../packages/magick-data/src/barrel.keys.test.ts)) moves by nine names,
 interleaved by position rather than appended — the planet row ends
 `archangel, alchemySymbol, gdGrade, sephirot, tetragrams, zodiacs`, the
 letter `planet, hermeticPath, hebrewPath`, the sephirah
 `…prev, pathsFrom, pathsTo` — and `tolPath` gains `fromId, toId, from, to`
-in the second commit. [assemble.declared.test.ts](../data/assemble.declared.test.ts),
+in the second commit. [assemble.declared.test.ts](../packages/magick-data/src/assemble.declared.test.ts),
 which says the real graph declares no singular or list-derived inverse,
 moves with the first. `Row` types gain the accessors without a runtime
 change, since `Inverses<T, I>` reads the `inverse` name off any link whose
@@ -481,7 +481,7 @@ or inputs hash moves, and the registry test asserts it.
   `primum-mobile`, Neophyte (dimmed tree, ritual), the Portal (no ritual),
   Ipsissimus, `1_2`, `2_5`, `7_10`, `9_10`.
 - The bar's test covers `/kabbalah/angel/<slug>` (decision 15).
-- The barrel keys pin, [types.test.ts](../data/types.test.ts) and
+- The barrel keys pin, [types.test.ts](../packages/magick-data/src/types.test.ts) and
   `assemble.declared.test.ts` gain the nine accessors.
 
 ## Migration
@@ -918,7 +918,7 @@ description promising a King scale; that was fixed after the review.
   utilities, which import `suncalc` and `date-fns`; the page is static, so
   it costs only the build, but the seven ids belong in a module of their
   own.
-- **In [types.ts](../data/types.ts), a derived back-link's arity** is decided
+- **In [types.ts](../packages/magick-data/src/types.ts), a derived back-link's arity** is decided
   per pair of tables rather than per link: a table declaring a list
   back-link and a single one onto the same target would type both as
   single. The two pairs that exist agree, so nothing is wrong today.

@@ -65,7 +65,7 @@ Taken by the owner on 1 October:
    does: capitalised and joined.** "Roshit HaGilgulim", "Olam HaYesodot",
    "Chayot HaKodesh", "Adonai HaAretz" (an initial aleph's vowel is
    capitalised, as the standard's examples do). The rule is written into
-   [data/README.md](../data/README.md) for the next entry.
+   [data/README.md](../packages/magick-data/README.md) for the next entry.
 2. **The heavens are the planet rows; `tenHeavens` goes.** The sephirah
    page drops its Heaven row, and its "Planet · Assiah" row gains the planet
    or sphere's Hebrew name. The sphere rows take the glosses `tenHeavens`

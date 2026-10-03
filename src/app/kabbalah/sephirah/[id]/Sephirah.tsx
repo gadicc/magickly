@@ -1,5 +1,5 @@
 import Link from "@magick-components/Link";
-import type { SephirahRow, TolPathRow } from "@/../data/rows";
+import type { SephirahRow, TolPathRow } from "magick-data/rows";
 import Chakras from "@/components/chakras/Chakras";
 import {
   EntityFrame,

@@ -1,5 +1,5 @@
-import { tetragram as tetragrams } from "@/../data/data";
-import type { TetragramRow } from "@/../data/rows";
+import { tetragram as tetragrams } from "magick-data";
+import type { TetragramRow } from "magick-data/rows";
 
 function compute(mothers: (1 | 2)[][]) {
   const daughters = [

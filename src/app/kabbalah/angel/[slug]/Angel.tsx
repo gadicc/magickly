@@ -1,10 +1,12 @@
 import Link from "@magick-components/Link";
-import zodiacs from "@/../data/astrology/Zodiac";
-import Data from "@/../data/data";
-import { angelSlug } from "@/../data/kabbalah/angelSlugs";
-import christianChoirs from "@/../data/kabbalah/ChristianChoirs";
-import { anchorOfGenius, notesOfGenius } from "@/../data/kabbalah/lenain/notes";
-import type { Angel } from "@/../data/kabbalah/SeventyTwoAngels";
+import Data from "magick-data";
+import zodiacs from "magick-data/astrology/zodiac";
+import christianChoirs from "magick-data/kabbalah/christianChoirs";
+import {
+  anchorOfGenius,
+  notesOfGenius,
+} from "magick-data/kabbalah/lenain/notes";
+import type { Angel } from "magick-data/kabbalah/seventyTwoAngels";
 import {
   ANGEL_COUNT,
   choirOf,
@@ -16,7 +18,7 @@ import {
   planetOf,
   presidingDaysOf,
   signOf,
-} from "@/../data/kabbalah/seventyTwoAngelsDerived";
+} from "magick-data/kabbalah/seventyTwoAngels/derived";
 import {
   EntityFrame,
   EntityTable,
@@ -27,6 +29,7 @@ import {
   Row,
   Trail,
 } from "@/components/entity";
+import { angelSlug } from "@/lib/angelSlugs";
 import styles from "./angel.module.css";
 
 /**

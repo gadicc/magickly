@@ -1,7 +1,7 @@
 import Paper from "@mui/material/Paper";
+import data from "magick-data";
 import Tetragram from "@/app/geomancy/Tetragram";
 import { readFieldPath } from "@/components/kabbalah/fieldPath";
-import data from "../../data/data";
 
 // https://stackoverflow.com/a/56773391/1839099
 function omit(key, obj) {

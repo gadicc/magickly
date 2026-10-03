@@ -1,4 +1,4 @@
-import type { TableName } from "@/../data/tables";
+import type { TableName } from "magick-data/tables";
 
 /**
  * What an entity page does with its table's row (plan 036, decision 12).

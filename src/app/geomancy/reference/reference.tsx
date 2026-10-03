@@ -17,14 +17,14 @@ import {
   TableRow,
 } from "@mui/material";
 import Typography from "@mui/material/Typography";
-import React from "react";
 import data, {
   tetragram as _tetragrams,
   geomanicHouse as houses,
-} from "@/../data/data";
+} from "magick-data";
+import { PlanetId } from "magick-data/astrology/planets";
+import React from "react";
 import PlanetarySpirit from "@/components/astrology/planetarySpirits";
 import { capitalizeFirstLetter } from "@/lib/utils";
-import { PlanetId } from "../../../../data/astrology/Planets";
 import Tetragram from "../Tetragram";
 
 /*

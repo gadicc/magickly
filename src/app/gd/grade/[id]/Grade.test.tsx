@@ -1,6 +1,6 @@
+import Data from "magick-data";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import Data from "@/../data/data";
 import { publicRitualQueryKeys } from "@/doc/publicRituals";
 import {
   expectEntityPage,

@@ -1,4 +1,4 @@
-import data from "@/../data/data";
+import data from "magick-data";
 
 const colorFromElement = {
   fire: "red",

@@ -1,7 +1,7 @@
-import Data from "@/../data/data";
-import { angelBySlug, angelSlugs } from "@/../data/kabbalah/angelSlugs";
-import { rowOf } from "@/../data/rowOf";
-import type { SephirahRow } from "@/../data/rows";
+import Data from "magick-data";
+import { rowOf } from "magick-data/rowOf";
+import type { SephirahRow } from "magick-data/rows";
+import { angelBySlug, angelSlugs } from "@/lib/angelSlugs";
 import { RWSName } from "@/tarot";
 import type { SeoPage } from "./pages";
 

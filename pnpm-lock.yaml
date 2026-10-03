@@ -168,6 +168,9 @@ importers:
       magic-string:
         specifier: ^0.30.10
         version: 0.30.10
+      magick-data:
+        specifier: workspace:*
+        version: link:packages/magick-data
       mongodb:
         specifier: 6.2.0
         version: 6.2.0
@@ -343,6 +346,15 @@ importers:
       webpack:
         specifier: ^5.111.0
         version: 5.111.0(esbuild@0.28.2)(sharp@0.35.4(@types/node@24.13.5))
+
+  packages/magick-data:
+    devDependencies:
+      json5:
+        specifier: ^2.2.3
+        version: 2.2.3
+      valibot:
+        specifier: 1.5.0
+        version: 1.5.0(typescript@6.0.3)
 
 packages:
 

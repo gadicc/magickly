@@ -1,5 +1,5 @@
 import Link from "@magick-components/Link";
-import type { GDGradeRow } from "@/../data/rows";
+import type { GDGradeRow } from "magick-data/rows";
 import {
   EntityFrame,
   EntityTable,

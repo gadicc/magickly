@@ -51,7 +51,7 @@ export default function Sequence() {
             </li>
             <li>
               Publish useful magick{" "}
-              <a href="https://github.com/gadicc/magickly/tree/main/data">
+              <a href="https://github.com/gadicc/magickly/tree/main/packages/magick-data">
                 data
               </a>{" "}
               in JSON format with types.
@@ -85,7 +85,9 @@ export default function Sequence() {
 
         <p>
           Two parts are deliberately freer. The{" "}
-          <a href="https://github.com/gadicc/magickly/tree/main/data">data</a>{" "}
+          <a href="https://github.com/gadicc/magickly/tree/main/packages/magick-data">
+            data
+          </a>{" "}
           is{" "}
           <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>,
           as are the images this app draws, such as the Tree of Life, sigils,

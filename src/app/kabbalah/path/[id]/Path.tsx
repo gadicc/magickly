@@ -1,6 +1,6 @@
 import Link from "@magick-components/Link";
+import type { HebrewLetterRow, TolPathRow } from "magick-data/rows";
 import Image from "next/image";
-import type { HebrewLetterRow, TolPathRow } from "@/../data/rows";
 import {
   EntityFrame,
   EntityTable,

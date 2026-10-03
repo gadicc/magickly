@@ -17,7 +17,7 @@ vi.mock("@/components/astrology/planetarySpirits", () => ({
  * Each used to index its table with a cast — `planets[id as keyof typeof
  * planets]` — which `strict: false` made `any`, so an unknown id reached the
  * render as `undefined` and the first field read of it threw. They go through
- * [rowOf](../../data/rowOf.ts) instead, and this pins both halves: the ids
+ * [rowOf](../../packages/magick-data/src/rowOf.ts) instead, and this pins both halves: the ids
  * that render, and the ids that 404 before anything is rendered.
  */
 const props = (id: string) => ({

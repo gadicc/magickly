@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/packages/*/node_modules
 /.pnp
 .pnp.js
 
@@ -9,8 +10,8 @@
 /coverage
 /output/
 
-# generated data tables (data/build.mts)
-/data/dist/
+# generated data tables (packages/magick-data/src/build.ts)
+/packages/magick-data/dist/
 
 # next.js
 /.next/

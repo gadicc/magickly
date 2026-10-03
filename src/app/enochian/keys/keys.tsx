@@ -13,9 +13,9 @@ import {
   RadioGroup,
   Typography,
 } from "@mui/material";
+import type { EnochianEntry } from "magick-data/enochian/dictionary";
+import keys, { EnochianKey } from "magick-data/enochian/keys";
 import React from "react";
-import type { EnochianEntry } from "@/../data/enochian/dictionaryEntry";
-import keys, { EnochianKey } from "@/../data/enochian/Keys";
 import useEnochianFont, { EnochianFont } from "../useEnochianFont";
 
 /** The entries the page was given, by the word as the Keys spell it. */
