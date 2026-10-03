@@ -104,6 +104,15 @@ describe("public field paths", () => {
         tableOfRow.set(row, name as TableName);
 
     const built = ["alchemy-basic-terms", "kerubim-face", "kerubim-zodiac"];
+    // Sets that ask or answer through a function rather than a path: there is
+    // no path to check, so they are skipped, and named here so that a new one
+    // fails this test until it is (`question`, `answer` or both).
+    const throughAFunction = [
+      "geomancy-symbol-names question",
+      "ten-heavens answer",
+      "ten-heavens question",
+    ];
+    const skipped: string[] = [];
     const checked: string[] = [];
 
     for (const [id, set] of Object.entries(sets)) {
@@ -114,6 +123,13 @@ describe("public field paths", () => {
       const asked = [set.question, set.answer].filter(
         (value) => typeof value === "string",
       );
+      for (const [key, value] of Object.entries({
+        question: set.question,
+        answer: set.answer,
+      })) {
+        expect(typeof value, `${id} ${key}`).toMatch(/^(string|function)$/);
+        if (typeof value === "function") skipped.push(`${id} ${key}`);
+      }
 
       if (!table) {
         // Cards built in the set itself: the fields are on those objects.
@@ -134,6 +150,7 @@ describe("public field paths", () => {
     // Every set is either over a table or named above, and the sets that are
     // over a table ask 45 paths between them.
     expect(checked).toHaveLength(45);
+    expect(skipped.sort()).toEqual(throughAFunction);
   });
 
   it("names the table and field a path ends on", () => {
