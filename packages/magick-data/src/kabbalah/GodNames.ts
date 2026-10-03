@@ -1,5 +1,5 @@
 import rows from "../../dist/kabbalah/godNames.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A name's key. */
 type GodNameId = keyof typeof rows;

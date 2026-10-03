@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import data from "./data";
-import { rowOf } from "./rowOf";
+import data from "./data.ts";
+import { rowOf } from "./rowOf.ts";
 
 describe("rowOf", () => {
   it("returns the row an id names", () => {

@@ -1,5 +1,5 @@
 import rows from "../../dist/gd/degrees.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A degree's key: the three, each on a pillar of the Tree. */
 type GDDegreeId = keyof typeof rows;

@@ -5,7 +5,7 @@
  * the types derived from it ([types.ts](./types.ts) reads the graph, not the
  * other way round).
  */
-import type { TableName } from "./tables";
+import type { TableName } from "./tables.ts";
 
 /** An id-shaped field that names a row, or a list of rows, in another table. */
 export interface LinkSpec {

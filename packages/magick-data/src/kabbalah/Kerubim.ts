@@ -1,5 +1,5 @@
 import rows from "../../dist/kabbalah/kerubim.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A kerub's key, which is its element. */
 type KerubId = keyof typeof rows;

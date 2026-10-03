@@ -17,7 +17,9 @@
  * The build also emits this as `dist/graph.json`, for a reader that is
  * not TypeScript.
  */
-import type { GraphSpec } from "./graphSpec";
+import type { GraphSpec, LinkSpec, TableSpec } from "./graphSpec.ts";
+
+export type { GraphSpec, LinkSpec, TableSpec } from "./graphSpec.ts";
 
 export const graph = {
   // ASTROLOGY
@@ -173,8 +175,32 @@ export const graph = {
   elemental: {
     links: { elementId: { to: "element", mirrors: "elementalId" } },
   },
-} as const satisfies GraphSpec;
+} as const;
 
 export type Graph = typeof graph;
+
+// `as const satisfies GraphSpec` held the literal to its shape, but
+// `isolatedDeclarations` cannot declare an export written that way (TS9010),
+// so the check is made on the type instead (plan 052). It is in two halves,
+// because `satisfies` checked two things: that the graph is assignable to a
+// `GraphSpec`, which fails to compile here if not, and that no table or link
+// carries a key the spec does not name — a misspelt `inverse`, say — which
+// assignability alone allows and the second half refuses.
+type Assert<T extends GraphSpec> = T;
+type _GraphIsSpec = Assert<Graph>;
+
+type LinksOf<T> = T extends { links: infer L } ? L : Record<never, never>;
+type ExcessKeys = {
+  [T in keyof Graph]:
+    | Exclude<keyof Graph[T], keyof TableSpec>
+    | {
+        [F in keyof LinksOf<Graph[T]>]: Exclude<
+          keyof LinksOf<Graph[T]>[F],
+          keyof LinkSpec
+        >;
+      }[keyof LinksOf<Graph[T]>];
+}[keyof Graph];
+type AssertNone<T extends never> = T;
+type _GraphHasNoExcessKeys = AssertNone<ExcessKeys>;
 
 export default graph;

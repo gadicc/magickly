@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import JSON5 from "json5";
 import { describe, expect, it } from "vitest";
-import { piecesOf, segmentsOf } from "./lenain/pieces";
+import { piecesOf, segmentsOf } from "./lenain/pieces.ts";
 import {
   bookLeaves,
   divisionOfLeaf,
@@ -9,7 +9,7 @@ import {
   LAST_LEAF,
   leavesOf,
   leaves as volumeLeaves,
-} from "./lenain/volume";
+} from "./lenain/volume.ts";
 
 /**
  * The edition as a document: the checks `pnpm data:check` cannot make.

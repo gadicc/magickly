@@ -1,5 +1,5 @@
-import angels from "../SeventyTwoAngels";
-import { leaves } from "./volume";
+import angels from "../SeventyTwoAngels.ts";
+import { leaves } from "./volume.ts";
 
 /**
  * The first cabalistic table, whole again.
@@ -100,7 +100,10 @@ export function firstTable(): FirstTableRow[] {
 }
 
 /** How many rows the plate gives, and how many had to be put back. */
-export function firstTableCounts() {
+export function firstTableCounts(): {
+  printed: number;
+  reconstructed: number;
+} {
   const rows = firstTable();
   return {
     printed: rows.filter((row) => row.source === "printed").length,

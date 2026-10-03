@@ -21,9 +21,9 @@
  * make hop two an error, because a link's target is the union of the target
  * table's rows.
  */
-import type { Graph } from "./graph";
-import type { NamedRows } from "./rows";
-import type { TableName, Tables } from "./tables";
+import type { Graph } from "./graph.ts";
+import type { NamedRows } from "./rows.ts";
+import type { TableName, Tables } from "./tables.ts";
 
 /** The tables an assembled object holds: some of them, or all of them. */
 export type Scope = TableName | "*";

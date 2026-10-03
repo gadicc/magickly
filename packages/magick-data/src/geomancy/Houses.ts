@@ -1,5 +1,5 @@
 import rows from "../../dist/geomancy/houses.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A house of a reading, keyed by its own number rather than an index. */
 type HouseId = keyof typeof rows;

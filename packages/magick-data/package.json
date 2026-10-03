@@ -2,11 +2,21 @@
   "name": "magick-data",
   "version": "0.0.0",
   "private": true,
-  "license": "CC-BY-4.0",
+  "license": "SEE LICENSE IN LICENSE.txt",
   "type": "module",
   "sideEffects": false,
+  "files": [
+    "lib",
+    "dist",
+    "README.md",
+    "LICENSE.txt",
+    "LICENSE-DATA.txt",
+    "!dist/enochian/dictionary.*",
+    "!lib/enochian/Dictionary.*"
+  ],
   "exports": {
     ".": "./src/data.ts",
+    "./tools": "./src/tools.ts",
     "./assemble": "./src/assemble.ts",
     "./rowOf": "./src/rowOf.ts",
     "./pathTarget": "./src/pathTarget.ts",
@@ -52,10 +62,199 @@
     "./kabbalah/lenain/pieces": "./src/kabbalah/lenain/pieces.ts",
     "./kabbalah/lenain/firstTable": "./src/kabbalah/lenain/firstTable.ts"
   },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./lib/data.d.ts",
+        "default": "./lib/data.js"
+      },
+      "./tools": {
+        "types": "./lib/tools.d.ts",
+        "default": "./lib/tools.js"
+      },
+      "./assemble": {
+        "types": "./lib/assemble.d.ts",
+        "default": "./lib/assemble.js"
+      },
+      "./rowOf": {
+        "types": "./lib/rowOf.d.ts",
+        "default": "./lib/rowOf.js"
+      },
+      "./pathTarget": {
+        "types": "./lib/pathTarget.d.ts",
+        "default": "./lib/pathTarget.js"
+      },
+      "./tables": {
+        "types": "./lib/tables.d.ts",
+        "default": "./lib/tables.js"
+      },
+      "./graph": {
+        "types": "./lib/graph.d.ts",
+        "default": "./lib/graph.js"
+      },
+      "./types": {
+        "types": "./lib/types.d.ts",
+        "default": "./lib/types.js"
+      },
+      "./rows": {
+        "types": "./lib/rows.d.ts",
+        "default": "./lib/rows.js"
+      },
+      "./alchemy/elementals": {
+        "types": "./lib/alchemy/Elementals.d.ts",
+        "default": "./lib/alchemy/Elementals.js"
+      },
+      "./alchemy/elements": {
+        "types": "./lib/alchemy/Elements.d.ts",
+        "default": "./lib/alchemy/Elements.js"
+      },
+      "./alchemy/symbols": {
+        "types": "./lib/alchemy/Symbols.d.ts",
+        "default": "./lib/alchemy/Symbols.js"
+      },
+      "./alchemy/terms": {
+        "types": "./lib/alchemy/Terms.d.ts",
+        "default": "./lib/alchemy/Terms.js"
+      },
+      "./astrology/houses": {
+        "types": "./lib/astrology/Houses.d.ts",
+        "default": "./lib/astrology/Houses.js"
+      },
+      "./astrology/planets": {
+        "types": "./lib/astrology/Planets.d.ts",
+        "default": "./lib/astrology/Planets.js"
+      },
+      "./astrology/zodiac": {
+        "types": "./lib/astrology/Zodiac.d.ts",
+        "default": "./lib/astrology/Zodiac.js"
+      },
+      "./enochian/letters": {
+        "types": "./lib/enochian/Letters.d.ts",
+        "default": "./lib/enochian/Letters.js"
+      },
+      "./enochian/tablets": {
+        "types": "./lib/enochian/Tablets.d.ts",
+        "default": "./lib/enochian/Tablets.js"
+      },
+      "./gd/grades": {
+        "types": "./lib/gd/Grades.d.ts",
+        "default": "./lib/gd/Grades.js"
+      },
+      "./geomancy/houses": {
+        "types": "./lib/geomancy/Houses.d.ts",
+        "default": "./lib/geomancy/Houses.js"
+      },
+      "./geomancy/tetragrams": {
+        "types": "./lib/geomancy/Tetragrams.d.ts",
+        "default": "./lib/geomancy/Tetragrams.js"
+      },
+      "./hebrewLetters": {
+        "types": "./lib/HebrewLetters.d.ts",
+        "default": "./lib/HebrewLetters.js"
+      },
+      "./kabbalah/angelicOrders": {
+        "types": "./lib/kabbalah/AngelicOrders.d.ts",
+        "default": "./lib/kabbalah/AngelicOrders.js"
+      },
+      "./kabbalah/archangels": {
+        "types": "./lib/kabbalah/Archangels.d.ts",
+        "default": "./lib/kabbalah/Archangels.js"
+      },
+      "./kabbalah/christianChoirs": {
+        "types": "./lib/kabbalah/ChristianChoirs.d.ts",
+        "default": "./lib/kabbalah/ChristianChoirs.js"
+      },
+      "./kabbalah/fourWorlds": {
+        "types": "./lib/kabbalah/FourWorlds.d.ts",
+        "default": "./lib/kabbalah/FourWorlds.js"
+      },
+      "./kabbalah/godNames": {
+        "types": "./lib/kabbalah/GodNames.d.ts",
+        "default": "./lib/kabbalah/GodNames.js"
+      },
+      "./kabbalah/kerubim": {
+        "types": "./lib/kabbalah/Kerubim.d.ts",
+        "default": "./lib/kabbalah/Kerubim.js"
+      },
+      "./kabbalah/paths": {
+        "types": "./lib/kabbalah/Paths.d.ts",
+        "default": "./lib/kabbalah/Paths.js"
+      },
+      "./kabbalah/sephirot": {
+        "types": "./lib/kabbalah/Sephirot.d.ts",
+        "default": "./lib/kabbalah/Sephirot.js"
+      },
+      "./kabbalah/tribesOfIsrael": {
+        "types": "./lib/kabbalah/TribesOfIsrael.d.ts",
+        "default": "./lib/kabbalah/TribesOfIsrael.js"
+      },
+      "./kabbalah/seventyTwoAngels": {
+        "types": "./lib/kabbalah/SeventyTwoAngels.d.ts",
+        "default": "./lib/kabbalah/SeventyTwoAngels.js"
+      },
+      "./gd/degrees": {
+        "types": "./lib/gd/Degrees.d.ts",
+        "default": "./lib/gd/Degrees.js"
+      },
+      "./kabbalah/souls": {
+        "types": "./lib/kabbalah/Souls.d.ts",
+        "default": "./lib/kabbalah/Souls.js"
+      },
+      "./chakras": {
+        "types": "./lib/Chakras.d.ts",
+        "default": "./lib/Chakras.js"
+      },
+      "./body/parts": {
+        "types": "./lib/body/Parts.d.ts",
+        "default": "./lib/body/Parts.js"
+      },
+      "./materia/stones": {
+        "types": "./lib/materia/Stones.d.ts",
+        "default": "./lib/materia/Stones.js"
+      },
+      "./materia/scents": {
+        "types": "./lib/materia/Scents.d.ts",
+        "default": "./lib/materia/Scents.js"
+      },
+      "./enochian/keys": {
+        "types": "./lib/enochian/Keys.d.ts",
+        "default": "./lib/enochian/Keys.js"
+      },
+      "./kabbalah/seventyTwoAngels/derived": {
+        "types": "./lib/kabbalah/seventyTwoAngelsDerived.d.ts",
+        "default": "./lib/kabbalah/seventyTwoAngelsDerived.js"
+      },
+      "./kabbalah/seventyTwoAngels/text": {
+        "types": "./lib/kabbalah/SeventyTwoAngelsText.d.ts",
+        "default": "./lib/kabbalah/SeventyTwoAngelsText.js"
+      },
+      "./kabbalah/lenain/volume": {
+        "types": "./lib/kabbalah/lenain/volume.d.ts",
+        "default": "./lib/kabbalah/lenain/volume.js"
+      },
+      "./kabbalah/lenain/notes": {
+        "types": "./lib/kabbalah/lenain/notes.d.ts",
+        "default": "./lib/kabbalah/lenain/notes.js"
+      },
+      "./kabbalah/lenain/pieces": {
+        "types": "./lib/kabbalah/lenain/pieces.d.ts",
+        "default": "./lib/kabbalah/lenain/pieces.js"
+      },
+      "./kabbalah/lenain/firstTable": {
+        "types": "./lib/kabbalah/lenain/firstTable.d.ts",
+        "default": "./lib/kabbalah/lenain/firstTable.js"
+      },
+      "./json/*.json": "./dist/*.json",
+      "./graph.json": "./dist/graph.json"
+    }
+  },
   "scripts": {
     "data:build": "node --import tsx src/build.ts",
     "data:watch": "node --import tsx src/build.ts --watch",
-    "data:check": "node --import tsx src/check.ts"
+    "data:check": "node --import tsx src/check.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "pnpm data:build && rm -rf lib && tsc -p tsconfig.build.json",
+    "smoke": "node scripts/smoke.mjs"
   },
   "devDependencies": {
     "json5": "^2.2.3",

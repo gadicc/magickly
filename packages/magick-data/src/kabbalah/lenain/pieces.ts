@@ -1,4 +1,4 @@
-import { leaves as allLeaves, type Block, type Leaf } from "./volume";
+import { leaves as allLeaves, type Block, type Leaf } from "./volume.ts";
 
 /**
  * The book as a reader meets it, rather than as the scanner found it.
@@ -43,7 +43,7 @@ export interface Piece {
  * or following a hyphen, is a continuation — so its own answer is taken only
  * as corroboration.
  */
-export function continuesParagraph(sofar: string, block: Block) {
+export function continuesParagraph(sofar: string, block: Block): boolean {
   if (block.continuesPrevious) return true;
   if (sofar.endsWith("-")) return true;
   return /^[a-zà-öø-ÿ]/.test(block.text);
@@ -166,7 +166,7 @@ export function segmentsOf(piece: Piece): {
  * Markdown edition did 51 times. The marker is the renderer's to draw, so the
  * text hands it over.
  */
-export function footnoteText(piece: Piece) {
+export function footnoteText(piece: Piece): string {
   if (piece.kind !== "footnote" || !piece.marker) return piece.text;
   const marker = piece.marker.replace(/[()]/g, "");
   return piece.text.replace(new RegExp(`^\\s*\\(${marker}\\)\\s*`), "");
@@ -181,7 +181,7 @@ export function footnoteText(piece: Piece) {
  * paragraph. This walks the pieces keeping the current leaf, so a leaf closes
  * at the last piece actually belonging to it.
  */
-export function leafClosings(pieces: Piece[]) {
+export function leafClosings(pieces: Piece[]): Map<number, string[]> {
   const lastOf = new Map<string, number>();
   let current: string | undefined;
   pieces.forEach((piece, index) => {

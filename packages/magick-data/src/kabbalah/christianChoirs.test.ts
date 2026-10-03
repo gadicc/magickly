@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import christianChoirs from "./ChristianChoirs";
-import { ANGEL_COUNT, choirOf } from "./seventyTwoAngelsDerived";
+import christianChoirs from "./ChristianChoirs.ts";
+import { ANGEL_COUNT, choirOf } from "./seventyTwoAngelsDerived.ts";
 
 describe("the nine choirs", () => {
   it("names all nine, in Lenain's order", () => {

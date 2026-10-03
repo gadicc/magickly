@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { pathTarget } from "./pathTarget";
+import { pathTarget } from "./pathTarget.ts";
 
 describe("pathTarget", () => {
   it("ends on a field of the table it started in", () => {

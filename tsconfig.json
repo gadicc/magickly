@@ -18,6 +18,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "allowImportingTsExtensions": true,
     "jsx": "react-jsx",
     "plugins": [
       {
@@ -34,5 +35,10 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "output"]
+  "exclude": [
+    "node_modules",
+    "output",
+    "packages/magick-data/dist",
+    "packages/magick-data/lib"
+  ]
 }

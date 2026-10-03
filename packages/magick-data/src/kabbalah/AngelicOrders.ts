@@ -1,5 +1,5 @@
 import rows from "../../dist/kabbalah/angelicOrders.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** An order's key. */
 type AngelicOrderId = keyof typeof rows;

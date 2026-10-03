@@ -1,5 +1,5 @@
 import rows from "../../dist/kabbalah/souls.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A part of the soul's key: yechidah to guph. */
 type SoulId = keyof typeof rows;

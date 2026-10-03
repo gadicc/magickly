@@ -5,10 +5,10 @@ import ts from "typescript";
 import * as v from "valibot";
 import { describe, expect, it } from "vitest";
 import type planets from "../dist/astrology/planets.js";
-import type { PlanetId } from "./astrology/Planets";
-import { buildData, picklistPaths, TABLE_FILES, tableType } from "./build";
-import { schemas } from "./schemas";
-import { type TableName, tables } from "./tables";
+import type { PlanetId } from "./astrology/Planets.ts";
+import { buildData, picklistPaths, TABLE_FILES, tableType } from "./build.ts";
+import { schemas } from "./schemas.ts";
+import { type TableName, tables } from "./tables.ts";
 
 /**
  * What [the build](./build.ts) emits for each source: a module, a declaration

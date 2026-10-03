@@ -10,8 +10,10 @@
 /coverage
 /output/
 
-# generated data tables (packages/magick-data/src/build.ts)
+# generated data tables (packages/magick-data/src/build.ts), and the
+# package's compiled modules, which only its publish build writes
 /packages/magick-data/dist/
+/packages/magick-data/lib/
 
 # next.js
 /.next/

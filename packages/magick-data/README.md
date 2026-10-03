@@ -3,11 +3,18 @@
 Magickal correspondences and reference data as JSON5, with TypeScript types
 beside each file.
 
-Copyright (c) 2020-2026 Gadi Cohen, under [CC BY 4.0](./LICENSE.txt): use it
-anywhere, including commercially, as long as you credit
-[magick.ly](https://magick.ly). The app that reads it is
-[AGPL-3.0-or-later](../../LICENSE.txt); this data is deliberately freer, so that
-it can travel.
+Copyright (c) 2020-2026 Gadi Cohen. The data is under
+[CC BY 4.0](./LICENSE-DATA.txt): use it anywhere, including commercially, as
+long as you credit [magick.ly](https://magick.ly). The code is
+[MIT](./LICENSE.txt), which says which file is which. The app that reads it is
+[AGPL-3.0-or-later](../../LICENSE.txt); this package is deliberately freer, so
+that it can travel.
+
+The Enochian dictionary is the exception: it is under neither licence, and is
+not in the published package. Its entries come from Gerald J. Schueler's
+*Enochian Magic: A Practical Manual* (Llewellyn, 1985), which is in
+copyright, and from *The Whole Enochian Dictionary*, an online compilation
+whose author and status are unknown, so no rights are claimed in them.
 
 Facts themselves belong to nobody. What is licensed here is the collecting,
 wording and arrangement.

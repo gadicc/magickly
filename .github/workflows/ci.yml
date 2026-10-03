@@ -46,6 +46,9 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test:coverage
       - run: pnpm build
+      # The package's published shape: built, packed, installed into a
+      # fixture, type-checked and loaded (plan 052).
+      - run: pnpm --filter magick-data smoke
       # Development runs on Turbopack while production builds with webpack
       # (above). This Turbopack build replaces that output and only checks
       # the development path still compiles and prerenders.

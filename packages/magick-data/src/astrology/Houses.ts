@@ -1,5 +1,5 @@
 import rows from "../../dist/astrology/houses.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /**
  * A row, which may carry the links `assemble()` makes: the barrel's rows have

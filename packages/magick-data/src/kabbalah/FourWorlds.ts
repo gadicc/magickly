@@ -1,5 +1,5 @@
 import rows from "../../dist/kabbalah/fourWorlds.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A world's key. */
 type FourWorldId = keyof typeof rows;

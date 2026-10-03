@@ -1,5 +1,5 @@
 import rows from "../../dist/enochian/letters.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A letter's key, which is its Latin transliteration. */
 type LetterId = keyof typeof rows;

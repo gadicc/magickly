@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { assemble } from "./assemble";
-import barrel from "./data";
+import { assemble } from "./assemble.ts";
+import barrel from "./data.ts";
 import type {
   AlchemySymbolRow,
   ArchangelRow,
@@ -13,9 +13,9 @@ import type {
   TetragramRow,
   TreeOfLifePathRow,
   ZodiacRow,
-} from "./rows";
-import { tables } from "./tables";
-import type { Links, Raw, Row } from "./types";
+} from "./rows.ts";
+import { tables } from "./tables.ts";
+import type { Links, Raw, Row } from "./types.ts";
 
 /**
  * The row types, asserted where they matter: a link is a property typed as

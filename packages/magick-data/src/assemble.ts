@@ -15,10 +15,10 @@
  * what [the integrity check](./integrity.test.ts) asserts on. Importing bad
  * data must fail a test, not a page.
  */
-import { graph } from "./graph";
-import type { LinkSpec, TableSpec } from "./graphSpec";
-import type { TableName, Tables } from "./tables";
-import type { Assembled } from "./types";
+import { graph } from "./graph.ts";
+import type { LinkSpec, TableSpec } from "./graphSpec.ts";
+import type { TableName, Tables } from "./tables.ts";
+import type { Assembled } from "./types.ts";
 
 /** What the data says that the graph says it should not. */
 export interface Problem {
@@ -57,7 +57,7 @@ const problemsByData = new WeakMap<object, Problem[]>();
  * The accessor a link takes: `as` if it names one, else the field name
  * without its suffix, pluralised for a list.
  */
-export function accessorName(field: string, link: LinkSpec) {
+export function accessorName(field: string, link: LinkSpec): string {
   if (link.as) return link.as;
   const leaf = field.slice(field.lastIndexOf(".") + 1);
   return leaf.endsWith("Ids") ? `${leaf.slice(0, -3)}s` : leaf.slice(0, -2);

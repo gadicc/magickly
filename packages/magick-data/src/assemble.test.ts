@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { assemble, type Problem, problemsOf } from "./assemble";
-import type { Tables } from "./tables";
-import { tables } from "./tables";
+import { assemble, type Problem, problemsOf } from "./assemble.ts";
+import type { Tables } from "./tables.ts";
+import { tables } from "./tables.ts";
 
 /**
  * `assemble()` against the real graph. The tables are mostly made up, because

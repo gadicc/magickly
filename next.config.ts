@@ -91,7 +91,10 @@ export default async function (phase: string): Promise<NextConfig> {
     // package native so its relative data paths remain runtime-relative.
     serverExternalPackages: ["pdf-parse", "@resvg/resvg-wasm", "css-tree"],
     // The data package's exports are its TypeScript sources, compiled here as
-    // the app's own code is.
+    // the app's own code is. Their relative specifiers end in `.ts`, which
+    // both bundlers resolve as written; neither resolves a `.js` specifier to
+    // a `.ts` file, and webpack's `extensionAlias`, the one remedy, is not
+    // read by Turbopack (plan 052).
     transpilePackages: ["magick-data"],
     outputFileTracingIncludes: {
       // The legacy alias only renders the Tree, which uses the public base fonts.

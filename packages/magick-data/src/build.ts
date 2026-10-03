@@ -35,8 +35,9 @@
  * TypeScript about 19,300 types, more than every table combined (plan 032,
  * decision 1). `unknown` costs none, and names nothing outside `dist/`.
  *
- * `dist/` sits at the package root, beside `src/`, and is generated and
- * gitignored, so every task that reads it runs this first: `data:build`
+ * `dist/` sits at the package root, beside `src/` and the published
+ * `lib/`, so `../dist/…` reaches the same file from a source and from its
+ * compiled module. It is generated and gitignored, so every task that reads it runs this first: `data:build`
  * chains ahead of the app's `typecheck`, `build`, `check:turbopack` and test
  * scripts, `pnpm dev` runs it in `--watch` ([below](#watchData)), and this
  * module is also vitest's globalSetup, so a bare `vitest run <file>` works.
@@ -52,9 +53,9 @@ import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import JSON5 from "json5";
 import type { GenericSchema } from "valibot";
-import { graph } from "./graph";
-import { schemas } from "./schemas";
-import type { TableName } from "./tables";
+import { graph } from "./graph.ts";
+import { schemas } from "./schemas.ts";
+import type { TableName } from "./tables.ts";
 
 const DATA_DIR = fileURLToPath(new URL(".", import.meta.url));
 const DIST_DIR = fileURLToPath(new URL("../dist", import.meta.url));
@@ -350,8 +351,8 @@ export async function buildData() {
     written.push(...(await buildOne(name)));
   }
 
-  // The graph, for a reader that is not TypeScript. `as const satisfies`
-  // leaves an ordinary object behind, so this is the same literal.
+  // The graph, for a reader that is not TypeScript. `as const` leaves an
+  // ordinary object behind, so this is the same literal.
   expected.add("graph.json");
   const graphJson = `${JSON.stringify(graph, null, 2)}\n`;
   if (await writeIfChanged(join(DIST_DIR, "graph.json"), graphJson))

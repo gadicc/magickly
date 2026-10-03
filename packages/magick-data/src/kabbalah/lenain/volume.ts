@@ -125,24 +125,24 @@ export const divisions: Division[] = OPENS.map((open, index) => ({
   to: (OPENS[index + 1]?.pdfPage ?? LAST_LEAF + 1) - 1,
 }));
 
-export function divisionBySlug(slug: string) {
+export function divisionBySlug(slug: string): Division | undefined {
   return divisions.find((division) => division.slug === slug);
 }
 
 /** The leaves of one division, in order. */
-export function leavesOf(division: Division) {
+export function leavesOf(division: Division): Leaf[] {
   return leaves.filter(
     (leaf) => leaf.pdfPage >= division.from && leaf.pdfPage <= division.to,
   );
 }
 
 /** Every leaf of the book proper, the reissue's advertisements excluded. */
-export function bookLeaves() {
+export function bookLeaves(): Leaf[] {
   return leaves.filter((leaf) => leaf.pdfPage <= LAST_LEAF);
 }
 
 /** Which division a leaf belongs to, for a permalink that names both. */
-export function divisionOfLeaf(pdfPage: number) {
+export function divisionOfLeaf(pdfPage: number): Division | undefined {
   return divisions.find(
     (division) => pdfPage >= division.from && pdfPage <= division.to,
   );

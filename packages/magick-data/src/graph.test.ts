@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import distGraph from "../dist/graph.json";
-import { graph } from "./graph";
-import type { TableSpec } from "./graphSpec";
-import { tables } from "./tables";
+import { graph } from "./graph.ts";
+import type { TableSpec } from "./graphSpec.ts";
+import { tables } from "./tables.ts";
 
 /**
  * The graph about itself: that it names every table, that what it leaves

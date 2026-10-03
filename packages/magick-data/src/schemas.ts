@@ -13,9 +13,9 @@
  * because optionality belongs to the data (plan 032, decision 5).
  */
 import * as v from "valibot";
-import { graph } from "./graph";
-import type { TableSpec } from "./graphSpec";
-import type { TableName } from "./tables";
+import { graph } from "./graph.ts";
+import type { TableSpec } from "./graphSpec.ts";
+import type { TableName } from "./tables.ts";
 
 type Entries = Record<string, v.GenericSchema>;
 

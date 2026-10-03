@@ -1,5 +1,5 @@
 import rows from "../../dist/astrology/zodiac.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A sign's key. */
 type ZodiacId = keyof typeof rows;

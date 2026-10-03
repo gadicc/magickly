@@ -11,7 +11,7 @@ import {
   planetOf,
   presidingDaysOf,
   signOf,
-} from "./seventyTwoAngelsDerived";
+} from "./seventyTwoAngelsDerived.ts";
 
 /**
  * The expectations here are transcribed from Lenain's own four tables and from

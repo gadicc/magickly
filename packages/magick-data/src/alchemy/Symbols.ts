@@ -1,5 +1,5 @@
 import rows from "../../dist/alchemy/symbols.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A symbol's key. */
 type AlchemySymbolID = keyof typeof rows;

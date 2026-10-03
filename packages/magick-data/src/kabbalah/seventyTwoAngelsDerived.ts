@@ -1,5 +1,5 @@
-import type { PlanetId } from "../astrology/Planets";
-import type { ZodiacId } from "../astrology/Zodiac";
+import type { PlanetId } from "../astrology/Planets.ts";
+import type { ZodiacId } from "../astrology/Zodiac.ts";
 
 /**
  * Lenain's four cabalistic tables are arithmetic. The year begins at the first
@@ -85,7 +85,7 @@ export function monthDayOf(dayOfYear: number): MonthDay {
 }
 
 /** `[month, day]` as a 0-based day of a common year. */
-export function dayOfYearOf([month, day]: MonthDay) {
+export function dayOfYearOf([month, day]: MonthDay): number {
   if (!Number.isInteger(month) || month < 1 || month > 12)
     throw new RangeError(`Not a month: ${month}`);
   if (!Number.isInteger(day) || day < 1 || day > MONTH_LENGTHS[month - 1])
@@ -97,7 +97,7 @@ export function dayOfYearOf([month, day]: MonthDay) {
 }
 
 /** The angel's five degrees of the sphere, 1-based and inclusive. */
-export function degreesOf(no: number) {
+export function degreesOf(no: number): { from: number; to: number } {
   assertAngelNumber(no);
   return { from: (no - 1) * DEGREES_EACH + 1, to: no * DEGREES_EACH };
 }
@@ -106,7 +106,12 @@ export function degreesOf(no: number) {
  * The sign the angel's degrees fall in, and which of that sign's six
  * five-degree quinances they are.
  */
-export function signOf(no: number) {
+export function signOf(no: number): {
+  zodiacId: ZodiacId;
+  from: number;
+  to: number;
+  quinance: number;
+} {
   assertAngelNumber(no);
   const withinSign = (no - 1) % ANGELS_PER_SIGN;
   return {
@@ -121,7 +126,10 @@ export function signOf(no: number) {
  * The five days the angel governs, from Lenain's second table. `shiftDays`
  * moves the year's start off the tropical equinox, for a sidereal reading.
  */
-export function governedDaysOf(no: number, shiftDays = 0) {
+export function governedDaysOf(
+  no: number,
+  shiftDays = 0,
+): { from: MonthDay; to: MonthDay } {
   assertAngelNumber(no);
   const first = FIRST_DAY + (no - 1) * DAYS_EACH + shiftDays;
   return {
@@ -143,24 +151,24 @@ export function presidingDaysOf(no: number): MonthDay[] {
  * The angel's twenty minutes of the day, from Lenain's fourth table, as
  * minutes after midnight.
  */
-export function invocationOf(no: number) {
+export function invocationOf(no: number): { from: number; to: number } {
   assertAngelNumber(no);
   return { from: (no - 1) * MINUTES_EACH, to: no * MINUTES_EACH };
 }
 
 /** Which of the sacred calendar's 36 decades the angel falls in. */
-export function decadeOf(no: number) {
+export function decadeOf(no: number): number {
   assertAngelNumber(no);
   return Math.ceil(no / ANGELS_PER_DECADE);
 }
 
 /** The planet ruling the angel's decade. */
-export function planetOf(no: number) {
+export function planetOf(no: number): PlanetId {
   return DECADE_PLANETS[(decadeOf(no) - 1) % DECADE_PLANETS.length];
 }
 
 /** Which of the nine choirs the angel belongs to, counting from the seraphim. */
-export function choirOf(no: number) {
+export function choirOf(no: number): number {
   assertAngelNumber(no);
   return Math.ceil(no / ANGELS_PER_CHOIR);
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { coverage } from "./coverage";
+import { coverage } from "./coverage.ts";
 
 /**
  * The list of sources no graph check opens, held where it can be seen.

@@ -6,9 +6,9 @@
  * Next reads data the graph disagrees with; `integrity.test.ts` is the same
  * list in CI.
  */
-import { coverage } from "./coverage";
-import { checkIntegrity } from "./integrity";
-import { tables } from "./tables";
+import { coverage } from "./coverage.ts";
+import { checkIntegrity } from "./integrity.ts";
+import { tables } from "./tables.ts";
 
 const failures = checkIntegrity();
 for (const { check, where, detail } of failures)

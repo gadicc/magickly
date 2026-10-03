@@ -17,8 +17,8 @@
  * ([keyEntries.ts](../../../../src/app/enochian/keys/keyEntries.ts)).
  */
 import dictionary from "../../dist/enochian/dictionary.js";
-import type { EnochianDictionary } from "./dictionaryEntry";
+import type { EnochianDictionary } from "./dictionaryEntry.ts";
 
-export type { EnochianDictionary, EnochianEntry } from "./dictionaryEntry";
+export type { EnochianDictionary, EnochianEntry } from "./dictionaryEntry.ts";
 
 export default dictionary as EnochianDictionary;

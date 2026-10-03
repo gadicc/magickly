@@ -1,5 +1,5 @@
 import rows from "../../dist/kabbalah/sephirot.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A sephirah's key, Da'at included. */
 type SephirahId = keyof typeof rows;

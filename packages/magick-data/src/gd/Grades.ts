@@ -1,5 +1,5 @@
 import rows from "../../dist/gd/grades.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A grade's key, Portal included. */
 type GDGradeId = keyof typeof rows;

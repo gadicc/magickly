@@ -1,5 +1,5 @@
 import rows from "../../dist/astrology/planets.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** Every key of the table, the three spheres of the Tree included. */
 type PlanetKey = keyof typeof rows;

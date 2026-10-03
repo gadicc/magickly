@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { duplicateKeys, duplicateKeysInSources } from "./duplicateKeys";
+import { duplicateKeys, duplicateKeysInSources } from "./duplicateKeys.ts";
 
 /**
  * The [duplicate-key lint](./duplicateKeys.ts) on text written for it, since

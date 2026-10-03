@@ -17,13 +17,15 @@
  */
 
 import * as v from "valibot";
-import { assemble, problemsOf } from "./assemble";
-import { duplicateKeysInSources } from "./duplicateKeys";
-import realDictionary, { type EnochianDictionary } from "./enochian/Dictionary";
-import { graph } from "./graph";
-import type { TableSpec } from "./graphSpec";
-import { enochianEntry, schemas } from "./schemas";
-import { tables as realTables, type TableName, type Tables } from "./tables";
+import { assemble, problemsOf } from "./assemble.ts";
+import { duplicateKeysInSources } from "./duplicateKeys.ts";
+import realDictionary, {
+  type EnochianDictionary,
+} from "./enochian/Dictionary.ts";
+import { graph } from "./graph.ts";
+import type { TableSpec } from "./graphSpec.ts";
+import { enochianEntry, schemas } from "./schemas.ts";
+import { tables as realTables, type TableName, type Tables } from "./tables.ts";
 
 /** One thing that is wrong, named so a reader knows where to look. */
 export interface Failure {

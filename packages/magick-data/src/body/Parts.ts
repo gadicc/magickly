@@ -1,5 +1,5 @@
 import rows from "../../dist/body/parts.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A part of the body's key, as the sephirot are laid on it. */
 type BodyPartId = keyof typeof rows;

@@ -1,5 +1,5 @@
 import rows from "../../dist/kabbalah/paths.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A path's key, `<from>_<to>` by the sephirot it joins. */
 type PathId = keyof typeof rows;

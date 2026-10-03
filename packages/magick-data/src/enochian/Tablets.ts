@@ -1,5 +1,5 @@
 import rows from "../../dist/enochian/tablets.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A tablet's key. Only the two with grid data are here. */
 type EnochianTabletID = keyof typeof rows;

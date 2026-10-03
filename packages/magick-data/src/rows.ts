@@ -18,7 +18,7 @@
  * `Raw & Partial<Links>`, which is the shape that accepts a raw row and an
  * assembled one alike. These are the assembled row exactly.
  */
-import type { Row } from "./types";
+import type { Row } from "./types.ts";
 
 // ASTROLOGY
 export interface PlanetRow extends Row<"*", "planet"> {}

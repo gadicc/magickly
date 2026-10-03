@@ -1,5 +1,5 @@
 import rows from "../../dist/kabbalah/archangels.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** An archangel's key. */
 type ArchangelId = keyof typeof rows;

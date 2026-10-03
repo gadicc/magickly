@@ -24,8 +24,9 @@
  * pulls in everything it can reach.
  */
 // biome-ignore assist/source/organizeImports: grouped by subject, as tables.ts is
-import { assemble } from "./assemble";
-import type { Tables } from "./tables";
+import { assemble } from "./assemble.ts";
+import type { TableName, Tables } from "./tables.ts";
+import type { Assembled } from "./types.ts";
 
 import planet from "../dist/astrology/planets.js";
 import zodiac from "../dist/astrology/zodiac.js";
@@ -62,6 +63,12 @@ import alchemySymbol from "../dist/alchemy/symbols.js";
 import alchemyTerm from "../dist/alchemy/terms.js";
 import element from "../dist/alchemy/elements.js";
 import elemental from "../dist/alchemy/elementals.js";
+
+/** The tables the barrel assembles: every one bar the three named above. */
+type BarrelTable = Exclude<
+  TableName,
+  "seventyTwoAngel" | "enochianTablet" | "christianChoir"
+>;
 
 const barrel = {
   // ASTROLOGY
@@ -107,11 +114,10 @@ const barrel = {
   alchemyTerm,
   element,
   elemental,
-} satisfies Omit<
-  Tables,
-  "seventyTwoAngel" | "enochianTablet" | "christianChoir"
->;
+} satisfies Pick<Tables, BarrelTable>;
 
-const data = assemble(barrel);
+// Stated rather than inferred, which is what `isolatedDeclarations` asks of
+// a published module, and exactly what `assemble()` returns for these.
+const data: Assembled<BarrelTable> = assemble(barrel);
 
 export default data;

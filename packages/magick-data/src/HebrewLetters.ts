@@ -1,5 +1,5 @@
 import rows from "../dist/hebrewLetters.js";
-import type { Links, Raw } from "./types";
+import type { Links, Raw } from "./types.ts";
 
 /** A letter's key, derived from the JSON: the twenty-two, and the five final forms. */
 type HebrewLetterId = keyof typeof rows;

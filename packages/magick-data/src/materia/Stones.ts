@@ -1,5 +1,5 @@
 import rows from "../../dist/materia/stones.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A precious stone's key, as the sephirot are given them. */
 type StoneId = keyof typeof rows;

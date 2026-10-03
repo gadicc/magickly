@@ -1,5 +1,5 @@
 import rows from "../../dist/materia/scents.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A perfume's or incense's key, as the sephirot are given them. */
 type ScentId = keyof typeof rows;

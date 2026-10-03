@@ -9,20 +9,20 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import * as v from "valibot";
 import { describe, expect, it } from "vitest";
-import { PLANET_IDS } from "./astrology/Planets";
+import { PLANET_IDS } from "./astrology/Planets.ts";
 import dictionary, {
   type EnochianDictionary,
   type EnochianEntry,
-} from "./enochian/Dictionary";
-import type { TableSpec } from "./graphSpec";
+} from "./enochian/Dictionary.ts";
+import type { TableSpec } from "./graphSpec.ts";
 import {
   checkDictionary,
   checkIntegrity,
   checkMirrors,
   type Failure,
-} from "./integrity";
-import { enochianEntry } from "./schemas";
-import { type Tables, tables } from "./tables";
+} from "./integrity.ts";
+import { enochianEntry } from "./schemas.ts";
+import { type Tables, tables } from "./tables.ts";
 
 /**
  * The data against the graph: every id-shaped field declared, every link

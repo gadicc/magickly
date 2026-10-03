@@ -1,5 +1,5 @@
 import rows from "../../dist/alchemy/terms.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A term's key. */
 type AlchemyTermID = keyof typeof rows;

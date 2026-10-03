@@ -7,8 +7,9 @@ Copyright (c) 2020-2026 Gadi Cohen.
 - The **app** is [AGPL-3.0-or-later](./LICENSE.txt): use it, change it and run
   it, but whoever you serve it to must be able to get its source.
 - The **data** in [`packages/magick-data/`](./packages/magick-data) is
-  [CC BY 4.0](./packages/magick-data/LICENSE.txt): use it anywhere, with
-  credit.
+  [CC BY 4.0](./packages/magick-data/LICENSE-DATA.txt): use it anywhere, with
+  credit. That package is licensed by its own files: its code is MIT, and its
+  [LICENSE.txt](./packages/magick-data/LICENSE.txt) says which file is which.
 - The **components** in [`src/components/`](./src/components) are
   [MIT](./src/components/LICENSE.txt), apart from the few that import app code,
   which that file lists.

@@ -12,8 +12,8 @@ import { describe, expect, it, vi } from "vitest";
  * the real graph under a name no real `assemble()` is handed, so that every
  * other assertion here reads the graph the app does.
  */
-vi.mock("./graph", async (importOriginal) => {
-  const real = await importOriginal<typeof import("./graph")>();
+vi.mock("./graph.ts", async (importOriginal) => {
+  const real = await importOriginal<typeof import("./graph.ts")>();
   const graph = {
     ...real.graph,
     ruled: { links: { archangelId: { to: "archangel", as: "ruler" } } },
@@ -21,8 +21,8 @@ vi.mock("./graph", async (importOriginal) => {
   return { ...real, graph, default: graph };
 });
 
-import { assemble, problemsOf } from "./assemble";
-import { type Tables, tables } from "./tables";
+import { assemble, problemsOf } from "./assemble.ts";
+import { type Tables, tables } from "./tables.ts";
 
 type Fake = Record<string, unknown>;
 

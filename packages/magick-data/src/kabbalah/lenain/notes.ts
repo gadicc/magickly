@@ -46,16 +46,16 @@ export function notesByPage(): Map<string, Note[]> {
 }
 
 /** Notes that concern no single leaf: they belong to the edition, not a page. */
-export function editionNotes() {
+export function editionNotes(): Note[] {
   return notes.filter((note) => note.no === 0 && !note.page);
 }
 
 /** The notes concerning one genius, in the order the apparatus holds them. */
-export function notesOfGenius(no: number) {
+export function notesOfGenius(no: number): Note[] {
   return notes.filter((note) => note.no === no);
 }
 
 /** The leaf a genius's entry opens on, for a link into the book. */
-export function anchorOfGenius(no: number) {
+export function anchorOfGenius(no: number): string | undefined {
   return notes.find((note) => note.no === no && note.page)?.page;
 }

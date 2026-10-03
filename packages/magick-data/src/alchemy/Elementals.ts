@@ -1,5 +1,5 @@
 import rows from "../../dist/alchemy/elementals.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** An elemental's key. */
 type ElementalId = keyof typeof rows;

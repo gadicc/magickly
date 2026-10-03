@@ -1,5 +1,5 @@
 import rows from "../../dist/kabbalah/tribesOfIsrael.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A tribe's key, Ephraim and Manasseh included. */
 type TribeOfIsraelId = keyof typeof rows;

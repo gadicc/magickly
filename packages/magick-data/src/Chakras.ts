@@ -1,5 +1,5 @@
 import rows from "../dist/chakras.js";
-import type { Links, Raw } from "./types";
+import type { Links, Raw } from "./types.ts";
 
 /** A chakra's key: the seven, root to crown. */
 type ChakraId = keyof typeof rows;

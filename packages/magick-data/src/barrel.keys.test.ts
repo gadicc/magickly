@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import data from "./data";
+import data from "./data.ts";
 
 /**
  * What a row of each table looks like from the outside: the fields as

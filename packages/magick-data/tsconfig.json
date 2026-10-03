@@ -1,0 +1,21 @@
+{
+  // The package's own check: every source and test, emitting nothing. It
+  // has no DOM, so a browser global the published modules relied on would
+  // fail here; `structuredClone` comes from Node's types (plan 052).
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": ["es2022"],
+    "types": ["node"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "strict": false,
+    "strictNullChecks": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "incremental": false
+  },
+  "include": ["src/**/*.ts"]
+}

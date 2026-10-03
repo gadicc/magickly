@@ -1,5 +1,5 @@
 import rows from "../../dist/alchemy/elements.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** An element's key: the four, and spirit. */
 type ElementId = keyof typeof rows;

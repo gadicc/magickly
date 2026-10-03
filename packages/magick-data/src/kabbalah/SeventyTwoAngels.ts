@@ -1,5 +1,5 @@
 import rows from "../../dist/kabbalah/seventyTwoAngels.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /**
  * One of Lenain's seventy-two genii, as his entry gives it. Everything his

@@ -31,10 +31,10 @@
  * elements. What such a path reads is one joined string, so its target is
  * never `many`.
  */
-import { accessorName } from "./assemble";
-import { graph } from "./graph";
-import type { LinkSpec } from "./graphSpec";
-import { type TableName, tables } from "./tables";
+import { accessorName } from "./assemble.ts";
+import { graph } from "./graph.ts";
+import type { LinkSpec } from "./graphSpec.ts";
+import { type TableName, tables } from "./tables.ts";
 
 /** Where a path ends. */
 export interface PathTarget {

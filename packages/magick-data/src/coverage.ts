@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { tables } from "./tables";
+import { tables } from "./tables.ts";
 
 /**
  * Which JSON5 sources the graph checks, and which it does not.

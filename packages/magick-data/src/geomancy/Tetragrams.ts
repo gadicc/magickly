@@ -1,5 +1,5 @@
 import rows from "../../dist/geomancy/tetragrams.js";
-import type { Links, Raw } from "../types";
+import type { Links, Raw } from "../types.ts";
 
 /** A figure's key. */
 type TetragramID = keyof typeof rows;
