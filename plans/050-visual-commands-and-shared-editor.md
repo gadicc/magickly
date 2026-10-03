@@ -5,6 +5,9 @@ Loom extraction, dedicated modifier bindings, duplicate/move actions and drag
 reordering remain follow-ups. The ritual authoring/storage contracts remain in
 place; no shared package changes or Markdown migration.
 
+The follow-up structure for block-owned commands, editor registries and research
+is recorded separately in [Block editor registry](051-block-editor-registry.md).
+
 ## Visual typing commands
 
 Implemented fast path: typing `/say hiero ` or `/do keryx ` at the start of a fresh
