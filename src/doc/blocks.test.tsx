@@ -118,3 +118,56 @@ it("retains reader section heading semantics and navigation anchors", () => {
   ).toBe("H5");
   expect(view.container.querySelector("#Opening_section")).toBeTruthy();
 });
+
+it("numbers collected footnotes in order and does not retain removed notes across renders", () => {
+  const task = {
+    type: "task",
+    role: "hiero",
+    say: true,
+    children: [
+      { type: "text", value: "Sentence" },
+      { type: "footnote", children: [{ type: "text", value: "First body" }] },
+      { type: "footnote", children: [{ type: "text", value: "Second body" }] },
+    ],
+  };
+  const doc = { children: [task] };
+  const view = render(
+    <DocContext.Provider value={{ vars: {}, roles }}>
+      <Render doc={doc} onChange={undefined} />
+    </DocContext.Provider>,
+  );
+  expect(
+    [...view.container.querySelectorAll("sup")].map((node) => node.textContent),
+  ).toEqual(["1", "2"]);
+  expect(
+    view.container.querySelectorAll('[data-ritual-frame="footnotes"] li'),
+  ).toHaveLength(2);
+  view.rerender(
+    <DocContext.Provider value={{ vars: {}, roles }}>
+      <Render
+        doc={{
+          children: [
+            { ...task, children: [task.children[0], task.children[2]] },
+          ],
+        }}
+        onChange={undefined}
+      />
+    </DocContext.Provider>,
+  );
+  expect(
+    [...view.container.querySelectorAll("sup")].map((node) => node.textContent),
+  ).toEqual(["1"]);
+  expect(
+    view.container.querySelectorAll('[data-ritual-frame="footnotes"] li'),
+  ).toHaveLength(1);
+});
+
+it("renders empty footnote collections without inventing notes or throwing", () => {
+  const view = render(
+    <Render doc={{ children: [{ type: "footnotes" }] }} onChange={undefined} />,
+  );
+  expect(
+    view.container.querySelector('[data-ritual-frame="footnotes"]'),
+  ).toBeTruthy();
+  expect(view.container.querySelectorAll("li")).toHaveLength(0);
+});

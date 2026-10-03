@@ -42,3 +42,55 @@
 .grade {
   display: inline;
 }
+.footnoteButton {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0 0.15em;
+  cursor: pointer;
+}
+.footnoteEditor {
+  min-width: 0;
+}
+.footnoteEditor :global(.tiptap) {
+  min-height: 1.4em;
+  padding: 0.25em;
+  background: transparent;
+  outline: 1px solid #8b95a6;
+}
+.footnotePreview {
+  overflow-wrap: anywhere;
+}
+/* Keep the reference in the sentence while its canonical children remain in
+   their original contentDOM. Only the collected view edits those children. */
+:global(.ritual-node-view):has(
+  > .block[data-ritual-block="footnote"][data-collected]
+),
+.block[data-ritual-block="footnote"][data-collected],
+.continuation {
+  display: inline;
+  margin: 0;
+}
+.block[data-ritual-block="footnote"][data-collected] {
+  white-space: normal;
+}
+
+.footnotePreview img {
+  max-width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+}
+
+.footnoteEditor :global(.tiptap) > p:first-child {
+  margin-top: 0;
+}
+.footnoteEditor :global(.tiptap) > p:last-child {
+  margin-bottom: 0;
+}
+
+/* The task footer projects its direct collection after the speech/action slot.
+   Its original node and hidden children still belong to ProseMirror. */
+.block[data-task-collection] {
+  display: none;
+}

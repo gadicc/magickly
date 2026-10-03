@@ -1,16 +1,22 @@
-import { Node, Render } from "json-rich-text/lib/esm/index.js";
+import { Node } from "json-rich-text/lib/esm/index.js";
 import React from "react";
 import DocContext from "../../src/doc/context.js";
 import {
+  FootnoteReferenceFrame,
+  FootnotesFrame,
   GradeFrame,
   ImageFrame,
+  ListFrame,
+  ListItemFrame,
   NoteFrame,
   SummaryFrame,
   TaskBody,
   TaskFrame,
   TitleFrame,
+  TodoFrame,
 } from "./ritualBlocks/Frames";
 import { roleAliases } from "./ritualBlocks/roles";
+import { planRitualFootnotes } from "./ritualFootnotes";
 
 class Title extends Node {
   render(key) {
@@ -34,7 +40,7 @@ class Todo extends Node {
   //type: "todo";
 
   render(key) {
-    return <div key={key}>(TODO: {this.renderChildren()})</div>;
+    return <TodoFrame key={key}>{this.renderChildren()}</TodoFrame>;
   }
 }
 
@@ -76,19 +82,27 @@ class Br extends Node {
 
 class ul extends Node {
   render(key) {
-    return <ul key={key}>{this.renderChildren()}</ul>;
+    return (
+      <ListFrame key={key} ordered={false}>
+        {this.renderChildren()}
+      </ListFrame>
+    );
   }
 }
 
 class ol extends Node {
   render(key) {
-    return <ol key={key}>{this.renderChildren()}</ol>;
+    return (
+      <ListFrame key={key} ordered>
+        {this.renderChildren()}
+      </ListFrame>
+    );
   }
 }
 
 class li extends Node {
   render(key) {
-    return <li key={key}>{this.renderChildren()}</li>;
+    return <ListItemFrame key={key}>{this.renderChildren()}</ListItemFrame>;
   }
 }
 
@@ -208,7 +222,7 @@ class Task extends Node {
       return children ? children.map((child, i) => child.render(i)) : null;
     }
 
-    // Render the body first: inline footnotes register themselves on this task.
+    // Keep the task's collection outside its speech/action presentation.
     const body = (
       <>
         {block.say && (
@@ -229,11 +243,18 @@ class Task extends Node {
         )}
       </>
     );
-    let footnotes = this.children.find((node) => node instanceof Footnotes);
-    if (!footnotes && this.footnotes) {
-      footnotes = new Footnotes({ type: "footnotes" });
-      footnotes.footnotes = this.footnotes;
-    }
+    const notes = footnotePlan(this).collections.get(this);
+    const footnotes = this.children.find((node) => node instanceof Footnotes);
+    const footer = footnotes ? (
+      footnotes.render()
+    ) : notes?.length ? (
+      <FootnotesFrame>
+        {notes.map((note, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: legacy JRT has no persisted node IDs; preserve its ordered child keys
+          <li key={i}>{note.renderChildren()}</li>
+        ))}
+      </FootnotesFrame>
+    ) : null;
     return (
       <div key={key} ref={ref}>
         <TaskFrame
@@ -242,7 +263,7 @@ class Task extends Node {
           audience={forMe ? "self" : "other"}
           samePreviousRole={samePreviousRole}
           page={key}
-          footer={footnotes && footnotes.render()}
+          footer={footer}
         >
           {body}
         </TaskFrame>
@@ -251,61 +272,30 @@ class Task extends Node {
   }
 }
 
+function footnotePlan(node) {
+  return node.footnotePlan;
+}
+
 class Footnote extends Node {
   render(key) {
-    let footnotes = null;
-    for (let parent = this.parent; parent; parent = parent.parent) {
-      for (const child of parent.children) {
-        // or child.block.type === "footnotes"
-        if (child instanceof Footnotes) {
-          footnotes = child;
-          break;
-        }
-      }
-      if (footnotes) break;
-      if (parent instanceof Task) {
-        footnotes = parent;
-        break;
-      }
-    }
-
-    let location = "";
-    if (footnotes) {
-      if (!footnotes.footnotes) footnotes.footnotes = [];
-      location = footnotes.footnotes.indexOf(this);
-      if (location === -1) {
-        footnotes.footnotes.push(this);
-        location = 0;
-      }
-    }
-    // console.log({ footnotes });
-
-    return <sup key={key}>{location + 1}</sup>;
+    return (
+      <FootnoteReferenceFrame
+        key={key}
+        number={footnotePlan(this).references.get(this)?.number ?? 1}
+      />
+    );
   }
 }
 
 class Footnotes extends Node {
   render(key) {
     return (
-      <details key={key}>
-        <style jsx>{`
-          details {
-            margin-top: 15px;
-          }
-          ol {
-            padding-inline-start: 15px;
-          }
-          ol li {
-            text-indent: 0px;
-          }
-        `}</style>
-        <summary>Footnotes</summary>
-        <ol>
-          {this.footnotes.map((footnote, i) => (
-            <li key={i}>{footnote.renderChildren()}</li>
-          ))}
-        </ol>
-      </details>
+      <FootnotesFrame key={key}>
+        {(footnotePlan(this).collections.get(this) ?? []).map((note, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: legacy JRT has no persisted node IDs; preserve its ordered child keys
+          <li key={i}>{note.renderChildren()}</li>
+        ))}
+      </FootnotesFrame>
     );
   }
 }
@@ -389,4 +379,38 @@ Node.registerBlocks(blocks);
 
 // NB: If we don't export "Node", React fast refresh won't pickup Component
 // changes.
-export { Node, Render };
+/** Plan footnotes before React rendering while preserving the reader's collection order. */
+export function Render({ doc, onChange }) {
+  const root = Node.getBlockNode(doc);
+  root.footnotePlan = planRitualFootnotes(
+    root,
+    (node) => node.block.type,
+    (node) => node.children ?? [],
+    (node) => {
+      const { type, say, do: action } = node.block;
+      return type === "task"
+        ? !!(say || action)
+        : ![
+            "declareVar",
+            "img",
+            "br",
+            "grade",
+            "var",
+            "stylesheet",
+            "hr",
+            "cursor",
+            "text",
+          ].includes(type);
+    },
+  );
+  // JRT caches child instances without refreshing their parent pointers on
+  // immutable rerenders. Give every node this render's plan directly.
+  const attach = (node) => {
+    node.footnotePlan = root.footnotePlan;
+    for (const child of node.children ?? []) attach(child);
+  };
+  attach(root);
+  if (onChange) root.onChange = onChange;
+  return root.render();
+}
+export { Node };

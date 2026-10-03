@@ -5,6 +5,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
 } from "@testing-library/react";
 import type { Editor } from "@tiptap/core";
 import React from "react";
@@ -93,3 +94,56 @@ vi.mock("@/doc/RitualSourceEditor", () => ({
       onCompositionEnd: () => onCompositionChange?.(false),
     }),
 }));
+
+it("synchronizes an open footnote when creation is disabled and re-enabled", async () => {
+  const source = "//- magickli-ritual-pug 1\nHiero: Hello#[footnote Note]\n";
+  const onChange = vi.fn(),
+    valid = vi.fn();
+  const view = render(
+    <RitualCreationEditor
+      source={source}
+      disabled={false}
+      onChange={onChange}
+      onValidityChange={valid}
+    />,
+  );
+  const outer = await screen.findByRole("textbox", {
+    name: "New ritual visual editor",
+  });
+  await waitFor(() =>
+    expect(outer.querySelector("button[data-footnote-reference]")).toBeTruthy(),
+  );
+  fireEvent.click(outer.querySelector("button[data-footnote-reference]")!);
+  const inner = await screen.findByRole("textbox", {
+    name: "Footnote 1 editor",
+  });
+  view.rerender(
+    <RitualCreationEditor
+      source={source}
+      disabled
+      onChange={onChange}
+      onValidityChange={valid}
+    />,
+  );
+  await waitFor(() =>
+    expect(inner.getAttribute("contenteditable")).toBe("false"),
+  );
+  expect(onChange).not.toHaveBeenCalled();
+  view.rerender(
+    <RitualCreationEditor
+      source={source}
+      disabled={false}
+      onChange={onChange}
+      onValidityChange={valid}
+    />,
+  );
+  await waitFor(() =>
+    expect(inner.getAttribute("contenteditable")).toBe("true"),
+  );
+  act(() =>
+    (inner as HTMLElement & { editor: Editor }).editor.commands.insertContent(
+      "New ",
+    ),
+  );
+  expect(onChange).toHaveBeenCalledWith(expect.stringContaining("NoteNew "));
+});

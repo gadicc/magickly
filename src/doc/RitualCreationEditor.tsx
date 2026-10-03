@@ -106,7 +106,7 @@ export default function RitualCreationEditor({
     onValidityChange(!next.diagnostic);
   }, [editor, source, sourceComposing, onValidityChange]);
   React.useEffect(() => {
-    editor?.setEditable(!disabled && !issue, false);
+    editor?.setEditable(!disabled && !issue);
   }, [editor, disabled, issue]);
   return (
     <Box sx={{ mt: 2, display: "grid", gap: 1 }}>

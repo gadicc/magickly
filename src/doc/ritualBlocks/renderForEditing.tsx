@@ -1,19 +1,29 @@
 "use client";
 
 import type { NodeViewProps } from "@tiptap/core";
-import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
-import type { CSSProperties } from "react";
-import { parseRitualFileLocator } from "@/files/ritualFileLocator";
-import styles from "./editing.module.css";
 import {
+  NodeViewContent,
+  NodeViewWrapper,
+  useEditorState,
+} from "@tiptap/react";
+import { parseRitualFileLocator } from "@/files/ritualFileLocator";
+import { ritualFootnotesKey } from "../ritualFootnotesClient";
+import styles from "./editing.module.css";
+import { FootnotesForEditing } from "./FootnotesForEditing";
+import {
+  FootnoteReferenceFrame,
   GradeFrame,
   ImageFrame,
+  ListFrame,
+  ListItemFrame,
   NoteFrame,
   SummaryFrame,
   TaskBody,
   TaskFrame,
   TitleFrame,
+  TodoFrame,
 } from "./Frames";
+import { editorImageDimension, editorImageStyle } from "./imagePresentation";
 import { roles } from "./roles";
 
 /** Adapts the common visual frames to one stable ProseMirror-owned content slot. */
@@ -21,10 +31,56 @@ export function RitualBlockForEditing({
   node,
   selected,
   selectionInside,
+  editor,
+  getPos,
 }: NodeViewProps & { selectionInside?: boolean }) {
   const tag = String(node.attrs.tag);
   const attrs = node.attrs.attrs;
-  const content = <NodeViewContent className="ritual-content" />;
+  const presentation = useEditorState({
+    editor,
+    selector: ({ editor: current }) => {
+      const pos = getPos();
+      const plan = ritualFootnotesKey.getState(current.state);
+      let explicitHost: number | undefined;
+      if (typeof pos === "number" && tag === "task")
+        current.state.doc.nodeAt(pos)?.forEach((child, offset) => {
+          if (child.attrs.tag === "footnotes" && explicitHost === undefined)
+            explicitHost = pos + 1 + offset;
+        });
+      const footerHost = explicitHost ?? pos;
+      const taskCollection =
+        tag === "footnotes" &&
+        typeof pos === "number" &&
+        current.state.doc.resolve(pos).parent.attrs.tag === "task";
+      return {
+        pos,
+        footerHost,
+        explicitHost,
+        taskCollection,
+        reference:
+          typeof pos === "number" ? plan?.references.get(pos) : undefined,
+        isEditable: current.isEditable,
+        hasCollection:
+          typeof footerHost === "number" &&
+          !!plan?.collections.get(footerHost)?.length,
+      };
+    },
+  });
+  const collected = presentation.reference?.host != null;
+  const content = (
+    <NodeViewContent
+      className="ritual-content"
+      style={collected || tag === "footnotes" ? { display: "none" } : undefined}
+    />
+  );
+  const footer =
+    typeof presentation.footerHost === "number" &&
+    (presentation.hasCollection ||
+      presentation.explicitHost !== undefined ||
+      (tag === "footnotes" && !presentation.taskCollection)) &&
+    !presentation.taskCollection ? (
+      <FootnotesForEditing editor={editor} host={presentation.footerHost} />
+    ) : undefined;
   let frame;
   switch (tag) {
     case "task":
@@ -33,6 +89,7 @@ export function RitualBlockForEditing({
           role={String(attrs.role ?? "all")}
           roles={roles}
           audience="author"
+          footer={footer}
         >
           <TaskBody action={attrs.do === true}>{content}</TaskBody>
         </TaskFrame>
@@ -51,13 +108,63 @@ export function RitualBlockForEditing({
         </SummaryFrame>
       );
       break;
+    case "ul":
+    case "ol":
+      frame = (
+        <ListFrame editing ordered={tag === "ol"}>
+          {content}
+        </ListFrame>
+      );
+      break;
+    case "li":
+      frame = <ListItemFrame editing>{content}</ListItemFrame>;
+      break;
+    case "todo":
+      frame = <TodoFrame>{content}</TodoFrame>;
+      break;
+    case "footnote":
+      frame = collected ? (
+        <>
+          <FootnoteReferenceFrame number={presentation.reference!.number}>
+            <button
+              type="button"
+              data-footnote-reference
+              aria-disabled={!presentation.isEditable || undefined}
+              className={styles.footnoteButton}
+              aria-label={`Edit footnote ${presentation.reference!.number}`}
+              onClick={() => {
+                if (editor.isEditable && typeof presentation.pos === "number")
+                  editor.commands.setNodeSelection(presentation.pos);
+              }}
+            >
+              {presentation.reference!.number}
+            </button>
+          </FootnoteReferenceFrame>
+          {content}
+        </>
+      ) : (
+        <div className={styles.fallback}>
+          <div className={styles.label} contentEditable={false}>
+            Footnote · no active reader destination; edit or move its collection
+            in source
+          </div>
+          {content}
+        </div>
+      );
+      break;
+    case "footnotes":
+      frame = (
+        <>
+          {content}
+          {footer}
+        </>
+      );
+      break;
     default:
       frame = (
         <div className={styles.fallback}>
           <div className={styles.label} contentEditable={false}>
-            {tag === "footnote" || tag === "footnotes"
-              ? "Footnote content · placed by the reader"
-              : tag}
+            {tag}
           </div>
           {content}
         </div>
@@ -67,6 +174,8 @@ export function RitualBlockForEditing({
     <NodeViewWrapper
       as="section"
       data-ritual-block={tag}
+      data-collected={collected || undefined}
+      data-task-collection={presentation.taskCollection || undefined}
       data-ritual-meta={JSON.stringify(node.attrs)}
       data-edit-active={selected || selectionInside || undefined}
       className={styles.block}
@@ -83,7 +192,7 @@ export function RitualInlineForEditing({ node, selected }: NodeViewProps) {
       as="span"
       data-ritual-inline={tag}
       data-ritual-meta={JSON.stringify(node.attrs)}
-      className={tag === "grade" ? styles.grade : styles.token}
+      className={tag === "grade" || tag === "br" ? styles.grade : styles.token}
       data-edit-active={selected || undefined}
       contentEditable={false}
     >
@@ -91,48 +200,13 @@ export function RitualInlineForEditing({ node, selected }: NodeViewProps) {
         <GradeFrame grade={String(node.attrs.attrs.grade ?? "")} />
       ) : tag === "var" ? (
         `⁨${String(node.attrs.attrs.name ?? "")}⁩`
+      ) : tag === "br" ? (
+        <br />
       ) : (
         "↵"
       )}
     </NodeViewWrapper>
   );
-}
-
-/** Clipboard attributes reach node views before semantic validation; only safe sizing is previewed. */
-function editorImageStyle(value: unknown): CSSProperties {
-  if (value === undefined) return { width: "100%" };
-  try {
-    if (typeof value !== "string") return {};
-    const parsed: unknown = JSON.parse(value);
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
-      return {};
-    const safe: CSSProperties = {};
-    for (const key of ["width", "height"] as const) {
-      const size = (parsed as Record<string, unknown>)[key];
-      if (
-        (typeof size === "number" && Number.isFinite(size) && size >= 0) ||
-        (typeof size === "string" &&
-          /^(?:auto|0|\d+(?:\.\d+)?(?:px|em|rem|%|vh|vw|vmin|vmax|ch))$/.test(
-            size,
-          ))
-      )
-        safe[key] = size;
-    }
-    return safe;
-  } catch {
-    return {};
-  }
-}
-
-function editorImageDimension(value: unknown): string | number | undefined {
-  if (typeof value === "number" && Number.isFinite(value) && value >= 0)
-    return value;
-  if (
-    typeof value === "string" &&
-    /^\d+(?:\.\d+)?(?:px|em|rem|%|vh|vw|vmin|vmax|ch)?$/.test(value)
-  )
-    return value;
-  return undefined;
 }
 
 /** Render attached images only; arbitrary source URLs retain a metadata placeholder. */

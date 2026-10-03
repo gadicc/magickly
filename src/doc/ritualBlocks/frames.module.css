@@ -101,3 +101,60 @@
 .note :global([data-node-view-content]) p:last-child {
   margin-bottom: 0;
 }
+.list {
+  padding-inline-start: 40px;
+  margin-block: 1em;
+}
+.ordered {
+  list-style-type: decimal;
+}
+.unordered {
+  list-style-type: disc;
+}
+.listItem {
+  display: list-item;
+  list-style-type: inherit;
+}
+.listItem :global([data-node-view-content]) > div > p:first-child,
+.todo :global([data-node-view-content]),
+.todo :global([data-node-view-content]) > div,
+.todo :global([data-node-view-content]) > div > p:first-child {
+  display: inline;
+  margin: 0;
+}
+.footnotes {
+  margin-top: 15px;
+  font-style: normal;
+  text-indent: 0;
+}
+.footnotes ol {
+  padding-inline-start: 15px;
+}
+.footnotes li {
+  text-indent: 0;
+}
+.footnotesHeading {
+  font-style: normal;
+}
+.footnoteReference {
+  font-style: normal;
+  text-indent: 0;
+}
+
+/* ProseMirror inserts wrappers between each list and its items, so native
+   list-item numbering restarts. An explicit scoped counter spans those slots. */
+.list[data-editing] {
+  counter-reset: ritual-item;
+}
+.ordered[data-editing] {
+  --ritual-list-marker: counter(ritual-item) ". ";
+}
+.unordered[data-editing] {
+  --ritual-list-marker: "• ";
+}
+.listItem[data-editing] {
+  counter-increment: ritual-item;
+}
+.listItem[data-editing]::marker {
+  content: var(--ritual-list-marker);
+}

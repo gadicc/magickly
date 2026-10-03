@@ -159,6 +159,97 @@ export function GradeFrame({ grade }: { grade: string }) {
   );
 }
 
+/** Native reader lists and editor-owned slots share spacing and marker styles. */
+export function ListFrame({
+  ordered,
+  editing = false,
+  children,
+}: {
+  ordered: boolean;
+  editing?: boolean;
+  children: ReactNode;
+}) {
+  const Element = editing ? "div" : ordered ? "ol" : "ul";
+  return (
+    <Element
+      data-ritual-frame={ordered ? "ol" : "ul"}
+      data-editing={editing || undefined}
+      role={editing ? "list" : undefined}
+      className={`${styles.list} ${ordered ? styles.ordered : styles.unordered}`}
+    >
+      {children}
+    </Element>
+  );
+}
+
+export function ListItemFrame({
+  editing = false,
+  children,
+}: {
+  editing?: boolean;
+  children: ReactNode;
+}) {
+  const Element = editing ? "div" : "li";
+  return (
+    <Element
+      data-ritual-frame="li"
+      data-editing={editing || undefined}
+      role={editing ? "listitem" : undefined}
+      className={styles.listItem}
+    >
+      {children}
+    </Element>
+  );
+}
+
+export function TodoFrame({ children }: { children: ReactNode }) {
+  return (
+    <div data-ritual-frame="todo" className={styles.todo}>
+      (TODO: {children})
+    </div>
+  );
+}
+
+export function FootnoteReferenceFrame({
+  number,
+  children,
+}: {
+  number: number;
+  children?: ReactNode;
+}) {
+  return (
+    <sup
+      data-ritual-frame="footnote-reference"
+      className={styles.footnoteReference}
+    >
+      {children ?? number}
+    </sup>
+  );
+}
+
+/** Editing exposes the collected bodies; reading keeps native disclosure. */
+export function FootnotesFrame({
+  editing = false,
+  children,
+}: {
+  editing?: boolean;
+  children: ReactNode;
+}) {
+  return editing ? (
+    <div data-ritual-frame="footnotes" className={styles.footnotes}>
+      <div className={styles.footnotesHeading} contentEditable={false}>
+        Footnotes
+      </div>
+      <ol>{children}</ol>
+    </div>
+  ) : (
+    <details data-ritual-frame="footnotes" className={styles.footnotes}>
+      <summary>Footnotes</summary>
+      <ol>{children}</ol>
+    </details>
+  );
+}
+
 /** Receives an already-authorized reader URL or an editor-approved file locator. */
 export function ImageFrame({
   src,

@@ -57,3 +57,6 @@ issue.
 This completes the currently planned core editor work. Future work includes
 footnote placement parity, full offline authoring, collaboration and physical
 mobile/assistive-technology testing. No deployment or push was performed.
+
+The footnote placement and remaining list/TODO/break presentation follow-up
+was completed in [closer ritual WYSIWYG](047-ritual-wysiwyg-completion.md).
