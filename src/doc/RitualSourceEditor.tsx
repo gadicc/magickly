@@ -220,11 +220,21 @@ export default function RitualSourceEditor({
         ".ritual-folded-id": {
           font: "inherit",
           color: "#52657e",
-          background: "#b8c5d433",
-          border: "1px solid #8b9caf66",
+          background: "transparent",
+          border: "1px solid transparent",
+          opacity: "0.5",
           borderRadius: "3px",
           padding: "0 0.15em",
           cursor: "pointer",
+        },
+        ".ritual-folded-id:hover, .ritual-folded-id:focus-visible": {
+          opacity: "1",
+          background: "#b8c5d41a",
+          borderColor: "#8b9caf66",
+        },
+        ".ritual-folded-id:focus-visible": {
+          outline: "2px solid #52657e",
+          outlineOffset: "1px",
         },
       }),
     ],
