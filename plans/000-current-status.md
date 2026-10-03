@@ -249,6 +249,11 @@ Follow-ups are separate from the completed migration work:
   data selects; and the `RENDER_INPUT_SWEEP=1` sweep compares the JSX handed
   to the outliner rather than the outlined bytes, which is stricter but not
   the published artefact.
+- Step 4 of the data layer, `data/` as the `magick-data` workspace
+  package, is planned in [plan 052](052-data-package.md) and not yet
+  implemented. Three of the follow-ups below ride along with it: the
+  Shewbread's two unseen tribes, `dist/graph.json` after a `graph.ts` edit,
+  and the study sets asked through a function.
 - TODO: two small ones left by step 3a
   ([plan 032](032-data-layer.md#follow-ups)): what `pnpm dev` does not pick up
   until it restarts — a source directory added while it runs, since the watch
