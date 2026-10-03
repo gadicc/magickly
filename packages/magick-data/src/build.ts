@@ -47,6 +47,7 @@
  * The package is `"type": "module"`, so this is an ES module as a `.ts`, and
  * awaits at the top level, at the end.
  */
+import { spawn } from "node:child_process";
 import { watch } from "node:fs";
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
@@ -371,6 +372,25 @@ export async function setup() {
 }
 
 /**
+ * The modules whose edit changes what the whole build writes: the graph is
+ * `dist/graph.json`, and the schemas' picklists decide what each table's
+ * declaration states as a literal. Relative to `src/`.
+ */
+const BUILD_INPUTS = new Set(["graph.ts", "schemas.ts"]);
+
+/**
+ * What the watcher does about a changed file, named relative to `src/`:
+ * rebuild that one source, rebuild everything in a fresh process, or
+ * nothing. A decision of its own so that it can be tested without racing a
+ * file watcher.
+ */
+export function rebuildFor(name: string): "source" | "all" | null {
+  if (name.endsWith(".json5")) return "source";
+  if (BUILD_INPUTS.has(name)) return "all";
+  return null;
+}
+
+/**
  * `--watch`: builds, then rebuilds a source as it is edited, so that a JSON5
  * edit reaches a running `pnpm dev` (which starts this beside `next dev`
  * through the app's `scripts/dev.mts`). Turbopack and webpack both pick the
@@ -380,15 +400,50 @@ export async function setup() {
  * the next save fixes, and a file that has gone sends the whole build round
  * again, which is what prunes the outputs it explained.
  *
- * What is watched is the JSON5 sources and nothing else, so an edit to
- * [graph.ts](./graph.ts) or [schemas.ts](./schemas.ts) while the task runs
- * leaves `dist/graph.json`, and any declaration a picklist decides, as the
- * first build wrote them; restarting the task rewrites them. `graph.json` is
- * for a reader that is not TypeScript — nothing under `src/` imports it, and
- * the graph reaches the app as a module, which Next reloads itself.
+ * An edit to [graph.ts](./graph.ts) or [schemas.ts](./schemas.ts) runs the
+ * whole build again in a child process, since this one imported both when
+ * it started and an ES module cannot be imported twice. From then on this
+ * process's copies are stale, so every later rebuild goes to a child too;
+ * restarting the task returns to rebuilding one source in-process. The
+ * graph reaches the app as a module, which Next reloads itself; what the
+ * child rewrites is `dist/graph.json`, for a reader that is not TypeScript,
+ * and the declarations a picklist decides.
  */
 async function watchData() {
   const { tables, texts } = await buildData();
+  const script = fileURLToPath(import.meta.url);
+
+  // Set once graph.ts or schemas.ts has changed under this process.
+  let stale = false;
+  // One child at a time; a change while one runs asks for one more after it.
+  let child: Promise<void> | null = null;
+  let again = false;
+
+  const rebuildAll = (why: string) => {
+    if (child) {
+      again = true;
+      return;
+    }
+    console.log(`data: ${why} changed, rebuilding everything`);
+    child = new Promise<void>((resolve) => {
+      const build = spawn(process.execPath, ["--import", "tsx", script], {
+        stdio: "inherit",
+      });
+      const done = (failure: string | null) => {
+        if (failure) console.error(`data: the rebuild ${failure}`);
+        child = null;
+        resolve();
+        if (again) {
+          again = false;
+          rebuildAll("another source");
+        }
+      };
+      build.on("error", (error) => done(`did not start: ${error.message}`));
+      build.on("exit", (code, signal) =>
+        done(code === 0 ? null : `failed (${signal ?? `exit ${code}`})`),
+      );
+    });
+  };
 
   const rebuild = async (name: string) => {
     try {
@@ -402,11 +457,17 @@ async function watchData() {
   // An editor writes in bursts, and one save raises several events; a save
   // that renames a new file over the old one raises them for both names.
   const dirty = new Set<string>();
+  const inputs = new Set<string>();
   let soon: NodeJS.Timeout | undefined;
   const flush = () => {
     const names = [...dirty];
+    const changed = [...inputs];
     dirty.clear();
-    for (const name of names) void rebuild(name);
+    inputs.clear();
+    if (changed.length) stale = true;
+    if (stale && (changed.length || names.length))
+      rebuildAll(changed.length ? changed.join(" and ") : names.join(", "));
+    else for (const name of names) void rebuild(name);
   };
 
   // One watcher per directory, and deliberately not one recursive watcher
@@ -414,22 +475,29 @@ async function watchData() {
   // that saves by writing a new file and renaming it over the old one — sed,
   // vim, VS Code — is invisible to it from the second save on. Measured, not
   // assumed. A directory's watch survives a rename inside it, because the
-  // directory is what it holds.
+  // directory is what it holds. `src/` itself is always watched, for the
+  // graph and the schemas.
   const dirs = [
-    ...new Set((await sources()).map((name) => dirname(join(DATA_DIR, name)))),
+    ...new Set([
+      DATA_DIR.replace(/\/$/, ""),
+      ...(await sources()).map((name) => dirname(join(DATA_DIR, name))),
+    ]),
   ];
   for (const dir of dirs)
     watch(dir, (_event, file) => {
       if (!file) return;
       const name = relative(DATA_DIR, join(dir, file.toString()));
-      if (!name.endsWith(".json5")) return;
-      dirty.add(name);
+      const kind = rebuildFor(name);
+      if (kind === "source") dirty.add(name);
+      else if (kind === "all") inputs.add(name);
+      else return;
       clearTimeout(soon);
       soon = setTimeout(flush, 30);
     });
 
   console.log(
-    `data: watching ${tables + texts} sources in ${dirs.length} directories`,
+    `data: watching ${tables + texts} sources in ${dirs.length} directories, ` +
+      `and ${[...BUILD_INPUTS].join(" and ")}`,
   );
 }
 

@@ -6,7 +6,13 @@ import * as v from "valibot";
 import { describe, expect, it } from "vitest";
 import type planets from "../dist/astrology/planets.js";
 import type { PlanetId } from "./astrology/Planets.ts";
-import { buildData, picklistPaths, TABLE_FILES, tableType } from "./build.ts";
+import {
+  buildData,
+  picklistPaths,
+  rebuildFor,
+  TABLE_FILES,
+  tableType,
+} from "./build.ts";
 import { schemas } from "./schemas.ts";
 import { type TableName, tables } from "./tables.ts";
 
@@ -148,6 +154,33 @@ describe("a table's declared type", () => {
       | "ketu"
     > = true;
     expect([kind, sphere, twelve]).toEqual([true, true, true]);
+  });
+});
+
+describe("what the watcher rebuilds", () => {
+  it("rebuilds one source for a JSON5 edit, at any depth", () => {
+    expect(rebuildFor("chakras.json5")).toBe("source");
+    expect(rebuildFor("kabbalah/lenain/pages.json5")).toBe("source");
+  });
+
+  it("rebuilds everything for the graph or the schemas", () => {
+    // Both decide what dist/ holds: graph.json, and the literals a
+    // picklist makes of a declaration.
+    expect(rebuildFor("graph.ts")).toBe("all");
+    expect(rebuildFor("schemas.ts")).toBe("all");
+  });
+
+  it("ignores everything else, editors' scratch files among them", () => {
+    for (const name of [
+      "build.ts",
+      "graphSpec.ts",
+      "kabbalah/graph.ts",
+      "kabbalah/Sephirot.ts",
+      ".graph.ts.swp",
+      "graph.ts~",
+      "schemas.ts.tmp",
+    ])
+      expect(rebuildFor(name), name).toBeNull();
   });
 });
 
