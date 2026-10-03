@@ -214,10 +214,6 @@ Follow-ups are separate from the completed migration work:
   `ZIRDO` are words the Keys say, `LONDOH` loses the run-on row, `LONSA`
   gains "POWER" and `ZIRDO` reads "I AM". See
   [plan 032](032-data-layer.md#the-eleven-partings).
-- TODO: one small one left by step 3c
-  ([plan 032](032-data-layer.md#follow-ups)): a study set whose question or
-  answer is a function has no dotted path for the new field-path test to
-  check.
 - TODO: the Enochian dictionary's entry `I` gives two of its objects an
   empty source, "(name of an angel, sol)" and the pronunciation "Ee", so the
   page prints "()" after the meaning; what they should cite is not in the
@@ -242,26 +238,45 @@ Follow-ups are separate from the completed migration work:
   were set closer, moving its profile to v4
   ([plan 039](039-correspondence-tables.md#after-the-owners-review)). The
   source of `magickTypes` is deferred indefinitely.
-- TODO: two small ones left by step 3b
-  ([plan 032](032-data-layer.md#follow-ups)): two tribes' Hebrew names are
-  hashed into the Table of Shewbread's identity although no sign points at
-  them, because an inputs spec takes a whole table rather than the set the
-  data selects; and the `RENDER_INPUT_SWEEP=1` sweep compares the JSX handed
-  to the outliner rather than the outlined bytes, which is stricter but not
-  the published artefact.
-- Step 4 of the data layer, `data/` as the `magick-data` workspace
-  package, is planned in [plan 052](052-data-package.md) and not yet
-  implemented. Three of the follow-ups below ride along with it: the
-  Shewbread's two unseen tribes, `dist/graph.json` after a `graph.ts` edit,
-  and the study sets asked through a function.
-- TODO: two small ones left by step 3a
-  ([plan 032](032-data-layer.md#follow-ups)): what `pnpm dev` does not pick up
-  until it restarts — a source directory added while it runs, since the watch
-  is one watcher per directory, and `dist/graph.json` after a `graph.ts` edit,
-  since only the build writes it; and a build emitting `as const` TypeScript
-  modules rather than JSON, which would make `kind` and the other closed
-  fields literal types and let `PlanetId` be derived rather than written out —
-  that one belongs with step 4's package.
+- TODO: one small one left by step 3b
+  ([plan 032](032-data-layer.md#follow-ups)): the `RENDER_INPUT_SWEEP=1`
+  sweep compares the JSX handed to the outliner rather than the outlined
+  bytes, which is stricter but not the published artefact.
+- Step 4 of the data layer is done, on 3 October
+  ([plan 052](052-data-package.md#results)): `data/` is
+  `packages/magick-data`, the `magick-data` workspace package, which the
+  app depends on as `workspace:*` and imports as `magick-data/…`, exactly
+  as anyone else would. Each table is emitted as a module with a generated
+  declaration that states its type, so a consumer needs no
+  `resolveJsonModule` and loses no type without it, `kind` is a literal and
+  `PlanetId` is derived; three tables are renamed before anything is
+  published (`geomanticHouse`, `astrologicalHouse`, `treeOfLifePath`); the
+  code is MIT and the data CC BY 4.0, by path; and a smoke test in CI packs
+  the tarball, installs it and type-checks and loads it. Nothing a reader
+  sees changed. Two images' inputs hashes moved and no byte did: the Tree
+  of Life's, by the rename, and the Table of Shewbread's, which no longer
+  hashes the two tribes no sign names. With it, `pnpm dev` rebuilds when
+  `graph.ts` or `schemas.ts` changes, and the field-path test names the
+  study sets asked through a function. The app's `package.json` is named
+  `magickly`; every other `magickli` is a stored, hashed, sent or
+  provisioned identifier and stays
+  ([plan 052](052-data-package.md#magickli-stays)).
+- TODO: publishing `magick-data` is deferred until the owner settles it: the
+  package is `private` at 0.0.0, the names `magick-data` and
+  `magick-components` are not yet reserved, and the CI workflow is designed
+  but not built ([plan 052](052-data-package.md#deferred)). The Enochian
+  dictionary stays out of the tarball whatever is decided: its entries come
+  from Schueler's *Enochian Magic: A Practical Manual* and *The Whole
+  Enochian Dictionary*, whose rights are not ours to give.
+- TODO: a component explorer under an open-source section of the app,
+  generated from `src/render/registry.tsx` rather than Storybook — every
+  entry already declares its contract, props and inputs — and built after
+  `magick-components`, whose demonstration site it would be
+  ([plan 052](052-data-package.md#follow-ups)).
+- TODO: one small one left by step 3a
+  ([plan 032](032-data-layer.md#follow-ups)): a source directory added while
+  `pnpm dev` runs is not watched until it restarts, since the watch is one
+  watcher per directory.
 - Not yet released: from the next release, anonymous `/api/session` checks
   return 200 with a null user instead of 401 (changed 17 September). An
   anonymous tab left open across that release shows a study load error until
@@ -284,8 +299,5 @@ Follow-ups are separate from the completed migration work:
 - TODO: `public/docs/Lenain - La Science Cabalistique (1823) - Google.txt`
   ships the book twice, byte for byte, at a cost of about 264 kB. Trimming it
   changes the contents of a URL the page links, so it wants its own decision.
-- TODO: several GitHub links in the about page and `OpenSource.tsx` name a
-  `master` branch this repository does not have. The 72 angels page's own two
-  were fixed on 19 September.
 
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.

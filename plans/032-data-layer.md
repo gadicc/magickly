@@ -1870,6 +1870,10 @@ dictionary out of the JSON imports and off the keys page, that page's
 normalisation and its literal `0`, and the JSON5 loaders. Step 3 is done;
 step 4 is [a plan of its own](#migration). The rest:
 
+- **Done in [plan 052](052-data-package.md#commits)**: the Shewbread's two
+  unseen tribes (step 3b), `dist/graph.json` after a `graph.ts` edit and the
+  `as const` emit that derives `PlanetId` (step 3a), and the study sets asked
+  through a function (step 3c).
 - **New, from step 3c.** A study set whose `question` or `answer` is a
   function has no dotted path for `pathTarget()` to check, which is the one
   gap in that test's coverage. And the dump-page redesign

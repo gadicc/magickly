@@ -10,7 +10,8 @@ plan 032 first. The design was settled between 22 September and 3 October
 and is recorded here rather than argued again; a measurement spike on
 1 October tested it and its structural findings stand, but every number
 below was taken again at `main` = `dc6f732` and is labelled with that SHA.
-Nothing is implemented yet, and nothing is published by this plan.
+It was implemented the same day, in ten gated commits ([below](#commits));
+nothing is published, and the package stays `private`.
 
 ## Where it stands at `dc6f732`
 
@@ -600,6 +601,9 @@ An adversarial review runs on the final tree.
 | ~~10~~ | ~~`ci(data): Publish magick-data when its version moves`~~ (deferred, [above](#decided-on-3-october-after-the-review)) | Inert: the version stays `0.0.0`, which the reservation holds, so the job finds the version published and does nothing until a human bumps it. A workflow of its own, on pushes to `main` (`ci.yml` runs only on `codex/**` and pull requests), with `id-token: write`. It packs with `pnpm pack`, which applies `publishConfig` (verified), and publishes that tarball with `npm publish` — npm 11.18, bundled with Node 24.18, supports trusted publishing (OIDC), and pnpm 10.18's `publish` lists no such option — so no long-lived token exists. The owner configures the trusted publisher on npm once the names exist |
 | 11 | `docs(plan): Record the data package` | This plan's commits and results; the status page: step 4's entry, the stale `master` TODO struck, the component explorer added as a TODO |
 
+As built, the final review added one commit between 9 and 11
+([final review](#final-review)).
+
 Commit 1 is large but mechanical; the risk in it is the wiring, which is why
 it changes no emit and no specifier. Splitting the move from the import
 rewrite would leave a commit that does not build.
@@ -689,6 +693,148 @@ the Shewbread's identities move; the consumer numbers, reproduced from the
 logs; that `pnpm pack` applies `publishConfig.exports` and `files` and keeps
 both licences; that nothing in the published modules imports a package; and
 that with `types: ["node"]` nothing in `data/` needs the DOM.
+
+## Commits
+
+On `gate/data-package` from `25c1eca`. Each commit was checked on its own
+tree with `pnpm check`, `pnpm typecheck` and `pnpm test`, `dist/` and `lib/`
+wiped first, and then gated in a clean worktree with a fresh install on
+Node 24.18.0: `pnpm install --frozen-lockfile`, `loom init`, `loom check`,
+`loom check --production`, `pnpm check`, `pnpm typecheck`,
+`pnpm test:coverage`, `pnpm build`, `pnpm check:turbopack` and, from commit 4,
+`pnpm --filter magick-data smoke`, each step's status recorded from a script
+file.
+
+Two tests in `src/seo/routes.test.ts` failed at every commit, and fail on
+`main` at `25c1eca` too: the editor work added `/help/ritual-pug` and
+`/help/ritual-text` without classifying them. Since vitest skips its coverage
+thresholds when any test fails, every gate also ran the coverage suite
+without that file, and the thresholds held at every commit. Under load, an
+editor test (`SemanticEditor.test.tsx`, "inserts structural blocks…") and,
+once, three `sqlLegacyImport.test.ts` tests timed out at 5 s; each such step
+was run again in a fresh worktree and passed, and both runs are in the logs.
+
+| Commit | Change |
+| --- | --- |
+| `f94f249` docs(plan): Plan the data package | This plan, drafted as 048, and the status page's pointer to it |
+| `694918a` build(data): Move the data layer into a package | Commit 1. `data/` is `packages/magick-data/src/`, the app imports `magick-data/…` on 99 lines and `@/lib/angelSlugs` on 6, the alias is gone, `transpilePackages`; the lockfile gained the importer and its link and nothing else (12 lines, installed with `--config.minimumReleaseAge=0`). Turbopack and webpack served ten data pages in development |
+| `0472b74` refactor(data): Rename three tables before publishing | `geomanticHouse`, `astrologicalHouse`, `treeOfLifePath` in 35 files; the barrel is default-export only; the Tree's inputs hash `30011c0c…` → `8db079d7…`, no byte moved |
+| `2f5cd19` build(data): Declare each table in a generated module | A `.js` and a `.d.ts` per table and per text; six picklists stated as literals; `PlanetId` derived; the six missing typed modules; a compiler-API test holding each generated type to its JSON import's |
+| `bec3e92` build(data): Build the published shape and prove it | `.ts` specifiers (105), two package `tsconfig`s, `isolatedDeclarations` (21 annotations), `./tools`, `publishConfig`, `files`, the licence split, and the pack-and-smoke test in CI |
+| `735458c` docs(data): Rewrite the package README | Decision 11, with a test holding its table of tables to the tables and both exports maps |
+| `d5f8eb2` fix(render): Hash only the tribes the signs name | The Shewbread's inputs hash `dfd57ffb…` → `02b94228…`, no byte moved; Levi's and Joseph's names move nothing |
+| `b76a5eb` fix(data): Rebuild when the graph or schemas change | The watcher rebuilds everything in a child process on a `graph.ts` or `schemas.ts` change, and from then on rebuilds every source that way, since its own imported schemas are stale |
+| `399f398` test(study): Name the sets asked through a function | `geomancy-symbol-names` (question) and `ten-heavens` (both), named and asserted |
+| `d4fe478` chore: Name the app package magickly | `package.json`'s `name`, and nothing else |
+| `4db4208` fix(data): Answer the final review | A row-by-row check of the picklist literals the generated declarations state; the README's figures from the shipped package and its derivable sentences tested; `readonly` array-table aliases; absolute links; `OpenSource`'s dead `magick-data/` mapping removed; `typescript`, `tsx` and `@types/node` declared (9 lockfile lines, `--config.minimumReleaseAge=0`); a `pnpm pack` note; `dev.mts` on what a `kill` reaches |
+
+A twelfth commit, `docs(plan): Record the data package`, adds this section
+and the next; it is not in the table, which it would have to predict.
+
+## Results
+
+### What the app sees
+
+Nothing a reader sees changed. Every pinned byte count and byte hash in
+`src/render/` held at every commit, and two inputs hashes moved, both as
+[planned](#render-identities): the Tree of Life's by the `treeOfLifePath`
+rename (`30011c0c…` → `8db079d7…`) and the Table of Shewbread's by reading
+the tribes through the signs (`dfd57ffb…` → `02b94228…`). A test now holds
+that changing Levi's or Joseph's Hebrew name moves no image, and that
+changing Gad's moves only the Shewbread.
+
+Development was checked by hand on both bundlers at commits 1, 3 and 4 —
+`pnpm dev` on Turbopack and `pnpm dev:webpack`, the sephirah, planet, Tree,
+Enochian dictionary and Keys, geomancy reference, seventy-two angels and
+Lenain pages, each 200 with real content and no module error in the log —
+and again by the final review at `d4fe478`. The gate script does not start
+dev servers, so the gate logs do not show it; this paragraph is the record.
+Plan 029's production Turbopack build ran in every gate.
+
+### Cost
+
+Measured by commit 3's implementer in fresh worktrees, each run twice with
+identical results:
+
+| | `0472b74` | `2f5cd19` |
+| --- | ---: | ---: |
+| The whole repository: types | 443,322 | 433,150 |
+| The whole repository: instantiations | 2,100,222 | 2,104,154 |
+| `rows.ts` alone: types / instantiations | 12,387 / 62,087 | 6,652 / 61,986 |
+| The barrel alone: types / instantiations | 14,173 / 66,070 | 8,442 / 65,858 |
+
+The repository's instantiations rose by 3,932, of which the new generator
+test is 2,770; types fell by about 10,000, and by about 45 % for the barrel
+alone. What a route ships did not move: `/kabbalah/tree` 405,862 →
+405,841 bytes gzipped, `/enochian/dictionary` 415,459 → 415,444,
+`/astrology/planet/sol` 374,635 → 374,636, read from the script tags of the
+prerendered HTML, because webpack already emitted a JSON import as
+`JSON.parse`.
+
+### The published artefact
+
+At `bec3e92`, as `pnpm pack` makes it: 199 files, 463,272 bytes gzipped —
+`lib/` (46 modules, 85,136 bytes of JavaScript, 62,979 of declarations),
+`dist/` (the generated modules, declarations and JSON), the README and the
+two licences — and no TypeScript source, no check, build or test module and
+no file of the Enochian dictionary, whose subpath Node refuses with
+`ERR_PACKAGE_PATH_NOT_EXPORTED`. The smoke test, in CI from commit 4,
+installs it into a fixture and measures a consumer on `lib: ["es2022"]`
+with `resolveJsonModule` off: the barrel 7,824 instantiations, one table 0,
+a four-hop read 17,621, each over the same 93 files. The barrel is 85 above
+the prototype's 7,740 because its type is
+`Assembled<Exclude<TableName, …>>`, which keeps the rule that a table added
+to the registry must be added to the barrel or excluded by name. Nine
+negatives are errors on their own lines, and nothing resolves to `any`.
+
+### What was decided while building it
+
+- **Two package tests read files outside the package** and moved into the
+  app: the Lenain edition's check of `public/docs`, and the check that the
+  app's build scripts run the data checks first.
+- **`.gitignore` gained `/packages/*/node_modules`**, without which the
+  package's own `node_modules` would have been committed.
+- **Every source emits all three files**, the dictionary included, so the
+  publish manifest excludes the dictionary's three by pattern.
+- **`as const` and a type-level assertion lose `satisfies`'s check on
+  unknown keys** — a misspelt `invers` passed — so `graph.ts` carries a
+  second assertion that no table or link names a key the spec does not.
+- **The watcher, once `graph.ts` or `schemas.ts` has changed, sends every
+  later rebuild to a child process**, since the schemas it imported at start
+  are stale and an in-process rebuild would state old literals.
+- **The seventy-two's literals are held as a set, not row by row**: an array
+  table is declared as the union of its row shapes, and seventy-two rows
+  make two.
+- **105 relative specifiers**, not about 55, and 28 `isolatedDeclarations`
+  errors in shipped modules, not 26, met with 21 annotations.
+
+## Final review
+
+Run on `d4fe478` by Fable 5.1 at high effort with `loom-torvalds-review`, in
+a worktree of its own with a fresh install; it packed and inspected the
+tarball, ran the smoke test and the dev servers, and wrote nothing into the
+branch. It found nothing blocking.
+
+| Finding | Disposition |
+| --- | --- |
+| The gate script does not start dev servers, so the plan's dev checks are not in the gate logs | Re-run by the review at `d4fe478`, clean on both bundlers; recorded [above](#what-the-app-sees) |
+| `kill` on the pnpm process leaves the dev trio running | pnpm 10.18 does not forward SIGTERM; `dev.mts` says so (`4db4208`) |
+| The equivalence test widens literals, so a wrong picklist literal would pass | A compiler-API check of every picked path, row by row where the type allows; shown to fail on three planted errors (`4db4208`) |
+| The README quoted the prototype's figures and tested none of its sentences | The shipped figures, and the derivable sentences held by `readme.test.ts` (`4db4208`) |
+| The README's claim about typed modules' type names is not uniform | Every exception named; the three array aliases `readonly` (`4db4208`) |
+| The package's scripts lean on undeclared root tools | Declared at the root's versions (`4db4208`) |
+| README links that resolve only inside the repository | Absolute (`4db4208`) |
+| `OpenSource` mapped `magick-data/…` to files that do not exist | Removed; no caller used it (`4db4208`) |
+| `npm publish` from the package directory would ship `exports` into `src/` | The README and the smoke script say to pack with pnpm; `private` stays (`4db4208`) |
+| `0472b74`'s body names Sonnet and its trailer Opus | Left: the trailer is the mandated attribution, and the body names the model that did the work |
+
+What it checked and found sound: the tarball's contents and manifest; that
+the declarations are self-contained and live under `bundler` and `nodenext`
+with `resolveJsonModule` off; the licence split by path; that neither name
+is registered on npm and no workflow publishes; the generator, its pruning
+and its writes; the watcher, live; the two moved hashes and no other; the
+renames' reach; the app's wiring and the 28 plan links; and every commit's
+manifest and lockfile.
 
 ## Deferred
 
