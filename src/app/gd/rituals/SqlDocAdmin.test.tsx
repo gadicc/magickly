@@ -184,7 +184,7 @@ it("retains an exact SQL-v2 create before sending and navigates only after ackno
   });
 });
 
-it("creates a semantic ritual from ritual text and retries the exact v3 request", async () => {
+it("creates a semantic ritual from Pug and retries the exact v3 request", async () => {
   mock.write.mockResolvedValueOnce(null).mockResolvedValueOnce(success);
   render(<SqlDocAdmin />);
   fireEvent.change(await screen.findByLabelText("Title"), {
@@ -196,7 +196,10 @@ it("creates a semantic ritual from ritual text and retries the exact v3 request"
   );
   fireEvent.click(await screen.findByRole("button", { name: "Ritual source" }));
   fireEvent.change(screen.getByLabelText("New ritual source"), {
-    target: { value: "ritual 1\nHiero: Welcome.\n* Keryx Open the door\n" },
+    target: {
+      value:
+        "//- magickli-ritual-pug 1\nHiero: Welcome.\n* Keryx Open the door\n",
+    },
   });
   fireEvent.mouseDown(screen.getByRole("combobox", { name: "Visibility" }));
   fireEvent.click(

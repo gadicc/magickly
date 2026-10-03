@@ -54,7 +54,7 @@ interface FormState {
   source: string;
   semanticSource: string;
   format: "pug" | "semantic";
-  editorMode: "visual" | "source";
+  editorMode: "visual" | "source" | "split";
 }
 
 interface CreationIdentity {
@@ -75,7 +75,7 @@ const emptyForm = (): FormState => ({
   source: pugRitualStarter,
   semanticSource: ritualPugStarter,
   format: "semantic",
-  editorMode: "visual",
+  editorMode: "split",
 });
 const storageKey = (ownerId: string) => `magickli:ritual-create:v2:${ownerId}`;
 const unavailable = (): SqlRitualWriteResult => ({
@@ -386,7 +386,7 @@ export default function SqlDocAdmin() {
                   presentationRef.current?.ownerId === next.ownerId &&
                   presentationRef.current.epoch === expected.epoch
                     ? presentationRef.current.editorMode
-                    : "visual",
+                    : "split",
               });
               replacePending(retained);
             } catch {

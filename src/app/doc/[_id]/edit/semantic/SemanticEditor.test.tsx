@@ -12,6 +12,7 @@ import { afterEach, expect, it, vi } from "vitest";
 import { printRitualPug } from "@/doc/ritualPug";
 import { printRitualText } from "@/doc/ritualText";
 import { semanticFromJrt } from "@/doc/semantic";
+import { RITUAL_EDITOR_LAYOUT_KEY } from "@/doc/useRitualEditorLayout";
 import { createUuidV7 } from "@/lib/ids";
 import SemanticEditor from "./SemanticEditor";
 import type { SemanticEditorProps } from "./SemanticEditorShell";
@@ -152,6 +153,7 @@ const props = (): SemanticEditorProps => ({
 
 afterEach(() => {
   cleanup();
+  localStorage.clear();
   vi.clearAllMocks();
   mock.owner = "";
   mock.phase = "ready";
@@ -165,6 +167,39 @@ afterEach(() => {
   mock.lockReason = undefined;
   mock.revalidating = false;
   mock.refreshResult = true;
+});
+
+it("defaults to split and restores the last chosen layout on reopening", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  const view = render(<SemanticEditor {...setup} />);
+  const visual = await screen.findByRole("textbox", {
+    name: "Ritual visual editor",
+  });
+  const source = screen.getByRole("textbox", {
+    name: "Ritual semantic source",
+  });
+  expect(
+    source.compareDocumentPosition(visual) & Node.DOCUMENT_POSITION_FOLLOWING,
+  ).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "source" }));
+  expect(localStorage.getItem(RITUAL_EDITOR_LAYOUT_KEY)).toBe("source");
+  expect(
+    screen.queryByRole("textbox", { name: "Ritual visual editor" }),
+  ).toBeNull();
+  view.unmount();
+  render(<SemanticEditor {...setup} />);
+  await screen.findByRole("textbox", { name: "Ritual semantic source" });
+  await waitFor(() =>
+    expect(
+      (screen.getByRole("button", { name: "source" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(false),
+  );
+  expect(
+    screen.queryByRole("textbox", { name: "Ritual visual editor" }),
+  ).toBeNull();
 });
 
 it("retains and saves a visual undo back to the confirmed document", async () => {
@@ -635,6 +670,7 @@ it("keeps conflicting Ritual Text bytes until the author resolves them", async (
 });
 
 it("retains incomplete Ritual Text only for recovery and uses Pug after discard", async () => {
+  localStorage.setItem(RITUAL_EDITOR_LAYOUT_KEY, "visual");
   const setup = props();
   mock.owner = setup.actorId;
   const oldBuffer = 'ritual 1\n@say hiero "Unfinished';
@@ -654,7 +690,7 @@ it("retains incomplete Ritual Text only for recovery and uses Pug after discard"
   mock.saveDraft.mockResolvedValue(undefined);
   render(<SemanticEditor {...setup} />);
   await screen.findByText("Recovered the local draft.");
-  fireEvent.click(screen.getByRole("button", { name: "source" }));
+  expect(localStorage.getItem(RITUAL_EDITOR_LAYOUT_KEY)).toBe("visual");
   const buffer = screen.getByRole("textbox", {
     name: "Ritual semantic source",
   }) as HTMLTextAreaElement;

@@ -15,6 +15,10 @@ import {
   semanticFromTiptap,
   visualRitualState,
 } from "./tiptapRitual";
+import {
+  type RitualEditorLayout,
+  useRitualEditorLayout,
+} from "./useRitualEditorLayout";
 
 const initialView = (source: string) => {
   try {
@@ -37,15 +41,15 @@ export default function RitualCreationEditor({
   onChange,
   disabled,
   onValidityChange,
-  initialMode = "visual",
+  initialMode = "split",
   onModeChange,
 }: {
   source: string;
   onChange(source: string): void;
   disabled: boolean;
   onValidityChange(valid: boolean): void;
-  initialMode?: "visual" | "source";
-  onModeChange?(mode: "visual" | "source"): void;
+  initialMode?: RitualEditorLayout;
+  onModeChange?(mode: RitualEditorLayout): void;
 }) {
   const [initial] = React.useState(() => initialView(source));
   const [issue, setIssue] = React.useState(initial.issue);
@@ -54,9 +58,11 @@ export default function RitualCreationEditor({
   );
   const [visualError, setVisualError] = React.useState<string | null>(null);
   const [sourceComposing, setSourceComposing] = React.useState(false);
-  const [mode, setMode] = React.useState(initialMode);
-  const chooseMode = (next: "visual" | "source") => {
-    setMode(next);
+  const [mode, chooseLayout] = useRitualEditorLayout(initialMode);
+  const displayMode = issue ? "source" : mode;
+  const chooseMode = (next: RitualEditorLayout) => {
+    if (next === "visual") setSourceComposing(false);
+    chooseLayout(next);
     onModeChange?.(next);
   };
   const lastEmission = React.useRef<string | null>(null);
@@ -106,15 +112,15 @@ export default function RitualCreationEditor({
     onValidityChange(!next.diagnostic);
   }, [editor, source, sourceComposing, onValidityChange]);
   React.useEffect(() => {
-    editor?.setEditable(!disabled && !issue);
-  }, [editor, disabled, issue]);
+    editor?.setEditable(!disabled && !issue && !sourceComposing);
+  }, [editor, disabled, issue, sourceComposing]);
   return (
     <Box sx={{ mt: 2, display: "grid", gap: 1 }}>
       <ButtonGroup size="small" aria-label="New ritual editor layout">
         <Button
           type="button"
           disabled={disabled || !!issue}
-          variant={mode === "visual" && !issue ? "contained" : "outlined"}
+          variant={displayMode === "visual" ? "contained" : "outlined"}
           onClick={() => chooseMode("visual")}
         >
           Visual
@@ -122,10 +128,18 @@ export default function RitualCreationEditor({
         <Button
           type="button"
           disabled={disabled}
-          variant={mode === "source" || issue ? "contained" : "outlined"}
+          variant={displayMode === "source" ? "contained" : "outlined"}
           onClick={() => chooseMode("source")}
         >
           Ritual source
+        </Button>
+        <Button
+          type="button"
+          disabled={disabled || !!issue}
+          variant={displayMode === "split" ? "contained" : "outlined"}
+          onClick={() => chooseMode("split")}
+        >
+          Split
         </Button>
       </ButtonGroup>
       <Link href="/help/ritual-pug" target="_blank" rel="noopener noreferrer">
@@ -133,27 +147,41 @@ export default function RitualCreationEditor({
       </Link>
       {issue && <Alert severity="warning">{issue}</Alert>}
       {visualError && <Alert severity="error">{visualError}</Alert>}
-      {mode === "source" || issue ? (
-        <RitualSourceEditor
-          diagnostic={sourceDiagnostic}
-          label="New ritual source"
-          value={source}
-          dialect="pug"
-          disabled={disabled}
-          onCompositionChange={setSourceComposing}
-          onChange={onChange}
-        />
-      ) : editor ? (
-        <section
-          className={styles.visualPanel}
-          aria-label="New ritual visual editor panel"
-        >
-          <RitualVisualControls editor={editor} disabled={disabled} />
-          <EditorContent editor={editor} className={styles.editor} />
-        </section>
-      ) : (
-        <p>Loading visual editor…</p>
-      )}
+      <Box className={styles.panels}>
+        {displayMode !== "visual" && (
+          <section
+            className={styles.sourcePanel}
+            aria-label="New ritual source panel"
+          >
+            <RitualSourceEditor
+              diagnostic={sourceDiagnostic}
+              label="New ritual source"
+              value={source}
+              dialect="pug"
+              disabled={disabled}
+              onCompositionChange={setSourceComposing}
+              onChange={onChange}
+            />
+          </section>
+        )}
+        {displayMode !== "source" &&
+          (editor ? (
+            <section
+              className={styles.visualPanel}
+              aria-label="New ritual visual editor panel"
+              aria-busy={sourceComposing || undefined}
+            >
+              <RitualVisualControls
+                editor={editor}
+                disabled={disabled}
+                syncingSource={sourceComposing}
+              />
+              <EditorContent editor={editor} className={styles.editor} />
+            </section>
+          ) : (
+            <p>Loading visual editor…</p>
+          ))}
+      </Box>
     </Box>
   );
 }

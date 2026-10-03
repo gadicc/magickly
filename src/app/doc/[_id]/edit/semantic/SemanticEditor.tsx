@@ -51,13 +51,13 @@ import {
   visualRitualState,
 } from "@/doc/tiptapRitual";
 import { ritualTiptapClientExtensions } from "@/doc/tiptapRitualClient";
+import { useRitualEditorLayout } from "@/doc/useRitualEditorLayout";
 import { createUuidV7 } from "@/lib/ids";
 import { getBrowserOfflineRuntime } from "@/offline/browserRuntime";
 import styles from "./SemanticEditor.module.css";
 import type { SemanticEditorProps } from "./SemanticEditorShell";
 
 type SaveRequest = Extract<SqlRitualWriteRequest, { kind: "save" }>;
-type Mode = "visual" | "source" | "split";
 interface SourceState {
   text: string;
   dialect: RitualSourceDialect;
@@ -88,7 +88,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     conflict: false,
   }));
   const [title, setTitle] = React.useState(props.title);
-  const [mode, setMode] = React.useState<Mode>("visual");
+  const [mode, chooseMode, setMode] = useRitualEditorLayout();
   const [base, setBase] = React.useState({
     revisionId: props.revisionId,
     version: props.parentVersion,
@@ -447,6 +447,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     props.parentVersion,
     props.title,
     props.initialDocument,
+    setMode,
   ]);
 
   React.useEffect(() => {
@@ -975,7 +976,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
               onClick={() => {
                 // Removing the source panel can interrupt IME without compositionend.
                 if (item === "visual") setSourceComposing(false);
-                setMode(item);
+                chooseMode(item);
               }}
             >
               {item}

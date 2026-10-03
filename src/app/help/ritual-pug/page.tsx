@@ -31,6 +31,12 @@ export default function RitualPugGuide() {
         visible.
       </p>
       <p>
+        The initial layout is split, with source on the left and visual editing
+        on the right; small screens stack the panels. Your last chosen layout is
+        remembered in this browser for both new and existing rituals.
+        Source-only recovery does not replace that preference.
+      </p>
+      <p>
         Choose <strong>Visual / Ritual Pug</strong> when creating a ritual.
         Older Ritual Text drafts are recovered and converted automatically when
         valid. Incomplete or conflicting buffers remain available to repair,
