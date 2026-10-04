@@ -4,8 +4,8 @@ import { afterEach, expect, it } from "vitest";
 import { Render } from "./blocks";
 import DocContext from "./context";
 import { roles } from "./ritualBlocks/roles";
-import { parseRitualText } from "./ritualText";
-import { ritualTextExamples } from "./ritualTextExamples";
+import { parseRitualPug } from "./ritualPug";
+import { ritualPugExamples } from "./ritualPugExamples";
 import { semanticToJrt } from "./semantic";
 
 afterEach(cleanup);
@@ -47,7 +47,7 @@ it.each([
 );
 
 it("carries the guide's alternative text through the semantic reader", () => {
-  const doc = semanticToJrt(parseRitualText(ritualTextExamples.image));
+  const doc = semanticToJrt(parseRitualPug(ritualPugExamples.image));
   render(<Render doc={doc} onChange={undefined} />);
   const image = screen.getByRole("img", { name: "Describe the image" });
   expect(image.getAttribute("src")).toBe("/image.svg");

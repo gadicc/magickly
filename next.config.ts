@@ -79,12 +79,20 @@ export default async function (phase: string): Promise<NextConfig> {
         headers: [{ key: "X-Robots-Tag", value: "noindex" }],
       },
     ],
-    redirects: () =>
-      Object.entries(legacyStaticImageAliases).map(([source, destination]) => ({
-        source,
-        destination,
+    redirects: () => [
+      {
+        source: "/help/ritual-text",
+        destination: "/help/ritual-pug",
         permanent: true,
-      })),
+      },
+      ...Object.entries(legacyStaticImageAliases).map(
+        ([source, destination]) => ({
+          source,
+          destination,
+          permanent: true,
+        }),
+      ),
+    ],
     // See also alternative with patch-package:
     // https://stackoverflow.com/a/77722836/1839099
     // css-tree's ESM data entry uses createRequire(import.meta.url). Keep the
@@ -126,9 +134,9 @@ export default async function (phase: string): Promise<NextConfig> {
       config.resolve.fallback = { fs: false };
 
       // Built-in ritual sources are imported `with { type: "text" }`. Next's
-      // webpack (5.98) ignores that attribute, so match the extension.
+      // webpack ignores that attribute, so match the extension.
       config.module.rules.push({
-        test: /\.jade$/,
+        test: /\.pug$/,
         type: "asset/source",
       });
 

@@ -823,7 +823,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             : "Save confirmed. Recovered author annotations remain in your local draft; save again to include them."
           : result.replayed
             ? "Save confirmed after retry."
-            : "Saved as a semantic revision.",
+            : "Saved.",
       );
     } catch {
       setError("The save result is unknown. Retry the same pending request.");
@@ -1021,19 +1021,15 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                 ? "Pug uses indentation for blocks and #[…] for inline formatting."
                 : "Ritual Text uses command lines and quoted text fragments."}{" "}
               Valid edits update the visual panel as you type.{" "}
-              <Link
-                href={
-                  source.dialect === "pug"
-                    ? "/help/ritual-pug"
-                    : "/help/ritual-text"
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Read the{" "}
-                {source.dialect === "pug" ? "Ritual Pug" : "Ritual Text"} guide
-                (opens in a new tab)
-              </Link>
+              {source.dialect === "pug" && (
+                <Link
+                  href="/help/ritual-pug"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Read the Ritual Pug guide (opens in a new tab)
+                </Link>
+              )}
             </Typography>
             {source.dialect === "ritual-text" && (
               <Alert severity="info">

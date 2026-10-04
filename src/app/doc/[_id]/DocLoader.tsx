@@ -2,13 +2,9 @@
 
 // Built-in ritual sources ship in the client bundle so they work offline.
 // Turbopack reads `type: "text"` itself; next.config.ts gives webpack a rule.
-// import neophyte from "../../src/doc/neophyte.yaml";
-import _neophyte from "@/doc/0=0.jade" with { type: "text" };
-// import _neophyteM from "@/doc/0=0m.jade" with { type: "text" };
-import _zelator from "@/doc/1=10.jade" with { type: "text" };
-// import _healing from "@/doc/healing.jade" with { type: "text" };
-// import _chesedTalisman from "@/doc/chesed-talisman.jade" with { type: "text" };
-import _theoricus from "@/doc/2=9.jade" with { type: "text" };
+import _neophyte from "@/doc/0=0.pug" with { type: "text" };
+import _zelator from "@/doc/1=10.pug" with { type: "text" };
+import _theoricus from "@/doc/2=9.pug" with { type: "text" };
 import { prepare } from "@/doc/prepare";
 import type { DocNode } from "@/schemas";
 import DocRender, { DocView } from "./DocRender";
@@ -25,9 +21,6 @@ const docs = {
   neophyte: prepareBuiltin(_neophyte),
   zelator: prepareBuiltin(_zelator),
   theoricus: prepareBuiltin(_theoricus),
-  // neophyteM: prepare(_neophyteM),
-  // healing: prepare(_healing),
-  // "chesed-talisman": prepare(_chesedTalisman),
 } satisfies Record<string, DocNode>;
 
 /**
@@ -47,5 +40,4 @@ function DocLoader({ id, prerender }: { id: string; prerender?: boolean }) {
   );
 }
 
-//export default dynamic(Promise.resolve(Doc), { ssr: false });
 export default DocLoader;

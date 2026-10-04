@@ -196,7 +196,7 @@ describe("ritual source to JRT", () => {
     "compiles the complete built-in %s ritual without losing tasks or grades",
     (name, opening, tasks, grades) => {
       const source = readFileSync(
-        new URL(`./${name}.jade`, import.meta.url),
+        new URL(`./${name}.pug`, import.meta.url),
         "utf8",
       );
       const document = prepare(source);

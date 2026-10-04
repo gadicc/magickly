@@ -218,7 +218,7 @@ it("retains and saves a visual undo back to the confirmed document", async () =>
   });
   render(<SemanticEditor {...setup} />);
   fireEvent.click(await screen.findByRole("button", { name: "Save" }));
-  await screen.findByText("Saved as a semantic revision.");
+  await screen.findByText("Saved.");
   const element = screen.getByRole("textbox", {
     name: "Ritual visual editor",
   }) as HTMLElement & { editor: import("@tiptap/core").Editor };
@@ -455,7 +455,7 @@ it("applies a compact source shortcut and saves semantic JSON through v3", async
     { tag: "task", attrs: { say: true, role: "hiero" } },
     { tag: "task", attrs: { do: true, role: "keryx" } },
   ]);
-  await screen.findByText("Saved as a semantic revision.");
+  await screen.findByText("Saved.");
   const writesAfterSave = mock.saveDraft.mock.calls.length;
   await new Promise((resolve) => setTimeout(resolve, 500));
   expect(mock.saveDraft).toHaveBeenCalledTimes(writesAfterSave);
@@ -1075,7 +1075,7 @@ it("reports a confirmed save when local draft cleanup fails", async () => {
   });
   render(<SemanticEditor {...setup} />);
   fireEvent.click(await screen.findByRole("button", { name: "Save" }));
-  await screen.findByText("Saved as a semantic revision.");
+  await screen.findByText("Saved.");
   expect(screen.getByText(/local draft could not be cleared/i)).toBeTruthy();
   expect(mock.send).toHaveBeenCalledTimes(1);
 });

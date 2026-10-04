@@ -59,8 +59,8 @@ describe("public field paths", () => {
 
   it("resolves every field the built-in ritual documents draw", () => {
     const dir = "src/doc";
-    const sources = readdirSync(dir).filter((name) => name.endsWith(".jade"));
-    expect(sources).toContain("2=9.jade");
+    const sources = readdirSync(dir).filter((name) => name.endsWith(".pug"));
+    expect(sources).toContain("2=9.pug");
 
     const asked: string[] = [];
     const letters: string[] = [];

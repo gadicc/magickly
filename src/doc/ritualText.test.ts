@@ -60,7 +60,7 @@ describe("ritual text projection", () => {
   for (const name of ["0=0", "1=10", "2=9"]) {
     it(`round-trips the complete ${name} semantic tree`, () => {
       const source = readFileSync(
-        new URL(`./${name}.jade`, import.meta.url),
+        new URL(`./${name}.pug`, import.meta.url),
         "utf8",
       );
       const original = semanticFromJrt(prepare(source));

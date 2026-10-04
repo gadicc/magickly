@@ -85,8 +85,8 @@ describe("component image registry", () => {
   });
 
   it("reproduces the published ritual Tree of Life bytes under the unchanged profile", async () => {
-    const jade = await readFile("src/doc/2=9.jade", "utf8");
-    const reference = jade.match(/\/api\/treeOfLife\?([^"'\s)]+)/)?.[1];
+    const source = await readFile("src/doc/2=9.pug", "utf8");
+    const reference = source.match(/\/api\/treeOfLife\?([^"'\s)]+)/)?.[1];
     expect(reference).toBeDefined();
     const image = await render("tree-of-life", reference);
     expect(image.identity.profile).toBe(TREE_IMAGE_PROFILE);

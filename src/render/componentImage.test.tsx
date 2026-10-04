@@ -151,8 +151,8 @@ describe("component image service and routes", () => {
   });
 
   it("covers the saved built-in ritual URL in the closed registry", async () => {
-    const jade = await readFile("src/doc/2=9.jade", "utf8");
-    const reference = jade.match(/\/api\/treeOfLife\?[^"'\s)]+/)?.[0];
+    const source = await readFile("src/doc/2=9.pug", "utf8");
+    const reference = source.match(/\/api\/treeOfLife\?[^"'\s)]+/)?.[0];
     expect(reference).toBeDefined();
     expect(
       (await legacyGet(new Request(`https://example.com${reference}`))).status,

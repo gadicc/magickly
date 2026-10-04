@@ -1,6 +1,6 @@
 import Link from "@magick-components/Link";
 import { Box, Container } from "@mui/material";
-import { ritualPugExamples, ritualPugStarter } from "@/doc/ritualTextExamples";
+import { ritualPugExamples, ritualPugStarter } from "@/doc/ritualPugExamples";
 import { pageMetadata } from "@/seo/metadata";
 
 export const metadata = pageMetadata("/help/ritual-pug");
@@ -214,7 +214,6 @@ export default function RitualPugGuide() {
         it with backup text.
       </p>
       <p>
-        <Link href="/help/ritual-text">Earlier Ritual Text syntax</Link> ·{" "}
         <Link href="/gd/rituals">Back to rituals</Link>
       </p>
     </Container>

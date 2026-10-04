@@ -78,7 +78,7 @@ describe("semantic compiler", () => {
   for (const name of ["0=0", "1=10", "2=9"]) {
     it(`emits JRT profile 1 parity for ${name}`, () => {
       const pug = readFileSync(
-        new URL(`./${name}.jade`, import.meta.url),
+        new URL(`./${name}.pug`, import.meta.url),
         "utf8",
       );
       const jrt = prepare(pug);

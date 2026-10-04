@@ -1,5 +1,11 @@
 # Ritual Text retirement — 2 October 2026
 
+Update, 4 October: the retired authoring examples and help page were removed in
+[Pug naming and compatibility](053-pug-naming-and-compatibility.md). Recovery
+codecs and preservation remain; that note describes the checks needed before
+retiring either. The original implementation record below describes the earlier
+state.
+
 Normal semantic authoring now uses bounded Ritual Pug. Creation and editing no
 longer offer a source-syntax selector. Saved revisions remain semantic JSON;
 no database or document-schema migration is needed. Legacy Pug editing remains

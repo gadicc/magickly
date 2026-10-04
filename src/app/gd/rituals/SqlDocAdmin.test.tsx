@@ -10,7 +10,7 @@ import {
 import type { Editor } from "@tiptap/core";
 import React from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { ritualPugStarter } from "@/doc/ritualTextExamples";
+import { ritualPugStarter } from "@/doc/ritualPugExamples";
 import { creationPublicationHandoffKey } from "@/offline/ritualPublicationHandoff";
 import SqlDocAdmin from "./SqlDocAdmin";
 

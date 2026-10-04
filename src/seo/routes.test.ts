@@ -26,8 +26,6 @@ const PRIVATE_ROUTES = [
   "/doc/[_id]/edit",
   "/doc/[_id]/edit/semantic",
   "/gd/components",
-  // Publicly accessible recovery reference for retired syntax; not indexed.
-  "/help/ritual-text",
   "/offline/ritual",
   "/signin",
   "/study/[_id]",

@@ -12,12 +12,12 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { retainsOnlineEditorIdentity } from "@/doc/onlineEditorIdentity";
+import { pugRitualStarter, ritualPugStarter } from "@/doc/ritualPugExamples";
 import {
   detectRitualSourceDialect,
   parseRitualSource,
   printRitualSource,
 } from "@/doc/ritualSource";
-import { pugRitualStarter, ritualPugStarter } from "@/doc/ritualTextExamples";
 import type { RitualSemanticDocument } from "@/doc/semantic";
 import {
   checkSqlRitualCreationOptions,
