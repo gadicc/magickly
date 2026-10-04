@@ -471,7 +471,10 @@ it("applies a compact source shortcut and saves semantic JSON through v3", async
   );
 });
 
-it("inserts structural blocks and a variable reference from the visual toolbar", async () => {
+// Four real editor insertions with MUI menus need headroom under coverage/load.
+it("inserts structural blocks and a variable reference from the visual toolbar", {
+  timeout: 15_000,
+}, async () => {
   mock.load.mockResolvedValue(undefined);
   mock.saveDraft.mockResolvedValue(undefined);
   mock.clear.mockResolvedValue(undefined);
@@ -496,8 +499,13 @@ it("inserts structural blocks and a variable reference from the visual toolbar",
       fireEvent.change(screen.getByRole("textbox", { name: label }), {
         target: { value },
       });
+    const dialog = screen.getByRole("dialog");
     fireEvent.click(screen.getByRole("button", { name: /^Insert$/ }));
-    await screen.findByRole("button", { name: "Save" });
+    // MUI hides the background from accessibility queries until exit completes.
+    await waitFor(() => expect(dialog.isConnected).toBe(false), {
+      timeout: 5000,
+    });
+    expect(screen.getByRole("button", { name: "Save" })).toBeTruthy();
   };
   await insert("Summary", "Summary heading", "Pronunciation");
   await insert("Section title", "Section title", "Opening");

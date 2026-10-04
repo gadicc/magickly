@@ -1,13 +1,9 @@
 import Link from "@magick-components/Link";
 import { Box, Container } from "@mui/material";
-import type { Metadata } from "next";
 import { ritualPugExamples, ritualPugStarter } from "@/doc/ritualTextExamples";
+import { pageMetadata } from "@/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Ritual Pug guide",
-  description:
-    "Write rituals with readable Pug source, visual editing and stable block identities.",
-};
+export const metadata = pageMetadata("/help/ritual-pug");
 function Example({ source }: { source: string }) {
   return (
     <Box

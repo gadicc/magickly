@@ -26,6 +26,8 @@ const PRIVATE_ROUTES = [
   "/doc/[_id]/edit",
   "/doc/[_id]/edit/semantic",
   "/gd/components",
+  // Publicly accessible recovery reference for retired syntax; not indexed.
+  "/help/ritual-text",
   "/offline/ritual",
   "/signin",
   "/study/[_id]",
@@ -57,11 +59,13 @@ describe("page routes", () => {
   const routes = pageRoutes();
 
   it("classifies every page as public, entity or private", () => {
-    const known = new Set([
+    const classifications = [
       ...Object.keys(PUBLIC_PAGES),
       ...ENTITY_ROUTES,
       ...PRIVATE_ROUTES,
-    ]);
+    ];
+    const known = new Set(classifications);
+    expect(known.size).toBe(classifications.length);
     expect(
       routes.map(({ route }) => route).filter((r) => !known.has(r)),
     ).toEqual([]);

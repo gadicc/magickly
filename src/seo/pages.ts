@@ -186,6 +186,11 @@ export const PUBLIC_PAGES = {
       "The sixteen geomantic figures with their meanings and correspondences, " +
       "sortable by pairs, name or binary value.",
   },
+  "/help/ritual-pug": {
+    title: "Ritual Pug guide",
+    description:
+      "Write rituals with readable Pug source, visual editing and stable block identities.",
+  },
   "/kabbalah": {
     title: "Kabbalah",
     description:

@@ -33,6 +33,11 @@ describe("sitemap", () => {
     }
   });
 
+  it("indexes current authoring help but excludes retired syntax recovery", () => {
+    expect(urls).toContain("https://magick.ly/help/ritual-pug");
+    expect(urls).not.toContain("https://magick.ly/help/ritual-text");
+  });
+
   it("claims no change frequency, priority or modification date", () => {
     for (const entry of sitemap()) expect(Object.keys(entry)).toEqual(["url"]);
   });

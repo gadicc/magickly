@@ -1,16 +1,12 @@
 import Link from "@magick-components/Link";
 import { Box, Container } from "@mui/material";
-import type { Metadata } from "next";
 import {
   ritualTextExamples,
   ritualTextStarter,
 } from "@/doc/ritualTextExamples";
+import { privateMetadata } from "@/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Ritual Text guide",
-  description:
-    "Write rituals with speech, actions, notes, variables and rich text.",
-};
+export const metadata = privateMetadata("Ritual Text recovery guide");
 
 function Example({ source }: { source: string }) {
   return (
