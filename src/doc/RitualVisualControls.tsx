@@ -143,7 +143,8 @@ function fieldsFor(target: Target): Fields {
   };
 }
 
-const modifierLabel =
+/** Platform modifier prefix for shortcut hints, such as "Ctrl+" or "⌘". */
+export const modifierLabel =
   typeof navigator !== "undefined" && /Mac|iP(hone|ad)/.test(navigator.platform)
     ? "⌘"
     : "Ctrl+";
@@ -655,6 +656,20 @@ export default function RitualVisualControls({
       <Box
         role="toolbar"
         aria-label="Visual editing tools"
+        onKeyDown={(event) => {
+          // The toolbar pattern moves between commands with the arrow keys.
+          if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+          const buttons = [
+            ...event.currentTarget.querySelectorAll<HTMLButtonElement>(
+              "button:not(:disabled)",
+            ),
+          ];
+          const index = buttons.indexOf(event.target as HTMLButtonElement);
+          if (index < 0) return;
+          event.preventDefault();
+          const step = event.key === "ArrowRight" ? 1 : -1;
+          buttons[(index + step + buttons.length) % buttons.length].focus();
+        }}
         sx={{
           display: "flex",
           gap: 0.25,
@@ -678,6 +693,7 @@ export default function RitualVisualControls({
             size="small"
             disabled={disabled}
             aria-haspopup="menu"
+            aria-expanded={roleMenu?.mode === mode || undefined}
             endIcon={<ArrowDropDown />}
             onClick={(event) => {
               if (!blocked) setRoleMenu({ mode, anchor: event.currentTarget });
@@ -831,19 +847,16 @@ export default function RitualVisualControls({
             component: "form",
             onSubmit: (event: React.FormEvent) => {
               event.preventDefault();
+              // React submits through portals: never submit a host form, such
+              // as the creation form around this editor.
+              event.stopPropagation();
               apply();
             },
           },
         }}
       >
         <DialogTitle>
-          {fields?.kind === "a"
-            ? target
-              ? "Edit link"
-              : "Insert link"
-            : target
-              ? `Edit ${kindLabels[fields?.kind ?? "title"]}`
-              : "Insert ritual structure"}
+          {`${target ? "Edit" : "Insert"} ${kindLabels[fields?.kind ?? "title"]}`}
         </DialogTitle>
         {/* MUI zeroes the top padding after a title, clipping outlined labels. */}
         <DialogContent sx={{ display: "grid", gap: 2, "&&": { pt: 1 } }}>

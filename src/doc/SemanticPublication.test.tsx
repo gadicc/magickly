@@ -231,3 +231,22 @@ it("reports compact status to its host without rendering alerts", async () => {
   expect(screen.queryByRole("alert")).toBeNull();
   expect(screen.queryByText("Published for download.")).toBeNull();
 });
+
+it("stops reporting progress when a save interrupts publishing", async () => {
+  const { props } = setup();
+  mock.send.mockImplementation(() => new Promise(() => {}));
+  const messages: [string | null, string][] = [];
+  const onMessage = (message: string | null, kind: string) =>
+    messages.push([message, kind]);
+  const view = render(<SemanticPublication {...props} onMessage={onMessage} />);
+  const publish = await screen.findByRole("button", {
+    name: "Publish saved version for download",
+  });
+  await waitFor(() => expect(publish).toHaveProperty("disabled", false));
+  fireEvent.click(publish);
+  await waitFor(() => expect(messages.at(-1)?.[1]).toBe("progress"));
+  view.rerender(
+    <SemanticPublication {...props} enabled={false} onMessage={onMessage} />,
+  );
+  await waitFor(() => expect(messages.at(-1)).toEqual([null, "info"]));
+});

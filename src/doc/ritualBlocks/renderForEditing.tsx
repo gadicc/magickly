@@ -263,6 +263,27 @@ export function RitualInlineForEditing({ node, selected }: NodeViewProps) {
 }
 
 /** Render attached images only; arbitrary source URLs retain a metadata placeholder. */
+/**
+ * A path on this origin. URL parsing drops tabs and newlines, so `/\t/host`
+ * would otherwise resolve to another host; reject controls and confirm the
+ * resolved origin.
+ */
+function sameOriginPath(src: unknown): src is string {
+  if (
+    typeof src !== "string" ||
+    !/^\/(?![/\\])/.test(src) ||
+    /[\u0000-\u001f\u007f\\]/.test(src)
+  )
+    return false;
+  try {
+    return (
+      new URL(src, window.location.origin).origin === window.location.origin
+    );
+  } catch {
+    return false;
+  }
+}
+
 export function RitualAtomForEditing({ node, selected }: NodeViewProps) {
   const tag = String(node.attrs.tag);
   const attrs = node.attrs.attrs;
@@ -283,11 +304,8 @@ export function RitualAtomForEditing({ node, selected }: NodeViewProps) {
   // Site assets (such as /pics/…) preview like the reader; other URLs stay
   // captions so the editor never fetches arbitrary hosts.
   const siteImage =
-    tag === "img" &&
-    !attachedImage &&
-    typeof attrs.src === "string" &&
-    /^\/[^/\\]/.test(attrs.src)
-      ? attrs.src
+    tag === "img" && !attachedImage && sameOriginPath(attrs.src)
+      ? (attrs.src as string)
       : null;
   return (
     <NodeViewWrapper

@@ -133,7 +133,7 @@ function choices(editor: Editor): Choice[] {
       match[1].toLowerCase() as Mode,
       match[2].toLowerCase(),
     );
-  if (!/^\/[a-z]*$/i.test(p.text)) return [];
+  if (!/^\/[a-z0-9-]*$/i.test(p.text)) return [];
   const query = p.text.slice(1).toLowerCase();
   const commands = (
     [
@@ -147,6 +147,12 @@ function choices(editor: Editor): Choice[] {
   return [
     ...commands,
     ...roleChoices(editor, "say", query)
+      // Names that start with the query outrank names that merely contain it.
+      .sort(
+        (a, b) =>
+          Number(!a.label.toLowerCase().startsWith(query)) -
+          Number(!b.label.toLowerCase().startsWith(query)),
+      )
       .slice(0, 5)
       .flatMap((choice) => [
         { ...choice, label: `${choice.label} · Speech` },

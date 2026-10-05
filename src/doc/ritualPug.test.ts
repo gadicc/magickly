@@ -347,6 +347,17 @@ describe("Pug surface conveniences", () => {
       "",
       "end\\",
       "  two",
+      // Text that would mean something at the start of a Pug line.
+      "|",
+      "| x",
+      "Keryx: hi",
+      "* Keryx go",
+      "//- c",
+      "- x",
+      "= y",
+      ". z",
+      "#",
+      ":",
     ];
     const inline = (depth: number): RitualSemanticNode => {
       const choice = random(depth > 1 ? 7 : 9);
@@ -370,7 +381,7 @@ describe("Pug surface conveniences", () => {
       };
     };
     let piped = 0;
-    for (let round = 0; round < 300; round++) {
+    for (let round = 0; round < 600; round++) {
       const task = random(2) === 0;
       const document: RitualSemanticDocument = {
         format: "magickli-ritual",
@@ -385,7 +396,26 @@ describe("Pug surface conveniences", () => {
               : {},
             children: Array.from({ length: 1 + random(7) }, () => inline(0)),
           },
-          { kind: "annotation", style: "blank", text: "" },
+          random(2)
+            ? { kind: "annotation", style: "blank", text: "" }
+            : { kind: "annotation", style: "comment", text: "sibling" },
+          {
+            kind: "element",
+            id: createRitualNodeId(),
+            tag: "note",
+            attrs: {},
+            children: [
+              {
+                kind: "element",
+                id: createRitualNodeId(),
+                tag: "note",
+                attrs: {},
+                children: Array.from({ length: 1 + random(5) }, () =>
+                  inline(0),
+                ),
+              },
+            ],
+          },
         ],
       };
       const printed = printRitualPug(document);

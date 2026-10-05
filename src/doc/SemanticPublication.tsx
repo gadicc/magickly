@@ -19,6 +19,8 @@ import {
 } from "./semanticDraft";
 import { sendRitualPublication } from "./sqlEditorClient";
 
+const PUBLISHING = "Publishing the saved version for download…";
+
 /** Online-only publishing retains exact requests across unknown outcomes and reloads. */
 export default function SemanticPublication({
   actorId,
@@ -143,7 +145,7 @@ export default function SemanticPublication({
     let active = true;
     const controller = new AbortController();
     setBusy(true);
-    setMessage("Publishing the saved version for download…");
+    setMessage(PUBLISHING);
     void (async () => {
       const result = await sendRitualPublication(request, controller.signal);
       if (!active) return;
@@ -178,6 +180,8 @@ export default function SemanticPublication({
     return () => {
       active = false;
       controller.abort();
+      // A cancelled attempt never reports again; do not leave it "publishing".
+      setMessage((current) => (current === PUBLISHING ? null : current));
     };
   }, [
     enabled,
@@ -233,7 +237,7 @@ export default function SemanticPublication({
       message,
       message === "Published for download."
         ? "success"
-        : message === "Publishing the saved version for download…"
+        : message === PUBLISHING
           ? "progress"
           : "info",
     );

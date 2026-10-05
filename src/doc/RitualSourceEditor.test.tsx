@@ -463,3 +463,20 @@ it("selects a revealed line each time its key changes", () => {
   view.rerender(<RitualSourceEditor {...props} reveal={{ line: 3, key: 2 }} />);
   expect(editor.state.selection.main.from).toBe(third.from);
 });
+
+it("does not replay an applied reveal when it remounts", () => {
+  const text = `${RITUAL_PUG_HEADER}\nnote#${id} First\nnote#${secondId} Second\n`;
+  const props = {
+    value: text,
+    dialect: "pug" as const,
+    disabled: false,
+    onChange: () => {},
+    reveal: { line: 3, key: 4 },
+  };
+  render(<RitualSourceEditor {...props} />);
+  const editor = EditorView.findFromDOM(
+    document.querySelector(".cm-editor") as HTMLElement,
+  )!;
+  expect(editor.state.selection.main.from).toBe(0);
+  expect(editor.hasFocus).toBe(false);
+});

@@ -192,3 +192,28 @@ it("does not install marks the semantic adapter cannot persist", () => {
     expect.not.arrayContaining(["strike", "underline", "code", "link"]),
   );
 });
+
+it("never submits a host form from its dialogs", async () => {
+  const { editor, props, rendered } = setup();
+  const submitted = vi.fn((event: React.FormEvent) => event.preventDefault());
+  rendered.rerender(
+    <form onSubmit={submitted}>
+      <RitualVisualControls {...props} />
+    </form>,
+  );
+  act(() => {
+    editor.commands.setTextSelection(12);
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Insert structure" }));
+  const title = await screen.findByRole("textbox", { name: "Section title" });
+  expect(
+    screen.getByRole("dialog", { name: "Insert section title" }),
+  ).toBeTruthy();
+  fireEvent.change(title, { target: { value: "Opening" } });
+  fireEvent.submit((title as HTMLInputElement).form!);
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  expect(JSON.stringify(semanticFromTiptap(editor.getJSON()))).toContain(
+    "Opening",
+  );
+  expect(submitted).not.toHaveBeenCalled();
+});

@@ -287,3 +287,27 @@ it("keeps single letters that match a command to the commands", () => {
     ),
   ).toEqual(["Sentinel · Speech", "Sentinel · Action"]);
 });
+
+it("matches hyphenated roles typed first", () => {
+  const editor = setup();
+  type(editor, "/all-o");
+  expect(
+    [...document.querySelectorAll('[role="option"]')].map(
+      (option) => option.textContent,
+    ),
+  ).toEqual(["All officers · Speech", "All officers · Action"]);
+});
+
+it("ranks roles whose names start with the query first", () => {
+  const editor = setup();
+  type(editor, "/hi");
+  const labels = [...document.querySelectorAll('[role="option"]')]
+    .map((option) => option.textContent)
+    .filter((label) => label?.endsWith("Speech"));
+  expect(labels.slice(0, 2)).toEqual([
+    "Hierophant · Speech",
+    "Hiereus · Speech",
+  ]);
+  expect(labels).toContain("Past Hierophant · Speech");
+  expect(labels.indexOf("Past Hierophant · Speech")).toBeGreaterThan(1);
+});

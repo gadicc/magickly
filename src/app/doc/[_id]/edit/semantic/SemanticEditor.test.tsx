@@ -241,6 +241,46 @@ it("shows a stored split layout as visual on narrow screens without changing it"
   }
 });
 
+it("offers Save for an unsaved legacy conversion", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = { ...props(), importedFromLegacy: true };
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  const save = (await screen.findByRole("button", {
+    name: "Save",
+  })) as HTMLButtonElement;
+  expect(save.disabled).toBe(false);
+  expect(screen.getByRole("status").textContent).toBe("Unsaved changes");
+});
+
+it("queues Ctrl+S pressed while typed source is still applying", async () => {
+  mock.load.mockResolvedValue(undefined);
+  mock.saveDraft.mockResolvedValue(undefined);
+  mock.clear.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  mock.send.mockResolvedValue({
+    ok: true,
+    replayed: false,
+    ritualId: setup.ritualId,
+    revisionId: createUuidV7(),
+    version: 8,
+    updatedAt: new Date().toISOString(),
+  });
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "source" }));
+  const source = screen.getByRole("textbox", {
+    name: "Ritual semantic source",
+  }) as HTMLTextAreaElement;
+  fireEvent.change(source, {
+    target: { value: source.value.replace("Welcome.", "Greetings.") },
+  });
+  fireEvent.keyDown(window, { key: "s", ctrlKey: true });
+  expect(mock.send).not.toHaveBeenCalled();
+  await waitFor(() => expect(mock.send).toHaveBeenCalledOnce());
+  expect(mock.send.mock.calls[0][0].source).toContain("Greetings.");
+});
+
 it("treats a visual undo back to the confirmed document as saved", async () => {
   mock.load.mockResolvedValue(undefined);
   mock.saveDraft.mockResolvedValue(undefined);

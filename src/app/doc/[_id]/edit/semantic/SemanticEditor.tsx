@@ -23,7 +23,9 @@ import React from "react";
 import EditorActionButton from "@/doc/EditorActionButton";
 import { retainsOnlineEditorIdentity } from "@/doc/onlineEditorIdentity";
 import RitualSourceEditor from "@/doc/RitualSourceEditor";
-import RitualVisualControls from "@/doc/RitualVisualControls";
+import RitualVisualControls, {
+  modifierLabel,
+} from "@/doc/RitualVisualControls";
 import { ritualPugTopLevelLines } from "@/doc/ritualPug";
 import {
   detectRitualSourceDialect,
@@ -122,6 +124,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     React.useState<RitualSourceDiagnostic | null>(null);
   const [sourceComposing, setSourceComposing] = React.useState(false);
   const [notice, setNotice] = React.useState<string | null>(null);
+  const [actionNotice, setActionNotice] = React.useState<string | null>(null);
   const [initialVisual] = React.useState(() =>
     visualRitualState(props.initialDocument),
   );
@@ -149,16 +152,22 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     if (!visualIssue) return null;
     const issue = locateVisualIssue(document);
     if (!issue) return null;
+    // The parser's own locations are exact while the buffer is the source of
+    // the current document; an ID can also appear in links or comments.
+    const parsed =
+      source.dialect === "pug" && !source.dirty
+        ? ritualPugTopLevelLines(source.text)?.[issue.index]
+        : undefined;
+    if (parsed) return parsed;
     const index = issue.id
       ? source.text
           .split("\n")
-          .findIndex((line) => line.includes(`#${issue.id}`))
+          .findIndex(
+            (line) =>
+              line.match(/^(?:\* )?[^\s(#]*#([A-Za-z0-9-]+)/)?.[1] === issue.id,
+          )
       : -1;
-    if (index >= 0) return index + 1;
-    // Typed or pasted source may carry no IDs; trust the parse only while
-    // the buffer is the source of the current document.
-    if (source.dialect !== "pug" || source.dirty) return null;
-    return ritualPugTopLevelLines(source.text)?.[issue.index] || null;
+    return index < 0 ? null : index + 1;
   }, [visualIssue, document, source.text, source.dialect, source.dirty]);
   const [reveal, setReveal] = React.useState<{
     line: number;
@@ -844,6 +853,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     setSaving(true);
     setPending(request);
     setNotice(null);
+    setActionNotice(null);
     try {
       await queueDraftWrite(() =>
         saveSemanticDraft({ ...currentDraft(), pending: request }),
@@ -910,15 +920,16 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           "The revision was saved, but its local draft could not be cleared. Reload to recover or discard that draft.",
         );
       }
-      setNotice(
-        followUp
-          ? source.dirty || source.conflict
+      // Follow-ups ask for action, so they stay as alerts; plain success
+      // fades as a snackbar.
+      if (followUp)
+        setActionNotice(
+          source.dirty || source.conflict
             ? "Save confirmed. Unapplied source changes remain in your local draft; resolve them before saving again."
-            : "Save confirmed. Recovered author annotations remain in your local draft; save again to include them."
-          : result.replayed
-            ? "Save confirmed after retry."
-            : "Saved.",
-      );
+            : "Save confirmed. Recovered author annotations remain in your local draft; save again to include them.",
+        );
+      else
+        setNotice(result.replayed ? "Save confirmed after retry." : "Saved.");
     } catch {
       setError("The save result is unknown. Retry the same pending request.");
     } finally {
@@ -933,9 +944,19 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     !saving &&
     !stale &&
     (!!pending || (unsaved && !error && !sourceProblem && !sourceSyncing));
+  const saveQueued = React.useRef(false);
   saveShortcut.current = () => {
     if (canSave) void save();
+    // Ctrl+S right after typing source saves once that source applies.
+    else if (sourceSyncing && !sourceProblem) saveQueued.current = true;
   };
+  React.useEffect(() => {
+    if (!saveQueued.current) return;
+    if (canSave) {
+      saveQueued.current = false;
+      void save();
+    } else if (!sourceSyncing || sourceProblem) saveQueued.current = false;
+  });
 
   if (access === "locked")
     return (
@@ -1056,7 +1077,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
               ? "Fix the ritual source error first."
               : "The visual panel is catching up with ritual source."
           }
-          title="Save (Ctrl+S)"
+          title={`Save (${modifierLabel}S)`}
           onClick={save}
         >
           {pending ? "Retry save" : "Save"}
@@ -1089,6 +1110,15 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             onClick={() => setMenuAnchor(null)}
           >
             View ritual
+          </MenuItem>
+          <MenuItem
+            component="a"
+            href="/help/ritual-pug"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setMenuAnchor(null)}
+          >
+            Ritual Pug guide (opens in a new tab)
           </MenuItem>
         </Menu>
       </header>
@@ -1183,6 +1213,11 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             >
               Download draft
             </Button>
+          </Alert>
+        )}
+        {actionNotice && (
+          <Alert severity="info" onClose={() => setActionNotice(null)}>
+            {actionNotice}
           </Alert>
         )}
         {publicationMessage && (

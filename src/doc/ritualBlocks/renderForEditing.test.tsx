@@ -171,6 +171,8 @@ it("previews only site and scoped images and retains attachment dimensions", asy
       },
       { type: "img", src: "/pics/neophyte.svg", alt: "Site asset" },
       { type: "img", src: "//example.invalid/protocol-relative", alt: "Host" },
+      { type: "img", src: "/\t/example.invalid/tab", alt: "Tab" },
+      { type: "img", src: "/\\example.invalid/backslash", alt: "Slash" },
     ],
   });
   render(<Host document={document} />);

@@ -356,9 +356,12 @@ export default function RitualSourceEditor({
     }
     instance.dispatch(setDiagnostics(instance.state, diagnostics));
   }, [diagnostic, value, extensions]);
+  // A remounted panel must not replay a reveal it already applied.
+  const revealed = React.useRef(reveal?.key);
   React.useEffect(() => {
     const instance = view.current;
-    if (!instance || !reveal) return;
+    if (!instance || !reveal || reveal.key === revealed.current) return;
+    revealed.current = reveal.key;
     const line = instance.state.doc.line(
       Math.max(1, Math.min(reveal.line, instance.state.doc.lines)),
     );
