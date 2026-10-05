@@ -59,6 +59,10 @@
 .editor :global(.ritual-link) {
   text-decoration: underline;
 }
+/* A newline inside text reads as a space, as in the reader. */
+.editor :global(.ritual-soft-break) {
+  white-space: normal;
+}
 .sourcePanel textarea {
   width: 100%;
   flex: 1;

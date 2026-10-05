@@ -10,6 +10,7 @@ import {
   semanticToTiptap,
   visualRitualState,
 } from "./tiptapRitual";
+import { RitualSoftBreaks } from "./tiptapRitualClient";
 
 it("does not append an unsaved paragraph after a ritual task", () => {
   const original = semanticFromJrt({
@@ -68,5 +69,26 @@ it("retains author comments and section separators through a real visual edit an
   } finally {
     editor.destroy();
     copy.destroy();
+  }
+});
+
+it("shows newlines inside text as collapsible spaces without changing the document", () => {
+  const document = parseRitualPug(
+    `${RITUAL_PUG_HEADER}\nHiero#Ab3k9Qp7Zx2Mn5Rs:\n  | first line\n  | second line\n`,
+  );
+  const element = window.document.createElement("div");
+  const editor = new Editor({
+    element,
+    extensions: [...ritualTiptapExtensions, RitualSoftBreaks],
+    content: visualRitualState(document).content,
+  });
+  try {
+    const breaks = element.querySelectorAll(".ritual-soft-break");
+    expect([...breaks].map((node) => node.textContent)).toEqual(["\n"]);
+    expect(semanticFromTiptap(editor.getJSON())).toEqual(document);
+    editor.commands.insertContentAt(1, "x");
+    expect(element.querySelectorAll(".ritual-soft-break")).toHaveLength(1);
+  } finally {
+    editor.destroy();
   }
 });
