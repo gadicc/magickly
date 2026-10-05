@@ -1194,7 +1194,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           </Alert>
         )}
       </div>
-      <Box className={styles.panels}>
+      <Box className={styles.panels} data-layout={displayMode}>
         {displayMode !== "visual" && (
           <section
             className={styles.sourcePanel}

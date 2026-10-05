@@ -148,7 +148,7 @@ it("uses shared frames for titles, notes and grades while leaving variables as a
   expect(semanticFromTiptap(editor.getJSON())).toEqual(document);
 });
 
-it("does not fetch arbitrary image URLs and retains scoped attachment dimensions", async () => {
+it("previews only site and scoped images and retains attachment dimensions", async () => {
   const src = formatRitualFileLocator({
     ritualId: createUuidV7(),
     attachmentId: createUuidV7(),
@@ -169,6 +169,8 @@ it("does not fetch arbitrary image URLs and retains scoped attachment dimensions
         height: 12,
         style: '{"width":"16px"}',
       },
+      { type: "img", src: "/pics/neophyte.svg", alt: "Site asset" },
+      { type: "img", src: "//example.invalid/protocol-relative", alt: "Host" },
     ],
   });
   render(<Host document={document} />);
@@ -176,7 +178,10 @@ it("does not fetch arbitrary image URLs and retains scoped attachment dimensions
     name: "Fixture visual editor",
   });
   const image = await screen.findByRole("img", { name: "Attached" });
-  expect(dom.querySelectorAll("img")).toHaveLength(1);
+  expect(dom.querySelectorAll("img")).toHaveLength(2);
+  expect(
+    screen.getByRole("img", { name: "Site asset" }).getAttribute("src"),
+  ).toBe("/pics/neophyte.svg");
   expect(image.getAttribute("src")).toBe(src);
   expect(image.getAttribute("width")).toBe("16");
   expect(image.getAttribute("height")).toBe("12");

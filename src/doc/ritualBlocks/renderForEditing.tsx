@@ -280,6 +280,15 @@ export function RitualAtomForEditing({ node, selected }: NodeViewProps) {
             ? `Variable · ${String(attrs.label ?? attrs.name ?? "")}`
             : tag;
   const imageStyle = editorImageStyle(attachedImage ? attrs.style : undefined);
+  // Site assets (such as /pics/…) preview like the reader; other URLs stay
+  // captions so the editor never fetches arbitrary hosts.
+  const siteImage =
+    tag === "img" &&
+    !attachedImage &&
+    typeof attrs.src === "string" &&
+    /^\/[^/\\]/.test(attrs.src)
+      ? attrs.src
+      : null;
   return (
     <NodeViewWrapper
       data-ritual-atom={tag}
@@ -296,6 +305,14 @@ export function RitualAtomForEditing({ node, selected }: NodeViewProps) {
           height={editorImageDimension(attrs.height)}
           style={imageStyle}
           editing
+        />
+      )}
+      {siteImage && (
+        // biome-ignore lint/performance/noImgElement: a same-origin preview of the reader's own asset.
+        <img
+          src={siteImage}
+          alt={typeof attrs.alt === "string" ? attrs.alt : ""}
+          className={styles.sitePreview}
         />
       )}
       {tag === "hr" ? <hr /> : <div className={styles.label}>{caption}</div>}

@@ -67,6 +67,37 @@
   box-sizing: border-box;
   min-height: 100%;
 }
+/* The panels' own frames only nested the CodeMirror border and the visual
+   well; the gap between them already separates the two. */
+.surface .visualPanel,
+.surface .sourcePanel {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  gap: 0.5rem;
+}
+/* Alone, the visual document reads as a page rather than a full-width band. */
+.surface .panels[data-layout="visual"] .editor {
+  background: #efeae2;
+}
+.surface .panels[data-layout="visual"] .editor :global(.tiptap) {
+  max-width: 52rem;
+  margin: 0 auto;
+}
+/* Declarations are settings, not content: let consecutive ones wrap as chips. */
+.editor
+:global(
+  .react-renderer.node-ritualAtom:has(> [data-ritual-atom="declareVar"])
+) {
+  display: inline-block;
+  vertical-align: top;
+  margin-inline-end: 0.4rem;
+}
+.editor :global([data-ritual-atom="declareVar"]) {
+  margin: 0.2rem 0;
+  padding: 0.15rem 0.5rem;
+  border-radius: 1rem;
+}
 .panels {
   display: flex;
   gap: 1rem;
@@ -125,6 +156,12 @@
 @media (max-width: 800px) {
   .panels {
     flex-direction: column;
+  }
+  .surface {
+    padding-inline: 0.5rem;
+  }
+  .editor :global(.tiptap) {
+    padding: 0.5rem;
   }
   .visualPanel,
   .sourcePanel {

@@ -62,6 +62,13 @@
   border: 1px dashed #8b95a6;
   border-radius: 0.35rem;
 }
+.sitePreview {
+  display: block;
+  max-width: 100%;
+  max-height: 160px;
+  margin-bottom: 0.25rem;
+  object-fit: contain;
+}
 .token {
   background: #e8eef8;
   border-radius: 0.25rem;
