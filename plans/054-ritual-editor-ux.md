@@ -89,9 +89,11 @@ In the visual editor each `"\n"` inside text is decorated to collapse like the
 reader's whitespace, so a soft line break displays as a space, as readers see
 it. Explicit `br` nodes still display breaks.
 
-**Toolbar and dialogs (6, 11).** Groups: Speech · Action · Note | Insert ▾
-(section title, summary, to-do, variable reference, variable declaration,
-link, image) | Bold · Italic | Undo · Redo | Properties. Formatting and
+**Toolbar and dialogs (6, 11).** Groups: Speech · Action · Note · Insert… |
+Link · Image · Bold · Italic | Undo · Redo | Properties. Insert… keeps its
+dialog with a structure select (section title, summary, to-do, variable
+reference, variable declaration); Link and Image stay separate buttons rather
+than joining an Insert menu, which keeps their existing flows and tests. Formatting and
 history are icon buttons with tooltips naming their shortcuts and
 `aria-pressed` for marks; accessible names stay as today. Speech and Action
 open a role menu (Everyone, All officers, then the role catalog, the last role
@@ -135,11 +137,69 @@ Each stage is one or more commits on `gate/editor-ux`, gated before it lands.
 - Show the rest of a ritual visually when one node needs source editing.
 - Slash commands for Note and Section title; Enter on an empty trailing task
   paragraph to leave the task.
-- Image thumbnails in the visual editor.
+- Previews for attached and site images exist; other image URLs stay captions
+  by design.
 - A page title in the app bar for editor routes; the app bar's hydration
   mismatch (present on every page).
-- Physical phone keyboards, Safari and assistive technology remain unverified.
+- Physical phone keyboards (including the fixed-height surface with an
+  on-screen keyboard and short landscape screens), Safari and assistive
+  technology remain unverified.
+
+## Commits
+
+| Commit | Change |
+| --- | --- |
+| `82ec5a1` | This plan |
+| `4f421d1` | Pipe-line printing |
+| `6a924b6` | Soft line breaks display as spaces |
+| `3efc62d` | Work surface, header, notices, save state, Ctrl/Cmd+S |
+| `f07dab2` | Toolbar groups, role menu, dialog fixes |
+| `d31a1c8` | Role-first slash search |
+| `fd9929b` | Visual fallback names its line |
+| `3b72a8c` | Visual density, site image previews, narrow padding |
+| `09839da` | Toolbar wraps outside phones |
+| `bcc8d4e` | Independent review fixes |
+| `7f3b1cd` | Final review fixes |
+| (this commit) | Verification record and status follow-ups |
 
 ## Verification
 
-To be filled in per stage.
+Every commit passed `pnpm check`, `typecheck`, `test:coverage` (per-file
+thresholds met) and the webpack `build` in a separate worktree with one fresh
+frozen install (no commit changes dependencies) and CI's placeholder
+environment. The tip also passed `loom init`, `loom check`,
+`loom check --production`, the `magick-data` smoke test and
+`check:turbopack`, leaving the tree clean.
+
+Measurements on the bundled corpus: wrappers drop from 2,040 to 214 with
+parse(print(doc)) still equal to doc for all three rituals; the Neophyte
+reprints as 958 lines with 41 wrappers instead of 499 lines with 775. A seeded
+600-document round trip (nested notes, sibling comments, Pug-significant text)
+is part of the suite; the independent reviewer's separate fuzz of about 11,000
+valid documents found no mismatch.
+
+A headless Chromium against the gate worktree's dev server, signed in as the
+local synthetic Creator with the full Neophyte, checked: the window no longer
+scrolls at 1440×900 or 390×844, both panels scroll independently, the first
+editable line moves from y≈360 to y≈220, Ctrl+S saves and the status moves
+from “Unsaved changes” to “Saved”, the role menu and dialogs, the fallback
+warning's “Show line 313” on the original Neophyte, chips and previews, and
+the creation form with the shared toolbar. Real phones, Safari, physical
+keyboards with IME and assistive technology were not tested.
+
+Reviews: an independent fresh-context Opus 5.5 review found a dialog submit
+escaping into the creation form, a site-image filter bypass, a stuck
+publishing status, auto-hiding follow-up notices and several smaller issues,
+all fixed in `bcc8d4e`. The final adversarial Fable 5.1 review found no
+data-loss path and no printer mismatch in a further 3,000-document fuzz. It
+did find a bug already on `main`: U+2028/U+2029 on a `Label:` shortcut line
+made source unparsable. It also found four smaller issues: a source error
+hidden on narrow screens with a stored split, a retained request's JSON
+formatting reading as unsaved, Ctrl+S under non-Latin layouts, and the
+debounced draft lost when leaving through the new menu. All five are fixed
+in `7f3b1cd`.
+
+Unverified, needing real devices: the fixed-height surface with an on-screen
+keyboard (Android Chrome resizes only the visual viewport by default, and iOS
+Safari has its own behaviour), and landscape phones about 390 px tall, where
+the header, any notices and the toolbar leave little room for the document.

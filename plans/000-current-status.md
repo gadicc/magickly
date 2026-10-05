@@ -273,6 +273,13 @@ Follow-ups are separate from the completed migration work:
   entry already declares its contract, props and inputs — and built after
   `magick-components`, whose demonstration site it would be
   ([plan 052](052-data-package.md#follow-ups)).
+- TODO: ritual editor follow-ups from
+  [plan 054](054-ritual-editor-ux.md#follow-ups): scroll synchronisation
+  between source and visual, visual editing for the rest of a ritual when one
+  node needs source, Note and Section title slash commands, leaving a task
+  with Enter, an app bar title for editor routes, and the app bar's hydration
+  mismatch on every page. Real phones, Safari, IME and assistive technology
+  remain untested for the editor.
 - TODO: one small one left by step 3a
   ([plan 032](032-data-layer.md#follow-ups)): a source directory added while
   `pnpm dev` runs is not watched until it restarts, since the watch is one
