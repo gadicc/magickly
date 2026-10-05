@@ -358,6 +358,8 @@ describe("Pug surface conveniences", () => {
       ". z",
       "#",
       ":",
+      "line\u2028separator",
+      "\u2029",
     ];
     const inline = (depth: number): RitualSemanticNode => {
       const choice = random(depth > 1 ? 7 : 9);
@@ -614,4 +616,13 @@ it("reports the source line of each top-level node", () => {
   const source = `${RITUAL_PUG_HEADER}\n//- Opening\nHiero: Welcome.\n\nnote\n  | First\n  | second\n* Keryx Opens.\n`;
   expect(ritualPugTopLevelLines(source)).toEqual([2, 3, 4, 5, 8]);
   expect(ritualPugTopLevelLines("broken")).toBeNull();
+});
+
+it("round-trips line and paragraph separators on shortcut lines", () => {
+  const source = `${RITUAL_PUG_HEADER}\nKeryx#Ab3k9Qp7Zx2Mn5Rs: a\u2028b\n* All#Other00000000001 c\u2029d\n`;
+  const document = parseRitualPug(source);
+  expect(document.nodes[0]).toMatchObject({
+    children: [{ text: "a\u2028b" }],
+  });
+  expect(printRitualPug(document)).toBe(source);
 });

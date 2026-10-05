@@ -236,6 +236,25 @@ it("shows a stored split layout as visual on narrow screens without changing it"
       "contained",
     );
     expect(localStorage.getItem(RITUAL_EDITOR_LAYOUT_KEY)).toBe("split");
+    cleanup();
+    // A recovered, unparseable source buffer must stay visible to fix.
+    mock.load.mockResolvedValue({
+      ownerId: setup.actorId,
+      ritualId: setup.ritualId,
+      baseRevisionId: setup.revisionId,
+      baseVersion: setup.parentVersion,
+      title: setup.title,
+      documentJson: JSON.stringify(setup.initialDocument, null, 2),
+      sourceBuffer: "//- magickli-ritual-pug 1\nnote(broken\n",
+      sourceDialect: "pug",
+      sourceDirty: true,
+      sourceConflict: false,
+      pending: null,
+      updatedAt: Date.now(),
+    });
+    render(<SemanticEditor {...setup} />);
+    await screen.findByRole("textbox", { name: "Ritual semantic source" });
+    await screen.findByText(/invalid Pug syntax/);
   } finally {
     window.matchMedia = original;
   }
@@ -279,6 +298,88 @@ it("queues Ctrl+S pressed while typed source is still applying", async () => {
   expect(mock.send).not.toHaveBeenCalled();
   await waitFor(() => expect(mock.send).toHaveBeenCalledOnce());
   expect(mock.send.mock.calls[0][0].source).toContain("Greetings.");
+});
+
+it("reads a retried request's compact JSON as saved", async () => {
+  const setup = props();
+  mock.owner = setup.actorId;
+  const pending = {
+    version: 3 as const,
+    kind: "save" as const,
+    operationId: createUuidV7(),
+    expectedActorId: setup.actorId,
+    ritualId: setup.ritualId,
+    expectedRevisionId: setup.revisionId,
+    expectedVersion: setup.parentVersion,
+    title: setup.title,
+    source: JSON.stringify(setup.initialDocument),
+  };
+  mock.load.mockResolvedValue({
+    ownerId: setup.actorId,
+    ritualId: setup.ritualId,
+    baseRevisionId: setup.revisionId,
+    baseVersion: setup.parentVersion,
+    title: setup.title,
+    documentJson: JSON.stringify(setup.initialDocument, null, 2),
+    sourceBuffer: printRitualPug(setup.initialDocument),
+    sourceDialect: "pug",
+    sourceDirty: false,
+    sourceConflict: false,
+    pending,
+    updatedAt: Date.now(),
+  });
+  mock.saveDraft.mockResolvedValue(undefined);
+  mock.clear.mockResolvedValue(undefined);
+  mock.send.mockResolvedValue({
+    ok: true,
+    replayed: true,
+    ritualId: setup.ritualId,
+    revisionId: createUuidV7(),
+    version: 8,
+    updatedAt: new Date().toISOString(),
+  });
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "Retry save" }));
+  await screen.findByText("Save confirmed after retry.");
+  expect(screen.getByRole("status").textContent).toBe("Saved");
+  expect(
+    (screen.getByRole("button", { name: "Save" }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(true);
+});
+
+it("keeps the debounced draft when the editor unmounts", async () => {
+  mock.load.mockResolvedValue(undefined);
+  mock.saveDraft.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  const view = render(<SemanticEditor {...setup} />);
+  await changeTitle("Left in a hurry");
+  expect(mock.saveDraft).not.toHaveBeenCalled();
+  view.unmount();
+  await waitFor(() =>
+    expect(mock.saveDraft.mock.lastCall?.[0].title).toBe("Left in a hurry"),
+  );
+});
+
+it("saves on the S key position under non-Latin layouts", async () => {
+  mock.load.mockResolvedValue(undefined);
+  mock.saveDraft.mockResolvedValue(undefined);
+  mock.clear.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  mock.send.mockResolvedValue({
+    ok: true,
+    replayed: false,
+    ritualId: setup.ritualId,
+    revisionId: createUuidV7(),
+    version: 8,
+    updatedAt: new Date().toISOString(),
+  });
+  render(<SemanticEditor {...setup} />);
+  await changeTitle();
+  fireEvent.keyDown(window, { key: "ы", code: "KeyS", ctrlKey: true });
+  await waitFor(() => expect(mock.send).toHaveBeenCalledOnce());
 });
 
 it("treats a visual undo back to the confirmed document as saved", async () => {

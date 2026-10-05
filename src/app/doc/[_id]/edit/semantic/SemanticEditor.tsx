@@ -131,10 +131,16 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   const [visualIssue, setVisualIssue] = React.useState(initialVisual.issue);
   const narrow = useMediaQuery("(max-width: 800px)", { noSsr: true });
   // Narrow screens show split as Visual without overwriting the preference.
+  // Split on a narrow screen shows Visual, unless the source has an error
+  // that only the source panel can show and resolve.
+  const narrowSourceProblem =
+    source.conflict || (!!sourceError && source.dirty);
   const displayMode = visualIssue
     ? "source"
     : narrow && mode === "split"
-      ? "visual"
+      ? narrowSourceProblem
+        ? "source"
+        : "visual"
       : mode;
   const [saved, setSaved] = React.useState(() => ({
     title: props.title,
@@ -198,7 +204,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         (event.ctrlKey || event.metaKey) &&
         !event.altKey &&
         !event.shiftKey &&
-        event.key.toLowerCase() === "s"
+        (event.key.toLowerCase() === "s" || event.code === "KeyS")
       ) {
         // Never let the browser's Save Page dialog replace a ritual save.
         event.preventDefault();
@@ -214,6 +220,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   }, [displayMode]);
   const skipPersist = React.useRef(true);
   const liveDraft = React.useRef<SemanticDraft | null>(null);
+  const draftScheduled = React.useRef(false);
   const draftWrites = React.useRef<Promise<void>>(Promise.resolve());
   const draftWriteVersion = React.useRef(0);
   const accessGeneration = React.useRef(0);
@@ -588,7 +595,9 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       updatedAt: Date.now(),
     };
     const writeVersion = draftWriteVersion.current;
+    draftScheduled.current = true;
     const timer = setTimeout(() => {
+      draftScheduled.current = false;
       if (skipPersist.current || writeVersion !== draftWriteVersion.current)
         return;
       const draft: SemanticDraft = {
@@ -624,6 +633,18 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     pending,
     queueDraftWrite,
   ]);
+
+  React.useEffect(
+    () => () => {
+      // Leaving the page cancels the debounce; keep its edits recoverable.
+      const draft = liveDraft.current;
+      if (draftScheduled.current && draft && !skipPersist.current)
+        void queueDraftWrite(() =>
+          saveSemanticDraft({ ...draft, updatedAt: Date.now() }),
+        ).catch(() => {});
+    },
+    [queueDraftWrite],
+  );
 
   const currentDraft = (): SemanticDraft => ({
     ownerId: props.actorId,
@@ -892,7 +913,8 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       setBase({ revisionId: result.revisionId, version: result.version });
       setSaved((current) => ({
         title: request.title ?? current.title,
-        document: request.source,
+        // Retained requests may format their JSON differently.
+        document: stringify(JSON.parse(request.source)),
       }));
       setPending(null);
       try {
@@ -1105,7 +1127,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             Download draft
           </MenuItem>
           <MenuItem
-            component="a"
+            component={Link}
             href={`/doc/${props.ritualId}`}
             onClick={() => setMenuAnchor(null)}
           >

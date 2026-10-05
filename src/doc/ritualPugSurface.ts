@@ -40,8 +40,9 @@ export function canPrintRoleShortcut(value: string): boolean {
 }
 
 const role = "[A-Za-z][A-Za-z0-9,-]*";
-const speech = new RegExp(`^(${role})(#[A-Za-z0-9-]+)?: ?(.*)$`);
-const action = new RegExp(`^\\* (${role})(#[A-Za-z0-9-]+)?(?: (.*))?$`);
+// `[^\n]` rather than `.`: text may contain U+2028/U+2029, which `.` skips.
+const speech = new RegExp(`^(${role})(#[A-Za-z0-9-]+)?: ?([^\\n]*)$`);
+const action = new RegExp(`^\\* (${role})(#[A-Za-z0-9-]+)?(?: ([^\\n]*))?$`);
 
 /** Accept either initial case while retaining reader role keys and explicit Pug roles. */
 export function shortcutRole(value: string): string {
