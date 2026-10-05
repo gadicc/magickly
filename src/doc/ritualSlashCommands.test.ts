@@ -256,3 +256,34 @@ it("keeps commands literal in an existing task nested through a note in another 
   expect(tasks).toBe(2);
   expect(editor.state.doc.textContent).toBe("/do keryx ");
 });
+
+it("offers a role typed first as speech and action", () => {
+  const editor = setup();
+  type(editor, "/ker");
+  const options = [...document.querySelectorAll('[role="option"]')].map(
+    (option) => option.textContent,
+  );
+  expect(options).toEqual(["Keryx · Speech", "Keryx · Action"]);
+  press(editor, "ArrowDown");
+  expect(press(editor, "Enter")).toBe(true);
+  expect(editor.state.doc.firstChild?.attrs.attrs).toEqual({
+    do: true,
+    role: "keryx",
+  });
+});
+
+it("keeps single letters that match a command to the commands", () => {
+  const editor = setup();
+  type(editor, "/s");
+  expect(
+    [...document.querySelectorAll('[role="option"]')].map(
+      (option) => option.textContent,
+    ),
+  ).toEqual(["Say · Speech"]);
+  type(editor, "en");
+  expect(
+    [...document.querySelectorAll('[role="option"]')].map(
+      (option) => option.textContent,
+    ),
+  ).toEqual(["Sentinel · Speech", "Sentinel · Action"]);
+});

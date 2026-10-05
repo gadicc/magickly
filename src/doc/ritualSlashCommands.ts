@@ -98,44 +98,61 @@ function permitted(editor: Editor) {
   );
 }
 
+function roleChoices(editor: Editor, mode: Mode, query: string): Choice[] {
+  const catalog = new Map([
+    ["all", "Everyone"],
+    ["all-officers", "All officers"],
+    ...[...ritualRoleCatalog(editor)].filter(
+      ([role]) => role !== "all" && role !== "all-officers",
+    ),
+  ]);
+  return [...catalog]
+    .map(([role, label]) => ({
+      mode,
+      role,
+      label,
+      search: [
+        role,
+        label,
+        ...Object.keys(roleAliases).filter(
+          (alias) => roleAliases[alias] === role,
+        ),
+      ].join(" "),
+    }))
+    .filter((choice) => choice.search.toLowerCase().includes(query));
+}
+
 function choices(editor: Editor): Choice[] {
   if (!permitted(editor) || !insertion(editor)) return [];
   const p = paragraph(editor)!;
   if (key.getState(editor.state)?.dismissed === p.pos) return [];
   const match = /^\/(say|do)\s+([^\s]*)$/i.exec(p.text);
-  if (match) {
-    const mode = match[1].toLowerCase() as Mode;
-    const query = match[2].toLowerCase();
-    const catalog = new Map([
-      ["all", "Everyone"],
-      ["all-officers", "All officers"],
-      ...[...ritualRoleCatalog(editor)].filter(
-        ([role]) => role !== "all" && role !== "all-officers",
-      ),
-    ]);
-    return [...catalog]
-      .map(([role, label]) => ({
-        mode,
-        role,
-        label,
-        search: [
-          role,
-          label,
-          ...Object.keys(roleAliases).filter(
-            (alias) => roleAliases[alias] === role,
-          ),
-        ].join(" "),
-      }))
-      .filter((choice) => choice.search.toLowerCase().includes(query));
-  }
+  if (match)
+    return roleChoices(
+      editor,
+      match[1].toLowerCase() as Mode,
+      match[2].toLowerCase(),
+    );
   if (!/^\/[a-z]*$/i.test(p.text)) return [];
   const query = p.text.slice(1).toLowerCase();
-  return (
+  const commands = (
     [
       { mode: "say", label: "Say · Speech", search: "say speech" },
       { mode: "do", label: "Do · Action", search: "do action" },
     ] satisfies Choice[]
   ).filter((choice) => choice.search.includes(query));
+  // A role typed first (`/ker`) offers that role as Speech and Action. One
+  // letter that already matches a command would list half the catalog.
+  if (!query || (query.length < 2 && commands.length)) return commands;
+  return [
+    ...commands,
+    ...roleChoices(editor, "say", query)
+      .slice(0, 5)
+      .flatMap((choice) => [
+        { ...choice, label: `${choice.label} · Speech` },
+        { ...choice, mode: "do" as const, label: `${choice.label} · Action` },
+      ]),
+  ];
 }
 
 function resolveRole(editor: Editor, input: string): string | null {
