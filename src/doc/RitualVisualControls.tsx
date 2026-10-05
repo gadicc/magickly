@@ -1,5 +1,13 @@
 "use client";
 
+import ArrowDropDown from "@mui/icons-material/ArrowDropDown";
+import FormatBold from "@mui/icons-material/FormatBold";
+import FormatItalic from "@mui/icons-material/FormatItalic";
+import ImageOutlined from "@mui/icons-material/ImageOutlined";
+import InsertLink from "@mui/icons-material/InsertLink";
+import Redo from "@mui/icons-material/Redo";
+import Tune from "@mui/icons-material/Tune";
+import Undo from "@mui/icons-material/Undo";
 import {
   Alert,
   Box,
@@ -8,8 +16,12 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
+  IconButton,
+  Menu,
   MenuItem,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import type { Editor, JSONContent } from "@tiptap/core";
@@ -20,6 +32,7 @@ import Upload from "@/lib/upload";
 import EditorActionButton from "./EditorActionButton";
 import { RitualTaskDeletionNotice } from "./RitualTaskDeletionNotice";
 import { createRitualNodeId } from "./ritualNodeIds";
+import { ritualRoleCatalog } from "./ritualRoleCatalog";
 import { ritualTaskContent } from "./ritualTaskCommands";
 import {
   type JsonValue,
@@ -65,6 +78,16 @@ const editableTags = new Set<Kind>([
   "img",
   "task",
 ]);
+const kindLabels: Record<Kind, string> = {
+  title: "section title",
+  summary: "summary",
+  todo: "to-do",
+  var: "variable reference",
+  declareVar: "variable declaration",
+  a: "link",
+  img: "image",
+  task: "task",
+};
 const freshFields = (kind: Kind): Fields => ({
   kind,
   value: "",
@@ -120,6 +143,62 @@ function fieldsFor(target: Target): Fields {
   };
 }
 
+const modifierLabel =
+  typeof navigator !== "undefined" && /Mac|iP(hone|ad)/.test(navigator.platform)
+    ? "⌘"
+    : "Ctrl+";
+
+/** Icon command with a tooltip; `inactive` guards it without disabled styling. */
+function ToolButton({
+  label,
+  shortcut,
+  icon,
+  pressed,
+  disabled,
+  inactive,
+  inactiveReason,
+  onClick,
+}: {
+  label: string;
+  shortcut?: string;
+  icon: React.ReactNode;
+  pressed?: boolean;
+  disabled: boolean;
+  inactive: boolean;
+  inactiveReason: string;
+  onClick(): void;
+}) {
+  return (
+    <Tooltip
+      title={
+        inactive ? inactiveReason : shortcut ? `${label} (${shortcut})` : label
+      }
+    >
+      {/* A disabled button emits no events, so the tooltip needs a wrapper. */}
+      <span>
+        <IconButton
+          size="small"
+          aria-label={label}
+          aria-pressed={pressed}
+          aria-disabled={disabled || inactive || undefined}
+          disabled={disabled}
+          color={pressed ? "primary" : "default"}
+          disableRipple={inactive}
+          onClick={(event) => {
+            if (disabled || inactive) {
+              event.preventDefault();
+              return;
+            }
+            onClick();
+          }}
+        >
+          {icon}
+        </IconButton>
+      </span>
+    </Tooltip>
+  );
+}
+
 /** Shared visual author controls; uploads require an already authorized ritual. */
 export default function RitualVisualControls({
   editor,
@@ -151,7 +230,37 @@ export default function RitualVisualControls({
     anchor: HTMLElement;
   } | null>(null);
   const closeTaskSettings = React.useCallback(() => setTaskSettings(null), []);
-  const [role, setRole] = React.useState("all");
+  const marks = useEditorState({
+    editor,
+    selector: ({ editor: current }) => ({
+      bold:
+        current.isActive("bold") ||
+        current.isActive("ritualSpan", { tag: "b" }),
+      italic:
+        current.isActive("italic") ||
+        current.isActive("ritualSpan", { tag: "i" }),
+    }),
+  });
+  const [roleMenu, setRoleMenu] = React.useState<{
+    mode: "say" | "do";
+    anchor: HTMLElement;
+  } | null>(null);
+  const [lastRole, setLastRole] = React.useState<string | null>(null);
+  const roleChoices = React.useMemo(() => {
+    if (!roleMenu) return [];
+    const catalog = ritualRoleCatalog(editor);
+    const choices: [string, string][] = [
+      ["all", "Everyone"],
+      ["all-officers", "All officers"],
+      ...[...catalog].filter(
+        ([value]) => value !== "all" && value !== "all-officers",
+      ),
+    ];
+    // The role chosen last comes first: consecutive tasks often share it.
+    const last = choices.findIndex(([value]) => value === lastRole);
+    if (last > 0) choices.unshift(...choices.splice(last, 1));
+    return choices;
+  }, [roleMenu, editor, lastRole]);
   const [fields, setFields] = React.useState<Fields | null>(null);
   const [target, setTarget] = React.useState<Target | null>(null);
   const [selection, setSelection] = React.useState<{
@@ -261,13 +370,18 @@ export default function RitualVisualControls({
     setError(null);
   };
 
-  const insertBlock = (tag: "task" | "note", mode?: "say" | "do") => {
+  const insertBlock = (
+    tag: "task" | "note",
+    mode?: "say" | "do",
+    role = "all",
+  ) => {
     if (blocked) return;
-    const task =
-      tag === "task" ? ritualTaskContent(mode!, role.trim() || "all") : null;
+    const task = tag === "task" ? ritualTaskContent(mode!, role) : null;
     if (tag === "task") {
-      if (task) editor.chain().focus().insertContent(task).run();
-      else
+      if (task) {
+        setLastRole(role);
+        editor.chain().focus().insertContent(task).run();
+      } else
         setError(
           "Use a comma-separated role list, all, all-officers, or all-except-roles.",
         );
@@ -539,31 +653,35 @@ export default function RitualVisualControls({
   return (
     <>
       <Box
+        role="toolbar"
+        aria-label="Visual editing tools"
         sx={{
           display: "flex",
-          gap: 0.5,
-          flexWrap: "wrap",
+          gap: 0.25,
+          flexWrap: "nowrap",
           alignItems: "center",
+          overflowX: "auto",
+          flex: "none",
+          scrollbarWidth: "thin",
+          "& > *": { flex: "none" },
         }}
       >
-        <EditorActionButton
-          inactive={syncingSource}
-          inactiveReason={sourceWaitReason}
-          size="small"
-          disabled={disabled}
-          onClick={() => insertBlock("task", "say")}
-        >
-          Speech
-        </EditorActionButton>
-        <EditorActionButton
-          inactive={syncingSource}
-          inactiveReason={sourceWaitReason}
-          size="small"
-          disabled={disabled}
-          onClick={() => insertBlock("task", "do")}
-        >
-          Action
-        </EditorActionButton>
+        {(["say", "do"] as const).map((mode) => (
+          <EditorActionButton
+            key={mode}
+            inactive={syncingSource}
+            inactiveReason={sourceWaitReason}
+            size="small"
+            disabled={disabled}
+            aria-haspopup="menu"
+            endIcon={<ArrowDropDown />}
+            onClick={(event) => {
+              if (!blocked) setRoleMenu({ mode, anchor: event.currentTarget });
+            }}
+          >
+            {mode === "say" ? "Speech" : "Action"}
+          </EditorActionButton>
+        ))}
         <EditorActionButton
           inactive={syncingSource}
           inactiveReason={sourceWaitReason}
@@ -578,35 +696,78 @@ export default function RitualVisualControls({
           inactiveReason={sourceWaitReason}
           size="small"
           disabled={disabled}
+          aria-label="Insert structure"
           onClick={() => open("title")}
         >
-          Insert structure
+          Insert…
         </EditorActionButton>
-        <EditorActionButton
+        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+        <ToolButton
+          label="Link"
+          icon={<InsertLink fontSize="small" />}
+          disabled={disabled}
           inactive={syncingSource}
           inactiveReason={sourceWaitReason}
-          size="small"
-          disabled={disabled}
           onClick={() =>
             open("a", selected?.node.attrs?.tag === "a" ? selected : null)
           }
-        >
-          Link
-        </EditorActionButton>
-        <EditorActionButton
+        />
+        <ToolButton
+          label="Image"
+          icon={<ImageOutlined fontSize="small" />}
+          disabled={disabled || !actorId || !ritualId}
           inactive={syncingSource}
           inactiveReason={sourceWaitReason}
-          size="small"
-          disabled={disabled || !actorId || !ritualId}
           onClick={openImage}
-        >
-          Image
-        </EditorActionButton>
+        />
+        <ToolButton
+          label="Bold"
+          shortcut={`${modifierLabel}B`}
+          icon={<FormatBold fontSize="small" />}
+          pressed={marks.bold}
+          disabled={disabled}
+          inactive={syncingSource}
+          inactiveReason={sourceWaitReason}
+          onClick={() => editor.chain().focus().toggleBold().run()}
+        />
+        <ToolButton
+          label="Italic"
+          shortcut={`${modifierLabel}I`}
+          icon={<FormatItalic fontSize="small" />}
+          pressed={marks.italic}
+          disabled={disabled}
+          inactive={syncingSource}
+          inactiveReason={sourceWaitReason}
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+        />
+        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+        <ToolButton
+          label="Undo"
+          shortcut={`${modifierLabel}Z`}
+          icon={<Undo fontSize="small" />}
+          disabled={disabled}
+          inactive={syncingSource}
+          inactiveReason={sourceWaitReason}
+          onClick={() => editor.chain().focus().undo().run()}
+        />
+        <ToolButton
+          label="Redo"
+          shortcut={`${modifierLabel}Shift+Z`}
+          icon={<Redo fontSize="small" />}
+          disabled={disabled}
+          inactive={syncingSource}
+          inactiveReason={sourceWaitReason}
+          onClick={() => editor.chain().focus().redo().run()}
+        />
+        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
         <EditorActionButton
           inactive={syncingSource}
           inactiveReason={sourceWaitReason}
           size="small"
           disabled={disabled || !selected}
+          aria-label="Edit properties"
+          title={selected ? undefined : "Place the cursor in a structure"}
+          startIcon={<Tune fontSize="small" />}
           onClick={(event) => {
             if (!selected || blocked) return;
             if (selected.node.attrs?.tag === "task")
@@ -614,52 +775,31 @@ export default function RitualVisualControls({
             else open(selected.node.attrs?.tag as Kind, selected);
           }}
         >
-          Edit properties
+          Properties
         </EditorActionButton>
-        <EditorActionButton
-          inactive={syncingSource}
-          inactiveReason={sourceWaitReason}
-          size="small"
-          disabled={disabled}
-          onClick={() => editor.chain().focus().toggleBold().run()}
-        >
-          Bold
-        </EditorActionButton>
-        <EditorActionButton
-          inactive={syncingSource}
-          inactiveReason={sourceWaitReason}
-          size="small"
-          disabled={disabled}
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-        >
-          Italic
-        </EditorActionButton>
-        <EditorActionButton
-          inactive={syncingSource}
-          inactiveReason={sourceWaitReason}
-          size="small"
-          disabled={disabled}
-          onClick={() => editor.chain().focus().undo().run()}
-        >
-          Undo
-        </EditorActionButton>
-        <EditorActionButton
-          inactive={syncingSource}
-          inactiveReason={sourceWaitReason}
-          size="small"
-          disabled={disabled}
-          onClick={() => editor.chain().focus().redo().run()}
-        >
-          Redo
-        </EditorActionButton>
-        <TextField
-          size="small"
-          label="Role for new task"
-          value={role}
-          disabled={disabled}
-          onChange={(event) => setRole(event.target.value)}
-        />
       </Box>
+      <Menu
+        anchorEl={roleMenu?.anchor}
+        open={!!roleMenu}
+        onClose={() => setRoleMenu(null)}
+        slotProps={{
+          paper: { sx: { maxHeight: "60vh" } },
+          root: { sx: { visibility: concealed ? "hidden" : undefined } },
+        }}
+      >
+        {roleChoices.map(([value, label]) => (
+          <MenuItem
+            key={value}
+            onClick={() => {
+              const mode = roleMenu?.mode;
+              setRoleMenu(null);
+              if (mode) insertBlock("task", mode, value);
+            }}
+          >
+            {label}
+          </MenuItem>
+        ))}
+      </Menu>
       {!ritualId && (
         <Typography variant="body2">
           Images can be attached after creating the ritual.
@@ -682,13 +822,30 @@ export default function RitualVisualControls({
         onClose={() => setFields(null)}
         fullWidth
         maxWidth="sm"
+        slotProps={{
+          paper: {
+            component: "form",
+            onSubmit: (event: React.FormEvent) => {
+              event.preventDefault();
+              apply();
+            },
+          },
+        }}
       >
         <DialogTitle>
-          {target ? "Edit ritual properties" : "Insert ritual structure"}
+          {fields?.kind === "a"
+            ? target
+              ? "Edit link"
+              : "Insert link"
+            : target
+              ? `Edit ${kindLabels[fields?.kind ?? "title"]}`
+              : "Insert ritual structure"}
         </DialogTitle>
-        <DialogContent sx={{ display: "grid", gap: 2, pt: 2 }}>
+        {/* MUI zeroes the top padding after a title, clipping outlined labels. */}
+        <DialogContent sx={{ display: "grid", gap: 2, "&&": { pt: 1 } }}>
           {!target && fields?.kind !== "a" && (
             <TextField
+              autoFocus
               select
               slotProps={{
                 select: {
@@ -715,6 +872,7 @@ export default function RitualVisualControls({
             fields?.kind === "summary" ||
             fields?.kind === "var") && (
             <TextField
+              autoFocus={!!target}
               label={
                 fields.kind === "title"
                   ? "Section title"
@@ -736,6 +894,7 @@ export default function RitualVisualControls({
           {fields?.kind === "a" && (
             <>
               <TextField
+                autoFocus
                 label="Link address"
                 value={fields.href}
                 onChange={(event) => change("href", event.target.value)}
@@ -752,6 +911,7 @@ export default function RitualVisualControls({
           )}
           {fields?.kind === "img" && (
             <TextField
+              autoFocus
               label="Image description"
               value={fields.alt}
               onChange={(event) => change("alt", event.target.value)}
@@ -760,6 +920,7 @@ export default function RitualVisualControls({
           {fields?.kind === "declareVar" && (
             <>
               <TextField
+                autoFocus={!!target}
                 label="Variable name"
                 value={fields.name}
                 onChange={(event) => change("name", event.target.value)}
@@ -861,10 +1022,10 @@ export default function RitualVisualControls({
         <DialogActions>
           <Button onClick={() => setFields(null)}>Cancel</Button>
           <EditorActionButton
+            type="submit"
             disabled={disabled}
             inactive={syncingSource}
             inactiveReason={sourceWaitReason}
-            onClick={apply}
           >
             {target ? "Apply properties" : "Insert"}
           </EditorActionButton>

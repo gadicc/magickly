@@ -6,6 +6,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
 } from "@testing-library/react";
 import { Editor } from "@tiptap/core";
 import { afterEach, expect, it, vi } from "vitest";
@@ -64,15 +65,62 @@ const setup = () => {
     },
   };
 };
-it("rejects malformed task roles before changing the document", () => {
+it("inserts tasks for a role chosen from the menu and offers it first next", async () => {
   const { editor } = setup();
-  const before = editor.getJSON();
-  fireEvent.change(screen.getByLabelText("Role for new task"), {
-    target: { value: "hiero," },
+  act(() => {
+    editor.commands.setTextSelection(12);
   });
   fireEvent.click(screen.getByRole("button", { name: "Speech" }));
-  expect(editor.getJSON()).toEqual(before);
-  expect(() => semanticFromTiptap(editor.getJSON())).not.toThrow();
+  const first = await screen.findAllByRole("menuitem");
+  expect(first.slice(0, 2).map((item) => item.textContent)).toEqual([
+    "Everyone",
+    "All officers",
+  ]);
+  fireEvent.click(screen.getByRole("menuitem", { name: "Keryx" }));
+  expect(JSON.stringify(semanticFromTiptap(editor.getJSON()))).toContain(
+    '"say":true,"role":"keryx"',
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Action" }));
+  await waitFor(() =>
+    expect(screen.getAllByRole("menuitem")[0].textContent).toBe("Keryx"),
+  );
+  fireEvent.click(screen.getAllByRole("menuitem")[0]);
+  expect(JSON.stringify(semanticFromTiptap(editor.getJSON()))).toContain(
+    '"do":true,"role":"keryx"',
+  );
+});
+it("shows active marks and keyboard shortcuts on formatting commands", async () => {
+  const { editor } = setup();
+  const bold = screen.getByRole("button", { name: "Bold" });
+  expect(bold.getAttribute("aria-pressed")).toBe("false");
+  act(() => {
+    editor.commands.setTextSelection({ from: 1, to: 6 });
+    editor.commands.toggleBold();
+  });
+  await waitFor(() => expect(bold.getAttribute("aria-pressed")).toBe("true"));
+  fireEvent.mouseOver(bold);
+  expect((await screen.findByRole("tooltip")).textContent).toMatch(
+    /^Bold \((Ctrl\+|⌘)B\)$/,
+  );
+});
+it("titles the link dialog and submits it with Enter", async () => {
+  const { editor } = setup();
+  act(() => {
+    editor.commands.setTextSelection({ from: 1, to: 6 });
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Link" }));
+  const dialog = await screen.findByRole("dialog", { name: "Insert link" });
+  const address = screen.getByRole("textbox", { name: "Link address" });
+  expect(window.document.activeElement).toBe(address);
+  fireEvent.change(address, { target: { value: "https://example.com/" } });
+  expect(dialog).toBeTruthy();
+  fireEvent.submit((address as HTMLInputElement).form!);
+  await waitFor(() =>
+    expect(screen.queryByRole("dialog", { name: "Insert link" })).toBeNull(),
+  );
+  expect(JSON.stringify(semanticFromTiptap(editor.getJSON()))).toContain(
+    "https://example.com/",
+  );
 });
 it("retires uploads when their image dialog closes", async () => {
   const { editor, receipt } = setup();

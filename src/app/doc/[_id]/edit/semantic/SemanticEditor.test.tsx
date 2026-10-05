@@ -1225,9 +1225,6 @@ it("keeps toolbar presentation stable while guarding commands against unapplied 
   expect(mock.send).not.toHaveBeenCalled();
   expect(visual.textContent).toContain("Welcome.");
   expect(screen.queryByRole("dialog")).toBeNull();
-  expect(
-    (screen.getByLabelText("Role for new task") as HTMLInputElement).disabled,
-  ).toBe(false);
   expect(discard.getAttribute("aria-disabled")).toBeNull();
   expect([save.className, speech.className, discard.className]).toEqual(
     classes,
@@ -1240,7 +1237,8 @@ it("keeps toolbar presentation stable while guarding commands against unapplied 
     classes,
   );
   fireEvent.click(speech);
-  expect(source.value).toContain('role="all"');
+  fireEvent.click(await screen.findByRole("menuitem", { name: "Everyone" }));
+  await waitFor(() => expect(source.value).toContain('role="all"'));
 });
 
 it("keeps the last valid visual document while source is incomplete and catches up when repaired", async () => {

@@ -2,7 +2,8 @@
 
 import Link from "@magick-components/Link";
 
-import { HelpOutlined, MoreVert } from "@mui/icons-material";
+import HelpOutlined from "@mui/icons-material/HelpOutlined";
+import MoreVert from "@mui/icons-material/MoreVert";
 import {
   Alert,
   Box,
