@@ -340,6 +340,20 @@ export function visualRitualState(input: RitualSemanticDocument): {
   }
 }
 
+/**
+ * Find the first top-level node that cannot round-trip through visual editing
+ * on its own, so authors can be pointed at it. Returns null when only the
+ * combination fails.
+ */
+export function locateVisualIssue(
+  input: RitualSemanticDocument,
+): { index: number; id?: string } | null {
+  for (const [index, node] of input.nodes.entries())
+    if (visualRitualState({ ...input, nodes: [node] }).issue)
+      return { index, ...("id" in node ? { id: node.id } : {}) };
+  return null;
+}
+
 /** Keep pasted identities stable in ProseMirror, not just in a derived snapshot. */
 export function normalizeTiptapNodeIds(editor: Editor): boolean {
   const seen = new Set<string>();

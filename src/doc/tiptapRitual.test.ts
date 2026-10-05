@@ -5,9 +5,11 @@ import { prepare } from "./prepare";
 import { semanticFromJrt, semanticToJrt } from "./semantic";
 import { hasDirectNestedTask } from "./semanticEditorCompatibility";
 import {
+  locateVisualIssue,
   ritualTiptapExtensions,
   semanticFromTiptap,
   semanticToTiptap,
+  visualRitualState,
 } from "./tiptapRitual";
 
 describe("Tiptap semantic adapter", () => {
@@ -123,4 +125,33 @@ describe("Tiptap semantic adapter", () => {
     expect(semanticToJrt(semantic)).toEqual(jrt);
     expect(() => semanticToTiptap(semantic)).toThrow(/Nested tasks/);
   });
+});
+
+it("locates the first top-level node that keeps a ritual source-only", () => {
+  const document = semanticFromJrt({
+    children: [
+      { type: "note", children: [{ type: "text", value: "Fine" }] },
+      {
+        type: "task",
+        say: true,
+        role: "hiero",
+        children: [
+          {
+            type: "task",
+            do: true,
+            role: "all",
+            children: [{ type: "text", value: "Nested" }],
+          },
+        ],
+      },
+    ],
+  });
+  expect(visualRitualState(document).issue).toBeTruthy();
+  expect(locateVisualIssue(document)).toEqual({
+    index: 1,
+    id: (document.nodes[1] as { id: string }).id,
+  });
+  expect(
+    locateVisualIssue({ ...document, nodes: document.nodes.slice(0, 1) }),
+  ).toBeNull();
 });

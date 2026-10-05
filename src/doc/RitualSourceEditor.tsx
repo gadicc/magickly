@@ -156,6 +156,7 @@ export default function RitualSourceEditor({
   diagnostic,
   fill = false,
   header,
+  reveal,
 }: {
   value: string;
   dialect: RitualSourceDialect;
@@ -168,6 +169,8 @@ export default function RitualSourceEditor({
   fill?: boolean;
   /** Leading content for the tools row, such as the panel title. */
   header?: React.ReactNode;
+  /** Select and scroll to a 1-based line whenever `key` changes. */
+  reveal?: { line: number; key: number } | null;
 }) {
   const [foldIds, setFoldIds] = React.useState(true);
   const host = React.useRef<HTMLDivElement>(null);
@@ -353,6 +356,18 @@ export default function RitualSourceEditor({
     }
     instance.dispatch(setDiagnostics(instance.state, diagnostics));
   }, [diagnostic, value, extensions]);
+  React.useEffect(() => {
+    const instance = view.current;
+    if (!instance || !reveal) return;
+    const line = instance.state.doc.line(
+      Math.max(1, Math.min(reveal.line, instance.state.doc.lines)),
+    );
+    instance.dispatch({
+      selection: { anchor: line.from, head: line.to },
+      effects: EditorView.scrollIntoView(line.from, { y: "center" }),
+    });
+    instance.focus();
+  }, [reveal]);
   const hasDiagnostic = diagnostic?.source === value;
   const tools = (dialect === "pug" || hasDiagnostic) && (
     <div

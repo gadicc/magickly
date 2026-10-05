@@ -248,6 +248,20 @@ export function printRitualPug(doc: RitualSemanticDocument): string {
 
 /** Parse the owned Pug subset without executing templates or attribute expressions. */
 export function parseRitualPug(source: string): RitualSemanticDocument {
+  return parseWithLocations(source).document;
+}
+
+/** 1-based source line of each top-level node, or null when the source is invalid. */
+export function ritualPugTopLevelLines(source: string): number[] | null {
+  try {
+    const { document, locations } = parseWithLocations(source);
+    return document.nodes.map((node) => locations.get(node)?.line ?? 0);
+  } catch {
+    return null;
+  }
+}
+
+function parseWithLocations(source: string) {
   const [header, ...lines] = source.replace(/\r\n?/g, "\n").split("\n");
   if (header !== RITUAL_PUG_HEADER)
     throw new RitualSourceError(`Line 1: expected ${RITUAL_PUG_HEADER}`, 1);
@@ -362,12 +376,15 @@ export function parseRitualPug(source: string): RitualSemanticDocument {
       );
     }
   };
-  return checked(
-    document(
-      ast.nodes
-        .filter((node) => node.type !== "Comment" || node.buffer !== false)
-        .map((node) => visit(node)),
+  return {
+    document: checked(
+      document(
+        ast.nodes
+          .filter((node) => node.type !== "Comment" || node.buffer !== false)
+          .map((node) => visit(node)),
+      ),
+      locations,
     ),
     locations,
-  );
+  };
 }

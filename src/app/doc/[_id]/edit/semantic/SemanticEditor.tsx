@@ -24,6 +24,7 @@ import EditorActionButton from "@/doc/EditorActionButton";
 import { retainsOnlineEditorIdentity } from "@/doc/onlineEditorIdentity";
 import RitualSourceEditor from "@/doc/RitualSourceEditor";
 import RitualVisualControls from "@/doc/RitualVisualControls";
+import { ritualPugTopLevelLines } from "@/doc/ritualPug";
 import {
   detectRitualSourceDialect,
   parseRitualSource,
@@ -54,6 +55,7 @@ import {
 } from "@/doc/sqlEditorClient";
 import type { SqlRitualWriteRequest } from "@/doc/sqlWriteContract";
 import {
+  locateVisualIssue,
   normalizeTiptapNodeIds,
   semanticFromTiptap,
   visualRitualState,
@@ -142,6 +144,26 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     title !== saved.title ||
     documentJson !== saved.document ||
     (props.importedFromLegacy && base.revisionId === props.revisionId);
+  // Point at the first structure that keeps the ritual source-only.
+  const issueLine = React.useMemo(() => {
+    if (!visualIssue) return null;
+    const issue = locateVisualIssue(document);
+    if (!issue) return null;
+    const index = issue.id
+      ? source.text
+          .split("\n")
+          .findIndex((line) => line.includes(`#${issue.id}`))
+      : -1;
+    if (index >= 0) return index + 1;
+    // Typed or pasted source may carry no IDs; trust the parse only while
+    // the buffer is the source of the current document.
+    if (source.dialect !== "pug" || source.dirty) return null;
+    return ritualPugTopLevelLines(source.text)?.[issue.index] || null;
+  }, [visualIssue, document, source.text, source.dialect, source.dirty]);
+  const [reveal, setReveal] = React.useState<{
+    line: number;
+    key: number;
+  } | null>(null);
   const [menuAnchor, setMenuAnchor] = React.useState<HTMLElement | null>(null);
   const [conversionNotice, setConversionNotice] = React.useState(true);
   const [publicationMessage, setPublicationMessage] = React.useState<
@@ -1085,8 +1107,28 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           </Alert>
         )}
         {visualIssue && (
-          <Alert severity="warning">
+          <Alert
+            severity="warning"
+            action={
+              issueLine ? (
+                <Button
+                  color="inherit"
+                  size="small"
+                  onClick={() =>
+                    setReveal((current) => ({
+                      line: issueLine,
+                      key: (current?.key ?? 0) + 1,
+                    }))
+                  }
+                >
+                  Show line {issueLine}
+                </Button>
+              ) : undefined
+            }
+          >
             {visualIssue}
+            {issueLine &&
+              ` The first structure that needs source editing is on line ${issueLine}.`}
             {props.importedFromLegacy && (
               <Button href={`/doc/${props.ritualId}/edit?legacy=1`}>
                 Open Pug editor
@@ -1169,6 +1211,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             )}
             <RitualSourceEditor
               fill
+              reveal={reveal}
               header={
                 <>
                   <Typography

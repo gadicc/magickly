@@ -485,6 +485,10 @@ it("saves an unsupported visual shape losslessly from its source-only fallback",
     (screen.getByRole("button", { name: "visual" }) as HTMLButtonElement)
       .disabled,
   ).toBe(true);
+  expect(
+    screen.getByText(/first structure that needs source editing is on line 2/),
+  ).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Show line 2" })).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Save" }));
   await waitFor(() => expect(mock.send).toHaveBeenCalledOnce());
   expect(JSON.parse(mock.send.mock.calls[0][0].source)).toEqual(
