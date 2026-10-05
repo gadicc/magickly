@@ -26,12 +26,21 @@ export default function SemanticPublication({
   revisionId,
   version,
   enabled,
+  onMessage,
 }: {
   actorId: string;
   ritualId: string;
   revisionId: string;
   version: number;
   enabled: boolean;
+  /**
+   * Report status messages to the host instead of rendering them, and show a
+   * compact button whose accessible name keeps the full action.
+   */
+  onMessage?(
+    message: string | null,
+    kind: "success" | "progress" | "info",
+  ): void;
 }) {
   const [request, setRequest] =
     React.useState<RitualPublicationRequestV1 | null>(null);
@@ -216,30 +225,45 @@ export default function SemanticPublication({
       if (mounted.current) setBusy(false);
     }
   };
+  const reportMessage = React.useRef(onMessage);
+  reportMessage.current = onMessage;
+  const compact = !!onMessage;
+  React.useEffect(() => {
+    reportMessage.current?.(
+      message,
+      message === "Published for download."
+        ? "success"
+        : message === "Publishing the saved version for download…"
+          ? "progress"
+          : "info",
+    );
+  }, [message]);
+  const label = staleRevision
+    ? null
+    : request && !renew
+      ? "Retry publication"
+      : renew
+        ? "Publish current saved version"
+        : "Publish saved version for download";
   return (
     <>
-      {message && (
+      {!compact && message && (
         <Alert
           severity={message === "Published for download." ? "success" : "info"}
         >
           {message}
         </Alert>
       )}
-      {staleRevision ? null : request && !renew ? (
+      {label && (
         <Button
           disabled={!enabled || busy || !loaded}
-          onClick={() => setAttempt((value) => value + 1)}
+          aria-label={compact ? label : undefined}
+          title={compact ? label : undefined}
+          onClick={() =>
+            request && !renew ? setAttempt((value) => value + 1) : void start()
+          }
         >
-          Retry publication
-        </Button>
-      ) : (
-        <Button
-          disabled={!enabled || busy || !loaded}
-          onClick={() => void start()}
-        >
-          {renew
-            ? "Publish current saved version"
-            : "Publish saved version for download"}
+          {compact && label !== "Retry publication" ? "Publish" : label}
         </Button>
       )}
     </>

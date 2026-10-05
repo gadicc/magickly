@@ -1,22 +1,71 @@
-.root {
-  display: grid;
-  gap: 1rem;
-  padding: 1rem;
-  max-width: 1500px;
-  margin: auto;
+/* The revision editor fills the viewport below the app bar's 56px spacer, so
+   the window never scrolls and the header and toolbars stay in view. */
+.surface {
+  box-sizing: border-box;
+  height: calc(100dvh - 56px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem 1rem;
+  max-width: 1600px;
+  margin: 0 auto;
 }
-.topbar,
-.toolbar,
-.rolebar,
+/* The app bar is 64px from 600px wide; the layout's spacer stays 56px. */
+@media (min-width: 600px) {
+  .surface {
+    padding-top: calc(8px + 0.5rem);
+  }
+}
+.header,
 .sourceActions {
   display: flex;
   gap: 0.5rem;
   align-items: center;
   flex-wrap: wrap;
 }
-.topbar > :first-child {
+.header {
+  flex: none;
+}
+.title {
+  flex: 1 1 16rem;
+  min-width: 10rem;
+}
+.status {
+  white-space: nowrap;
+}
+.notices {
+  flex: none;
+  display: grid;
+  gap: 0.5rem;
+  max-height: 35%;
+  overflow: auto;
+}
+.notices:empty {
+  display: none;
+}
+.panelTitle {
+  font-weight: 500;
+}
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.surface .panels {
   flex: 1;
-  min-width: 14rem;
+  min-height: 0;
+}
+.surface .visualPanel,
+.surface .sourcePanel,
+.surface .editor {
+  min-height: 0;
+}
+.surface .editor :global(.tiptap) {
+  box-sizing: border-box;
+  min-height: 100%;
 }
 .panels {
   display: flex;

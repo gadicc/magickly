@@ -27,13 +27,22 @@ export default async function SemanticEditPage({
   const ritualId = await resolveSqlRitualRouteId((await params)._id).catch(
     () => null,
   );
-  if (!ritualId) return <Alert severity="info">Ritual is unavailable.</Alert>;
+  if (!ritualId)
+    return (
+      <Alert severity="info" sx={{ m: 2 }}>
+        Ritual is unavailable.
+      </Alert>
+    );
   const [actorId, current] = await Promise.all([
     getCurrentSqlUserId(),
     sqlRitualReader.getCurrentSource(ritualId),
   ]);
   if (!actorId || !current || !current.ritual.canEdit)
-    return <Alert severity="info">Ritual editing is unavailable.</Alert>;
+    return (
+      <Alert severity="info" sx={{ m: 2 }}>
+        Ritual editing is unavailable.
+      </Alert>
+    );
   let document: RitualSemanticDocument;
   let importReport: SemanticImportReport | undefined;
   try {
@@ -41,7 +50,7 @@ export default async function SemanticEditPage({
       const value: unknown = JSON.parse(current.revision.source);
       if (validateRitualSemantic(value).length)
         return (
-          <Alert severity="error">
+          <Alert severity="error" sx={{ m: 2 }}>
             This semantic revision needs repair before editing.
           </Alert>
         );
@@ -56,7 +65,7 @@ export default async function SemanticEditPage({
         latest.version !== current.version
       )
         return (
-          <Alert severity="info">
+          <Alert severity="info" sx={{ m: 2 }}>
             This ritual changed while opening the editor. Reload to use its
             current revision.
           </Alert>
@@ -66,7 +75,7 @@ export default async function SemanticEditPage({
       importReport = createSemanticImportReport(jrt, document);
       if (!importReport.lossless)
         return (
-          <Alert severity="error">
+          <Alert severity="error" sx={{ m: 2 }}>
             This ritual could not be converted without changing its reader tree.
             Its saved revision is unchanged.
             <Button href={`/doc/${ritualId}/edit?legacy=1`}>
@@ -76,14 +85,14 @@ export default async function SemanticEditPage({
         );
     } else {
       return (
-        <Alert severity="info">
+        <Alert severity="info" sx={{ m: 2 }}>
           This source format is not supported by the new editor.
         </Alert>
       );
     }
   } catch {
     return (
-      <Alert severity="error">
+      <Alert severity="error" sx={{ m: 2 }}>
         The ritual could not be converted safely.
         {current.revision.sourceFormat === RITUAL_SOURCE_FORMAT && (
           <Button href={`/doc/${ritualId}/edit?legacy=1`}>

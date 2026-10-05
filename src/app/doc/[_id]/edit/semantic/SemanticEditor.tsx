@@ -2,13 +2,20 @@
 
 import Link from "@magick-components/Link";
 
+import { HelpOutlined, MoreVert } from "@mui/icons-material";
 import {
   Alert,
   Box,
   Button,
   ButtonGroup,
+  IconButton,
+  Menu,
+  MenuItem,
+  Snackbar,
   TextField,
+  Tooltip,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import { EditorContent, useEditor } from "@tiptap/react";
 import React from "react";
@@ -116,7 +123,63 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     visualRitualState(props.initialDocument),
   );
   const [visualIssue, setVisualIssue] = React.useState(initialVisual.issue);
-  const displayMode = visualIssue ? "source" : mode;
+  const narrow = useMediaQuery("(max-width: 800px)", { noSsr: true });
+  // Narrow screens show split as Visual without overwriting the preference.
+  const displayMode = visualIssue
+    ? "source"
+    : narrow && mode === "split"
+      ? "visual"
+      : mode;
+  const [saved, setSaved] = React.useState(() => ({
+    title: props.title,
+    document: stringify(props.initialDocument),
+  }));
+  const documentJson = React.useMemo(() => stringify(document), [document]);
+  // A legacy conversion is itself the change until its first semantic save.
+  const unsaved =
+    source.dirty ||
+    title !== saved.title ||
+    documentJson !== saved.document ||
+    (props.importedFromLegacy && base.revisionId === props.revisionId);
+  const [menuAnchor, setMenuAnchor] = React.useState<HTMLElement | null>(null);
+  const [conversionNotice, setConversionNotice] = React.useState(true);
+  const [publicationMessage, setPublicationMessage] = React.useState<
+    string | null
+  >(null);
+  const [publishing, setPublishing] = React.useState(false);
+  const onPublicationMessage = React.useCallback(
+    (message: string | null, kind: "success" | "progress" | "info") => {
+      // Progress belongs in the header status; an alert would shift the panels.
+      setPublishing(kind === "progress");
+      if (kind === "success")
+        setNotice((current) =>
+          current === "Saved." ? "Saved and published for download." : message,
+        );
+      setPublicationMessage(kind === "info" ? message : null);
+    },
+    [],
+  );
+  const saveShortcut = React.useRef(() => {});
+  React.useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        !event.altKey &&
+        !event.shiftKey &&
+        event.key.toLowerCase() === "s"
+      ) {
+        // Never let the browser's Save Page dialog replace a ritual save.
+        event.preventDefault();
+        saveShortcut.current();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+  React.useEffect(() => {
+    // Removing the source panel can interrupt IME without compositionend.
+    if (displayMode === "visual") setSourceComposing(false);
+  }, [displayMode]);
   const skipPersist = React.useRef(true);
   const liveDraft = React.useRef<SemanticDraft | null>(null);
   const draftWrites = React.useRef<Promise<void>>(Promise.resolve());
@@ -732,7 +795,11 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       access !== "ready" ||
       stale ||
       (!pending &&
-        (source.dirty || sourceComposing || source.conflict || error))
+        (!unsaved ||
+          source.dirty ||
+          sourceComposing ||
+          source.conflict ||
+          error))
     )
       return;
     const generation = accessGeneration.current;
@@ -790,6 +857,10 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       liveDraft.current = null;
       setManualRecoveryDraft(followUp ?? null);
       setBase({ revisionId: result.revisionId, version: result.version });
+      setSaved((current) => ({
+        title: request.title ?? current.title,
+        document: request.source,
+      }));
       setPending(null);
       try {
         const retained = await queueDraftWrite(() =>
@@ -834,12 +905,24 @@ export default function SemanticEditor(props: SemanticEditorProps) {
 
   const sourceProblem = source.conflict || (!!sourceError && source.dirty);
   const sourceSyncing = source.dirty || sourceComposing;
+  const canSave =
+    access === "ready" &&
+    !saving &&
+    !stale &&
+    (!!pending || (unsaved && !error && !sourceProblem && !sourceSyncing));
+  saveShortcut.current = () => {
+    if (canSave) void save();
+  };
 
   if (access === "locked")
-    return <Alert severity="info">{lockedMessage}</Alert>;
+    return (
+      <Alert severity="info" sx={{ m: 2 }}>
+        {lockedMessage}
+      </Alert>
+    );
   if (reloadRequired)
     return (
-      <Alert severity="success">
+      <Alert severity="success" sx={{ m: 2 }}>
         {manualRecoveryDraft
           ? "The pending save is confirmed, but local recovery changed. Download this draft before reloading."
           : "The pending save is confirmed. Reload this page to open the current revision."}
@@ -855,191 +938,261 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     );
   if (recoveryBlocked)
     return (
-      <Alert severity="error">
+      <Alert severity="error" sx={{ m: 2 }}>
         The local draft could not be loaded. Reload this page before editing.
       </Alert>
     );
   if (!editor || !ready)
-    return <p>Verifying account and loading local draft…</p>;
+    return (
+      <Typography color="text.secondary" sx={{ p: 2 }}>
+        Verifying account and loading local draft…
+      </Typography>
+    );
+  const saveStatus = saving
+    ? "Saving…"
+    : publishing
+      ? "Publishing…"
+      : pending
+        ? "Save not confirmed"
+        : unsaved
+          ? "Unsaved changes"
+          : "Saved";
   return (
     <Box
-      className={styles.root}
+      className={styles.surface}
       aria-busy={access === "checking"}
       sx={{ visibility: access === "checking" ? "hidden" : undefined }}
       aria-hidden={access === "checking"}
     >
-      {access === "checking" && (
-        <Alert severity="info">Verifying editor access…</Alert>
-      )}
-      <Typography variant="h4" component="h1">
-        Ritual editor
-      </Typography>
-      {props.importedFromLegacy && (
-        <Alert severity="info">
-          This is a semantic conversion of the current Pug revision. Saving
-          creates a new revision; the original source remains in history.
-        </Alert>
-      )}
-      {props.importReport && props.importReport.opaqueCount > 0 && (
-        <Alert severity="warning">
-          {props.importReport.opaqueCount} unsupported legacy blocks are
-          preserved. Inspect them in ritual source; they cannot be edited
-          visually.
-        </Alert>
-      )}
-      {visualIssue && (
-        <Alert severity="warning">
-          {visualIssue}
-          {props.importedFromLegacy && (
-            <Button href={`/doc/${props.ritualId}/edit?legacy=1`}>
-              Open Pug editor
-            </Button>
-          )}
-        </Alert>
-      )}
-      {stale && (
-        <Alert severity="warning">
-          A local draft needs recovery or belongs to an older revision. Review
-          it before editing this ritual.{" "}
-          <Button
-            disabled={access !== "ready"}
-            onClick={() => {
-              if (access === "ready") downloadDraft(stale);
-            }}
-          >
-            Download draft
-          </Button>{" "}
-          {stale.pending && (
-            <Button
-              disabled={access !== "ready" || saving}
-              onClick={confirmStalePending}
-            >
-              Confirm pending save
-            </Button>
-          )}{" "}
-          <Button
-            disabled={access !== "ready" || saving}
-            onClick={() => {
-              if (access !== "ready") return;
-              void clearSemanticDraft(props.actorId, props.ritualId).then(
-                () => {
-                  setStale(null);
-                  setError(null);
-                },
-              );
-            }}
-          >
-            Discard local draft
-          </Button>
-        </Alert>
-      )}
-      {error && (
-        <Alert severity="error">
-          {error}{" "}
-          <Button
-            disabled={access !== "ready"}
-            onClick={() => {
-              if (access === "ready") downloadDraft(stale ?? currentDraft());
-            }}
-          >
-            Download draft
-          </Button>
-        </Alert>
-      )}
-      {notice && <Alert severity="success">{notice}</Alert>}
-      <SemanticPublication
-        actorId={props.actorId}
-        ritualId={props.ritualId}
-        revisionId={base.revisionId}
-        version={base.version}
-        enabled={access === "ready" && !saving && !pending && !stale}
-      />
-      <Box className={styles.topbar}>
+      <h1 className={styles.visuallyHidden}>Ritual editor</h1>
+      <header className={styles.header}>
         <TextField
-          label="Title"
-          size="small"
+          className={styles.title}
+          variant="standard"
+          placeholder="Untitled ritual"
           value={title}
           disabled={access !== "ready" || !!pending || !!stale}
           onChange={(event) => {
             skipPersist.current = false;
             setTitle(event.target.value);
           }}
+          slotProps={{
+            htmlInput: { "aria-label": "Title" },
+            input: { sx: { fontSize: "1.25rem" } },
+          }}
         />
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          role="status"
+          className={styles.status}
+          title={
+            unsaved && !pending
+              ? "Unsaved changes are kept as a draft on this device."
+              : undefined
+          }
+        >
+          {saveStatus}
+        </Typography>
         <ButtonGroup size="small" aria-label="Editor layout">
-          {(["visual", "source", "split"] as const).map((item) => (
+          {(narrow
+            ? (["visual", "source"] as const)
+            : (["visual", "source", "split"] as const)
+          ).map((item) => (
             <Button
               key={item}
               variant={displayMode === item ? "contained" : "outlined"}
               disabled={
                 access !== "ready" || (!!visualIssue && item !== "source")
               }
-              onClick={() => {
-                // Removing the source panel can interrupt IME without compositionend.
-                if (item === "visual") setSourceComposing(false);
-                chooseMode(item);
-              }}
+              onClick={() => chooseMode(item)}
             >
               {item}
             </Button>
           ))}
         </ButtonGroup>
+        <SemanticPublication
+          actorId={props.actorId}
+          ritualId={props.ritualId}
+          revisionId={base.revisionId}
+          version={base.version}
+          enabled={access === "ready" && !saving && !pending && !stale}
+          onMessage={onPublicationMessage}
+        />
         <EditorActionButton
           variant="contained"
           disabled={
             access !== "ready" ||
             saving ||
             !!stale ||
-            (!pending && (!!error || sourceProblem))
+            (!pending && (!!error || sourceProblem || !unsaved))
           }
           inactive={!pending && sourceSyncing}
-          inactiveReason="The visual panel is catching up with ritual source."
+          inactiveReason={
+            sourceProblem
+              ? "Fix the ritual source error first."
+              : "The visual panel is catching up with ritual source."
+          }
+          title="Save (Ctrl+S)"
           onClick={save}
         >
           {pending ? "Retry save" : "Save"}
         </EditorActionButton>
-        <Button
-          disabled={access !== "ready"}
-          onClick={() => downloadDraft(currentDraft())}
+        <IconButton
+          aria-label="More editor actions"
+          aria-haspopup="menu"
+          aria-expanded={!!menuAnchor || undefined}
+          onClick={(event) => setMenuAnchor(event.currentTarget)}
         >
-          Download draft
-        </Button>
-      </Box>
-      {pending && (
-        <Alert severity="warning">
-          A save is pending. Retry it unchanged before making another edit.
-        </Alert>
-      )}
+          <MoreVert />
+        </IconButton>
+        <Menu
+          anchorEl={menuAnchor}
+          open={!!menuAnchor}
+          onClose={() => setMenuAnchor(null)}
+        >
+          <MenuItem
+            disabled={access !== "ready"}
+            onClick={() => {
+              setMenuAnchor(null);
+              downloadDraft(currentDraft());
+            }}
+          >
+            Download draft
+          </MenuItem>
+          <MenuItem
+            component="a"
+            href={`/doc/${props.ritualId}`}
+            onClick={() => setMenuAnchor(null)}
+          >
+            View ritual
+          </MenuItem>
+        </Menu>
+      </header>
+      <div className={styles.notices}>
+        {props.importedFromLegacy && conversionNotice && (
+          <Alert severity="info" onClose={() => setConversionNotice(false)}>
+            This is a semantic conversion of the current Pug revision. Saving
+            creates a new revision; the original source remains in history.
+          </Alert>
+        )}
+        {props.importReport && props.importReport.opaqueCount > 0 && (
+          <Alert severity="warning">
+            {props.importReport.opaqueCount} unsupported legacy blocks are
+            preserved. Inspect them in ritual source; they cannot be edited
+            visually.
+          </Alert>
+        )}
+        {visualIssue && (
+          <Alert severity="warning">
+            {visualIssue}
+            {props.importedFromLegacy && (
+              <Button href={`/doc/${props.ritualId}/edit?legacy=1`}>
+                Open Pug editor
+              </Button>
+            )}
+          </Alert>
+        )}
+        {stale && (
+          <Alert severity="warning">
+            A local draft needs recovery or belongs to an older revision. Review
+            it before editing this ritual.{" "}
+            <Button
+              disabled={access !== "ready"}
+              onClick={() => {
+                if (access === "ready") downloadDraft(stale);
+              }}
+            >
+              Download draft
+            </Button>{" "}
+            {stale.pending && (
+              <Button
+                disabled={access !== "ready" || saving}
+                onClick={confirmStalePending}
+              >
+                Confirm pending save
+              </Button>
+            )}{" "}
+            <Button
+              disabled={access !== "ready" || saving}
+              onClick={() => {
+                if (access !== "ready") return;
+                void clearSemanticDraft(props.actorId, props.ritualId).then(
+                  () => {
+                    setStale(null);
+                    setError(null);
+                  },
+                );
+              }}
+            >
+              Discard local draft
+            </Button>
+          </Alert>
+        )}
+        {error && (
+          <Alert severity="error">
+            {error}{" "}
+            <Button
+              disabled={access !== "ready"}
+              onClick={() => {
+                if (access === "ready") downloadDraft(stale ?? currentDraft());
+              }}
+            >
+              Download draft
+            </Button>
+          </Alert>
+        )}
+        {publicationMessage && (
+          <Alert severity="info">{publicationMessage}</Alert>
+        )}
+        {pending && (
+          <Alert severity="warning">
+            A save is pending. Retry it unchanged before making another edit.
+          </Alert>
+        )}
+      </div>
       <Box className={styles.panels}>
         {displayMode !== "visual" && (
           <section
             className={styles.sourcePanel}
             aria-label="Semantic source panel"
           >
-            <Typography variant="h6">Ritual source</Typography>
-            <Typography variant="body2">
-              {source.dialect === "pug"
-                ? "Pug uses indentation for blocks and #[…] for inline formatting."
-                : "Ritual Text uses command lines and quoted text fragments."}{" "}
-              Valid edits update the visual panel as you type.{" "}
-              {source.dialect === "pug" && (
-                <Link
-                  href="/help/ritual-pug"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Read the Ritual Pug guide (opens in a new tab)
-                </Link>
-              )}
-            </Typography>
             {source.dialect === "ritual-text" && (
               <Alert severity="info">
                 This older Ritual Text draft is being recovered. Correct or
                 resolve its source changes to convert it to Pug. Pending saves
                 must be confirmed first. Download the draft to keep its original
-                recovery buffer before changing it.
+                recovery buffer before changing it. Ritual Text uses command
+                lines and quoted text fragments.
               </Alert>
             )}
             <RitualSourceEditor
+              fill
+              header={
+                <>
+                  <Typography
+                    variant="subtitle1"
+                    component="h2"
+                    className={styles.panelTitle}
+                  >
+                    Ritual source
+                  </Typography>
+                  {source.dialect === "pug" && (
+                    <Tooltip title="Pug uses indentation for blocks and #[…] for inline formatting. Valid edits update the visual panel as you type.">
+                      <IconButton
+                        size="small"
+                        component={Link}
+                        href="/help/ritual-pug"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Ritual Pug guide (opens in a new tab)"
+                      >
+                        <HelpOutlined fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </>
+              }
               diagnostic={sourceError}
               value={source.text}
               dialect={source.dialect}
@@ -1079,6 +1232,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                 </Button>
               )}
               <EditorActionButton
+                size="small"
                 inactive={!source.dirty || sourceComposing}
                 inactiveReason={
                   sourceComposing
@@ -1137,6 +1291,14 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           </section>
         )}
       </Box>
+      <Snackbar
+        open={!!notice}
+        message={notice}
+        autoHideDuration={6000}
+        onClose={(_event, reason) => {
+          if (reason !== "clickaway") setNotice(null);
+        }}
+      />
     </Box>
   );
 }

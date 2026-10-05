@@ -151,6 +151,13 @@ const props = (): SemanticEditorProps => ({
   },
 });
 
+/** Save needs a change; edit the title so Save reflects only access and sync state. */
+async function changeTitle(value = "Trial ritual, edited") {
+  fireEvent.change(await screen.findByRole("textbox", { name: "Title" }), {
+    target: { value },
+  });
+}
+
 afterEach(() => {
   cleanup();
   localStorage.clear();
@@ -202,7 +209,39 @@ it("defaults to split and restores the last chosen layout on reopening", async (
   ).toBeNull();
 });
 
-it("retains and saves a visual undo back to the confirmed document", async () => {
+it("shows a stored split layout as visual on narrow screens without changing it", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  localStorage.setItem(RITUAL_EDITOR_LAYOUT_KEY, "split");
+  const original = window.matchMedia;
+  window.matchMedia = ((query: string) => ({
+    matches: query.includes("max-width: 800px"),
+    media: query,
+    onchange: null,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  })) as typeof window.matchMedia;
+  try {
+    render(<SemanticEditor {...setup} />);
+    await screen.findByRole("textbox", { name: "Ritual visual editor" });
+    expect(
+      screen.queryByRole("textbox", { name: "Ritual semantic source" }),
+    ).toBeNull();
+    expect(screen.queryByRole("button", { name: "split" })).toBeNull();
+    expect(screen.getByRole("button", { name: "visual" }).className).toContain(
+      "contained",
+    );
+    expect(localStorage.getItem(RITUAL_EDITOR_LAYOUT_KEY)).toBe("split");
+  } finally {
+    window.matchMedia = original;
+  }
+});
+
+it("treats a visual undo back to the confirmed document as saved", async () => {
   mock.load.mockResolvedValue(undefined);
   mock.saveDraft.mockResolvedValue(undefined);
   mock.clear.mockResolvedValue(undefined);
@@ -217,8 +256,16 @@ it("retains and saves a visual undo back to the confirmed document", async () =>
     updatedAt: new Date().toISOString(),
   });
   render(<SemanticEditor {...setup} />);
-  fireEvent.click(await screen.findByRole("button", { name: "Save" }));
+  const save = (await screen.findByRole("button", {
+    name: "Save",
+  })) as HTMLButtonElement;
+  expect(save.disabled).toBe(true);
+  expect(screen.getByRole("status").textContent).toBe("Saved");
+  await changeTitle();
+  expect(screen.getByRole("status").textContent).toBe("Unsaved changes");
+  fireEvent.click(save);
   await screen.findByText("Saved.");
+  expect(mock.send.mock.calls[0][0].title).toBe("Trial ritual, edited");
   const element = screen.getByRole("textbox", {
     name: "Ritual visual editor",
   }) as HTMLElement & { editor: import("@tiptap/core").Editor };
@@ -228,6 +275,7 @@ it("retains and saves a visual undo back to the confirmed document", async () =>
   await waitFor(() =>
     expect(mock.saveDraft.mock.lastCall?.[0].documentJson).toContain("WRONG"),
   );
+  expect(save.disabled).toBe(false);
   act(() => {
     element.editor.commands.undo();
   });
@@ -237,9 +285,40 @@ it("retains and saves a visual undo back to the confirmed document", async () =>
       "WRONG",
     ),
   );
-  fireEvent.click(screen.getByRole("button", { name: "Save" }));
-  await waitFor(() => expect(mock.send).toHaveBeenCalledTimes(2));
-  expect(mock.send.mock.calls[1][0].source).not.toContain("WRONG");
+  expect(save.disabled).toBe(true);
+  expect(screen.getByRole("status").textContent).toBe("Saved");
+  fireEvent.keyDown(window, { key: "s", ctrlKey: true });
+  expect(mock.send).toHaveBeenCalledTimes(1);
+});
+
+it("saves with Ctrl+S and keeps the browser's save dialog away", async () => {
+  mock.load.mockResolvedValue(undefined);
+  mock.saveDraft.mockResolvedValue(undefined);
+  mock.clear.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  mock.send.mockResolvedValue({
+    ok: true,
+    replayed: false,
+    ritualId: setup.ritualId,
+    revisionId: createUuidV7(),
+    version: 8,
+    updatedAt: new Date().toISOString(),
+  });
+  render(<SemanticEditor {...setup} />);
+  await screen.findByRole("button", { name: "Save" });
+  const clean = new KeyboardEvent("keydown", {
+    key: "s",
+    ctrlKey: true,
+    cancelable: true,
+  });
+  window.dispatchEvent(clean);
+  expect(clean.defaultPrevented).toBe(true);
+  expect(mock.send).not.toHaveBeenCalled();
+  await changeTitle();
+  fireEvent.keyDown(window, { key: "S", metaKey: true });
+  await screen.findByText("Saved.");
+  expect(mock.send).toHaveBeenCalledOnce();
 });
 
 it("conceals private content and portals immediately on a hard lock", async () => {
@@ -276,6 +355,7 @@ it("clears a source parse error after discarding the invalid buffer", async () =
   const setup = props();
   mock.owner = setup.actorId;
   render(<SemanticEditor {...setup} />);
+  await changeTitle();
   fireEvent.click(await screen.findByRole("button", { name: "source" }));
   fireEvent.change(
     screen.getByRole("textbox", { name: "Ritual semantic source" }),
@@ -400,6 +480,7 @@ it("saves an unsupported visual shape losslessly from its source-only fallback",
   });
   render(<SemanticEditor {...setup} />);
   await screen.findByRole("textbox", { name: "Ritual semantic source" });
+  await changeTitle();
   expect(
     (screen.getByRole("button", { name: "visual" }) as HTMLButtonElement)
       .disabled,
@@ -931,6 +1012,7 @@ it("retries an unknown save with the identical operation and payload", async () 
   });
   render(<SemanticEditor {...setup} />);
   await screen.findByRole("button", { name: "Save" });
+  await changeTitle();
   fireEvent.click(screen.getByRole("button", { name: "Save" }));
   await screen.findByRole("button", { name: "Retry save" });
   fireEvent.click(screen.getByRole("button", { name: "Retry save" }));
@@ -1074,6 +1156,7 @@ it("reports a confirmed save when local draft cleanup fails", async () => {
     updatedAt: new Date().toISOString(),
   });
   render(<SemanticEditor {...setup} />);
+  await changeTitle();
   fireEvent.click(await screen.findByRole("button", { name: "Save" }));
   await screen.findByText("Saved.");
   expect(screen.getByText(/local draft could not be cleared/i)).toBeTruthy();
@@ -1114,6 +1197,7 @@ it("keeps toolbar presentation stable while guarding commands against unapplied 
   const setup = props();
   mock.owner = setup.actorId;
   render(<SemanticEditor {...setup} />);
+  await changeTitle();
   fireEvent.click(await screen.findByRole("button", { name: "split" }));
   const source = screen.getByRole("textbox", {
     name: "Ritual semantic source",
@@ -1203,6 +1287,7 @@ it.each(["compositionend", "visual layout"] as const)(
     const setup = props();
     mock.owner = setup.actorId;
     render(<SemanticEditor {...setup} />);
+    await changeTitle();
     fireEvent.click(await screen.findByRole("button", { name: "split" }));
     const source = screen.getByRole("textbox", {
       name: "Ritual semantic source",
@@ -1239,6 +1324,7 @@ it("retains an editable split through routine revalidation and conceals on a har
   const setup = props();
   mock.owner = setup.actorId;
   render(<SemanticEditor {...setup} />);
+  await changeTitle();
   fireEvent.click(await screen.findByRole("button", { name: "split" }));
   const source = screen.getByRole("textbox", {
     name: "Ritual semantic source",
@@ -1285,6 +1371,7 @@ it("uses fresh source authorization when session refresh reports an overlapping 
   mock.owner = setup.actorId;
   mock.refreshResult = false;
   render(<SemanticEditor {...setup} />);
+  await changeTitle();
   const save = (await screen.findByRole("button", {
     name: "Save",
   })) as HTMLButtonElement;
@@ -1344,6 +1431,7 @@ it("ignores unavailable permission responses and cache locks during background c
   const setup = props();
   mock.owner = setup.actorId;
   render(<SemanticEditor {...setup} />);
+  await changeTitle();
   const save = await screen.findByRole("button", { name: "Save" });
   mock.permissionUnavailable = true;
   await act(async () => {
@@ -1367,6 +1455,7 @@ it("accepts a granted permission response despite overlapping coordinator checks
   const setup = props();
   mock.owner = setup.actorId;
   render(<SemanticEditor {...setup} />);
+  await changeTitle();
   const save = await screen.findByRole("button", { name: "Save" });
   let release!: () => void;
   mock.permissionGate = new Promise((resolve) => {
@@ -1392,6 +1481,7 @@ it("keeps editing after a background timeout and ignores its late denial", async
   const setup = props();
   mock.owner = setup.actorId;
   render(<SemanticEditor {...setup} />);
+  await changeTitle();
   const save = await screen.findByRole("button", { name: "Save" });
   let release!: () => void;
   mock.permissionGate = new Promise((resolve) => {
@@ -1430,17 +1520,23 @@ vi.mock("@/doc/RitualSourceEditor", () => ({
     label = "Ritual semantic source",
     onCompositionChange,
     diagnostic,
+    header,
   }) =>
-    React.createElement("textarea", {
-      "aria-label": label,
-      "data-diagnostic-source": diagnostic?.source,
-      value,
-      disabled,
-      onChange: (event) =>
-        onChange((event.target as HTMLTextAreaElement).value),
-      onCompositionStart: () => onCompositionChange?.(true),
-      onCompositionEnd: () => onCompositionChange?.(false),
-    }),
+    React.createElement(
+      React.Fragment,
+      null,
+      header,
+      React.createElement("textarea", {
+        "aria-label": label,
+        "data-diagnostic-source": diagnostic?.source,
+        value,
+        disabled,
+        onChange: (event) =>
+          onChange((event.target as HTMLTextAreaElement).value),
+        onCompositionStart: () => onCompositionChange?.(true),
+        onCompositionEnd: () => onCompositionChange?.(false),
+      }),
+    ),
 }));
 
 it("recovers annotations from a clean pre-upgrade Pug draft before visual regeneration", async () => {

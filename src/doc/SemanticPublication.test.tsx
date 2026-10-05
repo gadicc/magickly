@@ -193,3 +193,41 @@ it("does not send a recovered publication for an older saved version", async () 
   );
   expect(mock.send).not.toHaveBeenCalled();
 });
+
+it("reports compact status to its host without rendering alerts", async () => {
+  const { props } = setup();
+  let finish!: (result: { ok: true }) => void;
+  mock.send.mockImplementation(
+    () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  );
+  const messages: [string | null, string][] = [];
+  render(
+    <SemanticPublication
+      {...props}
+      onMessage={(message, kind) => messages.push([message, kind])}
+    />,
+  );
+  const publish = await screen.findByRole("button", {
+    name: "Publish saved version for download",
+  });
+  expect(publish.textContent).toBe("Publish");
+  await waitFor(() => expect(publish).toHaveProperty("disabled", false));
+  fireEvent.click(publish);
+  await waitFor(() =>
+    expect(messages).toContainEqual([
+      "Publishing the saved version for download…",
+      "progress",
+    ]),
+  );
+  await act(async () => {
+    finish({ ok: true });
+  });
+  await waitFor(() =>
+    expect(messages).toContainEqual(["Published for download.", "success"]),
+  );
+  expect(screen.queryByRole("alert")).toBeNull();
+  expect(screen.queryByText("Published for download.")).toBeNull();
+});

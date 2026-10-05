@@ -154,6 +154,8 @@ export default function RitualSourceEditor({
   label = "Ritual semantic source",
   onCompositionChange,
   diagnostic,
+  fill = false,
+  header,
 }: {
   value: string;
   dialect: RitualSourceDialect;
@@ -162,6 +164,10 @@ export default function RitualSourceEditor({
   label?: string;
   onCompositionChange?(composing: boolean): void;
   diagnostic?: RitualSourceDiagnostic | null;
+  /** Fill a sized flex parent instead of the inline form's bounded height. */
+  fill?: boolean;
+  /** Leading content for the tools row, such as the panel title. */
+  header?: React.ReactNode;
 }) {
   const [foldIds, setFoldIds] = React.useState(true);
   const host = React.useRef<HTMLDivElement>(null);
@@ -210,8 +216,9 @@ export default function RitualSourceEditor({
       })),
       EditorView.theme({
         "&": {
-          minHeight: "25rem",
-          maxHeight: "65vh",
+          ...(fill
+            ? { height: "100%" }
+            : { minHeight: "25rem", maxHeight: "65vh" }),
           fontSize: "0.85rem",
           border: "1px solid #8886",
           borderRadius: "4px",
@@ -238,7 +245,7 @@ export default function RitualSourceEditor({
         },
       }),
     ],
-    [dialect, foldIds, disabled, label, onCompositionChange],
+    [dialect, foldIds, disabled, label, onCompositionChange, fill],
   );
   const initialExtensions = React.useRef(extensions);
   React.useLayoutEffect(() => {
@@ -347,54 +354,69 @@ export default function RitualSourceEditor({
     instance.dispatch(setDiagnostics(instance.state, diagnostics));
   }, [diagnostic, value, extensions]);
   const hasDiagnostic = diagnostic?.source === value;
+  const tools = (dialect === "pug" || hasDiagnostic) && (
+    <div
+      role="group"
+      aria-label="Source editor tools"
+      style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}
+    >
+      {dialect === "pug" && (
+        <Button
+          size="small"
+          type="button"
+          aria-pressed={!foldIds}
+          onClick={() => setFoldIds((current) => !current)}
+        >
+          {foldIds ? "Show IDs" : "Fold IDs"}
+        </Button>
+      )}
+      {hasDiagnostic && (
+        <>
+          <Button
+            size="small"
+            type="button"
+            title="F8; Shift+F8 for the previous error"
+            onClick={() => {
+              if (view.current) {
+                navigateDiagnostic(view.current, nextDiagnostic);
+                view.current.focus();
+              }
+            }}
+          >
+            Go to error
+          </Button>
+          <Button
+            size="small"
+            type="button"
+            title="Ctrl+Shift+M (Cmd+Shift+M on Mac)"
+            onClick={() => {
+              if (view.current) openLintPanel(view.current);
+            }}
+          >
+            Problems
+          </Button>
+        </>
+      )}
+    </div>
+  );
   return (
     <>
-      {(dialect === "pug" || hasDiagnostic) && (
+      {header ? (
         <div
-          role="group"
-          aria-label="Source editor tools"
-          style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: "0.25rem 0.5rem",
+          }}
         >
-          {dialect === "pug" && (
-            <Button
-              size="small"
-              type="button"
-              aria-pressed={!foldIds}
-              onClick={() => setFoldIds((current) => !current)}
-            >
-              {foldIds ? "Show IDs" : "Fold IDs"}
-            </Button>
-          )}
-          {hasDiagnostic && (
-            <>
-              <Button
-                size="small"
-                type="button"
-                title="F8; Shift+F8 for the previous error"
-                onClick={() => {
-                  if (view.current) {
-                    navigateDiagnostic(view.current, nextDiagnostic);
-                    view.current.focus();
-                  }
-                }}
-              >
-                Go to error
-              </Button>
-              <Button
-                size="small"
-                type="button"
-                title="Ctrl+Shift+M (Cmd+Shift+M on Mac)"
-                onClick={() => {
-                  if (view.current) openLintPanel(view.current);
-                }}
-              >
-                Problems
-              </Button>
-            </>
-          )}
+          {header}
+          {tools}
         </div>
+      ) : (
+        tools
       )}
-      <div ref={host} />
+      <div ref={host} style={fill ? { flex: 1, minHeight: 0 } : undefined} />
     </>
   );
 }
