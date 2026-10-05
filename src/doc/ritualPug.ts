@@ -129,6 +129,41 @@ function inlineChildren(
   }
   return pieces.join("");
 }
+const capitalize = (part: string) => part[0].toUpperCase() + part.slice(1);
+const lineBreak = (node: RitualSemanticNode) =>
+  node.kind === "text" && node.text === "\n";
+/**
+ * Print inline children as pipe lines when Pug reproduces them exactly.
+ *
+ * Pug inserts one `"\n"` Text between consecutive pipe lines and one more for
+ * each blank `|` line, so standalone newline nodes need no wrapper. Leading or
+ * trailing newlines, and segments the inline printer cannot express, keep the
+ * exact wrapper projection.
+ */
+function pipeLines(nodes: RitualSemanticNode[]): string[] | null {
+  if (!nodes.some(lineBreak)) return null;
+  const lines: string[] = [];
+  let segment: RitualSemanticNode[] = [];
+  let breaks = 0;
+  const flush = () => {
+    const inline = inlineChildren(segment);
+    if (!inline) return false;
+    for (let i = 1; i < breaks; i++) lines.push("|");
+    lines.push(`| ${inline}`);
+    segment = [];
+    breaks = 0;
+    return true;
+  };
+  for (const node of nodes) {
+    if (!lineBreak(node)) segment.push(node);
+    else if (segment.length) {
+      if (!flush()) return null;
+      breaks = 1;
+    } else if (lines.length) breaks++;
+    else return null;
+  }
+  return segment.length && flush() ? lines : null;
+}
 function pugChildren(block, visit) {
   // Pug creates empty Text nodes at interpolation boundaries. Authored empty
   // nodes use the explicit literal wrapper, so those generated empties are safe
@@ -173,19 +208,35 @@ export function printRitualPug(doc: RitualSemanticDocument): string {
     const tag = speech ? (node.attrs.say ? "say" : "do") : node.tag;
     const attributes = speech ? { role: node.attrs.role } : node.attrs;
     const header = `${indent}${tag}#${node.id}${attributeText(attributes)}`;
-    const inline = node.children?.length ? inlineChildren(node.children) : null;
-    if (inline !== null) {
-      const role = attributes.role;
-      if (speech && typeof role === "string" && canPrintRoleShortcut(role)) {
-        // Capitalize the source label while retaining the reader's role keys.
-        const label = role
-          .split(",")
-          .map((part) => part[0].toUpperCase() + part.slice(1))
-          .join(",");
-        lines.push(
-          `${indent}${node.attrs.say ? `${label}#${node.id}:` : `* ${label}#${node.id}`} ${inline}`,
-        );
-      } else lines.push(`${header} ${inline}`);
+    const role = attributes.role;
+    // Capitalize the source label while retaining the reader's role keys.
+    const label =
+      speech && typeof role === "string" && canPrintRoleShortcut(role)
+        ? `${role.split(",").map(capitalize).join(",")}#${node.id}`
+        : null;
+    const shortcut =
+      label && `${indent}${node.attrs.say ? `${label}:` : `* ${label}`}`;
+    const children = node.children ?? [];
+    // `Label:` with nothing after the colon contributes its own leading space.
+    const shortcutLines =
+      shortcut &&
+      (node.attrs.say
+        ? children[0]?.kind === "text" && children[0].text === " "
+          ? pipeLines(children.slice(1))
+          : null
+        : pipeLines(children));
+    const piped = shortcutLines ? null : pipeLines(children);
+    const inline =
+      shortcutLines || piped || !children.length
+        ? null
+        : inlineChildren(children);
+    const pipeIndent = `${indent}  `;
+    if (shortcutLines) {
+      lines.push(shortcut!, ...shortcutLines.map((line) => pipeIndent + line));
+    } else if (piped) {
+      lines.push(header, ...piped.map((line) => pipeIndent + line));
+    } else if (inline !== null) {
+      lines.push(`${shortcut ?? header} ${inline}`);
     } else {
       lines.push(header + (node.children === undefined ? "/" : ""));
       node.children?.forEach((child) => visit(child, depth + 1));

@@ -258,6 +258,140 @@ describe("bounded semantic Pug", () => {
 });
 
 describe("Pug surface conveniences", () => {
+  it("prints line-separated text as pipe lines instead of text wrappers", () => {
+    const source = [
+      RITUAL_PUG_HEADER,
+      "Hierophant#Ab3k9Qp7Zx2Mn5Rs:",
+      "  | Fratres and sorores, assist",
+      "  | me to open the hall.",
+      "* Keryx#Other00000000001",
+      "  | Goes to the door",
+      "  |",
+      "  | and #[b#Bold000000000001 knocks].",
+      'say#Third00000000001(role="Hiero")',
+      "  | Exact case,",
+      "  | two lines.",
+      "note#Fourth0000000001",
+      "  |  leading space",
+      "  | trailing space ",
+      "",
+    ].join("\n");
+    const document = parseRitualPug(source);
+    expect(document.nodes[0]).toMatchObject({
+      children: [
+        { text: " " },
+        { text: "Fratres and sorores, assist" },
+        { text: "\n" },
+        { text: "me to open the hall." },
+      ],
+    });
+    expect(printRitualPug(document)).toBe(source);
+  });
+
+  it("keeps wrappers where pipe lines cannot reproduce the newlines", () => {
+    const text = (value: string): RitualSemanticNode => ({
+      kind: "text",
+      text: value,
+    });
+    const note = (...children: RitualSemanticNode[]): RitualSemanticNode => ({
+      kind: "element",
+      id: createRitualNodeId(),
+      tag: "note",
+      attrs: {},
+      children,
+    });
+    const document: RitualSemanticDocument = {
+      format: "magickli-ritual",
+      version: 1,
+      nodes: [
+        note(text("\n"), text("leading")),
+        note(text("trailing"), text("\n")),
+        note(text("a"), text(""), text("\n"), text("b")),
+        // A say shortcut without its own leading space must keep `say(...)`.
+        {
+          kind: "element",
+          id: createRitualNodeId(),
+          tag: "task",
+          attrs: { say: true, role: "keryx" },
+          children: [text("one"), text("\n"), text("two")],
+        },
+      ],
+    };
+    const printed = printRitualPug(document);
+    expect(printed).toContain('ritualText(value="\\n")');
+    expect(printed).toMatch(/say#[A-Za-z0-9]+\(role="keryx"\)\n {2}\| one\n/);
+    expect(parseRitualPug(printed)).toEqual(document);
+  });
+
+  it("round-trips randomized inline runs through pipe lines exactly", () => {
+    let seed = 20261005;
+    const random = (n: number) => {
+      seed = (seed * 1103515245 + 12345) % 2 ** 31;
+      return seed % n;
+    };
+    const texts = [
+      "\n",
+      "\n",
+      " ",
+      "word",
+      " lead",
+      "trail ",
+      "a\nb",
+      "[x]",
+      "#[no",
+      "",
+      "end\\",
+      "  two",
+    ];
+    const inline = (depth: number): RitualSemanticNode => {
+      const choice = random(depth > 1 ? 7 : 9);
+      if (choice < 6)
+        return { kind: "text", text: texts[random(texts.length)] };
+      if (choice === 6)
+        return {
+          kind: "element",
+          id: createRitualNodeId(),
+          tag: "br",
+          attrs: {},
+        };
+      return {
+        kind: "element",
+        id: createRitualNodeId(),
+        tag: choice === 7 ? "b" : "i",
+        attrs: {},
+        children: Array.from({ length: 1 + random(3) }, () =>
+          inline(depth + 1),
+        ),
+      };
+    };
+    let piped = 0;
+    for (let round = 0; round < 300; round++) {
+      const task = random(2) === 0;
+      const document: RitualSemanticDocument = {
+        format: "magickli-ritual",
+        version: 1,
+        nodes: [
+          {
+            kind: "element",
+            id: createRitualNodeId(),
+            tag: task ? "task" : "note",
+            attrs: task
+              ? { [random(2) ? "say" : "do"]: true, role: "hiero" }
+              : {},
+            children: Array.from({ length: 1 + random(7) }, () => inline(0)),
+          },
+          { kind: "annotation", style: "blank", text: "" },
+        ],
+      };
+      const printed = printRitualPug(document);
+      expect(parseRitualPug(printed), printed).toEqual(document);
+      expect(printRitualPug(parseRitualPug(printed))).toBe(printed);
+      if (/\n {2}\| /.test(printed)) piped++;
+    }
+    // The pool favours fallbacks; enough rounds must still take the pipe path.
+    expect(piped).toBeGreaterThan(40);
+  });
+
   it("expands shortcuts, retains IDs and inline content, and prints shortcuts by default", () => {
     const source = `${RITUAL_PUG_HEADER}\nHiero#Ab3k9Qp7Zx2Mn5Rs: Hi #[b#Other00000000001 there].\n* Keryx#Third00000000001 Open the door.\n`;
     const document = parseRitualPug(source);
