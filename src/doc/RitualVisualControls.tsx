@@ -658,12 +658,16 @@ export default function RitualVisualControls({
         sx={{
           display: "flex",
           gap: 0.25,
-          flexWrap: "nowrap",
+          flexWrap: "wrap",
           alignItems: "center",
-          overflowX: "auto",
           flex: "none",
-          scrollbarWidth: "thin",
           "& > *": { flex: "none" },
+          // Phones keep one row and scroll it sideways: height is scarcer.
+          "@media (max-width: 800px)": {
+            flexWrap: "nowrap",
+            overflowX: "auto",
+            scrollbarWidth: "thin",
+          },
         }}
       >
         {(["say", "do"] as const).map((mode) => (
