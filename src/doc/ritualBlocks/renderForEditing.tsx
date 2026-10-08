@@ -284,6 +284,18 @@ function sameOriginPath(src: unknown): src is string {
   }
 }
 
+/** Name a verbatim source-only node by its tag and the text that identifies it. */
+function sourceOnlyLabel(raw: unknown): string {
+  try {
+    const node = JSON.parse(String(raw));
+    if (node?.kind !== "element") return String(node?.kind ?? "structure");
+    const name = node.attrs?.text ?? node.attrs?.summary ?? node.attrs?.role;
+    return name ? `${node.tag} · ${String(name)}` : String(node.tag);
+  } catch {
+    return "structure";
+  }
+}
+
 export function RitualAtomForEditing({ node, selected }: NodeViewProps) {
   const tag = String(node.attrs.tag);
   const attrs = node.attrs.attrs;
@@ -295,11 +307,13 @@ export function RitualAtomForEditing({ node, selected }: NodeViewProps) {
         : `Author comment · ${String(attrs.text ?? "")}`
       : tag === "legacy"
         ? "Unsupported legacy content · preserved"
-        : tag === "img"
-          ? `Image · ${String(attrs.alt ?? attrs.src ?? "")}`
-          : tag === "declareVar"
-            ? `Variable · ${String(attrs.label ?? attrs.name ?? "")}`
-            : tag;
+        : tag === "sourceOnly"
+          ? `Needs source editing · ${sourceOnlyLabel(node.attrs.raw)}`
+          : tag === "img"
+            ? `Image · ${String(attrs.alt ?? attrs.src ?? "")}`
+            : tag === "declareVar"
+              ? `Variable · ${String(attrs.label ?? attrs.name ?? "")}`
+              : tag;
   const imageStyle = editorImageStyle(attachedImage ? attrs.style : undefined);
   // Site assets (such as /pics/…) preview like the reader; other URLs stay
   // captions so the editor never fetches arbitrary hosts.

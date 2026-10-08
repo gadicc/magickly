@@ -308,6 +308,24 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     },
     [editor, displayMode],
   );
+  // Nodes kept verbatim as "Needs source editing" blocks in visual editing.
+  const sourceOnlyIds = React.useMemo(() => {
+    const ids: string[] = [];
+    if (document)
+      editor?.state.doc.forEach((node) => {
+        if (node.type.name === "ritualAtom" && node.attrs.tag === "sourceOnly")
+          ids.push(node.attrs.id);
+      });
+    return ids;
+  }, [editor, document]);
+  const lineOfNode = (id: string) => {
+    const line = ritualPugLineOfId(source.text, id);
+    if (line || source.dialect !== "pug" || source.dirty) return line;
+    const index = document.nodes.findIndex(
+      (node) => "id" in node && node.id === id,
+    );
+    return ritualPugTopLevelLines(source.text)?.[index] || null;
+  };
 
   React.useEffect(() => {
     if (!editor) return;
@@ -1229,6 +1247,43 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             )}
           </Alert>
         )}
+        {!visualIssue &&
+          sourceOnlyIds.length > 0 &&
+          (() => {
+            const line = lineOfNode(sourceOnlyIds[0]);
+            const count = sourceOnlyIds.length;
+            return (
+              <Alert
+                severity="info"
+                action={
+                  line ? (
+                    <Button
+                      color="inherit"
+                      size="small"
+                      onClick={() => {
+                        const show = () =>
+                          setReveal((current) => ({
+                            line,
+                            key: (current?.key ?? 0) + 1,
+                          }));
+                        // Open the source panel first; it reveals once mounted.
+                        if (displayMode === "visual") {
+                          setMode("split");
+                          setTimeout(show);
+                        } else show();
+                      }}
+                    >
+                      Show line {line}
+                    </Button>
+                  ) : undefined
+                }
+              >
+                {count === 1
+                  ? "One structure can only be edited in ritual source; it appears as a “Needs source editing” block."
+                  : `${count} structures can only be edited in ritual source; they appear as “Needs source editing” blocks.`}
+              </Alert>
+            );
+          })()}
         {stale && (
           <Alert severity="warning">
             A local draft needs recovery or belongs to an older revision. Review

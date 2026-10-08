@@ -631,7 +631,7 @@ it("preserves split pane identity, scroll, source selection and visual Undo acro
   expect(visual.textContent).not.toContain("DIRTY");
 });
 
-it("saves an unsupported visual shape losslessly from its source-only fallback", async () => {
+it("keeps an unsupported shape as a verbatim block and saves it losslessly", async () => {
   mock.load.mockResolvedValue(undefined);
   mock.saveDraft.mockResolvedValue(undefined);
   mock.clear.mockResolvedValue(undefined);
@@ -665,14 +665,20 @@ it("saves an unsupported visual shape losslessly from its source-only fallback",
   render(<SemanticEditor {...setup} />);
   await screen.findByRole("textbox", { name: "Ritual semantic source" });
   await changeTitle();
+  // Visual editing stays available around one verbatim source-only block.
   expect(
     (screen.getByRole("button", { name: "visual" }) as HTMLButtonElement)
       .disabled,
-  ).toBe(true);
+  ).toBe(false);
   expect(
-    screen.getByText(/first structure that needs source editing is on line 2/),
+    screen.getByText(/One structure can only be edited in ritual source/),
   ).toBeTruthy();
   expect(screen.getByRole("button", { name: "Show line 2" })).toBeTruthy();
+  expect(
+    screen
+      .getByRole("textbox", { name: "Ritual visual editor" })
+      .querySelector('[data-ritual-atom="sourceOnly"]'),
+  ).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Save" }));
   await waitFor(() => expect(mock.send).toHaveBeenCalledOnce());
   expect(JSON.parse(mock.send.mock.calls[0][0].source)).toEqual(

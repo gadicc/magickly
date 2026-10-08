@@ -146,7 +146,14 @@ it("locates the first top-level node that keeps a ritual source-only", () => {
       },
     ],
   });
-  expect(visualRitualState(document).issue).toBeTruthy();
+  // The failing node becomes one verbatim block; the rest stays visual.
+  const state = visualRitualState(document);
+  expect(state.issue).toBeNull();
+  expect(state.content.content?.[1]).toMatchObject({
+    type: "ritualAtom",
+    attrs: { tag: "sourceOnly", id: (document.nodes[1] as { id: string }).id },
+  });
+  expect(semanticFromTiptap(state.content)).toEqual(document);
   expect(locateVisualIssue(document)).toEqual({
     index: 1,
     id: (document.nodes[1] as { id: string }).id,

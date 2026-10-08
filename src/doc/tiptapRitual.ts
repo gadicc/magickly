@@ -217,11 +217,13 @@ const RitualAtom = Node.create({
           : `Author comment · ${String(attrs.text ?? "")}`
         : tag === "legacy"
           ? "Unsupported legacy content · preserved"
-          : tag === "img"
-            ? `Image · ${String(attrs.alt ?? attrs.src ?? "")}`
-            : tag === "declareVar"
-              ? `Variable · ${String(attrs.label ?? attrs.name ?? "")}`
-              : label(tag, attrs);
+          : tag === "sourceOnly"
+            ? "Needs source editing · preserved"
+            : tag === "img"
+              ? `Image · ${String(attrs.alt ?? attrs.src ?? "")}`
+              : tag === "declareVar"
+                ? `Variable · ${String(attrs.label ?? attrs.name ?? "")}`
+                : label(tag, attrs);
     if (tag === "sourceAnnotation")
       return [
         "div",
@@ -315,23 +317,56 @@ export const ritualTiptapExtensions = [
 const ritualSchema = getSchema(ritualTiptapExtensions);
 
 /** Refuse visual edits when ProseMirror would alter the semantic reader tree. */
+/** Visual content that provably round-trips, or a thrown error. */
+function checkedVisualContent(
+  input: RitualSemanticDocument,
+  sourceOnly?: ReadonlySet<RitualSemanticNode>,
+): JSONContent {
+  const content = semanticToTiptap(input, sourceOnly);
+  const parsed = ritualSchema.nodeFromJSON(content);
+  parsed.check();
+  if (
+    JSON.stringify(semanticToJrt(input)) !==
+    JSON.stringify(semanticToJrt(semanticFromTiptap(parsed.toJSON())))
+  )
+    throw new Error("This structure cannot round-trip through visual editing.");
+  return content;
+}
+
+const fails = (input: RitualSemanticDocument, node: RitualSemanticNode) => {
+  try {
+    checkedVisualContent({ ...input, nodes: [node] });
+    return false;
+  } catch {
+    return true;
+  }
+};
+
+/**
+ * Visual editor content for a ritual. A top-level node that cannot round-trip
+ * on its own becomes one source-only block holding it verbatim, so the rest
+ * stays visually editable; only when that still fails is the whole ritual
+ * source-only (`issue`).
+ */
 export function visualRitualState(input: RitualSemanticDocument): {
   content: JSONContent;
   issue: string | null;
 } {
   try {
-    const content = semanticToTiptap(input);
-    const parsed = ritualSchema.nodeFromJSON(content);
-    parsed.check();
-    if (
-      JSON.stringify(semanticToJrt(input)) !==
-      JSON.stringify(semanticToJrt(semanticFromTiptap(parsed.toJSON())))
-    )
-      throw new Error(
-        "This structure cannot round-trip through visual editing.",
-      );
-    return { content, issue: null };
+    return { content: checkedVisualContent(input), issue: null };
   } catch {
+    const sourceOnly = new Set(
+      input.nodes.filter((node) => "id" in node && fails(input, node)),
+    );
+    try {
+      if (sourceOnly.size)
+        return {
+          content: checkedVisualContent(input, sourceOnly),
+          issue: null,
+        };
+    } catch {
+      // Only the combination fails: keep the whole ritual in source.
+    }
     return {
       content: { type: "doc", content: [{ type: "paragraph" }] },
       issue:
@@ -349,7 +384,7 @@ export function locateVisualIssue(
   input: RitualSemanticDocument,
 ): { index: number; id?: string } | null {
   for (const [index, node] of input.nodes.entries())
-    if (visualRitualState({ ...input, nodes: [node] }).issue)
+    if (fails(input, node))
       return { index, ...("id" in node ? { id: node.id } : {}) };
   return null;
 }
@@ -416,7 +451,10 @@ function toInline(node: RitualSemanticNode): JSONContent {
   throw new Error(`Unsupported inline node ${node.tag}`);
 }
 
-function toBlocks(nodes: RitualSemanticNode[]): JSONContent[] {
+function toBlocks(
+  nodes: RitualSemanticNode[],
+  sourceOnly?: ReadonlySet<RitualSemanticNode>,
+): JSONContent[] {
   const result: JSONContent[] = [];
   let run: JSONContent[] = [];
   const flush = () => {
@@ -424,6 +462,20 @@ function toBlocks(nodes: RitualSemanticNode[]): JSONContent[] {
     run = [];
   };
   for (const node of nodes) {
+    if (sourceOnly?.has(node) && "id" in node) {
+      // Kept verbatim; the source panel edits it.
+      flush();
+      result.push({
+        type: "ritualAtom",
+        attrs: {
+          id: node.id,
+          tag: "sourceOnly",
+          attrs: {},
+          raw: JSON.stringify(node),
+        },
+      });
+      continue;
+    }
     if (inline(node)) {
       run.push(toInline(node));
       continue;
@@ -472,13 +524,19 @@ function toBlocks(nodes: RitualSemanticNode[]): JSONContent[] {
   return result;
 }
 
-/** Adapt a validated semantic document into a ProseMirror document. */
-export function semanticToTiptap(input: RitualSemanticDocument): JSONContent {
+/**
+ * Adapt a validated semantic document into a ProseMirror document. Nodes in
+ * `sourceOnly` (top level only) become verbatim source-only blocks.
+ */
+export function semanticToTiptap(
+  input: RitualSemanticDocument,
+  sourceOnly?: ReadonlySet<RitualSemanticNode>,
+): JSONContent {
   const errors = validateRitualSemantic(input);
   if (errors.length) throw new Error(errors[0]);
-  if (hasDirectNestedTask(input.nodes))
+  if (hasDirectNestedTask(input.nodes.filter((node) => !sourceOnly?.has(node))))
     throw new Error("Nested tasks are not supported by the visual editor");
-  const content = toBlocks(input.nodes);
+  const content = toBlocks(input.nodes, sourceOnly);
   return {
     type: "doc",
     content: content.length ? content : [{ type: "paragraph" }],
@@ -577,6 +635,9 @@ function fromBlocks(nodes: JSONContent[]): RitualSemanticNode[] {
           id: node.attrs?.id,
           raw: node.attrs?.raw,
         });
+      else if (node.attrs?.tag === "sourceOnly")
+        // The atom's ID wins: identity normalization may have renamed a copy.
+        result.push({ ...JSON.parse(node.attrs.raw), id: node.attrs.id });
       else
         result.push({
           kind: "element",
