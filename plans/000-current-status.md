@@ -274,9 +274,10 @@ Follow-ups are separate from the completed migration work:
   `magick-components`, whose demonstration site it would be
   ([plan 052](052-data-package.md#follow-ups)).
 - TODO: ritual editor follow-ups from
-  [plan 055](055-ritual-editor-followups.md#follow-ups): decide the grade
-  and variable source shortcuts and empty-text normalization (proposal in
-  that plan), count footnotes inside source-only blocks when numbering, and
+  [plan 055](055-ritual-editor-followups.md#follow-ups) (grade and variable
+  shortcuts and empty-text normalization are done, see
+  [plan 056](056-pug-grade-and-variable-shortcuts.md)): count footnotes
+  inside source-only blocks when numbering, and
   harden the caret-follow scan for hand-typed multi-line attributes. Review
   later, deferred for now: real phones (the fixed-height editor with an
   on-screen keyboard, short landscape screens), Safari, IME and assistive
