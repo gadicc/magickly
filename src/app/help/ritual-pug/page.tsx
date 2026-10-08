@@ -83,11 +83,14 @@ export default function RitualPugGuide() {
         <code> all-officers</code>; edit more detailed assignments with the cog.
       </p>
       <p>
-        Typing <code>/</code> opens a menu. Use arrow keys and Enter, or tap a
-        choice, to select Say/Do and a role. Search by role name or shortcut.
-        Escape dismisses the menu and keeps that paragraph literal. Undo or
-        immediate Backspace restores the command after conversion. Pasted
-        commands stay literal.
+        Typing <code>/</code> opens a menu of Speech, Action, Note and Section
+        title; an empty line shows this as a hint. Use arrow keys and Enter, or
+        tap a choice. Speech and Action then ask for a role; typing a role
+        straight after the slash, such as <code>/ker</code>, offers it directly.
+        Enter on an empty last line of a speech or action leaves it. Escape
+        dismisses the menu and keeps that paragraph literal. Undo or immediate
+        Backspace restores the command after conversion. Pasted commands stay
+        literal.
       </p>
       <p>
         A command in the final paragraph of a task creates a sibling card.
@@ -180,6 +183,15 @@ export default function RitualPugGuide() {
       </p>
       <h2>Variables, options and grades</h2>
       <Example source={ritualPugExamples.variables} />
+      <p>
+        In text, <code>{"${candidate}"}</code> inserts a variable and{" "}
+        <code>0=0</code> a grade, as in the earlier Pug editor. Generated source
+        adds their IDs, as <code>{"${candidate#…}"}</code> and{" "}
+        <code>0=0#…</code>. A grade needs a space or punctuation on each side.
+        Text that only looks like a shortcut is kept in an exact{" "}
+        <code>ritualText</code> wrapper. The <code>grade(grade="0=0")/</code>{" "}
+        and <code>var(name="candidate")/</code> tags still work.
+      </p>
       <h2>Images</h2>
       <p>
         Use the visual editor’s Image control after saving a new ritual. It

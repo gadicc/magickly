@@ -89,6 +89,74 @@ function pugAttrs(ast, shorthandIds: ReadonlyMap<string, string>) {
   return attrs;
 }
 
+/**
+ * `0=0#ID` grades and `${name#ID}` variables in Pug text. Authors may omit the
+ * IDs (as in the earlier Pug editor); the printer always writes them.
+ */
+const textShortcut =
+  /(?<![\w=])(\d{1,2}=\d{1,2})(?:#([A-Za-z0-9-]+))?(?![\w=])|\$\{([A-Za-z0-9_=]+)(?:#([A-Za-z0-9-]+))?\}/g;
+
+/** Split a Pug Text value into text, grade and variable nodes. */
+function textWithShortcuts(text: string): RitualSemanticNode[] {
+  const nodes: RitualSemanticNode[] = [];
+  let last = 0;
+  for (const match of text.matchAll(textShortcut)) {
+    const id = match[2] ?? match[4];
+    // A malformed ID leaves the whole match as literal text.
+    if (id !== undefined && !isRitualNodeId(id)) continue;
+    if (match.index > last)
+      nodes.push({ kind: "text", text: text.slice(last, match.index) });
+    nodes.push({
+      kind: "element",
+      id: id ?? createRitualNodeId(),
+      tag: match[1] ? "grade" : "var",
+      attrs: match[1] ? { grade: match[1] } : { name: match[3] },
+      children: [],
+    });
+    last = match.index + match[0].length;
+  }
+  if (!nodes.length) return [{ kind: "text", text }];
+  if (last < text.length) nodes.push({ kind: "text", text: text.slice(last) });
+  return nodes;
+}
+
+/** Offsets of the IDs written in a text's grade and variable shortcuts. */
+export function ritualPugShortcutIds(
+  text: string,
+): { offset: number; id: string }[] {
+  const ids: { offset: number; id: string }[] = [];
+  for (const match of text.matchAll(textShortcut)) {
+    const id = match[2] ?? match[4];
+    if (id !== undefined && isRitualNodeId(id))
+      ids.push({ offset: match.index + match[0].indexOf("#"), id });
+  }
+  return ids;
+}
+
+/** The canonical grade or variable a text shortcut reproduces exactly. */
+function shortcutKind(node: RitualSemanticNode): "grade" | "var" | null {
+  if (
+    node.kind !== "element" ||
+    !Array.isArray(node.children) ||
+    node.children.length
+  )
+    return null;
+  const keys = Object.keys(node.attrs).join();
+  if (
+    node.tag === "grade" &&
+    keys === "grade" &&
+    /^\d{1,2}=\d{1,2}$/.test(String(node.attrs.grade))
+  )
+    return "grade";
+  if (
+    node.tag === "var" &&
+    keys === "name" &&
+    /^[A-Za-z0-9_=]+$/.test(String(node.attrs.name))
+  )
+    return "var";
+  return null;
+}
+
 const inlineTags = new Set(["a", "b", "i", "var", "grade", "br", "footnote"]);
 function inlineChildren(
   nodes: RitualSemanticNode[],
@@ -103,19 +171,47 @@ function inlineChildren(
     )
   )
     return null;
+  const literal = (i: number) => {
+    const node = nodes[i];
+    return (
+      node?.kind === "text" &&
+      plain(node.text) &&
+      !/[\[\]]/.test(node.text) &&
+      !node.text.endsWith("\\") &&
+      nodes[i - 1]?.kind !== "text" &&
+      // Text that would read as a grade or variable shortcut stays wrapped.
+      textWithShortcuts(node.text)[0]?.kind === "text" &&
+      textWithShortcuts(node.text).length === 1
+    );
+  };
+  // The first character the next node could print, for grade boundaries.
+  const nextStart = (i: number) => {
+    const next = nodes[i + 1];
+    if (!next) return "";
+    if (next.kind === "text") return literal(i + 1) ? next.text[0] : "#";
+    const kind = shortcutKind(next);
+    return kind === "grade" ? "0" : kind === "var" ? "$" : "#";
+  };
   const pieces: string[] = [];
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i];
     if (--budget.remaining < 0) return null;
+    const kind = shortcutKind(node);
     if (node.kind === "text") {
-      const literal =
-        plain(node.text) &&
-        !/[\[\]]/.test(node.text) &&
-        !node.text.endsWith("\\") &&
-        nodes[i - 1]?.kind !== "text";
       pieces.push(
-        literal ? node.text : `#[ritualText(value=${json(node.text)})/]`,
+        literal(i) ? node.text : `#[ritualText(value=${json(node.text)})/]`,
       );
+    } else if (node.kind === "element" && kind === "var") {
+      pieces.push(`\${${node.attrs.name}#${node.id}}`);
+    } else if (
+      node.kind === "element" &&
+      kind === "grade" &&
+      // A grade needs a boundary before it, and nothing after its ID that
+      // could extend the ID or the grade.
+      !/[\w=]$/.test(pieces.at(-1) ?? "") &&
+      !/^[\w=-]/.test(nextStart(i))
+    ) {
+      pieces.push(`${node.attrs.grade}#${node.id}`);
     } else if (node.kind === "element") {
       const children =
         node.children === undefined
@@ -164,7 +260,10 @@ function pipeLines(nodes: RitualSemanticNode[]): string[] | null {
   }
   return segment.length && flush() ? lines : null;
 }
-function pugChildren(block, visit) {
+function pugChildren(
+  block,
+  visit: (node) => RitualSemanticNode | RitualSemanticNode[],
+): RitualSemanticNode[] {
   // Pug creates empty Text nodes at interpolation boundaries. Authored empty
   // nodes use the explicit literal wrapper, so those generated empties are safe
   // to omit. Nonempty and newline Text nodes are never normalized or merged.
@@ -174,7 +273,7 @@ function pugChildren(block, visit) {
         (node.type !== "Text" || node.val !== "") &&
         (node.type !== "Comment" || node.buffer !== false),
     )
-    .map(visit);
+    .flatMap(visit);
 }
 
 /** Print an exact semantic tree as bounded Pug; IDs never become reader attributes. */
@@ -289,7 +388,10 @@ function parseWithLocations(source: string) {
   }
   let count = 0;
   const locations = new WeakMap<RitualSemanticNode, RitualSourceLocation>();
-  const convert = (node, depth = 0): RitualSemanticNode => {
+  const convert = (
+    node,
+    depth = 0,
+  ): RitualSemanticNode | RitualSemanticNode[] => {
     if (++count > 20_000 || depth > 100)
       throw new Error("Ritual is too large or deeply nested");
     if (node.code)
@@ -298,7 +400,7 @@ function parseWithLocations(source: string) {
         node.line + 1,
         node.column,
       );
-    if (node.type === "Text") return { kind: "text", text: node.val };
+    if (node.type === "Text") return textWithShortcuts(node.val);
     if (node.type !== "Tag")
       throw new Error("Template programs are unsupported");
     if (node.selfClosing && node.block.nodes.length)
@@ -355,18 +457,20 @@ function parseWithLocations(source: string) {
     else if (node.block.nodes.length) throw new Error("Leaf has children");
     return result;
   };
-  const visit = (node, depth = 0): RitualSemanticNode => {
+  const visit = (node, depth = 0): RitualSemanticNode[] => {
     try {
-      const result = convert(node, depth);
+      const converted = convert(node, depth);
+      const results = Array.isArray(converted) ? converted : [converted];
       const identity = node.attrs?.find((attr) => attr.name === "id");
-      locations.set(result, {
-        line: node.line + 1,
-        column: node.column,
-        ...(identity
-          ? { id: { line: identity.line + 1, column: identity.column } }
-          : {}),
-      });
-      return result;
+      for (const result of results)
+        locations.set(result, {
+          line: node.line + 1,
+          column: node.column,
+          ...(identity
+            ? { id: { line: identity.line + 1, column: identity.column } }
+            : {}),
+        });
+      return results;
     } catch (cause) {
       if (cause instanceof RitualSourceError) throw cause;
       throw new RitualSourceError(
@@ -381,7 +485,7 @@ function parseWithLocations(source: string) {
       document(
         ast.nodes
           .filter((node) => node.type !== "Comment" || node.buffer !== false)
-          .map((node) => visit(node)),
+          .flatMap((node) => visit(node)),
       ),
       locations,
     ),

@@ -12,7 +12,7 @@ summary(summary="Closing")
 /** Public guide examples parsed in tests, including the exact literal/opaque fallbacks. */
 export const ritualPugExamples = {
   inline: `//- magickli-ritual-pug 1
-Hiero: Welcome, #[var(name="candidate")/]. Speak #[b clearly].
+Hiero: Welcome, \${candidate}. Speak #[b clearly].
 * Keryx Open the door.
 `,
   structure: `//- magickli-ritual-pug 1
@@ -32,7 +32,7 @@ declareVar(name="candidate", label="Candidate name", varType="text", default="Gu
 declareVar(name="direction", label="Direction", varType="select", default="east")
   option(value="east", label="East")/
   option(value="west", label="West")/
-Hiero: Welcome, #[var(name="candidate")/].
+Hiero: Welcome, \${candidate}, to the 0=0 grade.
 grade(grade="0=0")/
 `,
   image: `//- magickli-ritual-pug 1

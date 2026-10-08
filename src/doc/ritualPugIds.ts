@@ -1,4 +1,5 @@
 import { isRitualNodeId } from "./ritualNodeIds";
+import { ritualPugShortcutIds } from "./ritualPug";
 import { lexRitualPug } from "./ritualPugLex";
 
 /** Exact source span of a lexer-owned #id, excluding lookalikes in text or attributes. */
@@ -14,16 +15,24 @@ export function ritualPugIdRanges(source: string): RitualPugIdRange[] | null {
     const starts = [0];
     for (let n = 0; n < source.length; n++)
       if (source[n] === "\n") starts.push(n + 1);
-    return lexRitualPug(source)
-      .filter(
-        (token): token is Extract<typeof token, { type: "id" }> =>
-          token.type === "id" && isRitualNodeId(token.val),
-      )
-      .map((token) => {
-        const from =
-          starts[token.loc.start.line - 1] + token.loc.start.column - 1;
-        return { from, to: from + token.val.length + 1, id: token.val };
-      });
+    return lexRitualPug(source).flatMap((token): RitualPugIdRange[] => {
+      const start =
+        starts[token.loc.start.line - 1] + token.loc.start.column - 1;
+      if (token.type === "id" && isRitualNodeId(token.val))
+        return [
+          { from: start, to: start + token.val.length + 1, id: token.val },
+        ];
+      if (token.type !== "text") return [];
+      // IDs inside `0=0#ID` and `${name#ID}` text shortcuts, where the token's
+      // text still matches the source at that position.
+      return ritualPugShortcutIds(token.val)
+        .map(({ offset, id }) => ({
+          from: start + offset,
+          to: start + offset + id.length + 1,
+          id,
+        }))
+        .filter(({ from, to, id }) => source.slice(from, to) === `#${id}`);
+    });
   } catch {
     return null;
   }

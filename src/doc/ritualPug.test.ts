@@ -360,18 +360,30 @@ describe("Pug surface conveniences", () => {
       ":",
       "line\u2028separator",
       "\u2029",
+      "0=0",
+      "1=",
+      "=2",
+      "9",
+      "${x}",
+      "-",
+      "_",
     ];
     const inline = (depth: number): RitualSemanticNode => {
       const choice = random(depth > 1 ? 7 : 9);
       if (choice < 6)
         return { kind: "text", text: texts[random(texts.length)] };
-      if (choice === 6)
-        return {
-          kind: "element",
-          id: createRitualNodeId(),
-          tag: "br",
-          attrs: {},
-        };
+      if (choice === 6) {
+        const pick = random(3);
+        return pick === 0
+          ? { kind: "element", id: createRitualNodeId(), tag: "br", attrs: {} }
+          : {
+              kind: "element",
+              id: createRitualNodeId(),
+              tag: pick === 1 ? "grade" : "var",
+              attrs: pick === 1 ? { grade: "1=10" } : { name: "templeName" },
+              children: [],
+            };
+      }
       return {
         kind: "element",
         id: createRitualNodeId(),
@@ -625,4 +637,147 @@ it("round-trips line and paragraph separators on shortcut lines", () => {
     children: [{ text: "a\u2028b" }],
   });
   expect(printRitualPug(document)).toBe(source);
+});
+
+describe("grade and variable shortcuts", () => {
+  const grade = (id: string, value = "0=0"): RitualSemanticNode => ({
+    kind: "element",
+    id,
+    tag: "grade",
+    attrs: { grade: value },
+    children: [],
+  });
+  const variable = (id: string, name = "templeName"): RitualSemanticNode => ({
+    kind: "element",
+    id,
+    tag: "var",
+    attrs: { name },
+    children: [],
+  });
+  const text = (value: string): RitualSemanticNode => ({
+    kind: "text",
+    text: value,
+  });
+  const note = (...children: RitualSemanticNode[]): RitualSemanticDocument => ({
+    format: "magickli-ritual",
+    version: 1,
+    nodes: [
+      {
+        kind: "element",
+        id: "Note000000000001",
+        tag: "note",
+        attrs: {},
+        children,
+      },
+    ],
+  });
+
+  it("reads and prints shortcuts with their IDs", () => {
+    const source = `${RITUAL_PUG_HEADER}\nnote#Note000000000001 The 0=0#Grade00000000001 rite of \${templeName#Var0000000000001}.\n`;
+    const document = parseRitualPug(source);
+    expect(document).toEqual(
+      note(
+        text("The "),
+        grade("Grade00000000001"),
+        text(" rite of "),
+        variable("Var0000000000001"),
+        text("."),
+      ),
+    );
+    expect(printRitualPug(document)).toBe(source);
+  });
+
+  it("gives typed shortcuts without IDs fresh ones, in pipes and inline tags", () => {
+    const document = parseRitualPug(
+      `${RITUAL_PUG_HEADER}\nHiero: Admit \${candidateName} to the 1=10\n* Keryx\n  | Grade #[b 2=9]\n`,
+    );
+    const said = (document.nodes[0] as { children: RitualSemanticNode[] })
+      .children;
+    expect(said.map((node) => node.kind === "element" && node.tag)).toEqual([
+      false,
+      "var",
+      false,
+      "grade",
+    ]);
+    const printed = printRitualPug(document);
+    expect(printed).toMatch(/\$\{candidateName#[A-Za-z0-9]{16}\}/);
+    expect(printed).toMatch(/1=10#[A-Za-z0-9]{16}/);
+    expect(parseRitualPug(printed)).toEqual(document);
+  });
+
+  it("keeps literal look-alikes as text and leaves attributes and comments alone", () => {
+    const literal = note(text("Score 5=3 and \${notAVar} stay text."));
+    const printed = printRitualPug(literal);
+    expect(printed).toContain("ritualText(");
+    expect(parseRitualPug(printed)).toEqual(literal);
+    const source = `${RITUAL_PUG_HEADER}\n//- grade 0=0 in a comment\ntitle#Title00000000001(text="0=0") Title\nnote#Note000000000001\n  ritualText(value="1=10")/\n`;
+    const document = parseRitualPug(source);
+    expect(document.nodes[0]).toMatchObject({
+      kind: "annotation",
+      text: "grade 0=0 in a comment",
+    });
+    expect(document.nodes[1]).toMatchObject({ attrs: { text: "0=0" } });
+    expect(document.nodes[2]).toMatchObject({
+      children: [{ kind: "text", text: "1=10" }],
+    });
+    // A malformed ID leaves the whole match as text.
+    expect(
+      parseRitualPug(
+        `${RITUAL_PUG_HEADER}\nnote#Note000000000001 a 0=0#bad b\n`,
+      ).nodes[0],
+    ).toMatchObject({ children: [{ kind: "text", text: "a 0=0#bad b" }] });
+  });
+
+  it("falls back to tags where neighbours would change the parse", () => {
+    for (const document of [
+      note(text("x"), grade("Grade00000000001")),
+      note(text("a="), grade("Grade00000000001")),
+      note(grade("Grade00000000001"), text("-y")),
+      note(grade("Grade00000000001"), text("_z")),
+      note(grade("Grade00000000001"), text("=1")),
+      note(grade("Grade00000000001"), text("9")),
+      note(grade("Grade00000000001"), grade("Grade00000000002", "1=10")),
+      note(text("$"), variable("Var0000000000001"), text("}")),
+      note(
+        grade("Grade00000000001"),
+        {
+          kind: "element",
+          id: "Bold000000000001",
+          tag: "b",
+          attrs: {},
+          children: [text("x")],
+        },
+        grade("Grade00000000002", "2=9"),
+      ),
+      // Non-canonical shapes keep the tag form.
+      note({
+        ...grade("Grade00000000001"),
+        children: undefined,
+      } as RitualSemanticNode),
+      note({
+        ...variable("Var0000000000001"),
+        children: undefined,
+      } as RitualSemanticNode),
+    ]) {
+      const printed = printRitualPug(document);
+      expect(parseRitualPug(printed), printed).toEqual(document);
+      expect(printRitualPug(parseRitualPug(printed))).toBe(printed);
+    }
+  });
+
+  it("folds the IDs written in shortcuts like other IDs", () => {
+    const source = `${RITUAL_PUG_HEADER}\nnote#Note000000000001 x 0=0#Grade00000000001 y\n  | a \${n#Var0000000000001} #[b in 1=10#Grade00000000002]\nHiero#Ab3k9Qp7Zx2Mn5Rs: hi 2=9#Grade00000000003\n`;
+    expect(
+      ritualPugIdRanges(source)!.map((range) =>
+        source.slice(range.from, range.to),
+      ),
+    ).toEqual([
+      "#Note000000000001",
+      "#Grade00000000001",
+      "#Var0000000000001",
+      "#Grade00000000002",
+      "#Ab3k9Qp7Zx2Mn5Rs",
+      "#Grade00000000003",
+    ]);
+  });
 });
