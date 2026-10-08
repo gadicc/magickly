@@ -465,6 +465,8 @@ export const RitualSlashCommands = Extension.create({
             const state = key.getState(view.state)!;
             if (
               event.key === "Backspace" &&
+              // A selected title placeholder is cleared, not the command undone.
+              view.state.selection.empty &&
               state.restore &&
               state.restore.ownerDoc === ritualEditorOwner(editor).state.doc
             ) {
@@ -549,9 +551,11 @@ export const RitualSlashCommands = Extension.create({
             );
             try {
               const rect = view.coordsAtPos(view.state.selection.from);
-              // The visual viewport excludes an on-screen keyboard.
-              const viewport =
-                window.visualViewport?.height ?? window.innerHeight;
+              // The visual viewport excludes an on-screen keyboard and may be
+              // scrolled within the layout viewport the caret is measured in.
+              const visual = window.visualViewport;
+              const top = visual?.offsetTop ?? 0;
+              const viewport = top + (visual?.height ?? window.innerHeight);
               menu.style.maxHeight = "";
               const { offsetWidth: width, offsetHeight: natural } = menu;
               menu.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - width - 8))}px`;
@@ -559,7 +563,7 @@ export const RitualSlashCommands = Extension.create({
               // fits, the roomier side with a shorter, scrolling list. Never
               // over the line itself.
               const roomBelow = viewport - 8 - (rect.bottom + 4);
-              const roomAbove = rect.top - 4 - 8;
+              const roomAbove = rect.top - 4 - 8 - top;
               const below =
                 natural <= roomBelow ||
                 (natural > roomAbove && roomBelow >= roomAbove);

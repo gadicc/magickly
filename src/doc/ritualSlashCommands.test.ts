@@ -379,3 +379,13 @@ it("offers a section title only at the top level", () => {
   type(editor, "/tit");
   expect(document.querySelectorAll('[role="option"]')).toHaveLength(0);
 });
+
+it("clears a selected title placeholder on Backspace instead of undoing", () => {
+  const editor = setup();
+  type(editor, "/title");
+  press(editor, "Enter");
+  expect(editor.state.selection.empty).toBe(false);
+  // The command restore applies only to an empty selection.
+  expect(press(editor, "Backspace")).toBe(false);
+  expect(editor.state.doc.firstChild?.attrs.tag).toBe("title");
+});

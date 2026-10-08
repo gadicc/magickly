@@ -290,7 +290,15 @@ function sourceOnlyLabel(raw: unknown): string {
     const node = JSON.parse(String(raw));
     if (node?.kind !== "element") return String(node?.kind ?? "structure");
     const name = node.attrs?.text ?? node.attrs?.summary ?? node.attrs?.role;
-    return name ? `${node.tag} · ${String(name)}` : String(node.tag);
+    // Say how much a single Delete would remove.
+    const count = (children: { children?: unknown[] }[] = []): number =>
+      children.reduce(
+        (sum, child) =>
+          sum + 1 + count(child.children as { children?: unknown[] }[]),
+        0,
+      );
+    const inside = count(node.children);
+    return `${node.tag}${name ? ` · ${String(name)}` : ""}${inside ? ` · ${inside} inside` : ""}`;
   } catch {
     return "structure";
   }

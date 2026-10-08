@@ -1,10 +1,12 @@
 import {
   type Editor,
+  Extension,
   getSchema,
   type JSONContent,
   Mark,
   Node,
 } from "@tiptap/core";
+import { Plugin } from "@tiptap/pm/state";
 import StarterKit from "@tiptap/starter-kit";
 import { parseRitualFileLocator } from "../files/ritualFileLocator";
 import { createRitualNodeId, isRitualNodeId } from "./ritualNodeIds";
@@ -301,6 +303,60 @@ const RitualSegment = Mark.create({
 });
 
 /** Editor-only schema. The saved semantic document never depends on Tiptap JSON. */
+const holdsTask = new Map<string, boolean>();
+/** Whether a source-only payload is, or contains, a task. */
+function sourceOnlyHoldsTask(raw: unknown): boolean {
+  if (typeof raw !== "string") return false;
+  let found = holdsTask.get(raw);
+  if (found === undefined) {
+    const walk = (node: RitualSemanticNode): boolean =>
+      node.kind === "element" &&
+      (node.tag === "task" || (node.children ?? []).some(walk));
+    try {
+      found = walk(JSON.parse(raw));
+    } catch {
+      found = false;
+    }
+    if (holdsTask.size > 500) holdsTask.clear();
+    holdsTask.set(raw, found);
+  }
+  return found;
+}
+
+/**
+ * The task schema already refuses a task inside a task. A source-only block
+ * hides its node from the schema, so refuse any change that would put one
+ * holding a task inside a task (a paste or drag), keeping that rule.
+ */
+const RitualTaskNesting = Extension.create({
+  name: "ritualTaskNesting",
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        filterTransaction(tr) {
+          if (!tr.docChanged) return true;
+          let nested = false;
+          tr.doc.descendants((node) => {
+            if (nested) return false;
+            if (node.type.name !== "ritualTask") return true;
+            node.descendants((child) => {
+              if (
+                child.type.name === "ritualAtom" &&
+                child.attrs.tag === "sourceOnly" &&
+                sourceOnlyHoldsTask(child.attrs.raw)
+              )
+                nested = true;
+              return !nested;
+            });
+            return false;
+          });
+          return !nested;
+        },
+      }),
+    ];
+  },
+});
+
 export const ritualTiptapExtensions = [
   StarterKit.configure({
     code: false,
@@ -323,6 +379,7 @@ export const ritualTiptapExtensions = [
   RitualInline,
   RitualAtom,
   RitualSegment,
+  RitualTaskNesting,
 ];
 
 const ritualSchema = getSchema(ritualTiptapExtensions);
@@ -752,6 +809,17 @@ export function semanticFromTiptap(input: JSONContent): RitualSemanticDocument {
     }
   };
   normalize(result.nodes);
+  const emptyTitle = (nodes: RitualSemanticNode[]): boolean =>
+    nodes.some(
+      (node) =>
+        node.kind === "element" &&
+        ((node.tag === "title" && !node.attrs.text) ||
+          (!!node.children && emptyTitle(node.children))),
+    );
+  if (emptyTitle(result.nodes))
+    throw new Error(
+      "A section title needs text. Type one, or remove the title.",
+    );
   const errors = validateRitualSemantic(result);
   if (errors.length) throw new Error(errors[0]);
   return result;

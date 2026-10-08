@@ -187,3 +187,69 @@ it("rejects pasted source-only blocks whose payload is not a valid node", () => 
     editor.destroy();
   }
 });
+
+it("refuses to put a source-only block holding a task inside a task", () => {
+  const nested = semanticFromJrt({
+    children: [
+      {
+        type: "task",
+        say: true,
+        role: "hiero",
+        children: [
+          {
+            type: "task",
+            do: true,
+            role: "all",
+            children: [{ type: "text", value: "Nested" }],
+          },
+        ],
+      },
+      {
+        type: "task",
+        say: true,
+        role: "keryx",
+        children: [{ type: "text", value: "Host" }],
+      },
+    ],
+  });
+  const element = window.document.createElement("div");
+  const editor = new Editor({
+    element,
+    extensions: ritualTiptapExtensions,
+    content: visualRitualState(nested).content,
+  });
+  try {
+    const atom = editor.state.doc.firstChild!;
+    expect(atom.attrs.tag).toBe("sourceOnly");
+    const before = editor.getJSON();
+    // Inside the host task's paragraph list, as a paste or drop would put it.
+    const inside = atom.nodeSize + 1;
+    editor.view.dispatch(editor.state.tr.insert(inside, atom.copy()));
+    expect(editor.getJSON()).toEqual(before);
+  } finally {
+    editor.destroy();
+  }
+});
+
+it("explains an emptied section title instead of a validator code", () => {
+  const document = parseRitualPug(
+    `${RITUAL_PUG_HEADER}\ntitle#Title00000000001(text="Opening") Opening\n`,
+  );
+  const element = window.document.createElement("div");
+  const editor = new Editor({
+    element,
+    extensions: ritualTiptapExtensions,
+    content: visualRitualState(document).content,
+  });
+  try {
+    const title = editor.state.doc.firstChild!;
+    editor.view.dispatch(
+      editor.state.tr.delete(2, 2 + title.firstChild!.content.size),
+    );
+    expect(() => semanticFromTiptap(editor.getJSON())).toThrow(
+      "A section title needs text",
+    );
+  } finally {
+    editor.destroy();
+  }
+});
