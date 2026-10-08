@@ -847,6 +847,27 @@ describe("grade and variable shortcuts", () => {
     );
   });
 
+  it("keeps a grade's ID when punctuation follows it directly", () => {
+    for (const after of [". End", "= x", "_y", ", and"]) {
+      const source = `${RITUAL_PUG_HEADER}\nnote#Note000000000001 The 0=0#Grade00000000001${after}\n`;
+      const document = parseRitualPug(source);
+      expect(document, after).toEqual(
+        note(text("The "), grade("Grade00000000001"), text(after)),
+      );
+      expect(parseRitualPug(printRitualPug(document))).toEqual(document);
+    }
+    // A malformed ID never leaks out of the text it was typed in.
+    expect(
+      parseRitualPug(
+        `${RITUAL_PUG_HEADER}\nnote#Note000000000001 a 0=0#bad. b\n`,
+      ).nodes[0],
+    ).toMatchObject({ children: [{ kind: "text", text: "a 0=0#bad. b" }] });
+    // The printer writes the natural form too.
+    expect(
+      printRitualPug(note(text("The "), grade("Grade00000000001"), text("."))),
+    ).toContain("The 0=0#Grade00000000001.");
+  });
+
   it("folds the IDs written in shortcuts like other IDs", () => {
     const source = `${RITUAL_PUG_HEADER}\nnote#Note000000000001 x 0=0#Grade00000000001 y\n  | a \${n#Var0000000000001} #[b in 1=10#Grade00000000002]\nHiero#Ab3k9Qp7Zx2Mn5Rs: hi 2=9#Grade00000000003\n`;
     expect(

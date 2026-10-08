@@ -93,8 +93,17 @@ function pugAttrs(ast, shorthandIds: ReadonlyMap<string, string>) {
  * `0=0#ID` grades and `${name#ID}` variables in Pug text. Authors may omit the
  * IDs (as in the earlier Pug editor); the printer always writes them.
  */
+// A grade with an ID never backs off it (so `0=0#ID.` keeps its ID before
+// the full stop); a bare grade may not be followed by `#`, so a malformed ID
+// stays literal text instead of leaking into the reader.
 const textShortcut =
-  /(?<![\w=.])(\d{1,2}=\d{1,2})(?:#([A-Za-z0-9-]+))?(?![\w=.])|\$\{([A-Za-z0-9_=]+)(?:#([A-Za-z0-9-]+))?\}/g;
+  /(?<![\w=.])(\d{1,2}=\d{1,2})#([A-Za-z0-9-]+)(?![A-Za-z0-9-])|(?<![\w=.])(\d{1,2}=\d{1,2})(?![\w=.#])|\$\{([A-Za-z0-9_=]+)(?:#([A-Za-z0-9-]+))?\}/g;
+/** Groups of a `textShortcut` match: grade value, ID and variable name. */
+const shortcutParts = (match: RegExpMatchArray) => ({
+  grade: match[1] ?? match[3],
+  id: match[2] ?? match[5],
+  name: match[4],
+});
 
 // Where each split node starts within its Pug Text value, for diagnostics.
 const textOffsets = new WeakMap<
@@ -111,7 +120,7 @@ function textWithShortcuts(text: string): RitualSemanticNode[] {
     nodes.push(node);
   };
   for (const match of text.matchAll(textShortcut)) {
-    const id = match[2] ?? match[4];
+    const { grade, id, name } = shortcutParts(match);
     // A malformed ID leaves the whole match as literal text.
     if (id !== undefined && !isRitualNodeId(id)) continue;
     if (match.index > last)
@@ -120,8 +129,8 @@ function textWithShortcuts(text: string): RitualSemanticNode[] {
       {
         kind: "element",
         id: id ?? createRitualNodeId(),
-        tag: match[1] ? "grade" : "var",
-        attrs: match[1] ? { grade: match[1] } : { name: match[3] },
+        tag: grade ? "grade" : "var",
+        attrs: grade ? { grade } : { name },
         children: [],
       },
       match.index,
@@ -140,7 +149,7 @@ export function ritualPugShortcutIds(
 ): { offset: number; id: string }[] {
   const ids: { offset: number; id: string }[] = [];
   for (const match of text.matchAll(textShortcut)) {
-    const id = match[2] ?? match[4];
+    const { id } = shortcutParts(match);
     if (id !== undefined && isRitualNodeId(id))
       ids.push({ offset: match.index + match[0].indexOf("#"), id });
   }
@@ -258,9 +267,9 @@ function inlineChildren(
       node.kind === "element" &&
       kind === "grade" &&
       // A grade needs a boundary before it, and nothing after its ID that
-      // could extend the ID or the grade.
+      // could extend the ID; the run check below catches anything else.
       !/[\w=.]$/.test(pieces.at(-1)?.text ?? "") &&
-      !/^[\w=.-]/.test(nextStart(i))
+      !/^[A-Za-z0-9-]/.test(nextStart(i))
     ) {
       pieces.push({ text: `${node.attrs.grade}#${node.id}`, bare: true, node });
     } else if (node.kind === "element") {
@@ -540,6 +549,10 @@ function parseWithLocations(source: string) {
     try {
       const converted = convert(node, depth);
       const results = Array.isArray(converted) ? converted : [converted];
+      // Shortcuts split one Text node into many; count them toward the bound.
+      count += results.length - 1;
+      if (count > 20_000)
+        throw new Error("Ritual is too large or deeply nested");
       const identity = node.attrs?.find((attr) => attr.name === "id");
       for (const result of results) {
         const within = textOffsets.get(result);

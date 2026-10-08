@@ -842,7 +842,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           dialect,
         );
         if (
-          JSON.stringify(JSON.parse(request.source)) !==
+          JSON.stringify(withoutEmptyText(JSON.parse(request.source))) !==
           JSON.stringify(restored)
         ) {
           if (
@@ -953,7 +953,8 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       const followUp: SemanticDraft | undefined =
         source.dirty ||
         source.conflict ||
-        JSON.stringify(JSON.parse(request.source)) !== JSON.stringify(document)
+        JSON.stringify(withoutEmptyText(JSON.parse(request.source))) !==
+          JSON.stringify(document)
           ? {
               ...currentDraft(),
               baseRevisionId: result.revisionId,
@@ -970,8 +971,9 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       setBase({ revisionId: result.revisionId, version: result.version });
       setSaved((current) => ({
         title: request.title ?? current.title,
-        // Retained requests may format their JSON differently.
-        document: stringify(JSON.parse(request.source)),
+        // Retained requests may format their JSON differently, and ones made
+        // before empty text was dropped still carry it.
+        document: stringify(withoutEmptyText(JSON.parse(request.source))),
       }));
       setPending(null);
       try {
