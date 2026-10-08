@@ -61,21 +61,30 @@ does not install dependencies, migrate, or seed on normal starts.
 
 For a new checkout, after pulling migrations, or after changing local database
 configuration, run `./dev --init`. This installs locked dependencies, runs
-Loom's local database setup and Files check, applies migrations, seeds Creator
-and Reader, then launches Next dev on port 3004. `pnpm local-development:init`
-performs the same setup without starting Next. Database setup reuses the checked
+Loom's local database setup and Files check, applies migrations, seeds Creator,
+Reader and the ritual fixture, then launches Next dev on port 3004.
+`pnpm local-development:init` performs the same setup without starting Next. Database setup reuses the checked
 credentials on this machine; a new database prompts for an administrator
 password. The migration task runs `local-development:verify-db` before
 `db:migrate`. The seed repeats the live identity check and is safe to rerun; it
 adds no admin grant, file row, or bucket object. `LOOM_LOCAL_TEST_LOGIN=1`
 exposes Creator and Reader buttons at `/signin` without Google. The ritual
 editor is enabled by default; it needs no feature flag or database migration.
+
+The seed also gives Creator a **Fixture Temple** holding **Neophyte
+(fixture)**: the full bundled 0=0 as the legacy import converts it (about
+450 top-level nodes, 400 tasks, variables, notes and footnotes), private to
+the temple. It is made through the app's own temple and ritual services with
+fixed operation IDs, so reruns replay the temple and find the ritual instead of
+duplicating them, and it prints the editor path. Use it for realistic editor
+work: sign in as Creator and open that path, or the ritual from
+`/gd/rituals`. Saves add revisions to it as usual; the seed never resets it.
 Leave `MAGICKLI_LOCAL_ACCEPTANCE` unset in ordinary development. The separate
 numeric-loopback production-build acceptance path is documented in
 `scripts/local-acceptance/README.md`.
 
 Initialization verifies the bucket with `pnpm exec loom files local check`.
-Create a test-owned temple as Creator, then create a ritual on `/gd/rituals`.
+Use the fixture ritual, or create another on `/gd/rituals` as Creator.
 Use **Image** in the visual editor to upload a small synthetic PNG, then save.
 The standalone `/upload` flow also remains available. Wait for **Published for download** before testing
 with a Reader who has a matching temple membership. The private `/api/files`

@@ -1,5 +1,9 @@
 import "server-only";
-import { seedLocalDevelopmentFixtures } from "./fixtures";
+import { readFileSync } from "node:fs";
+import {
+  seedLocalDevelopmentFixtures,
+  seedLocalDevelopmentRitualFixture,
+} from "./fixtures";
 import { verifyLocalDevelopmentDatabase } from "./verify-db";
 
 async function main() {
@@ -7,6 +11,11 @@ async function main() {
   const { db } = await import("../../src/db/neonFull");
   await db.transaction((tx) => seedLocalDevelopmentFixtures(tx));
   console.log("LOCAL_DEVELOPMENT_CREATOR_READER_SEEDED");
+  const { ritualId } = await seedLocalDevelopmentRitualFixture(
+    db,
+    readFileSync(new URL("../../src/doc/0=0.pug", import.meta.url), "utf8"),
+  );
+  console.log(`LOCAL_DEVELOPMENT_RITUAL_FIXTURE_SEEDED /doc/${ritualId}/edit`);
 }
 
 main()
