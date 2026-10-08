@@ -425,6 +425,51 @@ it("keeps the layout steady while a save is in flight", async () => {
   expect(screen.getByRole("button", { name: "Retry save" })).toBeTruthy();
 });
 
+it("opens Source, not split, for Show line on a narrow screen", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  setup.initialDocument = semanticFromJrt({
+    children: [
+      {
+        type: "task",
+        say: true,
+        role: "hiero",
+        children: [
+          {
+            type: "task",
+            do: true,
+            role: "all",
+            children: [{ type: "text", value: "Nested" }],
+          },
+        ],
+      },
+    ],
+  });
+  mock.owner = setup.actorId;
+  localStorage.setItem(RITUAL_EDITOR_LAYOUT_KEY, "visual");
+  const original = window.matchMedia;
+  window.matchMedia = ((query: string) => ({
+    matches: query.includes("max-width: 800px"),
+    media: query,
+    onchange: null,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  })) as typeof window.matchMedia;
+  try {
+    render(<SemanticEditor {...setup} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Show line 2" }));
+    await screen.findByRole("textbox", { name: "Ritual semantic source" });
+    expect(screen.getByRole("button", { name: "source" }).className).toContain(
+      "contained",
+    );
+  } finally {
+    window.matchMedia = original;
+  }
+});
+
 it("treats a visual undo back to the confirmed document as saved", async () => {
   mock.load.mockResolvedValue(undefined);
   mock.saveDraft.mockResolvedValue(undefined);

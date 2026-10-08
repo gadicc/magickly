@@ -39,17 +39,18 @@ export function ritualPugHeaderId(line: string): string | null {
 }
 
 /**
- * The ID of the node whose source encloses a 1-based line: the line's own
- * header, or the nearest header above it at a shallower indentation. A cheap
- * line scan, suitable for every caret move; null when nothing encloses it.
+ * The IDs of the nodes whose source encloses a 1-based line, innermost first:
+ * the line's own header, then each header above it at a shallower
+ * indentation. A cheap line scan, suitable for every caret move.
  */
-export function ritualPugNodeIdAtLine(
+export function ritualPugNodeIdsAtLine(
   lineText: (line: number) => string,
   line: number,
-): string | null {
+): string[] {
+  const ids: string[] = [];
   const at = lineText(line);
   const own = ritualPugHeaderId(at);
-  if (own) return own;
+  if (own) ids.push(own);
   let limit = at.trim() ? at.length - at.trimStart().length : Infinity;
   for (let n = line - 1; n >= 1 && limit > 0; n--) {
     const text = lineText(n);
@@ -57,10 +58,18 @@ export function ritualPugNodeIdAtLine(
     const width = text.length - text.trimStart().length;
     if (width >= limit) continue;
     const id = ritualPugHeaderId(text);
-    if (id) return id;
+    if (id) ids.push(id);
     limit = width;
   }
-  return null;
+  return ids;
+}
+
+/** The innermost node enclosing a 1-based line, or null. */
+export function ritualPugNodeIdAtLine(
+  lineText: (line: number) => string,
+  line: number,
+): string | null {
+  return ritualPugNodeIdsAtLine(lineText, line)[0] ?? null;
 }
 
 /** 1-based line whose header declares `id`, or null. */

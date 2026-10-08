@@ -60,9 +60,30 @@ export const RITUAL_SLASH_COMMANDS: readonly (Choice & { hint: string })[] = [
     search: "title section heading",
   },
 ];
-const hints = RITUAL_SLASH_COMMANDS.map((command) => command.hint);
-/** Shown in an empty line where slash commands work. */
-export const RITUAL_SLASH_HINT = `Type / for ${hints.slice(0, -1).join(", ")} or ${hints.at(-1)}`;
+const hintFor = (commands: readonly { hint: string }[]) => {
+  const hints = commands.map((command) => command.hint);
+  return `Type / for ${hints.slice(0, -1).join(", ")} or ${hints.at(-1)}`;
+};
+/** Shown in an empty top-level line, where every slash command works. */
+export const RITUAL_SLASH_HINT = hintFor(RITUAL_SLASH_COMMANDS);
+
+/**
+ * Blocks only go where the parent editor owns them (not in collected
+ * footnotes), and a section title only at the top level of the ritual.
+ */
+function blockAllowed(editor: Editor, block: Block) {
+  if (ritualEditorOwner(editor) !== editor) return false;
+  if (block !== "title") return true;
+  const { $from } = editor.state.selection;
+  return (
+    $from.depth === 1 ||
+    ($from.depth === 2 && $from.node(1).type.name === "ritualTask")
+  );
+}
+const available = (editor: Editor) =>
+  RITUAL_SLASH_COMMANDS.filter(
+    (command) => !command.block || blockAllowed(editor, command.block),
+  );
 type Snapshot = { ownerDoc: Node };
 type CommandState = {
   dismissed: number | null;
@@ -184,12 +205,9 @@ function choices(editor: Editor): Choice[] {
     );
   if (!/^\/[a-z0-9-]*$/i.test(p.text)) return [];
   const query = p.text.slice(1).toLowerCase();
-  const commands = RITUAL_SLASH_COMMANDS.filter(
-    (command) =>
-      command.search.includes(query) &&
-      // Blocks other than tasks only go where the parent editor owns them.
-      (!command.block || ritualEditorOwner(editor) === editor),
-  ).map(({ hint: _hint, ...choice }) => choice);
+  const commands = available(editor)
+    .filter((command) => command.search.includes(query))
+    .map(({ hint: _hint, ...choice }) => choice);
   // A role typed first (`/ker`) offers that role as Speech and Action. One
   // letter that already matches a command would list half the catalog.
   if (!query || (query.length < 2 && commands.length)) return commands;
@@ -250,7 +268,7 @@ function replaceCommand(
 }
 
 function convertBlock(editor: Editor, block: Block) {
-  if (!permitted(editor) || ritualEditorOwner(editor) !== editor) return false;
+  if (!permitted(editor) || !blockAllowed(editor, block)) return false;
   const target = insertion(editor);
   if (!target) return false;
   // A title needs text: select a placeholder that typing replaces.
@@ -411,7 +429,7 @@ export const RitualSlashCommands = Extension.create({
             return DecorationSet.create(state.doc, [
               Decoration.node(at, at + node.nodeSize, {
                 class: styles.hint,
-                "data-hint": RITUAL_SLASH_HINT,
+                "data-hint": hintFor(available(editor)),
               }),
             ]);
           },
@@ -531,15 +549,23 @@ export const RitualSlashCommands = Extension.create({
             );
             try {
               const rect = view.coordsAtPos(view.state.selection.from);
-              const { offsetWidth: width, offsetHeight: height } = menu;
+              // The visual viewport excludes an on-screen keyboard.
+              const viewport =
+                window.visualViewport?.height ?? window.innerHeight;
+              menu.style.maxHeight = "";
+              const { offsetWidth: width, offsetHeight: natural } = menu;
               menu.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - width - 8))}px`;
-              // Below the line when it fits, otherwise above it; never over it.
-              const below = rect.bottom + 4;
-              menu.style.top = `${
-                below + height <= window.innerHeight - 8
-                  ? below
-                  : Math.max(8, rect.top - 4 - height)
-              }px`;
+              // Below the line when it fits, otherwise above it; when neither
+              // fits, the roomier side with a shorter, scrolling list. Never
+              // over the line itself.
+              const roomBelow = viewport - 8 - (rect.bottom + 4);
+              const roomAbove = rect.top - 4 - 8;
+              const below =
+                natural <= roomBelow ||
+                (natural > roomAbove && roomBelow >= roomAbove);
+              const height = Math.min(natural, below ? roomBelow : roomAbove);
+              if (height < natural) menu.style.maxHeight = `${height}px`;
+              menu.style.top = `${below ? rect.bottom + 4 : rect.top - 4 - height}px`;
             } catch {
               menu.hidden = true;
             }

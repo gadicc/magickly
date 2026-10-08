@@ -285,7 +285,8 @@ export default function ButtonAppBar() {
   // server until hydration.
   const hydrated = useHydrated();
   const userId = hydrated ? (session.data?.user.id ?? null) : null;
-  const avatarSrc = session.data?.user.image;
+  // The avatar moves the search box, so it waits for hydration too.
+  const avatarSrc = hydrated ? session.data?.user.image : undefined;
   const recovery = useLegacyRecoveryGate();
   const [signOutPending, setSignOutPending] = React.useState(false);
   const [signOutError, setSignOutError] = React.useState<string | null>(null);

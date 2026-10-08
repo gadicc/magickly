@@ -6,7 +6,10 @@ import { expect, it, vi } from "vitest";
 import MyAppBar from "./MyAppBar";
 
 const auth = vi.hoisted(() => ({
-  session: { data: null as { user: { id: string } } | null, isPending: true },
+  session: {
+    data: null as { user: { id: string; image?: string } } | null,
+    isPending: true,
+  },
 }));
 
 vi.mock("next/navigation", () => ({
@@ -22,7 +25,12 @@ vi.mock("./clientProviders", () => ({
 
 it("hydrates the signed-out server bar even when the client already knows the user", async () => {
   const html = renderToString(<MyAppBar />);
-  auth.session = { data: { user: { id: "user-1" } }, isPending: false };
+  auth.session = {
+    data: { user: { id: "user-1", image: "/avatar.png" } },
+    isPending: false,
+  };
+  // Attribute mismatches are only logged, never reported as recoverable.
+  const logged = vi.spyOn(console, "error").mockImplementation(() => {});
   const container = document.createElement("div");
   container.innerHTML = html;
   document.body.append(container);
@@ -31,6 +39,8 @@ it("hydrates the signed-out server bar even when the client already knows the us
     hydrateRoot(container, <MyAppBar />, { onRecoverableError: recoverable });
   });
   expect(recoverable).not.toHaveBeenCalled();
+  expect(logged).not.toHaveBeenCalled();
+  logged.mockRestore();
   // After hydration the signed-in controls replace the sign-in button.
   expect(
     container.querySelector('[aria-label="account of current user"]'),

@@ -64,6 +64,17 @@ function clipboardAttrs(element: HTMLElement) {
       Array.isArray(meta.attrs)
     )
       return false;
+    // A source-only block must carry one valid semantic node.
+    if (
+      tag === "sourceOnly" &&
+      (typeof meta.raw !== "string" ||
+        validateRitualSemantic({
+          format: "magickli-ritual",
+          version: 1,
+          nodes: [JSON.parse(meta.raw)],
+        }).length)
+    )
+      return false;
     return meta;
   } catch {
     return false;
@@ -393,6 +404,22 @@ export function locateVisualIssue(
 export function normalizeTiptapNodeIds(editor: Editor): boolean {
   const seen = new Set<string>();
   const tr = editor.state.tr;
+  // Nodes an atom carries (a declaration's options, a source-only node) are
+  // renamed here too, once, so a pasted copy keeps stable IDs afterwards.
+  const freshen = (nodes: RitualSemanticNode[]): boolean => {
+    let changed = false;
+    for (const node of nodes) {
+      if (node.kind === "text" || node.kind === "annotation") continue;
+      if (!isRitualNodeId(node.id) || seen.has(node.id)) {
+        node.id = createRitualNodeId();
+        changed = true;
+      }
+      seen.add(node.id);
+      if (node.kind === "element" && node.children && freshen(node.children))
+        changed = true;
+    }
+    return changed;
+  };
   editor.state.doc.descendants((node, pos) => {
     if (
       ![
@@ -404,14 +431,37 @@ export function normalizeTiptapNodeIds(editor: Editor): boolean {
       ].includes(node.type.name)
     )
       return;
-    const id = node.attrs.id;
-    if (typeof id === "string" && isRitualNodeId(id) && !seen.has(id)) {
-      seen.add(id);
-      return;
+    let attrs = node.attrs;
+    let changed = false;
+    const id = attrs.id;
+    if (!(typeof id === "string" && isRitualNodeId(id) && !seen.has(id))) {
+      attrs = { ...attrs, id: createRitualNodeId() };
+      changed = true;
     }
-    const fresh = createRitualNodeId();
-    seen.add(fresh);
-    tr.setNodeMarkup(pos, undefined, { ...node.attrs, id: fresh }, node.marks);
+    seen.add(attrs.id);
+    if (node.type.name === "ritualAtom" && Array.isArray(attrs.children)) {
+      const children = structuredClone(attrs.children);
+      if (freshen(children)) {
+        attrs = { ...attrs, children };
+        changed = true;
+      }
+    }
+    if (attrs.tag === "sourceOnly" && typeof attrs.raw === "string") {
+      try {
+        const inner = JSON.parse(attrs.raw) as RitualSemanticNode;
+        if (inner.kind === "element" || inner.kind === "legacy")
+          inner.id = attrs.id;
+        if (inner.kind === "element" && inner.children) freshen(inner.children);
+        const raw = JSON.stringify(inner);
+        if (raw !== attrs.raw) {
+          attrs = { ...attrs, raw };
+          changed = true;
+        }
+      } catch {
+        // Validated at the clipboard boundary; semanticFromTiptap reports it.
+      }
+    }
+    if (changed) tr.setNodeMarkup(pos, undefined, attrs, node.marks);
   });
   if (!tr.docChanged) return false;
   tr.setMeta("addToHistory", false);
@@ -635,10 +685,20 @@ function fromBlocks(nodes: JSONContent[]): RitualSemanticNode[] {
           id: node.attrs?.id,
           raw: node.attrs?.raw,
         });
-      else if (node.attrs?.tag === "sourceOnly")
+      else if (node.attrs?.tag === "sourceOnly") {
+        let inner: RitualSemanticNode;
+        try {
+          inner = JSON.parse(node.attrs.raw);
+        } catch {
+          throw new Error("A source-only block is damaged. Undo the change.");
+        }
         // The atom's ID wins: identity normalization may have renamed a copy.
-        result.push({ ...JSON.parse(node.attrs.raw), id: node.attrs.id });
-      else
+        result.push(
+          inner.kind === "element" || inner.kind === "legacy"
+            ? { ...inner, id: node.attrs.id }
+            : inner,
+        );
+      } else
         result.push({
           kind: "element",
           id: node.attrs?.id,

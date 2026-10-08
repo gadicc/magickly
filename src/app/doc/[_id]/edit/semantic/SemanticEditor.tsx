@@ -293,18 +293,21 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     const reset = () => {
       last = null;
     };
+    // Not on focus: a click focuses before it moves the selection, which
+    // would scroll the source to the previous node first.
     editor.on("selectionUpdate", report);
-    editor.on("focus", report);
     editor.on("blur", reset);
     return () => {
       editor.off("selectionUpdate", report);
-      editor.off("focus", report);
       editor.off("blur", reset);
     };
   }, [editor, displayMode]);
   const onCaretNode = React.useCallback(
-    (id: string | null) => {
-      if (id && editor && displayMode === "split") revealRitualNode(editor, id);
+    (ids: string[]) => {
+      // Inline spans and nodes inside a source-only block have no visual
+      // block of their own: reveal the nearest enclosing one that does.
+      if (editor && displayMode === "split")
+        ids.some((id) => revealRitualNode(editor, id));
     },
     [editor, displayMode],
   );
@@ -1267,8 +1270,9 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                             key: (current?.key ?? 0) + 1,
                           }));
                         // Open the source panel first; it reveals once mounted.
+                        // Narrow screens show split as Visual, so use Source.
                         if (displayMode === "visual") {
-                          setMode("split");
+                          setMode(narrow ? "source" : "split");
                           setTimeout(show);
                         } else show();
                       }}
@@ -1281,6 +1285,11 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                 {count === 1
                   ? "One structure can only be edited in ritual source; it appears as a “Needs source editing” block."
                   : `${count} structures can only be edited in ritual source; they appear as “Needs source editing” blocks.`}
+                {props.importedFromLegacy && (
+                  <Button href={`/doc/${props.ritualId}/edit?legacy=1`}>
+                    Open Pug editor
+                  </Button>
+                )}
               </Alert>
             );
           })()}

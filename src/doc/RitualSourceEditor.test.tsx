@@ -483,13 +483,13 @@ it("does not replay an applied reveal when it remounts", () => {
 
 it("reports the caret's node while focused and follows without selecting", () => {
   const text = `${RITUAL_PUG_HEADER}\nnote#${id} First\n  | more\nnote#${secondId} Second\n`;
-  const nodes: (string | null)[] = [];
+  const nodes: string[][] = [];
   const props = {
     value: text,
     dialect: "pug" as const,
     disabled: false,
     onChange: () => {},
-    onCaretNode: (node: string | null) => nodes.push(node),
+    onCaretNode: (ids: string[]) => nodes.push(ids),
   };
   const view = render(<RitualSourceEditor {...props} />);
   const editor = EditorView.findFromDOM(
@@ -505,7 +505,7 @@ it("reports the caret's node while focused and follows without selecting", () =>
   act(() => {
     editor.dispatch({ selection: { anchor: editor.state.doc.line(4).from } });
   });
-  expect(nodes).toEqual([id, secondId]);
+  expect(nodes).toEqual([[id], [secondId]]);
   act(() => {
     editor.contentDOM.blur();
   });
@@ -514,4 +514,22 @@ it("reports the caret's node while focused and follows without selecting", () =>
     <RitualSourceEditor {...props} follow={{ id: secondId, key: 1 }} />,
   );
   expect(editor.state.selection.main.from).toBe(before);
+});
+
+it("does not replay an earlier follow when it remounts", () => {
+  const text = `${RITUAL_PUG_HEADER}\nnote#${id} First\nnote#${secondId} Second\n`;
+  render(
+    <RitualSourceEditor
+      value={text}
+      dialect="pug"
+      disabled={false}
+      onChange={() => {}}
+      follow={{ id: secondId, key: 3 }}
+    />,
+  );
+  const editor = EditorView.findFromDOM(
+    document.querySelector(".cm-editor") as HTMLElement,
+  )!;
+  expect(editor.scrollDOM.scrollTop).toBe(0);
+  expect(editor.state.selection.main.from).toBe(0);
 });

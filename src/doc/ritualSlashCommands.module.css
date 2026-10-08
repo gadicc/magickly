@@ -41,8 +41,9 @@
   opacity: 0.7;
 }
 
-/* The empty-line hint is presentation only; it never enters the document. */
-.hint::before {
+/* The empty-line hint is presentation only; it never enters the document,
+   and shows only in the focused editor. */
+:global(.ProseMirror-focused) .hint::before {
   content: attr(data-hint);
   float: left;
   height: 0;

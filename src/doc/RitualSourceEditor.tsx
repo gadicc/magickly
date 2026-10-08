@@ -30,7 +30,7 @@ import React from "react";
 import {
   ritualPugHeaderId,
   ritualPugIdRanges,
-  ritualPugNodeIdAtLine,
+  ritualPugNodeIdsAtLine,
 } from "./ritualPugIds";
 import type { RitualSourceDialect } from "./ritualSource";
 import type { RitualSourceDiagnostic } from "./ritualSourceDiagnostics";
@@ -179,8 +179,8 @@ export default function RitualSourceEditor({
   reveal?: { line: number; key: number } | null;
   /** Scroll a node's header line into view, without selecting it, per `key`. */
   follow?: { id: string; key: number } | null;
-  /** The node the caret is in, reported when it changes while focused. */
-  onCaretNode?(id: string | null): void;
+  /** The nodes around the caret, innermost first, when they change while focused. */
+  onCaretNode?(ids: string[]): void;
 }) {
   const [foldIds, setFoldIds] = React.useState(true);
   const host = React.useRef<HTMLDivElement>(null);
@@ -215,13 +215,14 @@ export default function RitualSourceEditor({
         if (!update.selectionSet && !update.focusChanged && !update.docChanged)
           return;
         const { doc } = update.state;
-        const id = ritualPugNodeIdAtLine(
+        const ids = ritualPugNodeIdsAtLine(
           (line) => doc.line(line).text,
           doc.lineAt(update.state.selection.main.head).number,
         );
-        if (id === caretNode.current) return;
-        caretNode.current = id;
-        latest.current.onCaretNode?.(id);
+        const key = ids.join(" ");
+        if (key === caretNode.current) return;
+        caretNode.current = key;
+        latest.current.onCaretNode?.(ids);
       }),
       ...(dialect === "pug"
         ? [StreamLanguage.define(pug), ...(foldIds ? [ritualIdFolding()] : [])]
@@ -396,9 +397,13 @@ export default function RitualSourceEditor({
     });
     instance.focus();
   }, [reveal]);
+  // Like reveal: a remounted panel must not replay an earlier follow.
+  const followed = React.useRef(follow?.key);
   React.useEffect(() => {
     const instance = view.current;
-    if (!instance || !follow || instance.hasFocus) return;
+    if (!instance || !follow || follow.key === followed.current) return;
+    followed.current = follow.key;
+    if (instance.hasFocus) return;
     const { doc } = instance.state;
     for (let n = 1; n <= doc.lines; n++) {
       const line = doc.line(n);

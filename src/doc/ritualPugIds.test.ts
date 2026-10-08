@@ -3,6 +3,7 @@ import {
   ritualPugHeaderId,
   ritualPugLineOfId,
   ritualPugNodeIdAtLine,
+  ritualPugNodeIdsAtLine,
 } from "./ritualPugIds";
 
 const source = [
@@ -45,4 +46,12 @@ it("finds the line of a node's header", () => {
   expect(ritualPugLineOfId(source, "Keryx00000000001")).toBe(8);
   expect(ritualPugLineOfId(source, "Inline0000000001")).toBeNull();
   expect(ritualPugLineOfId(source, "missing")).toBeNull();
+});
+
+it("lists every enclosing node, innermost first", () => {
+  const chain = (line: number) =>
+    ritualPugNodeIdsAtLine((n) => lines[n - 1], line);
+  expect(chain(3)).toEqual(["Bold000000000001", "Note000000000001"]);
+  expect(chain(11)).toEqual(["Summary000000001", "Say0000000000001"]);
+  expect(chain(1)).toEqual([]);
 });

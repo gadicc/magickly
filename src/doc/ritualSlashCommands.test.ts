@@ -365,3 +365,17 @@ it("leaves a task on Enter in its empty last paragraph", () => {
   const single = setup([task(p())]);
   expect(press(single, "Enter")).toBe(false);
 });
+
+it("offers a section title only at the top level", () => {
+  const note = (...content: JSONContent[]): JSONContent => ({
+    type: "ritualBlock",
+    attrs: { id: "Note000000000001", tag: "note", attrs: {} },
+    content,
+  });
+  const editor = setup([note(p("Inside"), p())]);
+  expect(
+    editor.view.dom.querySelector("[data-hint]")?.getAttribute("data-hint"),
+  ).toBe("Type / for speech, action or note");
+  type(editor, "/tit");
+  expect(document.querySelectorAll('[role="option"]')).toHaveLength(0);
+});

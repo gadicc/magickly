@@ -117,3 +117,73 @@ it("finds the block node around the visual selection for panel following", async
     editor.destroy();
   }
 });
+
+it("gives a pasted copy of a source-only block stable new IDs once", async () => {
+  const { normalizeTiptapNodeIds } = await import("./tiptapRitual");
+  const document = semanticFromJrt({
+    children: [
+      {
+        type: "task",
+        say: true,
+        role: "hiero",
+        children: [
+          {
+            type: "task",
+            do: true,
+            role: "all",
+            children: [{ type: "text", value: "Nested" }],
+          },
+        ],
+      },
+    ],
+  });
+  const element = window.document.createElement("div");
+  const editor = new Editor({
+    element,
+    extensions: ritualTiptapExtensions,
+    content: visualRitualState(document).content,
+  });
+  try {
+    const atom = editor.state.doc.firstChild!;
+    expect(atom.attrs.tag).toBe("sourceOnly");
+    // Duplicate the block in front of the original, as a paste would.
+    editor.view.dispatch(editor.state.tr.insert(0, atom));
+    while (normalizeTiptapNodeIds(editor));
+    const first = semanticFromTiptap(editor.getJSON());
+    const second = semanticFromTiptap(editor.getJSON());
+    expect(second).toEqual(first);
+    const ids = JSON.stringify(first).match(/"id":"[^"]+"/g)!;
+    expect(new Set(ids).size).toBe(ids.length);
+    // The document order keeps the first occurrence's IDs.
+    expect(first.nodes[0]).toMatchObject({
+      id: (document.nodes[0] as { id: string }).id,
+    });
+  } finally {
+    editor.destroy();
+  }
+});
+
+it("rejects pasted source-only blocks whose payload is not a valid node", () => {
+  const element = window.document.createElement("div");
+  const editor = new Editor({
+    element,
+    extensions: ritualTiptapExtensions,
+    content: { type: "doc", content: [{ type: "paragraph" }] },
+  });
+  try {
+    const meta = (raw: string) =>
+      JSON.stringify({
+        id: "Abcdefghijk12345",
+        tag: "sourceOnly",
+        attrs: {},
+        raw,
+      }).replace(/"/g, "&quot;");
+    editor.commands.insertContent(
+      `<div data-ritual-atom="sourceOnly" data-ritual-meta="${meta("{not json")}">x</div>`,
+    );
+    expect(JSON.stringify(editor.getJSON())).not.toContain("sourceOnly");
+    expect(() => semanticFromTiptap(editor.getJSON())).not.toThrow();
+  } finally {
+    editor.destroy();
+  }
+});
