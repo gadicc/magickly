@@ -54,6 +54,14 @@ const SITE_TITLE = "Magick.ly";
 // leading slash that the server-side pathname carries.
 const NOT_FOUND_SEGMENT = "_not-found";
 
+/**
+ * Titles for dynamic routes. The static map cannot hold them, and its
+ * entries are drawer links, which these pages must not become.
+ */
+const patternTitles: readonly [RegExp, PathnameValue][] = [
+  [/^\/doc\/[^/]+\/edit\/semantic\/?$/, "Ritual editor"],
+];
+
 /** `known` is false when the path has no title and the site name stands in. */
 function usePathnameInfo() {
   const browserPathname = usePathname() ?? "/";
@@ -64,6 +72,14 @@ function usePathnameInfo() {
     segment === NOT_FOUND_SEGMENT ? "/" + NOT_FOUND_SEGMENT : browserPathname;
   const navParts: { title: string; url: string }[] = [];
   // if (pathnames[pathname]) return { title: pathnames[pathname], navParts };
+  const pattern = patternTitles.find(([match]) => match.test(titlePath));
+  if (pattern)
+    return {
+      pathname: browserPathname,
+      navParts,
+      title: pattern[1],
+      known: true,
+    };
 
   let navPath = "";
 

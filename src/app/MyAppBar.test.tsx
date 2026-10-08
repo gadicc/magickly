@@ -65,6 +65,12 @@ describe("MyAppBar on the server", () => {
     expect(html).toContain('aria-label="share"');
   });
 
+  it("titles the ritual editor, a dynamic route the map cannot hold", () => {
+    expect(serverRender("/doc/abc123/edit/semantic")).toMatch(
+      /<h1[^>]*>Ritual editor<\/h1>/,
+    );
+  });
+
   it("names the site in a heading on the home page", () => {
     expect(serverRender("/")).toMatch(/<h1[^>]*>Magick\.ly<\/h1>/);
   });

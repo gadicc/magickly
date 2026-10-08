@@ -1034,7 +1034,6 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       sx={{ visibility: access === "checking" ? "hidden" : undefined }}
       aria-hidden={access === "checking"}
     >
-      <h1 className={styles.visuallyHidden}>Ritual editor</h1>
       <header className={styles.header}>
         <TextField
           className={styles.title}
