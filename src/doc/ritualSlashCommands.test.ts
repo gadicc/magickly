@@ -3,6 +3,7 @@ import { Editor, type JSONContent } from "@tiptap/core";
 import { afterEach, expect, it } from "vitest";
 import { registerRitualEditorOwner } from "./ritualEditorOwner";
 import {
+  RITUAL_SLASH_HINT,
   RitualSlashCommands,
   ritualSlashCommandsKey,
 } from "./ritualSlashCommands";
@@ -261,7 +262,7 @@ it("offers a role typed first as speech and action", () => {
   const editor = setup();
   type(editor, "/ker");
   const options = [...document.querySelectorAll('[role="option"]')].map(
-    (option) => option.textContent,
+    (option) => option.firstChild?.textContent,
   );
   expect(options).toEqual(["Keryx · Speech", "Keryx · Action"]);
   press(editor, "ArrowDown");
@@ -277,13 +278,13 @@ it("keeps single letters that match a command to the commands", () => {
   type(editor, "/s");
   expect(
     [...document.querySelectorAll('[role="option"]')].map(
-      (option) => option.textContent,
+      (option) => option.firstChild?.textContent,
     ),
-  ).toEqual(["Say · Speech"]);
+  ).toEqual(["Say · Speech", "Section title"]);
   type(editor, "en");
   expect(
     [...document.querySelectorAll('[role="option"]')].map(
-      (option) => option.textContent,
+      (option) => option.firstChild?.textContent,
     ),
   ).toEqual(["Sentinel · Speech", "Sentinel · Action"]);
 });
@@ -293,7 +294,7 @@ it("matches hyphenated roles typed first", () => {
   type(editor, "/all-o");
   expect(
     [...document.querySelectorAll('[role="option"]')].map(
-      (option) => option.textContent,
+      (option) => option.firstChild?.textContent,
     ),
   ).toEqual(["All officers · Speech", "All officers · Action"]);
 });
@@ -302,7 +303,7 @@ it("ranks roles whose names start with the query first", () => {
   const editor = setup();
   type(editor, "/hi");
   const labels = [...document.querySelectorAll('[role="option"]')]
-    .map((option) => option.textContent)
+    .map((option) => option.firstChild?.textContent)
     .filter((label) => label?.endsWith("Speech"));
   expect(labels.slice(0, 2)).toEqual([
     "Hierophant · Speech",
@@ -310,4 +311,57 @@ it("ranks roles whose names start with the query first", () => {
   ]);
   expect(labels).toContain("Past Hierophant · Speech");
   expect(labels.indexOf("Past Hierophant · Speech")).toBeGreaterThan(1);
+});
+
+it("inserts a note with the caret inside it", () => {
+  const editor = setup();
+  type(editor, "/note");
+  expect(press(editor, "Enter")).toBe(true);
+  expect(editor.state.doc.firstChild?.attrs.tag).toBe("note");
+  type(editor, "Mind the step");
+  expect(semanticFromTiptap(editor.getJSON()).nodes[0]).toMatchObject({
+    tag: "note",
+    children: [{ kind: "text", text: "Mind the step" }],
+  });
+});
+
+it("inserts a section title whose placeholder typing replaces", () => {
+  const editor = setup();
+  type(editor, "/title");
+  expect(press(editor, "Enter")).toBe(true);
+  expect(editor.state.doc.firstChild?.attrs.tag).toBe("title");
+  type(editor, "Closing");
+  expect(semanticFromTiptap(editor.getJSON()).nodes[0]).toMatchObject({
+    tag: "title",
+    attrs: { text: "Closing" },
+  });
+});
+
+it("hints at slash commands in an empty line that accepts them", () => {
+  const editor = setup([p("Existing"), p()]);
+  const hinted = () =>
+    [...editor.view.dom.querySelectorAll("[data-hint]")].map((node) =>
+      node.getAttribute("data-hint"),
+    );
+  expect(RITUAL_SLASH_HINT).toBe(
+    "Type / for speech, action, note or section title",
+  );
+  expect(hinted()).toEqual([RITUAL_SLASH_HINT]);
+  type(editor, "x");
+  expect(hinted()).toEqual([]);
+  // An empty task body keeps its own speech/action hint instead.
+  const empty = setup([task(p())]);
+  expect([...empty.view.dom.querySelectorAll("[data-hint]")].length).toBe(0);
+});
+
+it("leaves a task on Enter in its empty last paragraph", () => {
+  const editor = setup([task(p("Welcome."), p())]);
+  expect(press(editor, "Enter")).toBe(true);
+  expect(editor.state.doc.childCount).toBe(2);
+  expect(editor.state.doc.firstChild?.childCount).toBe(1);
+  expect(editor.state.doc.lastChild?.type.name).toBe("paragraph");
+  expect(editor.state.selection.$from.parent).toBe(editor.state.doc.lastChild);
+  // A task's only paragraph stays put.
+  const single = setup([task(p())]);
+  expect(press(single, "Enter")).toBe(false);
 });

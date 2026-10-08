@@ -4,16 +4,65 @@ import { type Editor, Extension } from "@tiptap/core";
 import { closeHistory } from "@tiptap/pm/history";
 import type { Node } from "@tiptap/pm/model";
 import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
+import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import { roles } from "./ritualBlocks/roles";
 import { RITUAL_SETTINGS_CHANGE } from "./ritualEditorHistory";
 import { ritualEditorOwner } from "./ritualEditorOwner";
+import { createRitualNodeId } from "./ritualNodeIds";
 import { ritualRoleCatalog } from "./ritualRoleCatalog";
 import { roleAliases } from "./ritualRoles";
 import styles from "./ritualSlashCommands.module.css";
 import { ritualTaskContent } from "./ritualTaskCommands";
 
 type Mode = "say" | "do";
-type Choice = { label: string; mode: Mode; role?: string; search: string };
+type Block = "note" | "title";
+type Choice = {
+  label: string;
+  search: string;
+  description?: string;
+  mode?: Mode;
+  role?: string;
+  block?: Block;
+};
+
+/**
+ * Every visual slash command. The menu, its search and the empty-line hint
+ * all read this list, so a new command needs only an entry here (and, for a
+ * new kind of block, its conversion below).
+ */
+export const RITUAL_SLASH_COMMANDS: readonly (Choice & { hint: string })[] = [
+  {
+    mode: "say",
+    label: "Say · Speech",
+    hint: "speech",
+    description: "A role speaks; pick the role next",
+    search: "say speech",
+  },
+  {
+    mode: "do",
+    label: "Do · Action",
+    hint: "action",
+    description: "A role acts; pick the role next",
+    search: "do action",
+  },
+  {
+    block: "note",
+    label: "Note",
+    hint: "note",
+    description: "A note set apart for readers",
+    search: "note",
+  },
+  {
+    block: "title",
+    label: "Section title",
+    hint: "section title",
+    description: "A heading that starts a section",
+    search: "title section heading",
+  },
+];
+const hints = RITUAL_SLASH_COMMANDS.map((command) => command.hint);
+/** Shown in an empty line where slash commands work. */
+export const RITUAL_SLASH_HINT = `Type / for ${hints.slice(0, -1).join(", ")} or ${hints.at(-1)}`;
 type Snapshot = { ownerDoc: Node };
 type CommandState = {
   dismissed: number | null;
@@ -135,12 +184,12 @@ function choices(editor: Editor): Choice[] {
     );
   if (!/^\/[a-z0-9-]*$/i.test(p.text)) return [];
   const query = p.text.slice(1).toLowerCase();
-  const commands = (
-    [
-      { mode: "say", label: "Say · Speech", search: "say speech" },
-      { mode: "do", label: "Do · Action", search: "do action" },
-    ] satisfies Choice[]
-  ).filter((choice) => choice.search.includes(query));
+  const commands = RITUAL_SLASH_COMMANDS.filter(
+    (command) =>
+      command.search.includes(query) &&
+      // Blocks other than tasks only go where the parent editor owns them.
+      (!command.block || ritualEditorOwner(editor) === editor),
+  ).map(({ hint: _hint, ...choice }) => choice);
   // A role typed first (`/ker`) offers that role as Speech and Action. One
   // letter that already matches a command would list half the catalog.
   if (!query || (query.length < 2 && commands.length)) return commands;
@@ -174,21 +223,22 @@ function resolveRole(editor: Editor, input: string): string | null {
     : null;
 }
 
-function convert(editor: Editor, mode: Mode, role: string) {
-  if (!permitted(editor)) return false;
-  const target = insertion(editor);
-  const content = ritualTaskContent(mode, role);
-  if (!target || !content) return false;
-  const task = editor.schema.nodeFromJSON(content);
+/** Replace the command paragraph (or a trailing task paragraph) with `node`. */
+function replaceCommand(
+  editor: Editor,
+  target: NonNullable<ReturnType<typeof insertion>>,
+  node: Node,
+  selectLength = 0,
+) {
   const { pos, $from } = target.paragraph;
   const tr = closeHistory(editor.state.tr);
   let at = pos;
   if (target.sibling !== null) {
     tr.delete(pos, pos + $from.parent.nodeSize);
     at = tr.mapping.map(target.sibling);
-    tr.insert(at, task);
-  } else tr.replaceWith(pos, pos + $from.parent.nodeSize, task);
-  tr.setSelection(TextSelection.create(tr.doc, at + 2));
+    tr.insert(at, node);
+  } else tr.replaceWith(pos, pos + $from.parent.nodeSize, node);
+  tr.setSelection(TextSelection.create(tr.doc, at + 2, at + 2 + selectLength));
   editor.view.dispatch(tr.setMeta(RITUAL_SETTINGS_CHANGE, true));
   editor.view.dispatch(
     closeHistory(editor.state.tr)
@@ -197,6 +247,42 @@ function convert(editor: Editor, mode: Mode, role: string) {
         restore: { ownerDoc: ritualEditorOwner(editor).state.doc },
       }),
   );
+}
+
+function convertBlock(editor: Editor, block: Block) {
+  if (!permitted(editor) || ritualEditorOwner(editor) !== editor) return false;
+  const target = insertion(editor);
+  if (!target) return false;
+  // A title needs text: select a placeholder that typing replaces.
+  const text = block === "title" ? "Section title" : "";
+  replaceCommand(
+    editor,
+    target,
+    editor.schema.nodeFromJSON({
+      type: "ritualBlock",
+      attrs: {
+        id: createRitualNodeId(),
+        tag: block,
+        attrs: text ? { text } : {},
+      },
+      content: [
+        {
+          type: "paragraph",
+          ...(text ? { content: [{ type: "text", text }] } : {}),
+        },
+      ],
+    }),
+    text.length,
+  );
+  return true;
+}
+
+function convert(editor: Editor, mode: Mode, role: string) {
+  if (!permitted(editor)) return false;
+  const target = insertion(editor);
+  const content = ritualTaskContent(mode, role);
+  if (!target || !content) return false;
+  replaceCommand(editor, target, editor.schema.nodeFromJSON(content));
   return true;
 }
 
@@ -206,12 +292,17 @@ function choose(editor: Editor, choice: Choice) {
   if (
     !p ||
     !choices(editor).some(
-      (item) => item.mode === choice.mode && item.role === choice.role,
+      (item) =>
+        item.mode === choice.mode &&
+        item.role === choice.role &&
+        item.block === choice.block,
     )
   )
     return;
-  if (choice.role) convert(editor, choice.mode, choice.role);
-  else
+  if (choice.block) convertBlock(editor, choice.block);
+  else if (choice.mode && choice.role)
+    convert(editor, choice.mode, choice.role);
+  else if (choice.mode)
     editor.view.dispatch(
       editor.state.tr.insertText(
         `/${choice.mode} `,
@@ -220,6 +311,63 @@ function choose(editor: Editor, choice: Choice) {
       ),
     );
   editor.view.focus();
+}
+
+/** The empty paragraph that should show the slash hint, if the caret is in one. */
+function hintPosition(editor: Editor, state: Editor["state"]): number | null {
+  const { selection } = state;
+  const { $from } = selection;
+  if (
+    !selection.empty ||
+    editor.isDestroyed ||
+    !editor.isEditable ||
+    $from.parent.type.name !== "paragraph" ||
+    $from.parent.content.size
+  )
+    return null;
+  // An empty task body already shows its own speech/action hint.
+  const parent = $from.depth > 1 ? $from.node($from.depth - 1) : null;
+  if (parent?.type.name === "ritualTask" && parent.childCount === 1)
+    return null;
+  return insertion(editor) ? $from.before() : null;
+}
+
+/**
+ * Enter on an empty last paragraph of a task leaves the task, as Enter on an
+ * empty list item leaves a list: the paragraph moves after the task, where
+ * the slash hint offers the next speech or action.
+ */
+function leaveTask(editor: Editor) {
+  if (!permitted(editor) || ritualEditorOwner(editor) !== editor) return false;
+  const { selection } = editor.state;
+  const { $from } = selection;
+  const depth = $from.depth;
+  if (
+    !selection.empty ||
+    depth < 2 ||
+    $from.parent.type.name !== "paragraph" ||
+    $from.parent.content.size
+  )
+    return false;
+  const task = $from.node(depth - 1);
+  if (
+    task.type.name !== "ritualTask" ||
+    task.childCount < 2 ||
+    $from.index(depth - 1) !== task.childCount - 1
+  )
+    return false;
+  const host = $from.node(depth - 2);
+  const index = $from.index(depth - 2) + 1;
+  if (!host.canReplaceWith(index, index, editor.schema.nodes.paragraph))
+    return false;
+  const tr = editor.state.tr;
+  const after = $from.after(depth - 1);
+  tr.delete($from.before(), $from.after());
+  const at = tr.mapping.map(after);
+  tr.insert(at, editor.schema.nodes.paragraph.create());
+  tr.setSelection(TextSelection.create(tr.doc, at + 1));
+  editor.view.dispatch(tr.scrollIntoView());
+  return true;
 }
 
 /** Visual-only task commands; normal source/JSON contain ordinary semantic tasks. */
@@ -255,6 +403,18 @@ export const RitualSlashCommands = Extension.create({
           },
         },
         props: {
+          decorations(state) {
+            const at = hintPosition(editor, state);
+            if (at === null) return null;
+            const node = state.doc.nodeAt(at);
+            if (!node) return null;
+            return DecorationSet.create(state.doc, [
+              Decoration.node(at, at + node.nodeSize, {
+                class: styles.hint,
+                "data-hint": RITUAL_SLASH_HINT,
+              }),
+            ]);
+          },
           handleTextInput(view, from, to, text) {
             if (
               text !== " " ||
@@ -293,7 +453,10 @@ export const RitualSlashCommands = Extension.create({
               return ritualEditorOwner(editor).commands.undo();
             }
             const list = choices(editor);
-            if (!list.length) return false;
+            if (!list.length)
+              return event.key === "Enter" && !event.shiftKey
+                ? leaveTask(editor)
+                : false;
             if (event.key === "Escape") {
               view.dispatch(
                 view.state.tr.setMeta(key, {
@@ -345,7 +508,16 @@ export const RitualSlashCommands = Extension.create({
               option.id = `${menu.id}-${i}`;
               option.setAttribute("role", "option");
               option.setAttribute("aria-selected", String(i === index));
-              option.textContent = choice.label;
+              const label = document.createElement("span");
+              label.className = styles.label;
+              label.textContent = choice.label;
+              option.append(label);
+              if (choice.description) {
+                const description = document.createElement("span");
+                description.className = styles.description;
+                description.textContent = choice.description;
+                option.append(description);
+              }
               option.addEventListener("pointerdown", (event) =>
                 event.preventDefault(),
               );
@@ -359,8 +531,15 @@ export const RitualSlashCommands = Extension.create({
             );
             try {
               const rect = view.coordsAtPos(view.state.selection.from);
-              menu.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - 280))}px`;
-              menu.style.top = `${Math.max(8, Math.min(rect.bottom + 4, window.innerHeight - 260))}px`;
+              const { offsetWidth: width, offsetHeight: height } = menu;
+              menu.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - width - 8))}px`;
+              // Below the line when it fits, otherwise above it; never over it.
+              const below = rect.bottom + 4;
+              menu.style.top = `${
+                below + height <= window.innerHeight - 8
+                  ? below
+                  : Math.max(8, rect.top - 4 - height)
+              }px`;
             } catch {
               menu.hidden = true;
             }
