@@ -57,6 +57,7 @@ import {
   type SemanticDraft,
   saveSemanticDraft,
 } from "@/doc/semanticDraft";
+import { withoutEmptyText } from "@/doc/semanticNormalize";
 import {
   fetchSqlRitualSource,
   sendSqlRitualWrite,
@@ -521,14 +522,16 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             !draft.sourceDirty &&
             !draft.sourceConflict &&
             draft.title === props.title &&
-            draft.documentJson === stringify(props.initialDocument) &&
+            stringify(withoutEmptyText(parsed as RitualSemanticDocument)) ===
+              stringify(props.initialDocument) &&
             draft.sourceBuffer ===
               printRitualSource(props.initialDocument, draftDialect)
           ) {
             await clearSemanticDraft(props.actorId, props.ritualId);
             return;
           }
-          let restored = parsed as RitualSemanticDocument;
+          // Drafts saved before empty text was dropped may still carry it.
+          let restored = withoutEmptyText(parsed as RitualSemanticDocument);
           // Older clean Pug buffers retain trivia that their saved JSON dropped.
           // The pending request itself remains immutable; recovered annotations
           // can become an unsaved follow-up after its receipt is confirmed.

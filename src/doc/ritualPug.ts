@@ -94,29 +94,43 @@ function pugAttrs(ast, shorthandIds: ReadonlyMap<string, string>) {
  * IDs (as in the earlier Pug editor); the printer always writes them.
  */
 const textShortcut =
-  /(?<![\w=])(\d{1,2}=\d{1,2})(?:#([A-Za-z0-9-]+))?(?![\w=])|\$\{([A-Za-z0-9_=]+)(?:#([A-Za-z0-9-]+))?\}/g;
+  /(?<![\w=.])(\d{1,2}=\d{1,2})(?:#([A-Za-z0-9-]+))?(?![\w=.])|\$\{([A-Za-z0-9_=]+)(?:#([A-Za-z0-9-]+))?\}/g;
+
+// Where each split node starts within its Pug Text value, for diagnostics.
+const textOffsets = new WeakMap<
+  RitualSemanticNode,
+  { offset: number; id?: number }
+>();
 
 /** Split a Pug Text value into text, grade and variable nodes. */
 function textWithShortcuts(text: string): RitualSemanticNode[] {
   const nodes: RitualSemanticNode[] = [];
   let last = 0;
+  const push = (node: RitualSemanticNode, offset: number, id?: number) => {
+    textOffsets.set(node, { offset, ...(id === undefined ? {} : { id }) });
+    nodes.push(node);
+  };
   for (const match of text.matchAll(textShortcut)) {
     const id = match[2] ?? match[4];
     // A malformed ID leaves the whole match as literal text.
     if (id !== undefined && !isRitualNodeId(id)) continue;
     if (match.index > last)
-      nodes.push({ kind: "text", text: text.slice(last, match.index) });
-    nodes.push({
-      kind: "element",
-      id: id ?? createRitualNodeId(),
-      tag: match[1] ? "grade" : "var",
-      attrs: match[1] ? { grade: match[1] } : { name: match[3] },
-      children: [],
-    });
+      push({ kind: "text", text: text.slice(last, match.index) }, last);
+    push(
+      {
+        kind: "element",
+        id: id ?? createRitualNodeId(),
+        tag: match[1] ? "grade" : "var",
+        attrs: match[1] ? { grade: match[1] } : { name: match[3] },
+        children: [],
+      },
+      match.index,
+      id === undefined ? undefined : match.index + match[0].indexOf("#"),
+    );
     last = match.index + match[0].length;
   }
   if (!nodes.length) return [{ kind: "text", text }];
-  if (last < text.length) nodes.push({ kind: "text", text: text.slice(last) });
+  if (last < text.length) push({ kind: "text", text: text.slice(last) }, last);
   return nodes;
 }
 
@@ -131,6 +145,31 @@ export function ritualPugShortcutIds(
       ids.push({ offset: match.index + match[0].indexOf("#"), id });
   }
   return ids;
+}
+
+/** Whether parsed text nodes equal the printed run, ignoring key order. */
+function sameRun(parsed: RitualSemanticNode[], printed: RitualSemanticNode[]) {
+  return (
+    parsed.length === printed.length &&
+    parsed.every((node, i) => {
+      const other = printed[i];
+      if (node.kind === "text" || other.kind === "text")
+        return (
+          node.kind === "text" &&
+          other.kind === "text" &&
+          node.text === other.text
+        );
+      return (
+        node.kind === "element" &&
+        other.kind === "element" &&
+        node.id === other.id &&
+        node.tag === other.tag &&
+        shortcutKind(other) === node.tag &&
+        node.attrs.grade === other.attrs.grade &&
+        node.attrs.name === other.attrs.name
+      );
+    })
+  );
 }
 
 /** The canonical grade or variable a text shortcut reproduces exactly. */
@@ -192,38 +231,78 @@ function inlineChildren(
     const kind = shortcutKind(next);
     return kind === "grade" ? "0" : kind === "var" ? "$" : "#";
   };
-  const pieces: string[] = [];
+  // Each piece remembers whether it is bare Pug text (literal text or a
+  // shortcut), so runs of those can be checked against the parser.
+  const pieces: { text: string; bare: boolean; node: RitualSemanticNode }[] =
+    [];
+  const tagged = (node: Extract<RitualSemanticNode, { kind: "element" }>) =>
+    `#[${node.tag}#${node.id}${attributeText(node.attrs)}]`;
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i];
     if (--budget.remaining < 0) return null;
     const kind = shortcutKind(node);
     if (node.kind === "text") {
-      pieces.push(
-        literal(i) ? node.text : `#[ritualText(value=${json(node.text)})/]`,
-      );
+      const bare = literal(i);
+      pieces.push({
+        text: bare ? node.text : `#[ritualText(value=${json(node.text)})/]`,
+        bare,
+        node,
+      });
     } else if (node.kind === "element" && kind === "var") {
-      pieces.push(`\${${node.attrs.name}#${node.id}}`);
+      pieces.push({
+        text: `\${${node.attrs.name}#${node.id}}`,
+        bare: true,
+        node,
+      });
     } else if (
       node.kind === "element" &&
       kind === "grade" &&
       // A grade needs a boundary before it, and nothing after its ID that
       // could extend the ID or the grade.
-      !/[\w=]$/.test(pieces.at(-1) ?? "") &&
-      !/^[\w=-]/.test(nextStart(i))
+      !/[\w=.]$/.test(pieces.at(-1)?.text ?? "") &&
+      !/^[\w=.-]/.test(nextStart(i))
     ) {
-      pieces.push(`${node.attrs.grade}#${node.id}`);
+      pieces.push({ text: `${node.attrs.grade}#${node.id}`, bare: true, node });
     } else if (node.kind === "element") {
       const children =
         node.children === undefined
           ? null
           : inlineChildren(node.children, budget);
       if (node.children !== undefined && children === null) return null;
-      pieces.push(
-        `#[${node.tag}#${node.id}${attributeText(node.attrs)}${node.children === undefined ? "/" : children ? ` ${children}` : ""}]`,
-      );
+      pieces.push({
+        text: `#[${node.tag}#${node.id}${attributeText(node.attrs)}${node.children === undefined ? "/" : children ? ` ${children}` : ""}]`,
+        bare: false,
+        node,
+      });
     }
   }
-  return pieces.join("");
+  // Pug reads each run of bare pieces as one Text node, so a shortcut can
+  // combine with its neighbours (`${` + `0=0#ID` + `}` reads as a variable).
+  // Parse every run as the parser will; any difference prints its
+  // shortcuts as tags instead.
+  for (let start = 0; start < pieces.length; ) {
+    if (!pieces[start].bare) {
+      start++;
+      continue;
+    }
+    let end = start;
+    while (end < pieces.length && pieces[end].bare) end++;
+    const run = pieces.slice(start, end);
+    if (
+      run.some((piece) => piece.node.kind === "element") &&
+      !sameRun(
+        textWithShortcuts(run.map((piece) => piece.text).join("")),
+        run.map((piece) => piece.node),
+      )
+    )
+      for (const piece of run)
+        if (piece.node.kind === "element") {
+          piece.text = tagged(piece.node);
+          piece.bare = false;
+        }
+    start = end;
+  }
+  return pieces.map((piece) => piece.text).join("");
 }
 const capitalize = (part: string) => part[0].toUpperCase() + part.slice(1);
 const lineBreak = (node: RitualSemanticNode) =>
@@ -462,14 +541,18 @@ function parseWithLocations(source: string) {
       const converted = convert(node, depth);
       const results = Array.isArray(converted) ? converted : [converted];
       const identity = node.attrs?.find((attr) => attr.name === "id");
-      for (const result of results)
+      for (const result of results) {
+        const within = textOffsets.get(result);
         locations.set(result, {
           line: node.line + 1,
-          column: node.column,
+          column: node.column + (within?.offset ?? 0),
           ...(identity
             ? { id: { line: identity.line + 1, column: identity.column } }
-            : {}),
+            : within?.id !== undefined
+              ? { id: { line: node.line + 1, column: node.column + within.id } }
+              : {}),
         });
+      }
       return results;
     } catch (cause) {
       if (cause instanceof RitualSourceError) throw cause;

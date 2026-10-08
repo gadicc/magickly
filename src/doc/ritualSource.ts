@@ -5,6 +5,7 @@ import {
   type RitualSemanticNode,
   semanticToJrt,
 } from "./semantic";
+import { withoutEmptyText } from "./semanticNormalize";
 
 /** Draft source dialect; saved revisions continue to contain semantic JSON. */
 export type RitualSourceDialect = "pug" | "ritual-text";
@@ -51,7 +52,10 @@ export function restoreDraftSourceAnnotations(
   source: string,
   dialect: RitualSourceDialect,
 ): RitualSemanticDocument {
-  const parsed = parseRitualSource(source, dialect);
+  // Older buffers and drafts may still hold empty text nodes, which the
+  // editor now drops from loaded documents; compare and restore without them.
+  const parsed = withoutEmptyText(parseRitualSource(source, dialect));
+  const authority = withoutEmptyText(document);
   const canonical = (value: unknown) =>
     JSON.stringify(value, (_key, entry) =>
       entry && typeof entry === "object" && !Array.isArray(entry)
@@ -62,7 +66,7 @@ export function restoreDraftSourceAnnotations(
           )
         : entry,
     );
-  if (canonical(semanticToJrt(parsed)) !== canonical(semanticToJrt(document)))
+  if (canonical(semanticToJrt(parsed)) !== canonical(semanticToJrt(authority)))
     throw new Error("The saved source and document need manual recovery");
   const restore = (
     current: RitualSemanticNode[],
@@ -80,6 +84,6 @@ export function restoreDraftSourceAnnotations(
         restore(node.children ?? [], old.children ?? []);
     }
   };
-  restore(parsed.nodes, document.nodes);
+  restore(parsed.nodes, authority.nodes);
   return parsed;
 }

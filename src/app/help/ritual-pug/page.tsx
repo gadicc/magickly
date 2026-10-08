@@ -187,10 +187,13 @@ export default function RitualPugGuide() {
         In text, <code>{"${candidate}"}</code> inserts a variable and{" "}
         <code>0=0</code> a grade, as in the earlier Pug editor. Generated source
         adds their IDs, as <code>{"${candidate#…}"}</code> and{" "}
-        <code>0=0#…</code>. A grade needs a space or punctuation on each side.
-        Text that only looks like a shortcut is kept in an exact{" "}
-        <code>ritualText</code> wrapper. The <code>grade(grade="0=0")/</code>{" "}
-        and <code>var(name="candidate")/</code> tags still work.
+        <code>0=0#…</code>. A grade needs a space or punctuation other than a
+        full stop on each side, so <code>3.1=2</code> stays text. To keep such
+        text literal, write it as{" "}
+        <code>{'#[ritualText(value="${candidate}")/]'}</code>; the editor does
+        this itself for text that only looks like a shortcut. The{" "}
+        <code>grade(grade="0=0")/</code> and <code>var(name="candidate")/</code>{" "}
+        tags still work.
       </p>
       <h2>Images</h2>
       <p>

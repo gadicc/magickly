@@ -11,7 +11,11 @@ import {
   ritualPugTopLevelLines,
 } from "./ritualPug";
 import { ritualPugIdRanges } from "./ritualPugIds";
-import { restorePugDraftAnnotations } from "./ritualSource";
+import {
+  restoreDraftSourceAnnotations,
+  restorePugDraftAnnotations,
+} from "./ritualSource";
+import { ritualSourceDiagnostic } from "./ritualSourceDiagnostics";
 import { parseRitualText, printRitualText } from "./ritualText";
 import {
   type RitualSemanticDocument,
@@ -19,6 +23,7 @@ import {
   semanticFromJrt,
   semanticToJrt,
 } from "./semantic";
+import { withoutEmptyText } from "./semanticNormalize";
 
 describe("bounded semantic Pug", () => {
   for (const name of ["0=0", "1=10", "2=9"])
@@ -763,6 +768,83 @@ describe("grade and variable shortcuts", () => {
       expect(parseRitualPug(printed), printed).toEqual(document);
       expect(printRitualPug(parseRitualPug(printed))).toBe(printed);
     }
+  });
+
+  it("never lets neighbouring text turn a shortcut into another node", () => {
+    const document = note(text("a ${"), grade("Grade00000000001"), text("} b"));
+    const printed = printRitualPug(document);
+    expect(printed).toContain("#[grade#Grade00000000001");
+    expect(parseRitualPug(printed)).toEqual(document);
+    expect(
+      parseRitualPug(
+        `${RITUAL_PUG_HEADER}\nnote#Note000000000001 3.1=2 and 1.0=1.0\n`,
+      ).nodes[0],
+    ).toMatchObject({
+      children: [{ kind: "text", text: "3.1=2 and 1.0=1.0" }],
+    });
+  });
+
+  it("round-trips every short text around a grade or variable", () => {
+    // Exhaustive over a small alphabet of Pug- and shortcut-significant
+    // characters: the class of input a random search can miss.
+    const alphabet = ["$", "{", "}", "0", "=", "#", "a", "-", ".", " "];
+    const texts = [""];
+    for (const first of alphabet) {
+      texts.push(first);
+      for (const second of alphabet) texts.push(first + second);
+    }
+    let checked = 0;
+    for (const middle of [
+      grade("Grade00000000001"),
+      variable("Var0000000000001", "x"),
+    ])
+      for (const before of texts)
+        for (const after of texts) {
+          const children = [
+            ...(before ? [text(before)] : []),
+            middle,
+            ...(after ? [text(after)] : []),
+          ];
+          const document = note(...children);
+          const printed = printRitualPug(document);
+          expect(parseRitualPug(printed), printed).toEqual(document);
+          checked++;
+        }
+    expect(checked).toBe(2 * 111 * 111);
+  }, 60_000);
+
+  it("points diagnostics in a shortcut at the shortcut's own ID", () => {
+    const source = `${RITUAL_PUG_HEADER}\nnote#Ab3k9Qp7Zx2Mn5Rs x 0=0#Ab3k9Qp7Zx2Mn5Rs\n`;
+    let diagnostic: ReturnType<typeof ritualSourceDiagnostic> | undefined;
+    try {
+      parseRitualPug(source);
+    } catch (cause) {
+      diagnostic = ritualSourceDiagnostic(cause, source);
+    }
+    expect(diagnostic).toMatchObject({ line: 2, column: 28 });
+    expect(source.split("\n")[1][27]).toBe("#");
+  });
+
+  it("recovers a draft written before empty text was dropped", () => {
+    const authority = note(text(""), variable("Var0000000000001"), text(""));
+    // An older clean buffer prints the empty text with exact wrappers.
+    const buffer = printRitualPug(authority).replace(
+      "note#Note000000000001",
+      "//- kept comment\nnote#Note000000000001",
+    );
+    expect(buffer).toContain('ritualText(value="")');
+    const recovered = restoreDraftSourceAnnotations(
+      withoutEmptyText(authority),
+      buffer,
+      "pug",
+    );
+    expect(recovered.nodes[0]).toMatchObject({
+      kind: "annotation",
+      text: "kept comment",
+    });
+    expect(recovered.nodes[1]).toEqual(
+      note(variable("Var0000000000001")).nodes[0],
+    );
   });
 
   it("folds the IDs written in shortcuts like other IDs", () => {
