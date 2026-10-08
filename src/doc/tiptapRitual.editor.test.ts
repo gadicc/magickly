@@ -92,3 +92,28 @@ it("shows newlines inside text as collapsible spaces without changing the docume
     editor.destroy();
   }
 });
+
+it("finds the block node around the visual selection for panel following", async () => {
+  const { ritualNodeIdAtSelection, revealRitualNode } = await import(
+    "./ritualPanelFollow"
+  );
+  const document = parseRitualPug(
+    `${RITUAL_PUG_HEADER}\nnote#Note000000000001 Before\nHiero#Ab3k9Qp7Zx2Mn5Rs: Hello #[b#Bold000000000001 there]\n`,
+  );
+  const element = window.document.createElement("div");
+  const editor = new Editor({
+    element,
+    extensions: ritualTiptapExtensions,
+    content: visualRitualState(document).content,
+  });
+  try {
+    editor.commands.setTextSelection(editor.state.doc.content.size - 3);
+    // Inline spans have no header line; the task around them does.
+    expect(ritualNodeIdAtSelection(editor)).toBe("Ab3k9Qp7Zx2Mn5Rs");
+    editor.commands.setTextSelection(3);
+    expect(ritualNodeIdAtSelection(editor)).toBe("Note000000000001");
+    expect(revealRitualNode(editor, "missing")).toBe(false);
+  } finally {
+    editor.destroy();
+  }
+});

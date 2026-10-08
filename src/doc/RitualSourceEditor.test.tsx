@@ -480,3 +480,38 @@ it("does not replay an applied reveal when it remounts", () => {
   expect(editor.state.selection.main.from).toBe(0);
   expect(editor.hasFocus).toBe(false);
 });
+
+it("reports the caret's node while focused and follows without selecting", () => {
+  const text = `${RITUAL_PUG_HEADER}\nnote#${id} First\n  | more\nnote#${secondId} Second\n`;
+  const nodes: (string | null)[] = [];
+  const props = {
+    value: text,
+    dialect: "pug" as const,
+    disabled: false,
+    onChange: () => {},
+    onCaretNode: (node: string | null) => nodes.push(node),
+  };
+  const view = render(<RitualSourceEditor {...props} />);
+  const editor = EditorView.findFromDOM(
+    document.querySelector(".cm-editor") as HTMLElement,
+  )!;
+  act(() => {
+    editor.focus();
+    editor.dispatch({ selection: { anchor: editor.state.doc.line(3).from } });
+  });
+  act(() => {
+    editor.dispatch({ selection: { anchor: editor.state.doc.line(2).to } });
+  });
+  act(() => {
+    editor.dispatch({ selection: { anchor: editor.state.doc.line(4).from } });
+  });
+  expect(nodes).toEqual([id, secondId]);
+  act(() => {
+    editor.contentDOM.blur();
+  });
+  const before = editor.state.selection.main.from;
+  view.rerender(
+    <RitualSourceEditor {...props} follow={{ id: secondId, key: 1 }} />,
+  );
+  expect(editor.state.selection.main.from).toBe(before);
+});

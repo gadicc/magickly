@@ -27,7 +27,11 @@ import {
   WidgetType,
 } from "@uiw/react-codemirror";
 import React from "react";
-import { ritualPugIdRanges } from "./ritualPugIds";
+import {
+  ritualPugHeaderId,
+  ritualPugIdRanges,
+  ritualPugNodeIdAtLine,
+} from "./ritualPugIds";
 import type { RitualSourceDialect } from "./ritualSource";
 import type { RitualSourceDiagnostic } from "./ritualSourceDiagnostics";
 
@@ -157,6 +161,8 @@ export default function RitualSourceEditor({
   fill = false,
   header,
   reveal,
+  follow,
+  onCaretNode,
 }: {
   value: string;
   dialect: RitualSourceDialect;
@@ -171,12 +177,17 @@ export default function RitualSourceEditor({
   header?: React.ReactNode;
   /** Select and scroll to a 1-based line whenever `key` changes. */
   reveal?: { line: number; key: number } | null;
+  /** Scroll a node's header line into view, without selecting it, per `key`. */
+  follow?: { id: string; key: number } | null;
+  /** The node the caret is in, reported when it changes while focused. */
+  onCaretNode?(id: string | null): void;
 }) {
   const [foldIds, setFoldIds] = React.useState(true);
   const host = React.useRef<HTMLDivElement>(null);
   const view = React.useRef<EditorView | null>(null);
-  const latest = React.useRef({ onChange, value });
-  latest.current = { onChange, value };
+  const latest = React.useRef({ onChange, value, onCaretNode });
+  const caretNode = React.useRef<string | null>(null);
+  latest.current = { onChange, value, onCaretNode };
   const previousDialect = React.useRef(dialect);
   const extensions = React.useMemo(
     () => [
@@ -197,6 +208,20 @@ export default function RitualSourceEditor({
       EditorView.updateListener.of((update) => {
         if (update.docChanged)
           latest.current.onChange(update.state.doc.toString());
+        if (!update.view.hasFocus) {
+          caretNode.current = null;
+          return;
+        }
+        if (!update.selectionSet && !update.focusChanged && !update.docChanged)
+          return;
+        const { doc } = update.state;
+        const id = ritualPugNodeIdAtLine(
+          (line) => doc.line(line).text,
+          doc.lineAt(update.state.selection.main.head).number,
+        );
+        if (id === caretNode.current) return;
+        caretNode.current = id;
+        latest.current.onCaretNode?.(id);
       }),
       ...(dialect === "pug"
         ? [StreamLanguage.define(pug), ...(foldIds ? [ritualIdFolding()] : [])]
@@ -371,6 +396,25 @@ export default function RitualSourceEditor({
     });
     instance.focus();
   }, [reveal]);
+  React.useEffect(() => {
+    const instance = view.current;
+    if (!instance || !follow || instance.hasFocus) return;
+    const { doc } = instance.state;
+    for (let n = 1; n <= doc.lines; n++) {
+      const line = doc.line(n);
+      if (ritualPugHeaderId(line.text) !== follow.id) continue;
+      const block = instance.lineBlockAt(line.from);
+      const top = instance.scrollDOM.scrollTop;
+      const visible =
+        block.top >= top &&
+        block.bottom <= top + instance.scrollDOM.clientHeight;
+      if (!visible)
+        instance.dispatch({
+          effects: EditorView.scrollIntoView(line.from, { y: "center" }),
+        });
+      return;
+    }
+  }, [follow]);
   const hasDiagnostic = diagnostic?.source === value;
   const tools = (dialect === "pug" || hasDiagnostic) && (
     <div

@@ -27,7 +27,12 @@ import RitualSourceEditor from "@/doc/RitualSourceEditor";
 import RitualVisualControls, {
   modifierLabel,
 } from "@/doc/RitualVisualControls";
+import {
+  revealRitualNode,
+  ritualNodeIdAtSelection,
+} from "@/doc/ritualPanelFollow";
 import { ritualPugTopLevelLines } from "@/doc/ritualPug";
+import { ritualPugLineOfId } from "@/doc/ritualPugIds";
 import {
   detectRitualSourceDialect,
   parseRitualSource,
@@ -166,16 +171,14 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         ? ritualPugTopLevelLines(source.text)?.[issue.index]
         : undefined;
     if (parsed) return parsed;
-    const index = issue.id
-      ? source.text
-          .split("\n")
-          .findIndex(
-            (line) =>
-              line.match(/^(?:\* )?[^\s(#]*#([A-Za-z0-9-]+)/)?.[1] === issue.id,
-          )
-      : -1;
-    return index < 0 ? null : index + 1;
+    return issue.id ? ritualPugLineOfId(source.text, issue.id) : null;
   }, [visualIssue, document, source.text, source.dialect, source.dirty]);
+  // In split view the other panel follows the caret's node, never its own
+  // caret or focus, and only when that node changes.
+  const [follow, setFollow] = React.useState<{
+    id: string;
+    key: number;
+  } | null>(null);
   const [reveal, setReveal] = React.useState<{
     line: number;
     key: number;
@@ -276,6 +279,35 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       }
     },
   });
+
+  React.useEffect(() => {
+    if (!editor || displayMode !== "split") return;
+    let last: string | null = null;
+    const report = () => {
+      if (!editor.view.hasFocus()) return;
+      const id = ritualNodeIdAtSelection(editor);
+      if (!id || id === last) return;
+      last = id;
+      setFollow((current) => ({ id, key: (current?.key ?? 0) + 1 }));
+    };
+    const reset = () => {
+      last = null;
+    };
+    editor.on("selectionUpdate", report);
+    editor.on("focus", report);
+    editor.on("blur", reset);
+    return () => {
+      editor.off("selectionUpdate", report);
+      editor.off("focus", report);
+      editor.off("blur", reset);
+    };
+  }, [editor, displayMode]);
+  const onCaretNode = React.useCallback(
+    (id: string | null) => {
+      if (id && editor && displayMode === "split") revealRitualNode(editor, id);
+    },
+    [editor, displayMode],
+  );
 
   React.useEffect(() => {
     if (!editor) return;
@@ -1278,6 +1310,8 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             <RitualSourceEditor
               fill
               reveal={reveal}
+              follow={follow}
+              onCaretNode={onCaretNode}
               header={
                 <>
                   <Typography
