@@ -205,6 +205,7 @@ export default function RitualVisualControls({
   editor,
   disabled,
   syncingSource = false,
+  waitReason = "The visual panel is catching up with ritual source.",
   concealed = false,
   actorId,
   ritualId,
@@ -214,14 +215,15 @@ export default function RitualVisualControls({
   disabled: boolean;
   /** Source owns the document until its debounced parse applies; keep command presentation steady. */
   syncingSource?: boolean;
+  /** Why commands are briefly inactive while `syncingSource` is set. */
+  waitReason?: string;
   concealed?: boolean;
   actorId?: string;
   ritualId?: string;
   title?: string;
 }) {
   const blocked = disabled || syncingSource;
-  const sourceWaitReason =
-    "The visual panel is catching up with ritual source.";
+  const sourceWaitReason = waitReason;
   const selected = useEditorState({
     editor,
     selector: ({ editor: current }) => selectionTarget(current),

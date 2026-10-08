@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   ButtonGroup,
+  CircularProgress,
   IconButton,
   Menu,
   MenuItem,
@@ -960,6 +961,9 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   };
 
   const sourceProblem = source.conflict || (!!sourceError && source.dirty);
+  // A request is pending from the moment Save starts; only one left pending
+  // after its attempt (failed or unknown) asks the author to retry.
+  const retryPending = !!pending && !saving;
   const sourceSyncing = source.dirty || sourceComposing;
   const canSave =
     access === "ready" &&
@@ -1037,13 +1041,14 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           variant="standard"
           placeholder="Untitled ritual"
           value={title}
-          disabled={access !== "ready" || !!pending || !!stale}
+          // Read-only, not disabled, while saving: no grey flash on every save.
+          disabled={access !== "ready" || retryPending || !!stale}
           onChange={(event) => {
             skipPersist.current = false;
             setTitle(event.target.value);
           }}
           slotProps={{
-            htmlInput: { "aria-label": "Title" },
+            htmlInput: { "aria-label": "Title", readOnly: !!pending },
             input: { sx: { fontSize: "1.25rem" } },
           }}
         />
@@ -1089,20 +1094,25 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           variant="contained"
           disabled={
             access !== "ready" ||
-            saving ||
             !!stale ||
             (!pending && (!!error || sourceProblem || !unsaved))
           }
-          inactive={!pending && sourceSyncing}
+          // Saving keeps the button steady; the spinner shows the wait.
+          inactive={saving || (!pending && sourceSyncing)}
           inactiveReason={
-            sourceProblem
-              ? "Fix the ritual source error first."
-              : "The visual panel is catching up with ritual source."
+            saving
+              ? "Saving…"
+              : sourceProblem
+                ? "Fix the ritual source error first."
+                : "The visual panel is catching up with ritual source."
+          }
+          startIcon={
+            saving ? <CircularProgress size={16} color="inherit" /> : undefined
           }
           title={`Save (${modifierLabel}S)`}
           onClick={save}
         >
-          {pending ? "Retry save" : "Save"}
+          {retryPending ? "Retry save" : "Save"}
         </EditorActionButton>
         <IconButton
           aria-label="More editor actions"
@@ -1245,7 +1255,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         {publicationMessage && (
           <Alert severity="info">{publicationMessage}</Alert>
         )}
-        {pending && (
+        {retryPending && (
           <Alert severity="warning">
             A save is pending. Retry it unchanged before making another edit.
           </Alert>
@@ -1377,13 +1387,15 @@ export default function SemanticEditor(props: SemanticEditorProps) {
               editor={editor}
               concealed={access === "checking"}
               disabled={
-                access !== "ready" ||
-                saving ||
-                !!pending ||
-                !!stale ||
-                sourceProblem
+                access !== "ready" || retryPending || !!stale || sourceProblem
               }
-              syncingSource={sourceSyncing}
+              // A normal save only pauses commands; keep the toolbar steady.
+              syncingSource={sourceSyncing || saving}
+              waitReason={
+                saving
+                  ? "Saving…"
+                  : "The visual panel is catching up with ritual source."
+              }
               actorId={props.actorId}
               ritualId={props.ritualId}
               title={title}

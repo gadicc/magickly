@@ -382,6 +382,49 @@ it("saves on the S key position under non-Latin layouts", async () => {
   await waitFor(() => expect(mock.send).toHaveBeenCalledOnce());
 });
 
+it("keeps the layout steady while a save is in flight", async () => {
+  mock.load.mockResolvedValue(undefined);
+  mock.saveDraft.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  let settle!: (value: null) => void;
+  mock.send.mockImplementation(
+    () =>
+      new Promise((resolve) => {
+        settle = resolve;
+      }),
+  );
+  render(<SemanticEditor {...setup} />);
+  await changeTitle();
+  const save = screen.getByRole("button", {
+    name: "Save",
+  }) as HTMLButtonElement;
+  const className = save.className;
+  fireEvent.click(save);
+  await waitFor(() => expect(mock.send).toHaveBeenCalledOnce());
+  expect(screen.queryByText(/A save is pending/)).toBeNull();
+  expect(save.disabled).toBe(false);
+  expect(save.className).toBe(className);
+  expect(save.querySelector('[role="progressbar"]')).toBeTruthy();
+  const title = screen.getByRole("textbox", {
+    name: "Title",
+  }) as HTMLInputElement;
+  expect(title.disabled).toBe(false);
+  expect(title.readOnly).toBe(true);
+  expect(screen.getByRole("status").textContent).toBe("Saving…");
+  const speech = screen.getByRole("button", {
+    name: "Speech",
+  }) as HTMLButtonElement;
+  expect(speech.disabled).toBe(false);
+  expect(speech.getAttribute("aria-disabled")).toBe("true");
+  await act(async () => {
+    settle(null);
+  });
+  // An unknown outcome is the case that needs the author's attention.
+  await screen.findByText(/A save is pending/);
+  expect(screen.getByRole("button", { name: "Retry save" })).toBeTruthy();
+});
+
 it("treats a visual undo back to the confirmed document as saved", async () => {
   mock.load.mockResolvedValue(undefined);
   mock.saveDraft.mockResolvedValue(undefined);
