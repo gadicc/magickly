@@ -1,4 +1,5 @@
 "use client";
+import useHydrated from "@magick-components/hooks/useHydrated";
 import {
   AccountCircle,
   ArrowDropDown,
@@ -263,7 +264,11 @@ export default function ButtonAppBar() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   const session = useSession();
-  const userId = session.data?.user.id ?? null;
+  // The server renders signed out. A cached session can be known on the
+  // first client render, which would hydrate a different tree; match the
+  // server until hydration.
+  const hydrated = useHydrated();
+  const userId = hydrated ? (session.data?.user.id ?? null) : null;
   const avatarSrc = session.data?.user.image;
   const recovery = useLegacyRecoveryGate();
   const [signOutPending, setSignOutPending] = React.useState(false);
