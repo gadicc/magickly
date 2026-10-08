@@ -12,6 +12,7 @@ import {
   createSemanticImportReport,
   type SemanticImportReport,
 } from "@/doc/semanticImportReport";
+import { withoutEmptyText } from "@/doc/semanticNormalize";
 import { resolveSqlRitualRouteId, sqlRitualReader } from "@/doc/sqlRuntime";
 import { privateMetadata } from "@/seo/metadata";
 import SemanticEditorShell from "./SemanticEditorShell";
@@ -102,6 +103,8 @@ export default async function SemanticEditPage({
       </Alert>
     );
   }
+  // After the import report's exact check: empty text renders nothing.
+  document = withoutEmptyText(document);
   return (
     <SemanticEditorShell
       key={ritualId}
