@@ -309,4 +309,13 @@ Follow-ups are separate from the completed migration work:
   ships the book twice, byte for byte, at a cost of about 264 kB. Trimming it
   changes the contents of a URL the page links, so it wants its own decision.
 
+- Temple administration: a guide at `/help/temples`, member removal and
+  leaving, editable ritual access and per-temple forums are done; see
+  [plan 057](057-temple-administration.md). TODO from it: an audit log of
+  access changes, the creator-rights gap when a ritual moves to a group, an
+  opt-in for forum sharing of member emails, and a list of feature ideas
+  ([plan 057](057-temple-administration.md#follow-ups)). Temple documents are a
+  proposal with questions for the operator in
+  [plan 058](058-temple-documents.md).
+
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.
