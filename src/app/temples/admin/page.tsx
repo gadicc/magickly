@@ -31,6 +31,11 @@ export default async function AdminTemplesPage() {
   return (
     <Container sx={{ my: 2 }}>
       <Typography variant="h5">Temples you administer</Typography>
+      <Typography variant="body2" sx={{ mt: 1 }}>
+        <Link href="/help/temples">
+          What are temples, and what can I do as an administrator?
+        </Link>
+      </Typography>
       {manageable.temples.length ? (
         <ol>
           {manageable.temples.map((temple) => (

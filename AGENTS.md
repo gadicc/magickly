@@ -22,3 +22,13 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Documentation screenshots
+
+Help pages with screenshots (today `src/app/help/temples`) get their images
+from `scripts/docs-screenshots`, never by hand. When you change a page that
+shows them, or a screen they show (temples, the ritual list or creation form,
+the ritual editor, the reader), regenerate the images and commit them with the
+change. Read `scripts/docs-screenshots/README.md` first: it covers running the
+seed and capture, adding a shot, and the rule that images contain only
+synthetic data (no real temple, member or email; ritual titles are fine).

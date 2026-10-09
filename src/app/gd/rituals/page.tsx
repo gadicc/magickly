@@ -107,7 +107,8 @@ export default async function Rituals() {
         <p>
           To share private rituals with temple members, open{" "}
           <Link href="/temples">My Temples</Link>. From there, you can join an
-          existing temple or create and manage one.
+          existing temple or create and manage one; the{" "}
+          <Link href="/help/temples">temples guide</Link> explains how.
         </p>
         <p style={{ fontSize: "80%" }}>
           <Link href="/about#credits">Image credits</Link>

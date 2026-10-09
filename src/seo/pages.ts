@@ -186,6 +186,12 @@ export const PUBLIC_PAGES = {
       "The sixteen geomantic figures with their meanings and correspondences, " +
       "sortable by pairs, name or binary value.",
   },
+  "/help/temples": {
+    title: "Temples and private rituals",
+    description:
+      "Run a temple on Magick.ly: manage members and grades, invite people, and " +
+      "keep private rituals readable by grade, on any device.",
+  },
   "/help/ritual-pug": {
     title: "Ritual Pug guide",
     description:

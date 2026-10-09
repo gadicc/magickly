@@ -104,6 +104,11 @@ export default async function TemplePage({
           <Button href="/temples/admin" variant="outlined">
             Create or manage temples
           </Button>
+          <Typography sx={{ mt: 1 }}>
+            <Link href="/help/temples">
+              What are temples, and what can I do as an administrator?
+            </Link>
+          </Typography>
         </>
       ) : null}
     </Container>

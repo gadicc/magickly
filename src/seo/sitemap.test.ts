@@ -27,14 +27,16 @@ describe("sitemap", () => {
   it("leaves out private pages and query variants", () => {
     for (const url of urls) {
       expect(url).toMatch(/^https:\/\/magick\.ly(\/[^?#]*)?$/);
+      // The temples guide under /help is public; the temple screens are not.
       expect(url).not.toMatch(
-        /\/(admin|signin|temples|upload|offline|chat\/train|gd\/components)\b/,
+        /\/(admin|signin|upload|offline|chat\/train|gd\/components)\b|^https:\/\/magick\.ly\/temples\b/,
       );
     }
   });
 
-  it("indexes current authoring help but excludes retired syntax recovery", () => {
+  it("indexes current authoring and temple help but excludes retired syntax recovery", () => {
     expect(urls).toContain("https://magick.ly/help/ritual-pug");
+    expect(urls).toContain("https://magick.ly/help/temples");
     expect(urls).not.toContain("https://magick.ly/help/ritual-text");
   });
 
