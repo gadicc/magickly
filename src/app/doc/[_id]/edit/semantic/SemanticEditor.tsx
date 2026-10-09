@@ -10,6 +10,9 @@ import {
   Button,
   ButtonGroup,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
   IconButton,
   Menu,
   MenuItem,
@@ -75,6 +78,34 @@ import { createUuidV7 } from "@/lib/ids";
 import { getBrowserOfflineRuntime } from "@/offline/browserRuntime";
 import styles from "./SemanticEditor.module.css";
 import type { SemanticEditorProps } from "./SemanticEditorShell";
+
+// Loaded on first use: it calls server actions, which the editor's own tests
+// and first paint have no need of.
+const RitualAccessDialog = React.lazy(() =>
+  import("./RitualAccessDialog").catch(() => ({
+    // Offline or a stale deployment: say so instead of tearing the editor down.
+    default: function RitualAccessUnavailable({
+      onClose,
+    }: {
+      onClose: () => void;
+      ritualId?: string;
+      actorId?: string;
+      open?: boolean;
+    }) {
+      return (
+        <Dialog open onClose={onClose}>
+          <DialogContent>
+            Who can read this ritual could not be loaded. Check your connection
+            and try again.
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={onClose}>Close</Button>
+          </DialogActions>
+        </Dialog>
+      );
+    },
+  })),
+);
 
 type SaveRequest = Extract<SqlRitualWriteRequest, { kind: "save" }>;
 interface SourceState {
@@ -185,6 +216,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     key: number;
   } | null>(null);
   const [menuAnchor, setMenuAnchor] = React.useState<HTMLElement | null>(null);
+  const [accessOpen, setAccessOpen] = React.useState(false);
   const [conversionNotice, setConversionNotice] = React.useState(true);
   const [publicationMessage, setPublicationMessage] = React.useState<
     string | null
@@ -1201,6 +1233,14 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             View ritual
           </MenuItem>
           <MenuItem
+            onClick={() => {
+              setMenuAnchor(null);
+              setAccessOpen(true);
+            }}
+          >
+            Who can read this ritual…
+          </MenuItem>
+          <MenuItem
             component="a"
             href="/help/ritual-pug"
             target="_blank"
@@ -1210,6 +1250,16 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             Ritual Pug guide (opens in a new tab)
           </MenuItem>
         </Menu>
+        {accessOpen && (
+          <React.Suspense fallback={null}>
+            <RitualAccessDialog
+              ritualId={props.ritualId}
+              actorId={props.actorId}
+              open
+              onClose={() => setAccessOpen(false)}
+            />
+          </React.Suspense>
+        )}
       </header>
       <div className={styles.notices}>
         {props.importedFromLegacy && conversionNotice && (

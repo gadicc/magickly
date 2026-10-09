@@ -144,7 +144,7 @@ export function getRitualAccess(
   return { read, edit, readSourceHistory: edit };
 }
 
-function sameScope(a: RitualScope, b: RitualScope): boolean {
+export function sameScope(a: RitualScope, b: RitualScope): boolean {
   if (a.kind !== b.kind) return false;
   if (a.kind === "public" && b.kind === "public") return true;
   if (a.kind === "group" && b.kind === "group") return a.groupId === b.groupId;
@@ -182,6 +182,47 @@ export function authorizeRitualContentUpdate(
   }
   // The proposed policy is identical, so the existing editor grant still applies.
   return { allowed: true };
+}
+
+/**
+ * Who a ritual is readable by is its scope. Changing it is a separate command
+ * from saving content (see authorizeRitualContentUpdate). The caller must edit
+ * the ritual as it stands and, for a new private scope, administer that group
+ * or temple, as creation requires; a global administrator may do any of it.
+ * Only global administrators make a ritual public or take one out of public.
+ * Naming the current scope again is allowed and changes nothing.
+ */
+export function authorizeRitualScopeChange(
+  current: RitualPolicy | null,
+  proposed: unknown,
+  principal: RitualPrincipal | null,
+): RitualDecision {
+  if (!principal || !getRitualAccess(current, principal).edit)
+    return { allowed: false, reason: "not-an-editor" };
+  const scope = parseRitualScope(proposed);
+  if (!scope) return { allowed: false, reason: "invalid-policy" };
+  const from = (current as RitualPolicy).scope;
+  if (sameScope(from, scope)) return { allowed: true };
+  // Publishing and un-publishing are both for global administrators: a public
+  // ritual belongs to everyone who may already be reading or linking to it.
+  if (from.kind === "public" && principal.globalAdmin !== true)
+    return { allowed: false, reason: "not-global-admin" };
+  if (scope.kind === "public")
+    return principal.globalAdmin === true
+      ? { allowed: true }
+      : { allowed: false, reason: "not-global-admin" };
+  if (
+    principal.globalAdmin === true ||
+    (scope.kind === "group" &&
+      principal.groupAdminIds.includes(scope.groupId)) ||
+    (scope.kind === "temple" &&
+      principal.templeMemberships.some(
+        (membership) =>
+          membership.templeId === scope.templeId && membership.admin === true,
+      ))
+  )
+    return { allowed: true };
+  return { allowed: false, reason: "not-a-scope-admin" };
 }
 
 /** New revision IDs/timestamps/authors are server-generated in the save command. */

@@ -154,6 +154,26 @@ const shots: Shot[] = [
     padding: 6,
   },
   {
+    name: "ritual-access",
+    persona: "creator",
+    viewport: [1100, 800],
+    open: async (b) => {
+      const path = await ritualPath(b, "Zelator 1=10 (sample)");
+      await b.goto(`${base}${path}/edit/semantic`);
+      await b.waitFor(editorReady);
+      await sleep(1500);
+      await b.click("button", "More editor actions");
+      await sleep(400);
+      await b.click("li", "Who can read this ritual");
+      await b.waitFor(
+        `document.body.textContent.includes('can currently be read by')`,
+      );
+      await sleep(500);
+    },
+    clip: `[...document.querySelectorAll('.MuiDialog-paper')].filter((e) => e.textContent.includes('Who can read this ritual'))`,
+    padding: 0,
+  },
+  {
     name: "ritual-list-grade-1",
     persona: "reader",
     viewport: [1000, 800],

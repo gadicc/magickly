@@ -41,6 +41,7 @@ export default defineConfig({
         "src/doc/sqlReads.ts",
         "src/doc/sqlRendered.ts",
         "src/doc/sqlWrites.ts",
+        "src/doc/sqlScope.ts",
         "src/doc/sqlPolicy.ts",
         "src/doc/compileContract.ts",
         "src/doc/publicShells.ts",

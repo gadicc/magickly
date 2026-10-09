@@ -6,6 +6,7 @@ import {
   authorizeRitualContentUpdate,
   authorizeRitualCreation,
   authorizeRitualPublication,
+  authorizeRitualScopeChange,
   getRitualAccess,
   parseRitualScope,
   type RitualPolicy,
@@ -615,6 +616,132 @@ describe("nullable unresolved creator", () => {
     expect(authorizeRitualCreation(unresolved, principal)).toEqual({
       allowed: false,
       reason: "creator-mismatch",
+    });
+  });
+});
+
+describe("changing who can read a ritual", () => {
+  const toOther = { kind: "temple", templeId: "other", minGrade: 0 };
+  const admin = (templeId = "temple", otherTemple = "other") =>
+    actor({
+      templeMemberships: [
+        { templeId, grade: 0, admin: true },
+        { templeId: otherTemple, grade: 0, admin: true },
+      ],
+    });
+
+  it("lets a temple administrator change the minimum grade or the destination they also administer", () => {
+    const grade = { kind: "temple", templeId: "temple", minGrade: 5 };
+    expect(
+      authorizeRitualScopeChange(templeDoc, grade, member(0, true)),
+    ).toEqual({ allowed: true });
+    expect(authorizeRitualScopeChange(templeDoc, toOther, admin())).toEqual({
+      allowed: true,
+    });
+    expect(
+      authorizeRitualScopeChange(
+        templeDoc,
+        { kind: "group", groupId: "mine" },
+        actor({
+          groupAdminIds: ["mine"],
+          templeMemberships: [{ templeId: "temple", grade: 0, admin: true }],
+        }),
+      ),
+    ).toEqual({ allowed: true });
+  });
+
+  it("needs edit rights now and administration of the destination", () => {
+    // Not an editor: members, outsiders and anonymous callers.
+    for (const principal of [null, actor(), member(6), member(0, false)])
+      expect(
+        authorizeRitualScopeChange(templeDoc, templeDoc.scope, principal),
+      ).toEqual({ allowed: false, reason: "not-an-editor" });
+    // An editor who does not administer the destination.
+    expect(
+      authorizeRitualScopeChange(templeDoc, toOther, member(0, true)),
+    ).toEqual({ allowed: false, reason: "not-a-scope-admin" });
+    expect(
+      authorizeRitualScopeChange(
+        templeDoc,
+        { kind: "group", groupId: "theirs" },
+        actor({
+          groupAdminIds: ["mine"],
+          templeMemberships: [{ templeId: "temple", grade: 0, admin: true }],
+        }),
+      ),
+    ).toEqual({ allowed: false, reason: "not-a-scope-admin" });
+    // A creator who is a plain member edits, but administers nothing.
+    expect(
+      authorizeRitualScopeChange(
+        templeDoc,
+        { kind: "temple", templeId: "temple", minGrade: 0 },
+        creatorMember,
+      ),
+    ).toEqual({ allowed: false, reason: "not-a-scope-admin" });
+  });
+
+  it("lets only a global administrator make a ritual public or private again, and anyone who edits it name its current scope", () => {
+    for (const principal of [member(0, true), creatorMember, admin()])
+      expect(
+        authorizeRitualScopeChange(templeDoc, { kind: "public" }, principal),
+      ).toEqual({ allowed: false, reason: "not-global-admin" });
+    expect(
+      authorizeRitualScopeChange(
+        templeDoc,
+        { kind: "public" },
+        actor({ globalAdmin: true }),
+      ),
+    ).toEqual({ allowed: true });
+    // Already public: naming it again is a no-op even for a creator.
+    expect(
+      authorizeRitualScopeChange(
+        publicDoc,
+        { kind: "public" },
+        actor({ userId: "creator" }),
+      ),
+    ).toEqual({ allowed: true });
+    // Taking a ritual out of public is for global administrators too, even
+    // for its creator who administers the destination.
+    expect(
+      authorizeRitualScopeChange(
+        publicDoc,
+        { kind: "temple", templeId: "temple", minGrade: 1 },
+        actor({
+          userId: "creator",
+          templeMemberships: admin().templeMemberships,
+        }),
+      ),
+    ).toEqual({ allowed: false, reason: "not-global-admin" });
+    expect(
+      authorizeRitualScopeChange(
+        publicDoc,
+        { kind: "temple", templeId: "temple", minGrade: 1 },
+        actor({ globalAdmin: true }),
+      ),
+    ).toEqual({ allowed: true });
+  });
+
+  it("lets a global administrator choose any valid scope and rejects malformed ones", () => {
+    const global = actor({ globalAdmin: true });
+    for (const scope of [groupDoc.scope, toOther, zeroDoc.scope])
+      expect(authorizeRitualScopeChange(templeDoc, scope, global)).toEqual({
+        allowed: true,
+      });
+    for (const bad of [
+      null,
+      {},
+      { kind: "temple", templeId: "temple" },
+      { kind: "public", templeId: "temple" },
+      { kind: "owner" },
+    ])
+      expect(authorizeRitualScopeChange(templeDoc, bad, global)).toEqual({
+        allowed: false,
+        reason: "invalid-policy",
+      });
+    // A malformed stored policy fails closed, even for a global admin.
+    expect(authorizeRitualScopeChange(null, templeDoc.scope, global)).toEqual({
+      allowed: false,
+      reason: "not-an-editor",
     });
   });
 });

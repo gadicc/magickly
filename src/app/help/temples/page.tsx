@@ -14,6 +14,7 @@ import members from "./images/members.webp";
 import myTemples from "./images/my-temples.webp";
 import readerPhone from "./images/reader-phone.webp";
 import removeMember from "./images/remove-member.webp";
+import ritualAccess from "./images/ritual-access.webp";
 import ritualList from "./images/ritual-list-grade-1.webp";
 
 export const metadata = pageMetadata("/help/temples");
@@ -247,16 +248,28 @@ export default function TemplesGuide() {
       >
         One list, a different view for each grade.
       </Figure>
+      <p>
+        The visibility and minimum grade are not fixed at creation. Open the
+        ritual in the editor, choose the <strong>⋮</strong> menu and{" "}
+        <strong>Who can read this ritual…</strong>. A temple administrator can
+        raise or lower the minimum grade, or move the ritual to another temple
+        or group they also administer. Only Magick.ly’s site administrators can
+        make a ritual public, after a warning, because everyone, signed in or
+        not, can then read it.
+      </p>
+      <Figure
+        image={ritualAccess}
+        alt="The Who can read this ritual dialog: the ritual is readable by members of the Example temple at grade 1 and above, with a Readable by menu, a Minimum grade field and Close and Save buttons."
+        maxWidth={560}
+      >
+        Changing who can read a ritual. It takes effect at once.
+      </Figure>
       <p>Some things to know:</p>
       <ul>
         <li>
           Readers get the finished ritual, not its source or edit history. Only
           the temple’s administrators, and the ritual’s creator for as long as
           they remain in the temple, can open the editor.
-        </li>
-        <li>
-          A ritual’s temple and minimum grade are chosen when it is created and
-          are not changed afterwards.
         </li>
         <li>
           Rituals on Magick.ly are for people who already have a teacher or have
@@ -347,6 +360,11 @@ export default function TemplesGuide() {
           device and closed wherever it was open.
         </li>
         <li>
+          <strong>Raise a ritual’s minimum grade</strong> (or move it) and
+          everyone who no longer qualifies loses it in the same way, as if their
+          own grade had dropped.
+        </li>
+        <li>
           <strong>Remove someone from the temple</strong>, or let them leave,
           and every temple ritual goes with them, including the ones they
           created. The same applies to a downloaded copy on their device.
@@ -390,10 +408,6 @@ export default function TemplesGuide() {
 
       <h2 id="limits">What it does not do (yet)</h2>
       <ul>
-        <li>
-          Visibility and minimum grade cannot be changed after a ritual is
-          created.
-        </li>
         <li>Temples cannot be renamed or deleted from the site.</li>
       </ul>
       <p>
