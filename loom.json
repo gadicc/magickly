@@ -138,6 +138,22 @@
         "release": {
           "productionBranch": "main"
         }
+      },
+      "managedTasks": {
+        "db:fixtures": "c1:d2b6a4f963f3dc74413d67f5b74c300336fb7935d0a2f437f6e6c887062c402a",
+        "db:generate": "c1:89fab7cdf625d4dca54ce9b5e080799d20458f977273a90d227866aaac1f179a",
+        "db:migrate": "c1:d677c0abe7e449a6c93b027a10096d27d49f0300c6804edf4b014631d399929c",
+        "db:push": "c1:095e2b4df50e2c16681c189fe1f8d9da4a25d31b39776a516e948565c649913d",
+        "drizzle-kit": "c1:643fe3e02158b2750321209ac65c7b4ef550347d3550b57b5db513de7c6e0555",
+        "schema:gen": "c1:a2e30ae4b6dab6ed65061a832b3f2664089de4473b7a9e257a5bd80e7af2772c"
+      },
+      "managedFiles": {
+        "drizzle.config.ts": "c1:625551b34f258035cdd7ef497aa8e6e5ba424817613f40fd2fdc98417a556bbc",
+        "scripts/tsconfig.scripts.json": "c1:8c6348421471ae95dd5e4e052de5ae5408df88ce36628f318c7f98a1cd7fe23d",
+        "src/db/neon.ts": "c1:dada6ee7764b7ba9211779388f062ae6e65e1e53f2107fe6cc50b2c5146afe6f",
+        "src/db/neonFull.ts": "c1:d89ad7be91e4e17065af01785c5479ae16a0028d1a702f4a6384919bc483112b",
+        "src/db/valibot/refinements/_common.ts": "c1:316d0ec999633f08b76fe3aa3c887de10095667365f8b15347e9b6184b8819bf",
+        "tests/memory-pglite.ts": "c1:40630af6a52ff83201d4f734dbeaadab120ef39743edcbef4b768b70196e51dd"
       }
     }
   }
