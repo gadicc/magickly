@@ -9,6 +9,7 @@ import editorPhone from "./images/editor-phone.webp";
 import editorSource from "./images/editor-source.webp";
 import editorSplit from "./images/editor-split.webp";
 import editorVisual from "./images/editor-visual.webp";
+import forumSettings from "./images/forum-settings.webp";
 import joinCode from "./images/join-code.webp";
 import members from "./images/members.webp";
 import myTemples from "./images/my-temples.webp";
@@ -101,7 +102,13 @@ export default function TemplesGuide() {
           <a href="#offline">Reading offline</a>
         </li>
         <li>
+          <a href="#forum">Connecting a forum</a>
+        </li>
+        <li>
           <a href="#limits">What it does not do (yet)</a>
+        </li>
+        <li>
+          <a href="#requests">Feature requests</a>
         </li>
       </ul>
 
@@ -406,19 +413,106 @@ export default function TemplesGuide() {
         device holds. Signing out removes the downloads.
       </p>
 
+      <h2 id="forum">Connecting a forum</h2>
+      <p>
+        If your temple runs a <a href="https://www.discourse.org/">Discourse</a>{" "}
+        forum, an administrator can connect it from the temple’s admin page and
+        keep it in step with the member list. You need the forum’s web address,
+        an API username (usually <code>system</code>) and a global API key,
+        which you create in the forum’s own admin area under API.
+      </p>
+      <Figure
+        image={forumSettings}
+        alt="The Forum section of a temple's admin page: fields for the forum address, the API username and the API key, a note that syncing sends each member's name, motto, grade and verified email address to the forum, and a Connect forum button."
+        maxWidth={620}
+      >
+        Connecting a forum. Any administrator of the temple can change or
+        disconnect it.
+      </Figure>
+      <p>
+        When you save, Magick.ly checks that the forum accepts the key as an
+        administrator’s. The key is then stored encrypted and never shown again,
+        only its last four characters so you can tell which one is saved.
+        Changing the forum’s address asks for the key again, so a saved key
+        cannot be pointed at a different server. The address must be a public
+        https site, and each request to it has a short time limit.
+      </p>
+      <p>
+        <strong>Synchronize with Discourse</strong> then does this, when an
+        administrator presses it:
+      </p>
+      <ol>
+        <li>
+          Makes sure the forum has a group for each grade, from Neophytes to
+          Adepti Majores, closed to joining and hidden from the public.
+        </li>
+        <li>
+          Finds each member’s forum account: one it was linked to before, or the
+          one that matches their verified email address. If an address matches
+          more than one account it skips that member rather than guess. If there
+          is no account it creates one, named after their motto and with a
+          random password; they sign in through the forum’s password reset.
+        </li>
+        <li>
+          Renames the forum account to the member’s motto, puts it in the group
+          for their current grade and out of the other grade groups, and makes
+          that group the account’s primary group, which is the badge beside
+          their posts, with the grade as their forum title (Zelator, Theoricus
+          and so on).
+        </li>
+        <li>
+          Takes people the sync knows about, who are no longer members of any
+          temple on that forum, out of the grade groups. Anyone it does not
+          know, such as the forum’s own staff, is left alone.
+        </li>
+      </ol>
+      <p>
+        The sync is manual and only ever changes the forum: nothing happens
+        until an administrator presses the button, so run it after changing
+        grades or removing someone. It reads the forum’s groups and accounts to
+        do its work, and remembers which forum account belongs to which member,
+        but it never changes a member’s grade or anything else on Magick.ly.
+      </p>
+      <p>
+        <strong>Privacy.</strong> A sync sends each member’s name, motto, grade
+        and verified email addresses to the forum, which creates accounts for
+        people it does not know. New members are told this when they join. Tell
+        existing members before you connect a forum, and connect only a forum
+        you run. Magick.ly’s own site administrators can also sync a temple that
+        has no forum of its own with the Magick.ly forum.
+      </p>
+
       <h2 id="limits">What it does not do (yet)</h2>
       <ul>
         <li>Temples cannot be renamed or deleted from the site.</li>
       </ul>
       <p>
-        Magick.ly’s own site administrators can manage every temple and can sync
-        a temple’s members with grade groups on the{" "}
-        <a href="https://forums.magick.ly">forum</a>.
+        Magick.ly’s own site administrators can manage every temple, and can
+        sync one with the <a href="https://forums.magick.ly">Magick.ly forum</a>
+        .
       </p>
+      <h2 id="requests">Feature requests</h2>
       <p>
-        Questions and feature requests are welcome on the project’s{" "}
-        <a href="https://github.com/gadicc/magickly">GitHub page</a>.
+        Temples run in many ways, in person and online, and this is a small part
+        of what they need. Requests are welcome on the project’s{" "}
+        <a href="https://github.com/gadicc/magickly">GitHub page</a>. Ideas we
+        are weighing, in no particular order, and would like to hear which
+        matter to you:
       </p>
+      <ul>
+        <li>Summonses and RSVPs for meetings.</li>
+        <li>An attendance register.</li>
+        <li>
+          A library of temple documents, with the same grade gating and offline
+          use as rituals, in place of photocopies of photocopies.
+        </li>
+        <li>Membership dues and subscriptions.</li>
+        <li>
+          Finer control over who can read a document: an exact grade, or
+          officers only.
+        </li>
+        <li>Printing or exporting a document with a name on it.</li>
+      </ul>
     </Container>
   );
 }

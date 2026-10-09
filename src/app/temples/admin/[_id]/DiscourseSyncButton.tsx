@@ -25,8 +25,9 @@ export function DiscourseSyncButton({
     <Stack spacing={1} sx={{ mt: 4, alignItems: "flex-start" }}>
       <Typography variant="h6">Discourse</Typography>
       <Typography>
-        Synchronize this temple&apos;s members with the forum grade groups. The
-        page will show the result when the sync finishes.
+        Match each member to a forum account (creating one if needed), name it
+        after their motto, and give it the forum group, title and badge for
+        their grade. The page will show the result when the sync finishes.
       </Typography>
       <form action={action}>
         <input type="hidden" name="actorId" value={actorId} />

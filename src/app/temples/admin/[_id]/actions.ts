@@ -1,16 +1,25 @@
 "use server";
 
 import Discourse, { HTTPError } from "discourse2";
+import { revalidatePath } from "next/cache";
 import { getCurrentSqlUserId } from "@/auth/session";
 import { db } from "@/db/neonFull";
 import {
-  canRunDiscourseSync,
   createSqlDiscourseSync,
   type DiscourseSyncState,
   type DiscourseSyncTransport,
   initialDiscourseSyncState,
   MAGICKLY_DISCOURSE_ORIGIN,
 } from "@/temples/discourseSync";
+import {
+  createSqlTempleForumService,
+  resolveForumSyncTarget,
+} from "@/temples/forum";
+import {
+  FORUM_SYNC_DEADLINE_MS,
+  forumFetchOptions,
+  readCappedText,
+} from "@/temples/forumHttp";
 
 function safeId(value: number) {
   if (!Number.isSafeInteger(value) || value < 1)
@@ -35,26 +44,36 @@ function nullableStringValue(value: unknown) {
   return stringValue(value);
 }
 
-function createDiscourseTransport(apiKey: string): DiscourseSyncTransport {
-  const discourse = new Discourse(MAGICKLY_DISCOURSE_ORIGIN, {
+/**
+ * A forum may be anyone's: never follow a redirect with the key attached, and
+ * give each request a timer of its own (a shared one would already be spent).
+ */
+const safe = () => ({ fetchOptions: forumFetchOptions() });
+
+function createDiscourseTransport(config: {
+  origin: string;
+  apiUsername: string;
+  apiKey: string;
+}): DiscourseSyncTransport {
+  const { origin, apiUsername, apiKey } = config;
+  const discourse = new Discourse(origin, {
     "Api-Key": apiKey,
-    "Api-Username": "system",
+    "Api-Username": apiUsername,
   });
 
   return {
     async listGroupsPage(page) {
-      const url = new URL("/groups.json", MAGICKLY_DISCOURSE_ORIGIN);
+      const url = new URL("/groups.json", origin);
       url.searchParams.set("page", page.toString());
       const response = await fetch(url, {
-        cache: "no-store",
-        redirect: "error",
+        ...forumFetchOptions(),
         headers: {
           "Api-Key": apiKey,
-          "Api-Username": "system",
+          "Api-Username": apiUsername,
         },
       });
       if (!response.ok) throw new Error("Discourse group list failed");
-      const payload = objectValue(await response.json());
+      const payload = objectValue(JSON.parse(await readCappedText(response)));
       if (!Array.isArray(payload.groups))
         throw new Error("Invalid Discourse response");
       return {
@@ -79,7 +98,7 @@ function createDiscourseTransport(apiKey: string): DiscourseSyncTransport {
             primary_group: true,
           },
         },
-        { validateParams: false },
+        { validateParams: false, ...safe() },
       );
       return {
         id: safeId(result.basic_group.id),
@@ -107,26 +126,25 @@ function createDiscourseTransport(apiKey: string): DiscourseSyncTransport {
         { id: safeId(groupId), group } as Parameters<
           typeof discourse.updateGroup
         >[0],
-        { validateParams: false },
+        { validateParams: false, ...safe() },
       );
     },
 
     async listGroupMemberPage(groupName, offset) {
       const url = new URL(
         `/groups/${encodeURIComponent(groupName)}/members.json`,
-        MAGICKLY_DISCOURSE_ORIGIN,
+        origin,
       );
       url.searchParams.set("offset", offset.toString());
       const response = await fetch(url, {
-        cache: "no-store",
-        redirect: "error",
+        ...forumFetchOptions(),
         headers: {
           "Api-Key": apiKey,
-          "Api-Username": "system",
+          "Api-Username": apiUsername,
         },
       });
       if (!response.ok) throw new Error("Discourse group member list failed");
-      const payload = objectValue(await response.json());
+      const payload = objectValue(JSON.parse(await readCappedText(response)));
       const meta = objectValue(payload.meta);
       if (!Array.isArray(payload.members))
         throw new Error("Invalid Discourse response");
@@ -142,7 +160,10 @@ function createDiscourseTransport(apiKey: string): DiscourseSyncTransport {
 
     async getUser(userId) {
       try {
-        const result = await discourse.adminGetUser({ id: safeId(userId) });
+        const result = await discourse.adminGetUser(
+          { id: safeId(userId) },
+          safe(),
+        );
         return {
           id: safeId(result.id),
           username: result.username,
@@ -156,22 +177,28 @@ function createDiscourseTransport(apiKey: string): DiscourseSyncTransport {
     },
 
     async findUsersByEmail(email) {
-      const result = await discourse.adminListUsers({
-        flag: "active",
-        email,
-      });
+      const result = await discourse.adminListUsers(
+        {
+          flag: "active",
+          email,
+        },
+        safe(),
+      );
       return result.map((candidate) => ({ id: safeId(candidate.id) }));
     },
 
     async createUser(input) {
-      const result = await discourse.createUser({
-        name: input.name,
-        email: input.email,
-        password: input.password,
-        username: input.username,
-        active: true,
-        approved: true,
-      });
+      const result = await discourse.createUser(
+        {
+          name: input.name,
+          email: input.email,
+          password: input.password,
+          username: input.username,
+          active: true,
+          approved: true,
+        },
+        safe(),
+      );
       return {
         success: result.success,
         userId: result.user_id ? safeId(result.user_id) : null,
@@ -179,32 +206,41 @@ function createDiscourseTransport(apiKey: string): DiscourseSyncTransport {
     },
 
     async updateUsername(username, newUsername) {
-      await discourse.updateUsername({ username, new_username: newUsername });
+      await discourse.updateUsername(
+        { username, new_username: newUsername },
+        safe(),
+      );
     },
 
     async addGroupMember(groupId, username) {
-      await discourse.addGroupMembers({
-        id: safeId(groupId),
-        usernames: username,
-      });
+      await discourse.addGroupMembers(
+        {
+          id: safeId(groupId),
+          usernames: username,
+        },
+        safe(),
+      );
     },
 
     async removeGroupMember(groupId, username) {
-      await discourse.removeGroupMembers({
-        id: safeId(groupId),
-        usernames: username,
-      });
+      await discourse.removeGroupMembers(
+        {
+          id: safeId(groupId),
+          usernames: username,
+        },
+        safe(),
+      );
     },
 
     async setPrimaryGroup(userId, groupId) {
       const response = await fetch(
-        `${MAGICKLY_DISCOURSE_ORIGIN}/admin/users/${safeId(userId)}/primary_group`,
+        `${origin}/admin/users/${safeId(userId)}/primary_group`,
         {
+          ...forumFetchOptions(),
           method: "PUT",
-          redirect: "error",
           headers: {
             "Api-Key": apiKey,
-            "Api-Username": "system",
+            "Api-Username": apiUsername,
             "Content-Type": "application/x-www-form-urlencoded",
           },
           body: new URLSearchParams({
@@ -219,46 +255,116 @@ function createDiscourseTransport(apiKey: string): DiscourseSyncTransport {
     async setTitle(username, title) {
       await discourse.updateUser(
         { username, title } as Parameters<typeof discourse.updateUser>[0],
-        { validateParams: false },
+        { validateParams: false, ...safe() },
       );
     },
   };
+}
+
+/** Stops a sync that a slow or hostile forum is dragging out. */
+function withDeadline(
+  transport: DiscourseSyncTransport,
+): DiscourseSyncTransport {
+  const deadline = Date.now() + FORUM_SYNC_DEADLINE_MS;
+  return Object.fromEntries(
+    Object.entries(transport).map(([name, call]) => [
+      name,
+      (...args: unknown[]) => {
+        if (Date.now() > deadline) throw new Error("The sync took too long.");
+        return (call as (...input: unknown[]) => unknown)(...args);
+      },
+    ]),
+  ) as unknown as DiscourseSyncTransport;
 }
 
 export async function discourseSync(
   _previous: DiscourseSyncState,
   formData: FormData,
 ): Promise<DiscourseSyncState> {
+  const fail = (message: string): DiscourseSyncState => ({
+    ...initialDiscourseSyncState,
+    status: "error",
+    message,
+  });
   const expectedActorId = formData.get("actorId");
   const templeId = formData.get("templeId");
   if (typeof expectedActorId !== "string" || typeof templeId !== "string")
-    return {
-      ...initialDiscourseSyncState,
-      status: "error",
-      message: "The sync request is invalid.",
-    };
-
+    return fail("The sync request is invalid.");
   const currentActorId = await getCurrentSqlUserId();
-  if (
-    currentActorId !== expectedActorId ||
-    !(await canRunDiscourseSync(db, currentActorId))
-  )
-    return {
-      ...initialDiscourseSyncState,
-      status: "error",
-      message: "Global administrator access is required.",
-    };
+  if (currentActorId !== expectedActorId)
+    return fail("Temple administrator access is required.");
 
+  const target = await resolveForumSyncTarget(db, {
+    actorId: expectedActorId,
+    templeId,
+  });
+  if (target.kind === "error") return fail(target.message);
+  if (target.kind === "own")
+    return createSqlDiscourseSync(db, {
+      getCurrentActorId: getCurrentSqlUserId,
+      transport: withDeadline(createDiscourseTransport(target.credentials)),
+      forumOrigin: target.credentials.origin,
+      access: "temple",
+      pruneFormerMembers: true,
+    })({ expectedActorId, templeId });
+
+  // No forum of its own: the site-wide forum, for global administrators.
   const apiKey = process.env.DISCOURSE_API_KEY;
-  if (!apiKey)
-    return {
-      ...initialDiscourseSyncState,
-      status: "error",
-      message: "Discourse sync is not configured.",
-    };
-
+  if (!apiKey) return fail("Discourse sync is not configured.");
   return createSqlDiscourseSync(db, {
     getCurrentActorId: getCurrentSqlUserId,
-    transport: createDiscourseTransport(apiKey),
+    transport: withDeadline(
+      createDiscourseTransport({
+        origin: MAGICKLY_DISCOURSE_ORIGIN,
+        apiUsername: "system",
+        apiKey,
+      }),
+    ),
+    access: "global",
   })({ expectedActorId, templeId });
+}
+
+export interface ForumSettingsState {
+  status: "idle" | "saved" | "cleared" | "error";
+  message: string;
+  /** What was typed, so a refusal does not wipe the form. Never the key. */
+  values?: { origin: string; apiUsername: string };
+}
+
+/** Saves, or with `intent=clear` removes, this temple's forum connection. */
+export async function saveTempleForumAction(
+  _previous: ForumSettingsState,
+  formData: FormData,
+): Promise<ForumSettingsState> {
+  const text = (name: string) => {
+    const value = formData.get(name);
+    return typeof value === "string" ? value : "";
+  };
+  const service = createSqlTempleForumService(db, getCurrentSqlUserId);
+  const clearing = text("intent") === "clear";
+  const result = clearing
+    ? await service.clear({
+        version: 1,
+        expectedActorId: text("actorId"),
+        templeId: text("templeId"),
+      })
+    : await service.save({
+        version: 1,
+        expectedActorId: text("actorId"),
+        templeId: text("templeId"),
+        origin: text("origin"),
+        apiUsername: text("apiUsername"),
+        apiKey: text("apiKey"),
+      });
+  if (!result.ok)
+    return {
+      status: "error",
+      message: result.message,
+      values: { origin: text("origin"), apiUsername: text("apiUsername") },
+    };
+  // The page is also reachable by legacy ids, so refresh every temple page.
+  revalidatePath("/temples/admin/[_id]", "page");
+  return clearing
+    ? { status: "cleared", message: "The forum connection was removed." }
+    : { status: "saved", message: "The forum connection was saved." };
 }

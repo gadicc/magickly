@@ -174,6 +174,17 @@ const shots: Shot[] = [
     padding: 0,
   },
   {
+    name: "forum-settings",
+    persona: "creator",
+    viewport: [1000, 900],
+    open: async (b) => {
+      const path = await templeAdminPath(b);
+      await b.goto(base + path);
+      await b.waitFor(`document.body.textContent.includes('Connect forum')`);
+    },
+    clip: `[...byTextAll('h6', 'Forum'), document.querySelector('input[name="apiKey"]').closest('form')]`,
+  },
+  {
     name: "ritual-list-grade-1",
     persona: "reader",
     viewport: [1000, 800],

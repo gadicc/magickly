@@ -7,7 +7,7 @@ import type {
   PgTransactionConfig,
 } from "drizzle-orm/pg-core";
 import { user } from "../db/schema/auth";
-import { discourseUserLinks } from "../db/schema/discourse";
+import { discourseUserLinks, templeForums } from "../db/schema/discourse";
 import { templeMemberships, temples } from "../db/schema/memberships";
 import {
   legacyUserEmails,
@@ -188,11 +188,34 @@ async function hasGlobalAdminAccess(
   return Boolean(identity);
 }
 
+/** Global administrators only: the site-wide forum, which has no temple of its own. */
 export async function canRunDiscourseSync(
   database: Pick<DiscourseSyncDatabase, "select">,
   actorId: string | null,
 ) {
   return actorId ? hasGlobalAdminAccess(database, actorId) : false;
+}
+
+/** A global administrator, or an administrator of this temple. */
+export async function canManageTempleForum(
+  database: Pick<DiscourseSyncDatabase, "select">,
+  actorId: string | null,
+  templeId: string | null,
+) {
+  if (!actorId || !isCanonicalId(actorId)) return false;
+  if (await hasGlobalAdminAccess(database, actorId)) return true;
+  if (!templeId || !isCanonicalId(templeId)) return false;
+  const [membership] = await database
+    .select({ id: templeMemberships.id })
+    .from(templeMemberships)
+    .where(
+      and(
+        eq(templeMemberships.userId, actorId),
+        eq(templeMemberships.templeId, templeId),
+        eq(templeMemberships.admin, true),
+      ),
+    );
+  return Boolean(membership);
 }
 
 async function loadCurrentLink(
@@ -321,6 +344,41 @@ async function loadMemberForSync(
   };
 }
 
+/**
+ * A forum user who is linked to a local account that belongs to no temple
+ * using this forum. Unlinked forum users (staff, strangers) are never touched.
+ */
+async function isFormerMember(
+  database: Pick<DiscourseSyncDatabase, "select">,
+  forumUserId: number,
+  forumOrigin: string,
+) {
+  const [link] = await database
+    .select({ userId: discourseUserLinks.userId })
+    .from(discourseUserLinks)
+    .where(
+      and(
+        eq(discourseUserLinks.forumOrigin, forumOrigin),
+        eq(discourseUserLinks.discourseUserId, forumUserId),
+      ),
+    );
+  if (!link) return false;
+  const [stillMember] = await database
+    .select({ id: templeMemberships.id })
+    .from(templeMemberships)
+    .innerJoin(
+      templeForums,
+      eq(templeForums.templeId, templeMemberships.templeId),
+    )
+    .where(
+      and(
+        eq(templeMemberships.userId, link.userId),
+        eq(templeForums.forumOrigin, forumOrigin),
+      ),
+    );
+  return !stillMember;
+}
+
 function safeFailureMessage(error: unknown) {
   if (error instanceof SyncFailure) {
     if (error.code === "authorization")
@@ -341,16 +399,32 @@ export function createSqlDiscourseSync(
     transport: DiscourseSyncTransport;
     forumOrigin?: string;
     createPassword?: () => string;
+    /**
+     * Also take forum grade-group membership away from linked people who no
+     * longer belong to any temple using this forum. Only for a temple's own
+     * forum: on the shared site forum others' temples cannot be told apart.
+     */
+    pruneFormerMembers?: boolean;
+    /**
+     * Who may run it. `global` (the default) is for the site-wide forum;
+     * `temple` also lets administrators of the temple being synced.
+     */
+    access?: "global" | "temple";
   },
 ) {
   const forumOrigin = options.forumOrigin ?? MAGICKLY_DISCOURSE_ORIGIN;
   const createPassword = options.createPassword ?? (() => crypto.randomUUID());
 
+  // The temple being synced, set by `sync` before any provider call.
+  let activeTempleId: string | null = null;
+
   async function guard(expectedActorId: string) {
     const currentActorId = await options.getCurrentActorId();
     if (
       currentActorId !== expectedActorId ||
-      !(await hasGlobalAdminAccess(database, expectedActorId))
+      !(options.access === "temple"
+        ? await canManageTempleForum(database, expectedActorId, activeTempleId)
+        : await hasGlobalAdminAccess(database, expectedActorId))
     )
       throw new SyncFailure("authorization");
   }
@@ -621,6 +695,7 @@ export function createSqlDiscourseSync(
     let skipped = 0;
     let total = 0;
     try {
+      activeTempleId = isCanonicalId(input.templeId) ? input.templeId : null;
       if (
         !isCanonicalId(input.expectedActorId) ||
         !isCanonicalId(input.templeId) ||
@@ -668,6 +743,7 @@ export function createSqlDiscourseSync(
       }
       progress.push("Forum grade groups are ready.");
 
+      const syncedForumIds = new Set<number>();
       for (let index = 0; index < membershipRows.length; index += 1) {
         await guard(input.expectedActorId);
         const member = await loadMemberForSync(
@@ -698,6 +774,7 @@ export function createSqlDiscourseSync(
           continue;
         }
         const forumUser = resolved.user;
+        syncedForumIds.add(forumUser.id);
         const motto = normalizeForumUsername(member.motto);
         if (motto && forumUser.username !== motto) {
           await callMemberProvider(
@@ -762,6 +839,37 @@ export function createSqlDiscourseSync(
         }
         completed += 1;
         progress.push(`Synced member ${index + 1} of ${total}.`);
+      }
+
+      // Never on the site forum: other temples there cannot be told apart.
+      if (
+        options.pruneFormerMembers &&
+        forumOrigin !== MAGICKLY_DISCOURSE_ORIGIN
+      ) {
+        let removed = 0;
+        for (const seed of forumGroupSeed) {
+          const group = groups.get(seed.grade);
+          if (!group) throw new SyncFailure("provider");
+          for (const forumUserId of [...group.members]) {
+            if (syncedForumIds.has(forumUserId)) continue;
+            await guard(input.expectedActorId);
+            if (!(await isFormerMember(database, forumUserId, forumOrigin)))
+              continue;
+            const forumUser = await callProvider(input.expectedActorId, () =>
+              options.transport.getUser(forumUserId),
+            );
+            if (!forumUser) continue;
+            await callProvider(input.expectedActorId, () =>
+              options.transport.removeGroupMember(group.id, forumUser.username),
+            );
+            group.members.delete(forumUserId);
+            removed += 1;
+          }
+        }
+        if (removed > 0)
+          progress.push(
+            `Removed ${removed} former member${removed === 1 ? "" : "s"} from forum grade groups.`,
+          );
       }
 
       return {

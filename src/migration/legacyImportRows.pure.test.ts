@@ -31,6 +31,7 @@ const emptyTables = [
   "ritual_bundle_assets",
   "ritual_bundles",
   "legacy_file_relocations",
+  "temple_forums",
 ] as const;
 const credentials = [
   "accessToken",
@@ -83,7 +84,7 @@ describe("complete legacy import row projection", () => {
       .filter((table) => table !== schema.legacyImportRuns)
       .map((table) => getTableName(table))
       .sort();
-    expect(schemaNames).toHaveLength(35);
+    expect(schemaNames).toHaveLength(36);
     expect(Object.keys(LEGACY_IMPORT_TABLES).sort()).toEqual(schemaNames);
     expect(Object.keys(rows).sort()).toEqual(schemaNames);
     for (const name of Object.keys(rows) as (keyof LegacyImportRows)[]) {

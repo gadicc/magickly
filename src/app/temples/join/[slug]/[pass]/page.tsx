@@ -60,6 +60,12 @@ export default async function TemplesJoinPage({
             Confirm that you want to join {preview.temple.name} Temple. Your
             membership will begin at grade 0.
           </Typography>
+          <Typography variant="body2" sx={{ my: 2 }}>
+            The temple’s administrators will see your name and can change your
+            grade and motto. If they connect a forum to the temple, syncing it
+            sends your name, motto, grade and verified email addresses to that
+            forum. You can leave at any time from My Temples.
+          </Typography>
           <form action={joinTempleAction}>
             <input type="hidden" name="expectedActorId" value={actorId} />
             <input type="hidden" name="slug" value={slug} />

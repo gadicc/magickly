@@ -407,7 +407,8 @@ async function verifiedActor(
   return current;
 }
 
-async function lockActorAndAuthorize(
+/** Locks the caller's identity and grants, then requires a temple or global admin. */
+export async function lockActorAndAuthorize(
   tx: Transaction,
   actorId: string,
   templeId: string,

@@ -16,8 +16,10 @@ import { getCurrentSqlUserId } from "@/auth/session";
 import { db } from "@/db/neonFull";
 import { privateMetadata } from "@/seo/metadata";
 import { canRunDiscourseSync } from "@/temples/discourseSync";
+import { createSqlTempleForumService } from "@/temples/forum";
 import { createSqlTempleReader } from "@/temples/sql";
 import { DiscourseSyncButton } from "./DiscourseSyncButton";
+import { ForumSettings } from "./ForumSettings";
 import { InviteManager } from "./InviteManager";
 
 export const metadata = privateMetadata("Manage Temple");
@@ -56,7 +58,12 @@ export default async function AdminTemplePage({
       </Container>
     );
   const query = await searchParams;
-  const showDiscourseSync = await canRunDiscourseSync(db, actorId);
+  const forumService = createSqlTempleForumService(db, getCurrentSqlUserId);
+  const forum = await forumService.read(temple.id);
+  // The site-wide forum is for global administrators; a temple's own is for
+  // its administrators, who reach this page.
+  const showDiscourseSync =
+    !!forum?.settings || (await canRunDiscourseSync(db, actorId));
   const date = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" });
 
   return (
@@ -126,6 +133,12 @@ export default async function AdminTemplePage({
         templeName={temple.name}
         slug={temple.slug}
         joinPass={temple.joinPass}
+      />
+      <ForumSettings
+        actorId={actorId}
+        templeId={temple.id}
+        saved={forum?.settings ?? null}
+        canStoreKeys={forumService.canStoreKeys()}
       />
       {showDiscourseSync ? (
         <DiscourseSyncButton actorId={actorId} templeId={temple.id} />

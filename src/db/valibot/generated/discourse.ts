@@ -49,3 +49,36 @@ export type DiscourseUserLinksInsert = v.InferInput<
 export type DiscourseUserLinksUpdate = v.InferInput<
   typeof discourseUserLinksUpdate
 >;
+export const templeForumsSelect = v.object({
+  templeId: v.pipe(v.string(), v.uuid()),
+  forumOrigin: v.string(),
+  apiUsername: v.string(),
+  apiKeyEncrypted: v.string(),
+  apiKeyHint: v.string(),
+  updatedById: v.nullable(v.pipe(v.string(), v.uuid())),
+  updatedAt: v.date(),
+});
+
+export const templeForumsInsert = v.object({
+  templeId: v.pipe(v.string(), v.uuid()),
+  forumOrigin: v.string(),
+  apiUsername: v.string(),
+  apiKeyEncrypted: v.string(),
+  apiKeyHint: v.optional(v.string()),
+  updatedById: v.optional(v.nullable(v.pipe(v.string(), v.uuid()))),
+  updatedAt: v.optional(v.date()),
+});
+
+export const templeForumsUpdate = v.object({
+  templeId: v.optional(v.pipe(v.string(), v.uuid())),
+  forumOrigin: v.optional(v.string()),
+  apiUsername: v.optional(v.string()),
+  apiKeyEncrypted: v.optional(v.string()),
+  apiKeyHint: v.optional(v.string()),
+  updatedById: v.optional(v.nullable(v.pipe(v.string(), v.uuid()))),
+  updatedAt: v.optional(v.date()),
+});
+
+export type TempleForumsSelect = v.InferOutput<typeof templeForumsSelect>;
+export type TempleForumsInsert = v.InferInput<typeof templeForumsInsert>;
+export type TempleForumsUpdate = v.InferInput<typeof templeForumsUpdate>;

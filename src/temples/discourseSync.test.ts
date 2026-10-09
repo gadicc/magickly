@@ -2,7 +2,7 @@ import { createMemoryPgliteHarness } from "@gadicc/loom/db/testing";
 import { and, eq } from "drizzle-orm";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { user } from "../db/schema/auth";
-import { discourseUserLinks } from "../db/schema/discourse";
+import { discourseUserLinks, templeForums } from "../db/schema/discourse";
 import { templeMemberships, temples } from "../db/schema/memberships";
 import {
   legacyUserEmails,
@@ -27,6 +27,7 @@ const schema = {
   temples,
   templeMemberships,
   discourseUserLinks,
+  templeForums,
 };
 const harness = await createMemoryPgliteHarness({ schema });
 const { db } = harness;
@@ -109,6 +110,7 @@ async function linkFor(userId: string, origin = MAGICKLY_DISCOURSE_ORIGIN) {
 
 beforeEach(async () => {
   await db.delete(discourseUserLinks);
+  await db.delete(templeForums);
   await db.delete(legacyUserEmails);
   await db.delete(templeMemberships);
   await db.delete(temples);
@@ -446,5 +448,220 @@ describe("SQL Discourse synchronization", () => {
     expect(provider.getUser).not.toHaveBeenCalled();
     expect(await linkFor(ids.member)).toBeNull();
     expect(JSON.stringify(result)).not.toContain("timeout after request");
+  });
+});
+
+describe("SQL Discourse synchronization for a temple's own forum", () => {
+  const forum = "https://forum.example.org";
+  const runAs = (
+    actor: string,
+    provider: DiscourseSyncTransport,
+    prune = true,
+  ) =>
+    createSqlDiscourseSync(db, {
+      getCurrentActorId: async () => actor,
+      transport: provider,
+      forumOrigin: forum,
+      access: "temple",
+      pruneFormerMembers: prune,
+      createPassword: () => "test-password",
+    })({ expectedActorId: actor, templeId: ids.temple });
+
+  const link = async (userId: string, discourseUserId: number) =>
+    db
+      .insert(discourseUserLinks)
+      .values({ userId, forumOrigin: forum, discourseUserId });
+  const useForum = async (templeId = ids.temple) =>
+    db.insert(templeForums).values({
+      templeId,
+      forumOrigin: forum,
+      apiUsername: "system",
+      apiKeyEncrypted: "x",
+    });
+
+  it("lets an administrator of this temple run it, but not an ordinary member or another temple's admin", async () => {
+    await db
+      .update(templeMemberships)
+      .set({ admin: true })
+      .where(eq(templeMemberships.userId, ids.member));
+    const allowed = transport();
+    expect(await runAs(ids.member, allowed, false)).toMatchObject({
+      status: expect.stringMatching(/success|warning/),
+    });
+    expect(allowed.listGroupsPage).toHaveBeenCalled();
+
+    await db
+      .update(templeMemberships)
+      .set({ admin: false })
+      .where(eq(templeMemberships.userId, ids.member));
+    const denied = transport();
+    expect(await runAs(ids.member, denied, false)).toMatchObject({
+      status: "error",
+      completed: 0,
+    });
+    expect(denied.listGroupsPage).not.toHaveBeenCalled();
+    // Admin of a different temple, not this one.
+    const otherTemple = createUuidV7();
+    await db.insert(temples).values({
+      id: otherTemple,
+      name: "Beta",
+      slug: "beta",
+      createdAt: when,
+      updatedAt: when,
+    });
+    await db.insert(templeMemberships).values({
+      id: createUuidV7(),
+      userId: ids.otherMember,
+      templeId: otherTemple,
+      grade: 0,
+      admin: true,
+      addedAt: when,
+      createdAt: when,
+      updatedAt: when,
+    });
+    const other = transport();
+    expect(await runAs(ids.otherMember, other, false)).toMatchObject({
+      status: "error",
+    });
+    expect(other.listGroupsPage).not.toHaveBeenCalled();
+  });
+
+  it("removes a former member from the grade groups, but only a linked one", async () => {
+    await useForum();
+    // 301: current member (grade 2), 302: linked but in no temple, 303: never linked.
+    await link(ids.member, 301);
+    await link(ids.otherMember, 302);
+    const groupOf = (seedGrade: number) => 100 + seedGrade;
+    const inGroup: Record<string, number[]> = {
+      theorici: [301],
+      zelators: [302, 303],
+    };
+    const provider = transport({
+      listGroupMemberPage: vi.fn(async (groupName, offset) => ({
+        memberIds: inGroup[groupName] ?? [],
+        total: (inGroup[groupName] ?? []).length,
+        limit: 50,
+        offset,
+      })),
+    });
+    const result = await runAs(ids.admin, provider);
+    expect(result).toMatchObject({ status: "success" });
+    expect(provider.removeGroupMember).toHaveBeenCalledTimes(1);
+    expect(provider.removeGroupMember).toHaveBeenCalledWith(
+      groupOf(1),
+      "member302",
+    );
+    expect(result.progress.join(" ")).toContain("Removed 1 former member");
+  });
+
+  it("keeps a linked person who still belongs to another temple on the same forum", async () => {
+    await useForum();
+    const otherTemple = createUuidV7();
+    await db.insert(temples).values({
+      id: otherTemple,
+      name: "Beta",
+      slug: "beta",
+      createdAt: when,
+      updatedAt: when,
+    });
+    await useForum(otherTemple);
+    await db.insert(templeMemberships).values({
+      id: createUuidV7(),
+      userId: ids.otherMember,
+      templeId: otherTemple,
+      grade: 1,
+      addedAt: when,
+      createdAt: when,
+      updatedAt: when,
+    });
+    await link(ids.otherMember, 302);
+    const provider = transport({
+      listGroupMemberPage: vi.fn(async (groupName, offset) => ({
+        memberIds: groupName === "zelators" ? [302] : [],
+        total: groupName === "zelators" ? 1 : 0,
+        limit: 50,
+        offset,
+      })),
+    });
+    await runAs(ids.admin, provider);
+    expect(provider.removeGroupMember).not.toHaveBeenCalled();
+  });
+
+  it("does nothing about former members on the shared site forum", async () => {
+    await link(ids.otherMember, 302);
+    const provider = transport({
+      listGroupMemberPage: vi.fn(async (groupName, offset) => ({
+        memberIds: groupName === "zelators" ? [302] : [],
+        total: groupName === "zelators" ? 1 : 0,
+        limit: 50,
+        offset,
+      })),
+    });
+    await runAs(ids.admin, provider, false);
+    expect(provider.removeGroupMember).not.toHaveBeenCalled();
+  });
+
+  it("skips a former member the forum no longer knows", async () => {
+    await useForum();
+    await link(ids.otherMember, 302);
+    const provider = transport({
+      getUser: vi.fn(async (userId) =>
+        userId === 302
+          ? null
+          : {
+              id: userId,
+              username: `member${userId}`,
+              title: null,
+              primaryGroupId: null,
+            },
+      ),
+      listGroupMemberPage: vi.fn(async (groupName, offset) => ({
+        memberIds: groupName === "zelators" ? [302] : [],
+        total: groupName === "zelators" ? 1 : 0,
+        limit: 50,
+        offset,
+      })),
+    });
+    expect(await runAs(ids.admin, provider)).toMatchObject({
+      status: "success",
+    });
+    expect(provider.removeGroupMember).not.toHaveBeenCalled();
+  });
+});
+
+describe("who may run a sync", () => {
+  it("lets a temple administrator run only the temple-access kind, never the site forum's", async () => {
+    await db
+      .update(templeMemberships)
+      .set({ admin: true })
+      .where(eq(templeMemberships.userId, ids.member));
+    const site = transport();
+    expect(await run(site, async () => ids.member)).toMatchObject({
+      status: "error",
+    });
+    expect(site.listGroupsPage).not.toHaveBeenCalled();
+  });
+
+  it("never prunes on the Magick.ly forum even if asked to", async () => {
+    await db.insert(discourseUserLinks).values({
+      userId: ids.otherMember,
+      forumOrigin: MAGICKLY_DISCOURSE_ORIGIN,
+      discourseUserId: 302,
+    });
+    const provider = transport({
+      listGroupMemberPage: vi.fn(async (groupName, offset) => ({
+        memberIds: groupName === "zelators" ? [302] : [],
+        total: groupName === "zelators" ? 1 : 0,
+        limit: 50,
+        offset,
+      })),
+    });
+    await createSqlDiscourseSync(db, {
+      getCurrentActorId: async () => ids.admin,
+      transport: provider,
+      access: "temple",
+      pruneFormerMembers: true,
+    })({ expectedActorId: ids.admin, templeId: ids.temple });
+    expect(provider.removeGroupMember).not.toHaveBeenCalled();
   });
 });
