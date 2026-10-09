@@ -141,6 +141,8 @@ beforeEach(async () => {
     ]);
     await tx.insert(templeMemberships).values(
       [
+        // The creator stays in the temple: removal ends creator rights too.
+        { userId: actor.creator, grade: 0 },
         { userId: actor.gradeZero, grade: 0 },
         { userId: actor.gradeTwo, grade: 2 },
         { userId: actor.templeAdmin, grade: 0, admin: true },
@@ -226,9 +228,12 @@ describe("SQL ritual authorization/read repository", () => {
     [null, ["public"], []],
     ["outsider", ["public"], []],
     [
+      // A grade 0 member of one temple: reads the grade 0 ritual they did not
+      // create and edits what they created there, but holds nothing of the
+      // other temple's ritual they created, since they are not in that temple.
       "creator",
-      ["group", "otherGroup", "otherTemple", "public", "two"],
-      ["group", "otherGroup", "otherTemple", "public", "two"],
+      ["group", "otherGroup", "public", "two", "zero"],
+      ["group", "otherGroup", "public", "two"],
     ],
     [
       "global",

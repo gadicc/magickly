@@ -502,18 +502,24 @@ it.each(["title", "version", "content", "artifact", "revision", "policy"])(
   },
 );
 
-it.each(["temple", "group", "global", "creator"])(
+it.each(["temple", "group", "global", "creator", "removed creator"])(
   "reloads revocation of %s authority after provider work",
   async (kind) => {
     if (kind === "group") await setScope("group");
     const grantActor =
       fixture.actors[
-        kind === "temple" ? "gradeZero" : kind === "group" ? "member" : kind
+        kind === "temple"
+          ? "gradeZero"
+          : kind === "group"
+            ? "member"
+            : kind === "removed creator"
+              ? "creator"
+              : kind
       ];
     actorId = grantActor;
     request.expectedActorId = grantActor;
     const { service, claim } = await start();
-    if (kind === "temple")
+    if (kind === "temple" || kind === "removed creator")
       await db
         .delete(templeMemberships)
         .where(eq(templeMemberships.userId, grantActor));
@@ -523,7 +529,14 @@ it.each(["temple", "group", "global", "creator"])(
         .where(eq(userGroupGrants.userId, grantActor));
     if (kind === "global")
       await db.delete(userAccess).where(eq(userAccess.userId, grantActor));
-    if (kind === "creator") await db.update(rituals).set({ creatorId: null });
+    // The fixture creator also holds a membership; creator authority alone is
+    // revoked by clearing the creator and leaving the temple.
+    if (kind === "creator") {
+      await db.update(rituals).set({ creatorId: null });
+      await db
+        .delete(templeMemberships)
+        .where(eq(templeMemberships.userId, grantActor));
+    }
     await expect(
       service.publish(claim, bundleStorageReceipts(claim)),
     ).rejects.toMatchObject({ code: "FORBIDDEN" });

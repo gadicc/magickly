@@ -116,10 +116,18 @@ export function getRitualAccess(
           (item) => item.templeId === scope.templeId,
         )
       : [];
+  // A temple's rituals belong to the temple: a creator who has been removed
+  // from it holds nothing, though one who is still a member keeps creator
+  // rights whatever their grade. Other scopes have no membership to lose.
+  const creator =
+    authenticated &&
+    policy.creatorId !== null &&
+    principal.userId === policy.creatorId &&
+    (scope.kind !== "temple" || templeMemberships.length > 0);
   const edit =
     authenticated &&
     (principal.globalAdmin === true ||
-      (policy.creatorId !== null && principal.userId === policy.creatorId) ||
+      creator ||
       (scope.kind === "group" &&
         principal.groupAdminIds.includes(scope.groupId)) ||
       (scope.kind === "temple" &&

@@ -31,7 +31,7 @@ export default async function AdminTemplePage({
   searchParams,
 }: {
   params: Promise<{ _id: string }>;
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; removed?: string }>;
 }) {
   const { _id } = await params;
   const callbackURL = `/temples/admin/${encodeURIComponent(_id)}`;
@@ -62,6 +62,11 @@ export default async function AdminTemplePage({
   return (
     <Container sx={{ my: 2 }}>
       <Typography variant="h5">{temple.name} Temple</Typography>
+      {query.removed ? (
+        <Typography color="success.main" role="status" sx={{ my: 2 }}>
+          The member has been removed.
+        </Typography>
+      ) : null}
       {query.error ? (
         <Typography color="error" role="alert" sx={{ my: 2 }}>
           {query.error}

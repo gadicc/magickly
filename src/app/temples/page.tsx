@@ -4,7 +4,8 @@ import { getCurrentSqlUserId } from "@/auth/session";
 import { db } from "@/db/neonFull";
 import { privateMetadata } from "@/seo/metadata";
 import { createSqlTempleReader } from "@/temples/sql";
-import { startTempleJoin } from "./actions";
+import { leaveTempleAction, startTempleJoin } from "./actions";
+import { ConfirmAction } from "./ConfirmAction";
 
 export const metadata = privateMetadata("My Temples");
 
@@ -15,7 +16,7 @@ function signInHref(callbackURL: string) {
 export default async function TemplePage({
   searchParams,
 }: {
-  searchParams: Promise<{ joined?: string; error?: string }>;
+  searchParams: Promise<{ joined?: string; left?: string; error?: string }>;
 }) {
   const actorId = await getCurrentSqlUserId();
   const query = await searchParams;
@@ -45,7 +46,20 @@ export default async function TemplePage({
                   , <Link href={`/temples/admin/${temple.id}`}>admin</Link>
                 </>
               ) : null}
-              )
+              ){" "}
+              <ConfirmAction
+                action={leaveTempleAction}
+                fields={{ expectedActorId: actorId, templeId: temple.id }}
+                label="Leave"
+                size="small"
+                title={`Leave ${temple.name}?`}
+                confirmLabel="Leave temple"
+              >
+                You will lose access to {temple.name}’s private rituals at once.
+                Copies downloaded to your devices are deleted the next time
+                those devices connect. You can only come back with a join code
+                from one of its administrators.
+              </ConfirmAction>
             </li>
           ))}
         </ul>
@@ -54,6 +68,11 @@ export default async function TemplePage({
       {query.joined ? (
         <Typography color="success.main" sx={{ my: 2 }} role="status">
           Your temple membership is active.
+        </Typography>
+      ) : null}
+      {query.left ? (
+        <Typography color="success.main" sx={{ my: 2 }} role="status">
+          You have left the temple.
         </Typography>
       ) : null}
       {query.error ? (

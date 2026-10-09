@@ -13,6 +13,7 @@ import joinCode from "./images/join-code.webp";
 import members from "./images/members.webp";
 import myTemples from "./images/my-temples.webp";
 import readerPhone from "./images/reader-phone.webp";
+import removeMember from "./images/remove-member.webp";
 import ritualList from "./images/ritual-list-grade-1.webp";
 
 export const metadata = pageMetadata("/help/temples");
@@ -175,6 +176,23 @@ export default function TemplesGuide() {
         member straight away.
       </Figure>
 
+      <p>
+        <strong>Remove from temple</strong>, at the foot of that page, takes
+        someone out of the temple after a confirmation. Members can also leave
+        by themselves from <Link href="/temples">My Temples</Link>. Either way
+        the person loses the temple’s private rituals (see{" "}
+        <a href="#access">When access changes</a>). A temple always keeps at
+        least one administrator, so the last one can neither be removed nor
+        leave until someone else has been made an administrator.
+      </p>
+      <Figure
+        image={removeMember}
+        alt="A confirmation dialog titled Remove Fiat Pax, explaining that they lose access to the temple’s private rituals and can rejoin at grade 0 if they still have the join code, with Cancel and Remove member buttons."
+        maxWidth={560}
+      >
+        Removal asks for confirmation and says what will happen.
+      </Figure>
+
       <h2 id="invite">Inviting people</h2>
       <p>
         Members join themselves. A temple has a <strong>slug</strong> and an
@@ -195,7 +213,8 @@ export default function TemplesGuide() {
       </Figure>
       <p>
         Treat the code like a password for the door: change it if it has been
-        shared too widely.
+        shared too widely, and change or clear it when you remove someone who
+        still has it, because they can use it to rejoin (at grade 0).
       </p>
 
       <h2 id="rituals">Private rituals and grade gating</h2>
@@ -232,8 +251,8 @@ export default function TemplesGuide() {
       <ul>
         <li>
           Readers get the finished ritual, not its source or edit history. Only
-          the temple’s administrators (and the ritual’s creator) can open the
-          editor.
+          the temple’s administrators, and the ritual’s creator for as long as
+          they remain in the temple, can open the editor.
         </li>
         <li>
           A ritual’s temple and minimum grade are chosen when it is created and
@@ -328,9 +347,20 @@ export default function TemplesGuide() {
           device and closed wherever it was open.
         </li>
         <li>
+          <strong>Remove someone from the temple</strong>, or let them leave,
+          and every temple ritual goes with them, including the ones they
+          created. The same applies to a downloaded copy on their device.
+        </li>
+        <li>
           <strong>Remove administrator rights</strong> and the person can no
           longer open the editor. They can still read the rituals their grade
           allows, but the downloaded source and any drafts are locked.
+        </li>
+        <li>
+          <strong>One exception:</strong> the person who created a ritual keeps
+          reading and editing it, at any grade and without being an
+          administrator, for as long as they remain in the temple. Removing them
+          ends that too.
         </li>
         <li>
           <strong>Offline and not yet reconnected?</strong> A device that has
@@ -360,11 +390,6 @@ export default function TemplesGuide() {
 
       <h2 id="limits">What it does not do (yet)</h2>
       <ul>
-        <li>
-          There is no button to remove a member. Lowering a grade reduces what
-          they can read, but grade 0 is the lowest, so a ritual that must never
-          reach a lapsed member needs a minimum of 1 or more.
-        </li>
         <li>
           Visibility and minimum grade cannot be changed after a ritual is
           created.

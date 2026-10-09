@@ -122,7 +122,23 @@ const shots: Shot[] = [
       const edit = await hrefOf(b, path, "a", "Edit Synthetic Member B");
       await b.goto(base + edit);
     },
-    clip: `[document.querySelector('h5'), document.querySelector('form')]`,
+    clip: `[document.querySelector('h5'), ...document.querySelectorAll('form')]`,
+  },
+  {
+    name: "remove-member",
+    persona: "creator",
+    open: async (b) => {
+      const path = await templeAdminPath(b);
+      const edit = await hrefOf(b, path, "a", "Edit Synthetic Member B");
+      await b.goto(base + edit);
+      await b.click("button", "Remove from temple");
+      await b.waitFor(
+        `[...document.querySelectorAll('.MuiDialog-paper')].some((e) => e.textContent.includes('Remove member'))`,
+      );
+      await sleep(500);
+    },
+    clip: `[...document.querySelectorAll('.MuiDialog-paper')].filter((e) => e.textContent.includes('Remove member'))`,
+    padding: 0,
   },
   {
     name: "create-ritual",

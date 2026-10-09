@@ -126,6 +126,8 @@ export async function seedRitualBundleFixture(
   ]);
   await db.insert(templeMemberships).values(
     [
+      // The creator stays in the temple: removal ends creator rights too.
+      { userId: actors.creator, templeId, grade: 0 },
       { userId: actors.gradeZero, templeId, grade: 0 },
       { userId: actors.gradeTwo, templeId, grade: 2 },
       { userId: actors.templeAdmin, templeId, grade: 0, admin: true },

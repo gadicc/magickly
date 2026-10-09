@@ -338,7 +338,8 @@ const failureMessages: Record<FailureCode, string> = {
   NOT_AUTHORIZED: "You do not have permission to manage this temple.",
   NOT_FOUND: "The temple or membership was not found.",
   INVALID_INVITE: "No temple matches that slug and join code.",
-  LAST_ADMIN: "Assign another administrator before removing the last one.",
+  LAST_ADMIN:
+    "A temple needs an administrator. Make another member an administrator first.",
   UNAVAILABLE: "The temple service is temporarily unavailable. Try again.",
 };
 export type TempleWriteResult =
@@ -347,6 +348,8 @@ export type TempleWriteResult =
       templeId: string;
       membershipId?: string;
       alreadyMember?: boolean;
+      /** The membership removed was the caller's own. */
+      removedSelf?: boolean;
     }
   | { ok: false; code: FailureCode; message: string };
 
@@ -434,6 +437,57 @@ async function lockActorAndAuthorize(
   if (membership?.admin !== true) reject("NOT_AUTHORIZED");
 }
 
+/**
+ * Deletes one membership while keeping the temple's last administrator. The
+ * caller holds the temple row lock, so concurrent removals and demotions
+ * serialise. A removed member's ritual access ends with the row: reads and
+ * writes load memberships fresh.
+ */
+async function deleteMembership(
+  tx: Transaction,
+  templeId: string,
+  membershipId: string,
+): Promise<{ userId: string }> {
+  const [target] = await tx
+    .select({
+      id: templeMemberships.id,
+      userId: templeMemberships.userId,
+      admin: templeMemberships.admin,
+    })
+    .from(templeMemberships)
+    .where(
+      and(
+        eq(templeMemberships.id, membershipId),
+        eq(templeMemberships.templeId, templeId),
+      ),
+    )
+    .for("update");
+  if (!target) reject("NOT_FOUND");
+  if (target.admin) {
+    const admins = await tx
+      .select({ id: templeMemberships.id })
+      .from(templeMemberships)
+      .where(
+        and(
+          eq(templeMemberships.templeId, templeId),
+          eq(templeMemberships.admin, true),
+        ),
+      )
+      .orderBy(asc(templeMemberships.id))
+      .for("update");
+    if (admins.length <= 1) reject("LAST_ADMIN");
+  }
+  await tx
+    .delete(templeMemberships)
+    .where(
+      and(
+        eq(templeMemberships.id, membershipId),
+        eq(templeMemberships.templeId, templeId),
+      ),
+    );
+  return { userId: target.userId };
+}
+
 /** Transactional temple joins and administrator edits with fresh SQL authorization. */
 export function createSqlTempleWriter(
   database: TempleDatabase,
@@ -480,7 +534,7 @@ export function createSqlTempleWriter(
             .select({ id: temples.id })
             .from(temples)
             .where(eq(temples.id, candidate.id))
-            .for("update");
+            .for("no key update");
           if (!temple) reject("INVALID_INVITE");
           const [invite] = await tx
             .select({ templeId: templeInvites.templeId })
@@ -600,7 +654,7 @@ export function createSqlTempleWriter(
             .select({ id: temples.id })
             .from(temples)
             .where(eq(temples.id, templeId))
-            .for("update");
+            .for("no key update");
           if (!temple) reject("NOT_FOUND");
           await lockActorAndAuthorize(tx, actorId, templeId);
           const joinPass = request.joinPass as string;
@@ -685,7 +739,7 @@ export function createSqlTempleWriter(
             .select({ id: temples.id })
             .from(temples)
             .where(eq(temples.id, templeId))
-            .for("update");
+            .for("no key update");
           if (!temple) reject("NOT_FOUND");
           await lockActorAndAuthorize(tx, actorId, templeId);
           const [target] = await tx
@@ -742,6 +796,111 @@ export function createSqlTempleWriter(
             templeId,
             membershipId,
           };
+        });
+      } catch (error) {
+        return writeFailure(error);
+      }
+    },
+    /** An administrator (or global admin) removes a member; they may rejoin with a join code. */
+    async removeMember(input: unknown): Promise<TempleWriteResult> {
+      try {
+        if (!input || typeof input !== "object" || Array.isArray(input))
+          reject("INVALID_REQUEST");
+        const request = input as Record<string, unknown>;
+        if (
+          !ownKeys(request, [
+            "version",
+            "expectedActorId",
+            "templeId",
+            "membershipId",
+          ]) ||
+          request.version !== 1 ||
+          !validText(request.templeId, 200) ||
+          !validText(request.membershipId, 200)
+        )
+          reject("INVALID_REQUEST");
+        const actorId = await verifiedActor(
+          getVerifiedActorId,
+          request.expectedActorId,
+        );
+        return await database.transaction(async (tx) => {
+          const templeId = await resolveTempleRouteId(
+            tx,
+            "temples",
+            request.templeId as string,
+          );
+          const membershipId = await resolveTempleRouteId(
+            tx,
+            "templeMemberships",
+            request.membershipId as string,
+          );
+          if (!templeId || !membershipId) reject("NOT_FOUND");
+          const [temple] = await tx
+            .select({ id: temples.id })
+            .from(temples)
+            .where(eq(temples.id, templeId))
+            .for("no key update");
+          if (!temple) reject("NOT_FOUND");
+          await lockActorAndAuthorize(tx, actorId, templeId);
+          const removed = await deleteMembership(tx, templeId, membershipId);
+          return {
+            ok: true as const,
+            templeId,
+            removedSelf: removed.userId === actorId,
+          };
+        });
+      } catch (error) {
+        return writeFailure(error);
+      }
+    },
+
+    /** A member leaves a temple of their own accord; only a join code lets them back. */
+    async leave(input: unknown): Promise<TempleWriteResult> {
+      try {
+        if (!input || typeof input !== "object" || Array.isArray(input))
+          reject("INVALID_REQUEST");
+        const request = input as Record<string, unknown>;
+        if (
+          !ownKeys(request, ["version", "expectedActorId", "templeId"]) ||
+          request.version !== 1 ||
+          !validText(request.templeId, 200)
+        )
+          reject("INVALID_REQUEST");
+        const actorId = await verifiedActor(
+          getVerifiedActorId,
+          request.expectedActorId,
+        );
+        return await database.transaction(async (tx) => {
+          const templeId = await resolveTempleRouteId(
+            tx,
+            "temples",
+            request.templeId as string,
+          );
+          if (!templeId) reject("NOT_FOUND");
+          const [temple] = await tx
+            .select({ id: temples.id })
+            .from(temples)
+            .where(eq(temples.id, templeId))
+            .for("no key update");
+          if (!temple) reject("NOT_FOUND");
+          const [identity] = await tx
+            .select({ id: user.id })
+            .from(user)
+            .where(eq(user.id, actorId))
+            .for("key share");
+          if (!identity) reject("NOT_AUTHENTICATED");
+          const [own] = await tx
+            .select({ id: templeMemberships.id })
+            .from(templeMemberships)
+            .where(
+              and(
+                eq(templeMemberships.templeId, templeId),
+                eq(templeMemberships.userId, actorId),
+              ),
+            );
+          if (!own) reject("NOT_FOUND");
+          await deleteMembership(tx, templeId, own.id);
+          return { ok: true as const, templeId, removedSelf: true };
         });
       } catch (error) {
         return writeFailure(error);

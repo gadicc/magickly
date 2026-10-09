@@ -12,12 +12,21 @@ import { getCurrentSqlUserId } from "@/auth/session";
 import { db } from "@/db/neonFull";
 import { privateMetadata } from "@/seo/metadata";
 import { createSqlTempleReader } from "@/temples/sql";
-import { updateTempleMembershipAction } from "../../../../actions";
+import {
+  removeTempleMemberAction,
+  updateTempleMembershipAction,
+} from "../../../../actions";
+import { ConfirmAction } from "../../../../ConfirmAction";
 
 export const metadata = privateMetadata("Temple Membership");
 
 function signInHref(callbackURL: string) {
   return `/signin?${new URLSearchParams({ callbackURL }).toString()}`;
+}
+
+/** A motto may run to thousands of characters; a dialog title should not. */
+function shortName(name: string) {
+  return name.length > 60 ? `${name.slice(0, 57)}…` : name;
 }
 
 export default async function TemplesAdminEditMembershipPage({
@@ -120,6 +129,32 @@ export default async function TemplesAdminEditMembershipPage({
           </Stack>
         </Stack>
       </form>
+
+      <Typography variant="h6" sx={{ mt: 5, mb: 1 }}>
+        Remove from temple
+      </Typography>
+      <ConfirmAction
+        action={removeTempleMemberAction}
+        fields={{
+          expectedActorId: actorId,
+          templeId: temple.id,
+          membershipId: membership.membershipId,
+        }}
+        label="Remove from temple"
+        title={`Remove ${shortName(membership.motto || membership.displayName)}?`}
+        confirmLabel="Remove member"
+      >
+        <p>
+          They lose access to {temple.name} Temple’s private rituals at once.
+          Copies downloaded to their devices are deleted the next time those
+          devices connect, and a device that stays offline locks them within 14
+          days at the latest.
+        </p>
+        <p>
+          They can rejoin at grade 0 if they still have the join code. Change or
+          clear it under Join information if you do not want that.
+        </p>
+      </ConfirmAction>
     </Container>
   );
 }

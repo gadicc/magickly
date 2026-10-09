@@ -8,8 +8,12 @@ import {
   templeInvites,
   templeMemberships,
   temples,
+  userGroupGrants,
+  userGroups,
 } from "../db/schema/memberships";
 import { userAccess, userProfile } from "../db/schema/userProfile";
+import { getRitualAccess, type RitualPolicy } from "../doc/access";
+import { loadSqlRitualPrincipal } from "../doc/sqlPolicy";
 import { createUuidV7 } from "../lib/ids";
 import {
   createSqlTempleReader,
@@ -28,6 +32,8 @@ const schema = {
   temples,
   templeInvites,
   templeMemberships,
+  userGroups,
+  userGroupGrants,
 };
 const harness = await createMemoryPgliteHarness({ schema });
 const { db } = harness;
@@ -495,5 +501,235 @@ describe("SQL temple administration", () => {
         .from(templeInvites)
         .where(eq(templeInvites.templeId, ids.temple)),
     ).toEqual([]);
+  });
+});
+
+describe("SQL temple removal and leaving", () => {
+  const remove = (
+    actorId: string,
+    membershipId: string,
+    templeId = ids.temple,
+  ) =>
+    createSqlTempleWriter(db, async () => actorId).removeMember({
+      version: 1,
+      expectedActorId: actorId,
+      templeId,
+      membershipId,
+    });
+  const leave = (actorId: string, templeId = ids.temple) =>
+    createSqlTempleWriter(db, async () => actorId).leave({
+      version: 1,
+      expectedActorId: actorId,
+      templeId,
+    });
+  const members = async (templeId = ids.temple) =>
+    (
+      await db
+        .select({ userId: templeMemberships.userId })
+        .from(templeMemberships)
+        .where(eq(templeMemberships.templeId, templeId))
+    )
+      .map((row) => row.userId)
+      .sort();
+
+  it("lets an administrator remove a member, who can then rejoin only at grade zero", async () => {
+    expect(await remove(ids.scopedAdmin, ids.memberMembership)).toEqual({
+      ok: true,
+      templeId: ids.temple,
+      removedSelf: false,
+    });
+    expect(await members()).toEqual([ids.scopedAdmin]);
+    expect(await createSqlTempleReader(db).getMyTemples(ids.member)).toEqual(
+      [],
+    );
+
+    const rejoined = await createSqlTempleWriter(
+      db,
+      async () => ids.member,
+    ).join({
+      version: 1,
+      expectedActorId: ids.member,
+      slug: "alpha",
+      joinPass: "alpha-secret",
+    });
+    expect(rejoined).toMatchObject({ ok: true, alreadyMember: false });
+    const [again] = await db
+      .select()
+      .from(templeMemberships)
+      .where(eq(templeMemberships.userId, ids.member));
+    expect(again).toMatchObject({ grade: 0, admin: false, motto: null });
+    expect(again.id).not.toBe(ids.memberMembership);
+  });
+
+  it("refuses everyone who is not currently an administrator, using fresh grants", async () => {
+    expect(await remove(ids.member, ids.adminMembership)).toMatchObject({
+      ok: false,
+      code: "NOT_AUTHORIZED",
+    });
+    expect(await remove(ids.outsider, ids.memberMembership)).toMatchObject({
+      ok: false,
+      code: "NOT_AUTHORIZED",
+    });
+    await db
+      .update(templeMemberships)
+      .set({ admin: false })
+      .where(eq(templeMemberships.id, ids.adminMembership));
+    expect(await remove(ids.scopedAdmin, ids.memberMembership)).toMatchObject({
+      ok: false,
+      code: "NOT_AUTHORIZED",
+    });
+    expect(await members()).toEqual([ids.member, ids.scopedAdmin].sort());
+  });
+
+  it("only removes memberships of the named temple and rejects bad requests", async () => {
+    expect(
+      await remove(ids.scopedAdmin, ids.globalMembership, ids.temple),
+    ).toMatchObject({ ok: false, code: "NOT_FOUND" });
+    expect(await members(ids.otherTemple)).toEqual([ids.globalAdmin]);
+    expect(await remove(ids.scopedAdmin, createUuidV7())).toMatchObject({
+      ok: false,
+      code: "NOT_FOUND",
+    });
+    const writer = createSqlTempleWriter(db, async () => ids.scopedAdmin);
+    for (const request of [
+      null,
+      [],
+      { version: 1, expectedActorId: ids.scopedAdmin, templeId: ids.temple },
+      {
+        version: 2,
+        expectedActorId: ids.scopedAdmin,
+        templeId: ids.temple,
+        membershipId: ids.memberMembership,
+      },
+      {
+        version: 1,
+        expectedActorId: ids.scopedAdmin,
+        templeId: ids.temple,
+        membershipId: ids.memberMembership,
+        admin: true,
+      },
+    ])
+      expect(await writer.removeMember(request)).toMatchObject({
+        ok: false,
+        code: "INVALID_REQUEST",
+      });
+    expect(
+      await writer.removeMember({
+        version: 1,
+        expectedActorId: ids.member,
+        templeId: ids.temple,
+        membershipId: ids.memberMembership,
+      }),
+    ).toMatchObject({ ok: false, code: "ACCOUNT_CHANGED" });
+    expect(await members()).toEqual([ids.member, ids.scopedAdmin].sort());
+  });
+
+  it("keeps the last administrator whether they are removed, remove themselves or leave", async () => {
+    for (const result of [
+      await remove(ids.scopedAdmin, ids.adminMembership),
+      await leave(ids.scopedAdmin),
+      await remove(ids.globalAdmin, ids.adminMembership),
+    ])
+      expect(result).toMatchObject({ ok: false, code: "LAST_ADMIN" });
+    expect(await members()).toEqual([ids.member, ids.scopedAdmin].sort());
+
+    // With a second administrator the first may go.
+    await db
+      .update(templeMemberships)
+      .set({ admin: true })
+      .where(eq(templeMemberships.id, ids.memberMembership));
+    expect(await leave(ids.scopedAdmin)).toEqual({
+      ok: true,
+      templeId: ids.temple,
+      removedSelf: true,
+    });
+    expect(await members()).toEqual([ids.member]);
+  });
+
+  it("reports when an administrator removed their own membership", async () => {
+    await db
+      .update(templeMemberships)
+      .set({ admin: true })
+      .where(eq(templeMemberships.id, ids.memberMembership));
+    expect(await remove(ids.scopedAdmin, ids.adminMembership)).toMatchObject({
+      ok: true,
+      removedSelf: true,
+    });
+    // Now the only administrator, they cannot remove themselves too.
+    expect(await remove(ids.member, ids.memberMembership)).toMatchObject({
+      ok: false,
+      code: "LAST_ADMIN",
+    });
+  });
+
+  it("lets a global administrator remove members of any temple", async () => {
+    expect(await remove(ids.globalAdmin, ids.memberMembership)).toMatchObject({
+      ok: true,
+    });
+    expect(await members()).toEqual([ids.scopedAdmin]);
+  });
+
+  it("lets a member leave on their own, once, and nobody else's temple", async () => {
+    expect(await leave(ids.member)).toEqual({
+      ok: true,
+      templeId: ids.temple,
+      removedSelf: true,
+    });
+    expect(await members()).toEqual([ids.scopedAdmin]);
+    expect(await leave(ids.member)).toMatchObject({
+      ok: false,
+      code: "NOT_FOUND",
+    });
+    expect(await leave(ids.outsider)).toMatchObject({
+      ok: false,
+      code: "NOT_FOUND",
+    });
+    expect(await members(ids.otherTemple)).toEqual([ids.globalAdmin]);
+    const writer = createSqlTempleWriter(db, async () => ids.member);
+    expect(
+      await writer.leave({
+        version: 1,
+        expectedActorId: ids.outsider,
+        templeId: ids.temple,
+      }),
+    ).toMatchObject({ ok: false, code: "ACCOUNT_CHANGED" });
+    for (const request of [
+      null,
+      { version: 1, expectedActorId: ids.member },
+      {
+        version: 1,
+        expectedActorId: ids.member,
+        templeId: ids.temple,
+        membershipId: ids.adminMembership,
+      },
+    ])
+      expect(await writer.leave(request)).toMatchObject({
+        ok: false,
+        code: "INVALID_REQUEST",
+      });
+    expect(await leave(ids.member, createUuidV7())).toMatchObject({
+      ok: false,
+      code: "NOT_FOUND",
+    });
+  });
+
+  it("ends the removed person's ritual access, creator rights included", async () => {
+    const ritual = (minGrade: number): RitualPolicy => ({
+      id: createUuidV7(),
+      creatorId: ids.member,
+      scope: { kind: "temple", templeId: ids.temple, minGrade },
+    });
+    const access = async (policy: RitualPolicy) =>
+      getRitualAccess(policy, await loadSqlRitualPrincipal(db, ids.member));
+    const reachable = ritual(2);
+    const beyond = ritual(5);
+    // Still a member: reads at their grade, and edits what they created.
+    const keeps = { read: true, edit: true, readSourceHistory: true };
+    expect(await access(reachable)).toEqual(keeps);
+    expect(await access(beyond)).toEqual(keeps);
+    await remove(ids.scopedAdmin, ids.memberMembership);
+    const gone = { read: false, edit: false, readSourceHistory: false };
+    expect(await access(reachable)).toEqual(gone);
+    expect(await access(beyond)).toEqual(gone);
   });
 });

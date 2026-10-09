@@ -124,3 +124,39 @@ export async function updateTempleMembershipAction(formData: FormData) {
   if (!result.ok) redirect(templeErrorPath(callbackURL, result.message));
   redirect(`/temples/admin/${result.templeId}`);
 }
+
+export async function removeTempleMemberAction(formData: FormData) {
+  const routeTempleId = field(formData, "templeId");
+  const routeMembershipId = field(formData, "membershipId");
+  if (!validRouteValue(routeTempleId) || !validRouteValue(routeMembershipId))
+    redirect("/temples/admin");
+  const callbackURL = `/temples/admin/${encodeURIComponent(routeTempleId)}/membership/${encodeURIComponent(routeMembershipId)}`;
+  if (!(await getCurrentSqlUserId())) redirect(signInPath(callbackURL));
+  const result = await createSqlTempleWriter(
+    db,
+    getCurrentSqlUserId,
+  ).removeMember({
+    version: 1,
+    expectedActorId: field(formData, "expectedActorId"),
+    templeId: routeTempleId,
+    membershipId: routeMembershipId,
+  });
+  if (!result.ok) redirect(templeErrorPath(callbackURL, result.message));
+  // An administrator who removed themselves can no longer open that page.
+  if (result.removedSelf) redirect("/temples?left=1");
+  redirect(`/temples/admin/${result.templeId}?removed=1`);
+}
+
+/** The signed-in member leaves of their own accord; a last administrator cannot. */
+export async function leaveTempleAction(formData: FormData) {
+  const routeTempleId = field(formData, "templeId");
+  if (!validRouteValue(routeTempleId)) redirect("/temples");
+  if (!(await getCurrentSqlUserId())) redirect(signInPath("/temples"));
+  const result = await createSqlTempleWriter(db, getCurrentSqlUserId).leave({
+    version: 1,
+    expectedActorId: field(formData, "expectedActorId"),
+    templeId: routeTempleId,
+  });
+  if (!result.ok) redirect(templeErrorPath("/temples", result.message));
+  redirect("/temples?left=1");
+}

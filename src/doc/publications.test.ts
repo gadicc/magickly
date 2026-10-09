@@ -235,10 +235,18 @@ describe("ritual publications", () => {
     [
       "creator",
       {},
-      [],
+      [{ userId: oid(1), templeId: oid(40), grade: 0 }],
       { templeId: oid(40), minGrade: 9, userId: id(1) },
       true,
       true,
+    ],
+    [
+      "creator removed from the temple",
+      {},
+      [],
+      { templeId: oid(40), minGrade: 9, userId: id(1) },
+      false,
+      false,
     ],
     [
       "global admin",

@@ -42,6 +42,11 @@ const member = (grade: number | null, admin = false, templeId = "temple") =>
   actor({
     templeMemberships: [{ templeId, grade, admin }],
   });
+/** The ritual's creator while still a (grade 0) member of the temple. */
+const creatorMember = actor({
+  userId: "creator",
+  templeMemberships: [{ templeId: "temple", grade: 0, admin: false }],
+});
 const denied = { read: false, edit: false, readSourceHistory: false };
 
 // Public, group, temple grade 2, temple grade 0. Synthetic domains cover scopes
@@ -60,10 +65,11 @@ const cases: [string, RitualPrincipal | null, boolean[], boolean[]][] = [
     [false, false, false, false],
   ],
   [
+    // Removed from the temple: its rituals are no longer theirs.
     "creator without any membership",
     actor({ userId: "creator" }),
-    [true, true, true, true],
-    [true, true, true, true],
+    [true, true, false, false],
+    [true, true, false, false],
   ],
   [
     "global admin without any membership",
@@ -172,6 +178,39 @@ describe("shared ritual read/edit/source-history matrix", () => {
     ).toEqual(denied);
   });
 
+  it("keeps a creator's rights on a temple ritual only while they are a member", () => {
+    const keeps = { read: true, edit: true, readSourceHistory: true };
+    // Still a member: creator rights hold whatever the grade.
+    expect(getRitualAccess(templeDoc, creatorMember)).toEqual(keeps);
+    // Removed, or only a member of some other temple: nothing is left.
+    expect(getRitualAccess(templeDoc, actor({ userId: "creator" }))).toEqual(
+      denied,
+    );
+    expect(
+      getRitualAccess(
+        templeDoc,
+        actor({
+          userId: "creator",
+          templeMemberships: [{ templeId: "other", grade: 6, admin: true }],
+        }),
+      ),
+    ).toEqual(denied);
+    // Public and group rituals have no membership to lose.
+    expect(
+      getRitualAccess(publicDoc, actor({ userId: "creator" })),
+    ).toMatchObject({ edit: true });
+    expect(
+      getRitualAccess(groupDoc, actor({ userId: "creator" })),
+    ).toMatchObject({ edit: true });
+    // A global administrator is unaffected.
+    expect(
+      getRitualAccess(
+        templeDoc,
+        actor({ userId: "creator", globalAdmin: true }),
+      ),
+    ).toEqual(keeps);
+  });
+
   it("does not give revision authors continuing access after membership removal", () => {
     // Authorship belongs to a revision; only ritual creatorId grants creator rights.
     expect(
@@ -233,7 +272,7 @@ describe("exclusive scopes for new writes", () => {
 describe("ordinary content and title saves", () => {
   it("allows creator and matching scope admins to retain the existing policy", () => {
     for (const principal of [
-      actor({ userId: "creator" }),
+      creatorMember,
       actor({ globalAdmin: true }),
       member(0, true),
     ]) {
@@ -273,7 +312,7 @@ describe("ordinary content and title saves", () => {
     { ...templeDoc, id: "other" },
   ])("requires a separate policy command for %j", (proposed) => {
     for (const principal of [
-      actor({ userId: "creator" }),
+      creatorMember,
       actor({ globalAdmin: true }),
       member(0, true),
     ]) {

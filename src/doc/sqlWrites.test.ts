@@ -151,6 +151,8 @@ beforeEach(async () => {
     ]);
     await tx.insert(templeMemberships).values(
       [
+        // The creator stays in the temple: removal ends creator rights too.
+        { userId: actor.creator, grade: 0 },
         { userId: actor.gradeZero, grade: 0 },
         { userId: actor.gradeTwo, grade: 2 },
         { userId: actor.templeAdmin, grade: 0, admin: true },
