@@ -138,7 +138,7 @@ export default async function AdminTemplePage({
         actorId={actorId}
         templeId={temple.id}
         saved={forum?.settings ?? null}
-        canStoreKeys={forumService.canStoreKeys()}
+        canStoreKeys={await forumService.canStoreKeys()}
       />
       {showDiscourseSync ? (
         <DiscourseSyncButton actorId={actorId} templeId={temple.id} />

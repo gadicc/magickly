@@ -51,8 +51,11 @@ Existing `v1.` rows, if any, show up as `malformed` in Loom's `report`,
 
 **One purpose, bound to the temple, the forum address and the username.**
 `temple-forum.api-key`, bound to `{ temple, origin, username }`. Today the
-binding is temple and address. Adding the username means a database writer
-cannot change who forum actions are attributed to.
+binding is temple and address. Adding the username means a database edit
+alone cannot change who forum actions are attributed to. It is not more than
+that: whoever the database calls a temple administrator can still change the
+username through the form, which seals the key again under the new name, and
+an older row of the same temple can be put back whole.
 
 **Changing a bound field without a new key re-seals in the transaction.** The
 form lets an administrator change the API username and keep the stored key.
@@ -62,23 +65,32 @@ existing `withTemple` transaction. Changing the address still requires entering
 the key again, as now, because the key is checked against the forum before it
 is saved.
 
-**Calls become asynchronous.** `encryptForumKey` and `decryptForumKey` are
-synchronous Node `crypto`; Loom's `seal` and `tryOpen` are Web Crypto. The call
-sites in `src/temples/forum.ts` are already inside async functions.
-`canStoreForumKeys` was called synchronously while rendering, so it becomes
-`hasSecretsKey` in `src/secrets.ts`: a check that the pointer and the key
-variable it names are present, without decoding either. A key that is present
-but refused (a fingerprint mismatch, say) shows when saving, as "this server
-cannot protect forum keys yet", and on the health route.
+**Calls become asynchronous, and ask whether the keys are ready.**
+`encryptForumKey` and `decryptForumKey` are synchronous Node `crypto`; Loom's
+`seal` and `tryOpen` are Web Crypto. The call sites in `src/temples/forum.ts`
+are already inside async functions. `canStoreForumKeys` was called
+synchronously while rendering and the plan first replaced it with a check
+that the key variables are present. Review showed that is not enough: with a
+key present but wrong (a fingerprint mismatch), Loom reports every stored
+value as unreadable, so each administrator would be told their own key had
+gone bad and would send a fresh one to their forum before the save failed. So
+`canStoreKeys`, `save` and the sync loader ask `assertReady()` instead: the
+form is switched off, a save is refused before the key goes anywhere, and a
+sync says the server cannot read keys at the moment.
 
 **The hint stays local.** The four-character hint is magickli's own display
 rule and is not a Loom concern. It stays in `src/temples/forumKeys.ts`, which
 keeps its name and now holds the hint and the one function that builds the
-binding; the cipher in it is gone.
+binding; the cipher in it is gone. When a key is kept or sealed again the
+hint is recomputed from the key, since the stored hint is not sealed with it.
 
 **One declared location.** `temple_forums.api_key_encrypted`, so Loom's
 `report`, `verify` and `reseal` can run. magickli has no jobs feature, so they
-are wired to a small admin-only server action. The column's 2048-character
+are wired to a server action on the global administration page (`/admin`,
+"Stored secrets"), with a rehearsal that writes nothing. A real reseal is
+refused unless the keys were checked against recorded fingerprints, and a run
+is called clean only when every location was read to its end, no row failed
+and none changed underneath it. The column's 2048-character
 check already fits: a 512-character key seals to about 770 characters.
 
 **Re-entry is not protected by the binding.** If someone with database access
@@ -88,7 +100,10 @@ neither the saved address nor the saved username back. The address matters
 more than the username the plan first named: a new key is checked against the
 forum before it is saved, so a pre-filled address would send it to a host the
 administrator never chose. Reading the settings therefore opens the stored key
-to learn whether it still can be, and a blank key is refused while it cannot.
+to learn whether it still can be; when it cannot, the service returns nothing
+else of the connection, so the saved values do not reach the browser at all,
+and a blank key is refused. A value that fails to open is logged on the server
+with its purpose, key version and reason.
 
 ## Rejected
 

@@ -1,22 +1,19 @@
 import "server-only";
 
 import { lookup as dnsLookup } from "node:dns/promises";
+import { type SecretPurpose, SecretsKeyError } from "@gadicc/loom/next/secrets";
 import { eq } from "drizzle-orm";
 import { templeForums } from "../db/schema/discourse";
 import { temples } from "../db/schema/memberships";
 import { isUuidV7 } from "../lib/ids";
+import { templeForumApiKey } from "../secrets";
 import {
   canManageTempleForum,
   canRunDiscourseSync,
   MAGICKLY_DISCOURSE_ORIGIN,
 } from "./discourseSync";
 import { forumFetchOptions } from "./forumHttp";
-import {
-  canStoreForumKeys,
-  decryptForumKey,
-  encryptForumKey,
-  forumKeyHint,
-} from "./forumKeys";
+import { forumKeyBinding, forumKeyHint } from "./forumKeys";
 import {
   assertPublicForumHost,
   type HostLookup,
@@ -28,13 +25,22 @@ import {
   type TempleDatabase,
 } from "./sql";
 
-/** What an administrator may see of a saved forum connection: never the key. */
-export interface TempleForumSettings {
-  origin: string;
-  apiUsername: string;
-  apiKeyHint: string;
-  updatedAt: Date;
-}
+/**
+ * What an administrator may see of a saved forum connection: never the key.
+ * When the saved key no longer opens for this temple, address and username,
+ * nothing else is given either: one of them may have been changed underneath
+ * the key, and a page that offered it back would have the administrator send
+ * a fresh key to an address they never chose.
+ */
+export type TempleForumSettings =
+  | {
+      keyReadable: true;
+      origin: string;
+      apiUsername: string;
+      apiKeyHint: string;
+      updatedAt: Date;
+    }
+  | { keyReadable: false };
 
 /** What a sync needs to talk to the forum. */
 export interface TempleForumCredentials {
@@ -55,6 +61,8 @@ const MESSAGES = {
     "This server cannot protect forum keys yet, so forum connections are switched off.",
   UNAVAILABLE: "The forum settings could not be saved. Try again.",
 } as const;
+const KEY_UNREADABLE =
+  "The saved API key can no longer be read. Enter the API key again.";
 type Code = keyof typeof MESSAGES;
 export type TempleForumResult =
   | { ok: true }
@@ -74,7 +82,49 @@ const reject = (code: Code, detail?: string): never => {
 const canonical = (value: unknown): value is string =>
   isUuidV7(value) && value === value.toLowerCase();
 
-type Env = Record<string, string | undefined>;
+/** The part of the forum key purpose this module uses; tests supply their own. */
+export type ForumKeySealer = Pick<
+  SecretPurpose,
+  "seal" | "tryOpen" | "assertReady"
+>;
+
+/**
+ * Whether this server's keys can be used at all: present, and in production
+ * the ones whose fingerprints are recorded. Without this a server with a
+ * missing or mistyped key would tell every administrator that their own key
+ * had become unreadable, and take a fresh one before failing to store it.
+ */
+async function keysReady(forumKey: ForumKeySealer) {
+  try {
+    await forumKey.assertReady();
+    return true;
+  } catch (error) {
+    if (error instanceof SecretsKeyError) return false;
+    throw error;
+  }
+}
+
+/**
+ * The stored key, or null when it cannot be read: sealed for another temple,
+ * address or username, altered, under a key that is gone, or because this
+ * server's keys are refused. Ask {@link keysReady} to tell the last apart.
+ */
+async function openStoredKey(
+  forumKey: ForumKeySealer,
+  row: {
+    templeId: string;
+    origin: string;
+    apiUsername: string;
+    sealed: string;
+  },
+) {
+  try {
+    return await forumKey.tryOpen(row.sealed, forumKeyBinding(row));
+  } catch (error) {
+    if (error instanceof SecretsKeyError) return null;
+    throw error;
+  }
+}
 
 export type ForumKeyCheck = (
   origin: string,
@@ -121,21 +171,21 @@ export async function checkForumAdminKey(
 /**
  * Temple administrators connect their own Discourse forum: its address, the
  * API username and an API key. Saving checks the address is a public https
- * host and encrypts the key; reads return only a hint of it. Changing the
- * address requires entering the key again, so an existing key can never be
- * redirected to another host.
+ * host and seals the key to the temple, address and username; reads return
+ * only a hint of it. Changing the address requires entering the key again, so
+ * a stored key is never sent to a host it was not entered for.
  */
 export function createSqlTempleForumService(
   database: TempleDatabase,
   getVerifiedActorId: () => Promise<string | null>,
   options: {
-    env?: Env;
+    forumKey?: ForumKeySealer;
     lookup?: HostLookup;
     now?: () => Date;
     checkKey?: ForumKeyCheck;
   } = {},
 ) {
-  const env = options.env ?? process.env;
+  const forumKey = options.forumKey ?? templeForumApiKey;
   const lookup: HostLookup =
     options.lookup ?? ((host) => dnsLookup(host, { all: true }));
   const now = options.now ?? (() => new Date());
@@ -197,12 +247,20 @@ export function createSqlTempleForumService(
     const code = (error as { code?: unknown } | null)?.code;
     if (typeof code === "string" && Object.hasOwn(MESSAGES, code))
       return { ok: false, code: code as Code, message: MESSAGES[code as Code] };
+    // The server's keys are missing or refused. The reason names a variable,
+    // which is for the health check to report, not this page.
+    if (error instanceof SecretsKeyError)
+      return {
+        ok: false,
+        code: "NOT_CONFIGURED",
+        message: MESSAGES.NOT_CONFIGURED,
+      };
     return { ok: false, code: "UNAVAILABLE", message: MESSAGES.UNAVAILABLE };
   }
 
   return {
-    /** Whether keys can be stored at all on this server. */
-    canStoreKeys: () => canStoreForumKeys(env),
+    /** Whether keys can be stored and read at all on this server. */
+    canStoreKeys: () => keysReady(forumKey),
 
     /** The saved connection, for temple and global administrators only. */
     async read(
@@ -224,11 +282,25 @@ export function createSqlTempleForumService(
               origin: templeForums.forumOrigin,
               apiUsername: templeForums.apiUsername,
               apiKeyHint: templeForums.apiKeyHint,
+              sealed: templeForums.apiKeyEncrypted,
               updatedAt: templeForums.updatedAt,
             })
             .from(templeForums)
             .where(eq(templeForums.templeId, templeId));
-          return { settings: row ?? null };
+          if (!row) return { settings: null };
+          // Opened only to learn whether it still can be; the key goes no further.
+          const { sealed, ...settings } = row;
+          const opened = await openStoredKey(forumKey, {
+            templeId,
+            sealed,
+            ...settings,
+          });
+          return {
+            settings:
+              opened === null
+                ? { keyReadable: false }
+                : { keyReadable: true, ...settings },
+          };
         });
       } catch {
         return null;
@@ -246,7 +318,9 @@ export function createSqlTempleForumService(
           "apiKey",
         ]);
         const actorId = await actor(request.expectedActorId);
-        if (!canStoreForumKeys(env)) return reject("NOT_CONFIGURED");
+        // Before the key is sent anywhere: a server that could not store it
+        // has no business asking a forum about it.
+        if (!(await keysReady(forumKey))) return reject("NOT_CONFIGURED");
         if (
           typeof request.origin !== "string" ||
           typeof request.apiUsername !== "string" ||
@@ -287,15 +361,34 @@ export function createSqlTempleForumService(
               .from(templeForums)
               .where(eq(templeForums.templeId, templeId))
               .for("update");
+            const binding = forumKeyBinding({ templeId, origin, apiUsername });
             let keyEncrypted: string;
             let hint: string;
             if (apiKey) {
-              keyEncrypted = encryptForumKey(apiKey, { templeId, origin }, env);
+              keyEncrypted = await forumKey.seal(apiKey, binding);
               hint = forumKeyHint(apiKey);
             } else if (existing && existing.forumOrigin === origin) {
-              // Keep the stored key, but only for the address it was entered for.
-              keyEncrypted = existing.apiKeyEncrypted;
-              hint = existing.apiKeyHint;
+              // Keep the stored key, but only for the address it was entered
+              // for, and only while it still opens: a key that does not would
+              // otherwise be saved again as if it were healthy.
+              const kept = await forumKey.tryOpen(
+                existing.apiKeyEncrypted,
+                forumKeyBinding({
+                  templeId,
+                  origin: existing.forumOrigin,
+                  apiUsername: existing.apiUsername,
+                }),
+              );
+              if (kept === null)
+                return reject("INVALID_REQUEST", KEY_UNREADABLE);
+              // The username is part of what the key is sealed to, so a new
+              // name needs the key sealed again or it would stop opening.
+              keyEncrypted =
+                existing.apiUsername === apiUsername
+                  ? existing.apiKeyEncrypted
+                  : await forumKey.seal(kept, binding);
+              // From the key itself: the stored hint is not sealed with it.
+              hint = forumKeyHint(kept);
             } else {
               return reject(
                 "INVALID_REQUEST",
@@ -354,15 +447,17 @@ export function createSqlTempleForumService(
 
 /**
  * The credentials a sync should use, or why there are none. Authorization is
- * the caller's: this only reads and decrypts.
+ * the caller's: this only reads and opens the key.
  */
 export async function loadTempleForumCredentials(
   database: Pick<TempleDatabase, "select">,
   templeId: string,
-  env: Env = process.env,
+  forumKey: ForumKeySealer = templeForumApiKey,
 ): Promise<
   | { kind: "none" }
   | { kind: "unreadable" }
+  /** This server's keys are missing or refused: no stored key can be read. */
+  | { kind: "unavailable" }
   | { kind: "ready"; credentials: TempleForumCredentials }
 > {
   const [row] = await database
@@ -371,12 +466,15 @@ export async function loadTempleForumCredentials(
     .where(eq(templeForums.templeId, templeId));
   if (!row) return { kind: "none" };
   const parsed = parseForumOrigin(row.forumOrigin);
-  const apiKey = decryptForumKey(
-    row.apiKeyEncrypted,
-    { templeId, origin: row.forumOrigin },
-    env,
-  );
-  if (!parsed.ok || !apiKey) return { kind: "unreadable" };
+  const apiKey = await openStoredKey(forumKey, {
+    templeId,
+    origin: row.forumOrigin,
+    apiUsername: row.apiUsername,
+    sealed: row.apiKeyEncrypted,
+  });
+  if (!parsed.ok) return { kind: "unreadable" };
+  if (!apiKey)
+    return { kind: (await keysReady(forumKey)) ? "unreadable" : "unavailable" };
   return {
     kind: "ready",
     credentials: {
@@ -401,7 +499,7 @@ export type ForumSyncTarget =
 export async function resolveForumSyncTarget(
   database: TempleDatabase,
   input: { actorId: string; templeId: string },
-  options: { env?: Env; lookup?: HostLookup } = {},
+  options: { forumKey?: ForumKeySealer; lookup?: HostLookup } = {},
 ): Promise<ForumSyncTarget> {
   const lookup: HostLookup =
     options.lookup ?? ((host) => dnsLookup(host, { all: true }));
@@ -415,8 +513,14 @@ export async function resolveForumSyncTarget(
   const own = await loadTempleForumCredentials(
     database,
     input.templeId,
-    options.env,
+    options.forumKey,
   );
+  if (own.kind === "unavailable")
+    return {
+      kind: "error",
+      message:
+        "This server cannot read forum keys at the moment. Try again later.",
+    };
   if (own.kind === "unreadable")
     return {
       kind: "error",

@@ -1,4 +1,11 @@
 import { createMemoryPgliteHarness } from "@gadicc/loom/db/testing";
+import {
+  createSecrets,
+  envKeyring,
+  SecretsKeyError,
+  secretKeyFingerprint,
+  staticKeyring,
+} from "@gadicc/loom/secrets";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { user } from "../db/schema/auth";
@@ -10,6 +17,7 @@ import { createUuidV7 } from "../lib/ids";
 import {
   checkForumAdminKey,
   createSqlTempleForumService,
+  type ForumKeySealer,
   loadTempleForumCredentials,
   resolveForumSyncTarget,
 } from "./forum";
@@ -45,7 +53,40 @@ const ids = {
   other: createUuidV7(),
 };
 const when = new Date("2026-10-09T10:00:00.000Z");
-const env = { BETTER_AUTH_SECRET: "test-secret" };
+// Obviously synthetic keys: thirty-two copies of one byte.
+const keyOf = (byte: number) => new Uint8Array(32).fill(byte);
+const PURPOSE = "temple-forum.api-key";
+const sealerUnder = (byte: number): ForumKeySealer =>
+  createSecrets({ keys: staticKeyring({ 1: keyOf(byte) }) }).purpose(PURPOSE);
+const forumKey = sealerUnder(1);
+const otherKey = sealerUnder(2);
+/** A server that was given no key at all, as a preview deployment is. */
+const noKeys: ForumKeySealer = createSecrets({
+  keys: envKeyring({ env: {} }),
+}).purpose(PURPOSE);
+/** A server holding a key other than the one whose fingerprint is recorded. */
+const mismatched: ForumKeySealer = createSecrets({
+  keys: staticKeyring({ 1: keyOf(1) }),
+  expectedKeys: [
+    {
+      id: 1,
+      fingerprint: await secretKeyFingerprint(keyOf(2)),
+      state: "active",
+    },
+  ],
+}).purpose(PURPOSE);
+/** A server that refuses every operation, as Loom does for a contradictory environment. */
+const refusing: ForumKeySealer = {
+  seal: async () => {
+    throw new SecretsKeyError("refused");
+  },
+  tryOpen: async () => {
+    throw new SecretsKeyError("refused");
+  },
+  assertReady: async () => {
+    throw new SecretsKeyError("refused");
+  },
+};
 const publicHost = async () => [{ address: "93.184.216.34", family: 4 }];
 const KEY = "0123456789abcdef0123456789abcdef";
 
@@ -54,7 +95,7 @@ const service = (
   overrides: Parameters<typeof createSqlTempleForumService>[2] = {},
 ) =>
   createSqlTempleForumService(db, async () => actor, {
-    env,
+    forumKey,
     lookup: publicHost,
     now: () => when,
     checkKey: async () => ({ ok: true }),
@@ -113,6 +154,7 @@ describe("saving a temple's forum connection", () => {
       apiKeyHint: "cdef",
       updatedById: ids.admin,
     });
+    expect(row.apiKeyEncrypted).toMatch(/^ls1\.1\.[\w-]+\.[\w-]+$/);
     expect(row.apiKeyEncrypted).not.toContain(KEY);
     const read = await service(ids.admin).read(ids.temple);
     expect(read).toEqual({
@@ -120,11 +162,16 @@ describe("saving a temple's forum connection", () => {
         origin: "https://forum.example.org",
         apiUsername: "system",
         apiKeyHint: "cdef",
+        keyReadable: true,
         updatedAt: row.updatedAt,
       },
     });
     expect(JSON.stringify(read)).not.toContain(KEY);
-    const credentials = await loadTempleForumCredentials(db, ids.temple, env);
+    const credentials = await loadTempleForumCredentials(
+      db,
+      ids.temple,
+      forumKey,
+    );
     expect(credentials).toEqual({
       kind: "ready",
       credentials: {
@@ -138,13 +185,37 @@ describe("saving a temple's forum connection", () => {
   it("keeps the saved key when only the username changes, but not when the address does", async () => {
     await save(ids.admin);
     const before = (await stored()).apiKeyEncrypted;
+    // Nothing it is sealed to changed: the stored string is left alone.
+    expect(await save(ids.admin, { apiKey: "" })).toEqual({ ok: true });
+    expect((await stored()).apiKeyEncrypted).toBe(before);
     expect(
       await save(ids.admin, { apiKey: "", apiUsername: "  bot.user " }),
     ).toEqual({ ok: true });
-    expect(await stored()).toMatchObject({
+    // The username is part of what the key is sealed to, so it is sealed again.
+    const renamed = await stored();
+    expect(renamed).toMatchObject({
       apiUsername: "bot.user",
-      apiKeyEncrypted: before,
+      apiKeyHint: "cdef",
     });
+    expect(renamed.apiKeyEncrypted).not.toBe(before);
+    expect(
+      await loadTempleForumCredentials(db, ids.temple, forumKey),
+    ).toMatchObject({
+      kind: "ready",
+      credentials: { apiUsername: "bot.user", apiKey: KEY },
+    });
+    // The string sealed for the old name does not open under the new one.
+    await db
+      .update(templeForums)
+      .set({ apiKeyEncrypted: before })
+      .where(eq(templeForums.templeId, ids.temple));
+    expect(await loadTempleForumCredentials(db, ids.temple, forumKey)).toEqual({
+      kind: "unreadable",
+    });
+    await db
+      .update(templeForums)
+      .set({ apiKeyEncrypted: renamed.apiKeyEncrypted })
+      .where(eq(templeForums.templeId, ids.temple));
     expect(
       await save(ids.admin, { apiKey: "", origin: "forum.other.org" }),
     ).toMatchObject({
@@ -158,14 +229,14 @@ describe("saving a temple's forum connection", () => {
         origin: "forum.other.org",
       }),
     ).toEqual({ ok: true });
-    expect(await loadTempleForumCredentials(db, ids.temple, env)).toMatchObject(
-      {
-        credentials: {
-          origin: "https://forum.other.org",
-          apiKey: "n3w-k3y-n3w-k3y",
-        },
+    expect(
+      await loadTempleForumCredentials(db, ids.temple, forumKey),
+    ).toMatchObject({
+      credentials: {
+        origin: "https://forum.other.org",
+        apiKey: "n3w-k3y-n3w-k3y",
       },
-    );
+    });
   });
 
   it("defaults the API username and needs a key the first time", async () => {
@@ -273,11 +344,199 @@ describe("saving a temple's forum connection", () => {
     ).toMatchObject({ ok: false, code: "NOT_FOUND" });
   });
 
-  it("refuses to store keys when the server has no secret to protect them", async () => {
-    const bare = service(ids.admin, { env: {} });
-    expect(bare.canStoreKeys()).toBe(false);
+  it("will not keep a saved key that no longer opens, and gives nothing of the connection back", async () => {
+    const unreadable = { settings: { keyReadable: false } };
+    const refusal = {
+      ok: false,
+      code: "INVALID_REQUEST",
+      message:
+        "The saved API key can no longer be read. Enter the API key again.",
+    };
+    await save(ids.admin);
+    const healthy = await stored();
+    const tamper = (change: Partial<typeof healthy>) =>
+      db
+        .update(templeForums)
+        .set({ ...healthy, ...change })
+        .where(eq(templeForums.templeId, ids.temple));
+
+    // Someone with database access changes who the key acts as.
+    await tamper({ apiUsername: "intruder" });
+    // Exactly this: not the changed name, the address or the hint.
+    expect(await service(ids.admin).read(ids.temple)).toEqual(unreadable);
+    for (const apiUsername of ["intruder", "system"])
+      expect(await save(ids.admin, { apiKey: "", apiUsername })).toEqual(
+        refusal,
+      );
+    expect((await stored()).apiUsername).toBe("intruder");
+
+    // Or where it is sent: another public host, kept or with a new name.
+    await tamper({ forumOrigin: "https://forum.other.org" });
+    expect(await service(ids.admin).read(ids.temple)).toEqual(unreadable);
+    expect(await loadTempleForumCredentials(db, ids.temple, forumKey)).toEqual({
+      kind: "unreadable",
+    });
+    for (const apiUsername of ["system", "bot"])
+      expect(
+        await save(ids.admin, {
+          apiKey: "",
+          origin: "https://forum.other.org",
+          apiUsername,
+        }),
+      ).toEqual(refusal);
+    expect(await stored()).toMatchObject({
+      forumOrigin: "https://forum.other.org",
+      apiKeyEncrypted: healthy.apiKeyEncrypted,
+    });
+
+    // Or swaps in the key sealed for another temple's forum.
+    await db.insert(templeForums).values({
+      ...healthy,
+      templeId: ids.other,
+      apiKeyEncrypted: await forumKey.seal("another-temples-key", {
+        temple: ids.other,
+        origin: healthy.forumOrigin,
+        username: healthy.apiUsername,
+      }),
+    });
+    const [theirs] = await db
+      .select()
+      .from(templeForums)
+      .where(eq(templeForums.templeId, ids.other));
+    await tamper({ apiKeyEncrypted: theirs.apiKeyEncrypted });
+    expect(await service(ids.admin).read(ids.temple)).toEqual(unreadable);
+    for (const apiUsername of ["system", "bot"])
+      expect(await save(ids.admin, { apiKey: "", apiUsername })).toEqual(
+        refusal,
+      );
+
+    // A value from before Loom, or under a key this server does not hold.
+    await tamper({
+      apiKeyEncrypted: "v1.0a1b2c3d.AAAAAAAAAAAAAAAA.AAAAAAAAAAAAAAAAAAAAAAAA",
+    });
+    expect(await service(ids.admin).read(ids.temple)).toEqual(unreadable);
+    await tamper({});
     expect(
-      await bare.save({
+      await service(ids.admin, { forumKey: otherKey }).read(ids.temple),
+    ).toEqual(unreadable);
+
+    // Entering the key again is the way out.
+    expect(await save(ids.admin)).toEqual({ ok: true });
+    expect(await service(ids.admin).read(ids.temple)).toMatchObject({
+      settings: { apiUsername: "system", keyReadable: true },
+    });
+  });
+
+  it("takes the hint from the key, not from the stored copy of it", async () => {
+    await save(ids.admin);
+    await db
+      .update(templeForums)
+      .set({ apiKeyHint: "EVIL" })
+      .where(eq(templeForums.templeId, ids.temple));
+    expect(await save(ids.admin, { apiKey: "" })).toEqual({ ok: true });
+    expect((await stored()).apiKeyHint).toBe("cdef");
+    await db
+      .update(templeForums)
+      .set({ apiKeyHint: "EVIL" })
+      .where(eq(templeForums.templeId, ids.temple));
+    expect(await save(ids.admin, { apiKey: "", apiUsername: "bot" })).toEqual({
+      ok: true,
+    });
+    expect((await stored()).apiKeyHint).toBe("cdef");
+  });
+
+  it.each([
+    ["has no key", noKeys],
+    ["holds a key other than the recorded one", mismatched],
+    ["refuses every operation", refusing],
+  ])(
+    "switches forum connections off when the server %s, before a key is sent anywhere",
+    async (_, sealer) => {
+      await save(ids.admin);
+      const before = await stored();
+      const checkKey = vi.fn(async () => ({ ok: true }) as const);
+      const broken = service(ids.admin, { forumKey: sealer, checkKey });
+      expect(await broken.canStoreKeys()).toBe(false);
+      for (const extra of [
+        {},
+        { apiKey: "" },
+        { apiKey: "", apiUsername: "bot" },
+      ])
+        expect(
+          await broken.save({
+            version: 1,
+            expectedActorId: ids.admin,
+            templeId: ids.temple,
+            origin: "https://forum.example.org",
+            apiUsername: "system",
+            apiKey: KEY,
+            ...extra,
+          }),
+        ).toMatchObject({ ok: false, code: "NOT_CONFIGURED" });
+      expect(checkKey).not.toHaveBeenCalled();
+      expect(await stored()).toEqual(before);
+      // The page hides the form in this state; nothing is offered back either.
+      expect(await broken.read(ids.temple)).toEqual({
+        settings: { keyReadable: false },
+      });
+      // A sync says the server is at fault, not the administrator's key.
+      expect(await loadTempleForumCredentials(db, ids.temple, sealer)).toEqual({
+        kind: "unavailable",
+      });
+      expect(
+        await resolveForumSyncTarget(
+          db,
+          { actorId: ids.admin, templeId: ids.temple },
+          { forumKey: sealer, lookup: publicHost },
+        ),
+      ).toEqual({
+        kind: "error",
+        message:
+          "This server cannot read forum keys at the moment. Try again later.",
+      });
+    },
+  );
+
+  it("stores keys on a server whose keys are ready", async () => {
+    expect(await service(ids.admin).canStoreKeys()).toBe(true);
+  });
+
+  it("does not mistake a failure for an unreadable key or an unready server", async () => {
+    await save(ids.admin);
+    const failing = (method: keyof ForumKeySealer): ForumKeySealer => ({
+      ...forumKey,
+      [method]: async () => {
+        throw new Error("down");
+      },
+    });
+    expect(
+      await service(ids.admin, { forumKey: failing("tryOpen") }).read(
+        ids.temple,
+      ),
+    ).toBeNull();
+    await expect(
+      loadTempleForumCredentials(db, ids.temple, failing("tryOpen")),
+    ).rejects.toThrow("down");
+    const unsure = service(ids.admin, { forumKey: failing("assertReady") });
+    await expect(unsure.canStoreKeys()).rejects.toThrow("down");
+    expect(
+      await unsure.save({
+        version: 1,
+        expectedActorId: ids.admin,
+        templeId: ids.temple,
+        origin: "https://forum.example.org",
+        apiUsername: "system",
+        apiKey: KEY,
+      }),
+    ).toMatchObject({ ok: false, code: "UNAVAILABLE" });
+    // The key was accepted when the keys were ready and refused only at the
+    // moment of sealing: still "not configured", and nothing is stored.
+    await db.delete(templeForums);
+    const late = service(ids.admin, {
+      forumKey: { ...forumKey, seal: refusing.seal },
+    });
+    expect(
+      await late.save({
         version: 1,
         expectedActorId: ids.admin,
         templeId: ids.temple,
@@ -286,12 +545,20 @@ describe("saving a temple's forum connection", () => {
         apiKey: KEY,
       }),
     ).toMatchObject({ ok: false, code: "NOT_CONFIGURED" });
-    expect(service(ids.admin).canStoreKeys()).toBe(true);
+    expect(await stored()).toBeUndefined();
+  });
+
+  it("uses the application's own keys unless given others", async () => {
+    const own = createSqlTempleForumService(db, async () => ids.admin);
+    expect(await own.read(ids.temple)).toEqual({ settings: null });
+    expect(await loadTempleForumCredentials(db, ids.temple)).toEqual({
+      kind: "none",
+    });
   });
 
   it("treats a temple route it cannot resolve as not found, and stamps the time by default", async () => {
     const plain = createSqlTempleForumService(db, async () => ids.admin, {
-      env,
+      forumKey,
       lookup: publicHost,
       checkKey: async () => ({ ok: true }),
     });
@@ -330,7 +597,11 @@ describe("saving a temple's forum connection", () => {
         },
       } as never,
       async () => ids.admin,
-      { env, lookup: publicHost, checkKey: async () => ({ ok: true }) },
+      {
+        forumKey,
+        lookup: publicHost,
+        checkKey: async () => ({ ok: true }),
+      },
     );
     expect(
       await broken.save({
@@ -347,7 +618,7 @@ describe("saving a temple's forum connection", () => {
 
   it("looks the address up with the system resolver by default", async () => {
     const real = createSqlTempleForumService(db, async () => ids.admin, {
-      env,
+      forumKey,
       checkKey: async () => ({ ok: true }),
     });
     expect(
@@ -473,24 +744,31 @@ describe("disconnecting and loading", () => {
   });
 
   it("tells a missing connection from one whose key can no longer be read", async () => {
-    expect(await loadTempleForumCredentials(db, ids.temple, env)).toEqual({
+    expect(await loadTempleForumCredentials(db, ids.temple, forumKey)).toEqual({
       kind: "none",
     });
     await save(ids.admin);
-    expect(
-      await loadTempleForumCredentials(db, ids.temple, {
-        BETTER_AUTH_SECRET: "a-different-secret",
-      }),
-    ).toEqual({ kind: "unreadable" });
-    // A row moved to another temple cannot be read either.
-    expect(await loadTempleForumCredentials(db, ids.other, env)).toEqual({
+    expect(await loadTempleForumCredentials(db, ids.temple, otherKey)).toEqual({
+      kind: "unreadable",
+    });
+    expect(await loadTempleForumCredentials(db, ids.other, forumKey)).toEqual({
       kind: "none",
     });
+    // A row copied to another temple cannot be read there.
+    const { templeId: _, ...copied } = await stored();
+    await db.insert(templeForums).values({ templeId: ids.other, ...copied });
+    expect(await loadTempleForumCredentials(db, ids.other, forumKey)).toEqual({
+      kind: "unreadable",
+    });
+    // An address that is not a forum's is unreadable whatever the key says.
     await db
       .update(templeForums)
       .set({ forumOrigin: "https://127.0.0.1" })
       .where(eq(templeForums.templeId, ids.temple));
-    expect(await loadTempleForumCredentials(db, ids.temple, env)).toEqual({
+    expect(await loadTempleForumCredentials(db, ids.temple, forumKey)).toEqual({
+      kind: "unreadable",
+    });
+    expect(await loadTempleForumCredentials(db, ids.temple, noKeys)).toEqual({
       kind: "unreadable",
     });
   });
@@ -501,7 +779,7 @@ describe("choosing what a sync talks to", () => {
     actorId: string,
     templeId = ids.temple,
     lookup = publicHost,
-  ) => resolveForumSyncTarget(db, { actorId, templeId }, { env, lookup });
+  ) => resolveForumSyncTarget(db, { actorId, templeId }, { forumKey, lookup });
 
   it("uses the temple's own forum for its administrators and for global ones", async () => {
     await save(ids.admin);
@@ -544,7 +822,7 @@ describe("choosing what a sync talks to", () => {
       await resolveForumSyncTarget(
         db,
         { actorId: ids.admin, templeId: ids.temple },
-        { env: { BETTER_AUTH_SECRET: "rotated-away" }, lookup: publicHost },
+        { forumKey: otherKey, lookup: publicHost },
       ),
     ).toMatchObject({
       kind: "error",
@@ -563,7 +841,7 @@ describe("choosing what a sync talks to", () => {
       await resolveForumSyncTarget(
         db,
         { actorId: ids.admin, templeId: ids.temple },
-        { env },
+        { forumKey },
       ),
     ).toMatchObject({
       kind: "error",

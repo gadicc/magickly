@@ -52,9 +52,10 @@ export const discourseUserLinks = pgTable(
 
 /**
  * A temple's own forum: where to sync its members, and the API credential to
- * do it with. Temple administrators supply it. The key is stored encrypted
- * (src/temples/forumKeys.ts) with the temple and address as authenticated data,
- * and is never selected into pages: only a four-character hint is shown back.
+ * do it with. Temple administrators supply it. The key is stored sealed by
+ * Loom secrets (src/secrets.ts), bound to the temple, address and API username
+ * (src/temples/forumKeys.ts), and never reaches a page: only a four-character
+ * hint is shown back.
  * A temple without a row syncs only for global administrators, with the
  * site-wide forum credential.
  */

@@ -19,13 +19,24 @@ export function ForumSettings({
 }: {
   actorId: string;
   templeId: string;
-  saved: { origin: string; apiUsername: string; apiKeyHint: string } | null;
+  saved:
+    | {
+        keyReadable: true;
+        origin: string;
+        apiUsername: string;
+        apiKeyHint: string;
+      }
+    | { keyReadable: false }
+    | null;
   canStoreKeys: boolean;
 }) {
   const [state, action, pending] = useActionState(
     saveTempleForumAction,
     initialState,
   );
+  // When the saved key no longer opens, the server sends nothing else of the
+  // connection: the address and username are typed again, not offered back.
+  const kept = saved?.keyReadable ? saved : null;
   return (
     <Stack spacing={1} sx={{ mt: 4, alignItems: "flex-start", maxWidth: 640 }}>
       <Typography variant="h6">Forum</Typography>
@@ -37,21 +48,28 @@ export function ForumSettings({
       </Typography>
       {!canStoreKeys ? (
         <Alert severity="info">
-          Forum connections are switched off on this server until it has a
-          secret to protect the keys with.
+          Forum connections are switched off on this server: it cannot protect
+          the keys at the moment.
         </Alert>
       ) : (
         <form action={action} style={{ width: "100%" }}>
           <input type="hidden" name="actorId" value={actorId} />
           <input type="hidden" name="templeId" value={templeId} />
           <Stack spacing={2}>
+            {saved && !kept ? (
+              <Alert severity="warning">
+                The saved API key can no longer be read, so this forum is not
+                being synced. Enter the forum’s address, API username and key
+                again.
+              </Alert>
+            ) : null}
             <TextField
               name="origin"
               label="Forum address"
               placeholder="https://forum.example.org"
               size="small"
               required
-              defaultValue={state.values?.origin ?? saved?.origin ?? ""}
+              defaultValue={state.values?.origin ?? kept?.origin ?? ""}
               slotProps={{ htmlInput: { maxLength: 255 } }}
             />
             <TextField
@@ -59,7 +77,7 @@ export function ForumSettings({
               label="API username"
               size="small"
               defaultValue={
-                state.values?.apiUsername ?? saved?.apiUsername ?? "system"
+                state.values?.apiUsername ?? kept?.apiUsername ?? "system"
               }
               helperText="The forum administrator the key acts as; usually system."
               slotProps={{ htmlInput: { maxLength: 60 } }}
@@ -70,10 +88,10 @@ export function ForumSettings({
               type="password"
               size="small"
               autoComplete="new-password"
-              required={!saved}
+              required={!kept}
               helperText={
-                saved
-                  ? `A key ending ${saved.apiKeyHint || "…"} is saved. Leave blank to keep it; enter it again if you change the address.`
+                kept
+                  ? `A key ending ${kept.apiKeyHint || "…"} is saved. Leave blank to keep it; enter it again if you change the address.`
                   : "A global API key from the forum's admin area. It is stored encrypted and not shown again."
               }
               slotProps={{ htmlInput: { maxLength: 512 } }}
