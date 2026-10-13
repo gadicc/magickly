@@ -48,6 +48,7 @@ export default defineConfig({
         "src/doc/publicRituals.ts",
         "src/study/scheduling.ts",
         "src/study/progressSnapshot.ts",
+        "src/app/api/health/secrets/route.ts",
         "src/temples/create.ts",
         "src/temples/forum.ts",
         "src/temples/forumHttp.ts",

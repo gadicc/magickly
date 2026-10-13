@@ -82,8 +82,28 @@ export function createReleaseChecks(env, options = {}) {
       throw new Error("Staged deployment identity or readiness mismatch");
     return { id: value.id, origin: url.origin };
   };
+  // Reject login HTML and unexpectedly large responses without logging them.
+  const smallJson = async (response, what) => {
+    const reader = response.body?.getReader();
+    if (!reader) throw new Error(`Missing ${what} response`);
+    let body = "";
+    const decoder = new TextDecoder();
+    try {
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        if (value.length + body.length > 64)
+          throw new Error(`Unexpected ${what} response`);
+        body += decoder.decode(value, { stream: true });
+      }
+      body += decoder.decode();
+      return JSON.parse(body);
+    } finally {
+      await reader.cancel();
+    }
+  };
   const smoke = async (url, headers = {}) => {
-    for (const path of ["/", "/api/auth/get-session"]) {
+    for (const path of ["/", "/api/auth/get-session", "/api/health/secrets"]) {
       const response = await request(`${url}${path}`, {
         headers,
         redirect: "manual",
@@ -96,26 +116,15 @@ export function createReleaseChecks(env, options = {}) {
         );
       }
       if (path === "/") await response.body?.cancel();
-      else {
-        // Reject login HTML and unexpectedly large responses without logging them.
-        const reader = response.body?.getReader();
-        if (!reader) throw new Error("Missing anonymous session response");
-        let body = "";
-        const decoder = new TextDecoder();
-        try {
-          for (;;) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            if (value.length + body.length > 64)
-              throw new Error("Unexpected anonymous session response");
-            body += decoder.decode(value, { stream: true });
-          }
-          body += decoder.decode();
-          if (JSON.parse(body) !== null)
-            throw new Error("Unexpected anonymous session response");
-        } finally {
-          await reader.cancel();
-        }
+      else if (path === "/api/auth/get-session") {
+        if ((await smallJson(response, "anonymous session")) !== null)
+          throw new Error("Unexpected anonymous session response");
+      } else {
+        // The deployed keys must be the ones whose fingerprints loom.json
+        // records; nothing else shows a key was pasted correctly.
+        const health = await smallJson(response, "secrets health");
+        if (health?.ready !== true || health.verified !== true)
+          throw new Error("The deployed secrets keys are not verified");
       }
     }
   };

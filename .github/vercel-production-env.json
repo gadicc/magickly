@@ -114,6 +114,19 @@
         "key": "DISCOURSE_API_KEY",
         "kind": "secret"
       }
+    },
+    {
+      "name": "secrets keys",
+      "keyPattern": "^LOOM_SECRETS_KEY_[1-9][0-9]*$",
+      "sensitive": true,
+      "productionOnly": true,
+      "placeholder": {
+        "kind": "secret"
+      }
+    },
+    {
+      "name": "secrets active key pointer",
+      "keys": ["LOOM_SECRETS_ACTIVE_KEY"]
     }
   ]
 }

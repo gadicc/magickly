@@ -155,6 +155,23 @@
         "src/db/valibot/refinements/_common.ts": "c1:316d0ec999633f08b76fe3aa3c887de10095667365f8b15347e9b6184b8819bf",
         "tests/memory-pglite.ts": "c1:40630af6a52ff83201d4f734dbeaadab120ef39743edcbef4b768b70196e51dd"
       }
+    },
+    "secrets": {
+      "status": "active",
+      "activatedOn": "2026-10-13",
+      "config": {
+        "modules": {
+          "secretsModule": "src/secrets.ts",
+          "locationsModule": "src/secretLocations.ts"
+        },
+        "env": {
+          "keyPrefix": "LOOM_SECRETS_KEY_",
+          "activeKeyName": "LOOM_SECRETS_ACTIVE_KEY"
+        },
+        "keys": {
+          "production": []
+        }
+      }
     }
   }
 }

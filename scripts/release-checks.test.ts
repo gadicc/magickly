@@ -27,6 +27,7 @@ const completed = {
     type: "promote",
   },
 };
+const healthy = { ready: true, verified: true };
 const alias = {
   alias: "magick.ly",
   projectId: "project",
@@ -87,9 +88,10 @@ describe("production release state checks", () => {
       { value: "short-lived-token" },
       new Response("home"),
       new Response("null"),
+      healthy,
     ]);
     await checks.staged();
-    expect(calls).toHaveLength(4);
+    expect(calls).toHaveLength(5);
     expect(calls[1][0]).toContain("audience=https%3A%2F%2Fgithub.com%2Fgadicc");
     expect(
       calls
@@ -103,6 +105,11 @@ describe("production release state checks", () => {
       ],
       [
         "https://staged-example.vercel.app/api/auth/get-session",
+        { "x-vercel-trusted-oidc-idp-token": "short-lived-token" },
+        "manual",
+      ],
+      [
+        "https://staged-example.vercel.app/api/health/secrets",
         { "x-vercel-trusted-oidc-idp-token": "short-lived-token" },
         "manual",
       ],
@@ -152,6 +159,32 @@ describe("production release state checks", () => {
       await expect(checks.staged()).rejects.toThrow();
     },
   );
+  it.each([
+    [new Response('{"ready":false}', { status: 503 }), "HTTP 503"],
+    [Response.json({ ready: true, verified: false }), "not verified"],
+    [Response.json({ ready: false, verified: true }), "not verified"],
+    [Response.json({ ready: true }), "not verified"],
+    [Response.json({ ready: "true", verified: 1 }), "not verified"],
+    [new Response("null"), "not verified"],
+    [new Response("<html>login</html>"), /JSON/],
+    [
+      new Response(`{"ready":true,"verified":true,"x":"${"x".repeat(40)}"}`),
+      "Unexpected secrets health response",
+    ],
+    [new Response(null), "Missing secrets health response"],
+  ])(
+    "refuses a deployment whose secrets keys are not the recorded ones",
+    async (health, message) => {
+      const { checks } = harness([
+        deployment,
+        { value: "short-lived-token" },
+        new Response("home"),
+        new Response("null"),
+        health,
+      ]);
+      await expect(checks.staged()).rejects.toThrow(message);
+    },
+  );
   it("waits for an uncertain promotion, checks the exact alias, and smokes without identity", async () => {
     const { checks, calls } = harness([
       deployment,
@@ -166,6 +199,7 @@ describe("production release state checks", () => {
       alias,
       new Response("home"),
       new Response("null"),
+      healthy,
       alias,
       completed,
     ]);
@@ -188,6 +222,7 @@ describe("production release state checks", () => {
     ).toEqual([
       ["https://magick.ly/", {}],
       ["https://magick.ly/api/auth/get-session", {}],
+      ["https://magick.ly/api/health/secrets", {}],
     ]);
   });
   it("smokes but still fails a partial promotion or wrong live alias", async () => {
@@ -203,6 +238,7 @@ describe("production release state checks", () => {
       { ...alias, deploymentId: "other" },
       new Response("home"),
       new Response("null"),
+      healthy,
       alias,
       {
         ...completed,
@@ -249,6 +285,7 @@ describe("production release state checks", () => {
       alias,
       new Response("home"),
       new Response("null"),
+      healthy,
       alias,
       {
         ...completed,
@@ -274,6 +311,7 @@ describe("production release state checks", () => {
       alias,
       new Response("home"),
       new Response("null"),
+      healthy,
       { ...alias, ...change },
       completed,
     ]);
@@ -308,6 +346,8 @@ describe("production release state checks", () => {
         if (url === "https://magick.ly/") return new Response("home");
         if (url === "https://magick.ly/api/auth/get-session")
           return new Response("null");
+        if (url === "https://magick.ly/api/health/secrets")
+          return Response.json(healthy);
         throw new Error("Unexpected request");
       },
     });

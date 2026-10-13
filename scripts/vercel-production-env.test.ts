@@ -20,6 +20,7 @@ const readable = {
   FILES_S3_BUCKET: "magickli-files-production",
   PINECONE_INDEX_NAME: "synthetic-index",
   PINECONE_NAME_SPACE: "synthetic-namespace",
+  LOOM_SECRETS_ACTIVE_KEY: "1",
 };
 const sensitive = [
   "DATABASE_URL",
@@ -31,10 +32,14 @@ const sensitive = [
   "OPENAI_API_KEY",
   "PINECONE_API_KEY",
   "DISCOURSE_API_KEY",
+  "LOOM_SECRETS_KEY_1",
 ];
 const directories: string[] = [];
 
-function fixture(omit?: string) {
+function fixture(
+  omit?: string,
+  metadata: Record<string, { target?: string[]; type?: string }> = {},
+) {
   const directory = mkdtempSync(join(tmpdir(), "magickli-release-env-test-"));
   directories.push(directory);
   const paths = {
@@ -61,6 +66,7 @@ function fixture(omit?: string) {
           key,
           target: ["production"],
           type: sensitive.includes(key) ? "sensitive" : "encrypted",
+          ...metadata[key],
         })),
     }),
   );
@@ -92,10 +98,24 @@ describe("production environment policy after legacy storage relocation", () => 
     "FILES_S3_SECRET_ACCESS_KEY",
     "BETTER_AUTH_URL",
     "BETTER_AUTH_SECRET",
+    "LOOM_SECRETS_KEY_1",
+    "LOOM_SECRETS_ACTIVE_KEY",
   ])("still refuses missing canonical %s", (key) => {
     const paths = fixture(key);
     expect(() =>
       prepareVercelBuildEnvironment(paths, { out: vi.fn() }),
     ).toThrow(`Missing Vercel Production variable`);
   });
+
+  // A secrets key that can be read back, or that a preview deployment also
+  // holds, is no longer only in the password manager and Production.
+  it.each([{ type: "encrypted" }, { target: ["production", "preview"] }])(
+    "refuses a secrets key that is %o",
+    (metadata) => {
+      const paths = fixture(undefined, { LOOM_SECRETS_KEY_1: metadata });
+      expect(() =>
+        prepareVercelBuildEnvironment(paths, { out: vi.fn() }),
+      ).toThrow("LOOM_SECRETS_KEY_1");
+    },
+  );
 });
