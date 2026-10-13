@@ -60,6 +60,15 @@ export function createSqlAdminService(
   }
 
   return {
+    /**
+     * The verified actor, for other operations that are a global
+     * administrator's alone. Throws a {@link SqlAdminError} otherwise.
+     */
+    async requireAdmin(expectedActorId: string) {
+      if (!canonical(expectedActorId)) throw new SqlAdminError("INVALID");
+      return authorize(db, expectedActorId);
+    },
+
     async read() {
       const actorId = await authorize(db);
       const [users, groups, grants] = await Promise.all([

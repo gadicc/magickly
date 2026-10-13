@@ -20,12 +20,18 @@ import {
 } from "@mui/material";
 import { useActionState } from "react";
 import type { createSqlAdminService } from "@/admin/sqlAdmin";
-import { createGroupAction, setGroupGrantsAction } from "./actions";
+import {
+  createGroupAction,
+  type SecretsActionState,
+  secretsMaintenanceAction,
+  setGroupGrantsAction,
+} from "./actions";
 
 type AdminData = Awaited<
   ReturnType<ReturnType<typeof createSqlAdminService>["read"]>
 >;
 const initial = { message: "", error: false };
+const initialSecrets: SecretsActionState = initial;
 
 export default function AdminForms({
   data,
@@ -41,6 +47,10 @@ export default function AdminForms({
   const [update, setGrants, updating] = useActionState(
     setGroupGrantsAction,
     initial,
+  );
+  const [secrets, runSecrets, runningSecrets] = useActionState(
+    secretsMaintenanceAction,
+    initialSecrets,
   );
   return (
     <Stack spacing={3} sx={{ mt: 2 }}>
@@ -171,6 +181,81 @@ export default function AdminForms({
             ))}
           </TableBody>
         </Table>
+      </form>
+      <form action={runSecrets}>
+        <Typography variant="h5" component="h2">
+          Stored secrets
+        </Typography>
+        <Typography sx={{ mb: 2 }}>
+          Temple forum keys are stored sealed. Report counts them by key version
+          without opening any; Verify opens each one. After a key rotation,
+          Reseal moves them to the active key: rehearse it first.
+        </Typography>
+        <input type="hidden" name="actorId" value={data.actorId} />
+        {(
+          [
+            ["report", "Report"],
+            ["verify", "Verify"],
+            ["rehearse", "Rehearse reseal"],
+            ["reseal", "Reseal"],
+          ] as const
+        ).map(([operation, label]) => (
+          <Button
+            key={operation}
+            type="submit"
+            name="operation"
+            value={operation}
+            disabled={runningSecrets}
+            onClick={
+              operation === "reseal"
+                ? (event) => {
+                    if (
+                      !window.confirm(
+                        "Reseal every stored secret under the active key?",
+                      )
+                    )
+                      event.preventDefault();
+                  }
+                : undefined
+            }
+          >
+            {label}
+          </Button>
+        ))}
+        {secrets.message && (
+          <Alert severity={secrets.error ? "error" : "success"}>
+            {secrets.message}
+          </Alert>
+        )}
+        {secrets.lines?.map((line) => (
+          <Box key={line.location} sx={{ mt: 1 }}>
+            <Typography>
+              <code>{line.location}</code>: {line.rows} rows
+              {line.done ? "" : " (not read to the end)"}
+              {line.counts
+                .map(([label, count]) => `, ${count} ${label}`)
+                .join("")}
+              {line.changed ? `, ${line.changed} changed meanwhile` : ""}
+              {line.failureCount ? `, ${line.failureCount} failed` : ""}
+            </Typography>
+            {line.failures.length || line.changedIds.length ? (
+              <ul>
+                {line.failures.map((failed) => (
+                  <li key={failed.id}>
+                    {failed.id}: {failed.reason}
+                  </li>
+                ))}
+                {line.changedIds.map((id) => (
+                  <li key={id}>{id}: changed meanwhile</li>
+                ))}
+                {line.failureCount > line.failures.length ||
+                line.changed > line.changedIds.length ? (
+                  <li>Only the first rows are listed.</li>
+                ) : null}
+              </ul>
+            ) : null}
+          </Box>
+        ))}
       </form>
     </Stack>
   );

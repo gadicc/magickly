@@ -2,18 +2,32 @@
 
 import { revalidatePath } from "next/cache";
 import {
+  createSecretsMaintenance,
+  type SecretsMaintenanceLine,
+} from "@/admin/secretsMaintenance";
+import {
   createSqlAdminService,
   type GroupGrantOperation,
   SqlAdminError,
 } from "@/admin/sqlAdmin";
 import { getCurrentSqlUserId } from "@/auth/session";
 import { db } from "@/db/neonFull";
+import { secretLocations } from "@/secretLocations";
 
 export interface AdminActionState {
   message: string;
   error: boolean;
 }
+/** What a secrets maintenance run found: counts and row ids, nothing secret. */
+export interface SecretsActionState extends AdminActionState {
+  lines?: SecretsMaintenanceLine[];
+}
 const service = createSqlAdminService(db, getCurrentSqlUserId);
+const secretsMaintenance = createSecretsMaintenance(
+  db,
+  service.requireAdmin,
+  secretLocations,
+);
 const text = (form: FormData, key: string) => {
   const value = form.get(key);
   return typeof value === "string" ? value : "";
@@ -68,4 +82,30 @@ export async function setGroupGrantsAction(
   }
   revalidatePath("/admin");
   return { message: "Group access updated.", error: false };
+}
+
+/** Reports on, verifies or reseals the stored secrets; see plan 059. */
+export async function secretsMaintenanceAction(
+  _previous: SecretsActionState,
+  form: FormData,
+): Promise<SecretsActionState> {
+  try {
+    const result = await secretsMaintenance.run({
+      expectedActorId: text(form, "actorId"),
+      operation: text(form, "operation"),
+    });
+    if (!result.ok) return { message: result.message, error: true };
+    return {
+      message: result.message,
+      error: !result.clean,
+      lines: result.lines,
+    };
+  } catch (error) {
+    if (error instanceof SqlAdminError && error.code === "INVALID")
+      return {
+        message: "The request was not valid. Reload and try again.",
+        error: true,
+      };
+    return failure(error);
+  }
 }

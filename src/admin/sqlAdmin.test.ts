@@ -78,6 +78,24 @@ describe("SQL global administration", () => {
     },
   );
 
+  it("vouches for a global administrator to other operations, and no one else", async () => {
+    expect(await service.requireAdmin(adminId)).toBe(adminId);
+    await expect(service.requireAdmin("nope")).rejects.toMatchObject({
+      code: "INVALID",
+    });
+    actorId = memberId;
+    await expect(service.requireAdmin(memberId)).rejects.toMatchObject({
+      code: "FORBIDDEN",
+    });
+    await expect(service.requireAdmin(adminId)).rejects.toMatchObject({
+      code: "CHANGED",
+    });
+    actorId = null;
+    await expect(service.requireAdmin(adminId)).rejects.toMatchObject({
+      code: "NOT_AUTHENTICATED",
+    });
+  });
+
   it("refuses a stale form after the signed-in account changes", async () => {
     await db.insert(userAccess).values({ userId: otherId, admin: true });
     actorId = otherId;
