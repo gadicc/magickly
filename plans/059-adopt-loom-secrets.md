@@ -20,9 +20,10 @@ a production key is recorded and deployed.
 
 | Commit | What |
 | --- | --- |
-| TODO | Activate Loom secrets: the health route, the release smoke check and the release environment policy |
-| TODO | Seal forum keys with Loom; drop the auth-derived cipher |
-| TODO | Report, verify and reseal from the administration page |
+| `fade5be` | Activate Loom secrets: the health route, the release smoke check and the release environment policy |
+| `fe235ee` | Seal forum keys with Loom; drop the auth-derived cipher |
+| `a30c4ce` | Report, verify and reseal from the administration page |
+| `4da1019` | Authorize before a forum is contacted; show the hint from the key |
 
 ## Decisions
 
@@ -104,6 +105,25 @@ to learn whether it still can be; when it cannot, the service returns nothing
 else of the connection, so the saved values do not reach the browser at all,
 and a blank key is refused. A value that fails to open is logged on the server
 with its purpose, key version and reason.
+
+**Authorize before the forum is contacted.** Found by the final review and
+older than this plan: saving checked the typed key against the typed address
+before it knew the temple existed or that the caller administers it, so any
+signed-in user could have the server request a host of their choosing. The
+save now resolves the temple and authorizes first, and again under its lock.
+
+## Known limits
+
+- A malformed `LOOM_SECRETS_ENVIRONMENT` value, or a malformed key list in
+  `loom.json`, makes `src/secrets.ts` throw when it loads. The temple
+  administration page and the forum sync then fail outright, not only the
+  health route. The release smoke check still fails closed.
+- When the pointer names a key that is not there but an older key is, the
+  page says forum connections are switched off although stored keys still
+  open and a sync still runs.
+- Changing only the username does not ask the forum again whether the key is
+  an administrator's for that name. The next sync finds out.
+- The stored `api_key_hint` is still written but no longer read.
 
 ## Rejected
 
