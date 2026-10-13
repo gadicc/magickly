@@ -1,8 +1,15 @@
+import { createSecrets, staticKeyring } from "@gadicc/loom/secrets";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { secrets, templeForumApiKey } from "./secrets";
 import { forumKeyBinding } from "./temples/forumKeys";
 
 vi.mock("server-only", () => ({}));
+// The module decides which environment's key list applies when it loads, so
+// this is settled before the import rather than in a hook.
+vi.hoisted(() => {
+  process.env.LOOM_SECRETS_ENVIRONMENT = "development";
+  delete process.env.VERCEL_ENV;
+});
 
 // An obviously synthetic key: thirty-two bytes of 0x01, in base64.
 const SYNTHETIC_KEY = Buffer.alloc(32, 1).toString("base64");
@@ -14,7 +21,6 @@ const row = {
 let warned: ReturnType<typeof vi.spyOn>;
 beforeEach(() => {
   warned = vi.spyOn(console, "warn").mockImplementation(() => {});
-  vi.stubEnv("LOOM_SECRETS_ENVIRONMENT", "development");
   vi.stubEnv("LOOM_SECRETS_ACTIVE_KEY", "1");
   vi.stubEnv("LOOM_SECRETS_KEY_1", SYNTHETIC_KEY);
 });
@@ -49,10 +55,22 @@ describe("application secrets", () => {
     expect(await templeForumApiKey.tryOpen(sealed, forumKeyBinding(row))).toBe(
       longest,
     );
+    // A string longer than the column could hold is refused unopened, even
+    // though it is genuine: sealed under the same key, purpose and binding.
+    const unlimited = createSecrets({
+      keys: staticKeyring({ 1: new Uint8Array(32).fill(1) }),
+    }).purpose("temple-forum.api-key");
+    const oversized = await unlimited.seal(
+      "k".repeat(2000),
+      forumKeyBinding(row),
+    );
+    expect(oversized.length).toBeGreaterThan(2048);
+    expect(await unlimited.tryOpen(oversized, forumKeyBinding(row))).toBe(
+      "k".repeat(2000),
+    );
+    expect(await unlimited.tryOpen(sealed, forumKeyBinding(row))).toBe(longest);
     expect(
-      await templeForumApiKey.tryOpen(`${sealed}${"A".repeat(2048)}`, {
-        ...forumKeyBinding(row),
-      }),
+      await templeForumApiKey.tryOpen(oversized, forumKeyBinding(row)),
     ).toBeNull();
   });
 

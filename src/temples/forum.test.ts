@@ -280,11 +280,31 @@ describe("saving a temple's forum connection", () => {
   });
 
   it("is for administrators of this temple (or global ones), and fresh each time", async () => {
+    // Refused before the address is looked up or the key sent to it:
+    // otherwise anyone signed in could have this server call a host of
+    // their choosing.
+    const lookup = vi.fn(publicHost);
+    const checkKey = vi.fn(async () => ({ ok: true }) as const);
+    const attempt = (actor: string, templeId = ids.temple) =>
+      service(actor, { lookup, checkKey }).save({
+        version: 1,
+        expectedActorId: actor,
+        templeId,
+        origin: "https://forum.example.org",
+        apiUsername: "system",
+        apiKey: KEY,
+      });
     for (const actor of [ids.member, ids.otherAdmin, ids.outsider])
-      expect(await save(actor)).toMatchObject({
+      expect(await attempt(actor)).toMatchObject({
         ok: false,
         code: "NOT_AUTHORIZED",
       });
+    expect(await attempt(ids.admin, createUuidV7())).toMatchObject({
+      ok: false,
+      code: "NOT_FOUND",
+    });
+    expect(lookup).not.toHaveBeenCalled();
+    expect(checkKey).not.toHaveBeenCalled();
     expect(await stored()).toBeUndefined();
     expect(await save(ids.global)).toEqual({ ok: true });
     await db
@@ -443,6 +463,14 @@ describe("saving a temple's forum connection", () => {
       ok: true,
     });
     expect((await stored()).apiKeyHint).toBe("cdef");
+    // Nor does the page show the stored copy.
+    await db
+      .update(templeForums)
+      .set({ apiKeyHint: "EVIL" })
+      .where(eq(templeForums.templeId, ids.temple));
+    expect(await service(ids.admin).read(ids.temple)).toMatchObject({
+      settings: { keyReadable: true, apiKeyHint: "cdef" },
+    });
   });
 
   it.each([

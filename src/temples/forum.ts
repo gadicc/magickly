@@ -281,14 +281,14 @@ export function createSqlTempleForumService(
             .select({
               origin: templeForums.forumOrigin,
               apiUsername: templeForums.apiUsername,
-              apiKeyHint: templeForums.apiKeyHint,
               sealed: templeForums.apiKeyEncrypted,
               updatedAt: templeForums.updatedAt,
             })
             .from(templeForums)
             .where(eq(templeForums.templeId, templeId));
           if (!row) return { settings: null };
-          // Opened only to learn whether it still can be; the key goes no further.
+          // Opened to learn whether it still can be, and for the hint: the
+          // stored hint is not sealed with the key, so it is not shown.
           const { sealed, ...settings } = row;
           const opened = await openStoredKey(forumKey, {
             templeId,
@@ -299,7 +299,11 @@ export function createSqlTempleForumService(
             settings:
               opened === null
                 ? { keyReadable: false }
-                : { keyReadable: true, ...settings },
+                : {
+                    keyReadable: true,
+                    ...settings,
+                    apiKeyHint: forumKeyHint(opened),
+                  },
           };
         });
       } catch {
@@ -318,8 +322,12 @@ export function createSqlTempleForumService(
           "apiKey",
         ]);
         const actorId = await actor(request.expectedActorId);
-        // Before the key is sent anywhere: a server that could not store it
-        // has no business asking a forum about it.
+        // Both before anything leaves this server. Checking the key below
+        // makes a request to the typed address with the typed key, which
+        // only this temple's administrators may cause, and a server that
+        // could not store the key has no business asking a forum about it.
+        // The save authorizes again, under its lock.
+        await withTemple(actorId, request.templeId as string, async () => {});
         if (!(await keysReady(forumKey))) return reject("NOT_CONFIGURED");
         if (
           typeof request.origin !== "string" ||
