@@ -39,9 +39,11 @@ reason for a refusal goes to the server log. Development gets its own key, writt
 `loom add secrets`; its fingerprint is not recorded. Preview has no key: a
 preview cannot store or read forum keys, and the page says so.
 
-**No reader for the existing `v1.` strings.** The current code has been live
-since 9 October and Gadi is all but certain no temple has connected a forum.
-The first step of the rollout counts `temple_forums` rows in production. If
+**No reader for the existing `v1.` strings.** The current code was committed on
+9 October but never released: on 14 October `origin/main` was still behind
+`c085b06`, so production has no `temple_forums` table and no `v1.` value can
+exist there. (This plan first said the code had been live since 9 October;
+that was wrong.) The first step of the rollout counted rows to be sure. If
 there are none, nothing is lost. If there are some, the sync reports them as
 unreadable and the temple's administrator enters the key again. The settings
 page does not decrypt today, so it would still show the saved hint as if
@@ -146,9 +148,8 @@ save now resolves the temple and authorizes first, and again under its lock.
 
 ## Rollout, each step Gadi's
 
-1. Count `temple_forums` rows in production. Skipped on 14 October 2026: Gadi
-   reports no temple changes since the forum code landed, so none are expected;
-   any that exist show as unreadable and the key is entered again.
+1. Count `temple_forums` rows in production. Not needed: the forum code ships
+   in the same release as this adoption, so the table does not exist there yet.
 2. `pnpm exec loom secrets keygen` in Gadi's own terminal, on this branch; save
    the key and fingerprint; commit the fingerprint. `loom check --production`
    fails until a production key has been recorded by `keygen`, so this step
