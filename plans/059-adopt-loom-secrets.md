@@ -146,11 +146,17 @@ save now resolves the temple and authorizes first, and again under its lock.
 
 ## Rollout, each step Gadi's
 
-1. Count `temple_forums` rows in production.
-2. `loom secrets keygen`; save key and fingerprint; commit the fingerprint.
-   `loom check --production` fails until a production key has been recorded by
-   `keygen`, so this step comes before any commit that the release gate checks.
-3. Add the two variables to Vercel, Production only. Here and at any later
+1. Count `temple_forums` rows in production. Skipped on 14 October 2026: Gadi
+   reports no temple changes since the forum code landed, so none are expected;
+   any that exist show as unreadable and the key is entered again.
+2. `pnpm exec loom secrets keygen` in Gadi's own terminal, on this branch; save
+   the key and fingerprint; commit the fingerprint. `loom check --production`
+   fails until a production key has been recorded by `keygen`, so this step
+   comes before any commit that the release gate checks.
+3. Add the two variables to Vercel, Production only. With Loom 1.37.0
+   `keygen` offers to do this itself: answer yes and paste the key back from
+   the password manager (`loom secrets push 1` does the same later). Here and
+   at any later
    rotation, set the pointer variable (`LOOM_SECRETS_ACTIVE_KEY`) on the
    platform **before** deploying a `loom.json` that changes the active key: a
    deployment built with the new list and the old pointer fails every seal,
@@ -192,6 +198,11 @@ save now resolves the temple and authorizes first, and again under its lock.
   before release.
 
 ## Follow-ups
+
+- **To do: rollout step 5**, connecting a forum on a test temple, reading it
+  back, changing its username and reading it back again. Deferred by Gadi on 14
+  October 2026. Do it before telling temples about their own forums, or the
+  first time one connects.
 
 - Site-wide `DISCOURSE_API_KEY` stays an environment variable; it is not a
   stored secret.
