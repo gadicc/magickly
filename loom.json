@@ -169,7 +169,13 @@
           "activeKeyName": "LOOM_SECRETS_ACTIVE_KEY"
         },
         "keys": {
-          "production": []
+          "production": [
+            {
+              "id": 1,
+              "fingerprint": "baa0dc32e4d822c3",
+              "state": "active"
+            }
+          ]
         }
       }
     }
