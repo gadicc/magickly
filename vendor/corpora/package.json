@@ -1,0 +1,11 @@
+{
+  "name": "corpora",
+  "version": "0.0.1",
+  "private": true,
+  "description": "The one file of dariusk/corpora that tarot-deck reads, at commit ff1941630dc5a7aa3d4459fc038cb7a04ec93cb0.",
+  "license": "CC0-1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dariusk/corpora.git"
+  }
+}

@@ -1,15 +1,25 @@
 packages:
   - "packages/*"
 
-onlyBuiltDependencies:
-  - core-js
-  - esbuild
-  - sharp
+# Only these dependencies may run install scripts; pnpm fails the install
+# when another one asks to, so a new build step is a reviewed decision.
+strictDepBuilds: true
+allowBuilds:
+  core-js: true
+  esbuild: true
+  sharp: true
 
 # Seven days keeps freshly published third-party releases out of resolution.
 minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - "@gadicc/loom"
+
+overrides:
+  # tarot-deck asks for corpora by URL, which pnpm 11 refuses for a dependency
+  # of a dependency; vendor/corpora holds the one file it reads.
+  corpora: file:vendor/corpora
+  browserslist: ^4.29.0
+  "@esbuild-kit/core-utils>esbuild": ^0.25.12
 
 patchedDependencies:
   json-rich-text@1.3.1: patches/json-rich-text@1.3.1.patch

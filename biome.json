@@ -20,7 +20,8 @@
       "!public/fonts/**",
       "!assets/fonts/**",
       "!**/*.svg",
-      "!src/components/enochian/font/**"
+      "!src/components/enochian/font/**",
+      "!vendor/**"
     ]
   },
   "formatter": {
