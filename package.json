@@ -4,8 +4,7 @@
   "private": true,
   "license": "AGPL-3.0-or-later",
   "engines": {
-    "node": "^24.15.0",
-    "pnpm": "^11.28.2"
+    "node": "^24.15.0"
   },
   "scripts": {
     "data:build": "pnpm --filter magick-data data:build",
