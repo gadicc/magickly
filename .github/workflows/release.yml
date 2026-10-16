@@ -70,18 +70,10 @@ jobs:
           cp .vercel/.env.production.local "$RUNNER_TEMP/vercel-production.env"
           chmod 600 "$RUNNER_TEMP/vercel-production.env"
 
+      # Loom's shared rule: every pulled value that could be secret, read the
+      # way the app reads it; short and public values stay readable in logs.
       - name: Mask pulled secret values
-        run: |
-          node - .vercel/.env.production.local <<'NODE'
-          const { readFileSync } = require('node:fs');
-          const { parseEnv } = require('node:util');
-          const values = parseEnv(readFileSync(process.argv[2], 'utf8'));
-          for (const [key, value] of Object.entries(values)) {
-            if (!value || key.startsWith('NEXT_PUBLIC_')) continue;
-            const escaped = value.replaceAll('%', '%25').replaceAll('\r', '%0D').replaceAll('\n', '%0A');
-            process.stdout.write(`::add-mask::${escaped}\n`);
-          }
-          NODE
+        run: pnpm exec loom db release mask-env .vercel/.env.production.local
 
       - name: Read production environment metadata
         env:
