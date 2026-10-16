@@ -1,10 +1,9 @@
-import { openai } from "@ai-sdk/openai";
 import { Pinecone, type RecordMetadata } from "@pinecone-database/pinecone";
-import { embed, embedMany } from "ai";
+import { embed, embedMany, gateway } from "ai";
 import type { ChatSource } from "./contracts";
 import { maximalMarginalRelevance } from "./mmr";
 
-const EMBEDDING_MODEL = "text-embedding-ada-002";
+const EMBEDDING_MODEL = "openai/text-embedding-ada-002";
 const EMBEDDING_BATCH_SIZE = 512;
 const UPSERT_BATCH_SIZE = 100;
 
@@ -29,7 +28,7 @@ export function createPineconeCorpus(
   if (!indexName || !apiKey) {
     throw new Error("Chat retrieval is not configured.");
   }
-  const embeddingModel = openai.embeddingModel(EMBEDDING_MODEL);
+  const embeddingModel = gateway.embeddingModel(EMBEDDING_MODEL);
 
   const index = (signal?: AbortSignal) =>
     new Pinecone({

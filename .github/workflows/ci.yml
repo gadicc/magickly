@@ -30,7 +30,6 @@ jobs:
       MONGO_URL: mongodb://127.0.0.1:1/?serverSelectionTimeoutMS=100
       DATABASE_URL: postgresql://build:build@127.0.0.1:1/build?sslmode=disable
       DATABASE_URL_UNPOOLED: postgresql://build:build@127.0.0.1:1/build?sslmode=disable
-      OPENAI_API_KEY: ci-build-only-placeholder
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       # pnpm 11's own action installs pnpm (from packageManager) and Node.js.

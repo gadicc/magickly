@@ -1,4 +1,5 @@
 export * from "./generated/auth";
+export * from "./generated/chatUsage";
 export * from "./generated/discourse";
 export * from "./generated/legacyFiles";
 export * from "./generated/legacyIds";

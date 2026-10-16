@@ -21,6 +21,7 @@ import {
   readConversation,
   renderPrompt,
 } from "./conversation";
+import type { ChatAdmission } from "./usage";
 
 export const CHAT_ERROR_MESSAGE = "Error Processing";
 
@@ -43,7 +44,7 @@ export async function prepareAnswer(
   const history = conversationHistory(turns.slice(0, -1));
   const { text: question } = await generateText({
     model,
-    temperature: 1,
+    maxOutputTokens: 1024,
     prompt: renderPrompt(CONDENSE_QUESTION_TEMPLATE, {
       chat_history: history,
       question: turns[turns.length - 1].content,
@@ -55,7 +56,7 @@ export async function prepareAnswer(
   signal.throwIfAborted();
   const result = streamText({
     model,
-    temperature: 1,
+    maxOutputTokens: 4096,
     prompt: renderPrompt(ANSWER_TEMPLATE, {
       context: sources.map((source) => source.pageContent).join("\n\n"),
       chat_history: history,
@@ -104,6 +105,7 @@ export async function respondToChat(
   request: Request,
   protocol: ChatProtocol,
   dependencies: () => Promise<ChatDependencies>,
+  admit: () => Promise<ChatAdmission>,
 ): Promise<Response> {
   try {
     let body: unknown;
@@ -114,6 +116,18 @@ export async function respondToChat(
     }
     const turns = readConversation(body, protocol);
     request.signal.throwIfAborted();
+    const admission = await admit();
+    request.signal.throwIfAborted();
+    if (!admission.allowed) {
+      const message = "Daily chat limit reached. Try again after midnight UTC.";
+      const headers = {
+        "Retry-After": admission.resetAt.toUTCString(),
+        "Cache-Control": "no-store",
+      };
+      return protocol === "legacy"
+        ? Response.json({ message }, { status: 429, headers })
+        : new Response(message, { status: 429, headers });
+    }
     const { sources, stream } = await prepareAnswer(
       turns,
       request.signal,

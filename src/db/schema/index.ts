@@ -1,4 +1,5 @@
 export * from "./auth";
+export * from "./chatUsage";
 export * from "./discourse";
 export * from "./legacyFiles";
 export * from "./legacyIds";

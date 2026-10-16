@@ -84,14 +84,6 @@
       "sensitive": true
     },
     {
-      "name": "chat generation and embeddings",
-      "keys": ["OPENAI_API_KEY"],
-      "placeholder": {
-        "key": "OPENAI_API_KEY",
-        "kind": "secret"
-      }
-    },
-    {
       "name": "Pinecone corpus access",
       "keys": ["PINECONE_API_KEY"],
       "placeholder": {

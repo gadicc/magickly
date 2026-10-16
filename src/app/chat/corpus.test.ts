@@ -46,15 +46,11 @@ function harness() {
     const url = String(input);
     const body = init.body ? JSON.parse(String(init.body)) : {};
     requests.push({ url, init, body });
-    if (url === "https://api.openai.com/v1/embeddings") {
+    if (url === "https://ai-gateway.vercel.sh/v4/ai/embedding-model") {
       return Response.json({
-        data: body.input.map((_: string, index: number) => ({
-          embedding: [1, 0],
-          index,
-        })),
+        embeddings: body.values.map(() => [1, 0]),
         usage: {
-          prompt_tokens: body.input.length,
-          total_tokens: body.input.length,
+          tokens: body.values.length,
         },
       });
     }
@@ -74,7 +70,7 @@ function harness() {
 }
 
 beforeEach(() => {
-  vi.stubEnv("OPENAI_API_KEY", "synthetic-openai-key");
+  vi.stubEnv("AI_GATEWAY_API_KEY", "synthetic-gateway-key");
   vi.stubEnv("PINECONE_API_KEY", "synthetic-pinecone-key");
   vi.stubEnv("PINECONE_CONTROLLER_HOST", undefined);
 });
@@ -92,9 +88,11 @@ describe("native Pinecone 9 corpus", () => {
       .corpus()
       .retrieve("first\r\nsecond\nthird", signal);
     expect(test.requests[0].body).toMatchObject({
-      model: "text-embedding-ada-002",
-      input: ["first\r second third"],
+      values: ["first\r second third"],
     });
+    expect(new Headers(test.requests[0].init.headers).get("ai-model-id")).toBe(
+      "openai/text-embedding-ada-002",
+    );
     const query = test.requests.find(({ url }) => url.endsWith("/query"))!;
     expect(query.body).toEqual({
       namespace: "",
@@ -222,7 +220,7 @@ describe("native Pinecone 9 corpus", () => {
         const url = String(input);
         const target =
           stage === "embedding"
-            ? url.endsWith("/embeddings")
+            ? url.endsWith("/embedding-model")
             : stage === "lookup"
               ? url.includes("/indexes/")
               : url.endsWith("/query");
@@ -280,7 +278,7 @@ describe("native Pinecone 9 corpus", () => {
       test.fetcher.mockImplementation((input, init) => {
         if (
           String(input).endsWith(
-            stage === "embedding" ? "/embeddings" : "/query",
+            stage === "embedding" ? "/embedding-model" : "/query",
           )
         ) {
           return Promise.resolve(
@@ -331,7 +329,7 @@ describe("native Pinecone 9 corpus", () => {
         text: "line 0\nnext",
       },
     });
-    expect((test.requests[0].body.input as string[])[0]).toBe("line 0 next");
+    expect((test.requests[0].body.values as string[])[0]).toBe("line 0 next");
     expect(chunks[0].metadata).toHaveProperty("loc.pageNumber", 3);
   });
 
@@ -397,10 +395,10 @@ describe("native Pinecone 9 corpus", () => {
     const ids = chunks.map((_, index) => `pdf-v1:synthetic-hash:${index}`);
     await expect(test.corpus().upsertChunks(chunks, ids)).resolves.toEqual(ids);
     const embeddings = test.requests.filter(({ url }) =>
-      url.endsWith("/embeddings"),
+      url.endsWith("/embedding-model"),
     );
     expect(
-      embeddings.map(({ body }) => (body.input as string[]).length),
+      embeddings.map(({ body }) => (body.values as string[]).length),
     ).toEqual([512, 1]);
     const written = test.requests
       .filter(({ url }) => url.endsWith("/vectors/upsert"))
@@ -414,10 +412,8 @@ describe("native Pinecone 9 corpus", () => {
     const test = harness();
     const normal = test.fetcher.getMockImplementation()!;
     test.fetcher.mockImplementation((input, init) => {
-      if (String(input).endsWith("/embeddings")) {
-        return Promise.resolve(
-          Response.json({ data: [{ embedding: [1, 0], index: 0 }] }),
-        );
+      if (String(input).endsWith("/embedding-model")) {
+        return Promise.resolve(Response.json({ embeddings: [[1, 0]] }));
       }
       return normal(input, init);
     });

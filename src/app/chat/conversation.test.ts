@@ -8,6 +8,45 @@ import {
 } from "./conversation";
 
 describe("conversation protocol boundary", () => {
+  it.each(["legacy", "v2"] as const)(
+    "bounds history size for %s",
+    (protocol) => {
+      const message = (content: string) =>
+        protocol === "legacy"
+          ? { role: "user", content }
+          : { role: "user", parts: [{ type: "text", text: content }] };
+      expect(() =>
+        readConversation(
+          { messages: Array.from({ length: 101 }, () => message("hi")) },
+          protocol,
+        ),
+      ).toThrow(ChatInputError);
+      expect(() =>
+        readConversation({ messages: [message("x".repeat(16_001))] }, protocol),
+      ).toThrow(ChatInputError);
+      expect(() =>
+        readConversation(
+          {
+            messages: Array.from({ length: 3 }, () =>
+              message("x".repeat(12_000)),
+            ),
+          },
+          protocol,
+        ),
+      ).toThrow(ChatInputError);
+      expect(
+        readConversation(
+          {
+            messages: [
+              message("x".repeat(16_000)),
+              message("x".repeat(16_000)),
+            ],
+          },
+          protocol,
+        ),
+      ).toHaveLength(2);
+    },
+  );
   it("keeps citation data out of model history while joining text parts", () => {
     expect(
       readConversation(

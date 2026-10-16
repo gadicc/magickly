@@ -40,7 +40,6 @@
     "schema:gen": "loom db schema-gen"
   },
   "dependencies": {
-    "@ai-sdk/openai": "4.0.67",
     "@ai-sdk/react": "4.0.105",
     "@ampproject/remapping": "^2.3.0",
     "@aws-sdk/client-s3": "3.1133.0",

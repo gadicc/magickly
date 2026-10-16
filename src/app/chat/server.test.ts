@@ -11,8 +11,26 @@ import {
   messageSources,
   messageText,
 } from "./contracts";
-import { LEGACY_METADATA_DELIMITER as marker } from "./conversation";
-import { CHAT_ERROR_MESSAGE, prepareAnswer, respondToChat } from "./server";
+import {
+  type ChatProtocol,
+  LEGACY_METADATA_DELIMITER as marker,
+} from "./conversation";
+import {
+  CHAT_ERROR_MESSAGE,
+  type ChatDependencies,
+  prepareAnswer,
+  respondToChat as respondWithAdmission,
+} from "./server";
+
+const admit = async () => ({
+  allowed: true,
+  resetAt: new Date("2026-10-17T00:00:00Z"),
+});
+const respondToChat = (
+  request: Request,
+  protocol: ChatProtocol,
+  dependencies: () => Promise<ChatDependencies>,
+) => respondWithAdmission(request, protocol, dependencies, admit);
 
 const usage = {
   inputTokens: {
@@ -39,7 +57,7 @@ const sources: ChatSource[] = [
 
 function dependencies(answer = ["Answer ", "🜁", "\nnext line"]) {
   const model = new MockLanguageModelV4({
-    modelId: "gpt-4o",
+    modelId: "gpt-6.1-sol",
     doGenerate: {
       content: [{ type: "text", text: "What does the sign mean?" }],
       finishReason: { unified: "stop", raw: undefined },
@@ -106,6 +124,64 @@ const messages: ChatMessage[] = [
 ];
 
 describe("shared chat generation and protocols", () => {
+  it.each(["legacy", "v2"] as const)(
+    "rejects exhausted %s capacity before provider work",
+    async (protocol) => {
+      const factory = vi.fn(async () => dependencies());
+      const response = await respondWithAdmission(
+        request(
+          protocol === "legacy"
+            ? [{ role: "user", content: "Hello" }]
+            : messages,
+        ),
+        protocol,
+        factory,
+        async () => ({
+          allowed: false,
+          resetAt: new Date("2026-10-17T00:00:00Z"),
+        }),
+      );
+      expect(response.status).toBe(429);
+      expect(response.headers.get("Retry-After")).toBe(
+        "Sat, 17 Oct 2026 00:00:00 GMT",
+      );
+      expect(response.headers.get("Cache-Control")).toBe("no-store");
+      expect(await response.text()).toContain("midnight UTC");
+      expect(factory).not.toHaveBeenCalled();
+    },
+  );
+
+  it("does not consume quota for malformed or oversized input", async () => {
+    const reserve = vi.fn(admit);
+    const factory = vi.fn(async () => dependencies());
+    for (const input of [
+      [],
+      [{ role: "user", parts: [{ type: "text", text: "x".repeat(16_001) }] }],
+    ]) {
+      expect(
+        (await respondWithAdmission(request(input), "v2", factory, reserve))
+          .status,
+      ).toBe(400);
+    }
+    expect(reserve).not.toHaveBeenCalled();
+    expect(factory).not.toHaveBeenCalled();
+  });
+
+  it("fails closed when quota storage or identity cannot be read", async () => {
+    const factory = vi.fn(async () => dependencies());
+    const response = await respondWithAdmission(
+      request(messages),
+      "v2",
+      factory,
+      async () => {
+        throw new Error("storage-secret");
+      },
+    );
+    expect(response.status).toBe(500);
+    expect(await response.text()).toBe(CHAT_ERROR_MESSAGE);
+    expect(factory).not.toHaveBeenCalled();
+  });
+
   it("makes the same two prompted model calls, with standalone retrieval and safe history", async () => {
     const deps = dependencies();
     const response = await respondToChat(
@@ -118,8 +194,8 @@ describe("shared chat generation and protocols", () => {
     expect(deps.model.doStreamCalls).toHaveLength(1);
     const first = deps.model.doGenerateCalls[0];
     const second = deps.model.doStreamCalls[0];
-    expect(first.temperature).toBe(1);
-    expect(second.temperature).toBe(1);
+    expect(first.maxOutputTokens).toBe(1024);
+    expect(second.maxOutputTokens).toBe(4096);
     expect(first.prompt).toEqual([
       {
         role: "user",

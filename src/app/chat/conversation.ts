@@ -42,6 +42,12 @@ export function readConversation(
   if (!record(body) || !Array.isArray(body.messages) || !body.messages.length) {
     throw new ChatInputError("Enter a message.");
   }
+  if (body.messages.length > 100) {
+    throw new ChatInputError(
+      "Start a new chat; this conversation is too long.",
+    );
+  }
+  let characters = 0;
   const turns = body.messages.map((message): ConversationTurn => {
     if (
       !record(message) ||
@@ -76,6 +82,10 @@ export function readConversation(
           return part.text;
         })
         .join("");
+    }
+    characters += content.length;
+    if (content.length > 16_000 || characters > 32_000) {
+      throw new ChatInputError("Shorten your message or start a new chat.");
     }
     return { role, content };
   });

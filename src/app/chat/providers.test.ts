@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mock = vi.hoisted(() => ({
-  chat: vi.fn(() => ({ provider: "test-model" })),
+  gateway: vi.fn(() => ({ provider: "test-model" })),
   createCorpus: vi.fn(),
   retrieve: vi.fn(),
 }));
-vi.mock("@ai-sdk/openai", () => ({ openai: { chat: mock.chat } }));
+vi.mock("ai", () => ({ gateway: mock.gateway }));
 vi.mock("./corpus", () => ({ createPineconeCorpus: mock.createCorpus }));
 
 import { chatDependencies } from "./providers";
@@ -22,9 +22,9 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 
 describe("chat provider wiring", () => {
-  it("keeps the existing chat endpoint and corpus and passes cancellation through", async () => {
+  it("uses Gateway and keeps the existing corpus and passes cancellation through", async () => {
     const deps = await chatDependencies();
-    expect(mock.chat).toHaveBeenCalledWith("gpt-4o");
+    expect(mock.gateway).toHaveBeenCalledWith("openai/gpt-6.1-sol");
     expect(mock.createCorpus).toHaveBeenCalledWith(
       "existing-index",
       "existing-namespace",
@@ -52,6 +52,6 @@ describe("chat provider wiring", () => {
     });
     await expect(chatDependencies()).rejects.toThrow("not configured");
     expect(mock.createCorpus).toHaveBeenCalledWith("", "existing-namespace");
-    expect(mock.chat).not.toHaveBeenCalled();
+    expect(mock.gateway).not.toHaveBeenCalled();
   });
 });
