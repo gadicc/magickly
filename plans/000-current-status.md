@@ -318,4 +318,13 @@ Follow-ups are separate from the completed migration work:
   proposal with questions for the operator in
   [plan 058](058-temple-documents.md).
 
+- Golden Dawn hall diagrams (`gdHall`): composable temple floor plans for the
+  rituals, in progress on `gate/gd-hall`; see [plan 061](061-gd-hall.md).
+  TODO from it: recording officer movement between stations, a `gdVault` for
+  the Adeptus Minor Vault, original Enochian letterforms, moving
+  `enochianFont.ts` out of `src/components`, embedded fonts in the Tree of
+  Life exports, Firefox and Safari checks of PNG export with embedded fonts,
+  a credit for the RWS tarot images and the Pinterest hotlink in `2=9.pug`
+  ([plan 061](061-gd-hall.md#follow-ups)).
+
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.
