@@ -317,7 +317,7 @@ const union = (a: Rect, b: Rect): Rect => ({
 });
 
 /** The box a compass word's letters fill, in floor squares. */
-function compassBox(label: ResolvedCompassLabel): Rect {
+export function compassBox(label: ResolvedCompassLabel): Rect {
   const width = compassFont.width(label.text, label.size);
   const up = compassFont.top * label.size;
   const down = compassFont.bottom * label.size;

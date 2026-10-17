@@ -5,7 +5,11 @@ import {
   resolveHall,
   validateHall,
 } from "@magick-components/gd/hall";
-import { WALL_GAP } from "@magick-components/gd/hall/layout";
+import {
+  compassBox,
+  type Rect,
+  WALL_GAP,
+} from "@magick-components/gd/hall/layout";
 import {
   HALL_PRESETS,
   HALL_SOURCE_WORKS,
@@ -109,7 +113,9 @@ describe.each([zelator1, zelator2].map((preset) => [preset.id, preset]))(
     // Plan 061, conflict 7: as the book draws it (p.44), inside the hall
     // with its outer edge on the North wall line, the lamp at its East end
     // and the salt at its West end, all clear of everything else.
-    const { objects } = resolveHall(preset.hall, { art: gdHallArt });
+    const { objects, compass } = resolveHall(preset.hall, {
+      art: gdHallArt,
+    });
     const find = (artKey: string) =>
       objects.find(
         (object) => object.artKey === artKey && object.cx < 2,
@@ -139,19 +145,44 @@ describe.each([zelator1, zelator2].map((preset) => [preset.id, preset]))(
         expect(edges(item).north).toBeGreaterThan(0);
     });
 
-    it("overlaps nothing else", () => {
+    it("overlaps nothing else: objects, labels or compass words", () => {
       const north = [tablet, lamp, salt];
-      for (const mine of north)
-        for (const other of objects) {
-          if (north.includes(other)) continue;
-          const a = edges(mine);
-          const b = edges(other);
+      const box = (rect: Rect) => ({
+        north: rect.x0,
+        south: rect.x1,
+        east: rect.y0,
+        west: rect.y1,
+      });
+      const labels = (object: ResolvedObject) =>
+        [...object.labels, ...(object.text ? [object.text] : [])].map((label) =>
+          box(label.bounds),
+        );
+      const mine = north.flatMap((object) =>
+        [edges(object), ...labels(object)].map(
+          (rect) => [object.artKey, rect] as const,
+        ),
+      );
+      const others = [
+        ...objects
+          .filter((object) => !north.includes(object))
+          .flatMap((object) =>
+            [edges(object), ...labels(object)].map(
+              (rect) => [object.artKey, rect] as const,
+            ),
+          ),
+        ...compass.map(
+          (label) => [label.text, box(compassBox(label))] as const,
+        ),
+      ];
+      expect(others.some(([name]) => name === "North")).toBe(true);
+      for (const [name, a] of mine)
+        for (const [otherName, b] of others) {
           const apart =
             a.south <= b.north ||
             b.south <= a.north ||
             a.west <= b.east ||
             b.west <= a.east;
-          expect(apart, `${mine.artKey} and ${other.artKey}`).toBe(true);
+          expect(apart, `${name} and ${otherName}`).toBe(true);
         }
     });
   },
