@@ -121,6 +121,7 @@ export default defineConfig({
         "src/seo/pages.ts",
         "src/seo/site.ts",
         "src/components/gd/roseSigilGeometry.ts",
+        "src/app/gd/components/lamen.tsx",
         "src/components/gd/hall/art/*.{ts,tsx}",
         "src/components/gd/hall/attributes.ts",
         "src/components/gd/hall/fonts.ts",

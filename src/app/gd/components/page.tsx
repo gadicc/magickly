@@ -10,6 +10,7 @@ export default function GDComponentTest() {
     "praemonstrator",
     "cancellarius",
     "hierophant",
+    "pastHierophant",
     "hegemon",
     "hiereus",
     "dadouchos",
