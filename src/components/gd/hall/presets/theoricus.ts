@@ -6,7 +6,7 @@ import { dais, type HallPreset, REGARDIE_1938 } from "./types";
  * dais, a lantern before it and the Pantacle, the Theoricus' badge.
  */
 const AIR: readonly HallNode[] = [
-  { type: "tablet", element: "air", x: 8.51, y: 0.95 },
+  { type: "tablet", element: "air", x: 7.97, y: 0.63 },
   { type: "item", kind: "lantern", x: 7, y: 1.66 },
   { type: "item", kind: "pantacle", x: 9.07, y: 1.83 },
 ];

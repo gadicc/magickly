@@ -12,14 +12,17 @@ const LETTERS: HallNode = {
 };
 
 /**
- * The Earth tablet in the North with its outer edge on the wall line, inside
- * the hall, the lamp and the salt before it, as the book draws it; the
- * drawings hang it outside the wall.
+ * The Earth tablet hung outside the North wall, the lamp and the salt
+ * before it, as the drawings have them. Its board is twice the Theoricus
+ * Air tablet's (3.82 × 5.31 squares), so it sets its own scale. The book
+ * stands it inside, its outer edge on the wall line (p.44, conflict 7);
+ * a board this size inside leaves the lamp and the salt no room before it
+ * clear of the Hiereus (part 1) and the Table of Shewbread (part 2).
  */
 const NORTH: readonly HallNode[] = [
-  { type: "tablet", element: "earth", anchor: "north", x: -0.31, y: 8.3 },
-  { type: "item", kind: "lantern", x: 3.3, y: 6.4 },
-  { type: "item", kind: "salt", x: 3.15, y: 10.05, scale: 1.04 },
+  { type: "tablet", element: "earth", x: -1.37, y: 8.3, scale: 2.655 },
+  { type: "item", kind: "lantern", x: 1.33, y: 6.61 },
+  { type: "item", kind: "salt", x: 1.32, y: 10.02, scale: 1.04 },
 ];
 
 const BANNERS: readonly HallNode[] = [
