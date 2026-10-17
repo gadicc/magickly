@@ -611,8 +611,10 @@ Settled while building A1, where the decisions above left a choice:
 - Hebrew banners use Noto Serif Hebrew **Bold** (the drawings' letters are
   heavy). The compass subset holds only the letters of East, West, North
   and South (2 KB); the label italic is Latin-1 plus dashes, curly quotes
-  and the ellipsis. The kern table is stored by kern class (340 class
-  pairs for 2,234 character pairs, 11 KB of JSON).
+  and the ellipsis. The kern table is stored by kern class (266 class
+  pairs for 1,839 character pairs, 8.6 KB of JSON). The soft hyphen has
+  no advance and no pairs (HarfBuzz draws nothing and kerns across it),
+  and no-break spaces do not break lines.
 - The default scales live in one table, `DEFAULT_SCALES` in
   `src/components/gd/hall/layout.ts`, measured on the drawings. Banners
   follow Neophyte (1.51 × 2.02 squares); the Zelator and Theoricus banners

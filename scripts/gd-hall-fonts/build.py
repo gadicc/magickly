@@ -80,6 +80,8 @@ LATIN1 = [
 COMPASS_TEXT = "East West North South"
 # The twenty-two letters and the five final forms, U+05D0–U+05EA.
 HEBREW = [*range(0x05D0, 0x05EB)]
+# Default-ignorable characters in the subset: drawn as nothing.
+IGNORABLE = {0x00AD}
 # font-variant-ligatures: none turns off all of these in the browser; the
 # subsets keep only `kern`, so a renderer that ignores the CSS agrees too.
 NO_LIGATURES = {"liga": False, "clig": False, "dlig": False, "hlig": False,
@@ -153,10 +155,20 @@ def metrics(ttf: bytes, unicodes: list[int]) -> dict:
 
     chars = [u for u in unicodes if u in cmap]
     letters = [u for u in chars if chr(u).isascii() and chr(u).isalnum()]
-    advances = {u: hmtx[cmap[u]][0] for u in chars}
+    # Each character's advance as HarfBuzz shapes it alone, not its glyph's:
+    # the soft hyphen (U+00AD) is default-ignorable and draws nothing, so
+    # it takes no space, and its glyph's 310 units would otherwise turn into
+    # a -310 "kern" on each side of it. HarfBuzz kerns across it (A, soft
+    # hyphen, V kerns as AV), so it takes no part in pairs either: label
+    # measurement skips zero-advance characters when kerning.
+    advances = {u: shaped(chr(u)) for u in chars}
+    for u in chars:
+        if advances[u] != (0 if u in IGNORABLE else hmtx[cmap[u]][0]):
+            sys.exit(f"U+{u:04X}: shaped advance {advances[u]} is unexpected")
+    kerned = [u for u in chars if u not in IGNORABLE]
     pairs = {}
-    for a in chars:
-        for b in chars:
+    for a in kerned:
+        for b in kerned:
             delta = shaped(chr(a) + chr(b)) - advances[a] - advances[b]
             if delta:
                 pairs[(a, b)] = delta
@@ -171,8 +183,8 @@ def metrics(ttf: bytes, unicodes: list[int]) -> dict:
                 out[u] = numbers.setdefault(key, len(numbers) + 1)
         return out
 
-    left = classes(lambda a: tuple(pairs.get((a, b), 0) for b in chars))
-    right = classes(lambda b: tuple(pairs.get((a, b), 0) for a in chars))
+    left = classes(lambda a: tuple(pairs.get((a, b), 0) for b in kerned))
+    right = classes(lambda b: tuple(pairs.get((a, b), 0) for a in kerned))
     class_pairs = {}
     for (a, b), delta in pairs.items():
         class_pairs[(left[a], right[b])] = delta
@@ -194,8 +206,8 @@ def metrics(ttf: bytes, unicodes: list[int]) -> dict:
         "kernRight": [n for u in right for n in (u, right[u])],
         "kern": [n for key in sorted(class_pairs) for n in (*key, class_pairs[key])],
     }
-    for a in chars:
-        for b in chars:
+    for a in kerned:
+        for b in kerned:
             got = class_pairs.get((left.get(a, 0), right.get(b, 0)), 0)
             if got != pairs.get((a, b), 0):
                 sys.exit(f"class table gives {got} for {chr(a)}{chr(b)}")
@@ -216,9 +228,12 @@ def check_pairs(table: dict, shaped, samples: list[str]) -> None:
     k = table["kern"]
     kern = {(k[i], k[i + 1]): k[i + 2] for i in range(0, len(k), 3)}
     for text in samples:
+        # As labels.ts measures: zero-advance characters are skipped for
+        # kerning.
+        drawn = [c for c in text if adv[ord(c)] != 0]
         total = sum(adv[ord(c)] for c in text) + sum(
             kern.get((left.get(ord(a), 0), right.get(ord(b), 0)), 0)
-            for a, b in zip(text, text[1:])
+            for a, b in zip(drawn, drawn[1:])
         )
         if total != shaped(text):
             sys.exit(f"pair table gives {total} for {text!r}, HarfBuzz {shaped(text)}")
@@ -272,6 +287,7 @@ def main() -> None:
         "Praemonstrator", "Hiereus", "Hegemon", "Keryx", "Stolistes",
         "Dadouchos", "Sentinel", "Neophyte Temple", "Banner of the West",
         "AVATAR Wave Ty Yo", "Füße à côté — «Ægir»", "Hiereus’ “Throne”…",
+        "Hiero\u00adphant", "Past\u00a0Hierophant", "A\u00adV",
     ])
     compass, compass_shaped, _ = metrics(bold_ttf, sorted({ord(c) for c in COMPASS_TEXT}))
     check_pairs(compass, compass_shaped, COMPASS_TEXT.split(" "))

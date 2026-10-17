@@ -49,6 +49,20 @@ describe("the generated font metrics", () => {
     expect(LABEL_SIZE).toBe(0.43);
   });
 
+  it("gives the soft hyphen no width and kerns across it", () => {
+    // HarfBuzz draws U+00AD as nothing and kerns A and V across it.
+    expect(labelFont.width("\u00ad", 1)).toBe(0);
+    expect(labelFont.width("Hiero\u00adphant", LABEL_SIZE)).toBeCloseTo(
+      labelFont.width("Hierophant", LABEL_SIZE),
+      10,
+    );
+    expect(labelFont.width("A\u00adV", 1)).toBeCloseTo(
+      labelFont.width("AV", 1),
+      10,
+    );
+    expect(labelFont.kerning("A", "\u00ad")).toBe(0);
+  });
+
   it("measures characters outside the subset with an average advance", () => {
     expect(labelFont.width("Ω", 1)).toBeCloseTo(0.55, 5);
     expect(labelFont.width("", 1)).toBe(0);
@@ -136,6 +150,15 @@ describe("wrapText", () => {
         (line) => line.text,
       ),
     ).toEqual(["one", "two…"]);
+  });
+
+  it("never breaks at a no-break space", () => {
+    expect(texts("Past\u00a0Hierophant")).toEqual(["Past\u00a0Hierophant"]);
+    expect(texts("Past\u202fHierophant")).toEqual(["Past\u202fHierophant"]);
+    expect(texts("Banner of\u00a0the West")).toEqual([
+      "Banner",
+      "of\u00a0the West",
+    ]);
   });
 
   it("collapses spaces, honours line breaks and drops empty text", () => {

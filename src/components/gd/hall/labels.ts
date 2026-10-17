@@ -64,7 +64,11 @@ export function textMeasure(table: FontMetricsTable): TextMeasure {
       let previous: number | undefined;
       for (const char of text) {
         const code = char.codePointAt(0) as number;
-        units += advances.get(code) ?? fallback;
+        const advance = advances.get(code) ?? fallback;
+        // A zero-advance character (the soft hyphen) draws nothing, and
+        // HarfBuzz kerns its neighbours as if it were not there.
+        if (advance === 0) continue;
+        units += advance;
         if (previous !== undefined) units += pairKern(previous, code);
         previous = code;
       }
@@ -109,8 +113,8 @@ export interface TextLine {
 }
 
 /**
- * Breaks text into lines no wider than `width` at spaces; `\n` forces a
- * break. A single word wider than the box stays on one line and overflows,
+ * Breaks text into lines no wider than `width` at spaces, but not at
+ * no-break spaces; `\n` forces a break. A single word wider than the box stays on one line and overflows,
  * as "Praemonstrator" does over a dais lamen. At most `maxLines` lines are
  * returned; the last ends in "…" when more were cut.
  */
@@ -123,7 +127,8 @@ export function wrapText(
 ): TextLine[] {
   const lines: string[] = [];
   for (const paragraph of text.split("\n")) {
-    const words = paragraph.split(/\s+/).filter(Boolean);
+    // No-break spaces join words: split at every other white space.
+    const words = paragraph.split(/[^\S\u00a0\u2007\u202f]+/).filter(Boolean);
     let line: string | undefined;
     for (const word of words) {
       const joined = line === undefined ? word : `${line} ${word}`;
