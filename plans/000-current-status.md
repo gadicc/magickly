@@ -320,13 +320,21 @@ Follow-ups are separate from the completed migration work:
 
 - Golden Dawn hall diagrams (`gdHall`): composable temple floor plans for the
   rituals, in progress on `gate/gd-hall`; see [plan 061](061-gd-hall.md).
+  Stage A is done; stage B waits on Gadi's choice between drawing and
+  uniform sizes, and on keeping or dropping `sizes`.
   TODO from it: recording officer movement between stations, a `gdVault` for
   the Adeptus Minor Vault, original Enochian letterforms, moving
   `enochianFont.ts` and the other files the import-boundary test allows out
   of `src/components` (or off their app imports), embedded fonts in the Tree
   of Life exports, Firefox and Safari checks of PNG export with embedded fonts,
   a credit for the RWS tarot images and the Pinterest hotlink in `2=9.pug`,
-  the Neophyte preset's "Dadouchos" label over the South wall, Gadi's calls
+  the Neophyte preset's "Dadouchos" label over the South wall and the
+  uniform-size "Hiereus" and "Keryx" labels overlapping in Zelator 2 (both
+  after the sizes decision), the README's claim (lines 13–15) that
+  `src/components/LICENSE.txt` lists the components importing app code
+  (it lists none), a hook-free id scheme for `GdHall` before halls are
+  rendered on the server or exported from the reader, resvg-wasm's
+  fallback to Noto Sans for the hall's quoted font stacks, Gadi's calls
   on whether the Hierophant's lamen takes the striped ring the hall drawings
   give it, whether the tarot titles adopt the Golden Dawn's own and whether
   a hall's PNG export embeds Enochian Plain for its tablets, and an

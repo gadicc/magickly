@@ -5,7 +5,8 @@ twice (Fable) and spiked the same day. Stage A is done on `gate/gd-hall`:
 A1 (model, validator, layout, labels, fonts, renderer, original art), A2
 (lamen, app art registry, legacy art, first-party art, the five presets)
 and A3 (the Zelator Earth tablet per the book, PNG font embedding, the
-read-only `/gd/hall` gallery).
+read-only `/gd/hall` gallery), with the fixes from the final reviews of
+stage A. Stage B waits on Gadi's decision on sizes (Stages).
 
 Composable Golden Dawn temple-hall diagrams, authored in the ritual Pug
 dialect, drawn as inline SVG in the reader and editor, edited visually, and
@@ -312,8 +313,11 @@ West" wrap; "Hierophant" fits a dais lamen with 0.016 square to spare;
   (fontTools: `pyftsubset` and the instancer) makes static instances and
   subsets — Latin-1 for labels, the 22 letters for Hebrew — and the kern
   table; its outputs are committed with their sources and hashes recorded,
-  like `assets/fonts/README.md` does today. Sizes as WOFF2: Latin-1 italic
-  16 KB, Hebrew letters 4 KB, compass bold italic under 3 KB.
+  like `assets/fonts/README.md` does today. Sizes as WOFF2 (estimated
+  16, 4 and under 3 KB): Latin-1 italic 11,464 bytes, Hebrew letters
+  3,340, compass bold italic 2,072; the advance and kern table
+  (`fontMetrics.json`, with the compass and Hebrew faces' advances)
+  10,736.
 - Enochian Plain: no licence text exists; font archives call it freeware,
   non-commercial (`assets/fonts/EnochianPlain-NOTICE.txt`, plan 027).
   `Tablet` keeps referring to the font rather than copying outlines. Original
@@ -399,8 +403,30 @@ are invalid, not clamped); the layout resolver clamps coordinates, scales
 and rotation to sane ranges and coerces numeric strings. Registries are
 looked up with `Map`/`Object.hasOwn` (`lamen.tsx` indexes plain objects by
 officer today, so `"constructor"` yields a function). Attribute strings only
-ever reach text nodes. Gradient and pattern IDs come from `useId`, so several
-halls on one page do not collide. The visual editor's first write-back
+ever reach text nodes. Gradient, pattern and drawing IDs come from `useId`, so
+several halls on one page do not collide.
+
+**Output bound.** The SVG grows with the source, never faster than a
+small constant per node:
+
+- At most `MAX_HALL_NODES` (4,000) nodes, labels included, within
+  `MAX_HALL_DEPTH` (24).
+- At most `MAX_HALL_LABEL_LINES` (500) lines of labels, free text and
+  markers' text in a hall, 6 per label; what is cut is reported.
+- Each drawing appears once per hall: the renderer draws every distinct
+  art key, box and variant once in `<defs>` and places it with `<use>`
+  (about 70 bytes a placement). An art's `variant(node)` names the
+  normalised values it draws (a trump's number, a named colour, a role
+  `Lamen` knows), so untrusted spellings of one drawing share it.
+  Placeholders are shared by name. Text inside a shared drawing (a tarot
+  card's title) is drawn once per drawing, not per placement, so it does
+  not count against the line budget.
+
+Measured after the final review of stage A: 4,000 chalices draw 405 KB
+(448 MB before), 3,990 tarot keys 312 KB (3.2 MB), 3,990 markers with
+200-character text 342 KB in 504 text elements (6.4 MB, 23,944). Tests
+hold 4,000 chalices under 1 MB and the package's hostile halls under
+500 KB. The visual editor's first write-back
 normalises numeric strings to numbers, and treats `children: []` and an
 absent `children` alike.
 
@@ -429,10 +455,12 @@ Copied into the source on insertion; styling defaults inherited (decision 4).
 
 Each preset's data carries a `sources` list of stable references (decided
 17 October 2026): the book diagram and rubric it follows, as in the Sources
-section below (for example "Regardie 1938, vol. 2, p.131, archive.org
-IsraelRegardie-TheGoldenDawn-Vol2-1938 leaf n125"), and for the presets
-ported from a drawing, that `public/pics` file. A test fails for a preset
-without a source.
+section below, and for the presets ported from a drawing, that
+`public/pics` file. A source is structured, `{ kind: "drawing", path }` or
+`{ kind: "book", work, page, leaf, note? }` (`regardie1938(131, 125)`),
+with the cited works in `HALL_SOURCE_WORKS`; `hallSourceText` writes one
+("Regardie 1938, vol. 2, p.131 (archive.org leaf n125)") and
+`hallSourceUrl` links it. A test fails for a preset without a source.
 
 | Preset | Source | Notes |
 | --- | --- | --- |
@@ -565,8 +593,14 @@ Kept until every reference is gone; this list is updated as they go.
 | `src/files/ritualPublicationStaticPaths.ts:11-17` | publication static paths |
 | `src/offline/ritualPublicationTracing.test.ts:84-86` | asserts the files exist, via that list |
 | `src/doc/ritualBlocks/renderForEditing.test.tsx:172,186` | test fixture |
+| The presets' `sources` (`drawing("neophyte")` and so on in `src/components/gd/hall/presets/*.ts`) | the drawing each preset was ported from; a citation, which needs the file only while it is served |
+| `/gd/hall` gallery: `originalDrawing()` and its `<img src="/pics/….svg">` ("Compare with the original drawing"), and the sources' links | shows the drawings beside the presets |
+| `src/app/gd/hall/presets.test.tsx` (each preset cites `public/pics/<id>.svg`, which must exist), `gallery.test.tsx` | tests of the two rows above |
 | Production ritual "0=0 Grade of the Neophyte" and 13 revisions | from the 15 September Mongo dump; rituals are unchanged since, so the SQL rows match. Migrate by editing the ritual once presets reach parity |
 | Published offline bundles, external links, search indexes, user exports | suspected; cannot be enumerated. Keep the files served |
+
+The presets, the gallery and their tests keep the drawings served until
+stage I, which decides whether the comparison and the citations stay.
 
 ## Stages
 
@@ -574,8 +608,8 @@ Each stage is a series of gated commits on `gate/gd-hall`.
 
 | Stage | Content | Can be reverted alone | Status |
 | --- | --- | --- | --- |
-| A | `src/components/gd/hall`: model, validator, layout, renderer, chrome, labels and fonts; `Lamen` move and variants; legacy art under `src/app`; the five drawn presets; a read-only `/gd/hall` gallery with export and side-by-side comparison with the old SVGs; `sizes` comparison | yes | done (A1–A3, 17 October 2026) |
-| B | Spike results applied: compiler change (decision 2), Pug round trip, lazy reader block, `blockAtoms` entry with a static node view, boundary tests | until the first hall is saved | |
+| A | `src/components/gd/hall`: model, validator, layout, renderer, chrome, labels and fonts; `Lamen` Past Hierophant variant and `Map` lookups (the move is stage H); legacy art under `src/app`; the five drawn presets; a read-only `/gd/hall` gallery with export and side-by-side comparison with the old SVGs; `sizes` comparison | yes | done (A1–A3 and the final review fixes, 17 October 2026) |
+| B | Spike results applied: compiler change (decision 2), Pug round trip, lazy reader block, `blockAtoms` entry with a static node view, boundary tests | until the first hall is saved | gated: starts once Gadi settles drawing against uniform sizes (decision 4), and whether `sizes` stays in the vocabulary or is dropped. B saves halls in rituals, after which default scales are a layout contract (decision 2) |
 | C | `/hall` slash command with presets | yes | |
 | D | Visual sub-editor | yes | |
 | E | `/gd/hall` source, visual and split playground with local draft and share link | yes | |
@@ -730,7 +764,8 @@ proved wrong:
   or a lamen's injected art declares (found by the A1 review).
 - Preset snapshots (`src/app/gd/hall/__snapshots__`) are 56–326 KB each,
   one tag per line; Zelator 2 is the largest (chalice, censer, both
-  diagrams, the tablet).
+  diagrams, the tablet). Since each drawing sits in `<defs>` once (Review
+  fixes) they are 57–314 KB.
 
 ## Stage A3 notes
 
@@ -862,6 +897,59 @@ after it:
   of calling `forwardRef`'s internal `render`, and so also sees hooks in
   their child components.
 
+The final reviews of stage A (Fable, `main..72cfad6`; Opus, A3) found one
+major problem, an owner decision and minor problems and nits, fixed after
+them except the decision:
+
+- **Art amplification** (Fable M1, major): every placement drew its art
+  in full, so with the app's art 200 chalices drew 22.4 MB of SVG from
+  6.7 KB of source (448 MB at the node bound), and markers wrapped their
+  own text outside the line budget. Each art now declares `variant(node)`
+  and the renderer draws each distinct drawing once in `<defs>` as
+  `<g id="…-art<n>">`, placed with `<use href>`; markers' text goes
+  through the label budget and is set over the marker by the layout; the
+  bound and the measurements are in decision 12. A `<g>` in `<defs>`
+  rather than the `<symbol>` the fix proposed: `<use>` of a `<symbol>`
+  opens a viewport that clips at the origin unless the symbol sets
+  `overflow`, while a `<g>` draws in the `<use>`'s own coordinates, as the
+  art did inline. The five presets rasterise pixel-identically in
+  Chromium before and after the `<defs>` change; moving the markers' text
+  into hall units changes the anti-aliasing of two of Theoricus 2's
+  marker lines (844 pixels at 1,600 px wide, the same glyphs and
+  positions). The PNG and SVG downloads of Neophyte, Zelator 2 and
+  Theoricus 1 from `/gd/hall` are pixel-identical to the same downloads
+  before the change; the SVG files carry no duplicate ids, so
+  `renameDuplicateIds` never renames an id a `<use>` points at. The
+  snapshots shrink only where a preset repeats art (Theoricus 1
+  121 KB → 107 KB, Zelator 2 328 KB → 314 KB) and grow by the `<use>`
+  elements elsewhere (Neophyte 56 KB → 57 KB). The art no longer receives
+  `unitsPerSquare` and `labelSize`, which only the marker read; the
+  largest preset now draws 16 label lines (Theoricus 2's markers).
+- **Invalid tags** (Fable m1): a node whose tag is not an identifier was
+  drawn as a placeholder while the validator said it was ignored; it is
+  no longer drawn.
+- **Doors** (Fable m4): `x` and `y` take a door's own 0–16 range, so the
+  validator's clamp warning matches the layout's; door bands are keyed by
+  order (two doors in one place shared a key).
+- **Preset sources** (Fable nit): structured, with one formatter (Presets).
+- **Copy PNG** (Opus m1): a failing `prepare` (the font fetch blocked)
+  made the clipboard write fail and showed "The browser refused clipboard
+  access."; `copyPng` now reports the PNG's own error, so the controls
+  say "Export failed.".
+- **Zelator Earth tablet test** (Opus n1): checks labels, free text and
+  the compass words as well as object boxes.
+- **`gdHallFontFaceRule`** (Opus n2): refuses a `src` with a quote,
+  bracket, backslash, space or markup character, as the base URL check
+  does.
+- **Rasterising** (Opus n3): `image.decode()` before `drawImage`, for
+  WebKit, which may fire `load` before data-URI fonts are usable.
+- **Plan** (Fable m2, m3, m5, nits): the old drawings' ledger, the stage
+  table's `Lamen` entry, decision 7's sizes, and the follow-ups below.
+
+Not changed: **sizes** (Fable M2) is Gadi's decision; stage B is gated on
+it (Stages). The uniform-size label overlaps (Opus n4) wait on it too
+(Follow-ups).
+
 ## Commits
 
 | Commit | Change |
@@ -898,6 +986,15 @@ after it:
 | 8ace114 | Zelator Earth tablet inside on the North wall line at the default size, per the book (conflict 7) |
 | 2eec39e | `ExportControls` `prepare` hook; hall fonts inlined in PNG exports |
 | e1e5ec7 | Read-only `/gd/hall` gallery: presets, sizes side by side, the original drawings, sources, export |
+| 87b6b6a | No node drawn without a valid tag (final review m1) |
+| 37f9d36 | Doors on the floor's 0–16; door bands keyed by order (final review m4, nit) |
+| ab35fcb | Markers' text laid out through the label line budget (final review M1) |
+| acb5ebb | Each art variant drawn once per hall in `<defs>`, placed with `<use>`; attack tests with byte budgets (final review M1) |
+| 0f3ca01 | Structured preset sources with one formatter (final review nit) |
+| 47eddf8 | A failed PNG copy reported as failed, not as a refused clipboard (A3 review m1) |
+| a6d1faa | `image.decode()` before rasterising (A3 review n3) |
+| 0b03f8b | `gdHallFontFaceRule` checks its source (A3 review n2) |
+| e1fb37a | The Zelator Earth tablet test checks labels and compass words (A3 review n1) |
 
 ## Future
 
@@ -921,11 +1018,12 @@ Listed in `plans/000-current-status.md`:
 officer movement; `gdVault`; original Enochian letterforms; moving
 `enochianFont.ts` (`next/font/local`) out of `src/components`, and the other
 files the import-boundary test still allows (`Link`, `Tiles`, `Mercury`,
-`planetarySpirits`, `entity/index`), which `src/components/LICENSE.txt` should
-list as the README says it does; export font
+`planetarySpirits`, `entity/index`; the README note below); export font
 embedding for the Tree of Life; Firefox and Safari checks of PNG export with
 embedded fonts; whether a hall's PNG embeds Enochian Plain for the tablets
-(Stage A3 notes); the Neophyte "Dadouchos" label over the South wall; the
+(Stage A3 notes); the Neophyte "Dadouchos" label over the South wall and,
+with uniform sizes, the "Hiereus" and "Keryx" labels overlapping in
+Zelator 2 (both wait on the sizes decision); the
 RWS tarot credit and the Pinterest hotlink in `2=9.pug`; whether the
 Hierophant's lamen takes the drawings' striped ring (Stage A2 notes);
 whether the tarot
@@ -933,7 +1031,15 @@ titles adopt the Golden Dawn's own, from a cited source (they are the
 common titles, with "The Universe" for XXI);
 `src/components/entity/entityFields.test.ts`, which reaches app code
 through `import.meta.glob("../../app/**/fields.ts")`, a path the
-import-boundary test cannot see.
+import-boundary test cannot see;
+`README.md` (lines 13–15) says `src/components/LICENSE.txt` lists the
+components that import app code; it lists none, so either the file
+gains the list or the README stops saying so. `GdHall` uses `useId`
+and `useMemo`, and the `/og` and `/api/render` routes render without a
+hook dispatcher (Stage A2 notes), so server rendering of halls and the
+reader export (stage I, Stretch) need a hook-free id scheme, such as an
+`idPrefix` prop as the Shewbread and candlestick take; and the resvg
+font stacks below.
 
 For stage B (PNG export): resvg-wasm 2.6.2 did not resolve the hall's
 quoted font stacks (`"GdHall Noto Serif", "Noto Serif", serif`) to a
