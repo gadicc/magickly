@@ -322,8 +322,9 @@ Follow-ups are separate from the completed migration work:
   rituals, in progress on `gate/gd-hall`; see [plan 061](061-gd-hall.md).
   TODO from it: recording officer movement between stations, a `gdVault` for
   the Adeptus Minor Vault, original Enochian letterforms, moving
-  `enochianFont.ts` out of `src/components`, embedded fonts in the Tree of
-  Life exports, Firefox and Safari checks of PNG export with embedded fonts,
+  `enochianFont.ts` and the other files the import-boundary test allows out
+  of `src/components` (or off their app imports), embedded fonts in the Tree
+  of Life exports, Firefox and Safari checks of PNG export with embedded fonts,
   a credit for the RWS tarot images and the Pinterest hotlink in `2=9.pug`
   ([plan 061](061-gd-hall.md#follow-ups)).
 

@@ -1,7 +1,8 @@
 # Golden Dawn hall diagrams (`gdHall`) — 17 October 2026
 
 Status: design settled with Gadi on 17 October 2026; adversarially reviewed
-twice (Fable) and spiked the same day. Stage A started on `gate/gd-hall`.
+twice (Fable) and spiked the same day. Stage A started on `gate/gd-hall`;
+A1 (model, validator, layout, labels, fonts, renderer, original art) is in.
 
 Composable Golden Dawn temple-hall diagrams, authored in the ritual Pug
 dialect, drawn as inline SVG in the reader and editor, edited visually, and
@@ -539,6 +540,40 @@ PNGs are kept outside the repository.
 | Label widths | Advances plus kerning match Chromium to 0.0092 % (decision 6) |
 | PNG export with embedded fonts | Works in Chromium with 14 KB of WOFF2 subsets (decision 8) |
 
+## Stage A1 notes
+
+Settled while building A1, where the decisions above left a choice:
+
+- Hebrew banners use Noto Serif Hebrew **Bold** (the drawings' letters are
+  heavy). The compass subset holds only the letters of East, West, North
+  and South (2 KB); the label italic is Latin-1 plus dashes, curly quotes
+  and the ellipsis. The kern table is stored by kern class (340 class
+  pairs for 2,234 character pairs, 11 KB of JSON).
+- The default scales live in one table, `DEFAULT_SCALES` in
+  `src/components/gd/hall/layout.ts`, measured on the drawings. Banners
+  follow Neophyte (1.51 × 2.02 squares); the Zelator and Theoricus banners
+  are half as large again, so their presets will either set `scale` or
+  accept the drift. `sizes="uniform"` draws every officer at scale 1.
+- `margin*` fixes that side of the view at a distance from the wall line;
+  without it the side follows the content plus `padding`.
+- The dais row centres its block, labels included, in the dais band;
+  banner rows stand beyond the compass labels, and `banners(spread="ends")`
+  puts the end banners on the corners (Philosophus 1).
+- Doors take `x` on the East and West walls and `y` on the North and South.
+- Item colours (`fill`, `stroke`) are named palette colours, never CSS.
+- A `label` child of a placeable is attached to it; a `label` in the floor,
+  a row or a host's frame is free text placed like any object.
+
+## Commits
+
+| Commit | Change |
+| --- | --- |
+| 4165f3c | Noto Serif and Noto Serif Hebrew subsets, their generator and kern table, OFL notices (also for the existing Noto Sans fonts) |
+| ed0d464 | Hall model, vocabulary and validator |
+| 946a743 | Layout resolver and label wrapping |
+| e63ae08 | `GdHall` renderer, chrome and the package's original art |
+| 8a7babd | Import-boundary test for `src/components` |
+
 ## Future
 
 **Officer movement.** Rituals describe movement in prose ("Keryx approaches
@@ -559,7 +594,10 @@ later.
 
 Listed in `plans/000-current-status.md`:
 officer movement; `gdVault`; original Enochian letterforms; moving
-`enochianFont.ts` (`next/font/local`) out of `src/components`; export font
+`enochianFont.ts` (`next/font/local`) out of `src/components`, and the other
+files the import-boundary test still allows (`Link`, `Tiles`, `Mercury`,
+`planetarySpirits`, `entity/index`), which `src/components/LICENSE.txt` should
+list as the README says it does; export font
 embedding for the Tree of Life; Firefox and Safari checks of PNG export with
 embedded fonts; the RWS tarot credit and the Pinterest
 hotlink in `2=9.pug`.
