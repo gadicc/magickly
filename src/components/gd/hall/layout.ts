@@ -302,6 +302,80 @@ const union = (a: Rect, b: Rect): Rect => ({
   y1: Math.max(a.y1, b.y1),
 });
 
+/** The box a compass word's letters fill, in floor squares. */
+function compassBox(label: ResolvedCompassLabel): Rect {
+  const width = compassFont.width(label.text, label.size);
+  const up = compassFont.top * label.size;
+  const down = compassFont.bottom * label.size;
+  return label.rotate === 0
+    ? {
+        x0: label.x - width / 2,
+        y0: label.y - up,
+        x1: label.x + width / 2,
+        y1: label.y + down,
+      }
+    : label.rotate === -90
+      ? {
+          x0: label.x - up,
+          y0: label.y - width / 2,
+          x1: label.x + down,
+          y1: label.y + width / 2,
+        }
+      : {
+          x0: label.x - down,
+          y0: label.y - width / 2,
+          x1: label.x + up,
+          y1: label.y + width / 2,
+        };
+}
+
+/**
+ * Moves a compass word outward, away from the floor, until it clears every
+ * rectangle beside it by `COMPASS_GAP`: an Earth tablet hung outside the
+ * North wall would otherwise cover "North". One pass, nearest first, so
+ * thousands of objects cost a sort.
+ */
+function clearOf(
+  label: ResolvedCompassLabel,
+  rects: readonly Rect[],
+): ResolvedCompassLabel {
+  const box = compassBox(label);
+  // Distances outward from the floor along the label's side, and the span
+  // across it that a rectangle must share to be in the way.
+  const side = {
+    East: { sign: -1, along: "y", across: "x" },
+    West: { sign: 1, along: "y", across: "x" },
+    North: { sign: -1, along: "x", across: "y" },
+    South: { sign: 1, along: "x", across: "y" },
+  }[label.text];
+  const out = (rect: Rect) => {
+    const lo = side.along === "x" ? rect.x0 : rect.y0;
+    const hi = side.along === "x" ? rect.x1 : rect.y1;
+    return side.sign > 0 ? [lo, hi] : [-hi, -lo];
+  };
+  const [start, end] = out(box);
+  const depth = end - start;
+  const across = (rect: Rect) =>
+    side.across === "x" ? [rect.x0, rect.x1] : [rect.y0, rect.y1];
+  const [c0, c1] = across(box);
+  const inTheWay = rects
+    .filter((rect) => {
+      const [r0, r1] = across(rect);
+      return r0 < c1 && c0 < r1;
+    })
+    .map(out)
+    .sort((a, b) => a[0] - b[0]);
+  let at = start;
+  for (const [near, far] of inTheWay) {
+    if (near >= at + depth) break;
+    if (far > at) at = far + COMPASS_GAP;
+  }
+  const shift = (at - start) * side.sign;
+  return side.along === "x"
+    ? { ...label, x: label.x + shift }
+    : { ...label, y: label.y + shift };
+}
+
 const coordinate = (value: number | undefined) =>
   value === undefined ? undefined : clamp(value, ...COORDINATE_RANGE);
 
@@ -770,12 +844,23 @@ export function resolveHall(
   for (const item of floorItems)
     place(prepare(item.node, item.path, "floor"), floorFrame, {});
 
-  // The compass labels sit just outside the wall lines; banner rows beyond.
+  // The compass labels sit just outside the wall lines, clear of anything
+  // drawn there; banner rows beyond.
+  const floorRects = objects.flatMap((object) => [
+    {
+      x0: object.cx - object.width / 2,
+      y0: object.cy - object.height / 2,
+      x1: object.cx + object.width / 2,
+      y1: object.cy + object.height / 2,
+    },
+    ...object.labels.map((label) => label.bounds),
+    ...(object.text ? [object.text.bounds] : []),
+  ]);
   const compassDepth = (compassFont.top + compassFont.bottom) * COMPASS_SIZE;
   const clearance = showCompass
     ? COMPASS_GAP + compassDepth + BANNER_ROW_GAP
     : COMPASS_GAP;
-  const compass: ResolvedCompassLabel[] = showCompass
+  const besideWalls: ResolvedCompassLabel[] = showCompass
     ? [
         {
           text: "East",
@@ -807,6 +892,7 @@ export function resolveHall(
         },
       ]
     : [];
+  const compass = besideWalls.map((label) => clearOf(label, floorRects));
 
   for (const row of rows) {
     const context: Context = row.kind === "dais" ? "dais" : "floor";
@@ -902,34 +988,7 @@ export function resolveHall(
     });
     for (const label of object.labels) bounds = union(bounds, label.bounds);
   }
-  for (const label of compass) {
-    const width = compassFont.width(label.text, label.size);
-    const up = compassFont.top * label.size;
-    const down = compassFont.bottom * label.size;
-    bounds = union(
-      bounds,
-      label.rotate === 0
-        ? {
-            x0: label.x - width / 2,
-            y0: label.y - up,
-            x1: label.x + width / 2,
-            y1: label.y + down,
-          }
-        : label.rotate === -90
-          ? {
-              x0: label.x - up,
-              y0: label.y - width / 2,
-              x1: label.x + down,
-              y1: label.y + width / 2,
-            }
-          : {
-              x0: label.x - down,
-              y0: label.y - width / 2,
-              x1: label.x + up,
-              y1: label.y + width / 2,
-            },
-    );
-  }
+  for (const label of compass) bounds = union(bounds, compassBox(label));
   let caption: ResolvedLabel | undefined;
   if (captionText) {
     const lines = wrapText(captionText, FLOOR_SIZE, CAPTION_SIZE);

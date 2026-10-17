@@ -769,6 +769,65 @@ describe("resolveHall: walls, compass, caption and bounds", () => {
     expect(resolve(hall({ compass: "false" })).compass).toEqual([]);
   });
 
+  it("moves a compass word out past whatever stands outside its wall", () => {
+    const plain = resolve(hall({})).compass;
+    // An altar (2 × 2) centred 1.5 squares outside the North wall, a
+    // second beyond it overlapping the first, and one well clear of both.
+    const tablet = resolve(
+      hall(
+        {},
+        floor(
+          { type: "altar", x: -1.5, y: 8 },
+          { type: "altar", x: -3, y: 8.5 },
+          { type: "altar", x: -9, y: 8 },
+        ),
+      ),
+    );
+    const north = tablet.compass.find((label) => label.text === "North");
+    // Past the second altar's outer edge (x = -4) by the gap; the word
+    // fits between it and the third.
+    expect(north?.x).toBeCloseTo(
+      -4 - COMPASS_GAP - compassFont.bottom * COMPASS_SIZE,
+      10,
+    );
+    expect((north?.x ?? 0) - compassFont.top * COMPASS_SIZE).toBeGreaterThan(
+      -8,
+    );
+    // The other words, with nothing beside them, stay where they were.
+    expect(tablet.compass.filter((label) => label.text !== "North")).toEqual(
+      plain.filter((label) => label.text !== "North"),
+    );
+    // Something on the floor itself never moves them.
+    expect(
+      resolve(hall({}, floor({ type: "altar", x: 1.5, y: 8 }))).compass,
+    ).toEqual(plain);
+    // Each side moves outward: South, East and West too.
+    const around = resolve(
+      hall(
+        {},
+        floor(
+          { type: "altar", x: 17.5, y: 8 },
+          { type: "altar", x: 8, y: -5.5 },
+          { type: "altar", x: 8, y: 17.5 },
+        ),
+      ),
+    ).compass;
+    const at = (text: string) =>
+      around.find((label) => label.text === text) as (typeof around)[number];
+    expect(at("South").x).toBeCloseTo(
+      18.5 + COMPASS_GAP + compassFont.bottom * COMPASS_SIZE,
+      10,
+    );
+    expect(at("East").y).toBeCloseTo(
+      -6.5 - COMPASS_GAP - compassFont.bottom * COMPASS_SIZE,
+      10,
+    );
+    expect(at("West").y).toBeCloseTo(
+      18.5 + COMPASS_GAP + compassFont.top * COMPASS_SIZE,
+      10,
+    );
+  });
+
   it("puts the caption below everything and wraps it at the floor's width", () => {
     const resolved = resolve(
       hall(
