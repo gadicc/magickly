@@ -9,6 +9,7 @@ import {
   gdHallFontFaceCss,
 } from "./fonts";
 import { GdHall } from "./GdHall";
+import { MAX_HALL_LABEL_LINES } from "./layout";
 import type { HallArt, HallNode } from "./types";
 import { CROSS_FORMS } from "./vocabulary";
 
@@ -242,6 +243,53 @@ describe("GdHall", () => {
     });
     expect(markup).toContain('data-art="cup"');
     expect(markup).not.toContain("stroke-dasharray");
+  });
+});
+
+describe("GdHall with hostile labels", () => {
+  // The A1 review's amplification: under 1.2 MB of source drew 125,000
+  // label lines (9.5 MB of SVG) from label children the node bound did not
+  // count, and 3,990 shrunken officers with one-letter labels drew 399,000
+  // lines (28 MB).
+  const text = "a ".repeat(100);
+  const textLines = (markup: string) => (markup.match(/<text /g) ?? []).length;
+
+  it("bounds the output of label children", () => {
+    const markup = render(
+      hall(
+        {},
+        floor({
+          type: "officer",
+          role: "keryx",
+          children: Array.from({ length: 5000 }, () => ({
+            type: "label",
+            text,
+          })),
+        }),
+      ),
+    );
+    // The compass words are the other four text elements.
+    expect(textLines(markup)).toBe(MAX_HALL_LABEL_LINES + 4);
+    expect(markup.length).toBeLessThan(100_000);
+  });
+
+  it("bounds the output of many small labelled officers", () => {
+    const markup = render(
+      hall(
+        {},
+        floor(
+          ...Array.from({ length: 3990 }, () => ({
+            type: "officer",
+            role: "keryx",
+            scale: 0.05,
+            label: text,
+          })),
+        ),
+      ),
+    );
+    expect(textLines(markup)).toBe(MAX_HALL_LABEL_LINES + 4);
+    // Mostly the 3,990 lamens, which the node bound limits.
+    expect(markup.length).toBeLessThan(1_000_000);
   });
 });
 

@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { compassFont, LABEL_SIZE, LINE_HEIGHT, labelFont } from "./labels";
+import {
+  compassFont,
+  LABEL_SIZE,
+  LINE_HEIGHT,
+  labelFont,
+  MAX_LABEL_LINES,
+  wrapText,
+} from "./labels";
 import {
   BANNER_ROW_GAP,
   CAPTION_GAP,
@@ -7,6 +14,8 @@ import {
   COMPASS_SIZE,
   DEFAULT_SCALES,
   LABEL_GAP,
+  MAX_HALL_LABEL_LINES,
+  MIN_LABEL_WIDTH,
   type ResolvedObject,
   resolveHall,
   WALL_GAP,
@@ -561,6 +570,66 @@ describe("resolveHall: labels", () => {
   });
 });
 
+describe("resolveHall: bounded label output", () => {
+  const lineCount = (objects: readonly ResolvedObject[]) =>
+    objects.reduce(
+      (sum, object) =>
+        sum +
+        (object.text?.lines.length ?? 0) +
+        object.labels.reduce((n, label) => n + label.lines.length, 0),
+      0,
+    );
+
+  it("wraps no narrower than MIN_LABEL_WIDTH", () => {
+    const [cross, tiny] = only(
+      hall(
+        {},
+        floor(
+          { type: "item", kind: "cross", label: "Cross of the Elements" },
+          { type: "officer", role: "pastHierophant", scale: 0.05 },
+        ),
+      ),
+    );
+    expect(cross.width).toBeLessThan(0.5);
+    const texts = (width: number) =>
+      wrapText("Cross of the Elements", width, LABEL_SIZE).map(
+        (line) => line.text,
+      );
+    expect(texts(cross.width)).toHaveLength(4);
+    expect(cross.labels[0].lines.map((line) => line.text)).toEqual(
+      texts(MIN_LABEL_WIDTH),
+    );
+    expect(texts(MIN_LABEL_WIDTH)).toEqual(["Cross", "of the", "Elements"]);
+    expect(tiny.labels[0].lines.map((line) => line.text)).toEqual([
+      "Past",
+      "Hierophant",
+    ]);
+  });
+
+  it("draws at most MAX_HALL_LABEL_LINES lines in a hall", () => {
+    // One-letter words at the smallest scale: six lines per label.
+    const text = "a ".repeat(100);
+    const objects = only(
+      hall(
+        {},
+        floor(
+          ...Array.from({ length: 200 }, () => ({
+            type: "officer",
+            scale: 0.05,
+            label: text,
+          })),
+          ...Array.from({ length: 200 }, () => ({ type: "label", text })),
+        ),
+      ),
+    );
+    expect(objects).toHaveLength(400);
+    expect(objects[0].labels[0].lines).toHaveLength(MAX_LABEL_LINES);
+    expect(lineCount(objects)).toBe(MAX_HALL_LABEL_LINES);
+    // Later labels lose their lines; nothing else changes.
+    expect(objects[399].text?.lines).toEqual([]);
+  });
+});
+
 describe("resolveHall: walls, compass, caption and bounds", () => {
   it("draws the wall around the dais and the floor", () => {
     expect(resolve(hall({})).outer).toEqual({
@@ -771,14 +840,19 @@ describe("resolveHall: untrusted content", () => {
       type: "label",
       text: `L${i}`,
     }));
-    const node = hall({}, floor({ type: "officer", children: labels }));
-    const [officer] = resolve(node).objects;
+    const node = hall(
+      {},
+      floor({ type: "officer", children: labels }, { type: "altar" }),
+    );
     const [overflow] = validateHall(node, { art }).filter((diagnostic) =>
       diagnostic.message.startsWith("more than"),
     );
     // gdHall, floor and officer count too.
     expect(overflow.path).toEqual([0, 0, MAX_HALL_NODES - 3]);
-    expect(officer.labels).toHaveLength(MAX_HALL_NODES - 3);
+    // The altar comes after the labels, beyond the bound.
+    expect(resolve(node).objects.map((object) => object.artKey)).toEqual([
+      "lamen",
+    ]);
   });
 
   it("stops at the depth bound without throwing", () => {

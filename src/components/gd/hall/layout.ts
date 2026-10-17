@@ -69,6 +69,20 @@ export const CAPTION_SIZE = 0.75;
 export const CAPTION_GAP = 0.3;
 /** Default padding around the content, in squares. */
 export const DEFAULT_PADDING = 0.5;
+/**
+ * The narrowest box a label wraps in, in squares: a label under an item
+ * or a scaled-down officer wraps as if 1.5 squares wide (a floor lamen is
+ * 1.66), so it never breaks after every word.
+ */
+export const MIN_LABEL_WIDTH = 1.5;
+/**
+ * The most label lines one hall draws, free labels included and the
+ * caption not; lines beyond it are dropped in layout order. The largest
+ * preset draws 12, so a fully labelled hall has room to spare, while
+ * untrusted content (up to MAX_HALL_NODES labels of MAX_LABEL_LINES
+ * lines each) cannot make the SVG grow without bound.
+ */
+export const MAX_HALL_LABEL_LINES = 500;
 
 /**
  * Default scales by kind (decision 4): `scale=1` fits an object's nominal
@@ -391,6 +405,14 @@ export function resolveHall(
   // The validator's walk decides which nodes are inside the node and depth
   // bounds, labels included, so both stop at the same node.
   const inBounds = hallNodesInBounds(hall, art);
+  let lineBudget = MAX_HALL_LABEL_LINES;
+  /** Wraps a label within the hall's line budget. */
+  const wrapLabel = (text: string, width: number, size: number) => {
+    const lines = wrapText(text, Math.max(width, MIN_LABEL_WIDTH), size);
+    const kept = lines.slice(0, Math.max(0, lineBudget));
+    lineBudget -= kept.length;
+    return kept;
+  };
   const objects: ResolvedObject[] = [];
   const doors: ResolvedDoor[] = [];
   const floorItems: { node: HallNode; path: readonly number[] }[] = [];
@@ -434,7 +456,7 @@ export function resolveHall(
     if (own !== undefined) {
       if (own !== "")
         labels.push({
-          lines: wrapText(own, width, labelSize),
+          lines: wrapLabel(own, width, labelSize),
           size: labelSize,
           pos,
         });
@@ -442,7 +464,7 @@ export function resolveHall(
       const role = stringAttr(node, "role", 200);
       if (role !== undefined)
         labels.push({
-          lines: wrapText(roleName(role), width, labelSize),
+          lines: wrapLabel(roleName(role), width, labelSize),
           size: labelSize,
           pos,
         });
@@ -451,7 +473,7 @@ export function resolveHall(
       const size = clamp(numberAttr(child, "size") ?? labelSize, 0.05, 4);
       const boxWidth = numberAttr(child, "width");
       labels.push({
-        lines: wrapText(
+        lines: wrapLabel(
           stringAttr(child, "text", 200) ?? "",
           boxWidth === undefined ? width : clamp(boxWidth, ...SIZE_RANGE),
           size,
@@ -474,7 +496,7 @@ export function resolveHall(
       const size = clamp(numberAttr(node, "size") ?? labelSize, 0.05, 4);
       const text = stringAttr(node, "text", 200) ?? "";
       const given = numberAttr(node, "width");
-      const lines = wrapText(
+      const lines = wrapLabel(
         text,
         given === undefined
           ? Number.POSITIVE_INFINITY

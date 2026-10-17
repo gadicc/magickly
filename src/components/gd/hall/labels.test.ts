@@ -5,6 +5,7 @@ import {
   hebrewLetterBody,
   LABEL_SIZE,
   labelFont,
+  MAX_LABEL_LINES,
   textMeasure,
   wrapText,
 } from "./labels";
@@ -103,6 +104,38 @@ describe("wrapText", () => {
     expect(lines[0].width).toBeGreaterThan(DAIS);
     expect(texts("Cancellarius")).toEqual(["Cancellarius"]);
     expect(texts("Past Praemonstrator")).toEqual(["Past", "Praemonstrator"]);
+  });
+
+  it("cuts text to six lines, the last ending in an ellipsis", () => {
+    const lines = wrapText("a ".repeat(100), 0.1, LABEL_SIZE);
+    expect(MAX_LABEL_LINES).toBe(6);
+    expect(lines.map((line) => line.text)).toEqual([
+      "a",
+      "a",
+      "a",
+      "a",
+      "a",
+      "a…",
+    ]);
+    expect(lines.map((line) => line.truncated)).toEqual([
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      true,
+    ]);
+    expect(lines[5].width).toBeCloseTo(labelFont.width("a…", LABEL_SIZE), 10);
+    expect(texts("1\n2\n3\n4\n5\n6")).toHaveLength(6);
+    expect(wrapText("1\n2\n3\n4\n5\n6", 10, 1).at(-1)?.truncated).toBe(
+      undefined,
+    );
+    expect(texts("1\n2\n3\n4\n5\n6\n7").at(-1)).toBe("6…");
+    expect(
+      wrapText("one two three", 0.1, LABEL_SIZE, labelFont, 2).map(
+        (line) => line.text,
+      ),
+    ).toEqual(["one", "two…"]);
   });
 
   it("collapses spaces, honours line breaks and drops empty text", () => {

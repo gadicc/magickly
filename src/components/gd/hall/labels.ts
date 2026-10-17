@@ -93,22 +93,33 @@ export const LABEL_SIZE = 0.43;
 /** Line advance as a multiple of the size. */
 export const LINE_HEIGHT = 1.15;
 
+/**
+ * The most lines one label or caption draws; the last of them ends in an
+ * ellipsis when the text is cut. Content is untrusted, and a 200-character
+ * label of one-letter words would otherwise draw a hundred lines.
+ */
+export const MAX_LABEL_LINES = 6;
+
 /** One wrapped line and its width. */
 export interface TextLine {
   text: string;
   width: number;
+  /** Set on the last line when the text was cut to the line limit. */
+  truncated?: boolean;
 }
 
 /**
  * Breaks text into lines no wider than `width` at spaces; `\n` forces a
  * break. A single word wider than the box stays on one line and overflows,
- * as "Praemonstrator" does over a dais lamen.
+ * as "Praemonstrator" does over a dais lamen. At most `maxLines` lines are
+ * returned; the last ends in "…" when more were cut.
  */
 export function wrapText(
   text: string,
   width: number,
   size: number,
   font: TextMeasure = labelFont,
+  maxLines = MAX_LABEL_LINES,
 ): TextLine[] {
   const lines: string[] = [];
   for (const paragraph of text.split("\n")) {
@@ -121,9 +132,24 @@ export function wrapText(
       else {
         lines.push(line);
         line = word;
+        if (lines.length > maxLines) break;
       }
     }
     if (line !== undefined) lines.push(line);
+    if (lines.length > maxLines) break;
   }
-  return lines.map((line) => ({ text: line, width: font.width(line, size) }));
+  const kept = lines.slice(0, Math.max(0, maxLines));
+  const result: TextLine[] = kept.map((line) => ({
+    text: line,
+    width: font.width(line, size),
+  }));
+  if (lines.length > kept.length && result.length > 0) {
+    const last = `${kept[kept.length - 1]}…`;
+    result[result.length - 1] = {
+      text: last,
+      width: font.width(last, size),
+      truncated: true,
+    };
+  }
+  return result;
 }
