@@ -326,9 +326,11 @@ Follow-ups are separate from the completed migration work:
   of `src/components` (or off their app imports), embedded fonts in the Tree
   of Life exports, Firefox and Safari checks of PNG export with embedded fonts,
   a credit for the RWS tarot images and the Pinterest hotlink in `2=9.pug`,
-  Gadi's calls on whether the Hierophant's lamen takes the striped ring
-  the hall drawings give it and whether the tarot titles adopt
-  the Golden Dawn's own, and an import-boundary gap:
+  the Neophyte preset's "Dadouchos" label over the South wall, Gadi's calls
+  on whether the Hierophant's lamen takes the striped ring the hall drawings
+  give it, whether the tarot titles adopt the Golden Dawn's own and whether
+  a hall's PNG export embeds Enochian Plain for its tablets, and an
+  import-boundary gap:
   `src/components/entity/entityFields.test.ts` reaches app code through
   `import.meta.glob("../../app/**/fields.ts")`, which the test cannot see
   ([plan 061](061-gd-hall.md#follow-ups)).

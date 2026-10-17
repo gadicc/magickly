@@ -1,10 +1,11 @@
 # Golden Dawn hall diagrams (`gdHall`) — 17 October 2026
 
 Status: design settled with Gadi on 17 October 2026; adversarially reviewed
-twice (Fable) and spiked the same day. Stage A started on `gate/gd-hall`;
-A1 (model, validator, layout, labels, fonts, renderer, original art) and A2
+twice (Fable) and spiked the same day. Stage A is done on `gate/gd-hall`:
+A1 (model, validator, layout, labels, fonts, renderer, original art), A2
 (lamen, app art registry, legacy art, first-party art, the five presets)
-are in.
+and A3 (the Zelator Earth tablet per the book, PNG font embedding, the
+read-only `/gd/hall` gallery).
 
 Composable Golden Dawn temple-hall diagrams, authored in the ritual Pug
 dialect, drawn as inline SVG in the reader and editor, edited visually, and
@@ -571,18 +572,18 @@ Kept until every reference is gone; this list is updated as they go.
 
 Each stage is a series of gated commits on `gate/gd-hall`.
 
-| Stage | Content | Can be reverted alone |
-| --- | --- | --- |
-| A | `src/components/gd/hall`: model, validator, layout, renderer, chrome, labels and fonts; `Lamen` move and variants; legacy art under `src/app`; the five drawn presets; a read-only `/gd/hall` gallery with export and side-by-side comparison with the old SVGs; `sizes` comparison | yes |
-| B | Spike results applied: compiler change (decision 2), Pug round trip, lazy reader block, `blockAtoms` entry with a static node view, boundary tests | until the first hall is saved |
-| C | `/hall` slash command with presets | yes |
-| D | Visual sub-editor | yes |
-| E | `/gd/hall` source, visual and split playground with local draft and share link | yes |
-| F | Remaining vocabulary and the presets for Practicus, Philosophus and Portal (markers where art is missing) | yes |
-| G | magick-data: Water, Fire and Union tablets | yes |
-| H | Original artwork; ledger to zero; `Lamen` moves to the MIT directory; credits | yes |
-| I | Built-in docs switched to presets; reader export; end-of-project review of `/gd/hall`, scales and the conflicts table | yes |
-| J | Private hall sources, written outside the repository for Gadi to save in his private rituals | — (nothing committed) |
+| Stage | Content | Can be reverted alone | Status |
+| --- | --- | --- | --- |
+| A | `src/components/gd/hall`: model, validator, layout, renderer, chrome, labels and fonts; `Lamen` move and variants; legacy art under `src/app`; the five drawn presets; a read-only `/gd/hall` gallery with export and side-by-side comparison with the old SVGs; `sizes` comparison | yes | done (A1–A3, 17 October 2026) |
+| B | Spike results applied: compiler change (decision 2), Pug round trip, lazy reader block, `blockAtoms` entry with a static node view, boundary tests | until the first hall is saved | |
+| C | `/hall` slash command with presets | yes | |
+| D | Visual sub-editor | yes | |
+| E | `/gd/hall` source, visual and split playground with local draft and share link | yes | |
+| F | Remaining vocabulary and the presets for Practicus, Philosophus and Portal (markers where art is missing) | yes | |
+| G | magick-data: Water, Fire and Union tablets | yes | |
+| H | Original artwork; ledger to zero; `Lamen` moves to the MIT directory; credits | yes | |
+| I | Built-in docs switched to presets; reader export; end-of-project review of `/gd/hall`, scales and the conflicts table | yes | |
+| J | Private hall sources, written outside the repository for Gadi to save in his private rituals | — (nothing committed) | |
 
 Stretch: a dark palette, server rendering through `/api/render`.
 
@@ -731,6 +732,65 @@ proved wrong:
   one tag per line; Zelator 2 is the largest (chalice, censer, both
   diagrams, the tablet).
 
+## Stage A3 notes
+
+Settled while building A3, where the plan or the brief left a choice:
+
+- **Zelator Earth tablet**: see the Stage A2 notes and conflict 7.
+- **The `prepare` hook** (decision 8). `ExportControls` clones the SVG at
+  the PNG's size and returns the PNG's promise inside the click, so the
+  `ClipboardItem` still gets a promise synchronously (Safari);
+  `prepare(clone)` runs inside that promise, then the clone is
+  serialised and rasterised. A rejection fails the export ("Export
+  failed."). The image links are drawn by the server and never pass
+  through it, nor do SVG files and copies.
+- **Hall fonts in PNGs.** `embedGdHallFonts` (`src/app/gd/hall/
+  exportFonts.ts`) fetches the three WOFF2 subsets from `/fonts` once
+  per page (a failed fetch is forgotten, so the next export retries),
+  inlines them as `data:` URIs through the package's new
+  `gdHallFontFaceRule`, and puts the `<style>` first in the clone.
+  Checked in headless Chromium 153 (Linux): a Chromium whose
+  fontconfig has no Noto at all (DejaVu and Liberation only) exported
+  Zelator 2 with Noto Serif Italic labels, the bold italic compass and
+  bold Hebrew letters; the same clone rasterised without the hook fell
+  back to the system's faces (38,306 pixels differ). With Noto
+  installed the fallback stacks find the system copy, so the hook
+  changes almost nothing there (1,023 pixels). An SVG download carries
+  no `@font-face`, `<style>` or `data:` URI. Firefox and Safari are
+  untested (Follow-ups).
+- **Enochian letters in PNGs.** Only the OFL subsets are embedded, as
+  the brief asked. A tablet's Enochian letters, drawn with the app's
+  `next/font` Enochian Plain, therefore show as Enochian in a PNG only
+  where an Enochian font is installed (the development machine has one
+  in `~/.local/share/fonts`) and as their Latin letters elsewhere. The
+  plan allows embedding Enochian Plain on the PNG path (only rasterised
+  glyphs leave the page); whether to, given its unclear licence, is for
+  Gadi (Follow-ups).
+- **The gallery** is public like `/gd/symbols/*`: `pathnames` ("Temple
+  Halls"), `PUBLIC_PAGES` and so the sitemap, a text tile on `/gd` (a
+  drawn tile would load the hall art there), and `/gd`'s description.
+  Its social card falls back to `/gd`'s Golden Dawn logo until halls
+  have a render contract. The server page declares the hall fonts once
+  in a `<style>`; the halls carry none (`fontBaseUrl` unset), so SVG
+  exports stay font-free. `GdHall` takes a `ref` to its `<svg>`.
+- **Sizes**: a three-way toggle, drawing, uniform or both side by side,
+  each hall with its own export (`gd-hall-<id>`, `gd-hall-<id>-uniform`).
+  "Compare with the original drawing" takes the drawing from the
+  preset's `sources`. Panes sit side by side from MUI's `md` breakpoint
+  (900 px), at most 560 px each, and stack below it. Uniform sizes draw
+  the dais lamens smaller (1 against 1.155) as well as the floor
+  officers larger, worth weighing when one strategy is kept.
+- **No URL state**: the chosen preset is component state; stage E brings
+  the share link.
+- **Bundles**: only the gallery imports `gdHallArt`; in the production
+  build the chalice's path data appears only in the `/gd/hall` page
+  chunk.
+- **Documentation screenshots** (`AGENTS.md`) cover temples, the ritual
+  list and creation form, the ritual editor and the reader, so they do
+  not apply to this page.
+- Seen on the way, not changed: in the Neophyte preset "Dadouchos" runs
+  over the South wall line.
+
 ## Review fixes
 
 An independent review of A1 (`469b66b..34321f7`) found two major and eight
@@ -835,6 +895,9 @@ after it:
 | 1173d66 | Theoricus 1 cup clear of the card's title (A2 review) |
 | 7262684 | magick-data: the trump titles described as the common ones (A2 review) |
 | 4e30021 | Hook-free test of the Shewbread and candlestick by rendering (A2 review) |
+| 8ace114 | Zelator Earth tablet inside on the North wall line at the default size, per the book (conflict 7) |
+| 2eec39e | `ExportControls` `prepare` hook; hall fonts inlined in PNG exports |
+| e1e5ec7 | Read-only `/gd/hall` gallery: presets, sizes side by side, the original drawings, sources, export |
 
 ## Future
 
@@ -861,9 +924,11 @@ files the import-boundary test still allows (`Link`, `Tiles`, `Mercury`,
 `planetarySpirits`, `entity/index`), which `src/components/LICENSE.txt` should
 list as the README says it does; export font
 embedding for the Tree of Life; Firefox and Safari checks of PNG export with
-embedded fonts; the RWS tarot credit and the Pinterest
-hotlink in `2=9.pug`; whether the Hierophant's lamen takes the drawings'
-striped ring (Stage A2 notes); whether the tarot
+embedded fonts; whether a hall's PNG embeds Enochian Plain for the tablets
+(Stage A3 notes); the Neophyte "Dadouchos" label over the South wall; the
+RWS tarot credit and the Pinterest hotlink in `2=9.pug`; whether the
+Hierophant's lamen takes the drawings' striped ring (Stage A2 notes);
+whether the tarot
 titles adopt the Golden Dawn's own, from a cited source (they are the
 common titles, with "The Universe" for XXI);
 `src/components/entity/entityFields.test.ts`, which reaches app code
