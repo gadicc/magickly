@@ -177,6 +177,7 @@ export const HALL_TAGS: ReadonlyMap<string, HallTagSpec> = new Map<
       role: "door",
       attributes: new Map([
         ["x", coordinate],
+        ["y", coordinate],
         ["width", number(0, 16)],
         ["side", enumOf(BANNER_SIDES)],
       ]),

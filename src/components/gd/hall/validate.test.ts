@@ -274,6 +274,8 @@ describe("validateHall", () => {
           { type: "marker" },
           { type: "label" },
           { type: "door" },
+          { type: "door", side: "north", y: 3 },
+          { type: "door", side: "south", x: 3 },
           {
             type: "officer",
             role: "hegemon",
@@ -293,6 +295,7 @@ describe("validateHall", () => {
       [[0, 6], "text", "warning"],
       [[0, 7], "text", "warning"],
       [[0, 8], "x", "warning"],
+      [[0, 10], "y", "warning"],
       [[1], "text", "warning"],
     ]);
   });

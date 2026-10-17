@@ -123,6 +123,8 @@ export default defineConfig({
         "src/components/gd/roseSigilGeometry.ts",
         "src/components/gd/hall/attributes.ts",
         "src/components/gd/hall/hebrewLetters.ts",
+        "src/components/gd/hall/labels.ts",
+        "src/components/gd/hall/layout.ts",
         "src/components/gd/hall/validate.ts",
         "src/components/gd/hall/vocabulary.ts",
         "src/components/svgCoordinate.ts",

@@ -233,15 +233,18 @@ export function validateHall(
         if (text("text") === undefined)
           report(path, "warning", `${tag}: no text`, "text");
         break;
-      case "door":
-        if (text("x") === undefined)
+      case "door": {
+        const side = text("side");
+        const along = side === "north" || side === "south" ? "y" : "x";
+        if (text(along) === undefined)
           report(
             path,
             "warning",
-            "door: no x; drawn in the middle of the wall",
-            "x",
+            `door: no ${along}; drawn in the middle of the wall`,
+            along,
           );
         break;
+      }
     }
   };
 
