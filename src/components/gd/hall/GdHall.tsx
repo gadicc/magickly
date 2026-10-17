@@ -121,9 +121,11 @@ function Chrome({
         stroke={PALETTE.ink}
         strokeWidth={u(FLOOR_STROKE)}
       />
-      {doorBands.map((band) => (
+      {doorBands.map((band, index) => (
         <rect
-          key={`${band.x0},${band.y0}`}
+          // Two doors may share a corner; bands never reorder.
+          // biome-ignore lint/suspicious/noArrayIndexKey: see above
+          key={index}
           x={u(band.x0)}
           y={u(band.y0)}
           width={u(band.x1 - band.x0)}

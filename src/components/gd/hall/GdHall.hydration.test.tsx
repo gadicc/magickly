@@ -1,4 +1,6 @@
 // @vitest-environment jsdom
+import { act } from "react";
+import { createRoot } from "react-dom/client";
 import { afterEach, expect, it, vi } from "vitest";
 import { hydrateAt, renderAt } from "../../../../tests/hydration";
 import { GdHall } from "./GdHall";
@@ -42,4 +44,29 @@ it("hydrates without a mismatch, ids included", async () => {
   expect(problems).toEqual([]);
   expect(container.querySelectorAll("svg")).toHaveLength(2);
   await unmount();
+});
+
+it("keys two doors in one place apart", async () => {
+  (
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true;
+  const error = vi.spyOn(console, "error").mockImplementation(() => {});
+  const door = { type: "door", x: 14, width: 2 };
+  const root = createRoot(document.createElement("div"));
+  try {
+    await act(async () =>
+      root.render(
+        <GdHall
+          hall={{
+            type: "gdHall",
+            children: [{ type: "floor", children: [door, door] }],
+          }}
+        />,
+      ),
+    );
+    expect(error).not.toHaveBeenCalled();
+  } finally {
+    await act(async () => root.unmount());
+    error.mockRestore();
+  }
 });

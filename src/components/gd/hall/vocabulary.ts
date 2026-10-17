@@ -175,9 +175,10 @@ export const HALL_TAGS: ReadonlyMap<string, HallTagSpec> = new Map<
     "door",
     {
       role: "door",
+      // A door stands in a wall, so along it on the floor's 0–16.
       attributes: new Map([
-        ["x", coordinate],
-        ["y", coordinate],
+        ["x", number(0, 16)],
+        ["y", number(0, 16)],
         ["width", number(0, 16)],
         ["side", enumOf(BANNER_SIDES)],
       ]),

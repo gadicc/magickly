@@ -262,6 +262,23 @@ describe("validateHall", () => {
     ]);
   });
 
+  it("warns that a door is clamped to the floor's 0–16, as drawn", () => {
+    const result = validateHall(
+      hall(
+        floor(
+          { type: "door", x: 1e308, width: 20 },
+          { type: "door", side: "north", y: -1 },
+          { type: "door", x: 16, width: 0 },
+        ),
+      ),
+    );
+    expect(result.map((d) => [d.path, d.attribute, d.message])).toEqual([
+      [[0, 0], "x", "door: x=1e+308 is outside 0–16 and is clamped"],
+      [[0, 0], "width", "door: width=20 is outside 0–16 and is clamped"],
+      [[0, 1], "y", "door: y=-1 is outside 0–16 and is clamped"],
+    ]);
+  });
+
   it("checks roles, letters, item kinds and required text", () => {
     const result = validateHall(
       hall(
