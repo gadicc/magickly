@@ -425,6 +425,13 @@ form, never named after a private setup.
 
 Copied into the source on insertion; styling defaults inherited (decision 4).
 
+Each preset's data carries a `sources` list of stable references (decided
+17 October 2026): the book diagram and rubric it follows, as in the Sources
+section below (for example "Regardie 1938, vol. 2, p.131, archive.org
+IsraelRegardie-TheGoldenDawn-Vol2-1938 leaf n125"), and for the presets
+ported from a drawing, that `public/pics` file. A test fails for a preset
+without a source.
+
 | Preset | Source | Notes |
 | --- | --- | --- |
 | `neophyte` | drawing, checked against the book | Banner of the West follows the book (floor, north of the platform) |
@@ -472,6 +479,53 @@ shown to candidates, not floor plans.
 Sequences within one part (the Garden of Eden moved to the South-West in 3=8,
 the Tablet of Union and white lamp placed on the altar late in Portal 2) are
 not presets; they belong with officer movement (Future).
+
+## Sources
+
+Cited by stable reference, per the outside-sources rule in `AGENTS.md`.
+Nothing from these is stored in the repository; presets take only layouts
+from them, drawn with our own art.
+
+- **Regardie, *The Golden Dawn*, vol. 2, Aries Press, Chicago, 1938.**
+  archive.org item `IsraelRegardie-TheGoldenDawn-Vol2-1938`; a leaf is at
+  `https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol2-1938/page/n{leaf}`.
+  Copyright status not established (a 1938 US book is public domain only if
+  its copyright was not renewed; unchecked), so cited, not copied.
+
+  | Diagram | Printed page | Leaf |
+  | --- | --- | --- |
+  | Neophyte | 11 | n3 |
+  | Zelator, first part | 44 | n38 |
+  | Theoricus, 32nd path | 69 | n63 |
+  | Theoricus 2=9, second part | 82 | n76 |
+  | Practicus, 31st path | 92 | n86 |
+  | Practicus, 30th path | 106 | n100 |
+  | Practicus 3=8 | 112 | n106 |
+  | Philosophus, 29th path (rubric p.122, n116) | 121 | n115 |
+  | Philosophus, 28th path | 131 | n125 |
+  | Philosophus, 27th path | 137 | n131 |
+  | Philosophus 4=7 (rubric p.145, n139) | 144 | n138 |
+  | Portal, part 1 (rubric p.156–157, n149–150) | 155 | n148 |
+  | Portal, part 2 | 175 | n168 |
+  | Adeptus Minor, First and Third Points (not halls) | 199, 230 | n192, n223 |
+
+  The Zelator second-part diagram's leaf is still to be located.
+- **Regardie, *The Golden Dawn*, Llewellyn, 5th edition, 1986.** archive.org
+  item `IsraelRegardie-TheGoldenDawnblackBrick1986-Enhanced`. Reprints the
+  1938 drawings photographically (Portal part 2 at p.208, leaf n226).
+  Copyrighted.
+- **Regardie, *The Golden Dawn*, Llewellyn, 7th edition, ed. John Michael
+  Greer** (ISBN 978-0-7387-4399-8). The edition Gadi owns; its diagrams are
+  redraws. Copyrighted; cited by its own page numbers in this plan's
+  research only. The archive.org copy (`goldendawnorigin0000rega_7edi`) is
+  access-restricted.
+- Nick Farrell, "How Israel Regardie saved and distorted the Golden Dawn",
+  `https://farrellnick.substack.com/p/how-israel-regardie-saved-and-distorted`
+  (on the lecture diagrams, not floor plans).
+- Frater I.I.I., "Thoughts on the Portal Ritual", Hermanubis Golden Dawn blog,
+  11 June 2018,
+  `https://hermanubisgoldendawn.blogspot.com/2018/06/thoughts-on-portal-ritual.html`
+  (notes that published Portal floor plans differ; weak evidence).
 
 ## Artwork ledger
 
