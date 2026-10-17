@@ -1,9 +1,9 @@
 import hebrewLetters, { type HebrewLetter } from "magick-data/hebrewLetters";
 import paths, { type Path } from "magick-data/kabbalah/paths";
-import { numberAttr } from "../attributes";
+import { specNumberAttr } from "../attributes";
 import { GD_HALL_FONT_STACKS } from "../fonts";
 import { LINE_HEIGHT, wrapText } from "../labels";
-import type { HallArt, HallArtProps } from "../types";
+import type { HallArt, HallArtProps, HallAttrSpec } from "../types";
 import { original, PALETTE } from "./shared";
 
 export const provenance = original(
@@ -62,6 +62,14 @@ export const TRUMPS: ReadonlyMap<number, Trump> = new Map(
   }),
 );
 
+/** `n`: a trump's number, clamped and rounded as the validator warns. */
+const N_SPEC = {
+  kind: "number",
+  min: 0,
+  max: 21,
+  integer: true,
+} as const satisfies HallAttrSpec;
+
 /** The card's box, in units; a trump's proportions. */
 const WIDTH = 58;
 const HEIGHT = 100;
@@ -69,7 +77,7 @@ const TITLE_SIZE = 7;
 const TITLE_WIDTH = 46;
 
 function TarotKey({ node }: HallArtProps) {
-  const n = numberAttr(node, "n");
+  const n = specNumberAttr(node, "n", N_SPEC);
   const trump = n === undefined ? undefined : TRUMPS.get(n);
   const title = trump ? wrapText(trump.title, TITLE_WIDTH, TITLE_SIZE) : [];
   const advance = TITLE_SIZE * LINE_HEIGHT;
@@ -116,7 +124,8 @@ function TarotKey({ node }: HallArtProps) {
           </text>
           {title.map((line, index) => (
             <text
-              key={line.text}
+              // biome-ignore lint/suspicious/noArrayIndexKey: lines keep their order
+              key={index}
               y={firstTitle + index * advance}
               fontSize={TITLE_SIZE}
               fontFamily={GD_HALL_FONT_STACKS.serif}
@@ -133,12 +142,12 @@ function TarotKey({ node }: HallArtProps) {
 }
 
 /**
- * A tarot trump (`tarotKey(n=21)`), 58 × 100: an original simplified card,
- * blank for a number that is not a trump's.
+ * A tarot trump (`tarotKey(n=21)`), 58 × 100: an original simplified card.
+ * `n` is clamped to 0–21 and rounded; a card without a number is blank.
  */
 export const tarotKeyArt: HallArt = {
   Component: TarotKey,
   box: { width: WIDTH, height: HEIGHT },
-  attributes: new Map([["n", { kind: "number", min: 0, max: 21 }]]),
+  attributes: new Map([["n", N_SPEC]]),
   provenance,
 };

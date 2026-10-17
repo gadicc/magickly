@@ -140,16 +140,25 @@ export function validateHall(
       } else if (
         reading.status === "ok" &&
         spec.kind === "number" &&
-        typeof reading.value === "number" &&
-        ((spec.min !== undefined && reading.value < spec.min) ||
-          (spec.max !== undefined && reading.value > spec.max))
+        typeof reading.value === "number"
       ) {
-        report(
-          path,
-          "warning",
-          `${tag}: ${clip(name)}=${reading.value} is outside ${spec.min}–${spec.max} and is clamped`,
-          name,
-        );
+        if (
+          (spec.min !== undefined && reading.value < spec.min) ||
+          (spec.max !== undefined && reading.value > spec.max)
+        )
+          report(
+            path,
+            "warning",
+            `${tag}: ${clip(name)}=${reading.value} is outside ${spec.min}–${spec.max} and is clamped`,
+            name,
+          );
+        if (spec.integer && !Number.isInteger(reading.value))
+          report(
+            path,
+            "warning",
+            `${tag}: ${clip(name)}=${reading.value} is not a whole number and is rounded`,
+            name,
+          );
       }
     }
   };

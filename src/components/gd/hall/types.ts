@@ -78,7 +78,13 @@ export interface HallArtProps {
 
 /** A specification an attribute value is checked against. */
 export type HallAttrSpec =
-  | { kind: "number"; min?: number; max?: number }
+  | {
+      kind: "number";
+      min?: number;
+      max?: number;
+      /** Whole numbers only: anything else is rounded, with a warning. */
+      integer?: boolean;
+    }
   | { kind: "enum"; values: readonly string[] }
   | { kind: "string"; maxLength?: number }
   | { kind: "boolean" };

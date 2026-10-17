@@ -127,21 +127,39 @@ describe("the tarot keys", () => {
     expect(priestess).toContain(">Priestess</text>");
   });
 
-  it("draws a blank card for anything that is not a trump's number", () => {
+  it("draws a blank card without a number", () => {
     const blank = draw(art("tarotKey"), { type: "tarotKey" });
     expect(blank).not.toContain("<text");
-    for (const n of [22, 2.5, -1, "abc"])
+    for (const n of ["abc", Number.NaN, "1e999"])
       expect(draw(art("tarotKey"), { type: "tarotKey", n }), String(n)).toBe(
         blank,
       );
   });
 
-  it("validates n as a trump's number", () => {
+  it("clamps and rounds n as the validator warns", () => {
+    const key = (n: number | string) =>
+      draw(art("tarotKey"), { type: "tarotKey", n });
+    expect(key(22)).toBe(key(21));
+    expect(key(-1)).toBe(key(0));
+    expect(key(2.5)).toBe(key(3));
+    expect(key("2.4")).toBe(key(2));
+    expect(key(2.5)).toContain(">The Empress</text>");
     expect(
-      validateHall(hall({ type: "tarotKey", n: 30 }), {
-        art: defaultHallArt,
-      }).map((d) => d.message),
-    ).toEqual(["tarotKey: n=30 is outside 0–21 and is clamped"]);
+      validateHall(
+        hall(
+          { type: "tarotKey", n: 30 },
+          { type: "tarotKey", n: 2.5 },
+          { type: "tarotKey", n: -0.5 },
+          { type: "tarotKey", n: 21 },
+        ),
+        { art: defaultHallArt },
+      ).map((d) => [d.severity, d.message]),
+    ).toEqual([
+      ["warning", "tarotKey: n=30 is outside 0–21 and is clamped"],
+      ["warning", "tarotKey: n=2.5 is not a whole number and is rounded"],
+      ["warning", "tarotKey: n=-0.5 is outside 0–21 and is clamped"],
+      ["warning", "tarotKey: n=-0.5 is not a whole number and is rounded"],
+    ]);
   });
 });
 

@@ -96,6 +96,26 @@ export function numberAttr(node: HallNode, name: string): number | undefined {
   return reading.status === "ok" ? reading.value : undefined;
 }
 
+/**
+ * A number attribute as its spec allows it: clamped to `min`–`max` and
+ * rounded when the spec wants a whole number, as the validator's warnings
+ * say; `undefined` when absent or invalid.
+ */
+export function specNumberAttr(
+  node: HallNode,
+  name: string,
+  spec: Extract<HallAttrSpec, { kind: "number" }>,
+): number | undefined {
+  const value = numberAttr(node, name);
+  if (value === undefined) return undefined;
+  const clamped = clamp(
+    value,
+    spec.min ?? Number.NEGATIVE_INFINITY,
+    spec.max ?? Number.POSITIVE_INFINITY,
+  );
+  return spec.integer ? Math.round(clamped) : clamped;
+}
+
 /** A string attribute, or `undefined` when absent or invalid. */
 export function stringAttr(
   node: HallNode,
