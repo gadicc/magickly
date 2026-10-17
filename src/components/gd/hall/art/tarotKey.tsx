@@ -8,7 +8,7 @@ import { original, PALETTE } from "./shared";
 
 export const provenance = original(
   "A simplified tarot trump drawn from geometry: a framed card with its " +
-    "Roman numeral, its Hebrew letter and its Golden Dawn title, all from " +
+    "Roman numeral, its Hebrew letter and its title, all from " +
     "magick-data's Hermetic paths. Stands in for the RWS card the " +
     "Theoricus drawing pasted onto the altar.",
 );

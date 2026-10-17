@@ -6,7 +6,7 @@ describe("the trumps' titles on the paths", () => {
     path.hermetic ? [path.hermetic] : [],
   );
 
-  it("names each of the 22 trumps once, by its Golden Dawn title", () => {
+  it("names each of the 22 trumps once, The Universe for XXI", () => {
     const byNumber = new Map(
       trumps.map((trump) => [Number(trump.tarotId), trump.tarotTitle]),
     );

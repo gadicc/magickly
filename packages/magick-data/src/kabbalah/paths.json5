@@ -1,8 +1,9 @@
 /*
 
-  `hermetic.tarotTitle` is the Golden Dawn's title of the trump on the path
-  (`tarotId`): "Strength" on Teth as VIII, "Justice" on Lamed as XI, and "The
-  Universe" for XXI, which other decks call "The World".
+  `hermetic.tarotTitle` is the title of the trump on the path (`tarotId`):
+  its common English title ("Strength" on Teth as VIII, "Justice" on Lamed
+  as XI), except XXI, which takes the Golden Dawn's "The Universe" for "The
+  World". The Order's own titles for the other trumps are not used.
 
   For more information on the difference in letter attribution to the paths in
   the Hebrew and Western Hermetic traditions, see:

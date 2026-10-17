@@ -28,8 +28,9 @@ export const fields: EntityFields = {
     "hebrew.hebrewLetterId",
     "nextId",
     "prevId",
-    // The trump's Golden Dawn title: the page names it as the Rider-Waite
-    // card beside it prints it (RWSName), and the hall's cards use this.
+    // The trump's title ("The Universe" for XXI): the page names it as the
+    // Rider-Waite card beside it prints it (RWSName); the hall's cards use
+    // this.
     "hermetic.tarotTitle",
   ],
 };
