@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import {
   GdHall,
   type ResolvedObject,
@@ -7,6 +8,7 @@ import {
 import { WALL_GAP } from "@magick-components/gd/hall/layout";
 import {
   HALL_PRESETS,
+  HALL_SOURCE_WORKS,
   zelator1,
   zelator2,
 } from "@magick-components/gd/hall/presets";
@@ -26,12 +28,18 @@ describe.each(HALL_PRESETS.map((preset) => [preset.id, preset] as const))(
     });
 
     it("says where its layout comes from", () => {
-      expect(preset.sources.length).toBeGreaterThan(0);
-      expect(preset.sources).toContain(`public/pics/${id}.svg`);
+      expect(preset.sources).toContainEqual({
+        kind: "drawing",
+        path: `public/pics/${id}.svg`,
+      });
       for (const source of preset.sources)
-        expect(source).toMatch(
-          /^(public\/pics\/\w+\.svg|Regardie 1938, vol\. 2, archive\.org IsraelRegardie-TheGoldenDawn-Vol2-1938, p\.\d+, leaf n\d+( \(.+\))?)$/,
-        );
+        if (source.kind === "drawing")
+          expect(existsSync(source.path), source.path).toBe(true);
+        else {
+          expect(Object.hasOwn(HALL_SOURCE_WORKS, source.work)).toBe(true);
+          expect(Number.isInteger(source.page) && source.page > 0).toBe(true);
+          expect(Number.isInteger(source.leaf) && source.leaf > 0).toBe(true);
+        }
     });
 
     it("draws the same SVG every time, with the app's art", async () => {

@@ -1,4 +1,4 @@
-import { dais, type HallPreset, REGARDIE_1938 } from "./types";
+import { dais, drawing, type HallPreset, regardie1938 } from "./types";
 
 /**
  * The Neophyte hall, ported from `public/pics/neophyte.svg`. The Banner of
@@ -9,7 +9,7 @@ export const neophyte: HallPreset = {
   id: "neophyte",
   title: "Neophyte Temple",
   grade: "0=0",
-  sources: ["public/pics/neophyte.svg", `${REGARDIE_1938}, p.11, leaf n3`],
+  sources: [drawing("neophyte"), regardie1938(11, 3)],
   hall: {
     type: "gdHall",
     wall: "gradient",

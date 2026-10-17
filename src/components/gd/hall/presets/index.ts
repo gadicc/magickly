@@ -3,7 +3,15 @@ import { theoricus1, theoricus2 } from "./theoricus";
 import type { HallPreset } from "./types";
 import { zelator1, zelator2 } from "./zelator";
 
-export { dais, type HallPreset } from "./types";
+export {
+  dais,
+  HALL_SOURCE_WORKS,
+  type HallPreset,
+  type HallPresetSource,
+  type HallSourceWork,
+  hallSourceText,
+  hallSourceUrl,
+} from "./types";
 export { neophyte, theoricus1, theoricus2, zelator1, zelator2 };
 
 /** Every preset, in the order of the grades. */

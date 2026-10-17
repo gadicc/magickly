@@ -10,7 +10,7 @@ import {
 } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import HallGallery, { originalDrawing, Source } from "./gallery";
+import HallGallery, { originalDrawing } from "./gallery";
 import HallPage from "./page";
 
 const runtime = vi.hoisted(() => ({
@@ -57,7 +57,11 @@ describe("the /gd/hall gallery", () => {
       screen.getByRole("link", { name: "public/pics/neophyte.svg" }),
     ).toHaveProperty("href", `${location.origin}/pics/neophyte.svg`);
     expect(
-      screen.getByRole("link", { name: "p.11" }).getAttribute("href"),
+      screen
+        .getByRole("link", {
+          name: "Regardie 1938, vol. 2, p.11 (archive.org leaf n3)",
+        })
+        .getAttribute("href"),
     ).toBe(
       "https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol2-1938/page/n3",
     );
@@ -122,11 +126,5 @@ describe("the gallery's sources", () => {
     expect(HALL_PRESETS.map(originalDrawing)).toEqual(
       HALL_PRESETS.map((preset) => `/pics/${preset.id}.svg`),
     );
-  });
-
-  it("leave anything else as plain text", () => {
-    render(<Source source="Somewhere else" />);
-    expect(screen.getByText("Somewhere else")).toBeTruthy();
-    expect(screen.queryByRole("link")).toBeNull();
   });
 });

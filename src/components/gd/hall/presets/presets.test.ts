@@ -2,7 +2,13 @@ import { describe, expect, it } from "vitest";
 import type { HallNode } from "../types";
 import { validateHall } from "../validate";
 import { RESERVED_ATTRIBUTES, RESERVED_TAGS } from "../vocabulary";
-import { dais, HALL_PRESETS, hallPreset } from ".";
+import {
+  dais,
+  HALL_PRESETS,
+  hallPreset,
+  hallSourceText,
+  hallSourceUrl,
+} from ".";
 
 const nodes = (node: HallNode): HallNode[] => [
   node,
@@ -29,19 +35,32 @@ describe("the hall presets", () => {
     const pages = Object.fromEntries(
       HALL_PRESETS.map((preset) => [
         preset.id,
-        preset.sources.flatMap(
-          (source) =>
-            source.match(/, p\.(\d+), leaf n\d+( \(.+\))?$/)?.slice(1) ?? [],
+        preset.sources.flatMap((source) =>
+          source.kind === "book" ? [source.page, source.note] : [],
         ),
       ]),
     );
     expect(pages).toEqual({
-      neophyte: ["11", undefined],
-      zelator1: ["44", undefined],
-      zelator2: ["44", " (the Earth tablet, lamp and salt only)"],
-      theoricus1: ["69", undefined],
-      theoricus2: ["82", undefined],
+      neophyte: [11, undefined],
+      zelator1: [44, undefined],
+      zelator2: [44, "the Earth tablet, lamp and salt only"],
+      theoricus1: [69, undefined],
+      theoricus2: [82, undefined],
     });
+  });
+
+  it("write each source one way, with a stable link", () => {
+    expect(HALL_PRESETS[1].sources.map(hallSourceText)).toEqual([
+      "public/pics/zelator1.svg",
+      "Regardie 1938, vol. 2, p.44 (archive.org leaf n38)",
+    ]);
+    expect(HALL_PRESETS[2].sources.map(hallSourceText)[1]).toBe(
+      "Regardie 1938, vol. 2, p.44 (archive.org leaf n38) (the Earth tablet, lamp and salt only)",
+    );
+    expect(HALL_PRESETS[1].sources.map(hallSourceUrl)).toEqual([
+      "/pics/zelator1.svg",
+      "https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol2-1938/page/n38",
+    ]);
   });
 
   it("use no reserved tag or attribute", () => {

@@ -1,5 +1,5 @@
 import type { HallNode } from "../types";
-import { dais, type HallPreset, REGARDIE_1938 } from "./types";
+import { dais, drawing, type HallPreset, regardie1938 } from "./types";
 
 /**
  * The East of both parts: the Air tablet standing over the edge of the
@@ -21,7 +21,7 @@ export const theoricus1: HallPreset = {
   title: "Theoricus Temple 1",
   grade: "2=9",
   part: 1,
-  sources: ["public/pics/theoricus1.svg", `${REGARDIE_1938}, p.69, leaf n63`],
+  sources: [drawing("theoricus1"), regardie1938(69, 63)],
   hall: {
     type: "gdHall",
     dais: 5,
@@ -97,7 +97,7 @@ export const theoricus2: HallPreset = {
   title: "Theoricus Temple 2",
   grade: "2=9",
   part: 2,
-  sources: ["public/pics/theoricus2.svg", `${REGARDIE_1938}, p.82, leaf n76`],
+  sources: [drawing("theoricus2"), regardie1938(82, 76)],
   hall: {
     type: "gdHall",
     dais: 5,

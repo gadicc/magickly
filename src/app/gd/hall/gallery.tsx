@@ -4,6 +4,9 @@ import { GdHall, type HallNode } from "@magick-components/gd/hall";
 import {
   HALL_PRESETS,
   type HallPreset,
+  type HallPresetSource,
+  hallSourceText,
+  hallSourceUrl,
 } from "@magick-components/gd/hall/presets";
 import {
   Box,
@@ -33,35 +36,15 @@ const SIZE_VIEWS: readonly [SizesView, string][] = [
   ["both", "Both sizes"],
 ];
 
-const ARCHIVE_SOURCE =
-  /^(.*), archive\.org (\S+), p\.(\d+), leaf n(\d+)( \(.+\))?$/;
-
 /** The old drawing a preset was ported from, as served from `public`. */
 export function originalDrawing(preset: HallPreset): string | undefined {
-  const file = preset.sources.find((source) =>
-    /^public\/pics\/\w+\.svg$/.test(source),
-  );
-  return file?.slice("public".length);
+  const file = preset.sources.find((source) => source.kind === "drawing");
+  return file && hallSourceUrl(file);
 }
 
-/** One source, linked where it has a stable place to go. */
-export function Source({ source }: { source: string }) {
-  const book = ARCHIVE_SOURCE.exec(source);
-  if (book) {
-    const [, work, item, page, leaf, note = ""] = book;
-    return (
-      <>
-        {work},{" "}
-        <a href={`https://archive.org/details/${item}/page/n${leaf}`}>
-          p.{page}
-        </a>{" "}
-        (archive.org leaf n{leaf}){note}
-      </>
-    );
-  }
-  if (source.startsWith("public/"))
-    return <a href={source.slice("public".length)}>{source}</a>;
-  return <>{source}</>;
+/** One source, linked to where it can be seen. */
+function Source({ source }: { source: HallPresetSource }) {
+  return <a href={hallSourceUrl(source)}>{hallSourceText(source)}</a>;
 }
 
 function Pane({
@@ -219,7 +202,7 @@ export default function HallGallery() {
       </Typography>
       <ul style={{ marginTop: 0, overflowWrap: "anywhere" }}>
         {preset.sources.map((source) => (
-          <li key={source}>
+          <li key={hallSourceText(source)}>
             <Source source={source} />
           </li>
         ))}

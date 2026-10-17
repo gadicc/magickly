@@ -1,5 +1,5 @@
 import type { HallNode } from "../types";
-import { dais, type HallPreset, REGARDIE_1938 } from "./types";
+import { dais, drawing, type HallPreset, regardie1938 } from "./types";
 
 /** The Zelator's letters above the East: Shin, Tau and Qoph. */
 const LETTERS: HallNode = {
@@ -44,7 +44,7 @@ export const zelator1: HallPreset = {
   title: "Zelator Temple 1",
   grade: "1=10",
   part: 1,
-  sources: ["public/pics/zelator1.svg", `${REGARDIE_1938}, p.44, leaf n38`],
+  sources: [drawing("zelator1"), regardie1938(44, 38)],
   hall: {
     type: "gdHall",
     dais: 5,
@@ -112,8 +112,8 @@ export const zelator2: HallPreset = {
   // The book's diagram of the second part is not yet located; p.44 draws
   // the first part and is cited only for the North wall it shares.
   sources: [
-    "public/pics/zelator2.svg",
-    `${REGARDIE_1938}, p.44, leaf n38 (the Earth tablet, lamp and salt only)`,
+    drawing("zelator2"),
+    regardie1938(44, 38, "the Earth tablet, lamp and salt only"),
   ],
   hall: {
     type: "gdHall",
