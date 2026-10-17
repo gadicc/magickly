@@ -312,7 +312,10 @@ const labelDepth = (label: PreparedLabel) =>
 
 /** Height of a text block from the first line's ink top to the last's descent. */
 const textHeight = (lines: number, size: number) =>
-  (labelFont.top + labelFont.bottom) * size + (lines - 1) * size * LINE_HEIGHT;
+  lines === 0
+    ? 0
+    : (labelFont.top + labelFont.bottom) * size +
+      (lines - 1) * size * LINE_HEIGHT;
 
 /** Lays out the lines of a label around an object's box. */
 function placeLabel(label: PreparedLabel, object: Rect): ResolvedLabel {
@@ -496,14 +499,10 @@ export function resolveHall(
       const size = clamp(numberAttr(node, "size") ?? labelSize, 0.05, 4);
       const text = stringAttr(node, "text", 200) ?? "";
       const given = numberAttr(node, "width");
-      const lines = wrapLabel(
-        text,
-        given === undefined
-          ? Number.POSITIVE_INFINITY
-          : clamp(given, ...SIZE_RANGE),
-        size,
-      );
-      const w = given ?? Math.max(0, ...lines.map((line) => line.width));
+      const width =
+        given === undefined ? undefined : clamp(given, ...SIZE_RANGE);
+      const lines = wrapLabel(text, width ?? Number.POSITIVE_INFINITY, size);
+      const w = width ?? Math.max(0, ...lines.map((line) => line.width));
       return {
         node,
         path,
@@ -596,10 +595,17 @@ export function resolveHall(
     ];
     const localX = px - (ax * item.w) / 2;
     const localY = py - (ay * item.h) / 2;
-    const cx = frame.ox + localX * frame.unit;
-    const cy = frame.oy + localY * frame.unit;
-    const width = item.w * frame.unit;
-    const height = item.h * frame.unit;
+    // Each frame clamps its own values; nested hosts multiply them, so the
+    // result is clamped again in floor squares: positions to the coordinate
+    // range, sizes (and with them a host's frame) to the largest size.
+    const cx = clamp(frame.ox + localX * frame.unit, ...COORDINATE_RANGE);
+    const cy = clamp(frame.oy + localY * frame.unit, ...COORDINATE_RANGE);
+    const largest = SIZE_RANGE[1];
+    const fit =
+      largest / Math.max(largest, item.w * frame.unit, item.h * frame.unit);
+    const unit = frame.unit * fit;
+    const width = item.w * unit;
+    const height = item.h * unit;
     const rect: Rect = {
       x0: cx - width / 2,
       y0: cy - height / 2,
@@ -614,7 +620,7 @@ export function resolveHall(
       box: item.box,
       cx,
       cy,
-      k: item.k * frame.unit,
+      k: item.k * unit,
       width,
       height,
       labels: item.labels.map((label) => placeLabel(label, rect)),
@@ -629,7 +635,7 @@ export function resolveHall(
     const hostFrame: Frame = {
       ox: cx,
       oy: cy,
-      unit: item.scale * frame.unit,
+      unit: item.scale * unit,
       box: { x0: -halfW, y0: -halfH, x1: halfW, y1: halfH },
     };
     for (const child of item.children)

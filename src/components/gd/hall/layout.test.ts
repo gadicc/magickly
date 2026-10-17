@@ -855,6 +855,42 @@ describe("resolveHall: untrusted content", () => {
     ]);
   });
 
+  it("clamps a free label's width", () => {
+    const [wide, negative, empty] = only(
+      hall(
+        { compass: false },
+        floor(
+          { type: "label", text: "Wide", width: 1e9 },
+          { type: "label", text: "Narrow", width: -5 },
+          { type: "label", text: "" },
+        ),
+      ),
+    );
+    expect(wide.width).toBe(48);
+    expect(negative.width).toBe(0.1);
+    expect([empty.width, empty.height]).toEqual([0, 0]);
+    const { viewBox } = resolve(
+      hall({}, floor({ type: "label", text: "Wide", width: 1e9 })),
+    );
+    expect(viewBox.x1 - viewBox.x0).toBeLessThan(60);
+  });
+
+  it("clamps positions and sizes in floor squares through nested hosts", () => {
+    let nested: unknown = { type: "altar", x: 64, y: 64, scale: 10 };
+    for (let i = 0; i < 20; i++)
+      nested = { type: "altar", x: 64, y: 64, scale: 10, children: [nested] };
+    const resolved = resolve(hall({}, floor(nested)));
+    expect(resolved.objects).toHaveLength(21);
+    for (const object of resolved.objects) {
+      expect(object.cx).toBeLessThanOrEqual(64);
+      expect(object.cy).toBeLessThanOrEqual(64);
+      expect(Math.max(object.width, object.height)).toBeLessThan(48 + 1e-9);
+    }
+    const { viewBox } = resolved;
+    for (const value of Object.values(viewBox))
+      expect(Math.abs(value)).toBeLessThan(100);
+  });
+
   it("stops at the depth bound without throwing", () => {
     let deep: unknown = { type: "altar" };
     for (let i = 0; i < MAX_HALL_DEPTH + 5; i++)
