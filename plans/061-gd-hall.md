@@ -627,8 +627,9 @@ Settled while building A1, where the decisions above left a choice:
   puts the end banners on the corners (Philosophus 1).
 - Doors take `x` on the East and West walls and `y` on the North and South.
 - Item colours (`fill`, `stroke`) are named palette colours, never CSS.
-- A `label` child of a placeable is attached to it; a `label` in the floor,
-  a row or a host's frame is free text placed like any object.
+- A `label` child of a placeable or a host is attached to it (an altar's
+  `label` child labels the altar); a `label` in the floor or a row is free
+  text placed like any object. Free text on an altar is not possible.
 
 ## Stage A2 notes
 
@@ -707,6 +708,50 @@ proved wrong:
   one tag per line; Zelator 2 is the largest (chalice, censer, both
   diagrams, the tablet).
 
+## Review fixes
+
+An independent review of A1 (`469b66b..34321f7`) found two major and eight
+minor problems and some nits; m5 was fixed in A2 (ca2a14c), the rest after
+A2:
+
+- **One set of rules** (`spec.ts`): tag specs, a placement table (allowed,
+  drawn on the floor, ignored) and a document-order walk within
+  `MAX_HALL_NODES` and `MAX_HALL_DEPTH` that both the validator and the
+  resolver use, so what the validator calls ignored is not drawn (a door in
+  a row, a structural tag in a host) and both stop at the same node. Label
+  children count towards the node bound. Children of unknown and reserved
+  tags are neither checked nor drawn. (M1, m1)
+- **Bounded labels**: at most 6 lines per label or caption (`MAX_LABEL_LINES`,
+  the last ending in "…"), at most 500 label lines per hall
+  (`MAX_HALL_LABEL_LINES`; the largest preset draws 12), and no wrapping
+  narrower than 1.5 squares (`MIN_LABEL_WIDTH`). The review's hostile halls
+  went from 125,000 and 399,000 lines (9.5 MB and 28 MB of SVG) to 500
+  lines (39 KB and 527 KB). (M1)
+- **Clamps**: a free label's `width` is clamped like every width; each
+  object's centre is clamped again in floor squares and its size to 48
+  squares, so nested hosts cannot multiply past them. (M2, m6)
+- **Label layout**: labels on one side stack away from the object; a host's
+  children wrap labels at their drawn width; rows measure every label of
+  their items; labels and lines are keyed by order. (m2, m3, nit)
+- **dais=0** stays valid (no dais band): an East door then cuts through to
+  the floor, and the validator warns of a dais row. (m7)
+- **Import boundary**: relative and `@magick-components/` specifiers are
+  resolved, `..` included, and must stay in `src/components`; tests may also
+  reach `tests/`. (m8)
+- **Fonts**: the soft hyphen has no advance and no kern pairs (HarfBuzz
+  draws nothing and kerns across it); no-break spaces do not break lines.
+- **Validator**: it reports what the layout cuts (long labels, the line
+  budget, a `margin*` clipping the drawing) and clips untrusted text in its
+  messages to 40 characters.
+- **Nits**: the Hebrew letter's baseline comes from the font's body metrics
+  (21 → 21.057 units, the only snapshot change); the art provenance test
+  uses `import.meta.glob`; the Neophyte banners' provenance notes that part
+  of the source looks auto-traced.
+
+Not changed: `gdHallFontFaceCss` still throws on an unsafe base URL. The URL
+is the developer's, not content, and failing loudly is preferred to a hall
+silently drawn without its fonts.
+
 ## Commits
 
 | Commit | Change |
@@ -723,6 +768,15 @@ proved wrong:
 | 4fe36e6 | magick-data: the trumps' Golden Dawn titles on the paths |
 | 0322fab | Pantacle, lightning, `tarotKey`, `tablet`, `shewbread`, `candlestick` |
 | 6563adf | The five presets and their tests |
+| 6d6b2e4 | Shared placement rules and node walk (review M1, m1) |
+| 1ee305e | Label line limits and minimum wrap width (M1) |
+| 9fb76bc | Free label width and nested geometry clamped (M2, m6) |
+| 605a371 | Stacked labels, wrapping at the drawn width, row extents (m2, m3) |
+| 9fc026b | A hall without a dais (m7) |
+| 0b03e0c | Import boundary resolves aliases and `..` (m8) |
+| ed14baf | Soft hyphen and no-break space in label measurement |
+| 5a84f05 | The validator reports what the layout cuts |
+| 555f0f2 | Clipped messages, Hebrew baseline, glob, provenance |
 
 ## Future
 
