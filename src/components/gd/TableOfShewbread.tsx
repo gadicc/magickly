@@ -48,7 +48,15 @@ const transToHeb = (str: string) =>
     .map((c) => yhvH[c] || c)
     .join("");
 
-function Branch({ zodiac, index }: { zodiac: ZodiacRow; index: number }) {
+function Branch({
+  zodiac,
+  index,
+  idPrefix,
+}: {
+  zodiac: ZodiacRow;
+  index: number;
+  idPrefix: string;
+}) {
   const numBranches = 12;
   const radius = 8; // TODO, work it out properly
   const center = degreesToPointOnCircle(
@@ -126,7 +134,7 @@ function Branch({ zodiac, index }: { zodiac: ZodiacRow; index: number }) {
       {texts.map((text, i) => (
         <g key={i}>
           <path
-            id={`path-${index}-l${i}`}
+            id={`${idPrefix}-path-${index}-l${i}`}
             d={`M ${textPaths[i][0].x} ${textPaths[i][0].y} L ${textPaths[i][1].x} ${textPaths[i][1].y}`}
             fill="none"
             stroke="none"
@@ -134,7 +142,7 @@ function Branch({ zodiac, index }: { zodiac: ZodiacRow; index: number }) {
           <text>
             <textPath
               fontSize="3"
-              href={`#path-${index}-l${i}`}
+              href={`#${idPrefix}-path-${index}-l${i}`}
               textAnchor="middle"
               startOffset="50%"
             >
@@ -181,15 +189,17 @@ function TextOnCircle({
   radius,
   position,
   offset = 0,
+  idPrefix,
 }: {
   text: string;
   center: Point;
   radius: number;
   position: "inner-top" | "inner-bottom";
   offset?: number;
+  idPrefix: string;
 }) {
   const fontSize = 2.5;
-  const textPathId = `text-path-${text}-${position}`;
+  const textPathId = `${idPrefix}-text-path-${text}-${position}`;
   radius -= offset;
 
   return (
@@ -219,8 +229,18 @@ function TextOnCircle({
   );
 }
 
+/** Props of the diagram. */
+export interface TableOfShewbreadProps {
+  /**
+   * Prefixes the text paths' ids, which are document-wide: two of these
+   * on one page need different prefixes. No hook makes one, because the
+   * image routes render this outside React's renderer for hooks.
+   */
+  idPrefix?: string;
+}
+
 export default React.forwardRef(function TableOfShewbread(
-  _opts,
+  { idPrefix = "shewbread" }: TableOfShewbreadProps,
   ref: React.Ref<SVGSVGElement>,
 ) {
   const innerTriangles = [0, 30, 60, 90].map((offset) => [
@@ -279,7 +299,7 @@ export default React.forwardRef(function TableOfShewbread(
       />
 
       {zodiacArray.map((zodiac, i) => (
-        <Branch key={i} zodiac={zodiac} index={i} />
+        <Branch key={i} zodiac={zodiac} index={i} idPrefix={idPrefix} />
       ))}
 
       <g>
@@ -298,6 +318,7 @@ export default React.forwardRef(function TableOfShewbread(
               center={raphaelCircleCenter}
               radius={circle.radius}
               position="inner-top"
+              idPrefix={idPrefix}
             />
             <text
               x={raphaelCircleCenter.x}
@@ -313,6 +334,7 @@ export default React.forwardRef(function TableOfShewbread(
               center={raphaelCircleCenter}
               radius={circle.radius}
               position="inner-bottom"
+              idPrefix={idPrefix}
             />
           </g>
         ))}

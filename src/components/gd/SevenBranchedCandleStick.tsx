@@ -45,7 +45,7 @@ export const CANDLESTICK_PLANETS = [
 
 const branches: readonly PlanetId[] = CANDLESTICK_PLANETS;
 
-function Branch({ index }: { index: number }) {
+function Branch({ index, idPrefix }: { index: number; idPrefix: string }) {
   const radius = 7.4; // TODO, work it out properly
   const center = degreesToPointOnCircle((index * 360) / 7 - 90, 25 + radius);
 
@@ -119,7 +119,7 @@ function Branch({ index }: { index: number }) {
       {texts.map((text, i) => (
         <g key={i}>
           <path
-            id={`path-${index}-l${i}`}
+            id={`${idPrefix}-path-${index}-l${i}`}
             d={`M ${textPaths[i][0].x} ${textPaths[i][0].y} L ${textPaths[i][1].x} ${textPaths[i][1].y}`}
             fill="none"
             stroke="none"
@@ -127,7 +127,7 @@ function Branch({ index }: { index: number }) {
           <text>
             <textPath
               fontSize="3"
-              href={`#path-${index}-l${i}`}
+              href={`#${idPrefix}-path-${index}-l${i}`}
               textAnchor="middle"
               startOffset="50%"
             >
@@ -140,8 +140,18 @@ function Branch({ index }: { index: number }) {
   );
 }
 
+/** Props of the diagram. */
+export interface SevenBranchedCandleStickProps {
+  /**
+   * Prefixes the text paths' ids, which are document-wide: two of these
+   * on one page need different prefixes. No hook makes one, because the
+   * image routes render this outside React's renderer for hooks.
+   */
+  idPrefix?: string;
+}
+
 export default React.forwardRef(function SevenBranchedCandleStick(
-  _opts,
+  { idPrefix = "candlestick" }: SevenBranchedCandleStickProps,
   ref: React.Ref<SVGSVGElement>,
 ) {
   const indexes = [0, 1, 2, 3, 4, 5, 6];
@@ -190,7 +200,7 @@ export default React.forwardRef(function SevenBranchedCandleStick(
       })()}
 
       {indexes.map((i) => (
-        <Branch key={i} index={i} />
+        <Branch key={i} index={i} idPrefix={idPrefix} />
       ))}
     </svg>
   );
