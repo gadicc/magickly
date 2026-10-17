@@ -32,6 +32,7 @@ import {
   type HallPoint,
   type HallTagRole,
   hallPoint,
+  IDENTIFIER,
   LABEL_POSITIONS,
   type LabelPosition,
   RESERVED_TAGS,
@@ -380,11 +381,17 @@ function clearOf(
 const coordinate = (value: number | undefined) =>
   value === undefined ? undefined : clamp(value, ...COORDINATE_RANGE);
 
+/**
+ * A node the resolver may draw: an object whose tag is an identifier. The
+ * validator ignores anything else ("a node without a valid tag"), so a
+ * registry key such as `item:cup` or `<b>` used as a tag draws nothing.
+ */
 const isNode = (value: unknown): value is HallNode =>
   typeof value === "object" &&
   value !== null &&
   !Array.isArray(value) &&
-  typeof (value as { type?: unknown }).type === "string";
+  typeof (value as { type?: unknown }).type === "string" &&
+  IDENTIFIER.test((value as { type: string }).type);
 
 const childrenOf = (node: HallNode) =>
   Array.isArray(node.children) ? (node.children as unknown[]) : [];

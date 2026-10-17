@@ -964,6 +964,9 @@ describe("resolveHall: untrusted content", () => {
             children: [{ type: "label", text: "not drawn" }],
           },
           { type: "item:cross" },
+          { type: "not a tag" },
+          { type: "" },
+          { type: "<b>" },
         ),
       ),
     );
@@ -975,12 +978,26 @@ describe("resolveHall: untrusted content", () => {
       "item:cross",
       "pillar",
       "unicorn",
-      "item:cross",
     ]);
-    const [, , , unicorn, notATag] = resolved.objects;
+    const [, , , unicorn] = resolved.objects;
     expect(unicorn.labels).toEqual([]);
-    // A registry key is not a tag: drawn as a placeholder.
-    expect(notATag.missing).toBe(true);
+  });
+
+  it("draws nothing for a node the validator ignores for its tag", () => {
+    // A registry key is not a tag, nor is anything but an identifier.
+    const node = hall(
+      {},
+      floor(
+        { type: "item:cross" },
+        { type: "not a tag" },
+        { type: "" },
+        { type: "<b>" },
+      ),
+    );
+    expect(only(node)).toEqual([]);
+    expect(
+      validateHall(node, { art }).map((diagnostic) => diagnostic.message),
+    ).toEqual(Array(4).fill("a node without a valid tag is ignored"));
   });
 
   it("counts label children towards the node bound, as the validator does", () => {
