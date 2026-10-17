@@ -15,3 +15,11 @@ upstream SIL Open Font License 1.1 notices. Symbols supplies the used alchemical
 and most planetary glyphs; Symbols 2 supplies U+2609 (sun). Both are needed by
 the existing grade fields. These files do not change the interactive component's
 CSS or font-loading behavior.
+
+`NotoSans-Regular.ttf` and `NotoSansHebrew-Regular.ttf` came into the
+repository in January 2021 (Noto 2.000, `noto-source:20170915`) without their
+notices. `NotoSans-OFL.txt` and `NotoSansHebrew-OFL.txt` are their SIL Open
+Font License 1.1 notices: each font's own copyright line (name ID 0,
+"Copyright 2015 Google Inc. All Rights Reserved.") above the OFL 1.1 text from
+google/fonts commit `8b0a1d0f5983c89bc2b93f1b5fb55f9e252744b5`
+(`ofl/notosans/OFL.txt`), written by `scripts/gd-hall-fonts/build.py`.
