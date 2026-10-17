@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-151.81 -817.21 1903.62 2674.77" role="img" aria-labelledby="_R_0_-title">
+<title id="_R_0_-title">Neophyte Temple</title>
+<defs>
+<pattern id="_R_0_-checker" width="200" height="200" patternUnits="userSpaceOnUse">
+<rect width="200" height="200" fill="#f9f9f9">
+</rect>
+<rect width="100" height="100" fill="#ececec">
+</rect>
+<rect x="100" y="100" width="100" height="100" fill="#ececec">
+</rect>
+</pattern>
+<linearGradient id="_R_0_-wall" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0.13" stop-color="#ffffff">
+</stop>
+<stop offset="1" stop-color="#000000">
+</stop>
+</linearGradient>
+</defs>
+<rect x="-151.81" y="-817.21" width="1903.62" height="2674.77" fill="#ffffff">
+</rect>
+<g>
+<rect x="-31" y="-400" width="1662" height="2031" fill="url(#_R_0_-wall)" stroke="#000000" stroke-width="16">
+</rect>
+<rect x="0" y="0" width="1600" height="1600" fill="url(#_R_0_-checker)" stroke="#000000" stroke-width="14">
+</rect>
+<rect x="1300" y="1584" width="200" height="63" fill="#ffffff">
+</rect>
+</g>
+<g transform="translate(940 0) scale(1.6)">
+<defs>
+<linearGradient id="_R_0_-2-0-fill" x1="-38" x2="38" y1="0" y2="0" gradientUnits="userSpaceOnUse">
+<stop offset="0" stop-color="#e0e0e0">
+</stop>
+<stop offset="1" stop-color="#ffffff">
+</stop>
+</linearGradient>
+</defs>
+<polyline points="-38,-37 0,-61 38,-37" fill="none" stroke="#d92128" stroke-width="2.5" stroke-linejoin="round">
+</polyline>
+<rect x="-43" y="-39" width="86" height="4" fill="#ffe600" stroke="#000000" stroke-width="0.6">
+</rect>
+<circle cx="-44" cy="-37" r="4.5" fill="#ffe600" stroke="#000000" stroke-width="0.6">
+</circle>
+<circle cx="44" cy="-37" r="4.5" fill="#ffe600" stroke="#000000" stroke-width="0.6">
+</circle>
+<path d="M-38,-37H38V27L0,49L-38,27Z" fill="url(#_R_0_-2-0-fill)" stroke="#000000" stroke-width="1.5">
+</path>
+<line x1="-38" x2="-38" y1="-37" y2="-22" stroke="#d92128" stroke-width="3.4" stroke-linecap="round">
+</line>
+<line x1="38" x2="38" y1="-37" y2="-22" stroke="#d92128" stroke-width="3.4" stroke-linecap="round">
+</line>
+<line x1="-38" x2="-38" y1="27" y2="40" stroke="#d92128" stroke-width="3.4" stroke-linecap="round">
+</line>
+<line x1="38" x2="38" y1="27" y2="40" stroke="#d92128" stroke-width="3.4" stroke-linecap="round">
+</line>
+<line x1="0" x2="0" y1="49" y2="62" stroke="#d92128" stroke-width="3.4" stroke-linecap="round">
+</line>
+<path d="M-7.5,-24H7.5V-9H23V5.5H7.5V35H-7.5V5.5H-23V-9H-7.5Z" fill="#fae513">
+</path>
+<polygon points="-23,-9 23,-9 0,28" fill="none" stroke="#406ab3" stroke-width="3.5">
+</polygon>
+<polygon points="0,-21 23,16 -23,16" fill="none" stroke="#d92128" stroke-width="3.5">
+</polygon>
+<path d="M-7,-3H7V1.5H2.5V10H-2.5V1.5H-7Z" fill="#f9f9f9">
+</path>
+</g>
+<g transform="translate(400 300) scale(2)">
+<defs>
+<radialGradient id="_R_0_-2-1-glow" cx="0" cy="0" r="40" gradientUnits="userSpaceOnUse">
+<stop offset="0" stop-color="#ff0000">
+</stop>
+<stop offset="1" stop-color="#ff0000" stop-opacity="0">
+</stop>
+</radialGradient>
+</defs>
+<circle r="48.8" fill="#000000" stroke="#cccccc" stroke-width="2.4">
+</circle>
+<polygon points="0,44 -38.105,-22 38.105,-22" fill="url(#_R_0_-2-1-glow)" stroke="#cccccc" stroke-width="5" stroke-linejoin="miter">
+</polygon>
+</g>
+<g transform="translate(800 300) scale(1.66)">
+<circle r="47" fill="#ffffff" stroke="#000000" stroke-width="6">
+</circle>
+</g>
+<g transform="translate(800 800) scale(2)">
+<rect x="-50" y="-50" width="100" height="100" fill="#000000">
+</rect>
+</g>
+<g transform="translate(800 760) scale(0.47)">
+<path d="M-8,-50H8V-28H30V-12H8V50H-8V-12H-30V-28H-8Z" fill="#e00000" stroke="#ffe000" stroke-width="3" stroke-linejoin="miter">
+</path>
+</g>
+<g transform="translate(800 830) scale(0.84)">
+<polygon points="0,-38.105 44,38.105 -44,38.105" fill="none" stroke="#ffffff" stroke-width="11" stroke-linejoin="miter">
+</polygon>
+</g>
+<g transform="translate(800 1450) scale(100)">
+<rect x="-2" y="-1.5" width="4" height="3" fill="#ffffff" stroke="#000000" stroke-width="0.06">
+</rect>
+</g>
+<g transform="translate(800 1450) scale(1.66)">
+<circle r="47" fill="#ffffff" stroke="#000000" stroke-width="6">
+</circle>
+</g>
+<g transform="translate(400 -146.06) scale(2.31)">
+<circle r="47" fill="#ffffff" stroke="#000000" stroke-width="6">
+</circle>
+</g>
+<g transform="translate(1200 -146.06) scale(2.31)">
+<circle r="47" fill="#ffffff" stroke="#000000" stroke-width="6">
+</circle>
+</g>
+<g transform="translate(800 -631.51) scale(2.95)">
+<defs>
+<linearGradient id="_R_0_-1-0-fill" x1="-38" x2="38" y1="0" y2="0" gradientUnits="userSpaceOnUse">
+<stop offset="0" stop-color="#e0e0e0">
+</stop>
+<stop offset="1" stop-color="#ffffff">
+</stop>
+</linearGradient>
+</defs>
+<rect x="-43" y="-40" width="86" height="4" fill="#ffe600" stroke="#000000" stroke-width="0.6">
+</rect>
+<circle cx="-44" cy="-38" r="4.5" fill="#ffe600" stroke="#000000" stroke-width="0.6">
+</circle>
+<circle cx="44" cy="-38" r="4.5" fill="#ffe600" stroke="#000000" stroke-width="0.6">
+</circle>
+<path d="M-38,-38H38V26L0,45L-38,26Z" fill="url(#_R_0_-1-0-fill)" stroke="#000000" stroke-width="0.8">
+</path>
+<text x="0" y="21" font-size="62" font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" text-anchor="middle" fill="#000000">ש</text>
+</g>
+<g font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">
+<g>
+<text x="800" y="191.68" font-size="43" text-anchor="middle">Hegemon</text>
+</g>
+<g>
+<text x="800" y="1341.68" font-size="43" text-anchor="middle">Hiereus</text>
+</g>
+<g>
+<text x="400" y="-286.88" font-size="43" text-anchor="middle">Hierophant</text>
+</g>
+<g>
+<text x="1200" y="-336.33" font-size="43" text-anchor="middle">Past</text>
+<text x="1200" y="-286.88" font-size="43" text-anchor="middle">Hierophant</text>
+</g>
+<text x="800" y="-430.53" font-size="53" font-weight="700" text-anchor="middle">East</text>
+<text x="800" y="1701.28" font-size="53" font-weight="700" text-anchor="middle">West</text>
+<text x="-61.53" y="800" font-size="53" font-weight="700" text-anchor="middle" transform="rotate(-90 -61.53 800)">North</text>
+<text x="1661.53" y="800" font-size="53" font-weight="700" text-anchor="middle" transform="rotate(90 1661.53 800)">South</text>
+<text x="800" y="1789.56" font-size="75" text-anchor="middle">Neophyte Temple</text>
+</g>
+</svg>
