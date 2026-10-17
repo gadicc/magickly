@@ -58,11 +58,20 @@ export const GD_HALL_FONT_FILES: readonly GdHallFontFile[] = [
 ];
 
 /**
+ * What a font source may not contain: the rules go into a `<style>`
+ * inside the SVG, where neither HTML nor XML escapes them.
+ */
+const UNSAFE_FONT_SRC = /["'()\\<>&\s]/;
+
+/**
  * One subset's `@font-face` rule with `src` as its WOFF2 source: a URL, or
- * a `data:` URI when an export inlines the font. The caller vouches that
- * `src` holds no quote, bracket, backslash or markup character.
+ * a `data:` URI when an export inlines the font (`data:font/woff2;base64,…`
+ * is safe). Throws for a `src` with a quote, bracket, backslash, space or
+ * markup character.
  */
 export function gdHallFontFaceRule(font: GdHallFontFile, src: string): string {
+  if (UNSAFE_FONT_SRC.test(src))
+    throw new Error(`Unsafe font source: ${JSON.stringify(src.slice(0, 80))}`);
   return `@font-face{font-family:"${font.family}";font-style:${font.style};font-weight:${font.weight};font-display:swap;src:url("${src}") format("woff2");unicode-range:${font.unicodeRange}}`;
 }
 
@@ -73,7 +82,7 @@ export function gdHallFontFaceRule(font: GdHallFontFile, src: string): string {
  * spaces, backslashes or markup characters.
  */
 export function gdHallFontFaceCss(baseUrl: string): string {
-  if (/["'()\\<>&\s]/.test(baseUrl))
+  if (UNSAFE_FONT_SRC.test(baseUrl))
     throw new Error(`Unsafe font base URL: ${JSON.stringify(baseUrl)}`);
   const base = baseUrl.replace(/\/+$/, "");
   return GD_HALL_FONT_FILES.map((font) =>

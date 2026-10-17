@@ -7,6 +7,7 @@ import {
   GD_HALL_FONT_FILES,
   GD_HALL_FONT_STACKS,
   gdHallFontFaceCss,
+  gdHallFontFaceRule,
 } from "./fonts";
 import { GdHall } from "./GdHall";
 import { MAX_HALL_LABEL_LINES } from "./layout";
@@ -401,6 +402,15 @@ describe("fonts", () => {
     expect(GD_HALL_FONT_STACKS.serif).toBe(
       '"GdHall Noto Serif", "Noto Serif", serif',
     );
+  });
+
+  it("checks a single rule's source too, data: URIs included", () => {
+    const [font] = GD_HALL_FONT_FILES;
+    expect(
+      gdHallFontFaceRule(font, "data:font/woff2;base64,d09GMg+/="),
+    ).toContain('src:url("data:font/woff2;base64,d09GMg+/=") format("woff2")');
+    for (const bad of ['a")}x{', "a b", "x'", "<x>", "a&b", "a\\b", "a(b"])
+      expect(() => gdHallFontFaceRule(font, bad)).toThrow("Unsafe font source");
   });
 
   it("names files that exist in public/fonts", () => {
