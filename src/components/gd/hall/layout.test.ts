@@ -445,6 +445,48 @@ describe("resolveHall: rows", () => {
     );
   });
 
+  it("counts a label wider than its banner in a North row", () => {
+    const [banner] = only(
+      hall(
+        {},
+        {
+          type: "banners",
+          side: "north",
+          children: [{ type: "banner", label: "Praemonstratorship" }],
+        },
+      ),
+    );
+    const clearance =
+      COMPASS_GAP +
+      (compassFont.top + compassFont.bottom) * COMPASS_SIZE +
+      BANNER_ROW_GAP;
+    const [label] = banner.labels;
+    expect(label.bounds.x1 - label.bounds.x0).toBeGreaterThan(banner.width);
+    expect(label.bounds.x1).toBeCloseTo(-WALL_GAP - clearance, 10);
+  });
+
+  it("counts a side label taller than its banner in an East row", () => {
+    const [banner] = only(
+      hall(
+        {},
+        {
+          type: "banners",
+          children: [
+            {
+              type: "banner",
+              labelPos: "right",
+              label: "1\n2\n3\n4\n5\n6",
+            },
+          ],
+        },
+      ),
+    );
+    const [label] = banner.labels;
+    expect(label.bounds.y1 - label.bounds.y0).toBeGreaterThan(banner.height);
+    const { outer } = resolve(hall({}));
+    expect(label.bounds.y1).toBeLessThanOrEqual(outer.y0);
+  });
+
   it("counts a banner's label towards the hall when placing the row", () => {
     const [banner] = only(
       hall(
@@ -531,6 +573,53 @@ describe("resolveHall: labels", () => {
       "Role",
     ]);
     expect(roleless.labels).toEqual([]);
+  });
+
+  it("stacks labels on one side, each beyond the one before", () => {
+    const [keryx] = only(
+      hall(
+        {},
+        floor({
+          type: "officer",
+          role: "keryx",
+          x: 8,
+          y: 8,
+          children: [
+            { type: "label", text: "One" },
+            { type: "label", text: "Two", pos: "top" },
+            { type: "label", text: "Three" },
+            { type: "label", text: "Four", pos: "left" },
+            { type: "label", text: "Five", pos: "left" },
+          ],
+        }),
+      ),
+    );
+    const [one, two, three, four, five] = keryx.labels;
+    expect(one.bounds.y0).toBeCloseTo(8 + 0.83 + LABEL_GAP, 10);
+    expect(three.bounds.y0).toBeCloseTo(one.bounds.y1 + LABEL_GAP, 10);
+    expect(two.bounds.y1).toBeCloseTo(8 - 0.83 - LABEL_GAP, 10);
+    expect(four.bounds.x1).toBeCloseTo(8 - 0.83 - LABEL_GAP, 10);
+    expect(five.bounds.x1).toBeCloseTo(four.bounds.x0 - LABEL_GAP, 10);
+  });
+
+  it("wraps a host's children's labels at their drawn width", () => {
+    const text = "Banner of the West";
+    const [altar, cross] = only(
+      hall(
+        {},
+        floor({
+          type: "altar",
+          scale: 3,
+          children: [{ type: "item", kind: "cross", scale: 1, label: text }],
+        }),
+      ),
+    );
+    expect(altar.width).toBe(6);
+    expect(cross.width).toBeCloseTo(3.6, 10);
+    const lines = (width: number) =>
+      wrapText(text, width, LABEL_SIZE).map((line) => line.text);
+    expect(cross.labels[0].lines.map((line) => line.text)).toEqual(lines(3.6));
+    expect(lines(3.6)).not.toEqual(lines(1.5));
   });
 
   it("draws free labels as centred text", () => {

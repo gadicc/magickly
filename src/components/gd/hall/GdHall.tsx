@@ -46,9 +46,11 @@ const labelTextStyle: CSSProperties = {
 function Lines({ label }: { label: ResolvedLabel }) {
   return (
     <>
-      {label.lines.map((line) => (
+      {label.lines.map((line, index) => (
         <text
-          key={`${line.x},${line.y}`}
+          // Lines never reorder, and a position is no unique key.
+          // biome-ignore lint/suspicious/noArrayIndexKey: see above
+          key={index}
           x={u(line.x)}
           y={u(line.y)}
           fontSize={u(label.size)}
@@ -261,11 +263,9 @@ export function GdHall({
           .map((object) => (
             <g key={object.path.join(".")}>
               {object.text && <Lines label={object.text} />}
-              {object.labels.map((label) => (
-                <Lines
-                  key={`${label.bounds.x0},${label.bounds.y0}`}
-                  label={label}
-                />
+              {object.labels.map((label, index) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: labels keep their order
+                <Lines key={index} label={label} />
               ))}
             </g>
           ))}

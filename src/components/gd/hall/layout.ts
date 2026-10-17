@@ -302,14 +302,6 @@ const isNode = (value: unknown): value is HallNode =>
 const childrenOf = (node: HallNode) =>
   Array.isArray(node.children) ? (node.children as unknown[]) : [];
 
-/** Ink depth of a label block: what it adds beside its object. */
-const labelDepth = (label: PreparedLabel) =>
-  label.pos === "left" || label.pos === "right"
-    ? LABEL_GAP + Math.max(0, ...label.lines.map((line) => line.width))
-    : LABEL_GAP +
-      (labelFont.top + labelFont.bottom) * label.size +
-      (label.lines.length - 1) * label.size * LINE_HEIGHT;
-
 /** Height of a text block from the first line's ink top to the last's descent. */
 const textHeight = (lines: number, size: number) =>
   lines === 0
@@ -356,6 +348,25 @@ function placeLabel(label: PreparedLabel, object: Rect): ResolvedLabel {
     anchor,
     bounds: { x0: left, y0: top, x1: left + widest, y1: top + height },
   };
+}
+
+/**
+ * Lays out an object's labels. Labels on one side stack, each growing away
+ * from the object beyond the one before it.
+ */
+function placeLabels(
+  labels: readonly PreparedLabel[],
+  object: Rect,
+): ResolvedLabel[] {
+  const edge = { ...object };
+  return labels.map((label) => {
+    const placed = placeLabel(label, edge);
+    if (label.pos === "top") edge.y0 = placed.bounds.y0;
+    else if (label.pos === "bottom") edge.y1 = placed.bounds.y1;
+    else if (label.pos === "left") edge.x0 = placed.bounds.x0;
+    else edge.x1 = placed.bounds.x1;
+    return placed;
+  });
 }
 
 /** Lays out a free label's lines centred in its own box. */
@@ -493,6 +504,8 @@ export function resolveHall(
     node: HallNode,
     path: readonly number[],
     context: Context,
+    /** Floor squares per frame unit: labels wrap at the drawn width. */
+    unit = 1,
   ): Prepared => {
     const tag = node.type;
     if (tag === "label") {
@@ -560,7 +573,7 @@ export function resolveHall(
       k,
       scale,
       isHost,
-      labels: prepareLabels(node, path, tag, w, context),
+      labels: prepareLabels(node, path, tag, w * unit, context),
       children: isHost ? placeables(node, path, "host") : [],
     };
   };
@@ -623,7 +636,7 @@ export function resolveHall(
       k: item.k * unit,
       width,
       height,
-      labels: item.labels.map((label) => placeLabel(label, rect)),
+      labels: placeLabels(item.labels, rect),
     };
     if (item.text) resolved.text = placeText(item.text, rect);
     objects.push(resolved);
@@ -639,7 +652,11 @@ export function resolveHall(
       box: { x0: -halfW, y0: -halfH, x1: halfW, y1: halfH },
     };
     for (const child of item.children)
-      place(prepare(child.node, child.path, "floor"), hostFrame, {});
+      place(
+        prepare(child.node, child.path, "floor", hostFrame.unit),
+        hostFrame,
+        {},
+      );
   };
 
   /** Whether a node is inside the bounds and a node at all. */
@@ -771,25 +788,21 @@ export function resolveHall(
     const lineItems = items.filter(
       (item) => free(item) && numberAttr(item.node, crossAttr) === undefined,
     );
-    // How far each item reaches before and after the row line, labels included.
+    // How far each item reaches before and after the row line, every label
+    // included: a side label taller than a banner, or a label wider than
+    // the banner it is under in a North or South row, reaches across.
     const reach = (item: Prepared, side: "before" | "after") => {
-      const half = (vertical ? item.w : item.h) / 2;
-      const labelSide = vertical
-        ? side === "before"
-          ? "left"
-          : "right"
-        : side === "before"
-          ? "top"
-          : "bottom";
-      return (
-        half +
-        Math.max(
-          0,
-          ...item.labels
-            .filter((label) => label.pos === labelSide)
-            .map(labelDepth),
-        )
-      );
+      const box: Rect = {
+        x0: -item.w / 2,
+        y0: -item.h / 2,
+        x1: item.w / 2,
+        y1: item.h / 2,
+      };
+      const bounds = placeLabels(item.labels, box)
+        .map((label) => label.bounds)
+        .reduce(union, box);
+      if (vertical) return side === "before" ? -bounds.x0 : bounds.x1;
+      return side === "before" ? -bounds.y0 : bounds.y1;
     };
     const before = Math.max(
       0,
