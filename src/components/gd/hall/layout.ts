@@ -83,14 +83,21 @@ export const DEFAULT_PADDING = 0.5;
  * | platform, throne, board | 1 | 1 | sized in squares by `w` and `h` |
  * | item cross | 0.235 | 0.235 | Neophyte altar cross 0.35 × 0.47 |
  * | item triangle, pentagram | 0.42 | 0.42 | Neophyte altar triangle 0.84 × 0.73 |
- * | item rose | 0.85 | 0.85 | Neophyte 1.70 × 0.74 |
- * | item cup | 0.39 | 0.39 | Neophyte 0.62 × 0.79 |
- * | item salt | 0.45 | 0.45 | Neophyte 0.54 × 0.90 |
- * | item bread | 0.36 | 0.36 | Neophyte 0.72 × 0.72 |
- * | item lamp | 0.54 | 0.54 | Neophyte 0.74 × 1.08 |
- * | item lantern | 1.08 | 1.08 | Zelator floor lantern 0.94 × 2.15 |
+ * | item rose | 0.75 | 0.75 | Neophyte 1.51 × 0.55 |
+ * | item cup | 0.35 | 0.35 | Neophyte 0.54 × 0.70 |
+ * | item chalice | 0.47 | 0.47 | Zelator 2 altar 0.52 × 0.93 |
+ * | item salt | 0.31 | 0.31 | Neophyte 0.26 × 0.62 |
+ * | item bread | 0.335 | 0.335 | Neophyte 0.67 × 0.67 |
+ * | item lamp | 0.47 | 0.47 | Neophyte altar 0.57 × 0.94 |
+ * | item lantern | 1.19 | 1.19 | Zelator floor lantern 1.43 × 2.38 |
+ * | item censer | 0.53 | 0.53 | Zelator 2 altar 0.78 × 1.06 |
+ * | item fan | 0.99 | 0.99 | Theoricus 1 altar 1.98 × 1.25 |
  * | other items | 0.4 | 0.4 | none |
  * | unknown tags (placeholder) | 0.5 | 0.5 | a 1-square box |
+ *
+ * Items are measured on their own geometry, glow filters left out, in the
+ * drawing where each first appears; a drawing that draws one larger (the
+ * Theoricus altar's cup) is a preset's `scale`, not a second default.
  */
 export const DEFAULT_SCALES: ReadonlyMap<string, readonly [number, number]> =
   new Map<string, readonly [number, number]>([
@@ -107,12 +114,15 @@ export const DEFAULT_SCALES: ReadonlyMap<string, readonly [number, number]> =
     ["item:cross", [0.235, 0.235]],
     ["item:triangle", [0.42, 0.42]],
     ["item:pentagram", [0.42, 0.42]],
-    ["item:rose", [0.85, 0.85]],
-    ["item:cup", [0.39, 0.39]],
-    ["item:salt", [0.45, 0.45]],
-    ["item:bread", [0.36, 0.36]],
-    ["item:lamp", [0.54, 0.54]],
-    ["item:lantern", [1.08, 1.08]],
+    ["item:rose", [0.75, 0.75]],
+    ["item:cup", [0.35, 0.35]],
+    ["item:chalice", [0.47, 0.47]],
+    ["item:salt", [0.31, 0.31]],
+    ["item:bread", [0.335, 0.335]],
+    ["item:lamp", [0.47, 0.47]],
+    ["item:lantern", [1.19, 1.19]],
+    ["item:censer", [0.53, 0.53]],
+    ["item:fan", [0.99, 0.99]],
     ["item", [0.4, 0.4]],
     ["unknown", [0.5, 0.5]],
   ]);

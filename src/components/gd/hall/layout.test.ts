@@ -700,7 +700,7 @@ describe("resolveHall: untrusted content", () => {
     ).toEqual([
       ["unicorn", true, 1],
       ["text", true, 1],
-      ["item:cup", true, 0.78],
+      ["item:cup", true, 0.7],
       ["item:", true, 0.8],
       ["throne", true, 2],
       ["altar", false, 2],
