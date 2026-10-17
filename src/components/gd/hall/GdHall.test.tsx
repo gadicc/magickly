@@ -127,8 +127,13 @@ describe("GdHall", () => {
     const tags = markup.match(/<[^>]+>/g) ?? [];
     expect(tags.length).toBeGreaterThan(20);
     for (const tag of tags) {
-      expect(tag).not.toMatch(/\s(?:xlink:)?href=/);
-      expect(tag).not.toMatch(/^<\/?(?:image|script|foreignObject|a|use)\b/);
+      // The only references are the renderer's own: each drawing placed
+      // from the hall's <defs>.
+      if (/\s(?:xlink:)?href=/.test(tag))
+        expect(tag).toMatch(
+          /^<use href="#_R_[A-Za-z0-9_-]+-art\d+" transform="[^"]+">$/,
+        );
+      expect(tag).not.toMatch(/^<\/?(?:image|script|foreignObject|a)\b/);
       for (const [, reference] of tag.matchAll(/url\(([^)]*)\)/g))
         expect(reference).toMatch(/^#_R_[A-Za-z0-9_-]+$/);
     }
@@ -253,6 +258,7 @@ describe("GdHall", () => {
     const cup: HallArt = {
       Component: () => <circle r={10} data-art="cup" />,
       box: { width: 20, height: 20 },
+      variant: () => "",
       provenance: { origin: "thirdParty", author: "test", licence: "test" },
     };
     const markup = render(hall({}, floor({ type: "item", kind: "cup" })), {
@@ -307,6 +313,78 @@ describe("GdHall with hostile labels", () => {
     expect(textLines(markup)).toBe(MAX_HALL_LABEL_LINES + 4);
     // Mostly the 3,990 lamens, which the node bound limits.
     expect(markup.length).toBeLessThan(1_000_000);
+  });
+});
+
+describe("GdHall with hostile art", () => {
+  // The final review of stage A: art drawn at every placement multiplied
+  // the source. Markers wrapped their own text outside the line budget
+  // (3,990 with 200-character text drew 23,944 lines, 6.4 MB), and 3,990
+  // tarot keys drew 3.2 MB from 106 KB.
+  const many = (count: number, node: (index: number) => unknown) =>
+    render(
+      hall({}, floor(...Array.from({ length: count }, (_, i) => node(i)))),
+    );
+  const textLines = (markup: string) => (markup.match(/<text /g) ?? []).length;
+  const drawings = (markup: string) =>
+    (markup.match(/ id="[^"]+-art\d+"/g) ?? []).length;
+
+  it("counts markers' text against the hall's line budget", () => {
+    const markup = many(3990, () => ({
+      type: "marker",
+      text: "a ".repeat(100),
+    }));
+    expect(textLines(markup)).toBe(MAX_HALL_LABEL_LINES + 4);
+    expect(drawings(markup)).toBe(1);
+    expect(markup.length).toBeLessThan(500_000);
+  });
+
+  it("draws each tarot key once however often it is placed", () => {
+    const markup = many(3990, (i) => ({ type: "tarotKey", n: i % 22 }));
+    expect(drawings(markup)).toBe(22);
+    expect(markup.length).toBeLessThan(500_000);
+  });
+
+  it("draws one drawing for values it draws alike", () => {
+    const markup = many(3990, (i) =>
+      i % 2
+        ? { type: "hebrewLetter", letter: `x${i}` }
+        : { type: "item", kind: "cross", fill: `c${i}`, form: `f${i}` },
+    );
+    expect(drawings(markup)).toBe(2);
+    expect(markup.length).toBeLessThan(500_000);
+  });
+
+  it("draws the placeholder once per name", () => {
+    const markup = many(3990, (i) => ({ type: i % 2 ? "unicorn" : "griffin" }));
+    expect(drawings(markup)).toBe(2);
+    expect(markup.length).toBeLessThan(500_000);
+  });
+
+  it("keeps drawings apart that differ, and their ids unique", () => {
+    const markup = render(
+      hall(
+        {},
+        floor(
+          { type: "pillar", kind: "black" },
+          { type: "pillar", kind: "white" },
+          { type: "pillar", kind: "white", glow: true },
+          { type: "pillar", kind: "white", glow: true },
+          { type: "platform", w: 4, h: 3 },
+          { type: "platform", w: 3, h: 3 },
+          { type: "banner", kind: "east" },
+          { type: "banner", kind: "east" },
+        ),
+      ),
+    );
+    expect(drawings(markup)).toBe(6);
+    // One glow gradient and one banner gradient, each inside its drawing.
+    const ids = [...markup.matchAll(/ id="([^"]+)"/g)].map(([, id]) => id);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(ids.filter((id) => id.endsWith("-glow"))).toHaveLength(1);
+    expect(ids.filter((id) => id.endsWith("-fill"))).toHaveLength(1);
+    for (const [, href] of markup.matchAll(/ href="#([^"]+)"/g))
+      expect(ids).toContain(href);
   });
 });
 

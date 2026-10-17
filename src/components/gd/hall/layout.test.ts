@@ -36,6 +36,7 @@ const provenance = {
 const drawing = (width: number, height = width): HallArt => ({
   Component: () => null,
   box: { width, height },
+  variant: () => "",
   provenance,
 });
 const art = new Map<string, HallArt>([
@@ -54,12 +55,18 @@ const art = new Map<string, HallArt>([
         height: Number(node.h ?? 3),
       }),
       fit: "squares",
+      variant: () => "",
       provenance,
     },
   ],
   [
     "throne",
-    { Component: () => null, box: () => ({ width: 0, height: 1 }), provenance },
+    {
+      Component: () => null,
+      box: () => ({ width: 0, height: 1 }),
+      variant: () => "",
+      provenance,
+    },
   ],
 ]);
 

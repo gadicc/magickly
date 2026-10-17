@@ -1,5 +1,5 @@
 import type { HallArt } from "../types";
-import { original, PALETTE } from "./shared";
+import { original, PALETTE, sameForEveryNode } from "./shared";
 
 export const provenance = original(
   "A plain circle standing in for an officer's lamen; the app injects the " +
@@ -12,5 +12,6 @@ export const lamenFallbackArt: HallArt = {
     <circle r={47} fill={PALETTE.paper} stroke={PALETTE.ink} strokeWidth={6} />
   ),
   box: { width: 100, height: 100 },
+  variant: sameForEveryNode,
   provenance,
 };

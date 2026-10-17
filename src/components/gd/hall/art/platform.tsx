@@ -1,7 +1,7 @@
 import { clamp, numberAttr } from "../attributes";
 import type { HallArt, HallArtProps, HallNode } from "../types";
 import { SIZE_RANGE } from "../vocabulary";
-import { original, PALETTE } from "./shared";
+import { original, PALETTE, sameForEveryNode } from "./shared";
 
 export const provenance = original(
   "A white rectangle with a black outline, sized in squares by w and h.",
@@ -33,6 +33,8 @@ const art = (width: number, height: number): HallArt => ({
   Component: Platform,
   box: sized(width, height),
   fit: "squares",
+  // The box (w × h) is all it draws, and the box is part of the key.
+  variant: sameForEveryNode,
   provenance,
 });
 

@@ -10,6 +10,14 @@ export function original(notes: string): HallArtProvenance {
   };
 }
 
+/** `HallArt.variant` for art that draws every node alike. */
+export const sameForEveryNode = (): string => "";
+
+/** `HallArt.variant` from the normalised values a drawing reads. */
+export const variantOf = (
+  ...values: readonly (string | number | boolean | undefined)[]
+): string => JSON.stringify(values);
+
 /** The hall's palette (plan 061, decision 13: light only for now). */
 export const PALETTE = {
   ink: "#000000",

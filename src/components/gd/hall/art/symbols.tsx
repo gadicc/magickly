@@ -4,7 +4,7 @@ import SevenBranchedCandleStick from "../../SevenBranchedCandleStick";
 import TableOfShewbread from "../../TableOfShewbread";
 import { enumAttr } from "../attributes";
 import type { HallArt, HallArtProps } from "../types";
-import { original, PALETTE } from "./shared";
+import { original, PALETTE, sameForEveryNode, variantOf } from "./shared";
 
 export const tabletProvenance = original(
   "Draws the package's own Enochian Tablet component (Gadi Cohen) on a " +
@@ -71,6 +71,7 @@ export function tabletArt(enochianStyle?: CSSProperties): HallArt {
     attributes: new Map([
       ["element", { kind: "enum", values: TABLET_ELEMENTS }],
     ]),
+    variant: (node) => variantOf(enumAttr(node, "element", TABLET_ELEMENTS)),
     provenance: tabletProvenance,
   };
 }
@@ -99,6 +100,7 @@ export const shewbreadArt: HallArt = {
     </Disc>
   ),
   box: { width: 100, height: 100 },
+  variant: sameForEveryNode,
   provenance: shewbreadProvenance,
 };
 
@@ -110,5 +112,6 @@ export const candlestickArt: HallArt = {
     </Disc>
   ),
   box: { width: 100, height: 100 },
+  variant: sameForEveryNode,
   provenance: candlestickProvenance,
 };

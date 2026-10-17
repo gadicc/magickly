@@ -1,13 +1,16 @@
 import { enumAttr } from "../attributes";
-import type { HallArt, HallArtProps } from "../types";
-import { original, PALETTE } from "./shared";
+import type { HallArt, HallArtProps, HallNode } from "../types";
+import { original, PALETTE, variantOf } from "./shared";
 
 export const provenance = original(
   "A labelled box or circle, as the book marks objects and the candidate.",
 );
 
+const isCircle = (node: HallNode) =>
+  enumAttr(node, "shape", ["box", "circle"]) === "circle";
+
 function Marker({ node }: HallArtProps) {
-  return enumAttr(node, "shape", ["box", "circle"]) === "circle" ? (
+  return isCircle(node) ? (
     <circle r={48} fill={PALETTE.paper} stroke={PALETTE.ink} strokeWidth={3} />
   ) : (
     <rect
@@ -30,5 +33,6 @@ function Marker({ node }: HallArtProps) {
 export const markerArt: HallArt = {
   Component: Marker,
   box: { width: 100, height: 100 },
+  variant: (node) => variantOf(isCircle(node)),
   provenance,
 };

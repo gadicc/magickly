@@ -4,7 +4,7 @@ import {
   type HallArtProps,
 } from "@magick-components/gd/hall";
 import { stringAttr } from "@magick-components/gd/hall/attributes";
-import Lamen from "../components/lamen";
+import Lamen, { LAMEN_OFFICERS } from "../components/lamen";
 
 const fallback = defaultHallArt.get("lamen") as HallArt;
 
@@ -31,6 +31,12 @@ function HallLamen(props: HallArtProps) {
 export const lamenArt: HallArt = {
   Component: HallLamen,
   box: { width: 100, height: 100 },
+  // A role `Lamen` does not know draws its plain lamen, whatever the name.
+  variant: (node) => {
+    const role = stringAttr(node, "role", 200);
+    if (role === undefined || role === "") return "";
+    return LAMEN_OFFICERS.has(role) ? role : "?";
+  },
   provenance: {
     origin: "thirdParty",
     author:

@@ -97,6 +97,17 @@ export interface HallArt {
   fit?: "box" | "squares";
   /** Attributes this art reads beyond the common placeable ones. */
   attributes?: ReadonlyMap<string, HallAttrSpec>;
+  /**
+   * What tells this node's drawing apart from another's: the values
+   * `Component` reads from the node, normalised as it reads them (a
+   * colour as the colour it draws, an unknown value as the default).
+   * The renderer draws each variant once per hall in `<defs>` and places
+   * it with `<use>` (the box is part of the key already), so a hall of
+   * many chalices carries one chalice. Return `""` for art that draws
+   * every node alike. Never return raw untrusted text the art does not
+   * draw: every distinct value is a drawing in the SVG.
+   */
+  variant: (node: HallNode) => string;
   provenance: HallArtProvenance;
 }
 

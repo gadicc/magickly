@@ -325,6 +325,7 @@ describe("validateHall", () => {
         {
           Component: () => null,
           box: { width: 1, height: 1 },
+          variant: () => "",
           provenance: { origin: "thirdParty", author: "?", licence: "?" },
         },
       ],
@@ -336,6 +337,7 @@ describe("validateHall", () => {
           attributes: new Map([
             ["element", { kind: "enum", values: ["earth"] }],
           ]),
+          variant: () => "",
           provenance: {
             origin: "original",
             author: "Gadi Cohen",
@@ -348,6 +350,7 @@ describe("validateHall", () => {
         {
           Component: () => null,
           box: { width: 1, height: 1 },
+          variant: () => "",
           provenance: { origin: "original", author: "x", licence: "MIT" },
         },
       ],
@@ -356,6 +359,7 @@ describe("validateHall", () => {
         {
           Component: () => null,
           box: { width: 1, height: 1 },
+          variant: () => "",
           provenance: { origin: "original", author: "x", licence: "MIT" },
         },
       ],
@@ -387,6 +391,7 @@ describe("validateHall", () => {
       Component: () => null,
       box: { width: 1, height: 1 },
       attributes: new Map(attributes),
+      variant: () => "",
       provenance: { origin: "original", author: "x", licence: "MIT" },
     });
     const art = new Map<string, HallArt>([
@@ -585,6 +590,7 @@ describe("validateHall", () => {
             {
               Component: () => null,
               box: { width: 1, height: 1 },
+              variant: () => "",
               provenance: { origin: "original", author: "x", licence: "MIT" },
             },
           ],

@@ -15,20 +15,9 @@
 <stop offset="1" stop-color="#000000">
 </stop>
 </linearGradient>
-</defs>
-<rect x="-151.81" y="-520.81" width="1903.62" height="2532.99" fill="#ffffff">
-</rect>
-<g>
-<rect x="-31" y="-400" width="1662" height="2031" fill="url(#_R_0_-wall)" stroke="#000000" stroke-width="16">
-</rect>
-<rect x="0" y="0" width="1600" height="1600" fill="url(#_R_0_-checker)" stroke="#000000" stroke-width="14">
-</rect>
-<rect x="1300" y="1584" width="200" height="63" fill="#ffffff">
-</rect>
-</g>
-<g transform="translate(957 -6) scale(1.6)">
+<g id="_R_0_-art0">
 <defs>
-<linearGradient id="_R_0_-1-0-fill" x1="-38" x2="38" y1="0" y2="0" gradientUnits="userSpaceOnUse">
+<linearGradient id="_R_0_-art0-fill" x1="-38" x2="38" y1="0" y2="0" gradientUnits="userSpaceOnUse">
 <stop offset="0" stop-color="#e0e0e0">
 </stop>
 <stop offset="1" stop-color="#ffffff">
@@ -43,7 +32,7 @@
 </circle>
 <circle cx="44" cy="-37" r="4.5" fill="#ffe600" stroke="#000000" stroke-width="0.6">
 </circle>
-<path d="M-38,-37H38V27L0,49L-38,27Z" fill="url(#_R_0_-1-0-fill)" stroke="#000000" stroke-width="1.5">
+<path d="M-38,-37H38V27L0,49L-38,27Z" fill="url(#_R_0_-art0-fill)" stroke="#000000" stroke-width="1.5">
 </path>
 <line x1="-38" x2="-38" y1="-37" y2="-22" stroke="#d92128" stroke-width="3.4" stroke-linecap="round">
 </line>
@@ -64,9 +53,9 @@
 <path d="M-7,-3H7V1.5H2.5V10H-2.5V1.5H-7Z" fill="#f9f9f9">
 </path>
 </g>
-<g transform="translate(400 300) scale(2)">
+<g id="_R_0_-art1">
 <defs>
-<radialGradient id="_R_0_-1-1-glow" cx="0" cy="0" r="40" gradientUnits="userSpaceOnUse">
+<radialGradient id="_R_0_-art1-glow" cx="0" cy="0" r="40" gradientUnits="userSpaceOnUse">
 <stop offset="0" stop-color="#ff0000">
 </stop>
 <stop offset="1" stop-color="#ff0000" stop-opacity="0">
@@ -75,10 +64,10 @@
 </defs>
 <circle r="48.8" fill="#000000" stroke="#cccccc" stroke-width="2.4">
 </circle>
-<polygon points="0,44 -38.105,-22 38.105,-22" fill="url(#_R_0_-1-1-glow)" stroke="#cccccc" stroke-width="5" stroke-linejoin="miter">
+<polygon points="0,44 -38.105,-22 38.105,-22" fill="url(#_R_0_-art1-glow)" stroke="#cccccc" stroke-width="5" stroke-linejoin="miter">
 </polygon>
 </g>
-<g transform="translate(800 300) scale(1.66)">
+<g id="_R_0_-art2">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -90,9 +79,9 @@
 </svg>
 </g>
 </g>
-<g transform="translate(1200 300) scale(2)">
+<g id="_R_0_-art3">
 <defs>
-<radialGradient id="_R_0_-1-3-glow" cx="0" cy="0" r="40" gradientUnits="userSpaceOnUse">
+<radialGradient id="_R_0_-art3-glow" cx="0" cy="0" r="40" gradientUnits="userSpaceOnUse">
 <stop offset="0" stop-color="#ff0000">
 </stop>
 <stop offset="1" stop-color="#ff0000" stop-opacity="0">
@@ -101,22 +90,22 @@
 </defs>
 <circle r="48.8" fill="#ffffff" stroke="#cccccc" stroke-width="2.4">
 </circle>
-<polygon points="0,-44 -38.105,22 38.105,22" fill="url(#_R_0_-1-3-glow)" stroke="#cccccc" stroke-width="5" stroke-linejoin="miter">
+<polygon points="0,-44 -38.105,22 38.105,22" fill="url(#_R_0_-art3-glow)" stroke="#cccccc" stroke-width="5" stroke-linejoin="miter">
 </polygon>
 </g>
-<g transform="translate(800 800) scale(2)">
+<g id="_R_0_-art4">
 <rect x="-50" y="-50" width="100" height="100" fill="#000000">
 </rect>
 </g>
-<g transform="translate(800 764) scale(0.47)">
+<g id="_R_0_-art5">
 <path d="M-8,-50H8V-28H30V-12H8V50H-8V-12H-30V-28H-8Z" fill="#e00000" stroke="#ffe000" stroke-width="3" stroke-linejoin="miter">
 </path>
 </g>
-<g transform="translate(800 824) scale(0.84)">
+<g id="_R_0_-art6">
 <polygon points="0,-38.105 44,38.105 -44,38.105" fill="none" stroke="#ffffff" stroke-width="11" stroke-linejoin="miter">
 </polygon>
 </g>
-<g transform="translate(808 700) scale(1.5)">
+<g id="_R_0_-art7">
 <path d="M-39.5-7.6c-5.4-.3-8.5-1.1-8.5-1.1c0 0 2.4 5 6.1 8.7c-3.7 3.7-6.1 8.7-6.1 8.7c0 0 3.1-.8 8.5-1.1c-2.8 4-4.4 7.3-4.4 7.3c0 0 9.2-2.2 24-2.2c5.4 0 9.8-4.4 9.8-9.9c0-.9-.1-1.9-.4-2.8c.3-.9 .4-1.9 .4-2.8c0-5.5-4.4-9.9-9.8-9.9c-14.8 0-24-2.2-24-2.2c0 0 1.6 3.3 4.4 7.3z" fill="#ff383e">
 </path>
 <path d="M21.6-10.3c2.3 2.3 2.3 6.1 0 8.5c-2.4 2.3-6.2 2.3-8.6 0c-2.3-2.4-5.8-14.4-5.8-14.4c0 0 12 3.5 14.4 5.9z" fill="#51b58b">
@@ -130,7 +119,7 @@
 <path d="M5.8-17.6c-.5 .5-.7 1.3-.5 2c.5 1.8 2.9 9.7 5.2 13.6h-9.5v-1.7c0-1.1-.9-2-2-2c-1.1 0-1.9 .9-1.9 2v1.7h-5.2c0-.3 0-.6 0-.8c0-6.6-5.3-11.9-11.8-11.9c-14.3 0-23.4-2.1-23.5-2.1c-.8-.2-1.6 .1-2 .7c-.5 .6-.6 1.4-.3 2.1c.1 .1 .9 1.7 2.3 4.1c-2.6-.4-4.1-.7-4.1-.7c-.8-.2-1.6 .1-2.1 .7c-.4 .6-.5 1.4-.2 2.1c.1 .2 2.1 4.2 5.2 7.8c-3.1 3.6-5.1 7.6-5.2 7.8c-.3 .7-.2 1.5 .2 2.1c.5 .6 1.3 .9 2.1 .7c0 0 1.5-.3 4.1-.7c-1.4 2.4-2.2 4-2.3 4.1c-.3 .7-.2 1.5 .3 2.1c.4 .6 1.2 .9 2 .7c.1 0 9.1-2.1 23.5-2.1c6.5 0 11.8-5.3 11.8-11.9c0-.2 0-.5 0-.8h5.3c-2.3 3.9-4.7 11.8-5.3 13.6c-.2 .7 0 1.5 .6 2c.5 .5 1.2 .7 1.9 .5c2.1-.6 12.7-3.8 15.2-6.4c1.6-1.5 2.4-3.5 2.4-5.6c0-1.5-.4-2.9-1.1-4.1h4.4v1.7c0 1.1 .9 2 2 2c1.1 0 2-.9 2-2v-1.7h28.7c1.1 0 2-.9 2-2c0-1.1-.9-2-2-2h-9.6v-1.7c0-1.1-.9-2-2-2c-1.1 0-2 .9-2 2v1.7h-10.2c.7-1.2 1.1-2.6 1.1-4.1c0-2.1-.8-4.1-2.3-5.6c-2.6-2.6-13.2-5.8-15.3-6.4c-.7-.2-1.4 0-1.9 .5zm1 20.8c.8 .8 1.2 1.8 1.2 2.9c0 1-.4 2-1.2 2.8c-1 1-5.3 2.7-9.9 4.3c1.5-4.6 3.3-9 4.2-10c.8-.7 1.8-1.2 2.9-1.2c1.1 0 2.1 .5 2.8 1.2zm-26.7-13.9c4.3 0 7.8 3.5 7.8 7.9c0 .7-.1 1.5-.3 2.2c-1 3.3-4.1 5.6-7.5 5.6c-2.5 0-5.1-.9-7.8-2.7c-.4-.4-.9-.7-1.4-1.1c-1-.8-1.9-1.6-2.9-2.6c-1-1-2-2.2-3-3.5c-1-1.2-1.9-2.4-2.9-3.8c-.8-1.2-1.6-2.4-2.2-3.5c4.1 .7 11.1 1.5 20.2 1.5zm-20.7 5.1c.8 1.1 1.6 2.2 2.4 3.2c.7 .9 1.4 1.6 2.1 2.4c-.4 .4-.7 .8-1.1 1.2c-1-.6-2.1-1.5-3.3-2.6c-1.4-1.5-2.7-3.1-3.6-4.6c1 .1 2.2 .3 3.5 .4zm-1.2 8.4c.7 .6 1.4 1.1 2.1 1.5c-.3 .5-.6 .9-.9 1.3c-1.3 .1-2.5 .3-3.5 .4c.6-1 1.4-2.1 2.3-3.2zm21.9 7.9c-9.1 0-16.1 .8-20.2 1.5c.6-1.1 1.4-2.3 2.2-3.5c1-1.4 1.9-2.6 2.9-3.8c.5-.7 1.1-1.4 1.7-2.1c.6 .5 1.1 1 1.7 1.5c.6 .4 1.1 .9 1.7 1.2c3.3 2.3 6.7 3.5 10 3.5c2.4 0 4.8-.8 6.7-2.1c-1.4 2.3-3.9 3.8-6.7 3.8zm40-19.6c.8 .8 1.2 1.8 1.2 2.8c0 1.1-.4 2.1-1.2 2.9c-.7 .7-1.7 1.2-2.8 1.2c-1.1 0-2.1-.5-2.8-1.2c-1-1-2.8-5.4-4.3-10c4.6 1.6 9 3.3 9.9 4.3z" fill="#000000">
 </path>
 </g>
-<g transform="translate(700 770) scale(0.62)">
+<g id="_R_0_-art8">
 <path d="M-3.6-48.6c2.7-.5 5.6-.5 8.2 0c3 .5 6.1 1.4 8.3 3c2.1 1.6 3.4 3.9 4.1 6.1c.6 2 1 4.2 0 6.1c-.8 1.3-4.1 3-4.1 3v6.1h-24.7v-6.1c0 0-3.4-1.7-4.1-3c-1.1-1.9-.6-4.1 0-6.1c.7-2.2 1.9-4.5 4.1-6.1c2.2-1.6 5.2-2.5 8.2-3z" fill="#000000" fill-rule="evenodd" stroke="#000000" stroke-width="0.2">
 </path>
 <path d="M-11.8-28l24.7 1.8" fill="#000000" fill-rule="evenodd" stroke="#000000" stroke-width="0.23">
@@ -194,7 +183,7 @@
 <path d="M-2.8-49.6c-1.1 0-2 .3-2 .6c0 .1 .1 .2 .2 .3c.3-.2 1.1-.4 2-.4c.8 0 1.4 .1 1.8 .3c.1-.1 .1-.1 .1-.2c0-.3-.9-.6-2.1-.6z" fill="#4d4d4d" opacity="0.7">
 </path>
 </g>
-<g transform="translate(705 834) scale(0.67)">
+<g id="_R_0_-art9">
 <path d="M-42.2 44.5c4.9 3.2 20.8 14.3 61.3-28.9c40.4-43.2 28-53.4 24.6-57c-3.4-3.7-33.1-18.8-69.8 15.3c-35.4 33-16.1 70.6-16.1 70.6z" fill="#eaad6a">
 </path>
 <path d="M-33.9 23.2c0 0 3.4 3.2 6.1 .5c2.8-2.7-.3-5-.3-5l-14.6-18.4l-3.4 8.4zm47.9-46.8c0 0 3.3 3.2 6.1 .5c2.7-2.7-.3-5-.3-5l-13-16.8l-7.8 2.4zm-29.7 17.6c0 0 3.3 3.2 6.1 .5c2.7-2.7-.3-5-.3-5l-13.9-17.7l-5.2 5.6z" fill="#ffc661">
@@ -218,7 +207,7 @@
 <path d="M-39.5 30.9m-2 0c0 1.1 .9 1.9 2 1.9c1 0 1.9-.8 1.9-1.9c0-1.1-.9-1.9-1.9-1.9c-1.1 0-2 .8-2 1.9z" fill="#004364">
 </path>
 </g>
-<g transform="translate(900 800) scale(0.94)">
+<g id="_R_0_-art10">
 <path d="M1.4-40.3c-.4-2.1 .3-5.8-.4-8.2c-.8-.8-2.2-.4-2.4 .9c0 2.4 .2 5.5-.1 7.3c-.5 0-.3-1.1-.3-1.6c0-3.1-.5-7.8 1.7-7.7c2.2 0 2.1 4.3 1.9 8.2c0 .5 .1 1.1-.4 1.1z" fill="#e7e7e8" fill-rule="evenodd">
 </path>
 <path d="M1.1-39.4h-2.2c-.1-.5 0-1.4 0-2.4c.9-2 2.8-.2 2.2 2.4z" fill="#e7e7e8" fill-rule="evenodd">
@@ -318,7 +307,7 @@
 <path d="M2-40.5c0 .6-.9 .2-.7 .9c.1 .4 .7 .5 1.2 .7c3.1 1.1 6.6 2.5 9.8 3.7c.1 .3 0 .4 0 .9h2c.2 .4 .1 1.6 0 2.2c-1.8 .2-3.8 0-5.7 .1c.8 1 1.7 1.6 2.6 2.4c.9 .8 1.8 1.6 2.7 2.3c1.8 1.5 3.5 3.4 5.4 4.9c1.8 1.5 3.5 3.3 5.4 4.7c1.4 1.1 2.7 2.3 4.1 3.6c.4 .3 .9 .7 1.2 1.2c-.9 .2-1.7 1.2-2.5 1.1c-.7-.1-1.1-1.2-1.8-1.5c-1 0-2 0-3.2 0c.1 6.2 .1 10.6 .1 17.7c0 5.8 0 11.8 0 16.3c0 4.8 0 9.5 0 13.2c.1 3.4 .1 6.9 .1 11.6c.7 .2 1.7 0 2.5 .1c0 1.3 .1 2.5 0 4.1c-10.7 .1-20 .1-30.4 .1c-6.4 0-13.1 .2-19.5 .2c0-1.7-.1-2.7 0-4.1c1-.1 1.6-.1 2.3-.1c.1-18.5 0-39.8 0-58.8c-1 0-1.9-.4-2.9-.1c-.8 .2-1.4 1.5-2.1 1.6c-.9 .2-1.6-.9-2.6-.9c1.2-1.5 2.6-2.5 4-3.7c2.2-1.9 4.5-4.2 6.7-6.2c3.7-3.2 7.3-6.3 10.8-9.7c-2.1-.1-4 .1-5.7 0c0-.6 0-1.4 0-2.2c.5-.2 1.2 0 1.8-.1c.3 0 0-.5 .1-.8c2.9-1.3 6.5-2.5 9.7-3.8c.4-.2 1.2-.3 1.2-.7c.1-.7-.3-.3-.6-.5c.2-1.6-.2-4.9 0-6.9c.1-1.8 1-3.4 2.5-2.9c.4 .2 .5 .7 1 1c.8 1.8 .4 5.5 .5 8.4zm-.2-.9c.2-3.9 .3-8.2-1.9-8.2c-2.2-.1-1.7 4.6-1.7 7.7c0 .5-.2 1.6 .3 1.6c.3-1.8 .1-4.9 .1-7.3c.2-1.3 1.6-1.7 2.4-.9c.7 2.4 0 6.1 .4 8.2c.5 0 .4-.6 .4-1.1zm-2.4-7.1c-.2 .2-.4 .5-.5 .8c0 2-.1 3.7 0 5.5c.3-1.2 1.8-.9 2.2 0c-.2-2 .9-7-1.7-6.3zm-.5 6.7c0 1-.1 1.9 0 2.4h2.2c.6-2.6-1.3-4.4-2.2-2.4zm4.7 3.7c-.8-.4-1.7-.9-2.5-1c-2.3-.3-3.7 .5-5.3 1.1c-2.2 .9-4.6 1.8-6.8 2.8c7.3-.1 14.9 .1 22.1-.1c-2.4-1-5-1.9-7.5-2.8zm7.4 3.2c-2.7 .2-6.4 0-9.8 0c-3.8 0-8 .1-11.3 0c-.7 0-1.5-.2-2.1 .3c.3 .6 .9 .4 1.4 .3c1.2 0 2.8-.1 4.2 0c5.7 0 11.7 .2 18.1 0c.2-.1 .6 .2 .7-.3c-.3-.6-.8-.3-1.2-.3zm-5.2 1c-2.8 0-5.7-.1-8.8 0c-3.4 0-8.2 0-11 0c-.1 .4 0 1.1 0 1.6c8.3-.2 18.8 .2 28.2-.2c-.1-.4 0-1.1-.1-1.4c-2.5-.2-5.7 0-8.3 0zm-13.9 1.9c-3.6 3.3-7.3 6.8-11 10c-2 1.7-3.8 3.5-5.9 5.1c-1.4 1.6-3.1 2.7-4.5 4.3c1 .5 1.6-1.1 2.4-1.6c6.7-5.8 13.3-11.7 19.8-17.8c-.2 0-.5 0-.8 0zm1.3 0c-6.5 6-13.2 11.8-19.7 17.8c4.2 0 7-.1 11-.1c3.3-5.9 6.6-11.8 10-17.7c-.5 0-.9 0-1.3 0zm1.6 0c-3.7 6.3-7.3 12.7-10.8 19.1h2.5c1.7-3.2 3.4-6.4 5.2-9.6c1.7-3.2 3.6-6.2 5.3-9.5c-.7 0-1.5 0-2.2 0zm2.5 0c-.9 1.9-2 3.6-3 5.4c-.1 0-.1 .1-.2 .1c.1 .6-.4 .3-.3 .9c-.6 .4-.7 1.4-1.3 1.9c-1.3 2.9-3 5.5-4.4 8.2c-.5 .9-1 1.8-1.4 2.8c.6 .2 .6-1 1-1.2c3.2-6.2 6.8-11.9 10-18.1h-.4zm.7 0c-3.2 5.8-6.6 11.6-9.7 17.6c7.8 0 15.5 0 23.4 0c-1.4-3.2-3.2-5.9-4.8-8.8c-1.6-2.9-3.2-5.9-4.9-8.8c-1.3 0-2.6 0-4 0zm4.4 .2c1.3 2.4 2.7 4.7 3.9 7.3c2.2 3.1 4.1 7.4 6.1 10.7c.3 .4 .6 1.3 1.1 .9c-.2-.3-.3-.7-.6-.9c-2.8-5.3-6-10.6-8.9-16c-.5-.7-1.1-2.3-1.6-2.2c0 .1 0 .2 0 .2zm11.4 18.9c.9-.1 1.7 0 2.4-.1c-3.6-6.5-7.4-12.5-10.9-19c-.8 0-1.7-.1-2.3 .1c3.5 6.4 7.1 12.7 10.8 19zm-5.7-14.5c.8 1.3 1.7 2.7 2.5 4.3c1.2 2.1 2.5 4.2 3.8 6.4c.3 .7 1 2 1.3 2.2c.5 .3 1.5 0 2.3 0c2.5 .2 5.9-.1 8.7 0c-3.3-3-6.7-5.6-10-8.8c-1.5-1.5-3.3-2.8-5-4.3c-.7-.7-1.6-1.5-2.5-2.3c-1-.8-2.2-2.5-3.7-2c.8 1.5 1.7 2.9 2.6 4.5zm4.6 .4c.9 .8 1.9 1.4 2.8 2.2c.9 .9 1.7 1.8 2.6 2.6c.9 .8 1.9 1.5 2.9 2.3c.8 .7 1.7 1.7 2.6 2.5c1.3 1.1 2.8 2.2 4.2 3.4c.7 .7 1.2 1.5 1.8 1.1c-2.6-2.7-5.4-4.8-8-7.2c-.9-.8-1.9-1.6-2.8-2.3c-1.8-1.5-3.5-3.3-5.4-4.9c-1.8-1.5-3.6-3.2-5.4-4.7c-.2 0-.7-.1-.8 .1c1.9 1.4 3.6 3.2 5.5 4.9zm3.2 13c.2 .6 .8 .4 1.2 .4c3.3 0 5.4-.1 8.9-.1c.3 0 .8 .2 .9-.4c-4.1-.3-6.9-.1-11 .1zm-5.8-.1c-8.2 0-13.5 0-21.1 0c-.4 0-1.1-.2-1.2 .5c8 0 15 0 24.5 0c-.6-.9-1.5-.5-2.2-.5zm-36.9 .4c.3 .7 1.1 .2 1.6 .2c2.2 0 5 .1 7.6 0c.6 0 1.5 .3 1.8-.5c-3.1 .1-7.7-.2-11 .3zm53.8 .1c.5 .3 1.2 1.7 1.7 .8c-.5-.3-.9-1-1.5-1.3c0 .2-.2 .2-.2 .5zm-55.6 1.4c.7 .4 1.2-.7 1.8-1.2c-.1-.1-.2-.2-.3-.4c-.5 .5-1.1 .9-1.5 1.6zm56.6-.2c-.6-.4-1-1.3-1.9-.9c.6 .3 1.2 1.7 1.9 .9zm-40.9 0c-.2 .2-.5 .2-.8 .1c-.2 .1-.6 0-1 .1c-.3 0-.9 0-.2 0c.6 .1 1.4 0 2.2 0c.2-.3 .5-.5 .6-1c-.4-.2-.6 .4-.8 .8zm1.9-.8c-.2 4-.1 8.8-.1 13.2c0 5.2 .1 11.4 .1 14.2c0 8 0 20.8 0 31.5c8.6 0 13.8-.1 22.3-.1c0-4.6-.1-10-.1-15.1c0-4.3 0-9.5 0-14.6c0-10.5-.1-17.9-.1-29.2c-7.3 .1-14.8-.1-22.1 .1zm23.4 1c-.2-.4-.4-.7-.5-1.1h-.5c.3 .4 .6 1.5 1 1.1zm.2 0h.6c-.2-.4-.5-.5-.6-1.1c-.1 .1-.4-.1-.5 .1c.2 .3 .4 .6 .5 1zm3.7-1.1c0 .3 .2 .8-.3 .9c-.3 .1-.1 .5-.5 .7c-.8 .4-2.4-.2-3.4 .1c-.3-.3-.4-1-.8-1.2c0 11.8 .1 18.1 .1 28.7c0 11 0 22.5 .1 29.7h11c0-10.1-.1-21.8-.1-29.6c0-9.1 0-20.9 0-29.3c-2 0-4 0-6.1 0zm-38.5 .2c-.1 2.4 0 5 0 7.2c0 6.3 0 14 0 22.7c0 5.4 .1 9.1 .1 14.8c0 5.4 0 10 0 14.2c4.3 0 6.8 0 10.9-.2c0-5.2 0-8.7 0-13.9c0-5.2 0-9.4 0-13.5c-.1-10-.1-20.5-.1-30.9c-.3 .1-.4 1-.8 1.1c-.5 .2-2.8 .3-3.2 0c-.3-.1-.3-.6-.3-.6c-.4-.4-.7 0-.8-.4c0-.4 .3-.2 .2-.6c-2.1 0-4.7-.1-6 .1zm9.9 1c.1 .1 .2 .1 .3 .1c.1-.5 .5-.7 .6-1.2h-.5c0 .5-.4 .6-.4 1.1zm-15.5 .2c.8 .2 1.3-.7 1.9-1.1c-.9-.2-1.5 .4-1.9 1.1zm42.1-.4c-.2 0-.5-.1-.6 .1c.2-.1 .5 .1 .6-.1zm-1.6 58.3v3.4c3.9 .1 7.4 0 12.3-.1c0-1.3 0-2.1 0-3.4c-4 .1-9.2 0-12.3 .1zm-7.6 0c-6.6 0-11.9 0-17.3 .1v3.4c8.7 .1 15 .1 24.7-.1c0-1.3 0-2.3 0-3.4c-2.2 0-4.7 0-7.4 0zm-29.6 .1c0 .1-.1 .1-.1 .3v3.3c1.6 0 4 0 6.2 0c1.8-.1 3.7-.1 6-.1v-3.5z" fill="#000000" fill-rule="evenodd">
 </path>
 </g>
-<g transform="translate(800 910) scale(0.7)">
+<g id="_R_0_-art11">
 <path d="M31.7-41.7h-63.4v13.4h63.4z" fill="#ffe100">
 </path>
 <path d="M33.3-41.7h-66.6c-1.9 0-3.4-1.5-3.4-3.3c0-1.8 1.5-3.3 3.4-3.3h66.6c1.9 0 3.4 1.5 3.4 3.3c0 1.8-1.5 3.3-3.4 3.3" fill="#ffe100">
@@ -380,7 +369,7 @@
 <path d="M-5 1.7c-9.2 0-16.7-7.5-16.7-16.7c0-1 .7-1.7 1.7-1.7c1 0 1.7 .7 1.7 1.7c0 7.3 6 13.3 13.3 13.3c1 0 1.7 .7 1.7 1.7c0 1-.7 1.7-1.7 1.7z" fill="#000000">
 </path>
 </g>
-<g transform="translate(105 800) scale(1.66)">
+<g id="_R_0_-art12">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -392,7 +381,7 @@
 </svg>
 </g>
 </g>
-<g transform="translate(1495 800) scale(1.66)">
+<g id="_R_0_-art13">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -404,11 +393,11 @@
 </svg>
 </g>
 </g>
-<g transform="translate(800 1450) scale(100)">
+<g id="_R_0_-art14">
 <rect x="-2" y="-1.5" width="4" height="3" fill="#ffffff" stroke="#000000" stroke-width="0.06">
 </rect>
 </g>
-<g transform="translate(800 1450) scale(1.66)">
+<g id="_R_0_-art15">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -420,7 +409,7 @@
 </svg>
 </g>
 </g>
-<g transform="translate(480 1430) scale(1.6)">
+<g id="_R_0_-art16">
 <polyline points="-38,-37 0,-61 38,-37" fill="none" stroke="#252524" stroke-width="2.5" stroke-linejoin="round">
 </polyline>
 <rect x="-43" y="-39" width="86" height="4" fill="#ffe600" stroke="#000000" stroke-width="0.6">
@@ -446,7 +435,7 @@
 <path d="M-2.3,-2.4H2.3V2H7V7H2.3V15.5H-2.3V7H-7V2H-2.3Z" fill="#ff0000" stroke="#ffe600" stroke-width="0.6">
 </path>
 </g>
-<g transform="translate(1400 1500) scale(1.66)">
+<g id="_R_0_-art17">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -470,7 +459,7 @@
 </svg>
 </g>
 </g>
-<g transform="translate(1400 1715) scale(1.66)">
+<g id="_R_0_-art18">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -482,7 +471,7 @@
 </svg>
 </g>
 </g>
-<g transform="translate(160 -146.06) scale(2.31)">
+<g id="_R_0_-art19">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:red;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -494,7 +483,7 @@
 </svg>
 </g>
 </g>
-<g transform="translate(480 -146.06) scale(2.31)">
+<g id="_R_0_-art20">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:yellow;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -506,7 +495,7 @@
 </svg>
 </g>
 </g>
-<g transform="translate(800 -146.06) scale(2.31)">
+<g id="_R_0_-art21">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:red;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -518,7 +507,7 @@
 </svg>
 </g>
 </g>
-<g transform="translate(1120 -146.06) scale(2.31)">
+<g id="_R_0_-art22">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:#f2f2f2;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -530,7 +519,7 @@
 </svg>
 </g>
 </g>
-<g transform="translate(1440 -146.06) scale(2.31)">
+<g id="_R_0_-art23">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:#48f;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -542,6 +531,65 @@
 </svg>
 </g>
 </g>
+</defs>
+<rect x="-151.81" y="-520.81" width="1903.62" height="2532.99" fill="#ffffff">
+</rect>
+<g>
+<rect x="-31" y="-400" width="1662" height="2031" fill="url(#_R_0_-wall)" stroke="#000000" stroke-width="16">
+</rect>
+<rect x="0" y="0" width="1600" height="1600" fill="url(#_R_0_-checker)" stroke="#000000" stroke-width="14">
+</rect>
+<rect x="1300" y="1584" width="200" height="63" fill="#ffffff">
+</rect>
+</g>
+<use href="#_R_0_-art0" transform="translate(957 -6) scale(1.6)">
+</use>
+<use href="#_R_0_-art1" transform="translate(400 300) scale(2)">
+</use>
+<use href="#_R_0_-art2" transform="translate(800 300) scale(1.66)">
+</use>
+<use href="#_R_0_-art3" transform="translate(1200 300) scale(2)">
+</use>
+<use href="#_R_0_-art4" transform="translate(800 800) scale(2)">
+</use>
+<use href="#_R_0_-art5" transform="translate(800 764) scale(0.47)">
+</use>
+<use href="#_R_0_-art6" transform="translate(800 824) scale(0.84)">
+</use>
+<use href="#_R_0_-art7" transform="translate(808 700) scale(1.5)">
+</use>
+<use href="#_R_0_-art8" transform="translate(700 770) scale(0.62)">
+</use>
+<use href="#_R_0_-art9" transform="translate(705 834) scale(0.67)">
+</use>
+<use href="#_R_0_-art10" transform="translate(900 800) scale(0.94)">
+</use>
+<use href="#_R_0_-art11" transform="translate(800 910) scale(0.7)">
+</use>
+<use href="#_R_0_-art12" transform="translate(105 800) scale(1.66)">
+</use>
+<use href="#_R_0_-art13" transform="translate(1495 800) scale(1.66)">
+</use>
+<use href="#_R_0_-art14" transform="translate(800 1450) scale(100)">
+</use>
+<use href="#_R_0_-art15" transform="translate(800 1450) scale(1.66)">
+</use>
+<use href="#_R_0_-art16" transform="translate(480 1430) scale(1.6)">
+</use>
+<use href="#_R_0_-art17" transform="translate(1400 1500) scale(1.66)">
+</use>
+<use href="#_R_0_-art18" transform="translate(1400 1715) scale(1.66)">
+</use>
+<use href="#_R_0_-art19" transform="translate(160 -146.06) scale(2.31)">
+</use>
+<use href="#_R_0_-art20" transform="translate(480 -146.06) scale(2.31)">
+</use>
+<use href="#_R_0_-art21" transform="translate(800 -146.06) scale(2.31)">
+</use>
+<use href="#_R_0_-art22" transform="translate(1120 -146.06) scale(2.31)">
+</use>
+<use href="#_R_0_-art23" transform="translate(1440 -146.06) scale(2.31)">
+</use>
 <g font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">
 <g>
 <text x="800" y="191.68" font-size="43" text-anchor="middle">Hegemon</text>

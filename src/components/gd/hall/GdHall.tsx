@@ -20,7 +20,7 @@ import {
   WALL_GAP,
   WALL_STROKE,
 } from "./layout";
-import type { HallArtRegistry, HallNode } from "./types";
+import type { HallArt, HallArtRegistry, HallNode } from "./types";
 
 /** SVG user units per checker square: text stays at a large font size. */
 const UNIT = 100;
@@ -151,30 +151,85 @@ function Inner({ label }: { label: ResolvedLabel }) {
   );
 }
 
+/**
+ * One drawing in the hall's `<defs>`: the first object drawn with it, and
+ * its art (none for the placeholder).
+ */
+interface ArtDefinition {
+  id: string;
+  object: ResolvedObject;
+  art?: HallArt;
+}
+
+/**
+ * The hall's distinct drawings and which one each object uses. Objects
+ * whose art, box and variant agree share one drawing, placed with `<use>`,
+ * so a drawing's size counts once per hall however many nodes use it
+ * (plan 061, decision 12). Ids follow the objects' order, so they are the
+ * same on the server and the client.
+ */
+function artDefinitions(
+  objects: readonly ResolvedObject[],
+  art: HallArtRegistry,
+  id: string,
+) {
+  const definitions = new Map<string, ArtDefinition>();
+  const uses = new Map<ResolvedObject, string>();
+  for (const object of objects) {
+    if (object.text) continue;
+    const drawn = object.missing ? undefined : art.get(object.artKey);
+    const key = drawn
+      ? JSON.stringify([
+          "art",
+          object.artKey,
+          object.box.width,
+          object.box.height,
+          drawn.variant(object.node),
+        ])
+      : JSON.stringify(["placeholder", object.artKey]);
+    let definition = definitions.get(key);
+    if (!definition) {
+      definition = { id: `${id}-art${definitions.size}`, object, art: drawn };
+      definitions.set(key, definition);
+    }
+    uses.set(object, definition.id);
+  }
+  return { definitions: [...definitions.values()], uses };
+}
+
+/** A drawing in `<defs>`, centred on the origin in its art units. */
+function ArtDefinitionGroup({ definition }: { definition: ArtDefinition }) {
+  const { id, object, art } = definition;
+  return (
+    <g id={id}>
+      {art ? (
+        <art.Component
+          node={object.node}
+          box={object.box}
+          defId={(name) => `${id}-${name}`}
+        />
+      ) : (
+        <Placeholder name={object.artKey} />
+      )}
+    </g>
+  );
+}
+
+/** An object: its drawing placed and scaled, and any text over it. */
 function HallObject({
   object,
-  art,
-  defId,
+  use,
 }: {
   object: ResolvedObject;
-  art: HallArtRegistry;
-  defId: (name: string) => string;
+  use: string | undefined;
 }): ReactNode {
-  if (object.text) return null;
-  const drawn = object.missing ? undefined : art.get(object.artKey);
-  const transform = `translate(${u(object.cx)} ${u(object.cy)}) scale(${svgCoordinate(object.k * UNIT)})`;
-  if (!drawn)
-    return (
-      <g transform={transform}>
-        <Placeholder name={object.artKey} />
-      </g>
-    );
-  const { Component } = drawn;
+  if (object.text || use === undefined) return null;
   return (
     <>
-      <g transform={transform}>
-        <Component node={object.node} box={object.box} defId={defId} />
-      </g>
+      <use
+        href={`#${use}`}
+        transform={`translate(${u(object.cx)} ${u(object.cy)}) scale(${svgCoordinate(object.k * UNIT)})`}
+      />
       {object.inner && <Inner label={object.inner} />}
     </>
   );
@@ -204,6 +259,10 @@ export function GdHall({
       ? hall
       : EMPTY_HALL;
   const resolved = useMemo(() => resolveHall(root, { art }), [root, art]);
+  const { definitions, uses } = useMemo(
+    () => artDefinitions(resolved.objects, art, id),
+    [resolved, art, id],
+  );
   const fontCss = useMemo(
     () =>
       fontBaseUrl === undefined ? undefined : gdHallFontFaceCss(fontBaseUrl),
@@ -259,6 +318,9 @@ export function GdHall({
             <stop offset={1} stopColor={PALETTE.ink} />
           </linearGradient>
         )}
+        {definitions.map((definition) => (
+          <ArtDefinitionGroup key={definition.id} definition={definition} />
+        ))}
       </defs>
       <rect
         x={u(viewBox.x0)}
@@ -272,8 +334,7 @@ export function GdHall({
         <HallObject
           key={object.path.join(".")}
           object={object}
-          art={art}
-          defId={(name) => `${id}-${object.path.join("-")}-${name}`}
+          use={uses.get(object)}
         />
       ))}
       <g

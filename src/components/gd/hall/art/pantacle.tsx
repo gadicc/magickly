@@ -3,7 +3,7 @@ import { GD_HALL_FONT_STACKS } from "../fonts";
 import { hebrewFont, labelFont, type TextMeasure } from "../labels";
 import type { HallArt } from "../types";
 import { points } from "./geometry";
-import { original, PALETTE } from "./shared";
+import { original, PALETTE, sameForEveryNode } from "./shared";
 
 export const provenance = {
   ...original(
@@ -223,5 +223,6 @@ function Pantacle() {
 export const pantacleArt: HallArt = {
   Component: Pantacle,
   box: { width: 100, height: 100 },
+  variant: sameForEveryNode,
   provenance,
 };

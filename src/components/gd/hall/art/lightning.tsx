@@ -1,8 +1,8 @@
 import { enumAttr } from "../attributes";
-import type { HallArt, HallArtProps } from "../types";
+import type { HallArt, HallArtProps, HallNode } from "../types";
 import { HALL_COLOURS } from "../vocabulary";
 import { points } from "./geometry";
-import { original, PALETTE } from "./shared";
+import { original, PALETTE, variantOf } from "./shared";
 
 export const provenance = {
   ...original(
@@ -28,11 +28,14 @@ const ZIGZAG: readonly (readonly [number, number])[] = [
 
 const COLOUR_NAMES = [...HALL_COLOURS.keys()];
 
-function Lightning({ node }: HallArtProps) {
-  // `stroke` names a colour, so the flash shows on the black altar too.
+/** `stroke` names a colour, so the flash shows on the black altar too. */
+const inkOf = (node: HallNode) => {
   const name = enumAttr(node, "stroke", COLOUR_NAMES);
-  const ink =
-    name === undefined ? PALETTE.ink : (HALL_COLOURS.get(name) as string);
+  return name === undefined ? PALETTE.ink : (HALL_COLOURS.get(name) as string);
+};
+
+function Lightning({ node }: HallArtProps) {
+  const ink = inkOf(node);
   return (
     <g stroke={ink} strokeWidth={STROKE} fill="none">
       <polyline points={points(ZIGZAG)} strokeLinejoin="miter" />
@@ -57,5 +60,6 @@ function Lightning({ node }: HallArtProps) {
 export const lightningArt: HallArt = {
   Component: Lightning,
   box: { width: 45.1, height: 100 },
+  variant: (node) => variantOf(inkOf(node)),
   provenance,
 };

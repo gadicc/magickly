@@ -25,6 +25,17 @@ const CROSS_LAMENS: ReadonlyMap<string, CrossLamenColours> = new Map([
   ["pastHierophant", { ring: "#f2f2f2", disc: "green", cross: "red" }],
 ]);
 
+/** The officers whose lamen `Lamen` draws; any other draws the same plain one. */
+export const LAMEN_OFFICERS: ReadonlySet<string> = new Set([
+  ...CROSS_LAMENS.keys(),
+  "hegemon",
+  "hiereus",
+  "stolistes",
+  "dadouchos",
+  "keryx",
+  "sentinel",
+]);
+
 const TipharethCalvaryCross = ({
   style,
   scale = 7.5,

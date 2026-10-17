@@ -1,5 +1,5 @@
 import type { HallArt } from "../types";
-import { original, PALETTE } from "./shared";
+import { original, PALETTE, sameForEveryNode } from "./shared";
 
 export const provenance = original(
   "The altar's black double cube seen from above: a square, as in the drawings.",
@@ -11,5 +11,6 @@ export const altarArt: HallArt = {
     <rect x={-50} y={-50} width={100} height={100} fill={PALETTE.ink} />
   ),
   box: { width: 100, height: 100 },
+  variant: sameForEveryNode,
   provenance,
 };

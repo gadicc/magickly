@@ -2,6 +2,7 @@ import type {
   HallArt,
   HallArtProps,
   HallArtProvenance,
+  HallNode,
 } from "@magick-components/gd/hall";
 import { enumAttr } from "@magick-components/gd/hall/attributes";
 import { HALL_COLOURS } from "@magick-components/gd/hall/vocabulary";
@@ -47,6 +48,7 @@ function glassOf(name: string): string {
 const art = (drawing: LegacyDrawing, source: string): HallArt => ({
   Component: () => <LegacyPaths drawing={drawing} />,
   box: drawing.box,
+  variant: () => "",
   provenance: lifted(source),
 });
 
@@ -55,19 +57,20 @@ const art = (drawing: LegacyDrawing, source: string): HallArt => ({
  * (`g2-6`); the drawings' unglazed lanterns are stretched copies of it
  * (`g49`). The panes take `fill`, a named colour, mixed with white.
  */
-const lampArt = (defaultGlass: string, source: string): HallArt => ({
-  Component: ({ node }: HallArtProps) => {
+const lampArt = (defaultGlass: string, source: string): HallArt => {
+  const glass = (node: HallNode) => {
     const name = enumAttr(node, "fill", COLOUR_NAMES);
-    return (
-      <LegacyPaths
-        drawing={lamp}
-        glass={name === undefined ? defaultGlass : glassOf(name)}
-      />
-    );
-  },
-  box: lamp.box,
-  provenance: lifted(source),
-});
+    return name === undefined ? defaultGlass : glassOf(name);
+  };
+  return {
+    Component: ({ node }: HallArtProps) => (
+      <LegacyPaths drawing={lamp} glass={glass(node)} />
+    ),
+    box: lamp.box,
+    variant: glass,
+    provenance: lifted(source),
+  };
+};
 
 /** The legacy items by registry key, for the app's art registry. */
 export const legacyHallArt: ReadonlyMap<string, HallArt> = new Map([

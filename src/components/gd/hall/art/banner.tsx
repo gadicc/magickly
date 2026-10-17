@@ -1,7 +1,7 @@
 import { enumAttr } from "../attributes";
-import type { HallArt, HallArtProps } from "../types";
+import type { HallArt, HallArtProps, HallNode } from "../types";
 import { points } from "./geometry";
-import { original, PALETTE } from "./shared";
+import { original, PALETTE, variantOf } from "./shared";
 
 export const provenance = {
   ...original(
@@ -109,8 +109,11 @@ function WestEmblem() {
   );
 }
 
+const isEast = (node: HallNode) =>
+  enumAttr(node, "kind", ["east", "west"]) !== "west";
+
 function Banner({ node, defId }: HallArtProps) {
-  const east = enumAttr(node, "kind", ["east", "west"]) !== "west";
+  const east = isEast(node);
   const { half, top, shoulder, point } = PENNANT;
   const fill = defId("fill");
   const tassels: [number, number, number][] = [
@@ -176,5 +179,6 @@ function Banner({ node, defId }: HallArtProps) {
 export const bannerArt: HallArt = {
   Component: Banner,
   box: { width: 100, height: 125 },
+  variant: (node) => variantOf(isEast(node)),
   provenance,
 };

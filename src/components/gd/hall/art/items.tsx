@@ -2,7 +2,7 @@ import { enumAttr } from "../attributes";
 import type { HallArt, HallArtProps, HallNode } from "../types";
 import { CROSS_FORMS, type CrossForm, HALL_COLOURS } from "../vocabulary";
 import { points } from "./geometry";
-import { original } from "./shared";
+import { original, variantOf } from "./shared";
 
 const COLOUR_NAMES = [...HALL_COLOURS.keys()];
 
@@ -114,6 +114,12 @@ export const crossArt: HallArt = {
   Component: Cross,
   box: (node) =>
     CROSS_BOXES.get(crossForm(node)) as { width: number; height: number },
+  variant: (node) =>
+    variantOf(
+      crossForm(node),
+      colour(node, "fill", "red"),
+      colour(node, "stroke", "yellow"),
+    ),
   provenance: crossProvenance,
 };
 
@@ -143,6 +149,12 @@ function Triangle({ node }: HallArtProps) {
 export const triangleArt: HallArt = {
   Component: Triangle,
   box: { width: 100, height: 86.6 },
+  variant: (node) =>
+    variantOf(
+      direction(node),
+      colour(node, "fill", "none"),
+      colour(node, "stroke", "white"),
+    ),
   provenance: triangleProvenance,
 };
 
@@ -171,5 +183,11 @@ function Pentagram({ node }: HallArtProps) {
 export const pentagramArt: HallArt = {
   Component: Pentagram,
   box: { width: 95.1, height: 90.5 },
+  variant: (node) =>
+    variantOf(
+      direction(node),
+      colour(node, "fill", "none"),
+      colour(node, "stroke", "white"),
+    ),
   provenance: pentagramProvenance,
 };

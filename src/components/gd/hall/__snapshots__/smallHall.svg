@@ -15,20 +15,9 @@
 <stop offset="1" stop-color="#000000">
 </stop>
 </linearGradient>
-</defs>
-<rect x="-151.81" y="-817.21" width="1903.62" height="2674.77" fill="#ffffff">
-</rect>
-<g>
-<rect x="-31" y="-400" width="1662" height="2031" fill="url(#_R_0_-wall)" stroke="#000000" stroke-width="16">
-</rect>
-<rect x="0" y="0" width="1600" height="1600" fill="url(#_R_0_-checker)" stroke="#000000" stroke-width="14">
-</rect>
-<rect x="1300" y="1584" width="200" height="63" fill="#ffffff">
-</rect>
-</g>
-<g transform="translate(940 0) scale(1.6)">
+<g id="_R_0_-art0">
 <defs>
-<linearGradient id="_R_0_-2-0-fill" x1="-38" x2="38" y1="0" y2="0" gradientUnits="userSpaceOnUse">
+<linearGradient id="_R_0_-art0-fill" x1="-38" x2="38" y1="0" y2="0" gradientUnits="userSpaceOnUse">
 <stop offset="0" stop-color="#e0e0e0">
 </stop>
 <stop offset="1" stop-color="#ffffff">
@@ -43,7 +32,7 @@
 </circle>
 <circle cx="44" cy="-37" r="4.5" fill="#ffe600" stroke="#000000" stroke-width="0.6">
 </circle>
-<path d="M-38,-37H38V27L0,49L-38,27Z" fill="url(#_R_0_-2-0-fill)" stroke="#000000" stroke-width="1.5">
+<path d="M-38,-37H38V27L0,49L-38,27Z" fill="url(#_R_0_-art0-fill)" stroke="#000000" stroke-width="1.5">
 </path>
 <line x1="-38" x2="-38" y1="-37" y2="-22" stroke="#d92128" stroke-width="3.4" stroke-linecap="round">
 </line>
@@ -64,9 +53,9 @@
 <path d="M-7,-3H7V1.5H2.5V10H-2.5V1.5H-7Z" fill="#f9f9f9">
 </path>
 </g>
-<g transform="translate(400 300) scale(2)">
+<g id="_R_0_-art1">
 <defs>
-<radialGradient id="_R_0_-2-1-glow" cx="0" cy="0" r="40" gradientUnits="userSpaceOnUse">
+<radialGradient id="_R_0_-art1-glow" cx="0" cy="0" r="40" gradientUnits="userSpaceOnUse">
 <stop offset="0" stop-color="#ff0000">
 </stop>
 <stop offset="1" stop-color="#ff0000" stop-opacity="0">
@@ -75,44 +64,32 @@
 </defs>
 <circle r="48.8" fill="#000000" stroke="#cccccc" stroke-width="2.4">
 </circle>
-<polygon points="0,44 -38.105,-22 38.105,-22" fill="url(#_R_0_-2-1-glow)" stroke="#cccccc" stroke-width="5" stroke-linejoin="miter">
+<polygon points="0,44 -38.105,-22 38.105,-22" fill="url(#_R_0_-art1-glow)" stroke="#cccccc" stroke-width="5" stroke-linejoin="miter">
 </polygon>
 </g>
-<g transform="translate(800 300) scale(1.66)">
+<g id="_R_0_-art2">
 <circle r="47" fill="#ffffff" stroke="#000000" stroke-width="6">
 </circle>
 </g>
-<g transform="translate(800 800) scale(2)">
+<g id="_R_0_-art3">
 <rect x="-50" y="-50" width="100" height="100" fill="#000000">
 </rect>
 </g>
-<g transform="translate(800 760) scale(0.47)">
+<g id="_R_0_-art4">
 <path d="M-8,-50H8V-28H30V-12H8V50H-8V-12H-30V-28H-8Z" fill="#e00000" stroke="#ffe000" stroke-width="3" stroke-linejoin="miter">
 </path>
 </g>
-<g transform="translate(800 830) scale(0.84)">
+<g id="_R_0_-art5">
 <polygon points="0,-38.105 44,38.105 -44,38.105" fill="none" stroke="#ffffff" stroke-width="11" stroke-linejoin="miter">
 </polygon>
 </g>
-<g transform="translate(800 1450) scale(100)">
+<g id="_R_0_-art6">
 <rect x="-2" y="-1.5" width="4" height="3" fill="#ffffff" stroke="#000000" stroke-width="0.06">
 </rect>
 </g>
-<g transform="translate(800 1450) scale(1.66)">
-<circle r="47" fill="#ffffff" stroke="#000000" stroke-width="6">
-</circle>
-</g>
-<g transform="translate(400 -146.06) scale(2.31)">
-<circle r="47" fill="#ffffff" stroke="#000000" stroke-width="6">
-</circle>
-</g>
-<g transform="translate(1200 -146.06) scale(2.31)">
-<circle r="47" fill="#ffffff" stroke="#000000" stroke-width="6">
-</circle>
-</g>
-<g transform="translate(800 -631.51) scale(2.95)">
+<g id="_R_0_-art7">
 <defs>
-<linearGradient id="_R_0_-1-0-fill" x1="-38" x2="38" y1="0" y2="0" gradientUnits="userSpaceOnUse">
+<linearGradient id="_R_0_-art7-fill" x1="-38" x2="38" y1="0" y2="0" gradientUnits="userSpaceOnUse">
 <stop offset="0" stop-color="#e0e0e0">
 </stop>
 <stop offset="1" stop-color="#ffffff">
@@ -125,10 +102,43 @@
 </circle>
 <circle cx="44" cy="-38" r="4.5" fill="#ffe600" stroke="#000000" stroke-width="0.6">
 </circle>
-<path d="M-38,-38H38V26L0,45L-38,26Z" fill="url(#_R_0_-1-0-fill)" stroke="#000000" stroke-width="0.8">
+<path d="M-38,-38H38V26L0,45L-38,26Z" fill="url(#_R_0_-art7-fill)" stroke="#000000" stroke-width="0.8">
 </path>
 <text x="0" y="21.057" font-size="62" font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" text-anchor="middle" fill="#000000">ש</text>
 </g>
+</defs>
+<rect x="-151.81" y="-817.21" width="1903.62" height="2674.77" fill="#ffffff">
+</rect>
+<g>
+<rect x="-31" y="-400" width="1662" height="2031" fill="url(#_R_0_-wall)" stroke="#000000" stroke-width="16">
+</rect>
+<rect x="0" y="0" width="1600" height="1600" fill="url(#_R_0_-checker)" stroke="#000000" stroke-width="14">
+</rect>
+<rect x="1300" y="1584" width="200" height="63" fill="#ffffff">
+</rect>
+</g>
+<use href="#_R_0_-art0" transform="translate(940 0) scale(1.6)">
+</use>
+<use href="#_R_0_-art1" transform="translate(400 300) scale(2)">
+</use>
+<use href="#_R_0_-art2" transform="translate(800 300) scale(1.66)">
+</use>
+<use href="#_R_0_-art3" transform="translate(800 800) scale(2)">
+</use>
+<use href="#_R_0_-art4" transform="translate(800 760) scale(0.47)">
+</use>
+<use href="#_R_0_-art5" transform="translate(800 830) scale(0.84)">
+</use>
+<use href="#_R_0_-art6" transform="translate(800 1450) scale(100)">
+</use>
+<use href="#_R_0_-art2" transform="translate(800 1450) scale(1.66)">
+</use>
+<use href="#_R_0_-art2" transform="translate(400 -146.06) scale(2.31)">
+</use>
+<use href="#_R_0_-art2" transform="translate(1200 -146.06) scale(2.31)">
+</use>
+<use href="#_R_0_-art7" transform="translate(800 -631.51) scale(2.95)">
+</use>
 <g font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">
 <g>
 <text x="800" y="191.68" font-size="43" text-anchor="middle">Hegemon</text>

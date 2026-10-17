@@ -1,7 +1,7 @@
 import { booleanAttr, enumAttr } from "../attributes";
-import type { HallArt, HallArtProps } from "../types";
+import type { HallArt, HallArtProps, HallNode } from "../types";
 import { triangle } from "./geometry";
-import { original, PALETTE } from "./shared";
+import { original, PALETTE, variantOf } from "./shared";
 
 export const provenance = original(
   "Redrawn from geometry after Gadi Cohen's hall drawings: a disc with a " +
@@ -9,10 +9,14 @@ export const provenance = original(
     "drawing's red radial light inside a grey-rimmed triangle.",
 );
 
+const isBlack = (node: HallNode) =>
+  enumAttr(node, "kind", ["black", "white"]) !== "white";
+const glows = (node: HallNode) => booleanAttr(node, "glow") === true;
+
 function Pillar({ node, defId }: HallArtProps) {
-  const black = enumAttr(node, "kind", ["black", "white"]) !== "white";
+  const black = isBlack(node);
   const dir = black ? "down" : "up";
-  if (booleanAttr(node, "glow")) {
+  if (glows(node)) {
     const glow = defId("glow");
     return (
       <>
@@ -64,5 +68,6 @@ function Pillar({ node, defId }: HallArtProps) {
 export const pillarArt: HallArt = {
   Component: Pillar,
   box: { width: 100, height: 100 },
+  variant: (node) => variantOf(isBlack(node), glows(node)),
   provenance,
 };

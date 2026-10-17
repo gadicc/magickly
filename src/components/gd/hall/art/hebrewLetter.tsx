@@ -3,9 +3,9 @@ import { stringAttr } from "../attributes";
 import { GD_HALL_FONT_STACKS } from "../fonts";
 import { hebrewLetter } from "../hebrewLetters";
 import { hebrewLetterBody } from "../labels";
-import type { HallArt, HallArtProps } from "../types";
+import type { HallArt, HallArtProps, HallNode } from "../types";
 import { pennantPath, Rod } from "./banner";
-import { original, PALETTE } from "./shared";
+import { original, PALETTE, variantOf } from "./shared";
 
 export const provenance = {
   ...original(
@@ -26,9 +26,14 @@ const BASELINE =
   LETTER_MIDDLE +
   (LETTER_SIZE * (hebrewLetterBody.top - hebrewLetterBody.bottom)) / 2;
 
-function HebrewLetter({ node, defId }: HallArtProps) {
+/** The letter drawn: one of the 22, whatever spelling named it. */
+const letterOf = (node: HallNode) => {
   const name = stringAttr(node, "letter", 40);
-  const letter = name === undefined ? undefined : hebrewLetter(name);
+  return name === undefined ? undefined : hebrewLetter(name);
+};
+
+function HebrewLetter({ node, defId }: HallArtProps) {
+  const letter = letterOf(node);
   const fill = defId("fill");
   return (
     <>
@@ -73,5 +78,6 @@ function HebrewLetter({ node, defId }: HallArtProps) {
 export const hebrewLetterArt: HallArt = {
   Component: HebrewLetter,
   box: { width: 100, height: 92 },
+  variant: (node) => variantOf(letterOf(node)),
   provenance,
 };

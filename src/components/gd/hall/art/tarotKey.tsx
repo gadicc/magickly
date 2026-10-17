@@ -4,7 +4,7 @@ import { specNumberAttr } from "../attributes";
 import { GD_HALL_FONT_STACKS } from "../fonts";
 import { LINE_HEIGHT, wrapText } from "../labels";
 import type { HallArt, HallArtProps, HallAttrSpec } from "../types";
-import { original, PALETTE } from "./shared";
+import { original, PALETTE, variantOf } from "./shared";
 
 export const provenance = original(
   "A simplified tarot trump drawn from geometry: a framed card with its " +
@@ -149,5 +149,7 @@ export const tarotKeyArt: HallArt = {
   Component: TarotKey,
   box: { width: WIDTH, height: HEIGHT },
   attributes: new Map([["n", N_SPEC]]),
+  // One of 22 cards or a blank one: at most 23 drawings in a hall.
+  variant: (node) => variantOf(specNumberAttr(node, "n", N_SPEC)),
   provenance,
 };

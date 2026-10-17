@@ -151,3 +151,75 @@ describe("the app's hall art", () => {
     expect(markup).toContain('fill="#88c088"');
   });
 });
+
+describe("the app's hall art in a hostile hall", () => {
+  // The final review of stage A: with this art, 200 chalices drew 22.4 MB
+  // of SVG from 6.7 KB of source, and 4,000 (the node bound) 448 MB. Each
+  // drawing is now in the hall's <defs> once per variant.
+  const floorOf = (children: unknown[]): HallNode =>
+    ({ type: "gdHall", children: [{ type: "floor", children }] }) as HallNode;
+  const render = (hall: HallNode) =>
+    renderToStaticMarkup(<GdHall hall={hall} art={gdHallArt} />);
+  const drawings = (markup: string) =>
+    (markup.match(/ id="[^"]+-art\d+"/g) ?? []).length;
+
+  it("draws 4,000 chalices in under 1 MB, the chalice once", () => {
+    const one = render(floorOf([{ type: "item", kind: "chalice" }]));
+    const markup = render(
+      floorOf(
+        Array.from({ length: 4000 }, (_, i) => ({
+          type: "item",
+          kind: "chalice",
+          x: i % 16,
+          y: Math.floor(i / 250),
+        })),
+      ),
+    );
+    expect(drawings(markup)).toBe(1);
+    expect((markup.match(/<use /g) ?? []).length).toBe(3998);
+    expect(markup.length).toBeLessThan(1_000_000);
+    // The drawing itself is counted once.
+    expect(markup.length - one.length).toBeLessThan(3998 * 100);
+  });
+
+  it("draws one drawing per variant, however the attributes are spelled", () => {
+    const kinds = [...legacyHallArt.keys()].map((key) => key.slice(5));
+    const markup = render(
+      floorOf(
+        Array.from({ length: 3990 }, (_, i) =>
+          i % 3 === 0
+            ? {
+                type: "item",
+                kind: kinds[(i / 3) % kinds.length],
+                fill: `c${i}`,
+              }
+            : i % 3 === 1
+              ? { type: "officer", role: `role${i}`, label: "" }
+              : { type: "officer", role: "keryx", label: "" },
+        ),
+      ),
+    );
+    // Nine items (an unknown fill is the default glass), one lamen for
+    // the unknown roles and the Keryx's.
+    expect(drawings(markup)).toBe(kinds.length + 2);
+    expect(markup.length).toBeLessThan(1_000_000);
+  });
+
+  it("tells drawings apart by what they draw", () => {
+    const markup = render(
+      floorOf([
+        { type: "item", kind: "lamp" },
+        { type: "item", kind: "lamp", fill: "nonsense" },
+        { type: "item", kind: "lamp", fill: "green" },
+        { type: "item", kind: "lantern" },
+        { type: "officer", role: "keryx" },
+        { type: "officer", role: "hegemon" },
+        { type: "officer" },
+        { type: "officer", role: "" },
+      ]),
+    );
+    // lamp (red, default), lamp (green), lantern, Keryx, Hegemon, and
+    // the plain circle for no role.
+    expect(drawings(markup)).toBe(6);
+  });
+});
