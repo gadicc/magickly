@@ -22,6 +22,26 @@ describe("the hall presets", () => {
       expect(preset.sources.length, preset.id).toBeGreaterThan(0);
   });
 
+  it("cite only the book page that draws their own hall", () => {
+    // Plan 061, Sources: the 1938 diagram of each part. The Zelator second
+    // part's is not yet located, and p.44 draws the first part.
+    const pages = Object.fromEntries(
+      HALL_PRESETS.map((preset) => [
+        preset.id,
+        preset.sources.flatMap(
+          (source) => source.match(/, p\.(\d+), leaf n\d+$/)?.[1] ?? [],
+        ),
+      ]),
+    );
+    expect(pages).toEqual({
+      neophyte: ["11"],
+      zelator1: ["44"],
+      zelator2: [],
+      theoricus1: ["69"],
+      theoricus2: ["82"],
+    });
+  });
+
   it("use no reserved tag or attribute", () => {
     for (const preset of HALL_PRESETS)
       for (const node of nodes(preset.hall)) {

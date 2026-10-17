@@ -35,11 +35,6 @@ const PILLARS: readonly HallNode[] = [
   { type: "pillar", kind: "white", x: 11, y: 11 },
 ];
 
-const SOURCES = (drawing: string) => [
-  `public/pics/${drawing}.svg`,
-  `${REGARDIE_1938}, p.44, leaf n38`,
-];
-
 /**
  * The Zelator hall, first part, ported from `public/pics/zelator1.svg`. As
  * the book draws it, the altar also bears the Flaming Sword with the cross
@@ -50,7 +45,7 @@ export const zelator1: HallPreset = {
   title: "Zelator Temple 1",
   grade: "1=10",
   part: 1,
-  sources: SOURCES("zelator1"),
+  sources: ["public/pics/zelator1.svg", `${REGARDIE_1938}, p.44, leaf n38`],
   hall: {
     type: "gdHall",
     dais: 5,
@@ -115,7 +110,9 @@ export const zelator2: HallPreset = {
   title: "Zelator Temple 2",
   grade: "1=10",
   part: 2,
-  sources: SOURCES("zelator2"),
+  // The book's diagram of the second part is not yet located; p.44 is the
+  // first part's.
+  sources: ["public/pics/zelator2.svg"],
   hall: {
     type: "gdHall",
     dais: 5,
