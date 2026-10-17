@@ -26,6 +26,23 @@ const tiles = [
           textDecoration: "none",
         }}
       >
+        Halls
+      </div>
+    ),
+    title: "Temple Halls",
+    to: "/gd/hall",
+  },
+  {
+    Component: () => (
+      <div
+        style={{
+          marginTop: 50,
+          textAlign: "center",
+          fontSize: "200%",
+          color: "black",
+          textDecoration: "none",
+        }}
+      >
         Sigils
       </div>
     ),

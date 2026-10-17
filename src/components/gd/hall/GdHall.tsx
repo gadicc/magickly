@@ -1,4 +1,10 @@
-import { type CSSProperties, type ReactNode, useId, useMemo } from "react";
+import {
+  type CSSProperties,
+  type ReactNode,
+  type Ref,
+  useId,
+  useMemo,
+} from "react";
 import { svgCoordinate } from "../../svgCoordinate";
 import { defaultHallArt } from "./art";
 import { Placeholder } from "./art/placeholder";
@@ -37,6 +43,8 @@ export interface GdHallProps {
   style?: CSSProperties;
   width?: number | string;
   height?: number | string;
+  /** The drawn `<svg>`, for exporting it. */
+  ref?: Ref<SVGSVGElement>;
 }
 
 const labelTextStyle: CSSProperties = {
@@ -177,6 +185,7 @@ export function GdHall({
   style,
   width,
   height,
+  ref,
 }: GdHallProps) {
   const id = useId().replace(/[^A-Za-z0-9_-]/g, "_");
   const root =
@@ -195,6 +204,7 @@ export function GdHall({
   const gradient = `${id}-wall`;
   return (
     <svg
+      ref={ref}
       xmlns="http://www.w3.org/2000/svg"
       viewBox={[
         u(viewBox.x0),

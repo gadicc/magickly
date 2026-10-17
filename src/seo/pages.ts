@@ -106,13 +106,19 @@ export const PUBLIC_PAGES = {
     title: "Golden Dawn",
     description:
       "Hermetic Order of the Golden Dawn resources: the grades on the Tree of " +
-      "Life, grade rituals, Rose Cross sigils and temple symbols.",
+      "Life, grade rituals, temple halls, Rose Cross sigils and temple symbols.",
   },
   "/gd/grades": {
     title: "Golden Dawn Grades",
     description:
       "The grades of the Golden Dawn from Neophyte 0=0 to Ipsissimus 10=1, " +
       "with their places on the Tree of Life.",
+  },
+  "/gd/hall": {
+    title: "Golden Dawn Temple Halls",
+    description:
+      "Floor plans of the Golden Dawn temple for the Neophyte, Zelator and " +
+      "Theoricus grades, drawn as vector images and exportable as SVG or PNG.",
   },
   "/gd/rituals": {
     title: "Golden Dawn Rituals",

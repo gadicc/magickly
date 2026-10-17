@@ -42,6 +42,7 @@ const pathnames: Pathnames = {
   gd: {
     "/": "Golden Dawn",
     grades: "Grades",
+    hall: "Temple Halls",
     rituals: "Rituals",
     sigils: "Sigils",
     symbols: {
