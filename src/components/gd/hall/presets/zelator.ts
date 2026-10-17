@@ -12,17 +12,16 @@ const LETTERS: HallNode = {
 };
 
 /**
- * The Earth tablet hung outside the North wall, the lamp and the salt
- * before it, as the drawings have them. Its board is twice the Theoricus
- * Air tablet's (3.82 × 5.31 squares), so it sets its own scale. The book
- * stands it inside, its outer edge on the wall line (p.44, conflict 7);
- * a board this size inside leaves the lamp and the salt no room before it
- * clear of the Hiereus (part 1) and the Table of Shewbread (part 2).
+ * The Earth tablet as the book draws it (p.44, conflict 7): standing inside
+ * the hall, its outer edge on the North wall line, the lamp at its East end
+ * and the salt at its West end. It is the Theoricus board's size (the
+ * default scale, 2.69 squares along the wall); our drawings hang a board
+ * twice that size outside the wall, which is drift.
  */
 const NORTH: readonly HallNode[] = [
-  { type: "tablet", element: "earth", x: -1.37, y: 8.3, scale: 2.655 },
-  { type: "item", kind: "lantern", x: 1.33, y: 6.61 },
-  { type: "item", kind: "salt", x: 1.32, y: 10.02, scale: 1.04 },
+  { type: "tablet", element: "earth", anchor: "north", x: -0.31, y: 8 },
+  { type: "item", kind: "lantern", x: 0.8, y: 5.3 },
+  { type: "item", kind: "salt", x: 0.8, y: 10.55, scale: 1.04 },
 ];
 
 const BANNERS: readonly HallNode[] = [
@@ -110,9 +109,12 @@ export const zelator2: HallPreset = {
   title: "Zelator Temple 2",
   grade: "1=10",
   part: 2,
-  // The book's diagram of the second part is not yet located; p.44 is the
-  // first part's.
-  sources: ["public/pics/zelator2.svg"],
+  // The book's diagram of the second part is not yet located; p.44 draws
+  // the first part and is cited only for the North wall it shares.
+  sources: [
+    "public/pics/zelator2.svg",
+    `${REGARDIE_1938}, p.44, leaf n38 (the Earth tablet, lamp and salt only)`,
+  ],
   hall: {
     type: "gdHall",
     dais: 5,

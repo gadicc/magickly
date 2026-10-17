@@ -17,7 +17,8 @@ export interface HallPreset {
   /**
    * Stable references to what the layout follows: the book diagram (page
    * and archive.org leaf) and, for a preset ported from one, the drawing
-   * in `public/pics`. Never empty.
+   * in `public/pics`. Never empty. A book reference that covers only part
+   * of the layout says which in parentheses at its end.
    */
   sources: readonly string[];
   hall: HallNode;

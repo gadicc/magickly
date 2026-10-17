@@ -327,8 +327,7 @@ Follow-ups are separate from the completed migration work:
   of Life exports, Firefox and Safari checks of PNG export with embedded fonts,
   a credit for the RWS tarot images and the Pinterest hotlink in `2=9.pug`,
   Gadi's calls on whether the Hierophant's lamen takes the striped ring
-  the hall drawings give it, whether the Zelator Earth tablet hangs outside
-  the North wall or stands inside it, and whether the tarot titles adopt
+  the hall drawings give it and whether the tarot titles adopt
   the Golden Dawn's own, and an import-boundary gap:
   `src/components/entity/entityFields.test.ts` reaches app code through
   `import.meta.glob("../../app/**/fields.ts")`, which the test cannot see

@@ -436,7 +436,7 @@ without a source.
 | Preset | Source | Notes |
 | --- | --- | --- |
 | `neophyte` | drawing, checked against the book | Banner of the West follows the book (floor, north of the platform) |
-| `zelator1`, `zelator2` | drawings | Earth tablet position: see conflicts |
+| `zelator1`, `zelator2` | drawings | Earth tablet, lamp and salt on the North wall from the book (conflict 7) |
 | `theoricus1`, `theoricus2` | drawings | Hexagram badge renamed `pantacle` |
 | `practicus1`–`practicus3` | book layouts | markers where art is missing |
 | `philosophus1`–`philosophus4` | book layouts | conflicts below |
@@ -465,7 +465,7 @@ below; the presets follow them.
 | 4 | Philosophus 3 (27th path) | 1938 p.137 (n131) draws Hiereus (with the Banner of the West), Hierophant and Hegemon (with the Banner of the East) in a row at the East edge, each with a cup; pillars North–South near the South wall facing Peh. The rubric on the same page: Hierophant on his throne on the dais, Hiereus with banner seated before the dais NE, Hegemon SE, red lamps. The cups look carried over from the 29th and 28th path drawings | Documented in 1938; unsettled | Follow the text (Hierophant on the dais, red lamps); keep the drawing's pillars, which the text supports |
 | 5 | Philosophus 4 (4=7) | 1938 p.144–145 (n138–139): the rubric twice puts the pillars North and South of the altar with Hiereus and Hegemon beside them; the drawing on the same page puts the pillars West of the altar | Documented in 1938; unsettled, text explicit twice | Follow the text |
 | 6 | Portal Adepts | Explained by #1: the floor stations belong to the part 1 drawing (3rd Adept NE, 2nd Adept SE); the part 2 rubric seats them on the dais | Resolved by #1 | As #1 |
-| 7 | Zelator Earth tablet | 1938 p.44 (n38) draws it with its outer edge on the North wall line, inside the hall, lamp and salt before it; no source says whether it hangs or stands | Reopened after the A2 review: at its drawn size (3.82 × 5.31 squares) the book's placement leaves the lamp and salt no room clear of the Hiereus and the Table of Shewbread | Was: on the wall line, inside (the book). The presets now hang it outside, as our drawings do, until Gadi decides |
+| 7 | Zelator Earth tablet | 1938 p.44 (n38) draws a small board, about 2 squares long, with its outer edge on the North wall line, inside the hall, the lamp at its East end and the salt at its West end; no source says whether it hangs or stands. Our drawings hang a board twice that size outside the wall | Settled: Gadi accepted the book's placement; the drawings' large board is drift | On the wall line, inside (the book), at the Theoricus board's size (the default tablet scale, 2.69 squares along the wall), the lamp East and the salt West of it along the wall |
 | 8 | Zelator altar | 1938 drawing: the Flaming Sword diagram on the altar, the red lamp at its East end, the cross in the triangle at the base of the Tree. The explicit "For the Altar" requirements line appears only from 1986, an editorial addition consistent with 1938 | Settled | Add the Flaming Sword board and the red lamp to Zelator 1 |
 | 9 | Neophyte Banner of the West | 1938 p.11 (n3) draws it free-standing on the floor, North-West of and slightly East of the Hiereus' throne; the Z documents give it a pole and base. No text gives a position | Settled as far as the sources go | On the floor, North-West of the throne (book) |
 
@@ -693,8 +693,9 @@ proved wrong:
 - **Tablets.** The default scale is the Theoricus Air tablet's board
   (`rect164-7`, 1.91 × 2.69 squares): 1.345. A2's 2.05 was mis-measured
   and drew the Theoricus tablet over the Pantacle and the lantern. The
-  Zelator Earth tablet is a larger board (`rect161`, 3.82 × 5.31) and
-  sets `scale` 2.655 in its presets. Measured in Chromium in the checker
+  Zelator drawings' Earth tablet is a larger board (`rect161`, 3.82 ×
+  5.31); the review fixes gave the Zelator presets `scale` 2.655, and A3
+  went back to the default (conflict 7: the size is drift). Measured in Chromium in the checker
   floor's frame (its altar exactly at (8, 8); `rect313`, the floor's
   outline, sits 0.034 squares off it). The package's tablet
   shows the transliteration; `gdHallArt` passes the app's Enochian font,
@@ -703,13 +704,19 @@ proved wrong:
   (`stroke`, a named colour) so it shows on the black altar, the cross in
   the triangle at its West end, the red lamp at its East end.
 - **Zelator Earth tablet** (conflict 7): A2 stood it inside on the wall
-  line (`anchor="north"`, x = −0.31) at the Theoricus size. At its own
-  size it reaches 3.4 squares into the hall, and the lamp and salt before
-  it would cover the Hiereus (part 1) and the Table of Shewbread (part
-  2), so after the A2 review it hangs outside the North wall as the
-  drawings have it (centre (−1.37, 8.30)), with the lamp and salt where
-  they draw them. Conflict 7 is reopened for Gadi. The compass labels now
-  move outward past anything outside their wall, so "North" clears it.
+  line (`anchor="north"`, x = −0.31) at the Theoricus size. The A2 review
+  fixes measured the drawings' larger board and, at that size, hung it
+  outside the North wall (centre (−1.37, 8.30)), reopening the conflict.
+  Gadi then accepted the book's placement and the large board as drift,
+  so A3 stands it inside again: outer edge on the outer wall line
+  (`anchor="north"`, x = −0.31), centred at y = 8, default scale (1.91 ×
+  2.69 squares, the long side along the wall); the lantern just East of
+  it (y = 5.3) and the salt just West (y = 10.55), both at x = 0.8, clear
+  of the floor's edge, the Hiereus (part 1), the Table of Shewbread (part
+  2) and "North". A test pins the placement and that the three overlap
+  nothing. Zelator 2 cites p.44 for these three alone ("the Earth tablet,
+  lamp and salt only"); its own diagram is still to be located. The
+  compass labels still move outward past anything outside their wall.
 - **Dais height.** The dais row centres its block, labels included, and the
   two-line "Past Hierophant" label pushed the dais-5 lamens down onto the
   Theoricus Air tablet; the Zelator and Theoricus presets set the lamens'
@@ -775,9 +782,9 @@ after it:
 - **Tablet scale** (major): the default was measured on the wrong shape;
   re-measured on the boards, 1.345 by default and 2.655 for the Zelator
   Earth tablet, the Theoricus tablets at the board's centre (7.97, 0.63).
-  The Zelator tablet now hangs outside the North wall (Stage A2 notes,
-  conflict 7), and compass labels move outward past anything outside
-  their wall.
+  The Zelator tablet then hung outside the North wall, and compass labels
+  move outward past anything outside their wall. A3 restored the book's
+  placement at the default size (Stage A2 notes, conflict 7).
 - **Zelator 2's sources** cited p.44, the first part's diagram; it now
   cites its drawing alone, and a test pins each preset's page to its own
   part.
@@ -856,9 +863,7 @@ list as the README says it does; export font
 embedding for the Tree of Life; Firefox and Safari checks of PNG export with
 embedded fonts; the RWS tarot credit and the Pinterest
 hotlink in `2=9.pug`; whether the Hierophant's lamen takes the drawings'
-striped ring (Stage A2 notes); whether the Zelator Earth tablet hangs
-outside the North wall (the drawings, now) or stands inside it (the book;
-conflict 7), and if inside, where the lamp and salt go; whether the tarot
+striped ring (Stage A2 notes); whether the tarot
 titles adopt the Golden Dawn's own, from a cited source (they are the
 common titles, with "The Universe" for XXI);
 `src/components/entity/entityFields.test.ts`, which reaches app code

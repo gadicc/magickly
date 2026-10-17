@@ -1,5 +1,15 @@
-import { GdHall, validateHall } from "@magick-components/gd/hall";
-import { HALL_PRESETS } from "@magick-components/gd/hall/presets";
+import {
+  GdHall,
+  type ResolvedObject,
+  resolveHall,
+  validateHall,
+} from "@magick-components/gd/hall";
+import { WALL_GAP } from "@magick-components/gd/hall/layout";
+import {
+  HALL_PRESETS,
+  zelator1,
+  zelator2,
+} from "@magick-components/gd/hall/presets";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { inventoryRitualAssets } from "@/offline/ritualAssetInventory";
@@ -20,7 +30,7 @@ describe.each(HALL_PRESETS.map((preset) => [preset.id, preset] as const))(
       expect(preset.sources).toContain(`public/pics/${id}.svg`);
       for (const source of preset.sources)
         expect(source).toMatch(
-          /^(public\/pics\/\w+\.svg|Regardie 1938, vol\. 2, archive\.org IsraelRegardie-TheGoldenDawn-Vol2-1938, p\.\d+, leaf n\d+)$/,
+          /^(public\/pics\/\w+\.svg|Regardie 1938, vol\. 2, archive\.org IsraelRegardie-TheGoldenDawn-Vol2-1938, p\.\d+, leaf n\d+( \(.+\))?)$/,
         );
     });
 
@@ -84,3 +94,57 @@ describe("the presets", () => {
     }
   });
 });
+
+describe.each([zelator1, zelator2].map((preset) => [preset.id, preset]))(
+  "the %s Earth tablet",
+  (_id, preset) => {
+    // Plan 061, conflict 7: as the book draws it (p.44), inside the hall
+    // with its outer edge on the North wall line, the lamp at its East end
+    // and the salt at its West end, all clear of everything else.
+    const { objects } = resolveHall(preset.hall, { art: gdHallArt });
+    const find = (artKey: string) =>
+      objects.find(
+        (object) => object.artKey === artKey && object.cx < 2,
+      ) as ResolvedObject;
+    const tablet = find("tablet");
+    const lamp = find("item:lantern");
+    const salt = find("item:salt");
+    const edges = (o: ResolvedObject) => ({
+      north: o.cx - o.width / 2,
+      south: o.cx + o.width / 2,
+      east: o.cy - o.height / 2,
+      west: o.cy + o.height / 2,
+    });
+
+    it("stands inside with its outer edge on the wall line", () => {
+      expect(edges(tablet).north).toBeCloseTo(-WALL_GAP, 6);
+      // The board's long side runs along the wall, about 2 squares long.
+      expect(tablet.height).toBeGreaterThan(tablet.width);
+      expect(tablet.height).toBeLessThan(3);
+      expect(tablet.cy).toBeCloseTo(8, 6);
+    });
+
+    it("has the lamp at its East end and the salt at its West end", () => {
+      expect(edges(lamp).west).toBeLessThan(edges(tablet).east);
+      expect(edges(salt).east).toBeGreaterThan(edges(tablet).west);
+      for (const item of [lamp, salt])
+        expect(edges(item).north).toBeGreaterThan(0);
+    });
+
+    it("overlaps nothing else", () => {
+      const north = [tablet, lamp, salt];
+      for (const mine of north)
+        for (const other of objects) {
+          if (north.includes(other)) continue;
+          const a = edges(mine);
+          const b = edges(other);
+          const apart =
+            a.south <= b.north ||
+            b.south <= a.north ||
+            a.west <= b.east ||
+            b.west <= a.east;
+          expect(apart, `${mine.artKey} and ${other.artKey}`).toBe(true);
+        }
+    });
+  },
+);

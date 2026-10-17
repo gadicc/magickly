@@ -22,23 +22,25 @@ describe("the hall presets", () => {
       expect(preset.sources.length, preset.id).toBeGreaterThan(0);
   });
 
-  it("cite only the book page that draws their own hall", () => {
+  it("cite the book page of their own hall, or say what they take", () => {
     // Plan 061, Sources: the 1938 diagram of each part. The Zelator second
-    // part's is not yet located, and p.44 draws the first part.
+    // part's is not yet located; p.44 draws the first part, so the second
+    // cites it only for what it takes from it (the North wall), and says so.
     const pages = Object.fromEntries(
       HALL_PRESETS.map((preset) => [
         preset.id,
         preset.sources.flatMap(
-          (source) => source.match(/, p\.(\d+), leaf n\d+$/)?.[1] ?? [],
+          (source) =>
+            source.match(/, p\.(\d+), leaf n\d+( \(.+\))?$/)?.slice(1) ?? [],
         ),
       ]),
     );
     expect(pages).toEqual({
-      neophyte: ["11"],
-      zelator1: ["44"],
-      zelator2: [],
-      theoricus1: ["69"],
-      theoricus2: ["82"],
+      neophyte: ["11", undefined],
+      zelator1: ["44", undefined],
+      zelator2: ["44", " (the Earth tablet, lamp and salt only)"],
+      theoricus1: ["69", undefined],
+      theoricus2: ["82", undefined],
     });
   });
 
