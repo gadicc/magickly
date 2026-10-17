@@ -67,7 +67,7 @@ export const theoricus1: HallPreset = {
                 y: -0.22,
                 scale: 0.87,
               },
-              { type: "item", kind: "cup", at: "west", y: 0.24, scale: 0.72 },
+              { type: "item", kind: "cup", at: "west", y: 0.45, scale: 0.72 },
             ],
           },
           {
