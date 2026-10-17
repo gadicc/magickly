@@ -93,6 +93,21 @@ describe("clipboard writes", () => {
     await expect(copyPng(Promise.resolve(new Blob()))).rejects.toEqual(
       new SvgExportError("raster-too-large"),
     );
+    // A clipboard fails the write when the PNG fails: the PNG's error is
+    // the one reported, whatever the clipboard says.
+    installClipboard({
+      item: FakeClipboardItem,
+      write: vi.fn(async ([item]: FakeClipboardItem[]) => {
+        await item.items["image/png"];
+      }),
+    });
+    await expect(
+      copyPng(Promise.reject(new SvgExportError("raster-failed"))),
+    ).rejects.toEqual(new SvgExportError("raster-failed"));
+    const prepareFailed = new Error("no fonts");
+    await expect(copyPng(Promise.reject(prepareFailed))).rejects.toBe(
+      prepareFailed,
+    );
     installClipboard({ item: undefined });
     // A raster that fails after the clipboard was refused must not surface as
     // an unhandled rejection; vitest would fail the run if it did.

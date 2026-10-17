@@ -83,7 +83,9 @@ async function guard<T>(operation: Promise<T>): Promise<T> {
 /**
  * Copies a PNG that is still being produced. The ClipboardItem is created
  * synchronously inside the user gesture with a promise value, which Safari
- * requires; awaiting the blob first loses the gesture.
+ * requires; awaiting the blob first loses the gesture. When the PNG itself
+ * fails (a `prepare` hook, the rasteriser), the clipboard write fails with
+ * it, and the PNG's own error is reported rather than a refused clipboard.
  */
 export function copyPng(png: Promise<Blob>): Promise<void> {
   if (!clipboardWriteSupported("image/png")) {
@@ -91,9 +93,18 @@ export function copyPng(png: Promise<Blob>): Promise<void> {
     png.catch(() => {});
     return Promise.reject(new SvgExportError("clipboard-unavailable"));
   }
-  return guard(
-    navigator.clipboard.write([new ClipboardItem({ "image/png": png })]),
+  const failure = png.then(
+    () => undefined,
+    (error: unknown) => ({ error }),
   );
+  const written = navigator.clipboard.write([
+    new ClipboardItem({ "image/png": png }),
+  ]);
+  return written.catch(async (error: unknown) => {
+    const failed = await failure;
+    if (failed) throw failed.error;
+    return guard(Promise.reject(error));
+  });
 }
 
 /** Copies SVG as an image where the browser allows it, otherwise as text. */

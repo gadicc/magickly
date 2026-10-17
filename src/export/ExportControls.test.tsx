@@ -193,6 +193,48 @@ describe("ExportControls", () => {
     expect(runtime.downloadBlob).not.toHaveBeenCalled();
   });
 
+  it("fails a PNG copy when prepare fails, not as a refused clipboard", async () => {
+    // The real copyPng, with a clipboard that, like a browser's, fails the
+    // write when the item's promise rejects.
+    const actual =
+      await vi.importActual<typeof import("./exportRuntime")>(
+        "./exportRuntime",
+      );
+    runtime.copyPng.mockImplementation(actual.copyPng);
+    class Item {
+      constructor(readonly items: Record<string, Promise<Blob>>) {}
+    }
+    vi.stubGlobal("ClipboardItem", Item);
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        write: async ([item]: Item[]) => {
+          try {
+            await item.items["image/png"];
+          } catch {
+            throw new DOMException("item failed", "NotAllowedError");
+          }
+        },
+      },
+    });
+    try {
+      const prepare = vi.fn().mockRejectedValue(new Error("no fonts"));
+      render(<Page filename="hall" viewBox="0 0 10 10" prepare={prepare} />);
+      fireEvent.click(screen.getByLabelText("Copy PNG to clipboard"));
+      expect(await screen.findByText("Export failed.")).toBeTruthy();
+      expect(
+        screen.queryByText("The browser refused clipboard access."),
+      ).toBeNull();
+      expect(runtime.rasterizeSvg).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: undefined,
+      });
+    }
+  });
+
   it("explains failures instead of throwing", async () => {
     runtime.copyPng.mockRejectedValue(
       new SvgExportError("clipboard-unavailable"),
