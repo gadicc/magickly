@@ -442,6 +442,71 @@ describe("validateHall", () => {
     ]);
   });
 
+  it("reports what the layout cuts", () => {
+    const long = "word ".repeat(40);
+    const result = validateHall({
+      type: "gdHall",
+      marginNorth: 0,
+      margin: 0.1,
+      marginSouth: 5,
+      children: [
+        floor(
+          { type: "officer", role: "keryx", label: long },
+          { type: "label", text: "Free" },
+          {
+            type: "officer",
+            role: "keryx",
+            children: [{ type: "label", text: long }],
+          },
+        ),
+        { type: "caption", text: "1\n2\n3\n4\n5\n6\n7" },
+      ],
+    });
+    expect(result.map((d) => [d.path, d.attribute, d.message])).toEqual([
+      [
+        [],
+        "marginNorth",
+        "gdHall: marginNorth cuts into the drawing on the North side",
+      ],
+      [[], "margin", "gdHall: margin cuts into the drawing on the East side"],
+      [[], "margin", "gdHall: margin cuts into the drawing on the West side"],
+      [
+        [0, 0],
+        undefined,
+        "officer: text longer than 6 lines; cut with an ellipsis",
+      ],
+      [
+        [0, 2, 0],
+        undefined,
+        "label: text longer than 6 lines; cut with an ellipsis",
+      ],
+      [
+        [1],
+        undefined,
+        "caption: text longer than 6 lines; cut with an ellipsis",
+      ],
+    ]);
+    const crowded = validateHall(
+      hall(
+        floor(
+          // Six lines each: the 84th label passes the 500th line.
+          ...Array.from({ length: 100 }, () => ({
+            type: "label",
+            text: "1\n2\n3\n4\n5\n6",
+          })),
+        ),
+      ),
+    ).filter((d) => d.message.startsWith("more than"));
+    expect(crowded).toEqual([
+      {
+        path: [0, 83],
+        severity: "warning",
+        message:
+          "more than 500 label lines in the hall; from here on they are not drawn",
+      },
+    ]);
+  });
+
   it("warns of a dais row in a hall without a dais", () => {
     const row = { type: "dais", children: [{ type: "officer", role: "x" }] };
     const daisWarnings = (dais: unknown) =>

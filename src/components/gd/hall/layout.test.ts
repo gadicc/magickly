@@ -934,7 +934,7 @@ describe("resolveHall: untrusted content", () => {
       floor({ type: "officer", children: labels }, { type: "altar" }),
     );
     const [overflow] = validateHall(node, { art }).filter((diagnostic) =>
-      diagnostic.message.startsWith("more than"),
+      diagnostic.message.startsWith(`more than ${MAX_HALL_NODES} nodes`),
     );
     // gdHall, floor and officer count too.
     expect(overflow.path).toEqual([0, 0, MAX_HALL_NODES - 3]);

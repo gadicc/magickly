@@ -231,6 +231,18 @@ export interface ResolvedHall {
   captionText?: string;
   labelSize: number;
   viewBox: Rect;
+  /** What the layout had to cut, which the validator reports. */
+  cuts: ResolvedCuts;
+}
+
+/** What the layout cut to stay bounded or to honour a margin. */
+export interface ResolvedCuts {
+  /** Nodes with a label, free text or caption cut to MAX_LABEL_LINES. */
+  truncated: readonly (readonly number[])[];
+  /** The first node whose label lines the hall's line budget dropped. */
+  overBudget?: readonly number[];
+  /** Sides where a `margin*` cuts into the drawing. */
+  clipped: readonly BannerSide[];
 }
 
 /** What the resolver needs besides the hall. */
@@ -420,10 +432,19 @@ export function resolveHall(
   // bounds, labels included, so both stop at the same node.
   const inBounds = hallNodesInBounds(hall, art);
   let lineBudget = MAX_HALL_LABEL_LINES;
-  /** Wraps a label within the hall's line budget. */
-  const wrapLabel = (text: string, width: number, size: number) => {
+  const truncated = new Map<string, readonly number[]>();
+  let overBudget: readonly number[] | undefined;
+  /** Wraps the label of the node at `path` within the hall's line budget. */
+  const wrapLabel = (
+    path: readonly number[],
+    text: string,
+    width: number,
+    size: number,
+  ) => {
     const lines = wrapText(text, Math.max(width, MIN_LABEL_WIDTH), size);
+    if (lines.at(-1)?.truncated) truncated.set(pathKey(path), path);
     const kept = lines.slice(0, Math.max(0, lineBudget));
+    if (kept.length < lines.length) overBudget ??= path;
     lineBudget -= kept.length;
     return kept;
   };
@@ -436,6 +457,7 @@ export function resolveHall(
     kind: "dais" | BannerSide;
   }[] = [];
   let captionText: string | undefined;
+  let captionPath: readonly number[] = [];
 
   const defaultScale = (artKey: string, tag: string, context: Context) => {
     if (artKey === "lamen") {
@@ -463,14 +485,18 @@ export function resolveHall(
     const labels: PreparedLabel[] = [];
     const own = stringAttr(node, "label", 200);
     // A label child is attached; children of unknown tags are never read.
-    const labelChildren = childrenOf(node).filter(
-      (child, index): child is HallNode =>
-        enter(child, [...path, index]) && child.type === "label",
+    const labelChildren = childrenOf(node).flatMap(
+      (child, index): [HallNode, readonly number[]][] => {
+        const childPath = [...path, index];
+        return enter(child, childPath) && child.type === "label"
+          ? [[child, childPath]]
+          : [];
+      },
     );
     if (own !== undefined) {
       if (own !== "")
         labels.push({
-          lines: wrapLabel(own, width, labelSize),
+          lines: wrapLabel(path, own, width, labelSize),
           size: labelSize,
           pos,
         });
@@ -478,16 +504,17 @@ export function resolveHall(
       const role = stringAttr(node, "role", 200);
       if (role !== undefined)
         labels.push({
-          lines: wrapLabel(roleName(role), width, labelSize),
+          lines: wrapLabel(path, roleName(role), width, labelSize),
           size: labelSize,
           pos,
         });
     }
-    for (const child of labelChildren) {
+    for (const [child, childPath] of labelChildren) {
       const size = clamp(numberAttr(child, "size") ?? labelSize, 0.05, 4);
       const boxWidth = numberAttr(child, "width");
       labels.push({
         lines: wrapLabel(
+          childPath,
           stringAttr(child, "text", 200) ?? "",
           boxWidth === undefined ? width : clamp(boxWidth, ...SIZE_RANGE),
           size,
@@ -514,7 +541,12 @@ export function resolveHall(
       const given = numberAttr(node, "width");
       const width =
         given === undefined ? undefined : clamp(given, ...SIZE_RANGE);
-      const lines = wrapLabel(text, width ?? Number.POSITIVE_INFINITY, size);
+      const lines = wrapLabel(
+        path,
+        text,
+        width ?? Number.POSITIVE_INFINITY,
+        size,
+      );
       const w = width ?? Math.max(0, ...lines.map((line) => line.width));
       return {
         node,
@@ -721,9 +753,14 @@ export function resolveHall(
           kind: enumAttr(child, "side", BANNER_SIDES) ?? "east",
         });
         return;
-      case "caption":
-        captionText = stringAttr(child, "text", 200) ?? captionText;
+      case "caption": {
+        const text = stringAttr(child, "text", 200);
+        if (text !== undefined) {
+          captionText = text;
+          captionPath = path;
+        }
         return;
+      }
       case "door":
         addDoor(child);
         return;
@@ -896,6 +933,8 @@ export function resolveHall(
   let caption: ResolvedLabel | undefined;
   if (captionText) {
     const lines = wrapText(captionText, FLOOR_SIZE, CAPTION_SIZE);
+    if (lines.at(-1)?.truncated)
+      truncated.set(pathKey(captionPath), captionPath);
     if (lines.length > 0) {
       caption = placeLabel(
         { lines, size: CAPTION_SIZE, pos: "bottom" },
@@ -925,6 +964,15 @@ export function resolveHall(
     y0: east === undefined ? bounds.y0 - padding : outer.y0 - east,
     y1: west === undefined ? bounds.y1 + padding : outer.y1 + west,
   };
+  // A margin narrower than the content cuts the drawing on that side.
+  const clipped = (
+    [
+      ["north", viewBox.x0 > bounds.x0 + 1e-9],
+      ["south", viewBox.x1 < bounds.x1 - 1e-9],
+      ["east", viewBox.y0 > bounds.y0 + 1e-9],
+      ["west", viewBox.y1 < bounds.y1 - 1e-9],
+    ] as const
+  ).flatMap(([name, cut]) => (cut ? [name] : []));
 
   return {
     dais,
@@ -937,5 +985,6 @@ export function resolveHall(
     captionText,
     labelSize,
     viewBox,
+    cuts: { truncated: [...truncated.values()], overBudget, clipped },
   };
 }

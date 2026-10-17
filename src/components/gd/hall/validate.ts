@@ -1,6 +1,7 @@
 import { numberAttr, readAttr } from "./attributes";
 import { hebrewLetter } from "./hebrewLetters";
-import { DEFAULT_DAIS } from "./layout";
+import { MAX_LABEL_LINES } from "./labels";
+import { DEFAULT_DAIS, MAX_HALL_LABEL_LINES, resolveHall } from "./layout";
 import { hallPlacement, hallTagSpec, itemKindKnown, walkHall } from "./spec";
 import type {
   HallArtRegistry,
@@ -294,5 +295,65 @@ export function validateHall(
       );
     }
   });
-  return diagnostics;
+  reportCuts(input as HallNode, options, report);
+  // Layout findings join the walk's in document order (paths sort so).
+  return diagnostics.sort((a, b) => comparePaths(a.path, b.path));
+}
+
+const comparePaths = (a: readonly number[], b: readonly number[]) => {
+  for (let i = 0; i < Math.min(a.length, b.length); i++)
+    if (a[i] !== b[i]) return a[i] - b[i];
+  return a.length - b.length;
+};
+
+const SIDE_NAMES = {
+  north: "North",
+  south: "South",
+  east: "East",
+  west: "West",
+} as const;
+
+/** Reports what the layout cut: long labels, the line budget, margins. */
+function reportCuts(
+  hall: HallNode,
+  options: ValidateHallOptions,
+  report: (
+    path: readonly number[],
+    severity: HallSeverity,
+    message: string,
+    attribute?: string,
+  ) => void,
+) {
+  const { cuts } = resolveHall(hall, { art: options.art });
+  const tagAt = (path: readonly number[]) => {
+    let node: unknown = hall;
+    for (const index of path)
+      node = (node as { children?: unknown[] }).children?.[index];
+    return (node as HallNode).type;
+  };
+  for (const path of cuts.truncated)
+    report(
+      path,
+      "warning",
+      `${tagAt(path)}: text longer than ${MAX_LABEL_LINES} lines; cut with an ellipsis`,
+    );
+  if (cuts.overBudget)
+    report(
+      cuts.overBudget,
+      "warning",
+      `more than ${MAX_HALL_LABEL_LINES} label lines in the hall; from here on they are not drawn`,
+    );
+  for (const side of cuts.clipped) {
+    const name = SIDE_NAMES[side];
+    const attribute =
+      numberAttr(hall, `margin${name}`) === undefined
+        ? "margin"
+        : `margin${name}`;
+    report(
+      [],
+      "warning",
+      `gdHall: ${attribute} cuts into the drawing on the ${name} side`,
+      attribute,
+    );
+  }
 }
