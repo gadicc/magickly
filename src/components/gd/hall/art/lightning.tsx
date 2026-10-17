@@ -1,4 +1,6 @@
-import type { HallArt } from "../types";
+import { enumAttr } from "../attributes";
+import type { HallArt, HallArtProps } from "../types";
+import { HALL_COLOURS } from "../vocabulary";
 import { points } from "./geometry";
 import { original, PALETTE } from "./shared";
 
@@ -24,9 +26,15 @@ const ZIGZAG: readonly (readonly [number, number])[] = [
   [1.4, 40.2],
 ];
 
-function Lightning() {
+const COLOUR_NAMES = [...HALL_COLOURS.keys()];
+
+function Lightning({ node }: HallArtProps) {
+  // `stroke` names a colour, so the flash shows on the black altar too.
+  const name = enumAttr(node, "stroke", COLOUR_NAMES);
+  const ink =
+    name === undefined ? PALETTE.ink : (HALL_COLOURS.get(name) as string);
   return (
-    <g stroke={PALETTE.ink} strokeWidth={STROKE} fill="none">
+    <g stroke={ink} strokeWidth={STROKE} fill="none">
       <polyline points={points(ZIGZAG)} strokeLinejoin="miter" />
       <line x1={11} y1={-47.8} x2={5.8} y2={-38.6} />
       <polygon
@@ -35,14 +43,17 @@ function Lightning() {
           [-4.3, 40.3],
           [7, 40.1],
         ])}
-        fill={PALETTE.ink}
+        fill={ink}
         stroke="none"
       />
     </g>
   );
 }
 
-/** The Flaming Sword, the lightning flash down the Tree (`item(kind="lightning")`). */
+/**
+ * The Flaming Sword, the lightning flash down the Tree
+ * (`item(kind="lightning")`), black unless `stroke` names a colour.
+ */
 export const lightningArt: HallArt = {
   Component: Lightning,
   box: { width: 45.1, height: 100 },

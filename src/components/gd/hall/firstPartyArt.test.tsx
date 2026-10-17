@@ -67,6 +67,18 @@ describe("the lightning flash", () => {
     expect(markup).toContain("<polygon");
     expect(markup).not.toMatch(/marker|href|\sid=/);
   });
+
+  it("takes a named colour, so it shows on the black altar", () => {
+    const yellow = draw(art("item:lightning"), {
+      type: "item",
+      stroke: "yellow",
+    });
+    expect(yellow).toContain('stroke="#ffe000"');
+    expect(yellow).toContain('fill="#ffe000"');
+    expect(
+      draw(art("item:lightning"), { type: "item", stroke: "url(#x)" }),
+    ).toBe(draw(art("item:lightning"), { type: "item" }));
+  });
 });
 
 describe("the tarot keys", () => {
