@@ -103,7 +103,8 @@ export function createRitualFileStorage(
           });
           return {
             ...result,
-            body: bytes,
+            // Response bodies require an ArrayBuffer-backed view.
+            body: new Uint8Array(bytes),
             byteSize: result.byteSize ?? bytes.byteLength,
           };
         } finally {
