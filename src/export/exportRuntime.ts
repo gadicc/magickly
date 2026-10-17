@@ -20,6 +20,11 @@ export async function rasterizeSvg(
       image.onerror = () => reject(new SvgExportError("raster-failed"));
       image.src = url;
     });
+    // WebKit may fire load before an SVG's data-URI fonts are usable;
+    // decoding first is cheap where it is not needed. A refusal to decode,
+    // or an engine without decode(), leaves the loaded image to draw as
+    // before.
+    await image.decode?.().catch(() => {});
     const canvas = document.createElement("canvas");
     canvas.width = size.width;
     canvas.height = size.height;

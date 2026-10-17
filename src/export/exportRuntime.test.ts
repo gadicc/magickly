@@ -246,4 +246,40 @@ describe("downloads and rasterisation", () => {
     getContext.mockRestore();
     toBlob.mockRestore();
   });
+
+  it("decodes the loaded image before drawing it, and draws if it cannot", async () => {
+    vi.stubGlobal("URL", {
+      ...URL,
+      createObjectURL: () => "blob:svg",
+      revokeObjectURL: () => {},
+    });
+    const order: string[] = [];
+    let refuse = false;
+    vi.stubGlobal(
+      "Image",
+      class {
+        onload: (() => void) | null = null;
+        onerror: (() => void) | null = null;
+        set src(_value: string) {
+          queueMicrotask(() => this.onload?.());
+        }
+        async decode() {
+          order.push("decode");
+          if (refuse) throw new DOMException("no", "EncodingError");
+        }
+      },
+    );
+    const getContext = vi
+      .spyOn(HTMLCanvasElement.prototype, "getContext")
+      .mockReturnValue({ drawImage: () => order.push("draw") } as never);
+    const toBlob = vi
+      .spyOn(HTMLCanvasElement.prototype, "toBlob")
+      .mockImplementation((callback) => callback(new Blob(["png"])));
+    await rasterizeSvg("<svg/>", { width: 1, height: 1 });
+    refuse = true;
+    await rasterizeSvg("<svg/>", { width: 1, height: 1 });
+    expect(order).toEqual(["decode", "draw", "decode", "draw"]);
+    getContext.mockRestore();
+    toBlob.mockRestore();
+  });
 });
