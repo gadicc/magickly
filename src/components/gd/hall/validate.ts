@@ -1,5 +1,6 @@
-import { readAttr } from "./attributes";
+import { numberAttr, readAttr } from "./attributes";
 import { hebrewLetter } from "./hebrewLetters";
+import { DEFAULT_DAIS } from "./layout";
 import { hallPlacement, hallTagSpec, itemKindKnown, walkHall } from "./spec";
 import type {
   HallArtRegistry,
@@ -50,6 +51,9 @@ export function validateHall(
         : { path, attribute, severity, message },
     );
   let overflowed = false;
+  const noDais =
+    isRecord(input) &&
+    (numberAttr(input as HallNode, "dais") ?? DEFAULT_DAIS) <= 0;
 
   const checkAttributes = (
     node: Record<string, unknown>,
@@ -191,6 +195,14 @@ export function validateHall(
       case "label":
         if (text("text") === undefined)
           report(path, "warning", `${tag}: no text`, "text");
+        break;
+      case "dais":
+        if (noDais)
+          report(
+            path,
+            "warning",
+            "dais: the hall has no dais (dais=0), so this row stands across the floor's East edge",
+          );
         break;
       case "door": {
         const side = text("side");

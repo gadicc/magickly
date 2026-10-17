@@ -202,6 +202,23 @@ describe("GdHall", () => {
     ).toHaveLength(5);
   });
 
+  it("cuts an East door through the floor's edge when there is no dais", () => {
+    const band = (dais: number) => {
+      const markup = render(
+        hall({ dais }, floor({ type: "door", side: "east", x: 8 })),
+      );
+      const [, y, height] =
+        markup.match(
+          /<rect x="700" y="([^"]+)" width="200" height="([^"]+)" fill="#ffffff"><\/rect>/,
+        ) ?? [];
+      return [Number(y), Number(y) + Number(height)];
+    };
+    // Behind a dais only the wall line; with none, the wall, the gap and
+    // the floor's outline, as on the other sides.
+    expect(band(4)).toEqual([-416, -384]);
+    expect(band(0)).toEqual([-47, 16]);
+  });
+
   it("draws every variant of the package's art", () => {
     const markup = render(
       hall(

@@ -11,6 +11,7 @@ import {
   type ResolvedLabel,
   type ResolvedObject,
   resolveHall,
+  WALL_GAP,
   WALL_STROKE,
 } from "./layout";
 import type { HallArtRegistry, HallNode } from "./types";
@@ -73,14 +74,17 @@ function Chrome({
   gradient: string;
 }) {
   const { outer } = hall;
+  // With no dais band (dais=0) the East wall stands at the floor's edge.
+  const daisBand = outer.y0 < -WALL_GAP;
   const doorBands = hall.doors.map((door) => {
-    // Cover the floor outline, the gap and the wall line on that side.
+    // Cover the floor outline, the gap and the wall line on that side; on
+    // the East, behind a dais, only the wall line.
     const pad = WALL_STROKE;
     const across =
       door.side === "west"
         ? [FLOOR_SIZE - pad, outer.y1 + pad]
         : door.side === "east"
-          ? [outer.y0 - pad, outer.y0 + pad]
+          ? [outer.y0 - pad, daisBand ? outer.y0 + pad : pad]
           : door.side === "north"
             ? [outer.x0 - pad, pad]
             : [FLOOR_SIZE - pad, outer.x1 + pad];

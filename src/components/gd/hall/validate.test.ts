@@ -442,6 +442,18 @@ describe("validateHall", () => {
     ]);
   });
 
+  it("warns of a dais row in a hall without a dais", () => {
+    const row = { type: "dais", children: [{ type: "officer", role: "x" }] };
+    const daisWarnings = (dais: unknown) =>
+      validateHall({ type: "gdHall", dais, children: [row] })
+        .filter((d) => d.message.startsWith("dais:"))
+        .map((d) => [d.path, d.severity]);
+    expect(daisWarnings(0)).toEqual([[[0], "warning"]]);
+    expect(daisWarnings("-1")).toEqual([[[0], "warning"]]);
+    expect(daisWarnings(4)).toEqual([]);
+    expect(daisWarnings(undefined)).toEqual([]);
+  });
+
   it("places unknown tags as placeholders and skips their children", () => {
     const result = validateHall(
       hall(
