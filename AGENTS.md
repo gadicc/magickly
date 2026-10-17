@@ -32,3 +32,18 @@ the ritual editor, the reader), regenerate the images and commit them with the
 change. Read `scripts/docs-screenshots/README.md` first: it covers running the
 seed and capture, adding a shot, and the rule that images contain only
 synthetic data (no real temple, member or email; ritual titles are fine).
+
+## Outside sources
+
+Cite outside material by a stable reference rather than committing a copy:
+an archive.org item ID with its page or leaf, a Wikimedia Commons file page,
+a URL pinned to a commit, or a DOI, plus a SHA-256 when we depend on the
+exact bytes (as `assets/fonts/README.md` does). Put the citation next to
+what it supports: the plan, the data file or the preset. Commit a
+public-domain file only when it is small and the app needs it, with the
+basis for its status recorded; being on archive.org does not make a work
+public domain. Copyrighted sources (such as the Llewellyn editions of
+Regardie's *The Golden Dawn*) never enter the repository, not even as crops
+or extracted images; only facts taken from them, such as a temple layout,
+drawn with our own art. Material from private temples stays out of the
+repository altogether.
