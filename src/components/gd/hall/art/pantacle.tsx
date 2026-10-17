@@ -1,6 +1,7 @@
 import { svgCoordinate } from "../../../svgCoordinate";
 import { GD_HALL_FONT_STACKS } from "../fonts";
-import type { HallArt, HallArtProps } from "../types";
+import { hebrewFont, labelFont, type TextMeasure } from "../labels";
+import type { HallArt } from "../types";
 import { points } from "./geometry";
 import { original, PALETTE } from "./shared";
 
@@ -9,7 +10,7 @@ export const provenance = {
     "The Pantacle redrawn from geometry after Gadi Cohen's Theoricus badge " +
       "in public/pics/theoricus2.svg (g4-9): the Earth disc in its four " +
       "colours, an interlaced hexagram and a ring naming the Earth's " +
-      "correspondences. The names are set by the browser in the hall fonts " +
+      "correspondences. The names are set letter by letter in the hall fonts " +
       "(SIL OFL 1.1); no glyph outlines are copied into the code.",
   ),
   source: "public/pics/theoricus2.svg#g4-9",
@@ -45,6 +46,58 @@ const RING: readonly { text: string; hebrew: boolean }[] = [
     hebrew: true,
   })),
 ];
+
+/** Sizes of the ring's letters, in units. */
+const LATIN_SIZE = 5;
+const HEBREW_SIZE = 6.4;
+
+/** One letter on the ring: its character and where its advance centres. */
+interface RingGlyph {
+  char: string;
+  /** Degrees clockwise from the x axis (SVG angles; 270 is the top). */
+  angle: number;
+}
+
+/**
+ * Where each letter of a name stands, its baseline on the ring and its top
+ * outward. Measured in logical order with the font's advances and kern
+ * pairs; Latin runs clockwise and Hebrew anticlockwise, so both read on
+ * from the name before. Each letter is drawn alone, so no renderer's bidi
+ * or text-on-path support (resvg reverses Hebrew on a path; rsvg draws no
+ * `textPath`) changes the order.
+ */
+function ringGlyphs(
+  text: string,
+  centre: number,
+  font: TextMeasure,
+  size: number,
+  rightToLeft: boolean,
+): RingGlyph[] {
+  const chars = [...text];
+  const total = font.width(text, size);
+  return chars.flatMap((char, index) => {
+    if (char === " ") return [];
+    // The letter's centre, from the start of the name in reading order.
+    const along =
+      font.width(chars.slice(0, index + 1).join(""), size) -
+      font.width(char, size) / 2;
+    const fromMiddle = along - total / 2;
+    const radians = (rightToLeft ? -fromMiddle : fromMiddle) / BASELINE;
+    return [{ char, angle: centre + (radians * 180) / Math.PI }];
+  });
+}
+
+/** The ring's names, each centred in its eighth, anticlockwise from the top. */
+const RING_GLYPHS = RING.map((name, index) => ({
+  ...name,
+  glyphs: ringGlyphs(
+    name.text,
+    270 - (index * 360) / RING.length,
+    name.hebrew ? hebrewFont : labelFont,
+    name.hebrew ? HEBREW_SIZE : LATIN_SIZE,
+    name.hebrew,
+  ),
+}));
 
 const at = (angle: number, r: number): [number, number] => {
   const radians = (angle * Math.PI) / 180;
@@ -106,18 +159,9 @@ function Band({ pointsList }: { pointsList: string }) {
   );
 }
 
-function Pantacle({ defId }: HallArtProps) {
-  const ring = defId("ring");
-  // Clockwise from just past the bottom, so no name straddles the start.
-  const start = 90 + 360 / RING.length / 2;
-  const [sx, sy] = at(start, BASELINE);
-  const [mx, my] = at(start + 180, BASELINE);
-  const circle = `M${sx},${sy}A${BASELINE},${BASELINE} 0 1 1 ${mx},${my}A${BASELINE},${BASELINE} 0 1 1 ${sx},${sy}`;
+function Pantacle() {
   return (
     <>
-      <defs>
-        <path id={ring} d={circle} />
-      </defs>
       <circle
         r={OUTER}
         fill={PALETTE.paper}
@@ -148,40 +192,29 @@ function Pantacle({ defId }: HallArtProps) {
           />
         </g>
       ))}
-      {RING.map((name, index) => {
-        // Slot centres anticlockwise from the top, as fractions of the path.
-        const angle = 270 - (index * 360) / RING.length;
-        const offset = (((angle - start) % 360) + 360) % 360;
-        // Set in visual order: Hebrew reversed, with bidi overridden, so
-        // every renderer lays the letters out along the path alike.
-        const text = name.hebrew
-          ? [...name.text].reverse().join("")
-          : name.text;
-        return (
-          <text
-            key={name.text}
-            fontFamily={
-              name.hebrew
-                ? GD_HALL_FONT_STACKS.hebrew
-                : GD_HALL_FONT_STACKS.serif
-            }
-            fontStyle={name.hebrew ? undefined : "italic"}
-            fontWeight={name.hebrew ? 700 : undefined}
-            fontSize={name.hebrew ? 6.4 : 5}
-            fill={PALETTE.ink}
-            direction="ltr"
-            unicodeBidi="bidi-override"
-          >
-            <textPath
-              href={`#${ring}`}
-              startOffset={`${svgCoordinate((offset / 360) * 100)}%`}
-              textAnchor="middle"
+      {RING_GLYPHS.map((name) => (
+        <g
+          key={name.text}
+          fontFamily={
+            name.hebrew ? GD_HALL_FONT_STACKS.hebrew : GD_HALL_FONT_STACKS.serif
+          }
+          fontStyle={name.hebrew ? undefined : "italic"}
+          fontWeight={name.hebrew ? 700 : undefined}
+          fontSize={name.hebrew ? HEBREW_SIZE : LATIN_SIZE}
+          fill={PALETTE.ink}
+          textAnchor="middle"
+        >
+          {name.glyphs.map((glyph) => (
+            <text
+              key={glyph.angle}
+              y={-BASELINE}
+              transform={`rotate(${svgCoordinate((glyph.angle + 450) % 360)})`}
             >
-              {text}
-            </textPath>
-          </text>
-        );
-      })}
+              {glyph.char}
+            </text>
+          ))}
+        </g>
+      ))}
     </>
   );
 }

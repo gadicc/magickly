@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import { defaultHallArt } from "./art";
 import { TABLET_ELEMENTS, tabletArt } from "./art/symbols";
 import { romanNumeral, TRUMPS } from "./art/tarotKey";
-import { GdHall } from "./GdHall";
 import type { HallArt, HallArtProps, HallNode } from "./types";
 import { validateHall } from "./validate";
 
@@ -27,36 +26,43 @@ const hall = (...children: unknown[]): HallNode =>
   ({ type: "gdHall", children: [{ type: "floor", children }] }) as HallNode;
 
 describe("the pantacle", () => {
+  /** The ring's letters in the markup, each with its rotation. */
+  const ring = (markup: string) =>
+    [
+      ...markup.matchAll(
+        /<text y="-42.6" transform="rotate\(([-\d.]+)\)">([^<]+)<\/text>/g,
+      ),
+    ].map(([, angle, char]) => ({ angle: Number(angle) - 90, char }));
+
   it("rings the Earth disc with SAPERE AUDE and the Earth's names", () => {
     const markup = draw(art("item:pantacle"), { type: "item" });
-    expect(markup).toContain(">SAPERE AUDE</textPath>");
-    // Hebrew is set in visual order with bidi overridden.
-    for (const name of [
-      "אדני",
-      "אוריאל",
-      "כרוב",
-      "פרת",
-      "צפון",
-      "פורלאך",
-      "ארץ",
-    ])
-      expect(markup).toContain(`>${[...name].reverse().join("")}</textPath>`);
-    expect(markup).toContain('unicode-bidi="bidi-override"');
+    // Clockwise from a gap just past the bottom of the ring.
+    const clockwise = ring(markup)
+      .map((glyph) => ({ ...glyph, angle: (glyph.angle - 112.5 + 720) % 360 }))
+      .sort((a, b) => a.angle - b.angle)
+      .map((glyph) => glyph.char)
+      .join("");
+    // SAPERE AUDE reads clockwise at the top; the names read on from it
+    // anticlockwise, the Hebrew direction, each letter after the last.
+    const anticlockwise = [...clockwise].reverse().join("");
+    expect(clockwise).toContain("SAPEREAUDE");
+    expect(anticlockwise).toBe("פרתצפוןפורלאךארץEDUAEREPASאדניאוריאלכרוב");
     for (const colour of ["#a9aa66", "#444f41", "#2c2b29", "#8f5642"])
       expect(markup).toContain(`fill="${colour}"`);
   });
 
-  it("names its ring path from the hall's ids, so two can share a page", () => {
-    const markup = renderToStaticMarkup(
-      <div>
-        <GdHall hall={hall({ type: "item", kind: "pantacle", x: 4, y: 4 })} />
-        <GdHall hall={hall({ type: "item", kind: "pantacle", x: 4, y: 4 })} />
-      </div>,
-    );
-    const ids = [...markup.matchAll(/<path id="([^"]+)"/g)].map(([, id]) => id);
-    expect(ids).toHaveLength(2);
-    expect(new Set(ids).size).toBe(2);
-    for (const id of ids) expect(markup).toContain(`href="#${id}"`);
+  it("draws each letter alone, so every renderer keeps their order", () => {
+    // resvg reverses Hebrew laid along a path, rsvg draws no textPath:
+    // no path, no bidi override and no ids to share.
+    const markup = draw(art("item:pantacle"), { type: "item" });
+    expect(markup).not.toMatch(/textPath|unicode-bidi|direction=|\sid=|href/);
+    const glyphs = ring(markup);
+    expect(glyphs).toHaveLength(40);
+    for (const glyph of glyphs) expect([...glyph.char]).toHaveLength(1);
+    // Neighbours stand an advance apart, never on top of each other.
+    const sorted = glyphs.map((glyph) => glyph.angle).sort((a, b) => a - b);
+    for (const [index, angle] of sorted.slice(1).entries())
+      expect(angle - sorted[index]).toBeGreaterThan(2.5);
   });
 });
 

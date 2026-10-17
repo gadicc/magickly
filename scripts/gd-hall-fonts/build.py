@@ -14,7 +14,8 @@ and writes:
   existing NotoSans-Regular.ttf and NotoSansHebrew-Regular.ttf lacked: their
   own copyright line (name ID 0) above the OFL 1.1 text
 - src/components/gd/hall/fontMetrics.json, the advances and GPOS kern pairs
-  that label wrapping measures with (no DOM measurement)
+  that label wrapping and the Pantacle's ring measure with (no DOM
+  measurement)
 
 Run from the repository root:
 
@@ -154,7 +155,9 @@ def metrics(ttf: bytes, unicodes: list[int]) -> dict:
         return sum(p.x_advance for p in buf.glyph_positions)
 
     chars = [u for u in unicodes if u in cmap]
-    letters = [u for u in chars if chr(u).isascii() and chr(u).isalnum()]
+    # Unaccented letters and digits; a script with neither (Hebrew) uses
+    # all its characters.
+    letters = [u for u in chars if chr(u).isascii() and chr(u).isalnum()] or chars
     # Each character's advance as HarfBuzz shapes it alone, not its glyph's:
     # the soft hyphen (U+00AD) is default-ignorable and draws nothing, so
     # it takes no space, and its glyph's 310 units would otherwise turn into
@@ -262,6 +265,7 @@ def main() -> None:
                        sorted({ord(c) for c in COMPASS_TEXT}))
     bold_ttf = to_bytes(bold)
     hebrew = subset_font(static_instance(hebrew_vf, 700), HEBREW)
+    hebrew_ttf = to_bytes(hebrew)
 
     outputs = {
         PUBLIC_FONTS / "NotoSerif-Italic-latin1.woff2": to_bytes(italic, "woff2"),
@@ -291,6 +295,11 @@ def main() -> None:
     ])
     compass, compass_shaped, _ = metrics(bold_ttf, sorted({ord(c) for c in COMPASS_TEXT}))
     check_pairs(compass, compass_shaped, COMPASS_TEXT.split(" "))
+    hebrew_metrics, hebrew_shaped, _ = metrics(hebrew_ttf, HEBREW)
+    # The Earth's names on the Pantacle's ring, set glyph by glyph.
+    check_pairs(hebrew_metrics, hebrew_shaped, [
+        "אדני", "אוריאל", "כרוב", "פרת", "צפון", "פורלאך", "ארץ",
+    ])
     hebrew_glyphs = TTFont(io.BytesIO(outputs[PUBLIC_FONTS / "NotoSerifHebrew-Bold-letters.woff2"]))
     shin = hebrew_glyphs["glyf"][hebrew_glyphs.getBestCmap()[0x05E9]]
     document = {
@@ -299,6 +308,7 @@ def main() -> None:
         "label": label,
         "compass": compass,
         "hebrew": {
+            **hebrew_metrics,
             "upem": hebrew_glyphs["head"].unitsPerEm,
             # Shin has neither ascender nor descender: the letter body.
             "bodyTop": shin.yMax,

@@ -685,10 +685,6 @@
 </path>
 </g>
 <g transform="translate(907 183) scale(2)">
-<defs>
-<path id="_R_0_-2-4-ring" d="M-16.302,39.357A42.6,42.6 0 1 1 16.302,-39.357A42.6,42.6 0 1 1 -16.302,39.357">
-</path>
-</defs>
 <circle r="49" fill="#ffffff" stroke="#000000" stroke-width="1.2">
 </circle>
 <path d="M0,0L-28.638,-28.638A40.5,40.5 0 0 1 28.638,-28.638Z" fill="#a9aa66">
@@ -727,30 +723,62 @@
 <polyline points="-18.818,-16 0.342,-16" stroke="#ffffff" stroke-width="5">
 </polyline>
 </g>
-<text font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" font-size="5" fill="#000000" direction="ltr" unicode-bidi="bidi-override">
-<textPath href="#_R_0_-2-4-ring" startOffset="43.75%" text-anchor="middle">SAPERE AUDE</textPath>
-</text>
-<text font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" font-size="6.4" fill="#000000" direction="ltr" unicode-bidi="bidi-override">
-<textPath href="#_R_0_-2-4-ring" startOffset="31.25%" text-anchor="middle">ינדא</textPath>
-</text>
-<text font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" font-size="6.4" fill="#000000" direction="ltr" unicode-bidi="bidi-override">
-<textPath href="#_R_0_-2-4-ring" startOffset="18.75%" text-anchor="middle">לאירוא</textPath>
-</text>
-<text font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" font-size="6.4" fill="#000000" direction="ltr" unicode-bidi="bidi-override">
-<textPath href="#_R_0_-2-4-ring" startOffset="6.25%" text-anchor="middle">בורכ</textPath>
-</text>
-<text font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" font-size="6.4" fill="#000000" direction="ltr" unicode-bidi="bidi-override">
-<textPath href="#_R_0_-2-4-ring" startOffset="93.75%" text-anchor="middle">תרפ</textPath>
-</text>
-<text font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" font-size="6.4" fill="#000000" direction="ltr" unicode-bidi="bidi-override">
-<textPath href="#_R_0_-2-4-ring" startOffset="81.25%" text-anchor="middle">ןופצ</textPath>
-</text>
-<text font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" font-size="6.4" fill="#000000" direction="ltr" unicode-bidi="bidi-override">
-<textPath href="#_R_0_-2-4-ring" startOffset="68.75%" text-anchor="middle">ךאלרופ</textPath>
-</text>
-<text font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" font-size="6.4" fill="#000000" direction="ltr" unicode-bidi="bidi-override">
-<textPath href="#_R_0_-2-4-ring" startOffset="56.25%" text-anchor="middle">ץרא</textPath>
-</text>
+<g font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" font-size="5" fill="#000000" text-anchor="middle">
+<text y="-42.6" transform="rotate(339.025)">S</text>
+<text y="-42.6" transform="rotate(343.09)">A</text>
+<text y="-42.6" transform="rotate(347.546)">P</text>
+<text y="-42.6" transform="rotate(351.725)">E</text>
+<text y="-42.6" transform="rotate(356.053)">R</text>
+<text y="-42.6" transform="rotate(0.38)">E</text>
+<text y="-42.6" transform="rotate(6.594)">A</text>
+<text y="-42.6" transform="rotate(11.284)">U</text>
+<text y="-42.6" transform="rotate(16.177)">D</text>
+<text y="-42.6" transform="rotate(20.709)">E</text>
+</g>
+<g font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" font-size="6.4" fill="#000000" text-anchor="middle">
+<text y="-42.6" transform="rotate(320.139)">א</text>
+<text y="-42.6" transform="rotate(315.37)">ד</text>
+<text y="-42.6" transform="rotate(311.57)">נ</text>
+<text y="-42.6" transform="rotate(308.703)">י</text>
+</g>
+<g font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" font-size="6.4" fill="#000000" text-anchor="middle">
+<text y="-42.6" transform="rotate(279.563)">א</text>
+<text y="-42.6" transform="rotate(275.608)">ו</text>
+<text y="-42.6" transform="rotate(272.225)">ר</text>
+<text y="-42.6" transform="rotate(268.636)">י</text>
+<text y="-42.6" transform="rotate(264.594)">א</text>
+<text y="-42.6" transform="rotate(260.041)">ל</text>
+</g>
+<g font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" font-size="6.4" fill="#000000" text-anchor="middle">
+<text y="-42.6" transform="rotate(230.892)">כ</text>
+<text y="-42.6" transform="rotate(226.339)">ר</text>
+<text y="-42.6" transform="rotate(222.835)">ו</text>
+<text y="-42.6" transform="rotate(219.091)">ב</text>
+</g>
+<g font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" font-size="6.4" fill="#000000" text-anchor="middle">
+<text y="-42.6" transform="rotate(184.73)">פ</text>
+<text y="-42.6" transform="rotate(180.077)">ר</text>
+<text y="-42.6" transform="rotate(175.408)">ת</text>
+</g>
+<g font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" font-size="6.4" fill="#000000" text-anchor="middle">
+<text y="-42.6" transform="rotate(140.117)">צ</text>
+<text y="-42.6" transform="rotate(135.284)">פ</text>
+<text y="-42.6" transform="rotate(131.423)">ו</text>
+<text y="-42.6" transform="rotate(128.811)">ן</text>
+</g>
+<g font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" font-size="6.4" fill="#000000" text-anchor="middle">
+<text y="-42.6" transform="rotate(100.269)">פ</text>
+<text y="-42.6" transform="rotate(96.409)">ו</text>
+<text y="-42.6" transform="rotate(93.026)">ר</text>
+<text y="-42.6" transform="rotate(88.829)">ל</text>
+<text y="-42.6" transform="rotate(84.233)">א</text>
+<text y="-42.6" transform="rotate(79.43)">ך</text>
+</g>
+<g font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" font-size="6.4" fill="#000000" text-anchor="middle">
+<text y="-42.6" transform="rotate(49.338)">א</text>
+<text y="-42.6" transform="rotate(44.591)">ר</text>
+<text y="-42.6" transform="rotate(40.253)">ץ</text>
+</g>
 </g>
 <g transform="translate(400 300) scale(2)">
 <circle r="50" fill="#000000" stroke="none" stroke-width="3">

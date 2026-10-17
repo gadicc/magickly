@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import fontMetrics from "./fontMetrics.json";
 import {
   compassFont,
+  hebrewFont,
   hebrewLetterBody,
   LABEL_SIZE,
   labelFont,
@@ -74,6 +75,24 @@ describe("the generated font metrics", () => {
     expect(compassFont.width("East", 1)).toBeGreaterThan(1);
     expect(hebrewLetterBody.top).toBeGreaterThan(0.5);
     expect(hebrewLetterBody.bottom).toBe(0);
+  });
+
+  it("measures the Hebrew names in logical order as HarfBuzz shapes them", () => {
+    // Widths in font units from HarfBuzz 14.5.1 on the shipped subset,
+    // right to left with its kern pairs (אל, the first letter on the
+    // right, kerns -29).
+    for (const [text, units] of [
+      ["אדני", 1798],
+      ["אוריאל", 2826],
+      ["כרוב", 1928],
+      ["פרת", 1681],
+      ["צפון", 1730],
+      ["פורלאך", 2968],
+      ["ארץ", 1612],
+    ] as const)
+      expect(hebrewFont.width(text, 1000), text).toBeCloseTo(units, 9);
+    expect(hebrewFont.kerning("א", "ל")).toBe(-29);
+    expect(fontMetrics.hebrew.upem).toBe(1000);
   });
 
   it("measures any table, ignoring a trailing odd entry", () => {

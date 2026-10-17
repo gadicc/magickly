@@ -19,15 +19,15 @@ ligatures, and keep the copyright and licence names.
 | NotoSerif-Italic-latin1.woff2 | weight 400; U+0020–007E, U+00A0–00FF, U+2013–2014, U+2018–2019, U+201C–201D, U+2026 | 11464 | 9f950c9e9439445d096145d53dcb951ec3baa9d71efbd206a87c70d876e538dd |
 | NotoSerif-BoldItalic-compass.woff2 | weight 700; the letters of "East West North South" | 2072 | f39a880b7b95a001802b1cb02f3ae8ffea9e656065a54f8d3bbd43b833d6ded0 |
 | NotoSerifHebrew-Bold-letters.woff2 | weight 700; U+05D0–05EA (the 22 letters and 5 final forms) | 3340 | 8e6caa54f8ea7632995cb66eee7afbfbd2630581945fe6e45bea8ede53950e0f |
-| ../../src/components/gd/hall/fontMetrics.json | advances and GPOS kern pairs (by class) of the two Latin subsets, in font units | 8613 | 0dc7d705d540f1f14355ce74457d5024d86b86c3e367dd455cf5a602126a3d8d |
+| ../../src/components/gd/hall/fontMetrics.json | advances and GPOS kern pairs (by class) of the three subsets, in font units | 10736 | 7e514c841ae2c761c0f0990f584a6a930d9dcd8d9e07a8d57245fea313270e90 |
 
 Built with fontTools 4.66.1, Brotli 1.2.0 and uharfbuzz 0.56.2 (HarfBuzz
 14.5.1); other versions may produce different bytes. The script checks that
 the kern table reproduces HarfBuzz's shaping, with ligatures off, for every
-character pair and for a list of label strings. The soft hyphen (U+00AD) is
-default-ignorable: HarfBuzz draws it as nothing and kerns across it, so the
-table gives it no advance and no kern pairs, and the labels' measurement
-skips it when kerning.
+character pair, for a list of label strings and for the Hebrew names on the
+Pantacle's ring. The soft hyphen (U+00AD) is default-ignorable: HarfBuzz
+draws it as nothing and kerns across it, so the table gives it no advance
+and no kern pairs, and the labels' measurement skips it when kerning.
 
 `NotoSerif-OFL.txt` and `NotoSerifHebrew-OFL.txt` are the upstream SIL Open
 Font License 1.1 notices from the same commit (Copyright 2022 The Noto Project
