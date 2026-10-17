@@ -13,7 +13,8 @@ import {
   WALL_STROKE,
 } from "./layout";
 import type { HallArt, HallNode } from "./types";
-import { MAX_HALL_DEPTH } from "./vocabulary";
+import { validateHall } from "./validate";
+import { MAX_HALL_DEPTH, MAX_HALL_NODES } from "./vocabulary";
 
 const provenance = {
   origin: "original",
@@ -720,6 +721,64 @@ describe("resolveHall: untrusted content", () => {
       ),
     );
     expect(objects).toEqual([]);
+  });
+
+  it("follows the validator's placement rules", () => {
+    const resolved = resolve(
+      hall(
+        {},
+        { type: "dais", children: [{ type: "door", x: 3 }] },
+        { type: "banners", children: [{ type: "door", side: "north" }] },
+        floor(
+          {
+            type: "altar",
+            children: [
+              { type: "floor" },
+              { type: "dais" },
+              { type: "caption", text: "x" },
+              { type: "door" },
+              { type: "gdHall" },
+              { type: "item", kind: "cross" },
+            ],
+          },
+          { type: "pillar", children: [{ type: "unicorn" }] },
+          {
+            type: "unicorn",
+            children: [{ type: "label", text: "not drawn" }],
+          },
+          { type: "item:cross" },
+        ),
+      ),
+    );
+    // Doors only cut walls from the floor or the hall; in a row they are
+    // ignored, as the validator says.
+    expect(resolved.doors).toEqual([]);
+    expect(resolved.objects.map((object) => object.artKey)).toEqual([
+      "altar",
+      "item:cross",
+      "pillar",
+      "unicorn",
+      "item:cross",
+    ]);
+    const [, , , unicorn, notATag] = resolved.objects;
+    expect(unicorn.labels).toEqual([]);
+    // A registry key is not a tag: drawn as a placeholder.
+    expect(notATag.missing).toBe(true);
+  });
+
+  it("counts label children towards the node bound, as the validator does", () => {
+    const labels = Array.from({ length: MAX_HALL_NODES + 10 }, (_, i) => ({
+      type: "label",
+      text: `L${i}`,
+    }));
+    const node = hall({}, floor({ type: "officer", children: labels }));
+    const [officer] = resolve(node).objects;
+    const [overflow] = validateHall(node, { art }).filter((diagnostic) =>
+      diagnostic.message.startsWith("more than"),
+    );
+    // gdHall, floor and officer count too.
+    expect(overflow.path).toEqual([0, 0, MAX_HALL_NODES - 3]);
+    expect(officer.labels).toHaveLength(MAX_HALL_NODES - 3);
   });
 
   it("stops at the depth bound without throwing", () => {

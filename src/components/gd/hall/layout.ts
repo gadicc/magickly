@@ -14,8 +14,15 @@ import {
   type TextLine,
   wrapText,
 } from "./labels";
+import {
+  hallArtKey,
+  hallNodesInBounds,
+  hallPlacement,
+  hallRole,
+  hallTagSpec,
+  pathKey,
+} from "./spec";
 import type { HallArt, HallArtBox, HallArtRegistry, HallNode } from "./types";
-import { hallArtKey, hallTagSpec } from "./validate";
 import {
   BANNER_SIDES,
   type BannerSide,
@@ -23,11 +30,10 @@ import {
   HALL_POINT_OFFSETS,
   HALL_POINTS,
   type HallPoint,
+  type HallTagRole,
   hallPoint,
   LABEL_POSITIONS,
   type LabelPosition,
-  MAX_HALL_DEPTH,
-  MAX_HALL_NODES,
   RESERVED_TAGS,
   roleName,
   SCALE_RANGE,
@@ -382,7 +388,9 @@ export function resolveHall(
   const floorBox: Rect = { x0: 0, y0: 0, x1: FLOOR_SIZE, y1: FLOOR_SIZE };
   const floorFrame: Frame = { ox: 0, oy: 0, unit: 1, box: floorBox };
 
-  let visited = 0;
+  // The validator's walk decides which nodes are inside the node and depth
+  // bounds, labels included, so both stop at the same node.
+  const inBounds = hallNodesInBounds(hall, art);
   const objects: ResolvedObject[] = [];
   const doors: ResolvedDoor[] = [];
   const floorItems: { node: HallNode; path: readonly number[] }[] = [];
@@ -409,17 +417,19 @@ export function resolveHall(
 
   const prepareLabels = (
     node: HallNode,
+    path: readonly number[],
     tag: string,
     width: number,
     context: Context,
-    children: unknown[],
   ): PreparedLabel[] => {
     const fallbackPos: LabelPosition = context === "dais" ? "top" : "bottom";
     const pos = enumAttr(node, "labelPos", LABEL_POSITIONS) ?? fallbackPos;
     const labels: PreparedLabel[] = [];
     const own = stringAttr(node, "label", 200);
-    const labelChildren = children.filter(
-      (child): child is HallNode => isNode(child) && child.type === "label",
+    // A label child is attached; children of unknown tags are never read.
+    const labelChildren = childrenOf(node).filter(
+      (child, index): child is HallNode =>
+        enter(child, [...path, index]) && child.type === "label",
     );
     if (own !== undefined) {
       if (own !== "")
@@ -460,7 +470,6 @@ export function resolveHall(
     context: Context,
   ): Prepared => {
     const tag = node.type;
-    const children = childrenOf(node);
     if (tag === "label") {
       const size = clamp(numberAttr(node, "size") ?? labelSize, 0.05, 4);
       const text = stringAttr(node, "text", 200) ?? "";
@@ -530,14 +539,8 @@ export function resolveHall(
       k,
       scale,
       isHost,
-      labels: prepareLabels(node, tag, w, context, children),
-      children: isHost
-        ? children.flatMap((child, index) =>
-            isNode(child) && child.type !== "label"
-              ? [{ node: child, path: [...path, index] }]
-              : [],
-          )
-        : [],
+      labels: prepareLabels(node, path, tag, w, context),
+      children: isHost ? placeables(node, path, "host") : [],
     };
   };
 
@@ -546,7 +549,6 @@ export function resolveHall(
     item: Prepared,
     frame: Frame,
     defaults: { x?: number; y?: number },
-    depth: number,
   ) => {
     const node = item.node;
     const at = hallPoint(enumAttr(node, "at", [...HALL_POINTS, "center"]));
@@ -608,30 +610,38 @@ export function resolveHall(
       unit: item.scale * frame.unit,
       box: { x0: -halfW, y0: -halfH, x1: halfW, y1: halfH },
     };
-    for (const child of item.children) {
-      if (!enter(child.node, depth + 1)) continue;
-      place(prepare(child.node, child.path, "floor"), hostFrame, {}, depth + 1);
-    }
+    for (const child of item.children)
+      place(prepare(child.node, child.path, "floor"), hostFrame, {});
   };
 
-  const enter = (node: unknown, depth: number): node is HallNode => {
-    if (++visited > MAX_HALL_NODES || depth > MAX_HALL_DEPTH) return false;
-    return isNode(node);
-  };
+  /** Whether a node is inside the bounds and a node at all. */
+  function enter(node: unknown, path: readonly number[]): node is HallNode {
+    return inBounds.has(pathKey(path)) && isNode(node);
+  }
 
-  /** Placeables, free labels and doors under a floor or row node. */
-  const placeables = (node: HallNode, path: readonly number[], depth: number) =>
-    childrenOf(node).flatMap((child, index) => {
-      if (!enter(child, depth + 1)) return [];
+  /**
+   * The placeables a floor, row or host draws, by the shared placement
+   * rules: a host's `label` children are attached to it, not placed, and a
+   * floor's doors cut the walls.
+   */
+  function placeables(
+    node: HallNode,
+    path: readonly number[],
+    parent: HallTagRole,
+  ) {
+    return childrenOf(node).flatMap((child, index) => {
       const childPath = [...path, index];
-      if (child.type === "door") {
+      if (!enter(child, childPath)) return [];
+      const role = hallRole(child.type, art);
+      if (hallPlacement(parent, role) !== "allowed") return [];
+      if (role === "door") {
         addDoor(child);
         return [];
       }
-      const role = hallTagSpec(child.type, art)?.role;
-      if (role && !["placeable", "host", "label"].includes(role)) return [];
+      if (parent === "host" && role === "label") return [];
       return [{ node: child, path: childPath }];
     });
+  }
 
   const addDoor = (node: HallNode) => {
     const side = enumAttr(node, "side", BANNER_SIDES) ?? "west";
@@ -646,11 +656,15 @@ export function resolveHall(
 
   // Gather the structure first: rows need the wall and compass geometry.
   childrenOf(hall).forEach((child, index) => {
-    if (!enter(child, 1)) return;
     const path = [index];
+    if (!enter(child, path)) return;
+    const placement = hallPlacement("root", hallRole(child.type, art));
+    // Placeables directly under gdHall are drawn on the floor.
+    if (placement === "floor") floorItems.push({ node: child, path });
+    if (placement !== "allowed") return;
     switch (child.type) {
       case "floor":
-        floorItems.push(...placeables(child, path, 1));
+        floorItems.push(...placeables(child, path, "floor"));
         return;
       case "dais":
         rows.push({ node: child, path, kind: "dais" });
@@ -669,14 +683,10 @@ export function resolveHall(
         addDoor(child);
         return;
     }
-    const role = hallTagSpec(child.type, art)?.role;
-    // Placeables directly under gdHall are drawn on the floor.
-    if (role === undefined || ["placeable", "host", "label"].includes(role))
-      floorItems.push({ node: child, path });
   });
 
   for (const item of floorItems)
-    place(prepare(item.node, item.path, "floor"), floorFrame, {}, 2);
+    place(prepare(item.node, item.path, "floor"), floorFrame, {});
 
   // The compass labels sit just outside the wall lines; banner rows beyond.
   const compassDepth = (compassFont.top + compassFont.bottom) * COMPASS_SIZE;
@@ -718,7 +728,7 @@ export function resolveHall(
 
   for (const row of rows) {
     const context: Context = row.kind === "dais" ? "dais" : "floor";
-    const items = placeables(row.node, row.path, 1).map((item) =>
+    const items = placeables(row.node, row.path, "row").map((item) =>
       prepare(item.node, item.path, context),
     );
     const vertical = row.kind === "north" || row.kind === "south";
@@ -794,7 +804,6 @@ export function resolveHall(
         item,
         floorFrame,
         vertical ? { x: line, y: along } : { x: along, y: line },
-        2,
       );
     }
   }

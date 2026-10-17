@@ -12,13 +12,9 @@ import {
   stringAttr,
 } from "./attributes";
 import { HEBREW_LETTER_SPELLINGS, hebrewLetter } from "./hebrewLetters";
+import { hallArtKey, hallTagSpec, itemKindKnown } from "./spec";
 import type { HallArt, HallAttrSpec, HallNode } from "./types";
-import {
-  hallArtKey,
-  hallTagSpec,
-  itemKindKnown,
-  validateHall,
-} from "./validate";
+import { validateHall } from "./validate";
 import {
   hallPoint,
   MAX_HALL_DEPTH,
@@ -443,6 +439,40 @@ describe("validateHall", () => {
       [[3, 0], "error", "door cannot stand here; ignored"],
       [[4, 0], "error", "label cannot stand here; ignored"],
       [[5, 0, 1], "error", "pillar cannot stand here; ignored"],
+    ]);
+  });
+
+  it("places unknown tags as placeholders and skips their children", () => {
+    const result = validateHall(
+      hall(
+        { type: "unicorn" },
+        floor(
+          { type: "pillar", children: [{ type: "unicorn" }] },
+          { type: "altar", children: [{ type: "unicorn" }, { type: "door" }] },
+          { type: "unicorn", children: [{ type: "label", bad: 1 }] },
+          { type: "item:cup" },
+        ),
+      ),
+      {
+        art: new Map([
+          [
+            "item:cup",
+            {
+              Component: () => null,
+              box: { width: 1, height: 1 },
+              provenance: { origin: "original", author: "x", licence: "MIT" },
+            },
+          ],
+        ]),
+      },
+    );
+    expect(result.map((d) => [d.path, d.severity, d.message])).toEqual([
+      [[0], "warning", "unknown tag unicorn; drawn as a placeholder"],
+      [[1, 0, 0], "error", "unicorn cannot stand here; ignored"],
+      [[1, 1, 0], "warning", "unknown tag unicorn; drawn as a placeholder"],
+      [[1, 1, 1], "error", "door cannot stand here; ignored"],
+      [[1, 2], "warning", "unknown tag unicorn; drawn as a placeholder"],
+      [[1, 3], "error", "a node without a valid tag is ignored"],
     ]);
   });
 

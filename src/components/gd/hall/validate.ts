@@ -1,5 +1,6 @@
-import { readAttr, stringAttr } from "./attributes";
+import { readAttr } from "./attributes";
 import { hebrewLetter } from "./hebrewLetters";
+import { hallPlacement, hallTagSpec, itemKindKnown, walkHall } from "./spec";
 import type {
   HallArtRegistry,
   HallAttrSpec,
@@ -8,15 +9,11 @@ import type {
   HallSeverity,
 } from "./types";
 import {
-  CORE_ITEM_KINDS,
   HALL_ROLES,
-  HALL_TAGS,
   type HallTagRole,
-  type HallTagSpec,
   IDENTIFIER,
   MAX_HALL_DEPTH,
   MAX_HALL_NODES,
-  PLACEABLE_ATTRIBUTES,
   RESERVED_ATTRIBUTES,
   RESERVED_TAGS,
 } from "./vocabulary";
@@ -27,68 +24,8 @@ export interface ValidateHallOptions {
   art?: HallArtRegistry;
 }
 
-/** Where each role may stand, by the role of its parent. */
-const ALLOWED_CHILDREN: ReadonlyMap<
-  HallTagRole,
-  ReadonlySet<HallTagRole>
-> = new Map([
-  ["root", new Set<HallTagRole>(["row", "floor", "caption", "door"])],
-  ["row", new Set<HallTagRole>(["placeable", "host", "label"])],
-  ["floor", new Set<HallTagRole>(["placeable", "host", "label", "door"])],
-  ["host", new Set<HallTagRole>(["placeable", "host", "label"])],
-  ["placeable", new Set<HallTagRole>(["label"])],
-  ["caption", new Set<HallTagRole>()],
-  ["door", new Set<HallTagRole>()],
-  ["label", new Set<HallTagRole>()],
-]);
-
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
-
-/**
- * The art registry key a node is drawn with: `lamen` for an officer,
- * `item:<kind>` for an item, otherwise the tag.
- */
-export function hallArtKey(node: HallNode): string {
-  if (node.type === "officer") return "lamen";
-  if (node.type === "item")
-    return `item:${stringAttr(node, "kind", 200) ?? ""}`;
-  return node.type;
-}
-
-/**
- * A tag's spec: the package's own, or a placeable the art registry adds.
- * Given the node, the attributes its art declares (`item:<kind>`, the
- * officer's `lamen`) are added to a package tag's own, which win on a
- * clash.
- */
-export function hallTagSpec(
-  type: string,
-  art?: HallArtRegistry,
-  node?: HallNode,
-): HallTagSpec | undefined {
-  const own = HALL_TAGS.get(type);
-  if (own) {
-    const extra = node && art?.get(hallArtKey(node))?.attributes;
-    return extra
-      ? { role: own.role, attributes: new Map([...extra, ...own.attributes]) }
-      : own;
-  }
-  const drawn = art?.get(type);
-  if (!drawn || RESERVED_TAGS.has(type)) return undefined;
-  return {
-    role: "placeable",
-    attributes: new Map([
-      ...PLACEABLE_ATTRIBUTES,
-      ...(drawn.attributes ?? new Map()),
-    ]),
-  };
-}
-
-/** Whether an item kind has art: the package's own or the registry's. */
-export function itemKindKnown(kind: string, art?: HallArtRegistry): boolean {
-  return CORE_ITEM_KINDS.has(kind) || art?.has(`item:${kind}`) === true;
-}
 
 /**
  * Checks a hall against the vocabulary and returns every problem found, in
@@ -112,7 +49,7 @@ export function validateHall(
         ? { path, severity, message }
         : { path, attribute, severity, message },
     );
-  let visited = 0;
+  let overflowed = false;
 
   const checkAttributes = (
     node: Record<string, unknown>,
@@ -276,19 +213,6 @@ export function validateHall(
     parent: HallTagRole,
     depth: number,
   ) => {
-    if (++visited > MAX_HALL_NODES) {
-      if (visited === MAX_HALL_NODES + 1)
-        report(
-          path,
-          "error",
-          `more than ${MAX_HALL_NODES} nodes; the rest are ignored`,
-        );
-      return;
-    }
-    if (depth > MAX_HALL_DEPTH) {
-      report(path, "error", `nested deeper than ${MAX_HALL_DEPTH}; ignored`);
-      return;
-    }
     if (!isRecord(node)) {
       report(
         path,
@@ -306,6 +230,22 @@ export function validateHall(
       report(path, "error", "a node without a valid tag is ignored");
       return;
     }
+    const spec = RESERVED_TAGS.has(tag)
+      ? undefined
+      : hallTagSpec(tag, options.art, node as HallNode);
+    // Unknown and reserved tags stand where a placeable may.
+    const role = spec?.role ?? "placeable";
+    const placement = depth === 0 ? "allowed" : hallPlacement(parent, role);
+    if (role === "root" && depth > 0)
+      report(path, "error", "gdHall cannot be nested");
+    else if (placement === "ignored")
+      report(path, "error", `${tag} cannot stand here; ignored`);
+    else if (placement === "floor" && spec)
+      report(
+        path,
+        "warning",
+        `${tag} belongs in floor, dais or banners; drawn on the floor`,
+      );
     if (RESERVED_TAGS.has(tag)) {
       report(
         path,
@@ -315,37 +255,32 @@ export function validateHall(
       checkAttributes(node, tag, undefined, path);
       return;
     }
-    const spec = hallTagSpec(tag, options.art, node as HallNode);
     if (!spec) {
-      report(path, "warning", `unknown tag ${tag}; drawn as a placeholder`);
+      if (placement !== "ignored")
+        report(path, "warning", `unknown tag ${tag}; drawn as a placeholder`);
       checkAttributes(node, tag, undefined, path);
       return;
     }
-    if (spec.role === "root" && depth > 0)
-      report(path, "error", "gdHall cannot be nested");
-    else if (depth > 0 && !ALLOWED_CHILDREN.get(parent)?.has(spec.role)) {
-      const onFloor =
-        parent === "root" && ["placeable", "host", "label"].includes(spec.role);
-      report(
-        path,
-        onFloor ? "warning" : "error",
-        onFloor
-          ? `${tag} belongs in floor, dais or banners; drawn on the floor`
-          : `${tag} cannot stand here; ignored`,
-      );
-    }
     checkAttributes(node, tag, spec.attributes, path);
-    checkMeaning(node, tag, path);
-    const children = Array.isArray(node.children) ? node.children : [];
-    children.forEach((child, index) =>
-      visit(child, [...path, index], spec.role, depth + 1),
-    );
+    // What is not drawn has no meaning to check ("drawn in the middle").
+    if (placement !== "ignored") checkMeaning(node, tag, path);
   };
 
   if (!isRecord(input) || input.type !== "gdHall") {
     report([], "error", "a hall must start with gdHall");
     return diagnostics;
   }
-  visit(input as HallNode, [], "root", 0);
+  walkHall(input, options.art, visit, (path, reason) => {
+    if (reason === "depth")
+      report(path, "error", `nested deeper than ${MAX_HALL_DEPTH}; ignored`);
+    else if (!overflowed) {
+      overflowed = true;
+      report(
+        path,
+        "error",
+        `more than ${MAX_HALL_NODES} nodes; the rest are ignored`,
+      );
+    }
+  });
   return diagnostics;
 }
