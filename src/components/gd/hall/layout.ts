@@ -92,6 +92,11 @@ export const DEFAULT_PADDING = 0.5;
  * | item lantern | 1.19 | 1.19 | Zelator floor lantern 1.43 × 2.38 |
  * | item censer | 0.53 | 0.53 | Zelator 2 altar 0.78 × 1.06 |
  * | item fan | 0.99 | 0.99 | Theoricus 1 altar 1.98 × 1.25 |
+ * | item pantacle | 1 | 1 | Theoricus badge 2 × 2 |
+ * | item lightning | 0.49 | 0.49 | Theoricus 2 Flaming Sword 0.56 × 0.98 |
+ * | tarotKey | 0.81 | 0.81 | Theoricus 1 altar card 0.94 × 1.62 |
+ * | tablet | 2.05 | 2.05 | Theoricus Air tablet 3.02 × 4.09 |
+ * | shewbread, candlestick | 1.25 | 1.25 | Zelator 2: the outer circle 2 squares across |
  * | other items | 0.4 | 0.4 | none |
  * | unknown tags (placeholder) | 0.5 | 0.5 | a 1-square box |
  *
@@ -123,6 +128,12 @@ export const DEFAULT_SCALES: ReadonlyMap<string, readonly [number, number]> =
     ["item:lantern", [1.19, 1.19]],
     ["item:censer", [0.53, 0.53]],
     ["item:fan", [0.99, 0.99]],
+    ["item:pantacle", [1, 1]],
+    ["item:lightning", [0.49, 0.49]],
+    ["tarotKey", [0.81, 0.81]],
+    ["tablet", [2.05, 2.05]],
+    ["shewbread", [1.25, 1.25]],
+    ["candlestick", [1.25, 1.25]],
     ["item", [0.4, 0.4]],
     ["unknown", [0.5, 0.5]],
   ]);

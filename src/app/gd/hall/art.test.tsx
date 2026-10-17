@@ -71,7 +71,10 @@ describe("the app's hall art", () => {
     for (const [key, art] of defaultHallArt) {
       expect(art.provenance.origin, key).toBe("original");
       expect(art.provenance.licence, key).toBe("MIT");
-      if (key !== "lamen") expect(gdHallArt.get(key), key).toBe(art);
+      // The app replaces the lamen, and gives the tablet its Enochian font.
+      if (key === "tablet")
+        expect(gdHallArt.get(key)?.provenance).toBe(art.provenance);
+      else if (key !== "lamen") expect(gdHallArt.get(key), key).toBe(art);
     }
   });
 

@@ -4,6 +4,8 @@
  * original art. MIT; see ../../LICENSE.txt.
  */
 export { defaultHallArt } from "./art";
+export { TABLET_ELEMENTS, tabletArt } from "./art/symbols";
+export { romanNumeral, TRUMPS } from "./art/tarotKey";
 export {
   GD_HALL_FONT_FAMILIES,
   GD_HALL_FONT_FILES,
