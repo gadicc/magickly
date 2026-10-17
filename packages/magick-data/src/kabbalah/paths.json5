@@ -1,5 +1,9 @@
 /*
 
+  `hermetic.tarotTitle` is the Golden Dawn's title of the trump on the path
+  (`tarotId`): "Strength" on Teth as VIII, "Justice" on Lamed as XI, and "The
+  Universe" for XXI, which other decks call "The World".
+
   For more information on the difference in letter attribution to the paths in
   the Hebrew and Western Hermetic traditions, see:
 
@@ -15,6 +19,7 @@
       hebrewLetterId: "alef",
       pathNo: 11,
       tarotId: "0",
+      tarotTitle: "The Fool",
     },
     hebrew: {
       hebrewLetterId: "he",
@@ -30,6 +35,7 @@
       hebrewLetterId: "bet",
       pathNo: 12,
       tarotId: "1",
+      tarotTitle: "The Magician",
     },
     hebrew: {
       hebrewLetterId: "vav",
@@ -46,6 +52,7 @@
       hebrewLetterId: "gimel",
       pathNo: 13,
       tarotId: "2",
+      tarotTitle: "The High Priestess",
     },
     hebrew: {
       hebrewLetterId: "dalet",
@@ -62,6 +69,7 @@
       hebrewLetterId: "dalet",
       pathNo: 14,
       tarotId: "3",
+      tarotTitle: "The Empress",
     },
     hebrew: {
       hebrewLetterId: "shin",
@@ -78,6 +86,7 @@
       hebrewLetterId: "vav",
       pathNo: 16,
       tarotId: "5",
+      tarotTitle: "The Hierophant",
     },
     hebrew: {
       hebrewLetterId: "bet",
@@ -105,6 +114,7 @@
       hebrewLetterId: "he",
       pathNo: 15,
       tarotId: "4",
+      tarotTitle: "The Emperor",
     },
     hebrew: {
       hebrewLetterId: "tet",
@@ -131,6 +141,7 @@
       hebrewLetterId: "het",
       pathNo: 18,
       tarotId: "7",
+      tarotTitle: "The Chariot",
     },
     hebrew: {
       hebrewLetterId: "gimel",
@@ -147,6 +158,7 @@
       hebrewLetterId: "zayin",
       pathNo: 17,
       tarotId: "6",
+      tarotTitle: "The Lovers",
     },
     hebrew: {
       hebrewLetterId: "ayin",
@@ -163,6 +175,7 @@
       hebrewLetterId: "tet",
       pathNo: 19,
       tarotId: "8",
+      tarotTitle: "Strength",
     },
     hebrew: {
       hebrewLetterId: "alef",
@@ -179,6 +192,7 @@
       hebrewLetterId: "yod",
       pathNo: 20,
       tarotId: "9",
+      tarotTitle: "The Hermit",
     },
     hebrew: {
       hebrewLetterId: "het",
@@ -195,6 +209,7 @@
       hebrewLetterId: "kaf",
       pathNo: 21,
       tarotId: "10",
+      tarotTitle: "Wheel of Fortune",
     },
     hebrew: {
       hebrewLetterId: "kaf",
@@ -211,6 +226,7 @@
       hebrewLetterId: "lamed",
       pathNo: 22,
       tarotId: "11",
+      tarotTitle: "Justice",
     },
     hebrew: {
       hebrewLetterId: "tsadi",
@@ -227,6 +243,7 @@
       hebrewLetterId: "mem",
       pathNo: 23,
       tarotId: "12",
+      tarotTitle: "The Hanged Man",
     },
     hebrew: {
       hebrewLetterId: "pe",
@@ -243,6 +260,7 @@
       hebrewLetterId: "nun",
       pathNo: 24,
       tarotId: "13",
+      tarotTitle: "Death",
     },
     hebrew: {
       hebrewLetterId: "yod",
@@ -259,6 +277,7 @@
       hebrewLetterId: "ayin",
       pathNo: 26,
       tarotId: "15",
+      tarotTitle: "The Devil",
     },
     hebrew: {
       hebrewLetterId: "samekh",
@@ -275,6 +294,7 @@
       hebrewLetterId: "samekh",
       pathNo: 25,
       tarotId: "14",
+      tarotTitle: "Temperance",
     },
     hebrew: {
       hebrewLetterId: "resh",
@@ -291,6 +311,7 @@
       hebrewLetterId: "pe",
       pathNo: 27,
       tarotId: "16",
+      tarotTitle: "The Tower",
     },
     hebrew: {
       hebrewLetterId: "mem",
@@ -307,6 +328,7 @@
       hebrewLetterId: "tsadi",
       pathNo: 28,
       tarotId: "17",
+      tarotTitle: "The Star",
     },
     hebrew: {
       hebrewLetterId: "nun",
@@ -323,6 +345,7 @@
       hebrewLetterId: "qof",
       pathNo: 29,
       tarotId: "18",
+      tarotTitle: "The Moon",
     },
     prevId: "7_9",
     nextId: "8_9",
@@ -336,6 +359,7 @@
       hebrewLetterId: "resh",
       pathNo: 30,
       tarotId: "19",
+      tarotTitle: "The Sun",
     },
     hebrew: {
       hebrewLetterId: "lamed",
@@ -352,6 +376,7 @@
       hebrewLetterId: "shin",
       pathNo: 31,
       tarotId: "20",
+      tarotTitle: "Judgement",
     },
     prevId: "8_9",
     nextId: "9_10",
@@ -365,6 +390,7 @@
       hebrewLetterId: "tav",
       pathNo: 32,
       tarotId: "21",
+      tarotTitle: "The Universe",
     },
     hebrew: {
       hebrewLetterId: "tav",

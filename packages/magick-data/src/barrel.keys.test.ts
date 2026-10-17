@@ -330,6 +330,7 @@ describe("data barrel", () => {
       "hebrewLetterId",
       "pathNo",
       "tarotId",
+      "tarotTitle",
       "hebrewLetter",
     ]);
     expect(Object.keys(data.treeOfLifePath["1_2"].hebrew ?? {})).toEqual([

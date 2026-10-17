@@ -293,6 +293,8 @@ export const schemas = {
         hebrewLetterId: v.string(),
         pathNo: v.number(),
         tarotId: v.string(),
+        /** The trump's Golden Dawn title, such as "The Universe" for XXI. */
+        tarotTitle: v.string(),
       }),
     ),
     hebrew: v.optional(v.strictObject({ hebrewLetterId: v.string() })),
