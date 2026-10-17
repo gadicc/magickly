@@ -2,7 +2,9 @@
 
 Status: design settled with Gadi on 17 October 2026; adversarially reviewed
 twice (Fable) and spiked the same day. Stage A started on `gate/gd-hall`;
-A1 (model, validator, layout, labels, fonts, renderer, original art) is in.
+A1 (model, validator, layout, labels, fonts, renderer, original art) and A2
+(lamen, app art registry, legacy art, first-party art, the five presets)
+are in.
 
 Composable Golden Dawn temple-hall diagrams, authored in the ritual Pug
 dialect, drawn as inline SVG in the reader and editor, edited visually, and
@@ -531,15 +533,23 @@ from them, drawn with our own art.
 
 | Item | Today | Status |
 | --- | --- | --- |
-| Checker floor, walls, dais, door | drawings, first-party | regenerated in code |
-| Lamens | `Lamen`, first-party | keep; caduceus and Eye of Horus to replace |
-| Pillars, banners, Hebrew banners, pantacle | drawings, first-party | port into code |
-| Enochian tablets and sigils | `Tablet`, first-party | reuse; font licence open |
-| Cup, chalice, salt, bread, rose, lamp, lantern, censer, fan | drawings, icon-set signatures, no source | replace |
+| Checker floor, walls, dais, door | drawings, first-party | regenerated in code (A1) |
+| Lamens | `Lamen`, first-party, injected as `lamenArt` (`src/app/gd/hall`) | Past Hierophant added (A2); caduceus and Eye of Horus to replace |
+| Pillars, banners, Hebrew banners | drawings, first-party | ported into code (A1) |
+| Pantacle | drawing, first-party | redrawn from geometry, `item:pantacle` (A2) |
+| Flaming Sword (lightning) | drawing, first-party | redrawn without markers, `item:lightning` (A2) |
+| Enochian tablets and sigils | `Tablet`, first-party | reused as `tablet` (A2); font licence open |
+| Table of Shewbread, candlestick | components, first-party | reused as `shewbread`, `candlestick` (A2) |
+| Cup, chalice, salt, bread, rose, lamp, lantern, censer, fan | drawings, icon-set signatures, no source | lifted into `src/app/gd/hall/legacyArt/` (A2, AGPL, injected); replace |
 | Caduceus (Keryx lamen) | SVG Repo, "public domain" label | replace |
 | Eye of Horus (Sentinel lamen) | game-icons.net, CC BY | replace |
-| Tarot XXI on the Theoricus altar | RWS raster in the drawing | original card |
-| Serpent on the Tree, Moon kamea, Moon seals | rasters in Theoricus 2, no source | redraw / generate |
+| Tarot XXI on the Theoricus altar | RWS raster in the drawing | original card, `tarotKey` (A2) |
+| Serpent on the Tree, Moon kamea, Moon seals | rasters in Theoricus 2, no source | markers in the preset (A2); redraw / generate |
+
+The third-party list the plan requires (decision 9) is
+`THIRD_PARTY_ART` in `src/app/gd/hall/art.test.tsx`: the nine legacy
+items and `lamen` (for its caduceus and Eye of Horus). Stage H brings it to
+zero.
 
 Outside this project but found on the way: `2=9.pug:414` hotlinks a Pinterest
 image; the 22 RWS tarot JPGs in `public/tarot/rws` are uncredited (public
@@ -618,6 +628,83 @@ Settled while building A1, where the decisions above left a choice:
 - A `label` child of a placeable is attached to it; a `label` in the floor,
   a row or a host's frame is free text placed like any object.
 
+## Stage A2 notes
+
+Settled while building A2, where the plan or the brief left a choice or
+proved wrong:
+
+- **Hierophant and Past Hierophant.** The plan said the Past Hierophant's
+  lamen is the striped ring "from the Neophyte drawing". The drawings label
+  it otherwise, the same in Neophyte, Zelator 1 and Theoricus 1: the
+  striped ring (`circle1-6-5`, a stripe pattern) is "Hierophant", and the
+  light grey ring with the green disc and red cross (`circle1-6-55`,
+  `#f2f2f2`) is "Past Hierophant". `Lamen` draws the Past Hierophant as
+  labelled; the Hierophant keeps the existing red ring, so the ritual role
+  symbols are unchanged. Open for Gadi: should the Hierophant take the
+  striped ring? It would change the role symbol in every ritual.
+- **Lamen colours** are `Lamen`'s, not the drawings' (whose Cancellarius
+  and Praemonstrator use deeper colours); `Lamen` is canonical.
+- **Legacy art** is lifted, not traced: every transform applied, centred,
+  100 units on the longer side, rounded to 0.1 unit; glow filters, ids and
+  Inkscape metadata dropped (the drawings' items have a soft glow; ours do
+  not). The chalice (115 KB) and censer (66 KB) are traced drawings with
+  hundreds of paths; integer rounding visibly roughened them, so they stay
+  that size until stage H.
+- **Lamp and lantern** are one drawing (the Neophyte red lamp); the other
+  drawings' lanterns are copies of it. The panes take the existing item
+  attribute `fill` (a named colour mixed half and half with white) rather
+  than a new `color`; the lamp defaults to the drawing's red, the lantern
+  to its pale yellow.
+- **Item scales** are re-measured on the items' own geometry: A1's figures
+  included the glow filters, and its lantern row measured the Zelator
+  salt. One default per kind, from the drawing where it first appears;
+  presets set `scale` where a drawing draws an item larger (the Theoricus
+  cups and lamps, the Zelator salt and triangles).
+- **Pantacle ring.** Theoricus 2 (`text39`) rings the disc with SAPERE AUDE
+  and seven Earth names separated by runic crosses: Adonai, Auriel, Kerub,
+  Phrath, Tzaphon, Phorlakh, Aretz. Its Adonai is spelled "אאאאדני" and a
+  stray "t" opens the text; both are read as typos. The names stand in
+  eighths of the ring, anticlockwise from SAPERE AUDE (the Hebrew reading
+  direction), set in visual order with bidi overridden so every renderer
+  lays them out alike; the runic separators are left out (the hall fonts
+  have no such glyph).
+- **Tarot titles** live in magick-data as `treeOfLifePath`'s
+  `hermetic.tarotTitle` (one per Hermetic path, so one per trump), with
+  "The Universe" for XXI. The path page keeps naming the trump as its
+  Rider-Waite card prints it.
+- **Shewbread and candlestick** both named their text paths
+  `path-<branch>-l<line>`, so on one page the second drew its text on the
+  first's paths. Each now takes an `idPrefix` prop, defaulting to its own
+  name; the hall passes one from `defId`. A first fix with `useId()` broke
+  the production build, because the `/og` and `/api/render` routes render
+  them with no hook dispatcher, so these components must stay hook-free.
+  The `idPrefix` fix was folded into the commits that introduced the ids
+  and the hall art, so every commit builds.
+  In the hall each draws in a 100-unit nested `<svg>` (they size
+  themselves to their parent viewport) on a white disc.
+- **Tablets.** One default scale (2.05, the Theoricus Air tablet) for both;
+  the Zelator drawings' larger Earth tablet is drift. The package's tablet
+  shows the transliteration; `gdHallArt` passes the app's Enochian font,
+  so whatever imports `gdHallArt` also carries that `next/font` face.
+- **Zelator 1 altar** (conflict 8): `item(kind="lightning")` drawn yellow
+  (`stroke`, a named colour) so it shows on the black altar, the cross in
+  the triangle at its West end, the red lamp at its East end.
+- **Zelator Earth tablet** (conflict 7): `anchor="north"` at x = −0.31, the
+  wall line; the lantern and salt stand just South of it, where they now
+  touch the Table of Shewbread's disc in Zelator 2.
+- **Dais height.** The dais row centres its block, labels included, and the
+  two-line "Past Hierophant" label pushed the dais-5 lamens down onto the
+  Theoricus Air tablet; the Zelator and Theoricus presets set the lamens'
+  `y` (−2.7) instead.
+- **Rendered references.** The pantacle's ring and the two diagrams use
+  `textPath` with `href="#…"`; the preset test allows `href` and `url()`
+  only when they point at an id in the same SVG.
+- **Registry attributes.** `hallTagSpec` now adds the attributes an item's
+  or a lamen's injected art declares (found by the A1 review).
+- Preset snapshots (`src/app/gd/hall/__snapshots__`) are 56–326 KB each,
+  one tag per line; Zelator 2 is the largest (chalice, censer, both
+  diagrams, the tablet).
+
 ## Commits
 
 | Commit | Change |
@@ -627,6 +714,13 @@ Settled while building A1, where the decisions above left a choice:
 | 946a743 | Layout resolver and label wrapping |
 | e63ae08 | `GdHall` renderer, chrome and the package's original art |
 | 8a7babd | Import-boundary test for `src/components` |
+| ca2a14c | Registry attributes for item kinds and officers (A1 review) |
+| b7134dc | `Lamen`: Past Hierophant, `Map` lookups, no duplicate caduceus id |
+| 952466b | App art registry `gdHallArt`, `lamenArt`, legacy art, item scales |
+| b2ab96c | Unique text path ids in the Shewbread and candlestick (hook-free `idPrefix`) |
+| 4fe36e6 | magick-data: the trumps' Golden Dawn titles on the paths |
+| 0322fab | Pantacle, lightning, `tarotKey`, `tablet`, `shewbread`, `candlestick` |
+| 6563adf | The five presets and their tests |
 
 ## Future
 
@@ -654,4 +748,5 @@ files the import-boundary test still allows (`Link`, `Tiles`, `Mercury`,
 list as the README says it does; export font
 embedding for the Tree of Life; Firefox and Safari checks of PNG export with
 embedded fonts; the RWS tarot credit and the Pinterest
-hotlink in `2=9.pug`.
+hotlink in `2=9.pug`; whether the Hierophant's lamen takes the drawings'
+striped ring (Stage A2 notes).
