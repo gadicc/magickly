@@ -1,6 +1,8 @@
+import { svgCoordinate } from "../../../svgCoordinate";
 import { stringAttr } from "../attributes";
 import { GD_HALL_FONT_STACKS } from "../fonts";
 import { hebrewLetter } from "../hebrewLetters";
+import { hebrewLetterBody } from "../labels";
 import type { HallArt, HallArtProps } from "../types";
 import { pennantPath, Rod } from "./banner";
 import { original, PALETTE } from "./shared";
@@ -16,6 +18,13 @@ export const provenance = {
 };
 
 const TOP = -38;
+/** The letter's size, and where the middle of its body stands. */
+const LETTER_SIZE = 62;
+const LETTER_MIDDLE = 1;
+/** The baseline that centres the letter's body (from the font) there. */
+const BASELINE =
+  LETTER_MIDDLE +
+  (LETTER_SIZE * (hebrewLetterBody.top - hebrewLetterBody.bottom)) / 2;
 
 function HebrewLetter({ node, defId }: HallArtProps) {
   const name = stringAttr(node, "letter", 40);
@@ -46,8 +55,8 @@ function HebrewLetter({ node, defId }: HallArtProps) {
       {letter && (
         <text
           x={0}
-          y={21}
-          fontSize={62}
+          y={svgCoordinate(BASELINE)}
+          fontSize={LETTER_SIZE}
           fontFamily={GD_HALL_FONT_STACKS.hebrew}
           fontWeight={700}
           textAnchor="middle"

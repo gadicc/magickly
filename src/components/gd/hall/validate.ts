@@ -29,6 +29,12 @@ export interface ValidateHallOptions {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
+/** Untrusted text as a message shows it: at most 40 characters. */
+const clip = (text: string) =>
+  text.length > 40 ? `${text.slice(0, 40)}…` : text;
+/** Untrusted text quoted in a message, clipped. */
+const quote = (text: string) => JSON.stringify(clip(text));
+
 /**
  * Checks a hall against the vocabulary and returns every problem found, in
  * document order. Never throws: content is untrusted and still draws, with
@@ -74,7 +80,7 @@ export function validateHall(
         report(
           path,
           "error",
-          `${tag}: the attribute ${name} is reserved`,
+          `${tag}: the attribute ${clip(name)} is reserved`,
           name,
         );
         continue;
@@ -83,7 +89,7 @@ export function validateHall(
         report(
           path,
           "error",
-          `${tag}: ${JSON.stringify(name)} is not an attribute name`,
+          `${tag}: ${quote(name)} is not an attribute name`,
           name,
         );
         continue;
@@ -95,7 +101,7 @@ export function validateHall(
         report(
           path,
           "error",
-          `${tag}: ${name} must be a number, string or boolean`,
+          `${tag}: ${clip(name)} must be a number, string or boolean`,
           name,
         );
         continue;
@@ -103,7 +109,12 @@ export function validateHall(
       if (!attributes) continue;
       const spec = attributes.get(name);
       if (!spec) {
-        report(path, "warning", `${tag}: unknown attribute ${name}`, name);
+        report(
+          path,
+          "warning",
+          `${tag}: unknown attribute ${clip(name)}`,
+          name,
+        );
         continue;
       }
       const reading = readAttr(value, spec);
@@ -112,12 +123,18 @@ export function validateHall(
           spec.kind === "enum"
             ? `one of ${spec.values.join(", ")}`
             : `a ${spec.kind}`;
-        const shown =
-          typeof value === "string" ? JSON.stringify(value) : String(value);
+        const shown = typeof value === "string" ? quote(value) : String(value);
+        const tooLong =
+          spec.kind === "string" &&
+          typeof value === "string" &&
+          spec.maxLength !== undefined &&
+          value.length > spec.maxLength;
         report(
           path,
           "error",
-          `${tag}: ${name}=${shown} is not ${expected}`,
+          tooLong
+            ? `${tag}: ${clip(name)}=${shown} is longer than ${spec.maxLength} characters`
+            : `${tag}: ${clip(name)}=${shown} is not ${expected}`,
           name,
         );
       } else if (
@@ -130,7 +147,7 @@ export function validateHall(
         report(
           path,
           "warning",
-          `${tag}: ${name}=${reading.value} is outside ${spec.min}–${spec.max} and is clamped`,
+          `${tag}: ${clip(name)}=${reading.value} is outside ${spec.min}–${spec.max} and is clamped`,
           name,
         );
       }
@@ -163,7 +180,7 @@ export function validateHall(
           report(
             path,
             "warning",
-            `${tag}: unknown role ${JSON.stringify(role)}`,
+            `${tag}: unknown role ${quote(role)}`,
             "role",
           );
         break;
@@ -174,7 +191,7 @@ export function validateHall(
           report(
             path,
             "error",
-            `hebrewLetter: ${letter === undefined ? "no letter" : `unknown letter ${JSON.stringify(letter)}`}`,
+            `hebrewLetter: ${letter === undefined ? "no letter" : `unknown letter ${quote(letter)}`}`,
             "letter",
           );
         break;
@@ -186,7 +203,7 @@ export function validateHall(
           report(
             path,
             "warning",
-            `item: no art for ${JSON.stringify(kind)}; drawn as a placeholder`,
+            `item: no art for ${quote(kind)}; drawn as a placeholder`,
             "kind",
           );
         break;
@@ -246,18 +263,19 @@ export function validateHall(
     const spec = RESERVED_TAGS.has(tag)
       ? undefined
       : hallTagSpec(tag, options.art, node as HallNode);
+    const shown = clip(tag);
     // Unknown and reserved tags stand where a placeable may.
     const role = spec?.role ?? "placeable";
     const placement = depth === 0 ? "allowed" : hallPlacement(parent, role);
     if (role === "root" && depth > 0)
       report(path, "error", "gdHall cannot be nested");
     else if (placement === "ignored")
-      report(path, "error", `${tag} cannot stand here; ignored`);
+      report(path, "error", `${shown} cannot stand here; ignored`);
     else if (placement === "floor" && spec)
       report(
         path,
         "warning",
-        `${tag} belongs in floor, dais or banners; drawn on the floor`,
+        `${shown} belongs in floor, dais or banners; drawn on the floor`,
       );
     if (RESERVED_TAGS.has(tag)) {
       report(
@@ -265,16 +283,16 @@ export function validateHall(
         "error",
         `the tag ${tag} is reserved and cannot be used in a hall`,
       );
-      checkAttributes(node, tag, undefined, path);
+      checkAttributes(node, shown, undefined, path);
       return;
     }
     if (!spec) {
       if (placement !== "ignored")
-        report(path, "warning", `unknown tag ${tag}; drawn as a placeholder`);
-      checkAttributes(node, tag, undefined, path);
+        report(path, "warning", `unknown tag ${shown}; drawn as a placeholder`);
+      checkAttributes(node, shown, undefined, path);
       return;
     }
-    checkAttributes(node, tag, spec.attributes, path);
+    checkAttributes(node, shown, spec.attributes, path);
     // What is not drawn has no meaning to check ("drawn in the middle").
     if (placement !== "ignored") checkMeaning(node, tag, path);
   };
@@ -335,7 +353,7 @@ function reportCuts(
     report(
       path,
       "warning",
-      `${tagAt(path)}: text longer than ${MAX_LABEL_LINES} lines; cut with an ellipsis`,
+      `${clip(tagAt(path))}: text longer than ${MAX_LABEL_LINES} lines; cut with an ellipsis`,
     );
   if (cuts.overBudget)
     report(

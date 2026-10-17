@@ -9,7 +9,10 @@ export const provenance = {
       "public/pics/neophyte.svg (groups g44, the East, and g5, the West): " +
       "a pennant on a rod with knobs, cord and tassels; the East bears the " +
       "yellow cross with the interlaced red and blue triangles and the white " +
-      "Tau, the West the white triangle with the red cross.",
+      "Tau, the West the white triangle with the red cross. Part of g44 " +
+      "is a path of steps on a 0.32-unit grid that looks auto-traced from " +
+      "a raster image; no path of either group is reused: these banners " +
+      "are primitive geometry throughout.",
   ),
   source: "public/pics/neophyte.svg",
 };

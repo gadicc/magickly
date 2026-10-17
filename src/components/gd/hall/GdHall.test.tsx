@@ -342,15 +342,19 @@ describe("art provenance", () => {
     }
   });
 
-  it("has every art module export its provenance", async () => {
-    const directory = path.join(__dirname, "art");
-    const modules = readdirSync(directory).filter(
+  it("has every art module export its provenance", () => {
+    // A glob Vite can see, unlike a template import().
+    const modules = import.meta.glob(["./art/*.tsx", "!./art/*.test.tsx"], {
+      eager: true,
+    }) as Record<string, { provenance?: unknown }>;
+    const files = readdirSync(path.join(__dirname, "art")).filter(
       (file) => file.endsWith(".tsx") && !file.endsWith(".test.tsx"),
     );
-    expect(modules.length).toBeGreaterThan(8);
-    for (const file of modules) {
-      const module = await import(`./art/${file.replace(/\.tsx$/, "")}`);
+    expect(files.length).toBeGreaterThan(8);
+    expect(Object.keys(modules).sort()).toEqual(
+      files.map((file) => `./art/${file}`).sort(),
+    );
+    for (const [file, module] of Object.entries(modules))
       expect(module.provenance, file).toBeDefined();
-    }
   });
 });

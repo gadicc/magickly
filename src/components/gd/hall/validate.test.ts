@@ -442,6 +442,37 @@ describe("validateHall", () => {
     ]);
   });
 
+  it("clips untrusted text in its messages", () => {
+    const long = "x".repeat(10_000);
+    const tag = `t${"x".repeat(10_000)}`;
+    const result = validateHall(
+      hall(
+        floor(
+          { type: "pillar", kind: long, [tag]: 1 },
+          { type: "officer", role: long },
+          { type: "item", kind: long },
+          { type: "hebrewLetter", letter: long },
+          { type: tag, children: [] },
+          { type: "pillar", children: [{ type: tag }] },
+        ),
+      ),
+    );
+    expect(result).toHaveLength(10);
+    for (const diagnostic of result)
+      expect(diagnostic.message.length, diagnostic.message).toBeLessThan(120);
+    expect(result[0].message).toBe(
+      `pillar: kind="${"x".repeat(40)}…" is not one of black, white`,
+    );
+    expect(result[1].message).toBe(
+      `pillar: unknown attribute t${"x".repeat(39)}…`,
+    );
+    // The attribute itself is kept whole, for an editor to find.
+    expect(result[1].attribute).toBe(tag);
+    expect(result[2].message).toBe(
+      `officer: role="${"x".repeat(40)}…" is longer than 200 characters`,
+    );
+  });
+
   it("reports what the layout cuts", () => {
     const long = "word ".repeat(40);
     const result = validateHall({
