@@ -246,7 +246,7 @@ Placeables:
 | `hebrewLetter(letter)` | A Hebrew-letter banner, in a row or anywhere |
 | `tablet(element)` | Reuses `Tablet`; earth and air now, water, fire and union once the data exists |
 | `item(kind)` | Art registry: cup, chalice, salt, bread, rose, lamp, lantern, censer, fan, cross (`form`: calvary, latin, greek, greekFiveSquares, fourTriangles), triangle (`dir`: up, down), pentagram, pantacle, serpentTree, lightning, gong, brazier |
-| `tarotKey(n)` | An original simplified card: numeral, Hebrew letter and title from magick-data |
+| `tarotKey(n)` | An original simplified card: numeral, Hebrew letter and title from magick-data; `n` is clamped to 0–21 and rounded, with a warning |
 | `kamea(planet)`, `seal(planet)` | The number square drawn from its numbers; seals redrawn |
 | `board(kind)` | A diagram on a stand: flamingSword and minutumMundum via `TreeOfLife`; gardenOfEden and theFall as labelled boards first |
 | `shewbread`, `candlestick` | The existing components |
@@ -269,9 +269,8 @@ runs the inventory over every preset and expects a complete enumeration with
 no issues. No hall tag is called `title`, which the inventory treats
 specially.
 
-Data still to add: tarot card titles (magick-data has path-to-key numbers and
-Hebrew letters, not titles), kamea squares (computed), seals (drawn), and the
-adept roles (`chiefAdept`, `secondAdept`, `thirdAdept`) in the ritual role
+Data still to add (the tarot titles came in A2): kamea squares (computed),
+seals (drawn), and the adept roles (`chiefAdept`, `secondAdept`, `thirdAdept`) in the ritual role
 catalog, so hall roles and ritual roles stay one set.
 
 ### 6. Labels
@@ -466,7 +465,7 @@ below; the presets follow them.
 | 4 | Philosophus 3 (27th path) | 1938 p.137 (n131) draws Hiereus (with the Banner of the West), Hierophant and Hegemon (with the Banner of the East) in a row at the East edge, each with a cup; pillars North–South near the South wall facing Peh. The rubric on the same page: Hierophant on his throne on the dais, Hiereus with banner seated before the dais NE, Hegemon SE, red lamps. The cups look carried over from the 29th and 28th path drawings | Documented in 1938; unsettled | Follow the text (Hierophant on the dais, red lamps); keep the drawing's pillars, which the text supports |
 | 5 | Philosophus 4 (4=7) | 1938 p.144–145 (n138–139): the rubric twice puts the pillars North and South of the altar with Hiereus and Hegemon beside them; the drawing on the same page puts the pillars West of the altar | Documented in 1938; unsettled, text explicit twice | Follow the text |
 | 6 | Portal Adepts | Explained by #1: the floor stations belong to the part 1 drawing (3rd Adept NE, 2nd Adept SE); the part 2 rubric seats them on the dais | Resolved by #1 | As #1 |
-| 7 | Zelator Earth tablet | 1938 p.44 (n38) draws it with its outer edge on the North wall line, inside the hall, lamp and salt before it; no source says whether it hangs or stands | Partly settled | On the wall line, inside (the book), not outside (our drawing) |
+| 7 | Zelator Earth tablet | 1938 p.44 (n38) draws it with its outer edge on the North wall line, inside the hall, lamp and salt before it; no source says whether it hangs or stands | Reopened after the A2 review: at its drawn size (3.82 × 5.31 squares) the book's placement leaves the lamp and salt no room clear of the Hiereus and the Table of Shewbread | Was: on the wall line, inside (the book). The presets now hang it outside, as our drawings do, until Gadi decides |
 | 8 | Zelator altar | 1938 drawing: the Flaming Sword diagram on the altar, the red lamp at its East end, the cross in the triangle at the base of the Tree. The explicit "For the Altar" requirements line appears only from 1986, an editorial addition consistent with 1938 | Settled | Add the Flaming Sword board and the red lamp to Zelator 1 |
 | 9 | Neophyte Banner of the West | 1938 p.11 (n3) draws it free-standing on the floor, North-West of and slightly East of the Hiereus' throne; the Z documents give it a pole and base. No text gives a position | Settled as far as the sources go | On the floor, North-West of the throne (book) |
 
@@ -668,13 +667,19 @@ proved wrong:
   Phrath, Tzaphon, Phorlakh, Aretz. Its Adonai is spelled "אאאאדני" and a
   stray "t" opens the text; both are read as typos. The names stand in
   eighths of the ring, anticlockwise from SAPERE AUDE (the Hebrew reading
-  direction), set in visual order with bidi overridden so every renderer
-  lays them out alike; the runic separators are left out (the hall fonts
-  have no such glyph).
+  direction); the runic separators are left out (the hall fonts have no
+  such glyph). A2 set each name on one `textPath`, Hebrew in visual order
+  with bidi overridden, claiming every renderer would lay them out alike:
+  Chromium did, but resvg-wasm (the server's renderer) drew every Hebrew
+  name reversed and rsvg draws no `textPath`. Each letter is now its own
+  rotated `<text>`, placed by the font's advances and kern pairs
+  (`fontMetrics.json` now holds Noto Serif Hebrew Bold's); Chromium and
+  resvg draw the same ring, in the order Chromium drew before.
 - **Tarot titles** live in magick-data as `treeOfLifePath`'s
-  `hermetic.tarotTitle` (one per Hermetic path, so one per trump), with
-  "The Universe" for XXI. The path page keeps naming the trump as its
-  Rider-Waite card prints it.
+  `hermetic.tarotTitle` (one per Hermetic path, so one per trump): the
+  trumps' common titles, with the Golden Dawn's "The Universe" for XXI,
+  not the Order's own titles (Follow-ups). The path page keeps naming the
+  trump as its Rider-Waite card prints it.
 - **Shewbread and candlestick** both named their text paths
   `path-<branch>-l<line>`, so on one page the second drew its text on the
   first's paths. Each now takes an `idPrefix` prop, defaulting to its own
@@ -685,23 +690,34 @@ proved wrong:
   and the hall art, so every commit builds.
   In the hall each draws in a 100-unit nested `<svg>` (they size
   themselves to their parent viewport) on a white disc.
-- **Tablets.** One default scale (2.05, the Theoricus Air tablet) for both;
-  the Zelator drawings' larger Earth tablet is drift. The package's tablet
+- **Tablets.** The default scale is the Theoricus Air tablet's board
+  (`rect164-7`, 1.91 × 2.69 squares): 1.345. A2's 2.05 was mis-measured
+  and drew the Theoricus tablet over the Pantacle and the lantern. The
+  Zelator Earth tablet is a larger board (`rect161`, 3.82 × 5.31) and
+  sets `scale` 2.655 in its presets. Measured in Chromium in the checker
+  floor's frame (its altar exactly at (8, 8); `rect313`, the floor's
+  outline, sits 0.034 squares off it). The package's tablet
   shows the transliteration; `gdHallArt` passes the app's Enochian font,
   so whatever imports `gdHallArt` also carries that `next/font` face.
 - **Zelator 1 altar** (conflict 8): `item(kind="lightning")` drawn yellow
   (`stroke`, a named colour) so it shows on the black altar, the cross in
   the triangle at its West end, the red lamp at its East end.
-- **Zelator Earth tablet** (conflict 7): `anchor="north"` at x = −0.31, the
-  wall line; the lantern and salt stand just South of it, where they now
-  touch the Table of Shewbread's disc in Zelator 2.
+- **Zelator Earth tablet** (conflict 7): A2 stood it inside on the wall
+  line (`anchor="north"`, x = −0.31) at the Theoricus size. At its own
+  size it reaches 3.4 squares into the hall, and the lamp and salt before
+  it would cover the Hiereus (part 1) and the Table of Shewbread (part
+  2), so after the A2 review it hangs outside the North wall as the
+  drawings have it (centre (−1.37, 8.30)), with the lamp and salt where
+  they draw them. Conflict 7 is reopened for Gadi. The compass labels now
+  move outward past anything outside their wall, so "North" clears it.
 - **Dais height.** The dais row centres its block, labels included, and the
   two-line "Past Hierophant" label pushed the dais-5 lamens down onto the
   Theoricus Air tablet; the Zelator and Theoricus presets set the lamens'
   `y` (−2.7) instead.
-- **Rendered references.** The pantacle's ring and the two diagrams use
-  `textPath` with `href="#…"`; the preset test allows `href` and `url()`
-  only when they point at an id in the same SVG.
+- **Rendered references.** The two diagrams (Shewbread, candlestick) use
+  `textPath` with `href="#…"` (the Pantacle's ring no longer does); the
+  preset test allows `href` and `url()` only when they point at an id in
+  the same SVG.
 - **Registry attributes.** `hallTagSpec` now adds the attributes an item's
   or a lamen's injected art declares (found by the A1 review).
 - Preset snapshots (`src/app/gd/hall/__snapshots__`) are 56–326 KB each,
@@ -711,7 +727,7 @@ proved wrong:
 ## Review fixes
 
 An independent review of A1 (`469b66b..34321f7`) found two major and eight
-minor problems and some nits; m5 was fixed in A2 (ca2a14c), the rest after
+minor problems and some nits; m5 was fixed in A2 (a0381b0), the rest after
 A2:
 
 - **One set of rules** (`spec.ts`): tag specs, a placement table (allowed,
@@ -752,6 +768,33 @@ Not changed: `gdHallFontFaceCss` still throws on an unsafe base URL. The URL
 is the developer's, not content, and failing loudly is preferred to a hall
 silently drawn without its fonts.
 
+An independent review of A2 (`34321f7..7de3734`, before the `idPrefix` fix
+was folded in) found one major and four minor problems and two nits, fixed
+after it:
+
+- **Tablet scale** (major): the default was measured on the wrong shape;
+  re-measured on the boards, 1.345 by default and 2.655 for the Zelator
+  Earth tablet, the Theoricus tablets at the board's centre (7.97, 0.63).
+  The Zelator tablet now hangs outside the North wall (Stage A2 notes,
+  conflict 7), and compass labels move outward past anything outside
+  their wall.
+- **Zelator 2's sources** cited p.44, the first part's diagram; it now
+  cites its drawing alone, and a test pins each preset's page to its own
+  part.
+- **Pantacle ring**: each letter drawn alone, so resvg no longer reverses
+  the Hebrew (Stage A2 notes). Checked in headless Chromium and
+  resvg-wasm 2.6.2 against the order Chromium drew before.
+- **tarotKey**: `n` is clamped and rounded as the validator says, and a
+  number spec may ask for whole numbers (`integer`), the validator
+  warning that a fraction is rounded.
+- **Theoricus 1**: the cup stands 0.21 squares further West, so the card's
+  title shows.
+- **Nits**: magick-data calls the trump titles the common ones, with the
+  Golden Dawn's "The Universe" for XXI; the hook-free test of the
+  Shewbread and candlestick renders them with a guarded `react` instead
+  of calling `forwardRef`'s internal `render`, and so also sees hooks in
+  their child components.
+
 ## Commits
 
 | Commit | Change |
@@ -761,22 +804,30 @@ silently drawn without its fonts.
 | 946a743 | Layout resolver and label wrapping |
 | e63ae08 | `GdHall` renderer, chrome and the package's original art |
 | 8a7babd | Import-boundary test for `src/components` |
-| ca2a14c | Registry attributes for item kinds and officers (A1 review) |
-| b7134dc | `Lamen`: Past Hierophant, `Map` lookups, no duplicate caduceus id |
-| 952466b | App art registry `gdHallArt`, `lamenArt`, legacy art, item scales |
-| b2ab96c | Unique text path ids in the Shewbread and candlestick (hook-free `idPrefix`) |
-| 4fe36e6 | magick-data: the trumps' Golden Dawn titles on the paths |
-| 0322fab | Pantacle, lightning, `tarotKey`, `tablet`, `shewbread`, `candlestick` |
-| 6563adf | The five presets and their tests |
-| 6d6b2e4 | Shared placement rules and node walk (review M1, m1) |
-| 1ee305e | Label line limits and minimum wrap width (M1) |
-| 9fb76bc | Free label width and nested geometry clamped (M2, m6) |
-| 605a371 | Stacked labels, wrapping at the drawn width, row extents (m2, m3) |
-| 9fc026b | A hall without a dais (m7) |
-| 0b03e0c | Import boundary resolves aliases and `..` (m8) |
-| ed14baf | Soft hyphen and no-break space in label measurement |
-| 5a84f05 | The validator reports what the layout cuts |
-| 555f0f2 | Clipped messages, Hebrew baseline, glob, provenance |
+| a0381b0 | Registry attributes for item kinds and officers (A1 review) |
+| 7ef8363 | `Lamen`: Past Hierophant, `Map` lookups, no duplicate caduceus id |
+| 82f2bee | App art registry `gdHallArt`, `lamenArt`, legacy art, item scales |
+| 507b99e | Unique text path ids in the Shewbread and candlestick (hook-free `idPrefix`) |
+| c1b775c | magick-data: the trumps' titles on the paths ("The Universe" for XXI) |
+| 9b37566 | Pantacle, lightning, `tarotKey`, `tablet`, `shewbread`, `candlestick` |
+| f4f4ff7 | The five presets and their tests |
+| 7a7885e | Shared placement rules and node walk (review M1, m1) |
+| 77dedc4 | Label line limits and minimum wrap width (M1) |
+| d5551bf | Free label width and nested geometry clamped (M2, m6) |
+| 3424553 | Stacked labels, wrapping at the drawn width, row extents (m2, m3) |
+| fe21e69 | A hall without a dais (m7) |
+| fe2a380 | Import boundary resolves aliases and `..` (m8) |
+| 3fae4ba | Soft hyphen and no-break space in label measurement |
+| 28e3677 | The validator reports what the layout cuts |
+| 538198e | Clipped messages, Hebrew baseline, glob, provenance |
+| 47990fc | Compass labels move past art outside their wall (A2 review) |
+| 51d67ec | Tablet scales from the boards: 1.345, Zelator 2.655; Zelator tablet outside (A2 review, major) |
+| dc27b1a | Zelator 2 cites its drawing alone (A2 review) |
+| 4b996aa | Pantacle ring drawn letter by letter; Hebrew advances in `fontMetrics.json` (A2 review) |
+| 6e79728 | `tarotKey` clamps and rounds `n`; `integer` number specs (A2 review) |
+| 1173d66 | Theoricus 1 cup clear of the card's title (A2 review) |
+| 7262684 | magick-data: the trump titles described as the common ones (A2 review) |
+| 4e30021 | Hook-free test of the Shewbread and candlestick by rendering (A2 review) |
 
 ## Future
 
@@ -805,4 +856,17 @@ list as the README says it does; export font
 embedding for the Tree of Life; Firefox and Safari checks of PNG export with
 embedded fonts; the RWS tarot credit and the Pinterest
 hotlink in `2=9.pug`; whether the Hierophant's lamen takes the drawings'
-striped ring (Stage A2 notes).
+striped ring (Stage A2 notes); whether the Zelator Earth tablet hangs
+outside the North wall (the drawings, now) or stands inside it (the book;
+conflict 7), and if inside, where the lamp and salt go; whether the tarot
+titles adopt the Golden Dawn's own, from a cited source (they are the
+common titles, with "The Universe" for XXI);
+`src/components/entity/entityFields.test.ts`, which reaches app code
+through `import.meta.glob("../../app/**/fields.ts")`, a path the
+import-boundary test cannot see.
+
+For stage B (PNG export): resvg-wasm 2.6.2 did not resolve the hall's
+quoted font stacks (`"GdHall Noto Serif", "Noto Serif", serif`) to a
+loaded Noto Serif in a test harness, falling back to Noto Sans, while the
+bare family name worked; check the stacks before relying on resvg for
+hall images.

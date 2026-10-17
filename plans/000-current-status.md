@@ -326,7 +326,12 @@ Follow-ups are separate from the completed migration work:
   of `src/components` (or off their app imports), embedded fonts in the Tree
   of Life exports, Firefox and Safari checks of PNG export with embedded fonts,
   a credit for the RWS tarot images and the Pinterest hotlink in `2=9.pug`,
-  and Gadi's call on whether the Hierophant's lamen takes the striped ring
-  the hall drawings give it ([plan 061](061-gd-hall.md#follow-ups)).
+  Gadi's calls on whether the Hierophant's lamen takes the striped ring
+  the hall drawings give it, whether the Zelator Earth tablet hangs outside
+  the North wall or stands inside it, and whether the tarot titles adopt
+  the Golden Dawn's own, and an import-boundary gap:
+  `src/components/entity/entityFields.test.ts` reaches app code through
+  `import.meta.glob("../../app/**/fields.ts")`, which the test cannot see
+  ([plan 061](061-gd-hall.md#follow-ups)).
 
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.
