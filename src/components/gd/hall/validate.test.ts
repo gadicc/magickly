@@ -12,8 +12,13 @@ import {
   stringAttr,
 } from "./attributes";
 import { HEBREW_LETTER_SPELLINGS, hebrewLetter } from "./hebrewLetters";
-import type { HallArt, HallNode } from "./types";
-import { hallTagSpec, itemKindKnown, validateHall } from "./validate";
+import type { HallArt, HallAttrSpec, HallNode } from "./types";
+import {
+  hallArtKey,
+  hallTagSpec,
+  itemKindKnown,
+  validateHall,
+} from "./validate";
 import {
   hallPoint,
   MAX_HALL_DEPTH,
@@ -361,6 +366,49 @@ describe("validateHall", () => {
     );
     expect(result.map((d) => d.message)).toEqual([
       'tablet: element="fire" is not one of earth',
+    ]);
+  });
+
+  it("adds the attributes an item's or officer's art declares", () => {
+    const declares = (attributes: [string, HallAttrSpec][]): HallArt => ({
+      Component: () => null,
+      box: { width: 1, height: 1 },
+      attributes: new Map(attributes),
+      provenance: { origin: "original", author: "x", licence: "MIT" },
+    });
+    const art = new Map<string, HallArt>([
+      ["item:lamp", declares([["glow", { kind: "boolean" }]])],
+      // The package's own spec wins a clash: fill stays a colour name.
+      ["item:cup", declares([["fill", { kind: "number" }]])],
+      ["lamen", declares([["ring", { kind: "enum", values: ["plain"] }]])],
+    ]);
+    expect(
+      hallTagSpec("item", art, { type: "item", kind: "lamp" })?.attributes.get(
+        "glow",
+      ),
+    ).toEqual({ kind: "boolean" });
+    expect(hallTagSpec("item", art)?.attributes.has("glow")).toBe(false);
+    expect(hallArtKey({ type: "officer", role: "keryx" })).toBe("lamen");
+    expect(hallArtKey({ type: "item" })).toBe("item:");
+    expect(hallArtKey({ type: "altar" })).toBe("altar");
+    const result = validateHall(
+      hall(
+        floor(
+          { type: "item", kind: "lamp", glow: true },
+          { type: "item", kind: "lamp", glow: "bright" },
+          { type: "item", kind: "cup", glow: true },
+          { type: "item", kind: "cup", fill: "red" },
+          { type: "officer", role: "keryx", ring: "plain" },
+          { type: "lamen", role: "keryx", ring: "plain" },
+          { type: "altar", ring: "plain" },
+        ),
+      ),
+      { art },
+    );
+    expect(result.map((d) => d.message)).toEqual([
+      'item: glow="bright" is not a boolean',
+      "item: unknown attribute glow",
+      "altar: unknown attribute ring",
     ]);
   });
 

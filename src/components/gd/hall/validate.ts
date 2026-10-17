@@ -1,4 +1,4 @@
-import { readAttr } from "./attributes";
+import { readAttr, stringAttr } from "./attributes";
 import { hebrewLetter } from "./hebrewLetters";
 import type {
   HallArtRegistry,
@@ -45,13 +45,35 @@ const ALLOWED_CHILDREN: ReadonlyMap<
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-/** A tag's spec: the package's own, or a placeable the art registry adds. */
+/**
+ * The art registry key a node is drawn with: `lamen` for an officer,
+ * `item:<kind>` for an item, otherwise the tag.
+ */
+export function hallArtKey(node: HallNode): string {
+  if (node.type === "officer") return "lamen";
+  if (node.type === "item")
+    return `item:${stringAttr(node, "kind", 200) ?? ""}`;
+  return node.type;
+}
+
+/**
+ * A tag's spec: the package's own, or a placeable the art registry adds.
+ * Given the node, the attributes its art declares (`item:<kind>`, the
+ * officer's `lamen`) are added to a package tag's own, which win on a
+ * clash.
+ */
 export function hallTagSpec(
   type: string,
   art?: HallArtRegistry,
+  node?: HallNode,
 ): HallTagSpec | undefined {
   const own = HALL_TAGS.get(type);
-  if (own) return own;
+  if (own) {
+    const extra = node && art?.get(hallArtKey(node))?.attributes;
+    return extra
+      ? { role: own.role, attributes: new Map([...extra, ...own.attributes]) }
+      : own;
+  }
   const drawn = art?.get(type);
   if (!drawn || RESERVED_TAGS.has(type)) return undefined;
   return {
@@ -293,7 +315,7 @@ export function validateHall(
       checkAttributes(node, tag, undefined, path);
       return;
     }
-    const spec = hallTagSpec(tag, options.art);
+    const spec = hallTagSpec(tag, options.art, node as HallNode);
     if (!spec) {
       report(path, "warning", `unknown tag ${tag}; drawn as a placeholder`);
       checkAttributes(node, tag, undefined, path);

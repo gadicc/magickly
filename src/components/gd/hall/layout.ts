@@ -15,7 +15,7 @@ import {
   wrapText,
 } from "./labels";
 import type { HallArt, HallArtBox, HallArtRegistry, HallNode } from "./types";
-import { hallTagSpec } from "./validate";
+import { hallArtKey, hallTagSpec } from "./validate";
 import {
   BANNER_SIDES,
   type BannerSide,
@@ -468,9 +468,7 @@ export function resolveHall(
         children: [],
       };
     }
-    const kind = stringAttr(node, "kind", 200);
-    const artKey =
-      tag === "officer" ? "lamen" : tag === "item" ? `item:${kind ?? ""}` : tag;
+    const artKey = hallArtKey(node);
     const known =
       !RESERVED_TAGS.has(tag) && hallTagSpec(tag, art) !== undefined;
     const drawn = known ? art.get(artKey) : undefined;
