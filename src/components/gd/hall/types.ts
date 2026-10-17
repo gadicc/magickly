@@ -63,13 +63,6 @@ export interface HallArtProps {
   /** The nominal box this node was laid out with, centred on the origin. */
   box: HallArtBox;
   /**
-   * Art units per checker square at the drawn size, for art that draws text
-   * at the hall's label size.
-   */
-  unitsPerSquare: number;
-  /** The hall's label size in squares. */
-  labelSize: number;
-  /**
    * A document-unique id for a gradient or pattern this art defines, stable
    * between server and client renders.
    */

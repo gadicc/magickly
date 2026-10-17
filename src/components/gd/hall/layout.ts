@@ -77,13 +77,21 @@ export const DEFAULT_PADDING = 0.5;
  */
 export const MIN_LABEL_WIDTH = 1.5;
 /**
- * The most label lines one hall draws, free labels included and the
- * caption not; lines beyond it are dropped in layout order. The largest
- * preset draws 12, so a fully labelled hall has room to spare, while
+ * The most label lines one hall draws, free labels and markers' text
+ * included and the caption not; lines beyond it are dropped in layout
+ * order. The largest preset draws 16 (Theoricus 2, with its three
+ * markers), so a fully labelled hall has room to spare, while
  * untrusted content (up to MAX_HALL_NODES labels of MAX_LABEL_LINES
  * lines each) cannot make the SVG grow without bound.
  */
 export const MAX_HALL_LABEL_LINES = 500;
+/**
+ * A marker's text: smaller than labels (a marker is only 1.2 squares
+ * wide), wrapped to this share of the marker's drawn width and centred in
+ * it. It counts against MAX_HALL_LABEL_LINES like any label.
+ */
+export const MARKER_TEXT_SCALE = 0.7;
+export const MARKER_TEXT_WIDTH = 0.84;
 
 /**
  * Default scales by kind (decision 4): `scale=1` fits an object's nominal
@@ -201,6 +209,8 @@ export interface ResolvedObject {
   labels: readonly ResolvedLabel[];
   /** Lines of a free `label`, which draws as text instead of art. */
   text?: ResolvedLabel;
+  /** Text drawn inside the object over its art: a marker's `text`. */
+  inner?: ResolvedLabel;
 }
 
 /** A gap in a wall. */
@@ -280,6 +290,8 @@ interface Prepared {
   isHost: boolean;
   labels: PreparedLabel[];
   text?: { lines: TextLine[]; size: number };
+  /** Text to wrap inside the object once its drawn width is known. */
+  inner?: string;
   children: { node: HallNode; path: readonly number[] }[];
 }
 
@@ -463,6 +475,32 @@ function placeLabels(
   });
 }
 
+/** Lays out lines centred on a point: a marker's text in its box. */
+function placeInner(lines: TextLine[], size: number, cx: number, cy: number) {
+  const advance = size * LINE_HEIGHT;
+  const first =
+    cy -
+    ((lines.length - 1) * advance) / 2 +
+    ((labelFont.top - labelFont.bottom) * size) / 2;
+  const widest = Math.max(0, ...lines.map((line) => line.width));
+  const top = first - labelFont.top * size;
+  return {
+    lines: lines.map((line, index) => ({
+      text: line.text,
+      x: cx,
+      y: first + index * advance,
+    })),
+    size,
+    anchor: "middle",
+    bounds: {
+      x0: cx - widest / 2,
+      y0: top,
+      x1: cx + widest / 2,
+      y1: top + textHeight(lines.length, size),
+    },
+  } satisfies ResolvedLabel;
+}
+
 /** Lays out a free label's lines centred in its own box. */
 function placeText(
   text: { lines: TextLine[]; size: number },
@@ -516,14 +554,18 @@ export function resolveHall(
   let lineBudget = MAX_HALL_LABEL_LINES;
   const truncated = new Map<string, readonly number[]>();
   let overBudget: readonly number[] | undefined;
-  /** Wraps the label of the node at `path` within the hall's line budget. */
+  /**
+   * Wraps the label of the node at `path` within the hall's line budget,
+   * no narrower than `minWidth`.
+   */
   const wrapLabel = (
     path: readonly number[],
     text: string,
     width: number,
     size: number,
+    minWidth = MIN_LABEL_WIDTH,
   ) => {
-    const lines = wrapText(text, Math.max(width, MIN_LABEL_WIDTH), size);
+    const lines = wrapText(text, Math.max(width, minWidth), size);
     if (lines.at(-1)?.truncated) truncated.set(pathKey(path), path);
     const kept = lines.slice(0, Math.max(0, lineBudget));
     if (kept.length < lines.length) overBudget ??= path;
@@ -688,6 +730,10 @@ export function resolveHall(
       scale,
       isHost,
       labels: prepareLabels(node, path, tag, w * unit, context),
+      inner:
+        tag === "marker" && !missing
+          ? stringAttr(node, "text", 200)
+          : undefined,
       children: isHost ? placeables(node, path, "host") : [],
     };
   };
@@ -753,6 +799,19 @@ export function resolveHall(
       labels: placeLabels(item.labels, rect),
     };
     if (item.text) resolved.text = placeText(item.text, rect);
+    if (item.inner) {
+      // Inside the box, as the marker drew it before: no minimum width,
+      // since the box is the limit, but every line counts.
+      const size = labelSize * MARKER_TEXT_SCALE;
+      const lines = wrapLabel(
+        item.path,
+        item.inner,
+        MARKER_TEXT_WIDTH * width,
+        size,
+        0,
+      );
+      if (lines.length > 0) resolved.inner = placeInner(lines, size, cx, cy);
+    }
     objects.push(resolved);
     if (!item.isHost) return;
     // A host's children live in its unscaled squares, centred on it, and
@@ -863,6 +922,7 @@ export function resolveHall(
     },
     ...object.labels.map((label) => label.bounds),
     ...(object.text ? [object.text.bounds] : []),
+    ...(object.inner ? [object.inner.bounds] : []),
   ]);
   const compassDepth = (compassFont.top + compassFont.bottom) * COMPASS_SIZE;
   const clearance = showCompass
@@ -995,6 +1055,7 @@ export function resolveHall(
       y1: object.cy + object.height / 2,
     });
     for (const label of object.labels) bounds = union(bounds, label.bounds);
+    if (object.inner) bounds = union(bounds, object.inner.bounds);
   }
   for (const label of compass) bounds = union(bounds, compassBox(label));
   let caption: ResolvedLabel | undefined;

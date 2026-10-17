@@ -14,8 +14,11 @@ import {
   COMPASS_SIZE,
   DEFAULT_SCALES,
   LABEL_GAP,
+  MARKER_TEXT_SCALE,
+  MARKER_TEXT_WIDTH,
   MAX_HALL_LABEL_LINES,
   MIN_LABEL_WIDTH,
+  type Rect,
   type ResolvedObject,
   resolveHall,
   WALL_GAP,
@@ -665,6 +668,7 @@ describe("resolveHall: bounded label output", () => {
       (sum, object) =>
         sum +
         (object.text?.lines.length ?? 0) +
+        (object.inner?.lines.length ?? 0) +
         object.labels.reduce((n, label) => n + label.lines.length, 0),
       0,
     );
@@ -716,6 +720,69 @@ describe("resolveHall: bounded label output", () => {
     expect(lineCount(objects)).toBe(MAX_HALL_LABEL_LINES);
     // Later labels lose their lines; nothing else changes.
     expect(objects[399].text?.lines).toEqual([]);
+  });
+});
+
+describe("resolveHall: marker text", () => {
+  const withMarker = new Map([...art, ["marker", drawing(100)]]);
+  const markers = (...children: unknown[]) =>
+    resolveHall(hall({}, floor(...children)), { art: withMarker });
+
+  it("wraps a marker's text inside it and centres it there", () => {
+    const [marker] = markers({
+      type: "marker",
+      text: "Serpent on the Tree",
+      x: 8,
+      y: 6,
+    }).objects;
+    const size = LABEL_SIZE * MARKER_TEXT_SCALE;
+    const lines = wrapText(
+      "Serpent on the Tree",
+      MARKER_TEXT_WIDTH * marker.width,
+      size,
+    );
+    // Narrower than MIN_LABEL_WIDTH: the box is the limit.
+    expect(MARKER_TEXT_WIDTH * marker.width).toBeLessThan(MIN_LABEL_WIDTH);
+    expect(marker.inner?.lines.map((line) => line.text)).toEqual(
+      lines.map((line) => line.text),
+    );
+    expect(marker.inner?.size).toBeCloseTo(size);
+    const bounds = marker.inner?.bounds as Rect;
+    expect((bounds.x0 + bounds.x1) / 2).toBeCloseTo(8);
+    expect(bounds.y0).toBeGreaterThan(marker.cy - marker.height / 2);
+    expect(bounds.y1).toBeLessThan(marker.cy + marker.height / 2);
+    expect(marker.labels).toEqual([]);
+  });
+
+  it("counts marker lines against the hall's budget and reports cuts", () => {
+    const text = "a ".repeat(100);
+    const node = hall(
+      {},
+      floor(...Array.from({ length: 100 }, () => ({ type: "marker", text }))),
+    );
+    const { objects, cuts } = resolveHall(node, { art: withMarker });
+    expect(objects[0].inner?.lines).toHaveLength(MAX_LABEL_LINES);
+    expect(objects[0].inner?.lines.at(-1)?.text.endsWith("…")).toBe(true);
+    expect(
+      objects.reduce((n, object) => n + (object.inner?.lines.length ?? 0), 0),
+    ).toBe(MAX_HALL_LABEL_LINES);
+    expect(cuts.truncated[0]).toEqual([0, 0]);
+    expect(cuts.overBudget).toEqual([0, Math.floor(MAX_HALL_LABEL_LINES / 6)]);
+    const messages = validateHall(node, { art: withMarker }).map(
+      (diagnostic) => diagnostic.message,
+    );
+    expect(messages).toContain(
+      `marker: text longer than ${MAX_LABEL_LINES} lines; cut with an ellipsis`,
+    );
+    expect(messages).toContain(
+      `more than ${MAX_HALL_LABEL_LINES} label lines in the hall; from here on they are not drawn`,
+    );
+  });
+
+  it("sets no text on a marker drawn as a placeholder", () => {
+    const [marker] = only(hall({}, floor({ type: "marker", text: "Lamp" })));
+    expect(marker.missing).toBe(true);
+    expect(marker.inner).toBeUndefined();
   });
 });
 

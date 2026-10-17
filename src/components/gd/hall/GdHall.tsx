@@ -137,15 +137,27 @@ function Chrome({
   );
 }
 
+/** Text drawn over an object's art, in the labels' face. */
+function Inner({ label }: { label: ResolvedLabel }) {
+  return (
+    <g
+      fontFamily={GD_HALL_FONT_STACKS.serif}
+      fontStyle="italic"
+      fill={PALETTE.ink}
+      style={labelTextStyle}
+    >
+      <Lines label={label} />
+    </g>
+  );
+}
+
 function HallObject({
   object,
   art,
-  labelSize,
   defId,
 }: {
   object: ResolvedObject;
   art: HallArtRegistry;
-  labelSize: number;
   defId: (name: string) => string;
 }): ReactNode {
   if (object.text) return null;
@@ -159,15 +171,12 @@ function HallObject({
     );
   const { Component } = drawn;
   return (
-    <g transform={transform}>
-      <Component
-        node={object.node}
-        box={object.box}
-        unitsPerSquare={1 / object.k}
-        labelSize={labelSize}
-        defId={defId}
-      />
-    </g>
+    <>
+      <g transform={transform}>
+        <Component node={object.node} box={object.box} defId={defId} />
+      </g>
+      {object.inner && <Inner label={object.inner} />}
+    </>
   );
 }
 
@@ -264,7 +273,6 @@ export function GdHall({
           key={object.path.join(".")}
           object={object}
           art={art}
-          labelSize={resolved.labelSize}
           defId={(name) => `${id}-${object.path.join("-")}-${name}`}
         />
       ))}

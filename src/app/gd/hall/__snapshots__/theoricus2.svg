@@ -561,14 +561,18 @@
 <g transform="translate(300 107) scale(1.8)">
 <rect x="-48" y="-48" width="96" height="96" fill="#ffffff" stroke="#000000" stroke-width="3">
 </rect>
-<text x="0" y="-5.184" font-size="16.722" font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" text-anchor="middle" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">Kamea of</text>
-<text x="0" y="14.047" font-size="16.722" font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" text-anchor="middle" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">Luna</text>
+</g>
+<g font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">
+<text x="300" y="97.669" font-size="30.1" text-anchor="middle">Kamea of</text>
+<text x="300" y="132.284" font-size="30.1" text-anchor="middle">Luna</text>
 </g>
 <g transform="translate(1302 97) scale(1.8)">
 <rect x="-48" y="-48" width="96" height="96" fill="#ffffff" stroke="#000000" stroke-width="3">
 </rect>
-<text x="0" y="-5.184" font-size="16.722" font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" text-anchor="middle" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">Seals of</text>
-<text x="0" y="14.047" font-size="16.722" font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" text-anchor="middle" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">Luna</text>
+</g>
+<g font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">
+<text x="1302" y="87.669" font-size="30.1" text-anchor="middle">Seals of</text>
+<text x="1302" y="122.284" font-size="30.1" text-anchor="middle">Luna</text>
 </g>
 <g transform="translate(700 166) scale(2.38)">
 <path d="M1.4-40.3c-.4-2.1 .3-5.8-.4-8.2c-.8-.8-2.2-.4-2.4 .9c0 2.4 .2 5.5-.1 7.3c-.5 0-.3-1.1-.3-1.6c0-3.1-.5-7.8 1.7-7.7c2.2 0 2.1 4.3 1.9 8.2c0 .5 .1 1.1-.4 1.1z" fill="#e7e7e8" fill-rule="evenodd">
@@ -769,9 +773,11 @@
 <g transform="translate(800 613) scale(1.72)">
 <rect x="-48" y="-48" width="96" height="96" fill="#ffffff" stroke="#000000" stroke-width="3">
 </rect>
-<text x="0" y="-15.487" font-size="17.5" font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" text-anchor="middle" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">Serpent</text>
-<text x="0" y="4.637" font-size="17.5" font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" text-anchor="middle" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">on the</text>
-<text x="0" y="24.763" font-size="17.5" font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" text-anchor="middle" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">Tree</text>
+</g>
+<g font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">
+<text x="800" y="586.362" font-size="30.1" text-anchor="middle">Serpent</text>
+<text x="800" y="620.977" font-size="30.1" text-anchor="middle">on the</text>
+<text x="800" y="655.592" font-size="30.1" text-anchor="middle">Tree</text>
 </g>
 <g transform="translate(180 814) scale(1.66)">
 <g transform="translate(-50 -50)">

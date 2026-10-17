@@ -11,8 +11,6 @@ const draw = (art: HallArt, node: HallNode, id = "t") => {
   const props: HallArtProps = {
     node,
     box,
-    unitsPerSquare: 50,
-    labelSize: 0.43,
     defId: (name) => `${id}-${name}`,
   };
   return renderToStaticMarkup(
