@@ -148,7 +148,11 @@ export function prepareSvgClone(
  * for rasterisation; file and clipboard output keep the element's own sizing.
  */
 export function serializeSvg(svg: SVGSVGElement, size?: RasterSize): string {
-  const clone = prepareSvgClone(svg, size);
+  return serializeSvgClone(prepareSvgClone(svg, size));
+}
+
+/** Standalone SVG text for a clone from `prepareSvgClone`, as it stands. */
+export function serializeSvgClone(clone: SVGSVGElement): string {
   const body = new XMLSerializer().serializeToString(clone);
   return `<?xml version="1.0" encoding="UTF-8"?>\n${body}\n`;
 }

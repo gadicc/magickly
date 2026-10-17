@@ -13,7 +13,13 @@ import {
   downloadBlob,
   rasterizeSvg,
 } from "./exportRuntime";
-import { rasterSize, SvgExportError, serializeSvg } from "./svgExport";
+import {
+  prepareSvgClone,
+  rasterSize,
+  SvgExportError,
+  serializeSvg,
+  serializeSvgClone,
+} from "./svgExport";
 
 const MESSAGES: Record<SvgExportError["code"], string> = {
   "no-target": "Nothing to export yet.",
@@ -45,6 +51,14 @@ export interface ExportControlsProps {
   linkNote?: string;
   /** Builds the interactive page URL that restores the current state. */
   share?: () => string;
+  /**
+   * Changes the detached copy of the SVG that becomes a PNG, before it is
+   * rasterised: download and copy as PNG only (the image links are drawn
+   * by the server). SVG files and copies never pass through it, so a font
+   * it inlines leaves the page only as rasterised glyphs. A rejection
+   * fails the export.
+   */
+  prepare?: (clone: SVGSVGElement) => void | Promise<void>;
 }
 
 /** Absolute form of a site-relative path for copying. */
@@ -62,6 +76,7 @@ export default function ExportControls({
   link,
   linkNote,
   share,
+  prepare,
 }: ExportControlsProps) {
   const [feedback, setFeedback] = React.useState<Feedback | null>(null);
   // Every action disables the controls until it settles; the PNG ones can
@@ -74,12 +89,17 @@ export default function ExportControls({
     if (!svg) throw new SvgExportError("no-target");
     return svg;
   };
-  // Serialise and start rasterising synchronously so clipboard writes keep
-  // the user gesture; only the PNG bytes arrive later.
+  // Clone the SVG and return the PNG's promise synchronously, so clipboard
+  // writes keep the user gesture (Safari); `prepare` and the PNG bytes
+  // arrive later, inside that promise.
   const png = () => {
     const svg = element();
     const size = rasterSize(svg);
-    return rasterizeSvg(serializeSvg(svg, size), size);
+    if (!prepare) return rasterizeSvg(serializeSvg(svg, size), size);
+    const clone = prepareSvgClone(svg, size);
+    return Promise.resolve()
+      .then(() => prepare(clone))
+      .then(() => rasterizeSvg(serializeSvgClone(clone), size));
   };
   const run = async (operation: () => Promise<string>) => {
     setPending((count) => count + 1);

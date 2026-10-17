@@ -58,6 +58,15 @@ export const GD_HALL_FONT_FILES: readonly GdHallFontFile[] = [
 ];
 
 /**
+ * One subset's `@font-face` rule with `src` as its WOFF2 source: a URL, or
+ * a `data:` URI when an export inlines the font. The caller vouches that
+ * `src` holds no quote, bracket, backslash or markup character.
+ */
+export function gdHallFontFaceRule(font: GdHallFontFile, src: string): string {
+  return `@font-face{font-family:"${font.family}";font-style:${font.style};font-weight:${font.weight};font-display:swap;src:url("${src}") format("woff2");unicode-range:${font.unicodeRange}}`;
+}
+
+/**
  * `@font-face` rules for the hall fonts served under `baseUrl` (such as
  * `/fonts`). The rules go into a `<style>` inside the SVG, where neither
  * HTML nor XML escapes them, so the URL may not contain quotes, brackets,
@@ -67,8 +76,7 @@ export function gdHallFontFaceCss(baseUrl: string): string {
   if (/["'()\\<>&\s]/.test(baseUrl))
     throw new Error(`Unsafe font base URL: ${JSON.stringify(baseUrl)}`);
   const base = baseUrl.replace(/\/+$/, "");
-  return GD_HALL_FONT_FILES.map(
-    (font) =>
-      `@font-face{font-family:"${font.family}";font-style:${font.style};font-weight:${font.weight};font-display:swap;src:url("${base}/${font.file}") format("woff2");unicode-range:${font.unicodeRange}}`,
+  return GD_HALL_FONT_FILES.map((font) =>
+    gdHallFontFaceRule(font, `${base}/${font.file}`),
   ).join("\n");
 }

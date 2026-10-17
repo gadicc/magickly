@@ -119,6 +119,80 @@ describe("ExportControls", () => {
     expect((copy as HTMLButtonElement).disabled).toBe(false);
   });
 
+  it("runs prepare on a clone for the PNG paths only, before rasterising", async () => {
+    const order: string[] = [];
+    let release!: () => void;
+    const prepare = vi.fn(async (clone: SVGSVGElement) => {
+      order.push("prepare");
+      await new Promise<void>((r) => {
+        release = r;
+      });
+      clone.setAttribute("data-prepared", "yes");
+    });
+    runtime.rasterizeSvg.mockImplementation(async () => {
+      order.push("rasterize");
+      return new Blob(["png"], { type: "image/png" });
+    });
+    runtime.copySvg.mockResolvedValue("image/svg+xml");
+    runtime.copyPng.mockImplementation(async (pending: Promise<Blob>) => {
+      await pending;
+    });
+    render(<Page filename="hall" viewBox="0 0 10 20" prepare={prepare} />);
+    const live = document.querySelector("svg") as SVGSVGElement;
+
+    // SVG download and copy never see it.
+    fireEvent.click(screen.getByLabelText("Download SVG"));
+    expect(await screen.findByText("Downloading SVG")).toBeTruthy();
+    fireEvent.click(screen.getByLabelText("Copy SVG to clipboard"));
+    expect(
+      await screen.findByText("Copied SVG image to clipboard"),
+    ).toBeTruthy();
+    expect(prepare).not.toHaveBeenCalled();
+    const [svgBlob] = runtime.downloadBlob.mock.calls[0] as [Blob];
+    expect(await svgBlob.text()).not.toContain("data-prepared");
+    expect(runtime.copySvg.mock.calls[0][0]).not.toContain("data-prepared");
+
+    // Copy PNG: the clipboard gets the pending PNG inside the click, while
+    // prepare is still running; rasterising waits for it.
+    fireEvent.click(screen.getByLabelText("Copy PNG to clipboard"));
+    expect(runtime.copyPng).toHaveBeenCalledTimes(1);
+    expect(runtime.copyPng.mock.calls[0][0]).toBeInstanceOf(Promise);
+    await vi.waitFor(() => expect(prepare).toHaveBeenCalledTimes(1));
+    const clone = prepare.mock.calls[0][0];
+    expect(clone).not.toBe(live);
+    expect(clone.isConnected).toBe(false);
+    expect(clone.getAttribute("width")).toBe("1024");
+    expect(runtime.rasterizeSvg).not.toHaveBeenCalled();
+    release();
+    expect(await screen.findByText("Copied PNG to clipboard")).toBeTruthy();
+    expect(order).toEqual(["prepare", "rasterize"]);
+    expect(runtime.rasterizeSvg).toHaveBeenCalledWith(
+      expect.stringContaining('data-prepared="yes"'),
+      { width: 1024, height: 2048 },
+    );
+    expect(live.hasAttribute("data-prepared")).toBe(false);
+
+    // Download PNG runs it again, on a fresh clone.
+    fireEvent.click(screen.getByLabelText("Download PNG"));
+    await vi.waitFor(() => expect(prepare).toHaveBeenCalledTimes(2));
+    expect(prepare.mock.calls[1][0]).not.toBe(clone);
+    release();
+    expect(await screen.findByText("Downloading PNG")).toBeTruthy();
+    expect(runtime.downloadBlob).toHaveBeenLastCalledWith(
+      expect.any(Blob),
+      "hall.png",
+    );
+  });
+
+  it("fails the PNG export when prepare fails", async () => {
+    const prepare = vi.fn().mockRejectedValue(new Error("no fonts"));
+    render(<Page filename="hall" viewBox="0 0 10 10" prepare={prepare} />);
+    fireEvent.click(screen.getByLabelText("Download PNG"));
+    expect(await screen.findByText("Export failed.")).toBeTruthy();
+    expect(runtime.rasterizeSvg).not.toHaveBeenCalled();
+    expect(runtime.downloadBlob).not.toHaveBeenCalled();
+  });
+
   it("explains failures instead of throwing", async () => {
     runtime.copyPng.mockRejectedValue(
       new SvgExportError("clipboard-unavailable"),

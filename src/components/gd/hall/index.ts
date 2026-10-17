@@ -12,6 +12,7 @@ export {
   GD_HALL_FONT_STACKS,
   type GdHallFontFile,
   gdHallFontFaceCss,
+  gdHallFontFaceRule,
 } from "./fonts";
 export { GdHall, type GdHallProps } from "./GdHall";
 export { labelFont, wrapText } from "./labels";
