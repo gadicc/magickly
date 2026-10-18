@@ -6,7 +6,9 @@ A1 (model, validator, layout, labels, fonts, renderer, original art), A2
 (lamen, app art registry, legacy art, first-party art, the five presets)
 and A3 (the Zelator Earth tablet per the book, PNG font embedding, the
 read-only `/gd/hall` gallery), with the fixes from the final reviews of
-stage A. Stage B waits on Gadi's decision on sizes (Stages).
+stage A. Before stage B (17–18 October 2026) Gadi settled sizes (one
+cell size, decision 4), the lamen rings (decision 9), the art and the
+tarot titles (Decisions before stage B); stage B is next.
 
 Composable Golden Dawn temple-hall diagrams, authored in the ritual Pug
 dialect, drawn as inline SVG in the reader and editor, edited visually, and
@@ -23,7 +25,7 @@ Research on 17 October 2026 (agents' reports checked against the code):
   groups, shapes pasted between files): a 16 × 16 checker floor of 6.6182 mm
   squares, East at the top, North on the left; dais 4 squares deep
   (Neophyte) or 5 (Zelator, Theoricus); floor lamens 1.66 squares across,
-  dais lamens 2.31, altar and pillars 2 × 2; the Zelator files carry about 2.4
+  dais lamens 2.31 (drift: decision 4), altar and pillars 2 × 2; the Zelator files carry about 2.4
   squares of extra margin on the North for the Earth tablet. Differences
   between the drawings are treated as drift, not intent, unless Gadi says
   otherwise. The Zelator drawings (July 2024) draw the dais lamens grey with a
@@ -208,18 +210,46 @@ gdHall(dais=4, wall="gradient")
   and the four corners name a point on the parent's box (on the floor, the
   floor's centre and walls). With `at`, x and y are offsets from that point.
 - **Anchor**: an object's centre by default; `anchor` overrides it.
-- **Scale**: `scale=1` fits the object into a 2 × 2-square box, aspect kept.
-  Each kind has a default scale from the drawings (floor lamen 0.83, dais
-  lamen 1.15, altar and pillar 1). A hall-level `sizes="drawing" | "uniform"`
-  renders the same hall with drawing scales or one common size, so the two can
-  be compared side by side; we keep one afterwards.
+- **Scale and cells** (settled 17–18 October 2026): `scale=1` gives an
+  object a cell of 2 × 2 squares. Its art fills the cell, aspect kept, or
+  the share of it the art's `inset` says: officers' lamens, on the dais and
+  on the floor alike, are inset to 0.8, 1.6 squares across at scale 1, as
+  Regardie's and Greer's diagrams draw every lamen one size (about 1.55
+  squares; the drawings' 2.31 on the dais and 1.66 on the floor were
+  drift). Spacing between neighbours comes from the inset. Furniture
+  fills its cell (altar, pillars, platform and throne, tablets: physical
+  sizes); items on the altar and elsewhere keep their measured per-kind
+  sizes. A label may use its object's whole cell width (2 squares at
+  scale 1), not just the art's. One default scale per kind,
+  `DEFAULT_SCALES` in `layout.ts` (officer 1 everywhere); the
+  `sizes="drawing" | "uniform"` comparison and `officerScale` of stage A
+  are gone.
+- **Layout contract**, set now, before any hall is saved (decision 2,
+  "Picking up component changes"): each kind's nominal box (its art's
+  `box`), its anchor (the centre unless `anchor` says otherwise), its
+  default scale and its art's `inset`. Changing any of them moves things
+  in saved halls, so it needs a deliberate decision; the preset render
+  snapshots catch accidental changes.
+
+  | Kind | Default scale | Drawn at scale 1 |
+  | --- | --- | --- |
+  | officer, lamen | 1 | 1.6 squares (inset 0.8 in a 2-square cell) |
+  | altar, pillar, banner | 1 | fills the 2-square cell (banner 1.6 × 2) |
+  | platform, throne, board | 1 | `w` × `h` squares |
+  | hebrewLetter | 1.475 | 2.95 × 2.71 |
+  | tablet | 1.345 | 1.91 × 2.69 |
+  | shewbread, candlestick | 1.25 | 2.5 |
+  | marker | 0.6 | 1.2 |
+  | tarotKey | 0.81 | 0.94 × 1.62 |
+  | items | per kind, 0.235–1.19 (other items 0.4) | measured on the drawings |
+  | unknown tags (placeholder) | 0.5 | 1 |
 - **Bounds and margins** come from content: the viewBox is the union of every
   resolved object and label plus `padding` (default half a square), so an
   Earth tablet outside the North wall widens the North margin by itself.
   `margin*` attributes override.
 - **The visual editor** writes positions rounded to two decimals, snapped to
   half squares unless Alt is held, and prints leaves in one form.
-- **Hall-level defaults** (`labelSize`, `officerScale`, later a palette) are
+- **Hall-level defaults** (`labelSize`, later a palette) are
   how a hall overrides styling without copying values into every node.
 
 Rejected: fractions 0–1 of the container (sixteenths such as 0.1875, units
@@ -232,8 +262,8 @@ counting squares).
 Structure: `gdHall`, `dais`, `banners`, `floor`, `caption` (the title),
 `door`. Hall attributes: `dais` (depth in squares), `wall`
 (`plain` | `gradient`), `compass` (East/West/North/South labels, on by
-default; the side labels are rotated as in the drawings), `sizes`, `padding`,
-`labelSize`.
+default; the side labels are rotated as in the drawings), `padding`,
+`labelSize` and the `margin*` attributes.
 
 Placeables:
 
@@ -295,10 +325,12 @@ size with `text-rendering="geometricPrecision"`, which Chromium lays out on a
 1/64 px grid (widths 1.9 % off, bounding boxes up to 152 % off). Wrapping
 uses advances, not `getBBox`, which includes the italic overhang.
 
-At the default sizes, "Past Hierophant", "Neophyte Temple" and "Banner of the
-West" wrap; "Hierophant" fits a dais lamen with 0.016 square to spare;
-"Cancellarius" and "Praemonstrator" overflow on the dais, and "Stolistes",
-"Hegemon" and "Dadouchos" slightly overflow a floor lamen.
+Labels wrap at their object's cell width (decision 4), 2 squares for an
+officer. At the default sizes "Past Hierophant" and "Banner of the West"
+wrap; "Hegemon", "Stolistes", "Hiereus", "Keryx" and "Sentinel" fit; the
+single words "Imperator" (2.06 squares), "Dadouchos" (2.22),
+"Hierophant" (2.30), "Cancellarius" (2.50) and "Praemonstrator" (3.22)
+overflow, centred.
 
 ### 7. Fonts
 
@@ -357,9 +389,28 @@ the reader is a later stage.
   directory, and reaches the renderer through the injected registry
   (decision 1) until it is redrawn. MIT `src/components/gd/hall` receives only
   original art.
-- `Lamen` gains the Past Hierophant (striped ring, from the Neophyte drawing)
-  and safe lookups where it is, in `src/app/gd/components`, and is injected the
-  same way. It moves to `src/components/gd/Lamen.tsx` (MIT) in stage H, once
+- `Lamen` gains the Past Hierophant and safe lookups where it is, in
+  `src/app/gd/components`, and is injected the same way.
+- **Lamen rings** (settled 17–18 October 2026): the ring shows the collar,
+  Gadi's own convention, kept deliberately so the roles stay
+  distinguishable even as 20–25 px ritual role icons. Imperator red,
+  Praemonstrator blue, Cancellarius yellow on the purple ("flashing")
+  disc; Hierophant horizontal red and white stripes (8 lamen units each,
+  a red stripe centred on the horizontal diameter, so the ring is
+  symmetric; the black outline kept); Past Hierophant white, the same
+  red cross on green, the same size as the others. The Past Hierophant's
+  ritual role icon uses its own lamen. The stripes are geometry (slabs of
+  the ring's disc under the inner disc), not a `<pattern>`, so `Lamen`
+  still defines no ids and needs no hook. The sources differ, and the
+  convention is ours: Regardie (*The Golden Dawn*) hangs the Hierophant's
+  lamen from a white collar, the Imperator's scarlet, the
+  Praemonstrator's blue and the Cancellarius' purple, and gives the Past
+  Hierophant only "a Jewel of that Lamen"; the Ciceros paint the ring in
+  the cross's colour and draw the Past Hierophant's lamen smaller; red
+  and white stripes are the Hierophant's nemyss in Zalewski and in the
+  Ciceros. Books are cited by title, edition and page only; archive.org
+  copies of the Cicero and Zalewski books look unauthorised and are
+  never linked. It moves to `src/components/gd/Lamen.tsx` (MIT) in stage H, once
   its caduceus (SVG Repo; "public domain" is the site's label, not the
   author's own licence text) and Eye of Horus (game-icons.net, CC BY) are
   replaced: Gadi wrote the file, but not those two paths, and CC BY
@@ -562,7 +613,7 @@ from them, drawn with our own art.
 | Item | Today | Status |
 | --- | --- | --- |
 | Checker floor, walls, dais, door | drawings, first-party | regenerated in code (A1) |
-| Lamens | `Lamen`, first-party, injected as `lamenArt` (`src/app/gd/hall`) | Past Hierophant added (A2); caduceus and Eye of Horus to replace |
+| Lamens | `Lamen`, first-party, injected as `lamenArt` (`src/app/gd/hall`) | Past Hierophant added (A2); collar rings, the Hierophant striped (before B); caduceus and Eye of Horus to replace |
 | Pillars, banners, Hebrew banners | drawings, first-party | ported into code (A1) |
 | Pantacle | drawing, first-party | redrawn from geometry, `item:pantacle` (A2) |
 | Flaming Sword (lightning) | drawing, first-party | redrawn without markers, `item:lightning` (A2) |
@@ -608,8 +659,8 @@ Each stage is a series of gated commits on `gate/gd-hall`.
 
 | Stage | Content | Can be reverted alone | Status |
 | --- | --- | --- | --- |
-| A | `src/components/gd/hall`: model, validator, layout, renderer, chrome, labels and fonts; `Lamen` Past Hierophant variant and `Map` lookups (the move is stage H); legacy art under `src/app`; the five drawn presets; a read-only `/gd/hall` gallery with export and side-by-side comparison with the old SVGs; `sizes` comparison | yes | done (A1–A3 and the final review fixes, 17 October 2026) |
-| B | Spike results applied: compiler change (decision 2), Pug round trip, lazy reader block, `blockAtoms` entry with a static node view, boundary tests | until the first hall is saved | gated: starts once Gadi settles drawing against uniform sizes (decision 4), and whether `sizes` stays in the vocabulary or is dropped. B saves halls in rituals, after which default scales are a layout contract (decision 2) |
+| A | `src/components/gd/hall`: model, validator, layout, renderer, chrome, labels and fonts; `Lamen` Past Hierophant variant and `Map` lookups (the move is stage H); legacy art under `src/app`; the five drawn presets; a read-only `/gd/hall` gallery with export and side-by-side comparison with the old SVGs; `sizes` comparison (removed before B) | yes | done (A1–A3 and the final review fixes, 17 October 2026) |
+| B | Spike results applied: compiler change (decision 2), Pug round trip, lazy reader block, `blockAtoms` entry with a static node view, boundary tests | until the first hall is saved | next: its gate is satisfied, since Gadi settled sizes (one cell size, decision 4) and `sizes` is dropped. B saves halls in rituals, after which the layout contract (decision 4) holds |
 | C | `/hall` slash command with presets | yes | |
 | D | Visual sub-editor | yes | |
 | E | `/gd/hall` source, visual and split playground with local draft and share link | yes | |
@@ -653,7 +704,8 @@ Settled while building A1, where the decisions above left a choice:
   `src/components/gd/hall/layout.ts`, measured on the drawings. Banners
   follow Neophyte (1.51 × 2.02 squares); the Zelator and Theoricus banners
   are half as large again, so their presets will either set `scale` or
-  accept the drift. `sizes="uniform"` draws every officer at scale 1.
+  accept the drift. `sizes="uniform"` drew every officer at scale 1
+  (removed before stage B: decision 4).
 - `margin*` fixes that side of the view at a distance from the wall line;
   without it the side follows the content plus `padding`.
 - The dais row centres its block, labels included, in the dais band;
@@ -678,7 +730,9 @@ proved wrong:
   `#f2f2f2`) is "Past Hierophant". `Lamen` draws the Past Hierophant as
   labelled; the Hierophant keeps the existing red ring, so the ritual role
   symbols are unchanged. Open for Gadi: should the Hierophant take the
-  striped ring? It would change the role symbol in every ritual.
+  striped ring? It would change the role symbol in every ritual. Settled
+  before stage B: yes, and the Past Hierophant's ring is white (decision
+  9, Lamen rings).
 - **Lamen colours** are `Lamen`'s, not the drawings' (whose Cancellarius
   and Praemonstrator use deeper colours); `Lamen` is canonical.
 - **Legacy art** is lifted, not traced: every transform applied, centred,
@@ -713,7 +767,7 @@ proved wrong:
 - **Tarot titles** live in magick-data as `treeOfLifePath`'s
   `hermetic.tarotTitle` (one per Hermetic path, so one per trump): the
   trumps' common titles, with the Golden Dawn's "The Universe" for XXI,
-  not the Order's own titles (Follow-ups). The path page keeps naming the
+  not the Order's own titles (kept: Decisions before stage B). The path page keeps naming the
   trump as its Rider-Waite card prints it.
 - **Shewbread and candlestick** both named their text paths
   `path-<branch>-l<line>`, so on one page the second drew its text on the
@@ -755,7 +809,8 @@ proved wrong:
 - **Dais height.** The dais row centres its block, labels included, and the
   two-line "Past Hierophant" label pushed the dais-5 lamens down onto the
   Theoricus Air tablet; the Zelator and Theoricus presets set the lamens'
-  `y` (−2.7) instead.
+  `y` (−2.7) instead. With the 1.6-square lamens of decision 4 the
+  workaround went: the row centres again, clear of the tablet.
 - **Rendered references.** The two diagrams (Shewbread, candlestick) use
   `textPath` with `href="#…"` (the Pantacle's ring no longer does); the
   preset test allows `href` and `url()` only when they point at an id in
@@ -809,7 +864,8 @@ Settled while building A3, where the plan or the brief left a choice:
   in a `<style>`; the halls carry none (`fontBaseUrl` unset), so SVG
   exports stay font-free. `GdHall` takes a `ref` to its `<svg>`.
 - **Sizes**: a three-way toggle, drawing, uniform or both side by side,
-  each hall with its own export (`gd-hall-<id>`, `gd-hall-<id>-uniform`).
+  each hall with its own export (`gd-hall-<id>`, `gd-hall-<id>-uniform`);
+  removed before stage B with the one cell size (decision 4).
   "Compare with the original drawing" takes the drawing from the
   preset's `sources`. Panes sit side by side from MUI's `md` breakpoint
   (900 px), at most 560 px each, and stack below it. Uniform sizes draw
@@ -948,7 +1004,32 @@ them except the decision:
 
 Not changed: **sizes** (Fable M2) is Gadi's decision; stage B is gated on
 it (Stages). The uniform-size label overlaps (Opus n4) wait on it too
-(Follow-ups).
+(Follow-ups). Both settled before stage B: one cell size (decision 4),
+and the overlaps went with the uniform sizes.
+
+## Decisions before stage B
+
+Gadi's decisions of 17–18 October 2026, implemented on `gate/gd-hall-b`:
+
+- **Cell sizes and the layout contract**: decision 4. The five presets
+  were rendered again afterwards. The dais rows centre in the dais again
+  (the `y=−2.7` workaround went); Theoricus 2's Banner of the East moved
+  from y = −1.24 to −0.84, as in the other dais-5 presets, because the
+  Hierophant's lamen covered its hanger (it touched it before too). In
+  Zelator 2 "Hiereus" and "Keryx" no longer meet (0.34 squares apart),
+  and no label meets a compass word. The Neophyte "Dadouchos" still runs
+  0.06 squares past the floor's edge into the South wall band (a single
+  word: the cell width cannot help; Follow-ups), and Theoricus 1's
+  "Hegemon" ends at the floor's edge.
+- **Lamen rings**: decision 9.
+- **Art**: the lifted legacy art stays until stage H; no change.
+- **Tarot titles**: the common Rider–Waite titles, with "The Universe"
+  for XXI, stay; no data change.
+
+The documentation screenshots that show the ritual editor and reader
+(`editor-split`, `editor-source`, `editor-visual`, `editor-phone`,
+`reader-phone`) were recaptured from this branch after the lamen change
+and came out byte-identical: none of them shows a role icon.
 
 ## Commits
 
@@ -995,6 +1076,8 @@ it (Stages). The uniform-size label overlaps (Opus n4) wait on it too
 | a6d1faa | `image.decode()` before rasterising (A3 review n3) |
 | 0b03f8b | `gdHallFontFaceRule` checks its source (A3 review n2) |
 | e1fb37a | The Zelator Earth tablet test checks labels and compass words (A3 review n1) |
+| 21a970a | `Lamen`: the Hierophant's striped ring, the Past Hierophant's white ring and role icon (before B) |
+| dcf2453 | One cell size: `inset`, labels at the cell width, one default scale per kind; `sizes`, `officerScale` and the gallery's toggle removed (before B) |
 
 ## Future
 
@@ -1021,14 +1104,10 @@ files the import-boundary test still allows (`Link`, `Tiles`, `Mercury`,
 `planetarySpirits`, `entity/index`; the README note below); export font
 embedding for the Tree of Life; Firefox and Safari checks of PNG export with
 embedded fonts; whether a hall's PNG embeds Enochian Plain for the tablets
-(Stage A3 notes); the Neophyte "Dadouchos" label over the South wall and,
-with uniform sizes, the "Hiereus" and "Keryx" labels overlapping in
-Zelator 2 (both wait on the sizes decision); the
-RWS tarot credit and the Pinterest hotlink in `2=9.pug`; whether the
-Hierophant's lamen takes the drawings' striped ring (Stage A2 notes);
-whether the tarot
-titles adopt the Golden Dawn's own, from a cited source (they are the
-common titles, with "The Universe" for XXI);
+(Stage A3 notes); the Neophyte "Dadouchos" label over the South wall (a
+single word wider than the cell: move the officer or let labels shift
+inside the walls); the
+RWS tarot credit and the Pinterest hotlink in `2=9.pug`;
 `src/components/entity/entityFields.test.ts`, which reaches app code
 through `import.meta.glob("../../app/**/fields.ts")`, a path the
 import-boundary test cannot see;
