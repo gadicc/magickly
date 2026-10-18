@@ -489,9 +489,24 @@ function parseWithLocations(source: string) {
   const convert = (
     node,
     depth = 0,
+    hall = false,
   ): RitualSemanticNode | RitualSemanticNode[] => {
     if (++count > 20_000 || depth > 100)
       throw new Error("Ritual is too large or deeply nested");
+    // A hall holds no text, so spaces typed after a hall tag (which Pug
+    // reads as text) are dropped rather than refused; the printer never
+    // writes them, so the round trip stays exact.
+    const inHall = hall || (node.type === "Tag" && node.name === "gdHall");
+    if (inHall && node.block)
+      node = {
+        ...node,
+        block: {
+          ...node.block,
+          nodes: node.block.nodes.filter(
+            (child) => child.type !== "Text" || !/^\s*$/.test(child.val),
+          ),
+        },
+      };
     if (node.code)
       throw new RitualSourceError(
         `Line ${node.line + 1}: template programs are unsupported`,
@@ -550,14 +565,14 @@ function parseWithLocations(source: string) {
     };
     if (!node.selfClosing)
       result.children = pugChildren(node.block, (child) =>
-        visit(child, depth + 1),
+        visit(child, depth + 1, inHall),
       );
     else if (node.block.nodes.length) throw new Error("Leaf has children");
     return result;
   };
-  const visit = (node, depth = 0): RitualSemanticNode[] => {
+  const visit = (node, depth = 0, hall = false): RitualSemanticNode[] => {
     try {
-      const converted = convert(node, depth);
+      const converted = convert(node, depth, hall);
       const results = Array.isArray(converted) ? converted : [converted];
       // Shortcuts split one Text node into many; count them toward the bound.
       count += results.length - 1;

@@ -255,6 +255,26 @@ describe("hostile halls", () => {
     expect(result?.column).toBe(column);
   });
 
+  it("ignores spaces after a hall's tags, and prints without them", () => {
+    const withoutIds = (doc: RitualSemanticDocument) =>
+      JSON.parse(
+        JSON.stringify(doc, (key, value) => (key === "id" ? undefined : value)),
+      );
+    const plain = parseRitualPug(hall('altar(kind="x")\nitem/\npillar'));
+    const spaced = parseRitualPug(
+      `${RITUAL_PUG_HEADER}\ngdHall   \n  floor \n    altar(kind="x")  \n    item/  \n    pillar \n    |   \n`,
+    );
+    expect(withoutIds(spaced)).toEqual(withoutIds(plain));
+    const printed = printRitualPug(spaced);
+    expect(printed).not.toMatch(/[ \t]\n/);
+    expect(parseRitualPug(printed)).toEqual(spaced);
+    // Outside a hall, trailing spaces are text, as before.
+    const note = parseRitualPug(`${RITUAL_PUG_HEADER}\nnote   \n`);
+    expect((note.nodes[0] as Element).children).toEqual([
+      { kind: "text", text: "  " },
+    ]);
+  });
+
   it("accepts any other identifier tag, nesting and scalars, and prints them back", () => {
     const text = hall(
       [
