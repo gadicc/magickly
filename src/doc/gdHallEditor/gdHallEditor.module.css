@@ -1,0 +1,198 @@
+/* The visual hall editor (plan 061, decision 11). Side by side when its
+   container is wide enough, the panel below the drawing otherwise. */
+.editor {
+  container-type: inline-size;
+  display: grid;
+  gap: 0.5rem;
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+.spacer {
+  flex: 1 1 auto;
+}
+.body {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+@container (min-width: 720px) {
+  .body {
+    grid-template-columns: minmax(0, 1fr) minmax(15rem, 19rem);
+    align-items: start;
+  }
+}
+.drawingColumn {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+}
+.surface {
+  position: relative;
+  max-width: 40rem;
+  width: 100%;
+  margin: 0 auto;
+  user-select: none;
+  -webkit-user-select: none;
+  border-radius: 0.25rem;
+  outline: none;
+}
+.surface:focus-visible {
+  box-shadow: 0 0 0 3px #1e5bd8;
+}
+.surface[aria-disabled="true"] {
+  opacity: 0.7;
+}
+.drawing {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.hitLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* Objects take the pointer, and touch drags them; elsewhere a touch
+   scrolls the page as usual. */
+.hit,
+.handle {
+  position: absolute;
+  pointer-events: auto;
+  touch-action: none;
+}
+.hit {
+  cursor: grab;
+  border-radius: 2px;
+}
+.hit:hover {
+  box-shadow: inset 0 0 0 1.5px rgb(30 91 216 / 0.45);
+}
+.surface[data-gesture="move"] .hit,
+.surface[data-gesture="move"] {
+  cursor: grabbing;
+}
+.selection {
+  fill: rgb(30 91 216 / 0.06);
+  stroke: #1e5bd8;
+  stroke-width: 2px;
+  stroke-dasharray: 6 3;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+.labelHighlight {
+  fill: rgb(30 91 216 / 0.16);
+  stroke: none;
+  pointer-events: none;
+}
+.handleMark {
+  fill: #ffffff;
+  stroke: #1e5bd8;
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+.handle[data-corner="nw"],
+.handle[data-corner="se"] {
+  cursor: nwse-resize;
+}
+.handle[data-corner="ne"],
+.handle[data-corner="sw"] {
+  cursor: nesw-resize;
+}
+.hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #555;
+  text-align: center;
+}
+.warnings {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.15rem;
+  font-size: 0.85rem;
+}
+.warning {
+  display: flex;
+  gap: 0.35rem;
+  align-items: baseline;
+  width: 100%;
+  padding: 0.15rem 0.35rem;
+  border: 0;
+  border-radius: 0.2rem;
+  background: #fff8e1;
+  color: #5d4300;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.warning[data-severity="error"] {
+  background: #fdecea;
+  color: #7a1c13;
+}
+.warning:hover,
+.warning:focus-visible {
+  outline: 2px solid #1e5bd8;
+}
+.panel {
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+  padding: 0.6rem;
+  border: 1px solid #c9d1de;
+  border-radius: 0.35rem;
+  background: #fafbfd;
+}
+.panelHeading {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.panelTag {
+  font-weight: 400;
+  color: #666;
+}
+.fieldPair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.scaleRow {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+.panelNote {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #555;
+}
+.panelActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

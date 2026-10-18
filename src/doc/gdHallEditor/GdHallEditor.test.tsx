@@ -1,0 +1,690 @@
+// @vitest-environment jsdom
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
+import { useState } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { gdHallArt } from "@/app/gd/hall/art";
+import { GdHallEditor } from "./GdHallEditor";
+import type { HallElement } from "./hallModel";
+import {
+  byAttr,
+  findNode,
+  hallFromPug,
+  neophyteHall,
+  sequentialIds,
+} from "./hallTestFixtures";
+
+/** The editor's overlay, which carries the drawing's view box. */
+const OVERLAY = "[role=application] > svg[aria-hidden]";
+/** Pixels per square the mocked layout draws the hall at. */
+const PX = 30;
+
+beforeEach(() => {
+  // jsdom has no PointerEvent; React reads these fields from it.
+  if (typeof window.PointerEvent === "undefined") {
+    class PointerEvent extends MouseEvent {
+      pointerId: number;
+      pointerType: string;
+      constructor(type: string, init: PointerEventInit = {}) {
+        super(type, init);
+        this.pointerId = init.pointerId ?? 1;
+        this.pointerType = init.pointerType ?? "mouse";
+      }
+    }
+    vi.stubGlobal("PointerEvent", PointerEvent);
+  }
+});
+
+beforeEach(() => {
+  vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
+    callback(0);
+    return 1;
+  });
+  vi.stubGlobal("cancelAnimationFrame", () => {});
+  // The overlay draws the hall's view box at PX pixels per square, from
+  // the page's top left corner.
+  vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(
+    function (this: Element) {
+      const box =
+        this instanceof SVGSVGElement && this.matches(OVERLAY)
+          ? this.getAttribute("viewBox")?.split(" ").map(Number)
+          : undefined;
+      if (!box) return new DOMRect();
+      return new DOMRect(0, 0, (box[2] / 100) * PX, (box[3] / 100) * PX);
+    },
+  );
+});
+
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
+
+interface Harness {
+  changes: HallElement[];
+  done: ReturnType<typeof vi.fn>;
+  undo: ReturnType<typeof vi.fn>;
+  redo: ReturnType<typeof vi.fn>;
+  current: () => HallElement;
+  surface: HTMLElement;
+}
+
+function setup(
+  initial: HallElement = neophyteHall(),
+  editable = true,
+  options: { refuse?: boolean; history?: boolean } = {},
+): Harness {
+  const harness = {
+    changes: [] as HallElement[],
+    done: vi.fn(),
+    undo: vi.fn(),
+    redo: vi.fn(),
+  };
+  let latest = initial;
+  const past: HallElement[] = [];
+  function Host() {
+    const [hall, setHall] = useState(initial);
+    latest = hall;
+    return (
+      <GdHallEditor
+        hall={hall}
+        art={gdHallArt}
+        editable={editable}
+        createId={sequentialIds("New")}
+        onChange={(next) => {
+          harness.changes.push(next);
+          if (options.refuse) return false;
+          past.push(hall);
+          setHall(next);
+        }}
+        onDone={harness.done}
+        onUndo={() => {
+          harness.undo();
+          const previous = past.pop();
+          if (options.history && previous) setHall(previous);
+        }}
+        onRedo={harness.redo}
+      />
+    );
+  }
+  render(<Host />);
+  return {
+    ...harness,
+    current: () => latest,
+    surface: screen.getByRole("application"),
+  };
+}
+
+/** The view box origin in squares, as the overlay states it. */
+function origin() {
+  const svg = document.querySelector(OVERLAY) as SVGSVGElement;
+  const [x, y] = (svg.getAttribute("viewBox") as string).split(" ").map(Number);
+  return { x: x / 100, y: y / 100 };
+}
+
+/** The client point of a floor point, in squares. */
+function at(x: number, y: number) {
+  const o = origin();
+  return { clientX: (x - o.x) * PX, clientY: (y - o.y) * PX };
+}
+
+const key = (
+  surface: HTMLElement,
+  name: string,
+  init: KeyboardEventInit = {},
+) => fireEvent.keyDown(surface, { key: name, ...init });
+const selected = () =>
+  screen.getByRole("application").getAttribute("aria-label");
+
+describe("entering and the keyboard", () => {
+  it("starts with the drawing focused and nothing selected", () => {
+    const { surface } = setup();
+    expect(document.activeElement).toBe(surface);
+    expect(selected()).toBe("Temple hall editor");
+    expect(screen.getByRole("heading", { name: /^Hall/ })).toBeTruthy();
+  });
+
+  it("cycles objects with Tab, and lets Tab leave at either end", () => {
+    const { surface } = setup(
+      hallFromPug(
+        "gdHall",
+        "  floor",
+        '    pillar(kind="black", x=4, y=3)',
+        '    pillar(kind="white", x=12, y=3)',
+      ),
+    );
+    // Shift+Tab with nothing selected leaves the drawing.
+    expect(key(surface, "Tab", { shiftKey: true })).toBe(true);
+    expect(key(surface, "Tab")).toBe(false);
+    expect(selected()).toContain("Black pillar selected");
+    expect(key(surface, "Tab")).toBe(false);
+    expect(selected()).toContain("White pillar selected");
+    // Past the last, Tab is the browser's again; the selection stays.
+    expect(key(surface, "Tab")).toBe(true);
+    expect(selected()).toContain("White pillar selected");
+    expect(key(surface, "Tab", { shiftKey: true })).toBe(false);
+    expect(selected()).toContain("Black pillar selected");
+    expect(key(surface, "Tab", { shiftKey: true })).toBe(true);
+  });
+
+  it("clears the selection with Escape, then leaves", () => {
+    const { surface, done } = setup();
+    key(surface, "Tab");
+    key(surface, "Escape");
+    expect(selected()).toBe("Temple hall editor");
+    expect(done).not.toHaveBeenCalled();
+    key(surface, "Escape");
+    expect(done).toHaveBeenCalledOnce();
+  });
+
+  it("nudges, scales, duplicates and deletes, one change each", () => {
+    const hall = hallFromPug(
+      "gdHall",
+      "  floor",
+      '    pillar(kind="black", x=4, y=3)',
+    );
+    const { surface, changes, current } = setup(hall);
+    key(surface, "Tab");
+    key(surface, "ArrowRight");
+    key(surface, "ArrowDown", { shiftKey: true });
+    key(surface, "ArrowLeft");
+    key(surface, "ArrowUp");
+    expect(changes).toHaveLength(4);
+    const pillar = () => byAttr(current(), "kind", "black");
+    expect(pillar().attrs).toMatchObject({ x: 4, y: 3.5 });
+    key(surface, "+");
+    key(surface, "=");
+    key(surface, "-");
+    expect(pillar().attrs.scale).toBe(1.1);
+    expect(changes).toHaveLength(7);
+    expect(screen.getByText("Scaled Black pillar to 1.1")).toBeTruthy();
+    key(surface, "d", { ctrlKey: true });
+    expect(changes).toHaveLength(8);
+    expect(selected()).toContain("Black pillar selected");
+    const floor = current().children?.[0] as HallElement;
+    expect(floor.children).toHaveLength(2);
+    expect((floor.children?.[1] as HallElement).id).toBe("New0000000000001");
+    key(surface, "Delete");
+    expect(changes).toHaveLength(9);
+    expect((current().children?.[0] as HallElement).children).toHaveLength(1);
+    expect(selected()).toBe("Temple hall editor");
+    // Without a selection, keys do nothing.
+    key(surface, "ArrowRight");
+    key(surface, "Backspace");
+    expect(changes).toHaveLength(9);
+  });
+
+  it("hands undo and redo to the host", () => {
+    const { surface, undo, redo } = setup();
+    key(surface, "z", { ctrlKey: true });
+    key(surface, "Z", { metaKey: true, shiftKey: true });
+    key(surface, "y", { ctrlKey: true });
+    expect(undo).toHaveBeenCalledOnce();
+    expect(redo).toHaveBeenCalledTimes(2);
+  });
+
+  it("leaves keys typed in the panel to the panel", () => {
+    const { changes } = setup();
+    key(screen.getByRole("application"), "Tab");
+    const x = screen.getByRole("textbox", { name: /^x/ });
+    fireEvent.keyDown(x, { key: "Delete" });
+    fireEvent.keyDown(x, { key: "Escape" });
+    expect(changes).toHaveLength(0);
+    expect(selected()).toContain("Imperator selected");
+  });
+});
+
+describe("the pointer", () => {
+  const pointer = (
+    type: "pointerDown" | "pointerMove" | "pointerUp" | "pointerCancel",
+    target: Element,
+    point: { clientX: number; clientY: number },
+    init: Record<string, unknown> = {},
+  ) =>
+    fireEvent[type](target, {
+      pointerId: 1,
+      pointerType: "mouse",
+      button: 0,
+      ...point,
+      ...init,
+    });
+
+  it("selects by a click and moves by a drag, one change per drag", () => {
+    const { surface, changes, current } = setup();
+    pointer("pointerDown", surface, at(8, 3));
+    pointer("pointerUp", surface, at(8, 3));
+    expect(selected()).toContain("Hegemon selected");
+    expect(changes).toHaveLength(0);
+    pointer("pointerDown", surface, at(8, 3));
+    pointer("pointerMove", surface, at(8.6, 3.1));
+    pointer("pointerMove", surface, at(9.1, 3.1));
+    // The preview shows where it will go before anything is written.
+    expect(
+      (screen.getByRole("textbox", { name: /^x/ }) as HTMLInputElement).value,
+    ).toBe("9");
+    expect(changes).toHaveLength(0);
+    pointer("pointerUp", surface, at(9.3, 3.1));
+    expect(changes).toHaveLength(1);
+    expect(byAttr(current(), "role", "hegemon").attrs).toMatchObject({
+      x: 9.5,
+      y: 3,
+    });
+    expect(screen.getByText("Moved Hegemon to x 9.5, y 3")).toBeTruthy();
+  });
+
+  it("does not snap with Alt, and writes nothing for a cancelled drag", () => {
+    const { surface, changes, current } = setup();
+    pointer("pointerDown", surface, at(8, 3), { altKey: true });
+    pointer("pointerMove", surface, at(8.3, 3), { altKey: true });
+    pointer("pointerUp", surface, at(8.33, 3), { altKey: true });
+    expect(byAttr(current(), "role", "hegemon").attrs.x).toBe(8.33);
+    pointer("pointerDown", surface, at(8.33, 3));
+    pointer("pointerMove", surface, at(10, 3));
+    pointer("pointerCancel", surface, at(10, 3));
+    expect(changes).toHaveLength(1);
+    expect(byAttr(current(), "role", "hegemon").attrs.x).toBe(8.33);
+  });
+
+  it("clears the selection on empty floor", () => {
+    const { surface } = setup();
+    pointer("pointerDown", surface, at(8, 3));
+    pointer("pointerUp", surface, at(8, 3));
+    pointer("pointerDown", surface, at(6, 11));
+    pointer("pointerUp", surface, at(6, 11));
+    expect(selected()).toBe("Temple hall editor");
+  });
+
+  it("scales by a corner handle", () => {
+    const { surface, changes, current } = setup(
+      hallFromPug("gdHall", "  floor", '    pillar(kind="black", x=4, y=3)'),
+    );
+    pointer("pointerDown", surface, at(4, 3));
+    pointer("pointerUp", surface, at(4, 3));
+    const handle = document.querySelector('[data-corner="se"]') as Element;
+    expect(handle).toBeTruthy();
+    pointer("pointerDown", handle, at(5.2, 4.2));
+    pointer("pointerMove", surface, at(5.8, 4.8));
+    pointer("pointerUp", surface, at(6.4, 5.4));
+    expect(changes).toHaveLength(1);
+    expect(byAttr(current(), "kind", "black").attrs.scale).toBe(2);
+  });
+
+  it("ignores other buttons and other pointers", () => {
+    const { surface, changes } = setup();
+    pointer("pointerDown", surface, at(8, 3), { button: 2 });
+    expect(selected()).toBe("Temple hall editor");
+    pointer("pointerDown", surface, at(8, 3));
+    pointer("pointerMove", surface, at(10, 3), { pointerId: 2 });
+    pointer("pointerUp", surface, at(10, 3), { pointerId: 2 });
+    pointer("pointerUp", surface, at(8, 3));
+    expect(changes).toHaveLength(0);
+  });
+});
+
+describe("the properties panel", () => {
+  it("writes a typed value when the field is left, refusing bad ones", () => {
+    const { changes, current } = setup();
+    key(screen.getByRole("application"), "Tab");
+    const x = screen.getByRole("textbox", { name: /^x/ }) as HTMLInputElement;
+    fireEvent.change(x, { target: { value: "abc" } });
+    fireEvent.blur(x);
+    expect(screen.getByText("Not a number")).toBeTruthy();
+    fireEvent.change(x, { target: { value: "99" } });
+    fireEvent.blur(x);
+    expect(screen.getByText("Between -48 and 64")).toBeTruthy();
+    expect(changes).toHaveLength(0);
+    fireEvent.change(x, { target: { value: "2.345" } });
+    fireEvent.keyDown(x, { key: "Enter" });
+    fireEvent.blur(x);
+    expect(changes).toHaveLength(1);
+    const imperator = () => byAttr(current(), "role", "imperator");
+    expect(imperator().attrs.x).toBe(2.35);
+    // Emptied, the attribute goes and the row places it again.
+    const typed = screen.getByRole("textbox", { name: /^x/ });
+    fireEvent.change(typed, { target: { value: "" } });
+    fireEvent.blur(typed);
+    expect(imperator().attrs).not.toHaveProperty("x");
+    expect(
+      (screen.getByRole("textbox", { name: /^x/ }) as HTMLInputElement)
+        .placeholder,
+    ).toBe("1.6");
+  });
+
+  it("writes text, switches and choices", async () => {
+    const { changes, current } = setup();
+    const surface = screen.getByRole("application");
+    for (let tab = 0; tab < 7; tab++) key(surface, "Tab");
+    expect(selected()).toContain("Black pillar selected");
+    const label = screen.getByRole("textbox", { name: "Label" });
+    fireEvent.change(label, { target: { value: "Boaz" } });
+    fireEvent.blur(label);
+    expect(byAttr(current(), "kind", "black").attrs.label).toBe("Boaz");
+    fireEvent.click(screen.getByRole("switch", { name: "Glow" }));
+    expect(byAttr(current(), "kind", "black").attrs.glow).toBe(false);
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: "Kind" }));
+    fireEvent.click(await screen.findByRole("option", { name: "white" }));
+    expect(
+      findNode(current(), (node) => node.attrs.label === "Boaz")?.attrs.kind,
+    ).toBe("white");
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: "Kind" }));
+    fireEvent.click(await screen.findByRole("option", { name: "Default" }));
+    expect(
+      findNode(current(), (node) => node.attrs.label === "Boaz")?.attrs,
+    ).not.toHaveProperty("kind");
+    expect(changes).toHaveLength(4);
+  });
+
+  it("offers roles and item kinds by name, keeping unknown ones", async () => {
+    setup(
+      hallFromPug(
+        "gdHall",
+        "  floor",
+        '    officer(role="warden", x=3, y=3)',
+        '    item(kind="cross", x=6, y=6)',
+      ),
+    );
+    const surface = screen.getByRole("application");
+    key(surface, "Tab");
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: "Role" }));
+    const listbox = await screen.findByRole("listbox");
+    expect(
+      within(listbox).getByRole("option", { name: "warden" }),
+    ).toBeTruthy();
+    expect(
+      within(listbox).getByRole("option", { name: "Past Hierophant" }),
+    ).toBeTruthy();
+    fireEvent.keyDown(listbox, { key: "Escape" });
+    await waitFor(() => expect(screen.queryByRole("listbox")).toBeNull());
+    key(surface, "Tab");
+    // A cross takes a form; a triangle's direction is not offered.
+    expect(screen.getByRole("combobox", { name: "Form" })).toBeTruthy();
+    expect(screen.queryByRole("combobox", { name: "Dir" })).toBeNull();
+    expect(screen.getByRole("combobox", { name: "Kind" }).textContent).toBe(
+      "Cross",
+    );
+  });
+
+  it("edits the hall itself when nothing is selected", () => {
+    const { current } = setup(hallFromPug("gdHall", "  floor"));
+    const caption = screen.getByRole("textbox", { name: "Caption" });
+    fireEvent.change(caption, { target: { value: "My temple" } });
+    fireEvent.blur(caption);
+    expect(current().children?.[1]).toMatchObject({
+      tag: "caption",
+      attrs: { text: "My temple" },
+    });
+    const again = screen.getByRole("textbox", { name: "Caption" });
+    fireEvent.change(again, { target: { value: "Ours" } });
+    fireEvent.blur(again);
+    expect((current().children?.[1] as HallElement).attrs.text).toBe("Ours");
+    fireEvent.change(again, { target: { value: "" } });
+    fireEvent.blur(again);
+    expect(current().children).toHaveLength(1);
+    fireEvent.click(screen.getByRole("switch", { name: "Compass" }));
+    expect(current().attrs.compass).toBe(false);
+    const dais = screen.getByRole("textbox", { name: "Dais depth" });
+    fireEvent.change(dais, { target: { value: "5" } });
+    fireEvent.blur(dais);
+    expect(current().attrs.dais).toBe(5);
+  });
+
+  it("duplicates, deletes and scales from buttons", () => {
+    const { changes, current } = setup(
+      hallFromPug("gdHall", "  floor", '    pillar(kind="black", x=4, y=3)'),
+    );
+    key(screen.getByRole("application"), "Tab");
+    fireEvent.click(screen.getByRole("button", { name: "Larger" }));
+    fireEvent.click(screen.getByRole("button", { name: "Smaller" }));
+    expect(byAttr(current(), "kind", "black").attrs.scale).toBe(1);
+    fireEvent.click(screen.getByRole("button", { name: "Duplicate" }));
+    expect((current().children?.[0] as HallElement).children).toHaveLength(2);
+    expect(document.activeElement).toBe(screen.getByRole("application"));
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }));
+    expect((current().children?.[0] as HallElement).children).toHaveLength(1);
+    expect(changes).toHaveLength(4);
+  });
+});
+
+describe("the palette and the warnings", () => {
+  it("adds a component, selected, with the drawing focused", async () => {
+    const { changes, current } = setup();
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Cup" }));
+    expect(changes).toHaveLength(1);
+    const cup = findNode(current(), (node) => node.id === "New0000000000001");
+    expect(cup).toMatchObject({ tag: "item", attrs: { kind: "cup" } });
+    await waitFor(() => expect(selected()).toContain("Cup selected"));
+    await waitFor(() =>
+      expect(document.activeElement).toBe(screen.getByRole("application")),
+    );
+  });
+
+  it("lists the hall's warnings, selecting what one names", () => {
+    setup(
+      hallFromPug(
+        "gdHall",
+        "  floor",
+        "    unicorn(x=3, y=3)",
+        "    item(x=5, y=5)",
+      ),
+    );
+    const warnings = within(
+      screen.getByRole("region", { name: "Hall warnings" }),
+    ).getAllByRole("button");
+    expect(warnings.map((warning) => warning.textContent)).toEqual([
+      "⚠unknown tag unicorn; drawn as a placeholder",
+      "✕item: no kind",
+    ]);
+    fireEvent.click(warnings[0]);
+    expect(selected()).toContain("Unicorn selected");
+    expect(document.activeElement).toBe(screen.getByRole("application"));
+  });
+
+  it("counts warnings past twenty", () => {
+    setup(
+      hallFromPug(
+        "gdHall",
+        "  floor",
+        ...Array.from(
+          { length: 23 },
+          (_, n) => `    unicorn(x=${n % 16}, y=3)`,
+        ),
+      ),
+    );
+    expect(
+      screen.getByText("3 more warnings, listed in the source view."),
+    ).toBeTruthy();
+  });
+});
+
+describe("while the host takes no changes", () => {
+  it("shows the hall without editing it", () => {
+    const { surface, changes } = setup(neophyteHall(), false);
+    expect(surface.getAttribute("aria-disabled")).toBe("true");
+    expect(
+      screen.getByText(
+        "The hall cannot be edited while the ritual is updating.",
+      ),
+    ).toBeTruthy();
+    key(surface, "Tab");
+    key(surface, "ArrowRight");
+    fireEvent.pointerDown(surface, { ...at(8, 3), pointerId: 1, button: 0 });
+    expect(changes).toHaveLength(0);
+    expect(document.querySelector("[data-corner]")).toBeNull();
+    expect(
+      (screen.getByRole("button", { name: "Add" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+  });
+});
+
+describe("a hall that cannot be drawn", () => {
+  it("offers nothing to select", () => {
+    setup({ kind: "element", id: "x", tag: "gdHall", attrs: {} });
+    expect(screen.queryByRole("img")).toBeNull();
+    expect(document.querySelector(OVERLAY)).toBeNull();
+  });
+});
+
+describe("the host's replies", () => {
+  it("drops a selection that an undo takes away", () => {
+    const { surface } = setup(neophyteHall(), true, { history: true });
+    key(surface, "Tab");
+    key(surface, "d", { ctrlKey: true });
+    expect(selected()).toContain("Imperator selected");
+    key(surface, "z", { ctrlKey: true });
+    expect(selected()).toBe("Temple hall editor");
+  });
+
+  it("keeps the hall as it was when the host refuses a change", () => {
+    const { surface, changes, current } = setup(neophyteHall(), true, {
+      refuse: true,
+    });
+    key(surface, "Tab");
+    key(surface, "ArrowRight");
+    expect(changes).toHaveLength(1);
+    expect(byAttr(current(), "role", "imperator").attrs).not.toHaveProperty(
+      "x",
+    );
+    expect(screen.queryByText(/^Moved/)).toBeNull();
+    expect(
+      (screen.getByRole("textbox", { name: /^x/ }) as HTMLInputElement).value,
+    ).toBe("");
+  });
+});
+
+describe("drawing and frames", () => {
+  it("sizes handles from the drawing's width", () => {
+    let report: (() => void) | undefined;
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: () => void) {
+          report = callback;
+        }
+        observe() {}
+        disconnect() {}
+      },
+    );
+    const { surface } = setup(
+      hallFromPug("gdHall", "  floor", '    pillar(kind="black", x=4, y=3)'),
+    );
+    key(surface, "Tab");
+    const size = () =>
+      (document.querySelector('[data-corner="se"]') as HTMLElement).style.width;
+    const before = size();
+    // Drawn larger: the handles keep their pixels, so a smaller share.
+    vi.mocked(Element.prototype.getBoundingClientRect).mockImplementation(
+      () => new DOMRect(0, 0, 1900, 2500),
+    );
+    act(() => report?.());
+    expect(Number.parseFloat(size())).toBeLessThan(Number.parseFloat(before));
+  });
+
+  it("lays out once a frame, and drops a frame left at the end", () => {
+    const frames: FrameRequestCallback[] = [];
+    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) =>
+      frames.push(callback),
+    );
+    const cancel = vi.fn();
+    vi.stubGlobal("cancelAnimationFrame", cancel);
+    const { surface, changes, current } = setup();
+    const press = (
+      type: "pointerDown" | "pointerMove" | "pointerUp",
+      x: number,
+    ) => fireEvent[type](surface, { ...at(x, 3), pointerId: 1, button: 0 });
+    press("pointerDown", 8);
+    // Under the threshold: not a drag yet.
+    fireEvent.pointerMove(surface, {
+      clientX: at(8, 3).clientX + 1,
+      clientY: at(8, 3).clientY,
+      pointerId: 1,
+    });
+    expect(frames).toHaveLength(0);
+    press("pointerMove", 9);
+    press("pointerMove", 10);
+    expect(frames).toHaveLength(1);
+    act(() => frames[0](0));
+    press("pointerMove", 11);
+    expect(frames).toHaveLength(2);
+    press("pointerUp", 11);
+    expect(cancel).toHaveBeenCalledOnce();
+    expect(changes).toHaveLength(1);
+    expect(byAttr(current(), "role", "hegemon").attrs.x).toBe(11);
+    // A frame still pending when the editor goes is cancelled.
+    press("pointerDown", 11);
+    press("pointerMove", 13);
+    cleanup();
+    expect(cancel).toHaveBeenCalledTimes(2);
+  });
+
+  it("releases the pointer it captured", () => {
+    const release = vi.fn();
+    Object.assign(HTMLElement.prototype, {
+      setPointerCapture: vi.fn(),
+      hasPointerCapture: () => true,
+      releasePointerCapture: release,
+    });
+    try {
+      const { surface } = setup();
+      fireEvent.pointerDown(surface, { ...at(8, 3), pointerId: 1, button: 0 });
+      fireEvent.pointerUp(surface, { ...at(8, 3), pointerId: 1, button: 0 });
+      expect(release).toHaveBeenCalledWith(1);
+    } finally {
+      for (const name of [
+        "setPointerCapture",
+        "hasPointerCapture",
+        "releasePointerCapture",
+      ])
+        delete (HTMLElement.prototype as unknown as Record<string, unknown>)[
+          name
+        ];
+    }
+  });
+
+  it("ignores the pointer while the drawing has no size", () => {
+    const { surface, changes } = setup();
+    vi.mocked(Element.prototype.getBoundingClientRect).mockImplementation(
+      () => new DOMRect(),
+    );
+    fireEvent.pointerDown(surface, { clientX: 10, clientY: 10, pointerId: 1 });
+    fireEvent.pointerUp(surface, { clientX: 10, clientY: 10, pointerId: 1 });
+    expect(selected()).toBe("Temple hall editor");
+    expect(changes).toHaveLength(0);
+  });
+});
+
+describe("on a touch screen", () => {
+  it("keeps finger-sized handles off small objects", () => {
+    vi.stubGlobal("matchMedia", (query: string) => ({
+      matches: query === "(pointer: coarse)",
+    }));
+    const { surface } = setup(
+      hallFromPug(
+        "gdHall",
+        "  floor",
+        '    pillar(kind="black", x=4, y=3)',
+        '    item(kind="cup", x=8, y=8)',
+      ),
+    );
+    expect(
+      screen.getByText(
+        "Tap to select, drag to move, drag a corner to scale; the panel edits the rest.",
+      ),
+    ).toBeTruthy();
+    key(surface, "Tab");
+    expect(document.querySelectorAll("[data-corner]")).toHaveLength(4);
+    key(surface, "Tab");
+    expect(selected()).toContain("Cup selected");
+    expect(document.querySelector("[data-corner]")).toBeNull();
+    expect(screen.getByRole("button", { name: "Larger" })).toBeTruthy();
+  });
+});
