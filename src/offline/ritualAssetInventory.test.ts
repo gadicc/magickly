@@ -1,6 +1,11 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it, vi } from "vitest";
 import {
+  type RitualSemanticDocument,
+  semanticToJrt,
+  validateRitualSemantic,
+} from "../doc/semantic";
+import {
   inventoryRitualAssetJson as fromJson,
   inventoryRitualAssets as inventory,
   RITUAL_ASSET_INVENTORY_LIMITS as limits,
@@ -413,9 +418,38 @@ describe("bounded parsing and fail-closed structures", () => {
         .enumerationComplete,
     ).toBe(false);
   });
+  it("bounds a tree's rows as the compiler bounds a document's nodes", () => {
+    const document = (count: number) => ({
+      format: "magickli-ritual",
+      version: 1,
+      nodes: Array.from({ length: count }, (_, i) => ({
+        kind: "element",
+        id: `Ab3k9Qp7Zx${String(i).padStart(6, "0")}`,
+        tag: "hr",
+        attrs: {},
+      })),
+    });
+    expect(validateRitualSemantic(document(limits.nodes))).toEqual([]);
+    expect(validateRitualSemantic(document(limits.nodes + 1))).not.toEqual([]);
+    // The largest valid document compiles to that many rows under the
+    // root, and inventories completely.
+    const tree = semanticToJrt(
+      document(limits.nodes) as RitualSemanticDocument,
+    ) as { children: unknown[] };
+    expect(tree.children).toHaveLength(limits.nodes);
+    expect(inventory(tree, options).enumerationComplete).toBe(true);
+    const rows = (count: number) =>
+      node(Array.from({ length: count }, () => ({ type: "hr" })));
+    expect(codes(rows(limits.nodes))).not.toContain("tree-limit");
+    expect(codes(rows(limits.nodes + 1))).toContain("tree-limit");
+  });
+
   it("reports node, depth, occurrence, reference and style bounds", () => {
     expect(
-      codes(node([img(), img()]), { ...options, limits: { nodes: 2 } }),
+      codes(node([img(), img(), img()]), {
+        ...options,
+        limits: { nodes: 2 },
+      }),
     ).toContain("tree-limit");
     expect(
       codes(node([node([img()])]), { ...options, limits: { depth: 1 } }),

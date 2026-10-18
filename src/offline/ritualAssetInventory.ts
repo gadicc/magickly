@@ -316,7 +316,12 @@ export function inventoryRitualAssets(
       path: number[],
       parent: Info | null,
     ): Info => {
-      if (++nodes > limits.nodes || path.length > limits.depth) {
+      // The root row holds the document; its rows, which the compiler
+      // also bounds at 20,000 nodes, are what count.
+      if (
+        (parent !== null && ++nodes > limits.nodes) ||
+        path.length > limits.depth
+      ) {
         issue("tree-limit", path);
         throw new Error();
       }
