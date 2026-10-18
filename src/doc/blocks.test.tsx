@@ -207,3 +207,33 @@ it("renders empty footnote collections without inventing notes or throwing", () 
   ).toBeTruthy();
   expect(view.container.querySelectorAll("li")).toHaveLength(0);
 });
+
+it.each([
+  "toString",
+  "valueOf",
+  "hasOwnProperty",
+  "isPrototypeOf",
+  "constructor",
+  "__proto__",
+])("renders a legacy %s row as plain content, in a hall or not", (type) => {
+  const row = { type, children: [{ type: "text", value: "Kept" }] };
+  const view = render(
+    <DocContext.Provider value={{ vars: {}, roles }}>
+      <Render
+        doc={{
+          children: [
+            row,
+            { type: "note", children: [structuredClone(row)] },
+            // An opaque legacy hall still builds its rows' nodes.
+            { type: "gdHall", children: [structuredClone(row)] },
+          ],
+        }}
+        onChange={undefined}
+      />
+    </DocContext.Provider>,
+  );
+  expect(screen.getAllByText("Kept")).toHaveLength(2);
+  expect(
+    view.container.querySelector('[data-ritual-frame="gdHall"]'),
+  ).toBeTruthy();
+});

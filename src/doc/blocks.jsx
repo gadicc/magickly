@@ -1,3 +1,4 @@
+import { blocks as registry } from "json-rich-text/lib/esm/blocks/node.js";
 import { Node } from "json-rich-text/lib/esm/index.js";
 import React from "react";
 import DocContext from "../../src/doc/context.js";
@@ -369,6 +370,11 @@ export const blocks = {
   gdHall: GdHallBlock,
 };
 Node.registerBlocks(blocks);
+// JRT looks a row's `type` up in this plain object (`blocks[type] || Node`),
+// so a legacy row typed `toString` or `constructor` would be taken for a
+// block class and crash the reader. Without a prototype, only registered
+// types are found and every other one renders as a plain node.
+Object.setPrototypeOf(registry, null);
 
 // NB: If we don't export "Node", React fast refresh won't pickup Component
 // changes.
