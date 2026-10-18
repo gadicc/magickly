@@ -368,7 +368,7 @@ function pugChildren(
 export function printRitualPug(doc: RitualSemanticDocument): string {
   checked(doc);
   const lines = [RITUAL_PUG_HEADER];
-  const visit = (node: RitualSemanticNode, depth: number) => {
+  const visit = (node: RitualSemanticNode, depth: number, hall = false) => {
     const indent = "  ".repeat(depth);
     if (node.kind === "annotation") {
       if (node.style === "blank") lines.push(indent);
@@ -385,6 +385,16 @@ export function printRitualPug(doc: RitualSemanticDocument): string {
     }
     if (node.kind === "legacy") {
       lines.push(`${indent}ritualLegacy#${node.id}(raw=${json(node.raw)})/`);
+      return;
+    }
+    if (hall || node.tag === "gdHall") {
+      // A hall holds no text, so every node gets its own line: no inline,
+      // pipe or shortcut forms. A leaf with `children: []` prints bare and
+      // one without `children` ends in `/`, as for every tag.
+      lines.push(
+        `${indent}${node.tag}#${node.id}${attributeText(node.attrs)}${node.children === undefined ? "/" : ""}`,
+      );
+      node.children?.forEach((child) => visit(child, depth + 1, true));
       return;
     }
     const speech =

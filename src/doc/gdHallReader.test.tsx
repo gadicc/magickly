@@ -1,16 +1,21 @@
 // @vitest-environment jsdom
 import { readFileSync } from "node:fs";
+import { GdHall } from "@magick-components/gd/hall";
 import type { HallNode } from "@magick-components/gd/hall/types";
 import { cleanup, render, screen } from "@testing-library/react";
 import { act } from "react";
 import { hydrateRoot } from "react-dom/client";
+import { renderToStaticMarkup } from "react-dom/server";
 import { prerender } from "react-dom/static";
 import { afterEach, beforeAll, expect, it, vi } from "vitest";
+import { gdHallArt } from "@/app/gd/hall/art";
 import "../../tests/hydration";
 import { Render } from "./blocks";
 import DocContext from "./context";
 import { prepare } from "./prepare";
 import { roles } from "./ritualBlocks/roles";
+import { parseRitualPug, RITUAL_PUG_HEADER } from "./ritualPug";
+import { semanticToJrt } from "./semantic";
 
 // The hall chunk is a large module graph; load it once, so the tests time
 // the drawing rather than its first transform on a busy machine.
@@ -23,8 +28,10 @@ afterEach(() => {
 });
 
 const legacyPug = readFileSync("src/doc/fixtures/gdHallNeophyte.pug", "utf8");
-/** A legacy ritual's rows: `prepare.js` writes numbers as strings. */
-const rows = () => prepare(legacyPug) as { children: HallNode[] };
+const compiled = () =>
+  semanticToJrt(parseRitualPug(`${RITUAL_PUG_HEADER}\n${legacyPug}`)) as {
+    children: HallNode[];
+  };
 
 /** The reader as `DocRender` mounts it. */
 const reader = (doc: unknown) => (
@@ -41,8 +48,8 @@ async function html(
   return new Response(prelude).text();
 }
 
-it("draws a hall in the reader once its chunk loads", async () => {
-  const view = render(reader(rows()));
+it("draws a compiled hall in the reader once its chunk loads", async () => {
+  const view = render(reader(compiled()));
   const figure = view.container.querySelector('[data-ritual-frame="gdHall"]');
   expect(figure).toBeTruthy();
   const svg = await screen.findByRole("img", { name: "Neophyte Temple" });
@@ -61,8 +68,19 @@ it("draws a hall in the reader once its chunk loads", async () => {
   );
 });
 
+it("draws prepare.js rows, numbers as strings, as it draws compiled rows", () => {
+  const legacy = (prepare(legacyPug) as { children: HallNode[] }).children[2];
+  const semantic = compiled().children[2];
+  expect(legacy.dais).toBe("4");
+  expect(semantic.dais).toBe(4);
+  const svg = (hall: HallNode) =>
+    renderToStaticMarkup(<GdHall hall={hall} art={gdHallArt} />);
+  expect(svg(legacy)).toBe(svg(semantic));
+  expect(svg(legacy)).toContain(">Dadouchos</text>");
+});
+
 it("server-renders the hall and hydrates it without a mismatch", async () => {
-  const element = reader(rows());
+  const element = reader(compiled());
   // The drawing is larger than React's progressive chunk (12.8 KB), so the
   // server sends the placeholder and the drawing after it in the same
   // response, with the inline script that swaps them.
@@ -100,6 +118,29 @@ it("server-renders the hall and hydrates it without a mismatch", async () => {
   await act(async () => root.unmount());
   container.remove();
 });
+
+it.each(["note", "summary", "li", "todo"])(
+  "draws a hall inside a %s",
+  async (type) => {
+    const hall = compiled().children[2];
+    const view = render(
+      reader({
+        children: [
+          {
+            type,
+            ...(type === "summary" ? { summary: "The hall" } : {}),
+            children: [hall],
+          },
+        ],
+      }),
+    );
+    const svg = await screen.findByRole("img", { name: "Neophyte Temple" });
+    const frame = view.container.querySelector(`[data-ritual-frame="${type}"]`);
+    expect(
+      frame?.querySelector('[data-ritual-frame="gdHall"]')?.contains(svg),
+    ).toBe(true);
+  },
+);
 
 it("leaves a ritual without a hall as it was", async () => {
   const markup = await html(
