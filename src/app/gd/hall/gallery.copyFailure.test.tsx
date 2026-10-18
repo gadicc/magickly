@@ -11,10 +11,20 @@ vi.mock("@/doc/gdHallPug", () => {
 
 afterEach(cleanup);
 
-it("leaves Copy Pug source disabled when the printer cannot load", async () => {
+it("leaves Copy Pug source disabled, and says why, when the printer cannot load", async () => {
   render(<HallGallery />);
   const button = screen.getByRole("button", { name: "Copy Pug source" });
   // Let the failed import settle.
-  await new Promise((resolve) => setTimeout(resolve, 50));
+  await screen.findByText(
+    "Copying Pug needs a part of the page that did not load. Reload when online.",
+  );
   expect(button).toHaveProperty("disabled", true);
+});
+
+it("ignores a failed load after the gallery is gone", async () => {
+  const { unmount } = render(<HallGallery />);
+  unmount();
+  // The failed import settles after unmounting; nothing is updated.
+  await new Promise((resolve) => setTimeout(resolve, 50));
+  expect(document.body.textContent).toBe("");
 });

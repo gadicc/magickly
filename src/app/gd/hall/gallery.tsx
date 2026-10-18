@@ -46,17 +46,21 @@ function Source({ source }: { source: HallPresetSource }) {
  * the click.
  */
 function CopyPug({ preset }: { preset: HallPreset }) {
-  const [print, setPrint] = React.useState<((hall: HallNode) => string) | null>(
-    null,
-  );
+  const [printer, setPrinter] = React.useState<
+    ((hall: HallNode) => string) | "loading" | "failed"
+  >("loading");
   const [status, setStatus] = React.useState("");
   React.useEffect(() => {
     let current = true;
     import("@/doc/gdHallPug")
       .then(({ gdHallPug }) => {
-        if (current) setPrint(() => gdHallPug);
+        if (current) setPrinter(() => gdHallPug);
       })
-      .catch(() => {});
+      // Offline before the chunk is cached, say so beside the button: a
+      // disabled button shows no tooltip.
+      .catch(() => {
+        if (current) setPrinter("failed");
+      });
     return () => {
       current = false;
     };
@@ -68,12 +72,19 @@ function CopyPug({ preset }: { preset: HallPreset }) {
       <Button
         size="small"
         variant="outlined"
-        disabled={!print}
+        disabled={typeof printer !== "function"}
         title="Ritual Pug without IDs, for the top level of a ritual's source; indent it to put the hall in a note"
         onClick={async () => {
-          if (!print) return;
+          if (typeof printer !== "function") return;
+          let text: string;
           try {
-            await copyText(print(preset.hall));
+            text = printer(preset.hall);
+          } catch {
+            setStatus("Could not copy: this hall could not be written as Pug.");
+            return;
+          }
+          try {
+            await copyText(text);
             setStatus("Copied. Paste it into a ritual's source.");
           } catch {
             setStatus("Could not copy: the browser refused the clipboard.");
@@ -83,7 +94,9 @@ function CopyPug({ preset }: { preset: HallPreset }) {
         Copy Pug source
       </Button>
       <Typography variant="body2" role="status">
-        {status}
+        {printer === "failed"
+          ? "Copying Pug needs a part of the page that did not load. Reload when online."
+          : status}
       </Typography>
     </>
   );
