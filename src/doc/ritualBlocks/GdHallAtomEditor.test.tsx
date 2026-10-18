@@ -101,6 +101,42 @@ describe("editing a hall in the ritual editor", () => {
     );
   }, 60_000);
 
+  it("keeps cut, copy and paste away from the ritual's text", async () => {
+    const { editor, surface } = await openEditor();
+    await waitFor(() => expect(document.activeElement).toBe(surface));
+    // The author had "Opening" selected in the title. Chromium leaves such
+    // a selection in place when a non-editable element takes the focus
+    // (jsdom moves it), and sends cut, copy and paste to its start.
+    editor.commands.setTextSelection({ from: 1, to: 8 });
+    const place = editor.state.selection.toJSON();
+    const selection = document.getSelection() as Selection;
+    const range = document.createRange();
+    range.selectNodeContents(editor.view.domAtPos(1).node);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    expect(selection.toString()).toBe("Opening");
+    fireEvent.focusIn(surface);
+    // The page's text selection is gone; ProseMirror keeps its own.
+    expect(selection.rangeCount).toBe(0);
+    expect(editor.state.selection.toJSON()).toEqual(place);
+    const doc = editor.state.doc;
+    for (const key of ["x", "c", "v", "X"])
+      expect(fireEvent.keyDown(surface, { key, ctrlKey: true })).toBe(false);
+    const target =
+      selection.rangeCount > 0 && !selection.isCollapsed
+        ? (selection.anchorNode?.parentElement as Element)
+        : (document.activeElement as Element);
+    for (const type of ["cut", "copy", "paste"])
+      target.dispatchEvent(
+        new Event(type, { bubbles: true, cancelable: true }),
+      );
+    expect(editor.state.doc).toBe(doc);
+    // A panel field keeps its own clipboard keys.
+    fireEvent.keyDown(surface, { key: "Tab" });
+    const field = screen.getByRole("textbox", { name: /^x/ });
+    expect(fireEvent.keyDown(field, { key: "x", ctrlKey: true })).toBe(true);
+  }, 60_000);
+
   it("writes each gesture as one undo step, keeping IDs", async () => {
     const { editor, surface } = await openEditor();
     const original = hallIn(editor);

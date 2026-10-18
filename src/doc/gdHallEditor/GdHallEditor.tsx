@@ -135,6 +135,26 @@ const CORNERS = [
   ["se", 1, 1],
 ] as const;
 
+/** Cut, copy and paste, with Ctrl or Cmd. */
+const CLIPBOARD_KEYS = new Set(["x", "c", "v"]);
+
+/**
+ * Clears the page's text selection when it lies outside `root`. A text
+ * selection left in the ritual stays live under the hall editor's
+ * drawing, which is focused but not editable: the browser sends cut,
+ * copy and paste (from the keyboard or its menus) to the selection, so
+ * Ctrl+X in the hall editor cut ritual text the author could not see.
+ * Only the DOM selection goes: ProseMirror keeps its own, and puts it
+ * back, without scrolling, when the ritual is focused again.
+ */
+function clearOutsideSelection(root: Element | null) {
+  const selection = document.getSelection();
+  if (!selection || selection.rangeCount === 0) return;
+  if (root && selection.anchorNode && root.contains(selection.anchorNode))
+    return;
+  selection.removeAllRanges();
+}
+
 /** Keys that only modify others: they never end or disturb a gesture. */
 const MODIFIER_KEYS = new Set(["Alt", "Control", "Meta", "Shift"]);
 
@@ -175,6 +195,7 @@ export function GdHallEditor({
   const [paletteAnchor, setPaletteAnchor] = useState<HTMLElement | null>(null);
   const [pixelsPerSquare, setPixelsPerSquare] = useState(30);
   const [coarse, setCoarse] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
   const surface = useRef<HTMLDivElement>(null);
   const overlay = useRef<SVGSVGElement>(null);
   const gesture = useRef<Gesture | null>(null);
@@ -531,6 +552,12 @@ export function GdHallEditor({
     const modifier = event.ctrlKey || event.metaKey;
     const key = event.key;
     const history = modifier && (key === "z" || key === "Z" || key === "y");
+    // No clipboard for objects yet: cut, copy and paste do nothing here,
+    // and never reach a selection elsewhere on the page.
+    if (modifier && !event.altKey && CLIPBOARD_KEYS.has(key.toLowerCase())) {
+      event.preventDefault();
+      return;
+    }
     if (gesture.current) {
       // Escape, undo, redo and Delete end a gesture without writing it;
       // other keys wait for the pointer to be released.
@@ -636,7 +663,7 @@ export function GdHallEditor({
       : [];
 
   return (
-    <div className={styles.editor} data-gd-hall-controls>
+    <div ref={root} className={styles.editor} data-gd-hall-controls>
       <div className={styles.toolbar}>
         <Button
           size="small"
@@ -722,6 +749,7 @@ export function GdHallEditor({
             tabIndex={0}
             data-gesture={gestureKind ?? undefined}
             onKeyDown={onKeyDown}
+            onFocus={() => clearOutsideSelection(root.current)}
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
             onPointerUp={(event) => endGesture(event, false)}
