@@ -2,7 +2,7 @@ import * as React from "react";
 
 /** The colours of a lamen with the Calvary cross of Tiphareth. */
 interface CrossLamenColours {
-  /** The outer ring. */
+  /** The outer ring: a colour, or `stripes` (red and white). */
   ring: string;
   /** The disc inside it. */
   disc: string;
@@ -12,17 +12,27 @@ interface CrossLamenColours {
 
 /**
  * Lamens bearing the Calvary cross, by officer. The Hierophant is not a
- * Temple Chief but has the Imperator's lamen. The Past Hierophant's ring
- * is the light grey the hall drawings give it (`public/pics/neophyte.svg`,
- * `circle1-6-55`, labelled "Past Hierophant"). Looked up in a `Map`, so an
+ * Temple Chief but has the Imperator's cross. Looked up in a `Map`, so an
  * officer name such as "constructor" is simply not found.
+ *
+ * The ring shows the officer's collar, by Gadi's own convention, so the
+ * roles stay distinguishable even as 20 px ritual role icons: Imperator
+ * red, Praemonstrator blue, Cancellarius yellow on a purple disc,
+ * Hierophant red and white stripes, Past Hierophant white, every lamen
+ * the same size. The sources differ: Regardie (*The Golden Dawn*) hangs
+ * the Hierophant's lamen from a white collar, the Imperator's scarlet,
+ * the Praemonstrator's blue and the Cancellarius' purple, and gives the
+ * Past Hierophant only "a Jewel of that Lamen"; the Ciceros paint the
+ * ring in the cross's colour and draw the Past Hierophant's lamen
+ * smaller; red and white stripes are the Hierophant's nemyss in Zalewski
+ * and in the Ciceros.
  */
 const CROSS_LAMENS: ReadonlyMap<string, CrossLamenColours> = new Map([
   ["imperator", { ring: "red", disc: "green" }],
   ["praemonstrator", { ring: "#48f", disc: "orange" }],
   ["cancellarius", { ring: "yellow", disc: "#b5b" }],
-  ["hierophant", { ring: "red", disc: "green" }],
-  ["pastHierophant", { ring: "#f2f2f2", disc: "green", cross: "red" }],
+  ["hierophant", { ring: "stripes", disc: "green", cross: "red" }],
+  ["pastHierophant", { ring: "white", disc: "green", cross: "red" }],
 ]);
 
 /** The officers whose lamen `Lamen` draws; any other draws the same plain one. */
@@ -35,6 +45,38 @@ export const LAMEN_OFFICERS: ReadonlySet<string> = new Set([
   "keryx",
   "sentinel",
 ]);
+
+/** The ring's outer radius, inside the −50…50 viewBox; the disc's is 42. */
+const RING_RADIUS = 49;
+/** Height of each of the Hierophant's ring stripes, in lamen units. */
+const STRIPE = 8;
+
+/**
+ * The part of the ring's disc between heights `a` and `b`, as a path: the
+ * two arcs of the circle and the chords joining them.
+ */
+function discSlab(a: number, b: number, r = RING_RADIUS) {
+  const top = Math.max(a, -r);
+  const bottom = Math.min(b, r);
+  const half = (y: number) => +Math.sqrt(r * r - y * y).toFixed(3);
+  const [xt, xb] = [half(top), half(bottom)];
+  return `M${xt} ${top}A${r} ${r} 0 0 1 ${xb} ${bottom}H${-xb}A${r} ${r} 0 0 1 ${-xt} ${top}Z`;
+}
+
+/**
+ * The white stripes of the Hierophant's ring, drawn over its red fill: a
+ * red stripe is centred on the horizontal diameter, so the ring is
+ * symmetric top to bottom (red, then white, every 8 units outward). Plain
+ * geometry under the disc rather than a `<pattern>`, so the lamen defines
+ * no ids and any number of them can share a page, inside a hall's `<defs>`
+ * or in renderers without hooks.
+ */
+const RING_STRIPES = [1, 3, 5]
+  .flatMap((n) => [
+    discSlab((n - 0.5) * STRIPE, (n + 0.5) * STRIPE),
+    discSlab(-(n + 0.5) * STRIPE, -(n - 0.5) * STRIPE),
+  ])
+  .join("");
 
 const TipharethCalvaryCross = ({
   style,
@@ -93,7 +135,8 @@ export default function Lamen({
   const _outerCircleStyle = {
     color: "#000",
     overflow: "visible",
-    fill: crossLamen?.ring ?? "white",
+    fill:
+      crossLamen?.ring === "stripes" ? "red" : (crossLamen?.ring ?? "white"),
     stroke: "#000",
     strokeWidth: 1,
     strokeDasharray: "none",
@@ -122,7 +165,8 @@ export default function Lamen({
       viewBox="-50 -50 100 100"
       // style={{ border: "1px solid blue" }}
     >
-      <circle cx={0} cy={0} r={49} style={_outerCircleStyle} />
+      <circle cx={0} cy={0} r={RING_RADIUS} style={_outerCircleStyle} />
+      {crossLamen?.ring === "stripes" && <path d={RING_STRIPES} fill="white" />}
       <circle cx={0} cy={0} r={42} style={_innerCircleStyle} />
       {crossLamen && (
         <TipharethCalvaryCross

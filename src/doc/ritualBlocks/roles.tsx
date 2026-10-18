@@ -37,7 +37,7 @@ export const roles: Record<string, RitualRolePresentation> = {
     name: "Past Hierophant",
     symbol: (
       <span>
-        (<Lamen officer="hierophant" height={25} />)
+        (<Lamen officer="pastHierophant" height={25} />)
       </span>
     ),
     color: "red",

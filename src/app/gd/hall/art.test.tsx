@@ -114,9 +114,14 @@ describe("the app's hall art", () => {
   });
 
   it("draws the lamens through Lamen, and a plain circle without a role", () => {
-    expect(
-      draw("lamen", { type: "officer", role: "pastHierophant" }),
-    ).toContain("fill:#f2f2f2");
+    // The Hierophant's striped ring; the Past Hierophant's white one.
+    expect(draw("lamen", { type: "officer", role: "hierophant" })).toContain(
+      'fill="white"',
+    );
+    const past = draw("lamen", { type: "officer", role: "pastHierophant" });
+    expect(past).toContain("fill:white");
+    expect(past).toContain("fill:green");
+    expect(past).not.toContain('fill="white"');
     const plain = draw("lamen", { type: "officer" });
     expect(plain).toContain('<circle r="47"');
     expect(draw("lamen", { type: "officer", role: "" })).toBe(plain);

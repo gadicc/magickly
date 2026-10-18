@@ -24,20 +24,35 @@ const OFFICERS = [
 ];
 
 describe("Lamen", () => {
-  it("draws the chiefs' and the Hierophant's Calvary cross in the ring's colour", () => {
+  it("draws the chiefs' Calvary cross in the ring's colour", () => {
     expect(fills(render("imperator"))).toEqual(["red", "green", "red"]);
-    expect(fills(render("hierophant"))).toEqual(["red", "green", "red"]);
     expect(fills(render("praemonstrator"))).toEqual(["#48f", "orange", "#48f"]);
     expect(fills(render("cancellarius"))).toEqual(["yellow", "#b5b", "yellow"]);
   });
 
-  it("draws the Past Hierophant as the hall drawings do", () => {
-    // public/pics/neophyte.svg: a light grey ring, a green disc, a red cross.
-    expect(fills(render("pastHierophant"))).toEqual([
-      "#f2f2f2",
-      "green",
-      "red",
-    ]);
+  it("rings the Hierophant in red and white stripes", () => {
+    const markup = render("hierophant");
+    expect(fills(markup)).toEqual(["red", "green", "red"]);
+    // Six white stripes over the red ring, under the disc.
+    const stripes = markup.match(/<path d="([^"]+)" fill="white"/);
+    expect(stripes?.[1].match(/M/g)).toHaveLength(6);
+    expect(markup.indexOf('fill="white"')).toBeLessThan(
+      markup.indexOf('r="42"'),
+    );
+  });
+
+  it("draws the stripes symmetrically, a red stripe on the diameter", () => {
+    const d = (render("hierophant").match(/<path d="([^"]+)" fill="white"/) ??
+      [])[1] as string;
+    const heights = [...d.matchAll(/M[-\d.]+ ([-\d.]+)A/g)].map(([, y]) =>
+      Number(y),
+    );
+    expect(heights).toEqual([4, -12, 20, -28, 36, -44]);
+  });
+
+  it("rings the Past Hierophant in white, the Hierophant's cross and disc", () => {
+    expect(fills(render("pastHierophant"))).toEqual(["white", "green", "red"]);
+    expect(render("pastHierophant")).not.toContain('fill="white"');
   });
 
   it("draws the floor officers white on black", () => {

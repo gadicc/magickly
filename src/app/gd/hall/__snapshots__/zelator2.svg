@@ -2823,6 +2823,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:red;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
 </circle>
+<path d="M48.836 4A49 49 0 0 1 47.508 12H-47.508A49 49 0 0 1 -48.836 4ZM47.508 -12A49 49 0 0 1 48.836 -4H-48.836A49 49 0 0 1 -47.508 -12ZM44.733 20A49 49 0 0 1 40.212 28H-40.212A49 49 0 0 1 -44.733 20ZM40.212 -28A49 49 0 0 1 44.733 -20H-44.733A49 49 0 0 1 -40.212 -28ZM33.242 36A49 49 0 0 1 21.564 44H-21.564A49 49 0 0 1 -33.242 36ZM21.564 -44A49 49 0 0 1 33.242 -36H-33.242A49 49 0 0 1 -21.564 -44Z" fill="white">
+</path>
 <circle cx="0" cy="0" r="42" style="color:#000;overflow:visible;fill:green;stroke:#000;stroke-width:1;paint-order:stroke fill markers;stop-color:#000">
 </circle>
 <path d="M -1.1 -4.8 v.708a3.045 3.045 0 0 0-1.842 1.806h-.64v2.02h.601a3.045 3.045 0 0 0 1.881 1.91v3.134h2.02v-3.14a3.045 3.045 0 0 0 1.867-1.904h.615v-2.02h-.653a3.045 3.045 0 0 0-1.829-1.8v-.714zm2.02 1.256a2.534 2.534 0 0 1 1.285 1.258h-1.285zm-2.02 0v1.258h-1.292a2.534 2.534 0 0 1 1.292-1.257zm-1.334 3.278h1.334v1.361a2.534 2.534 0 0 1-1.334-1.36zm3.354 0h1.329a2.534 2.534 0 0 1-1.329 1.362z" style="fill:red;stroke:black;stroke-width:0.08333333333333333" transform="scale(7.5)">
@@ -2833,7 +2835,7 @@
 <g id="_R_0_-art25">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
-<circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:#f2f2f2;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
+<circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
 </circle>
 <circle cx="0" cy="0" r="42" style="color:#000;overflow:visible;fill:green;stroke:#000;stroke-width:1;paint-order:stroke fill markers;stop-color:#000">
 </circle>
