@@ -6,10 +6,12 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
   within,
 } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { parseRitualPug, RITUAL_PUG_HEADER } from "@/doc/ritualPug";
 import HallGallery, { originalDrawing } from "./gallery";
 import HallPage from "./page";
 
@@ -112,6 +114,41 @@ describe("the /gd/hall gallery", () => {
       "Regardie 1938, vol. 2, p.44 (archive.org leaf n38) (the Earth tablet, lamp and salt only)",
     );
   });
+});
+
+describe("the gallery's Copy Pug source", () => {
+  it("copies the shown preset as Pug a ritual's source accepts", async () => {
+    runtime.copyText.mockResolvedValue(undefined);
+    render(<HallGallery />);
+    choose("Zelator Temple 1");
+    const button = screen.getByRole("button", { name: "Copy Pug source" });
+    // The printer loads after the page.
+    await waitFor(() => expect(button).toHaveProperty("disabled", false), {
+      timeout: 30_000,
+    });
+    fireEvent.click(button);
+    await screen.findByText("Copied. Paste it into a ritual's source.");
+    const [text] = runtime.copyText.mock.calls[0];
+    expect(text).toMatch(/^gdHall\(/);
+    const [hall] = parseRitualPug(`${RITUAL_PUG_HEADER}\n${text}`).nodes;
+    expect(JSON.stringify(hall)).toContain("Zelator Temple 1");
+    // Choosing another hall clears the old status.
+    choose("Neophyte Temple");
+    expect(screen.queryByText(/^Copied/)).toBeNull();
+  }, 60_000);
+
+  it("says when the browser refuses the clipboard", async () => {
+    runtime.copyText.mockRejectedValue(new Error("denied"));
+    render(<HallGallery />);
+    const button = screen.getByRole("button", { name: "Copy Pug source" });
+    await waitFor(() => expect(button).toHaveProperty("disabled", false), {
+      timeout: 30_000,
+    });
+    fireEvent.click(button);
+    await screen.findByText(
+      "Could not copy: the browser refused the clipboard.",
+    );
+  }, 60_000);
 });
 
 describe("the gallery's sources", () => {

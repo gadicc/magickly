@@ -107,7 +107,10 @@ export default function RitualPugGuide() {
         note, summary, list item or to-do. The slash command replaces its line
         there, or follows a speech or action from its last line; elsewhere it is
         not offered. The toolbar puts the hall after the block holding the
-        cursor, at the nearest place a hall may stand.
+        cursor, at the nearest place a hall may stand. For source, the{" "}
+        <Link href="/gd/hall">temple halls page</Link> copies a preset’s Pug
+        without IDs, ready to paste at the top level; indent it to put the hall
+        in a note.
       </p>
       <h2>Finding and fixing errors</h2>
       <p>

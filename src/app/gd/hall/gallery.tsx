@@ -8,8 +8,10 @@ import {
   hallSourceText,
   hallSourceUrl,
 } from "@magick-components/gd/hall/presets";
+import type { HallNode } from "@magick-components/gd/hall/types";
 import {
   Box,
+  Button,
   Container,
   FormControl,
   FormControlLabel,
@@ -21,6 +23,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import ExportControls from "@/export/ExportControls";
+import { copyText } from "@/export/exportRuntime";
 import OpenSource from "@/OpenSource";
 import { gdHallArt } from "./art";
 import { embedGdHallFonts } from "./exportFonts";
@@ -34,6 +37,56 @@ export function originalDrawing(preset: HallPreset): string | undefined {
 /** One source, linked to where it can be seen. */
 function Source({ source }: { source: HallPresetSource }) {
   return <a href={hallSourceUrl(source)}>{hallSourceText(source)}</a>;
+}
+
+/**
+ * Copies a preset as ritual Pug, without IDs, to paste into a ritual's
+ * source (`gdHallPug`). The printer loads after the page, so the gallery's
+ * own bundle does not carry the Pug parser; the copy itself stays inside
+ * the click.
+ */
+function CopyPug({ preset }: { preset: HallPreset }) {
+  const [print, setPrint] = React.useState<((hall: HallNode) => string) | null>(
+    null,
+  );
+  const [status, setStatus] = React.useState("");
+  React.useEffect(() => {
+    let current = true;
+    import("@/doc/gdHallPug")
+      .then(({ gdHallPug }) => {
+        if (current) setPrint(() => gdHallPug);
+      })
+      .catch(() => {});
+    return () => {
+      current = false;
+    };
+  }, []);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a status belongs to the preset it copied.
+  React.useEffect(() => setStatus(""), [preset]);
+  return (
+    <>
+      <Button
+        size="small"
+        variant="outlined"
+        disabled={!print}
+        title="Ritual Pug without IDs, for the top level of a ritual's source; indent it to put the hall in a note"
+        onClick={async () => {
+          if (!print) return;
+          try {
+            await copyText(print(preset.hall));
+            setStatus("Copied. Paste it into a ritual's source.");
+          } catch {
+            setStatus("Could not copy: the browser refused the clipboard.");
+          }
+        }}
+      >
+        Copy Pug source
+      </Button>
+      <Typography variant="body2" role="status">
+        {status}
+      </Typography>
+    </>
+  );
 }
 
 function Pane({ preset, label }: { preset: HallPreset; label?: string }) {
@@ -76,8 +129,9 @@ export default function HallGallery() {
     <Container sx={{ p: 2 }}>
       <Typography variant="body2" sx={{ mb: 2 }}>
         Golden Dawn temple halls, drawn from layouts as data with our own
-        artwork. Read-only for now: editing halls, and saving them in rituals,
-        come later.
+        artwork. To put one in a ritual, type /hall in the ritual editor, or
+        copy its Pug source into the ritual's source. Editing halls visually
+        comes later.
       </Typography>
       <Box
         sx={{
@@ -114,6 +168,7 @@ export default function HallGallery() {
             label="Compare with the original drawing"
           />
         )}
+        <CopyPug preset={preset} />
       </Box>
       <Box
         sx={{
