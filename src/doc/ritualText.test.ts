@@ -2,8 +2,9 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { createUuidV7 } from "../lib/ids";
 import { prepare } from "./prepare";
+import { restoreDraftSourceAnnotations } from "./ritualSource";
 import { parseRitualText, printRitualText } from "./ritualText";
-import { semanticFromJrt } from "./semantic";
+import { type RitualSemanticDocument, semanticFromJrt } from "./semantic";
 
 describe("ritual text projection", () => {
   it("preserves UUIDs and mixed-case short IDs in every source command form", () => {
@@ -87,6 +88,74 @@ describe("ritual text projection", () => {
         attrs: { do: true, role: "all-officers" },
         children: [{ text: "Rise" }],
       },
+    ]);
+  });
+
+  it("round-trips line and paragraph separators in every line form", () => {
+    const sep = "a\u2028b\u2029c";
+    const id = (n: number) => `Ab3k9Qp7Zx2Mn5R${n}`;
+    const document: RitualSemanticDocument = {
+      format: "magickli-ritual",
+      version: 1,
+      nodes: [
+        // A hall's attributes, and a plain element's.
+        {
+          kind: "element",
+          id: id(0),
+          tag: "gdHall",
+          attrs: {},
+          children: [
+            {
+              kind: "element",
+              id: id(1),
+              tag: "caption",
+              attrs: { text: sep },
+              children: [],
+            },
+          ],
+        },
+        {
+          kind: "element",
+          id: id(2),
+          tag: "img",
+          attrs: { src: "/pics/x.png", alt: sep },
+        },
+        {
+          kind: "element",
+          id: id(3),
+          tag: "task",
+          attrs: { say: true, role: "hiereus" },
+          children: [{ kind: "text", text: sep }],
+        },
+        {
+          kind: "element",
+          id: id(4),
+          tag: "summary",
+          attrs: { summary: sep },
+        },
+        {
+          kind: "element",
+          id: id(5),
+          tag: "title",
+          attrs: { text: sep },
+          children: [{ kind: "text", text: sep }],
+        },
+        { kind: "legacy", id: id(6), raw: { type: "widget", note: sep } },
+      ],
+    };
+    const text = printRitualText(document);
+    expect(text).toContain("\u2028");
+    expect(parseRitualText(text)).toEqual(document);
+    // A draft saved in this dialect restores without throwing.
+    expect(
+      restoreDraftSourceAnnotations(document, text, "ritual-text"),
+    ).toEqual(document);
+    // The typed shortcuts take them as text too.
+    expect(
+      parseRitualText(`ritual 1\nHiereus: ${sep}\n* Hiereus ${sep}\n`).nodes,
+    ).toMatchObject([
+      { attrs: { say: true }, children: [{ text: sep }] },
+      { attrs: { do: true }, children: [{ text: sep }] },
     ]);
   });
 

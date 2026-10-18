@@ -106,7 +106,11 @@ function parseJson(text: string, line: number): JsonValue {
   }
 }
 
-/** Parse a complete ritual tree. Unlabelled task shortcuts receive fresh IDs. */
+/**
+ * Parse a complete ritual tree. Unlabelled task shortcuts receive fresh IDs.
+ * Lines end at `\n` only: `JSON.stringify` leaves U+2028 and U+2029 raw, so
+ * the line patterns use the `s` flag to let `.` match them.
+ */
 export function parseRitualText(source: string): RitualSemanticDocument {
   const lines = source.replace(/\r\n/g, "\n").split("\n");
   if (lines.shift() !== "ritual 1")
@@ -143,7 +147,7 @@ export function parseRitualText(source: string): RitualSemanticDocument {
         throw new Error(`Line ${lineNumber}: text must be a JSON string`);
       node = { kind: "text", text: value };
     } else if (line.startsWith("?~")) {
-      const match = /^\?~([A-Za-z0-9-]+) (.+)$/.exec(line);
+      const match = /^\?~([A-Za-z0-9-]+) (.+)$/s.exec(line);
       if (!match) throw new Error(`Line ${lineNumber}: invalid opaque node`);
       node = {
         kind: "legacy",
@@ -151,7 +155,7 @@ export function parseRitualText(source: string): RitualSemanticDocument {
         raw: parseJson(match[2], lineNumber),
       };
     } else if (/^\* [A-Za-z][A-Za-z0-9,-]* /.test(line)) {
-      const match = /^\* ([A-Za-z][A-Za-z0-9,-]*) (.*)$/.exec(line)!;
+      const match = /^\* ([A-Za-z][A-Za-z0-9,-]*) (.*)$/s.exec(line)!;
       node = {
         kind: "element",
         id: createRitualNodeId(),
@@ -160,7 +164,7 @@ export function parseRitualText(source: string): RitualSemanticDocument {
         children: [{ kind: "text", text: match[2] }],
       };
     } else if (/^[A-Za-z][A-Za-z0-9,-]*:/.test(line)) {
-      const match = /^([A-Za-z][A-Za-z0-9,-]*):(?: ?)(.*)$/.exec(line)!;
+      const match = /^([A-Za-z][A-Za-z0-9,-]*):(?: ?)(.*)$/s.exec(line)!;
       node = {
         kind: "element",
         id: createRitualNodeId(),
@@ -170,7 +174,7 @@ export function parseRitualText(source: string): RitualSemanticDocument {
       };
     } else if (line.startsWith("@")) {
       const shortcut =
-        /^@(say|do)(?:~([A-Za-z0-9-]+))? ([A-Za-z][A-Za-z0-9,-]*) (".*")$/.exec(
+        /^@(say|do)(?:~([A-Za-z0-9-]+))? ([A-Za-z][A-Za-z0-9,-]*) (".*")$/s.exec(
           line,
         );
       if (shortcut) {
@@ -185,9 +189,8 @@ export function parseRitualText(source: string): RitualSemanticDocument {
           children: [{ kind: "text", text: value }],
         };
       } else {
-        const label = /^@(summary|title)(?:~([A-Za-z0-9-]+))? (".*")(:?)$/.exec(
-          line,
-        );
+        const label =
+          /^@(summary|title)(?:~([A-Za-z0-9-]+))? (".*")(:?)$/s.exec(line);
         const inlineAtom =
           /^@(var|grade)(?:~([A-Za-z0-9-]+))? ([A-Za-z0-9_=]+)(:?)$/.exec(line);
         if (label) {
@@ -217,7 +220,7 @@ export function parseRitualText(source: string): RitualSemanticDocument {
           };
         } else {
           const match =
-            /^@([A-Za-z][A-Za-z0-9]*)(?:~([A-Za-z0-9-]+))?(?: (\{.*\}))?(:?)$/.exec(
+            /^@([A-Za-z][A-Za-z0-9]*)(?:~([A-Za-z0-9-]+))?(?: (\{.*\}))?(:?)$/s.exec(
               line,
             );
           if (!match)
