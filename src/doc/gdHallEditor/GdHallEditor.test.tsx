@@ -75,6 +75,10 @@ interface Harness {
   redo: ReturnType<typeof vi.fn>;
   current: () => HallElement;
   surface: HTMLElement;
+  /** Gives the editor a hall from elsewhere (a source sync, the other panel). */
+  replace: (hall: HallElement) => void;
+  /** Locks or unlocks the host. */
+  lock: (locked: boolean) => void;
 }
 
 function setup(
@@ -90,14 +94,19 @@ function setup(
   };
   let latest = initial;
   const past: HallElement[] = [];
+  let replace: (hall: HallElement) => void = () => {};
+  let lock: (locked: boolean) => void = () => {};
   function Host() {
     const [hall, setHall] = useState(initial);
+    const [unlocked, setUnlocked] = useState(editable);
     latest = hall;
+    replace = setHall;
+    lock = (locked) => setUnlocked(!locked);
     return (
       <GdHallEditor
         hall={hall}
         art={gdHallArt}
-        editable={editable}
+        editable={unlocked}
         createId={sequentialIds("New")}
         onChange={(next) => {
           harness.changes.push(next);
@@ -120,6 +129,8 @@ function setup(
     ...harness,
     current: () => latest,
     surface: screen.getByRole("application"),
+    replace: (hall) => act(() => replace(hall)),
+    lock: (locked) => act(() => lock(locked)),
   };
 }
 
@@ -242,21 +253,21 @@ describe("entering and the keyboard", () => {
   });
 });
 
-describe("the pointer", () => {
-  const pointer = (
-    type: "pointerDown" | "pointerMove" | "pointerUp" | "pointerCancel",
-    target: Element,
-    point: { clientX: number; clientY: number },
-    init: Record<string, unknown> = {},
-  ) =>
-    fireEvent[type](target, {
-      pointerId: 1,
-      pointerType: "mouse",
-      button: 0,
-      ...point,
-      ...init,
-    });
+const pointer = (
+  type: "pointerDown" | "pointerMove" | "pointerUp" | "pointerCancel",
+  target: Element,
+  point: { clientX: number; clientY: number },
+  init: Record<string, unknown> = {},
+) =>
+  fireEvent[type](target, {
+    pointerId: 1,
+    pointerType: "mouse",
+    button: 0,
+    ...point,
+    ...init,
+  });
 
+describe("the pointer", () => {
   it("selects by a click and moves by a drag, one change per drag", () => {
     const { surface, changes, current } = setup();
     pointer("pointerDown", surface, at(8, 3));
@@ -326,6 +337,181 @@ describe("the pointer", () => {
     pointer("pointerUp", surface, at(10, 3), { pointerId: 2 });
     pointer("pointerUp", surface, at(8, 3));
     expect(changes).toHaveLength(0);
+  });
+});
+
+describe("a gesture and the hall it writes", () => {
+  /** Presses on the Hegemon and drags it a square South, not released. */
+  const dragHegemon = (surface: HTMLElement) => {
+    pointer("pointerDown", surface, at(8, 3));
+    pointer("pointerMove", surface, at(9, 3));
+  };
+
+  it("keeps a field's value written as the press begins", () => {
+    const { surface, changes, current } = setup();
+    pointer("pointerDown", surface, at(4, 3));
+    pointer("pointerUp", surface, at(4, 3));
+    const label = screen.getByRole("textbox", { name: /^Label$/ });
+    act(() => label.focus());
+    fireEvent.change(label, { target: { value: "Jachin" } });
+    // The press leaves the field, which writes it; the drag builds on it.
+    dragHegemon(surface);
+    expect(changes).toHaveLength(1);
+    pointer("pointerUp", surface, at(9, 3));
+    expect(changes).toHaveLength(2);
+    expect(byAttr(current(), "kind", "black").attrs.label).toBe("Jachin");
+    expect(byAttr(current(), "role", "hegemon").attrs.x).toBe(9);
+  });
+
+  it("builds a drag on a position typed as it begins", () => {
+    const { surface, current } = setup();
+    pointer("pointerDown", surface, at(8, 3));
+    pointer("pointerUp", surface, at(8, 3));
+    const x = screen.getByRole("textbox", { name: /^x/ });
+    act(() => x.focus());
+    fireEvent.change(x, { target: { value: "10" } });
+    dragHegemon(surface);
+    pointer("pointerUp", surface, at(9, 3));
+    // A square South of the typed 10, not of where the press began.
+    expect(byAttr(current(), "role", "hegemon").attrs.x).toBe(11);
+  });
+
+  it("ends a drag without writing it on undo", () => {
+    const { surface, changes, current } = setup(neophyteHall(), true, {
+      history: true,
+    });
+    pointer("pointerDown", surface, at(4, 3));
+    pointer("pointerUp", surface, at(4, 3));
+    key(surface, "ArrowRight");
+    expect(byAttr(current(), "kind", "black").attrs.x).toBe(4.5);
+    dragHegemon(surface);
+    expect(key(surface, "z", { ctrlKey: true })).toBe(false);
+    expect(byAttr(current(), "kind", "black").attrs.x).toBe(4);
+    pointer("pointerMove", surface, at(10, 3));
+    pointer("pointerUp", surface, at(10, 3));
+    expect(changes).toHaveLength(1);
+    expect(byAttr(current(), "kind", "black").attrs.x).toBe(4);
+    expect(byAttr(current(), "role", "hegemon").attrs.x).toBe(8);
+  });
+
+  it("ends a drag on redo, Delete and Escape", () => {
+    const { surface, changes, current, redo } = setup();
+    dragHegemon(surface);
+    key(surface, "y", { ctrlKey: true });
+    expect(redo).toHaveBeenCalledOnce();
+    pointer("pointerUp", surface, at(10, 3));
+    expect(changes).toHaveLength(0);
+    // Escape ends the drag and keeps the selection.
+    dragHegemon(surface);
+    expect(key(surface, "Escape")).toBe(false);
+    expect(selected()).toContain("Hegemon selected");
+    // The preview is gone: the field shows where it stands.
+    expect(
+      (screen.getByRole("textbox", { name: /^x/ }) as HTMLInputElement).value,
+    ).toBe("8");
+    pointer("pointerUp", surface, at(10, 3));
+    expect(changes).toHaveLength(0);
+    // Delete ends it and deletes; the release does not bring it back.
+    dragHegemon(surface);
+    key(surface, "Delete");
+    expect(changes).toHaveLength(1);
+    pointer("pointerMove", surface, at(10, 3));
+    pointer("pointerUp", surface, at(10, 3));
+    expect(changes).toHaveLength(1);
+    expect(byAttr(current(), "role", "hegemon")).toBeUndefined();
+  });
+
+  it("holds other keys until the pointer is released", () => {
+    const { surface, changes, current } = setup();
+    dragHegemon(surface);
+    expect(key(surface, "ArrowRight")).toBe(false);
+    expect(key(surface, "+")).toBe(false);
+    expect(key(surface, "Tab")).toBe(false);
+    expect(key(surface, "Shift", { shiftKey: true })).toBe(true);
+    expect(changes).toHaveLength(0);
+    pointer("pointerUp", surface, at(9, 3));
+    expect(changes).toHaveLength(1);
+    expect(byAttr(current(), "role", "hegemon").attrs).toMatchObject({
+      x: 9,
+    });
+    expect(byAttr(current(), "role", "hegemon").attrs).not.toHaveProperty(
+      "scale",
+    );
+  });
+
+  it("ends a drag when the host gives another hall", () => {
+    const { surface, changes, current, replace } = setup();
+    dragHegemon(surface);
+    const elsewhere = neophyteHall();
+    byAttr(elsewhere, "kind", "black").attrs.label = "From the source";
+    replace(elsewhere);
+    pointer("pointerUp", surface, at(10, 3));
+    expect(changes).toHaveLength(0);
+    expect(current()).toBe(elsewhere);
+  });
+
+  it("ends a drag when the host locks", () => {
+    const { surface, changes, lock } = setup();
+    dragHegemon(surface);
+    lock(true);
+    lock(false);
+    pointer("pointerUp", surface, at(10, 3));
+    expect(changes).toHaveLength(0);
+  });
+
+  it("ends a drag whose node the hall no longer has", () => {
+    const { surface, changes, replace } = setup();
+    dragHegemon(surface);
+    // The same hall again (not an echo of one sent) without the Hegemon:
+    // the drag ends, and so would a frame drawn on it.
+    const without = neophyteHall();
+    const floor = without.children?.find(
+      (child): child is HallElement =>
+        child.kind === "element" && child.tag === "floor",
+    ) as HallElement;
+    floor.children = floor.children?.filter(
+      (child) => child.kind !== "element" || child.attrs.role !== "hegemon",
+    );
+    replace(without);
+    pointer("pointerMove", surface, at(11, 3));
+    pointer("pointerUp", surface, at(11, 3));
+    expect(changes).toHaveLength(0);
+  });
+
+  it("lets one pointer drag at a time", () => {
+    const { surface, changes, current } = setup();
+    pointer("pointerDown", surface, at(8, 3));
+    pointer("pointerDown", surface, at(4, 3), { pointerId: 2 });
+    pointer("pointerMove", surface, at(4, 6), { pointerId: 2 });
+    pointer("pointerUp", surface, at(4, 6), { pointerId: 2 });
+    expect(selected()).toContain("Hegemon selected");
+    pointer("pointerMove", surface, at(9, 3));
+    pointer("pointerUp", surface, at(9, 3));
+    expect(changes).toHaveLength(1);
+    expect(byAttr(current(), "role", "hegemon").attrs.x).toBe(9);
+    expect(byAttr(current(), "kind", "black").attrs).toEqual(
+      byAttr(neophyteHall(), "kind", "black").attrs,
+    );
+  });
+
+  it("holds the drawing's view box during a drag", () => {
+    const { surface, current } = setup();
+    const viewBox = () =>
+      document.querySelector(OVERLAY)?.getAttribute("viewBox");
+    const before = viewBox();
+    const start = at(8, 3);
+    pointer("pointerDown", surface, start);
+    // Far past the South wall, which would grow the drawing.
+    const far = { clientX: start.clientX + 15 * PX, clientY: start.clientY };
+    pointer("pointerMove", surface, far);
+    expect(viewBox()).toBe(before);
+    const frame = surface.querySelector("svg[role=img]") as SVGElement;
+    expect(frame.style.width).not.toBe("100%");
+    pointer("pointerUp", surface, far);
+    expect(byAttr(current(), "role", "hegemon").attrs.x).toBe(23);
+    // Released, the drawing takes its new extent.
+    expect(viewBox()).not.toBe(before);
+    expect(frame.style.width).toBe("100%");
   });
 });
 

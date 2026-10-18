@@ -17,12 +17,14 @@ import {
   Tooltip,
 } from "@mui/material";
 import {
+  type CSSProperties,
   type KeyboardEvent,
   type PointerEvent,
   type ReactNode,
   useCallback,
   useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -104,14 +106,21 @@ export interface GdHallEditorProps {
   createId?: () => string;
 }
 
+/**
+ * A pointer gesture: which node it acts on and where it began, never the
+ * hall itself. Each preview and the release apply the gesture to the hall
+ * the editor holds at that moment, so a field written as the press began,
+ * or a hall the host echoes back mid-drag, is built on, not reverted.
+ */
 type Gesture = {
   kind: "move" | "scale";
   id: string;
   pointerId: number;
-  /** The hall as laid out when the gesture began; moves are measured from it. */
-  view: HallView;
   startClient: Point;
+  /** Where the press began, in squares (a scale is measured from it). */
   start: Point;
+  /** The drawing's view box when the press began, held for the gesture. */
+  box: Rect;
   /** CSS pixels per square at the start. */
   pixels: number;
   moved: boolean;
@@ -125,6 +134,13 @@ const CORNERS = [
   ["sw", 0, 1],
   ["se", 1, 1],
 ] as const;
+
+/** Keys that only modify others: they never end or disturb a gesture. */
+const MODIFIER_KEYS = new Set(["Alt", "Control", "Meta", "Shift"]);
+
+/** Whether two halls are the same source (an echo of one sent). */
+const sameHall = (a: HallElement, b: HallElement) =>
+  a === b || JSON.stringify(a) === JSON.stringify(b);
 
 /** The live region's sentence for a position. */
 const at = (point: { x?: unknown; y?: unknown }) =>
@@ -166,18 +182,38 @@ export function GdHallEditor({
    * The hall last handed to `onChange`, shown until the host gives back a
    * new `hall`: a host may draw it a frame later (a node view's React
    * renderer does), and the next key press must build on it, not on the
-   * hall before it.
+   * hall before it. Any new `hall` from the host replaces it (an undo may
+   * give back the very hall it was built on).
    */
   const [sent, setSent] = useState<HallElement | null>(null);
+  const [hallShown, setHallShown] = useState(hall);
+  if (hallShown !== hall) {
+    setHallShown(hall);
+    setSent(null);
+  }
+  /** The hall the editor holds: the one it sent, or the host's. */
+  const current = (hallShown === hall && sent) || hall;
+  /**
+   * `current`, also updated the moment a change is sent, so a second
+   * change in the same event (a field written on blur as a drag begins)
+   * builds on the first.
+   */
+  const currentRef = useRef(current);
+  /** The last hall sent, until the host echoes it back as `hall`. */
+  const echo = useRef<HallElement | null>(null);
+  /** The view box held while a gesture runs (the drawing does not rescale). */
+  const [heldBox, setHeldBox] = useState<Rect | null>(null);
   /** The palette's choice moves the focus to the drawing, not back to Add. */
   const [paletteChosen, setPaletteChosen] = useState(false);
   const frame = useRef<number | null>(null);
   const helpId = useId();
 
-  const committed = useMemo(
-    () => hallView(sent ?? hall, art),
-    [sent, hall, art],
-  );
+  const committed = useMemo(() => hallView(current, art), [current, art]);
+  const viewCache = useRef(committed);
+  useLayoutEffect(() => {
+    currentRef.current = current;
+    viewCache.current = committed;
+  });
   const previewView = useMemo(
     () => (preview ? hallView(preview, art) : null),
     [preview, art],
@@ -195,12 +231,45 @@ export function GdHallEditor({
     if (selectedId && !committed.byId.has(selectedId)) setSelectedId(null);
   }, [committed, selectedId]);
 
-  // A new hall from the host replaces whatever was drawn over the old one.
+  /** The view of the hall the editor holds now, laid out at most once. */
+  const currentView = () => {
+    if (viewCache.current.hall !== currentRef.current)
+      viewCache.current = hallView(currentRef.current, art);
+    return viewCache.current;
+  };
+
+  /** Ends a gesture without writing anything. */
+  const cancelGesture = () => {
+    const current = gesture.current;
+    if (!current) return;
+    gesture.current = null;
+    setGestureKind(null);
+    setHeldBox(null);
+    setPreview(null);
+    if (frame.current !== null) {
+      if (frame.current >= 0) cancelAnimationFrame(frame.current);
+      frame.current = null;
+    }
+    if (surface.current?.hasPointerCapture?.(current.pointerId))
+      surface.current.releasePointerCapture(current.pointerId);
+  };
+
+  // A new hall from the host, other than the echo of the one sent, ends a
+  // gesture in progress: it was begun on a hall that is no longer there.
   // biome-ignore lint/correctness/useExhaustiveDependencies: on a new hall only
   useEffect(() => {
-    setPreview(null);
-    setSent(null);
+    const sentHall = echo.current;
+    echo.current = null;
+    if (sentHall && sameHall(sentHall, hall)) return;
+    cancelGesture();
   }, [hall]);
+
+  // So does the host locking: the gesture would be written later, on a
+  // hall the host may by then have changed.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: on a lock only
+  useEffect(() => {
+    if (!editable) cancelGesture();
+  }, [editable]);
 
   // Handles and hit areas are sized in pixels, whatever the drawing's size.
   useEffect(() => {
@@ -234,20 +303,28 @@ export function GdHallEditor({
     surface.current?.focus({ preventScroll: true });
   }, []);
 
-  /** Hands a completed gesture's hall to the host, once. */
-  const commit = useCallback(
-    (next: HallElement, message: string, select?: string | null) => {
-      setPreview(null);
-      if (select !== undefined) setSelectedId(select);
-      if (next === committed.hall || next === view.hall) return;
-      const normal = normalizeHall(next, art);
-      // A host that refuses the change says so; the hall stays as it was.
-      if (onChange(normal) === false) return;
-      setSent(normal);
-      setAnnouncement(message);
-    },
-    [committed.hall, view.hall, art, onChange],
-  );
+  /**
+   * Hands a completed gesture's hall, built on `currentView()`, to the
+   * host, once. False when it was not taken.
+   */
+  const commit = (
+    next: HallElement,
+    message: string,
+    select?: string | null,
+  ): boolean => {
+    setPreview(null);
+    if (select !== undefined) setSelectedId(select);
+    const base = currentRef.current;
+    if (next === base) return true;
+    const normal = normalizeHall(next, art);
+    // A host that refuses the change says so; the hall stays as it was.
+    if (onChange(normal) === false) return false;
+    currentRef.current = normal;
+    echo.current = normal;
+    setSent(normal);
+    setAnnouncement(message);
+    return true;
+  };
 
   const select = useCallback((entry: HallSelectable | undefined) => {
     setSelectedId(entry?.id ?? null);
@@ -255,7 +332,7 @@ export function GdHallEditor({
   }, []);
 
   const toSquares = (clientX: number, clientY: number): Point | null => {
-    const box = view.resolved?.viewBox;
+    const box = heldBox ?? view.resolved?.viewBox;
     const element = overlay.current;
     if (!box || !element) return null;
     const rect = element.getBoundingClientRect();
@@ -266,23 +343,31 @@ export function GdHallEditor({
     };
   };
 
-  /** The gesture's hall for the pointer at `latest`. */
-  const gestureHall = (current: Gesture): HallElement => {
+  /**
+   * The gesture applied, for the pointer at `latest`, to the hall the
+   * editor holds now; null when its node is gone.
+   */
+  const gestureHall = (current: Gesture): HallElement | null => {
+    const base = currentView();
+    if (!base.byId.has(current.id)) return null;
     const delta = {
       x: (current.latest.x - current.startClient.x) / current.pixels,
       y: (current.latest.y - current.startClient.y) / current.pixels,
     };
     if (current.kind === "move")
-      return moveNode(current.view, current.id, delta, current.snap);
-    return dragScaleNode(current.view, current.id, current.start, {
+      return moveNode(base, current.id, delta, current.snap);
+    return dragScaleNode(base, current.id, current.start, {
       x: current.start.x + delta.x,
       y: current.start.y + delta.y,
     });
   };
 
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    // One gesture at a time: a second finger does not take over a drag.
+    if (gesture.current) return;
     if (!editable || (event.pointerType === "mouse" && event.button !== 0))
       return;
+    // A field left by this press writes its value now, before the gesture.
     focusSurface();
     const point = toSquares(event.clientX, event.clientY);
     const box = view.resolved?.viewBox;
@@ -309,9 +394,9 @@ export function GdHallEditor({
       kind,
       id: entry.id,
       pointerId: event.pointerId,
-      view,
       startClient: { x: event.clientX, y: event.clientY },
       start: point,
+      box,
       pixels: rect.width / (box.x1 - box.x0),
       moved: false,
       snap: !event.altKey,
@@ -335,6 +420,7 @@ export function GdHallEditor({
     if (!current.moved) {
       current.moved = true;
       setGestureKind(current.kind);
+      setHeldBox(current.box);
     }
     // One layout per frame, however fast the pointer reports.
     if (frame.current !== null) return;
@@ -342,7 +428,10 @@ export function GdHallEditor({
     frame.current = -1;
     const id = requestAnimationFrame(() => {
       frame.current = null;
-      if (gesture.current === current) setPreview(gestureHall(current));
+      if (gesture.current !== current) return;
+      const next = gestureHall(current);
+      if (next) setPreview(next);
+      else cancelGesture();
     });
     if (frame.current === -1) frame.current = id;
   };
@@ -350,40 +439,33 @@ export function GdHallEditor({
   const endGesture = (event: PointerEvent<HTMLDivElement>, cancel: boolean) => {
     const current = gesture.current;
     if (!current || current.pointerId !== event.pointerId) return;
-    gesture.current = null;
-    setGestureKind(null);
-    if (frame.current !== null) {
-      if (frame.current >= 0) cancelAnimationFrame(frame.current);
-      frame.current = null;
-    }
-    if (surface.current?.hasPointerCapture?.(event.pointerId))
-      surface.current.releasePointerCapture(event.pointerId);
-    if (cancel || !current.moved) {
-      setPreview(null);
-      return;
-    }
+    cancelGesture();
+    if (cancel || !current.moved || !editable) return;
     current.latest = { x: event.clientX, y: event.clientY };
     const next = gestureHall(current);
-    const entry = current.view.byId.get(current.id) as HallSelectable;
+    const entry = currentView().byId.get(current.id);
+    if (!next || !entry) return;
     commit(
       next,
       current.kind === "move" ? moved(entry, next) : scaled(entry, next),
     );
   };
 
+  // Keys, buttons and fields edit the hall the editor holds now (see
+  // `currentView`), by node ID.
   const nudge = (entry: HallSelectable, step: Point) => {
-    const next = nudgeNode(view, entry.id, step);
+    const next = nudgeNode(currentView(), entry.id, step);
     commit(next, moved(entry, next));
   };
 
   const scaleStep = (entry: HallSelectable, up: boolean) => {
-    const next = stepScaleNode(view, entry.id, up);
+    const next = stepScaleNode(currentView(), entry.id, up);
     commit(next, scaled(entry, next));
   };
 
   const remove = (entry: HallSelectable) => {
     commit(
-      deleteNode(view, entry.id),
+      deleteNode(currentView(), entry.id),
       `Deleted ${hallNodeName(entry.node)}`,
       null,
     );
@@ -391,7 +473,7 @@ export function GdHallEditor({
   };
 
   const duplicate = (entry: HallSelectable) => {
-    const copy = duplicateNode(view, entry.id, createId);
+    const copy = duplicateNode(currentView(), entry.id, createId);
     if (!copy) return;
     commit(copy.hall, `Duplicated ${hallNodeName(entry.node)}`, copy.id);
     focusSurface();
@@ -400,10 +482,11 @@ export function GdHallEditor({
   const add = (entry: HallPaletteEntry) => {
     setPaletteChosen(true);
     setPaletteAnchor(null);
-    if (!view.resolved) return;
+    const base = currentView();
+    if (!base.resolved) return;
     const inserted = insertFromPalette(
-      view.hall,
-      view.resolved,
+      base.hall,
+      base.resolved,
       entry,
       selectedId ?? undefined,
       createId,
@@ -414,25 +497,26 @@ export function GdHallEditor({
 
   const setAttr = (id: string, name: string, value: JsonValue | undefined) =>
     commit(
-      setNodeAttr(view, id, name, value),
+      setNodeAttr(currentView(), id, name, value),
       value === undefined ? `Removed ${name}` : `Set ${name} to ${value}`,
     );
 
   const setCaption = (text: string | undefined) => {
-    const caption = view.hall.children?.find(
+    const base = currentRef.current;
+    const caption = base.children?.find(
       (child): child is HallElement =>
         child.kind === "element" && child.tag === "caption",
     );
     if (caption)
       commit(
         text === undefined
-          ? removeHallNode(view.hall, caption.id)
-          : updateHallAttrs(view.hall, caption.id, { text }),
+          ? removeHallNode(base, caption.id)
+          : updateHallAttrs(base, caption.id, { text }),
         text === undefined ? "Removed the caption" : "Set the caption",
       );
     else if (text !== undefined)
       commit(
-        insertHallNode(view.hall, view.hall.id, {
+        insertHallNode(base, base.id, {
           kind: "element",
           id: createId(),
           tag: "caption",
@@ -446,7 +530,20 @@ export function GdHallEditor({
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     const modifier = event.ctrlKey || event.metaKey;
     const key = event.key;
-    if (modifier && (key === "z" || key === "Z" || key === "y")) {
+    const history = modifier && (key === "z" || key === "Z" || key === "y");
+    if (gesture.current) {
+      // Escape, undo, redo and Delete end a gesture without writing it;
+      // other keys wait for the pointer to be released.
+      const ends =
+        key === "Escape" || key === "Delete" || key === "Backspace" || history;
+      if (!ends || key === "Escape") {
+        if (!MODIFIER_KEYS.has(key)) event.preventDefault();
+        if (key === "Escape") cancelGesture();
+        return;
+      }
+      cancelGesture();
+    }
+    if (history) {
       event.preventDefault();
       if (key === "y" || event.shiftKey) onRedo?.();
       else onUndo?.();
@@ -498,7 +595,9 @@ export function GdHallEditor({
     }
   };
 
-  const box = view.resolved?.viewBox;
+  // The drawing's view box, held still while a gesture runs: a drag past
+  // the drawing's edge would otherwise rescale it under the pointer.
+  const box = heldBox ?? view.resolved?.viewBox;
   const handleMark = (coarse ? 16 : 10) / pixelsPerSquare;
   const handleHit = (coarse ? 40 : 22) / pixelsPerSquare;
   const selectedRect = selected?.object
@@ -628,8 +727,20 @@ export function GdHallEditor({
             onPointerUp={(event) => endGesture(event, false)}
             onPointerCancel={(event) => endGesture(event, true)}
           >
-            {view.row && (
-              <GdHall hall={view.row} art={art} className={styles.drawing} />
+            {view.row && view.resolved && box && (
+              <div
+                className={styles.frame}
+                style={{
+                  aspectRatio: `${box.x1 - box.x0} / ${box.y1 - box.y0}`,
+                }}
+              >
+                <GdHall
+                  hall={view.row}
+                  art={art}
+                  className={styles.drawing}
+                  style={placeWithin(view.resolved.viewBox, box)}
+                />
+              </div>
             )}
             {box && view.resolved && (
               <svg
@@ -760,6 +871,22 @@ const moved = (entry: HallSelectable, hall: HallElement) =>
 /** The live region's sentence for a scale. */
 const scaled = (entry: HallSelectable, hall: HallElement) =>
   `Scaled ${hallNodeName(entry.node)} to ${attrsIn(hall, entry).scale}`;
+
+/**
+ * Where a drawing of `drawn` stands in a frame showing `frame`, in
+ * percent of the frame: the whole frame when they agree, beyond it where
+ * a drag has taken an object past the held view box.
+ */
+const placeWithin = (drawn: Rect, frame: Rect): CSSProperties => {
+  const width = frame.x1 - frame.x0;
+  const height = frame.y1 - frame.y0;
+  return {
+    left: `${((drawn.x0 - frame.x0) / width) * 100}%`,
+    top: `${((drawn.y0 - frame.y0) / height) * 100}%`,
+    width: `${((drawn.x1 - drawn.x0) / width) * 100}%`,
+    height: `${((drawn.y1 - drawn.y0) / height) * 100}%`,
+  };
+};
 
 /** A square of `size` centred on a point, in squares. */
 const square = (cx: number, cy: number, size: number): Rect => ({

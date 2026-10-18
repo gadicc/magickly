@@ -46,10 +46,16 @@
 .surface[aria-disabled="true"] {
   opacity: 0.7;
 }
-.drawing {
-  display: block;
+/* The frame keeps the drawing's proportions; during a drag it keeps
+   those of the drawing as the drag began, the drawing placed within. */
+.frame {
+  position: relative;
   width: 100%;
-  height: auto;
+}
+.drawing {
+  position: absolute;
+  display: block;
+  overflow: visible;
 }
 .overlay {
   position: absolute;
