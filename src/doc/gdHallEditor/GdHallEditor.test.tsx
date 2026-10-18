@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { gdHallArt } from "@/app/gd/hall/art";
+import { flushPendingEdits } from "../pendingEdits";
 import { GdHallEditor } from "./GdHallEditor";
 import type { HallElement } from "./hallModel";
 import {
@@ -778,6 +779,59 @@ describe("the host's replies", () => {
     key(surface, "ArrowRight");
     expect(byAttr(current(), "role", "imperator").attrs.x).toBe(2.1);
     expect(document.querySelector("[data-hall-notice]")).toBeNull();
+  });
+});
+
+describe("a value still being typed", () => {
+  it("is written when a save asks", () => {
+    const { surface, changes, current, lock } = setup();
+    key(surface, "Tab");
+    const x = screen.getByRole("textbox", { name: /^x/ }) as HTMLInputElement;
+    act(() => x.focus());
+    fireEvent.change(x, { target: { value: "3" } });
+    // Nothing is written while the host is locked.
+    lock(true);
+    expect(flushPendingEdits()).toBe(false);
+    expect(changes).toHaveLength(0);
+    lock(false);
+    // Ctrl+S does not leave the field: the save writes it first.
+    act(() => {
+      expect(flushPendingEdits()).toBe(true);
+    });
+    expect(changes).toHaveLength(1);
+    expect(byAttr(current(), "role", "imperator").attrs.x).toBe(3);
+    expect(document.activeElement).toBe(x);
+    act(() => {
+      expect(flushPendingEdits()).toBe(false);
+    });
+  });
+
+  it("is written once the host unlocks, the field having lost the focus", () => {
+    const { surface, changes, current, lock } = setup();
+    key(surface, "Tab");
+    const x = screen.getByRole("textbox", { name: /^x/ }) as HTMLInputElement;
+    act(() => x.focus());
+    fireEvent.change(x, { target: { value: "3" } });
+    // Chromium disables the field without a blur and drops its focus
+    // (jsdom keeps it there).
+    lock(true);
+    vi.spyOn(document, "activeElement", "get").mockReturnValue(document.body);
+    expect(changes).toHaveLength(0);
+    expect(x.value).toBe("3");
+    lock(false);
+    expect(changes).toHaveLength(1);
+    expect(byAttr(current(), "role", "imperator").attrs.x).toBe(3);
+  });
+
+  it("stops being offered once the editor goes", () => {
+    const { surface, changes } = setup();
+    key(surface, "Tab");
+    const x = screen.getByRole("textbox", { name: /^x/ }) as HTMLInputElement;
+    act(() => x.focus());
+    fireEvent.change(x, { target: { value: "3" } });
+    cleanup();
+    expect(flushPendingEdits()).toBe(false);
+    expect(changes).toHaveLength(0);
   });
 });
 

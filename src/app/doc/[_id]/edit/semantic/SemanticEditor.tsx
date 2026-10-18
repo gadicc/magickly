@@ -26,6 +26,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import React from "react";
 import EditorActionButton from "@/doc/EditorActionButton";
 import { retainsOnlineEditorIdentity } from "@/doc/onlineEditorIdentity";
+import { flushPendingEdits } from "@/doc/pendingEdits";
 import RitualSourceEditor from "@/doc/RitualSourceEditor";
 import RitualVisualControls, {
   modifierLabel,
@@ -1061,8 +1062,18 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     !stale &&
     (!!pending || (unsaved && !error && !sourceProblem && !sourceSyncing));
   const saveQueued = React.useRef(false);
+  /**
+   * Saves, after writing what a hall editor field still holds (Ctrl+S
+   * does not leave the field); a value so written saves once the
+   * document has taken it, at the next render.
+   */
+  const saveWithPending = () => {
+    if (flushPendingEdits()) saveQueued.current = true;
+    else void save();
+  };
   saveShortcut.current = () => {
-    if (canSave) void save();
+    if (flushPendingEdits()) saveQueued.current = true;
+    else if (canSave) void save();
     // Ctrl+S right after typing source saves once that source applies.
     else if (sourceSyncing && !sourceProblem) saveQueued.current = true;
   };
@@ -1199,7 +1210,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             saving ? <CircularProgress size={16} color="inherit" /> : undefined
           }
           title={`Save (${modifierLabel}S)`}
-          onClick={save}
+          onClick={saveWithPending}
         >
           {retryPending ? "Retry save" : "Save"}
         </EditorActionButton>

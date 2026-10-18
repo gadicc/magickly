@@ -9,6 +9,7 @@ import {
 } from "@testing-library/react";
 import React from "react";
 import { afterEach, expect, it, vi } from "vitest";
+import { neophyteHall } from "@/doc/gdHallEditor/hallTestFixtures";
 import { printRitualPug } from "@/doc/ritualPug";
 import { printRitualText } from "@/doc/ritualText";
 import { semanticFromJrt } from "@/doc/semantic";
@@ -549,6 +550,51 @@ it("saves with Ctrl+S and keeps the browser's save dialog away", async () => {
   await screen.findByText("Saved.");
   expect(mock.send).toHaveBeenCalledOnce();
 });
+
+it("saves what a hall field still holds, from Ctrl+S or Save", async () => {
+  mock.load.mockResolvedValue(undefined);
+  mock.saveDraft.mockResolvedValue(undefined);
+  mock.clear.mockResolvedValue(undefined);
+  const setup = props();
+  setup.initialDocument.nodes.push(neophyteHall());
+  mock.owner = setup.actorId;
+  const saved = () => ({
+    ok: true,
+    replayed: false,
+    ritualId: setup.ritualId,
+    revisionId: createUuidV7(),
+    version: 8,
+    updatedAt: new Date().toISOString(),
+  });
+  mock.send.mockImplementation(async () => saved());
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "Edit hall" }));
+  const surface = await screen.findByRole(
+    "application",
+    {},
+    { timeout: 30_000 },
+  );
+  fireEvent.keyDown(surface, { key: "Tab" });
+  const label = () => screen.getByRole("textbox", { name: /^Label$/ });
+  act(() => label().focus());
+  fireEvent.change(label(), { target: { value: "Keeper" } });
+  // Ctrl+S in the field: the field keeps the focus, and its value saves.
+  fireEvent.keyDown(label(), { key: "s", ctrlKey: true });
+  await screen.findByText("Saved.");
+  expect(document.activeElement).toBe(label());
+  expect(mock.send).toHaveBeenCalledOnce();
+  expect(mock.send.mock.calls[0][0].source).toMatch(/"label": "Keeper"/);
+  // Save pressed without taking the focus, as Safari's buttons do, with
+  // another change unsaved (else Save is disabled).
+  await changeTitle();
+  fireEvent.change(label(), { target: { value: "Keeper of the East" } });
+  expect(document.activeElement).toBe(label());
+  fireEvent.click(screen.getByRole("button", { name: "Save" }));
+  await waitFor(() => expect(mock.send).toHaveBeenCalledTimes(2));
+  expect(mock.send.mock.calls[1][0].source).toMatch(
+    /"label": "Keeper of the East"/,
+  );
+}, 60_000);
 
 it("conceals private content and portals immediately on a hard lock", async () => {
   mock.load.mockResolvedValue(undefined);

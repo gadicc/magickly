@@ -20,7 +20,8 @@ import {
   Switch,
   TextField,
 } from "@mui/material";
-import { type KeyboardEvent, useEffect, useId, useState } from "react";
+import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
+import { registerPendingEdit } from "../pendingEdits";
 import type { JsonValue } from "../semantic";
 import styles from "./gdHallEditor.module.css";
 import { type HallSelectable, type HallView, hallNodeName } from "./hallEdits";
@@ -139,33 +140,47 @@ function TypedField({
   const shown = value === undefined || value === null ? "" : String(value);
   const [text, setText] = useState(shown);
   const [error, setError] = useState<string | null>(null);
+  const input = useRef<HTMLInputElement>(null);
   // The node changed under the field (a drag, undo): show its value.
   useEffect(() => {
     setText(shown);
     setError(null);
   }, [shown]);
-  const commit = () => {
-    if (text === shown) return;
+  /** Writes the typed value; true when the hall took a change. */
+  const commit = (): boolean => {
+    if (text === shown) return false;
     if (spec.kind === "number") {
       const parsed = parseNumberField(text, spec);
       if ("error" in parsed) {
         setError(parsed.error);
-        return;
+        return false;
       }
-      write(parsed.value);
-      return;
+      return write(parsed.value);
     }
-    write(text === "" ? undefined : text);
+    return write(text === "" ? undefined : text);
   };
   /** A value the hall did not take goes back to the hall's, with a note. */
-  const write = (next: JsonValue | undefined) => {
+  const write = (next: JsonValue | undefined): boolean => {
     if (onCommit(name, next)) {
       setError(null);
-      return;
+      return true;
     }
     setText(shown);
     setError("Not written");
+    return false;
   };
+  // A save writes what is still being typed (Ctrl+S does not leave the
+  // field), unless the field is disabled.
+  const flush = useRef(commit);
+  flush.current = disabled ? () => false : commit;
+  useEffect(() => registerPendingEdit(() => flush.current()), []);
+  // A lock (a save, a source sync) disables the field without a blur in
+  // Chromium, and takes the focus away: the typed value is kept while
+  // locked, then written, as leaving the field would have.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: on unlocking only
+  useEffect(() => {
+    if (!disabled && document.activeElement !== input.current) commit();
+  }, [disabled]);
   return (
     <TextField
       size="small"
@@ -176,6 +191,7 @@ function TypedField({
       error={!!error}
       helperText={error ?? undefined}
       onChange={(event) => setText(event.target.value)}
+      inputRef={input}
       onBlur={commit}
       onKeyDown={commitOnEnter}
       slotProps={{
