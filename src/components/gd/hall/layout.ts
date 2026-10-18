@@ -219,10 +219,27 @@ export interface ResolvedObject {
   text?: ResolvedLabel;
   /** Text drawn inside the object over its art: a marker's `text`. */
   inner?: ResolvedLabel;
+  /**
+   * The frame the node's own `x` and `y` are read in: its origin and
+   * floor squares per frame unit (1 on the floor and in rows; a host's
+   * scale, times its own frame's, for a host's children). A visual
+   * editor turns a move in floor squares into attribute values with it.
+   */
+  frame: { ox: number; oy: number; unit: number };
+  /**
+   * The `x` and `y` that place the node where it is drawn, in its frame:
+   * its own values (clamped to the coordinate range), else where its row
+   * spreads it or its frame's centre; with `at`, offsets from that point.
+   */
+  position: { x: number; y: number };
+  /** The scale it is drawn at: its own, clamped, or its kind's default. */
+  scale: number;
 }
 
 /** A gap in a wall. */
 export interface ResolvedDoor {
+  /** Child indices from the root. */
+  path: readonly number[];
   side: BannerSide;
   /** Along the wall: x for East and West, y for North and South. */
   from: number;
@@ -755,8 +772,10 @@ export function resolveHall(
     const y = coordinate(numberAttr(node, "y"));
     let px: number;
     let py: number;
+    let bx = 0;
+    let by = 0;
     if (at) {
-      const [bx, by] = point(frame.box, at);
+      [bx, by] = point(frame.box, at);
       px = bx + (x ?? 0);
       py = by + (y ?? 0);
     } else {
@@ -799,6 +818,9 @@ export function resolveHall(
       width,
       height,
       labels: placeLabels(item.labels, rect),
+      frame: { ox: frame.ox, oy: frame.oy, unit: frame.unit },
+      position: { x: px - bx, y: py - by },
+      scale: item.scale,
     };
     if (item.text) resolved.text = placeText(item.text, rect);
     if (item.inner) {
@@ -855,7 +877,7 @@ export function resolveHall(
       const role = hallRole(child.type, art);
       if (hallPlacement(parent, role) !== "allowed") return [];
       if (role === "door") {
-        addDoor(child);
+        addDoor(child, childPath);
         return [];
       }
       if (parent === "host" && role === "label") return [];
@@ -863,7 +885,7 @@ export function resolveHall(
     });
   }
 
-  const addDoor = (node: HallNode) => {
+  const addDoor = (node: HallNode, path: readonly number[]) => {
     const side = enumAttr(node, "side", BANNER_SIDES) ?? "west";
     const along =
       side === "east" || side === "west"
@@ -871,7 +893,12 @@ export function resolveHall(
         : numberAttr(node, "y");
     const centre = clamp(along ?? FLOOR_SIZE / 2, 0, FLOOR_SIZE);
     const width = clamp(numberAttr(node, "width") ?? 2, 0, FLOOR_SIZE);
-    doors.push({ side, from: centre - width / 2, to: centre + width / 2 });
+    doors.push({
+      path,
+      side,
+      from: centre - width / 2,
+      to: centre + width / 2,
+    });
   };
 
   // Gather the structure first: rows need the wall and compass geometry.
@@ -905,7 +932,7 @@ export function resolveHall(
         return;
       }
       case "door":
-        addDoor(child);
+        addDoor(child, path);
         return;
     }
   });

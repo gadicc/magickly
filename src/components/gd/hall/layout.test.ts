@@ -308,6 +308,46 @@ describe("resolveHall: hosts", () => {
     expect(at(objects, [0, 0, 1])).toMatchObject({ cx: 6.5, cy: 14.5 });
   });
 
+  it("reports each object's frame, position and scale for editors", () => {
+    const objects = only(
+      hall(
+        {},
+        { type: "dais", children: [{ type: "officer", role: "hierophant" }] },
+        floor(
+          { type: "pillar", kind: "black", x: "4", y: 3, scale: 99 },
+          {
+            type: "altar",
+            at: "centre",
+            x: 1,
+            scale: 2,
+            children: [
+              { type: "item", kind: "cup", at: "west", y: -0.25 },
+              { type: "item", kind: "cup" },
+            ],
+          },
+        ),
+      ),
+    );
+    const pillar = at(objects, [1, 0]);
+    expect(pillar.frame).toEqual({ ox: 0, oy: 0, unit: 1 });
+    expect(pillar.position).toEqual({ x: 4, y: 3 });
+    expect(pillar.scale).toBe(10);
+    const altar = at(objects, [1, 1]);
+    expect(altar.position).toEqual({ x: 1, y: 0 });
+    expect(altar).toMatchObject({ cx: 9, cy: 8, scale: 2 });
+    // The altar's children: its unscaled squares, centred on it.
+    const cup = at(objects, [1, 1, 0]);
+    expect(cup.frame).toEqual({ ox: 9, oy: 8, unit: 2 });
+    expect(cup.position).toEqual({ x: 0, y: -0.25 });
+    expect(cup.cy).toBeCloseTo(8 + 2 * (1 - 0.25), 10);
+    expect(at(objects, [1, 1, 1]).position).toEqual({ x: 0, y: 0 });
+    // A row spreads its officer: the position is where it was spread.
+    const hierophant = at(objects, [0, 0]);
+    expect(hierophant.position.x).toBe(8);
+    expect(hierophant.position.y).toBe(hierophant.cy);
+    expect(hierophant.scale).toBe(1);
+  });
+
   it("ignores children of placeables that are not labels", () => {
     const objects = only(
       hall(
@@ -838,10 +878,10 @@ describe("resolveHall: walls, compass, caption and bounds", () => {
       ),
     );
     expect(doors).toEqual([
-      { side: "west", from: 13, to: 15 },
-      { side: "north", from: 3.5, to: 4.5 },
-      { side: "east", from: 7, to: 9 },
-      { side: "west", from: -8, to: 8 },
+      { path: [0, 0], side: "west", from: 13, to: 15 },
+      { path: [1], side: "north", from: 3.5, to: 4.5 },
+      { path: [2], side: "east", from: 7, to: 9 },
+      { path: [3], side: "west", from: -8, to: 8 },
     ]);
   });
 
