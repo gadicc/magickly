@@ -8,7 +8,10 @@ and A3 (the Zelator Earth tablet per the book, PNG font embedding, the
 read-only `/gd/hall` gallery), with the fixes from the final reviews of
 stage A. Before stage B (17–18 October 2026) Gadi settled sizes (one
 cell size, decision 4), the lamen rings (decision 9), the art and the
-tarot titles (Decisions before stage B); stage B is next.
+tarot titles (Decisions before stage B). Stage B is done on
+`gate/gd-hall-b` (18 October 2026): rituals hold halls, drawn in the
+reader and as one atom in the visual editor, after the compiler change
+of decision 2 (Stage B notes); stage C is next.
 
 Composable Golden Dawn temple-hall diagrams, authored in the ritual Pug
 dialect, drawn as inline SVG in the reader and editor, edited visually, and
@@ -81,7 +84,9 @@ Research on 17 October 2026 (agents' reports checked against the code):
   drawing. A test renders the Neophyte hall from `prepare()` output and from
   `semanticToJrt()` output and expects identical SVG.
 - **Bundle.** The reader block loads the renderer lazily (a placeholder sized
-  from the hall's bounds while it loads), so rituals without a hall do not
+  from the hall's bounds while it loads: an estimate from the hall's
+  structure, since the resolver itself is too large to load up front;
+  Stage B notes), so rituals without a hall do not
   carry it; the chunk is still precached for offline. `readerBoundary.test.ts`
   learns to follow `import()` calls and the `@magick-components/*` alias, and
   a new test forbids `@/`, `next/`, `@mui/`, `@tiptap` and `prosemirror`
@@ -105,7 +110,10 @@ and the editor block:
 - `validateRitualSemantic`: a `gdHall` element whose descendants are elements
   or annotations (no text) with identifier tags and JSON-scalar attributes,
   within the existing node and depth bounds. Tag and attribute names match
-  `/^[A-Za-z][A-Za-z0-9]*$/`, so the printer can always write them back.
+  `/^[A-Za-z][A-Za-z0-9]*$/`, and the names Pug reads as statements are
+  reserved (below), so the printer can always write them back: an
+  identifier alone is not enough, since a printed `each#…` or `if#…` line
+  parses as a Pug statement.
   Attributes named `type`, `children` or `id` are rejected anywhere in the
   subtree: the compiled tree stores the tag in `type` and spreads attributes
   over it (`semantic.ts:298-304`), so `item(type="cup")` would become a `cup`
@@ -119,7 +127,37 @@ and the editor block:
   specially: `text` (it would compile to a json-rich-text text node), `title`,
   `grade`, `footnote`, `footnotes`, `task`, `span`, and `img` until it is
   designed. Reserved attribute names: `type`, `children`, `id`, `style` and
-  the inventory's resource names (decision 5).
+  the inventory's resource names (decision 5). Every resource attribute
+  name is reserved, so images inside halls (stages F and I) need an
+  inventory change and a compiler-identity change, not only new hall
+  vocabulary.
+- Pug's keywords are reserved hall tags too: `if`, `else`, `unless`,
+  `case`, `when`, `default`, `each`, `for`, `while`, `extends`, `extend`,
+  `include` and `doctype` could not be printed back (the line parses as a
+  statement, or as "template programs are unsupported"), nor any tag that
+  begins with `doctype` (`doctypeX`, `doctypes`), since Pug's lexer
+  reads a doctype from those letters whatever follows them; and `mixin`,
+  `block`, `append`, `prepend`, `yield`, `filter`, `script` and `style`,
+  which print back today but are statements when typed bare or mean
+  something to Pug or HTML, with them. Reserving a name once halls use it
+  would break their saved revisions, so the list errs on the side of more.
+- **Where a hall may stand.** At the top level, or directly inside a
+  `note`, `summary`, `li` or `todo`, which the reader and the visual
+  editor both draw as blocks (`HALL_PARENT_TAGS` in `semantic.ts`).
+  Anywhere else, inside `b`, `i`, `a`, a title, an option, a task, a list,
+  a footnote or another hall, the validator reports "a temple hall cannot
+  stand here" with its line and column, and a compiled hall row there
+  imports as opaque legacy content. Before this rule a hall inside `b`
+  made the visual editor throw (the top-level node went source-only), a
+  title's text was replaced by the drawing, an option saved one that was
+  never drawn, and a hall could hold a hall. A task is a block container
+  too but is left out: allowing it, or any other parent, later is a
+  compiler-identity change only, while tightening the rule after halls
+  are saved would break their revisions.
+- The hall root is keyed literally (`gdHall`), so a second diagram root,
+  such as a `gdVault` for the Vault, is another compiler-identity change
+  by design; decided (18 October 2026) to keep the literal root rather
+  than a generic diagram tag.
 - Inside a hall in a built-in `.pug` doc, a `//-` comment compiles through
   `prepare.js` to `{}`; the hall importer skips such rows (the comment is
   already gone from the compiled tree) rather than throwing.
@@ -132,6 +170,8 @@ and the editor block:
   `src/app/doc` passed.
 - Attribute errors report a line but no column ("Line 5: invalid hall
   attributes"), as attribute errors do today; text and tag errors carry both.
+- Stage B reserved more names than listed here, and keeps a hall that
+  breaks the rule as opaque legacy content on import (Stage B notes).
 
 What the tags mean is checked by the hall validator, outside the hashed files,
 and shown as editor diagnostics. The renderer draws an "unknown component"
@@ -142,7 +182,11 @@ to the subtree and never collide with ritual tags.
 **Reverting.** Once a ritual with a `gdHall` is saved, its revisions are valid
 only under the new validator, so the change cannot be rolled back without
 breaking them: fix forward. Validator, converter, reader block and editor block
-therefore land as the final commit of one stage.
+therefore land as the final commit of one stage. The previous
+`semanticModelSha256` (`041fa6dc…`) stays on every artifact compiled
+before stage B: `compilerVersion` is written with each compiled artifact
+(`sqlWrites.ts:388`) and nothing reads or compares it, so the bump
+triggers no recompilation and invalidates no cache or offline bundle.
 
 **Picking up component changes.** The compiled tree holds the hall's nodes,
 not a drawing, and the reader draws it with the current components. An
@@ -670,7 +714,7 @@ Each stage is a series of gated commits on `gate/gd-hall`.
 | Stage | Content | Can be reverted alone | Status |
 | --- | --- | --- | --- |
 | A | `src/components/gd/hall`: model, validator, layout, renderer, chrome, labels and fonts; `Lamen` Past Hierophant variant and `Map` lookups (the move is stage H); legacy art under `src/app`; the five drawn presets; a read-only `/gd/hall` gallery with export and side-by-side comparison with the old SVGs; `sizes` comparison (removed before B) | yes | done (A1–A3 and the final review fixes, 17 October 2026) |
-| B | Spike results applied: compiler change (decision 2), Pug round trip, lazy reader block, `blockAtoms` entry with a static node view, boundary tests | until the first hall is saved | next: its gate is satisfied, since Gadi settled sizes (one cell size, decision 4) and `sizes` is dropped. B saves halls in rituals, after which the layout contract (decision 4) holds |
+| B | Spike results applied: compiler change (decision 2), Pug round trip, lazy reader block, `blockAtoms` entry with a static node view, boundary tests | until the first hall is saved | done (18 October 2026; Stage B notes). Rituals may now save halls, after which the layout contract (decision 4) holds |
 | C | `/hall` slash command with presets | yes | |
 | D | Visual sub-editor | yes | |
 | E | `/gd/hall` source, visual and split playground with local draft and share link | yes | |
@@ -1049,6 +1093,279 @@ The documentation screenshots that show the ritual editor and reader
 `reader-phone`) were recaptured from this branch after the lamen change
 and came out byte-identical: none of them shows a role icon.
 
+## Stage B notes
+
+Settled while building stage B (18 October 2026), where the plan or the
+brief left a choice or proved wrong:
+
+- **Commit order.** The boundary test learns `import()` first
+  (575d22a); the reader block next (4d3b50b), harmless without the compiler
+  change and useful at once, since a legacy ritual compiled by
+  `prepare.js` may already hold a hall; then the editor atom (ab2f700),
+  which nothing reaches until source can hold a hall; and then the
+  compiler change itself (347fe2b), with the Pug printer's hall form and
+  every test that needs source to hold a hall. The review's fixes follow
+  it (Review fixes for stage B, below); the compiler's own fixes were
+  folded into 347fe2b, so the branch changes the compiler identity once.
+  Every commit passes its gate, and nothing a user can reach half-works
+  in between.
+- **The compiler identity.** `semantic.ts`'s hash went from
+  `041fa6dc…` to `6b059a0f…` (347fe2b; `71dba594…` before the review's
+  fixes were folded in and `d48ca764…` before the final review's, never
+  on `main`); `semanticCompilerImpl.ts` and
+  `ritualNodeIds.ts` are unchanged. **Reverting:** the window closes
+  when the first ritual with a hall is saved; from then on, fix forward
+  (decision 2).
+- **Reserved names, beyond decision 2's list.** Tags `stylesheet` and
+  `cursor` (the offline inventory reports them, so a hall holding one
+  could not be published); `say`, `do` and `ritual` followed by a
+  capital (the Pug parser reads them as tasks and its wrappers, so they
+  could not be printed back); any tag beginning with `doctype`, which
+  Pug reads as a doctype (the final review); and `Object.prototype`'s
+  identifier names
+  (`constructor`, `toString`, `valueOf` and four more) as tags and as
+  attributes, which the inventory calls malformed; and Pug's keywords
+  (decision 2). The list is written out rather than read from the
+  engine, so the compiler does not depend on it. Reserving the
+  prototype names keeps them out of halls in source, but did not, as
+  first written here, keep them from crashing the reader: the JRT
+  reader looks a row's type up in a plain object and constructs every
+  child row eagerly, so a legacy row typed `toString` outside a hall,
+  or inside an opaque legacy hall, was taken for a block class and took
+  the whole reader down. The reader's registry now has no prototype
+  (d7dce07).
+- **Messages**: "invalid hall tag", "reserved hall tag" and "a temple
+  hall cannot stand here" (line and column), "invalid hall attributes"
+  and "reserved hall attribute" (line only), "text is not allowed in a
+  hall", and "unsupported hall node" for anything else (a legacy node,
+  an unknown key).
+- **Importing compiled rows.** A `gdHall` row whose subtree breaks the
+  shape rule, or that stands where a hall may not, imports as opaque
+  legacy content, as every hall did before, rather than failing the
+  whole import. The `{}` rows `prepare.js`
+  leaves for `//-` comments inside a hall are skipped, so such a
+  ritual's reader tree loses them on import: `audit-ritual-corpus.ts`
+  counts it as failed (Follow-ups).
+- **Printing.** A hall prints one node per line, never in the inline,
+  pipe or shortcut forms other tags may take (a hall `b` or `var` would
+  otherwise print as `#[b#…]` or `${…}`). Leaves follow the general
+  rule: `children: []` prints bare (`item#…(kind="cup")`), a node
+  without `children` ends in `/`. Authors and `prepare.js` produce the
+  first, so it is the canonical leaf; `gdHallSource` (in
+  `src/doc/gdHallRows.ts`, outside the hashed files) gives preset rows
+  `children` when they become source, and the visual editor (stage D)
+  should do the same. Spaces typed after a hall's tags, which Pug reads
+  as text, are dropped by the parser (34f24ff) rather than refused as
+  "text is not allowed in a hall"; the printer never writes them.
+- **The reader block** (`GdHallFrame`) loads `GdHallDrawing` with
+  `next/dynamic`, the app directory's `React.lazy` with chunk and CSS
+  preloading (the CSS is the Enochian face). The hall is drawn at most
+  36rem wide. Its placeholder was 3:4 at first, while the presets draw
+  at 0.620–0.752 (width over height), a shift of up to 161 px at 576 px
+  when the drawing arrived. The resolver cannot size it up front: it
+  needs the art registry, and alone, with its label metrics, it is
+  23.7 KB minified (9.7 KB gzipped) that every ritual's reader would
+  load. `estimateHallAspect` (`src/components/gd/hall/aspect.ts`,
+  83b2211) reads the hall's structure only (dais, compass, banner rows,
+  floor objects beyond the walls, caption, padding, margins), 2.6 KB
+  minified, 1.3 KB gzipped (esbuild); every preset comes within 2 % of
+  its drawing (Theoricus 2, the farthest, 1.8 %: 18 px at 576 px), and
+  the frame passes it to the placeholder as `--gd-hall-aspect`. It
+  clamps floor coordinates to `COORDINATE_RANGE`, as the resolver does,
+  and its result to 0.25–4, so a hostile hall cannot ask for a strip
+  30,000 px tall. A small
+  error boundary around the drawing (98eb915) keeps that placeholder,
+  with "The temple hall could not be drawn.", when the chunk fails to
+  load or the renderer throws, instead of reaching `DocRender`'s
+  whole-document boundary; it tries again when it is given another
+  hall, since the editor keeps one node view while the hall is edited.
+  The server renders the drawing; being larger than React's progressive chunk
+  (12.8 KB), it follows the placeholder in the same response and React's
+  inline script swaps it in, and hydration keeps it. The labels'
+  `@font-face` rules go in one `<style href precedence>` per page, which
+  React hoists and dedupes, rather than into each SVG, so a future reader
+  export starts font-free. The footnote plan does not walk a hall's rows.
+  `GD_HALL_FONT_BASE` moved to `src/app/gd/hall/fontBase.ts` so the
+  export code stays out of the chunk. Tests alias `next/dynamic` to the
+  `app-dynamic` module Next compiles it to in the app directory.
+- **The editor atom** draws the row `semanticToJrt` compiles for the
+  subtree (`gdHallRow`), so the editor draws what the reader will, and
+  nothing while a pasted copy's IDs await repair. A transaction filter
+  (cc5e413) refuses a paste or drag that would put a hall where it may
+  not stand, as another keeps tasks out of tasks, and the clipboard's
+  parse rule refuses a pasted hall whose rows break the shape rule
+  (0e2b46e). Hall diagnostics from `validateHall` are not shown yet
+  (Follow-ups).
+- **The Neophyte Dadouchos** moved to x = 14.75, not the 14.9 proposed
+  (Decisions before stage B).
+
+**Review fixes for stage B** (the Fable final and Opus independent
+reviews, 18 October 2026; the branch was rebased onto `main` at
+2468cff, past the Loom 2.0.0 upgrade, first):
+
+- Pug keywords as hall tags (M1, both reviews): reserved (decision 2),
+  folded into 347fe2b. They reached the compiler through a crafted
+  paste, the text projection, semantic JSON or a JRT import, and their
+  printed lines did not parse back.
+- No rule on where a hall may stand (Opus m3; Fable m3, which asked
+  for the rule, is superseded by it): decision 2's placement rule,
+  folded into 347fe2b; the visual editor's filter (cc5e413).
+- A legacy `toString` row crashing the reader (Opus m1): d7dce07.
+- The hall package's reserved lists behind the compiler's (Opus m2):
+  1cdb45a, with `src/doc/gdHallReserved.test.ts`, which reads the
+  compiler's lists from `semantic.ts` and expects both validators to
+  refuse every name either reserves.
+- No error boundary around the lazy drawing (Opus m4): 98eb915.
+- The fixed 3:4 placeholder (Opus m5): 83b2211.
+- Trailing spaces after a hall tag refused (Opus n1): 34f24ff.
+- Recorded in decision 2: a second diagram root is another identity
+  change (Fable m1), images in halls need an inventory and an identity
+  change (Fable m2), and why reverting invalidates nothing (Fable n2).
+
+**Final review fixes for stage B** (a Fable review of the fixed branch,
+18 October 2026; the branch was rewritten again so that it still
+changes the compiler identity once, and every rewritten commit was
+gated again):
+
+- A tag beginning with `doctype` (M, compiler): Pug's lexer scans
+  `doctype` followed by anything to the end of the line, so
+  `doctypeX` validated but printed Pug that did not parse back.
+  Reserved as a prefix in `semantic.ts` (folded into 347fe2b; the hash
+  is now `6b059a0f…`) and in the package's `reservedTag` (folded into
+  1cdb45a), with both tests. Every lexer keyword, and the lexer's
+  token names, was probed bare and followed by `X`, `s`, `html`, `0`,
+  `Y1` and `x`, lower and capitalised, as a leaf and with attributes,
+  through the compiler, Pug and the text projection: of 1,260 tags,
+  only the lowercase `doctype…` ones validated and then failed to
+  round-trip (the other scans match exact words, end at `\b`, or need
+  a space or a lookahead).
+- `estimateHallAspect` did not clamp coordinates (M): an officer at
+  y = 1000 gave 0.0189, a 30,476 px placeholder at 576 px, and
+  y = 1e6 none at all. It clamps them to `COORDINATE_RANGE` (moved to
+  `dimensions.ts`, re-exported by the vocabulary) and its result to
+  0.25–4 (folded into 83b2211); an officer at y = 1e3, 1e4 or 1e6 now
+  estimates 0.2670, as drawn, and at x = 1e5 2.9490 (drawn 2.9489).
+- Ritual text and U+2028/U+2029 (m, older than halls): its line
+  patterns used `.`, so attribute strings, task text and legacy rows
+  holding either did not parse back, the typed `Role: text` and
+  `* Role text` shortcuts threw on a null match, and so did
+  `restoreDraftSourceAnnotations` for such a draft. The patterns use
+  the `s` flag (1caf6b7); `ritualText.ts` is not hashed.
+- `HallBoundary` never reset (m): it now tries again when its `hall`
+  changes (folded into 98eb915).
+- Crafted clipboard HTML bypassed the shape rule (m): the atom's parse
+  rule validates a pasted hall with its rows (0e2b46e).
+- The offline inventory counted the root row (nit, older than halls):
+  a 20,000-node document validated but reported `tree-limit`. It
+  counts the rows below the root now (4618ca1).
+- `-0` coordinates (nit): the compiler keeps them; the visual editor
+  must write `0` (Follow-ups).
+
+What was verified, and how:
+
+- **Tests.** The Neophyte hall of decision 3 and the five presets
+  round-trip through Pug exactly (print → parse deep-equal, reprint
+  byte-identical, IDs and comments kept); 35 hostile inputs are refused
+  with the expected message, line and column, and other identifier tags
+  and scalars round-trip; semantic JSON hostile shapes are refused; the
+  legacy path (`src/doc/fixtures/gdHallNeophyte.pug` through
+  `prepare.js` and `semanticFromJrt`) validates and draws the same SVG
+  as the compiled rows; the visual editor holds the hall as one atom
+  that round-trips through `getJSON` and clipboard HTML, and gives
+  duplicated and pasted halls fresh nested IDs once; the reader draws
+  the hall lazily, server-renders it and hydrates with no mismatch; a
+  ritual holding the Neophyte hall and every preset inventories with no
+  issues and no occurrences, plans no assets, and bundles; the boundary
+  test sees the hall's code only behind `import()`. After the review's
+  fixes, 44 hostile Pug inputs (35 before); the 21 reserved Pug keywords
+  refused through semantic JSON, the text projection and JRT import, and
+  the 13 unprintable ones shown not to parse back from Pug; halls in a
+  note, summary, list item, todo and a note in a task round-trip
+  through Pug, the text projection and JRT, draw in the reader and edit
+  as atoms, while ten other places refuse them at their line and
+  column; the visual editor refuses a hall moved into a task or title
+  and accepts one moved into a note; legacy rows typed with six
+  `Object.prototype` names render as plain content in and outside
+  halls; both validators refuse every reserved name; the placeholder
+  estimate holds within 2 % for the presets; a failing or throwing
+  drawing leaves the placeholder, the note and the rest of the ritual;
+  and spaces after a hall's tags parse as the same hall. The boundary
+  test now allows the package's `aspect.ts`, `attributes.ts` and
+  `dimensions.ts`, and nothing else of it, in the reader's static graph.
+  After the final review's fixes: `doctypeX`, `doctypes` and
+  `doctypehtml` are refused on every path and shown not to parse back
+  from Pug, and both validators refuse them; the estimate stays within
+  0.25–4 and follows the drawing for officers at y = 1e4, ±1e6 and
+  x = ±1e5, and for objects at the coordinate range's ends; a hall
+  that failed to draw is drawn once it changes, and stays failed
+  through a re-render with the same hall; pasted halls holding a text
+  row, a reserved tag, a nested hall, an object attribute or a
+  reserved attribute are refused, a well-formed one still pastes;
+  U+2028 and U+2029 round-trip through ritual text in a hall's
+  attribute, an image's, a spoken task, a summary, a title and a
+  legacy row, and a draft holding them restores; a 20,000-node
+  document validates and inventories completely, and 20,001 rows
+  report `tree-limit`. These were checked by tests only, not again in
+  the browser.
+- **In the browser** (webpack dev server from `gate/gd-hall-b`,
+  headless Chromium, the local Creator): a synthetic ritual, "Hall
+  check (stage B)" in Fixture Temple, created by pasting the Neophyte
+  hall into the creation form's source; the visual and split views drew
+  it as one "Temple hall" atom; a reserved attribute typed into the
+  saved ritual's source showed "Line 24: reserved hall attribute" and
+  disabled Save; Publish ("Published for download") ran the offline
+  inventory and bundle on the server; the reader drew it on desktop
+  (576 px wide) and phone (358 px, no horizontal scroll) with the hall
+  fonts loaded and one font sheet. The only console errors were React's
+  `flushSync` warnings from `RitualCreationEditor`'s `setContent` in an
+  effect, which a source without a hall raises too (`main` has since
+  deferred that `setContent`, 2468cff). The private reader
+  renders on the client, so server rendering and hydration were checked
+  by the tests only, as was reading the bundle offline (the service
+  worker is off in development). The app cannot delete a ritual, so
+  the synthetic one stays in the local database. After the review's
+  fixes (same setup, port 3093): the reader drew the hall at 576 × 767
+  px with the placeholder estimated at 0.7421 (576 × 776 px, 9 px
+  taller than the drawing); with the drawing's chunk blocked over the
+  DevTools protocol, the placeholder stayed at 576 × 776 px with "The
+  temple hall could not be drawn." and the rest of the ritual read on
+  (React logged the `ChunkLoadError` as handled by `HallBoundary`). In
+  the editor's source, the hall moved into a task showed "Line 5: a
+  temple hall cannot stand here" and disabled Save; into a note, the
+  visual panel drew it as an atom inside the note, it saved, and the
+  reader drew it inside the note on desktop and phone (302 px, no
+  horizontal scroll); trailing spaces after the hall's tags raised no
+  error; a bare `each` in the hall showed "Line 6: invalid Pug syntax".
+  The ritual's source was then restored and saved as it was. Apart from
+  the blocked chunk's error, the console showed only the dev server's
+  font-preload notice and the source editor's existing "Unknown
+  highlighting tag" warnings.
+- **Production build** (webpack; first measured on the compiler commit
+  before the review's fixes were folded in): the hall's code (renderer,
+  layout, app and legacy art, chalice included) is one 260 KB chunk that
+  the client reference manifests of the reader (`/doc/[_id]`), the
+  editor and the offline reader do not list; they hold only the 25 KB
+  chunk with `GdHallFrame`. The react-loadable manifest gives
+  `GdHallDrawing` that chunk, a 480-byte entry, two shared chunks and
+  the Enochian `@font-face` CSS, so only a ritual that draws a hall
+  loads them; `/gd/hall` imports it directly. All of them, and the three
+  hall font subsets, are in the service worker's precache. The
+  Turbopack build and the data package's smoke test pass too. The
+  `GdHallFrame` chunk was 25,037 bytes (10,199 gzipped) on the compiler
+  commit and 28,673 (11,710) with the first review's fixes, the
+  placeholder estimate and the error boundary added (both measured
+  before the final review's fixes were folded in), and is 28,864
+  (11,792) at 4618ca1; the drawing's own entry is still 480 bytes.
+- **Corpus.** `scripts/audit-ritual-corpus.ts` over a synthetic corpus
+  (the three built-in docs as legacy and as semantic sources, a semantic
+  hall ritual, and the legacy hall with and without a `//-` comment
+  inside it): all lossless and visual except the legacy hall with the
+  comment, as expected (Importing compiled rows). No private corpus was
+  read.
+- **Documentation screenshots** of the editor, reader, ritual list and
+  creation form, recaptured from this branch: byte-identical (no shown
+  ritual holds a hall).
+
 ## Commits
 
 | Commit | Change |
@@ -1094,8 +1411,24 @@ and came out byte-identical: none of them shows a role icon.
 | a6d1faa | `image.decode()` before rasterising (A3 review n3) |
 | 0b03f8b | `gdHallFontFaceRule` checks its source (A3 review n2) |
 | e1fb37a | The Zelator Earth tablet test checks labels and compass words (A3 review n1) |
-| 21a970a | `Lamen`: the Hierophant's striped ring, the Past Hierophant's white ring and role icon (before B) |
-| dcf2453 | One cell size: `inset`, labels at the cell width, one default scale per kind; `sizes`, `officerScale` and the gallery's toggle removed (before B) |
+| 14d74fa | `Lamen`: the Hierophant's striped ring, the Past Hierophant's white ring and role icon (before B) |
+| b8d6394 | One cell size: `inset`, labels at the cell width, one default scale per kind; `sizes`, `officerScale` and the gallery's toggle removed (before B) |
+| c916b3e | Citations for the lamen rings in `lamen.tsx` and decision 9 (before B) |
+| 55f2430 | The Past Hierophant's role icon without brackets (before B) |
+| b19a005 | The Neophyte Dadouchos at x = 14.75, its label inside the floor (before B) |
+| 575d22a | The reader boundary test follows `import()`, the `@magick-components` alias and index files (B) |
+| 4d3b50b | The reader's lazy `gdHall` block, hoisted hall fonts, `next/dynamic` in tests (B) |
+| ab2f700 | `gdHall` as one editor atom, drawn and labelled "Temple hall" (B) |
+| 347fe2b | The compiler accepts a `gdHall` subtree by shape and imports it as elements, Pug's keywords and the `doctype` prefix reserved, at the top level or in a note, summary, list item or todo only; Pug prints halls one node per line (B, decision 2; review M1, m3; final review M) |
+| d7dce07 | The reader's block registry without a prototype: a legacy `toString` row renders as plain content (B review m1) |
+| 1cdb45a | The hall package reserves the compiler's names; `reservedTag`, with the `ritual` + capital and `doctype` prefixes; a cross-test of both validators (B review m2; final review M) |
+| 83b2211 | The placeholder shaped by `estimateHallAspect`, coordinates and result clamped; base dimensions and `COORDINATE_RANGE` in `dimensions.ts` (B review m5; final review M) |
+| 98eb915 | An error boundary keeps the placeholder and the ritual when a hall cannot draw, and tries again for a changed hall (B review m4; final review m) |
+| 34f24ff | Spaces after a hall's tags ignored by the Pug parser (B review n1) |
+| cc5e413 | The visual editor refuses to move a hall where it may not stand (B review m3) |
+| 0e2b46e | A pasted hall whose rows break the shape rule is refused by the clipboard parse rule (B final review m) |
+| 1caf6b7 | Ritual text reads U+2028 and U+2029 in its line forms (B final review m; older than halls) |
+| 4618ca1 | The offline inventory counts the rows below the root, as the compiler counts nodes (B final review nit; older than halls) |
 
 ## Future
 
@@ -1137,6 +1470,15 @@ hook dispatcher (Stage A2 notes), so server rendering of halls and the
 reader export (stage I, Stretch) need a hook-free id scheme, such as an
 `idPrefix` prop as the Shewbread and candlestick take; and the resvg
 font stacks below.
+
+From stage B: the visual editor (stage D) must write `0`, never `-0`,
+when it writes coordinates (rounding can produce `-0`, which the
+compiler keeps as it is); built-in docs that hold halls (stage I) must
+keep `//-` comments out of them, or their exact parity test and the
+corpus audit must allow the dropped `{}` rows (Stage B notes); the
+editor does not yet show `validateHall`'s diagnostics for a hall
+(decision 2 promises them; stage C or D); the synthetic "Hall check
+(stage B)" ritual stays in the local development database.
 
 For stage B (PNG export): resvg-wasm 2.6.2 did not resolve the hall's
 quoted font stacks (`"GdHall Noto Serif", "Noto Serif", serif`) to a

@@ -320,9 +320,11 @@ Follow-ups are separate from the completed migration work:
 
 - Golden Dawn hall diagrams (`gdHall`): composable temple floor plans for the
   rituals, in progress on `gate/gd-hall`; see [plan 061](061-gd-hall.md).
-  Stage A is done, and the decisions taken before stage B (one cell size
-  for every object, lamens inset to 1.6 squares; the lamen rings showing
-  the collars) are in; stage B is next.
+  Stages A and B are done: rituals hold halls (at the top level or in a
+  note, summary, list item or todo), drawn in the reader and as one
+  atom in the visual editor, after the planned compiler change
+  (stage B; fix forward once a hall is saved). Stage C, the `/hall`
+  command, is next.
   TODO from it: recording officer movement between stations, a `gdVault` for
   the Adeptus Minor Vault, original Enochian letterforms, moving
   `enochianFont.ts` and the other files the import-boundary test allows out
@@ -335,7 +337,10 @@ Follow-ups are separate from the completed migration work:
   (it lists none), a hook-free id scheme for `GdHall` before halls are
   rendered on the server or exported from the reader, resvg-wasm's
   fallback to Noto Sans for the hall's quoted font stacks, Gadi's call on
-  whether a hall's PNG export embeds Enochian Plain for its tablets, and an
+  whether a hall's PNG export embeds Enochian Plain for its tablets,
+  `//-` comments inside the built-in docs' halls (stage I) against their
+  parity test, hall diagnostics in the editor, writing `0` rather than
+  `-0` for coordinates in the visual hall editor (stage D), and an
   import-boundary gap:
   `src/components/entity/entityFields.test.ts` reaches app code through
   `import.meta.glob("../../app/**/fields.ts")`, which the test cannot see
