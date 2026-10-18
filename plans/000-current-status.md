@@ -320,11 +320,13 @@ Follow-ups are separate from the completed migration work:
 
 - Golden Dawn hall diagrams (`gdHall`): composable temple floor plans for the
   rituals, in progress on `gate/gd-hall`; see [plan 061](061-gd-hall.md).
-  Stages A and B are done: rituals hold halls (at the top level or in a
-  note, summary, list item or todo), drawn in the reader and as one
-  atom in the visual editor, after the planned compiler change
-  (stage B; fix forward once a hall is saved). Stage C, the `/hall`
-  command, is next.
+  Stages A, B and C are done: rituals hold halls (at the top level or
+  in a note, summary, list item or todo), drawn in the reader and as
+  one atom in the visual editor, after the planned compiler change
+  (stage B; fix forward once a hall is saved); the `/hall` command and
+  the Insert… dialog insert presets, `/gd/hall` copies a preset's Pug,
+  and the source editor shows hall warnings (stage C). Stage D, the
+  visual sub-editor, is next.
   TODO from it: recording officer movement between stations, a `gdVault` for
   the Adeptus Minor Vault, original Enochian letterforms, moving
   `enochianFont.ts` and the other files the import-boundary test allows out
@@ -339,8 +341,14 @@ Follow-ups are separate from the completed migration work:
   fallback to Noto Sans for the hall's quoted font stacks, Gadi's call on
   whether a hall's PNG export embeds Enochian Plain for its tablets,
   `//-` comments inside the built-in docs' halls (stage I) against their
-  parity test, hall diagnostics in the editor, writing `0` rather than
-  `-0` for coordinates in the visual hall editor (stage D), and an
+  parity test, writing `0` rather than `-0` for coordinates in the
+  visual hall editor (stage D), hall warnings in the visual
+  sub-editor (they show in source only), selecting a hall node as its
+  node view mounts beside another atom (Chromium loses the selection),
+  the order-dependent `members` documentation screenshot, a server
+  error on the temple membership page seen during the screenshot
+  capture, `pnpm check:turbopack` failing on `main` as well
+  (`next/font/google` in Turbopack, 18 October 2026), and an
   import-boundary gap:
   `src/components/entity/entityFields.test.ts` reaches app code through
   `import.meta.glob("../../app/**/fields.ts")`, which the test cannot see

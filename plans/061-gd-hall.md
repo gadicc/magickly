@@ -11,7 +11,10 @@ cell size, decision 4), the lamen rings (decision 9), the art and the
 tarot titles (Decisions before stage B). Stage B is done on
 `gate/gd-hall-b` (18 October 2026): rituals hold halls, drawn in the
 reader and as one atom in the visual editor, after the compiler change
-of decision 2 (Stage B notes); stage C is next.
+of decision 2 (Stage B notes). Stage C is done on `gate/gd-hall-c`
+(18 October 2026): the `/hall` slash command and the toolbar insert
+presets, the gallery copies a preset's Pug, and the source editor shows
+hall warnings (Stage C notes); stage D is next.
 
 Composable Golden Dawn temple-hall diagrams, authored in the ritual Pug
 dialect, drawn as inline SVG in the reader and editor, edited visually, and
@@ -482,7 +485,8 @@ the reader is a later stage.
   editor treats it as one block; its node view draws the hall and hosts the
   visual sub-editor. Without this the hall would open as nested editable
   blocks.
-- `/hall` slash command inserts a preset, copied into the source. The static
+- `/hall` slash command inserts a preset, copied into the source (and
+  the toolbar's Insert… dialog; Stage C notes). The static
   node view of stage B labels the block "Temple hall" (today's `label()`
   would print the bare tag).
 - No ritual text is embedded for chat today (only PDFs are ingested), and the
@@ -715,7 +719,7 @@ Each stage is a series of gated commits on `gate/gd-hall`.
 | --- | --- | --- | --- |
 | A | `src/components/gd/hall`: model, validator, layout, renderer, chrome, labels and fonts; `Lamen` Past Hierophant variant and `Map` lookups (the move is stage H); legacy art under `src/app`; the five drawn presets; a read-only `/gd/hall` gallery with export and side-by-side comparison with the old SVGs; `sizes` comparison (removed before B) | yes | done (A1–A3 and the final review fixes, 17 October 2026) |
 | B | Spike results applied: compiler change (decision 2), Pug round trip, lazy reader block, `blockAtoms` entry with a static node view, boundary tests | until the first hall is saved | done (18 October 2026; Stage B notes). Rituals may now save halls, after which the layout contract (decision 4) holds |
-| C | `/hall` slash command with presets | yes | |
+| C | `/hall` slash command with presets | yes | done (18 October 2026; Stage C notes): slash command and Insert… dialog, Copy Pug source on `/gd/hall`, hall warnings in the source editor |
 | D | Visual sub-editor | yes | |
 | E | `/gd/hall` source, visual and split playground with local draft and share link | yes | |
 | F | Remaining vocabulary and the presets for Practicus, Philosophus and Portal (markers where art is missing) | yes | |
@@ -1194,8 +1198,8 @@ brief left a choice or proved wrong:
   (cc5e413) refuses a paste or drag that would put a hall where it may
   not stand, as another keeps tasks out of tasks, and the clipboard's
   parse rule refuses a pasted hall whose rows break the shape rule
-  (0e2b46e). Hall diagnostics from `validateHall` are not shown yet
-  (Follow-ups).
+  (0e2b46e). Hall diagnostics from `validateHall` were not shown yet;
+  stage C shows them in the source editor (Stage C notes).
 - **The Neophyte Dadouchos** moved to x = 14.75, not the 14.9 proposed
   (Decisions before stage B).
 
@@ -1366,6 +1370,160 @@ What was verified, and how:
   creation form, recaptured from this branch: byte-identical (no shown
   ritual holds a hall).
 
+## Stage C notes
+
+Settled while building stage C (18 October 2026), where the plan or the
+brief left a choice or proved wrong:
+
+- **Where the command lives.** "Temple hall" joins the slash menu
+  (`ritualSlashCommands.ts`, plan 055's registry) and the toolbar's
+  Insert… dialog, the established place for structures (plan 054).
+  Choosing it in the slash menu lists the five presets by title and
+  grade ("Zelator Temple 1 · 1=10, part 1"), as Speech lists roles; a
+  grade typed straight after the slash (`/zel`, `/theo`) lists its
+  halls too, labelled "Temple hall · …". The dialog takes a preset from
+  a second select. A titled list, not thumbnails: no picker in the
+  editor draws previews, and a drawn picker would load the hall art
+  before anyone asked for a hall. The empty-line hint keeps naming the
+  everyday commands only ("Type / for speech, action, note or section
+  title"), so the documentation screenshots did not change.
+- **Copies.** Both insert `gdHallPresetAtom(preset)` (`gdHallInsert.ts`):
+  the preset through `gdHallSource`, every node with a fresh ID, as one
+  atom in one transaction, so one undo step (decisions 3 and 10).
+- **Placement (decision 2).** The slash command replaces its command
+  paragraph where a hall may stand (the top level, or directly in a
+  note, summary, list item or todo), or, from the last paragraph of a
+  task whose own container may hold a hall, becomes the task's next
+  sibling, as Speech and Action do. Anywhere else it is not offered:
+  a title, a list itself, a footnote (collected footnotes have no
+  blocks), the middle of a task, a paragraph that already holds text.
+  In a list item, where Speech and Action are not offered (plan 050),
+  it is the only command. So it never makes a hall the validator
+  refuses, and never meets the transaction filter of stage B. The
+  toolbar always finds a place: after the block holding the cursor, at
+  the nearest level where a hall may stand (after a task, a title or a
+  list; after the paragraph inside a note), replacing an empty
+  paragraph there (`gdHallInsertionRange`).
+- **The caret goes after the hall**, to the start of the paragraph that
+  follows it or into a new empty one, which the semantic document does
+  not keep (an empty paragraph between blocks, or at the end of its
+  container, projects to nothing). The first build selected the hall
+  instead. Typing would then have replaced it, and in headless
+  Chromium 153 a hall selected as its node view mounted right after
+  another atom lost the selection: Chromium moved the DOM selection to
+  the start of the document about 100 ms later, ProseMirror read it
+  back (`DOMObserver.onSelectionChange` → `readDOMChange`), and the
+  next keystrokes went into the ritual's title. Selecting an already
+  drawn hall next to another one by command kept its selection, so the
+  trigger is selecting at mount time; a hall after a task or text kept
+  it too. Clicking a hall to select it is unchanged (Follow-ups).
+  Immediate Backspace or one undo brings the literal command back.
+- **Source view.** The source editor has no snippets or completion
+  (`basicSetup` with the legacy Pug mode supplies none), and none was
+  added. The `/gd/hall` gallery has a "Copy Pug source" button instead
+  (`gdHallPug`): the preset printed by the ritual printer, one node per
+  line, without the source header and without IDs. `parseRitualPug`
+  gives a node without an ID a fresh one, so the same text pastes any
+  number of times without duplicate IDs. It is for the top level;
+  indented, it goes in a note, summary, list item or todo. The printer
+  and the Pug parser load after the gallery page, so its bundle does
+  not carry them, and the copy happens inside the click. The Ritual Pug
+  guide (`/help/ritual-pug`) describes the command, the button and the
+  warnings.
+- **Hall diagnostics (decision 2's promise; a stage B follow-up).**
+  `validateHall`'s findings show in the source editor as CodeMirror
+  warnings beside the source errors of plan 044: yellow underlines,
+  gutter markers, F8 and Problems ("Temple hall" as their source).
+  Hall errors (a tag that cannot stand there, a missing kind) are shown
+  as warnings too, since the compiler accepts the hall and saving is
+  never blocked; they do not set `aria-invalid`, and "Go to error"
+  reads "Go to warning" when only warnings remain. A source error
+  replaces them, as the source no longer parses. `gdHallSourceWarnings`
+  (`gdHallDiagnostics.ts`) parses with the parser's location map
+  (`parseRitualPugWithLocations`, new), compiles each hall to the row
+  the reader draws, validates it with the app's art registry (so the
+  legacy items count as known), and walks each diagnostic's path from
+  the hall to its node, skipping source annotations as the compiled
+  row does. A diagnostic naming an attribute points at the attribute's
+  name: the parser now records attribute positions, for hall nodes
+  only (`RitualSourceLocation.attributes`); otherwise the tag. Exact
+  locations proved cheap, so nothing falls back to the hall's line
+  except a diagnostic the walk cannot place (none known). At most 100
+  are shown, then one line says how many more. The validator and the
+  hall art load lazily, 300 ms after typing stops and only for source
+  that holds a hall, so other rituals' editors never fetch them.
+  Neither `ritualPug.ts` nor `ritualSourceDiagnostics.ts` is hashed:
+  the compiler identity is unchanged (`6b059a0f…`).
+- **Not built here:** the visual sub-editor (stage D) and the
+  `/gd/hall` editor (stage E). The warnings show only in the source
+  panel; a visual-only author sees none (Follow-ups).
+
+What was verified, and how:
+
+- **Tests.** Every preset inserted by the slash command validates,
+  draws what the preset draws (its compiled row equals the preset's
+  through `gdHallSource`), has a fresh, valid, unique ID on every node
+  (and two copies share none), prints and parses back through Pug
+  exactly, holds no `-0`, and goes back to the literal command with
+  one undo; immediate Backspace does the same. Placement: the command
+  puts the hall at the top level, in a note, summary, todo and list
+  item, after a task from its last paragraph (also inside a note), and
+  is not offered in the middle of a task, in a title, in a list
+  itself, after text or in collected footnotes; in a list item it is
+  the only command; `/zel` and `/hall theo` filter the presets. The
+  toolbar: an empty paragraph is replaced, otherwise the hall goes
+  after the paragraph, task, title or selected block, inside a note it
+  stays in the note, and the dialog lists the presets and inserts one
+  in one undo step. Diagnostics: an unknown attribute at its name, an
+  unknown tag at the tag, a clamped value past comments and folded
+  IDs, halls at the top level and in a list item, a hall-wide value at
+  the hall's attribute, none for the five presets or for source that
+  does not parse, the cap of 100 with its count; in the real
+  CodeMirror editor a warning underlines the attribute, leaves
+  `aria-invalid` false, offers "Go to warning" and Problems, and gives
+  way to a source error. `gdHallPug`: every preset parses back to
+  itself with no `#` in the text, pastes twice without shared IDs, and
+  indents into a note; the gallery copies the shown preset, clears the
+  status for another, reports a refused clipboard, and keeps the
+  button disabled when the printer cannot load.
+- **In the browser** (Turbopack dev server from this branch on port
+  3141, headless Chromium 153, the local Creator; synthetic data
+  only): in "Hall check (stage B)" (Fixture Temple), `/hall` listed
+  the five presets by title and grade above the line; all five were
+  inserted in a row at the end of the ritual, each drawn as its
+  preset in the visual and split views and printed in source (194
+  lines); Save ("Saved and published for download."), and the reader
+  drew all six halls. An unknown attribute and an unknown tag typed
+  into the source showed as two yellow warnings at `colour` and
+  `unicorn`, listed in Problems as "Temple hall", with "Go to
+  warning", `aria-invalid` false and Save enabled; it saved, the
+  placeholder drawn. The Insert… dialog with the caret in the first
+  speech put Zelator 2 after that speech, and Undo brought back the
+  saved state. On `/gd/hall` the button copied the Neophyte as 29
+  lines without IDs ("Copied. Paste it into a ritual's source."); at
+  390 px the page has no horizontal scroll. The ritual's source was
+  then restored and saved as it was; it reads with its one hall. The
+  first build's node selection lost the selection as described above,
+  which is how it was found. Console: only the existing "Unknown
+  highlighting tag" warnings. Once, a navigation straight after a save
+  showed "Editor access could not be verified. Reconnect and reload
+  to try again."; a reload opened the editor. Screenshots are outside
+  the repository.
+- **Production build** (webpack): `gdHallDiagnostics` is its own
+  1,182-byte chunk (773 gzipped), loaded with the hall code's shared
+  265 KB chunk only through the react-loadable entry
+  `RitualSourceEditor.tsx -> ./gdHallDiagnostics`; the editor's and
+  the reader's client reference manifests do not list it. The
+  gallery's printer loads through `gallery.tsx -> @/doc/gdHallPug`;
+  the chunk holding the Pug parser (13.9 KB) is not in `/gd/hall`'s
+  client reference manifest.
+- **Documentation screenshots**, recaptured from this branch
+  (`DOCS_SCREENSHOTS_ORIGIN=http://localhost:3141`): the editor and
+  reader shots are byte-identical. `join-code` changed only by the
+  origin's port in its link, and `members` only by the order of six
+  members added on the same day; neither is a stage C change, so both
+  were left as committed (Follow-ups).
+
 ## Commits
 
 | Commit | Change |
@@ -1429,6 +1587,9 @@ What was verified, and how:
 | 0e2b46e | A pasted hall whose rows break the shape rule is refused by the clipboard parse rule (B final review m) |
 | 1caf6b7 | Ritual text reads U+2028 and U+2029 in its line forms (B final review m; older than halls) |
 | 4618ca1 | The offline inventory counts the rows below the root, as the compiler counts nodes (B final review nit; older than halls) |
+| 71847b9 | Temple hall in the slash menu and the Insert… dialog: presets copied with fresh IDs where a hall may stand, the caret after it (C) |
+| ea0f106 | Copy Pug source on `/gd/hall`: a preset as Pug without IDs, the printer loaded after the page (C) |
+| 52ab8b6 | Hall warnings in the source editor at the node or attribute they name, never blocking a save (C; decision 2) |
 
 ## Future
 
@@ -1476,9 +1637,25 @@ when it writes coordinates (rounding can produce `-0`, which the
 compiler keeps as it is); built-in docs that hold halls (stage I) must
 keep `//-` comments out of them, or their exact parity test and the
 corpus audit must allow the dropped `{}` rows (Stage B notes); the
-editor does not yet show `validateHall`'s diagnostics for a hall
-(decision 2 promises them; stage C or D); the synthetic "Hall check
-(stage B)" ritual stays in the local development database.
+synthetic "Hall check (stage B)" ritual stays in the local development
+database.
+
+From stage C: hall warnings show only in the source panel, so the
+visual sub-editor (stage D) should show them for the hall it edits;
+selecting a hall node at the moment its node view mounts right after
+another atom loses the selection in Chromium (Stage C notes), which
+the sub-editor must avoid when it selects a new or duplicated node,
+and which clicking a hall next to another atom may share (unchecked);
+the `members` documentation screenshot depends on the order of
+members added on the same day, and `join-code` on the capture's
+origin; during the capture the dev server logged a server error on
+`/temples/admin/<temple>/membership/<member>` ("Cannot read properties
+of undefined (reading 'disabled')", HTTP 500) while the shot still
+came out unchanged; and `pnpm check:turbopack` failed on 18 October
+2026 for `main` (d1aaf33) as for this branch, Turbopack's
+`next/font/google` resolving no Roboto files
+(`@vercel/turbopack-next/internal/font/google/font` not found), while
+it passed for stage B.
 
 For stage B (PNG export): resvg-wasm 2.6.2 did not resolve the hall's
 quoted font stacks (`"GdHall Noto Serif", "Noto Serif", serif`) to a
