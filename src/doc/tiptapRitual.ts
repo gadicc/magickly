@@ -11,6 +11,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { parseRitualFileLocator } from "../files/ritualFileLocator";
 import { createRitualNodeId, isRitualNodeId } from "./ritualNodeIds";
 import {
+  HALL_PARENT_TAGS,
   type JsonValue,
   type RitualSemanticDocument,
   type RitualSemanticNode,
@@ -359,6 +360,55 @@ const RitualTaskNesting = Extension.create({
   },
 });
 
+/** Whether a source-only payload is itself a hall. */
+function sourceOnlyIsHall(raw: unknown): boolean {
+  if (typeof raw !== "string") return false;
+  try {
+    const node = JSON.parse(raw);
+    return node?.kind === "element" && node.tag === "gdHall";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * A hall may stand only at the top level or directly in a note, summary,
+ * list item or todo (`HALL_PARENT_TAGS`), which the validator enforces.
+ * Refuse a paste or drag that would put one anywhere else (a task, a
+ * title), so the author sees nothing happen rather than a validator error.
+ */
+const RitualHallPlacement = Extension.create({
+  name: "ritualHallPlacement",
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        filterTransaction(tr) {
+          if (!tr.docChanged) return true;
+          let misplaced = false;
+          tr.doc.descendants((node, _pos, parent) => {
+            if (misplaced || node.isTextblock) return false;
+            if (
+              node.type.name === "ritualAtom" &&
+              (node.attrs.tag === "gdHall" ||
+                (node.attrs.tag === "sourceOnly" &&
+                  sourceOnlyIsHall(node.attrs.raw))) &&
+              parent &&
+              parent.type.name !== "doc" &&
+              !(
+                parent.type.name === "ritualBlock" &&
+                HALL_PARENT_TAGS.has(parent.attrs.tag)
+              )
+            )
+              misplaced = true;
+            return !misplaced;
+          });
+          return !misplaced;
+        },
+      }),
+    ];
+  },
+});
+
 export const ritualTiptapExtensions = [
   StarterKit.configure({
     code: false,
@@ -382,6 +432,7 @@ export const ritualTiptapExtensions = [
   RitualAtom,
   RitualSegment,
   RitualTaskNesting,
+  RitualHallPlacement,
 ];
 
 const ritualSchema = getSchema(ritualTiptapExtensions);

@@ -160,6 +160,52 @@ describe("a hall where it may stand", () => {
   });
 });
 
+it("refuses to move a hall where it may not stand", () => {
+  const doc = parseRitualPug(
+    `${RITUAL_PUG_HEADER}\n${[
+      'task(say=true, role="hiereus") Host',
+      "note",
+      "  | A note",
+      'title(text="Hall") Hall',
+      "gdHall",
+      "  floor",
+    ].join("\n")}\n`,
+  );
+  const editor = new Editor({
+    extensions: ritualTiptapExtensions,
+    content: semanticToTiptap(doc),
+  });
+  try {
+    const at = (name: string) => {
+      let found = -1;
+      editor.state.doc.forEach((node, offset) => {
+        if (found < 0 && node.attrs.tag === name) found = offset;
+      });
+      return found;
+    };
+    const hall = editor.state.doc.child(3);
+    expect(hall.attrs.tag).toBe("gdHall");
+    const before = editor.getJSON();
+    // Into the task and the title, as a paste or a drop would put it.
+    for (const host of ["task", "title"]) {
+      editor.view.dispatch(editor.state.tr.insert(at(host) + 1, hall.copy()));
+      expect(editor.getJSON()).toEqual(before);
+    }
+    // A note may hold one.
+    editor.view.dispatch(editor.state.tr.insert(at("note") + 1, hall.copy()));
+    expect(normalizeTiptapNodeIds(editor)).toBe(true);
+    const after = semanticFromTiptap(editor.getJSON());
+    const note = after.nodes[1] as Extract<
+      RitualSemanticNode,
+      { kind: "element" }
+    >;
+    expect(note.children?.[0]).toMatchObject({ tag: "gdHall" });
+    expect(validateRitualSemantic(after)).toEqual([]);
+  } finally {
+    editor.destroy();
+  }
+});
+
 function Host({ doc }: { doc: RitualSemanticDocument }) {
   const editor = useEditor({
     extensions: ritualTiptapClientExtensions,
