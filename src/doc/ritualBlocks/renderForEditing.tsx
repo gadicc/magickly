@@ -7,7 +7,9 @@ import {
   NodeViewWrapper,
   useEditorState,
 } from "@tiptap/react";
+import { useMemo } from "react";
 import { parseRitualFileLocator } from "@/files/ritualFileLocator";
+import { gdHallRow } from "../gdHallRows";
 import { ritualEditorOwner } from "../ritualEditorOwner";
 import { ritualFootnotesKey } from "../ritualFootnotesClient";
 import { TaskSettingsTrigger } from "../TaskSettings";
@@ -26,6 +28,7 @@ import {
   TitleFrame,
   TodoFrame,
 } from "./Frames";
+import { GdHallFrame } from "./GdHallFrame";
 import { editorImageDimension, editorImageStyle } from "./imagePresentation";
 import { roles } from "./roles";
 
@@ -321,7 +324,14 @@ export function RitualAtomForEditing({ node, selected }: NodeViewProps) {
             ? `Image · ${String(attrs.alt ?? attrs.src ?? "")}`
             : tag === "declareVar"
               ? `Variable · ${String(attrs.label ?? attrs.name ?? "")}`
-              : tag;
+              : tag === "gdHall"
+                ? "Temple hall"
+                : tag;
+  // The hall as the reader will draw it; the visual sub-editor is stage D.
+  const hall = useMemo(
+    () => (tag === "gdHall" ? gdHallRow(node.attrs) : null),
+    [tag, node.attrs],
+  );
   const imageStyle = editorImageStyle(attachedImage ? attrs.style : undefined);
   // Site assets (such as /pics/…) preview like the reader; other URLs stay
   // captions so the editor never fetches arbitrary hosts.
@@ -355,6 +365,7 @@ export function RitualAtomForEditing({ node, selected }: NodeViewProps) {
           className={styles.sitePreview}
         />
       )}
+      {hall && <GdHallFrame hall={hall} />}
       {tag === "hr" ? <hr /> : <div className={styles.label}>{caption}</div>}
     </NodeViewWrapper>
   );

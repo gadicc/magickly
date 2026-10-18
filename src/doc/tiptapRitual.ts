@@ -21,7 +21,8 @@ import { hasDirectNestedTask } from "./semanticEditorCompatibility";
 
 const inlineAtoms = new Set(["br", "grade", "var"]);
 const inlineSpans = new Set(["a", "b", "i"]);
-const blockAtoms = new Set(["declareVar", "img", "option", "hr"]);
+// A hall is one block, drawn whole; its rows travel in the atom's children.
+const blockAtoms = new Set(["declareVar", "img", "option", "hr", "gdHall"]);
 const inline = (node: RitualSemanticNode) =>
   node.kind === "text" ||
   (node.kind === "element" &&
@@ -32,6 +33,7 @@ function label(tag: string, attrs: Record<string, JsonValue>): string {
     return `${attrs.say === true ? "Say" : "Do"} · ${String(attrs.role ?? "choose role")}`;
   if (tag === "summary") return `Summary · ${String(attrs.summary ?? "")}`;
   if (tag === "title") return `Title · ${String(attrs.text ?? "")}`;
+  if (tag === "gdHall") return "Temple hall";
   return tag;
 }
 
