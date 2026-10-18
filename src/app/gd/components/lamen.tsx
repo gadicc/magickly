@@ -26,6 +26,19 @@ interface CrossLamenColours {
  * ring in the cross's colour and draw the Past Hierophant's lamen
  * smaller; red and white stripes are the Hierophant's nemyss in Zalewski
  * and in the Ciceros.
+ *
+ * Sources, by title, edition and page (plan 061, decision 9):
+ * - Israel Regardie, *The Golden Dawn*, vol. 3 (Aries Press, 1939), Z.1:
+ *   pp. 82–84, the Chiefs' lamens and collars and "a Jewel of that Lamen"
+ *   for a Past Hierophant; pp. 88–90, the Hierophant's lamen on a white
+ *   collar.
+ * - Pat Zalewski, *Secret Teachings of the Golden Dawn, Book 1: The
+ *   Neophyte Ritual 0=0* (Llewellyn, 1991): p. 76, the Hierophant's
+ *   scarlet-and-white-striped nemyss; p. 78 (Fig. 26), the lamen drawn
+ *   with an outer ring; p. 87, Whare Ra's white-field variant.
+ * - Chic and Sandra Tabatha Cicero, *Secrets of a Golden Dawn Temple*
+ *   (Thoth, 2004): pp. 80–81, the collars and the Past Hierophant's
+ *   smaller lamen; pp. 96–97, the ring in the charge colour.
  */
 const CROSS_LAMENS: ReadonlyMap<string, CrossLamenColours> = new Map([
   ["imperator", { ring: "red", disc: "green" }],

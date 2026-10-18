@@ -410,7 +410,17 @@ the reader is a later stage.
   and white stripes are the Hierophant's nemyss in Zalewski and in the
   Ciceros. Books are cited by title, edition and page only; archive.org
   copies of the Cicero and Zalewski books look unauthorised and are
-  never linked. It moves to `src/components/gd/Lamen.tsx` (MIT) in stage H, once
+  never linked. The citations, also in `lamen.tsx`'s doc comment:
+  Regardie, *The Golden Dawn*, vol. 3 (Aries Press, 1939), Z.1,
+  pp. 82–84 (the Chiefs' lamens and collars; "a Jewel of that Lamen"
+  for a Past Hierophant) and pp. 88–90 (the Hierophant's lamen on a
+  white collar); Pat Zalewski, *Secret Teachings of the Golden Dawn,
+  Book 1: The Neophyte Ritual 0=0* (Llewellyn, 1991), p. 76 (the
+  Hierophant's scarlet-and-white-striped nemyss), p. 78 (Fig. 26, the
+  lamen drawn with an outer ring) and p. 87 (Whare Ra's white-field
+  variant); Chic and Sandra Tabatha Cicero, *Secrets of a Golden Dawn
+  Temple* (Thoth, 2004), pp. 80–81 (the collars; the Past Hierophant's
+  smaller lamen) and pp. 96–97 (the ring in the charge colour). It moves to `src/components/gd/Lamen.tsx` (MIT) in stage H, once
   its caduceus (SVG Repo; "public domain" is the site's label, not the
   author's own licence text) and Eye of Horus (game-icons.net, CC BY) are
   replaced: Gadi wrote the file, but not those two paths, and CC BY
