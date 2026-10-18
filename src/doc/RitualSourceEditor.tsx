@@ -101,9 +101,27 @@ function diagnosticRange(
 }
 
 /**
+ * Runs `task` when the main thread is idle (within `timeout` ms at the
+ * latest), or in a later task where `requestIdleCallback` is missing
+ * (Safari). Returns its cancel function.
+ */
+function whenIdle(task: () => void, timeout: number): () => void {
+  if (typeof window.requestIdleCallback === "function") {
+    const handle = window.requestIdleCallback(task, { timeout });
+    return () => window.cancelIdleCallback(handle);
+  }
+  const handle = window.setTimeout(task, 0);
+  return () => window.clearTimeout(handle);
+}
+
+/**
  * Temple hall warnings for the exact bytes of `source` (plan 061, stage C).
  * The validator and the hall art load lazily, and only for source that
- * holds a hall, so other rituals' editors never fetch them.
+ * holds a hall, so other rituals' editors never fetch them. The warnings
+ * parse the source themselves (as long as the editor's own parse, about
+ * 80 ms for 75 KB), so they wait for a pause in typing and then for idle
+ * time, behind the editor's own work. A result for older source, or one
+ * that arrives after unmounting, is dropped.
  */
 function useHallWarnings(
   source: string,
@@ -119,11 +137,15 @@ function useHallWarnings(
       return;
     }
     let current = true;
+    let cancelIdle = () => {};
     const timer = window.setTimeout(() => {
       import("./gdHallDiagnostics")
         .then(({ gdHallSourceWarnings }) => {
-          if (current)
-            setFound({ source, warnings: gdHallSourceWarnings(source) });
+          if (!current) return;
+          cancelIdle = whenIdle(() => {
+            if (current)
+              setFound({ source, warnings: gdHallSourceWarnings(source) });
+          }, 2000);
         })
         // A chunk that fails to load leaves the source without warnings.
         .catch(() => {});
@@ -131,6 +153,7 @@ function useHallWarnings(
     return () => {
       current = false;
       window.clearTimeout(timer);
+      cancelIdle();
     };
   }, [source, enabled]);
   return found;
