@@ -4,7 +4,6 @@ import { StreamLanguage } from "@codemirror/language";
 import { pug } from "@codemirror/legacy-modes/mode/pug";
 import {
   type Diagnostic,
-  diagnosticCount,
   forEachDiagnostic,
   linter,
   lintGutter,
@@ -27,6 +26,7 @@ import {
   WidgetType,
 } from "@uiw/react-codemirror";
 import React from "react";
+import type { RitualSourceWarning } from "./gdHallDiagnostics";
 import {
   ritualPugHeaderId,
   ritualPugIdRanges,
@@ -72,6 +72,68 @@ class IdWidget extends WidgetType {
   ignoreEvent() {
     return true;
   }
+}
+
+/**
+ * The span a diagnostic underlines: its token (a tag, an attribute name,
+ * an ID) when the column is known, else the line's content, or the start
+ * of the document when there is no line.
+ */
+function diagnosticRange(
+  doc: EditorState["doc"],
+  at: { line?: number; column?: number },
+) {
+  if (at.line === undefined) return { from: 0, to: 0 };
+  const line = doc.line(Math.max(1, Math.min(at.line, doc.lines)));
+  if (at.column === undefined)
+    return { from: line.from + line.text.search(/\S|$/), to: line.to };
+  const from = line.from + Math.max(0, Math.min(at.column - 1, line.length));
+  const rest = line.text.slice(from - line.from);
+  return {
+    from,
+    to: Math.min(
+      line.to,
+      from +
+        (rest.match(/^#?[A-Za-z0-9_-]+/)?.[0].length ??
+          ((rest.codePointAt(0) ?? 0) > 0xffff ? 2 : 1)),
+    ),
+  };
+}
+
+/**
+ * Temple hall warnings for the exact bytes of `source` (plan 061, stage C).
+ * The validator and the hall art load lazily, and only for source that
+ * holds a hall, so other rituals' editors never fetch them.
+ */
+function useHallWarnings(
+  source: string,
+  enabled: boolean,
+): { source: string; warnings: RitualSourceWarning[] } | null {
+  const [found, setFound] = React.useState<{
+    source: string;
+    warnings: RitualSourceWarning[];
+  } | null>(null);
+  React.useEffect(() => {
+    if (!enabled || !source.includes("gdHall")) {
+      setFound(null);
+      return;
+    }
+    let current = true;
+    const timer = window.setTimeout(() => {
+      import("./gdHallDiagnostics")
+        .then(({ gdHallSourceWarnings }) => {
+          if (current)
+            setFound({ source, warnings: gdHallSourceWarnings(source) });
+        })
+        // A chunk that fails to load leaves the source without warnings.
+        .catch(() => {});
+    }, 300);
+    return () => {
+      current = false;
+      window.clearTimeout(timer);
+    };
+  }, [source, enabled]);
+  return found;
 }
 
 /** Fold identity spans visually; the underlying document, selection copy and save bytes stay intact. */
@@ -237,12 +299,19 @@ export default function RitualSourceEditor({
           return false;
         },
       }),
-      EditorView.contentAttributes.of((editor) => ({
-        "aria-label": label,
-        "aria-multiline": "true",
-        "aria-invalid": diagnosticCount(editor.state) ? "true" : "false",
-        spellcheck: "false",
-      })),
+      EditorView.contentAttributes.of((editor) => {
+        // Hall warnings do not make the source invalid; only errors do.
+        let invalid = false;
+        forEachDiagnostic(editor.state, (found) => {
+          if (found.severity === "error") invalid = true;
+        });
+        return {
+          "aria-label": label,
+          "aria-multiline": "true",
+          "aria-invalid": invalid ? "true" : "false",
+          spellcheck: "false",
+        };
+      }),
       EditorView.theme({
         "&": {
           ...(fill
@@ -337,51 +406,36 @@ export default function RitualSourceEditor({
       instance.dispatch({ effects: StateEffect.reconfigure.of(extensions) });
     }
   }, [value, dialect, extensions]);
+  const hallWarnings = useHallWarnings(
+    value,
+    dialect === "pug" && diagnostic?.source !== value,
+  );
   // biome-ignore lint/correctness/useExhaustiveDependencies: projections and reconfiguration can replace the CodeMirror state; reapply its diagnostics afterward.
   React.useLayoutEffect(() => {
     const instance = view.current;
     if (!instance) return;
-    const active =
-      diagnostic?.source === instance.state.doc.toString() ? diagnostic : null;
+    const { doc } = instance.state;
+    const text = doc.toString();
+    const active = diagnostic?.source === text ? diagnostic : null;
     const diagnostics: Diagnostic[] = [];
-    if (active) {
-      const line = instance.state.doc.line(
-        Math.max(1, Math.min(active.line ?? 1, instance.state.doc.lines)),
-      );
-      const hasColumn = active.column !== undefined;
-      const from =
-        active.line === undefined
-          ? 0
-          : line.from +
-            (hasColumn
-              ? Math.max(0, Math.min(active.column! - 1, line.length))
-              : line.text.search(/\S|$/));
-      const to =
-        active.line === undefined
-          ? 0
-          : hasColumn
-            ? Math.min(
-                line.to,
-                from +
-                  (line.text
-                    .slice(from - line.from)
-                    .match(/^#?[A-Za-z0-9_-]+/)?.[0].length ??
-                    ((line.text.codePointAt(from - line.from) ?? 0) > 0xffff
-                      ? 2
-                      : 1)),
-              )
-            : line.to;
+    if (active)
       diagnostics.push({
-        from,
-        to,
+        ...diagnosticRange(doc, active),
         severity: "error",
         message: active.message,
         source:
           active.column === undefined ? undefined : `Column ${active.column}`,
       });
-    }
+    if (hallWarnings?.source === text)
+      for (const warning of hallWarnings.warnings)
+        diagnostics.push({
+          ...diagnosticRange(doc, warning),
+          severity: "warning",
+          message: warning.message,
+          source: "Temple hall",
+        });
     instance.dispatch(setDiagnostics(instance.state, diagnostics));
-  }, [diagnostic, value, extensions]);
+  }, [diagnostic, hallWarnings, value, extensions]);
   // A remounted panel must not replay a reveal it already applied.
   const revealed = React.useRef(reveal?.key);
   React.useEffect(() => {
@@ -420,7 +474,11 @@ export default function RitualSourceEditor({
       return;
     }
   }, [follow]);
-  const hasDiagnostic = diagnostic?.source === value;
+  const hasError = diagnostic?.source === value;
+  const hasWarnings =
+    hallWarnings?.source === value && hallWarnings.warnings.length > 0;
+  const hasDiagnostic = hasError || hasWarnings;
+  const problem = hasError ? "error" : "warning";
   const tools = (dialect === "pug" || hasDiagnostic) && (
     <div
       role="group"
@@ -442,7 +500,7 @@ export default function RitualSourceEditor({
           <Button
             size="small"
             type="button"
-            title="F8; Shift+F8 for the previous error"
+            title={`F8; Shift+F8 for the previous ${problem}`}
             onClick={() => {
               if (view.current) {
                 navigateDiagnostic(view.current, nextDiagnostic);
@@ -450,7 +508,7 @@ export default function RitualSourceEditor({
               }
             }}
           >
-            Go to error
+            Go to {problem}
           </Button>
           <Button
             size="small"

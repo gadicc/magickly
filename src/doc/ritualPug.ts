@@ -448,6 +448,18 @@ export function parseRitualPug(source: string): RitualSemanticDocument {
   return parseWithLocations(source).document;
 }
 
+/**
+ * Parse as `parseRitualPug` does, with the parser's source location of
+ * every node (and, in halls, of each attribute). Locations are never part
+ * of the semantic document. Throws as `parseRitualPug` does.
+ */
+export function parseRitualPugWithLocations(source: string): {
+  document: RitualSemanticDocument;
+  locations: WeakMap<RitualSemanticNode, RitualSourceLocation>;
+} {
+  return parseWithLocations(source);
+}
+
 /** 1-based source line of each top-level node, or null when the source is invalid. */
 export function ritualPugTopLevelLines(source: string): number[] | null {
   try {
@@ -579,6 +591,18 @@ function parseWithLocations(source: string) {
       if (count > 20_000)
         throw new Error("Ritual is too large or deeply nested");
       const identity = node.attrs?.find((attr) => attr.name === "id");
+      // Hall diagnostics name one attribute; nothing else needs them yet.
+      const attributes =
+        hall || (node.type === "Tag" && node.name === "gdHall")
+          ? Object.fromEntries(
+              (node.attrs ?? [])
+                .filter((attr) => attr.name !== "id")
+                .map((attr) => [
+                  attr.name,
+                  { line: attr.line + 1, column: attr.column },
+                ]),
+            )
+          : undefined;
       for (const result of results) {
         const within = textOffsets.get(result);
         locations.set(result, {
@@ -589,6 +613,7 @@ function parseWithLocations(source: string) {
             : within?.id !== undefined
               ? { id: { line: node.line + 1, column: node.column + within.id } }
               : {}),
+          ...(attributes ? { attributes } : {}),
         });
       }
       return results;

@@ -5,6 +5,11 @@ export interface RitualSourceLocation {
   line: number;
   column?: number;
   id?: { line: number; column: number };
+  /**
+   * Where each attribute's name stands, for the nodes of a temple hall
+   * only, whose diagnostics name one attribute (`gdHallDiagnostics.ts`).
+   */
+  attributes?: Readonly<Record<string, { line: number; column: number }>>;
 }
 
 /** Sanitized parser error with one-based coordinates in the author's source. */

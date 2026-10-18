@@ -7,6 +7,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
 } from "@testing-library/react";
 import { EditorState, EditorView } from "@uiw/react-codemirror";
 import { afterEach, expect, it, vi } from "vitest";
@@ -533,3 +534,60 @@ it("does not replay an earlier follow when it remounts", () => {
   expect(editor.scrollDOM.scrollTop).toBe(0);
   expect(editor.state.selection.main.from).toBe(0);
 });
+
+it("shows temple hall warnings that do not make the source invalid", async () => {
+  const line = '    altar(at="centre", colour="red")';
+  const hall = `${RITUAL_PUG_HEADER}\ngdHall\n  floor\n${line}\n`;
+  const props = {
+    value: hall,
+    dialect: "pug" as const,
+    onChange: vi.fn(),
+    disabled: false,
+  };
+  const { container, rerender } = render(<RitualSourceEditor {...props} />);
+  const view = EditorView.findFromDOM(container.querySelector(".cm-editor")!)!;
+  // The validator and the hall art load lazily, after a pause in typing.
+  await waitFor(() => expect(diagnosticCount(view.state)).toBe(1), {
+    timeout: 30_000,
+  });
+  const found: [number, number, string, string][] = [];
+  forEachDiagnostic(view.state, (diagnostic, from, to) =>
+    found.push([from, to, diagnostic.severity, diagnostic.message]),
+  );
+  const at = hall.indexOf("colour");
+  expect(found).toEqual([
+    [
+      at,
+      at + "colour".length,
+      "warning",
+      "Line 4: altar: unknown attribute colour",
+    ],
+  ]);
+  expect(container.querySelector(".cm-lintRange-warning")?.textContent).toBe(
+    "colour",
+  );
+  expect(view.contentDOM.getAttribute("aria-invalid")).toBe("false");
+  fireEvent.click(screen.getByRole("button", { name: "Go to warning" }));
+  expect(view.state.selection.main.from).toBe(at);
+  fireEvent.click(screen.getByRole("button", { name: "Problems" }));
+  expect(container.querySelector(".cm-panel-lint")?.textContent).toContain(
+    "unknown attribute colour",
+  );
+  // A source error replaces them; a source without a hall has none.
+  const broken = `${hall}  each x\n`;
+  rerender(
+    <RitualSourceEditor
+      {...props}
+      value={broken}
+      diagnostic={ritualSourceDiagnostic(
+        new RitualSourceError("Line 5: invalid Pug syntax", 5, 3),
+        broken,
+      )}
+    />,
+  );
+  expect(diagnosticCount(view.state)).toBe(1);
+  expect(screen.getByRole("button", { name: "Go to error" })).toBeTruthy();
+  rerender(<RitualSourceEditor {...props} value={source} />);
+  expect(diagnosticCount(view.state)).toBe(0);
+  expect(screen.queryByRole("button", { name: "Go to warning" })).toBeNull();
+}, 60_000);

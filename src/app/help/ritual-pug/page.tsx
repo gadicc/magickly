@@ -121,6 +121,9 @@ export default function RitualPugGuide() {
         <kbd> Ctrl+Shift+M</kbd> (<kbd>Cmd+Shift+M</kbd> on Mac). A folded ID is
         revealed when you jump to its error. Where only the line is known, the
         editor underlines that line’s content. Errors clear when corrected.
+        Problems in a temple hall, such as an unknown tag or attribute or a
+        value out of range, are warnings: underlined in yellow and listed in
+        Problems, they do not stop saving, and the hall still draws.
       </p>
       <h2>Starter</h2>
       <Example source={ritualPugStarter} />
