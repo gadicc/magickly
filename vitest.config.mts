@@ -1,3 +1,4 @@
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { configDefaults, defineConfig } from "vitest/config";
 
@@ -11,6 +12,11 @@ export default defineConfig({
       ),
       "next/font/local": fileURLToPath(
         new URL("./tests/nextFontLocal.ts", import.meta.url),
+      ),
+      // Next compiles `next/dynamic` in the app directory to its React.lazy
+      // version, which server-renders; the package entry is the Pages one.
+      "next/dynamic": createRequire(import.meta.url).resolve(
+        "next/dist/shared/lib/app-dynamic",
       ),
     },
   },

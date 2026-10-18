@@ -1,0 +1,33 @@
+title(text="Opening") Opening
+Hiero: Let the hall be prepared.
+gdHall(dais=4, wall="gradient")
+  dais
+    officer(role="imperator")
+    officer(role="cancellarius")
+    officer(role="hierophant")
+    officer(role="pastHierophant")
+    officer(role="praemonstrator")
+  floor
+    //- Pillars stand either side of Hegemon
+    banner(kind="east", x=9.4, y=0)
+    pillar(kind="black", x=4, y=3, glow)
+    officer(role="hegemon", x=8, y=3, labelPos="top")
+    pillar(kind="white", x=12, y=3, glow=true)
+    altar(at="centre")
+      item(kind="cross", y=-0.4)
+      item(kind="triangle", y=0.3)
+      item(kind="rose", at="east")
+      item(kind="salt", at="north", y=-0.3)
+      item(kind="bread", at="north", y=0.35)
+      item(kind="lamp", at="south")
+      item(kind="cup", at="west")
+    officer(role="stolistes", x=1, y=8, labelPos="bottom")
+    officer(role="dadouchos", x=14.75, y=8, labelPos="bottom")
+    platform(x=8, y=14.5, w=4, h=3)
+      officer(role="hiereus", labelPos="top")
+    banner(kind="west", x=4.8, y=14.3)
+    officer(role="keryx", x=14, y=15, labelPos="top")
+    door(x=14, width=2)
+    officer(role="sentinel", x=14, y=17.2, labelPos="bottom", scale=null)
+  caption(text="Neophyte Temple")
+Hiero: The hall is prepared.

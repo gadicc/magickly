@@ -15,6 +15,7 @@ import {
   TitleFrame,
   TodoFrame,
 } from "./ritualBlocks/Frames";
+import { GdHallFrame } from "./ritualBlocks/GdHallFrame";
 import { planRitualFootnotes } from "./ritualFootnotes";
 import { roleAssignmentIncludes } from "./ritualRoles";
 
@@ -284,6 +285,13 @@ class Footnotes extends Node {
   }
 }
 
+/** A temple hall diagram (plan 061): drawn from the row, never from children. */
+class GdHallBlock extends Node {
+  render(key) {
+    return <GdHallFrame key={key} hall={this.block} />;
+  }
+}
+
 class Stylesheet extends Node {
   render(key) {
     return <link key={key} rel="stylesheet" href={this.block.href} />;
@@ -358,6 +366,7 @@ export const blocks = {
   footnotes: Footnotes,
 
   grade: Grade,
+  gdHall: GdHallBlock,
 };
 Node.registerBlocks(blocks);
 
@@ -384,6 +393,8 @@ export function Render({ doc, onChange }) {
             "hr",
             "cursor",
             "text",
+            // Drawn whole; its rows are never rendered as ritual content.
+            "gdHall",
           ].includes(type);
     },
   );

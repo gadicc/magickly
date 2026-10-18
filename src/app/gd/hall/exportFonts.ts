@@ -3,9 +3,9 @@ import {
   gdHallFontFaceRule,
 } from "@magick-components/gd/hall";
 import { SVG_NAMESPACE } from "@/export/svgExport";
+import { GD_HALL_FONT_BASE } from "./fontBase";
 
-/** Where the app serves the hall's WOFF2 subsets (`public/fonts`). */
-export const GD_HALL_FONT_BASE = "/fonts";
+export { GD_HALL_FONT_BASE };
 
 let embedded: Promise<string> | undefined;
 

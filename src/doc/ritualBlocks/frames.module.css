@@ -160,3 +160,17 @@
 .listItem[data-editing]::marker {
   content: var(--ritual-list-marker);
 }
+/* A temple hall: the page's width, up to a size that still reads whole. */
+.hall {
+  margin: 1rem auto;
+  max-width: 36rem;
+}
+.hall > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.hallPlaceholder {
+  aspect-ratio: 3 / 4;
+  background: #f4f4f4;
+}
