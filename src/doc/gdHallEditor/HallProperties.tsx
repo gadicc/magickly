@@ -111,7 +111,8 @@ interface FieldProps {
   placeholder?: string;
   disabled: boolean;
   art: HallArtRegistry;
-  onCommit: (name: string, value: JsonValue | undefined) => void;
+  /** Writes a value; false when the hall did not take it. */
+  onCommit: (name: string, value: JsonValue | undefined) => boolean;
 }
 
 /** A field's label: `marginNorth` reads "Margin north", `labelSize` "Label size". */
@@ -151,12 +152,19 @@ function TypedField({
         setError(parsed.error);
         return;
       }
-      setError(null);
-      onCommit(name, parsed.value);
+      write(parsed.value);
       return;
     }
-    setError(null);
-    onCommit(name, text === "" ? undefined : text);
+    write(text === "" ? undefined : text);
+  };
+  /** A value the hall did not take goes back to the hall's, with a note. */
+  const write = (next: JsonValue | undefined) => {
+    if (onCommit(name, next)) {
+      setError(null);
+      return;
+    }
+    setText(shown);
+    setError("Not written");
   };
   return (
     <TextField
@@ -277,8 +285,13 @@ export interface HallPropertiesProps {
   selected: HallSelectable | undefined;
   art: HallArtRegistry;
   disabled: boolean;
-  onSetAttr: (id: string, name: string, value: JsonValue | undefined) => void;
-  onSetCaption: (text: string | undefined) => void;
+  /** Each returns false when the hall did not take the value. */
+  onSetAttr: (
+    id: string,
+    name: string,
+    value: JsonValue | undefined,
+  ) => boolean;
+  onSetCaption: (text: string | undefined) => boolean;
   onScaleStep: (entry: HallSelectable, up: boolean) => void;
   onDuplicate: (entry: HallSelectable) => void;
   onDelete: (entry: HallSelectable) => void;

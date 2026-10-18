@@ -8,7 +8,7 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { Editor } from "@tiptap/core";
-import { NodeSelection } from "@tiptap/pm/state";
+import { NodeSelection, Plugin } from "@tiptap/pm/state";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { HallElement } from "../gdHallEditor/hallModel";
@@ -179,6 +179,48 @@ describe("editing a hall in the ritual editor", () => {
     expect(screen.getByRole("img", { name: "Neophyte Temple" })).toBeTruthy();
   }, 60_000);
 
+  it("undoes without scrolling the ritual to its caret", async () => {
+    const { editor, surface } = await openEditor();
+    const scrolled: boolean[] = [];
+    editor.on("transaction", ({ transaction }) => {
+      if (transaction.docChanged) scrolled.push(transaction.scrolledIntoView);
+    });
+    fireEvent.keyDown(surface, { key: "Tab" });
+    fireEvent.keyDown(surface, { key: "ArrowRight" });
+    fireEvent.keyDown(surface, { key: "z", ctrlKey: true });
+    fireEvent.keyDown(surface, { key: "y", ctrlKey: true });
+    expect(scrolled).toEqual([false, false, false]);
+  }, 60_000);
+
+  it("leaves the ritual's history alone while it is locked", async () => {
+    const { editor, surface } = await openEditor();
+    fireEvent.keyDown(surface, { key: "Tab" });
+    fireEvent.keyDown(surface, { key: "ArrowRight" });
+    const moved = editor.state.doc;
+    // Locked as a save or a source sync locks it: the hall editor knows.
+    editor.setEditable(false);
+    await waitFor(() =>
+      expect(surface.getAttribute("aria-disabled")).toBe("true"),
+    );
+    fireEvent.keyDown(surface, { key: "z", ctrlKey: true });
+    expect(editor.state.doc).toBe(moved);
+    // Locked without telling it: the host's undo still refuses.
+    editor.setEditable(true);
+    await waitFor(() =>
+      expect(surface.getAttribute("aria-disabled")).toBe(null),
+    );
+    editor.setEditable(false, false);
+    fireEvent.keyDown(surface, { key: "z", ctrlKey: true });
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(editor.state.doc).toBe(moved);
+    // Nor does a key then write.
+    fireEvent.keyDown(surface, { key: "ArrowRight" });
+    expect(editor.state.doc).toBe(moved);
+    expect(
+      document.querySelector("[data-hall-notice]")?.textContent,
+    ).toBeTruthy();
+  }, 60_000);
+
   it("pauses edits while the editor takes no changes", async () => {
     const { editor, surface } = await openEditor();
     editor.setEditable(false);
@@ -223,6 +265,40 @@ describe("writeHallToAtom", () => {
         }),
       ).toBe(true);
       expect(hallIn(editor).attrs.dais).toBe(5);
+    } finally {
+      editor.destroy();
+    }
+  });
+
+  it("refuses while the editor takes no changes", () => {
+    const editor = setup();
+    try {
+      const pos = hallPos(editor);
+      const hall = hallOfAtom(editor.state.doc.nodeAt(pos)?.attrs ?? {});
+      editor.setEditable(false);
+      const before = editor.state.doc;
+      const next = { ...hall, attrs: { ...hall.attrs, dais: 5 } };
+      expect(writeHallToAtom(editor, pos, hall.id, next)).toBe(false);
+      expect(editor.state.doc).toBe(before);
+    } finally {
+      editor.destroy();
+    }
+  });
+
+  it("says so when the write does not reach the document", () => {
+    const editor = setup();
+    try {
+      const pos = hallPos(editor);
+      const hall = hallOfAtom(editor.state.doc.nodeAt(pos)?.attrs ?? {});
+      // As `RitualHallPlacement` drops every write while any hall in the
+      // ritual stands where it may not.
+      editor.registerPlugin(
+        new Plugin({ filterTransaction: (tr) => !tr.docChanged }),
+      );
+      const before = editor.state.doc;
+      const next = { ...hall, attrs: { ...hall.attrs, dais: 5 } };
+      expect(writeHallToAtom(editor, pos, hall.id, next)).toBe(false);
+      expect(editor.state.doc).toBe(before);
     } finally {
       editor.destroy();
     }

@@ -123,6 +123,12 @@
   color: #555;
   text-align: center;
 }
+.notice {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #7a1c13;
+  text-align: center;
+}
 .warnings {
   margin: 0;
   padding: 0;

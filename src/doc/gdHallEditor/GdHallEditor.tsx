@@ -92,7 +92,8 @@ export interface GdHallEditorProps {
    * written, an object added) with the next hall, normalised as
    * `normalizeHall` writes it. The host stores it as one undo step and
    * gives it back as `hall`; until then the editor shows it as sent. A
-   * host that cannot take it returns false.
+   * host that does not take it (refused, or dropped on the way) must
+   * return false: the editor then shows the host's hall and says so.
    */
   onChange: (next: HallElement) => boolean | void;
   /** Leaves edit mode: Done, or Escape with nothing selected. */
@@ -134,6 +135,9 @@ const CORNERS = [
   ["sw", 0, 1],
   ["se", 1, 1],
 ] as const;
+
+/** What the author is told when the host does not take a change. */
+const REFUSED = "That change was not made; the hall is as it was.";
 
 /** Cut, copy and paste, with Ctrl or Cmd. */
 const CLIPBOARD_KEYS = new Set(["x", "c", "v"]);
@@ -191,6 +195,8 @@ export function GdHallEditor({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [preview, setPreview] = useState<HallElement | null>(null);
   const [announcement, setAnnouncement] = useState("");
+  /** Why the last change was not made, until the next one is. */
+  const [notice, setNotice] = useState<string | null>(null);
   const [gestureKind, setGestureKind] = useState<Gesture["kind"] | null>(null);
   const [paletteAnchor, setPaletteAnchor] = useState<HTMLElement | null>(null);
   const [pixelsPerSquare, setPixelsPerSquare] = useState(30);
@@ -335,14 +341,22 @@ export function GdHallEditor({
   ): boolean => {
     setPreview(null);
     if (select !== undefined) setSelectedId(select);
+    // A change that ends as the host locks is dropped, as if cancelled.
+    if (!editable) return false;
     const base = currentRef.current;
     if (next === base) return true;
     const normal = normalizeHall(next, art);
-    // A host that refuses the change says so; the hall stays as it was.
-    if (onChange(normal) === false) return false;
+    // A host that refuses the change says so; the hall stays as the host
+    // has it, and the author is told.
+    if (onChange(normal) === false) {
+      setNotice(REFUSED);
+      setAnnouncement(REFUSED);
+      return false;
+    }
     currentRef.current = normal;
     echo.current = normal;
     setSent(normal);
+    setNotice(null);
     setAnnouncement(message);
     return true;
   };
@@ -522,30 +536,30 @@ export function GdHallEditor({
       value === undefined ? `Removed ${name}` : `Set ${name} to ${value}`,
     );
 
-  const setCaption = (text: string | undefined) => {
+  const setCaption = (text: string | undefined): boolean => {
     const base = currentRef.current;
     const caption = base.children?.find(
       (child): child is HallElement =>
         child.kind === "element" && child.tag === "caption",
     );
     if (caption)
-      commit(
+      return commit(
         text === undefined
           ? removeHallNode(base, caption.id)
           : updateHallAttrs(base, caption.id, { text }),
         text === undefined ? "Removed the caption" : "Set the caption",
       );
-    else if (text !== undefined)
-      commit(
-        insertHallNode(base, base.id, {
-          kind: "element",
-          id: createId(),
-          tag: "caption",
-          attrs: { text },
-          children: [],
-        }),
-        "Set the caption",
-      );
+    if (text === undefined) return true;
+    return commit(
+      insertHallNode(base, base.id, {
+        kind: "element",
+        id: createId(),
+        tag: "caption",
+        attrs: { text },
+        children: [],
+      }),
+      "Set the caption",
+    );
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -572,6 +586,8 @@ export function GdHallEditor({
     }
     if (history) {
       event.preventDefault();
+      // The host's history is not this editor's to move while it is locked.
+      if (!editable) return;
       if (key === "y" || event.shiftKey) onRedo?.();
       else onUndo?.();
       return;
@@ -841,6 +857,11 @@ export function GdHallEditor({
               </div>
             )}
           </div>
+          {notice && (
+            <p className={styles.notice} data-hall-notice>
+              {notice}
+            </p>
+          )}
           <p id={helpId} className={styles.hint}>
             {!editable
               ? "The hall cannot be edited while the ritual is updating."

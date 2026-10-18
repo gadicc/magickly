@@ -79,6 +79,8 @@ interface Harness {
   replace: (hall: HallElement) => void;
   /** Locks or unlocks the host. */
   lock: (locked: boolean) => void;
+  /** Makes the host refuse changes, or take them again. */
+  refuse: (refusing: boolean) => void;
 }
 
 function setup(
@@ -95,6 +97,7 @@ function setup(
   let latest = initial;
   const past: HallElement[] = [];
   let replace: (hall: HallElement) => void = () => {};
+  let refusing = !!options.refuse;
   let lock: (locked: boolean) => void = () => {};
   function Host() {
     const [hall, setHall] = useState(initial);
@@ -110,7 +113,7 @@ function setup(
         createId={sequentialIds("New")}
         onChange={(next) => {
           harness.changes.push(next);
-          if (options.refuse) return false;
+          if (refusing) return false;
           past.push(hall);
           setHall(next);
         }}
@@ -131,6 +134,9 @@ function setup(
     surface: screen.getByRole("application"),
     replace: (hall) => act(() => replace(hall)),
     lock: (locked) => act(() => lock(locked)),
+    refuse: (next) => {
+      refusing = next;
+    },
   };
 }
 
@@ -693,7 +699,7 @@ describe("the palette and the warnings", () => {
 
 describe("while the host takes no changes", () => {
   it("shows the hall without editing it", () => {
-    const { surface, changes } = setup(neophyteHall(), false);
+    const { surface, changes, undo, redo } = setup(neophyteHall(), false);
     expect(surface.getAttribute("aria-disabled")).toBe("true");
     expect(
       screen.getByText(
@@ -704,6 +710,11 @@ describe("while the host takes no changes", () => {
     key(surface, "ArrowRight");
     fireEvent.pointerDown(surface, { ...at(8, 3), pointerId: 1, button: 0 });
     expect(changes).toHaveLength(0);
+    // Nor are undo and redo handed to the host, whose history it is.
+    expect(key(surface, "z", { ctrlKey: true })).toBe(false);
+    expect(key(surface, "y", { ctrlKey: true })).toBe(false);
+    expect(undo).not.toHaveBeenCalled();
+    expect(redo).not.toHaveBeenCalled();
     expect(document.querySelector("[data-corner]")).toBeNull();
     expect(
       (screen.getByRole("button", { name: "Add" }) as HTMLButtonElement)
@@ -744,6 +755,29 @@ describe("the host's replies", () => {
     expect(
       (screen.getByRole("textbox", { name: /^x/ }) as HTMLInputElement).value,
     ).toBe("");
+    // The author is told, once visibly and once in the live region.
+    const refused = "That change was not made; the hall is as it was.";
+    expect(screen.getAllByText(refused)).toHaveLength(2);
+  });
+
+  it("says a field's value was not written, and clears the note", () => {
+    const { surface, changes, current, refuse } = setup(neophyteHall(), true, {
+      refuse: true,
+    });
+    key(surface, "Tab");
+    const x = screen.getByRole("textbox", { name: /^x/ }) as HTMLInputElement;
+    act(() => x.focus());
+    fireEvent.change(x, { target: { value: "3" } });
+    act(() => x.blur());
+    expect(changes).toHaveLength(1);
+    // The field shows the hall's value again, and why.
+    expect(x.value).toBe("");
+    expect(screen.getByText("Not written")).toBeTruthy();
+    expect(document.querySelector("[data-hall-notice]")).toBeTruthy();
+    refuse(false);
+    key(surface, "ArrowRight");
+    expect(byAttr(current(), "role", "imperator").attrs.x).toBe(2.1);
+    expect(document.querySelector("[data-hall-notice]")).toBeNull();
   });
 });
 
