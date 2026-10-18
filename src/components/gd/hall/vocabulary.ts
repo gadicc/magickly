@@ -1,3 +1,4 @@
+import { COORDINATE_RANGE } from "./dimensions";
 import type { HallAttrSpec } from "./types";
 
 /**
@@ -89,8 +90,7 @@ const enumOf = (values: readonly string[]): HallAttrSpec => ({
 const text: HallAttrSpec = { kind: "string", maxLength: 200 };
 const flag: HallAttrSpec = { kind: "boolean" };
 
-/** The coordinate range the resolver clamps positions to, in squares. */
-export const COORDINATE_RANGE = [-48, 64] as const;
+export { COORDINATE_RANGE };
 /** The scale range the resolver clamps to. */
 export const SCALE_RANGE = [0.05, 10] as const;
 /** The size range for `w`, `h` and widths, in squares. */

@@ -89,10 +89,15 @@ it("keeps Tiptap, ProseMirror and editor code out of the reader import graph", (
 });
 
 it("loads the hall renderer and its art only through import()", () => {
-  // Plan 061, decision 1: a ritual without a hall does not carry them.
+  // Plan 061, decision 1: a ritual without a hall does not carry them,
+  // only the few kilobytes that size the placeholder while they load.
   const graph = readerGraph();
   const hall = /^src\/(?:components\/gd\/hall|app\/gd\/hall)\//;
-  expect(files(graph.static).filter((file) => hall.test(file))).toEqual([]);
+  expect(files(graph.static).filter((file) => hall.test(file))).toEqual([
+    "src/components/gd/hall/aspect.ts",
+    "src/components/gd/hall/attributes.ts",
+    "src/components/gd/hall/dimensions.ts",
+  ]);
   const lazy = files(graph.lazy);
   expect(lazy).toContain("src/doc/ritualBlocks/GdHallDrawing.tsx");
   expect(lazy).toContain("src/components/gd/hall/GdHall.tsx");

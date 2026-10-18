@@ -5,6 +5,7 @@ import {
   resolveHall,
   validateHall,
 } from "@magick-components/gd/hall";
+import { estimateHallAspect } from "@magick-components/gd/hall/aspect";
 import {
   compassBox,
   FLOOR_SIZE,
@@ -32,6 +33,14 @@ describe.each(HALL_PRESETS.map((preset) => [preset.id, preset] as const))(
   (id, preset) => {
     it("validates with no errors or warnings against the app's art", () => {
       expect(validateHall(preset.hall, { art: gdHallArt })).toEqual([]);
+    });
+
+    it("sizes the reader's placeholder within 2 % of the drawing", () => {
+      const { viewBox } = resolveHall(preset.hall, { art: gdHallArt });
+      const drawn = (viewBox.x1 - viewBox.x0) / (viewBox.y1 - viewBox.y0);
+      expect(
+        Math.abs(estimateHallAspect(preset.hall) / drawn - 1),
+      ).toBeLessThan(0.02);
     });
 
     it("says where its layout comes from", () => {

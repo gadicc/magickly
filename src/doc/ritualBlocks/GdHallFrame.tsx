@@ -1,8 +1,13 @@
+import { estimateHallAspect } from "@magick-components/gd/hall/aspect";
 import type { HallNode } from "@magick-components/gd/hall/types";
 import dynamic from "next/dynamic";
+import type { CSSProperties } from "react";
 import styles from "./frames.module.css";
 
-/** Holds the hall's place, at a typical hall's shape, while it loads. */
+/**
+ * Holds the hall's place while it loads, at the shape the frame's
+ * `--gd-hall-aspect` estimates, so the text below barely moves.
+ */
 function HallPlaceholder() {
   return <div className={styles.hallPlaceholder} aria-hidden="true" />;
 }
@@ -25,8 +30,12 @@ const GdHallDrawing = dynamic(() => import("./GdHallDrawing"), {
  * what it can of it.
  */
 export function GdHallFrame({ hall }: { hall: HallNode }) {
+  // `next/dynamic` gives its placeholder no props: the shape goes by CSS.
+  const style = {
+    "--gd-hall-aspect": estimateHallAspect(hall).toFixed(4),
+  } as CSSProperties;
   return (
-    <figure data-ritual-frame="gdHall" className={styles.hall}>
+    <figure data-ritual-frame="gdHall" className={styles.hall} style={style}>
       <GdHallDrawing hall={hall} />
     </figure>
   );

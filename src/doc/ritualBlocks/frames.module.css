@@ -170,7 +170,8 @@
   width: 100%;
   height: auto;
 }
+/* The frame estimates the hall's shape; 3:4 is a typical hall's. */
 .hallPlaceholder {
-  aspect-ratio: 3 / 4;
+  aspect-ratio: var(--gd-hall-aspect, 3 / 4);
   background: #f4f4f4;
 }

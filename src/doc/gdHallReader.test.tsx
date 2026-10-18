@@ -88,6 +88,10 @@ it("server-renders the hall and hydrates it without a mismatch", async () => {
   expect(streamed).toMatch(
     /hallPlaceholder.*<svg.*>Neophyte Temple<\/title>.*\$RC\(/s,
   );
+  // The placeholder takes the hall's estimated shape (the drawing: 0.752).
+  expect(streamed).toMatch(
+    /data-ritual-frame="gdHall"[^>]*style="--gd-hall-aspect:0\.74\d\d"/,
+  );
   // Inlined, as a browser has it once that script ran.
   const markup = await html(element, Number.POSITIVE_INFINITY);
   expect(markup).toContain(">Neophyte Temple</title>");
