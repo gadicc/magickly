@@ -252,9 +252,27 @@ export const HALL_TAGS: ReadonlyMap<string, HallTagSpec> = new Map<
 ]);
 
 /**
+ * `Object.prototype`'s identifier names: looked up in a plain object (the
+ * reader's block registry, an inventory table), `toString` would be found
+ * as a function.
+ */
+const OBJECT_PROTOTYPE_NAMES = [
+  "constructor",
+  "hasOwnProperty",
+  "isPrototypeOf",
+  "propertyIsEnumerable",
+  "toLocaleString",
+  "toString",
+  "valueOf",
+];
+
+/**
  * Tags a hall may not use (decision 2): `text` would compile to a
- * json-rich-text text node, the others the reader or the offline inventory
- * treat specially; `img` waits for its own design.
+ * json-rich-text text node, the others the reader, the offline inventory
+ * or the ritual Pug codec treat specially (`say` and `do` parse as tasks,
+ * Pug's keywords as statements); `img` waits for its own design. The
+ * compiler keeps its own copy of this list, since it may not import this
+ * package; an app test holds the two in step. See also `reservedTag`.
  */
 export const RESERVED_TAGS: ReadonlySet<string> = new Set([
   "text",
@@ -265,12 +283,50 @@ export const RESERVED_TAGS: ReadonlySet<string> = new Set([
   "task",
   "span",
   "img",
+  "stylesheet",
+  "cursor",
+  "say",
+  "do",
+  "if",
+  "else",
+  "unless",
+  "case",
+  "when",
+  "default",
+  "each",
+  "for",
+  "while",
+  "extends",
+  "extend",
+  "include",
+  "doctype",
+  "mixin",
+  "block",
+  "append",
+  "prepend",
+  "yield",
+  "filter",
+  "script",
+  "style",
+  ...OBJECT_PROTOTYPE_NAMES,
 ]);
 
 /**
+ * Whether a hall may not use `tag`: a reserved name, a name the Pug codec
+ * keeps for its wrappers (`ritual` followed by a capital), or one that
+ * begins with `doctype`, which Pug reads as a doctype whatever follows.
+ */
+export function reservedTag(tag: string): boolean {
+  return (
+    RESERVED_TAGS.has(tag) || /^ritual[A-Z]/.test(tag) || /^doctype/.test(tag)
+  );
+}
+
+/**
  * Attribute names a hall node may not carry (decisions 2 and 5): the tree's
- * own keys, `style`, and every resource name the offline asset inventory
- * follows, any of which would stop publication.
+ * own keys, `style`, every resource name the offline asset inventory
+ * follows, any of which would stop publication, and `Object.prototype`'s
+ * names.
  */
 export const RESERVED_ATTRIBUTES: ReadonlySet<string> = new Set([
   "type",
@@ -286,6 +342,7 @@ export const RESERVED_ATTRIBUTES: ReadonlySet<string> = new Set([
   "data",
   "background",
   "dangerouslySetInnerHTML",
+  ...OBJECT_PROTOTYPE_NAMES,
 ]);
 
 /** Tag and attribute names the Pug printer can always write back. */

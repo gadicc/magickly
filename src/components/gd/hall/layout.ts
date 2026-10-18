@@ -35,7 +35,7 @@ import {
   IDENTIFIER,
   LABEL_POSITIONS,
   type LabelPosition,
-  RESERVED_TAGS,
+  reservedTag,
   roleName,
   SCALE_RANGE,
   SIZE_RANGE,
@@ -679,8 +679,7 @@ export function resolveHall(
       };
     }
     const artKey = hallArtKey(node);
-    const known =
-      !RESERVED_TAGS.has(tag) && hallTagSpec(tag, art) !== undefined;
+    const known = !reservedTag(tag) && hallTagSpec(tag, art) !== undefined;
     const drawn = known ? art.get(artKey) : undefined;
     let box = PLACEHOLDER_BOX;
     let fit: HallArt["fit"] = "box";

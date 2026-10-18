@@ -17,7 +17,7 @@ import {
   MAX_HALL_DEPTH,
   MAX_HALL_NODES,
   RESERVED_ATTRIBUTES,
-  RESERVED_TAGS,
+  reservedTag,
 } from "./vocabulary";
 
 /** What the validator knows beyond the package's own vocabulary. */
@@ -269,7 +269,7 @@ export function validateHall(
       report(path, "error", "a node without a valid tag is ignored");
       return;
     }
-    const spec = RESERVED_TAGS.has(tag)
+    const spec = reservedTag(tag)
       ? undefined
       : hallTagSpec(tag, options.art, node as HallNode);
     const shown = clip(tag);
@@ -286,7 +286,7 @@ export function validateHall(
         "warning",
         `${shown} belongs in floor, dais or banners; drawn on the floor`,
       );
-    if (RESERVED_TAGS.has(tag)) {
+    if (reservedTag(tag)) {
       report(
         path,
         "error",

@@ -9,7 +9,7 @@ import {
   MAX_HALL_DEPTH,
   MAX_HALL_NODES,
   PLACEABLE_ATTRIBUTES,
-  RESERVED_TAGS,
+  reservedTag,
 } from "./vocabulary";
 
 /**
@@ -50,7 +50,7 @@ export function hallTagSpec(
   }
   // A registry key such as `item:cup` is not a tag: only an identifier is.
   const drawn = IDENTIFIER.test(type) ? art?.get(type) : undefined;
-  if (!drawn || RESERVED_TAGS.has(type)) return undefined;
+  if (!drawn || reservedTag(type)) return undefined;
   return {
     role: "placeable",
     attributes: new Map([
