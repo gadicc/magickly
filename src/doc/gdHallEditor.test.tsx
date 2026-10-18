@@ -80,6 +80,66 @@ describe("a hall in the visual editor", () => {
     }
   });
 
+  it("refuses pasted HTML whose hall breaks the shape rule", () => {
+    const id = (n: number) => `Ab3k9Qp7Zx2Mn5R${n}`;
+    const pasted = (
+      children: unknown[],
+      attrs: Record<string, unknown> = {},
+    ) => {
+      const meta = JSON.stringify({
+        id: id(0),
+        tag: "gdHall",
+        attrs,
+        children,
+        raw: null,
+      }).replaceAll('"', "&quot;");
+      const editor = new Editor({
+        extensions: ritualTiptapExtensions,
+        content: `<div data-ritual-atom="gdHall" data-ritual-meta="${meta}">Temple hall</div>`,
+      });
+      try {
+        const doc = semanticFromTiptap(editor.getJSON());
+        expect(validateRitualSemantic(doc)).toEqual([]);
+        return halls(doc).length;
+      } finally {
+        editor.destroy();
+      }
+    };
+    const floor = (...children: unknown[]) => ({
+      kind: "element",
+      id: id(1),
+      tag: "floor",
+      attrs: {},
+      children,
+    });
+    // A well-formed hall still pastes as a hall.
+    expect(pasted([floor()])).toBe(1);
+    for (const [name, children, attrs] of [
+      ["a text row", [floor({ kind: "text", text: "a cup" })]],
+      [
+        "a reserved tag",
+        [floor({ kind: "element", id: id(2), tag: "title", attrs: {} })],
+      ],
+      [
+        "a nested hall",
+        [floor({ kind: "element", id: id(2), tag: "gdHall", attrs: {} })],
+      ],
+      [
+        "an object attribute",
+        [
+          floor({
+            kind: "element",
+            id: id(2),
+            tag: "item",
+            attrs: { pos: { x: 1 } },
+          }),
+        ],
+      ],
+      ["a reserved attribute on the hall", [floor()], { href: "/x" }],
+    ] as [string, unknown[], Record<string, unknown>?][])
+      expect(pasted(children, attrs), name).toBe(0);
+  });
+
   it("gives a duplicated or pasted hall fresh IDs throughout", () => {
     const doc = parseRitualPug(source);
     const editor = new Editor({

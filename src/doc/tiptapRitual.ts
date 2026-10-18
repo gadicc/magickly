@@ -69,6 +69,28 @@ function clipboardAttrs(element: HTMLElement) {
       Array.isArray(meta.attrs)
     )
       return false;
+    // A hall must keep the shape the compiler accepts (plan 061, decision
+    // 2): crafted HTML could otherwise put text, a reserved tag or another
+    // hall in its rows, which only failed when the ritual was saved.
+    if (
+      tag === "gdHall" &&
+      validateRitualSemantic({
+        format: "magickli-ritual",
+        version: 1,
+        nodes: [
+          {
+            kind: "element",
+            id: meta.id,
+            tag,
+            attrs: meta.attrs,
+            ...(meta.children === null || meta.children === undefined
+              ? {}
+              : { children: meta.children }),
+          },
+        ],
+      }).length
+    )
+      return false;
     // A source-only block must carry one valid semantic node.
     if (
       tag === "sourceOnly" &&
