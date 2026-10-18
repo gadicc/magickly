@@ -11,6 +11,7 @@ import {
   RitualInlineForEditing,
 } from "./ritualBlocks/renderForEditing";
 import { RitualFootnotesPresentation } from "./ritualFootnotesClient";
+import { RitualSelectionInput } from "./ritualSelectionInput";
 import { RitualSlashCommands } from "./ritualSlashCommands";
 import { ritualTiptapExtensions } from "./tiptapRitual";
 
@@ -87,6 +88,7 @@ export const ritualTiptapClientExtensions = [
     return extension;
   }),
   RitualFootnotesPresentation,
+  RitualSelectionInput,
   RitualSlashCommands,
   RitualSoftBreaks,
 ];

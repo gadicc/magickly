@@ -98,9 +98,14 @@ function rangeIn(state: EditorState, depth: number) {
  * goes on after the hall. An empty paragraph between blocks, or at the end
  * of its container, adds nothing to the semantic document.
  *
- * Not a node selection of the hall: typing would replace it, and in
- * Chromium a hall selected as its node view mounts right after another
- * atom loses the selection to the start of the document (stage C notes).
+ * Not a node selection of the hall: the author goes on writing after the
+ * hall rather than replacing it with the first character typed. A node
+ * selection of a block is also fragile in Chromium: its DOM selection
+ * spans an uneditable element with no caret position, which Chromium can
+ * move to an editable position of its own choosing (the end of the task
+ * before, or the start of the title), and ProseMirror may read that move
+ * back (plan 061, Stage C review fixes). `RitualSelectionInput` keeps
+ * text typed over a selected block where it belongs.
  */
 export function caretAfterGdHall(tr: Transaction, pos: number): Transaction {
   const hall = tr.doc.nodeAt(pos);
