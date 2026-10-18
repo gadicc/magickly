@@ -330,8 +330,11 @@ Follow-ups are separate from the completed migration work:
   now replaces it, as a key press does, instead of landing in the
   title). Stage D is done: "Edit hall" opens a visual hall editor in
   place (select, drag, scale, keys, a properties panel, a palette and
-  the hall's warnings; one undo step per gesture). Stage E, the
-  `/gd/hall` playground, is next.
+  the hall's warnings; one undo step per gesture), with its review
+  fixes: a drag no longer reverts a field written or an undo made
+  during it, Ctrl+X there no longer cuts ritual text, undo waits while
+  the ritual is locked, and Ctrl+S saves a field still being typed.
+  Stage E, the `/gd/hall` playground, is next.
   TODO from it: recording officer movement between stations, a `gdVault` for
   the Adeptus Minor Vault, original Enochian letterforms, moving
   `enochianFont.ts` and the other files the import-boundary test allows out
@@ -349,7 +352,10 @@ Follow-ups are separate from the completed migration work:
   parity test, reparenting in the hall editor, whether moving one
   officer of a row should hold its siblings still (Gadi's call), hall
   warnings on the plain hall atom, Firefox, Safari and real-device
-  checks of the hall editor's pointer and touch handling, the
+  checks of the hall editor's pointer and touch handling, a hall field
+  in the creation form saved by a Create button that does not take the
+  focus (Safari), the reader and documentation screenshots unchecked
+  after the stage D review fixes (no publication storage locally), the
   warnings' second parse of
   the source (now in idle time), Chromium moving a selected block's DOM
   selection before input (ProseMirror reads it; seen in 3 of 28 CDP

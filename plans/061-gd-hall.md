@@ -1674,20 +1674,26 @@ brief left a choice or proved wrong:
   would not be valid source. The atom's node view stops ProseMirror's
   handling of every event inside `[data-gd-hall-controls]` (the button
   and the editor), so the atom is never node-selected, neither on entry
-  nor on a press, ProseMirror never takes the editor's keys, and
-  `RitualSelectionInput` never sees text typed in the panel (it reaches
-  the field; the ritual's title is unchanged). Undo and redo inside the
-  editor are the ritual editor's. While the editor takes no changes (a
-  source sync, a save) the hall shows read-only with a note.
+  nor on a press, ProseMirror's own handlers never see the editor's
+  keys, and `RitualSelectionInput` never sees text typed in the panel
+  (it reaches the field; the ritual's title is unchanged). That did not
+  keep the browser's clipboard actions away from the ritual, which
+  follow the page's text selection rather than the focus: Ctrl+X in the
+  editor cut ritual text until the review fixes (Stage D review fixes,
+  M2). Undo and redo inside the editor are the ritual editor's. While
+  the editor takes no changes (a source sync, a save) the hall shows
+  read-only with a note.
 - **Selection.** By click or tap, hit-tested on the resolver's boxes (at
   least 0.6 squares across), labels and free text, topmost first (a
-  host's children over the host); doors by a band across their wall
-  line; empty floor clears it. Tab and Shift+Tab walk objects and doors
+  host's children over the host; labels and free text, drawn above
+  every object, before any object since the review fixes); doors by a
+  band across their wall line; empty floor clears it. Tab and Shift+Tab walk objects and doors
   in document order and leave the drawing past either end, so the
   keyboard is never trapped. The selection is a dashed outline, its
-  labels highlighted. The drawing is `role="application"`, labelled with
-  what is selected, and a polite live region says what each gesture did
-  ("Moved Hegemon to x 9.5, y 3").
+  labels highlighted. The drawing is `role="application"`, described
+  with what is selected (labelled with it until the review fixes), and
+  a polite live region says what each gesture did ("Moved Hegemon to
+  x 9.5, y 3").
 - **Coordinates.** A drag in floor squares is divided by the node's
   frame unit: floor squares on the floor and in rows, the host's
   unscaled squares for its children (twice as far on an altar at
@@ -1708,7 +1714,9 @@ brief left a choice or proved wrong:
   its own position, so the row does not move.
 - **Drags** use pointer events with capture, a 4-pixel threshold, a
   preview laid out once per animation frame, and one write on release;
-  a cancelled pointer writes nothing. On touch the pointer lands on
+  a cancelled pointer writes nothing. Since the review fixes a drag is
+  applied, by node ID, to the hall the editor holds at release, with
+  the drawing's view box held for its duration (Stage D review fixes). On touch the pointer lands on
   HTML boxes over the objects and handles with `touch-action: none`:
   Chromium ignored `touch-action` on SVG shapes (a touch drag on an
   officer was taken for a pan and the pointer cancelled), while a touch
@@ -1826,6 +1834,145 @@ What was verified, and how:
   of members added on the same day, as in stage C, so both were left as
   committed.
 
+## Stage D review fixes
+
+An independent Opus review of stage D (a783911..a0d791d) found three
+major problems, six smaller ones and nine nits; a final Fable review
+confirmed the third and added four more. All were fixed on
+`gate/gd-hall-d` on 18 October 2026, in five commits on top of a0d791d
+(none of stage D's commits rewritten). Each new test fails on the
+commit before its fix, unless said otherwise.
+
+- **A drag reverted edits made before or during it (M1; bc6db42).** A
+  gesture kept the hall laid out when the press began and wrote a
+  whole hall built from it on release. The press itself blurred a
+  panel field, which wrote its value in that same event, after the
+  hall was captured, so a label typed and then an object dragged lost
+  the label; an undo or Delete during the drag was undone by the
+  release, which brought back the deleted node; a hall from the source
+  mid-drag was overwritten. A gesture now records its node ID, where it
+  began and the view box, and each preview and the release apply the
+  move or scale by node ID to the hall the editor holds at that moment
+  (the one it last sent, which a change updates at once, or the
+  host's). Keys, buttons and fields do the same. A gesture ends
+  without writing on Escape, undo, redo, Delete, a lock, a hall from
+  the host other than the echo of the one sent, or its node going;
+  other keys wait for the release. The hall sent is dropped on any new
+  hall from the host, even one identical to the hall it was built on
+  (an undo gives that back). Tests: a field typed then a drag, a
+  position typed then a drag (a square from the typed value), undo,
+  redo, Delete and Escape during a drag, keys during a drag, a hall
+  from the host, a lock, a node gone.
+- **Ctrl+X in the hall editor cut ritual text (M2; 0c5b352).** The
+  drawing takes the focus but is not editable, and Chromium leaves the
+  page's text selection in the ritual and sends cut, copy and paste
+  there; ProseMirror owns that selection and deleted the text. The
+  drawing now clears the page's text selection when it takes the focus
+  (on entry and on any later focus), if the selection lies outside the
+  editor. Only the DOM selection goes: ProseMirror keeps its selection
+  state (nothing is dispatched, nothing scrolls) and restores it when
+  the ritual is focused again, as Done then a click or Tab into the
+  text does. The drawing also cancels Ctrl/Cmd+X, C and V (no object
+  clipboard yet); the panel's fields keep theirs. The jsdom test
+  recreates Chromium's selection (jsdom itself moves the selection into
+  a focused element) and its choice of target for a cut.
+- **Undo and redo while the ritual was locked (M3; 3476c25).** They
+  were handed to the ritual's history before the lock was checked, so
+  an undo while a source sync or save held the ritual moved the visual
+  document under the source panel ("Both panels changed"). The editor
+  ignores them while locked, and the host's undo and redo check the
+  editor (and the ritual it projects) themselves. They now use
+  `undoNoScroll` and `redoNoScroll`, so an undo from the hall editor
+  does not scroll the ritual to its caret (m1).
+- **Writes while locked, and writes that never landed (Fable (a), (b);
+  m2, m3; 3476c25).** A gesture ending as the host locks is dropped;
+  `writeHallToAtom` refuses while the editor or the ritual takes no
+  changes, and confirms after dispatching that the atom holds the new
+  attributes and children: a plugin's `filterTransaction` (the hall
+  placement rule drops every write while any hall stands where it may
+  not) dropped the write silently, and the editor went on showing a
+  hall the ritual did not have. A change the host does not take leaves
+  the host's hall shown and says "That change was not made; the hall
+  is as it was." under the drawing and in the live region; a refused
+  field shows the hall's value again with "Not written".
+- **The atom's lock state (Fable (c); 3476c25)** read the ritual
+  owner's `isEditable` while subscribing only to the editor's own
+  updates; it now subscribes to each.
+- **Ctrl+S saved without the value being typed in a field (m4;
+  522d4bb).** A field writes its value when left, and Ctrl+S does not
+  leave it, nor does a Save button that does not take the focus
+  (Safari's). Fields register a flush in `src/doc/pendingEdits.ts`;
+  the semantic editor's Ctrl+S and Save write pending values first
+  and, when one changed the document, save at the next render through
+  the queue Ctrl+S already used for source being applied.
+- **A field disabled while holding typed text (Fable (d); 522d4bb).**
+  Chromium drops the focus of a field disabled by a lock without a
+  blur, so the text stayed unwritten while looking written. The field
+  keeps it while locked and writes it on unlocking, as leaving the
+  field would have; a hall changed under it during the lock replaces
+  it.
+- **The drawing rescaled under a drag (m5; bc6db42).** The view box
+  includes every object, so a drag past the edge grew it, the drawing
+  shrank under the pointer and the page height jumped. The view box is
+  held for the gesture: the drawing stands in a frame of the held
+  proportions, placed within it, and takes its new extent on release.
+- **A second touch took over a drag (m6; bc6db42):** other pointers
+  are ignored while a gesture runs.
+- **Nits (3e1cb42):** labels and free text are hit before any object,
+  as they are drawn above them; a switch put back to its default
+  removes the attribute (glow off, compass on); a one-sided bound reads
+  "At least 0" or "At most 4"; the drawing takes the focus on arriving
+  only if the focus is nowhere or in the editor (an author who moved
+  on while the chunk loaded keeps their place); Edit hall stays,
+  disabled, while the ritual is locked; the handles follow
+  `(pointer: coarse)` as it changes; the drawing's name no longer
+  changes with the selection (screen readers announced it with the
+  live region on every Tab), the selection being in its description;
+  the reader import-boundary test forbids the hall editor's modules;
+  a stale comment goes.
+
+What was verified, and how:
+
+- **Tests:** 26 new and 4 extended (in `GdHallEditor.test.tsx`,
+  `GdHallAtomEditor.test.tsx`, `hallGeometry.test.ts` and
+  `SemanticEditor.test.tsx`, where a hall field typed in and then
+  Ctrl+S, or Save pressed without taking the focus, is saved). The
+  compiler is untouched: `semantic.ts`, `semanticCompile.ts`,
+  `semanticCompilerImpl.ts` and `ritualNodeIds.ts` have no diff.
+- **In the browser** (Turbopack dev server from this branch on
+  127.0.0.1:3187, headless Chromium, the local Creator; "Hall check
+  (stage B)" in Fixture Temple, restored and saved as it was
+  afterwards). The dev server must listen on 127.0.0.1 (`-H
+  127.0.0.1`), or Next blocks the page's dev resources there and it
+  never hydrates; signing in on 127.0.0.1 then works and leaves a
+  `localhost` session alone. At 1440 × 900: "Jachin" typed into the
+  black pillar's label, then the Hegemon dragged: the source had both,
+  one Ctrl+Z took back only the drag; Ctrl+Z during a drag undid the
+  previous nudge and the release wrote nothing; Delete during a drag
+  removed the Hegemon and the release did not bring it back. With "Let
+  the hall be prepared." selected in the ritual, Edit hall left no
+  page selection (ProseMirror's kept), and Ctrl+X, C and V left the
+  ritual's text as it was; Done gave the focus to Edit hall with
+  ProseMirror's selection unchanged. In split view, with the source
+  made invalid (the visual panel locked), Ctrl+Z and Ctrl+Y in the
+  hall editor changed nothing and no "Both panels changed" appeared.
+  A label typed and Ctrl+S pressed in the field: the saved revision
+  has it. Escape mid-drag wrote nothing; a corner handle scaled; Add
+  → Marker, its text emptied, the warning selected it; Undo, Done.
+  At 390 × 844 with touch: a tap selected, a touch drag moved the
+  Hegemon a square, the panel stood below, no horizontal scroll; at
+  that width only objects at least about 3.25 squares across have
+  room for finger-sized handles (the platform after + twice). The
+  reader was not checked: the minimal local environment (database and
+  local sign-in only) has no publication storage, and publication
+  answers 503, so the reader has no ritual to show; no reader code
+  changed. Screenshots are outside the repository.
+- **Documentation screenshots** were not recaptured: the capture
+  publishes the sample rituals first, which needs the storage the
+  minimal environment lacks. No documentation fixture holds a hall,
+  and the only change to a screen they show without one is the Save
+  button's handler, so they are unchanged by this round.
+
 ## Commits
 
 | Commit | Change |
@@ -1899,6 +2046,11 @@ What was verified, and how:
 | 447f30a | The resolver reports each object's frame, position and scale, and each door's path (D) |
 | d7bec90 | The visual hall editor `GdHallEditor`: selection, drag, handles, keys, properties panel, palette, warnings; its model, geometry, edits and palette modules; randomised operations on every preset (D) |
 | fc00423 | Edit hall in the ritual editor's hall atom: in place, one undo step per gesture, ProseMirror kept out of the editor's events (D) |
+| bc6db42 | Drags applied by node ID to the hall held at release; gestures ended by Escape, undo, redo, Delete, a lock or a new hall; the view box held during a drag; one pointer at a time (D review M1, m5, m6) |
+| 0c5b352 | The page's text selection cleared when the hall drawing takes the focus; Ctrl/Cmd+X, C and V cancelled there (D review M2) |
+| 3476c25 | Undo and redo only while the ritual takes changes, without scrolling; `writeHallToAtom` refuses while locked and reports a dropped write; refusals shown (D review M3, m1–m3; Fable review) |
+| 522d4bb | Ctrl+S and Save write a hall field's typed value first (`pendingEdits.ts`); a field disabled by a lock writes on unlocking (D review m4; Fable review) |
+| 3e1cb42 | Labels hit first; defaults remove switches; one-sided bounds; focus only for a waiting author; Edit hall disabled, not hidden; `(pointer: coarse)` followed; the selection described, not named (D review nits) |
 
 ## Future
 
@@ -1994,3 +2146,14 @@ its object; Firefox and Safari, and a real phone or tablet, for the
 pointer, touch and focus handling (checked in headless Chromium with
 CDP touch events only; no Safari device); Chromium not scrolling a pan
 that begins within a touch's radius of an object.
+
+From the stage D review fixes: the ritual creation form saves through
+its Create button, which in Safari does not take the focus, so a hall
+field still being typed there is not written first (only the semantic
+editor's Ctrl+S and Save flush); the save that Ctrl+S starts locks the
+ritual, which disables the field and drops its focus, so the author
+clicks back into it; on a phone only objects at least about 3.25
+squares across get finger-sized handles at 390 px (the panel scales
+the rest); the reader and the documentation screenshots were not
+rechecked in this round (no publication storage in the minimal local
+environment).
