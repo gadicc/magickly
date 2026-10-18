@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { HALL_PRESETS } from "@magick-components/gd/hall/presets";
 import { Editor, type JSONContent } from "@tiptap/core";
-import { NodeSelection } from "@tiptap/pm/state";
+import { NodeSelection, TextSelection } from "@tiptap/pm/state";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   gdHallInsertionRange,
@@ -383,6 +383,38 @@ describe("where the toolbar puts a hall", () => {
           ),
       ),
     ).toEqual(["hr", "gdHall"]);
+  });
+  it("goes at the end of the ritual for Select All", () => {
+    expect(
+      range([block("title", p("Opening")), p("One"), p("Two")], (e) =>
+        e.commands.selectAll(),
+      ),
+    ).toEqual(["title text", "text", "br", "text", "gdHall"]);
+  });
+  it("goes after a selection across blocks, not inside it", () => {
+    const content = [p("One"), task(p("Said.")), p("Three"), p("Four")];
+    expect(
+      range(content, (e) => e.commands.setTextSelection({ from: 2, to: 12 })),
+    ).toEqual(["text", "task text", "gdHall", "text", "br", "text"]);
+    // Ending in the paragraph after the task: after that paragraph.
+    expect(
+      range(content, (e) => e.commands.setTextSelection({ from: 2, to: 17 })),
+    ).toEqual(["text", "task text", "text", "gdHall", "text"]);
+    // Backwards (head before anchor): still after the selection's end.
+    expect(
+      range(content, (e) =>
+        e.view.dispatch(
+          e.state.tr.setSelection(TextSelection.create(e.state.doc, 17, 2)),
+        ),
+      ),
+    ).toEqual(["text", "task text", "text", "gdHall", "text"]);
+  });
+  it("keeps a selection within one paragraph counted from its start", () => {
+    expect(
+      range([p("One two"), p("Three")], (e) =>
+        e.commands.setTextSelection({ from: 2, to: 5 }),
+      ),
+    ).toEqual(["text", "gdHall", "text"]);
   });
 });
 

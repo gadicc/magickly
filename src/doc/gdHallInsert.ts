@@ -1,6 +1,6 @@
 import type { HallPreset } from "@magick-components/gd/hall/presets";
 import type { JSONContent } from "@tiptap/core";
-import type { Node } from "@tiptap/pm/model";
+import type { Node, ResolvedPos } from "@tiptap/pm/model";
 import {
   type EditorState,
   NodeSelection,
@@ -58,23 +58,30 @@ export function gdHallPresetAtom(
  * or a list that is after the task, title or list; in a note, after the
  * paragraph in the note. An empty paragraph where a hall may stand is
  * replaced. A selected block counts as the block that holds the cursor.
+ * A selection whose ends lie in different blocks (Select All among them)
+ * counts from its end, so the hall goes after the selection, never before
+ * or inside it.
  */
 export function gdHallInsertionRange(state: EditorState): {
   from: number;
   to: number;
 } {
   const { selection } = state;
-  const $pos = selection.$from;
+  const inOneBlock =
+    selection instanceof NodeSelection ||
+    selection.empty ||
+    (selection.$from.parent.isTextblock &&
+      selection.$from.sameParent(selection.$to));
+  const $pos = inOneBlock ? selection.$from : selection.$to;
   for (let depth = $pos.depth; depth > 0; depth--) {
     if (!holdsGdHall($pos.node(depth))) continue;
-    return rangeIn(state, depth);
+    return rangeIn(state, $pos, depth);
   }
-  return rangeIn(state, 0);
+  return rangeIn(state, $pos, 0);
 }
 
-function rangeIn(state: EditorState, depth: number) {
+function rangeIn(state: EditorState, $pos: ResolvedPos, depth: number) {
   const { selection } = state;
-  const $pos = selection.$from;
   if (depth === $pos.depth) {
     // The cursor stands between blocks of the container, or one of them
     // is selected.
