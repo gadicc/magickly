@@ -1,7 +1,7 @@
 import { estimateHallAspect } from "@magick-components/gd/hall/aspect";
 import type { HallNode } from "@magick-components/gd/hall/types";
 import dynamic from "next/dynamic";
-import type { CSSProperties } from "react";
+import { Component, type CSSProperties, type ReactNode } from "react";
 import styles from "./frames.module.css";
 
 /**
@@ -25,6 +25,40 @@ const GdHallDrawing = dynamic(() => import("./GdHallDrawing"), {
 });
 
 /**
+ * A drawing whose chunk fails to load, or that throws, leaves the
+ * placeholder and a short note rather than reaching the reader's
+ * whole-document boundary: the rest of the ritual still reads. A new
+ * `hall` tries again: the editor keeps one frame while its hall is edited.
+ */
+class HallBoundary extends Component<
+  { hall: HallNode; children: ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidUpdate(previous: { hall: HallNode }) {
+    if (this.state.failed && previous.hall !== this.props.hall)
+      this.setState({ failed: false });
+  }
+
+  render() {
+    if (!this.state.failed) return this.props.children;
+    return (
+      <>
+        <HallPlaceholder />
+        <figcaption className={styles.hallFailure}>
+          The temple hall could not be drawn.
+        </figcaption>
+      </>
+    );
+  }
+}
+
+/**
  * A temple hall diagram, for the reader and the editor alike. `hall` is the
  * compiled `gdHall` row; its content is untrusted and the renderer draws
  * what it can of it.
@@ -36,7 +70,9 @@ export function GdHallFrame({ hall }: { hall: HallNode }) {
   } as CSSProperties;
   return (
     <figure data-ritual-frame="gdHall" className={styles.hall} style={style}>
-      <GdHallDrawing hall={hall} />
+      <HallBoundary hall={hall}>
+        <GdHallDrawing hall={hall} />
+      </HallBoundary>
     </figure>
   );
 }

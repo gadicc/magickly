@@ -175,3 +175,9 @@
   aspect-ratio: var(--gd-hall-aspect, 3 / 4);
   background: #f4f4f4;
 }
+.hallFailure {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #666;
+  text-align: center;
+}
