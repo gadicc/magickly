@@ -329,8 +329,8 @@ Follow-ups are separate from the completed migration work:
   of `src/components` (or off their app imports), embedded fonts in the Tree
   of Life exports, Firefox and Safari checks of PNG export with embedded fonts,
   a credit for the RWS tarot images and the Pinterest hotlink in `2=9.pug`,
-  the Neophyte preset's "Dadouchos" label over the South wall, the
-  README's claim (lines 13–15) that
+  single-word labels wider than their cell, which the layout cannot keep
+  inside the walls, the README's claim (lines 13–15) that
   `src/components/LICENSE.txt` lists the components importing app code
   (it lists none), a hook-free id scheme for `GdHall` before halls are
   rendered on the server or exported from the reader, resvg-wasm's

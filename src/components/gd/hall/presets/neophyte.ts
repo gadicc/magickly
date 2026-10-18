@@ -45,7 +45,7 @@ export const neophyte: HallPreset = {
           {
             type: "officer",
             role: "dadouchos",
-            x: 14.95,
+            x: 14.75,
             y: 8,
             labelPos: "bottom",
           },

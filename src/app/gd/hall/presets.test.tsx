@@ -7,12 +7,15 @@ import {
 } from "@magick-components/gd/hall";
 import {
   compassBox,
+  FLOOR_SIZE,
+  FLOOR_STROKE,
   type Rect,
   WALL_GAP,
 } from "@magick-components/gd/hall/layout";
 import {
   HALL_PRESETS,
   HALL_SOURCE_WORKS,
+  neophyte,
   zelator1,
   zelator2,
 } from "@magick-components/gd/hall/presets";
@@ -104,6 +107,22 @@ describe("the presets", () => {
       );
       expect(caption?.text, preset.id).toBe(preset.title);
     }
+  });
+});
+
+describe("the neophyte Dadouchos", () => {
+  it("keeps its label clear of the floor's South outline", () => {
+    // "Dadouchos" is one word wider than its cell, so only the officer's
+    // place can keep it inside: at x = 14.95 and 14.9 its "s" lay on the
+    // outline, whose inner edge is half a stroke inside the floor's edge.
+    const dadouchos = resolveHall(neophyte.hall, {
+      art: gdHallArt,
+    }).objects.find(
+      (object) => object.node.role === "dadouchos",
+    ) as ResolvedObject;
+    const [label] = dadouchos.labels;
+    expect(label.lines.map((line) => line.text)).toEqual(["Dadouchos"]);
+    expect(label.bounds.x1).toBeLessThan(FLOOR_SIZE - FLOOR_STROKE / 2);
   });
 });
 

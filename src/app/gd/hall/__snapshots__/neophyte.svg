@@ -570,7 +570,7 @@
 </use>
 <use href="#_R_0_-art12" transform="translate(105 800) scale(1.6)">
 </use>
-<use href="#_R_0_-art13" transform="translate(1495 800) scale(1.6)">
+<use href="#_R_0_-art13" transform="translate(1475 800) scale(1.6)">
 </use>
 <use href="#_R_0_-art14" transform="translate(800 1450) scale(100)">
 </use>
@@ -600,7 +600,7 @@
 <text x="105" y="928.11" font-size="43" text-anchor="middle">Stolistes</text>
 </g>
 <g>
-<text x="1495" y="928.11" font-size="43" text-anchor="middle">Dadouchos</text>
+<text x="1475" y="928.11" font-size="43" text-anchor="middle">Dadouchos</text>
 </g>
 <g>
 <text x="800" y="1344.68" font-size="43" text-anchor="middle">Hiereus</text>

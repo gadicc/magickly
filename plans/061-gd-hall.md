@@ -1025,12 +1025,20 @@ Gadi's decisions of 17–18 October 2026, implemented on `gate/gd-hall-b`:
   were rendered again afterwards. The dais rows centre in the dais again
   (the `y=−2.7` workaround went); Theoricus 2's Banner of the East moved
   from y = −1.24 to −0.84, as in the other dais-5 presets, because the
-  Hierophant's lamen covered its hanger (it touched it before too). In
+  Hierophant's lamen covered its hanger (it touched it before too);
+  Gadi accepted this as drift normalised (18 October 2026). In
   Zelator 2 "Hiereus" and "Keryx" no longer meet (0.34 squares apart),
-  and no label meets a compass word. The Neophyte "Dadouchos" still runs
-  0.06 squares past the floor's edge into the South wall band (a single
-  word: the cell width cannot help; Follow-ups), and Theoricus 1's
+  and no label meets a compass word. The Neophyte "Dadouchos" ran 0.06
+  squares past the floor's edge into the South wall band (a single
+  word: the cell width cannot help); before stage B the Dadouchos moved
+  from x = 14.95 to 14.75. The x = 14.9 proposed for it still laid the
+  final "s" on the floor's outline when rasterised (its advance ends at
+  16.01 squares, the outline's inner edge is at 15.93); at 14.75 the
+  label ends at 15.86, clear of it, and a test pins that. Theoricus 1's
   "Hegemon" ends at the floor's edge.
+- **Citations** for the lamen rings: decision 9 and `lamen.tsx`.
+- **Past Hierophant role icon**: the brackets around it went, since the
+  white ring now tells it from the Hierophant's.
 - **Lamen rings**: decision 9.
 - **Art**: the lifted legacy art stays until stage H; no change.
 - **Tarot titles**: the common Rider–Waite titles, with "The Universe"
@@ -1114,9 +1122,9 @@ files the import-boundary test still allows (`Link`, `Tiles`, `Mercury`,
 `planetarySpirits`, `entity/index`; the README note below); export font
 embedding for the Tree of Life; Firefox and Safari checks of PNG export with
 embedded fonts; whether a hall's PNG embeds Enochian Plain for the tablets
-(Stage A3 notes); the Neophyte "Dadouchos" label over the South wall (a
-single word wider than the cell: move the officer or let labels shift
-inside the walls); the
+(Stage A3 notes); labels of single words wider than their cell, which
+the layout cannot keep inside the walls (the Neophyte "Dadouchos" was
+moved instead: Decisions before stage B); the
 RWS tarot credit and the Pinterest hotlink in `2=9.pug`;
 `src/components/entity/entityFields.test.ts`, which reaches app code
 through `import.meta.glob("../../app/**/fields.ts")`, a path the
