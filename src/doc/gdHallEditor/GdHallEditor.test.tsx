@@ -13,6 +13,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { gdHallArt } from "@/app/gd/hall/art";
 import { flushPendingEdits } from "../pendingEdits";
 import { GdHallEditor } from "./GdHallEditor";
+import { parseNumberField } from "./HallProperties";
 import type { HallElement } from "./hallModel";
 import {
   byAttr,
@@ -159,14 +160,20 @@ const key = (
   name: string,
   init: KeyboardEventInit = {},
 ) => fireEvent.keyDown(surface, { key: name, ...init });
-const selected = () =>
-  screen.getByRole("application").getAttribute("aria-label");
+/** What the drawing's description says is selected. */
+const selected = () => {
+  const ids = screen
+    .getByRole("application")
+    .getAttribute("aria-describedby")
+    ?.split(" ");
+  return document.getElementById(ids?.[0] ?? "")?.textContent;
+};
 
 describe("entering and the keyboard", () => {
   it("starts with the drawing focused and nothing selected", () => {
     const { surface } = setup();
     expect(document.activeElement).toBe(surface);
-    expect(selected()).toBe("Temple hall editor");
+    expect(selected()).toBe("Nothing selected");
     expect(screen.getByRole("heading", { name: /^Hall/ })).toBeTruthy();
   });
 
@@ -197,7 +204,7 @@ describe("entering and the keyboard", () => {
     const { surface, done } = setup();
     key(surface, "Tab");
     key(surface, "Escape");
-    expect(selected()).toBe("Temple hall editor");
+    expect(selected()).toBe("Nothing selected");
     expect(done).not.toHaveBeenCalled();
     key(surface, "Escape");
     expect(done).toHaveBeenCalledOnce();
@@ -233,7 +240,7 @@ describe("entering and the keyboard", () => {
     key(surface, "Delete");
     expect(changes).toHaveLength(9);
     expect((current().children?.[0] as HallElement).children).toHaveLength(1);
-    expect(selected()).toBe("Temple hall editor");
+    expect(selected()).toBe("Nothing selected");
     // Without a selection, keys do nothing.
     key(surface, "ArrowRight");
     key(surface, "Backspace");
@@ -317,7 +324,7 @@ describe("the pointer", () => {
     pointer("pointerUp", surface, at(8, 3));
     pointer("pointerDown", surface, at(6, 11));
     pointer("pointerUp", surface, at(6, 11));
-    expect(selected()).toBe("Temple hall editor");
+    expect(selected()).toBe("Nothing selected");
   });
 
   it("scales by a corner handle", () => {
@@ -338,12 +345,58 @@ describe("the pointer", () => {
   it("ignores other buttons and other pointers", () => {
     const { surface, changes } = setup();
     pointer("pointerDown", surface, at(8, 3), { button: 2 });
-    expect(selected()).toBe("Temple hall editor");
+    expect(selected()).toBe("Nothing selected");
     pointer("pointerDown", surface, at(8, 3));
     pointer("pointerMove", surface, at(10, 3), { pointerId: 2 });
     pointer("pointerUp", surface, at(10, 3), { pointerId: 2 });
     pointer("pointerUp", surface, at(8, 3));
     expect(changes).toHaveLength(0);
+  });
+});
+
+describe("focus, touch and announcements", () => {
+  it("keeps the author's place when the editor arrives late", () => {
+    const elsewhere = document.createElement("input");
+    document.body.append(elsewhere);
+    try {
+      elsewhere.focus();
+      const { surface } = setup();
+      expect(document.activeElement).toBe(elsewhere);
+      expect(surface).not.toBe(document.activeElement);
+    } finally {
+      elsewhere.remove();
+    }
+  });
+
+  it("follows a pointer that becomes, or stops being, coarse", () => {
+    const listeners = new Set<() => void>();
+    const query = {
+      matches: false,
+      addEventListener: (_: string, listener: () => void) =>
+        listeners.add(listener),
+      removeEventListener: (_: string, listener: () => void) =>
+        listeners.delete(listener),
+    };
+    vi.stubGlobal("matchMedia", () => query);
+    setup();
+    const touch =
+      "Tap to select, drag to move, drag a corner to scale; the panel edits the rest.";
+    expect(screen.queryByText(touch)).toBeNull();
+    query.matches = true;
+    act(() => {
+      for (const listener of listeners) listener();
+    });
+    expect(screen.getByText(touch)).toBeTruthy();
+    cleanup();
+    expect(listeners.size).toBe(0);
+  });
+
+  it("names the drawing once, and announces each selection", () => {
+    const { surface } = setup();
+    key(surface, "Tab");
+    expect(surface.getAttribute("aria-label")).toBe("Temple hall editor");
+    expect(selected()).toBe("Imperator selected");
+    expect(screen.getByText("Selected Imperator")).toBeTruthy();
   });
 });
 
@@ -560,8 +613,9 @@ describe("the properties panel", () => {
     fireEvent.change(label, { target: { value: "Boaz" } });
     fireEvent.blur(label);
     expect(byAttr(current(), "kind", "black").attrs.label).toBe("Boaz");
+    // Switched off, a flag that defaults to off goes from the source.
     fireEvent.click(screen.getByRole("switch", { name: "Glow" }));
-    expect(byAttr(current(), "kind", "black").attrs.glow).toBe(false);
+    expect(byAttr(current(), "kind", "black").attrs).not.toHaveProperty("glow");
     fireEvent.mouseDown(screen.getByRole("combobox", { name: "Kind" }));
     fireEvent.click(await screen.findByRole("option", { name: "white" }));
     expect(
@@ -573,6 +627,22 @@ describe("the properties panel", () => {
       findNode(current(), (node) => node.attrs.label === "Boaz")?.attrs,
     ).not.toHaveProperty("kind");
     expect(changes).toHaveLength(4);
+    fireEvent.click(screen.getByRole("switch", { name: "Glow" }));
+    expect(
+      findNode(current(), (node) => node.attrs.label === "Boaz")?.attrs.glow,
+    ).toBe(true);
+  });
+
+  it("states a one-sided bound as one", () => {
+    expect(parseNumberField("-1", { kind: "number", min: 0 })).toEqual({
+      error: "At least 0",
+    });
+    expect(parseNumberField("5", { kind: "number", max: 4 })).toEqual({
+      error: "At most 4",
+    });
+    expect(parseNumberField("3", { kind: "number", min: 0 })).toEqual({
+      value: 3,
+    });
   });
 
   it("offers roles and item kinds by name, keeping unknown ones", async () => {
@@ -623,6 +693,9 @@ describe("the properties panel", () => {
     expect(current().children).toHaveLength(1);
     fireEvent.click(screen.getByRole("switch", { name: "Compass" }));
     expect(current().attrs.compass).toBe(false);
+    // On again is its default: the attribute goes.
+    fireEvent.click(screen.getByRole("switch", { name: "Compass" }));
+    expect(current().attrs).not.toHaveProperty("compass");
     const dais = screen.getByRole("textbox", { name: "Dais depth" });
     fireEvent.change(dais, { target: { value: "5" } });
     fireEvent.blur(dais);
@@ -739,7 +812,7 @@ describe("the host's replies", () => {
     key(surface, "d", { ctrlKey: true });
     expect(selected()).toContain("Imperator selected");
     key(surface, "z", { ctrlKey: true });
-    expect(selected()).toBe("Temple hall editor");
+    expect(selected()).toBe("Nothing selected");
   });
 
   it("keeps the hall as it was when the host refuses a change", () => {
@@ -931,7 +1004,7 @@ describe("drawing and frames", () => {
     );
     fireEvent.pointerDown(surface, { clientX: 10, clientY: 10, pointerId: 1 });
     fireEvent.pointerUp(surface, { clientX: 10, clientY: 10, pointerId: 1 });
-    expect(selected()).toBe("Temple hall editor");
+    expect(selected()).toBe("Nothing selected");
     expect(changes).toHaveLength(0);
   });
 });

@@ -225,13 +225,25 @@ export interface HallHit {
 }
 
 /**
- * The object or door under `point`: the topmost, as drawn (later objects
- * draw over earlier ones, a host's children over the host), then doors.
+ * The object or door under `point`: the topmost, as drawn. Labels and
+ * free text draw above every object (`GdHall` draws them last), so they
+ * are tried first, in their own order; then the objects (later objects
+ * draw over earlier ones, a host's children over the host); then doors.
  */
 export function hitTest(hall: ResolvedHall, point: Point): HallHit | null {
+  const at = (rects: readonly Rect[]) =>
+    rects.some((rect) => inside(rect, point));
   for (let index = hall.objects.length - 1; index >= 0; index--) {
     const object = hall.objects[index];
-    if (hitRects(object).some((rect) => inside(rect, point)))
+    // Free text is all text; an object's labels only its text.
+    const text = object.text
+      ? hitRects(object)
+      : object.labels.map((label) => label.bounds);
+    if (at(text)) return { path: object.path, kind: "object" };
+  }
+  for (let index = hall.objects.length - 1; index >= 0; index--) {
+    const object = hall.objects[index];
+    if (!object.text && at(hitRects(object).slice(0, 1)))
       return { path: object.path, kind: "object" };
   }
   for (const door of hall.doors)

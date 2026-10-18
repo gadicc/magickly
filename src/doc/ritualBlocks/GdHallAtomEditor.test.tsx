@@ -101,6 +101,19 @@ describe("editing a hall in the ritual editor", () => {
     );
   }, 60_000);
 
+  it("keeps Edit hall in place, disabled, while the ritual is locked", async () => {
+    render(<Host />);
+    const button = (await screen.findByRole("button", {
+      name: "Edit hall",
+    })) as HTMLButtonElement;
+    const editor = current as Editor;
+    editor.setEditable(false);
+    await waitFor(() => expect(button.disabled).toBe(true));
+    expect(screen.getByRole("button", { name: "Edit hall" })).toBe(button);
+    editor.setEditable(true);
+    await waitFor(() => expect(button.disabled).toBe(false));
+  }, 60_000);
+
   it("keeps cut, copy and paste away from the ritual's text", async () => {
     const { editor, surface } = await openEditor();
     await waitFor(() => expect(document.activeElement).toBe(surface));

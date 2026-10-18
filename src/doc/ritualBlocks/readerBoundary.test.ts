@@ -84,7 +84,9 @@ it("keeps Tiptap, ProseMirror and editor code out of the reader import graph", (
     expect(name, file).not.toMatch(/(?:@tiptap|prosemirror)/);
   const all = [...files(graph.static), ...files(graph.lazy)];
   expect(
-    all.filter((file) => /tiptap|ForEditing|export\//i.test(file)),
+    all.filter((file) =>
+      /tiptap|ForEditing|export\/|gdHallEditor|GdHallAtomEditor/i.test(file),
+    ),
   ).toEqual([]);
 });
 

@@ -237,6 +237,39 @@ describe("hitTest", () => {
     expect(hitTest(tiny, { x: 3.25, y: 3.25 })?.path).toEqual([0, 0]);
   });
 
+  it("hits a label over a later object, as labels are drawn over it", () => {
+    const hall = (cup = "") =>
+      resolveHall(
+        hallRowOf(
+          hallFromPug(
+            "gdHall",
+            "  floor",
+            '    pillar(kind="black", x=4, y=3, label="Boaz")',
+            ...(cup ? [`    item(kind="cup", ${cup})`] : []),
+          ),
+        ) ?? { type: "gdHall" },
+        { art: gdHallArt },
+      );
+    const label = hall().objects[0].labels[0].bounds;
+    const centre = {
+      x: round2((label.x0 + label.x1) / 2),
+      y: round2((label.y0 + label.y1) / 2),
+    };
+    // A cup later in the floor, standing on the pillar's label.
+    const both = hall(`x=${centre.x}, y=${centre.y}`);
+    expect(both.objects[0].labels[0].bounds).toEqual(label);
+    expect(hitRects(both.objects[1])[0].x0).toBeLessThan(centre.x);
+    expect(hitTest(both, centre)?.path).toEqual([0, 0]);
+    // Off the label, the cup's body is hit.
+    const body = hitRects(both.objects[1])[0];
+    expect(
+      hitTest(both, {
+        x: centre.x,
+        y: Math.max(body.y1 - 0.01, label.y1 + 0.01),
+      })?.path,
+    ).toEqual([0, 1]);
+  });
+
   it("hits free text by its box", () => {
     const hall = resolveHall(
       hallRowOf(

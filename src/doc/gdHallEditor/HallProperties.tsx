@@ -94,11 +94,16 @@ export function parseNumberField(
   if (trimmed === "") return { value: undefined };
   if (!/^-?(\d+\.?\d*|\.\d+)$/.test(trimmed)) return { error: "Not a number" };
   const value = round2(Number(trimmed));
-  if (
-    (spec.min !== undefined && value < spec.min) ||
-    (spec.max !== undefined && value > spec.max)
-  )
-    return { error: `Between ${spec.min} and ${spec.max}` };
+  const { min, max } = spec;
+  if ((min !== undefined && value < min) || (max !== undefined && value > max))
+    return {
+      error:
+        min === undefined
+          ? `At most ${max}`
+          : max === undefined
+            ? `At least ${min}`
+            : `Between ${min} and ${max}`,
+    };
   if (spec.integer && !Number.isInteger(value))
     return { error: "A whole number" };
   return { value };
@@ -284,7 +289,16 @@ function Field(props: FieldProps) {
             size="small"
             checked={checked}
             disabled={disabled}
-            onChange={(event) => onCommit(name, event.target.checked)}
+            // Switched to its default, the attribute goes, as an emptied
+            // field's does.
+            onChange={(event) =>
+              onCommit(
+                name,
+                event.target.checked === TRUE_BY_DEFAULT.has(name)
+                  ? undefined
+                  : event.target.checked,
+              )
+            }
             slotProps={{ input: { "data-hall-field": name } as object }}
           />
         }

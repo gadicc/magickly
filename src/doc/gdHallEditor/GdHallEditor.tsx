@@ -234,6 +234,7 @@ export function GdHallEditor({
   const [paletteChosen, setPaletteChosen] = useState(false);
   const frame = useRef<number | null>(null);
   const helpId = useId();
+  const selectionId = useId();
 
   const committed = useMemo(() => hallView(current, art), [current, art]);
   const viewCache = useRef(committed);
@@ -298,14 +299,20 @@ export function GdHallEditor({
     if (!editable) cancelGesture();
   }, [editable]);
 
+  // A touch screen gets larger handles; a tablet's keyboard or mouse can
+  // come and go.
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") return;
+    const query = window.matchMedia("(pointer: coarse)");
+    const update = () => setCoarse(query.matches);
+    update();
+    query.addEventListener?.("change", update);
+    return () => query.removeEventListener?.("change", update);
+  }, []);
+
   // Handles and hit areas are sized in pixels, whatever the drawing's size.
   useEffect(() => {
     const element = overlay.current;
-    const query =
-      typeof window.matchMedia === "function"
-        ? window.matchMedia("(pointer: coarse)")
-        : undefined;
-    setCoarse(!!query?.matches);
     if (!element || typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(() => {
       const box = committed.resolved?.viewBox;
@@ -316,10 +323,15 @@ export function GdHallEditor({
     return () => observer.disconnect();
   }, [committed.resolved]);
 
-  // Editing starts with the drawing focused, so keys work at once; the
-  // last pending frame goes with the editor.
+  // Editing starts with the drawing focused, so keys work at once, if the
+  // author is still waiting on this hall: the focus is nowhere (Edit hall,
+  // which opened it, is gone) or in the editor. An author who moved on
+  // while its code loaded keeps their place. The last pending frame goes
+  // with the editor.
   useEffect(() => {
-    surface.current?.focus({ preventScroll: true });
+    const active = document.activeElement;
+    if (!active || active === document.body || root.current?.contains(active))
+      surface.current?.focus({ preventScroll: true });
     return () => {
       if (frame.current !== null && frame.current >= 0)
         cancelAnimationFrame(frame.current);
@@ -755,12 +767,11 @@ export function GdHallEditor({
             className={styles.surface}
             role="application"
             aria-roledescription="hall editor"
-            aria-label={
-              selected
-                ? `Temple hall editor, ${hallNodeName(selected.node)} selected`
-                : "Temple hall editor"
-            }
-            aria-describedby={helpId}
+            // The name stays put; what is selected is described, read when
+            // the drawing takes the focus, and announced by the live region
+            // as it changes (a changing name was announced twice on Tab).
+            aria-label="Temple hall editor"
+            aria-describedby={`${selectionId} ${helpId}`}
             aria-disabled={!editable || undefined}
             tabIndex={0}
             data-gesture={gestureKind ?? undefined}
@@ -862,6 +873,11 @@ export function GdHallEditor({
               {notice}
             </p>
           )}
+          <p id={selectionId} className={styles.visuallyHidden}>
+            {selected
+              ? `${hallNodeName(selected.node)} selected`
+              : "Nothing selected"}
+          </p>
           <p id={helpId} className={styles.hint}>
             {!editable
               ? "The hall cannot be edited while the ritual is updating."

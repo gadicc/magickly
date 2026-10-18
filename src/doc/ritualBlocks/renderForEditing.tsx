@@ -361,7 +361,8 @@ export function RitualAtomForEditing({
               : tag === "gdHall"
                 ? "Temple hall"
                 : tag;
-  // The hall as the reader will draw it; the visual sub-editor is stage D.
+  // The hall as the reader will draw it, shown until Edit hall opens the
+  // hall editor in its place.
   const hall = useMemo(
     () => (tag === "gdHall" ? gdHallRow(node.attrs) : null),
     [tag, node.attrs],
@@ -417,13 +418,16 @@ export function RitualAtomForEditing({
       ) : (
         <div className={styles.label}>
           {caption}
-          {tag === "gdHall" && hall && editable && !editingHall && (
+          {tag === "gdHall" && hall && !editingHall && (
+            // Disabled, not hidden, while the ritual takes no changes (a
+            // save or source sync), so the label does not flicker.
             <Button
               ref={editHallButton}
               size="small"
               variant="outlined"
               startIcon={<EditOutlined fontSize="small" />}
               className={styles.hallEdit}
+              disabled={!editable}
               data-gd-hall-controls
               onClick={() => setEditingHall(true)}
             >
