@@ -1,5 +1,6 @@
 "use client";
 
+import { HALL_PRESETS, hallPreset } from "@magick-components/gd/hall/presets";
 import ArrowDropDown from "@mui/icons-material/ArrowDropDown";
 import FormatBold from "@mui/icons-material/FormatBold";
 import FormatItalic from "@mui/icons-material/FormatItalic";
@@ -30,6 +31,12 @@ import React from "react";
 import { formatRitualFileLocator } from "@/files/ritualFileLocator";
 import Upload from "@/lib/upload";
 import EditorActionButton from "./EditorActionButton";
+import {
+  caretAfterGdHall,
+  gdHallInsertionRange,
+  gdHallPresetAtom,
+  gdHallPresetGrade,
+} from "./gdHallInsert";
 import { RitualTaskDeletionNotice } from "./RitualTaskDeletionNotice";
 import { createRitualNodeId } from "./ritualNodeIds";
 import { ritualRoleCatalog } from "./ritualRoleCatalog";
@@ -49,7 +56,8 @@ type Kind =
   | "declareVar"
   | "a"
   | "img"
-  | "task";
+  | "task"
+  | "gdHall";
 type Element = Extract<RitualSemanticNode, { kind: "element" }>;
 type Option = { id: string; value: string; label: string };
 interface Fields {
@@ -87,10 +95,12 @@ const kindLabels: Record<Kind, string> = {
   a: "link",
   img: "image",
   task: "task",
+  gdHall: "temple hall",
 };
 const freshFields = (kind: Kind): Fields => ({
   kind,
-  value: "",
+  // A hall's value is the preset it copies.
+  value: kind === "gdHall" ? HALL_PRESETS[0].id : "",
   name: "",
   label: "",
   varType: "text",
@@ -419,8 +429,41 @@ export default function RitualVisualControls({
       .run();
   };
 
+  /**
+   * A copy of the chosen preset, after the block holding the cursor at the
+   * nearest level where a hall may stand (`gdHallInsertionRange`), with
+   * the caret after it: one transaction, so one undo step.
+   */
+  const insertHall = (id: string) => {
+    const preset = hallPreset(id);
+    if (!preset) {
+      setError("Choose a temple hall.");
+      return;
+    }
+    const { from, to } = gdHallInsertionRange(editor.state);
+    const tr = editor.state.tr.replaceWith(
+      from,
+      to,
+      editor.schema.nodeFromJSON(gdHallPresetAtom(preset)),
+    );
+    caretAfterGdHall(tr, from).scrollIntoView();
+    const before = editor.state.doc;
+    editor.view.dispatch(tr);
+    if (editor.state.doc === before) {
+      setError("This structure could not be inserted here.");
+      return;
+    }
+    editor.commands.focus();
+    setFields(null);
+    setError(null);
+  };
+
   const apply = () => {
     if (!fields || blocked) return;
+    if (fields.kind === "gdHall") {
+      insertHall(fields.value);
+      return;
+    }
     const previous = target ? editor.state.doc.nodeAt(target.pos) : null;
     if (target && previous?.attrs.id !== target.id) {
       setError(
@@ -885,6 +928,29 @@ export default function RitualVisualControls({
               <MenuItem value="todo">To-do</MenuItem>
               <MenuItem value="var">Variable reference</MenuItem>
               <MenuItem value="declareVar">Variable declaration</MenuItem>
+              <MenuItem value="gdHall">Temple hall</MenuItem>
+            </TextField>
+          )}
+          {fields?.kind === "gdHall" && (
+            <TextField
+              select
+              slotProps={{
+                select: {
+                  MenuProps: {
+                    sx: { visibility: concealed ? "hidden" : undefined },
+                  },
+                },
+              }}
+              label="Hall"
+              helperText="A copy of the preset, placed after the current block where a hall may stand"
+              value={fields.value}
+              onChange={(event) => change("value", event.target.value)}
+            >
+              {HALL_PRESETS.map((preset) => (
+                <MenuItem key={preset.id} value={preset.id}>
+                  {`${preset.title} (${gdHallPresetGrade(preset)})`}
+                </MenuItem>
+              ))}
             </TextField>
           )}
           {(fields?.kind === "title" ||

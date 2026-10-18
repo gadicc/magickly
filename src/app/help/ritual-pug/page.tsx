@@ -83,14 +83,14 @@ export default function RitualPugGuide() {
         <code> all-officers</code>; edit more detailed assignments with the cog.
       </p>
       <p>
-        Typing <code>/</code> opens a menu of Speech, Action, Note and Section
-        title; an empty line shows this as a hint. Use arrow keys and Enter, or
-        tap a choice. Speech and Action then ask for a role; typing a role
-        straight after the slash, such as <code>/ker</code>, offers it directly.
-        Enter on an empty last line of a speech or action leaves it. Escape
-        dismisses the menu and keeps that paragraph literal. Undo or immediate
-        Backspace restores the command after conversion. Pasted commands stay
-        literal.
+        Typing <code>/</code> opens a menu of Speech, Action, Note, Section
+        title and Temple hall; an empty line shows the first four as a hint. Use
+        arrow keys and Enter, or tap a choice. Speech and Action then ask for a
+        role; typing a role straight after the slash, such as <code>/ker</code>,
+        offers it directly. Enter on an empty last line of a speech or action
+        leaves it. Escape dismisses the menu and keeps that paragraph literal.
+        Undo or immediate Backspace restores the command after conversion.
+        Pasted commands stay literal.
       </p>
       <p>
         A command in the final paragraph of a task creates a sibling card.
@@ -98,6 +98,16 @@ export default function RitualPugGuide() {
         task stay literal. Collected footnotes outside tasks support the same
         commands and canonical undo history. Commands create ordinary tasks in
         source; they do not introduce a new saved format.
+      </p>
+      <p>
+        Temple hall lists the Golden Dawn hall presets by grade, as does typing
+        a grade straight after the slash, such as <code>/zel</code>, and the
+        toolbar’s Insert… dialog. Each inserts a copy of the preset that the
+        ritual then owns. A hall may stand at the top level or directly inside a
+        note, summary, list item or to-do. The slash command replaces its line
+        there, or follows a speech or action from its last line; elsewhere it is
+        not offered. The toolbar puts the hall after the block holding the
+        cursor, at the nearest place a hall may stand.
       </p>
       <h2>Finding and fixing errors</h2>
       <p>

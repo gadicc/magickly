@@ -217,3 +217,43 @@ it("never submits a host form from its dialogs", async () => {
   );
   expect(submitted).not.toHaveBeenCalled();
 });
+
+it("inserts a chosen temple hall after the current block, in one undo step", async () => {
+  const { editor } = setup();
+  act(() => {
+    editor.commands.setTextSelection(3);
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Insert structure" }));
+  fireEvent.mouseDown(
+    await screen.findByRole("combobox", { name: "Structure" }),
+  );
+  fireEvent.click(await screen.findByRole("option", { name: "Temple hall" }));
+  expect(
+    screen.getByRole("dialog", { name: "Insert temple hall" }),
+  ).toBeTruthy();
+  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Hall" }));
+  const presets = await screen.findAllByRole("option");
+  expect(presets.map((option) => option.textContent)).toEqual([
+    "Neophyte Temple (0=0)",
+    "Zelator Temple 1 (1=10, part 1)",
+    "Zelator Temple 2 (1=10, part 2)",
+    "Theoricus Temple 1 (2=9, part 1)",
+    "Theoricus Temple 2 (2=9, part 2)",
+  ]);
+  fireEvent.click(presets[3]);
+  fireEvent.click(screen.getByRole("button", { name: "Insert" }));
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  const doc = semanticFromTiptap(editor.getJSON());
+  expect(
+    doc.nodes.map((node) => (node.kind === "element" ? node.tag : node.kind)),
+  ).toEqual(["text", "gdHall"]);
+  expect(JSON.stringify(doc.nodes[1])).toContain('"caption"');
+  expect(JSON.stringify(doc.nodes[1])).toContain("Theoricus Temple 1");
+  // The caret waits after the hall, in a paragraph the document does not keep.
+  expect(editor.state.doc.lastChild?.type.name).toBe("paragraph");
+  expect(editor.state.selection.$from.parent).toBe(editor.state.doc.lastChild);
+  editor.commands.undo();
+  expect(
+    semanticFromTiptap(editor.getJSON()).nodes.map((node) => node.kind),
+  ).toEqual(["text"]);
+});

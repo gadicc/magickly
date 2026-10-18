@@ -1,10 +1,22 @@
 "use client";
 
+import { HALL_PRESETS, hallPreset } from "@magick-components/gd/hall/presets";
 import { type Editor, Extension } from "@tiptap/core";
 import { closeHistory } from "@tiptap/pm/history";
 import type { Node } from "@tiptap/pm/model";
-import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
+import {
+  Plugin,
+  PluginKey,
+  TextSelection,
+  type Transaction,
+} from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
+import {
+  caretAfterGdHall,
+  gdHallPresetAtom,
+  gdHallPresetGrade,
+  holdsGdHall,
+} from "./gdHallInsert";
 import { roles } from "./ritualBlocks/roles";
 import { RITUAL_SETTINGS_CHANGE } from "./ritualEditorHistory";
 import { ritualEditorOwner } from "./ritualEditorOwner";
@@ -15,7 +27,7 @@ import styles from "./ritualSlashCommands.module.css";
 import { ritualTaskContent } from "./ritualTaskCommands";
 
 type Mode = "say" | "do";
-type Block = "note" | "title";
+type Block = "note" | "title" | "gdHall";
 type Choice = {
   label: string;
   search: string;
@@ -23,14 +35,18 @@ type Choice = {
   mode?: Mode;
   role?: string;
   block?: Block;
+  /** A hall preset's id: the choice inserts a copy of it. */
+  preset?: string;
 };
 
 /**
  * Every visual slash command. The menu, its search and the empty-line hint
  * all read this list, so a new command needs only an entry here (and, for a
- * new kind of block, its conversion below).
+ * new kind of block, its conversion below). A command without a `hint` is
+ * offered in the menu but left out of the hint, which names the everyday
+ * ones.
  */
-export const RITUAL_SLASH_COMMANDS: readonly (Choice & { hint: string })[] = [
+export const RITUAL_SLASH_COMMANDS: readonly (Choice & { hint?: string })[] = [
   {
     mode: "say",
     label: "Say · Speech",
@@ -59,9 +75,18 @@ export const RITUAL_SLASH_COMMANDS: readonly (Choice & { hint: string })[] = [
     description: "A heading that starts a section",
     search: "title section heading",
   },
+  {
+    // Halls are rare beside speech and action, so the hint leaves them out.
+    block: "gdHall",
+    label: "Temple hall",
+    description: "A Golden Dawn temple floor plan; pick the grade next",
+    search: "temple hall floor plan diagram",
+  },
 ];
-const hintFor = (commands: readonly { hint: string }[]) => {
-  const hints = commands.map((command) => command.hint);
+const hintFor = (commands: readonly { hint?: string }[]) => {
+  const hints = commands.flatMap((command) =>
+    command.hint ? [command.hint] : [],
+  );
   return `Type / for ${hints.slice(0, -1).join(", ")} or ${hints.at(-1)}`;
 };
 /** Shown in an empty top-level line, where every slash command works. */
@@ -73,6 +98,8 @@ export const RITUAL_SLASH_HINT = hintFor(RITUAL_SLASH_COMMANDS);
  */
 function blockAllowed(editor: Editor, block: Block) {
   if (ritualEditorOwner(editor) !== editor) return false;
+  if (block === "gdHall") return !!hallInsertion(editor);
+  if (!insertion(editor)) return false;
   if (block !== "title") return true;
   const { $from } = editor.state.selection;
   return (
@@ -81,8 +108,8 @@ function blockAllowed(editor: Editor, block: Block) {
   );
 }
 const available = (editor: Editor) =>
-  RITUAL_SLASH_COMMANDS.filter(
-    (command) => !command.block || blockAllowed(editor, command.block),
+  RITUAL_SLASH_COMMANDS.filter((command) =>
+    command.block ? blockAllowed(editor, command.block) : !!insertion(editor),
   );
 type Snapshot = { ownerDoc: Node };
 type CommandState = {
@@ -159,6 +186,49 @@ function insertion(editor: Editor) {
   return { paragraph: p, sibling: null };
 }
 
+/**
+ * Where a hall replaces the command paragraph: in place when a hall may
+ * stand in the paragraph's container (the top level, a note, summary,
+ * list item or todo); as a sibling after a task when the command is the
+ * task's last paragraph and the task's own container may hold a hall, as
+ * Speech and Action do. Nowhere else (a title, a list itself, a
+ * footnote, an earlier task paragraph): the command is not offered, so it
+ * can never produce a hall the validator refuses.
+ */
+function hallInsertion(editor: Editor) {
+  if (ritualEditorOwner(editor) !== editor) return null;
+  const p = paragraph(editor);
+  if (!p) return null;
+  const depth = p.$from.depth;
+  const host = p.$from.node(depth - 1);
+  if (holdsGdHall(host)) return { paragraph: p, sibling: null };
+  if (
+    host.type.name !== "ritualTask" ||
+    depth < 2 ||
+    p.$from.index(depth - 1) !== host.childCount - 1 ||
+    !holdsGdHall(p.$from.node(depth - 2))
+  )
+    return null;
+  return { paragraph: p, sibling: p.$from.after(depth - 1) };
+}
+
+/** Presets matching a query, by title, grade or id. */
+function presetChoices(query: string, described: boolean): Choice[] {
+  const wanted = query.trim().toLowerCase();
+  return HALL_PRESETS.filter((preset) =>
+    `${preset.title} ${preset.grade} ${preset.id}`
+      .toLowerCase()
+      .includes(wanted),
+  ).map((preset) => ({
+    preset: preset.id,
+    label: preset.title,
+    description: described
+      ? `Temple hall · ${gdHallPresetGrade(preset)}`
+      : gdHallPresetGrade(preset),
+    search: preset.id,
+  }));
+}
+
 function permitted(editor: Editor) {
   return (
     !editor.isDestroyed &&
@@ -193,27 +263,36 @@ function roleChoices(editor: Editor, mode: Mode, query: string): Choice[] {
 }
 
 function choices(editor: Editor): Choice[] {
-  if (!permitted(editor) || !insertion(editor)) return [];
+  if (!permitted(editor)) return [];
+  const tasks = !!insertion(editor);
+  const halls = !!hallInsertion(editor);
+  if (!tasks && !halls) return [];
   const p = paragraph(editor)!;
   if (key.getState(editor.state)?.dismissed === p.pos) return [];
+  const hall = /^\/hall\s(.*)$/i.exec(p.text);
+  if (hall) return halls ? presetChoices(hall[1], false) : [];
   const match = /^\/(say|do)\s+([^\s]*)$/i.exec(p.text);
   if (match)
-    return roleChoices(
-      editor,
-      match[1].toLowerCase() as Mode,
-      match[2].toLowerCase(),
-    );
+    return tasks
+      ? roleChoices(
+          editor,
+          match[1].toLowerCase() as Mode,
+          match[2].toLowerCase(),
+        )
+      : [];
   if (!/^\/[a-z0-9-]*$/i.test(p.text)) return [];
   const query = p.text.slice(1).toLowerCase();
   const commands = available(editor)
     .filter((command) => command.search.includes(query))
     .map(({ hint: _hint, ...choice }) => choice);
-  // A role typed first (`/ker`) offers that role as Speech and Action. One
-  // letter that already matches a command would list half the catalog.
+  // A role or a hall typed first (`/ker`, `/zel`) offers that role as
+  // Speech and Action, or that hall. One letter that already matches a
+  // command would list half the catalog.
   if (!query || (query.length < 2 && commands.length)) return commands;
   return [
     ...commands,
-    ...roleChoices(editor, "say", query)
+    ...(halls ? presetChoices(query, true) : []),
+    ...(tasks ? roleChoices(editor, "say", query) : [])
       // Names that start with the query outrank names that merely contain it.
       .sort(
         (a, b) =>
@@ -241,12 +320,23 @@ function resolveRole(editor: Editor, input: string): string | null {
     : null;
 }
 
-/** Replace the command paragraph (or a trailing task paragraph) with `node`. */
+/**
+ * Replace the command paragraph (or a trailing task paragraph) with `node`
+ * and place the selection: by default the caret in its first paragraph,
+ * with `selectLength` characters selected.
+ */
 function replaceCommand(
   editor: Editor,
-  target: NonNullable<ReturnType<typeof insertion>>,
+  target: {
+    paragraph: NonNullable<ReturnType<typeof paragraph>>;
+    sibling: number | null;
+  },
   node: Node,
   selectLength = 0,
+  place = (tr: Transaction, at: number) =>
+    tr.setSelection(
+      TextSelection.create(tr.doc, at + 2, at + 2 + selectLength),
+    ),
 ) {
   const { pos, $from } = target.paragraph;
   const tr = closeHistory(editor.state.tr);
@@ -256,7 +346,7 @@ function replaceCommand(
     at = tr.mapping.map(target.sibling);
     tr.insert(at, node);
   } else tr.replaceWith(pos, pos + $from.parent.nodeSize, node);
-  tr.setSelection(TextSelection.create(tr.doc, at + 2, at + 2 + selectLength));
+  place(tr, at);
   editor.view.dispatch(tr.setMeta(RITUAL_SETTINGS_CHANGE, true));
   editor.view.dispatch(
     closeHistory(editor.state.tr)
@@ -295,6 +385,22 @@ function convertBlock(editor: Editor, block: Block) {
   return true;
 }
 
+/** Replace the command paragraph with a copy of a preset; the caret follows it. */
+function convertHall(editor: Editor, id: string) {
+  if (!permitted(editor)) return false;
+  const target = hallInsertion(editor);
+  const preset = hallPreset(id);
+  if (!target || !preset) return false;
+  replaceCommand(
+    editor,
+    target,
+    editor.schema.nodeFromJSON(gdHallPresetAtom(preset)),
+    0,
+    caretAfterGdHall,
+  );
+  return true;
+}
+
 function convert(editor: Editor, mode: Mode, role: string) {
   if (!permitted(editor)) return false;
   const target = insertion(editor);
@@ -313,11 +419,22 @@ function choose(editor: Editor, choice: Choice) {
       (item) =>
         item.mode === choice.mode &&
         item.role === choice.role &&
-        item.block === choice.block,
+        item.block === choice.block &&
+        item.preset === choice.preset,
     )
   )
     return;
-  if (choice.block) convertBlock(editor, choice.block);
+  if (choice.preset) convertHall(editor, choice.preset);
+  // Halls come in several presets: list them next, as roles follow Speech.
+  else if (choice.block === "gdHall")
+    editor.view.dispatch(
+      editor.state.tr.insertText(
+        "/hall ",
+        p.pos + 1,
+        editor.state.selection.from,
+      ),
+    );
+  else if (choice.block) convertBlock(editor, choice.block);
   else if (choice.mode && choice.role)
     convert(editor, choice.mode, choice.role);
   else if (choice.mode)
