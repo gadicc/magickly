@@ -16,7 +16,9 @@ of decision 2 (Stage B notes). Stage C is done on `gate/gd-hall-c`
 presets, the gallery copies a preset's Pug, and the Pug source editor
 shows hall warnings (Stage C notes), with the fixes from its review,
 among them text typed over a selected block without a keypress (Stage
-C review fixes); stage D is next.
+C review fixes). Stage D is done on `gate/gd-hall-d` (18 October
+2026): the visual hall editor, opened in place from a hall in the
+ritual editor (Stage D notes); stage E is next.
 
 Composable Golden Dawn temple-hall diagrams, authored in the ritual Pug
 dialect, drawn as inline SVG in the reader and editor, edited visually, and
@@ -504,7 +506,7 @@ a whole square); a palette to add components; delete and duplicate. Each
 gesture is one `setNodeMarkup` on the block: one undo step, IDs kept, new
 nodes given fresh IDs. Touch: tap to select, drag to move, the panel for the
 rest (plan 050's rule on small handles). Reparenting converts positions
-between frames.
+between frames. Built in stage D, without reparenting (Stage D notes).
 
 ### 12. Validation and safety
 
@@ -722,7 +724,7 @@ Each stage is a series of gated commits on `gate/gd-hall`.
 | A | `src/components/gd/hall`: model, validator, layout, renderer, chrome, labels and fonts; `Lamen` Past Hierophant variant and `Map` lookups (the move is stage H); legacy art under `src/app`; the five drawn presets; a read-only `/gd/hall` gallery with export and side-by-side comparison with the old SVGs; `sizes` comparison (removed before B) | yes | done (A1–A3 and the final review fixes, 17 October 2026) |
 | B | Spike results applied: compiler change (decision 2), Pug round trip, lazy reader block, `blockAtoms` entry with a static node view, boundary tests | until the first hall is saved | done (18 October 2026; Stage B notes). Rituals may now save halls, after which the layout contract (decision 4) holds |
 | C | `/hall` slash command with presets | yes | done (18 October 2026; Stage C notes): slash command and Insert… dialog, Copy Pug source on `/gd/hall`, hall warnings in the source editor |
-| D | Visual sub-editor | yes | |
+| D | Visual sub-editor | yes | done (18 October 2026; Stage D notes): `GdHallEditor`, opened from a hall's atom; reparenting left for later |
 | E | `/gd/hall` source, visual and split playground with local draft and share link | yes | |
 | F | Remaining vocabulary and the presets for Practicus, Philosophus and Portal (markers where art is missing) | yes | |
 | G | magick-data: Water, Fire and Union tablets | yes | |
@@ -1633,6 +1635,197 @@ editor and reader were recaptured from this branch
 byte-identical; `editor-visual` timed out once waiting for the editor
 and was captured on a second run.
 
+## Stage D notes
+
+Settled while building stage D (18 October 2026), where the plan or the
+brief left a choice or proved wrong:
+
+- **Where it lives, and its API.** `src/doc/gdHallEditor/` (AGPL, beside
+  the semantic model it edits): `GdHallEditor` takes `hall`, the
+  semantic `gdHall` element with its subtree and IDs as source holds it,
+  `art` (the app's `gdHallArt`), and calls `onChange(nextHall)` once per
+  completed gesture, with `onDone`, optional `onUndo`/`onRedo` (the
+  host's history), `editable` and `createId`. It holds no document and
+  no history: stage E mounts it with a playground's own. A host may
+  return `false` from `onChange` to refuse a hall; until the host gives
+  a new `hall` back the editor shows the one it sent, since the ritual
+  editor's node view draws a frame later and a second key press must
+  build on the first. Pure modules beneath it, each tested alone:
+  `hallModel.ts` (index by ID and by compiled path, immutable edits,
+  copies with fresh IDs, `normalizeHall`), `hallGeometry.ts`
+  (conversion, snapping, rounding, hit-testing), `hallEdits.ts` (one
+  function per gesture, returning the same hall when nothing changes)
+  and `hallPalette.ts`. The panel is `HallProperties.tsx`.
+- **The resolver reports frames.** Each resolved object now carries its
+  frame (origin, floor squares per frame unit), the `x` and `y` that
+  place it where it is drawn (offsets from `at` where it has one, a
+  row's spread position otherwise) and the scale it is drawn at; doors
+  carry their path (447f30a). The editor therefore never lays a hall
+  out twice to learn where a node's values come from. Additive; the
+  preset snapshots are unchanged.
+- **In the ritual editor** (`GdHallAtomEditor.tsx`, loaded only on
+  "Edit hall"): the atom shows its drawing and an Edit hall button;
+  editing happens in place, full width, the panel beside the drawing
+  from 720 px of container width and below it under that (a container
+  query, so the split view stacks too); Done or Escape with nothing
+  selected leaves, the focus going back to Edit hall. Each gesture is
+  one `setNodeMarkup` with history closed before and after (the Task
+  settings pattern), refused when the atom moved, changed identity or
+  would not be valid source. The atom's node view stops ProseMirror's
+  handling of every event inside `[data-gd-hall-controls]` (the button
+  and the editor), so the atom is never node-selected, neither on entry
+  nor on a press, ProseMirror never takes the editor's keys, and
+  `RitualSelectionInput` never sees text typed in the panel (it reaches
+  the field; the ritual's title is unchanged). Undo and redo inside the
+  editor are the ritual editor's. While the editor takes no changes (a
+  source sync, a save) the hall shows read-only with a note.
+- **Selection.** By click or tap, hit-tested on the resolver's boxes (at
+  least 0.6 squares across), labels and free text, topmost first (a
+  host's children over the host); doors by a band across their wall
+  line; empty floor clears it. Tab and Shift+Tab walk objects and doors
+  in document order and leave the drawing past either end, so the
+  keyboard is never trapped. The selection is a dashed outline, its
+  labels highlighted. The drawing is `role="application"`, labelled with
+  what is selected, and a polite live region says what each gesture did
+  ("Moved Hegemon to x 9.5, y 3").
+- **Coordinates.** A drag in floor squares is divided by the node's
+  frame unit: floor squares on the floor and in rows, the host's
+  unscaled squares for its children (twice as far on an altar at
+  scale 2), offsets from `at` with `at` kept. Values snap to half units
+  of that frame unless Alt is held, then round to two decimals; an axis
+  the pointer moved less than a quarter unit along is not written (a
+  sideways drag does not snap the other value); values are clamped to
+  `COORDINATE_RANGE`, doors to their wall's 0–16 along it, and `-0` is
+  written as `0`. Arrow keys add half a unit (Shift: one) without
+  snapping. Scale handles scale with the pointer's distance from the
+  centre; `+` and `-` multiply by 1.1 (at least 0.01); both round to two
+  decimals within `SCALE_RANGE`. Free text has no scale. **Rows:** a
+  dais or banner child without `x` gets one when moved along the row
+  (and `y` across it), which takes it out of the spread: the row's other
+  children spread again without it. Writing explicit positions to its
+  siblings instead would keep them still but change nodes the author
+  did not touch; left for Gadi (Follow-ups). A copy of a row child gets
+  its own position, so the row does not move.
+- **Drags** use pointer events with capture, a 4-pixel threshold, a
+  preview laid out once per animation frame, and one write on release;
+  a cancelled pointer writes nothing. On touch the pointer lands on
+  HTML boxes over the objects and handles with `touch-action: none`:
+  Chromium ignored `touch-action` on SVG shapes (a touch drag on an
+  officer was taken for a pan and the pointer cancelled), while a touch
+  on the empty floor still scrolls. Chromium applies the most restrictive
+  action under a touch's area, so a pan begun within a few pixels of an
+  object does not scroll (seen with CDP touches of radius 4).
+- **Handles** are 10 pixels drawn and 22 to grab with a mouse, 16 and 40
+  on a touch screen, placed just outside the corners so a small object
+  stays draggable. On a touch screen an object narrower than one and a
+  half handles shows none (a finger-sized handle covered a cup and took
+  its drags); the panel's scale field and its − and + buttons are the
+  alternative (plan 050's rule), as the panel's fields and its Duplicate
+  and Delete buttons are for the keys.
+- **The panel** is generated from `hallTagSpec`, the art's attributes
+  included: enums as selects (with "Default", which removes the
+  attribute), numbers and strings typed and written when the field is
+  left or Enter pressed (one change each, a bad or out-of-range number
+  refused with a message), booleans as switches; an officer's `role`
+  and an item's `kind` as named choices, an unknown value kept
+  choosable; `form` only for a cross and `dir` only for a triangle unless
+  set. Position, scale and the label come first; `x` and `y` show where
+  a node without them stands as a placeholder. An emptied field removes
+  its attribute (so an officer's emptied label shows its role again).
+  With nothing selected it edits the hall: its attributes and its
+  caption. Attributes the vocabulary does not know are listed, for the
+  source.
+- **The palette** offers every officer role (the lamens' and the
+  adepts'), a marker, the altar, both pillars, a platform, a throne, a
+  door, both banners, a Hebrew letter, every item kind the art draws
+  (the package's and the legacy ones), a tarot key, a tablet, the Table
+  of Shewbread, the candlestick and free text. A new object goes into
+  the floor (made before the caption if missing) a square past the
+  selection's South edge, or at the floor's centre, moved South a square
+  at a time until it is clear of other objects, on half squares; with a
+  host selected, items, tarot keys, text and markers go onto any host
+  (an altar, platform, throne or board) and officers onto a platform or
+  throne, at its centre; a door goes into the West wall. It is selected,
+  with fresh IDs, and the focus returns to the drawing.
+- **Writes** go through `normalizeHall`: numeric and boolean strings
+  from the legacy path become numbers and booleans where the vocabulary
+  expects them (decision 12), `-0` becomes `0`, and every node gets
+  `children`, so leaves print in the bare form presets use (Stage B
+  notes). Comments in a hall are kept and skipped when mapping compiled
+  paths to nodes. Copies and new nodes get IDs from the ritual editor's
+  `createRitualNodeId`. The compiler is untouched: `semantic.ts`,
+  `semanticCompile.ts`, `semanticCompilerImpl.ts` and `ritualNodeIds.ts`
+  have no diff, so the identity stays `6b059a0f…`.
+- **Warnings** (a stage C follow-up): `validateHall` runs on the edited
+  hall and lists up to 20 findings under the drawing, then a count;
+  choosing one selects the object it names or its nearest drawn
+  ancestor. They show in edit mode only: drawing them on the plain atom
+  would load the validator for every ritual with a hall (Follow-ups).
+- **Not built:** reparenting. Dropping onto a host needs a rule for
+  intent (an officer dragged across the altar would land on it), and
+  the palette's host rule covers adding to one; left for later
+  (Follow-ups). Nor is a label child of an object editable apart from
+  it, except in the source.
+
+What was verified, and how:
+
+- **Tests** (96 new, in `src/doc/gdHallEditor` and
+  `src/doc/ritualBlocks/GdHallAtomEditor.test.tsx`, with the resolver's
+  new fields in `layout.test.ts`): conversion, snapping and rounding on
+  the floor, on a scaled host, with `at`, in a row, at the range's ends
+  and around `-0`; door moves; scale by handle and by step; hit-testing
+  of hosts' children, labels, free text, minimum sizes and doors;
+  document order; the model's index (comments skipped), edits, copies
+  and normalisation; every gesture and its no-op; the palette's
+  entries (each added to the Neophyte hall and drawn), placement on the
+  floor, beside a selection, on hosts, a door, a missing floor; the
+  component in jsdom: focus on entry, Tab cycling and leaving, Escape
+  twice, every key as one change, drags as one change with a live
+  preview, Alt, cancel, thresholds and frames, handles, panel fields
+  (bad, out of range, emptied, text, switches, selects, unknown roles,
+  the hall and its caption), buttons, palette, warnings, a refusing
+  host, an undo removing the selection, the touch-screen handle rule,
+  read-only; in the ritual editor: entry without selecting the atom,
+  keys as one undo step each through the editor's history, Delete on an
+  object leaving the hall, Done restoring focus, read-only while not
+  editable, the write's refusals and the node view's event filter. A
+  randomised test applies 120 seeded operations (moves, nudges,
+  scales, steps, deletes, copies, palette insertions, panel values from
+  each attribute's spec, strings with quotes, backslashes, newlines,
+  U+2028, Greek, Hebrew and emoji) to each of the five presets,
+  normalising after each as the editor does, and checks after each
+  change (100 to 115 per preset) that the hall validates, prints to Pug
+  and parses back deep-equal, reprints byte-identically, and has
+  unique valid IDs and no `-0` or non-finite number.
+- **In the browser** (Turbopack dev server from this branch on port
+  3171, headless Chromium, the local Creator; "Hall check (stage B)" in
+  Fixture Temple, restored and saved as it was afterwards). At
+  1440 × 900: Edit hall focused the drawing and left ProseMirror's
+  selection as it was; a click selected the Hegemon; a drag 1.3 squares
+  South previewed and wrote x = 9.5 (y unchanged), one undo step; the
+  black pillar's corner handle scaled it to 1.25; Right, Right and
+  Shift+Down moved it to (5, 4); "Boaz" typed into its label field went
+  to the field (the title unchanged); Add → Cup put a cup at (7.5, 4),
+  selected, the drawing focused; Ctrl+D copied the Hegemon to
+  (10, 3.5), Delete removed the copy, Ctrl+Z brought it back and
+  Ctrl+Shift+Z removed it again; a marker emptied of its text showed
+  "marker: no text", which selected it; Done gave the focus to Edit
+  hall; the ritual saved, the source kept the comment in the floor and
+  the IDs, and the reader drew the edited hall. At 390 × 844 with touch
+  emulation (CDP touch events): no horizontal scroll in the editor or
+  the reader; a tap selected; a touch drag moved the Hegemon to
+  (10, 4); the panel stood below the drawing; the panel's + scaled the
+  pillar to 1.1; Add → Cup added a cup with no handles over it; saved,
+  read. Before the HTML hit boxes, a touch drag was cancelled as a
+  pan (above). Console: only the source editor's existing "Unknown
+  highlighting tag" warnings. Screenshots are outside the repository.
+- **Documentation screenshots**, recaptured from this branch
+  (`DOCS_SCREENSHOTS_ORIGIN=http://localhost:3171`): the editor and
+  reader shots are byte-identical (none shows a hall); `join-code`
+  changed only by the port in its link and `members` only by the order
+  of members added on the same day, as in stage C, so both were left as
+  committed.
+
 ## Commits
 
 | Commit | Change |
@@ -1703,6 +1896,9 @@ and was captured on a second run.
 | 3016669 | The Insert… dialog puts a hall after a selection whose ends lie in different blocks, at the end for Select All (C review) |
 | 5a2b847 | Hall warnings checked in idle time after the pause; stale and unmount guards tested (C review) |
 | 9923d1e | Copy Pug source reports a printer error as such and says when the printer cannot load (C review) |
+| 447f30a | The resolver reports each object's frame, position and scale, and each door's path (D) |
+| d7bec90 | The visual hall editor `GdHallEditor`: selection, drag, handles, keys, properties panel, palette, warnings; its model, geometry, edits and palette modules; randomised operations on every preset (D) |
+| fc00423 | Edit hall in the ritual editor's hall atom: in place, one undo step per gesture, ProseMirror kept out of the editor's events (D) |
 
 ## Future
 
@@ -1745,17 +1941,13 @@ reader export (stage I, Stretch) need a hook-free id scheme, such as an
 `idPrefix` prop as the Shewbread and candlestick take; and the resvg
 font stacks below.
 
-From stage B: the visual editor (stage D) must write `0`, never `-0`,
-when it writes coordinates (rounding can produce `-0`, which the
-compiler keeps as it is); built-in docs that hold halls (stage I) must
+From stage B: built-in docs that hold halls (stage I) must
 keep `//-` comments out of them, or their exact parity test and the
 corpus audit must allow the dropped `{}` rows (Stage B notes); the
 synthetic "Hall check (stage B)" ritual stays in the local development
 database.
 
-From stage C: hall warnings show only in the Pug source panel, so the
-visual sub-editor (stage D) should show them for the hall it edits;
-the warnings parse the source a second time (63–83 ms on 74 KB, now in
+From stage C: the warnings parse the source a second time (63–83 ms on 74 KB, now in
 idle time), so they could reuse the editor's parse, which would need
 it to keep locations and run first, or move off the main thread;
 Chromium can move a selected block's DOM selection to an editable
@@ -1766,8 +1958,8 @@ title), and in the first stage C build after a hall selected as it
 mounted. Keeping a block
 selection against moves the author did not make (no pointer, touch or
 key) would cover it, at the risk of refusing a caret set by assistive
-technology, so it is not done; the sub-editor (stage D) should still
-avoid node-selecting a new or duplicated node at mount. A composition
+technology, so it is not done (the hall editor of stage D selects no
+node, on entry or after). A composition
 that starts without an IME keydown over a block next to another
 uneditable block reaches the new paragraph but does not end cleanly in
 Chromium (seen only with CDP's `Input.imeSetComposition`). The input
@@ -1788,3 +1980,17 @@ quoted font stacks (`"GdHall Noto Serif", "Noto Serif", serif`) to a
 loaded Noto Serif in a test harness, falling back to Noto Sans, while the
 bare family name worked; check the stacks before relying on resvg for
 hall images.
+
+From stage D: reparenting (dropping an object onto a host, or dragging
+a host's child out to the floor, converting its position between
+frames) needs a rule for intent, perhaps a modifier or a panel action
+("Stand on: floor / altar"); whether moving one officer of a dais or
+banner row should write its siblings' positions too, so they stay where
+they are instead of spreading again (Gadi's call; today they spread
+again); hall warnings on the plain hall atom, outside edit mode, which
+would need the validator loaded for every ritual with a hall (a count
+from a lazily loaded check would do); editing a label child apart from
+its object; Firefox and Safari, and a real phone or tablet, for the
+pointer, touch and focus handling (checked in headless Chromium with
+CDP touch events only; no Safari device); Chromium not scrolling a pan
+that begins within a touch's radius of an object.

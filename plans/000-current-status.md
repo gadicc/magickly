@@ -328,7 +328,10 @@ Follow-ups are separate from the completed migration work:
   and the Pug source editor shows hall warnings (stage C, with its
   review fixes: text typed without a keypress over a selected block
   now replaces it, as a key press does, instead of landing in the
-  title). Stage D, the visual sub-editor, is next.
+  title). Stage D is done: "Edit hall" opens a visual hall editor in
+  place (select, drag, scale, keys, a properties panel, a palette and
+  the hall's warnings; one undo step per gesture). Stage E, the
+  `/gd/hall` playground, is next.
   TODO from it: recording officer movement between stations, a `gdVault` for
   the Adeptus Minor Vault, original Enochian letterforms, moving
   `enochianFont.ts` and the other files the import-boundary test allows out
@@ -343,9 +346,11 @@ Follow-ups are separate from the completed migration work:
   fallback to Noto Sans for the hall's quoted font stacks, Gadi's call on
   whether a hall's PNG export embeds Enochian Plain for its tablets,
   `//-` comments inside the built-in docs' halls (stage I) against their
-  parity test, writing `0` rather than `-0` for coordinates in the
-  visual hall editor (stage D), hall warnings in the visual
-  sub-editor (they show in source only), the warnings' second parse of
+  parity test, reparenting in the hall editor, whether moving one
+  officer of a row should hold its siblings still (Gadi's call), hall
+  warnings on the plain hall atom, Firefox, Safari and real-device
+  checks of the hall editor's pointer and touch handling, the
+  warnings' second parse of
   the source (now in idle time), Chromium moving a selected block's DOM
   selection before input (ProseMirror reads it; seen in 3 of 28 CDP
   key presses) and a composition without an IME keydown not ending
