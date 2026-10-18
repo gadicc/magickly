@@ -1,41 +1,89 @@
 import { existsSync, readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { dirname, relative, resolve } from "node:path";
 import ts from "typescript";
 import { expect, it } from "vitest";
 
-it("keeps Tiptap and ProseMirror outside the reader presentation import graph", () => {
-  const seen = new Set<string>();
-  const inspect = (file: string) => {
-    if (seen.has(file)) return;
-    seen.add(file);
+/** A local specifier's file: relative, `@/…` or `@magick-components/…`. */
+function resolveLocal(from: string, name: string): string | null {
+  const stem = name.startsWith(".")
+    ? resolve(dirname(from), name)
+    : name.startsWith("@/")
+      ? resolve("src", name.slice(2))
+      : name.startsWith("@magick-components/")
+        ? resolve("src/components", name.slice("@magick-components/".length))
+        : null;
+  if (!stem) return null;
+  const extensions = [".ts", ".tsx", ".js", ".jsx"];
+  return (
+    [
+      stem,
+      ...extensions.map((extension) => stem + extension),
+      ...extensions.map((extension) => `${stem}/index${extension}`),
+    ].find((path) => /\.[jt]sx?$/.test(path) && existsSync(path)) ?? null
+  );
+}
+
+/**
+ * The reader's import graph from `blocks.jsx`: what it loads up front
+ * (`static`, type-only imports aside) and what only `import()` reaches
+ * (`lazy`), with every specifier its files name.
+ */
+function readerGraph() {
+  const graph = { static: new Set<string>(), lazy: new Set<string>() };
+  const specifiers: { file: string; name: string }[] = [];
+  const inspect = (file: string, lazy: boolean) => {
+    if (graph.static.has(file) || (lazy && graph.lazy.has(file))) return;
+    graph.lazy.delete(file);
+    (lazy ? graph.lazy : graph.static).add(file);
     const source = ts.createSourceFile(
       file,
       readFileSync(file, "utf8"),
       ts.ScriptTarget.Latest,
       true,
     );
-    for (const statement of source.statements) {
+    const follow = (name: string, viaImport: boolean) => {
+      specifiers.push({ file, name });
+      const next = resolveLocal(file, name);
+      if (next) inspect(next, lazy || viaImport);
+    };
+    const visit = (node: ts.Node) => {
       if (
-        !ts.isImportDeclaration(statement) &&
-        !ts.isExportDeclaration(statement)
-      )
-        continue;
-      const specifier = statement.moduleSpecifier;
-      if (!specifier || !ts.isStringLiteral(specifier)) continue;
-      const name = specifier.text;
-      expect(name, file).not.toMatch(/(?:@tiptap|prosemirror)/);
-      const stem = name.startsWith(".")
-        ? resolve(dirname(file), name)
-        : name.startsWith("@/")
-          ? resolve("src", name.slice(2))
-          : null;
-      if (!stem) continue;
-      const next = [
-        stem,
-        ...[".ts", ".tsx", ".js", ".jsx"].map((extension) => stem + extension),
-      ].find((path) => existsSync(path) && /\.[jt]sx?$/.test(path));
-      if (next) inspect(next);
-    }
+        (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) &&
+        node.moduleSpecifier &&
+        ts.isStringLiteral(node.moduleSpecifier)
+      ) {
+        const typeOnly = ts.isImportDeclaration(node)
+          ? node.importClause?.isTypeOnly === true
+          : node.isTypeOnly;
+        if (!typeOnly) follow(node.moduleSpecifier.text, false);
+      } else if (
+        ts.isCallExpression(node) &&
+        node.expression.kind === ts.SyntaxKind.ImportKeyword
+      ) {
+        const [argument] = node.arguments;
+        expect(
+          argument && ts.isStringLiteralLike(argument),
+          `${file}: import() of a computed specifier`,
+        ).toBe(true);
+        follow((argument as ts.StringLiteralLike).text, true);
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
   };
-  inspect(resolve("src/doc/blocks.jsx"));
+  inspect(resolve("src/doc/blocks.jsx"), false);
+  return { ...graph, specifiers };
+}
+
+const files = (set: Set<string>) =>
+  [...set].map((file) => relative(process.cwd(), file)).sort();
+
+it("keeps Tiptap, ProseMirror and editor code out of the reader import graph", () => {
+  const graph = readerGraph();
+  for (const { file, name } of graph.specifiers)
+    expect(name, file).not.toMatch(/(?:@tiptap|prosemirror)/);
+  const all = [...files(graph.static), ...files(graph.lazy)];
+  expect(
+    all.filter((file) => /tiptap|ForEditing|export\//i.test(file)),
+  ).toEqual([]);
 });
