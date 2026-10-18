@@ -53,6 +53,17 @@ export const RitualSoftBreaks = Extension.create({
   },
 });
 
+/** Whether an event comes from a hall atom's own controls or editor. */
+export function insideHallControls(
+  event: Event,
+  dom: Element | undefined,
+): boolean {
+  const target = event.target;
+  if (!(target instanceof Element) || !dom) return false;
+  const controls = target.closest("[data-gd-hall-controls]");
+  return !!controls && dom.contains(controls);
+}
+
 /** Client presentation only; schema, clipboard HTML and saved JSON remain unchanged. */
 export const ritualTiptapClientExtensions = [
   ...ritualTiptapExtensions.map((extension) => {
@@ -82,7 +93,19 @@ export const ritualTiptapClientExtensions = [
     if (extension.name === "ritualAtom")
       return extension.extend({
         addNodeView() {
-          return ReactNodeViewRenderer(RitualAtomForEditing);
+          const render = ReactNodeViewRenderer(RitualAtomForEditing);
+          return (props) => {
+            const view = render(props);
+            const stopEvent = view.stopEvent?.bind(view);
+            // The hall editor's pointer, key and focus events are its own:
+            // ProseMirror would select the atom, start a drag or take the
+            // keys (plan 061, decision 11). Elsewhere the atom behaves as
+            // before.
+            view.stopEvent = (event: Event) =>
+              insideHallControls(event, view.dom as Element | undefined) ||
+              !!stopEvent?.(event);
+            return view;
+          };
         },
       });
     return extension;

@@ -1,5 +1,7 @@
 "use client";
 
+import EditOutlined from "@mui/icons-material/EditOutlined";
+import { Button } from "@mui/material";
 import type { NodeViewProps } from "@tiptap/core";
 import { TextSelection } from "@tiptap/pm/state";
 import {
@@ -7,7 +9,8 @@ import {
   NodeViewWrapper,
   useEditorState,
 } from "@tiptap/react";
-import { useMemo } from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { parseRitualFileLocator } from "@/files/ritualFileLocator";
 import { gdHallRow } from "../gdHallRows";
 import { ritualEditorOwner } from "../ritualEditorOwner";
@@ -307,9 +310,40 @@ function sourceOnlyLabel(raw: unknown): string {
   }
 }
 
-export function RitualAtomForEditing({ node, selected }: NodeViewProps) {
+/**
+ * The visual hall editor, its renderer and the app's art load only when an
+ * author edits a hall (plan 061, decision 11); the hall's drawing stands
+ * in while they load.
+ */
+const GdHallAtomEditor = dynamic(() => import("./GdHallAtomEditor"), {
+  loading: () => (
+    <p className={styles.hallLoading} role="status">
+      Opening the hall editor…
+    </p>
+  ),
+});
+
+export function RitualAtomForEditing({
+  node,
+  selected,
+  editor,
+  getPos,
+}: NodeViewProps) {
   const tag = String(node.attrs.tag);
   const attrs = node.attrs.attrs;
+  const [editingHall, setEditingHall] = useState(false);
+  const editHallButton = useRef<HTMLButtonElement>(null);
+  const finishedEditing = useRef(false);
+  const editable = useEditorState({
+    editor,
+    selector: ({ editor: current }) => current.isEditable,
+  });
+  // Done gives the focus back to the button that began editing.
+  useEffect(() => {
+    if (editingHall || !finishedEditing.current) return;
+    finishedEditing.current = false;
+    editHallButton.current?.focus({ preventScroll: true });
+  }, [editingHall]);
   const attachedImage = tag === "img" && parseRitualFileLocator(attrs.src);
   const caption =
     tag === "sourceAnnotation"
@@ -365,8 +399,39 @@ export function RitualAtomForEditing({ node, selected }: NodeViewProps) {
           className={styles.sitePreview}
         />
       )}
-      {hall && <GdHallFrame hall={hall} />}
-      {tag === "hr" ? <hr /> : <div className={styles.label}>{caption}</div>}
+      {tag === "gdHall" && editingHall ? (
+        <GdHallAtomEditor
+          editor={editor}
+          getPos={getPos}
+          node={node}
+          onDone={() => {
+            finishedEditing.current = true;
+            setEditingHall(false);
+          }}
+        />
+      ) : (
+        hall && <GdHallFrame hall={hall} />
+      )}
+      {tag === "hr" ? (
+        <hr />
+      ) : (
+        <div className={styles.label}>
+          {caption}
+          {tag === "gdHall" && hall && editable && !editingHall && (
+            <Button
+              ref={editHallButton}
+              size="small"
+              variant="outlined"
+              startIcon={<EditOutlined fontSize="small" />}
+              className={styles.hallEdit}
+              data-gd-hall-controls
+              onClick={() => setEditingHall(true)}
+            >
+              Edit hall
+            </Button>
+          )}
+        </div>
+      )}
     </NodeViewWrapper>
   );
 }

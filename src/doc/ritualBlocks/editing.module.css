@@ -146,3 +146,12 @@
     opacity: 0.65;
   }
 }
+/* The hall atom's Edit button, beside its "Temple hall" label. */
+.hallEdit {
+  margin-inline-start: 0.5rem;
+}
+.hallLoading {
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+  color: #555;
+}

@@ -146,6 +146,7 @@ export default defineConfig({
         "src/doc/gdHallEditor/hallGeometry.ts",
         "src/doc/gdHallEditor/hallModel.ts",
         "src/doc/gdHallEditor/hallPalette.ts",
+        "src/doc/ritualBlocks/GdHallAtomEditor.tsx",
         "src/components/svgCoordinate.ts",
         "src/app/geomancy/tetragrams.ts",
         "src/app/enochian/keys/keyEntries.ts",
