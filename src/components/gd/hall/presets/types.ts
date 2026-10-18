@@ -93,10 +93,10 @@ export function hallSourceUrl(source: HallPresetSource): string {
 
 /**
  * The dais of every Outer grade: the Chiefs, the Hierophant and his
- * predecessor, spread evenly. `y` puts the lamens where a drawing has them
- * rather than centring the row, labels included, in the dais.
+ * predecessor, spread evenly, the row centred in the dais, labels
+ * included.
  */
-export function dais(y?: number): HallNode {
+export function dais(): HallNode {
   return {
     type: "dais",
     children: [
@@ -105,10 +105,6 @@ export function dais(y?: number): HallNode {
       "hierophant",
       "pastHierophant",
       "praemonstrator",
-    ].map((role) =>
-      y === undefined
-        ? { type: "officer", role }
-        : { type: "officer", role, y },
-    ),
+    ].map((role) => ({ type: "officer", role })),
   };
 }

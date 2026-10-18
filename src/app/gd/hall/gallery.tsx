@@ -1,6 +1,6 @@
 "use client";
 
-import { GdHall, type HallNode } from "@magick-components/gd/hall";
+import { GdHall } from "@magick-components/gd/hall";
 import {
   HALL_PRESETS,
   type HallPreset,
@@ -17,8 +17,6 @@ import {
   MenuItem,
   Select,
   Switch,
-  ToggleButton,
-  ToggleButtonGroup,
   Typography,
 } from "@mui/material";
 import React from "react";
@@ -26,15 +24,6 @@ import ExportControls from "@/export/ExportControls";
 import OpenSource from "@/OpenSource";
 import { gdHallArt } from "./art";
 import { embedGdHallFonts } from "./exportFonts";
-
-/** Plan 061, decision 4: drawing scales, one common size, or both. */
-type SizesView = "drawing" | "uniform" | "both";
-
-const SIZE_VIEWS: readonly [SizesView, string][] = [
-  ["drawing", "Drawing sizes"],
-  ["uniform", "Uniform sizes"],
-  ["both", "Both sizes"],
-];
 
 /** The old drawing a preset was ported from, as served from `public`. */
 export function originalDrawing(preset: HallPreset): string | undefined {
@@ -47,20 +36,8 @@ function Source({ source }: { source: HallPresetSource }) {
   return <a href={hallSourceUrl(source)}>{hallSourceText(source)}</a>;
 }
 
-function Pane({
-  preset,
-  sizes,
-  label,
-}: {
-  preset: HallPreset;
-  sizes: "drawing" | "uniform";
-  label?: string;
-}) {
+function Pane({ preset, label }: { preset: HallPreset; label?: string }) {
   const ref = React.useRef<SVGSVGElement>(null);
-  const hall = React.useMemo<HallNode>(
-    () => ({ ...preset.hall, sizes }),
-    [preset, sizes],
-  );
   return (
     <figure style={{ margin: 0, minWidth: 0 }}>
       {label && (
@@ -70,13 +47,13 @@ function Pane({
       )}
       <GdHall
         ref={ref}
-        hall={hall}
+        hall={preset.hall}
         art={gdHallArt}
         style={{ display: "block", width: "100%", height: "auto" }}
       />
       <ExportControls
         target={ref}
-        filename={`gd-hall-${preset.id}${sizes === "uniform" ? "-uniform" : ""}`}
+        filename={`gd-hall-${preset.id}`}
         prepare={embedGdHallFonts}
       />
     </figure>
@@ -84,17 +61,16 @@ function Pane({
 }
 
 /**
- * The hall presets, read-only (plan 061, stage A): a picker, the old
- * drawing beside the new one, and the two size strategies side by side.
+ * The hall presets, read-only (plan 061, stage A): a picker, and the old
+ * drawing beside the new one.
  */
 export default function HallGallery() {
   const [id, setId] = React.useState(HALL_PRESETS[0].id);
   const [compare, setCompare] = React.useState(false);
-  const [sizes, setSizes] = React.useState<SizesView>("drawing");
   const preset =
     HALL_PRESETS.find((candidate) => candidate.id === id) ?? HALL_PRESETS[0];
   const original = originalDrawing(preset);
-  const panes = (sizes === "both" ? 2 : 1) + (compare && original ? 1 : 0);
+  const panes = compare && original ? 2 : 1;
 
   return (
     <Container sx={{ p: 2 }}>
@@ -127,21 +103,6 @@ export default function HallGallery() {
             ))}
           </Select>
         </FormControl>
-        <ToggleButtonGroup
-          size="small"
-          exclusive
-          value={sizes}
-          aria-label="Sizes"
-          onChange={(_event, value: SizesView | null) =>
-            value && setSizes(value)
-          }
-        >
-          {SIZE_VIEWS.map(([view, label]) => (
-            <ToggleButton key={view} value={view}>
-              {label}
-            </ToggleButton>
-          ))}
-        </ToggleButtonGroup>
         {original && (
           <FormControlLabel
             control={
@@ -182,20 +143,7 @@ export default function HallGallery() {
             />
           </figure>
         )}
-        {sizes !== "uniform" && (
-          <Pane
-            preset={preset}
-            sizes="drawing"
-            label={sizes === "both" || compare ? "Drawing sizes" : undefined}
-          />
-        )}
-        {sizes !== "drawing" && (
-          <Pane
-            preset={preset}
-            sizes="uniform"
-            label={sizes === "both" || compare ? "Uniform sizes" : undefined}
-          />
-        )}
+        <Pane preset={preset} label={compare ? "From the preset" : undefined} />
       </Box>
       <Typography variant="subtitle2" component="h2" sx={{ mt: 2 }}>
         Sources

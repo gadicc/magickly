@@ -72,8 +72,8 @@ export const CAPTION_GAP = 0.3;
 export const DEFAULT_PADDING = 0.5;
 /**
  * The narrowest box a label wraps in, in squares: a label under an item
- * or a scaled-down officer wraps as if 1.5 squares wide (a floor lamen is
- * 1.66), so it never breaks after every word.
+ * or a scaled-down officer wraps as if 1.5 squares wide (an officer's
+ * cell is 2), so it never breaks after every word.
  */
 export const MIN_LABEL_WIDTH = 1.5;
 /**
@@ -94,79 +94,80 @@ export const MARKER_TEXT_SCALE = 0.7;
 export const MARKER_TEXT_WIDTH = 0.84;
 
 /**
- * Default scales by kind (decision 4): `scale=1` fits an object's nominal
- * box into 2 × 2 squares, so a scale is half the longer side in squares.
- * "drawing" values are measured on the five drawings in `public/pics`
- * (6.6182 mm squares); "uniform" draws the officers one size everywhere so
- * the two can be compared. These are a layout contract: changing one moves
- * things in saved halls.
+ * Default scales by kind (decision 4), one per kind, wherever it stands.
+ * `scale=1` gives an object a cell of 2 × 2 squares; its art fills the
+ * cell, aspect kept, or the share of it the art's `inset` says (officers'
+ * lamens 0.8, so 1.6 squares across, as Regardie's and Greer's diagrams
+ * draw every lamen one size; the old drawings' 2.31 on the dais and 1.66
+ * on the floor were drift). The inset is what keeps neighbouring officers
+ * apart. Furniture fills its cell, items keep sizes measured on the
+ * drawings relative to their host, and a label may use its object's whole
+ * cell width. These are a layout contract: changing one moves things in
+ * saved halls.
  *
- * | Kind | Drawing | Uniform | Source |
- * | --- | --- | --- | --- |
- * | officer, lamen on the floor | 0.83 | 1 | floor lamens 1.66 squares across |
- * | officer, lamen on the dais | 1.155 | 1 | dais lamens 2.31 across |
- * | altar, pillar | 1 | 1 | 2 × 2 squares |
- * | banner | 1 | 1 | Neophyte banners 1.51 × 2.02 |
- * | hebrewLetter | 1.475 | 1.475 | Zelator and Theoricus letter banners 2.95 × 2.71 |
- * | marker | 0.6 | 0.6 | none drawn; a 1.2-square box |
- * | platform, throne, board | 1 | 1 | sized in squares by `w` and `h` |
- * | item cross | 0.235 | 0.235 | Neophyte altar cross 0.35 × 0.47 |
- * | item triangle, pentagram | 0.42 | 0.42 | Neophyte altar triangle 0.84 × 0.73 |
- * | item rose | 0.75 | 0.75 | Neophyte 1.51 × 0.55 |
- * | item cup | 0.35 | 0.35 | Neophyte 0.54 × 0.70 |
- * | item chalice | 0.47 | 0.47 | Zelator 2 altar 0.52 × 0.93 |
- * | item salt | 0.31 | 0.31 | Neophyte 0.26 × 0.62 |
- * | item bread | 0.335 | 0.335 | Neophyte 0.67 × 0.67 |
- * | item lamp | 0.47 | 0.47 | Neophyte altar 0.57 × 0.94 |
- * | item lantern | 1.19 | 1.19 | Zelator floor lantern 1.43 × 2.38 |
- * | item censer | 0.53 | 0.53 | Zelator 2 altar 0.78 × 1.06 |
- * | item fan | 0.99 | 0.99 | Theoricus 1 altar 1.98 × 1.25 |
- * | item pantacle | 1 | 1 | Theoricus badge 2 × 2 |
- * | item lightning | 0.49 | 0.49 | Theoricus 2 Flaming Sword 0.56 × 0.98 |
- * | tarotKey | 0.81 | 0.81 | Theoricus 1 altar card 0.94 × 1.62 |
- * | tablet | 1.345 | 1.345 | Theoricus Air tablet board 1.91 × 2.69 |
- * | shewbread, candlestick | 1.25 | 1.25 | Zelator 2: the outer circle 2 squares across |
- * | other items | 0.4 | 0.4 | none |
- * | unknown tags (placeholder) | 0.5 | 0.5 | a 1-square box |
+ * | Kind | Scale | Source |
+ * | --- | --- | --- |
+ * | officer, lamen (dais and floor) | 1 | a 2-square cell, the lamen inset to 1.6 |
+ * | altar, pillar | 1 | 2 × 2 squares |
+ * | banner | 1 | Neophyte banners 1.51 × 2.02 |
+ * | hebrewLetter | 1.475 | Zelator and Theoricus letter banners 2.95 × 2.71 |
+ * | marker | 0.6 | none drawn; a 1.2-square box |
+ * | platform, throne, board | 1 | sized in squares by `w` and `h` |
+ * | item cross | 0.235 | Neophyte altar cross 0.35 × 0.47 |
+ * | item triangle, pentagram | 0.42 | Neophyte altar triangle 0.84 × 0.73 |
+ * | item rose | 0.75 | Neophyte 1.51 × 0.55 |
+ * | item cup | 0.35 | Neophyte 0.54 × 0.70 |
+ * | item chalice | 0.47 | Zelator 2 altar 0.52 × 0.93 |
+ * | item salt | 0.31 | Neophyte 0.26 × 0.62 |
+ * | item bread | 0.335 | Neophyte 0.67 × 0.67 |
+ * | item lamp | 0.47 | Neophyte altar 0.57 × 0.94 |
+ * | item lantern | 1.19 | Zelator floor lantern 1.43 × 2.38 |
+ * | item censer | 0.53 | Zelator 2 altar 0.78 × 1.06 |
+ * | item fan | 0.99 | Theoricus 1 altar 1.98 × 1.25 |
+ * | item pantacle | 1 | Theoricus badge 2 × 2 |
+ * | item lightning | 0.49 | Theoricus 2 Flaming Sword 0.56 × 0.98 |
+ * | tarotKey | 0.81 | Theoricus 1 altar card 0.94 × 1.62 |
+ * | tablet | 1.345 | Theoricus Air tablet board 1.91 × 2.69 |
+ * | shewbread, candlestick | 1.25 | Zelator 2: the outer circle 2 squares across |
+ * | other items | 0.4 | none |
+ * | unknown tags (placeholder) | 0.5 | a 1-square box |
  *
  * Items are measured on their own geometry, glow filters left out, in the
  * drawing where each first appears; a drawing that draws one larger (the
  * Theoricus altar's cup, the Zelator Earth tablet's larger board) is a
  * preset's `scale`, not a second default.
  */
-export const DEFAULT_SCALES: ReadonlyMap<string, readonly [number, number]> =
-  new Map<string, readonly [number, number]>([
-    ["lamen:floor", [0.83, 1]],
-    ["lamen:dais", [1.155, 1]],
-    ["altar", [1, 1]],
-    ["pillar", [1, 1]],
-    ["banner", [1, 1]],
-    ["hebrewLetter", [1.475, 1.475]],
-    ["marker", [0.6, 0.6]],
-    ["platform", [1, 1]],
-    ["throne", [1, 1]],
-    ["board", [1, 1]],
-    ["item:cross", [0.235, 0.235]],
-    ["item:triangle", [0.42, 0.42]],
-    ["item:pentagram", [0.42, 0.42]],
-    ["item:rose", [0.75, 0.75]],
-    ["item:cup", [0.35, 0.35]],
-    ["item:chalice", [0.47, 0.47]],
-    ["item:salt", [0.31, 0.31]],
-    ["item:bread", [0.335, 0.335]],
-    ["item:lamp", [0.47, 0.47]],
-    ["item:lantern", [1.19, 1.19]],
-    ["item:censer", [0.53, 0.53]],
-    ["item:fan", [0.99, 0.99]],
-    ["item:pantacle", [1, 1]],
-    ["item:lightning", [0.49, 0.49]],
-    ["tarotKey", [0.81, 0.81]],
-    ["tablet", [1.345, 1.345]],
-    ["shewbread", [1.25, 1.25]],
-    ["candlestick", [1.25, 1.25]],
-    ["item", [0.4, 0.4]],
-    ["unknown", [0.5, 0.5]],
-  ]);
+export const DEFAULT_SCALES: ReadonlyMap<string, number> = new Map([
+  ["lamen", 1],
+  ["altar", 1],
+  ["pillar", 1],
+  ["banner", 1],
+  ["hebrewLetter", 1.475],
+  ["marker", 0.6],
+  ["platform", 1],
+  ["throne", 1],
+  ["board", 1],
+  ["item:cross", 0.235],
+  ["item:triangle", 0.42],
+  ["item:pentagram", 0.42],
+  ["item:rose", 0.75],
+  ["item:cup", 0.35],
+  ["item:chalice", 0.47],
+  ["item:salt", 0.31],
+  ["item:bread", 0.335],
+  ["item:lamp", 0.47],
+  ["item:lantern", 1.19],
+  ["item:censer", 0.53],
+  ["item:fan", 0.99],
+  ["item:pantacle", 1],
+  ["item:lightning", 0.49],
+  ["tarotKey", 0.81],
+  ["tablet", 1.345],
+  ["shewbread", 1.25],
+  ["candlestick", 1.25],
+  ["item", 0.4],
+  ["unknown", 0.5],
+]);
 
 /** The placeholder's nominal box. */
 export const PLACEHOLDER_BOX: HallArtBox = { width: 100, height: 100 };
@@ -533,10 +534,8 @@ export function resolveHall(
   const dais = clamp(numberAttr(hall, "dais") ?? DEFAULT_DAIS, 0, 16);
   const wall = enumAttr(hall, "wall", ["plain", "gradient"]) ?? "plain";
   const showCompass = booleanAttr(hall, "compass") ?? true;
-  const sizes = enumAttr(hall, "sizes", ["drawing", "uniform"]) ?? "drawing";
   const padding = clamp(numberAttr(hall, "padding") ?? DEFAULT_PADDING, 0, 16);
   const labelSize = clamp(numberAttr(hall, "labelSize") ?? LABEL_SIZE, 0.05, 4);
-  const officerScale = numberAttr(hall, "officerScale");
 
   const eastWall = -Math.max(dais, WALL_GAP);
   const outer: Rect = {
@@ -583,19 +582,10 @@ export function resolveHall(
   let captionText: string | undefined;
   let captionPath: readonly number[] = [];
 
-  const defaultScale = (artKey: string, tag: string, context: Context) => {
-    if (artKey === "lamen") {
-      if (officerScale !== undefined) return officerScale;
-      return (DEFAULT_SCALES.get(`lamen:${context}`) as readonly number[])[
-        sizes === "uniform" ? 1 : 0
-      ];
-    }
-    const entry =
-      DEFAULT_SCALES.get(artKey) ??
-      (tag === "item" ? DEFAULT_SCALES.get("item") : undefined) ??
-      (DEFAULT_SCALES.get("unknown") as readonly [number, number]);
-    return entry[sizes === "uniform" ? 1 : 0];
-  };
+  const defaultScale = (artKey: string, tag: string) =>
+    DEFAULT_SCALES.get(artKey) ??
+    (tag === "item" ? DEFAULT_SCALES.get("item") : undefined) ??
+    (DEFAULT_SCALES.get("unknown") as number);
 
   const prepareLabels = (
     node: HallNode,
@@ -694,6 +684,7 @@ export function resolveHall(
     const drawn = known ? art.get(artKey) : undefined;
     let box = PLACEHOLDER_BOX;
     let fit: HallArt["fit"] = "box";
+    let inset = 1;
     if (drawn) {
       const candidate =
         typeof drawn.box === "function" ? drawn.box(node) : drawn.box;
@@ -705,16 +696,20 @@ export function resolveHall(
       ) {
         box = candidate;
         fit = drawn.fit ?? "box";
+        const given = drawn.inset ?? 1;
+        if (Number.isFinite(given) && given > 0 && given <= 1) inset = given;
       }
     }
     const missing = !drawn || box === PLACEHOLDER_BOX;
     const scale = clamp(
-      numberAttr(node, "scale") ?? defaultScale(artKey, tag, context),
+      numberAttr(node, "scale") ?? defaultScale(artKey, tag),
       ...SCALE_RANGE,
     );
-    const unscaled =
-      missing || fit === "box" ? 2 / Math.max(box.width, box.height) : 1;
-    const k = unscaled * scale;
+    // The cell: 2 × 2 squares at scale 1, or the box itself in squares.
+    const byBox = missing || fit === "box";
+    const unscaled = byBox ? 2 / Math.max(box.width, box.height) : 1;
+    const cellWidth = byBox ? 2 * scale : box.width * scale;
+    const k = unscaled * scale * inset;
     const w = box.width * k;
     const h = box.height * k;
     const isHost = hallTagSpec(tag, art)?.role === "host";
@@ -729,7 +724,8 @@ export function resolveHall(
       k,
       scale,
       isHost,
-      labels: prepareLabels(node, path, tag, w * unit, context),
+      // A label may use the cell's whole width, not just the art's.
+      labels: prepareLabels(node, path, tag, cellWidth * unit, context),
       inner:
         tag === "marker" && !missing
           ? stringAttr(node, "text", 200)

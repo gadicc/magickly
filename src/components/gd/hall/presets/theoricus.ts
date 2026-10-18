@@ -34,7 +34,7 @@ export const theoricus1: HallPreset = {
           { type: "hebrewLetter", letter: "qoph", x: 12.66 },
         ],
       },
-      dais(-2.7),
+      dais(),
       {
         type: "floor",
         children: [
@@ -110,7 +110,7 @@ export const theoricus2: HallPreset = {
           { type: "hebrewLetter", letter: "tzaddi", x: 12.66 },
         ],
       },
-      dais(-2.7),
+      dais(),
       {
         type: "banners",
         side: "west",
@@ -120,7 +120,7 @@ export const theoricus2: HallPreset = {
         type: "floor",
         children: [
           AIR[0],
-          { type: "banner", kind: "east", x: 9.46, y: -1.24 },
+          { type: "banner", kind: "east", x: 9.46, y: -0.84 },
           { type: "marker", text: "Kamea of Luna", x: 3, y: 1.07, scale: 0.9 },
           {
             type: "marker",

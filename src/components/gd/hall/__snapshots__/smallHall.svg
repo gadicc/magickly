@@ -121,7 +121,7 @@
 </use>
 <use href="#_R_0_-art1" transform="translate(400 300) scale(2)">
 </use>
-<use href="#_R_0_-art2" transform="translate(800 300) scale(1.66)">
+<use href="#_R_0_-art2" transform="translate(800 300) scale(1.6)">
 </use>
 <use href="#_R_0_-art3" transform="translate(800 800) scale(2)">
 </use>
@@ -131,27 +131,27 @@
 </use>
 <use href="#_R_0_-art6" transform="translate(800 1450) scale(100)">
 </use>
-<use href="#_R_0_-art2" transform="translate(800 1450) scale(1.66)">
+<use href="#_R_0_-art2" transform="translate(800 1450) scale(1.6)">
 </use>
-<use href="#_R_0_-art2" transform="translate(400 -146.06) scale(2.31)">
+<use href="#_R_0_-art2" transform="translate(400 -146.06) scale(1.6)">
 </use>
-<use href="#_R_0_-art2" transform="translate(1200 -146.06) scale(2.31)">
+<use href="#_R_0_-art2" transform="translate(1200 -146.06) scale(1.6)">
 </use>
 <use href="#_R_0_-art7" transform="translate(800 -631.51) scale(2.95)">
 </use>
 <g font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">
 <g>
-<text x="800" y="191.68" font-size="43" text-anchor="middle">Hegemon</text>
+<text x="800" y="194.68" font-size="43" text-anchor="middle">Hegemon</text>
 </g>
 <g>
-<text x="800" y="1341.68" font-size="43" text-anchor="middle">Hiereus</text>
+<text x="800" y="1344.68" font-size="43" text-anchor="middle">Hiereus</text>
 </g>
 <g>
-<text x="400" y="-286.88" font-size="43" text-anchor="middle">Hierophant</text>
+<text x="400" y="-251.38" font-size="43" text-anchor="middle">Hierophant</text>
 </g>
 <g>
-<text x="1200" y="-336.33" font-size="43" text-anchor="middle">Past</text>
-<text x="1200" y="-286.88" font-size="43" text-anchor="middle">Hierophant</text>
+<text x="1200" y="-300.83" font-size="43" text-anchor="middle">Past</text>
+<text x="1200" y="-251.38" font-size="43" text-anchor="middle">Hierophant</text>
 </g>
 <text x="800" y="-430.53" font-size="53" font-weight="700" text-anchor="middle">East</text>
 <text x="800" y="1701.28" font-size="53" font-weight="700" text-anchor="middle">West</text>

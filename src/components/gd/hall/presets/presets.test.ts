@@ -81,10 +81,9 @@ describe("the hall presets", () => {
       ).toEqual([]);
   });
 
-  it("spread the dais evenly unless a drawing puts it lower", () => {
+  it("spread the dais evenly, centred in the dais", () => {
     expect(dais().children?.map((child) => child.y)).toEqual(
       Array(5).fill(undefined),
     );
-    expect(dais(-2.7).children?.every((child) => child.y === -2.7)).toBe(true);
   });
 });

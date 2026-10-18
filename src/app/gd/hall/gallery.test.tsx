@@ -68,7 +68,7 @@ describe("the /gd/hall gallery", () => {
     expect(screen.queryByRole("img", { name: /original drawing/ })).toBeNull();
   });
 
-  it("switches presets, compares with the drawing and shows both sizes", () => {
+  it("switches presets and compares with the drawing", () => {
     render(<HallGallery />);
     choose("Zelator Temple 1");
     expect(halls()).toEqual(["Zelator Temple 1"]);
@@ -82,22 +82,15 @@ describe("the /gd/hall gallery", () => {
         .getAttribute("src"),
     ).toBe("/pics/zelator1.svg");
 
-    fireEvent.click(screen.getByRole("button", { name: "Both sizes" }));
-    expect(halls()).toEqual(["Zelator Temple 1", "Zelator Temple 1"]);
-    const [drawing, uniform] = document.querySelectorAll("figure:has(svg)");
-    expect(
-      within(drawing as HTMLElement).getByText("Drawing sizes"),
-    ).toBeTruthy();
-    expect(
-      within(uniform as HTMLElement).getByText("Uniform sizes"),
-    ).toBeTruthy();
-    const [a, b] = document.querySelectorAll("svg[role=img]");
-    // Uniform sizes draw the officers at one common size.
-    expect(a.innerHTML).not.toBe(b.innerHTML);
-    expect(screen.getAllByLabelText("Download PNG")).toHaveLength(2);
-
-    fireEvent.click(screen.getByRole("button", { name: "Uniform sizes" }));
     expect(halls()).toEqual(["Zelator Temple 1"]);
+    expect(
+      within(
+        document.querySelector("figure:has(svg)") as HTMLElement,
+      ).getByText("From the preset"),
+    ).toBeTruthy();
+    expect(screen.getAllByLabelText("Download PNG")).toHaveLength(1);
+    // One size of everything: no size strategies to choose between.
+    expect(screen.queryByRole("button", { name: /sizes/i })).toBeNull();
   });
 
   it("exports the hall it shows", async () => {

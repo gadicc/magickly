@@ -31,6 +31,8 @@ function HallLamen(props: HallArtProps) {
 export const lamenArt: HallArt = {
   Component: HallLamen,
   box: { width: 100, height: 100 },
+  // 1.6 squares in an officer's 2-square cell (DEFAULT_SCALES).
+  inset: fallback.inset,
   // A role `Lamen` does not know draws its plain lamen, whatever the name.
   variant: (node) => {
     const role = stringAttr(node, "role", 200);

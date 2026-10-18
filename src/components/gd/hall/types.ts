@@ -95,6 +95,13 @@ export interface HallArt {
    * kept. `squares`: the box is already in squares (a platform's `w` × `h`).
    */
   fit?: "box" | "squares";
+  /**
+   * The share of its cell the drawing fills, above 0 and at most 1 (the
+   * default): officers' lamens are inset to 0.8, so neighbours keep
+   * their distance while their labels still use the whole cell's width.
+   * Part of the layout contract, like the default scales.
+   */
+  inset?: number;
   /** Attributes this art reads beyond the common placeable ones. */
   attributes?: ReadonlyMap<string, HallAttrSpec>;
   /**

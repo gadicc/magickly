@@ -50,7 +50,7 @@ export const zelator1: HallPreset = {
     dais: 5,
     children: [
       LETTERS,
-      dais(-2.7),
+      dais(),
       {
         type: "floor",
         children: [
@@ -120,7 +120,7 @@ export const zelator2: HallPreset = {
     dais: 5,
     children: [
       LETTERS,
-      dais(-2.7),
+      dais(),
       {
         type: "floor",
         children: [

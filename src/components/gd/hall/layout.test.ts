@@ -40,7 +40,8 @@ const drawing = (width: number, height = width): HallArt => ({
   provenance,
 });
 const art = new Map<string, HallArt>([
-  ["lamen", drawing(100)],
+  // As the package's and the app's lamens: 1.6 squares in a 2-square cell.
+  ["lamen", { ...drawing(100), inset: 0.8 }],
   ["altar", drawing(100)],
   ["pillar", drawing(100)],
   ["banner", drawing(100, 125)],
@@ -170,7 +171,7 @@ describe("resolveHall: the floor frame", () => {
 });
 
 describe("resolveHall: scales", () => {
-  it("uses the per-kind defaults from the drawings", () => {
+  it("uses the per-kind defaults, one per kind", () => {
     const objects = only(
       hall(
         {},
@@ -184,34 +185,50 @@ describe("resolveHall: scales", () => {
       ),
     );
     const width = (path: number[]) => at(objects, path).width;
-    expect(width([1, 0])).toBeCloseTo(1.66, 10);
-    expect(width([0, 0])).toBeCloseTo(2.31, 10);
+    // Every lamen alike, on the dais and on the floor.
+    expect(width([1, 0])).toBeCloseTo(1.6, 10);
+    expect(width([0, 0])).toBeCloseTo(1.6, 10);
     expect(at(objects, [1, 1]).height).toBeCloseTo(2, 10);
     expect(width([1, 2])).toBeCloseTo(2.95, 10);
     expect(width([1, 3])).toBe(1);
     expect(at(objects, [1, 3]).missing).toBe(true);
   });
 
-  it("draws the officers one size with sizes=uniform or officerScale", () => {
-    const officers = (attrs: Record<string, unknown>) =>
-      only(
-        hall(
-          attrs,
-          { type: "dais", children: [{ type: "officer", role: "imperator" }] },
-          floor({ type: "officer", role: "keryx" }, { type: "altar" }),
+  it("insets art in its cell and lets the label use the whole cell", () => {
+    // A text 1.6 to 2 squares wide fits a cell but not an inset lamen.
+    const text = "Red lamp";
+    const width = labelFont.width(text, LABEL_SIZE);
+    expect(width).toBeGreaterThan(1.6);
+    expect(width).toBeLessThan(2);
+    const [officer, altar, half] = only(
+      hall(
+        {},
+        floor(
+          { type: "officer", role: "keryx", label: text },
+          { type: "altar" },
+          { type: "officer", role: "keryx", scale: 0.5 },
         ),
-      ).map((object) => object.width);
-    expect(officers({ sizes: "uniform" })).toEqual([2, 2, 2]);
-    expect(officers({ officerScale: 0.5 })).toEqual([1, 2, 1]);
-    expect(officers({ officerScale: "0.5", sizes: "uniform" })).toEqual([
-      1, 2, 1,
-    ]);
+      ),
+    );
+    expect(officer.width).toBeCloseTo(1.6, 10);
+    expect(officer.labels[0].lines.map((line) => line.text)).toEqual([text]);
+    expect(altar.width).toBe(2);
+    expect(half.width).toBeCloseTo(0.8, 10);
+  });
+
+  it("ignores an inset outside (0, 1]", () => {
+    for (const inset of [0, -1, 1.5, Number.NaN]) {
+      const [lamen] = resolveHall(hall({}, floor({ type: "lamen" })), {
+        art: new Map([["lamen", { ...drawing(100), inset }]]),
+      }).objects;
+      expect(lamen.width, String(inset)).toBe(2);
+    }
   });
 
   it("documents every default in one table", () => {
-    expect(DEFAULT_SCALES.get("lamen:floor")).toEqual([0.83, 1]);
-    expect(DEFAULT_SCALES.get("lamen:dais")).toEqual([1.155, 1]);
-    expect(DEFAULT_SCALES.get("item:cross")).toEqual([0.235, 0.235]);
+    expect(DEFAULT_SCALES.get("lamen")).toBe(1);
+    expect(DEFAULT_SCALES.has("lamen:dais")).toBe(false);
+    expect(DEFAULT_SCALES.get("item:cross")).toBe(0.235);
   });
 });
 
@@ -287,7 +304,7 @@ describe("resolveHall: hosts", () => {
     );
     expect(at(objects, [0, 0])).toMatchObject({ width: 4, height: 3 });
     expect(at(objects, [0, 0, 0])).toMatchObject({ cx: 8, cy: 14.5 });
-    expect(at(objects, [0, 0, 0]).width).toBeCloseTo(1.66, 10);
+    expect(at(objects, [0, 0, 0]).width).toBeCloseTo(1.6, 10);
     expect(at(objects, [0, 0, 1])).toMatchObject({ cx: 6.5, cy: 14.5 });
   });
 
@@ -526,10 +543,10 @@ describe("resolveHall: labels", () => {
       {
         text: "Hegemon",
         x: 8,
-        y: 3 + 0.83 + LABEL_GAP + labelFont.top * LABEL_SIZE,
+        y: 3 + 0.8 + LABEL_GAP + labelFont.top * LABEL_SIZE,
       },
     ]);
-    expect(label.bounds.y0).toBeCloseTo(3 + 0.83 + LABEL_GAP, 10);
+    expect(label.bounds.y0).toBeCloseTo(3 + 0.8 + LABEL_GAP, 10);
     expect(label.bounds.x1 - label.bounds.x0).toBeCloseTo(
       labelFont.width("Hegemon", LABEL_SIZE),
       10,
@@ -561,10 +578,10 @@ describe("resolveHall: labels", () => {
     );
     const [left, right, hidden, pillar, keryx, unknown, roleless] = objects;
     expect(left.labels[0]).toMatchObject({ anchor: "end", size: 0.5 });
-    expect(left.labels[0].lines[0].x).toBeCloseTo(8 - 0.83 - LABEL_GAP, 10);
-    expect(left.labels[0].bounds.x1).toBeCloseTo(8 - 0.83 - LABEL_GAP, 10);
+    expect(left.labels[0].lines[0].x).toBeCloseTo(8 - 0.8 - LABEL_GAP, 10);
+    expect(left.labels[0].bounds.x1).toBeCloseTo(8 - 0.8 - LABEL_GAP, 10);
     expect(right.labels[0].anchor).toBe("start");
-    expect(right.labels[0].bounds.x0).toBeCloseTo(8 + 0.83 + LABEL_GAP, 10);
+    expect(right.labels[0].bounds.x0).toBeCloseTo(8 + 0.8 + LABEL_GAP, 10);
     // A side label is centred on the object's centre line.
     const middle = (right.labels[0].bounds.y0 + right.labels[0].bounds.y1) / 2;
     expect(middle).toBeCloseTo(8, 10);
@@ -605,14 +622,14 @@ describe("resolveHall: labels", () => {
       ),
     );
     const [one, two, three, four, five] = keryx.labels;
-    expect(one.bounds.y0).toBeCloseTo(8 + 0.83 + LABEL_GAP, 10);
+    expect(one.bounds.y0).toBeCloseTo(8 + 0.8 + LABEL_GAP, 10);
     expect(three.bounds.y0).toBeCloseTo(one.bounds.y1 + LABEL_GAP, 10);
-    expect(two.bounds.y1).toBeCloseTo(8 - 0.83 - LABEL_GAP, 10);
-    expect(four.bounds.x1).toBeCloseTo(8 - 0.83 - LABEL_GAP, 10);
+    expect(two.bounds.y1).toBeCloseTo(8 - 0.8 - LABEL_GAP, 10);
+    expect(four.bounds.x1).toBeCloseTo(8 - 0.8 - LABEL_GAP, 10);
     expect(five.bounds.x1).toBeCloseTo(four.bounds.x0 - LABEL_GAP, 10);
   });
 
-  it("wraps a host's children's labels at their drawn width", () => {
+  it("wraps a host's children's labels at their cell width", () => {
     const text = "Banner of the West";
     const [altar, cross] = only(
       hall(
@@ -628,8 +645,9 @@ describe("resolveHall: labels", () => {
     expect(cross.width).toBeCloseTo(3.6, 10);
     const lines = (width: number) =>
       wrapText(text, width, LABEL_SIZE).map((line) => line.text);
-    expect(cross.labels[0].lines.map((line) => line.text)).toEqual(lines(3.6));
-    expect(lines(3.6)).not.toEqual(lines(1.5));
+    // The cross's cell: 2 squares at scale 1, times the altar's 3.
+    expect(cross.labels[0].lines.map((line) => line.text)).toEqual(lines(6));
+    expect(lines(6)).not.toEqual(lines(3.6));
   });
 
   it("draws free labels as centred text", () => {
