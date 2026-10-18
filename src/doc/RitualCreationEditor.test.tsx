@@ -295,3 +295,38 @@ it("synchronizes an open footnote when creation is disabled and re-enabled", asy
   );
   expect(onChange).toHaveBeenCalledWith(expect.stringContaining("NoteNew "));
 });
+
+it("applies replaced source outside React's commit phase", async () => {
+  const error = vi.spyOn(console, "error");
+  function Host() {
+    const [source, setSource] = React.useState(
+      "//- magickli-ritual-pug 1\nHiero: Before\n",
+    );
+    return (
+      <RitualCreationEditor
+        source={source}
+        disabled={false}
+        onValidityChange={() => {}}
+        onChange={setSource}
+      />
+    );
+  }
+  render(<Host />);
+  const visual = await screen.findByRole("textbox", {
+    name: "New ritual visual editor",
+  });
+  await waitFor(() => expect(visual.textContent).toContain("Before"));
+  fireEvent.change(screen.getByRole("textbox", { name: "New ritual source" }), {
+    target: {
+      value:
+        "//- magickli-ritual-pug 1\nHiero: Pasted\nKerux: More#[footnote Note]\n",
+    },
+  });
+  await waitFor(() => expect(visual.textContent).toContain("Pasted"));
+  expect(visual.textContent).not.toContain("Before");
+  // Only React node views mounted after initialization call flushSync.
+  expect(visual.querySelector(".ritual-node-view")).toBeTruthy();
+  expect(
+    error.mock.calls.filter((call) => String(call[0]).includes("flushSync")),
+  ).toEqual([]);
+});

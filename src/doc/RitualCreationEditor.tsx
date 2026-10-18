@@ -104,7 +104,14 @@ export default function RitualCreationEditor({
     }
     lastEmission.current = null;
     const next = initialView(source);
-    editor.commands.setContent(next.content, { emitUpdate: false });
+    // React node views mount with flushSync, which React refuses during the
+    // commit that a discrete event (typing, paste) flushes this effect in.
+    // Microtasks run in order and before any further input, so the latest
+    // source still wins; a later task could overwrite a visual edit.
+    queueMicrotask(() => {
+      if (!editor.isDestroyed)
+        editor.commands.setContent(next.content, { emitUpdate: false });
+    });
     setIssue(next.issue);
     setSourceDiagnostic(next.diagnostic);
     setVisualError(null);
