@@ -325,8 +325,10 @@ Follow-ups are separate from the completed migration work:
   one atom in the visual editor, after the planned compiler change
   (stage B; fix forward once a hall is saved); the `/hall` command and
   the Insert… dialog insert presets, `/gd/hall` copies a preset's Pug,
-  and the source editor shows hall warnings (stage C). Stage D, the
-  visual sub-editor, is next.
+  and the Pug source editor shows hall warnings (stage C, with its
+  review fixes: text typed without a keypress over a selected block
+  now replaces it, as a key press does, instead of landing in the
+  title). Stage D, the visual sub-editor, is next.
   TODO from it: recording officer movement between stations, a `gdVault` for
   the Adeptus Minor Vault, original Enochian letterforms, moving
   `enochianFont.ts` and the other files the import-boundary test allows out
@@ -343,8 +345,12 @@ Follow-ups are separate from the completed migration work:
   `//-` comments inside the built-in docs' halls (stage I) against their
   parity test, writing `0` rather than `-0` for coordinates in the
   visual hall editor (stage D), hall warnings in the visual
-  sub-editor (they show in source only), selecting a hall node as its
-  node view mounts beside another atom (Chromium loses the selection),
+  sub-editor (they show in source only), the warnings' second parse of
+  the source (now in idle time), Chromium moving a selected block's DOM
+  selection before input (ProseMirror reads it; seen in 3 of 28 CDP
+  key presses) and a composition without an IME keydown not ending
+  cleanly over a block next to another, Firefox and Safari checks of
+  that input handling,
   the order-dependent `members` documentation screenshot, a server
   error on the temple membership page seen during the screenshot
   capture, `pnpm check:turbopack` failing on `main` as well

@@ -13,8 +13,10 @@ tarot titles (Decisions before stage B). Stage B is done on
 reader and as one atom in the visual editor, after the compiler change
 of decision 2 (Stage B notes). Stage C is done on `gate/gd-hall-c`
 (18 October 2026): the `/hall` slash command and the toolbar insert
-presets, the gallery copies a preset's Pug, and the source editor shows
-hall warnings (Stage C notes); stage D is next.
+presets, the gallery copies a preset's Pug, and the Pug source editor
+shows hall warnings (Stage C notes), with the fixes from its review,
+among them text typed over a selected block without a keypress (Stage
+C review fixes); stage D is next.
 
 Composable Golden Dawn temple-hall diagrams, authored in the ritual Pug
 dialect, drawn as inline SVG in the reader and editor, edited visually, and
@@ -1199,7 +1201,7 @@ brief left a choice or proved wrong:
   not stand, as another keeps tasks out of tasks, and the clipboard's
   parse rule refuses a pasted hall whose rows break the shape rule
   (0e2b46e). Hall diagnostics from `validateHall` were not shown yet;
-  stage C shows them in the source editor (Stage C notes).
+  stage C shows them in the Pug source editor (Stage C notes).
 - **The Neophyte Dadouchos** moved to x = 14.75, not the 14.9 proposed
   (Decisions before stage B).
 
@@ -1408,16 +1410,17 @@ brief left a choice or proved wrong:
   follows it or into a new empty one, which the semantic document does
   not keep (an empty paragraph between blocks, or at the end of its
   container, projects to nothing). The first build selected the hall
-  instead. Typing would then have replaced it, and in headless
-  Chromium 153 a hall selected as its node view mounted right after
-  another atom lost the selection: Chromium moved the DOM selection to
-  the start of the document about 100 ms later, ProseMirror read it
-  back (`DOMObserver.onSelectionChange` → `readDOMChange`), and the
-  next keystrokes went into the ritual's title. Selecting an already
-  drawn hall next to another one by command kept its selection, so the
-  trigger is selecting at mount time; a hall after a task or text kept
-  it too. Clicking a hall to select it is unchanged (Follow-ups).
-  Immediate Backspace or one undo brings the literal command back.
+  instead, so the first character typed would have replaced it; the
+  author goes on writing after the hall instead. Immediate Backspace or
+  one undo brings the literal command back. That first build also met a
+  wider bug, first read here as a mount-time selection loss: after a
+  hall selected right after another atom, the next keystrokes in
+  headless Chromium 153 went into the ritual's title. The review found
+  the cause (Stage C review fixes): the DOM selection of any selected
+  block spans an uneditable element with no caret position, Chromium
+  moves input that ProseMirror leaves to it to an editable position of
+  its own choosing, and ProseMirror reads that back. Clicking a hall to
+  select it is unchanged.
 - **Source view.** The source editor has no snippets or completion
   (`basicSetup` with the legacy Pug mode supplies none), and none was
   added. The `/gd/hall` gallery has a "Copy Pug source" button instead
@@ -1431,7 +1434,7 @@ brief left a choice or proved wrong:
   guide (`/help/ritual-pug`) describes the command, the button and the
   warnings.
 - **Hall diagnostics (decision 2's promise; a stage B follow-up).**
-  `validateHall`'s findings show in the source editor as CodeMirror
+  `validateHall`'s findings show in the Pug source editor as CodeMirror
   warnings beside the source errors of plan 044: yellow underlines,
   gutter markers, F8 and Problems ("Temple hall" as their source).
   Hall errors (a tag that cannot stand there, a missing kind) are shown
@@ -1451,12 +1454,16 @@ brief left a choice or proved wrong:
   except a diagnostic the walk cannot place (none known). At most 100
   are shown, then one line says how many more. The validator and the
   hall art load lazily, 300 ms after typing stops and only for source
-  that holds a hall, so other rituals' editors never fetch them.
+  that holds a hall, so other rituals' editors never fetch them; the
+  check then waits for idle time (Stage C review fixes). Ritual Text
+  shows none: in the semantic editor it is only the dialect of a
+  recovered draft, converted to Pug as soon as it parses, and the
+  creation editor is Pug only.
   Neither `ritualPug.ts` nor `ritualSourceDiagnostics.ts` is hashed:
   the compiler identity is unchanged (`6b059a0f…`).
 - **Not built here:** the visual sub-editor (stage D) and the
-  `/gd/hall` editor (stage E). The warnings show only in the source
-  panel; a visual-only author sees none (Follow-ups).
+  `/gd/hall` editor (stage E). The warnings show only in the Pug
+  source panel; a visual-only author sees none (Follow-ups).
 
 What was verified, and how:
 
@@ -1524,6 +1531,108 @@ What was verified, and how:
   members added on the same day; neither is a stage C change, so both
   were left as committed (Follow-ups).
 
+## Stage C review fixes
+
+An independent review of stage C (d1aaf33..46debf8) found one major
+problem and five smaller ones, fixed on `gate/gd-hall-c` on 18 October
+2026:
+
+- **Text without a keypress over a selected block (major; 98f4ffa).**
+  With a hall, or any other block, node-selected beside uneditable
+  neighbours, text that arrives without a keypress (an IME, a virtual
+  keyboard, dictation, a spelling replacement, CDP's
+  `Input.insertText`) went elsewhere: to the start of the ritual's
+  title between two halls or two rules, to the end of the task before a
+  hall after a task (the reviewer once saw a new task copying that
+  task's `say` and `role` instead, the same mechanism), and so for a
+  hall just pasted at the end of the ritual. It predates stage C.
+  ProseMirror types over a block selection only in its keypress
+  handler; other input is left to the browser and read back from the
+  DOM. A selected block's DOM selection spans a `contenteditable=false`
+  element with no caret position, and Chromium moves the input to an
+  editable position of its own choosing, sometimes moving the DOM
+  selection itself before the input event, which ProseMirror then reads
+  as an edit there. `RitualSelectionInput` (`ritualSelectionInput.ts`,
+  in the visual editor's client extensions) handles the selection
+  ProseMirror holds, a selected block or a gap cursor: it cancels
+  `beforeinput` for `insertText` and `insertReplacementText` and types
+  the text as the keypress handler does (`handleTextInput`, else
+  `tr.insertText`), so the block becomes a paragraph holding the text,
+  as a real key press makes it, in one undo step; an IME's first keydown
+  (key code 229) replaces the block with the empty paragraph typing
+  would make, caret inside, before the composition starts (composition
+  text cannot be cancelled), and `compositionstart` without that
+  keydown does the same. In headless Chromium 153 (Turbopack dev
+  server on port 3157, the local Creator, "Hall check (stage B)", each
+  case on a freshly loaded editor, nothing saved), CDP
+  `Input.insertText` over a hall next to a hall, a rule next to a rule,
+  a hall after a task, a hall just pasted at the end, and a gap cursor
+  between two halls put the text in a new paragraph in the block's
+  place, the title and the tasks (with their roles) unchanged; before
+  the fix the same steps put it at the title's start (halls, rules,
+  paste) or the end of the task before (a hall after a task). An IME
+  composition sent as real IMEs send it (a key code 229 keydown, then
+  `Input.imeSetComposition` and a commit) did the same and ended
+  cleanly; CDP key presses went into the new paragraph as before.
+  Without the keydown, a composition over a hall or rule next to
+  another reached the new paragraph but did not end cleanly in
+  Chromium (the commit added to the first update, and ProseMirror
+  stayed composing): CDP's composition without a keydown is the only
+  way seen to reach that, as real IMEs send the keydown (Follow-ups).
+  In 3 of 28 fresh runs (hall or rule next to another), a CDP key
+  press shortly after selecting went into the title, with or without
+  the fix: Chromium had moved the DOM selection before the keydown and
+  ProseMirror read it (Follow-ups). Tests
+  (`ritualSelectionInput.test.ts`, jsdom): each input type over a hall
+  next to a hall, a rule next to a rule and a hall after a task gives
+  the document `tr.insertText` gives, at a gap cursor too, in one undo
+  step; text in text, a read-only editor and other input types are left
+  alone; the keydown and `compositionstart` open the paragraph, other
+  keys and shortcuts do not. The comment on `caretAfterGdHall` names
+  the real cause; the caret still goes after a new hall.
+- **Warnings for Pug only (minor).** The commit and these notes said
+  "the source editor shows hall warnings"; they show for Pug. Ritual
+  Text is only the dialect of a recovered draft in the semantic editor,
+  converted to Pug once it parses (`applySource`), and the creation
+  editor is Pug only, so no location mapping was added for it; the
+  wording above says Pug.
+- **The warnings' second parse (minor; 5a2b847).** On a synthetic
+  74 KB ritual with 20 halls (978 lines; the five presets four times,
+  each followed by 17 speeches), the warnings were one main-thread task
+  of 63–83 ms in headless Chromium, nearly all of it the parse
+  (`parseRitualPug` alone: 82 ms in Node, `gdHallSourceWarnings` 77 ms),
+  and in four of four measured keystrokes it ran before the semantic
+  editor's own parse and visual update (about 600 ms of work), delaying
+  it. Reusing the editor's parse is not cleanly reachable: the semantic
+  editor parses only dirty source, without locations, its 200 ms
+  debounce fired after the warnings' 300 ms one in every measured case,
+  and a visual edit reprints the source without parsing it. The check
+  now waits for idle time after the pause (`requestIdleCallback`, at
+  most 2 s; a later task where it is missing): in two of four measured
+  keystrokes it then ran after the visual update. The work is
+  unchanged (Follow-ups). Tests: the scheduling, a result for source
+  that changed while it waited, older warnings while newer source
+  waits, unmounting before or after the import, and the fallback.
+- **Insert… with a wide selection (minor; 3016669).** With Select All
+  the toolbar put the hall before the title, and a selection across
+  blocks put it inside the selection. `gdHallInsertionRange` counts
+  from the selection's end when its ends lie in different blocks, so
+  the hall goes at the end of the ritual for Select All, after the
+  block holding the end otherwise. In Chromium, Select All then Insert…
+  → Temple hall put the Neophyte at the end, the title unchanged, and
+  one undo removed it.
+- **Copy Pug source (nit; 9923d1e).** A printer error reads "Could not
+  copy: this hall could not be written as Pug." and leaves the
+  clipboard alone; a printer that cannot load leaves a note beside the
+  disabled button, which shows no tooltip.
+- **Tests for the warnings' guards (nit; 5a2b847)**, as above.
+
+The documentation screenshots of the ritual list, creation form,
+editor and reader were recaptured from this branch
+(`DOCS_SCREENSHOTS_ORIGIN=http://localhost:3157`) and are
+byte-identical; `editor-visual` timed out once waiting for the editor
+and was captured on a second run.
+
 ## Commits
 
 | Commit | Change |
@@ -1589,7 +1698,11 @@ What was verified, and how:
 | 4618ca1 | The offline inventory counts the rows below the root, as the compiler counts nodes (B final review nit; older than halls) |
 | 71847b9 | Temple hall in the slash menu and the Insert… dialog: presets copied with fresh IDs where a hall may stand, the caret after it (C) |
 | ea0f106 | Copy Pug source on `/gd/hall`: a preset as Pug without IDs, the printer loaded after the page (C) |
-| 52ab8b6 | Hall warnings in the source editor at the node or attribute they name, never blocking a save (C; decision 2) |
+| 52ab8b6 | Hall warnings in the Pug source editor at the node or attribute they name, never blocking a save (C; decision 2) |
+| 98f4ffa | Text without a keypress over a selected block or gap cursor typed over it as a keypress does; an IME's first keydown opens the paragraph (C review, major) |
+| 3016669 | The Insert… dialog puts a hall after a selection whose ends lie in different blocks, at the end for Select All (C review) |
+| 5a2b847 | Hall warnings checked in idle time after the pause; stale and unmount guards tested (C review) |
+| 9923d1e | Copy Pug source reports a printer error as such and says when the printer cannot load (C review) |
 
 ## Future
 
@@ -1640,13 +1753,26 @@ corpus audit must allow the dropped `{}` rows (Stage B notes); the
 synthetic "Hall check (stage B)" ritual stays in the local development
 database.
 
-From stage C: hall warnings show only in the source panel, so the
+From stage C: hall warnings show only in the Pug source panel, so the
 visual sub-editor (stage D) should show them for the hall it edits;
-selecting a hall node at the moment its node view mounts right after
-another atom loses the selection in Chromium (Stage C notes), which
-the sub-editor must avoid when it selects a new or duplicated node,
-and which clicking a hall next to another atom may share (unchecked);
-the `members` documentation screenshot depends on the order of
+the warnings parse the source a second time (63–83 ms on 74 KB, now in
+idle time), so they could reuse the editor's parse, which would need
+it to keep locations and run first, or move off the main thread;
+Chromium can move a selected block's DOM selection to an editable
+position before input arrives, and ProseMirror then reads it as the
+author's: seen in 3 of 28 fresh CDP key presses shortly after
+selecting a hall or rule next to another (the key went into the
+title), and in the first stage C build after a hall selected as it
+mounted. Keeping a block
+selection against moves the author did not make (no pointer, touch or
+key) would cover it, at the risk of refusing a caret set by assistive
+technology, so it is not done; the sub-editor (stage D) should still
+avoid node-selecting a new or duplicated node at mount. A composition
+that starts without an IME keydown over a block next to another
+uneditable block reaches the new paragraph but does not end cleanly in
+Chromium (seen only with CDP's `Input.imeSetComposition`). The input
+handling is checked in Chromium only (no Firefox or Safari run here).
+The `members` documentation screenshot depends on the order of
 members added on the same day, and `join-code` on the capture's
 origin; during the capture the dev server logged a server error on
 `/temples/admin/<temple>/membership/<member>` ("Cannot read properties
