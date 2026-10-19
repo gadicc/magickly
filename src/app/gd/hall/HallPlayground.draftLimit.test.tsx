@@ -16,7 +16,7 @@ it("says when a hall is too large to keep as a draft", async () => {
   render(<HallPlayground />);
   expect(
     await screen.findByText(
-      "This hall is too large to keep as a draft in this browser.",
+      "This hall is too large to keep as a draft in this browser: a draft holds at most 1,000 nodes and 96,000 characters.",
     ),
   ).toBeTruthy();
 });

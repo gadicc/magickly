@@ -60,8 +60,12 @@ export interface HallHistory {
 export type HallHistoryAction =
   /** A completed visual gesture's hall. */
   | { type: "visual"; hall: HallElement }
-  /** The source as typed: shown at once, a step once settled. */
-  | { type: "typed"; source: string }
+  /**
+   * The source as typed, read once typing rests a moment (the page shows
+   * the text at once, and reads it as a hall only then); a step once
+   * settled.
+   */
+  | { type: "typed"; entry: HallEntry }
   /** Typing paused: the typed source becomes one step. */
   | { type: "settle" }
   /** A preset, a draft or a shared hall, as one step. */
@@ -113,10 +117,10 @@ export function hallHistoryReducer(
     case "load":
       return step(history, action.entry);
     case "typed":
-      if (action.source === history.present.source) return history;
+      if (action.entry.source === history.present.source) return history;
       return {
         ...history,
-        present: entryOfSource(action.source),
+        present: action.entry,
         typingFrom: history.typingFrom ?? history.present,
       };
     case "settle":

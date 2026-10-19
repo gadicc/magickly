@@ -9,8 +9,12 @@
 /** The draft's key; a new format takes a new version. */
 export const HALL_DRAFT_KEY = "magickli:gd-hall-draft:v1";
 
-/** The longest draft kept or read, in characters (a 4,000-node hall fits). */
-export const MAX_HALL_DRAFT = 1_000_000;
+/**
+ * The longest draft kept or read, in characters: a hall of
+ * `MAX_KEPT_HALL_NODES` with its IDs fits (`hallLimits.ts`), and reading
+ * one stays quick.
+ */
+export const MAX_HALL_DRAFT = 96_000;
 
 /** A stored draft: the hall's source (header-less Pug with IDs). */
 export interface HallDraft {

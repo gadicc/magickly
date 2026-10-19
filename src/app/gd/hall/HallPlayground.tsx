@@ -39,7 +39,12 @@ import ExportControls from "@/export/ExportControls";
 import { copyText } from "@/export/exportRuntime";
 import { gdHallArt } from "./art";
 import { embedGdHallFonts } from "./exportFonts";
-import { draftStorage, readHallDraft, writeHallDraft } from "./hallDraft";
+import {
+  draftStorage,
+  MAX_HALL_DRAFT,
+  readHallDraft,
+  writeHallDraft,
+} from "./hallDraft";
 import {
   canRedo,
   canUndo,
@@ -49,10 +54,12 @@ import {
   hallHistoryReducer,
   initialHistory,
 } from "./hallHistory";
+import { hallNodeCount, MAX_KEPT_HALL_NODES, tooManyNodes } from "./hallLimits";
 import styles from "./hallPlayground.module.css";
 import {
   isShareHash,
   MAX_SHARE_FRAGMENT,
+  MAX_SHARED_BYTES,
   readShareHash,
   type ShareFragment,
   shareFragment,
@@ -61,6 +68,12 @@ import {
 /** The page's own layout preference (plan 049's, under another key). */
 export const HALL_LAYOUT_KEY = "magickli:gd-hall-editor-layout:v1";
 
+/**
+ * How long typing in the source rests before it is read as a hall and
+ * drawn, as the ritual editor applies its source: the text shows at once,
+ * and a large hall is not parsed and laid out at every keystroke.
+ */
+const READ_TYPING = 200;
 /** How long typing in the source pauses before it is one undo step. */
 const SETTLE_TYPING = 700;
 /** How long the hall rests before the draft is written. */
@@ -117,8 +130,11 @@ function startingPoint(): {
   draft: boolean;
 } {
   const reading = readHallDraft(draftStorage());
-  if (reading.status === "found") {
-    const entry = entryOfSource(reading.draft.source);
+  const entry =
+    reading.status === "found" ? entryOfSource(reading.draft.source) : null;
+  // A draft this page would not have kept is not restored.
+  const oversized = !!entry?.hall && tooManyNodes(entry.hall);
+  if (entry && !oversized) {
     return {
       entry,
       note: matchingPreset(entry) ? null : { kind: "restored" },
@@ -129,7 +145,9 @@ function startingPoint(): {
     entry: presetEntry(HALL_PRESETS[0]),
     draft: false,
     note:
-      reading.status === "corrupt" || reading.status === "oversized"
+      oversized ||
+      reading.status === "corrupt" ||
+      reading.status === "oversized"
         ? { kind: "unreadable-draft" }
         : null,
   };
@@ -182,11 +200,18 @@ export default function HallPlayground() {
   >("saved");
   const [share, setShare] = React.useState<{
     source: string;
-    result: ShareFragment | "failed";
+    result: ShareFragment | { tooMany: number } | "failed";
   } | null>(null);
   const [status, setStatus] = React.useState("");
   const drawing = React.useRef<SVGSVGElement>(null);
   const present = history.present;
+  // Source typed but not yet read (`READ_TYPING`): what the panel shows.
+  const [typed, setTyped] = React.useState<string | null>(null);
+  const unread = React.useRef<string | null>(null);
+  const latestSource = React.useRef(present.source);
+  latestSource.current = present.source;
+  const latestHall = React.useRef(present);
+  latestHall.current = present;
   const preset = React.useMemo(() => matchingPreset(present), [present]);
 
   // The last hall the source held, shown (read-only) while it holds none.
@@ -198,6 +223,23 @@ export default function HallPlayground() {
     [shownHall],
   );
   const displayMode = !shownHall && mode === "visual" ? "source" : mode;
+
+  // Typed source is read once typing rests. Anything else the author does
+  // reads it first, so it is never lost or undone out of order.
+  const readTyped = React.useCallback((): HallEntry | null => {
+    const source = unread.current;
+    if (source === null) return null;
+    unread.current = null;
+    setTyped(null);
+    const entry = entryOfSource(source);
+    dispatch({ type: "typed", entry });
+    return entry;
+  }, []);
+  React.useEffect(() => {
+    if (typed === null) return;
+    const timer = window.setTimeout(readTyped, READ_TYPING);
+    return () => window.clearTimeout(timer);
+  }, [typed, readTyped]);
 
   // Typing becomes one undo step once it pauses: each keystroke starts
   // the wait again.
@@ -215,23 +257,35 @@ export default function HallPlayground() {
   // goes. A hall opened from a share link is not written over the draft
   // until it is changed.
   const holdDraft = React.useRef<string | null>(null);
-  const latestSource = React.useRef(present.source);
-  latestSource.current = present.source;
-  const saveDraft = React.useCallback(() => {
-    const source = latestSource.current;
-    if (source === holdDraft.current) return;
+  /** Keeps `entry` as the draft, unless it holds too many nodes. */
+  const writeDraft = React.useCallback((entry: HallEntry) => {
+    if (entry.source === holdDraft.current) return;
     holdDraft.current = null;
-    setDraftKept(writeHallDraft(draftStorage(), source));
+    // Too many nodes to keep (the length `writeHallDraft` checks).
+    if (entry.hall && tooManyNodes(entry.hall)) {
+      setDraftKept("too-large");
+      return;
+    }
+    setDraftKept(writeHallDraft(draftStorage(), entry.source));
   }, []);
+  /** Keeps the hall as it is now as the draft, typing read first. */
+  const saveNow = React.useCallback(
+    () => writeDraft(readTyped() ?? latestHall.current),
+    [readTyped, writeDraft],
+  );
+  // While typing waits to be read, it is not kept: the hall it gives is,
+  // a moment after it is read.
   // biome-ignore lint/correctness/useExhaustiveDependencies: a new source only
   React.useEffect(() => {
-    const timer = window.setTimeout(saveDraft, SAVE_DRAFT);
+    const timer = window.setTimeout(() => {
+      if (unread.current === null) writeDraft(latestHall.current);
+    }, SAVE_DRAFT);
     return () => window.clearTimeout(timer);
-  }, [present.source, saveDraft]);
+  }, [present.source, writeDraft]);
   React.useEffect(() => {
-    window.addEventListener("pagehide", saveDraft);
-    return () => window.removeEventListener("pagehide", saveDraft);
-  }, [saveDraft]);
+    window.addEventListener("pagehide", saveNow);
+    return () => window.removeEventListener("pagehide", saveNow);
+  }, [saveNow]);
 
   // A share link opens its hall, as one step: undo goes back to the draft.
   React.useEffect(() => {
@@ -258,7 +312,15 @@ export default function HallPlayground() {
         });
         return;
       }
+      if (tooManyNodes(entry.hall)) {
+        setNote({
+          kind: "share-failed",
+          reason: `its hall holds more than ${MAX_KEPT_HALL_NODES.toLocaleString("en")} nodes, more than a shared hall may`,
+        });
+        return;
+      }
       holdDraft.current = entry.source;
+      readTyped();
       dispatch({ type: "load", entry });
       setNote({ kind: "shared", draft: start.draft });
     };
@@ -268,7 +330,7 @@ export default function HallPlayground() {
       current = false;
       window.removeEventListener("hashchange", open);
     };
-  }, [start.draft]);
+  }, [start.draft, readTyped]);
 
   // The share link for the hall as it is, ready for the click (copying
   // keeps the click's permission only if it starts at once).
@@ -277,6 +339,11 @@ export default function HallPlayground() {
     if (!hall) return;
     let current = true;
     const timer = window.setTimeout(() => {
+      const nodes = hallNodeCount(hall);
+      if (nodes > MAX_KEPT_HALL_NODES) {
+        setShare({ source: present.source, result: { tooMany: nodes } });
+        return;
+      }
       shareFragment(printHallSource(hall, { ids: false }))
         .then((result) => {
           if (current) setShare({ source: present.source, result });
@@ -290,7 +357,9 @@ export default function HallPlayground() {
       window.clearTimeout(timer);
     };
   }, [present]);
-  const shared = share?.source === present.source ? share.result : null;
+  // No link while typed source waits to be read: it would be the last hall's.
+  const shared =
+    typed === null && share?.source === present.source ? share.result : null;
 
   // A status belongs to the hall it was about.
   // biome-ignore lint/correctness/useExhaustiveDependencies: on a new hall only
@@ -300,6 +369,7 @@ export default function HallPlayground() {
     setReplacing(null);
     setNote(null);
     setCompare(false);
+    readTyped();
     dispatch({ type: "load", entry: presetEntry(chosen) });
   };
   const choosePreset = (id: string) => {
@@ -313,21 +383,39 @@ export default function HallPlayground() {
   };
 
   /** A visual gesture's hall, refused unless it is valid ritual source. */
-  const onVisualChange = React.useCallback((hall: HallElement) => {
-    if (!validHall(hall)) return false;
-    dispatch({ type: "visual", hall });
-    return true;
-  }, []);
-  const undo = React.useCallback(() => dispatch({ type: "undo" }), []);
-  const redo = React.useCallback(() => dispatch({ type: "redo" }), []);
-  const onSourceChange = React.useCallback(
-    (source: string) => dispatch({ type: "typed", source }),
-    [],
+  const onVisualChange = React.useCallback(
+    (hall: HallElement) => {
+      if (!validHall(hall)) return false;
+      // A gesture on the hall drawn before typing that is still unread
+      // would write over the typing: it is refused, and the typing read.
+      const read = readTyped();
+      if (read && read.source !== latestSource.current) return false;
+      dispatch({ type: "visual", hall });
+      return true;
+    },
+    [readTyped],
   );
+  const undo = React.useCallback(() => {
+    readTyped();
+    dispatch({ type: "undo" });
+  }, [readTyped]);
+  const redo = React.useCallback(() => {
+    readTyped();
+    dispatch({ type: "redo" });
+  }, [readTyped]);
+  const onSourceChange = React.useCallback((source: string) => {
+    unread.current = source;
+    setTyped(source);
+  }, []);
 
   // Both buttons are enabled only with a hall, and a link, to copy.
   const copyPug = async () => {
-    const text = printHallSource(present.hall as HallElement, { ids: false });
+    const hall = (readTyped() ?? present).hall;
+    if (!hall) {
+      setStatus("Correct the source to copy the hall.");
+      return;
+    }
+    const text = printHallSource(hall, { ids: false });
     try {
       await copyText(text);
       setStatus("Copied the Pug source. Paste it into a ritual's source.");
@@ -355,7 +443,11 @@ export default function HallPlayground() {
       ? "This browser could not make a share link."
       : shared && "tooLong" in shared
         ? `This hall is too large for a share link (${shared.tooLong.toLocaleString("en")} characters; the most is ${MAX_SHARE_FRAGMENT.toLocaleString("en")}). Copy its Pug source instead.`
-        : null;
+        : shared && "tooLarge" in shared
+          ? `This hall is too large for a share link (${Math.ceil(shared.tooLarge / 1024).toLocaleString("en")} KB of Pug; the most is ${MAX_SHARED_BYTES / 1024} KB). Copy its Pug source instead.`
+          : shared && "tooMany" in shared
+            ? `This hall is too large for a share link (${shared.tooMany.toLocaleString("en")} nodes; the most is ${MAX_KEPT_HALL_NODES.toLocaleString("en")}). Copy its Pug source instead.`
+            : null;
 
   return (
     <div className={styles.playground}>
@@ -419,7 +511,10 @@ export default function HallPlayground() {
             <span>
               <IconButton
                 aria-label="Undo"
-                disabled={!canUndo(history)}
+                disabled={
+                  !canUndo(history) &&
+                  (typed === null || typed === present.source)
+                }
                 onClick={undo}
               >
                 <Undo />
@@ -476,7 +571,7 @@ export default function HallPlayground() {
             aria-label="Temple hall source panel"
           >
             <RitualSourceEditor
-              value={present.source}
+              value={typed ?? present.source}
               dialect="pug"
               headerless
               disabled={false}
@@ -557,7 +652,7 @@ export default function HallPlayground() {
         {draftKept !== "saved" && (
           <p className={styles.status}>
             {draftKept === "too-large"
-              ? "This hall is too large to keep as a draft in this browser."
+              ? `This hall is too large to keep as a draft in this browser: a draft holds at most ${MAX_KEPT_HALL_NODES.toLocaleString("en")} nodes and ${MAX_HALL_DRAFT.toLocaleString("en")} characters.`
               : "This browser is not keeping a draft: its storage is unavailable or full."}
           </p>
         )}

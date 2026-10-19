@@ -33,6 +33,19 @@ const runtime = vi.hoisted(() => ({
 }));
 vi.mock("@/export/exportRuntime", () => runtime);
 
+// How often the page reads source as a hall.
+const parses = vi.hoisted(() => ({ count: 0 }));
+vi.mock("@/doc/gdHallPug", async (importActual) => {
+  const actual = await importActual<typeof import("@/doc/gdHallPug")>();
+  return {
+    ...actual,
+    parseHallSource: (text: string) => {
+      parses.count++;
+      return actual.parseHallSource(text);
+    },
+  };
+});
+
 // The Pug source panel is CodeMirror; its own tests cover it. Here it is a
 // plain text box, so the page's handling of what is typed can be tested.
 vi.mock("@/doc/RitualSourceEditor", () => ({
@@ -84,6 +97,9 @@ const sourceBox = () =>
 const source = () => sourceBox().value;
 const type = (text: string) =>
   fireEvent.change(sourceBox(), { target: { value: text } });
+/** Typing rests, and the page reads what was typed. */
+const rest = () =>
+  act(() => new Promise((resolve) => setTimeout(resolve, 250)));
 /** The titles of the halls drawn (the editor's and the export's). */
 const titles = () =>
   [...document.querySelectorAll("svg[role=img]")].map(
@@ -111,6 +127,10 @@ function nudgeFirst() {
 /** A source's hall as Pug without IDs, as the page shares it. */
 const pugOf = (text: string) =>
   printHallSource(parseHallSource(text), { ids: false });
+
+/** A hall of `count` plain markers: it packs well. */
+const markers = (count: number) =>
+  `gdHall\n  floor\n${'    marker(text="a", x=1, y=1)\n'.repeat(count)}`;
 
 /** A hall of `count` markers with text that does not compress. */
 function noisyHall(count: number) {
@@ -233,9 +253,10 @@ describe("presets", () => {
 });
 
 describe("source and drawing in step", () => {
-  it("draws what is typed, and prints what is drawn", () => {
+  it("draws what is typed, and prints what is drawn", async () => {
     render(<HallPlayground />);
     type(source().replace('text="Neophyte Temple"', 'text="My hall"'));
+    await rest();
     expect(titles()).toEqual(["My hall", "My hall"]);
     nudgeFirst();
     // The visual edit reprints the source, IDs and all.
@@ -245,10 +266,11 @@ describe("source and drawing in step", () => {
     expect(source()).toContain('text="My hall"');
   });
 
-  it("locks the drawing while the source has an error", () => {
+  it("locks the drawing while the source has an error", async () => {
     render(<HallPlayground />);
     const good = source();
     type(`${good}  each x in y\n`);
+    await rest();
     expect(screen.getByTestId("source-error").textContent).toMatch(
       /^Line \d+:/,
     );
@@ -267,9 +289,56 @@ describe("source and drawing in step", () => {
       screen.getByText("Correct the source to share the hall."),
     ).toBeTruthy();
     type(good);
+    await rest();
     expect(
       screen.getByRole("application").getAttribute("aria-disabled"),
     ).toBeNull();
+  });
+
+  it("reads typed source as a hall once typing rests", async () => {
+    render(<HallPlayground />);
+    const first = source();
+    parses.count = 0;
+    for (const text of ["A", "AB", "ABC"])
+      type(first.replace("Neophyte Temple", text));
+    // The text shows at once; the drawing waits for the rest.
+    expect(source()).toContain('text="ABC"');
+    expect(titles()).toEqual(["Neophyte Temple", "Neophyte Temple"]);
+    expect(parses.count).toBe(0);
+    await rest();
+    expect(titles()).toEqual(["ABC", "ABC"]);
+    expect(parses.count).toBe(1);
+  });
+
+  it("reads unread typing before an undo, a gesture or a copy", async () => {
+    runtime.copyText.mockResolvedValue(undefined);
+    render(<HallPlayground />);
+    const first = source();
+    type(first.replace("Neophyte Temple", "Mine"));
+    // Undo takes the unread edit back whole, and Redo restores it.
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(source()).toBe(first);
+    fireEvent.click(screen.getByRole("button", { name: "Redo" }));
+    expect(titles()).toEqual(["Mine", "Mine"]);
+    type(source().replace('text="Mine"', 'text="Copied"'));
+    fireEvent.click(screen.getByRole("button", { name: "Copy Pug source" }));
+    await screen.findByText(
+      "Copied the Pug source. Paste it into a ritual's source.",
+    );
+    expect(runtime.copyText.mock.calls[0][0]).toContain('text="Copied"');
+    type(source().replace('text="Copied"', 'text="Typed"'));
+    // A gesture on the hall drawn before the typing would write over it:
+    // it is refused, and the typing kept.
+    const typed = source();
+    nudgeFirst();
+    expect(source()).toBe(typed);
+    expect(titles()).toEqual(["Typed", "Typed"]);
+    expect(
+      screen.getAllByText("That change was not made; the hall is as it was."),
+    ).not.toHaveLength(0);
+    // Typing that has not paused is one step: Undo takes both edits back.
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(source()).toContain('text="Mine"');
   });
 
   it("makes typing one undo step once it pauses, and redoes it", async () => {
@@ -386,6 +455,42 @@ describe("the draft", () => {
     ).toBeTruthy();
   });
 
+  it("does not restore a draft of more nodes than it keeps", () => {
+    localStorage.setItem(
+      HALL_DRAFT_KEY,
+      JSON.stringify({ v: 1, source: markers(1000) }),
+    );
+    render(<HallPlayground />);
+    expect(presetShown()).toBe("Neophyte Temple");
+    expect(
+      screen.getByText(/The draft kept in this browser could not be read/),
+    ).toBeTruthy();
+  });
+
+  it("neither keeps nor shares a hall of more nodes than it keeps", async () => {
+    // The source alone: a thousand markers draw slowly in jsdom.
+    localStorage.setItem(HALL_LAYOUT_KEY, "source");
+    render(<HallPlayground />);
+    await act(() => new Promise((resolve) => setTimeout(resolve, 600)));
+    const kept = localStorage.getItem(HALL_DRAFT_KEY);
+    type(markers(1000));
+    expect(
+      await screen.findByText(
+        "This hall is too large to keep as a draft in this browser: a draft holds at most 1,000 nodes and 96,000 characters.",
+        {},
+        { timeout: 20_000 },
+      ),
+    ).toBeTruthy();
+    expect(
+      await screen.findByText(
+        "This hall is too large for a share link (1,002 nodes; the most is 1,000). Copy its Pug source instead.",
+        {},
+        { timeout: 20_000 },
+      ),
+    ).toBeTruthy();
+    expect(localStorage.getItem(HALL_DRAFT_KEY)).toBe(kept);
+  }, 30_000);
+
   it("works when storage is blocked, and says the draft is not kept", async () => {
     vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
       throw new Error("SecurityError");
@@ -456,6 +561,17 @@ describe("sharing and export", () => {
       /^This share link could not be opened: its hall does not read/,
     );
     expect(document.querySelector("img[src=x]")).toBeNull();
+  });
+
+  it("refuses a link to a hall of more nodes than it keeps", async () => {
+    const link = await shareFragment(markers(1000));
+    if (!("fragment" in link)) throw new Error("too long");
+    window.history.replaceState(null, "", `/gd/hall#${link.fragment}`);
+    render(<HallPlayground />);
+    await screen.findByText(
+      "This share link could not be opened: its hall holds more than 1,000 nodes, more than a shared hall may.",
+    );
+    expect(presetShown()).toBe("Neophyte Temple");
   });
 
   it("does nothing once the page has gone", async () => {

@@ -14,8 +14,12 @@ const PREFIX = "hall=";
 /** The longest fragment a share link carries, after `#`. */
 export const MAX_SHARE_FRAGMENT = 8000;
 
-/** The most text a link may unpack to, in bytes of UTF-8. */
-export const MAX_SHARED_BYTES = 256 * 1024;
+/**
+ * The most text a link may unpack to, in bytes of UTF-8: a hall of
+ * `MAX_KEPT_HALL_NODES` without IDs fits (`hallLimits.ts`), and reading
+ * one stays quick.
+ */
+export const MAX_SHARED_BYTES = 64 * 1024;
 
 const encoder = new TextEncoder();
 
@@ -50,7 +54,7 @@ async function readAll(
     size += value.length;
     if (size > limit) {
       await reader.cancel();
-      throw new ShareLinkError("it unpacks to more than a hall may hold");
+      throw new ShareLinkError(TOO_LARGE);
     }
     chunks.push(value);
   }
@@ -75,12 +79,22 @@ const through = (bytes: Uint8Array, transform: GenericTransformStream) =>
 /** Why a share link could not be opened, in words for the author. */
 export class ShareLinkError extends Error {}
 
-/** A share link's fragment for a hall's Pug, or how long it would be. */
-export type ShareFragment = { fragment: string } | { tooLong: number };
+const TOO_LARGE = `it unpacks to more than ${MAX_SHARED_BYTES / 1024} KB, more than a shared hall may hold`;
+
+/**
+ * A share link's fragment for a hall's Pug, or why there is none: how
+ * long the fragment would be, or how many bytes the Pug is (a hall so
+ * large a link to it would be refused, however well it packs).
+ */
+export type ShareFragment =
+  | { fragment: string }
+  | { tooLong: number }
+  | { tooLarge: number };
 
 /** The fragment (without `#`) that shares `pug`, if it fits. */
 export async function shareFragment(pug: string): Promise<ShareFragment> {
   const bytes = encoder.encode(pug);
+  if (bytes.length > MAX_SHARED_BYTES) return { tooLarge: bytes.length };
   const compress = typeof CompressionStream === "function";
   const data = compress
     ? await readAll(
@@ -130,7 +144,7 @@ export async function readShareHash(hash: string): Promise<string> {
       throw new ShareLinkError("it is damaged");
     }
   } else if (bytes.length > MAX_SHARED_BYTES)
-    throw new ShareLinkError("it unpacks to more than a hall may hold");
+    throw new ShareLinkError(TOO_LARGE);
   try {
     return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
   } catch {

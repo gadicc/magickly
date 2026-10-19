@@ -15,6 +15,11 @@ import {
 } from "./hallHistory";
 
 const start = () => entryOfHall(gdHallSource(HALL_PRESETS[0].hall));
+/** What the page dispatches once typing rests: the source, read. */
+const typed = (source: string): HallHistoryAction => ({
+  type: "typed",
+  entry: entryOfSource(source),
+});
 const run = (history: HallHistory, ...actions: HallHistoryAction[]) =>
   actions.reduce(hallHistoryReducer, history);
 /** The start's hall with its caption changed, as a visual gesture gives. */
@@ -79,8 +84,8 @@ describe("the hall editor's history", () => {
     const source = base.present.source;
     let history = run(
       base,
-      { type: "typed", source: source.replace("Neophyte", "N") },
-      { type: "typed", source: source.replace("Neophyte", "Ne") },
+      typed(source.replace("Neophyte", "N")),
+      typed(source.replace("Neophyte", "Ne")),
     );
     expect(history.past).toHaveLength(0);
     expect(history.typingFrom).toBe(base.present);
@@ -89,32 +94,23 @@ describe("the hall editor's history", () => {
     expect(history.past).toEqual([base.present]);
     expect(history.present.source).toContain("Ne Temple");
     // Typed back to where it began: no step.
-    const back = run(
-      base,
-      { type: "typed", source: `${source} ` },
-      { type: "typed", source },
-      { type: "settle" },
-    );
+    const back = run(base, typed(`${source} `), typed(source), {
+      type: "settle",
+    });
     expect(back.past).toHaveLength(0);
-    expect(run(base, { type: "typed", source })).toBe(base);
+    expect(run(base, typed(source))).toBe(base);
   });
 
   it("undoes typing that has not settled yet as one step", () => {
     const base = initialHistory(start());
-    const typed = run(base, {
-      type: "typed",
-      source: "gdHall\n  floor\n    altar(x=.5)\n",
-    });
-    expect(typed.present.hall).toBeNull();
-    const undone = run(typed, { type: "undo" });
+    const unsettled = run(base, typed("gdHall\n  floor\n    altar(x=.5)\n"));
+    expect(unsettled.present.hall).toBeNull();
+    const undone = run(unsettled, { type: "undo" });
     expect(undone.present).toBe(base.present);
     expect(undone.future[0].hall).toBeNull();
     // A gesture made while typing is unsettled settles it first.
     const gesture = run(
-      run(base, {
-        type: "typed",
-        source: base.present.source.replace("Neophyte", "Mine"),
-      }),
+      run(base, typed(base.present.source.replace("Neophyte", "Mine"))),
       { type: "settle" },
     );
     const visual = run(gesture, {

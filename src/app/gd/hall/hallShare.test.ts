@@ -73,6 +73,19 @@ describe("share links", () => {
     );
   });
 
+  it("refuse a hall that packs well but is too large to read quickly", async () => {
+    // The review's link: 8,400 markers, 260 KB, in 934 characters, which
+    // took seconds to read and lay out.
+    const pug = `gdHall\n  floor\n${'    marker(text="a", x=1, y=1)\n'.repeat(8400)}`;
+    expect(await shareFragment(pug)).toEqual({ tooLarge: pug.length });
+    const link = await deflated(new TextEncoder().encode(pug));
+    expect(link.length).toBeLessThan(1000);
+    await expect(readShareHash(`#hall=1.${link}`)).rejects.toThrow(
+      "it unpacks to more than 64 KB, more than a shared hall may hold",
+    );
+    expect(MAX_SHARED_BYTES).toBe(64 * 1024);
+  });
+
   it("refuse links that are not halls, too long, damaged or bombs", async () => {
     expect(isShareHash("#other=1")).toBe(false);
     const fails = (hash: string, message: string | RegExp) =>
@@ -90,7 +103,10 @@ describe("share links", () => {
     // Deflate unpacking to more than a hall may hold.
     const bomb = await deflated(new Uint8Array(MAX_SHARED_BYTES + 1));
     expect(bomb.length).toBeLessThan(MAX_SHARE_FRAGMENT);
-    await fails(`#hall=1.${bomb}`, "it unpacks to more than a hall may hold");
+    await fails(
+      `#hall=1.${bomb}`,
+      "it unpacks to more than 64 KB, more than a shared hall may hold",
+    );
     const plain = Buffer.from("x".repeat(MAX_SHARED_BYTES + 1)).toString(
       "base64url",
     );
