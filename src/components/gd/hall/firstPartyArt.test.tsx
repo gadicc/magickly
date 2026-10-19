@@ -195,6 +195,49 @@ describe("the Enochian tablets", () => {
   });
 });
 
+describe("the altars, the veil and the furnishings", () => {
+  it("draws a white altar beside the black one", () => {
+    const black = draw(art("altar"), { type: "altar" });
+    const white = draw(art("altar"), { type: "altar", kind: "white" });
+    expect(black).toContain('fill="#000000"');
+    expect(white).toContain('fill="#ffffff"');
+    expect(draw(art("altar"), { type: "altar", kind: "red" })).toBe(black);
+    expect(art("altar").variant({ type: "altar", kind: "red" })).toBe(
+      art("altar").variant({ type: "altar" }),
+    );
+    // A kind it does not know, the legacy "null" included, is an error.
+    expect(
+      validateHall(
+        hall(
+          { type: "altar", kind: "white", x: 3, y: 3 },
+          { type: "altar", kind: "red", x: 8, y: 3 },
+          { type: "altar", kind: "null", x: 13, y: 3 },
+        ),
+        { art: defaultHallArt },
+      ).map((d) => d.message),
+    ).toEqual([
+      'altar: kind="red" is not one of black, white',
+      'altar: kind="null" is not one of black, white',
+    ]);
+  });
+
+  it("draws the veil the hall's width, pleated, sized by scale", () => {
+    const veil = draw(art("veil"), { type: "veil", w: 3 });
+    expect(art("veil").box).toEqual({ width: 16, height: 0.4 });
+    expect(art("veil").fit).toBe("squares");
+    // A pleat every half square: 31 lines across a 16-square band.
+    expect((veil.match(/M[-\d.]+,-0\.2v0\.4/g) ?? []).length).toBe(31);
+  });
+
+  it("draws the gong, the brazier and the candle from geometry", () => {
+    for (const kind of ["gong", "brazier", "candle"]) {
+      const markup = draw(art(`item:${kind}`), { type: "item", kind });
+      expect(markup, kind).toMatch(/<(path|circle|rect)/);
+      expect(markup, kind).not.toMatch(/href|\sid=|url\(|<text|<image/);
+    }
+  });
+});
+
 describe("the boards", () => {
   it("draw the Tree for the Flaming Sword and the Minutum Mundum", () => {
     const sword = draw(art("board"), { type: "board", kind: "flamingSword" });

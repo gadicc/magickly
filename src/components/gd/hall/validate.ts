@@ -12,6 +12,7 @@ import type {
   HallSeverity,
 } from "./types";
 import {
+  ALTAR_KINDS,
   BOARD_KINDS,
   HALL_ROLES,
   type HallTagRole,
@@ -234,6 +235,9 @@ export function validateHall(
           );
         break;
       }
+      case "altar":
+        nullChoice("kind", ALTAR_KINDS);
+        break;
       case "board":
         if (nullChoice("kind", BOARD_KINDS)) break;
         // A board with a diagram keeps the diagram's proportions; one with

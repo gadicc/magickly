@@ -133,6 +133,8 @@ export const MARKER_TEXT_WIDTH = 0.84;
  * | item fan | 0.99 | Theoricus 1 altar 1.98 × 1.25 |
  * | item pantacle | 1 | Theoricus badge 2 × 2 |
  * | item lightning | 0.49 | Theoricus 2 Flaming Sword 0.56 × 0.98 |
+ * | item gong, brazier, candle | 0.5 | none drawn; a square, a candle 1 square tall |
+ * | veil | 1 | 16 × 0.4 squares, the hall's width |
  * | tarotKey | 0.81 | Theoricus 1 altar card 0.94 × 1.62 |
  * | tablet | 1.345 | Theoricus Air tablet board 1.91 × 2.69 |
  * | shewbread, candlestick | 1.25 | Zelator 2: the outer circle 2 squares across |
@@ -169,10 +171,14 @@ export const DEFAULT_SCALES: ReadonlyMap<string, number> = new Map([
   ["item:fan", 0.99],
   ["item:pantacle", 1],
   ["item:lightning", 0.49],
+  ["item:gong", 0.5],
+  ["item:brazier", 0.5],
+  ["item:candle", 0.5],
   ["tarotKey", 0.81],
   ["tablet", 1.345],
   ["shewbread", 1.25],
   ["candlestick", 1.25],
+  ["veil", 1],
   ["kamea", 0.9],
   ["seal", 0.9],
   ["item", 0.4],

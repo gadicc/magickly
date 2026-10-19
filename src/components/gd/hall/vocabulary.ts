@@ -128,6 +128,12 @@ export const CROSS_FORMS = [
 export type CrossForm = (typeof CROSS_FORMS)[number];
 
 /**
+ * The altars (decision 5): the black double cube, and the Portal's small
+ * white altar on the dais, an altar too since things are put on it.
+ */
+export const ALTAR_KINDS = ["black", "white"] as const;
+
+/**
  * The diagrams a board shows (decision 5): the Tree with the Flaming
  * Sword or as the Minutum Mundum, and the Garden of Eden and the Fall,
  * labelled boards until they are drawn.
@@ -212,7 +218,7 @@ export const HALL_TAGS: ReadonlyMap<string, HallTagSpec> = new Map<
       ["shape", enumOf(["box", "circle"])],
     ]),
   ],
-  ["altar", placeable("host")],
+  ["altar", placeable("host", [["kind", enumOf(ALTAR_KINDS)]])],
   [
     "platform",
     placeable("host", [
@@ -243,6 +249,8 @@ export const HALL_TAGS: ReadonlyMap<string, HallTagSpec> = new Map<
     ]),
   ],
   ["banner", placeable("placeable", [["kind", enumOf(["east", "west"])]])],
+  // The Portal's curtain across the dais, sized by scale.
+  ["veil", placeable("placeable")],
   ["hebrewLetter", placeable("placeable", [["letter", text]])],
   [
     "item",
@@ -410,6 +418,9 @@ export const CORE_ITEM_KINDS: ReadonlySet<string> = new Set([
   "cross",
   "triangle",
   "pentagram",
+  "gong",
+  "brazier",
+  "candle",
 ]);
 
 /** The deepest nesting the validator and the resolver follow. */

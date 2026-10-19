@@ -44,10 +44,12 @@ describe("the palette", () => {
     for (const key of [
       "marker",
       "altar",
+      "altar:white",
       "pillar:black",
       "pillar:white",
       "platform",
       "throne",
+      "veil",
       "door",
       "banner:east",
       "banner:west",
@@ -67,12 +69,15 @@ describe("the palette", () => {
       expect(keys).toContain(key);
     // The package's items and the legacy art's.
     expect(hallItemKinds(gdHallArt)).toEqual([
+      "brazier",
       "bread",
+      "candle",
       "censer",
       "chalice",
       "cross",
       "cup",
       "fan",
+      "gong",
       "lamp",
       "lantern",
       "lightning",
@@ -190,6 +195,25 @@ describe("insertFromPalette", () => {
     );
     const seated = add(hall, "officer:hiereus", platform?.id);
     expect(seated.view.index.byId.get(seated.id)?.parentId).toBe(platform?.id);
+  });
+
+  it("puts the veil across the hall, whatever is selected", () => {
+    const hall = neophyteHall();
+    // A dais officer selected: the veil goes into the floor, not the row.
+    const imperator = byAttr(hall, "role", "imperator");
+    for (const selected of [undefined, imperator.id]) {
+      const { view, id } = add(hall, "veil", selected);
+      const veil = view.byId.get(id);
+      expect(veil?.node.attrs).toEqual({ x: 8, y: -0.3 });
+      expect(view.index.byId.get(veil?.node.id ?? "")?.parentId).toBe(
+        findNode(hall, (node) => node.tag === "floor")?.id,
+      );
+      // The hall's width, within the walls.
+      const object = veil?.object;
+      expect(object?.cx).toBe(8);
+      expect((object?.cx ?? 0) - (object?.width ?? 0) / 2).toBeCloseTo(0, 6);
+      expect((object?.cx ?? 0) + (object?.width ?? 0) / 2).toBeCloseTo(16, 6);
+    }
   });
 
   it("puts a door in the West wall", () => {

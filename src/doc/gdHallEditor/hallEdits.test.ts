@@ -99,6 +99,9 @@ describe("hallNodeName", () => {
       "Board: The Garden of Eden",
     );
     expect(hallNodeName(node("board", { kind: "toString" }))).toBe("Board");
+    expect(hallNodeName(node("altar", { kind: "white" }))).toBe("White altar");
+    expect(hallNodeName(node("altar"))).toBe("Altar");
+    expect(hallNodeName(node("veil"))).toBe("Veil");
     expect(hallNodeName(node("unicorn"))).toBe("Unicorn");
     expect(hallNodeName(node("label", { text: "x".repeat(50) }))).toBe(
       `${"x".repeat(40)}…`,

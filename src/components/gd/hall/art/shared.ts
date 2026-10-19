@@ -36,4 +36,9 @@ export const PALETTE = {
   fire: "#d92128",
   tau: "#f9f9f9",
   placeholder: "#888888",
+  veil: "#c8b8e0",
+  veilPleat: "#7a64a0",
+  bronze: "#b08d3c",
+  flame: "#ff9a1f",
+  wax: "#fffbe8",
 } as const;

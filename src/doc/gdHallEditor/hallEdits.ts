@@ -147,6 +147,7 @@ export function hallNodeName(node: HallElement): string {
     const element = text(node, "element");
     return element ? `${clip(itemKindLabel(element))} tablet` : "Tablet";
   }
+  if (tag === "altar") return kind === "white" ? "White altar" : "Altar";
   if (tag === "board") {
     const diagram = BOARD_NAMES.get(kind as BoardKind);
     return diagram ? `Board: ${diagram}` : "Board";

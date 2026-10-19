@@ -67,7 +67,7 @@ export function hallItemKinds(art: HallArtRegistry): string[] {
 /**
  * The palette for an art registry: every officer role (the lamens and the
  * adepts, drawn as labelled circles until their lamens exist) and a
- * marker; the altar, pillars, platform, throne and a door; the banners
+ * marker; the altars, pillars, platform, throne, veil and a door; the banners
  * and a Hebrew letter; every item kind; a tarot key, a tablet, the Table
  * of Shewbread, the candlestick, the boards' diagrams, a kamea and a
  * planet's seals; free text.
@@ -98,6 +98,13 @@ export function hallPalette(art: HallArtRegistry): HallPaletteEntry[] {
       attrs: {},
     },
     {
+      key: "altar:white",
+      group: "Furniture",
+      label: "White altar",
+      tag: "altar",
+      attrs: { kind: "white", scale: 0.5 },
+    },
+    {
       key: "pillar:black",
       group: "Furniture",
       label: "Black pillar",
@@ -124,6 +131,16 @@ export function hallPalette(art: HallArtRegistry): HallPaletteEntry[] {
       label: "Throne",
       tag: "throne",
       attrs: {},
+    },
+    {
+      key: "veil",
+      group: "Furniture",
+      label: "Veil",
+      tag: "veil",
+      // Across the hall at the dais's West edge, its place in the Portal:
+      // the hall's width, so never beside the selection, where it would
+      // overhang a wall.
+      attrs: { x: 8, y: -0.3 },
     },
     {
       key: "door",
@@ -237,6 +254,12 @@ export function goesOnHost(tag: string, hostTag: string): boolean {
   return hostAccepts(hostTag, tag);
 }
 
+/**
+ * What goes where its palette entry says rather than beside the
+ * selection: a door into its wall, the veil across the hall.
+ */
+const KEEPS_ITS_PLACE: ReadonlySet<string> = new Set(["door", "veil"]);
+
 /** How far from an occupied spot a new object is put, in squares. */
 const STEP = 1;
 
@@ -277,7 +300,9 @@ export interface HallInsertion {
  *
  * - With a host selected that the component goes on (`goesOnHost`), it
  *   goes into the host, at the host's centre (no `x` or `y`).
- * - A door goes into the floor at its own place in the West wall.
+ * - A door goes into the floor at its own place in the West wall, and
+ *   the veil across the hall at the dais's West edge. Neither ever goes
+ *   into a row, where the veil would take a slot and overhang the hall.
  * - Anything else goes into the floor (one is made, before the caption,
  *   when the hall has none) beside the selection, a square past its
  *   South edge, or at the floor's centre when nothing is selected, moved
@@ -304,7 +329,7 @@ export function insertFromPalette(
   if (selected && goesOnHost(entry.tag, selected.node.tag))
     return { hall: insertHallNode(hall, selected.node.id, node), id: node.id };
   const { hall: next, floor } = ensureFloor(hall, createId);
-  if (entry.tag !== "door") {
+  if (!KEEPS_ITS_PLACE.has(entry.tag)) {
     const object =
       selected &&
       resolved.objects.find(
