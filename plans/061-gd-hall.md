@@ -716,13 +716,17 @@ Kept until every reference is gone; this list is updated as they go.
 | `src/offline/ritualPublicationTracing.test.ts:84-86` | asserts the files exist, via that list |
 | `src/doc/ritualBlocks/renderForEditing.test.tsx:172,186` | test fixture |
 | The presets' `sources` (`drawing("neophyte")` and so on in `src/components/gd/hall/presets/*.ts`) | the drawing each preset was ported from; a citation, which needs the file only while it is served |
-| `/gd/hall` gallery: `originalDrawing()` and its `<img src="/pics/….svg">` ("Compare with the original drawing"), and the sources' links | shows the drawings beside the presets |
-| `src/app/gd/hall/presets.test.tsx` (each preset cites `public/pics/<id>.svg`, which must exist), `gallery.test.tsx` | tests of the two rows above |
+| `/gd/hall`: the sources' links under the editor | link each cited drawing |
+| `src/app/gd/hall/presets.test.tsx` (each preset cites `public/pics/<id>.svg`, which must exist) | test of the two rows above |
 | Production ritual "0=0 Grade of the Neophyte" and 13 revisions | from the 15 September Mongo dump; rituals are unchanged since, so the SQL rows match. Migrate by editing the ritual once presets reach parity |
 | Published offline bundles, external links, search indexes, user exports | suspected; cannot be enumerated. Keep the files served |
 
-The presets, the gallery and their tests keep the drawings served until
-stage I, which decides whether the comparison and the citations stay.
+The presets, the page's source links and their tests keep the drawings
+served until stage I, which decides whether the citations stay. The
+"Compare with the original drawing" switch and the drawing it showed
+under the `/gd/hall` editor are gone: Gadi decided on 19 October 2026
+that the comparisons are done and that the switch no longer fits the
+toolbar.
 
 ## Stages
 
@@ -730,7 +734,7 @@ Each stage is a series of gated commits on `gate/gd-hall`.
 
 | Stage | Content | Can be reverted alone | Status |
 | --- | --- | --- | --- |
-| A | `src/components/gd/hall`: model, validator, layout, renderer, chrome, labels and fonts; `Lamen` Past Hierophant variant and `Map` lookups (the move is stage H); legacy art under `src/app`; the five drawn presets; a read-only `/gd/hall` gallery with export and side-by-side comparison with the old SVGs; `sizes` comparison (removed before B) | yes | done (A1–A3 and the final review fixes, 17 October 2026) |
+| A | `src/components/gd/hall`: model, validator, layout, renderer, chrome, labels and fonts; `Lamen` Past Hierophant variant and `Map` lookups (the move is stage H); legacy art under `src/app`; the five drawn presets; a read-only `/gd/hall` gallery with export and side-by-side comparison with the old SVGs (the comparison removed 19 October 2026, Gadi's decision); `sizes` comparison (removed before B) | yes | done (A1–A3 and the final review fixes, 17 October 2026) |
 | B | Spike results applied: compiler change (decision 2), Pug round trip, lazy reader block, `blockAtoms` entry with a static node view, boundary tests | until the first hall is saved | done (18 October 2026; Stage B notes). Rituals may now save halls, after which the layout contract (decision 4) holds |
 | C | `/hall` slash command with presets | yes | done (18 October 2026; Stage C notes): slash command and Insert… dialog, Copy Pug source on `/gd/hall`, hall warnings in the source editor |
 | D | Visual sub-editor | yes | done (18 October 2026; Stage D notes): `GdHallEditor`, opened from a hall's atom; refined in stage E (19 October 2026, Gadi's decisions): rows reorder by drag with explicit positions freezing their siblings, objects stand on hosts by drag or the panel's Stands on, and a warnings badge outside edit mode (Stage E notes) |
@@ -938,7 +942,7 @@ Settled while building A3, where the plan or the brief left a choice:
   each hall with its own export (`gd-hall-<id>`, `gd-hall-<id>-uniform`);
   removed before stage B with the one cell size (decision 4).
   "Compare with the original drawing" takes the drawing from the
-  preset's `sources`. Panes sit side by side from MUI's `md` breakpoint
+  preset's `sources` (removed 19 October 2026). Panes sit side by side from MUI's `md` breakpoint
   (900 px), at most 560 px each, and stack below it. Uniform sizes draw
   the dais lamens smaller (1 against 1.155) as well as the floor
   officers larger, worth weighing when one strategy is kept.
@@ -2099,10 +2103,11 @@ settled where the brief left a choice or proved wrong.
   IDs. The picker reads "Your hall (changed)" when the hall's Pug
   without IDs is no preset's; choosing a preset then asks first
   ("Replace your hall?"), since the draft would be replaced, and Undo
-  brings the hall back. "Compare with the original drawing" is offered
-  while the hall is an unchanged preset that has one, the drawing
-  shown below the editor: once edited, the hall is the author's own and
-  the old drawing no longer describes it (the choice the brief left).
+  brings the hall back. "Compare with the original drawing" was offered
+  while the hall was an unchanged preset that had one, the drawing
+  shown below the editor (the choice the brief left); removed on 19
+  October 2026 (Gadi: the comparisons are done, and the switch no
+  longer fits the toolbar).
 - **Draft.** The source is written to `magickli:gd-hall-draft:v1` as
   `{"v":1,"source":…}` 0.4 s after it rests and on `pagehide`, by a tab
   that changed it, and another tab's newer draft is offered (Review

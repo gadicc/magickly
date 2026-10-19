@@ -17,7 +17,6 @@ import HallPlayground, {
   clipped,
   HALL_LAYOUT_KEY,
   matchingPreset,
-  originalDrawing,
   presetEntry,
   validHall,
 } from "./HallPlayground";
@@ -218,23 +217,12 @@ describe("presets", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(presetShown()).toBe("Zelator Temple 1");
     expect(pugOf(source())).toBe(gdHallPug(HALL_PRESETS[1].hall));
-    fireEvent.click(screen.getByLabelText("Compare with the original drawing"));
-    expect(
-      screen
-        .getByRole("img", {
-          name: "The original drawing of the Zelator Temple 1",
-        })
-        .getAttribute("src"),
-    ).toBe("/pics/zelator1.svg");
   });
 
   it("asks before replacing a changed hall, which Undo brings back", async () => {
     render(<HallPlayground />);
     nudgeFirst();
     expect(presetShown()).toBe("Your hall (changed)");
-    expect(
-      screen.queryByLabelText("Compare with the original drawing"),
-    ).toBeNull();
     const changed = source();
     choose("Theoricus Temple 1");
     const dialog = screen.getByRole("dialog", { name: "Replace your hall?" });
@@ -279,9 +267,6 @@ describe("presets", () => {
     expect(a.hall?.id).not.toBe(b.hall?.id);
     expect(matchingPreset(a)).toBe(HALL_PRESETS[0]);
     expect(matchingPreset({ ...a, hall: null })).toBeUndefined();
-    expect(HALL_PRESETS.map(originalDrawing)).toEqual(
-      HALL_PRESETS.map((preset) => `/pics/${preset.id}.svg`),
-    );
   });
 });
 

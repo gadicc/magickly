@@ -40,18 +40,6 @@
   margin: 0;
   color: #555;
 }
-.original {
-  margin: 0 auto;
-  width: 100%;
-  max-width: 560px;
-  text-align: center;
-  font-size: 90%;
-}
-.original img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
 .share {
   display: grid;
   gap: 0.5rem;

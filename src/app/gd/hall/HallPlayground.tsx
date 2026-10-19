@@ -18,10 +18,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  FormControlLabel,
   IconButton,
   MenuItem,
-  Switch,
   TextField,
   Tooltip,
 } from "@mui/material";
@@ -79,12 +77,6 @@ const READ_TYPING = 200;
 const SETTLE_TYPING = 700;
 /** How long the hall rests before the draft is written. */
 const SAVE_DRAFT = 400;
-
-/** The old drawing a preset was ported from, as served from `public`. */
-export function originalDrawing(preset: HallPreset): string | undefined {
-  const file = preset.sources.find((source) => source.kind === "drawing");
-  return file && hallSourceUrl(file);
-}
 
 /** A fresh copy of a preset: every node with a new ID. */
 export const presetEntry = (preset: HallPreset): HallEntry =>
@@ -248,7 +240,6 @@ export default function HallPlayground() {
   );
   const [mode, chooseMode] = useRitualEditorLayout("split", HALL_LAYOUT_KEY);
   const [replacing, setReplacing] = React.useState<HallPreset | null>(null);
-  const [compare, setCompare] = React.useState(false);
   const [draftKept, setDraftKept] = React.useState<
     "saved" | "too-large" | "failed"
   >("saved");
@@ -504,7 +495,6 @@ export default function HallPlayground() {
     setReplacing(null);
     // Another tab's draft is still on offer.
     setNotes((shown) => shown.filter((note) => note.kind === "other-tab"));
-    setCompare(false);
     readTyped();
     dispatch({ type: "load", entry: presetEntry(chosen) });
   };
@@ -572,7 +562,6 @@ export default function HallPlayground() {
     }
   };
 
-  const original = preset && originalDrawing(preset);
   // Said, not announced: a source is wrong for a moment at many a
   // keystroke, and the source panel announces its own error.
   const sourceProblem =
@@ -691,17 +680,6 @@ export default function HallPlayground() {
           onChoose={chooseMode}
           isDisabled={(value) => value === "visual" && !shownHall}
         />
-        {original && (
-          <FormControlLabel
-            control={
-              <Switch
-                checked={compare}
-                onChange={(event) => setCompare(event.target.checked)}
-              />
-            }
-            label="Compare with the original drawing"
-          />
-        )}
       </div>
       <div className={styles.panels} data-layout={displayMode}>
         {displayMode !== "visual" && (
@@ -745,16 +723,6 @@ export default function HallPlayground() {
           </section>
         )}
       </div>
-      {compare && original && preset && (
-        <figure className={styles.original}>
-          <figcaption>Original drawing</figcaption>
-          {/* biome-ignore lint/performance/noImgElement: a static SVG shown as drawn */}
-          <img
-            src={original}
-            alt={`The original drawing of the ${preset.title}`}
-          />
-        </figure>
-      )}
       <section className={styles.share} aria-label="Export and share">
         {row && (
           <div className={styles.exportDrawing} hidden>
