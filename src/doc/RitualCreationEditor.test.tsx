@@ -6,6 +6,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
 import type { Editor } from "@tiptap/core";
 import React from "react";
@@ -35,6 +36,14 @@ it("opens split by default, with source before visual, and remembers a chosen la
     source.compareDocumentPosition(visual) & Node.DOCUMENT_POSITION_FOLLOWING,
   ).toBeTruthy();
   expect(localStorage.getItem(RITUAL_EDITOR_LAYOUT_KEY)).toBeNull();
+  expect(
+    within(screen.getByRole("group", { name: "New ritual editor layout" }))
+      .getAllByRole("button")
+      .map((button) => button.textContent),
+  ).toEqual(["Source", "Split", "Visual"]);
+  expect(
+    screen.getByRole("button", { name: "Split" }).getAttribute("aria-pressed"),
+  ).toBe("true");
   fireEvent.click(screen.getByRole("button", { name: "Visual" }));
   expect(
     screen.queryByRole("textbox", { name: "New ritual source" }),
@@ -109,7 +118,7 @@ it("keeps layout controls working when browser storage is unavailable", async ()
     />,
   );
   await screen.findByRole("textbox", { name: "New ritual visual editor" });
-  fireEvent.click(screen.getByRole("button", { name: "Ritual source" }));
+  fireEvent.click(screen.getByRole("button", { name: "Source" }));
   expect(
     screen.getByRole("textbox", { name: "New ritual source" }),
   ).toBeTruthy();
@@ -151,7 +160,7 @@ it("recovers when source is restored to its previous visual projection", async (
     );
   });
   const emitted = latest;
-  fireEvent.click(screen.getByRole("button", { name: "Ritual source" }));
+  fireEvent.click(screen.getByRole("button", { name: "Source" }));
   fireEvent.change(screen.getByRole("textbox", { name: "New ritual source" }), {
     target: { value: "broken" },
   });

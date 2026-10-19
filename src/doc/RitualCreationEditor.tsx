@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "@magick-components/Link";
-import { Alert, Box, Button, ButtonGroup } from "@mui/material";
+import { Alert, Box } from "@mui/material";
 import { EditorContent, useEditor } from "@tiptap/react";
 import React from "react";
 import styles from "@/app/doc/[_id]/edit/semantic/SemanticEditor.module.css";
 import { ritualTiptapClientExtensions } from "@/doc/tiptapRitualClient";
+import { RitualLayoutSwitch } from "./RitualLayoutSwitch";
 import RitualSourceEditor from "./RitualSourceEditor";
 import RitualVisualControls from "./RitualVisualControls";
 import { parseRitualSource, printRitualSource } from "./ritualSource";
@@ -123,32 +124,12 @@ export default function RitualCreationEditor({
   }, [editor, disabled, issue, sourceComposing]);
   return (
     <Box sx={{ mt: 2, display: "grid", gap: 1 }}>
-      <ButtonGroup size="small" aria-label="New ritual editor layout">
-        <Button
-          type="button"
-          disabled={disabled || !!issue}
-          variant={displayMode === "visual" ? "contained" : "outlined"}
-          onClick={() => chooseMode("visual")}
-        >
-          Visual
-        </Button>
-        <Button
-          type="button"
-          disabled={disabled}
-          variant={displayMode === "source" ? "contained" : "outlined"}
-          onClick={() => chooseMode("source")}
-        >
-          Ritual source
-        </Button>
-        <Button
-          type="button"
-          disabled={disabled || !!issue}
-          variant={displayMode === "split" ? "contained" : "outlined"}
-          onClick={() => chooseMode("split")}
-        >
-          Split
-        </Button>
-      </ButtonGroup>
+      <RitualLayoutSwitch
+        label="New ritual editor layout"
+        value={displayMode}
+        onChoose={chooseMode}
+        isDisabled={(value) => disabled || (!!issue && value !== "source")}
+      />
       <Link href="/help/ritual-pug" target="_blank" rel="noopener noreferrer">
         Ritual Pug guide (opens in a new tab)
       </Link>

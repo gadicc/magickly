@@ -301,23 +301,24 @@ export default function TemplesGuide() {
       </p>
       <ul>
         <li>
-          <strong>Visual</strong> edits the ritual as the reader sees it:
-          speeches and actions for each officer, notes, variables and images.
-        </li>
-        <li>
-          <strong>Source</strong> edits the same ritual as plain text in{" "}
+          <strong>Source</strong> edits the ritual as plain text in{" "}
           <Link href="/help/ritual-pug">Ritual Pug</Link>, which suits large
           changes and find-and-replace.
         </li>
         <li>
-          <strong>Split</strong> shows both side by side; a change in either
-          updates the other. A phone has room for one at a time, so it offers
-          Visual and Source.
+          <strong>Split</strong> shows both side by side, the source on the left
+          and the visual editor on the right; a change in either updates the
+          other. A phone has room for one at a time, so it offers Source and
+          Visual.
+        </li>
+        <li>
+          <strong>Visual</strong> edits the same ritual as the reader sees it:
+          speeches and actions for each officer, notes, variables and images.
         </li>
       </ul>
       <Figure
         image={editorSplit}
-        alt="The ritual editor in split view: Ritual Pug source on the left and the visual editor on the right, with a Visual, Source and Split switch, and Publish and Save buttons."
+        alt="The ritual editor in split view: Ritual Pug source on the left and the visual editor on the right, with a Source, Split and Visual switch, and Publish and Save buttons."
         maxWidth={900}
       >
         Split view. The switch at the top right changes the layout.

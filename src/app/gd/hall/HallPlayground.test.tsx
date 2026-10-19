@@ -195,7 +195,12 @@ describe("the /gd/hall page", () => {
 
   it("remembers its layout apart from the ritual editor's", () => {
     render(<HallPlayground />);
-    fireEvent.click(screen.getByRole("button", { name: "Pug source" }));
+    expect(
+      within(screen.getByRole("group", { name: "Hall editor layout" }))
+        .getAllByRole("button")
+        .map((button) => button.textContent),
+    ).toEqual(["Source", "Split", "Visual"]);
+    fireEvent.click(screen.getByRole("button", { name: "Source" }));
     expect(screen.queryByRole("application")).toBeNull();
     expect(localStorage.getItem(HALL_LAYOUT_KEY)).toBe("source");
     fireEvent.click(screen.getByRole("button", { name: "Visual" }));

@@ -8,7 +8,6 @@ import {
   Alert,
   Box,
   Button,
-  ButtonGroup,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -27,6 +26,7 @@ import React from "react";
 import EditorActionButton from "@/doc/EditorActionButton";
 import { retainsOnlineEditorIdentity } from "@/doc/onlineEditorIdentity";
 import { flushPendingEdits } from "@/doc/pendingEdits";
+import { RitualLayoutSwitch } from "@/doc/RitualLayoutSwitch";
 import RitualSourceEditor from "@/doc/RitualSourceEditor";
 import RitualVisualControls, {
   modifierLabel,
@@ -1165,23 +1165,15 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         >
           {saveStatus}
         </Typography>
-        <ButtonGroup size="small" aria-label="Editor layout">
-          {(narrow
-            ? (["visual", "source"] as const)
-            : (["visual", "source", "split"] as const)
-          ).map((item) => (
-            <Button
-              key={item}
-              variant={displayMode === item ? "contained" : "outlined"}
-              disabled={
-                access !== "ready" || (!!visualIssue && item !== "source")
-              }
-              onClick={() => chooseMode(item)}
-            >
-              {item}
-            </Button>
-          ))}
-        </ButtonGroup>
+        <RitualLayoutSwitch
+          label="Editor layout"
+          value={displayMode}
+          onChoose={chooseMode}
+          withoutSplit={narrow}
+          isDisabled={(item) =>
+            access !== "ready" || (!!visualIssue && item !== "source")
+          }
+        />
         <SemanticPublication
           actorId={props.actorId}
           ritualId={props.ritualId}

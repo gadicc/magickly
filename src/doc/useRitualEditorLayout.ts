@@ -6,6 +6,20 @@ export type RitualEditorLayout = "visual" | "source" | "split";
 export const RITUAL_EDITOR_LAYOUT_KEY = "magickli:ritual-editor-layout:v1";
 
 /**
+ * The layout switch's buttons, in screen order: Source, Split, Visual, so
+ * the switch reads as split view lays the panels out (source on the left,
+ * the visual editor on the right). Every editor's switch uses these.
+ */
+export const RITUAL_EDITOR_LAYOUTS: readonly (readonly [
+  RitualEditorLayout,
+  string,
+])[] = [
+  ["source", "Source"],
+  ["split", "Split"],
+  ["visual", "Visual"],
+];
+
+/**
  * Browser-only presentation preference; recovery changes never persist
  * implicitly. `storageKey` gives another editor (the `/gd/hall` page's)
  * a preference of its own.

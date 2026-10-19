@@ -13,7 +13,6 @@ import Undo from "@mui/icons-material/Undo";
 import {
   Alert,
   Button,
-  ButtonGroup,
   Dialog,
   DialogActions,
   DialogContent,
@@ -31,6 +30,7 @@ import { GdHallEditor } from "@/doc/gdHallEditor/GdHallEditor";
 import { type HallElement, hallRowOf } from "@/doc/gdHallEditor/hallModel";
 import { gdHallPug, printHallSource } from "@/doc/gdHallPug";
 import { gdHallSource } from "@/doc/gdHallRows";
+import { RitualLayoutSwitch } from "@/doc/RitualLayoutSwitch";
 import RitualSourceEditor from "@/doc/RitualSourceEditor";
 import type { RitualSourceDiagnostic } from "@/doc/ritualSourceDiagnostics";
 import { validateRitualSemantic } from "@/doc/semantic";
@@ -685,25 +685,12 @@ export default function HallPlayground() {
             </span>
           </Tooltip>
         </span>
-        <ButtonGroup size="small" aria-label="Hall editor layout">
-          {(
-            [
-              ["visual", "Visual"],
-              ["source", "Pug source"],
-              ["split", "Split"],
-            ] as const
-          ).map(([value, label]) => (
-            <Button
-              key={value}
-              aria-pressed={displayMode === value}
-              disabled={value === "visual" && !shownHall}
-              variant={displayMode === value ? "contained" : "outlined"}
-              onClick={() => chooseMode(value)}
-            >
-              {label}
-            </Button>
-          ))}
-        </ButtonGroup>
+        <RitualLayoutSwitch
+          label="Hall editor layout"
+          value={displayMode}
+          onChoose={chooseMode}
+          isDisabled={(value) => value === "visual" && !shownHall}
+        />
         {original && (
           <FormControlLabel
             control={

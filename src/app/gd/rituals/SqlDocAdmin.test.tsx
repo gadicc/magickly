@@ -194,7 +194,7 @@ it("creates a semantic ritual from Pug and retries the exact v3 request", async 
   fireEvent.click(
     await screen.findByRole("option", { name: "Visual / Ritual Pug" }),
   );
-  fireEvent.click(await screen.findByRole("button", { name: "Ritual source" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Source" }));
   fireEvent.change(screen.getByLabelText("New ritual source"), {
     target: {
       value:
@@ -274,7 +274,7 @@ it("prefills source with the starter and links to help without leaving the draft
   const guide = await screen.findByRole("link", { name: /Ritual Pug guide/ });
   expect(guide.getAttribute("href")).toBe("/help/ritual-pug");
   expect(guide.getAttribute("target")).toBe("_blank");
-  fireEvent.click(screen.getByRole("button", { name: "Ritual source" }));
+  fireEvent.click(screen.getByRole("button", { name: "Source" }));
   expect(
     (screen.getByLabelText("New ritual source") as HTMLTextAreaElement).value,
   ).toBe(ritualPugStarter);
@@ -318,7 +318,7 @@ it("keeps the creation source mode and draft on a successful focus recheck", asy
   fireEvent.change(await screen.findByLabelText("Title"), {
     target: { value: "Unsaved" },
   });
-  fireEvent.click(await screen.findByRole("button", { name: "Ritual source" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Source" }));
   const text = "ritual 1\nHiero: My unsaved words.\n";
   fireEvent.change(screen.getByLabelText("New ritual source"), {
     target: { value: text },
@@ -341,7 +341,7 @@ it("keeps source mode for an exact pending creation after a same-account check",
   fireEvent.change(await screen.findByLabelText("Title"), {
     target: { value: "Pending draft" },
   });
-  fireEvent.click(await screen.findByRole("button", { name: "Ritual source" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Source" }));
   fireEvent.mouseDown(screen.getByRole("combobox", { name: "Visibility" }));
   fireEvent.click(
     await screen.findByRole("option", { name: "Synthetic temple" }),
@@ -392,7 +392,7 @@ it("keeps invalid ritual text local instead of sending a create request", async 
   fireEvent.click(
     await screen.findByRole("option", { name: "Visual / Ritual Pug" }),
   );
-  fireEvent.click(await screen.findByRole("button", { name: "Ritual source" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Source" }));
   fireEvent.change(screen.getByLabelText("New ritual source"), {
     target: { value: "not a ritual" },
   });

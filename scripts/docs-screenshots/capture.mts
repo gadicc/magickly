@@ -64,7 +64,9 @@ async function editor(b: Browser, mode: "visual" | "source" | "split") {
   await b.goto(`${base}${path}/edit/semantic`);
   await b.waitFor(editorReady);
   await sleep(1500);
-  await b.click("button", mode);
+  // The switch's buttons read Source, Split and Visual.
+  const label = mode.charAt(0).toUpperCase() + mode.slice(1);
+  await b.click('[aria-label="Editor layout"] button', label);
   await sleep(800);
 }
 

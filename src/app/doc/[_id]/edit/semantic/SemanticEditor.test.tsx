@@ -6,6 +6,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
 import React from "react";
 import { afterEach, expect, it, vi } from "vitest";
@@ -191,7 +192,16 @@ it("defaults to split and restores the last chosen layout on reopening", async (
   expect(
     source.compareDocumentPosition(visual) & Node.DOCUMENT_POSITION_FOLLOWING,
   ).toBeTruthy();
-  fireEvent.click(screen.getByRole("button", { name: "source" }));
+  // The switch reads as split view lays the panels out.
+  expect(
+    within(screen.getByRole("group", { name: "Editor layout" }))
+      .getAllByRole("button")
+      .map((button) => button.textContent),
+  ).toEqual(["Source", "Split", "Visual"]);
+  expect(
+    screen.getByRole("button", { name: "Split" }).getAttribute("aria-pressed"),
+  ).toBe("true");
+  fireEvent.click(screen.getByRole("button", { name: "Source" }));
   expect(localStorage.getItem(RITUAL_EDITOR_LAYOUT_KEY)).toBe("source");
   expect(
     screen.queryByRole("textbox", { name: "Ritual visual editor" }),
@@ -201,7 +211,7 @@ it("defaults to split and restores the last chosen layout on reopening", async (
   await screen.findByRole("textbox", { name: "Ritual semantic source" });
   await waitFor(() =>
     expect(
-      (screen.getByRole("button", { name: "source" }) as HTMLButtonElement)
+      (screen.getByRole("button", { name: "Source" }) as HTMLButtonElement)
         .disabled,
     ).toBe(false),
   );
@@ -232,8 +242,13 @@ it("shows a stored split layout as visual on narrow screens without changing it"
     expect(
       screen.queryByRole("textbox", { name: "Ritual semantic source" }),
     ).toBeNull();
-    expect(screen.queryByRole("button", { name: "split" })).toBeNull();
-    expect(screen.getByRole("button", { name: "visual" }).className).toContain(
+    expect(screen.queryByRole("button", { name: "Split" })).toBeNull();
+    expect(
+      within(screen.getByRole("group", { name: "Editor layout" }))
+        .getAllByRole("button")
+        .map((button) => button.textContent),
+    ).toEqual(["Source", "Visual"]);
+    expect(screen.getByRole("button", { name: "Visual" }).className).toContain(
       "contained",
     );
     expect(localStorage.getItem(RITUAL_EDITOR_LAYOUT_KEY)).toBe("split");
@@ -288,7 +303,7 @@ it("queues Ctrl+S pressed while typed source is still applying", async () => {
     updatedAt: new Date().toISOString(),
   });
   render(<SemanticEditor {...setup} />);
-  fireEvent.click(await screen.findByRole("button", { name: "source" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Source" }));
   const source = screen.getByRole("textbox", {
     name: "Ritual semantic source",
   }) as HTMLTextAreaElement;
@@ -463,7 +478,7 @@ it("opens Source, not split, for Show line on a narrow screen", async () => {
     render(<SemanticEditor {...setup} />);
     fireEvent.click(await screen.findByRole("button", { name: "Show line 2" }));
     await screen.findByRole("textbox", { name: "Ritual semantic source" });
-    expect(screen.getByRole("button", { name: "source" }).className).toContain(
+    expect(screen.getByRole("button", { name: "Source" }).className).toContain(
       "contained",
     );
   } finally {
@@ -631,7 +646,7 @@ it("clears a source parse error after discarding the invalid buffer", async () =
   mock.owner = setup.actorId;
   render(<SemanticEditor {...setup} />);
   await changeTitle();
-  fireEvent.click(await screen.findByRole("button", { name: "source" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Source" }));
   fireEvent.change(
     screen.getByRole("textbox", { name: "Ritual semantic source" }),
     {
@@ -668,7 +683,7 @@ it("preserves split pane identity, scroll, source selection and visual Undo acro
   const setup = props();
   mock.owner = setup.actorId;
   render(<SemanticEditor {...setup} />);
-  fireEvent.click(await screen.findByRole("button", { name: "split" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Split" }));
   const visual = screen.getByRole("textbox", {
     name: "Ritual visual editor",
   }) as HTMLElement & { editor: import("@tiptap/core").Editor };
@@ -758,7 +773,7 @@ it("keeps an unsupported shape as a verbatim block and saves it losslessly", asy
   await changeTitle();
   // Visual editing stays available around one verbatim source-only block.
   expect(
-    (screen.getByRole("button", { name: "visual" }) as HTMLButtonElement)
+    (screen.getByRole("button", { name: "Visual" }) as HTMLButtonElement)
       .disabled,
   ).toBe(false);
   expect(
@@ -792,8 +807,8 @@ it("applies a compact source shortcut and saves semantic JSON through v3", async
     updatedAt: new Date().toISOString(),
   });
   render(<SemanticEditor {...setup} />);
-  await screen.findByRole("button", { name: "source" });
-  fireEvent.click(screen.getByRole("button", { name: "source" }));
+  await screen.findByRole("button", { name: "Source" });
+  fireEvent.click(screen.getByRole("button", { name: "Source" }));
   const source = screen.getByRole("textbox", {
     name: "Ritual semantic source",
   });
@@ -1117,7 +1132,7 @@ it("retains a restored pending request and old source bytes exactly", async () =
   mock.send.mockResolvedValue(null);
   render(<SemanticEditor {...setup} />);
   await screen.findByRole("button", { name: "Retry save" });
-  fireEvent.click(screen.getByRole("button", { name: "source" }));
+  fireEvent.click(screen.getByRole("button", { name: "Source" }));
   expect(
     (
       screen.getByRole("textbox", {
@@ -1310,8 +1325,8 @@ it("removes private editor content when the verified account changes", async () 
   const setup = props();
   mock.owner = setup.actorId;
   render(<SemanticEditor {...setup} />);
-  await screen.findByRole("button", { name: "source" });
-  fireEvent.click(screen.getByRole("button", { name: "source" }));
+  await screen.findByRole("button", { name: "Source" });
+  fireEvent.click(screen.getByRole("button", { name: "Source" }));
   expect(
     (
       screen.getByRole("textbox", {
@@ -1334,7 +1349,7 @@ it("hides the editor when a fresh source permission check is denied", async () =
   const setup = props();
   mock.owner = setup.actorId;
   render(<SemanticEditor {...setup} />);
-  await screen.findByRole("button", { name: "source" });
+  await screen.findByRole("button", { name: "Source" });
   mock.permissionDenied = true;
   await act(async () => {
     fireEvent.focus(window);
@@ -1453,7 +1468,7 @@ it("updates the visual panel automatically without rewriting typed source or its
   const setup = props();
   mock.owner = setup.actorId;
   render(<SemanticEditor {...setup} />);
-  fireEvent.click(await screen.findByRole("button", { name: "split" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Split" }));
   const source = screen.getByRole("textbox", {
     name: "Ritual semantic source",
   }) as HTMLTextAreaElement;
@@ -1483,7 +1498,7 @@ it("keeps toolbar presentation stable while guarding commands against unapplied 
   mock.owner = setup.actorId;
   render(<SemanticEditor {...setup} />);
   await changeTitle();
-  fireEvent.click(await screen.findByRole("button", { name: "split" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Split" }));
   const source = screen.getByRole("textbox", {
     name: "Ritual semantic source",
   }) as HTMLTextAreaElement;
@@ -1531,7 +1546,7 @@ it("keeps the last valid visual document while source is incomplete and catches 
   const setup = props();
   mock.owner = setup.actorId;
   render(<SemanticEditor {...setup} />);
-  fireEvent.click(await screen.findByRole("button", { name: "split" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Split" }));
   const source = screen.getByRole("textbox", {
     name: "Ritual semantic source",
   }) as HTMLTextAreaElement;
@@ -1571,7 +1586,7 @@ it.each(["compositionend", "visual layout"] as const)(
     mock.owner = setup.actorId;
     render(<SemanticEditor {...setup} />);
     await changeTitle();
-    fireEvent.click(await screen.findByRole("button", { name: "split" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Split" }));
     const source = screen.getByRole("textbox", {
       name: "Ritual semantic source",
     }) as HTMLTextAreaElement;
@@ -1595,7 +1610,7 @@ it.each(["compositionend", "visual layout"] as const)(
     });
     expect(visual.textContent).toContain("Welcome.");
     if (finish === "compositionend") fireEvent.compositionEnd(source);
-    else fireEvent.click(screen.getByRole("button", { name: "visual" }));
+    else fireEvent.click(screen.getByRole("button", { name: "Visual" }));
     await waitFor(() => expect(visual.textContent).toContain("שלום"));
     expect(save.getAttribute("aria-disabled")).toBeNull();
     expect(visual.getAttribute("contenteditable")).toBe("true");
@@ -1608,7 +1623,7 @@ it("retains an editable split through routine revalidation and conceals on a har
   mock.owner = setup.actorId;
   render(<SemanticEditor {...setup} />);
   await changeTitle();
-  fireEvent.click(await screen.findByRole("button", { name: "split" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Split" }));
   const source = screen.getByRole("textbox", {
     name: "Ritual semantic source",
   });
@@ -1853,7 +1868,7 @@ it("recovers annotations from a clean pre-upgrade Pug draft before visual regene
   fireEvent.mouseDown(screen.getByRole("combobox", { name: "Structure" }));
   fireEvent.click(await screen.findByRole("option", { name: "To-do" }));
   fireEvent.click(screen.getByRole("button", { name: /^Insert$/ }));
-  fireEvent.click(await screen.findByRole("button", { name: "source" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Source" }));
   const buffer = screen.getByRole("textbox", {
     name: "Ritual semantic source",
   }) as HTMLTextAreaElement;

@@ -20,11 +20,11 @@ export default function RitualPugGuide() {
     <Container maxWidth="md" sx={{ py: 3 }}>
       <h1>Ritual Pug guide</h1>
       <p>
-        Ritual Pug is the source view of a structured ritual. You can edit
-        visually, in source, or with both panels side by side. Visual edits
-        regenerate source; valid source edits update the visual panel after a
-        short typing pause. Incomplete syntax keeps the last valid document
-        visible.
+        Ritual Pug is the source view of a structured ritual. The editor's
+        switch offers Source, Split (both panels side by side) and Visual.
+        Visual edits regenerate source; valid source edits update the visual
+        panel after a short typing pause. Incomplete syntax keeps the last valid
+        document visible.
       </p>
       <p>
         The initial layout is split, with source on the left and visual editing
