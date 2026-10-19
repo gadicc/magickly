@@ -9,6 +9,7 @@ import {
 } from "@magick-components/gd/hall/vocabulary";
 import type { JsonValue } from "../semantic";
 import { coordinateValue, snapHalf } from "./hallGeometry";
+import { hostAccepts, isHost } from "./hallHostRules";
 import {
   ensureFloor,
   type HallElement,
@@ -196,22 +197,18 @@ export function hallPalette(art: HallArtRegistry): HallPaletteEntry[] {
   ];
 }
 
-/** Hosts whose children stand on them: the altar holds items, a platform officers. */
-const HOSTS = new Set(["altar", "platform", "throne", "board"]);
-/** What goes into a selected host rather than beside it. */
-const ON_ANY_HOST = new Set(["item", "tarotKey", "label", "marker"]);
-const ON_SEATS = new Set(["platform", "throne"]);
-
 /**
  * Whether a new `tag` goes into a selected host `hostTag` rather than on
- * the floor beside it: items, tarot keys, labels and markers go on any
- * host (an altar, a platform, a throne, a board); officers on a platform
- * or throne. Furniture, banners, tablets and the diagrams stay on the
- * floor.
+ * the floor beside it: whatever the host takes (`hostAccepts`, the rule a
+ * drag and the panel's "Stands on" follow), so what the palette puts on a
+ * host can be moved off and back. Labels are the one exception, as
+ * documented with the hosts: a `label` under a host labels that host, so
+ * a new label with a host selected goes into it, while a free label never
+ * joins a host by a drag.
  */
 export function goesOnHost(tag: string, hostTag: string): boolean {
-  if (!HOSTS.has(hostTag)) return false;
-  return ON_ANY_HOST.has(tag) || (tag === "officer" && ON_SEATS.has(hostTag));
+  if (tag === "label") return isHost(hostTag);
+  return hostAccepts(hostTag, tag);
 }
 
 /** How far from an occupied spot a new object is put, in squares. */

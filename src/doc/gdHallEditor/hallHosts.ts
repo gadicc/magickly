@@ -12,6 +12,7 @@ import {
 } from "@magick-components/gd/hall/vocabulary";
 import { type HallSelectable, type HallView, hallNodeName } from "./hallEdits";
 import { objectRect, type Point, round2 } from "./hallGeometry";
+import { HOST_TAKES, hostAccepts, isHost } from "./hallHostRules";
 import {
   ensureFloor,
   type HallAttrPatch,
@@ -30,26 +31,6 @@ import {
  * `at` (a point of the old parent) gives way to `x` and `y`.
  */
 
-/**
- * What each host takes. Labels are left out although the brief listed
- * them: a `label` under a host labels the host (Stage A1 notes), so a
- * free label dropped on one would stop being free text and jump.
- */
-const HOST_ACCEPTS: ReadonlyMap<string, ReadonlySet<string>> = new Map([
-  ["altar", new Set(["item", "tarotKey", "marker"])],
-  [
-    "platform",
-    new Set(["officer", "banner", "hebrewLetter", "item", "marker"]),
-  ],
-  ["throne", new Set(["officer", "banner", "hebrewLetter", "item", "marker"])],
-  ["board", new Set(["marker"])],
-]);
-
-/** Whether a host tag takes a child tag. */
-export function hostAccepts(hostTag: string, tag: string): boolean {
-  return HOST_ACCEPTS.get(hostTag)?.has(tag) ?? false;
-}
-
 /** Where a node stands, for reparenting: on the floor, a host or a row. */
 type Standing =
   | { kind: "floor" }
@@ -65,7 +46,7 @@ function standing(view: HallView, id: string): Standing {
   if (parent.tag === "floor" || parent.id === view.hall.id)
     return { kind: "floor" };
   const host = view.byId.get(parent.id);
-  if (host?.object?.childFrame && HOST_ACCEPTS.has(parent.tag))
+  if (host?.object?.childFrame && isHost(parent.tag))
     return { kind: "host", host };
   return { kind: "other" };
 }
@@ -78,8 +59,7 @@ function standing(view: HallView, id: string): Standing {
 export function reparentable(view: HallView, id: string): boolean {
   const entry = view.byId.get(id);
   if (!entry?.object) return false;
-  if (![...HOST_ACCEPTS.values()].some((tags) => tags.has(entry.node.tag)))
-    return false;
+  if (!HOST_TAKES.has(entry.node.tag)) return false;
   return standing(view, id).kind !== "other";
 }
 
@@ -278,12 +258,16 @@ export interface HallStandOption {
 /**
  * The panel's "Stands on" choices for `id`: the floor, then every host
  * that takes it, in document order, named with its position where two
- * share a name.
+ * share a name. The host it stands on now is always among them, even one
+ * that does not take it (source may put an officer on an altar), so the
+ * choice shown is one of the list.
  */
 export function standOptions(view: HallView, id: string): HallStandOption[] {
   if (!reparentable(view, id)) return [];
-  const compatible = new Set(compatibleHosts(view, id));
-  const hosts = view.selectables.filter((entry) => compatible.has(entry));
+  const now = standing(view, id);
+  const offered = new Set(compatibleHosts(view, id));
+  if (now.kind === "host") offered.add(now.host);
+  const hosts = view.selectables.filter((entry) => offered.has(entry));
   const names = hosts.map((host) => hallNodeName(host.node));
   return [
     { value: "floor", label: "Floor" },

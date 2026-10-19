@@ -2,6 +2,7 @@ import { HALL_ROLES } from "@magick-components/gd/hall/vocabulary";
 import { describe, expect, it } from "vitest";
 import { gdHallArt } from "@/app/gd/hall/art";
 import { hallView } from "./hallEdits";
+import { hostAccepts } from "./hallHostRules";
 import type { HallElement } from "./hallModel";
 import {
   goesOnHost,
@@ -13,6 +14,7 @@ import {
 } from "./hallPalette";
 import {
   byAttr,
+  findNode,
   hallFromPug,
   neophyteHall,
   sequentialIds,
@@ -109,17 +111,39 @@ describe("the palette", () => {
 });
 
 describe("goesOnHost", () => {
-  it("puts items and text on hosts, officers on seats", () => {
+  it("puts on a host what it takes, and labels on any host", () => {
     expect(goesOnHost("item", "altar")).toBe(true);
-    expect(goesOnHost("tarotKey", "board")).toBe(true);
     expect(goesOnHost("officer", "platform")).toBe(true);
+    expect(goesOnHost("banner", "throne")).toBe(true);
     expect(goesOnHost("officer", "altar")).toBe(false);
     expect(goesOnHost("pillar", "altar")).toBe(false);
     expect(goesOnHost("item", "pillar")).toBe(false);
+    expect(goesOnHost("label", "board")).toBe(true);
+    expect(goesOnHost("label", "pillar")).toBe(false);
+  });
+
+  it("agrees with what a host takes by a drag or Stands on", () => {
+    const tags = [...new Set(hallPalette(gdHallArt).map((e) => e.tag))];
+    for (const host of ["altar", "platform", "throne", "board", "pillar"])
+      for (const tag of tags.filter((tag) => tag !== "label"))
+        expect(goesOnHost(tag, host), `${tag} on ${host}`).toBe(
+          hostAccepts(host, tag),
+        );
+    // A tarot key with a platform selected goes on the floor beside it.
+    expect(goesOnHost("tarotKey", "platform")).toBe(false);
+    expect(goesOnHost("item", "board")).toBe(false);
   });
 });
 
 describe("insertFromPalette", () => {
+  it("puts a tarot key beside a selected platform, which takes none", () => {
+    const hall = hallFromPug("gdHall", "  floor", "    platform(x=8, y=12)");
+    const platform = findNode(hall, (node) => node.tag === "platform");
+    const { view, id } = add(hall, "tarotKey", platform?.id);
+    const parent = view.index.byId.get(id)?.parentId;
+    expect(view.index.byId.get(parent ?? "")?.node.tag).toBe("floor");
+  });
+
   it("puts a new object at the floor's centre, clear of the altar", () => {
     const { hall, id, view } = add(neophyteHall(), "item:cup");
     expect(id).toBe("New0000000000001");

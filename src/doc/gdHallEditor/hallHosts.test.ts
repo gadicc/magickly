@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { gdHallArt } from "@/app/gd/hall/art";
 import { hallView, moveNode } from "./hallEdits";
+import { hostAccepts } from "./hallHostRules";
 import {
   compatibleHosts,
   dropTarget,
-  hostAccepts,
   reparentable,
   reparentNode,
   standOptions,
@@ -202,9 +202,12 @@ describe("hosts: an object its host does not take", () => {
     expect(dropTarget(laid, hegemon, { x: 12, y: 8 })).toEqual({
       kind: "floor",
     });
+    // The panel shows where it stands, and offers the floor.
     expect(standOptions(laid, hegemon).map((option) => option.label)).toEqual([
       "Floor",
+      "Altar",
     ]);
+    expect(standValue(laid, hegemon)).toBe(altar);
   });
 });
 
@@ -415,5 +418,29 @@ describe("hosts: the panel's Stands on", () => {
     expect(standValue(view(on), hegemon)).toBe(throne);
     expect(standOptions(laid, byAttr(hall, "kind", "cup").id)).toHaveLength(4);
     expect(standValue(laid, "missing")).toBeUndefined();
+  });
+
+  it("offers the host an object stands on, even one that does not take it", () => {
+    // Source may stand a tarot key on a platform, which takes none.
+    const hall = hallFromPug(
+      "gdHall",
+      "  floor",
+      "    altar(x=4, y=8)",
+      "    platform(x=8, y=12)",
+      '      tarotKey(key="0")',
+    );
+    const laid = view(hall);
+    const key = findNode(hall, (node) => node.tag === "tarotKey")!.id;
+    const platform = findNode(hall, (node) => node.tag === "platform")!.id;
+    const options = standOptions(laid, key);
+    expect(options.map((option) => option.label)).toEqual([
+      "Floor",
+      "Altar",
+      "Platform",
+    ]);
+    expect(options.map((option) => option.value)).toContain(
+      standValue(laid, key),
+    );
+    expect(standValue(laid, key)).toBe(platform);
   });
 });
