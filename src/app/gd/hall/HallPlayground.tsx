@@ -573,8 +573,12 @@ export default function HallPlayground() {
   };
 
   const original = preset && originalDrawing(preset);
+  // Said, not announced: a source is wrong for a moment at many a
+  // keystroke, and the source panel announces its own error.
+  const sourceProblem =
+    !present.hall && !status ? "Correct the source to share the hall." : null;
   const shareProblem = !present.hall
-    ? "Correct the source to share the hall."
+    ? null
     : shared === "failed"
       ? "This browser could not make a share link."
       : shared && "tooLong" in shared
@@ -794,8 +798,9 @@ export default function HallPlayground() {
             Copy share link
           </Button>
         </div>
-        <p className={styles.status} role="status">
-          {status || shareProblem}
+        <p className={styles.status}>
+          <span role="status">{status || shareProblem}</span>
+          {sourceProblem}
         </p>
         {draftKept !== "saved" && (
           <p className={styles.status}>

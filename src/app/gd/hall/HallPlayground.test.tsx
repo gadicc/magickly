@@ -257,6 +257,17 @@ describe("presets", () => {
     expect(source()).toBe(changed);
   });
 
+  it("does nothing when the preset shown is chosen again", () => {
+    render(<HallPlayground />);
+    const first = source();
+    choose("Neophyte Temple");
+    expect(source()).toBe(first);
+    expect(screen.getByRole("button", { name: "Undo" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+  });
+
   it("gives each copy fresh IDs and knows an unchanged one", () => {
     const a = presetEntry(HALL_PRESETS[0]);
     const b = presetEntry(HALL_PRESETS[0]);
@@ -302,9 +313,10 @@ describe("source and drawing in step", { timeout: 20_000 }, () => {
     expect(
       screen.getByRole("button", { name: "Copy Pug source" }),
     ).toHaveProperty("disabled", true);
-    expect(
-      screen.getByText("Correct the source to share the hall."),
-    ).toBeTruthy();
+    // Said beside the buttons, but not announced at each keystroke.
+    const said = screen.getByText("Correct the source to share the hall.");
+    expect(said.closest("[role=status], [aria-live]")).toBeNull();
+    expect(screen.getByRole("status").textContent).toBe("");
     type(good);
     await rest();
     expect(
