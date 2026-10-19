@@ -334,7 +334,12 @@ Follow-ups are separate from the completed migration work:
   fixes: a drag no longer reverts a field written or an undo made
   during it, Ctrl+X there no longer cuts ritual text, undo waits while
   the ritual is locked, and Ctrl+S saves a field still being typed.
-  Stage E, the `/gd/hall` playground, is next.
+  Stage E is done on `gate/gd-hall-e` (19 October 2026): `/gd/hall` is a
+  hall editor (source, visual and split views, presets, undo, a draft in
+  the browser, share links in the URL fragment, export), and the visual
+  editor reorders dais and banner rows, stands objects on altars,
+  platforms and thrones, and badges a hall's warnings outside edit mode,
+  as Gadi decided that day. Stage F is next.
   TODO from it: recording officer movement between stations, a `gdVault` for
   the Adeptus Minor Vault, original Enochian letterforms, moving
   `enochianFont.ts` and the other files the import-boundary test allows out
@@ -349,9 +354,9 @@ Follow-ups are separate from the completed migration work:
   fallback to Noto Sans for the hall's quoted font stacks, Gadi's call on
   whether a hall's PNG export embeds Enochian Plain for its tablets,
   `//-` comments inside the built-in docs' halls (stage I) against their
-  parity test, reparenting in the hall editor, whether moving one
-  officer of a row should hold its siblings still (Gadi's call), hall
-  warnings on the plain hall atom, Firefox, Safari and real-device
+  parity test, the stage E follow-ups (free labels on hosts, a drawing of
+  `/gd/hall` for search engines, share links' format 0 and the hall
+  editor's new gestures outside Chromium), Firefox, Safari and real-device
   checks of the hall editor's pointer and touch handling, a hall field
   in the creation form saved by a Create button that does not take the
   focus (Safari), the reader and documentation screenshots unchecked

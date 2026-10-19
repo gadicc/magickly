@@ -18,7 +18,12 @@ shows hall warnings (Stage C notes), with the fixes from its review,
 among them text typed over a selected block without a keypress (Stage
 C review fixes). Stage D is done on `gate/gd-hall-d` (18 October
 2026): the visual hall editor, opened in place from a hall in the
-ritual editor (Stage D notes); stage E is next.
+ritual editor (Stage D notes). Stage E is done on `gate/gd-hall-e` (19
+October 2026): `/gd/hall` is a hall editor with source, visual and split
+views, presets, undo, a draft in the browser, share links and export,
+and the visual editor reorders rows, stands objects on hosts and badges
+a hall's warnings, as Gadi decided that day (Stage E notes); stage F is
+next.
 
 Composable Golden Dawn temple-hall diagrams, authored in the ritual Pug
 dialect, drawn as inline SVG in the reader and editor, edited visually, and
@@ -506,7 +511,9 @@ a whole square); a palette to add components; delete and duplicate. Each
 gesture is one `setNodeMarkup` on the block: one undo step, IDs kept, new
 nodes given fresh IDs. Touch: tap to select, drag to move, the panel for the
 rest (plan 050's rule on small handles). Reparenting converts positions
-between frames. Built in stage D, without reparenting (Stage D notes).
+between frames. Built in stage D, without reparenting (Stage D notes);
+stage E added reordering rows and standing objects on hosts, by drag and
+from the panel (Stage E notes).
 
 ### 12. Validation and safety
 
@@ -724,8 +731,8 @@ Each stage is a series of gated commits on `gate/gd-hall`.
 | A | `src/components/gd/hall`: model, validator, layout, renderer, chrome, labels and fonts; `Lamen` Past Hierophant variant and `Map` lookups (the move is stage H); legacy art under `src/app`; the five drawn presets; a read-only `/gd/hall` gallery with export and side-by-side comparison with the old SVGs; `sizes` comparison (removed before B) | yes | done (A1–A3 and the final review fixes, 17 October 2026) |
 | B | Spike results applied: compiler change (decision 2), Pug round trip, lazy reader block, `blockAtoms` entry with a static node view, boundary tests | until the first hall is saved | done (18 October 2026; Stage B notes). Rituals may now save halls, after which the layout contract (decision 4) holds |
 | C | `/hall` slash command with presets | yes | done (18 October 2026; Stage C notes): slash command and Insert… dialog, Copy Pug source on `/gd/hall`, hall warnings in the source editor |
-| D | Visual sub-editor | yes | done (18 October 2026; Stage D notes): `GdHallEditor`, opened from a hall's atom; reparenting left for later |
-| E | `/gd/hall` source, visual and split playground with local draft and share link | yes | |
+| D | Visual sub-editor | yes | done (18 October 2026; Stage D notes): `GdHallEditor`, opened from a hall's atom; refined in stage E (19 October 2026, Gadi's decisions): rows reorder by drag with explicit positions freezing their siblings, objects stand on hosts by drag or the panel's Stands on, and a warnings badge outside edit mode (Stage E notes) |
+| E | `/gd/hall` source, visual and split playground with local draft and share link | yes | done (19 October 2026; Stage E notes): the gallery became a hall editor built from the shared source panel and visual editor, with presets, its own history, a draft in localStorage, share links in the fragment, export and Copy Pug source |
 | F | Remaining vocabulary and the presets for Practicus, Philosophus and Portal (markers where art is missing) | yes | |
 | G | magick-data: Water, Fire and Union tablets | yes | |
 | H | Original artwork; ledger to zero; `Lamen` moves to the MIT directory; credits | yes | |
@@ -1973,6 +1980,265 @@ What was verified, and how:
   and the only change to a screen they show without one is the Save
   button's handler, so they are unchanged by this round.
 
+## Stage E notes
+
+Built on `gate/gd-hall-e` (19 October 2026), from `main` at 837ecc9.
+Stage E brought the `/gd/hall` editor and three refinements Gadi decided
+for the stage D visual editor on 19 October 2026. Each records what was
+settled where the brief left a choice or proved wrong.
+
+### Owner decisions of 19 October 2026: the visual editor
+
+- **Rows reorder, with explicit positions as the fallback.** A `dais` or
+  `banners` child that its row spreads (no position along the row, no
+  `at`) is reordered by a drag along the row: the others make room as
+  it passes their centres, an orange box marks where it will land, and
+  the release writes only the new order, so the row keeps its even
+  spread. Alt and an arrow along the row (Left and Right for the dais
+  and the East and West rows, Up and Down for North and South) move it
+  one place, as do the panel's Move left and Move right. An explicit
+  position stays possible: an Alt-drag places it freely (Alt already
+  meant "no snapping"), and so do an arrow along the row without Alt
+  and the panel's `x` (or `y`) field. Giving a spread child a position
+  freezes its spread siblings: their current positions are written in
+  the same change, so nothing jumps. The panel's **Spread evenly
+  again** takes every position along the row away (offsets from `at`
+  stay), and shows whenever the row holds one. A position across the
+  row (`y` on the dais) freezes nothing. Each is one change and one
+  undo step; a copy of a row child still gets its own position. The
+  rules live in `hallRows.ts`.
+- **Objects stand on hosts and leave them.** What each host takes:
+
+  | Host | Takes |
+  | --- | --- |
+  | altar | item, tarotKey, marker |
+  | platform, throne | officer, banner, hebrewLetter, item, marker |
+  | board | marker |
+
+  Labels are not in the table although the brief listed them: a
+  `label` under a host labels the host (Stage A1 notes), so a free
+  label dropped on one would stop being free text and jump to the
+  host's label position. Labels never change parent by a drag; adding
+  one from the palette with a host selected labels the host, as
+  before. During a drag the host the object would join is outlined in
+  green. On release it joins the topmost host that takes it and whose
+  box holds its centre; while its centre is still on its own host it
+  stays there (an object source put on a host that does not take it,
+  an officer on an altar, stays while over it, and leaves it for the
+  floor); otherwise it stands on the floor, a floor being made when the
+  hall has none. Rows never take or give up objects; a host standing in
+  a row is still a host. The object stays where it is drawn: its anchor
+  point is converted into the new frame, its scale multiplied by the
+  old frame's unit over the new (left out when it comes back to its
+  kind's default, written only when it changes), `at` gives way to `x`
+  and `y`, and it goes to the end of its new parent's children, drawn
+  on top. Converted values keep two decimals unless a scaled host's
+  frame needs more to stay within half a hundredth of a square (and a
+  scale more to keep the drawn size within 0.004 of a square): a cup
+  put on a scale-2 altar takes `scale=0.175`. The panel's **Stands on**
+  select (Floor and each host that takes the object, named by kind,
+  with its position where two share a name) does the same from the
+  keyboard or a touch screen (plan 050). One change, one undo step.
+  The resolver now reports each host's `childFrame` (d0121ec), so the
+  conversion needs no second layout. The rules live in `hallHosts.ts`.
+- **A warnings badge outside edit mode, in the editor only.** Beside
+  Edit hall, a hall with warnings shows "⚠ N warnings" (labelled "N
+  hall warnings: edit the hall to see them"); activating it opens the
+  hall editor with the focus on the first warning in its list. The
+  count comes from `validateHall` with the app's art, in
+  `gdHallWarningCount.ts`, loaded by the editor's node view with
+  `import()` a quarter of a second after the hall changes. The reader
+  never reaches it; the reader boundary test now says so. Bundle cost:
+  below.
+
+### The `/gd/hall` editor
+
+- **Architecture.** Shared, unchanged in behaviour for the ritual
+  editor: `RitualSourceEditor` (Pug, IDs folded, hall warnings),
+  `GdHallEditor` (always editing here: no Done button, the page's
+  history on its keys, a locked note of the page's), `ExportControls`
+  with `embedGdHallFonts`, `useRitualEditorLayout` (a storage key of its
+  own, `magickli:gd-hall-editor-layout:v1`), and new shared helpers in
+  `gdHallPug.ts`: `printHallSource` prints a semantic hall as the Pug
+  of a ritual holding only it, without the header, with or without
+  IDs (`gdHallPug` uses it), and `parseHallSource` reads that back
+  through the ritual parser and validator, refusing anything beside the
+  hall but blank lines ("only the hall goes here; put comments inside
+  it") with the author's line numbers. `gdHallSourceWarnings` and the
+  source panel take `headerless` for the same reason. Page-specific,
+  in `src/app/gd/hall/`: `HallPlayground.tsx` (the editor, loaded with
+  `next/dynamic` and `ssr: false` by `HallPlaygroundLoader.tsx`),
+  `hallHistory.ts` (the page's undo and redo), `hallDraft.ts` and
+  `hallShare.ts`. `page.tsx` is a server component: the fonts, two
+  short paragraphs (what the page is; that drafts stay in the browser
+  and how to keep a hall with history), the loader and the source
+  links. The read-only gallery and its tests are gone; their checks
+  (fonts, sources, exports, Copy Pug source, the original drawings)
+  moved to `HallPlayground.test.tsx`.
+- **Views and sync.** Source, visual and split, as in the ritual editor
+  (split side by side from 900 px, stacked below). The source is the
+  page's state: a visual gesture reprints it with IDs; typed source is
+  parsed on each change and drawn at once. While the source does not
+  parse, the drawing shows the last hall read-only ("The source has an
+  error: correct it to edit the drawing again."), Copy Pug source and
+  the share link are disabled, and Visual is offered only once there
+  is a hall to show. Nodes typed without IDs get fresh ones at each
+  parse until a visual gesture prints them.
+- **History.** One step per visual gesture, per loaded hall (a preset,
+  a share link, Start over) and per source edit once typing pauses for
+  0.7 s; undo during unsettled typing takes the whole edit back. At
+  most 200 steps. The page's Undo and Redo buttons, and Ctrl+Z, Ctrl+Y
+  and Ctrl+Shift+Z in the drawing; CodeMirror keeps its own undo for
+  typing inside the source.
+- **Presets.** A picker of the five, each loaded as a copy with fresh
+  IDs. The picker reads "Your hall (changed)" when the hall's Pug
+  without IDs is no preset's; choosing a preset then asks first
+  ("Replace your hall?"), since the draft would be replaced, and Undo
+  brings the hall back. "Compare with the original drawing" is offered
+  while the hall is an unchanged preset that has one, the drawing
+  shown below the editor: once edited, the hall is the author's own and
+  the old drawing no longer describes it (the choice the brief left).
+- **Draft.** The source is written to `magickli:gd-hall-draft:v1` as
+  `{"v":1,"source":…}` 0.4 s after it rests and on `pagehide`; at most
+  1,000,000 characters. On return a draft that is no unchanged preset
+  is restored with "Draft restored · Start over" (Start over loads the
+  Neophyte); a corrupt, other-version or oversized draft is said and
+  the Neophyte loads; blocked storage, or a full one, is survived and
+  said ("This browser is not keeping a draft…"). A draft whose source
+  does not parse opens in the source view with its error.
+- **Share link.** "Copy share link" copies
+  `/gd/hall#hall=1.<data>`: the hall's Pug without IDs, deflated
+  (`CompressionStream("deflate-raw")`) and base64url-encoded, in the
+  fragment, never the query string; `hall=0.` carries the UTF-8 text
+  uncompressed where a browser has no compression streams. The
+  fragment may be at most 8,000 characters (a link the hall is too
+  large for is refused with its length and the limit, pointing to Copy
+  Pug source), and a link may unpack to at most 256 KB, so a deflate
+  bomb is refused while it is read. Opening one parses it as hall
+  source and nothing else: a damaged, oversized or non-hall link says
+  why ("This share link could not be opened: …") and leaves the draft.
+  The fragment is removed from the address bar once read, so a reload
+  shows the draft, and a link pasted while the page is open
+  (`hashchange`) opens too. A shared hall is loaded as one step (Undo
+  goes back) and is not written over the browser's draft until it is
+  changed. The link is made ahead of the click, so copying keeps the
+  click's permission. Measured: an edited Neophyte hall of 1,139
+  characters of Pug gave a 613-character link.
+- **Export and copying.** `ExportControls` exports a hidden drawing of
+  the hall (no editor overlay; drawn again only when the hall changes),
+  PNGs with the embedded fonts of stage A3; Copy Pug source copies the
+  Pug without IDs.
+- **Accessibility and phones.** Labelled toolbar, picker, layout
+  buttons (`aria-pressed`), history buttons and panels; the drawing is
+  the stage D editor. At 390 px nothing scrolls sideways in any view.
+
+### Bundle
+
+Production builds (webpack), from each commit's gate:
+
+- **The badge** (fbbe523 against 8fd906f): the editor's lazily loaded
+  visual chunk, which the reader never loads, grew by 828 bytes, and
+  `gdHallWarningCount` is a 327-byte entry (264 gzipped) whose other
+  files are the three shared chunks `GdHallDrawing` already loads, the
+  validator among them (the package's index exports it). An editor
+  that has drawn a hall therefore fetches 327 bytes more. The reader's
+  and the editor's client reference manifests do not list it.
+- **`/gd/hall`** (27683ff's code, built as 160c714, against 8663fef):
+  the page's own chunk went from 25,570 bytes (the gallery drew a hall
+  on the page) to 4,380 (1,688 gzipped); the chunks its client
+  reference manifest lists, the site's layout included, from 1,160,135
+  bytes to 733,045 (244,573 gzipped). The editor loads after it,
+  client-side only: 30 files, 1,509,131 bytes (491,656 gzipped), of
+  which 1,375,459 (444,919) are not already in the shell: CodeMirror,
+  the Pug parser and printer, the visual editor and MUI components it
+  uses, and the hall code and art (the 266,532-byte hall chunk is the
+  one the reader's drawing loads).
+
+### What was verified, and how
+
+- **Gates**, per commit, in this worktree with Node 24 (`pnpm check`,
+  `typecheck`, `test:coverage` with the per-file thresholds, `build`),
+  all exit 0; the tip also `loom check`, `loom check --production`
+  with the CI placeholder environment, the magick-data smoke test and
+  `pnpm check:turbopack`, all 0 (the tip's first gate failed `check`
+  on the Ritual Pug guide's formatting, which was folded into 27683ff
+  and gated again). `hallRows.ts` and `hallHosts.ts` joined the
+  coverage list. The compiler is untouched: `semantic.ts`,
+  `semanticCompile.ts`, `semanticCompilerImpl.ts` and `ritualNodeIds.ts`
+  have no diff, so the identity stays `6b059a0f…`.
+- **Tests** (about 90 new): rows (`hallRows.test.ts`: places, spread,
+  reordering with comments and fixed siblings around, landing index,
+  the preview, freezing by field, arrow and Alt-drag, siblings with
+  `at` or a position left alone, spreading again, North rows along
+  `y`); hosts (`hallHosts.test.ts`: the table, what never moves, the
+  topmost host, staying on one's host, the floor, conversions off a
+  board on a scale-2 altar with an anchor, onto that board, an item
+  onto the scaled altar, an officer onto and off a platform, an
+  unknown item kind's default, a hall without a floor, each within
+  0.01 square of where it was drawn; Stands on's choices); the model's
+  `moveHallNode` and `ensureFloor`; the component (a reorder drag with
+  its mark, an Alt-drag freezing the row, Alt+arrows and the panel's
+  buttons, Spread evenly again, a cup off the altar and back with the
+  highlight, an officer never on the altar, Stands on, no Done, the
+  locked note, focus at the warnings); the randomised operations test
+  with row steps, reorders, spreads and Stands on, every operation
+  shown to change some hall; the badge in the ritual editor (none for a
+  clean hall; "⚠ 2 warnings" opening the editor at the first); the
+  page (`HallPlayground.test.tsx`, with the source panel replaced by a
+  text box: start, layouts, presets with and without changes, Escape,
+  source and drawing in step, the error lock, typing as one step,
+  undo keys, the draft restored, unchanged, broken, corrupt, of another
+  version, oversized, blocked and too large, share links copied and
+  opened in a fresh browser, kept off the draft, damaged, not a hall,
+  pasted, after unmounting, unmakeable, too large, refused by the
+  clipboard, Copy Pug source and SVG export without the overlay);
+  `hallHistory`, `hallDraft` and `hallShare` alone (every preset round
+  trip, the uncompressed format, a 1,500-marker hall too large, a
+  deflate bomb, bad base64, bad UTF-8); `parseHallSource` and
+  `printHallSource`; headerless warnings; a layout key of the page's
+  own.
+- **In the browser** (Turbopack dev server from this branch on
+  127.0.0.1:3213, headless Chromium 153 over CDP; synthetic data only).
+  `/gd/hall` at 1440 × 900, logged out: the Neophyte in split view;
+  a drag moved the Hegemon to x 9.5 in one step; a caption typed in
+  the source redrew the hall; the Hierophant dragged past the Past
+  Hierophant showed the others moving and the landing mark, and
+  undo and redo took and gave back the order; the cup dragged off
+  the altar ("Moved Cup to the floor") and back (the altar outlined
+  in green; "Moved Cup onto the Altar", `x=0.5, y=0.5`); the Hegemon
+  onto the platform and the Hiereus off it; Zelator Temple 1 chosen
+  with changes asked "Replace your hall?", replaced, compared with its
+  drawing, and Undo brought the changed hall back; a reload restored
+  the draft ("Draft restored"); Copy share link gave a 613-character
+  URL with the hall in the fragment and no query, which a second
+  Chromium with a fresh profile opened to the same hall (Pug without
+  IDs identical), the fragment gone from the address bar and no draft
+  written; SVG and PNG downloads (the PNG 1541 × 2048 with the label
+  fonts). At 390 × 844 with touch: split, visual and source views
+  without horizontal scroll, a tap selected and a touch drag moved the
+  Stolistes. In the ritual editor ("Hall check (stage B)", the local
+  Creator), at 1440 × 900: a dais reorder by drag with its preview,
+  undone and redone as one step each through the ritual's history,
+  Alt+Right moving it back; x = 3 typed for the Imperator froze the
+  other four at 4.8, 8, 11.2 and 14.4, and Spread evenly again cleared
+  all five; the cup off and back onto the altar and the Hiereus off
+  and back onto the platform, highlighted, and four undos gave the
+  hall back; an unknown attribute on the altar and another on the rose
+  typed into the source gave "⚠ 2 warnings" beside Edit hall, which
+  opened the editor with the focus on "altar: unknown attribute
+  colour". At 390 × 844 with touch, in the visual view: no horizontal
+  scroll; a touch reorder of the Hierophant, the cup dragged off the
+  altar by touch and put back with Stands on (Floor, Altar, Platform),
+  and the editor's Undo three times back to "Saved". Nothing was
+  saved; the source was put back as it was ("Saved"). Console: only
+  the source editor's existing "Unknown highlighting tag" warning and
+  the app's own debug lines. Screenshots are outside the repository.
+- **Documentation screenshots** were not recaptured: the capture
+  publishes the sample rituals, which needs the storage the minimal
+  local environment lacks. No fixture holds a hall, and the only change
+  to a screen they show is the badge, which a hall without warnings
+  does not show.
+
 ## Commits
 
 | Commit | Change |
@@ -2051,6 +2317,13 @@ What was verified, and how:
 | 3476c25 | Undo and redo only while the ritual takes changes, without scrolling; `writeHallToAtom` refuses while locked and reports a dropped write; refusals shown (D review M3, m1–m3; Fable review) |
 | 522d4bb | Ctrl+S and Save write a hall field's typed value first (`pendingEdits.ts`); a field disabled by a lock writes on unlocking (D review m4; Fable review) |
 | 3e1cb42 | Labels hit first; defaults remove switches; one-sided bounds; focus only for a waiting author; Edit hall disabled, not hidden; `(pointer: coarse)` followed; the selection described, not named (D review nits) |
+| d0121ec | The resolver reports each host's child frame (E) |
+| d28e67f | Rows reorder by drag, Alt+arrows and the panel; an explicit position freezes the spread siblings; Spread evenly again (E, Gadi's decision) |
+| 8fd906f | Objects stand on hosts and leave them by drag or the panel's Stands on, converted to stay where they are drawn; `hallHosts.ts`, `ensureFloor`, `moveHallNode` (E, Gadi's decision) |
+| fbbe523 | A "⚠ N warnings" badge beside Edit hall, opening the editor at its warnings; the validator loaded by the editor only (E, Gadi's decision) |
+| b3b4d22 | `GdHallEditor` without Done, history buttons or the ritual's locked note, for a host that is always editing (E) |
+| 8663fef | `printHallSource` and `parseHallSource` for a hall's own source; headerless hall warnings; a layout preference per editor (E) |
+| 27683ff | `/gd/hall` as a hall editor: views, presets, history, draft, share link, export; the gallery removed (E) |
 
 ## Future
 
@@ -2133,16 +2406,7 @@ loaded Noto Serif in a test harness, falling back to Noto Sans, while the
 bare family name worked; check the stacks before relying on resvg for
 hall images.
 
-From stage D: reparenting (dropping an object onto a host, or dragging
-a host's child out to the floor, converting its position between
-frames) needs a rule for intent, perhaps a modifier or a panel action
-("Stand on: floor / altar"); whether moving one officer of a dais or
-banner row should write its siblings' positions too, so they stay where
-they are instead of spreading again (Gadi's call; today they spread
-again); hall warnings on the plain hall atom, outside edit mode, which
-would need the validator loaded for every ritual with a hall (a count
-from a lazily loaded check would do); editing a label child apart from
-its object; Firefox and Safari, and a real phone or tablet, for the
+From stage D: editing a label child apart from its object; Firefox and Safari, and a real phone or tablet, for the
 pointer, touch and focus handling (checked in headless Chromium with
 CDP touch events only; no Safari device); Chromium not scrolling a pan
 that begins within a touch's radius of an object.
@@ -2157,3 +2421,19 @@ squares across get finger-sized handles at 390 px (the panel scales
 the rest); the reader and the documentation screenshots were not
 rechecked in this round (no publication storage in the minimal local
 environment).
+
+From stage E: free labels never move onto hosts, since a `label`
+under a host labels it (a free-text child of a host would need a
+vocabulary change); `/gd/hall` renders no drawing on the server (the
+editor is client-only for its draft and fragment), so search engines
+see its text only; share links in format 0 (uncompressed, for browsers
+without compression streams) are tested in jsdom and Node only; the
+new gestures (reorder, hosts, Alt+arrows) and the page are checked in
+headless Chromium only, with CDP touch events for the phone (no Firefox,
+Safari or real device); on the phone the badge and the Hiereus moves
+were checked at desktop size only; during a reorder drag the dragged
+officer's label can overlap its neighbour's until release; nodes typed
+in the page's source without IDs get new ones at every parse, so such a
+node selected in the drawing loses its selection as typing goes on; the
+documentation screenshots were not recaptured (no publication storage
+locally) though no screen they show changed unless a hall has warnings.
