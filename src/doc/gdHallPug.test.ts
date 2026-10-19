@@ -104,4 +104,15 @@ describe("a hall's own source, as /gd/hall shows it", () => {
     );
     expect(() => parseHallSource("| text\n")).toThrow(/Line 1:/);
   });
+
+  it("says to leave out a pasted ritual header", () => {
+    expect(() =>
+      parseHallSource("//- magickli-ritual-pug 1\ngdHall\n  floor\n"),
+    ).toThrow(
+      "Line 1: leave out the `//- magickli-ritual-pug 1` header line; paste only the hall",
+    );
+    expect(() =>
+      parseHallSource("\n//- magickli-ritual-pug 1\ngdHall\n"),
+    ).toThrow(/^Line 2: leave out the/);
+  });
 });

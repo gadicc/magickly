@@ -70,6 +70,15 @@ export function parseHallSource(text: string): HallElement {
       "Line 1: the source holds no hall; start it with gdHall",
       1,
     );
+  // A whole ritual's source pasted in: its header is the first thing to go.
+  const header = text
+    .split("\n")
+    .findIndex((row) => row.trimEnd() === RITUAL_PUG_HEADER);
+  if (header >= 0)
+    throw new RitualSourceError(
+      `Line ${header + 1}: leave out the \`${RITUAL_PUG_HEADER}\` header line; paste only the hall`,
+      header + 1,
+    );
   let nodes: ReturnType<typeof parseRitualPug>["nodes"];
   try {
     ({ nodes } = parseRitualPug(`${RITUAL_PUG_HEADER}\n${text}`));
