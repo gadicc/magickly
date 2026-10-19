@@ -1,5 +1,6 @@
 "use client";
 
+import type { HallNode } from "@magick-components/gd/hall/types";
 import EditOutlined from "@mui/icons-material/EditOutlined";
 import { Button } from "@mui/material";
 import type { NodeViewProps } from "@tiptap/core";
@@ -323,6 +324,36 @@ const GdHallAtomEditor = dynamic(() => import("./GdHallAtomEditor"), {
   ),
 });
 
+/**
+ * How many warnings `validateHall` has for a hall, for the badge on a hall
+ * outside edit mode (plan 061, Stage E notes): 0 until known. The
+ * validator loads lazily, after a pause, and only in the editor; a hall
+ * changed meanwhile drops the older count.
+ */
+function useHallWarningCount(hall: HallNode | null): number {
+  const [found, setFound] = useState<{ hall: HallNode; count: number } | null>(
+    null,
+  );
+  useEffect(() => {
+    if (!hall) return;
+    let current = true;
+    const timer = window.setTimeout(() => {
+      import("./gdHallWarningCount")
+        .then(({ countHallWarnings }) => {
+          if (current) setFound({ hall, count: countHallWarnings(hall) });
+        })
+        // Without the chunk (offline before it was cached) there is no
+        // badge; the editor lists the warnings when it opens.
+        .catch(() => {});
+    }, 250);
+    return () => {
+      current = false;
+      window.clearTimeout(timer);
+    };
+  }, [hall]);
+  return found?.hall === hall ? found.count : 0;
+}
+
 export function RitualAtomForEditing({
   node,
   selected,
@@ -332,6 +363,8 @@ export function RitualAtomForEditing({
   const tag = String(node.attrs.tag);
   const attrs = node.attrs.attrs;
   const [editingHall, setEditingHall] = useState(false);
+  /** The badge opened the editor: it starts at the warnings. */
+  const [toWarnings, setToWarnings] = useState(false);
   const editHallButton = useRef<HTMLButtonElement>(null);
   const finishedEditing = useRef(false);
   const editable = useEditorState({
@@ -367,6 +400,7 @@ export function RitualAtomForEditing({
     () => (tag === "gdHall" ? gdHallRow(node.attrs) : null),
     [tag, node.attrs],
   );
+  const warningCount = useHallWarningCount(hall);
   const imageStyle = editorImageStyle(attachedImage ? attrs.style : undefined);
   // Site assets (such as /pics/…) preview like the reader; other URLs stay
   // captions so the editor never fetches arbitrary hosts.
@@ -405,6 +439,7 @@ export function RitualAtomForEditing({
           editor={editor}
           getPos={getPos}
           node={node}
+          initialFocus={toWarnings ? "warnings" : "drawing"}
           onDone={() => {
             finishedEditing.current = true;
             setEditingHall(false);
@@ -429,9 +464,29 @@ export function RitualAtomForEditing({
               className={styles.hallEdit}
               disabled={!editable}
               data-gd-hall-controls
-              onClick={() => setEditingHall(true)}
+              onClick={() => {
+                setToWarnings(false);
+                setEditingHall(true);
+              }}
             >
               Edit hall
+            </Button>
+          )}
+          {tag === "gdHall" && hall && !editingHall && warningCount > 0 && (
+            <Button
+              size="small"
+              color="warning"
+              className={styles.hallWarnings}
+              disabled={!editable}
+              data-gd-hall-controls
+              aria-label={`${warningCount} hall ${warningCount === 1 ? "warning" : "warnings"}: edit the hall to see them`}
+              onClick={() => {
+                setToWarnings(true);
+                setEditingHall(true);
+              }}
+            >
+              <span aria-hidden="true">⚠</span>&nbsp;{warningCount}{" "}
+              {warningCount === 1 ? "warning" : "warnings"}
             </Button>
           )}
         </div>

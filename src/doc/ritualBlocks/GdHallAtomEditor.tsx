@@ -23,6 +23,8 @@ export interface GdHallAtomEditorProps {
   getPos: () => number | undefined;
   node: ProseMirrorNode;
   onDone: () => void;
+  /** Where the focus goes on arriving (the badge asks for the warnings). */
+  initialFocus?: "drawing" | "warnings";
 }
 
 /**
@@ -114,6 +116,7 @@ export default function GdHallAtomEditor({
   getPos,
   node,
   onDone,
+  initialFocus,
 }: GdHallAtomEditorProps) {
   const hall = useMemo(() => hallOfAtom(node.attrs), [node.attrs]);
   // A footnote's editor projects the ritual's: both must take changes,
@@ -148,6 +151,7 @@ export default function GdHallAtomEditor({
         editable={ownEditable && ritualEditable}
         onChange={onChange}
         onDone={onDone}
+        initialFocus={initialFocus}
         onUndo={history(undoNoScroll)}
         onRedo={history(redoNoScroll)}
       />

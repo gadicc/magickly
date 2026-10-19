@@ -12,7 +12,7 @@ import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { gdHallArt } from "@/app/gd/hall/art";
 import { flushPendingEdits } from "../pendingEdits";
-import { GdHallEditor } from "./GdHallEditor";
+import { GdHallEditor, type GdHallEditorProps } from "./GdHallEditor";
 import { parseNumberField } from "./HallProperties";
 import { hallView } from "./hallEdits";
 import type { HallElement } from "./hallModel";
@@ -92,6 +92,7 @@ function setup(
   options: {
     refuse?: boolean;
     history?: boolean;
+    props?: Partial<GdHallEditorProps>;
   } = {},
 ): Harness {
   const harness = {
@@ -130,6 +131,7 @@ function setup(
           if (options.history && previous) setHall(previous);
         }}
         onRedo={harness.redo}
+        {...options.props}
       />
     );
   }
@@ -1224,5 +1226,16 @@ describe("hosts (owner's decision, 19 October 2026)", () => {
       y: 3,
     });
     expect(screen.getByText("Moved Hegemon onto the Platform")).toBeTruthy();
+  });
+});
+
+describe("where the focus starts", () => {
+  it("starts at the warnings when asked", () => {
+    setup(hallFromPug("gdHall", "  floor", "    unicorn(x=3, y=3)"), true, {
+      props: { initialFocus: "warnings" },
+    });
+    expect(document.activeElement?.textContent).toBe(
+      "⚠unknown tag unicorn; drawn as a placeholder",
+    );
   });
 });

@@ -150,6 +150,10 @@
 .hallEdit {
   margin-inline-start: 0.5rem;
 }
+.hallWarnings {
+  margin-inline-start: 0.25rem;
+  text-transform: none;
+}
 .hallLoading {
   margin: 0.5rem 0;
   font-size: 0.875rem;

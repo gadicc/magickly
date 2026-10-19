@@ -58,10 +58,10 @@ const hallPos = (editor: Editor) => {
 };
 
 let current: Editor | null = null;
-function Host() {
+function Host({ text = source }: { text?: string }) {
   const editor = useEditor({
     extensions: ritualTiptapClientExtensions,
-    content: semanticToTiptap(parseRitualPug(source)),
+    content: semanticToTiptap(parseRitualPug(text)),
     immediatelyRender: false,
     editorProps: {
       attributes: { role: "textbox", "aria-label": "Fixture visual editor" },
@@ -353,4 +353,36 @@ describe("insideHallControls", () => {
     dom.remove();
     vi.restoreAllMocks();
   });
+});
+
+describe("the warnings badge outside edit mode", () => {
+  it("shows none for a hall without warnings", async () => {
+    render(<Host />);
+    await screen.findByRole("button", { name: "Edit hall" });
+    // Long enough for the lazily loaded count to arrive.
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    expect(screen.queryByRole("button", { name: /hall warning/ })).toBeNull();
+  }, 60_000);
+
+  it("counts a hall's warnings and opens the editor at them", async () => {
+    render(
+      <Host
+        text={`${RITUAL_PUG_HEADER}\ngdHall\n  floor\n    unicorn(x=3, y=3)\n    item(x=5, y=5)\n`}
+      />,
+    );
+    const badge = await screen.findByRole(
+      "button",
+      { name: "2 hall warnings: edit the hall to see them" },
+      { timeout: 10_000 },
+    );
+    expect(badge.textContent).toBe("⚠\u00a02 warnings");
+    fireEvent.click(badge);
+    await screen.findByRole("application", {}, { timeout: 30_000 });
+    await waitFor(() =>
+      expect(document.activeElement?.textContent).toBe(
+        "⚠unknown tag unicorn; drawn as a placeholder",
+      ),
+    );
+    expect(screen.queryByRole("button", { name: /hall warnings:/ })).toBeNull();
+  }, 60_000);
 });

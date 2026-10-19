@@ -112,6 +112,11 @@ export interface GdHallEditorProps {
   onRedo?: () => void;
   /** False while the host cannot take changes; the editor only shows. */
   editable?: boolean;
+  /**
+   * Where the focus goes on arriving: the drawing (by default), or the
+   * first of the hall's warnings, for an author who asked to see them.
+   */
+  initialFocus?: "drawing" | "warnings";
   /** IDs for new and copied nodes; the ritual editor's by default. */
   createId?: () => string;
 }
@@ -199,6 +204,7 @@ export function GdHallEditor({
   onUndo,
   onRedo,
   editable = true,
+  initialFocus = "drawing",
   createId = createRitualNodeId,
 }: GdHallEditorProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -343,10 +349,19 @@ export function GdHallEditor({
   // which opened it, is gone) or in the editor. An author who moved on
   // while its code loaded keeps their place. The last pending frame goes
   // with the editor.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: on arriving only
   useEffect(() => {
     const active = document.activeElement;
-    if (!active || active === document.body || root.current?.contains(active))
-      surface.current?.focus({ preventScroll: true });
+    if (!active || active === document.body || root.current?.contains(active)) {
+      const warning =
+        initialFocus === "warnings"
+          ? root.current?.querySelector<HTMLElement>("[data-hall-warning]")
+          : null;
+      if (warning) {
+        warning.focus({ preventScroll: true });
+        warning.scrollIntoView?.({ block: "nearest" });
+      } else surface.current?.focus({ preventScroll: true });
+    }
     return () => {
       if (frame.current !== null && frame.current >= 0)
         cancelAnimationFrame(frame.current);
@@ -1201,6 +1216,7 @@ function Warnings({
             <button
               type="button"
               className={styles.warning}
+              data-hall-warning
               data-severity={warning.severity}
               onClick={() => onSelect(selectableForPath(view, warning.path))}
             >
