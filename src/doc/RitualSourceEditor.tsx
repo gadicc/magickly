@@ -126,6 +126,7 @@ function whenIdle(task: () => void, timeout: number): () => void {
 function useHallWarnings(
   source: string,
   enabled: boolean,
+  headerless: boolean,
 ): { source: string; warnings: RitualSourceWarning[] } | null {
   const [found, setFound] = React.useState<{
     source: string;
@@ -144,7 +145,10 @@ function useHallWarnings(
           if (!current) return;
           cancelIdle = whenIdle(() => {
             if (current)
-              setFound({ source, warnings: gdHallSourceWarnings(source) });
+              setFound({
+                source,
+                warnings: gdHallSourceWarnings(source, { headerless }),
+              });
           }, 2000);
         })
         // A chunk that fails to load leaves the source without warnings.
@@ -155,7 +159,7 @@ function useHallWarnings(
       window.clearTimeout(timer);
       cancelIdle();
     };
-  }, [source, enabled]);
+  }, [source, enabled, headerless]);
   return found;
 }
 
@@ -248,6 +252,7 @@ export default function RitualSourceEditor({
   reveal,
   follow,
   onCaretNode,
+  headerless = false,
 }: {
   value: string;
   dialect: RitualSourceDialect;
@@ -266,6 +271,11 @@ export default function RitualSourceEditor({
   follow?: { id: string; key: number } | null;
   /** The nodes around the caret, innermost first, when they change while focused. */
   onCaretNode?(ids: string[]): void;
+  /**
+   * The source is ritual Pug without its header line (the `/gd/hall`
+   * page's hall); hall warnings count lines from its first.
+   */
+  headerless?: boolean;
 }) {
   const [foldIds, setFoldIds] = React.useState(true);
   const host = React.useRef<HTMLDivElement>(null);
@@ -432,6 +442,7 @@ export default function RitualSourceEditor({
   const hallWarnings = useHallWarnings(
     value,
     dialect === "pug" && diagnostic?.source !== value,
+    headerless,
   );
   // biome-ignore lint/correctness/useExhaustiveDependencies: projections and reconfiguration can replace the CodeMirror state; reapply its diagnostics afterward.
   React.useLayoutEffect(() => {

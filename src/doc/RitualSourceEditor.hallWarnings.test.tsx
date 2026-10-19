@@ -80,7 +80,7 @@ it("checks the source in idle time after a pause in typing", async () => {
   expect(warnings).not.toHaveBeenCalled();
   expect(idle.size).toBe(1);
   await runIdle();
-  expect(warnings).toHaveBeenCalledWith(first);
+  expect(warnings).toHaveBeenCalledWith(first, { headerless: false });
   expect(shown(container)).toEqual([`for ${first.length}`]);
 });
 
@@ -97,7 +97,7 @@ it("drops a check for source that has since changed", async () => {
   expect(shown(container)).toEqual([]);
   await pause();
   await runIdle();
-  expect(warnings.mock.calls).toEqual([[second]]);
+  expect(warnings.mock.calls).toEqual([[second, { headerless: false }]]);
   expect(shown(container)).toEqual([`for ${second.length}`]);
 });
 
@@ -144,4 +144,12 @@ it("waits for a later task where idle callbacks are missing", async () => {
   } finally {
     window.requestIdleCallback = request;
   }
+});
+
+it("checks a hall's own source, without the header, as such", async () => {
+  const text = "gdHall\n  floor\n";
+  render(<RitualSourceEditor {...props} value={text} headerless />);
+  await pause();
+  await runIdle();
+  expect(warnings).toHaveBeenCalledWith(text, { headerless: true });
 });

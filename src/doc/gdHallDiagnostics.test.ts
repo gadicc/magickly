@@ -112,3 +112,19 @@ describe("hall warnings in Pug source", () => {
     });
   });
 });
+
+describe("hall warnings in a hall's own source (/gd/hall)", () => {
+  it("counts lines from the first, without the header", () => {
+    const line = '    altar(at="centre", colour="red")';
+    const text = ["gdHall", "  //- a comment", "  floor", line, ""].join("\n");
+    expect(gdHallSourceWarnings(text, { headerless: true })).toEqual([
+      {
+        line: 4,
+        column: column("colour", line),
+        message: "Line 4: altar: unknown attribute colour",
+      },
+    ]);
+    // Read as a whole ritual, the same text has no header: no warnings.
+    expect(gdHallSourceWarnings(text)).toEqual([]);
+  });
+});

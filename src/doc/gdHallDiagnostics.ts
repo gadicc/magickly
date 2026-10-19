@@ -4,7 +4,7 @@ import type {
 } from "@magick-components/gd/hall/types";
 import { validateHall } from "@magick-components/gd/hall/validate";
 import { gdHallArt } from "@/app/gd/hall/art";
-import { parseRitualPugWithLocations } from "./ritualPug";
+import { parseRitualPugWithLocations, RITUAL_PUG_HEADER } from "./ritualPug";
 import type { RitualSourceLocation } from "./ritualSourceDiagnostics";
 import {
   type RitualSemanticDocument,
@@ -39,13 +39,44 @@ type Element = Extract<RitualSemanticNode, { kind: "element" }>;
  * The hall validator's paths count a node's compiled children, which
  * leave out source annotations (comments, blank lines), so the walk from
  * the hall to the node skips them too.
+ *
+ * With `headerless`, the source is a ritual's Pug without its header
+ * line (the `/gd/hall` page's source, plan 061 stage E), and the lines
+ * are counted from its first.
  */
-export function gdHallSourceWarnings(source: string): RitualSourceWarning[] {
+export function gdHallSourceWarnings(
+  source: string,
+  { headerless = false }: { headerless?: boolean } = {},
+): RitualSourceWarning[] {
   let parsed: ReturnType<typeof parseRitualPugWithLocations>;
   try {
-    parsed = parseRitualPugWithLocations(source);
+    parsed = parseRitualPugWithLocations(
+      headerless ? `${RITUAL_PUG_HEADER}\n${source}` : source,
+    );
   } catch {
     return [];
+  }
+  if (headerless) {
+    const shift = (at: RitualSourceLocation): RitualSourceLocation => ({
+      ...at,
+      line: at.line - 1,
+      ...(at.attributes && {
+        attributes: Object.fromEntries(
+          Object.entries(at.attributes).map(([name, place]) => [
+            name,
+            { ...place, line: place.line - 1 },
+          ]),
+        ),
+      }),
+    });
+    const shifted = new WeakMap<RitualSemanticNode, RitualSourceLocation>();
+    const visit = (node: RitualSemanticNode) => {
+      const location = parsed.locations.get(node);
+      if (location) shifted.set(node, shift(location));
+      if (node.kind === "element") node.children?.forEach(visit);
+    };
+    parsed.document.nodes.forEach(visit);
+    parsed = { ...parsed, locations: shifted };
   }
   const { document, locations } = parsed;
   const warnings: RitualSourceWarning[] = [];
