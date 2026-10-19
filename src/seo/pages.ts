@@ -117,8 +117,9 @@ export const PUBLIC_PAGES = {
   "/gd/hall": {
     title: "Golden Dawn Temple Halls",
     description:
-      "Floor plans of the Golden Dawn temple for the Neophyte, Zelator and " +
-      "Theoricus grades, drawn as vector images and exportable as SVG or PNG.",
+      "Edit floor plans of the Golden Dawn temple, from the Neophyte, " +
+      "Zelator and Theoricus presets, on the drawing or in Pug; export as SVG " +
+      "or PNG, or share a link.",
   },
   "/gd/rituals": {
     title: "Golden Dawn Rituals",

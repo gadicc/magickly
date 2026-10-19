@@ -1,0 +1,75 @@
+.playground {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+.presetPicker {
+  min-width: 14rem;
+  max-width: 100%;
+}
+.panels {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+/* Source beside the drawing on a wide screen; stacked on a phone. */
+@media (min-width: 900px) {
+  .panels[data-layout="split"] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+.panel {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.panelTitle {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.empty {
+  margin: 0;
+  color: #555;
+}
+.original {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 560px;
+  text-align: center;
+  font-size: 90%;
+}
+.original img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.share {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: center;
+}
+.shareButtons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.status {
+  margin: 0;
+  min-height: 1.25em;
+  font-size: 0.875rem;
+  text-align: center;
+}
+.sources {
+  margin-top: 0.25rem;
+  overflow-wrap: anywhere;
+}

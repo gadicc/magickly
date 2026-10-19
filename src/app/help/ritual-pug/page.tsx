@@ -108,9 +108,23 @@ export default function RitualPugGuide() {
         there, or follows a speech or action from its last line; elsewhere it is
         not offered. The toolbar puts the hall after the block holding the
         cursor, at the nearest place a hall may stand. For source, the{" "}
-        <Link href="/gd/hall">temple halls page</Link> copies a preset’s Pug
+        <Link href="/gd/hall">temple hall editor</Link> copies a hall’s Pug
         without IDs, ready to paste at the top level; indent it to put the hall
         in a note.
+      </p>
+      <p>
+        The temple hall editor works on one hall outside any ritual: start from
+        a preset, edit it on the drawing or in its Pug, side by side if you
+        like, with undo and redo. It keeps the hall as a draft in that browser
+        only, shares it as a link that holds the hall itself, and exports it as
+        SVG or PNG. To keep a hall with a ritual’s history, copy its Pug source
+        into the ritual’s source, or insert a temple hall there and choose{" "}
+        <strong>Edit hall</strong> to edit it in place. In the drawing, an
+        officer or banner dragged along the dais or a banner row changes places
+        (<kbd>Alt</kbd> and the arrow keys do the same; an Alt-drag places it
+        freely), and an item, marker or officer dropped on an altar, platform or
+        throne that takes it stands on it. A hall with warnings shows how many
+        beside <strong>Edit hall</strong>.
       </p>
       <h2>Finding and fixing errors</h2>
       <p>
