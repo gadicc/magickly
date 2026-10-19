@@ -86,7 +86,7 @@ export const MIN_LABEL_WIDTH = 1.5;
 /**
  * The most label lines one hall draws, free labels and markers' text
  * included and the caption not; lines beyond it are dropped in layout
- * order. The largest preset draws 16 (Theoricus 2, with its three
+ * order. The largest preset draws 16 (Portal 2, with its six
  * markers), so a fully labelled hall has room to spare, while
  * untrusted content (up to MAX_HALL_NODES labels of MAX_LABEL_LINES
  * lines each) cannot make the SVG grow without bound.

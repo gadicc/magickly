@@ -129,7 +129,7 @@ const compiled = (hall: Element) =>
   semanticToJrt({ format: "magickli-ritual", version: 1, nodes: [hall] });
 
 describe("the /hall slash command", () => {
-  it("lists the five presets by title and grade", () => {
+  it("lists the presets by title and grade", () => {
     const editor = setup([p()], [0]);
     type(editor, "/");
     expect(options()).toContain(
@@ -148,6 +148,15 @@ describe("the /hall slash command", () => {
       "Zelator Temple 2 | 1=10, part 2",
       "Theoricus Temple 1 | 2=9, part 1",
       "Theoricus Temple 2 | 2=9, part 2",
+      "Practicus Temple 1 | 3=8, part 1",
+      "Practicus Temple 2 | 3=8, part 2",
+      "Practicus Temple 3 | 3=8, part 3",
+      "Philosophus Temple 1 | 4=7, part 1",
+      "Philosophus Temple 2 | 4=7, part 2",
+      "Philosophus Temple 3 | 4=7, part 3",
+      "Philosophus Temple 4 | 4=7, part 4",
+      "Portal Temple 1 | Portal, part 1",
+      "Portal Temple 2 | Portal, part 2",
     ]);
     type(editor, "theo");
     expect(options()).toEqual([
@@ -171,6 +180,21 @@ describe("the /hall slash command", () => {
     expect(compiled(hall)).toEqual(
       compiled(gdHallSource(HALL_PRESETS[2].hall)),
     );
+  });
+
+  it("finds the grades of stage F by name, the Portal by its own", () => {
+    const editor = setup([p()], [0]);
+    type(editor, "/philo");
+    expect(options()).toHaveLength(4);
+    expect(options()[0]).toBe(
+      "Philosophus Temple 1 | Temple hall · 4=7, part 1",
+    );
+    const portal = setup([p()], [0]);
+    type(portal, "/portal");
+    expect(options()).toEqual([
+      "Portal Temple 1 | Temple hall · Portal, part 1",
+      "Portal Temple 2 | Temple hall · Portal, part 2",
+    ]);
   });
 
   it.each(
@@ -425,5 +449,14 @@ it("labels presets with their grade and part", () => {
     "1=10, part 2",
     "2=9, part 1",
     "2=9, part 2",
+    "3=8, part 1",
+    "3=8, part 2",
+    "3=8, part 3",
+    "4=7, part 1",
+    "4=7, part 2",
+    "4=7, part 3",
+    "4=7, part 4",
+    "Portal, part 1",
+    "Portal, part 2",
   ]);
 });

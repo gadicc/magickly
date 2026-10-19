@@ -239,6 +239,15 @@ it("inserts a chosen temple hall after the current block, in one undo step", asy
     "Zelator Temple 2 (1=10, part 2)",
     "Theoricus Temple 1 (2=9, part 1)",
     "Theoricus Temple 2 (2=9, part 2)",
+    "Practicus Temple 1 (3=8, part 1)",
+    "Practicus Temple 2 (3=8, part 2)",
+    "Practicus Temple 3 (3=8, part 3)",
+    "Philosophus Temple 1 (4=7, part 1)",
+    "Philosophus Temple 2 (4=7, part 2)",
+    "Philosophus Temple 3 (4=7, part 3)",
+    "Philosophus Temple 4 (4=7, part 4)",
+    "Portal Temple 1 (Portal, part 1)",
+    "Portal Temple 2 (Portal, part 2)",
   ]);
   fireEvent.click(presets[3]);
   fireEvent.click(screen.getByRole("button", { name: "Insert" }));

@@ -589,9 +589,9 @@ with the cited works in `HALL_SOURCE_WORKS`; `hallSourceText` writes one
 | `neophyte` | drawing, checked against the book | Banner of the West follows the book (floor, north of the platform) |
 | `zelator1`, `zelator2` | drawings | Earth tablet, lamp and salt on the North wall from the book (conflict 7) |
 | `theoricus1`, `theoricus2` | drawings | Hexagram badge renamed `pantacle` |
-| `practicus1`–`practicus3` | book layouts | markers where art is missing |
-| `philosophus1`–`philosophus4` | book layouts | conflicts below |
-| `portal1`, `portal2` | book layouts | diagrams appear swapped against the text |
+| `practicus1`–`practicus3` | book layouts (stage F) | the 31st and 30th paths and 3=8; "Mercury" on the 3=8 dais a marker, as the drawing names it |
+| `philosophus1`–`philosophus4` | book layouts (stage F) | conflicts 2–5 and 10; the Fire tablet a marker |
+| `portal1`, `portal2` | book layouts (stage F) | each part takes the diagram its rubric describes (conflicts 1, 6); the Tablet of Union and the Fire and Water tablets markers |
 
 ### Where the sources disagree
 
@@ -605,8 +605,9 @@ Ciceros, Greer, Order sites) found none on these floor plans; Llewellyn's
 blurbs for the 6th and 7th editions mention corrected errors without detail,
 and the 7th edition scan on archive.org is access-restricted. Most conflicts
 therefore go back to Regardie's own 1938 edition, and two disappear once the
-1938 drawings are read. On 17 October 2026 Gadi accepted every recommendation
-below; the presets follow them.
+1938 drawings are read. On 17 October 2026 Gadi accepted the
+recommendations of rows 1–9; the presets follow them. Row 10 (stage F)
+awaits him.
 
 | # | Setup | Finding | Status | Recommendation |
 | --- | --- | --- | --- | --- |
@@ -619,6 +620,7 @@ below; the presets follow them.
 | 7 | Zelator Earth tablet | 1938 p.44 (n38) draws a small board, about 2 squares long, with its outer edge on the North wall line, inside the hall, the lamp at its East end and the salt at its West end; no source says whether it hangs or stands. Our drawings hang a board twice that size outside the wall | Settled: Gadi accepted the book's placement; the drawings' large board is drift | On the wall line, inside (the book), at the Theoricus board's size (the default tablet scale, 2.69 squares along the wall), the lamp East and the salt West of it along the wall |
 | 8 | Zelator altar | 1938 drawing: the Flaming Sword diagram on the altar, the red lamp at its East end, the cross in the triangle at the base of the Tree. The explicit "For the Altar" requirements line appears only from 1986, an editorial addition consistent with 1938 | Settled | Add the Flaming Sword board and the red lamp to Zelator 1 |
 | 9 | Neophyte Banner of the West | 1938 p.11 (n3) draws it free-standing on the floor, North-West of and slightly East of the Hiereus' throne; the Z documents give it a pole and base. No text gives a position | Settled as far as the sources go | On the floor, North-West of the throne (book) |
+| 10 | Philosophus 4 (4=7) symbol of Venus | 1938 p.144 (n138) labels a box on the dais "Kamea & Sigils of ♀"; the rubric (p.145, n139) says instead "The symbol of VENUS on the Tree of Life is shown in the East". Neither mentions the other; the Theoricus 2=9 drawing shows the Moon's kamea and seals the same way | New in stage F — for Gadi | Show both: the kamea and seals of Venus the drawing names, and the rubric's symbol as a marker ("Venus on the Tree of Life") until it is drawn (stage H). The preset does so; dropping either is one line |
 
 Also from 1938, with no errata found: Theoricus 32nd path (p.69, n63) writes
 "Flaming Sword" West of the altar and has incense in the South-East corner;
@@ -717,7 +719,7 @@ Kept until every reference is gone; this list is updated as they go.
 | `src/doc/ritualBlocks/renderForEditing.test.tsx:172,186` | test fixture |
 | The presets' `sources` (`drawing("neophyte")` and so on in `src/components/gd/hall/presets/*.ts`) | the drawing each preset was ported from; a citation, which needs the file only while it is served |
 | `/gd/hall`: the sources' links under the editor | link each cited drawing |
-| `src/app/gd/hall/presets.test.tsx` (each preset cites `public/pics/<id>.svg`, which must exist) | test of the two rows above |
+| `src/app/gd/hall/presets.test.tsx` (each preset ported from a drawing cites `public/pics/<id>.svg`, which must exist) | test of the two rows above |
 | Production ritual "0=0 Grade of the Neophyte" and 13 revisions | from the 15 September Mongo dump; rituals are unchanged since, so the SQL rows match. Migrate by editing the ritual once presets reach parity |
 | Published offline bundles, external links, search indexes, user exports | suspected; cannot be enumerated. Keep the files served |
 

@@ -25,6 +25,9 @@ import { describe, expect, it } from "vitest";
 import { inventoryRitualAssets } from "@/offline/ritualAssetInventory";
 import { gdHallArt } from "./art";
 
+/** The presets ported from the old drawings in `public/pics`. */
+const DRAWN = ["neophyte", "zelator1", "zelator2", "theoricus1", "theoricus2"];
+
 const render = (hall: (typeof HALL_PRESETS)[number]["hall"]) =>
   renderToStaticMarkup(<GdHall hall={hall} art={gdHallArt} />);
 
@@ -44,10 +47,17 @@ describe.each(HALL_PRESETS.map((preset) => [preset.id, preset] as const))(
     });
 
     it("says where its layout comes from", () => {
-      expect(preset.sources).toContainEqual({
-        kind: "drawing",
-        path: `public/pics/${id}.svg`,
-      });
+      // The five ported from the old drawings cite them; the others are
+      // the book's layouts alone (plan 061, Presets).
+      if (DRAWN.includes(id))
+        expect(preset.sources).toContainEqual({
+          kind: "drawing",
+          path: `public/pics/${id}.svg`,
+        });
+      else
+        expect(preset.sources.every((source) => source.kind === "book")).toBe(
+          true,
+        );
       for (const source of preset.sources)
         if (source.kind === "drawing")
           expect(existsSync(source.path), source.path).toBe(true);
@@ -104,12 +114,20 @@ describe("the presets", () => {
   it("have unique ids and titles, each its caption", () => {
     const ids = HALL_PRESETS.map((preset) => preset.id);
     expect(ids).toEqual([
-      "neophyte",
-      "zelator1",
-      "zelator2",
-      "theoricus1",
-      "theoricus2",
+      ...DRAWN,
+      "practicus1",
+      "practicus2",
+      "practicus3",
+      "philosophus1",
+      "philosophus2",
+      "philosophus3",
+      "philosophus4",
+      "portal1",
+      "portal2",
     ]);
+    expect(new Set(HALL_PRESETS.map((preset) => preset.title)).size).toBe(
+      HALL_PRESETS.length,
+    );
     for (const preset of HALL_PRESETS) {
       const caption = preset.hall.children?.find(
         (child) => child.type === "caption",

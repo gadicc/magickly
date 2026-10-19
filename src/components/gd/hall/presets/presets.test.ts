@@ -19,13 +19,42 @@ describe("the hall presets", () => {
   it("are found by id, and nothing else is", () => {
     for (const preset of HALL_PRESETS)
       expect(hallPreset(preset.id)).toBe(preset);
-    for (const id of ["", "constructor", "practicus1"])
+    for (const id of ["", "constructor", "practicus4", "portal"])
       expect(hallPreset(id)).toBeUndefined();
   });
 
   it("each cite at least one source", () => {
     for (const preset of HALL_PRESETS)
       expect(preset.sources.length, preset.id).toBeGreaterThan(0);
+  });
+
+  it("cite each page by its own leaf, as the plan's leaf table lists them", () => {
+    // Plan 061, Sources: printed page and archive.org leaf of each diagram
+    // and rubric cited.
+    const leaves = new Map([
+      [11, 3],
+      [44, 38],
+      [69, 63],
+      [82, 76],
+      [92, 86],
+      [106, 100],
+      [112, 106],
+      [121, 115],
+      [122, 116],
+      [131, 125],
+      [137, 131],
+      [144, 138],
+      [145, 139],
+      [155, 148],
+      [156, 149],
+      [175, 168],
+    ]);
+    for (const preset of HALL_PRESETS)
+      for (const source of preset.sources)
+        if (source.kind === "book")
+          expect(source.leaf, `${preset.id} p.${source.page}`).toBe(
+            leaves.get(source.page),
+          );
   });
 
   it("cite the book page of their own hall, or say what they take", () => {
@@ -46,6 +75,27 @@ describe("the hall presets", () => {
       zelator2: [44, "the Earth tablet, lamp and salt only"],
       theoricus1: [69, undefined],
       theoricus2: [82, undefined],
+      practicus1: [92, undefined],
+      practicus2: [106, undefined],
+      practicus3: [112, undefined],
+      philosophus1: [121, undefined, 122, "the rubric"],
+      philosophus2: [131, undefined],
+      philosophus3: [137, undefined],
+      philosophus4: [144, undefined, 145, "the rubric, continued"],
+      // Conflict 1: each part takes the diagram its own rubric describes,
+      // which the book prints at the head of the other part.
+      portal1: [
+        175,
+        "its diagram, which the book heads part 2",
+        156,
+        "the rubric of part 1, pp.156–157",
+      ],
+      portal2: [
+        155,
+        "its diagram, which the book heads part 1",
+        175,
+        "the rubric of part 2",
+      ],
     });
   });
 
