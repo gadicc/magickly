@@ -155,6 +155,72 @@ export function insertHallNode(
   });
 }
 
+/**
+ * The hall's `floor` element, and the hall with it: the first floor, or a
+ * new empty one made before the caption (at the end without one).
+ */
+export function ensureFloor(
+  hall: HallElement,
+  createId: () => string,
+): { hall: HallElement; floor: HallElement } {
+  const found = (hall.children ?? []).find(
+    (child): child is HallElement =>
+      child.kind === "element" && child.tag === "floor",
+  );
+  if (found) return { hall, floor: found };
+  const floor: HallElement = {
+    kind: "element",
+    id: createId(),
+    tag: "floor",
+    attrs: {},
+    children: [],
+  };
+  const caption = (hall.children ?? []).findIndex(
+    (child) => child.kind === "element" && child.tag === "caption",
+  );
+  return {
+    hall: insertHallNode(
+      hall,
+      hall.id,
+      floor,
+      caption < 0 ? undefined : caption,
+    ),
+    floor,
+  };
+}
+
+/**
+ * Moves the element `id`, its subtree and ID kept, to the end of the
+ * element `parentId`'s children, with `patch` applied to its attributes
+ * (set ones after the rest); never into itself or its own subtree.
+ */
+export function moveHallNode(
+  hall: HallElement,
+  id: string,
+  parentId: string,
+  patch: HallAttrPatch = {},
+): HallElement {
+  const index = indexHall(hall);
+  const entry = index.byId.get(id);
+  const parent = index.byId.get(parentId);
+  if (!entry || !parent || entry.path.length === 0) return hall;
+  const inside = (path: readonly number[]) =>
+    path.length >= entry.path.length &&
+    entry.path.every((step, at) => path[at] === step);
+  if (inside(parent.path)) return hall;
+  // Patched values go last, in the patch's order: a converted position
+  // reads `x`, then `y`, whatever order the node had them in.
+  const attrs = { ...entry.node.attrs };
+  for (const [name, value] of Object.entries(patch)) {
+    delete attrs[name];
+    if (value !== undefined) attrs[name] = value;
+  }
+  return insertHallNode(removeHallNode(hall, id), parentId, {
+    ...entry.node,
+    attrs,
+  });
+}
+
 /** A copy of an element and its subtree with a fresh ID on every element. */
 export function withFreshIds(
   node: HallElement,

@@ -97,6 +97,14 @@
   vector-effect: non-scaling-stroke;
   pointer-events: none;
 }
+/* The host a dragged object would stand on. */
+.dropHost {
+  fill: rgb(18 140 74 / 0.12);
+  stroke: #128c4a;
+  stroke-width: 3px;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
 /* Where a row child being reordered will land. */
 .slot {
   fill: rgb(214 108 0 / 0.1);

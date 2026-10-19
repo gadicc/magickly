@@ -1151,3 +1151,78 @@ describe("rows (owner's decision, 19 October 2026)", () => {
     expect(changes).toHaveLength(5);
   });
 });
+
+describe("hosts (owner's decision, 19 October 2026)", () => {
+  it("drags a cup off the altar and back, highlighting the altar", () => {
+    const { surface, changes, current } = setup();
+    const cup = byAttr(current(), "kind", "cup").id;
+    const from = centre(current(), cup);
+    expect(from).toEqual({ x: 8, y: 9 });
+    pointer("pointerDown", surface, at(8, 9));
+    pointer("pointerMove", surface, at(7.6, 9.1));
+    // Still on the altar (its box is 7 to 9): it would stay there.
+    expect(document.querySelector("[data-hall-drop]")).toBeTruthy();
+    pointer("pointerMove", surface, at(8, 11.5));
+    expect(document.querySelector("[data-hall-drop]")).toBeNull();
+    pointer("pointerUp", surface, at(8, 11.5));
+    expect(changes).toHaveLength(1);
+    expect(screen.getByText("Moved Cup to the floor")).toBeTruthy();
+    expect(byAttr(current(), "kind", "cup").attrs).toEqual({
+      kind: "cup",
+      x: 8,
+      y: 11.5,
+    });
+    expect(centre(current(), cup)).toEqual({ x: 8, y: 11.5 });
+    pointer("pointerDown", surface, at(8, 11.5));
+    pointer("pointerMove", surface, at(8.1, 8.6));
+    expect(document.querySelector("[data-hall-drop]")).toBeTruthy();
+    pointer("pointerUp", surface, at(8.1, 8.6));
+    expect(changes).toHaveLength(2);
+    expect(screen.getByText("Moved Cup onto the Altar")).toBeTruthy();
+    expect(byAttr(current(), "kind", "cup").attrs).toEqual({
+      kind: "cup",
+      x: 0,
+      y: 0.5,
+    });
+  });
+
+  it("never stands an officer on the altar", () => {
+    const { surface, current } = setup();
+    pointer("pointerDown", surface, at(8, 3));
+    pointer("pointerMove", surface, at(8, 8));
+    expect(document.querySelector("[data-hall-drop]")).toBeNull();
+    pointer("pointerUp", surface, at(8, 8));
+    const floor = current().children?.find(
+      (child) => child.kind === "element" && child.tag === "floor",
+    ) as HallElement;
+    expect(
+      floor.children?.some(
+        (child) => child.kind === "element" && child.attrs.role === "hegemon",
+      ),
+    ).toBe(true);
+  });
+
+  it("stands an object on a host from the panel", async () => {
+    const { surface, changes, current } = setup();
+    pointer("pointerDown", surface, at(8, 3));
+    pointer("pointerUp", surface, at(8, 3));
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: "Stands on" }));
+    const listbox = await screen.findByRole("listbox");
+    expect(
+      within(listbox)
+        .getAllByRole("option")
+        .map((option) => option.textContent),
+    ).toEqual(["Floor", "Platform"]);
+    fireEvent.click(within(listbox).getByRole("option", { name: "Platform" }));
+    expect(changes).toHaveLength(1);
+    expect(byAttr(current(), "role", "hegemon").attrs).toMatchObject({
+      x: 0,
+      y: -11.5,
+    });
+    expect(centre(current(), byAttr(current(), "role", "hegemon").id)).toEqual({
+      x: 8,
+      y: 3,
+    });
+    expect(screen.getByText("Moved Hegemon onto the Platform")).toBeTruthy();
+  });
+});

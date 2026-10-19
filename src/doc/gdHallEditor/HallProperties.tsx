@@ -26,6 +26,7 @@ import type { JsonValue } from "../semantic";
 import styles from "./gdHallEditor.module.css";
 import { type HallSelectable, type HallView, hallNodeName } from "./hallEdits";
 import { round2 } from "./hallGeometry";
+import { standOptions, standValue } from "./hallHosts";
 import type { HallElement } from "./hallModel";
 import { hallItemKinds, itemKindLabel } from "./hallPalette";
 import { reorderable, rowHasPositions, rowPlace } from "./hallRows";
@@ -330,6 +331,8 @@ export interface HallPropertiesProps {
   onStepInRow: (entry: HallSelectable, step: -1 | 1) => void;
   /** Takes every position along the row away ("Spread evenly again"). */
   onSpreadRow: (entry: HallSelectable) => void;
+  /** Stands an object on the floor (`floor`) or on a host (its ID). */
+  onStandOn: (entry: HallSelectable, value: string) => void;
 }
 
 /**
@@ -352,6 +355,7 @@ export function HallProperties({
   onDelete,
   onStepInRow,
   onSpreadRow,
+  onStandOn,
 }: HallPropertiesProps) {
   const headingId = useId();
   const node = selected?.node ?? view.hall;
@@ -383,6 +387,8 @@ export function HallProperties({
   const row = selected ? rowPlace(view, selected.id) : undefined;
   const inSpread = !!selected && reorderable(view, selected.id);
   const order = row?.spread.findIndex((entry) => entry.id === selected?.id);
+  const stands = selected ? standOptions(view, selected.id) : [];
+  const standing = selected ? standValue(view, selected.id) : undefined;
   return (
     <section className={styles.panel} aria-labelledby={headingId}>
       <h3 id={headingId} className={styles.panelHeading}>
@@ -455,6 +461,23 @@ export function HallProperties({
           </div>
         );
       })}
+      {selected && stands.length > 1 && (
+        <TextField
+          select
+          size="small"
+          label="Stands on"
+          value={standing ?? ""}
+          disabled={disabled}
+          onChange={(event) => onStandOn(selected, event.target.value)}
+          slotProps={{ htmlInput: { "data-hall-field": "standsOn" } }}
+        >
+          {stands.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
+      )}
       {selected && row && (inSpread || rowHasPositions(view, selected.id)) && (
         <div
           className={styles.rowActions}

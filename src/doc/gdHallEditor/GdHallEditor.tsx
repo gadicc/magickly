@@ -59,6 +59,12 @@ import {
   round2,
 } from "./hallGeometry";
 import {
+  dropTarget,
+  type HallDropTarget,
+  reparentNode,
+  standsOn,
+} from "./hallHosts";
+import {
   type HallElement,
   indexHall,
   insertHallNode,
@@ -201,6 +207,8 @@ export function GdHallEditor({
   /** Why the last change was not made, until the next one is. */
   const [notice, setNotice] = useState<string | null>(null);
   const [gestureKind, setGestureKind] = useState<Gesture["kind"] | null>(null);
+  /** The node a running drag moves, for the host it would land on. */
+  const [gestureNode, setGestureNode] = useState<string | null>(null);
   /** Where a row child being reordered will land, marked on the drawing. */
   const [slot, setSlot] = useState<Rect | null>(null);
   const [paletteAnchor, setPaletteAnchor] = useState<HTMLElement | null>(null);
@@ -277,6 +285,7 @@ export function GdHallEditor({
     if (!current) return;
     gesture.current = null;
     setGestureKind(null);
+    setGestureNode(null);
     setSlot(null);
     setHeldBox(null);
     setPreview(null);
@@ -443,8 +452,9 @@ export function GdHallEditor({
   };
 
   /**
-   * A gesture's hall on release, and what it did: a row child reordered,
-   * or moved or scaled where it stands.
+   * A move's hall on release, and what it did: a row child reordered, an
+   * object onto a host or off one to the floor (converted so it stays
+   * where it is drawn), or moved where it stands.
    */
   const releaseHall = (
     current: Gesture,
@@ -466,7 +476,21 @@ export function GdHallEditor({
           : moved(entry, next),
       };
     }
-    return { hall: next, message: moved(entry, next) };
+    const nextView = hallView(next, art);
+    const object = nextView.byId.get(current.id)?.object;
+    const target: HallDropTarget | undefined =
+      object &&
+      dropTarget(nextView, current.id, { x: object.cx, y: object.cy });
+    if (!target || standsOn(nextView, current.id, target))
+      return { hall: next, message: moved(entry, next) };
+    const host =
+      target.kind === "host" ? nextView.byId.get(target.id) : undefined;
+    return {
+      hall: reparentNode(nextView, current.id, target, createId),
+      message: host
+        ? `Moved ${name} onto the ${hallNodeName(host.node)}`
+        : `Moved ${name} to the floor`,
+    };
   };
 
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
@@ -527,6 +551,7 @@ export function GdHallEditor({
     if (!current.moved) {
       current.moved = true;
       setGestureKind(current.kind);
+      setGestureNode(current.id);
       setHeldBox(current.box);
     }
     // One layout per frame, however fast the pointer reports.
@@ -581,6 +606,20 @@ export function GdHallEditor({
   /** "Spread evenly again": the row's positions along it taken away. */
   const spreadRow = (entry: HallSelectable) => {
     commit(spreadRowEvenly(currentView(), entry.id), "Spread the row evenly");
+  };
+
+  /** The panel's "Stands on": the floor or a host, kept where it is drawn. */
+  const standOn = (entry: HallSelectable, value: string) => {
+    const base = currentView();
+    const target: HallDropTarget =
+      value === "floor" ? { kind: "floor" } : { kind: "host", id: value };
+    const host = target.kind === "host" ? base.byId.get(target.id) : undefined;
+    commit(
+      reparentNode(base, entry.id, target, createId),
+      host
+        ? `Moved ${hallNodeName(entry.node)} onto the ${hallNodeName(host.node)}`
+        : `Moved ${hallNodeName(entry.node)} to the floor`,
+    );
   };
 
   const scaleStep = (entry: HallSelectable, up: boolean) => {
@@ -742,6 +781,19 @@ export function GdHallEditor({
     }
   };
 
+  // The host a dragged object would land on, highlighted while it is over
+  // one that takes it.
+  const dropHost = useMemo(() => {
+    if (gestureKind !== "move" || !gestureNode || !previewView) return null;
+    const object = previewView.byId.get(gestureNode)?.object;
+    const target =
+      object &&
+      dropTarget(previewView, gestureNode, { x: object.cx, y: object.cy });
+    const host =
+      target?.kind === "host" ? previewView.byId.get(target.id) : undefined;
+    return host?.object ? objectRect(host.object) : null;
+  }, [gestureKind, gestureNode, previewView]);
+
   // The drawing's view box, held still while a gesture runs: a drag past
   // the drawing's edge would otherwise rescale it under the pointer.
   const box = heldBox ?? view.resolved?.viewBox;
@@ -901,6 +953,11 @@ export function GdHallEditor({
                 ].join(" ")}
                 aria-hidden="true"
               >
+                {dropHost && (
+                  <g data-hall-drop>
+                    <SquareRect rect={dropHost} className={styles.dropHost} />
+                  </g>
+                )}
                 {slot && (
                   <g data-hall-slot>
                     <SquareRect rect={slot} className={styles.slot} />
@@ -979,8 +1036,8 @@ export function GdHallEditor({
             {!editable
               ? "The hall cannot be edited while the ritual is updating."
               : coarse
-                ? "Tap to select, drag to move (along a row: to reorder), drag a corner to scale; the panel edits the rest."
-                : `Click to select, drag to move (Alt: no snapping), drag a corner to scale. Dragged along a row, an officer or banner changes places (Alt: places it freely). Keys: Tab selects the next object, arrows nudge (Shift: a square; Alt: a place along its row), + and − scale, Delete removes, Ctrl+D duplicates, Escape deselects, then finishes.`}
+                ? "Tap to select, drag to move (along a row: to reorder; onto or off an altar, platform or throne: to stand there), drag a corner to scale; the panel edits the rest."
+                : `Click to select, drag to move (Alt: no snapping), drag a corner to scale. Dragged along a row, an officer or banner changes places (Alt: places it freely); dropped on an altar, platform or throne it stands there, and dragged off, on the floor. Keys: Tab selects the next object, arrows nudge (Shift: a square; Alt: a place along its row), + and − scale, Delete removes, Ctrl+D duplicates, Escape deselects, then finishes.`}
           </p>
           {warnings.length > 0 && (
             <Warnings
@@ -1005,6 +1062,7 @@ export function GdHallEditor({
           onDelete={remove}
           onStepInRow={reorderStep}
           onSpreadRow={spreadRow}
+          onStandOn={standOn}
         />
       </div>
       <div className={styles.visuallyHidden} aria-live="polite">

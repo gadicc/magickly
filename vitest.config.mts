@@ -144,6 +144,7 @@ export default defineConfig({
         "src/doc/gdHallEditor/HallProperties.tsx",
         "src/doc/gdHallEditor/hallEdits.ts",
         "src/doc/gdHallEditor/hallGeometry.ts",
+        "src/doc/gdHallEditor/hallHosts.ts",
         "src/doc/gdHallEditor/hallModel.ts",
         "src/doc/gdHallEditor/hallPalette.ts",
         "src/doc/gdHallEditor/hallRows.ts",

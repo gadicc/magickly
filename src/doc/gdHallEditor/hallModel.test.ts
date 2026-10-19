@@ -3,10 +3,12 @@ import { gdHallArt } from "@/app/gd/hall/art";
 import { isRitualNodeId } from "../ritualNodeIds";
 import {
   duplicateHallNode,
+  ensureFloor,
   type HallElement,
   hallRowOf,
   indexHall,
   insertHallNode,
+  moveHallNode,
   noNegativeZero,
   normalizeHall,
   removeHallNode,
@@ -159,6 +161,66 @@ describe("edits", () => {
       sequentialIds(),
     );
     expect(leaf).not.toHaveProperty("children");
+  });
+});
+
+describe("moving nodes and the floor", () => {
+  it("moves a node by ID to the end of another parent, with a patch", () => {
+    const hall = neophyteHall();
+    const cup = byAttr(hall, "kind", "cup");
+    const floor = hall.children?.find(
+      (child): child is HallElement =>
+        child.kind === "element" && child.tag === "floor",
+    ) as HallElement;
+    const moved = moveHallNode(hall, cup.id, floor.id, {
+      at: undefined,
+      x: 8,
+      y: 9,
+    });
+    const newFloor = moved.children?.find(
+      (child): child is HallElement =>
+        child.kind === "element" && child.tag === "floor",
+    ) as HallElement;
+    expect(newFloor.children?.at(-1)).toEqual({
+      ...cup,
+      attrs: { kind: "cup", x: 8, y: 9 },
+    });
+    // Set values go last, in the patch's order.
+    expect(
+      Object.keys((newFloor.children?.at(-1) as HallElement).attrs),
+    ).toEqual(["kind", "x", "y"]);
+    expect(ids(moved).sort()).toEqual(ids(hall).sort());
+  });
+
+  it("never moves the hall, into itself, or to nowhere", () => {
+    const hall = neophyteHall();
+    const altar = byAttr(hall, "at", "centre");
+    const cup = byAttr(hall, "kind", "cup");
+    expect(moveHallNode(hall, hall.id, altar.id)).toBe(hall);
+    expect(moveHallNode(hall, altar.id, cup.id)).toBe(hall);
+    expect(moveHallNode(hall, altar.id, altar.id)).toBe(hall);
+    expect(moveHallNode(hall, "missing", altar.id)).toBe(hall);
+    expect(moveHallNode(hall, cup.id, "missing")).toBe(hall);
+  });
+
+  it("finds the floor, or makes one before the caption or at the end", () => {
+    const hall = neophyteHall();
+    const found = ensureFloor(hall, sequentialIds("F"));
+    expect(found.hall).toBe(hall);
+    expect(found.floor.tag).toBe("floor");
+    const captioned = hallFromPug("gdHall", "  dais", '  caption(text="x")');
+    const made = ensureFloor(captioned, sequentialIds("F"));
+    expect(
+      made.hall.children?.map((child) => (child as HallElement).tag),
+    ).toEqual(["dais", "floor", "caption"]);
+    const bare: HallElement = {
+      kind: "element",
+      id: "Bare000000000001",
+      tag: "gdHall",
+      attrs: {},
+    };
+    const empty = ensureFloor(bare, sequentialIds("F"));
+    expect(empty.hall.children).toEqual([empty.floor]);
   });
 });
 

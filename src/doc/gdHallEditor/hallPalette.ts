@@ -10,6 +10,7 @@ import {
 import type { JsonValue } from "../semantic";
 import { coordinateValue, snapHalf } from "./hallGeometry";
 import {
+  ensureFloor,
   type HallElement,
   indexHall,
   insertHallNode,
@@ -279,29 +280,7 @@ export function insertFromPalette(
   };
   if (selected && goesOnHost(entry.tag, selected.node.tag))
     return { hall: insertHallNode(hall, selected.node.id, node), id: node.id };
-  let floor = (hall.children ?? []).find(
-    (child): child is HallElement =>
-      child.kind === "element" && child.tag === "floor",
-  );
-  let next = hall;
-  if (!floor) {
-    floor = {
-      kind: "element",
-      id: createId(),
-      tag: "floor",
-      attrs: {},
-      children: [],
-    };
-    const caption = (hall.children ?? []).findIndex(
-      (child) => child.kind === "element" && child.tag === "caption",
-    );
-    next = insertHallNode(
-      hall,
-      hall.id,
-      floor,
-      caption < 0 ? undefined : caption,
-    );
-  }
+  const { hall: next, floor } = ensureFloor(hall, createId);
   if (entry.tag !== "door") {
     const object =
       selected &&

@@ -23,6 +23,7 @@ import {
   stepInRow,
   stepScaleNode,
 } from "./hallEdits";
+import { reparentNode, standOptions } from "./hallHosts";
 import { type HallElement, normalizeHall } from "./hallModel";
 import { hallPalette, insertFromPalette } from "./hallPalette";
 import { reorderRowChild, rowPlace, spreadRowEvenly } from "./hallRows";
@@ -177,6 +178,19 @@ function operations(createId: () => string): Operation[] {
           )
         : spreadRowEvenly(view, entry.id);
     },
+    // Hosts: onto one, or to the floor, as the panel's Stands on does.
+    (view, next) => {
+      const entry = target(view, next);
+      const options = entry ? standOptions(view, entry.id) : [];
+      if (!entry || options.length === 0) return view.hall;
+      const { value } = options[Math.floor(next() * options.length)];
+      return reparentNode(
+        view,
+        entry.id,
+        value === "floor" ? { kind: "floor" } : { kind: "host", id: value },
+        createId,
+      );
+    },
   ];
 }
 
@@ -236,7 +250,7 @@ describe.each(HALL_PRESETS.map((preset) => [preset.id, preset] as const))(
 );
 
 describe("random editor operations", () => {
-  it("each changed some hall, rows included", () => {
+  it("each changed some hall, rows and hosts included", () => {
     const count = operations(sequentialIds("C")).length;
     for (let choice = 0; choice < count; choice++)
       expect(changedBy.get(choice) ?? 0, `operation ${choice}`).toBeGreaterThan(
