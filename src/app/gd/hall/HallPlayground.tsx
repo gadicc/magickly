@@ -41,6 +41,7 @@ import { gdHallArt } from "./art";
 import { embedGdHallFonts } from "./exportFonts";
 import {
   draftStorage,
+  HALL_DRAFT_KEY,
   MAX_HALL_DRAFT,
   readHallDraft,
   writeHallDraft,
@@ -119,15 +120,58 @@ export const validHall = (hall: HallElement) =>
 type Note =
   | { kind: "restored" }
   | { kind: "unreadable-draft" }
-  /** `draft`: whether this browser held a draft of its own. */
-  | { kind: "shared"; draft: boolean }
-  | { kind: "share-failed"; reason: string };
+  /**
+   * A hall opened from a share link. `draft`: what this browser held as
+   * the link opened: a draft, none, or one that could not be read.
+   */
+  | { kind: "shared"; draft: "kept" | "none" | "unreadable" }
+  | { kind: "share-failed"; reason: string }
+  /**
+   * Another tab wrote a newer draft. `conflict`: this tab has changes of
+   * its own too, which are not written over it until the author chooses.
+   */
+  | { kind: "other-tab"; conflict: boolean };
+
+/** A note's buttons go below its text where both do not fit beside it. */
+const NOTE_LAYOUT = {
+  flexWrap: "wrap",
+  "& .MuiAlert-message": { flex: "1 1 14rem" },
+  "& .MuiAlert-action": { ml: "auto", whiteSpace: "nowrap" },
+} as const;
+
+/** The longest part of a parser's message a note repeats. */
+const MAX_REASON = 120;
+
+/** `text` cut to `MAX_REASON` characters: a link's text is anyone's. */
+export const clipped = (text: string) =>
+  text.length > MAX_REASON ? `${text.slice(0, MAX_REASON - 1)}…` : text;
+
+/** What a note says. */
+function noteText(note: Note): string {
+  switch (note.kind) {
+    case "restored":
+      return "Draft restored.";
+    case "unreadable-draft":
+      return "The draft kept in this browser could not be read, so the editor starts from the Neophyte hall.";
+    case "shared":
+      return note.draft === "kept"
+        ? "Opened a hall from a share link. Your own draft stays in this browser until you change this hall; Undo goes back to the hall you had."
+        : note.draft === "unreadable"
+          ? "Opened a hall from a share link. The draft kept in this browser could not be read; once you change this hall, it is kept as the draft in its place."
+          : "Opened a hall from a share link. Once you change it, it is kept as a draft in this browser.";
+    case "share-failed":
+      return `This share link could not be opened: ${note.reason}.`;
+    case "other-tab":
+      return note.conflict
+        ? "Another tab kept a newer draft while this one has changes of its own. Neither is written over until you choose: load it (Undo brings yours back), or keep yours."
+        : "A newer draft from another tab.";
+  }
+}
 
 /** Where the page starts: the draft, or the first preset. */
 function startingPoint(): {
   entry: HallEntry;
   note: Note | null;
-  draft: boolean;
 } {
   const reading = readHallDraft(draftStorage());
   const entry =
@@ -138,12 +182,10 @@ function startingPoint(): {
     return {
       entry,
       note: matchingPreset(entry) ? null : { kind: "restored" },
-      draft: true,
     };
   }
   return {
     entry: presetEntry(HALL_PRESETS[0]),
-    draft: false,
     note:
       oversized ||
       reading.status === "corrupt" ||
@@ -189,8 +231,20 @@ export default function HallPlayground() {
     start.entry,
     initialHistory,
   );
-  const [note, setNote] = React.useState<Note | null>(() =>
-    isShareHash(window.location.hash) ? null : start.note,
+  const [notes, setNotes] = React.useState<readonly Note[]>(() =>
+    start.note ? [start.note] : [],
+  );
+  /** Shows `note` in place of any of the kinds listed. */
+  const showNote = React.useCallback(
+    (note: Note, replacing: readonly Note["kind"][]) =>
+      setNotes((shown) => [
+        ...shown.filter(
+          (other) =>
+            other.kind !== note.kind && !replacing.includes(other.kind),
+        ),
+        note,
+      ]),
+    [],
   );
   const [mode, chooseMode] = useRitualEditorLayout("split", HALL_LAYOUT_KEY);
   const [replacing, setReplacing] = React.useState<HallPreset | null>(null);
@@ -254,20 +308,40 @@ export default function HallPlayground() {
   }, [history.typingFrom, present.source]);
 
   // The draft follows the hall, a moment after it rests, and as the page
-  // goes. A hall opened from a share link is not written over the draft
-  // until it is changed.
+  // goes, but only with what this tab changed: a tab left open on an old
+  // draft never writes it back over a newer one from another tab. A hall
+  // opened from a share link is not written over the draft until it is
+  // changed, whatever Undo and Redo do meanwhile.
+  /** The draft as this tab last read or wrote it. */
+  const synced = React.useRef(start.entry.source);
+  /** A shared hall the draft is not written with until it is changed. */
   const holdDraft = React.useRef<string | null>(null);
-  /** Keeps `entry` as the draft, unless it holds too many nodes. */
-  const writeDraft = React.useCallback((entry: HallEntry) => {
-    if (entry.source === holdDraft.current) return;
-    holdDraft.current = null;
-    // Too many nodes to keep (the length `writeHallDraft` checks).
-    if (entry.hall && tooManyNodes(entry.hall)) {
-      setDraftKept("too-large");
-      return;
-    }
-    setDraftKept(writeHallDraft(draftStorage(), entry.source));
-  }, []);
+  /** A newer draft from another tab, until it is loaded or overruled. */
+  const otherTab = React.useRef<string | null>(null);
+  /** Keeps `entry` as the draft, if this tab changed it. */
+  const writeDraft = React.useCallback(
+    (entry: HallEntry) => {
+      const { source } = entry;
+      if (source === synced.current || source === holdDraft.current) return;
+      if (otherTab.current !== null) {
+        // Both tabs changed the hall: the author chooses which is kept.
+        showNote({ kind: "other-tab", conflict: true }, []);
+        return;
+      }
+      // Too many nodes to keep (the length `writeHallDraft` checks).
+      if (entry.hall && tooManyNodes(entry.hall)) {
+        setDraftKept("too-large");
+        return;
+      }
+      const kept = writeHallDraft(draftStorage(), source);
+      if (kept === "saved") {
+        synced.current = source;
+        holdDraft.current = null;
+      }
+      setDraftKept(kept);
+    },
+    [showNote],
+  );
   /** Keeps the hall as it is now as the draft, typing read first. */
   const saveNow = React.useCallback(
     () => writeDraft(readTyped() ?? latestHall.current),
@@ -287,6 +361,53 @@ export default function HallPlayground() {
     return () => window.removeEventListener("pagehide", saveNow);
   }, [saveNow]);
 
+  // Another tab's draft: offered here, never written over unasked.
+  React.useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== HALL_DRAFT_KEY || event.newValue === null) return;
+      const value = event.newValue;
+      const reading = readHallDraft({ getItem: () => value });
+      if (reading.status !== "found") return;
+      const theirs = reading.draft.source;
+      if (theirs === synced.current) return;
+      const mine = unread.current ?? latestSource.current;
+      if (theirs === mine) {
+        // Both tabs hold the same hall: in step again.
+        synced.current = theirs;
+        otherTab.current = null;
+        setNotes((shown) => shown.filter((note) => note.kind !== "other-tab"));
+        return;
+      }
+      otherTab.current = theirs;
+      showNote(
+        {
+          kind: "other-tab",
+          conflict: mine !== synced.current && mine !== holdDraft.current,
+        },
+        [],
+      );
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [showNote]);
+  /** Loads the other tab's draft here, as one step: Undo comes back. */
+  const loadOtherTab = () => {
+    const theirs = otherTab.current;
+    if (theirs === null) return;
+    otherTab.current = null;
+    synced.current = theirs;
+    holdDraft.current = null;
+    readTyped();
+    dispatch({ type: "load", entry: entryOfSource(theirs) });
+    setNotes((shown) => shown.filter((note) => note.kind !== "other-tab"));
+  };
+  /** Keeps this tab's hall as the draft, over the other tab's. */
+  const keepThisTab = () => {
+    otherTab.current = null;
+    setNotes((shown) => shown.filter((note) => note.kind !== "other-tab"));
+    saveNow();
+  };
+
   // A share link opens its hall, as one step: undo goes back to the draft.
   React.useEffect(() => {
     let current = true;
@@ -300,37 +421,51 @@ export default function HallPlayground() {
         if (!current) return;
         clearShareHash();
         // `readShareHash` says why in a `ShareLinkError`.
-        setNote({ kind: "share-failed", reason: (error as Error).message });
+        failed(clipped((error as Error).message));
         return;
       }
       if (!current) return;
       clearShareHash();
       if (!entry.hall) {
-        setNote({
-          kind: "share-failed",
-          reason: `its hall does not read (${(entry.diagnostic as RitualSourceDiagnostic).message})`,
-        });
+        failed(
+          `its hall does not read (${clipped((entry.diagnostic as RitualSourceDiagnostic).message)})`,
+        );
         return;
       }
       if (tooManyNodes(entry.hall)) {
-        setNote({
-          kind: "share-failed",
-          reason: `its hall holds more than ${MAX_KEPT_HALL_NODES.toLocaleString("en")} nodes, more than a shared hall may`,
-        });
+        failed(
+          `its hall holds more than ${MAX_KEPT_HALL_NODES.toLocaleString("en")} nodes, more than a shared hall may`,
+        );
         return;
       }
+      // What this tab changed is kept first, so the note says what the
+      // browser holds as the link opens, and Undo comes back to it.
+      saveNow();
+      const reading = readHallDraft(draftStorage());
       holdDraft.current = entry.source;
-      readTyped();
       dispatch({ type: "load", entry });
-      setNote({ kind: "shared", draft: start.draft });
+      showNote(
+        {
+          kind: "shared",
+          draft:
+            reading.status === "found"
+              ? "kept"
+              : reading.status === "corrupt" || reading.status === "oversized"
+                ? "unreadable"
+                : "none",
+        },
+        ["restored", "unreadable-draft", "share-failed"],
+      );
     };
+    const failed = (reason: string) =>
+      showNote({ kind: "share-failed", reason }, ["shared"]);
     open();
     window.addEventListener("hashchange", open);
     return () => {
       current = false;
       window.removeEventListener("hashchange", open);
     };
-  }, [start.draft, readTyped]);
+  }, [saveNow, showNote]);
 
   // The share link for the hall as it is, ready for the click (copying
   // keeps the click's permission only if it starts at once).
@@ -367,7 +502,8 @@ export default function HallPlayground() {
 
   const loadPreset = (chosen: HallPreset) => {
     setReplacing(null);
-    setNote(null);
+    // Another tab's draft is still on offer.
+    setNotes((shown) => shown.filter((note) => note.kind === "other-tab"));
     setCompare(false);
     readTyped();
     dispatch({ type: "load", entry: presetEntry(chosen) });
@@ -451,10 +587,19 @@ export default function HallPlayground() {
 
   return (
     <div className={styles.playground}>
-      {note && (
+      {notes.map((note) => (
         <Alert
-          severity={note.kind === "share-failed" ? "warning" : "info"}
-          onClose={() => setNote(null)}
+          key={note.kind}
+          sx={NOTE_LAYOUT}
+          severity={
+            note.kind === "share-failed" ||
+            (note.kind === "other-tab" && note.conflict)
+              ? "warning"
+              : "info"
+          }
+          onClose={() =>
+            setNotes((shown) => shown.filter((other) => other !== note))
+          }
           action={
             note.kind === "restored" ? (
               <Button
@@ -464,20 +609,23 @@ export default function HallPlayground() {
               >
                 Start over
               </Button>
+            ) : note.kind === "other-tab" ? (
+              <>
+                <Button color="inherit" size="small" onClick={loadOtherTab}>
+                  Load it
+                </Button>
+                {note.conflict && (
+                  <Button color="inherit" size="small" onClick={keepThisTab}>
+                    Keep mine
+                  </Button>
+                )}
+              </>
             ) : undefined
           }
         >
-          {note.kind === "restored"
-            ? "Draft restored."
-            : note.kind === "unreadable-draft"
-              ? "The draft kept in this browser could not be read, so the editor starts from the Neophyte hall."
-              : note.kind === "shared"
-                ? note.draft
-                  ? "Opened a hall from a share link. Your own draft stays in this browser until you change this hall; Undo goes back to it."
-                  : "Opened a hall from a share link. Once you change it, it is kept as a draft in this browser."
-                : `This share link could not be opened: ${note.reason}.`}
+          {noteText(note)}
         </Alert>
-      )}
+      ))}
       <div
         className={styles.toolbar}
         role="toolbar"

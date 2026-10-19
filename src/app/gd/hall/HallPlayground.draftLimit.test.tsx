@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import HallPlayground from "./HallPlayground";
 
@@ -14,6 +14,10 @@ afterEach(cleanup);
 
 it("says when a hall is too large to keep as a draft", async () => {
   render(<HallPlayground />);
+  // A change: the page writes only what it changed.
+  const surface = screen.getByRole("application");
+  fireEvent.keyDown(surface, { key: "Tab" });
+  fireEvent.keyDown(surface, { key: "ArrowRight" });
   expect(
     await screen.findByText(
       "This hall is too large to keep as a draft in this browser: a draft holds at most 1,000 nodes and 96,000 characters.",

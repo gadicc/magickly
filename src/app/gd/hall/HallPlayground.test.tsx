@@ -14,6 +14,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { gdHallPug, parseHallSource, printHallSource } from "@/doc/gdHallPug";
 import HallPlayground, {
+  clipped,
   HALL_LAYOUT_KEY,
   matchingPreset,
   originalDrawing,
@@ -41,6 +42,9 @@ vi.mock("@/doc/gdHallPug", async (importActual) => {
     ...actual,
     parseHallSource: (text: string) => {
       parses.count++;
+      // A parser message that repeats much of what it read.
+      if (text.startsWith("//- echo\n"))
+        throw new Error(`Line 1: ${"echo ".repeat(100)}`);
       return actual.parseHallSource(text);
     },
   };
@@ -122,6 +126,15 @@ function nudgeFirst() {
   const surface = screen.getByRole("application");
   fireEvent.keyDown(surface, { key: "Tab" });
   fireEvent.keyDown(surface, { key: "ArrowRight" });
+}
+
+/**
+ * The hall rests: read, and kept as the draft. In short spans, since
+ * React renders what a span's timers changed only as the span ends.
+ */
+async function kept() {
+  for (let span = 0; span < 4; span++)
+    await act(() => new Promise((resolve) => setTimeout(resolve, 250)));
 }
 
 /** A source's hall as Pug without IDs, as the page shares it. */
@@ -252,7 +265,7 @@ describe("presets", () => {
   });
 });
 
-describe("source and drawing in step", () => {
+describe("source and drawing in step", { timeout: 20_000 }, () => {
   it("draws what is typed, and prints what is drawn", async () => {
     render(<HallPlayground />);
     type(source().replace('text="Neophyte Temple"', 'text="My hall"'));
@@ -384,7 +397,7 @@ describe("source and drawing in step", () => {
   });
 });
 
-describe("the draft", () => {
+describe("the draft", { timeout: 20_000 }, () => {
   const draft = () =>
     JSON.parse(localStorage.getItem(HALL_DRAFT_KEY) ?? "null") as {
       v: number;
@@ -471,8 +484,7 @@ describe("the draft", () => {
     // The source alone: a thousand markers draw slowly in jsdom.
     localStorage.setItem(HALL_LAYOUT_KEY, "source");
     render(<HallPlayground />);
-    await act(() => new Promise((resolve) => setTimeout(resolve, 600)));
-    const kept = localStorage.getItem(HALL_DRAFT_KEY);
+    const before = localStorage.getItem(HALL_DRAFT_KEY);
     type(markers(1000));
     expect(
       await screen.findByText(
@@ -488,7 +500,7 @@ describe("the draft", () => {
         { timeout: 20_000 },
       ),
     ).toBeTruthy();
-    expect(localStorage.getItem(HALL_DRAFT_KEY)).toBe(kept);
+    expect(localStorage.getItem(HALL_DRAFT_KEY)).toBe(before);
   }, 30_000);
 
   it("works when storage is blocked, and says the draft is not kept", async () => {
@@ -509,7 +521,127 @@ describe("the draft", () => {
   });
 });
 
-describe("sharing and export", () => {
+describe("two tabs", { timeout: 20_000 }, () => {
+  // Each write reaches the other tabs as a `storage` event, after it, as
+  // a browser sends it. Both pages here share one window and one storage;
+  // a page knows its own write when it hears it.
+  beforeEach(() => {
+    const setItem = Storage.prototype.setItem;
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (
+      this: Storage,
+      key: string,
+      value: string,
+    ) {
+      const oldValue = this.getItem(key);
+      setItem.call(this, key, value);
+      setTimeout(() =>
+        window.dispatchEvent(
+          new StorageEvent("storage", { key, oldValue, newValue: value }),
+        ),
+      );
+    });
+  });
+
+  /** A page in a tab of its own. */
+  function openTab() {
+    const page = render(<HallPlayground />);
+    const tab = within(page.container);
+    const box = () =>
+      tab.getByRole("textbox", {
+        name: "Temple hall source",
+        hidden: true,
+      }) as HTMLTextAreaElement;
+    return {
+      ...tab,
+      unmount: page.unmount,
+      source: () => box().value,
+      /** Gives the hall's caption a new text. */
+      caption(text: string) {
+        fireEvent.change(box(), {
+          target: {
+            value: box().value.replace(/caption(#\w+)?\(text="[^"]*"/, (m) =>
+              m.replace(/text="[^"]*"/, `text="${text}"`),
+            ),
+          },
+        });
+      },
+    };
+  }
+  const draft = () =>
+    JSON.parse(localStorage.getItem(HALL_DRAFT_KEY) ?? "null")?.source as
+      | string
+      | undefined;
+
+  it("never writes an idle tab's old draft over a newer one", async () => {
+    const a = openTab();
+    a.caption("Seven");
+    await kept();
+    expect(draft()).toContain('text="Seven"');
+    const b = openTab();
+    expect(b.source()).toContain('text="Seven"');
+    a.caption("Six");
+    await kept();
+    expect(draft()).toContain('text="Six"');
+    // Both tabs go: the idle one changed nothing, so writes nothing.
+    a.unmount();
+    window.dispatchEvent(new Event("pagehide"));
+    await kept();
+    expect(draft()).toContain('text="Six"');
+    // Had it stayed, it is told, and offered the newer draft.
+    expect(b.getByText("A newer draft from another tab.")).toBeTruthy();
+    // Loading it is one step: Undo brings this tab's hall back.
+    fireEvent.click(b.getByRole("button", { name: "Load it" }));
+    expect(b.source()).toContain('text="Six"');
+    expect(b.queryByText("A newer draft from another tab.")).toBeNull();
+    fireEvent.click(b.getByRole("button", { name: "Undo" }));
+    expect(b.source()).toContain('text="Seven"');
+  });
+
+  it("lets the author choose when both tabs changed the hall", async () => {
+    const a = openTab();
+    const b = openTab();
+    a.caption("From A");
+    await kept();
+    expect(draft()).toContain('text="From A"');
+    b.caption("From B");
+    await kept();
+    // Not written over: said, with the choice.
+    expect(draft()).toContain('text="From A"');
+    expect(
+      b.getByText(/^Another tab kept a newer draft while this one has changes/),
+    ).toBeTruthy();
+    window.dispatchEvent(new Event("pagehide"));
+    expect(draft()).toContain('text="From A"');
+    fireEvent.click(b.getByRole("button", { name: "Keep mine" }));
+    expect(draft()).toContain('text="From B"');
+    // Now the first tab is offered B's draft, and loads it.
+    await kept();
+    fireEvent.click(a.getByRole("button", { name: "Load it" }));
+    expect(a.source()).toContain('text="From B"');
+    await kept();
+    expect(draft()).toContain('text="From B"');
+  });
+
+  it("loads the other tab's draft on request in a conflict too", async () => {
+    const a = openTab();
+    const b = openTab();
+    a.caption("From A");
+    await kept();
+    b.caption("From B");
+    await kept();
+    fireEvent.click(b.getByRole("button", { name: "Load it" }));
+    expect(b.source()).toContain('text="From A"');
+    await kept();
+    expect(draft()).toContain('text="From A"');
+    // Undo brings this tab's changes back, which are then its own again.
+    fireEvent.click(b.getByRole("button", { name: "Undo" }));
+    expect(b.source()).toContain('text="From B"');
+    await kept();
+    expect(draft()).toContain('text="From B"');
+  });
+});
+
+describe("sharing and export", { timeout: 20_000 }, () => {
   it("copies a share link that opens the hall in a fresh browser", async () => {
     runtime.copyText.mockResolvedValue(undefined);
     const first = render(<HallPlayground />);
@@ -536,7 +668,7 @@ describe("sharing and export", () => {
     expect(titles()).toContain("Shared hall");
     expect(window.location.hash).toBe("");
     // Not written over the draft until it is changed.
-    await act(() => new Promise((resolve) => setTimeout(resolve, 600)));
+    await kept();
     expect(localStorage.getItem(HALL_DRAFT_KEY) ?? "").not.toContain(
       "Shared hall",
     );
@@ -625,13 +757,101 @@ describe("sharing and export", () => {
     window.history.replaceState(null, "", `/gd/hall#${zelator.fragment}`);
     render(<HallPlayground />);
     await screen.findByText(
-      "Opened a hall from a share link. Your own draft stays in this browser until you change this hall; Undo goes back to it.",
+      "Opened a hall from a share link. Your own draft stays in this browser until you change this hall; Undo goes back to the hall you had.",
     );
     expect(presetShown()).toBe("Zelator Temple 1");
-    await act(() => new Promise((resolve) => setTimeout(resolve, 600)));
+    await kept();
     expect(
       JSON.parse(localStorage.getItem(HALL_DRAFT_KEY) ?? "{}").source,
     ).toBe(mine);
+  });
+
+  it("keeps the draft while the shared hall shows, through Undo and Redo", async () => {
+    const mine = presetEntry(HALL_PRESETS[4]).source;
+    localStorage.setItem(
+      HALL_DRAFT_KEY,
+      JSON.stringify({ v: 1, source: mine }),
+    );
+    const zelator = await shareFragment(gdHallPug(HALL_PRESETS[1].hall));
+    if (!("fragment" in zelator)) throw new Error("too long");
+    window.history.replaceState(null, "", `/gd/hall#${zelator.fragment}`);
+    render(<HallPlayground />);
+    await waitFor(() => expect(presetShown()).toBe("Zelator Temple 1"));
+    const stored = () =>
+      JSON.parse(localStorage.getItem(HALL_DRAFT_KEY) ?? "{}").source;
+    await kept();
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(source()).toBe(mine);
+    await kept();
+    fireEvent.click(screen.getByRole("button", { name: "Redo" }));
+    expect(presetShown()).toBe("Zelator Temple 1");
+    await kept();
+    window.dispatchEvent(new Event("pagehide"));
+    expect(stored()).toBe(mine);
+    // Changed, the shared hall is the author's: kept as the draft.
+    nudgeFirst();
+    await kept();
+    expect(stored()).toBe(source());
+  });
+
+  it("says a draft stays when a link is pasted into an open page", async () => {
+    render(<HallPlayground />);
+    nudgeFirst();
+    await kept();
+    // Typed, and not yet read or kept, as the link arrives.
+    type(source().replace('text="Neophyte Temple"', 'text="Mine"'));
+    const mine = source();
+    const zelator = await shareFragment(gdHallPug(HALL_PRESETS[1].hall));
+    if (!("fragment" in zelator)) throw new Error("too long");
+    act(() => {
+      window.history.replaceState(null, "", `/gd/hall#${zelator.fragment}`);
+      window.dispatchEvent(new HashChangeEvent("hashchange"));
+    });
+    await screen.findByText(
+      "Opened a hall from a share link. Your own draft stays in this browser until you change this hall; Undo goes back to the hall you had.",
+    );
+    expect(
+      JSON.parse(localStorage.getItem(HALL_DRAFT_KEY) ?? "{}").source,
+    ).toBe(mine);
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(source()).toBe(mine);
+  });
+
+  it("says when the draft a link would replace could not be read", async () => {
+    localStorage.setItem(HALL_DRAFT_KEY, "{not json");
+    const zelator = await shareFragment(gdHallPug(HALL_PRESETS[1].hall));
+    if (!("fragment" in zelator)) throw new Error("too long");
+    window.history.replaceState(null, "", `/gd/hall#${zelator.fragment}`);
+    render(<HallPlayground />);
+    await screen.findByText(
+      "Opened a hall from a share link. The draft kept in this browser could not be read; once you change this hall, it is kept as the draft in its place.",
+    );
+    expect(screen.getAllByRole("alert")).toHaveLength(1);
+    cleanup();
+    // A link that cannot be opened leaves both said.
+    window.history.replaceState(null, "", "/gd/hall#hall=1.%%%");
+    render(<HallPlayground />);
+    await screen.findByText(
+      "This share link could not be opened: it is damaged.",
+    );
+    expect(
+      screen.getByText(/^The draft kept in this browser could not be read/),
+    ).toBeTruthy();
+  });
+
+  it("repeats only the start of a parser's message about a link", async () => {
+    const echo = await shareFragment("//- echo\ngdHall\n");
+    if (!("fragment" in echo)) throw new Error("too long");
+    window.history.replaceState(null, "", `/gd/hall#${echo.fragment}`);
+    render(<HallPlayground />);
+    const note = await screen.findByText(
+      /^This share link could not be opened: its hall does not read/,
+    );
+    expect(note.textContent).toBe(
+      `This share link could not be opened: its hall does not read (${`Line 1: ${"echo ".repeat(100)}`.slice(0, 119)}…).`,
+    );
+    expect(clipped("short")).toBe("short");
+    expect(clipped("x".repeat(121))).toHaveLength(120);
   });
 
   it("opens a link pasted while the page is open", async () => {
