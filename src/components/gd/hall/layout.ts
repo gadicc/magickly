@@ -1,9 +1,9 @@
 import {
-  attr,
   booleanAttr,
   clamp,
   enumAttr,
   numberAttr,
+  placedByAt,
   stringAttr,
 } from "./attributes";
 import {
@@ -1016,9 +1016,7 @@ export function resolveHall(
     const vertical = row.kind === "north" || row.kind === "south";
     const spreadAttr = vertical ? "y" : "x";
     const crossAttr = vertical ? "x" : "y";
-    const free = (item: Prepared) =>
-      attr(item.node, "at") === undefined ||
-      enumAttr(item.node, "at", [...HALL_POINTS, "center"]) === undefined;
+    const free = (item: Prepared) => !placedByAt(item.node);
     const spread = items.filter(
       (item) => free(item) && numberAttr(item.node, spreadAttr) === undefined,
     );

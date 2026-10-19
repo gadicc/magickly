@@ -27,6 +27,23 @@ export const CAPTION_GAP = 0.3;
 /** Default padding around the content, in squares. */
 export const DEFAULT_PADDING = 0.5;
 /**
+ * Named points on a box: `at` on the parent, `anchor` on the object
+ * (re-exported by the vocabulary); here so the placeholder estimate
+ * reads `at` as the resolver does.
+ */
+export const HALL_POINTS = [
+  "centre",
+  "north",
+  "south",
+  "east",
+  "west",
+  "northEast",
+  "northWest",
+  "southEast",
+  "southWest",
+] as const;
+
+/**
  * The coordinate range the resolver clamps positions to, in squares; here
  * so the placeholder estimate clamps as the resolver does.
  */

@@ -1,3 +1,4 @@
+import { HALL_POINTS } from "./dimensions";
 import type { HallAttrSpec, HallNode } from "./types";
 
 /** An attribute read against its spec: absent, invalid, or a value. */
@@ -145,4 +146,13 @@ export function enumAttr<T extends string>(
 /** Clamps to a range; the resolver's answer to out-of-range content. */
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
+}
+
+/**
+ * Whether a node is placed by a valid `at` (its `x` and `y` then offsets
+ * from that point), which takes it out of a row's spread: the rule the
+ * resolver, the placeholder estimate and the editor's rows share.
+ */
+export function placedByAt(node: HallNode): boolean {
+  return enumAttr(node, "at", [...HALL_POINTS, "center"]) !== undefined;
 }

@@ -1,4 +1,10 @@
-import { booleanAttr, clamp, numberAttr, stringAttr } from "./attributes";
+import {
+  booleanAttr,
+  clamp,
+  numberAttr,
+  placedByAt,
+  stringAttr,
+} from "./attributes";
 import {
   BANNER_ROW_GAP,
   CAPTION_GAP,
@@ -110,6 +116,40 @@ export function estimateHallAspect(hall: HallNode): number {
         }),
       );
       const side = stringAttr(child, "side");
+      // Along the row: spread evenly, or from corner to corner ("ends"),
+      // unless placed, by a position along it or by `at` as the resolver
+      // reads them; an end banner reaches past the corner. Items placed by
+      // `at` stand off the row line, measured from the floor's points,
+      // and are left out.
+      const vertical = side === "north" || side === "south";
+      const alongAttr = vertical ? "y" : "x";
+      const items = rows(child).filter((item) => !placedByAt(item));
+      const spread = new Map(
+        items
+          .filter((item) => numberAttr(item, alongAttr) === undefined)
+          .map((item, index) => [item, index]),
+      );
+      const ends = stringAttr(child, "spread") === "ends";
+      for (const item of items) {
+        const index = spread.get(item) ?? 0;
+        const along = clamp(
+          numberAttr(item, alongAttr) ??
+            (ends
+              ? spread.size === 1
+                ? FLOOR_SIZE / 2
+                : (index * FLOOR_SIZE) / (spread.size - 1)
+              : ((index + 0.5) * FLOOR_SIZE) / spread.size),
+          ...COORDINATE_RANGE,
+        );
+        const { half } = reach(item);
+        if (vertical) {
+          bounds.y0 = Math.min(bounds.y0, along - half);
+          bounds.y1 = Math.max(bounds.y1, along + half);
+        } else {
+          bounds.x0 = Math.min(bounds.x0, along - half);
+          bounds.x1 = Math.max(bounds.x1, along + half);
+        }
+      }
       if (side === "west")
         bounds.y1 = Math.max(bounds.y1, outer.y1 + clearance + depth);
       else if (side === "north")

@@ -1,4 +1,4 @@
-import { COORDINATE_RANGE } from "./dimensions";
+import { COORDINATE_RANGE, HALL_POINTS } from "./dimensions";
 import type { HallAttrSpec } from "./types";
 
 /**
@@ -24,18 +24,8 @@ export interface HallTagSpec {
   attributes: ReadonlyMap<string, HallAttrSpec>;
 }
 
+export { HALL_POINTS };
 /** Named points on a box: `at` on the parent, `anchor` on the object. */
-export const HALL_POINTS = [
-  "centre",
-  "north",
-  "south",
-  "east",
-  "west",
-  "northEast",
-  "northWest",
-  "southEast",
-  "southWest",
-] as const;
 export type HallPoint = (typeof HALL_POINTS)[number];
 
 /**

@@ -1,9 +1,10 @@
-import { enumAttr, numberAttr } from "@magick-components/gd/hall/attributes";
-import type { HallNode } from "@magick-components/gd/hall/types";
 import {
-  BANNER_SIDES,
-  HALL_POINTS,
-} from "@magick-components/gd/hall/vocabulary";
+  enumAttr,
+  numberAttr,
+  placedByAt,
+} from "@magick-components/gd/hall/attributes";
+import type { HallNode } from "@magick-components/gd/hall/types";
+import { BANNER_SIDES } from "@magick-components/gd/hall/vocabulary";
 import type { HallSelectable, HallView } from "./hallEdits";
 import { round2 } from "./hallGeometry";
 import {
@@ -40,8 +41,7 @@ const rowNode = (node: HallElement): HallNode =>
   ({ type: node.tag, ...node.attrs }) as HallNode;
 
 /** Whether a row places `node` with `at` (its `x` and `y` are offsets). */
-const anchoredAt = (node: HallElement) =>
-  enumAttr(rowNode(node), "at", [...HALL_POINTS, "center"]) !== undefined;
+const anchoredAt = (node: HallElement) => placedByAt(rowNode(node));
 
 /**
  * Whether the row spreads `node`, as the resolver decides: no valid `at`

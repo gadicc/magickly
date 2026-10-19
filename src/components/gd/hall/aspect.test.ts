@@ -55,6 +55,62 @@ describe("estimateHallAspect", () => {
         ],
       },
     ],
+    [
+      "letters from corner to corner beyond the East",
+      {
+        type: "gdHall",
+        children: [
+          {
+            type: "banners",
+            spread: "ends",
+            children: ["shin", "tau", "qoph"].map((letter) => ({
+              type: "hebrewLetter",
+              letter,
+            })),
+          },
+        ],
+      },
+    ],
+    [
+      // The resolver spreads only the two without `at`: 4 and 12 at this
+      // size, inside the walls; spreading three put the first past them.
+      "a row whose last item is placed by at",
+      {
+        type: "gdHall",
+        children: [
+          {
+            type: "banners",
+            children: [
+              { type: "hebrewLetter", letter: "shin", scale: 4 },
+              { type: "hebrewLetter", letter: "tau", scale: 4 },
+              {
+                type: "hebrewLetter",
+                letter: "qoph",
+                scale: 4,
+                at: "centre",
+                y: -12,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    [
+      "letters placed past the corners of a North row",
+      {
+        type: "gdHall",
+        children: [
+          {
+            type: "banners",
+            side: "north",
+            children: [
+              { type: "hebrewLetter", letter: "nun", y: -1 },
+              { type: "hebrewLetter", letter: "peh", y: 17 },
+            ],
+          },
+        ],
+      },
+    ],
   ] as [string, HallNode][])("comes within 2 %% for %s", (_name, hall) => {
     expect(Math.abs(estimateHallAspect(hall) / drawn(hall) - 1)).toBeLessThan(
       0.02,
