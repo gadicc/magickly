@@ -1229,7 +1229,26 @@ describe("hosts (owner's decision, 19 October 2026)", () => {
   });
 });
 
-describe("where the focus starts", () => {
+describe("hosts that are always editing", () => {
+  it("shows no Done, and Escape with nothing selected stays", () => {
+    const { surface } = setup(neophyteHall(), true, {
+      props: { onDone: undefined, historyButtons: false },
+    });
+    expect(screen.queryByRole("button", { name: "Done" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Undo" })).toBeNull();
+    expect(key(surface, "Escape")).toBe(true);
+    expect(screen.getByText(/Escape deselects\./)).toBeTruthy();
+  });
+
+  it("says what the host chose while locked", () => {
+    setup(neophyteHall(), false, {
+      props: { lockedNote: "Correct the source to edit the drawing." },
+    });
+    expect(
+      screen.getByText("Correct the source to edit the drawing."),
+    ).toBeTruthy();
+  });
+
   it("starts at the warnings when asked", () => {
     setup(hallFromPug("gdHall", "  floor", "    unicorn(x=3, y=3)"), true, {
       props: { initialFocus: "warnings" },

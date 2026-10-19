@@ -105,13 +105,24 @@ export interface GdHallEditorProps {
    * return false: the editor then shows the host's hall and says so.
    */
   onChange: (next: HallElement) => boolean | void;
-  /** Leaves edit mode: Done, or Escape with nothing selected. */
-  onDone: () => void;
+  /**
+   * Leaves edit mode: Done, or Escape with nothing selected. Without it
+   * (a page that is always editing) there is no Done button.
+   */
+  onDone?: () => void;
   /** The host's undo and redo (Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z or Ctrl+Y). */
   onUndo?: () => void;
   onRedo?: () => void;
+  /**
+   * Whether the toolbar shows Undo and Redo buttons for `onUndo` and
+   * `onRedo` (a host with its own buttons keeps only the keys); true by
+   * default.
+   */
+  historyButtons?: boolean;
   /** False while the host cannot take changes; the editor only shows. */
   editable?: boolean;
+  /** Said under the drawing while `editable` is false. */
+  lockedNote?: string;
   /**
    * Where the focus goes on arriving: the drawing (by default), or the
    * first of the hall's warnings, for an author who asked to see them.
@@ -203,7 +214,9 @@ export function GdHallEditor({
   onDone,
   onUndo,
   onRedo,
+  historyButtons = true,
   editable = true,
+  lockedNote = "The hall cannot be edited while the ritual is updating.",
   initialFocus = "drawing",
   createId = createRitualNodeId,
 }: GdHallEditorProps) {
@@ -737,9 +750,10 @@ export function GdHallEditor({
       return;
     }
     if (key === "Escape") {
-      event.preventDefault();
       if (selectedId) select(undefined);
-      else onDone();
+      else if (onDone) onDone();
+      else return;
+      event.preventDefault();
       return;
     }
     if (key === "Tab" && !modifier && !event.altKey) {
@@ -881,7 +895,7 @@ export function GdHallEditor({
         >
           {paletteItems(palette, add)}
         </Menu>
-        {onUndo && (
+        {onUndo && historyButtons && (
           <Tooltip title="Undo">
             <span>
               <IconButton
@@ -895,7 +909,7 @@ export function GdHallEditor({
             </span>
           </Tooltip>
         )}
-        {onRedo && (
+        {onRedo && historyButtons && (
           <Tooltip title="Redo">
             <span>
               <IconButton
@@ -910,14 +924,16 @@ export function GdHallEditor({
           </Tooltip>
         )}
         <span className={styles.spacer} />
-        <Button
-          size="small"
-          variant="contained"
-          startIcon={<Check fontSize="small" />}
-          onClick={onDone}
-        >
-          Done
-        </Button>
+        {onDone && (
+          <Button
+            size="small"
+            variant="contained"
+            startIcon={<Check fontSize="small" />}
+            onClick={onDone}
+          >
+            Done
+          </Button>
+        )}
       </div>
       <div className={styles.body}>
         <div className={styles.drawingColumn}>
@@ -1049,10 +1065,10 @@ export function GdHallEditor({
           </p>
           <p id={helpId} className={styles.hint}>
             {!editable
-              ? "The hall cannot be edited while the ritual is updating."
+              ? lockedNote
               : coarse
                 ? "Tap to select, drag to move (along a row: to reorder; onto or off an altar, platform or throne: to stand there), drag a corner to scale; the panel edits the rest."
-                : `Click to select, drag to move (Alt: no snapping), drag a corner to scale. Dragged along a row, an officer or banner changes places (Alt: places it freely); dropped on an altar, platform or throne it stands there, and dragged off, on the floor. Keys: Tab selects the next object, arrows nudge (Shift: a square; Alt: a place along its row), + and − scale, Delete removes, Ctrl+D duplicates, Escape deselects, then finishes.`}
+                : `Click to select, drag to move (Alt: no snapping), drag a corner to scale. Dragged along a row, an officer or banner changes places (Alt: places it freely); dropped on an altar, platform or throne it stands there, and dragged off, on the floor. Keys: Tab selects the next object, arrows nudge (Shift: a square; Alt: a place along its row), + and − scale, Delete removes, Ctrl+D duplicates, Escape deselects${onDone ? ", then finishes" : ""}.`}
           </p>
           {warnings.length > 0 && (
             <Warnings
