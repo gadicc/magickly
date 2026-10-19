@@ -8,6 +8,7 @@ import {
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { gdHallArt } from "./art";
+import { lamenArt } from "./lamenArt";
 import { legacyHallArt } from "./legacyArt";
 
 /**
@@ -128,6 +129,14 @@ describe("the app's hall art", () => {
     // An unknown role is Lamen's plain lamen, not the Hierophant's.
     expect(draw("lamen", { type: "officer", role: "constructor" })).toContain(
       "fill:white",
+    );
+    // The adepts have no lamens yet: labelled circles, one drawing.
+    for (const role of ["chiefAdept", "secondAdept", "thirdAdept"]) {
+      expect(draw("lamen", { type: "officer", role }), role).toBe(plain);
+      expect(lamenArt.variant({ type: "officer", role }), role).toBe("");
+    }
+    expect(lamenArt.variant({ type: "officer", role: "constructor" })).toBe(
+      "?",
     );
   });
 

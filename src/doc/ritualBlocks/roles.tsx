@@ -12,6 +12,22 @@ export interface RitualRolePresentation {
   color?: string;
 }
 
+/**
+ * The adepts' role symbol until their lamens are drawn: a plain circle,
+ * as the temple hall draws them (plan 061, decision 5).
+ */
+const plainLamen = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="-50 -50 100 100"
+    height={25}
+    width={25}
+    aria-hidden="true"
+  >
+    <circle r={47} fill="white" stroke="black" strokeWidth={6} />
+  </svg>
+);
+
 export const roles: Record<string, RitualRolePresentation> = {
   imperator: {
     name: "Imperator",
@@ -68,6 +84,13 @@ export const roles: Record<string, RitualRolePresentation> = {
     symbol: <Lamen officer="sentinel" height={25} />,
     color: "#777",
   },
+  // The Portal's officers (plan 061, stage F): the hall's adept roles.
+  // Their colours are ours, after the rubric's (Regardie 1938, vol. 2,
+  // p.156): the Chief Adept's yellow collar and nemyss, the Second
+  // Adept's orange, the Third Adept's green.
+  chiefAdept: { name: "Chief Adept", symbol: plainLamen, color: "#b8860b" },
+  secondAdept: { name: "Second Adept", symbol: plainLamen, color: "#d06000" },
+  thirdAdept: { name: "Third Adept", symbol: plainLamen, color: "#108010" },
   candidate: { name: "Candidate", symbol: "🤠", color: "#fcf" },
   aspirant: { name: "Aspirant", symbol: "🤒", color: "#fcf" },
   member: { name: "Member", color: "#ccc" },

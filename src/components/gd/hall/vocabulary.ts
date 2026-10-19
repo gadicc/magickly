@@ -349,8 +349,9 @@ export const RESERVED_ATTRIBUTES: ReadonlySet<string> = new Set([
 export const IDENTIFIER = /^[A-Za-z][A-Za-z0-9]*$/;
 
 /**
- * Officer roles: the ritual role keys (`src/doc/ritualBlocks/roles.tsx`)
- * and the adepts the plan adds, with their display names.
+ * Officer roles: the ritual role keys (`src/doc/ritualBlocks/roles.tsx`,
+ * which holds the adepts too), with their display names. An app test
+ * holds the two in step.
  */
 export const HALL_ROLES: ReadonlyMap<string, string> = new Map([
   ["imperator", "Imperator"],
