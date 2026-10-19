@@ -293,13 +293,15 @@ gdHall(dais=4, wall="gradient")
   | --- | --- | --- |
   | officer, lamen | 1 | 1.6 squares (inset 0.8 in a 2-square cell) |
   | altar, pillar, banner | 1 | fills the 2-square cell (banner 1.6 × 2) |
-  | platform, throne, board | 1 | `w` × `h` squares |
+  | platform, throne, board | 1 | `w` × `h` squares; a board with a diagram 2 × 3, sized by `scale` |
   | hebrewLetter | 1.475 | 2.95 × 2.71 |
   | tablet | 1.345 | 1.91 × 2.69 |
   | shewbread, candlestick | 1.25 | 2.5 |
+  | kamea, seal | 0.9 | 1.8 |
+  | veil | 1 | 16 × 0.4 (sized by `scale` only) |
   | marker | 0.6 | 1.2 |
   | tarotKey | 0.81 | 0.94 × 1.62 |
-  | items | per kind, 0.235–1.19 (other items 0.4) | measured on the drawings |
+  | items | per kind, 0.235–1.19 (gong, brazier, candle 0.5; other items 0.4) | measured on the drawings |
   | unknown tags (placeholder) | 0.5 | 1 |
 - **Bounds and margins** come from content: the viewBox is the union of every
   resolved object and label plus `padding` (default half a square), so an
@@ -327,20 +329,20 @@ Placeables:
 
 | Tag | Notes |
 | --- | --- |
-| `officer(role)` | `lamen` + `label`. Roles use the ritual role keys (`src/doc/ritualBlocks/roles.tsx`): imperator, cancellarius, praemonstrator, hierophant, pastHierophant, hiereus, hegemon, keryx, stolistes, dadouchos, sentinel; adepts (chiefAdept, secondAdept, thirdAdept) as labelled circles until their lamens exist. Colour lamens only (see Background) |
+| `officer(role)` | `lamen` + `label`. Roles use the ritual role keys (`src/doc/ritualBlocks/roles.tsx`): imperator, cancellarius, praemonstrator, hierophant, pastHierophant, hiereus, hegemon, keryx, stolistes, dadouchos, sentinel; adepts (chiefAdept, secondAdept, thirdAdept, in the catalog since stage F) as labelled circles until their lamens exist. Colour lamens only (see Background) |
 | `lamen(role)` | The lamen alone |
 | `marker(text, shape)` | A labelled box or circle, as the book uses for objects (Lamp, Pantacle) and for the candidate. Every grade can be preset before its art exists |
-| `altar`, `platform`, `throne` | Hosts. The altar is the black cube; what lies on it is items |
+| `altar`, `platform`, `throne` | Hosts. The altar is the black cube, or the Portal's small white altar with `kind="white"` (stage F); what lies on it is items |
 | `pillar(kind)` | `black` (downward triangle) or `white` (upward); `glow` for the Neophyte style. No rotation |
 | `banner(kind)` | `east` or `west` |
 | `hebrewLetter(letter)` | A Hebrew-letter banner, in a row or anywhere |
 | `tablet(element)` | Reuses `Tablet`; earth and air now, water, fire and union once the data exists |
-| `item(kind)` | Art registry: cup, chalice, salt, bread, rose, lamp, lantern, censer, fan, cross (`form`: calvary, latin, greek, greekFiveSquares, fourTriangles), triangle (`dir`: up, down), pentagram, pantacle, serpentTree, lightning, gong, brazier |
+| `item(kind)` | Art registry: cup, chalice, salt, bread, rose, lamp, lantern, censer, fan, cross (`form`: calvary, latin, greek, greekFiveSquares, fourTriangles), triangle (`dir`: up, down), pentagram, pantacle, serpentTree, lightning, gong, brazier, candle (stage F; the rubrics' candles beside the altar) |
 | `tarotKey(n)` | An original simplified card: numeral, Hebrew letter and title from magick-data; `n` is clamped to 0–21 and rounded, with a warning |
-| `kamea(planet)`, `seal(planet)` | The number square drawn from its numbers; seals redrawn |
-| `board(kind)` | A diagram on a stand: flamingSword and minutumMundum via `TreeOfLife`; gardenOfEden and theFall as labelled boards first |
+| `kamea(planet)`, `seal(planet)` | The number square drawn from its numbers (Agrippa's squares, computed); seals a placeholder until stage H. `planet`: saturn, jupiter, mars, sun, venus, mercury, moon |
+| `board(kind)` | A diagram on a stand: flamingSword and minutumMundum through the Tree's figure (`TreeFigure`, shared with `TreeOfLife`); gardenOfEden and theFall as labelled boards first |
 | `shewbread`, `candlestick` | The existing components |
-| `veil` | The Portal's curtain across the dais |
+| `veil` | The Portal's curtain across the dais: 16 × 0.4 squares, sized by `scale` |
 | `label` | Free or attached text |
 | `img` | Later; goes through the ritual image policy and the offline asset inventory |
 
@@ -359,9 +361,10 @@ runs the inventory over every preset and expects a complete enumeration with
 no issues. No hall tag is called `title`, which the inventory treats
 specially.
 
-Data still to add (the tarot titles came in A2): kamea squares (computed),
-seals (drawn), and the adept roles (`chiefAdept`, `secondAdept`, `thirdAdept`) in the ritual role
-catalog, so hall roles and ritual roles stay one set.
+Data still to add (the tarot titles came in A2): seals (drawn). The kamea
+squares (computed) and the adept roles (`chiefAdept`, `secondAdept`,
+`thirdAdept`) in the ritual role catalog, so hall roles and ritual roles
+stay one set, came in stage F.
 
 ### 6. Labels
 
@@ -606,8 +609,8 @@ blurbs for the 6th and 7th editions mention corrected errors without detail,
 and the 7th edition scan on archive.org is access-restricted. Most conflicts
 therefore go back to Regardie's own 1938 edition, and two disappear once the
 1938 drawings are read. On 17 October 2026 Gadi accepted the
-recommendations of rows 1–9; the presets follow them. Row 10 (stage F)
-awaits him.
+recommendations of rows 1–9, and on 20 October 2026 that of row 10;
+the presets follow them.
 
 | # | Setup | Finding | Status | Recommendation |
 | --- | --- | --- | --- | --- |
@@ -620,7 +623,7 @@ awaits him.
 | 7 | Zelator Earth tablet | 1938 p.44 (n38) draws a small board, about 2 squares long, with its outer edge on the North wall line, inside the hall, the lamp at its East end and the salt at its West end; no source says whether it hangs or stands. Our drawings hang a board twice that size outside the wall | Settled: Gadi accepted the book's placement; the drawings' large board is drift | On the wall line, inside (the book), at the Theoricus board's size (the default tablet scale, 2.69 squares along the wall), the lamp East and the salt West of it along the wall |
 | 8 | Zelator altar | 1938 drawing: the Flaming Sword diagram on the altar, the red lamp at its East end, the cross in the triangle at the base of the Tree. The explicit "For the Altar" requirements line appears only from 1986, an editorial addition consistent with 1938 | Settled | Add the Flaming Sword board and the red lamp to Zelator 1 |
 | 9 | Neophyte Banner of the West | 1938 p.11 (n3) draws it free-standing on the floor, North-West of and slightly East of the Hiereus' throne; the Z documents give it a pole and base. No text gives a position | Settled as far as the sources go | On the floor, North-West of the throne (book) |
-| 10 | Philosophus 4 (4=7) symbol of Venus | 1938 p.144 (n138) labels a box on the dais "Kamea & Sigils of ♀"; the rubric (p.145, n139) says instead "The symbol of VENUS on the Tree of Life is shown in the East". Neither mentions the other; the Theoricus 2=9 drawing shows the Moon's kamea and seals the same way | New in stage F — for Gadi | Show both: the kamea and seals of Venus the drawing names, and the rubric's symbol as a marker ("Venus on the Tree of Life") until it is drawn (stage H). The preset does so; dropping either is one line |
+| 10 | Philosophus 4 (4=7) symbol of Venus | 1938 p.144 (n138) labels a box on the dais "Kamea & Sigils of ♀"; the rubric (p.145, n139) says instead "The symbol of VENUS on the Tree of Life is shown in the East". Neither mentions the other; the Theoricus 2=9 drawing shows the Moon's kamea and seals the same way | New in stage F; Gadi accepted showing both (20 October 2026) | Show both: the kamea and seals of Venus the drawing names, and the rubric's symbol as a marker ("Venus on the Tree of Life") until it is drawn (stage H). The preset does so; dropping either is one line |
 
 Also from 1938, with no errata found: Theoricus 32nd path (p.69, n63) writes
 "Flaming Sword" West of the altar and has incense in the South-East corner;
@@ -696,7 +699,14 @@ from them, drawn with our own art.
 | Caduceus (Keryx lamen) | SVG Repo, "public domain" label | replace |
 | Eye of Horus (Sentinel lamen) | game-icons.net, CC BY | replace |
 | Tarot XXI on the Theoricus altar | RWS raster in the drawing | original card, `tarotKey` (A2) |
-| Serpent on the Tree, Moon kamea, Moon seals | rasters in Theoricus 2, no source | markers in the preset (A2); redraw / generate |
+| Serpent on the Tree, Moon kamea, Moon seals | rasters in Theoricus 2, no source | markers in the preset (A2); the kamea computed and drawn, `kamea` (F); the seals a placeholder, `seal` (F), to draw in H; the serpent a marker, to draw in H |
+| Planetary kameas | none | computed (Agrippa's squares) and drawn from geometry, `kamea` (F) |
+| Planetary seals | none | placeholder `seal`, a dashed ring naming the planet (F); draw in H |
+| Flaming Sword and Minutum Mundum boards | `TreeOfLife`, first-party | `TreeFigure` (the Tree's own geometry) on a board, `board` (F); the Minutum Mundum's paths in their colours need path colour data (H) |
+| Garden of Eden, the Fall | none | labelled boards (F); draw in H |
+| Veil, white altar, gong, brazier, candle | none | original geometry (F) |
+| Adept lamens | none | plain circles in the hall and as role icons (F); draw in H |
+| Markers in the stage F presets | none | the Fire and Water tablets and the Tablet of Union (stage G); "Venus on the Tree of Life" (conflict 10), "Mercury" (3=8), Pan, the Devil, Death and Typhon (Portal 2), the Theoricus' seat (Practicus): draw or keep in H |
 
 The third-party list the plan requires (decision 9) is
 `THIRD_PARTY_ART` in `src/app/gd/hall/art.test.tsx`: the nine legacy
@@ -741,7 +751,7 @@ Each stage is a series of gated commits on `gate/gd-hall`.
 | C | `/hall` slash command with presets | yes | done (18 October 2026; Stage C notes): slash command and Insert… dialog, Copy Pug source on `/gd/hall`, hall warnings in the source editor |
 | D | Visual sub-editor | yes | done (18 October 2026; Stage D notes): `GdHallEditor`, opened from a hall's atom; refined in stage E (19 October 2026, Gadi's decisions): rows reorder by drag with explicit positions freezing their siblings, objects stand on hosts by drag or the panel's Stands on, and a warnings badge outside edit mode (Stage E notes) |
 | E | `/gd/hall` source, visual and split playground with local draft and share link | yes | done (19 October 2026; Stage E notes): the gallery became a hall editor built from the shared source panel and visual editor, with presets, its own history, a draft in localStorage, share links in the fragment, export and Copy Pug source |
-| F | Remaining vocabulary and the presets for Practicus, Philosophus and Portal (markers where art is missing) | yes | |
+| F | Remaining vocabulary and the presets for Practicus, Philosophus and Portal (markers where art is missing) | yes | done (19 October 2026; Stage F notes): kameas, placeholder seals, boards, veil, white altar, gong, brazier, candle, the adepts in the ritual roles, nine presets from the 1938 layouts; the layout switch reads Source, Split, Visual and the drawing comparison is gone |
 | G | magick-data: Water, Fire and Union tablets | yes | |
 | H | Original artwork; ledger to zero; `Lamen` moves to the MIT directory; credits | yes | |
 | I | Built-in docs switched to presets; reader export; end-of-project review of `/gd/hall`, scales and the conflicts table | yes | |
@@ -2412,6 +2422,234 @@ Verified:
   and Redo, an SVG export, and no horizontal scroll at 390 px in split,
   visual and source views. Screenshots are outside the repository.
 
+## Stage F notes
+
+Built on `gate/gd-hall-f` (19 October 2026), from `main` at 463c12a,
+with two changes Gadi asked for first. Each records what was settled
+where the brief or the plan left a choice.
+
+### Owner requests of 19 October 2026
+
+- **Source | Split | Visual.** The editors' layout switch now reads in
+  the order split view lays the panels out, source on the left:
+  `RITUAL_EDITOR_LAYOUTS` (`useRitualEditorLayout.ts`) holds the order
+  and labels, and `RitualLayoutSwitch` draws them, the chosen layout
+  pressed (`aria-pressed`) as well as filled; the ritual editor (which
+  printed its raw lowercase keys and showed the choice by fill alone),
+  the `/gd/hall` editor ("Pug source" became "Source") and the
+  new-ritual form all use it; a narrow ritual editor offers
+  Source and Visual. The new-ritual form was not named in the request
+  but has the same switch, so it follows. The temples and Ritual Pug
+  guides describe the new order, and the documentation capture clicks
+  the new labels. The screenshots that show the switch
+  (`editor-split`, `editor-source`, `editor-visual`, `editor-phone`)
+  were recaptured from this branch with the local development stack
+  and fold into the switch's commit.
+- **No drawing comparison.** "Compare with the original drawing" and
+  the drawing under the `/gd/hall` editor are gone (Old `/pics/*.svg`
+  references); the presets still cite their drawings, which the page
+  links.
+
+### Vocabulary
+
+- **Adepts.** `chiefAdept`, `secondAdept` and `thirdAdept` join the
+  ritual role catalog with their names, a colour each (ours, after the
+  rubric's colours, Regardie 1938 p.156, n149: the Chief Adept's yellow
+  collar and nemyss, the Second Adept's orange, the Third Adept's green;
+  the Chief Adept's cloak is the Hierophant's red) and a plain circle for a symbol, as the hall
+  draws them; a test holds every hall role in the catalog under the
+  same name. In the hall, `lamenArt` draws the package's plain circle
+  for a hall role `Lamen` has no lamen for; other unknown roles keep
+  `Lamen`'s plain lamen, as before. The catalog's consumers (the
+  reader's frames, the role pickers and slash menu, the source check)
+  read names and symbols by key, so they needed nothing else.
+- **Kameas** are computed, not copied (`kameas.ts`): Agrippa's squares
+  (*De occulta philosophia*, 1533, II.22), the odd ones by the
+  step-down-right construction, the doubly even ones by complementing
+  the 4 × 4 diagonals, both of which give exactly Agrippa's squares,
+  and the Sun's order-6 square written out. Tests check every square is
+  magic and Agrippa's row by row. `kamea(planet)` draws the grid with
+  its numbers (once per planet per hall, the numbers inside the
+  drawing), default scale 0.9, the Theoricus 2 drawing's Moon square.
+  At that scale the Moon's numbers are about 0.1 squares tall (Saturn's
+  0.28): a kamea reads as a number square at the reader's size, and its
+  numbers only when zoomed or exported large, by design.
+  Like `tarotKey`, `kamea` and `seal` are tags the art registry adds,
+  so the validator knows them with the art.
+- **Seals** could not be drawn from geometry here, so `seal(planet)` is
+  a clearly marked placeholder: a dashed grey ring reading "Seals of
+  Luna" (the plural, as the drawings name the seal and sigils
+  together). Theoricus 2 now draws its Moon kamea and this placeholder
+  instead of its two markers. Stage H draws the seals (Artwork ledger).
+- **Boards.** `board(kind)` is an enum: `flamingSword`,
+  `minutumMundum`, `gardenOfEden`, `theFall`. `TreeOfLife` could not be
+  drawn in a hall as it is: it reads the whole magick-data barrel for
+  its labels (which would have gone into the chunk every ritual with a
+  hall loads), and draws ids, links, titles, text paths and a
+  stylesheet loading fonts by URL. Its geometry, draw order and path
+  outlines moved to `treeOfLifeFigure.tsx`, which also draws
+  `TreeFigure`, the spheres (Queen scale) and Hermetic paths alone,
+  reading only magick-data's sephirot; `TreeOfLife` imports them and
+  draws exactly what it drew before (four variants compared byte for
+  byte). The Flaming Sword adds the Lightning Flash down the spheres;
+  the Minutum Mundum's paths stay white, since magick-data has no path
+  colours (Artwork ledger). The Garden of Eden and the Fall are boards
+  with their names. A board with a diagram keeps the Tree's 2 × 3
+  proportions and is sized by `scale` (`w` and `h` are ignored, with a
+  warning), so each diagram is drawn once per hall however many boards
+  differ in size; a plain board, or one whose kind is not one of the
+  four, still takes `w` and `h`, and the properties panel offers them
+  only there (or where the node already has them, so they can be
+  emptied). Saved halls: `board(kind)` was free text before stage F,
+  so a saved board whose kind is exactly one of the four now draws its
+  diagram at 2 × 3 by `scale`, ignoring its `w` and `h` (with a
+  warning), and any other kind is an error diagnostic, which never
+  blocks a save, the board drawn plain at its `w` and `h`. No saved
+  ritual holds a hall yet.
+- **"null" in a choice.** The attribute check reads the string "null"
+  as absent (the legacy path writes `null` so), which left a kamea or
+  seal with `planet="null"` drawn empty, and a board's or altar's
+  `kind="null"` drawn plain or black, with nothing said; those are now
+  errors like any value the vocabulary does not know.
+- **Veil**: a pleated band, 16 × 0.4 squares at scale 1 (the hall's
+  width), sized by `scale` only for the same reason; lavender, our
+  choice. The palette puts it across the hall at the dais's West edge
+  (x 8, y −0.3) whatever is selected: beside the selection it would
+  overhang a wall, and the palette never puts anything into a row,
+  where it would take a slot and overhang the hall.
+- **White altar**: `altar(kind="white")`, an attribute rather than a
+  tag, as `pillar(kind)` is: it is still an altar that things are put
+  on (the Tablet of Union and the white lamp late in Portal 2), so the
+  host rules apply to both kinds. The presets and the palette draw it
+  at scale 0.5.
+- **Items** `gong`, `brazier` and `candle`, drawn from geometry in the
+  package, default scale 0.5. The candle is beyond the plan's list:
+  the Practicus and Philosophus rubrics and drawings put a candle on
+  each side of the altar in five of the halls.
+- **Hebrew letters on any side** needed nothing new: `banners` rows
+  already stand beyond each wall, spread evenly, from corner to corner
+  or at their own positions. The 1938 drawings put the paths' letters
+  inside the walls, as portals; the presets put them in rows beyond the
+  walls, as the Theoricus presets and the Greer redraws do, except the
+  Portal's five, which stay along the East edge of the floor (the
+  Tablet of Union and the gong stand beyond the East wall there).
+- **Consistency.** The palette offers every new tag and kind (the
+  boards, a kamea, the seals, the white altar, the veil, the items
+  through the item kinds); no host takes the new tags, and the
+  palette's host test still agrees with the host rules; the properties
+  panel shows `kind` on altars and boards and `planet` as selects; the
+  editor names the new nodes ("Kamea of Luna", "Board: The Fall",
+  "White altar"); no new name is reserved, and every preset round-trips
+  through Pug.
+- **The placeholder estimate** (`estimateHallAspect`) measured banner
+  rows only across the row: letters from corner to corner (Philosophus)
+  reach half a banner past the walls, which put the reader's
+  placeholder 5.8 % off for Philosophus 1 and 2. Rows are now placed
+  along their line as the resolver places them, items placed by `at`
+  left out of the spread by `placedByAt` (`attributes.ts`), the rule
+  the resolver, the estimate and the editor's rows now share: 1.3 %
+  off, and every preset within 2 %.
+
+### Presets
+
+From the 1938 diagrams and rubrics (Sources), following the accepted
+conflicts; each cites its pages and leaves, and a test holds every
+cited page at its leaf. Moves within a part (the candidate after the
+circumambulation, the Hierophant's chair moved West in 3=8) are left
+out. Settled here:
+
+- **No Chiefs.** The 1938 diagrams of these grades draw only the
+  Hierophant on the dais, and the Philosophus rubric names three
+  officers, so the presets have no Chiefs, unlike the five drawn ones
+  (and Greer's redraws). For Gadi (Follow-ups).
+- **Practicus 1 and 2** (31st and 30th paths): the letter in the
+  North-East, the pillars in the North-East as the text says, the
+  trump between two candles, incense in the South, the Hiereus and
+  Hegemon in the West with red lamps, the cup of water, and the "Seat
+  for the Theoricus" as a marker (it is furniture set before the
+  ceremony). The hatched corners of the dais in the 31st path (and
+  3=8) are not explained by the text and are not drawn.
+- **Practicus 3** (3=8): the diagram draws the Hierophant both on the
+  dais and at his "1st Position" West of the altar; the officer stands
+  at the first position and the dais keeps "Hierophant's throne". The
+  dais box "Mercury" is a marker, as the drawing names it (not a
+  kamea), East of the throne as the drawing stacks them. On the altar, the cross, the cup and the triangle of Water
+  with a lamp at each angle (the drawing's circles; Greer labels them
+  lamps).
+- **Philosophus 1 and 2**: conflicts 2 and 3. The Fire tablet is a
+  marker on the South wall with its lamp and incense.
+- **Philosophus 3**: conflict 4: the Hierophant on the dais with a red
+  lamp, the Hiereus and Hegemon with red lamps instead of cups, the
+  drawing's pillars before Peh and its Banner of the East kept.
+- **Philosophus 4** (4=7): conflict 5 (pillars North and South), and a
+  new one, conflict 10 (the drawing's kamea and seals of Venus against
+  the rubric's symbol of Venus on the Tree): both are shown.
+- **Portal 1 and 2**: conflicts 1 and 6. Part 1 has no Tau (its p.175
+  diagram draws none); part 2 has Tau beyond the West. The Tablet of
+  Union and the gong stand beyond the East wall, as p.175 draws them
+  (Greer moves the gong onto the dais); p.155's unlabelled hexagram
+  above the East is not drawn. Incense sticks and the incense for the
+  altar are censers; the white lamp is a lamp with `fill="white"`.
+  The grade is written "Portal".
+
+### Bundle
+
+From the gates' production builds (webpack), a2e29c7 against 1ad0abc:
+the hall chunk the reader's drawing loads grew from 266,532 to 276,349
+bytes (90,779 to 95,072 gzipped), with the new art, `TreeFigure` and
+magick-data's sephirot; the chunk holding the presets (the Insert
+dialog, the slash command and `/gd/hall`) from 16,280 to 25,232 (6,069
+to 7,767). The reader's static graph is unchanged (its boundary test
+passes).
+
+### Review fixes
+
+Two independent reviews of stage F found no blocker. Their fixes were
+folded into the commits they belong to (the branch rewritten; Commits
+lists the new ones): the shared `RitualLayoutSwitch` with
+`aria-pressed`; the adepts' colours credited to the rubric's collars
+and nemysses; "null" in a choice an error; the board's `w`/`h` warning
+only for a kind the vocabulary knows, and the panel's Width and Height
+only where they do something; board fixtures in `hallHosts.test.ts`
+without kinds, so they draw as their comments say and warn of nothing;
+`LineOutline` typed; the veil from the palette across the hall; the
+placeholder estimate's rows sharing the resolver's `at` rule, in one
+pass; Practicus 3's "Mercury" East of the throne, and the Philosophus 3
+comment on Shin; the conflicts' acceptance limited to rows 1–9; commit
+subjects within 50 characters, the type included.
+
+### What was verified, and how
+
+- **Gates**, per commit, each in a clean export of the commit with
+  Node 24 (`pnpm check`, `typecheck`, `test:coverage`, `build`): all 0
+  for every commit. `kameas.ts` joined the coverage list. The compiler
+  is untouched: `semantic.ts`, `semanticCompile.ts`,
+  `semanticCompilerImpl.ts` and `ritualNodeIds.ts` have no diff, so the
+  identity stays `6b059a0f…`.
+- **Tests**: the switch's order in each editor; the adepts in the
+  catalog and drawn as one plain circle; the kameas magic and Agrippa's,
+  the constructions for other orders; kamea, seal, board, altar, veil
+  and item drawings (no ids, links or text where none belongs), their
+  validation, their bounded output (3,990 kameas and seals in 14
+  drawings, 3,990 boards of different sizes in 2), their names and
+  palette entries; the placeholder estimate for rows (failing without
+  the fix); every preset validated with the app's art without warnings,
+  drawn to a snapshot, inventoried, round-tripped through Pug, inserted
+  by the slash command and the Insert dialog, and randomly edited.
+- **In the browser** (Turbopack dev server from this branch on
+  127.0.0.1:3291, headless Chromium over CDP; synthetic data only):
+  `/gd/hall` reads Source, Split, Visual with no comparison switch, and
+  its picker lists the fourteen presets; Practicus 1 and 3, Philosophus
+  1 and 4 and Portal 1 and 2 drawn in the visual view with no warnings;
+  at 390 px no horizontal scroll. In the ritual editor ("Hall check
+  (stage B)", the local Creator) the switch reads Source, Split,
+  Visual, and Source, Visual at 390 px; the new-ritual form reads
+  Source, Split, Visual. After the review fixes (same setup): the
+  switch's chosen layout is `aria-pressed` in all three, and a veil
+  added from the palette with a dais officer selected lies across the
+  hall at x 8, y −0.3. Nothing was saved. Screenshots are outside the
+  repository.
+
 ## Commits
 
 | Commit | Change |
@@ -2503,6 +2741,14 @@ Verified:
 | 0e129f3 | A tab writes only what it changed and offers another tab's newer draft; the shared hall held through Undo and Redo; notes from what the browser holds, stacked, clipped (E review M1, F2, m3, Fnit1) |
 | b0324d6 | An error boundary and `<noscript>` line for the lazily loaded editor (E review F3) |
 | 398b7c9 | "Correct the source to share the hall." not announced (E review n3; n2 held by a test) |
+| b29b2a3 | The layout switch reads Source, Split, Visual in every editor, pressed as well as filled (`RITUAL_EDITOR_LAYOUTS`, `RitualLayoutSwitch`) (F, Gadi's request) |
+| a2e29c7 | The original-drawing comparison removed from `/gd/hall` (F, Gadi's request) |
+| a551e6e | The adepts in the ritual role catalog; plain circles for hall roles without a lamen (F) |
+| afa1fe9 | `kamea(planet)` drawn from Agrippa's squares, computed; `seal(planet)` a placeholder; Theoricus 2 draws both (F) |
+| 6b2d403 | `board(kind)` diagrams: `TreeFigure` shared with `TreeOfLife`, the Flaming Sword and Minutum Mundum, labelled Eden and Fall boards (F) |
+| 65162ab | `veil`, `altar(kind="white")`, items `gong`, `brazier` and `candle` (F) |
+| a842390 | The placeholder estimate places banner rows along their line; `placedByAt` shared (F) |
+| 1ad0abc | The Practicus, Philosophus and Portal presets from the 1938 layouts; conflict 10 (F) |
 
 ## Future
 
@@ -2627,3 +2873,16 @@ typed or pasted beyond the limits is still read whole at each rest
 (seconds for thousands of nodes), which a worker or an incremental
 parse would cure; a tab closed while the choice between two tabs'
 drafts is unmade keeps the other tab's.
+
+From stage F: whether the Practicus, Philosophus and Portal presets
+should have the Chiefs on the dais like the five drawn ones (the 1938
+diagrams draw none; Stage F notes; Gadi leans towards Greer's redraws,
+which seat them, and will decide after reviewing the merged presets);
+Gadi to look again at saved boards drawing by `scale` once merged (he
+accepted the change on 20 October 2026); drawing the seals, the Garden of Eden and the Fall, the
+adepts' lamens, the symbol of Venus on the Tree and the Portal 2
+figures (Pan, the Devil, Death, Typhon), and the Minutum Mundum's path
+colours (magick-data has none) in stage H; the Fire, Water and Union
+tablets in stage G; the slash menu now lists fourteen halls
+after "Temple hall" (typing a grade narrows it); the new presets and
+the switch checked in headless Chromium only.

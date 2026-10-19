@@ -344,8 +344,22 @@ Follow-ups are separate from the completed migration work:
   offered, and both tabs' changes are kept until the author chooses),
   links and drafts are capped (1,000 nodes, 64 KB) and typed source is
   read at a rest, so a small link can no longer freeze the page, and
-  the editor says when its code cannot load. Stage F is next.
-  TODO from it: recording officer movement between stations, a `gdVault` for
+  the editor says when its code cannot load. Stage F is done on
+  `gate/gd-hall-f` (19 October 2026): kameas computed and drawn from
+  their numbers, placeholder seals, the Tree on the Flaming Sword and
+  Minutum Mundum boards, the veil, the white altar, gong, brazier and
+  candle, the Portal's adepts in the ritual roles, and nine presets for
+  Practicus, Philosophus and the Portal from the 1938 layouts; the
+  editors' layout switch reads Source, Split, Visual, and `/gd/hall` no
+  longer compares presets with the old drawings. Next, before stage G
+  (Gadi, 20 October 2026): the hall editor's panel beside the drawing
+  whenever it fits (split `/gd/hall` using the full width), otherwise
+  docked at the foot of the screen; and the kameas moved out of the
+  hall into magick-data and a shared `Kamea` component the hall wraps.
+  TODO from it: Gadi's call on the Chiefs on the new presets' daises
+  (after the merge; he leans towards Greer's redraws), the stage F
+  markers and placeholders for stage H (seals, Eden, the Fall, adept
+  lamens, the Minutum Mundum's path colours); recording officer movement between stations, a `gdVault` for
   the Adeptus Minor Vault, original Enochian letterforms, moving
   `enochianFont.ts` and the other files the import-boundary test allows out
   of `src/components` (or off their app imports), embedded fonts in the Tree
