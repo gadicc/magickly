@@ -127,6 +127,27 @@ export const CROSS_FORMS = [
 ] as const;
 export type CrossForm = (typeof CROSS_FORMS)[number];
 
+/**
+ * The diagrams a board shows (decision 5): the Tree with the Flaming
+ * Sword or as the Minutum Mundum, and the Garden of Eden and the Fall,
+ * labelled boards until they are drawn.
+ */
+export const BOARD_KINDS = [
+  "flamingSword",
+  "minutumMundum",
+  "gardenOfEden",
+  "theFall",
+] as const;
+export type BoardKind = (typeof BOARD_KINDS)[number];
+
+/** Each board's diagram by name. */
+export const BOARD_NAMES: ReadonlyMap<BoardKind, string> = new Map([
+  ["flamingSword", "The Flaming Sword"],
+  ["minutumMundum", "Minutum Mundum"],
+  ["gardenOfEden", "The Garden of Eden"],
+  ["theFall", "The Fall"],
+]);
+
 /** Every tag the package knows. Art may add more through the registry. */
 export const HALL_TAGS: ReadonlyMap<string, HallTagSpec> = new Map<
   string,
@@ -209,7 +230,7 @@ export const HALL_TAGS: ReadonlyMap<string, HallTagSpec> = new Map<
   [
     "board",
     placeable("host", [
-      ["kind", text],
+      ["kind", enumOf(BOARD_KINDS)],
       ["w", size],
       ["h", size],
     ]),

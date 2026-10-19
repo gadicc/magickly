@@ -696,6 +696,30 @@ describe("the properties panel", () => {
     );
   });
 
+  it("offers a board's width and height only without a diagram", () => {
+    setup(
+      hallFromPug(
+        "gdHall",
+        "  floor",
+        '    board(kind="flamingSword", x=3, y=3)',
+        "    board(x=8, y=3)",
+        '    board(kind="theFall", x=13, y=3, w=4)',
+      ),
+    );
+    const surface = screen.getByRole("application");
+    // The diagram keeps its proportions: w and h would do nothing.
+    key(surface, "Tab");
+    expect(screen.queryByRole("textbox", { name: "Width" })).toBeNull();
+    expect(screen.queryByRole("textbox", { name: "Height" })).toBeNull();
+    key(surface, "Tab");
+    expect(screen.getByRole("textbox", { name: "Width" })).toBeTruthy();
+    expect(screen.getByRole("textbox", { name: "Height" })).toBeTruthy();
+    // A w already written is shown, so it can be emptied.
+    key(surface, "Tab");
+    expect(screen.getByRole("textbox", { name: "Width" })).toBeTruthy();
+    expect(screen.queryByRole("textbox", { name: "Height" })).toBeNull();
+  });
+
   it("edits the hall itself when nothing is selected", () => {
     const { current } = setup(hallFromPug("gdHall", "  floor"));
     const caption = screen.getByRole("textbox", { name: "Caption" });

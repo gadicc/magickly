@@ -10,12 +10,14 @@ export const provenance = original(
 /** Outline width, in squares. */
 const STROKE = 0.06;
 
-const sized = (width: number, height: number) => (node: HallNode) => ({
+/** A box `w` × `h` squares, `width` × `height` unless they say otherwise. */
+export const sized = (width: number, height: number) => (node: HallNode) => ({
   width: clamp(numberAttr(node, "w") ?? width, ...SIZE_RANGE),
   height: clamp(numberAttr(node, "h") ?? height, ...SIZE_RANGE),
 });
 
-function Platform({ box }: HallArtProps) {
+/** The white rectangle every platform, throne and board draws. */
+export function Platform({ box }: Pick<HallArtProps, "box">) {
   return (
     <rect
       x={-box.width / 2}
@@ -42,5 +44,3 @@ const art = (width: number, height: number): HallArt => ({
 export const platformArt = art(4, 3);
 /** A throne (2 × 2 squares unless w and h say otherwise). */
 export const throneArt = art(2, 2);
-/** A board on a stand (2 × 3 squares) until diagrams are drawn on it. */
-export const boardArt = art(2, 3);

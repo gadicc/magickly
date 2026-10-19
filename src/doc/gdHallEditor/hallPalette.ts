@@ -4,6 +4,8 @@ import type {
 } from "@magick-components/gd/hall/layout";
 import type { HallArtRegistry } from "@magick-components/gd/hall/types";
 import {
+  BOARD_KINDS,
+  BOARD_NAMES,
   CORE_ITEM_KINDS,
   HALL_ROLES,
 } from "@magick-components/gd/hall/vocabulary";
@@ -67,7 +69,8 @@ export function hallItemKinds(art: HallArtRegistry): string[] {
  * adepts, drawn as labelled circles until their lamens exist) and a
  * marker; the altar, pillars, platform, throne and a door; the banners
  * and a Hebrew letter; every item kind; a tarot key, a tablet, the Table
- * of Shewbread, the candlestick, a kamea and a planet's seals; free text.
+ * of Shewbread, the candlestick, the boards' diagrams, a kamea and a
+ * planet's seals; free text.
  */
 export function hallPalette(art: HallArtRegistry): HallPaletteEntry[] {
   return [
@@ -187,6 +190,15 @@ export function hallPalette(art: HallArtRegistry): HallPaletteEntry[] {
       tag: "candlestick",
       attrs: {},
     },
+    ...BOARD_KINDS.map(
+      (kind): HallPaletteEntry => ({
+        key: `board:${kind}`,
+        group: "Symbols",
+        label: `${BOARD_NAMES.get(kind)} (board)`,
+        tag: "board",
+        attrs: { kind },
+      }),
+    ),
     {
       key: "kamea",
       group: "Symbols",

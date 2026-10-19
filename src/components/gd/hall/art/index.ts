@@ -1,6 +1,7 @@
 import type { HallArtRegistry } from "../types";
 import { altarArt } from "./altar";
 import { bannerArt } from "./banner";
+import { boardArt } from "./board";
 import { hebrewLetterArt } from "./hebrewLetter";
 import { crossArt, pentagramArt, triangleArt } from "./items";
 import { kameaArt, sealArt } from "./kamea";
@@ -9,7 +10,7 @@ import { lightningArt } from "./lightning";
 import { markerArt } from "./marker";
 import { pantacleArt } from "./pantacle";
 import { pillarArt } from "./pillar";
-import { boardArt, platformArt, throneArt } from "./platform";
+import { platformArt, throneArt } from "./platform";
 import { candlestickArt, shewbreadArt, tabletArt } from "./symbols";
 import { tarotKeyArt } from "./tarotKey";
 

@@ -1,4 +1,4 @@
-import { numberAttr, readAttr } from "./attributes";
+import { enumAttr, numberAttr, readAttr } from "./attributes";
 import { hebrewLetter } from "./hebrewLetters";
 import { PLANETS } from "./kameas";
 import { MAX_LABEL_LINES } from "./labels";
@@ -12,6 +12,7 @@ import type {
   HallSeverity,
 } from "./types";
 import {
+  BOARD_KINDS,
   HALL_ROLES,
   type HallTagRole,
   IDENTIFIER,
@@ -233,6 +234,20 @@ export function validateHall(
           );
         break;
       }
+      case "board":
+        if (nullChoice("kind", BOARD_KINDS)) break;
+        // A board with a diagram keeps the diagram's proportions; one with
+        // a kind it does not know is plain, and takes w and h.
+        if (enumAttr(node as HallNode, "kind", BOARD_KINDS) !== undefined)
+          for (const name of ["w", "h"])
+            if (text(name) !== undefined)
+              report(
+                path,
+                "warning",
+                `board: ${name} is ignored for a board with a diagram; scale sizes it`,
+                name,
+              );
+        break;
       case "kamea":
       case "seal":
         if (nullChoice("planet", PLANETS)) break;

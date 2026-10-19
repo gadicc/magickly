@@ -10,7 +10,11 @@ import type {
   HallArtRegistry,
   HallNode,
 } from "@magick-components/gd/hall/types";
-import { roleName } from "@magick-components/gd/hall/vocabulary";
+import {
+  BOARD_NAMES,
+  type BoardKind,
+  roleName,
+} from "@magick-components/gd/hall/vocabulary";
 import type { JsonValue } from "../semantic";
 import {
   compareRowPaths,
@@ -142,6 +146,10 @@ export function hallNodeName(node: HallElement): string {
   if (tag === "tablet") {
     const element = text(node, "element");
     return element ? `${clip(itemKindLabel(element))} tablet` : "Tablet";
+  }
+  if (tag === "board") {
+    const diagram = BOARD_NAMES.get(kind as BoardKind);
+    return diagram ? `Board: ${diagram}` : "Board";
   }
   if (tag === "kamea" || tag === "seal") {
     const planet = PLANET_NAMES.get(text(node, "planet") as Planet);

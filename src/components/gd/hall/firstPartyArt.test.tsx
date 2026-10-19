@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { defaultHallArt } from "./art";
 import { TABLET_ELEMENTS, tabletArt } from "./art/symbols";
 import { romanNumeral, TRUMPS } from "./art/tarotKey";
+import { resolveHall } from "./layout";
 import type { HallArt, HallArtProps, HallNode } from "./types";
 import { validateHall } from "./validate";
 
@@ -191,6 +192,86 @@ describe("the Enochian tablets", () => {
       element: "air",
     });
     expect(styled).toContain("font-family:Enochian");
+  });
+});
+
+describe("the boards", () => {
+  it("draw the Tree for the Flaming Sword and the Minutum Mundum", () => {
+    const sword = draw(art("board"), { type: "board", kind: "flamingSword" });
+    const mundum = draw(art("board"), { type: "board", kind: "minutumMundum" });
+    for (const markup of [sword, mundum]) {
+      // Ten spheres (Malkuth in quarters) and the 22 Hermetic paths.
+      expect((markup.match(/<circle /g) ?? []).length).toBe(10);
+      expect((markup.match(/<path /g) ?? []).length).toBe(22 + 4);
+      expect(markup).not.toMatch(/<text|href|\sid=|<style|<title|https?:/);
+    }
+    // The Lightning Flash, Kether to Malkuth, only on the Flaming Sword.
+    expect(sword).toContain("<polyline");
+    expect(mundum).not.toContain("<polyline");
+    expect(mundum).toContain('fill="#0066ff"');
+  });
+
+  it("name the diagrams not drawn yet", () => {
+    const eden = draw(art("board"), { type: "board", kind: "gardenOfEden" });
+    expect(eden).toMatch(/>The Garden<\/text><text [^>]*>of Eden<\/text>/);
+    expect(draw(art("board"), { type: "board", kind: "theFall" })).toContain(
+      ">The Fall</text>",
+    );
+    expect(draw(art("board"), { type: "board" })).not.toContain("<text");
+  });
+
+  it("keep a diagram's proportions, and size a plain board by w and h", () => {
+    const box = (node: HallNode) => {
+      const { box } = art("board");
+      return typeof box === "function" ? box(node) : box;
+    };
+    expect(box({ type: "board", kind: "theFall", w: 5, h: 1 })).toEqual({
+      width: 2,
+      height: 3,
+    });
+    expect(box({ type: "board", w: 5, h: 1 })).toEqual({ width: 5, height: 1 });
+    expect(box({ type: "board", kind: "unicorn", w: 5 })).toEqual({
+      width: 5,
+      height: 3,
+    });
+  });
+
+  it("validate a kind and say what w and h do", () => {
+    const found = validateHall(
+      hall(
+        { type: "board", kind: "theFall", x: 3, y: 3, w: 4 },
+        { type: "board", kind: "eden", x: 9, y: 3 },
+        { type: "board", w: 4, h: 2, x: 12, y: 9 },
+        // Not a diagram it knows: a plain board, which takes w.
+        { type: "board", kind: "eden", w: 3, x: 3, y: 12 },
+        { type: "board", kind: "null", x: 9, y: 12 },
+      ),
+      { art: defaultHallArt },
+    ).map((d) => [d.severity, d.message]);
+    expect(found).toEqual([
+      [
+        "warning",
+        "board: w is ignored for a board with a diagram; scale sizes it",
+      ],
+      [
+        "error",
+        'board: kind="eden" is not one of flamingSword, minutumMundum, gardenOfEden, theFall',
+      ],
+      [
+        "error",
+        'board: kind="eden" is not one of flamingSword, minutumMundum, gardenOfEden, theFall',
+      ],
+      [
+        "error",
+        'board: kind="null" is not one of flamingSword, minutumMundum, gardenOfEden, theFall',
+      ],
+    ]);
+    // The unknown kind's board is drawn at its w.
+    const { objects } = resolveHall(
+      hall({ type: "board", kind: "eden", w: 3, x: 3, y: 12 }),
+      { art: defaultHallArt },
+    );
+    expect(objects[0].width).toBeCloseTo(3, 6);
   });
 });
 

@@ -359,6 +359,17 @@ describe("GdHall with hostile art", () => {
     expect(markup.length).toBeLessThan(500_000);
   });
 
+  it("draws each board's diagram once, whatever w and h say", () => {
+    const markup = many(3990, (i) => ({
+      type: "board",
+      kind: i % 2 ? "flamingSword" : "gardenOfEden",
+      w: 1 + i / 1000,
+      h: 2 + i / 1000,
+    }));
+    expect(drawings(markup)).toBe(2);
+    expect(markup.length).toBeLessThan(500_000);
+  });
+
   it("draws one drawing for values it draws alike", () => {
     const markup = many(3990, (i) =>
       i % 2

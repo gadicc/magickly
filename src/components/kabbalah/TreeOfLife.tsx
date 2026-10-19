@@ -2,62 +2,17 @@ import Data from "magick-data";
 import React from "react";
 import { svgCoordinate } from "../svgCoordinate";
 import { FIELD_PATH_LIST_SEPARATOR, readFieldPath } from "./fieldPath";
+import {
+  LineOutline,
+  ORDERED_PATHS as orderedPaths,
+  point,
+  SEPHIRAH_CENTRES,
+  sephirahWedges,
+  TREE_GEOMETRY,
+} from "./treeOfLifeFigure";
 
 const _sephirot = Object.values(Data.sephirah);
 const _paths = Data.treeOfLifePath;
-
-// Draw order, which paths are "on top" of which, for clarity
-// prettier-ignore
-const orderedPaths = {
-  hebrew: [
-    "4_5",
-    "2_3",
-    "7_8", // alef, shin, mem
-    "1_2",
-    "1_3",
-    "1_6", // he, vav, dalet
-    "2_5",
-    "3_4", // zayin, qof <-- paths specific to hebrew tree
-    "2_4",
-    "2_6",
-    "3_5",
-    "3_6",
-    "4_6",
-    "4_7",
-    "5_6",
-    "5_8",
-    "6_7",
-    "6_8",
-    "6_9",
-    "7_9",
-    "8_9",
-    "9_10",
-  ],
-  hermetic: [
-    "4_5",
-    "2_3",
-    "7_8",
-    "1_2",
-    "1_3",
-    "1_6",
-    "2_4",
-    "2_6",
-    "3_5",
-    "3_6",
-    "4_6",
-    "4_7",
-    "5_6",
-    "5_8",
-    "6_7",
-    "6_8",
-    "6_9",
-    "7_9",
-    "8_9",
-    "9_10",
-    "7_10",
-    "8_10", // paths specific to hermetic tree
-  ],
-};
 
 /** A label's line height, as a multiple of its font size. */
 const LINE_PITCH = 1.2;
@@ -88,27 +43,6 @@ export function labelLines(text: string): string[] {
       .filter((item) => item !== "");
   const words = text.split(" ").filter((word) => word !== "");
   return words.length > 1 ? [words[0], words.slice(1).join(" ")] : words;
-}
-
-/** `x,y` for SVG path data, rounded so every engine writes the same digits. */
-function point(x: number, y: number) {
-  return `${svgCoordinate(x)},${svgCoordinate(y)}`;
-}
-
-function LineOutline({ x1, y1, x2, y2, offset = 5, ...args }) {
-  const theta = Math.PI / 2 - Math.atan((x2 - x1) / (y2 - y1));
-  const xd = Math.sin(theta) * offset;
-  const yd = Math.cos(theta) * offset;
-
-  return (
-    <path
-      {...args}
-      d={
-        `M ${point(x1 - xd, y1 + yd)} L ${point(x1 + xd, y1 - yd)} ` +
-        `L ${point(x2 + xd, y2 - yd)} L ${point(x2 - xd, y2 + yd)} z`
-      }
-    />
-  );
 }
 
 /** A link, or a plain group when `href` is empty (GradeTree's paths). */
@@ -209,103 +143,89 @@ function TreeOfLife({
 
   if (!fontSize) fontSize = fontSizeFromFieldName[field] || 10;
 
-  const constructRadius = 128.5;
-  const intersectionOffset = (constructRadius / 2) * Math.sqrt(3);
-  const strokePadding = 2;
+  const { constructRadius, sephirahRadius, canvasWidth, canvasHeight } =
+    TREE_GEOMETRY;
   const showConstructionCircles = false;
-
-  const sephirahRadius = 40;
-  const canvasWidth = 2 * (constructRadius + sephirahRadius + strokePadding);
-  const canvasHeight =
-    4 * constructRadius + 2 * (sephirahRadius + strokePadding);
-
-  // prettier-ignore
-  const pillar = [
-    { name: "severity", x: -intersectionOffset },
-    { name: "equilibrium", x: 0 },
-    { name: "mercy", x: intersectionOffset },
-  ];
-
-  const rowStart = sephirahRadius + strokePadding;
-  const rowGap = constructRadius / 2;
+  const pillar = TREE_GEOMETRY.pillars.map((x) => ({ x }));
+  const rowStart = TREE_GEOMETRY.rowStart;
 
   // prettier-ignore
   const sephirot = [
     {
-      x: pillar[1].x,
-      y: rowStart + rowGap * 0,
+      x: SEPHIRAH_CENTRES[0].x,
+      y: SEPHIRAH_CENTRES[0].y,
       data: _sephirot[0],
       color: _sephirot[0].color[color],
       text: labels[0],
       textColor: _sephirot[0].color[color + "Text"],
     },
     {
-      x: pillar[2].x,
-      y: rowStart + rowGap * 1,
+      x: SEPHIRAH_CENTRES[1].x,
+      y: SEPHIRAH_CENTRES[1].y,
       data: _sephirot[1],
       color: _sephirot[1].color[color],
       text: labels[1],
       textColor: _sephirot[1].color[color + "Text"],
     },
     {
-      x: pillar[0].x,
-      y: rowStart + rowGap * 1,
+      x: SEPHIRAH_CENTRES[2].x,
+      y: SEPHIRAH_CENTRES[2].y,
       data: _sephirot[2],
       color: _sephirot[2].color[color],
       text: labels[2],
       textColor: _sephirot[2].color[color + "Text"],
     },
     {
-      x: pillar[2].x,
-      y: rowStart + rowGap * 3,
+      x: SEPHIRAH_CENTRES[3].x,
+      y: SEPHIRAH_CENTRES[3].y,
       data: _sephirot[3],
       color: _sephirot[3].color[color],
       text: labels[3],
       textColor: _sephirot[3].color[color + "Text"],
     },
     {
-      x: pillar[0].x,
-      y: rowStart + rowGap * 3,
+      x: SEPHIRAH_CENTRES[4].x,
+      y: SEPHIRAH_CENTRES[4].y,
       data: _sephirot[4],
       color: _sephirot[4].color[color],
       text: labels[4],
       textColor: _sephirot[4].color[color + "Text"],
     },
     {
-      x: pillar[1].x,
-      y: rowStart + rowGap * 4,
+      x: SEPHIRAH_CENTRES[5].x,
+      y: SEPHIRAH_CENTRES[5].y,
       data: _sephirot[5],
       color: _sephirot[5].color[color],
       text: labels[5],
       textColor: _sephirot[5].color[color + "Text"],
     },
     {
-      x: pillar[2].x,
-      y: rowStart + rowGap * 5,
+      x: SEPHIRAH_CENTRES[6].x,
+      y: SEPHIRAH_CENTRES[6].y,
       data: _sephirot[6],
       color: _sephirot[6].color[color],
       text: labels[6],
       textColor: _sephirot[6].color[color + "Text"],
     },
     {
-      x: pillar[0].x,
-      y: rowStart + rowGap * 5,
+      x: SEPHIRAH_CENTRES[7].x,
+      y: SEPHIRAH_CENTRES[7].y,
       data: _sephirot[7],
       color: _sephirot[7].color[color],
       text: labels[7],
       textColor: _sephirot[7].color[color + "Text"],
     },
     {
-      x: pillar[1].x,
-      y: rowStart + rowGap * 6,
+      x: SEPHIRAH_CENTRES[8].x,
+      y: SEPHIRAH_CENTRES[8].y,
       data: _sephirot[8],
       color: _sephirot[8].color[color],
       text: labels[8],
       textColor: _sephirot[8].color[color + "Text"],
     },
     {
-      x: pillar[1].x,
-      y: rowStart + rowGap * 8,
+      x: SEPHIRAH_CENTRES[9].x,
+      y: SEPHIRAH_CENTRES[9].y,
       data: _sephirot[9],
       color: _sephirot[9].color[color],
       text: labels[9],
@@ -315,8 +235,8 @@ function TreeOfLife({
 
   if (showDaat)
     sephirot.push({
-      x: pillar[1].x,
-      y: rowStart + rowGap * 2,
+      x: SEPHIRAH_CENTRES[10].x,
+      y: SEPHIRAH_CENTRES[10].y,
       data: _sephirot[10],
       color: _sephirot[10].color[color],
       text: labels[10],
@@ -451,7 +371,7 @@ function TreeOfLife({
                 x2={end.x}
                 y2={end.y}
                 offset={8.5}
-                style={style}
+                style={style ?? undefined}
               />
               {/*
                   Note: Originally it was quite nice to have each letter inside the path.
@@ -541,41 +461,20 @@ function TreeOfLife({
             ></circle>
             {(function () {
               const colors = s.color.split(",");
-              if (colors.length > 1) {
-                const out = new Array(colors.length);
-                const r = sephirahRadius;
-                const rads = Math.PI / 180;
-                // Adapted from https://codepen.io/hari_shanx/pen/NRyPBz
-                const from = { angle: 0, x: 0, y: 0 },
-                  to = { angle: 0, x: 0, y: 0 };
-                for (let i = 0; i < colors.length; i++) {
-                  // 180 - 45; hard coded malkuth angles till we need something else
-                  from.angle = (i * 360) / colors.length + 180 - 45;
-                  to.angle = ((i + 1) * 360) / colors.length + 180 - 45;
-                  from.x = s.x + r * Math.cos(from.angle * rads);
-                  from.y = s.y + r * Math.sin(from.angle * rads);
-                  to.x = s.x + r * Math.cos(to.angle * rads);
-                  to.y = s.y + r * Math.sin(to.angle * rads);
-                  out.push(
-                    <path
-                      key={i}
-                      style={{
-                        fill: colors[i],
-                        stroke: "#000000",
-                        strokeWidth: 1.568,
-                      }}
-                      opacity={sephirahOpacity(s)}
-                      d={
-                        `M ${point(s.x, s.y)} L ${point(from.x, from.y)} ` +
-                        `A ${r},${r} 0 0,1 ${point(to.x, to.y)} z`
-                      }
-                    />,
-                  );
-                }
-                return out;
-              } else {
-                return null;
-              }
+              if (colors.length < 2) return null;
+              return sephirahWedges(s.x, s.y, colors).map((wedge, i) => (
+                <path
+                  // biome-ignore lint/suspicious/noArrayIndexKey: quarters keep their order
+                  key={i}
+                  style={{
+                    fill: wedge.fill,
+                    stroke: "#000000",
+                    strokeWidth: 1.568,
+                  }}
+                  opacity={sephirahOpacity(s)}
+                  d={wedge.d}
+                />
+              ));
             })()}
             {field === "gdGrade.id" ? (
               <g>

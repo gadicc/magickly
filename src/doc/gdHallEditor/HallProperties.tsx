@@ -7,6 +7,7 @@ import type {
   HallNode,
 } from "@magick-components/gd/hall/types";
 import {
+  BOARD_KINDS,
   HALL_ROLES,
   PLACEABLE_ATTRIBUTES,
 } from "@magick-components/gd/hall/vocabulary";
@@ -39,6 +40,23 @@ const ONE_KIND: ReadonlyMap<string, string> = new Map([
   ["form", "cross"],
   ["dir", "triangle"],
 ]);
+
+/**
+ * Whether the panel offers a field for a node: an item's one-kind
+ * attributes for that kind, a board's `w` and `h` unless it shows a
+ * diagram (which keeps the diagram's proportions and ignores them), and
+ * any attribute the node already has, so it can be emptied.
+ */
+export function hallFieldShown(node: HallElement, name: string): boolean {
+  if (Object.hasOwn(node.attrs, name)) return true;
+  if (node.tag === "item") {
+    const kind = ONE_KIND.get(name);
+    return kind === undefined || node.attrs.kind === kind;
+  }
+  if (node.tag === "board" && (name === "w" || name === "h"))
+    return !(BOARD_KINDS as readonly unknown[]).includes(node.attrs.kind);
+  return true;
+}
 
 /** Booleans whose absence means true. */
 const TRUE_BY_DEFAULT = new Set(["compass"]);
@@ -360,15 +378,9 @@ export function HallProperties({
   const headingId = useId();
   const node = selected?.node ?? view.hall;
   const spec = hallNodeSpec(node, art);
-  const fields = hallFieldOrder(spec).filter(([name]) => {
-    const kind = ONE_KIND.get(name);
-    return (
-      node.tag !== "item" ||
-      kind === undefined ||
-      node.attrs.kind === kind ||
-      Object.hasOwn(node.attrs, name)
-    );
-  });
+  const fields = hallFieldOrder(spec).filter(([name]) =>
+    hallFieldShown(node, name),
+  );
   const unknown = Object.keys(node.attrs).filter((name) => !spec.has(name));
   const object = selected?.object;
   const placeholder = (name: string): string | undefined => {
