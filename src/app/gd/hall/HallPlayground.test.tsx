@@ -167,8 +167,12 @@ describe("the /gd/hall page", () => {
     expect(markup.match(/<style>/g)).toHaveLength(1);
     expect(markup).toContain("kept as a draft in this browser only");
     expect(markup).toContain("<code>/hall</code>");
-    // The editor loads after the page: the shell draws no hall.
+    // The editor loads after the page: the shell draws no hall, and says
+    // so where scripts are off.
     expect(markup).not.toContain('role="img"');
+    expect(markup).toContain(
+      "<noscript><p>The hall editor needs JavaScript, which is off in this browser.</p></noscript>",
+    );
   });
 
   it("starts from a copy of the Neophyte hall, in split view", () => {

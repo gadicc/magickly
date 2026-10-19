@@ -31,6 +31,9 @@ export default function HallPage() {
           hall) and edit it in place. See the{" "}
           <Link href="/help/ritual-pug">Ritual Pug guide</Link>.
         </Typography>
+        <noscript>
+          <p>The hall editor needs JavaScript, which is off in this browser.</p>
+        </noscript>
         <HallPlaygroundLoader />
         <OpenSource
           files={[
