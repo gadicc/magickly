@@ -22,8 +22,10 @@ ritual editor (Stage D notes). Stage E is done on `gate/gd-hall-e` (19
 October 2026): `/gd/hall` is a hall editor with source, visual and split
 views, presets, undo, a draft in the browser, share links and export,
 and the visual editor reorders rows, stands objects on hosts and badges
-a hall's warnings, as Gadi decided that day (Stage E notes); stage F is
-next.
+a hall's warnings, as Gadi decided that day (Stage E notes), with the
+fixes from its review: tabs no longer write over each other's drafts,
+heavy halls are capped and typing is read at a rest (Stage E review
+fixes); stage F is next.
 
 Composable Golden Dawn temple-hall diagrams, authored in the ritual Pug
 dialect, drawn as inline SVG in the reader and editor, edited visually, and
@@ -2038,7 +2040,9 @@ settled where the brief left a choice or proved wrong.
   put on a scale-2 altar takes `scale=0.175`. The panel's **Stands on**
   select (Floor and each host that takes the object, named by kind,
   with its position where two share a name) does the same from the
-  keyboard or a touch screen (plan 050). One change, one undo step.
+  keyboard or a touch screen (plan 050); since the review fixes it
+  also offers the host an object stands on, even one that does not
+  take it. One change, one undo step.
   The resolver now reports each host's `childFrame` (d0121ec), so the
   conversion needs no second layout. The rules live in `hallHosts.ts`.
 - **A warnings badge outside edit mode, in the editor only.** Beside
@@ -2077,13 +2081,14 @@ settled where the brief left a choice or proved wrong.
   moved to `HallPlayground.test.tsx`.
 - **Views and sync.** Source, visual and split, as in the ritual editor
   (split side by side from 900 px, stacked below). The source is the
-  page's state: a visual gesture reprints it with IDs; typed source is
-  parsed on each change and drawn at once. While the source does not
-  parse, the drawing shows the last hall read-only ("The source has an
-  error: correct it to edit the drawing again."), Copy Pug source and
-  the share link are disabled, and Visual is offered only once there
-  is a hall to show. Nodes typed without IDs get fresh ones at each
-  parse until a visual gesture prints them.
+  page's state: a visual gesture reprints it with IDs; typed source
+  shows at once and is read and drawn once typing rests 0.2 s (Review
+  fixes). While the source does not parse, the drawing shows the last
+  hall read-only ("The source has an error: correct it to edit the
+  drawing again."), Copy Pug source and the share link are disabled, and
+  Visual is offered only once there is a hall to show. Nodes typed
+  without IDs get fresh ones at each parse until a visual gesture prints
+  them.
 - **History.** One step per visual gesture, per loaded hall (a preset,
   a share link, Start over) and per source edit once typing pauses for
   0.7 s; undo during unsettled typing takes the whole edit back. At
@@ -2099,13 +2104,15 @@ settled where the brief left a choice or proved wrong.
   shown below the editor: once edited, the hall is the author's own and
   the old drawing no longer describes it (the choice the brief left).
 - **Draft.** The source is written to `magickli:gd-hall-draft:v1` as
-  `{"v":1,"source":…}` 0.4 s after it rests and on `pagehide`; at most
-  1,000,000 characters. On return a draft that is no unchanged preset
-  is restored with "Draft restored · Start over" (Start over loads the
-  Neophyte); a corrupt, other-version or oversized draft is said and
-  the Neophyte loads; blocked storage, or a full one, is survived and
-  said ("This browser is not keeping a draft…"). A draft whose source
-  does not parse opens in the source view with its error.
+  `{"v":1,"source":…}` 0.4 s after it rests and on `pagehide`, by a tab
+  that changed it, and another tab's newer draft is offered (Review
+  fixes); at most 96,000 characters and 1,000 nodes (1,000,000
+  characters before the review fixes). On return a draft that is no
+  unchanged preset is restored with "Draft restored · Start over" (Start
+  over loads the Neophyte); a corrupt, other-version or oversized draft
+  is said and the Neophyte loads; blocked storage, or a full one, is
+  survived and said ("This browser is not keeping a draft…"). A draft
+  whose source does not parse opens in the source view with its error.
 - **Share link.** "Copy share link" copies
   `/gd/hall#hall=1.<data>`: the hall's Pug without IDs, deflated
   (`CompressionStream("deflate-raw")`) and base64url-encoded, in the
@@ -2113,8 +2120,9 @@ settled where the brief left a choice or proved wrong.
   uncompressed where a browser has no compression streams. The
   fragment may be at most 8,000 characters (a link the hall is too
   large for is refused with its length and the limit, pointing to Copy
-  Pug source), and a link may unpack to at most 256 KB, so a deflate
-  bomb is refused while it is read. Opening one parses it as hall
+  Pug source), and a link may unpack to at most 64 KB (256 KB before
+  the review fixes) and hold at most 1,000 nodes, so a deflate bomb is
+  refused while it is read. Opening one parses it as hall
   source and nothing else: a damaged, oversized or non-hall link says
   why ("This share link could not be opened: …") and leaves the draft.
   The fragment is removed from the address bar once read, so a reload
@@ -2143,12 +2151,12 @@ Production builds (webpack), from each commit's gate:
   validator among them (the package's index exports it). An editor
   that has drawn a hall therefore fetches 327 bytes more. The reader's
   and the editor's client reference manifests do not list it.
-- **`/gd/hall`** (27683ff's code, built as 160c714, against 8663fef):
-  the page's own chunk went from 25,570 bytes (the gallery drew a hall
-  on the page) to 4,380 (1,688 gzipped); the chunks its client
-  reference manifest lists, the site's layout included, from 1,160,135
-  bytes to 733,045 (244,573 gzipped). The editor loads after it,
-  client-side only: 30 files, 1,509,131 bytes (491,656 gzipped), of
+- **`/gd/hall`** (27683ff's code as built before its final rebase,
+  against 8663fef): the page's own chunk went from 25,570 bytes (the
+  gallery drew a hall on the page) to 4,380 (1,688 gzipped); the chunks
+  its client reference manifest lists, the site's layout included, from
+  1,160,135 bytes to 733,045 (244,573 gzipped). The editor loads after
+  it, client-side only: 30 files, 1,509,131 bytes (491,656 gzipped), of
   which 1,375,459 (444,919) are not already in the shell: CodeMirror,
   the Pug parser and printer, the visual editor and MUI components it
   uses, and the hall code and art (the 266,532-byte hall chunk is the
@@ -2239,6 +2247,164 @@ Production builds (webpack), from each commit's gate:
   to a screen they show is the badge, which a hall without warnings
   does not show.
 
+### Review fixes
+
+Two reviews of 837ecc9..54ee002 found no blocker: an independent Opus
+review (M1, m1–m3, n1–n3) and the final Fable review (F1–F4, Fnit1; F1
+is m1 in more detail). Fixed on `gate/gd-hall-e` on 19 October 2026,
+in six commits after 54ee002 (Commits):
+
+- **A tab writes only what it changed (M1).** An idle tab wrote its
+  old hall over a newer draft from another tab as it closed: it wrote
+  whatever differed from a held shared hall, on `pagehide` and 0.4 s
+  after loading. Each tab now remembers the draft as it last read or
+  wrote it and writes only a hall it changed since. It listens for
+  other tabs' drafts (`storage` events): with no changes of its own it
+  offers "A newer draft from another tab" with **Load it**; with
+  changes of its own as well it writes nothing, on resting or leaving,
+  and says "Another tab kept a newer draft while this one has changes
+  of its own. Neither is written over until you choose: load it (Undo
+  brings yours back), or keep yours.", with **Load it** and **Keep
+  mine**. Loading is one step, so Undo brings the tab's own hall back.
+  A tab closed with the choice unmade keeps the other tab's draft; a
+  tab that starts from a preset no longer writes the untouched copy.
+- **Heavy halls (m1, F1).** The review's 934-character link held 8,400
+  markers (260,415 bytes of Pug). Before, in the Turbopack dev server
+  and headless Chromium, opening it took 8.2 s with one 7.7 s long task,
+  and a keystroke that added a marker cost a 589 ms CodeMirror dispatch
+  and then long tasks of 1.9 s and 8.1 s (parsing it took 1.4 s in
+  Node); the draft then kept it across reloads. Now typed source shows
+  at once and is read as a hall once typing rests 0.2 s, as the ritual
+  editor applies its source (the reducer's `typed` takes the entry
+  read). Undo, Redo, a loaded hall and Copy Pug source read unread
+  typing first; a gesture made on the drawing before unread typing is
+  refused ("That change was not made; the hall is as it was.") rather
+  than written over it; no share link is offered while typing is unread;
+  and the draft keeps typing once it is read, or as the page goes
+  (`pagehide` reads it first), so it is parsed once. A hall kept as a
+  draft or shared holds at most 1,000 nodes (`hallLimits.ts`), a link
+  unpacks to at most 64 KB (was 256 KB) and a draft holds at most 96,000
+  characters (was 1,000,000), all well below the resolver's 4,000 nodes:
+  a link beyond them is refused as it opens ("it unpacks to more than 64
+  KB, more than a shared hall may hold"; "its hall holds more than 1,000
+  nodes, more than a shared hall may"), none is made ("This hall is too
+  large for a share link (1,002 nodes; the most is 1,000)…", or "…KB of
+  Pug; the most is 64 KB"), and a draft beyond them is neither written
+  ("…a draft holds at most 1,000 nodes and 96,000 characters.") nor
+  restored. After (the final code, the same way): the review's link is
+  refused in 0.6 s, at 1280 px and at 390 px, with no long task over 135
+  ms, and a keystroke in the Neophyte costs a 7 ms dispatch. The largest
+  hall allowed (998 markers, 1,000 nodes, a 193-character link, 30,953
+  bytes) opens in 1.2 s with one 735 ms long task, and a keystroke in it
+  costs a 69 ms dispatch and long tasks of at most 246 ms (parsing it
+  takes 118 ms in Node). A hall typed or pasted into the source is not
+  capped: it is only not kept or shared, and each rest still reads it
+  whole.
+- **The palette and Stands on agree (m2).** The palette put items,
+  tarot keys and markers into any selected host, while a drag and
+  Stands on follow the hosts' table: a tarot key added with a platform
+  selected landed on it, and its Stands on (Floor, Altar) showed a
+  blank, out-of-range select. The table moved to `hallHostRules.ts`,
+  which all three share; the palette's `goesOnHost` is `hostAccepts`,
+  so a banner goes onto a selected throne and a tarot key beside a
+  platform. Labels stay the documented exception: a new label with a
+  host selected labels it. Stands on always offers the host an object
+  stands on, even one that does not take it (source may stand an
+  officer on an altar), so the select shows where it stands.
+- **The draft under a shared hall (m3, F2, Fnit1).** The hold on a
+  shared hall was dropped at the first write, so Undo (back to the
+  draft) then Redo wrote the shared hall as the draft; it now lasts
+  while the hall shown is the shared one, until the author's change is
+  written. The note on opening a link said whether a draft existed as
+  the page loaded, so a link pasted into an open page claimed "Once
+  you change it, it is kept as a draft" over the author's own; the
+  page now keeps what this tab changed first and says what the browser
+  holds ("Your own draft stays in this browser until you change this
+  hall; Undo goes back to the hall you had."). With a share link an
+  unreadable draft went unsaid; the note now says "The draft kept in
+  this browser could not be read; once you change this hall, it is
+  kept as the draft in its place." Notes stack, so a link that fails
+  leaves the unreadable-draft note shown, their buttons go below the
+  text on a phone, and a parser's message about a link is cut to 120
+  characters.
+- **An editor that cannot load (F3).** An error boundary around the
+  lazily loaded editor says "The hall editor could not load, or
+  stopped working." with **Reload**, instead of Next's client error
+  screen, and the server shell has a `<noscript>` line ("The hall
+  editor needs JavaScript, which is off in this browser."). An
+  app-wide `error.tsx` is a follow-up.
+- **Nits.** A pasted ritual header gets "Line 1: leave out the
+  `//- magickli-ritual-pug 1` header line; paste only the hall" (n1;
+  `parseHallSource`, so the ritual editor's hall paste is unchanged).
+  "Correct the source to share the hall." is shown but no longer in
+  the live region, so it is not announced at every keystroke that
+  leaves the source wrong for a moment (n3). Re-choosing the preset
+  shown (n2) does not happen: MUI's Select calls `onChange` only for a
+  new value (`SelectInput`'s `handleItemClick`), so it changes
+  nothing; a test holds that, and no code changed.
+- **This plan (F4).** The bundle note cited the tip of a superseded
+  backup branch, not an ancestor of this branch; it now says 27683ff's
+  code as built before its final rebase. With that fixed, no commit
+  named in `plans/` lay only on this stage's own backup branches
+  (`backup/gd-hall-e-base-348904c`, `backup/gd-hall-e-part1-v1` and
+  `backup/gd-hall-e-tip-v2`), so they were deleted.
+
+Verified:
+
+- **Gates**, per commit, in this worktree with Node 24 (`pnpm check`,
+  `typecheck`, `test:coverage`, `build`), all exit 0 for the six
+  commits; the last also `loom check`, `loom check --production` with
+  the CI placeholder environment, the magick-data smoke test and
+  `pnpm check:turbopack`, all 0. The first run failed `test:coverage`
+  from the heavy-halls commit on: under the full suite's load the
+  draft's timer parsed typing not yet read (a second parse, also paid
+  in use) and page tests hit the 5 s timeout. The draft keeps typing
+  only once read, the page's slow test groups allow 20 s, and the six
+  commits were rebuilt and gated again. The compiler is untouched:
+  `semantic.ts`, `semanticCompile.ts`, `semanticCompilerImpl.ts` and
+  `ritualNodeIds.ts` have no diff since 54ee002.
+- **Bundle**: the page's own chunk grew from 4,380 to 10,009 bytes
+  (1,688 to 3,747 gzipped) with the boundary's Alert and Button; the
+  chunks its client reference manifest lists, from 733,045 to 738,529
+  bytes.
+- **Tests that fail without their fix**, each run against the code
+  before it: m2, the two `goesOnHost` tests, the tarot key beside a
+  platform and both Stands on tests; n1, the header test; m1/F1, the
+  heavy link refused in `hallShare.test.ts`, a typing burst read once,
+  unread typing before Undo, a gesture and a copy, the draft and share
+  node limits and the draft limit message; M1, the two-tab tests (two
+  pages on one storage, each write reaching the other as a `storage`
+  event: the idle tab wrote "Seven" back over "Six"), the conflict
+  and its Load it; F2, the shared hall through Undo and Redo (the
+  shared hall was written); m3, the pasted link; Fnit1, the unreadable
+  draft with a link and the clipped message; F3, the boundary with a
+  loader that throws; n3, the status test. The page tests now wait for
+  the draft in short `act()` spans: React renders what a span's timers
+  changed only as the span ends, so the old 600 ms waits could not see
+  a write made after the hall changed; those waits use the spans now.
+- **In the browser** (Turbopack dev server from this branch on
+  127.0.0.1:3247, headless Chromium over CDP with background throttling
+  off; synthetic halls only): two tabs, the first changing the caption
+  to "Seven" and then "Six" while the second sat on "Seven", which said
+  "A newer draft from another tab"; both gone, the draft was "Six", and
+  a reload showed it. Two tabs both changed: the second said so and
+  wrote nothing until Keep mine, after which the first offered the newer
+  draft and Load it took it. A draft of the author's own, then a Zelator
+  1 link: the note said the draft stays; Undo, Redo and leaving the page
+  kept the draft, and the reload restored it. The same link pasted into
+  the open page with a draft, and into a fresh one without, gave the two
+  notes; a corrupt draft with the link gave the unreadable-draft note; a
+  link with the ritual header said to leave it out. The review's link
+  before and after, as measured above. These checks ran again on the
+  final code. With the editor's chunks blocked
+  (`Network.setBlockedURLs`) the page showed the boundary's message
+  (Next logged the `ChunkLoadError` as handled by the boundary), and
+  Reload brought the editor back. A thousand markers pasted into the
+  source gave both too-large messages in 1.1 s. A quick pass: a preset
+  chosen, a keyboard nudge, a caption typed (drawn after the rest), Undo
+  and Redo, an SVG export, and no horizontal scroll at 390 px in split,
+  visual and source views. Screenshots are outside the repository.
+
 ## Commits
 
 | Commit | Change |
@@ -2324,6 +2490,12 @@ Production builds (webpack), from each commit's gate:
 | b3b4d22 | `GdHallEditor` without Done, history buttons or the ritual's locked note, for a host that is always editing (E) |
 | 8663fef | `printHallSource` and `parseHallSource` for a hall's own source; headerless hall warnings; a layout preference per editor (E) |
 | 27683ff | `/gd/hall` as a hall editor: views, presets, history, draft, share link, export; the gallery removed (E) |
+| add477f | The palette puts on a host only what it takes (`hallHostRules.ts`); Stands on offers the current host (E review m2) |
+| 8560526 | A pasted ritual header: "leave out the … header line" (E review n1) |
+| aee6374 | Typed source read once typing rests; kept and shared halls at most 1,000 nodes, links 64 KB, drafts 96,000 characters (E review m1, F1) |
+| 0e129f3 | A tab writes only what it changed and offers another tab's newer draft; the shared hall held through Undo and Redo; notes from what the browser holds, stacked, clipped (E review M1, F2, m3, Fnit1) |
+| b0324d6 | An error boundary and `<noscript>` line for the lazily loaded editor (E review F3) |
+| 398b7c9 | "Correct the source to share the hall." not announced (E review n3; n2 held by a test) |
 
 ## Future
 
@@ -2437,3 +2609,14 @@ in the page's source without IDs get new ones at every parse, so such a
 node selected in the drawing loses its selection as typing goes on; the
 documentation screenshots were not recaptured (no publication storage
 locally) though no screen they show changed unless a hall has warnings.
+
+From the stage E review fixes: an app-wide `error.tsx` (and
+`global-error.tsx`), since only `/gd/hall`'s editor has a boundary and
+any other client error shows Next's default screen; the two-tab draft
+handling (`storage` events), the boundary and the notes checked in
+headless Chromium only, with background throttling off and CDP's
+viewport for the phone (no Firefox, Safari or real device); a hall
+typed or pasted beyond the limits is still read whole at each rest
+(seconds for thousands of nodes), which a worker or an incremental
+parse would cure; a tab closed while the choice between two tabs'
+drafts is unmade keeps the other tab's.

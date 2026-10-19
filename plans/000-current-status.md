@@ -339,7 +339,12 @@ Follow-ups are separate from the completed migration work:
   the browser, share links in the URL fragment, export), and the visual
   editor reorders dais and banner rows, stands objects on altars,
   platforms and thrones, and badges a hall's warnings outside edit mode,
-  as Gadi decided that day. Stage F is next.
+  as Gadi decided that day, with its review fixes: an idle tab no longer
+  writes an old draft over another tab's newer one (a newer draft is
+  offered, and both tabs' changes are kept until the author chooses),
+  links and drafts are capped (1,000 nodes, 64 KB) and typed source is
+  read at a rest, so a small link can no longer freeze the page, and
+  the editor says when its code cannot load. Stage F is next.
   TODO from it: recording officer movement between stations, a `gdVault` for
   the Adeptus Minor Vault, original Enochian letterforms, moving
   `enochianFont.ts` and the other files the import-boundary test allows out
@@ -356,7 +361,10 @@ Follow-ups are separate from the completed migration work:
   `//-` comments inside the built-in docs' halls (stage I) against their
   parity test, the stage E follow-ups (free labels on hosts, a drawing of
   `/gd/hall` for search engines, share links' format 0 and the hall
-  editor's new gestures outside Chromium), Firefox, Safari and real-device
+  editor's new gestures outside Chromium; an app-wide `error.tsx`; the
+  two-tab draft handling and the editor's error boundary outside
+  headless Chromium; halls typed beyond the limits still read whole at
+  each rest), Firefox, Safari and real-device
   checks of the hall editor's pointer and touch handling, a hall field
   in the creation form saved by a Create button that does not take the
   focus (Safari), the reader and documentation screenshots unchecked
