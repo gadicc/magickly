@@ -28,6 +28,7 @@ import { type HallSelectable, type HallView, hallNodeName } from "./hallEdits";
 import { round2 } from "./hallGeometry";
 import type { HallElement } from "./hallModel";
 import { hallItemKinds, itemKindLabel } from "./hallPalette";
+import { reorderable, rowHasPositions, rowPlace } from "./hallRows";
 
 /**
  * Item attributes that only one kind draws: shown for that kind, or when
@@ -325,6 +326,10 @@ export interface HallPropertiesProps {
   onScaleStep: (entry: HallSelectable, up: boolean) => void;
   onDuplicate: (entry: HallSelectable) => void;
   onDelete: (entry: HallSelectable) => void;
+  /** Moves a row child one place earlier (-1) or later (1) in its row. */
+  onStepInRow: (entry: HallSelectable, step: -1 | 1) => void;
+  /** Takes every position along the row away ("Spread evenly again"). */
+  onSpreadRow: (entry: HallSelectable) => void;
 }
 
 /**
@@ -345,6 +350,8 @@ export function HallProperties({
   onScaleStep,
   onDuplicate,
   onDelete,
+  onStepInRow,
+  onSpreadRow,
 }: HallPropertiesProps) {
   const headingId = useId();
   const node = selected?.node ?? view.hall;
@@ -373,6 +380,9 @@ export function HallProperties({
   );
   const commit = (name: string, value: JsonValue | undefined) =>
     onSetAttr(node.id, name, value);
+  const row = selected ? rowPlace(view, selected.id) : undefined;
+  const inSpread = !!selected && reorderable(view, selected.id);
+  const order = row?.spread.findIndex((entry) => entry.id === selected?.id);
   return (
     <section className={styles.panel} aria-labelledby={headingId}>
       <h3 id={headingId} className={styles.panelHeading}>
@@ -445,6 +455,44 @@ export function HallProperties({
           </div>
         );
       })}
+      {selected && row && (inSpread || rowHasPositions(view, selected.id)) && (
+        <div
+          className={styles.rowActions}
+          role="group"
+          aria-label={`Place in the ${row.row.tag === "dais" ? "dais" : "banner row"}`}
+        >
+          {inSpread && order !== undefined && (
+            <>
+              <Button
+                size="small"
+                variant="outlined"
+                disabled={disabled || order <= 0}
+                onClick={() => onStepInRow(selected, -1)}
+              >
+                {row.along === "x" ? "Move left" : "Move up"}
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                disabled={disabled || order >= row.spread.length - 1}
+                onClick={() => onStepInRow(selected, 1)}
+              >
+                {row.along === "x" ? "Move right" : "Move down"}
+              </Button>
+            </>
+          )}
+          {rowHasPositions(view, selected.id) && (
+            <Button
+              size="small"
+              variant="outlined"
+              disabled={disabled}
+              onClick={() => onSpreadRow(selected)}
+            >
+              Spread evenly again
+            </Button>
+          )}
+        </div>
+      )}
       {unknown.length > 0 && (
         <p className={styles.panelNote}>
           Other attributes, edited in the source: {unknown.join(", ")}

@@ -14,6 +14,7 @@ import { gdHallArt } from "@/app/gd/hall/art";
 import { flushPendingEdits } from "../pendingEdits";
 import { GdHallEditor } from "./GdHallEditor";
 import { parseNumberField } from "./HallProperties";
+import { hallView } from "./hallEdits";
 import type { HallElement } from "./hallModel";
 import {
   byAttr,
@@ -88,7 +89,10 @@ interface Harness {
 function setup(
   initial: HallElement = neophyteHall(),
   editable = true,
-  options: { refuse?: boolean; history?: boolean } = {},
+  options: {
+    refuse?: boolean;
+    history?: boolean;
+  } = {},
 ): Harness {
   const harness = {
     changes: [] as HallElement[],
@@ -379,8 +383,7 @@ describe("focus, touch and announcements", () => {
     };
     vi.stubGlobal("matchMedia", () => query);
     setup();
-    const touch =
-      "Tap to select, drag to move, drag a corner to scale; the panel edits the rest.";
+    const touch = /^Tap to select, drag to move/;
     expect(screen.queryByText(touch)).toBeNull();
     query.matches = true;
     act(() => {
@@ -593,7 +596,11 @@ describe("the properties panel", () => {
     expect(changes).toHaveLength(1);
     const imperator = () => byAttr(current(), "role", "imperator");
     expect(imperator().attrs.x).toBe(2.35);
-    // Emptied, the attribute goes and the row places it again.
+    // The rest of the dais is frozen where it stood, in the same change.
+    expect(byAttr(current(), "role", "cancellarius").attrs.x).toBe(4.8);
+    expect(byAttr(current(), "role", "praemonstrator").attrs.x).toBe(14.4);
+    // Emptied, the attribute goes and the row places it again: alone in
+    // the spread now, at the row's middle.
     const typed = screen.getByRole("textbox", { name: /^x/ });
     fireEvent.change(typed, { target: { value: "" } });
     fireEvent.blur(typed);
@@ -601,7 +608,19 @@ describe("the properties panel", () => {
     expect(
       (screen.getByRole("textbox", { name: /^x/ }) as HTMLInputElement)
         .placeholder,
-    ).toBe("1.6");
+    ).toBe("8");
+    // Spread evenly again: every explicit x in the dais goes, one change.
+    const count = changes.length;
+    fireEvent.click(
+      screen.getByRole("button", { name: "Spread evenly again" }),
+    );
+    expect(changes).toHaveLength(count + 1);
+    expect(byAttr(current(), "role", "cancellarius").attrs).not.toHaveProperty(
+      "x",
+    );
+    expect(
+      screen.queryByRole("button", { name: "Spread evenly again" }),
+    ).toBeNull();
   });
 
   it("writes text, switches and choices", async () => {
@@ -1022,16 +1041,113 @@ describe("on a touch screen", () => {
         '    item(kind="cup", x=8, y=8)',
       ),
     );
-    expect(
-      screen.getByText(
-        "Tap to select, drag to move, drag a corner to scale; the panel edits the rest.",
-      ),
-    ).toBeTruthy();
+    expect(screen.getByText(/^Tap to select, drag to move/)).toBeTruthy();
     key(surface, "Tab");
     expect(document.querySelectorAll("[data-corner]")).toHaveLength(4);
     key(surface, "Tab");
     expect(selected()).toContain("Cup selected");
     expect(document.querySelector("[data-corner]")).toBeNull();
     expect(screen.getByRole("button", { name: "Larger" })).toBeTruthy();
+  });
+});
+
+/** Where an object is drawn, in floor squares (its centre). */
+function centre(hall: HallElement, id: string) {
+  const object = hallView(hall, gdHallArt).byId.get(id)?.object;
+  if (!object) throw new Error(`${id} is not drawn`);
+  return { x: object.cx, y: object.cy };
+}
+
+/** The roles in the dais, in order. */
+const daisOrder = (hall: HallElement) =>
+  (
+    (
+      hall.children?.find(
+        (child) => child.kind === "element" && child.tag === "dais",
+      ) as HallElement | undefined
+    )?.children ?? []
+  ).map((child) => (child as HallElement).attrs.role);
+
+describe("rows (owner's decision, 19 October 2026)", () => {
+  it("reorders a dais officer by a drag, marking where it lands", () => {
+    const { surface, changes, current } = setup();
+    const hierophant = byAttr(current(), "role", "hierophant");
+    const from = centre(current(), hierophant.id);
+    pointer("pointerDown", surface, at(from.x, from.y));
+    pointer("pointerMove", surface, at(from.x + 2, from.y + 0.3));
+    pointer("pointerMove", surface, at(from.x + 3.6, from.y + 0.3));
+    expect(document.querySelector("[data-hall-slot]")).toBeTruthy();
+    expect(changes).toHaveLength(0);
+    pointer("pointerUp", surface, at(from.x + 3.6, from.y + 0.3));
+    expect(changes).toHaveLength(1);
+    expect(document.querySelector("[data-hall-slot]")).toBeNull();
+    expect(daisOrder(current())).toEqual([
+      "imperator",
+      "cancellarius",
+      "pastHierophant",
+      "hierophant",
+      "praemonstrator",
+    ]);
+    expect(byAttr(current(), "role", "hierophant").attrs).toEqual({
+      role: "hierophant",
+    });
+    expect(
+      screen.getByText("Moved Hierophant to place 4 of 5 in its row"),
+    ).toBeTruthy();
+  });
+
+  it("places one freely with Alt, freezing the rest of the row", () => {
+    const { surface, changes, current } = setup();
+    const before = current();
+    const hierophant = byAttr(before, "role", "hierophant").id;
+    const from = centre(before, hierophant);
+    pointer("pointerDown", surface, at(from.x, from.y), { altKey: true });
+    pointer("pointerMove", surface, at(from.x + 0.7, from.y), { altKey: true });
+    expect(document.querySelector("[data-hall-slot]")).toBeNull();
+    pointer("pointerUp", surface, at(from.x + 0.7, from.y), { altKey: true });
+    expect(changes).toHaveLength(1);
+    expect(byAttr(current(), "role", "hierophant").attrs.x).toBe(8.7);
+    const imperator = byAttr(before, "role", "imperator").id;
+    expect(centre(current(), imperator)).toEqual(centre(before, imperator));
+    expect(byAttr(current(), "role", "imperator").attrs.x).toBe(1.6);
+  });
+
+  it("moves a place with Alt and an arrow, or the panel's buttons", () => {
+    const { surface, changes, current } = setup();
+    for (let tab = 0; tab < 3; tab++) key(surface, "Tab");
+    expect(selected()).toContain("Hierophant selected");
+    expect(key(surface, "ArrowLeft", { altKey: true })).toBe(false);
+    expect(daisOrder(current()).slice(0, 2)).toEqual([
+      "imperator",
+      "hierophant",
+    ]);
+    expect(changes).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: "Move left" }));
+    expect(daisOrder(current())[0]).toBe("hierophant");
+    expect(
+      (screen.getByRole("button", { name: "Move left" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "Move right" }));
+    expect(daisOrder(current()).slice(0, 2)).toEqual([
+      "imperator",
+      "hierophant",
+    ]);
+    expect(changes).toHaveLength(3);
+    expect(byAttr(current(), "role", "hierophant").attrs).toEqual({
+      role: "hierophant",
+    });
+    // Without Alt, an arrow along the row places it and freezes the rest.
+    key(surface, "ArrowRight");
+    expect(byAttr(current(), "role", "hierophant").attrs.x).toBe(5.3);
+    expect(byAttr(current(), "role", "imperator").attrs.x).toBe(1.6);
+    expect(screen.queryByRole("button", { name: "Move left" })).toBeNull();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Spread evenly again" }),
+    );
+    expect(byAttr(current(), "role", "imperator").attrs).toEqual({
+      role: "imperator",
+    });
+    expect(changes).toHaveLength(5);
   });
 });

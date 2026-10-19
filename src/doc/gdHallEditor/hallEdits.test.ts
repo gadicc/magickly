@@ -106,20 +106,47 @@ describe("gestures", () => {
     expect(moveNode(view(hall), "missing", { x: 1, y: 1 }, true)).toBe(hall);
   });
 
-  it("moves a row child out of the row's spread", () => {
+  it("reorders a spread row child, or places it with Alt", () => {
     const hall = neophyteHall();
     const hierophant = byAttr(hall, "role", "hierophant");
     const before = view(hall);
-    const next = moveNode(before, hierophant.id, { x: 0.6, y: 0 }, true);
+    // Not past a neighbour's centre: nothing changes.
+    expect(moveNode(before, hierophant.id, { x: 0.6, y: 0 }, true)).toBe(hall);
+    // Past the Past Hierophant's: it takes its place, nothing written.
+    const next = moveNode(before, hierophant.id, { x: 3.5, y: 0.4 }, true);
     expect(byAttr(next, "role", "hierophant").attrs).toEqual({
       role: "hierophant",
-      x: 8.5,
     });
-    // The other four spread again without it.
-    const after = view(next);
-    const imperator = byAttr(hall, "role", "imperator").id;
-    expect(after.byId.get(imperator)?.object?.cx).toBe(2);
-    expect(before.byId.get(imperator)?.object?.cx).toBe(1.6);
+    const dais = next.children?.find(
+      (child): child is HallElement =>
+        child.kind === "element" && child.tag === "dais",
+    );
+    expect(
+      dais?.children?.map((child) => (child as HallElement).attrs.role),
+    ).toEqual([
+      "imperator",
+      "cancellarius",
+      "pastHierophant",
+      "hierophant",
+      "praemonstrator",
+    ]);
+    expect(view(next).byId.get(hierophant.id)?.object?.cx).toBeCloseTo(11.2);
+    // With Alt it stands where it is put; the others are frozen in place.
+    const placed = moveNode(before, hierophant.id, { x: 0.6, y: 0 }, false);
+    expect(byAttr(placed, "role", "hierophant").attrs).toEqual({
+      role: "hierophant",
+      x: 8.6,
+    });
+    const after = view(placed);
+    for (const role of ["imperator", "cancellarius", "pastHierophant"]) {
+      const id = byAttr(hall, "role", role).id;
+      expect(after.byId.get(id)?.object?.cx).toBe(
+        before.byId.get(id)?.object?.cx,
+      );
+      expect(byAttr(placed, "role", role).attrs.x).toBe(
+        before.byId.get(id)?.object?.cx,
+      );
+    }
   });
 
   it("moves a door along its wall only", () => {

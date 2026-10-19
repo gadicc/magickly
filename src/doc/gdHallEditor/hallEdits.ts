@@ -1,4 +1,5 @@
 import {
+  type Rect,
   type ResolvedDoor,
   type ResolvedHall,
   type ResolvedObject,
@@ -18,6 +19,7 @@ import {
   moveAttrs,
   moveDoor,
   nudgeAttrs,
+  objectRect,
   type Point,
   round2,
   scaleValue,
@@ -35,6 +37,13 @@ import {
   updateHallAttrs,
 } from "./hallModel";
 import { itemKindLabel } from "./hallPalette";
+import {
+  patchFreezingRow,
+  reorderable,
+  reorderIndex,
+  reorderRowChild,
+  rowPlace,
+} from "./hallRows";
 
 /**
  * The visual hall editor's edits (plan 061, decision 11): one function per
@@ -153,7 +162,12 @@ export function movePatch(
   return moveAttrs(selectable.object, delta, snap);
 }
 
-/** Moves a node by `delta` floor squares (a drag). */
+/**
+ * Moves a node by `delta` floor squares (a drag). A row child the row
+ * spreads is reordered among the spread children instead (nothing
+ * written but the order), unless `snap` is off (Alt): then it takes the
+ * position, and its spread siblings theirs (`patchFreezingRow`).
+ */
 export function moveNode(
   view: HallView,
   id: string,
@@ -162,7 +176,77 @@ export function moveNode(
 ): HallElement {
   const selectable = view.byId.get(id);
   if (!selectable) return view.hall;
-  return updateHallAttrs(view.hall, id, movePatch(selectable, delta, snap));
+  const place = snap && selectable.object && rowPlace(view, id);
+  if (place && selectable.object && reorderable(view, id)) {
+    const along = place.along;
+    return reorderRowChild(
+      view,
+      id,
+      reorderIndex(view, id, selectable.object.position[along] + delta[along]),
+    );
+  }
+  return patchFreezingRow(view, id, movePatch(selectable, delta, snap));
+}
+
+/** What a reordering drag shows before it is released. */
+export interface RowDragPreview {
+  /** The hall the release writes: the row in its new order. */
+  hall: HallElement;
+  /**
+   * The hall drawn meanwhile: the dragged child under the pointer along
+   * the row, the others where the new order spreads them.
+   */
+  preview: HallElement;
+  /** Where the dragged child lands: the insertion mark. */
+  slot: Rect;
+}
+
+/**
+ * A drag of `delta` floor squares on a row child the row spreads, as it
+ * reorders it (`moveNode` with snapping); undefined for anything else.
+ */
+export function rowDragPreview(
+  view: HallView,
+  id: string,
+  delta: Point,
+  art: HallArtRegistry,
+): RowDragPreview | undefined {
+  const object = view.byId.get(id)?.object;
+  const place = rowPlace(view, id);
+  if (!object || !place || !reorderable(view, id)) return undefined;
+  const hall = moveNode(view, id, delta, true);
+  const reordered = hall === view.hall ? view : hallView(hall, art);
+  const landed = reordered.byId.get(id)?.object;
+  if (!landed) return undefined;
+  const along = place.along;
+  let preview = hall;
+  for (const entry of rowPlace(reordered, id)?.spread ?? [])
+    if (entry.object)
+      preview = updateHallAttrs(preview, entry.id, {
+        [along]:
+          entry.id === id
+            ? object.position[along] + delta[along]
+            : entry.object.position[along],
+      });
+  return { hall, preview, slot: objectRect(landed) };
+}
+
+/**
+ * Moves a spread row child one place earlier (`-1`, towards the row's
+ * North or East end) or later (`1`) among the spread children: Alt and an
+ * arrow key, or the panel's buttons.
+ */
+export function stepInRow(
+  view: HallView,
+  id: string,
+  step: -1 | 1,
+): HallElement {
+  const place = rowPlace(view, id);
+  const index = place?.spread.findIndex((entry) => entry.id === id) ?? -1;
+  if (!place || index < 0) return view.hall;
+  const to = index + step;
+  if (to < 0 || to >= place.spread.length) return view.hall;
+  return reorderRowChild(view, id, to);
 }
 
 /**
@@ -184,7 +268,7 @@ export function nudgeNode(
     });
   }
   if (!selectable.object) return view.hall;
-  return updateHallAttrs(view.hall, id, nudgeAttrs(selectable.object, step));
+  return patchFreezingRow(view, id, nudgeAttrs(selectable.object, step));
 }
 
 /** Whether a node has a `scale`: every drawn object except free text. */
@@ -263,14 +347,18 @@ export function duplicateNode(
   return duplicateHallNode(view.hall, id, createId, patch);
 }
 
-/** Sets or removes one attribute (the properties panel). */
+/**
+ * Sets or removes one attribute (the properties panel); a position along
+ * its row given to a spread row child freezes its siblings
+ * (`patchFreezingRow`).
+ */
 export function setNodeAttr(
   view: HallView,
   id: string,
   name: string,
   value: JsonValue | undefined,
 ): HallElement {
-  return updateHallAttrs(view.hall, id, { [name]: value });
+  return patchFreezingRow(view, id, { [name]: value });
 }
 
 /**

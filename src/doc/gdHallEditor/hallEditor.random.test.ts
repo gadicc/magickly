@@ -20,10 +20,12 @@ import {
   moveNode,
   nudgeNode,
   setNodeAttr,
+  stepInRow,
   stepScaleNode,
 } from "./hallEdits";
 import { type HallElement, normalizeHall } from "./hallModel";
 import { hallPalette, insertFromPalette } from "./hallPalette";
+import { reorderRowChild, rowPlace, spreadRowEvenly } from "./hallRows";
 import { sequentialIds } from "./hallTestFixtures";
 
 /**
@@ -156,6 +158,25 @@ function operations(createId: () => string): Operation[] {
         next() < 0.15 ? undefined : valueFor(spec, next),
       );
     },
+    // Rows: a place earlier or later, any place, spread again.
+    (view, next) => {
+      const entry = target(view, next);
+      return entry
+        ? stepInRow(view, entry.id, next() < 0.5 ? -1 : 1)
+        : view.hall;
+    },
+    (view, next) => {
+      const entry = target(view, next);
+      const place = entry && rowPlace(view, entry.id);
+      if (!entry || !place) return view.hall;
+      return next() < 0.7
+        ? reorderRowChild(
+            view,
+            entry.id,
+            Math.floor(next() * (place.spread.length + 1)),
+          )
+        : spreadRowEvenly(view, entry.id);
+    },
   ];
 }
 
@@ -188,6 +209,9 @@ function check(hall: HallElement, context: string) {
   walk(hall);
 }
 
+/** How often each operation changed a hall, over every preset. */
+const changedBy = new Map<number, number>();
+
 describe.each(HALL_PRESETS.map((preset) => [preset.id, preset] as const))(
   "random editor operations on the %s preset",
   (id, preset) => {
@@ -203,9 +227,20 @@ describe.each(HALL_PRESETS.map((preset) => [preset.id, preset] as const))(
         const choice = Math.floor(next() * steps.length);
         const changed = steps[choice](hallView(hall, gdHallArt), next);
         if (changed === hall) continue;
+        changedBy.set(choice, (changedBy.get(choice) ?? 0) + 1);
         hall = normalizeHall(changed, gdHallArt);
         check(hall, `${id}, step ${step}, operation ${choice}`);
       }
     });
   },
 );
+
+describe("random editor operations", () => {
+  it("each changed some hall, rows included", () => {
+    const count = operations(sequentialIds("C")).length;
+    for (let choice = 0; choice < count; choice++)
+      expect(changedBy.get(choice) ?? 0, `operation ${choice}`).toBeGreaterThan(
+        0,
+      );
+  });
+});

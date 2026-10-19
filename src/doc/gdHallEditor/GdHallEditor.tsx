@@ -43,9 +43,11 @@ import {
   hallView,
   moveNode,
   nudgeNode,
+  rowDragPreview,
   scalable,
   selectableForPath,
   setNodeAttr,
+  stepInRow,
   stepScaleNode,
 } from "./hallEdits";
 import {
@@ -70,6 +72,7 @@ import {
   hallPalette,
   insertFromPalette,
 } from "./hallPalette";
+import { reorderable, rowPlace, spreadRowEvenly } from "./hallRows";
 
 /** SVG user units per square, as `GdHall` draws. */
 const UNIT = 100;
@@ -198,6 +201,8 @@ export function GdHallEditor({
   /** Why the last change was not made, until the next one is. */
   const [notice, setNotice] = useState<string | null>(null);
   const [gestureKind, setGestureKind] = useState<Gesture["kind"] | null>(null);
+  /** Where a row child being reordered will land, marked on the drawing. */
+  const [slot, setSlot] = useState<Rect | null>(null);
   const [paletteAnchor, setPaletteAnchor] = useState<HTMLElement | null>(null);
   const [pixelsPerSquare, setPixelsPerSquare] = useState(30);
   const [coarse, setCoarse] = useState(false);
@@ -272,6 +277,7 @@ export function GdHallEditor({
     if (!current) return;
     gesture.current = null;
     setGestureKind(null);
+    setSlot(null);
     setHeldBox(null);
     setPreview(null);
     if (frame.current !== null) {
@@ -352,6 +358,7 @@ export function GdHallEditor({
     select?: string | null,
   ): boolean => {
     setPreview(null);
+    setSlot(null);
     if (select !== undefined) setSelectedId(select);
     // A change that ends as the host locks is dropped, as if cancelled.
     if (!editable) return false;
@@ -407,6 +414,59 @@ export function GdHallEditor({
       x: current.start.x + delta.x,
       y: current.start.y + delta.y,
     });
+  };
+
+  /**
+   * What a gesture shows before release: the hall it would write, or for
+   * a row child being reordered the row in its new order with the child
+   * under the pointer, and where it lands. Null when its node is gone.
+   */
+  const gesturePreview = (
+    current: Gesture,
+  ): { hall: HallElement; slot?: Rect } | null => {
+    if (current.kind === "move" && current.snap) {
+      const base = currentView();
+      if (!base.byId.has(current.id)) return null;
+      const row = rowDragPreview(
+        base,
+        current.id,
+        {
+          x: (current.latest.x - current.startClient.x) / current.pixels,
+          y: (current.latest.y - current.startClient.y) / current.pixels,
+        },
+        art,
+      );
+      if (row) return { hall: row.preview, slot: row.slot };
+    }
+    const next = gestureHall(current);
+    return next ? { hall: next } : null;
+  };
+
+  /**
+   * A gesture's hall on release, and what it did: a row child reordered,
+   * or moved or scaled where it stands.
+   */
+  const releaseHall = (
+    current: Gesture,
+    entry: HallSelectable,
+    next: HallElement,
+  ): { hall: HallElement; message: string } => {
+    const name = hallNodeName(entry.node);
+    if (current.kind === "scale")
+      return { hall: next, message: scaled(entry, next) };
+    const base = currentView();
+    if (current.snap && reorderable(base, current.id)) {
+      const place = rowPlace(hallView(next, art), current.id);
+      const index =
+        place?.spread.findIndex((child) => child.id === current.id) ?? -1;
+      return {
+        hall: next,
+        message: place
+          ? `Moved ${name} to place ${index + 1} of ${place.spread.length} in its row`
+          : moved(entry, next),
+      };
+    }
+    return { hall: next, message: moved(entry, next) };
   };
 
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
@@ -476,9 +536,13 @@ export function GdHallEditor({
     const id = requestAnimationFrame(() => {
       frame.current = null;
       if (gesture.current !== current) return;
-      const next = gestureHall(current);
-      if (next) setPreview(next);
-      else cancelGesture();
+      const next = gesturePreview(current);
+      if (!next) {
+        cancelGesture();
+        return;
+      }
+      setPreview(next.hall);
+      setSlot(next.slot ?? null);
     });
     if (frame.current === -1) frame.current = id;
   };
@@ -492,10 +556,8 @@ export function GdHallEditor({
     const next = gestureHall(current);
     const entry = currentView().byId.get(current.id);
     if (!next || !entry) return;
-    commit(
-      next,
-      current.kind === "move" ? moved(entry, next) : scaled(entry, next),
-    );
+    const released = releaseHall(current, entry, next);
+    commit(released.hall, released.message);
   };
 
   // Keys, buttons and fields edit the hall the editor holds now (see
@@ -503,6 +565,22 @@ export function GdHallEditor({
   const nudge = (entry: HallSelectable, step: Point) => {
     const next = nudgeNode(currentView(), entry.id, step);
     commit(next, moved(entry, next));
+  };
+
+  /** One place earlier (-1) or later (1) in its row (Alt+arrows, the panel). */
+  const reorderStep = (entry: HallSelectable, step: -1 | 1) => {
+    const next = stepInRow(currentView(), entry.id, step);
+    const place = rowPlace(hallView(next, art), entry.id);
+    const index = place?.spread.findIndex((child) => child.id === entry.id);
+    commit(
+      next,
+      `Moved ${hallNodeName(entry.node)} to place ${(index ?? 0) + 1} of ${place?.spread.length ?? 0} in its row`,
+    );
+  };
+
+  /** "Spread evenly again": the row's positions along it taken away. */
+  const spreadRow = (entry: HallSelectable) => {
+    commit(spreadRowEvenly(currentView(), entry.id), "Spread the row evenly");
   };
 
   const scaleStep = (entry: HallSelectable, up: boolean) => {
@@ -632,7 +710,21 @@ export function GdHallEditor({
       ArrowUp: { x: 0, y: -step },
       ArrowDown: { x: 0, y: step },
     };
-    if (key in moves && !modifier) {
+    // Alt and an arrow along its row move a spread row child one place.
+    const place =
+      event.altKey && key in moves && !modifier
+        ? rowPlace(currentView(), selected.id)
+        : undefined;
+    const rowStep =
+      place && reorderable(currentView(), selected.id)
+        ? place.along === "x"
+          ? moves[key].x
+          : moves[key].y
+        : 0;
+    if (rowStep !== 0) {
+      event.preventDefault();
+      reorderStep(selected, rowStep < 0 ? -1 : 1);
+    } else if (key in moves && !modifier) {
       event.preventDefault();
       nudge(selected, moves[key]);
     } else if ((key === "+" || key === "=") && !modifier) {
@@ -809,6 +901,11 @@ export function GdHallEditor({
                 ].join(" ")}
                 aria-hidden="true"
               >
+                {slot && (
+                  <g data-hall-slot>
+                    <SquareRect rect={slot} className={styles.slot} />
+                  </g>
+                )}
                 {selected && selectedRect && (
                   <>
                     {selected.object?.labels.map((label, index) => (
@@ -882,8 +979,8 @@ export function GdHallEditor({
             {!editable
               ? "The hall cannot be edited while the ritual is updating."
               : coarse
-                ? "Tap to select, drag to move, drag a corner to scale; the panel edits the rest."
-                : "Click to select, drag to move (Alt: no snapping), drag a corner to scale. Keys: Tab selects the next object, arrows nudge (Shift: a square), + and − scale, Delete removes, Ctrl+D duplicates, Escape deselects, then finishes."}
+                ? "Tap to select, drag to move (along a row: to reorder), drag a corner to scale; the panel edits the rest."
+                : `Click to select, drag to move (Alt: no snapping), drag a corner to scale. Dragged along a row, an officer or banner changes places (Alt: places it freely). Keys: Tab selects the next object, arrows nudge (Shift: a square; Alt: a place along its row), + and − scale, Delete removes, Ctrl+D duplicates, Escape deselects, then finishes.`}
           </p>
           {warnings.length > 0 && (
             <Warnings
@@ -906,6 +1003,8 @@ export function GdHallEditor({
           onScaleStep={scaleStep}
           onDuplicate={duplicate}
           onDelete={remove}
+          onStepInRow={reorderStep}
+          onSpreadRow={spreadRow}
         />
       </div>
       <div className={styles.visuallyHidden} aria-live="polite">

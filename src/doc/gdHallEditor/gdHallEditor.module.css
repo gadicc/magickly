@@ -97,6 +97,20 @@
   vector-effect: non-scaling-stroke;
   pointer-events: none;
 }
+/* Where a row child being reordered will land. */
+.slot {
+  fill: rgb(214 108 0 / 0.1);
+  stroke: #c25f00;
+  stroke-width: 2px;
+  stroke-dasharray: 3 3;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+.rowActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
 .labelHighlight {
   fill: rgb(30 91 216 / 0.16);
   stroke: none;
