@@ -3,6 +3,7 @@ import { altarArt } from "./altar";
 import { bannerArt } from "./banner";
 import { hebrewLetterArt } from "./hebrewLetter";
 import { crossArt, pentagramArt, triangleArt } from "./items";
+import { kameaArt, sealArt } from "./kamea";
 import { lamenFallbackArt } from "./lamen";
 import { lightningArt } from "./lightning";
 import { markerArt } from "./marker";
@@ -36,4 +37,6 @@ export const defaultHallArt: HallArtRegistry = new Map([
   ["tablet", tabletArt()],
   ["shewbread", shewbreadArt],
   ["candlestick", candlestickArt],
+  ["kamea", kameaArt],
+  ["seal", sealArt],
 ]);

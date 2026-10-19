@@ -67,7 +67,7 @@ export function hallItemKinds(art: HallArtRegistry): string[] {
  * adepts, drawn as labelled circles until their lamens exist) and a
  * marker; the altar, pillars, platform, throne and a door; the banners
  * and a Hebrew letter; every item kind; a tarot key, a tablet, the Table
- * of Shewbread and the candlestick; free text.
+ * of Shewbread, the candlestick, a kamea and a planet's seals; free text.
  */
 export function hallPalette(art: HallArtRegistry): HallPaletteEntry[] {
   return [
@@ -186,6 +186,20 @@ export function hallPalette(art: HallArtRegistry): HallPaletteEntry[] {
       label: "Seven-branched candlestick",
       tag: "candlestick",
       attrs: {},
+    },
+    {
+      key: "kamea",
+      group: "Symbols",
+      label: "Kamea",
+      tag: "kamea",
+      attrs: { planet: "saturn" },
+    },
+    {
+      key: "seal",
+      group: "Symbols",
+      label: "Planetary seals",
+      tag: "seal",
+      attrs: { planet: "saturn" },
     },
     {
       key: "label",

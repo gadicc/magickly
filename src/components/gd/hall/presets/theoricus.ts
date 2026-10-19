@@ -88,9 +88,9 @@ export const theoricus1: HallPreset = {
 
 /**
  * The Theoricus 2=9 hall, ported from `public/pics/theoricus2.svg`: Resh,
- * Samekh and Tzaddi above the East and Tau beyond the West. The drawing's
- * pictures of the kamea and seals of Luna and of the serpent on the Tree
- * are markers until their art is drawn (stages F and H).
+ * Samekh and Tzaddi above the East and Tau beyond the West. The kamea of
+ * Luna is drawn from its numbers; the seals of Luna are a placeholder and
+ * the serpent on the Tree a marker until their art is drawn (stage H).
  */
 export const theoricus2: HallPreset = {
   id: "theoricus2",
@@ -121,14 +121,8 @@ export const theoricus2: HallPreset = {
         children: [
           AIR[0],
           { type: "banner", kind: "east", x: 9.46, y: -0.84 },
-          { type: "marker", text: "Kamea of Luna", x: 3, y: 1.07, scale: 0.9 },
-          {
-            type: "marker",
-            text: "Seals of Luna",
-            x: 13.02,
-            y: 0.97,
-            scale: 0.9,
-          },
+          { type: "kamea", planet: "moon", x: 3, y: 1.07 },
+          { type: "seal", planet: "moon", x: 13.02, y: 0.97 },
           ...AIR.slice(1),
           {
             type: "marker",

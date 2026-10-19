@@ -136,6 +136,7 @@ export const MARKER_TEXT_WIDTH = 0.84;
  * | tarotKey | 0.81 | Theoricus 1 altar card 0.94 × 1.62 |
  * | tablet | 1.345 | Theoricus Air tablet board 1.91 × 2.69 |
  * | shewbread, candlestick | 1.25 | Zelator 2: the outer circle 2 squares across |
+ * | kamea, seal | 0.9 | Theoricus 2: the Moon's kamea 1.83 × 1.79 |
  * | other items | 0.4 | none |
  * | unknown tags (placeholder) | 0.5 | a 1-square box |
  *
@@ -172,6 +173,8 @@ export const DEFAULT_SCALES: ReadonlyMap<string, number> = new Map([
   ["tablet", 1.345],
   ["shewbread", 1.25],
   ["candlestick", 1.25],
+  ["kamea", 0.9],
+  ["seal", 0.9],
   ["item", 0.4],
   ["unknown", 0.5],
 ]);

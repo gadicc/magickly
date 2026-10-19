@@ -346,6 +346,19 @@ describe("GdHall with hostile art", () => {
     expect(markup.length).toBeLessThan(500_000);
   });
 
+  it("draws each kamea once, its numbers inside the drawing", () => {
+    // A Moon square is 81 numbers: drawn in <defs> once, not per placement.
+    const planets = ["moon", "mercury", "venus", "sun", "x", "saturn", "mars"];
+    const markup = many(3990, (i) => ({
+      type: i % 2 ? "kamea" : "seal",
+      planet: planets[i % planets.length],
+    }));
+    // Seven values each (one unknown, drawn empty) for kameas and seals.
+    expect(drawings(markup)).toBe(14);
+    expect(textLines(markup)).toBeLessThan(300);
+    expect(markup.length).toBeLessThan(500_000);
+  });
+
   it("draws one drawing for values it draws alike", () => {
     const markup = many(3990, (i) =>
       i % 2

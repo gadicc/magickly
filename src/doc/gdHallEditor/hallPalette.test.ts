@@ -56,6 +56,8 @@ describe("the palette", () => {
       "tablet",
       "shewbread",
       "candlestick",
+      "kamea",
+      "seal",
       "label",
     ])
       expect(keys).toContain(key);

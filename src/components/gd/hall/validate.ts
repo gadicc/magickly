@@ -1,5 +1,6 @@
 import { numberAttr, readAttr } from "./attributes";
 import { hebrewLetter } from "./hebrewLetters";
+import { PLANETS } from "./kameas";
 import { MAX_LABEL_LINES } from "./labels";
 import { DEFAULT_DAIS, MAX_HALL_LABEL_LINES, resolveHall } from "./layout";
 import { hallPlacement, hallTagSpec, itemKindKnown, walkHall } from "./spec";
@@ -174,6 +175,21 @@ export function validateHall(
         ? String(value)
         : undefined;
     };
+    /**
+     * The string "null" in a choice that draws something: the attribute
+     * check reads it as absent (the legacy path writes `null` so), which
+     * would leave it drawn empty or as the default with nothing said.
+     */
+    const nullChoice = (name: string, values: readonly string[]) => {
+      if (node[name] !== "null") return false;
+      report(
+        path,
+        "error",
+        `${tag}: ${name}="null" is not one of ${values.join(", ")}`,
+        name,
+      );
+      return true;
+    };
     switch (tag) {
       case "officer":
       case "lamen": {
@@ -217,6 +233,17 @@ export function validateHall(
           );
         break;
       }
+      case "kamea":
+      case "seal":
+        if (nullChoice("planet", PLANETS)) break;
+        if (text("planet") === undefined)
+          report(
+            path,
+            "warning",
+            `${tag}: no planet; drawn ${tag === "kamea" ? "as an empty square" : "as an empty ring"}`,
+            "planet",
+          );
+        break;
       case "marker":
       case "caption":
       case "label":

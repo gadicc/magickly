@@ -135,6 +135,7 @@ export default defineConfig({
         "src/components/gd/hall/fonts.ts",
         "src/components/gd/hall/GdHall.tsx",
         "src/components/gd/hall/hebrewLetters.ts",
+        "src/components/gd/hall/kameas.ts",
         "src/components/gd/hall/labels.ts",
         "src/components/gd/hall/layout.ts",
         "src/components/gd/hall/presets/*.ts",

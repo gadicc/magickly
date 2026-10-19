@@ -87,6 +87,14 @@ describe("hallNodeName", () => {
     expect(hallNodeName(node("tablet"))).toBe("Tablet");
     expect(hallNodeName(node("door", { side: "north" }))).toBe("Door (north)");
     expect(hallNodeName(node("shewbread"))).toBe("Shewbread");
+    expect(hallNodeName(node("kamea", { planet: "moon" }))).toBe(
+      "Kamea of Luna",
+    );
+    expect(hallNodeName(node("seal", { planet: "sun" }))).toBe("Seals of Sol");
+    expect(hallNodeName(node("kamea", { planet: "constructor" }))).toBe(
+      "Kamea",
+    );
+    expect(hallNodeName(node("seal"))).toBe("Seals");
     expect(hallNodeName(node("unicorn"))).toBe("Unicorn");
     expect(hallNodeName(node("label", { text: "x".repeat(50) }))).toBe(
       `${"x".repeat(40)}…`,

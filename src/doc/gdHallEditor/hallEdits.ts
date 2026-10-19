@@ -1,3 +1,4 @@
+import { PLANET_NAMES, type Planet } from "@magick-components/gd/hall/kameas";
 import {
   type Rect,
   type ResolvedDoor,
@@ -141,6 +142,11 @@ export function hallNodeName(node: HallElement): string {
   if (tag === "tablet") {
     const element = text(node, "element");
     return element ? `${clip(itemKindLabel(element))} tablet` : "Tablet";
+  }
+  if (tag === "kamea" || tag === "seal") {
+    const planet = PLANET_NAMES.get(text(node, "planet") as Planet);
+    const name = tag === "kamea" ? "Kamea" : "Seals";
+    return planet ? `${name} of ${planet}` : name;
   }
   if (tag === "door") return `Door (${text(node, "side") ?? "west"})`;
   return clip(itemKindLabel(tag));

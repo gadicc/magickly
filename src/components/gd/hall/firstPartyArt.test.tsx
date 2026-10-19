@@ -194,6 +194,71 @@ describe("the Enochian tablets", () => {
   });
 });
 
+describe("the kameas and seals", () => {
+  const numbers = (markup: string) =>
+    [...markup.matchAll(/<text [^>]*>(\d+)<\/text>/g)].map(([, n]) =>
+      Number(n),
+    );
+
+  it("draws each planet's square with its numbers in their cells", () => {
+    const moon = draw(art("kamea"), { type: "kamea", planet: "moon" });
+    expect([...numbers(moon)].sort((a, b) => a - b)).toEqual(
+      Array.from({ length: 81 }, (_, i) => i + 1),
+    );
+    // Row by row: the Moon's first row first.
+    expect(numbers(moon).slice(0, 9)).toEqual([
+      37, 78, 29, 70, 21, 62, 13, 54, 5,
+    ]);
+    expect(
+      numbers(draw(art("kamea"), { type: "kamea", planet: "saturn" })),
+    ).toEqual([4, 9, 2, 3, 5, 7, 8, 1, 6]);
+    expect(moon).not.toMatch(/href|\sid=|url\(/);
+  });
+
+  it("draws an empty frame without a planet, or with one it does not know", () => {
+    const empty = draw(art("kamea"), { type: "kamea" });
+    expect(numbers(empty)).toEqual([]);
+    expect(draw(art("kamea"), { type: "kamea", planet: "pluto" })).toBe(empty);
+    expect(art("kamea").variant({ type: "kamea", planet: "pluto" })).toBe(
+      art("kamea").variant({ type: "kamea" }),
+    );
+  });
+
+  it("marks the seals as a placeholder naming the planet", () => {
+    const seal = draw(art("seal"), { type: "seal", planet: "moon" });
+    expect(seal).toContain("stroke-dasharray");
+    expect(seal).toMatch(/>Seals of<\/text><text [^>]*>Luna<\/text>/);
+    expect(draw(art("seal"), { type: "seal", planet: "sun" })).toMatch(
+      />Sol<\/text>/,
+    );
+    expect(draw(art("seal"), { type: "seal" })).not.toContain("<text");
+  });
+
+  it("validates a planet and warns of a missing one", () => {
+    const found = validateHall(
+      hall(
+        { type: "kamea", planet: "venus", x: 3, y: 3 },
+        { type: "kamea", x: 6, y: 3 },
+        { type: "seal", planet: "pluto", x: 9, y: 3 },
+        // The legacy path's spelling of null: read as absent, drawn empty.
+        { type: "kamea", planet: "null", x: 12, y: 3 },
+      ),
+      { art: defaultHallArt },
+    ).map((d) => [d.severity, d.message]);
+    expect(found).toEqual([
+      ["warning", "kamea: no planet; drawn as an empty square"],
+      [
+        "error",
+        'seal: planet="pluto" is not one of saturn, jupiter, mars, sun, venus, mercury, moon',
+      ],
+      [
+        "error",
+        'kamea: planet="null" is not one of saturn, jupiter, mars, sun, venus, mercury, moon',
+      ],
+    ]);
+  });
+});
+
 describe("the Shewbread and the candlestick", () => {
   it("give each diagram a 100-unit viewport centred on the origin", () => {
     for (const key of ["shewbread", "candlestick"]) {
