@@ -341,6 +341,9 @@ describe("resolveHall: hosts", () => {
     expect(cup.position).toEqual({ x: 0, y: -0.25 });
     expect(cup.cy).toBeCloseTo(8 + 2 * (1 - 0.25), 10);
     expect(at(objects, [1, 1, 1]).position).toEqual({ x: 0, y: 0 });
+    // A host reports the frame its children are read in; others do not.
+    expect(altar.childFrame).toEqual(cup.frame);
+    expect(pillar.childFrame).toBeUndefined();
     // A row spreads its officer: the position is where it was spread.
     const hierophant = at(objects, [0, 0]);
     expect(hierophant.position.x).toBe(8);

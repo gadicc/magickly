@@ -234,6 +234,12 @@ export interface ResolvedObject {
   position: { x: number; y: number };
   /** The scale it is drawn at: its own, clamped, or its kind's default. */
   scale: number;
+  /**
+   * For a host, the frame its children's `x` and `y` are read in: its
+   * centre, and floor squares per unit of its unscaled squares. A visual
+   * editor moving an object onto or off a host converts with it.
+   */
+  childFrame?: { ox: number; oy: number; unit: number };
 }
 
 /** A gap in a wall. */
@@ -822,6 +828,8 @@ export function resolveHall(
       position: { x: px - bx, y: py - by },
       scale: item.scale,
     };
+    if (item.isHost)
+      resolved.childFrame = { ox: cx, oy: cy, unit: item.scale * unit };
     if (item.text) resolved.text = placeText(item.text, rect);
     if (item.inner) {
       // Inside the box, as the marker drew it before: no minimum width,
