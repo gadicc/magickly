@@ -25,7 +25,14 @@ and the visual editor reorders rows, stands objects on hosts and badges
 a hall's warnings, as Gadi decided that day (Stage E notes), with the
 fixes from its review: tabs no longer write over each other's drafts,
 heavy halls are capped and typing is read at a rest (Stage E review
-fixes); stage F is next.
+fixes). Stage F is done on `gate/gd-hall-f` (19 October 2026): kameas,
+placeholder seals, boards with the Tree, the veil, the white altar and
+the Practicus, Philosophus and Portal presets (Stage F notes). Two
+follow-ups Gadi decided on 20 October 2026 are done on
+`gate/gd-hall-f2`: the properties panel beside the drawing whenever it
+fits (split `/gd/hall` at the full width) and docked at the foot of the
+screen otherwise, and the kameas in magick-data with a shared `Kamea`
+component the hall wraps (Follow-ups after stage F); stage G is next.
 
 Composable Golden Dawn temple-hall diagrams, authored in the ritual Pug
 dialect, drawn as inline SVG in the reader and editor, edited visually, and
@@ -339,7 +346,7 @@ Placeables:
 | `tablet(element)` | Reuses `Tablet`; earth and air now, water, fire and union once the data exists |
 | `item(kind)` | Art registry: cup, chalice, salt, bread, rose, lamp, lantern, censer, fan, cross (`form`: calvary, latin, greek, greekFiveSquares, fourTriangles), triangle (`dir`: up, down), pentagram, pantacle, serpentTree, lightning, gong, brazier, candle (stage F; the rubrics' candles beside the altar) |
 | `tarotKey(n)` | An original simplified card: numeral, Hebrew letter and title from magick-data; `n` is clamped to 0–21 and rounded, with a warning |
-| `kamea(planet)`, `seal(planet)` | The number square drawn from its numbers (Agrippa's squares, computed); seals a placeholder until stage H. `planet`: saturn, jupiter, mars, sun, venus, mercury, moon |
+| `kamea(planet)`, `seal(planet)` | The number square drawn from its numbers (Agrippa's squares, computed in magick-data's `astrology/kameas` and drawn by the shared `Kamea`, since the follow-ups after stage F); seals a placeholder until stage H. `planet`: saturn, jupiter, mars, sun, venus, mercury, moon (the hall's words, mapped to magick-data's `sol` and `luna`) |
 | `board(kind)` | A diagram on a stand: flamingSword and minutumMundum through the Tree's figure (`TreeFigure`, shared with `TreeOfLife`); gardenOfEden and theFall as labelled boards first |
 | `shewbread`, `candlestick` | The existing components |
 | `veil` | The Portal's curtain across the dais: 16 × 0.4 squares, sized by `scale` |
@@ -364,7 +371,8 @@ specially.
 Data still to add (the tarot titles came in A2): seals (drawn). The kamea
 squares (computed) and the adept roles (`chiefAdept`, `secondAdept`,
 `thirdAdept`) in the ritual role catalog, so hall roles and ritual roles
-stay one set, came in stage F.
+stay one set, came in stage F; the squares moved to magick-data after it
+(Follow-ups after stage F).
 
 ### 6. Labels
 
@@ -518,7 +526,10 @@ nodes given fresh IDs. Touch: tap to select, drag to move, the panel for the
 rest (plan 050's rule on small handles). Reparenting converts positions
 between frames. Built in stage D, without reparenting (Stage D notes);
 stage E added reordering rows and standing objects on hosts, by drag and
-from the panel (Stage E notes).
+from the panel (Stage E notes). The panel stands beside the drawing
+when the editor is at least 732 px wide and docks at the foot of the
+screen, as a strip that can be hidden, when it is not (Follow-ups after
+stage F).
 
 ### 12. Validation and safety
 
@@ -699,8 +710,8 @@ from them, drawn with our own art.
 | Caduceus (Keryx lamen) | SVG Repo, "public domain" label | replace |
 | Eye of Horus (Sentinel lamen) | game-icons.net, CC BY | replace |
 | Tarot XXI on the Theoricus altar | RWS raster in the drawing | original card, `tarotKey` (A2) |
-| Serpent on the Tree, Moon kamea, Moon seals | rasters in Theoricus 2, no source | markers in the preset (A2); the kamea computed and drawn, `kamea` (F); the seals a placeholder, `seal` (F), to draw in H; the serpent a marker, to draw in H |
-| Planetary kameas | none | computed (Agrippa's squares) and drawn from geometry, `kamea` (F) |
+| Serpent on the Tree, Moon kamea, Moon seals | rasters in Theoricus 2, no source | markers in the preset (A2); the kamea computed and drawn, `kamea` (F), through the shared `Kamea` (after F); the seals a placeholder, `seal` (F), to draw in H; the serpent a marker, to draw in H |
+| Planetary kameas | none | computed (Agrippa's squares) and drawn from geometry, `kamea` (F); since the follow-ups after F the squares are magick-data's (`astrology/kameas`, MIT code, no rights asserted over the squares) and the drawing is `Kamea` (`src/components/astrology/Kamea.tsx`, MIT), which the hall's `kamea` art wraps in its font and palette; seals and sigils to overlay it in H |
 | Planetary seals | none | placeholder `seal`, a dashed ring naming the planet (F); draw in H |
 | Flaming Sword and Minutum Mundum boards | `TreeOfLife`, first-party | `TreeFigure` (the Tree's own geometry) on a board, `board` (F); the Minutum Mundum's paths in their colours need path colour data (H) |
 | Garden of Eden, the Fall | none | labelled boards (F); draw in H |
@@ -2463,7 +2474,8 @@ where the brief or the plan left a choice.
   `Lamen`'s plain lamen, as before. The catalog's consumers (the
   reader's frames, the role pickers and slash menu, the source check)
   read names and symbols by key, so they needed nothing else.
-- **Kameas** are computed, not copied (`kameas.ts`): Agrippa's squares
+- **Kameas** are computed, not copied (`kameas.ts`, in magick-data since
+  the follow-ups after stage F): Agrippa's squares
   (*De occulta philosophia*, 1533, II.22), the odd ones by the
   step-down-right construction, the doubly even ones by complementing
   the 4 × 4 diagonals, both of which give exactly Agrippa's squares,
@@ -2650,6 +2662,317 @@ subjects within 50 characters, the type included.
   hall at x 8, y −0.3. Nothing was saved. Screenshots are outside the
   repository.
 
+## Follow-ups after stage F
+
+Built on `gate/gd-hall-f2` (20 October 2026), from `main` at 33ad461:
+two changes Gadi decided that day, the first from mock-ups (A, the
+panel beside the drawing whenever it fits; C, docked at the foot of the
+screen otherwise; B, a panel floating over the drawing, was the
+runner-up and was not built). Two independent reviews (Opus, Fable)
+found the kamea move clean and the dock in need of work, and a second,
+focused review of their fixes found more (phones, focus, the reveal);
+all their fixes were folded into the commits they belong to (the branch rewritten;
+Commits lists the new ones). Each point records what was settled where
+the brief or the reviews left a choice. Every width here was measured
+with classic 15 px scrollbars, as most desktop browsers on Windows and
+Linux draw them (the first measurements, with the headless browser's
+hidden scrollbars, overstated them by 9–15 px).
+
+### The properties panel
+
+- **Beside or docked.** `hallPanelDock.ts` measures the editor before
+  its first paint and then from the `ResizeObserver` entry's border box
+  (its content box where a browser has no border box). The panel
+  stands beside the drawing from 732 px: the beside layout is
+  `minmax(30rem, 1fr) minmax(15rem, 19rem)`, so the drawing keeps 480
+  px and the panel 240, and room beyond both goes first to the panel
+  (up to 19rem), then to the drawing. A docked panel goes back beside
+  only at 748 px (16 px of hysteresis, more than a classic scrollbar),
+  so a scrollbar that comes and goes as the panel moves cannot make it
+  flap. Either side of the switch (`/gd/hall` visual, the window
+  stepped 778, 779, 790, 794, 795, 779, 778 px): docked at 731–747 px
+  with a 640 px drawing (its 40rem), beside at 748 px with a 480 px
+  drawing and a 256 px panel, beside still at 732 px (480 and 240),
+  docked again at 731. The jump is 640 to 480 px (25 %), where the
+  stage D container query's 720 px gave 408 beside and 640 docked
+  (57 %). Until the editor has a width the place is unknown, and the
+  drawing and the panel share one column (no `data-panel`), which fits
+  any width; the measurement comes before the first paint, so a wide
+  screen never shows the dock for a frame. (The first rendering was
+  "beside" until the second review: its two minimums asked 748 px of a
+  phone's 358, the phone's browser shrank the page to fit, and the
+  measurement then read a window of 748 × 1,619 at 390 × 844, which
+  stuck.) A measured width rather than the container query: the dock's
+  buttons exist only where they do something, and the switch can be
+  tested.
+- **The dock.** `position: sticky; bottom: 0`: the panel sticks to the
+  foot of the nearest scrolling box (the page on `/gd/hall`; the visual
+  panel, which scrolls, in the ritual editor), stays there while the
+  editor is on screen and stops at the editor's end, so it neither
+  covers the page beyond the editor nor leaves the ritual editor's
+  visual panel. A sticky grid item cannot leave its own grid area, so
+  the editor's body is a block while the panel is docked. Its place in
+  the flow stays below the drawing, so scrolled to the editor's end the
+  drawing's foot lies clear above it. Its fields run in as many columns
+  as fit (at least 9rem each; x and y side by side across two).
+- **Its size follows the box it sticks in**, not the screen:
+  `hallPanelDock.ts` measures that box's height (the scrolling
+  ancestor's `clientHeight`, or the window's layout viewport,
+  `documentElement.clientHeight`, which holds still under a phone's
+  address bar, measured again on `resize` and `visualViewport`
+  resizes) and the fields take at
+  most 30 % of it less the title bar's 3.5rem, within 4.5–13rem,
+  scrolling inside. In a box under 400 px (`DOCK_MIN_ROOM`; the ritual
+  editor's visual panel on a landscape phone is 183 px under its header
+  and toolbars) the panel stays in the flow below the drawing, at its
+  full height, as it stood before the dock: there even its title bar
+  and caption would have covered three quarters of the drawing. Its
+  foot is padded by `env(safe-area-inset-bottom)`, 0 until the app sets
+  `viewport-fit=cover`.
+- **Nothing selected, the dock is short.** Docked with nothing selected
+  it shows its title bar, the caption and **All hall settings**, which
+  shows the hall's other fields (padding, margins, the dais and the
+  rest) and becomes **Fewer hall settings**; beside the drawing every
+  hall field shows as before. A selection shows its own fields at once,
+  unless the viewer has hidden the dock. Measured (classic scrollbars,
+  the Neophyte): 164 px with nothing selected, 18–29 % of its box in
+  every docked case; with the Black pillar selected 234 px at 1280 ×
+  800 (29 % of the window), 238 at 1024 × 768 (31 %) and 272 on a 390 ×
+  844 phone (32 %); hidden, 57 px.
+- **Keyboard selections are scrolled into view.** After a key that
+  selects (Tab, or a warning chosen), nudges, reorders along a row,
+  scales or duplicates, and after the panel's own buttons (Duplicate,
+  Move left and right, Smaller and Larger, Spread evenly again, Stands
+  on), whose result can land under the dock, the selection's rectangle
+  is scrolled into its scrolling box with 12 px to spare, its foot
+  clear of a docked panel's measured height (`revealDelta`,
+  `scrollingAncestor`). The request keeps the selection and hall it
+  found and is acted on only if the next render shows another, so a key
+  that changed nothing (+ on a door, a nudge at a limit) leaves nothing
+  pending; a pointer press clears any. A selection made with the
+  pointer is where the pointer is, and is left alone; a field typed in
+  the panel is not followed, since its author is in the panel.
+  Checked by tabbing through all 25 objects of the Neophyte and nudging
+  the last, in `/gd/hall` (split and visual) and the ritual editor, at
+  every size below: none was left outside its box or under the dock.
+- **Hiding.** **Hide** and **Show** (a text button in the title bar, at
+  least 44 × 44 px; its name "Hide properties" or "Show properties",
+  with `aria-expanded` and `aria-controls`; no tooltip) fold the strip
+  to its title bar, which still names the selection. The choice is kept
+  for the viewer in `localStorage`
+  (`magickli:gd-hall-panel-collapsed:v1`, in try/catch) and shared:
+  every editor in the page hears of a change at once, and other tabs
+  by the `storage` event. Where storage is blocked or full the choice
+  lasts for that editor only. Beside the drawing the panel is never
+  hidden. Hidden fields stay mounted (`hidden`), so a value being typed
+  is still written by Ctrl+S or Save.
+- **Focus is never dropped by the dock.** A panel that docks while one
+  of its fields holds the focus stays open, in that editor, until the
+  viewer hides it again or it next stands beside the drawing (the kept
+  choice is not changed); a hall field holding the focus keeps its
+  fields shown. When the panel goes beside the drawing with Hide or All
+  hall settings focused (both go with the dock), the focus goes to the
+  panel's first field (the caption, with nothing selected), or to the
+  drawing when the panel has none: a callback ref notes the focus as
+  React detaches it, before the element is removed. Whether a field
+  holds the focus is read again after every render, not taken from
+  blur events alone, which Firefox does not fire for a focused field
+  that is removed.
+- **Unchanged:** keys and focus in the drawing, the live region, the
+  warnings and their badge, fields written when left, drags (released
+  over the dock too, the pointer being captured), Escape and undo. The
+  Ritual Pug guide says where the panel goes.
+
+### Split `/gd/hall` at the full width
+
+- **Columns.** Only split view's two panels take the screen's full
+  width (16 px gutters), the source and the drawing two parts to three
+  from 900 px. The toolbar (preset, undo and redo, the layout switch),
+  the notes and the share controls keep to the text column (1,168 px,
+  the lg Container less its gutters) in every layout, so the layout
+  switch stays under the pointer (it moved 353 px at 1920 before the
+  review fix).
+- **Measured** (classic scrollbars): the drawing's half is 1,114 px at
+  1920 × 1080 and 826 at 1440 × 900, the panel beside; 730 at 1280 × 800
+  and 577 at 1024 × 768, docked. So 1280 × 800 misses the side-by-side
+  width by 2 px; from about 1,300 px of window it is beside, as Gadi's
+  "around 1,300 px or wider" asked. A 3:5 split would give 761 px at
+  1280 × 800 (beside); that is Gadi's call, not taken here.
+- **Visual alone stays in the text column**, as do source alone, the
+  loading line and the error message: the drawing stops at 40rem, and
+  in visual view the panel already stands beside it in that column
+  (at 1024 × 768 too, 977 px), so more width would only add empty space
+  and part the editor from the page's text. The page's text and its
+  sources stay in lg Containers; the editor sits in a band between
+  them, the three marked with `data-hall-page` for the page's test.
+- **The ritual editor** keeps its 1:1 split: it is the ritual's
+  document editor, and the brief changed only `/gd/hall`; the question
+  goes to Gadi. With classic scrollbars its visual panel has its own
+  15 px scrollbar, and its hall editor is 717 px at 1920 × 1080, 637 at
+  1440 × 900, 557 at 1280 × 800 and 429 at 1024 × 768: docked at every
+  size (beside only with overlay scrollbars, as the first measurements
+  had them). For comparison, measured by injecting the CSS and changing
+  nothing: a 2:3 ritual split would give 873 px at 1920 × 1080 (beside,
+  a 557 px drawing), 777 at 1440 × 900 (beside, 480) and 681 at 1280 ×
+  800 (docked). A lower switch would have to sit at 717 px to put the
+  1:1 split beside at 1920 × 1080 (a drawing of at least 465 px), and
+  at 637 px for 1440 × 900 (385 px).
+
+### Kameas in magick-data and a shared `Kamea`
+
+- **The squares** are `magick-data/astrology/kameas`, beside the planet
+  table whose ids key them (`saturn`, `jupiter`, `mars`, `sol`,
+  `venus`, `mercury`, `luna`; the type is held to the table's
+  `PlanetId`): the default export is every square, frozen, in a table
+  without a prototype (so "constructor" or "__proto__" read as nothing),
+  with `KAMEA_PLANETS` (frozen) in the Chaldean order and the two
+  constructions. `oddKamea` and `doublyEvenKamea` throw a RangeError
+  for an order they do not build: odd from 3, or a multiple of 4, up
+  to `MAX_KAMEA_ORDER` (100); before the review fix 2 and 6 gave
+  squares that were not magic and 4 threw a TypeError. They are
+  derived values, as Lenain's are in `seventyTwoAngelsDerived.ts`, so
+  a hand-written module rather than a JSON5 table: no schema, no JSON,
+  nothing in the barrel or the graph. The package's conventions
+  followed: both exports maps, the publish emit (`tsconfig.build.json`,
+  with `isolatedDeclarations`), the README (Licences says the module is
+  code, under MIT; it is listed under "Texts and values that are not
+  tables", and Sources carries the provenance: Agrippa, *De occulta
+  philosophia*, 1533, II.22; no rights asserted, the squares being
+  facts), the coverage list, and a load in the smoke test.
+  `LICENSE.txt` already puts hand-written modules under MIT. The
+  package is private at 0.0.0 with no changelog; a new subpath is a
+  minor change under its README's versioning, recorded here. The tests
+  moved with the module (every square magic; each starting with
+  Agrippa's first row; Saturn's and Jupiter's his row by row; new:
+  keyed by the table's planets, frozen, hostile names, refused orders).
+- **The hall keeps its words.** Saved halls hold `planet="sun"` and
+  `"moon"`, so the hall's vocabulary stays (`planets.ts`: `PLANETS`,
+  `PLANET_NAMES`) and `KAMEA_PLANET_IDS` maps it to magick-data's ids;
+  a test holds the names to the planet table's.
+- **The component** is `src/components/astrology/Kamea.tsx` (MIT),
+  beside the other planetary components: `Kamea` draws a planet's
+  square in an `<svg>` of its own (`planet`, `size`, `label` for an
+  image's name, otherwise `aria-hidden`; `className`, `style`);
+  `KameaFigure` is the same as bare elements centred on the origin, 96
+  units across, for a drawing that places it (`fontFamily`, `paper`,
+  `ink`); `kameaGeometry(order)` gives each cell's centre. A name that
+  is not one of the seven draws the empty frame (`Object.hasOwn`). No
+  ids, links or `<style>`, so any number share a page. Room for stage
+  H's seals and sigils: `children` are drawn over the numbers in the
+  square's own frame, where `kameaGeometry` places the cells.
+- **The hall's `kamea` art** is `KameaFigure` in the hall's font and
+  palette. Its markup for the seven planets, the empty frame and an
+  unknown planet is pinned by a file snapshot
+  (`src/components/gd/hall/__snapshots__/kameaArt.html`) written by the
+  same test run at 33ad461, before the change (SHA-256 `8b5061f7…`),
+  and the preset snapshots (Theoricus 2's Moon, Philosophus 4's Venus)
+  pass unchanged. The import boundary holds: `Kamea` imports React,
+  `magick-data/astrology/kameas` and `../svgCoordinate` (inside
+  `src/components`), and the hall reaches it by a relative path inside
+  `src/components`.
+- **No demo page.** The repository shows a symbol on a `/gd/symbols`
+  page with its SEO entry, card, render contract and their tests
+  (about fifteen files for the Shewbread); that is more than this
+  change warranted, so the component has none yet (Follow-ups).
+
+### Bundle
+
+Production builds (webpack) from each commit's gate, gzip -6: the hall
+chunk the reader's drawing loads was 276,349 bytes (95,072 gzipped) at
+33ad461, 276,910 (93,958) with the squares read from magick-data's
+subpath (d5219d7; 276,597 before the review fixes added the order
+checks), and 277,262 (94,153) with the `Kamea` component (1c291d6;
+276,928 before them); the dock and the page do not touch that chunk. Neither the planet table nor any other barrel table entered it
+(no planet or zodiac names in the chunk); the squares' only literal is
+still the Sun's.
+
+### What was verified, and how
+
+- **Gates**, per commit, each in a clean `git archive` export with Node
+  24 and the CI placeholder environment (`pnpm check`, `typecheck`,
+  `test:coverage` with the per-file thresholds, `build`): all 0 for the
+  four code commits as first built and again as rebuilt with the review
+  fixes; the tip also `loom check`, the magick-data smoke test (which
+  loads the kameas) and `pnpm check:turbopack`, all 0. The new modules
+  joined the coverage list (`astrology/kameas.ts`, `Kamea.tsx`, the
+  hall's `planets.ts`, `hallPanelDock.ts`). The compiler is untouched:
+  `semantic.ts`, `semanticCompile.ts`, `semanticCompilerImpl.ts` and
+  `ritualNodeIds.ts` have no diff.
+- **Tests:** the squares in magick-data (with hostile names and refused
+  orders), the hall's planet names against the planet table, `Kamea`
+  and `KameaFigure` (numbers row by row in their cells, the rules, the
+  `<svg>` and its label, no ids or links among many, fonts and colours,
+  the empty frame, hostile names, the overlay last and in the square's
+  frame, the geometry), the hall's kamea art against its snapshot from
+  33ad461; `hallPanelDock` (the 732 px switch and its hysteresis, the
+  border box and its fallback, `revealDelta`, `scrollingAncestor`, the
+  box's height from a scroller or the window's layout viewport and its
+  resizes and `visualViewport`'s, no place before a width, the observer
+  disconnected on unmount, the 400 px floor, the kept choice
+  shared in the page and across tabs, blocked storage, the server's
+  snapshot); the editor: beside at 732, docked at 731 and back only at
+  748, docked and back beside, the box's height as a CSS variable, in
+  the flow in a short box, one column without a width, the dock's own
+  observer stopped on unmount, the compact hall fields, hidden and shown
+  with the selection
+  named and the choice kept and followed by a second editor and another
+  tab, a typed value kept while hidden, a field focused as the panel
+  docks kept open and the viewer's choice followed again after it has
+  been beside, the focus followed out of a field without a blur, the
+  focus of Hide and of All hall settings given to a field or the
+  drawing, keyboard selections and nudges scrolled clear of the dock
+  and a pointer's not, a key that changed nothing forgotten before a
+  pointer's selection, the panel's Larger, Duplicate and Smaller
+  revealed, no scroll beside; the page's three parts in
+  order and the toolbar in the text column in every layout. The focus,
+  reveal and flow tests and those of the second review fail with their
+  fix taken out; the page tests fail on the page before the change.
+- **Not tested in jsdom**, which lays nothing out: the CSS itself
+  (sticky positioning, the grid's minimums, the strip's height cap,
+  the scroll margins, the safe-area padding, the columns, the toolbar's
+  column). Those were checked in the browser only.
+- **In the browser** (Turbopack dev server from this branch on
+  127.0.0.1, headless Chromium over CDP with classic 15 px scrollbars,
+  `Emulation.setScrollbarsHidden(false)`; the phones with touch
+  emulation and the mobile viewport, whose scrollbars overlay;
+  synthetic data only), after the review fixes: `/gd/hall` in split
+  and visual at 1920 × 1080, 1440 × 900, 1280 × 800, 1024 × 768, 390 ×
+  844 and 844 × 390, with the widths above, no horizontal scroll, the
+  layout switch at the same place in every layout, and every keyboard
+  selection in view; the landscape phone's 812 px editor is beside. In
+  the ritual editor ("Hall check (stage B)", the local Creator,
+  nothing edited) in split at the four desktop sizes and on the phones
+  with Edit hall open: docked at each, its foot on the visual panel's
+  (1,064, 884, 784, 752 and 828 px, the panel's own bottoms), in the
+  flow below the drawing on the landscape phone; every keyboard
+  selection clear of the dock; Escape twice left the editor, and the
+  ritual stayed "Saved". Before the review fixes the same checks (with
+  hidden scrollbars) covered hiding and a reload, x typed in the dock,
+  Ctrl+Z and a drag released over the dock. Screenshots are outside
+  the repository.
+- **Phones, after the second review** (mobile emulation with touch,
+  `/gd/hall` visual and split and the ritual editor's visual view with
+  Edit hall open; the window now reads the device's size, no
+  horizontal scroll anywhere, and Tab through all 25 objects left none
+  hidden):
+
+  | Phone | `/gd/hall` editor | Dock | Strip, nothing selected → an object |
+  | --- | --- | --- | --- |
+  | 390 × 844 | 358 px, docked | stuck, room 844 | 164 px (19 %) → 261 (31 %) |
+  | 375 × 667 | 343 px, docked | stuck, room 667 | 164 (25 %) → 208 (31 %) |
+  | 667 × 375 | 635 px, docked | in the flow, room 375 | below the drawing |
+  | 640 × 360 | 608 px, docked | in the flow, room 360 | below the drawing |
+
+  In the ritual editor: 390 × 844 stuck in a 632 px panel (164 → 197
+  px, 26–31 %), 375 × 667 stuck in 455 px (144 px, 32 %), and in the
+  flow on both landscape phones (rooms of 200 and 140 px); Escape twice
+  left the editor and the ritual stayed "Saved". Before the fix
+  667 × 375 and 640 × 360 had a 136 px sticky dock over a 375 px
+  screen, and portrait phones about twice their room.
+- **Documentation screenshots:** none shows the hall editor or
+  `/gd/hall` (the capture's editor shots open the Neophyte ritual, which
+  holds no hall, and none opens Edit hall), so none was recaptured.
+
 ## Commits
 
 | Commit | Change |
@@ -2749,6 +3072,10 @@ subjects within 50 characters, the type included.
 | 65162ab | `veil`, `altar(kind="white")`, items `gong`, `brazier` and `candle` (F) |
 | a842390 | The placeholder estimate places banner rows along their line; `placedByAt` shared (F) |
 | 1ad0abc | The Practicus, Philosophus and Portal presets from the 1938 layouts; conflict 10 (F) |
+| d5219d7 | magick-data: the planetary kameas (`astrology/kameas`), orders checked, a table without a prototype; the hall's planet words in `planets.ts` (after F, Gadi's decision; review fixes folded in) |
+| 1c291d6 | The shared `Kamea` component (`src/components/astrology`), which the hall's `kamea` art wraps, pinned to 33ad461's bytes (after F, Gadi's decision; review fixes folded in) |
+| 8096767 | The hall editor's properties panel docked at the foot of its scrolling box when the editor is under 732 px (16 px of hysteresis), sized by that box, hideable and shared, keyboard selections scrolled clear of it, focus kept (after F, Gadi's decision; review fixes folded in) |
+| 4bb082d | Split `/gd/hall`'s panels at the full width, its columns 2:3, the toolbar in the text column (after F, Gadi's decision; review fixes folded in) |
 
 ## Future
 
@@ -2886,3 +3213,19 @@ colours (magick-data has none) in stage H; the Fire, Water and Union
 tablets in stage G; the slash menu now lists fourteen halls
 after "Temple hall" (typing a grade narrows it); the new presets and
 the switch checked in headless Chromium only.
+
+From the follow-ups after stage F: the docked panel (sticky in the page
+and in the ritual editor's scrolling visual panel, the safe-area inset,
+the scroll margins, keyboard selections scrolled clear of it) checked
+in headless Chromium only, with touch emulation for the phones (no
+Safari, Firefox or real device); `env(safe-area-inset-bottom)` stays 0
+until the app opts into `viewport-fit=cover`; the ritual editor's split
+stays 1:1, so with classic scrollbars its hall editor (717 px at 1920 ×
+1080) docks the panel at every screen size: Gadi to choose between a
+2:3 ritual split (873 px at 1920, 777 at 1440, both beside), a lower
+switch (717 px, a drawing of 465), or the dock; `/gd/hall` split misses
+side by side at 1280 × 800 by 2 px (730), which a 3:5 split would
+cure; a `/gd/symbols` page for `Kamea` (the repository's way of showing
+a symbol: page, SEO entry, card, render contract); the seals and
+sigils over `Kamea` in stage H, through its `children` and
+`kameaGeometry`.

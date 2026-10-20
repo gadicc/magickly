@@ -351,12 +351,13 @@ Follow-ups are separate from the completed migration work:
   candle, the Portal's adepts in the ritual roles, and nine presets for
   Practicus, Philosophus and the Portal from the 1938 layouts; the
   editors' layout switch reads Source, Split, Visual, and `/gd/hall` no
-  longer compares presets with the old drawings. Next, before stage G
-  (Gadi, 20 October 2026): the hall editor's panel beside the drawing
-  whenever it fits (split `/gd/hall` using the full width), otherwise
-  docked at the foot of the screen; and the kameas moved out of the
-  hall into magick-data and a shared `Kamea` component the hall wraps.
-  TODO from it: Gadi's call on the Chiefs on the new presets' daises
+  longer compares presets with the old drawings. Two follow-ups Gadi
+  decided on 20 October 2026 are done on `gate/gd-hall-f2`: the hall
+  editor's properties panel beside the drawing whenever it fits (split
+  `/gd/hall` at the full width, its columns 2:3), otherwise docked at the
+  foot of the screen as a strip the author can hide; and the kameas in
+  magick-data (`astrology/kameas`) with a shared `Kamea` component the
+  hall wraps. Stage G is next. TODO from it: Gadi's call on the Chiefs on the new presets' daises
   (after the merge; he leans towards Greer's redraws), the stage F
   markers and placeholders for stage H (seals, Eden, the Fall, adept
   lamens, the Minutum Mundum's path colours); recording officer movement between stations, a `gdVault` for
@@ -373,7 +374,10 @@ Follow-ups are separate from the completed migration work:
   fallback to Noto Sans for the hall's quoted font stacks, Gadi's call on
   whether a hall's PNG export embeds Enochian Plain for its tablets,
   `//-` comments inside the built-in docs' halls (stage I) against their
-  parity test, the stage E follow-ups (free labels on hosts, a drawing of
+  parity test, the docked panel checked outside headless Chromium, the
+  ritual editor's 1:1 split docking it at every screen size with classic
+  scrollbars (Gadi to choose a 2:3 split, a lower switch or the dock), a
+  `/gd/symbols` page for `Kamea`, the stage E follow-ups (free labels on hosts, a drawing of
   `/gd/hall` for search engines, share links' format 0 and the hall
   editor's new gestures outside Chromium; an app-wide `error.tsx`; the
   two-tab draft handling and the editor's error boundary outside
