@@ -4,6 +4,9 @@ import { Alert, Button } from "@mui/material";
 import dynamic from "next/dynamic";
 import React from "react";
 
+/** The page's text column, which the editor keeps to unless split. */
+const TEXT_COLUMN = { maxWidth: 1168, marginInline: "auto" } as const;
+
 /**
  * The hall editor loads after the page, on the client only: it reads this
  * browser's draft and the link's fragment, and its code (the visual
@@ -11,7 +14,11 @@ import React from "react";
  */
 const HallPlayground = dynamic(() => import("./HallPlayground"), {
   ssr: false,
-  loading: () => <p role="status">Loading the hall editor…</p>,
+  loading: () => (
+    <p role="status" style={TEXT_COLUMN}>
+      Loading the hall editor…
+    </p>
+  ),
 });
 
 /**
@@ -34,6 +41,7 @@ export class HallEditorBoundary extends React.Component<
     return (
       <Alert
         severity="error"
+        sx={TEXT_COLUMN}
         action={
           <Button
             color="inherit"

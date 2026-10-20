@@ -192,6 +192,34 @@ describe("the /gd/hall page", () => {
     ).toBeTruthy();
   });
 
+  it("puts the editor below the page's text column, not inside it", () => {
+    const markup = renderToStaticMarkup(<HallPage />);
+    // The text column holds the page's words and closes before the
+    // editor's band, which split view widens to the screen (Gadi, 20
+    // October 2026); the sources follow in a column of their own.
+    const parts = [...markup.matchAll(/data-hall-page="(\w+)"/g)];
+    expect(parts.map(([, part]) => part)).toEqual(["text", "editor", "text"]);
+    const [words, editor, sources] = parts.map(({ index }) => index);
+    const text = markup.indexOf("kept as a draft in this browser only");
+    expect(words).toBeLessThan(text);
+    expect(text).toBeLessThan(editor);
+    expect(markup.indexOf("Magick.ly is open-source")).toBeGreaterThan(sources);
+  });
+
+  it("takes the screen's width in split view only", () => {
+    render(<HallPlayground />);
+    const toolbar = screen.getByRole("toolbar", { name: "Temple hall editor" });
+    const playground = () => toolbar.closest("[data-layout]");
+    // The toolbar is the playground's own child, which keeps to the text
+    // column in every layout; only the panels widen.
+    expect(toolbar.parentElement).toBe(playground());
+    expect(playground()?.getAttribute("data-layout")).toBe("split");
+    fireEvent.click(screen.getByRole("button", { name: "Visual" }));
+    expect(playground()?.getAttribute("data-layout")).toBe("visual");
+    fireEvent.click(screen.getByRole("button", { name: "Source" }));
+    expect(playground()?.getAttribute("data-layout")).toBe("source");
+  });
+
   it("remembers its layout apart from the ritual editor's", () => {
     render(<HallPlayground />);
     expect(

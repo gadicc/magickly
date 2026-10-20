@@ -1,5 +1,5 @@
 import { gdHallFontFaceCss } from "@magick-components/gd/hall";
-import { Container, Typography } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import Link from "next/link";
 import OpenSource from "@/OpenSource";
 import { pageMetadata } from "@/seo/metadata";
@@ -18,7 +18,7 @@ export default function HallPage() {
     <>
       {/* The halls' label fonts, for every hall on the page. */}
       <style>{gdHallFontFaceCss(GD_HALL_FONT_BASE)}</style>
-      <Container sx={{ p: 2 }}>
+      <Container sx={{ px: 2, pt: 2 }} data-hall-page="text">
         <Typography variant="body2" sx={{ mb: 1 }}>
           Golden Dawn temple halls, drawn from layouts as data with our own
           artwork. Start from a preset and edit it on the drawing or in its Pug
@@ -34,7 +34,13 @@ export default function HallPage() {
         <noscript>
           <p>The hall editor needs JavaScript, which is off in this browser.</p>
         </noscript>
+      </Container>
+      {/* Outside the Container: split view takes the screen's full width,
+          and the editor keeps to the text column otherwise. */}
+      <Box sx={{ px: 2 }} data-hall-page="editor">
         <HallPlaygroundLoader />
+      </Box>
+      <Container sx={{ px: 2, pb: 2 }} data-hall-page="text">
         <OpenSource
           files={[
             "/src/app/gd/hall/HallPlayground.tsx",

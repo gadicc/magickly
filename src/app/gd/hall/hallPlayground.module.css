@@ -1,7 +1,25 @@
+/* Everything keeps to the page's text column (MUI's lg Container, 1,200px
+   less its 16px gutters) but split view's two panels, which take the
+   screen's full width, so that on a desktop the drawing's half is wide
+   enough for the properties panel beside it (Gadi, 20 October 2026). The
+   toolbar and the notes stay put as the layout changes, so the layout
+   switch does not move under the pointer. Visual alone gains nothing from
+   more width: the drawing stops at 40rem, and the panel already stands
+   beside it in the text column. */
 .playground {
   display: grid;
   gap: 0.75rem;
   min-width: 0;
+  width: 100%;
+}
+.playground > * {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1168px;
+  margin-inline: auto;
+}
+.playground > .panels[data-layout="split"] {
+  max-width: none;
 }
 .toolbar {
   display: flex;
@@ -19,10 +37,12 @@
   grid-template-columns: minmax(0, 1fr);
   align-items: start;
 }
-/* Source beside the drawing on a wide screen; stacked on a phone. */
+/* Source beside the drawing on a wide screen, two parts to three, the
+   drawing's half holding the editor's properties panel too; stacked on a
+   phone. */
 @media (min-width: 900px) {
   .panels[data-layout="split"] {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
   }
 }
 .panel {

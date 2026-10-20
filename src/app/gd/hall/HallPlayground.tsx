@@ -579,7 +579,7 @@ export default function HallPlayground() {
             : null;
 
   return (
-    <div className={styles.playground}>
+    <div className={styles.playground} data-layout={displayMode}>
       {notes.map((note) => (
         <Alert
           key={note.kind}
