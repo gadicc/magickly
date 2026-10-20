@@ -1,9 +1,13 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { KameaFigure } from "../../astrology/Kamea";
 import { defaultHallArt } from "./art";
+import { PALETTE } from "./art/shared";
 import { TABLET_ELEMENTS, tabletArt } from "./art/symbols";
 import { romanNumeral, TRUMPS } from "./art/tarotKey";
+import { GD_HALL_FONT_STACKS } from "./fonts";
 import { resolveHall } from "./layout";
+import { KAMEA_PLANET_IDS, PLANETS } from "./planets";
 import type { HallArt, HallArtProps, HallNode } from "./types";
 import { validateHall } from "./validate";
 
@@ -339,6 +343,29 @@ describe("the kameas and seals", () => {
     expect(moon).not.toMatch(/href|\sid=|url\(/);
   });
 
+  it("draws the shared Kamea's figure, in the hall's font and palette", () => {
+    const figure = (planet?: (typeof PLANETS)[number]) =>
+      renderToStaticMarkup(
+        <svg aria-hidden="true">
+          <KameaFigure
+            planet={planet && KAMEA_PLANET_IDS.get(planet)}
+            fontFamily={GD_HALL_FONT_STACKS.serif}
+            paper={PALETTE.paper}
+            ink={PALETTE.ink}
+          />
+        </svg>,
+      );
+    for (const planet of PLANETS)
+      expect(draw(art("kamea"), { type: "kamea", planet }), planet).toBe(
+        figure(planet),
+      );
+    expect(draw(art("kamea"), { type: "kamea" })).toBe(figure());
+    // The hall's "moon" is magick-data's "luna".
+    expect(draw(art("kamea"), { type: "kamea", planet: "moon" })).toContain(
+      `font-family="${GD_HALL_FONT_STACKS.serif.replaceAll('"', "&quot;")}"`,
+    );
+  });
+
   it("draws an empty frame without a planet, or with one it does not know", () => {
     const empty = draw(art("kamea"), { type: "kamea" });
     expect(numbers(empty)).toEqual([]);
@@ -392,5 +419,27 @@ describe("the Shewbread and the candlestick", () => {
       );
       expect(markup, key).toContain('viewBox="-50 -50 100 100"');
     }
+  });
+});
+
+describe("the kamea art's bytes", () => {
+  it("are what they were before the shared Kamea (33ad461)", async () => {
+    // Seven planets, no planet and one the vocabulary does not know.
+    const markup = [
+      "saturn",
+      "jupiter",
+      "mars",
+      "sun",
+      "venus",
+      "mercury",
+      "moon",
+      undefined,
+      "pluto",
+    ]
+      .map((planet) => draw(art("kamea"), { type: "kamea", planet }))
+      .join("\n");
+    await expect(`${markup}\n`).toMatchFileSnapshot(
+      "./__snapshots__/kameaArt.html",
+    );
   });
 });

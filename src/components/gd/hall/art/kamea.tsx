@@ -1,4 +1,4 @@
-import kameas, { type KameaPlanetId } from "magick-data/astrology/kameas";
+import { KameaFigure } from "../../../astrology/Kamea";
 import { svgCoordinate } from "../../../svgCoordinate";
 import { enumAttr } from "../attributes";
 import { GD_HALL_FONT_STACKS } from "../fonts";
@@ -14,7 +14,8 @@ import { original, PALETTE, variantOf } from "./shared";
 
 export const kameaProvenance = original(
   "A planet's magic square drawn from its numbers, which magick-data " +
-    "computes (astrology/kameas): a grid with each number in its cell.",
+    "computes (astrology/kameas): the shared Kamea component's figure, a " +
+    "grid with each number in its cell.",
 );
 export const sealProvenance = original(
   "A placeholder for a planet's seals: a dashed ring naming the planet. " +
@@ -30,65 +31,19 @@ export const PLANET_SPEC: HallAttrSpec = { kind: "enum", values: PLANETS };
 const planetOf = (node: HallNode): Planet | undefined =>
   enumAttr(node, "planet", PLANETS);
 
-/** The square's side, in units, and its outline. */
-const SIDE = 96;
-const FRAME = 2;
-const RULE = 0.6;
-
+/**
+ * The shared `KameaFigure` in the hall's fonts and palette. Its square is
+ * 96 units across, inside the art's 100 × 100 box.
+ */
 function Kamea({ node }: HallArtProps) {
   const planet = planetOf(node);
-  const half = SIDE / 2;
-  const frame = (
-    <rect
-      x={-half}
-      y={-half}
-      width={SIDE}
-      height={SIDE}
-      fill={PALETTE.paper}
-      stroke={PALETTE.ink}
-      strokeWidth={FRAME}
-    />
-  );
-  if (!planet) return frame;
-  const square = kameas[KAMEA_PLANET_IDS.get(planet) as KameaPlanetId];
-  const n = square.length;
-  const cell = SIDE / n;
-  const size = cell * 0.48;
-  const rules = Array.from({ length: n - 1 }, (_, i) =>
-    svgCoordinate(-half + (i + 1) * cell),
-  );
   return (
-    <>
-      {frame}
-      <path
-        d={rules
-          .map((at) => `M${at},${-half}V${half}M${-half},${at}H${half}`)
-          .join("")}
-        stroke={PALETTE.ink}
-        strokeWidth={RULE}
-        fill="none"
-      />
-      <g
-        fill={PALETTE.ink}
-        fontFamily={GD_HALL_FONT_STACKS.serif}
-        fontStyle="italic"
-        fontSize={svgCoordinate(size)}
-        textAnchor="middle"
-      >
-        {square.flatMap((row, i) =>
-          row.map((value, j) => (
-            <text
-              key={value}
-              x={svgCoordinate(-half + (j + 0.5) * cell)}
-              // The digits' middle on the cell's: a third of the size down.
-              y={svgCoordinate(-half + (i + 0.5) * cell + size * 0.36)}
-            >
-              {value}
-            </text>
-          )),
-        )}
-      </g>
-    </>
+    <KameaFigure
+      planet={planet && KAMEA_PLANET_IDS.get(planet)}
+      fontFamily={GD_HALL_FONT_STACKS.serif}
+      paper={PALETTE.paper}
+      ink={PALETTE.ink}
+    />
   );
 }
 
