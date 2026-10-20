@@ -1282,3 +1282,454 @@ describe("hosts that are always editing", () => {
     );
   });
 });
+
+describe("the panel's place (owner's decision, 20 October 2026)", () => {
+  /** The editor's width, which the mocked layout reports for its root. */
+  let width = 0;
+  /** The docked panel's height, as the mocked layout reports it. */
+  let panelHeight = 300;
+  const observers: ((entries: ResizeObserverEntry[]) => void)[] = [];
+  const disconnected = vi.fn();
+
+  beforeEach(() => {
+    width = 0;
+    panelHeight = 300;
+    observers.length = 0;
+    disconnected.mockClear();
+    localStorage.clear();
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        watched: Element[] = [];
+        constructor(callback: (entries: ResizeObserverEntry[]) => void) {
+          observers.push(callback);
+        }
+        observe(element: Element) {
+          this.watched.push(element);
+        }
+        disconnect() {
+          disconnected(this.watched);
+        }
+      },
+    );
+    const overlay = vi.mocked(Element.prototype.getBoundingClientRect);
+    const drawn = overlay.getMockImplementation();
+    overlay.mockImplementation(function (this: Element) {
+      if (this.matches("[data-gd-hall-controls]"))
+        return new DOMRect(0, 0, width, 900);
+      if (this.matches("[data-hall-panel]"))
+        return new DOMRect(0, 768 - panelHeight, width, panelHeight);
+      return drawn ? drawn.call(this) : new DOMRect();
+    });
+  });
+
+  afterEach(() => localStorage.clear());
+
+  /** Gives the editor a new width, as the observer reports a border box. */
+  const resize = (next: number) => {
+    width = next;
+    const root = document.querySelector("[data-gd-hall-controls]") as Element;
+    const entry = {
+      target: root,
+      borderBoxSize: [{ inlineSize: next, blockSize: 900 }],
+      contentRect: new DOMRect(0, 0, next, 900),
+    } as unknown as ResizeObserverEntry;
+    act(() => {
+      for (const report of observers) report([entry]);
+    });
+  };
+  /** The editor's body, which holds the drawing and the panel. */
+  const body = () =>
+    screen.getByRole("heading", { level: 3 }).closest("section")
+      ?.parentElement as HTMLElement;
+  const panel = () =>
+    screen.getByRole("heading", { level: 3 }).closest("section") as HTMLElement;
+  const toggle = () => screen.queryByRole("button", { name: /properties$/ });
+  const fieldsOf = (button: HTMLElement) =>
+    document.getElementById(
+      button.getAttribute("aria-controls") ?? "",
+    ) as HTMLElement;
+
+  it("stands beside the drawing when the editor is wide enough", () => {
+    width = 900;
+    setup();
+    expect(body().dataset.panel).toBe("beside");
+    expect(panel().dataset.hallPanel).toBe("beside");
+    expect(toggle()).toBeNull();
+    // Beside down to 732 px: a 30rem drawing, the 15rem panel, the gap.
+    resize(732);
+    expect(body().dataset.panel).toBe("beside");
+    resize(731);
+    expect(body().dataset.panel).toBe("docked");
+  });
+
+  it("goes back beside only 16 px wider, so a scrollbar cannot flap it", () => {
+    width = 731;
+    setup();
+    expect(body().dataset.panel).toBe("docked");
+    resize(740);
+    expect(body().dataset.panel).toBe("docked");
+    resize(747);
+    expect(body().dataset.panel).toBe("docked");
+    resize(748);
+    expect(body().dataset.panel).toBe("beside");
+    // A scrollbar's 15 px taken and given back: beside, docked, docked.
+    resize(733);
+    expect(body().dataset.panel).toBe("beside");
+    resize(718);
+    expect(body().dataset.panel).toBe("docked");
+    resize(733);
+    expect(body().dataset.panel).toBe("docked");
+  });
+
+  it("docks at the screen's foot when it is not, and goes back beside", () => {
+    width = 576;
+    const { surface } = setup();
+    expect(body().dataset.panel).toBe("docked");
+    expect(panel().dataset.hallPanel).toBe("docked");
+    const button = toggle() as HTMLElement;
+    expect(button.textContent).toBe("Hide properties");
+    expect(button.getAttribute("aria-expanded")).toBe("true");
+    // The keys and the live region work as before.
+    key(surface, "Tab");
+    expect(selected()).toBe("Imperator selected");
+    expect(
+      fieldsOf(button).contains(screen.getByRole("textbox", { name: /^x/ })),
+    ).toBe(true);
+    resize(1000);
+    expect(body().dataset.panel).toBe("beside");
+    expect(toggle()).toBeNull();
+  });
+
+  it("caps the dock by the height of the box it sticks in", () => {
+    width = 576;
+    setup();
+    // No scrolling ancestor in this page: the window's height (jsdom 768).
+    expect(body().style.getPropertyValue("--hall-dock-room")).toBe("768px");
+  });
+
+  it("stays below the drawing in a box too short to dock in", () => {
+    const scrolled = vi.spyOn(window, "scrollBy").mockImplementation(() => {});
+    vi.stubGlobal("innerHeight", 390);
+    width = 576;
+    const { surface } = setup(
+      hallFromPug("gdHall", "  floor", '    pillar(kind="white", x=12, y=4)'),
+    );
+    expect(body().dataset.panel).toBe("docked");
+    expect(body().dataset.dock).toBe("flow");
+    // Nothing lies over the drawing, so a selection in view stays put.
+    key(surface, "Tab");
+    expect(scrolled).not.toHaveBeenCalled();
+    width = 576;
+    vi.stubGlobal("innerHeight", 768);
+    act(() => {
+      window.dispatchEvent(new Event("resize"));
+    });
+    expect(body().dataset.dock).toBe("stuck");
+  });
+
+  it("lays one column until the editor has a width", () => {
+    // Unmeasured, a beside layout would ask 748 px of any screen, and a
+    // phone's browser would shrink the page to fit before measuring.
+    setup();
+    expect(body().dataset.panel).toBeUndefined();
+    expect(panel().dataset.hallPanel).toBe("beside");
+    expect(toggle()).toBeNull();
+    resize(0);
+    expect(body().dataset.panel).toBeUndefined();
+    resize(358);
+    expect(body().dataset.panel).toBe("docked");
+  });
+
+  it("stops observing when the editor goes", () => {
+    width = 900;
+    setup();
+    const root = document.querySelector("[data-gd-hall-controls]");
+    expect(disconnected).not.toHaveBeenCalled();
+    cleanup();
+    // The panel's own observer, which watched the editor itself (the
+    // overlay's watches the drawing).
+    expect(disconnected).toHaveBeenCalledWith([root]);
+  });
+
+  it("shows the hall's caption docked, the rest a click away", () => {
+    width = 390;
+    const { surface } = setup();
+    expect(screen.getByRole("textbox", { name: "Caption" })).toBeTruthy();
+    expect(screen.queryByRole("textbox", { name: "Dais depth" })).toBeNull();
+    const more = screen.getByRole("button", { name: "All hall settings" });
+    expect(more.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(more);
+    expect(screen.getByRole("textbox", { name: "Dais depth" })).toBeTruthy();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Fewer hall settings" }),
+    );
+    expect(screen.queryByRole("textbox", { name: "Dais depth" })).toBeNull();
+    // A selection shows its own fields at once.
+    key(surface, "Tab");
+    expect(screen.getByRole("textbox", { name: /^x/ })).toBeTruthy();
+    expect(
+      screen.queryByRole("button", { name: "All hall settings" }),
+    ).toBeNull();
+    // Beside, every hall field shows as before.
+    key(surface, "Escape");
+    resize(900);
+    expect(screen.getByRole("textbox", { name: "Dais depth" })).toBeTruthy();
+  });
+
+  it("hides to its title bar and shows again, kept for this viewer", () => {
+    width = 390;
+    const { surface } = setup();
+    key(surface, "Tab");
+    fireEvent.click(toggle() as HTMLElement);
+    const button = toggle() as HTMLElement;
+    expect(button.textContent).toBe("Show properties");
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+    const fields = fieldsOf(button);
+    expect(fields.hidden).toBe(true);
+    expect(panel().dataset.collapsed).toBe("true");
+    // The title bar still says what is selected, as the selection moves.
+    key(surface, "Tab");
+    expect(screen.getByRole("heading", { level: 3 }).textContent).toMatch(
+      /^Cancellarius/,
+    );
+    expect(localStorage.getItem("magickli:gd-hall-panel-collapsed:v1")).toBe(
+      "1",
+    );
+    // Beside the drawing it is never hidden.
+    resize(900);
+    expect(fields.hidden).toBe(false);
+    expect(panel().dataset.collapsed).toBeUndefined();
+    resize(390);
+    expect(fields.hidden).toBe(true);
+    // Another hall, or the next visit, opens it as this viewer left it.
+    cleanup();
+    setup();
+    expect(toggle()?.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(toggle() as HTMLElement);
+    expect(toggle()?.getAttribute("aria-expanded")).toBe("true");
+    expect(
+      localStorage.getItem("magickli:gd-hall-panel-collapsed:v1"),
+    ).toBeNull();
+  });
+
+  it("follows the choice made in another editor or another tab", () => {
+    width = 390;
+    setup();
+    const second = render(
+      <GdHallEditor
+        hall={neophyteHall()}
+        art={gdHallArt}
+        onChange={() => {}}
+      />,
+    );
+    const toggles = () =>
+      screen.getAllByRole("button", { name: /properties$/ });
+    expect(toggles()).toHaveLength(2);
+    fireEvent.click(toggles()[0]);
+    expect(toggles().map((button) => button.textContent)).toEqual([
+      "Show properties",
+      "Show properties",
+    ]);
+    second.unmount();
+    // Another tab shows it again.
+    localStorage.removeItem("magickli:gd-hall-panel-collapsed:v1");
+    act(() => {
+      window.dispatchEvent(
+        new StorageEvent("storage", {
+          key: "magickli:gd-hall-panel-collapsed:v1",
+          newValue: null,
+        }),
+      );
+    });
+    expect(toggle()?.textContent).toBe("Hide properties");
+  });
+
+  it("keeps a value typed before it was hidden, for a save to write", () => {
+    width = 390;
+    const { surface, changes, current } = setup();
+    key(surface, "Tab");
+    const x = screen.getByRole("textbox", { name: /^x/ }) as HTMLInputElement;
+    act(() => x.focus());
+    fireEvent.change(x, { target: { value: "3" } });
+    fireEvent.click(toggle() as HTMLElement);
+    expect(x.isConnected).toBe(true);
+    act(() => {
+      expect(flushPendingEdits()).toBe(true);
+    });
+    expect(changes).toHaveLength(1);
+    expect(byAttr(current(), "role", "imperator").attrs.x).toBe(3);
+  });
+
+  it("opens rather than hide a field that holds the focus as it docks", () => {
+    localStorage.setItem("magickli:gd-hall-panel-collapsed:v1", "1");
+    width = 1440;
+    const { surface } = setup();
+    key(surface, "Tab");
+    const x = screen.getByRole("textbox", { name: /^x/ }) as HTMLInputElement;
+    act(() => x.focus());
+    resize(1024 - 450);
+    expect(body().dataset.panel).toBe("docked");
+    expect(fieldsOf(toggle() as HTMLElement).hidden).toBe(false);
+    expect(document.activeElement).toBe(x);
+    // Leaving the field keeps it open in this editor until it is hidden.
+    act(() => surface.focus());
+    expect(fieldsOf(toggle() as HTMLElement).hidden).toBe(false);
+    fireEvent.click(toggle() as HTMLElement);
+    expect(fieldsOf(toggle() as HTMLElement).hidden).toBe(true);
+  });
+
+  it("gives the Hide button's focus to a field when the dock goes", () => {
+    width = 576;
+    const { surface } = setup();
+    key(surface, "Tab");
+    act(() => (toggle() as HTMLElement).focus());
+    resize(1440);
+    expect(toggle()).toBeNull();
+    expect(document.activeElement).toBe(
+      screen.getByRole("textbox", { name: /^x/ }),
+    );
+  });
+
+  it("gives All hall settings' focus to the caption when the dock goes", () => {
+    width = 576;
+    setup();
+    act(() =>
+      screen.getByRole("button", { name: "All hall settings" }).focus(),
+    );
+    resize(1440);
+    expect(
+      screen.queryByRole("button", { name: "All hall settings" }),
+    ).toBeNull();
+    expect(document.activeElement).toBe(
+      screen.getByRole("textbox", { name: "Caption" }),
+    );
+  });
+
+  it("follows the focus out of a field even without a blur", () => {
+    width = 1440;
+    const { surface } = setup();
+    const dais = screen.getByRole("textbox", { name: "Dais depth" });
+    act(() => dais.focus());
+    // Docked with a hall field focused: the hall's fields stay.
+    resize(576);
+    expect(screen.getByRole("textbox", { name: "Dais depth" })).toBe(dais);
+    // The focus leaves with no blur event, as Firefox leaves a field that
+    // is removed; the next render reads where it went.
+    const swallow = (event: Event) => event.stopImmediatePropagation();
+    dais.addEventListener("blur", swallow, { capture: true });
+    dais.addEventListener("focusout", swallow, { capture: true });
+    act(() => surface.focus());
+    key(surface, "Tab");
+    key(surface, "Escape");
+    expect(screen.queryByRole("textbox", { name: "Dais depth" })).toBeNull();
+  });
+
+  it("follows the viewer's choice again once it has been beside", () => {
+    localStorage.setItem("magickli:gd-hall-panel-collapsed:v1", "1");
+    width = 1440;
+    const { surface } = setup();
+    key(surface, "Tab");
+    const x = () =>
+      document.querySelector('input[data-hall-field="x"]') as HTMLElement;
+    act(() => x().focus());
+    resize(576);
+    expect(fieldsOf(toggle() as HTMLElement).hidden).toBe(false);
+    resize(1440);
+    act(() => surface.focus());
+    resize(576);
+    expect(fieldsOf(toggle() as HTMLElement).hidden).toBe(true);
+  });
+
+  it("gives it to the drawing when no field can take it", () => {
+    width = 576;
+    const { surface } = setup(neophyteHall(), false);
+    act(() => (toggle() as HTMLElement).focus());
+    resize(1440);
+    expect(document.activeElement).toBe(surface);
+  });
+
+  describe("a selection made by a key", () => {
+    /** A hall whose pillar stands low, under a docked panel's top. */
+    const low = () =>
+      hallFromPug(
+        "gdHall",
+        "  floor",
+        '    pillar(kind="black", x=4, y=2)',
+        '    pillar(kind="white", x=12, y=15)',
+      );
+
+    it("is scrolled clear of the dock, and a pointer's is not", () => {
+      const scrolled = vi
+        .spyOn(window, "scrollBy")
+        .mockImplementation(() => {});
+      width = 576;
+      const { surface } = setup(low());
+      key(surface, "Tab");
+      // The black pillar, high on the floor: in view already.
+      expect(scrolled).not.toHaveBeenCalled();
+      key(surface, "Tab");
+      // The white pillar's foot lies below 768 − 300 − 12 px.
+      expect(scrolled).toHaveBeenCalledTimes(1);
+      const [{ top }] = scrolled.mock.calls[0] as unknown as [ScrollToOptions];
+      expect(top).toBeGreaterThan(0);
+      // A nudge scrolls again; a click on the drawing does not.
+      key(surface, "ArrowDown");
+      expect(scrolled).toHaveBeenCalledTimes(2);
+      key(surface, "Escape");
+      pointer("pointerDown", surface, at(12, 15));
+      pointer("pointerUp", surface, at(12, 15));
+      expect(selected()).toContain("selected");
+      expect(scrolled).toHaveBeenCalledTimes(2);
+    });
+
+    it("forgets a key that changed nothing before a pointer's selection", () => {
+      const scrolled = vi
+        .spyOn(window, "scrollBy")
+        .mockImplementation(() => {});
+      width = 576;
+      const { surface } = setup(low());
+      key(surface, "Tab");
+      // Smaller than the least scale: nothing changes, nothing renders.
+      for (let i = 0; i < 40; i++) key(surface, "-");
+      const count = scrolled.mock.calls.length;
+      key(surface, "-");
+      expect(scrolled.mock.calls.length).toBe(count);
+      // The low pillar, picked by the pointer under the dock: no jump.
+      pointer("pointerDown", surface, at(12, 15));
+      pointer("pointerUp", surface, at(12, 15));
+      expect(selected()).toBe("White pillar selected");
+      expect(scrolled.mock.calls.length).toBe(count);
+    });
+
+    it("reveals what the panel's buttons move or add", () => {
+      const scrolled = vi
+        .spyOn(window, "scrollBy")
+        .mockImplementation(() => {});
+      width = 576;
+      const { surface } = setup(low());
+      key(surface, "Tab");
+      key(surface, "Tab");
+      // The low pillar, scrolled clear (the mocked scroll moves nothing,
+      // so it stays under the dock for what follows).
+      expect(scrolled).toHaveBeenCalledTimes(1);
+      fireEvent.click(screen.getByRole("button", { name: "Larger" }));
+      expect(scrolled).toHaveBeenCalledTimes(2);
+      fireEvent.click(screen.getByRole("button", { name: "Duplicate" }));
+      expect(scrolled).toHaveBeenCalledTimes(3);
+      fireEvent.click(screen.getByRole("button", { name: "Smaller" }));
+      expect(scrolled).toHaveBeenCalledTimes(4);
+    });
+
+    it("needs no scroll beside the drawing, with no dock below", () => {
+      const scrolled = vi
+        .spyOn(window, "scrollBy")
+        .mockImplementation(() => {});
+      width = 900;
+      const { surface } = setup(low());
+      key(surface, "Tab");
+      key(surface, "Tab");
+      expect(scrolled).not.toHaveBeenCalled();
+    });
+  });
+});

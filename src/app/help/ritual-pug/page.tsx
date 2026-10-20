@@ -123,8 +123,10 @@ export default function RitualPugGuide() {
         officer or banner dragged along the dais or a banner row changes places
         (<kbd>Alt</kbd> and the arrow keys do the same; an Alt-drag places it
         freely), and an item, marker or officer dropped on an altar, platform or
-        throne that takes it stands on it. A hall with warnings shows how many
-        beside <strong>Edit hall</strong>.
+        throne that takes it stands on it. The properties of what is selected
+        stand beside the drawing where there is room, and otherwise at the foot
+        of the screen, where they can be hidden and shown again. A hall with
+        warnings shows how many beside <strong>Edit hall</strong>.
       </p>
       <h2>Finding and fixing errors</h2>
       <p>

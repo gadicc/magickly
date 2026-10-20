@@ -1,7 +1,8 @@
-/* The visual hall editor (plan 061, decision 11). Side by side when its
-   container is wide enough, the panel below the drawing otherwise. */
+/* The visual hall editor (plan 061, decision 11). The properties panel
+   stands beside the drawing when the editor is wide enough, and is
+   docked at the foot of the screen otherwise (hallPanelDock.ts, which
+   measures the editor and sets `data-panel`). */
 .editor {
-  container-type: inline-size;
   display: grid;
   gap: 0.5rem;
 }
@@ -19,11 +20,43 @@
   gap: 0.75rem;
   grid-template-columns: minmax(0, 1fr);
 }
-@container (min-width: 720px) {
-  .body {
-    grid-template-columns: minmax(0, 1fr) minmax(15rem, 19rem);
-    align-items: start;
-  }
+/* Beside, the drawing keeps at least 30rem and the panel at least 15rem
+   (hallPanelDock.ts docks the panel in a narrower editor); room beyond
+   both goes to the panel up to 19rem, then to the drawing. Just above the
+   switch the drawing is 480px; just below it, docked, at most 40rem. */
+.body[data-panel="beside"] {
+  grid-template-columns: minmax(30rem, 1fr) minmax(15rem, 19rem);
+  align-items: start;
+}
+.body {
+  /* The docked strip's fields: at most 30% of the box it sticks in, less
+     its title bar, within 4.5–13rem. The box's height is measured
+     (--hall-dock-room); the screen's stands in until it is. */
+  --dock-fields: clamp(
+    4.5rem,
+    calc(var(--hall-dock-room, 100dvh) * 0.3 - 3.5rem),
+    13rem
+  );
+}
+/* Docked, the panel sticks to the foot of the nearest scrolling box (the
+   page, or the ritual editor's visual panel) while the editor is on
+   screen, over the drawing, and stops at the editor's end; it never
+   covers the page beyond the editor. A sticky grid item could not leave
+   its own row, so the body is a block here. Its place in the flow stays
+   below the drawing, so the drawing's foot always scrolls clear of it. */
+.body[data-panel="docked"] {
+  display: block;
+}
+.body[data-panel="docked"] > .drawingColumn {
+  margin-bottom: 0.75rem;
+  /* A control focused under the dock is scrolled clear of it. */
+  --dock-clearance: calc(var(--dock-fields) + 4.5rem);
+}
+.body[data-panel="docked"]:has(.panel[data-collapsed]) > .drawingColumn {
+  --dock-clearance: 4.5rem;
+}
+.body[data-panel="docked"] > .drawingColumn :is(button, [tabindex]) {
+  scroll-margin-bottom: var(--dock-clearance);
 }
 .drawingColumn {
   display: grid;
@@ -190,10 +223,87 @@
   border-radius: 0.35rem;
   background: #fafbfd;
 }
+.panel[data-hall-panel="docked"] {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  gap: 0.25rem;
+  padding: 0.35rem 0.6rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+  border-radius: 0.35rem 0.35rem 0 0;
+  box-shadow: 0 -2px 10px rgb(0 0 0 / 0.14);
+}
+.panel[data-collapsed] {
+  padding-bottom: calc(0.35rem + env(safe-area-inset-bottom, 0px));
+}
+/* At least 44px square, a finger's target. */
+.dockToggle {
+  flex: none;
+  min-width: 44px;
+  min-height: 44px;
+}
+.hallFieldsToggle {
+  justify-self: start;
+  min-height: 44px;
+}
+/* A box too short to dock in (hallPanelDock.ts, DOCK_MIN_ROOM): the
+   strip stays below the drawing, in the flow, at its full height. */
+.body[data-dock="flow"] .panel[data-hall-panel="docked"] {
+  position: static;
+  box-shadow: none;
+  border-radius: 0.35rem;
+}
+.body[data-dock="flow"] .panel[data-hall-panel="docked"] .panelBody {
+  max-height: none;
+}
+.body[data-panel="docked"][data-dock="flow"]:has(.panel) > .drawingColumn {
+  --dock-clearance: 0px;
+}
+.panelTitleBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 2rem;
+}
+.panelBody {
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+  min-width: 0;
+}
+.panelBody[hidden] {
+  display: none;
+}
+/* Docked: a short, wide strip, its fields in as many columns as fit,
+   scrolling within itself rather than growing up the screen. */
+.panel[data-hall-panel="docked"] .panelBody {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr));
+  gap: 0.6rem 0.75rem;
+  align-items: start;
+  max-height: var(--dock-fields);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* Room for the outlined fields' raised labels in the first row. */
+  padding-top: 0.4rem;
+  container-type: inline-size;
+}
+/* x and y take two columns once there are two to take. */
+@container (min-width: 18.75rem) {
+  .panel[data-hall-panel="docked"] .panelBody > .fieldPair {
+    grid-column: span 2;
+  }
+}
+.panel[data-hall-panel="docked"]
+  .panelBody
+  > :is(.rowActions, .panelActions, .panelNote, .hallFieldsToggle) {
+  grid-column: 1 / -1;
+}
 .panelHeading {
   margin: 0;
+  min-width: 0;
   font-size: 0.95rem;
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 .panelTag {
   font-weight: 400;

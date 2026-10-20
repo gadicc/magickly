@@ -12,6 +12,8 @@ import {
   PLACEABLE_ATTRIBUTES,
 } from "@magick-components/gd/hall/vocabulary";
 import Add from "@mui/icons-material/Add";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
 import Remove from "@mui/icons-material/Remove";
 import {
   Button,
@@ -21,7 +23,15 @@ import {
   Switch,
   TextField,
 } from "@mui/material";
-import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
+import {
+  type KeyboardEvent,
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { registerPendingEdit } from "../pendingEdits";
 import type { JsonValue } from "../semantic";
 import styles from "./gdHallEditor.module.css";
@@ -56,6 +66,33 @@ export function hallFieldShown(node: HallElement, name: string): boolean {
   if (node.tag === "board" && (name === "w" || name === "h"))
     return !(BOARD_KINDS as readonly unknown[]).includes(node.attrs.kind);
   return true;
+}
+
+/**
+ * Whether an element in the panel is one of its fields, whose focus the
+ * panel keeps by staying open (not the button that shows the hall's).
+ */
+const isField = (element: Element) =>
+  !element.closest("[data-hall-fields-toggle]");
+
+/**
+ * A callback ref that notes, in `lost`, an element removed while it held
+ * the focus. React detaches a ref before it removes the element, so the
+ * focus can still be read there; the browser then drops it to the page.
+ */
+function useFocusWatch(lost: { current: boolean }) {
+  const element = useRef<HTMLElement | null>(null);
+  return useCallback(
+    (node: HTMLElement | null) => {
+      if (node) element.current = node;
+      else {
+        if (element.current && document.activeElement === element.current)
+          lost.current = true;
+        element.current = null;
+      }
+    },
+    [lost],
+  );
 }
 
 /** Booleans whose absence means true. */
@@ -351,6 +388,21 @@ export interface HallPropertiesProps {
   onSpreadRow: (entry: HallSelectable) => void;
   /** Stands an object on the floor (`floor`) or on a host (its ID). */
   onStandOn: (entry: HallSelectable, value: string) => void;
+  /**
+   * Docked at the foot of the screen, as a strip with its fields in
+   * columns that can be hidden to its title bar, rather than beside the
+   * drawing.
+   */
+  docked?: boolean;
+  /** Whether the docked panel shows only its title bar. */
+  collapsed?: boolean;
+  onCollapsedChange?: (collapsed: boolean) => void;
+  /**
+   * Takes the focus when the docked panel's Hide button, holding it, goes
+   * as the panel moves beside the drawing and the panel has no field to
+   * take it (the drawing, as the editor passes it).
+   */
+  onFocusElsewhere?: () => void;
 }
 
 /**
@@ -374,8 +426,57 @@ export function HallProperties({
   onStepInRow,
   onSpreadRow,
   onStandOn,
+  docked = false,
+  collapsed = false,
+  onCollapsedChange,
+  onFocusElsewhere,
 }: HallPropertiesProps) {
   const headingId = useId();
+  const bodyId = useId();
+  const body = useRef<HTMLDivElement>(null);
+  /** Whether a field in the panel holds the focus. */
+  const [focusInside, setFocusInside] = useState(false);
+  /**
+   * Kept open in this editor although the viewer hides the dock: it docked
+   * while a field held the focus, which hiding would have dropped.
+   */
+  const [heldOpen, setHeldOpen] = useState(false);
+  /** Docked with nothing selected: the hall's other fields on request. */
+  const [hallFieldsShown, setHallFieldsShown] = useState(false);
+  const hidden = docked && collapsed && !heldOpen && !focusInside;
+  const compact = docked && !selected && !hallFieldsShown && !focusInside;
+  useEffect(() => {
+    if (docked && collapsed && focusInside) setHeldOpen(true);
+    // Beside the drawing it is never hidden; docked again, it follows the
+    // viewer's choice.
+    if (!docked) setHeldOpen(false);
+  }, [docked, collapsed, focusInside]);
+  // Blur alone cannot be trusted to say the focus left: Firefox fires none
+  // for a focused field that is removed. Read it again after each render.
+  useLayoutEffect(() => {
+    const active = document.activeElement;
+    const inside =
+      !!active && !!body.current?.contains(active) && isField(active);
+    if (inside !== focusInside) setFocusInside(inside);
+  });
+  /**
+   * A button of the dock's that held the focus as the dock went (Hide, and
+   * All hall settings): the focus is then given to a field.
+   */
+  const dockFocusLost = useRef(false);
+  const toggleRef = useFocusWatch(dockFocusLost);
+  const hallFieldsRef = useFocusWatch(dockFocusLost);
+  useLayoutEffect(() => {
+    if (!dockFocusLost.current) return;
+    dockFocusLost.current = false;
+    const active = document.activeElement;
+    if (active && active !== document.body) return;
+    const field = body.current?.querySelector<HTMLElement>(
+      "input:not([disabled]):not([type=hidden]), button:not([disabled])",
+    );
+    if (field) field.focus({ preventScroll: true });
+    else onFocusElsewhere?.();
+  });
   const node = selected?.node ?? view.hall;
   const spec = hallNodeSpec(node, art);
   const fields = hallFieldOrder(spec).filter(([name]) =>
@@ -402,158 +503,221 @@ export function HallProperties({
   const stands = selected ? standOptions(view, selected.id) : [];
   const standing = selected ? standValue(view, selected.id) : undefined;
   return (
-    <section className={styles.panel} aria-labelledby={headingId}>
-      <h3 id={headingId} className={styles.panelHeading}>
-        {selected ? hallNodeName(node) : "Hall"}{" "}
-        <span className={styles.panelTag}>
-          · {selected ? node.tag : "nothing selected"}
-        </span>
-      </h3>
-      {!selected && (
-        <TypedField
-          key={`caption-${view.hall.id}`}
-          name="caption"
-          spec={{ kind: "string", maxLength: 200 }}
-          value={
-            typeof caption?.attrs.text === "string"
-              ? caption.attrs.text
-              : undefined
-          }
-          disabled={disabled}
-          art={art}
-          onCommit={(_name, value) =>
-            onSetCaption(typeof value === "string" ? value : undefined)
-          }
-        />
-      )}
-      {fields.map(([name, fieldSpec], index) => {
-        const field = (key: string, fieldName: string, spec: HallAttrSpec) => (
-          <Field
-            key={key}
-            name={fieldName}
-            spec={spec}
-            value={node.attrs[fieldName]}
-            placeholder={placeholder(fieldName)}
+    <section
+      className={styles.panel}
+      aria-labelledby={headingId}
+      data-hall-panel={docked ? "docked" : "beside"}
+      data-collapsed={hidden || undefined}
+    >
+      <div className={styles.panelTitleBar}>
+        <h3 id={headingId} className={styles.panelHeading}>
+          {selected ? hallNodeName(node) : "Hall"}{" "}
+          <span className={styles.panelTag}>
+            · {selected ? node.tag : "nothing selected"}
+          </span>
+        </h3>
+        {docked && (
+          <Button
+            size="small"
+            className={styles.dockToggle}
+            aria-expanded={!hidden}
+            aria-controls={bodyId}
+            endIcon={hidden ? <ExpandLess /> : <ExpandMore />}
+            ref={toggleRef}
+            onClick={() => {
+              if (hidden) onCollapsedChange?.(false);
+              else {
+                setHeldOpen(false);
+                onCollapsedChange?.(true);
+              }
+            }}
+          >
+            {hidden ? "Show" : "Hide"}
+            <span className={styles.visuallyHidden}> properties</span>
+          </Button>
+        )}
+      </div>
+      {/* Hidden rather than removed, so a field keeps what is typed in it. */}
+      <div
+        ref={body}
+        id={bodyId}
+        className={styles.panelBody}
+        hidden={hidden}
+        onFocus={(event) => setFocusInside(isField(event.target))}
+        onBlur={(event) => {
+          const next = event.relatedTarget as Element | null;
+          if (!next || !event.currentTarget.contains(next) || !isField(next))
+            setFocusInside(false);
+        }}
+      >
+        {!selected && (
+          <TypedField
+            key={`caption-${view.hall.id}`}
+            name="caption"
+            spec={{ kind: "string", maxLength: 200 }}
+            value={
+              typeof caption?.attrs.text === "string"
+                ? caption.attrs.text
+                : undefined
+            }
             disabled={disabled}
             art={art}
-            onCommit={commit}
+            onCommit={(_name, value) =>
+              onSetCaption(typeof value === "string" ? value : undefined)
+            }
           />
-        );
-        // x and y side by side, and y with them.
-        const next = fields[index + 1];
-        if (name === "y" && fields[index - 1]?.[0] === "x") return null;
-        if (name === "x" && next?.[0] === "y")
-          return (
-            <div key={`${node.id}-xy`} className={styles.fieldPair}>
-              {field(`${node.id}-x`, "x", fieldSpec)}
-              {field(`${node.id}-y`, "y", next[1])}
+        )}
+        {docked && !selected && (
+          // Docked, the hall's own fields would cover the drawing as it
+          // opens: the caption is shown, the rest a click away.
+          <Button
+            size="small"
+            variant="text"
+            className={styles.hallFieldsToggle}
+            data-hall-fields-toggle
+            ref={hallFieldsRef}
+            aria-expanded={!compact}
+            onClick={() => setHallFieldsShown(compact)}
+          >
+            {compact ? "All hall settings" : "Fewer hall settings"}
+          </Button>
+        )}
+        {!compact &&
+          fields.map(([name, fieldSpec], index) => {
+            const field = (
+              key: string,
+              fieldName: string,
+              spec: HallAttrSpec,
+            ) => (
+              <Field
+                key={key}
+                name={fieldName}
+                spec={spec}
+                value={node.attrs[fieldName]}
+                placeholder={placeholder(fieldName)}
+                disabled={disabled}
+                art={art}
+                onCommit={commit}
+              />
+            );
+            // x and y side by side, and y with them.
+            const next = fields[index + 1];
+            if (name === "y" && fields[index - 1]?.[0] === "x") return null;
+            if (name === "x" && next?.[0] === "y")
+              return (
+                <div key={`${node.id}-xy`} className={styles.fieldPair}>
+                  {field(`${node.id}-x`, "x", fieldSpec)}
+                  {field(`${node.id}-y`, "y", next[1])}
+                </div>
+              );
+            if (name !== "scale" || !selected)
+              return field(`${node.id}-${name}`, name, fieldSpec);
+            return (
+              <div key={`${node.id}-scale`} className={styles.scaleRow}>
+                {field(`${node.id}-${name}`, name, fieldSpec)}
+                <IconButton
+                  size="small"
+                  aria-label="Smaller"
+                  disabled={disabled}
+                  onClick={() => onScaleStep(selected, false)}
+                >
+                  <Remove fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  aria-label="Larger"
+                  disabled={disabled}
+                  onClick={() => onScaleStep(selected, true)}
+                >
+                  <Add fontSize="small" />
+                </IconButton>
+              </div>
+            );
+          })}
+        {selected && stands.length > 1 && (
+          <TextField
+            select
+            size="small"
+            label="Stands on"
+            value={standing ?? ""}
+            disabled={disabled}
+            onChange={(event) => onStandOn(selected, event.target.value)}
+            slotProps={{ htmlInput: { "data-hall-field": "standsOn" } }}
+          >
+            {stands.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        )}
+        {selected &&
+          row &&
+          (inSpread || rowHasPositions(view, selected.id)) && (
+            <div
+              className={styles.rowActions}
+              role="group"
+              aria-label={`Place in the ${row.row.tag === "dais" ? "dais" : "banner row"}`}
+            >
+              {inSpread && order !== undefined && (
+                <>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    disabled={disabled || order <= 0}
+                    onClick={() => onStepInRow(selected, -1)}
+                  >
+                    {row.along === "x" ? "Move left" : "Move up"}
+                  </Button>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    disabled={disabled || order >= row.spread.length - 1}
+                    onClick={() => onStepInRow(selected, 1)}
+                  >
+                    {row.along === "x" ? "Move right" : "Move down"}
+                  </Button>
+                </>
+              )}
+              {rowHasPositions(view, selected.id) && (
+                <Button
+                  size="small"
+                  variant="outlined"
+                  disabled={disabled}
+                  onClick={() => onSpreadRow(selected)}
+                >
+                  Spread evenly again
+                </Button>
+              )}
             </div>
-          );
-        if (name !== "scale" || !selected)
-          return field(`${node.id}-${name}`, name, fieldSpec);
-        return (
-          <div key={`${node.id}-scale`} className={styles.scaleRow}>
-            {field(`${node.id}-${name}`, name, fieldSpec)}
-            <IconButton
-              size="small"
-              aria-label="Smaller"
-              disabled={disabled}
-              onClick={() => onScaleStep(selected, false)}
-            >
-              <Remove fontSize="small" />
-            </IconButton>
-            <IconButton
-              size="small"
-              aria-label="Larger"
-              disabled={disabled}
-              onClick={() => onScaleStep(selected, true)}
-            >
-              <Add fontSize="small" />
-            </IconButton>
-          </div>
-        );
-      })}
-      {selected && stands.length > 1 && (
-        <TextField
-          select
-          size="small"
-          label="Stands on"
-          value={standing ?? ""}
-          disabled={disabled}
-          onChange={(event) => onStandOn(selected, event.target.value)}
-          slotProps={{ htmlInput: { "data-hall-field": "standsOn" } }}
-        >
-          {stands.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </TextField>
-      )}
-      {selected && row && (inSpread || rowHasPositions(view, selected.id)) && (
-        <div
-          className={styles.rowActions}
-          role="group"
-          aria-label={`Place in the ${row.row.tag === "dais" ? "dais" : "banner row"}`}
-        >
-          {inSpread && order !== undefined && (
-            <>
-              <Button
-                size="small"
-                variant="outlined"
-                disabled={disabled || order <= 0}
-                onClick={() => onStepInRow(selected, -1)}
-              >
-                {row.along === "x" ? "Move left" : "Move up"}
-              </Button>
-              <Button
-                size="small"
-                variant="outlined"
-                disabled={disabled || order >= row.spread.length - 1}
-                onClick={() => onStepInRow(selected, 1)}
-              >
-                {row.along === "x" ? "Move right" : "Move down"}
-              </Button>
-            </>
           )}
-          {rowHasPositions(view, selected.id) && (
+        {!compact && unknown.length > 0 && (
+          <p className={styles.panelNote}>
+            Other attributes, edited in the source: {unknown.join(", ")}
+          </p>
+        )}
+        {selected && (
+          <div className={styles.panelActions}>
             <Button
               size="small"
               variant="outlined"
               disabled={disabled}
-              onClick={() => onSpreadRow(selected)}
+              onClick={() => onDuplicate(selected)}
             >
-              Spread evenly again
+              Duplicate
             </Button>
-          )}
-        </div>
-      )}
-      {unknown.length > 0 && (
-        <p className={styles.panelNote}>
-          Other attributes, edited in the source: {unknown.join(", ")}
-        </p>
-      )}
-      {selected && (
-        <div className={styles.panelActions}>
-          <Button
-            size="small"
-            variant="outlined"
-            disabled={disabled}
-            onClick={() => onDuplicate(selected)}
-          >
-            Duplicate
-          </Button>
-          <Button
-            size="small"
-            variant="outlined"
-            color="error"
-            disabled={disabled}
-            onClick={() => onDelete(selected)}
-          >
-            Delete
-          </Button>
-        </div>
-      )}
+            <Button
+              size="small"
+              variant="outlined"
+              color="error"
+              disabled={disabled}
+              onClick={() => onDelete(selected)}
+            >
+              Delete
+            </Button>
+          </div>
+        )}
+      </div>
     </section>
   );
 }

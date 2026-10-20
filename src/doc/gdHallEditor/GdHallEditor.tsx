@@ -78,6 +78,14 @@ import {
   hallPalette,
   insertFromPalette,
 } from "./hallPalette";
+import {
+  dockSticks,
+  revealDelta,
+  scrollingAncestor,
+  useHallPanelDock,
+  usePanelCollapsed,
+  windowRoom,
+} from "./hallPanelDock";
 import { reorderable, rowPlace, spreadRowEvenly } from "./hallRows";
 
 /** SVG user units per square, as `GdHall` draws. */
@@ -163,6 +171,9 @@ const CORNERS = [
 
 /** What the author is told when the host does not take a change. */
 const REFUSED = "That change was not made; the hall is as it was.";
+
+/** Pixels kept between a selection scrolled into view and its box's edges. */
+const REVEAL_MARGIN = 12;
 
 /** Cut, copy and paste, with Ctrl or Cmd. */
 const CLIPBOARD_KEYS = new Set(["x", "c", "v"]);
@@ -267,6 +278,29 @@ export function GdHallEditor({
   const frame = useRef<number | null>(null);
   const helpId = useId();
   const selectionId = useId();
+  /**
+   * The panel beside the drawing, or docked at the foot of the box it
+   * sticks in, whose height (`dockRoom`) caps the dock's.
+   */
+  const { place: panelPlace, room: dockRoom } = useHallPanelDock(root);
+  /** Docked over the drawing, or (in a box too short for that) below it. */
+  const dockStuck = panelPlace === "docked" && dockSticks(dockRoom);
+  /** Whether the docked panel is hidden to its title bar (kept per viewer). */
+  const [panelCollapsed, setPanelCollapsed] = usePanelCollapsed();
+  /**
+   * Set by a key, or a button in the panel, that selects, moves, scales or
+   * adds, with the selection and hall it found: if the next render shows
+   * another, the selection is scrolled into view, clear of a docked panel.
+   * A key that changed nothing leaves nothing to reveal, and a pointer's
+   * selection is where the pointer is, and is left alone.
+   */
+  const revealPending = useRef<{
+    id: string | null;
+    hall: HallElement;
+  } | null>(null);
+  const markReveal = () => {
+    revealPending.current = { id: selectedId, hall: currentRef.current };
+  };
 
   const committed = useMemo(() => hallView(current, art), [current, art]);
   const viewCache = useRef(committed);
@@ -522,6 +556,8 @@ export function GdHallEditor({
   };
 
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    // A key that changed nothing left a reveal waiting: not for this.
+    revealPending.current = null;
     // One gesture at a time: a second finger does not take over a drag.
     if (gesture.current) return;
     if (!editable || (event.pointerType === "mouse" && event.button !== 0))
@@ -767,6 +803,7 @@ export function GdHallEditor({
       // Past either end, Tab leaves the drawing for the toolbar or panel.
       if (!next || (event.shiftKey && index < 0)) return;
       event.preventDefault();
+      markReveal();
       select(next);
       return;
     }
@@ -791,21 +828,26 @@ export function GdHallEditor({
         : 0;
     if (rowStep !== 0) {
       event.preventDefault();
+      markReveal();
       reorderStep(selected, rowStep < 0 ? -1 : 1);
     } else if (key in moves && !modifier) {
       event.preventDefault();
+      markReveal();
       nudge(selected, moves[key]);
     } else if ((key === "+" || key === "=") && !modifier) {
       event.preventDefault();
+      markReveal();
       scaleStep(selected, true);
     } else if ((key === "-" || key === "_") && !modifier) {
       event.preventDefault();
+      markReveal();
       scaleStep(selected, false);
     } else if ((key === "Delete" || key === "Backspace") && !modifier) {
       event.preventDefault();
       remove(selected);
     } else if (modifier && (key === "d" || key === "D")) {
       event.preventDefault();
+      markReveal();
       duplicate(selected);
     }
   };
@@ -833,6 +875,42 @@ export function GdHallEditor({
     : selected?.door && view.resolved
       ? doorRect(selected.door, view.resolved.outer)
       : undefined;
+
+  // After a key, the selection is scrolled into the box that scrolls the
+  // editor (the page, or the ritual editor's visual panel), clear of the
+  // docked panel at its foot: a selection under the dock could not be
+  // seen, and nothing else would scroll to it.
+  useLayoutEffect(() => {
+    const pending = revealPending.current;
+    if (!pending) return;
+    revealPending.current = null;
+    if (pending.id === selectedId && pending.hall === current) return;
+    const element = overlay.current;
+    if (!selectedRect || !box || !element) return;
+    const area = element.getBoundingClientRect();
+    if (area.width <= 0) return;
+    const scale = area.width / (box.x1 - box.x0);
+    const scroller = scrollingAncestor(root.current);
+    const port = scroller
+      ? scroller.getBoundingClientRect()
+      : { top: 0, bottom: windowRoom() };
+    const dock = dockStuck
+      ? (root.current
+          ?.querySelector("[data-hall-panel]")
+          ?.getBoundingClientRect().height ?? 0)
+      : 0;
+    const delta = revealDelta(
+      {
+        top: area.top + (selectedRect.y0 - box.y0) * scale,
+        bottom: area.top + (selectedRect.y1 - box.y0) * scale,
+      },
+      {
+        top: port.top + REVEAL_MARGIN,
+        bottom: port.bottom - dock - REVEAL_MARGIN,
+      },
+    );
+    if (delta !== 0) (scroller ?? window).scrollBy({ top: delta });
+  });
 
   // On a touch screen a finger-sized handle would cover a small object
   // and take its drags: such objects scale from the panel instead (plan
@@ -935,7 +1013,18 @@ export function GdHallEditor({
           </Button>
         )}
       </div>
-      <div className={styles.body}>
+      <div
+        className={styles.body}
+        data-panel={panelPlace}
+        data-dock={
+          panelPlace === "docked" ? (dockStuck ? "stuck" : "flow") : undefined
+        }
+        style={
+          dockRoom
+            ? ({ "--hall-dock-room": `${dockRoom}px` } as CSSProperties)
+            : undefined
+        }
+      >
         <div className={styles.drawingColumn}>
           <div
             ref={surface}
@@ -1075,6 +1164,7 @@ export function GdHallEditor({
               view={committed}
               warnings={warnings}
               onSelect={(entry) => {
+                markReveal();
                 select(entry);
                 focusSurface();
               }}
@@ -1088,12 +1178,32 @@ export function GdHallEditor({
           disabled={!editable}
           onSetAttr={setAttr}
           onSetCaption={setCaption}
-          onScaleStep={scaleStep}
-          onDuplicate={duplicate}
+          // What the panel's buttons move or add can land under the dock.
+          onScaleStep={(entry, up) => {
+            markReveal();
+            scaleStep(entry, up);
+          }}
+          onDuplicate={(entry) => {
+            markReveal();
+            duplicate(entry);
+          }}
           onDelete={remove}
-          onStepInRow={reorderStep}
-          onSpreadRow={spreadRow}
-          onStandOn={standOn}
+          onStepInRow={(entry, step) => {
+            markReveal();
+            reorderStep(entry, step);
+          }}
+          onSpreadRow={(entry) => {
+            markReveal();
+            spreadRow(entry);
+          }}
+          onStandOn={(entry, value) => {
+            markReveal();
+            standOn(entry, value);
+          }}
+          docked={panelPlace === "docked"}
+          collapsed={panelCollapsed}
+          onCollapsedChange={setPanelCollapsed}
+          onFocusElsewhere={focusSurface}
         />
       </div>
       <div className={styles.visuallyHidden} aria-live="polite">
