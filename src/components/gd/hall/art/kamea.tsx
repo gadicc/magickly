@@ -1,20 +1,20 @@
+import kameas, { type KameaPlanetId } from "magick-data/astrology/kameas";
 import { svgCoordinate } from "../../../svgCoordinate";
 import { enumAttr } from "../attributes";
 import { GD_HALL_FONT_STACKS } from "../fonts";
+import { wrapText } from "../labels";
 import {
-  KAMEA_ORDERS,
-  kamea,
+  KAMEA_PLANET_IDS,
   PLANET_NAMES,
   PLANETS,
   type Planet,
-} from "../kameas";
-import { wrapText } from "../labels";
+} from "../planets";
 import type { HallArt, HallArtProps, HallAttrSpec, HallNode } from "../types";
 import { original, PALETTE, variantOf } from "./shared";
 
 export const kameaProvenance = original(
-  "A planet's magic square drawn from its numbers, which the package " +
-    "computes (kameas.ts): a grid with each number in its cell.",
+  "A planet's magic square drawn from its numbers, which magick-data " +
+    "computes (astrology/kameas): a grid with each number in its cell.",
 );
 export const sealProvenance = original(
   "A placeholder for a planet's seals: a dashed ring naming the planet. " +
@@ -50,7 +50,8 @@ function Kamea({ node }: HallArtProps) {
     />
   );
   if (!planet) return frame;
-  const n = KAMEA_ORDERS.get(planet) as number;
+  const square = kameas[KAMEA_PLANET_IDS.get(planet) as KameaPlanetId];
+  const n = square.length;
   const cell = SIDE / n;
   const size = cell * 0.48;
   const rules = Array.from({ length: n - 1 }, (_, i) =>
@@ -74,7 +75,7 @@ function Kamea({ node }: HallArtProps) {
         fontSize={svgCoordinate(size)}
         textAnchor="middle"
       >
-        {kamea(planet).flatMap((row, i) =>
+        {square.flatMap((row, i) =>
           row.map((value, j) => (
             <text
               key={value}

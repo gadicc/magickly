@@ -18,7 +18,9 @@ Copyright (c) 2020-2026 Gadi Cohen. The package is under two licences, by
 path, and [LICENSE.txt](./LICENSE.txt) says which file is which:
 
 - **The code is [MIT](./LICENSE.txt):** the hand-written modules and what
-  they compile to.
+  they compile to. Among them is `astrology/kameas`, which is code, not
+  data: it computes the planetary squares, and writes out only the Sun's,
+  a fact from Agrippa ([Sources](#sources)).
 - **The data is [CC BY 4.0](./LICENSE-DATA.txt):** the JSON5 sources,
   everything the build emits from them, and the Enochian Keys, a text
   written as TypeScript. Use it anywhere, including commercially, as long as
@@ -225,7 +227,7 @@ or `null`.
   and tests rather than pages; a bundler drops it from a `tools` import that
   does not use it.
 
-## Texts that are not tables
+## Texts and values that are not tables
 
 - `magick-data/enochian/keys`: the Enochian Keys, word by word, in the
   original, transliterated and in English.
@@ -237,6 +239,13 @@ or `null`.
   `…/firstTable`: Lenain's *La Science Cabalistique* leaf by leaf, the
   editorial apparatus, the text folded into paragraphs that run across
   leaves, and his first table reconstructed.
+- `magick-data/astrology/kameas`: the planetary kameas (magic squares),
+  Saturn's 3 × 3 to the Moon's 9 × 9, keyed by the planet table's ids
+  (`kameas.luna`) and frozen, row by row from the top. They are computed
+  rather than written out, except the Sun's ([Sources](#sources)), so there
+  is no JSON for them; `oddKamea(n)` and `doublyEvenKamea(n)` are the
+  constructions, for an odd order from 3 or a multiple of 4, up to
+  `MAX_KAMEA_ORDER` (100). Any other order is a `RangeError`.
 - `magick-data/enochian/dictionary`: for the app only, and not published
   ([above](#licences)).
 
@@ -288,8 +297,8 @@ instead; the data keeps to one of the two.
 
 ## Sources
 
-Most of this is correspondences, which belong to nobody. Two sets are derived
-from identified works and are worth naming:
+Most of this is correspondences, which belong to nobody. Three sets are
+derived from identified works and are worth naming:
 
 **`seventyTwoAngels.json5`, `seventyTwoAngelsText/` and `lenain/`** come from
 Lazare Lenain, *La Science Cabalistique* (Amiens, 1823), read page by page from
@@ -321,3 +330,13 @@ sacred-texts' transcription of his edition. Mathers died in 1918, so the
 translation is in the public domain and **no rights are asserted over the
 text**. See
 [plan 039](https://github.com/gadicc/magickly/blob/main/plans/039-correspondence-tables.md).
+
+**`astrology/kameas.ts`** gives the squares of Heinrich Cornelius Agrippa,
+*De occulta philosophia libri tres* (Cologne, 1533), book II, chapter 22,
+which the Golden Dawn's diagrams follow. Agrippa died in 1535, the squares
+are facts, and **no rights are asserted over them**. Six are computed by
+the standard constructions, which give exactly his squares, and the Sun's,
+of order 6, is written out; the tests check that every square is magic,
+that each starts with his first row, and that Saturn's and Jupiter's are
+his row by row. See
+[plan 061](https://github.com/gadicc/magickly/blob/main/plans/061-gd-hall.md).

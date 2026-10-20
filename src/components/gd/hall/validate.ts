@@ -1,8 +1,8 @@
 import { enumAttr, numberAttr, readAttr } from "./attributes";
 import { hebrewLetter } from "./hebrewLetters";
-import { PLANETS } from "./kameas";
 import { MAX_LABEL_LINES } from "./labels";
 import { DEFAULT_DAIS, MAX_HALL_LABEL_LINES, resolveHall } from "./layout";
+import { PLANETS } from "./planets";
 import { hallPlacement, hallTagSpec, itemKindKnown, walkHall } from "./spec";
 import type {
   HallArtRegistry,

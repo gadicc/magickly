@@ -1,4 +1,3 @@
-import { PLANET_NAMES, type Planet } from "@magick-components/gd/hall/kameas";
 import {
   type Rect,
   type ResolvedDoor,
@@ -6,6 +5,7 @@ import {
   type ResolvedObject,
   resolveHall,
 } from "@magick-components/gd/hall/layout";
+import { PLANET_NAMES, type Planet } from "@magick-components/gd/hall/planets";
 import type {
   HallArtRegistry,
   HallNode,

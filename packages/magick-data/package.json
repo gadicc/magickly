@@ -30,6 +30,7 @@
     "./alchemy/terms": "./src/alchemy/Terms.ts",
     "./astrology/houses": "./src/astrology/Houses.ts",
     "./astrology/planets": "./src/astrology/Planets.ts",
+    "./astrology/kameas": "./src/astrology/kameas.ts",
     "./astrology/zodiac": "./src/astrology/Zodiac.ts",
     "./enochian/letters": "./src/enochian/Letters.ts",
     "./enochian/tablets": "./src/enochian/Tablets.ts",
@@ -123,6 +124,10 @@
       "./astrology/planets": {
         "types": "./lib/astrology/Planets.d.ts",
         "default": "./lib/astrology/Planets.js"
+      },
+      "./astrology/kameas": {
+        "types": "./lib/astrology/kameas.d.ts",
+        "default": "./lib/astrology/kameas.js"
       },
       "./astrology/zodiac": {
         "types": "./lib/astrology/Zodiac.d.ts",

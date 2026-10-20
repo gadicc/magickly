@@ -30,6 +30,7 @@
     "src/alchemy/Terms.ts",
     "src/astrology/Houses.ts",
     "src/astrology/Planets.ts",
+    "src/astrology/kameas.ts",
     "src/astrology/Zodiac.ts",
     "src/enochian/Letters.ts",
     "src/enochian/Tablets.ts",

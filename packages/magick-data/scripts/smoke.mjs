@@ -18,8 +18,8 @@
  *    every `@ts-expect-error` is used, and the same file without them gives
  *    exactly that many errors on exactly those lines;
  * 4. the consumer again under `nodenext`, as an ES module;
- * 5. the barrel, a table, `./tools` and a JSON subpath loaded in Node, with
- *    real values asserted, and the dictionary refused.
+ * 5. the barrel, a table, `./tools`, the kameas and a JSON subpath loaded in
+ *    Node, with real values asserted, and the dictionary refused.
  *
  * Every step throws on failure and the process exits non-zero; the temporary
  * directory is removed either way.
@@ -364,6 +364,7 @@ export const g = data.seventyTwoAngel;
     `import assert from "node:assert/strict";
 import data from "magick-data";
 import sephirot from "magick-data/kabbalah/sephirot";
+import kameas from "magick-data/astrology/kameas";
 import * as tools from "magick-data/tools";
 import sephirotJson from "magick-data/json/kabbalah/sephirot.json" with { type: "json" };
 
@@ -386,6 +387,9 @@ const scoped = tools.assemble({
 });
 assert.equal(scoped.element.fire.elemental?.elementId, "fire");
 assert.deepEqual(sephirotJson.hod, sephirot.hod);
+assert.deepEqual(kameas.saturn, [[4, 9, 2], [3, 5, 7], [8, 1, 6]]);
+assert.equal(kameas.luna[4][4], 41);
+assert.ok(Object.isFrozen(kameas.sol[0]));
 await assert.rejects(import("magick-data/enochian/dictionary"), {
   code: "ERR_PACKAGE_PATH_NOT_EXPORTED",
 });
@@ -393,7 +397,7 @@ console.log("loaded:", Object.keys(data).length, "tables in the barrel");
 `,
   );
 
-  step("(d) Node loads the barrel, a table, ./tools and a JSON subpath", () => {
+  step("(d) Node loads the barrel, tables, ./tools and a JSON subpath", () => {
     const { output } = run(process.execPath, ["load.mjs"], { cwd: fixture });
     process.stdout.write(`   ${output}`);
   });
