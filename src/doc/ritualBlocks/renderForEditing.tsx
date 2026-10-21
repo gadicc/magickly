@@ -11,7 +11,14 @@ import {
   useEditorState,
 } from "@tiptap/react";
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Component,
+  type ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { parseRitualFileLocator } from "@/files/ritualFileLocator";
 import { gdHallRow } from "../gdHallRows";
 import { ritualEditorOwner } from "../ritualEditorOwner";
@@ -325,6 +332,31 @@ const GdHallAtomEditor = dynamic(() => import("./GdHallAtomEditor"), {
 });
 
 /**
+ * Catches the hall editor failing, its chunk not loading above all (offline
+ * before it was cached, or a deploy that replaced it), so that it ends the
+ * editing instead of taking down the whole ritual editor; `onFailed` tells
+ * the atom, which drops back to the drawing and says so.
+ */
+class HallEditorBoundary extends Component<
+  { onFailed: () => void; children: ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidCatch() {
+    this.props.onFailed();
+  }
+
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
+
+/**
  * How many warnings `validateHall` has for a hall, for the badge on a hall
  * outside edit mode (plan 061, Stage E notes): 0 until known. The
  * validator loads lazily, after a pause, and only in the editor; a hall
@@ -363,6 +395,8 @@ export function RitualAtomForEditing({
   const tag = String(node.attrs.tag);
   const attrs = node.attrs.attrs;
   const [editingHall, setEditingHall] = useState(false);
+  /** The hall editor could not load or failed: say so beside Edit hall. */
+  const [hallEditorFailed, setHallEditorFailed] = useState(false);
   /** The badge opened the editor: it starts at the warnings. */
   const [toWarnings, setToWarnings] = useState(false);
   const editHallButton = useRef<HTMLButtonElement>(null);
@@ -439,16 +473,24 @@ export function RitualAtomForEditing({
         />
       )}
       {tag === "gdHall" && editingHall ? (
-        <GdHallAtomEditor
-          editor={editor}
-          getPos={getPos}
-          node={node}
-          initialFocus={toWarnings ? "warnings" : "drawing"}
-          onDone={() => {
+        <HallEditorBoundary
+          onFailed={() => {
             finishedEditing.current = true;
+            setHallEditorFailed(true);
             setEditingHall(false);
           }}
-        />
+        >
+          <GdHallAtomEditor
+            editor={editor}
+            getPos={getPos}
+            node={node}
+            initialFocus={toWarnings ? "warnings" : "drawing"}
+            onDone={() => {
+              finishedEditing.current = true;
+              setEditingHall(false);
+            }}
+          />
+        </HallEditorBoundary>
       ) : (
         hall && <GdHallFrame hall={hall} />
       )}
@@ -470,11 +512,17 @@ export function RitualAtomForEditing({
               data-gd-hall-controls
               onClick={() => {
                 setToWarnings(false);
+                setHallEditorFailed(false);
                 setEditingHall(true);
               }}
             >
               Edit hall
             </Button>
+          )}
+          {tag === "gdHall" && hallEditorFailed && !editingHall && (
+            <span role="alert" className={styles.hallFailed}>
+              The hall editor failed; reload to try again.
+            </span>
           )}
           {tag === "gdHall" && hall && !editingHall && warningCount > 0 && (
             <Button
@@ -486,6 +534,7 @@ export function RitualAtomForEditing({
               aria-label={`${warningCount} hall ${warningCount === 1 ? "warning" : "warnings"}: edit the hall to see them`}
               onClick={() => {
                 setToWarnings(true);
+                setHallEditorFailed(false);
                 setEditingHall(true);
               }}
             >
