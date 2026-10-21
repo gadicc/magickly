@@ -373,10 +373,14 @@ Follow-ups are separate from the completed migration work:
   Philosophus and Portal presets draw the tablets they had as markers;
   after its reviews `Tablet` is named as an image, and a hall editor
   that cannot load ends the editing instead of taking down the ritual
-  editor. Waiting for Gadi from it (decision renders outside the
-  repository, plan 061): the Water and Fire letter choices (a
-  variants table in plan 061), whether Earth and Air (Dee's table, not
-  the Order's) switch to the Golden Dawn's, the tablets' colours, how
+  editor. At Gadi's request the research on the tablets' versions is
+  kept in magick-data (`enochian/tabletNotes`) and shown on
+  `/enochian/tablets`, square by square where the sources differ.
+  Waiting for Gadi from it (decision renders outside the repository,
+  plan 061; the colours at the end of the project): the Water and Fire
+  letter choices (a variants table in plan 061), whether Earth and Air
+  (which seem to follow Dee's table, not the Order's) switch to the
+  Golden Dawn's, the tablets' colours, how
   second letters are drawn, the Union on the page and the image route,
   and a source `version` for the tablets. TODO from earlier: Gadi's call on the Chiefs on the new presets' daises
   (after the merge; he leans towards Greer's redraws), the stage F
