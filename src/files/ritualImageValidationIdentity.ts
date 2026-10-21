@@ -27,7 +27,7 @@ export const STATIC_SVG_VALIDATION_COMPONENTS = Object.freeze({
     "1d8273b4d29bb8e00c8a5c716f7fd2759ed938082231f3eddba66c98f65a1e60",
   "css-tree": "3.2.1",
   "mdn-data": "2.27.1",
-  "source-map-js": "1.2.1",
+  "source-map-js": "1.2.2",
   saxes: "6.0.0",
   xmlchars: "2.2.0",
 });
