@@ -145,6 +145,7 @@ export function hallNodeName(node: HallElement): string {
   if (tag === "tarotKey") return `Tarot key ${text(node, "n") ?? ""}`.trim();
   if (tag === "tablet") {
     const element = text(node, "element");
+    if (element === "union") return "Tablet of Union";
     return element ? `${clip(itemKindLabel(element))} tablet` : "Tablet";
   }
   if (tag === "altar") return kind === "white" ? "White altar" : "Altar";

@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import Tablet from "../../../enochian/Tablet";
+import Tablet, { UNION_VIEWBOX } from "../../../enochian/Tablet";
 import SevenBranchedCandleStick from "../../SevenBranchedCandleStick";
 import TableOfShewbread from "../../TableOfShewbread";
 import { enumAttr } from "../attributes";
@@ -26,38 +26,57 @@ export const provenance = [
   candlestickProvenance,
 ];
 
-/** The tablets with data in magick-data; water, fire and union follow. */
-export const TABLET_ELEMENTS = ["earth", "air"] as const;
+/**
+ * The tablets magick-data has: the four Watchtowers, by their elements, and
+ * the Tablet of Union.
+ */
+export const TABLET_ELEMENTS = [
+  "earth",
+  "air",
+  "water",
+  "fire",
+  "union",
+] as const;
 
-// Tablet draws on a 210 × 297 page (viewBox -105 0 210 297).
+// A Watchtower draws on a 210 × 297 page (viewBox -105 0 210 297), the
+// Tablet of Union on a 124 × 104 one, its squares the Watchtowers' size.
 const PAGE = { width: 210, height: 297 };
+const UNION_PAGE = { width: UNION_VIEWBOX[2], height: UNION_VIEWBOX[3] };
+
+/** The board a tablet stands on: the Tablet of Union's, or a Watchtower's. */
+const boardOf = (element: string | undefined) =>
+  element === "union" ? UNION_PAGE : PAGE;
 
 /**
- * An Enochian tablet (`tablet(element="air")`) on a white board, 210 × 297.
- * `enochianStyle` is the app's Enochian font; without it the grid shows
- * the transliteration. The package never loads that font itself.
+ * An Enochian tablet (`tablet(element="air")`) on a white board: a
+ * Watchtower's 210 × 297, the Tablet of Union's (`element="union"`)
+ * 124 × 104. Like any object, a board fills its cell, its longer side
+ * 2 squares at scale 1. `enochianStyle` is the app's Enochian font;
+ * without it the grid shows the transliteration. The package never loads
+ * that font itself.
  */
 export function tabletArt(enochianStyle?: CSSProperties): HallArt {
   function HallTablet({ node }: HallArtProps) {
     const element = enumAttr(node, "element", TABLET_ELEMENTS);
+    const board = boardOf(element);
     return (
       <>
         <rect
-          x={-PAGE.width / 2}
-          y={-PAGE.height / 2}
-          width={PAGE.width}
-          height={PAGE.height}
+          x={-board.width / 2}
+          y={-board.height / 2}
+          width={board.width}
+          height={board.height}
           fill={PALETTE.paper}
           stroke={PALETTE.ink}
           strokeWidth={2}
         />
         {element && (
-          <g transform={`translate(${-PAGE.width / 2} ${-PAGE.height / 2})`}>
+          <g transform={`translate(${-board.width / 2} ${-board.height / 2})`}>
             <Tablet
               id={element}
               frame={false}
-              width={PAGE.width}
-              height={PAGE.height}
+              width={board.width}
+              height={board.height}
               enochianStyle={enochianStyle}
             />
           </g>
@@ -67,7 +86,7 @@ export function tabletArt(enochianStyle?: CSSProperties): HallArt {
   }
   return {
     Component: HallTablet,
-    box: PAGE,
+    box: (node) => boardOf(enumAttr(node, "element", TABLET_ELEMENTS)),
     attributes: new Map([
       ["element", { kind: "enum", values: TABLET_ELEMENTS }],
     ]),

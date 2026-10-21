@@ -85,6 +85,12 @@ describe("hallNodeName", () => {
       "Earth tablet",
     );
     expect(hallNodeName(node("tablet"))).toBe("Tablet");
+    expect(hallNodeName(node("tablet", { element: "fire" }))).toBe(
+      "Fire tablet",
+    );
+    expect(hallNodeName(node("tablet", { element: "union" }))).toBe(
+      "Tablet of Union",
+    );
     expect(hallNodeName(node("door", { side: "north" }))).toBe("Door (north)");
     expect(hallNodeName(node("shewbread"))).toBe("Shewbread");
     expect(hallNodeName(node("kamea", { planet: "moon" }))).toBe(

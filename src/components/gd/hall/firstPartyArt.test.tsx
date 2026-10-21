@@ -170,22 +170,47 @@ describe("the Enochian tablets", () => {
   it("draws Tablet on a board for each element with data", () => {
     for (const element of TABLET_ELEMENTS) {
       const markup = draw(art("tablet"), { type: "tablet", element });
-      expect(markup, element).toContain('viewBox="-105 0 210 297"');
+      const page = element === "union" ? "0 0 124 104" : "-105 0 210 297";
+      expect(markup, element).toContain(`viewBox="${page}"`);
       expect(markup, element).not.toContain("border:");
     }
   });
 
+  it("stands each tablet on a board of its own shape", () => {
+    const { box } = art("tablet");
+    const boxOf = (element?: string) =>
+      typeof box === "function" ? box({ type: "tablet", element }) : box;
+    for (const element of [
+      "earth",
+      "air",
+      "water",
+      "fire",
+      "spirit",
+      undefined,
+    ])
+      expect(boxOf(element), String(element)).toEqual({
+        width: 210,
+        height: 297,
+      });
+    expect(boxOf("union")).toEqual({ width: 124, height: 104 });
+    const union = draw(art("tablet"), { type: "tablet", element: "union" });
+    expect(union).toContain('<rect x="-62" y="-52" width="124" height="104"');
+    expect(union).toContain('viewBox="0 0 124 104" width="124" height="104"');
+  });
+
   it("draws an empty board for an element without data", () => {
-    for (const element of ["fire", "constructor", undefined]) {
+    for (const element of ["spirit", "constructor", undefined]) {
       const markup = draw(art("tablet"), { type: "tablet", element });
       expect(markup, String(element)).toContain("<rect");
       expect(markup, String(element)).not.toContain("<svg xmlns");
     }
     expect(
-      validateHall(hall({ type: "tablet", element: "fire" }), {
+      validateHall(hall({ type: "tablet", element: "spirit" }), {
         art: defaultHallArt,
       }).map((d) => d.message),
-    ).toEqual(['tablet: element="fire" is not one of earth, air']);
+    ).toEqual([
+      'tablet: element="spirit" is not one of earth, air, water, fire, union',
+    ]);
   });
 
   it("takes the Enochian font from the app, and the transliteration without", () => {

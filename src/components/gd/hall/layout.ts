@@ -136,7 +136,7 @@ export const MARKER_TEXT_WIDTH = 0.84;
  * | item gong, brazier, candle | 0.5 | none drawn; a square, a candle 1 square tall |
  * | veil | 1 | 16 × 0.4 squares, the hall's width |
  * | tarotKey | 0.81 | Theoricus 1 altar card 0.94 × 1.62 |
- * | tablet | 1.345 | Theoricus Air tablet board 1.91 × 2.69 |
+ * | tablet | 1.345 | Theoricus Air tablet board 1.91 × 2.69; the Tablet of Union's 2.69 × 2.26 |
  * | shewbread, candlestick | 1.25 | Zelator 2: the outer circle 2 squares across |
  * | kamea, seal | 0.9 | Theoricus 2: the Moon's kamea 1.83 × 1.79 |
  * | other items | 0.4 | none |
