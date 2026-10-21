@@ -16,7 +16,7 @@ export const STATIC_RASTER_VALIDATION_COMPONENTS = Object.freeze({
     "629fb0130e13e5a9eba479d01ccfbd368f883d767c3731d62b6842d83bd627e0",
   ritualUploadProtocolSha256:
     "d8a8ebc12df7638de1e62f89b47ed642f1424797e28ea8438cd93d75f23c9a4a",
-  sharp: "0.35.4",
+  sharp: "0.35.5",
   "file-type": "22.1.1",
 });
 /** Added SVG/parser semantics are independently pinned alongside the unchanged raster contract. */
