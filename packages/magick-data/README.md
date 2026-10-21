@@ -142,7 +142,7 @@ is what a link's `to` names.
 | `astrologicalHouse` | 12 | `./astrology/houses` |
 | `hebrewLetter` | 27 | `./hebrewLetters` |
 | `enochianLetter` | 21 | `./enochian/letters` |
-| `enochianTablet` | 2 | `./enochian/tablets` |
+| `enochianTablet` | 5 | `./enochian/tablets` |
 | `tetragram` | 16 | `./geomancy/tetragrams` |
 | `geomanticHouse` | 12 | `./geomancy/houses` |
 | `gdGrade` | 12 | `./gd/grades` |
@@ -297,7 +297,7 @@ instead; the data keeps to one of the two.
 
 ## Sources
 
-Most of this is correspondences, which belong to nobody. Three sets are
+Most of this is correspondences, which belong to nobody. Four sets are
 derived from identified works and are worth naming:
 
 **`seventyTwoAngels.json5`, `seventyTwoAngelsText/` and `lenain/`** come from
@@ -339,4 +339,20 @@ the standard constructions, which give exactly his squares, and the Sun's,
 of order 6, is written out; the tests check that every square is magic,
 that each starts with his first row, and that Saturn's and Jupiter's are
 his row by row. See
+[plan 061](https://github.com/gadicc/magickly/blob/main/plans/061-gd-hall.md).
+
+**`enochian/tablets.json5`** gives the Enochian tablets as the Golden Dawn
+painted them. Water, Fire and the Tablet of Union are the Book of the
+Concourse of the Forces in Israel Regardie, *The Golden Dawn*, vol. 4
+(Aries Press, Chicago, 1940; archive.org
+`IsraelRegardie-TheGoldenDawn-Vol4-1940`, pp. 271, 273 and 275),
+cross-checked against *The Equinox*, vol. I no. 7 (London, 1912), Plates
+III and VIII (archive.org `crowley-equinox_202110`, the file "The
+Equinox Vol. 1, No. 7", leaves 241 and 246), and the redrawn colour
+plates of Regardie's book in its seventh edition, edited by John
+Michael Greer (Llewellyn, ISBN 978-0-7387-4399-8); the file's comment
+says where each square comes from. Earth and Air are older, with no
+source of their own; they differ from the Golden Dawn's in thirteen
+squares each, and seem to follow Dee's own table. The letters are facts,
+and **no rights are asserted over them**. See
 [plan 061](https://github.com/gadicc/magickly/blob/main/plans/061-gd-hall.md).

@@ -18,8 +18,9 @@
  *    every `@ts-expect-error` is used, and the same file without them gives
  *    exactly that many errors on exactly those lines;
  * 4. the consumer again under `nodenext`, as an ES module;
- * 5. the barrel, a table, `./tools`, the kameas and a JSON subpath loaded in
- *    Node, with real values asserted, and the dictionary refused.
+ * 5. the barrel, a table, `./tools`, the kameas, the Enochian tablets and a
+ *    JSON subpath loaded in Node, with real values asserted, and the
+ *    dictionary refused.
  *
  * Every step throws on failure and the process exits non-zero; the temporary
  * directory is removed either way.
@@ -365,6 +366,7 @@ export const g = data.seventyTwoAngel;
 import data from "magick-data";
 import sephirot from "magick-data/kabbalah/sephirot";
 import kameas from "magick-data/astrology/kameas";
+import tablets, { WATCHTOWER_IDS } from "magick-data/enochian/tablets";
 import * as tools from "magick-data/tools";
 import sephirotJson from "magick-data/json/kabbalah/sephirot.json" with { type: "json" };
 
@@ -390,6 +392,8 @@ assert.deepEqual(sephirotJson.hod, sephirot.hod);
 assert.deepEqual(kameas.saturn, [[4, 9, 2], [3, 5, 7], [8, 1, 6]]);
 assert.equal(kameas.luna[4][4], 41);
 assert.ok(Object.isFrozen(kameas.sol[0]));
+assert.deepEqual(WATCHTOWER_IDS, ["earth", "air", "water", "fire"]);
+assert.equal(tablets.union.grid.map((row) => row.join("")).join(" "), "EXARP HCOMA NANTA BITOM");
 await assert.rejects(import("magick-data/enochian/dictionary"), {
   code: "ERR_PACKAGE_PATH_NOT_EXPORTED",
 });

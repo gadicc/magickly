@@ -1,11 +1,53 @@
-// The Enochian tablets: the Watchtowers, thirteen rows of twelve letters,
-// and the Tablet of Union, four rows of five. Rows run from the top; a
-// letter is the Latin transliteration, a capital where the source prints
-// one. `marks` names, by row and column from 0, the squares that hold
-// more: the other letters printed in the same square (`alt`, the higher
-// first) and letters printed reversed.
+// The Enochian tablets in the Golden Dawn's version: the four
+// Watchtowers, thirteen rows of twelve letters, and the Tablet of Union,
+// four rows of five. Rows run from the top; a letter is the Latin
+// transliteration, a capital where the source prints one. `marks` names,
+// by row and column from 0, the squares that hold more: `alt`, the other
+// letters the sources below print in that square (Regardie's first, the
+// higher first, then the Equinox's and Greer's), and `reversed`, which
+// says the grid's letter is printed reversed (never the `alt` letters).
 //
-// Earth and Air have no recorded source.
+// Water, Fire and the Tablet of Union follow Regardie, *The Golden
+// Dawn*, vol. 4 (Aries Press, Chicago, 1940), the Book of the Concourse
+// of the Forces: archive.org item
+// IsraelRegardie-TheGoldenDawn-Vol4-1940, the Watchtowers of Water p.271
+// (leaf n263) and Fire p.273 (n265), the Tablet of Union's lines p.275
+// (n267). Where he prints two letters in a square the grid takes the
+// higher, which he prefers while allowing both (p.306, n298).
+//
+// Nine squares read otherwise; rows and squares are counted here from 1.
+// In eight, both other sources print another letter and the Order's
+// names through the square read it too (the Seniors as the Greer
+// edition's "The Four Elemental Weapons" names them; the names Liber
+// Chanokh reads off Water, The Equinox, pp.235-236): Water's row 2
+// square 3 (l: Olgota, Aalco), row 4 square 8 (l, where Regardie prints
+// only i: Laoc), row 5 squares 7 (o: Laoaxrp) and 11 (s: Vssn) and row 6
+// square 11 (o, which Regardie does not print: Rvoi); Fire's row 4
+// square 7 (d: Alndvod), row 5 square 6 (o, where Regardie prints only
+// a: Adoeoet) and row 13 square 7 (P: Arinnap; the Equinox and Greer
+// print P, Regardie O over p).
+//
+// The ninth, Water's row 5 square 12, has no higher letter to take:
+// Regardie prints four there, y and l side by side over N and h, so the
+// rule cannot choose, and the grid takes N, one of his four, which both
+// other sources print (reversed). That differs from Water's row 5 square
+// 1 and row 12 square 1, where he prints two letters, one plainly higher
+// (f over p, r over i): the higher stands there although both other
+// sources print the lower, since no name settles them. Reversed letters
+// are those the Equinox prints in Enochian and Greer mirrors.
+//
+// Cross-checked against The Equinox, vol. I no. 7 (London, 1912), "Liber
+// Chanokh", Plates III and VIII (archive.org item
+// crowley-equinox_202110, file "The Equinox Vol. 1, No. 7", leaves n241
+// and n246), and the Watchtowers redrawn in Regardie, *The Golden Dawn*,
+// 7th edition, ed. John Michael Greer (Llewellyn, ISBN
+// 978-0-7387-4399-8), its colour plates "Enochian Tablet: The First
+// Watchtower" to "The Fourth Watchtower". Plan 061 (Stage G notes) lists
+// every square where they differ. Earth and Air were here before, with
+// no source of their own. They differ from the Golden Dawn's in thirteen
+// squares each; a comparison with a modern transcription of Dee's table
+// (Sloane MS 3191) suggests they follow it. They stay so until the owner
+// decides (plan 061).
 {
   earth: {
     id: "earth",
@@ -43,6 +85,93 @@
       ["N", "a", "o", "c", "O", "T", "t", "n", "P", "r", "n", "T"],
       ["o", "c", "a", "n", "m", "a", "g", "o", "t", "r", "o", "i"],
       ["S", "h", "i", "a", "l", "r", "a", "P", "m", "z", "o", "x"],
+    ],
+  },
+  water: {
+    id: "water",
+    kind: "watchtower",
+    grid: [
+      ["T", "a", "O", "A", "d", "u", "p", "t", "D", "n", "i", "m"],
+      ["a", "a", "l", "c", "o", "o", "r", "o", "m", "e", "b", "b"],
+      ["T", "o", "g", "c", "o", "n", "x", "m", "a", "l", "G", "m"],
+      ["n", "h", "o", "d", "D", "i", "a", "l", "l", "a", "o", "c"],
+      ["f", "a", "t", "A", "x", "i", "o", "V", "s", "P", "s", "N"],
+      ["S", "a", "a", "i", "z", "a", "a", "r", "V", "r", "o", "i"],
+      ["m", "p", "h", "a", "r", "s", "l", "g", "a", "i", "o", "l"],
+      ["M", "a", "m", "g", "l", "o", "i", "n", "L", "i", "r", "x"],
+      ["o", "l", "a", "a", "D", "n", "g", "a", "T", "a", "p", "a"],
+      ["p", "a", "L", "c", "o", "i", "d", "x", "P", "a", "c", "n"],
+      ["n", "d", "a", "z", "N", "z", "i", "V", "a", "a", "s", "a"],
+      ["r", "i", "d", "P", "o", "n", "s", "d", "A", "s", "p", "i"],
+      ["x", "r", "i", "n", "h", "t", "a", "r", "n", "d", "i", "L"],
+    ],
+    marks: [
+      { row: 0, column: 5, alt: ["v"] },
+      { row: 1, column: 0, alt: ["o"] },
+      { row: 1, column: 2, alt: ["b"] },
+      { row: 2, column: 1, alt: ["a"] },
+      { row: 2, column: 6, alt: ["z"] },
+      { row: 2, column: 7, alt: ["i"] },
+      { row: 2, column: 8, alt: ["n", "u"] },
+      { row: 3, column: 7, alt: ["i"] },
+      { row: 3, column: 8, alt: ["a", "e"] },
+      { row: 4, column: 0, alt: ["p"] },
+      { row: 4, column: 2, alt: ["c"] },
+      { row: 4, column: 6, alt: ["v"] },
+      { row: 4, column: 10, alt: ["x"] },
+      { row: 4, column: 11, alt: ["y", "l", "h"], reversed: true },
+      { row: 5, column: 4, alt: ["x"] },
+      { row: 5, column: 10, alt: ["c", "L"] },
+      { row: 8, column: 5, alt: ["a"] },
+      { row: 10, column: 5, alt: ["x"] },
+      { row: 11, column: 0, alt: ["i"] },
+      { row: 12, column: 2, alt: ["r"] },
+      { row: 12, column: 8, alt: ["a"] },
+      { row: 12, column: 11, reversed: true },
+    ],
+  },
+  fire: {
+    id: "fire",
+    kind: "watchtower",
+    grid: [
+      ["d", "o", "n", "p", "a", "T", "d", "a", "n", "V", "a", "a"],
+      ["o", "l", "o", "a", "G", "e", "o", "o", "b", "a", "u", "a"],
+      ["O", "P", "a", "m", "n", "o", "v", "G", "m", "d", "n", "m"],
+      ["a", "p", "l", "s", "T", "e", "d", "e", "c", "a", "o", "p"],
+      ["s", "c", "m", "i", "o", "o", "n", "A", "m", "l", "o", "x"],
+      ["V", "a", "r", "s", "G", "d", "L", "b", "r", "i", "a", "p"],
+      ["o", "i", "P", "t", "e", "a", "a", "p", "D", "o", "c", "e"],
+      ["P", "s", "u", "a", "c", "n", "r", "Z", "i", "r", "z", "a"],
+      ["S", "i", "o", "d", "a", "o", "i", "n", "r", "z", "f", "m"],
+      ["d", "a", "l", "t", "T", "d", "n", "a", "d", "i", "r", "e"],
+      ["d", "i", "x", "o", "m", "o", "n", "s", "i", "o", "s", "p"],
+      ["O", "o", "D", "p", "z", "i", "A", "p", "a", "n", "l", "i"],
+      ["r", "g", "o", "a", "n", "n", "P", "A", "C", "r", "a", "r"],
+    ],
+    marks: [
+      { row: 1, column: 10, alt: ["v"] },
+      { row: 1, column: 11, alt: ["i"] },
+      { row: 2, column: 6, alt: ["o"] },
+      { row: 2, column: 8, alt: ["n"] },
+      { row: 3, column: 1, alt: ["b"] },
+      { row: 3, column: 6, alt: ["c"] },
+      { row: 4, column: 4, alt: ["a"] },
+      { row: 4, column: 5, alt: ["a"] },
+      { row: 5, column: 7, alt: ["v"] },
+      { row: 7, column: 2, alt: ["v"] },
+      { row: 9, column: 2, alt: ["b"] },
+      { row: 12, column: 6, alt: ["O"], reversed: true },
+      { row: 12, column: 7, reversed: true },
+    ],
+  },
+  union: {
+    id: "union",
+    kind: "union",
+    grid: [
+      ["E", "X", "A", "R", "P"],
+      ["H", "C", "O", "M", "A"],
+      ["N", "A", "N", "T", "A"],
+      ["B", "I", "T", "O", "M"],
     ],
   },
 }

@@ -1,7 +1,10 @@
 import rows from "../../dist/enochian/tablets.js";
 import type { Links, Raw } from "../types.ts";
 
-/** A tablet's key: a Watchtower's element (`earth`, `air`). */
+/**
+ * A tablet's key: the four Watchtowers by their elements (`earth`, `air`,
+ * `water`, `fire`) and the Tablet of Union (`union`).
+ */
 type EnochianTabletID = keyof typeof rows;
 
 /**
@@ -14,11 +17,9 @@ type EnochianTablet = Raw<"enochianTablet"> &
 /** Every tablet the data has, by key. */
 type EnochianTablets = Record<EnochianTabletID, EnochianTablet>;
 
-/** The Watchtowers, 13 rows of 12 letters, in the table's order. */
-const WATCHTOWER_IDS: readonly ["earth", "air"] = Object.freeze([
-  "earth",
-  "air",
-] as const);
+/** The four Watchtowers, 13 rows of 12 letters, in the table's order. */
+const WATCHTOWER_IDS: readonly ["earth", "air", "water", "fire"] =
+  Object.freeze(["earth", "air", "water", "fire"] as const);
 
 /** A Watchtower's key, its element. */
 type EnochianWatchtowerID = (typeof WATCHTOWER_IDS)[number];
