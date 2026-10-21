@@ -367,6 +367,7 @@ import data from "magick-data";
 import sephirot from "magick-data/kabbalah/sephirot";
 import kameas from "magick-data/astrology/kameas";
 import tablets, { WATCHTOWER_IDS } from "magick-data/enochian/tablets";
+import { squareNote } from "magick-data/enochian/tabletNotes";
 import * as tools from "magick-data/tools";
 import sephirotJson from "magick-data/json/kabbalah/sephirot.json" with { type: "json" };
 
@@ -393,6 +394,7 @@ assert.deepEqual(kameas.saturn, [[4, 9, 2], [3, 5, 7], [8, 1, 6]]);
 assert.equal(kameas.luna[4][4], 41);
 assert.ok(Object.isFrozen(kameas.sol[0]));
 assert.deepEqual(WATCHTOWER_IDS, ["earth", "air", "water", "fire"]);
+assert.equal(squareNote("water", 4, 11)?.printed.equinox1912, "N");
 assert.equal(tablets.union.grid.map((row) => row.join("")).join(" "), "EXARP HCOMA NANTA BITOM");
 await assert.rejects(import("magick-data/enochian/dictionary"), {
   code: "ERR_PACKAGE_PATH_NOT_EXPORTED",

@@ -34,6 +34,7 @@
     "./astrology/zodiac": "./src/astrology/Zodiac.ts",
     "./enochian/letters": "./src/enochian/Letters.ts",
     "./enochian/tablets": "./src/enochian/Tablets.ts",
+    "./enochian/tabletNotes": "./src/enochian/TabletNotes.ts",
     "./gd/grades": "./src/gd/Grades.ts",
     "./geomancy/houses": "./src/geomancy/Houses.ts",
     "./geomancy/tetragrams": "./src/geomancy/Tetragrams.ts",
@@ -140,6 +141,10 @@
       "./enochian/tablets": {
         "types": "./lib/enochian/Tablets.d.ts",
         "default": "./lib/enochian/Tablets.js"
+      },
+      "./enochian/tabletNotes": {
+        "types": "./lib/enochian/TabletNotes.d.ts",
+        "default": "./lib/enochian/TabletNotes.js"
       },
       "./gd/grades": {
         "types": "./lib/gd/Grades.d.ts",

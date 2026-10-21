@@ -14,6 +14,7 @@ describe("what the graph does not check", () => {
     const { uncovered } = coverage();
     expect(uncovered.map((entry) => entry.file)).toEqual([
       "enochian/dictionary.json5",
+      "enochian/tabletNotes.json5",
       "kabbalah/lenain/apparatus.json5",
       "kabbalah/lenain/evidence.json5",
       "kabbalah/lenain/pages.json5",

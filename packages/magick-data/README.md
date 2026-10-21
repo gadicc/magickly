@@ -246,6 +246,13 @@ or `null`.
   is no JSON for them; `oddKamea(n)` and `doublyEvenKamea(n)` are the
   constructions, for an odd order from 3 or a multiple of 4, up to
   `MAX_KAMEA_ORDER` (100). Any other order is a `RangeError`.
+- `magick-data/enochian/tabletNotes`: notes on the Enochian tablets: the
+  versions (Dee and Kelley's of 1584, Raphael's revision of 1587, the Golden
+  Dawn's and its printings), how they differ, each tablet's sources, and
+  what the sources print in particular squares, by row and column from 0 as
+  the tablets' `marks` count them (`squareNote(id, row, column)`), with
+  `sourceText` and `sourceUrl` for the works cited. The prose is ours, under
+  CC BY 4.0 like the tables.
 - `magick-data/enochian/dictionary`: for the app only, and not published
   ([above](#licences)).
 

@@ -165,6 +165,7 @@ export default defineConfig({
         "packages/magick-data/src/schemas.ts",
         "packages/magick-data/src/kabbalah/seventyTwoAngelsDerived.ts",
         "packages/magick-data/src/astrology/kameas.ts",
+        "packages/magick-data/src/enochian/TabletNotes.ts",
         "src/app/chat/train/access.ts",
         "src/app/chat/train/ingestPdf.ts",
         "src/app/chat/train/upload/route.ts",

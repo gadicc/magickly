@@ -1,0 +1,2105 @@
+// Notes on the Enochian tablets: where their versions come from, how they
+// differ, and what the sources print in particular squares. Original
+// prose, facts only, citing the works below by stable reference; plan 061
+// (Stage G notes) has the transcriptions' account. Rows and columns are
+// counted from 0, as in tablets.json5's grids and marks; `printed` gives
+// each source's letters in that square ("x over y" where Regardie prints
+// a higher and a lower letter).
+{
+  works: {
+    "sloane3191": {
+      "title": "John Dee, the Enochian tables and invocations, British Library, Sloane MS 3191",
+      "year": 1584
+    },
+    "casaubon1659": {
+      "title": "Meric Casaubon (ed.), A True & Faithful Relation of what passed for many Yeers between Dr. John Dee and Some Spirits (London, 1659), from British Library, Cotton MS Appendix XLVI",
+      "year": 1659,
+      "archive": {
+        "item": "truefaithfulrela00deej"
+      }
+    },
+    "equinox1912": {
+      "title": "The Equinox, vol. I no. 7 (London, 1912), \"Liber Chanokh\"",
+      "year": 1912,
+      "archive": {
+        "item": "crowley-equinox_202110",
+        "file": "The Equinox Vol. 1, No. 7"
+      }
+    },
+    "regardie1940": {
+      "title": "Israel Regardie, The Golden Dawn, vol. 4 (Aries Press, Chicago, 1940)",
+      "year": 1940,
+      "archive": {
+        "item": "IsraelRegardie-TheGoldenDawn-Vol4-1940"
+      }
+    },
+    "greer": {
+      "title": "Israel Regardie, The Golden Dawn, 7th edition, ed. John Michael Greer (Llewellyn)",
+      "isbn": "978-0-7387-4399-8"
+    }
+  },
+  versions: [
+    {
+      "id": "dee1584",
+      "title": "Dee and Kelley, 1584",
+      "text": "John Dee recorded the four Watchtowers, joined into one Great Table, from Edward Kelley's scrying in 1584. Dee's own copy of the tables is among his papers in the British Library. The letters were given square by square.",
+      "sources": [
+        {
+          "work": "sloane3191"
+        }
+      ]
+    },
+    {
+      "id": "raphael1587",
+      "title": "Raphael's revision, 1587",
+      "text": "Dee's records also tell of a revised version of the table, given through Kelley in 1587 and known as the Tabula recensa. His diaries of the sessions with Kelley were printed in 1659.",
+      "sources": [
+        {
+          "work": "casaubon1659"
+        }
+      ]
+    },
+    {
+      "id": "gd",
+      "title": "The Golden Dawn",
+      "text": "The Hermetic Order of the Golden Dawn worked from copies of Dee's tables. Its tablets keep his letters with some changes, print a second letter in many squares, attribute each tablet to an element and a quarter, and add a Tablet of Union, colours and a layer of attributions on every square.",
+      "sources": [
+        {
+          "work": "regardie1940",
+          "page": 270,
+          "leaf": 262
+        },
+        {
+          "work": "regardie1940",
+          "page": 306,
+          "leaf": 298
+        }
+      ]
+    },
+    {
+      "id": "printings",
+      "title": "Later printings",
+      "text": "The Order's tablets reached print in The Equinox (1912), which gives them whole and with the Black Cross, square by square as pyramids, and with the Tablet of Union; in Regardie's The Golden Dawn (1937 to 1940), the Order's own papers, with the second letters; and in modern editions, of which the seventh, edited by John Michael Greer, redraws them in colour with one letter a square. The three disagree in a few squares each.",
+      "sources": [
+        {
+          "work": "equinox1912",
+          "plate": "III",
+          "leaf": 241
+        },
+        {
+          "work": "regardie1940",
+          "page": 270,
+          "leaf": 262
+        },
+        {
+          "work": "greer"
+        }
+      ]
+    }
+  ],
+  differences: [
+    {
+      "id": "letters",
+      "title": "Letters",
+      "text": "Most squares hold the same letter in every version. Where they differ it is usually by a letter that looks alike in a hand or in print (z and x, c and t, n and u), by u against v, which were one letter in Dee's day, or by a capital.",
+      "sources": [
+        {
+          "work": "regardie1940",
+          "page": 270,
+          "leaf": 262
+        },
+        {
+          "work": "equinox1912",
+          "plate": "III",
+          "leaf": 241
+        }
+      ]
+    },
+    {
+      "id": "doubled",
+      "title": "Squares with two letters",
+      "text": "Regardie prints a second, smaller letter in many squares, and once four. He treats either letter as valid for the square, prefers the higher, and allows both; the Order's names sometimes draw on both. The Equinox and Greer print one letter a square. Here the grid takes the higher letter unless both other sources and the Order's names read another, and the other letters are kept as variants.",
+      "sources": [
+        {
+          "work": "regardie1940",
+          "page": 306,
+          "leaf": 298
+        }
+      ]
+    },
+    {
+      "id": "reversed",
+      "title": "Reversed letters",
+      "text": "A few letters are printed reversed. Most of them, one or two in each Watchtower, spell Paraoan, the name of one of the governors of the Aethyrs. The Equinox writes them in Enochian, since a reversed A or O cannot be told from a plain one, and Greer mirrors them. Both also reverse one letter outside that name, Water's last, an L.",
+      "sources": [
+        {
+          "work": "equinox1912",
+          "page": 234,
+          "leaf": 240
+        },
+        {
+          "work": "greer"
+        }
+      ]
+    },
+    {
+      "id": "earthRow8",
+      "title": "The eighth row of Earth",
+      "text": "The eighth row of the Earth tablet differs most: Regardie prints two readings in every square, the lower one shifted a square along, and the Equinox and Greer each follow a different mixture of them. The older reading kept here begins with O; the Golden Dawn's begins with R, printed reversed.",
+      "sources": [
+        {
+          "work": "regardie1940",
+          "page": 272,
+          "leaf": 264
+        },
+        {
+          "work": "equinox1912",
+          "plate": "III",
+          "leaf": 241
+        },
+        {
+          "work": "greer"
+        }
+      ]
+    },
+    {
+      "id": "union",
+      "title": "The Tablet of Union",
+      "text": "The Tablet of Union is the Order's: twenty letters in five columns and four rows, EXARP, HCOMA, NANTA and BITOM, one line to each element. The same letters stand in the Black Cross that joins the four Watchtowers in the Equinox's general view.",
+      "sources": [
+        {
+          "work": "regardie1940",
+          "page": 275,
+          "leaf": 267
+        },
+        {
+          "work": "equinox1912",
+          "plate": "III",
+          "leaf": 241
+        },
+        {
+          "work": "equinox1912",
+          "plate": "VIII",
+          "leaf": 246
+        }
+      ]
+    },
+    {
+      "id": "attributions",
+      "title": "Elements and quarters",
+      "text": "The Order gives each Watchtower an element and a quarter: Air the East, Water the West, Earth the North and Fire the South, and divides each into four lesser angles, one for each element. This is the Order's scheme; other writers attribute the tablets differently.",
+      "sources": [
+        {
+          "work": "regardie1940",
+          "page": 270,
+          "leaf": 262
+        },
+        {
+          "work": "equinox1912",
+          "page": 234,
+          "leaf": 240
+        }
+      ]
+    },
+    {
+      "id": "colours",
+      "title": "Colours and pyramids",
+      "text": "The Order painted each tablet in its element's colour and its own angle's letters in the complementary one, the crosses black on white, and the Tablet of Union white with each line in its element's colour. It also treats every square as a truncated pyramid whose sides carry elements, signs, planets and other attributions, as the Equinox draws them.",
+      "sources": [
+        {
+          "work": "regardie1940",
+          "page": 274,
+          "leaf": 266
+        },
+        {
+          "work": "regardie1940",
+          "page": 275,
+          "leaf": 267
+        },
+        {
+          "work": "equinox1912",
+          "plate": "IV",
+          "leaf": 242
+        }
+      ]
+    }
+  ],
+  tablets: {
+    "earth": {
+      "version": "older",
+      "text": "The Watchtower of the North, Earth. This tablet's letters predate the sources recorded here and have no source of their own. They differ from the Golden Dawn's in thirteen squares: capitals, u for v, and four letters, two of them in the eighth row. A comparison with a modern transcription of Dee's table suggests they follow it. Its sigil is a cross with arms of four colours.",
+      "sources": [
+        {
+          "work": "regardie1940",
+          "page": 272,
+          "leaf": 264
+        },
+        {
+          "work": "regardie1940",
+          "page": 307,
+          "leaf": 299
+        }
+      ]
+    },
+    "air": {
+      "version": "older",
+      "text": "The Watchtower of the East, Air. This tablet's letters predate the sources recorded here and have no source of their own. They differ from the Golden Dawn's in thirteen squares: capitals, u for v, and two letters. A comparison with a modern transcription of Dee's table suggests they follow it. Its sigil is a Tau with four flames above it.",
+      "sources": [
+        {
+          "work": "regardie1940",
+          "page": 270,
+          "leaf": 262
+        },
+        {
+          "work": "regardie1940",
+          "page": 307,
+          "leaf": 299
+        }
+      ]
+    },
+    "water": {
+      "version": "gd",
+      "text": "The Watchtower of the West, Water, as the Golden Dawn has it. Regardie prints a second letter in twenty of its squares; the grid takes his letter except in six squares, each with a note of its own. Its sigil is a cross potent with b, 6, 4 and b in its angles; the Equinox sets the four figures differently.",
+      "sources": [
+        {
+          "work": "regardie1940",
+          "page": 271,
+          "leaf": 263
+        },
+        {
+          "work": "regardie1940",
+          "page": 307,
+          "leaf": 299
+        },
+        {
+          "work": "equinox1912",
+          "plate": "X",
+          "leaf": 256
+        }
+      ]
+    },
+    "fire": {
+      "version": "gd",
+      "text": "The Watchtower of the South, Fire, as the Golden Dawn has it. Regardie prints a second letter in ten of its squares; the grid takes his letter except in three squares, each with a note of its own. Its sigil is a circle with twelve rays.",
+      "sources": [
+        {
+          "work": "regardie1940",
+          "page": 273,
+          "leaf": 265
+        },
+        {
+          "work": "regardie1940",
+          "page": 307,
+          "leaf": 299
+        },
+        {
+          "work": "equinox1912",
+          "plate": "X",
+          "leaf": 256
+        }
+      ]
+    },
+    "union": {
+      "version": "gd",
+      "text": "The Tablet of Union, by which the Golden Dawn joins the four Watchtowers: EXARP for Air, HCOMA for Water, NANTA for Earth and BITOM for Fire. It has no sigil and no variants in these sources.",
+      "sources": [
+        {
+          "work": "regardie1940",
+          "page": 275,
+          "leaf": 267
+        },
+        {
+          "work": "equinox1912",
+          "plate": "VIII",
+          "leaf": 246
+        }
+      ]
+    }
+  },
+  squares: {
+    "air": [
+      {
+        "row": 0,
+        "column": 7,
+        "goldenDawn": "y",
+        "printed": {
+          "regardie1940": "y over u",
+          "equinox1912": "y",
+          "greer": "u"
+        },
+        "note": "Regardie prints y over u, the Equinox y, Greer u; this tablet has a capital Y.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 0,
+        "column": 10,
+        "goldenDawn": "p",
+        "printed": {
+          "regardie1940": "p",
+          "equinox1912": "p",
+          "greer": "p"
+        },
+        "note": "The sources print p; this tablet has a capital.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 1,
+        "column": 7,
+        "goldenDawn": "p",
+        "printed": {
+          "regardie1940": "p",
+          "equinox1912": "p",
+          "greer": "p"
+        },
+        "note": "The sources print p; this tablet has a capital.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 2,
+        "column": 0,
+        "goldenDawn": "C",
+        "printed": {
+          "regardie1940": "C",
+          "equinox1912": "c",
+          "greer": "c"
+        },
+        "note": "Regardie prints a capital C; the Equinox, Greer and this tablet c.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 2,
+        "column": 10,
+        "goldenDawn": "u",
+        "printed": {
+          "regardie1940": "u",
+          "equinox1912": "u",
+          "greer": "u"
+        },
+        "note": "The sources print u; this tablet has v.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 3,
+        "column": 5,
+        "printed": {
+          "regardie1940": "z over x",
+          "equinox1912": "x",
+          "greer": "x"
+        },
+        "note": "Regardie prints z over x; the Equinox and Greer x; this tablet z, the higher letter (the Senior Aaozaif; Aaoxaif reads x).",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 4,
+        "column": 6,
+        "printed": {
+          "regardie1940": "n over m",
+          "equinox1912": "m",
+          "greer": "m"
+        },
+        "note": "Regardie prints n over m; the Equinox, Greer and the Senior Htmorda read m, as this tablet does.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 5,
+        "column": 11,
+        "goldenDawn": "l",
+        "printed": {
+          "regardie1940": "l over i",
+          "equinox1912": "i",
+          "greer": "i"
+        },
+        "note": "Regardie prints l over i; the Equinox and Greer i, as this tablet does.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 6,
+        "column": 5,
+        "goldenDawn": "a",
+        "printed": {
+          "regardie1940": "a",
+          "equinox1912": "A",
+          "greer": "A"
+        },
+        "note": "Regardie prints a; the Equinox, Greer and this tablet A.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 6,
+        "column": 10,
+        "goldenDawn": "p",
+        "printed": {
+          "regardie1940": "p",
+          "equinox1912": "p",
+          "greer": "p"
+        },
+        "note": "The sources print p; this tablet has a capital.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 7,
+        "column": 0,
+        "printed": {
+          "regardie1940": "t over c",
+          "equinox1912": "c",
+          "greer": "c"
+        },
+        "note": "Regardie prints t over c; the Equinox and Greer c; this tablet t.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 7,
+        "column": 4,
+        "printed": {
+          "regardie1940": "r over a",
+          "equinox1912": "a",
+          "greer": "r"
+        },
+        "note": "Regardie prints r over a; Greer r, the Equinox a; this tablet r.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 7,
+        "column": 10,
+        "printed": {
+          "regardie1940": "s over z",
+          "equinox1912": "z",
+          "greer": "z"
+        },
+        "note": "Regardie prints s over z; the Equinox and Greer z; this tablet s.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 8,
+        "column": 0,
+        "printed": {
+          "regardie1940": "O",
+          "equinox1912": "O",
+          "greer": "O"
+        },
+        "note": "Printed reversed in the Equinox (in Enochian).",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 8,
+        "column": 6,
+        "goldenDawn": "p",
+        "printed": {
+          "regardie1940": "p",
+          "equinox1912": "p",
+          "greer": "p"
+        },
+        "note": "The sources print p; this tablet has a capital.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 9,
+        "column": 0,
+        "printed": {
+          "regardie1940": "A",
+          "equinox1912": "A",
+          "greer": "A"
+        },
+        "note": "Printed reversed in the Equinox (in Enochian).",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 9,
+        "column": 9,
+        "goldenDawn": "u",
+        "printed": {
+          "regardie1940": "u over v",
+          "equinox1912": "u",
+          "greer": "u"
+        },
+        "note": "The sources print u (Regardie u over v); this tablet has v.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 10,
+        "column": 8,
+        "goldenDawn": "p",
+        "printed": {
+          "regardie1940": "p",
+          "equinox1912": "p",
+          "greer": "p"
+        },
+        "note": "The sources print p; this tablet has a capital.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 10,
+        "column": 10,
+        "goldenDawn": "u",
+        "printed": {
+          "regardie1940": "u over a",
+          "equinox1912": "a",
+          "greer": "a"
+        },
+        "note": "Regardie prints u over a, the Equinox and Greer a; this tablet's n is in none of them.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 12,
+        "column": 7,
+        "goldenDawn": "p",
+        "printed": {
+          "regardie1940": "p",
+          "equinox1912": "p",
+          "greer": "p"
+        },
+        "note": "The sources print p; this tablet has a capital.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 270,
+            "leaf": 262
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      }
+    ],
+    "water": [
+      {
+        "row": 0,
+        "column": 5,
+        "printed": {
+          "regardie1940": "u over v",
+          "equinox1912": "v",
+          "greer": "u"
+        },
+        "note": "u and v are one letter; Regardie prints both, the Equinox v.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 1,
+        "column": 0,
+        "printed": {
+          "regardie1940": "a over o",
+          "equinox1912": "a",
+          "greer": "o"
+        },
+        "note": "Regardie's higher letter, a, as the Equinox prints it; Greer prints o.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 1,
+        "column": 2,
+        "printed": {
+          "regardie1940": "b over l",
+          "equinox1912": "l",
+          "greer": "l"
+        },
+        "note": "The Order's names through this square read l (Olgota, Aalco) and both other sources print l, so the grid takes it over Regardie's higher b; Oblgotca uses both.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 2,
+        "column": 1,
+        "printed": {
+          "regardie1940": "o over a",
+          "equinox1912": "o",
+          "greer": "a"
+        },
+        "note": "Regardie's higher letter, o, as the Equinox prints it; Greer prints a.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 2,
+        "column": 6,
+        "printed": {
+          "regardie1940": "x over z",
+          "equinox1912": "z",
+          "greer": "x"
+        },
+        "note": "Regardie's higher letter, x, as Greer prints it and the Senior Laoaxrp reads it; the Equinox prints z.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 2,
+        "column": 7,
+        "printed": {
+          "regardie1940": "m over i",
+          "equinox1912": "i",
+          "greer": "m"
+        },
+        "note": "Regardie's higher letter, m, as Greer prints it; the Equinox prints i, which its name Ingm reads.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 2,
+        "column": 8,
+        "printed": {
+          "regardie1940": "a over n and u",
+          "equinox1912": "n",
+          "greer": "a"
+        },
+        "note": "Regardie's higher letter, a, as Greer prints it; the Equinox prints n, which its name Ingm reads.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 3,
+        "column": 7,
+        "printed": {
+          "regardie1940": "i",
+          "equinox1912": "l",
+          "greer": "l"
+        },
+        "note": "Regardie prints only i here; both other sources print l, and the name Laoc reads l, so the grid takes l and keeps his i as a variant.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 3,
+        "column": 8,
+        "printed": {
+          "regardie1940": "l over a",
+          "equinox1912": "a",
+          "greer": "e"
+        },
+        "note": "Regardie's higher letter, l. The Equinox prints a, which its name Laoc reads; Greer prints e.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 4,
+        "column": 0,
+        "printed": {
+          "regardie1940": "f over p",
+          "equinox1912": "p",
+          "greer": "p"
+        },
+        "note": "Regardie's higher letter, f; both other sources print p, but no name settles it.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 4,
+        "column": 2,
+        "printed": {
+          "regardie1940": "t over c",
+          "equinox1912": "t",
+          "greer": "t"
+        },
+        "note": "All three read t; Regardie adds c below it.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 4,
+        "column": 6,
+        "printed": {
+          "regardie1940": "v over o",
+          "equinox1912": "o",
+          "greer": "o"
+        },
+        "note": "The Senior Laoaxrp reads o and both other sources print o, so the grid takes it over Regardie's higher v.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 4,
+        "column": 10,
+        "printed": {
+          "regardie1940": "x over s",
+          "equinox1912": "s",
+          "greer": "s"
+        },
+        "note": "The name Vssn reads s and both other sources print s, so the grid takes it over Regardie's higher x.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 4,
+        "column": 11,
+        "printed": {
+          "regardie1940": "y and l over N and h",
+          "equinox1912": "N",
+          "greer": "N"
+        },
+        "note": "Regardie prints four letters here, y and l side by side over N and h, so there is no single higher letter. Both other sources print N, reversed, and the grid takes it.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 5,
+        "column": 4,
+        "printed": {
+          "regardie1940": "z over x",
+          "equinox1912": "z",
+          "greer": "z"
+        },
+        "note": "All three read z; Regardie adds x below it.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 5,
+        "column": 10,
+        "printed": {
+          "regardie1940": "c over L",
+          "equinox1912": "o",
+          "greer": "o"
+        },
+        "note": "Regardie prints c over L; both other sources print o, which the name Rvoi reads, so the grid takes o, a letter Regardie does not print here.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 8,
+        "column": 5,
+        "printed": {
+          "regardie1940": "n over a",
+          "equinox1912": "a",
+          "greer": "a"
+        },
+        "note": "Regardie's higher letter, n, which the Senior Soniznt reads; both other sources print a.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 10,
+        "column": 5,
+        "printed": {
+          "regardie1940": "z over x",
+          "equinox1912": "z",
+          "greer": "z"
+        },
+        "note": "All three read z; Regardie adds x below it.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 11,
+        "column": 0,
+        "printed": {
+          "regardie1940": "r over i",
+          "equinox1912": "i",
+          "greer": "i"
+        },
+        "note": "Regardie's higher letter, r; both other sources print i, but no name settles it.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 12,
+        "column": 2,
+        "printed": {
+          "regardie1940": "i over r",
+          "equinox1912": "i",
+          "greer": "i"
+        },
+        "note": "All three read i; Regardie adds r below it.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 12,
+        "column": 8,
+        "printed": {
+          "regardie1940": "n over a",
+          "equinox1912": "n",
+          "greer": "n"
+        },
+        "note": "All three read n; Regardie adds a below it.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 12,
+        "column": 11,
+        "printed": {
+          "regardie1940": "L",
+          "equinox1912": "L",
+          "greer": "L"
+        },
+        "note": "Printed reversed in the Equinox (in Enochian) and in Greer.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      }
+    ],
+    "earth": [
+      {
+        "row": 0,
+        "column": 7,
+        "goldenDawn": "p",
+        "printed": {
+          "regardie1940": "p",
+          "equinox1912": "p",
+          "greer": "p"
+        },
+        "note": "The sources print p; this tablet has a capital.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 272,
+            "leaf": 264
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 1,
+        "column": 0,
+        "goldenDawn": "u",
+        "printed": {
+          "regardie1940": "u over v",
+          "equinox1912": "u",
+          "greer": "u"
+        },
+        "note": "The sources print u (Regardie u over v); this tablet has v.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 272,
+            "leaf": 264
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 2,
+        "column": 7,
+        "goldenDawn": "a",
+        "printed": {
+          "regardie1940": "a over o",
+          "equinox1912": "o",
+          "greer": "o"
+        },
+        "note": "Regardie prints a over o; the Equinox and Greer print o, as this tablet does.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 272,
+            "leaf": 264
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 3,
+        "column": 2,
+        "goldenDawn": "p",
+        "printed": {
+          "regardie1940": "p",
+          "equinox1912": "p",
+          "greer": "p"
+        },
+        "note": "The sources print p; this tablet has a capital.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 272,
+            "leaf": 264
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 4,
+        "column": 11,
+        "goldenDawn": "u",
+        "printed": {
+          "regardie1940": "u",
+          "equinox1912": "u",
+          "greer": "u"
+        },
+        "note": "The sources print u; this tablet has v.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 272,
+            "leaf": 264
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 7,
+        "column": 0,
+        "goldenDawn": "R",
+        "printed": {
+          "regardie1940": "R over o",
+          "equinox1912": "R",
+          "greer": "R"
+        },
+        "note": "Row 8 is where the versions differ most: Regardie prints two readings in every square, the upper one beginning R C a n c h, the lower one shifted a square to the right. The Equinox and Greer begin the row with R, reversed (in Enochian in the Equinox); this tablet begins it with O.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 272,
+            "leaf": 264
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 7,
+        "column": 7,
+        "goldenDawn": "i",
+        "printed": {
+          "regardie1940": "i and a over b and t",
+          "equinox1912": "i",
+          "greer": "i"
+        },
+        "note": "Regardie prints i and a side by side over b and t; the Equinox and Greer print i; this tablet has a.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 272,
+            "leaf": 264
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 8,
+        "column": 0,
+        "printed": {
+          "regardie1940": "A",
+          "equinox1912": "A",
+          "greer": "A"
+        },
+        "note": "Printed reversed in the Equinox (in Enochian).",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 272,
+            "leaf": 264
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 8,
+        "column": 9,
+        "goldenDawn": "p",
+        "printed": {
+          "regardie1940": "p",
+          "equinox1912": "p",
+          "greer": "p"
+        },
+        "note": "The sources print p; this tablet has a capital.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 272,
+            "leaf": 264
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 9,
+        "column": 1,
+        "goldenDawn": "p",
+        "printed": {
+          "regardie1940": "p",
+          "equinox1912": "p",
+          "greer": "p"
+        },
+        "note": "The sources print p; this tablet has a capital.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 272,
+            "leaf": 264
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 9,
+        "column": 5,
+        "goldenDawn": "l",
+        "printed": {
+          "regardie1940": "l over B",
+          "equinox1912": "B",
+          "greer": "B"
+        },
+        "note": "Regardie prints l over B; the Equinox and Greer print B; this tablet has L.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 272,
+            "leaf": 264
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 9,
+        "column": 11,
+        "goldenDawn": "T",
+        "printed": {
+          "regardie1940": "T over L",
+          "equinox1912": "L",
+          "greer": "l"
+        },
+        "note": "Regardie prints T over L, the Equinox L, Greer l; this tablet's P is in none of them.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 272,
+            "leaf": 264
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 10,
+        "column": 5,
+        "printed": {
+          "regardie1940": "l",
+          "equinox1912": "i",
+          "greer": "i"
+        },
+        "note": "Regardie prints only l, which the Senior Ahmlicv contradicts; the Equinox and Greer print i, as this tablet does.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 272,
+            "leaf": 264
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 11,
+        "column": 2,
+        "goldenDawn": "p",
+        "printed": {
+          "regardie1940": "p",
+          "equinox1912": "p",
+          "greer": "p"
+        },
+        "note": "The sources print p; this tablet has a capital.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 272,
+            "leaf": 264
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 11,
+        "column": 11,
+        "goldenDawn": "p",
+        "printed": {
+          "regardie1940": "p",
+          "equinox1912": "p",
+          "greer": "p"
+        },
+        "note": "The sources print p; this tablet has a capital.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 272,
+            "leaf": 264
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      }
+    ],
+    "fire": [
+      {
+        "row": 1,
+        "column": 10,
+        "printed": {
+          "regardie1940": "u over v",
+          "equinox1912": "v",
+          "greer": "u"
+        },
+        "note": "u and v are one letter; Regardie prints both, the Equinox v.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 273,
+            "leaf": 265
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 1,
+        "column": 11,
+        "printed": {
+          "regardie1940": "a over i",
+          "equinox1912": "a",
+          "greer": "a"
+        },
+        "note": "All three read a; Regardie adds i below it.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 273,
+            "leaf": 265
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 2,
+        "column": 6,
+        "printed": {
+          "regardie1940": "v over o",
+          "equinox1912": "O",
+          "greer": "O"
+        },
+        "note": "Regardie's higher letter, v, which the Senior Alndvod reads; both other sources print O.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 273,
+            "leaf": 265
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 2,
+        "column": 8,
+        "printed": {
+          "regardie1940": "m over n",
+          "equinox1912": "m",
+          "greer": "m"
+        },
+        "note": "All three read m; Regardie adds n below it.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 273,
+            "leaf": 265
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 3,
+        "column": 1,
+        "printed": {
+          "regardie1940": "p over b",
+          "equinox1912": "b",
+          "greer": "p"
+        },
+        "note": "Regardie's higher letter, p, as Greer prints it; the Equinox prints b.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 273,
+            "leaf": 265
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 3,
+        "column": 6,
+        "printed": {
+          "regardie1940": "c over d",
+          "equinox1912": "d",
+          "greer": "d"
+        },
+        "note": "The Senior Alndvod reads d and both other sources print d, so the grid takes it over Regardie's higher c.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 273,
+            "leaf": 265
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 4,
+        "column": 4,
+        "printed": {
+          "regardie1940": "o",
+          "equinox1912": "a",
+          "greer": "o"
+        },
+        "note": "Regardie and Greer print o; the Equinox prints a.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 273,
+            "leaf": 265
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 4,
+        "column": 5,
+        "printed": {
+          "regardie1940": "a",
+          "equinox1912": "o",
+          "greer": "o"
+        },
+        "note": "Regardie prints only a here; both other sources print o, and the Senior Adoeoet reads o, so the grid takes o and keeps his a as a variant.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 273,
+            "leaf": 265
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 5,
+        "column": 7,
+        "printed": {
+          "regardie1940": "b over v",
+          "equinox1912": "b",
+          "greer": "b"
+        },
+        "note": "All three read b; Regardie adds v below it.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 273,
+            "leaf": 265
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 7,
+        "column": 2,
+        "printed": {
+          "regardie1940": "u over v",
+          "equinox1912": "u",
+          "greer": "u"
+        },
+        "note": "All three read u; Regardie adds v below it.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 273,
+            "leaf": 265
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 9,
+        "column": 2,
+        "printed": {
+          "regardie1940": "l over b",
+          "equinox1912": "l",
+          "greer": "l"
+        },
+        "note": "All three read l; Regardie adds b below it.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 273,
+            "leaf": 265
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 12,
+        "column": 6,
+        "printed": {
+          "regardie1940": "O over p",
+          "equinox1912": "P",
+          "greer": "P"
+        },
+        "note": "The Senior Arinnap reads p, and the Equinox and Greer print P, reversed; Regardie prints O over p. The grid takes P.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 273,
+            "leaf": 265
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 12,
+        "column": 7,
+        "printed": {
+          "regardie1940": "A",
+          "equinox1912": "A",
+          "greer": "A"
+        },
+        "note": "Printed reversed in the Equinox (in Enochian); A looks the same either way.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 273,
+            "leaf": 265
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      }
+    ]
+  },
+}

@@ -33,6 +33,8 @@ const CHECKED_ELSEWHERE: Record<string, string> = {
   // Not a table and never was, which tables.ts says in as many words; the
   // integrity check holds every entry to its schema instead.
   "enochian/dictionary.json5": "integrity.ts",
+  // Notes, not a table: their squares and sources are held to the tablets.
+  "enochian/tabletNotes.json5": "tabletNotes.test.ts",
 };
 
 function sources(dir: string, prefix = ""): string[] {
