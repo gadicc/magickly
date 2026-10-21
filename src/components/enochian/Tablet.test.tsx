@@ -3,12 +3,18 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import Tablet, {
   Sigils,
+  tabletName,
   tabletViewBox,
   UNION_VIEWBOX,
   WATCHTOWER_VIEWBOX,
 } from "./Tablet";
 
-const draw = (id: string, enochian = false, frame = true) =>
+const draw = (
+  id: string,
+  enochian = false,
+  frame = true,
+  label: boolean | string = true,
+) =>
   renderToStaticMarkup(
     <Tablet
       id={id}
@@ -16,6 +22,7 @@ const draw = (id: string, enochian = false, frame = true) =>
       frame={frame}
       width={210}
       height={297}
+      label={label}
     />,
   );
 
@@ -28,7 +35,9 @@ const letters = (markup: string) =>
 
 describe("Tablet", () => {
   // Earth and Air drew these bytes before the Water, Fire and Union tablets
-  // came (plan 061, stage G): hashed from the same calls at f8e21c8.
+  // came (plan 061, stage G): hashed from the same calls on main before
+  // stage G (bd26b64). Without its accessible name (`label={false}`, as the
+  // hall and the image route draw it) a tablet still draws exactly them.
   it.each([
     [
       "earth",
@@ -81,9 +90,35 @@ describe("Tablet", () => {
   ] as const)(
     "draws %s (Enochian %s, frame %s) as it did",
     (id, enochian, frame, hash) => {
-      expect(sha256(draw(id, enochian, frame))).toBe(hash);
+      expect(sha256(draw(id, enochian, frame, false))).toBe(hash);
     },
   );
+
+  it("names each tablet as an image, and is unnamed when told", () => {
+    const named = {
+      earth: "Enochian Watchtower of Earth",
+      air: "Enochian Watchtower of Air",
+      water: "Enochian Watchtower of Water",
+      fire: "Enochian Watchtower of Fire",
+      union: "Tablet of Union",
+      spirit: "Enochian tablet",
+    };
+    for (const [id, name] of Object.entries(named)) {
+      expect(tabletName(id)).toBe(name);
+      const markup = draw(id);
+      expect(markup).toMatch(
+        new RegExp(`^<svg [^>]*role="img" aria-label="${name}"`),
+      );
+      // No <title>: it would show a tooltip over every square.
+      expect(markup).not.toContain("<title>");
+      expect(draw(id, false, true, "Shown here")).toContain(
+        'aria-label="Shown here"',
+      );
+      const unnamed = draw(id, false, true, false);
+      expect(unnamed).not.toContain("aria-label");
+      expect(unnamed).not.toContain('role="img"');
+    }
+  });
 
   it.each(["water", "fire"])(
     "draws %s's sigil above its 13 rows of 12",

@@ -75,6 +75,7 @@ export function tabletArt(enochianStyle?: CSSProperties): HallArt {
             <Tablet
               id={element}
               frame={false}
+              label={false}
               width={board.width}
               height={board.height}
               enochianStyle={enochianStyle}

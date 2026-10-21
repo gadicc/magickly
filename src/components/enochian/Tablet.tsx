@@ -413,10 +413,33 @@ function UnionGrid({
   );
 }
 
+/** Each Watchtower's element, as its accessible name says it. */
+const ELEMENT_NAMES: Record<string, string> = {
+  earth: "Earth",
+  air: "Air",
+  water: "Water",
+  fire: "Fire",
+};
+
+/**
+ * The name a tablet is announced by: "Enochian Watchtower of Fire", "Tablet
+ * of Union", or "Enochian tablet" for a key the data does not have.
+ */
+export function tabletName(id: string): string {
+  const tablet = tabletOf(id);
+  if (tablet?.kind === "union") return "Tablet of Union";
+  if (tablet && Object.hasOwn(ELEMENT_NAMES, id))
+    return `Enochian Watchtower of ${ELEMENT_NAMES[id]}`;
+  return "Enochian tablet";
+}
+
 /**
  * An Enochian tablet: a Watchtower's sigil above its grid on a 210 × 297
  * page, or the Tablet of Union's grid on a page of its own
  * (`tabletViewBox`). A key the data does not have draws an empty page.
+ * It is an image named by `tabletName` (an `aria-label`, which shows no
+ * tooltip over the squares as a `<title>` would) unless `label` is false,
+ * as for a tablet drawn inside a larger drawing that names itself.
  */
 const Tablet = React.forwardRef(function Tablet(
   {
@@ -425,8 +448,11 @@ const Tablet = React.forwardRef(function Tablet(
     frame = true,
     width,
     height,
+    label = true,
   }: {
     id: string;
+    /** The accessible name: the tablet's own (`true`), another, or none. */
+    label?: boolean | string;
     /** Page font style for the grid letters; omitted renders the Latin transliteration. */
     enochianStyle?: CSSProperties;
     /** CSS border for on-page display; server images omit it since CSS boxes are not SVG. */
@@ -440,6 +466,7 @@ const Tablet = React.forwardRef(function Tablet(
   const Sigil = Object.hasOwn(Sigils, id)
     ? Sigils[id as keyof typeof Sigils]
     : undefined;
+  const name = label === true ? tabletName(id) : label || undefined;
 
   return (
     <svg
@@ -448,6 +475,8 @@ const Tablet = React.forwardRef(function Tablet(
       width={width}
       height={height}
       style={frame ? { border: "1px solid black" } : undefined}
+      role={name ? "img" : undefined}
+      aria-label={name}
       ref={ref}
     >
       {tablet?.kind === "union" ? (

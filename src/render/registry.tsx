@@ -116,6 +116,9 @@ export const COMPONENT_IMAGE_REGISTRY: {
       <Tablet
         id={props.id}
         frame={false}
+        // The image keeps the bytes it was published with; a page that
+        // shows it gives it its own alt text.
+        label={false}
         enochianStyle={
           props.font === "enochian" ? { fontFamily: "Enochian" } : undefined
         }
