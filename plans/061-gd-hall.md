@@ -302,7 +302,7 @@ gdHall(dais=4, wall="gradient")
   | altar, pillar, banner | 1 | fills the 2-square cell (banner 1.6 × 2) |
   | platform, throne, board | 1 | `w` × `h` squares; a board with a diagram 2 × 3, sized by `scale` |
   | hebrewLetter | 1.475 | 2.95 × 2.71 |
-  | tablet | 1.345 | 1.91 × 2.69 |
+  | tablet | 1.345 | a Watchtower 1.91 × 2.69; the Tablet of Union 2.69 × 2.26 (its own board, stage G) |
   | shewbread, candlestick | 1.25 | 2.5 |
   | kamea, seal | 0.9 | 1.8 |
   | veil | 1 | 16 × 0.4 (sized by `scale` only) |
@@ -343,7 +343,7 @@ Placeables:
 | `pillar(kind)` | `black` (downward triangle) or `white` (upward); `glow` for the Neophyte style. No rotation |
 | `banner(kind)` | `east` or `west` |
 | `hebrewLetter(letter)` | A Hebrew-letter banner, in a row or anywhere |
-| `tablet(element)` | Reuses `Tablet`; earth and air now, water, fire and union once the data exists |
+| `tablet(element)` | Reuses `Tablet`: earth, air, water, fire and union (stage G), the Tablet of Union on a board of its own shape |
 | `item(kind)` | Art registry: cup, chalice, salt, bread, rose, lamp, lantern, censer, fan, cross (`form`: calvary, latin, greek, greekFiveSquares, fourTriangles), triangle (`dir`: up, down), pentagram, pantacle, serpentTree, lightning, gong, brazier, candle (stage F; the rubrics' candles beside the altar) |
 | `tarotKey(n)` | An original simplified card: numeral, Hebrew letter and title from magick-data; `n` is clamped to 0–21 and rounded, with a warning |
 | `kamea(planet)`, `seal(planet)` | The number square drawn from its numbers (Agrippa's squares, computed in magick-data's `astrology/kameas` and drawn by the shared `Kamea`, since the follow-ups after stage F); seals a placeholder until stage H. `planet`: saturn, jupiter, mars, sun, venus, mercury, moon (the hall's words, mapped to magick-data's `sol` and `luna`) |
@@ -604,8 +604,8 @@ with the cited works in `HALL_SOURCE_WORKS`; `hallSourceText` writes one
 | `zelator1`, `zelator2` | drawings | Earth tablet, lamp and salt on the North wall from the book (conflict 7) |
 | `theoricus1`, `theoricus2` | drawings | Hexagram badge renamed `pantacle` |
 | `practicus1`–`practicus3` | book layouts (stage F) | the 31st and 30th paths and 3=8; "Mercury" on the 3=8 dais a marker, as the drawing names it |
-| `philosophus1`–`philosophus4` | book layouts (stage F) | conflicts 2–5 and 10; the Fire tablet a marker |
-| `portal1`, `portal2` | book layouts (stage F) | each part takes the diagram its rubric describes (conflicts 1, 6); the Tablet of Union and the Fire and Water tablets markers |
+| `philosophus1`–`philosophus4` | book layouts (stage F) | conflicts 2–5 and 10; the Fire tablet drawn since stage G |
+| `portal1`, `portal2` | book layouts (stage F) | each part takes the diagram its rubric describes (conflicts 1, 6); the Tablet of Union and the Fire and Water tablets drawn since stage G |
 
 ### Where the sources disagree
 
@@ -695,6 +695,34 @@ from them, drawn with our own art.
   `https://hermanubisgoldendawn.blogspot.com/2018/06/thoughts-on-portal-ritual.html`
   (notes that published Portal floor plans differ; weak evidence).
 
+For the Enochian tablets (stage G):
+
+- **Regardie, *The Golden Dawn*, vol. 4, Aries Press, Chicago, 1940.**
+  archive.org item `IsraelRegardie-TheGoldenDawn-Vol4-1940`: the
+  Watchtowers of Air, Water, Earth and Fire pp.270–273 (leaves
+  n262–n265), the colours p.274–275 (n266–n267, the Tablet of Union's
+  lines on p.275), squares with two letters p.306 (n298: "the higher
+  one is preferable"), the sigils p.307 (n299). Copyright status not
+  established, as for vol. 2; cited, and only letters taken.
+- ***The Equinox*, vol. I no. 7, London, 1912**, "Liber Chanokh"
+  (Crowley's abstract of the Order's Enochian papers). Public domain in
+  the US. archive.org item `crowley-equinox_202110`, file "The Equinox
+  Vol. 1, No. 7": the four Watchtowers and the Black Cross in Latin
+  letters, Plate III (leaf n241); each Watchtower in Enochian, Plates
+  IV–VII (n242–n245); the Tablet of Union, Plate VIII (n246); names
+  read off Water pp.235–236 (n247–n248); the Kings' sigils, Plate X
+  (n256).
+- **Regardie, *The Golden Dawn*, 7th edition, ed. John Michael Greer**
+  (Llewellyn, ISBN 978-0-7387-4399-8): the colour plates "Enochian
+  Tablet: The First Watchtower" to "The Fourth Watchtower" and "The
+  Sigils of the Angelic Tablets" (an unnumbered colour insert), and the
+  Seniors' names in "The Four Elemental Weapons". Copyrighted; letters
+  and names only.
+- Dee's own tables (British Library, Sloane MS 3188 and 3191) were not
+  read directly; a research note compared the existing Earth and Air
+  grids with a modern transcription of Sloane MS 3191's Great Table
+  (Stage G notes).
+
 ## Artwork ledger
 
 | Item | Today | Status |
@@ -704,7 +732,7 @@ from them, drawn with our own art.
 | Pillars, banners, Hebrew banners | drawings, first-party | ported into code (A1) |
 | Pantacle | drawing, first-party | redrawn from geometry, `item:pantacle` (A2) |
 | Flaming Sword (lightning) | drawing, first-party | redrawn without markers, `item:lightning` (A2) |
-| Enochian tablets and sigils | `Tablet`, first-party | reused as `tablet` (A2); font licence open |
+| Enochian tablets and sigils | `Tablet`, first-party | reused as `tablet` (A2); the Water and Fire sigils drawn from geometry after Regardie's description and the Tablet of Union drawn (G); font licence open |
 | Table of Shewbread, candlestick | components, first-party | reused as `shewbread`, `candlestick` (A2) |
 | Cup, chalice, salt, bread, rose, lamp, lantern, censer, fan | drawings, icon-set signatures, no source | lifted into `src/app/gd/hall/legacyArt/` (A2, AGPL, injected); replace |
 | Caduceus (Keryx lamen) | SVG Repo, "public domain" label | replace |
@@ -717,7 +745,7 @@ from them, drawn with our own art.
 | Garden of Eden, the Fall | none | labelled boards (F); draw in H |
 | Veil, white altar, gong, brazier, candle | none | original geometry (F) |
 | Adept lamens | none | plain circles in the hall and as role icons (F); draw in H |
-| Markers in the stage F presets | none | the Fire and Water tablets and the Tablet of Union (stage G); "Venus on the Tree of Life" (conflict 10), "Mercury" (3=8), Pan, the Devil, Death and Typhon (Portal 2), the Theoricus' seat (Practicus): draw or keep in H |
+| Markers in the stage F presets | none | the Fire and Water tablets and the Tablet of Union drawn (stage G); "Venus on the Tree of Life" (conflict 10), "Mercury" (3=8), Pan, the Devil, Death and Typhon (Portal 2), the Theoricus' seat (Practicus): draw or keep in H |
 
 The third-party list the plan requires (decision 9) is
 `THIRD_PARTY_ART` in `src/app/gd/hall/art.test.tsx`: the nine legacy
@@ -763,7 +791,7 @@ Each stage is a series of gated commits on `gate/gd-hall`.
 | D | Visual sub-editor | yes | done (18 October 2026; Stage D notes): `GdHallEditor`, opened from a hall's atom; refined in stage E (19 October 2026, Gadi's decisions): rows reorder by drag with explicit positions freezing their siblings, objects stand on hosts by drag or the panel's Stands on, and a warnings badge outside edit mode (Stage E notes) |
 | E | `/gd/hall` source, visual and split playground with local draft and share link | yes | done (19 October 2026; Stage E notes): the gallery became a hall editor built from the shared source panel and visual editor, with presets, its own history, a draft in localStorage, share links in the fragment, export and Copy Pug source |
 | F | Remaining vocabulary and the presets for Practicus, Philosophus and Portal (markers where art is missing) | yes | done (19 October 2026; Stage F notes): kameas, placeholder seals, boards, veil, white altar, gong, brazier, candle, the adepts in the ritual roles, nine presets from the 1938 layouts; the layout switch reads Source, Split, Visual and the drawing comparison is gone |
-| G | magick-data: Water, Fire and Union tablets | yes | |
+| G | magick-data: Water, Fire and Union tablets | yes | done (21 October 2026; Stage G notes), with Gadi's split ratios first; the letter choices and the Earth and Air question await Gadi |
 | H | Original artwork; ledger to zero; `Lamen` moves to the MIT directory; credits | yes | |
 | I | Built-in docs switched to presets; reader export; end-of-project review of `/gd/hall`, scales and the conflicts table | yes | |
 | J | Private hall sources, written outside the repository for Gadi to save in his private rituals | — (nothing committed) | |
@@ -2981,6 +3009,274 @@ still the Sun's.
   `/gd/hall` (the capture's editor shots open the Neophyte ritual, which
   holds no hall, and none opens Edit hall), so none was recaptured.
 
+## Stage G notes
+
+Built on `gate/gd-hall-g` (21 October 2026), from `main` at 1f16a7b:
+first the split ratios Gadi chose that morning, then the tablets. The
+agent that began the stage was cut off; this one finished it. Each
+point records what was settled where the brief left a choice, and
+what waits for Gadi.
+
+### Gadi's split ratios (21 October 2026)
+
+- **`/gd/hall` split is 3:5** (source to visual) from 900 px, not 2:3
+  (46997cd), curing the 2 px it missed side by side at 1280 × 800. With
+  classic 15 px scrollbars, in headless Chromium: the hall editor is
+  1,161 px at 1920 × 1080, 861 at 1440 × 900 and 761 at 1280 × 800,
+  the panel beside the drawing at each, and 601 at 1024 × 768, docked;
+  no horizontal scroll. jsdom lays nothing out, so the page's test reads
+  the stylesheet's columns.
+- **The ritual editor's split is 2:3 while a hall is open for editing**
+  and 1:1 for writing (f8e21c8). The hall atom marks itself
+  (`data-gd-hall-editing`) from the moment Edit hall is chosen, its
+  loading line included, and the stylesheet widens the visual side
+  through `:has()`: one attribute, one relayout, no state crossing from
+  the Tiptap node view to the page, so the hall editor measures itself
+  at its final width and its panel never flips between docked and
+  beside. Measured the same way ("Hall check (stage B)", nothing saved):
+  873 px at 1920 × 1080 and 777 at 1440 × 900, beside; 681 at
+  1280 × 800 and 527 at 1024 × 768, docked. The source keeps its
+  selection, and CodeMirror's scroll anchoring its top line as lines
+  rewrap, but for one line back on closing at 1024 × 768. The Ritual
+  Pug guide says the visual side widens for a hall. The `editor-split`
+  documentation screenshot shows no hall being edited, so it is
+  unchanged.
+
+### The data
+
+- **Sources.** The Golden Dawn's tablets are the Book of the Concourse
+  of the Forces in Regardie's vol. 4 (1940; Sources), cross-checked
+  against the Equinox's Plate III (1912) and Greer's redrawn plates.
+  Each of the three was transcribed twice, independently (one
+  transcription by a research agent, one by the stage agent, both from
+  the scans at full size, both kept outside the repository); the two
+  differ in one square, an Equinox U against V. The Tablet of Union is
+  EXARP, HCOMA, NANTA, BITOM in all three (Regardie p.275, the Equinox's
+  Black Cross on Plate III and its Plate VIII).
+- **Squares with two letters.** Regardie prints a second, smaller
+  letter in about twenty squares of each Watchtower, and once four
+  (Water, row 5, square 12: y and l over N and h); he says either
+  characterises the square, the higher being preferable (p.306), and
+  the Order's names use both (Oblgotca, through Air of Water). The
+  Equinox and Greer print one letter a square. While Gadi decides, the
+  coordinator's instruction (21 October 2026): each square holds its
+  letter, an optional `alt` and a `reversed` flag, its capital the
+  letter's case, designed so that a source `version` can be added
+  later; Earth and Air untouched; the letter choices in commits of
+  their own. After the review, `alt` holds every other letter any of
+  the three sources prints in the square (Regardie's first, the higher
+  first, then the Equinox's and Greer's), so no reading is lost, and
+  `reversed` says only that the grid's letter is printed reversed,
+  never the `alt` letters: a flag per letter was the alternative, but
+  only grid letters are printed reversed in any source, and a source
+  `version` would carry its own grid and marks.
+- **The model** (38a7c32): every row has `kind` (`watchtower` or
+  `union`), and its grid is held to that kind's shape (13 rows of 12,
+  4 of 5); a square is one Latin letter; optional `marks` name squares
+  by row and column from 0 with `alt` (the other letters printed there,
+  the higher first) and `reversed`. `WATCHTOWER_IDS` lists the four.
+  The ids stay the bare elements, so Dee's 1584 table, Raphael's 1587
+  revision and the Golden Dawn's can later be a `version` field or
+  sibling tables without renaming a row; nothing is built for that now.
+  New fields and rows are minor changes under the package's versioning
+  (it is private at 0.0.0).
+- **Water and Fire**: Regardie's letter, the higher where he prints
+  two, except where both other sources print another letter and the
+  Order's names through the square read it too: the Seniors as the
+  Greer edition's "The Four Elemental Weapons" names them, and the names
+  Liber Chanokh reads off Water (the Equinox, pp.235–236). Eight squares
+  are read so, and a ninth, Water's four-letter square, takes N, as
+  below. A test reads all
+  twelve Seniors of Water and Fire and eight of Water's names off the
+  grids. Reversed letters, marked, are those the Equinox prints in
+  Enochian and Greer mirrors (Water's N and L, Fire's P and A); Fire's
+  row 13 square 7 is a capital P, as the Equinox and Greer print it
+  (Regardie prints O over p).
+- **Variants, all for Gadi.** Every square where the three sources
+  differ in Water or Fire, or where Regardie prints two letters ("Data"
+  is what the package holds; case and u/v differences are noted only
+  where they are the difference):
+
+| Tablet, row, square | Regardie 1940 | The Equinox 1912 | Greer | Data, with `alt` | Recommendation |
+| --- | --- | --- | --- | --- | --- |
+| Water 1, 6 | u over v | v | u | u; alt v | Agreed (u and v one letter) |
+| Water 2, 1 | a over o | a | o | a; alt o | Keep a (higher; the Equinox). For Gadi |
+| Water 2, 3 | b over l | l | l | l; alt b | l (Olgota, Aalco; both others). For Gadi |
+| Water 3, 2 | o over a | o | a | o; alt a | Keep o (higher; the Equinox). For Gadi |
+| Water 3, 7 | x over z | z | x | x; alt z | Keep x (higher; Greer; Laoaxrp). For Gadi |
+| Water 3, 8 | m over i | i | m | m; alt i | Keep m (higher; Greer); the Equinox's INGM reads i. For Gadi |
+| Water 3, 9 | a over n, u | n | a | a; alt n, u | Keep a (higher; Greer); the Equinox's INGM reads n. For Gadi |
+| Water 4, 8 | i | l | l | l; alt i | l (Laoc; both others): Regardie's i looks a misprint. For Gadi |
+| Water 4, 9 | l over a | a | e | l; alt a, e | Keep l (higher); the Equinox's Laoc reads a, Greer e. For Gadi |
+| Water 5, 1 | f over p | p | p | f; alt p | Keep f (higher; no name settles it). For Gadi |
+| Water 5, 3 | t over c | t | t | t; alt c | Agreed |
+| Water 5, 7 | v over o | o | o | o; alt v | o (Laoaxrp; both others). For Gadi |
+| Water 5, 11 | x over s | s | s | s; alt x | s (Vssn; both others). For Gadi |
+| Water 5, 12 | y, l over N, h | N | N | N (reversed); alt y, l, h | N: four letters, no single higher one; both others print N. For Gadi |
+| Water 6, 5 | z over x | z | z | z; alt x | Agreed |
+| Water 6, 11 | c over L | o | o | o; alt c, L | o (Rvoi; both others), though Regardie prints neither. For Gadi |
+| Water 9, 6 | n over a | a | a | n; alt a | Keep n (higher; Soniznt). For Gadi |
+| Water 11, 6 | z over x | z | z | z; alt x | Agreed |
+| Water 12, 1 | r over i | i | i | r; alt i | Keep r (higher; no name settles it). For Gadi |
+| Water 13, 3 | i over r | i | i | i; alt r | Agreed |
+| Water 13, 9 | n over a | n | n | n; alt a | Agreed |
+| Fire 2, 11 | u over v | v | u | u; alt v | Agreed (u and v one letter) |
+| Fire 2, 12 | a over i | a | a | a; alt i | Agreed |
+| Fire 3, 7 | v over o | O | O | v; alt o | Keep v (higher; Alndvod). For Gadi |
+| Fire 3, 9 | m over n | m | m | m; alt n | Agreed |
+| Fire 4, 2 | p over b | b | p | p; alt b | Keep p (higher; Greer). For Gadi |
+| Fire 4, 7 | c over d | d | d | d; alt c | d (Alndvod; both others). For Gadi |
+| Fire 5, 5 | o | a | o | o; alt a | Keep o (Regardie; Greer). For Gadi |
+| Fire 5, 6 | a | o | o | o; alt a | o (Adoeoet; both others): Regardie's a looks a misprint. For Gadi |
+| Fire 6, 8 | b over v | b | b | b; alt v | Agreed |
+| Fire 8, 3 | u over v | u | u | u; alt v | Agreed |
+| Fire 10, 3 | l over b | l | l | l; alt b | Agreed |
+| Fire 13, 7 | O over p | P | P | P (reversed); alt O | P (Arinnap; both others print P). For Gadi |
+
+  Beyond these, case or u for v alone differs in four squares: Water's
+  row 10 square 3 (Greer l for L) and row 11 square 8 (the Equinox U
+  for V), and Fire's row 8 squares 1 (the Equinox and Greer p for
+  Regardie's P) and 11 (both Z for z). Water's row 5 square 12 departs
+  from the rule in a different way from its rows 5 and 12, square 1:
+  there Regardie prints two letters, one plainly higher (f over p, r
+  over i), and the higher stands though both other sources print the
+  lower, since no name settles them; at row 5 square 12 he prints four,
+  y and l side by side over N and h, so there is no single higher
+  letter for the rule to take, and the grid takes N, one of his four,
+  which both other sources print.
+- **Earth and Air: an open decision.** They had no source. Read against
+  the three, they are not the Golden Dawn's version: they differ from it
+  in thirteen squares each. A research note compared them with a modern
+  transcription of Dee's Great Table (Sloane MS 3191), with which they
+  agree letter for letter but for every p being a capital; that
+  transcription has no stable reference to cite and the manuscript was
+  not read here, so the data and the page say only that they seem to
+  follow Dee's table. The brief keeps them byte for byte until Gadi
+  decides. Switching them to the Golden Dawn's, by the rule used for
+  Water and Fire, would change these squares (row, square, from 1;
+  current → Golden Dawn):
+  - letters: Earth 3, 8 o → a; 8, 1 O → R (Regardie R over o; the
+    others R); 8, 8 a → i (Regardie prints i and a side by side over b
+    and t; the others i; either reading keeps the square); 10, 12 P → T
+    (Regardie T over L; the Equinox L, Greer l; P is in no source).
+    Air 6, 12 i → l (Regardie l over i; the others i); 11, 11 n → u
+    (Regardie u over a; the others a; n is in no source). Air 5, 7 (n
+    over m) keeps its m, which Htmorda reads and both others print, and
+    Earth 11, 6 its i (Ahmlicv; Regardie prints only l, a misprint);
+  - case: every capital P that the sources print p (Earth 1, 8; 4, 3;
+    9, 10; 10, 2; 12, 3; 12, 12; Air 1, 11; 2, 8; 7, 11; 9, 7; 11, 9;
+    13, 8), Earth 10, 6 L → l, Air 1, 8 Y → y, 3, 1 c → C, 7, 6 A → a;
+  - u for v: Earth 2, 1 and 5, 12; Air 3, 11 and 10, 10;
+  - and marks: the other letters the sources print in their squares,
+    and the reversed letters (Air's O and A in rows 9 and 10, square 1; Earth's
+    R and A in rows 8 and 9, square 1).
+  None of this moves a square's place, so no hall layout changes; it
+  redraws the Earth and Air tablets in `Tablet`, the page, the image
+  route and the presets that hold them.
+- **Colours: a question for Gadi.** Regardie's p.274–275: the Great
+  Cross and the Calvary Crosses black on white; each tablet painted in
+  its element's colour, its own angle lettered in the complementary
+  (Air yellow, mauve letters; Water blue, orange; Earth black, green;
+  Fire red, green), the other angles in their elements' colours. The
+  existing tablets letter Air's own angle brown, not mauve, and Earth's
+  white, not green; Water and Fire follow the book (`#59f` with orange, `#f33` with green); the
+  Tablet of Union is white, its lines yellow, blue, black and red
+  (p.275), the yellow darkened to `#d4a000` to read on white.
+
+### The component and the page
+
+- **`Tablet`** (77c73fc) draws Water and Fire as Earth and Air are
+  drawn, their sigils from geometry after Regardie's description
+  (p.307): Water a blue cross potent with b, 6, 4 and b in its angles,
+  on orange in a blue ring; Fire twelve wavy rays, alternately mauve
+  and yellow, about a red centre and ring, on green in a red ring.
+  The Equinox's Plate X puts Water's figures 4, b over b, 6; Regardie
+  and Greer b, 6 over 4, b, which `Tablet` follows (for Gadi). Letters
+  marked reversed are mirrored in their squares; `alt` letters are not
+  drawn (a choice for Gadi: Regardie prints them small in the corner).
+- **The Tablet of Union** draws on a page of its own, 124 × 104
+  (`UNION_VIEWBOX`; `tabletViewBox(id)` gives each tablet's), its
+  squares a Watchtower's size, with no sigil. A key the data does not
+  have draws an empty page rather than throwing.
+- **Earth and Air draw the same bytes** for both fonts and frames: a
+  test pins their SHA-256 from f8e21c8, and every preset snapshot
+  holding them passed unchanged.
+- **`/enochian/tablets`** and the `enochian-tablet` image offer Water
+  and Fire. The image contract has one viewBox for every id, which the
+  Tablet of Union's page does not fit, so the Union is not on the page
+  or the route yet (Follow-ups). The image spec now reads each tablet's
+  `kind` and `marks` as well as its `grid`, and lists Water and Fire, so
+  its inputs hash moved (pinned anew; Earth and Air bytes unchanged);
+  the whole-data render sweep (`RENDER_INPUT_SWEEP=1`) passes. The SEO
+  description names the four. No documentation screenshot shows the
+  page.
+
+### The hall
+
+- **`tablet(element)`** (8e3d9f3) takes earth, air, water, fire and
+  union; the validator, the properties panel's select and the Pug round
+  trip follow from the art's attribute. A Watchtower keeps its
+  210 × 297 board (decision 4: Earth and Air lay out as before); the
+  Tablet of Union stands on a 124 × 104 board, so at the one default
+  scale per kind (1.345) it is 2.69 × 2.26 squares. The editor names it
+  "Tablet of Union".
+- **The presets** (ae68ccc) draw each tablet where its marker stood:
+  Fire on the South wall line and Water on the West, inside, as Earth
+  stands on the North (conflict 7); the Tablet of Union in Portal 1's
+  East row at the marker's scale (0.9). At the default scale the
+  Philosophus Fire tablet would overlap its lamp, its incense and, in
+  4=7, the Hegemon, and Portal 1's Water tablet the Hiereus, so those
+  draw at scale 1 (2 squares along the long side); Portal's Fire and
+  Portal 2's Water keep the default, as Earth does. A Watchtower on the
+  West wall is portrait, so its long side runs into the hall rather
+  than along the wall (the hall draws nothing rotated). A test holds
+  that the six halls draw their tablets, name none in a marker, stand
+  them on their walls or beyond the East, and overlap nothing.
+
+### Bundle
+
+From the gates' production builds (webpack), gzip -6. At f8e21c8 the
+reader's hall drawing loaded one chunk of 277,262 bytes (94,153
+gzipped), `Tablet` and its two rows inside it. At 66481d3 `Tablet`
+and the five rows (magick-data's `enochian/tablets` subpath, as
+before) are a chunk of their own, 12,672 bytes (4,259), which the
+hall chunk, now 270,178 (91,516), and the `/enochian/tablets` page
+share: 282,850 bytes (95,775) in all, 5,588 (1,622 gzipped) more, for
+the two new sigils, the Tablet of Union and three rows. No other table
+entered either chunk (no barrel names in them). The chunk holding the
+presets (the Insert dialog, the slash command and `/gd/hall`) went
+from 25,232 bytes (7,767) to 25,257 (7,777).
+
+### What was verified, and how
+
+- **Gates**, per commit, each in a clean `git archive` export with Node
+  24 and the CI placeholder environment (`pnpm check`, `typecheck`,
+  `test:coverage` with the per-file thresholds, `build`): all 0 for
+  46997cd, f8e21c8, 38a7c32, be3d3fd, 8e3d9f3, ae68ccc and 66481d3.
+  77c73fc's first run failed one test outside this work,
+  `SqlDocAdmin.test.tsx` ("creates a semantic ritual from Pug…", its
+  Source button not found) at a load average near 40, every other step
+  0; rerun in a fresh export, all 0. 66481d3, the last code commit,
+  also passed `loom check`, the magick-data smoke test (which now loads
+  the tablets) and `pnpm check:turbopack`. `Tablet.tsx` joined the
+  coverage list (100 % of statements, 93 % of branches). The whole-data
+  render sweep passed at 77c73fc's tree and at 66481d3's. The compiler
+  is untouched: `semantic.ts`, `semanticCompilerImpl.ts` and
+  `ritualNodeIds.ts` have no diff.
+
+- **In the browser** (Turbopack dev server from this branch on
+  127.0.0.1:3297, headless Chromium over CDP with classic 15 px
+  scrollbars; nothing signed in or saved): `/enochian/tablets` lists
+  Earth, Air, Water and Fire, draws each with 156 letters (Water's N
+  and L and Fire's P and A mirrored), links each to its image, and
+  draws Fire in the Enochian font; at 390 px no horizontal scroll.
+  `/gd/hall` draws Portal 1 (five tablets), Portal 2 (four) and
+  Philosophus 1 (one) with no warnings; the Tablet of Union, clicked,
+  is selected as "Tablet of Union", and its Element select offers
+  earth, air, water, fire and union; the source reads
+  `tablet(element="union", x=8, scale=0.9)`. No console errors.
+  Screenshots are outside the repository.
+
 ## Commits
 
 | Commit | Change |
@@ -3086,6 +3382,14 @@ still the Sun's.
 | 4bb082d | Split `/gd/hall`'s panels at the full width, its columns 2:3, the toolbar in the text column (after F, Gadi's decision; review fixes folded in) |
 | 571b022 | `/gd/hall` keeps its history ahead of the render: typing read but not yet drawn is kept as a link opens or the page goes; gestures made before the hall is drawn are refused; the preset question asks from the hall as it is (after F, a CI failure under load; review fixes folded in) |
 | 012aa58 | Every `/gd/hall` test allows 20 s, as most did (after F, timeouts under load) |
+| 46997cd | `/gd/hall` split 3:5 (G, Gadi's decision) |
+| f8e21c8 | The ritual editor's split 2:3 while a hall is open for editing (G, Gadi's decision) |
+| 38a7c32 | magick-data: tablets' `kind`, shapes, letters and `marks`; `WATCHTOWER_IDS` (G) |
+| be3d3fd | magick-data: the Golden Dawn's Water, Fire and Tablet of Union, with sources (G) |
+| 77c73fc | `Tablet` draws Water, Fire (their sigils) and the Tablet of Union, mirrors reversed letters; `/enochian/tablets` and the image offer Water and Fire (G) |
+| 8e3d9f3 | The hall's `tablet(element)` takes all five, the Union on its own board (G) |
+| ae68ccc | The Philosophus and Portal presets draw their Fire, Water and Union tablets (G) |
+| 66481d3 | magick-data: nine of Water's and Fire's squares read as the Order's names read them (G) |
 
 ## Future
 
@@ -3219,8 +3523,7 @@ Gadi to look again at saved boards drawing by `scale` once merged (he
 accepted the change on 20 October 2026); drawing the seals, the Garden of Eden and the Fall, the
 adepts' lamens, the symbol of Venus on the Tree and the Portal 2
 figures (Pan, the Devil, Death, Typhon), and the Minutum Mundum's path
-colours (magick-data has none) in stage H; the Fire, Water and Union
-tablets in stage G; the slash menu now lists fourteen halls
+colours (magick-data has none) in stage H; the slash menu now lists fourteen halls
 after "Temple hall" (typing a grade narrows it); the new presets and
 the switch checked in headless Chromium only.
 
@@ -3229,13 +3532,23 @@ and in the ritual editor's scrolling visual panel, the safe-area inset,
 the scroll margins, keyboard selections scrolled clear of it) checked
 in headless Chromium only, with touch emulation for the phones (no
 Safari, Firefox or real device); `env(safe-area-inset-bottom)` stays 0
-until the app opts into `viewport-fit=cover`; the ritual editor's split
-stays 1:1, so with classic scrollbars its hall editor (717 px at 1920 ×
-1080) docks the panel at every screen size: Gadi to choose between a
-2:3 ritual split (873 px at 1920, 777 at 1440, both beside), a lower
-switch (717 px, a drawing of 465), or the dock; `/gd/hall` split misses
-side by side at 1280 × 800 by 2 px (730), which a 3:5 split would
-cure; a `/gd/symbols` page for `Kamea` (the repository's way of showing
+until the app opts into `viewport-fit=cover` (the ritual editor's
+split and `/gd/hall`'s 2 px at 1280 × 800 Gadi settled in stage G);
+a `/gd/symbols` page for `Kamea` (the repository's way of showing
 a symbol: page, SEO entry, card, render contract); the seals and
 sigils over `Kamea` in stage H, through its `children` and
 `kameaGeometry`.
+
+From stage G, for Gadi: the letter choices in Water and Fire (the
+variants table in Stage G notes, every row marked); switching Earth and
+Air to the Golden Dawn's version, and the squares it would change; the
+tablets' colours (Air's own angle brown rather than mauve); drawing
+`alt` letters, and the reversed letters on Earth and Air once they
+carry marks; Water's sigil as Regardie and Greer draw it rather than
+the Equinox; the Tablet of Union on `/enochian/tablets` and the image
+route, which needs a viewBox per id in the render contract; a source
+`version` for the tablets (Dee 1584, Raphael 1587, the Golden Dawn),
+as a field or sibling tables beside the unchanged ids; Dee's
+manuscripts read directly for it; a West-wall Watchtower drawn along
+the wall needs rotation, which the hall does not do.
+

@@ -362,7 +362,20 @@ Follow-ups are separate from the completed migration work:
   `/gd/hall` at the full width, its columns 2:3), otherwise docked at the
   foot of the screen as a strip the author can hide; and the kameas in
   magick-data (`astrology/kameas`) with a shared `Kamea` component the
-  hall wraps. Stage G is next. TODO from it: Gadi's call on the Chiefs on the new presets' daises
+  hall wraps. Stage G is done on `gate/gd-hall-g` (21 October 2026),
+  after Gadi's split ratios of that day (`/gd/hall` split 3:5; the
+  ritual editor's split 2:3 while a hall is open for editing):
+  magick-data has the Golden Dawn's Water and Fire Watchtowers and the
+  Tablet of Union, from Regardie's 1940 vol. 4 checked against The
+  Equinox (1912) and Greer, squares with second letters and reversed
+  letters marked; `Tablet`, `/enochian/tablets` and the image route draw
+  Water and Fire, `Tablet` and the hall the Tablet of Union, and the
+  Philosophus and Portal presets draw the tablets they had as markers.
+  Waiting for Gadi from it: the Water and Fire letter choices (a
+  variants table in plan 061), whether Earth and Air (Dee's table, not
+  the Order's) switch to the Golden Dawn's, the tablets' colours, how
+  second letters are drawn, the Union on the page and the image route,
+  and a source `version` for the tablets. TODO from earlier: Gadi's call on the Chiefs on the new presets' daises
   (after the merge; he leans towards Greer's redraws), the stage F
   markers and placeholders for stage H (seals, Eden, the Fall, adept
   lamens, the Minutum Mundum's path colours); recording officer movement between stations, a `gdVault` for
@@ -379,9 +392,7 @@ Follow-ups are separate from the completed migration work:
   fallback to Noto Sans for the hall's quoted font stacks, Gadi's call on
   whether a hall's PNG export embeds Enochian Plain for its tablets,
   `//-` comments inside the built-in docs' halls (stage I) against their
-  parity test, the docked panel checked outside headless Chromium, the
-  ritual editor's 1:1 split docking it at every screen size with classic
-  scrollbars (Gadi to choose a 2:3 split, a lower switch or the dock), a
+  parity test, the docked panel checked outside headless Chromium, a
   `/gd/symbols` page for `Kamea`, the stage E follow-ups (free labels on hosts, a drawing of
   `/gd/hall` for search engines, share links' format 0 and the hall
   editor's new gestures outside Chromium; an app-wide `error.tsx`; the
