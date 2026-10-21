@@ -254,6 +254,24 @@ export const Sigils = {
   fire: FireSigil,
 };
 
+/** A square of a tablet's grid, by row and column from 0. */
+export interface TabletSquare {
+  row: number;
+  column: number;
+}
+
+/**
+ * Squares to outline over a Watchtower's grid, one of them selected, and
+ * what a click on one does. The outlines are drawing only; a page that
+ * offers them gives keyboard and screen-reader users the same choice in a
+ * list.
+ */
+export interface TabletHighlights {
+  squares: readonly TabletSquare[];
+  selected?: TabletSquare;
+  onSelect?: (square: TabletSquare) => void;
+}
+
 /** The squares whose letters the source prints reversed, as "row,column". */
 function reversedSquares(tablet: EnochianTablet): Set<string> {
   return new Set(
@@ -270,11 +288,13 @@ function Grid({
   id,
   tablet,
   enochianStyle,
+  highlights,
 }: {
   /** The tablet's key, which picks its colours. */
   id: string;
   tablet: EnochianTablet;
   enochianStyle?: CSSProperties;
+  highlights?: TabletHighlights;
 }) {
   const enochianFont = enochianStyle !== undefined;
   const reversed = reversedSquares(tablet);
@@ -333,6 +353,34 @@ function Grid({
           );
         }),
       )}
+      {highlights?.squares.map(({ row, column }) => {
+        const chosen =
+          highlights.selected?.row === row &&
+          highlights.selected?.column === column;
+        return (
+          // A pointer shortcut: the page's list is the accessible way to
+          // choose a square.
+          <rect
+            key={`h-${row}-${column}`}
+            data-square={`${row},${column}`}
+            x={column * size + border + 1}
+            y={row * size + border + 1}
+            width={size - 2}
+            height={size - 2}
+            style={{
+              fill: "transparent",
+              stroke: chosen ? "#c0f" : "#e0f",
+              strokeWidth: chosen ? 3 : 1.6,
+              strokeDasharray: chosen ? undefined : "3 2",
+            }}
+            onClick={
+              highlights.onSelect
+                ? () => highlights.onSelect?.({ row, column })
+                : undefined
+            }
+          />
+        );
+      })}
       <rect
         x={0}
         y={0}
@@ -449,8 +497,11 @@ const Tablet = React.forwardRef(function Tablet(
     width,
     height,
     label = true,
+    highlights,
   }: {
     id: string;
+    /** Squares of a Watchtower's grid to outline, and choose by pointer. */
+    highlights?: TabletHighlights;
     /** The accessible name: the tablet's own (`true`), another, or none. */
     label?: boolean | string;
     /** Page font style for the grid letters; omitted renders the Latin transliteration. */
@@ -490,7 +541,12 @@ const Tablet = React.forwardRef(function Tablet(
               </g>
             )}
             <g transform="translate(-94.5,48) scale(0.9)">
-              <Grid id={id} tablet={tablet} enochianStyle={enochianStyle} />
+              <Grid
+                id={id}
+                tablet={tablet}
+                enochianStyle={enochianStyle}
+                highlights={highlights}
+              />
             </g>
           </>
         )

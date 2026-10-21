@@ -168,6 +168,28 @@ describe("Tablet", () => {
     expect(draw("union", true)).toContain("font-family:Enochian");
   });
 
+  it("outlines the squares it is given, the selected one more boldly", () => {
+    const markup = renderToStaticMarkup(
+      <Tablet
+        id="water"
+        highlights={{
+          squares: [
+            { row: 4, column: 11 },
+            { row: 0, column: 5 },
+          ],
+          selected: { row: 0, column: 5 },
+        }}
+      />,
+    );
+    expect(markup.match(/data-square=/g)).toHaveLength(2);
+    expect(markup).toContain(
+      'data-square="4,11" x="223" y="83" width="18" height="18"',
+    );
+    expect(markup).toMatch(/data-square="0,5"[^>]*stroke-width:3/);
+    expect(markup).toMatch(/data-square="4,11"[^>]*stroke-dasharray:3 2/);
+    expect(draw("water")).not.toContain("data-square");
+  });
+
   it("draws an empty page for a key the data does not have", () => {
     for (const id of ["spirit", "constructor", "__proto__", ""]) {
       const markup = draw(id);
