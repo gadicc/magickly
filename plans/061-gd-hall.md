@@ -3084,6 +3084,8 @@ still the Sun's.
 | 1c291d6 | The shared `Kamea` component (`src/components/astrology`), which the hall's `kamea` art wraps, pinned to 33ad461's bytes (after F, Gadi's decision; review fixes folded in) |
 | 8096767 | The hall editor's properties panel docked at the foot of its scrolling box when the editor is under 732 px (16 px of hysteresis), sized by that box, hideable and shared, keyboard selections scrolled clear of it, focus kept (after F, Gadi's decision; review fixes folded in) |
 | 4bb082d | Split `/gd/hall`'s panels at the full width, its columns 2:3, the toolbar in the text column (after F, Gadi's decision; review fixes folded in) |
+| 571b022 | `/gd/hall` keeps its history ahead of the render: typing read but not yet drawn is kept as a link opens or the page goes; gestures made before the hall is drawn are refused; the preset question asks from the hall as it is (after F, a CI failure under load; review fixes folded in) |
+| 012aa58 | Every `/gd/hall` test allows 20 s, as most did (after F, timeouts under load) |
 
 ## Future
 
