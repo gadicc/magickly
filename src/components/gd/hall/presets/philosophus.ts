@@ -5,13 +5,23 @@ import { type HallPreset, regardie1938 } from "./types";
  * The Philosophus halls (4=7), from the diagrams and rubrics of
  * Regardie's 1938 first edition (plan 061, Sources), following the text
  * where it is explicit (Where the sources disagree, 2–5). The paths'
- * halls have three officers, as the rubric of the 29th path says. The
- * Fire tablet is a marker until magick-data has it (stage G).
+ * halls have three officers, as the rubric of the 29th path says.
  */
 
-/** The Fire tablet on the South wall, its lamp East and incense West. */
+/**
+ * The Fire tablet on the South wall, its lamp East and incense West. At
+ * scale 1, 2 squares along the wall: at the default it would overlap the
+ * lamp, the incense and, in 4=7, the Hegemon.
+ */
 const FIRE: readonly HallNode[] = [
-  { type: "marker", text: "Fire Tablet", x: 15.3, y: 7.6, scale: 0.75 },
+  {
+    type: "tablet",
+    element: "fire",
+    x: 16.31,
+    y: 7.6,
+    anchor: "south",
+    scale: 1,
+  },
   { type: "item", kind: "lamp", x: 14.4, y: 6.2 },
   { type: "item", kind: "censer", x: 14.4, y: 9.4 },
 ];

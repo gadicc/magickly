@@ -233,3 +233,76 @@ describe.each([zelator1, zelator2].map((preset) => [preset.id, preset]))(
     });
   },
 );
+
+describe("the Enochian tablets of the Philosophus and Portal halls", () => {
+  // Stage G drew the tablets these halls had as markers: Fire on the South
+  // wall, Water on the West, the Tablet of Union beyond the East wall.
+  const expected: Record<string, readonly string[]> = {
+    philosophus1: ["fire"],
+    philosophus2: ["fire"],
+    philosophus3: ["fire"],
+    philosophus4: ["fire"],
+    portal1: ["air", "earth", "fire", "union", "water"],
+    portal2: ["air", "earth", "fire", "water"],
+  };
+  const presets = HALL_PRESETS.filter((preset) =>
+    Object.hasOwn(expected, preset.id),
+  );
+
+  it.each(presets.map((preset) => [preset.id, preset] as const))(
+    "%s draws its tablets, and names none in a marker",
+    (id, preset) => {
+      const { objects } = resolveHall(preset.hall, { art: gdHallArt });
+      const tablets = objects.filter((object) => object.artKey === "tablet");
+      expect(tablets.map((object) => object.node.element).sort()).toEqual(
+        [...expected[id]].sort(),
+      );
+      for (const object of objects)
+        if (object.artKey === "marker")
+          expect(String(object.node.text)).not.toMatch(/tablet/i);
+      const edges = (o: ResolvedObject) => ({
+        north: o.cx - o.width / 2,
+        south: o.cx + o.width / 2,
+        east: o.cy - o.height / 2,
+        west: o.cy + o.height / 2,
+      });
+      for (const tablet of tablets) {
+        const element = tablet.node.element;
+        // On the wall line, inside, as the Earth tablet stands (conflict 7).
+        if (element === "fire")
+          expect(edges(tablet).south).toBeCloseTo(FLOOR_SIZE + WALL_GAP, 6);
+        if (element === "water")
+          expect(edges(tablet).west).toBeCloseTo(FLOOR_SIZE + WALL_GAP, 6);
+        // Beyond the East wall, past the dais.
+        if (element === "union") expect(edges(tablet).west).toBeLessThan(-5);
+        // Clear of every other object, and of every label and marker text
+        // (an officer's name included).
+        const rects = (object: ResolvedObject) => [
+          ...(object.artKey === "label" ? [] : [edges(object)]),
+          ...[
+            ...object.labels,
+            ...(object.text ? [object.text] : []),
+            ...(object.inner ? [object.inner] : []),
+          ].map(({ bounds }) => ({
+            north: bounds.x0,
+            south: bounds.x1,
+            east: bounds.y0,
+            west: bounds.y1,
+          })),
+        ];
+        for (const other of objects) {
+          if (other === tablet) continue;
+          for (const b of rects(other)) {
+            const a = edges(tablet);
+            const apart =
+              a.south <= b.north ||
+              b.south <= a.north ||
+              a.west <= b.east ||
+              b.west <= a.east;
+            expect(apart, `${element} tablet and ${other.artKey}`).toBe(true);
+          }
+        }
+      }
+    },
+  );
+});

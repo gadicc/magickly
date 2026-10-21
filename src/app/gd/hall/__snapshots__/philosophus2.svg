@@ -148,8 +148,522 @@
 </polygon>
 </g>
 <g id="_R_0_-art6">
-<rect x="-48" y="-48" width="96" height="96" fill="#ffffff" stroke="#000000" stroke-width="3">
+<rect x="-105" y="-148.5" width="210" height="297" fill="#ffffff" stroke="#000000" stroke-width="2">
 </rect>
+<g transform="translate(-105 -148.5)">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-105 0 210 297" width="210" height="297">
+<g transform="translate(-31.5,-5) scale(0.3)">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -100 200 200">
+<circle r="92" fill="#2b2" stroke="#e22" stroke-width="15">
+</circle>
+<circle r="22" fill="none" stroke="#e22" stroke-width="6">
+</circle>
+<circle r="9" fill="#e22">
+</circle>
+<g fill="none" stroke-width="6" stroke-linecap="round">
+<path d="M 0 -36 c -8 -6 8 -12 0 -18 s 8 -12 0 -17" stroke="#a05090" transform="rotate(0)">
+</path>
+<path d="M 0 -36 c -8 -6 8 -12 0 -18 s 8 -12 0 -17" stroke="#ff0" transform="rotate(30)">
+</path>
+<path d="M 0 -36 c -8 -6 8 -12 0 -18 s 8 -12 0 -17" stroke="#a05090" transform="rotate(60)">
+</path>
+<path d="M 0 -36 c -8 -6 8 -12 0 -18 s 8 -12 0 -17" stroke="#ff0" transform="rotate(90)">
+</path>
+<path d="M 0 -36 c -8 -6 8 -12 0 -18 s 8 -12 0 -17" stroke="#a05090" transform="rotate(120)">
+</path>
+<path d="M 0 -36 c -8 -6 8 -12 0 -18 s 8 -12 0 -17" stroke="#ff0" transform="rotate(150)">
+</path>
+<path d="M 0 -36 c -8 -6 8 -12 0 -18 s 8 -12 0 -17" stroke="#a05090" transform="rotate(180)">
+</path>
+<path d="M 0 -36 c -8 -6 8 -12 0 -18 s 8 -12 0 -17" stroke="#ff0" transform="rotate(210)">
+</path>
+<path d="M 0 -36 c -8 -6 8 -12 0 -18 s 8 -12 0 -17" stroke="#a05090" transform="rotate(240)">
+</path>
+<path d="M 0 -36 c -8 -6 8 -12 0 -18 s 8 -12 0 -17" stroke="#ff0" transform="rotate(270)">
+</path>
+<path d="M 0 -36 c -8 -6 8 -12 0 -18 s 8 -12 0 -17" stroke="#a05090" transform="rotate(300)">
+</path>
+<path d="M 0 -36 c -8 -6 8 -12 0 -18 s 8 -12 0 -17" stroke="#ff0" transform="rotate(330)">
+</path>
+</g>
+</svg>
+</g>
+<g transform="translate(-94.5,48) scale(0.9)">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 244 264">
+<rect x="2" y="2" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="12" y="18" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">d</text>
+<rect x="22" y="2" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="32" y="18" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="42" y="2" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="52" y="18" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">n</text>
+<rect x="62" y="2" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="72" y="18" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">p</text>
+<rect x="82" y="2" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="92" y="18" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="102" y="2" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="112" y="18" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">T</text>
+<rect x="122" y="2" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="132" y="18" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">d</text>
+<rect x="142" y="2" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="152" y="18" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="162" y="2" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="172" y="18" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">n</text>
+<rect x="182" y="2" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="192" y="18" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">V</text>
+<rect x="202" y="2" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="212" y="18" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="222" y="2" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="232" y="18" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="2" y="22" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="12" y="38" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="22" y="22" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="32" y="38" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">l</text>
+<rect x="42" y="22" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="52" y="38" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="62" y="22" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="72" y="38" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="82" y="22" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="92" y="38" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">G</text>
+<rect x="102" y="22" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="112" y="38" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">e</text>
+<rect x="122" y="22" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="132" y="38" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="142" y="22" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="152" y="38" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="162" y="22" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="172" y="38" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">b</text>
+<rect x="182" y="22" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="192" y="38" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="202" y="22" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="212" y="38" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">u</text>
+<rect x="222" y="22" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="232" y="38" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="2" y="42" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="12" y="58" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">O</text>
+<rect x="22" y="42" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="32" y="58" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">P</text>
+<rect x="42" y="42" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="52" y="58" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="62" y="42" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="72" y="58" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">m</text>
+<rect x="82" y="42" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="92" y="58" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">n</text>
+<rect x="102" y="42" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="112" y="58" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="122" y="42" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="132" y="58" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">v</text>
+<rect x="142" y="42" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="152" y="58" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">G</text>
+<rect x="162" y="42" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="172" y="58" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">m</text>
+<rect x="182" y="42" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="192" y="58" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">d</text>
+<rect x="202" y="42" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="212" y="58" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">n</text>
+<rect x="222" y="42" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="232" y="58" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">m</text>
+<rect x="2" y="62" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="12" y="78" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="22" y="62" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="32" y="78" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">p</text>
+<rect x="42" y="62" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="52" y="78" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">l</text>
+<rect x="62" y="62" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="72" y="78" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">s</text>
+<rect x="82" y="62" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="92" y="78" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">T</text>
+<rect x="102" y="62" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="112" y="78" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">e</text>
+<rect x="122" y="62" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="132" y="78" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">d</text>
+<rect x="142" y="62" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="152" y="78" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">e</text>
+<rect x="162" y="62" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="172" y="78" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">c</text>
+<rect x="182" y="62" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="192" y="78" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="202" y="62" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="212" y="78" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="222" y="62" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="232" y="78" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">p</text>
+<rect x="2" y="82" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="12" y="98" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">s</text>
+<rect x="22" y="82" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="32" y="98" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">c</text>
+<rect x="42" y="82" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="52" y="98" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">m</text>
+<rect x="62" y="82" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="72" y="98" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">i</text>
+<rect x="82" y="82" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="92" y="98" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="102" y="82" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="112" y="98" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="122" y="82" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="132" y="98" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">n</text>
+<rect x="142" y="82" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="152" y="98" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">A</text>
+<rect x="162" y="82" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="172" y="98" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">m</text>
+<rect x="182" y="82" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="192" y="98" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">l</text>
+<rect x="202" y="82" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="212" y="98" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="222" y="82" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="232" y="98" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">x</text>
+<rect x="2" y="102" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="12" y="118" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">V</text>
+<rect x="22" y="102" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="32" y="118" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="42" y="102" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="52" y="118" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">r</text>
+<rect x="62" y="102" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="72" y="118" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">s</text>
+<rect x="82" y="102" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="92" y="118" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:yellow;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">G</text>
+<rect x="102" y="102" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="112" y="118" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">d</text>
+<rect x="122" y="102" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="132" y="118" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">L</text>
+<rect x="142" y="102" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="152" y="118" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">b</text>
+<rect x="162" y="102" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="172" y="118" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">r</text>
+<rect x="182" y="102" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="192" y="118" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">i</text>
+<rect x="202" y="102" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="212" y="118" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="222" y="102" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="232" y="118" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#59f;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">p</text>
+<rect x="2" y="122" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="12" y="138" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="22" y="122" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="32" y="138" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">i</text>
+<rect x="42" y="122" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="52" y="138" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">P</text>
+<rect x="62" y="122" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="72" y="138" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">t</text>
+<rect x="82" y="122" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="92" y="138" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">e</text>
+<rect x="102" y="122" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="112" y="138" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="122" y="122" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="132" y="138" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="142" y="122" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="152" y="138" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">p</text>
+<rect x="162" y="122" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="172" y="138" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">D</text>
+<rect x="182" y="122" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="192" y="138" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="202" y="122" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="212" y="138" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">c</text>
+<rect x="222" y="122" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="232" y="138" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">e</text>
+<rect x="2" y="142" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="12" y="158" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">P</text>
+<rect x="22" y="142" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="32" y="158" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">s</text>
+<rect x="42" y="142" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="52" y="158" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">u</text>
+<rect x="62" y="142" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="72" y="158" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="82" y="142" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="92" y="158" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">c</text>
+<rect x="102" y="142" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="112" y="158" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">n</text>
+<rect x="122" y="142" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="132" y="158" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">r</text>
+<rect x="142" y="142" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="152" y="158" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">Z</text>
+<rect x="162" y="142" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="172" y="158" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">i</text>
+<rect x="182" y="142" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="192" y="158" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">r</text>
+<rect x="202" y="142" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="212" y="158" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">z</text>
+<rect x="222" y="142" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="232" y="158" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="2" y="162" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="12" y="178" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">S</text>
+<rect x="22" y="162" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="32" y="178" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">i</text>
+<rect x="42" y="162" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="52" y="178" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="62" y="162" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="72" y="178" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">d</text>
+<rect x="82" y="162" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="92" y="178" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="102" y="162" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="112" y="178" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="122" y="162" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="132" y="178" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">i</text>
+<rect x="142" y="162" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="152" y="178" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">n</text>
+<rect x="162" y="162" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="172" y="178" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">r</text>
+<rect x="182" y="162" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="192" y="178" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">z</text>
+<rect x="202" y="162" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="212" y="178" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">f</text>
+<rect x="222" y="162" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="232" y="178" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">m</text>
+<rect x="2" y="182" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="12" y="198" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">d</text>
+<rect x="22" y="182" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="32" y="198" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="42" y="182" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="52" y="198" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">l</text>
+<rect x="62" y="182" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="72" y="198" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">t</text>
+<rect x="82" y="182" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="92" y="198" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">T</text>
+<rect x="102" y="182" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="112" y="198" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">d</text>
+<rect x="122" y="182" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="132" y="198" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">n</text>
+<rect x="142" y="182" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="152" y="198" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="162" y="182" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="172" y="198" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">d</text>
+<rect x="182" y="182" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="192" y="198" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">i</text>
+<rect x="202" y="182" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="212" y="198" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">r</text>
+<rect x="222" y="182" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="232" y="198" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">e</text>
+<rect x="2" y="202" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="12" y="218" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">d</text>
+<rect x="22" y="202" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="32" y="218" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">i</text>
+<rect x="42" y="202" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="52" y="218" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">x</text>
+<rect x="62" y="202" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="72" y="218" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="82" y="202" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="92" y="218" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">m</text>
+<rect x="102" y="202" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="112" y="218" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="122" y="202" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="132" y="218" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">n</text>
+<rect x="142" y="202" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="152" y="218" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">s</text>
+<rect x="162" y="202" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="172" y="218" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">i</text>
+<rect x="182" y="202" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="192" y="218" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="202" y="202" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="212" y="218" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">s</text>
+<rect x="222" y="202" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="232" y="218" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">p</text>
+<rect x="2" y="222" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="12" y="238" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">O</text>
+<rect x="22" y="222" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="32" y="238" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="42" y="222" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="52" y="238" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">D</text>
+<rect x="62" y="222" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="72" y="238" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">p</text>
+<rect x="82" y="222" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="92" y="238" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">z</text>
+<rect x="102" y="222" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="112" y="238" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">i</text>
+<rect x="122" y="222" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="132" y="238" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">A</text>
+<rect x="142" y="222" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="152" y="238" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">p</text>
+<rect x="162" y="222" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="172" y="238" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="182" y="222" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="192" y="238" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">n</text>
+<rect x="202" y="222" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="212" y="238" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">l</text>
+<rect x="222" y="222" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="232" y="238" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">i</text>
+<rect x="2" y="242" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="12" y="258" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">r</text>
+<rect x="22" y="242" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="32" y="258" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">g</text>
+<rect x="42" y="242" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="52" y="258" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">o</text>
+<rect x="62" y="242" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="72" y="258" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="82" y="242" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="92" y="258" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">n</text>
+<rect x="102" y="242" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="112" y="258" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">n</text>
+<rect x="122" y="242" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="132" y="258" transform="translate(264 0) scale(-1 1)" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">P</text>
+<rect x="142" y="242" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="152" y="258" transform="translate(304 0) scale(-1 1)" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">A</text>
+<rect x="162" y="242" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="172" y="258" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">C</text>
+<rect x="182" y="242" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:white">
+</rect>
+<text x="192" y="258" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:black;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">r</text>
+<rect x="202" y="242" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="212" y="258" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">a</text>
+<rect x="222" y="242" width="20" height="20" style="stroke-width:1.2;stroke:black;fill:#f33">
+</rect>
+<text x="232" y="258" style="font-weight:bold;font-size:14px;text-anchor:middle;fill:#2b2;font-family:LocalFont, &#x27;Enochian Plain&#x27;, &#x27;Enochian&#x27;;direction:rtl;unicode-bidi:bidi-override">r</text>
+<rect x="0" y="0" width="244" height="264" style="stroke-width:4;stroke:black;fill:none">
+</rect>
+</svg>
+</g>
+</svg>
+</g>
 </g>
 <g id="_R_0_-art7">
 <path d="M1.4-40.3c-.4-2.1 .3-5.8-.4-8.2c-.8-.8-2.2-.4-2.4 .9c0 2.4 .2 5.5-.1 7.3c-.5 0-.3-1.1-.3-1.6c0-3.1-.5-7.8 1.7-7.7c2.2 0 2.1 4.3 1.9 8.2c0 .5 .1 1.1-.4 1.1z" fill="#e7e7e8" fill-rule="evenodd">
@@ -832,12 +1346,8 @@
 </use>
 <use href="#_R_0_-art5" transform="translate(1380 500) scale(2)">
 </use>
-<use href="#_R_0_-art6" transform="translate(1530 760) scale(1.5)">
+<use href="#_R_0_-art6" transform="translate(1560.293 760) scale(0.673)">
 </use>
-<g font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">
-<text x="1530" y="750.669" font-size="30.1" text-anchor="middle">Fire</text>
-<text x="1530" y="785.284" font-size="30.1" text-anchor="middle">Tablet</text>
-</g>
 <use href="#_R_0_-art7" transform="translate(1440 620) scale(0.94)">
 </use>
 <use href="#_R_0_-art8" transform="translate(1440 940) scale(1.06)">

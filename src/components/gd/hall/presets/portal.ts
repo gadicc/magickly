@@ -5,9 +5,7 @@ import { type HallPreset, regardie1938 } from "./types";
  * The Portal halls, from Regardie's 1938 first edition (plan 061,
  * Sources). The book heads each part with the other part's diagram, so
  * each preset takes the diagram its own rubric describes (Where the
- * sources disagree, 1 and 6). The Tablet of Union and the Fire and
- * Water tablets are markers until magick-data has them (stage G); the
- * Earth and Air tablets are drawn.
+ * sources disagree, 1 and 6).
  */
 
 /** The five paths from the Portal, across the East of the floor. */
@@ -40,7 +38,7 @@ const EAST: readonly HallNode[] = [
 /** The Earth tablet on the North wall, the Fire tablet on the South. */
 const SIDES: readonly HallNode[] = [
   { type: "tablet", element: "earth", x: -0.31, y: 8, anchor: "north" },
-  { type: "marker", text: "Fire Tablet", x: 15.3, y: 8, scale: 0.75 },
+  { type: "tablet", element: "fire", x: 16.31, y: 8, anchor: "south" },
 ];
 
 /**
@@ -69,7 +67,7 @@ export const portal1: HallPreset = {
       {
         type: "banners",
         children: [
-          { type: "marker", text: "Tablet of Union", x: 8, scale: 0.9 },
+          { type: "tablet", element: "union", x: 8, scale: 0.9 },
           { type: "item", kind: "gong", x: 13.9 },
         ],
       },
@@ -111,7 +109,16 @@ export const portal1: HallPreset = {
           { type: "officer", role: "hiereus", x: 8, y: 13.1, labelPos: "top" },
           { type: "item", kind: "salt", x: 9.4, y: 13.4 },
           { type: "banner", kind: "west", x: 5, y: 14.3 },
-          { type: "marker", text: "Water Tablet", x: 8, y: 15.3, scale: 0.75 },
+          // At scale 1, 2 squares deep: at the default it would touch the
+          // Hiereus.
+          {
+            type: "tablet",
+            element: "water",
+            x: 8,
+            y: 16.31,
+            anchor: "west",
+            scale: 1,
+          },
         ],
       },
       { type: "caption", text: "Portal Temple 1" },
@@ -194,11 +201,11 @@ export const portal2: HallPreset = {
           { type: "officer", role: "hiereus", x: 8, y: 13.6 },
           { type: "banner", kind: "west", x: 5, y: 14.4 },
           {
-            type: "marker",
-            text: "Water Tablet",
+            type: "tablet",
+            element: "water",
             x: 10.8,
-            y: 15.2,
-            scale: 0.75,
+            y: 16.31,
+            anchor: "west",
           },
         ],
       },
