@@ -370,8 +370,11 @@ Follow-ups are separate from the completed migration work:
   Equinox (1912) and Greer, squares with second letters and reversed
   letters marked; `Tablet`, `/enochian/tablets` and the image route draw
   Water and Fire, `Tablet` and the hall the Tablet of Union, and the
-  Philosophus and Portal presets draw the tablets they had as markers.
-  Waiting for Gadi from it: the Water and Fire letter choices (a
+  Philosophus and Portal presets draw the tablets they had as markers;
+  after its reviews `Tablet` is named as an image, and a hall editor
+  that cannot load ends the editing instead of taking down the ritual
+  editor. Waiting for Gadi from it (decision renders outside the
+  repository, plan 061): the Water and Fire letter choices (a
   variants table in plan 061), whether Earth and Air (Dee's table, not
   the Order's) switch to the Golden Dawn's, the tablets' colours, how
   second letters are drawn, the Union on the page and the image route,

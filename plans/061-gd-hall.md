@@ -3070,7 +3070,7 @@ what waits for Gadi.
   never the `alt` letters: a flag per letter was the alternative, but
   only grid letters are printed reversed in any source, and a source
   `version` would carry its own grid and marks.
-- **The model** (38a7c32): every row has `kind` (`watchtower` or
+- **The model** (f8b59b0): every row has `kind` (`watchtower` or
   `union`), and its grid is held to that kind's shape (13 rows of 12,
   4 of 5); a square is one Latin letter; optional `marks` name squares
   by row and column from 0 with `alt` (the other letters printed there,
@@ -3185,7 +3185,7 @@ what waits for Gadi.
 
 ### The component and the page
 
-- **`Tablet`** (77c73fc) draws Water and Fire as Earth and Air are
+- **`Tablet`** (bd5c3bb) draws Water and Fire as Earth and Air are
   drawn, their sigils from geometry after Regardie's description
   (p.307): Water a blue cross potent with b, 6, 4 and b in its angles,
   on orange in a blue ring; Fire twelve wavy rays, alternately mauve
@@ -3213,14 +3213,14 @@ what waits for Gadi.
 
 ### The hall
 
-- **`tablet(element)`** (8e3d9f3) takes earth, air, water, fire and
+- **`tablet(element)`** (5700159) takes earth, air, water, fire and
   union; the validator, the properties panel's select and the Pug round
   trip follow from the art's attribute. A Watchtower keeps its
   210 × 297 board (decision 4: Earth and Air lay out as before); the
   Tablet of Union stands on a 124 × 104 board, so at the one default
   scale per kind (1.345) it is 2.69 × 2.26 squares. The editor names it
   "Tablet of Union".
-- **The presets** (ae68ccc) draw each tablet where its marker stood:
+- **The presets** (0d50c51) draw each tablet where its marker stood:
   Fire on the South wall line and Water on the West, inside, as Earth
   stands on the North (conflict 7); the Tablet of Union in Portal 1's
   East row at the marker's scale (0.9). At the default scale the
@@ -3233,37 +3233,97 @@ what waits for Gadi.
   that the six halls draw their tablets, name none in a marker, stand
   them on their walls or beyond the East, and overlap nothing.
 
+### Review fixes
+
+Two independent reviews (Opus and Fable) found no blocker; their
+letter checks matched the scans square by square. Their fixes were
+folded into the commits they belong to (the branch rewritten with
+`git commit --fixup` and an autosquash; Commits lists the new ones),
+and the letter corrections, first made in a commit of their own, were
+folded into the data commit, so `main` never carries the intermediate
+letters. Two fixes are commits of their own.
+
+- **`alt` and `reversed`.** `alt` now holds every other letter any of
+  the three sources prints in the square, so Regardie's single letters
+  where the grid reads otherwise are kept too (Water row 4 square 8, i;
+  Fire row 5 square 6, a), and the Equinox's and Greer's where they
+  differ (Water row 4 square 9 gains Greer's e, Fire row 5 squares 5
+  and 6 the Equinox's a). `reversed` describes the grid's letter only,
+  as the schema and the data file now say; Water's N and Fire's P carry
+  `alt` letters that are not reversed. A flag per letter was the
+  alternative; no source prints an `alt` letter reversed, and a source
+  `version` would carry its own grid and marks, so the flag stays on
+  the square.
+- **Water row 5 square 12** is explained beside the rule in the data
+  file and above: four letters, no single higher one.
+- **Fire's capital P** rests on the sources (the Equinox and Greer
+  print P), not on how a mirrored p would look.
+- **Colours**: Regardie letters Earth's own angle green (p.275), not
+  white; the existing component letters it white (corrected above).
+- **Citations**: Greer by edition and ISBN, by the plates' titles (the
+  colour insert is unnumbered, and Gadi's copy is a reflowed ebook);
+  the Equinox's file named within its archive.org item; the Equinox's
+  Fire row 2 square 11 is a lowercase v.
+- **The image contract's viewBox** is written out rather than imported
+  (the contracts are imported widely and must not pull in `Tablet`); a
+  test holds it equal to `WATCHTOWER_VIEWBOX`. The image spec's comment
+  says why `marks` is hashed whole, its undrawn `alt` too: a field path
+  cannot select inside an array.
+- **An accessible name** (188863c): `Tablet` is `role="img"` with a
+  `<title>` ("Enochian Watchtower of Fire", "Tablet of Union"), so the
+  page's Earth and Air tablets change bytes, deliberately. The hall and
+  the image route draw it with `label={false}`: the hall drawing names
+  itself, so no preset snapshot moves, and the published Earth and Air
+  images keep their bytes (a page showing one gives it alt text); the
+  f8e21c8 hashes are pinned for that unnamed form.
+- **Tests**: the presets' overlap test covers officers' and other
+  labels and marker text as well as objects; a render test of
+  `/enochian/tablets` checks its four tablets by name and their letters.
+- **The hall editor failing to load** (582632f, found in review, older
+  than stage G): Edit hall loaded the editor through `next/dynamic` with
+  no boundary, so a chunk that could not be fetched took down the whole
+  ritual editor. A boundary now ends the editing (dropping the
+  attribute that widens the split), draws the hall again, gives Edit
+  hall back and says "Couldn't load the hall editor; reload to try
+  again." A test makes the chunk fail.
+- **For Gadi, decision renders** outside the repository, in
+  `/home/dragon/.cache/gdhall-g/decide/` (README there): contrast with a
+  thin dark letter outline, and Earth with green letters; Earth and Air
+  as now beside the Golden Dawn reading, the changed squares marked;
+  `alt` letters drawn small in a corner or not; the Water and Fire
+  sigils as Regardie and as the Equinox draw them.
+
 ### Bundle
 
 From the gates' production builds (webpack), gzip -6. At f8e21c8 the
 reader's hall drawing loaded one chunk of 277,262 bytes (94,153
-gzipped), `Tablet` and its two rows inside it. At 66481d3 `Tablet`
-and the five rows (magick-data's `enochian/tablets` subpath, as
-before) are a chunk of their own, 12,672 bytes (4,259), which the
-hall chunk, now 270,178 (91,516), and the `/enochian/tablets` page
-share: 282,850 bytes (95,775) in all, 5,588 (1,622 gzipped) more, for
-the two new sigils, the Tablet of Union and three rows. No other table
-entered either chunk (no barrel names in them). The chunk holding the
-presets (the Insert dialog, the slash command and `/gd/hall`) went
-from 25,232 bytes (7,767) to 25,257 (7,777).
+gzipped), `Tablet` and its two rows inside it. At 582632f `Tablet` and
+the five rows (magick-data's `enochian/tablets` subpath, as before) are
+a chunk of their own, 13,037 bytes (4,391), which the hall chunk, now
+270,187 (91,519), and the `/enochian/tablets` page share: 283,224 bytes
+(95,910) in all, 5,962 (1,757 gzipped) more, for the two new sigils,
+the Tablet of Union, three rows, their marks and the accessible name.
+No other table entered either chunk (no barrel names in them). The
+chunk holding the presets (the Insert dialog, the slash command and
+`/gd/hall`) went from 25,232 bytes (7,767) to 25,257 (7,777).
 
 ### What was verified, and how
 
 - **Gates**, per commit, each in a clean `git archive` export with Node
   24 and the CI placeholder environment (`pnpm check`, `typecheck`,
   `test:coverage` with the per-file thresholds, `build`): all 0 for
-  46997cd, f8e21c8, 38a7c32, be3d3fd, 8e3d9f3, ae68ccc and 66481d3.
-  77c73fc's first run failed one test outside this work,
-  `SqlDocAdmin.test.tsx` ("creates a semantic ritual from Pug…", its
-  Source button not found) at a load average near 40, every other step
-  0; rerun in a fresh export, all 0. 66481d3, the last code commit,
-  also passed `loom check`, the magick-data smoke test (which now loads
-  the tablets) and `pnpm check:turbopack`. `Tablet.tsx` joined the
-  coverage list (100 % of statements, 93 % of branches). The whole-data
-  render sweep passed at 77c73fc's tree and at 66481d3's. The compiler
-  is untouched: `semantic.ts`, `semanticCompilerImpl.ts` and
-  `ritualNodeIds.ts` have no diff.
-
+  46997cd, f8e21c8 and, after the review fixes, f8b59b0, dfe17b3,
+  bd5c3bb, 5700159, 0d50c51, the plan, 188863c and 582632f. (Before
+  the rewrite, one run of the Tablet commit failed one test outside this
+  work, `SqlDocAdmin.test.tsx`, its Source button not found at a load
+  average near 40; it passed on a rerun and in every later gate.) The
+  tip also passed `loom check`, the magick-data smoke test (which now
+  loads the tablets) and `pnpm check:turbopack`. `Tablet.tsx` joined
+  the coverage list. The whole-data render sweep
+  (`RENDER_INPUT_SWEEP=1`) passed on the Tablet commit's changes and
+  after the letter corrections. The compiler is untouched:
+  `semantic.ts`, `semanticCompilerImpl.ts` and `ritualNodeIds.ts` have
+  no diff.
 - **In the browser** (Turbopack dev server from this branch on
   127.0.0.1:3297, headless Chromium over CDP with classic 15 px
   scrollbars; nothing signed in or saved): `/enochian/tablets` lists
@@ -3384,12 +3444,13 @@ from 25,232 bytes (7,767) to 25,257 (7,777).
 | 012aa58 | Every `/gd/hall` test allows 20 s, as most did (after F, timeouts under load) |
 | 46997cd | `/gd/hall` split 3:5 (G, Gadi's decision) |
 | f8e21c8 | The ritual editor's split 2:3 while a hall is open for editing (G, Gadi's decision) |
-| 38a7c32 | magick-data: tablets' `kind`, shapes, letters and `marks`; `WATCHTOWER_IDS` (G) |
-| be3d3fd | magick-data: the Golden Dawn's Water, Fire and Tablet of Union, with sources (G) |
-| 77c73fc | `Tablet` draws Water, Fire (their sigils) and the Tablet of Union, mirrors reversed letters; `/enochian/tablets` and the image offer Water and Fire (G) |
-| 8e3d9f3 | The hall's `tablet(element)` takes all five, the Union on its own board (G) |
-| ae68ccc | The Philosophus and Portal presets draw their Fire, Water and Union tablets (G) |
-| 66481d3 | magick-data: nine of Water's and Fire's squares read as the Order's names read them (G) |
+| f8b59b0 | magick-data: tablets' `kind`, shapes, letters and `marks`; `WATCHTOWER_IDS` (G; review fixes folded in) |
+| dfe17b3 | magick-data: the Golden Dawn's Water, Fire and Tablet of Union, with sources, nine squares read as the Order's names read them, `alt` from every source (G; review fixes folded in) |
+| bd5c3bb | `Tablet` draws Water, Fire (their sigils) and the Tablet of Union, mirrors reversed letters; `/enochian/tablets` and the image offer Water and Fire (G; review fixes folded in) |
+| 5700159 | The hall's `tablet(element)` takes all five, the Union on its own board (G) |
+| 0d50c51 | The Philosophus and Portal presets draw their Fire, Water and Union tablets (G; review fixes folded in) |
+| 188863c | `Tablet` named as an image; unnamed in the hall and the image route, whose bytes stay (G review) |
+| 582632f | An error boundary ends hall editing when the hall editor cannot load, instead of taking down the ritual editor (G review) |
 
 ## Future
 
