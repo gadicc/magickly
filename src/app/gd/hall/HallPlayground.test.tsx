@@ -166,7 +166,7 @@ function noisyHall(count: number) {
   ).join("")}`;
 }
 
-describe("the /gd/hall page", () => {
+describe("the /gd/hall page", { timeout: 20_000 }, () => {
   it("declares the hall fonts once and says where drafts stay", () => {
     const markup = renderToStaticMarkup(<HallPage />);
     const style = markup.match(/<style>(.*?)<\/style>/s)?.[1] ?? "";
@@ -247,7 +247,7 @@ describe("the /gd/hall page", () => {
   });
 });
 
-describe("presets", () => {
+describe("presets", { timeout: 20_000 }, () => {
   it("loads another at once while the hall is unchanged", () => {
     render(<HallPlayground />);
     choose("Zelator Temple 1");

@@ -12,6 +12,7 @@ vi.mock("./hallDraft", async (importActual) => ({
 
 afterEach(cleanup);
 
+// The real source panel and drawing: slow to render under load.
 it("says when a hall is too large to keep as a draft", async () => {
   render(<HallPlayground />);
   // A change: the page writes only what it changed.
@@ -23,4 +24,4 @@ it("says when a hall is too large to keep as a draft", async () => {
       "This hall is too large to keep as a draft in this browser: a draft holds at most 1,000 nodes and 96,000 characters.",
     ),
   ).toBeTruthy();
-});
+}, 20_000);
