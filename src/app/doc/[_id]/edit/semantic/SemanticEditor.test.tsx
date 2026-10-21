@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { readFileSync } from "node:fs";
 import {
   act,
   cleanup,
@@ -657,6 +658,65 @@ it("saves what a hall field still holds, from Ctrl+S or Save", async () => {
     /"label": "Keeper of the East"/,
   );
 }, 60_000);
+
+it("widens split's visual side only while a hall is open for editing", async () => {
+  mock.load.mockResolvedValue(undefined);
+  mock.saveDraft.mockResolvedValue(undefined);
+  const setup = props();
+  setup.initialDocument.nodes.push(neophyteHall());
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "Split" }));
+  const sourcePanel = screen.getByLabelText("Semantic source panel");
+  const panels = sourcePanel.parentElement as HTMLElement;
+  expect(panels.getAttribute("data-layout")).toBe("split");
+  // What the rule in SemanticEditor.module.css that gives the sides 2:3
+  // selects.
+  const editing = '[data-layout="split"]:has([data-gd-hall-editing])';
+  expect(panels.matches(editing)).toBe(false);
+  const source = screen.getByRole("textbox", {
+    name: "Ritual semantic source",
+  }) as HTMLTextAreaElement;
+  source.setSelectionRange(3, 8);
+  source.scrollTop = 240;
+  fireEvent.click(await screen.findByRole("button", { name: "Edit hall" }));
+  // At once, while the hall editor's code is still loading, so that it
+  // first measures itself at its final width.
+  expect(panels.matches(editing)).toBe(true);
+  const surface = await screen.findByRole(
+    "application",
+    {},
+    { timeout: 30_000 },
+  );
+  expect(panels.matches(editing)).toBe(true);
+  // The source panel is the same element, its scroll and selection kept.
+  expect(screen.getByRole("textbox", { name: "Ritual semantic source" })).toBe(
+    source,
+  );
+  expect(source.scrollTop).toBe(240);
+  expect([source.selectionStart, source.selectionEnd]).toEqual([3, 8]);
+  fireEvent.keyDown(surface, { key: "Escape" });
+  await waitFor(() => expect(screen.queryByRole("application")).toBeNull());
+  expect(panels.matches(editing)).toBe(false);
+  expect(screen.getByRole("textbox", { name: "Ritual semantic source" })).toBe(
+    source,
+  );
+}, 60_000);
+
+it("gives the sides 1:1, or 2:3 while a hall is edited, in its stylesheet", () => {
+  const css = readFileSync(
+    "src/app/doc/[_id]/edit/semantic/SemanticEditor.module.css",
+    "utf8",
+  ).replace(/\/\*[\s\S]*?\*\//g, "");
+  const rule = (selector: string) =>
+    new RegExp(
+      `${selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\{([^}]*)\\}`,
+    ).exec(css)?.[1];
+  expect(rule(".visualPanel,\n.sourcePanel")).toMatch(/flex: 1 1 0;/);
+  const editing = '.panels[data-layout="split"]:has([data-gd-hall-editing])';
+  expect(rule(`${editing} .sourcePanel`)?.trim()).toBe("flex-grow: 2;");
+  expect(rule(`${editing} .visualPanel`)?.trim()).toBe("flex-grow: 3;");
+});
 
 it("conceals private content and portals immediately on a hard lock", async () => {
   mock.load.mockResolvedValue(undefined);

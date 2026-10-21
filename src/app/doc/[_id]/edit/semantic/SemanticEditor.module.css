@@ -107,6 +107,19 @@
   flex-direction: column;
   gap: 0.75rem;
 }
+/* Split is 1:1 for writing the ritual, and 2:3 while a hall is open for
+   editing (its atom marks itself), so that the hall editor's properties
+   panel stands beside its drawing at 1440 and 1920px with classic
+   scrollbars (Gadi, 21 October 2026). One switch, no transition: the
+   hall editor measures its width before its first paint, and a width in
+   motion would flip its panel between docked and beside on the way.
+   Below 800px split shows one panel, so the rule never applies there. */
+.panels[data-layout="split"]:has([data-gd-hall-editing]) .sourcePanel {
+  flex-grow: 2;
+}
+.panels[data-layout="split"]:has([data-gd-hall-editing]) .visualPanel {
+  flex-grow: 3;
+}
 .editor {
   overflow: auto;
   flex: 1;

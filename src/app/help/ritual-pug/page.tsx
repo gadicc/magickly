@@ -125,8 +125,9 @@ export default function RitualPugGuide() {
         freely), and an item, marker or officer dropped on an altar, platform or
         throne that takes it stands on it. The properties of what is selected
         stand beside the drawing where there is room, and otherwise at the foot
-        of the screen, where they can be hidden and shown again. A hall with
-        warnings shows how many beside <strong>Edit hall</strong>.
+        of the screen, where they can be hidden and shown again; in split view
+        the visual side widens while a hall is being edited, to make that room.
+        A hall with warnings shows how many beside <strong>Edit hall</strong>.
       </p>
       <h2>Finding and fixing errors</h2>
       <p>

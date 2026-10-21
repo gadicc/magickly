@@ -414,6 +414,10 @@ export function RitualAtomForEditing({
       data-ritual-meta={JSON.stringify(node.attrs)}
       className={styles.atom}
       data-edit-active={selected || undefined}
+      // While its hall editor is open (loading included), the ritual
+      // editor's split gives the visual panel three parts to the source's
+      // two, through :has() in SemanticEditor.module.css.
+      data-gd-hall-editing={(tag === "gdHall" && editingHall) || undefined}
       contentEditable={false}
     >
       {attachedImage && (
