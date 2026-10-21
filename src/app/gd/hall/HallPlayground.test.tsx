@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { readFileSync } from "node:fs";
 import { HALL_PRESETS } from "@magick-components/gd/hall/presets";
 import {
   act,
@@ -227,6 +228,21 @@ describe("the /gd/hall page", { timeout: 20_000 }, () => {
     expect(playground()?.getAttribute("data-layout")).toBe("visual");
     fireEvent.click(screen.getByRole("button", { name: "Source" }));
     expect(playground()?.getAttribute("data-layout")).toBe("source");
+  });
+
+  it("splits source and drawing three parts to five on a wide screen", () => {
+    // jsdom lays nothing out, so the stylesheet is read: 3:5 gives the
+    // hall editor 761px at 1280 x 800 with classic scrollbars, beside its
+    // panel (Gadi, 21 October 2026); 2:3 gave 730 and docked it.
+    const css = readFileSync(
+      "src/app/gd/hall/hallPlayground.module.css",
+      "utf8",
+    ).replace(/\/\*[\s\S]*?\*\//g, "");
+    expect(
+      /@media \(min-width: 900px\) \{\s*\.panels\[data-layout="split"\] \{\s*grid-template-columns: ([^;]*);/.exec(
+        css,
+      )?.[1],
+    ).toBe("minmax(0, 3fr) minmax(0, 5fr)");
   });
 
   it("remembers its layout apart from the ritual editor's", () => {

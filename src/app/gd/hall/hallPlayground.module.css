@@ -37,12 +37,14 @@
   grid-template-columns: minmax(0, 1fr);
   align-items: start;
 }
-/* Source beside the drawing on a wide screen, two parts to three, the
-   drawing's half holding the editor's properties panel too; stacked on a
-   phone. */
+/* Source beside the drawing on a wide screen, three parts to five, the
+   drawing's side holding the editor's properties panel too; stacked on a
+   phone. At 1280 x 800 with classic scrollbars 3:5 gives the hall editor
+   761px, beside its panel, where 2:3 gave 730 and docked it (Gadi, 21
+   October 2026). */
 @media (min-width: 900px) {
   .panels[data-layout="split"] {
-    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    grid-template-columns: minmax(0, 3fr) minmax(0, 5fr);
   }
 }
 .panel {
