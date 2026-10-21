@@ -15,6 +15,13 @@ import { componentImageFilename } from "@/render/componentImageUrl";
 import { TABLET_IDS } from "@/render/contracts/enochianTablet";
 import useEnochianFont, { EnochianFont } from "../useEnochianFont";
 
+const TABLET_NAMES: Record<(typeof TABLET_IDS)[number], string> = {
+  earth: "Earth",
+  air: "Air",
+  water: "Water",
+  fire: "Fire",
+};
+
 export default function Tablets() {
   const [id, setId] = React.useState<(typeof TABLET_IDS)[number]>("earth");
   const { EnochianFontToggle, enochianFont } = useEnochianFont();
@@ -41,8 +48,11 @@ export default function Tablets() {
               setId(e.target.value as (typeof TABLET_IDS)[number])
             }
           >
-            <MenuItem value="earth">Earth</MenuItem>
-            <MenuItem value="air">Air</MenuItem>
+            {TABLET_IDS.map((tablet) => (
+              <MenuItem key={tablet} value={tablet}>
+                {TABLET_NAMES[tablet]}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
         <EnochianFontToggle />

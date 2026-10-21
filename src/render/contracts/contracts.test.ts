@@ -1,3 +1,4 @@
+import { WATCHTOWER_VIEWBOX } from "@magick-components/enochian/Tablet";
 import { describe, expect, it } from "vitest";
 import { parseComponentImageRequest } from "../componentImageRequest";
 import { componentImageQuery } from "../componentImageUrl";
@@ -6,6 +7,7 @@ import {
   mothersFromString,
   mothersToString,
 } from "./astroGeomancyChart";
+import { TABLET_VIEWBOX } from "./enochianTablet";
 import {
   COMPONENT_IMAGE_SLUGS,
   CONTRACTS,
@@ -186,9 +188,13 @@ describe("component image contracts", () => {
     }
   });
 
+  it("draws the tablets on the page the component draws them on", () => {
+    expect([...TABLET_VIEWBOX]).toEqual([...WATCHTOWER_VIEWBOX]);
+  });
+
   it("rejects unknown tablets and keys on the new slugs", () => {
     for (const [slug, query] of [
-      ["enochian-tablet", "id=water"],
+      ["enochian-tablet", "id=union"],
       ["enochian-tablet", "id=Earth"],
       ["enochian-tablet", "font=Enochian"],
       ["enochian-tablet", "font=hebrew"],

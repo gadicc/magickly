@@ -6,8 +6,17 @@ import {
   parseDimensions,
 } from "./types";
 
-/** Only the tablets with drawn sigils and grid data. */
-export const TABLET_IDS = ["earth", "air"] as const;
+/**
+ * The four Watchtowers, each on the same page. The Tablet of Union draws on
+ * a page of its own shape (`tabletViewBox` in the component), which this
+ * contract's single viewBox cannot state, so it is not offered here.
+ */
+export const TABLET_IDS = ["earth", "air", "water", "fire"] as const;
+/**
+ * `WATCHTOWER_VIEWBOX` in the component, written out so that the contracts,
+ * which much of the app imports, do not pull in `Tablet`; a test holds the
+ * two equal.
+ */
 export const TABLET_VIEWBOX = [-105, 0, 210, 297] as const;
 
 export const TABLET_FONTS = ["latin", "enochian"] as const;

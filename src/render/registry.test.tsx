@@ -58,9 +58,12 @@ describe("component image registry", () => {
       "astro-geomancy-chart",
       "c89a608fb92e2f9b43ff58bdd53b7dc4259ab6a2530d861a8f78f7bb7bdee093",
     ],
+    // 63b83840… until the Water and Fire Watchtowers joined the page and the
+    // spec read each tablet's kind and marks too (plan 061, stage G); the
+    // Earth and Air images' bytes did not move.
     [
       "enochian-tablet",
-      "63b83840b8a165223df3f3e8c12afcb74a49132c8f4f5fa56e92bb9829a75e3e",
+      "3340879b74a54889d04c6f5ab11cc37cc8249fa04c7757a9cbd7f72d0de73bff",
     ],
     [
       "seven-branched-candlestick",

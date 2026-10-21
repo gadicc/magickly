@@ -1,5 +1,29 @@
-import enochianTablets, { EnochianTablet } from "magick-data/enochian/tablets";
+import enochianTablets, {
+  type EnochianTablet,
+  type EnochianTabletID,
+} from "magick-data/enochian/tablets";
 import React, { type CSSProperties } from "react";
+
+/** A tablet's page, as its `<svg>`'s viewBox: x, y, width, height. */
+export type TabletViewBox = readonly [number, number, number, number];
+
+/** A Watchtower's page: its sigil above its grid. */
+export const WATCHTOWER_VIEWBOX: TabletViewBox = [-105, 0, 210, 297];
+
+/** The Tablet of Union's page: its grid of five by four with a margin. */
+export const UNION_VIEWBOX: TabletViewBox = [0, 0, 124, 104];
+
+/** The page a tablet draws on, by its key. */
+export function tabletViewBox(id: string): TabletViewBox {
+  return tabletOf(id)?.kind === "union" ? UNION_VIEWBOX : WATCHTOWER_VIEWBOX;
+}
+
+/** The tablet with this key, or nothing for a key the data does not have. */
+function tabletOf(id: string): EnochianTablet | undefined {
+  return Object.hasOwn(enochianTablets, id)
+    ? enochianTablets[id as EnochianTabletID]
+    : undefined;
+}
 
 function isCrossFromPosition(x: number, y: number) {
   if (x === 2 || x === 5 || x === 6 || x === 9) return true;
@@ -40,6 +64,20 @@ const tabletColors = {
       air: "brown",
     },
     background: "#fff100",
+  },
+  // Painted in blue, the Water angle lettered in orange, and in red, the
+  // Fire angle in green: Regardie, The Golden Dawn, vol. 4 (1940), p.275.
+  water: {
+    color: {
+      water: "#f80",
+    },
+    background: "#59f",
+  },
+  fire: {
+    color: {
+      fire: "#2b2",
+    },
+    background: "#f33",
   },
 };
 
@@ -126,20 +164,120 @@ function AirSigil(props) {
   );
 }
 
+/** One arm of the Water sigil's cross potent, pointing up from the centre. */
+const POTENT_ARM =
+  "M -4 -4 V -54 Q -4 -60 -16 -62 V -69 H 16 V -62 Q 4 -60 4 -54 V -4 Z";
+
+/** The figures in the cross's angles, as strokes around (0, 0). */
+const ANGLE_FIGURES = {
+  b: "M -7 -17 V 13 M -7 4 a 9 9 0 1 1 0 0.1",
+  "6": "M 8 -16 Q -9 -14 -9 5 M -9 5 a 9 9 0 1 0 0 -0.1",
+  "4": "M 4 15 V -16 L -11 6 H 10",
+};
+
+/**
+ * Water: a cross potent with b, 6, 4 and b in its angles, in blue on
+ * orange within a blue ring: Regardie, The Golden Dawn, vol. 4 (1940),
+ * p.307. Drawn here from that description.
+ */
+function WaterSigil() {
+  const blue = "#2255cc";
+  const figures = [
+    ["b", -33, -33],
+    ["6", 33, -33],
+    ["4", -33, 33],
+    ["b", 33, 33],
+  ] as const;
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -100 200 200">
+      <circle r={92} fill="#f80" stroke={blue} strokeWidth={15} />
+      <g fill={blue}>
+        {[0, 90, 180, 270].map((angle) => (
+          <path key={angle} d={POTENT_ARM} transform={`rotate(${angle})`} />
+        ))}
+      </g>
+      <g
+        fill="none"
+        stroke={blue}
+        strokeWidth={5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {figures.map(([figure, x, y]) => (
+          <path
+            key={`${x},${y}`}
+            d={ANGLE_FIGURES[figure]}
+            transform={`translate(${x} ${y})`}
+          />
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+/** One of the Fire sigil's twelve rays, a flame rising from the centre. */
+const FLAME = "M 0 -36 c -8 -6 8 -12 0 -18 s 8 -12 0 -17";
+
+/** The twelve rays' angles, every 30°. */
+const FLAME_ANGLES = Array.from({ length: 12 }, (_, ray) => ray * 30);
+
+/**
+ * Fire: a circle with twelve rays, alternately mauve and yellow, about a
+ * red centre and ring, on green within a red ring: Regardie, The Golden
+ * Dawn, vol. 4 (1940), p.307. Drawn here from that description.
+ */
+function FireSigil() {
+  const red = "#e22";
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -100 200 200">
+      <circle r={92} fill="#2b2" stroke={red} strokeWidth={15} />
+      <circle r={22} fill="none" stroke={red} strokeWidth={6} />
+      <circle r={9} fill={red} />
+      <g fill="none" strokeWidth={6} strokeLinecap="round">
+        {FLAME_ANGLES.map((angle) => (
+          <path
+            key={angle}
+            d={FLAME}
+            stroke={angle % 60 ? "#ff0" : "#a05090"}
+            transform={`rotate(${angle})`}
+          />
+        ))}
+      </g>
+    </svg>
+  );
+}
+
 export const Sigils = {
   earth: EarthSigil,
   air: AirSigil,
+  water: WaterSigil,
+  fire: FireSigil,
 };
+
+/** The squares whose letters the source prints reversed, as "row,column". */
+function reversedSquares(tablet: EnochianTablet): Set<string> {
+  return new Set(
+    (tablet.marks ?? [])
+      .filter((mark) => mark.reversed)
+      .map(({ row, column }) => `${row},${column}`),
+  );
+}
+
+/** A reversed letter's mirror about the vertical through `cx`. */
+const mirrorAt = (cx: number) => `translate(${2 * cx} 0) scale(-1 1)`;
 
 function Grid({
   id,
+  tablet,
   enochianStyle,
 }: {
+  /** The tablet's key, which picks its colours. */
   id: string;
+  tablet: EnochianTablet;
   enochianStyle?: CSSProperties;
 }) {
   const enochianFont = enochianStyle !== undefined;
-  const tablet: EnochianTablet = enochianTablets[id];
+  const reversed = reversedSquares(tablet);
   const size = 20;
   const border = 2;
 
@@ -176,6 +314,11 @@ function Grid({
                 key={`t-${y}-${x}`}
                 x={x * size + size / 2 + border}
                 y={y * size + size / 2 + 6 + border}
+                transform={
+                  reversed.has(`${y},${x}`)
+                    ? mirrorAt(x * size + size / 2 + border)
+                    : undefined
+                }
                 style={{
                   fontWeight: enochianFont ? "bold" : undefined,
                   fontSize: size - 2 - (enochianFont ? 4 : 0),
@@ -205,6 +348,76 @@ function Grid({
   );
 }
 
+/**
+ * The Tablet of Union's lines in their elements' colours on white, EXARP
+ * for Air, HCOMA for Water, NANTA for Earth and BITOM for Fire: Regardie,
+ * The Golden Dawn, vol. 4 (1940), p.275.
+ */
+const UNION_LINE_COLORS = ["#d4a000", "#2255cc", "black", "#e22"];
+
+/** The Tablet of Union, its squares at a Watchtower's size, on its page. */
+function UnionGrid({
+  tablet,
+  enochianStyle,
+}: {
+  tablet: EnochianTablet;
+  enochianStyle?: CSSProperties;
+}) {
+  const enochianFont = enochianStyle !== undefined;
+  const reversed = reversedSquares(tablet);
+  const size = 20;
+  const [, , pageWidth, pageHeight] = UNION_VIEWBOX;
+  const columns = tablet.grid[0]?.length ?? 0;
+  const left = (pageWidth - size * columns) / 2;
+  const top = (pageHeight - size * tablet.grid.length) / 2;
+  return (
+    <>
+      {tablet.grid
+        .flatMap((row, y) => row.map((letter, x) => ({ letter, x, y })))
+        .map(({ letter, x, y }) => {
+          const cx = left + x * size + size / 2;
+          return (
+            <React.Fragment key={`grid-${x},${y}`}>
+              <rect
+                x={left + x * size}
+                y={top + y * size}
+                width={size}
+                height={size}
+                style={{ strokeWidth: 1.2, stroke: "black", fill: "white" }}
+              />
+              <text
+                x={cx}
+                y={top + y * size + size / 2 + 6}
+                transform={reversed.has(`${y},${x}`) ? mirrorAt(cx) : undefined}
+                style={{
+                  fontWeight: enochianFont ? "bold" : undefined,
+                  fontSize: size - 2 - (enochianFont ? 4 : 0),
+                  textAnchor: "middle",
+                  fill: UNION_LINE_COLORS[y] ?? "black",
+                  ...enochianStyle,
+                }}
+              >
+                {letter}
+              </text>
+            </React.Fragment>
+          );
+        })}
+      <rect
+        x={left}
+        y={top}
+        width={size * columns}
+        height={size * tablet.grid.length}
+        style={{ strokeWidth: 4, stroke: "black", fill: "none" }}
+      />
+    </>
+  );
+}
+
+/**
+ * An Enochian tablet: a Watchtower's sigil above its grid on a 210 × 297
+ * page, or the Tablet of Union's grid on a page of its own
+ * (`tabletViewBox`). A key the data does not have draws an empty page.
+ */
 const Tablet = React.forwardRef(function Tablet(
   {
     id,
@@ -223,23 +436,36 @@ const Tablet = React.forwardRef(function Tablet(
   },
   ref: React.Ref<SVGSVGElement>,
 ) {
-  const Sigil = Sigils[id];
+  const tablet = tabletOf(id);
+  const Sigil = Object.hasOwn(Sigils, id)
+    ? Sigils[id as keyof typeof Sigils]
+    : undefined;
 
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="-105 0 210 297"
+      viewBox={tabletViewBox(id).join(" ")}
       width={width}
       height={height}
       style={frame ? { border: "1px solid black" } : undefined}
       ref={ref}
     >
-      <g transform="translate(-31.5,-5) scale(0.3)">
-        <Sigil />
-      </g>
-      <g transform="translate(-94.5,48) scale(0.9)">
-        <Grid id={id} enochianStyle={enochianStyle} />
-      </g>
+      {tablet?.kind === "union" ? (
+        <UnionGrid tablet={tablet} enochianStyle={enochianStyle} />
+      ) : (
+        tablet && (
+          <>
+            {Sigil && (
+              <g transform="translate(-31.5,-5) scale(0.3)">
+                <Sigil />
+              </g>
+            )}
+            <g transform="translate(-94.5,48) scale(0.9)">
+              <Grid id={id} tablet={tablet} enochianStyle={enochianStyle} />
+            </g>
+          </>
+        )
+      )}
     </svg>
   );
 });

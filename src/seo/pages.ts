@@ -99,8 +99,9 @@ export const PUBLIC_PAGES = {
   "/enochian/tablets": {
     title: "Enochian Elemental Tablets",
     description:
-      "The Enochian elemental tablets (Watchtowers) of earth and air, drawn " +
-      "in Latin or Enochian letters and exportable as SVG or PNG.",
+      "The four Enochian elemental tablets (Watchtowers) of earth, air, " +
+      "water and fire, drawn in Latin or Enochian letters and exportable as " +
+      "SVG or PNG.",
   },
   "/gd": {
     title: "Golden Dawn",

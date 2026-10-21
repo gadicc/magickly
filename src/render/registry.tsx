@@ -123,8 +123,18 @@ export const COMPONENT_IMAGE_REGISTRY: {
     ),
     profile: COMPONENT_IMAGE_PROFILE,
     fonts: ["EnochianPlain.ttf"],
-    // The sigils are drawn in the component; only the letter grid is data.
-    inputs: [{ table: "enochianTablet", rows: TABLET_IDS, fields: ["grid"] }],
+    // The sigils are drawn in the component; the letters, which of them are
+    // reversed, and the kind that chooses the page are data. A field path
+    // cannot select inside an array, so `marks` is hashed whole, its `alt`
+    // letters too, which no image draws: correcting an `alt` re-identifies
+    // the image without moving a byte, the safe direction.
+    inputs: [
+      {
+        table: "enochianTablet",
+        rows: TABLET_IDS,
+        fields: ["kind", "grid", "marks"],
+      },
+    ],
   },
   "seven-branched-candlestick": {
     render: () => <SevenBranchedCandleStick />,

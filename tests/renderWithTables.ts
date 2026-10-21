@@ -128,7 +128,7 @@ export const DRAWING_QUERIES: Record<ComponentImageSlug, readonly string[]> = {
     "letterAttr=hebrew&activePath=2_5&field=gdGrade.id",
   ],
   "astro-geomancy-chart": ["", "m=2222111122221111"],
-  "enochian-tablet": ["", "id=air", "font=enochian"],
+  "enochian-tablet": ["", "id=air", "id=water", "id=fire", "font=enochian"],
   "seven-branched-candlestick": [""],
   "table-of-shewbread": [""],
   "rose-sigil": ["text=א&rose=false"],
