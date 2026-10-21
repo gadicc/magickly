@@ -2354,7 +2354,15 @@ in six commits after 54ee002 (Commits):
   kept as the draft in its place." Notes stack, so a link that fails
   leaves the unreadable-draft note shown, their buttons go below the
   text on a phone, and a parser's message about a link is cut to 120
-  characters.
+  characters. Typing read as its 0.2 s wait ended, but not yet drawn,
+  as a link opened was not kept: the page kept the hall last drawn (a
+  CI failure under load, 21 October 2026). The page now holds its
+  history as of the last action, ahead of the render, so that typing
+  is the draft (also as the page goes) and one undo step back. A
+  gesture on the drawing in such a moment, after typing or a link's
+  hall and before it is drawn, is refused as one made before unread
+  typing is, and choosing a preset then asks before replacing typing
+  that is not yet drawn.
 - **An editor that cannot load (F3).** An error boundary around the
   lazily loaded editor says "The hall editor could not load, or
   stopped working." with **Reload**, instead of Next's client error

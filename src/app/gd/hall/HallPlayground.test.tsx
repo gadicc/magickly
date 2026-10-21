@@ -21,7 +21,7 @@ import HallPlayground, {
   validHall,
 } from "./HallPlayground";
 import { HALL_DRAFT_KEY, MAX_HALL_DRAFT } from "./hallDraft";
-import { shareFragment } from "./hallShare";
+import { readShareHash, shareFragment } from "./hallShare";
 import HallPage from "./page";
 
 const runtime = vi.hoisted(() => ({
@@ -47,6 +47,13 @@ vi.mock("@/doc/gdHallPug", async (importActual) => {
       return actual.parseHallSource(text);
     },
   };
+});
+
+// A link's hall is read as `hallShare` reads it, unless a test sets the
+// moment it arrives.
+vi.mock("./hallShare", async (importActual) => {
+  const actual = await importActual<typeof import("./hallShare")>();
+  return { ...actual, readShareHash: vi.fn(actual.readShareHash) };
 });
 
 // The Pug source panel is CodeMirror; its own tests cover it. Here it is a
@@ -88,6 +95,8 @@ afterEach(() => {
   cleanup();
   vi.clearAllMocks();
   vi.restoreAllMocks();
+  // A link's hall a test queued and did not use goes with it.
+  vi.mocked(readShareHash).mockReset();
 });
 
 const sourceBox = () =>
@@ -247,6 +256,19 @@ describe("presets", () => {
     expect(pugOf(source())).toBe(gdHallPug(HALL_PRESETS[1].hall));
   });
 
+  it("asks before replacing a hall changed by typing not yet read", () => {
+    render(<HallPlayground />);
+    type(source().replace('text="Neophyte Temple"', 'text="Mine"'));
+    const mine = source();
+    // The drawing is still the unchanged Neophyte; the typing is not.
+    expect(titles()).toEqual(["Neophyte Temple", "Neophyte Temple"]);
+    choose("Zelator Temple 1");
+    expect(
+      screen.getByRole("dialog", { name: "Replace your hall?" }),
+    ).toBeTruthy();
+    expect(source()).toBe(mine);
+  });
+
   it("asks before replacing a changed hall, which Undo brings back", async () => {
     render(<HallPlayground />);
     nudgeFirst();
@@ -388,6 +410,36 @@ describe("source and drawing in step", { timeout: 20_000 }, () => {
     expect(source()).toContain('text="Mine"');
   });
 
+  it("refuses a gesture made before read typing is drawn", async () => {
+    render(<HallPlayground />);
+    const surface = screen.getByRole("application");
+    fireEvent.keyDown(surface, { key: "Tab" });
+    const scope = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean };
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    try {
+      type(source().replace('text="Neophyte Temple"', 'text="Mine"'));
+      const mine = source();
+      // The typing is read as its wait ends; a key press moves the
+      // selection before React draws the typed hall (in a task of its own).
+      scope.IS_REACT_ACT_ENVIRONMENT = false;
+      try {
+        vi.advanceTimersByTime(200);
+      } finally {
+        scope.IS_REACT_ACT_ENVIRONMENT = true;
+      }
+      fireEvent.keyDown(surface, { key: "ArrowRight" });
+      vi.useRealTimers();
+      await rest();
+      expect(source()).toBe(mine);
+      expect(titles()).toEqual(["Mine", "Mine"]);
+      expect(
+        screen.getAllByText("That change was not made; the hall is as it was."),
+      ).not.toHaveLength(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("makes typing one undo step once it pauses, and redoes it", async () => {
     render(<HallPlayground />);
     const first = source();
@@ -437,6 +489,31 @@ describe("the draft", { timeout: 20_000 }, () => {
       v: number;
       source: string;
     } | null;
+
+  it("keeps typing read but not yet drawn as the page goes", async () => {
+    render(<HallPlayground />);
+    const scope = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean };
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    try {
+      type(source().replace('text="Neophyte Temple"', 'text="Mine"'));
+      const mine = source();
+      // The typing is read as its wait ends, and the page goes before
+      // React draws the typed hall (in a task of its own).
+      scope.IS_REACT_ACT_ENVIRONMENT = false;
+      try {
+        vi.advanceTimersByTime(200);
+        window.dispatchEvent(new Event("pagehide"));
+        expect(titles()).toEqual(["Neophyte Temple", "Neophyte Temple"]);
+        expect(draft()?.source).toBe(mine);
+      } finally {
+        scope.IS_REACT_ACT_ENVIRONMENT = true;
+      }
+      vi.useRealTimers();
+      await rest();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 
   it("keeps the hall in this browser and restores it on return", async () => {
     const first = render(<HallPlayground />);
@@ -829,14 +906,18 @@ describe("sharing and export", { timeout: 20_000 }, () => {
   });
 
   it("says a draft stays when a link is pasted into an open page", async () => {
+    const zelator = await shareFragment(gdHallPug(HALL_PRESETS[1].hall));
+    if (!("fragment" in zelator)) throw new Error("too long");
+    // The link's hall arrives at once: the typing is still unread.
+    vi.mocked(readShareHash).mockResolvedValueOnce(
+      gdHallPug(HALL_PRESETS[1].hall),
+    );
     render(<HallPlayground />);
     nudgeFirst();
     await kept();
     // Typed, and not yet read or kept, as the link arrives.
     type(source().replace('text="Neophyte Temple"', 'text="Mine"'));
     const mine = source();
-    const zelator = await shareFragment(gdHallPug(HALL_PRESETS[1].hall));
-    if (!("fragment" in zelator)) throw new Error("too long");
     act(() => {
       window.history.replaceState(null, "", `/gd/hall#${zelator.fragment}`);
       window.dispatchEvent(new HashChangeEvent("hashchange"));
@@ -849,6 +930,96 @@ describe("sharing and export", { timeout: 20_000 }, () => {
     ).toBe(mine);
     fireEvent.click(screen.getByRole("button", { name: "Undo" }));
     expect(source()).toBe(mine);
+  });
+
+  it("refuses a gesture made before an opened link's hall is drawn", async () => {
+    const zelator = await shareFragment(gdHallPug(HALL_PRESETS[1].hall));
+    if (!("fragment" in zelator)) throw new Error("too long");
+    // The link's hall arrives at once, so the page opens it in the task
+    // the link came in.
+    vi.mocked(readShareHash).mockResolvedValueOnce(
+      gdHallPug(HALL_PRESETS[1].hall),
+    );
+    render(<HallPlayground />);
+    const mine = source();
+    const surface = screen.getByRole("application");
+    fireEvent.keyDown(surface, { key: "Tab" });
+    const scope = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean };
+    scope.IS_REACT_ACT_ENVIRONMENT = false;
+    try {
+      window.history.replaceState(null, "", `/gd/hall#${zelator.fragment}`);
+      window.dispatchEvent(new HashChangeEvent("hashchange"));
+      // Opened in the promise steps that follow; React draws it in a
+      // task of its own.
+      for (let step = 0; step < 20; step++) await null;
+      expect(titles()).toEqual(["Neophyte Temple", "Neophyte Temple"]);
+    } finally {
+      scope.IS_REACT_ACT_ENVIRONMENT = true;
+    }
+    // A key press on the drawing before then.
+    fireEvent.keyDown(surface, { key: "ArrowRight" });
+    await screen.findByText(
+      "Opened a hall from a share link. Once you change it, it is kept as a draft in this browser.",
+    );
+    expect(presetShown()).toBe("Zelator Temple 1");
+    expect(
+      screen.getAllByText("That change was not made; the hall is as it was."),
+    ).not.toHaveLength(0);
+    // Undo goes back to the hall before the link, as the note says.
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(source()).toBe(mine);
+  });
+
+  it("keeps typing read but not yet drawn as a link opens", async () => {
+    const zelator = await shareFragment(gdHallPug(HALL_PRESETS[1].hall));
+    if (!("fragment" in zelator)) throw new Error("too long");
+    // The link's hall arrives at once, so the page opens it in the task
+    // the link came in.
+    vi.mocked(readShareHash).mockResolvedValueOnce(
+      gdHallPug(HALL_PRESETS[1].hall),
+    );
+    render(<HallPlayground />);
+    nudgeFirst();
+    await kept();
+    const scope = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean };
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    try {
+      type(source().replace('text="Neophyte Temple"', 'text="Mine"'));
+      const mine = source();
+      // As in a browser: the typing is read as its wait ends and the link
+      // arrives in the same task; React draws the typed hall only in a
+      // later one, after the link has opened.
+      scope.IS_REACT_ACT_ENVIRONMENT = false;
+      try {
+        vi.advanceTimersByTime(200);
+        window.history.replaceState(null, "", `/gd/hall#${zelator.fragment}`);
+        window.dispatchEvent(new HashChangeEvent("hashchange"));
+        // The link opens in the promise steps that follow, before React
+        // renders (in a task of its own): the typed hall is not yet drawn,
+        // and is kept as the draft.
+        for (let step = 0; step < 20; step++) await null;
+        expect(titles()).toEqual(["Neophyte Temple", "Neophyte Temple"]);
+        expect(
+          JSON.parse(localStorage.getItem(HALL_DRAFT_KEY) ?? "{}").source,
+        ).toBe(mine);
+      } finally {
+        scope.IS_REACT_ACT_ENVIRONMENT = true;
+      }
+      vi.useRealTimers();
+      await screen.findByText(
+        "Opened a hall from a share link. Your own draft stays in this browser until you change this hall; Undo goes back to the hall you had.",
+      );
+      expect(presetShown()).toBe("Zelator Temple 1");
+      // The typed hall stays the draft, and is one undo step back.
+      await kept();
+      expect(
+        JSON.parse(localStorage.getItem(HALL_DRAFT_KEY) ?? "{}").source,
+      ).toBe(mine);
+      fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+      expect(source()).toBe(mine);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("says when the draft a link would replace could not be read", async () => {

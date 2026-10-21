@@ -50,6 +50,7 @@ import {
   entryOfHall,
   entryOfSource,
   type HallEntry,
+  type HallHistoryAction,
   hallHistoryReducer,
   initialHistory,
 } from "./hallHistory";
@@ -218,11 +219,19 @@ const ExportDrawing = React.memo(function ExportDrawing({
  */
 export default function HallPlayground() {
   const [start] = React.useState(startingPoint);
-  const [history, dispatch] = React.useReducer(
-    hallHistoryReducer,
-    start.entry,
-    initialHistory,
-  );
+  const [initial] = React.useState(() => initialHistory(start.entry));
+  /**
+   * The history as of the last action, ahead of the render that draws it:
+   * typing read as its wait ends is drawn a task later, and a link that
+   * opens, or a page that goes, in between keeps that hall, not the one
+   * last drawn.
+   */
+  const now = React.useRef(initial);
+  const [history, setHistory] = React.useState(initial);
+  const dispatch = React.useCallback((action: HallHistoryAction) => {
+    now.current = hallHistoryReducer(now.current, action);
+    setHistory(now.current);
+  }, []);
   const [notes, setNotes] = React.useState<readonly Note[]>(() =>
     start.note ? [start.note] : [],
   );
@@ -253,10 +262,11 @@ export default function HallPlayground() {
   // Source typed but not yet read (`READ_TYPING`): what the panel shows.
   const [typed, setTyped] = React.useState<string | null>(null);
   const unread = React.useRef<string | null>(null);
-  const latestSource = React.useRef(present.source);
-  latestSource.current = present.source;
-  const latestHall = React.useRef(present);
-  latestHall.current = present;
+  /** The source of the hall drawn, which a visual gesture builds on. */
+  const drawnSource = React.useRef(present.source);
+  drawnSource.current = present.source;
+  /** The hall the last gesture taken gave, which the next may build on. */
+  const sentSource = React.useRef<string | null>(null);
   const preset = React.useMemo(() => matchingPreset(present), [present]);
 
   // The last hall the source held, shown (read-only) while it holds none.
@@ -279,7 +289,7 @@ export default function HallPlayground() {
     const entry = entryOfSource(source);
     dispatch({ type: "typed", entry });
     return entry;
-  }, []);
+  }, [dispatch]);
   React.useEffect(() => {
     if (typed === null) return;
     const timer = window.setTimeout(readTyped, READ_TYPING);
@@ -334,16 +344,16 @@ export default function HallPlayground() {
     [showNote],
   );
   /** Keeps the hall as it is now as the draft, typing read first. */
-  const saveNow = React.useCallback(
-    () => writeDraft(readTyped() ?? latestHall.current),
-    [readTyped, writeDraft],
-  );
+  const saveNow = React.useCallback(() => {
+    readTyped();
+    writeDraft(now.current.present);
+  }, [readTyped, writeDraft]);
   // While typing waits to be read, it is not kept: the hall it gives is,
   // a moment after it is read.
   // biome-ignore lint/correctness/useExhaustiveDependencies: a new source only
   React.useEffect(() => {
     const timer = window.setTimeout(() => {
-      if (unread.current === null) writeDraft(latestHall.current);
+      if (unread.current === null) writeDraft(now.current.present);
     }, SAVE_DRAFT);
     return () => window.clearTimeout(timer);
   }, [present.source, writeDraft]);
@@ -361,7 +371,7 @@ export default function HallPlayground() {
       if (reading.status !== "found") return;
       const theirs = reading.draft.source;
       if (theirs === synced.current) return;
-      const mine = unread.current ?? latestSource.current;
+      const mine = unread.current ?? now.current.present.source;
       if (theirs === mine) {
         // Both tabs hold the same hall: in step again.
         synced.current = theirs;
@@ -456,7 +466,7 @@ export default function HallPlayground() {
       current = false;
       window.removeEventListener("hashchange", open);
     };
-  }, [saveNow, showNote]);
+  }, [saveNow, showNote, dispatch]);
 
   // The share link for the hall as it is, ready for the click (copying
   // keeps the click's permission only if it starts at once).
@@ -503,8 +513,10 @@ export default function HallPlayground() {
     const chosen = HALL_PRESETS.find(
       (candidate) => candidate.id === id,
     ) as HallPreset;
-    // Changes would be lost from the draft: ask first.
-    if (preset) loadPreset(chosen);
+    // Changes would be lost from the draft: ask first. Typing counts,
+    // read or not, drawn or not.
+    readTyped();
+    if (matchingPreset(now.current.present)) loadPreset(chosen);
     else setReplacing(chosen);
   };
 
@@ -512,23 +524,29 @@ export default function HallPlayground() {
   const onVisualChange = React.useCallback(
     (hall: HallElement) => {
       if (!validHall(hall)) return false;
-      // A gesture on the hall drawn before typing that is still unread
-      // would write over the typing: it is refused, and the typing read.
-      const read = readTyped();
-      if (read && read.source !== latestSource.current) return false;
+      // A gesture builds on the hall drawn. One made after the hall moved
+      // on and before it is drawn (typing, unread or just read; a link
+      // just opened) would write over that: it is refused, and the typing
+      // read. A second change in one event builds on the first, which is
+      // not yet drawn either: it is taken.
+      readTyped();
+      const latest = now.current.present.source;
+      if (latest !== drawnSource.current && latest !== sentSource.current)
+        return false;
       dispatch({ type: "visual", hall });
+      sentSource.current = now.current.present.source;
       return true;
     },
-    [readTyped],
+    [readTyped, dispatch],
   );
   const undo = React.useCallback(() => {
     readTyped();
     dispatch({ type: "undo" });
-  }, [readTyped]);
+  }, [readTyped, dispatch]);
   const redo = React.useCallback(() => {
     readTyped();
     dispatch({ type: "redo" });
-  }, [readTyped]);
+  }, [readTyped, dispatch]);
   const onSourceChange = React.useCallback((source: string) => {
     unread.current = source;
     setTyped(source);
@@ -536,7 +554,8 @@ export default function HallPlayground() {
 
   // Both buttons are enabled only with a hall, and a link, to copy.
   const copyPug = async () => {
-    const hall = (readTyped() ?? present).hall;
+    readTyped();
+    const { hall } = now.current.present;
     if (!hall) {
       setStatus("Correct the source to copy the hall.");
       return;
