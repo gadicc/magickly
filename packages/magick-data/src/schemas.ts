@@ -38,6 +38,18 @@ const HOUSE_NUMBERS = [
   "12",
 ] as const;
 
+/** One square's letter on an Enochian tablet. */
+const tabletLetter = v.pipe(v.string(), v.regex(/^[A-Za-z]$/));
+
+/** A row or column of an Enochian tablet, from 0. */
+const tabletIndex = v.pipe(v.number(), v.integer(), v.minValue(0));
+
+/** How many rows and columns of letters each kind of Enochian tablet has. */
+const TABLET_SHAPES = {
+  watchtower: { rows: 13, columns: 12 },
+  union: { rows: 4, columns: 5 },
+} as const;
+
 const byHouse = (value: v.GenericSchema): Entries =>
   Object.fromEntries(HOUSE_NUMBERS.map((no) => [no, value]));
 
@@ -151,12 +163,58 @@ export const schemas = {
     gematria: v.number(),
     ...ids("enochianLetter"),
   }),
-  enochianTablet: v.strictObject({
-    id: v.string(),
-    /** Twelve columns of thirteen letters, as transliterations. */
-    grid: v.array(v.array(v.string())),
-    ...ids("enochianTablet"),
-  }),
+  enochianTablet: v.pipe(
+    v.strictObject({
+      id: v.string(),
+      /**
+       * A Watchtower, one of the four elemental tablets, or the Tablet of
+       * Union, which joins them: required of every row.
+       */
+      kind: v.picklist(["watchtower", "union"]),
+      /**
+       * The letters, row by row from the top: each square's letter, the
+       * Latin transliteration of its Enochian, a capital where the source
+       * prints one.
+       */
+      grid: v.array(v.array(tabletLetter)),
+      /**
+       * The squares that hold more than their letter, by row and column
+       * from 0. `alt`: the other letters the sources print in that square,
+       * as the data file says in which order. `reversed`: the grid's letter
+       * is printed reversed; it says nothing of the `alt` letters. A square
+       * appears at most once.
+       */
+      marks: v.optional(
+        v.array(
+          v.strictObject({
+            row: tabletIndex,
+            column: tabletIndex,
+            alt: v.optional(v.array(tabletLetter)),
+            reversed: v.optional(v.boolean()),
+          }),
+        ),
+      ),
+      ...ids("enochianTablet"),
+    }),
+    v.check(
+      ({ kind, grid }) =>
+        grid.length === TABLET_SHAPES[kind].rows &&
+        grid.every((row) => row.length === TABLET_SHAPES[kind].columns),
+      "a Watchtower's grid is 13 rows of 12 letters, the Tablet of Union's 4 rows of 5",
+    ),
+    v.check(
+      ({ kind, marks = [] }) =>
+        marks.every(
+          ({ row, column, alt, reversed }) =>
+            row < TABLET_SHAPES[kind].rows &&
+            column < TABLET_SHAPES[kind].columns &&
+            (alt?.length || reversed),
+        ) &&
+        new Set(marks.map(({ row, column }) => `${row},${column}`)).size ===
+          marks.length,
+      "a mark names a square of the grid once, and gives it letters or reverses it",
+    ),
+  ),
 
   tetragram: v.strictObject({
     id: v.string(),

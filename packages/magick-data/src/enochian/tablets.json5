@@ -1,6 +1,15 @@
+// The Enochian tablets: the Watchtowers, thirteen rows of twelve letters,
+// and the Tablet of Union, four rows of five. Rows run from the top; a
+// letter is the Latin transliteration, a capital where the source prints
+// one. `marks` names, by row and column from 0, the squares that hold
+// more: the other letters printed in the same square (`alt`, the higher
+// first) and letters printed reversed.
+//
+// Earth and Air have no recorded source.
 {
   earth: {
     id: "earth",
+    kind: "watchtower",
     grid: [
       ["b", "O", "a", "Z", "a", "R", "o", "P", "h", "a", "R", "a"],
       ["v", "N", "n", "a", "x", "o", "P", "S", "o", "n", "d", "n"],
@@ -19,6 +28,7 @@
   },
   air: {
     id: "air",
+    kind: "watchtower",
     grid: [
       ["r", "Z", "i", "l", "a", "f", "A", "Y", "t", "l", "P", "a"],
       ["a", "r", "d", "Z", "a", "i", "d", "P", "a", "L", "a", "m"],
