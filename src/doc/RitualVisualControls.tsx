@@ -23,7 +23,6 @@ import {
   MenuItem,
   TextField,
   Tooltip,
-  Typography,
 } from "@mui/material";
 import type { Editor, JSONContent } from "@tiptap/core";
 import { useEditorState } from "@tiptap/react";
@@ -228,8 +227,10 @@ export default function RitualVisualControls({
   /** Why commands are briefly inactive while `syncingSource` is set. */
   waitReason?: string;
   concealed?: boolean;
-  actorId?: string;
-  ritualId?: string;
+  /** The signed-in author; image uploads are bound to this actor. */
+  actorId: string;
+  /** The saved ritual being edited; image uploads attach to it. */
+  ritualId: string;
   title?: string;
 }) {
   const blocked = disabled || syncingSource;
@@ -780,7 +781,7 @@ export default function RitualVisualControls({
         <ToolButton
           label="Image"
           icon={<ImageOutlined fontSize="small" />}
-          disabled={disabled || !actorId || !ritualId}
+          disabled={disabled}
           inactive={syncingSource}
           inactiveReason={sourceWaitReason}
           onClick={openImage}
@@ -865,11 +866,6 @@ export default function RitualVisualControls({
           </MenuItem>
         ))}
       </Menu>
-      {!ritualId && (
-        <Typography variant="body2">
-          Images can be attached after creating the ritual.
-        </Typography>
-      )}
       {error && !fields && <Alert severity="error">{error}</Alert>}
       <RitualTaskDeletionNotice editor={editor} blocked={blocked} />
       {taskSettings && (
@@ -892,8 +888,8 @@ export default function RitualVisualControls({
             component: "form",
             onSubmit: (event: React.FormEvent) => {
               event.preventDefault();
-              // React submits through portals: never submit a host form, such
-              // as the creation form around this editor.
+              // React submits through portals: keep this dialog's submit
+              // from reaching any form around the editor.
               event.stopPropagation();
               apply();
             },
@@ -1125,26 +1121,24 @@ export default function RitualVisualControls({
       >
         <DialogTitle>Insert image</DialogTitle>
         <DialogContent>
-          {actorId && ritualId && (
-            <Upload
-              concealed={concealed}
-              disabled={blocked}
-              expectedActorId={actorId}
-              rituals={[{ id: ritualId, title: title ?? "Current ritual" }]}
-              onResult={(receipt) => {
-                if (
-                  !mounted.current ||
-                  !activeImageToken ||
-                  imageAttempt.current?.token !== activeImageToken ||
-                  receipt.actorId !== actorId ||
-                  receipt.ritualId !== ritualId ||
-                  insertedUploads.current.has(receipt.operationId)
-                )
-                  return;
-                setUploadedImage({ token: activeImageToken, receipt });
-              }}
-            />
-          )}
+          <Upload
+            concealed={concealed}
+            disabled={blocked}
+            expectedActorId={actorId}
+            rituals={[{ id: ritualId, title: title ?? "Current ritual" }]}
+            onResult={(receipt) => {
+              if (
+                !mounted.current ||
+                !activeImageToken ||
+                imageAttempt.current?.token !== activeImageToken ||
+                receipt.actorId !== actorId ||
+                receipt.ritualId !== ritualId ||
+                insertedUploads.current.has(receipt.operationId)
+              )
+                return;
+              setUploadedImage({ token: activeImageToken, receipt });
+            }}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={closeImage}>Close</Button>

@@ -1,4 +1,4 @@
-/** Default semantic source starter; omitted identities are assigned by the editor. */
+/** The guide's starter ritual; omitted identities are assigned by the editor. */
 export const ritualPugStarter = `//- magickli-ritual-pug 1
 title(text="Opening") Opening
 summary(summary="Preparation")
@@ -43,13 +43,3 @@ ritualText(value="Text with exact trailing space ")/
 ritualLegacy(raw={"type":"synthetic-widget","mode":"preserve"})/
 `,
 };
-
-/** Equivalent starting content for authors who choose the legacy Pug format. */
-export const pugRitualStarter = `title(text="Opening") Opening
-summary(summary="Preparation")
-  note Replace this note with preparations for your ritual.
-task(say role="hiero") Welcome.
-task(do role="keryx") Open the door.
-summary(summary="Closing")
-  task(say role="hiero") The ritual is concluded.
-`;

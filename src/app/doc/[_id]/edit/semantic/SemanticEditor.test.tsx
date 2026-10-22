@@ -220,6 +220,53 @@ it("defaults to split and restores the last chosen layout on reopening", async (
   ).toBeNull();
 });
 
+it("puts the caret in a new, empty ritual so its hint shows", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  setup.initialDocument.nodes = [];
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  const visual = await screen.findByRole("textbox", {
+    name: "Ritual visual editor",
+  });
+  await waitFor(() => expect(document.activeElement).toBe(visual));
+  expect(visual.querySelector("p[data-hint]")?.getAttribute("data-hint")).toBe(
+    "Type / for speech, action, note or section title",
+  );
+});
+
+it("leaves the focus alone when a ritual has content", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  const visual = await screen.findByRole("textbox", {
+    name: "Ritual visual editor",
+  });
+  await waitFor(() =>
+    expect(visual.getAttribute("contenteditable")).toBe("true"),
+  );
+  expect(document.activeElement).not.toBe(visual);
+});
+
+it("puts the caret after an empty ritual's source header in Source layout", async () => {
+  mock.load.mockResolvedValue(undefined);
+  localStorage.setItem(RITUAL_EDITOR_LAYOUT_KEY, "source");
+  const setup = props();
+  setup.initialDocument.nodes = [];
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  const source = await screen.findByRole("textbox", {
+    name: "Ritual semantic source",
+  });
+  await waitFor(() =>
+    expect(source.getAttribute("data-reveal-line")).toBe("2"),
+  );
+  expect((source as HTMLTextAreaElement).value).toBe(
+    "//- magickli-ritual-pug 1\n",
+  );
+});
+
 it("shows a stored split layout as visual on narrow screens without changing it", async () => {
   mock.load.mockResolvedValue(undefined);
   const setup = props();
@@ -1819,6 +1866,7 @@ vi.mock("@/doc/RitualSourceEditor", () => ({
     onCompositionChange,
     diagnostic,
     header,
+    reveal,
   }) =>
     React.createElement(
       React.Fragment,
@@ -1827,6 +1875,7 @@ vi.mock("@/doc/RitualSourceEditor", () => ({
       React.createElement("textarea", {
         "aria-label": label,
         "data-diagnostic-source": diagnostic?.source,
+        "data-reveal-line": reveal?.line,
         value,
         disabled,
         onChange: (event) =>

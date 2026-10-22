@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "@magick-components/Link";
 import {
   Alert,
   Box,
@@ -8,16 +9,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { retainsOnlineEditorIdentity } from "@/doc/onlineEditorIdentity";
-import { pugRitualStarter, ritualPugStarter } from "@/doc/ritualPugExamples";
-import {
-  detectRitualSourceDialect,
-  parseRitualSource,
-  printRitualSource,
-} from "@/doc/ritualSource";
 import type { RitualSemanticDocument } from "@/doc/semantic";
 import {
   checkSqlRitualCreationOptions,
@@ -39,22 +33,10 @@ import {
   retainCreationPublicationHandoff,
 } from "@/offline/ritualPublicationHandoff";
 
-const RitualCreationEditor = dynamic(
-  () => import("@/doc/RitualCreationEditor"),
-  {
-    ssr: false,
-    loading: () => <p>Loading ritual editor…</p>,
-  },
-);
-
 interface FormState {
   title: string;
   scopeKey: string;
   minGrade: number;
-  source: string;
-  semanticSource: string;
-  format: "pug" | "semantic";
-  editorMode: "visual" | "source" | "split";
 }
 
 interface CreationIdentity {
@@ -72,11 +54,18 @@ const emptyForm = (): FormState => ({
   title: "",
   scopeKey: "",
   minGrade: 0,
-  source: pugRitualStarter,
-  semanticSource: ritualPugStarter,
-  format: "semantic",
-  editorMode: "split",
 });
+/**
+ * A new ritual starts empty, as a semantic (Visual / Ritual Pug) document,
+ * and the author writes it in the full editor that creation opens.
+ */
+const emptyRitualSource = JSON.stringify({
+  format: "magickli-ritual",
+  version: 1,
+  nodes: [],
+} satisfies RitualSemanticDocument);
+/** The full editor; a legacy (SQL-v2) ritual is imported there too. */
+const editorPath = (ritualId: string) => `/doc/${ritualId}/edit/semantic`;
 const storageKey = (ownerId: string) => `magickli:ritual-create:v2:${ownerId}`;
 const unavailable = (): SqlRitualWriteResult => ({
   ok: false,
@@ -109,7 +98,10 @@ export default function SqlDocAdmin() {
   const [error, setError] = React.useState<string | null>(null);
   const [terminal, setTerminal] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
-  const [composerValid, setComposerValid] = React.useState(true);
+  /** The created ritual whose editor is opening. */
+  const [opening, setOpening] = React.useState<string | null>(null);
+  const openingLinkRef = React.useRef<HTMLAnchorElement | null>(null);
+  const helpId = React.useId();
   const [blockedRecovery, setBlockedRecovery] = React.useState<string | null>(
     null,
   );
@@ -131,7 +123,6 @@ export default function SqlDocAdmin() {
     ownerId: string;
     epoch: string;
     height: number;
-    editorMode: FormState["editorMode"];
   } | null>(null);
   const [reservedHeight, setReservedHeight] = React.useState(0);
 
@@ -179,11 +170,7 @@ export default function SqlDocAdmin() {
       // so the browser cannot clamp the ritual-list scroll to a shorter page.
       if (identity && rootRef.current) {
         const height = rootRef.current.getBoundingClientRect().height;
-        presentationRef.current = {
-          ...identity,
-          height,
-          editorMode: formRef.current.editorMode,
-        };
+        presentationRef.current = { ...identity, height };
         setReservedHeight(height);
       }
       if (message) {
@@ -209,6 +196,7 @@ export default function SqlDocAdmin() {
       setBlockedRecovery(null);
       setTerminal(false);
       setBusy(false);
+      setOpening(null);
       setLoaded(message !== null);
       setError(message);
     };
@@ -365,13 +353,6 @@ export default function SqlDocAdmin() {
                   : retained.scope.kind === "group"
                     ? `group:${retained.scope.groupId}`
                     : `temple:${retained.scope.templeId}`;
-              let semanticSource = ritualPugStarter;
-              if (retained.version === 3) {
-                const document = JSON.parse(
-                  retained.source,
-                ) as RitualSemanticDocument;
-                semanticSource = printRitualSource(document);
-              }
               replaceForm({
                 title: retained.title,
                 scopeKey: key,
@@ -379,14 +360,6 @@ export default function SqlDocAdmin() {
                   retained.scope.kind === "temple"
                     ? retained.scope.minGrade
                     : 0,
-                source: retained.version === 2 ? retained.source : "",
-                semanticSource,
-                format: retained.version === 3 ? "semantic" : "pug",
-                editorMode:
-                  presentationRef.current?.ownerId === next.ownerId &&
-                  presentationRef.current.epoch === expected.epoch
-                    ? presentationRef.current.editorMode
-                    : "split",
               });
               replacePending(retained);
             } catch {
@@ -436,12 +409,17 @@ export default function SqlDocAdmin() {
       }
     };
     finish();
-    // The lazy composer and autosizing textareas finish layout after the form.
+    // Alerts and menus can finish layout after the form.
     if (typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(finish);
     observer.observe(content);
     return () => observer.disconnect();
   }, [options, reservedHeight, currentIdentity]);
+
+  // The form gives way to the opening notice: keep keyboard focus with it.
+  React.useEffect(() => {
+    if (opening) openingLinkRef.current?.focus();
+  }, [opening]);
 
   const permitted = React.useCallback(
     (scopeKey: string) =>
@@ -471,39 +449,21 @@ export default function SqlDocAdmin() {
       setError("Choose a valid visibility and minimum grade.");
       return;
     }
-    let source = form.source;
-    if (!pending && form.format === "semantic") {
-      try {
-        source = JSON.stringify(
-          parseRitualSource(
-            form.semanticSource,
-            detectRitualSourceDialect(form.semanticSource) ?? "pug",
-          ),
-        );
-        if (!composerValid) {
-          setError("Correct the visual document before creating this ritual.");
-          return;
-        }
-      } catch (cause) {
-        setError(
-          cause instanceof Error ? cause.message : "Invalid ritual source.",
-        );
-        return;
-      }
-    }
+    // A retained request (including a legacy SQL-v2 one from an older form)
+    // is replayed exactly, so an uncertain creation never duplicates.
     const request =
       pending ??
       parseSqlRitualCreateRequest({
-        version: form.format === "semantic" ? 3 : 2,
+        version: 3,
         operationId: createUuidV7(),
         expectedActorId: options.ownerId,
         kind: "create",
         scope,
         title: form.title,
-        source,
+        source: emptyRitualSource,
       });
     if (!request) {
-      setError("Enter a valid title and ritual source.");
+      setError("Enter a valid title.");
       return;
     }
     const serialized = JSON.stringify(request);
@@ -547,9 +507,13 @@ export default function SqlDocAdmin() {
         );
         return;
       }
-      router.push(
-        `/doc/${result.ritualId}/edit${request.version === 3 ? "/semantic" : ""}`,
-      );
+      // The ritual exists: nothing is left to retry or to create again, and
+      // later access checks must not turn the opening notice back into a
+      // recovery prompt or a filled form.
+      replacePending(null);
+      replaceForm(emptyForm());
+      setOpening(result.ritualId);
+      router.push(editorPath(result.ritualId));
     } catch {
       if (currentIdentity(identity))
         setError(SQL_RITUAL_WRITE_MESSAGES.UNAVAILABLE);
@@ -609,6 +573,19 @@ export default function SqlDocAdmin() {
     URL.revokeObjectURL(url);
   };
 
+  if (opening)
+    return (
+      <Box ref={rootRef} aria-label="Ritual creation area" sx={{ my: 2 }}>
+        <Typography variant="h6">Create ritual</Typography>
+        <Alert severity="success">
+          Ritual created. Opening the editor…{" "}
+          <Link ref={openingLinkRef} href={editorPath(opening)}>
+            Open the editor
+          </Link>
+        </Alert>
+      </Box>
+    );
+
   if (!loaded)
     return (
       <Box
@@ -647,6 +624,15 @@ export default function SqlDocAdmin() {
     >
       <div ref={contentRef}>
         <Typography variant="h6">Create ritual</Typography>
+        <Typography
+          id={helpId}
+          variant="body2"
+          color="text.secondary"
+          sx={{ mb: 1 }}
+        >
+          Choose a title and who can read the ritual. Create opens the new
+          ritual in the editor.
+        </Typography>
         {error && <Alert severity="warning">{error}</Alert>}
         {pending && (
           <Alert severity="info">
@@ -659,26 +645,7 @@ export default function SqlDocAdmin() {
             Download retained request
           </Button>
         )}
-        <form onSubmit={submit}>
-          {
-            <TextField
-              select
-              label="Source format"
-              size="small"
-              value={form.format}
-              disabled={busy || !!pending || !!blockedRecovery}
-              onChange={(event) =>
-                updateForm((current) => ({
-                  ...current,
-                  format: event.target.value as FormState["format"],
-                }))
-              }
-              sx={{ minWidth: 180 }}
-            >
-              <MenuItem value="pug">Legacy Pug source</MenuItem>
-              <MenuItem value="semantic">Visual / Ritual Pug</MenuItem>
-            </TextField>
-          }{" "}
+        <form onSubmit={submit} aria-describedby={helpId}>
           <TextField
             label="Title"
             size="small"
@@ -733,38 +700,7 @@ export default function SqlDocAdmin() {
               }
               sx={{ width: 100 }}
             />
-          )}
-          {form.format === "semantic" ? (
-            <RitualCreationEditor
-              key={options.ownerId}
-              source={form.semanticSource}
-              onChange={(semanticSource) =>
-                updateForm((current) => ({ ...current, semanticSource }))
-              }
-              onValidityChange={setComposerValid}
-              initialMode={form.editorMode}
-              onModeChange={(editorMode) =>
-                updateForm((current) => ({ ...current, editorMode }))
-              }
-              disabled={busy || !!pending || !!blockedRecovery}
-            />
-          ) : (
-            <TextField
-              label="Ritual source"
-              multiline
-              minRows={4}
-              fullWidth
-              value={form.source}
-              disabled={busy || !!pending || !!blockedRecovery}
-              onChange={(event) =>
-                updateForm((current) => ({
-                  ...current,
-                  source: event.target.value,
-                }))
-              }
-              sx={{ mt: 1 }}
-            />
-          )}
+          )}{" "}
           <Button
             type="submit"
             disabled={

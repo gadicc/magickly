@@ -228,15 +228,17 @@ export default function TemplesGuide() {
       <h2 id="rituals">Private rituals and grade gating</h2>
       <p>
         Temple administrators create rituals from the{" "}
-        <Link href="/gd/rituals">Rituals</Link> page. The{" "}
-        <strong>Visibility</strong> menu offers the temples they administer;
-        choosing one asks for a <strong>Min Grade</strong>. Members at that
-        grade or above can read the ritual. Members below it cannot see that it
-        exists.
+        <Link href="/gd/rituals">Rituals</Link> page, by giving the ritual a
+        title and choosing who can read it. The <strong>Visibility</strong> menu
+        offers the temples they administer; choosing one asks for a{" "}
+        <strong>Min Grade</strong>. Members at that grade or above can read the
+        ritual. Members below it cannot see that it exists.{" "}
+        <strong>Create</strong> opens the new, empty ritual in the editor, where
+        you write it.
       </p>
       <Figure
         image={createRitual}
-        alt="The Create ritual form: source format, title, a Visibility menu set to the Example temple and a Min Grade field."
+        alt="The Create ritual form: a title, a Visibility menu set to the Example temple, a Min Grade field and a Create button."
         maxWidth={680}
       >
         Choosing the visibility and minimum grade for a new ritual. A minimum of

@@ -22,7 +22,7 @@ import {
 import { userAccess } from "../db/schema/userProfile";
 import { createUuidV7 } from "../lib/ids";
 import * as compiler from "./compileContract";
-import { semanticFromJrt } from "./semantic";
+import { semanticFromJrt, semanticToJrt } from "./semantic";
 import * as semanticCompiler from "./semanticCompile";
 import { createSqlRitualReader } from "./sqlReads";
 import type { SqlRitualWriteRequest } from "./sqlWriteContract";
@@ -365,6 +365,42 @@ describe("atomic canonical SQL-v2 ritual writes", () => {
     ).toMatchObject({
       contentJson: artifact.contentJson,
     });
+  });
+
+  it("creates the empty semantic ritual the creation form sends, once", async () => {
+    // The exact bytes /gd/rituals sends; the author writes it in the editor.
+    const source = '{"format":"magickli-ritual","version":1,"nodes":[]}';
+    const command = {
+      ...create("templeAdmin", {
+        kind: "temple",
+        templeId: temple,
+        minGrade: 0,
+      }),
+      version: 3 as const,
+      source,
+    };
+    const first = await writer("templeAdmin")(command);
+    expect(first).toMatchObject({ ok: true, version: 1, replayed: false });
+    if (!first.ok) throw new Error("Expected empty semantic create");
+    const after = await counts();
+    expect(await writer("templeAdmin")(command)).toEqual({
+      ...first,
+      replayed: true,
+    });
+    expect(await counts()).toEqual(after);
+    const stored = await reader(actor.templeAdmin).getCurrentSource(
+      first.ritualId,
+    );
+    expect(stored?.revision).toMatchObject({
+      source,
+      sourceFormat: semanticCompiler.SEMANTIC_SOURCE_FORMAT,
+    });
+    const rendered = await reader(actor.templeAdmin).getRendered(
+      first.ritualId,
+    );
+    expect(JSON.parse(rendered!.contentJson)).toEqual(
+      semanticToJrt(JSON.parse(source)),
+    );
   });
 
   it("creates a semantic ritual with a selected profile-1 artifact", async () => {

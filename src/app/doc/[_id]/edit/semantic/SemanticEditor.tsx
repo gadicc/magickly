@@ -642,31 +642,36 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     setMode,
   ]);
 
+  const visualEditable =
+    !visualIssue &&
+    access === "ready" &&
+    ready &&
+    !recoveryBlocked &&
+    !saving &&
+    !pending &&
+    !stale &&
+    !source.dirty &&
+    !sourceComposing;
   React.useEffect(() => {
-    if (!editor) return;
-    editor.setEditable(
-      !visualIssue &&
-        access === "ready" &&
-        ready &&
-        !recoveryBlocked &&
-        !saving &&
-        !pending &&
-        !stale &&
-        !source.dirty &&
-        !sourceComposing,
-    );
-  }, [
-    editor,
-    access,
-    ready,
-    recoveryBlocked,
-    saving,
-    pending,
-    stale,
-    visualIssue,
-    source.dirty,
-    sourceComposing,
-  ]);
+    editor?.setEditable(visualEditable);
+  }, [editor, visualEditable]);
+
+  // A new ritual arrives empty from creation. When the editor first becomes
+  // editable, put the caret in it, so the author can type at once and the
+  // visual panel's "Type /" hint (shown only while focused) appears.
+  const arrivalFocused = React.useRef(false);
+  const sourceLines = source.text.split("\n").length;
+  React.useEffect(() => {
+    if (!editor || !visualEditable || arrivalFocused.current) return;
+    arrivalFocused.current = true;
+    if (document.nodes.length) return;
+    if (displayMode === "source")
+      setReveal((current) => ({
+        line: sourceLines,
+        key: (current?.key ?? 0) + 1,
+      }));
+    else editor.commands.focus("end");
+  }, [editor, visualEditable, document.nodes.length, displayMode, sourceLines]);
 
   React.useEffect(() => {
     if (access !== "ready" || !ready || skipPersist.current) return;

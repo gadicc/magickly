@@ -64,6 +64,8 @@ function Host({
           editor={editor}
           disabled={false}
           syncingSource={syncingSource}
+          actorId="01995000-0000-7000-8000-000000000001"
+          ritualId="01995000-0000-7000-8000-000000000003"
         />
       )}
       <EditorContent editor={editor} />

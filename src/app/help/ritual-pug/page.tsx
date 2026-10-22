@@ -33,13 +33,13 @@ export default function RitualPugGuide() {
         Source-only recovery does not replace that preference.
       </p>
       <p>
-        Choose <strong>Visual / Ritual Pug</strong> when creating a ritual.
-        Older Ritual Text drafts are recovered and converted automatically when
-        valid. Incomplete or conflicting buffers remain available to repair,
-        apply or download; pending saves must resolve before conversion. Block
-        IDs and annotations are preserved. Source Undo covers typing in the
-        current view; visual regeneration, discarding source, and recovery
-        conversion start a fresh source history.
+        New rituals use Visual / Ritual Pug: creating one opens it, empty, in
+        this editor. Older Ritual Text drafts are recovered and converted
+        automatically when valid. Incomplete or conflicting buffers remain
+        available to repair, apply or download; pending saves must resolve
+        before conversion. Block IDs and annotations are preserved. Source Undo
+        covers typing in the current view; visual regeneration, discarding
+        source, and recovery conversion start a fresh source history.
       </p>
       <h2>Task settings in the visual editor</h2>
       <p>
@@ -229,10 +229,9 @@ export default function RitualPugGuide() {
       </p>
       <h2>Images</h2>
       <p>
-        Use the visual editor’s Image control after saving a new ritual. It
-        supplies an authorized image URL. Replace the example URL below;{" "}
-        <code>alt</code>
-        describes the image for readers who cannot see it.
+        Use the visual editor’s Image control. It supplies an authorized image
+        URL. Replace the example URL below; <code>alt</code> describes the image
+        for readers who cannot see it.
       </p>
       <Example source={ritualPugExamples.image} />
       <h2>IDs and exact preservation</h2>

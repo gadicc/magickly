@@ -57,6 +57,7 @@ const templeAdminPath = (b: Browser) =>
 const ritualPath = (b: Browser, title: string) =>
   hrefOf(b, "/gd/rituals", "a", title);
 
+const creationArea = '[aria-label="Ritual creation area"]';
 const editorReady = `!!document.querySelector('.cm-content, [contenteditable="true"]')`;
 
 async function editor(b: Browser, mode: "visual" | "source" | "split") {
@@ -148,11 +149,12 @@ const shots: Shot[] = [
     open: async (b) => {
       await b.goto(`${base}/gd/rituals`);
       await b.waitFor(`document.body.textContent.includes('Create ritual')`);
+      await b.type(`${creationArea} input`, "Opening for new members");
       await b.click(".MuiTextField-root", "Visibility");
       await b.click(`[role="option"]`, "Example");
       await b.waitFor(`document.body.textContent.includes('Min Grade')`);
     },
-    clip: `[...byTextAll('h6', 'Create ritual'), ...document.querySelectorAll('form > .MuiTextField-root, form > .MuiFormControl-root')]`,
+    clip: `[document.querySelector(${text(creationArea)})]`,
     padding: 6,
   },
   {

@@ -7,10 +7,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import type { Editor } from "@tiptap/core";
-import React from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { ritualPugStarter } from "@/doc/ritualPugExamples";
 import { creationPublicationHandoffKey } from "@/offline/ritualPublicationHandoff";
 import SqlDocAdmin from "./SqlDocAdmin";
 
@@ -30,6 +27,8 @@ const mock = vi.hoisted(() => ({
   push: vi.fn(),
   start: vi.fn(),
   stateListener: null as null | ((state: typeof runtimeState) => void),
+  // Set when the visual or source editor's modules are imported.
+  editorLoaded: false,
 }));
 
 let runtimeState = {
@@ -76,6 +75,14 @@ vi.mock("@/doc/sqlEditorClient", () => ({
 vi.mock("@/offline/browserRuntime", () => ({
   getBrowserOfflineRuntime: () => runtime,
 }));
+vi.mock("@tiptap/react", async (original) => {
+  mock.editorLoaded = true;
+  return original();
+});
+vi.mock("@/doc/RitualSourceEditor", async (original) => {
+  mock.editorLoaded = true;
+  return original();
+});
 
 const options = {
   version: 1,
@@ -93,6 +100,8 @@ const success = {
   updatedAt: "2026-09-13T12:00:00.000Z",
 };
 const key = `magickli:ritual-create:v2:${ids.actor}`;
+const emptySource = '{"format":"magickli-ritual","version":1,"nodes":[]}';
+const editorPath = `/doc/${ids.ritual}/edit/semantic`;
 
 beforeEach(() => {
   localStorage.clear();
@@ -121,13 +130,6 @@ async function fill() {
   fireEvent.change(await screen.findByLabelText("Title"), {
     target: { value: "New ritual" },
   });
-  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Source format" }));
-  fireEvent.click(
-    await screen.findByRole("option", { name: "Legacy Pug source" }),
-  );
-  fireEvent.change(screen.getByLabelText("Ritual source"), {
-    target: { value: "p Exact source" },
-  });
   fireEvent.mouseDown(screen.getByRole("combobox", { name: "Visibility" }));
   fireEvent.click(
     await screen.findByRole("option", { name: "Synthetic temple" }),
@@ -139,7 +141,7 @@ function emitState(next: typeof runtimeState) {
   mock.stateListener?.(next);
 }
 
-it("retains an exact SQL-v2 create before sending and navigates only after acknowledgement", async () => {
+it("retains an exact empty SQL-v3 create before sending and opens the editor only after acknowledgement", async () => {
   let resolve!: (value: unknown) => void;
   mock.write.mockImplementation(
     () =>
@@ -154,17 +156,17 @@ it("retains an exact SQL-v2 create before sending and navigates only after ackno
   fireEvent.click(screen.getByRole("button", { name: "Create" }));
   const request = mock.write.mock.calls[0][0];
   expect(request).toMatchObject({
-    version: 2,
+    version: 3,
     kind: "create",
     expectedActorId: ids.actor,
     scope: { kind: "temple", templeId: ids.temple, minGrade: 2 },
     title: "New ritual",
-    source: "p Exact source",
+    source: emptySource,
   });
   expect(JSON.parse(localStorage.getItem(key) ?? "null")).toEqual(request);
   expect(mock.push).not.toHaveBeenCalled();
   await act(async () => resolve(success));
-  expect(mock.push).toHaveBeenCalledWith(`/doc/${ids.ritual}/edit`);
+  expect(mock.push).toHaveBeenCalledExactlyOnceWith(editorPath);
   expect(localStorage.getItem(key)).toBeNull();
   expect(
     JSON.parse(
@@ -184,101 +186,134 @@ it("retains an exact SQL-v2 create before sending and navigates only after ackno
   });
 });
 
-it("creates a semantic ritual from Pug and retries the exact v3 request", async () => {
-  mock.write.mockResolvedValueOnce(null).mockResolvedValueOnce(success);
-  render(<SqlDocAdmin />);
-  fireEvent.change(await screen.findByLabelText("Title"), {
-    target: { value: "New semantic ritual" },
+it("offers only the fields creation needs and loads no editor", async () => {
+  // A fresh module registry, so the editor mocks below record this render's
+  // imports whatever earlier tests (or files in this worker) imported.
+  vi.resetModules();
+  mock.editorLoaded = false;
+  const { default: FreshSqlDocAdmin } = await import("./SqlDocAdmin");
+  render(<FreshSqlDocAdmin />);
+  await screen.findByLabelText("Title");
+  expect(screen.getByRole("combobox", { name: "Visibility" })).toBeDefined();
+  expect(screen.queryByRole("combobox", { name: "Source format" })).toBeNull();
+  expect(screen.queryByRole("textbox", { name: /source|editor/i })).toBeNull();
+  expect(screen.queryByText(/Loading ritual editor/)).toBeNull();
+  // A lazily imported editor would have started loading by now.
+  await act(async () => {
+    await new Promise((done) => setTimeout(done, 50));
   });
-  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Source format" }));
-  fireEvent.click(
-    await screen.findByRole("option", { name: "Visual / Ritual Pug" }),
+  expect(mock.editorLoaded).toBe(false);
+});
+
+it("replaces the form with a link to the editor it opens", async () => {
+  await fill();
+  fireEvent.click(screen.getByRole("button", { name: "Create" }));
+  await waitFor(() => expect(mock.push).toHaveBeenCalledOnce());
+  expect(screen.getByText(/Ritual created\. Opening the editor/)).toBeDefined();
+  expect(
+    screen.getByRole("link", { name: "Open the editor" }).getAttribute("href"),
+  ).toBe(editorPath);
+  expect(screen.queryByLabelText("Title")).toBeNull();
+  expect(screen.queryByRole("button", { name: "Retry creation" })).toBeNull();
+});
+
+it("keeps focus with the opening notice", async () => {
+  await fill();
+  expect(
+    screen
+      .getByLabelText("Ritual creation area")
+      .querySelector("form")
+      ?.getAttribute("aria-describedby"),
+  ).toBe(screen.getByText(/Choose a title and who can read/).id);
+  fireEvent.click(screen.getByRole("button", { name: "Create" }));
+  const link = await screen.findByRole("link", { name: "Open the editor" });
+  await waitFor(() => expect(document.activeElement).toBe(link));
+});
+
+it("keeps the opening notice when a later check finds no creation grants", async () => {
+  await fill();
+  fireEvent.click(screen.getByRole("button", { name: "Create" }));
+  await screen.findByText(/Ritual created\. Opening the editor/);
+  mock.options.mockResolvedValueOnce({ ...options, temples: [] });
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "locked",
+      generation: 2,
+      revalidating: true,
+    }),
   );
-  fireEvent.click(await screen.findByRole("button", { name: "Source" }));
-  fireEvent.change(screen.getByLabelText("New ritual source"), {
-    target: {
-      value:
-        "//- magickli-ritual-pug 1\nHiero: Welcome.\n* Keryx Open the door\n",
-    },
-  });
-  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Visibility" }));
-  fireEvent.click(
-    await screen.findByRole("option", { name: "Synthetic temple" }),
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "ready",
+      generation: 3,
+      revalidating: false,
+    }),
   );
+  await waitFor(() => expect(mock.options).toHaveBeenCalledTimes(2));
+  await act(async () => {});
+  expect(screen.getByText(/Ritual created\. Opening the editor/)).toBeDefined();
+  expect(screen.queryByText(/No creation visibility/)).toBeNull();
+  expect(
+    screen.queryByRole("button", { name: "Download retained request" }),
+  ).toBeNull();
+});
+
+it("drops the opening notice on a lock and returns an empty form", async () => {
+  await fill();
+  fireEvent.click(screen.getByRole("button", { name: "Create" }));
+  await screen.findByText(/Ritual created\. Opening the editor/);
+  act(() => emitState({ ...runtimeState, phase: "locked", generation: 2 }));
+  expect(screen.queryByText(/Ritual created/)).toBeNull();
+  expect(screen.queryByRole("link", { name: "Open the editor" })).toBeNull();
+  act(() =>
+    emitState({
+      ...runtimeState,
+      phase: "ready",
+      generation: 3,
+      account: { ownerId: ids.actor, epoch: ids.otherEpoch },
+    }),
+  );
+  expect(
+    ((await screen.findByLabelText("Title")) as HTMLInputElement).value,
+  ).toBe("");
+  expect(screen.queryByRole("button", { name: "Retry creation" })).toBeNull();
+});
+
+it("opens the existing ritual when a retained retry is replayed", async () => {
+  mock.write.mockResolvedValueOnce(null);
+  await fill();
   fireEvent.click(screen.getByRole("button", { name: "Create" }));
   await screen.findByRole("button", { name: "Retry creation" });
   const request = mock.write.mock.calls[0][0];
-  expect(request).toMatchObject({
-    version: 3,
-    kind: "create",
-    title: "New semantic ritual",
-  });
-  expect(JSON.parse(request.source).nodes).toMatchObject([
-    { tag: "task", attrs: { say: true, role: "hiero" } },
-    { tag: "task", attrs: { do: true, role: "keryx" } },
-  ]);
-  expect(JSON.parse(localStorage.getItem(key) ?? "null")).toEqual(request);
-  cleanup();
-  render(<SqlDocAdmin />);
-  await screen.findByRole("button", { name: "Retry creation" });
+  mock.write.mockResolvedValueOnce({ ...success, replayed: true });
   fireEvent.click(screen.getByRole("button", { name: "Retry creation" }));
   await waitFor(() => expect(mock.push).toHaveBeenCalledOnce());
   expect(mock.write.mock.calls[1][0]).toEqual(request);
-  expect(mock.push).toHaveBeenCalledWith(`/doc/${ids.ritual}/edit/semantic`);
+  expect(mock.push).toHaveBeenCalledWith(editorPath);
   expect(localStorage.getItem(key)).toBeNull();
-  expect(
-    JSON.parse(
-      localStorage.getItem(
-        creationPublicationHandoffKey(ids.actor, ids.ritual),
-      ) ?? "null",
-    ),
-  ).toMatchObject({ write: request, result: success });
 });
 
-it("creates a valid semantic ritual from the default visual composer", async () => {
+it("retries a retained legacy SQL-v2 create exactly and opens the editor", async () => {
+  const retained = JSON.stringify({
+    version: 2,
+    operationId: "01995000-0000-7000-8000-000000000009",
+    expectedActorId: ids.actor,
+    kind: "create",
+    scope: { kind: "temple", templeId: ids.temple, minGrade: 1 },
+    title: "Legacy pending",
+    source: "p Exact source",
+  });
+  localStorage.setItem(key, retained);
   render(<SqlDocAdmin />);
-  fireEvent.change(await screen.findByLabelText("Title"), {
-    target: { value: "Visual creation" },
-  });
-  const dom = await screen.findByRole("textbox", {
-    name: "New ritual visual editor",
-  });
-  const editor = (dom as HTMLElement & { editor: Editor }).editor;
-  act(() => {
-    editor.commands.insertContent("Visual words");
-  });
-  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Visibility" }));
   fireEvent.click(
-    await screen.findByRole("option", { name: "Synthetic temple" }),
+    await screen.findByRole("button", { name: "Retry creation" }),
   );
-  fireEvent.click(screen.getByRole("button", { name: "Create" }));
-  await waitFor(() => expect(mock.write).toHaveBeenCalledOnce());
-  expect(mock.write.mock.calls[0][0].version).toBe(3);
-  expect(JSON.parse(mock.write.mock.calls[0][0].source).nodes).toMatchObject([
-    { tag: "title" },
-    { tag: "summary" },
-    { tag: "task" },
-    { tag: "task" },
-    {
-      tag: "summary",
-      children: [
-        { children: [{ text: "The ritual is concluded.Visual words" }] },
-      ],
-    },
-  ]);
-});
-
-it("prefills source with the starter and links to help without leaving the draft", async () => {
-  render(<SqlDocAdmin />);
-  await screen.findByLabelText("Title");
-  const guide = await screen.findByRole("link", { name: /Ritual Pug guide/ });
-  expect(guide.getAttribute("href")).toBe("/help/ritual-pug");
-  expect(guide.getAttribute("target")).toBe("_blank");
-  fireEvent.click(screen.getByRole("button", { name: "Source" }));
-  expect(
-    (screen.getByLabelText("New ritual source") as HTMLTextAreaElement).value,
-  ).toBe(ritualPugStarter);
-  expect(mock.write).not.toHaveBeenCalled();
+  await waitFor(() => expect(mock.push).toHaveBeenCalledOnce());
+  expect(JSON.stringify(mock.write.mock.calls[0][0])).toBe(retained);
+  expect(mock.push).toHaveBeenCalledWith(editorPath);
+  expect(localStorage.getItem(key)).toBeNull();
 });
 
 it("conceals content while reserving page height through repeated same-account checks", async () => {
@@ -296,7 +331,7 @@ it("conceals content while reserving page height through repeated same-account c
   );
   act(() => emitState({ ...runtimeState, phase: "locked", generation: 2 }));
   expect(screen.queryByLabelText("Title")).toBeNull();
-  expect(screen.queryByDisplayValue("p Exact source")).toBeNull();
+  expect(screen.queryByDisplayValue("New ritual")).toBeNull();
   expect(
     getComputedStyle(screen.getByLabelText("Ritual creation area")).minHeight,
   ).toBe("1200px");
@@ -313,46 +348,29 @@ it("conceals content while reserving page height through repeated same-account c
   expect(mock.write).not.toHaveBeenCalled();
 });
 
-it("keeps the creation source mode and draft on a successful focus recheck", async () => {
-  render(<SqlDocAdmin />);
-  fireEvent.change(await screen.findByLabelText("Title"), {
-    target: { value: "Unsaved" },
-  });
-  fireEvent.click(await screen.findByRole("button", { name: "Source" }));
-  const text = "ritual 1\nHiero: My unsaved words.\n";
-  fireEvent.change(screen.getByLabelText("New ritual source"), {
-    target: { value: text },
-  });
+it("keeps the draft on a successful focus recheck", async () => {
+  await fill();
   act(() => emitState({ ...runtimeState, phase: "locked", generation: 2 }));
-  expect(screen.queryByDisplayValue(text)).toBeNull();
+  expect(screen.queryByDisplayValue("New ritual")).toBeNull();
   act(() => emitState({ ...runtimeState, phase: "ready", generation: 3 }));
   expect(
-    ((await screen.findByLabelText("New ritual source")) as HTMLTextAreaElement)
-      .value,
-  ).toBe(text);
-  expect((screen.getByLabelText("Title") as HTMLInputElement).value).toBe(
-    "Unsaved",
+    ((await screen.findByLabelText("Title")) as HTMLInputElement).value,
+  ).toBe("New ritual");
+  expect(screen.getByRole("combobox", { name: "Visibility" }).textContent).toBe(
+    "Synthetic temple",
   );
 });
 
-it("keeps source mode for an exact pending creation after a same-account check", async () => {
+it("keeps an exact pending creation after a same-account check", async () => {
   mock.write.mockResolvedValue(null);
-  render(<SqlDocAdmin />);
-  fireEvent.change(await screen.findByLabelText("Title"), {
-    target: { value: "Pending draft" },
-  });
-  fireEvent.click(await screen.findByRole("button", { name: "Source" }));
-  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Visibility" }));
-  fireEvent.click(
-    await screen.findByRole("option", { name: "Synthetic temple" }),
-  );
+  await fill();
   fireEvent.click(screen.getByRole("button", { name: "Create" }));
   await screen.findByRole("button", { name: "Retry creation" });
   const request = localStorage.getItem(key);
   act(() => emitState({ ...runtimeState, phase: "locked", generation: 2 }));
   act(() => emitState({ ...runtimeState, phase: "ready", generation: 3 }));
-  const source = await screen.findByLabelText("New ritual source");
-  expect((source as HTMLTextAreaElement).disabled).toBe(true);
+  const title = await screen.findByLabelText("Title");
+  expect((title as HTMLInputElement).disabled).toBe(true);
   expect(localStorage.getItem(key)).toBe(request);
   fireEvent.click(screen.getByRole("button", { name: "Retry creation" }));
   await waitFor(() => expect(mock.write).toHaveBeenCalledTimes(2));
@@ -380,30 +398,16 @@ it("releases the reserved page height when the account is signed out", async () 
   expect(
     getComputedStyle(screen.getByLabelText("Ritual creation area")).minHeight,
   ).toBe("0px");
-  expect(screen.queryByDisplayValue("p Exact source")).toBeNull();
+  expect(screen.queryByDisplayValue("New ritual")).toBeNull();
 });
 
-it("keeps invalid ritual text local instead of sending a create request", async () => {
-  render(<SqlDocAdmin />);
-  fireEvent.change(await screen.findByLabelText("Title"), {
-    target: { value: "Invalid semantic ritual" },
+it("keeps an invalid title local instead of sending a create request", async () => {
+  await fill();
+  fireEvent.change(screen.getByLabelText("Title"), {
+    target: { value: "x".repeat(501) },
   });
-  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Source format" }));
-  fireEvent.click(
-    await screen.findByRole("option", { name: "Visual / Ritual Pug" }),
-  );
-  fireEvent.click(await screen.findByRole("button", { name: "Source" }));
-  fireEvent.change(screen.getByLabelText("New ritual source"), {
-    target: { value: "not a ritual" },
-  });
-  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Visibility" }));
-  fireEvent.click(
-    await screen.findByRole("option", { name: "Synthetic temple" }),
-  );
   fireEvent.click(screen.getByRole("button", { name: "Create" }));
-  expect(
-    await screen.findByText(/Line 1: expected \/\/- magickli-ritual-pug 1/),
-  ).toBeTruthy();
+  expect(await screen.findByText("Enter a valid title.")).toBeTruthy();
   expect(mock.write).not.toHaveBeenCalled();
   expect(localStorage.getItem(key)).toBeNull();
 });
@@ -423,6 +427,7 @@ it("retries an uncertain create with the same retained operation after remount",
   fireEvent.click(screen.getByRole("button", { name: "Retry creation" }));
   await waitFor(() => expect(mock.push).toHaveBeenCalledOnce());
   expect(mock.write.mock.calls[1][0]).toEqual(request);
+  expect(mock.push).toHaveBeenCalledWith(editorPath);
 });
 
 it("does not write when browser storage cannot retain the immutable request", async () => {
@@ -483,11 +488,11 @@ it("does not overwrite malformed retained creation evidence", async () => {
   expect(mock.write).not.toHaveBeenCalled();
 });
 
-it("hides creation options and source immediately when the account lifecycle locks", async () => {
+it("hides creation options and the draft immediately when the account lifecycle locks", async () => {
   await fill();
-  expect(
-    (screen.getByLabelText("Ritual source") as HTMLTextAreaElement).value,
-  ).toBe("p Exact source");
+  expect((screen.getByLabelText("Title") as HTMLInputElement).value).toBe(
+    "New ritual",
+  );
   act(() =>
     emitState({
       ...runtimeState,
@@ -495,7 +500,7 @@ it("hides creation options and source immediately when the account lifecycle loc
       generation: 2,
     }),
   );
-  expect(screen.queryByLabelText("Ritual source")).toBeNull();
+  expect(screen.queryByLabelText("Title")).toBeNull();
   expect(screen.queryByText("Synthetic temple")).toBeNull();
 });
 
@@ -511,7 +516,7 @@ it("restores an unsubmitted form after fresh authorization for the same owner", 
       generation: 2,
     }),
   );
-  expect(screen.queryByLabelText("Ritual source")).toBeNull();
+  expect(screen.queryByLabelText("Title")).toBeNull();
 
   act(() =>
     emitState({
@@ -525,9 +530,6 @@ it("restores an unsubmitted form after fresh authorization for the same owner", 
   expect(
     ((await screen.findByLabelText("Title")) as HTMLInputElement).value,
   ).toBe("New ritual");
-  expect(
-    (screen.getByLabelText("Ritual source") as HTMLTextAreaElement).value,
-  ).toBe("p Exact source");
   expect((screen.getByLabelText("Min Grade") as HTMLInputElement).value).toBe(
     "3",
   );
@@ -563,12 +565,8 @@ it("does not reveal an unsubmitted form to a different owner", async () => {
   expect(
     ((await screen.findByLabelText("Title")) as HTMLInputElement).value,
   ).toBe("");
-  expect(screen.queryByLabelText("Ritual source")).toBeNull();
-  expect(
-    await screen.findByRole("textbox", { name: "New ritual visual editor" }),
-  ).toBeDefined();
   expect(screen.queryByDisplayValue("New ritual")).toBeNull();
-  expect(screen.queryByDisplayValue("p Exact source")).toBeNull();
+  expect(screen.queryByText("Synthetic temple")).toBeNull();
 });
 
 it("discards an unsubmitted form when its selected scope is revoked", async () => {
@@ -595,10 +593,6 @@ it("discards an unsubmitted form when its selected scope is revoked", async () =
   expect(
     ((await screen.findByLabelText("Title")) as HTMLInputElement).value,
   ).toBe("");
-  expect(screen.queryByLabelText("Ritual source")).toBeNull();
-  expect(
-    await screen.findByRole("textbox", { name: "New ritual visual editor" }),
-  ).toBeDefined();
   expect(screen.queryByLabelText("Min Grade")).toBeNull();
 });
 
@@ -620,7 +614,7 @@ it("does not reveal a delayed options response after the lifecycle locks", async
     }),
   );
   await act(async () => resolve(options));
-  expect(screen.queryByLabelText("Ritual source")).toBeNull();
+  expect(screen.queryByLabelText("Title")).toBeNull();
   expect(screen.queryByText("Synthetic temple")).toBeNull();
 });
 
@@ -648,12 +642,12 @@ it("ignores an old create acknowledgement after an account switch", async () => 
     localStorage.getItem(creationPublicationHandoffKey(ids.actor, ids.ritual)),
   ).toBeNull();
   expect(localStorage.getItem(key)).not.toBeNull();
-  expect(screen.queryByLabelText("Ritual source")).toBeNull();
+  expect(screen.queryByLabelText("Title")).toBeNull();
 });
 
-it("keeps the creation composer editable during routine checks and resumes the same DOM", async () => {
+it("keeps the creation form editable during routine checks and resumes the same DOM", async () => {
   await fill();
-  const source = screen.getByLabelText("Ritual source") as HTMLTextAreaElement;
+  const title = screen.getByLabelText("Title") as HTMLInputElement;
   let release!: (value: unknown) => void;
   mock.options.mockImplementationOnce(
     () =>
@@ -669,9 +663,9 @@ it("keeps the creation composer editable during routine checks and resumes the s
       revalidating: true,
     }),
   );
-  expect(screen.getByLabelText("Ritual source")).toBe(source);
-  expect(source.value).toBe("p Exact source");
-  expect(source.disabled).toBe(false);
+  expect(screen.getByLabelText("Title")).toBe(title);
+  expect(title.value).toBe("New ritual");
+  expect(title.disabled).toBe(false);
   expect(
     (screen.getByRole("button", { name: "Create" }) as HTMLButtonElement)
       .disabled,
@@ -684,15 +678,13 @@ it("keeps the creation composer editable during routine checks and resumes the s
       revalidating: false,
     }),
   );
-  expect(source.disabled).toBe(false);
+  expect(title.disabled).toBe(false);
   await act(async () => {
     release(options);
   });
-  expect(screen.getByLabelText("Ritual source")).toBe(source);
-  expect(source.disabled).toBe(false);
-  expect((screen.getByLabelText("Title") as HTMLInputElement).value).toBe(
-    "New ritual",
-  );
+  expect(screen.getByLabelText("Title")).toBe(title);
+  expect(title.disabled).toBe(false);
+  expect(title.value).toBe("New ritual");
 });
 
 it("preserves an editable unsubmitted draft after a routine options check fails", async () => {
@@ -715,13 +707,12 @@ it("preserves an editable unsubmitted draft after a routine options check fails"
     }),
   );
   await act(async () => {});
-  expect(screen.getByDisplayValue("p Exact source")).toBeTruthy();
+  expect(screen.getByDisplayValue("New ritual")).toBeTruthy();
   expect(screen.queryByText(/creation is unavailable/)).toBeNull();
   act(() => emitState({ ...runtimeState, phase: "ready", generation: 4 }));
   expect(
-    ((await screen.findByLabelText("Ritual source")) as HTMLTextAreaElement)
-      .value,
-  ).toBe("p Exact source");
+    ((await screen.findByLabelText("Title")) as HTMLInputElement).value,
+  ).toBe("New ritual");
 });
 
 it("keeps a revoked-scope pending request downloadable and retries it exactly after scope returns", async () => {
@@ -806,14 +797,14 @@ it("keeps creation editable when coordinator verification stalls", async () => {
         revalidating: true,
       }),
     );
-    expect(screen.getByLabelText("Ritual source")).toBeTruthy();
+    expect(screen.getByLabelText("Title")).toBeTruthy();
     await act(async () => {
       await vi.advanceTimersByTimeAsync(10_000);
     });
-    expect(screen.getByDisplayValue("p Exact source")).toBeTruthy();
-    expect(
-      (screen.getByLabelText("Ritual source") as HTMLTextAreaElement).disabled,
-    ).toBe(false);
+    expect(screen.getByDisplayValue("New ritual")).toBeTruthy();
+    expect((screen.getByLabelText("Title") as HTMLInputElement).disabled).toBe(
+      false,
+    );
     expect(screen.queryByText(/creation is unavailable/)).toBeNull();
   } finally {
     vi.useRealTimers();
@@ -827,9 +818,8 @@ it("keeps creation editable when coordinator verification stalls", async () => {
     }),
   );
   expect(
-    ((await screen.findByLabelText("Ritual source")) as HTMLTextAreaElement)
-      .value,
-  ).toBe("p Exact source");
+    ((await screen.findByLabelText("Title")) as HTMLInputElement).value,
+  ).toBe("New ritual");
 });
 
 it("allows recovery of an exact pending request when every creation grant is removed", async () => {
@@ -891,7 +881,7 @@ it("accepts a creation acknowledgement across routine account checks", async () 
   await act(async () => {
     release(success);
   });
-  expect(mock.push).toHaveBeenCalledWith(`/doc/${ids.ritual}/edit`);
+  expect(mock.push).toHaveBeenCalledWith(editorPath);
   expect(localStorage.getItem(key)).toBeNull();
 });
 
@@ -907,7 +897,7 @@ it("allows submitting creation while a routine check is in progress", async () =
   );
   fireEvent.click(screen.getByRole("button", { name: "Create" }));
   await waitFor(() => expect(mock.write).toHaveBeenCalledOnce());
-  expect(mock.push).toHaveBeenCalledWith(`/doc/${ids.ritual}/edit`);
+  expect(mock.push).toHaveBeenCalledWith(editorPath);
 });
 
 it("conceals creation after a confirmed missing-actor response", async () => {
@@ -915,25 +905,6 @@ it("conceals creation after a confirmed missing-actor response", async () => {
   mock.authLost = true;
   act(() => emitState({ ...runtimeState, phase: "ready", generation: 2 }));
   await screen.findByText(/creation access changed/);
-  expect(screen.queryByDisplayValue("p Exact source")).toBeNull();
+  expect(screen.queryByDisplayValue("New ritual")).toBeNull();
   expect(screen.queryByText("Synthetic temple")).toBeNull();
 });
-
-vi.mock("@/doc/RitualSourceEditor", () => ({
-  default: ({
-    value,
-    onChange,
-    disabled,
-    label = "Ritual semantic source",
-    onCompositionChange,
-  }) =>
-    React.createElement("textarea", {
-      "aria-label": label,
-      value,
-      disabled,
-      onChange: (event) =>
-        onChange((event.target as HTMLTextAreaElement).value),
-      onCompositionStart: () => onCompositionChange?.(true),
-      onCompositionEnd: () => onCompositionChange?.(false),
-    }),
-}));
