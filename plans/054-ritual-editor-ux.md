@@ -203,3 +203,55 @@ Unverified, needing real devices: the fixed-height surface with an on-screen
 keyboard (Android Chrome resizes only the visual viewport by default, and iOS
 Safari has its own behaviour), and landscape phones about 390 px tall, where
 the header, any notices and the toolbar leave little room for the document.
+
+## Creation opens the editor — 22 October 2026
+
+Gadi asked that `/gd/rituals` stop carrying the whole editor: "Create
+ritual" now asks only for Title, Visibility and (for a temple) Min Grade,
+creates the ritual and opens `/doc/<id>/edit/semantic` in the editor's
+remembered layout (`8b17380`). This supersedes the inline creation editor
+described under Decisions.
+
+- **Initial source.** A SQL-v3 create with an empty semantic document,
+  `{"format":"magickli-ritual","version":1,"nodes":[]}`. The validator and
+  compiler accept it. Its source is `//- magickli-ritual-pug 1`. The
+  "Type /" hint shows only in a focused visual editor, so when the editor
+  first becomes editable on a ritual with no nodes it puts the caret in
+  it: the visual editor, or the source's empty last line in Source
+  layout. The author can type at once and the hint shows.
+- **No format choice.** The Legacy Pug option went: nothing needs to create
+  legacy rituals, and `/doc/<id>/edit` already redirected them to the
+  semantic editor. A SQL-v2 request retained by the old form still replays
+  byte for byte and opens the editor.
+- **Retry and recovery** are unchanged: a pending or uncertain create is
+  retried with its retained operation, and a replayed acknowledgement opens
+  the existing ritual. After an acknowledgement the form clears its draft
+  and pending request and gives way to "Ritual created. Opening the
+  editor…", whose link takes the focus; later access checks keep that
+  notice, and a lock returns an empty form.
+- **Removed:** `RitualCreationEditor` and its tests, the legacy
+  `pugRitualStarter` (`ritualPugStarter` stays for the Ritual Pug guide),
+  and the visual toolbar's "Images can be attached after creating the
+  ritual" branch: `RitualVisualControls` now requires `actorId` and
+  `ritualId`.
+- **Bundle** (webpack production build, `/gd/rituals`, every client chunk of
+  the route plus its lazy chunks): 2,751 KiB raw / 876 KiB gzip before, of
+  which the editor's lazy chunk was 1,296 / 416; 1,238 / 396 after, with no
+  lazy chunk. The route's first load fell from 463 to 396 KiB gzip.
+- **Docs screenshots:** `create-ritual` now clips the whole creation area
+  with a title typed, and needs recapturing with the owner's dev stack.
+- **Moot follow-up:** the hall field in the creation form saved by a Create
+  button that does not take the focus (Safari) no longer applies; it is
+  removed from `000-current-status.md` (plan 061 still records it).
+- **Follow-up:** plain text typed into an empty document becomes a
+  top-level `ritualText` (and a `br` per line break) rather than
+  paragraphs. That is existing visual-editor behaviour, now met first
+  by every new ritual.
+- **Checked** in headless Chromium against a local dev server: the form, the
+  create, the redirect (about 2 s) and typing into the new ritual's visual
+  editor; after the review fixes, reopening that empty ritual put the
+  caret in its visual editor with the hint showing, and the form's
+  `aria-describedby` named its help line. The local dev database keeps two
+  test rituals for the owner to delete: "Create redirect check (agent)"
+  (`01a16538-bc9d-7567-ae3f-7b9a175d362e`, Example temple, grade 0) and
+  the reviewer's "Create redirect review (agent)".

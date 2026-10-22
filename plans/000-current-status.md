@@ -388,9 +388,8 @@ Follow-ups are separate from the completed migration work:
   two-tab draft handling and the editor's error boundary outside
   headless Chromium; halls typed beyond the limits still read whole at
   each rest), Firefox, Safari and real-device
-  checks of the hall editor's pointer and touch handling, a hall field
-  in the creation form saved by a Create button that does not take the
-  focus (Safari), the reader and documentation screenshots unchecked
+  checks of the hall editor's pointer and touch handling, the reader
+  and documentation screenshots unchecked
   after the stage D review fixes (no publication storage locally), the
   warnings' second parse of
   the source (now in idle time), Chromium moving a selected block's DOM
