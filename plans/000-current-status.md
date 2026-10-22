@@ -77,6 +77,11 @@ Follow-ups are separate from the completed migration work:
   upgrades and removals, four audit findings remain unreachable through the
   verified current paths, and the deferred majors list their revisit conditions.
   Dependabot re-evaluates its list after the push; this is not a complete audit.
+- 22 October 2026: sharp 0.35.5 (GHSA-wq5f-xc86-pv6w, librsvg) and
+  source-map-js 1.2.2 in both lockfiles (GHSA-68fv-2mgg-jv7q); the image
+  validation identity rotated with nothing to regenerate. Recorded in the
+  [advisory clearance](035-advisory-clearance.md), with the open vite
+  advisories and an upload-hardening idea as follow-ups.
 
 - TODO: rate limiting for the public component image routes
   (`/api/render/*`, `/api/treeOfLife`). Each distinct query renders through

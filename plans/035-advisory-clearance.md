@@ -145,3 +145,51 @@ still hold, for the reasons recorded there.
   `browserslist` entry when `@serwist/next` moves its exact pin past 4.28.6, and
   the `@esbuild-kit/core-utils>esbuild` entry when `drizzle-kit` drops the
   `@esbuild-kit/esm-loader` declaration its own code no longer uses.
+
+## October 2026: sharp and source-map-js
+
+Added 22 October 2026. Two advisories, closed on branch `gate/sharp-pin`.
+It supersedes Dependabot PR #27.
+
+- **GHSA-wq5f-xc86-pv6w** (high, CVE-2026-96889; Dependabot alert #318), a
+  memory bug in the librsvg that sharp bundles, which can allow remote code
+  execution on glibc Linux (the Vercel target). Fixed in sharp 0.35.5
+  (sharp-libvips 1.3.4: libvips 8.18.7, rsvg 2.63.2). Exposure was narrow:
+  `fileTypeFromBuffer` admits only raster types to sharp for uploads
+  (`validateRitualImage.ts`), and sharp decodes SVG only from the closed
+  component renderer and the social card art.
+- **GHSA-68fv-2mgg-jv7q** (high, CVE-2026-93749; alerts #317 for the root
+  lockfile and #310 for `editor-trial`), in `source-map-js` 1.2.1, an
+  indirect dependency of css-tree, postcss and magicast. Both lockfiles were
+  re-resolved to 1.2.2; every dependent's range already allowed it, so no
+  override remains. The validators call only css-tree's `parse`, `walk`,
+  `lexer` and `ident`, and never build a source map.
+
+**Validation identity.** Both packages are pinned in
+`src/files/ritualImageValidationIdentity.ts`, so the identity rotated twice:
+`e165011c…` → `53e63d52…` (sharp) → `92964229…` (source-map-js). As in the
+September rotation above, nothing stored needed regenerating: catalogs
+compute the identity at runtime, no committed catalog or fixture embeds it,
+publication intents keep it in `planJson` as provenance that the reader
+checks for form, not equality, and bundle manifests leave it out. Retries of
+an operation started before the deploy replay or complete it
+(`ritualPublicationTransition.test.ts`).
+
+**Before and after.** The real validators, run on the old and new versions,
+gave identical results for all 66 images in `public/`, the 17-entry static
+publication catalog, every component image as SVG and PNG, and five social
+card images. Rasterised directly, `public/pics/theoricus1.svg` differs in 59
+of 765,672 raw bytes under rsvg 2.63.2; nothing rasterises, stores or serves
+it that way.
+
+**Follow-ups.**
+
+- next: the critical GHSA-vcvr-r3jv-pc5j (fixed in 16.3.6) and five more
+  (fixed in 16.3.8) closed when Dependabot PR #28 (next 16.3.8) merged on
+  22 October; re-read the alert list after the next push.
+- vite 8.3.0–8.3.2 advisories in both lockfiles: Dependabot PRs #31 (root)
+  and #32 (`editor-trial`) pass CI, but their Vercel previews fail before the
+  build starts; read the build log on the Vercel dashboard before merging.
+- Upload hardening: `validateRitualImage.ts` could check that sharp's
+  `metadata.format` matches the type `fileTypeFromBuffer` detected, so a
+  mismatched file can never reach another decoder such as librsvg.
