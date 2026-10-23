@@ -121,7 +121,7 @@ export interface HallArt {
 /**
  * Art by kind. Keys are tags (`altar`, `pillar`, `lamen`) or `item:<kind>`
  * for items (`item:cross`, `item:cup`). The app composes its own art (the
- * legacy items, `Lamen`) over the package's original art; anything missing
- * draws as a placeholder.
+ * tablets in its Enochian font) over the package's original art; anything
+ * missing draws as a placeholder.
  */
 export type HallArtRegistry = ReadonlyMap<string, HallArt>;

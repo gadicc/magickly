@@ -131,7 +131,6 @@ export default defineConfig({
         "src/components/enochian/Tablet.tsx",
         "src/app/gd/components/lamen.tsx",
         "src/app/gd/hall/*.{ts,tsx}",
-        "src/app/gd/hall/legacyArt/*.{ts,tsx}",
         "src/components/gd/hall/art/*.{ts,tsx}",
         "src/components/gd/hall/attributes.ts",
         "src/components/gd/hall/fonts.ts",

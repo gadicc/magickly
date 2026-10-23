@@ -67,7 +67,7 @@ describe("the palette", () => {
       "label",
     ])
       expect(keys).toContain(key);
-    // The package's items and the legacy art's.
+    // Every item the package draws.
     expect(hallItemKinds(gdHallArt)).toEqual([
       "brazier",
       "bread",

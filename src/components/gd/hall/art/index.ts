@@ -1,5 +1,6 @@
 import type { HallArtRegistry } from "../types";
 import { altarArt } from "./altar";
+import { breadArt, fanArt, roseArt, saltArt } from "./altarItems";
 import { bannerArt } from "./banner";
 import { boardArt } from "./board";
 import { brazierArt, candleArt, gongArt } from "./furnishings";
@@ -46,6 +47,10 @@ export const defaultHallArt: HallArtRegistry = new Map([
   ["item:censer", censerArt],
   ["item:lamp", lampArt],
   ["item:lantern", lanternArt],
+  ["item:rose", roseArt],
+  ["item:salt", saltArt],
+  ["item:bread", breadArt],
+  ["item:fan", fanArt],
   ["tarotKey", tarotKeyArt],
   ["tablet", tabletArt()],
   ["shewbread", shewbreadArt],

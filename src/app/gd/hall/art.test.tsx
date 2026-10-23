@@ -9,18 +9,12 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { gdHallArt } from "./art";
 import { lamenArt } from "./lamenArt";
-import { legacyHallArt } from "./legacyArt";
 
 /**
  * The art that is not original, by registry key. Plan 061 (decision 9):
  * this list must be empty before the project is finished (stage H).
  */
 const THIRD_PARTY_ART = [
-  // Lifted from the old hall drawings; icon-set signatures, source unknown.
-  "item:bread",
-  "item:fan",
-  "item:rose",
-  "item:salt",
   // Lamen: the Kerux's caduceus and the Sentinel's Eye of Horus.
   "lamen",
 ];
@@ -72,23 +66,6 @@ describe("the app's hall art", () => {
     }
   });
 
-  it("names its legacy sources in the public drawings", () => {
-    for (const [key, art] of legacyHallArt) {
-      expect(art.provenance.source, key).toMatch(
-        /^public\/pics\/(neophyte|zelator[12]|theoricus[12])\.svg#/,
-      );
-      expect(art.provenance.licence, key).toBe("unknown");
-    }
-  });
-
-  it("draws every legacy item as plain paths", () => {
-    for (const key of legacyHallArt.keys()) {
-      const markup = draw(key, { type: "item", kind: key.slice(5) });
-      expect(markup, key).toMatch(/<path d="M/);
-      expect(markup, key).not.toMatch(/\sid=|href|<image|filter|url\(/);
-    }
-  });
-
   it("draws the lamens through Lamen, and a plain circle without a role", () => {
     // The Hierophant's striped ring; the Past Hierophant's white one.
     expect(draw("lamen", { type: "officer", role: "hierophant" })).toContain(
@@ -115,7 +92,7 @@ describe("the app's hall art", () => {
     );
   });
 
-  it("validates and draws a hall of legacy items without placeholders", () => {
+  it("validates and draws a hall of every item without placeholders", () => {
     const hall: HallNode = {
       type: "gdHall",
       children: [
@@ -123,12 +100,14 @@ describe("the app's hall art", () => {
           type: "floor",
           children: [
             { type: "officer", role: "keryx", x: 2, y: 2 },
-            ...[...legacyHallArt.keys()].map((key, index) => ({
-              type: "item",
-              kind: key.slice(5),
-              x: 1 + index,
-              y: 8,
-            })),
+            ...[...gdHallArt.keys()]
+              .filter((key) => key.startsWith("item:"))
+              .map((key, index) => ({
+                type: "item",
+                kind: key.slice(5),
+                x: 1 + (index % 14),
+                y: 8 + 2 * Math.floor(index / 14),
+              })),
           ],
         },
       ],

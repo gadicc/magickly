@@ -480,6 +480,10 @@ describe("the items redrawn in stage H", () => {
     ["censer", [73.69, 100]],
     ["lamp", [60.09, 100]],
     ["lantern", [60.09, 100]],
+    ["rose", [100, 36.35]],
+    ["salt", [42.41, 100]],
+    ["bread", [100, 100]],
+    ["fan", [100, 62.79]],
   ]);
 
   it("keep the boxes and the scales the drawings' items had", () => {
@@ -492,8 +496,11 @@ describe("the items redrawn in stage H", () => {
   it("are flat shapes with the one outline, and nothing to load", () => {
     for (const kind of BOXES.keys()) {
       const markup = draw(art(`item:${kind}`), { type: "item", kind });
+      // The rose, small and many-petalled, is drawn in the inner lines'
+      // width throughout.
+      const width = kind === "rose" ? "2.4" : "3.6";
       expect(markup, kind).toContain(
-        '<g stroke="#000000" stroke-width="3.6" stroke-linejoin="round"',
+        `<g stroke="#000000" stroke-width="${width}" stroke-linejoin="round"`,
       );
       expect(markup, kind).not.toMatch(
         /href|\sid=|url\(|<text|<image|Gradient|opacity/,
@@ -502,8 +509,16 @@ describe("the items redrawn in stage H", () => {
     }
   });
 
-  it("draw each vessel alike, whatever the node says", () => {
-    for (const kind of ["cup", "chalice", "censer"])
+  it("draw each item but the lights alike, whatever the node says", () => {
+    for (const kind of [
+      "cup",
+      "chalice",
+      "censer",
+      "rose",
+      "salt",
+      "bread",
+      "fan",
+    ])
       expect(art(`item:${kind}`).variant({ type: "item", fill: "red" })).toBe(
         "",
       );
@@ -576,11 +591,13 @@ describe("the items redrawn in stage H", () => {
   });
 
   it("give metal its one white highlight", () => {
-    for (const kind of ["cup", "chalice", "censer", "lamp", "lantern"]) {
+    for (const kind of BOXES.keys()) {
       const markup = draw(art(`item:${kind}`), { type: "item", kind });
-      expect(markup.match(/fill="none" stroke="#ffffff"/g), kind).toHaveLength(
-        1,
-      );
+      const metal = !["rose", "bread", "fan"].includes(kind);
+      expect(
+        markup.match(/fill="none" stroke="#ffffff"/g) ?? [],
+        kind,
+      ).toHaveLength(metal ? 1 : 0);
     }
   });
 });

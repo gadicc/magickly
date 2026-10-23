@@ -55,7 +55,7 @@ export const itemKindLabel = (kind: string): string =>
 
 /**
  * Every item kind the art draws: the package's own and the registry's
- * (`item:<kind>`, the legacy art included), sorted by name.
+ * (`item:<kind>`), sorted by name.
  */
 export function hallItemKinds(art: HallArtRegistry): string[] {
   const kinds = new Set(CORE_ITEM_KINDS);
