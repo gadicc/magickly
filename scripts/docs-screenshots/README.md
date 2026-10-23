@@ -33,6 +33,67 @@ at a different binary. The capture signs in with the dev-only test buttons
 (`LOOM_LOCAL_TEST_LOGIN=1`), publishes the sample rituals once (readers only get a
 ritual after its saved version is published), then writes WebP files.
 
+## Capturing from a worktree
+
+Agents and other parallel work run in git worktrees, which must not use the
+main checkout's dev server or sign-in cookies. `capture-worktree.sh` runs the
+seed, a dev server and the capture for one worktree:
+
+```sh
+/usr/local/bin/magickli-docs-capture /path/to/worktree create-ritual editor-split
+```
+
+It takes about two minutes; agents should run it with a long timeout or in
+the background.
+
+What it checks, before running anything from the worktree:
+
+- the worktree is one the main checkout has registered (`git worktree list`
+  in the main checkout), and not the main checkout itself;
+- the worktree has no `.env*` file of its own, which Next would load;
+- each shot is a plain name in the worktree's `capture.mts`;
+- the database and storage settings point at this machine.
+
+It then gives the worktree's code only the local development settings,
+read (never sourced) from the main checkout's `.env.local`: the database, the
+MinIO storage and the local test login, with a throwaway auth secret and
+placeholder Google values. API keys, secrets keys and the rest stay out of its
+environment. The dev server listens on 127.0.0.1 on a free port and is
+stopped when the run ends or is interrupted.
+
+**What this does not do.** The worktree's code runs as you, with your files:
+it could read the main checkout's `.env.local`, or anything else in your home
+directory, itself. Keeping other settings out of its environment prevents
+accidental leaks (an environment dump, an error report, the dev overlay in a
+screenshot); it is not a sandbox. Allowing the command is the same trust as
+letting an agent run `pnpm test` in its own worktree. Root ownership protects
+the script's text, not the `node` and `pnpm` it runs.
+
+### Installing
+
+Install it root-owned, outside the repository, with the main checkout's path
+written in, so that a standing permission to run it covers exactly this script
+and only that checkout's worktrees. From the main checkout:
+
+```sh
+sed "s#@MAIN_CHECKOUT@#$PWD#" scripts/docs-screenshots/capture-worktree.sh |
+  sudo tee /usr/local/bin/magickli-docs-capture >/dev/null &&
+  sudo chmod 755 /usr/local/bin/magickli-docs-capture
+```
+
+`tee` run by root creates the file owned by root. Repeat it after reading any
+change to the script; the installed copy does not follow the repository.
+
+Then allow it in Claude Code, by absolute path, in `.claude/settings.local.json`
+under `permissions.allow` (local to your machine, not committed):
+
+```json
+"Bash(/usr/local/bin/magickli-docs-capture:*)"
+```
+
+The absolute path matters: a rule for the bare name would also match a file of
+that name that something placed earlier on your `PATH`, such as `~/bin`.
+
 ## Adding a shot
 
 1. Add a `Shot` to the list in `capture.mts`: a `name` (the file name), a `persona`

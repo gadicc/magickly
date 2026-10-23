@@ -32,6 +32,11 @@ the ritual editor, the reader), regenerate the images and commit them with the
 change. Read `scripts/docs-screenshots/README.md` first: it covers running the
 seed and capture, adding a shot, and the rule that images contain only
 synthetic data (no real temple, member or email; ritual titles are fine).
+From a worktree, capture with
+`/usr/local/bin/magickli-docs-capture <worktree> <shot>...` (the README's
+"Capturing from a worktree"; it takes a few minutes, so use a long timeout);
+if it is not installed, ask the owner rather than starting a dev server with
+the main checkout's `.env.local`.
 
 ## Outside sources
 
