@@ -288,7 +288,7 @@ describe("validateHall", () => {
           { type: "hebrewLetter", letter: "omega" },
           { type: "hebrewLetter" },
           { type: "item" },
-          { type: "item", kind: "cup" },
+          { type: "item", kind: "goblet" },
           { type: "marker" },
           { type: "label" },
           { type: "door" },
@@ -321,7 +321,7 @@ describe("validateHall", () => {
   it("knows the art registry's tags and item kinds", () => {
     const art = new Map<string, HallArt>([
       [
-        "item:cup",
+        "item:goblet",
         {
           Component: () => null,
           box: { width: 1, height: 1 },
@@ -364,8 +364,8 @@ describe("validateHall", () => {
         },
       ],
     ]);
-    expect(itemKindKnown("cup", art)).toBe(true);
-    expect(itemKindKnown("cup")).toBe(false);
+    expect(itemKindKnown("goblet", art)).toBe(true);
+    expect(itemKindKnown("goblet")).toBe(false);
     expect(itemKindKnown("cross")).toBe(true);
     expect(hallTagSpec("tablet", art)?.role).toBe("placeable");
     expect(hallTagSpec("text", art)).toBeUndefined();
@@ -373,7 +373,7 @@ describe("validateHall", () => {
     const result = validateHall(
       hall(
         floor(
-          { type: "item", kind: "cup" },
+          { type: "item", kind: "goblet" },
           { type: "tablet", element: "earth", x: 1 },
           { type: "tablet", element: "fire" },
           { type: "veil", x: 2 },

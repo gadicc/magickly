@@ -411,6 +411,9 @@ export const CORE_ITEM_KINDS: ReadonlySet<string> = new Set([
   "gong",
   "brazier",
   "candle",
+  "cup",
+  "chalice",
+  "censer",
 ]);
 
 /** The deepest nesting the validator and the resolver follow. */

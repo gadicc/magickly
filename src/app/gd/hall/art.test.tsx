@@ -18,9 +18,6 @@ import { legacyHallArt } from "./legacyArt";
 const THIRD_PARTY_ART = [
   // Lifted from the old hall drawings; icon-set signatures, source unknown.
   "item:bread",
-  "item:censer",
-  "item:chalice",
-  "item:cup",
   "item:fan",
   "item:lamp",
   "item:lantern",

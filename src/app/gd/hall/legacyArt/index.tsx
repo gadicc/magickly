@@ -7,9 +7,6 @@ import type {
 import { enumAttr } from "@magick-components/gd/hall/attributes";
 import { HALL_COLOURS } from "@magick-components/gd/hall/vocabulary";
 import { bread } from "./bread";
-import { censer } from "./censer";
-import { chalice } from "./chalice";
-import { cup } from "./cup";
 import { type LegacyDrawing, LegacyPaths } from "./drawing";
 import { fan } from "./fan";
 import { lamp } from "./lamp";
@@ -74,8 +71,6 @@ const lampArt = (defaultGlass: string, source: string): HallArt => {
 
 /** The legacy items by registry key, for the app's art registry. */
 export const legacyHallArt: ReadonlyMap<string, HallArt> = new Map([
-  ["item:cup", art(cup, "public/pics/neophyte.svg#g26")],
-  ["item:chalice", art(chalice, "public/pics/zelator2.svg#g6960")],
   ["item:salt", art(salt, "public/pics/neophyte.svg#g7064")],
   ["item:bread", art(bread, "public/pics/neophyte.svg#g11-8")],
   ["item:rose", art(rose, "public/pics/neophyte.svg#g6-06")],
@@ -87,6 +82,5 @@ export const legacyHallArt: ReadonlyMap<string, HallArt> = new Map([
       "public/pics/neophyte.svg#g2-6 (glazed as zelator1.svg#g49)",
     ),
   ],
-  ["item:censer", art(censer, "public/pics/zelator2.svg#g239")],
   ["item:fan", art(fan, "public/pics/theoricus1.svg#g1-0")],
 ]);

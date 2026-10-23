@@ -15,6 +15,7 @@ import { platformArt, throneArt } from "./platform";
 import { candlestickArt, shewbreadArt, tabletArt } from "./symbols";
 import { tarotKeyArt } from "./tarotKey";
 import { veilArt } from "./veil";
+import { censerArt, chaliceArt, cupArt } from "./vessels";
 
 /**
  * The package's own art, all original (MIT). The app composes its art over
@@ -39,6 +40,9 @@ export const defaultHallArt: HallArtRegistry = new Map([
   ["item:gong", gongArt],
   ["item:brazier", brazierArt],
   ["item:candle", candleArt],
+  ["item:cup", cupArt],
+  ["item:chalice", chaliceArt],
+  ["item:censer", censerArt],
   ["tarotKey", tarotKeyArt],
   ["tablet", tabletArt()],
   ["shewbread", shewbreadArt],

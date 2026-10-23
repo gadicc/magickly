@@ -96,12 +96,12 @@ describe("GdHall", () => {
         floor(
           { type: "unicorn" },
           { type: "text", value: "hidden" },
-          { type: "item", kind: "cup" },
+          { type: "item", kind: "goblet" },
         ),
       ),
     );
     expect(markup.match(/stroke-dasharray="6 4"/g)).toHaveLength(3);
-    for (const name of ["unicorn", "text", "item:cup"])
+    for (const name of ["unicorn", "text", "item:goblet"])
       expect(markup).toContain(`>${name}</text>`);
     expect(markup).not.toContain("hidden");
   });

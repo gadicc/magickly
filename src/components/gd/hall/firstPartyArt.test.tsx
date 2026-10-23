@@ -468,3 +468,48 @@ describe("the kamea art's bytes", () => {
     );
   });
 });
+
+describe("the items redrawn in stage H", () => {
+  /**
+   * The boxes the drawings' items had: part of the layout contract
+   * (plan 061, decision 4), so saved halls and presets keep their places.
+   */
+  const BOXES: ReadonlyMap<string, [number, number]> = new Map([
+    ["cup", [76.67, 100]],
+    ["chalice", [56.17, 100]],
+    ["censer", [73.69, 100]],
+  ]);
+
+  it("keep the boxes and the scales the drawings' items had", () => {
+    for (const [kind, [width, height]] of BOXES) {
+      expect(art(`item:${kind}`).box, kind).toEqual({ width, height });
+      expect(art(`item:${kind}`).inset, kind).toBeUndefined();
+    }
+  });
+
+  it("are flat shapes with the one outline, and nothing to load", () => {
+    for (const kind of BOXES.keys()) {
+      const markup = draw(art(`item:${kind}`), { type: "item", kind });
+      expect(markup, kind).toContain(
+        '<g stroke="#000000" stroke-width="3.6" stroke-linejoin="round"',
+      );
+      expect(markup, kind).not.toMatch(
+        /href|\sid=|url\(|<text|<image|Gradient|opacity/,
+      );
+      expect(art(`item:${kind}`).provenance.origin, kind).toBe("original");
+      // One drawing whatever the node says.
+      expect(art(`item:${kind}`).variant({ type: "item", fill: "red" })).toBe(
+        "",
+      );
+    }
+  });
+
+  it("give metal its one white highlight", () => {
+    for (const kind of ["cup", "chalice", "censer"]) {
+      const markup = draw(art(`item:${kind}`), { type: "item", kind });
+      expect(markup.match(/fill="none" stroke="#ffffff"/g), kind).toHaveLength(
+        1,
+      );
+    }
+  });
+});
