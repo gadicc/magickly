@@ -376,6 +376,15 @@ Follow-ups are separate from the completed migration work:
   editor. At Gadi's request the research on the tablets' versions is
   kept in magick-data (`enochian/tabletNotes`) and shown on
   `/enochian/tablets`, square by square where the sources differ.
+  The core of stage H is done on `gate/gd-hall-h` (23 October 2026), in
+  the flat-emblem style Gadi chose that day: the cup, chalice, censer,
+  lamp and lantern, rose, salt (a shaker), bread (a round loaf) and fan
+  are original drawings in the MIT package, in the old boxes so no hall
+  moves; lamps and lanterns take a `light` colour (red, yellow or white;
+  a lamp red and a lantern yellow by default), checked, offered in the
+  properties panel and carried in the Pug; the Keryx's caduceus and the
+  Sentinel's Eye of Horus are redrawn, `Lamen` is in
+  `src/components/gd` and the third-party art list is empty.
   Waiting for Gadi from it (decision renders outside the repository,
   plan 061; the colours at the end of the project): the Water and Fire
   letter choices (a variants table in plan 061), whether Earth and Air
@@ -384,8 +393,10 @@ Follow-ups are separate from the completed migration work:
   second letters are drawn, the Union on the page and the image route,
   and a source `version` for the tablets. TODO from earlier: Gadi's call on the Chiefs on the new presets' daises
   (after the merge; he leans towards Greer's redraws), the stage F
-  markers and placeholders for stage H (seals, Eden, the Fall, adept
-  lamens, the Minutum Mundum's path colours); recording officer movement between stations, a `gdVault` for
+  markers and placeholders Gadi has yet to decide on in stage H (Pan, the
+  Devil, Death and Typhon; Eden and the Fall; the adepts' lamens; the
+  Tree markers; the Minutum Mundum's path colours), and the seals,
+  deferred (adapt `/gd/sigils` to draw kamea sigils, decided later); recording officer movement between stations, a `gdVault` for
   the Adeptus Minor Vault, original Enochian letterforms, moving
   `enochianFont.ts` and the other files the import-boundary test allows out
   of `src/components` (or off their app imports), embedded fonts in the Tree

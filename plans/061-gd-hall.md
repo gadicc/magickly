@@ -32,7 +32,15 @@ follow-ups Gadi decided on 20 October 2026 are done on
 `gate/gd-hall-f2`: the properties panel beside the drawing whenever it
 fits (split `/gd/hall` at the full width) and docked at the foot of the
 screen otherwise, and the kameas in magick-data with a shared `Kamea`
-component the hall wraps (Follow-ups after stage F); stage G is next.
+component the hall wraps (Follow-ups after stage F). Stage G is done
+on `gate/gd-hall-g` (21 October 2026): the Water, Fire and Union tablets
+(Stage G notes). The core of stage H is done on `gate/gd-hall-h` (23
+October 2026), in the style Gadi chose that day: the nine items drawn
+from the old drawings and the Keryx's and Sentinel's glyphs are original
+flat emblems, lamps and lanterns take a `light` colour, `Lamen` is in
+the MIT package and the third-party list is empty (Stage H notes); the
+seals, the boards, the figure markers, the adepts' lamens and the
+Minutum Mundum's colours wait for Gadi.
 
 Composable Golden Dawn temple-hall diagrams, authored in the ritual Pug
 dialect, drawn as inline SVG in the reader and editor, edited visually, and
@@ -98,6 +106,8 @@ Research on 17 October 2026 (agents' reports checked against the code):
   not put under MIT (the legacy drawings' items, and `Lamen` until its
   caduceus and Eye of Horus are replaced) for the reader block, the editor
   and `/gd/hall`. Preset snapshot tests run with the composed registry.
+  Since stage H all of the art is the package's, and the app composes
+  only the tablets' Enochian font over it.
 - **Input shape.** `GdHall` takes the compiled json-rich-text row shape
   (`{type, …attrs, children}`), which is what the reader holds; numbers may
   arrive as numeric strings from the legacy `prepare.js` path. The editor
@@ -344,7 +354,7 @@ Placeables:
 | `banner(kind)` | `east` or `west` |
 | `hebrewLetter(letter)` | A Hebrew-letter banner, in a row or anywhere |
 | `tablet(element)` | Reuses `Tablet`: earth, air, water, fire and union (stage G), the Tablet of Union on a board of its own shape |
-| `item(kind)` | Art registry: cup, chalice, salt, bread, rose, lamp, lantern, censer, fan, cross (`form`: calvary, latin, greek, greekFiveSquares, fourTriangles), triangle (`dir`: up, down), pentagram, pantacle, serpentTree, lightning, gong, brazier, candle (stage F; the rubrics' candles beside the altar) |
+| `item(kind)` | Art registry: cup, chalice, salt, bread, rose, lamp, lantern (`light`: red, yellow, white; a lamp red and a lantern yellow by default; stage H), censer, fan, cross (`form`: calvary, latin, greek, greekFiveSquares, fourTriangles), triangle (`dir`: up, down), pentagram, pantacle, serpentTree, lightning, gong, brazier, candle (stage F; the rubrics' candles beside the altar) |
 | `tarotKey(n)` | An original simplified card: numeral, Hebrew letter and title from magick-data; `n` is clamped to 0–21 and rounded, with a warning |
 | `kamea(planet)`, `seal(planet)` | The number square drawn from its numbers (Agrippa's squares, computed in magick-data's `astrology/kameas` and drawn by the shared `Kamea`, since the follow-ups after stage F); seals a placeholder until stage H. `planet`: saturn, jupiter, mars, sun, venus, mercury, moon (the hall's words, mapped to magick-data's `sol` and `luna`) |
 | `board(kind)` | A diagram on a stand: flamingSword and minutumMundum through the Tree's figure (`TreeFigure`, shared with `TreeOfLife`); gardenOfEden and theFall as labelled boards first |
@@ -496,6 +506,16 @@ the reader is a later stage.
   attribution must travel with the file.
 - Replacements are original flat drawings in the lamens' style: black
   outline, limited palette, hand-authored SVG paths.
+- Done in stage H (Stage H notes): the items are original in
+  `src/components/gd/hall/art` and `legacyArt/` is gone; the caduceus
+  and the Eye of Horus are redrawn and `Lamen` is
+  `src/components/gd/Lamen.tsx`, which the package's `lamen` art draws
+  through, so the app injects neither; `THIRD_PARTY_ART` is empty. The
+  hall package is clean, but the old drawings in `public/pics` that the
+  built-in rituals still show (`0=0.pug`, `1=10.pug`, `2=9.pug`), which
+  offline bundles capture, still carry both icons (the Neophyte's both,
+  the Zelator's and Theoricus' the caduceus), so `/about#credits` keeps
+  both credits, worded for those drawings, until stage I replaces them.
 
 ### 10. Ritual integration
 
@@ -728,29 +748,29 @@ For the Enochian tablets (stage G):
 | Item | Today | Status |
 | --- | --- | --- |
 | Checker floor, walls, dais, door | drawings, first-party | regenerated in code (A1) |
-| Lamens | `Lamen`, first-party, injected as `lamenArt` (`src/app/gd/hall`) | Past Hierophant added (A2); collar rings, the Hierophant striped (before B); caduceus and Eye of Horus to replace |
+| Lamens | `Lamen`, first-party | Past Hierophant added (A2); collar rings, the Hierophant striped (before B); the caduceus and the Eye of Horus redrawn from geometry and `Lamen` moved to `src/components/gd/Lamen.tsx` (MIT), drawn by the package's `lamen` art (H) |
 | Pillars, banners, Hebrew banners | drawings, first-party | ported into code (A1) |
 | Pantacle | drawing, first-party | redrawn from geometry, `item:pantacle` (A2) |
 | Flaming Sword (lightning) | drawing, first-party | redrawn without markers, `item:lightning` (A2) |
 | Enochian tablets and sigils | `Tablet`, first-party | reused as `tablet` (A2); the Water and Fire sigils drawn from geometry after Regardie's description and the Tablet of Union drawn (G); font licence open |
 | Table of Shewbread, candlestick | components, first-party | reused as `shewbread`, `candlestick` (A2) |
-| Cup, chalice, salt, bread, rose, lamp, lantern, censer, fan | drawings, icon-set signatures, no source | lifted into `src/app/gd/hall/legacyArt/` (A2, AGPL, injected); replace |
-| Caduceus (Keryx lamen) | SVG Repo, "public domain" label | replace |
-| Eye of Horus (Sentinel lamen) | game-icons.net, CC BY | replace |
+| Cup, chalice, salt, bread, rose, lamp, lantern, censer, fan | drawings, icon-set signatures, no source | lifted into `src/app/gd/hall/legacyArt/` (A2, AGPL, injected); redrawn as original flat emblems in the old boxes, `vessels.tsx`, `lights.tsx`, `altarItems.tsx` (H, `original()`), `legacyArt/` removed |
+| Caduceus (Keryx lamen) | SVG Repo, "public domain" label | redrawn from geometry in `Lamen` (H) |
+| Eye of Horus (Sentinel lamen) | game-icons.net, CC BY | redrawn from strokes after the wedjat's ancient form in `Lamen` (H); the old drawings in `public/pics` still carry it and the caduceus, so `/about` credits both for them until stage I |
 | Tarot XXI on the Theoricus altar | RWS raster in the drawing | original card, `tarotKey` (A2) |
-| Serpent on the Tree, Moon kamea, Moon seals | rasters in Theoricus 2, no source | markers in the preset (A2); the kamea computed and drawn, `kamea` (F), through the shared `Kamea` (after F); the seals a placeholder, `seal` (F), to draw in H; the serpent a marker, to draw in H |
+| Serpent on the Tree, Moon kamea, Moon seals | rasters in Theoricus 2, no source | markers in the preset (A2); the kamea computed and drawn, `kamea` (F), through the shared `Kamea` (after F); the seals a placeholder, `seal` (F), deferred by Gadi in H (Follow-ups); the serpent a marker, pending Gadi's decision |
 | Planetary kameas | none | computed (Agrippa's squares) and drawn from geometry, `kamea` (F); since the follow-ups after F the squares are magick-data's (`astrology/kameas`, MIT code, no rights asserted over the squares) and the drawing is `Kamea` (`src/components/astrology/Kamea.tsx`, MIT), which the hall's `kamea` art wraps in its font and palette; seals and sigils to overlay it in H |
-| Planetary seals | none | placeholder `seal`, a dashed ring naming the planet (F); draw in H |
-| Flaming Sword and Minutum Mundum boards | `TreeOfLife`, first-party | `TreeFigure` (the Tree's own geometry) on a board, `board` (F); the Minutum Mundum's paths in their colours need path colour data (H) |
-| Garden of Eden, the Fall | none | labelled boards (F); draw in H |
+| Planetary seals | none | placeholder `seal`, a dashed ring naming the planet (F); deferred (H, Gadi's decision): `/gd/sigils` to be adapted to draw kamea sigils, decided later |
+| Flaming Sword and Minutum Mundum boards | `TreeOfLife`, first-party | `TreeFigure` (the Tree's own geometry) on a board, `board` (F); the Minutum Mundum's paths in their colours need path colour data; pending Gadi's decision (H) |
+| Garden of Eden, the Fall | none | labelled boards (F); pending Gadi's decision (H) |
 | Veil, white altar, gong, brazier, candle | none | original geometry (F) |
-| Adept lamens | none | plain circles in the hall and as role icons (F); draw in H |
-| Markers in the stage F presets | none | the Fire and Water tablets and the Tablet of Union drawn (stage G); "Venus on the Tree of Life" (conflict 10), "Mercury" (3=8), Pan, the Devil, Death and Typhon (Portal 2), the Theoricus' seat (Practicus): draw or keep in H |
+| Adept lamens | none | plain circles in the hall and as role icons (F); pending Gadi's decision on what each shows (H) |
+| Markers in the stage F presets | none | the Fire and Water tablets and the Tablet of Union drawn (stage G); "Venus on the Tree of Life" (conflict 10), "Mercury" (3=8), Pan, the Devil, Death and Typhon (Portal 2), the Theoricus' seat (Practicus): markers still, pending Gadi's decision (H) |
 
 The third-party list the plan requires (decision 9) is
 `THIRD_PARTY_ART` in `src/app/gd/hall/art.test.tsx`: the nine legacy
-items and `lamen` (for its caduceus and Eye of Horus). Stage H brings it to
-zero.
+items and `lamen` (for its caduceus and Eye of Horus) until stage H,
+which brought it to zero; the test keeps it there.
 
 Outside this project but found on the way: `2=9.pug:414` hotlinks a Pinterest
 image; the 22 RWS tarot JPGs in `public/tarot/rws` are uncredited (public
@@ -792,7 +812,7 @@ Each stage is a series of gated commits on `gate/gd-hall`.
 | E | `/gd/hall` source, visual and split playground with local draft and share link | yes | done (19 October 2026; Stage E notes): the gallery became a hall editor built from the shared source panel and visual editor, with presets, its own history, a draft in localStorage, share links in the fragment, export and Copy Pug source |
 | F | Remaining vocabulary and the presets for Practicus, Philosophus and Portal (markers where art is missing) | yes | done (19 October 2026; Stage F notes): kameas, placeholder seals, boards, veil, white altar, gong, brazier, candle, the adepts in the ritual roles, nine presets from the 1938 layouts; the layout switch reads Source, Split, Visual and the drawing comparison is gone |
 | G | magick-data: Water, Fire and Union tablets | yes | done (21 October 2026; Stage G notes), with Gadi's split ratios first; the letter choices and the Earth and Air question await Gadi |
-| H | Original artwork; ledger to zero; `Lamen` moves to the MIT directory; credits | yes | |
+| H | Original artwork; ledger to zero; `Lamen` moves to the MIT directory; credits | yes | core done (23 October 2026; Stage H notes): the nine items, `light`, the Keryx's and Sentinel's glyphs, `Lamen` in the MIT package, the ledger at zero; the seals deferred and the boards, figure markers, adept lamens and Minutum Mundum colours pending Gadi's decision |
 | I | Built-in docs switched to presets; reader export; end-of-project review of `/gd/hall`, scales and the conflicts table | yes | |
 | J | Private hall sources, written outside the repository for Gadi to save in his private rituals | — (nothing committed) | |
 
@@ -3407,6 +3427,270 @@ it in the hall's.
   `tablet(element="union", x=8, scale=0.9)`. No console errors.
   Screenshots are outside the repository.
 
+## Stage H notes
+
+Built on `gate/gd-hall-h` (23 October 2026), from `main` at 570e5f8,
+after a design round outside the repository (three directions, mock-ups
+at real sizes) and Gadi's decisions of the same day. This is the core
+of the stage: the third-party art is gone. What Gadi has not decided
+yet is listed at the end and in Follow-ups.
+
+### Gadi's decisions (23 October 2026)
+
+- **One style for everything**: direction A, the flat emblem: flat fills
+  from the hall's palette, one black outline, one accent per object,
+  plus a single white highlight on metal (from direction C). It matches
+  the first-party art already in the hall (the gong, brazier, candle,
+  pillars and pantacle), reads at 16 to 24 px on the checker and on the
+  black altar, and needs no gradients, ids or `<defs>` of its own.
+- **Boxes stay**: every item is drawn into the box the old drawing had
+  (decision 4's layout contract), so no saved hall or preset moves. The
+  Zelator test that pins the lantern, the salt and the tablet passes
+  with the presets untouched.
+- **What the items are**: the salt a shaker (more recognisable than a
+  cellar), the bread a round loaf, the censer standing, the rose
+  heraldic; the lights per the rituals (below).
+- **Lamens**: the caduceus and the Eye of Horus as drafted; `Lamen`
+  moves to the MIT directory.
+- **Seals deferred**: the placeholder stays (Follow-ups).
+
+### The palette
+
+`PALETTE` (`art/shared.ts`) gains the items' materials. The gold stays
+the hall's gold, as on the banners and the gong, with the named `gold`
+as its deep tone; the outline is one weight for every item.
+
+| Entry | Colour | Used for |
+| --- | --- | --- |
+| `gold` (existing) | `#fae513` | cup, chalice, the rose's seed, the gong's boss |
+| `goldDeep` | `#d4a017` | rims, knops and the chalice's band |
+| `silver` | `#d3d7dc` | the censer, the salt's cap |
+| `bronze` (existing) | `#b08d3c` | the lantern, the censer's band and finial, the fan's guards |
+| `wine` | `#7a0c1e` | the cup's wine |
+| `rose` | `#d92128` | petals, the chalice's jewels |
+| `green` | `#108010` | the rose's stem, leaves and barbs |
+| `bread`, `crumb` | `#e3a857`, `#f6d79a` | the loaf, its scored crust |
+| `air` | `#ffe000` | the fan, the flame's core |
+| `glassRed`, `glassYellow`, `glassWhite` | `#ff9a8a`, `#fbf0b8`, `#ffffff` | a light's panes |
+| `flame`, `fire` (existing) | `#ff9a1f`, `#d92128` | flames, the censer's glowing piercings |
+
+`ITEM_OUTLINE` is black, 3.6 units in a drawing 100 units on its longer
+side, round joins, set on each drawing's group so its shapes give only
+fills; `ITEM_DETAIL` (2.4) is for the few inner lines (a few tiny parts,
+the jewels, thorns and fan ribs, are hairlines of 1.2 to 1.6), and
+`HIGHLIGHT` is a 2.6-unit white stroke along the lit side of metal (the
+cup, chalice, censer, salt cap and lantern roof). The rose, small and
+many-petalled, is drawn in the detail width throughout. The gong, the
+brazier and the candle took the same weights (their outlines were 3
+and 2, inner lines 1.5 to 2).
+
+### The items
+
+All in `src/components/gd/hall/art` with `original()` provenance and
+`sameForEveryNode` variants (the lights excepted), drawn from geometry:
+lathe profiles written as their right half and mirrored (`mirrored`),
+smooth curves through points (`smoothPath`), polar points; no image was
+traced or sampled, the old drawings were looked at only for what each
+item shows and how big it is.
+
+| Kind | Box (unchanged) | Drawing | Module |
+| --- | --- | --- | --- |
+| cup | 76.67 × 100 | a wide gold goblet, wine at the brim | `vessels.tsx` |
+| chalice | 56.17 × 100 | a taller bowl, a jewelled band, two knops | `vessels.tsx` |
+| censer | 73.69 × 100 | standing: a domed silver lid, pierced and glowing, on a bowl, stem and foot | `vessels.tsx` |
+| lamp, lantern | 60.09 × 100 | a lantern: ring, roof, glazed panes, flame, stepped base | `lights.tsx` |
+| rose | 100 × 36.35 | heraldic: five petals over five, barbs, seed, on a stem with two leaves and two thorns | `altarItems.tsx` |
+| salt | 42.41 × 100 | a shaker: pierced silver cap, a glass of salt marked with salt's sign | `altarItems.tsx` |
+| bread | 100 × 100 | a round loaf, scored three times, 80 tall (review) | `altarItems.tsx` |
+| fan | 100 × 62.79 | folding, Air's yellow, twelve ribs, scalloped | `altarItems.tsx` |
+
+The nine join `CORE_ITEM_KINDS`, so the validator knows them without
+the app's registry.
+
+### Lamps and lanterns
+
+The rituals need a red light and a yellow one. `0=0.pug` puts a red
+lamp on the altar and gives the Keryx "lamen, lamp, and wand", the
+"Lamp of Hidden Knowledge" he raises; `1=10.pug` asks for a red light
+on the altar; `2=9.pug` sets the elements' fan, lamp, cup and salt
+round the altar diagram. The presets draw red lamps (the Neophyte and
+Zelator altars, the Practicus and Philosophus stations and altars), yellow
+lanterns (the Zelator's North wall and altar, the Theoricus' before the
+dais and on the altar), and the Portal's white lamp.
+
+- **One drawing, two kinds.** A lamp and a lantern draw the same
+  lantern, as the old drawings did (their lanterns were the lamp
+  stretched). They stay two kinds: their default scales differ (0.47
+  and 1.19, 0.94 and 2.38 squares tall), which is the layout contract,
+  and saved halls and the presets name both.
+- **`light`**: `red`, `yellow` or `white`, the colour of the panes; a
+  lamp is red and a lantern yellow by default, as before. The name says
+  what it colours, as `fill` and `stroke` do, and is none of decision
+  2's reserved names. It is the lights' art attribute (`HallArt.attributes`),
+  so the validator checks it on lamps and lanterns and reports it on any
+  other item, the properties panel offers it as "Light colour" for those
+  two only, and the Pug round trip carries it like any attribute (the
+  Portal 1 preset's `item(kind="lamp", light="white", …)`). The variant
+  is the colour drawn, so a hall carries at most three drawings per
+  kind, six in all.
+- **Earlier halls.** The glass used to take the generic `fill`; a lamp
+  or lantern saved with `fill` red, yellow or white still draws it when
+  it has no `light` (other colours draw the kind's default). The Portal
+  1 preset now says `light="white"`. Any other `fill` on a light, or one
+  beside `light`, draws the kind's default, so the validator warns
+  "item: fill no longer colours a lamp; use light (red, yellow or
+  white)", and the panel names that field "Fill (old light colour)"
+  (shown only where a hall still has it); a label rather than an offer
+  to move the value, which would be a second kind of edit for one old
+  attribute.
+- **The panel** offers `fill`, `stroke` and `dir` only to the items
+  that draw them (`fill` to crosses, triangles and pentagrams, `stroke`
+  to those and the lightning, `dir` to triangles and pentagrams), or
+  when a node already has them; it used to offer colours to every item
+  and hid a pentagram's `dir`.
+
+### The lamens
+
+- **The caduceus** (`Lamen`'s Keryx glyph): a staff and ball, two wings
+  (one hand-written path, flipped), and two serpents
+  `x = ±A·sin(2π·0.75·t)`, widening from the tail, sampled at 16 points
+  and drawn smooth to one decimal: one crossing and two thick coils,
+  the heads below the ball (after the review, for the 20 px role icon;
+  the first version had 1.25 turns, thinner serpents and heads over the
+  ball). The serpents lie on a halo of the disc's black, and each is
+  drawn again on its halo where it passes over the other, so they
+  interlace with no ids or masks. Scaled so the wings stay inside the
+  disc. The Keryx's role icon is 4,429 bytes of markup,
+  against 5,832 with the SVG Repo icon; the Sentinel's 1,022, against
+  3,517.
+- **The Eye of Horus** (the Sentinel's): the brow, the eye and pupil,
+  the line from the outer corner, the drop and the spiral, a few
+  strokes after the wedjat's ancient form, facing as before.
+- Both stay white on the black disc and serve as the ritual role icons
+  at 20 to 25 px (`roles.tsx`, the reader), where they read as before
+  (the sheets below).
+- **The move.** `Lamen` is `src/components/gd/Lamen.tsx` (MIT); its
+  only imports are the package's geometry and `svgCoordinate`. The
+  package's `lamen` art draws through it, with the plain circle for an
+  officer without a role and for the adepts, so `lamenArt.tsx` is gone
+  and the app's registry adds only the tablets' Enochian font. The role
+  icons and `/gd/components` import it from the package; its test moved
+  with it. `/about#credits` keeps the two credits, now for the old
+  drawings in `public/pics` that still embed the icons, until stage I
+  (decision 9).
+
+### Output
+
+Every drawing is still drawn once per hall in `<defs>` and placed with
+`<use>`; none defines an id, a gradient or a pattern, and their paths
+are computed once at module load, to two decimals. The presets' SVG,
+as the committed snapshots hold it (`src/app/gd/hall/__snapshots__`,
+one tag per line), shrank with the legacy paths: the Neophyte from
+57,720 bytes to 27,906, Zelator 2 from 314,583 to 113,863, Practicus 1
+from 101,418 to 14,551.
+
+From the gates' production builds (webpack), gzip -6, with the same
+method before and after. At 570e5f8 the reader's hall drawing loaded one
+chunk of 270,187 bytes (93,777 gzipped); at 3bcc110 it is 76,481
+(27,444), the 122 KB chalice, the 70 KB censer and the other lifted
+paths gone. `Lamen` sits in a shared chunk the reader's role icons load
+(30,054 bytes, 12,003 gzipped, before; 25,208, 9,119, after) and in one
+lazy chunk (42,467, 16,636; now 37,622, 13,885), so moving it changed
+no chunk boundary. All JavaScript chunks: 8,159,958 bytes before,
+7,956,929 after. (Before the review fixes, at the first version of the
+move, the hall chunk was 76,241 bytes, 27,350 gzipped.)
+
+### Sheets for Gadi
+
+Outside the repository, in `~/.cache/gdhall-h/impl/sheets/`: every
+preset before (main at 570e5f8) and after, side by side at reader width
+(`01-neophyte.png` to `14-portal2.png`), the ritual role icons at 20, 25
+and 40 px before and after (`15-role-icons.png`), and every item at 16,
+24, 40 and 120 px and on the altar, before and after (`16-items.png`).
+
+### What was verified, and how
+
+- **Gates**, per commit, each in a clean `git archive` export with Node
+  24 and the CI placeholder environment (`pnpm check`, `typecheck`,
+  `test:coverage` with the per-file thresholds, `build`): all 0 for
+  every commit before the review (8e60545, 1bc6756, 58e9911, 6e5e235,
+  and the glyphs and the move as 9ef4c5e and 050c41b) and again for
+  every commit the review fixes rewrote (aa92abd, 158a48f, f26ae70,
+  10d8c1f, 3bcc110; 8e60545 is unchanged). The tip, with this plan,
+  also ran `loom check`, the magick-data smoke test and `pnpm
+  check:turbopack`, before the review and after. The compiler is untouched: `semantic.ts`,
+  `semanticCompilerImpl.ts` and `ritualNodeIds.ts` have no diff, and
+  `src/components` imports no app code (the boundary test).
+- **Snapshots** were regenerated in the commit that changes each
+  drawing; the presets' SVG differ only in the redrawn items and the
+  two glyphs (and, from the first commit, the gong's, brazier's and
+  candle's stroke widths).
+- **In the browser** (Turbopack dev server from this branch on
+  127.0.0.1:3361 with placeholder settings, headless Chromium over CDP;
+  nothing signed in or saved): `/gd/hall` draws the Neophyte preset
+  with no placeholder and no console error; clicking the altar's lamp
+  selects "Lamp · item" and the panel offers "Light colour", not Fill
+  or Stroke (checked before the review fixes; the label for a light's
+  old `fill`, the warning, the loaf, the chalice's rim and the
+  caduceus are covered by tests and the sheets). The bundled `/doc/neophyte` reader draws its role icons with
+  the new glyphs (92 of the Keryx, and the Sentinel's). A ritual from the database
+  with a hall was not opened (no sign-in): its block draws the same
+  `GdHall` with the same registry, and `readerBoundary.test.ts` holds
+  that the reader loads it, `Lamen` included, as before.
+- **Help screenshots** were not recaptured: none shows the new art.
+  The ones of the ritual editor and reader do show the old drawing
+  (`/pics/neophyte.svg`, with its third-party caduceus and eye, which
+  `/about` credits), since the built-in Neophyte shows it until stage I,
+  but no `gdHall` and no Keryx or Sentinel role icon.
+
+### Review fixes
+
+Two independent reviews (Opus and Fable) found the drawings original
+and every placement in the 14 presets byte-identical. Their fixes were
+folded into the commits they belong to (the branch rewritten with
+`git rebase -i`, each commit amended at its own place so its snapshots
+are its own; Commits lists the new ones):
+
+- **Credits kept** (major): the glyphs commit had removed `/about`'s
+  credits, but the old drawings the built-in rituals still show embed
+  both icons (decision 9). Both are back, worded for those drawings.
+- **Old light colours** warned about and labelled (above).
+- **A bigger loaf**: it filled about 57 % of its box and read as the
+  smallest item on the altar; it is now 80 units tall (y −40 to 40) in
+  the same box.
+- **Inside their boxes**: measured in Chromium (each shape's box plus
+  half its stroke), only the chalice's rim reached past its box (to
+  −50.3); it sits 0.5 lower. The cup's rim (±37.3 of ±38.3) and the
+  fan's scallops (−30.8 of −31.4) were inside.
+- **The caduceus at icon size**: fewer, thicker coils, heads below the
+  ball and the wings a little deeper (above; `15-role-icons.png`).
+- **Not done**: deriving the panel's `fill` and `stroke` from the art's
+  declared attributes. They belong to the `item` tag's own vocabulary,
+  which every item is validated against and saved halls use; moving them
+  into the crosses', triangles', pentagrams' and lightning's art would
+  make them unknown attributes, with warnings, on every other item. The
+  panel's `SOME_KINDS` table stays, beside the art that reads them.
+
+### Waiting for Gadi
+
+Kept as they are, as Gadi asked, until he decides:
+
+- **Seals** (deferred): the placeholder stays. The follow-up is to
+  adapt `/gd/sigils`, which draws sigils on the Golden Dawn's rose, to
+  draw sigils on the kameas, and then decide what the hall's `seal`
+  shows (the traditional seals after Agrippa's 1533 woodcuts, or
+  generated figures, and whether name sigils belong in the hall).
+- **Pan, the Devil, Death and Typhon** (Portal 2): drawn figures, tarot
+  keys for Death and the Devil with emblems for Pan and Typhon, or
+  labelled markers.
+- **The Garden of Eden and the Fall**: drawn schematically, or labelled
+  boards.
+- **The adepts' lamens**: what each shows.
+- **Tree markers**: "Venus on the Tree of Life", "Mercury" and the
+  serpent on the Tree, drawn over `TreeFigure` or kept as markers.
+- **The Minutum Mundum's path colours**, which need path colour data in
+  magick-data.
+
 ## Commits
 
 | Commit | Change |
@@ -3523,6 +3807,12 @@ it in the hall's.
 | d34635e | An error boundary ends hall editing when the hall editor cannot load, instead of taking down the ritual editor (G review) |
 | 68d96bc | magick-data: notes on the tablets' versions, differences, sources and 70 squares (`enochian/tabletNotes`) (G, Gadi's request) |
 | 4f7c9e9 | `/enochian/tablets` explains the tablets and shows, square by square, where the sources differ (G, Gadi's request) |
+| 8e60545 | The items' palette (silver, wine, bread, green, gold's deep tone, glass), one outline weight for every item, the gong, brazier and candle on it; geometry helpers (H) |
+| aa92abd | The cup, chalice and censer (standing) as original flat emblems in the old boxes (H; review fixes folded in) |
+| 158a48f | The lamp and lantern as one original drawing; `light` (red, yellow, white) in the validator, the panel and the Pug; a warning and a label for a light's old `fill`; the panel's colours only for the items that draw them (H; review fixes folded in) |
+| f26ae70 | The rose (heraldic), salt (a shaker), bread (a round loaf) and fan as original flat emblems; `legacyArt/` removed (H; review fixes folded in) |
+| 10d8c1f | The Keryx's caduceus and the Sentinel's Eye of Horus redrawn from geometry; the list of third-party art empty; `/about`'s two credits kept for the old drawings (H; review fixes folded in) |
+| 3bcc110 | `Lamen` moved to `src/components/gd/Lamen.tsx` (MIT), drawn by the package's `lamen` art; `lamenArt.tsx` gone (H) |
 
 ## Future
 
@@ -3690,3 +3980,17 @@ later name each square's reading per version once the `version` work
 lands, and cover the Tablet of Union once the page shows it; the page's
 export still draws the outlines when the switch is on.
 
+
+From stage H, for Gadi: the seals, deferred (adapt `/gd/sigils`, which
+draws sigils on the Golden Dawn's rose, to draw sigils on the kameas,
+then decide what the hall's `seal` shows: the traditional seals after
+Agrippa's 1533 woodcuts from a cited scan, or generated figures, and
+whether name sigils belong in the hall); Pan, the Devil, Death and
+Typhon (drawn figures, tarot keys and emblems, or markers); the Garden
+of Eden and the Fall (drawn schematically or labelled boards); what each
+adept's lamen shows; "Venus on the Tree of Life", "Mercury" and the
+serpent drawn over `TreeFigure` or kept as markers; the Minutum
+Mundum's path colours (path colour data in magick-data first). The
+before and after sheets are outside the repository (Stage H notes). The
+new art is checked in headless Chromium only (no Firefox, Safari or
+real device).
