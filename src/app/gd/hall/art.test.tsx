@@ -12,12 +12,10 @@ import { lamenArt } from "./lamenArt";
 
 /**
  * The art that is not original, by registry key. Plan 061 (decision 9):
- * this list must be empty before the project is finished (stage H).
+ * this list had to be empty before the project was finished; stage H
+ * emptied it, and it stays so.
  */
-const THIRD_PARTY_ART = [
-  // Lamen: the Kerux's caduceus and the Sentinel's Eye of Horus.
-  "lamen",
-];
+const THIRD_PARTY_ART: string[] = [];
 
 const draw = (key: string, node: HallNode) => {
   const art = gdHallArt.get(key);

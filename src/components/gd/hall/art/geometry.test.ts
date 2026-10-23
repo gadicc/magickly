@@ -40,6 +40,17 @@ describe("the art's geometry helpers", () => {
       [20, 10],
     ]);
     expect(d).toMatch(/^M0,0C[^C]+ 10,0C[^C]+ 20,10$/);
+    expect(d).toContain("C1.67,0 ");
+    expect(
+      smoothPath(
+        [
+          [0, 0],
+          [10, 0],
+          [20, 10],
+        ],
+        1,
+      ),
+    ).toContain("C1.7,0 ");
   });
 
   it("measures angles clockwise from East", () => {

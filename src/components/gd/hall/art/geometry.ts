@@ -65,10 +65,16 @@ export function mirrored(start: Point, segments: readonly Segment[]): string {
   return `M${pair(start)}${segments.map(command).join("")}${left.join("")}Z`;
 }
 
-/** A smooth open path through points (Catmull–Rom as cubic Béziers). */
-export function smoothPath(list: readonly Point[]): string {
+/**
+ * A smooth open path through points (Catmull–Rom as cubic Béziers), to
+ * `decimals` places (two unless a small glyph needs fewer bytes).
+ */
+export function smoothPath(list: readonly Point[], decimals = 2): string {
   const at = (index: number) =>
     list[Math.min(list.length - 1, Math.max(0, index))];
+  const scale = 10 ** decimals;
+  const round = (value: number) => Math.round(value * scale) / scale + 0;
+  const pair = ([x, y]: Point) => `${round(x)},${round(y)}`;
   let d = `M${pair(list[0])}`;
   for (let i = 0; i < list.length - 1; i++) {
     const [p0, p1, p2, p3] = [at(i - 1), at(i), at(i + 1), at(i + 2)];

@@ -62,8 +62,21 @@ describe("Lamen", () => {
         "#000",
         "white",
       ]);
-    expect(render("keryx")).toContain('<g fill="white"');
-    expect(render("sentinel")).toContain('<path fill="white"');
+    expect(render("keryx")).toMatch(/<g transform="[^"]+" fill="white">/);
+    expect(render("sentinel")).toMatch(/<g transform="[^"]+" fill="white"/);
+  });
+
+  it("draws the caduceus and the Eye of Horus from our own geometry", () => {
+    const keryx = render("keryx");
+    // The serpents on a halo of the disc's black, and each drawn again,
+    // on its halo, where it passes over the other.
+    expect(keryx.match(/stroke="black" stroke-width="12.6"/g)).toHaveLength(2);
+    expect(keryx.match(/<ellipse /g)).toHaveLength(2);
+    // Neither the SVG Repo caduceus nor the game-icons.net eye.
+    expect(keryx).not.toContain("512");
+    expect(render("sentinel")).not.toContain("scale(0.15)");
+    for (const officer of ["keryx", "sentinel"])
+      expect(render(officer).length, officer).toBeLessThan(6000);
   });
 
   it("falls back to the Hierophant without an officer", () => {

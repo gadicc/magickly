@@ -137,7 +137,9 @@ export default function Sequence() {
             . We crop it to fit, under the same licence.
           </li>
           <li>
-            The Sentinel&apos;s eye on the officer lamens:{" "}
+            The Sentinel&apos;s eye in the original temple drawings of the
+            built-in rituals (the <a href="/pics/neophyte.svg">Neophyte hall</a>
+            ):{" "}
             <a href="https://www.svgrepo.com/svg/322283/eye-of-horus">
               Eye of Horus
             </a>{" "}
@@ -146,10 +148,12 @@ export default function Sequence() {
             <a href="https://www.svgrepo.com/page/licensing/#CC%20Attribution">
               CC Attribution licence
             </a>
-            , redrawn as a single path.
+            , redrawn as a single path. The officer lamens elsewhere draw our
+            own eye.
           </li>
           <li>
-            The Kerux&apos;s caduceus on the officer lamens:{" "}
+            The Kerux&apos;s caduceus in the same drawings (the Neophyte,
+            Zelator and Theoricus halls):{" "}
             <a href="https://www.svgrepo.com/svg/482800/caduceus-staff-icon">
               Caduceus staff
             </a>{" "}
@@ -158,7 +162,7 @@ export default function Sequence() {
             <a href="https://www.svgrepo.com/page/licensing/#PD">
               public domain
             </a>
-            .
+            . The officer lamens elsewhere draw our own caduceus.
           </li>
           <li>
             The <Link href="/kabbalah/tree">Tree of Life</Link> glyph is our

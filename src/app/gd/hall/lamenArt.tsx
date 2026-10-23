@@ -31,9 +31,8 @@ function HallLamen(props: HallArtProps) {
 }
 
 /**
- * The officers' lamens for the hall (plan 061, decision 9). `Lamen` is Gadi
- * Cohen's own drawing except two paths, so it stays in the AGPL app and is
- * injected; it moves to the MIT package in stage H, once both are redrawn.
+ * The officers' lamens for the hall (plan 061, decision 9), injected from
+ * the app while `Lamen` lives here.
  */
 export const lamenArt: HallArt = {
   Component: HallLamen,
@@ -48,17 +47,12 @@ export const lamenArt: HallArt = {
     return LAMEN_OFFICERS.has(role) ? role : "?";
   },
   provenance: {
-    origin: "thirdParty",
-    author:
-      "Gadi Cohen; the caduceus by Icooon Mono, the Eye of Horus by game-icons.net",
-    licence:
-      "AGPL-3.0-or-later; the caduceus is labelled public domain by SVG Repo " +
-      "(not its author's own licence text); the Eye of Horus is CC BY",
+    origin: "original",
+    author: "Gadi Cohen",
+    licence: "AGPL-3.0-or-later",
     source: "src/app/gd/components/lamen.tsx",
     notes:
-      "Two third-party paths: the Kerux's caduceus " +
-      "(svgrepo.com/svg/482800/caduceus-staff-icon) and the Sentinel's Eye " +
-      "of Horus (svgrepo.com/svg/322283/eye-of-horus), credited on " +
-      "/about#credits. Replace both in stage H.",
+      "Drawn for this app; the Keryx's caduceus and the Sentinel's Eye of " +
+      "Horus redrawn from geometry in stage H.",
   },
 };
