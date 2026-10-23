@@ -19,8 +19,6 @@ const THIRD_PARTY_ART = [
   // Lifted from the old hall drawings; icon-set signatures, source unknown.
   "item:bread",
   "item:fan",
-  "item:lamp",
-  "item:lantern",
   "item:rose",
   "item:salt",
   // Lamen: the Kerux's caduceus and the Sentinel's Eye of Horus.
@@ -91,26 +89,6 @@ describe("the app's hall art", () => {
     }
   });
 
-  it("glazes the lamp red and the lantern pale yellow, or a named colour", () => {
-    expect(draw("item:lamp", { type: "item", kind: "lamp" })).toContain(
-      'fill="#ff8080"',
-    );
-    expect(draw("item:lantern", { type: "item", kind: "lantern" })).toContain(
-      'fill="#f8edb4"',
-    );
-    // HALL_COLOURS blue (#2050c0) mixed half and half with white.
-    expect(
-      draw("item:lamp", { type: "item", kind: "lamp", fill: "blue" }),
-    ).toContain('fill="#90a8e0"');
-    expect(
-      draw("item:lamp", { type: "item", kind: "lamp", fill: "none" }),
-    ).not.toContain("#ff8080");
-    // Not a colour name: the default glass, never the raw value.
-    const raw = draw("item:lamp", { type: "item", kind: "lamp", fill: "#123" });
-    expect(raw).toContain('fill="#ff8080"');
-    expect(raw).not.toContain("#123");
-  });
-
   it("draws the lamens through Lamen, and a plain circle without a role", () => {
     // The Hierophant's striped ring; the Past Hierophant's white one.
     expect(draw("lamen", { type: "officer", role: "hierophant" })).toContain(
@@ -151,7 +129,6 @@ describe("the app's hall art", () => {
               x: 1 + index,
               y: 8,
             })),
-            { type: "item", kind: "lantern", fill: "green", x: 4, y: 12 },
           ],
         },
       ],
@@ -159,7 +136,6 @@ describe("the app's hall art", () => {
     expect(validateHall(hall, { art: gdHallArt })).toEqual([]);
     const markup = renderToStaticMarkup(<GdHall hall={hall} art={gdHallArt} />);
     expect(markup).not.toContain(`stroke-dasharray="6 4"`);
-    expect(markup).toContain('fill="#88c088"');
   });
 });
 
@@ -194,7 +170,9 @@ describe("the app's hall art in a hostile hall", () => {
   });
 
   it("draws one drawing per variant, however the attributes are spelled", () => {
-    const kinds = [...legacyHallArt.keys()].map((key) => key.slice(5));
+    const kinds = [...gdHallArt.keys()]
+      .filter((key) => key.startsWith("item:"))
+      .map((key) => key.slice(5));
     const markup = render(
       floorOf(
         Array.from({ length: 3990 }, (_, i) =>
@@ -203,6 +181,8 @@ describe("the app's hall art in a hostile hall", () => {
                 type: "item",
                 kind: kinds[(i / 3) % kinds.length],
                 fill: `c${i}`,
+                stroke: `s${i}`,
+                light: `l${i}`,
               }
             : i % 3 === 1
               ? { type: "officer", role: `role${i}`, label: "" }
@@ -210,8 +190,8 @@ describe("the app's hall art in a hostile hall", () => {
         ),
       ),
     );
-    // Nine items (an unknown fill is the default glass), one lamen for
-    // the unknown roles and the Keryx's.
+    // Each item kind once (an unknown colour is the default), one lamen
+    // for the unknown roles and the Keryx's.
     expect(drawings(markup)).toBe(kinds.length + 2);
     expect(markup.length).toBeLessThan(1_000_000);
   });
@@ -220,17 +200,19 @@ describe("the app's hall art in a hostile hall", () => {
     const markup = render(
       floorOf([
         { type: "item", kind: "lamp" },
-        { type: "item", kind: "lamp", fill: "nonsense" },
-        { type: "item", kind: "lamp", fill: "green" },
+        { type: "item", kind: "lamp", light: "nonsense" },
+        { type: "item", kind: "lamp", light: "red" },
+        { type: "item", kind: "lamp", light: "white" },
         { type: "item", kind: "lantern" },
+        { type: "item", kind: "lantern", light: "yellow" },
         { type: "officer", role: "keryx" },
         { type: "officer", role: "hegemon" },
         { type: "officer" },
         { type: "officer", role: "" },
       ]),
     );
-    // lamp (red, default), lamp (green), lantern, Keryx, Hegemon, and
-    // the plain circle for no role.
+    // lamp (red, default and named), lamp (white), lantern (yellow,
+    // default and named), Keryx, Hegemon, and the plain circle for no role.
     expect(drawings(markup)).toBe(6);
   });
 });

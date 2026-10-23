@@ -696,6 +696,37 @@ describe("the properties panel", () => {
     );
   });
 
+  it("offers a light's colour, and colours only to the items that draw them", () => {
+    setup(
+      hallFromPug(
+        "gdHall",
+        "  floor",
+        '    item(kind="lamp", x=3, y=3)',
+        '    item(kind="cross", x=6, y=6)',
+        '    item(kind="cup", x=9, y=9, fill="red")',
+        '    item(kind="lantern", x=12, y=12, fill="white")',
+      ),
+    );
+    const surface = screen.getByRole("application");
+    key(surface, "Tab");
+    expect(screen.getByRole("combobox", { name: "Light colour" })).toBeTruthy();
+    expect(screen.queryByRole("combobox", { name: "Fill" })).toBeNull();
+    key(surface, "Tab");
+    expect(screen.queryByRole("combobox", { name: "Light colour" })).toBeNull();
+    expect(screen.getByRole("combobox", { name: "Fill" })).toBeTruthy();
+    expect(screen.getByRole("combobox", { name: "Stroke" })).toBeTruthy();
+    // A fill already written is shown, so it can be emptied.
+    key(surface, "Tab");
+    expect(screen.getByRole("combobox", { name: "Fill" })).toBeTruthy();
+    expect(screen.queryByRole("combobox", { name: "Stroke" })).toBeNull();
+    // A light's fill, from before `light`, says what it was.
+    key(surface, "Tab");
+    expect(
+      screen.getByRole("combobox", { name: "Fill (old light colour)" }),
+    ).toBeTruthy();
+    expect(screen.getByRole("combobox", { name: "Light colour" })).toBeTruthy();
+  });
+
   it("offers a board's width and height only without a diagram", () => {
     setup(
       hallFromPug(

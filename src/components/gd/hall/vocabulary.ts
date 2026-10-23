@@ -68,6 +68,18 @@ export const HALL_COLOURS: ReadonlyMap<string, string> = new Map([
 ]);
 const COLOUR_NAMES = [...HALL_COLOURS.keys()];
 
+/**
+ * The colours a light burns (stage H): the red lamps of the altar and the
+ * Philosophus' stations, the yellow light of the Keryx's lantern and the
+ * Zelator's and Theoricus' lanterns, and the Portal's white lamp. Lamps
+ * and lanterns take one as `light`.
+ */
+export const LIGHT_COLOURS = ["red", "yellow", "white"] as const;
+export type LightColour = (typeof LIGHT_COLOURS)[number];
+
+/** The item kinds that are lights, and take `light`. */
+export const LIGHT_KINDS: ReadonlySet<string> = new Set(["lamp", "lantern"]);
+
 const number = (min: number, max: number): HallAttrSpec => ({
   kind: "number",
   min,
@@ -414,6 +426,8 @@ export const CORE_ITEM_KINDS: ReadonlySet<string> = new Set([
   "cup",
   "chalice",
   "censer",
+  "lamp",
+  "lantern",
 ]);
 
 /** The deepest nesting the validator and the resolver follow. */

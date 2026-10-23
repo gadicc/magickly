@@ -8,6 +8,7 @@ import { crossArt, pentagramArt, triangleArt } from "./items";
 import { kameaArt, sealArt } from "./kamea";
 import { lamenFallbackArt } from "./lamen";
 import { lightningArt } from "./lightning";
+import { lampArt, lanternArt } from "./lights";
 import { markerArt } from "./marker";
 import { pantacleArt } from "./pantacle";
 import { pillarArt } from "./pillar";
@@ -43,6 +44,8 @@ export const defaultHallArt: HallArtRegistry = new Map([
   ["item:cup", cupArt],
   ["item:chalice", chaliceArt],
   ["item:censer", censerArt],
+  ["item:lamp", lampArt],
+  ["item:lantern", lanternArt],
   ["tarotKey", tarotKeyArt],
   ["tablet", tabletArt()],
   ["shewbread", shewbreadArt],

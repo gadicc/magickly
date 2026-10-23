@@ -2,7 +2,6 @@ import type { HallArtBox } from "@magick-components/gd/hall";
 
 /** Presentation attributes of one path of a legacy drawing. */
 export interface LegacyStyle {
-  /** A colour, or `"glass"` for the caller to fill (the lamp's panes). */
   fill?: string;
   fillRule?: "evenodd";
   fillOpacity?: number;
@@ -25,14 +24,8 @@ export interface LegacyDrawing {
   paths: readonly (readonly [style: number, d: string])[];
 }
 
-/** Draws a legacy drawing; `glass` fills the paths styled `"glass"`. */
-export function LegacyPaths({
-  drawing,
-  glass = "none",
-}: {
-  drawing: LegacyDrawing;
-  glass?: string;
-}) {
+/** Draws a legacy drawing. */
+export function LegacyPaths({ drawing }: { drawing: LegacyDrawing }) {
   return (
     <>
       {drawing.paths.map(([index, d], order) => {
@@ -42,7 +35,7 @@ export function LegacyPaths({
             // biome-ignore lint/suspicious/noArrayIndexKey: a static drawing, never reordered
             key={order}
             d={d}
-            fill={fill === "glass" ? glass : fill}
+            fill={fill}
             {...style}
           />
         );

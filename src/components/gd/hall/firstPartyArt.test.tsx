@@ -478,6 +478,8 @@ describe("the items redrawn in stage H", () => {
     ["cup", [76.67, 100]],
     ["chalice", [56.17, 100]],
     ["censer", [73.69, 100]],
+    ["lamp", [60.09, 100]],
+    ["lantern", [60.09, 100]],
   ]);
 
   it("keep the boxes and the scales the drawings' items had", () => {
@@ -497,15 +499,84 @@ describe("the items redrawn in stage H", () => {
         /href|\sid=|url\(|<text|<image|Gradient|opacity/,
       );
       expect(art(`item:${kind}`).provenance.origin, kind).toBe("original");
-      // One drawing whatever the node says.
-      expect(art(`item:${kind}`).variant({ type: "item", fill: "red" })).toBe(
-        "",
-      );
     }
   });
 
+  it("draw each vessel alike, whatever the node says", () => {
+    for (const kind of ["cup", "chalice", "censer"])
+      expect(art(`item:${kind}`).variant({ type: "item", fill: "red" })).toBe(
+        "",
+      );
+  });
+
+  it("light a lamp red and a lantern yellow, or as `light` says", () => {
+    const glass = (node: Record<string, unknown>) => {
+      const markup = draw(art(`item:${node.kind}`), {
+        type: "item",
+        ...node,
+      } as HallNode);
+      return markup.match(/<path d="M-11,-18[^"]*" fill="([^"]+)"/)?.[1];
+    };
+    expect(glass({ kind: "lamp" })).toBe(PALETTE.glassRed);
+    expect(glass({ kind: "lantern" })).toBe(PALETTE.glassYellow);
+    expect(glass({ kind: "lamp", light: "yellow" })).toBe(PALETTE.glassYellow);
+    expect(glass({ kind: "lantern", light: "red" })).toBe(PALETTE.glassRed);
+    expect(glass({ kind: "lamp", light: "white" })).toBe(PALETTE.glassWhite);
+    // Not a light's colour: the kind's own, never the raw value.
+    const raw = draw(art("item:lamp"), {
+      type: "item",
+      kind: "lamp",
+      light: "#123",
+    });
+    expect(raw).toContain(`fill="${PALETTE.glassRed}"`);
+    expect(raw).not.toContain("#123");
+    // A hall written before stage H named the glass with `fill`.
+    expect(glass({ kind: "lamp", fill: "white" })).toBe(PALETTE.glassWhite);
+    expect(glass({ kind: "lamp", fill: "blue" })).toBe(PALETTE.glassRed);
+    expect(glass({ kind: "lamp", fill: "white", light: "red" })).toBe(
+      PALETTE.glassRed,
+    );
+    // The variant is the colour it draws.
+    const lamp = art("item:lamp");
+    expect(lamp.variant({ type: "item", light: "nonsense" })).toBe("red");
+    expect(lamp.variant({ type: "item", fill: "yellow" })).toBe("yellow");
+    expect(art("item:lantern").variant({ type: "item" })).toBe("yellow");
+  });
+
+  it("check a light's colour, which only the lights take", () => {
+    const diagnostics = (node: Record<string, unknown>) =>
+      validateHall(hall({ type: "item", x: 4, y: 4, ...node }), {
+        art: defaultHallArt,
+      });
+    expect(diagnostics({ kind: "lamp", light: "white" })).toEqual([]);
+    expect(diagnostics({ kind: "lantern", light: "red" })).toEqual([]);
+    for (const node of [
+      { kind: "lamp", light: "blue" },
+      { kind: "cup", light: "red" },
+    ])
+      expect(diagnostics(node), node.kind).toEqual([
+        expect.objectContaining({ attribute: "light" }),
+      ]);
+    // A hall from before `light`: its fill still colours a light when it
+    // is a light's colour and nothing else does; otherwise it is flagged.
+    expect(diagnostics({ kind: "lamp", fill: "white" })).toEqual([]);
+    expect(diagnostics({ kind: "cup", fill: "blue" })).toEqual([]);
+    for (const node of [
+      { kind: "lamp", fill: "blue" },
+      { kind: "lantern", fill: "none" },
+      { kind: "lamp", fill: "white", light: "red" },
+    ])
+      expect(diagnostics(node), JSON.stringify(node)).toEqual([
+        expect.objectContaining({
+          attribute: "fill",
+          severity: "warning",
+          message: `item: fill no longer colours a ${node.kind}; use light (red, yellow or white)`,
+        }),
+      ]);
+  });
+
   it("give metal its one white highlight", () => {
-    for (const kind of ["cup", "chalice", "censer"]) {
+    for (const kind of ["cup", "chalice", "censer", "lamp", "lantern"]) {
       const markup = draw(art(`item:${kind}`), { type: "item", kind });
       expect(markup.match(/fill="none" stroke="#ffffff"/g), kind).toHaveLength(
         1,

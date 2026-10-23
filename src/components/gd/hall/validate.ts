@@ -17,6 +17,8 @@ import {
   HALL_ROLES,
   type HallTagRole,
   IDENTIFIER,
+  LIGHT_COLOURS,
+  LIGHT_KINDS,
   MAX_HALL_DEPTH,
   MAX_HALL_NODES,
   RESERVED_ATTRIBUTES,
@@ -232,6 +234,23 @@ export function validateHall(
             "warning",
             `item: no art for ${quote(kind)}; drawn as a placeholder`,
             "kind",
+          );
+        // Halls written before stage H coloured a light's glass with
+        // `fill`; only red, yellow or white still does, and only without
+        // a `light`.
+        const fill = text("fill");
+        if (
+          kind !== undefined &&
+          LIGHT_KINDS.has(kind) &&
+          fill !== undefined &&
+          (text("light") !== undefined ||
+            !(LIGHT_COLOURS as readonly string[]).includes(fill))
+        )
+          report(
+            path,
+            "warning",
+            `item: fill no longer colours a ${kind}; use light (red, yellow or white)`,
+            "fill",
           );
         break;
       }

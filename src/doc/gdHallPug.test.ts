@@ -66,6 +66,12 @@ describe("a hall's own source, as /gd/hall shows it", () => {
     expect(compiled([parseHallSource(without)])).toEqual(compiled([hall]));
   });
 
+  it("writes a light's colour in the Pug", () => {
+    const portal = HALL_PRESETS.find((preset) => preset.id === "portal1");
+    const text = gdHallPug(portal?.hall as never);
+    expect(text).toContain('item(kind="lamp", light="white", x=1.4, y=-2.4)');
+  });
+
   it("keeps comments inside the hall and ignores blank lines around it", () => {
     const parsed = parseHallSource(
       "\ngdHall\n  //- the floor\n  floor\n    altar\n\n\n",

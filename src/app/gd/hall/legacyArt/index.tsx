@@ -1,15 +1,7 @@
-import type {
-  HallArt,
-  HallArtProps,
-  HallArtProvenance,
-  HallNode,
-} from "@magick-components/gd/hall";
-import { enumAttr } from "@magick-components/gd/hall/attributes";
-import { HALL_COLOURS } from "@magick-components/gd/hall/vocabulary";
+import type { HallArt, HallArtProvenance } from "@magick-components/gd/hall";
 import { bread } from "./bread";
 import { type LegacyDrawing, LegacyPaths } from "./drawing";
 import { fan } from "./fan";
-import { lamp } from "./lamp";
 import { rose } from "./rose";
 import { salt } from "./salt";
 
@@ -28,20 +20,6 @@ const lifted = (source: string): HallArtProvenance => ({
   notes: "icon-set signatures; replace in stage H",
 });
 
-const COLOUR_NAMES = [...HALL_COLOURS.keys()];
-
-/** A named colour mixed half and half with white, as glass. */
-function glassOf(name: string): string {
-  const hex = HALL_COLOURS.get(name) as string;
-  if (!hex.startsWith("#")) return hex;
-  const mixed = [1, 3, 5].map((at) =>
-    Math.round((Number.parseInt(hex.slice(at, at + 2), 16) + 255) / 2)
-      .toString(16)
-      .padStart(2, "0"),
-  );
-  return `#${mixed.join("")}`;
-}
-
 const art = (drawing: LegacyDrawing, source: string): HallArt => ({
   Component: () => <LegacyPaths drawing={drawing} />,
   box: drawing.box,
@@ -49,38 +27,10 @@ const art = (drawing: LegacyDrawing, source: string): HallArt => ({
   provenance: lifted(source),
 });
 
-/**
- * The lamp and the lantern are one drawing, the Neophyte altar's red lamp
- * (`g2-6`); the drawings' unglazed lanterns are stretched copies of it
- * (`g49`). The panes take `fill`, a named colour, mixed with white.
- */
-const lampArt = (defaultGlass: string, source: string): HallArt => {
-  const glass = (node: HallNode) => {
-    const name = enumAttr(node, "fill", COLOUR_NAMES);
-    return name === undefined ? defaultGlass : glassOf(name);
-  };
-  return {
-    Component: ({ node }: HallArtProps) => (
-      <LegacyPaths drawing={lamp} glass={glass(node)} />
-    ),
-    box: lamp.box,
-    variant: glass,
-    provenance: lifted(source),
-  };
-};
-
 /** The legacy items by registry key, for the app's art registry. */
 export const legacyHallArt: ReadonlyMap<string, HallArt> = new Map([
   ["item:salt", art(salt, "public/pics/neophyte.svg#g7064")],
   ["item:bread", art(bread, "public/pics/neophyte.svg#g11-8")],
   ["item:rose", art(rose, "public/pics/neophyte.svg#g6-06")],
-  ["item:lamp", lampArt("#ff8080", "public/pics/neophyte.svg#g2-6")],
-  [
-    "item:lantern",
-    lampArt(
-      "#f8edb4",
-      "public/pics/neophyte.svg#g2-6 (glazed as zelator1.svg#g49)",
-    ),
-  ],
   ["item:fan", art(fan, "public/pics/theoricus1.svg#g1-0")],
 ]);

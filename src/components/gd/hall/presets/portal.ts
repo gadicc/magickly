@@ -75,7 +75,7 @@ export const portal1: HallPreset = {
         type: "dais",
         children: [
           { type: "item", kind: "brazier", x: 1.4, y: -4 },
-          { type: "item", kind: "lamp", fill: "white", x: 1.4, y: -2.4 },
+          { type: "item", kind: "lamp", light: "white", x: 1.4, y: -2.4 },
           { type: "item", kind: "censer", x: 2.9, y: -3.2 },
           ...EAST,
         ],

@@ -9,6 +9,7 @@ import type {
 import {
   BOARD_KINDS,
   HALL_ROLES,
+  LIGHT_KINDS,
   PLACEABLE_ATTRIBUTES,
 } from "@magick-components/gd/hall/vocabulary";
 import Add from "@mui/icons-material/Add";
@@ -43,29 +44,50 @@ import { hallItemKinds, itemKindLabel } from "./hallPalette";
 import { reorderable, rowHasPositions, rowPlace } from "./hallRows";
 
 /**
- * Item attributes that only one kind draws: shown for that kind, or when
- * the node already has them.
+ * Item attributes that only some kinds draw: shown for those kinds, or
+ * when the node already has them. (The lamp's and the lantern's `light`
+ * is their art's own attribute, so other items never have it.)
  */
-const ONE_KIND: ReadonlyMap<string, string> = new Map([
-  ["form", "cross"],
-  ["dir", "triangle"],
+const SOME_KINDS: ReadonlyMap<string, ReadonlySet<string>> = new Map([
+  ["form", new Set(["cross"])],
+  ["dir", new Set(["triangle", "pentagram"])],
+  ["fill", new Set(["cross", "triangle", "pentagram"])],
+  ["stroke", new Set(["cross", "triangle", "pentagram", "lightning"])],
 ]);
 
 /**
- * Whether the panel offers a field for a node: an item's one-kind
- * attributes for that kind, a board's `w` and `h` unless it shows a
+ * Whether the panel offers a field for a node: an item's attributes for
+ * the kinds that draw them, a board's `w` and `h` unless it shows a
  * diagram (which keeps the diagram's proportions and ignores them), and
  * any attribute the node already has, so it can be emptied.
  */
 export function hallFieldShown(node: HallElement, name: string): boolean {
   if (Object.hasOwn(node.attrs, name)) return true;
   if (node.tag === "item") {
-    const kind = ONE_KIND.get(name);
-    return kind === undefined || node.attrs.kind === kind;
+    const kinds = SOME_KINDS.get(name);
+    return (
+      kinds === undefined ||
+      (typeof node.attrs.kind === "string" && kinds.has(node.attrs.kind))
+    );
   }
   if (node.tag === "board" && (name === "w" || name === "h"))
     return !(BOARD_KINDS as readonly unknown[]).includes(node.attrs.kind);
   return true;
+}
+
+/**
+ * A field's label for a node. A light's `fill` is the colour of its glass
+ * from before `light`: the panel shows it only where a hall still has one
+ * (`hallFieldShown`), named so the author knows to move it.
+ */
+export function hallFieldLabel(node: HallElement, name: string): string {
+  const light =
+    node.tag === "item" &&
+    typeof node.attrs.kind === "string" &&
+    LIGHT_KINDS.has(node.attrs.kind);
+  return light && name === "fill"
+    ? "Fill (old light colour)"
+    : fieldLabel(name);
 }
 
 /**
@@ -113,6 +135,7 @@ const FIELD_LABELS: ReadonlyMap<string, string> = new Map([
   ["h", "Height"],
   ["pos", "Position"],
   ["labelPos", "Label position"],
+  ["light", "Light colour"],
 ]);
 
 /** The fields of a node, in order: spec attributes with the common first. */
@@ -168,6 +191,8 @@ export function parseNumberField(
 
 interface FieldProps {
   name: string;
+  /** What the field is called, when not its attribute's own name. */
+  label?: string;
   spec: HallAttrSpec;
   value: JsonValue | undefined;
   /** Shown when the attribute is absent: where the node stands, or its default. */
@@ -193,6 +218,7 @@ const commitOnEnter = (event: KeyboardEvent<HTMLElement>) => {
 /** A number or string typed and written when the field is left or Enter. */
 function TypedField({
   name,
+  label = fieldLabel(name),
   spec,
   value,
   placeholder,
@@ -246,7 +272,7 @@ function TypedField({
   return (
     <TextField
       size="small"
-      label={fieldLabel(name)}
+      label={label}
       value={text}
       disabled={disabled}
       placeholder={placeholder}
@@ -271,6 +297,7 @@ function TypedField({
 /** A choice: an enum, an officer's role or an item's kind. */
 function ChoiceField({
   name,
+  label = fieldLabel(name),
   value,
   options,
   disabled,
@@ -288,7 +315,7 @@ function ChoiceField({
     <TextField
       select
       size="small"
-      label={fieldLabel(name)}
+      label={label}
       value={current}
       disabled={disabled}
       onChange={(event) =>
@@ -313,6 +340,7 @@ function ChoiceField({
 
 function Field(props: FieldProps) {
   const { name, spec, value, disabled, onCommit, art } = props;
+  const label = props.label ?? fieldLabel(name);
   if (name === "role")
     return <ChoiceField {...props} options={[...HALL_ROLES]} />;
   if (name === "kind" && spec.kind === "string")
@@ -359,7 +387,7 @@ function Field(props: FieldProps) {
             slotProps={{ input: { "data-hall-field": name } as object }}
           />
         }
-        label={fieldLabel(name)}
+        label={label}
       />
     );
   }
@@ -592,6 +620,7 @@ export function HallProperties({
               <Field
                 key={key}
                 name={fieldName}
+                label={hallFieldLabel(node, fieldName)}
                 spec={spec}
                 value={node.attrs[fieldName]}
                 placeholder={placeholder(fieldName)}
