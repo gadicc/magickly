@@ -1,5 +1,11 @@
 import type { HallArt } from "../types";
-import { original, PALETTE, sameForEveryNode } from "./shared";
+import {
+  ITEM_DETAIL,
+  ITEM_OUTLINE,
+  original,
+  PALETTE,
+  sameForEveryNode,
+} from "./shared";
 
 export const gongProvenance = original(
   "A gong on its frame, drawn from geometry: two posts and a bar, the " +
@@ -31,7 +37,7 @@ export const gongArt: HallArt = {
       <path
         d="M-12,-42L-10,-25M12,-42L10,-25"
         stroke={ink}
-        strokeWidth={2}
+        strokeWidth={ITEM_DETAIL}
         fill="none"
       />
       <circle
@@ -39,10 +45,22 @@ export const gongArt: HallArt = {
         r={30}
         fill={PALETTE.bronze}
         stroke={ink}
-        strokeWidth={3}
+        strokeWidth={ITEM_OUTLINE.strokeWidth}
       />
-      <circle cy={4} r={20} fill="none" stroke={ink} strokeWidth={1.5} />
-      <circle cy={4} r={8} fill={PALETTE.gold} stroke={ink} strokeWidth={1.5} />
+      <circle
+        cy={4}
+        r={20}
+        fill="none"
+        stroke={ink}
+        strokeWidth={ITEM_DETAIL}
+      />
+      <circle
+        cy={4}
+        r={8}
+        fill={PALETTE.gold}
+        stroke={ink}
+        strokeWidth={ITEM_DETAIL}
+      />
     </>
   ),
   box: { width: 100, height: 100 },
@@ -73,7 +91,7 @@ export const brazierArt: HallArt = {
             d="M0,-42C14,-24 14,-8 0,0C-14,-8 -14,-24 0,-42Z"
             fill={PALETTE.fire}
             stroke={ink}
-            strokeWidth={1.5}
+            strokeWidth={ITEM_DETAIL}
           />
           <path
             d="M0,-24C7,-14 7,-6 0,-2C-7,-6 -7,-14 0,-24Z"
@@ -84,8 +102,7 @@ export const brazierArt: HallArt = {
       <path
         d="M-44,-8H44A44,28 0 0 1 -44,-8Z"
         fill={PALETTE.bronze}
-        stroke={ink}
-        strokeWidth={3}
+        {...ITEM_OUTLINE}
       />
     </>
   ),
@@ -105,7 +122,7 @@ export const candleArt: HallArt = {
         height={8}
         fill={PALETTE.bronze}
         stroke={ink}
-        strokeWidth={2}
+        strokeWidth={ITEM_OUTLINE.strokeWidth}
       />
       <rect
         x={-11}
@@ -114,7 +131,7 @@ export const candleArt: HallArt = {
         height={10}
         fill={PALETTE.bronze}
         stroke={ink}
-        strokeWidth={2}
+        strokeWidth={ITEM_OUTLINE.strokeWidth}
       />
       <rect
         x={-7}
@@ -123,14 +140,14 @@ export const candleArt: HallArt = {
         height={52}
         fill={PALETTE.wax}
         stroke={ink}
-        strokeWidth={2}
+        strokeWidth={ITEM_OUTLINE.strokeWidth}
       />
-      <path d="M0,-22V-28" stroke={ink} strokeWidth={1.5} />
+      <path d="M0,-22V-28" stroke={ink} strokeWidth={ITEM_DETAIL} />
       <path
         d="M0,-50C8,-38 7,-30 0,-27C-7,-30 -8,-38 0,-50Z"
         fill={PALETTE.flame}
         stroke={PALETTE.fire}
-        strokeWidth={1.5}
+        strokeWidth={ITEM_DETAIL}
       />
     </>
   ),
