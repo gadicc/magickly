@@ -248,7 +248,8 @@ describe("GdHall", () => {
         ),
       ),
     );
-    expect(markup).not.toContain("stroke-dasharray");
+    // No placeholder (the lamen's own style says `stroke-dasharray:none`).
+    expect(markup).not.toContain('stroke-dasharray="');
     expect(markup).toContain(">Lamp</text>");
     expect(markup).toContain(">of the</text>");
     expect(markup).toContain(">Free text</text>");

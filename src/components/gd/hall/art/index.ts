@@ -7,7 +7,7 @@ import { brazierArt, candleArt, gongArt } from "./furnishings";
 import { hebrewLetterArt } from "./hebrewLetter";
 import { crossArt, pentagramArt, triangleArt } from "./items";
 import { kameaArt, sealArt } from "./kamea";
-import { lamenFallbackArt } from "./lamen";
+import { lamenArt } from "./lamen";
 import { lightningArt } from "./lightning";
 import { lampArt, lanternArt } from "./lights";
 import { markerArt } from "./marker";
@@ -21,7 +21,7 @@ import { censerArt, chaliceArt, cupArt } from "./vessels";
 
 /**
  * The package's own art, all original (MIT). The app composes its art over
- * this — `new Map([...defaultHallArt, ["lamen", lamenArt], …])` — and
+ * this — `new Map([...defaultHallArt, ["tablet", tabletArt(font)]])` — and
  * anything still missing draws as a placeholder.
  */
 export const defaultHallArt: HallArtRegistry = new Map([
@@ -33,7 +33,7 @@ export const defaultHallArt: HallArtRegistry = new Map([
   ["banner", bannerArt],
   ["hebrewLetter", hebrewLetterArt],
   ["marker", markerArt],
-  ["lamen", lamenFallbackArt],
+  ["lamen", lamenArt],
   ["item:cross", crossArt],
   ["item:triangle", triangleArt],
   ["item:pentagram", pentagramArt],

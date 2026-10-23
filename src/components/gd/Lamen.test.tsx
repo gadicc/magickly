@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import Lamen from "./lamen";
+import Lamen from "./Lamen";
 
 const render = (officer: string) =>
   renderToStaticMarkup(<Lamen officer={officer} />);

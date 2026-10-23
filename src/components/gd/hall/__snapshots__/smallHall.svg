@@ -68,8 +68,16 @@
 </polygon>
 </g>
 <g id="_R_0_-art2">
-<circle r="47" fill="#ffffff" stroke="#000000" stroke-width="6">
+<g transform="translate(-50 -50)">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
+<circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
 </circle>
+<circle cx="0" cy="0" r="42" style="color:#000;overflow:visible;fill:#000;stroke:#000;stroke-width:1;paint-order:stroke fill markers;stop-color:#000">
+</circle>
+<path d="M 0 0 h2.482v2.02h-2.482v5.043h-2.02v-5.043h-2.482v-2.02h2.481v-2.515h2.02z" style="fill:white" transform="scale(7.2) translate(1,-2.2)">
+</path>
+</svg>
+</g>
 </g>
 <g id="_R_0_-art3">
 <rect x="-50" y="-50" width="100" height="100" fill="#000000">
@@ -88,8 +96,46 @@
 </rect>
 </g>
 <g id="_R_0_-art7">
+<g transform="translate(-50 -50)">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
+<circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
+</circle>
+<circle cx="0" cy="0" r="42" style="color:#000;overflow:visible;fill:#000;stroke:#000;stroke-width:1;paint-order:stroke fill markers;stop-color:#000">
+</circle>
+<path d="m114.746 96.37-4.93 8.54h9.86zm0 2.13 3.087 5.346h-6.174z" style="fill:white" transform="scale(6) translate(-114.7,-101.5)">
+</path>
+</svg>
+</g>
+</g>
+<g id="_R_0_-art8">
+<g transform="translate(-50 -50)">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
+<circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:red;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
+</circle>
+<path d="M48.836 4A49 49 0 0 1 47.508 12H-47.508A49 49 0 0 1 -48.836 4ZM47.508 -12A49 49 0 0 1 48.836 -4H-48.836A49 49 0 0 1 -47.508 -12ZM44.733 20A49 49 0 0 1 40.212 28H-40.212A49 49 0 0 1 -44.733 20ZM40.212 -28A49 49 0 0 1 44.733 -20H-44.733A49 49 0 0 1 -40.212 -28ZM33.242 36A49 49 0 0 1 21.564 44H-21.564A49 49 0 0 1 -33.242 36ZM21.564 -44A49 49 0 0 1 33.242 -36H-33.242A49 49 0 0 1 -21.564 -44Z" fill="white">
+</path>
+<circle cx="0" cy="0" r="42" style="color:#000;overflow:visible;fill:green;stroke:#000;stroke-width:1;paint-order:stroke fill markers;stop-color:#000">
+</circle>
+<path d="M -1.1 -4.8 v.708a3.045 3.045 0 0 0-1.842 1.806h-.64v2.02h.601a3.045 3.045 0 0 0 1.881 1.91v3.134h2.02v-3.14a3.045 3.045 0 0 0 1.867-1.904h.615v-2.02h-.653a3.045 3.045 0 0 0-1.829-1.8v-.714zm2.02 1.256a2.534 2.534 0 0 1 1.285 1.258h-1.285zm-2.02 0v1.258h-1.292a2.534 2.534 0 0 1 1.292-1.257zm-1.334 3.278h1.334v1.361a2.534 2.534 0 0 1-1.334-1.36zm3.354 0h1.329a2.534 2.534 0 0 1-1.329 1.362z" style="fill:red;stroke:black;stroke-width:0.08333333333333333" transform="scale(7.5)">
+</path>
+</svg>
+</g>
+</g>
+<g id="_R_0_-art9">
+<g transform="translate(-50 -50)">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
+<circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
+</circle>
+<circle cx="0" cy="0" r="42" style="color:#000;overflow:visible;fill:green;stroke:#000;stroke-width:1;paint-order:stroke fill markers;stop-color:#000">
+</circle>
+<path d="M -1.1 -4.8 v.708a3.045 3.045 0 0 0-1.842 1.806h-.64v2.02h.601a3.045 3.045 0 0 0 1.881 1.91v3.134h2.02v-3.14a3.045 3.045 0 0 0 1.867-1.904h.615v-2.02h-.653a3.045 3.045 0 0 0-1.829-1.8v-.714zm2.02 1.256a2.534 2.534 0 0 1 1.285 1.258h-1.285zm-2.02 0v1.258h-1.292a2.534 2.534 0 0 1 1.292-1.257zm-1.334 3.278h1.334v1.361a2.534 2.534 0 0 1-1.334-1.36zm3.354 0h1.329a2.534 2.534 0 0 1-1.329 1.362z" style="fill:red;stroke:black;stroke-width:0.08333333333333333" transform="scale(7.5)">
+</path>
+</svg>
+</g>
+</g>
+<g id="_R_0_-art10">
 <defs>
-<linearGradient id="_R_0_-art7-fill" x1="-38" x2="38" y1="0" y2="0" gradientUnits="userSpaceOnUse">
+<linearGradient id="_R_0_-art10-fill" x1="-38" x2="38" y1="0" y2="0" gradientUnits="userSpaceOnUse">
 <stop offset="0" stop-color="#e0e0e0">
 </stop>
 <stop offset="1" stop-color="#ffffff">
@@ -102,7 +148,7 @@
 </circle>
 <circle cx="44" cy="-38" r="4.5" fill="#ffe600" stroke="#000000" stroke-width="0.6">
 </circle>
-<path d="M-38,-38H38V26L0,45L-38,26Z" fill="url(#_R_0_-art7-fill)" stroke="#000000" stroke-width="0.8">
+<path d="M-38,-38H38V26L0,45L-38,26Z" fill="url(#_R_0_-art10-fill)" stroke="#000000" stroke-width="0.8">
 </path>
 <text x="0" y="21.057" font-size="62" font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" text-anchor="middle" fill="#000000">ש</text>
 </g>
@@ -131,13 +177,13 @@
 </use>
 <use href="#_R_0_-art6" transform="translate(800 1450) scale(100)">
 </use>
-<use href="#_R_0_-art2" transform="translate(800 1450) scale(1.6)">
+<use href="#_R_0_-art7" transform="translate(800 1450) scale(1.6)">
 </use>
-<use href="#_R_0_-art2" transform="translate(400 -146.06) scale(1.6)">
+<use href="#_R_0_-art8" transform="translate(400 -146.06) scale(1.6)">
 </use>
-<use href="#_R_0_-art2" transform="translate(1200 -146.06) scale(1.6)">
+<use href="#_R_0_-art9" transform="translate(1200 -146.06) scale(1.6)">
 </use>
-<use href="#_R_0_-art7" transform="translate(800 -631.51) scale(2.95)">
+<use href="#_R_0_-art10" transform="translate(800 -631.51) scale(2.95)">
 </use>
 <g font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">
 <g>

@@ -42,7 +42,8 @@ it("hydrates without a mismatch, ids included", async () => {
   const html = renderAt(time, element);
   const { container, problems, unmount } = await hydrateAt(time, html, element);
   expect(problems).toEqual([]);
-  expect(container.querySelectorAll("svg")).toHaveLength(2);
+  // The two halls (their officers' lamens are SVGs of their own).
+  expect(container.querySelectorAll('svg[role="img"]')).toHaveLength(2);
   await unmount();
 });
 

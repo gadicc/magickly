@@ -129,7 +129,7 @@ export default defineConfig({
         "src/components/gd/roseSigilGeometry.ts",
         "src/components/astrology/Kamea.tsx",
         "src/components/enochian/Tablet.tsx",
-        "src/app/gd/components/lamen.tsx",
+        "src/components/gd/Lamen.tsx",
         "src/app/gd/hall/*.{ts,tsx}",
         "src/components/gd/hall/art/*.{ts,tsx}",
         "src/components/gd/hall/attributes.ts",

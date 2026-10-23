@@ -1,6 +1,6 @@
+import Lamen from "@magick-components/gd/Lamen";
 import { Fragment } from "react";
 import { privateMetadata } from "@/seo/metadata";
-import Lamen from "./lamen";
 
 export const metadata = privateMetadata("Officer Lamens");
 

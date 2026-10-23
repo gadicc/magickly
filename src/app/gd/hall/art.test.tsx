@@ -1,6 +1,7 @@
 import {
   defaultHallArt,
   GdHall,
+  type HallArt,
   type HallArtProps,
   type HallNode,
   validateHall,
@@ -8,7 +9,6 @@ import {
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { gdHallArt } from "./art";
-import { lamenArt } from "./lamenArt";
 
 /**
  * The art that is not original, by registry key. Plan 061 (decision 9):
@@ -57,10 +57,10 @@ describe("the app's hall art", () => {
     for (const [key, art] of defaultHallArt) {
       expect(art.provenance.origin, key).toBe("original");
       expect(art.provenance.licence, key).toBe("MIT");
-      // The app replaces the lamen, and gives the tablet its Enochian font.
+      // The app gives the tablet its Enochian font, and takes the rest.
       if (key === "tablet")
         expect(gdHallArt.get(key)?.provenance).toBe(art.provenance);
-      else if (key !== "lamen") expect(gdHallArt.get(key), key).toBe(art);
+      else expect(gdHallArt.get(key), key).toBe(art);
     }
   });
 
@@ -83,11 +83,17 @@ describe("the app's hall art", () => {
     // The adepts have no lamens yet: labelled circles, one drawing.
     for (const role of ["chiefAdept", "secondAdept", "thirdAdept"]) {
       expect(draw("lamen", { type: "officer", role }), role).toBe(plain);
-      expect(lamenArt.variant({ type: "officer", role }), role).toBe("");
+      expect(
+        (gdHallArt.get("lamen") as HallArt).variant({ type: "officer", role }),
+        role,
+      ).toBe("");
     }
-    expect(lamenArt.variant({ type: "officer", role: "constructor" })).toBe(
-      "?",
-    );
+    expect(
+      (gdHallArt.get("lamen") as HallArt).variant({
+        type: "officer",
+        role: "constructor",
+      }),
+    ).toBe("?");
   });
 
   it("validates and draws a hall of every item without placeholders", () => {

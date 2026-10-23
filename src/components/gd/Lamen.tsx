@@ -1,10 +1,6 @@
-import {
-  flipped,
-  type Point,
-  smoothPath,
-} from "@magick-components/gd/hall/art/geometry";
-import { svgCoordinate } from "@magick-components/svgCoordinate";
 import type * as React from "react";
+import { svgCoordinate } from "../svgCoordinate";
+import { flipped, type Point, smoothPath } from "./hall/art/geometry";
 
 /** The colours of a lamen with the Calvary cross of Tiphareth. */
 interface CrossLamenColours {

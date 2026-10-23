@@ -3,7 +3,7 @@ import { roleAliases } from "../ritualRoles";
 
 export { roleAliases } from "../ritualRoles";
 
-import Lamen from "@/app/gd/components/lamen";
+import Lamen from "@magick-components/gd/Lamen";
 
 /** Shared officer presentation; reader context may supply its own role map. */
 export interface RitualRolePresentation {

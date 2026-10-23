@@ -106,5 +106,5 @@ it("loads the hall renderer and its art only through import()", () => {
   expect(lazy).toContain("src/doc/ritualBlocks/GdHallDrawing.tsx");
   expect(lazy).toContain("src/components/gd/hall/GdHall.tsx");
   expect(lazy).toContain("src/app/gd/hall/art.ts");
-  expect(lazy).toContain("src/app/gd/components/lamen.tsx");
+  expect(lazy).toContain("src/components/gd/Lamen.tsx");
 });
