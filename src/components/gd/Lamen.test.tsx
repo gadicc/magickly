@@ -66,15 +66,17 @@ describe("Lamen", () => {
         "#000",
         "white",
       ]);
-    expect(render("keryx")).toMatch(/<g transform="[^"]+" fill="white">/);
+    expect(render("keryx")).toMatch(/<g fill="white"><path d="M2.4,-15C/);
     expect(render("sentinel")).toMatch(/<g transform="[^"]+" fill="white"/);
   });
 
   it("draws the caduceus and the Eye of Horus from our own geometry", () => {
     const keryx = render("keryx");
     // The serpents on a halo of the disc's black, and each drawn again,
-    // on its halo, where it passes over the other.
-    expect(keryx.match(/stroke="black" stroke-width="12.6"/g)).toHaveLength(2);
+    // on its halo, where it passes over the other: two crossings since
+    // stage H, part 2, one each.
+    expect(keryx.match(/stroke="black" stroke-width="12"/g)).toHaveLength(3);
+    expect(keryx.match(/stroke-linecap="butt"/g)).toHaveLength(2);
     expect(keryx.match(/<ellipse /g)).toHaveLength(2);
     // Neither the SVG Repo caduceus nor the game-icons.net eye.
     expect(keryx).not.toContain("512");

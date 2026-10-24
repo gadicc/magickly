@@ -53,6 +53,24 @@ describe("the art's geometry helpers", () => {
     ).toContain("C1.7,0 ");
   });
 
+  it("draws a stretch of a smooth path along the same curve", () => {
+    const line = [
+      [0, 0],
+      [10, 0],
+      [20, 10],
+      [30, 0],
+      [40, 5],
+    ] as const;
+    const whole = smoothPath(line);
+    const [, ...segments] = whole.split("C");
+    // The stretch from the second point to the fourth is the whole path's
+    // second and third segments, from the second point.
+    expect(smoothPath(line, 2, 1, 3)).toBe(
+      `M10,0C${segments[1]}C${segments[2]}`,
+    );
+    expect(smoothPath(line, 2, 0, line.length - 1)).toBe(whole);
+  });
+
   it("measures angles clockwise from East", () => {
     const [x, y] = polar(10, 90, [1, 1]);
     expect(x).toBeCloseTo(1);
