@@ -78,9 +78,21 @@ export type HallAttrSpec =
       /** Whole numbers only: anything else is rounded, with a warning. */
       integer?: boolean;
     }
-  | { kind: "enum"; values: readonly string[] }
+  | {
+      kind: "enum";
+      values: readonly string[];
+      /**
+       * A reader's name for each value, which an editor may show beside
+       * the value itself (the value is what the source holds).
+       */
+      labels?: Readonly<Record<string, string>>;
+    }
   | { kind: "string"; maxLength?: number }
-  | { kind: "boolean" };
+  | {
+      kind: "boolean";
+      /** What an absent attribute means; false unless said. */
+      default?: boolean;
+    };
 
 /**
  * One drawing in the art registry. The renderer draws `Component` centred

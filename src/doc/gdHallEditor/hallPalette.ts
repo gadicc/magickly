@@ -189,6 +189,8 @@ export function hallPalette(art: HallArtRegistry): HallPaletteEntry[] {
     {
       key: "tablet",
       group: "Symbols",
+      // The Golden Dawn's version, a hall's default, so `version` is
+      // left unwritten; the properties panel offers the others.
       label: "Enochian tablet",
       tag: "tablet",
       attrs: { element: "earth" },

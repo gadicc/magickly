@@ -87,6 +87,13 @@ describe("the palette", () => {
       "salt",
       "triangle",
     ]);
+    // A tablet comes in the Golden Dawn's version, which goes unwritten.
+    expect(
+      palette.find((candidate) => candidate.key === "tablet"),
+    ).toMatchObject({ tag: "tablet", attrs: { element: "earth" } });
+    expect(
+      palette.find((candidate) => candidate.key === "tablet")?.attrs,
+    ).not.toHaveProperty("version");
     expect(new Set(keys).size).toBe(keys.length);
     expect(palette.map((candidate) => candidate.group)).toEqual(
       [...palette.map((candidate) => candidate.group)].sort(

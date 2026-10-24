@@ -778,6 +778,38 @@ describe("the properties panel", () => {
     expect(current().attrs.dais).toBe(5);
   });
 
+  it("chooses a tablet's version and how its letters are drawn", () => {
+    const { current } = setup(
+      hallFromPug("gdHall", "  floor", '    tablet(element="fire", x=8, y=8)'),
+    );
+    key(screen.getByRole("application"), "Tab");
+    const tablet = () =>
+      (current().children?.[0] as HallElement).children?.[0] as HallElement;
+    // The Golden Dawn's by default: nothing written.
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: "Version" }));
+    expect(
+      screen.getAllByRole("option").map((option) => option.textContent),
+    ).toEqual([
+      "Default",
+      "gd · Golden Dawn",
+      "regardie · Regardie's print, 1940",
+      "equinox · The Equinox, 1912",
+      "dee · Dee, 1584",
+      "raphael · Raphael's table, 1587",
+    ]);
+    fireEvent.click(screen.getByRole("option", { name: "dee · Dee, 1584" }));
+    expect(tablet().attrs.version).toBe("dee");
+    // Reversed letters are on by default, second letters off.
+    const reversed = screen.getByRole("switch", { name: "Reversed letters" });
+    expect((reversed as HTMLInputElement).checked).toBe(true);
+    fireEvent.click(reversed);
+    expect(tablet().attrs.reversed).toBe(false);
+    fireEvent.click(screen.getByRole("switch", { name: "Reversed letters" }));
+    expect(tablet().attrs).not.toHaveProperty("reversed");
+    fireEvent.click(screen.getByRole("switch", { name: "Second letters" }));
+    expect(tablet().attrs.alt).toBe(true);
+  });
+
   it("duplicates, deletes and scales from buttons", () => {
     const { changes, current } = setup(
       hallFromPug("gdHall", "  floor", '    pillar(kind="black", x=4, y=3)'),

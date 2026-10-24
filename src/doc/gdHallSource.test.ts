@@ -298,6 +298,43 @@ describe("hostile halls", () => {
     expect(printed).toMatch(/\n {4}var#\S+\(name="x"\)\n/);
   });
 
+  it("carries a tablet's version and letters through source and rows", () => {
+    const text = hall(
+      [
+        'tablet(element="fire", version="dee", reversed=false, alt=true)',
+        'tablet(element="union", version="raphael")',
+        'tablet(element="earth")',
+      ].join("\n"),
+    );
+    const parsed = parseRitualPug(text);
+    const printed = printRitualPug(parsed);
+    expect(parseRitualPug(printed)).toEqual(parsed);
+    expect(printed).toMatch(
+      /tablet#\S+\(element="fire", version="dee", reversed=false, alt=true\)/,
+    );
+    const row = gdHallRow(hallOf(parsed)) as HallNode;
+    expect(row.children?.[0]?.children?.map(bare)).toEqual([
+      {
+        type: "tablet",
+        element: "fire",
+        version: "dee",
+        reversed: false,
+        alt: true,
+      },
+      { type: "tablet", element: "union", version: "raphael" },
+      { type: "tablet", element: "earth" },
+    ]);
+    expect(validateHall(row, { art: gdHallArt })).toEqual([]);
+    const wrong = gdHallRow(
+      hallOf(parseRitualPug(hall('tablet(element="fire", version="golden")'))),
+    ) as HallNode;
+    expect(
+      validateHall(wrong, { art: gdHallArt }).map((each) => each.message),
+    ).toEqual([
+      'tablet: version="golden" is not one of gd, regardie, equinox, dee, raphael',
+    ]);
+  });
+
   it("applies the document's node and depth bounds inside a hall", () => {
     let nested: RitualSemanticNode = {
       kind: "element",

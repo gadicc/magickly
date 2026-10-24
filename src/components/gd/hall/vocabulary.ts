@@ -168,7 +168,7 @@ export const HALL_TAGS: ReadonlyMap<string, HallTagSpec> = new Map<
       attributes: new Map([
         ["dais", number(0, 16)],
         ["wall", enumOf(["plain", "gradient"])],
-        ["compass", flag],
+        ["compass", { kind: "boolean", default: true }],
         ["padding", number(0, 16)],
         ["labelSize", number(0.05, 4)],
         ["margin", number(0, 48)],

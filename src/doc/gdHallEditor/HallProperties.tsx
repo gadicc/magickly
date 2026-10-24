@@ -117,9 +117,6 @@ function useFocusWatch(lost: { current: boolean }) {
   );
 }
 
-/** Booleans whose absence means true. */
-const TRUE_BY_DEFAULT = new Set(["compass"]);
-
 /** Fields shown first, in this order; the tag's own follow in spec order. */
 const FIRST = ["x", "y", "at", "anchor", "scale", "label", "labelPos"];
 
@@ -136,6 +133,8 @@ const FIELD_LABELS: ReadonlyMap<string, string> = new Map([
   ["pos", "Position"],
   ["labelPos", "Label position"],
   ["light", "Light colour"],
+  ["reversed", "Reversed letters"],
+  ["alt", "Second letters"],
 ]);
 
 /** The fields of a node, in order: spec attributes with the common first. */
@@ -359,14 +358,22 @@ function Field(props: FieldProps) {
         // `center` is `centre`'s other spelling: offer one.
         options={spec.values
           .filter((option) => option !== "center")
-          .map((option) => [option, option] as const)}
+          .map(
+            (option) =>
+              [
+                option,
+                spec.labels?.[option]
+                  ? `${option} · ${spec.labels[option]}`
+                  : option,
+              ] as const,
+          )}
       />
     );
   if (spec.kind === "boolean") {
     const checked =
       value === true ||
       value === "true" ||
-      (value === undefined && TRUE_BY_DEFAULT.has(name));
+      (value === undefined && spec.default === true);
     return (
       <FormControlLabel
         control={
@@ -379,7 +386,7 @@ function Field(props: FieldProps) {
             onChange={(event) =>
               onCommit(
                 name,
-                event.target.checked === TRUE_BY_DEFAULT.has(name)
+                event.target.checked === (spec.default === true)
                   ? undefined
                   : event.target.checked,
               )

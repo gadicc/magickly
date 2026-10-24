@@ -213,6 +213,59 @@ describe("the Enochian tablets", () => {
     ]);
   });
 
+  it("draws the Golden Dawn's version unless told otherwise", () => {
+    const tablet = art("tablet");
+    const node = (attrs: Record<string, unknown>): HallNode => ({
+      type: "tablet",
+      element: "fire",
+      ...attrs,
+    });
+    const gd = draw(tablet, node({}));
+    expect(draw(tablet, node({ version: "gd" }))).toBe(gd);
+    expect(draw(tablet, node({ version: "nonesuch" }))).toBe(gd);
+    // Dee's Fire: no sigil, two squares blank.
+    const dee = draw(tablet, node({ version: "dee" }));
+    expect(dee).not.toContain('viewBox="-100 -100 200 200"');
+    expect(dee).toContain("data-sigil-note");
+    expect(dee.match(/<text/g)).toHaveLength(154 + 3);
+    // Reversed letters plain, second letters in the corners.
+    expect(gd).toContain("scale(-1 1)");
+    expect(draw(tablet, node({ reversed: false }))).not.toContain(
+      "scale(-1 1)",
+    );
+    expect(draw(tablet, node({ alt: true }))).toContain("data-alt");
+    // Dee's version has no Tablet of Union, and its board says so.
+    const union = draw(tablet, {
+      ...node({ version: "dee" }),
+      element: "union",
+    });
+    expect(union).toContain("No Tablet of Union");
+    expect(union).toContain('<rect x="-62" y="-52" width="124" height="104"');
+    // A tablet drawn as before keeps its variant; each other look has its own.
+    expect(
+      tablet.variant(node({ version: "gd", reversed: true, alt: false })),
+    ).toBe(tablet.variant(node({})));
+    expect(tablet.variant(node({}))).toBe('["fire"]');
+    const looks = [
+      node({ version: "dee" }),
+      node({ reversed: false }),
+      node({ alt: true }),
+      node({ version: "equinox", alt: true }),
+    ].map(tablet.variant);
+    expect(new Set([...looks, tablet.variant(node({}))]).size).toBe(5);
+    expect(
+      validateHall(
+        hall(node({ version: "raphael", reversed: false, alt: true })),
+        { art: defaultHallArt },
+      ),
+    ).toEqual([]);
+    expect(
+      validateHall(hall(node({ alt: "yes" })), { art: defaultHallArt }).map(
+        (d) => d.message,
+      ),
+    ).toEqual(['tablet: alt="yes" is not a boolean']);
+  });
+
   it("takes the Enochian font from the app, and the transliteration without", () => {
     const plain = draw(art("tablet"), { type: "tablet", element: "air" });
     expect(plain).not.toContain("Enochian");
