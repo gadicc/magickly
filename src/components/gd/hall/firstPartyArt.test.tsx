@@ -10,6 +10,7 @@ import { resolveHall } from "./layout";
 import { KAMEA_PLANET_IDS, PLANETS } from "./planets";
 import type { HallArt, HallArtProps, HallNode } from "./types";
 import { validateHall } from "./validate";
+import { CARD_KINDS, CARD_TITLES } from "./vocabulary";
 
 const draw = (art: HallArt, node: HallNode, id = "t") => {
   const box = typeof art.box === "function" ? art.box(node) : art.box;
@@ -163,6 +164,69 @@ describe("the tarot keys", () => {
       ["warning", "tarotKey: n=-0.5 is outside 0–21 and is clamped"],
       ["warning", "tarotKey: n=-0.5 is not a whole number and is rounded"],
     ]);
+  });
+});
+
+describe("the emblem cards", () => {
+  it("draws each card in the tarot key's frame, the keys numbered", () => {
+    const frame = draw(art("tarotKey"), { type: "tarotKey" });
+    const blank = draw(art("card"), { type: "card" });
+    // The same frame as a blank tarot key, and nothing in it.
+    expect(blank).toBe(frame);
+    const titles = new Map(
+      CARD_KINDS.map((kind) => [
+        kind,
+        draw(art("card"), { type: "card", kind }),
+      ]),
+    );
+    expect(titles.get("death")).toContain(">XIII</text>");
+    expect(titles.get("devil")).toContain(">XV</text>");
+    expect(titles.get("pan")).not.toMatch(/>[IVX]+<\/text>/);
+    expect(titles.get("typhon")).not.toMatch(/>[IVX]+<\/text>/);
+    // A key's title is its trump's.
+    expect(CARD_TITLES.get("death")).toBe(TRUMPS.get(13)?.title);
+    expect(CARD_TITLES.get("devil")).toBe(TRUMPS.get(15)?.title);
+    for (const [kind, markup] of titles) {
+      expect(markup, kind).toContain(`>${CARD_TITLES.get(kind)}</text>`);
+      expect(markup, kind).toContain(
+        frame.replace(/^<svg[^>]*>|<\/svg>$/g, ""),
+      );
+      expect(markup, kind).not.toMatch(/\sid=|href|url\(/);
+    }
+    // Typhon's cloud in the storm grey.
+    expect(titles.get("typhon")).toContain(`fill="${PALETTE.storm}"`);
+    expect(new Set(titles.values()).size).toBe(4);
+    expect(draw(art("card"), { type: "card", kind: "toString" })).toBe(blank);
+    expect(art("card").variant({ type: "card", kind: "toString" })).toBe(
+      art("card").variant({ type: "card" }),
+    );
+  });
+
+  it("validates a card's kind and warns of a missing one", () => {
+    expect(
+      validateHall(
+        hall(
+          { type: "card", kind: "pan", label: "Pan" },
+          { type: "card" },
+          { type: "card", kind: "fool" },
+          { type: "card", kind: "null" },
+        ),
+        { art: defaultHallArt },
+      ).map((d) => [d.severity, d.message]),
+    ).toEqual([
+      ["warning", "card: no kind; drawn blank"],
+      ["error", 'card: kind="fool" is not one of pan, devil, death, typhon'],
+      ["error", 'card: kind="null" is not one of pan, devil, death, typhon'],
+    ]);
+  });
+
+  it("is drawn the size of a tarot key", () => {
+    const { objects } = resolveHall(
+      hall({ type: "card", kind: "pan" }, { type: "tarotKey", n: 13 }),
+      { art: defaultHallArt },
+    );
+    expect(objects[0].width).toBeCloseTo(objects[1].width);
+    expect(objects[0].height).toBeCloseTo(1.62);
   });
 });
 

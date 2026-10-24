@@ -643,10 +643,168 @@
 </g>
 </g>
 <g id="_R_0_-art7">
-<rect x="-48" y="-48" width="96" height="96" fill="#ffffff" stroke="#000000" stroke-width="3">
+<rect x="-28" y="-49" width="56" height="98" rx="4" fill="#ffffff" stroke="#000000" stroke-width="1.6">
 </rect>
+<rect x="-24" y="-45" width="48" height="90" fill="none" stroke="#000000" stroke-width="0.6">
+</rect>
+<g transform="translate(0 -3) scale(0.44)">
+<g stroke="#000000" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
+<g fill="none">
+<path d="M30,46L30,-30C30,-44 12,-44 12,-33C12,-29 14,-27 17,-27" stroke="#000000" stroke-width="12.2">
+</path>
+<path d="M30,46L30,-30C30,-44 12,-44 12,-33C12,-29 14,-27 17,-27" stroke="#b08d3c" stroke-width="5">
+</path>
+</g>
+<path d="M-46.3,-32V29.7A4.3,4.3 0 0 0 -37.7,29.7V-32ZM-37.7,-32V23.3A4.3,4.3 0 0 0 -29.1,23.3V-32ZM-29.1,-32V16.9A4.3,4.3 0 0 0 -20.5,16.9V-32ZM-20.5,-32V10.5A4.3,4.3 0 0 0 -11.9,10.5V-32ZM-11.9,-32V4.1A4.3,4.3 0 0 0 -3.3,4.1V-32ZM-3.3,-32V-2.3A4.3,4.3 0 0 0 5.3,-2.3V-32ZM5.3,-32V-8.7A4.3,4.3 0 0 0 13.9,-8.7V-32Z" fill="#e3a857">
+</path>
+<g fill="#000000" stroke="none">
+<ellipse cx="-42" cy="-32" rx="2.6" ry="1.4">
+</ellipse>
+<ellipse cx="-33.4" cy="-32" rx="2.6" ry="1.4">
+</ellipse>
+<ellipse cx="-24.8" cy="-32" rx="2.6" ry="1.4">
+</ellipse>
+<ellipse cx="-16.2" cy="-32" rx="2.6" ry="1.4">
+</ellipse>
+<ellipse cx="-7.6" cy="-32" rx="2.6" ry="1.4">
+</ellipse>
+<ellipse cx="1" cy="-32" rx="2.6" ry="1.4">
+</ellipse>
+<ellipse cx="9.6" cy="-32" rx="2.6" ry="1.4">
+</ellipse>
+</g>
+<path d="M-46.3,-16H13.9V-8L-46.3,-6Z" fill="#d92128">
+</path>
+</g>
+</g>
+<g fill="#000000" text-anchor="middle">
+<text y="40" font-size="7" font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" style="font-variant-ligatures:none;font-kerning:normal">Pan</text>
+</g>
 </g>
 <g id="_R_0_-art8">
+<rect x="-28" y="-49" width="56" height="98" rx="4" fill="#ffffff" stroke="#000000" stroke-width="1.6">
+</rect>
+<rect x="-24" y="-45" width="48" height="90" fill="none" stroke="#000000" stroke-width="0.6">
+</rect>
+<g transform="translate(0 2) scale(0.44)">
+<g stroke="#000000" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
+<path d="M8,-6C18,-20 34,-26 48,-22L44,-10C40,0 42,8 46,16C38,10 32,10 28,16C24,8 18,8 14,14C14,6 12,0 8,-2ZM-8,-6C-18,-20 -34,-26 -48,-22L-44,-10C-40,0 -42,8 -46,16C-38,10 -32,10 -28,16C-24,8 -18,8 -14,14C-14,6 -12,0 -8,-2Z" fill="#252524">
+</path>
+<path d="M-18,22H18V44H-18Z" fill="#252524">
+</path>
+<path d="M-18,22L-12,16H24L18,22M24,16V38L18,44" fill="#6b6f78">
+</path>
+<path d="M-7,-14C-18,-17 -23,-26 -20,-35C-17,-27 -11,-23 -3,-19Z" fill="#d4a017">
+</path>
+<path d="M7,-14C18,-17 23,-26 20,-35C17,-27 11,-23 3,-19Z" fill="#d4a017">
+</path>
+<path d="M-12,-16C-6,-20 6,-20 12,-16C13,-6 8,4 4,10L0,18L-4,10C-8,4 -13,-6 -12,-16Z" fill="#d92128">
+</path>
+<path d="M-9,-8L-3,-6M9,-8L3,-6" stroke="#ffffff" stroke-width="3.2">
+</path>
+<path d="M0,-28L-4.702,-42.472L7.608,-33.528L-7.608,-33.528L4.702,-42.472Z" fill="none" stroke="#000000" stroke-width="5.6">
+</path>
+<path d="M0,-28L-4.702,-42.472L7.608,-33.528L-7.608,-33.528L4.702,-42.472Z" fill="none" stroke="#ffffff" stroke-width="2.2">
+</path>
+</g>
+</g>
+<g fill="#000000" text-anchor="middle">
+<text y="-31" font-size="11" font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic">XV</text>
+<text y="40" font-size="7" font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" style="font-variant-ligatures:none;font-kerning:normal">The Devil</text>
+</g>
+</g>
+<g id="_R_0_-art9">
+<rect x="-28" y="-49" width="56" height="98" rx="4" fill="#ffffff" stroke="#000000" stroke-width="1.6">
+</rect>
+<rect x="-24" y="-45" width="48" height="90" fill="none" stroke="#000000" stroke-width="0.6">
+</rect>
+<g transform="translate(0 2) scale(0.44)">
+<g stroke="#000000" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
+<g fill="none">
+<path d="M26,46L12,-38" stroke="#000000" stroke-width="12.2">
+</path>
+<path d="M26,46L12,-38" stroke="#b08d3c" stroke-width="5">
+</path>
+</g>
+<path d="M13,-40C-4,-48 -30,-44 -46,-24C-28,-36 -6,-36 15,-30Z" fill="#d3d7dc">
+</path>
+<path d="M-30,6A20,20 0 1 1 6,6C6,12 2,14 0,16V24H-24V16C-26,14 -30,12 -30,6Z" fill="#ffffff">
+</path>
+<g fill="#000000" stroke="none">
+<ellipse cx="-20" cy="4" rx="5.6" ry="6.4">
+</ellipse>
+<ellipse cx="-4" cy="4" rx="5.6" ry="6.4">
+</ellipse>
+<path d="M-12,10L-15,17H-9Z">
+</path>
+</g>
+<path d="M-18,24V19M-12,24V19M-6,24V19" fill="none" stroke-width="2.4">
+</path>
+</g>
+</g>
+<g fill="#000000" text-anchor="middle">
+<text y="-31" font-size="11" font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic">XIII</text>
+<text y="40" font-size="7" font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" style="font-variant-ligatures:none;font-kerning:normal">Death</text>
+</g>
+</g>
+<g id="_R_0_-art10">
+<rect x="-28" y="-49" width="56" height="98" rx="4" fill="#ffffff" stroke="#000000" stroke-width="1.6">
+</rect>
+<rect x="-24" y="-45" width="48" height="90" fill="none" stroke="#000000" stroke-width="0.6">
+</rect>
+<g transform="translate(0 -3) scale(0.44)">
+<g stroke="#000000" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
+<path d="M-48,32Q-44,27 -40,32T-32,32Q-28,27 -24,32T-16,32Q-12,27 -8,32T0,32Q4,27 8,32T16,32Q20,27 24,32T32,32Q36,27 40,32T48,32V48H-48Z" fill="#406ab3">
+</path>
+<g fill="none">
+<path d="M-30,34C-27.3,33.3 -20,31.7 -14,30C-8,28.3 1,26.7 6,24C11,21.3 15.7,17.3 16,14C16.3,10.7 12.7,6.7 8,4C3.3,1.3 -7.3,0.7 -12,-2C-16.7,-4.7 -20.3,-8.7 -20,-12C-19.7,-15.3 -14.3,-19.3 -10,-22C-5.7,-24.7 3.3,-27 6,-28" stroke="#000000" stroke-width="18.2">
+</path>
+<path d="M-30,34C-27.3,33.3 -20,31.7 -14,30C-8,28.3 1,26.7 6,24C11,21.3 15.7,17.3 16,14C16.3,10.7 12.7,6.7 8,4C3.3,1.3 -7.3,0.7 -12,-2C-16.7,-4.7 -20.3,-8.7 -20,-12C-19.7,-15.3 -14.3,-19.3 -10,-22C-5.7,-24.7 3.3,-27 6,-28" stroke="#d92128" stroke-width="11">
+</path>
+</g>
+<path d="M-48,40Q-44,36 -40,40T-32,40Q-28,36 -24,40T-16,40Q-12,36 -8,40T0,40Q4,36 8,40T16,40Q20,36 24,40T32,40Q36,36 40,40T48,40V48H-48Z" fill="#406ab3">
+</path>
+<g fill="#6b6f78">
+<circle cx="-22" cy="-34" r="13">
+</circle>
+<circle cx="-4" cy="-40" r="15">
+</circle>
+<circle cx="16" cy="-36" r="13">
+</circle>
+<circle cx="30" cy="-30" r="10">
+</circle>
+<circle cx="-34" cy="-28" r="9">
+</circle>
+<circle cx="6" cy="-27" r="12">
+</circle>
+<circle cx="-16" cy="-26" r="10">
+</circle>
+</g>
+<g fill="#6b6f78" stroke="none">
+<circle cx="-22" cy="-34" r="11.2">
+</circle>
+<circle cx="-4" cy="-40" r="13.2">
+</circle>
+<circle cx="16" cy="-36" r="11.2">
+</circle>
+<circle cx="30" cy="-30" r="8.2">
+</circle>
+<circle cx="-34" cy="-28" r="7.2">
+</circle>
+<circle cx="6" cy="-27" r="10.2">
+</circle>
+<circle cx="-16" cy="-26" r="8.2">
+</circle>
+</g>
+<path d="M2,-24L-6,-10L2,-12L-4,2" fill="none" stroke="#ffe000" stroke-width="3.4">
+</path>
+</g>
+</g>
+<g fill="#000000" text-anchor="middle">
+<text y="40" font-size="7" font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" style="font-variant-ligatures:none;font-kerning:normal">Typhon</text>
+</g>
+</g>
+<g id="_R_0_-art11">
 <rect x="-105" y="-148.5" width="210" height="297" fill="#ffffff" stroke="#000000" stroke-width="2">
 </rect>
 <g transform="translate(-105 -148.5)">
@@ -1142,7 +1300,7 @@
 </svg>
 </g>
 </g>
-<g id="_R_0_-art9">
+<g id="_R_0_-art12">
 <rect x="-105" y="-148.5" width="210" height="297" fill="#ffffff" stroke="#000000" stroke-width="2">
 </rect>
 <g transform="translate(-105 -148.5)">
@@ -1660,15 +1818,15 @@
 </svg>
 </g>
 </g>
-<g id="_R_0_-art10">
+<g id="_R_0_-art13">
 <rect x="-50" y="-50" width="100" height="100" fill="#000000">
 </rect>
 </g>
-<g id="_R_0_-art11">
+<g id="_R_0_-art14">
 <polygon points="0,-45.225 29.389,45.225 -47.553,-10.676 47.553,-10.676 -29.389,45.225" fill="none" stroke="#ffffff" stroke-width="5" stroke-linejoin="miter">
 </polygon>
 </g>
-<g id="_R_0_-art12">
+<g id="_R_0_-art15">
 <path d="M-49.5,-16.5h33v33h-33Z" fill="#e00000" stroke="#ffe000" stroke-width="3" stroke-linejoin="miter">
 </path>
 <path d="M-16.5,-49.5h33v33h-33Z" fill="#e00000" stroke="#ffe000" stroke-width="3" stroke-linejoin="miter">
@@ -1680,7 +1838,7 @@
 <path d="M16.5,-16.5h33v33h-33Z" fill="#e00000" stroke="#ffe000" stroke-width="3" stroke-linejoin="miter">
 </path>
 </g>
-<g id="_R_0_-art13">
+<g id="_R_0_-art16">
 <g stroke="#000000" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
 <path d="M-16,1C0,5 20,-4 46,2" fill="none" stroke-width="7">
 </path>
@@ -1716,7 +1874,7 @@
 </circle>
 </g>
 </g>
-<g id="_R_0_-art14">
+<g id="_R_0_-art17">
 <g stroke="#000000" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
 <path d="M0,-27L15,-27C19,-16 19,30 17,44Q17,48 13,48L0,48L-13,48Q-17,48 -17,44C-19,30 -19,-16 -15,-27L0,-27Z" fill="#ffffff">
 </path>
@@ -1734,7 +1892,7 @@
 </path>
 </g>
 </g>
-<g id="_R_0_-art15">
+<g id="_R_0_-art18">
 <g stroke="#000000" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
 <path d="M-2.5,-41V-36H2.5V-41Z" fill="#b08d3c">
 </path>
@@ -1758,7 +1916,7 @@
 </path>
 </g>
 </g>
-<g id="_R_0_-art16">
+<g id="_R_0_-art19">
 <g stroke="#000000" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
 <path d="M0,-42L35.5,-42C35.5,-15 24.5,1.5 7,5L5.5,30C5.5,38 24,40 28,44L28,48L0,48L-28,48L-28,44C-24,40 -5.5,38 -5.5,30L-7,5C-24.5,1.5 -35.5,-15 -35.5,-42L0,-42Z" fill="#fae513">
 </path>
@@ -1772,7 +1930,7 @@
 </path>
 </g>
 </g>
-<g id="_R_0_-art17">
+<g id="_R_0_-art20">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:yellow;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -1810,7 +1968,7 @@
 </svg>
 </g>
 </g>
-<g id="_R_0_-art18">
+<g id="_R_0_-art21">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:red;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -1858,7 +2016,7 @@
 </svg>
 </g>
 </g>
-<g id="_R_0_-art19">
+<g id="_R_0_-art22">
 <polyline points="-38,-37 0,-61 38,-37" fill="none" stroke="#252524" stroke-width="2.5" stroke-linejoin="round">
 </polyline>
 <rect x="-43" y="-39" width="86" height="4" fill="#ffe600" stroke="#000000" stroke-width="0.6">
@@ -1884,7 +2042,7 @@
 <path d="M-2.3,-2.4H2.3V2H7V7H2.3V15.5H-2.3V7H-7V2H-2.3Z" fill="#ff0000" stroke="#ffe600" stroke-width="0.6">
 </path>
 </g>
-<g id="_R_0_-art20">
+<g id="_R_0_-art23">
 <rect x="-105" y="-148.5" width="210" height="297" fill="#ffffff" stroke="#000000" stroke-width="2">
 </rect>
 <g transform="translate(-105 -148.5)">
@@ -2392,7 +2550,7 @@
 </svg>
 </g>
 </g>
-<g id="_R_0_-art21">
+<g id="_R_0_-art24">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:#48f;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -2408,7 +2566,7 @@
 </svg>
 </g>
 </g>
-<g id="_R_0_-art22">
+<g id="_R_0_-art25">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:yellow;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -2452,29 +2610,29 @@
 </svg>
 </g>
 </g>
-<g id="_R_0_-art23">
+<g id="_R_0_-art26">
 <circle r="50" fill="#000000" stroke="none" stroke-width="3">
 </circle>
 <polygon points="0,38 -32.909,-19 32.909,-19" fill="#ffffff">
 </polygon>
 </g>
-<g id="_R_0_-art24">
+<g id="_R_0_-art27">
 <rect x="-48" y="-48" width="96" height="96" fill="#ffffff" stroke="#000000" stroke-width="4">
 </rect>
 </g>
-<g id="_R_0_-art25">
+<g id="_R_0_-art28">
 <circle r="48.5" fill="#ffffff" stroke="#000000" stroke-width="3">
 </circle>
 <polygon points="0,-38 -32.909,19 32.909,19" fill="#000000">
 </polygon>
 </g>
-<g id="_R_0_-art26">
+<g id="_R_0_-art29">
 <rect x="-8" y="-0.2" width="16" height="0.4" fill="#c8b8e0" stroke="#000000" stroke-width="0.04">
 </rect>
 <path d="M-7.5,-0.2v0.4M-7,-0.2v0.4M-6.5,-0.2v0.4M-6,-0.2v0.4M-5.5,-0.2v0.4M-5,-0.2v0.4M-4.5,-0.2v0.4M-4,-0.2v0.4M-3.5,-0.2v0.4M-3,-0.2v0.4M-2.5,-0.2v0.4M-2,-0.2v0.4M-1.5,-0.2v0.4M-1,-0.2v0.4M-0.5,-0.2v0.4M0,-0.2v0.4M0.5,-0.2v0.4M1,-0.2v0.4M1.5,-0.2v0.4M2,-0.2v0.4M2.5,-0.2v0.4M3,-0.2v0.4M3.5,-0.2v0.4M4,-0.2v0.4M4.5,-0.2v0.4M5,-0.2v0.4M5.5,-0.2v0.4M6,-0.2v0.4M6.5,-0.2v0.4M7,-0.2v0.4M7.5,-0.2v0.4" stroke="#7a64a0" stroke-width="0.03">
 </path>
 </g>
-<g id="_R_0_-art27">
+<g id="_R_0_-art30">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -2490,9 +2648,9 @@
 </svg>
 </g>
 </g>
-<g id="_R_0_-art28">
+<g id="_R_0_-art31">
 <defs>
-<linearGradient id="_R_0_-art28-fill" x1="-38" x2="38" y1="0" y2="0" gradientUnits="userSpaceOnUse">
+<linearGradient id="_R_0_-art31-fill" x1="-38" x2="38" y1="0" y2="0" gradientUnits="userSpaceOnUse">
 <stop offset="0" stop-color="#e0e0e0">
 </stop>
 <stop offset="1" stop-color="#ffffff">
@@ -2505,7 +2663,7 @@
 </circle>
 <circle cx="44" cy="-38" r="4.5" fill="#ffe600" stroke="#000000" stroke-width="0.6">
 </circle>
-<path d="M-38,-38H38V26L0,45L-38,26Z" fill="url(#_R_0_-art28-fill)" stroke="#000000" stroke-width="0.8">
+<path d="M-38,-38H38V26L0,45L-38,26Z" fill="url(#_R_0_-art31-fill)" stroke="#000000" stroke-width="0.8">
 </path>
 <text x="0" y="21.057" font-size="62" font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" text-anchor="middle" fill="#000000">ת</text>
 </g>
@@ -2532,69 +2690,69 @@
 </use>
 <use href="#_R_0_-art6" transform="translate(980 300) scale(0.906)">
 </use>
-<use href="#_R_0_-art7" transform="translate(120 500) scale(1.2)">
+<use href="#_R_0_-art7" transform="translate(120 500) scale(1.62)">
+</use>
+<use href="#_R_0_-art8" transform="translate(120 1120) scale(1.62)">
+</use>
+<use href="#_R_0_-art9" transform="translate(1480 500) scale(1.62)">
+</use>
+<use href="#_R_0_-art10" transform="translate(1480 1120) scale(1.62)">
+</use>
+<use href="#_R_0_-art11" transform="translate(64.101 800) scale(0.906)">
+</use>
+<use href="#_R_0_-art12" transform="translate(1535.899 800) scale(0.906)">
+</use>
+<use href="#_R_0_-art13" transform="translate(800 800) scale(2)">
+</use>
+<use href="#_R_0_-art14" transform="translate(800 760) scale(0.715)">
+</use>
+<use href="#_R_0_-art15" transform="translate(800 830) scale(0.56)">
+</use>
+<use href="#_R_0_-art16" transform="translate(800 700) scale(0.8)">
+</use>
+<use href="#_R_0_-art17" transform="translate(720 800) scale(0.62)">
+</use>
+<use href="#_R_0_-art18" transform="translate(880 800) scale(0.8)">
+</use>
+<use href="#_R_0_-art19" transform="translate(800 900) scale(0.6)">
+</use>
+<use href="#_R_0_-art20" transform="translate(800 1100) scale(1.6)">
+</use>
+<use href="#_R_0_-art21" transform="translate(800 1360) scale(1.6)">
+</use>
+<use href="#_R_0_-art22" transform="translate(500 1440) scale(1.6)">
+</use>
+<use href="#_R_0_-art23" transform="translate(1080 1496.5) scale(0.906)">
+</use>
+<use href="#_R_0_-art24" transform="translate(240 -260) scale(1.6)">
+</use>
+<use href="#_R_0_-art25" transform="translate(800 -380) scale(1.6)">
+</use>
+<use href="#_R_0_-art26" transform="translate(570 -200) scale(2)">
+</use>
+<use href="#_R_0_-art27" transform="translate(800 -200) scale(1)">
+</use>
+<use href="#_R_0_-art28" transform="translate(1030 -200) scale(2)">
+</use>
+<use href="#_R_0_-art29" transform="translate(800 -30) scale(100)">
+</use>
+<use href="#_R_0_-art30" transform="translate(1360 -260) scale(1.6)">
+</use>
+<use href="#_R_0_-art31" transform="translate(800 1862.51) scale(2.95)">
 </use>
 <g font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">
-<text x="120" y="507.977" font-size="30.1" text-anchor="middle">Pan</text>
+<g>
+<text x="120" y="629.11" font-size="43" text-anchor="middle">Pan</text>
 </g>
-<use href="#_R_0_-art7" transform="translate(120 1120) scale(1.2)">
-</use>
-<g font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">
-<text x="120" y="1127.977" font-size="30.1" text-anchor="middle">Devil</text>
+<g>
+<text x="120" y="1249.11" font-size="43" text-anchor="middle">Devil</text>
 </g>
-<use href="#_R_0_-art7" transform="translate(1480 500) scale(1.2)">
-</use>
-<g font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">
-<text x="1480" y="507.977" font-size="30.1" text-anchor="middle">Death</text>
+<g>
+<text x="1480" y="629.11" font-size="43" text-anchor="middle">Death</text>
 </g>
-<use href="#_R_0_-art7" transform="translate(1480 1120) scale(1.2)">
-</use>
-<g font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">
-<text x="1480" y="1127.977" font-size="30.1" text-anchor="middle">Typhon</text>
+<g>
+<text x="1480" y="1249.11" font-size="43" text-anchor="middle">Typhon</text>
 </g>
-<use href="#_R_0_-art8" transform="translate(64.101 800) scale(0.906)">
-</use>
-<use href="#_R_0_-art9" transform="translate(1535.899 800) scale(0.906)">
-</use>
-<use href="#_R_0_-art10" transform="translate(800 800) scale(2)">
-</use>
-<use href="#_R_0_-art11" transform="translate(800 760) scale(0.715)">
-</use>
-<use href="#_R_0_-art12" transform="translate(800 830) scale(0.56)">
-</use>
-<use href="#_R_0_-art13" transform="translate(800 700) scale(0.8)">
-</use>
-<use href="#_R_0_-art14" transform="translate(720 800) scale(0.62)">
-</use>
-<use href="#_R_0_-art15" transform="translate(880 800) scale(0.8)">
-</use>
-<use href="#_R_0_-art16" transform="translate(800 900) scale(0.6)">
-</use>
-<use href="#_R_0_-art17" transform="translate(800 1100) scale(1.6)">
-</use>
-<use href="#_R_0_-art18" transform="translate(800 1360) scale(1.6)">
-</use>
-<use href="#_R_0_-art19" transform="translate(500 1440) scale(1.6)">
-</use>
-<use href="#_R_0_-art20" transform="translate(1080 1496.5) scale(0.906)">
-</use>
-<use href="#_R_0_-art21" transform="translate(240 -260) scale(1.6)">
-</use>
-<use href="#_R_0_-art22" transform="translate(800 -380) scale(1.6)">
-</use>
-<use href="#_R_0_-art23" transform="translate(570 -200) scale(2)">
-</use>
-<use href="#_R_0_-art24" transform="translate(800 -200) scale(1)">
-</use>
-<use href="#_R_0_-art25" transform="translate(1030 -200) scale(2)">
-</use>
-<use href="#_R_0_-art26" transform="translate(800 -30) scale(100)">
-</use>
-<use href="#_R_0_-art27" transform="translate(1360 -260) scale(1.6)">
-</use>
-<use href="#_R_0_-art28" transform="translate(800 1862.51) scale(2.95)">
-</use>
-<g font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">
 <g>
 <text x="800" y="1228.11" font-size="43" text-anchor="middle">Hegemon</text>
 </g>

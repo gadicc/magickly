@@ -156,6 +156,36 @@ export const BOARD_NAMES: ReadonlyMap<BoardKind, string> = new Map([
   ["theFall", "The Fall"],
 ]);
 
+/**
+ * The emblem cards (stage H, part 2): pictures shown to the candidate in
+ * part 2 of the Portal, in a tarot key's frame. Death and the Devil are
+ * the 13th and 15th keys; Pan and Typhon the rubric's "drawings"
+ * (Regardie, *The Golden Dawn*, vol. 2, 1938, pp. 178–184).
+ */
+export const CARD_KINDS = ["pan", "devil", "death", "typhon"] as const;
+export type CardKind = (typeof CARD_KINDS)[number];
+
+/** Each card's title, as the card writes it: a key's is its trump's. */
+export const CARD_TITLES: ReadonlyMap<CardKind, string> = new Map([
+  ["pan", "Pan"],
+  ["devil", "The Devil"],
+  ["death", "Death"],
+  ["typhon", "Typhon"],
+]);
+
+/**
+ * The labels a hall gives the cards, whose own titles cannot be read at
+ * a hall's size: their names as the Portal's diagram writes them
+ * (Regardie 1938, vol. 2, p.155), "Devil" on one line like the others
+ * rather than the key's "The Devil", which would wrap.
+ */
+export const CARD_LABELS: ReadonlyMap<CardKind, string> = new Map([
+  ["pan", "Pan"],
+  ["devil", "Devil"],
+  ["death", "Death"],
+  ["typhon", "Typhon"],
+]);
+
 /** Every tag the package knows. Art may add more through the registry. */
 export const HALL_TAGS: ReadonlyMap<string, HallTagSpec> = new Map<
   string,

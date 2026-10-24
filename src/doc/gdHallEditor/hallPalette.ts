@@ -6,6 +6,9 @@ import type { HallArtRegistry } from "@magick-components/gd/hall/types";
 import {
   BOARD_KINDS,
   BOARD_NAMES,
+  CARD_KINDS,
+  CARD_LABELS,
+  CARD_TITLES,
   CORE_ITEM_KINDS,
   HALL_ROLES,
 } from "@magick-components/gd/hall/vocabulary";
@@ -65,11 +68,11 @@ export function hallItemKinds(art: HallArtRegistry): string[] {
 }
 
 /**
- * The palette for an art registry: every officer role (the adepts
- * among them) and a marker; the altars, pillars, platform, throne, veil and a door; the banners
- * and a Hebrew letter; every item kind; a tarot key, a tablet, the Table
- * of Shewbread, the candlestick, the boards' diagrams, a kamea and a
- * planet's seals; free text.
+ * The palette for an art registry: every officer role (the adepts among
+ * them) and a marker; the altars, pillars, platform, throne, veil and a
+ * door; the banners and a Hebrew letter; every item kind; a tarot key,
+ * the emblem cards, a tablet, the Table of Shewbread, the candlestick,
+ * the boards' diagrams, a kamea and a planet's seals; free text.
  */
 export function hallPalette(art: HallArtRegistry): HallPaletteEntry[] {
   return [
@@ -208,6 +211,18 @@ export function hallPalette(art: HallArtRegistry): HallPaletteEntry[] {
       tag: "candlestick",
       attrs: {},
     },
+    // The emblem cards, labelled with their names (as p.155 labels them),
+    // which a card's own title is too small to show in a hall.
+    ...CARD_KINDS.map((kind): HallPaletteEntry => {
+      const label = CARD_LABELS.get(kind) as string;
+      return {
+        key: `card:${kind}`,
+        group: "Symbols",
+        label: `${CARD_TITLES.get(kind)} (card)`,
+        tag: "card",
+        attrs: { kind, label },
+      };
+    }),
     ...BOARD_KINDS.map(
       (kind): HallPaletteEntry => ({
         key: `board:${kind}`,

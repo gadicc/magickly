@@ -62,11 +62,23 @@ describe("the palette", () => {
       "board:minutumMundum",
       "board:gardenOfEden",
       "board:theFall",
+      "card:pan",
+      "card:devil",
+      "card:death",
+      "card:typhon",
       "kamea",
       "seal",
       "label",
     ])
       expect(keys).toContain(key);
+    // The cards come labelled, as the Portal's diagram labels them.
+    expect(
+      palette.find((candidate) => candidate.key === "card:devil"),
+    ).toMatchObject({
+      label: "The Devil (card)",
+      tag: "card",
+      attrs: { kind: "devil", label: "Devil" },
+    });
     // Every item the package draws.
     expect(hallItemKinds(gdHallArt)).toEqual([
       "brazier",

@@ -3,6 +3,7 @@ import { altarArt } from "./altar";
 import { breadArt, fanArt, roseArt, saltArt } from "./altarItems";
 import { bannerArt } from "./banner";
 import { boardArt } from "./board";
+import { cardArt } from "./cards";
 import { brazierArt, candleArt, gongArt } from "./furnishings";
 import { hebrewLetterArt } from "./hebrewLetter";
 import { crossArt, pentagramArt, triangleArt } from "./items";
@@ -52,6 +53,7 @@ export const defaultHallArt: HallArtRegistry = new Map([
   ["item:bread", breadArt],
   ["item:fan", fanArt],
   ["tarotKey", tarotKeyArt],
+  ["card", cardArt],
   ["tablet", tabletArt()],
   ["shewbread", shewbreadArt],
   ["candlestick", candlestickArt],

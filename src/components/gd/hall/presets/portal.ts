@@ -1,4 +1,5 @@
 import type { HallNode } from "../types";
+import { CARD_LABELS } from "../vocabulary";
 import { type HallPreset, regardie1938 } from "./types";
 
 /**
@@ -34,6 +35,28 @@ const EAST: readonly HallNode[] = [
   { type: "pillar", kind: "white", x: 10.3, y: -2 },
   { type: "veil", x: 8, y: -0.3 },
 ];
+
+/**
+ * The pictures shown to the candidate in part 2 (pp.178–184), where the
+ * diagram of p.155 names them: Pan and the Devil by the North wall (Pan
+ * to the East), Death and Typhon by the South wall (Death to the East).
+ * Emblem cards, each labelled as the diagram labels it (Gadi's option
+ * (d), 24 October 2026).
+ */
+const FIGURES: readonly HallNode[] = (
+  [
+    ["pan", 1.2, 5],
+    ["devil", 1.2, 11.2],
+    ["death", 14.8, 5],
+    ["typhon", 14.8, 11.2],
+  ] as const
+).map(([kind, x, y]) => ({
+  type: "card",
+  kind,
+  label: CARD_LABELS.get(kind) as string,
+  x,
+  y,
+}));
 
 /** The Earth tablet on the North wall, the Fire tablet on the South. */
 const SIDES: readonly HallNode[] = [
@@ -183,10 +206,7 @@ export const portal2: HallPreset = {
           ...PATHS,
           { type: "banner", kind: "east", x: 5, y: 3.5 },
           { type: "tablet", element: "air", x: 9.8, y: 3 },
-          { type: "marker", text: "Pan", x: 1.2, y: 5 },
-          { type: "marker", text: "Devil", x: 1.2, y: 11.2 },
-          { type: "marker", text: "Death", x: 14.8, y: 5 },
-          { type: "marker", text: "Typhon", x: 14.8, y: 11.2 },
+          ...FIGURES,
           ...SIDES,
           {
             type: "altar",

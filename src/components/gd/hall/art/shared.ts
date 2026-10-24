@@ -65,6 +65,8 @@ export const PALETTE = {
   earthBlack: "#2c2b29",
   /** The Third Adept's octagram. */
   orange: "#ff8c1a",
+  /** Typhon's storm cloud (stage H, part 2). */
+  storm: "#6b6f78",
 } as const;
 
 /**

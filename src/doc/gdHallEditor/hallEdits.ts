@@ -13,6 +13,8 @@ import type {
 import {
   BOARD_NAMES,
   type BoardKind,
+  CARD_TITLES,
+  type CardKind,
   roleName,
 } from "@magick-components/gd/hall/vocabulary";
 import {
@@ -159,6 +161,10 @@ export function hallNodeName(node: HallElement): string {
   if (tag === "board") {
     const diagram = BOARD_NAMES.get(kind as BoardKind);
     return diagram ? `Board: ${diagram}` : "Board";
+  }
+  if (tag === "card") {
+    const title = CARD_TITLES.get(kind as CardKind);
+    return title ? `Card: ${title}` : "Card";
   }
   if (tag === "kamea" || tag === "seal") {
     const planet = PLANET_NAMES.get(text(node, "planet") as Planet);

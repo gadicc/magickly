@@ -15,6 +15,7 @@ import type {
 import {
   ALTAR_KINDS,
   BOARD_KINDS,
+  CARD_KINDS,
   HALL_ROLES,
   type HallTagRole,
   IDENTIFIER,
@@ -292,6 +293,11 @@ export function validateHall(
                 `board: ${name} is ignored for a board with a diagram; scale sizes it`,
                 name,
               );
+        break;
+      case "card":
+        if (nullChoice("kind", CARD_KINDS)) break;
+        if (text("kind") === undefined)
+          report(path, "warning", "card: no kind; drawn blank", "kind");
         break;
       case "kamea":
       case "seal":
