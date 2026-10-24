@@ -385,18 +385,50 @@ Follow-ups are separate from the completed migration work:
   properties panel and carried in the Pug; the Keryx's caduceus and the
   Sentinel's Eye of Horus are redrawn, `Lamen` is in
   `src/components/gd` and the third-party art list is empty.
-  Waiting for Gadi from it (decision renders outside the repository,
-  plan 061; the colours at the end of the project): the Water and Fire
-  letter choices (a variants table in plan 061), whether Earth and Air
-  (which seem to follow Dee's table, not the Order's) switch to the
-  Golden Dawn's, the tablets' colours, how
-  second letters are drawn, the Union on the page and the image route,
-  and a source `version` for the tablets. TODO from earlier: Gadi's call on the Chiefs on the new presets' daises
+  The tablet versions Gadi decided on 24 October 2026 are done on
+  `gate/enochian-versions`: magick-data holds each source's reading of
+  every square (Regardie 1940, the Equinox 1912, Greer, Dee's table of
+  1584 as he corrected it and Raphael's of 1587, from Casaubon's 1659
+  printing of Dee's records), and a version is a rule over them: the
+  Golden Dawn's (the default, Earth and Air now included), Regardie's,
+  the Equinox's, Dee's and Raphael's. `Tablet` draws any of them, with
+  reversed letters optional and second letters in the corners;
+  `/enochian/tablets` chooses one and says how it differs from each
+  other; the image route takes `version`; the hall's `tablet` takes
+  `version`, the Golden Dawn's when absent. In Gadi's words: "we want to
+  accommodate Enochian practitioners from both traditions; for gdHall we
+  use the Regardie/GD version, but we also accommodate Dee purists"
+  ([plan 061](061-gd-hall.md#tablet-versions)). On this merge every
+  tablet image's identity (`inputs.sha256`) moves, though only Earth's
+  and Air's bytes do, so a catalog comparing the images' metadata
+  re-identifies and republishes all four tablet images once.
+  Waiting for Gadi from stages G and H (decision renders outside the
+  repository, plan 061; the colours at the end of the project): the
+  Water and Fire letter choices (a variants table in plan 061), the
+  tablets' colours, and the Union on the page and the image route; from
+  the versions, what Dee's two empty Fire squares mean and Cotton's x
+  against Sloane's p (both built as recommended), Dee's Black Cross in
+  the data, and the 1587 print's v in Fire's row 6 square 8. TODO: the British Library follow-up: re-check the catalogue
+  (searcharchives.bl.uk, Sloane MS 3191), whose images have been
+  offline since the Rhysida attack of October 2023 ("Images currently
+  unavailable" on 24 October 2026; Cotton MS Appendix XLVI was never
+  digitised), and when they return check the reformed table's folios
+  (Peterson ff.53v–54r, Vovina and Burford ff.55v–56r), the 1587
+  capitals, the Black Cross's placement, the letters Dee struck through
+  in 1584, the two Fire squares where Sloane and Cotton differ, and the
+  images' licence. TODO from earlier: Gadi's call on the Chiefs on the new presets' daises
   (after the merge; he leans towards Greer's redraws), the stage F
   markers and placeholders Gadi has yet to decide on in stage H (Pan, the
   Devil, Death and Typhon; Eden and the Fall; the adepts' lamens; the
   Tree markers; the Minutum Mundum's path colours), and the seals,
-  deferred (adapt `/gd/sigils` to draw kamea sigils, decided later); recording officer movement between stations, a `gdVault` for
+  deferred: two features, name sigils traced over a kamea (adapt
+  `/gd/sigils`: a planet's square, the name's letters as numbers with an
+  Aiq Bekar reduction where a value exceeds the square, a path through
+  `kameaGeometry`'s cell centres, start and end marks as on the rose;
+  `Kamea` hosts it as an overlay through `children`), and the
+  traditional seals, hand-drawn after Agrippa's public-domain woodcuts
+  (1533, II.22, cited by archive.org item and leaf), which the hall's
+  `seal(planet)` shows; recording officer movement between stations, a `gdVault` for
   the Adeptus Minor Vault, original Enochian letterforms, moving
   `enochianFont.ts` and the other files the import-boundary test allows out
   of `src/components` (or off their app imports), embedded fonts in the Tree

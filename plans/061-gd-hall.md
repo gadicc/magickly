@@ -752,7 +752,7 @@ For the Enochian tablets (stage G):
 | Pillars, banners, Hebrew banners | drawings, first-party | ported into code (A1) |
 | Pantacle | drawing, first-party | redrawn from geometry, `item:pantacle` (A2) |
 | Flaming Sword (lightning) | drawing, first-party | redrawn without markers, `item:lightning` (A2) |
-| Enochian tablets and sigils | `Tablet`, first-party | reused as `tablet` (A2); the Water and Fire sigils drawn from geometry after Regardie's description and the Tablet of Union drawn (G); font licence open |
+| Enochian tablets and sigils | `Tablet`, first-party | reused as `tablet` (A2); the Water and Fire sigils drawn from geometry after Regardie's description and the Tablet of Union drawn (G); drawn in any version, the Equinox's sigils in black after its Plate X, none for Dee's and Raphael's tables (Tablet versions); font licence open |
 | Table of Shewbread, candlestick | components, first-party | reused as `shewbread`, `candlestick` (A2) |
 | Cup, chalice, salt, bread, rose, lamp, lantern, censer, fan | drawings, icon-set signatures, no source | lifted into `src/app/gd/hall/legacyArt/` (A2, AGPL, injected); redrawn as original flat emblems in the old boxes, `vessels.tsx`, `lights.tsx`, `altarItems.tsx` (H, `original()`), `legacyArt/` removed |
 | Caduceus (Keryx lamen) | SVG Repo, "public domain" label | redrawn from geometry in `Lamen` (H) |
@@ -760,7 +760,7 @@ For the Enochian tablets (stage G):
 | Tarot XXI on the Theoricus altar | RWS raster in the drawing | original card, `tarotKey` (A2) |
 | Serpent on the Tree, Moon kamea, Moon seals | rasters in Theoricus 2, no source | markers in the preset (A2); the kamea computed and drawn, `kamea` (F), through the shared `Kamea` (after F); the seals a placeholder, `seal` (F), deferred by Gadi in H (Follow-ups); the serpent a marker, pending Gadi's decision |
 | Planetary kameas | none | computed (Agrippa's squares) and drawn from geometry, `kamea` (F); since the follow-ups after F the squares are magick-data's (`astrology/kameas`, MIT code, no rights asserted over the squares) and the drawing is `Kamea` (`src/components/astrology/Kamea.tsx`, MIT), which the hall's `kamea` art wraps in its font and palette; seals and sigils to overlay it in H |
-| Planetary seals | none | placeholder `seal`, a dashed ring naming the planet (F); deferred (H, Gadi's decision): `/gd/sigils` to be adapted to draw kamea sigils, decided later |
+| Planetary seals | none | placeholder `seal`, a dashed ring naming the planet (F); deferred (H, Gadi's decision). Two features, both deferred (Gadi, 24 October 2026; Follow-ups): name sigils traced over a kamea by an adapted `/gd/sigils`, hosted by `Kamea` as an overlay; and the traditional seals, hand-drawn after Agrippa's public-domain woodcuts (1533, II.22), which the hall's `seal(planet)` shows |
 | Flaming Sword and Minutum Mundum boards | `TreeOfLife`, first-party | `TreeFigure` (the Tree's own geometry) on a board, `board` (F); the Minutum Mundum's paths in their colours need path colour data; pending Gadi's decision (H) |
 | Garden of Eden, the Fall | none | labelled boards (F); pending Gadi's decision (H) |
 | Veil, white altar, gong, brazier, candle | none | original geometry (F) |
@@ -3691,6 +3691,391 @@ Kept as they are, as Gadi asked, until he decides:
 - **The Minutum Mundum's path colours**, which need path colour data in
   magick-data.
 
+## Tablet versions
+
+Built on `gate/enochian-versions` (24 October 2026), from `main` at
+2b07004, after Gadi's decisions of that morning on the research into
+Dee's tables (outside the repository, in `~/.cache/tablets-dee/`:
+`README.md`, `sources.md`, `diffs.md`, `grids.json`).
+
+### The principle
+
+In Gadi's words (24 October 2026): "we want to accommodate Enochian
+practitioners from both traditions; for gdHall we use the Regardie/GD
+version, but we also accommodate Dee purists." The Golden Dawn's version
+is the default everywhere, and the only one a hall draws unless told
+otherwise; Dee's tables of 1584 and 1587 stand beside it, from his own
+records. The magick-data README says the same.
+
+### Gadi's decisions (24 October 2026)
+
+1. **Versions.** One concept, `version`: `gd` (the default, the Golden
+   Dawn's by the rules of Stage G: Regardie's higher letter, the
+   name-based corrections and the variants table's recommendations),
+   `regardie` (his 1940 print exactly, higher letter), `equinox` (the
+   1912 print), `dee` (the 1584 table as Dee corrected it, which the
+   angel approved, with the first-dictated letters recorded) and
+   `raphael` (the Tabula recensa of 1587). Each source's reading is
+   stored square by square, and a version is a rule over the readings,
+   not a copy. Earth and Air take the Golden Dawn's version too; their
+   old letters, which are 1587's, become Raphael's reading in the 1659
+   print's case. Dee's Black Cross stays out of the data for now.
+2. **Differences both ways**, each version against each other, the
+   facts generated from the readings and the prose our own.
+3. **`Tablet`** takes `version`, `reversed` and `alt`; the sigils follow
+   the version.
+4. **`/enochian/tablets`**: a version picker, the version's notes and
+   differences, the existing differences view across versions, and
+   switches for reversed and second letters.
+5. **The hall**: `tablet(element, version)`, `gd` when absent.
+6. The principle above, recorded here and in the README.
+7. The British Library follow-up, and 8. the kamea follow-up (below).
+
+Two questions are not decided, and the recommendation is built where
+it is cheap to change (below): what the two empty Fire squares of 1584
+mean, and Cotton's x against Sloane's p in two Fire squares of 1587
+(follow the print).
+
+### The data
+
+- **The model** (6db02d5). A tablet row is `id`, `kind`, `readings` and,
+  for Watchtowers, `choices`. `readings` holds each source by key,
+  `regardie1940`, `equinox1912`, `greer`, `dee1584` and `raphael1587`
+  (`TABLET_SOURCES`): its `rows`, one character a square ("." for an
+  empty one, the first letter where several are printed) and `marks`
+  for the squares that hold more: `beside` (letters on the same line,
+  Regardie's "yl"), `below` (his second letters), `reversed`,
+  `dictated` (the letters first written down in 1584, where Dee later
+  corrected the square), `misprint` (what the 1659 print has where every
+  other witness agrees otherwise), `alt` (other readings within the
+  version's witnesses) and `doubt` (low, medium or high). `choices.gd`
+  lists the eleven squares where the Golden Dawn's version takes the
+  Equinox's letter rather than Regardie's higher one (Stage G's nine in
+  Water and Fire; Air's row 5 square 7, m, by Htmorda; Earth's row 11
+  square 6, i, by Ahmlicv). The Tablet of Union has the three Golden
+  Dawn readings only.
+- **The versions** are code (`Tablets.ts`, MIT): `TABLET_VERSIONS`
+  (`gd`, `regardie`, `equinox`, `dee`, `raphael`),
+  `DEFAULT_TABLET_VERSION` and `tabletVersion(tablet, version)`, which
+  resolves a frozen, cached view (`grid`, with `null` for an empty
+  square, and `marks` with `alt`, `reversed` and `doubt`), or
+  `undefined` where a version has no such tablet. `gd`: Regardie's
+  higher letter but where `choices.gd` says; `alt` every other letter
+  Regardie, the Equinox or Greer prints (Regardie's all, the others'
+  where they add more than case or u for v, which reproduces Stage G's
+  marks exactly); reversed letters the Equinox's. The others take their
+  source's letters, reversed letters and doubts, and `alt` from
+  `beside`, `below`, `dictated` and `alt`. `tabletDifferences(a, b)`
+  lists the squares where two views differ, as `letter`, `uv`, `case` or
+  `empty`. A new source is a new key in `readings`, a new version a new
+  id and rule: no tablet's id moves.
+- `grid` and `marks` left the rows: a breaking change, which the
+  package's 0.0.0 and privacy allow. Its readers in the app (`Tablet`,
+  the image spec, the page) moved with it.
+- **Dee 1584.** From Casaubon's *A True & Faithful Relation* (1659,
+  archive.org `truefaithfulrela00deej`), pp.175–177 (leaves n264–n266),
+  with Dee's corrections (p.185, n274; p.188, n277: the tables true,
+  both readings of a name true, the capitals well corrected). As
+  corrected: Air row 3 square 7 r (first written v), Water row 5 square
+  3 t (c), row 5 square 12 N reversed (y and l), row 13 square 4 n (i);
+  every later copy has the corrected letter. Case is Casaubon's type,
+  and he sets Earth's row 8 square 1, a reversed R, as the ligature Æ,
+  which the header of `tablets.json5` records. Reversed: the eight
+  smallest letters Dee picked out (pp.179, 183), which spell Paraoan;
+  the print marks Fire's P and A (its margin) and Water's L (its sort)
+  reversed, and p.183 asks after the "averted" L; the other five rest on
+  later copies as modern renderings show them (doubt medium).
+- **The two empty Fire squares** (row 1 square 12, row 2 square 11) are
+  empty in every 1584 witness read: printed as dots, and empty in a
+  modern rendering of the Cotton manuscript. As recommended, the
+  `dee1584` reading has "." there, with Raphael's 1587 letters (a, v)
+  as `alt`; `Tablet` draws them blank and the hall and the image with
+  it. Changing the decision is two characters and two marks in
+  `tablets.json5` (the `dee1584` reading of `fire`), the notes'
+  `emptyFire` topic and two square notes, and the tests that pin them.
+- **Raphael 1587.** From the same book's "Actio Tertia", second
+  pagination, p.15 (leaf n456): the print's letters and case, mostly
+  small letters, in ten squares a misprint corrected to the letter
+  every other copy of Dee's tables has (`misprint` keeps the printed
+  one; the Golden Dawn's sources are not counted, so Fire's row 6
+  square 8, where the print's v is Regardie's second letter, b over v,
+  has doubt medium and a note: it may be the Cotton copy's reading); the
+  print's q in Fire's last row is its reversed p. Fire's row 8 square 1
+  and row 12 square 4 follow the print, x (from the Cotton manuscript),
+  with Sloane MS 3191's p as `alt` (doubt high). Its capitals, from
+  Sloane MS 3191, are known only through Peterson's and Vovina's
+  renderings (cross-checks, never cited), so they wait for the British
+  Library (below). Reversed: seven of Dee's eight; Earth's R left the
+  table when its eighth row moved one square left.
+- **Earth and Air** now read the Golden Dawn's by default: thirteen
+  squares change in each, exactly the list in Stage G's notes. Raphael's
+  reading holds the old letters, u and v and case aside (a test pins
+  them).
+- **The research findings** are in the notes, cited by stable
+  reference: Earth and Air's old letters are 1587's, not 1584's; many
+  of Regardie's doubled squares pair the 1584 and the 1587 letter,
+  nearly always 1587 above, and Earth's eighth row is the 1587 row over
+  the 1584 row, which the notes call an inference; giving a whole
+  Watchtower an element is the Golden Dawn's (Dee gives elements to the
+  angels under each lesser cross, p.181); the Tablet of Union is the
+  Order's, from Dee's Black Cross letters (pp.179–180).
+
+### The notes
+
+`tabletNotes.json5` is rewritten around the versions (6db02d5): an
+`intro` (the principle, for readers); a note per version (`text`,
+`reversed`, `sigils`, `sources` and `differs`, a paragraph on how it
+differs from each of the four others, so twenty in all, in both
+directions); nine topics on how the versions differ (letters, second
+letters, reversed letters, Earth's eighth row, the empty Fire squares,
+the Tablet of Union, elements and quarters, sigils, colours); a note per
+tablet; and 59 square notes. A square note is prose and sources only:
+what each source prints there, and the counts and squares where two
+versions differ, are read from the readings (a test holds the prose to
+no counts of squares but the sources' own: four corrected, ten
+misprints, two empty). New works: Cotton MS Appendix XLVI, and
+`casaubon1659` cited by page and leaf, the 1587 table by part
+("Actio Tertia").
+
+### Counts of the differences
+
+Squares that differ in letter or by an empty square, per Watchtower,
+with every difference (u for v and case too) in brackets:
+
+| Versions | Earth | Air | Water | Fire | All four |
+| --- | ---: | ---: | ---: | ---: | --- |
+| gd / regardie | 1 (1) | 1 (1) | 6 (6) | 3 (3) | 11 (11: 0 u/v, 0 case) |
+| gd / equinox | 10 (10) | 6 (8) | 7 (9) | 3 (6) | 26 (33: 3 u/v, 4 case) |
+| gd / dee | 12 (15) | 6 (13) | 7 (9) | 4 (8) | 29 (45: 1 u/v, 15 case) |
+| gd / raphael | 4 (29) | 2 (28) | 5 (29) | 2 (27) | 13 (113: 7 u/v, 93 case) |
+| regardie / equinox | 11 (11) | 7 (9) | 13 (15) | 6 (9) | 37 (44: 3 u/v, 4 case) |
+| regardie / dee | 13 (16) | 7 (14) | 11 (13) | 7 (11) | 38 (54: 1 u/v, 15 case) |
+| regardie / raphael | 5 (30) | 3 (29) | 9 (32) | 5 (29) | 22 (120: 7 u/v, 91 case) |
+| equinox / dee | 4 (7) | 2 (9) | 7 (11) | 5 (7) | 18 (34: 3 u/v, 13 case) |
+| equinox / raphael | 11 (35) | 5 (31) | 7 (30) | 5 (30) | 28 (126: 6 u/v, 92 case) |
+| dee / raphael | 13 (34) | 5 (32) | 2 (26) | 6 (29) | 26 (121: 5 u/v, 90 case) |
+
+Dee's 1584 table and Raphael's 1587 differ in 26 squares, as the
+research found: Earth's eighth row (12), the three Fire squares 1587
+fills or changes, Fire's two x squares, and nine elsewhere. Case
+dominates every comparison with Raphael's, whose print is in small
+letters.
+
+### Defaults chosen
+
+- **Reversed letters** are mirrored by default in every version; a
+  version marks only what its source marks: `gd` and `equinox` the
+  eight the Equinox prints in Enochian, `regardie` none (he prints them
+  plain), `dee` the eight Dee picked out, `raphael` seven of them.
+- **Second letters** are off by default.
+- **Sigils**: Regardie's for `gd` and `regardie`; the Equinox's for
+  `equinox`, from its Plate X, in black (Water's figures 4 and b over b
+  and 6; Earth a plain cross potent; Fire's rays straight and wavy by
+  turns); none for `dee` and `raphael`, since Regardie says the Order
+  took its sigils from the Sigillum Dei Aemeth (p.307), and the pages
+  of Dee's record cited draw none above the tables. As Gadi asked in
+  review, a short note stands in the sigil's place, in three small
+  lines ("No sigil: Dee's tables carry none. The Watchtower sigils are
+  the Golden Dawn's, from the Sigillum Dei Aemeth (Regardie, vol. 4,
+  p.307)."), so the page keeps its shape. The image route draws it
+  too, outlined like the letters; it fits the sigil's band of the
+  page, and an image of Dee's table then says why it has no sigil.
+
+### The component, the page, the image and the hall
+
+- **`Tablet`** (a05f661): `version`, `reversed` (default true) and `alt`
+  (default false), second letters drawn small in each square's top right
+  corner (6 units, left to right in either font); Dee's empty squares
+  draw no letter; a tablet a version lacks (Dee's or Raphael's Tablet of
+  Union) draws its page with a dashed outline and "No Tablet of Union in
+  Dee's table of 1584"; Dee's and Raphael's Watchtowers draw the note
+  above in the sigil's place; a version other than the default is in the
+  accessible name. The default drawing keeps its bytes (Water, Fire and
+  the Union unchanged; Earth's and Air's re-pinned in 6db02d5 for their
+  new letters).
+- **`/enochian/tablets`** (d129108): Tablet, Version (the Golden
+  Dawn's marked default), the font, and switches for Reversed letters,
+  Second letters and "Show where the sources differ". The chosen
+  version's section gives its note, its reversed letters, its sigils
+  and its sources, then, for each other version, the notes' paragraph,
+  a count read from the readings ("In the Earth tablet, 34 squares
+  differ: 13 in letter, 2 in u for v, 19 in case alone", Dee's against
+  Raphael's) and the squares in a `<details>` list. The
+  differences view outlines, across all versions, every square where
+  two versions differ in more than case, a version holds second
+  letters, a doubt or a reversed letter, or a note speaks; a square's
+  detail gives each version's letter, each source's reading in words
+  ("y and l over N and h"; "N, reversed; first written y and l; high
+  doubt") and the note. The live region announces each version's
+  letter.
+- **The image route** takes `version` (written out in the contract,
+  held equal to `TABLET_VERSIONS` by a test; `gd` when absent, so old
+  links keep their meaning, and left out of canonical queries; the
+  filename gains `-dee` and the like). The page links the image in the
+  version shown, and gives no link, saying why, while second letters
+  are shown or reversed letters drawn plain; downloads are named for
+  what is drawn (`-second-letters`, `-plain`, `-differences` after the
+  image's name). The image's inputs hash every reading, the `choices`
+  and the version rules (`TABLET_VERSION_RULES`, exported frozen, each
+  with a `revision` to bump when `tabletVersion`'s code changes what it
+  makes of a rule), so a change of rule moves the identity with the
+  bytes (re-pinned in 6db02d5). Bytes are pinned, after a review of the
+  rasters, for Air in the Golden Dawn's version (both fonts) and for
+  Fire in each other version. On this merge the identities
+  (`inputs.sha256`) of all four Watchtowers' images move, since every
+  reading and the rules join their inputs, while the bytes move for
+  Earth and Air only: a catalog or bundle that compares the images'
+  metadata will re-identify and republish every tablet image once.
+- **The hall** (fc7a6e1): `tablet` takes `version` (enum), `reversed`
+  and `alt` (booleans), none of them a reserved name; absent, the
+  version is `gd`, reversed letters are mirrored and second letters left
+  out. The validator, the properties panel and the Pug round trip follow
+  from the art's attributes; the palette's tablet leaves the version
+  unwritten. A boolean's default is now part of its attribute spec
+  (`default: true` for the tablet's `reversed` and the hall's
+  `compass`), replacing the panel's list of names, and an enum spec may
+  name its values (`labels`): the panel offers each version as its id,
+  which the Pug holds, with its name beside it ("dee · Dee, 1584";
+  Gadi's request in review), in its usual select, no special case. A
+  tablet drawn as before keeps its variant, so no preset snapshot moved
+  for this commit (they moved in 6db02d5, Earth's and Air's letters
+  only). The board is the same in every version, so the layout contract
+  stands.
+
+### Bundle
+
+From the gates' production builds (webpack), gzip -6, at fc7a6e1
+against `main` at 2b07004 built the same way. The reader's hall
+drawing loads its art in one chunk, 76,481 bytes before and 77,044
+after (27,444 and 27,679 gzipped): the tablet's three attributes and
+the versions' names for the panel. It carries no table of the barrel
+and none of the notes' prose. `Tablet` with magick-data's
+`enochian/tablets` is a chunk of its own, which the hall and the page
+share: 13,410 bytes before and 24,177 after (4,564 and 7,273 gzipped),
+for the five sources' readings, the rules, the resolver, the Equinox's
+sigils, the note where a sigil is missing, and the props. The notes'
+prose is in the `/enochian/tablets` page's chunk alone: 36,359 bytes
+before and 56,016 after (7,419 and 12,498 gzipped).
+
+### What was verified, and how
+
+- **Gates**, per commit, each in a clean `git archive` export with Node
+  24 and the CI placeholder environment (`pnpm install
+  --frozen-lockfile`, `check`, `typecheck`, `test:coverage` with the
+  per-file thresholds, `build`): all 0 for 6db02d5, a05f661, d129108 and
+  fc7a6e1 after the review fixes, as for each before them, and for the
+  plan's commit with `loom check`, the magick-data smoke test and
+  `pnpm check:turbopack`, all 0 at fc7a6e1 (6,614 tests passed, 17
+  skipped; the smoke test's 13 steps), after the final review's fixes
+  as after the first review's. One run of the data commit between the
+  two reviews failed a test outside this work, `TrainingUpload.test.tsx`
+  (its FilePond upload), and passed on a rerun. The smoke test's packed
+  build is what found the declarations `Tablets.ts` lacked under
+  `isolatedDeclarations`, a fix folded into the data commit. The
+  compiler is untouched: `semantic.ts`, `semanticCompilerImpl.ts` and
+  `ritualNodeIds.ts` have no diff; the MIT directories import no app
+  code.
+- **The data against the sources.** The Golden Dawn rule reproduces
+  Water's, Fire's and the Union's Stage G letters and marks exactly, and
+  Earth's and Air's thirteen changes each as Stage G listed them; the
+  transcriptions of Regardie, the Equinox and Greer in Stage G's seventy
+  square notes (before the rewrite to the present 59) match the
+  readings square for square; the `dee1584` reading is
+  Casaubon's print but for the four corrected squares and the print's
+  glyphs for reversed letters; `raphael1587` is the 1587 print but for
+  its ten misprints; Earth's and Air's old letters equal Raphael's, u
+  and v and case aside. The Seniors of all four Watchtowers read off the
+  Golden Dawn's version (tests).
+- **In the browser** (Turbopack dev server from this branch on
+  127.0.0.1:3317, headless Chromium over CDP with classic 15 px
+  scrollbars; nothing signed in or saved): `/enochian/tablets` at 1440 ×
+  900 and 390 × 844 (mobile emulation): the Version choice redraws
+  Earth's eighth row (RCanchiisomt, ROcanchiasom), names the tablet
+  "Enochian Watchtower of Earth, Dee's table of 1584", draws Dee's Fire
+  with 154 letters and, after the review fixes, the note in the sigil's
+  place; Second letters by keyboard (Space) draws the two empty squares'
+  1587 letters; the differences view outlines 18 Fire squares and
+  announces each version's letter; no horizontal scroll, no console
+  errors. `/gd/hall` at both sizes: Portal 1's Fire tablet given
+  `version="dee", alt=true` in the source draws the note in its sigil's
+  place and its second letters; its Tablet of Union given
+  `version="raphael"` says it has none; no warnings, no console errors.
+  Screenshots are outside the repository
+  (`~/.cache/enochian-versions/shots/`).
+- **Documentation screenshots**: none shows a tablet or a hall
+  (`scripts/docs-screenshots`), so none was regenerated.
+
+### Review fixes
+
+An independent review by Opus 5.5 (24 October 2026) found the letters
+right against the scans and Stage G, the API safe and the default
+drawings' bytes unchanged but for Earth and Air. Its fixes, and Gadi's
+two requests, were folded into the commits they belong to (a `--fixup`
+and `amend!` autosquash; Commits lists the new SHAs): the page commit's
+subject shortened to 50 characters; Fire's row 6 square 8 (above);
+`misprint` defined against Dee's copies only, which Water's row 4 square
+9 had shown too broad; Casaubon's Æ recorded; the version rules in the
+image's identity, and a pin for each version; a count in the notes'
+prose reworded ("about two dozen squares"), and their test widened to
+words such as "dozen" and "half"; boolean defaults in the attribute
+spec; downloads named for what is drawn; "From the Golden Dawn's" in
+lower case mid-sentence; the schema refusing a mark that says only
+`reversed: false` and a choice of an empty square or of Regardie's own
+letter; `TabletView.id` typed as a tablet's id, `tabletDifferences`
+refusing views of two tablets, and the rows deeply frozen so the views'
+cache stays sound; the notes saying Casaubon *marks* three reversed
+letters (two in his margin), and naming the four Greer mirrors, N, L, R
+and P. Gadi asked for the note in the sigil's place and the version
+names in the hall's panel (both above).
+
+A final review by Fable 5.1 (24 October 2026) checked every square of
+every version against the scans, found no disagreement and the branch
+safe to merge, and asked for a last few small fixes, folded the same
+way: this section and plan 000 say that every tablet image's identity
+moves on the merge (above); with second letters shown, the page lists
+them in words, square by square, for readers who cannot see the
+corners; Water's row 6 square 11 explains that Regardie sets L large
+and first, with c small and raised, which is why c is read as the
+higher letter; two marks Casaubon prints on Earth, a rule under the c
+of row 12 square 6 and over the V of row 13 square 6, have notes saying
+their meaning is unknown, perhaps letters Dee queried (so 59 square
+notes); `Tablet`'s `alt` is documented as Watchtowers only, since the
+Tablet of Union has no second letters; and the hall's panel names the
+Golden Dawn's version "gd · Golden Dawn", its own "Default" choice
+already saying it is the default.
+
+### British Library follow-up
+
+The Library's Rhysida ransomware attack of October 2023 took its
+Digitised Manuscripts service offline. About 1,000 manuscripts returned
+in October 2024, and recovery was reported as ongoing in 2026. On 24
+October 2026 the catalogue record for Sloane MS 3191 still read
+"Images currently unavailable", and Cotton MS Appendix XLVI was never
+digitised. Re-check the catalogue (searcharchives.bl.uk, Sloane MS
+3191) from time to time; when the images return, check:
+
+- the folios of the reformed table: Peterson gives ff.53v–54r, Vovina
+  and Burford ff.55v–56r;
+- the 1587 capitals, which `raphael1587` leaves as the 1659 print's
+  small letters;
+- the Black Cross's placement, and then whether it enters the data;
+- the letters Dee struck through in 1584, which may explain Regardie's
+  second letters that are neither of Dee's tables;
+- the two Fire squares where Sloane (p) and Cotton through the print
+  (x) differ, row 8 square 1 and row 12 square 4;
+- the images' licence terms, before any is cited by URL or used.
+
+### Open for Gadi
+
+- The two empty Fire squares of 1584: what they mean, and whether Dee's
+  version keeps them empty (built so; cheap to change, above).
+- The two Fire squares where Cotton's print has x and Sloane p (built
+  following the print).
+- Dee's Black Cross in the data, after the British Library.
+- Fire's row 6 square 8 in the 1587 print: a misprint, as the version
+  reads it, or the Cotton copy's v, which Regardie keeps as a second
+  letter (doubt medium, until the British Library).
+
 ## Commits
 
 | Commit | Change |
@@ -3813,6 +4198,10 @@ Kept as they are, as Gadi asked, until he decides:
 | f26ae70 | The rose (heraldic), salt (a shaker), bread (a round loaf) and fan as original flat emblems; `legacyArt/` removed (H; review fixes folded in) |
 | 10d8c1f | The Keryx's caduceus and the Sentinel's Eye of Horus redrawn from geometry; the list of third-party art empty; `/about`'s two credits kept for the old drawings (H; review fixes folded in) |
 | 3bcc110 | `Lamen` moved to `src/components/gd/Lamen.tsx` (MIT), drawn by the package's `lamen` art; `lamenArt.tsx` gone (H) |
+| 6db02d5 | magick-data: each source's reading per square, versions as rules (`tabletVersion`, `tabletDifferences`), Earth and Air the Golden Dawn's by default, the notes rewritten around the versions (Tablet versions) |
+| a05f661 | `Tablet` draws any version, its reversed letters optional and second letters in the corners; the Equinox's sigils; none for Dee's and Raphael's (Tablet versions) |
+| d129108 | `/enochian/tablets` chooses a version and says how it differs from each other; the image route takes `version` (Tablet versions) |
+| fc7a6e1 | The hall's `tablet` takes `version`, `reversed` and `alt`, the Golden Dawn's when absent (Tablet versions) |
 
 ## Future
 
@@ -3970,8 +4359,8 @@ tablets' colours (Air's own angle brown rather than mauve); drawing
 carry marks; Water's sigil as Regardie and Greer draw it rather than
 the Equinox; the Tablet of Union on `/enochian/tablets` and the image
 route, which needs a viewBox per id in the render contract; a source
-`version` for the tablets (Dee 1584, Raphael 1587, the Golden Dawn),
-as a field or sibling tables beside the unchanged ids; Dee's
+`version` for the tablets (done in Tablet versions, with Earth and Air
+switched and second letters drawable); Dee's
 manuscripts read directly for it; a West-wall Watchtower drawn along
 the wall needs rotation, which the hall does not do. The tablets'
 colours wait for Gadi's review at the end of the project (the contrast
@@ -3994,3 +4383,30 @@ Mundum's path colours (path colour data in magick-data first). The
 before and after sheets are outside the repository (Stage H notes). The
 new art is checked in headless Chromium only (no Firefox, Safari or
 real device).
+
+From the tablet versions (24 October 2026): the British Library
+follow-up (Tablet versions: re-check the Sloane MS 3191 catalogue
+record and, when its images return, the folios, the 1587 capitals, the
+Black Cross, Dee's struck letters, Fire's x and p squares and the
+licence); Dee's Black Cross in the data after that; Gadi's calls on the
+two empty Fire squares and Cotton's x (both built as recommended); the
+1587 print's v in Fire's row 6 square 8; the Tablet
+of Union on the page and the image route, still waiting for a viewBox
+per id. The page and the hall checked in headless Chromium only (no
+Firefox, Safari or real device).
+
+The seals and the kamea sigils, both deferred (Gadi, 24 October 2026):
+
+- **Name sigils over a kamea.** Adapt `/gd/sigils`, which traces a
+  name's sigil over the Golden Dawn's rose, to trace it over a planet's
+  kamea as well: the planet's square; the name's letters as numbers,
+  reduced by Aiq Bekar where a value exceeds the square; a path through
+  the cell centres `kameaGeometry` gives; and start and end marks as on
+  the rose. That gives the *name sigils*, such as those of the planetary
+  intelligences and spirits. `Kamea` can host it as an overlay, through
+  its `children`.
+- **The traditional seals** are not those sigils but designed figures in
+  Agrippa, *De occulta philosophia* (1533), book II, chapter 22, to be
+  hand-drawn after his public-domain woodcuts, cited by archive.org item
+  and leaf. The hall's `seal(planet)` shows them; the sigil tool is a
+  separate feature.
