@@ -3,6 +3,7 @@ import tablets, { tabletVersion } from "magick-data/enochian/tablets";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import Tablet, {
+  EquinoxSigils,
   Sigils,
   tabletName,
   tabletViewBox,
@@ -30,9 +31,13 @@ const draw = (
 const sha256 = (text: string) =>
   createHash("sha256").update(text).digest("hex");
 
-/** The letters drawn, in order. */
+/** The letters drawn, in order, not counting a note in the sigil's place. */
 const letters = (markup: string) =>
-  [...markup.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((match) => match[1]);
+  [
+    ...markup
+      .replace(/<g data-sigil-note="">.*?<\/g>/g, "")
+      .matchAll(/<text[^>]*>([^<]*)<\/text>/g),
+  ].map((match) => match[1]);
 
 describe("Tablet", () => {
   // Earth and Air in the Golden Dawn's version, the default since the
@@ -210,5 +215,130 @@ describe("Tablet", () => {
       expect(markup).not.toContain("<text");
       expect(markup).not.toContain("<rect");
     }
+  });
+
+  describe("in a version", () => {
+    const drawIn = (
+      id: string,
+      version: string,
+      options: { reversed?: boolean; alt?: boolean } = {},
+    ) =>
+      renderToStaticMarkup(
+        <Tablet id={id} version={version} frame={false} {...options} />,
+      );
+    const mirrored = (markup: string) =>
+      [
+        ...markup.matchAll(
+          /<text[^>]*transform="[^"]*scale\(-1 1\)"[^>]*>([^<]*)</g,
+        ),
+      ].map((match) => match[1]);
+    const grid = (id: "fire" | "water", version: string) =>
+      (tabletVersion(tablets[id], version)?.grid ?? [])
+        .flat()
+        .filter((letter) => letter !== null)
+        .join("");
+    const corner = (markup: string) =>
+      [...markup.matchAll(/<text[^>]*data-alt=""[^>]*>([^<]*)</g)].map(
+        (match) => match[1],
+      );
+
+    it("draws its letters, leaving an empty square blank", () => {
+      for (const version of ["gd", "regardie", "equinox", "dee", "raphael"])
+        expect(letters(drawIn("fire", version)).join(""), version).toBe(
+          grid("fire", version),
+        );
+      // Dee's two empty Fire squares draw no letter at all.
+      expect(letters(drawIn("fire", "dee"))).toHaveLength(154);
+      expect(drawIn("fire", "nonesuch")).toBe(drawIn("fire", "gd"));
+    });
+
+    it("draws Regardie's sigils, the Equinox's, or none", () => {
+      for (const id of ["earth", "air", "water", "fire"] as const) {
+        const regardie = renderToStaticMarkup(Sigils[id]());
+        const equinox = renderToStaticMarkup(EquinoxSigils[id]());
+        expect(regardie).not.toBe(equinox);
+        expect(drawIn(id, "gd")).toContain(regardie);
+        expect(drawIn(id, "regardie")).toContain(regardie);
+        expect(drawIn(id, "equinox")).toContain(equinox);
+        // In black alone, as the Equinox prints them.
+        expect(equinox).not.toMatch(/#(?!000)[0-9a-f]{3}\b/);
+        for (const version of ["dee", "raphael"]) {
+          const markup = drawIn(id, version);
+          expect(markup).not.toContain('viewBox="-100 -100 200 200"');
+          // A note in the sigil's place says why there is none.
+          expect(markup).toContain("data-sigil-note");
+          expect(markup).toContain("Sigillum Dei Aemeth");
+        }
+        for (const version of ["gd", "regardie", "equinox"])
+          expect(drawIn(id, version)).not.toContain("data-sigil-note");
+      }
+    });
+
+    it("mirrors its own reversed letters, unless told not to", () => {
+      expect(mirrored(drawIn("water", "equinox"))).toEqual(["N", "L"]);
+      expect(mirrored(drawIn("water", "regardie"))).toEqual([]);
+      expect(mirrored(drawIn("water", "dee"))).toEqual(["N", "L"]);
+      expect(mirrored(drawIn("earth", "dee"))).toEqual(["R", "A"]);
+      expect(mirrored(drawIn("earth", "raphael"))).toEqual(["a"]);
+      expect(mirrored(drawIn("fire", "raphael"))).toEqual(["p", "a"]);
+      for (const version of ["gd", "equinox", "dee", "raphael"])
+        expect(mirrored(drawIn("water", version, { reversed: false }))).toEqual(
+          [],
+        );
+    });
+
+    it("draws second letters small in a corner when asked", () => {
+      expect(corner(drawIn("water", "gd"))).toEqual([]);
+      const water = drawIn("water", "gd", { alt: true });
+      const marks = tabletVersion(tablets.water, "gd")?.marks ?? [];
+      expect(corner(water)).toEqual(
+        marks.filter((mark) => mark.alt).map((mark) => mark.alt?.join("")),
+      );
+      expect(corner(water)).toContain("ylh");
+      // The squares' own letters are drawn as before.
+      expect(
+        letters(water.replace(/<text[^>]*data-alt=""[^>]*>[^<]*<\/text>/g, "")),
+      ).toEqual(letters(drawIn("water", "gd")));
+      // Row 5, square 12's corner: the top right of its square.
+      expect(water).toMatch(
+        /<text x="240.5" y="88" data-alt="" style="font-size:6px;text-anchor:end[^"]*">ylh</,
+      );
+      // Dee's empty Fire squares show Raphael's letters there.
+      expect(corner(drawIn("fire", "dee", { alt: true }))).toEqual(
+        expect.arrayContaining(["a", "v"]),
+      );
+      expect(corner(drawIn("water", "equinox", { alt: true }))).toEqual([]);
+    });
+
+    it("names a version other than the Golden Dawn's", () => {
+      expect(tabletName("fire", "dee")).toBe(
+        "Enochian Watchtower of Fire, Dee's table of 1584",
+      );
+      expect(tabletName("fire", "gd")).toBe("Enochian Watchtower of Fire");
+      expect(tabletName("spirit", "dee")).toBe("Enochian tablet");
+      expect(
+        renderToStaticMarkup(<Tablet id="air" version="equinox" />),
+      ).toContain(
+        'aria-label="Enochian Watchtower of Air, the Equinox&#x27;s version"',
+      );
+    });
+
+    it("says so on the page of a tablet the version lacks", () => {
+      for (const [version, name] of [
+        ["dee", "Dee's table of 1584"],
+        ["raphael", "Raphael's table of 1587"],
+      ]) {
+        const markup = drawIn("union", version);
+        expect(markup).toContain(`viewBox="${UNION_VIEWBOX.join(" ")}"`);
+        expect(markup).toContain("data-missing");
+        expect(letters(markup)).toEqual([
+          "No Tablet of Union",
+          `in ${name.replace("'", "&#x27;")}`,
+        ]);
+      }
+      expect(letters(drawIn("union", "equinox")).join("")).toBe(
+        "EXARPHCOMANANTABITOM",
+      );
+    });
   });
 });

@@ -1,6 +1,9 @@
 import enochianTablets, {
+  DEFAULT_TABLET_VERSION,
   type EnochianTablet,
   type EnochianTabletID,
+  TABLET_VERSIONS,
+  type TabletVersionId,
   type TabletView,
   tabletVersion,
 } from "magick-data/enochian/tablets";
@@ -146,17 +149,17 @@ function EarthSigil() {
   );
 }
 
-function AirSigil(props) {
+/**
+ * Air: a Tau with four flames above it, yellow on mauve within a yellow
+ * ring; `plain`, in black alone, as the Equinox's Plate X prints it.
+ */
+function AirSigil({ plain = false }: { plain?: boolean }) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="-100 -100 200 200"
-      {...props}
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -100 200 200">
       <g stroke="#000">
-        <circle r={98} fill="#ff0" strokeWidth={2.5} />
-        <circle r={80} fill="#774060" strokeWidth={2} />
-        <g fill="#ff0" strokeWidth={1}>
+        {!plain && <circle r={98} fill="#ff0" strokeWidth={2.5} />}
+        {!plain && <circle r={80} fill="#774060" strokeWidth={2} />}
+        <g fill={plain ? "#000" : "#ff0"} strokeWidth={1}>
           <path d="M-10.513 68.112c-1.933 0-4.687-.217-5.46-.651-.774-.484-1.16-1.258-1.16-2.321 0-1.547 2.657-2.827 5.17-3.843 1.258-.483 2.248-.943 2.973-1.377.919-.58 1.548-1.45 1.885-2.61.387-1.208.58-3.408.58-6.597v-74.386c0-3.432-.434-5.559-1.304-6.38-.871-.87-2.562-1.306-5.077-1.306-3.382 0-6.5.41-9.351 1.232-2.803.774-5.535 1.983-8.193 3.626-1.305.87-3.046 2.368-5.22 4.495-2.175 2.078-3.988 3.118-5.438 3.118-.82 0-1.402-.219-1.74-.653-.338-.435-.508-1.258-.508-2.465 0-3.432.291-6.647.871-9.643.58-2.997 1.135-4.833 1.667-5.51.531-.725 1.306-1.232 2.32-1.522 1.016-.291 2.828-.436 5.438-.436h64.38c3.094 0 5.148.097 6.163.292 1.064.144 1.886.41 2.466.797.966.675 1.763 2.513 2.392 5.509.675 2.948 1.014 6.453 1.014 10.513 0 1.258-.145 2.102-.434 2.538-.291.387-.822.58-1.595.58-1.547 0-3.456-1.112-5.728-3.337-1.112-1.061-2.03-1.884-2.754-2.464-2.9-2.272-5.97-3.939-9.209-5.002-3.19-1.112-6.766-1.668-10.73-1.668-2.513 0-4.205.436-5.075 1.305-.87.821-1.305 2.949-1.305 6.38v74.387c0 2.754.121 4.663.362 5.726.243 1.065.63 1.934 1.16 2.611.533.676 1.933 1.474 4.205 2.393 2.321.917 4.882 2.15 4.882 3.697 0 1.063-.387 1.837-1.16 2.32-.773.435-2.803.652-4.688.652z" />
           <path d="M-11.858-62.828h3.198q2.59 0 3.858.993 1.268.993 1.763 3.858.441 2.426-.11 5.127-.55 2.7-1.984 4.797Q-6.51-45.958-8-44.636q-1.488 1.269-2.425.276-.827-.938.496-2.26 3.307-3.142 2.81-6.065-.163-1.101-.99-1.708-.828-.606-1.93-.606h-1.378q-2.37 0-3.529-1.159-1.101-1.211-1.101-3.694 0-1.983.771-3.747.771-1.765 1.818-1.765.443 0 .497.167.11.166.055.662-.055.44-.055.661.11.441.44.772.331.275.663.275z" />
           <path d="M29.984-62.828h3.198q2.59 0 3.858.993 1.268.993 1.764 3.858.44 2.426-.11 5.127-.551 2.7-1.985 4.797-1.377 2.095-2.867 3.417-1.488 1.269-2.425.276-.827-.938.496-2.26 3.307-3.142 2.81-6.065-.165-1.101-.992-1.708-.826-.606-1.928-.606h-1.378q-2.37 0-3.529-1.159-1.101-1.211-1.101-3.694 0-1.983.77-3.747.772-1.765 1.82-1.765.44 0 .496.167.11.166.055.662-.055.44-.055.661.11.441.44.772.332.275.663.275zM9.063-63.4h3.198q2.59 0 3.858.993 1.268.992 1.764 3.858.44 2.426-.11 5.127-.551 2.7-1.985 4.796-1.377 2.094-2.867 3.417-1.488 1.268-2.425.277-.827-.938.496-2.26 3.307-3.144 2.81-6.065-.165-1.102-.99-1.708-.828-.607-1.93-.607H9.504q-2.37 0-3.529-1.157-1.101-1.213-1.101-3.695 0-1.983.77-3.747.772-1.764 1.82-1.764.442 0 .496.165.11.166.055.662-.055.441-.055.662.11.44.44.77.332.276.663.276zm-41.842 0h3.198q2.59 0 3.858.993 1.268.992 1.763 3.858.441 2.426-.11 5.127-.55 2.7-1.984 4.796-1.377 2.094-2.867 3.417-1.488 1.268-2.425.277-.827-.938.496-2.26 3.307-3.144 2.81-6.065-.163-1.102-.99-1.708-.827-.607-1.93-.607h-1.378q-2.37 0-3.529-1.157-1.101-1.213-1.101-3.695 0-1.983.771-3.747.771-1.764 1.82-1.764.44 0 .495.165.11.166.056.662-.056.441-.056.662.11.44.44.77.332.276.663.276z" />
@@ -180,24 +183,28 @@ const ANGLE_FIGURES = {
 /**
  * Water: a cross potent with b, 6, 4 and b in its angles, in blue on
  * orange within a blue ring: Regardie, The Golden Dawn, vol. 4 (1940),
- * p.307. Drawn here from that description.
+ * p.307. Drawn here from that description. `plain`: in black alone, the
+ * figures 4 and b over b and 6, as the Equinox's Plate X prints it.
  */
-function WaterSigil() {
-  const blue = "#2255cc";
-  const figures = [
-    ["b", -33, -33],
-    ["6", 33, -33],
-    ["4", -33, 33],
-    ["b", 33, 33],
-  ] as const;
+function WaterSigil({ plain = false }: { plain?: boolean }) {
+  const blue = plain ? "#000" : "#2255cc";
+  const figures = plain
+    ? ([
+        ["4", -33, -33],
+        ["b", 33, -33],
+        ["b", -33, 33],
+        ["6", 33, 33],
+      ] as const)
+    : ([
+        ["b", -33, -33],
+        ["6", 33, -33],
+        ["4", -33, 33],
+        ["b", 33, 33],
+      ] as const);
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -100 200 200">
-      <circle r={92} fill="#f80" stroke={blue} strokeWidth={15} />
-      <g fill={blue}>
-        {[0, 90, 180, 270].map((angle) => (
-          <path key={angle} d={POTENT_ARM} transform={`rotate(${angle})`} />
-        ))}
-      </g>
+      {!plain && <circle r={92} fill="#f80" stroke={blue} strokeWidth={15} />}
+      <CrossPotent fill={blue} />
       <g
         fill="none"
         stroke={blue}
@@ -213,6 +220,26 @@ function WaterSigil() {
           />
         ))}
       </g>
+    </svg>
+  );
+}
+
+/** A cross potent: four arms, each flared at its end. */
+function CrossPotent({ fill }: { fill: string }) {
+  return (
+    <g fill={fill}>
+      {[0, 90, 180, 270].map((angle) => (
+        <path key={angle} d={POTENT_ARM} transform={`rotate(${angle})`} />
+      ))}
+    </g>
+  );
+}
+
+/** Earth as the Equinox's Plate X prints it: a cross potent, in black. */
+function PlainEarthSigil() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -100 200 200">
+      <CrossPotent fill="#000" />
     </svg>
   );
 }
@@ -249,12 +276,102 @@ function FireSigil() {
   );
 }
 
+/**
+ * Fire as the Equinox's Plate X prints it, in black: a small circle with
+ * twelve rays, straight and wavy by turns.
+ */
+function PlainFireSigil() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -100 200 200">
+      <circle r={22} fill="none" stroke="#000" strokeWidth={6} />
+      <g fill="none" stroke="#000" strokeWidth={6} strokeLinecap="round">
+        {FLAME_ANGLES.map((angle) => (
+          <path
+            key={angle}
+            d={angle % 60 ? FLAME : "M 0 -30 V -76"}
+            transform={`rotate(${angle})`}
+          />
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+/** Regardie's sigils, which the Golden Dawn's version and his print draw. */
 export const Sigils = {
   earth: EarthSigil,
-  air: AirSigil,
-  water: WaterSigil,
+  air: () => <AirSigil />,
+  water: () => <WaterSigil />,
   fire: FireSigil,
 };
+
+/** The Equinox's sigils, from its Plate X, in black. */
+export const EquinoxSigils = {
+  earth: PlainEarthSigil,
+  air: () => <AirSigil plain />,
+  water: () => <WaterSigil plain />,
+  fire: PlainFireSigil,
+};
+
+/**
+ * Which sigils each version draws: Regardie's for the Golden Dawn's and
+ * his own, the Equinox's for its own, and none for Dee's and Raphael's
+ * tables, which carry none (the Golden Dawn takes its sigils from Dee's
+ * Sigillum Dei Aemeth).
+ */
+const VERSION_SIGILS: Readonly<
+  Record<TabletVersionId, typeof Sigils | undefined>
+> = {
+  gd: Sigils,
+  regardie: Sigils,
+  equinox: EquinoxSigils,
+  dee: undefined,
+  raphael: undefined,
+};
+
+/**
+ * Where a version without sigils (Dee's and Raphael's tables) would draw
+ * one: a short note saying why there is none, in the sigil's place, so
+ * the page keeps its shape. Drawn in the transliteration's font always.
+ */
+const NO_SIGIL_LINES = [
+  "No sigil: Dee's tables carry none.",
+  "The Watchtower sigils are the Golden Dawn's, from",
+  "the Sigillum Dei Aemeth (Regardie, vol. 4, p.307).",
+];
+
+function NoSigil() {
+  return (
+    <g data-sigil-note="">
+      {NO_SIGIL_LINES.map((line, index) => (
+        <text
+          key={line}
+          x={0}
+          y={18 + index * 9}
+          style={{ fontSize: 6.5, textAnchor: "middle", fill: "#555" }}
+        >
+          {line}
+        </text>
+      ))}
+    </g>
+  );
+}
+
+/** Each version as a drawing names it. */
+export const VERSION_NAMES: Readonly<Record<TabletVersionId, string>> = {
+  gd: "the Golden Dawn's version",
+  regardie: "Regardie's print",
+  equinox: "the Equinox's version",
+  dee: "Dee's table of 1584",
+  raphael: "Raphael's table of 1587",
+};
+
+/** A version by its id, or the default for an id that is none. */
+function versionOf(version: string | undefined): TabletVersionId {
+  return (TABLET_VERSIONS as readonly string[]).includes(version ?? "")
+    ? (version as TabletVersionId)
+    : DEFAULT_TABLET_VERSION;
+}
 
 /** A square of a tablet's grid, by row and column from 0. */
 export interface TabletSquare {
@@ -274,12 +391,73 @@ export interface TabletHighlights {
   onSelect?: (square: TabletSquare) => void;
 }
 
-/** The squares whose letters the source prints reversed, as "row,column". */
-function reversedSquares(tablet: TabletView): Set<string> {
+/** How a grid draws its letters: reversed ones mirrored, second letters. */
+interface LetterOptions {
+  /** Mirror the letters the version reverses. */
+  reversed: boolean;
+  /** Draw each square's second letters small in its top right corner. */
+  alt: boolean;
+}
+
+/** The squares whose letters the version reverses, as "row,column". */
+function reversedSquares(tablet: TabletView, options: LetterOptions) {
   return new Set(
-    tablet.marks
-      .filter((mark) => mark.reversed)
-      .map(({ row, column }) => `${row},${column}`),
+    options.reversed
+      ? tablet.marks
+          .filter((mark) => mark.reversed)
+          .map(({ row, column }) => `${row},${column}`)
+      : [],
+  );
+}
+
+/** Each square's second letters, as "row,column", when they are drawn. */
+function altLetters(tablet: TabletView, options: LetterOptions) {
+  return new Map(
+    options.alt
+      ? tablet.marks
+          .filter((mark) => mark.alt?.length)
+          .map(({ row, column, alt }) => [
+            `${row},${column}`,
+            (alt ?? []).join(""),
+          ])
+      : [],
+  );
+}
+
+/**
+ * A square's second letters, small in its top right corner, in the
+ * transliteration's font or the page's Enochian one.
+ */
+function AltLetters({
+  letters,
+  right,
+  top,
+  fill,
+  enochianStyle,
+}: {
+  letters: string;
+  right: number;
+  top: number;
+  fill: string | undefined;
+  enochianStyle?: CSSProperties;
+}) {
+  return (
+    <text
+      x={right - 1.5}
+      y={top + 6}
+      data-alt=""
+      style={{
+        fontSize: 6,
+        textAnchor: "end",
+        fill,
+        ...enochianStyle,
+        // Left to right, so that the corner holds them in either font.
+        direction: "ltr",
+        unicodeBidi: "normal",
+      }}
+    >
+      {letters}
+    </text>
   );
 }
 
@@ -289,17 +467,20 @@ const mirrorAt = (cx: number) => `translate(${2 * cx} 0) scale(-1 1)`;
 function Grid({
   id,
   tablet,
+  options,
   enochianStyle,
   highlights,
 }: {
   /** The tablet's key, which picks its colours. */
   id: string;
   tablet: TabletView;
+  options: LetterOptions;
   enochianStyle?: CSSProperties;
   highlights?: TabletHighlights;
 }) {
   const enochianFont = enochianStyle !== undefined;
-  const reversed = reversedSquares(tablet);
+  const reversed = reversedSquares(tablet, options);
+  const alt = altLetters(tablet, options);
   const size = 20;
   const border = 2;
 
@@ -332,25 +513,36 @@ function Grid({
                   fill: isCross ? "white" : fill,
                 }}
               />
-              <text
-                key={`t-${y}-${x}`}
-                x={x * size + size / 2 + border}
-                y={y * size + size / 2 + 6 + border}
-                transform={
-                  reversed.has(`${y},${x}`)
-                    ? mirrorAt(x * size + size / 2 + border)
-                    : undefined
-                }
-                style={{
-                  fontWeight: enochianFont ? "bold" : undefined,
-                  fontSize: size - 2 - (enochianFont ? 4 : 0),
-                  textAnchor: "middle",
-                  fill: isCross ? "black" : color || undefined,
-                  ...enochianStyle,
-                }}
-              >
-                {letter}
-              </text>
+              {letter !== null && (
+                <text
+                  key={`t-${y}-${x}`}
+                  x={x * size + size / 2 + border}
+                  y={y * size + size / 2 + 6 + border}
+                  transform={
+                    reversed.has(`${y},${x}`)
+                      ? mirrorAt(x * size + size / 2 + border)
+                      : undefined
+                  }
+                  style={{
+                    fontWeight: enochianFont ? "bold" : undefined,
+                    fontSize: size - 2 - (enochianFont ? 4 : 0),
+                    textAnchor: "middle",
+                    fill: isCross ? "black" : color || undefined,
+                    ...enochianStyle,
+                  }}
+                >
+                  {letter}
+                </text>
+              )}
+              {alt.has(`${y},${x}`) && (
+                <AltLetters
+                  letters={alt.get(`${y},${x}`) ?? ""}
+                  right={(x + 1) * size + border}
+                  top={y * size + border}
+                  fill={isCross ? "black" : color || undefined}
+                  enochianStyle={enochianStyle}
+                />
+              )}
             </React.Fragment>
           );
         }),
@@ -408,13 +600,15 @@ const UNION_LINE_COLORS = ["#d4a000", "#2255cc", "black", "#e22"];
 /** The Tablet of Union, its squares at a Watchtower's size, on its page. */
 function UnionGrid({
   tablet,
+  options,
   enochianStyle,
 }: {
   tablet: TabletView;
+  options: LetterOptions;
   enochianStyle?: CSSProperties;
 }) {
   const enochianFont = enochianStyle !== undefined;
-  const reversed = reversedSquares(tablet);
+  const reversed = reversedSquares(tablet, options);
   const size = 20;
   const [, , pageWidth, pageHeight] = UNION_VIEWBOX;
   const columns = tablet.grid[0]?.length ?? 0;
@@ -473,27 +667,85 @@ const ELEMENT_NAMES: Record<string, string> = {
 
 /**
  * The name a tablet is announced by: "Enochian Watchtower of Fire", "Tablet
- * of Union", or "Enochian tablet" for a key the data does not have.
+ * of Union", or "Enochian tablet" for a key the data does not have; in a
+ * version other than the default, with the version's name ("Enochian
+ * Watchtower of Fire, Dee's table of 1584").
  */
-export function tabletName(id: string): string {
+export function tabletName(id: string, version?: string): string {
   const tablet = tabletOf(id);
-  if (tablet?.kind === "union") return "Tablet of Union";
-  if (tablet && Object.hasOwn(ELEMENT_NAMES, id))
-    return `Enochian Watchtower of ${ELEMENT_NAMES[id]}`;
-  return "Enochian tablet";
+  const name =
+    tablet?.kind === "union"
+      ? "Tablet of Union"
+      : tablet && Object.hasOwn(ELEMENT_NAMES, id)
+        ? `Enochian Watchtower of ${ELEMENT_NAMES[id]}`
+        : "Enochian tablet";
+  const chosen = versionOf(version);
+  return tablet && chosen !== DEFAULT_TABLET_VERSION
+    ? `${name}, ${VERSION_NAMES[chosen]}`
+    : name;
 }
 
 /**
- * An Enochian tablet: a Watchtower's sigil above its grid on a 210 × 297
- * page, or the Tablet of Union's grid on a page of its own
- * (`tabletViewBox`). A key the data does not have draws an empty page.
- * It is an image named by `tabletName` (an `aria-label`, which shows no
- * tooltip over the squares as a `<title>` would) unless `label` is false,
- * as for a tablet drawn inside a larger drawing that names itself.
+ * The page of a tablet a version does not have (Dee's and Raphael's have
+ * no Tablet of Union): its outline and a line saying so.
+ */
+function Missing({
+  name,
+  version,
+  viewBox,
+}: {
+  name: string;
+  version: TabletVersionId;
+  viewBox: TabletViewBox;
+}) {
+  const [x, y, width, height] = viewBox;
+  const lines = [`No ${name}`, `in ${VERSION_NAMES[version]}`];
+  return (
+    <g data-missing="">
+      <rect
+        x={x + 2}
+        y={y + 2}
+        width={width - 4}
+        height={height - 4}
+        style={{
+          fill: "white",
+          stroke: "#888",
+          strokeWidth: 1,
+          strokeDasharray: "4 3",
+        }}
+      />
+      {lines.map((line, index) => (
+        <text
+          key={line}
+          x={x + width / 2}
+          y={y + height / 2 + (index - 0.5) * 10 + 3}
+          style={{ fontSize: 7, textAnchor: "middle", fill: "#444" }}
+        >
+          {line}
+        </text>
+      ))}
+    </g>
+  );
+}
+
+/**
+ * An Enochian tablet in a version (`version`, the Golden Dawn's by
+ * default): a Watchtower's sigil above its grid on a 210 × 297 page, or
+ * the Tablet of Union's grid on a page of its own (`tabletViewBox`). The
+ * version's reversed letters are mirrored unless `reversed` is false, and
+ * a Watchtower's second letters drawn small in each square's corner when
+ * `alt` is true. A key the data does not have draws an empty page; a
+ * tablet the version does not have, its page saying so. It is an image
+ * named by `tabletName` (an `aria-label`, which shows no tooltip over the
+ * squares as a `<title>` would) unless `label` is false, as for a tablet
+ * drawn inside a larger drawing that names itself.
  */
 const Tablet = React.forwardRef(function Tablet(
   {
     id,
+    version,
+    reversed = true,
+    alt = false,
     enochianStyle,
     frame = true,
     width,
@@ -502,6 +754,19 @@ const Tablet = React.forwardRef(function Tablet(
     highlights,
   }: {
     id: string;
+    /**
+     * One of the data's `TABLET_VERSIONS`; the Golden Dawn's (`gd`) when
+     * absent or unknown.
+     */
+    version?: string;
+    /** Mirror the letters the version reverses (default true). */
+    reversed?: boolean;
+    /**
+     * Draw each square's second letters small in its corner (default
+     * false). Watchtowers only: no source gives the Tablet of Union a
+     * second letter, so its grid has none to draw.
+     */
+    alt?: boolean;
     /** Squares of a Watchtower's grid to outline, and choose by pointer. */
     highlights?: TabletHighlights;
     /** The accessible name: the tablet's own (`true`), another, or none. */
@@ -515,11 +780,16 @@ const Tablet = React.forwardRef(function Tablet(
   },
   ref: React.Ref<SVGSVGElement>,
 ) {
-  const tablet = tabletVersion(tabletOf(id));
-  const Sigil = Object.hasOwn(Sigils, id)
-    ? Sigils[id as keyof typeof Sigils]
-    : undefined;
-  const name = label === true ? tabletName(id) : label || undefined;
+  const chosen = versionOf(version);
+  const data = tabletOf(id);
+  const tablet = tabletVersion(data, chosen);
+  const sigils = VERSION_SIGILS[chosen];
+  const Sigil =
+    sigils && Object.hasOwn(sigils, id)
+      ? sigils[id as keyof typeof sigils]
+      : undefined;
+  const name = label === true ? tabletName(id, chosen) : label || undefined;
+  const options = { reversed, alt };
 
   return (
     <svg
@@ -532,20 +802,33 @@ const Tablet = React.forwardRef(function Tablet(
       aria-label={name}
       ref={ref}
     >
-      {tablet?.kind === "union" ? (
-        <UnionGrid tablet={tablet} enochianStyle={enochianStyle} />
+      {data && !tablet ? (
+        <Missing
+          name={tabletName(id)}
+          version={chosen}
+          viewBox={tabletViewBox(id)}
+        />
+      ) : tablet?.kind === "union" ? (
+        <UnionGrid
+          tablet={tablet}
+          options={options}
+          enochianStyle={enochianStyle}
+        />
       ) : (
         tablet && (
           <>
-            {Sigil && (
+            {Sigil ? (
               <g transform="translate(-31.5,-5) scale(0.3)">
                 <Sigil />
               </g>
+            ) : (
+              <NoSigil />
             )}
             <g transform="translate(-94.5,48) scale(0.9)">
               <Grid
                 id={id}
                 tablet={tablet}
+                options={options}
                 enochianStyle={enochianStyle}
                 highlights={highlights}
               />
