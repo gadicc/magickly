@@ -28,10 +28,10 @@ const EDGE = 1.4;
 
 /** The Earth's colours, quartered as in the drawing: citrine above. */
 const QUARTERS = [
-  { angle: -90, fill: "#a9aa66" }, // citrine, East (up)
-  { angle: 0, fill: "#444f41" }, // olive
-  { angle: 90, fill: "#2c2b29" }, // black
-  { angle: 180, fill: "#8f5642" }, // russet
+  { angle: -90, fill: PALETTE.citrine }, // East (up)
+  { angle: 0, fill: PALETTE.olive },
+  { angle: 90, fill: PALETTE.earthBlack },
+  { angle: 180, fill: PALETTE.russet },
 ] as const;
 
 /**

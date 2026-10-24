@@ -1,6 +1,7 @@
 import { HALL_ROLES } from "@magick-components/gd/hall/vocabulary";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { TaskFrame } from "./Frames";
 import { roles } from "./roles";
 
 describe("ritual role symbols", () => {
@@ -21,9 +22,25 @@ describe("ritual role symbols", () => {
     }
   });
 
-  it("draws the adepts as plain circles until their lamens exist", () => {
-    const chief = renderToStaticMarkup(roles.chiefAdept.symbol);
-    expect(chief).toContain("<circle");
-    expect(renderToStaticMarkup(roles.thirdAdept.symbol)).toBe(chief);
+  it("hides every role's symbol from assistive technology, beside its name", () => {
+    for (const role of Object.keys(roles)) {
+      const markup = renderToStaticMarkup(
+        <TaskFrame role={role} roles={roles}>
+          text
+        </TaskFrame>,
+      );
+      const symbol = /<div class="[^"]*roleSymbol[^"]*"([^>]*)>/.exec(markup);
+      expect(symbol?.[1], role).toContain('aria-hidden="true"');
+      expect(markup, role).toContain(`>${roles[role].name}</span>`);
+    }
+  });
+
+  it("draws the adepts' own lamens, each its own", () => {
+    const symbols = ["chiefAdept", "secondAdept", "thirdAdept"].map((role) =>
+      renderToStaticMarkup(roles[role].symbol),
+    );
+    expect(new Set(symbols).size).toBe(3);
+    for (const symbol of symbols)
+      expect(symbol).toContain('viewBox="-50 -50 100 100"');
   });
 });

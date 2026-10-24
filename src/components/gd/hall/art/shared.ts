@@ -57,6 +57,14 @@ export const PALETTE = {
   glassRed: "#ff9a8a",
   glassYellow: "#fbf0b8",
   glassWhite: "#ffffff",
+  // Malkuth's four colours, as the Pantacle quarters them; shared with
+  // the lamens (stage H, part 2).
+  citrine: "#a9aa66",
+  olive: "#444f41",
+  russet: "#8f5642",
+  earthBlack: "#2c2b29",
+  /** The Third Adept's octagram. */
+  orange: "#ff8c1a",
 } as const;
 
 /**

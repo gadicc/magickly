@@ -6,6 +6,7 @@ import {
   type HallNode,
   validateHall,
 } from "@magick-components/gd/hall";
+import { HALL_ROLES } from "@magick-components/gd/hall/vocabulary";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { gdHallArt } from "./art";
@@ -80,13 +81,14 @@ describe("the app's hall art", () => {
     expect(draw("lamen", { type: "officer", role: "constructor" })).toContain(
       "fill:white",
     );
-    // The adepts have no lamens yet: labelled circles, one drawing.
-    for (const role of ["chiefAdept", "secondAdept", "thirdAdept"]) {
-      expect(draw("lamen", { type: "officer", role }), role).toBe(plain);
+    // Every hall role has its lamen now, the adepts' included (stage H,
+    // part 2): a drawing each.
+    for (const role of HALL_ROLES.keys()) {
+      expect(draw("lamen", { type: "officer", role }), role).not.toBe(plain);
       expect(
         (gdHallArt.get("lamen") as HallArt).variant({ type: "officer", role }),
         role,
-      ).toBe("");
+      ).toBe(role);
     }
     expect(
       (gdHallArt.get("lamen") as HallArt).variant({

@@ -55,7 +55,8 @@ export function TaskFrame({
     >
       {!samePreviousRole && (
         <div className={styles.role} contentEditable={false}>
-          <div className={styles.roleSymbol}>
+          {/* The symbols only repeat the role names beside them. */}
+          <div className={styles.roleSymbol} aria-hidden="true">
             {individualRoles.map((entry) => (
               <span key={entry}>
                 {Object.hasOwn(roles, entry) ? roles[entry].symbol : undefined}

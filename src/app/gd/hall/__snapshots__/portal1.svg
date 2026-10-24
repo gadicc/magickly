@@ -105,8 +105,20 @@
 <text x="0" y="21.057" font-size="62" font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" text-anchor="middle" fill="#000000">כ</text>
 </g>
 <g id="_R_0_-art5">
-<circle r="47" fill="#ffffff" stroke="#000000" stroke-width="6">
+<g transform="translate(-50 -50)">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
+<circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:#48f;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
 </circle>
+<circle cx="0" cy="0" r="42" style="color:#000;overflow:visible;fill:#000;stroke:#000;stroke-width:1;paint-order:stroke fill markers;stop-color:#000">
+</circle>
+<g stroke="#000000" stroke-width="1.6" stroke-linejoin="round">
+<polygon points="0,-37 10.837,-26.163 26.163,-26.163 26.163,-10.837 37,0 26.163,10.837 26.163,26.163 10.837,26.163 0,37 -10.837,26.163 -26.163,26.163 -26.163,10.837 -37,0 -26.163,-10.837 -26.163,-26.163 -10.837,-26.163" fill="#ff8c1a">
+</polygon>
+<path d="M-13,-12H13C13,0 7,6 2.5,7V13H8V17H-8V13H-2.5V7C-7,6 -13,0 -13,-12Z" fill="#406ab3">
+</path>
+</g>
+</svg>
+</g>
 </g>
 <g id="_R_0_-art6">
 <g stroke="#000000" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
@@ -661,6 +673,22 @@
 </g>
 </g>
 <g id="_R_0_-art9">
+<g transform="translate(-50 -50)">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
+<circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
+</circle>
+<circle cx="0" cy="0" r="42" style="color:#000;overflow:visible;fill:#000;stroke:#000;stroke-width:1;paint-order:stroke fill markers;stop-color:#000">
+</circle>
+<g stroke="#000000" stroke-linejoin="round">
+<polygon points="0,-34.5 8.308,-8.935 35.189,-8.934 13.442,6.868 21.748,32.434 0,16.634 -21.748,32.434 -13.442,6.868 -35.189,-8.934 -8.308,-8.935" fill="#108010" stroke-width="1.6">
+</polygon>
+<polygon points="0,-10.927 11.628,9.214 -11.628,9.214" fill="#d92128" stroke-width="1.2">
+</polygon>
+</g>
+</svg>
+</g>
+</g>
+<g id="_R_0_-art10">
 <g stroke="#000000" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
 <path d="M-2.5,-41V-36H2.5V-41Z" fill="#b08d3c">
 </path>
@@ -684,7 +712,7 @@
 </path>
 </g>
 </g>
-<g id="_R_0_-art10">
+<g id="_R_0_-art11">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -696,7 +724,7 @@
 </svg>
 </g>
 </g>
-<g id="_R_0_-art11">
+<g id="_R_0_-art12">
 <g stroke="#000000" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
 <path d="M-16,1C0,5 20,-4 46,2" fill="none" stroke-width="7">
 </path>
@@ -732,7 +760,7 @@
 </circle>
 </g>
 </g>
-<g id="_R_0_-art12">
+<g id="_R_0_-art13">
 <rect x="-105" y="-148.5" width="210" height="297" fill="#ffffff" stroke="#000000" stroke-width="2">
 </rect>
 <g transform="translate(-105 -148.5)">
@@ -1228,7 +1256,7 @@
 </svg>
 </g>
 </g>
-<g id="_R_0_-art13">
+<g id="_R_0_-art14">
 <rect x="-105" y="-148.5" width="210" height="297" fill="#ffffff" stroke="#000000" stroke-width="2">
 </rect>
 <g transform="translate(-105 -148.5)">
@@ -1746,11 +1774,11 @@
 </svg>
 </g>
 </g>
-<g id="_R_0_-art14">
+<g id="_R_0_-art15">
 <rect x="-50" y="-50" width="100" height="100" fill="#000000">
 </rect>
 </g>
-<g id="_R_0_-art15">
+<g id="_R_0_-art16">
 <path d="M-30,-50 30,-50 0,-4Z" fill="#e00000" stroke="#ffe000" stroke-width="3" stroke-linejoin="miter">
 </path>
 <path d="M50,-30 50,30 4,0Z" fill="#e00000" stroke="#ffe000" stroke-width="3" stroke-linejoin="miter">
@@ -1760,7 +1788,7 @@
 <path d="M-50,30 -50,-30 -4,0Z" fill="#e00000" stroke="#ffe000" stroke-width="3" stroke-linejoin="miter">
 </path>
 </g>
-<g id="_R_0_-art16">
+<g id="_R_0_-art17">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
@@ -1772,7 +1800,7 @@
 </svg>
 </g>
 </g>
-<g id="_R_0_-art17">
+<g id="_R_0_-art18">
 <g stroke="#000000" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
 <path d="M0,-27L15,-27C19,-16 19,30 17,44Q17,48 13,48L0,48L-13,48Q-17,48 -17,44C-19,30 -19,-16 -15,-27L0,-27Z" fill="#ffffff">
 </path>
@@ -1790,7 +1818,7 @@
 </path>
 </g>
 </g>
-<g id="_R_0_-art18">
+<g id="_R_0_-art19">
 <polyline points="-38,-37 0,-61 38,-37" fill="none" stroke="#252524" stroke-width="2.5" stroke-linejoin="round">
 </polyline>
 <rect x="-43" y="-39" width="86" height="4" fill="#ffe600" stroke="#000000" stroke-width="0.6">
@@ -1816,7 +1844,7 @@
 <path d="M-2.3,-2.4H2.3V2H7V7H2.3V15.5H-2.3V7H-7V2H-2.3Z" fill="#ff0000" stroke="#ffe600" stroke-width="0.6">
 </path>
 </g>
-<g id="_R_0_-art19">
+<g id="_R_0_-art20">
 <rect x="-105" y="-148.5" width="210" height="297" fill="#ffffff" stroke="#000000" stroke-width="2">
 </rect>
 <g transform="translate(-105 -148.5)">
@@ -2324,7 +2352,7 @@
 </svg>
 </g>
 </g>
-<g id="_R_0_-art20">
+<g id="_R_0_-art21">
 <rect x="-62" y="-52" width="124" height="104" fill="#ffffff" stroke="#000000" stroke-width="2">
 </rect>
 <g transform="translate(-62 -52)">
@@ -2394,7 +2422,7 @@
 </svg>
 </g>
 </g>
-<g id="_R_0_-art21">
+<g id="_R_0_-art22">
 <path d="M-40,46V-42M40,46V-42M-46,-42H46M-48,46H-32M32,46H48" stroke="#000000" stroke-width="6" stroke-linecap="round" fill="none">
 </path>
 <path d="M-12,-42L-10,-25M12,-42L10,-25" stroke="#000000" stroke-width="2.4" fill="none">
@@ -2406,7 +2434,7 @@
 <circle cy="4" r="8" fill="#fae513" stroke="#000000" stroke-width="2.4">
 </circle>
 </g>
-<g id="_R_0_-art22">
+<g id="_R_0_-art23">
 <path d="M-26,14L-34,46M0,20V46M26,14L34,46" stroke="#000000" stroke-width="4" stroke-linecap="round">
 </path>
 <g transform="translate(-22 -8) scale(0.8)">
@@ -2430,7 +2458,7 @@
 <path d="M-44,-8H44A44,28 0 0 1 -44,-8Z" fill="#b08d3c" stroke="#000000" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
 </path>
 </g>
-<g id="_R_0_-art23">
+<g id="_R_0_-art24">
 <g stroke="#000000" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
 <circle cy="-45" r="3" fill="none" stroke-width="2.4">
 </circle>
@@ -2454,23 +2482,67 @@
 </path>
 </g>
 </g>
-<g id="_R_0_-art24">
+<g id="_R_0_-art25">
+<g transform="translate(-50 -50)">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
+<circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:yellow;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
+</circle>
+<circle cx="0" cy="0" r="42" style="color:#000;overflow:visible;fill:#000;stroke:#000;stroke-width:1;paint-order:stroke fill markers;stop-color:#000">
+</circle>
+<g transform="translate(0 -1)" stroke-linejoin="round">
+<g stroke="#ffffff" stroke-width="3.2">
+<path d="M7,0L7,-25L-7,-25L-7,0ZM-5.6,-33.4a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0M-11,-28a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0M-0.2,-28a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0" fill="#ffe000">
+</path>
+<path d="M0,7L-25,7L-25,-7L0,-7ZM-39,0a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0M-33.6,-5.4a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0M-33.6,5.4a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0" fill="#d92128">
+</path>
+<path d="M0,-7L25,-7L25,7L0,7ZM27.8,0a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0M22.4,5.4a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0M22.4,-5.4a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0" fill="#406ab3">
+</path>
+<path d="M-7,0L-7,27L7,27L7,0ZM-5.6,35.4a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0M-0.2,30a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0M-11,30a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0" fill="#2c2b29">
+</path>
+</g>
+<path d="M7,0L7,-25L-7,-25L-7,0ZM-5.6,-33.4a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0M-11,-28a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0M-0.2,-28a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0" fill="#ffe000">
+</path>
+<path d="M0,7L-25,7L-25,-7L0,-7ZM-39,0a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0M-33.6,-5.4a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0M-33.6,5.4a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0" fill="#d92128">
+</path>
+<path d="M0,-7L25,-7L25,7L0,7ZM27.8,0a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0M22.4,5.4a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0M22.4,-5.4a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0" fill="#406ab3">
+</path>
+<path d="M-7,0L-7,27L7,27L7,0ZM-5.6,35.4a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0M-0.2,30a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0M-11,30a5.6,5.6 0 1 0 11.2,0a5.6,5.6 0 1 0 -11.2,0" fill="#2c2b29">
+</path>
+<polygon points="-7,6 0,16 7,6" fill="#a9aa66">
+</polygon>
+<polygon points="-7,6 0,16 -7,27" fill="#8f5642">
+</polygon>
+<polygon points="7,6 0,16 7,27" fill="#444f41">
+</polygon>
+<g stroke="#000000" stroke-width="1">
+<circle r="11.5" fill="#d92128">
+</circle>
+<path d="M-4.6,-5.6a4.6,4.6 0 1 0 9.2,0a4.6,4.6 0 1 0 -9.2,0M0.726,-1.73a4.6,4.6 0 1 0 9.2,0a4.6,4.6 0 1 0 -9.2,0M-1.308,4.53a4.6,4.6 0 1 0 9.2,0a4.6,4.6 0 1 0 -9.2,0M-7.892,4.53a4.6,4.6 0 1 0 9.2,0a4.6,4.6 0 1 0 -9.2,0M-9.926,-1.73a4.6,4.6 0 1 0 9.2,0a4.6,4.6 0 1 0 -9.2,0" fill="#ff7b7b">
+</path>
+<circle r="2.8" fill="#fae513">
+</circle>
+</g>
+</g>
+</svg>
+</g>
+</g>
+<g id="_R_0_-art26">
 <circle r="50" fill="#000000" stroke="none" stroke-width="3">
 </circle>
 <polygon points="0,38 -32.909,-19 32.909,-19" fill="#ffffff">
 </polygon>
 </g>
-<g id="_R_0_-art25">
+<g id="_R_0_-art27">
 <rect x="-48" y="-48" width="96" height="96" fill="#ffffff" stroke="#000000" stroke-width="4">
 </rect>
 </g>
-<g id="_R_0_-art26">
+<g id="_R_0_-art28">
 <circle r="48.5" fill="#ffffff" stroke="#000000" stroke-width="3">
 </circle>
 <polygon points="0,-38 -32.909,19 32.909,19" fill="#000000">
 </polygon>
 </g>
-<g id="_R_0_-art27">
+<g id="_R_0_-art29">
 <rect x="-8" y="-0.2" width="16" height="0.4" fill="#c8b8e0" stroke="#000000" stroke-width="0.04">
 </rect>
 <path d="M-7.5,-0.2v0.4M-7,-0.2v0.4M-6.5,-0.2v0.4M-6,-0.2v0.4M-5.5,-0.2v0.4M-5,-0.2v0.4M-4.5,-0.2v0.4M-4,-0.2v0.4M-3.5,-0.2v0.4M-3,-0.2v0.4M-2.5,-0.2v0.4M-2,-0.2v0.4M-1.5,-0.2v0.4M-1,-0.2v0.4M-0.5,-0.2v0.4M0,-0.2v0.4M0.5,-0.2v0.4M1,-0.2v0.4M1.5,-0.2v0.4M2,-0.2v0.4M2.5,-0.2v0.4M3,-0.2v0.4M3.5,-0.2v0.4M4,-0.2v0.4M4.5,-0.2v0.4M5,-0.2v0.4M5.5,-0.2v0.4M6,-0.2v0.4M6.5,-0.2v0.4M7,-0.2v0.4M7.5,-0.2v0.4" stroke="#7a64a0" stroke-width="0.03">
@@ -2503,49 +2575,49 @@
 </use>
 <use href="#_R_0_-art8" transform="translate(980 300) scale(0.906)">
 </use>
-<use href="#_R_0_-art5" transform="translate(1300 280) scale(1.6)">
+<use href="#_R_0_-art9" transform="translate(1300 280) scale(1.6)">
 </use>
-<use href="#_R_0_-art9" transform="translate(1460 380) scale(1.06)">
+<use href="#_R_0_-art10" transform="translate(1460 380) scale(1.06)">
 </use>
-<use href="#_R_0_-art10" transform="translate(800 540) scale(1.6)">
+<use href="#_R_0_-art11" transform="translate(800 540) scale(1.6)">
 </use>
-<use href="#_R_0_-art11" transform="translate(950 560) scale(0.9)">
+<use href="#_R_0_-art12" transform="translate(950 560) scale(0.9)">
 </use>
-<use href="#_R_0_-art12" transform="translate(64.101 800) scale(0.906)">
+<use href="#_R_0_-art13" transform="translate(64.101 800) scale(0.906)">
 </use>
-<use href="#_R_0_-art13" transform="translate(1535.899 800) scale(0.906)">
+<use href="#_R_0_-art14" transform="translate(1535.899 800) scale(0.906)">
 </use>
-<use href="#_R_0_-art14" transform="translate(800 800) scale(2)">
+<use href="#_R_0_-art15" transform="translate(800 800) scale(2)">
 </use>
-<use href="#_R_0_-art15" transform="translate(800 800) scale(0.9)">
+<use href="#_R_0_-art16" transform="translate(800 800) scale(0.9)">
 </use>
-<use href="#_R_0_-art16" transform="translate(800 1310) scale(1.6)">
+<use href="#_R_0_-art17" transform="translate(800 1310) scale(1.6)">
 </use>
-<use href="#_R_0_-art17" transform="translate(940 1340) scale(0.62)">
+<use href="#_R_0_-art18" transform="translate(940 1340) scale(0.62)">
 </use>
-<use href="#_R_0_-art18" transform="translate(500 1430) scale(1.6)">
+<use href="#_R_0_-art19" transform="translate(500 1430) scale(1.6)">
 </use>
-<use href="#_R_0_-art19" transform="translate(800 1531) scale(0.673)">
+<use href="#_R_0_-art20" transform="translate(800 1531) scale(0.673)">
 </use>
-<use href="#_R_0_-art20" transform="translate(800 -671.294) scale(1.452)">
+<use href="#_R_0_-art21" transform="translate(800 -671.294) scale(1.452)">
 </use>
-<use href="#_R_0_-art21" transform="translate(1390 -671.294) scale(1)">
+<use href="#_R_0_-art22" transform="translate(1390 -671.294) scale(1)">
 </use>
-<use href="#_R_0_-art22" transform="translate(140 -400) scale(1)">
+<use href="#_R_0_-art23" transform="translate(140 -400) scale(1)">
 </use>
-<use href="#_R_0_-art23" transform="translate(140 -240) scale(0.94)">
+<use href="#_R_0_-art24" transform="translate(140 -240) scale(0.94)">
 </use>
-<use href="#_R_0_-art9" transform="translate(290 -320) scale(1.06)">
+<use href="#_R_0_-art10" transform="translate(290 -320) scale(1.06)">
 </use>
-<use href="#_R_0_-art5" transform="translate(800 -380) scale(1.6)">
+<use href="#_R_0_-art25" transform="translate(800 -380) scale(1.6)">
 </use>
-<use href="#_R_0_-art24" transform="translate(570 -200) scale(2)">
+<use href="#_R_0_-art26" transform="translate(570 -200) scale(2)">
 </use>
-<use href="#_R_0_-art25" transform="translate(800 -200) scale(1)">
+<use href="#_R_0_-art27" transform="translate(800 -200) scale(1)">
 </use>
-<use href="#_R_0_-art26" transform="translate(1030 -200) scale(2)">
+<use href="#_R_0_-art28" transform="translate(1030 -200) scale(2)">
 </use>
-<use href="#_R_0_-art27" transform="translate(800 -30) scale(100)">
+<use href="#_R_0_-art29" transform="translate(800 -30) scale(100)">
 </use>
 <g font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" fill="#000000" style="font-variant-ligatures:none;font-kerning:normal">
 <g>

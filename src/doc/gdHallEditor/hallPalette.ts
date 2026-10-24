@@ -65,9 +65,8 @@ export function hallItemKinds(art: HallArtRegistry): string[] {
 }
 
 /**
- * The palette for an art registry: every officer role (the lamens and the
- * adepts, drawn as labelled circles until their lamens exist) and a
- * marker; the altars, pillars, platform, throne, veil and a door; the banners
+ * The palette for an art registry: every officer role (the adepts
+ * among them) and a marker; the altars, pillars, platform, throne, veil and a door; the banners
  * and a Hebrew letter; every item kind; a tarot key, a tablet, the Table
  * of Shewbread, the candlestick, the boards' diagrams, a kamea and a
  * planet's seals; free text.

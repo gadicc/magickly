@@ -21,6 +21,9 @@ const OFFICERS = [
   "stolistes",
   "dadouchos",
   "sentinel",
+  "chiefAdept",
+  "secondAdept",
+  "thirdAdept",
 ];
 
 describe("Lamen", () => {
@@ -77,6 +80,23 @@ describe("Lamen", () => {
     expect(render("sentinel")).not.toContain("scale(0.15)");
     for (const officer of ["keryx", "sentinel"])
       expect(render(officer).length, officer).toBeLessThan(6000);
+  });
+
+  it("draws the adepts' Portal lamens, ringed in their collars", () => {
+    // Regardie 1938, vol. 2, p.156: yellow, white and blue collars.
+    expect(fills(render("chiefAdept"))).toEqual(["yellow", "#000"]);
+    expect(fills(render("secondAdept"))).toEqual(["white", "#000"]);
+    expect(fills(render("thirdAdept"))).toEqual(["#48f", "#000"]);
+    // The Rose-Cross: Air, Fire, Water and Earth arms, Malkuth's quarters
+    // and the rose; the green pentagram and red triangle; the orange
+    // octagram and blue cup.
+    const chief = render("chiefAdept");
+    for (const colour of ["#ffe000", "#d92128", "#406ab3", "#2c2b29"])
+      expect(chief).toContain(`fill="${colour}"`);
+    for (const colour of ["#a9aa66", "#8f5642", "#444f41"])
+      expect(chief).toContain(`fill="${colour}"`);
+    expect(render("secondAdept")).toMatch(/fill="#108010"[^]*fill="#d92128"/);
+    expect(render("thirdAdept")).toMatch(/fill="#ff8c1a"[^]*fill="#406ab3"/);
   });
 
   it("falls back to the Hierophant without an officer", () => {

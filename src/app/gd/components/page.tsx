@@ -17,6 +17,9 @@ export default function GDComponentTest() {
     "stolistes",
     "keryx",
     "sentinel",
+    "chiefAdept",
+    "secondAdept",
+    "thirdAdept",
   ].map((officer) => (
     <Fragment key={officer}>
       <Lamen officer={officer} />

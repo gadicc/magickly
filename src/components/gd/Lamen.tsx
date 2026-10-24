@@ -1,6 +1,7 @@
 import type * as React from "react";
 import { svgCoordinate } from "../svgCoordinate";
 import { flipped, type Point, smoothPath } from "./hall/art/geometry";
+import { CupOnOctagram, RoseCross, TriangleInPentagram } from "./lamenGlyphs";
 
 /** The colours of a lamen with the Calvary cross of Tiphareth. */
 interface CrossLamenColours {
@@ -50,9 +51,34 @@ const CROSS_LAMENS: ReadonlyMap<string, CrossLamenColours> = new Map([
   ["pastHierophant", { ring: "white", disc: "green", cross: "red" }],
 ]);
 
+/** A lamen whose glyph is drawn in colour on the black disc. */
+interface GlyphLamen {
+  /** The collar's colour, as the ring shows it. */
+  ring: string;
+  Glyph: () => React.ReactElement;
+}
+
+/**
+ * The adepts' lamens, from the Portal's rubric (Regardie, *The Golden
+ * Dawn*, vol. 2, Aries Press, 1938, p. 156; archive.org
+ * `IsraelRegardie-TheGoldenDawn-Vol2-1938`, leaf n149): the Chief Adept's
+ * Rose-Cross on a yellow collar, the Second Adept's red triangle in a
+ * green pentagram on a white one, the Third Adept's blue cup on an orange
+ * octagram on a blue one. The ring shows the collar, as for the Chiefs;
+ * the Third Adept's blue is the Praemonstrator's. A hall of the 5=6 would
+ * use the same role names, though every Adept there wears the Rose-Cross
+ * (plan 061, stage H, part 2).
+ */
+const GLYPH_LAMENS: ReadonlyMap<string, GlyphLamen> = new Map([
+  ["chiefAdept", { ring: "yellow", Glyph: RoseCross }],
+  ["secondAdept", { ring: "white", Glyph: TriangleInPentagram }],
+  ["thirdAdept", { ring: "#48f", Glyph: CupOnOctagram }],
+]);
+
 /** The officers whose lamen `Lamen` draws; any other draws the same plain one. */
 export const LAMEN_OFFICERS: ReadonlySet<string> = new Set([
   ...CROSS_LAMENS.keys(),
+  ...GLYPH_LAMENS.keys(),
   "hegemon",
   "hiereus",
   "stolistes",
@@ -262,8 +288,9 @@ function EyeOfHorus() {
  * An officer's lamen: the collar's ring, the disc and the officer's glyph,
  * in a −50…50 box. All of it is drawn for this app, the Keryx's caduceus
  * and the Sentinel's Eye of Horus from geometry since stage H of plan 061
- * (they were an SVG Repo icon and a game-icons.net path before). Defines
- * no ids, so any number can share a page.
+ * (they were an SVG Repo icon and a game-icons.net path before), the
+ * adepts' since its second part. Defines no ids, so any number can share
+ * a page.
  */
 export default function Lamen({
   officer,
@@ -280,12 +307,15 @@ export default function Lamen({
 }) {
   if (!officer) officer = "hierophant";
   const crossLamen = CROSS_LAMENS.get(officer);
+  const glyphLamen = GLYPH_LAMENS.get(officer);
 
   const _outerCircleStyle = {
     color: "#000",
     overflow: "visible",
     fill:
-      crossLamen?.ring === "stripes" ? "red" : (crossLamen?.ring ?? "white"),
+      crossLamen?.ring === "stripes"
+        ? "red"
+        : (crossLamen?.ring ?? glyphLamen?.ring ?? "white"),
     stroke: "#000",
     strokeWidth: 1,
     strokeDasharray: "none",
@@ -354,6 +384,7 @@ export default function Lamen({
       )}
       {officer === "keryx" && <Caduceus />}
       {officer === "sentinel" && <EyeOfHorus />}
+      {glyphLamen && <glyphLamen.Glyph />}
     </svg>
   );
 }

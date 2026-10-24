@@ -1,30 +1,29 @@
 import Lamen, { LAMEN_OFFICERS } from "../../Lamen";
 import { stringAttr } from "../attributes";
 import type { HallArt, HallArtProps, HallNode } from "../types";
-import { HALL_ROLES } from "../vocabulary";
 import { original, PALETTE } from "./shared";
 
 export const provenance = original(
   "The officers' lamens, drawn by `Lamen` (src/components/gd/Lamen.tsx): " +
     "the collar's ring, the disc and the officer's glyph; a plain circle " +
-    "for an officer without a role or a hall role without a lamen yet.",
+    "for an officer without a role.",
 );
 
 /**
  * Whether a node draws the plain circle: without a role, as the validator
- * promises, or with a hall role whose lamen `Lamen` does not draw yet (the
- * adepts', plan 061 decision 5: labelled circles). Any other role draws
- * through `Lamen`, an unknown one as its plain lamen.
+ * promises. Every hall role has its lamen since stage H, part 2 (the
+ * adepts' were labelled circles before); any other role draws through
+ * `Lamen` as its plain lamen.
  */
-const plainCircle = (role: string) =>
-  role === "" || (HALL_ROLES.has(role) && !LAMEN_OFFICERS.has(role));
+const plainCircle = (role: string | undefined): role is undefined | "" =>
+  role === undefined || role === "";
 
 const roleOf = (node: HallNode) => stringAttr(node, "role", 200);
 
 /** An officer's lamen in its 100 × 100 box, centred, or the plain circle. */
 function HallLamen({ node }: HallArtProps) {
   const role = roleOf(node);
-  if (role === undefined || plainCircle(role))
+  if (plainCircle(role))
     return (
       <circle
         r={47}
@@ -46,11 +45,10 @@ export const lamenArt: HallArt = {
   box: { width: 100, height: 100 },
   // 1.6 squares in an officer's 2-square cell (layout.ts, DEFAULT_SCALES).
   inset: 0.8,
-  // A role `Lamen` does not know draws its plain lamen, whatever the name,
-  // unless it is a hall role (an adept): the plain circle.
+  // A role `Lamen` does not know draws its plain lamen, whatever the name.
   variant: (node) => {
     const role = roleOf(node);
-    if (role === undefined || plainCircle(role)) return "";
+    if (plainCircle(role)) return "";
     return LAMEN_OFFICERS.has(role) ? role : "?";
   },
   provenance,
