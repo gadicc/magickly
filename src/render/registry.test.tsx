@@ -60,10 +60,14 @@ describe("component image registry", () => {
     ],
     // 63b83840… until the Water and Fire Watchtowers joined the page and the
     // spec read each tablet's kind and marks too (plan 061, stage G); the
-    // Earth and Air images' bytes did not move.
+    // Earth and Air images' bytes did not move. 3340879b… until each
+    // tablet held every source's reading and the spec hashed them all
+    // (plan 061, "Tablet versions") and the version rules with their
+    // revision; Earth and Air moved to the Golden Dawn's letters with it,
+    // below.
     [
       "enochian-tablet",
-      "3340879b74a54889d04c6f5ab11cc37cc8249fa04c7757a9cbd7f72d0de73bff",
+      "1212086a363070af3b7b2eed54a28c9f2b967c8ccfefb1c8c152d2cdfd2327d8",
     ],
     [
       "seven-branched-candlestick",
@@ -188,17 +192,20 @@ describe("component image registry", () => {
   // pins were taken after visual review of the rasterised output; a font or
   // engine change needs a new review before they move.
   it.each([
+    // 124,838 bytes, 5ed3a569…, and 223,771, 53514ca8…, until Air drew
+    // the Golden Dawn's letters, with its O and A reversed (plan 061,
+    // "Tablet versions"); reviewed again as rasterised.
     [
       "enochian-tablet",
       "id=air",
-      124_838,
-      "5ed3a569d959b1ed9065bd9e6ee2af84938f1b0e8139789af1a85bb045f96fed",
+      127_724,
+      "28267bac4938edd83072e1485b3f2602a914f34d03ee20ea7fb341419da1c931",
     ],
     [
       "enochian-tablet",
       "id=air&font=enochian",
-      223_771,
-      "53514ca864d7f13b59c90bf048a462c6d56c65b11c306c53a569a6684c3c81fe",
+      223_063,
+      "1a637907b7e36e97a1cfcd08f2086141c14ec7f0ab642fd9cdc03dca0cdb4a78",
     ],
     // 136,294 bytes and df3c3791… until Manasseh's Hebrew name stopped being
     // Benjamin's; the Gemini branch is one glyph shorter and one wider.

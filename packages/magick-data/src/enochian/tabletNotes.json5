@@ -1,15 +1,23 @@
-// Notes on the Enochian tablets: where their versions come from, how they
-// differ, and what the sources print in particular squares. Original
-// prose, facts only, citing the works below by stable reference; plan 061
-// (Stage G notes) has the transcriptions' account. Rows and columns are
-// counted from 0, as in tablets.json5's grids and marks; `printed` gives
-// each source's letters in that square ("x over y" where Regardie prints
-// a higher and a lower letter).
+// Notes on the Enochian tablets: the versions, how each differs from the
+// others, each tablet, and particular squares. Original prose, facts
+// only, citing the works below by stable reference; plan 061 ("Tablet
+// versions" and the Stage G notes) has the transcriptions' account. The
+// letters themselves are in tablets.json5, each source's reading by
+// source: what a source prints in a square, and the counts and squares
+// where two versions differ, are read from there, never written here.
+// Rows and columns are counted from 0, as in tablets.json5.
+//
+// Generated once from a script outside the repository and edited by hand
+// since; nothing regenerates it.
 {
-  works: {
+  "works": {
     "sloane3191": {
-      "title": "John Dee, the Enochian tables and invocations, British Library, Sloane MS 3191",
+      "title": "John Dee, notes on ceremonial magic, with the Enochian tables, British Library, Sloane MS 3191",
       "year": 1584
+    },
+    "cottonAppXLVI": {
+      "title": "John Dee, Mysteriorum libri, the records of the sessions with Edward Kelley, British Library, Cotton MS Appendix XLVI",
+      "year": 1583
     },
     "casaubon1659": {
       "title": "Meric Casaubon (ed.), A True & Faithful Relation of what passed for many Yeers between Dr. John Dee and Some Spirits (London, 1659), from British Library, Cotton MS Appendix XLVI",
@@ -38,31 +46,12 @@
       "isbn": "978-0-7387-4399-8"
     }
   },
-  versions: [
-    {
-      "id": "dee1584",
-      "title": "Dee and Kelley, 1584",
-      "text": "John Dee recorded the four Watchtowers, joined into one Great Table, from Edward Kelley's scrying in 1584. Dee's own copy of the tables is among his papers in the British Library. The letters were given square by square.",
-      "sources": [
-        {
-          "work": "sloane3191"
-        }
-      ]
-    },
-    {
-      "id": "raphael1587",
-      "title": "Raphael's revision, 1587",
-      "text": "Dee's records also tell of a revised version of the table, given through Kelley in 1587 and known as the Tabula recensa. His diaries of the sessions with Kelley were printed in 1659.",
-      "sources": [
-        {
-          "work": "casaubon1659"
-        }
-      ]
-    },
+  "intro": "The Enochian tablets come down in two traditions: John Dee's own records of 1584 and 1587, and the Golden Dawn's tablets, which grew from them. Both are given here. The Golden Dawn's version is the default, here and in the hall diagrams, and Dee's tables, as he recorded them, are here for those who work from Dee alone. Each version below says where it comes from and how it differs from the others.",
+  "versions": [
     {
       "id": "gd",
-      "title": "The Golden Dawn",
-      "text": "The Hermetic Order of the Golden Dawn worked from copies of Dee's tables. Its tablets keep his letters with some changes, print a second letter in many squares, attribute each tablet to an element and a quarter, and add a Tablet of Union, colours and a layer of attributions on every square.",
+      "title": "The Golden Dawn's",
+      "text": "The tablets as the Golden Dawn used them, and the default here. Each square has Regardie's higher letter, which he prefers while allowing both, except where both other Golden Dawn sources print another letter and the Order's names through the square read it too, and in Water's one square of four letters. The other letters any of the three sources prints are kept as second letters. The reversed letters are those the Equinox prints in Enochian, and the sigils are Regardie's, drawn here from his description.",
       "sources": [
         {
           "work": "regardie1940",
@@ -73,35 +62,189 @@
           "work": "regardie1940",
           "page": 306,
           "leaf": 298
-        }
-      ]
-    },
-    {
-      "id": "printings",
-      "title": "Later printings",
-      "text": "The Order's tablets reached print in The Equinox (1912), which gives them whole and with the Black Cross, square by square as pyramids, and with the Tablet of Union; in Regardie's The Golden Dawn (1937 to 1940), the Order's own papers, with the second letters; and in modern editions, of which the seventh, edited by John Michael Greer, redraws them in colour with one letter a square. The three disagree in a few squares each.",
-      "sources": [
+        },
+        {
+          "work": "regardie1940",
+          "page": 307,
+          "leaf": 299
+        },
         {
           "work": "equinox1912",
           "plate": "III",
           "leaf": 241
-        },
-        {
-          "work": "regardie1940",
-          "page": 270,
-          "leaf": 262
         },
         {
           "work": "greer"
         }
-      ]
+      ],
+      "reversed": "Reversed letters: the eight the Equinox prints in Enochian, one or two in each Watchtower.",
+      "sigils": "Sigils: Regardie's, which he says are taken from Dee's Sigillum Dei Aemeth.",
+      "differs": {
+        "regardie": "It is Regardie's print with a few squares chosen otherwise: where both other sources and the Order's names read another letter, and in Water's square of four letters, where it takes the N the others print. It also reverses the letters the Equinox prints in Enochian, which Regardie prints plain.",
+        "equinox": "Where Regardie prints two letters it takes the higher, and the Equinox, which prints one, often has the lower. Where Dee's two tables differ, the Equinox mostly has the 1584 letter and this version the 1587 one. Both reverse the same letters.",
+        "dee": "It keeps most of Dee's 1584 letters. It differs mostly where the reform of 1587 changed them, for Regardie's higher letters are mostly the 1587 ones: Earth's eighth row above all, which the reform moved one square left. It differs too in a few squares where it has a letter neither of Dee's tables has, it fills the two Fire squares Dee's record leaves empty, and its capitals are Regardie's.",
+        "raphael": "The two agree in nearly every letter, since Regardie's higher letters are mostly Raphael's. Most of their differences are of case, for the 1659 print of the 1587 table is set in small letters. Where the letter differs, this version has a letter neither of Dee's tables has, or keeps the 1584 letter, or has p where the 1587 print has x."
+      }
+    },
+    {
+      "id": "regardie",
+      "title": "Regardie's print",
+      "text": "The tablets exactly as Regardie prints them in 1940, from the Order's papers: in each square his higher letter, the one he prefers, and his smaller letters below it as second letters. In Water's row 5, square 12, where he prints four letters, two above two, the first of the upper pair stands. He prints no letter reversed.",
+      "sources": [
+        {
+          "work": "regardie1940",
+          "page": 270,
+          "leaf": 262
+        },
+        {
+          "work": "regardie1940",
+          "page": 271,
+          "leaf": 263
+        },
+        {
+          "work": "regardie1940",
+          "page": 272,
+          "leaf": 264
+        },
+        {
+          "work": "regardie1940",
+          "page": 273,
+          "leaf": 265
+        },
+        {
+          "work": "regardie1940",
+          "page": 275,
+          "leaf": 267
+        },
+        {
+          "work": "regardie1940",
+          "page": 306,
+          "leaf": 298
+        }
+      ],
+      "reversed": "Reversed letters: none; Regardie prints every letter plain.",
+      "sigils": "Sigils: Regardie's, as in the Golden Dawn's version.",
+      "differs": {
+        "gd": "It is the Golden Dawn's version before its choices: Regardie's higher letter everywhere, even in the few squares where the version takes the letter the other sources and the Order's names read, his y in Water's square of four letters, and nothing reversed.",
+        "equinox": "Regardie prints a second letter in many squares and the Equinox one letter a square, often Regardie's lower one. Where Dee's two tables differ, Regardie's higher letter is mostly the 1587 one and the Equinox's the 1584 one.",
+        "dee": "Where Dee's two tables differ, Regardie's higher letter is mostly the 1587 one, and his lower often the 1584 one, so his print and Dee's 1584 table differ most where the reform changed the letters. He also has letters in neither of Dee's tables, often look-alikes (l and i, b and l, z and x), and he fills the two Fire squares Dee's record leaves empty.",
+        "raphael": "Regardie's higher letters are mostly Raphael's, so the two differ little in letter. They differ in case, since the 1659 print of the 1587 table is set in small letters, and where Regardie has a letter in neither of Dee's tables or keeps a 1584 letter above a 1587 one."
+      }
+    },
+    {
+      "id": "equinox",
+      "title": "The Equinox's",
+      "text": "The tablets as The Equinox prints them in 1912, in its general view of the four Watchtowers joined by the Black Cross: one letter a square, the reversed letters written in Enochian. Its sigils are those of its Plate X, drawn here in black.",
+      "sources": [
+        {
+          "work": "equinox1912",
+          "plate": "III",
+          "leaf": 241
+        },
+        {
+          "work": "equinox1912",
+          "page": 234,
+          "leaf": 240
+        },
+        {
+          "work": "equinox1912",
+          "plate": "VIII",
+          "leaf": 246
+        },
+        {
+          "work": "equinox1912",
+          "plate": "X",
+          "leaf": 256
+        }
+      ],
+      "reversed": "Reversed letters: the eight it writes in Enochian, the Golden Dawn's way of marking them.",
+      "sigils": "Sigils: the Equinox's Plate X, in black. Its Water sigil sets the figures 4 and b over b and 6, where Regardie's has b and 6 over 4 and b, and its Fire sigil alternates straight rays with wavy ones.",
+      "differs": {
+        "gd": "It prints one letter a square, often the lower of Regardie's two, and mostly Dee's 1584 letter where his two tables differ. Its Earth eighth row mixes the two tables' rows. It writes its reversed letters in Enochian, and the Golden Dawn's version reverses the same ones.",
+        "regardie": "It prints one letter a square where Regardie prints two in many, and mostly the 1584 letter where he puts the 1587 one higher. Its reversed letters are in Enochian; Regardie prints them plain.",
+        "dee": "It is close to Dee's 1584 table: where Dee's two tables differ, it mostly has the 1584 letter. It differs in a few look-alike letters, in Earth's eighth row, in case, and in filling the two Fire squares Dee's record leaves empty.",
+        "raphael": "Where Dee's two tables differ it mostly has the 1584 letter, so it differs from Raphael's there, Earth's eighth row above all; and in case, the 1659 print of the 1587 table being set in small letters."
+      }
+    },
+    {
+      "id": "dee",
+      "title": "Dee's, 1584",
+      "text": "The four tables Edward Kelley dictated to John Dee in Cracow in June 1584, as Dee recorded them and as he corrected them. Kelley was told to write small letters and great, so the capitals are deliberate; here they are Casaubon's type, since the manuscript could not be read. In four squares Dee's record has a letter that every later copy replaces: Dee asked the angel about his corrections, and was told the tables were true and his capitals well corrected. This version takes the corrected letters and keeps the first ones as second letters. Two squares of Fire are empty in every 1584 witness read; they are drawn empty, with Raphael's 1587 letters as second letters.",
+      "sources": [
+        {
+          "work": "casaubon1659",
+          "page": 175,
+          "leaf": 264
+        },
+        {
+          "work": "casaubon1659",
+          "page": 176,
+          "leaf": 265
+        },
+        {
+          "work": "casaubon1659",
+          "page": 177,
+          "leaf": 266
+        },
+        {
+          "work": "casaubon1659",
+          "page": 185,
+          "leaf": 274
+        },
+        {
+          "work": "casaubon1659",
+          "page": 188,
+          "leaf": 277
+        },
+        {
+          "work": "cottonAppXLVI"
+        },
+        {
+          "work": "sloane3191"
+        }
+      ],
+      "reversed": "Reversed letters: the eight smallest letters Dee picked out, which spell Paraoan, the name of a governor; Casaubon's print marks three of them reversed, P and A in its margin and the averted L Dee asked about in its type.",
+      "sigils": "Sigils: none. The Golden Dawn's are taken from the Sigillum Dei Aemeth; the pages of Dee's record cited here draw none above the tables.",
+      "differs": {
+        "gd": "It is the table before the reform of 1587 that the Golden Dawn's higher letters mostly follow, so it keeps the older letters there, Earth's eighth row unshifted. It has two empty squares in Fire, Casaubon's capitals, and the eight reversed letters Dee picked out, the same eight the Golden Dawn reverses. It has no Tablet of Union, which is the Golden Dawn's.",
+        "regardie": "Where Regardie prints two letters, his lower is often this table's and his higher the 1587 one. It also lacks the letters of Regardie's that are in neither of Dee's tables, and two of its Fire squares are empty.",
+        "equinox": "The Equinox mostly follows this table where Dee's two differ, so the two are close: they differ in a few look-alike letters, in Earth's eighth row, in case, and in the two Fire squares this table leaves empty.",
+        "raphael": "Raphael's table of 1587 is this one reformed: Earth's eighth row moved one square left, the two empty Fire squares filled and a third changed, and a few letters changed elsewhere. The 1659 print sets it in small letters, so the case differs too."
+      }
+    },
+    {
+      "id": "raphael",
+      "title": "Raphael's, 1587",
+      "text": "The Tabula recensa, the table \"reformed by Raphael\" on 20 April 1587, as Casaubon prints it from Dee's record. Dee notes that he had been unsure in 1584 how to join the four tables, given apart, and the reformed table joins them. Its letters are as printed, where every other copy of Dee's tables agrees with the print; in ten squares the print has a letter no other copy of Dee's tables has, and this version corrects it, keeping the printed letter. It is set in small letters: the capitals of Dee's copy in Sloane MS 3191 are known here only through modern redrawings, and wait until the British Library's images return. In two Fire squares the print has x and Sloane MS 3191 p; this version follows the print, with p as a second letter.",
+      "sources": [
+        {
+          "work": "casaubon1659",
+          "part": "Actio Tertia",
+          "page": 15,
+          "leaf": 456
+        },
+        {
+          "work": "cottonAppXLVI"
+        },
+        {
+          "work": "sloane3191"
+        }
+      ],
+      "reversed": "Reversed letters: seven of Dee's eight, as modern renderings of the 1587 copies mark them; the eighth, Earth's R, left the table when its row moved. The 1659 print shows the L reversed, and the P as a q.",
+      "sigils": "Sigils: none, as for Dee's 1584 table.",
+      "differs": {
+        "gd": "The Golden Dawn mostly took Raphael's letters as its higher letters, so the two differ little in letter. They differ in case, the 1587 table being printed in small letters, and where the Golden Dawn keeps a 1584 letter, has a letter neither of Dee's tables has, or reads p where this table has x. It has no Tablet of Union.",
+        "regardie": "Regardie's higher letters are mostly this table's, so the two differ little in letter, but much in case. Regardie also prints second letters, many of them this table's predecessor's.",
+        "equinox": "The Equinox mostly follows the 1584 table where the two of Dee's differ, so it differs from this one in the squares the reform changed, Earth's eighth row above all, and in case.",
+        "dee": "It is Dee's 1584 table reformed: Earth's eighth row moved one square left, losing its reversed R and gaining t, Fire's top right corner filled and changed, and a few letters changed elsewhere. It is printed in small letters."
+      }
     }
   ],
-  differences: [
+  "differences": [
     {
       "id": "letters",
       "title": "Letters",
-      "text": "Most squares hold the same letter in every version. Where they differ it is usually by a letter that looks alike in a hand or in print (z and x, c and t, n and u), by u against v, which were one letter in Dee's day, or by a capital.",
+      "text": "Most squares hold the same letter in every version. Where they differ it is usually by a letter that looks alike in a hand or in print (z and x, c and t, n and u, l and i), by u against v, which were one letter in Dee's day, or by a capital.",
       "sources": [
         {
           "work": "regardie1940",
@@ -112,26 +255,68 @@
           "work": "equinox1912",
           "plate": "III",
           "leaf": 241
+        },
+        {
+          "work": "casaubon1659",
+          "page": 176,
+          "leaf": 265
+        },
+        {
+          "work": "casaubon1659",
+          "part": "Actio Tertia",
+          "page": 15,
+          "leaf": 456
         }
       ]
     },
     {
       "id": "doubled",
       "title": "Squares with two letters",
-      "text": "Regardie prints a second, smaller letter in many squares, and once four. He treats either letter as valid for the square, prefers the higher, and allows both; the Order's names sometimes draw on both. The Equinox and Greer print one letter a square. Here the grid takes the higher letter unless both other sources and the Order's names read another, and the other letters are kept as variants.",
+      "text": "Regardie prints a second, smaller letter in many squares, and once four. He treats either letter as valid for the square, prefers the higher, and allows both, and the Order's names sometimes draw on both; Dee too was told that two readings of a name could both be true. Set against Dee's two tables, many of Regardie's pairs are the 1584 letter and the 1587 one, nearly always with the 1587 letter on top, and Earth's eighth row is the 1587 row over the 1584 row. So the Golden Dawn's tablets look like Dee's 1584 table with the 1587 readings written in. That is an inference from the letters: no Golden Dawn paper read here says so. Most of Regardie's other pairs are look-alike letters, whose source is open.",
       "sources": [
         {
           "work": "regardie1940",
           "page": 306,
           "leaf": 298
+        },
+        {
+          "work": "regardie1940",
+          "page": 272,
+          "leaf": 264
+        },
+        {
+          "work": "casaubon1659",
+          "page": 188,
+          "leaf": 277
+        },
+        {
+          "work": "casaubon1659",
+          "part": "Actio Tertia",
+          "page": 15,
+          "leaf": 456
         }
       ]
     },
     {
       "id": "reversed",
       "title": "Reversed letters",
-      "text": "A few letters are printed reversed. Most of them, one or two in each Watchtower, spell Paraoan, the name of one of the governors of the Aethyrs. The Equinox writes them in Enochian, since a reversed A or O cannot be told from a plain one, and Greer mirrors them. Both also reverse one letter outside that name, Water's last, an L.",
+      "text": "Dee picked out eight letters smaller than the rest, one or two in each table, which together spell Paraoan, the name of a governor; the eighth, an L, he was told could be read N or L. Casaubon's print marks some of them reversed. The Equinox writes the same eight in Enochian, since a reversed A or O cannot be told from a plain one; Greer mirrors N, L, R and P, the four whose reversal can be seen; Regardie prints them plain.",
       "sources": [
+        {
+          "work": "casaubon1659",
+          "page": 179,
+          "leaf": 268
+        },
+        {
+          "work": "casaubon1659",
+          "page": 183,
+          "leaf": 272
+        },
+        {
+          "work": "casaubon1659",
+          "page": 176,
+          "leaf": 265
+        },
         {
           "work": "equinox1912",
           "page": 234,
@@ -145,7 +330,7 @@
     {
       "id": "earthRow8",
       "title": "The eighth row of Earth",
-      "text": "The eighth row of the Earth tablet differs most: Regardie prints two readings in every square, the lower one shifted a square along, and the Equinox and Greer each follow a different mixture of them. The older reading kept here begins with O; the Golden Dawn's begins with R, printed reversed.",
+      "text": "The eighth row of the Earth tablet differs most. The reform of 1587 moved Dee's 1584 row one square to the left, dropping its reversed R and adding a t at the end. Regardie prints both rows, the 1587 one above, and the Golden Dawn's version reads his higher letters; the Equinox and Greer each follow a different mixture of the two.",
       "sources": [
         {
           "work": "regardie1940",
@@ -159,13 +344,47 @@
         },
         {
           "work": "greer"
+        },
+        {
+          "work": "casaubon1659",
+          "page": 176,
+          "leaf": 265
+        },
+        {
+          "work": "casaubon1659",
+          "part": "Actio Tertia",
+          "page": 15,
+          "leaf": 456
+        }
+      ]
+    },
+    {
+      "id": "emptyFire",
+      "title": "Two empty squares in Fire",
+      "text": "In Dee's 1584 record two squares at the top right of the Fire table, row 1 square 12 and row 2 square 11, are empty, printed as dots, and a modern rendering of the Cotton manuscript leaves them empty too. The 1587 table fills them with a and v, and every Golden Dawn source has a letter there. Dee's version leaves them empty and gives the 1587 letters as second letters, and the hall and the image draw them blank.",
+      "sources": [
+        {
+          "work": "casaubon1659",
+          "page": 176,
+          "leaf": 265
+        },
+        {
+          "work": "casaubon1659",
+          "part": "Actio Tertia",
+          "page": 15,
+          "leaf": 456
+        },
+        {
+          "work": "regardie1940",
+          "page": 273,
+          "leaf": 265
         }
       ]
     },
     {
       "id": "union",
       "title": "The Tablet of Union",
-      "text": "The Tablet of Union is the Order's: twenty letters in five columns and four rows, EXARP, HCOMA, NANTA and BITOM, one line to each element. The same letters stand in the Black Cross that joins the four Watchtowers in the Equinox's general view.",
+      "text": "The Tablet of Union is the Golden Dawn's construction: twenty letters in five columns and four rows, EXARP, HCOMA, NANTA and BITOM, one line to each element. Its letters are those of Dee's Black Cross, which binds the four tables together: Dee was given them in names (pp.179-180), with the rule for reading them into the tables' names. Dee's and Raphael's versions have no Tablet of Union, and the Black Cross itself is not yet in this data.",
       "sources": [
         {
           "work": "regardie1940",
@@ -181,13 +400,23 @@
           "work": "equinox1912",
           "plate": "VIII",
           "leaf": 246
+        },
+        {
+          "work": "casaubon1659",
+          "page": 179,
+          "leaf": 268
+        },
+        {
+          "work": "casaubon1659",
+          "page": 180,
+          "leaf": 269
         }
       ]
     },
     {
       "id": "attributions",
       "title": "Elements and quarters",
-      "text": "The Order gives each Watchtower an element and a quarter: Air the East, Water the West, Earth the North and Fire the South, and divides each into four lesser angles, one for each element. This is the Order's scheme; other writers attribute the tablets differently.",
+      "text": "The Golden Dawn gives each Watchtower an element and a quarter: Air the East, Water the West, Earth the North and Fire the South, and divides each into four lesser angles, one for each element. Giving a whole table one element is the Order's addition: Dee's record gives elements to the angels under each lesser cross, of air, water, earth and fire, and names the tables by the first letters of their middle rows, ORO, MPH, MOR and OIP.",
       "sources": [
         {
           "work": "regardie1940",
@@ -198,6 +427,33 @@
           "work": "equinox1912",
           "page": 234,
           "leaf": 240
+        },
+        {
+          "work": "casaubon1659",
+          "page": 181,
+          "leaf": 270
+        },
+        {
+          "work": "casaubon1659",
+          "page": 177,
+          "leaf": 266
+        }
+      ]
+    },
+    {
+      "id": "sigils",
+      "title": "Sigils",
+      "text": "Each Golden Dawn Watchtower carries a sigil: a Tau with four flames for Air, a cross potent with figures in its angles for Water, a cross potent for Earth and a circle of twelve rays for Fire. Regardie says they are taken from Dee's Sigillum Dei Aemeth. The Equinox draws them a little differently. Dee's and Raphael's tables are drawn here without them.",
+      "sources": [
+        {
+          "work": "regardie1940",
+          "page": 307,
+          "leaf": 299
+        },
+        {
+          "work": "equinox1912",
+          "plate": "X",
+          "leaf": 256
         }
       ]
     },
@@ -224,10 +480,9 @@
       ]
     }
   ],
-  tablets: {
+  "tablets": {
     "earth": {
-      "version": "older",
-      "text": "The Watchtower of the North, Earth. This tablet's letters predate the sources recorded here and have no source of their own. They differ from the Golden Dawn's in thirteen squares: capitals, u for v, and four letters, two of them in the eighth row. A comparison with a modern transcription of Dee's table suggests they follow it. Its sigil is a cross with arms of four colours.",
+      "text": "The Watchtower of the North, Earth, in the Golden Dawn's attribution: Dee's MOR, after the first letters of its middle row. Its eighth row is where the versions differ most. In Dee's 1584 record Casaubon prints two marks the readings do not record: a rule under the c of row 12, square 6, and over the V of row 13, square 6; what they mean is unknown, perhaps letters Dee queried. Its Golden Dawn sigil is a cross potent, its arms in four colours.",
       "sources": [
         {
           "work": "regardie1940",
@@ -238,12 +493,22 @@
           "work": "regardie1940",
           "page": 307,
           "leaf": 299
+        },
+        {
+          "work": "casaubon1659",
+          "page": 176,
+          "leaf": 265
+        },
+        {
+          "work": "casaubon1659",
+          "part": "Actio Tertia",
+          "page": 15,
+          "leaf": 456
         }
       ]
     },
     "air": {
-      "version": "older",
-      "text": "The Watchtower of the East, Air. This tablet's letters predate the sources recorded here and have no source of their own. They differ from the Golden Dawn's in thirteen squares: capitals, u for v, and two letters. A comparison with a modern transcription of Dee's table suggests they follow it. Its sigil is a Tau with four flames above it.",
+      "text": "The Watchtower of the East, Air, in the Golden Dawn's attribution: Dee's ORO, the first table written down in 1584, whose middle line the angel called the great cross that came out of the East gate. Its Golden Dawn sigil is a Tau with four flames above it.",
       "sources": [
         {
           "work": "regardie1940",
@@ -254,12 +519,21 @@
           "work": "regardie1940",
           "page": 307,
           "leaf": 299
+        },
+        {
+          "work": "casaubon1659",
+          "page": 175,
+          "leaf": 264
+        },
+        {
+          "work": "casaubon1659",
+          "page": 177,
+          "leaf": 266
         }
       ]
     },
     "water": {
-      "version": "gd",
-      "text": "The Watchtower of the West, Water, as the Golden Dawn has it. Regardie prints a second letter in twenty of its squares; the grid takes his letter except in six squares, each with a note of its own. Its sigil is a cross potent with b, 6, 4 and b in its angles; the Equinox sets the four figures differently.",
+      "text": "The Watchtower of the West, Water, in the Golden Dawn's attribution: Dee's MPH. Regardie prints second letters in many of its squares, once four in one square. Its Golden Dawn sigil is a cross potent with b, 6, 4 and b in its angles; the Equinox sets the four figures differently.",
       "sources": [
         {
           "work": "regardie1940",
@@ -275,12 +549,16 @@
           "work": "equinox1912",
           "plate": "X",
           "leaf": 256
+        },
+        {
+          "work": "casaubon1659",
+          "page": 177,
+          "leaf": 266
         }
       ]
     },
     "fire": {
-      "version": "gd",
-      "text": "The Watchtower of the South, Fire, as the Golden Dawn has it. Regardie prints a second letter in ten of its squares; the grid takes his letter except in three squares, each with a note of its own. Its sigil is a circle with twelve rays.",
+      "text": "The Watchtower of the South, Fire, in the Golden Dawn's attribution: Dee's OIP. Two of its squares are empty in Dee's 1584 record. Its Golden Dawn sigil is a circle with twelve rays.",
       "sources": [
         {
           "work": "regardie1940",
@@ -296,12 +574,16 @@
           "work": "equinox1912",
           "plate": "X",
           "leaf": 256
+        },
+        {
+          "work": "casaubon1659",
+          "page": 176,
+          "leaf": 265
         }
       ]
     },
     "union": {
-      "version": "gd",
-      "text": "The Tablet of Union, by which the Golden Dawn joins the four Watchtowers: EXARP for Air, HCOMA for Water, NANTA for Earth and BITOM for Fire. It has no sigil and no variants in these sources.",
+      "text": "The Tablet of Union, by which the Golden Dawn joins the four Watchtowers: EXARP for Air, HCOMA for Water, NANTA for Earth and BITOM for Fire, the letters of Dee's Black Cross. It has no sigil, no variants in the Golden Dawn's sources, and no place in Dee's or Raphael's versions.",
       "sources": [
         {
           "work": "regardie1940",
@@ -312,22 +594,21 @@
           "work": "equinox1912",
           "plate": "VIII",
           "leaf": 246
+        },
+        {
+          "work": "casaubon1659",
+          "page": 179,
+          "leaf": 268
         }
       ]
     }
   },
-  squares: {
+  "squares": {
     "air": [
       {
         "row": 0,
         "column": 7,
-        "goldenDawn": "y",
-        "printed": {
-          "regardie1940": "y over u",
-          "equinox1912": "y",
-          "greer": "u"
-        },
-        "note": "Regardie prints y over u, the Equinox y, Greer u; this tablet has a capital Y.",
+        "note": "Regardie prints y over u: y is the 1587 table's letter and u the 1584 table's. The Equinox prints y, Greer u.",
         "sources": [
           {
             "work": "regardie1940",
@@ -341,98 +622,45 @@
           },
           {
             "work": "greer"
-          }
-        ]
-      },
-      {
-        "row": 0,
-        "column": 10,
-        "goldenDawn": "p",
-        "printed": {
-          "regardie1940": "p",
-          "equinox1912": "p",
-          "greer": "p"
-        },
-        "note": "The sources print p; this tablet has a capital.",
-        "sources": [
-          {
-            "work": "regardie1940",
-            "page": 270,
-            "leaf": 262
           },
           {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
+            "work": "casaubon1659",
+            "page": 175,
+            "leaf": 264
           },
           {
-            "work": "greer"
-          }
-        ]
-      },
-      {
-        "row": 1,
-        "column": 7,
-        "goldenDawn": "p",
-        "printed": {
-          "regardie1940": "p",
-          "equinox1912": "p",
-          "greer": "p"
-        },
-        "note": "The sources print p; this tablet has a capital.",
-        "sources": [
-          {
-            "work": "regardie1940",
-            "page": 270,
-            "leaf": 262
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
           },
           {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
-          },
-          {
-            "work": "greer"
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 2,
-        "column": 0,
-        "goldenDawn": "C",
-        "printed": {
-          "regardie1940": "C",
-          "equinox1912": "c",
-          "greer": "c"
-        },
-        "note": "Regardie prints a capital C; the Equinox, Greer and this tablet c.",
+        "column": 6,
+        "note": "Dee's record of the 1584 session has v here, as Casaubon prints it; every later copy and every Golden Dawn source has r. Dee's version takes r, as Dee corrected the table, and keeps v as the letter first written.",
         "sources": [
           {
-            "work": "regardie1940",
-            "page": 270,
-            "leaf": 262
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
           },
           {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
+            "work": "casaubon1659",
+            "page": 185,
+            "leaf": 274
           },
           {
-            "work": "greer"
-          }
-        ]
-      },
-      {
-        "row": 2,
-        "column": 10,
-        "goldenDawn": "u",
-        "printed": {
-          "regardie1940": "u",
-          "equinox1912": "u",
-          "greer": "u"
-        },
-        "note": "The sources print u; this tablet has v.",
-        "sources": [
+            "work": "casaubon1659",
+            "page": 188,
+            "leaf": 277
+          },
           {
             "work": "regardie1940",
             "page": 270,
@@ -451,12 +679,7 @@
       {
         "row": 3,
         "column": 5,
-        "printed": {
-          "regardie1940": "z over x",
-          "equinox1912": "x",
-          "greer": "x"
-        },
-        "note": "Regardie prints z over x; the Equinox and Greer x; this tablet z, the higher letter (the Senior Aaozaif; Aaoxaif reads x).",
+        "note": "Regardie prints z over x: z is the 1587 letter, x (a capital in the 1584 print) the 1584 one; the Equinox and Greer print x. The Golden Dawn's version takes z, the higher letter; the Senior's name reads Aaozaif in Greer's edition, Aaoxaif in Regardie's.",
         "sources": [
           {
             "work": "regardie1940",
@@ -470,18 +693,29 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 175,
+            "leaf": 264
+          },
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 4,
         "column": 6,
-        "printed": {
-          "regardie1940": "n over m",
-          "equinox1912": "m",
-          "greer": "m"
-        },
-        "note": "Regardie prints n over m; the Equinox, Greer and the Senior Htmorda read m, as this tablet does.",
+        "note": "Regardie prints n over m; the Equinox, Greer, both of Dee's tables and the Senior Htmorda read m, which the Golden Dawn's version takes.",
         "sources": [
           {
             "work": "regardie1940",
@@ -495,19 +729,29 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 175,
+            "leaf": 264
+          },
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 5,
         "column": 11,
-        "goldenDawn": "l",
-        "printed": {
-          "regardie1940": "l over i",
-          "equinox1912": "i",
-          "greer": "i"
-        },
-        "note": "Regardie prints l over i; the Equinox and Greer i, as this tablet does.",
+        "note": "Regardie prints l over i; the Equinox, Greer and both of Dee's tables have i. The Golden Dawn's version takes Regardie's higher l.",
         "sources": [
           {
             "work": "regardie1940",
@@ -521,70 +765,29 @@
           },
           {
             "work": "greer"
-          }
-        ]
-      },
-      {
-        "row": 6,
-        "column": 5,
-        "goldenDawn": "a",
-        "printed": {
-          "regardie1940": "a",
-          "equinox1912": "A",
-          "greer": "A"
-        },
-        "note": "Regardie prints a; the Equinox, Greer and this tablet A.",
-        "sources": [
-          {
-            "work": "regardie1940",
-            "page": 270,
-            "leaf": 262
           },
           {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
+            "work": "casaubon1659",
+            "page": 175,
+            "leaf": 264
           },
           {
-            "work": "greer"
-          }
-        ]
-      },
-      {
-        "row": 6,
-        "column": 10,
-        "goldenDawn": "p",
-        "printed": {
-          "regardie1940": "p",
-          "equinox1912": "p",
-          "greer": "p"
-        },
-        "note": "The sources print p; this tablet has a capital.",
-        "sources": [
-          {
-            "work": "regardie1940",
-            "page": 270,
-            "leaf": 262
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
           },
           {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
-          },
-          {
-            "work": "greer"
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 7,
         "column": 0,
-        "printed": {
-          "regardie1940": "t over c",
-          "equinox1912": "c",
-          "greer": "c"
-        },
-        "note": "Regardie prints t over c; the Equinox and Greer c; this tablet t.",
+        "note": "Regardie prints t over c: t is the 1587 letter, c (a capital in the 1584 print) the 1584 one. The Equinox and Greer print c.",
         "sources": [
           {
             "work": "regardie1940",
@@ -598,18 +801,29 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 175,
+            "leaf": 264
+          },
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 7,
         "column": 4,
-        "printed": {
-          "regardie1940": "r over a",
-          "equinox1912": "a",
-          "greer": "r"
-        },
-        "note": "Regardie prints r over a; Greer r, the Equinox a; this tablet r.",
+        "note": "Regardie prints r over a; Greer and both of Dee's tables have r, the Equinox a.",
         "sources": [
           {
             "work": "regardie1940",
@@ -623,18 +837,29 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 175,
+            "leaf": 264
+          },
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 7,
         "column": 10,
-        "printed": {
-          "regardie1940": "s over z",
-          "equinox1912": "z",
-          "greer": "z"
-        },
-        "note": "Regardie prints s over z; the Equinox and Greer z; this tablet s.",
+        "note": "Regardie prints s over z: s is the 1587 letter, z the 1584 one. The Equinox and Greer print z.",
         "sources": [
           {
             "work": "regardie1940",
@@ -648,147 +873,73 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 175,
+            "leaf": 264
+          },
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 8,
         "column": 0,
-        "printed": {
-          "regardie1940": "O",
-          "equinox1912": "O",
-          "greer": "O"
-        },
-        "note": "Printed reversed in the Equinox (in Enochian).",
+        "note": "One of the eight smallest letters Dee picked out, which spell Paraoan. The Equinox writes it in Enochian; a reversed O looks the same as a plain one.",
         "sources": [
           {
-            "work": "regardie1940",
-            "page": 270,
-            "leaf": 262
+            "work": "casaubon1659",
+            "page": 179,
+            "leaf": 268
+          },
+          {
+            "work": "casaubon1659",
+            "page": 183,
+            "leaf": 272
           },
           {
             "work": "equinox1912",
             "plate": "III",
             "leaf": 241
-          },
-          {
-            "work": "greer"
-          }
-        ]
-      },
-      {
-        "row": 8,
-        "column": 6,
-        "goldenDawn": "p",
-        "printed": {
-          "regardie1940": "p",
-          "equinox1912": "p",
-          "greer": "p"
-        },
-        "note": "The sources print p; this tablet has a capital.",
-        "sources": [
-          {
-            "work": "regardie1940",
-            "page": 270,
-            "leaf": 262
-          },
-          {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
-          },
-          {
-            "work": "greer"
           }
         ]
       },
       {
         "row": 9,
         "column": 0,
-        "printed": {
-          "regardie1940": "A",
-          "equinox1912": "A",
-          "greer": "A"
-        },
-        "note": "Printed reversed in the Equinox (in Enochian).",
+        "note": "One of the eight smallest letters Dee picked out, which spell Paraoan. The Equinox writes it in Enochian; a reversed A looks the same as a plain one.",
         "sources": [
           {
-            "work": "regardie1940",
-            "page": 270,
-            "leaf": 262
+            "work": "casaubon1659",
+            "page": 179,
+            "leaf": 268
+          },
+          {
+            "work": "casaubon1659",
+            "page": 183,
+            "leaf": 272
           },
           {
             "work": "equinox1912",
             "plate": "III",
             "leaf": 241
-          },
-          {
-            "work": "greer"
-          }
-        ]
-      },
-      {
-        "row": 9,
-        "column": 9,
-        "goldenDawn": "u",
-        "printed": {
-          "regardie1940": "u over v",
-          "equinox1912": "u",
-          "greer": "u"
-        },
-        "note": "The sources print u (Regardie u over v); this tablet has v.",
-        "sources": [
-          {
-            "work": "regardie1940",
-            "page": 270,
-            "leaf": 262
-          },
-          {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
-          },
-          {
-            "work": "greer"
-          }
-        ]
-      },
-      {
-        "row": 10,
-        "column": 8,
-        "goldenDawn": "p",
-        "printed": {
-          "regardie1940": "p",
-          "equinox1912": "p",
-          "greer": "p"
-        },
-        "note": "The sources print p; this tablet has a capital.",
-        "sources": [
-          {
-            "work": "regardie1940",
-            "page": 270,
-            "leaf": 262
-          },
-          {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
-          },
-          {
-            "work": "greer"
           }
         ]
       },
       {
         "row": 10,
         "column": 10,
-        "goldenDawn": "u",
-        "printed": {
-          "regardie1940": "u over a",
-          "equinox1912": "a",
-          "greer": "a"
-        },
-        "note": "Regardie prints u over a, the Equinox and Greer a; this tablet's n is in none of them.",
+        "note": "Regardie prints u over a. The 1584 table has a, which the Equinox and Greer print, and the 1587 table n, so his u may be the 1587 n misread.",
         "sources": [
           {
             "work": "regardie1940",
@@ -802,32 +953,22 @@
           },
           {
             "work": "greer"
-          }
-        ]
-      },
-      {
-        "row": 12,
-        "column": 7,
-        "goldenDawn": "p",
-        "printed": {
-          "regardie1940": "p",
-          "equinox1912": "p",
-          "greer": "p"
-        },
-        "note": "The sources print p; this tablet has a capital.",
-        "sources": [
-          {
-            "work": "regardie1940",
-            "page": 270,
-            "leaf": 262
           },
           {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
+            "work": "casaubon1659",
+            "page": 175,
+            "leaf": 264
           },
           {
-            "work": "greer"
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       }
@@ -836,11 +977,6 @@
       {
         "row": 0,
         "column": 5,
-        "printed": {
-          "regardie1940": "u over v",
-          "equinox1912": "v",
-          "greer": "u"
-        },
         "note": "u and v are one letter; Regardie prints both, the Equinox v.",
         "sources": [
           {
@@ -861,12 +997,7 @@
       {
         "row": 1,
         "column": 0,
-        "printed": {
-          "regardie1940": "a over o",
-          "equinox1912": "a",
-          "greer": "o"
-        },
-        "note": "Regardie's higher letter, a, as the Equinox prints it; Greer prints o.",
+        "note": "Regardie's higher letter, a, as the Equinox and both of Dee's tables have it; Greer prints o.",
         "sources": [
           {
             "work": "regardie1940",
@@ -886,12 +1017,7 @@
       {
         "row": 1,
         "column": 2,
-        "printed": {
-          "regardie1940": "b over l",
-          "equinox1912": "l",
-          "greer": "l"
-        },
-        "note": "The Order's names through this square read l (Olgota, Aalco) and both other sources print l, so the grid takes it over Regardie's higher b; Oblgotca uses both.",
+        "note": "The Order's names through this square read l (Olgota, Aalco) and both other Golden Dawn sources print l, so the Golden Dawn's version takes it over Regardie's higher b, which both of Dee's tables have; Oblgotca uses both.",
         "sources": [
           {
             "work": "regardie1940",
@@ -905,18 +1031,18 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "equinox1912",
+            "page": 235,
+            "leaf": 241
           }
         ]
       },
       {
         "row": 2,
         "column": 1,
-        "printed": {
-          "regardie1940": "o over a",
-          "equinox1912": "o",
-          "greer": "a"
-        },
-        "note": "Regardie's higher letter, o, as the Equinox prints it; Greer prints a.",
+        "note": "Regardie's higher letter, o, as the Equinox and both of Dee's tables have it; Greer prints a.",
         "sources": [
           {
             "work": "regardie1940",
@@ -936,12 +1062,7 @@
       {
         "row": 2,
         "column": 6,
-        "printed": {
-          "regardie1940": "x over z",
-          "equinox1912": "z",
-          "greer": "x"
-        },
-        "note": "Regardie's higher letter, x, as Greer prints it and the Senior Laoaxrp reads it; the Equinox prints z.",
+        "note": "Regardie's higher letter, x, as Greer and both of Dee's tables have it and the Senior Laoaxrp reads it; the Equinox prints z.",
         "sources": [
           {
             "work": "regardie1940",
@@ -961,12 +1082,7 @@
       {
         "row": 2,
         "column": 7,
-        "printed": {
-          "regardie1940": "m over i",
-          "equinox1912": "i",
-          "greer": "m"
-        },
-        "note": "Regardie's higher letter, m, as Greer prints it; the Equinox prints i, which its name Ingm reads.",
+        "note": "Regardie's higher letter, m, as Greer and both of Dee's tables have it; the Equinox prints i, which its name Ingm reads.",
         "sources": [
           {
             "work": "regardie1940",
@@ -980,18 +1096,18 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "equinox1912",
+            "page": 235,
+            "leaf": 241
           }
         ]
       },
       {
         "row": 2,
         "column": 8,
-        "printed": {
-          "regardie1940": "a over n and u",
-          "equinox1912": "n",
-          "greer": "a"
-        },
-        "note": "Regardie's higher letter, a, as Greer prints it; the Equinox prints n, which its name Ingm reads.",
+        "note": "Regardie's higher letter, a, as Greer and both of Dee's tables have it; the Equinox prints n, which its name Ingm reads.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1005,18 +1121,18 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "equinox1912",
+            "page": 235,
+            "leaf": 241
           }
         ]
       },
       {
         "row": 3,
         "column": 7,
-        "printed": {
-          "regardie1940": "i",
-          "equinox1912": "l",
-          "greer": "l"
-        },
-        "note": "Regardie prints only i here; both other sources print l, and the name Laoc reads l, so the grid takes l and keeps his i as a variant.",
+        "note": "Regardie prints only i here; both other Golden Dawn sources and both of Dee's tables have l, and the name Laoc reads l, so the Golden Dawn's version takes l and keeps his i as a second letter.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1030,18 +1146,18 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "equinox1912",
+            "page": 235,
+            "leaf": 241
           }
         ]
       },
       {
         "row": 3,
         "column": 8,
-        "printed": {
-          "regardie1940": "l over a",
-          "equinox1912": "a",
-          "greer": "e"
-        },
-        "note": "Regardie's higher letter, l. The Equinox prints a, which its name Laoc reads; Greer prints e.",
+        "note": "Regardie's higher letter, l. The Equinox prints a, which its name Laoc reads; Greer and both of Dee's tables have e.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1055,18 +1171,18 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "equinox1912",
+            "page": 235,
+            "leaf": 241
           }
         ]
       },
       {
         "row": 4,
         "column": 0,
-        "printed": {
-          "regardie1940": "f over p",
-          "equinox1912": "p",
-          "greer": "p"
-        },
-        "note": "Regardie's higher letter, f; both other sources print p, but no name settles it.",
+        "note": "Regardie's higher letter, f; both other Golden Dawn sources and both of Dee's tables have p, but no name settles it.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1086,13 +1202,23 @@
       {
         "row": 4,
         "column": 2,
-        "printed": {
-          "regardie1940": "t over c",
-          "equinox1912": "t",
-          "greer": "t"
-        },
-        "note": "All three read t; Regardie adds c below it.",
+        "note": "Every later source reads t. Dee's record of the 1584 session has c, as Casaubon prints it, and Regardie prints c below his t; Dee's version takes t, as Dee corrected the table, and keeps c as the letter first written.",
         "sources": [
+          {
+            "work": "casaubon1659",
+            "page": 177,
+            "leaf": 266
+          },
+          {
+            "work": "casaubon1659",
+            "page": 185,
+            "leaf": 274
+          },
+          {
+            "work": "casaubon1659",
+            "page": 188,
+            "leaf": 277
+          },
           {
             "work": "regardie1940",
             "page": 271,
@@ -1111,12 +1237,7 @@
       {
         "row": 4,
         "column": 6,
-        "printed": {
-          "regardie1940": "v over o",
-          "equinox1912": "o",
-          "greer": "o"
-        },
-        "note": "The Senior Laoaxrp reads o and both other sources print o, so the grid takes it over Regardie's higher v.",
+        "note": "The Senior Laoaxrp reads o and both other Golden Dawn sources print o, as both of Dee's tables have it, so the Golden Dawn's version takes it over Regardie's higher v.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1136,12 +1257,7 @@
       {
         "row": 4,
         "column": 10,
-        "printed": {
-          "regardie1940": "x over s",
-          "equinox1912": "s",
-          "greer": "s"
-        },
-        "note": "The name Vssn reads s and both other sources print s, so the grid takes it over Regardie's higher x.",
+        "note": "The name Vssn reads s and both other Golden Dawn sources print s, as both of Dee's tables have it, so the Golden Dawn's version takes it over Regardie's higher x.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1155,18 +1271,18 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "equinox1912",
+            "page": 235,
+            "leaf": 241
           }
         ]
       },
       {
         "row": 4,
         "column": 11,
-        "printed": {
-          "regardie1940": "y and l over N and h",
-          "equinox1912": "N",
-          "greer": "N"
-        },
-        "note": "Regardie prints four letters here, y and l side by side over N and h, so there is no single higher letter. Both other sources print N, reversed, and the grid takes it.",
+        "note": "Regardie prints four letters here, y and l side by side over N and h, so there is no single higher letter. Both other Golden Dawn sources print N, reversed, and the Golden Dawn's version takes it. Dee's record of the 1584 session has y and l together, as Casaubon prints it, and every later copy a reversed N; Dee's version takes N and keeps y and l as the letters first written. N is the last letter of Paraoan.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1180,18 +1296,33 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 177,
+            "leaf": 266
+          },
+          {
+            "work": "casaubon1659",
+            "page": 179,
+            "leaf": 268
+          },
+          {
+            "work": "casaubon1659",
+            "page": 183,
+            "leaf": 272
+          },
+          {
+            "work": "casaubon1659",
+            "page": 188,
+            "leaf": 277
           }
         ]
       },
       {
         "row": 5,
         "column": 4,
-        "printed": {
-          "regardie1940": "z over x",
-          "equinox1912": "z",
-          "greer": "z"
-        },
-        "note": "All three read z; Regardie adds x below it.",
+        "note": "Every Golden Dawn source reads z, with Regardie's x below it; both of Dee's tables have x.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1205,18 +1336,24 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 177,
+            "leaf": 266
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 5,
         "column": 10,
-        "printed": {
-          "regardie1940": "c over L",
-          "equinox1912": "o",
-          "greer": "o"
-        },
-        "note": "Regardie prints c over L; both other sources print o, which the name Rvoi reads, so the grid takes o, a letter Regardie does not print here.",
+        "note": "Regardie prints c over L: he sets L large and first, with c small and raised beside it, so c is read as the higher letter. Both other Golden Dawn sources and both of Dee's tables have o, which the name Rvoi reads, so the Golden Dawn's version takes o, a letter Regardie does not print here.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1230,18 +1367,18 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "equinox1912",
+            "page": 235,
+            "leaf": 241
           }
         ]
       },
       {
         "row": 8,
         "column": 5,
-        "printed": {
-          "regardie1940": "n over a",
-          "equinox1912": "a",
-          "greer": "a"
-        },
-        "note": "Regardie's higher letter, n, which the Senior Soniznt reads; both other sources print a.",
+        "note": "Regardie's higher letter, n, which the Senior Soniznt reads and the 1587 table has; the Equinox, Greer and the 1584 table have a.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1255,18 +1392,24 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 177,
+            "leaf": 266
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 10,
         "column": 5,
-        "printed": {
-          "regardie1940": "z over x",
-          "equinox1912": "z",
-          "greer": "z"
-        },
-        "note": "All three read z; Regardie adds x below it.",
+        "note": "Every Golden Dawn source reads z, with Regardie's x below it. z is the 1587 table's letter and x the 1584 one's.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1280,18 +1423,24 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 177,
+            "leaf": 266
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 11,
         "column": 0,
-        "printed": {
-          "regardie1940": "r over i",
-          "equinox1912": "i",
-          "greer": "i"
-        },
-        "note": "Regardie's higher letter, r; both other sources print i, but no name settles it.",
+        "note": "Regardie's higher letter, r; both other Golden Dawn sources and both of Dee's tables have i, but no name settles it.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1311,12 +1460,7 @@
       {
         "row": 12,
         "column": 2,
-        "printed": {
-          "regardie1940": "i over r",
-          "equinox1912": "i",
-          "greer": "i"
-        },
-        "note": "All three read i; Regardie adds r below it.",
+        "note": "Every Golden Dawn source reads i, with Regardie's r below it.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1335,13 +1479,43 @@
       },
       {
         "row": 12,
+        "column": 3,
+        "note": "Dee's record of the 1584 session has i here, as Casaubon prints it; every later copy and every Golden Dawn source has n. Dee's version takes n, as Dee corrected the table, and keeps i as the letter first written.",
+        "sources": [
+          {
+            "work": "casaubon1659",
+            "page": 177,
+            "leaf": 266
+          },
+          {
+            "work": "casaubon1659",
+            "page": 185,
+            "leaf": 274
+          },
+          {
+            "work": "casaubon1659",
+            "page": 188,
+            "leaf": 277
+          },
+          {
+            "work": "regardie1940",
+            "page": 271,
+            "leaf": 263
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 12,
         "column": 8,
-        "printed": {
-          "regardie1940": "n over a",
-          "equinox1912": "n",
-          "greer": "n"
-        },
-        "note": "All three read n; Regardie adds a below it.",
+        "note": "Every Golden Dawn source reads n, with Regardie's a below it.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1361,17 +1535,17 @@
       {
         "row": 12,
         "column": 11,
-        "printed": {
-          "regardie1940": "L",
-          "equinox1912": "L",
-          "greer": "L"
-        },
-        "note": "Printed reversed in the Equinox (in Enochian) and in Greer.",
+        "note": "The eighth of the smallest letters Dee picked out: of this averted L Dee was told it could be read N or L. Casaubon's print sets it reversed, the Equinox writes it in Enochian and Greer mirrors it.",
         "sources": [
           {
-            "work": "regardie1940",
-            "page": 271,
-            "leaf": 263
+            "work": "casaubon1659",
+            "page": 177,
+            "leaf": 266
+          },
+          {
+            "work": "casaubon1659",
+            "page": 183,
+            "leaf": 272
           },
           {
             "work": "equinox1912",
@@ -1386,67 +1560,9 @@
     ],
     "earth": [
       {
-        "row": 0,
-        "column": 7,
-        "goldenDawn": "p",
-        "printed": {
-          "regardie1940": "p",
-          "equinox1912": "p",
-          "greer": "p"
-        },
-        "note": "The sources print p; this tablet has a capital.",
-        "sources": [
-          {
-            "work": "regardie1940",
-            "page": 272,
-            "leaf": 264
-          },
-          {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
-          },
-          {
-            "work": "greer"
-          }
-        ]
-      },
-      {
-        "row": 1,
-        "column": 0,
-        "goldenDawn": "u",
-        "printed": {
-          "regardie1940": "u over v",
-          "equinox1912": "u",
-          "greer": "u"
-        },
-        "note": "The sources print u (Regardie u over v); this tablet has v.",
-        "sources": [
-          {
-            "work": "regardie1940",
-            "page": 272,
-            "leaf": 264
-          },
-          {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
-          },
-          {
-            "work": "greer"
-          }
-        ]
-      },
-      {
         "row": 2,
         "column": 7,
-        "goldenDawn": "a",
-        "printed": {
-          "regardie1940": "a over o",
-          "equinox1912": "o",
-          "greer": "o"
-        },
-        "note": "Regardie prints a over o; the Equinox and Greer print o, as this tablet does.",
+        "note": "Regardie prints a over o; the Equinox, Greer and both of Dee's tables have o. The Golden Dawn's version takes a, Regardie's higher letter.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1460,71 +1576,24 @@
           },
           {
             "work": "greer"
-          }
-        ]
-      },
-      {
-        "row": 3,
-        "column": 2,
-        "goldenDawn": "p",
-        "printed": {
-          "regardie1940": "p",
-          "equinox1912": "p",
-          "greer": "p"
-        },
-        "note": "The sources print p; this tablet has a capital.",
-        "sources": [
-          {
-            "work": "regardie1940",
-            "page": 272,
-            "leaf": 264
           },
           {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
           },
           {
-            "work": "greer"
-          }
-        ]
-      },
-      {
-        "row": 4,
-        "column": 11,
-        "goldenDawn": "u",
-        "printed": {
-          "regardie1940": "u",
-          "equinox1912": "u",
-          "greer": "u"
-        },
-        "note": "The sources print u; this tablet has v.",
-        "sources": [
-          {
-            "work": "regardie1940",
-            "page": 272,
-            "leaf": 264
-          },
-          {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
-          },
-          {
-            "work": "greer"
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 7,
         "column": 0,
-        "goldenDawn": "R",
-        "printed": {
-          "regardie1940": "R over o",
-          "equinox1912": "R",
-          "greer": "R"
-        },
-        "note": "Row 8 is where the versions differ most: Regardie prints two readings in every square, the upper one beginning R C a n c h, the lower one shifted a square to the right. The Equinox and Greer begin the row with R, reversed (in Enochian in the Equinox); this tablet begins it with O.",
+        "note": "Row 8 is where the versions differ most. The reform of 1587 moved Dee's 1584 row one square to the left, dropping this square's reversed R and adding t at the end. Regardie prints the two rows together, the 1587 one above, except in this square, where the 1584 R stands over the 1587 o; the Golden Dawn's version reads his higher letters. The Equinox and Greer begin the row with the reversed R, and Casaubon prints it as a ligature. That Regardie's two rows are Dee's two tables is an inference from the letters.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1538,19 +1607,24 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 7,
         "column": 7,
-        "goldenDawn": "i",
-        "printed": {
-          "regardie1940": "i and a over b and t",
-          "equinox1912": "i",
-          "greer": "i"
-        },
-        "note": "Regardie prints i and a side by side over b and t; the Equinox and Greer print i; this tablet has a.",
+        "note": "Regardie prints i and a side by side over b and t; the Golden Dawn's version takes i, which the Equinox, Greer and the 1584 table have; the 1587 table has a.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1564,96 +1638,46 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 8,
         "column": 0,
-        "printed": {
-          "regardie1940": "A",
-          "equinox1912": "A",
-          "greer": "A"
-        },
-        "note": "Printed reversed in the Equinox (in Enochian).",
+        "note": "One of the eight smallest letters Dee picked out, which spell Paraoan. The Equinox writes it in Enochian; a reversed A looks the same as a plain one.",
         "sources": [
           {
-            "work": "regardie1940",
-            "page": 272,
-            "leaf": 264
+            "work": "casaubon1659",
+            "page": 179,
+            "leaf": 268
+          },
+          {
+            "work": "casaubon1659",
+            "page": 183,
+            "leaf": 272
           },
           {
             "work": "equinox1912",
             "plate": "III",
             "leaf": 241
-          },
-          {
-            "work": "greer"
-          }
-        ]
-      },
-      {
-        "row": 8,
-        "column": 9,
-        "goldenDawn": "p",
-        "printed": {
-          "regardie1940": "p",
-          "equinox1912": "p",
-          "greer": "p"
-        },
-        "note": "The sources print p; this tablet has a capital.",
-        "sources": [
-          {
-            "work": "regardie1940",
-            "page": 272,
-            "leaf": 264
-          },
-          {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
-          },
-          {
-            "work": "greer"
-          }
-        ]
-      },
-      {
-        "row": 9,
-        "column": 1,
-        "goldenDawn": "p",
-        "printed": {
-          "regardie1940": "p",
-          "equinox1912": "p",
-          "greer": "p"
-        },
-        "note": "The sources print p; this tablet has a capital.",
-        "sources": [
-          {
-            "work": "regardie1940",
-            "page": 272,
-            "leaf": 264
-          },
-          {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
-          },
-          {
-            "work": "greer"
           }
         ]
       },
       {
         "row": 9,
         "column": 5,
-        "goldenDawn": "l",
-        "printed": {
-          "regardie1940": "l over B",
-          "equinox1912": "B",
-          "greer": "B"
-        },
-        "note": "Regardie prints l over B; the Equinox and Greer print B; this tablet has L.",
+        "note": "Regardie prints l over B; the Equinox and Greer print B, and both of Dee's tables have l, which the Golden Dawn's version takes.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1667,19 +1691,24 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 9,
         "column": 11,
-        "goldenDawn": "T",
-        "printed": {
-          "regardie1940": "T over L",
-          "equinox1912": "L",
-          "greer": "l"
-        },
-        "note": "Regardie prints T over L, the Equinox L, Greer l; this tablet's P is in none of them.",
+        "note": "Regardie prints T over L; the Equinox L, Greer l. The 1584 table has L and the 1587 table P, so his T may be the 1587 P misread. The Golden Dawn's version takes his higher T.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1693,18 +1722,24 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 10,
         "column": 5,
-        "printed": {
-          "regardie1940": "l",
-          "equinox1912": "i",
-          "greer": "i"
-        },
-        "note": "Regardie prints only l, which the Senior Ahmlicv contradicts; the Equinox and Greer print i, as this tablet does.",
+        "note": "Regardie prints only l, which the Senior Ahmlicv contradicts; the Equinox, Greer and both of Dee's tables have i, which the Golden Dawn's version takes.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1718,73 +1753,93 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 11,
-        "column": 2,
-        "goldenDawn": "p",
-        "printed": {
-          "regardie1940": "p",
-          "equinox1912": "p",
-          "greer": "p"
-        },
-        "note": "The sources print p; this tablet has a capital.",
+        "column": 5,
+        "note": "Casaubon's print of Dee's 1584 record rules a line under this c, which every source reads as c. What the mark means is unknown; it may be a letter Dee queried.",
         "sources": [
           {
-            "work": "regardie1940",
-            "page": 272,
-            "leaf": 264
-          },
-          {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
-          },
-          {
-            "work": "greer"
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
           }
         ]
       },
       {
-        "row": 11,
-        "column": 11,
-        "goldenDawn": "p",
-        "printed": {
-          "regardie1940": "p",
-          "equinox1912": "p",
-          "greer": "p"
-        },
-        "note": "The sources print p; this tablet has a capital.",
+        "row": 12,
+        "column": 5,
+        "note": "Casaubon's print of Dee's 1584 record sets a bar over this V, which every source reads as v. What the mark means is unknown; it may be a letter Dee queried.",
         "sources": [
           {
-            "work": "regardie1940",
-            "page": 272,
-            "leaf": 264
-          },
-          {
-            "work": "equinox1912",
-            "plate": "III",
-            "leaf": 241
-          },
-          {
-            "work": "greer"
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
           }
         ]
       }
     ],
     "fire": [
       {
+        "row": 0,
+        "column": 11,
+        "note": "Empty in Dee's 1584 record, printed as dots, and in a modern rendering of the Cotton manuscript. The 1587 table has a, as every Golden Dawn source does. Dee's version leaves it empty, with a as a second letter.",
+        "sources": [
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
+          },
+          {
+            "work": "regardie1940",
+            "page": 273,
+            "leaf": 265
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
         "row": 1,
         "column": 10,
-        "printed": {
-          "regardie1940": "u over v",
-          "equinox1912": "v",
-          "greer": "u"
-        },
-        "note": "u and v are one letter; Regardie prints both, the Equinox v.",
+        "note": "Empty in Dee's 1584 record, printed as dots, and in a modern rendering of the Cotton manuscript. The 1587 table has v; Regardie prints u over v, the Equinox v and Greer u. Dee's version leaves it empty, with v as a second letter.",
         "sources": [
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
+          },
           {
             "work": "regardie1940",
             "page": 273,
@@ -1803,13 +1858,19 @@
       {
         "row": 1,
         "column": 11,
-        "printed": {
-          "regardie1940": "a over i",
-          "equinox1912": "a",
-          "greer": "a"
-        },
-        "note": "All three read a; Regardie adds i below it.",
+        "note": "Casaubon's print of the 1584 record has i here, though a modern rendering of the Cotton manuscript shows the square empty; the 1587 table has a. Regardie prints a over i, the Equinox and Greer a.",
         "sources": [
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
+          },
           {
             "work": "regardie1940",
             "page": 273,
@@ -1828,12 +1889,7 @@
       {
         "row": 2,
         "column": 6,
-        "printed": {
-          "regardie1940": "v over o",
-          "equinox1912": "O",
-          "greer": "O"
-        },
-        "note": "Regardie's higher letter, v, which the Senior Alndvod reads; both other sources print O.",
+        "note": "Regardie's higher letter, v, which the Senior Alndvod reads and the 1587 table has; the Equinox, Greer and the 1584 table have O.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1847,18 +1903,24 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
           }
         ]
       },
       {
         "row": 2,
         "column": 8,
-        "printed": {
-          "regardie1940": "m over n",
-          "equinox1912": "m",
-          "greer": "m"
-        },
-        "note": "All three read m; Regardie adds n below it.",
+        "note": "Every Golden Dawn source reads m, with Regardie's n below it.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1878,12 +1940,7 @@
       {
         "row": 3,
         "column": 1,
-        "printed": {
-          "regardie1940": "p over b",
-          "equinox1912": "b",
-          "greer": "p"
-        },
-        "note": "Regardie's higher letter, p, as Greer prints it; the Equinox prints b.",
+        "note": "Regardie's higher letter, p, as Greer and both of Dee's tables have it; the Equinox prints b.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1903,12 +1960,7 @@
       {
         "row": 3,
         "column": 6,
-        "printed": {
-          "regardie1940": "c over d",
-          "equinox1912": "d",
-          "greer": "d"
-        },
-        "note": "The Senior Alndvod reads d and both other sources print d, so the grid takes it over Regardie's higher c.",
+        "note": "The Senior Alndvod reads d and both other Golden Dawn sources print d, as both of Dee's tables have it, so the Golden Dawn's version takes it over Regardie's higher c.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1928,12 +1980,7 @@
       {
         "row": 4,
         "column": 4,
-        "printed": {
-          "regardie1940": "o",
-          "equinox1912": "a",
-          "greer": "o"
-        },
-        "note": "Regardie and Greer print o; the Equinox prints a.",
+        "note": "Regardie, Greer and both of Dee's tables have o; the Equinox prints a.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1953,12 +2000,7 @@
       {
         "row": 4,
         "column": 5,
-        "printed": {
-          "regardie1940": "a",
-          "equinox1912": "o",
-          "greer": "o"
-        },
-        "note": "Regardie prints only a here; both other sources print o, and the Senior Adoeoet reads o, so the grid takes o and keeps his a as a variant.",
+        "note": "Regardie prints only a here; both other Golden Dawn sources and both of Dee's tables have o, and the Senior Adoeoet reads o, so the Golden Dawn's version takes o and keeps his a as a second letter.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1978,13 +2020,53 @@
       {
         "row": 5,
         "column": 7,
-        "printed": {
-          "regardie1940": "b over v",
-          "equinox1912": "b",
-          "greer": "b"
-        },
-        "note": "All three read b; Regardie adds v below it.",
+        "note": "Every Golden Dawn source reads b, with Regardie's v below it, and so do Dee's 1584 table and the 1587 table's other copies. The 1659 print of the 1587 table has v, which Raphael's version takes for a misprint and corrects to b; since Regardie keeps v as a second letter, it may instead be the Cotton copy's reading.",
         "sources": [
+          {
+            "work": "regardie1940",
+            "page": 273,
+            "leaf": 265
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
+          }
+        ]
+      },
+      {
+        "row": 7,
+        "column": 0,
+        "note": "The 1587 table as Casaubon prints it, from the Cotton manuscript, has x here; Dee's copy in Sloane MS 3191, as modern redrawings show it, keeps the 1584 p, which every Golden Dawn source has. Raphael's version follows the print, with p as a second letter, until the manuscript can be read.",
+        "sources": [
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
+          },
+          {
+            "work": "sloane3191"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
           {
             "work": "regardie1940",
             "page": 273,
@@ -2003,12 +2085,7 @@
       {
         "row": 7,
         "column": 2,
-        "printed": {
-          "regardie1940": "u over v",
-          "equinox1912": "u",
-          "greer": "u"
-        },
-        "note": "All three read u; Regardie adds v below it.",
+        "note": "Every Golden Dawn source reads u, with Regardie's v below it.",
         "sources": [
           {
             "work": "regardie1940",
@@ -2028,13 +2105,42 @@
       {
         "row": 9,
         "column": 2,
-        "printed": {
-          "regardie1940": "l over b",
-          "equinox1912": "l",
-          "greer": "l"
-        },
-        "note": "All three read l; Regardie adds b below it.",
+        "note": "Every Golden Dawn source reads l, with Regardie's b below it.",
         "sources": [
+          {
+            "work": "regardie1940",
+            "page": 273,
+            "leaf": 265
+          },
+          {
+            "work": "equinox1912",
+            "plate": "III",
+            "leaf": 241
+          },
+          {
+            "work": "greer"
+          }
+        ]
+      },
+      {
+        "row": 11,
+        "column": 3,
+        "note": "The 1587 table as Casaubon prints it, from the Cotton manuscript, has x here; Dee's copy in Sloane MS 3191, as modern redrawings show it, keeps the 1584 p, which every Golden Dawn source has. Raphael's version follows the print, with p as a second letter, until the manuscript can be read.",
+        "sources": [
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
+          },
+          {
+            "work": "sloane3191"
+          },
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
           {
             "work": "regardie1940",
             "page": 273,
@@ -2053,13 +2159,24 @@
       {
         "row": 12,
         "column": 6,
-        "printed": {
-          "regardie1940": "O over p",
-          "equinox1912": "P",
-          "greer": "P"
-        },
-        "note": "The Senior Arinnap reads p, and the Equinox and Greer print P, reversed; Regardie prints O over p. The grid takes P.",
+        "note": "The first letter of Paraoan. Dee's record notes it in the margin as a P backward, and the 1587 print sets it as a q. The Senior Arinnap reads p, and the Equinox and Greer print P, reversed; Regardie prints O over p. The Golden Dawn's version takes P.",
         "sources": [
+          {
+            "work": "casaubon1659",
+            "page": 176,
+            "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "part": "Actio Tertia",
+            "page": 15,
+            "leaf": 456
+          },
+          {
+            "work": "casaubon1659",
+            "page": 179,
+            "leaf": 268
+          },
           {
             "work": "regardie1940",
             "page": 273,
@@ -2078,28 +2195,25 @@
       {
         "row": 12,
         "column": 7,
-        "printed": {
-          "regardie1940": "A",
-          "equinox1912": "A",
-          "greer": "A"
-        },
-        "note": "Printed reversed in the Equinox (in Enochian); A looks the same either way.",
+        "note": "The second letter of Paraoan, which Dee's record notes in the margin as reversed. The Equinox writes it in Enochian; a reversed A looks the same as a plain one.",
         "sources": [
           {
-            "work": "regardie1940",
-            "page": 273,
+            "work": "casaubon1659",
+            "page": 176,
             "leaf": 265
+          },
+          {
+            "work": "casaubon1659",
+            "page": 179,
+            "leaf": 268
           },
           {
             "work": "equinox1912",
             "plate": "III",
             "leaf": 241
-          },
-          {
-            "work": "greer"
           }
         ]
       }
     ]
-  },
+  }
 }

@@ -38,7 +38,7 @@ const HOUSE_NUMBERS = [
   "12",
 ] as const;
 
-/** One square's letter on an Enochian tablet. */
+/** One letter on an Enochian tablet. */
 const tabletLetter = v.pipe(v.string(), v.regex(/^[A-Za-z]$/));
 
 /** A row or column of an Enochian tablet, from 0. */
@@ -49,6 +49,48 @@ const TABLET_SHAPES = {
   watchtower: { rows: 13, columns: 12 },
   union: { rows: 4, columns: 5 },
 } as const;
+
+/**
+ * The sources whose readings the tablets hold, as `readings` keys them
+ * (the data file names each work). `Tablets.ts` lists them too, and its
+ * test holds the two equal.
+ */
+const TABLET_SOURCES = [
+  "regardie1940",
+  "equinox1912",
+  "greer",
+  "dee1584",
+  "raphael1587",
+] as const;
+
+/** One source's reading of a tablet: see the data file's comment. */
+const tabletReading = v.strictObject({
+  /** A row a string, a square a letter, or "." for an empty square. */
+  rows: v.array(v.pipe(v.string(), v.regex(/^[A-Za-z.]+$/))),
+  /** The squares that hold more than their letter, each at most once. */
+  marks: v.optional(
+    v.array(
+      v.strictObject({
+        row: tabletIndex,
+        column: tabletIndex,
+        beside: v.optional(v.array(tabletLetter)),
+        below: v.optional(v.array(tabletLetter)),
+        reversed: v.optional(v.boolean()),
+        dictated: v.optional(v.array(tabletLetter)),
+        misprint: v.optional(tabletLetter),
+        alt: v.optional(v.array(tabletLetter)),
+        // Not a picklist, which a declaration would state per row and most
+        // readings never use: Tablets.ts types it.
+        doubt: v.optional(
+          v.pipe(
+            v.string(),
+            v.check((doubt) => ["low", "medium", "high"].includes(doubt)),
+          ),
+        ),
+      }),
+    ),
+  ),
+});
 
 const byHouse = (value: v.GenericSchema): Entries =>
   Object.fromEntries(HOUSE_NUMBERS.map((no) => [no, value]));
@@ -172,47 +214,86 @@ export const schemas = {
        */
       kind: v.picklist(["watchtower", "union"]),
       /**
-       * The letters, row by row from the top: each square's letter, the
-       * Latin transliteration of its Enochian, a capital where the source
-       * prints one.
+       * Each source's letters, by source. A version of the tablet is a
+       * rule over these (`tabletVersion` in `Tablets.ts`).
        */
-      grid: v.array(v.array(tabletLetter)),
+      readings: v.strictObject(
+        Object.fromEntries(
+          TABLET_SOURCES.map((source) => [source, v.optional(tabletReading)]),
+        ) as Record<
+          (typeof TABLET_SOURCES)[number],
+          v.OptionalSchema<typeof tabletReading, undefined>
+        >,
+      ),
       /**
-       * The squares that hold more than their letter, by row and column
-       * from 0. `alt`: the other letters the sources print in that square,
-       * as the data file says in which order. `reversed`: the grid's letter
-       * is printed reversed; it says nothing of the `alt` letters. A square
-       * appears at most once.
+       * Where a version departs from its base reading, square by square:
+       * `gd`, the Golden Dawn's, takes another source's letter where
+       * Regardie's higher letter is not the Order's.
        */
-      marks: v.optional(
-        v.array(
-          v.strictObject({
-            row: tabletIndex,
-            column: tabletIndex,
-            alt: v.optional(v.array(tabletLetter)),
-            reversed: v.optional(v.boolean()),
-          }),
-        ),
+      choices: v.optional(
+        v.strictObject({
+          gd: v.array(
+            v.strictObject({
+              row: tabletIndex,
+              column: tabletIndex,
+              from: v.picklist(TABLET_SOURCES),
+            }),
+          ),
+        }),
       ),
       ...ids("enochianTablet"),
     }),
     v.check(
-      ({ kind, grid }) =>
-        grid.length === TABLET_SHAPES[kind].rows &&
-        grid.every((row) => row.length === TABLET_SHAPES[kind].columns),
-      "a Watchtower's grid is 13 rows of 12 letters, the Tablet of Union's 4 rows of 5",
+      ({ readings }) => Object.values(readings).some(Boolean),
+      "a tablet has at least one reading",
     ),
     v.check(
-      ({ kind, marks = [] }) =>
-        marks.every(
-          ({ row, column, alt, reversed }) =>
-            row < TABLET_SHAPES[kind].rows &&
-            column < TABLET_SHAPES[kind].columns &&
-            (alt?.length || reversed),
-        ) &&
-        new Set(marks.map(({ row, column }) => `${row},${column}`)).size ===
-          marks.length,
-      "a mark names a square of the grid once, and gives it letters or reverses it",
+      ({ kind, readings }) =>
+        Object.values(readings).every(
+          (reading) =>
+            reading === undefined ||
+            (reading.rows.length === TABLET_SHAPES[kind].rows &&
+              reading.rows.every(
+                (row) => row.length === TABLET_SHAPES[kind].columns,
+              )),
+        ),
+      "a Watchtower's reading is 13 rows of 12 squares, the Tablet of Union's 4 rows of 5",
+    ),
+    v.check(
+      ({ kind, readings }) =>
+        Object.values(readings).every(({ marks = [] } = { rows: [] }) => {
+          const inside = marks.every(
+            ({ row, column }) =>
+              row < TABLET_SHAPES[kind].rows &&
+              column < TABLET_SHAPES[kind].columns,
+          );
+          const keys = new Set(
+            marks.map(({ row, column }) => `${row},${column}`),
+          );
+          // `reversed: false` and an empty list say nothing.
+          const more = marks.every(({ row, column, ...rest }) =>
+            Object.values(rest).some((value) =>
+              Array.isArray(value) ? value.length > 0 : value !== false,
+            ),
+          );
+          return inside && more && keys.size === marks.length;
+        }),
+      "a mark names a square of the grid once, and says something of it",
+    ),
+    v.check(
+      ({ readings, choices }) =>
+        (choices?.gd ?? []).every(({ row, column, from }) => {
+          const letter = readings[from]?.rows[row]?.[column];
+          // The Golden Dawn's version starts from Regardie's reading; a
+          // choice of his own letter, or of an empty square, changes
+          // nothing it should.
+          return (
+            letter !== undefined &&
+            letter !== "." &&
+            letter !== readings.regardie1940?.rows[row]?.[column]
+          );
+        }),
+      "a choice names a letter of a reading the tablet has, other than Regardie's",
     ),
   ),
 

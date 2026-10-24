@@ -1,18 +1,19 @@
 import notes from "../../dist/enochian/tabletNotes.js";
-import type { EnochianTabletID } from "./Tablets.ts";
+import type { EnochianTabletID, TabletVersionId } from "./Tablets.ts";
 
 /**
- * Notes on the Enochian tablets (plan 061, stage G): where the versions come
- * from, how they differ, each tablet's sources, and what the sources print
- * in particular squares. The prose is ours; the works are cited by stable
- * reference. Squares are counted from 0, as the tablets' grids and `marks`
- * count them, so a square's note sits beside its mark; a source `version`
- * (Dee 1584, Raphael 1587, the Golden Dawn) can hang off the same keys.
+ * Notes on the Enochian tablets (plan 061, "Tablet versions"): the
+ * versions, how each differs from the others, each tablet, and particular
+ * squares. The prose is ours; the works are cited by stable reference.
+ * What a source prints in a square, and where two versions differ, are
+ * read from the readings in `magick-data/enochian/tablets`, never written
+ * here. Squares are counted from 0, as the readings count them.
  */
 
 /** The works the notes cite. */
 export type TabletWorkId =
   | "sloane3191"
+  | "cottonAppXLVI"
   | "casaubon1659"
   | "equinox1912"
   | "regardie1940"
@@ -27,15 +28,17 @@ export interface TabletWork {
   archive?: { item: string; file?: string };
 }
 
-/** A place in a work: a printed page or plate, and the scan's leaf. */
+/** A place in a work: a part, a printed page or plate, and the scan's leaf. */
 export interface TabletSource {
   work: TabletWorkId;
+  /** A part with a pagination of its own ("Actio Tertia"). */
+  part?: string;
   page?: number;
   plate?: string;
   leaf?: number;
 }
 
-/** A titled paragraph: a version of the tablets, or a way they differ. */
+/** A titled paragraph: a way the versions differ. */
 export interface TabletTopic {
   id: string;
   title: string;
@@ -43,25 +46,33 @@ export interface TabletTopic {
   sources: readonly TabletSource[];
 }
 
-/** One tablet's note: which version its letters are, and where they are from. */
+/** One version: where it comes from, and how it differs from each other. */
+export interface TabletVersionNote {
+  id: TabletVersionId;
+  title: string;
+  text: string;
+  sources: readonly TabletSource[];
+  /** Which letters it reverses, and why. */
+  reversed: string;
+  /** Which sigils it draws, or why none. */
+  sigils: string;
+  /**
+   * How it differs from each other version, in words; the squares and
+   * counts are the readings' (`tabletDifferences`).
+   */
+  differs: Readonly<Partial<Record<TabletVersionId, string>>>;
+}
+
+/** One tablet's note. */
 export interface TabletNote {
-  /** `gd`: the Golden Dawn's, from these sources; `older`: unsourced. */
-  version: "gd" | "older";
   text: string;
   sources: readonly TabletSource[];
 }
 
-/** What the sources print in one square, and a note on the grid's reading. */
+/** A note on one square. */
 export interface SquareNote {
   row: number;
   column: number;
-  /**
-   * The Golden Dawn's letter, on a tablet whose letters are older and
-   * differ from it here (Earth and Air).
-   */
-  goldenDawn?: string;
-  /** Each source's letters, "x over y" where Regardie prints two. */
-  printed: { regardie1940: string; equinox1912: string; greer: string };
   note: string;
   sources: readonly TabletSource[];
 }
@@ -69,13 +80,20 @@ export interface SquareNote {
 /** Everything the notes hold. */
 export interface TabletNotes {
   works: Readonly<Record<TabletWorkId, TabletWork>>;
-  versions: readonly TabletTopic[];
+  /** Why there are versions, for a page that offers them. */
+  intro: string;
+  versions: readonly TabletVersionNote[];
   differences: readonly TabletTopic[];
   tablets: Readonly<Record<EnochianTabletID, TabletNote>>;
   squares: Readonly<Partial<Record<EnochianTabletID, readonly SquareNote[]>>>;
 }
 
 const tabletNotes: TabletNotes = notes as TabletNotes;
+
+/** A version's note, or nothing for an id that is not a version. */
+export function versionNote(id: string): TabletVersionNote | undefined {
+  return tabletNotes.versions.find((version) => version.id === id);
+}
 
 /** The notes on one tablet's squares, top row first; none for a key without. */
 export function squareNotes(id: string): readonly SquareNote[] {
@@ -99,6 +117,7 @@ export function squareNote(
 export function sourceText(source: TabletSource): string {
   const work = tabletNotes.works[source.work];
   const place = [
+    source.part ?? "",
     source.plate ? `Plate ${source.plate}` : "",
     source.page ? `p.${source.page}` : "",
   ]

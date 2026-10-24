@@ -27,6 +27,7 @@ import OpenSource from "@/OpenSource";
 import { componentImageFilename } from "@/render/componentImageUrl";
 import { TABLET_IDS } from "@/render/contracts/enochianTablet";
 import useEnochianFont, { EnochianFont } from "../useEnochianFont";
+import { SOURCE_NAMES, squareReadings } from "./squareReadings";
 
 const TABLET_NAMES: Record<(typeof TABLET_IDS)[number], string> = {
   earth: "Earth",
@@ -40,8 +41,13 @@ const squareName = ({ row, column }: TabletSquare) =>
   `Row ${row + 1}, square ${column + 1}`;
 
 /** One line for the live region: the square and what each source prints. */
-const squareSummary = (note: SquareNote) =>
-  `${squareName(note)}: Regardie ${note.printed.regardie1940}; the Equinox ${note.printed.equinox1912}; Greer ${note.printed.greer}`;
+const squareSummary = (id: string, note: SquareNote) =>
+  [
+    squareName(note),
+    ...squareReadings(id, note.row, note.column).map(
+      ([source, text]) => `${SOURCE_NAMES[source]}: ${text}`,
+    ),
+  ].join(". ");
 
 /** The works cited, each linked to its scan where there is one. */
 function Sources({ sources }: { sources: readonly TabletSource[] }) {
@@ -84,12 +90,10 @@ function Topic({ topic }: { topic: TabletTopic }) {
 }
 
 /** What each source prints in a square, the note on it, and its sources. */
-function SquareDetail({ note }: { note: SquareNote }) {
-  const printed = [
-    ["Regardie, 1940", note.printed.regardie1940],
-    ["The Equinox, 1912", note.printed.equinox1912],
-    ["Greer's edition", note.printed.greer],
-  ] as const;
+function SquareDetail({ id, note }: { id: string; note: SquareNote }) {
+  const printed = squareReadings(id, note.row, note.column).map(
+    ([source, text]) => [SOURCE_NAMES[source], text] as const,
+  );
   return (
     <Box sx={{ mt: 1 }}>
       <Typography variant="subtitle1" component="h4">
@@ -263,9 +267,11 @@ export default function Tablets() {
               aria-live="polite"
               sx={{ fontWeight: "bold" }}
             >
-              {chosen ? squareSummary(chosen) : ""}
+              {chosen ? squareSummary(id, chosen) : ""}
             </Typography>
-            <div ref={detail}>{chosen && <SquareDetail note={chosen} />}</div>
+            <div ref={detail}>
+              {chosen && <SquareDetail id={id} note={chosen} />}
+            </div>
           </Box>
         )}
       </Box>

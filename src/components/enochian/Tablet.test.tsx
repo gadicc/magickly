@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import tablets, { tabletVersion } from "magick-data/enochian/tablets";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import Tablet, {
@@ -34,58 +35,61 @@ const letters = (markup: string) =>
   [...markup.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((match) => match[1]);
 
 describe("Tablet", () => {
-  // Earth and Air drew these bytes before the Water, Fire and Union tablets
-  // came (plan 061, stage G): hashed from the same calls on main before
-  // stage G (bd26b64). Without its accessible name (`label={false}`, as the
-  // hall and the image route draw it) a tablet still draws exactly them.
+  // Earth and Air in the Golden Dawn's version, the default since the
+  // versions came (plan 061, "Tablet versions"); unnamed (`label={false}`),
+  // as the hall and the image route draw them. Until then they drew
+  // Raphael's 1587 letters with capital Ps (431f2c1b…, 47076de7…,
+  // 5dce9c66…, 070a31f9…; 2a3099a8…, 9a45aad1…, 16975aae…, 3005bd54…,
+  // hashed on main before stage G, bd26b64): only their letters and
+  // mirroring moved, as the tests below read them.
   it.each([
     [
       "earth",
       false,
       true,
-      "431f2c1b17ae1bb2e4201faf299200c213c807c33beb4c92de87f838cb263d43",
+      "f178668e5b9e20242c1441b59b0c1d6ef978b4329e00d39773724ee5c303a7e3",
     ],
     [
       "earth",
       false,
       false,
-      "47076de76f70a300f343b664e8b3ded13f7c55837519a633d5627b96e965b4e0",
+      "e2cd835e9c5ca2ec8d4e1e3d52e310a836a1bcb1f8ef0d14a9b6bf925ec6dd8d",
     ],
     [
       "earth",
       true,
       true,
-      "5dce9c66ff91064cbc0282e5a21d736d9405ee5365d5df36855926f07f93861c",
+      "1b742202cca7180caa298e8dc7eb013dda61121bee82895a34a6463be7d2c55f",
     ],
     [
       "earth",
       true,
       false,
-      "070a31f9cf6ceac53994983a9faf23c865a7675fb0ec15107f59b9ffd9f55f7d",
+      "5d047bcf70775ffc79ce745119e6d7c3f7413604ce68739df454547c7ce8d297",
     ],
     [
       "air",
       false,
       true,
-      "2a3099a8193e06cceca00a72822c6d7d9bda8e733a66029f7ea6c3620c74b2e3",
+      "8b12dffcf86b0c9553c1b3f629eca465981dd771a455fe7ed189c788598e9faf",
     ],
     [
       "air",
       false,
       false,
-      "9a45aad1fca2e60bc73bcff10037fd732ab4231b09c7c3c6fc90ea3eff04c99c",
+      "657b0c6f35931f955bdb6a47dd95116082fe92df58472703ca8c18925eec9f4d",
     ],
     [
       "air",
       true,
       true,
-      "16975aaedf4a723d3f2616b04b5a43ea537c6c16ce82cec78b992af8866504ac",
+      "c597afb22b7138fd0b6d37cd8a516e31f104f81beab78c85a1940fa293d092b6",
     ],
     [
       "air",
       true,
       false,
-      "3005bd541135a93ee3c7c783c6fac4f84ff4d579ab392efe42f3a84a15671a61",
+      "a14408e150da608907af43cff9f552700f81169d7f3edca402c64fc57476105f",
     ],
   ] as const)(
     "draws %s (Enochian %s, frame %s) as it did",
@@ -133,6 +137,14 @@ describe("Tablet", () => {
     },
   );
 
+  it("draws the Golden Dawn's letters by default", () => {
+    const grid = (id: "earth" | "air") =>
+      (tabletVersion(tablets[id], "gd")?.grid ?? []).flat().join("");
+    for (const id of ["earth", "air"] as const)
+      expect(letters(draw(id)).join("")).toBe(grid(id));
+    expect(letters(draw("earth")).slice(84, 96).join("")).toBe("RCanchiisomt");
+  });
+
   it("draws the sigils from geometry alone", () => {
     for (const Sigil of Object.values(Sigils)) {
       const markup = renderToStaticMarkup(<Sigil />);
@@ -149,7 +161,8 @@ describe("Tablet", () => {
       ].map((match) => match[1]);
     expect(mirrored(draw("water"))).toEqual(["N", "L"]);
     expect(mirrored(draw("fire"))).toEqual(["P", "A"]);
-    expect(mirrored(draw("earth"))).toEqual([]);
+    expect(mirrored(draw("earth"))).toEqual(["R", "A"]);
+    expect(mirrored(draw("air"))).toEqual(["O", "A"]);
     // Mirrored about its own square's centre: Fire's last row, seventh square.
     expect(draw("fire")).toContain('transform="translate(264 0) scale(-1 1)"');
   });

@@ -1,6 +1,8 @@
 import enochianTablets, {
   type EnochianTablet,
   type EnochianTabletID,
+  type TabletView,
+  tabletVersion,
 } from "magick-data/enochian/tablets";
 import React, { type CSSProperties } from "react";
 
@@ -273,9 +275,9 @@ export interface TabletHighlights {
 }
 
 /** The squares whose letters the source prints reversed, as "row,column". */
-function reversedSquares(tablet: EnochianTablet): Set<string> {
+function reversedSquares(tablet: TabletView): Set<string> {
   return new Set(
-    (tablet.marks ?? [])
+    tablet.marks
       .filter((mark) => mark.reversed)
       .map(({ row, column }) => `${row},${column}`),
   );
@@ -292,7 +294,7 @@ function Grid({
 }: {
   /** The tablet's key, which picks its colours. */
   id: string;
-  tablet: EnochianTablet;
+  tablet: TabletView;
   enochianStyle?: CSSProperties;
   highlights?: TabletHighlights;
 }) {
@@ -408,7 +410,7 @@ function UnionGrid({
   tablet,
   enochianStyle,
 }: {
-  tablet: EnochianTablet;
+  tablet: TabletView;
   enochianStyle?: CSSProperties;
 }) {
   const enochianFont = enochianStyle !== undefined;
@@ -513,7 +515,7 @@ const Tablet = React.forwardRef(function Tablet(
   },
   ref: React.Ref<SVGSVGElement>,
 ) {
-  const tablet = tabletOf(id);
+  const tablet = tabletVersion(tabletOf(id));
   const Sigil = Object.hasOwn(Sigils, id)
     ? Sigils[id as keyof typeof Sigils]
     : undefined;

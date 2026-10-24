@@ -127,15 +127,25 @@ export const COMPONENT_IMAGE_REGISTRY: {
     profile: COMPONENT_IMAGE_PROFILE,
     fonts: ["EnochianPlain.ttf"],
     // The sigils are drawn in the component; the letters, which of them are
-    // reversed, and the kind that chooses the page are data. A field path
-    // cannot select inside an array, so `marks` is hashed whole, its `alt`
-    // letters too, which no image draws: correcting an `alt` re-identifies
-    // the image without moving a byte, the safe direction.
+    // reversed, and the kind that chooses the page are data: every
+    // source's reading, since a version is a rule over several (the Golden
+    // Dawn's takes Regardie's letters, the Equinox's reversed ones and
+    // its `choices`). A field path cannot select inside an object of
+    // readings by version, so they are hashed whole, the letters no image
+    // draws too: correcting one re-identifies the image without moving a
+    // byte, the safe direction.
     inputs: [
       {
         table: "enochianTablet",
         rows: TABLET_IDS,
-        fields: ["kind", "grid", "marks"],
+        fields: ["kind", "readings", "choices"],
+      },
+      // How a version is read from them, and the revision of the code
+      // that reads it: a rule's change moves the bytes too.
+      {
+        table: "enochianTabletVersion",
+        rows: "*",
+        fields: ["revision", "base", "choices", "variants", "reversedFrom"],
       },
     ],
   },

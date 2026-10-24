@@ -48,8 +48,8 @@ describe("/enochian/tablets' notes", () => {
       screen.getByRole("heading", { name: "About these tablets" }),
     ).toBeTruthy();
     for (const name of [
-      "Dee and Kelley, 1584",
-      "The Golden Dawn",
+      "Dee's, 1584",
+      "The Golden Dawn's",
       "Squares with two letters",
       "The Tablet of Union",
     ])
@@ -75,11 +75,11 @@ describe("/enochian/tablets' notes", () => {
     fireEvent.click(
       screen.getByRole("switch", { name: "Show where the sources differ" }),
     );
-    expect(outlined()).toHaveLength(22);
+    expect(outlined()).toHaveLength(23);
     const list = screen.getByRole("list", {
       name: "Squares where the sources differ",
     });
-    expect(list.querySelectorAll("button")).toHaveLength(22);
+    expect(list.querySelectorAll("button")).toHaveLength(23);
     // From the list, by keyboard or pointer.
     const square = screen.getByRole("button", { name: "Row 5, square 12" });
     fireEvent.click(square);
@@ -88,7 +88,7 @@ describe("/enochian/tablets' notes", () => {
     // Only a one-line summary is announced; the note is outside it.
     const live = container.querySelector('[aria-live="polite"]');
     expect(live?.textContent).toBe(
-      "Row 5, square 12: Regardie y and l over N and h; the Equinox N; Greer N",
+      "Row 5, square 12. Regardie, 1940: y and l over N and h. The Equinox, 1912: N, reversed. Greer's edition: N, reversed. Dee's record, 1584: N, reversed; first written y and l; high doubt. Raphael's table, 1587: n, reversed; medium doubt",
     );
     expect(live?.textContent).not.toMatch(/four letters here/);
     expect(screen.getByText(/four letters here/)).toBeTruthy();

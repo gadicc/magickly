@@ -5,13 +5,20 @@ import tabletNotes, {
   squareNote,
   squareNotes,
   type TabletSource,
+  versionNote,
 } from "./TabletNotes.ts";
-import tablets, { type EnochianTablet } from "./Tablets.ts";
+import tablets, {
+  type EnochianTabletID,
+  readingMark,
+  TABLET_VERSIONS,
+  tabletReading,
+  tabletVersion,
+  WATCHTOWER_IDS,
+} from "./Tablets.ts";
 
 const allSources = (): TabletSource[] => [
-  ...[...tabletNotes.versions, ...tabletNotes.differences].flatMap(
-    (topic) => topic.sources,
-  ),
+  ...tabletNotes.versions.flatMap((version) => version.sources),
+  ...tabletNotes.differences.flatMap((topic) => topic.sources),
   ...Object.values(tabletNotes.tablets).flatMap((note) => note.sources),
   ...Object.values(tabletNotes.squares).flatMap((notes) =>
     (notes ?? []).flatMap((note) => note.sources),
@@ -27,12 +34,51 @@ describe("the tablet notes", () => {
       expect(Object.hasOwn(tablets, id), id).toBe(true);
   });
 
-  it("call a tablet the Golden Dawn's only where its rows are", () => {
-    expect(tabletNotes.tablets.water.version).toBe("gd");
-    expect(tabletNotes.tablets.fire.version).toBe("gd");
-    expect(tabletNotes.tablets.union.version).toBe("gd");
-    expect(tabletNotes.tablets.earth.version).toBe("older");
-    expect(tabletNotes.tablets.air.version).toBe("older");
+  it("note every version, in order, against every other", () => {
+    expect(tabletNotes.versions.map((version) => version.id)).toEqual([
+      ...TABLET_VERSIONS,
+    ]);
+    for (const version of tabletNotes.versions) {
+      expect(Object.keys(version.differs).sort(), version.id).toEqual(
+        TABLET_VERSIONS.filter((other) => other !== version.id).sort(),
+      );
+      for (const text of [
+        version.text,
+        version.reversed,
+        version.sigils,
+        ...Object.values(version.differs),
+      ])
+        expect(text?.length, version.id).toBeGreaterThan(30);
+      expect(version.sources.length, version.id).toBeGreaterThan(0);
+    }
+    expect(versionNote("dee")?.title).toBe("Dee's, 1584");
+    expect(versionNote("nonesuch")).toBeUndefined();
+    expect(tabletNotes.intro).toContain("Dee alone");
+  });
+
+  it("leave the counts to the readings", () => {
+    // Prose written beside data drifts from it: the notes give no count of
+    // squares or letters, which the page reads from the readings.
+    const numbers =
+      /\b(?:two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|twenty|\d+) squares\b/;
+    const prose = [
+      ...tabletNotes.versions.flatMap((version) => [
+        version.text,
+        ...Object.values(version.differs),
+      ]),
+      ...Object.values(tabletNotes.tablets).map((note) => note.text),
+    ];
+    // Nor a count in other words.
+    for (const text of prose)
+      expect(text).not.toMatch(
+        /\b(?:dozens?|score|scores|half|halves|hundreds?)\b/i,
+      );
+    const counted = prose.filter((text) => numbers.test(text ?? ""));
+    // Facts of the sources, not counts of the data: the four squares Dee
+    // corrected, the print's ten misprints, the two it leaves empty.
+    for (const text of counted)
+      for (const count of text.match(new RegExp(numbers, "g")) ?? [])
+        expect(["four squares", "ten squares", "two squares"]).toContain(count);
   });
 
   it("cite only works they name, each with a place or an edition", () => {
@@ -41,104 +87,72 @@ describe("the tablet notes", () => {
       expect(work, source.work).toBeDefined();
       if (source.leaf) expect(work.archive, source.work).toBeDefined();
     }
-    // The topics are all there, each cited.
-    expect(tabletNotes.versions.map((topic) => topic.id)).toEqual([
-      "dee1584",
-      "raphael1587",
-      "gd",
-      "printings",
-    ]);
     expect(tabletNotes.differences.map((topic) => topic.id)).toEqual([
       "letters",
       "doubled",
       "reversed",
       "earthRow8",
+      "emptyFire",
       "union",
       "attributions",
+      "sigils",
       "colours",
     ]);
-    for (const topic of [...tabletNotes.versions, ...tabletNotes.differences])
+    for (const topic of tabletNotes.differences)
       expect(topic.sources.length, topic.id).toBeGreaterThan(0);
   });
 
   it("note squares inside their tablets, once each, top row first", () => {
     for (const [id, notes] of Object.entries(tabletNotes.squares)) {
-      const tablet: EnochianTablet = tablets[id as keyof typeof tablets];
+      const tablet = tabletVersion(tablets[id as EnochianTabletID]);
       const keys = (notes ?? []).map((note) => note.row * 100 + note.column);
       expect(keys, id).toEqual([...new Set(keys)].sort((a, b) => a - b));
       for (const note of notes ?? []) {
-        expect(tablet.grid[note.row]?.[note.column], id).toBeDefined();
+        expect(tablet?.grid[note.row]?.[note.column], id).toBeDefined();
         expect(
           note.note.length,
           `${id} ${note.row},${note.column}`,
         ).toBeGreaterThan(20);
+        expect(note.sources.length).toBeGreaterThan(0);
       }
     }
   });
 
-  it("note every marked square of Water and Fire, from what the sources print", () => {
-    for (const id of ["water", "fire"] as const) {
-      const tablet: EnochianTablet = tablets[id];
-      for (const mark of tablet.marks ?? []) {
-        const note = squareNote(id, mark.row, mark.column);
-        expect(note, `${id} ${mark.row},${mark.column}`).toBeDefined();
-        // Every letter the grid or its alt holds is one a source prints.
-        const printed = Object.values(note?.printed ?? {})
-          .join(" ")
-          .toLowerCase();
-        for (const letter of [
-          tablet.grid[mark.row][mark.column],
-          ...(mark.alt ?? []),
-        ])
-          expect(printed, `${id} ${mark.row},${mark.column}`).toContain(
-            letter.toLowerCase(),
+  it("note every square the Golden Dawn's version chooses, or Dee corrected or left empty", () => {
+    for (const id of WATCHTOWER_IDS) {
+      const tablet = tablets[id];
+      const squares = [
+        ...(tablet.choices?.gd ?? []),
+        ...(tabletReading(tablet, "dee1584")?.marks ?? []).filter(
+          (mark) => mark.dictated || mark.alt,
+        ),
+        ...(tabletReading(tablet, "raphael1587")?.marks ?? []).filter(
+          (mark) => mark.alt,
+        ),
+      ];
+      for (const { row, column } of squares)
+        expect(
+          squareNote(id, row, column),
+          `${id} ${row},${column}`,
+        ).toBeDefined();
+    }
+    // The letters first written are named in their notes.
+    for (const id of WATCHTOWER_IDS)
+      for (const note of squareNotes(id)) {
+        const mark = readingMark(
+          tabletReading(tablets[id], "dee1584"),
+          note.row,
+          note.column,
+        );
+        for (const letter of mark?.dictated ?? [])
+          expect(note.note, `${id} ${note.row},${note.column}`).toMatch(
+            new RegExp(`\\b${letter}\\b`),
           );
       }
-    }
-  });
-
-  it("count the squares where Earth and Air differ from the Golden Dawn's", () => {
-    const words = [
-      "zero",
-      "one",
-      "two",
-      "three",
-      "four",
-      "five",
-      "six",
-      "seven",
-      "eight",
-      "nine",
-      "ten",
-      "eleven",
-      "twelve",
-      "thirteen",
-      "fourteen",
-      "fifteen",
-    ];
-    for (const id of ["earth", "air"] as const) {
-      const tablet: EnochianTablet = tablets[id];
-      const differing = squareNotes(id).filter((note) => note.goldenDawn);
-      for (const note of differing) {
-        // A letter the Golden Dawn prints there, and not this tablet's.
-        expect(note.goldenDawn, `${id} ${note.row},${note.column}`).not.toBe(
-          tablet.grid[note.row][note.column],
-        );
-        expect(note.printed.regardie1940.split(" ")[0]).toBe(note.goldenDawn);
-      }
-      const count = words[differing.length];
-      expect(tabletNotes.tablets[id].text).toContain(
-        `differ from the Golden Dawn's in ${count} squares`,
-      );
-    }
-    for (const id of ["water", "fire"] as const)
-      expect(squareNotes(id).some((note) => note.goldenDawn)).toBe(false);
   });
 
   it("find a square's note, and none for a square or key without", () => {
-    expect(squareNote("water", 4, 11)?.printed.regardie1940).toBe(
-      "y and l over N and h",
-    );
+    expect(squareNote("water", 4, 11)?.note).toMatch(/y and l side by side/);
     expect(squareNote("water", 6, 6)).toBeUndefined();
     expect(squareNotes("union")).toEqual([]);
     expect(squareNotes("constructor")).toEqual([]);
@@ -156,6 +170,18 @@ describe("the tablet notes", () => {
     expect(sourceUrl({ work: "equinox1912", plate: "III", leaf: 241 })).toBe(
       "https://archive.org/details/crowley-equinox_202110/The%20Equinox%20Vol.%201%2C%20No.%207/page/n241",
     );
+    const recensa = {
+      work: "casaubon1659",
+      part: "Actio Tertia",
+      page: 15,
+      leaf: 456,
+    } as const;
+    expect(sourceText(recensa)).toMatch(
+      /, Actio Tertia, p\.15 \(archive\.org leaf n456\)$/,
+    );
+    expect(sourceUrl(recensa)).toBe(
+      "https://archive.org/details/truefaithfulrela00deej/page/n456",
+    );
     expect(sourceText({ work: "greer" })).toContain("ISBN 978-0-7387-4399-8");
     expect(sourceUrl({ work: "greer" })).toBeUndefined();
     expect(sourceText({ work: "equinox1912", plate: "X" })).toBe(
@@ -168,5 +194,6 @@ describe("the tablet notes", () => {
       "https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol4-1940",
     );
     expect(sourceUrl({ work: "sloane3191" })).toBeUndefined();
+    expect(sourceUrl({ work: "cottonAppXLVI" })).toBeUndefined();
   });
 });

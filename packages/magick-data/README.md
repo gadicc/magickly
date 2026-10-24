@@ -246,13 +246,26 @@ or `null`.
   is no JSON for them; `oddKamea(n)` and `doublyEvenKamea(n)` are the
   constructions, for an odd order from 3 or a multiple of 4, up to
   `MAX_KAMEA_ORDER` (100). Any other order is a `RangeError`.
-- `magick-data/enochian/tabletNotes`: notes on the Enochian tablets: the
-  versions (Dee and Kelley's of 1584, Raphael's revision of 1587, the Golden
-  Dawn's and its printings), how they differ, each tablet's sources, and
-  what the sources print in particular squares, by row and column from 0 as
-  the tablets' `marks` count them (`squareNote(id, row, column)`), with
-  `sourceText` and `sourceUrl` for the works cited. The prose is ours, under
-  CC BY 4.0 like the tables.
+- `magick-data/enochian/tablets`: besides its rows, the tablets'
+  versions. A row holds each source's reading of the tablet, square by
+  square (`readings`: Regardie 1940, the Equinox 1912, Greer's edition,
+  Dee's table of 1584 and Raphael's of 1587), and a version is a rule over
+  them, not a copy: `tabletVersion(tablet, version)` gives its letters
+  (`null` for an empty square) and the squares that hold more (`alt`,
+  `reversed`, `doubt`), for `gd`, the Golden Dawn's and the default,
+  `regardie`, `equinox`, `dee` and `raphael` (`TABLET_VERSIONS`), or
+  `undefined` where a version has no such tablet: Dee and Raphael have no
+  Tablet of Union. `tabletDifferences(a, b)` lists the squares where two
+  versions differ, and how. A new source or version is a new key; no id
+  moves.
+- `magick-data/enochian/tabletNotes`: notes on the Enochian tablets: each
+  version, where it comes from and how it differs from each of the others
+  (`versionNote(id)`), how the versions differ in general, each tablet,
+  and particular squares, by row and column from 0 as the readings count
+  them (`squareNote(id, row, column)`), with `sourceText` and `sourceUrl`
+  for the works cited. The prose is ours, under CC BY 4.0 like the tables;
+  the counts and squares where versions differ are the readings', never
+  written into the prose.
 - `magick-data/enochian/dictionary`: for the app only, and not published
   ([above](#licences)).
 
@@ -348,18 +361,25 @@ that each starts with his first row, and that Saturn's and Jupiter's are
 his row by row. See
 [plan 061](https://github.com/gadicc/magickly/blob/main/plans/061-gd-hall.md).
 
-**`enochian/tablets.json5`** gives the Enochian tablets as the Golden Dawn
-painted them. Water, Fire and the Tablet of Union are the Book of the
-Concourse of the Forces in Israel Regardie, *The Golden Dawn*, vol. 4
-(Aries Press, Chicago, 1940; archive.org
-`IsraelRegardie-TheGoldenDawn-Vol4-1940`, pp. 271, 273 and 275),
-cross-checked against *The Equinox*, vol. I no. 7 (London, 1912), Plates
-III and VIII (archive.org `crowley-equinox_202110`, the file "The
-Equinox Vol. 1, No. 7", leaves 241 and 246), and the redrawn colour
-plates of Regardie's book in its seventh edition, edited by John
-Michael Greer (Llewellyn, ISBN 978-0-7387-4399-8); the file's comment
-says where each square comes from. Earth and Air are older, with no
-source of their own; they differ from the Golden Dawn's in thirteen
-squares each, and seem to follow Dee's own table. The letters are facts,
-and **no rights are asserted over them**. See
-[plan 061](https://github.com/gadicc/magickly/blob/main/plans/061-gd-hall.md).
+**`enochian/tablets.json5`** gives the Enochian tablets as each source
+prints them, so that both traditions are served. In the owner's words
+(24 October 2026): "we want to accommodate Enochian practitioners from
+both traditions; for gdHall we use the Regardie/GD version, but we also
+accommodate Dee purists." The Golden Dawn's version is the default.
+Its sources are Israel Regardie, *The Golden Dawn*, vol. 4 (Aries Press,
+Chicago, 1940; archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`,
+pp. 270-275), *The Equinox*, vol. I no. 7 (London, 1912), Plates III and
+VIII (archive.org `crowley-equinox_202110`, the file "The Equinox Vol. 1,
+No. 7", leaves 241 and 246), and the redrawn colour plates of Regardie's
+book in its seventh edition, edited by John Michael Greer (Llewellyn,
+ISBN 978-0-7387-4399-8). Dee's table of 1584 and Raphael's reformed
+table of 1587 are read from Meric Casaubon's printing of Dee's records,
+*A True & Faithful Relation* (London, 1659; archive.org
+`truefaithfulrela00deej`, pp. 175-188 and the "Actio Tertia", p. 15),
+which comes from British Library, Cotton MS Appendix XLVI. Dee's own copy
+in Sloane MS 3191 could not be read: the Library's images have been
+offline since its cyber-attack of 2023 (plan 061 says what to check when
+they return). The file's comment says where each square comes from. The
+letters are facts, and **no rights are asserted over them**. See
+[plan 061](https://github.com/gadicc/magickly/blob/main/plans/061-gd-hall.md),
+"Tablet versions".

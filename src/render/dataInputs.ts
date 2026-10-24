@@ -1,7 +1,9 @@
 import "server-only";
 import { createHash } from "node:crypto";
 import data from "magick-data";
-import enochianTablet from "magick-data/enochian/tablets";
+import enochianTablet, {
+  TABLET_VERSION_RULES,
+} from "magick-data/enochian/tablets";
 import { readFieldPath } from "@/components/kabbalah/fieldPath";
 
 /**
@@ -26,11 +28,22 @@ export const IMAGE_INPUTS_PROFILE = "magickli-image-inputs-v1";
 
 /**
  * The tables a spec may read: the barrel, plus the one table a registered
- * component draws that the barrel leaves out. `enochianTablet` is named in no
+ * component draws that the barrel leaves out, and the tablets' version
+ * rules. `enochianTablet` is named in no
  * link in either direction, so the barrel does not assemble it
  * ([data.ts](../../packages/magick-data/src/data.ts)) and its rows are the raw JSON either way.
  */
-export const DATA_INPUT_TABLES = { ...data, enochianTablet };
+export const DATA_INPUT_TABLES = {
+  ...data,
+  enochianTablet,
+  /**
+   * Not a table: the rules by which the tablets' versions are read from
+   * their readings, by version. A tablet's image draws through them, and
+   * their `revision` moves when the code applying them changes what it
+   * draws, so they are hashed like the data.
+   */
+  enochianTabletVersion: TABLET_VERSION_RULES,
+};
 
 /** A table a component may declare inputs from. */
 export type DataInputTable = keyof typeof DATA_INPUT_TABLES;

@@ -1,177 +1,666 @@
-// The Enochian tablets in the Golden Dawn's version: the four
-// Watchtowers, thirteen rows of twelve letters, and the Tablet of Union,
-// four rows of five. Rows run from the top; a letter is the Latin
-// transliteration, a capital where the source prints one. `marks` names,
-// by row and column from 0, the squares that hold more: `alt`, the other
-// letters the sources below print in that square (Regardie's first, the
-// higher first, then the Equinox's and Greer's), and `reversed`, which
-// says the grid's letter is printed reversed (never the `alt` letters).
+// The Enochian tablets: the four Watchtowers, thirteen rows of twelve
+// letters, and the Tablet of Union, four rows of five, as each source
+// prints them. A version of a tablet (the Golden Dawn's, Regardie's, the
+// Equinox's, Dee's or Raphael's) is a rule over these readings, not a copy
+// of them: magick-data/enochian/tablets's `tabletVersion()` applies it
+// (plan 061, "Tablet versions").
 //
-// Water, Fire and the Tablet of Union follow Regardie, *The Golden
-// Dawn*, vol. 4 (Aries Press, Chicago, 1940), the Book of the Concourse
-// of the Forces: archive.org item
-// IsraelRegardie-TheGoldenDawn-Vol4-1940, the Watchtowers of Water p.271
-// (leaf n263) and Fire p.273 (n265), the Tablet of Union's lines p.275
-// (n267). Where he prints two letters in a square the grid takes the
-// higher, which he prefers while allowing both (p.306, n298).
+// `readings` holds each source's letters, keyed by source:
+//   regardie1940  Israel Regardie, *The Golden Dawn*, vol. 4 (Aries Press,
+//                 Chicago, 1940), the Book of the Concourse of the Forces:
+//                 archive.org item IsraelRegardie-TheGoldenDawn-Vol4-1940,
+//                 Air p.270 (leaf n262), Water p.271 (n263), Earth p.272
+//                 (n264), Fire p.273 (n265), the Tablet of Union's lines
+//                 p.275 (n267).
+//   equinox1912   *The Equinox*, vol. I no. 7 (London, 1912), "Liber
+//                 Chanokh", Plates III and VIII: archive.org item
+//                 crowley-equinox_202110, file "The Equinox Vol. 1, No. 7",
+//                 leaves n241 and n246.
+//   greer         The Watchtowers redrawn in Regardie, *The Golden Dawn*,
+//                 7th edition, ed. John Michael Greer (Llewellyn, ISBN
+//                 978-0-7387-4399-8), its colour plates "Enochian Tablet:
+//                 The First Watchtower" to "The Fourth Watchtower".
+//   dee1584       Dee and Kelley's tables of June 1584 as Casaubon prints
+//                 Dee's record, *A True & Faithful Relation* (London, 1659;
+//                 from British Library, Cotton MS Appendix XLVI): archive.org
+//                 item truefaithfulrela00deej, pp.175-177 (leaves
+//                 n264-n266), with Dee's corrections (pp.185 and 188, leaves
+//                 n274 and n277).
+//   raphael1587   The Tabula recensa of 20 April 1587, "thus reformed by
+//                 Raphael", in the same book's "Actio Tertia", second
+//                 pagination, p.15 (leaf n456).
+// Dee's records name the four tables by their middle rows; the Golden Dawn
+// gives them elements: ORO is Air, MPH Water, MOR Earth and OIP Fire. Dee
+// and Raphael have no Tablet of Union, which is the Golden Dawn's.
 //
-// Nine squares read otherwise; rows and squares are counted here from 1.
-// In eight, both other sources print another letter and the Order's
-// names through the square read it too (the Seniors as the Greer
+// A reading's `rows` run from the top, one character a square: the Latin
+// transliteration, a capital where the source prints one, and "." for a
+// square the source leaves empty. Where a source prints more than one
+// letter in a square, `rows` has the higher, first one. `marks` names, by
+// row and column from 0, the squares that hold more:
+//   beside    letters printed on the same line, after the first (Regardie
+//             prints y and l side by side in Water's row 5, square 12);
+//   below     the smaller letters printed below (Regardie's second
+//             letters: u over v is "u" in `rows` and below ["v"]);
+//   reversed  the square's letter is printed reversed (the Equinox writes
+//             these in Enochian, Greer mirrors them);
+//   dictated  the letters first written down in the 1584 session, where Dee
+//             later corrected the square and `rows` has his correction;
+//   misprint  what the 1659 print has, where every other copy of Dee's
+//             tables read (his 1584 table and the 1587 table's copies)
+//             agrees on the letter in `rows`; the Golden Dawn's sources
+//             are not counted;
+//   alt       other readings of the square in this version's witnesses: the
+//             1587 letters for the two Fire squares the 1584 record leaves
+//             empty, and Sloane MS 3191's p where the 1587 print has x;
+//   doubt     how sure the reading is: "low", "medium" or "high" doubt.
+// Rows and squares are counted from 1 in the comments below, from 0 in the
+// data.
+//
+// `choices.gd` is the Golden Dawn's version: Regardie's higher letter,
+// which he prefers while allowing both (p.306, leaf n298), except in the
+// squares listed, where both other sources print another letter and the
+// Order's names through the square read it too (the Seniors as the Greer
 // edition's "The Four Elemental Weapons" names them; the names Liber
-// Chanokh reads off Water, The Equinox, pp.235-236): Water's row 2
-// square 3 (l: Olgota, Aalco), row 4 square 8 (l, where Regardie prints
-// only i: Laoc), row 5 squares 7 (o: Laoaxrp) and 11 (s: Vssn) and row 6
-// square 11 (o, which Regardie does not print: Rvoi); Fire's row 4
-// square 7 (d: Alndvod), row 5 square 6 (o, where Regardie prints only
-// a: Adoeoet) and row 13 square 7 (P: Arinnap; the Equinox and Greer
-// print P, Regardie O over p).
+// Chanokh reads off Water, The Equinox, pp.235-236). There the version
+// takes the Equinox's letter. Water's row 5 square 12 has no higher letter
+// to take: Regardie prints four there, y and l side by side over N and h,
+// and the version takes N, one of his four, which both other sources print
+// (reversed). That differs from Water's row 5 square 1 and row 12 square 1,
+// where he prints two letters, one plainly higher (f over p, r over i):
+// the higher stands there although both other sources print the lower,
+// since no name settles them. The version's reversed letters are the
+// Equinox's, and its other letters in a square (its `alt`) are every other
+// letter any of the three Golden Dawn sources prints there. Plan 061
+// (Stage G notes) lists every square where those sources differ.
 //
-// The ninth, Water's row 5 square 12, has no higher letter to take:
-// Regardie prints four there, y and l side by side over N and h, so the
-// rule cannot choose, and the grid takes N, one of his four, which both
-// other sources print (reversed). That differs from Water's row 5 square
-// 1 and row 12 square 1, where he prints two letters, one plainly higher
-// (f over p, r over i): the higher stands there although both other
-// sources print the lower, since no name settles them. Reversed letters
-// are those the Equinox prints in Enochian and Greer mirrors.
+// Dee's version is the 1584 table as Dee corrected it, which the angel
+// approved (p.188): in four squares, where the session's record has a
+// letter that every later copy replaces, it takes the later letter and
+// keeps the first as `dictated`. Its case is Casaubon's type, and its
+// reversed letters are marked as he prints or notes them, except Earth's
+// row 8 square 1, a reversed R, which he sets as the ligature Æ: the
+// reading has R, reversed (doubt medium). Two Fire squares (row 1 square
+// 12 and row 2 square 11) are empty in every 1584 witness read: they are
+// kept empty, with the 1587 letters as `alt`.
+// Raphael's version follows the 1659 print of the 1587 table, small letters
+// as printed: the capitals of Sloane MS 3191's copy are unverified until
+// its images return (plan 061). In Fire's row 8 square 1 and row 12 square
+// 4 the print (from the Cotton manuscript) has x, Sloane p. Of its ten
+// misprints, Fire's row 6 square 8 is the least sure: the print's v is
+// Regardie's second letter there (b over v), so it may be the Cotton
+// copy's reading rather than the printer's slip (doubt medium).
 //
-// Cross-checked against The Equinox, vol. I no. 7 (London, 1912), "Liber
-// Chanokh", Plates III and VIII (archive.org item
-// crowley-equinox_202110, file "The Equinox Vol. 1, No. 7", leaves n241
-// and n246), and the Watchtowers redrawn in Regardie, *The Golden Dawn*,
-// 7th edition, ed. John Michael Greer (Llewellyn, ISBN
-// 978-0-7387-4399-8), its colour plates "Enochian Tablet: The First
-// Watchtower" to "The Fourth Watchtower". Plan 061 (Stage G notes) lists
-// every square where they differ. Earth and Air were here before, with
-// no source of their own. They differ from the Golden Dawn's in thirteen
-// squares each; a comparison with a modern transcription of Dee's table
-// (Sloane MS 3191) suggests they follow it. They stay so until the owner
-// decides (plan 061).
+// Cross-checked, never cited: J. H. Peterson's redraws of Sloane MS 3191
+// (esotericarchives.com) and the Vovina Archives' renderings of the Cotton
+// and Sloane tables (CC BY-NC-SA 4.0). Nothing of theirs is copied here.
+// The letters are facts, and no rights are asserted over them.
 {
   earth: {
     id: "earth",
     kind: "watchtower",
-    grid: [
-      ["b", "O", "a", "Z", "a", "R", "o", "P", "h", "a", "R", "a"],
-      ["v", "N", "n", "a", "x", "o", "P", "S", "o", "n", "d", "n"],
-      ["a", "i", "g", "r", "a", "n", "o", "o", "m", "a", "g", "g"],
-      ["o", "r", "P", "m", "n", "i", "n", "g", "b", "e", "a", "l"],
-      ["r", "s", "O", "n", "i", "z", "i", "r", "l", "e", "m", "v"],
-      ["i", "z", "i", "n", "r", "C", "z", "i", "a", "M", "h", "l"],
-      ["M", "O", "r", "d", "i", "a", "l", "h", "C", "t", "G", "a"],
-      ["O", "C", "a", "n", "c", "h", "i", "a", "s", "o", "m", "t"],
-      ["A", "r", "b", "i", "z", "m", "i", "i", "l", "P", "i", "z"],
-      ["O", "P", "a", "n", "a", "L", "a", "m", "S", "m", "a", "P"],
-      ["d", "O", "l", "o", "P", "i", "n", "i", "a", "n", "b", "a"],
-      ["r", "x", "P", "a", "o", "c", "s", "i", "z", "i", "x", "P"],
-      ["a", "x", "t", "i", "r", "V", "a", "s", "t", "r", "i", "m"],
-    ],
+    choices: {
+      gd: [
+        { row: 10, column: 5, from: "equinox1912" }, // i, where Regardie prints only l: Ahmlicv
+      ],
+    },
+    readings: {
+      regardie1940: {
+        rows: [
+          "bOaZaRophaRa",
+          "uNnaxoPSondn",
+          "aigranoamagg",
+          "orpmningbeal",
+          "rsOnizirlemu",
+          "izinrCziaMhl",
+          "MOrdialhCtGa",
+          "RCanchiisomt",
+          "Arbizmiilpiz",
+          "OpanalamSmaT",
+          "dOloPlnianba",
+          "rxpaocsizixp",
+          "axtirVastrim",
+        ],
+        marks: [
+          { row: 1, column: 0, below: ["v"] },
+          { row: 2, column: 7, below: ["o"] },
+          { row: 7, column: 0, below: ["o"] },
+          { row: 7, column: 1, below: ["O"] },
+          { row: 7, column: 2, below: ["c"] },
+          { row: 7, column: 3, below: ["a"] },
+          { row: 7, column: 4, below: ["n", "m"] },
+          { row: 7, column: 5, below: ["c"] },
+          { row: 7, column: 6, below: ["h"] },
+          { row: 7, column: 7, beside: ["a"], below: ["b", "t"] },
+          { row: 7, column: 8, below: ["a"] },
+          { row: 7, column: 9, below: ["s"] },
+          { row: 7, column: 10, below: ["o"] },
+          { row: 7, column: 11, below: ["m"] },
+          { row: 8, column: 7, below: ["l"] },
+          { row: 9, column: 5, below: ["B"] },
+          { row: 9, column: 11, below: ["L"] },
+          { row: 10, column: 4, below: ["F"] },
+        ],
+      },
+      equinox1912: {
+        rows: [
+          "bOaZaRophaRa",
+          "uNnaxoPSondn",
+          "aigranoomagg",
+          "orpmningbeal",
+          "rsOnizirlemu",
+          "izinrCziaMhl",
+          "MOrdialhCtGa",
+          "ROancchiasom",
+          "Arbizmiilpiz",
+          "OpanaBamSmaL",
+          "dOloPinianba",
+          "rxpaocsizixp",
+          "axtirVastrim",
+        ],
+        marks: [
+          { row: 7, column: 0, reversed: true },
+          { row: 8, column: 0, reversed: true },
+        ],
+      },
+      greer: {
+        rows: [
+          "bOaZaRophaRa",
+          "uNnaxopSondn",
+          "aigranoomagg",
+          "orpmningbeal",
+          "rsonizirlemu",
+          "izinrCziaMhl",
+          "MordialhCtGa",
+          "ROcanchiasom",
+          "Arbizmiilpiz",
+          "OpanaBamSmal",
+          "dOlopinianba",
+          "rxpaocsizixp",
+          "axtirVastrim",
+        ],
+        marks: [
+          { row: 7, column: 0, reversed: true },
+        ],
+      },
+      dee1584: {
+        rows: [
+          "bOaZaRophaRa",
+          "uNnaxoPSondn",
+          "aigranoomagg",
+          "orpmningbeal",
+          "rsOnizirlemu",
+          "izinrCziaMhl",
+          "mordialhCtGa",
+          "ROcanchiasom",
+          "Arbizmiilpiz",
+          "OpanalamSmaL",
+          "dOlopinianba",
+          "rxpaocsizixp",
+          "axtirVastrim",
+        ],
+        marks: [
+          { row: 7, column: 0, reversed: true, doubt: "medium" },
+          { row: 8, column: 0, reversed: true, doubt: "medium" },
+        ],
+      },
+      raphael1587: {
+        rows: [
+          "boazarophara",
+          "vnnaxopsondn",
+          "aigranoomagg",
+          "orpmningbeal",
+          "rsonizirlemv",
+          "izinrcziamhl",
+          "mordialhctga",
+          "ocanchiasomt",
+          "arbiZmiilpiz",
+          "opanalamsmap",
+          "dolopinianba",
+          "rxpaocSizixp",
+          "axtirvastrim",
+        ],
+        marks: [
+          { row: 2, column: 4, misprint: "u", doubt: "low" },
+          { row: 7, column: 0, doubt: "medium" },
+          { row: 8, column: 0, reversed: true, doubt: "medium" },
+        ],
+      },
+    },
   },
   air: {
     id: "air",
     kind: "watchtower",
-    grid: [
-      ["r", "Z", "i", "l", "a", "f", "A", "Y", "t", "l", "P", "a"],
-      ["a", "r", "d", "Z", "a", "i", "d", "P", "a", "L", "a", "m"],
-      ["c", "z", "o", "n", "s", "a", "r", "o", "Y", "a", "v", "b"],
-      ["T", "o", "i", "T", "t", "z", "o", "P", "a", "c", "o", "C"],
-      ["S", "i", "g", "a", "s", "o", "m", "r", "b", "z", "n", "h"],
-      ["f", "m", "o", "n", "d", "a", "T", "d", "i", "a", "r", "i"],
-      ["o", "r", "o", "i", "b", "A", "h", "a", "o", "z", "P", "i"],
-      ["t", "N", "a", "b", "r", "V", "i", "x", "g", "a", "s", "d"],
-      ["O", "i", "i", "i", "t", "T", "P", "a", "l", "O", "a", "i"],
-      ["A", "b", "a", "m", "o", "o", "o", "a", "C", "v", "c", "a"],
-      ["N", "a", "o", "c", "O", "T", "t", "n", "P", "r", "n", "T"],
-      ["o", "c", "a", "n", "m", "a", "g", "o", "t", "r", "o", "i"],
-      ["S", "h", "i", "a", "l", "r", "a", "P", "m", "z", "o", "x"],
-    ],
+    choices: {
+      gd: [
+        { row: 4, column: 6, from: "equinox1912" }, // m, Regardie's lower letter: Htmorda
+      ],
+    },
+    readings: {
+      regardie1940: {
+        rows: [
+          "rZilafAytlpa",
+          "ardZaidpaLam",
+          "CzonsaroYaub",
+          "ToiTtzoPacoC",
+          "Sigasonrbznh",
+          "fmondaTdiarl",
+          "oroibahaozpi",
+          "tNabrVixgasd",
+          "OiiitTpalOai",
+          "AbamoooaCuca",
+          "NaocOTtnpruT",
+          "ocanmagotroi",
+          "Shialrapmzox",
+        ],
+        marks: [
+          { row: 0, column: 7, below: ["u"] },
+          { row: 0, column: 9, below: ["i"] },
+          { row: 2, column: 8, below: ["v"] },
+          { row: 3, column: 5, below: ["x"] },
+          { row: 4, column: 6, below: ["m"] },
+          { row: 5, column: 11, below: ["i"] },
+          { row: 7, column: 0, below: ["c"] },
+          { row: 7, column: 4, below: ["a"] },
+          { row: 7, column: 10, below: ["z"] },
+          { row: 9, column: 9, below: ["v"] },
+          { row: 10, column: 10, below: ["a"] },
+        ],
+      },
+      equinox1912: {
+        rows: [
+          "rZilafAytlpa",
+          "ardZaidpaLam",
+          "czonsaroYaub",
+          "ToiTtxoPacoC",
+          "Sigasomrbznh",
+          "fmondaTdiari",
+          "oroibAhaozpi",
+          "cNabaVixgazd",
+          "OiiitTpalOai",
+          "AbamoooaCuca",
+          "NaocOTtnpraT",
+          "ocanmagotroi",
+          "Shialrapmzox",
+        ],
+        marks: [
+          { row: 8, column: 0, reversed: true },
+          { row: 9, column: 0, reversed: true },
+        ],
+      },
+      greer: {
+        rows: [
+          "rZilafAutlpa",
+          "ardZaidpaLam",
+          "czonsaroYaub",
+          "ToiTtxoPacoC",
+          "Sigasomrbznh",
+          "fmondaTdiari",
+          "oroibAhaozpi",
+          "cNabrVixgazd",
+          "OiiitTpaloai",
+          "AbamoooaCuca",
+          "NaocoTtnpraT",
+          "ocanmagotroi",
+          "shialrapmzox",
+        ],
+      },
+      dee1584: {
+        rows: [
+          "rZilafAutlpa",
+          "ardZaidpaLam",
+          "cZonsaroYaub",
+          "ToiTtXoPacoC",
+          "Sigasomrbznh",
+          "fmondaTdiari",
+          "oroibAhaoZpi",
+          "CnabrVixgazd",
+          "OiiitTpalOai",
+          "AbamoooaCvca",
+          "NaocOTtnpraT",
+          "Ocanmagotroi",
+          "Shialrapmzox",
+        ],
+        marks: [
+          { row: 2, column: 6, dictated: ["v"], doubt: "medium" },
+          { row: 8, column: 0, reversed: true, doubt: "medium" },
+          { row: 9, column: 0, reversed: true, doubt: "medium" },
+        ],
+      },
+      raphael1587: {
+        rows: [
+          "rzilafaytlpa",
+          "ardzaidpalam",
+          "czonsaroyavb",
+          "toittzopacoc",
+          "sigasomrbznh",
+          "fmondatdiari",
+          "oroibahaozpi",
+          "tnabrvixgasd",
+          "oiiitTpaloai",
+          "abamoooacvca",
+          "naocotTnprnt",
+          "ocanmagotroi",
+          "shialrapmzox",
+        ],
+        marks: [
+          { row: 2, column: 1, misprint: "o", doubt: "low" },
+          { row: 2, column: 7, misprint: "e", doubt: "low" },
+          { row: 4, column: 11, misprint: "b", doubt: "low" },
+          { row: 8, column: 0, reversed: true, doubt: "medium" },
+          { row: 9, column: 0, reversed: true, doubt: "medium" },
+          { row: 11, column: 10, misprint: "r", doubt: "low" },
+        ],
+      },
+    },
   },
   water: {
     id: "water",
     kind: "watchtower",
-    grid: [
-      ["T", "a", "O", "A", "d", "u", "p", "t", "D", "n", "i", "m"],
-      ["a", "a", "l", "c", "o", "o", "r", "o", "m", "e", "b", "b"],
-      ["T", "o", "g", "c", "o", "n", "x", "m", "a", "l", "G", "m"],
-      ["n", "h", "o", "d", "D", "i", "a", "l", "l", "a", "o", "c"],
-      ["f", "a", "t", "A", "x", "i", "o", "V", "s", "P", "s", "N"],
-      ["S", "a", "a", "i", "z", "a", "a", "r", "V", "r", "o", "i"],
-      ["m", "p", "h", "a", "r", "s", "l", "g", "a", "i", "o", "l"],
-      ["M", "a", "m", "g", "l", "o", "i", "n", "L", "i", "r", "x"],
-      ["o", "l", "a", "a", "D", "n", "g", "a", "T", "a", "p", "a"],
-      ["p", "a", "L", "c", "o", "i", "d", "x", "P", "a", "c", "n"],
-      ["n", "d", "a", "z", "N", "z", "i", "V", "a", "a", "s", "a"],
-      ["r", "i", "d", "P", "o", "n", "s", "d", "A", "s", "p", "i"],
-      ["x", "r", "i", "n", "h", "t", "a", "r", "n", "d", "i", "L"],
-    ],
-    marks: [
-      { row: 0, column: 5, alt: ["v"] },
-      { row: 1, column: 0, alt: ["o"] },
-      { row: 1, column: 2, alt: ["b"] },
-      { row: 2, column: 1, alt: ["a"] },
-      { row: 2, column: 6, alt: ["z"] },
-      { row: 2, column: 7, alt: ["i"] },
-      { row: 2, column: 8, alt: ["n", "u"] },
-      { row: 3, column: 7, alt: ["i"] },
-      { row: 3, column: 8, alt: ["a", "e"] },
-      { row: 4, column: 0, alt: ["p"] },
-      { row: 4, column: 2, alt: ["c"] },
-      { row: 4, column: 6, alt: ["v"] },
-      { row: 4, column: 10, alt: ["x"] },
-      { row: 4, column: 11, alt: ["y", "l", "h"], reversed: true },
-      { row: 5, column: 4, alt: ["x"] },
-      { row: 5, column: 10, alt: ["c", "L"] },
-      { row: 8, column: 5, alt: ["a"] },
-      { row: 10, column: 5, alt: ["x"] },
-      { row: 11, column: 0, alt: ["i"] },
-      { row: 12, column: 2, alt: ["r"] },
-      { row: 12, column: 8, alt: ["a"] },
-      { row: 12, column: 11, reversed: true },
-    ],
+    choices: {
+      gd: [
+        { row: 1, column: 2, from: "equinox1912" }, // l: Olgota, Aalco
+        { row: 3, column: 7, from: "equinox1912" }, // l, where Regardie prints only i: Laoc
+        { row: 4, column: 6, from: "equinox1912" }, // o: Laoaxrp
+        { row: 4, column: 10, from: "equinox1912" }, // s: Vssn
+        { row: 4, column: 11, from: "equinox1912" }, // N, of Regardie's four letters (y and l over N and h)
+        { row: 5, column: 10, from: "equinox1912" }, // o, which Regardie does not print: Rvoi
+      ],
+    },
+    readings: {
+      regardie1940: {
+        rows: [
+          "TaOAduptDnim",
+          "aabcooromebb",
+          "TogconxmalGm",
+          "nhodDiailaoc",
+          "fatAxivVsPxy",
+          "SaaizaarVrci",
+          "mpharslgaiol",
+          "MamgloinLirx",
+          "olaaDngaTapa",
+          "paLcoidxPacn",
+          "ndazNziVaasa",
+          "ridPonsdAspi",
+          "xrinhtarndiL",
+        ],
+        marks: [
+          { row: 0, column: 5, below: ["v"] },
+          { row: 1, column: 0, below: ["o"] },
+          { row: 1, column: 2, below: ["l"] },
+          { row: 2, column: 1, below: ["a"] },
+          { row: 2, column: 6, below: ["z"] },
+          { row: 2, column: 7, below: ["i"] },
+          { row: 2, column: 8, below: ["n", "u"] },
+          { row: 3, column: 8, below: ["a"] },
+          { row: 4, column: 0, below: ["p"] },
+          { row: 4, column: 2, below: ["c"] },
+          { row: 4, column: 6, below: ["o"] },
+          { row: 4, column: 10, below: ["s"] },
+          { row: 4, column: 11, beside: ["l"], below: ["N", "h"] },
+          { row: 5, column: 4, below: ["x"] },
+          // Row 6 square 11: Regardie sets L large and first, with c small
+          // and raised beside it; the raised c is the higher letter, so it
+          // is the reading's first.
+          { row: 5, column: 10, below: ["L"] },
+          { row: 8, column: 5, below: ["a"] },
+          { row: 10, column: 5, below: ["x"] },
+          { row: 11, column: 0, below: ["i"] },
+          { row: 12, column: 2, below: ["r"] },
+          { row: 12, column: 8, below: ["a"] },
+        ],
+      },
+      equinox1912: {
+        rows: [
+          "TaOAdvptDnim",
+          "aalcooromebb",
+          "TogconzinlGm",
+          "nhodDialaaoc",
+          "patAxioVsPsN",
+          "SaaizaarVroi",
+          "mpharslgaiol",
+          "MamgloinLirx",
+          "olaaDagaTapa",
+          "paLcoidxPacn",
+          "ndazNziUaasa",
+          "iidPonsdAspi",
+          "xrinhtarndiL",
+        ],
+        marks: [
+          { row: 4, column: 11, reversed: true },
+          { row: 12, column: 11, reversed: true },
+        ],
+      },
+      greer: {
+        rows: [
+          "TaOAduptDnim",
+          "oalcooromebb",
+          "TagconxmalGm",
+          "nhodDialeaoc",
+          "patAxioVsPsN",
+          "SaaizaarVroi",
+          "mpharslgaiol",
+          "MamgloinLirx",
+          "olaaDagaTapa",
+          "palcoidxPacn",
+          "ndazNziVaasa",
+          "iidPonsdAspi",
+          "xrinhtarndiL",
+        ],
+        marks: [
+          { row: 4, column: 11, reversed: true },
+          { row: 12, column: 11, reversed: true },
+        ],
+      },
+      dee1584: {
+        rows: [
+          "TaOAduptDnIm",
+          "aabcooromebb",
+          "TogconxmalGm",
+          "nhodDialeaoc",
+          "patAxioVsPsN",
+          "SaaixaarVroi",
+          "mpharslgaiol",
+          "MamgloinLirx",
+          "olaaDagaTapa",
+          "paLcoidxPacn",
+          "ndazNxiVaasa",
+          "iidPonsdaspi",
+          "xrinhtarndiL",
+        ],
+        marks: [
+          { row: 4, column: 2, dictated: ["c"], doubt: "medium" },
+          { row: 4, column: 11, dictated: ["y", "l"], reversed: true, doubt: "high" },
+          { row: 12, column: 3, dictated: ["i"], doubt: "medium" },
+          { row: 12, column: 11, reversed: true, doubt: "low" },
+        ],
+      },
+      raphael1587: {
+        rows: [
+          "taoadvptdnim",
+          "aabcooromebb",
+          "togconxmalgm",
+          "nhoddialeaoc",
+          "pataxiovspsn",
+          "saaixaarvroi",
+          "mpharslgaiol",
+          "mamgloinlirx",
+          "olaadngatapa",
+          "palcoidxpacn",
+          "ndaznzivaasa",
+          "iidponsdaspi",
+          "xrinhtarndiL",
+        ],
+        marks: [
+          { row: 3, column: 8, misprint: "c", doubt: "low" },
+          { row: 3, column: 11, misprint: "o", doubt: "low" },
+          { row: 4, column: 11, reversed: true, doubt: "medium" },
+          { row: 12, column: 11, reversed: true, doubt: "medium" },
+        ],
+      },
+    },
   },
   fire: {
     id: "fire",
     kind: "watchtower",
-    grid: [
-      ["d", "o", "n", "p", "a", "T", "d", "a", "n", "V", "a", "a"],
-      ["o", "l", "o", "a", "G", "e", "o", "o", "b", "a", "u", "a"],
-      ["O", "P", "a", "m", "n", "o", "v", "G", "m", "d", "n", "m"],
-      ["a", "p", "l", "s", "T", "e", "d", "e", "c", "a", "o", "p"],
-      ["s", "c", "m", "i", "o", "o", "n", "A", "m", "l", "o", "x"],
-      ["V", "a", "r", "s", "G", "d", "L", "b", "r", "i", "a", "p"],
-      ["o", "i", "P", "t", "e", "a", "a", "p", "D", "o", "c", "e"],
-      ["P", "s", "u", "a", "c", "n", "r", "Z", "i", "r", "z", "a"],
-      ["S", "i", "o", "d", "a", "o", "i", "n", "r", "z", "f", "m"],
-      ["d", "a", "l", "t", "T", "d", "n", "a", "d", "i", "r", "e"],
-      ["d", "i", "x", "o", "m", "o", "n", "s", "i", "o", "s", "p"],
-      ["O", "o", "D", "p", "z", "i", "A", "p", "a", "n", "l", "i"],
-      ["r", "g", "o", "a", "n", "n", "P", "A", "C", "r", "a", "r"],
-    ],
-    marks: [
-      { row: 1, column: 10, alt: ["v"] },
-      { row: 1, column: 11, alt: ["i"] },
-      { row: 2, column: 6, alt: ["o"] },
-      { row: 2, column: 8, alt: ["n"] },
-      { row: 3, column: 1, alt: ["b"] },
-      { row: 3, column: 6, alt: ["c"] },
-      { row: 4, column: 4, alt: ["a"] },
-      { row: 4, column: 5, alt: ["a"] },
-      { row: 5, column: 7, alt: ["v"] },
-      { row: 7, column: 2, alt: ["v"] },
-      { row: 9, column: 2, alt: ["b"] },
-      { row: 12, column: 6, alt: ["O"], reversed: true },
-      { row: 12, column: 7, reversed: true },
-    ],
+    choices: {
+      gd: [
+        { row: 3, column: 6, from: "equinox1912" }, // d: Alndvod
+        { row: 4, column: 5, from: "equinox1912" }, // o, where Regardie prints only a: Adoeoet
+        { row: 12, column: 6, from: "equinox1912" }, // P, reversed: Arinnap (Regardie O over p)
+      ],
+    },
+    readings: {
+      regardie1940: {
+        rows: [
+          "donpaTdanVaa",
+          "oloaGeoobaua",
+          "OPamnovGmdnm",
+          "aplsTececaop",
+          "scmioanAmlox",
+          "VarsGdLbriap",
+          "oiPteaapDoce",
+          "PsuacnrZirza",
+          "Siodaoinrzfm",
+          "daltTdnadire",
+          "dixomonsiosp",
+          "OoDpziApanli",
+          "rgoannOACrar",
+        ],
+        marks: [
+          { row: 1, column: 10, below: ["v"] },
+          { row: 1, column: 11, below: ["i"] },
+          { row: 2, column: 6, below: ["o"] },
+          { row: 2, column: 8, below: ["n"] },
+          { row: 3, column: 1, below: ["b"] },
+          { row: 3, column: 6, below: ["d"] },
+          { row: 5, column: 7, below: ["v"] },
+          { row: 7, column: 2, below: ["v"] },
+          { row: 9, column: 2, below: ["b"] },
+          { row: 12, column: 6, below: ["p"] },
+        ],
+      },
+      equinox1912: {
+        rows: [
+          "donpaTdanVaa",
+          "oloaGeoobava",
+          "OPamnoOGmdnm",
+          "ablsTedecaop",
+          "scmiaonAmlox",
+          "VarsGdLbriap",
+          "oiPteaapDoce",
+          "psuacnrZirZa",
+          "Siodaoinrzfm",
+          "daltTdnadire",
+          "dixomonsiosp",
+          "OoDpziApanli",
+          "rgoannPACrar",
+        ],
+        marks: [
+          { row: 12, column: 6, reversed: true },
+          { row: 12, column: 7, reversed: true },
+        ],
+      },
+      greer: {
+        rows: [
+          "donpaTdanVaa",
+          "oloaGeoobaua",
+          "OPamnoOGmdnm",
+          "aplsTedecaop",
+          "scmioonAmlox",
+          "VarsGdLbriap",
+          "oiPteaapDoce",
+          "psuacnrZirZa",
+          "Siodaoinrzfm",
+          "daltTdnadire",
+          "dixomonsiosp",
+          "OoDpziApanli",
+          "rgoannPACrar",
+        ],
+        marks: [
+          { row: 12, column: 6, reversed: true },
+        ],
+      },
+      dee1584: {
+        rows: [
+          "donpaTdanVa.",
+          "oloaGeooba.i",
+          "oPamnoOGmdnm",
+          "aplsTedecaop",
+          "scmioonAmlox",
+          "VarsGdLbriap",
+          "oiPteaapdoce",
+          "psuacnrZirZa",
+          "Siodaoinrzfm",
+          "daltTdnadire",
+          "dixomonsiosp",
+          "OoDpziApanli",
+          "rgoannPACrar",
+        ],
+        marks: [
+          { row: 0, column: 11, alt: ["a"], doubt: "medium" },
+          { row: 1, column: 10, alt: ["v"], doubt: "medium" },
+          { row: 1, column: 11, doubt: "high" },
+          { row: 12, column: 6, reversed: true, doubt: "low" },
+          { row: 12, column: 7, reversed: true, doubt: "low" },
+        ],
+      },
+      raphael1587: {
+        rows: [
+          "donpatdanvaa",
+          "oloageoobava",
+          "opamnovgmdnm",
+          "aplstedecaop",
+          "scmioonamlox",
+          "varsgdlbriap",
+          "oipteaapdoce",
+          "xsvacNrzirza",
+          "siodaoinrzfm",
+          "dalttdnadire",
+          "dixomonsiosp",
+          "oodxziapanli",
+          "rgoannpacrar",
+        ],
+        marks: [
+          { row: 0, column: 9, misprint: "o", doubt: "low" },
+          { row: 5, column: 2, misprint: "v", doubt: "low" },
+          { row: 5, column: 7, misprint: "v", doubt: "medium" },
+          { row: 7, column: 0, alt: ["p"], doubt: "high" },
+          { row: 11, column: 3, alt: ["p"], doubt: "high" },
+          { row: 12, column: 6, reversed: true, doubt: "low" },
+          { row: 12, column: 7, reversed: true, doubt: "medium" },
+        ],
+      },
+    },
   },
   union: {
     id: "union",
     kind: "union",
-    grid: [
-      ["E", "X", "A", "R", "P"],
-      ["H", "C", "O", "M", "A"],
-      ["N", "A", "N", "T", "A"],
-      ["B", "I", "T", "O", "M"],
-    ],
+    readings: {
+      regardie1940: {
+        rows: [
+          "EXARP",
+          "HCOMA",
+          "NANTA",
+          "BITOM",
+        ],
+      },
+      equinox1912: {
+        rows: [
+          "EXARP",
+          "HCOMA",
+          "NANTA",
+          "BITOM",
+        ],
+      },
+      greer: {
+        rows: [
+          "EXARP",
+          "HCOMA",
+          "NANTA",
+          "BITOM",
+        ],
+      },
+    },
   },
 }
