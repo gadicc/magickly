@@ -21,10 +21,28 @@ export const TABLET_VIEWBOX = [-105, 0, 210, 297] as const;
 
 export const TABLET_FONTS = ["latin", "enochian"] as const;
 
+/**
+ * The versions a tablet draws in, the Golden Dawn's (`gd`) first and by
+ * default: magick-data's `TABLET_VERSIONS`, written out so that the
+ * contracts do not pull in the tablets' data; a test holds the two equal.
+ */
+export const TABLET_IMAGE_VERSIONS = [
+  "gd",
+  "regardie",
+  "equinox",
+  "dee",
+  "raphael",
+] as const;
+
 export interface EnochianTabletProps extends ImageDimensions {
   id: (typeof TABLET_IDS)[number];
   /** Latin transliteration, or the bundled Enochian Plain glyphs. */
   font: (typeof TABLET_FONTS)[number];
+  /**
+   * Whose letters and sigil: the Golden Dawn's when absent, as for a link
+   * made before the versions.
+   */
+  version?: (typeof TABLET_IMAGE_VERSIONS)[number];
 }
 
 /** The grid letters are transliterations; the Enochian font maps them to glyphs. */
@@ -32,12 +50,16 @@ export const enochianTablet: ComponentImageContract<EnochianTabletProps> = {
   slug: "enochian-tablet",
   viewBox: TABLET_VIEWBOX,
   rasterDefault: { width: 840, height: 1188 },
-  keys: ["id", "font"],
+  keys: ["id", "font", "version"],
   personal: false,
   parse(searchParams) {
     return {
       id: choice(searchParams.get("id") || "earth", TABLET_IDS),
       font: choice(searchParams.get("font") || "latin", TABLET_FONTS),
+      version: choice(
+        searchParams.get("version") || "gd",
+        TABLET_IMAGE_VERSIONS,
+      ),
       ...parseDimensions(searchParams, TABLET_VIEWBOX),
     };
   },
@@ -45,8 +67,10 @@ export const enochianTablet: ComponentImageContract<EnochianTabletProps> = {
     const pairs: Array<[string, string]> = [];
     if (props.id !== "earth") pairs.push(["id", props.id]);
     if (props.font !== "latin") pairs.push(["font", props.font]);
+    if (props.version && props.version !== "gd")
+      pairs.push(["version", props.version]);
     return [...pairs, ...canonicalDimensions(props)];
   },
   filename: (props) =>
-    `enochian-${props.id}-tablet${props.font === "enochian" ? "-glyphs" : ""}`,
+    `enochian-${props.id}-tablet${props.version && props.version !== "gd" ? `-${props.version}` : ""}${props.font === "enochian" ? "-glyphs" : ""}`,
 };

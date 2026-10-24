@@ -128,6 +128,7 @@ describe("component image registry", () => {
     ["enochian-tablet", "", 840, 1188, 300],
     ["enochian-tablet", "id=air&height=297", 210, 297, 300],
     ["enochian-tablet", "font=enochian", 840, 1188, 300],
+    ["enochian-tablet", "id=fire&version=dee", 840, 1188, 300],
     ["seven-branched-candlestick", "", 1024, 1024, 60],
     ["table-of-shewbread", "", 1024, 1024, 130],
     ["rose-sigil", "text=גדי", 1024, 1024, 26],
@@ -206,6 +207,33 @@ describe("component image registry", () => {
       "id=air&font=enochian",
       223_063,
       "1a637907b7e36e97a1cfcd08f2086141c14ec7f0ab642fd9cdc03dca0cdb4a78",
+    ],
+    // One tablet in each other version, reviewed as rasterised (plan 061,
+    // "Tablet versions"): Regardie's sigil, the Equinox's in black, and
+    // for Dee's and Raphael's tables the note where the sigil would be.
+    [
+      "enochian-tablet",
+      "id=fire&version=regardie",
+      129_479,
+      "41657fe69438e1b3d39045e6a8e106d6b33163ac8c656943eed667f7bfd422e8",
+    ],
+    [
+      "enochian-tablet",
+      "id=fire&version=equinox",
+      129_492,
+      "36552c46496b0c69fa208559bb6cae0bd587cd2263ff33cb5fbd4b2b7e034315",
+    ],
+    [
+      "enochian-tablet",
+      "id=fire&version=dee",
+      196_786,
+      "54f3e8a9a8adb89898a5767995cdf88b995e161cbdfbbfa5bd8a564474b6dae0",
+    ],
+    [
+      "enochian-tablet",
+      "id=fire&version=raphael",
+      201_612,
+      "7996e0277aa287e480ac1aa396c1e75c86c2e200b57e84885df9808490b0a56b",
     ],
     // 136,294 bytes and df3c3791… until Manasseh's Hebrew name stopped being
     // Benjamin's; the Gemini branch is one glyph shorter and one wider.

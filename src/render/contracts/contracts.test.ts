@@ -1,4 +1,5 @@
 import { WATCHTOWER_VIEWBOX } from "@magick-components/enochian/Tablet";
+import { TABLET_VERSIONS } from "magick-data/enochian/tablets";
 import { describe, expect, it } from "vitest";
 import { parseComponentImageRequest } from "../componentImageRequest";
 import { componentImageQuery } from "../componentImageUrl";
@@ -7,7 +8,7 @@ import {
   mothersFromString,
   mothersToString,
 } from "./astroGeomancyChart";
-import { TABLET_VIEWBOX } from "./enochianTablet";
+import { TABLET_IMAGE_VERSIONS, TABLET_VIEWBOX } from "./enochianTablet";
 import {
   COMPONENT_IMAGE_SLUGS,
   CONTRACTS,
@@ -57,6 +58,8 @@ describe("component image contracts", () => {
       "id=earth&height=600",
       "font=enochian",
       "id=air&font=enochian&width=420",
+      "id=fire&version=dee",
+      "version=equinox&font=enochian",
     ],
     "seven-branched-candlestick": ["", "width=300", "width=100&height=100"],
     "table-of-shewbread": ["", "width=300"],
@@ -192,12 +195,30 @@ describe("component image contracts", () => {
     expect([...TABLET_VIEWBOX]).toEqual([...WATCHTOWER_VIEWBOX]);
   });
 
+  it("offers the tablets' versions, the Golden Dawn's by default", () => {
+    expect([...TABLET_IMAGE_VERSIONS]).toEqual([...TABLET_VERSIONS]);
+    expect(parse("enochian-tablet", "").version).toBe("gd");
+    expect(
+      componentImageQuery({
+        slug: "enochian-tablet",
+        props: parse("enochian-tablet", "version=gd"),
+      }).toString(),
+    ).toBe("");
+    expect(
+      CONTRACTS["enochian-tablet"].filename(
+        parse("enochian-tablet", "id=fire&version=dee&font=enochian"),
+      ),
+    ).toBe("enochian-fire-tablet-dee-glyphs");
+  });
+
   it("rejects unknown tablets and keys on the new slugs", () => {
     for (const [slug, query] of [
       ["enochian-tablet", "id=union"],
       ["enochian-tablet", "id=Earth"],
       ["enochian-tablet", "font=Enochian"],
       ["enochian-tablet", "font=hebrew"],
+      ["enochian-tablet", "version=Dee"],
+      ["enochian-tablet", "version=golden"],
       ["table-of-shewbread", "font=enochian"],
       ["seven-branched-candlestick", "id=earth"],
       ["astro-geomancy-chart", "m=1211111221111212&m=1211111221111212"],

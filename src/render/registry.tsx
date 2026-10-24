@@ -115,6 +115,7 @@ export const COMPONENT_IMAGE_REGISTRY: {
     render: (props) => (
       <Tablet
         id={props.id}
+        version={props.version}
         frame={false}
         // The image keeps the bytes it was published with; a page that
         // shows it gives it its own alt text.
