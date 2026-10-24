@@ -741,13 +741,21 @@
 </g>
 </g>
 <g id="_R_0_-art14">
-<circle r="47" fill="#ffffff" stroke="#888888" stroke-width="2.5" stroke-dasharray="7 5">
+<rect x="-47" y="-47" width="94" height="94" rx="8" fill="#d3d7dc" stroke="#000000" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
+</rect>
+<path d="M-2.151,-2.091L-33.849,-32.909M2.151,-2.091L33.849,-32.909M-2.151,2.091L-33.849,32.909M2.183,2.058L35,33M30,-21Q47.5,6 35,33M-38,-16Q-15.75,-3.5 -38.5,9M0,-38V-10.5M-13.5,-27H13.5M0,-27L-11.5,-37.5M0,-27L11.5,-37.5M-2,-38H2M-14,-37.5H-9.5M9.5,-37.5H14" fill="none" stroke="#000000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+</path>
+<circle cx="0" cy="25" r="12.5" fill="none" stroke="#000000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
 </circle>
-<circle r="39" fill="none" stroke="#888888" stroke-width="1">
+<g fill="#d3d7dc" stroke="#000000" stroke-width="2.4">
+<circle cx="0" cy="0" r="3">
 </circle>
-<g fill="#888888" font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" font-size="13" text-anchor="middle" style="font-variant-ligatures:none;font-kerning:normal">
-<text y="-3.12">Seals of</text>
-<text y="12.48">Venus</text>
+<circle cx="-36" cy="-35" r="3">
+</circle>
+<circle cx="36" cy="-35" r="3">
+</circle>
+<circle cx="-36" cy="35" r="3">
+</circle>
 </g>
 </g>
 <g id="_R_0_-art15">

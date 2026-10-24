@@ -10,6 +10,7 @@ import {
   type Planet,
 } from "../planets";
 import type { HallArt, HallArtProps, HallAttrSpec, HallNode } from "../types";
+import { SEALS, sealProvenance } from "./seals";
 import { original, PALETTE, variantOf } from "./shared";
 
 export const kameaProvenance = original(
@@ -17,10 +18,7 @@ export const kameaProvenance = original(
     "computes (astrology/kameas): the shared Kamea component's figure, a " +
     "grid with each number in its cell.",
 );
-export const sealProvenance = original(
-  "A placeholder for a planet's seals: a dashed ring naming the planet. " +
-    "The seals themselves are to be drawn (plan 061, stage H).",
-);
+export { sealProvenance };
 
 /** Every art module exports its provenance; these two share a module. */
 export const provenance = [kameaProvenance, sealProvenance];
@@ -66,6 +64,8 @@ const SEAL_WIDTH = 64;
 
 function Seal({ node }: HallArtProps) {
   const planet = planetOf(node);
+  const Drawn = planet && SEALS.get(planet);
+  if (Drawn) return <Drawn />;
   const name = planet && PLANET_NAMES.get(planet);
   const lines = name ? wrapText(`Seals of ${name}`, SEAL_WIDTH, SEAL_SIZE) : [];
   const advance = SEAL_SIZE * 1.2;
@@ -103,8 +103,9 @@ function Seal({ node }: HallArtProps) {
 }
 
 /**
- * A planet's seals (`seal(planet="moon")`), 100 × 100. A placeholder
- * until the seals are drawn: a dashed ring with "Seals of Luna" in it.
+ * A planet's seals (`seal(planet="moon")`), 100 × 100: the Moon's and
+ * Venus' seals after Agrippa (`seals.tsx`); for the other planets, until
+ * theirs are drawn, a dashed ring with "Seals of Sol" in it.
  */
 export const sealArt: HallArt = {
   Component: Seal,

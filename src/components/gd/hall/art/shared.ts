@@ -10,6 +10,19 @@ export function original(notes: string): HallArtProvenance {
   };
 }
 
+/**
+ * Provenance of art drawn for this package from geometry after a
+ * public-domain original: the drawing (our code and paths) is MIT like
+ * the rest, while the design it follows is in the public domain, on the
+ * recorded `basis`. `source` cites the original by a stable reference.
+ */
+export function publicDomain(
+  notes: string,
+  { source, basis }: { source: string; basis: string },
+): HallArtProvenance {
+  return { ...original(`${notes} Public domain: ${basis}`), source };
+}
+
 /** `HallArt.variant` for art that draws every node alike. */
 export const sameForEveryNode = (): string => "";
 

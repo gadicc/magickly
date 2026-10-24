@@ -45,7 +45,10 @@ export interface HallArtProvenance {
   origin: "original" | "thirdParty";
   author: string;
   licence: string;
-  /** Where it was taken from, for third-party or ported art. */
+  /**
+   * Where it was taken from: for third-party or ported art, or for
+   * original art drawn after a cited public-domain source.
+   */
   source?: string;
   notes?: string;
 }

@@ -517,13 +517,44 @@ describe("the kameas and seals", () => {
     );
   });
 
-  it("marks the seals as a placeholder naming the planet", () => {
-    const seal = draw(art("seal"), { type: "seal", planet: "moon" });
+  it("draws the Moon's and Venus' seals on silver, after Agrippa", () => {
+    const moon = draw(art("seal"), { type: "seal", planet: "moon" });
+    const venus = draw(art("seal"), { type: "seal", planet: "venus" });
+    for (const [planet, seal] of [
+      ["moon", moon],
+      ["venus", venus],
+    ]) {
+      expect(seal, planet).toContain(`fill="${PALETTE.silver}"`);
+      expect(seal, planet).not.toContain("stroke-dasharray");
+      expect(seal, planet).not.toMatch(/<text|\sid=|href|url\(/);
+      expect(seal.length, planet).toBeLessThan(4000);
+    }
+    // The Moon's: a ring at the centre, four in the corners and two on
+    // each of the four crescents' horns.
+    expect(moon.match(/<circle /g)).toHaveLength(13);
+    expect(moon.match(/A[\d.]+,[\d.]+ 0 0 [01]/g)).toHaveLength(12);
+    // Venus': the centre and three arms' ends ringed, and the ring below.
+    expect(venus.match(/<circle /g)).toHaveLength(5);
+    // Every line engraved at one weight: no filled figure (the left arc
+    // is an open stroke, as on leaf n166).
+    expect(venus).not.toMatch(/<path [^>]*fill="#000000"/);
+    expect(moon).not.toBe(venus);
+    // Provenance names the book, the copy and the leaves.
+    const { provenance } = art("seal");
+    expect(provenance.origin).toBe("original");
+    expect(provenance.source).toContain("DeOccultaPhilosophiaLoc1533");
+    expect(provenance.source).toMatch(/n166.*n168/);
+    expect(provenance.notes).toContain("Public domain:");
+  });
+
+  it("marks the other planets' seals as a placeholder naming the planet", () => {
+    const seal = draw(art("seal"), { type: "seal", planet: "sun" });
     expect(seal).toContain("stroke-dasharray");
-    expect(seal).toMatch(/>Seals of<\/text><text [^>]*>Luna<\/text>/);
-    expect(draw(art("seal"), { type: "seal", planet: "sun" })).toMatch(
-      />Sol<\/text>/,
-    );
+    expect(seal).toMatch(/>Seals of<\/text><text [^>]*>Sol<\/text>/);
+    for (const planet of ["saturn", "jupiter", "mars", "mercury"])
+      expect(draw(art("seal"), { type: "seal", planet }), planet).toContain(
+        "stroke-dasharray",
+      );
     expect(draw(art("seal"), { type: "seal" })).not.toContain("<text");
   });
 
