@@ -727,6 +727,32 @@ describe("the properties panel", () => {
     expect(screen.getByRole("combobox", { name: "Light colour" })).toBeTruthy();
   });
 
+  it("offers a grade's lamen only to the officers who wear one", () => {
+    setup(
+      hallFromPug(
+        "gdHall",
+        "  floor",
+        '    officer(role="hiereus", grade="portal", x=3, y=3)',
+        '    officer(role="keryx", x=6, y=6)',
+        '    officer(role="hegemon", x=9, y=9)',
+      ),
+    );
+    const surface = screen.getByRole("application");
+    key(surface, "Tab");
+    expect(
+      screen.getByRole("combobox", { name: "Lamen of the grade" }).textContent,
+    ).toBe("portal");
+    expect(screen.getByText("Hiereus (Portal)")).toBeTruthy();
+    key(surface, "Tab");
+    expect(
+      screen.queryByRole("combobox", { name: "Lamen of the grade" }),
+    ).toBeNull();
+    key(surface, "Tab");
+    expect(
+      screen.getByRole("combobox", { name: "Lamen of the grade" }),
+    ).toBeTruthy();
+  });
+
   it("offers a board's width and height only without a diagram", () => {
     setup(
       hallFromPug(

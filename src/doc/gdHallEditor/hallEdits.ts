@@ -15,6 +15,11 @@ import {
   type BoardKind,
   roleName,
 } from "@magick-components/gd/hall/vocabulary";
+import {
+  hasGradeLamen,
+  LAMEN_GRADE_NAMES,
+  type LamenGrade,
+} from "@magick-components/gd/lamenGrades";
 import type { JsonValue } from "../semantic";
 import {
   compareRowPaths,
@@ -127,12 +132,14 @@ export function hallNodeName(node: HallElement): string {
   const tag = node.tag;
   const role = text(node, "role");
   const kind = text(node, "kind");
-  if (tag === "officer" || tag === "lamen")
-    return role
-      ? clip(roleName(role))
-      : tag === "officer"
-        ? "Officer"
-        : "Lamen";
+  if (tag === "officer" || tag === "lamen") {
+    if (!role) return tag === "officer" ? "Officer" : "Lamen";
+    // The Portal's Hiereus and Hegemon, who wear lamens of their own.
+    const grade = text(node, "grade");
+    return grade && hasGradeLamen(role, grade)
+      ? `${clip(roleName(role))} (${LAMEN_GRADE_NAMES.get(grade as LamenGrade)})`
+      : clip(roleName(role));
+  }
   if (tag === "item") return kind ? clip(itemKindLabel(kind)) : "Item";
   if (tag === "label" || tag === "marker")
     return clip(text(node, "text") ?? (tag === "label" ? "Label" : "Marker"));

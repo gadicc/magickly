@@ -715,12 +715,38 @@
 <g id="_R_0_-art11">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
-<circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
+<circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:yellow;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
 </circle>
-<circle cx="0" cy="0" r="42" style="color:#000;overflow:visible;fill:#000;stroke:#000;stroke-width:1;paint-order:stroke fill markers;stop-color:#000">
+<circle cx="0" cy="0" r="42" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;paint-order:stroke fill markers;stop-color:#000">
 </circle>
-<path d="M 0 0 h2.482v2.02h-2.482v5.043h-2.02v-5.043h-2.482v-2.02h2.481v-2.515h2.02z" style="fill:white" transform="scale(7.2) translate(1,-2.2)">
-</path>
+<g fill="none" stroke-linejoin="miter">
+<polygon points="0,31 -26.847,-15.5 26.847,-15.5" stroke="#000000" stroke-width="7.8">
+</polygon>
+<polygon points="0,31 -26.847,-15.5 26.847,-15.5" stroke="#406ab3" stroke-width="5">
+</polygon>
+<polygon points="0,-31 26.847,15.5 -26.847,15.5" stroke="#000000" stroke-width="7.8">
+</polygon>
+<polygon points="0,-31 26.847,15.5 -26.847,15.5" stroke="#d92128" stroke-width="5">
+</polygon>
+<g>
+<polyline points="22.188,-7.43 13.608,7.43" stroke="#000000" stroke-width="7.8">
+</polyline>
+<polyline points="22.688,-8.297 13.108,8.297" stroke="#406ab3" stroke-width="5">
+</polyline>
+</g>
+<g>
+<polyline points="-4.659,22.93 -13.239,8.07" stroke="#000000" stroke-width="7.8">
+</polyline>
+<polyline points="-4.159,23.797 -13.739,7.203" stroke="#406ab3" stroke-width="5">
+</polyline>
+</g>
+<g>
+<polyline points="-17.529,-15.5 -0.369,-15.5" stroke="#000000" stroke-width="7.8">
+</polyline>
+<polyline points="-18.529,-15.5 0.631,-15.5" stroke="#406ab3" stroke-width="5">
+</polyline>
+</g>
+</g>
 </svg>
 </g>
 </g>
@@ -1791,12 +1817,48 @@
 <g id="_R_0_-art17">
 <g transform="translate(-50 -50)">
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
-<circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
+<circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:red;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
 </circle>
 <circle cx="0" cy="0" r="42" style="color:#000;overflow:visible;fill:#000;stroke:#000;stroke-width:1;paint-order:stroke fill markers;stop-color:#000">
 </circle>
-<path d="m114.746 96.37-4.93 8.54h9.86zm0 2.13 3.087 5.346h-6.174z" style="fill:white" transform="scale(6) translate(-114.7,-101.5)">
+<path d="M0,0L-29.698,-29.698A42,42 0 0 1 29.698,-29.698Z" fill="#a9aa66">
 </path>
+<path d="M0,0L29.698,-29.698A42,42 0 0 1 29.698,29.698Z" fill="#444f41">
+</path>
+<path d="M0,0L29.698,29.698A42,42 0 0 1 -29.698,29.698Z" fill="#2c2b29">
+</path>
+<path d="M0,0L-29.698,29.698A42,42 0 0 1 -29.698,-29.698Z" fill="#8f5642">
+</path>
+<circle r="42" fill="none" stroke="#000000" stroke-width="1">
+</circle>
+<g fill="none" stroke-linejoin="miter">
+<polygon points="0,31 -26.847,-15.5 26.847,-15.5" stroke="#000000" stroke-width="7.8">
+</polygon>
+<polygon points="0,31 -26.847,-15.5 26.847,-15.5" stroke="#ffffff" stroke-width="5">
+</polygon>
+<polygon points="0,-31 26.847,15.5 -26.847,15.5" stroke="#000000" stroke-width="7.8">
+</polygon>
+<polygon points="0,-31 26.847,15.5 -26.847,15.5" stroke="#ffffff" stroke-width="5">
+</polygon>
+<g>
+<polyline points="22.188,-7.43 13.608,7.43" stroke="#000000" stroke-width="7.8">
+</polyline>
+<polyline points="22.688,-8.297 13.108,8.297" stroke="#ffffff" stroke-width="5">
+</polyline>
+</g>
+<g>
+<polyline points="-4.659,22.93 -13.239,8.07" stroke="#000000" stroke-width="7.8">
+</polyline>
+<polyline points="-4.159,23.797 -13.739,7.203" stroke="#ffffff" stroke-width="5">
+</polyline>
+</g>
+<g>
+<polyline points="-17.529,-15.5 -0.369,-15.5" stroke="#000000" stroke-width="7.8">
+</polyline>
+<polyline points="-18.529,-15.5 0.631,-15.5" stroke="#ffffff" stroke-width="5">
+</polyline>
+</g>
+</g>
 </svg>
 </g>
 </g>

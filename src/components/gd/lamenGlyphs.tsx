@@ -3,9 +3,10 @@ import { type Point, points, polar } from "./hall/art/geometry";
 import { PALETTE } from "./hall/art/shared";
 
 /**
- * The glyphs `Lamen` draws in colour (plan 061, stage H, part 2): the
- * adepts' lamens from the Portal's rubric. Each is drawn from geometry in
- * `Lamen`'s −50…50 box, inside the disc (radius 42), and defines no ids.
+ * The glyphs `Lamen` draws in colour (plan 061, stage H, part 2), from the
+ * Portal's rubric: the adepts' lamens, and the Hiereus' and Hegemon's
+ * own in the Portal. Each is drawn from geometry in `Lamen`'s −50…50 box,
+ * inside the disc (radius 42), and defines no ids.
  */
 
 /** A circle as path data, so several join one path. */
@@ -144,4 +145,104 @@ export function CupOnOctagram() {
       <path d={CUP} fill={PALETTE.water} />
     </g>
   );
+}
+
+/** The Portal hexagrams' size, in lamen units. */
+const STAR = 31;
+const BAND = 5;
+const EDGE = 1.4;
+
+const at = (degrees: number, r: number): Point => {
+  const [x, y] = polar(r, degrees);
+  return [svgCoordinate(x), svgCoordinate(y)];
+};
+const HEX_UP = points([-90, 30, 150].map((angle) => at(angle, STAR)));
+const HEX_DOWN = points([90, 210, 330].map((angle) => at(angle, STAR)));
+
+/**
+ * Where the downward triangle passes over the upward one: three of the
+ * six crossings, alternating, as short pieces of its edges drawn again on
+ * top (as the Pantacle's hexagram is interlaced). The coloured piece runs
+ * a little past the black one, so no seam shows on the band it continues.
+ */
+const HEX_OVER = [0, 120, 240].map((angle) => {
+  const [x, y] = at(angle, STAR / Math.sqrt(3));
+  const piece = (half: number) => {
+    const [dx, dy] = polar(half, angle + 120);
+    return points([
+      [x - dx, y - dy],
+      [x + dx, y + dy],
+    ]);
+  };
+  const black = 1.1 * (BAND + 2 * EDGE);
+  return { black: piece(black), colour: piece(black + 1) };
+});
+
+/** A band along a triangle: black edges, the colour between. */
+function Band({ at, colour }: { at: string; colour: string }) {
+  return (
+    <>
+      <polygon points={at} stroke={PALETTE.ink} strokeWidth={BAND + 2 * EDGE} />
+      <polygon points={at} stroke={colour} strokeWidth={BAND} />
+    </>
+  );
+}
+
+/** An interlaced hexagram of bands, the downward triangle over at three crossings. */
+function Hexagram({ up, down }: { up: string; down: string }) {
+  return (
+    <g fill="none" strokeLinejoin="miter">
+      <Band at={HEX_DOWN} colour={down} />
+      <Band at={HEX_UP} colour={up} />
+      {HEX_OVER.map(({ black, colour }) => (
+        <g key={black}>
+          <polyline
+            points={black}
+            stroke={PALETTE.ink}
+            strokeWidth={BAND + 2 * EDGE}
+          />
+          <polyline points={colour} stroke={down} strokeWidth={BAND} />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+/** A quarter of the disc (radius 42) centred on `degrees`. */
+const quarter = (degrees: number) => {
+  const [x0, y0] = at(degrees - 45, 42);
+  const [x1, y1] = at(degrees + 45, 42);
+  return `M0,0L${x0},${y0}A42,42 0 0 1 ${x1},${y1}Z`;
+};
+const MALKUTH_QUARTERS = [
+  { d: quarter(-90), fill: PALETTE.citrine },
+  { d: quarter(0), fill: PALETTE.olive },
+  { d: quarter(90), fill: PALETTE.earthBlack },
+  { d: quarter(180), fill: PALETTE.russet },
+];
+
+/**
+ * The Hiereus' lamen in the Portal (Regardie 1938, vol. 2, p.156): a
+ * white hexagram on the four colours of Malkuth, the disc quartered as
+ * the Pantacle's, citrine above.
+ */
+export function PortalHiereus() {
+  return (
+    <>
+      {MALKUTH_QUARTERS.map(({ d, fill }) => (
+        <path key={fill} d={d} fill={fill} />
+      ))}
+      <circle r={42} fill="none" stroke={PALETTE.ink} strokeWidth={1} />
+      <Hexagram up={PALETTE.paper} down={PALETTE.paper} />
+    </>
+  );
+}
+
+/**
+ * The Hegemon's lamen in the Portal (Regardie 1938, vol. 2, p.156): a
+ * red and blue hexagram on a white ground, Fire's triangle pointing up
+ * and Water's down.
+ */
+export function PortalHegemon() {
+  return <Hexagram up={PALETTE.fire} down={PALETTE.water} />;
 }

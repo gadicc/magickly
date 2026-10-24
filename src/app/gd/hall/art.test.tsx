@@ -192,12 +192,17 @@ describe("the app's hall art in a hostile hall", () => {
         { type: "item", kind: "lantern", light: "yellow" },
         { type: "officer", role: "keryx" },
         { type: "officer", role: "hegemon" },
+        { type: "officer", role: "hegemon", grade: "nonsense" },
+        { type: "officer", role: "hegemon", grade: "portal" },
+        { type: "officer", role: "keryx", grade: "portal" },
         { type: "officer" },
         { type: "officer", role: "" },
       ]),
     );
     // lamp (red, default and named), lamp (white), lantern (yellow,
-    // default and named), Keryx, Hegemon, and the plain circle for no role.
-    expect(drawings(markup)).toBe(6);
+    // default and named), Keryx (a grade changes nothing), Hegemon (an
+    // unknown grade is the Outer Order's), the Portal's Hegemon, and the
+    // plain circle for no role.
+    expect(drawings(markup)).toBe(7);
   });
 });

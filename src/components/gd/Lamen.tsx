@@ -1,7 +1,13 @@
 import type * as React from "react";
 import { svgCoordinate } from "../svgCoordinate";
 import { flipped, type Point, smoothPath } from "./hall/art/geometry";
-import { CupOnOctagram, RoseCross, TriangleInPentagram } from "./lamenGlyphs";
+import {
+  CupOnOctagram,
+  PortalHegemon,
+  PortalHiereus,
+  RoseCross,
+  TriangleInPentagram,
+} from "./lamenGlyphs";
 
 /** The colours of a lamen with the Calvary cross of Tiphareth. */
 interface CrossLamenColours {
@@ -55,6 +61,8 @@ const CROSS_LAMENS: ReadonlyMap<string, CrossLamenColours> = new Map([
 interface GlyphLamen {
   /** The collar's colour, as the ring shows it. */
   ring: string;
+  /** The disc's colour; black unless given. */
+  disc?: string;
   Glyph: () => React.ReactElement;
 }
 
@@ -73,6 +81,20 @@ const GLYPH_LAMENS: ReadonlyMap<string, GlyphLamen> = new Map([
   ["chiefAdept", { ring: "yellow", Glyph: RoseCross }],
   ["secondAdept", { ring: "white", Glyph: TriangleInPentagram }],
   ["thirdAdept", { ring: "#48f", Glyph: CupOnOctagram }],
+]);
+
+/**
+ * The lamens an officer wears in a particular grade instead of the Outer
+ * Order's, by `grade:officer` (`lamenGrades.ts`), from the Portal's
+ * rubric (Regardie 1938, vol. 2, p.156, leaf n149). The Hiereus wears a
+ * white hexagram on the four colours of Malkuth; the rubric gives him a
+ * black collar and then "Red Shoes and Collar", and the ring takes the
+ * red, which a black ring's outline would not show. The Hegemon wears a
+ * red and blue hexagram on a white ground, on a yellow collar.
+ */
+const GRADE_LAMENS: ReadonlyMap<string, GlyphLamen> = new Map([
+  ["portal:hiereus", { ring: "red", Glyph: PortalHiereus }],
+  ["portal:hegemon", { ring: "yellow", disc: "white", Glyph: PortalHegemon }],
 ]);
 
 /** The officers whose lamen `Lamen` draws; any other draws the same plain one. */
@@ -294,20 +316,31 @@ function EyeOfHorus() {
  */
 export default function Lamen({
   officer,
+  grade,
   width,
   height,
   outerCircleStyle,
   innerCircleStyle,
 }: {
   officer: string;
+  /**
+   * The grade whose lamen to draw, for an officer who wears another in it
+   * (`lamenGrades.ts`: the Portal's Hiereus and Hegemon); otherwise the
+   * Outer Order's, as the ritual role icons always show.
+   */
+  grade?: string;
   width?: React.CSSProperties["width"];
   height?: React.CSSProperties["width"];
   outerCircleStyle?: React.CSSProperties;
   innerCircleStyle?: React.CSSProperties;
 }) {
   if (!officer) officer = "hierophant";
+  const gradeLamen =
+    grade === undefined ? undefined : GRADE_LAMENS.get(`${grade}:${officer}`);
+  // A grade's own lamen replaces the officer's white-on-black glyph.
+  const glyph = gradeLamen ? "" : officer;
   const crossLamen = CROSS_LAMENS.get(officer);
-  const glyphLamen = GLYPH_LAMENS.get(officer);
+  const glyphLamen = gradeLamen ?? GLYPH_LAMENS.get(officer);
 
   const _outerCircleStyle = {
     color: "#000",
@@ -327,7 +360,7 @@ export default function Lamen({
   const _innerCircleStyle = {
     color: "#000",
     overflow: "visible",
-    fill: crossLamen?.disc ?? "#000",
+    fill: crossLamen?.disc ?? glyphLamen?.disc ?? "#000",
     stroke: "#000",
     strokeWidth: 1,
     paintOrder: "stroke fill markers",
@@ -352,7 +385,7 @@ export default function Lamen({
           style={{ fill: crossLamen.cross ?? crossLamen.ring }}
         />
       )}
-      {officer === "hegemon" && (
+      {glyph === "hegemon" && (
         <path
           d="M 0 0 h2.482v2.02h-2.482v5.043h-2.02v-5.043h-2.482v-2.02h2.481v-2.515h2.02z"
           style={{
@@ -361,29 +394,29 @@ export default function Lamen({
           transform="scale(7.2) translate(1,-2.2)"
         />
       )}
-      {officer === "hiereus" && (
+      {glyph === "hiereus" && (
         <path
           d="m114.746 96.37-4.93 8.54h9.86zm0 2.13 3.087 5.346h-6.174z"
           style={{ fill: "white" }}
           transform="scale(6) translate(-114.7,-101.5)"
         />
       )}
-      {officer === "stolistes" && (
+      {glyph === "stolistes" && (
         <path
           d="M79.292 93.798H69.273l5.002-6.66zm-2.397-8.903a2.62 2.62 0 0 1-2.62 2.62 2.62 2.62 0 0 1-2.622-2.62 2.62 2.62 0 0 1 2.621-2.62 2.62 2.62 0 0 1 2.621 2.62zm-9.152-10.753H80.81c-.448 4.994-3.182 7.714-6.523 8.346-3.279-.596-6.12-3.083-6.544-8.346z"
           style={{ fill: "white" }}
           transform="scale(3.3) translate(-74.2,-83.5)"
         />
       )}
-      {officer === "dadouchos" && (
+      {glyph === "dadouchos" && (
         <path
           d="M30.12 92.248V88.65h3.598v3.598zm0-3.587v-3.597h3.598v3.597zm0-3.587v-3.597h3.598v3.597zm3.587 0v-3.597h3.597v3.597zm3.587 0v-3.597h3.597v3.597zm10.767 7.174h-3.597V88.65h3.597zm-3.587 0h-3.597V88.65h3.597zm-3.587 0H37.29V88.65h3.597zm0-3.587H37.29v-3.597h3.597zm0-3.587H37.29v-3.597h3.597zM48.061 74.3v3.597h-3.597v-3.597zm0 3.587v3.597h-3.597v-3.597zm0 3.587v3.597h-3.597v-3.597zm-3.587 0v3.597h-3.597v-3.597zm-3.587 0v3.597H37.29v-3.597Zm-10.766-7.182h3.597v3.597H30.12Zm3.586 0h3.598v3.597h-3.598zm3.587 0h3.597v3.597h-3.597zm0 3.587h3.597v3.597h-3.597zm0 3.587h3.597v3.597h-3.597z"
           style={{ fill: "white" }}
           transform="scale(2.9) translate(-39,-83.5)"
         />
       )}
-      {officer === "keryx" && <Caduceus />}
-      {officer === "sentinel" && <EyeOfHorus />}
+      {glyph === "keryx" && <Caduceus />}
+      {glyph === "sentinel" && <EyeOfHorus />}
       {glyphLamen && <glyphLamen.Glyph />}
     </svg>
   );

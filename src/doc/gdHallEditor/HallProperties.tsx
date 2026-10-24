@@ -12,6 +12,7 @@ import {
   LIGHT_KINDS,
   PLACEABLE_ATTRIBUTES,
 } from "@magick-components/gd/hall/vocabulary";
+import { GRADE_LAMEN_OFFICERS } from "@magick-components/gd/lamenGrades";
 import Add from "@mui/icons-material/Add";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
@@ -57,7 +58,8 @@ const SOME_KINDS: ReadonlyMap<string, ReadonlySet<string>> = new Map([
 
 /**
  * Whether the panel offers a field for a node: an item's attributes for
- * the kinds that draw them, a board's `w` and `h` unless it shows a
+ * the kinds that draw them, an officer's `grade` for the officers who
+ * wear another lamen in a grade, a board's `w` and `h` unless it shows a
  * diagram (which keeps the diagram's proportions and ignores them), and
  * any attribute the node already has, so it can be emptied.
  */
@@ -70,6 +72,12 @@ export function hallFieldShown(node: HallElement, name: string): boolean {
       (typeof node.attrs.kind === "string" && kinds.has(node.attrs.kind))
     );
   }
+  // A grade changes only the lamens of the officers who wear another in it.
+  if ((node.tag === "officer" || node.tag === "lamen") && name === "grade")
+    return (
+      typeof node.attrs.role === "string" &&
+      GRADE_LAMEN_OFFICERS.has(node.attrs.role)
+    );
   if (node.tag === "board" && (name === "w" || name === "h"))
     return !(BOARD_KINDS as readonly unknown[]).includes(node.attrs.kind);
   return true;
@@ -135,6 +143,7 @@ const FIELD_LABELS: ReadonlyMap<string, string> = new Map([
   ["light", "Light colour"],
   ["reversed", "Reversed letters"],
   ["alt", "Second letters"],
+  ["grade", "Lamen of the grade"],
 ]);
 
 /** The fields of a node, in order: spec attributes with the common first. */

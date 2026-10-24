@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { defaultHallArt } from "./art";
 import {
   booleanAttr,
   clamp,
@@ -427,6 +428,38 @@ describe("validateHall", () => {
       'item: glow="bright" is not a boolean',
       "item: unknown attribute glow",
       "altar: unknown attribute ring",
+    ]);
+  });
+
+  it("checks an officer's grade against the lamens it changes", () => {
+    const art = defaultHallArt;
+    const result = validateHall(
+      hall(
+        floor(
+          { type: "officer", role: "hiereus", grade: "portal" },
+          { type: "lamen", role: "hegemon", grade: "portal" },
+          { type: "officer", role: "keryx", grade: "portal" },
+          { type: "officer", role: "hiereus", grade: "zelator" },
+          { type: "officer", role: "warden", grade: "portal" },
+          { type: "officer", grade: "portal" },
+          { type: "lamen", role: "", grade: "portal" },
+        ),
+      ),
+      { art },
+    );
+    expect(result.map((d) => [d.path, d.attribute, d.message])).toEqual([
+      [
+        [0, 2],
+        "grade",
+        "officer: the Keryx wears the same lamen in the Portal; grade is ignored",
+      ],
+      [[0, 3], "grade", 'officer: grade="zelator" is not one of portal'],
+      [[0, 4], "role", 'officer: unknown role "warden"'],
+      [[0, 4], "grade", "officer: grade is ignored for an unknown role"],
+      [[0, 5], "role", "officer: no role; drawn as a plain circle"],
+      [[0, 5], "grade", "officer: grade is ignored without a role"],
+      [[0, 6], "role", 'lamen: unknown role ""'],
+      [[0, 6], "grade", "lamen: grade is ignored without a role"],
     ]);
   });
 

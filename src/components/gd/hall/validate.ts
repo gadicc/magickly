@@ -1,3 +1,4 @@
+import { hasGradeLamen, LAMEN_GRADE_NAMES, LAMEN_GRADES } from "../lamenGrades";
 import { enumAttr, numberAttr, readAttr } from "./attributes";
 import { hebrewLetter } from "./hebrewLetters";
 import { MAX_LABEL_LINES } from "./labels";
@@ -23,6 +24,7 @@ import {
   MAX_HALL_NODES,
   RESERVED_ATTRIBUTES,
   reservedTag,
+  roleName,
 } from "./vocabulary";
 
 /** What the validator knows beyond the package's own vocabulary. */
@@ -212,6 +214,26 @@ export function validateHall(
             `${tag}: unknown role ${quote(role)}`,
             "role",
           );
+        // A grade changes only the lamens of the officers who wear
+        // another in it (the Portal's Hiereus and Hegemon): on any other,
+        // or without a known role, it is ignored.
+        const grade = enumAttr(node as HallNode, "grade", LAMEN_GRADES);
+        if (
+          grade !== undefined &&
+          !(role !== undefined && hasGradeLamen(role, grade))
+        ) {
+          const name = LAMEN_GRADE_NAMES.get(grade);
+          report(
+            path,
+            "warning",
+            role === undefined || role === ""
+              ? `${tag}: grade is ignored without a role`
+              : HALL_ROLES.has(role)
+                ? `${tag}: the ${roleName(role)} wears the same lamen in the ${name}; grade is ignored`
+                : `${tag}: grade is ignored for an unknown role`,
+            "grade",
+          );
+        }
         break;
       }
       case "hebrewLetter": {

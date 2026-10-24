@@ -47,7 +47,8 @@ const SIDES: readonly HallNode[] = [
  * the white lamp and the incense for the altar; the Third Adept in the
  * North-East with the cup of water, the Second Adept in the South-East
  * with the incense sticks, the Hegemon East of the altar with the rose
- * leaves, the Hiereus in the West with the salt. On the altar, the cross
+ * leaves, the Hiereus in the West with the salt, both in the Portal's own
+ * lamens (`grade="portal"`, p.156). On the altar, the cross
  * of four triangles. Beyond the East wall, as the diagram draws them,
  * the Tablet of Union and the gong.
  */
@@ -90,7 +91,14 @@ export const portal1: HallPreset = {
           { type: "tablet", element: "air", x: 9.8, y: 3 },
           { type: "officer", role: "secondAdept", x: 13, y: 2.8 },
           { type: "item", kind: "censer", x: 14.6, y: 3.8 },
-          { type: "officer", role: "hegemon", x: 8, y: 5.4, labelPos: "left" },
+          {
+            type: "officer",
+            role: "hegemon",
+            grade: "portal",
+            x: 8,
+            y: 5.4,
+            labelPos: "left",
+          },
           { type: "item", kind: "rose", x: 9.5, y: 5.6, scale: 0.45 },
           ...SIDES,
           {
@@ -106,7 +114,14 @@ export const portal1: HallPreset = {
               },
             ],
           },
-          { type: "officer", role: "hiereus", x: 8, y: 13.1, labelPos: "top" },
+          {
+            type: "officer",
+            role: "hiereus",
+            grade: "portal",
+            x: 8,
+            y: 13.1,
+            labelPos: "top",
+          },
           { type: "item", kind: "salt", x: 9.4, y: 13.4 },
           { type: "banner", kind: "west", x: 5, y: 14.3 },
           // At scale 1, 2 squares deep: at the default it would touch the
@@ -132,7 +147,8 @@ export const portal1: HallPreset = {
  * North-East (conflict 6); the altar under the hanging pentagram with
  * the four elemental emblems (rose leaves, salt, incense and the cup)
  * round the Greek cross of five squares; the Hegemon West of the altar,
- * the Hiereus in the West; Pan, the Devil, Death and Typhon by the
+ * the Hiereus in the West, both in the Portal's own lamens; Pan, the
+ * Devil, Death and Typhon by the
  * North and South walls; Tau beyond the West.
  */
 export const portal2: HallPreset = {
@@ -197,8 +213,8 @@ export const portal2: HallPreset = {
               { type: "item", kind: "cup", at: "west", scale: 0.3 },
             ],
           },
-          { type: "officer", role: "hegemon", x: 8, y: 11 },
-          { type: "officer", role: "hiereus", x: 8, y: 13.6 },
+          { type: "officer", role: "hegemon", grade: "portal", x: 8, y: 11 },
+          { type: "officer", role: "hiereus", grade: "portal", x: 8, y: 13.6 },
           { type: "banner", kind: "west", x: 5, y: 14.4 },
           {
             type: "tablet",

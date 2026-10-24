@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import Lamen from "./Lamen";
+import { GRADE_LAMEN_OFFICERS, hasGradeLamen } from "./lamenGrades";
 
 const render = (officer: string) =>
   renderToStaticMarkup(<Lamen officer={officer} />);
@@ -97,6 +98,39 @@ describe("Lamen", () => {
       expect(chief).toContain(`fill="${colour}"`);
     expect(render("secondAdept")).toMatch(/fill="#108010"[^]*fill="#d92128"/);
     expect(render("thirdAdept")).toMatch(/fill="#ff8c1a"[^]*fill="#406ab3"/);
+  });
+
+  it("draws the Portal's own lamens for the Hiereus and Hegemon", () => {
+    const portal = (officer: string) =>
+      renderToStaticMarkup(<Lamen officer={officer} grade="portal" />);
+    // Regardie 1938, vol. 2, p.156: a white hexagram on Malkuth's four
+    // colours, the red collar; a red and blue hexagram on white, the
+    // yellow collar.
+    const hiereus = portal("hiereus");
+    expect(fills(hiereus)).toEqual(["red", "#000"]);
+    for (const colour of ["#a9aa66", "#444f41", "#2c2b29", "#8f5642"])
+      expect(hiereus).toContain(`fill="${colour}"`);
+    expect(hiereus).toContain('stroke="#ffffff"');
+    const hegemon = portal("hegemon");
+    expect(fills(hegemon)).toEqual(["yellow", "white"]);
+    expect(hegemon).toMatch(/stroke="#406ab3"[^]*stroke="#d92128"/);
+    // Neither the Outer Order glyph.
+    expect(hiereus).not.toContain("114.746");
+    expect(hegemon).not.toContain("2.482");
+    // Other officers, and other grades, draw as always.
+    for (const officer of OFFICERS.filter(
+      (officer) => !GRADE_LAMEN_OFFICERS.has(officer),
+    ))
+      expect(portal(officer), officer).toBe(render(officer));
+    for (const officer of GRADE_LAMEN_OFFICERS) {
+      expect(portal(officer), officer).not.toBe(render(officer));
+      expect(
+        renderToStaticMarkup(<Lamen officer={officer} grade="toString" />),
+      ).toBe(render(officer));
+    }
+    for (const officer of GRADE_LAMEN_OFFICERS)
+      expect(hasGradeLamen(officer, "portal"), officer).toBe(true);
+    expect(portal("hiereus")).not.toMatch(/\sid=/);
   });
 
   it("falls back to the Hierophant without an officer", () => {
