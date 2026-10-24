@@ -384,7 +384,14 @@ Follow-ups are separate from the completed migration work:
   a lamp red and a lantern yellow by default), checked, offered in the
   properties panel and carried in the Pug; the Keryx's caduceus and the
   Sentinel's Eye of Horus are redrawn, `Lamen` is in
-  `src/components/gd` and the third-party art list is empty.
+  `src/components/gd` and the third-party art list is empty. Its
+  second part (24 October 2026), after Gadi's decisions that day: Pan,
+  the Devil, Death and Typhon are emblem cards (`card(kind)`) in Portal
+  2; the adepts wear the Portal rubric's lamens and the Portal's Hiereus
+  and Hegemon their own (`grade="portal"`); the Keryx's wings dip round
+  the ball and its coils narrow downward; and the Moon's and Venus'
+  seals are drawn after Agrippa's 1533 woodcuts (public domain, cited by
+  archive.org item and leaf).
   The tablet versions Gadi decided on 24 October 2026 are done on
   `gate/enochian-versions`: magick-data holds each source's reading of
   every square (Regardie 1940, the Equinox 1912, Greer, Dee's table of
@@ -418,17 +425,19 @@ Follow-ups are separate from the completed migration work:
   in 1584, the two Fire squares where Sloane and Cotton differ, and the
   images' licence. TODO from earlier: Gadi's call on the Chiefs on the new presets' daises
   (after the merge; he leans towards Greer's redraws), the stage F
-  markers and placeholders Gadi has yet to decide on in stage H (Pan, the
-  Devil, Death and Typhon; Eden and the Fall; the adepts' lamens; the
-  Tree markers; the Minutum Mundum's path colours), and the seals,
-  deferred: two features, name sigils traced over a kamea (adapt
-  `/gd/sigils`: a planet's square, the name's letters as numbers with an
-  Aiq Bekar reduction where a value exceeds the square, a path through
+  markers and placeholders Gadi has yet to decide on (Eden and the Fall,
+  with a proposal to make the pictures shown to the candidate cards
+  like the Portal's; the Tree markers; the Minutum Mundum's path
+  colours), the Portal Hiereus' ring colour (the rubric names a black
+  and a red collar), whether the Third Adept's lamen (blue ring, orange
+  octagram) needs telling apart from the Praemonstrator's at icon size,
+  the other five seals (hand-drawn after Agrippa like the Moon's and
+  Venus'), and name sigils traced over a kamea (adapt `/gd/sigils`: a
+  planet's square, the name's letters as numbers with an Aiq Bekar
+  reduction where a value exceeds the square, a path through
   `kameaGeometry`'s cell centres, start and end marks as on the rose;
-  `Kamea` hosts it as an overlay through `children`), and the
-  traditional seals, hand-drawn after Agrippa's public-domain woodcuts
-  (1533, II.22, cited by archive.org item and leaf), which the hall's
-  `seal(planet)` shows; recording officer movement between stations, a `gdVault` for
+  `Kamea` hosts it as an overlay through `children`) once the sigil
+  system handles the hard cases; recording officer movement between stations, a `gdVault` for
   the Adeptus Minor Vault, original Enochian letterforms, moving
   `enochianFont.ts` and the other files the import-boundary test allows out
   of `src/components` (or off their app imports), embedded fonts in the Tree

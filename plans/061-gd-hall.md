@@ -318,6 +318,7 @@ gdHall(dais=4, wall="gradient")
   | veil | 1 | 16 × 0.4 (sized by `scale` only) |
   | marker | 0.6 | 1.2 |
   | tarotKey | 0.81 | 0.94 × 1.62 |
+  | card | 0.81 | 0.94 × 1.62, a tarot key's size (stage H, part 2) |
   | items | per kind, 0.235–1.19 (gong, brazier, candle 0.5; other items 0.4) | measured on the drawings |
   | unknown tags (placeholder) | 0.5 | 1 |
 - **Bounds and margins** come from content: the viewBox is the union of every
@@ -346,8 +347,8 @@ Placeables:
 
 | Tag | Notes |
 | --- | --- |
-| `officer(role)` | `lamen` + `label`. Roles use the ritual role keys (`src/doc/ritualBlocks/roles.tsx`): imperator, cancellarius, praemonstrator, hierophant, pastHierophant, hiereus, hegemon, keryx, stolistes, dadouchos, sentinel; adepts (chiefAdept, secondAdept, thirdAdept, in the catalog since stage F) as labelled circles until their lamens exist. Colour lamens only (see Background) |
-| `lamen(role)` | The lamen alone |
+| `officer(role)` | `lamen` + `label`. Roles use the ritual role keys (`src/doc/ritualBlocks/roles.tsx`): imperator, cancellarius, praemonstrator, hierophant, pastHierophant, hiereus, hegemon, keryx, stolistes, dadouchos, sentinel; adepts (chiefAdept, secondAdept, thirdAdept, in the catalog since stage F), with the Portal rubric's lamens since stage H, part 2. `grade="portal"` draws the Portal's own Hiereus and Hegemon (stage H, part 2). Colour lamens only (see Background) |
+| `lamen(role)` | The lamen alone; `grade` as on `officer` |
 | `marker(text, shape)` | A labelled box or circle, as the book uses for objects (Lamp, Pantacle) and for the candidate. Every grade can be preset before its art exists |
 | `altar`, `platform`, `throne` | Hosts. The altar is the black cube, or the Portal's small white altar with `kind="white"` (stage F); what lies on it is items |
 | `pillar(kind)` | `black` (downward triangle) or `white` (upward); `glow` for the Neophyte style. No rotation |
@@ -356,7 +357,8 @@ Placeables:
 | `tablet(element)` | Reuses `Tablet`: earth, air, water, fire and union (stage G), the Tablet of Union on a board of its own shape |
 | `item(kind)` | Art registry: cup, chalice, salt, bread, rose, lamp, lantern (`light`: red, yellow, white; a lamp red and a lantern yellow by default; stage H), censer, fan, cross (`form`: calvary, latin, greek, greekFiveSquares, fourTriangles), triangle (`dir`: up, down), pentagram, pantacle, serpentTree, lightning, gong, brazier, candle (stage F; the rubrics' candles beside the altar) |
 | `tarotKey(n)` | An original simplified card: numeral, Hebrew letter and title from magick-data; `n` is clamped to 0–21 and rounded, with a warning |
-| `kamea(planet)`, `seal(planet)` | The number square drawn from its numbers (Agrippa's squares, computed in magick-data's `astrology/kameas` and drawn by the shared `Kamea`, since the follow-ups after stage F); seals a placeholder until stage H. `planet`: saturn, jupiter, mars, sun, venus, mercury, moon (the hall's words, mapped to magick-data's `sol` and `luna`) |
+| `card(kind)` | An emblem card in the tarot key's frame (stage H, part 2): `pan`, `devil`, `death` (with XIII and XV, the keys' numerals), `typhon`; labelled by the hall, since its title cannot be read at hall size |
+| `kamea(planet)`, `seal(planet)` | The number square drawn from its numbers (Agrippa's squares, computed in magick-data's `astrology/kameas` and drawn by the shared `Kamea`, since the follow-ups after stage F); seals drawn after Agrippa's 1533 woodcuts for the Moon and Venus (stage H, part 2), a placeholder for the other five. `planet`: saturn, jupiter, mars, sun, venus, mercury, moon (the hall's words, mapped to magick-data's `sol` and `luna`) |
 | `board(kind)` | A diagram on a stand: flamingSword and minutumMundum through the Tree's figure (`TreeFigure`, shared with `TreeOfLife`); gardenOfEden and theFall as labelled boards first |
 | `shewbread`, `candlestick` | The existing components |
 | `veil` | The Portal's curtain across the dais: 16 × 0.4 squares, sized by `scale` |
@@ -748,24 +750,25 @@ For the Enochian tablets (stage G):
 | Item | Today | Status |
 | --- | --- | --- |
 | Checker floor, walls, dais, door | drawings, first-party | regenerated in code (A1) |
-| Lamens | `Lamen`, first-party | Past Hierophant added (A2); collar rings, the Hierophant striped (before B); the caduceus and the Eye of Horus redrawn from geometry and `Lamen` moved to `src/components/gd/Lamen.tsx` (MIT), drawn by the package's `lamen` art (H) |
+| Lamens | `Lamen`, first-party | Past Hierophant added (A2); collar rings, the Hierophant striped (before B); the caduceus and the Eye of Horus redrawn from geometry and `Lamen` moved to `src/components/gd/Lamen.tsx` (MIT), drawn by the package's `lamen` art (H); the adepts' lamens and the Portal's Hiereus and Hegemon (`grade`) added, the caduceus's wings and coils redrawn (H2) |
 | Pillars, banners, Hebrew banners | drawings, first-party | ported into code (A1) |
 | Pantacle | drawing, first-party | redrawn from geometry, `item:pantacle` (A2) |
 | Flaming Sword (lightning) | drawing, first-party | redrawn without markers, `item:lightning` (A2) |
 | Enochian tablets and sigils | `Tablet`, first-party | reused as `tablet` (A2); the Water and Fire sigils drawn from geometry after Regardie's description and the Tablet of Union drawn (G); drawn in any version, the Equinox's sigils in black after its Plate X, none for Dee's and Raphael's tables (Tablet versions); font licence open |
 | Table of Shewbread, candlestick | components, first-party | reused as `shewbread`, `candlestick` (A2) |
 | Cup, chalice, salt, bread, rose, lamp, lantern, censer, fan | drawings, icon-set signatures, no source | lifted into `src/app/gd/hall/legacyArt/` (A2, AGPL, injected); redrawn as original flat emblems in the old boxes, `vessels.tsx`, `lights.tsx`, `altarItems.tsx` (H, `original()`), `legacyArt/` removed |
-| Caduceus (Keryx lamen) | SVG Repo, "public domain" label | redrawn from geometry in `Lamen` (H) |
+| Caduceus (Keryx lamen) | SVG Repo, "public domain" label | redrawn from geometry in `Lamen` (H); wings K1 with a dip round the ball, coils narrowing and tightening downward (H2) |
 | Eye of Horus (Sentinel lamen) | game-icons.net, CC BY | redrawn from strokes after the wedjat's ancient form in `Lamen` (H); the old drawings in `public/pics` still carry it and the caduceus, so `/about` credits both for them until stage I |
 | Tarot XXI on the Theoricus altar | RWS raster in the drawing | original card, `tarotKey` (A2) |
-| Serpent on the Tree, Moon kamea, Moon seals | rasters in Theoricus 2, no source | markers in the preset (A2); the kamea computed and drawn, `kamea` (F), through the shared `Kamea` (after F); the seals a placeholder, `seal` (F), deferred by Gadi in H (Follow-ups); the serpent a marker, pending Gadi's decision |
+| Serpent on the Tree, Moon kamea, Moon seals | rasters in Theoricus 2, no source | markers in the preset (A2); the kamea computed and drawn, `kamea` (F), through the shared `Kamea` (after F); the seals a placeholder, `seal` (F), deferred by Gadi in H; the Moon's seal drawn after Agrippa (H2); the serpent a marker, pending Gadi's decision |
 | Planetary kameas | none | computed (Agrippa's squares) and drawn from geometry, `kamea` (F); since the follow-ups after F the squares are magick-data's (`astrology/kameas`, MIT code, no rights asserted over the squares) and the drawing is `Kamea` (`src/components/astrology/Kamea.tsx`, MIT), which the hall's `kamea` art wraps in its font and palette; seals and sigils to overlay it in H |
-| Planetary seals | none | placeholder `seal`, a dashed ring naming the planet (F); deferred (H, Gadi's decision). Two features, both deferred (Gadi, 24 October 2026; Follow-ups): name sigils traced over a kamea by an adapted `/gd/sigils`, hosted by `Kamea` as an overlay; and the traditional seals, hand-drawn after Agrippa's public-domain woodcuts (1533, II.22), which the hall's `seal(planet)` shows |
+| Planetary seals | none | placeholder `seal`, a dashed ring naming the planet (F); the Moon's and Venus' drawn from geometry after Agrippa's 1533 woodcuts (LOC copy, archive.org `DeOccultaPhilosophiaLoc1533`, leaves n168 and n166; public domain, recorded with `publicDomain()`), on silver plates (H2); the other five still placeholders, to be hand-drawn after Agrippa the same way (Follow-ups); name sigils traced over a kamea by an adapted `/gd/sigils`, hosted by `Kamea` as an overlay, a later feature once the sigil system handles the hard cases (Gadi, 24 October 2026) |
 | Flaming Sword and Minutum Mundum boards | `TreeOfLife`, first-party | `TreeFigure` (the Tree's own geometry) on a board, `board` (F); the Minutum Mundum's paths in their colours need path colour data; pending Gadi's decision (H) |
 | Garden of Eden, the Fall | none | labelled boards (F); pending Gadi's decision (H) |
 | Veil, white altar, gong, brazier, candle | none | original geometry (F) |
-| Adept lamens | none | plain circles in the hall and as role icons (F); pending Gadi's decision on what each shows (H) |
-| Markers in the stage F presets | none | the Fire and Water tablets and the Tablet of Union drawn (stage G); "Venus on the Tree of Life" (conflict 10), "Mercury" (3=8), Pan, the Devil, Death and Typhon (Portal 2), the Theoricus' seat (Practicus): markers still, pending Gadi's decision (H) |
+| Adept lamens | none | plain circles in the hall and as role icons (F); the Portal rubric's lamens, option A, drawn from geometry in `Lamen` (`lamenGlyphs.tsx`) (H2) |
+| Portal Hiereus and Hegemon lamens | none (the Outer Order's drawn) | drawn from geometry after the rubric (p.156), `grade="portal"` (H2) |
+| Markers in the stage F presets | none | the Fire and Water tablets and the Tablet of Union drawn (stage G); Pan, the Devil, Death and Typhon (Portal 2) emblem cards, `card` (H2); "Venus on the Tree of Life" (conflict 10), "Mercury" (3=8), the Theoricus' seat (Practicus): markers still, pending Gadi's decision (Follow-ups: the cards proposal) |
 
 The third-party list the plan requires (decision 9) is
 `THIRD_PARTY_ART` in `src/app/gd/hall/art.test.tsx`: the nine legacy
@@ -3956,6 +3959,218 @@ for the five sources' readings, the rules, the resolver, the Equinox's
 sigils, the note where a sigil is missing, and the props. The notes'
 prose is in the `/enochian/tablets` page's chunk alone: 36,359 bytes
 before and 56,016 after (7,419 and 12,498 gzipped).
+## Stage H, part 2
+
+Built on `gate/gd-hall-h2` (24 October 2026), from `main` at 2b07004,
+after a second design round outside the repository (mock-ups at real
+sizes, `~/.cache/gdhall-h2/`) and Gadi's decisions of the same day.
+
+### Gadi's decisions (24 October 2026)
+
+- **Pan, the Devil, Death and Typhon: option (d)**, four emblem cards
+  in the tarot key's frame, Death and the Devil with their keys'
+  numerals.
+- **Adept lamens: option A**, the Portal rubric's, the ring in the
+  collar's colour.
+- **The Keryx's wings: K1**, with a dip where they meet round the ball,
+  as the old icon had, and coils narrowing and tightening towards the
+  tail.
+- **The Portal's Hiereus and Hegemon** in their own lamens.
+- **Seals drawn by hand** for the Moon and Venus, after Agrippa's
+  woodcuts, before any sigil work.
+
+### The emblem cards
+
+- **A tag, `card(kind)`**, kinds `pan`, `devil`, `death`, `typhon`
+  (`CARD_KINDS`), added by the art registry as `tarotKey`, `kamea` and
+  `seal` are, so the validator knows it with its art. Not item kinds:
+  the four hang by the walls, they are not things set on an altar, and
+  items carry per-kind scales and the item tag's colours, which mean
+  nothing here. Not a `tarotKey` variant: Pan and Typhon are the
+  rubric's "drawings", not keys, and a variant would need a second
+  attribute beside `n` for half of them. A card is a tarot key's size
+  (box 58 × 100, default scale 0.81: 0.94 × 1.62 squares), recorded in
+  the sizes table, and shares its frame, numeral and title
+  (`CardFrame`, `CardNumeral`, `CardTitle` in `tarotKey.tsx`, which
+  draws the same bytes as before).
+- **The drawings** (`art/cards.tsx`) are the mock-ups' emblems, cleaned:
+  paths computed once at load and rounded, no ids. Pan: seven reeds,
+  level at the top and each shorter than the last, a red band, a
+  bronze crook. The Devil: bat wings, a red horned head under a
+  reversed pentagram, on the cube. Death: a skull and a scythe. Typhon:
+  a red serpent rising from blue waves into a storm cloud, a yellow
+  bolt below. Each emblem is drawn in a 100-unit box at 0.44 inside the
+  card, so its 3.6-unit outline matches the frame's 1.6.
+- **Labels.** A card's title cannot be read at hall size, so the hall
+  labels it: `CARD_LABELS` gives "Pan", "Devil", "Death" and "Typhon",
+  the names the p.155 diagram writes by the walls. "Devil" rather than
+  "The Devil": it stays on one line like the other three, and the card
+  itself still reads "The Devil", the key's title, when zoomed or
+  exported. Cards are not labelled by default, as officers are: that
+  would be a second default-label rule in the resolver and the aspect
+  estimate. Portal 2 and the palette write the label instead.
+- **Everywhere else**: the validator reports a card without a kind
+  ("drawn blank") and `kind="null"` like any unknown kind; the palette
+  offers the four, labelled ("The Devil (card)"); the properties panel
+  shows `kind` as a select; the editor names a card "Card: The Devil";
+  no name is reserved (`card` is not one of Pug's or the reader's); the
+  hosts are unchanged, so a card may stand wherever a tarot key may:
+  on the floor, in a row or on a host (the editor's host rules keep
+  cards off altars when dragging); Portal 2 round-trips through Pug.
+- **The palette** gains `storm` (`#6b6f78`), Typhon's cloud and the
+  cube's lit faces.
+- **Portal 2** draws the four cards at the markers' places (x 1.2 and
+  14.8, y 5 and 11.2). At 1.62 squares they stand clear of the Earth
+  and Fire tablets on the same walls (sheet `02-portal2.png`).
+
+### The lamens
+
+- **The adepts** (`lamenGlyphs.tsx`, drawn by `Lamen`): the Chief
+  Adept's Rose-Cross on a yellow ring, the Second Adept's red triangle
+  in a green pentagram on a white ring, the Third Adept's blue cup on an
+  orange octagram (two squares crossed) on a blue ring, each on the
+  black disc. The rubric
+  (Regardie 1938, vol. 2, p.156, leaf n149) gives the lamens and the
+  collars; the ring shows the collar, Gadi's convention (decision 9).
+  The Rose-Cross is simplified, as in the mock-ups: Air's yellow above,
+  Fire's red on the viewer's left (Geburah's side), Water's blue on the
+  right, the lower arm in Malkuth's four colours, trefoil ends, a
+  five-petalled rose; vol. 3 (1939), pp.51–53 describes the full one.
+  Malkuth's colours moved into `PALETTE` (`citrine`, `olive`, `russet`,
+  `earthBlack`), shared with the Pantacle, which draws the same bytes;
+  the octagram's orange is `orange` (`#ff8c1a`). The role icons
+  (`roles.tsx`), the hall and `/gd/components` all draw them; the hall's
+  plain circle is now only for an officer without a role.
+- **Role icons and assistive technology.** The adepts' old plain
+  circles were `aria-hidden`; `Lamen`'s svg has neither `aria-hidden`
+  nor a title, so the role icons would have been unnamed graphics. The
+  reader's task frame (`Frames.tsx`) now hides its whole symbol column,
+  every role's lamen or emoji, since each only repeats the role name
+  shown beside it; a test renders every role so (review fix).
+- **Caveats.** The Third Adept's blue ring and orange star are close to
+  the Praemonstrator's blue ring and orange disc, though the glyphs
+  differ (sheet `05-role-icons.png`). A future 5=6 hall would use the
+  same role names, but every Adept there wears the Rose-Cross (vol. 2,
+  pp.250 and 256): `grade` (below) is where a Vault preset could ask
+  for it.
+- **The Portal's Hiereus and Hegemon.** The rubric (p.156) gives the
+  Hiereus a "Lamen of Four Colours of Malkuth with White Hexagram" and
+  the Hegemon a "Lamen of Red and Blue Hexagram on White Ground" on a
+  yellow collar. `Lamen` takes a `grade` prop, and the hall's `officer`
+  and `lamen` a matching `grade` attribute, one value, `portal`
+  (`lamenGrades.ts`). It is the lamen art's own attribute
+  (`HallArt.attributes`), as `light` is the lights', so the validator,
+  the properties panel ("Lamen of the grade", offered only to the
+  officers it changes) and the Pug round trip carry it. A grade on any
+  officer it does not change draws as without it, with a warning: on
+  another known role, without a role or with `role=""`, or with an
+  unknown role (review fix). `LAMEN_GRADE_NAMES` names the grade for
+  those messages and for the editor, which calls the two "Hiereus
+  (Portal)" and "Hegemon (Portal)".
+  Distinct roles (`portalHiereus`) were rejected: the hall's roles are
+  the ritual catalog's keys, and the same officer would need two names
+  in tasks. The role icons keep the Outer Order lamens. The Hiereus
+  draws a white interlaced hexagram on a disc quartered as the
+  Pantacle's (citrine above, olive right, black below, russet left); his
+  ring is red: the rubric names a "Black Collar" and then "Red Shoes and
+  Collar", and a black ring would vanish into the outline (for Gadi).
+  The Hegemon draws a red upward and a blue downward triangle,
+  interlaced, on white, ringed in yellow. Portal 1 and 2 use both.
+- **The Keryx.** Wings K1, written in lamen units outside the serpents'
+  group: the leading edge leaves the staff under the ball, dips beside
+  it and sweeps up to a pointed tip, the trailing edge nearly flat in
+  four feathers, so a notch shows round the ball, as the old icon's did
+  (looked at only for its silhouette; none of its path data used). The
+  serpents make a turn and a quarter (three-quarters before): their
+  reach falls to 65% at the tail and the turns run faster there
+  (`turned(u) = 1 − (1 − u)^1.2`), so the top loop is wide and the
+  lower ones smaller. Two crossings, one each over the other; the pieces
+  drawn again over a crossing now follow the whole curve exactly
+  (`smoothPath` takes a stretch) and reach an eighth of a turn either
+  side, since a band's square end on a loop's sharp turn showed as a
+  spike. The first version (serpents 6.2 units wide, the reach falling
+  to half, `^1.4`) turned to noise at 20 px, the review found; the
+  serpents are now 8.4 units wide before the glyph's 0.66 scale, 1.1 px
+  at 20 px, with the gentler taper above. At 20 px the icon reads as
+  the wings and ball over a column of white coils, the lowest about a
+  pixel wide, as bold as main's; at 25 px the crossings show (sheets
+  `06-keryx.png`, the 20 and 25 px renders magnified ×4 pixel for
+  pixel, and `06b-keryx-magnified.png`, ×10 and ×8, the old icon, main
+  and the new one). 22 samples a serpent; the Keryx's role icon is
+  5,198 bytes of markup (4,429 before).
+
+### The seals
+
+- **Source.** Agrippa, *De occulta philosophia libri tres* (Cologne:
+  Soter, 1533), book II, chapter 22: each planet's table is followed by
+  its "signacula sive characteres". Read from the Library of Congress
+  copy on archive.org, item `DeOccultaPhilosophiaLoc1533`: Venus' seal
+  on p. CLI (leaf n166), the Moon's on p. CLIII (leaf n168). The
+  McGill (`McGillLibrary-osl_henrici-cornelii-agrippae_folioA279o1533-19978`)
+  and Wellcome (`hin-wel-all-00001912-001`) copies of the same edition
+  are on archive.org too. The chapter's text (leaf n162) says each of
+  these planets' tables, with its characters, is engraved on silver,
+  Venus' "in lamina argenti", the Moon's "in argento"; the silver plate
+  under each seal is our reading of that, since the woodcuts draw the
+  seals on the bare page.
+- **Public-domain basis**, recorded in `seals.tsx` and in the art's
+  provenance through a new `publicDomain(notes, { source, basis })`
+  helper (`art/shared.ts`): printed in 1533, Agrippa died in 1535 and
+  the woodcuts' cutters are anonymous, so the work is out of copyright
+  everywhere; a faithful scan of a two-dimensional public-domain work
+  adds no copyright, and the archive.org item carries the Public Domain
+  Mark 1.0.
+  The drawing is ours (origin `original`, MIT), so the third-party list
+  stays empty. No image of the book is committed; the page images were
+  looked at outside the repository.
+- **The drawings** (`art/seals.tsx`) follow the woodcuts, made
+  symmetric where the cutter's hand wandered. The Moon: a saltire from
+  a ring at the centre to rings in the corners, and four crescents
+  between its arms, each a lune of two circular arcs with a third along
+  its middle, ringed at the horns (the woodcut's lower-right arm ends in
+  a blot, drawn as a ring like the others). Venus: three arms of a
+  saltire from a ring at the centre to rings at their ends, the fourth
+  running to the foot of a great arc on the right; above the centre a
+  cross whose stem forks into two arms, serifed; an open arc on the
+  left, like a ")", even in width with blunt ends; a ring below. (The
+  first version filled that arc as a horned lune at twice the weight,
+  which read as a crescent moon; the review found it, and it is now a
+  stroke at the other lines' weight.) Each is engraved in ink (3 units,
+  the Moon's inner lines 2.4 and 1.6) on a silver plate, a rounded square in the items' outline
+  (the placeholder was a ring; the box, 100 × 100, and the default
+  scale, 0.9, are unchanged). Theoricus 2 and Philosophus 4 draw them;
+  the other five planets keep the placeholder, and the editor still
+  names the node "Seals of Luna".
+
+### Output
+
+Every new drawing is drawn once per hall in `<defs>` and placed with
+`<use>`; none defines an id, a gradient or a pattern. The committed
+preset snapshots: Portal 1 233,041 bytes before, 239,851 after; Portal
+2 226,284 and 239,388; Theoricus 2 88,557 and 90,472; Philosophus 4
+71,874 and 72,315; the Neophyte (its Keryx) 27,906 and 28,671.
+
+From the gates' production builds (webpack), gzip -6, measured the same
+way before and after (2b07004 against ce5daa8): the hall chunk the
+reader's drawing loads grew from 76,481 bytes (27,444 gzipped) to
+79,358 (28,360), with the cards and the seals. `Lamen` sits in the
+shared chunk the reader's role icons load, which grew from 25,208
+(9,119) to 29,972 (10,787), and in one lazy chunk, from 37,622 (13,884)
+to 42,426 (15,653): the adepts' and the Portal's glyphs, the new
+caduceus, and the hall's `PALETTE`, which `lamenGlyphs.tsx` imports
+whole. No chunk boundary moved. All JavaScript chunks: 7,956,929 bytes
+before, 7,978,904 after (measured after the review fixes).
+
+### Sheets for Gadi
+
+Outside the repository, in `~/.cache/gdhall-h2/impl/sheets/`: Portal 1
+and 2 before (main at 2b07004) and after at reader width
+(`01-portal1.png`, `02-portal2.png`), Theoricus 2 and Philosophus 4 for
+the seals (`03-theoricus2.png`, `04-philosophus4.png`), the ritual role
+icons at 20, 25 and 40 px (`05-role-icons.png`), the Keryx's old icon
+(570e5f8), main and the new one at 20, 25, 40, 51 and 120 px as role
+icons, on a dark row and magnified (`06-keryx.png`), and close-ups of
+the cards, the new lamens and the seals (`07-close-ups.png`).
 
 ### What was verified, and how
 
@@ -4075,6 +4290,83 @@ digitised. Re-check the catalogue (searcharchives.bl.uk, Sloane MS
 - Fire's row 6 square 8 in the 1587 print: a misprint, as the version
   reads it, or the Cotton copy's v, which Regardie keeps as a second
   letter (doubt medium, until the British Library).
+  per-file thresholds, `build`): all 0 for f05bbf7, ce5b2a1, 3b8bd15,
+  501d320 and ce5daa8. The tip, with this plan, also ran `loom check`,
+  the magick-data smoke test and `pnpm check:turbopack`. The compiler
+  is untouched: `semantic.ts`, `semanticCompilerImpl.ts` and
+  `ritualNodeIds.ts` have no diff, and `src/components` imports no app
+  code (the boundary test).
+- **Snapshots** were regenerated in the commit that changes each
+  drawing: the Portal presets for the adepts (f05bbf7) and the grade
+  (ce5b2a1), the five halls with a Keryx (3b8bd15), Portal 2 for the
+  cards (501d320), Theoricus 2 and Philosophus 4 for the seals
+  (ce5daa8). Moving tarotKey's frame and Malkuth's colours changed no
+  byte of any other preset.
+- **Tests**: the adepts' and the Portal's lamens (rings, colours, no
+  ids; other officers and unknown grades unchanged), every hall role
+  drawn by `Lamen`, every role's symbol hidden from assistive
+  technology beside its name, the grade's validation (on any role it
+  does not change, without a role and with an unknown one), panel field
+  and names, the
+  caduceus's two crossings and size, a stretch of a smooth path along
+  the same curve, the cards (frame, numerals, titles, no ids, kinds
+  validated, a tarot key's size, the palette's labelled entries, the
+  editor's names), the seals (silver plates, rings and arcs, the
+  placeholder for the other planets, the provenance's source and
+  basis), and every preset validated, drawn, inventoried and
+  round-tripped through Pug as before.
+- **In the browser** (Turbopack dev server from this branch on
+  127.0.0.1:3427 with placeholder settings, headless Chromium over CDP;
+  nothing signed in or saved): `/gd/components` draws the sixteen
+  lamens, the adepts and the Portal's two among them, with no console
+  error; `/gd/hall`, Portal Temple 2 in the visual view, draws the four
+  cards labelled and the Portal lamens, with no warning badge; tabbing
+  through it names "Card: Pan", "Card: The Devil", "Card: Death",
+  "Card: Typhon", "Hegemon (Portal)" and "Hiereus (Portal)", and the
+  Devil's panel shows its Label ("Devil") and Kind ("devil"). The one
+  console warning, CodeMirror's "Unknown highlighting tag indent", comes
+  from the source view and is older than this work.
+- **Help screenshots** were not recaptured: none shows the changed art
+  (the editor and reader shots show the Neophyte's old `/pics` drawing,
+  with no Keryx or adept role icon in view; hiding the symbol column
+  changes no pixel).
+- **After the review fixes** the browser check was not repeated: the
+  fixes change drawings the tests and the sheets cover, an `aria-hidden`
+  the role test checks, and the validator's messages.
+
+### Review fixes
+
+An independent review found no blocker: the seals match the woodcuts,
+the provenance is sound and the layout contract holds. Its fixes were
+folded into the commits they belong to (`--fixup` and `amend!`, the
+branch rewritten with `git rebase -i --autosquash`, each commit's
+snapshots regenerated at its own place; Commits lists the new ones):
+
+- **Venus' left figure** an open arc at the lines' one weight, not a
+  filled crescent (The seals).
+- **The Keryx at 20 px**: thicker serpents and a gentler taper (The
+  lamens).
+- **Role icons hidden from assistive technology** beside their names,
+  for every role (The lamens).
+- **Grade warnings** for a grade on any officer it does not change,
+  without a role or with an unknown one (The lamens).
+- **Nits**: the seals' wording (the archive.org item carries the mark;
+  the silver plate an interpretation of n162); `LAMEN_GRADE_NAMES`
+  shared by the validator and the editor; the octagram two true
+  squares (inner radius 37 · cos 45° / cos 22.5°, about 28.3, not 26);
+  the palette's doc comment reflowed; `cards.tsx`'s `Band` takes a
+  `stroke`; `lamenGlyphs.tsx`'s doc comment corrected in the commit
+  that adds the Portal glyphs; the Third Adept against the
+  Praemonstrator in plan 000's open questions.
+
+### Waiting for Gadi
+
+- The Portal Hiereus' ring: red (chosen) or black, the rubric naming
+  both collars.
+- Whether the Third Adept's lamen needs telling apart from the
+  Praemonstrator's at icon size.
+- The cards proposal (Follow-ups).
+- The five remaining seals.
 
 ## Commits
 
@@ -4202,6 +4494,11 @@ digitised. Re-check the catalogue (searcharchives.bl.uk, Sloane MS
 | a05f661 | `Tablet` draws any version, its reversed letters optional and second letters in the corners; the Equinox's sigils; none for Dee's and Raphael's (Tablet versions) |
 | d129108 | `/enochian/tablets` chooses a version and says how it differs from each other; the image route takes `version` (Tablet versions) |
 | fc7a6e1 | The hall's `tablet` takes `version`, `reversed` and `alt`, the Golden Dawn's when absent (Tablet versions) |
+| f05bbf7 | The adepts' Portal lamens (option A) in `Lamen`, `lamenGlyphs.tsx`; Malkuth's colours in the palette (H2, Gadi's decision) |
+| ce5b2a1 | The Portal's own Hiereus and Hegemon: `Lamen`'s `grade`, the hall's `grade="portal"` (`lamenGrades.ts`), in the validator, the panel, the editor's names and both Portal presets (H2) |
+| 3b8bd15 | The Keryx's wings (K1, a dip round the ball) and coils narrowing and tightening downward; `smoothPath` draws a stretch of a path (H2, Gadi's decision) |
+| 501d320 | `card(kind)`: Pan, the Devil, Death and Typhon as emblem cards in the tarot key's frame, labelled; Portal 2 draws them; storm grey (H2, Gadi's decision) |
+| ce5daa8 | The Moon's and Venus' seals after Agrippa's 1533 woodcuts on silver plates; `publicDomain()` provenance (H2, Gadi's decision) |
 
 ## Future
 
@@ -4369,6 +4666,15 @@ later name each square's reading per version once the `version` work
 lands, and cover the Tablet of Union once the page shows it; the page's
 export still draws the outlines when the switch is on.
 
+From stage H, for Gadi: the Garden of Eden and the Fall (drawn
+schematically or labelled boards; see the cards proposal below);
+"Venus on the Tree of Life", "Mercury" and the serpent drawn over
+`TreeFigure` or kept as markers; the Minutum Mundum's path colours
+(path colour data in magick-data first). The seals, Pan, the Devil,
+Death and Typhon, and the adepts' lamens were decided on 24 October
+2026 and are done in part 2. The before and after sheets are outside
+the repository (Stage H notes). The new art is checked in headless
+Chromium only (no Firefox, Safari or real device).
 
 From stage H, for Gadi: the seals, deferred (adapt `/gd/sigils`, which
 draws sigils on the Golden Dawn's rose, to draw sigils on the kameas,
@@ -4410,3 +4716,45 @@ The seals and the kamea sigils, both deferred (Gadi, 24 October 2026):
   hand-drawn after his public-domain woodcuts, cited by archive.org item
   and leaf. The hall's `seal(planet)` shows them; the sigil tool is a
   separate feature.
+From stage H, part 2:
+
+- **The remaining seals.** Saturn's, Jupiter's, Mars', the Sun's and
+  Mercury's seals are still the placeholder; they are drawn the same
+  way, after the same copy (leaves n163–n167 hold their tables), when
+  a hall needs them.
+- **Name sigils** over the kamea (the intelligences' and spirits'
+  sigils, and sigils of any name) are a separate, later `/gd/sigils`
+  feature, not hall art. The sigil system needs more work first: it
+  handles easy names but not all the hard cases.
+- **For Gadi**: the Portal Hiereus' ring (red, from "Red Shoes and
+  Collar", or black, from "Black Collar"; p.156 names both); whether
+  the Third Adept's blue and orange need telling apart from the
+  Praemonstrator's at icon size; whether a 5=6 hall should give every
+  Adept the Rose-Cross through `grade`.
+- **The cards proposal** (not done, for Gadi). The rituals show the
+  candidate three kinds of thing, and the hall could draw each one way:
+  - *Pictures shown to the candidate*, which the officers hold up or
+    lead the candidate to: the Portal's four (cards now), the Garden of
+    Eden shown with the Kerubim in the Theoricus (vol. 2, p.83, leaf
+    n77), the serpent of Wisdom on the Tree (p.84, n78), the "Diagram of
+    THE FALL, facing West" in the Philosophus (p.144, n138) and the
+    symbol of Venus on the Tree of Life there (p.145, n139). These suit
+    the card: portable, upright, labelled, one emblem each. They would
+    become `card` kinds (`gardenOfEden`, `theFall`, `serpentTree`,
+    `venusTree`), Eden, the Fall and Venus drawing the Tree's own
+    `TreeFigure` inside the card frame, so the frame is shared and the
+    Tree's geometry with it.
+  - *Diagrams on a stand* that stay in the hall for the whole grade:
+    the Flaming Sword (Zelator) and the Minutum Mundum. These stay
+    `board`s, larger and sized by `scale`, as now.
+  - *Objects*: the furniture and the items (lamps, cups, the tablets,
+    the Pantacle). They stay items and tags.
+  The boards `gardenOfEden` and `theFall` would stay valid for saved
+  halls (decision 2); the presets would move to the cards. The serpent
+  on the Tree is today a marker and `serpentTree` an item kind with no
+  art of its own in the presets. Recommendation: cards for the pictures
+  shown, as above, with one frame; to be decided before stage I.
+- **Checked in headless Chromium only** (no Firefox, Safari or real
+  device); no documentation screenshot shows the changed art (the
+  editor and reader shots show the Neophyte's old `/pics` drawing, and
+  no Keryx or adept role icon).
