@@ -4368,6 +4368,262 @@ snapshots regenerated at its own place; Commits lists the new ones):
 - The cards proposal (Follow-ups).
 - The five remaining seals.
 
+### Follow-ups (26 October 2026)
+
+Built on `gate/gd-hall-h3`, from `main` at a84d017, after Gadi's
+decisions that day on the third round of Keryx mock-ups
+(`~/.cache/keryx-v3/`), the hall editor's palette and two research
+questions (`~/.cache/research-56/README.md`).
+
+#### Gadi's decisions (26 October 2026)
+
+- **The Keryx: V1 with V2's two turns.** V1 ("Arch"): a crest beside
+  the ball, the top edge falling to a far, low tip, a flat underside cut
+  into four round feathers, the heads turned outward; but two turns of
+  the serpents, as V2 has, for contrast at small sizes. Gadi was tempted
+  by V2's Shin (wings rising to high tips towards Chokmah and Binah,
+  Regardie vol. 2, p.83, so that wings and staff make a Shin), and chose
+  what reads best at icon size.
+- **One button per palette group** instead of one "Add" button, each
+  opening its group's menu, with a small drawing of each entry.
+- **`/gd/hall`'s source panel** to reach the foot of the screen in
+  Source view, and in split view to stay in view, as tall as the
+  viewport, while the page scrolls past the drawing.
+- **Brief notes in the code** for the 5=6 lamens and the Portal
+  Hiereus' collar (below).
+
+#### The Keryx
+
+- **The geometry** (`Lamen.tsx`), in lamen units, with no scale group
+  now: a pointed staff 3.4 wide, a ball of radius 4.8 with a black ring
+  (1.6) at y −27, the wing as one static outline mirrored with
+  `flipped`, and two serpents derived at load from a few constants. Each
+  serpent is a double helix seen a little from above: `x = A(u)·sin θ`,
+  with a tilt of 0.3 · dy/dθ · cos θ added to y, which rounds the loops.
+  The reach falls from 12 at the neck to 40% at the tail, the turning
+  rate rises linearly to 1.9 times the neck's at the tail, and the body
+  thins from 5 to 3 (3.2 as drawn, arc by arc). The serpent is cut into
+  half-turn arcs where it turns at a side: the arcs behind are drawn
+  under the staff, whose black edge (2.5) parts them from it, and the
+  arcs in front over it, each on a band of the disc's black over its
+  middle two-thirds only, clear of the turns. Depth settles every
+  crossing, with no over-and-under bookkeeping. Each arc is four
+  Hermite cubics through eighth-turn knots (the bands three), tangents
+  by central difference, rounded to one decimal; the heads are
+  ellipses on short necks. No ids, no gradients.
+- **The same bytes as the mock-up**: the port reproduces `gen.ts`'s V1
+  at two turns coordinate for coordinate.
+- **Size.** The Keryx's role icon is 3,376 bytes of markup (5,211 on
+  main). The five halls with a Keryx shrink by 1,823 bytes each: the
+  Neophyte 28,671 to 26,848, Zelator 1 78,620 to 76,797, Zelator 2
+  114,708 to 112,885, Theoricus 1 84,769 to 82,946, Theoricus 2 90,552
+  to 88,729 (snapshots regenerated in the same commit).
+- **Originality.** The old icon (SVG Repo, 570e5f8) was looked at only
+  as a rendered silhouette, never its path data, and nothing was copied
+  or traced from the mock-ups' `old/` reference copy. The serpents are
+  a parametric helix with depth-ordered arcs and per-arc widths, not a
+  filled outline; the wing is generated (notch, crest, tip, feathers
+  along a straight underside) and mirrored. Overlap with the old
+  glyph's white area inside the disc at 200 px (intersection over
+  union): the new one 0.54, main 0.43; V1 at 2.5 turns was 0.56. A trace
+  would score above 0.9.
+- **Checked** at 20, 25, 40 and 120 px and as the 25 px role chip beside
+  "Keryx": at 20 px the wings and ball read as a bright bar with a dark
+  notch over a checked column; at 25 px the two crossings show.
+- **Tests** check four arcs behind the staff, four bands after it, the
+  body's widths (5 at the neck, 3.2 at the tail), two heads and the
+  size.
+
+#### The palette's buttons
+
+- **The toolbar** shows "+ Officer", "+ Furniture", "+ Banner",
+  "+ Item", "+ Symbol" and "+ Text", the palette's six groups
+  (`HALL_PALETTE_GROUPS` gives each group's button name, singular:
+  what one choice adds). Their accessible names are "Add officer",
+  "Add furniture" and so on, which contain the visible text.
+  `hallPaletteSections` splits the palette in toolbar order and leaves
+  out a group without entries (the art registry decides the items).
+- **Each button's name covers what it offers** (review). Officer held
+  the marker and Banner the Hebrew letter, which their names did not
+  hint at. Of the two fixes offered, moving them or listing each
+  button's contents in a tooltip, they moved: the marker, text in a
+  box for an object without art, is under Text beside the label
+  ("Marker (text in a box)"), and the Hebrew letter under Symbol.
+  Only the group changed: where each lands is as before.
+- **One tab stop.** The six buttons are a toolbar of their own ("Add
+  to the hall") with a roving tab stop: Tab reaches the last one used,
+  and the left and right arrows (wrapping), Home and End move along
+  it (review).
+- **Menus.** Each button opens its group's MUI menu
+  (`aria-haspopup="menu"`, `aria-expanded`, `aria-controls` naming the
+  menu's list, which `aria-labelledby` names after the button): arrow
+  keys, Home and End, type-ahead, Escape back to the button, Tab out.
+  A group of one would add its entry at once, without a menu (none is
+  now). A choice moves the focus to the drawing, as before.
+- **Icons.** Beside each entry's name the menu draws the entry itself at
+  22 px through the hall's own art registry (`PaletteIcon`: the entry's
+  tag and attributes as a hall row, its art's `Component` in its
+  nominal box, gradient ids from `useId`), hidden from assistive
+  technology. An entry without art (the door, which its wall draws)
+  keeps an empty slot. The name comes first in the markup and the icon
+  shows first by CSS `order`, so the type-ahead reads the name: a
+  tablet's icon holds its letters, and "e" would otherwise not find
+  "Enochian tablet" (tested).
+- **Behaviour kept.** `insertFromPalette` is unchanged: where a new
+  object lands, the host rules and one undo step per addition.
+- **Layout.** The buttons wrap: one row at 1440 px and in `/gd/hall`'s
+  split view at 1024 px (the panel docked), two rows of three on a 390
+  px phone; no horizontal scroll. No "More" overflow was needed.
+- **Help.** Neither the editor's hint nor the Ritual Pug guide
+  mentioned "Add", so neither changed. No documentation screenshot
+  shows the hall editor, its Add menu or the Keryx (the editor and
+  reader shots show the Neophyte's old `/pics` drawing), so none was
+  recaptured.
+
+#### The 5=6 lamens and the Hiereus' collar
+
+From the research of 26 October 2026, kept outside the repository
+(`~/.cache/research-56/README.md`); only facts and page references
+enter it.
+
+- **The adepts in a 5=6 hall.** The Chief Adept bears the Rose-Cross on
+  his breast: Regardie 1938, vol. 2, p.202 (leaf n195, the Chief's
+  breast emblem) and p.220 (n213: in the Pastos it hangs from a double
+  Phoenix collar); the Equinox I.3, pp.208–222, agrees. The Second and
+  Third Adepts probably wear it too, but that is inferred, not stated
+  in the 5=6 rubric: every Adept wears it at all meetings of Adepts
+  (vol. 3, p.51, n44, from a yellow collarette), and the Third Adept
+  touches the Rose-Cross on his own breast (vol. 2, p.254, n248, in the
+  Equinox ceremony). No source carries the Portal's
+  triangle-in-pentagram or cup-on-octagram into the 5=6; they belong to
+  the Portal only. The only source with distinct jewels for the Second
+  and Third Adepts is Waite's reworked Fellowship of the Rosy Cross rite
+  (1917). The review corrected the first citations, which made all
+  three stated and the collar yellow. Noted by
+  the adepts' lamens (`lamenGlyphs.tsx`, `Lamen.tsx`) and in
+  `lamenGrades.ts`, where a 5=6 grade would go. Nothing drawn changes:
+  without a grade the adepts keep the Portal's lamens.
+- **The Portal Hiereus' collar.** The p.156 (n149) list gives him two
+  collars and no cloak ("Black Collar", then "Red Shoes and Collar").
+  We read "Black Collar" as a misprint for "Black Cloak", which keeps
+  the Outer Order's black cloak and scarlet collar (Z.1, Regardie vol.
+  3, pp.92–93, leaves n84–85, where the scarlet is the Divine
+  Severity's), so the ring stays red, as built. Noted at `GRADE_LAMENS`
+  in `Lamen.tsx` and by `PortalHiereus`. If Gadi chooses black, the
+  ring becomes a dark grey (about `#333`) with the usual outline, so it
+  shows against the black disc.
+
+#### The source panel
+
+- **Before**, `/gd/hall`'s source editor held the bounded height it has
+  inline (25rem to 65vh), so in Source view it ended well above the
+  screen's foot, and in split view it scrolled away with the drawing.
+- **From 900px wide** (where split puts the panels side by side) the
+  editor now fills its panel (`RitualSourceEditor`'s `fill`). In Source
+  view the panel ends 0.75rem above the viewport's foot: the panels'
+  distance from the top of the page is measured into `--panels-top`
+  (`usePanelsTop`). It is measured again when anything above the
+  panels can have moved them: a resize of any of their ancestors or of
+  the elements before each (a dozen or so elements, ResizeObserver),
+  of the window, or the fonts' loading; a measurement that finds the
+  same top writes nothing (review: observing only the playground
+  missed the page's text above it). In split view the panel is
+  `position: sticky` 0.5rem below the 64px app bar and as tall as the
+  viewport below it, so it stays in view while the page scrolls past
+  the drawing, its source scrolling inside it; its minimum height,
+  20rem, never exceeds that room on a short screen (review). It is not
+  sized to the drawing, whose height varies by hall and layout; a
+  drawing shorter than the panel simply ends the sticking sooner.
+- **Narrower**, stacked, the editor keeps its bounded height (a CSS
+  rule restores 25rem to 65vh, since `fill` is now always passed).
+- **The ritual editor** already does this: its surface is the
+  viewport's height below the app bar (`SemanticEditor.module.css`)
+  and the window does not scroll, so its source reaches within its 1rem
+  bottom padding of the foot. Nothing changed there; it was read, not
+  opened in the browser (no database here).
+- **Measured** in headless Chromium with classic 15px scrollbars (the
+  phone with none): Source view, the editor's foot 12px above the
+  viewport's at 1920 × 1080, 1440 × 900 and 1280 × 800; split view with
+  Portal 2, scrolled half-way down the drawing, the panel from 72px to
+  8px above the foot at 1440 × 900 and 1280 × 800, its source scrolling
+  inside (1,072 and 1,224px of source in 779 and 679), and at 1920 ×
+  1080, where the drawing's column is barely taller than the panel, held
+  until that column ends; at 390 × 844 the editor 548px (65vh), as
+  before; no horizontal scroll. After the review fixes: 150px of text
+  added above the playground moved the panel down and kept its foot
+  12px above the viewport's; at 1280 × 360 the split panel ran from 72
+  to 352px, inside the screen. The app bar hides as the page scrolls
+  down, which leaves the sticky panel's top 72px empty until it shows
+  again.
+
+#### Bundle
+
+From the gates' production builds (webpack), gzip -6 for the chunks:
+
+- **The Keryx** (main a84d017 against d62c7c0): the lazy chunk holding
+  `Lamen` with the hall's art grew from 42,426 bytes (15,653 gzipped)
+  to 42,685 (15,842), and the shared chunk the reader's role icons load
+  from 29,972 (10,788) to 30,231 (10,977): the helix is a little more
+  code than the stretches it replaces, though each drawing is 1,835
+  bytes smaller. All JavaScript chunks: 8,010,204 bytes before,
+  8,010,714 after.
+- **The palette's buttons** (d62c7c0 against ea29a29, with the review
+  fixes): the hall editor's chunk grew from 43,496 bytes (15,852
+  gzipped) to 45,135 (16,410), 1,639 bytes (558 gzipped), with
+  `PaletteIcon`, `hallPaletteSections`, the menu's wiring and the
+  toolbar's roving tab stop; the art registry it draws with was loaded
+  already. Webpack also re-split two lazy chunks the page loads (MUI's
+  `ListSubheader`, which the editor no longer imports, moved to a
+  shared chunk `/gd/hall` does not load), so the scripts `/gd/hall`
+  itself loads, measured in a production server after the editor has
+  drawn, went from 3,689,085 bytes to 3,688,930 (1,162,666 to
+  1,162,716 as served). All JavaScript chunks: 8,010,714 before,
+  8,018,144 after, the shared chunk's growth.
+
+#### Sheets
+
+Outside the repository, in `~/.cache/gdhall-h3/`:
+
+- `keryx/keryx-before-after.png`: the old icon, main and the new one at
+  20, 25, 40 and 120 px, the 20 and 25 px renders magnified ×8 pixel
+  for pixel, and the 25 px role chip, every row labelled.
+- `browser/add-menus-desktop-v2.png` and
+  `browser/add-menus-phone-and-docked-v2.png`: the Officer, Symbol and
+  Text menus at 1440 px; the toolbar and the Officer and Item menus on
+  a 390 px phone; the Officer menu in the docked split view at 1024 px
+  (every shot in `browser/shots2/`).
+- `browser/source-panel-desktop-v2.png` and
+  `browser/source-panel-phone-v2.png`: Source view and split view,
+  scrolled, at the four sizes, and split view at 1280 × 360 (every shot
+  in `browser/panel2/`).
+- The sheets before the review fixes keep their names without `-v2`.
+
+#### What was verified, and how
+
+- **Gates**, per commit, each in a clean `git archive` export with Node
+  24 and the CI placeholder environment (`pnpm install
+  --frozen-lockfile`, `check`, `typecheck`, `test:coverage`, `build`):
+  all 0 for d62c7c0 and, after the review fixes, for ea29a29, 620b3d6
+  and 366e80d (6,627 tests passed, 17 skipped, at 366e80d), as for each before them. The plan's
+  commit also ran `loom check`, the magick-data smoke test and `pnpm
+  check:turbopack`. The compiler is untouched (`semantic.ts`,
+  `semanticCompilerImpl.ts` and `ritualNodeIds.ts` have no diff);
+  `src/components` imports no app code; no hall box or scale changed.
+- **In the browser** (Turbopack dev servers from this branch on
+  127.0.0.1:3463 and, after the review fixes, 3466, with placeholder
+  settings, headless Chromium over CDP; nothing signed in or saved):
+  `/gd/hall` at 1440 × 900, at 390 × 844 (mobile emulation, the panel
+  docked) and in split view at 1024 × 768 (docked): six buttons named
+  "Add officer" … "Add text" in one toolbar, whose arrows and End move
+  the tab stop; the Officer, Symbol, Item and Text menus named after
+  their buttons, 14, 15, 17 and 2 entries, each with its icon (the
+  label has none); Escape back to the button; Enter, an arrow and
+  Enter from the keyboard adds the Enochian tablet, selected, the
+  drawing focused; "e" in the Symbol menu finds "Enochian tablet";
+  Text's Label adds a label, selected; no horizontal scroll, no
+  console error. The ritual editor's hall editor is the same component
+  (tests); it was not opened in the browser (no database here).
+
 ## Commits
 
 | Commit | Change |
@@ -4499,6 +4755,10 @@ snapshots regenerated at its own place; Commits lists the new ones):
 | 3b8bd15 | The Keryx's wings (K1, a dip round the ball) and coils narrowing and tightening downward; `smoothPath` draws a stretch of a path (H2, Gadi's decision) |
 | 501d320 | `card(kind)`: Pan, the Devil, Death and Typhon as emblem cards in the tarot key's frame, labelled; Portal 2 draws them; storm grey (H2, Gadi's decision) |
 | ce5daa8 | The Moon's and Venus' seals after Agrippa's 1533 woodcuts on silver plates; `publicDomain()` provenance (H2, Gadi's decision) |
+| d62c7c0 | The Keryx's caduceus as V1 with two turns: a helix of depth-ordered arcs, the "Arch" wings (H2 follow-ups, Gadi's decision) |
+| ea29a29 | One palette button per group, each with its menu, and each entry drawn beside its name; one tab stop for the six; the marker under Text and the Hebrew letter under Symbol (H2 follow-ups, Gadi's request; review fixes folded in) |
+| 620b3d6 | Notes on the 5=6 lamens and the Portal Hiereus' collar (H2 follow-ups; review fixes folded in) |
+| 366e80d | `/gd/hall`'s source panel reaches the screen's foot in Source view and sticks, as tall as the viewport, in split view (H2 follow-ups, Gadi's request; review fixes folded in) |
 
 ## Future
 
@@ -4726,11 +4986,27 @@ From stage H, part 2:
   sigils, and sigils of any name) are a separate, later `/gd/sigils`
   feature, not hall art. The sigil system needs more work first: it
   handles easy names but not all the hard cases.
-- **For Gadi**: the Portal Hiereus' ring (red, from "Red Shoes and
-  Collar", or black, from "Black Collar"; p.156 names both); whether
-  the Third Adept's blue and orange need telling apart from the
-  Praemonstrator's at icon size; whether a 5=6 hall should give every
-  Adept the Rose-Cross through `grade`.
+- **For Gadi**: the Portal Hiereus' ring, red as built, reading
+  p.156's "Black Collar" as a misprint for "Black Cloak" (Follow-ups
+  of 26 October 2026); if Gadi chooses black, a dark grey (about
+  `#333`) ring with the usual outline. Whether the Third Adept's blue
+  and orange need telling apart from the Praemonstrator's at icon size.
+- **A 5=6 hall** (none yet): the Chief Adept bears the Rose-Cross
+  (Regardie 1938, vol. 2, pp.202 and 220, a double Phoenix collar in
+  the Pastos), and the Second and Third probably do too (inferred from
+  vol. 3, p.51, and vol. 2, p.254), not the Portal's lamens. A grade value
+  in `lamenGrades.ts` for the 5=6 would draw it, when a Vault or 5=6
+  preset needs it; noted in the code.
+- **The Keryx's Shin** (V2), which Gadi liked for its symbolism but did
+  not choose for icon sizes: possible later as a larger drawing, such
+  as the Keryx's own lamen in a close-up, if ever wanted.
+- **The palette's menus** checked in headless Chromium only (no
+  Firefox, Safari or real device), and only in `/gd/hall`; the ritual
+  editor's hall editor, the same component, by its tests.
+- **`/gd/hall`'s sticky source panel** leaves 72px empty above it while
+  the app bar is hidden on scrolling down; following the bar's
+  visibility would close the gap. Checked in headless Chromium only;
+  `100dvh` on a phone is not used (the panels stack there).
 - **The cards proposal** (not done, for Gadi). The rituals show the
   candidate three kinds of thing, and the hall could draw each one way:
   - *Pictures shown to the candidate*, which the officers hold up or

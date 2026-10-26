@@ -391,7 +391,14 @@ Follow-ups are separate from the completed migration work:
   and Hegemon their own (`grade="portal"`); the Keryx's wings dip round
   the ball and its coils narrow downward; and the Moon's and Venus'
   seals are drawn after Agrippa's 1533 woodcuts (public domain, cited by
-  archive.org item and leaf).
+  archive.org item and leaf). Its follow-ups (26 October 2026, Gadi's
+  decisions): the Keryx's caduceus is design V1 with two turns, the hall
+  editor adds from one button per palette group ("+ Officer" …
+  "+ Text"), each menu drawing its entries, and the code notes that a
+  5=6 hall's Chief Adept wears the Rose-Cross (the other two probably)
+  and why the Portal
+  Hiereus' ring is red; `/gd/hall`'s source panel reaches the screen's
+  foot in Source view and stays in view, sticky, in split view.
   The tablet versions Gadi decided on 24 October 2026 are done on
   `gate/enochian-versions`: magick-data holds each source's reading of
   every square (Regardie 1940, the Equinox 1912, Greer, Dee's table of
@@ -428,8 +435,9 @@ Follow-ups are separate from the completed migration work:
   markers and placeholders Gadi has yet to decide on (Eden and the Fall,
   with a proposal to make the pictures shown to the candidate cards
   like the Portal's; the Tree markers; the Minutum Mundum's path
-  colours), the Portal Hiereus' ring colour (the rubric names a black
-  and a red collar), whether the Third Adept's lamen (blue ring, orange
+  colours), the Portal Hiereus' ring colour (red as built, reading the
+  rubric's "Black Collar" as a misprint for "Black Cloak"; black would
+  be a dark grey ring), whether the Third Adept's lamen (blue ring, orange
   octagram) needs telling apart from the Praemonstrator's at icon size,
   the other five seals (hand-drawn after Agrippa like the Moon's and
   Venus'), and name sigils traced over a kamea (adapt `/gd/sigils`: a
