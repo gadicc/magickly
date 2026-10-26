@@ -66,23 +66,41 @@ describe("Lamen", () => {
         "#000",
         "white",
       ]);
-    expect(render("keryx")).toMatch(/<g fill="white"><path d="M2.4,-15C/);
+    expect(render("keryx")).toMatch(
+      /<g fill="white"><g fill="none" stroke="white"/,
+    );
     expect(render("sentinel")).toMatch(/<g transform="[^"]+" fill="white"/);
   });
 
   it("draws the caduceus and the Eye of Horus from our own geometry", () => {
     const keryx = render("keryx");
-    // The serpents on a halo of the disc's black, and each drawn again,
-    // on its halo, where it passes over the other: two crossings since
-    // stage H, part 2, one each.
-    expect(keryx.match(/stroke="black" stroke-width="12"/g)).toHaveLength(3);
-    expect(keryx.match(/stroke-linecap="butt"/g)).toHaveLength(2);
+    // Two serpents of two turns, each cut into four half-turn arcs: the two
+    // behind drawn under the staff, the two in front over it on bands of
+    // the disc's black (stage H, part 2, follow-ups).
+    const staff = keryx.indexOf('paint-order="stroke"');
+    const behind = keryx
+      .slice(0, staff)
+      .match(/<path d="M[^"]+" stroke-width=/g);
+    expect(behind).toHaveLength(4);
+    const bands = [
+      ...keryx.matchAll(
+        /stroke="black" stroke-width="[\d.]+" stroke-linecap="butt"/g,
+      ),
+    ];
+    expect(bands).toHaveLength(4);
+    for (const band of bands) expect(band.index).toBeGreaterThan(staff);
+    // The body thins towards the tail: 5 at the neck, 3.2 at the tail.
+    const widths = [
+      ...keryx.matchAll(/" stroke-width="([\d.]+)"><\/path>/g),
+    ].map(([, width]) => Number(width));
+    expect(Math.max(...widths)).toBe(5);
+    expect(Math.min(...widths)).toBe(3.2);
     expect(keryx.match(/<ellipse /g)).toHaveLength(2);
     // Neither the SVG Repo caduceus nor the game-icons.net eye.
     expect(keryx).not.toContain("512");
     expect(render("sentinel")).not.toContain("scale(0.15)");
     for (const officer of ["keryx", "sentinel"])
-      expect(render(officer).length, officer).toBeLessThan(6000);
+      expect(render(officer).length, officer).toBeLessThan(4000);
   });
 
   it("draws the adepts' Portal lamens, ringed in their collars", () => {

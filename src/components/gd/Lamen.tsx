@@ -1,6 +1,5 @@
 import type * as React from "react";
-import { svgCoordinate } from "../svgCoordinate";
-import { flipped, type Point, smoothPath } from "./hall/art/geometry";
+import { flipped, type Point } from "./hall/art/geometry";
 import {
   CupOnOctagram,
   PortalHegemon,
@@ -161,145 +160,196 @@ const TipharethCalvaryCross = ({
 );
 
 /**
- * The caduceus of the Keryx's lamen, drawn from geometry (plan 061, stage
- * H): a staff topped by a ball, two wings, and two serpents interlaced up
- * the staff, their heads facing each other below the ball. Each serpent
- * winds `x = ±A(u)·sin(2π·turns·g(u))` from the tail (u = 0) to the neck
- * (u = 1), through a smooth curve. Since stage H, part 2 (Gadi's request)
- * the coils narrow and tighten towards the tail: the amplitude falls off
- * downward, and `g` runs faster near the tail, so the loops are wide at
- * the top and small below. Where one serpent passes over the other it is
- * drawn again over a band of the disc's black, which makes the
- * interlacing. One colour, white on the black disc like every other
- * lamen's glyph.
+ * The caduceus of the Keryx's lamen, drawn from geometry in lamen units
+ * (plan 061, stage H, part 2, follow-ups: Gadi chose wings V1 with two
+ * turns of the serpents on 26 October 2026). A pointed staff topped by a
+ * ringed ball, two wings, and two serpents wound round the staff as a
+ * double helix seen a little from above, their heads turned outward
+ * below the wings.
+ *
+ * Each serpent winds `x = A(u)·sin θ` from the tail (u = 0) to the neck
+ * (u = 1), with a small tilt `TILT · dy/dθ · cos θ` added to y that
+ * rounds the loops. The reach `A` falls towards the tail, the turning
+ * rate rises there (the coils tighten), and the body thins arc by arc.
+ * The serpent is cut into half-turn arcs where it turns at a side: the
+ * arcs behind (cos θ < 0) are drawn under the staff, those in front over
+ * it on a band of the disc's black, so the depth settles every crossing.
+ * Each arc is a few Hermite cubics through eighth-turn knots, rounded to
+ * one decimal: no ids, no gradients.
  */
-const SERPENT_TURNS = 1.25;
-/**
- * The serpents' width before the glyph's 0.66 scale: 1.1 px at the role
- * icon's 20 px, so the lowest coil still shows (review, stage H, part 2).
- */
-const SERPENT_WIDTH = 8.4;
-/** How high the serpents run: from the tail up to the necks, below the ball. */
-const SERPENT_TAIL = 42;
-const SERPENT_NECK = -12;
-const SERPENT_SAMPLES = 22;
-/** The widest coil, at the neck, and the share of it left at the tail. */
-const SERPENT_REACH = 17;
-const SERPENT_TAPER = 0.65;
-/** How much faster the coils turn at the tail than at the neck. */
-const SERPENT_TIGHTEN = 1.2;
+const TURNS = 2;
+/** The body's width at the neck, and the share of it left at the tail. */
+const BODY = 5;
+const THIN = 0.6;
+/** The black edge either side of a front arc and of the staff. */
+const EDGE = 1.25;
+/** The widest swing, at the neck, and the share of it left at the tail. */
+const REACH = 12;
+const TAPER = 0.4;
+/** How much faster the coils turn at the tail than at the neck (+90%). */
+const TIGHTEN = 0.9;
+const TAIL = 35;
+const NECK = -10;
+const TILT = 0.3;
+/** Knots per serpent: one every eighth of a turn. */
+const KNOTS = TURNS * 8;
 
-/** The share of the turns made by `u`, from the tail (0) to the neck (1). */
-const turned = (u: number) => 1 - (1 - u) ** SERPENT_TIGHTEN;
-/** Where along the serpent (0 to 1) it has made `share` of its turns. */
-const whereTurned = (share: number) =>
-  1 - (1 - Math.min(1, Math.max(0, share))) ** (1 / SERPENT_TIGHTEN);
-
-/** One serpent's centre line, tail (bottom) to head, `side` ±1. */
-function serpentLine(side: 1 | -1): Point[] {
-  const line: Point[] = [];
-  for (let i = 0; i <= SERPENT_SAMPLES; i++) {
-    const u = i / SERPENT_SAMPLES;
-    const reach = SERPENT_REACH * (SERPENT_TAPER + (1 - SERPENT_TAPER) * u);
-    line.push([
-      side * reach * Math.sin(2 * Math.PI * SERPENT_TURNS * turned(u)),
-      SERPENT_TAIL + (SERPENT_NECK - SERPENT_TAIL) * u,
-    ]);
-  }
-  // The neck turns in towards the staff, the head facing the other's.
-  const [x, y] = line[line.length - 1];
-  line.push([x * 0.92, y - 4], [x * 0.62, y - 7]);
-  return line;
-}
+const r1 = (value: number) => Math.round(value * 10) / 10 + 0;
+const xy = ([x, y]: Point) => `${r1(x)},${r1(y)}`;
 
 /**
- * The stretches where a serpent passes over the other: an eighth of a
- * turn either side of every other crossing, which lie at k / (2 · turns)
- * of the turns, so the two take turns. An eighth reaches past where the
- * two bodies overlap and stops short of the loops' sharp ends, where a
- * band's square end would show.
+ * How far along the serpent (u, tail 0 to neck 1) it has made `share` of
+ * its turns, the turning rate falling linearly from 1 + TIGHTEN at the
+ * tail to 1 at the neck.
  */
-function overStretches(side: 1 | -1): [number, number][] {
-  const at = (share: number) =>
-    Math.round(whereTurned(share) * SERPENT_SAMPLES);
-  const eighth = 1 / (8 * SERPENT_TURNS);
-  const stretches: [number, number][] = [];
-  for (let k = 1; k / (2 * SERPENT_TURNS) < 1; k++)
-    if ((k % 2 === 1) === (side === 1)) {
-      const share = k / (2 * SERPENT_TURNS);
-      stretches.push([at(share - eighth), at(share + eighth)]);
-    }
-  return stretches;
+const along = (share: number) =>
+  (1 +
+    TIGHTEN -
+    Math.sqrt((1 + TIGHTEN) ** 2 - 2 * TIGHTEN * share * (1 + TIGHTEN / 2))) /
+  TIGHTEN;
+
+/** The angle at `share` of the turns: π/2 at the neck (and the tail). */
+const angle = (side: 1 | -1, share: number) =>
+  Math.PI / 2 + 2 * Math.PI * TURNS * (share - 1) + (side < 0 ? Math.PI : 0);
+
+/** A serpent's centre line at `share` of its turns. */
+function coil(side: 1 | -1, share: number): Point {
+  const u = along(share);
+  const theta = angle(side, share);
+  // dy/dθ: how far the coil falls per radian here.
+  const pitch =
+    ((NECK - TAIL) * (1 + TIGHTEN / 2)) /
+    ((1 + TIGHTEN - TIGHTEN * u) * 2 * Math.PI * TURNS);
+  return [
+    REACH * (TAPER + (1 - TAPER) * u) * Math.sin(theta),
+    TAIL + (NECK - TAIL) * u + TILT * pitch * Math.cos(theta),
+  ];
 }
 
-const SERPENTS = ([1, -1] as const).map((side) => {
-  const line = serpentLine(side);
-  const [hx, hy] = line[line.length - 1];
-  return {
-    whole: smoothPath(line, 1),
-    // Each piece follows the whole serpent's curve exactly, the white
-    // body a little past its black band at both ends.
-    over: overStretches(side).map(([from, to]) => ({
-      band: smoothPath(line, 1, from, to),
-      body: smoothPath(
-        line,
-        1,
-        Math.max(0, from - 2),
-        Math.min(line.length - 1, to + 2),
-      ),
-    })),
-    head: { cx: hx - side * 1.5, cy: hy - 0.8, angle: side * 18, hx, hy },
+/** The centre line from share `a` to `b` in `pieces` Hermite cubics. */
+function coilPath(side: 1 | -1, a: number, b: number, pieces: number) {
+  const tangent = (share: number): Point => {
+    const h = 1e-4;
+    const [p, q] = [coil(side, share - h), coil(side, share + h)];
+    return [(q[0] - p[0]) / (2 * h), (q[1] - p[1]) / (2 * h)];
   };
-});
+  let d = `M${xy(coil(side, a))}`;
+  for (let i = 0; i < pieces; i++) {
+    const [s0, s1] = [
+      a + ((b - a) * i) / pieces,
+      a + ((b - a) * (i + 1)) / pieces,
+    ];
+    const k = (s1 - s0) / 3;
+    const [p0, p1, t0, t1] = [
+      coil(side, s0),
+      coil(side, s1),
+      tangent(s0),
+      tangent(s1),
+    ];
+    d += `C${xy([p0[0] + t0[0] * k, p0[1] + t0[1] * k])} ${xy([p1[0] - t1[0] * k, p1[1] - t1[1] * k])} ${xy(p1)}`;
+  }
+  return d;
+}
 
-/** Both serpents in one path: the over-stretches settle the crossings. */
-const BOTH = SERPENTS.map(({ whole }) => whole).join("");
+/** A stroke of the serpents: its path, its width and whether it is a black band. */
+interface CoilStroke {
+  d: string;
+  width: number;
+  band?: true;
+}
+
+const BEHIND: CoilStroke[] = [];
+const IN_FRONT: CoilStroke[] = [];
+/** Each head: its centre, and the angle it leans out. */
+const HEADS: { cx: number; cy: number; lean: number }[] = [];
+for (const side of [1, -1] as const) {
+  // Half-turn arcs, from one side turn to the next: the tail is at a side
+  // too, as TURNS is whole.
+  for (let i = 0; i < KNOTS; i += 4) {
+    const [a, b] = [i / KNOTS, (i + 4) / KNOTS];
+    const width = r1(BODY * (THIN + (1 - THIN) * along((a + b) / 2)));
+    const d = coilPath(side, a, b, 4);
+    if (Math.cos(angle(side, (a + b) / 2)) < 0) BEHIND.push({ d, width });
+    else {
+      // The black band only over the arc's middle, where it crosses the
+      // staff and the other serpent, clear of the turns at the sides.
+      const trim = (b - a) * 0.17;
+      IN_FRONT.push(
+        {
+          d: coilPath(side, a + trim, b - trim, 3),
+          width: width + 2 * EDGE,
+          band: true,
+        },
+        { d, width },
+      );
+    }
+  }
+  // The neck rises and leans outward to the head.
+  const [x, y] = coil(side, 1);
+  const [hx, hy] = [x + side * 2.6, y - 3];
+  IN_FRONT.push({
+    d: `M${xy([x, y])}Q${xy([x + side * 0.3, y - 2.2])} ${xy([hx, hy])}`,
+    width: BODY,
+  });
+  HEADS.push({ cx: r1(hx + side * 1.2), cy: r1(hy - 1), lean: -side * 35 });
+}
+
+/** The staff, pointed at the foot, its top hidden by the ball. */
+const STAFF = "M-1.7,-26H1.7V36L0,38.4L-1.7,36Z";
 
 /**
- * One wing (the right), in lamen units; flipped for the left. Option K1
- * of Gadi's choice (24 October 2026): a leading edge that leaves the
- * staff low under the ball, dips there, and sweeps up to a pointed tip,
- * and a nearly flat trailing edge cut into four rounded feathers. The
- * dip leaves a notch round the ball, as the old icon's wings had.
+ * One wing (the right), in lamen units; flipped for the left. Design V1
+ * ("Arch"): the top edge leaves the ball's side, dips under it (the notch
+ * the ball's ring closes), rises to a crest beside the ball and falls to
+ * a far, low tip; the underside is flat, cut into four round feathers.
  */
 const WING =
-  "M2.4,-15C8,-16 15,-25 29.5,-26C29.3,-22.6 27,-15.1 26.2,-18.1C25.8,-14.7 20.7,-11.8 18.9,-14.8C18.5,-11.4 12.7,-9.6 10.7,-12.6C10.3,-9.2 4.5,-7.5 2.4,-10.5Z";
+  "M0,-24.5Q3.8,-20.4 6,-21C9.5,-22.5 9,-30.6 14,-31Q25.8,-25.2 35.5,-16.5C35.5,-14.4 30.9,-13.8 29.3,-16.6C29.3,-13.6 24.1,-13 22.5,-16.2C22.5,-13.2 16.7,-12.6 15.1,-15.8C15.1,-12.8 8.6,-12.2 7,-15.4Q2.4,-14.9 0,-19Z";
 const WINGS = WING + flipped(WING);
 
 /** The Keryx's caduceus, white on the black disc, in lamen units. */
 function Caduceus() {
-  const serpent = SERPENT_WIDTH;
+  const strokes = (list: CoilStroke[]) =>
+    list.map(({ d, width, band }) =>
+      band ? (
+        <path
+          key={`b${d}`}
+          d={d}
+          stroke="black"
+          strokeWidth={width}
+          strokeLinecap="butt"
+        />
+      ) : (
+        <path key={d} d={d} strokeWidth={width} />
+      ),
+    );
   return (
     <g fill="white">
+      <g fill="none" stroke="white" strokeLinecap="round">
+        {strokes(BEHIND)}
+        <path
+          d={STAFF}
+          fill="white"
+          stroke="black"
+          strokeWidth={2 * EDGE}
+          paintOrder="stroke"
+        />
+        {strokes(IN_FRONT)}
+      </g>
       <path d={WINGS} />
-      <g transform="translate(0 6) scale(0.66)">
-        <path d="M-3.4,-34H3.4V46A3.4,3.4 0 0 1 -3.4,46Z" />
-        <circle cy={-38} r={7.5} />
-        <g fill="none" strokeLinecap="round">
-          <path d={BOTH} stroke="black" strokeWidth={serpent + 3.6} />
-          <path d={BOTH} stroke="white" strokeWidth={serpent} />
-          {SERPENTS.flatMap(({ over }) =>
-            over.map(({ band, body }) => (
-              <g key={band} strokeLinecap="butt">
-                <path d={band} stroke="black" strokeWidth={serpent + 3.6} />
-                <path d={body} stroke="white" strokeWidth={serpent} />
-              </g>
-            )),
-          )}
-        </g>
-        {SERPENTS.map(({ head: { cx, cy, angle, hx, hy } }) => (
+      <g stroke="black" strokeWidth={1.2}>
+        {HEADS.map(({ cx, cy, lean }) => (
           <ellipse
-            key={angle}
-            cx={svgCoordinate(cx)}
-            cy={svgCoordinate(cy)}
-            rx={serpent * 0.95}
-            ry={serpent * 0.7}
-            transform={`rotate(${angle} ${svgCoordinate(hx)} ${svgCoordinate(hy)})`}
-            stroke="black"
-            strokeWidth={1.4}
+            key={lean}
+            cx={cx}
+            cy={cy}
+            rx={r1(BODY * 0.9)}
+            ry={r1(BODY * 0.6)}
+            transform={`rotate(${lean} ${cx} ${cy})`}
           />
         ))}
       </g>
+      <circle cy={-27} r={4.8} stroke="black" strokeWidth={1.6} />
     </g>
   );
 }
