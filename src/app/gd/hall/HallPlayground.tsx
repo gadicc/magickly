@@ -4,6 +4,7 @@ import { GdHall } from "@magick-components/gd/hall/GdHall";
 import {
   HALL_PRESETS,
   type HallPreset,
+  hallPreset,
   hallSourceText,
   hallSourceUrl,
 } from "@magick-components/gd/hall/presets";
@@ -35,6 +36,7 @@ import { validateRitualSemantic } from "@/doc/semantic";
 import { useRitualEditorLayout } from "@/doc/useRitualEditorLayout";
 import ExportControls from "@/export/ExportControls";
 import { copyText } from "@/export/exportRuntime";
+import { GD_HALLS, gdHall, gdHallFileBase } from "@/render/contracts/gdHall";
 import { gdHallArt } from "./art";
 import { embedGdHallFonts } from "./exportFonts";
 import {
@@ -57,9 +59,11 @@ import {
 import { hallNodeCount, MAX_KEPT_HALL_NODES, tooManyNodes } from "./hallLimits";
 import styles from "./hallPlayground.module.css";
 import {
+  isPresetHash,
   isShareHash,
   MAX_SHARE_FRAGMENT,
   MAX_SHARED_BYTES,
+  presetHashSlug,
   readShareHash,
   type ShareFragment,
   shareFragment,
@@ -109,6 +113,16 @@ export const validHall = (hall: HallElement) =>
     nodes: [hall],
   }).length === 0;
 
+/**
+ * The export's file name: an unchanged preset's is its published image's
+ * (`golden-dawn-zelator-1-temple`, plan 062), any other hall's
+ * `gd-hall-custom`.
+ */
+export function exportFilename(preset: HallPreset | undefined): string {
+  const hall = preset && GD_HALLS.find((entry) => entry.preset === preset.id);
+  return hall ? gdHallFileBase(hall) : "gd-hall-custom";
+}
+
 /** A message above the editor, until the author dismisses or acts on it. */
 type Note =
   | { kind: "restored" }
@@ -117,8 +131,14 @@ type Note =
    * A hall opened from a share link. `draft`: what this browser held as
    * the link opened: a draft, none, or one that could not be read.
    */
-  | { kind: "shared"; draft: "kept" | "none" | "unreadable" }
-  | { kind: "share-failed"; reason: string }
+  | {
+      kind: "shared";
+      draft: "kept" | "none" | "unreadable";
+      /** The preset a `#preset=` link opened; a share link's hall otherwise. */
+      preset?: string;
+    }
+  /** A link that did not open; `preset` for a `#preset=` link. */
+  | { kind: "share-failed"; reason: string; preset?: boolean }
   /**
    * Another tab wrote a newer draft. `conflict`: this tab has changes of
    * its own too, which are not written over it until the author chooses.
@@ -146,14 +166,18 @@ function noteText(note: Note): string {
       return "Draft restored.";
     case "unreadable-draft":
       return "The draft kept in this browser could not be read, so the editor starts from the Neophyte hall.";
-    case "shared":
+    case "shared": {
+      const opened = note.preset
+        ? `Opened the ${note.preset}.`
+        : "Opened a hall from a share link.";
       return note.draft === "kept"
-        ? "Opened a hall from a share link. Your own draft stays in this browser until you change this hall; Undo goes back to the hall you had."
+        ? `${opened} Your own draft stays in this browser until you change this hall; Undo goes back to the hall you had.`
         : note.draft === "unreadable"
-          ? "Opened a hall from a share link. The draft kept in this browser could not be read; once you change this hall, it is kept as the draft in its place."
-          : "Opened a hall from a share link. Once you change it, it is kept as a draft in this browser.";
+          ? `${opened} The draft kept in this browser could not be read; once you change this hall, it is kept as the draft in its place.`
+          : `${opened} Once you change it, it is kept as a draft in this browser.`;
+    }
     case "share-failed":
-      return `This share link could not be opened: ${note.reason}.`;
+      return `This ${note.preset ? "preset" : "share"} link could not be opened: ${note.reason}.`;
     case "other-tab":
       return note.conflict
         ? "Another tab kept a newer draft while this one has changes of its own. Neither is written over until you choose: load it (Undo brings yours back), or keep yours."
@@ -471,17 +495,33 @@ export default function HallPlayground() {
     let current = true;
     const open = async () => {
       const hash = window.location.hash;
-      if (!isShareHash(hash)) return;
       let entry: HallEntry;
-      try {
-        entry = entryOfSource(await readShareHash(hash));
-      } catch (error) {
-        if (!current) return;
+      let preset: HallPreset | undefined;
+      if (isPresetHash(hash)) {
+        // A hall page's "Open in the editor": the preset, as a fresh copy.
+        const slug = presetHashSlug(hash);
+        const id = gdHall(slug)?.preset;
+        preset = id === undefined ? undefined : hallPreset(id);
         clearShareHash();
-        // `readShareHash` says why in a `ShareLinkError`.
-        failed(clipped((error as Error).message));
-        return;
-      }
+        if (!preset) {
+          failed(
+            `no preset hall is called ${clipped(JSON.stringify(slug))}`,
+            true,
+          );
+          return;
+        }
+        entry = presetEntry(preset);
+      } else if (!isShareHash(hash)) return;
+      else
+        try {
+          entry = entryOfSource(await readShareHash(hash));
+        } catch (error) {
+          if (!current) return;
+          clearShareHash();
+          // `readShareHash` says why in a `ShareLinkError`.
+          failed(clipped((error as Error).message));
+          return;
+        }
       if (!current) return;
       clearShareHash();
       if (!entry.hall) {
@@ -505,6 +545,7 @@ export default function HallPlayground() {
       showNote(
         {
           kind: "shared",
+          ...(preset && { preset: preset.title }),
           draft:
             reading.status === "found"
               ? "kept"
@@ -515,8 +556,8 @@ export default function HallPlayground() {
         ["restored", "unreadable-draft", "share-failed"],
       );
     };
-    const failed = (reason: string) =>
-      showNote({ kind: "share-failed", reason }, ["shared"]);
+    const failed = (reason: string, preset?: boolean) =>
+      showNote({ kind: "share-failed", reason, preset }, ["shared"]);
     open();
     window.addEventListener("hashchange", open);
     return () => {
@@ -808,7 +849,7 @@ export default function HallPlayground() {
         )}
         <ExportControls
           target={drawing}
-          filename={`gd-hall-${preset?.id ?? "custom"}`}
+          filename={exportFilename(preset)}
           prepare={embedGdHallFonts}
         />
         <div className={styles.shareButtons}>

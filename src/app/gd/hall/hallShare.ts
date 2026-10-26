@@ -151,3 +151,17 @@ export async function readShareHash(hash: string): Promise<string> {
     throw new ShareLinkError("it is damaged");
   }
 }
+
+const PRESET_PREFIX = "preset=";
+
+/**
+ * Whether a URL's hash is a link to a preset, `#preset=<slug>`: what the
+ * hall pages' "Open in the editor" links to (plan 062). Like a share
+ * link it stays in the fragment, so no server or index sees it.
+ */
+export const isPresetHash = (hash: string) =>
+  hash.replace(/^#/, "").startsWith(PRESET_PREFIX);
+
+/** The slug a preset link names, as written (at most 40 characters). */
+export const presetHashSlug = (hash: string) =>
+  hash.replace(/^#/, "").slice(PRESET_PREFIX.length, PRESET_PREFIX.length + 40);

@@ -2,9 +2,11 @@ import { HALL_PRESETS } from "@magick-components/gd/hall/presets";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { gdHallPug } from "@/doc/gdHallPug";
 import {
+  isPresetHash,
   isShareHash,
   MAX_SHARE_FRAGMENT,
   MAX_SHARED_BYTES,
+  presetHashSlug,
   readShareHash,
   ShareLinkError,
   shareFragment,
@@ -119,5 +121,15 @@ describe("share links", () => {
   it("leave the text itself for the parser to judge", async () => {
     const fragment = await fragmentOf("p <script>alert(1)</script>\n");
     expect(await readShareHash(fragment)).toBe("p <script>alert(1)</script>\n");
+  });
+});
+
+describe("preset links (plan 062)", () => {
+  it("reads #preset=<slug>, at most 40 characters of it", () => {
+    expect(isPresetHash("#preset=zelator-1")).toBe(true);
+    expect(isPresetHash("preset=")).toBe(true);
+    expect(isPresetHash("#hall=1.abc")).toBe(false);
+    expect(presetHashSlug("#preset=zelator-1")).toBe("zelator-1");
+    expect(presetHashSlug(`#preset=${"x".repeat(100)}`)).toHaveLength(40);
   });
 });

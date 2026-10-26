@@ -16,6 +16,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { gdHallPug, parseHallSource, printHallSource } from "@/doc/gdHallPug";
 import HallPlayground, {
   clipped,
+  exportFilename,
   HALL_LAYOUT_KEY,
   matchingPreset,
   presetEntry,
@@ -1117,11 +1118,67 @@ describe("sharing and export", { timeout: 20_000 }, () => {
     fireEvent.click(screen.getByLabelText("Download SVG"));
     expect(await screen.findByText("Downloading SVG")).toBeTruthy();
     const [blob, name] = runtime.downloadBlob.mock.calls[0] as [Blob, string];
-    expect(name).toBe("gd-hall-theoricus1.svg");
+    // An unchanged preset's export is named as its published image.
+    expect(name).toBe("golden-dawn-theoricus-1-temple.svg");
     const svg = await blob.text();
     expect(svg).toContain(">Theoricus Temple 1</title>");
     // The drawing alone: none of the editor's overlay.
     expect(svg).not.toContain("aria-hidden");
+  });
+
+  it("opens a preset from a hall page's link, keeping the draft", async () => {
+    const mine = presetEntry(HALL_PRESETS[4]).source;
+    localStorage.setItem(
+      HALL_DRAFT_KEY,
+      JSON.stringify({ v: 1, source: mine }),
+    );
+    window.history.replaceState(null, "", "/gd/hall#preset=philosophus-3");
+    render(<HallPlayground />);
+    await screen.findByText(
+      "Opened the Philosophus Temple 3. Your own draft stays in this browser until you change this hall; Undo goes back to the hall you had.",
+    );
+    expect(presetShown()).toBe("Philosophus Temple 3");
+    expect(window.location.hash).toBe("");
+    await kept();
+    expect(
+      JSON.parse(localStorage.getItem(HALL_DRAFT_KEY) ?? "{}").source,
+    ).toBe(mine);
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(source()).toBe(mine);
+  });
+
+  it("opens a preset link in a fresh browser and when pasted", async () => {
+    window.history.replaceState(null, "", "/gd/hall#preset=portal-2");
+    render(<HallPlayground />);
+    await screen.findByText(
+      "Opened the Portal Temple 2. Once you change it, it is kept as a draft in this browser.",
+    );
+    expect(presetShown()).toBe("Portal Temple 2");
+    act(() => {
+      window.history.replaceState(null, "", "/gd/hall#preset=neophyte");
+      window.dispatchEvent(new HashChangeEvent("hashchange"));
+    });
+    await waitFor(() => expect(presetShown()).toBe("Neophyte Temple"));
+  });
+
+  it("says when a preset link names no hall, keeping the draft", async () => {
+    window.history.replaceState(null, "", "/gd/hall#preset=zelator1");
+    render(<HallPlayground />);
+    await screen.findByText(
+      'This preset link could not be opened: no preset hall is called "zelator1".',
+    );
+    expect(presetShown()).toBe("Neophyte Temple");
+    expect(window.location.hash).toBe("");
+  });
+
+  it("names a changed hall's export as a custom hall", () => {
+    expect(exportFilename(HALL_PRESETS[12])).toBe(
+      "golden-dawn-portal-1-temple",
+    );
+    expect(exportFilename(undefined)).toBe("gd-hall-custom");
+    expect(exportFilename({ ...HALL_PRESETS[0], id: "unknown" })).toBe(
+      "gd-hall-custom",
+    );
   });
 
   it("says when the browser refuses the clipboard", async () => {
