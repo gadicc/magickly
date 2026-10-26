@@ -1,7 +1,10 @@
+import { JSDOM } from "jsdom";
+import { resolveSitemap } from "next/dist/build/webpack/loaders/metadata/resolve-route-data";
 import { describe, expect, it } from "vitest";
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
 import { entityPages } from "./entities";
+import { hallPages } from "./halls";
 import { lenainPages } from "./lenain";
 import { PUBLIC_PAGES } from "./pages";
 
@@ -12,8 +15,10 @@ describe("sitemap", () => {
     expect(urls).toHaveLength(
       Object.keys(PUBLIC_PAGES).length +
         entityPages().length +
-        lenainPages().length,
+        lenainPages().length +
+        hallPages().length,
     );
+    expect(urls).toContain("https://magick.ly/gd/hall/zelator-1");
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls[0]).toBe("https://magick.ly");
     expect(urls).toContain("https://magick.ly/gd/grade/0=0");
@@ -41,7 +46,42 @@ describe("sitemap", () => {
   });
 
   it("claims no change frequency, priority or modification date", () => {
-    for (const entry of sitemap()) expect(Object.keys(entry)).toEqual(["url"]);
+    for (const entry of sitemap())
+      expect(Object.keys(entry)).toEqual(
+        entry.url.includes("/gd/hall/") ? ["url", "images"] : ["url"],
+      );
+  });
+
+  it("lists each hall's PNG and SVG, absolute and safe to write unescaped", () => {
+    const halls = sitemap().filter((entry) => entry.images);
+    expect(halls).toHaveLength(14);
+    expect(halls[1]).toEqual({
+      url: "https://magick.ly/gd/hall/zelator-1",
+      images: [
+        "https://magick.ly/gd/hall/zelator-1/golden-dawn-zelator-1-temple.png",
+        "https://magick.ly/gd/hall/zelator-1/golden-dawn-zelator-1-temple.svg",
+      ],
+    });
+    for (const entry of halls)
+      for (const image of entry.images ?? [])
+        expect(image).toMatch(/^https:\/\/magick\.ly\/gd\/hall\/[a-z0-9/.-]+$/);
+  });
+
+  it("writes XML that parses, with the image namespace", () => {
+    const xml = resolveSitemap(sitemap());
+    const { DOMParser } = new JSDOM().window;
+    const document = new DOMParser().parseFromString(xml, "application/xml");
+    expect(document.getElementsByTagName("parsererror")).toHaveLength(0);
+    const urls = document.getElementsByTagName("url");
+    expect(urls).toHaveLength(sitemap().length);
+    const images = document.getElementsByTagNameNS(
+      "http://www.google.com/schemas/sitemap-image/1.1",
+      "loc",
+    );
+    expect(images).toHaveLength(28);
+    expect(images[0].textContent).toBe(
+      "https://magick.ly/gd/hall/neophyte/golden-dawn-neophyte-temple.png",
+    );
   });
 });
 
