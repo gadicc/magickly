@@ -72,9 +72,10 @@ interface GlyphLamen {
  * Rose-Cross on a yellow collar, the Second Adept's red triangle in a
  * green pentagram on a white one, the Third Adept's blue cup on an orange
  * octagram on a blue one. The ring shows the collar, as for the Chiefs;
- * the Third Adept's blue is the Praemonstrator's. A hall of the 5=6 would
- * use the same role names, though every Adept there wears the Rose-Cross
- * (plan 061, stage H, part 2).
+ * the Third Adept's blue is the Praemonstrator's. These are the Portal's
+ * lamens only: in a 5=6 hall, under the same role names, the Adepts wear
+ * the Rose-Cross, the Second's and Third's by inference
+ * (`lamenGrades.ts`).
  */
 const GLYPH_LAMENS: ReadonlyMap<string, GlyphLamen> = new Map([
   ["chiefAdept", { ring: "yellow", Glyph: RoseCross }],
@@ -86,10 +87,14 @@ const GLYPH_LAMENS: ReadonlyMap<string, GlyphLamen> = new Map([
  * The lamens an officer wears in a particular grade instead of the Outer
  * Order's, by `grade:officer` (`lamenGrades.ts`), from the Portal's
  * rubric (Regardie 1938, vol. 2, p.156, leaf n149). The Hiereus wears a
- * white hexagram on the four colours of Malkuth; the rubric gives him a
- * black collar and then "Red Shoes and Collar", and the ring takes the
- * red, which a black ring's outline would not show. The Hegemon wears a
- * red and blue hexagram on a white ground, on a yellow collar.
+ * white hexagram on the four colours of Malkuth. His ring is red: the
+ * p.156 list gives him two collars and no cloak ("Black Collar", then
+ * "Red Shoes and Collar"), and we read "Black Collar" as a misprint for
+ * "Black Cloak", which keeps the Outer Order's scarlet collar (Z.1,
+ * vol. 3, pp.92–93, leaves n84–85). Should Gadi choose black instead,
+ * the ring becomes a dark grey (about `#333`) with the usual outline.
+ * The Hegemon wears a red and blue hexagram on a white ground, on a
+ * yellow collar.
  */
 const GRADE_LAMENS: ReadonlyMap<string, GlyphLamen> = new Map([
   ["portal:hiereus", { ring: "red", Glyph: PortalHiereus }],

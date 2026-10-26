@@ -7,6 +7,17 @@ import { PALETTE } from "./hall/art/shared";
  * Portal's rubric: the adepts' lamens, and the Hiereus' and Hegemon's
  * own in the Portal. Each is drawn from geometry in `Lamen`'s −50…50 box,
  * inside the disc (radius 42), and defines no ids.
+ *
+ * The adepts' three lamens are the Portal's only. In a 5=6 hall the
+ * Chief Adept bears the Rose-Cross on his breast (Regardie 1938, vol. 2,
+ * p.202, leaf n195; in the Pastos, p.220, n213, it hangs from a double
+ * Phoenix collar; the Equinox I.3, pp.208–222, agrees). The Second and
+ * Third Adepts probably wear it too, though the 5=6 rubric does not say
+ * so: every Adept wears it at all meetings of Adepts (vol. 3, p.51, n44,
+ * on a yellow collarette), and the Third Adept touches the one on his
+ * own breast (vol. 2, p.254, n248). No source carries the
+ * triangle-in-pentagram or the cup-on-octagram into the 5=6 (plan 061,
+ * stage H, part 2, follow-ups).
  */
 
 /** A circle as path data, so several join one path. */
@@ -224,7 +235,8 @@ const MALKUTH_QUARTERS = [
 /**
  * The Hiereus' lamen in the Portal (Regardie 1938, vol. 2, p.156): a
  * white hexagram on the four colours of Malkuth, the disc quartered as
- * the Pantacle's, citrine above.
+ * the Pantacle's, citrine above. His collar, the ring, is red: see
+ * `GRADE_LAMENS` in `Lamen.tsx`.
  */
 export function PortalHiereus() {
   return (
