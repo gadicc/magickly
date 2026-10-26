@@ -53,6 +53,33 @@
   flex-direction: column;
   gap: 0.5rem;
 }
+/* The source panel's height (Gadi, 26 October 2026). From 900px wide,
+   in Source view it ends at the viewport's foot, less a small gap
+   (`--panels-top` is measured, HallPlayground's `usePanelsTop`); in split
+   view it is as tall as the viewport below the app bar (64px from 600px
+   wide) and sticks there while the page scrolls past the drawing, the
+   source scrolling inside it, as the ritual editor keeps its source in
+   view. The editor fills the panel (`fill`). Narrower, stacked, it keeps
+   the editor's own bounded height. */
+@media (min-width: 900px) {
+  .panels[data-layout="source"] > .sourcePanel {
+    height: calc(100dvh - var(--panels-top, 0px) - 0.75rem);
+    min-height: 25rem;
+  }
+  .panels[data-layout="split"] > .sourcePanel {
+    position: sticky;
+    top: calc(64px + 0.5rem);
+    height: calc(100dvh - 64px - 1rem);
+    /* No taller than the room under the app bar on a short screen. */
+    min-height: min(20rem, calc(100dvh - 64px - 1rem));
+  }
+}
+@media (max-width: 899.98px) {
+  .sourcePanel :global(.cm-editor) {
+    min-height: 25rem;
+    max-height: 65vh;
+  }
+}
 .panelTitle {
   margin: 0;
   font-size: 0.95rem;

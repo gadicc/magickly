@@ -188,6 +188,61 @@ function startingPoint(): {
   };
 }
 
+/**
+ * Keeps `--panels-top` on the panels at their distance from the top of
+ * the page, which the source panel's Source-view height subtracts to end
+ * at the viewport's foot (`hallPlayground.module.css`). Measured again
+ * whenever anything above them can have moved them: a resize of any of
+ * their ancestors or of the elements before each (the notes, the
+ * toolbar, the page's text), of the window, or the fonts' loading. A
+ * dozen or so elements are observed; a measurement that finds the same
+ * top changes nothing, so the panel's own resizing settles at once.
+ */
+function usePanelsTop(panels: React.RefObject<HTMLDivElement | null>) {
+  React.useLayoutEffect(() => {
+    const element = panels.current;
+    if (!element) return;
+    let top = "";
+    const measure = () => {
+      const next = `${Math.round(element.getBoundingClientRect().top + window.scrollY)}px`;
+      if (next === top) return;
+      top = next;
+      element.style.setProperty("--panels-top", top);
+    };
+    measure();
+    // jsdom has no ResizeObserver; the window's resize still measures.
+    const observer =
+      typeof ResizeObserver === "undefined"
+        ? undefined
+        : new ResizeObserver(measure);
+    for (
+      let node = element.parentElement;
+      node && node !== document.body;
+      node = node.parentElement
+    ) {
+      observer?.observe(node);
+      for (
+        let before = node.previousElementSibling;
+        before;
+        before = before.previousElementSibling
+      )
+        observer?.observe(before);
+    }
+    for (
+      let before = element.previousElementSibling;
+      before;
+      before = before.previousElementSibling
+    )
+      observer?.observe(before);
+    window.addEventListener("resize", measure);
+    document.fonts?.ready.then(measure);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [panels]);
+}
+
 /** The address bar without the share fragment, nothing reloaded. */
 function clearShareHash() {
   window.history.replaceState(
@@ -258,6 +313,8 @@ export default function HallPlayground() {
   } | null>(null);
   const [status, setStatus] = React.useState("");
   const drawing = React.useRef<SVGSVGElement>(null);
+  const panels = React.useRef<HTMLDivElement>(null);
+  usePanelsTop(panels);
   const present = history.present;
   // Source typed but not yet read (`READ_TYPING`): what the panel shows.
   const [typed, setTyped] = React.useState<string | null>(null);
@@ -700,13 +757,14 @@ export default function HallPlayground() {
           isDisabled={(value) => value === "visual" && !shownHall}
         />
       </div>
-      <div className={styles.panels} data-layout={displayMode}>
+      <div ref={panels} className={styles.panels} data-layout={displayMode}>
         {displayMode !== "visual" && (
           <section
-            className={styles.panel}
+            className={`${styles.panel} ${styles.sourcePanel}`}
             aria-label="Temple hall source panel"
           >
             <RitualSourceEditor
+              fill
               value={typed ?? present.source}
               dialect="pug"
               headerless
