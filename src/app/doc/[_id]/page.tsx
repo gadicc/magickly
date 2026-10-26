@@ -15,13 +15,16 @@ import { privateMetadata, seoMetadata } from "@/seo/metadata";
 import DocRender from "./DocRender";
 import PrivateRitualReader from "./PrivateRitualReader";
 
+/**
+ * Both ritual compilers store a typeless `{ children: [...] }` root, which the
+ * reader renders as a plain node, as the offline reader already does.
+ */
 function parsePublicDoc(contentJson: string): DocNode | null {
   try {
     const value: unknown = JSON.parse(contentJson);
     return value &&
       typeof value === "object" &&
-      !Array.isArray(value) &&
-      typeof (value as Record<string, unknown>).type === "string"
+      Array.isArray((value as Record<string, unknown>).children)
       ? (value as DocNode)
       : null;
   } catch {
