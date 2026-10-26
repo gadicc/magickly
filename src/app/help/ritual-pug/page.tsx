@@ -114,20 +114,22 @@ export default function RitualPugGuide() {
       </p>
       <p>
         The temple hall editor works on one hall outside any ritual: start from
-        a preset, edit it on the drawing or in its Pug, side by side if you
-        like, with undo and redo. It keeps the hall as a draft in that browser
-        only, shares it as a link that holds the hall itself, and exports it as
-        SVG or PNG. To keep a hall with a ritual’s history, copy its Pug source
-        into the ritual’s source, or insert a temple hall there and choose{" "}
-        <strong>Edit hall</strong> to edit it in place. In the drawing, an
-        officer or banner dragged along the dais or a banner row changes places
-        (<kbd>Alt</kbd> and the arrow keys do the same; an Alt-drag places it
-        freely), and an item, marker or officer dropped on an altar, platform or
-        throne that takes it stands on it. The properties of what is selected
-        stand beside the drawing where there is room, and otherwise at the foot
-        of the screen, where they can be hidden and shown again; in split view
-        the visual side widens while a hall is being edited, to make that room.
-        A hall with warnings shows how many beside <strong>Edit hall</strong>.
+        a preset (each of the <Link href="/gd/hall#halls">preset halls</Link>{" "}
+        also has a page of its own), edit it on the drawing or in its Pug, side
+        by side if you like, with undo and redo. It keeps the hall as a draft in
+        that browser only, shares it as a link that holds the hall itself, and
+        exports it as SVG or PNG. To keep a hall with a ritual’s history, copy
+        its Pug source into the ritual’s source, or insert a temple hall there
+        and choose <strong>Edit hall</strong> to edit it in place. In the
+        drawing, an officer or banner dragged along the dais or a banner row
+        changes places (<kbd>Alt</kbd> and the arrow keys do the same; an
+        Alt-drag places it freely), and an item, marker or officer dropped on an
+        altar, platform or throne that takes it stands on it. The properties of
+        what is selected stand beside the drawing where there is room, and
+        otherwise at the foot of the screen, where they can be hidden and shown
+        again; in split view the visual side widens while a hall is being
+        edited, to make that room. A hall with warnings shows how many beside{" "}
+        <strong>Edit hall</strong>.
       </p>
       <h2>Finding and fixing errors</h2>
       <p>

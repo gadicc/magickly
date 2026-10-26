@@ -135,7 +135,13 @@ describe("what a reader sees", () => {
     // is where the old page printed "(no sephirah)"; the Tree lights every
     // sphere when `active` names none, so this is where dimming could fail.
     const html = await page("0=0");
-    expect([...rowsOf(html).keys()]).toEqual(["Order", "Degree", "Ritual"]);
+    expect([...rowsOf(html).keys()]).toEqual([
+      "Order",
+      "Degree",
+      "Ritual",
+      "Temple halls",
+    ]);
+    expect(rowText(html, "Temple halls")).toBe("Neophyte Temple");
     expect(rowText(html, "Order")).toBe("First Order");
     expect(rowText(html, "Degree")).toBe("First Degree · Pillar of Severity");
     expect(rowText(html, "Ritual")).toBe("Neophyte 0=0 Ritual");
@@ -191,7 +197,14 @@ describe("what a reader sees", () => {
     // The one grade outside the three orders, with the element Spirit, which
     // has no elementals; the other grade with no sephirah, so dimmed too.
     const html = await page("portal");
-    expect([...rowsOf(html).keys()]).toEqual(["Degree", "Element"]);
+    expect([...rowsOf(html).keys()]).toEqual([
+      "Degree",
+      "Element",
+      "Temple halls",
+    ]);
+    expect(rowText(html, "Temple halls")).toBe(
+      "Portal Temple, part 1; Portal Temple, part 2",
+    );
     expect(rowText(html, "Degree")).toBe("Second Degree · Pillar of Mercy");
     expect(rowText(html, "Element")).toBe("☸ Spirit");
     expect(textOf(html)).toContain(

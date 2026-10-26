@@ -12,6 +12,8 @@ import {
 } from "@/components/entity";
 import GradeTree from "@/components/gd/GradeTree";
 import { isPublicRitualId } from "@/doc/publicRituals";
+import { gdHallShortName } from "@/render/contracts/gdHall";
+import { gradeHalls, hallPath } from "@/seo/halls";
 import { PUBLIC_PAGES } from "@/seo/pages";
 
 /**
@@ -88,6 +90,8 @@ export default function GradePage({ grade }: { grade: GDGradeRow }) {
   // The built-in rituals are keyed by the grade's name in lower case, which
   // is the mapping the data already carries (decision 6).
   const ritual = grade.name.toLowerCase();
+  // The grade's preset halls, each with a page of its own (plan 062).
+  const halls = gradeHalls(grade.id);
 
   return (
     <EntityFrame>
@@ -143,6 +147,20 @@ export default function GradePage({ grade }: { grade: GDGradeRow }) {
               {PUBLIC_PAGES[`/doc/${ritual}` as const].title}
             </Link>
           ) : null}
+        </Row>
+        <Row label="Temple halls">
+          {halls.length
+            ? halls.map((hall, index) => (
+                <span key={hall.slug}>
+                  {index ? "; " : null}
+                  {/* No prefetch: a hall page's payload preloads its
+                      full image. */}
+                  <Link href={hallPath(hall)} prefetch={false}>
+                    {gdHallShortName(hall)}
+                  </Link>
+                </span>
+              ))
+            : null}
         </Row>
       </EntityTable>
 

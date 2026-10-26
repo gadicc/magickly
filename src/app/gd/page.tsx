@@ -1,5 +1,7 @@
 import GradeTree from "@/components/gd/GradeTree";
 import Tiles from "@/components/Tiles";
+import { GD_HALLS } from "@/render/contracts/gdHall";
+import { hallFiles } from "@/seo/halls";
 import { pageMetadata } from "@/seo/metadata";
 
 export const metadata = pageMetadata("/gd");
@@ -16,19 +18,8 @@ const tiles = [
     to: "/gd/rituals",
   },
   {
-    Component: () => (
-      <div
-        style={{
-          marginTop: 50,
-          textAlign: "center",
-          fontSize: "200%",
-          color: "black",
-          textDecoration: "none",
-        }}
-      >
-        Halls
-      </div>
-    ),
+    // The Neophyte hall's own image (plan 062), the small one: enough at 2×.
+    img: hallFiles(GD_HALLS[0]).small.path,
     title: "Temple Halls",
     to: "/gd/hall",
   },
