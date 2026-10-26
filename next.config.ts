@@ -64,6 +64,10 @@ const ritualPublicationTraceFiles = [
   ...cssTreeDynamicDataTraceFiles,
 ];
 
+/** The temple halls' medium and small PNGs, which stay out of the index. */
+const HALL_SMALLER_IMAGES =
+  "/gd/hall/:slug/:file([a-z0-9-]+-(?:medium|small)\\.png)";
+
 export default async function (phase: string): Promise<NextConfig> {
   const nextConfig: NextConfig = {
     /**
@@ -76,6 +80,13 @@ export default async function (phase: string): Promise<NextConfig> {
     headers: async () => [
       {
         source: "/docs/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex" }],
+      },
+      {
+        // A temple hall's smaller PNGs (plan 062): the full PNG and the SVG
+        // are each hall's images in search; these are for phones and the
+        // gallery.
+        source: HALL_SMALLER_IMAGES,
         headers: [{ key: "X-Robots-Tag", value: "noindex" }],
       },
     ],

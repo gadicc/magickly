@@ -42,7 +42,8 @@ const pathnames: Pathnames = {
   gd: {
     "/": "Golden Dawn",
     grades: "Grades",
-    hall: "Temple Halls",
+    // A section, so each hall's page under it shows the trail.
+    hall: { "/": "Temple Halls" },
     rituals: "Rituals",
     sigils: "Sigils",
     symbols: {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { sigilFromSearchParams } from "@/app/gd/sigils/sigilState";
 import { socialCards } from "./cardList";
-import { socialCard, socialCardImage } from "./cards";
+import { hallCardArt, socialCard, socialCardImage } from "./cards";
 import { entityPages } from "./entities";
 import { pageMetadata, seoMetadata } from "./metadata";
 import { PUBLIC_PAGES, type PublicPath } from "./pages";
@@ -42,6 +42,30 @@ describe("social cards", () => {
     expect(socialCard("/about", "About").section).toBe("Magick.ly");
     // A prefix only matches whole segments.
     expect(socialCard("/gdx", "x").section).toBe("Magick.ly");
+  });
+
+  it("draws each temple hall on its own card", () => {
+    expect(
+      socialCard(
+        "/gd/hall/portal-2",
+        "Golden Dawn Portal Temple, part 2: floor plan",
+        hallCardArt("portal-2"),
+      ),
+    ).toMatchObject({
+      segments: ["gd", "hall", "portal-2.png"],
+      section: "Golden Dawn",
+      art: {
+        kind: "diagram",
+        slug: "gd-hall",
+        query: "hall=portal-2",
+        raster: "query",
+      },
+    });
+    expect(socialCard("/gd/hall", "Temple Halls").art).toEqual({
+      kind: "diagram",
+      slug: "gd-hall",
+      raster: "query",
+    });
   });
 
   it("describes the card as a 1200×630 image", () => {

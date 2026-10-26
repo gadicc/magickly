@@ -24,6 +24,9 @@ describe("/og/[...card]", () => {
     [["gd", "grade", "1=10.png"]],
     [["kabbalah", "sephirah", "keter.png"]],
     [["kabbalah", "sephirah", "binah.png"]],
+    // A temple hall's card draws the hall at its contract's own size.
+    [["gd", "hall", "theoricus-2.png"]],
+    [["gd", "hall.png"]],
   ])("draws %j as a 1200×630 PNG", async (segments) => {
     const response = await get(segments);
     expect(response.status).toBe(200);

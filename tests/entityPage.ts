@@ -3,6 +3,7 @@ import { divisions } from "magick-data/kabbalah/lenain/volume";
 import { expect } from "vitest";
 import { publicRitualQueryKeys } from "@/doc/publicRituals";
 import { angelSlugs } from "@/lib/angelSlugs";
+import { allHallFiles, hallPages } from "@/seo/halls";
 import { PUBLIC_PAGES } from "@/seo/pages";
 
 /**
@@ -78,7 +79,20 @@ const ROUTES = new Set<string>([
   ...divisions.map(
     (division) => `/books/la-science-cabalistique/${division.slug}`,
   ),
+  // The temple halls' pages and their image files (plan 062).
+  ...hallPages().map((page) => page.path),
+  ...allHallFiles().map(({ file }) => file.path),
 ]);
+
+/**
+ * The only places off the site a page may link to: the licence, the
+ * scanned sources a hall cites, and the code's own repository.
+ */
+const EXTERNAL = [
+  "https://creativecommons.org/licenses/",
+  "https://archive.org/details/",
+  "https://github.com/gadicc/magickly/",
+];
 
 /** Every `href` and `xlink:href` value in the markup, decoded. */
 function linksOf(html: string) {
@@ -126,7 +140,11 @@ export function expectEntityPage(html: string, heading: string) {
   ).toEqual([]);
 
   expect(
-    hrefsOf(html).filter((href) => !ROUTES.has(href)),
+    hrefsOf(html).filter(
+      (href) =>
+        !ROUTES.has(href) &&
+        !EXTERNAL.some((prefix) => href.startsWith(prefix)),
+    ),
     "links to no route of this site",
   ).toEqual([]);
   expect(

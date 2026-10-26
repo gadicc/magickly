@@ -3,17 +3,27 @@ import {
   type HallDescription,
 } from "@magick-components/gd/hall/describe";
 import {
+  HALL_SOURCE_WORKS,
   type HallPreset,
   hallPreset,
+  hallSourceUrl,
 } from "@magick-components/gd/hall/presets";
+import type { Metadata } from "next";
 import {
+  GD_HALL_LICENCE,
   GD_HALLS,
   type GdHallEntry,
+  type GdHallSize,
   gdHall,
+  gdHallFileBase,
+  gdHallPixels,
   gdHallShortName,
   gdHallTitle,
 } from "@/render/contracts/gdHall";
+import { socialCardImage } from "./cards";
 import type { EntityPage } from "./entities";
+import { seoMetadata } from "./metadata";
+import { SITE_URL } from "./site";
 
 /**
  * The temple halls' search pages (plan 062): their paths, titles,
@@ -219,5 +229,151 @@ export function hallStations(hall: GdHallEntry) {
       items: counted(altar.items),
     })),
     furniture: description.furniture,
+  };
+}
+
+/** One of a hall's static image files. */
+export interface HallFile {
+  /** The file's name in the URL: `golden-dawn-zelator-1-temple-small.png`. */
+  name: string;
+  /** Its path on the site. */
+  path: string;
+  format: "png" | "svg";
+  /** A PNG's smaller size; the full image when absent. */
+  size?: GdHallSize;
+  width: number;
+  height: number;
+  /** Whether search engines may index it: the full PNG and the SVG. */
+  indexed: boolean;
+}
+
+/**
+ * A hall's four static files under its page (plan 062, decision 3): the
+ * full PNG, the medium and small PNGs, and the SVG.
+ */
+export function hallFiles(hall: GdHallEntry) {
+  const base = gdHallFileBase(hall);
+  const file = (
+    name: string,
+    format: "png" | "svg",
+    size?: GdHallSize,
+  ): HallFile => ({
+    name,
+    path: `${hallPath(hall)}/${name}`,
+    format,
+    ...(size && { size }),
+    ...gdHallPixels({ hall: hall.slug as never, ...(size && { size }) }),
+    indexed: !size,
+  });
+  return {
+    png: file(`${base}.png`, "png"),
+    medium: file(`${base}-medium.png`, "png", "medium"),
+    small: file(`${base}-small.png`, "png", "small"),
+    svg: file(`${base}.svg`, "svg"),
+  };
+}
+
+/** Every hall's files, as the route prerenders them. */
+export function allHallFiles(): { slug: string; file: HallFile }[] {
+  return GD_HALLS.flatMap((hall) =>
+    Object.values(hallFiles(hall)).map((file) => ({ slug: hall.slug, file })),
+  );
+}
+
+/**
+ * A hall page's structured data (plan 062, decision 10): the trail the app
+ * bar shows, and an `ImageObject` for each indexable file, the PNG first,
+ * each `contentUrl` exactly the URL the page shows it at.
+ */
+export function hallJsonLd(hall: GdHallEntry) {
+  const { preset } = partsOf(hall);
+  const files = hallFiles(hall);
+  const page = `${SITE_URL}${hallPath(hall)}`;
+  const L = GD_HALL_LICENCE;
+  // Each cited page as its book, the page and leaf in its description.
+  const books = preset.sources.flatMap((source) => {
+    if (source.kind !== "book") return [];
+    const work = HALL_SOURCE_WORKS[source.work];
+    return [
+      {
+        "@type": "Book",
+        name: `${work.book}, ${work.volume}`,
+        author: { "@type": "Person", name: work.author },
+        publisher: { "@type": "Organization", name: work.publisher },
+        datePublished: String(work.year),
+        description: `p.${source.page}, archive.org leaf n${source.leaf}${source.note ? ` (${source.note})` : ""}`,
+        url: hallSourceUrl(source),
+      },
+    ];
+  });
+  const image = (file: HallFile, id: string) => ({
+    "@type": "ImageObject",
+    "@id": `${page}#${id}`,
+    contentUrl: `${SITE_URL}${file.path}`,
+    url: page,
+    name: gdHallTitle(hall),
+    caption: hallAlt(hall),
+    encodingFormat: file.format === "png" ? "image/png" : "image/svg+xml",
+    width: file.width,
+    height: file.height,
+    license: L.url,
+    acquireLicensePage: L.acquireLicensePage,
+    creator: { "@type": "Organization", name: L.creator, url: `${SITE_URL}/` },
+    creditText: L.creditText,
+    copyrightNotice: L.copyrightNotice,
+    isBasedOn: books,
+  });
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          ["Golden Dawn", `${SITE_URL}/gd`],
+          ["Temple Halls", `${SITE_URL}/gd/hall`],
+          [gdHallShortName(hall), page],
+        ].map(([name, item], index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name,
+          item,
+        })),
+      },
+      {
+        ...image(files.png, "png"),
+        associatedMedia: { "@id": `${page}#svg` },
+      },
+      image(files.svg, "svg"),
+    ],
+  };
+}
+
+/**
+ * A hall page's metadata: the canonical and snippet as every entity page
+ * has them, and two Open Graph images, the site's card with the hall drawn
+ * in it first, then the hall's own PNG (Gadi, 26 October 2026). No
+ * `twitter` object, so the layout's large card stands and X takes the
+ * first image.
+ */
+export function hallMetadata(slug: string): Metadata | null {
+  const page = hallPage(slug);
+  const hall = gdHall(slug);
+  if (!page || !hall) return null;
+  const metadata = seoMetadata(page.path, page);
+  const { png } = hallFiles(hall);
+  return {
+    ...metadata,
+    openGraph: {
+      ...metadata.openGraph,
+      images: [
+        socialCardImage(page.path, page.title),
+        {
+          url: png.path,
+          width: png.width,
+          height: png.height,
+          alt: hallAlt(hall),
+        },
+      ],
+    },
   };
 }

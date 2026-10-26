@@ -12,7 +12,17 @@ export type CardArt =
       /** Which part of a cropped image to keep; the centre by default. */
       position?: "left" | "right" | "top" | "bottom";
     }
-  | { kind: "diagram"; slug: ComponentImageSlug; query?: string };
+  | {
+      kind: "diagram";
+      slug: ComponentImageSlug;
+      query?: string;
+      /**
+       * `"query"` when the query names its own size, for a contract with
+       * fixed sizes (the halls refuse `height`); the card asks for its art
+       * box's height otherwise.
+       */
+      raster?: "query";
+    };
 
 /** What a page's card shows; the route draws it at build time. */
 export interface SocialCard {
@@ -56,7 +66,17 @@ const ART = {
   // Page defaults only: shared readings and sigils never reach a card.
   geomancyChart: { kind: "diagram", slug: "astro-geomancy-chart" },
   sigil: { kind: "diagram", slug: "rose-sigil", query: "text=גדי" },
+  // The Neophyte hall, at the full size the halls' contract draws.
+  hall: { kind: "diagram", slug: "gd-hall", raster: "query" },
 } satisfies Record<string, CardArt>;
+
+/** A temple hall's card art: its own drawing (plan 062). */
+export const hallCardArt = (slug: string): CardArt => ({
+  kind: "diagram",
+  slug: "gd-hall",
+  query: `hall=${slug}`,
+  raster: "query",
+});
 
 /** Most specific prefix first; every path matches the final entry. */
 const SECTIONS: [prefix: string, section: string, art: CardArt][] = [
@@ -70,6 +90,7 @@ const SECTIONS: [prefix: string, section: string, art: CardArt][] = [
   ["/enochian", "Enochian Magick", ART.enochian],
   ["/doc", "Golden Dawn Rituals", ART.robes],
   ["/gd/rituals", "Golden Dawn", ART.robes],
+  ["/gd/hall", "Golden Dawn", ART.hall],
   ["/gd/sigils", "Golden Dawn", ART.sigil],
   ["/gd/symbols/shewbread", "Golden Dawn", ART.shewbread],
   ["/gd/symbols/fylfot-cross", "Golden Dawn", ART.goldenDawn],
@@ -92,10 +113,15 @@ function matches(path: string, prefix: string) {
 }
 
 /** The card for an indexable path and its page title. */
-export function socialCard(path: string, title: string): SocialCard {
-  const [, section, art] = SECTIONS.find(([prefix]) =>
+export function socialCard(
+  path: string,
+  title: string,
+  ownArt?: CardArt,
+): SocialCard {
+  const [, section, sectionArt] = SECTIONS.find(([prefix]) =>
     matches(path, prefix),
   ) as (typeof SECTIONS)[number];
+  const art = ownArt ?? sectionArt;
   const segments = path === "/" ? ["home"] : path.slice(1).split("/");
   segments.push(`${segments.pop()}.png`);
   return {

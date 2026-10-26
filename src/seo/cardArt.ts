@@ -45,7 +45,8 @@ async function drawArt(art: CardArt): Promise<Buffer> {
   } else {
     const params = new URLSearchParams(art.query);
     params.set("fmt", "png");
-    params.set("height", String(CARD_ART_BOX.height * 2));
+    if (art.raster !== "query")
+      params.set("height", String(CARD_ART_BOX.height * 2));
     source = (await renderComponentImage(art.slug, params)).bytes;
   }
   // Contained art keeps a margin inside the frame's rounded corners.

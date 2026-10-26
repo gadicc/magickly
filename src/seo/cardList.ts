@@ -1,5 +1,6 @@
-import { type SocialCard, socialCard } from "./cards";
+import { hallCardArt, type SocialCard, socialCard } from "./cards";
 import { entityPages } from "./entities";
+import { hallPages } from "./halls";
 import { lenainPages } from "./lenain";
 import { PUBLIC_PAGES, type SeoPage } from "./pages";
 
@@ -15,5 +16,13 @@ export function socialCards(): SocialCard[] {
       .map(([path, page]) => socialCard(path, page.title)),
     ...entityPages().map((page) => socialCard(page.path, page.title)),
     ...lenainPages().map((page) => socialCard(page.path, page.title)),
+    // Each temple hall's card draws that hall (plan 062).
+    ...hallPages().map((page) =>
+      socialCard(
+        page.path,
+        page.title,
+        hallCardArt(page.path.split("/").at(-1) as string),
+      ),
+    ),
   ];
 }

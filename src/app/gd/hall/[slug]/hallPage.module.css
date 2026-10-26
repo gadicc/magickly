@@ -1,0 +1,37 @@
+/* A temple hall's page (plan 062): the image fills the text column. */
+
+.figure {
+  margin: 0 0 1rem;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+.caption {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-top: 0.4em;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 1.4em;
+}
+
+.note {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.credit {
+  margin: 0.6em 0;
+  padding: 0.5em 0.8em;
+  border-left: 3px solid rgba(128, 128, 128, 0.4);
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+}
