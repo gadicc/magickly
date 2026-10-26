@@ -116,11 +116,11 @@ export const PUBLIC_PAGES = {
       "with their places on the Tree of Life.",
   },
   "/gd/hall": {
-    title: "Golden Dawn Temple Halls",
+    title: "Golden Dawn Temple Halls: Floor Plans and Editor",
     description:
-      "Edit floor plans of the Golden Dawn temple, from the Neophyte, " +
-      "Zelator and Theoricus presets, on the drawing or in Pug; export as SVG " +
-      "or PNG, or share a link.",
+      "Golden Dawn temple floor plans for the Neophyte, Zelator, Theoricus, " +
+      "Practicus, Philosophus and Portal grades: open a preset, edit it, " +
+      "export SVG or PNG.",
   },
   "/gd/rituals": {
     title: "Golden Dawn Rituals",

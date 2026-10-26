@@ -4,6 +4,7 @@ import Link from "next/link";
 import OpenSource from "@/OpenSource";
 import { pageMetadata } from "@/seo/metadata";
 import { GD_HALL_FONT_BASE } from "./fontBase";
+import HallGallery from "./HallGallery";
 import HallPlaygroundLoader from "./HallPlaygroundLoader";
 
 export const metadata = pageMetadata("/gd/hall");
@@ -22,7 +23,9 @@ export default function HallPage() {
         <Typography variant="body2" sx={{ mb: 1 }}>
           Golden Dawn temple halls, drawn from layouts as data with our own
           artwork. Start from a preset and edit it on the drawing or in its Pug
-          source, then export it, copy its Pug, or share a link to it.
+          source, then export it, copy its Pug, or share a link to it.{" "}
+          <Link href="#halls">Browse the presets</Link>, each with a page of its
+          own.
         </Typography>
         <Typography variant="body2" sx={{ mb: 2 }}>
           Your hall is kept as a draft in this browser only. To save it with its
@@ -37,10 +40,17 @@ export default function HallPage() {
       </Container>
       {/* Outside the Container: split view takes the screen's full width,
           and the editor keeps to the text column otherwise. */}
-      <Box sx={{ px: 2 }} data-hall-page="editor">
+      {/* At least the screen below the app bar, whether the editor or its
+          loading note is in it, so the gallery below starts out of view
+          and does not move when the editor arrives (plan 062). */}
+      <Box
+        sx={{ px: 2, minHeight: "calc(100vh - 64px)" }}
+        data-hall-page="editor"
+      >
         <HallPlaygroundLoader />
       </Box>
       <Container sx={{ px: 2, pb: 2 }} data-hall-page="text">
+        <HallGallery />
         <OpenSource
           files={[
             "/src/app/gd/hall/HallPlayground.tsx",

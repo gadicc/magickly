@@ -215,6 +215,9 @@ describe("the /gd/hall page", { timeout: 20_000 }, () => {
     expect(words).toBeLessThan(text);
     expect(text).toBeLessThan(editor);
     expect(markup.indexOf("Magick.ly is open-source")).toBeGreaterThan(sources);
+    // The presets follow the editor, linked from the opening words.
+    expect(markup.indexOf('id="halls"')).toBeGreaterThan(sources);
+    expect(markup).toContain('href="#halls"');
   });
 
   it("takes the screen's width in split view only", () => {
