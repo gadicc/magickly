@@ -653,6 +653,85 @@ Halls from users by URL; an `ImageGallery` or `ItemList` markup for
 is unchanged); the Tablet of Union on the image route; dark images;
 translations.
 
+## Spike and stages 1–7 (26 October 2026)
+
+Built on `gate/hall-seo` after Gadi's answers, each commit gated in a
+clean export (statuses in `~/.cache/hall-seo/gates/`). Stage 6's leads
+wait for Gadi's review (`~/.cache/hall-seo/leads-sheet.png` and `.md`),
+and the pages (stage 8) wait for it.
+
+### What the spike found
+
+Run on all fourteen presets, nothing committed; outputs in
+`~/.cache/hall-seo/spike/`:
+
+- **Paint servers (decision 5, option (a)).** resvg's output holds only
+  `url(#id)` references, 6 to 18 a hall, every one resolving to a
+  `pattern`, `linearGradient`, `radialGradient` or `clipPath` in the
+  `<defs>`, resvg's own `clipPath1` … among them; no other reference
+  kind and no text, style or image.
+- **The integer viewBox** comes back from resvg unchanged.
+- **Fonts.** The quoted stack does not resolve even with the TrueType
+  twins loaded: the output was byte-identical to having no Noto Serif
+  at all. The bare family names do resolve to the twins. So the stacks
+  are rewritten in the rendered markup (a registration `source` hook),
+  not passed as a `GdHallSvg` prop: the art modules write the stacks
+  themselves, and a prop would have touched every one of them.
+- **Sizes.** Outlined SVGs were 154 KB to 1.18 MB (the Portal's labels
+  and Enochian letters), mostly digits at full float precision; numbers
+  rounded to hundredths of a unit and no indentation bring them to 116
+  to 854 KB (37 to 240 KB gzipped). Palette quantisation cuts the PNGs
+  by about 60 % with no visible change at 1:1 (a crop compared side by
+  side). Practicus 1 and 2, and Philosophus 1 and 2, outline to
+  different bytes once the label fonts are there.
+- **sharp** rasterises a hall within its pixel limit once the root has
+  the PNG's `width` and `height`.
+
+### What was built, and how it departs from the plan
+
+The commits are listed in "Commits", at the end of the plan.
+
+| Stage | Change |
+| --- | --- |
+| 1 | `GdHallSvg` without hooks (an `idPrefix`, memoised drawings when the caller has them, image mode); `GdHall` draws through it unchanged |
+| 2 | `viewBoxOf` and `contractViewBox` |
+| 3 | the outliner's `paintServers` option; the Tree's default and two rose sigils pinned beside the existing pins first |
+| 4 | the `gd-hall` contract and registration, the TrueType twins, the licence in the files, golden pins |
+| 5 | `describeHall` and `src/seo/halls.ts` |
+| 6 | the fourteen leads, drafted |
+| 7 | `#preset=<slug>` and the exports' file names |
+
+- **The slug table** lives in the image contract
+  (`src/render/contracts/gdHall.ts`) with the titles' parts and file
+  names, since the contract needs it and client code imports it;
+  `src/seo/halls.ts` builds on it. It is still the one place a slug is
+  written.
+- **The registration** gained five hooks rather than one: the font
+  rewrite, the paint servers, the compaction, palette PNGs and the
+  licence. Paint-server ids are renumbered `gdhall-0` … in the order
+  the defs hold them.
+- **The PNG licence** is an uncompressed `iTXt` XMP packet, as planned.
+  libvips (sharp) reads XMP only from `zTXt`, so the test walks the
+  chunks and checks every CRC; ImageMagick reads the packet and its
+  IPTC fields (checked by hand).
+- **Data inputs.** The Zelator's second hall draws the Table of
+  Shewbread and the candlestick, so the halls' inputs include theirs;
+  the mutation test caught it. The whole-data sweep
+  (`RENDER_INPUT_SWEEP=1`) passes with every hall in it (422 s), after
+  the trumps' table stopped failing to load for a path naming no
+  letter.
+- **Measured** (one process, warm): outlining a hall 15 to 93 ms; the
+  full PNG 218 to 390 ms, the medium 88 to 211 ms, the small 46 to
+  151 ms. Sizes: full PNGs 74 to 137 KB, medium 31 to 56 KB, small 14
+  to 23 KB. The budgets above (500, 150 and 40 KB; SVGs 300 KB gzipped)
+  hold.
+- **Editor exports crediting the art** (decision 12) are not in stage
+  7: they change the shared `ExportControls`, so they get a commit of
+  their own before the pages.
+- **Browser.** `/gd/hall#preset=portal-2` in headless Chromium against
+  a Turbopack dev server on 127.0.0.1: the Portal 2 preset opened with
+  its note, the drawing matching the server's image.
+
 ## Questions answered
 
 All of the plan's questions were answered by Gadi on 26 October 2026
