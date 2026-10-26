@@ -483,8 +483,12 @@ Follow-ups are separate from the completed migration work:
   `src/components/entity/entityFields.test.ts` reaches app code through
   `import.meta.glob("../../app/**/fields.ts")`, which the test cannot see
   ([plan 061](061-gd-hall.md#follow-ups)).
-- Search pages for the temple halls: designed on 26 October 2026 in
-  [plan 062](062-gd-hall-seo.md), not built; revised after its
+- Search pages for the temple halls: designed and built on 26 October
+  2026 on `gate/hall-seo` ([plan 062](062-gd-hall-seo.md)), every commit
+  gated; awaiting review and merge. Each preset hall has a page under
+  `/gd/hall/<slug>` with its licensed PNG and SVG, the presets are
+  listed below the editor, the sitemap lists the images, and the
+  editor's exports credit the art. The plan was revised after its
   adversarial review and Gadi's answers. Gadi's decisions that day: the
   hall images are CC BY 4.0, credited to Magick.ly (an `Organization`,
   not a person); one statically generated page per preset under
@@ -501,7 +505,10 @@ Follow-ups are separate from the completed migration work:
   now drawn in CC BY hall images (Gadi: fine), and the IPTC Digital
   Source Type, left out as ambiguous for code-drawn art that AI agents
   wrote; revisit if a platform asks or Gadi wants to disclose the AI
-  involvement.
+  involvement. After the release: the hall pages in Google's Rich
+  Results Test, the sitemap resubmitted, whether Vercel answers the
+  image files' conditional requests with a 304
+  ([plan 062](062-gd-hall-seo.md#follow-ups)).
 - TODO (Gadi, 26 October 2026; saved for after the current hall work):
   whether the hall editor gets "+ Image". The ritual renderer may
   already draw images, but offline bundles and rights need thought;

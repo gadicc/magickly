@@ -5038,7 +5038,7 @@ From stage H, part 2:
   no Keryx or adept role icon).
 
 From the search pages (26 October 2026; [plan 062](062-gd-hall-seo.md),
-designed, not built):
+built on `gate/hall-seo`):
 
 - **What remains here**: stage I (the built-in docs switched to the
   presets, the `public/pics` drawings and their `/about` credits
@@ -5054,7 +5054,12 @@ designed, not built):
   for private temples rights may not matter; or an uploader consents
   to (donates under) CC BY 4.0, against keeping copyright for internal
   use.
-- Plan 062 closes, once built, the follow-ups on a hook-free id scheme
+- For stage I, from plan 062: each built-in ritual's hall links its
+  page under `/gd/hall/<slug>`; whether the `/gd/hall` editor's source
+  list keeps citing the `public/pics` drawings, which the hall pages no
+  longer cite; and the reader's hall could take a `<desc>` from
+  `describeHall`.
+- Plan 062 closes, once merged, the follow-ups on a hook-free id scheme
   for `GdHall`, resvg's fallback for the quoted font stacks and a
   drawing of `/gd/hall` for search engines. Gadi answered this plan's
   question on Enochian Plain for the published images: fine to draw the

@@ -1,6 +1,7 @@
 # Search pages for the temple halls — 26 October 2026
 
-Status: design only, no code. Read
+Status: built on `gate/hall-seo` (26 October 2026), every commit
+gated; see "Stages 7 to 11 and the checks" for the results. Read
 [current status](000-current-status.md) first. This plan builds on the
 whole-site SEO of [plan 028](028-seo.md), the image route of
 [plan 027](027-component-exports.md), the entity pages of
@@ -433,12 +434,18 @@ here.
   identical bytes, the licence metadata included (no timestamps; held by
   the golden test).
 - URLs never carry a hash: an image keeps its URL as it improves, and
-  search engines keep its history. The static files are served with the
-  platform's revalidating headers and ETag, the CDN purges on deploy,
-  and the API copy keeps its `s-maxage` of a day. The service worker
-  caches images stale-while-revalidate, so a client that has seen an
-  image is shown the old one once after it changes, and the new one
-  from then on; acceptable for a drawing.
+  search engines keep its history. Since the names are not
+  content-addressed, the static files are served with `Cache-Control:
+  public, max-age=0, must-revalidate` and an ETag from their SHA-256, set
+  by the route handler and stored with the prerendered output: a browser
+  revalidates every view rather than keeping a copy it cannot know is
+  stale, and the CDN purges on deploy. (`next start` answers a matching
+  `If-None-Match` with the whole file rather than a 304; whether
+  Vercel's edge answers it is a follow-up.) `/api/render/gd-hall` sends
+  a permanent redirect to the matching file (review of 26 October). The
+  service worker caches images stale-while-revalidate, so a client that
+  has seen an image is shown the old one once after it changes, and the
+  new one from then on; acceptable for a drawing.
 
 ### 8. Licence in the files
 
@@ -698,7 +705,7 @@ The commits are listed in "Commits", at the end of the plan.
 | 3 | the outliner's `paintServers` option; the Tree's default and two rose sigils pinned beside the existing pins first |
 | 4 | the `gd-hall` contract and registration, the TrueType twins, the licence in the files, golden pins |
 | 5 | `describeHall` and `src/seo/halls.ts` |
-| 6 | the fourteen leads, drafted |
+| 6 | the fourteen leads, approved by Gadi with one change (below) |
 | 7 | `#preset=<slug>` and the exports' file names |
 
 - **The slug table** lives in the image contract
@@ -731,6 +738,177 @@ The commits are listed in "Commits", at the end of the plan.
 - **Browser.** `/gd/hall#preset=portal-2` in headless Chromium against
   a Turbopack dev server on 127.0.0.1: the Portal 2 preset opened with
   its note, the drawing matching the server's image.
+
+## Stages 7 to 11 and the checks (26 October 2026)
+
+Gadi approved the fourteen leads with one change: no mention of the
+drawings some presets were ported from, which readers have never seen.
+The three source sentences that named them were reworded in their own
+terms (the Banner of the West "as the 1938 diagram draws it"; Zelator
+2's North wall following the first part's diagram, its own diagram
+still to be located) and folded into the leads' commit; a test keeps
+"older" and "our drawing" out. He also confirmed: no `next/image`.
+
+| Stage | Change |
+| --- | --- |
+| 7 (rest) | `ExportControls` takes a `credit`; the hall editor's SVG and PNG exports credit the art only |
+| 8 | the hall pages, their image files, JSON-LD, cards and metadata |
+| 9 | the presets below the editor, the editor's band at least a screen tall, the new title and description |
+| 10 | the sitemap's image entries |
+| 11 | links from `/gd`, the grade pages, the Ritual Pug guide and `/about` |
+
+How the build departs from the decisions above:
+
+- **Editor exports.** `pngText.ts` writes the `iTXt` chunk with its
+  own CRC-32, shared by the browser and the server (the pinned hall
+  images kept their bytes). The editor's credit is a `dc:description`
+  in the SVG and a `dc:description` and `photoshop:Credit` in the PNG,
+  stating no licence or rights for the file.
+- **The pages' sources** list the book pages only. The `public/pics`
+  drawings stay in the presets' `sources` and in the editor's list
+  until plan 061's stage I.
+- **The trail** is the app bar's: below the Temple Halls section it
+  shows the site's name with the trail in its menu, and the page names
+  itself in its own `h1`, as on the Sephirah and angel pages.
+- **Grade pages** link their halls in a "Temple halls" row, by name,
+  without thumbnails.
+- **Prefetching.** A hall page's server payload carries a preload of
+  its full image (its `fetchPriority="high"`), so prefetching a link to
+  it downloads that image. The gallery and the grade rows therefore
+  link without prefetch (the gallery would otherwise fetch fourteen
+  full PNGs as it scrolls in); the neighbours at a hall page's foot
+  keep it, so the next hall opens at once, at the cost of two images
+  once the reader reaches the foot.
+- **The gallery's links** are Next's own rather than the site's MUI
+  `Link`, which added about a kilobyte (gzipped) to `/gd/hall`'s chunk.
+- **The static files' headers.** Without headers of its own the route
+  was served with `s-maxage=31536000` alone, which browsers cannot
+  revalidate; the final review's fixes set them (decision 7).
+
+The checks, against a production build (webpack) served by `next
+start` on 127.0.0.1, screenshots and the report in
+`~/.cache/hall-seo/shots/`:
+
+- **Gates**: each commit, one at a time, `install --frozen-lockfile`,
+  `check`, `typecheck`, `test:coverage` and `build`; `loom check`, the
+  magick-data smoke test and `check:turbopack` ran at the tip only.
+  Rewritten commits were gated again. One run of the stage 9 gate
+  failed `TrainingUpload.test.tsx` (a FilePond timing test) while two
+  builds ran beside it; that commit was rewritten and gated again.
+- **Build**: 476 static pages, the fourteen hall pages and their 56
+  files among them; the prerendered PNG of Zelator 1 has the pinned
+  bytes.
+- **HTTP**: each file kind served with its type; `X-Robots-Tag:
+  noindex` on the medium and small PNGs and the API copy, none on the
+  full PNG and the SVG; the PNGs carry the `iTXt` packet and the SVG
+  its RDF; an unknown slug or file is a 404.
+- **Sitemap**: 196 URLs, 28 image entries, the image namespace
+  declared, no `&` in an image URL; a test parses the XML.
+- **Structured data, offline**: for the Neophyte, Zelator 1 and Portal
+  2 pages, every type and property checked against schema.org's
+  (`BreadcrumbList`, `ListItem`, `ImageObject`, `Organization`,
+  `Person`, `Book`) and Google's image licence fields (`contentUrl`,
+  `license`, `acquireLicensePage`, `creator`, `creditText`,
+  `copyrightNotice`), the PNG's `contentUrl` the `<img src>` and the
+  SVG's the download link: no problems. The canonical and the two
+  `og:image`s, card first, are in the HTML; Next derives the
+  `twitter:image`s from them. Google's Rich Results Test and the live
+  Search Console checks remain for after the release (follow-ups).
+- **Browser** (headless Chromium, 1,440 × 900 and 390 × 844 at 2×):
+  Zelator 1 and Portal 2's pages, `/gd/hall`, `/gd/hall#preset=
+  philosophus-4`, `/gd` and the Portal's grade page: one `h1`, no
+  horizontal scroll, no console error, layout shift 0 throughout; the
+  hall image loads, the full PNG on the desktop at 2× and the medium on
+  the phone (a 1× desktop picks the 750 w candidate, right for its
+  568 px slot; the full PNG from about 1.33×); the preset link opens Philosophus 4 with its note; the gallery
+  starts below the screen (at 1,360 and 2,138 px) and loads only small
+  PNGs; the card draws the hall. Firefox, Safari and real devices were
+  not checked.
+- **Bundles** (gzip -6, against `main` a633e95, both built here):
+  `/gd/hall`'s page chunk 10,070 → 10,243 bytes (3,793 → 3,861); the
+  editor's chunk 40,423 → 41,791 (14,937 → 15,552, the `#preset` link
+  and the credit); `/gd/hall`'s HTML 9,282 → 10,919 gzipped; a hall
+  page's chunk 4,246 bytes (1,876), as a grade page's (3,988, 1,768),
+  and its HTML 11.7 to 12.1 KB gzipped; all JavaScript chunks
+  8,018,894 → 8,029,295.
+- **Documentation screenshots**: none shows a changed screen; none
+  recaptured.
+
+## The final reviews' fixes (26 October 2026)
+
+Two final reviews of the branch (Opus and Fable; evidence in
+`~/.cache/review-seo-opus/` and `~/.cache/review-seo-fable/`) found it
+mergeable once the first three points below were settled. Every point
+was folded into the commit it belongs to, and every rewritten commit
+gated again:
+
+- **Caching** (stage 8): the files' `Cache-Control` and ETag, as
+  decision 7 now says.
+- **The PNG's XMP** (stages 4 and 7): the `iTXt` chunk goes right after
+  `IHDR`, ahead of the image data, where readers that stop at the data
+  find it; `pngText.ts` and the hall images share the code.
+- **Compaction** (stage 4): rounding numbers distorted the art (the
+  tablets moved about a pixel; Zelator 2 and Portal 2 differed
+  visibly). Rounding path data even to a thousandth still moved
+  antialiased pixels by up to 19 levels, the glyphs being drawn through
+  scaling transforms, so nothing is rounded: the compaction only drops
+  resvg's indentation between tags and around path commands, and a
+  test holds the compacted raster to the uncompacted one within one
+  level (it is identical). The SVGs are 133 KB to 1.02 MB, at most
+  289 KB gzipped.
+- **The figure's description** (stage 8): `aria-describedby` names the
+  section holding the stations' heading and table.
+- **Size budgets** (stage 4): a test holds every hall's PNGs to 500,
+  150 and 40 KB and its SVG to 300 KB gzipped.
+- **A trump's letter** (stage 4): read when the trump is drawn; a path
+  naming no letter row fails that drawing with a clear error, which the
+  render sweep catches, instead of drawing nothing.
+- **`/api/render/gd-hall`** (stage 8): a permanent redirect (308,
+  relative `Location`) to the matching static file; a wrong query is
+  still a 400.
+- **The outliner** (stage 3): every `url(` must be a whole `url(#id)`
+  that was validated, so an unclosed one fails closed; tests cover
+  filters, masks, images (in a pattern too), scripts, foreignObjects,
+  dangling references and malformed forms.
+- **One licence constant** (stages 4, 7, 8): `GD_HALL_LICENCE` in the
+  image contract, used by the files, the pages' JSON-LD and the
+  editor's credit, which takes its host from `SITE_URL`.
+- **Polish**: each JSON-LD `Book` is named "The Golden Dawn, vol. 2",
+  with author, publisher and year from the cited work and the page and
+  leaf in its description; the SVG's and XMP's source is the full
+  citation; an unknown preset link says "preset link"; the gallery's
+  links carry their grade for screen readers; mid-sentence trumps read
+  "the Tower (XVI)"; Theoricus 2 says "the kamea of the Moon"
+  throughout; the Neophyte's description names its altar's cross and
+  triangle; an empty altar is listed as furniture rather than "nothing";
+  the `/gd` tile uses the small PNG; the editor's exported SVG keeps
+  its title first.
+
+**Pins that moved** (stage 4, deliberately, once): for all fourteen
+halls the SVG digest and the three PNG digests, because the compaction
+no longer rounds numbers, the PNG's XMP moved before the image data,
+and the files' source citation names the book. The source digests
+(the SVG before outlining) did not move, which shows the drawings
+themselves are unchanged. No other slug's pins moved.
+
+## Commits
+
+| Commit | Change |
+| --- | --- |
+| d8811fb | The plan, Gadi's answers folded in |
+| 89fa92d | Halls drawn without hooks: `GdHallSvg` |
+| 87aba04 | A viewBox per request: `viewBoxOf` |
+| 249f357 | The outliner keeps the halls' paint servers |
+| a5956e0 | The `gd-hall` image: contract, registration, fonts, licence metadata, pins |
+| c684e5d | The halls' names and generated words for search |
+| 1a0a73f | The fourteen leads |
+| 834687c | `#preset=<slug>` and the exports' file names |
+| 289bd25 | The spike's record |
+| dbac425 | The editor's exports credit the art |
+| 349ba03 | A page per hall, its files, JSON-LD and cards |
+| a0a4098 | The presets below the editor |
+| 77a0253 | The sitemap's image entries |
+| 72bce4b | Links from `/gd`, the grade pages, the guide and `/about` |
 
 ## Questions answered
 
@@ -909,5 +1087,11 @@ Recorded in [plan 061](061-gd-hall.md#follow-ups) and
 - After the release: the hall pages' live URLs in the Rich Results Test,
   the sitemap resubmitted in Search Console, and Search Console's image
   reports watched for the licence badge.
-- Stage I of plan 061: link each built-in ritual's hall to its page.
+- After the release, also: whether Vercel's edge answers a hall
+  file's `If-None-Match` with a 304 (`next start` sends the whole file),
+  and whether the neighbours' prefetched images at a hall page's foot
+  are worth their bytes on phones.
+- Stage I of plan 061: link each built-in ritual's hall to its page,
+  and decide whether the editor's source list keeps citing the
+  `public/pics` drawings (the hall pages no longer do).
 - The reader's hall could take a `<desc>` from `describeHall`.
