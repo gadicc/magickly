@@ -114,6 +114,7 @@ export default defineConfig({
         "src/export/svgExport.ts",
         "src/export/exportRuntime.ts",
         "src/export/ExportControls.tsx",
+        "src/export/pngText.ts",
         "src/app/geomancy/reading/readingState.ts",
         "src/app/kabbalah/tree/treeSettings.ts",
         "src/lib/pageSearchParams.ts",

@@ -1,4 +1,3 @@
-import { crc32 } from "node:zlib";
 import {
   defaultHallArt,
   GD_HALL_FONT_STACKS,
@@ -13,6 +12,7 @@ import {
   hallPreset,
   hallSourceCitation,
 } from "@magick-components/gd/hall/presets";
+import { pngWithText, XMP_KEYWORD } from "@/export/pngText";
 import { SITE_URL } from "@/seo/site";
 import {
   GD_HALL_LICENCE,
@@ -194,8 +194,7 @@ export function hallXmp(props: GdHallImageProps): string {
   );
 }
 
-/** The keyword the XMP specification gives an XMP packet in a PNG. */
-export const XMP_KEYWORD = "XML:com.adobe.xmp";
+export { XMP_KEYWORD };
 
 /**
  * The PNG with an uncompressed `iTXt` chunk holding the XMP packet,
@@ -205,29 +204,7 @@ export const XMP_KEYWORD = "XML:com.adobe.xmp";
  * encode drops it, so this runs after the last encode.
  */
 export function pngWithXmp(png: Buffer, xmp: string): Buffer {
-  // The signature, then IHDR: a 13-byte chunk, 25 bytes with its frame.
-  const at = 8 + 12 + 13;
-  if (png.toString("latin1", 12, 16) !== "IHDR" || png.readUInt32BE(8) !== 13)
-    throw new Error("Unexpected PNG start");
-  const data = Buffer.concat([
-    Buffer.from(XMP_KEYWORD, "latin1"),
-    // Null separator, uncompressed, method 0, no language, no translation.
-    Buffer.from([0, 0, 0, 0, 0]),
-    Buffer.from(xmp, "utf8"),
-  ]);
-  const type = Buffer.from("iTXt", "latin1");
-  const length = Buffer.alloc(4);
-  length.writeUInt32BE(data.length);
-  const crc = Buffer.alloc(4);
-  crc.writeUInt32BE(crc32(Buffer.concat([type, data])));
-  return Buffer.concat([
-    png.subarray(0, at),
-    length,
-    type,
-    data,
-    crc,
-    png.subarray(at),
-  ]);
+  return Buffer.from(pngWithText(png, XMP_KEYWORD, xmp));
 }
 
 /** The registration's last step: the licence in either format. */

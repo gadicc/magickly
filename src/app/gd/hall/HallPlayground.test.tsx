@@ -1124,6 +1124,11 @@ describe("sharing and export", { timeout: 20_000 }, () => {
     expect(svg).toContain(">Theoricus Temple 1</title>");
     // The drawing alone: none of the editor's overlay.
     expect(svg).not.toContain("aria-hidden");
+    // The art credited, the drawing itself given no licence (plan 062).
+    expect(svg).toContain(
+      "<dc:description>Hall art: Magick.ly, CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), drawn with the temple hall editor at https://magick.ly/gd/hall. The licence covers the art, not the hall as arranged.</dc:description>",
+    );
+    expect(svg).not.toMatch(/cc:license|xmpRights/);
   });
 
   it("opens a preset from a hall page's link, keeping the draft", async () => {

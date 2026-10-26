@@ -13,6 +13,7 @@ import {
   downloadBlob,
   rasterizeSvg,
 } from "./exportRuntime";
+import { pngWithText, svgWithMarkup, XMP_KEYWORD } from "./pngText";
 import {
   prepareSvgClone,
   rasterSize,
@@ -59,6 +60,13 @@ export interface ExportControlsProps {
    * fails the export.
    */
   prepare?: (clone: SVGSVGElement) => void | Promise<void>;
+  /**
+   * Credit every exported file carries: markup put first inside the SVG
+   * (a `<metadata>` block), and an XMP packet written into the PNG as an
+   * `iTXt` chunk, in downloads and copies alike. Its wording is the
+   * page's; the halls credit their art without licensing the drawing.
+   */
+  credit?: { svg: string; xmp: string };
 }
 
 /** Absolute form of a site-relative path for copying. */
@@ -77,6 +85,7 @@ export default function ExportControls({
   linkNote,
   share,
   prepare,
+  credit,
 }: ExportControlsProps) {
   const [feedback, setFeedback] = React.useState<Feedback | null>(null);
   // Every action disables the controls until it settles; the PNG ones can
@@ -92,7 +101,7 @@ export default function ExportControls({
   // Clone the SVG and return the PNG's promise synchronously, so clipboard
   // writes keep the user gesture (Safari); `prepare` and the PNG bytes
   // arrive later, inside that promise.
-  const png = () => {
+  const raster = () => {
     const svg = element();
     const size = rasterSize(svg);
     if (!prepare) return rasterizeSvg(serializeSvg(svg, size), size);
@@ -100,6 +109,28 @@ export default function ExportControls({
     return Promise.resolve()
       .then(() => prepare(clone))
       .then(() => rasterizeSvg(serializeSvgClone(clone), size));
+  };
+  const png = () => {
+    const drawn = raster();
+    if (!credit) return drawn;
+    return drawn.then(
+      async (blob) =>
+        new Blob(
+          [
+            pngWithText(
+              new Uint8Array(await blob.arrayBuffer()),
+              XMP_KEYWORD,
+              credit.xmp,
+            ) as Uint8Array<ArrayBuffer>,
+          ],
+          { type: "image/png" },
+        ),
+    );
+  };
+  /** The SVG file's text, with the credit when there is one. */
+  const svgText = () => {
+    const text = serializeSvg(element());
+    return credit ? svgWithMarkup(text, credit.svg) : text;
   };
   const run = async (operation: () => Promise<string>) => {
     setPending((count) => count + 1);
@@ -134,7 +165,7 @@ export default function ExportControls({
           onClick={() =>
             run(async () => {
               downloadBlob(
-                new Blob([serializeSvg(element())], { type: "image/svg+xml" }),
+                new Blob([svgText()], { type: "image/svg+xml" }),
                 `${filename}.svg`,
               );
               return "Downloading SVG";
@@ -166,7 +197,7 @@ export default function ExportControls({
           disabled={busy}
           onClick={() =>
             run(async () =>
-              (await copySvg(serializeSvg(element()))) === "image/svg+xml"
+              (await copySvg(svgText())) === "image/svg+xml"
                 ? "Copied SVG image to clipboard"
                 : "Copied SVG text to clipboard",
             )

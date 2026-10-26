@@ -38,6 +38,7 @@ import ExportControls from "@/export/ExportControls";
 import { copyText } from "@/export/exportRuntime";
 import { GD_HALLS, gdHall, gdHallFileBase } from "@/render/contracts/gdHall";
 import { gdHallArt } from "./art";
+import { hallArtCredit } from "./exportCredit";
 import { embedGdHallFonts } from "./exportFonts";
 import {
   draftStorage,
@@ -851,6 +852,7 @@ export default function HallPlayground() {
           target={drawing}
           filename={exportFilename(preset)}
           prepare={embedGdHallFonts}
+          credit={hallArtCredit}
         />
         <div className={styles.shareButtons}>
           <Button

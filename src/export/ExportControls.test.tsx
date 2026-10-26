@@ -90,6 +90,52 @@ describe("ExportControls", () => {
     expect(runtime.downloadBlob).toHaveBeenLastCalledWith(png, "tree.png");
   });
 
+  it("credits every exported file when given a credit", async () => {
+    // A 1 × 1 PNG: the signature, IHDR, IDAT and IEND.
+    const png = Uint8Array.from(
+      atob(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+      ),
+      (char) => char.charCodeAt(0),
+    );
+    runtime.rasterizeSvg.mockResolvedValue(new Blob([png]));
+    runtime.copySvg.mockResolvedValue("text/plain");
+    runtime.copyPng.mockImplementation(async (pending: Promise<Blob>) => {
+      await pending;
+    });
+    const credit = { svg: "<metadata>Art: us</metadata>", xmp: "<x>Art</x>" };
+    render(<Page filename="hall" viewBox="0 0 10 10" credit={credit} />);
+    fireEvent.click(screen.getByLabelText("Download SVG"));
+    await screen.findByText("Downloading SVG");
+    const [svgBlob] = runtime.downloadBlob.mock.calls[0] as [Blob];
+    expect(await svgBlob.text()).toMatch(
+      /<svg[^>]*><title>hall<\/title><metadata>Art: us<\/metadata>/,
+    );
+    fireEvent.click(screen.getByLabelText("Copy SVG to clipboard"));
+    await screen.findByText("Copied SVG text to clipboard");
+    expect(runtime.copySvg.mock.calls[0][0]).toContain(
+      "<metadata>Art: us</metadata>",
+    );
+    fireEvent.click(screen.getByLabelText("Download PNG"));
+    await screen.findByText("Downloading PNG");
+    const [pngBlob, name] = runtime.downloadBlob.mock.calls[1] as [
+      Blob,
+      string,
+    ];
+    expect(name).toBe("hall.png");
+    expect(pngBlob.type).toBe("image/png");
+    const bytes = new Uint8Array(await pngBlob.arrayBuffer());
+    expect(new TextDecoder().decode(bytes)).toContain(
+      "iTXtXML:com.adobe.xmp\0\0\0\0\0<x>Art</x>",
+    );
+    fireEvent.click(screen.getByLabelText("Copy PNG to clipboard"));
+    await screen.findByText("Copied PNG to clipboard");
+    const copied = await (runtime.copyPng.mock.calls[0][0] as Promise<Blob>);
+    expect(new TextDecoder().decode(await copied.arrayBuffer())).toContain(
+      "<x>Art</x>",
+    );
+  });
+
   it("hands the pending PNG promise to the clipboard inside the click", async () => {
     let resolve!: (blob: Blob) => void;
     runtime.rasterizeSvg.mockReturnValue(
