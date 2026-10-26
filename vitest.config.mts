@@ -124,6 +124,7 @@ export default defineConfig({
         "src/seo/cardList.ts",
         "src/seo/cards.ts",
         "src/seo/entities.ts",
+        "src/seo/halls.ts",
         "src/seo/JsonLd.tsx",
         "src/seo/metadata.ts",
         "src/seo/pages.ts",

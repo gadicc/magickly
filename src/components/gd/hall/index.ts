@@ -7,6 +7,13 @@ export { defaultHallArt } from "./art";
 export { TABLET_ELEMENTS, tabletArt } from "./art/symbols";
 export { romanNumeral, TRUMPS } from "./art/tarotKey";
 export {
+  describeHall,
+  type HallDescription,
+  type HallStation,
+  hallObjectName,
+  hallStation,
+} from "./describe";
+export {
   GD_HALL_FONT_FAMILIES,
   GD_HALL_FONT_FILES,
   GD_HALL_FONT_STACKS,
