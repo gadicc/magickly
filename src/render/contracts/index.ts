@@ -1,5 +1,6 @@
 import { astroGeomancyChart } from "./astroGeomancyChart";
 import { enochianTablet } from "./enochianTablet";
+import { gdHallImage } from "./gdHall";
 import { roseSigil } from "./roseSigil";
 import { sevenBranchedCandlestick } from "./sevenBranchedCandlestick";
 import { tableOfShewbread } from "./tableOfShewbread";
@@ -17,6 +18,7 @@ export const CONTRACTS = {
   "seven-branched-candlestick": sevenBranchedCandlestick,
   "table-of-shewbread": tableOfShewbread,
   "rose-sigil": roseSigil,
+  "gd-hall": gdHallImage,
 } as const;
 
 export type ComponentImageSlug = keyof typeof CONTRACTS;

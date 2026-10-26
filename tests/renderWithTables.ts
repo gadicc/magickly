@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { vi } from "vitest";
 import type { ComponentImageSlug } from "@/render/contracts";
+import { GD_HALL_SLUGS } from "@/render/contracts/gdHall";
 import { TREE_IMAGE_FIELDS } from "@/render/contracts/treeOfLife";
 
 /**
@@ -132,6 +133,8 @@ export const DRAWING_QUERIES: Record<ComponentImageSlug, readonly string[]> = {
   "seven-branched-candlestick": [""],
   "table-of-shewbread": [""],
   "rose-sigil": ["text=א&rose=false"],
+  // Every hall: between them they draw every tablet, trump and board.
+  "gd-hall": GD_HALL_SLUGS.map((slug) => `hall=${slug}`),
 };
 
 /** A changed copy of one table, for `loadWithTables`. */

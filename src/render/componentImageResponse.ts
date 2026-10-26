@@ -55,7 +55,8 @@ export async function componentImageResponse(slug: string, request: Request) {
         filename,
       ),
     };
-    if (contract.personal) headers["X-Robots-Tag"] = "noindex";
+    if (contract.personal || contract.indexed === false)
+      headers["X-Robots-Tag"] = "noindex";
     if (matchesEtag(request.headers.get("if-none-match"), etag))
       return new Response(null, { status: 304, headers });
     return new Response(image.bytes, {

@@ -97,6 +97,26 @@ describe("component image responses", () => {
     );
   });
 
+  it("keeps the temple halls' route copies out of the index", async () => {
+    // Their canonical copies are the static files under /gd/hall/<slug>.
+    const response = await componentImageResponse(
+      "gd-hall",
+      new Request(
+        "https://magick.ly/api/render/gd-hall?fmt=png&hall=zelator-1",
+      ),
+    );
+    expect(response.status).toBe(200);
+    expect(response.headers.get("x-robots-tag")).toBe("noindex");
+    expect(response.headers.get("content-disposition")).toBe(
+      'inline; filename="golden-dawn-zelator-1-temple.png"',
+    );
+    const tree = await componentImageResponse(
+      "tree-of-life",
+      new Request("https://magick.ly/api/render/tree-of-life"),
+    );
+    expect(tree.headers.get("x-robots-tag")).toBeNull();
+  });
+
   it("gives the attachment URL the inline URL's ETag, bytes and 304", async () => {
     const inline = await componentImageResponse(
       "tree-of-life",

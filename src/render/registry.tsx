@@ -19,6 +19,13 @@ import { TABLET_IDS } from "./contracts/enochianTablet";
 import { TREE_IMAGE_FIELDS, TREE_PATHS } from "./contracts/treeOfLife";
 import { type DataInputsSpec, resolvedInputsHash } from "./dataInputs";
 import {
+  bareHallFonts,
+  compactHallSvg,
+  finishGdHallImage,
+  GD_HALL_IMAGE_PROFILE,
+  renderGdHallImage,
+} from "./gdHallImage";
+import {
   COMPONENT_IMAGE_PROFILE,
   type ServerFontFile,
   TREE_IMAGE_PROFILE,
@@ -39,6 +46,26 @@ export interface ComponentImageRegistration<S extends ComponentImageSlug> {
   flip?(props: ComponentImageProps<S>): boolean;
   /** Server-only bundled fonts beyond the shared base set (see assets/fonts). */
   fonts?: readonly ServerFontFile[];
+  /**
+   * Rewrites the rendered markup before outlining; part of the recorded
+   * source digest (the halls name their fonts as resvg resolves them).
+   */
+  source?(svg: string): string;
+  /** Keep the local paint servers (see `outlineComponentImage`). */
+  paintServers?: { idPrefix: string };
+  /** Rewrites the outlined SVG before any PNG is drawn from it. */
+  outlined?(svg: Buffer): Buffer;
+  /** Quantise PNGs to a palette (libimagequant), as the social cards do. */
+  palette?: boolean;
+  /**
+   * The final bytes of either format, after encoding: the halls' licence
+   * metadata. Nothing re-encodes after it.
+   */
+  finish?(
+    bytes: Buffer,
+    format: "svg" | "png",
+    props: ComponentImageProps<S>,
+  ): Buffer;
 }
 
 /**
@@ -73,6 +100,33 @@ const TREE_INPUTS: DataInputsSpec = [
       "hermetic.pathNo",
       "hermetic.tarotId",
     ],
+  },
+];
+
+const CANDLESTICK_INPUTS: DataInputsSpec = [
+  {
+    table: "planet",
+    rows: CANDLESTICK_PLANETS,
+    fields: [
+      "symbol",
+      "archangel.name.he",
+      "hebrewLetter.letter.he",
+      "name.he.he",
+    ],
+  },
+];
+
+/**
+ * The signs are drawn by position, so their key order counts. Each sign's
+ * tribe is read through its link, as the component reads it, so only the
+ * twelve tribes the signs name are hashed: Levi and Joseph, whom no sign
+ * names and the table never draws, are not (plan 052).
+ */
+const SHEWBREAD_INPUTS: DataInputsSpec = [
+  {
+    table: "zodiac",
+    rows: "*",
+    fields: ["symbol", "tetragrammatonPermutation", "tribeOfIsrael.name.he"],
   },
 ];
 
@@ -153,38 +207,13 @@ export const COMPONENT_IMAGE_REGISTRY: {
   "seven-branched-candlestick": {
     render: () => <SevenBranchedCandleStick />,
     profile: COMPONENT_IMAGE_PROFILE,
-    inputs: [
-      {
-        table: "planet",
-        rows: CANDLESTICK_PLANETS,
-        fields: [
-          "symbol",
-          "archangel.name.he",
-          "hebrewLetter.letter.he",
-          "name.he.he",
-        ],
-      },
-    ],
+    inputs: CANDLESTICK_INPUTS,
   },
   "table-of-shewbread": {
     render: () => <TableOfShewbread />,
     profile: COMPONENT_IMAGE_PROFILE,
     fonts: ["NotoEmoji-Variable.ttf"],
-    // The signs are drawn by position, so their key order counts. Each
-    // sign's tribe is read through its link, as the component reads it, so
-    // only the twelve tribes the signs name are hashed: Levi and Joseph,
-    // whom no sign names and the table never draws, are not (plan 052).
-    inputs: [
-      {
-        table: "zodiac",
-        rows: "*",
-        fields: [
-          "symbol",
-          "tetragrammatonPermutation",
-          "tribeOfIsrael.name.he",
-        ],
-      },
-    ],
+    inputs: SHEWBREAD_INPUTS,
   },
   "rose-sigil": {
     // The same bounded optimiser as the page, so the link reproduces the drawn sigil.
@@ -200,6 +229,57 @@ export const COMPONENT_IMAGE_REGISTRY: {
     // The rose's letters are geometry, written out in roseSigilGeometry.ts;
     // this image reads no table, and no data edit can move its identity.
     inputs: [],
+  },
+  "gd-hall": {
+    render: renderGdHallImage,
+    profile: GD_HALL_IMAGE_PROFILE,
+    fonts: [
+      "NotoSerif-Italic-latin1.ttf",
+      "NotoSerif-BoldItalic-compass.ttf",
+      "NotoSerifHebrew-Bold-letters.ttf",
+      "EnochianPlain.ttf",
+    ],
+    source: bareHallFonts,
+    paintServers: { idPrefix: "gdhall-" },
+    outlined: compactHallSvg,
+    palette: true,
+    finish: finishGdHallImage,
+    // What any preset draws from the data: the Hebrew letters (banners,
+    // the trumps' letters), the trumps' paths and titles, the Tree's
+    // colours on the boards, the tablets' letters in their versions, as
+    // the tablet image reads them (every tablet: the Portal draws the
+    // Tablet of Union), and the Shewbread and the candlestick, which the
+    // Zelator's second hall draws. The art and the presets are code; the
+    // golden pins hold their bytes.
+    inputs: [
+      ...SHEWBREAD_INPUTS,
+      ...CANDLESTICK_INPUTS,
+      {
+        table: "hebrewLetter",
+        rows: "*",
+        fields: ["id", "letter.he", "letter.name"],
+      },
+      {
+        table: "treeOfLifePath",
+        rows: "*",
+        fields: [
+          "hermetic.tarotId",
+          "hermetic.hebrewLetterId",
+          "hermetic.tarotTitle",
+        ],
+      },
+      { table: "sephirah", rows: "*", fields: ["id", "color.queenWeb"] },
+      {
+        table: "enochianTablet",
+        rows: "*",
+        fields: ["kind", "readings", "choices"],
+      },
+      {
+        table: "enochianTabletVersion",
+        rows: "*",
+        fields: ["revision", "base", "choices", "variants", "reversedFrom"],
+      },
+    ],
   },
 };
 

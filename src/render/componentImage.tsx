@@ -43,10 +43,11 @@ export async function renderComponentImage(
   const { renderToStaticMarkup } = await import("react-dom/server");
   const element = await registration.render(request.props as never);
   // This exact replacement is part of the recorded source digest.
-  const svg = renderToStaticMarkup(element).replace(
+  const markup = renderToStaticMarkup(element).replace(
     'xmlns="http://www.w3.org/2000/svg"',
     'xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"',
   );
+  const svg = registration.source ? registration.source(markup) : markup;
   const outlined = await outlineComponentImage(svg, {
     profile: registration.profile,
     inputsSha256: componentInputsHash(request.slug),
@@ -56,16 +57,26 @@ export async function renderComponentImage(
     ),
     flip: registration.flip?.(request.props as never) ?? false,
     fonts: registration.fonts,
+    paintServers: registration.paintServers,
   });
-  let bytes: Buffer<ArrayBuffer> = outlined.bytes;
+  let bytes = (registration.outlined?.(outlined.bytes) ??
+    outlined.bytes) as Buffer<ArrayBuffer>;
   if (request.format === "png") {
     const { width, height } = request.props;
     const image = sharp(bytes, { limitInputPixels: 4_194_304 });
     if (width || height) image.resize(width, height);
     else if (contract.rasterDefault)
       image.resize(contract.rasterDefault.width, contract.rasterDefault.height);
-    bytes = await image.png().toBuffer();
+    bytes = await image
+      .png(registration.palette ? { palette: true } : undefined)
+      .toBuffer();
   }
+  if (registration.finish)
+    bytes = registration.finish(
+      bytes,
+      request.format,
+      request.props as never,
+    ) as Buffer<ArrayBuffer>;
   return {
     ...outlined,
     request,

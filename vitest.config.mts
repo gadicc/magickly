@@ -109,6 +109,8 @@ export default defineConfig({
         "src/render/contracts/sevenBranchedCandlestick.ts",
         "src/render/contracts/tableOfShewbread.ts",
         "src/render/contracts/roseSigil.ts",
+        "src/render/contracts/gdHall.ts",
+        "src/render/gdHallImage.tsx",
         "src/export/svgExport.ts",
         "src/export/exportRuntime.ts",
         "src/export/ExportControls.tsx",

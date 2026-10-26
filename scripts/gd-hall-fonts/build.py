@@ -9,6 +9,10 @@ and writes:
 - public/fonts/NotoSerif-Italic-latin1.woff2      labels and captions
 - public/fonts/NotoSerif-BoldItalic-compass.woff2 the compass labels
 - public/fonts/NotoSerifHebrew-Bold-letters.woff2 Hebrew-letter banners
+- assets/fonts/NotoSerif-Italic-latin1.ttf, NotoSerif-BoldItalic-compass.ttf
+  and NotoSerifHebrew-Bold-letters.ttf, the same subsets as TrueType for
+  the server's image renderer (resvg reads no WOFF2; plan 062), outside
+  public/ so no URL serves them and the service worker never caches them
 - public/fonts/NotoSerif-OFL.txt, NotoSerifHebrew-OFL.txt (upstream notices)
 - public/fonts/NotoSans-OFL.txt, NotoSansHebrew-OFL.txt, the notices the
   existing NotoSans-Regular.ttf and NotoSansHebrew-Regular.ttf lacked: their
@@ -90,6 +94,7 @@ NO_LIGATURES = {"liga": False, "clig": False, "dlig": False, "hlig": False,
 
 ROOT = Path(__file__).resolve().parents[2]
 PUBLIC_FONTS = ROOT / "public" / "fonts"
+ASSET_FONTS = ROOT / "assets" / "fonts"
 METRICS_JSON = ROOT / "src" / "components" / "gd" / "hall" / "fontMetrics.json"
 
 
@@ -271,6 +276,10 @@ def main() -> None:
         PUBLIC_FONTS / "NotoSerif-Italic-latin1.woff2": to_bytes(italic, "woff2"),
         PUBLIC_FONTS / "NotoSerif-BoldItalic-compass.woff2": to_bytes(bold, "woff2"),
         PUBLIC_FONTS / "NotoSerifHebrew-Bold-letters.woff2": to_bytes(hebrew, "woff2"),
+        # The same subsets as TrueType, from the same run, for resvg.
+        ASSET_FONTS / "NotoSerif-Italic-latin1.ttf": italic_ttf,
+        ASSET_FONTS / "NotoSerif-BoldItalic-compass.ttf": bold_ttf,
+        ASSET_FONTS / "NotoSerifHebrew-Bold-letters.ttf": hebrew_ttf,
         PUBLIC_FONTS / "NotoSerif-OFL.txt": ofl_notice(
             fetch(args.cache, "notoserif-OFL.txt")),
         PUBLIC_FONTS / "NotoSerifHebrew-OFL.txt": ofl_notice(

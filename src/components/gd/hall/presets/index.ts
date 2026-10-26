@@ -17,6 +17,7 @@ export {
   type HallPreset,
   type HallPresetSource,
   type HallSourceWork,
+  hallSourceCitation,
   hallSourceText,
   hallSourceUrl,
 } from "./types";

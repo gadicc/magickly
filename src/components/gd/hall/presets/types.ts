@@ -47,7 +47,13 @@ export type HallPresetSource =
 /** The books presets cite, with their archive.org items. */
 export const HALL_SOURCE_WORKS = {
   regardie1938: {
+    /** How a source line names it: "Regardie 1938, vol. 2". */
     title: "Regardie 1938, vol. 2",
+    author: "Israel Regardie",
+    book: "The Golden Dawn",
+    volume: "vol. 2",
+    publisher: "Aries Press, Chicago",
+    year: 1938,
     archiveItem: "IsraelRegardie-TheGoldenDawn-Vol2-1938",
   },
 } as const;
@@ -79,6 +85,18 @@ export function hallSourceText(source: HallPresetSource): string {
   const { title } = HALL_SOURCE_WORKS[source.work];
   const note = source.note === undefined ? "" : ` (${source.note})`;
   return `${title}, p.${source.page} (archive.org leaf n${source.leaf})${note}`;
+}
+
+/**
+ * A book source in full, for a file's metadata: "Israel Regardie, The
+ * Golden Dawn, vol. 2 (Aries Press, Chicago, 1938), p.44, archive.org
+ * leaf n38" and the note in parentheses. A drawing is its path.
+ */
+export function hallSourceCitation(source: HallPresetSource): string {
+  if (source.kind === "drawing") return source.path;
+  const work = HALL_SOURCE_WORKS[source.work];
+  const note = source.note === undefined ? "" : ` (${source.note})`;
+  return `${work.author}, ${work.book}, ${work.volume} (${work.publisher}, ${work.year}), p.${source.page}, archive.org leaf n${source.leaf}${note}`;
 }
 
 /**

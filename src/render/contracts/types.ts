@@ -112,6 +112,12 @@ export interface ComponentImageContract<Props extends ImageDimensions> {
   readonly keys: readonly string[];
   /** Carries user-authored state; links need explicit consent and responses are not indexed. */
   readonly personal: boolean;
+  /**
+   * `false` when the image's canonical copy is published elsewhere, so the
+   * route's copy carries `X-Robots-Tag: noindex` too (plan 062: the halls'
+   * static files).
+   */
+  readonly indexed?: boolean;
   parse(searchParams: URLSearchParams): Props;
   /** Ordered query pairs with defaults omitted, except empties that differ from the default. */
   canonicalize(props: Props): Array<[string, string]>;

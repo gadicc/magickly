@@ -70,6 +70,8 @@ describe("component image contracts", () => {
     "seven-branched-candlestick": ["", "width=300", "width=100&height=100"],
     "table-of-shewbread": ["", "width=300"],
     "rose-sigil": ["text=גדי", "text=אבג&rose=false", "text=שלום&width=50"],
+    // Sizes are PNG-only, so they round-trip in gdHall.test.ts.
+    "gd-hall": ["", "hall=zelator-1", "hall=portal-2"],
   };
 
   it.each(Object.entries(samples))(
@@ -198,8 +200,10 @@ describe("component image contracts", () => {
   });
 
   it("takes each request's viewBox from viewBoxOf, else the fixed one", () => {
-    // The existing contracts draw one shape and keep their fixed viewBox.
-    for (const slug of COMPONENT_IMAGE_SLUGS) {
+    // The other contracts draw one shape and keep their fixed viewBox.
+    for (const slug of COMPONENT_IMAGE_SLUGS.filter(
+      (slug) => slug !== "gd-hall",
+    )) {
       const contract = CONTRACTS[
         slug
       ] as unknown as ComponentImageContract<ImageDimensions>;

@@ -56,15 +56,17 @@ beforeAll(async () => {
 describe("a data change and the images it can reach", () => {
   it("moves one image's bytes and only that image's inputs hash", async () => {
     // A tribe's Hebrew name, which is what Manasseh's fix changed. The Table
-    // of Shewbread prints it in that sign's branch and nothing else reads it.
+    // of Shewbread prints it in that sign's branch, and so does the Zelator
+    // hall that stands the table in the North; nothing else reads it.
     const rename = (rows: Record<string, unknown>) => {
       (rows.manasseh as { name: { he: string } }).name.he = "שבט";
     };
     const after = await withChange("tribeOfIsrael", rename);
-    expect([...changedSlugs(base, after)]).toEqual(["table-of-shewbread"]);
+    const reached = ["table-of-shewbread", "gd-hall"];
+    expect([...changedSlugs(base, after)]).toEqual(reached);
     const renderer = await loadWithTables(changeTable("tribeOfIsrael", rename));
     for (const slug of COMPONENT_IMAGE_SLUGS)
-      if (slug === "table-of-shewbread")
+      if (reached.includes(slug))
         expect(renderer.inputsHash(slug)).not.toBe(baseHashes[slug]);
       else expect(renderer.inputsHash(slug)).toBe(baseHashes[slug]);
   }, 120_000);
@@ -91,7 +93,7 @@ describe("a data change and the images it can reach", () => {
     const moved = COMPONENT_IMAGE_SLUGS.filter(
       (slug) => renderer.inputsHash(slug) !== baseHashes[slug],
     );
-    expect(moved).toEqual(["table-of-shewbread"]);
+    expect(moved).toEqual(["table-of-shewbread", "gd-hall"]);
   }, 120_000);
 
   it("reaches through a link: an archangel's name is a Tree label", async () => {
@@ -155,8 +157,11 @@ describe("a data change and the images it can reach", () => {
   it("never moves the rose sigil, which reads no table at all", async () => {
     const renderer = await loadWithTables(
       changeTable("hebrewLetter", (rows) => {
-        for (const id of Object.keys(rows))
-          (rows[id] as { letter?: { he?: string } }).letter = { he: "ת" };
+        // Each letter's character only: the halls look letters up by name.
+        for (const id of Object.keys(rows)) {
+          const row = rows[id] as { letter?: Record<string, unknown> };
+          row.letter = { ...row.letter, he: "ת" };
+        }
       }),
     );
     expect(renderer.inputsHash("rose-sigil")).toBe(baseHashes["rose-sigil"]);

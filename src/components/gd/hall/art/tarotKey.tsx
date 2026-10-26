@@ -16,7 +16,8 @@ export const provenance = original(
 /** What a trump's card shows. */
 interface Trump {
   numeral: string;
-  letter: string;
+  /** The path's Hebrew letter; throws if its row names no letter. */
+  readonly letter: string;
   title: string;
 }
 
@@ -54,7 +55,17 @@ export const TRUMPS: ReadonlyMap<number, Trump> = new Map(
         n,
         {
           numeral: romanNumeral(n),
-          letter: letters[hermetic.hebrewLetterId].letter.he,
+          // Read when drawn, not as the module loads: a path naming no
+          // letter row fails that trump's drawing, loudly, and nothing
+          // else (the render sweep changes every id and catches it).
+          get letter() {
+            const letter = letters[hermetic.hebrewLetterId]?.letter.he;
+            if (letter === undefined)
+              throw new Error(
+                `Trump ${n}: no Hebrew letter ${JSON.stringify(hermetic.hebrewLetterId)}`,
+              );
+            return letter;
+          },
           title: hermetic.tarotTitle,
         },
       ] as const,

@@ -19,6 +19,9 @@ ligatures, and keep the copyright and licence names.
 | NotoSerif-Italic-latin1.woff2 | weight 400; U+0020–007E, U+00A0–00FF, U+2013–2014, U+2018–2019, U+201C–201D, U+2026 | 11464 | 9f950c9e9439445d096145d53dcb951ec3baa9d71efbd206a87c70d876e538dd |
 | NotoSerif-BoldItalic-compass.woff2 | weight 700; the letters of "East West North South" | 2072 | f39a880b7b95a001802b1cb02f3ae8ffea9e656065a54f8d3bbd43b833d6ded0 |
 | NotoSerifHebrew-Bold-letters.woff2 | weight 700; U+05D0–05EA (the 22 letters and 5 final forms) | 3340 | 8e6caa54f8ea7632995cb66eee7afbfbd2630581945fe6e45bea8ede53950e0f |
+| ../../assets/fonts/NotoSerif-Italic-latin1.ttf | the same subset as TrueType, for the server's image renderer (plan 062) | 26112 | b17042575847967023a24dba5b9b4b16aa9fe9a627005acfed7b18ca2c48c6b9 |
+| ../../assets/fonts/NotoSerif-BoldItalic-compass.ttf | the same subset as TrueType | 3908 | d443ee9985cdaf7c3aa1120bfb3971b8f4f1b42896bf2c07cec5833b3336f475 |
+| ../../assets/fonts/NotoSerifHebrew-Bold-letters.ttf | the same subset as TrueType | 6448 | 13c7ddab852ce3a9d6e0d02fab9fa21a35c6eef210dd57579c7e43d9074d5573 |
 | ../../src/components/gd/hall/fontMetrics.json | advances and GPOS kern pairs (by class) of the three subsets, in font units | 10736 | 7e514c841ae2c761c0f0990f584a6a930d9dcd8d9e07a8d57245fea313270e90 |
 
 Built with fontTools 4.66.1, Brotli 1.2.0 and uharfbuzz 0.56.2 (HarfBuzz
