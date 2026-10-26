@@ -17,7 +17,13 @@ import {
   isComponentImageSlug,
 } from "./index";
 import { rectifySigilText, SIGIL_MAX_LETTERS } from "./roseSigil";
-import { DIMENSION_LIMITS, parseDimensions } from "./types";
+import {
+  type ComponentImageContract,
+  contractViewBox,
+  DIMENSION_LIMITS,
+  type ImageDimensions,
+  parseDimensions,
+} from "./types";
 
 const parse = <S extends ComponentImageSlug>(slug: S, query = "") =>
   parseComponentImageRequest(slug, new URLSearchParams(query)).props;
@@ -189,6 +195,28 @@ describe("component image contracts", () => {
       const query = slug === "rose-sigil" ? "text=א&download=1" : "download=1";
       expect(() => parse(slug, query)).toThrow(InvalidComponentImageRequest);
     }
+  });
+
+  it("takes each request's viewBox from viewBoxOf, else the fixed one", () => {
+    // The existing contracts draw one shape and keep their fixed viewBox.
+    for (const slug of COMPONENT_IMAGE_SLUGS) {
+      const contract = CONTRACTS[
+        slug
+      ] as unknown as ComponentImageContract<ImageDimensions>;
+      for (const query of samples[slug])
+        expect(contractViewBox(contract, parse(slug, query))).toBe(
+          contract.viewBox,
+        );
+    }
+    type Wide = ImageDimensions & { wide: boolean };
+    const sized: ComponentImageContract<Wide> = {
+      ...(CONTRACTS[
+        "seven-branched-candlestick"
+      ] as unknown as ComponentImageContract<Wide>),
+      viewBoxOf: (props) => (props.wide ? [0, 0, 20, 10] : [0, 0, 10, 20]),
+    };
+    expect(contractViewBox(sized, { wide: true })).toEqual([0, 0, 20, 10]);
+    expect(contractViewBox(sized, { wide: false })).toEqual([0, 0, 10, 20]);
   });
 
   it("draws the tablets on the page the component draws them on", () => {

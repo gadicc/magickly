@@ -6,6 +6,7 @@ import {
   parseComponentImageRequest,
 } from "./componentImageRequest";
 import { CONTRACTS, type ComponentImageSlug } from "./contracts";
+import { contractViewBox } from "./contracts/types";
 import { outlineComponentImage } from "./outlineTreeImage";
 import { COMPONENT_IMAGE_REGISTRY, componentInputsHash } from "./registry";
 
@@ -49,7 +50,10 @@ export async function renderComponentImage(
   const outlined = await outlineComponentImage(svg, {
     profile: registration.profile,
     inputsSha256: componentInputsHash(request.slug),
-    viewBox: contract.viewBox,
+    viewBox: contractViewBox(
+      contract as Parameters<typeof contractViewBox>[0],
+      request.props,
+    ),
     flip: registration.flip?.(request.props as never) ?? false,
     fonts: registration.fonts,
   });

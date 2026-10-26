@@ -93,8 +93,16 @@ export function canonicalDimensions(
 export interface ComponentImageContract<Props extends ImageDimensions> {
   /** Stable URL slug: `/api/render/<slug>`. */
   readonly slug: string;
-  /** Root `viewBox` the component always renders, checked after outlining. */
+  /**
+   * Root `viewBox` the component renders, checked after outlining; the
+   * default when `viewBoxOf` is absent.
+   */
   readonly viewBox: readonly [number, number, number, number];
+  /**
+   * The root `viewBox` for these props, for a component whose drawings
+   * differ in shape (plan 062: each temple hall has its own bounds).
+   */
+  viewBoxOf?(props: Props): readonly [number, number, number, number];
   /**
    * PNG size when the request names neither axis. `null` keeps the viewBox
    * size, which existing saved Tree references depend on.
@@ -109,4 +117,12 @@ export interface ComponentImageContract<Props extends ImageDimensions> {
   canonicalize(props: Props): Array<[string, string]>;
   /** Download file name without extension. */
   filename(props: Props): string;
+}
+
+/** The root `viewBox` a contract's component renders for these props. */
+export function contractViewBox<Props extends ImageDimensions>(
+  contract: ComponentImageContract<Props>,
+  props: Props,
+): readonly [number, number, number, number] {
+  return contract.viewBoxOf?.(props) ?? contract.viewBox;
 }
