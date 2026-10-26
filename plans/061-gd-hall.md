@@ -816,10 +816,12 @@ Each stage is a series of gated commits on `gate/gd-hall`.
 | F | Remaining vocabulary and the presets for Practicus, Philosophus and Portal (markers where art is missing) | yes | done (19 October 2026; Stage F notes): kameas, placeholder seals, boards, veil, white altar, gong, brazier, candle, the adepts in the ritual roles, nine presets from the 1938 layouts; the layout switch reads Source, Split, Visual and the drawing comparison is gone |
 | G | magick-data: Water, Fire and Union tablets | yes | done (21 October 2026; Stage G notes), with Gadi's split ratios first; the letter choices and the Earth and Air question await Gadi |
 | H | Original artwork; ledger to zero; `Lamen` moves to the MIT directory; credits | yes | core done (23 October 2026; Stage H notes): the nine items, `light`, the Keryx's and Sentinel's glyphs, `Lamen` in the MIT package, the ledger at zero; the seals deferred and the boards, figure markers, adept lamens and Minutum Mundum colours pending Gadi's decision |
-| I | Built-in docs switched to presets; reader export; end-of-project review of `/gd/hall`, scales and the conflicts table | yes | |
+| I | Built-in docs switched to presets, then `public/pics`' drawings and their `/about` credits removed (Old `/pics/*.svg` references); each built-in ritual's hall linked to its page under `/gd/hall/<slug>` ([plan 062](062-gd-hall-seo.md)); reader export; end-of-project review of `/gd/hall`, scales and the conflicts table | yes | |
 | J | Private hall sources, written outside the repository for Gadi to save in his private rituals | — (nothing committed) | |
 
-Stretch: a dark palette, server rendering through `/api/render`.
+Stretch: a dark palette. Server rendering through `/api/render` is
+planned in [plan 062](062-gd-hall-seo.md) (26 October 2026), for the
+presets' search pages.
 
 ## Spike (17 October 2026)
 
@@ -5034,3 +5036,28 @@ From stage H, part 2:
   device); no documentation screenshot shows the changed art (the
   editor and reader shots show the Neophyte's old `/pics` drawing, and
   no Keryx or adept role icon).
+
+From the search pages (26 October 2026; [plan 062](062-gd-hall-seo.md),
+designed, not built):
+
+- **What remains here**: stage I (the built-in docs switched to the
+  presets, the `public/pics` drawings and their `/about` credits
+  removed once nothing cites them, each built-in ritual's hall linked
+  to its page, reader export, and the end-of-project review of
+  `/gd/hall`, the scales and the conflicts table) and stage J (the
+  private hall sources, outside the repository).
+- **"+ Image" in the hall editor** (Gadi, 26 October 2026: should a
+  hall allow images?). Saved for later; Gadi wants the current work
+  finished first. The ritual renderer may already draw images in
+  rituals, but offline bundles and rights need thought. Options to
+  weigh, not decided: users upload images and assert their rights;
+  for private temples rights may not matter; or an uploader consents
+  to (donates under) CC BY 4.0, against keeping copyright for internal
+  use.
+- Plan 062 closes, once built, the follow-ups on a hook-free id scheme
+  for `GdHall`, resvg's fallback for the quoted font stacks and a
+  drawing of `/gd/hall` for search engines. Gadi answered this plan's
+  question on Enochian Plain for the published images: fine to draw the
+  tablets in it; its unknown licence stays a follow-up (plan 062). The
+  editor's exports will carry the art's attribution only (plan 062,
+  decision 12).

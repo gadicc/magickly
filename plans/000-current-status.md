@@ -483,5 +483,34 @@ Follow-ups are separate from the completed migration work:
   `src/components/entity/entityFields.test.ts` reaches app code through
   `import.meta.glob("../../app/**/fields.ts")`, which the test cannot see
   ([plan 061](061-gd-hall.md#follow-ups)).
+- Search pages for the temple halls: designed on 26 October 2026 in
+  [plan 062](062-gd-hall-seo.md), not built; revised after its
+  adversarial review and Gadi's answers. Gadi's decisions that day: the
+  hall images are CC BY 4.0, credited to Magick.ly (an `Organization`,
+  not a person); one statically generated page per preset under
+  `/gd/hall/<slug>`, with numbered slugs (`neophyte`, `zelator-1` …
+  `portal-2`) and descriptive titles; `/gd/hall` stays the editor with a
+  gallery below it; the social card with the hall first, the PNG
+  second; editor exports credit the art only. The plan adds a `gd-hall`
+  image contract drawn hook-free, static image files named after the
+  slugs, licence metadata in the files and in `ImageObject` JSON-LD,
+  sitemap image entries and links from `/gd` and the grade pages.
+  Gadi then chose the outliner admitting the halls' gradients,
+  patterns and clips for `gd-hall` only, the SVG indexable beside the
+  PNG, and a 750 px image for phones. TODO from it: Enochian Plain's unknown licence,
+  now drawn in CC BY hall images (Gadi: fine), and the IPTC Digital
+  Source Type, left out as ambiguous for code-drawn art that AI agents
+  wrote; revisit if a platform asks or Gadi wants to disclose the AI
+  involvement.
+- TODO (Gadi, 26 October 2026; saved for after the current hall work):
+  whether the hall editor gets "+ Image". The ritual renderer may
+  already draw images, but offline bundles and rights need thought;
+  options recorded, not decided: users upload images and assert their
+  rights; rights may not matter for private temples; or an uploader
+  consents to (donates under) CC BY 4.0, against keeping copyright for
+  internal use ([plan 061](061-gd-hall.md#follow-ups)). Plan 061's
+  stages I (built-in docs on the presets, `public/pics` and its credits
+  removed, reader export, the end-of-project review) and J (private hall
+  sources) remain.
 
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.
