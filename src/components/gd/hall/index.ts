@@ -14,7 +14,15 @@ export {
   gdHallFontFaceCss,
   gdHallFontFaceRule,
 } from "./fonts";
-export { GdHall, type GdHallProps } from "./GdHall";
+export {
+  GdHall,
+  type GdHallProps,
+  GdHallSvg,
+  type GdHallSvgProps,
+  type HallDrawings,
+  hallRoot,
+  hallViewBox,
+} from "./GdHall";
 export { labelFont, wrapText } from "./labels";
 export {
   DEFAULT_SCALES,

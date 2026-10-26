@@ -155,7 +155,7 @@ function Inner({ label }: { label: ResolvedLabel }) {
  * One drawing in the hall's `<defs>`: the first object drawn with it, and
  * its art (none for the placeholder).
  */
-interface ArtDefinition {
+export interface ArtDefinition {
   id: string;
   object: ResolvedObject;
   art?: HallArt;
@@ -235,40 +235,89 @@ function HallObject({
   );
 }
 
+/** The drawings of a hall, as `GdHall` memoises them. */
+export interface HallDrawings {
+  definitions: readonly ArtDefinition[];
+  uses: ReadonlyMap<ResolvedObject, string>;
+}
+
 /**
- * A Golden Dawn temple hall as inline SVG (plan 061). Pure and SSR-safe:
- * layout comes from `resolveHall`, text widths from the generated font
- * table, and gradient and pattern ids from `useId`, so several halls share
- * a page. Content is untrusted: strings only reach text nodes, unknown tags
- * draw as dashed placeholders, and nothing is loaded by URL except the
- * fonts the caller points at.
+ * The hall a node draws: itself when it is a `gdHall`, an empty hall for
+ * anything else.
  */
-export function GdHall({
-  hall,
-  art = defaultHallArt,
-  fontBaseUrl,
+export function hallRoot(hall: HallNode): HallNode {
+  return typeof hall === "object" && hall !== null && hall.type === "gdHall"
+    ? hall
+    : EMPTY_HALL;
+}
+
+/** Props of `GdHallSvg`: a resolved hall, drawn without hooks. */
+export interface GdHallSvgProps {
+  /** The hall as `resolveHall` resolved it with `art`. */
+  resolved: ResolvedHall;
+  /** The art `resolved` was resolved with. */
+  art: HallArtRegistry;
+  /**
+   * Prefixes the pattern, gradient and drawing ids, which must be unique
+   * in the document: `useId`'s in `GdHall`, a fixed name in an image.
+   */
+  idPrefix: string;
+  /** The drawings, when the caller memoises them; computed otherwise. */
+  drawings?: HallDrawings;
+  /** `@font-face` rules carried inside the SVG, if any. */
+  fontCss?: string;
+  /**
+   * Draw for the server's image renderer (plan 062): the viewBox rounded
+   * outward to whole units, which resvg writes back unchanged, and no
+   * `<title>`, `role` or `aria-labelledby`, since outlining drops the
+   * title an accessible name would point at.
+   */
+  image?: boolean;
+  className?: string;
+  style?: CSSProperties;
+  width?: number | string;
+  height?: number | string;
+  ref?: Ref<SVGSVGElement>;
+}
+
+/** A resolved viewBox in SVG units, as `GdHallSvg` writes it. */
+export function hallViewBox(
+  resolved: ResolvedHall,
+  image = false,
+): [number, number, number, number] {
+  const { viewBox } = resolved;
+  if (!image)
+    return [
+      u(viewBox.x0),
+      u(viewBox.y0),
+      u(viewBox.x1 - viewBox.x0),
+      u(viewBox.y1 - viewBox.y0),
+    ];
+  const x0 = Math.floor(u(viewBox.x0));
+  const y0 = Math.floor(u(viewBox.y0));
+  return [x0, y0, Math.ceil(u(viewBox.x1)) - x0, Math.ceil(u(viewBox.y1)) - y0];
+}
+
+/**
+ * The drawing of a resolved hall, without hooks, so a server route with no
+ * hook dispatcher can render it (plan 062). `GdHall` draws through it.
+ */
+export function GdHallSvg({
+  resolved,
+  art,
+  idPrefix: id,
+  drawings,
+  fontCss,
+  image = false,
   className,
   style,
   width,
   height,
   ref,
-}: GdHallProps) {
-  const id = useId().replace(/[^A-Za-z0-9_-]/g, "_");
-  const root =
-    typeof hall === "object" && hall !== null && hall.type === "gdHall"
-      ? hall
-      : EMPTY_HALL;
-  const resolved = useMemo(() => resolveHall(root, { art }), [root, art]);
-  const { definitions, uses } = useMemo(
-    () => artDefinitions(resolved.objects, art, id),
-    [resolved, art, id],
-  );
-  const fontCss = useMemo(
-    () =>
-      fontBaseUrl === undefined ? undefined : gdHallFontFaceCss(fontBaseUrl),
-    [fontBaseUrl],
-  );
-  const { viewBox } = resolved;
+}: GdHallSvgProps) {
+  const { definitions, uses } =
+    drawings ?? artDefinitions(resolved.objects, art, id);
+  const box = hallViewBox(resolved, image);
   const titleId = `${id}-title`;
   const checker = `${id}-checker`;
   const gradient = `${id}-wall`;
@@ -276,20 +325,17 @@ export function GdHall({
     <svg
       ref={ref}
       xmlns="http://www.w3.org/2000/svg"
-      viewBox={[
-        u(viewBox.x0),
-        u(viewBox.y0),
-        u(viewBox.x1 - viewBox.x0),
-        u(viewBox.y1 - viewBox.y0),
-      ].join(" ")}
-      role="img"
-      aria-labelledby={titleId}
+      viewBox={box.join(" ")}
+      role={image ? undefined : "img"}
+      aria-labelledby={image ? undefined : titleId}
       className={className}
       style={style}
       width={width}
       height={height}
     >
-      <title id={titleId}>{resolved.captionText ?? "Temple hall"}</title>
+      {!image && (
+        <title id={titleId}>{resolved.captionText ?? "Temple hall"}</title>
+      )}
       {fontCss && <style>{fontCss}</style>}
       <defs>
         <pattern
@@ -323,10 +369,10 @@ export function GdHall({
         ))}
       </defs>
       <rect
-        x={u(viewBox.x0)}
-        y={u(viewBox.y0)}
-        width={u(viewBox.x1 - viewBox.x0)}
-        height={u(viewBox.y1 - viewBox.y0)}
+        x={box[0]}
+        y={box[1]}
+        width={box[2]}
+        height={box[3]}
         fill={PALETTE.paper}
       />
       <Chrome hall={resolved} checker={checker} gradient={gradient} />
@@ -374,5 +420,51 @@ export function GdHall({
         {resolved.caption && <Lines label={resolved.caption} />}
       </g>
     </svg>
+  );
+}
+
+/**
+ * A Golden Dawn temple hall as inline SVG (plan 061). Pure and SSR-safe:
+ * layout comes from `resolveHall`, text widths from the generated font
+ * table, and gradient and pattern ids from `useId`, so several halls share
+ * a page. Content is untrusted: strings only reach text nodes, unknown tags
+ * draw as dashed placeholders, and nothing is loaded by URL except the
+ * fonts the caller points at.
+ */
+export function GdHall({
+  hall,
+  art = defaultHallArt,
+  fontBaseUrl,
+  className,
+  style,
+  width,
+  height,
+  ref,
+}: GdHallProps) {
+  const id = useId().replace(/[^A-Za-z0-9_-]/g, "_");
+  const root = hallRoot(hall);
+  const resolved = useMemo(() => resolveHall(root, { art }), [root, art]);
+  const drawings = useMemo(
+    () => artDefinitions(resolved.objects, art, id),
+    [resolved, art, id],
+  );
+  const fontCss = useMemo(
+    () =>
+      fontBaseUrl === undefined ? undefined : gdHallFontFaceCss(fontBaseUrl),
+    [fontBaseUrl],
+  );
+  return (
+    <GdHallSvg
+      resolved={resolved}
+      art={art}
+      idPrefix={id}
+      drawings={drawings}
+      fontCss={fontCss}
+      className={className}
+      style={style}
+      width={width}
+      height={height}
+      ref={ref}
+    />
   );
 }
