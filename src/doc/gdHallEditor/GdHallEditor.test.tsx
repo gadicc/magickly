@@ -856,12 +856,101 @@ describe("the properties panel", () => {
 describe("the palette and the warnings", () => {
   it("adds a component, selected, with the drawing focused", async () => {
     const { changes, current } = setup();
-    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add item" }));
     fireEvent.click(await screen.findByRole("menuitem", { name: "Cup" }));
     expect(changes).toHaveLength(1);
     const cup = findNode(current(), (node) => node.id === "New0000000000001");
     expect(cup).toMatchObject({ tag: "item", attrs: { kind: "cup" } });
     await waitFor(() => expect(selected()).toContain("Cup selected"));
+    await waitFor(() =>
+      expect(document.activeElement).toBe(screen.getByRole("application")),
+    );
+  });
+
+  it("offers each group from its own button and menu", async () => {
+    setup();
+    const buttons = screen.getAllByRole("button", { name: /^Add / });
+    expect(buttons.map((button) => button.getAttribute("aria-label"))).toEqual([
+      "Add officer",
+      "Add furniture",
+      "Add banner",
+      "Add item",
+      "Add symbol",
+      "Add text",
+    ]);
+    expect(buttons.map((button) => button.textContent)).toEqual([
+      "Officer",
+      "Furniture",
+      "Banner",
+      "Item",
+      "Symbol",
+      "Text",
+    ]);
+    for (const button of buttons) {
+      expect(button.getAttribute("aria-haspopup")).toBe("menu");
+      expect(button.getAttribute("aria-expanded")).toBe("false");
+    }
+    // One tab stop in the Add toolbar; the arrows move along it.
+    const toolbar = screen.getByRole("toolbar", { name: "Add to the hall" });
+    expect(within(toolbar).getAllByRole("button")).toEqual(buttons);
+    expect(buttons.map((button) => button.tabIndex)).toEqual([
+      0, -1, -1, -1, -1, -1,
+    ]);
+    buttons[0].focus();
+    fireEvent.keyDown(buttons[0], { key: "ArrowLeft" });
+    expect(document.activeElement).toBe(buttons[5]);
+    fireEvent.keyDown(buttons[5], { key: "ArrowRight" });
+    expect(document.activeElement).toBe(buttons[0]);
+    fireEvent.keyDown(buttons[0], { key: "End" });
+    fireEvent.keyDown(buttons[5], { key: "Home" });
+    fireEvent.keyDown(buttons[0], { key: "ArrowRight" });
+    expect(document.activeElement).toBe(buttons[1]);
+    expect(buttons.map((button) => button.tabIndex)).toEqual([
+      -1, 0, -1, -1, -1, -1,
+    ]);
+
+    const officer = buttons[0];
+    officer.focus();
+    fireEvent.click(officer);
+    const menu = await screen.findByRole("menu", { name: "Add officer" });
+    expect(officer.getAttribute("aria-expanded")).toBe("true");
+    expect(officer.getAttribute("aria-controls")).toBe(menu.id);
+    const items = within(menu).getAllByRole("menuitem");
+    // Only the officers, each named by its label alone, beside its lamen
+    // drawn by the hall's art, hidden from assistive technology.
+    expect(items.map((item) => item.textContent)).toContain("Keryx");
+    expect(items.map((item) => item.textContent)).not.toContain("Cup");
+    const keryx = within(menu).getByRole("menuitem", { name: "Keryx" });
+    const icon = keryx.querySelector("svg");
+    expect(icon?.getAttribute("aria-hidden")).toBe("true");
+    expect(icon?.innerHTML).toContain("ellipse");
+    // Escape closes the menu and gives the focus back to its button.
+    fireEvent.keyDown(document.activeElement as Element, { key: "Escape" });
+    await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
+    await waitFor(() => expect(document.activeElement).toBe(officer));
+
+    // Typing a letter finds an entry by its name, though its drawing holds
+    // text of its own (the tablet's letters).
+    fireEvent.click(screen.getByRole("button", { name: "Add symbol" }));
+    await screen.findByRole("menu", { name: "Add symbol" });
+    fireEvent.keyDown(document.activeElement as Element, { key: "e" });
+    expect(document.activeElement?.textContent).toMatch(/^Enochian tablet/);
+  });
+
+  it("adds a label or a marker from Text", async () => {
+    const { changes, current } = setup();
+    fireEvent.click(screen.getByRole("button", { name: "Add text" }));
+    const menu = await screen.findByRole("menu", { name: "Add text" });
+    expect(
+      within(menu)
+        .getAllByRole("menuitem")
+        .map((item) => item.textContent),
+    ).toEqual(["Label", "Marker (text in a box)"]);
+    fireEvent.click(within(menu).getByRole("menuitem", { name: "Label" }));
+    expect(changes).toHaveLength(1);
+    expect(
+      findNode(current(), (node) => node.id === "New0000000000001"),
+    ).toMatchObject({ tag: "label", attrs: { text: "Label" } });
     await waitFor(() =>
       expect(document.activeElement).toBe(screen.getByRole("application")),
     );
@@ -924,10 +1013,12 @@ describe("while the host takes no changes", () => {
     expect(undo).not.toHaveBeenCalled();
     expect(redo).not.toHaveBeenCalled();
     expect(document.querySelector("[data-corner]")).toBeNull();
-    expect(
-      (screen.getByRole("button", { name: "Add" }) as HTMLButtonElement)
-        .disabled,
-    ).toBe(true);
+    const adds = screen.getAllByRole("button", { name: /^Add / });
+    expect(adds).toHaveLength(6);
+    for (const button of adds)
+      expect((button as HTMLButtonElement).disabled, button.textContent).toBe(
+        true,
+      );
   });
 });
 

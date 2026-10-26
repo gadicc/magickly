@@ -6,9 +6,11 @@ import { hostAccepts } from "./hallHostRules";
 import type { HallElement } from "./hallModel";
 import {
   goesOnHost,
+  HALL_PALETTE_GROUPS,
   type HallPaletteEntry,
   hallItemKinds,
   hallPalette,
+  hallPaletteSections,
   insertFromPalette,
   itemKindLabel,
 } from "./hallPalette";
@@ -37,6 +39,43 @@ const add = (hall: HallElement, key: string, selected?: string) => {
 };
 
 describe("the palette", () => {
+  it("splits into one section per group, in the toolbar's order", () => {
+    const sections = hallPaletteSections(palette);
+    expect(sections.map(({ button }) => button)).toEqual([
+      "Officer",
+      "Furniture",
+      "Banner",
+      "Item",
+      "Symbol",
+      "Text",
+    ]);
+    // Every entry once, in its group, in the palette's order.
+    expect(sections.flatMap(({ entries }) => entries)).toEqual(palette);
+    for (const { group, entries } of sections)
+      for (const { key, group: own } of entries) expect(own, key).toBe(group);
+    // Each button's name covers what it offers: the marker is text in a
+    // box, the Hebrew letter a symbol.
+    expect(sections.at(-1)?.entries.map(({ key }) => key)).toEqual([
+      "label",
+      "marker",
+    ]);
+    expect(
+      sections.find(({ group }) => group === "Symbols")?.entries.at(-1)?.key,
+    ).toBe("hebrewLetter");
+    expect(
+      sections
+        .find(({ group }) => group === "Officers")
+        ?.entries.map(({ tag }) => tag),
+    ).toEqual(Array(HALL_ROLES.size).fill("officer"));
+    // A group without entries has no button.
+    expect(
+      hallPaletteSections(palette.filter(({ group }) => group !== "Items")).map(
+        ({ group }) => group,
+      ),
+    ).not.toContain("Items");
+    expect(HALL_PALETTE_GROUPS.size).toBe(6);
+  });
+
   it("offers every officer, the furniture, banners, items and symbols", () => {
     const keys = palette.map((candidate) => candidate.key);
     for (const role of HALL_ROLES.keys())

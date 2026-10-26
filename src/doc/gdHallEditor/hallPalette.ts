@@ -28,7 +28,7 @@ import {
  * an author can add, and where a new one goes.
  */
 
-/** A palette group, in the order the menu lists them. */
+/** A palette group; `HALL_PALETTE_GROUPS` gives their order and buttons. */
 export type HallPaletteGroup =
   | "Officers"
   | "Furniture"
@@ -46,6 +46,46 @@ export interface HallPaletteEntry {
   label: string;
   tag: string;
   attrs: Readonly<Record<string, JsonValue>>;
+}
+
+/**
+ * The palette's groups in the order the toolbar shows them, each with its
+ * button's name: singular, as in "+ Officer", what one choice adds. Each
+ * group holds only what its name says: the marker (text in a box) is
+ * Text, with the label, and the Hebrew letter a Symbol.
+ */
+export const HALL_PALETTE_GROUPS: ReadonlyMap<HallPaletteGroup, string> =
+  new Map([
+    ["Officers", "Officer"],
+    ["Furniture", "Furniture"],
+    ["Banners", "Banner"],
+    ["Items", "Item"],
+    ["Symbols", "Symbol"],
+    ["Text", "Text"],
+  ]);
+
+/** One toolbar button of the palette and the entries it offers. */
+export interface HallPaletteSection {
+  group: HallPaletteGroup;
+  /** The button's visible name, such as "Officer". */
+  button: string;
+  entries: HallPaletteEntry[];
+}
+
+/**
+ * The palette by group, in toolbar order, leaving out any group without
+ * entries (an art registry decides the items).
+ */
+export function hallPaletteSections(
+  palette: readonly HallPaletteEntry[],
+): HallPaletteSection[] {
+  return [...HALL_PALETTE_GROUPS]
+    .map(([group, button]) => ({
+      group,
+      button,
+      entries: palette.filter((entry) => entry.group === group),
+    }))
+    .filter((section) => section.entries.length > 0);
 }
 
 /** An item kind's name for a menu: `lightning` → "Lightning". */
@@ -69,10 +109,10 @@ export function hallItemKinds(art: HallArtRegistry): string[] {
 
 /**
  * The palette for an art registry: every officer role (the adepts among
- * them) and a marker; the altars, pillars, platform, throne, veil and a
- * door; the banners and a Hebrew letter; every item kind; a tarot key,
- * the emblem cards, a tablet, the Table of Shewbread, the candlestick,
- * the boards' diagrams, a kamea and a planet's seals; free text.
+ * them); the altars, pillars, platform, throne, veil and a door; the
+ * banners; every item kind; a tarot key, the emblem cards, a tablet, the
+ * Table of Shewbread, the candlestick, the boards' diagrams, a kamea, a
+ * planet's seals and a Hebrew letter; free text and a marker.
  */
 export function hallPalette(art: HallArtRegistry): HallPaletteEntry[] {
   return [
@@ -85,13 +125,6 @@ export function hallPalette(art: HallArtRegistry): HallPaletteEntry[] {
         attrs: { role },
       }),
     ),
-    {
-      key: "marker",
-      group: "Officers",
-      label: "Marker",
-      tag: "marker",
-      attrs: { text: "Marker" },
-    },
     {
       key: "altar",
       group: "Furniture",
@@ -164,13 +197,6 @@ export function hallPalette(art: HallArtRegistry): HallPaletteEntry[] {
       label: "Banner of the West",
       tag: "banner",
       attrs: { kind: "west" },
-    },
-    {
-      key: "hebrewLetter",
-      group: "Banners",
-      label: "Hebrew letter",
-      tag: "hebrewLetter",
-      attrs: { letter: "aleph" },
     },
     ...hallItemKinds(art).map(
       (kind): HallPaletteEntry => ({
@@ -247,11 +273,26 @@ export function hallPalette(art: HallArtRegistry): HallPaletteEntry[] {
       attrs: { planet: "saturn" },
     },
     {
+      key: "hebrewLetter",
+      group: "Symbols",
+      label: "Hebrew letter",
+      tag: "hebrewLetter",
+      attrs: { letter: "aleph" },
+    },
+    {
       key: "label",
       group: "Text",
       label: "Label",
       tag: "label",
       attrs: { text: "Label" },
+    },
+    {
+      key: "marker",
+      group: "Text",
+      // Text in a box, for an object without art yet.
+      label: "Marker (text in a box)",
+      tag: "marker",
+      attrs: { text: "Marker" },
     },
   ];
 }

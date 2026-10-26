@@ -2,25 +2,21 @@
 
 import { GdHall } from "@magick-components/gd/hall/GdHall";
 import type { Rect } from "@magick-components/gd/hall/layout";
-import type { HallArtRegistry } from "@magick-components/gd/hall/types";
+import { hallArtKey } from "@magick-components/gd/hall/spec";
+import type {
+  HallArtRegistry,
+  HallNode,
+} from "@magick-components/gd/hall/types";
 import { validateHall } from "@magick-components/gd/hall/validate";
 import Add from "@mui/icons-material/Add";
 import Check from "@mui/icons-material/Check";
 import Redo from "@mui/icons-material/Redo";
 import Undo from "@mui/icons-material/Undo";
-import {
-  Button,
-  IconButton,
-  ListSubheader,
-  Menu,
-  MenuItem,
-  Tooltip,
-} from "@mui/material";
+import { Button, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import {
   type CSSProperties,
   type KeyboardEvent,
   type PointerEvent,
-  type ReactNode,
   useCallback,
   useEffect,
   useId,
@@ -75,7 +71,9 @@ import {
 } from "./hallModel";
 import {
   type HallPaletteEntry,
+  type HallPaletteGroup,
   hallPalette,
+  hallPaletteSections,
   insertFromPalette,
 } from "./hallPalette";
 import {
@@ -241,7 +239,14 @@ export function GdHallEditor({
   const [gestureNode, setGestureNode] = useState<string | null>(null);
   /** Where a row child being reordered will land, marked on the drawing. */
   const [slot, setSlot] = useState<Rect | null>(null);
+  /** The palette group whose menu is open, and its button. */
   const [paletteAnchor, setPaletteAnchor] = useState<HTMLElement | null>(null);
+  /** Kept as the menu closes, so its entries stay while it fades. */
+  const [paletteGroup, setPaletteGroup] = useState<HallPaletteGroup | null>(
+    null,
+  );
+  /** The Add button the Tab key reaches (a roving tab stop). */
+  const [addStop, setAddStop] = useState(0);
   const [pixelsPerSquare, setPixelsPerSquare] = useState(30);
   const [coarse, setCoarse] = useState(false);
   const root = useRef<HTMLDivElement>(null);
@@ -273,10 +278,14 @@ export function GdHallEditor({
   const echo = useRef<HallElement | null>(null);
   /** The view box held while a gesture runs (the drawing does not rescale). */
   const [heldBox, setHeldBox] = useState<Rect | null>(null);
-  /** The palette's choice moves the focus to the drawing, not back to Add. */
+  /**
+   * The palette's choice moves the focus to the drawing, not back to the
+   * group's button.
+   */
   const [paletteChosen, setPaletteChosen] = useState(false);
   const frame = useRef<number | null>(null);
   const helpId = useId();
+  const paletteId = useId();
   const selectionId = useId();
   /**
    * The panel beside the drawing, or docked at the foot of the box it
@@ -313,7 +322,8 @@ export function GdHallEditor({
     [preview, art],
   );
   const view = previewView ?? committed;
-  const palette = useMemo(() => hallPalette(art), [art]);
+  const sections = useMemo(() => hallPaletteSections(hallPalette(art)), [art]);
+  const menuSection = sections.find(({ group }) => group === paletteGroup);
   const selected = selectedId ? view.byId.get(selectedId) : undefined;
   const warnings = useMemo(
     () => (committed.row ? validateHall(committed.row, { art }) : []),
@@ -723,6 +733,35 @@ export function GdHallEditor({
     focusSurface();
   };
 
+  /** Left and right arrows, Home and End move between the Add buttons. */
+  const onAddKey = (event: KeyboardEvent<HTMLDivElement>) => {
+    const buttons = [
+      ...event.currentTarget.querySelectorAll<HTMLButtonElement>(
+        ":scope > button:not(:disabled)",
+      ),
+    ];
+    const at = buttons.indexOf(event.target as HTMLButtonElement);
+    if (at < 0) return;
+    const last = buttons.length - 1;
+    const to =
+      event.key === "ArrowRight"
+        ? at === last
+          ? 0
+          : at + 1
+        : event.key === "ArrowLeft"
+          ? at === 0
+            ? last
+            : at - 1
+          : event.key === "Home"
+            ? 0
+            : event.key === "End"
+              ? last
+              : null;
+    if (to === null) return;
+    event.preventDefault();
+    buttons[to].focus();
+  };
+
   const setAttr = (id: string, name: string, value: JsonValue | undefined) =>
     commit(
       setNodeAttr(currentView(), id, name, value),
@@ -944,25 +983,55 @@ export function GdHallEditor({
   return (
     <div ref={root} className={styles.editor} data-gd-hall-controls>
       <div className={styles.toolbar}>
-        <Button
-          size="small"
-          variant="outlined"
-          startIcon={<Add fontSize="small" />}
-          disabled={!editable || !view.resolved}
-          aria-haspopup="menu"
-          onClick={(event) => {
-            setPaletteChosen(false);
-            setPaletteAnchor(event.currentTarget);
-          }}
+        {/* One button per palette group: a group of one adds it at once.
+            One tab stop for all of them; the arrow keys move between. */}
+        <div
+          role="toolbar"
+          aria-label="Add to the hall"
+          className={styles.addButtons}
+          onKeyDown={onAddKey}
         >
-          Add
-        </Button>
+          {sections.map(({ group, button, entries }, index) => {
+            const single = entries.length === 1 ? entries[0] : undefined;
+            const open = !!paletteAnchor && paletteGroup === group;
+            return (
+              <Button
+                key={group}
+                id={`${paletteId}-${group}`}
+                size="small"
+                variant="outlined"
+                startIcon={<Add fontSize="small" />}
+                disabled={!editable || !view.resolved}
+                // The visible name with the action: "Add officer".
+                aria-label={`Add ${button.toLowerCase()}`}
+                aria-haspopup={single ? undefined : "menu"}
+                aria-expanded={single ? undefined : open}
+                aria-controls={open ? `${paletteId}-menu` : undefined}
+                tabIndex={index === addStop ? 0 : -1}
+                onFocus={() => setAddStop(index)}
+                onClick={(event) => {
+                  if (single) return add(single);
+                  setPaletteChosen(false);
+                  setPaletteGroup(group);
+                  setPaletteAnchor(event.currentTarget);
+                }}
+              >
+                {button}
+              </Button>
+            );
+          })}
+        </div>
         <Menu
           anchorEl={paletteAnchor}
           open={!!paletteAnchor}
           onClose={() => setPaletteAnchor(null)}
           disableRestoreFocus={paletteChosen}
           slotProps={{
+            // The menu itself, named by its button.
+            list: {
+              id: `${paletteId}-menu`,
+              "aria-labelledby": `${paletteId}-${paletteGroup}`,
+            },
             paper: { sx: { maxHeight: "60vh" } },
             transition: {
               onExited: () => {
@@ -971,7 +1040,19 @@ export function GdHallEditor({
             },
           }}
         >
-          {paletteItems(palette, add)}
+          {menuSection?.entries.map((entry) => (
+            <MenuItem
+              key={entry.key}
+              dense
+              className={styles.paletteItem}
+              onClick={() => add(entry)}
+            >
+              {/* The name first, for the menu's type-ahead (an icon may
+                  hold text, a tablet's letters); the icon shows first. */}
+              {entry.label}
+              <PaletteIcon entry={entry} art={art} />
+            </MenuItem>
+          ))}
         </Menu>
         {onUndo && historyButtons && (
           <Tooltip title="Undo">
@@ -1301,25 +1382,40 @@ function HitBox({
   );
 }
 
-/** The palette's menu items, grouped. */
-function paletteItems(
-  palette: readonly HallPaletteEntry[],
-  add: (entry: HallPaletteEntry) => void,
-) {
-  const items: ReactNode[] = [];
-  let group: string | undefined;
-  for (const entry of palette) {
-    if (entry.group !== group) {
-      group = entry.group;
-      items.push(<ListSubheader key={`group-${group}`}>{group}</ListSubheader>);
-    }
-    items.push(
-      <MenuItem key={entry.key} dense onClick={() => add(entry)}>
-        {entry.label}
-      </MenuItem>,
-    );
-  }
-  return items;
+/**
+ * A palette entry's own drawing at icon size, drawn by the hall's art
+ * registry as the hall draws it, beside its name (which alone names the
+ * entry); an empty slot for an entry with no art (a door is drawn by its
+ * wall).
+ */
+function PaletteIcon({
+  entry,
+  art,
+}: {
+  entry: HallPaletteEntry;
+  art: HallArtRegistry;
+}) {
+  const id = useId().replace(/[^A-Za-z0-9_-]/g, "_");
+  // A palette entry's attributes are scalars, as a hall row's are.
+  const node = { type: entry.tag, ...entry.attrs } as HallNode;
+  const drawn = art.get(hallArtKey(node));
+  if (!drawn) return <span className={styles.paletteIcon} />;
+  const { width, height } =
+    typeof drawn.box === "function" ? drawn.box(node) : drawn.box;
+  return (
+    <svg
+      className={styles.paletteIcon}
+      viewBox={`${-width / 2} ${-height / 2} ${width} ${height}`}
+      aria-hidden="true"
+      focusable="false"
+    >
+      <drawn.Component
+        node={node}
+        box={{ width, height }}
+        defId={(name) => `${id}-${name}`}
+      />
+    </svg>
+  );
 }
 
 /** The hall's warnings; choosing one selects the object it names. */
