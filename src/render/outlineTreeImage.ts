@@ -126,6 +126,63 @@ export interface OutlineOptions {
    * that need them so other components' glyph fallback never changes.
    */
   fonts?: readonly ServerFontFile[];
+  /**
+   * Keep the local paint servers resvg leaves in the output (plan 062,
+   * decision 5): `url(#id)` references to a `linearGradient`,
+   * `radialGradient`, `pattern` or `clipPath` inside the root's `<defs>`,
+   * their ids renumbered under this prefix. Every other id is stripped
+   * and anything else still refused. Only the temple halls set it.
+   */
+  paintServers?: { idPrefix: string };
+}
+
+/** The elements a kept `url(#id)` may name. */
+const PAINT_SERVERS = /^(?:linearGradient|radialGradient|pattern|clipPath)$/;
+
+/**
+ * The outlined body's ids, renumbered where a paint server keeps one and
+ * removed everywhere else, and its `url(#id)` references pointed at the
+ * new ids. Throws for any `url(` that is not a whole `url(#id)`, closed
+ * included, for a reference that names no element or anything but a
+ * paint server in the `<defs>`, and for an id two elements share.
+ * Exported for its tests.
+ */
+export function keepPaintServers(body: string, idPrefix: string): string {
+  const defs = body.match(/^\s*<defs>[\s\S]*?<\/defs>/)?.[0] ?? "";
+  const servers = new Set<string>();
+  for (const [, element, id] of defs.matchAll(/<(\w+)\b[^>]*? id="([^"]*)"/g))
+    if (PAINT_SERVERS.test(element)) servers.add(id);
+  // Every `url(` must open one of the references below, so an unclosed
+  // or other form fails closed rather than going unread.
+  const references = [...body.matchAll(/url\(#([A-Za-z0-9_-]+)\)/g)];
+  if (references.length !== body.split("url(").length - 1)
+    throw new Error("Unexpected component image dependency");
+  const used = new Set<string>();
+  for (const [, id] of references) {
+    if (!servers.has(id))
+      throw new Error("Unexpected component image dependency");
+    used.add(id);
+  }
+  // A kept id must name one element, or two would share the new id.
+  for (const id of used)
+    if (body.split(` id="${id}"`).length !== 2)
+      throw new Error("Unexpected component image dependency");
+  // Numbered in the order the defs hold them, so the ids are the same
+  // for the same drawing whatever resvg or the component called them.
+  const renamed = new Map(
+    [...servers]
+      .filter((id) => used.has(id))
+      .map((id, index) => [id, `${idPrefix}${index}`]),
+  );
+  return body
+    .replace(/ id="([^"]*)"/g, (_, id: string) => {
+      const kept = renamed.get(id);
+      return kept === undefined ? "" : ` id="${kept}"`;
+    })
+    .replace(
+      /url\(#([A-Za-z0-9_-]+)\)/g,
+      (_, id: string) => `url(#${renamed.get(id)})`,
+    );
 }
 
 /**
@@ -161,12 +218,19 @@ export async function outlineComponentImage(
       throw new Error("Unexpected component viewport");
     }
     let body = result.slice(outlinedRoot.length);
-    // Components repeat link IDs. Outlined images have no link targets;
-    // remove those inert IDs instead of weakening the shared SVG validator.
-    if (/href=|url\(|<(?:text|style|image)\b/.test(body)) {
+    const { paintServers } = options;
+    if (
+      /href=|<(?:text|style|image)\b/.test(body) ||
+      (!paintServers && /url\(/.test(body))
+    ) {
       throw new Error("Unexpected component image dependency");
     }
-    body = body.replace(/ id="[^"]*"/g, "");
+    // Components repeat link IDs. Outlined images have no link targets
+    // but the paint servers a hall keeps; remove the inert IDs instead of
+    // weakening the shared SVG validator.
+    body = paintServers
+      ? keepPaintServers(body, paintServers.idPrefix)
+      : body.replace(/ id="[^"]*"/g, "");
     // usvg leaves invisible textPath carrier geometry after outlining. Nothing
     // references it now; display:none preserves its non-rendering behavior in
     // the existing closed SVG profile, which does not admit visibility.

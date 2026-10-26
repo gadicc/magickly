@@ -9,7 +9,10 @@ vi.mock("server-only", () => ({}));
 import { createRitualSvgValidator } from "@/files/validateRitualSvg";
 import { IMAGE_INPUTS_PROFILE } from "./dataInputs";
 import {
+  COMPONENT_IMAGE_PROFILE,
+  keepPaintServers,
   outlineTreeImage as outline,
+  outlineComponentImage,
   TREE_IMAGE_PROFILE,
 } from "./outlineTreeImage";
 
@@ -176,5 +179,152 @@ describe("bundled Tree of Life outlines", () => {
         new AbortController().signal,
       ),
     ).toMatchObject({ status: "validated" });
+  });
+});
+
+describe("paint servers kept for the temple halls (plan 062)", () => {
+  const VIEWBOX = [0, 0, 300, 200] as const;
+  const hall = (body: string) =>
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200">${body}</svg>`;
+  const PAINTED = hall(
+    '<defs><pattern id="gdhall-checker" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#eee"/></pattern>' +
+      '<linearGradient id="gdhall-wall" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient>' +
+      '<radialGradient id="gdhall-glow"><stop offset="0" stop-color="red"/><stop offset="1" stop-color="red" stop-opacity="0"/></radialGradient>' +
+      '<g id="gdhall-art0"><rect x="0" y="0" width="5" height="5" fill="url(#gdhall-glow)"/></g></defs>' +
+      '<rect width="300" height="200" fill="url(#gdhall-wall)"/>' +
+      '<rect x="10" y="10" width="100" height="100" fill="url(#gdhall-checker)"/>' +
+      '<use href="#gdhall-art0" x="150" y="50"/>' +
+      // A nested viewport, for which resvg writes a clipPath of its own.
+      '<svg x="200" y="100" width="50" height="50" viewBox="0 0 100 100"><circle cx="50" cy="50" r="80" fill="blue"/></svg>' +
+      '<text x="20" y="180" font-size="20">Hall</text>',
+  );
+  const options = {
+    profile: COMPONENT_IMAGE_PROFILE,
+    inputsSha256: INPUTS_SHA256,
+    viewBox: VIEWBOX,
+  };
+
+  it("refuses them without the option, as for every other slug", async () => {
+    await expect(outlineComponentImage(PAINTED, options)).rejects.toThrow(
+      "Unexpected component image dependency",
+    );
+  });
+
+  it("keeps each url(#id), renumbered, resolving to its paint server", async () => {
+    const result = await outlineComponentImage(PAINTED, {
+      ...options,
+      paintServers: { idPrefix: "gdhall-" },
+    });
+    const text = result.bytes.toString();
+    const ids = [...text.matchAll(/<(\w+)\b[^>]*? id="([^"]*)"/g)].map(
+      ([, element, id]) => `${element}#${id}`,
+    );
+    const references = [...text.matchAll(/url\(#([^)]*)\)/g)].map(
+      ([, id]) => id,
+    );
+    // The pattern, both gradients and resvg's clipPath for the nested
+    // viewport, numbered in the order the defs hold them.
+    expect(ids.map((id) => id.split("#")[0]).sort()).toEqual([
+      "clipPath",
+      "linearGradient",
+      "pattern",
+      "radialGradient",
+    ]);
+    expect(ids.map((id) => id.split("#")[1]).sort()).toEqual([
+      "gdhall-0",
+      "gdhall-1",
+      "gdhall-2",
+      "gdhall-3",
+    ]);
+    expect(new Set(references)).toEqual(
+      new Set(["gdhall-0", "gdhall-1", "gdhall-2", "gdhall-3"]),
+    );
+    expect(text).not.toMatch(/href=|<text|<style|<image|<use|clipPath\d/);
+    const again = await outlineComponentImage(PAINTED, {
+      ...options,
+      paintServers: { idPrefix: "gdhall-" },
+    });
+    expect(again.bytes.equals(result.bytes)).toBe(true);
+  });
+
+  it.each([
+    [
+      "a filter",
+      '<defs><filter id="f"><feGaussianBlur stdDeviation="2"/></filter></defs><rect width="10" height="10" filter="url(#f)"/>',
+    ],
+    [
+      "a mask",
+      '<defs><mask id="m"><rect width="5" height="5" fill="#fff"/></mask></defs><rect width="10" height="10" mask="url(#m)"/>',
+    ],
+    [
+      "an image inside a pattern",
+      '<defs><pattern id="p" width="10" height="10" patternUnits="userSpaceOnUse"><image width="10" height="10" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="/></pattern></defs><rect width="10" height="10" fill="url(#p)"/>',
+    ],
+    [
+      "an image",
+      '<image width="10" height="10" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="/>',
+    ],
+  ])("still refuses %s", async (_, body) => {
+    await expect(
+      outlineComponentImage(hall(body), {
+        ...options,
+        paintServers: { idPrefix: "gdhall-" },
+      }),
+    ).rejects.toThrow(/Unexpected component image dependency/);
+  });
+
+  it.each([
+    ["a script", '<script>alert(1)</script><rect width="5" height="5"/>'],
+    [
+      "a foreignObject",
+      '<foreignObject width="10" height="10"><div xmlns="http://www.w3.org/1999/xhtml">x</div></foreignObject>',
+    ],
+  ])("drops %s, as resvg does, whatever the option", async (_, body) => {
+    const result = await outlineComponentImage(hall(body), {
+      ...options,
+      paintServers: { idPrefix: "gdhall-" },
+    });
+    expect(result.bytes.toString()).not.toMatch(
+      /<script|<foreignObject|<div|alert/,
+    );
+  });
+
+  describe("keepPaintServers", () => {
+    const defs =
+      '<defs><linearGradient id="g"><stop offset="0"/></linearGradient><filter id="f"/></defs>';
+    it.each([
+      ["a dangling reference", `${defs}<path fill="url(#missing)"/>`],
+      ["a reference to a filter", `${defs}<path filter="url(#f)"/>`],
+      ["an unclosed url(", `${defs}<path fill="url(#g"/>`],
+      [
+        "an unclosed url( after a good one",
+        `${defs}<path fill="url(#g)" stroke="url(#g"/>`,
+      ],
+      [
+        "a url( that is no fragment",
+        `${defs}<path fill="url(https://x/y#g)"/>`,
+      ],
+      ["a url( with spaces", `${defs}<path fill="url( #g)"/>`],
+      ["a kept id two elements share", `${defs}<path id="g" fill="url(#g)"/>`],
+      [
+        "a paint server outside the defs",
+        '<defs></defs><linearGradient id="g"/><path fill="url(#g)"/>',
+      ],
+    ])("refuses %s", (_, body) => {
+      expect(() => keepPaintServers(body, "gdhall-")).toThrow(
+        "Unexpected component image dependency",
+      );
+    });
+
+    it("keeps and renumbers what it may", () => {
+      expect(
+        keepPaintServers(
+          `${defs}<path id="x" fill="url(#g)" stroke="url(#g)"/>`,
+          "gdhall-",
+        ),
+      ).toBe(
+        '<defs><linearGradient id="gdhall-0"><stop offset="0"/></linearGradient><filter/></defs><path fill="url(#gdhall-0)" stroke="url(#gdhall-0)"/>',
+      );
+    });
   });
 });

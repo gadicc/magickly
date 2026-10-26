@@ -255,6 +255,26 @@ describe("component image registry", () => {
       52_476,
       "eb2f1b6fe2fef2f563ee164de6e403ca9f398ec4706c9ad331195bc34286bffa",
     ],
+    // Pinned before the outliner learned to keep the halls' paint servers
+    // (plan 062), so all six slugs prove that change left them alone.
+    [
+      "tree-of-life",
+      "",
+      44_251,
+      "a6f69235cd10092063a5a24572819d6bb7fecc489560f6f6b8a2b99ed91fa557",
+    ],
+    [
+      "rose-sigil",
+      "text=גדי",
+      13_454,
+      "6edd6bd2b48b513facf72cd6a9d5e036338f4d698df6f24967163e5ee340e137",
+    ],
+    [
+      "rose-sigil",
+      "text=שלום&rose=false",
+      707,
+      "ef44185a356b72d97765be00496d220c081000e1db734398748b643f8bef96d4",
+    ],
   ] as const)(
     "pins the reviewed bytes of %s?%s so a silent font fallback fails",
     async (slug, query, byteSize, sha256) => {
