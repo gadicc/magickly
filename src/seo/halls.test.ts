@@ -12,7 +12,10 @@ import {
   counted,
   gradeHalls,
   hallAlt,
+  hallCardLabel,
   hallDescription,
+  hallGroupName,
+  hallGroups,
   hallPage,
   hallPages,
   hallPath,
@@ -90,6 +93,38 @@ describe("the temple halls' search pages", () => {
     expect(hallAlt(gdHall("portal-1") as never)).toBe(
       "Floor plan of the Golden Dawn Portal Temple, part 1, East at the top, with the Third Adept, Second Adept, Hegemon, Hiereus and Chief Adept; on the altar the cross.",
     );
+  });
+
+  it("groups the halls by grade and labels each the one way", () => {
+    // The index, the rail and the select all show these (plan 062's
+    // amendment), so they are pinned here once.
+    expect(
+      hallGroups().map((group) => [
+        hallGroupName(group),
+        group.halls.map(hallCardLabel),
+      ]),
+    ).toEqual([
+      ["Neophyte 0=0", ["The hall"]],
+      ["Zelator 1=10", ["Part 1", "Part 2"]],
+      ["Theoricus 2=9", ["Part 1 · 32nd path", "Part 2 · In Yesod"]],
+      [
+        "Practicus 3=8",
+        ["Part 1 · 31st path", "Part 2 · 30th path", "Part 3 · In Hod"],
+      ],
+      [
+        "Philosophus 4=7",
+        [
+          "Part 1 · 29th path",
+          "Part 2 · 28th path",
+          "Part 3 · 27th path",
+          "Part 4 · In Netzach",
+        ],
+      ],
+      ["Portal", ["Part 1", "Part 2"]],
+    ]);
+    expect(
+      hallGroups().flatMap((group) => group.halls.map((card) => card.hall)),
+    ).toEqual([...GD_HALLS]);
   });
 
   it("finds each grade's halls by its magick-data id", () => {

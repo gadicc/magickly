@@ -217,6 +217,64 @@ export function gradeHalls(gradeId: string): GdHallEntry[] {
   return GD_HALLS.filter((hall) => hall.gradeId === gradeId);
 }
 
+/** One hall in a grade's group, with its card's label in two parts. */
+export interface HallCard {
+  hall: GdHallEntry;
+  /** "Part 1", or "The hall" for a grade with one hall. */
+  part: string;
+  /** The path or place the hall stands for ("31st path", "In Hod"), if any. */
+  place: string;
+}
+
+/** A grade's halls, in the presets' order. */
+export interface HallGroup {
+  /** "Practicus". */
+  grade: string;
+  /** "3=8"; empty for the Portal. */
+  number: string;
+  halls: HallCard[];
+}
+
+/**
+ * The halls grouped by grade, with their cards' labels: what the index,
+ * the hall pages' rail and their "Jump to hall" select all show (plan
+ * 062's amendment), so the three read alike. A grade with one hall
+ * labels it "The hall"; otherwise each is "Part N", with the path or
+ * place its title names ("Part 1 · 31st path", "Part 2 · In Yesod").
+ */
+export function hallGroups(): HallGroup[] {
+  const groups: HallGroup[] = [];
+  for (const hall of GD_HALLS) {
+    const group = groups.at(-1);
+    if (group?.grade === hall.grade)
+      group.halls.push({ hall, part: "", place: "" });
+    else
+      groups.push({
+        grade: hall.grade,
+        number: hall.number,
+        halls: [{ hall, part: "", place: "" }],
+      });
+  }
+  for (const group of groups)
+    group.halls.forEach((card, i) => {
+      card.part = group.halls.length === 1 ? "The hall" : `Part ${i + 1}`;
+      // ", 32nd path" or " in Yesod" name a place; ", part 1" does not.
+      const place = card.hall.part.replace(/^,? /, "");
+      card.place = /^part \d+$/.test(place)
+        ? ""
+        : place.charAt(0).toUpperCase() + place.slice(1);
+    });
+  return groups;
+}
+
+/** "Part 1 · 31st path", "Part 1", "The hall": a card's label on one line. */
+export const hallCardLabel = (card: HallCard) =>
+  card.place ? `${card.part} · ${card.place}` : card.part;
+
+/** "Practicus 3=8", "Portal": a group's heading as text. */
+export const hallGroupName = (group: HallGroup) =>
+  group.number ? `${group.grade} ${group.number}` : group.grade;
+
 /**
  * A hall's description for its page, worded: each officer's station, each
  * altar's items, and the rest of the hall.

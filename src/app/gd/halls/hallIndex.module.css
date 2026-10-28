@@ -1,0 +1,101 @@
+/* The temple halls' index grid (plan 062's amendment, sheet A1). */
+
+.groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  margin: 1.5rem 0 1rem;
+}
+
+.group h3 {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin: 0 0 0.4rem;
+}
+
+.number {
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.halls {
+  display: flex;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hall {
+  display: block;
+  width: 120px;
+  text-decoration: none;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
+
+.hall:hover .label,
+.hall:focus-visible .label {
+  text-decoration: underline;
+}
+
+.hall img {
+  display: block;
+  width: 120px;
+  height: auto;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+.hall:hover img {
+  border-color: currentColor;
+}
+
+/* On a phone the cards shrink and the place drops to a second line. */
+@media (max-width: 599.95px) {
+  .groups {
+    gap: 1rem 1.25rem;
+  }
+  .hall,
+  .hall img {
+    width: 82px;
+  }
+  .card {
+    font-size: 0.75rem;
+  }
+  .place {
+    display: block;
+  }
+  .dot {
+    display: none;
+  }
+}
+
+/* Read by screen readers, not shown. */
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.intro {
+  max-width: 40rem;
+}
+
+.editor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
