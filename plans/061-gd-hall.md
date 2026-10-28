@@ -782,6 +782,8 @@ domain 1909 edition; record the source).
 ## Old `/pics/*.svg` references
 
 Kept until every reference is gone; this list is updated as they go.
+Stage I removes them all and redirects the five URLs to the halls'
+SVGs (Stage I plan, I.3).
 
 | Where | Kind |
 | --- | --- |
@@ -816,7 +818,7 @@ Each stage is a series of gated commits on `gate/gd-hall`.
 | F | Remaining vocabulary and the presets for Practicus, Philosophus and Portal (markers where art is missing) | yes | done (19 October 2026; Stage F notes): kameas, placeholder seals, boards, veil, white altar, gong, brazier, candle, the adepts in the ritual roles, nine presets from the 1938 layouts; the layout switch reads Source, Split, Visual and the drawing comparison is gone |
 | G | magick-data: Water, Fire and Union tablets | yes | done (21 October 2026; Stage G notes), with Gadi's split ratios first; the letter choices and the Earth and Air question await Gadi |
 | H | Original artwork; ledger to zero; `Lamen` moves to the MIT directory; credits | yes | core done (23 October 2026; Stage H notes): the nine items, `light`, the Keryx's and Sentinel's glyphs, `Lamen` in the MIT package, the ledger at zero; the seals deferred and the boards, figure markers, adept lamens and Minutum Mundum colours pending Gadi's decision |
-| I | Built-in docs switched to presets, then `public/pics`' drawings and their `/about` credits removed (Old `/pics/*.svg` references); each built-in ritual's hall linked to its page under `/gd/hall/<slug>` ([plan 062](062-gd-hall-seo.md)); reader export; end-of-project review of `/gd/hall`, scales and the conflicts table | yes | |
+| I | Built-in docs switched to presets, then `public/pics`' drawings and their `/about` credits removed (Old `/pics/*.svg` references); each built-in ritual's hall linked to its page under `/gd/halls/<slug>` ([plan 062](062-gd-hall-seo.md), as amended on 28 October 2026); reader export; end-of-project review of the hall pages and editor, scales and the conflicts table | yes | planned (28 October 2026; Stage I plan): the old drawings removed and redirected to the halls' SVGs (Gadi's decision), reader export deferred |
 | J | Private hall sources, written outside the repository for Gadi to save in his private rituals | — (nothing committed) | |
 
 Stretch: a dark palette. Server rendering through `/api/render` is
@@ -4625,6 +4627,410 @@ Outside the repository, in `~/.cache/gdhall-h3/`:
   Text's Label adds a label, selected; no horizontal scroll, no
   console error. The ritual editor's hall editor is the same component
   (tests); it was not opened in the browser (no database here).
+
+## Stage I plan (28 October 2026)
+
+Status: planned on `gate/halls-i` (from `main` at ec6f765), with the
+move of the hall pages to `/gd/halls` that
+[plan 062's amendment](062-gd-hall-seo.md#amendment-the-halls-under-gdhalls-28-october-2026)
+records; not yet built. Stage I as the Stages table defines it: the
+built-in docs switched to the presets, each built-in hall linked to its
+page, `public/pics`' five drawings and their `/about` credits removed,
+reader export, and the end-of-project review. The links go to
+`/gd/halls/<slug>`, so the amendment's commits come first.
+
+Gadi's decision of 28 October 2026 (the old drawings):
+
+- **Remove the five drawings, then permanently redirect each to its
+  hall's image**, SVG to SVG: `/pics/neophyte.svg`, `zelator1.svg`,
+  `zelator2.svg`, `theoricus1.svg` and `theoricus2.svg` each to the
+  matching file under `/gd/halls/<slug>/`, such as
+  `/gd/halls/zelator-1/golden-dawn-zelator-1-temple.svg`.
+
+### I.1 The built-in docs draw the presets
+
+- **What.** Each `img(src="/pics/<name>.svg")` in `src/doc/0=0.pug`
+  (line 58), `1=10.pug` (61, 480) and `2=9.pug` (47, 484) becomes that
+  preset's hall, as Pug: exactly what `gdHallPug(preset.hall)` prints
+  (one node per line, no IDs, no `//-` comments, which the Stage B notes
+  forbid inside a built-in doc's hall), indented into its note.
+  Presets are copied, never referenced (decisions 3 and 10).
+- **Measured** (a scratch test, 28 October 2026, nothing committed):
+  the five halls print as 30 to 36 lines, 1.1 to 1.3 KB each, 2.4 KB
+  gzipped in all; `prepare()` compiles each to a `gdHall` row with
+  numeric strings, and `semanticFromJrt` imports each as an element, not
+  as opaque legacy content. The built-in docs ship in the client bundle
+  (`DocLoader.tsx`), so the docs' chunk grows by about that much; the
+  drawing itself loads lazily from the hall chunk the service worker
+  already precaches.
+- **Where.** In 1=10 and 2=9 the images already stand in notes. In 0=0
+  the image stands at the top level; the hall goes into a note like the
+  others, so that its link can sit under it in the same block. A note
+  is one of `HALL_PARENT_TAGS`, so the compiler accepts it unchanged.
+- **The link to each hall's page.** Under each hall, in its note, a
+  plain ritual link: `a(href="/gd/halls/neophyte") Neophyte Temple:
+  stations, sources and downloads`, the name being the hall's short name
+  (`gdHallShortName`: "Zelator Temple, part 1", "Theoricus Temple in
+  Yesod"). Considered and not chosen:
+  - *a caption link*: the caption is drawn SVG text inside the hall, and
+    a hall holds no links;
+  - *a hall attribute*: none exists. `href` is a reserved hall attribute,
+    as is every resource name the offline inventory follows (decision
+    2). A new attribute (say `page="neophyte"`) would be hall vocabulary
+    that any ritual could set on any hall, claiming a preset's page for
+    a hall edited away from it, and the reader would need to learn it.
+  A ritual `a` is what the docs already use (`2=9.pug:419`), the reader
+  draws it as a link, and the offline inventory skips an `a`'s `href`
+  (`ritualAssetInventory.ts`), so it never blocks a publication.
+- **Each note is printed, not typed.** A draft of the note (the hall
+  from `gdHallPug` and the link) is parsed with `parseRitualPug` and
+  printed back without IDs, so it is in the form the printer writes: the
+  hall one node per line, and the link a block `a` with a `|` text
+  child, as `2=9.pug:419–420` has it. The tests over the three docs
+  (the round trip and JRT parity in `ritualPug.test.ts`, the parity in
+  `semanticCompile.test.ts`) then hold that form.
+- **A test** (`src/doc/builtInHalls.test.ts`): for each of the five,
+  the built-in doc's hall, compiled by `prepare()`, imported by
+  `semanticFromJrt` and printed without IDs, equals
+  `gdHallPug(preset.hall)` exactly, and the note's next node is a link
+  to `hallPath` of that slug. A preset that changes changes the docs in
+  the same commit, without a hand paste into three files: run with
+  `BUILT_IN_HALLS=write`, as the image pins update with `GD_HALL_PINS`,
+  the test rewrites each doc's hall block (the `gdHall` line and the
+  lines indented under it, found by the link that follows it) with that
+  preset's `gdHallPug` at the block's indent, and fails otherwise with
+  a message naming the variable. The docs stay copies, never
+  references: the updater writes text into them, and nothing reads a
+  preset when a doc is drawn.
+  The existing tests over the three docs (JRT parity in
+  `semanticCompile.test.ts`, the Pug round trip in `ritualPug.test.ts`,
+  the task and grade counts in `prepare.test.ts`) cover the rest.
+- **Compiler identity.** Unchanged: halls compile since stage B, and
+  none of `semantic.ts`, `semanticCompilerImpl.ts` or `ritualNodeIds.ts`
+  is touched. If the docs needed a compiler change, the work would stop
+  and come back to Gadi.
+- **Documentation screenshots** (`scripts/docs-screenshots`). The
+  "Neophyte 0=0" sample is seeded from the bundled `0=0.pug`, and four
+  shots show its old drawing: `editor-split` (the image atom, "Image ·
+  /pics/neophyte.svg"), `editor-visual` and `editor-phone` (the same
+  atom) and `reader-phone` (the drawing under the opening title).
+  `editor-source` shows the source's first lines, which may reach the
+  hall. All five are recaptured with `magickli-docs-capture` and the
+  changed images committed with I1, each looked at. The seed creates the
+  ritual once and never updates it (it stops at the operation's
+  receipt), so the shared local database would keep the image: the seed
+  learns to save a new revision (`kind: "save"`, an operation id derived
+  from the bundled source's hash) when the ritual's current source
+  differs from the bundled one, and the capture's "(publish)" step
+  publishes it. The README says so. A side effect: until this merges, a
+  capture from `main` would show the hall in that ritual, because the
+  local database is shared.
+
+### I.2 The drawings are no source
+
+The five presets cite their drawings (`drawing("neophyte")`, a path in
+the repository), the editor's Sources list links them, and four art
+modules name them in their provenance (`banner.tsx`, `hebrewLetter.tsx`,
+`lightning.tsx`, `pantacle.tsx`). Gadi decided on 28 October 2026 to
+drop them as sources altogether: he drew them himself from Regardie's
+diagrams, so they are not an authority and must not be presented as
+one. The presets cite only the primary sources they already rely on,
+the 1938 pages.
+
+- **The `drawing` kind goes**: from `HallPresetSource`, `drawing()`,
+  `hallSourceText`, `hallSourceCitation` and `hallSourceUrl`
+  (`src/components/gd/hall/presets/types.ts`), and from the five
+  presets' `sources`. Zelator 2 keeps its one book source (p.44, "the
+  Earth tablet, lamp and salt only"), and its lead's sources sentence
+  already says its own 1938 diagram is still to be located.
+- **The presets' doc comments** describe the layouts after the book, not
+  as "ported from `public/pics/...`".
+- **The art's provenance** loses its `source` paths, and its notes
+  describe the art as Gadi's own design drawn as geometry, without naming
+  the files (provenance needs a `source` only for third-party art).
+- **The editor's Sources list** and the hall pages list the book pages
+  alone; the hall page's and the image metadata's `kind === "book"`
+  filters become unnecessary and go. The image files already cite the
+  book only, so no pin moves.
+- **No wording about older drawings** anywhere a reader sees it, the
+  leads included (Gadi's rule from plan 062, stage 6, which
+  `hallLeads.test.ts` keeps).
+- **Tests**, all in I2 so that it builds alone: `presets.test.tsx`
+  requires every preset's sources to be book pages;
+  `src/components/gd/hall/presets/presets.test.ts` (the "write each
+  source one way" test, lines 102–112) expects the book line and URL
+  only; the editor's test (`HallPlayground.test.tsx:202`) finds the
+  book's link instead of `public/pics/neophyte.svg`.
+
+### I.3 Removing the drawings, and the redirects
+
+**Removed**: `public/pics/{neophyte,zelator1,zelator2,theoricus1,theoricus2}.svg`
+(1,983,319 bytes) and every reference in the "Old `/pics/*.svg`
+references" table: the built-in docs (I.1); the five paths in
+`RITUAL_PUBLICATION_STATIC_PATHS` (15 to 10; `next.config.ts`'s trace
+files follow the list); `staticRitualImageCatalog.test.ts`'s list of
+real files (15 names to 10, 17 available paths with the two aliases to
+12, SVGs 6 to 1, rasters still 11); `ritualPublicationTracing.test.ts`
+(it follows the list); the fixture in `renderForEditing.test.tsx`
+(`/pics/candidate-hexagram.svg` instead, which stays); `/about`'s link
+to `/pics/neophyte.svg`. (The presets' and the editor's tests changed in
+I2.)
+
+**Redirects** (308, `next.config.ts`'s `redirects()`), from one table
+of the five old names and their slugs, `RETIRED_HALL_DRAWINGS`, with
+the targets from `hallFiles(...).svg.path`. Next checks redirects before
+the filesystem and `public`. A test holds the table: each target is a
+hall's SVG path, no source is a file under `public`, and no source is
+in the publication's static paths.
+
+How each thing that holds a `/pics` URL behaves afterwards, from the
+code:
+
+- **A browser** loading the URL (the ritual editor's preview of an
+  `img` in an unedited revision, external links, search engines, the
+  legacy public reader if a ritual still holds one) follows the 308 and
+  shows the hall's SVG, which has no external references and draws in an
+  `<img>`.
+- **Publication does not follow redirects.** The static catalog
+  (`staticRitualImageCatalog.ts`) reads each listed path from `public/`
+  on disk, and the inventory (`ritualAssetInventory.ts`) admits only
+  listed paths. So the list drops the five and gains nothing: the new
+  hall SVGs are build output, not files in `public/`, and were never put
+  to the ritual SVG validator (plan 062, decision 8); rituals now hold
+  halls as `gdHall`, not as images. An alias in the manner of
+  `legacyStaticImageAliases` would need both, so it is not done. A ritual
+  whose current revision still holds `img(src="/pics/neophyte.svg")` then
+  reports `unrecognized-local-reference`, its asset plan is incomplete,
+  and publishing it fails (`INCOMPLETE`) until the image is replaced.
+  The administrators' publication backfill, which walks every ritual,
+  would stop there too.
+- **Bundles already published** keep working as they are. A private
+  ritual is read from its bundle (`PrivateRitualReader.tsx` turns each
+  captured asset into a `blob:` URL, online and offline), and the server
+  serves the newest publication for the ritual's current revision
+  (`sqlRitualBundleReads.ts`). The production ritual "0=0 Grade of the
+  Neophyte", published on 15 September with the drawing captured,
+  therefore still shows the old drawing, from its own copy, until it is
+  edited and republished; the redirect is never involved.
+- **Existing revisions** are unchanged in the database. Opened in the
+  editor, an old revision's image previews through the redirect as the
+  new hall.
+- **The service worker** precaches `public/**` (`precacheEntries()` in
+  `next.config.ts`), so the five drawings leave the precache, about 2 MB
+  less on every install; Serwist deletes them when the new worker
+  activates (`skipWaiting: false`, so after the app's tabs close). Until
+  then the old worker's precache answers `/pics/*.svg` with the old
+  drawing. A runtime image cache entry (Serwist's `defaultCache`,
+  stale-while-revalidate) would show the old drawing once and then the
+  hall; an image request from the worker follows redirects (only
+  navigations use manual mode). Checked in Chromium in the stage's
+  browser run (below).
+
+**What Gadi must do**, after the deploy that carries this. The bundle
+reader (`sqlRitualBundleReads.ts`, lines 211–218) returns nothing unless
+the newest accepted publication belongs to the ritual's current
+revision, so `PrivateRitualReader` shows the ritual as unavailable, and
+devices that resync drop their copy (`repository.ts`, lines 479–503).
+From the moment the edit is saved until it is published, readers
+cannot open the ritual at all; if the publication fails, it stays
+unreadable. Reverting does not help after this deploy either: the old
+source's `/pics/neophyte.svg` can no longer be published. Hence:
+
+0. **First, the query.** Check, read-only, which rituals' current
+   revisions cite a drawing:
+   `select r.id, r.title from rituals r join ritual_revisions v on v.id = r.current_revision_id where v.source ~ '/pics/(neophyte|zelator1|zelator2|theoricus1|theoricus2)\.svg';`
+   The pattern matches the path anywhere in the source, so it
+   deliberately catches absolute same-origin URLs
+   (`https://magick.ly/pics/neophyte.svg`) too, which the inventory
+   also treats as local. Every ritual it finds goes through steps 1
+   and 2.
+1. **Rehearse locally.** Put a copy of the production ritual's current
+   source into the local database (a private ritual in the local
+   development temple; the copy never enters the repository), replace
+   `img(src="/pics/neophyte.svg")` with the Neophyte hall (`/hall` →
+   Neophyte Temple, or the hall and its link from the built-in
+   `0=0.pug`), save, publish, and see the publication succeed and the
+   reader draw the hall, offline too.
+2. **Then production, at a quiet time.** Keep the current source to
+   hand, make the same edit, save and publish at once, and open the
+   ritual in the reader. Whether one action does both: the classic
+   editor (`/doc/<id>/edit`, `SqlDocEdit.tsx`) publishes straight after a
+   save that queued a publication ("The saved version is queued for
+   publication"), while the semantic editor publishes with its own
+   button after Save; the rehearsal shows which applies, and the single
+   action is the one to use if it does. If the publication fails, do not
+   go back to the kept source (it cannot be published any more): save a
+   version without the image line, which publishes with no image at
+   all, and look into the failure; the kept source is for the hall's
+   text, not for publishing.
+3. **Not before step 2**: the administrators' publication backfill,
+   which would stop at this ritual.
+
+**The `/about` credits.** The Eye of Horus (game-icons.net, CC BY) and
+the caduceus (SVG Repo) are in these five drawings only: `Lamen` was
+redrawn in stage H (its test checks for neither), and the other SVGs
+under `public` are `candidate-hexagram.svg`, Gadi's own drawing
+(efe0c4a, "replace candidate-hexagram with own svg"), and `vercel.svg`,
+the framework's logo. After I3 no URL of the site serves either icon,
+except a published bundle that captured a drawing, which the bundle
+endpoint serves until its ritual is republished: today the production
+Neophyte ritual's, until it is republished. Gadi decided on 28 October
+2026 to remove the credits now, on this branch, since he is not sure
+when he will deploy and a short uncredited window is fine:
+
+- I3 removes the files and the redirects, and drops the credit's link to
+  `/pics/neophyte.svg` (which would now lead to our own art).
+- I4 removes the two credits, in the main sequence on `gate/halls-i`.
+  The steps above for the production ritual stay; the credits no longer
+  wait for them.
+
+### I.4 Reader export: deferred
+
+Plan 061 names reader export in the Stages table and decision 8 ("a
+later stage") but never designs it; decision 10 keeps `ExportControls`
+and editor code out of the reader. With stage I, each built-in hall
+links to its page, where its PNG and SVG download under CC BY 4.0, and
+any hall in a ritual can be exported by copying its Pug into
+`/gd/halls/editor`. A real export from the reader would put a menu and
+the export code into the reader's chunk and the offline bundle, and
+needs a design (where it sits, a private hall's file name, the
+Enochian font in PNGs). Deferred to the Follow-ups (Gadi, 28 October
+2026). A cheaper way, recorded there too: an "Open in the hall editor"
+link on a ritual's hall, which loads the Pug printer on click and opens
+a `#hall=` link in the same browser (the fragment never reaches a
+server), where the editor's export already works.
+
+### I.5 The end-of-project review (prepared for the orchestrator)
+
+To run once I1 to I3 are built (fresh Opus High per area, Fable High
+for the whole):
+
+- **The hall pages and the editor**: `/gd/halls`, every hall page and
+  `/gd/halls/editor` at 1,440 × 900, 1,024 × 768 and 390 × 844, against
+  sheets A1 to A3; the redirects with `#hall=` and `#preset=`; whether
+  the editor is still wanted beside the ritual editor's hall editor, as
+  decision 1 asks to revisit at the end, and what it should say about
+  saving in a ritual.
+- **Scales**: `DEFAULT_SCALES` (`layout.ts`) against the 1938 diagrams
+  and the drawings it was measured on: the Zelator and Theoricus
+  banners (half as large again in the drawings; the presets accept the
+  drift or set `scale`), floor lamens (1.66 squares) against dais
+  lamens (2.31), the tablets (1.345; Zelator 2.655), the boards by
+  `scale`, the kameas; a sheet of all fourteen presets side by side at
+  one size, and each beside its 1938 page, viewed from a local copy
+  outside the repository and never committed.
+- **The conflicts table** ("Where the sources disagree"): each of rows 1
+  to 10 against its preset as built (the Portal's swapped diagrams, the
+  Philosophus letters, pillars and Venus, the Zelator's Earth tablet and
+  altar, the Neophyte's Banner of the West), and the notes under the
+  table (incense in the Theoricus' South-East, the Practicus pillars).
+- **Open decisions for Gadi**, gathered from the Follow-ups: the Chiefs
+  on the daises of the stage F presets; the cards proposal (Eden, the
+  Fall, the serpent and Venus on the Tree); the Minutum Mundum's path
+  colours; the five remaining planetary seals; the Portal Hiereus'
+  ring; the tablets' colours and letter choices; Enochian Plain's
+  licence and whether PNG exports embed it.
+- **The artwork ledger**: every row's status, `THIRD_PARTY_ART` empty,
+  `/about#credits` matching what is served (after I4).
+- **Stage I itself**: the built-in docs in the reader and the ritual
+  editor, offline (a published sample ritual read with the network off),
+  the five redirects, publication refusing an unedited `/pics` image
+  with a clear message, and the docs screenshots.
+- **Housekeeping**: the "Old `/pics/*.svg` references" table empty;
+  the URL-form grep of plan 062's amendment (A6) only the redirects; the
+  Follow-ups pruned of what stage I and plan 062 closed; plan 000.
+
+The reviewers get this list, the branch, the sheets and a running
+production build on 127.0.0.1.
+
+### I.6 Commits
+
+After plan 062's amendment (P1 to P3), each one gated commit on
+`gate/halls-i`, building and passing alone:
+
+| # | Commit (subject) | Content |
+| --- | --- | --- |
+| I1 | `feat(doc): Draw the built-in rituals' halls` | I.1: the five halls and their links in the three docs, `builtInHalls.test.ts`, the screenshot seed's update, the recaptured screenshots |
+| I2 | `refactor(gd): Drop the old drawings as sources` | I.2: the `drawing` source kind and the five presets' drawing sources, the art's file paths, the books-only filters, the presets' and the editor's tests |
+| I3 | `feat(gd): Retire the old temple hall drawings` | I.3: the five files, the static paths and their tests, the fixture, the redirects and their test, the reworded credits |
+| I4 | `docs(about): Drop the old drawings' credits` | the two credits (Gadi: now, on this branch) |
+| D | `docs(plan): Record the halls and stage I` | the results here and in plan 062's amendment, the Old references table, the Follow-ups, plan 000 |
+
+I3 and I4 can be reverted together without I1 or I2 (the drawings
+served again, credited); I1 alone (the docs' images back) only before
+I3; I2 alone at any time.
+
+### I.7 Verification
+
+- **Gates**, per commit, one at a time, in a clean `git archive` export
+  on `/home` with Node 24 and the CI placeholder environment (the
+  stage's adaptation of `~/.cache/gates/gate.sh`, statuses under
+  `~/.cache/halls-i/gates/`): `install --frozen-lockfile`, `check`,
+  `typecheck`, `test:coverage` and `build`, each `$?` read; the tip also
+  `loom check`, the magick-data smoke test and `check:turbopack`. The
+  compiler identity files show no diff against `main`; `src/components`
+  imports no app code.
+- **Unit tests**: I.1's test; the redirect table; the static paths and
+  the catalog's real-file test at ten; the presets' sources.
+- **Built output** (`next build`, `next start` on 127.0.0.1): `curl -I`
+  of each `/pics/<name>.svg` gives 308 to its hall's SVG, which is 200
+  `image/svg+xml`; `/pics/candidate-hexagram.svg` still 200; the
+  precache manifest without the five.
+- **Browser** (headless Chromium over CDP on 127.0.0.1 and a fresh port;
+  a temporary `.env.local` holding only the local-login and database
+  lines, deleted afterwards and before any docs capture, which refuses
+  a worktree with one): `/doc/neophyte`, `/doc/zelator` and
+  `/doc/theoricus` draw their halls, each link opens its page; a
+  temple ritual from the built-in 0=0 in the reader and the semantic
+  editor; a revision still holding `/pics/neophyte.svg` previews the
+  hall through the redirect, and publishing it fails with the image
+  named; a service worker from the commit before I3, then the update,
+  then `/pics/neophyte.svg` (the old drawing until the new worker
+  activates, the hall after). Firefox: the redirect of an image. No
+  Safari or real device; stated.
+- **Documentation screenshots**: the five recaptured and inspected.
+
+### I.8 Risks
+
+- **The production ritual** shows the old drawing until Gadi edits and
+  republishes it, cannot be republished before he does, and is
+  unreadable between the edit's save and its publication. Steps 0 to 3
+  above: rehearsal first, then save and publish together; the
+  publication error names the image.
+- **A dead link offline**: a reader of a published ritual offline who
+  follows a hall's link gets no page, since the hall pages are not
+  precached (plan 062 keeps them out of the service worker). Accepted;
+  the hall above the link draws offline.
+- **Unknown rituals or bundles** citing a drawing: the query in step 0
+  finds rituals; bundles published from them keep their copies and
+  keep working; external links follow the redirect.
+- **The credits** are gone before the production ritual is
+  republished, so its bundle serves the two icons uncredited until then
+  (Gadi accepts the window).
+- **The built-in docs and the presets drift apart**: the test ties them,
+  at the cost of editing three docs when a preset changes.
+- **The shared local database**: the seed's new revision of the sample
+  ritual shows in captures from other worktrees until this merges.
+- **A redirect to a different drawing**: the old URLs now show the
+  preset, which differs where the presets follow the book (Zelator's
+  Earth tablet on the wall, conflict 7). That is the intent: the
+  drawings are retired, not kept.
+
+### I.9 Gadi's answers (28 October 2026)
+
+1. **The credits**: removed now, on this branch (I4 in the main
+   sequence), not held for the republish; a short uncredited window is
+   fine. The production ritual's steps stay.
+2. **The drawings as sources**: dropped entirely, not pinned to commits
+   (I.2). He drew them from Regardie's diagrams; only the primary
+   sources are cited.
+3. **Reader export**: deferred, as recommended (I.4); recorded in the
+   Follow-ups.
+4. **The link under each built-in hall**: "Neophyte Temple: stations,
+   sources and downloads" (each hall's short name), with the 0=0 hall
+   moved into a note, as recommended.
+5. **The editor in the sitemap**: a plain entry (plan 062's amendment,
+   A10).
 
 ## Commits
 

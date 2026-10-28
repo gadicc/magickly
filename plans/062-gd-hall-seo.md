@@ -11,7 +11,11 @@ day after an adversarial review (verdict "not ready as written", the
 design sound apart from the findings folded in below; evidence in
 `~/.cache/review-seo/`) and Gadi's answers to the first draft's seven
 questions; Gadi answered the last three the same day (the outliner's
-option (a), the SVG indexable, a medium size for phones).
+option (a), the SVG indexable, a medium size for phones). **Amended on
+28 October 2026**: the halls move to `/gd/halls` (an index, the hall
+pages with a rail, and the editor at `/gd/halls/editor`), which
+supersedes the "URLs" decision below and every `/gd/hall` path in this
+plan; see [the amendment](#amendment-the-halls-under-gdhalls-28-october-2026).
 
 Gadi's decisions of 26 October 2026:
 
@@ -20,6 +24,9 @@ Gadi's decisions of 26 October 2026:
 - **URLs.** One server-rendered, statically generated page per preset
   under `/gd/hall/<slug>`. `/gd/hall` stays the editor and gains a
   server-rendered gallery, below the editor with a jump link to it.
+  (Superseded on 28 October 2026 by the amendment at the end: the pages
+  are `/gd/halls/<slug>`, the index `/gd/halls` and the editor
+  `/gd/halls/editor`.)
 - **Slugs.** Numbered: `neophyte`, `zelator-1`, `zelator-2`,
   `theoricus-1`, `theoricus-2`, `practicus-1` … `practicus-3`,
   `philosophus-1` … `philosophus-4`, `portal-1`, `portal-2`. Titles and
@@ -1095,3 +1102,297 @@ Recorded in [plan 061](061-gd-hall.md#follow-ups) and
   and decide whether the editor's source list keeps citing the
   `public/pics` drawings (the hall pages no longer do).
 - The reader's hall could take a `<desc>` from `describeHall`.
+
+## Amendment: the halls under `/gd/halls` (28 October 2026)
+
+Status: planned on `gate/halls-i` (from `main` at ec6f765), not yet
+built. Gadi chose option A of the UX mock-ups on 28 October 2026
+(`~/.cache/halls-ux/`: sheets `A1-index.png`, `A2-hall.png` and
+`A3-editor.png`, the mock pages in `mock/`, and the README's URL and
+redirect plan). Today `/gd/hall` puts a full-screen editor in front of
+the gallery: people who came to look scroll past, and download, a code
+editor, and the hub search engines see is a page of two paragraphs and a
+loader. Option A gives each job its own URL. It supersedes the "URLs"
+decision and decisions 2, 12 and 13 wherever they name `/gd/hall`;
+everything else in this plan stands (the slugs, files, licence,
+JSON-LD, cards and sitemap images), at the new paths. Nothing has been
+pushed, so the old URLs were never public; the redirects are for
+bookmarks and copied links.
+
+Gadi's decisions of 28 October 2026:
+
+- **Option A**: a server-rendered index, hall pages with a rail, and the
+  editor on a route of its own.
+- **Group headings** are the grade names with their numbers ("Practicus
+  3=8"). No "Outer Order" label: it would cover twelve of the fourteen
+  halls and tell them apart from nothing.
+- **On a phone** the lede sits below the plan; on the desktop it is
+  beside it. Fine.
+
+### A1. URLs
+
+| URL | What | Rendering |
+| --- | --- | --- |
+| `/gd/halls` | The index, the hub: a short intro, "Open the editor", the fourteen halls grouped by grade | Server, static; no client code of its own |
+| `/gd/halls/<slug>` | A hall's page (decision 2), with a rail of every hall on the desktop and a "Jump to hall" select on a phone | Server, static (`dynamicParams = false`); the select is the only client code |
+| `/gd/halls/<slug>/<file>` | The four image files (decision 3), unchanged but for the path | Prerendered route handler |
+| `/gd/halls/editor` | The editor, with its preset dropdown, a "Browse halls" link and no gallery | As `/gd/hall` today |
+
+Permanent redirects (308) in `next.config.ts`'s `redirects()`:
+
+| Old | New |
+| --- | --- |
+| `/gd/hall` | `/gd/halls/editor` |
+| `/gd/hall/:slug` | `/gd/halls/:slug` |
+| `/gd/hall/:slug/:file` | `/gd/halls/:slug/:file` |
+
+- **Fragments survive.** A `Location` without a fragment inherits the
+  request's (RFC 9110 §10.2.2), so `/gd/hall#hall=1.…` lands on
+  `/gd/halls/editor#hall=1.…` and `/gd/hall#preset=portal-2` on
+  `/gd/halls/editor#preset=portal-2`, which the editor reads as it does
+  today. Checked in Chromium and Firefox (both installed here); no Safari
+  device, so WebKit ships on the same RFC rule, stated as unchecked.
+- **Share links** come out right without a change: the editor builds
+  them from `window.location.pathname` (`HallPlayground.tsx`).
+- **Drafts** survive: the `localStorage` key
+  (`magickli:gd-hall-draft:v1`) is per origin, not per path.
+- **Queries** pass through a Next redirect, so `/gd/hall?x=1` keeps its
+  query; nothing reads one.
+- **`#halls`** (the gallery's anchor) needs no redirect: it was never
+  public, and its two internal links (`/about`, `/help/ritual-pug`) move
+  to `/gd/halls`.
+
+### A2. "editor" is a reserved slug
+
+`src/app/gd/halls/editor/page.tsx` is a static segment beside
+`[slug]`, and Next matches static segments first, so a hall slugged
+`editor` could never be reached. `GD_HALL_RESERVED_SLUGS = ["editor"]`
+goes beside `GD_HALLS` in `src/render/contracts/gdHall.ts`, with the
+rule in its doc comment, and a contract test fails if a slug is
+reserved. The existing test that no slug names a static child of the
+route directory (`src/seo/halls.test.ts`) reads `src/app/gd/halls` and
+now also requires every static child to be listed in the reserved set,
+so a later `/gd/halls/<name>` page cannot be added without reserving
+its name. It counts only folders that are routes: it skips dynamic
+segments (`[…]`), private folders (`_*`, which covers the presets'
+`__snapshots__`), route groups (`(…)`) and parallel slots (`@*`), so
+the snapshots stay where they are. `[slug]` keeps `dynamicParams = false`: an unknown slug,
+`/gd/halls/editor/<anything>` among them, is a 404 that renders
+nothing.
+
+### A3. The index (`/gd/halls`, sheet A1)
+
+- **H1** "Golden Dawn temple halls"; one intro paragraph in our words
+  (the fourteen halls of the Outer Order's grades and the Portal, drawn
+  from the 1938 layouts with our own art; each page shows where every
+  officer stands, with its sources and the plan to download under CC BY
+  4.0); an outlined "Open the editor" link (`/gd/halls/editor`) with
+  one line on what it does; and a note under the grid that East is at
+  the top of every plan and North on the left.
+- **Cards**, grouped by grade in the presets' order: a heading per
+  grade, the name bold and the number light ("Practicus 3=8"); each
+  group's cards in a row, the groups flowing in one wrapping grid with
+  small gaps, so all fourteen sit above the fold at 1,440 × 900. A card
+  is the small PNG (the existing 360 px file) shown 120 CSS px wide on
+  the desktop and 82 px on a phone, with its label under it: "The hall"
+  for the Neophyte, otherwise "Part N · <path or place>" ("Part 1 ·
+  31st path", "Part 2 · In Yesod", "Part 1" for the Zelator and
+  Portal), stacked on two lines on a phone. Screen readers hear the
+  grade too, as the gallery does now. The labels come from one function
+  beside the slug table, which the rail and the select share.
+- **Code**: today's `HallGallery` becomes the index's grid
+  (`HallIndex`), still Next's own `Link` with `prefetch={false}` (a hall
+  page preloads its full image), images `loading="lazy"` with `width`
+  and `height` set. No client component.
+- **Metadata** (`src/seo/pages.ts`): "Golden Dawn Temple Halls: Floor
+  Plans", described as "Floor plans of the fourteen Golden Dawn temple
+  halls, Neophyte to Portal: officers' stations, sources, and PNG and
+  SVG downloads under CC BY 4.0." (145 characters, measured; the cap in
+  `src/seo/pages.test.ts` is 160). Its card draws the Neophyte
+  hall (today's `/gd/hall` card). It is a public page, in the sitemap
+  as a bare entry, and its canonical is itself.
+- **The app bar**: `pathnames.ts` makes `gd.halls` the section
+  `{ "/": "Temple Halls", editor: "Hall Editor" }`, so the index is
+  "Temple Halls", a hall page shows the trail, and the editor "Hall
+  Editor".
+
+### A4. A hall's page (`/gd/halls/<slug>`, sheet A2)
+
+- **Content** as decision 2 built it: trail, H1, lede, the figure with
+  its credit line, the actions, the stations table, sources, licence,
+  previous and next. The trail and "All temple halls" go to
+  `/gd/halls`; "Open in the editor" to `/gd/halls/editor#preset=<slug>`.
+- **Layout.** The page leaves `EntityFrame`'s 600 px column for a frame
+  of its own (still the entity parts: `Trail`, `Lede`, `EntityTable`,
+  `Row`, `PrevNext`), in a CSS grid:
+  - **From 1,200 px**: three columns, the rail (about 220 px), the plan
+    (at most 480 px) and the text (the H1, the lede, the actions,
+    previous and next, the stations), with the sources and the licence
+    under the text column.
+  - **From 900 to 1,199 px**: the rail and one column (the plan, then
+    the text).
+  - **Below 900 px**: no rail; the "Jump to hall" select under the
+    trail, then the H1, the plan with its credit, previous and next, the
+    actions, the lede and the rest (Gadi: fine).
+  The DOM order is the phone's, with the rail's `<nav>` last, so a
+  screen reader meets the hall before fourteen links; the grid places
+  the rail on the left. On the desktop the tab order therefore differs
+  from the visual order: Tab reaches the rail after the page's text,
+  though it stands first on the left. The figure's `sizes` follows the columns, so the
+  phone still fetches the medium PNG and the desktop at 1× the medium
+  or full by width.
+- **The rail** (desktop): a server-rendered `<nav aria-label="Temple
+  halls">` headed by an "All temple halls" link, the grade groups and
+  their cards at 56 px, the current hall outlined and marked
+  `aria-current="page"`. It is sticky below the app bar and scrolls
+  within itself if the window is shorter than the rail. Links have
+  `prefetch={false}`. Its thumbnails are the small PNGs (14 to 23 KB
+  each, about 250 KB for all fourteen), `loading="lazy"`; on a phone
+  the rail is `display: none`, and browsers do not fetch lazy images
+  that are not rendered.
+- **"Jump to hall"** (phone): a native `<select>` with an `<optgroup>`
+  per grade and the shared labels, the current hall selected, in a small
+  client component (`HallJump`) that calls `router.push` on change.
+  Without JavaScript it does nothing, and the trail, previous and next
+  remain. It is the one piece of client code on a hall page: decision 2
+  said "no page-specific client code", which this relaxes, with the
+  budget below.
+- **JSON-LD**: the `BreadcrumbList`'s second item is Temple Halls at
+  `/gd/halls`; the `ImageObject`s are unchanged but for their URLs.
+
+### A5. The editor (`/gd/halls/editor`, sheet A3)
+
+- Today's editor unchanged, moved: the preset dropdown, undo, the
+  layout switch, the panels, the draft, `#hall=` and `#preset=`.
+- The intro's link becomes "Browse the halls" (`/gd/halls`), and a
+  "Browse halls" button stands beside the preset dropdown.
+- No gallery below it, and no `min-height: calc(100vh - 64px)` spacer,
+  which existed only to keep the gallery below the fold.
+- Metadata: "Golden Dawn Temple Hall Editor", described as "Edit a
+  Golden Dawn temple floor plan in the browser: start from any of
+  fourteen halls, arrange officers and furniture, export SVG or PNG,
+  share a link." (151 characters, measured). A public page, in the sitemap as a
+  bare entry, its canonical itself; its card draws the Neophyte hall.
+
+### A6. Every path that moves
+
+- **Routes**: `git mv src/app/gd/hall src/app/gd/halls`; the editor's
+  page, its loader and the modules only it uses (`HallPlayground*`,
+  `hallDraft`, `hallHistory`, `hallShare`, `hallLimits`, `exportFonts`,
+  `exportCredit`, their CSS and tests) move into `halls/editor/`
+  (`exportCredit.ts` writes `${SITE_URL}/gd/hall` into every export's
+  credit; it becomes `${SITE_URL}/gd/halls/editor`, and its test's
+  expected text and the exports' credit pins follow); `art`,
+  `fontBase`, the presets' snapshots and `presets.test.tsx` stay in
+  `halls/`, since the reader and the ritual editor import them. Imports
+  of `@/app/gd/hall/...` follow (`src/doc`, `src/offline`,
+  `src/render`).
+- **The page path** moves into the contract, `gdHallPagePath(slug)` →
+  `/gd/halls/<slug>`, which `hallPath` (`src/seo/halls.ts`) and the
+  image files' metadata (`licenceFacts` in `src/render/gdHallImage.tsx`,
+  which writes `${SITE_URL}/gd/hall/<slug>` today) both use, so the path
+  is written once.
+- **Image pins move** (deliberately, once): each file names its page
+  (the SVG's `cc:attributionURL`, the PNG's XMP), so all fourteen halls'
+  SVG and three PNG digests change. The source digests (the SVG before
+  outlining) must not, which shows the drawings are unchanged.
+- **`next.config.ts`**: `HALL_SMALLER_IMAGES` →
+  `/gd/halls/:slug/:file([a-z0-9-]+-(?:medium|small)\.png)`; the three
+  redirects.
+- **`/api/render/gd-hall`**'s redirect follows `hallFiles`, so it moves
+  with them.
+- **`src/seo/pages.ts`**: `/gd/hall` gives way to `/gd/halls` and
+  `/gd/halls/editor`. **`cards.ts`**: the two cards (A3, A5).
+  **`pathnames.ts`**: A3. **`routes.test.ts`**: `/gd/halls` and
+  `/gd/halls/editor` public, `/gd/halls/[slug]` an entity route.
+  **Sitemap**: `/gd/halls` and `/gd/halls/editor` bare, the fourteen
+  hall pages with their images at the new paths.
+- **Links**: the `/gd` tile (`/gd/halls`); the grade pages' "Temple
+  halls" row (through `hallPath`); `/about`'s licence paragraph and
+  `/help/ritual-pug` (`/gd/halls`, and "temple hall editor" to
+  `/gd/halls/editor`); the hall page's trail, "Open in the editor" and
+  previous and next.
+- **Words**: doc comments and test names that say `/gd/hall`, in the app
+  and in `src/components/gd/hall` (comments only there; the directory
+  keeps its name, which is the package's, not a URL). At the end, a
+  grep for the URL forms only (a bare `/gd/hall\b` would also match
+  every `@magick-components/gd/hall` import), a quote, backtick,
+  bracket, brace or space before the path and a separator or the line's
+  end after it:
+  `` git grep -nE "(^|[\"'\`( }])/gd/hall([/#\"'\` ]|$)" -- . ':!plans' ``
+  finds only the redirects and their test. On `main` it finds 75 lines
+  today, none of them an import.
+
+### A7. Commits
+
+Each is one gated commit on `gate/halls-i`, building and passing alone.
+
+| # | Commit (subject) | Content |
+| --- | --- | --- |
+| P1 | `feat(gd): Move the temple halls to /gd/halls` | A2, A5 and A6: the route move, the editor alone at `/gd/halls/editor`, `/gd/halls` serving today's gallery with the intro and "Open the editor", the redirects and their test, the reserved slug, every path, the moved pins |
+| P2 | `feat(gd): Group the halls on their index` | A3: the compact grouped cards, the shared labels, the index's metadata |
+| P3 | `feat(gd): Show every hall beside each hall` | A4: the hall page's grid, the rail, `HallJump`, the phone order |
+| — | (with plan 061's stage I record) | this amendment's results, and plan 000 |
+
+P1 is a move, kept whole so that no commit has a link to a page that is
+not there; P2 and P3 are each revertable alone.
+
+### A8. Verification
+
+- **Unit tests**: the redirect list (the three entries, `permanent`,
+  read from the built `next.config` as the `headers()` test does);
+  `GD_HALL_RESERVED_SLUGS` against the slugs and against the static
+  children of `src/app/gd/halls`; `hallPath` and the files' paths; the
+  page metadata of the index, the editor and a hall (canonical, title,
+  description lengths); the JSON-LD breadcrumb; the sitemap entries; the
+  route classification; the moved pins; the shared labels (all fourteen,
+  pinned literally); the rail's `aria-current` and the select's groups
+  and selected option in the hall page's render test; the index's
+  render test (one `h1`, fourteen links, grade headings).
+- **Built output** (`next build`, webpack; `next start` on 127.0.0.1):
+  `/gd/halls`, `/gd/halls/editor` and the fourteen pages and 56 files
+  prerendered; `curl -I` of `/gd/hall`, `/gd/hall/zelator-1` and
+  `/gd/hall/zelator-1/golden-dawn-zelator-1-temple.png` gives 308 to the
+  new paths; `noindex` still on the medium and small PNGs only;
+  `/gd/halls/editor/x` and `/gd/halls/nope` are 404s.
+- **Browser** (headless Chromium over CDP, 127.0.0.1, a fresh port,
+  never 3004 or 3011): the index, Practicus 1's page and the editor at
+  1,440 × 900, 1,024 × 768 and 390 × 844 at 2×: one `h1`, no horizontal
+  scroll, no console error or hydration warning, layout shift 0; the
+  rail sticky with the current hall outlined; on the phone no rail
+  thumbnail fetched and the select navigating; `/gd/hall#preset=
+  philosophus-4` and a `/gd/hall#hall=1.…` share link landing on the
+  editor with that hall. **Firefox** (headless, `firefox --headless
+  --screenshot` and a WebDriver run if one is to hand): the same two
+  fragment links through the redirect. Safari and real devices are not
+  available; stated.
+- **Budgets** (gzip -6, against `main` ec6f765): the index's HTML at
+  most 15 KB and no page-specific client chunk; a hall page's own
+  client chunk (`HallJump`) at most 1 KB gzipped and its HTML at most
+  20 KB (it gains the rail's markup); the editor's chunks unchanged
+  within 0.2 KB (only the "Browse halls" link).
+- **Documentation screenshots**: none shows `/gd/hall` or a hall page;
+  none recaptured for this piece.
+
+### A9. Risks
+
+- **A permanent redirect is cached for good.** If `/gd/hall` were ever
+  wanted back, browsers that saw the 308 would keep going to
+  `/gd/halls/editor`. Nothing public links `/gd/hall`, and nothing
+  plans to reuse it.
+- **The rail's weight**: about 250 KB of thumbnails on every desktop
+  hall page, loaded lazily but all in view. Accepted in the mock-ups'
+  review; a 56 px thumbnail size would be a new image size and new
+  pins, not done.
+- **A client component on the hall pages** (the select): a little
+  JavaScript and a hydration boundary where there was none; the budget
+  and the hydration check hold it.
+- **The pins move** for every hall image at once, by text only; the
+  source digests prove the drawings did not.
+- **Search engines** have not seen `/gd/hall/<slug>` (never deployed),
+  so nothing is lost; the 308s cover anyone who kept a link from a
+  preview.
+
+### A10. Gadi's answer (28 October 2026)
+
+1. **The editor in the sitemap**: a plain entry, as recommended.
