@@ -98,7 +98,7 @@ describe("component image responses", () => {
   });
 
   it("keeps the temple halls' route copies out of the index", async () => {
-    // Their canonical copies are the static files under /gd/hall/<slug>.
+    // Their canonical copies are the static files under /gd/halls/<slug>.
     const response = await componentImageResponse(
       "gd-hall",
       new Request(

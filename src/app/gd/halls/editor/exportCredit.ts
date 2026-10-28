@@ -11,7 +11,7 @@ import { SITE_URL } from "@/seo/site";
 const L = GD_HALL_LICENCE;
 
 /** The credit, in words. */
-export const HALL_ART_CREDIT = `Hall art: ${L.creator}, ${L.name} (${L.url}), drawn with the temple hall editor at ${SITE_URL}/gd/hall. The licence covers the art, not the hall as arranged.`;
+export const HALL_ART_CREDIT = `Hall art: ${L.creator}, ${L.name} (${L.url}), drawn with the temple hall editor at ${SITE_URL}/gd/halls/editor. The licence covers the art, not the hall as arranged.`;
 
 /** `ExportControls`' credit for a hall: SVG metadata and an XMP packet. */
 export const hallArtCredit = {

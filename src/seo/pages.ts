@@ -115,11 +115,18 @@ export const PUBLIC_PAGES = {
       "The grades of the Golden Dawn from Neophyte 0=0 to Ipsissimus 10=1, " +
       "with their places on the Tree of Life.",
   },
-  "/gd/hall": {
-    title: "Golden Dawn Temple Halls: Floor Plans and Editor",
+  "/gd/halls": {
+    title: "Golden Dawn Temple Halls: Floor Plans",
     description:
-      "Golden Dawn temple floor plans for the Neophyte, Zelator, Theoricus, " +
-      "Practicus, Philosophus and Portal grades: open a preset, edit it, " +
+      "Floor plans of the fourteen Golden Dawn temple halls, Neophyte to " +
+      "Portal: officers' stations, sources, and PNG and SVG downloads under " +
+      "CC BY 4.0.",
+  },
+  "/gd/halls/editor": {
+    title: "Golden Dawn Temple Hall and Floor Plan Editor",
+    description:
+      "Design a Golden Dawn temple hall in your browser: place officers, " +
+      "furniture, banners and tablets in Pug source or visually, then " +
       "export SVG or PNG.",
   },
   "/gd/rituals": {

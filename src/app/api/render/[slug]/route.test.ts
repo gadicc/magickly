@@ -11,18 +11,18 @@ const get = (slug: string, query = "") =>
 
 describe("/api/render/[slug]", () => {
   it.each([
-    ["", "/gd/hall/neophyte/golden-dawn-neophyte-temple.svg"],
+    ["", "/gd/halls/neophyte/golden-dawn-neophyte-temple.svg"],
     [
       "?fmt=png&hall=zelator-1",
-      "/gd/hall/zelator-1/golden-dawn-zelator-1-temple.png",
+      "/gd/halls/zelator-1/golden-dawn-zelator-1-temple.png",
     ],
     [
       "?hall=portal-2&fmt=png&size=small&download=1",
-      "/gd/hall/portal-2/golden-dawn-portal-2-temple-small.png",
+      "/gd/halls/portal-2/golden-dawn-portal-2-temple-small.png",
     ],
     [
       "?size=medium&fmt=png&hall=theoricus-2",
-      "/gd/hall/theoricus-2/golden-dawn-theoricus-2-temple-medium.png",
+      "/gd/halls/theoricus-2/golden-dawn-theoricus-2-temple-medium.png",
     ],
   ])("sends gd-hall%s to the hall's static file", async (query, path) => {
     const response = await get("gd-hall", query);

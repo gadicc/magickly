@@ -12,7 +12,7 @@ import {
   resetGdHallEmbeddedFonts,
 } from "./exportFonts";
 
-const publicDir = path.join(import.meta.dirname, "../../../../public");
+const publicDir = path.join(import.meta.dirname, "../../../../../public");
 
 /** Serves the real subsets from `public/fonts`, counting requests. */
 function serveFonts(status = 200) {

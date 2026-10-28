@@ -12,7 +12,7 @@ const ENTITY_ROUTES = [
   "/astrology/planet/[id]",
   "/doc/[_id]",
   "/gd/grade/[id]",
-  "/gd/hall/[slug]",
+  "/gd/halls/[slug]",
   "/kabbalah/path/[id]",
   "/kabbalah/sephirah/[id]",
 ];

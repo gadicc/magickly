@@ -56,7 +56,7 @@ export default function HallPage({ hall }: { hall: GdHallEntry }) {
   return (
     <EntityFrame>
       <JsonLd data={hallJsonLd(hall)} />
-      <Trail href="/gd/hall#halls">Temple halls</Trail>
+      <Trail href="/gd/halls">Temple halls</Trail>
       <h1>{title}</h1>
       <Lede>{lead.lead}</Lede>
 
@@ -83,7 +83,9 @@ export default function HallPage({ hall }: { hall: GdHallEntry }) {
       </figure>
 
       <p className={styles.actions}>
-        <Link href={`/gd/hall#preset=${hall.slug}`}>Open in the editor</Link>
+        <Link href={`/gd/halls/editor#preset=${hall.slug}`}>
+          Open in the editor
+        </Link>
         {/* Files, not pages: nothing to prefetch. */}
         <Link href={files.png.path} download={files.png.name} prefetch={false}>
           Download PNG

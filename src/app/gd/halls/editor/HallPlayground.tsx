@@ -9,6 +9,7 @@ import {
   hallSourceUrl,
 } from "@magick-components/gd/hall/presets";
 import type { HallNode } from "@magick-components/gd/hall/types";
+import Apps from "@mui/icons-material/Apps";
 import Redo from "@mui/icons-material/Redo";
 import Undo from "@mui/icons-material/Undo";
 import {
@@ -37,7 +38,7 @@ import { useRitualEditorLayout } from "@/doc/useRitualEditorLayout";
 import ExportControls from "@/export/ExportControls";
 import { copyText } from "@/export/exportRuntime";
 import { GD_HALLS, gdHall, gdHallFileBase } from "@/render/contracts/gdHall";
-import { gdHallArt } from "./art";
+import { gdHallArt } from "../art";
 import { hallArtCredit } from "./exportCredit";
 import { embedGdHallFonts } from "./exportFonts";
 import {
@@ -292,7 +293,7 @@ const ExportDrawing = React.memo(function ExportDrawing({
 });
 
 /**
- * The `/gd/hall` hall editor (plan 061, stage E): source, visual and
+ * The `/gd/halls/editor` hall editor (plan 061, stage E): source, visual and
  * split views of one hall, with the ritual editor's source panel and the
  * visual hall editor; presets, undo and redo, a draft in this browser, a
  * share link, export and the hall's Pug.
@@ -765,6 +766,16 @@ export default function HallPlayground() {
             </MenuItem>
           ))}
         </TextField>
+        {/* Browsing is its own page (plan 062's amendment, A5): the
+            dropdown is for people who know the hall's name. */}
+        <Button
+          variant="outlined"
+          href="/gd/halls"
+          startIcon={<Apps />}
+          className={styles.browse}
+        >
+          Browse halls
+        </Button>
         <span>
           <Tooltip title="Undo">
             <span>

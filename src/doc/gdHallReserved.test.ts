@@ -5,7 +5,7 @@ import {
   RESERVED_TAGS,
 } from "@magick-components/gd/hall/vocabulary";
 import { describe, expect, it } from "vitest";
-import { gdHallArt } from "@/app/gd/hall/art";
+import { gdHallArt } from "@/app/gd/halls/art";
 import { type JsonValue, validateRitualSemantic } from "./semantic";
 
 /**

@@ -12,13 +12,13 @@ export function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: PageProps<"/gd/hall/[slug]">) {
+}: PageProps<"/gd/halls/[slug]">) {
   const metadata = hallMetadata((await params).slug);
   if (!metadata) notFound();
   return metadata;
 }
 
-export default async function Hall({ params }: PageProps<"/gd/hall/[slug]">) {
+export default async function Hall({ params }: PageProps<"/gd/halls/[slug]">) {
   const hall = gdHall((await params).slug);
   if (!hall) notFound();
   return <HallPage hall={hall} />;

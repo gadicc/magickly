@@ -1,6 +1,6 @@
 import { HALL_ROLES } from "@magick-components/gd/hall/vocabulary";
 import { describe, expect, it } from "vitest";
-import { gdHallArt } from "@/app/gd/hall/art";
+import { gdHallArt } from "@/app/gd/halls/art";
 import { hallView } from "./hallEdits";
 import { hostAccepts } from "./hallHostRules";
 import type { HallElement } from "./hallModel";

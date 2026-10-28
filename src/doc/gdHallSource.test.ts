@@ -3,7 +3,7 @@ import { validateHall } from "@magick-components/gd/hall";
 import { HALL_PRESETS } from "@magick-components/gd/hall/presets";
 import type { HallNode } from "@magick-components/gd/hall/types";
 import { describe, expect, it } from "vitest";
-import { gdHallArt } from "@/app/gd/hall/art";
+import { gdHallArt } from "@/app/gd/halls/art";
 import { gdHallRow, gdHallSource } from "./gdHallRows";
 import { prepare } from "./prepare";
 import { parseRitualPug, printRitualPug, RITUAL_PUG_HEADER } from "./ritualPug";

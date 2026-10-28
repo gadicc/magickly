@@ -21,7 +21,7 @@ const tiles = [
     // The Neophyte hall's own image (plan 062), the small one: enough at 2×.
     img: hallFiles(GD_HALLS[0]).small.path,
     title: "Temple Halls",
-    to: "/gd/hall",
+    to: "/gd/halls",
   },
   {
     Component: () => (

@@ -1,6 +1,6 @@
 import type { HallNode } from "@magick-components/gd/hall/types";
 import { validateHall } from "@magick-components/gd/hall/validate";
-import { gdHallArt } from "@/app/gd/hall/art";
+import { gdHallArt } from "@/app/gd/halls/art";
 
 /**
  * How many findings `validateHall` has for a hall, with the app's art (so

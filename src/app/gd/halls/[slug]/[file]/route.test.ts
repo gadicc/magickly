@@ -10,12 +10,12 @@ import nextConfig from "../../../../../../next.config";
 import { GET, generateStaticParams } from "./route";
 
 function get(slug: string, file: string) {
-  return GET(new Request("https://magick.ly/gd/hall"), {
+  return GET(new Request("https://magick.ly/gd/halls"), {
     params: Promise.resolve({ slug, file }),
   });
 }
 
-describe("/gd/hall/[slug]/[file]", () => {
+describe("/gd/halls/[slug]/[file]", () => {
   it("prerenders each hall's four files", () => {
     const params = generateStaticParams();
     expect(params).toHaveLength(56);
@@ -79,6 +79,6 @@ describe("/gd/hall/[slug]/[file]", () => {
         file.path,
         !file.indexed,
       ]);
-    expect(noindex("/gd/hall/neophyte")).toBe(false);
+    expect(noindex("/gd/halls/neophyte")).toBe(false);
   });
 });

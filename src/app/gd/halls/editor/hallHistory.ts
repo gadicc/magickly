@@ -6,7 +6,7 @@ import {
 } from "@/doc/ritualSourceDiagnostics";
 
 /**
- * The `/gd/hall` editor's state and history (plan 061, stage E): the hall
+ * The `/gd/halls/editor` editor's state and history (plan 061, stage E): the hall
  * as its source, which the source panel shows (header-less Pug with IDs),
  * and the hall that source holds, which the visual editor edits. The page
  * keeps its own undo and redo: one step per visual gesture, per loaded

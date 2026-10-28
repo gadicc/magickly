@@ -47,12 +47,12 @@ describe("social cards", () => {
   it("draws each temple hall on its own card", () => {
     expect(
       socialCard(
-        "/gd/hall/portal-2",
+        "/gd/halls/portal-2",
         "Golden Dawn Portal Temple, part 2: floor plan",
         hallCardArt("portal-2"),
       ),
     ).toMatchObject({
-      segments: ["gd", "hall", "portal-2.png"],
+      segments: ["gd", "halls", "portal-2.png"],
       section: "Golden Dawn",
       art: {
         kind: "diagram",
@@ -61,11 +61,12 @@ describe("social cards", () => {
         raster: "query",
       },
     });
-    expect(socialCard("/gd/hall", "Temple Halls").art).toEqual({
-      kind: "diagram",
-      slug: "gd-hall",
-      raster: "query",
-    });
+    for (const path of ["/gd/halls", "/gd/halls/editor"])
+      expect(socialCard(path, "Temple Halls").art).toEqual({
+        kind: "diagram",
+        slug: "gd-hall",
+        raster: "query",
+      });
   });
 
   it("describes the card as a 1200×630 image", () => {

@@ -77,7 +77,7 @@ const reach = (node: HallNode) => {
  * banner rows, floor objects placed beyond the walls, the caption, padding
  * and margins; never the art or the label layout, whose code it would
  * need. Every preset comes within 2 % of its drawing with the app's art
- * (`src/app/gd/hall/presets.test.tsx`), and simpler halls within 2 % of
+ * (`src/app/gd/halls/presets.test.tsx`), and simpler halls within 2 % of
  * the package's (`aspect.test.ts`). Never throws, whatever the content.
  */
 export function estimateHallAspect(hall: HallNode): number {

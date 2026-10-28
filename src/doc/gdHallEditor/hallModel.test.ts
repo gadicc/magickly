@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { gdHallArt } from "@/app/gd/hall/art";
+import { gdHallArt } from "@/app/gd/halls/art";
 import { isRitualNodeId } from "../ritualNodeIds";
 import {
   duplicateHallNode,

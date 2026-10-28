@@ -67,7 +67,7 @@ describe("a temple hall's page", () => {
       expect(img).toContain(`width="1500" height="${files.png.height}"`);
       expect(img).toMatch(/alt="Floor plan of the Golden Dawn [^"]+"/);
       expect(img).toContain('fetchPriority="high"');
-      expect(markup).toContain(`href="/gd/hall#preset=${slug}"`);
+      expect(markup).toContain(`href="/gd/halls/editor#preset=${slug}"`);
       for (const file of [files.png, files.svg]) {
         const link = markup.match(
           new RegExp(`<a[^>]*href="${file.path}"[^>]*>`),
@@ -91,8 +91,8 @@ describe("a temple hall's page", () => {
         trail.itemListElement.map((item: { item: string }) => item.item),
       ).toEqual([
         "https://magick.ly/gd",
-        "https://magick.ly/gd/hall",
-        `https://magick.ly/gd/hall/${slug}`,
+        "https://magick.ly/gd/halls",
+        `https://magick.ly/gd/halls/${slug}`,
       ]);
       expectLicensable(png);
       expectLicensable(svg);
@@ -126,14 +126,14 @@ describe("a temple hall's page", () => {
     const metadata = hallMetadata("zelator-1");
     expect(metadata).toMatchObject({
       title: "Golden Dawn Zelator Temple, part 1 (1=10): floor plan",
-      alternates: { canonical: "/gd/hall/zelator-1" },
-      openGraph: { url: "/gd/hall/zelator-1", siteName: "Magick.ly" },
+      alternates: { canonical: "/gd/halls/zelator-1" },
+      openGraph: { url: "/gd/halls/zelator-1", siteName: "Magick.ly" },
     });
     expect(metadata?.twitter).toBeUndefined();
     const images = metadata?.openGraph?.images as { url: string }[];
     expect(images.map((image) => image.url)).toEqual([
-      "/og/gd/hall/zelator-1.png",
-      "/gd/hall/zelator-1/golden-dawn-zelator-1-temple.png",
+      "/og/gd/halls/zelator-1.png",
+      "/gd/halls/zelator-1/golden-dawn-zelator-1-temple.png",
     ]);
     expect(hallMetadata("nope")).toBeNull();
   });

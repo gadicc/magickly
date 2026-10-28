@@ -90,7 +90,7 @@ const SECTIONS: [prefix: string, section: string, art: CardArt][] = [
   ["/enochian", "Enochian Magick", ART.enochian],
   ["/doc", "Golden Dawn Rituals", ART.robes],
   ["/gd/rituals", "Golden Dawn", ART.robes],
-  ["/gd/hall", "Golden Dawn", ART.hall],
+  ["/gd/halls", "Golden Dawn", ART.hall],
   ["/gd/sigils", "Golden Dawn", ART.sigil],
   ["/gd/symbols/shewbread", "Golden Dawn", ART.shewbread],
   ["/gd/symbols/fylfot-cross", "Golden Dawn", ART.goldenDawn],

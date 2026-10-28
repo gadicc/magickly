@@ -2,7 +2,7 @@ import type { HallElement } from "@/doc/gdHallEditor/hallModel";
 import type { RitualSemanticNode } from "@/doc/semantic";
 
 /**
- * How large a hall `/gd/hall` keeps as a draft or opens from a share link
+ * How large a hall `/gd/halls/editor` keeps as a draft or opens from a share link
  * (plan 061, stage E review). Each is well below what the resolver lays
  * out (`MAX_HALL_NODES`, 4,000), so a link or a draft never freezes the
  * page as it opens: a hall of 8,400 markers fits in a 934-character link

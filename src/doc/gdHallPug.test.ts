@@ -53,7 +53,7 @@ describe.each(HALL_PRESETS.map((preset) => [preset.id, preset] as const))(
   },
 );
 
-describe("a hall's own source, as /gd/hall shows it", () => {
+describe("a hall's own source, as /gd/halls/editor shows it", () => {
   const hall = gdHallSource(HALL_PRESETS[0].hall);
 
   it("prints without the header, with or without IDs, and parses back", () => {

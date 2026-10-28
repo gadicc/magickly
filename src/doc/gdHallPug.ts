@@ -19,7 +19,7 @@ export function gdHallPug(hall: HallNode): string {
 
 /**
  * A semantic hall as the Pug of a ritual holding only it, without the
- * source header: what `/gd/hall` shows and shares (plan 061, stage E).
+ * source header: what `/gd/halls/editor` shows and shares (plan 061, stage E).
  * With `ids: false` the node IDs are left out, as `gdHallPug` gives them.
  */
 export function printHallSource(
@@ -58,7 +58,7 @@ function unwrapped(error: unknown): RitualSourceError {
 }
 
 /**
- * The hall a `/gd/hall` source holds: ritual Pug without the header, one
+ * The hall a `/gd/halls/editor` source holds: ritual Pug without the header, one
  * `gdHall` at the top level and nothing else but blank lines. Parsed and
  * validated as ritual source is, so untrusted text (a draft, a share
  * link) is only ever data; nodes without IDs get fresh ones. Throws a

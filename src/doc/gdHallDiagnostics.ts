@@ -3,7 +3,7 @@ import type {
   HallNode,
 } from "@magick-components/gd/hall/types";
 import { validateHall } from "@magick-components/gd/hall/validate";
-import { gdHallArt } from "@/app/gd/hall/art";
+import { gdHallArt } from "@/app/gd/halls/art";
 import { parseRitualPugWithLocations, RITUAL_PUG_HEADER } from "./ritualPug";
 import type { RitualSourceLocation } from "./ritualSourceDiagnostics";
 import {
@@ -41,7 +41,7 @@ type Element = Extract<RitualSemanticNode, { kind: "element" }>;
  * the hall to the node skips them too.
  *
  * With `headerless`, the source is a ritual's Pug without its header
- * line (the `/gd/hall` page's source, plan 061 stage E), and the lines
+ * line (the `/gd/halls/editor` page's source, plan 061 stage E), and the lines
  * are counted from its first.
  */
 export function gdHallSourceWarnings(

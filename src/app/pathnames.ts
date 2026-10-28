@@ -43,7 +43,7 @@ const pathnames: Pathnames = {
     "/": "Golden Dawn",
     grades: "Grades",
     // A section, so each hall's page under it shows the trail.
-    hall: { "/": "Temple Halls" },
+    halls: { "/": "Temple Halls", editor: "Hall Editor" },
     rituals: "Rituals",
     sigils: "Sigils",
     symbols: {

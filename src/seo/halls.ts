@@ -16,6 +16,7 @@ import {
   type GdHallSize,
   gdHall,
   gdHallFileBase,
+  gdHallPagePath,
   gdHallPixels,
   gdHallShortName,
   gdHallTitle,
@@ -33,7 +34,7 @@ import { SITE_URL } from "./site";
  */
 
 /** Where a hall's page is. */
-export const hallPath = (hall: GdHallEntry) => `/gd/hall/${hall.slug}`;
+export const hallPath = (hall: GdHallEntry) => gdHallPagePath(hall.slug);
 
 const NUMBERS = ["", "", "two", "three", "four", "five", "six", "seven"];
 
@@ -330,7 +331,7 @@ export function hallJsonLd(hall: GdHallEntry) {
         "@type": "BreadcrumbList",
         itemListElement: [
           ["Golden Dawn", `${SITE_URL}/gd`],
-          ["Temple Halls", `${SITE_URL}/gd/hall`],
+          ["Temple Halls", `${SITE_URL}/gd/halls`],
           [gdHallShortName(hall), page],
         ].map(([name, item], index) => ({
           "@type": "ListItem",

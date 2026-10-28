@@ -272,7 +272,7 @@ export default function RitualSourceEditor({
   /** The nodes around the caret, innermost first, when they change while focused. */
   onCaretNode?(ids: string[]): void;
   /**
-   * The source is ritual Pug without its header line (the `/gd/hall`
+   * The source is ritual Pug without its header line (the `/gd/halls/editor`
    * page's hall); hall warnings count lines from its first.
    */
   headerless?: boolean;

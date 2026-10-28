@@ -8,7 +8,7 @@ import { hydrateRoot } from "react-dom/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import { prerender } from "react-dom/static";
 import { afterEach, beforeAll, expect, it, vi } from "vitest";
-import { gdHallArt } from "@/app/gd/hall/art";
+import { gdHallArt } from "@/app/gd/halls/art";
 import "../../tests/hydration";
 import { Render } from "./blocks";
 import DocContext from "./context";

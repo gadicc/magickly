@@ -152,7 +152,7 @@ export const GD_HALLS = [
 export interface GdHallEntry {
   /** The preset's id in `HALL_PRESETS`. */
   preset: string;
-  /** Its public slug: `/gd/hall/<slug>`. */
+  /** Its public slug: `/gd/halls/<slug>`. */
   slug: string;
   /** The grade's name, as titles write it. */
   grade: string;
@@ -170,6 +170,17 @@ export type GdHallSlug = (typeof GD_HALLS)[number]["slug"];
 export const GD_HALL_SLUGS: readonly GdHallSlug[] = GD_HALLS.map(
   (hall) => hall.slug,
 );
+
+/**
+ * Names no hall may take as its slug: the static pages beside
+ * `/gd/halls/[slug]` (plan 062's amendment, A2). Next matches a static
+ * segment first, so a hall slugged `editor` could never be reached; add
+ * a name here before adding a page under `/gd/halls`.
+ */
+export const GD_HALL_RESERVED_SLUGS: readonly string[] = ["editor"];
+
+/** Where a hall's page is: `/gd/halls/<slug>`. */
+export const gdHallPagePath = (slug: string) => `/gd/halls/${slug}`;
 
 /** A published hall by slug; `undefined` for any other string. */
 export function gdHall(slug: string): GdHallEntry | undefined {
@@ -245,7 +256,7 @@ export const gdHallImage: ComponentImageContract<GdHallImageProps> = {
   rasterDefault: null,
   keys: ["hall", "size"],
   personal: false,
-  // The canonical copies are the static files under /gd/hall/<slug>.
+  // The canonical copies are the static files under /gd/halls/<slug>.
   indexed: false,
   parse(searchParams) {
     if (searchParams.has("width") || searchParams.has("height")) invalid();

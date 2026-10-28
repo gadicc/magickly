@@ -90,7 +90,7 @@ vi.mock("@/doc/RitualSourceEditor", () => ({
 
 beforeEach(() => {
   localStorage.clear();
-  window.history.replaceState(null, "", "/gd/hall");
+  window.history.replaceState(null, "", "/gd/halls/editor");
 });
 
 afterEach(() => {
@@ -168,7 +168,7 @@ function noisyHall(count: number) {
   ).join("")}`;
 }
 
-describe("the /gd/hall page", { timeout: 20_000 }, () => {
+describe("the /gd/halls/editor page", { timeout: 20_000 }, () => {
   it("declares the hall fonts once and says where drafts stay", () => {
     const markup = renderToStaticMarkup(<HallPage />);
     const style = markup.match(/<style>(.*?)<\/style>/s)?.[1] ?? "";
@@ -215,9 +215,18 @@ describe("the /gd/hall page", { timeout: 20_000 }, () => {
     expect(words).toBeLessThan(text);
     expect(text).toBeLessThan(editor);
     expect(markup.indexOf("Magick.ly is open-source")).toBeGreaterThan(sources);
-    // The presets follow the editor, linked from the opening words.
-    expect(markup.indexOf('id="halls"')).toBeGreaterThan(sources);
-    expect(markup).toContain('href="#halls"');
+    // Browsing is its own page (plan 062's amendment): no gallery here,
+    // and nothing to hold it below the fold.
+    expect(markup).not.toContain('id="halls"');
+    expect(markup).toContain('href="/gd/halls"');
+    expect(markup).not.toContain("min-height");
+  });
+
+  it("links the halls' index beside the preset dropdown", () => {
+    render(<HallPlayground />);
+    const toolbar = screen.getByRole("toolbar", { name: "Temple hall editor" });
+    const browse = within(toolbar).getByRole("link", { name: "Browse halls" });
+    expect(browse.getAttribute("href")).toBe("/gd/halls");
   });
 
   it("takes the screen's width in split view only", () => {
@@ -239,7 +248,7 @@ describe("the /gd/hall page", { timeout: 20_000 }, () => {
     // hall editor 761px at 1280 x 800 with classic scrollbars, beside its
     // panel (Gadi, 21 October 2026); 2:3 gave 730 and docked it.
     const css = readFileSync(
-      "src/app/gd/hall/hallPlayground.module.css",
+      "src/app/gd/halls/editor/hallPlayground.module.css",
       "utf8",
     ).replace(/\/\*[\s\S]*?\*\//g, "");
     expect(
@@ -783,14 +792,14 @@ describe("sharing and export", { timeout: 20_000 }, () => {
     await screen.findByText(/^Copied a link to this hall as it is now/);
     const [url] = runtime.copyText.mock.calls[0] as [string];
     const link = new URL(url);
-    expect(link.pathname).toBe("/gd/hall");
+    expect(link.pathname).toBe("/gd/halls/editor");
     expect(link.search).toBe("");
     expect(link.hash).toMatch(/^#hall=1\./);
     const shared = pugOf(source());
     first.unmount();
     // A fresh browser: no draft. The link's hall opens, as one step.
     localStorage.clear();
-    window.history.replaceState(null, "", `/gd/hall${link.hash}`);
+    window.history.replaceState(null, "", `/gd/halls/editor${link.hash}`);
     render(<HallPlayground />);
     await screen.findByText(
       "Opened a hall from a share link. Once you change it, it is kept as a draft in this browser.",
@@ -808,7 +817,7 @@ describe("sharing and export", { timeout: 20_000 }, () => {
   });
 
   it("says when a link cannot be opened, keeping the draft", async () => {
-    window.history.replaceState(null, "", "/gd/hall#hall=1.%%%");
+    window.history.replaceState(null, "", "/gd/halls/editor#hall=1.%%%");
     render(<HallPlayground />);
     await screen.findByText(
       "This share link could not be opened: it is damaged.",
@@ -818,7 +827,11 @@ describe("sharing and export", { timeout: 20_000 }, () => {
     cleanup();
     const notHall = await shareFragment("p <img src=x onerror=alert(1)>\n");
     if (!("fragment" in notHall)) throw new Error("too long");
-    window.history.replaceState(null, "", `/gd/hall#${notHall.fragment}`);
+    window.history.replaceState(
+      null,
+      "",
+      `/gd/halls/editor#${notHall.fragment}`,
+    );
     render(<HallPlayground />);
     await screen.findByText(
       /^This share link could not be opened: its hall does not read/,
@@ -829,7 +842,7 @@ describe("sharing and export", { timeout: 20_000 }, () => {
   it("refuses a link to a hall of more nodes than it keeps", async () => {
     const link = await shareFragment(markers(1000));
     if (!("fragment" in link)) throw new Error("too long");
-    window.history.replaceState(null, "", `/gd/hall#${link.fragment}`);
+    window.history.replaceState(null, "", `/gd/halls/editor#${link.fragment}`);
     render(<HallPlayground />);
     await screen.findByText(
       "This share link could not be opened: its hall holds more than 1,000 nodes, more than a shared hall may.",
@@ -841,7 +854,7 @@ describe("sharing and export", { timeout: 20_000 }, () => {
     const zelator = await shareFragment(gdHallPug(HALL_PRESETS[1].hall));
     if (!("fragment" in zelator)) throw new Error("too long");
     for (const hash of [`#${zelator.fragment}`, "#hall=1.%%%"]) {
-      window.history.replaceState(null, "", `/gd/hall${hash}`);
+      window.history.replaceState(null, "", `/gd/halls/editor${hash}`);
       render(<HallPlayground />).unmount();
       await act(() => new Promise((resolve) => setTimeout(resolve, 50)));
       // The link was left as it was: nothing ran after unmounting.
@@ -885,7 +898,11 @@ describe("sharing and export", { timeout: 20_000 }, () => {
     );
     const zelator = await shareFragment(gdHallPug(HALL_PRESETS[1].hall));
     if (!("fragment" in zelator)) throw new Error("too long");
-    window.history.replaceState(null, "", `/gd/hall#${zelator.fragment}`);
+    window.history.replaceState(
+      null,
+      "",
+      `/gd/halls/editor#${zelator.fragment}`,
+    );
     render(<HallPlayground />);
     await screen.findByText(
       "Opened a hall from a share link. Your own draft stays in this browser until you change this hall; Undo goes back to the hall you had.",
@@ -905,7 +922,11 @@ describe("sharing and export", { timeout: 20_000 }, () => {
     );
     const zelator = await shareFragment(gdHallPug(HALL_PRESETS[1].hall));
     if (!("fragment" in zelator)) throw new Error("too long");
-    window.history.replaceState(null, "", `/gd/hall#${zelator.fragment}`);
+    window.history.replaceState(
+      null,
+      "",
+      `/gd/halls/editor#${zelator.fragment}`,
+    );
     render(<HallPlayground />);
     await waitFor(() => expect(presetShown()).toBe("Zelator Temple 1"));
     const stored = () =>
@@ -939,7 +960,11 @@ describe("sharing and export", { timeout: 20_000 }, () => {
     type(source().replace('text="Neophyte Temple"', 'text="Mine"'));
     const mine = source();
     act(() => {
-      window.history.replaceState(null, "", `/gd/hall#${zelator.fragment}`);
+      window.history.replaceState(
+        null,
+        "",
+        `/gd/halls/editor#${zelator.fragment}`,
+      );
       window.dispatchEvent(new HashChangeEvent("hashchange"));
     });
     await screen.findByText(
@@ -967,7 +992,11 @@ describe("sharing and export", { timeout: 20_000 }, () => {
     const scope = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean };
     scope.IS_REACT_ACT_ENVIRONMENT = false;
     try {
-      window.history.replaceState(null, "", `/gd/hall#${zelator.fragment}`);
+      window.history.replaceState(
+        null,
+        "",
+        `/gd/halls/editor#${zelator.fragment}`,
+      );
       window.dispatchEvent(new HashChangeEvent("hashchange"));
       // Opened in the promise steps that follow; React draws it in a
       // task of its own.
@@ -1012,7 +1041,11 @@ describe("sharing and export", { timeout: 20_000 }, () => {
       scope.IS_REACT_ACT_ENVIRONMENT = false;
       try {
         vi.advanceTimersByTime(200);
-        window.history.replaceState(null, "", `/gd/hall#${zelator.fragment}`);
+        window.history.replaceState(
+          null,
+          "",
+          `/gd/halls/editor#${zelator.fragment}`,
+        );
         window.dispatchEvent(new HashChangeEvent("hashchange"));
         // The link opens in the promise steps that follow, before React
         // renders (in a task of its own): the typed hall is not yet drawn,
@@ -1046,7 +1079,11 @@ describe("sharing and export", { timeout: 20_000 }, () => {
     localStorage.setItem(HALL_DRAFT_KEY, "{not json");
     const zelator = await shareFragment(gdHallPug(HALL_PRESETS[1].hall));
     if (!("fragment" in zelator)) throw new Error("too long");
-    window.history.replaceState(null, "", `/gd/hall#${zelator.fragment}`);
+    window.history.replaceState(
+      null,
+      "",
+      `/gd/halls/editor#${zelator.fragment}`,
+    );
     render(<HallPlayground />);
     await screen.findByText(
       "Opened a hall from a share link. The draft kept in this browser could not be read; once you change this hall, it is kept as the draft in its place.",
@@ -1054,7 +1091,7 @@ describe("sharing and export", { timeout: 20_000 }, () => {
     expect(screen.getAllByRole("alert")).toHaveLength(1);
     cleanup();
     // A link that cannot be opened leaves both said.
-    window.history.replaceState(null, "", "/gd/hall#hall=1.%%%");
+    window.history.replaceState(null, "", "/gd/halls/editor#hall=1.%%%");
     render(<HallPlayground />);
     await screen.findByText(
       "This share link could not be opened: it is damaged.",
@@ -1067,7 +1104,7 @@ describe("sharing and export", { timeout: 20_000 }, () => {
   it("repeats only the start of a parser's message about a link", async () => {
     const echo = await shareFragment("//- echo\ngdHall\n");
     if (!("fragment" in echo)) throw new Error("too long");
-    window.history.replaceState(null, "", `/gd/hall#${echo.fragment}`);
+    window.history.replaceState(null, "", `/gd/halls/editor#${echo.fragment}`);
     render(<HallPlayground />);
     const note = await screen.findByText(
       /^This share link could not be opened: its hall does not read/,
@@ -1084,7 +1121,11 @@ describe("sharing and export", { timeout: 20_000 }, () => {
     const zelator = await shareFragment(gdHallPug(HALL_PRESETS[1].hall));
     if (!("fragment" in zelator)) throw new Error("too long");
     act(() => {
-      window.history.replaceState(null, "", `/gd/hall#${zelator.fragment}`);
+      window.history.replaceState(
+        null,
+        "",
+        `/gd/halls/editor#${zelator.fragment}`,
+      );
       window.dispatchEvent(new HashChangeEvent("hashchange"));
     });
     await waitFor(() => expect(presetShown()).toBe("Zelator Temple 1"));
@@ -1129,7 +1170,7 @@ describe("sharing and export", { timeout: 20_000 }, () => {
     expect(svg).not.toContain("aria-hidden");
     // The art credited, the drawing itself given no licence (plan 062).
     expect(svg).toContain(
-      "<dc:description>Hall art: Magick.ly, CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), drawn with the temple hall editor at https://magick.ly/gd/hall. The licence covers the art, not the hall as arranged.</dc:description>",
+      "<dc:description>Hall art: Magick.ly, CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), drawn with the temple hall editor at https://magick.ly/gd/halls/editor. The licence covers the art, not the hall as arranged.</dc:description>",
     );
     expect(svg).not.toMatch(/cc:license|xmpRights/);
   });
@@ -1140,7 +1181,11 @@ describe("sharing and export", { timeout: 20_000 }, () => {
       HALL_DRAFT_KEY,
       JSON.stringify({ v: 1, source: mine }),
     );
-    window.history.replaceState(null, "", "/gd/hall#preset=philosophus-3");
+    window.history.replaceState(
+      null,
+      "",
+      "/gd/halls/editor#preset=philosophus-3",
+    );
     render(<HallPlayground />);
     await screen.findByText(
       "Opened the Philosophus Temple 3. Your own draft stays in this browser until you change this hall; Undo goes back to the hall you had.",
@@ -1156,21 +1201,21 @@ describe("sharing and export", { timeout: 20_000 }, () => {
   });
 
   it("opens a preset link in a fresh browser and when pasted", async () => {
-    window.history.replaceState(null, "", "/gd/hall#preset=portal-2");
+    window.history.replaceState(null, "", "/gd/halls/editor#preset=portal-2");
     render(<HallPlayground />);
     await screen.findByText(
       "Opened the Portal Temple 2. Once you change it, it is kept as a draft in this browser.",
     );
     expect(presetShown()).toBe("Portal Temple 2");
     act(() => {
-      window.history.replaceState(null, "", "/gd/hall#preset=neophyte");
+      window.history.replaceState(null, "", "/gd/halls/editor#preset=neophyte");
       window.dispatchEvent(new HashChangeEvent("hashchange"));
     });
     await waitFor(() => expect(presetShown()).toBe("Neophyte Temple"));
   });
 
   it("says when a preset link names no hall, keeping the draft", async () => {
-    window.history.replaceState(null, "", "/gd/hall#preset=zelator1");
+    window.history.replaceState(null, "", "/gd/halls/editor#preset=zelator1");
     render(<HallPlayground />);
     await screen.findByText(
       'This preset link could not be opened: no preset hall is called "zelator1".',

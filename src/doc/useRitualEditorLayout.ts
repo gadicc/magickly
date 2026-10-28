@@ -21,7 +21,7 @@ export const RITUAL_EDITOR_LAYOUTS: readonly (readonly [
 
 /**
  * Browser-only presentation preference; recovery changes never persist
- * implicitly. `storageKey` gives another editor (the `/gd/hall` page's)
+ * implicitly. `storageKey` gives another editor (the `/gd/halls/editor` page's)
  * a preference of its own.
  */
 export function useRitualEditorLayout(

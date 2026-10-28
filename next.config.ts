@@ -8,6 +8,7 @@ import {
 } from "next/constants";
 import { legacyStaticImageAliases } from "./src/files/legacyStaticImages";
 import { RITUAL_PUBLICATION_STATIC_PATHS } from "./src/files/ritualPublicationStaticPaths";
+import { HALL_REDIRECTS } from "./src/seo/hallRedirects";
 
 // Vercel standalone can retain this package symlink while dropping a file traced
 // through it. Trace the physical target while the runtime keeps the stable alias.
@@ -66,7 +67,7 @@ const ritualPublicationTraceFiles = [
 
 /** The temple halls' medium and small PNGs, which stay out of the index. */
 const HALL_SMALLER_IMAGES =
-  "/gd/hall/:slug/:file([a-z0-9-]+-(?:medium|small)\\.png)";
+  "/gd/halls/:slug/:file([a-z0-9-]+-(?:medium|small)\\.png)";
 
 export default async function (phase: string): Promise<NextConfig> {
   const nextConfig: NextConfig = {
@@ -103,6 +104,8 @@ export default async function (phase: string): Promise<NextConfig> {
           permanent: true,
         }),
       ),
+      // The temple halls moved from /gd/hall to /gd/halls.
+      ...HALL_REDIRECTS,
     ],
     // See also alternative with patch-package:
     // https://stackoverflow.com/a/77722836/1839099

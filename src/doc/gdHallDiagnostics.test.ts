@@ -113,7 +113,7 @@ describe("hall warnings in Pug source", () => {
   });
 });
 
-describe("hall warnings in a hall's own source (/gd/hall)", () => {
+describe("hall warnings in a hall's own source (/gd/halls/editor)", () => {
   it("counts lines from the first, without the header", () => {
     const line = '    altar(at="centre", colour="red")';
     const text = ["gdHall", "  //- a comment", "  floor", line, ""].join("\n");

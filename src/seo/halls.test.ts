@@ -2,7 +2,12 @@ import { readdirSync } from "node:fs";
 import path from "node:path";
 import Data from "magick-data";
 import { describe, expect, it } from "vitest";
-import { GD_HALL_SLUGS, GD_HALLS, gdHall } from "@/render/contracts/gdHall";
+import {
+  GD_HALL_RESERVED_SLUGS,
+  GD_HALL_SLUGS,
+  GD_HALLS,
+  gdHall,
+} from "@/render/contracts/gdHall";
 import {
   counted,
   gradeHalls,
@@ -17,12 +22,12 @@ import {
 } from "./halls";
 
 describe("the temple halls' search pages", () => {
-  it("gives every hall a page under /gd/hall, in the presets' order", () => {
+  it("gives every hall a page under /gd/halls, in the presets' order", () => {
     expect(hallPages().map((page) => page.path)).toEqual(
-      GD_HALL_SLUGS.map((slug) => `/gd/hall/${slug}`),
+      GD_HALL_SLUGS.map((slug) => `/gd/halls/${slug}`),
     );
     expect(hallPage("zelator-1")).toEqual({
-      path: "/gd/hall/zelator-1",
+      path: "/gd/halls/zelator-1",
       title: "Golden Dawn Zelator Temple, part 1 (1=10): floor plan",
       description:
         "Floor plan of the Golden Dawn Zelator Temple, part 1 (1=10): the officers' stations, the altar and the Earth tablet, after Regardie (1938). CC BY 4.0.",
@@ -31,13 +36,21 @@ describe("the temple halls' search pages", () => {
     expect(hallPage("toString")).toBeNull();
   });
 
-  it("keeps the slugs clear of the editor's own routes", () => {
-    // A static page under /gd/hall would shadow a hall of the same name.
-    const dir = path.join(process.cwd(), "src/app/gd/hall");
-    const children = readdirSync(dir, { withFileTypes: true })
-      .filter((entry) => entry.isDirectory() && !entry.name.startsWith("["))
+  it("keeps the slugs clear of the static pages beside them", () => {
+    // A static page under /gd/halls (the editor) would shadow a hall of
+    // the same name, since Next matches static segments first. Only
+    // folders that are routes count: not dynamic segments, private
+    // folders (`_*`, the presets' `__snapshots__`), route groups or
+    // parallel slots.
+    const dir = path.join(process.cwd(), "src/app/gd/halls");
+    const routes = readdirSync(dir, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory() && !/^[[_(@]/.test(entry.name))
       .map((entry) => entry.name);
-    for (const slug of GD_HALL_SLUGS) expect(children).not.toContain(slug);
+    expect(routes).toContain("editor");
+    // Every static page is reserved, so a new one must be reserved first.
+    for (const route of routes) expect(GD_HALL_RESERVED_SLUGS).toContain(route);
+    for (const slug of GD_HALL_SLUGS)
+      expect(GD_HALL_RESERVED_SLUGS).not.toContain(slug);
   });
 
   it("describes each hall in a search snippet's length, each differently", () => {
@@ -83,8 +96,8 @@ describe("the temple halls' search pages", () => {
     for (const hall of GD_HALLS)
       expect(Object.keys(Data.gdGrade)).toContain(hall.gradeId);
     expect(gradeHalls("portal").map(hallPath)).toEqual([
-      "/gd/hall/portal-1",
-      "/gd/hall/portal-2",
+      "/gd/halls/portal-1",
+      "/gd/halls/portal-2",
     ]);
     expect(gradeHalls("0=0").map((hall) => hall.slug)).toEqual(["neophyte"]);
     expect(gradeHalls("5=6")).toEqual([]);

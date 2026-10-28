@@ -3,7 +3,7 @@ import {
   gdHallFontFaceRule,
 } from "@magick-components/gd/hall";
 import { SVG_NAMESPACE } from "@/export/svgExport";
-import { GD_HALL_FONT_BASE } from "./fontBase";
+import { GD_HALL_FONT_BASE } from "../fontBase";
 
 export { GD_HALL_FONT_BASE };
 

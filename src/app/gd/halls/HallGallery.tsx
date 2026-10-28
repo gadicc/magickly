@@ -22,9 +22,9 @@ const label = (hall: GdHallEntry) => {
 };
 
 /**
- * `/gd/hall`'s presets, each linking to its page (plan 062, decision 12):
- * server-rendered thumbnails below the editor, which load lazily and add
- * no client code.
+ * The temple halls by grade, each linking to its page (plan 062 and its
+ * amendment): server-rendered thumbnails, which load lazily and add no
+ * client code.
  */
 export default function HallGallery() {
   return (

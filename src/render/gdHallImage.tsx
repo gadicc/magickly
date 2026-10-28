@@ -19,6 +19,7 @@ import {
   type GdHallEntry,
   type GdHallImageProps,
   gdHall,
+  gdHallPagePath,
   gdHallPixels,
   gdHallTitle,
 } from "./contracts/gdHall";
@@ -123,7 +124,7 @@ function licenceFacts(props: GdHallImageProps) {
   const { entry, preset } = entryOf(props);
   return {
     title: escapeXml(gdHallTitle(entry)),
-    page: escapeXml(`${SITE_URL}/gd/hall/${entry.slug}`),
+    page: escapeXml(`${SITE_URL}${gdHallPagePath(entry.slug)}`),
     source: escapeXml(
       preset.sources
         .filter((source) => source.kind === "book")

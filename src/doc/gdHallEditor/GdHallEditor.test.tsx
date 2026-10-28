@@ -10,7 +10,7 @@ import {
 } from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { gdHallArt } from "@/app/gd/hall/art";
+import { gdHallArt } from "@/app/gd/halls/art";
 import { flushPendingEdits } from "../pendingEdits";
 import { GdHallEditor, type GdHallEditorProps } from "./GdHallEditor";
 import { parseNumberField } from "./HallProperties";

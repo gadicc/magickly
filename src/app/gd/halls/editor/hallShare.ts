@@ -1,5 +1,5 @@
 /**
- * `/gd/hall` share links (plan 061, decision 1 and stage E): the hall's
+ * `/gd/halls/editor` share links (plan 061, decision 1 and stage E): the hall's
  * Pug without IDs, compressed (deflate, where the browser has
  * `CompressionStream`) and base64url-encoded into the URL's fragment, so
  * it never reaches a server's logs. Opening a link only parses the text

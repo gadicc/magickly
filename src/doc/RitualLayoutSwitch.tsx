@@ -10,7 +10,7 @@ import {
  * An editor's layout switch: Source, Split and Visual, in the order split
  * view lays the panels out, the chosen one pressed (`aria-pressed`) as
  * well as filled. The ritual editor, the new-ritual form and the
- * `/gd/hall` editor all use it, so the three read alike.
+ * `/gd/halls/editor` editor all use it, so the three read alike.
  */
 export function RitualLayoutSwitch({
   label,

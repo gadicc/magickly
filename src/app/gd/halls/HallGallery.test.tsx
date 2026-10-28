@@ -4,15 +4,15 @@ import { GD_HALLS } from "@/render/contracts/gdHall";
 import { hallFiles } from "@/seo/halls";
 import HallGallery from "./HallGallery";
 
-describe("/gd/hall's presets", () => {
+describe("the halls index grid", () => {
   const html = renderToString(<HallGallery />);
 
   it("links every hall's page with its lazy thumbnail, by grade", () => {
     expect(html).toContain('id="halls"');
-    const links = [...html.matchAll(/<a[^>]*href="(\/gd\/hall\/[^"]+)"/g)].map(
+    const links = [...html.matchAll(/<a[^>]*href="(\/gd\/halls\/[^"]+)"/g)].map(
       ([, href]) => href,
     );
-    expect(links).toEqual(GD_HALLS.map((hall) => `/gd/hall/${hall.slug}`));
+    expect(links).toEqual(GD_HALLS.map((hall) => `/gd/halls/${hall.slug}`));
     for (const hall of GD_HALLS) {
       const { small } = hallFiles(hall);
       expect(html).toContain(`src="${small.path}"`);

@@ -1,5 +1,5 @@
 /**
- * The `/gd/hall` editor's draft (plan 061, stage E): the hall's source,
+ * The `/gd/halls/editor` editor's draft (plan 061, stage E): the hall's source,
  * kept in this browser's localStorage under a versioned key. Nothing is
  * sent anywhere. Storage may be missing, blocked, full or hold anything
  * at all, so every access is guarded and what is read is only ever

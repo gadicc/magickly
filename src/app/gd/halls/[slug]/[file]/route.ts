@@ -20,7 +20,7 @@ export function generateStaticParams() {
 
 export async function GET(
   _request: Request,
-  { params }: RouteContext<"/gd/hall/[slug]/[file]">,
+  { params }: RouteContext<"/gd/halls/[slug]/[file]">,
 ) {
   const { slug, file: name } = await params;
   const found = allHallFiles().find(
