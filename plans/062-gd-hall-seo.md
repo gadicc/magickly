@@ -1105,8 +1105,8 @@ Recorded in [plan 061](061-gd-hall.md#follow-ups) and
 
 ## Amendment: the halls under `/gd/halls` (28 October 2026)
 
-Status: planned on `gate/halls-i` (from `main` at ec6f765), not yet
-built. Gadi chose option A of the UX mock-ups on 28 October 2026
+Status: built on `gate/halls-i` (from `main` at ec6f765) on 28 October
+2026, every commit gated; see A11. Gadi chose option A of the UX mock-ups on 28 October 2026
 (`~/.cache/halls-ux/`: sheets `A1-index.png`, `A2-hall.png` and
 `A3-editor.png`, the mock pages in `mock/`, and the README's URL and
 redirect plan). Today `/gd/hall` puts a full-screen editor in front of
@@ -1234,11 +1234,16 @@ nothing.
   - **Below 900 px**: no rail; the "Jump to hall" select under the
     trail, then the H1, the plan with its credit, previous and next, the
     actions, the lede and the rest (Gadi: fine).
-  The DOM order is the phone's, with the rail's `<nav>` last, so a
+  The DOM order is the trail and the select, the H1, the plan with its
+  credit, then the words in the desktop's order (lede, actions,
+  previous and next, the rest), with the rail's `<nav>` last, so a
   screen reader meets the hall before fourteen links; the grid places
   the rail on the left. On the desktop the tab order therefore differs
   from the visual order: Tab reaches the rail after the page's text,
-  though it stands first on the left. The figure's `sizes` follows the columns, so the
+  though it stands first on the left. On a phone, CSS `order` moves
+  previous and next and the actions above the lede, so there too the
+  visual order differs from the DOM's (corrected after the review of
+  28 October 2026; a follow-up in plan 000). The figure's `sizes` follows the columns, so the
   phone still fetches the medium PNG and the desktop at 1× the medium
   or full by width.
 - **The rail** (desktop): a server-rendered `<nav aria-label="Temple
@@ -1396,3 +1401,106 @@ not there; P2 and P3 are each revertable alone.
 ### A10. Gadi's answer (28 October 2026)
 
 1. **The editor in the sitemap**: a plain entry, as recommended.
+
+### A11. As built (28 October 2026)
+
+Gadi added on 28 October 2026: the editor page keeps its sitemap entry
+and gets a better title, description and short intro in our own words,
+its licence line matching what the exports embed (the art credited
+under CC BY 4.0 to Magick.ly, no licence over the user's arrangement).
+
+| # | Commit | Change |
+| --- | --- | --- |
+| P1 | cdb7bab | the move, the redirects (`src/seo/hallRedirects.ts`), the reserved slug, every path, the editor alone with "Browse halls", the editor's title, description and intro, the moved pins |
+| P2 | 1678397 | the index's grouped cards (`HallIndex`) and the shared labels (`hallGroups`) |
+| P3 | 0f0fc86 | the hall page's grid, the rail (`HallRail`) and "Jump to hall" (`HallJump`) |
+
+How the build departs from A1 to A10:
+
+- **Headings.** The app bar names a page that has a title in its own
+  `h1` ("Temple Halls", "Hall Editor"), so the index's "Golden Dawn
+  temple halls" is an `h2` and its grade headings `h3`; a hall page's
+  title stays the page's `h1` (the bar shows the site's name there).
+- **The editor's words** (Gadi's addition): the title "Golden Dawn
+  Temple Hall and Floor Plan Editor" (57 characters with the site's
+  suffix); the description "Design a Golden Dawn temple hall in your
+  browser: place officers, furniture, banners and tablets in Pug source
+  or visually, then export SVG or PNG." (147); and the intro "An editor
+  for Golden Dawn temple halls. Start from any of the fourteen halls, or
+  build your own from composable tags in its Pug source or on the
+  drawing. Download it as SVG or PNG: our artwork is CC BY 4.0, free to
+  use with credit to Magick.ly.", the licence linked to its deed, before
+  the existing paragraph on drafts. Its Open Graph follows the page
+  entry; it carries no JSON-LD.
+- **The redirects** live in `src/seo/hallRedirects.ts`, which
+  `next.config.ts` imports, so they import nothing; a test resolves each
+  through the built config with `path-to-regexp`.
+- **The rail** labels a card by its place where it has one ("31st
+  path", "In Hod") and by its part otherwise; the select's options read
+  "Practicus · Part 1 · 31st path", since a closed native select shows
+  only the chosen option. The previous and next links appear twice,
+  under the actions ("Previous and next halls") and at the foot ("More
+  temple halls"); the rail is "All temple halls".
+- **`EntityFrame`** takes a `maxWidth` (`lg` for the hall pages).
+- **The export credit** names `/gd/halls/editor`; the image files name
+  their pages under `/gd/halls`, so all fourteen halls' SVG and three
+  PNG digests moved (56), the source digests did not.
+
+The checks:
+
+- **Gates**: each commit, one at a time, in a clean `git archive` export
+  on `/home` with Node 24 and the CI placeholder environment:
+  `install --frozen-lockfile`, `check`, `typecheck`, `test:coverage` and
+  `build`, every status 0; the tip also `loom check`, the magick-data
+  smoke test and `check:turbopack`.
+- **HTTP** (`next start` of the gate's build, 127.0.0.1): `/gd/hall`,
+  `/gd/hall/zelator-1` and its full PNG answer 308 to the new paths;
+  `/gd/halls`, `/gd/halls/editor` and the hall pages 200;
+  `/gd/halls/editor/x` and `/gd/halls/nope` 404; `noindex` on the
+  medium and small PNGs only; `/api/render/gd-hall?hall=portal-2` 308 to its SVG. The
+  sitemap has 197 URLs and 28 image entries, `/gd/halls` and
+  `/gd/halls/editor` among them, and no `/gd/hall/`.
+- **Fragments through the redirect**: `/gd/hall#preset=philosophus-4`
+  opened Philosophus 4 in the editor, a `/gd/hall#hall=1.…` share link
+  opened its hall (a changed caption), and `/gd/hall/zelator-1` landed on
+  the hall's page, in headless Chromium and in headless Firefox 157
+  (WebDriver BiDi). Safari and real devices were not checked.
+- **Browser** (headless Chromium over CDP, 1,440 × 900, 1,024 × 768 and
+  390 × 844 at 2×): one `h1`, no horizontal scroll and layout shift 0 on
+  the index and the hall pages; the editor's layout shift is 0.03 on the
+  desktop (the footer moving when the editor arrives, now that the
+  full-screen spacer is gone) and 0 on the phone; the rail sticky
+  with the current hall outlined; the select grouped by grade.
+- **The rail's thumbnails, corrected after the review.** The first
+  build hid the rail with `display: none` and trusted lazy loading,
+  and Chromium fetched all fourteen small PNGs on a phone all the same
+  (the review measured them at 375 × 812, about 250 KB a page; this
+  record's first check, on a dev server, had missed it). Each thumbnail
+  is now a `<picture>` source for `(min-width: 900px)` over an inline
+  transparent pixel, which costs no request. Measured on the production
+  build of P3 (headless Chromium, a fresh profile each, the page
+  scrolled to its foot): at 375 × 812 and 390 × 844, no small PNG (the
+  page's medium PNG and its neighbours' prefetched ones only); at
+  1,440 × 900, the fourteen small PNGs, 250,357 bytes.
+- **The review's other fixes in P1 to P3**: the per-file coverage
+  thresholds (95/90) now cover `src/app/gd/halls`, its `editor` and
+  `[slug]` folders and `src/seo/hallRedirects.ts` (the move had left
+  the old glob matching nothing), with tests of the index page, the
+  hall route's metadata and 404s, and `HallJump`; the select is named
+  "Jump to hall" alone (`htmlFor`) and keeps the chosen hall while the
+  next page loads; the rail and the index take the theme's link colour
+  (MUI `Typography color="primary"`) and outline the current hall in
+  it, with no fixed colours. The rail's "All temple halls" link is
+  still a plain link in the browser's colour (a follow-up).
+- **Budgets** (gzip -6, against `main` ec6f765 built here; after the
+  review's fixes): the index's HTML 11,073 bytes and its page chunk
+  8,616 (3,223); a hall page's chunk 4,246 → 5,919 bytes (1,877 →
+  2,446, the select), its HTML 11,970 → 15,612 (Zelator 1); the editor page's chunk 10,278 → 10,070 (3,877 →
+  3,792) and its HTML 11,031 → 9,424 (the gallery gone); the hall
+  editor's own chunk 41,803 → 41,997 (15,558 → 15,599).
+- **Documentation screenshots**: none shows these pages.
+
+A `WebApplication` node in the editor's JSON-LD would fit (name,
+`applicationCategory` "DesignApplication", `operatingSystem` "Any",
+`offers` free, `url`); proposed for Gadi rather than added.
+

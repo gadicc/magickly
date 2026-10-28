@@ -515,9 +515,30 @@ Follow-ups are separate from the completed migration work:
   options recorded, not decided: users upload images and assert their
   rights; rights may not matter for private temples; or an uploader
   consents to (donates under) CC BY 4.0, against keeping copyright for
-  internal use ([plan 061](061-gd-hall.md#follow-ups)). Plan 061's
-  stages I (built-in docs on the presets, `public/pics` and its credits
-  removed, reader export, the end-of-project review) and J (private hall
-  sources) remain.
+  internal use ([plan 061](061-gd-hall.md#follow-ups)).
+- Temple halls under `/gd/halls` and plan 061's stage I: built on 28
+  October 2026 on `gate/halls-i`, every commit gated; awaiting review
+  and merge. Gadi chose a routed index (`/gd/halls`), hall pages with a
+  rail of every hall (a "Jump to hall" select on phones) and the editor
+  alone at `/gd/halls/editor`, with permanent redirects from `/gd/hall`
+  ([plan 062's amendment](062-gd-hall-seo.md#amendment-the-halls-under-gdhalls-28-october-2026)).
+  The built-in rituals draw the presets and link each hall's page; the
+  ritual reader now opens links to this site; the five old drawings in
+  `public/pics` are gone, no longer cited as sources, and redirect to
+  their halls' SVGs; their `/about` credits are removed
+  ([plan 061](061-gd-hall.md#stage-i-plan-28-october-2026)). TODO for
+  Gadi after the deploy: edit the production "0=0 Grade of the
+  Neophyte" ritual once to draw the Neophyte hall (a read-only query
+  of current revisions and of revisions with unfinished publications,
+  a local rehearsal, then save and publish at once; no publication
+  backfill before; plan 061, I.3). TODO: reader export, deferred; plan
+  061's end-of-project review (prepared) and stage J (private hall
+  sources) remain. TODO from the review of 28 October 2026: at 1,440 ×
+  900 the hall pages' rail (804 px) scrolls within itself, leaving the
+  Portal below the fold (smaller thumbnails, or two columns on short
+  screens); on a phone the hall page's visual order differs from its
+  DOM order (CSS `order` puts previous and next and the actions above
+  the lede), so reorder the markup or accept it
+  ([plan 062's amendment](062-gd-hall-seo.md#amendment-the-halls-under-gdhalls-28-october-2026), A4).
 
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.
