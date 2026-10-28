@@ -94,6 +94,7 @@ export default defineConfig({
         "src/files/ritualImageValidationIdentity.ts",
         "src/files/dataImage.ts",
         "src/files/validateRitualSvg.ts",
+        "src/doc/sameOriginPath.ts",
         "src/render/componentImageRequest.ts",
         "src/render/componentImageUrl.ts",
         "src/render/componentImage.tsx",

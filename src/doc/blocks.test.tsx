@@ -237,3 +237,73 @@ it.each([
     view.container.querySelector('[data-ritual-frame="gdHall"]'),
   ).toBeTruthy();
 });
+
+it("opens a link on this site in place, a link elsewhere in a new tab, and blocks the rest", () => {
+  const link = (href: string) => ({
+    type: "a",
+    href,
+    children: [{ type: "text", value: href }],
+  });
+  const blocked = [
+    "/\t/evil.example/",
+    "/\n/evil.example/",
+    "/\r/evil.example/",
+    " /gd/halls",
+    "/gd/ halls",
+    "/\\evil.example/",
+    "//evil.example/",
+    "javascript:alert(1)",
+    "data:text/html,x",
+    "gd/halls",
+  ];
+  const doc = {
+    children: [
+      {
+        type: "note",
+        children: [
+          link("/gd/halls/neophyte"),
+          link("/%2f/evil.example/"),
+          link("/%5c/evil.example/"),
+          link("https://example.org/"),
+          ...blocked.map(link),
+        ],
+      },
+    ],
+  };
+  const view = render(<Render doc={doc} onChange={undefined} />);
+  const anchors = [...view.container.querySelectorAll("a")].map((a) => [
+    a.getAttribute("href"),
+    a.getAttribute("target"),
+  ]);
+  expect(anchors).toEqual([
+    ["/gd/halls/neophyte", null],
+    ["/%2f/evil.example/", null],
+    ["/%5c/evil.example/", null],
+    ["https://example.org/", "_blank"],
+  ]);
+  expect(
+    [...view.container.querySelectorAll("span[title^='Blocked href']")].map(
+      (span) => span.getAttribute("title"),
+    ),
+  ).toEqual(blocked.map((href) => `Blocked href to ${href}`));
+});
+
+it("opens a link on this site in a new tab where the context asks, as the editor's previews do", () => {
+  const doc = {
+    children: [
+      {
+        type: "a",
+        href: "/gd/halls/neophyte",
+        children: [{ type: "text", value: "Neophyte" }],
+      },
+    ],
+  };
+  const view = render(
+    <DocContext.Provider value={{ roles, vars: {}, linksInNewTab: true }}>
+      <Render doc={doc} onChange={undefined} />
+    </DocContext.Provider>,
+  );
+  expect(view.container.querySelector("a")?.getAttribute("target")).toBe(
+    "_blank",
+  );
+});

@@ -19,6 +19,7 @@ import {
 import { GdHallFrame } from "./ritualBlocks/GdHallFrame";
 import { planRitualFootnotes } from "./ritualFootnotes";
 import { roleAssignmentIncludes } from "./ritualRoles";
+import { sameOriginPath } from "./sameOriginPath";
 
 class Title extends Node {
   render(key) {
@@ -299,11 +300,30 @@ class Stylesheet extends Node {
   }
 }
 
+/**
+ * A link. A path on this site (the built-in rituals link their halls'
+ * pages so, plan 061 stage I) opens in place, except in the editor's
+ * previews, where it would navigate the editor away; another host opens
+ * in a new tab; anything else is shown blocked.
+ */
 class A extends Node {
   render(key) {
-    const valid = this.block.href && this.block.href.startsWith("http");
+    // biome-ignore lint/correctness/useHookAtTopLevel: JRT invokes render as its React component
+    const context = React.useContext(DocContext);
+    const { href } = this.block;
+    if (sameOriginPath(href))
+      return context?.linksInNewTab ? (
+        <a key={key} href={href} target="_blank">
+          {this.renderChildren()}
+        </a>
+      ) : (
+        <a key={key} href={href}>
+          {this.renderChildren()}
+        </a>
+      );
+    const valid = href && href.startsWith("http");
     return valid ? (
-      <a key={key} href={this.block.href} target="_blank">
+      <a key={key} href={href} target="_blank">
         {this.renderChildren()}
       </a>
     ) : (

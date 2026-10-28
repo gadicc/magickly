@@ -23,6 +23,7 @@ import { parseRitualFileLocator } from "@/files/ritualFileLocator";
 import { gdHallRow } from "../gdHallRows";
 import { ritualEditorOwner } from "../ritualEditorOwner";
 import { ritualFootnotesKey } from "../ritualFootnotesClient";
+import { sameOriginPath } from "../sameOriginPath";
 import { TaskSettingsTrigger } from "../TaskSettings";
 import styles from "./editing.module.css";
 import { FootnotesForEditing } from "./FootnotesForEditing";
@@ -274,28 +275,6 @@ export function RitualInlineForEditing({ node, selected }: NodeViewProps) {
       )}
     </NodeViewWrapper>
   );
-}
-
-/** Render attached images only; arbitrary source URLs retain a metadata placeholder. */
-/**
- * A path on this origin. URL parsing drops tabs and newlines, so `/\t/host`
- * would otherwise resolve to another host; reject controls and confirm the
- * resolved origin.
- */
-function sameOriginPath(src: unknown): src is string {
-  if (
-    typeof src !== "string" ||
-    !/^\/(?![/\\])/.test(src) ||
-    /[\u0000-\u001f\u007f\\]/.test(src)
-  )
-    return false;
-  try {
-    return (
-      new URL(src, window.location.origin).origin === window.location.origin
-    );
-  } catch {
-    return false;
-  }
 }
 
 /** Name a verbatim source-only node by its tag and the text that identifies it. */

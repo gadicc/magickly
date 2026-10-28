@@ -77,7 +77,12 @@ function preview(entry: EditorFootnote) {
   };
 }
 
-function FootnotePreview({ entry }: { entry: EditorFootnote }) {
+/**
+ * A footnote drawn as the reader draws it, in the editor's footnote list.
+ * Its links open in a new tab, so following one never navigates the
+ * editor away.
+ */
+export function FootnotePreview({ entry }: { entry: EditorFootnote }) {
   const model = React.useMemo(() => {
     try {
       return preview(entry);
@@ -86,7 +91,9 @@ function FootnotePreview({ entry }: { entry: EditorFootnote }) {
     }
   }, [entry]);
   return model ? (
-    <DocContext.Provider value={{ roles, vars: model.vars }}>
+    <DocContext.Provider
+      value={{ roles, vars: model.vars, linksInNewTab: true }}
+    >
       {/* JRT invokes hookful block renders directly; changed preview structure
           needs a fresh reader component to keep its hook order valid. */}
       <Render
