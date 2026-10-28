@@ -169,7 +169,7 @@ it("previews only site and scoped images and retains attachment dimensions", asy
         height: 12,
         style: '{"width":"16px"}',
       },
-      { type: "img", src: "/pics/neophyte.svg", alt: "Site asset" },
+      { type: "img", src: "/pics/candidate-hexagram.svg", alt: "Site asset" },
       { type: "img", src: "//example.invalid/protocol-relative", alt: "Host" },
       { type: "img", src: "/\t/example.invalid/tab", alt: "Tab" },
       { type: "img", src: "/\\example.invalid/backslash", alt: "Slash" },
@@ -183,7 +183,7 @@ it("previews only site and scoped images and retains attachment dimensions", asy
   expect(dom.querySelectorAll("img")).toHaveLength(2);
   expect(
     screen.getByRole("img", { name: "Site asset" }).getAttribute("src"),
-  ).toBe("/pics/neophyte.svg");
+  ).toBe("/pics/candidate-hexagram.svg");
   expect(image.getAttribute("src")).toBe(src);
   expect(image.getAttribute("width")).toBe("16");
   expect(image.getAttribute("height")).toBe("12");

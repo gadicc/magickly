@@ -3,8 +3,11 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import { GD_HALLS } from "@/render/contracts/gdHall";
+import { existsSync } from "node:fs";
+import { RITUAL_PUBLICATION_STATIC_PATHS } from "@/files/ritualPublicationStaticPaths";
+import { GD_HALLS, gdHall } from "@/render/contracts/gdHall";
 import nextConfig from "../../next.config";
+import { RETIRED_HALL_DRAWINGS } from "./hallRedirects";
 import { hallFiles, hallPath } from "./halls";
 
 /** Where the built config sends a path, or null when nothing matches. */
@@ -44,5 +47,22 @@ describe("the temple halls' old URLs (plan 062's amendment)", () => {
   it("leaves the new URLs alone", async () => {
     for (const path of ["/gd/halls", "/gd/halls/editor", "/gd/halls/neophyte"])
       expect(await redirected(path)).toBeNull();
+  });
+
+  it("send each retired drawing to its hall's SVG for good", async () => {
+    // Plan 061, stage I (Gadi, 28 October 2026).
+    for (const [path, slug] of Object.entries(RETIRED_HALL_DRAWINGS)) {
+      const hall = gdHall(slug);
+      expect(hall, slug).toBeDefined();
+      expect(await redirected(path)).toEqual({
+        to: hallFiles(hall as never).svg.path,
+        permanent: true,
+      });
+      // Gone from the site's files and from what a ritual may capture.
+      expect(existsSync(`public${path}`), path).toBe(false);
+      expect(RITUAL_PUBLICATION_STATIC_PATHS).not.toContain(path);
+    }
+    // The other pictures are served as they are.
+    expect(await redirected("/pics/candidate-hexagram.svg")).toBeNull();
   });
 });

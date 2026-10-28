@@ -8,11 +8,6 @@ export const RITUAL_PUBLICATION_STATIC_PATHS = Object.freeze([
   "/pics/candidate-hexagram.jpg",
   "/pics/candidate-hexagram.svg",
   "/pics/mercury.webp",
-  "/pics/neophyte.svg",
   "/pics/planets2013.jpg",
-  "/pics/theoricus1.svg",
-  "/pics/theoricus2.svg",
   "/pics/treeOfLife.jpg",
-  "/pics/zelator1.svg",
-  "/pics/zelator2.svg",
 ] as const);

@@ -4,6 +4,7 @@ import type {
 } from "@magick-components/gd/hall/types";
 import { validateHall } from "@magick-components/gd/hall/validate";
 import { gdHallArt } from "@/app/gd/halls/art";
+import { RETIRED_HALL_DRAWINGS } from "@/seo/hallRedirects";
 import { parseRitualPugWithLocations, RITUAL_PUG_HEADER } from "./ritualPug";
 import type { RitualSourceLocation } from "./ritualSourceDiagnostics";
 import {
@@ -39,6 +40,11 @@ type Element = Extract<RitualSemanticNode, { kind: "element" }>;
  * The hall validator's paths count a node's compiled children, which
  * leave out source annotations (comments, blank lines), so the walk from
  * the hall to the node skips them too.
+ *
+ * An image of one of the site's retired temple drawings is a warning too,
+ * at its tag: publishing would fail on it, since publication cannot
+ * capture a file that is gone (plan 061, stage I), and the hall it showed
+ * is one `/hall` away.
  *
  * With `headerless`, the source is a ritual's Pug without its header
  * line (the `/gd/halls/editor` page's source, plan 061 stage E), and the lines
@@ -84,6 +90,22 @@ export function gdHallSourceWarnings(
   let firstHall: RitualSourceLocation | undefined;
   const visit = (node: RitualSemanticNode) => {
     if (node.kind !== "element") return;
+    if (
+      node.tag === "img" &&
+      Object.hasOwn(RETIRED_HALL_DRAWINGS, String(node.attrs.src))
+    ) {
+      const location = locations.get(node);
+      const at = location?.attributes?.src ?? location;
+      const line = at?.line ?? 1;
+      if (warnings.length >= MAX_HALL_WARNINGS) unshown++;
+      else
+        warnings.push({
+          line,
+          ...(at?.column === undefined ? {} : { column: at.column }),
+          message: `Line ${line}: this temple drawing was retired, so the ritual cannot be published with it; insert its hall with /hall (Temple hall) instead`,
+        });
+      return;
+    }
     if (node.tag !== "gdHall") {
       node.children?.forEach(visit);
       return;

@@ -8,7 +8,10 @@ import {
 } from "next/constants";
 import { legacyStaticImageAliases } from "./src/files/legacyStaticImages";
 import { RITUAL_PUBLICATION_STATIC_PATHS } from "./src/files/ritualPublicationStaticPaths";
-import { HALL_REDIRECTS } from "./src/seo/hallRedirects";
+import {
+  HALL_REDIRECTS,
+  RETIRED_DRAWING_REDIRECTS,
+} from "./src/seo/hallRedirects";
 
 // Vercel standalone can retain this package symlink while dropping a file traced
 // through it. Trace the physical target while the runtime keeps the stable alias.
@@ -106,6 +109,8 @@ export default async function (phase: string): Promise<NextConfig> {
       ),
       // The temple halls moved from /gd/hall to /gd/halls.
       ...HALL_REDIRECTS,
+      // The old temple drawings, retired for the halls' own images.
+      ...RETIRED_DRAWING_REDIRECTS,
     ],
     // See also alternative with patch-package:
     // https://stackoverflow.com/a/77722836/1839099

@@ -133,7 +133,8 @@ function useHallWarnings(
     warnings: RitualSourceWarning[];
   } | null>(null);
   React.useEffect(() => {
-    if (!enabled || !source.includes("gdHall")) {
+    // Halls, and images of the retired temple drawings under /pics.
+    if (!enabled || !/gdHall|\/pics\//.test(source)) {
       setFound(null);
       return;
     }

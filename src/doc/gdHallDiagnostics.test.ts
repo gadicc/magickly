@@ -113,6 +113,35 @@ describe("hall warnings in Pug source", () => {
   });
 });
 
+describe("warnings on the retired temple drawings", () => {
+  it("places one at each retired drawing's image, and none at others", () => {
+    const retired = '  img(src="/pics/zelator2.svg")';
+    expect(
+      gdHallSourceWarnings(
+        source(
+          'img(src="/pics/neophyte.svg")',
+          "note",
+          retired,
+          '  img(src="/pics/candidate-hexagram.svg")',
+        ),
+      ),
+    ).toEqual([
+      {
+        line: 2,
+        column: column("img", 'img(src="/pics/neophyte.svg")'),
+        message:
+          "Line 2: this temple drawing was retired, so the ritual cannot be published with it; insert its hall with /hall (Temple hall) instead",
+      },
+      {
+        line: 4,
+        column: column("img", retired),
+        message:
+          "Line 4: this temple drawing was retired, so the ritual cannot be published with it; insert its hall with /hall (Temple hall) instead",
+      },
+    ]);
+  });
+});
+
 describe("hall warnings in a hall's own source (/gd/halls/editor)", () => {
   it("counts lines from the first, without the header", () => {
     const line = '    altar(at="centre", colour="red")';

@@ -138,9 +138,9 @@ export default function Sequence() {
             . We crop it to fit, under the same licence.
           </li>
           <li>
-            The Sentinel&apos;s eye in the original temple drawings of the
-            built-in rituals (the <a href="/pics/neophyte.svg">Neophyte hall</a>
-            ):{" "}
+            The Sentinel&apos;s eye in the temple drawings the built-in rituals
+            showed before 28 October 2026 (the Neophyte hall), which rituals
+            published before then and copies cached by browsers may still hold:{" "}
             <a href="https://www.svgrepo.com/svg/322283/eye-of-horus">
               Eye of Horus
             </a>{" "}

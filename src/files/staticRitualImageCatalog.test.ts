@@ -862,7 +862,7 @@ describe("static SVG compatibility catalog v2", () => {
     ).toMatchObject({ kind: "unresolved", reason: "source-changed" });
     expect(seen[0].every((byte) => byte === 0)).toBe(true);
   });
-  it("validates all15 actual public images plus2 exact aliases without changing any source bytes", async () => {
+  it("validates all10 actual public images plus2 exact aliases without changing any source bytes", async () => {
     const publicDirectory = await fs.realpath(path.join(here, "../../public"));
     const names = [
       "30aethyrs.jpg",
@@ -873,13 +873,8 @@ describe("static SVG compatibility catalog v2", () => {
       "candidate-hexagram.jpg",
       "candidate-hexagram.svg",
       "mercury.webp",
-      "neophyte.svg",
       "planets2013.jpg",
-      "theoricus1.svg",
-      "theoricus2.svg",
       "treeOfLife.jpg",
-      "zelator1.svg",
-      "zelator2.svg",
     ];
     const paths = names.map((name) => `/pics/${name}`);
     const before = await Promise.all(
@@ -888,13 +883,13 @@ describe("static SVG compatibility catalog v2", () => {
       ),
     );
     const result = await catalog(paths, { publicDirectory });
-    expect(result.metadata.availablePaths).toHaveLength(17);
+    expect(result.metadata.availablePaths).toHaveLength(12);
     const images = result.metadata.entries.filter(
       (entry) => entry.kind === "available",
     );
     expect(
       images.filter((entry) => entry.validationKind === "svg"),
-    ).toHaveLength(6);
+    ).toHaveLength(1);
     expect(
       images.filter((entry) => entry.validationKind === "raster"),
     ).toHaveLength(11);
@@ -902,15 +897,8 @@ describe("static SVG compatibility catalog v2", () => {
       const bytes = result.copyBytes(entry.pathname)!;
       expect(hash(bytes)).toBe(entry.sha256);
       expect(bytes.length).toBe(entry.bytes);
-      if (entry.validationKind === "svg") {
-        expect(entry.embeddedRasters).toHaveLength(
-          entry.pathname.includes("theoricus1")
-            ? 1
-            : entry.pathname.includes("theoricus2")
-              ? 3
-              : 0,
-        );
-      }
+      if (entry.validationKind === "svg")
+        expect(entry.embeddedRasters).toHaveLength(0);
     }
     const after = await Promise.all(
       paths.map(async (name) =>

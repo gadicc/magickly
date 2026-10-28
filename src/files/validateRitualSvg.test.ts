@@ -56,14 +56,10 @@ describe("SVG compatibility bytes and actual corpus", () => {
     expect(result.embeddedRasters).toEqual([]);
     expect(result.byteSize).toBe(snapshot.byteLength);
   });
-  for (const name of [
-    "candidate-hexagram",
-    "neophyte",
-    "theoricus1",
-    "theoricus2",
-    "zelator1",
-    "zelator2",
-  ]) {
+  // The old temple drawings, two of which embedded PNGs, were retired in
+  // plan 061's stage I; embedded rasters are covered by the synthetic
+  // cases below.
+  for (const name of ["candidate-hexagram"]) {
     it(`validates exact existing ${name}.svg with fully decoded embedded PNGs`, async () => {
       const bytes = await readFile(`${process.cwd()}/public/pics/${name}.svg`);
       const before = Buffer.from(bytes);
@@ -79,9 +75,7 @@ describe("SVG compatibility bytes and actual corpus", () => {
       // Native comparisons retain exactness without walking every byte in Vitest.
       expect(before.equals(result.bytes)).toBe(true);
       expect(bytes.equals(before)).toBe(true);
-      expect(result.embeddedRasters).toHaveLength(
-        name === "theoricus1" ? 1 : name === "theoricus2" ? 3 : 0,
-      );
+      expect(result.embeddedRasters).toHaveLength(0);
       for (const embedded of result.embeddedRasters) {
         expect(embedded.contentType).toBe("image/png");
         expect(embedded.decodedPixels).toBeGreaterThan(0);
