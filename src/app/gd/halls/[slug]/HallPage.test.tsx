@@ -3,11 +3,18 @@ import { describe, expect, it, vi } from "vitest";
 import { expectEntityPage, textOf } from "../../../../../tests/entityPage";
 
 vi.mock("server-only", () => ({}));
+// The "Jump to hall" select pushes a route; no app router is mounted here.
+const push = vi.hoisted(() => vi.fn());
+vi.mock("next/navigation", async (importActual) => ({
+  ...(await importActual<typeof import("next/navigation")>()),
+  useRouter: () => ({ push }),
+}));
 
 import { GD_HALLS, gdHall, gdHallTitle } from "@/render/contracts/gdHall";
 import { hallFiles, hallJsonLd, hallMetadata } from "@/seo/halls";
 import HallPage from "./HallPage";
-import { generateStaticParams } from "./page";
+import { BLANK, RAIL_MEDIA } from "./HallRail";
+import Hall, { generateMetadata, generateStaticParams } from "./page";
 
 const html = (slug: string) =>
   renderToString(<HallPage hall={gdHall(slug) as never} />);
@@ -121,6 +128,79 @@ describe("a temple hall's page", () => {
       expect(text).not.toContain("nothing");
     },
   );
+
+  it("sets every hall beside it, the current one marked", () => {
+    const markup = html("practicus-1");
+    const rail =
+      markup.match(/<nav aria-label="All temple halls"[\s\S]*?<\/nav>/)?.[0] ??
+      "";
+    // Last in the markup, after the page's own words.
+    expect(markup.indexOf(rail)).toBeGreaterThan(
+      markup.indexOf('id="licence"'),
+    );
+    const links = [...rail.matchAll(/<a[^>]*href="([^"]+)"[^>]*>/g)];
+    expect(links.map(([, href]) => href)).toEqual([
+      "/gd/halls",
+      ...GD_HALLS.map((hall) => `/gd/halls/${hall.slug}`),
+    ]);
+    const current = links.filter(([tag]) =>
+      tag.includes('aria-current="page"'),
+    );
+    expect(current.map(([, href]) => href)).toEqual(["/gd/halls/practicus-1"]);
+    expect(rail.match(/loading="lazy"/g)).toHaveLength(14);
+    // Only a screen wide enough to show the rail fetches its thumbnails:
+    // each is a source for that width, over an inline blank.
+    for (const hall of GD_HALLS)
+      expect(rail).toContain(
+        `<source media="${RAIL_MEDIA}" srcSet="${hallFiles(hall).small.path}"`,
+      );
+    expect(rail.match(/<img [^>]*src="([^"]+)"/g)?.length).toBe(14);
+    for (const [, src] of rail.matchAll(/<img [^>]*src="([^"]+)"/g))
+      expect(src).toBe(BLANK);
+    expect(textOf(rail)).toContain("Practicus 3=8, 31st path");
+  });
+
+  it("offers every hall in a select grouped by grade, the current one chosen", () => {
+    const markup = html("theoricus-2");
+    const select = markup.match(/<select[\s\S]*?<\/select>/)?.[0] ?? "";
+    expect(
+      [...select.matchAll(/<optgroup label="([^"]+)"/g)].map(
+        ([, name]) => name,
+      ),
+    ).toEqual([
+      "Neophyte 0=0",
+      "Zelator 1=10",
+      "Theoricus 2=9",
+      "Practicus 3=8",
+      "Philosophus 4=7",
+      "Portal",
+    ]);
+    const options = [
+      ...select.matchAll(/<option[^>]*value="([^"]+)"[^>]*>([^<]+)</g),
+    ];
+    expect(options).toHaveLength(14);
+    expect(options[4].slice(1)).toEqual([
+      "/gd/halls/theoricus-2",
+      "Theoricus · Part 2 · In Yesod",
+    ]);
+    expect(options[4][0]).toContain('selected=""');
+    expect(textOf(markup)).toContain("Jump to hall");
+  });
+
+  it("routes a slug to its hall and anything else to a 404", async () => {
+    const params = (slug: string) => ({ params: Promise.resolve({ slug }) });
+    expect(await generateMetadata(params("zelator-1") as never)).toEqual(
+      hallMetadata("zelator-1"),
+    );
+    const page = await Hall(params("zelator-1") as never);
+    expect(page.props.hall).toBe(gdHall("zelator-1"));
+    // notFound() throws Next's own 404 error.
+    for (const call of [
+      () => generateMetadata(params("editor") as never),
+      () => Hall(params("nope") as never),
+    ])
+      await expect(call()).rejects.toThrow(/NEXT_HTTP_ERROR_FALLBACK;404/);
+  });
 
   it("describes itself to search and sharing, the card first", () => {
     const metadata = hallMetadata("zelator-1");

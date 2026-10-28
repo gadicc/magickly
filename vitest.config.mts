@@ -137,6 +137,7 @@ export default defineConfig({
         "src/components/gd/Lamen.tsx",
         "src/app/gd/halls/*.{ts,tsx}",
         "src/app/gd/halls/editor/*.{ts,tsx}",
+        "src/app/gd/halls/[[]slug]/*.{ts,tsx}",
         "src/components/gd/hall/art/*.{ts,tsx}",
         "src/components/gd/hall/attributes.ts",
         "src/components/gd/hall/fonts.ts",

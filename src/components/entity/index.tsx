@@ -36,11 +36,18 @@ export interface Neighbour {
 /**
  * The site's frame, `Container maxWidth="sm"` with the vertical margin the
  * other pages have, and the angel page's line height and heading sizes,
- * which a plain `<h1>` and `<h2>` inside it take.
+ * which a plain `<h1>` and `<h2>` inside it take. `maxWidth` widens it for
+ * a page that lays out columns of its own (the temple halls' rail).
  */
-export function EntityFrame({ children }: { children: ReactNode }) {
+export function EntityFrame({
+  children,
+  maxWidth = "sm",
+}: {
+  children: ReactNode;
+  maxWidth?: "sm" | "lg";
+}) {
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth={maxWidth}>
       <Box sx={{ my: 4 }} className={styles.frame}>
         {children}
       </Box>

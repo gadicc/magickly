@@ -1,7 +1,44 @@
-/* A temple hall's page (plan 062): the image fills the text column. */
+/* A temple hall's page (plan 062 and its amendment, sheet A2). Below
+   900 px one column in the markup's order, with the lede after the
+   actions; from 900 px the rail on the left; from 1,200 px the plan and
+   the words side by side. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The words' parts join the page's column on a phone, so that the lede
+   can follow the plan, previous and next, and the actions. */
+.words {
+  display: contents;
+}
+.words > * {
+  order: 4;
+}
+.near {
+  order: 1;
+}
+.actions {
+  order: 2;
+}
+.words > :first-child {
+  order: 3;
+}
+
+.top,
+.title,
+.figure {
+  order: 0;
+}
+
+.title {
+  margin-top: 0.3em;
+}
 
 .figure {
   margin: 0 0 1rem;
+  max-width: 568px;
 }
 
 .image {
@@ -23,6 +60,11 @@
   gap: 0.4em 1.4em;
 }
 
+/* Previous and next under the actions sit close to them. */
+.near nav {
+  margin: 0.5em 0 1em;
+}
+
 .note {
   font-size: 0.85rem;
   opacity: 0.8;
@@ -34,4 +76,141 @@
   border-left: 3px solid rgba(128, 128, 128, 0.4);
   font-size: 0.92rem;
   overflow-wrap: anywhere;
+}
+
+/* "Jump to hall", phones only. */
+.jump {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  margin: 0.6em 0 0.2em;
+  max-width: 568px;
+}
+.jumpLabel {
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+.jump select {
+  font: inherit;
+  font-size: 1rem;
+  padding: 0.5em 0.6em;
+  border: 1px solid rgba(128, 128, 128, 0.5);
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+}
+
+/* The rail: desktop only. */
+.rail {
+  display: none;
+}
+.railAll {
+  margin: 0 0 0.6em;
+  font-size: 0.9rem;
+}
+.railGroup ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 0 0 0.6em;
+  padding: 0;
+}
+.railGrade {
+  font-size: 0.78rem;
+  opacity: 0.75;
+  margin: 0 0 0.2em;
+}
+.railHall {
+  display: block;
+  width: 56px;
+  text-decoration: none;
+}
+.railCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 0.7rem;
+  line-height: 1.25;
+}
+.railHall:hover .railCard > span,
+.railHall:focus-visible .railCard > span {
+  text-decoration: underline;
+}
+.railHall img {
+  display: block;
+  width: 56px;
+  height: auto;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+}
+/* The current hall, outlined in the link's own colour. */
+.railHall[aria-current="page"] img {
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
+}
+.railHall[aria-current="page"] {
+  font-weight: 600;
+}
+
+@media (min-width: 900px) {
+  .page {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    grid-template-areas:
+      "rail top"
+      "rail title"
+      "rail figure"
+      "rail words";
+    column-gap: 2rem;
+    align-items: start;
+  }
+  .top {
+    grid-area: top;
+  }
+  .title {
+    grid-area: title;
+  }
+  .figure {
+    grid-area: figure;
+  }
+  .words {
+    grid-area: words;
+    display: block;
+  }
+  .jump {
+    display: none;
+  }
+  .rail {
+    display: block;
+    grid-area: rail;
+    grid-row: 1 / -1;
+    position: sticky;
+    top: 80px;
+    max-height: calc(100vh - 96px);
+    overflow-y: auto;
+  }
+}
+
+@media (min-width: 1200px) {
+  .page {
+    grid-template-columns: 200px minmax(0, 480px) minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "rail top top"
+      "rail figure title"
+      "rail figure words";
+  }
+}
+
+/* Read by screen readers, not shown. */
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
