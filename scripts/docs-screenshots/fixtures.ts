@@ -1,11 +1,16 @@
+import { createHash } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { LOCAL_ACCEPTANCE_USERS } from "../../src/auth/localTestIdentities";
 import { user } from "../../src/db/schema/auth";
 import { templeMemberships, temples } from "../../src/db/schema/memberships";
 import { ritualWriteReceipts } from "../../src/db/schema/ritualCommands";
+import {
+  ritualRevisions,
+  rituals as ritualRows,
+} from "../../src/db/schema/rituals";
 import { prepare } from "../../src/doc/prepare";
-import { semanticFromJrt } from "../../src/doc/semantic";
+import { semanticFromJrt, semanticToJrt } from "../../src/doc/semantic";
 import {
   createSqlRitualWriter,
   type SqlRitualWriteDatabase,
@@ -217,6 +222,12 @@ export async function seedDocsScreenshotFixtures(
       .where(eq(ritualWriteReceipts.operationId, ritual.operationId));
     if (receipt) {
       rituals[ritual.title] = receipt.ritualId;
+      await saveIfChanged(
+        db,
+        asCreator,
+        receipt.ritualId,
+        ritual.pug ?? neophytePug,
+      );
       continue;
     }
     const written = await createSqlRitualWriter(
@@ -237,4 +248,59 @@ export async function seedDocsScreenshotFixtures(
     rituals[ritual.title] = written.ritualId;
   }
   return { templeId, rituals };
+}
+
+/**
+ * Saves the ritual's source again when its Pug has changed since it was
+ * seeded (the bundled 0=0 drawing its hall from a preset, for one), so that
+ * the screenshots show the current source; the capture publishes it. The
+ * stored source is compared without node IDs, which conversion assigns
+ * afresh. The operation ID comes from the Pug's hash, so a rerun replays.
+ */
+async function saveIfChanged(
+  db: SeedDatabase,
+  asCreator: () => Promise<string | null>,
+  ritualId: string,
+  pug: string,
+) {
+  const [current] = await db
+    .select({
+      revisionId: ritualRows.currentRevisionId,
+      version: ritualRows.version,
+      source: ritualRevisions.source,
+    })
+    .from(ritualRows)
+    .innerJoin(
+      ritualRevisions,
+      eq(ritualRevisions.id, ritualRows.currentRevisionId),
+    )
+    .where(eq(ritualRows.id, ritualId));
+  const jrt = prepare(pug);
+  if (
+    !current?.revisionId ||
+    JSON.stringify(semanticToJrt(JSON.parse(current.source))) ===
+      JSON.stringify(jrt)
+  )
+    return;
+  const hash = createHash("sha256").update(pug).digest("hex");
+  const operationId = `019a0001-${hash.slice(0, 4)}-7${hash.slice(4, 7)}-8${hash.slice(7, 10)}-${hash.slice(10, 22)}`;
+  const [done] = await db
+    .select()
+    .from(ritualWriteReceipts)
+    .where(eq(ritualWriteReceipts.operationId, operationId));
+  if (done) return;
+  const saved = await createSqlRitualWriter(
+    db,
+    asCreator,
+  )({
+    version: 3,
+    operationId,
+    expectedActorId: creator.id,
+    kind: "save",
+    ritualId,
+    expectedRevisionId: current.revisionId,
+    expectedVersion: current.version,
+    source: JSON.stringify(semanticFromJrt(jrt)),
+  });
+  if (!saved.ok) throw new Error(`DOCS_SCREENSHOTS_SAVE_${saved.code}`);
 }

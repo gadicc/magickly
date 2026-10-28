@@ -55,7 +55,37 @@ declareVar(
 )
 title(text="Opening of the Hall of the Neophytes")
   | Opening of the Hall of the Neophytes
-img(src="/pics/neophyte.svg")
+note
+  gdHall(wall="gradient")
+    dais
+      officer(role="imperator")
+      officer(role="cancellarius")
+      officer(role="hierophant")
+      officer(role="pastHierophant")
+      officer(role="praemonstrator")
+    floor
+      banner(kind="east", x=9.57, y=-0.06)
+      pillar(kind="black", x=4, y=3, glow=true)
+      officer(role="hegemon", x=8, y=3, labelPos="top")
+      pillar(kind="white", x=12, y=3, glow=true)
+      altar(at="centre")
+        item(kind="cross", y=-0.36)
+        item(kind="triangle", y=0.24)
+        item(kind="rose", at="east", x=0.08)
+        item(kind="salt", at="north", y=-0.3)
+        item(kind="bread", at="north", x=0.05, y=0.34)
+        item(kind="lamp", at="south")
+        item(kind="cup", at="west", y=0.1)
+      officer(role="stolistes", x=1.05, y=8, labelPos="bottom")
+      officer(role="dadouchos", x=14.75, y=8, labelPos="bottom")
+      platform(x=8, y=14.5, w=4, h=3)
+        officer(role="hiereus", labelPos="top")
+      banner(kind="west", x=4.8, y=14.3)
+      officer(role="keryx", x=14, y=15, labelPos="top")
+      door(x=14, width=2)
+      officer(role="sentinel", x=14, y=17.15, labelPos="bottom")
+    caption(text="Neophyte Temple")
+  a(href="/gd/halls/neophyte") Neophyte Temple: stations, sources and downloads
 note
   b Officers
   ul

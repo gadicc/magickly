@@ -288,7 +288,7 @@ export default function TemplesGuide() {
       </ul>
       <Figure
         image={readerPhone}
-        alt="A temple ritual open on a phone: a title, then speech and action lines laid out in a single readable column."
+        alt="A temple ritual open on a phone: its opening title, then the Neophyte hall's floor plan in a single readable column."
         maxWidth={300}
       >
         A temple ritual on a phone, laid out to read at a glance rather than as
@@ -327,7 +327,7 @@ export default function TemplesGuide() {
       </Figure>
       <Figure
         image={editorVisual}
-        alt="The ritual editor in visual view, showing the ritual title, variables and an officers' note."
+        alt="The ritual editor in visual view, showing the ritual title, variables and the Neophyte hall's floor plan."
         maxWidth={900}
       >
         Visual view, for writing as the ritual will read.
