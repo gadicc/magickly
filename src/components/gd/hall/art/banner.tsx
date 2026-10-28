@@ -5,16 +5,11 @@ import { original, PALETTE, variantOf } from "./shared";
 
 export const provenance = {
   ...original(
-    "Redrawn as clean geometry from Gadi Cohen's own banners in " +
-      "public/pics/neophyte.svg (groups g44, the East, and g5, the West): " +
-      "a pennant on a rod with knobs, cord and tassels; the East bears the " +
+    "Gadi Cohen's own banner design, drawn as primitive geometry: a " +
+      "pennant on a rod with knobs, cord and tassels; the East bears the " +
       "yellow cross with the interlaced red and blue triangles and the white " +
-      "Tau, the West the white triangle with the red cross. Part of g44 " +
-      "is a path of steps on a 0.32-unit grid that looks auto-traced from " +
-      "a raster image; no path of either group is reused: these banners " +
-      "are primitive geometry throughout.",
+      "Tau, the West the white triangle with the red cross.",
   ),
-  source: "public/pics/neophyte.svg",
 };
 
 /** The pennant's half-width and its top, shoulder and point. */

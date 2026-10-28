@@ -125,12 +125,7 @@ function licenceFacts(props: GdHallImageProps) {
   return {
     title: escapeXml(gdHallTitle(entry)),
     page: escapeXml(`${SITE_URL}${gdHallPagePath(entry.slug)}`),
-    source: escapeXml(
-      preset.sources
-        .filter((source) => source.kind === "book")
-        .map(hallSourceCitation)
-        .join("; "),
-    ),
+    source: escapeXml(preset.sources.map(hallSourceCitation).join("; ")),
   };
 }
 

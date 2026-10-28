@@ -198,9 +198,16 @@ describe("the /gd/halls/editor page", { timeout: 20_000 }, () => {
       "disabled",
       true,
     );
+    // The book's page, the one source cited.
     expect(
-      screen.getByRole("link", { name: "public/pics/neophyte.svg" }),
-    ).toBeTruthy();
+      screen
+        .getByRole("link", {
+          name: "Regardie 1938, vol. 2, p.11 (archive.org leaf n3)",
+        })
+        .getAttribute("href"),
+    ).toBe(
+      "https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol2-1938/page/n3",
+    );
   });
 
   it("puts the editor below the page's text column, not inside it", () => {

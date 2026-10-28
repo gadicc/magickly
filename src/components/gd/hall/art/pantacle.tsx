@@ -7,13 +7,12 @@ import { original, PALETTE, sameForEveryNode } from "./shared";
 
 export const provenance = {
   ...original(
-    "The Pantacle redrawn from geometry after Gadi Cohen's Theoricus badge " +
-      "in public/pics/theoricus2.svg (g4-9): the Earth disc in its four " +
+    "The Pantacle drawn from geometry after Gadi Cohen's own Theoricus " +
+      "badge design: the Earth disc in its four " +
       "colours, an interlaced hexagram and a ring naming the Earth's " +
       "correspondences. The names are set letter by letter in the hall fonts " +
       "(SIL OFL 1.1); no glyph outlines are copied into the code.",
   ),
-  source: "public/pics/theoricus2.svg#g4-9",
 };
 
 /** Radii in the 100-unit box. */

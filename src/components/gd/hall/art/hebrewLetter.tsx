@@ -9,12 +9,11 @@ import { original, PALETTE, variantOf } from "./shared";
 
 export const provenance = {
   ...original(
-    "Redrawn after Gadi Cohen's letter banners in public/pics/zelator1.svg " +
-      "and theoricus1.svg: a light pennant on a rod with knobs, the letter " +
+    "Gadi Cohen's own letter banner design: a light pennant on a rod " +
+      "with knobs, the letter " +
       "set in Noto Serif Hebrew Bold (SIL OFL 1.1) by the browser; no glyph " +
       "outlines are copied into the code.",
   ),
-  source: "public/pics/zelator1.svg",
 };
 
 const TOP = -38;

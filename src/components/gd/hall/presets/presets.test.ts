@@ -51,10 +51,9 @@ describe("the hall presets", () => {
     ]);
     for (const preset of HALL_PRESETS)
       for (const source of preset.sources)
-        if (source.kind === "book")
-          expect(source.leaf, `${preset.id} p.${source.page}`).toBe(
-            leaves.get(source.page),
-          );
+        expect(source.leaf, `${preset.id} p.${source.page}`).toBe(
+          leaves.get(source.page),
+        );
   });
 
   it("cite the book page of their own hall, or say what they take", () => {
@@ -64,9 +63,7 @@ describe("the hall presets", () => {
     const pages = Object.fromEntries(
       HALL_PRESETS.map((preset) => [
         preset.id,
-        preset.sources.flatMap((source) =>
-          source.kind === "book" ? [source.page, source.note] : [],
-        ),
+        preset.sources.flatMap((source) => [source.page, source.note]),
       ]),
     );
     expect(pages).toEqual({
@@ -100,15 +97,14 @@ describe("the hall presets", () => {
   });
 
   it("write each source one way, with a stable link", () => {
+    // Only the primary sources (Gadi, 28 October 2026).
     expect(HALL_PRESETS[1].sources.map(hallSourceText)).toEqual([
-      "public/pics/zelator1.svg",
       "Regardie 1938, vol. 2, p.44 (archive.org leaf n38)",
     ]);
-    expect(HALL_PRESETS[2].sources.map(hallSourceText)[1]).toBe(
+    expect(HALL_PRESETS[2].sources.map(hallSourceText)).toEqual([
       "Regardie 1938, vol. 2, p.44 (archive.org leaf n38) (the Earth tablet, lamp and salt only)",
-    );
+    ]);
     expect(HALL_PRESETS[1].sources.map(hallSourceUrl)).toEqual([
-      "/pics/zelator1.svg",
       "https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol2-1938/page/n38",
     ]);
   });

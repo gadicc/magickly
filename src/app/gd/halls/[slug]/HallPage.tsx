@@ -172,17 +172,13 @@ export default function HallPage({ hall }: { hall: GdHallEntry }) {
           <h2>Sources</h2>
           {lead.sources ? <p>{lead.sources}</p> : null}
           <ul>
-            {/* The book pages only: the site's old drawings, which some
-            presets were ported from, are no source for a reader. */}
-            {preset.sources
-              .filter((source) => source.kind === "book")
-              .map((source) => (
-                <li key={hallSourceText(source)}>
-                  <Link href={hallSourceUrl(source)}>
-                    {hallSourceText(source)}
-                  </Link>
-                </li>
-              ))}
+            {preset.sources.map((source) => (
+              <li key={hallSourceText(source)}>
+                <Link href={hallSourceUrl(source)}>
+                  {hallSourceText(source)}
+                </Link>
+              </li>
+            ))}
           </ul>
           <p>
             The layout is taken from these sources and drawn with our own art;

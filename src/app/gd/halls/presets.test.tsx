@@ -1,4 +1,3 @@
-import { existsSync } from "node:fs";
 import {
   GdHall,
   type ResolvedObject,
@@ -26,7 +25,6 @@ import { inventoryRitualAssets } from "@/offline/ritualAssetInventory";
 import { gdHallArt } from "./art";
 
 /** The presets ported from the old drawings in `public/pics`. */
-const DRAWN = ["neophyte", "zelator1", "zelator2", "theoricus1", "theoricus2"];
 
 const render = (hall: (typeof HALL_PRESETS)[number]["hall"]) =>
   renderToStaticMarkup(<GdHall hall={hall} art={gdHallArt} />);
@@ -46,26 +44,17 @@ describe.each(HALL_PRESETS.map((preset) => [preset.id, preset] as const))(
       ).toBeLessThan(0.02);
     });
 
-    it("says where its layout comes from", () => {
-      // The five ported from the old drawings cite them; the others are
-      // the book's layouts alone (plan 061, Presets).
-      if (DRAWN.includes(id))
-        expect(preset.sources).toContainEqual({
-          kind: "drawing",
-          path: `public/pics/${id}.svg`,
-        });
-      else
-        expect(preset.sources.every((source) => source.kind === "book")).toBe(
-          true,
-        );
-      for (const source of preset.sources)
-        if (source.kind === "drawing")
-          expect(existsSync(source.path), source.path).toBe(true);
-        else {
-          expect(Object.hasOwn(HALL_SOURCE_WORKS, source.work)).toBe(true);
-          expect(Number.isInteger(source.page) && source.page > 0).toBe(true);
-          expect(Number.isInteger(source.leaf) && source.leaf > 0).toBe(true);
-        }
+    it("says where its layout comes from: book pages only", () => {
+      // Only primary sources are cited (Gadi, 28 October 2026); the site's
+      // own hand drawings were made from these diagrams and are none.
+      expect(preset.sources.length).toBeGreaterThan(0);
+      for (const source of preset.sources) {
+        expect(source.kind).toBe("book");
+        expect(Object.hasOwn(HALL_SOURCE_WORKS, source.work)).toBe(true);
+        expect(Number.isInteger(source.page) && source.page > 0).toBe(true);
+        expect(Number.isInteger(source.leaf) && source.leaf > 0).toBe(true);
+      }
+      expect(JSON.stringify(preset)).not.toContain("public/pics");
     });
 
     it("draws the same SVG every time, with the app's art", async () => {
@@ -114,7 +103,11 @@ describe("the presets", () => {
   it("have unique ids and titles, each its caption", () => {
     const ids = HALL_PRESETS.map((preset) => preset.id);
     expect(ids).toEqual([
-      ...DRAWN,
+      "neophyte",
+      "zelator1",
+      "zelator2",
+      "theoricus1",
+      "theoricus2",
       "practicus1",
       "practicus2",
       "practicus3",

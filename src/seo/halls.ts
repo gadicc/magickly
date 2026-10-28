@@ -351,7 +351,6 @@ export function hallJsonLd(hall: GdHallEntry) {
   const L = GD_HALL_LICENCE;
   // Each cited page as its book, the page and leaf in its description.
   const books = preset.sources.flatMap((source) => {
-    if (source.kind !== "book") return [];
     const work = HALL_SOURCE_WORKS[source.work];
     return [
       {

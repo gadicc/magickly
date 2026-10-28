@@ -6,11 +6,9 @@ import { original, PALETTE, variantOf } from "./shared";
 
 export const provenance = {
   ...original(
-    "The Flaming Sword as a zig-zag, after Gadi Cohen's drawing in " +
-      "public/pics/theoricus2.svg (g3-8), with the arrowhead drawn as a " +
-      "triangle instead of an SVG marker.",
+    "The Flaming Sword as a zig-zag, after Gadi Cohen's own design, with " +
+      "the arrowhead drawn as a triangle instead of an SVG marker.",
   ),
-  source: "public/pics/theoricus2.svg#g3-8",
 };
 
 const STROKE = 3.8;

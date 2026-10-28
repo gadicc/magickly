@@ -1,5 +1,5 @@
 import type { HallNode } from "../types";
-import { dais, drawing, type HallPreset, regardie1938 } from "./types";
+import { dais, type HallPreset, regardie1938 } from "./types";
 
 /** The Zelator's letters above the East: Shin, Tau and Qoph. */
 const LETTERS: HallNode = {
@@ -15,8 +15,7 @@ const LETTERS: HallNode = {
  * The Earth tablet as the book draws it (p.44, conflict 7): standing inside
  * the hall, its outer edge on the North wall line, the lamp at its East end
  * and the salt at its West end. It is the Theoricus board's size (the
- * default scale, 2.69 squares along the wall); our drawings hang a board
- * twice that size outside the wall, which is drift.
+ * default scale, 2.69 squares along the wall).
  */
 const NORTH: readonly HallNode[] = [
   { type: "tablet", element: "earth", anchor: "north", x: -0.31, y: 8 },
@@ -35,7 +34,7 @@ const PILLARS: readonly HallNode[] = [
 ];
 
 /**
- * The Zelator hall, first part, ported from `public/pics/zelator1.svg`. As
+ * The Zelator hall, first part, after Regardie 1938, vol. 2, p.44. As
  * the book draws it, the altar also bears the Flaming Sword with the cross
  * in the triangle at its base, and a red lamp at its East end.
  */
@@ -44,7 +43,7 @@ export const zelator1: HallPreset = {
   title: "Zelator Temple 1",
   grade: "1=10",
   part: 1,
-  sources: [drawing("zelator1"), regardie1938(44, 38)],
+  sources: [regardie1938(44, 38)],
   hall: {
     type: "gdHall",
     dais: 5,
@@ -100,9 +99,8 @@ export const zelator1: HallPreset = {
 };
 
 /**
- * The Zelator hall, second part, ported from `public/pics/zelator2.svg`:
- * the altar in the East, the Table of Shewbread in the North and the
- * candlestick in the South.
+ * The Zelator hall, second part: the altar in the East, the Table of
+ * Shewbread in the North and the candlestick in the South.
  */
 export const zelator2: HallPreset = {
   id: "zelator2",
@@ -111,10 +109,7 @@ export const zelator2: HallPreset = {
   part: 2,
   // The book's diagram of the second part is not yet located; p.44 draws
   // the first part and is cited only for the North wall it shares.
-  sources: [
-    drawing("zelator2"),
-    regardie1938(44, 38, "the Earth tablet, lamp and salt only"),
-  ],
+  sources: [regardie1938(44, 38, "the Earth tablet, lamp and salt only")],
   hall: {
     type: "gdHall",
     dais: 5,

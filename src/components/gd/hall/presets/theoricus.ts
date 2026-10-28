@@ -1,5 +1,5 @@
 import type { HallNode } from "../types";
-import { dais, drawing, type HallPreset, regardie1938 } from "./types";
+import { dais, type HallPreset, regardie1938 } from "./types";
 
 /**
  * The East of both parts: the Air tablet standing over the edge of the
@@ -12,16 +12,15 @@ const AIR: readonly HallNode[] = [
 ];
 
 /**
- * The Theoricus hall of the 32nd path, ported from
- * `public/pics/theoricus1.svg`. The Universe, the path's trump, lies on
- * the altar.
+ * The Theoricus hall of the 32nd path, after Regardie 1938, vol. 2,
+ * p.69. The Universe, the path's trump, lies on the altar.
  */
 export const theoricus1: HallPreset = {
   id: "theoricus1",
   title: "Theoricus Temple 1",
   grade: "2=9",
   part: 1,
-  sources: [drawing("theoricus1"), regardie1938(69, 63)],
+  sources: [regardie1938(69, 63)],
   hall: {
     type: "gdHall",
     dais: 5,
@@ -87,7 +86,7 @@ export const theoricus1: HallPreset = {
 };
 
 /**
- * The Theoricus 2=9 hall, ported from `public/pics/theoricus2.svg`: Resh,
+ * The Theoricus 2=9 hall, after Regardie 1938, vol. 2, p.82: Resh,
  * Samekh and Tzaddi above the East and Tau beyond the West. The kamea of
  * Luna is drawn from its numbers; the seals of Luna are a placeholder and
  * the serpent on the Tree a marker until their art is drawn (stage H).
@@ -97,7 +96,7 @@ export const theoricus2: HallPreset = {
   title: "Theoricus Temple 2",
   grade: "2=9",
   part: 2,
-  sources: [drawing("theoricus2"), regardie1938(82, 76)],
+  sources: [regardie1938(82, 76)],
   hall: {
     type: "gdHall",
     dais: 5,

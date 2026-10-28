@@ -1,15 +1,15 @@
-import { dais, drawing, type HallPreset, regardie1938 } from "./types";
+import { dais, type HallPreset, regardie1938 } from "./types";
 
 /**
- * The Neophyte hall, ported from `public/pics/neophyte.svg`. The Banner of
- * the West stands free on the floor North-West of the Hiereus' platform, as
- * the book draws it, not on the platform as the drawing has it.
+ * The Neophyte hall, after Regardie 1938, vol. 2, p.11. The Banner of the
+ * West stands free on the floor North-West of the Hiereus' platform, as
+ * the book draws it.
  */
 export const neophyte: HallPreset = {
   id: "neophyte",
   title: "Neophyte Temple",
   grade: "0=0",
-  sources: [drawing("neophyte"), regardie1938(11, 3)],
+  sources: [regardie1938(11, 3)],
   hall: {
     type: "gdHall",
     wall: "gradient",
