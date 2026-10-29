@@ -2,7 +2,7 @@ import { AdminPanelSettingsTwoTone } from "@mui/icons-material";
 import { getCurrentSqlViewer } from "@/auth/viewer";
 import Tiles from "@/components/Tiles";
 import GDLogoSquished from "@/goldendawn-logo-squished.svg";
-import JsonLd, { WEBSITE_JSON_LD } from "@/seo/JsonLd";
+import JsonLd, { SITE_JSON_LD } from "@/seo/JsonLd";
 import { pageMetadata } from "@/seo/metadata";
 import AndroidMagician from "./img/android-magician.png";
 import AstrologyTile from "./img/astrology.jpeg";
@@ -93,7 +93,7 @@ async function Index() {
 
   return (
     <>
-      <JsonLd data={WEBSITE_JSON_LD} />
+      <JsonLd data={SITE_JSON_LD} />
       <Tiles tiles={_tiles} />
     </>
   );

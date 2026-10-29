@@ -244,11 +244,13 @@ describe("the temple halls' search pages", () => {
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       publisher: {
         "@type": "Organization",
+        "@id": "https://magick.ly/#organization",
         name: "Magick.ly",
         url: "https://magick.ly/",
       },
       creator: {
         "@type": "Organization",
+        "@id": "https://magick.ly/#organization",
         name: "Magick.ly",
         url: "https://magick.ly/",
       },

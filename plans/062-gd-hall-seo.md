@@ -1534,3 +1534,46 @@ requires `name`, `offers.price` and either `aggregateRating` or
 With no rating the page earns no software-app rich result; the node is
 structured data only, which is what was wanted.
 
+### A13. The site and its publisher in one graph (29 October 2026)
+
+Gadi asked on 29 October 2026 for the same markup for the app as a
+whole. The home page alone carries one JSON-LD graph (`SITE_JSON_LD`
+in `src/seo/JsonLd.tsx`, in place of the lone `WebSite` node):
+
+- **`WebSite`** (`https://magick.ly/#website`), as before (name,
+  alternate name, URL, description), now with `publisher` pointing at
+  the Organization's `@id`.
+- **`Organization`** (`https://magick.ly/#organization`): "Magick.ly",
+  its URL, `logo` the app's largest manifest icon
+  (`/favicons/android-icon-192x192.png`, a 192 × 192 PNG; Google asks
+  for at least 112 × 112), and `sameAs` the GitHub repository, its one
+  real profile.
+- **`WebApplication`** (`https://magick.ly/#app`), the PWA as a whole:
+  name, URL and the site's description; `applicationCategory`
+  "ReferenceApplication", since the site is reference first
+  (correspondence tables, dictionaries, the Tree of Life, the rituals)
+  with study tools beside it, as its own description says (the
+  flashcards alone would suggest EducationalApplication);
+  `operatingSystem` "Any"; a free offer in US dollars, as in Google's
+  own examples (the apps are free); `publisher`
+  the Organization's `@id`. No `browserRequirements`: most pages read
+  without JavaScript, so no single requirement is true of the whole.
+- **Elsewhere** the Organization is named by the same `@id`, with its
+  type, name and URL inline (`SITE_ORGANIZATION` in `src/seo/site.ts`),
+  because Google reads each page on its own and does not follow an
+  `@id` to another page: the editor's `WebApplication` (A12) as
+  publisher and creator, and the hall images' `ImageObject`s as
+  creator. The app node is on the home page only, the editor's on the
+  editor only.
+
+Tests hold the graph's shape and order, that every `{"@id"}`
+reference resolves to a node in the same graph, and that the logo file
+is served, a PNG, square, at least 112 px and of the declared size, and
+the manifest's own icon.
+
+What Google can use: the site name (`WebSite`) and the organization's
+logo (`Organization` with `logo`, on the home page, as its documentation
+recommends). What it cannot: a software-app rich result for either app
+node, which needs `aggregateRating` or `review`; there are none, and
+none is made up. Both app nodes are structured data only.
+

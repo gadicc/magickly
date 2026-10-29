@@ -40,8 +40,11 @@ function expectLicensable(image: Record<string, unknown>) {
   ])
     expect(image[field], field).toBeTruthy();
   expect(image.license).toBe("https://creativecommons.org/licenses/by/4.0/");
+  // The home page's Organization, by its @id, its name and URL inline
+  // since Google reads each page alone.
   expect(image.creator).toEqual({
     "@type": "Organization",
+    "@id": "https://magick.ly/#organization",
     name: "Magick.ly",
     url: "https://magick.ly/",
   });

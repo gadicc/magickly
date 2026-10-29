@@ -3,12 +3,19 @@ export const SITE_URL = "https://magick.ly";
 
 export const SITE_NAME = "Magick.ly";
 
+/** The site's `Organization` node, defined in full on the home page. */
+export const SITE_ORGANIZATION_ID = `${SITE_URL}/#organization`;
+
 /**
- * The site as an `Organization` in structured data: the hall images'
- * creator and the hall editor's publisher, one node for both.
+ * The site as an `Organization` where another page names it (the hall
+ * images' creator, the hall editor's publisher): its `@id`, which points
+ * at the home page's full node, with its type, name and URL inline, since
+ * Google reads each page on its own and does not follow an `@id` to
+ * another page.
  */
 export const SITE_ORGANIZATION = {
   "@type": "Organization",
+  "@id": SITE_ORGANIZATION_ID,
   name: SITE_NAME,
   url: `${SITE_URL}/`,
 } as const;
