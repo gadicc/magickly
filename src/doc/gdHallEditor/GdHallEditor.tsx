@@ -48,6 +48,7 @@ import {
 } from "./hallEdits";
 import {
   doorRect,
+  drawnRect,
   hitRects,
   hitTest,
   objectRect,
@@ -143,6 +144,30 @@ export interface GdHallEditorProps {
    * page moves its source caret by it (plan 063).
    */
   onSelectionChange?: (selection: HallSelection | null) => void;
+  /**
+   * A selection the host asks for, applied once per object: the node at
+   * the row `path` in `hall`, or its nearest drawn ancestor; nothing for
+   * null, `[]` (the hall) or a path the hall lacks. Ignored unless `hall`
+   * is the hall the editor holds, and during a gesture. It takes no focus
+   * and announces nothing; a node it selects out of view is scrolled into
+   * the drawing's own scrolling box, or the page only with `pageInset`.
+   * The hall editor page selects by its source caret (plan 063).
+   */
+  selectPath?: HallSelectionRequest | null;
+}
+
+/** A selection a host asks for (`selectPath`). */
+export interface HallSelectionRequest {
+  path: readonly number[] | null;
+  hall: HallElement;
+  /**
+   * The page may scroll too, to show a node selected out of view when the
+   * drawing has no scrolling box of its own, keeping this many pixels
+   * clear at the window's top (an app bar). Without it only such a box
+   * scrolls. The hall editor page gives it beside its sticky source
+   * panel, where scrolling the page leaves the source in place.
+   */
+  pageInset?: number;
 }
 
 /** A selection as `onSelectionChange` reports it. */
@@ -185,6 +210,12 @@ const REFUSED = "That change was not made; the hall is as it was.";
 
 /** Pixels kept between a selection scrolled into view and its box's edges. */
 const REVEAL_MARGIN = 12;
+/**
+ * The margin kept around a node selected from the source as it is
+ * revealed, label included: the author did not pick it out on the
+ * drawing, so it is shown with room to see it (plan 063).
+ */
+const ASKED_REVEAL_MARGIN = 16;
 
 /** Cut, copy and paste, with Ctrl or Cmd. */
 const CLIPBOARD_KEYS = new Set(["x", "c", "v"]);
@@ -242,6 +273,7 @@ export function GdHallEditor({
   initialFocus = "drawing",
   createId = createRitualNodeId,
   onSelectionChange,
+  selectPath,
 }: GdHallEditorProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [preview, setPreview] = useState<HallElement | null>(null);
@@ -320,6 +352,10 @@ export function GdHallEditor({
   const revealPending = useRef<{
     id: string | null;
     hall: HallElement;
+    /** Only within the drawing's scrolling box, or the page with an inset. */
+    contained?: boolean;
+    /** The window's top kept clear when a contained reveal scrolls the page. */
+    pageInset?: number;
   } | null>(null);
   const markReveal = () => {
     revealPending.current = { id: selectedId, hall: currentRef.current };
@@ -348,6 +384,32 @@ export function GdHallEditor({
   useEffect(() => {
     if (selectedId && !committed.byId.has(selectedId)) setSelectedId(null);
   }, [committed, selectedId]);
+
+  // After the effect above, so a node the source names again with a new
+  // ID (one typed without, read again) is selected, not cleared.
+  const requested = useRef<HallSelectionRequest | null>(null);
+  useEffect(() => {
+    if (!selectPath || selectPath === requested.current) return;
+    // Not yet the hall it names: the host gives the hall and the request
+    // together, so it waits the render or two until they agree (a hall
+    // the editor sent shows until the host gives it back).
+    if (selectPath.hall !== committed.hall) return;
+    requested.current = selectPath;
+    // One made during a drag is dropped, never applied after it.
+    if (gesture.current) return;
+    const target = selectPath.path
+      ? selectableForPath(committed, selectPath.path)
+      : undefined;
+    const id = target?.id ?? null;
+    if (id === selectedId) return;
+    revealPending.current = {
+      id: selectedId,
+      hall: committed.hall,
+      contained: true,
+      pageInset: selectPath.pageInset,
+    };
+    setSelectedId(id);
+  }, [selectPath, committed, selectedId]);
 
   /** The selection last reported; undefined until the first report. */
   const reported = useRef<string | undefined>(undefined);
@@ -954,10 +1016,18 @@ export function GdHallEditor({
     const area = element.getBoundingClientRect();
     if (area.width <= 0) return;
     const scale = area.width / (box.x1 - box.x0);
+    // A selection the host asked for is shown whole, its label too.
+    const shown =
+      pending.contained && selected?.object
+        ? drawnRect(selected.object)
+        : selectedRect;
+    const margin = pending.contained ? ASKED_REVEAL_MARGIN : REVEAL_MARGIN;
     const scroller = scrollingAncestor(root.current);
+    if (pending.contained && !scroller && pending.pageInset === undefined)
+      return;
     const port = scroller
       ? scroller.getBoundingClientRect()
-      : { top: 0, bottom: windowRoom() };
+      : { top: pending.pageInset ?? 0, bottom: windowRoom() };
     const dock = dockStuck
       ? (root.current
           ?.querySelector("[data-hall-panel]")
@@ -965,12 +1035,12 @@ export function GdHallEditor({
       : 0;
     const delta = revealDelta(
       {
-        top: area.top + (selectedRect.y0 - box.y0) * scale,
-        bottom: area.top + (selectedRect.y1 - box.y0) * scale,
+        top: area.top + (shown.y0 - box.y0) * scale,
+        bottom: area.top + (shown.y1 - box.y0) * scale,
       },
       {
-        top: port.top + REVEAL_MARGIN,
-        bottom: port.bottom - dock - REVEAL_MARGIN,
+        top: port.top + margin,
+        bottom: port.bottom - dock - margin,
       },
     );
     if (delta !== 0) (scroller ?? window).scrollBy({ top: delta });

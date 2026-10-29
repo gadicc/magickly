@@ -540,9 +540,10 @@ Follow-ups are separate from the completed migration work:
   DOM order (CSS `order` puts previous and next and the actions above
   the lede), so reorder the markup or accept it
   ([plan 062's amendment](062-gd-hall-seo.md#amendment-the-halls-under-gdhalls-28-october-2026), A4).
-- Linked selection in the hall editor: planned on 29 October 2026 on
-  `gate/hall-sync` ([plan 063](063-hall-selection-link.md)), reviewed
-  and answered by Gadi the same day. In `/gd/halls/editor`'s split view,
+- Linked selection in the hall editor: planned and built on 29 October
+  2026 on `gate/hall-sync` ([plan 063](063-hall-selection-link.md)),
+  reviewed and answered by Gadi the same day, every commit gated;
+  awaiting review and merge. In `/gd/halls/editor`'s split view,
   selecting an item in the drawing moves the source caret to its tag,
   and moving the caret selects the item. TODO (out of its scope): the
   same link in the ritual editor's split view, between a hall item and

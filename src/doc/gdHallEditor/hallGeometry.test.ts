@@ -11,12 +11,14 @@ import {
   doorAlongAttr,
   doorRect,
   dragScale,
+  drawnRect,
   hitRects,
   hitTest,
   MIN_HIT_SIZE,
   moveAttrs,
   moveDoor,
   nudgeAttrs,
+  objectRect,
   round2,
   scaleValue,
   snapHalf,
@@ -293,5 +295,38 @@ describe("compareRowPaths", () => {
       [1, 2, 0],
       [1, 10],
     ]);
+  });
+});
+
+describe("drawnRect", () => {
+  it("takes in an object's label and text, as drawn", () => {
+    const hall = resolved(
+      hallFromPug(
+        "gdHall",
+        "  floor",
+        '    officer(role="sentinel", x=14, y=12, labelPos="bottom")',
+        '    pillar(kind="black", x=4, y=3)',
+        '    marker(text="Here", x=8, y=8)',
+      ),
+    );
+    const [sentinel, pillar, marker] = hall.objects;
+    const label = sentinel.labels[0].bounds;
+    expect(drawnRect(sentinel)).toEqual({
+      ...objectRect(sentinel),
+      y1: label.y1,
+      x0: Math.min(objectRect(sentinel).x0, label.x0),
+      x1: Math.max(objectRect(sentinel).x1, label.x1),
+    });
+    // Nothing drawn beyond its box: the box.
+    expect(pillar.labels).toHaveLength(0);
+    expect(drawnRect(pillar)).toEqual(objectRect(pillar));
+    // A marker's text, drawn over it, is inside the union too.
+    const text = (marker.inner ?? marker.text)?.bounds;
+    if (!text) throw new Error("no marker text");
+    const union = drawnRect(marker);
+    expect(union.x0).toBeLessThanOrEqual(text.x0);
+    expect(union.x1).toBeGreaterThanOrEqual(text.x1);
+    expect(union.y0).toBeLessThanOrEqual(text.y0);
+    expect(union.y1).toBeGreaterThanOrEqual(text.y1);
   });
 });

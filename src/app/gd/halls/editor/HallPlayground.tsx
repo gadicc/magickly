@@ -363,10 +363,15 @@ export default function HallPlayground() {
   );
   const displayMode = !shownHall && mode === "visual" ? "source" : mode;
   // In split view the source and the drawing select together (plan 063).
+  const sourceText = React.useCallback(
+    () => unread.current ?? now.current.present.source,
+    [],
+  );
   const link = useHallSelectionLink({
     linked: displayMode === "split",
     present,
     typed,
+    text: sourceText,
   });
 
   // Typed source is read once typing rests. Anything else the author does
@@ -839,6 +844,7 @@ export default function HallPlayground() {
               header={<h2 className={styles.panelTitle}>Pug source</h2>}
               onChange={onSourceChange}
               cursor={link.cursor}
+              onCursor={link.onCursor}
             />
           </section>
         )}
@@ -859,6 +865,7 @@ export default function HallPlayground() {
                 onUndo={undo}
                 onRedo={redo}
                 onSelectionChange={link.onSelectionChange}
+                selectPath={link.selectPath}
               />
             ) : (
               <p className={styles.empty}>

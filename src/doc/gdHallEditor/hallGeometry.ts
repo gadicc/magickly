@@ -173,6 +173,26 @@ export function objectRect(object: ResolvedObject): Rect {
 }
 
 /**
+ * All an object draws: its box, its labels and its text, in one rect, so
+ * that revealing it shows its name too (plan 063).
+ */
+export function drawnRect(object: ResolvedObject): Rect {
+  return [
+    ...object.labels.map((label) => label.bounds),
+    ...(object.text ? [object.text.bounds] : []),
+    ...(object.inner ? [object.inner.bounds] : []),
+  ].reduce(
+    (union, rect) => ({
+      x0: Math.min(union.x0, rect.x0),
+      y0: Math.min(union.y0, rect.y0),
+      x1: Math.max(union.x1, rect.x1),
+      y1: Math.max(union.y1, rect.y1),
+    }),
+    objectRect(object),
+  );
+}
+
+/**
  * Where a pointer hits an object: its box, at least `MIN_HIT_SIZE` across,
  * and its labels and text.
  */

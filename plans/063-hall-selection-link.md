@@ -2,7 +2,8 @@
 
 Status: planned on `gate/hall-sync`, reviewed (Fable) and answered by
 Gadi on 29 October 2026; amended the same day with both, below, then
-built on the same branch from `main` at 05dd5f6e. Read
+built on the same branch from `main` at 05dd5f6e, every commit gated;
+see "The build". Awaiting review. Read
 [current status](000-current-status.md) and the stage E notes of
 [plan 061](061-gd-hall.md) first.
 
@@ -25,7 +26,12 @@ Gadi approved the feature for `/gd/halls/editor` in split view:
 3. **Changed:** an item selected from the source that is out of view in
    the drawing is scrolled into view by the drawing's own scroll
    container, just enough (nearest), clear of a docked panel. Never the
-   page (decision 3).
+   page (decision 3). Later the same day, asked again once the build
+   showed that this page's drawing has no scroll container of its own,
+   Gadi said yes to scrolling the page when the panels stand side by
+   side (from 900 px, the source panel sticky), just enough, clear of
+   the app bar; never stacked, never for a selection made in the
+   drawing.
 4. The link stays on in the stacked split view on phones; the page never
    scrolls (decision 6).
 5. While typing, the item under the caret is selected again at each
@@ -182,9 +188,14 @@ rule, which needs no indentation, replaced it.)
 - **No focus, no announcement:** `setSelectedId`, not `select()`.
 - **Reveal (answer 3):** the selection is scrolled into view by the
   drawing's scrolling ancestor, nearest and clear of a docked panel
-  (`markReveal`'s path, contained); with none, nothing scrolls. On
-  `/gd/halls/editor` that is always the case, so there the selection
-  shows wherever the page is scrolled.
+  (`markReveal`'s path, contained). With none, as on
+  `/gd/halls/editor`, the page scrolls instead only when the request
+  carries `pageInset`: the page gives it (the app bar's 64 px) while
+  the panels stand side by side (`(min-width: 900px)`), where the
+  sticky source stays put; stacked, nothing scrolls. A selection made in
+  the drawing never asks. Either way the node is shown whole, its label
+  and text with its box (`drawnRect`), 16 px clear of the edges; one
+  taller than the room shows from its top.
 
 ### 4. Loops and echoes
 
@@ -205,6 +216,7 @@ onSelectionChange?: (
 selectPath?: {
   path: readonly number[] | null;
   hall: HallElement;
+  pageInset?: number; // the page may scroll too, this much kept clear
 } | null; // applied once per object, if `hall` is held, not mid-gesture
 ```
 
@@ -267,3 +279,94 @@ Each gated alone in a clean `git archive` export under `~/.cache/gates/`
 - The shared source editor: new behaviour only behind optional props.
 - Scroll arithmetic below the viewport is an estimate until measured.
 - The focus-origin rule is a heuristic (a toolbar Undo after typing).
+
+## The build, 29 October 2026
+
+Three commits on `gate/hall-sync` after this plan, each gated alone
+(`~/.cache/gates/hallsync/gate.sh`: a `git archive` export, install,
+check, typecheck, test:coverage, build), the tip with the full checks:
+
+1. `feat(gd): Map hall source to drawing paths`: `hallSourceMap.ts`,
+   `parseHallSourceWithLocations`, the locations and `\n` line breaks in
+   `entryOfSource`.
+2. `feat(gd): Follow drawing selection in the source`:
+   `onSelectionChange`, `cursor` and `centredScrollTop`, the caret
+   line's mark, `useHallSelectionLink`'s drawing half.
+3. `feat(gd): Select hall items from the source caret`: `onCursor`,
+   `selectPath` with its contained reveal, the hook's source half.
+
+Where the build departs from the decisions above: `selectPath` and
+`cursor` are applied once per object (no `key`); the page re-renders
+for a caret move only when the caret comes to another item. The caret
+is found by the selected node's ID in the entry's hall, so a node an
+edit moved is found before the drawing reports its new path.
+
+### The browser check
+
+Headless Chromium over CDP against a production build of the tip's
+tree (`next start -H 127.0.0.1`, the gate's placeholder environment),
+at 1,440 × 900 and 390 × 844 (mobile emulation), the Neophyte hall:
+
+- Tab and a click in the drawing put the caret on the item's tag
+  (column of the tag name) with the mark; nudges, a copy (the caret on
+  the copy), Delete (the caret left where it was), undo and redo, an
+  object added from the palette all behaved as decision 2 says; the
+  focus stayed in the drawing and the page did not scroll.
+- A click and the arrow keys in the source selected the item of each
+  line (a banner, an officer on a platform, the platform), the `gdHall`
+  line nothing; the focus stayed in the source. Typing an attribute,
+  and a tag typed without an ID, were selected at the read, and again
+  at the next read with a fresh ID.
+- Answer 3, as first built: the Sentinel, selected from the source with
+  its box at the foot of the window (y 894 of 900), did not scroll into
+  view, since this page's drawing has no scroll container of its own.
+  After Gadi's yes (above), checked again the same way: at first the
+  page scrolled 53 px and showed the Sentinel's box but cut its label
+  off at the window's foot, so the reveal now takes in the label. Then
+  the page scrolled 74 px, the label's foot at 885 (the window's 900
+  less 16 px, give or take the text's own box), the source panel and
+  the focus where they were (screenshots 07 and 08); the Hegemon,
+  already in view, moved nothing; on a phone (stacked) the page stayed
+  at 0 with the Sentinel below the fold (09).
+- Phone (stacked): a tap in the drawing, with the page scrolled to the
+  drawing, moved the caret and scrolled only the source box (to 361 px);
+  `scrollY` stayed at 900. A click in the source selected in the
+  drawing. Headless Chromium's synthesized tap does not focus
+  CodeMirror (on the desktop either), so the source was clicked.
+- 1,000 nodes (a caption, a floor, 997 markers), typed in as one
+  paste: a caret move to the next marker drew its box in 41 ms (median
+  of 20; at most 60) with no long task; Tab in the drawing moved the
+  caret in 24 ms. The long tasks left are the read of typing (126 ms,
+  the parse and layout the page already did) and a nudge (257 ms, the
+  layout). No node ceiling is needed.
+
+Screenshots and the logs: `.mockups/hall-sync/` in the worktree (not
+committed).
+
+### Review fixes, 29 October 2026
+
+Two reviews of the branch: Fable's found it ready to merge, Opus's
+found one blocking bug. Each fix is folded into the commit it belongs
+to:
+
+- **Blocking: a stale caret leading into split view.** The caret the
+  link held was only the author's, so after the drawing moved it (Tab to
+  another item), going to Source and back to Split selected the item of
+  the author's last caret. The caret the link places is now recorded as
+  the source's caret, and forgotten when the source panel goes (Visual).
+  Page tests for split → source → split and split → visual → source →
+  split.
+- A request made during a drag is dropped, not applied after it (the
+  next Tab goes on from the dragged node); one for a hall not yet held
+  still waits for it.
+- The caret line's mark shows only while the source holds the hall
+  drawn: not while it has an error.
+- The owner rule of decision 1, above.
+- `cursor`'s contract: give it with, or after, the value it names.
+
+## Follow-ups
+
+- The same link in the ritual editor's split view (plan 000).
+- A second `@codemirror/view` in the install (plan 000).
+- Real phones and Safari, as for the rest of the hall editor.
+

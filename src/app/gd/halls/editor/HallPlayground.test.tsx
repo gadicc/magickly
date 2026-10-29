@@ -62,6 +62,12 @@ vi.mock("./hallShare", async (importActual) => {
 
 // The Pug source panel is CodeMirror; its own tests cover it. Here it is a
 // plain text box, so the page's handling of what is typed can be tested.
+// Its caret is moved by calling the `onCursor` the page gave it.
+const sourcePanel = vi.hoisted(() => ({
+  onCursor: undefined as
+    | ((at: { line: number; column: number }) => void)
+    | undefined,
+}));
 vi.mock("@/doc/RitualSourceEditor", () => ({
   default: ({
     value,
@@ -70,6 +76,7 @@ vi.mock("@/doc/RitualSourceEditor", () => ({
     diagnostic,
     headerless,
     cursor,
+    onCursor,
   }: {
     value: string;
     onChange: (value: string) => void;
@@ -77,25 +84,29 @@ vi.mock("@/doc/RitualSourceEditor", () => ({
     diagnostic?: { source: string; message: string } | null;
     headerless?: boolean;
     cursor?: { line: number; column: number; source: string } | null;
-  }) => (
-    <div>
-      <textarea
-        aria-label={label}
-        value={value}
-        data-headerless={headerless}
-        // The caret the page asks for, while it is for the text shown.
-        data-cursor={
-          cursor && cursor.source === value
-            ? `${cursor.line}:${cursor.column}`
-            : undefined
-        }
-        onChange={(event) => onChange(event.target.value)}
-      />
-      {diagnostic?.source === value && (
-        <p data-testid="source-error">{diagnostic.message}</p>
-      )}
-    </div>
-  ),
+    onCursor?: (at: { line: number; column: number }) => void;
+  }) => {
+    sourcePanel.onCursor = onCursor;
+    return (
+      <div>
+        <textarea
+          aria-label={label}
+          value={value}
+          data-headerless={headerless}
+          // The caret the page asks for, while it is for the text shown.
+          data-cursor={
+            cursor && cursor.source === value
+              ? `${cursor.line}:${cursor.column}`
+              : undefined
+          }
+          onChange={(event) => onChange(event.target.value)}
+        />
+        {diagnostic?.source === value && (
+          <p data-testid="source-error">{diagnostic.message}</p>
+        )}
+      </div>
+    );
+  },
 }));
 
 beforeEach(() => {
@@ -610,10 +621,152 @@ describe("the source caret follows the drawing (plan 063)", {
     fireEvent.keyDown(surface, { key: "Tab" });
     fireEvent.click(screen.getByRole("button", { name: "Split" }));
     expect(caretAt()?.text).toMatch(/role="imperator"/);
-    // From the source, the drawing that appears leads nothing.
+    // From the source, the caret leads: the item the drawing put it on,
+    // and no caret is sent back. (A click focuses the button, as a
+    // browser does, so the drawing that appears takes no focus.)
+    fireEvent.click(screen.getByRole("button", { name: "Source" }));
+    const split = screen.getByRole("button", { name: "Split" });
+    split.focus();
+    fireEvent.click(split);
+    expect(screen.getByRole("application")).not.toBe(document.activeElement);
+    const [id] =
+      screen
+        .getByRole("application")
+        .getAttribute("aria-describedby")
+        ?.split(" ") ?? [];
+    expect(document.getElementById(id)?.textContent).toBe("Imperator selected");
+    expect(caretAt()).toBeNull();
+  });
+});
+
+describe("the source caret selects in the drawing (plan 063)", {
+  timeout: 20_000,
+}, () => {
+  /** What the drawing's description says is selected. */
+  const drawn = () => {
+    const [id] =
+      screen
+        .getByRole("application")
+        .getAttribute("aria-describedby")
+        ?.split(" ") ?? [];
+    return document.getElementById(id)?.textContent;
+  };
+  /** The author's caret on the first line holding `text`. */
+  const caretOn = (text: string, column = 7) => {
+    const line =
+      source()
+        .split("\n")
+        .findIndex((row) => row.includes(text)) + 1;
+    act(() => sourcePanel.onCursor?.({ line, column }));
+  };
+  const inSource = () => {
+    sourceBox().focus();
+    fireEvent.focus(sourceBox());
+  };
+
+  it("selects the item the caret is in, the focus staying in the source", () => {
+    render(<HallPlayground />);
+    inSource();
+    caretOn('role="hegemon"');
+    expect(drawn()).toBe("Hegemon selected");
+    expect(document.activeElement).toBe(sourceBox());
+    // Its own line, past its end: the same item, nothing drawn again.
+    caretOn('role="hegemon"', 60);
+    expect(drawn()).toBe("Hegemon selected");
+    // The hall's own line selects nothing.
+    act(() => sourcePanel.onCursor?.({ line: 1, column: 1 }));
+    expect(drawn()).toBe("Nothing selected");
+    // No caret is put back into the source the author is in.
+    expect(sourceBox().dataset.cursor).toBeUndefined();
+  });
+
+  it("selects in typing once it is read, at each read", async () => {
+    render(<HallPlayground />);
+    inSource();
+    const pillar = '    pillar(kind="black", x=2, y=2)';
+    const lines = source().split("\n");
+    const floor = lines.findIndex((row) => /^ {2}floor/.test(row));
+    type(
+      [...lines.slice(0, floor + 1), pillar, ...lines.slice(floor + 1)].join(
+        "\n",
+      ),
+    );
+    act(() => sourcePanel.onCursor?.({ line: floor + 2, column: 8 }));
+    expect(drawn()).toBe("Nothing selected");
+    await rest();
+    expect(drawn()).toBe("Black pillar selected");
+    // Typed without an ID, read again with a new one: still selected.
+    type(`${source()}\n`);
+    act(() => sourcePanel.onCursor?.({ line: floor + 2, column: 9 }));
+    await rest();
+    expect(drawn()).toBe("Black pillar selected");
+  });
+
+  it("drops a caret whose typing an undo replaced before it was read", () => {
+    render(<HallPlayground />);
+    inSource();
+    caretOn('role="hegemon"');
+    type(`${source()}  `);
+    caretOn('role="keryx"');
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(drawn()).toBe("Hegemon selected");
+  });
+
+  it("selects nothing new while the source has an error", async () => {
+    render(<HallPlayground />);
+    inSource();
+    caretOn('role="hegemon"');
+    type("gdHall\n  floor\n    altar(x=.5)\n");
+    act(() => sourcePanel.onCursor?.({ line: 3, column: 5 }));
+    await rest();
+    expect(drawn()).toBe("Hegemon selected");
+  });
+
+  it("selects again where the drawing moved away", () => {
+    render(<HallPlayground />);
+    inSource();
+    caretOn('role="hegemon"');
+    const surface = screen.getByRole("application");
+    surface.focus();
+    fireEvent.focus(surface);
+    fireEvent.keyDown(surface, { key: "Tab" });
+    expect(drawn()).not.toBe("Hegemon selected");
+    inSource();
+    caretOn('role="hegemon"');
+    expect(drawn()).toBe("Hegemon selected");
+  });
+
+  it("leads into split view with the caret the drawing put there", () => {
+    render(<HallPlayground />);
+    inSource();
+    caretOn('role="hegemon"');
+    const surface = screen.getByRole("application");
+    surface.focus();
+    fireEvent.focus(surface);
+    fireEvent.keyDown(surface, { key: "Tab" });
+    expect(drawn()).toBe("White pillar selected");
     fireEvent.click(screen.getByRole("button", { name: "Source" }));
     fireEvent.click(screen.getByRole("button", { name: "Split" }));
-    expect(caretAt()).toBeNull();
+    expect(drawn()).toBe("White pillar selected");
+  });
+
+  it("forgets the caret when the source panel goes", () => {
+    render(<HallPlayground />);
+    inSource();
+    caretOn('role="hegemon"');
+    fireEvent.click(screen.getByRole("button", { name: "Visual" }));
+    fireEvent.click(screen.getByRole("button", { name: "Source" }));
+    fireEvent.click(screen.getByRole("button", { name: "Split" }));
+    expect(drawn()).toBe("Nothing selected");
+  });
+
+  it("leads into split view from the source", () => {
+    render(<HallPlayground />);
+    fireEvent.click(screen.getByRole("button", { name: "Source" }));
+    inSource();
+    caretOn('role="keryx"');
+    fireEvent.click(screen.getByRole("button", { name: "Split" }));
+    expect(drawn()).toBe("Keryx selected");
   });
 });
 

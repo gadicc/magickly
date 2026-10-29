@@ -15,6 +15,7 @@ import {
 } from "@codemirror/lint";
 import { Button } from "@mui/material";
 import {
+  Annotation,
   basicSetup,
   Decoration,
   type DecorationSet,
@@ -36,6 +37,8 @@ import type { RitualSourceDialect } from "./ritualSource";
 import type { RitualSourceDiagnostic } from "./ritualSourceDiagnostics";
 
 const revealId = StateEffect.define<string>();
+/** Marks the caret a host placed (`cursor`), which `onCursor` never echoes. */
+const placedCaret = Annotation.define<boolean>();
 function navigateDiagnostic(
   view: EditorView,
   command: (view: EditorView) => boolean,
@@ -277,6 +280,7 @@ export default function RitualSourceEditor({
   onCaretNode,
   headerless = false,
   cursor,
+  onCursor,
 }: {
   value: string;
   dialect: RitualSourceDialect;
@@ -310,13 +314,18 @@ export default function RitualSourceEditor({
    * places it on the tag it selects (plan 063).
    */
   cursor?: RitualSourceCursor | null;
+  /**
+   * The caret (1-based) whenever the author moves it, or types, while the
+   * editor has the focus; never for `cursor` or a new `value`.
+   */
+  onCursor?(at: { line: number; column: number }): void;
 }) {
   const [foldIds, setFoldIds] = React.useState(true);
   const host = React.useRef<HTMLDivElement>(null);
   const view = React.useRef<EditorView | null>(null);
-  const latest = React.useRef({ onChange, value, onCaretNode });
+  const latest = React.useRef({ onChange, value, onCaretNode, onCursor });
   const caretNode = React.useRef<string | null>(null);
-  latest.current = { onChange, value, onCaretNode };
+  latest.current = { onChange, value, onCaretNode, onCursor };
   const previousDialect = React.useRef(dialect);
   const extensions = React.useMemo(
     () => [
@@ -344,6 +353,18 @@ export default function RitualSourceEditor({
         if (!update.selectionSet && !update.focusChanged && !update.docChanged)
           return;
         const { doc } = update.state;
+        // After `onChange`, so a host sees the typing before the caret in it.
+        if (
+          (update.selectionSet || update.docChanged) &&
+          !update.transactions.some((tr) => tr.annotation(placedCaret))
+        ) {
+          const head = update.state.selection.main.head;
+          const line = doc.lineAt(head);
+          latest.current.onCursor?.({
+            line: line.number,
+            column: head - line.from + 1,
+          });
+        }
         const ids = ritualPugNodeIdsAtLine(
           (line) => doc.line(line).text,
           doc.lineAt(update.state.selection.main.head).number,
@@ -496,7 +517,10 @@ export default function RitualSourceEditor({
       line.from + Math.min(Math.max(cursor.column - 1, 0), line.length);
     const main = instance.state.selection.main;
     if (!main.empty || main.head !== pos)
-      instance.dispatch({ selection: { anchor: pos } });
+      instance.dispatch({
+        selection: { anchor: pos },
+        annotations: placedCaret.of(true),
+      });
     // Measured, not read now: a new value's line heights are estimates
     // until CodeMirror measures them. The line is scrolled to even when
     // the caret was already there.

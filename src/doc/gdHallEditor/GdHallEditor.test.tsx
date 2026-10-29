@@ -1979,3 +1979,219 @@ describe("the selection a host follows (plan 063)", () => {
     expect(selected()).toContain("selected");
   });
 });
+
+describe("a selection the host asks for (plan 063)", () => {
+  const pillars = () =>
+    hallFromPug(
+      "gdHall",
+      "  floor",
+      '    pillar(kind="black", x=4, y=3)',
+      '    pillar(kind="white", x=12, y=3)',
+    );
+  /** The editor with a host that asks for selections. */
+  function asking(initial = pillars()) {
+    let ask: (request: GdHallEditorProps["selectPath"]) => void = () => {};
+    let give: (hall: HallElement) => void = () => {};
+    const onSelectionChange = vi.fn();
+    function Host() {
+      const [hall, setHall] = useState(initial);
+      const [request, setRequest] =
+        useState<GdHallEditorProps["selectPath"]>(null);
+      ask = setRequest;
+      give = setHall;
+      return (
+        <>
+          <button type="button">source</button>
+          <GdHallEditor
+            hall={hall}
+            art={gdHallArt}
+            onChange={setHall}
+            selectPath={request}
+            onSelectionChange={onSelectionChange}
+          />
+        </>
+      );
+    }
+    render(<Host />);
+    const elsewhere = screen.getByRole("button", { name: "source" });
+    elsewhere.focus();
+    return {
+      ask: (
+        path: readonly number[] | null,
+        hall = initial,
+        pageInset?: number,
+      ) =>
+        act(() =>
+          ask({ path, hall, ...(pageInset !== undefined && { pageInset }) }),
+        ),
+      give: (hall: HallElement) => act(() => give(hall)),
+      elsewhere,
+      onSelectionChange,
+    };
+  }
+  const live = () =>
+    document.querySelector("[aria-live=polite]")?.textContent ?? "";
+
+  it("selects the node at a path, quietly and without the focus", () => {
+    const { ask, elsewhere } = asking();
+    ask([0, 1]);
+    expect(selected()).toBe("White pillar selected");
+    expect(document.activeElement).toBe(elsewhere);
+    expect(live()).toBe("");
+    // A path below a drawn node selects that node.
+    ask([0, 0, 4]);
+    expect(selected()).toBe("Black pillar selected");
+    // The hall, an undrawn node, a path the hall lacks, none: nothing.
+    for (const path of [[], [0], [5, 1], null]) {
+      ask([0, 1]);
+      ask(path);
+      expect(selected()).toBe("Nothing selected");
+    }
+  });
+
+  it("ignores a request for another hall, or one made during a drag", () => {
+    const { ask, give } = asking();
+    ask([0, 1], pillars());
+    expect(selected()).toBe("Nothing selected");
+    const surface = screen.getByRole("application");
+    // The Hegemon, pressed by the pointer: a request meanwhile is ignored.
+    const held = neophyteHall();
+    give(held);
+    pointer("pointerDown", surface, at(8, 3));
+    ask([1, 0], held);
+    expect(selected()).toBe("Hegemon selected");
+    pointer("pointerCancel", surface, at(8, 3));
+    // Dropped, not applied later: Tab goes on from the Hegemon.
+    key(surface, "Tab");
+    expect(selected()).toBe("White pillar selected");
+  });
+
+  it("leaves the current node alone, reporting nothing", () => {
+    const { ask, onSelectionChange } = asking();
+    ask([0, 0]);
+    const reports = onSelectionChange.mock.calls.length;
+    ask([0, 0]);
+    expect(onSelectionChange).toHaveBeenCalledTimes(reports);
+    expect(selected()).toBe("Black pillar selected");
+  });
+
+  it("keeps a node typed without an ID selected as the source is read again", () => {
+    const typed = () =>
+      hallFromPug("gdHall", "  floor", '    pillar(kind="black", x=4, y=3)');
+    const first = typed();
+    const { ask, give } = asking(first);
+    ask([0, 0], first);
+    expect(selected()).toBe("Black pillar selected");
+    // Read again: the same node with a fresh ID, asked for at once.
+    const again = typed();
+    expect(byAttr(again, "kind", "black").id).not.toBe(
+      byAttr(first, "kind", "black").id,
+    );
+    act(() => {
+      give(again);
+    });
+    ask([0, 0], again);
+    expect(selected()).toBe("Black pillar selected");
+  });
+
+  it("scrolls the page, given an inset, just enough and only for a node out of view", () => {
+    const page = vi.spyOn(window, "scrollBy").mockImplementation(() => {});
+    const room = vi
+      .spyOn(document.documentElement, "clientHeight", "get")
+      .mockReturnValue(500);
+    const hall = hallFromPug(
+      "gdHall",
+      "  floor",
+      '    pillar(kind="black", x=4, y=6)',
+      '    pillar(kind="white", x=12, y=15)',
+    );
+    const { ask, elsewhere } = asking(hall);
+    // The black pillar, in view below a 64 px bar: nothing moves.
+    ask([0, 0], hall, 64);
+    expect(selected()).toBe("Black pillar selected");
+    expect(page).not.toHaveBeenCalled();
+    // The white one, below the window's foot: scrolled to just show it,
+    // 12 px above the foot, the focus where it was.
+    ask([0, 1], hall, 64);
+    expect(selected()).toBe("White pillar selected");
+    expect(page).toHaveBeenCalledOnce();
+    const top = (page.mock.calls[0][0] as ScrollToOptions).top as number;
+    const surface = screen.getByRole("application");
+    const pillar = at(12, 15);
+    expect(top).toBeGreaterThan(pillar.clientY - 500);
+    expect(top).toBeLessThan(pillar.clientY);
+    expect(document.activeElement).toBe(elsewhere);
+    // Without an inset (stacked), or from the drawing: the page stays.
+    ask([0, 0], hall);
+    ask([0, 1], hall);
+    pointer("pointerDown", surface, at(4, 6));
+    pointer("pointerUp", surface, at(4, 6));
+    expect(selected()).toBe("Black pillar selected");
+    expect(page).toHaveBeenCalledOnce();
+    room.mockRestore();
+  });
+
+  it("shows the label of a node it reveals, 16 px clear of the window's foot", () => {
+    const page = vi.spyOn(window, "scrollBy").mockImplementation(() => {});
+    vi.spyOn(document.documentElement, "clientHeight", "get").mockReturnValue(
+      500,
+    );
+    const hall = hallFromPug(
+      "gdHall",
+      "  floor",
+      '    officer(role="sentinel", x=14, y=15, labelPos="bottom")',
+    );
+    const { ask } = asking(hall);
+    ask([0, 0], hall, 64);
+    expect(selected()).toBe("Sentinel selected");
+    const [sentinel] = hallView(hall, gdHallArt).selectables;
+    const label = sentinel.object?.labels[0].bounds;
+    if (!label) throw new Error("no label");
+    // The label's foot, not the officer's box's, 16 px above the window's.
+    expect(page).toHaveBeenCalledWith({
+      top: expect.closeTo(at(0, label.y1).clientY - (500 - 16), 6),
+    });
+  });
+
+  it("scrolls a node into the drawing's own box, never the page", () => {
+    const page = vi.spyOn(window, "scrollBy").mockImplementation(() => {});
+    const { ask } = asking(
+      hallFromPug(
+        "gdHall",
+        "  floor",
+        '    pillar(kind="black", x=4, y=2)',
+        '    pillar(kind="white", x=12, y=15)',
+      ),
+    );
+    ask([0, 1]);
+    expect(selected()).toBe("White pillar selected");
+    // No box of its own here: the page stays where it is.
+    expect(page).not.toHaveBeenCalled();
+    cleanup();
+    const box = document.createElement("div");
+    box.style.overflowY = "auto";
+    const scrollBy = vi.fn();
+    box.scrollBy = scrollBy;
+    document.body.append(box);
+    const hall = pillars();
+    let ask2: (request: GdHallEditorProps["selectPath"]) => void = () => {};
+    function Inside() {
+      const [request, setRequest] =
+        useState<GdHallEditorProps["selectPath"]>(null);
+      ask2 = setRequest;
+      return (
+        <GdHallEditor
+          hall={hall}
+          art={gdHallArt}
+          onChange={() => {}}
+          selectPath={request}
+        />
+      );
+    }
+    render(<Inside />, { container: box });
+    act(() => ask2({ path: [0, 1], hall }));
+    expect(scrollBy).toHaveBeenCalledOnce();
+    expect(page).not.toHaveBeenCalled();
+    box.remove();
+  });
+});

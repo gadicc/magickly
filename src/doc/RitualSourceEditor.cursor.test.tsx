@@ -181,3 +181,59 @@ describe("the cursor a host gives", () => {
     await waitFor(() => expect(top).toBeGreaterThan(100));
   });
 });
+
+describe("the caret the author moves", () => {
+  it("is reported while the editor has the focus, never the host's own", () => {
+    const text = hall(3);
+    const onCursor = vi.fn();
+    const props = {
+      value: text,
+      dialect: "pug" as const,
+      disabled: false,
+      onChange: vi.fn(),
+      onCursor,
+    };
+    const { container, rerender } = render(<RitualSourceEditor {...props} />);
+    const view = EditorView.findFromDOM(
+      container.querySelector(".cm-editor") as HTMLElement,
+    ) as EditorView;
+    // Without the focus: not the author's.
+    act(() => view.dispatch({ selection: { anchor: 3 } }));
+    expect(onCursor).not.toHaveBeenCalled();
+    act(() => view.focus());
+    // The focus alone moves nothing.
+    expect(onCursor).not.toHaveBeenCalled();
+    const line = view.state.doc.line(3);
+    act(() =>
+      view.dispatch({
+        selection: { anchor: line.from + 6 },
+        userEvent: "select",
+      }),
+    );
+    expect(onCursor).toHaveBeenLastCalledWith({ line: 3, column: 7 });
+    // Typing moves it too.
+    act(() =>
+      view.dispatch({
+        changes: { from: line.from + 6, insert: "x" },
+        selection: { anchor: line.from + 7 },
+        userEvent: "input.type",
+      }),
+    );
+    expect(onCursor).toHaveBeenLastCalledWith({ line: 3, column: 8 });
+    const calls = onCursor.mock.calls.length;
+    // A caret the host places, focused or not, and a new value: silent.
+    const typed = view.state.doc.toString();
+    rerender(
+      <RitualSourceEditor
+        {...props}
+        value={typed}
+        cursor={{ line: 4, column: 5, source: typed }}
+      />,
+    );
+    expect(view.state.doc.lineAt(view.state.selection.main.head).number).toBe(
+      4,
+    );
+    rerender(<RitualSourceEditor {...props} value={hall(5)} />);
+    expect(onCursor).toHaveBeenCalledTimes(calls);
+  });
+});

@@ -1,12 +1,33 @@
 "use client";
 
 import React from "react";
-import type { HallSelection } from "@/doc/gdHallEditor/GdHallEditor";
-import { indexHall } from "@/doc/gdHallEditor/hallModel";
-import { hallSourceMap } from "@/doc/gdHallEditor/hallSourceMap";
+import type {
+  HallSelection,
+  HallSelectionRequest,
+} from "@/doc/gdHallEditor/GdHallEditor";
+import { indexHall, rowPathKey } from "@/doc/gdHallEditor/hallModel";
+import {
+  type HallSourcePlace,
+  hallSourceMap,
+} from "@/doc/gdHallEditor/hallSourceMap";
 import type { RitualSourceCursor } from "@/doc/RitualSourceEditor";
 import type { RitualEditorLayout } from "@/doc/useRitualEditorLayout";
 import type { HallEntry } from "./hallHistory";
+
+/**
+ * Split view lays the panels side by side from this width, the source
+ * panel sticky below the app bar (`hallPlayground.module.css`): there a
+ * selection from the source may scroll the page (Gadi, 29 October 2026),
+ * which leaves the source where it is. Stacked, it would carry the
+ * source away from the caret.
+ */
+const SIDE_BY_SIDE = "(min-width: 900px)";
+/** The app bar's height from 600 px wide, which the page keeps clear. */
+const APP_BAR = 64;
+
+const sideBySide = () =>
+  typeof window.matchMedia === "function" &&
+  window.matchMedia(SIDE_BY_SIDE).matches;
 
 /** The panel the link follows: the one that last had the focus. */
 type Panel = "source" | "drawing";
@@ -14,16 +35,20 @@ type Panel = "source" | "drawing";
 /**
  * The `/gd/halls/editor` page's link between its source and its drawing
  * in split view (plan 063): the drawing's selection puts the source
- * caret on the selected tag.
+ * caret on the selected tag, and the source caret selects the item it
+ * is in.
  *
  * The link follows the panel that last had the focus, so neither panel
- * answers what the other did on its behalf. The focus is kept in a ref:
- * it decides what the next change does, and is no reason to draw again.
+ * answers what the other did on its behalf. The focus and the caret are
+ * kept in refs: they decide what the next change does, and are no reason
+ * to draw again. The page draws again only when the caret comes to
+ * another item.
  */
 export function useHallSelectionLink({
   linked,
   present,
   typed,
+  text,
 }: {
   /** Split view: both panels are showing. */
   linked: boolean;
@@ -31,6 +56,8 @@ export function useHallSelectionLink({
   present: HallEntry;
   /** Typing not yet read, which the source panel shows instead. */
   typed: string | null;
+  /** The source panel's text now, read or not. */
+  text: () => string;
 }) {
   const origin = React.useRef<Panel>("drawing");
   const [selection, setSelection] = React.useState<HallSelection | null>(null);
@@ -59,8 +86,56 @@ export function useHallSelectionLink({
     return place ? { ...place, source: present.source } : null;
   }, [map, index, selection, typed, present.source]);
 
+  // The source caret, with the text it was in: typing not yet read holds
+  // it until the read makes that text the hall's, which selects again
+  // (Gadi, 29 October 2026); anything else replacing the text drops it.
+  const caret = React.useRef<(HallSourcePlace & { source: string }) | null>(
+    null,
+  );
+  /** The item the caret was last found in, and in which text. */
+  const found = React.useRef<{ source: string; key: string } | null>(null);
+  const [moved, setMoved] = React.useState(0);
+  // The caret the link puts in the source is the source's caret too: on
+  // entering split view from the source, it is that caret which leads.
+  React.useEffect(() => {
+    if (cursor) caret.current = cursor;
+  }, [cursor]);
+  const latest = React.useRef({ map, present, text });
+  latest.current = { map, present, text };
+  const onCursor = React.useCallback((at: HallSourcePlace) => {
+    const { map, present, text } = latest.current;
+    origin.current = "source";
+    const source = text();
+    caret.current = { ...at, source };
+    if (!map || source !== present.source) return;
+    const path = map.pathAt(at);
+    const key = path ? rowPathKey(path) : "-";
+    if (found.current?.source === source && found.current.key === key) return;
+    found.current = { source, key };
+    setMoved((count) => count + 1);
+  }, []);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `moved` is the caret's ref changing
+  const selectPath = React.useMemo((): HallSelectionRequest | null => {
+    const at = caret.current;
+    if (
+      origin.current !== "source" ||
+      !at ||
+      !map ||
+      !present.hall ||
+      at.source !== present.source
+    )
+      return null;
+    return {
+      path: map.pathAt(at),
+      hall: present.hall,
+      ...(sideBySide() && { pageInset: APP_BAR }),
+    };
+  }, [map, present, moved]);
+
   return {
     cursor,
+    onCursor,
+    selectPath,
     onSelectionChange: setSelection,
     /**
      * The source panel marks the caret's line while something is selected
@@ -69,6 +144,8 @@ export function useHallSelectionLink({
     marked: linked && selection !== null && map !== null,
     onSourceFocus: () => {
       origin.current = "source";
+      // A caret in the item the drawing moved away from selects it again.
+      found.current = null;
     },
     onDrawingFocus: () => {
       origin.current = "drawing";
@@ -80,6 +157,11 @@ export function useHallSelectionLink({
     onLayout: (next: RitualEditorLayout, from: RitualEditorLayout) => {
       if (next === "split" && from !== "split")
         origin.current = from === "source" ? "source" : "drawing";
+      // The source panel goes, and its caret with it.
+      if (next === "visual") {
+        caret.current = null;
+        found.current = null;
+      }
     },
   };
 }
