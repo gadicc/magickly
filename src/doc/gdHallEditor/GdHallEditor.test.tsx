@@ -1913,3 +1913,69 @@ describe("the panel's place (owner's decision, 20 October 2026)", () => {
     });
   });
 });
+
+describe("the selection a host follows (plan 063)", () => {
+  /** The reports so far, as IDs' row paths (null for none). */
+  const paths = (spy: ReturnType<typeof vi.fn>) =>
+    spy.mock.calls.map(([selection]) =>
+      selection === null ? null : selection.path.join("."),
+    );
+
+  it("reports on arriving, then each change of the node or its path", () => {
+    const onSelectionChange = vi.fn();
+    const hall = hallFromPug(
+      "gdHall",
+      "  floor",
+      '    pillar(kind="black", x=4, y=3)',
+    );
+    const { surface } = setup(hall, true, { props: { onSelectionChange } });
+    expect(paths(onSelectionChange)).toEqual([null]);
+    key(surface, "Tab");
+    expect(onSelectionChange).toHaveBeenLastCalledWith({
+      id: byAttr(hall, "kind", "black").id,
+      path: [0, 0],
+    });
+    // A nudge keeps the node and its path: nothing to report.
+    key(surface, "ArrowRight");
+    expect(onSelectionChange).toHaveBeenCalledTimes(2);
+    // The copy, selected; Delete; Escape with nothing selected.
+    key(surface, "d", { ctrlKey: true });
+    expect(onSelectionChange).toHaveBeenLastCalledWith({
+      id: "New0000000000001",
+      path: [0, 1],
+    });
+    key(surface, "Delete");
+    key(surface, "Escape");
+    expect(paths(onSelectionChange)).toEqual([null, "0.0", "0.1", null]);
+  });
+
+  it("reports a node moved onto a host, and one an undo takes away", async () => {
+    const onSelectionChange = vi.fn();
+    const { surface } = setup(neophyteHall(), true, {
+      history: true,
+      props: { onSelectionChange },
+    });
+    pointer("pointerDown", surface, at(8, 3));
+    pointer("pointerUp", surface, at(8, 3));
+    const before = onSelectionChange.mock.lastCall?.[0];
+    expect(before).toMatchObject({ id: expect.any(String) });
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: "Stands on" }));
+    const listbox = await screen.findByRole("listbox");
+    fireEvent.click(within(listbox).getByRole("option", { name: "Platform" }));
+    const after = onSelectionChange.mock.lastCall?.[0];
+    expect(after.id).toBe(before.id);
+    expect(after.path).not.toEqual(before.path);
+    // Escape, select the Imperator, copy it, then undo the copy away.
+    key(surface, "Escape");
+    key(surface, "Tab");
+    key(surface, "d", { ctrlKey: true });
+    key(surface, "z", { ctrlKey: true });
+    expect(onSelectionChange).toHaveBeenLastCalledWith(null);
+  });
+
+  it("reports nothing when no host asks", () => {
+    const { surface } = setup();
+    key(surface, "Tab");
+    expect(selected()).toContain("selected");
+  });
+});

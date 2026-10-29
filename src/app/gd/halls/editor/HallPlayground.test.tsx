@@ -69,18 +69,26 @@ vi.mock("@/doc/RitualSourceEditor", () => ({
     label,
     diagnostic,
     headerless,
+    cursor,
   }: {
     value: string;
     onChange: (value: string) => void;
     label: string;
     diagnostic?: { source: string; message: string } | null;
     headerless?: boolean;
+    cursor?: { line: number; column: number; source: string } | null;
   }) => (
     <div>
       <textarea
         aria-label={label}
         value={value}
         data-headerless={headerless}
+        // The caret the page asks for, while it is for the text shown.
+        data-cursor={
+          cursor && cursor.source === value
+            ? `${cursor.line}:${cursor.column}`
+            : undefined
+        }
         onChange={(event) => onChange(event.target.value)}
       />
       {diagnostic?.source === value && (
@@ -524,6 +532,88 @@ describe("source and drawing in step", { timeout: 20_000 }, () => {
     expect(source()).not.toBe(first);
     // The editor keeps no buttons of its own: the page's are the ones.
     expect(screen.getAllByRole("button", { name: "Undo" })).toHaveLength(1);
+  });
+});
+
+describe("the source caret follows the drawing (plan 063)", {
+  timeout: 20_000,
+}, () => {
+  const sourcePanel = () =>
+    screen.getByRole("region", { name: "Temple hall source panel" });
+  /** The source line the page put the caret on, and its column. */
+  const caretAt = () => {
+    const at = sourceBox().dataset.cursor;
+    if (!at) return null;
+    const [line, column] = at.split(":").map(Number);
+    return { text: source().split("\n")[line - 1], column };
+  };
+
+  it("puts the caret on the selected tag, again after each edit", () => {
+    render(<HallPlayground />);
+    const surface = screen.getByRole("application");
+    // The drawing is focused as the editor arrives.
+    expect(document.activeElement).toBe(surface);
+    expect(caretAt()).toBeNull();
+    expect(sourcePanel().dataset.linkedCaret).toBeUndefined();
+    fireEvent.keyDown(surface, { key: "Tab" });
+    expect(caretAt()?.text).toMatch(/^ {4}officer#\w+\(role="imperator"/);
+    expect(caretAt()?.column).toBe(5);
+    expect(sourcePanel().dataset.linkedCaret).toBe("true");
+    const first = source();
+    fireEvent.keyDown(surface, { key: "ArrowDown" });
+    expect(source()).not.toBe(first);
+    expect(caretAt()?.text).toMatch(/role="imperator"/);
+    // The copy, then nothing selected: the caret stays where it was.
+    fireEvent.keyDown(surface, { key: "d", ctrlKey: true });
+    const copy = caretAt()?.text;
+    expect(copy).toMatch(/role="imperator"/);
+    expect(copy).not.toBe(
+      first.split("\n").find((line) => line.includes("imperator")),
+    );
+    fireEvent.keyDown(surface, { key: "Escape" });
+    expect(caretAt()).toBeNull();
+    expect(sourcePanel().dataset.linkedCaret).toBeUndefined();
+    expect(document.activeElement).toBe(surface);
+  });
+
+  it("follows the drawing only while it has the focus", () => {
+    render(<HallPlayground />);
+    const surface = screen.getByRole("application");
+    fireEvent.focus(sourceBox());
+    fireEvent.keyDown(surface, { key: "Tab" });
+    expect(caretAt()).toBeNull();
+    fireEvent.focus(surface);
+    fireEvent.keyDown(surface, { key: "Tab" });
+    expect(caretAt()?.text).toMatch(/role="cancellarius"/);
+  });
+
+  it("puts no caret in typing not yet read, nor in a source with an error", async () => {
+    render(<HallPlayground />);
+    const surface = screen.getByRole("application");
+    fireEvent.keyDown(surface, { key: "Tab" });
+    expect(caretAt()).not.toBeNull();
+    type(`${source()}  `);
+    expect(caretAt()).toBeNull();
+    type("gdHall\n  floor\n    altar(x=.5)\n");
+    await rest();
+    expect(caretAt()).toBeNull();
+    // The drawing keeps its selection, but the source holds no hall to
+    // mark a line of.
+    expect(sourcePanel().dataset.linkedCaret).toBeUndefined();
+  });
+
+  it("links nothing with one panel, and the drawing leads into split view", () => {
+    render(<HallPlayground />);
+    fireEvent.click(screen.getByRole("button", { name: "Visual" }));
+    const surface = screen.getByRole("application");
+    fireEvent.focus(surface);
+    fireEvent.keyDown(surface, { key: "Tab" });
+    fireEvent.click(screen.getByRole("button", { name: "Split" }));
+    expect(caretAt()?.text).toMatch(/role="imperator"/);
+    // From the source, the drawing that appears leads nothing.
+    fireEvent.click(screen.getByRole("button", { name: "Source" }));
+    fireEvent.click(screen.getByRole("button", { name: "Split" }));
+    expect(caretAt()).toBeNull();
   });
 });
 

@@ -83,6 +83,20 @@
     max-height: 65vh;
   }
 }
+/* While the drawing has a selection in split view, the source caret
+   stands on its tag (plan 063), but CodeMirror hides its caret and barely
+   tints its line without the focus: mark the line, as Gadi chose from
+   the mock-ups (B, 29 October 2026), in MUI's primary blue, like the
+   drawing's selection box. */
+.sourcePanel[data-linked-caret]
+:global(.cm-editor:not(.cm-focused) .cm-activeLine) {
+  background-color: #cfe6fa;
+  box-shadow: inset 3px 0 0 #1976d2;
+}
+.sourcePanel[data-linked-caret]
+  :global(.cm-editor:not(.cm-focused) .cm-activeLineGutter) {
+  background-color: #b9dcf5;
+}
 .panelTitle {
   margin: 0;
   font-size: 0.95rem;

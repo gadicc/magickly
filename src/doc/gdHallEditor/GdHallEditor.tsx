@@ -136,6 +136,19 @@ export interface GdHallEditorProps {
   initialFocus?: "drawing" | "warnings";
   /** IDs for new and copied nodes; the ritual editor's by default. */
   createId?: () => string;
+  /**
+   * The selected node and its compiled row path (`HallSelectable.rowPath`):
+   * once on arriving, then whenever either changes, whatever changed it
+   * (the author, an edit, an undo taking the node away). The hall editor
+   * page moves its source caret by it (plan 063).
+   */
+  onSelectionChange?: (selection: HallSelection | null) => void;
+}
+
+/** A selection as `onSelectionChange` reports it. */
+export interface HallSelection {
+  id: string;
+  path: readonly number[];
 }
 
 /**
@@ -228,6 +241,7 @@ export function GdHallEditor({
   lockedNote = "The hall cannot be edited while the ritual is updating.",
   initialFocus = "drawing",
   createId = createRitualNodeId,
+  onSelectionChange,
 }: GdHallEditorProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [preview, setPreview] = useState<HallElement | null>(null);
@@ -334,6 +348,17 @@ export function GdHallEditor({
   useEffect(() => {
     if (selectedId && !committed.byId.has(selectedId)) setSelectedId(null);
   }, [committed, selectedId]);
+
+  /** The selection last reported; undefined until the first report. */
+  const reported = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (!onSelectionChange) return;
+    const entry = selectedId ? committed.byId.get(selectedId) : undefined;
+    const key = entry ? `${entry.id} ${rowPathKey(entry.rowPath)}` : "";
+    if (key === reported.current) return;
+    reported.current = key;
+    onSelectionChange(entry ? { id: entry.id, path: entry.rowPath } : null);
+  }, [committed, selectedId, onSelectionChange]);
 
   /** The view of the hall the editor holds now, laid out at most once. */
   const currentView = () => {

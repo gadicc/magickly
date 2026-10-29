@@ -239,6 +239,28 @@ export function ritualIdFolding() {
   return field;
 }
 
+/**
+ * The `scrollTop` that centres a line in the box that scrolls it, or null
+ * when the line is already wholly in view. Everything in client pixels,
+ * as measured; never below 0.
+ */
+export function centredScrollTop(
+  line: { top: number; bottom: number },
+  port: { top: number; bottom: number },
+  scrollTop: number,
+): number | null {
+  if (line.top >= port.top && line.bottom <= port.bottom) return null;
+  const room = port.bottom - port.top - (line.bottom - line.top);
+  return Math.max(0, scrollTop + line.top - port.top - room / 2);
+}
+
+/** A caret the host asked for: 1-based, in the text `source`. */
+export interface RitualSourceCursor {
+  line: number;
+  column: number;
+  source: string;
+}
+
 /** Shared Pug/Ritual Text source panel with optional, lossless identity folding. */
 export default function RitualSourceEditor({
   value,
@@ -254,6 +276,7 @@ export default function RitualSourceEditor({
   follow,
   onCaretNode,
   headerless = false,
+  cursor,
 }: {
   value: string;
   dialect: RitualSourceDialect;
@@ -277,6 +300,16 @@ export default function RitualSourceEditor({
    * page's hall); hall warnings count lines from its first.
    */
   headerless?: boolean;
+  /**
+   * Puts the caret here, without taking the focus, whenever a new object
+   * is given (and again for a new editor view, as Strict Mode makes one),
+   * if the text is still `source`. The editor's own box then scrolls to
+   * centre the line if it is not wholly in view; the page never scrolls.
+   * Give it with, or after, the `value` it names: one given before is
+   * spent on the text then shown and skipped. The hall editor's drawing
+   * places it on the tag it selects (plan 063).
+   */
+  cursor?: RitualSourceCursor | null;
 }) {
   const [foldIds, setFoldIds] = React.useState(true);
   const host = React.useRef<HTMLDivElement>(null);
@@ -440,6 +473,52 @@ export default function RitualSourceEditor({
       instance.dispatch({ effects: StateEffect.reconfigure.of(extensions) });
     }
   }, [value, dialect, extensions]);
+  // After the value is applied, so a caret for the new text finds it.
+  const placed = React.useRef<{
+    view: EditorView | null;
+    cursor: RitualSourceCursor | null;
+  }>({ view: null, cursor: null });
+  React.useLayoutEffect(() => {
+    const instance = view.current;
+    if (!instance || !cursor) return;
+    if (placed.current.view === instance && placed.current.cursor === cursor)
+      return;
+    placed.current = { view: instance, cursor };
+    const { doc } = instance.state;
+    if (
+      cursor.line < 1 ||
+      cursor.line > doc.lines ||
+      doc.toString() !== cursor.source
+    )
+      return;
+    const line = doc.line(cursor.line);
+    const pos =
+      line.from + Math.min(Math.max(cursor.column - 1, 0), line.length);
+    const main = instance.state.selection.main;
+    if (!main.empty || main.head !== pos)
+      instance.dispatch({ selection: { anchor: pos } });
+    // Measured, not read now: a new value's line heights are estimates
+    // until CodeMirror measures them. The line is scrolled to even when
+    // the caret was already there.
+    instance.requestMeasure({
+      read: (editor) => {
+        const block = editor.lineBlockAt(pos);
+        const port = editor.scrollDOM.getBoundingClientRect();
+        return {
+          line: {
+            top: editor.documentTop + block.top,
+            bottom: editor.documentTop + block.bottom,
+          },
+          port: { top: port.top, bottom: port.bottom },
+          scrollTop: editor.scrollDOM.scrollTop,
+        };
+      },
+      write: ({ line, port, scrollTop }, editor) => {
+        const top = centredScrollTop(line, port, scrollTop);
+        if (top !== null) editor.scrollDOM.scrollTop = top;
+      },
+    });
+  }, [cursor]);
   const hallWarnings = useHallWarnings(
     value,
     dialect === "pug" && diagnostic?.source !== value,

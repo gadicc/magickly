@@ -60,6 +60,7 @@ import {
 } from "./hallHistory";
 import { hallNodeCount, MAX_KEPT_HALL_NODES, tooManyNodes } from "./hallLimits";
 import styles from "./hallPlayground.module.css";
+import { useHallSelectionLink } from "./hallSelectionLink";
 import {
   isPresetHash,
   isShareHash,
@@ -361,6 +362,12 @@ export default function HallPlayground() {
     [shownHall],
   );
   const displayMode = !shownHall && mode === "visual" ? "source" : mode;
+  // In split view the source and the drawing select together (plan 063).
+  const link = useHallSelectionLink({
+    linked: displayMode === "split",
+    present,
+    typed,
+  });
 
   // Typed source is read once typing rests. Anything else the author does
   // reads it first, so it is never lost or undone out of order.
@@ -806,7 +813,10 @@ export default function HallPlayground() {
         <RitualLayoutSwitch
           label="Hall editor layout"
           value={displayMode}
-          onChoose={chooseMode}
+          onChoose={(next) => {
+            link.onLayout(next, displayMode);
+            chooseMode(next);
+          }}
           isDisabled={(value) => value === "visual" && !shownHall}
         />
       </div>
@@ -815,6 +825,8 @@ export default function HallPlayground() {
           <section
             className={`${styles.panel} ${styles.sourcePanel}`}
             aria-label="Temple hall source panel"
+            data-linked-caret={link.marked || undefined}
+            onFocus={link.onSourceFocus}
           >
             <RitualSourceEditor
               fill
@@ -826,6 +838,7 @@ export default function HallPlayground() {
               diagnostic={present.diagnostic}
               header={<h2 className={styles.panelTitle}>Pug source</h2>}
               onChange={onSourceChange}
+              cursor={link.cursor}
             />
           </section>
         )}
@@ -833,6 +846,7 @@ export default function HallPlayground() {
           <section
             className={styles.panel}
             aria-label="Temple hall visual panel"
+            onFocus={link.onDrawingFocus}
           >
             {shownHall ? (
               <GdHallEditor
@@ -844,6 +858,7 @@ export default function HallPlayground() {
                 onChange={onVisualChange}
                 onUndo={undo}
                 onRedo={redo}
+                onSelectionChange={link.onSelectionChange}
               />
             ) : (
               <p className={styles.empty}>
