@@ -42,12 +42,13 @@ vi.mock("@/doc/gdHallPug", async (importActual) => {
   const actual = await importActual<typeof import("@/doc/gdHallPug")>();
   return {
     ...actual,
-    parseHallSource: (text: string) => {
+    // The page reads with locations, for the source link (plan 063).
+    parseHallSourceWithLocations: (text: string) => {
       parses.count++;
       // A parser message that repeats much of what it read.
       if (text.startsWith("//- echo\n"))
         throw new Error(`Line 1: ${"echo ".repeat(100)}`);
-      return actual.parseHallSource(text);
+      return actual.parseHallSourceWithLocations(text);
     },
   };
 });

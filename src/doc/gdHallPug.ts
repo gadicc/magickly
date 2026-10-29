@@ -1,9 +1,17 @@
 import type { HallNode } from "@magick-components/gd/hall/types";
 import type { HallElement } from "./gdHallEditor/hallModel";
 import { gdHallSource } from "./gdHallRows";
-import { parseRitualPug, printRitualPug, RITUAL_PUG_HEADER } from "./ritualPug";
+import {
+  parseRitualPugWithLocations,
+  printRitualPug,
+  RITUAL_PUG_HEADER,
+} from "./ritualPug";
 import { ritualPugIdRanges } from "./ritualPugIds";
-import { RitualSourceError } from "./ritualSourceDiagnostics";
+import {
+  RitualSourceError,
+  type RitualSourceLocation,
+} from "./ritualSourceDiagnostics";
+import type { RitualSemanticNode } from "./semantic";
 
 /**
  * A hall (a preset, say) as ritual Pug to paste into a ritual's source:
@@ -57,6 +65,12 @@ function unwrapped(error: unknown): RitualSourceError {
   );
 }
 
+/** Where each node of a hall starts, in the header-less source. */
+export type HallSourceLocations = WeakMap<
+  RitualSemanticNode,
+  RitualSourceLocation
+>;
+
 /**
  * The hall a `/gd/halls/editor` source holds: ritual Pug without the header, one
  * `gdHall` at the top level and nothing else but blank lines. Parsed and
@@ -65,6 +79,19 @@ function unwrapped(error: unknown): RitualSourceError {
  * `RitualSourceError` with the author's line numbers.
  */
 export function parseHallSource(text: string): HallElement {
+  return parseHallSourceWithLocations(text).hall;
+}
+
+/**
+ * `parseHallSource`, with where each node of the hall starts (1-based
+ * line and column of the header-less source), from the same parse: the
+ * hall editor links its source and drawing through them (plan 063)
+ * without parsing again.
+ */
+export function parseHallSourceWithLocations(text: string): {
+  hall: HallElement;
+  locations: HallSourceLocations;
+} {
   if (text.trim() === "")
     throw new RitualSourceError(
       "Line 1: the source holds no hall; start it with gdHall",
@@ -79,13 +106,13 @@ export function parseHallSource(text: string): HallElement {
       `Line ${header + 1}: leave out the \`${RITUAL_PUG_HEADER}\` header line; paste only the hall`,
       header + 1,
     );
-  let nodes: ReturnType<typeof parseRitualPug>["nodes"];
+  let parsed: ReturnType<typeof parseRitualPugWithLocations>;
   try {
-    ({ nodes } = parseRitualPug(`${RITUAL_PUG_HEADER}\n${text}`));
+    parsed = parseRitualPugWithLocations(`${RITUAL_PUG_HEADER}\n${text}`);
   } catch (error) {
     throw unwrapped(error);
   }
-  const content = nodes.filter(
+  const content = parsed.document.nodes.filter(
     (node) => !(node.kind === "annotation" && node.style === "blank"),
   );
   const [first] = content;
@@ -94,7 +121,7 @@ export function parseHallSource(text: string): HallElement {
     first.kind === "element" &&
     first.tag === "gdHall"
   )
-    return first;
+    return { hall: first, locations: headerless(first, parsed.locations) };
   // The first line at the top level that is not the hall's own.
   const rows = text.split("\n");
   const hallLine = rows.findIndex((row) => /^gdHall\b/.test(row));
@@ -108,4 +135,20 @@ export function parseHallSource(text: string): HallElement {
       : `Line ${line}: only the hall goes here; put comments inside it`,
     line,
   );
+}
+
+/** The hall's locations one line up: the header the parse was given goes. */
+function headerless(
+  hall: HallElement,
+  located: HallSourceLocations,
+): HallSourceLocations {
+  const locations: HallSourceLocations = new WeakMap();
+  const visit = (node: RitualSemanticNode) => {
+    const at = located.get(node);
+    // Every parsed node is located; the guard keeps the type honest.
+    if (at) locations.set(node, { line: at.line - 1, column: at.column });
+    if (node.kind === "element") node.children?.forEach(visit);
+  };
+  visit(hall);
+  return locations;
 }

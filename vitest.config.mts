@@ -160,6 +160,7 @@ export default defineConfig({
         "src/doc/gdHallEditor/hallPalette.ts",
         "src/doc/gdHallEditor/hallPanelDock.ts",
         "src/doc/gdHallEditor/hallRows.ts",
+        "src/doc/gdHallEditor/hallSourceMap.ts",
         "src/doc/ritualBlocks/GdHallAtomEditor.tsx",
         "src/doc/pendingEdits.ts",
         "src/components/svgCoordinate.ts",

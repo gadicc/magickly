@@ -1,5 +1,9 @@
 import type { HallElement } from "@/doc/gdHallEditor/hallModel";
-import { parseHallSource, printHallSource } from "@/doc/gdHallPug";
+import {
+  type HallSourceLocations,
+  parseHallSourceWithLocations,
+  printHallSource,
+} from "@/doc/gdHallPug";
 import {
   type RitualSourceDiagnostic,
   ritualSourceDiagnostic,
@@ -19,12 +23,25 @@ export interface HallEntry {
   /** Null while the source does not parse to a hall. */
   hall: HallElement | null;
   diagnostic: RitualSourceDiagnostic | null;
+  /**
+   * Where the hall's nodes start in `source`, kept from the parse that
+   * read it, so the source and the drawing are linked without parsing it
+   * again (plan 063). Absent for a printed hall, whose layout the link
+   * follows instead.
+   */
+  locations?: HallSourceLocations;
 }
 
-/** The entry for a source the author typed (or a draft, a share link). */
-export function entryOfSource(source: string): HallEntry {
+/**
+ * The entry for a source the author typed (or a draft, a share link).
+ * Line breaks are kept as the source panel keeps them, `\n` only, so a
+ * draft or link written with `\r\n` is the panel's text exactly.
+ */
+export function entryOfSource(text: string): HallEntry {
+  const source = text.replace(/\r\n?/g, "\n");
   try {
-    return { source, hall: parseHallSource(source), diagnostic: null };
+    const { hall, locations } = parseHallSourceWithLocations(source);
+    return { source, hall, diagnostic: null, locations };
   } catch (error) {
     return {
       source,

@@ -36,7 +36,21 @@ const recaptioned = (history: HallHistory, text: string) => {
 describe("the hall editor's history", () => {
   it("reads a source as its hall, or as why it holds none", () => {
     const entry = start();
-    expect(entryOfSource(entry.source)).toEqual(entry);
+    const read = entryOfSource(entry.source);
+    expect(read).toMatchObject({
+      source: entry.source,
+      hall: entry.hall,
+      diagnostic: null,
+    });
+    // The parse's locations are kept for the source link (plan 063).
+    expect(read.hall && read.locations?.get(read.hall)).toEqual({
+      line: 1,
+      column: 1,
+    });
+    // `\r\n` reads as the source panel keeps it.
+    const crlf = entryOfSource(entry.source.replaceAll("\n", "\r\n"));
+    expect(crlf.source).toBe(entry.source);
+    expect(crlf.hall).toEqual(entry.hall);
     const broken = entryOfSource("gdHall\n  floor\n    altar(x=.5)\n");
     expect(broken.hall).toBeNull();
     expect(broken.diagnostic).toMatchObject({
