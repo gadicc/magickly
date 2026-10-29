@@ -70,10 +70,11 @@ export default function HallPage({ hall }: { hall: GdHallEntry }) {
       label: `${group.grade} · ${hallCardLabel(card)}`,
     })),
   }));
-  // The grid (plan 062's amendment, A4) places these on the desktop: the
-  // rail, the plan and the words in three columns from 1,200 px, the rail
-  // and one column from 900 px. Below that the markup's order is the
-  // phone's, with the lede moved after the actions.
+  // The markup is in the desktop's order, the rail last. The grid (plan
+  // 062's amendment, A4) places the rail, the plan and the words in three
+  // columns from 1,200 px, the rail and one column from 900 px. Below
+  // that, CSS `order` moves previous and next and the actions above the
+  // lede for the phone.
   return (
     <EntityFrame maxWidth="lg">
       <JsonLd data={hallJsonLd(hall)} />

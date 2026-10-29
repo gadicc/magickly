@@ -139,6 +139,7 @@ export default defineConfig({
         "src/app/gd/halls/*.{ts,tsx}",
         "src/app/gd/halls/editor/*.{ts,tsx}",
         "src/app/gd/halls/[[]slug]/*.{ts,tsx}",
+        "src/app/gd/halls/[[]slug]/[[]file]/route.ts",
         "src/components/gd/hall/art/*.{ts,tsx}",
         "src/components/gd/hall/attributes.ts",
         "src/components/gd/hall/fonts.ts",

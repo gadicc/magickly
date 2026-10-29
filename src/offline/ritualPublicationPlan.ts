@@ -16,12 +16,15 @@ import {
   type PreparedRitualBundle,
   prepareRitualBundle,
 } from "./prepareRitualBundle";
-import { inventoryRitualAssetJson } from "./ritualAssetInventory";
+import {
+  inventoryRitualAssetJson,
+  RITUAL_KNOWN_APP_ORIGINS,
+} from "./ritualAssetInventory";
 import { createRitualAssetPlan, type RitualAssetPlan } from "./ritualAssetPlan";
 import { deriveRitualPublicationIdentity } from "./ritualPublicationIdentity";
 import type { RitualPublicationSelection } from "./sqlRitualPublicationSelection";
 
-const KNOWN_APP_ORIGINS = ["https://magick.ly"] as const;
+const KNOWN_APP_ORIGINS = RITUAL_KNOWN_APP_ORIGINS;
 const STATIC_INVENTORY_PATHS = Object.freeze([
   ...RITUAL_PUBLICATION_STATIC_PATHS,
   ...Object.keys(legacyStaticImageAliases),

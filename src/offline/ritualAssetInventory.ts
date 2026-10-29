@@ -11,6 +11,8 @@ export const RITUAL_ASSET_INVENTORY_LIMITS = Object.freeze({
   styleBytes: 16 * 1024,
   issues: 512,
 } as const);
+/** The app's own origins: an absolute URL on one of these is a local reference. */
+export const RITUAL_KNOWN_APP_ORIGINS = Object.freeze(["https://magick.ly"]);
 /** Explicit server/build configuration. Catalog membership is not proof of bytes or permission. */
 export interface RitualAssetInventoryOptions {
   knownAppOrigins: readonly string[];

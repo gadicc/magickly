@@ -68,7 +68,6 @@ export default function HallRail({ current }: { current: GdHallEntry }) {
                             width={small.width}
                             height={small.height}
                           />
-                          {/* biome-ignore lint/performance/noImgElement: a static, sized thumbnail */}
                           <img
                             src={BLANK}
                             width={small.width}

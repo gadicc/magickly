@@ -1225,7 +1225,7 @@ nothing.
 - **Layout.** The page leaves `EntityFrame`'s 600 px column for a frame
   of its own (still the entity parts: `Trail`, `Lede`, `EntityTable`,
   `Row`, `PrevNext`), in a CSS grid:
-  - **From 1,200 px**: three columns, the rail (about 220 px), the plan
+  - **From 1,200 px**: three columns, the rail (200 px), the plan
     (at most 480 px) and the text (the H1, the lede, the actions,
     previous and next, the stations), with the sources and the licence
     under the text column.
@@ -1246,15 +1246,16 @@ nothing.
   28 October 2026; a follow-up in plan 000). The figure's `sizes` follows the columns, so the
   phone still fetches the medium PNG and the desktop at 1× the medium
   or full by width.
-- **The rail** (desktop): a server-rendered `<nav aria-label="Temple
-  halls">` headed by an "All temple halls" link, the grade groups and
-  their cards at 56 px, the current hall outlined and marked
+- **The rail** (desktop): a server-rendered `<nav aria-label="All
+  temple halls">` headed by an "All temple halls" link, the grade groups
+  and their cards at 56 px, the current hall outlined and marked
   `aria-current="page"`. It is sticky below the app bar and scrolls
   within itself if the window is shorter than the rail. Links have
   `prefetch={false}`. Its thumbnails are the small PNGs (14 to 23 KB
   each, about 250 KB for all fourteen), `loading="lazy"`; on a phone
-  the rail is `display: none`, and browsers do not fetch lazy images
-  that are not rendered.
+  the rail is `display: none`, and only a screen 900 px or wider
+  fetches them (see A11: a hidden lazy image is fetched all the same,
+  so each is a `<picture>` source for that width).
 - **"Jump to hall"** (phone): a native `<select>` with an `<optgroup>`
   per grade and the shared labels, the current hall selected, in a small
   client component (`HallJump`) that calls `router.push` on change.

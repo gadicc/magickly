@@ -4,6 +4,10 @@ import type {
 } from "@magick-components/gd/hall/types";
 import { validateHall } from "@magick-components/gd/hall/validate";
 import { gdHallArt } from "@/app/gd/halls/art";
+import {
+  inventoryRitualAssets,
+  RITUAL_KNOWN_APP_ORIGINS,
+} from "@/offline/ritualAssetInventory";
 import { RETIRED_HALL_DRAWINGS } from "@/seo/hallRedirects";
 import { parseRitualPugWithLocations, RITUAL_PUG_HEADER } from "./ritualPug";
 import type { RitualSourceLocation } from "./ritualSourceDiagnostics";
@@ -42,9 +46,10 @@ type Element = Extract<RitualSemanticNode, { kind: "element" }>;
  * the hall to the node skips them too.
  *
  * An image of one of the site's retired temple drawings is a warning too,
- * at its tag: publishing would fail on it, since publication cannot
- * capture a file that is gone (plan 061, stage I), and the hall it showed
- * is one `/hall` away.
+ * at its tag, in any form publication would read as that file:
+ * publishing would fail on it, since publication cannot capture a file
+ * that is gone (plan 061, stage I), and the hall it showed is a Temple
+ * hall block away.
  *
  * With `headerless`, the source is a ritual's Pug without its header
  * line (the `/gd/halls/editor` page's source, plan 061 stage E), and the lines
@@ -90,10 +95,7 @@ export function gdHallSourceWarnings(
   let firstHall: RitualSourceLocation | undefined;
   const visit = (node: RitualSemanticNode) => {
     if (node.kind !== "element") return;
-    if (
-      node.tag === "img" &&
-      Object.hasOwn(RETIRED_HALL_DRAWINGS, String(node.attrs.src))
-    ) {
+    if (node.tag === "img" && retiredDrawing(node.attrs.src)) {
       const location = locations.get(node);
       const at = location?.attributes?.src ?? location;
       const line = at?.line ?? 1;
@@ -102,7 +104,7 @@ export function gdHallSourceWarnings(
         warnings.push({
           line,
           ...(at?.column === undefined ? {} : { column: at.column }),
-          message: `Line ${line}: this temple drawing was retired, so the ritual cannot be published with it; insert its hall with /hall (Temple hall) instead`,
+          message: `Line ${line}: this temple drawing was retired, so the ritual cannot be published with it; insert its hall instead, as a Temple hall block (in the visual editor, /hall)`,
         });
       return;
     }
@@ -124,6 +126,24 @@ export function gdHallSourceWarnings(
       message: `Line ${firstHall.line}: ${unshown} more temple hall ${unshown === 1 ? "warning" : "warnings"} not shown`,
     });
   return warnings;
+}
+
+/**
+ * Whether an image's `src` is one of the retired drawings in any form
+ * publication would read as that file: classified by the offline asset
+ * inventory itself, so an absolute URL on the site's origin, a query and
+ * a display fragment count as they do there.
+ */
+function retiredDrawing(src: unknown): boolean {
+  if (typeof src !== "string") return false;
+  const { occurrences } = inventoryRitualAssets(
+    { children: [{ type: "img", src }] },
+    {
+      knownAppOrigins: RITUAL_KNOWN_APP_ORIGINS,
+      staticPaths: Object.keys(RETIRED_HALL_DRAWINGS),
+    },
+  );
+  return occurrences[0]?.reference.kind === "local-static";
 }
 
 /** The row the reader draws for a hall, as `gdHallRow` gives the editor. */

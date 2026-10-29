@@ -4831,10 +4831,10 @@ unreadable. Reverting does not help after this deploy either: the old
 source's `/pics/neophyte.svg` can no longer be published. Hence:
 
 0. **First, the query.** Check, read-only, which rituals cite a
-   drawing in their current revision, or in a revision an unfinished
-   publication still points at (a queued publication of an older
+   drawing in their current revision, or in a revision an unfinished,
+   unexpired publication still points at (a queued publication of an older
    revision would fail on it too):
-   `select distinct r.id, r.title, v.id as revision, v.id = r.current_revision_id as is_current from rituals r join ritual_revisions v on v.ritual_id = r.id where v.source ~ '/pics/(neophyte|zelator1|zelator2|theoricus1|theoricus2)\.svg' and (v.id = r.current_revision_id or v.id in (select i.current_revision_id from ritual_bundle_publication_intents i where i.ritual_id = r.id and i.completed_at is null));`
+   `select distinct r.id, r.title, v.id as revision, v.id = r.current_revision_id as is_current from rituals r join ritual_revisions v on v.ritual_id = r.id where v.source ~ '/pics/(neophyte|zelator1|zelator2|theoricus1|theoricus2)\.svg' and (v.id = r.current_revision_id or v.id in (select i.current_revision_id from ritual_bundle_publication_intents i where i.ritual_id = r.id and i.completed_at is null and i.expires_at > now()));`
    The pattern matches the path anywhere in the source, so it
    deliberately catches absolute same-origin URLs
    (`https://magick.ly/pics/neophyte.svg`) too, which the inventory
@@ -5075,9 +5075,14 @@ How it departs from I.1 to I.9:
   "cannot be prepared" message, which names no image; naming it would
   change the publication protocol's result. Instead the Pug source
   editor warns at each image of a retired drawing that the ritual
-  cannot be published with it and that `/hall` inserts its hall
-  (`gdHallSourceWarnings`, which now also runs for source holding
-  `/pics/`). The visual editor shows no such warning.
+  cannot be published with it and that its hall goes in as a Temple hall
+  block (`/hall` in the visual editor), in any form publication would
+  read as that file: the offline asset inventory classifies the `src`,
+  so an absolute URL on the site's origin, a query and a display
+  fragment count (`gdHallSourceWarnings`, which now also runs for source
+  holding `/pics/`; the app's origins are the inventory's
+  `RITUAL_KNOWN_APP_ORIGINS`, shared with publication). The visual
+  editor shows no such warning.
 - **The link's printed form.** The printer writes a link that follows a
   hall inline (`a(href="/gd/halls/neophyte") Neophyte Temple: stations,
   sources and downloads`), not as a block with a `|` child; the docs'

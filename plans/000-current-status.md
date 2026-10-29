@@ -529,11 +529,11 @@ Follow-ups are separate from the completed migration work:
   ([plan 061](061-gd-hall.md#stage-i-plan-28-october-2026)). TODO for
   Gadi after the deploy: edit the production "0=0 Grade of the
   Neophyte" ritual once to draw the Neophyte hall (a read-only query
-  of current revisions and of revisions with unfinished publications,
-  a local rehearsal, then save and publish at once; no publication
-  backfill before; plan 061, I.3). TODO: reader export, deferred; plan
-  061's end-of-project review (prepared) and stage J (private hall
-  sources) remain. TODO from the review of 28 October 2026: at 1,440 ×
+  of current revisions and of revisions with unfinished, unexpired
+  publications, a local rehearsal, then save and publish at once; no
+  publication backfill before; plan 061, I.3). TODO: reader export,
+  deferred; plan 061's end-of-project review (prepared) and stage J
+  (private hall sources) remain. TODO from the review of 28 October 2026: at 1,440 ×
   900 the hall pages' rail (804 px) scrolls within itself, leaving the
   Portal below the fold (smaller thumbnails, or two columns on short
   screens); on a phone the hall page's visual order differs from its

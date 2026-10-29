@@ -114,6 +114,9 @@ describe("hall warnings in Pug source", () => {
 });
 
 describe("warnings on the retired temple drawings", () => {
+  const message = (line: number) =>
+    `Line ${line}: this temple drawing was retired, so the ritual cannot be published with it; insert its hall instead, as a Temple hall block (in the visual editor, /hall)`;
+
   it("places one at each retired drawing's image, and none at others", () => {
     const retired = '  img(src="/pics/zelator2.svg")';
     expect(
@@ -129,16 +132,31 @@ describe("warnings on the retired temple drawings", () => {
       {
         line: 2,
         column: column("img", 'img(src="/pics/neophyte.svg")'),
-        message:
-          "Line 2: this temple drawing was retired, so the ritual cannot be published with it; insert its hall with /hall (Temple hall) instead",
+        message: message(2),
       },
-      {
-        line: 4,
-        column: column("img", retired),
-        message:
-          "Line 4: this temple drawing was retired, so the ritual cannot be published with it; insert its hall with /hall (Temple hall) instead",
-      },
+      { line: 4, column: column("img", retired), message: message(4) },
     ]);
+  });
+
+  it.each([
+    "https://magick.ly/pics/theoricus1.svg",
+    "/pics/theoricus1.svg?v=2",
+    "/pics/theoricus1.svg#view",
+    "https://magick.ly/pics/theoricus1.svg?v=2#view",
+  ])("knows %s as the inventory does", (src) => {
+    expect(
+      gdHallSourceWarnings(source(`img(src="${src}")`)).map(
+        (warning) => warning.message,
+      ),
+    ).toEqual([message(2)]);
+  });
+
+  it.each([
+    "https://example.org/pics/theoricus1.svg",
+    "/pics/theoricus1.svg.png",
+    "/pics/theoricus3.svg",
+  ])("leaves %s alone", (src) => {
+    expect(gdHallSourceWarnings(source(`img(src="${src}")`))).toEqual([]);
   });
 });
 
