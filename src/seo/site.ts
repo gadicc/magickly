@@ -3,6 +3,16 @@ export const SITE_URL = "https://magick.ly";
 
 export const SITE_NAME = "Magick.ly";
 
+/**
+ * The site as an `Organization` in structured data: the hall images'
+ * creator and the hall editor's publisher, one node for both.
+ */
+export const SITE_ORGANIZATION = {
+  "@type": "Organization",
+  name: SITE_NAME,
+  url: `${SITE_URL}/`,
+} as const;
+
 export const SITE_TITLE = `${SITE_NAME}: Open Source Magick Reference and Tools`;
 
 export const SITE_DESCRIPTION =

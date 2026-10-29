@@ -14,6 +14,7 @@ import {
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { gdHallPug, parseHallSource, printHallSource } from "@/doc/gdHallPug";
+import { hallEditorJsonLd } from "@/seo/halls";
 import HallPlayground, {
   clipped,
   exportFilename,
@@ -176,6 +177,12 @@ describe("the /gd/halls/editor page", { timeout: 20_000 }, () => {
     expect(style).toContain('src:url("/fonts/NotoSerif-Italic-latin1.woff2")');
     expect(markup.match(/<style>/g)).toHaveLength(1);
     expect(markup).toContain("kept as a draft in this browser only");
+    // The editor described as an app, escaped as every page's JSON-LD is.
+    const script = markup.match(
+      /<script type="application\/ld\+json">([\s\S]*?)<\/script>/,
+    )?.[1];
+    expect(script).not.toContain("<");
+    expect(JSON.parse(script ?? "null")).toEqual(hallEditorJsonLd());
     expect(markup).toContain("<code>/hall</code>");
     // The editor loads after the page: the shell draws no hall, and says
     // so where scripts are off.

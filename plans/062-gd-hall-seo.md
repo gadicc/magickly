@@ -1432,7 +1432,7 @@ How the build departs from A1 to A10:
   drawing. Download it as SVG or PNG: our artwork is CC BY 4.0, free to
   use with credit to Magick.ly.", the licence linked to its deed, before
   the existing paragraph on drafts. Its Open Graph follows the page
-  entry; it carries no JSON-LD.
+  entry; its JSON-LD came later (A12).
 - **The redirects** live in `src/seo/hallRedirects.ts`, which
   `next.config.ts` imports, so they import nothing; a test resolves each
   through the built config with `path-to-regexp`.
@@ -1503,5 +1503,34 @@ The checks:
 
 A `WebApplication` node in the editor's JSON-LD would fit (name,
 `applicationCategory` "DesignApplication", `operatingSystem` "Any",
-`offers` free, `url`); proposed for Gadi rather than added.
+`offers` free, `url`); proposed for Gadi rather than added. Gadi
+approved it on 29 October 2026 (A12).
+
+### A12. The editor described as an app (29 October 2026)
+
+Gadi approved A11's proposal on 29 October 2026. `/gd/halls/editor`
+carries one JSON-LD node, `hallEditorJsonLd()` in `src/seo/halls.ts`,
+rendered and escaped by `JsonLd` as the hall pages' is:
+
+- `@type` `WebApplication`; `name`, `description` and `url` are the
+  page's own title, meta description and canonical (a test holds them
+  to `pageMetadata("/gd/halls/editor")`).
+- `applicationCategory` "DesignApplication" and `operatingSystem`
+  "Any", Google's recommended properties; `browserRequirements`
+  "Requires JavaScript.", which is true (the page says so where scripts
+  are off).
+- `offers`: price "0" in `USD`, as in Google's own examples; the apps
+  are free (Gadi's choice, 29 October 2026; Google recommends a
+  currency only for paid apps).
+- `publisher` and `creator`: the `Organization` "Magick.ly", the same
+  node (`SITE_ORGANIZATION` in `src/seo/site.ts`) the hall images'
+  `ImageObject`s now take as their creator, rather than a second copy.
+- No `license`: CC BY 4.0 covers the hall art, not the app (its code is
+  AGPL, the hall package MIT). No rating or review.
+
+Google's software-app documentation (last updated 8 September 2026)
+requires `name`, `offers.price` and either `aggregateRating` or
+`review` for the rich result, and supports the `WebApplication` subtype.
+With no rating the page earns no software-app rich result; the node is
+structured data only, which is what was wanted.
 

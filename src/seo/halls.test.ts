@@ -14,8 +14,10 @@ import {
   hallAlt,
   hallCardLabel,
   hallDescription,
+  hallEditorJsonLd,
   hallGroupName,
   hallGroups,
+  hallJsonLd,
   hallPage,
   hallPages,
   hallPath,
@@ -23,6 +25,7 @@ import {
   listed,
   withArticle,
 } from "./halls";
+import { pageMetadata } from "./metadata";
 
 describe("the temple halls' search pages", () => {
   it("gives every hall a page under /gd/halls, in the presets' order", () => {
@@ -224,5 +227,41 @@ describe("the temple halls' search pages", () => {
     ).toBe(
       "Floor plan of the Golden Dawn Portal Temple, part 1: the officers' stations, the altar, Pan and the Devil, after Regardie (1938). CC BY 4.0.",
     );
+  });
+
+  it("describes the hall editor as a free web application, from its own metadata", () => {
+    const metadata = pageMetadata("/gd/halls/editor");
+    const app = hallEditorJsonLd();
+    expect(app).toEqual({
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: metadata.title,
+      description: metadata.description,
+      url: `https://magick.ly${metadata.alternates?.canonical}`,
+      applicationCategory: "DesignApplication",
+      operatingSystem: "Any",
+      browserRequirements: "Requires JavaScript.",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      publisher: {
+        "@type": "Organization",
+        name: "Magick.ly",
+        url: "https://magick.ly/",
+      },
+      creator: {
+        "@type": "Organization",
+        name: "Magick.ly",
+        url: "https://magick.ly/",
+      },
+    });
+    // The same Organization the hall images credit.
+    const [, png] = hallJsonLd(gdHall("neophyte") as never)["@graph"];
+    expect(app.publisher).toEqual((png as { creator: unknown }).creator);
+    // Google's software-app fields: a name and a price (a rating, which a
+    // rich result also needs, the editor has none of).
+    expect(app.name).toBeTruthy();
+    expect(Number(app.offers.price)).toBe(0);
+    expect(app.offers.priceCurrency).toMatch(/^[A-Z]{3}$/);
+    // CC BY 4.0 covers the hall art, not the app.
+    expect(app).not.toHaveProperty("license");
   });
 });

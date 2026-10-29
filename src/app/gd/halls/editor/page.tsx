@@ -3,6 +3,8 @@ import { Box, Container, Typography } from "@mui/material";
 import Link from "next/link";
 import OpenSource from "@/OpenSource";
 import { GD_HALL_LICENCE } from "@/render/contracts/gdHall";
+import { hallEditorJsonLd } from "@/seo/halls";
+import JsonLd from "@/seo/JsonLd";
 import { pageMetadata } from "@/seo/metadata";
 import { GD_HALL_FONT_BASE } from "../fontBase";
 import HallPlaygroundLoader from "./HallPlaygroundLoader";
@@ -18,6 +20,7 @@ export const metadata = pageMetadata("/gd/halls/editor");
 export default function HallEditorPage() {
   return (
     <>
+      <JsonLd data={hallEditorJsonLd()} />
       {/* The halls' label fonts, for every hall on the page. */}
       <style>{gdHallFontFaceCss(GD_HALL_FONT_BASE)}</style>
       <Container sx={{ px: 2, pt: 2 }} data-hall-page="text">

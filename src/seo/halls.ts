@@ -24,7 +24,8 @@ import {
 import { socialCardImage } from "./cards";
 import type { EntityPage } from "./entities";
 import { seoMetadata } from "./metadata";
-import { SITE_URL } from "./site";
+import { PUBLIC_PAGES } from "./pages";
+import { SITE_ORGANIZATION, SITE_URL } from "./site";
 
 /**
  * The temple halls' search pages (plan 062): their paths, titles,
@@ -376,7 +377,7 @@ export function hallJsonLd(hall: GdHallEntry) {
     height: file.height,
     license: L.url,
     acquireLicensePage: L.acquireLicensePage,
-    creator: { "@type": "Organization", name: L.creator, url: `${SITE_URL}/` },
+    creator: SITE_ORGANIZATION,
     creditText: L.creditText,
     copyrightNotice: L.copyrightNotice,
     isBasedOn: books,
@@ -433,5 +434,32 @@ export function hallMetadata(slug: string): Metadata | null {
         },
       ],
     },
+  };
+}
+
+/**
+ * The hall editor as a `WebApplication` (Gadi, 29 October 2026): its
+ * name, description and URL are the page's own metadata. Free, so the
+ * offer is a price of 0, in US dollars, as in Google's own examples (the
+ * app is free in any currency; Gadi, 29 October 2026). No `license`: CC BY
+ * 4.0 covers the hall art, not the app. No rating either, so Google
+ * shows no software-app rich result for it; the node describes the page
+ * all the same.
+ */
+export function hallEditorJsonLd() {
+  const path = "/gd/halls/editor";
+  const page = PUBLIC_PAGES[path];
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: page.title,
+    description: page.description,
+    url: `${SITE_URL}${path}`,
+    applicationCategory: "DesignApplication",
+    operatingSystem: "Any",
+    browserRequirements: "Requires JavaScript.",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    publisher: SITE_ORGANIZATION,
+    creator: SITE_ORGANIZATION,
   };
 }
