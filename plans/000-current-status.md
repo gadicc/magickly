@@ -540,5 +540,15 @@ Follow-ups are separate from the completed migration work:
   DOM order (CSS `order` puts previous and next and the actions above
   the lede), so reorder the markup or accept it
   ([plan 062's amendment](062-gd-hall-seo.md#amendment-the-halls-under-gdhalls-28-october-2026), A4).
+- Linked selection in the hall editor: planned on 29 October 2026 on
+  `gate/hall-sync` ([plan 063](063-hall-selection-link.md)), reviewed
+  and answered by Gadi the same day. In `/gd/halls/editor`'s split view,
+  selecting an item in the drawing moves the source caret to its tag,
+  and moving the caret selects the item. TODO (out of its scope): the
+  same link in the ritual editor's split view, between a hall item and
+  its line in the whole ritual's source
+  ([plan 063](063-hall-selection-link.md#9-out-of-scope)). TODO: the
+  install holds two copies of `@codemirror/view` (6.43.12, which
+  `@uiw/react-codemirror` uses, and 6.38.4); dedupe them.
 
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.
