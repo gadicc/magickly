@@ -162,6 +162,8 @@ export default defineConfig({
         "src/doc/gdHallEditor/hallRows.ts",
         "src/doc/gdHallEditor/hallSourceMap.ts",
         "src/doc/ritualBlocks/GdHallAtomEditor.tsx",
+        "src/doc/ritualHallLink.ts",
+        "src/app/doc/[[]_id]/edit/semantic/useRitualHallLink.ts",
         "src/doc/pendingEdits.ts",
         "src/components/svgCoordinate.ts",
         "src/app/geomancy/tetragrams.ts",

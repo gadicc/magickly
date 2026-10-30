@@ -703,6 +703,105 @@ it("widens split's visual side only while a hall is open for editing", async () 
   );
 }, 60_000);
 
+/** A ritual with the Neophyte hall, in split view, its hall open. */
+async function openLinkedHall() {
+  mock.load.mockResolvedValue(undefined);
+  mock.saveDraft.mockResolvedValue(undefined);
+  const setup = props();
+  const hall = neophyteHall();
+  setup.initialDocument.nodes.push(hall);
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  fireEvent.click(await screen.findByRole("button", { name: "Split" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Edit hall" }));
+  const surface = await screen.findByRole(
+    "application",
+    {},
+    { timeout: 30_000 },
+  );
+  await waitFor(() => expect(document.activeElement).toBe(surface));
+  const source = () =>
+    screen.getByRole("textbox", {
+      name: "Ritual semantic source",
+    }) as HTMLTextAreaElement;
+  const panel = () => screen.getByLabelText("Semantic source panel");
+  /** The caret at the tag of the line declaring `id`, as `line:column`. */
+  const tagOf = (id: string) => {
+    const lines = source().value.split("\n");
+    const index = lines.findIndex((line) => line.includes(`#${id}`));
+    return `${index + 1}:${lines[index].search(/\S/) + 1}`;
+  };
+  const imperator = (
+    (hall.children?.[0] as typeof hall).children?.[0] as typeof hall
+  ).id;
+  return { hall, surface, source, panel, tagOf, imperator };
+}
+
+it("puts the source caret on the hall item the drawing selects (plan 064)", async () => {
+  const { surface, source, panel, tagOf, imperator } = await openLinkedHall();
+  expect(source().dataset.cursor).toBeUndefined();
+  expect(panel().dataset.linkedCaret).toBeUndefined();
+  fireEvent.keyDown(surface, { key: "Tab" });
+  await waitFor(() => expect(source().dataset.cursor).toBe(tagOf(imperator)));
+  expect(panel().dataset.linkedCaret).toBe("true");
+  expect(document.activeElement).toBe(surface);
+  // A nudge reprints the source; the caret goes to the item again.
+  const before = source().value;
+  fireEvent.keyDown(surface, { key: "ArrowRight" });
+  await waitFor(() => expect(source().value).not.toBe(before));
+  expect(source().dataset.cursor).toBe(tagOf(imperator));
+  expect(document.activeElement).toBe(surface);
+  // The source taking the focus ends the drawing's lead.
+  fireEvent.focus(source());
+  expect(source().dataset.cursor).toBeUndefined();
+  expect(panel().dataset.linkedCaret).toBeUndefined();
+}, 60_000);
+
+it("lets the source go while the author types in the visual text (plan 064)", async () => {
+  const { surface, source, panel, tagOf, imperator } = await openLinkedHall();
+  fireEvent.keyDown(surface, { key: "Tab" });
+  await waitFor(() => expect(source().dataset.cursor).toBe(tagOf(imperator)));
+  const visual = screen.getByRole("textbox", {
+    name: "Ritual visual editor",
+  }) as HTMLElement & { editor: import("@tiptap/core").Editor };
+  act(() => visual.focus());
+  const before = source().value;
+  act(() => {
+    visual.editor.chain().setTextSelection(2).insertContent("TYPED").run();
+  });
+  await waitFor(() => expect(source().value).not.toBe(before));
+  expect(source().value).toContain("TYPED");
+  // Each keystroke reprints the source: no caret drawn back to the hall.
+  expect(source().dataset.cursor).toBeUndefined();
+  expect(panel().dataset.linkedCaret).toBeUndefined();
+  // Back in the hall's editor, it leads again with its selection.
+  act(() => surface.focus());
+  await waitFor(() => expect(source().dataset.cursor).toBe(tagOf(imperator)));
+}, 60_000);
+
+it("leads into split view from Visual with the drawing's selection (plan 064)", async () => {
+  const { surface, source, panel, tagOf, imperator } = await openLinkedHall();
+  fireEvent.keyDown(surface, { key: "Tab" });
+  await waitFor(() => expect(source().dataset.cursor).toBe(tagOf(imperator)));
+  fireEvent.click(screen.getByRole("button", { name: "Visual" }));
+  expect(screen.queryByLabelText("Semantic source panel")).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "Split" }));
+  await waitFor(() => expect(source().dataset.cursor).toBe(tagOf(imperator)));
+  expect(panel().dataset.linkedCaret).toBe("true");
+  // After the source led, the drawing still leads into split view.
+  fireEvent.focus(source());
+  expect(source().dataset.cursor).toBeUndefined();
+  fireEvent.click(screen.getByRole("button", { name: "Visual" }));
+  fireEvent.click(screen.getByRole("button", { name: "Split" }));
+  await waitFor(() => expect(source().dataset.cursor).toBe(tagOf(imperator)));
+  // Closing the hall forgets its selection.
+  fireEvent.keyDown(surface, { key: "Escape" });
+  fireEvent.keyDown(surface, { key: "Escape" });
+  await waitFor(() => expect(screen.queryByRole("application")).toBeNull());
+  expect(source().dataset.cursor).toBeUndefined();
+  expect(panel().dataset.linkedCaret).toBeUndefined();
+}, 60_000);
+
 it("gives the sides 1:1, or 2:3 while a hall is edited, in its stylesheet", () => {
   const css = readFileSync(
     "src/app/doc/[_id]/edit/semantic/SemanticEditor.module.css",
@@ -1927,22 +2026,33 @@ vi.mock("@/doc/RitualSourceEditor", () => ({
     diagnostic,
     header,
     reveal,
+    cursor,
   }) =>
     React.createElement(
       React.Fragment,
       null,
       header,
-      React.createElement("textarea", {
-        "aria-label": label,
-        "data-diagnostic-source": diagnostic?.source,
-        "data-reveal-line": reveal?.line,
-        value,
-        disabled,
-        onChange: (event) =>
-          onChange((event.target as HTMLTextAreaElement).value),
-        onCompositionStart: () => onCompositionChange?.(true),
-        onCompositionEnd: () => onCompositionChange?.(false),
-      }),
+      // CodeMirror's own box, where the source leads (plan 064).
+      React.createElement(
+        "div",
+        { className: "cm-editor" },
+        React.createElement("textarea", {
+          "aria-label": label,
+          "data-diagnostic-source": diagnostic?.source,
+          "data-reveal-line": reveal?.line,
+          // The caret the editor asks for, while it is for the text shown.
+          "data-cursor":
+            cursor && cursor.source === value
+              ? `${cursor.line}:${cursor.column}`
+              : undefined,
+          value,
+          disabled,
+          onChange: (event) =>
+            onChange((event.target as HTMLTextAreaElement).value),
+          onCompositionStart: () => onCompositionChange?.(true),
+          onCompositionEnd: () => onCompositionChange?.(false),
+        }),
+      ),
     ),
 }));
 

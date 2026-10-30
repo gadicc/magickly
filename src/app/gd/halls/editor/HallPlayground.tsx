@@ -30,6 +30,7 @@ import { GdHallEditor } from "@/doc/gdHallEditor/GdHallEditor";
 import { type HallElement, hallRowOf } from "@/doc/gdHallEditor/hallModel";
 import { gdHallPug, printHallSource } from "@/doc/gdHallPug";
 import { gdHallSource } from "@/doc/gdHallRows";
+import linkedCaret from "@/doc/linkedCaret.module.css";
 import { RitualLayoutSwitch } from "@/doc/RitualLayoutSwitch";
 import RitualSourceEditor from "@/doc/RitualSourceEditor";
 import type { RitualSourceDiagnostic } from "@/doc/ritualSourceDiagnostics";
@@ -828,7 +829,7 @@ export default function HallPlayground() {
       <div ref={panels} className={styles.panels} data-layout={displayMode}>
         {displayMode !== "visual" && (
           <section
-            className={`${styles.panel} ${styles.sourcePanel}`}
+            className={`${styles.panel} ${styles.sourcePanel} ${linkedCaret.panel}`}
             aria-label="Temple hall source panel"
             data-linked-caret={link.marked || undefined}
             onFocus={link.onSourceFocus}

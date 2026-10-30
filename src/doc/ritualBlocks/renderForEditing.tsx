@@ -429,8 +429,12 @@ export function RitualAtomForEditing({
       data-edit-active={selected || undefined}
       // While its hall editor is open (loading included), the ritual
       // editor's split gives the visual panel three parts to the source's
-      // two, through :has() in SemanticEditor.module.css.
-      data-gd-hall-editing={(tag === "gdHall" && editingHall) || undefined}
+      // two, through :has() in SemanticEditor.module.css. Its value is
+      // the hall's ID, which the ritual editor's link reads from the
+      // focus (plan 064).
+      data-gd-hall-editing={
+        tag === "gdHall" && editingHall ? String(node.attrs.id) : undefined
+      }
       contentEditable={false}
     >
       {attachedImage && (

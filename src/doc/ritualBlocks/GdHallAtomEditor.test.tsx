@@ -12,6 +12,7 @@ import { NodeSelection, Plugin } from "@tiptap/pm/state";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { HallElement } from "../gdHallEditor/hallModel";
+import { type RitualHallLink, RitualHallLinkContext } from "../ritualHallLink";
 import { parseRitualPug, RITUAL_PUG_HEADER } from "../ritualPug";
 import { type RitualSemanticNode, validateRitualSemantic } from "../semantic";
 import {
@@ -58,7 +59,13 @@ const hallPos = (editor: Editor) => {
 };
 
 let current: Editor | null = null;
-function Host({ text = source }: { text?: string }) {
+function Host({
+  text = source,
+  link = null,
+}: {
+  text?: string;
+  link?: RitualHallLink | null;
+}) {
   const editor = useEditor({
     extensions: ritualTiptapClientExtensions,
     content: semanticToTiptap(parseRitualPug(text)),
@@ -68,11 +75,15 @@ function Host({ text = source }: { text?: string }) {
     },
   });
   current = editor;
-  return <EditorContent editor={editor} />;
+  return (
+    <RitualHallLinkContext value={link}>
+      <EditorContent editor={editor} />
+    </RitualHallLinkContext>
+  );
 }
 
-async function openEditor() {
-  render(<Host />);
+async function openEditor(link: RitualHallLink | null = null) {
+  const rendered = render(<Host link={link} />);
   const button = await screen.findByRole("button", { name: "Edit hall" });
   const editor = current as Editor;
   const before = editor.state.selection.toJSON();
@@ -83,7 +94,7 @@ async function openEditor() {
     {},
     { timeout: 30_000 },
   );
-  return { editor, surface, before };
+  return { editor, surface, before, rendered };
 }
 
 describe("editing a hall in the ritual editor", () => {
@@ -243,6 +254,34 @@ describe("editing a hall in the ritual editor", () => {
     fireEvent.keyDown(surface, { key: "Tab" });
     fireEvent.keyDown(surface, { key: "ArrowRight" });
     expect(editor.can().undo()).toBe(false);
+  }, 60_000);
+});
+
+describe("linked with the ritual source (plan 064)", () => {
+  const linking = () => {
+    const close = vi.fn();
+    const link: RitualHallLink = {
+      linked: true,
+      open: vi.fn(() => close),
+      selected: vi.fn(),
+    };
+    return { link, close };
+  };
+
+  it("registers while open and reports the drawing's selection", async () => {
+    const { link, close } = linking();
+    const { editor, surface } = await openEditor(link);
+    const hallId = hallIn(editor).id;
+    expect(link.open).toHaveBeenCalledWith(hallId);
+    expect(link.selected).toHaveBeenLastCalledWith(hallId, null);
+    fireEvent.keyDown(surface, { key: "Tab" });
+    const imperator = (hallIn(editor).children?.[0] as SemanticElement)
+      .children?.[0] as SemanticElement;
+    expect(link.selected).toHaveBeenLastCalledWith(hallId, imperator.id);
+    fireEvent.keyDown(surface, { key: "Escape" });
+    expect(link.selected).toHaveBeenLastCalledWith(hallId, null);
+    fireEvent.keyDown(surface, { key: "Escape" });
+    await waitFor(() => expect(close).toHaveBeenCalledOnce());
   }, 60_000);
 });
 

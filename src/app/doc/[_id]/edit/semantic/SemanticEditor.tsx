@@ -24,6 +24,7 @@ import {
 import { EditorContent, useEditor } from "@tiptap/react";
 import React from "react";
 import EditorActionButton from "@/doc/EditorActionButton";
+import linkedCaret from "@/doc/linkedCaret.module.css";
 import { retainsOnlineEditorIdentity } from "@/doc/onlineEditorIdentity";
 import { flushPendingEdits } from "@/doc/pendingEdits";
 import { RitualLayoutSwitch } from "@/doc/RitualLayoutSwitch";
@@ -31,6 +32,7 @@ import RitualSourceEditor from "@/doc/RitualSourceEditor";
 import RitualVisualControls, {
   modifierLabel,
 } from "@/doc/RitualVisualControls";
+import { RitualHallLinkContext } from "@/doc/ritualHallLink";
 import {
   revealRitualNode,
   ritualNodeIdAtSelection,
@@ -79,6 +81,7 @@ import { createUuidV7 } from "@/lib/ids";
 import { getBrowserOfflineRuntime } from "@/offline/browserRuntime";
 import styles from "./SemanticEditor.module.css";
 import type { SemanticEditorProps } from "./SemanticEditorShell";
+import { useRitualHallLink } from "./useRitualHallLink";
 
 // Loaded on first use: it calls server actions, which the editor's own tests
 // and first paint have no need of.
@@ -206,6 +209,9 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     if (parsed) return parsed;
     return issue.id ? ritualPugLineOfId(source.text, issue.id) : null;
   }, [visualIssue, document, source.text, source.dialect, source.dirty]);
+  // A hall open for editing links its selection with the source caret
+  // (plan 064), in both directions.
+  const hallLink = useRitualHallLink({ displayMode, source });
   // In split view the other panel follows the caret's node, never its own
   // caret or focus, and only when that node changes.
   const [follow, setFollow] = React.useState<{
@@ -1422,8 +1428,10 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       <Box className={styles.panels} data-layout={displayMode}>
         {displayMode !== "visual" && (
           <section
-            className={styles.sourcePanel}
+            className={`${styles.sourcePanel} ${linkedCaret.panel}`}
             aria-label="Semantic source panel"
+            data-linked-caret={hallLink.marked || undefined}
+            onFocus={hallLink.onSourceFocus}
           >
             {source.dialect === "ritual-text" && (
               <Alert severity="info">
@@ -1439,6 +1447,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
               reveal={reveal}
               follow={follow}
               onCaretNode={onCaretNode}
+              cursor={hallLink.cursor}
               header={
                 <>
                   <Typography
@@ -1542,6 +1551,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             className={styles.visualPanel}
             aria-label="Visual editor panel"
             aria-busy={(sourceSyncing && !sourceProblem) || undefined}
+            onFocus={hallLink.onVisualFocus}
           >
             <RitualVisualControls
               editor={editor}
@@ -1560,7 +1570,9 @@ export default function SemanticEditor(props: SemanticEditorProps) {
               ritualId={props.ritualId}
               title={title}
             />
-            <EditorContent editor={editor} className={styles.editor} />
+            <RitualHallLinkContext value={hallLink.link}>
+              <EditorContent editor={editor} className={styles.editor} />
+            </RitualHallLinkContext>
           </section>
         )}
       </Box>

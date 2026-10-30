@@ -1,0 +1,15 @@
+/* While a hall's drawing has a selection in split view, the source caret
+   stands on its tag (plans 063 and 064), but CodeMirror hides its caret
+   and barely tints its line without the focus: mark the line, as Gadi
+   chose from the mock-ups (B, 29 October 2026), in MUI's primary blue,
+   like the drawing's selection box. Both source panels (the hall editor
+   page's and the ritual editor's) add `.panel` and set
+   `data-linked-caret` while the mark applies. */
+.panel[data-linked-caret] :global(.cm-editor:not(.cm-focused) .cm-activeLine) {
+  background-color: #cfe6fa;
+  box-shadow: inset 3px 0 0 #1976d2;
+}
+.panel[data-linked-caret]
+  :global(.cm-editor:not(.cm-focused) .cm-activeLineGutter) {
+  background-color: #b9dcf5;
+}

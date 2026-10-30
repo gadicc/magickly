@@ -12,6 +12,7 @@ import { GD_HALL_FONT_BASE } from "@/app/gd/halls/fontBase";
 import { GdHallEditor } from "../gdHallEditor/GdHallEditor";
 import type { HallElement } from "../gdHallEditor/hallModel";
 import { ritualEditorOwner } from "../ritualEditorOwner";
+import { useLinkedHall } from "../ritualHallLink";
 import { validateRitualSemantic } from "../semantic";
 
 const fontFaces = gdHallFontFaceCss(GD_HALL_FONT_BASE);
@@ -129,6 +130,8 @@ export default function GdHallAtomEditor({
     editor: ritualEditorOwner(editor),
     selector: ({ editor: current }) => current.isEditable,
   });
+  // The ritual editor's split view links the selection with its source.
+  const linked = useLinkedHall(hall);
   const onChange = useCallback(
     (next: HallElement) => writeHallToAtom(editor, getPos(), hall.id, next),
     [editor, getPos, hall.id],
@@ -154,6 +157,7 @@ export default function GdHallAtomEditor({
         initialFocus={initialFocus}
         onUndo={history(undoNoScroll)}
         onRedo={history(redoNoScroll)}
+        {...linked}
       />
     </>
   );
