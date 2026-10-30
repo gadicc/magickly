@@ -545,10 +545,11 @@ Follow-ups are separate from the completed migration work:
   reviewed and answered by Gadi the same day, every commit gated;
   awaiting review and merge. In `/gd/halls/editor`'s split view,
   selecting an item in the drawing moves the source caret to its tag,
-  and moving the caret selects the item. TODO (out of its scope): the
-  same link in the ritual editor's split view, between a hall item and
-  its line in the whole ritual's source
-  ([plan 063](063-hall-selection-link.md#9-out-of-scope)). The install
+  and moving the caret selects the item. The same link in the ritual
+  editor's split view, between a hall item and its line in the whole
+  ritual's source, while Edit hall is open: planned and reviewed on 30
+  October 2026 on `gate/ritual-hall-link`
+  ([plan 064](064-ritual-hall-selection-link.md)). The install
   holds one `@codemirror/view` again (6.43.15) and one
   `@codemirror/commands` (6.11.1), since 30 October 2026.
 
