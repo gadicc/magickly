@@ -2,6 +2,9 @@
 
 Status: planned on `gate/ritual-hall-link` from `main` at 364f7e51,
 reviewed (Fable) and revised the same day; see "The review" below.
+Built on the same branch the same day, every commit gated; see "The
+build". Code-reviewed (Opus and Fable) the same day, the fixes folded
+into their commits; see "The code review". Awaiting merge.
 Read [current status](000-current-status.md) and
 [plan 063](063-hall-selection-link.md) first: this plan carries 063's
 link from `/gd/halls/editor` into the ritual editor, the follow-up its
@@ -72,9 +75,8 @@ Fable found no blocking defect. Folded into the decisions below:
   option, no change to `revealRitualNode`. If the open hall editor is
   not shown (a footnote's hidden canonical body), today's follow runs
   (decision 4).
-- **The ritual atom's node view is never re-purposed for another tag**
-  (decision 7), so a read does not hand an open hall's view to a
-  neighbouring atom.
+- **Harden the atom's node view against re-use across tags** (item 7):
+  considered, and not built, as it would not help (decision 7).
 - **The channel is React state**, not an external store (decision 5):
   SemanticEditor renders anyway for every keystroke in the source; a
   store is kept only if a measurement shows a cost.
@@ -113,9 +115,11 @@ Fable found no blocking defect. Folded into the decisions below:
     the indentation scan finds above them: the tag when they are
     indented deeper than it, else an ancestor. Printed halls have
     neither; only typed ones do.
-  - Lines inside a Pug block comment that look like headers
-    (`//-` with an indented, commented-out `officer#…`) are read as
-    headers; the first header with an ID wins.
+  - A `//-` line itself never matches the header pattern, but the
+    indented body lines of a Pug block comment (a `//-` alone on its
+    line, a commented-out `officer#…` indented below it) do: the line
+    scans read them as headers, and the first header with an ID wins
+    (checked by script: `ritualPugLineOfId` finds the commented copy).
   - The scan is meaningful only for the text the document was read
     from: not while `source.dirty` (typing not yet read, an error, a
     conflict), and not in the `ritual-text` recovery dialect.
@@ -168,11 +172,12 @@ Fable found no blocking defect. Folded into the decisions below:
   tree. A footnote may hold a hall (`block*` content, `li` or `note`
   inside); its canonical body stays in the document, hidden.
 - **Node view reuse.** Tiptap's `ReactNodeView.update` accepts any node
-  of the same type; ProseMirror's `updateNextNode` offers a changed node
-  to the following views of the parent in turn. So a `setContent` (a
-  read of the source) can give one `ritualAtom`'s view, with its React
-  state, to another atom: an open hall's `editingHall` to an image, or
-  an image's view to the hall, closing its editor.
+  of the same type. ProseMirror's `updateNextNode` (1.42.4, line 1912)
+  offers a changed node to the first view at or after its place, and
+  stops there: a view that refuses means a new view. So a read that
+  changes only the hall updates its view in place, its editor kept;
+  one that also changes or removes the atom just before it gives the
+  hall a new view (or that atom's), and the open editor closes.
 - **The caret mark** (style B) is two rules in
   `src/app/gd/halls/editor/hallPlayground.module.css`, on
   `.sourcePanel[data-linked-caret]`, outside `.cm-focused`.
@@ -200,8 +205,8 @@ Accepted limits (the "What exists" list): a tag typed without an ID
 links through its parent until a visual edit reprints the source (the
 drawing selecting it leaves the caret and shows no mark); a blank line,
 and an attribute list's further lines, belong to what the indentation
-scan finds above them; commented-out header lines can be taken for
-headers. Each is what today's block follow and issue lines already do.
+scan finds above them; the body lines of a block comment can be taken
+for headers. Each is what today's block follow and issue lines already do.
 
 ### 2. Drawing → source
 
@@ -227,8 +232,9 @@ headers. Each is what today's block follow and issue lines already do.
   editor stays registered and its reports keep arriving. Entering Split
   from Visual makes the drawing lead with the selection it holds, so
   the new source view's caret goes to it (063's rule:
-  `hallSelectionLink.ts`, `onLayout`), whichever panel had led before.
-  Source → Split cannot carry a hall: in Source the visual panel, and
+  `hallSelectionLink.ts`, `onLayout`), whichever editor had led
+  before; not when the author was last in the visual panel's text,
+  where neither leads (decision 4). Source → Split cannot carry a hall: in Source the visual panel, and
   the hall editor with it, unmounts.
 
 ### 3. Source → drawing
@@ -263,14 +269,27 @@ headers. Each is what today's block follow and issue lines already do.
 
 ### 4. Who leads, and the block follow
 
-**Origin.** As on the hall page, the link follows the panel that led
-last: `onFocus` on each `<section>` (React's focus events bubble out of
-the node view's portal), and `caretMoved` itself, which makes the source
-lead whatever the order of events. The source leading ends the
-drawing's lead on the selection, so typing never draws the caret back
-to the selected tag; the drawing leading ends the source's requests. A
-selection the source asked for is reported while the source leads and
-is never echoed into a caret move.
+**What leads.** The link follows the editor that took the focus last,
+by `onFocus` on each `<section>` (React's focus events bubble out of
+the node view's portal) and where its target stands:
+
+- in an open hall's editor (inside its node view's
+  `data-gd-hall-editing`, which holds the hall's ID): that hall leads,
+  with its selection, even one the source chose, whose tag then takes
+  the caret, as on the hall editor page; the source's caret stops
+  selecting;
+- in CodeMirror's `.cm-editor`, and in `caretMoved` itself, whatever
+  the order of events: the source leads; the drawing's selection stops
+  moving the caret, so typing never draws it back to the selected tag;
+- anywhere else in either panel (the visual panel's text, a toolbar,
+  the source's help link or buttons): neither leads. Typing in the
+  visual text reprints the source at every keystroke, and must not
+  draw its caret back to the hall.
+
+A selection the source asked for is reported while the source leads
+and is never echoed into a caret move. Safari does not focus a button
+or similar control on a click, so a click there leaves the lead where
+it was; the same platform gap as plan 063's.
 
 **Visual → source.** The block follow never fires from the hall editor
 (`insideHallControls`, and `hasFocus`), and the link's `cursor` fires
@@ -283,13 +302,17 @@ only from it; they cannot both act on one change.
 if (!link.caretMoved(ids)) ids.some((id) => revealRitualNode(editor, id));
 ```
 
-`caretMoved` answers true when an open hall's ID stands in the chain
-after its first ID (the caret is in one of its items) and that hall's
-editor is drawn (its node view has a height). Then the item reveal
-does all the scrolling, just enough, inside `.editor`. The hall's own
-line (`[]`), lines outside open halls, closed halls, and a hall whose
-editor is not drawn (a footnote's hidden canonical body) keep today's
-follow unchanged.
+`caretMoved` answers true only when the item reveal will happen: split
+view, read text, an open hall's ID in the chain after its first ID,
+and that hall answering that the chain selects a drawn node and that
+its editor is drawn (`reveals`: `hallCaretPath`, `selectableForPath`
+on the hall laid out once per hall, and its node view's height). Then
+the item reveal does all the scrolling, just enough, inside `.editor`.
+Everything else keeps today's follow unchanged: text not yet read or
+in error (nothing will select), a line of the hall's structure
+(`dais`, `floor`, a comment in them) and the hall's own line (which
+select nothing), lines outside open halls, closed halls, and a hall
+whose editor is not drawn (a footnote's hidden canonical body).
 
 ### 5. The channel: React context over SemanticEditor state
 
@@ -310,9 +333,15 @@ export interface RitualHallLink {
   /** While the source leads, on read text; else null. */
   caret: RitualHallCaret | null;
   /** An open hall editor: on mount; the result on unmount. */
-  open(hallId: string, shown: () => boolean): () => void;
+  open(hallId: string, hall: RitualLinkedHall): () => void;
   /** The open hall's selection, on mount and whenever it changes. */
   selected(hallId: string, id: string | null): void;
+}
+
+/** An open hall editor, as the link asks it. */
+export interface RitualLinkedHall {
+  /** Whether a caret with this chain selects a drawn node, and is shown. */
+  reveals(ids: readonly string[]): boolean;
 }
 
 export const RitualHallLinkContext =
@@ -326,6 +355,7 @@ export function hallCaretPath(
 /** GdHallAtomEditor's half: its `selectPath` and `onSelectionChange`. */
 export function useLinkedHall(
   hall: HallElement,
+  art: HallArtRegistry,
   shown: () => boolean,
 ): Pick<GdHallEditorProps, "selectPath" | "onSelectionChange">;
 ```
@@ -400,13 +430,15 @@ Why this channel:
   view (just enough, as any asked-for reveal), by setting the pending
   reveal as if from no selection and rendering once more. The hall page
   does not pass it and is unchanged.
-- The `ritualAtom` node view (`tiptapRitualClient.ts`) gets an `update`
-  option: the same node object updates nothing (as now), a node with
-  another `attrs.tag` is refused (ProseMirror makes a new view), any
-  other is drawn with its new props (as now). Atoms of one tag update
-  exactly as before; only a view's re-use across tags goes. Tested with
-  a read that removes the atom before an open hall.
-- `GdHallAtomEditor`: `useLinkedHall(hall, shown)` spread onto
+- The `ritualAtom` node view is unchanged. The review asked for an
+  `update` option refusing a node of another tag, so that a read never
+  re-purposes a neighbouring atom's view as the hall. Built and tested,
+  it did not keep the hall editor open: ProseMirror stops at the first
+  view that refuses and makes a new one, so the open editor closes
+  either way when the atom before the hall changes in the same read.
+  Its only effect would be fewer re-used views, so it was dropped; an
+  accepted risk (Risks).
+- `GdHallAtomEditor`: `useLinkedHall(hall, gdHallArt, shown)` spread onto
   `GdHallEditor`, `shown` reading its node view's height.
 - `SemanticEditor`: the hook, the provider, `cursor`, the section focus
   handlers, `data-linked-caret`, the new `onCaretNode` body.
@@ -471,9 +503,9 @@ Per-file 95/90 coverage (`vitest.config.mts`): add
 - **`GdHallAtomEditor.test.tsx`:** with a provider, a selection in the
   drawing reaches `selected` with the hall's ID; a caret selects the
   item, `[]` clears, a caret outside keeps the selection; `open` on
-  mount and its cleanup on Done. The node view keeps an open hall's
-  editor through a `setContent` that removes the atom before it.
-  Without a provider the existing tests stand.
+  mount and its cleanup on Done. A `setContent` that changes only the
+  hall keeps its editor open. Without a provider the existing tests
+  stand.
 - **`SemanticEditor.test.tsx`** (the hall test's setup, split view, the
   Neophyte hall). Its source mock gains `data-cursor` (when
   `cursor.source === value`) and captures `onCaretNode` for the test to
@@ -522,7 +554,7 @@ committed).
    page's rules moved); tests.
 3. `feat(gd): Select hall items from ritual caret`: `hallCaretPath`,
    the caret, `useLinkedHall`'s `selectPath`, `revealSelected`, the
-   node view's `update`, the new `onCaretNode`; tests.
+   new `onCaretNode`; tests.
 
 Each gated alone in a clean `git archive` export under `~/.cache/gates/`
 (install, check, typecheck, test:coverage, build), with nvm's Node 24;
@@ -537,12 +569,27 @@ passes.
   portals under `EditorContent` (3.31.3 does). A Tiptap upgrade that
   renders them in separate roots would turn the link off silently; the
   SemanticEditor tests, which use the real `EditorContent`, would fail.
-- **A read that recreates the hall's node view** would still close the
-  hall editor; the `update` option removes the cross-tag case, and a
-  test types an attribute with the hall open.
+- **A read that recreates the hall's node view closes its editor.**
+  Typing in the hall's own lines updates its view in place (tested); a
+  read that also changes or removes the atom just before the hall (a
+  comment, an image) gives the hall a new view, closed. The author is
+  then editing that atom in the source; Edit hall opens it again.
 - **The lead is a heuristic**, as on the hall page (a click on the page
   outside both panels leaves the last lead).
-- **A stale header scan** for commented-out lines (decision 1).
+- **A stale header scan** for a block comment's body lines (decision 1).
+- **A request deferred by the hall editor loses its reveal.**
+  `useLinkedHall` records the caret it asked for once the request is
+  given; if `GdHallEditor` defers it (its own edit still on the way, so
+  the request's hall is not yet the one it holds), the request rebuilt
+  with the new hall has `revealSelected` false. That needs the drawing
+  to be editing while the source leads, which the lead rules keep
+  apart.
+- **Editing the `gdHall`'s own ID** in the source while it is open
+  gives the hall editor a new ID: the link forgets its selection until
+  the next one.
+- **Two halls open**: closing the one last selected in drops the cursor
+  and the mark, though the other keeps its selection until it is
+  selected in again.
 
 ## Out of scope
 
@@ -553,3 +600,65 @@ passes.
   closed halls: unchanged.
 - `revealSelected` on the hall page.
 - Real phones and Safari: no link there (Gadi's decision 4).
+
+## The build, 30 October 2026
+
+Three commits on `gate/ritual-hall-link`, each gated alone
+(`~/.cache/gates/gate.sh`: a `git archive` export, install, check,
+typecheck, test:coverage, build), the tip with the full checks:
+
+1. `docs(plan): Plan ritual hall selection link` (d8833e93): this plan
+   and plan 000's line.
+2. `feat(gd): Follow hall selection in ritual source` (e765bcfa, was
+   fa7b0047 before the code review): `RitualHallLinkContext`,
+   `useLinkedHall`'s report, `useRitualHallLink` with
+   `ritualTagCursor`, the leads by focus, the shared
+   `linkedCaret.module.css`.
+3. `feat(gd): Select hall items from ritual caret`: the caret and
+   `hallCaretPath`, `useLinkedHall`'s `selectPath` and `reveals`,
+   `revealSelected`, `caretMoved` in `onCaretNode`; this section.
+
+Where the build departs from the decisions above: no node view `update`
+option (decision 7). An open hall is drawn when its node view has a
+height, so in jsdom, which lays nothing out, it never is: the tests
+that need it drawn stub `getBoundingClientRect`.
+
+## The code review, 30 October 2026
+
+Opus and Fable reviewed the branch; both found the first item. The
+fixes are folded into the commits they belong to:
+
+1. **Typing in the visual text pinned the source to the hall item.**
+   The visual section's focus made the drawing lead wherever it landed,
+   so after a selection in the drawing every keystroke in a paragraph
+   reprinted the source and put its caret back on the hall item. The
+   lead now follows where the focus lands (decision 4): an open hall's
+   editor, CodeMirror's box, or neither. Commit 2, with a
+   SemanticEditor test of the scenario.
+2. **`caretMoved` stood the block follow aside when nothing would
+   scroll**: on text not yet read or in error, and on lines of the
+   hall's structure, which select nothing. It now asks the hall
+   (`reveals`) and needs read text. Commit 3, with tests for both.
+3. **The hall's editor taking the focus promotes its selection**, even
+   one the source chose, so a drag of it puts the caret on its tag
+   (decision 4). Commit 2.
+4. A deferred request losing `revealSelected`, editing the hall's own
+   ID, and closing one of two open halls: accepted limits (Risks).
+5. Tests: the layout stub restored by `onTestFinished`; the read of
+   typing selects an item the caret moved to while the text was dirty;
+   the closed hall's test checks the follow's IDs in order; a
+   `revealSelected` test in a scrolling box without `pageInset`, as in
+   the ritual editor.
+6. `ritualTagCursor` uses `ritualPugLineOfId`.
+7. The plan's limits: the block comment's body lines, not `//-` lines,
+   pass for headers; the blank line and attribute-list lines checked
+   again.
+
+The cost of a new link on every caret move and read (decision 5),
+measured in the browser on a production build at 1,440 × 900 with the
+Neophyte hall open: the arrow keys through the hall's lines take a
+median 38 ms from key to the next frame (at most 60, over 20 keys,
+CDP's round trips included), with no long task; typing in a hall line
+takes a median 17 ms a keystroke, the same as in a ritual line outside
+the hall. No memoising is needed.
+

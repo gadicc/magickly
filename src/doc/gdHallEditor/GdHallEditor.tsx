@@ -168,6 +168,12 @@ export interface HallSelectionRequest {
    * panel, where scrolling the page leaves the source in place.
    */
   pageInset?: number;
+  /**
+   * Scroll the node into view even when it is already the selection (a
+   * caret that came back to it, the ritual editor's link, plan 064).
+   * Without it, a request for the selected node does nothing.
+   */
+  revealSelected?: boolean;
 }
 
 /** A selection as `onSelectionChange` reports it. */
@@ -357,6 +363,8 @@ export function GdHallEditor({
     /** The window's top kept clear when a contained reveal scrolls the page. */
     pageInset?: number;
   } | null>(null);
+  /** Renders again for a reveal of the node already selected. */
+  const [, setRevealAsked] = useState(0);
   const markReveal = () => {
     revealPending.current = { id: selectedId, hall: currentRef.current };
   };
@@ -401,7 +409,20 @@ export function GdHallEditor({
       ? selectableForPath(committed, selectPath.path)
       : undefined;
     const id = target?.id ?? null;
-    if (id === selectedId) return;
+    if (id === selectedId) {
+      // Shown as if newly selected: from no selection, which the reveal
+      // below takes for a change; one more render runs it.
+      if (id && selectPath.revealSelected) {
+        revealPending.current = {
+          id: null,
+          hall: committed.hall,
+          contained: true,
+          pageInset: selectPath.pageInset,
+        };
+        setRevealAsked((count) => count + 1);
+      }
+      return;
+    }
     revealPending.current = {
       id: selectedId,
       hall: committed.hall,

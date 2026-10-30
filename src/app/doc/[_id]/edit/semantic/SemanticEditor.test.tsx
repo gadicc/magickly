@@ -10,9 +10,10 @@ import {
   within,
 } from "@testing-library/react";
 import React from "react";
-import { afterEach, expect, it, vi } from "vitest";
-import { neophyteHall } from "@/doc/gdHallEditor/hallTestFixtures";
+import { afterEach, expect, it, onTestFinished, vi } from "vitest";
+import { byAttr, neophyteHall } from "@/doc/gdHallEditor/hallTestFixtures";
 import { printRitualPug } from "@/doc/ritualPug";
+import { ritualPugNodeIdsAtLine } from "@/doc/ritualPugIds";
 import { printRitualText } from "@/doc/ritualText";
 import { semanticFromJrt } from "@/doc/semantic";
 import { RITUAL_EDITOR_LAYOUT_KEY } from "@/doc/useRitualEditorLayout";
@@ -734,7 +735,33 @@ async function openLinkedHall() {
   const imperator = (
     (hall.children?.[0] as typeof hall).children?.[0] as typeof hall
   ).id;
-  return { hall, surface, source, panel, tagOf, imperator };
+  /** The source caret moves to the line declaring `id`. */
+  const caretTo = (id: string) => {
+    const lines = source().value.split("\n");
+    const line = lines.findIndex((text) => text.includes(`#${id}`)) + 1;
+    act(() => source().focus());
+    act(() =>
+      sourcePanel.onCaretNode?.(
+        ritualPugNodeIdsAtLine((at) => lines[at - 1] ?? "", line),
+      ),
+    );
+  };
+  /** What the drawing has selected, as it describes it. */
+  const selection = () =>
+    document.getElementById(
+      surface.getAttribute("aria-describedby")?.split(" ")[0] ?? "",
+    )?.textContent;
+  return {
+    setup,
+    hall,
+    surface,
+    source,
+    panel,
+    tagOf,
+    imperator,
+    caretTo,
+    selection,
+  };
 }
 
 it("puts the source caret on the hall item the drawing selects (plan 064)", async () => {
@@ -800,6 +827,136 @@ it("leads into split view from Visual with the drawing's selection (plan 064)", 
   await waitFor(() => expect(screen.queryByRole("application")).toBeNull());
   expect(source().dataset.cursor).toBeUndefined();
   expect(panel().dataset.linkedCaret).toBeUndefined();
+}, 60_000);
+
+/** jsdom lays nothing out: give elements a box, so the hall is drawn. */
+function laidOut() {
+  const spy = vi
+    .spyOn(HTMLElement.prototype, "getBoundingClientRect")
+    .mockReturnValue(new DOMRect(0, 0, 400, 300));
+  onTestFinished(() => spy.mockRestore());
+}
+/** The IDs the block follow was asked to reveal, in order. */
+const followed = () => panelFollow.reveal.mock.calls.map((call) => call[1]);
+
+it("selects the hall item the source caret is in (plan 064)", async () => {
+  const { setup, hall, source, panel, caretTo, selection, surface } =
+    await openLinkedHall();
+  laidOut();
+  const hegemon = byAttr(hall, "role", "hegemon").id;
+  const sentinel = byAttr(hall, "role", "sentinel").id;
+  const first = (setup.initialDocument.nodes[0] as { id: string }).id;
+  expect(selection()).toBe("Nothing selected");
+  caretTo(hegemon);
+  await waitFor(() => expect(selection()).toBe("Hegemon selected"));
+  // The hall editor scrolls to the item: not the block follow.
+  expect(panelFollow.reveal).not.toHaveBeenCalled();
+  expect(panel().dataset.linkedCaret).toBe("true");
+  expect(source().dataset.cursor).toBeUndefined();
+  expect(document.activeElement).toBe(source());
+  caretTo(sentinel);
+  await waitFor(() => expect(selection()).toBe("Sentinel selected"));
+  // A ritual line outside the hall: the follow, the selection kept.
+  caretTo(first);
+  expect(followed()).toEqual([first]);
+  expect(selection()).toBe("Sentinel selected");
+  expect(panel().dataset.linkedCaret).toBeUndefined();
+  // The hall's own line: the follow, and the selection cleared.
+  panelFollow.reveal.mockClear();
+  caretTo(hall.id);
+  await waitFor(() => expect(selection()).toBe("Nothing selected"));
+  expect(followed()).toEqual([hall.id]);
+  // The drawing leading again ends the source's asking: Tab selects.
+  act(() => surface.focus());
+  fireEvent.keyDown(surface, { key: "Tab" });
+  await waitFor(() => expect(source().dataset.cursor).toBeDefined());
+}, 60_000);
+
+it("leaves to the block follow what selects nothing (plan 064)", async () => {
+  const { hall, source, caretTo, selection } = await openLinkedHall();
+  laidOut();
+  const hegemon = byAttr(hall, "role", "hegemon").id;
+  const floor = (hall.children?.[1] as typeof hall).id;
+  caretTo(hegemon);
+  await waitFor(() => expect(selection()).toBe("Hegemon selected"));
+  // The floor's line: nothing drawn to select, so the follow shows the
+  // hall.
+  panelFollow.reveal.mockClear();
+  caretTo(floor);
+  expect(followed()).toEqual([floor, hall.id]);
+  await waitFor(() => expect(selection()).toBe("Nothing selected"));
+  // Source with an error is never read: the follow, the drawing as it was.
+  fireEvent.change(source(), {
+    target: { value: `${source().value}  )(\n` },
+  });
+  panelFollow.reveal.mockClear();
+  caretTo(hegemon);
+  expect(followed()).toEqual([hegemon, floor, hall.id]);
+  await new Promise((resolve) => setTimeout(resolve, 400));
+  expect(selection()).toBe("Nothing selected");
+}, 60_000);
+
+it("leads with the hall's selection when its editor takes the focus (plan 064)", async () => {
+  const { hall, source, panel, tagOf, caretTo, selection, surface } =
+    await openLinkedHall();
+  const hegemon = byAttr(hall, "role", "hegemon").id;
+  caretTo(hegemon);
+  await waitFor(() => expect(selection()).toBe("Hegemon selected"));
+  expect(source().dataset.cursor).toBeUndefined();
+  // The author goes on in the drawing with the item the source chose: a
+  // nudge moves the caret to its tag, as any gesture there would.
+  act(() => surface.focus());
+  await waitFor(() => expect(source().dataset.cursor).toBe(tagOf(hegemon)));
+  expect(panel().dataset.linkedCaret).toBe("true");
+  const before = source().value;
+  fireEvent.keyDown(surface, { key: "ArrowRight" });
+  await waitFor(() => expect(source().value).not.toBe(before));
+  expect(source().dataset.cursor).toBe(tagOf(hegemon));
+}, 60_000);
+
+it("selects again at the read of typing, keeping the hall open (plan 064)", async () => {
+  const { hall, source, caretTo, selection } = await openLinkedHall();
+  const hegemon = byAttr(hall, "role", "hegemon").id;
+  const sentinel = byAttr(hall, "role", "sentinel").id;
+  caretTo(hegemon);
+  await waitFor(() => expect(selection()).toBe("Hegemon selected"));
+  const surface = screen.getByRole("application");
+  // Typing an attribute, then the caret on another item before the read:
+  // the hall waits for the read, then selects what the caret is in.
+  fireEvent.change(source(), {
+    target: {
+      value: source().value.replace(
+        'role="hegemon", x=8',
+        'role="hegemon", x=7',
+      ),
+    },
+  });
+  caretTo(sentinel);
+  expect(selection()).toBe("Hegemon selected");
+  await waitFor(
+    () =>
+      expect(
+        (surface.closest("[data-ritual-meta]") as HTMLElement).dataset
+          .ritualMeta,
+      ).toMatch(/"x":7/),
+    { timeout: 5_000 },
+  );
+  await waitFor(() => expect(selection()).toBe("Sentinel selected"));
+  expect(screen.getByRole("application")).toBe(surface);
+}, 60_000);
+
+it("leaves a closed hall's lines to the block follow, opening nothing (plan 064)", async () => {
+  const { hall, caretTo, surface } = await openLinkedHall();
+  laidOut();
+  fireEvent.keyDown(surface, { key: "Escape" });
+  await waitFor(() => expect(screen.queryByRole("application")).toBeNull());
+  panelFollow.reveal.mockClear();
+  const hegemon = byAttr(hall, "role", "hegemon").id;
+  const floor = (hall.children?.[1] as typeof hall).id;
+  caretTo(hegemon);
+  // Today's follow, from the item outwards (jsdom reveals none of them).
+  expect(followed()).toEqual([hegemon, floor, hall.id]);
+  expect(screen.queryByRole("application")).toBeNull();
 }, 60_000);
 
 it("gives the sides 1:1, or 2:3 while a hall is edited, in its stylesheet", () => {
@@ -2016,6 +2173,20 @@ it("keeps editing after a background timeout and ignores its late denial", async
   }
 });
 
+// The source panel's caret moves are given by calling the `onCaretNode`
+// the editor passed it.
+const sourcePanel = vi.hoisted(() => ({
+  onCaretNode: undefined as ((ids: string[]) => void) | undefined,
+}));
+// The block follow, watched: in an item of an open hall the hall's own
+// reveal scrolls instead (plan 064).
+const panelFollow = vi.hoisted(() => ({ reveal: vi.fn() }));
+vi.mock("@/doc/ritualPanelFollow", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@/doc/ritualPanelFollow")>();
+  panelFollow.reveal.mockImplementation(actual.revealRitualNode);
+  return { ...actual, revealRitualNode: panelFollow.reveal };
+});
 vi.mock("@/doc/RitualSourceEditor", () => ({
   default: ({
     value,
@@ -2027,8 +2198,10 @@ vi.mock("@/doc/RitualSourceEditor", () => ({
     header,
     reveal,
     cursor,
-  }) =>
-    React.createElement(
+    onCaretNode,
+  }) => {
+    sourcePanel.onCaretNode = onCaretNode;
+    return React.createElement(
       React.Fragment,
       null,
       header,
@@ -2053,7 +2226,8 @@ vi.mock("@/doc/RitualSourceEditor", () => ({
           onCompositionEnd: () => onCompositionChange?.(false),
         }),
       ),
-    ),
+    );
+  },
 }));
 
 it("recovers annotations from a clean pre-upgrade Pug draft before visual regeneration", async () => {

@@ -2,7 +2,11 @@
 
 import React from "react";
 import type { RitualSourceCursor } from "@/doc/RitualSourceEditor";
-import type { RitualHallLink } from "@/doc/ritualHallLink";
+import type {
+  RitualHallCaret,
+  RitualHallLink,
+  RitualLinkedHall,
+} from "@/doc/ritualHallLink";
 import { ritualPugLineOfId } from "@/doc/ritualPugIds";
 import type { RitualSourceDialect } from "@/doc/ritualSource";
 import type { RitualEditorLayout } from "@/doc/useRitualEditorLayout";
@@ -37,6 +41,13 @@ export function ritualTagCursor(
   return { line, column: indent + 1, source: text };
 }
 
+/** The source caret's chain, and the open hall it is in, if any. */
+interface SourceCaret extends RitualHallCaret {
+  hallId: string | null;
+  /** The source leads: the halls select by it. */
+  live: boolean;
+}
+
 /** The element matching `selector` that holds the focus event's target. */
 const focusIn = (event: React.FocusEvent, selector: string) =>
   event.target instanceof Element ? event.target.closest(selector) : null;
@@ -44,7 +55,8 @@ const focusIn = (event: React.FocusEvent, selector: string) =>
 /**
  * The ritual editor's side of the link between a hall open for editing
  * and its source in split view (plan 064): the hall's selection, made in
- * the drawing, puts the source caret on the item's line.
+ * the drawing, puts the source caret on the item's line, and the source
+ * caret selects the item it is in.
  *
  * The link follows what led last: an open hall's editor, or the source's
  * editor, by where the focus went. The focus anywhere else in a panel
@@ -77,18 +89,21 @@ export function useRitualHallLink({
   const [selection, setSelection] = React.useState<LinkedSelection | null>(
     null,
   );
-  /** Open hall editors by hall ID, counted (Strict Mode mounts twice). */
-  const opened = React.useRef(new Map<string, number>());
+  const [caret, setCaret] = React.useState<SourceCaret | null>(null);
+  /** Open hall editors by hall ID, each as often as it is mounted. */
+  const opened = React.useRef(new Map<string, RitualLinkedHall[]>());
+  /** For `caretMoved`, which the source editor keeps from its first render. */
+  const now = React.useRef({ linked, read });
+  now.current = { linked, read };
 
-  const open = React.useCallback((hallId: string) => {
+  const open = React.useCallback((hallId: string, hall: RitualLinkedHall) => {
     const halls = opened.current;
-    halls.set(hallId, (halls.get(hallId) ?? 0) + 1);
+    const views = halls.get(hallId) ?? [];
+    views.push(hall);
+    halls.set(hallId, views);
     return () => {
-      const left = (halls.get(hallId) ?? 1) - 1;
-      if (left > 0) {
-        halls.set(hallId, left);
-        return;
-      }
+      views.splice(views.indexOf(hall), 1);
+      if (views.length) return;
       halls.delete(hallId);
       // A closed hall's selection leads nowhere.
       setSelection((current) => (current?.hallId === hallId ? null : current));
@@ -105,32 +120,57 @@ export function useRitualHallLink({
         : { hallId, id, byDrawing };
     });
   }, []);
+  // The caret the halls select by, kept the same object while it is.
+  const caretForHalls = React.useMemo(
+    (): RitualHallCaret | null =>
+      linked && read && caret?.live ? { ids: caret.ids, key: caret.key } : null,
+    [linked, read, caret],
+  );
   const link = React.useMemo<RitualHallLink>(
-    () => ({ linked, open, selected }),
-    [linked, open, selected],
+    () => ({ linked, caret: caretForHalls, open, selected }),
+    [linked, caretForHalls, open, selected],
   );
 
-  /** No editor leads: the drawing's selection no longer moves the caret. */
-  const noneLeads = React.useCallback(() => {
-    lead.current = null;
+  /** The source caret no longer leads: the halls stop selecting by it. */
+  const caretLetGo = React.useCallback(() => {
+    setCaret((current) =>
+      current?.live ? { ...current, live: false } : current,
+    );
+  }, []);
+  /**
+   * The source's editor leads: the drawing's selection no longer moves
+   * its caret (typing must not draw it back to the selected tag).
+   */
+  const sourceLeads = React.useCallback(() => {
+    lead.current = "source";
     setSelection((current) =>
       current?.byDrawing ? { ...current, byDrawing: false } : current,
     );
   }, []);
+  /** No editor leads: neither moves what the other shows. */
+  const noneLeads = React.useCallback(() => {
+    sourceLeads();
+    lead.current = null;
+    caretLetGo();
+  }, [sourceLeads, caretLetGo]);
   /**
    * An open hall's editor leads: its selection, even one the source
    * chose, puts the caret on its tag, as on the hall editor page.
    */
-  const drawingLeads = React.useCallback((hallId?: string) => {
-    lead.current = "drawing";
-    setSelection((current) =>
-      current &&
-      !current.byDrawing &&
-      (hallId === undefined || current.hallId === hallId)
-        ? { ...current, byDrawing: true }
-        : current,
-    );
-  }, []);
+  const drawingLeads = React.useCallback(
+    (hallId?: string) => {
+      lead.current = "drawing";
+      caretLetGo();
+      setSelection((current) =>
+        current &&
+        !current.byDrawing &&
+        (hallId === undefined || current.hallId === hallId)
+          ? { ...current, byDrawing: true }
+          : current,
+      );
+    },
+    [caretLetGo],
+  );
 
   // Entering split view from Visual, the drawing leads with what it
   // holds, whichever editor led before (plan 063's rule); not when the
@@ -159,8 +199,18 @@ export function useRitualHallLink({
     link,
     /** For the source panel's `cursor`. */
     cursor,
-    /** The source panel marks the caret's line (`data-linked-caret`). */
-    marked: cursor !== null,
+    /**
+     * The source panel marks the caret's line (`data-linked-caret`) while
+     * the caret is on an open hall's selection: put there by the drawing,
+     * or the source's own caret in that hall, which chose it.
+     */
+    marked:
+      linked &&
+      read &&
+      selection !== null &&
+      (selection.byDrawing
+        ? cursor !== null
+        : caret?.hallId === selection.hallId),
     /**
      * The source section's `onFocus`: in its editor the source leads
      * (typing must not draw the caret back to the selected tag); on its
@@ -168,10 +218,11 @@ export function useRitualHallLink({
      */
     onSourceFocus: React.useCallback(
       (event: React.FocusEvent) => {
-        noneLeads();
-        if (focusIn(event, ".cm-editor")) lead.current = "source";
+        // Its caret, which may have reported first, keeps leading.
+        if (focusIn(event, ".cm-editor")) sourceLeads();
+        else noneLeads();
       },
-      [noneLeads],
+      [sourceLeads, noneLeads],
     ),
     /**
      * The visual section's `onFocus`: in an open hall's editor that hall
@@ -186,6 +237,36 @@ export function useRitualHallLink({
         else noneLeads();
       },
       [drawingLeads, noneLeads],
+    ),
+    /**
+     * The source caret's chain changed (`onCaretNode`, split view only):
+     * the source leads, and the open hall it is in selects by it. True
+     * when that hall's editor is drawn and will select, and so reveal, a
+     * drawn node for it: then the block follow stands aside. Never for
+     * text not yet read, a container or the hall's own line, which select
+     * nothing, nor a hall that is not drawn: the follow shows those.
+     */
+    caretMoved: React.useCallback(
+      (ids: readonly string[]) => {
+        sourceLeads();
+        const halls = opened.current;
+        const hallId = ids.find((id) => halls.has(id)) ?? null;
+        setCaret((current) => ({
+          ids,
+          key: (current?.key ?? 0) + 1,
+          hallId,
+          live: true,
+        }));
+        const { linked, read } = now.current;
+        return (
+          linked &&
+          read &&
+          hallId !== null &&
+          ids.indexOf(hallId) > 0 &&
+          (halls.get(hallId)?.some((hall) => hall.reveals(ids)) ?? false)
+        );
+      },
+      [sourceLeads],
     ),
   };
 }

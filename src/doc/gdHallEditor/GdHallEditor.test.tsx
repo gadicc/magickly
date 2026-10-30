@@ -2020,9 +2020,15 @@ describe("a selection the host asks for (plan 063)", () => {
         path: readonly number[] | null,
         hall = initial,
         pageInset?: number,
+        revealSelected?: boolean,
       ) =>
         act(() =>
-          ask({ path, hall, ...(pageInset !== undefined && { pageInset }) }),
+          ask({
+            path,
+            hall,
+            ...(pageInset !== undefined && { pageInset }),
+            ...(revealSelected && { revealSelected }),
+          }),
         ),
       give: (hall: HallElement) => act(() => give(hall)),
       elsewhere,
@@ -2151,6 +2157,85 @@ describe("a selection the host asks for (plan 063)", () => {
     expect(page).toHaveBeenCalledWith({
       top: expect.closeTo(at(0, label.y1).clientY - (500 - 16), 6),
     });
+  });
+
+  it("shows the node already selected only when asked to (plan 064)", () => {
+    const page = vi.spyOn(window, "scrollBy").mockImplementation(() => {});
+    vi.spyOn(document.documentElement, "clientHeight", "get").mockReturnValue(
+      500,
+    );
+    const hall = hallFromPug(
+      "gdHall",
+      "  floor",
+      '    officer(role="sentinel", x=14, y=15, labelPos="bottom")',
+      '    officer(role="hegemon", x=2, y=1)',
+    );
+    const { ask, onSelectionChange } = asking(hall);
+    ask([0, 0], hall, 64);
+    expect(selected()).toBe("Sentinel selected");
+    expect(page).toHaveBeenCalledOnce();
+    const reports = onSelectionChange.mock.calls.length;
+    // Asked again for the same node: nothing, unless asked to show it.
+    ask([0, 0], hall, 64);
+    expect(page).toHaveBeenCalledOnce();
+    ask([0, 0], hall, 64, true);
+    expect(page).toHaveBeenCalledTimes(2);
+    expect(page.mock.calls[1]).toEqual(page.mock.calls[0]);
+    expect(onSelectionChange).toHaveBeenCalledTimes(reports);
+    // In view already, or nothing selected: nothing scrolls.
+    ask([0, 1], hall, 64);
+    expect(selected()).toBe("Hegemon selected");
+    ask([0, 1], hall, 64, true);
+    ask(null, hall, 64);
+    ask(null, hall, 64, true);
+    expect(page).toHaveBeenCalledTimes(2);
+  });
+
+  it("shows the selected node in the ritual editor's panel when asked (plan 064)", () => {
+    const page = vi.spyOn(window, "scrollBy").mockImplementation(() => {});
+    // The ritual editor's visual panel: a box that scrolls, no inset.
+    const box = document.createElement("div");
+    box.style.overflowY = "auto";
+    const scrollBy = vi.fn();
+    box.scrollBy = scrollBy;
+    vi.spyOn(box, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, 800, 300),
+    );
+    document.body.append(box);
+    const hall = hallFromPug(
+      "gdHall",
+      "  floor",
+      '    officer(role="sentinel", x=14, y=15, labelPos="bottom")',
+    );
+    let ask: (request: GdHallEditorProps["selectPath"]) => void = () => {};
+    function Inside() {
+      const [request, setRequest] =
+        useState<GdHallEditorProps["selectPath"]>(null);
+      ask = setRequest;
+      return (
+        <GdHallEditor
+          hall={hall}
+          art={gdHallArt}
+          onChange={() => {}}
+          selectPath={request}
+        />
+      );
+    }
+    try {
+      render(<Inside />, { container: box });
+      act(() => ask({ path: [0, 0], hall }));
+      expect(selected()).toBe("Sentinel selected");
+      expect(scrollBy).toHaveBeenCalledOnce();
+      act(() => ask({ path: [0, 0], hall }));
+      expect(scrollBy).toHaveBeenCalledOnce();
+      act(() => ask({ path: [0, 0], hall, revealSelected: true }));
+      expect(scrollBy).toHaveBeenCalledTimes(2);
+      expect(scrollBy.mock.calls[1]).toEqual(scrollBy.mock.calls[0]);
+      expect(page).not.toHaveBeenCalled();
+    } finally {
+      cleanup();
+      box.remove();
+    }
   });
 
   it("scrolls a node into the drawing's own box, never the page", () => {

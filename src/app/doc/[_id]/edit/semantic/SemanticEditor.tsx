@@ -342,14 +342,18 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       editor.off("blur", reset);
     };
   }, [editor, displayMode]);
+  const { caretMoved } = hallLink;
   const onCaretNode = React.useCallback(
     (ids: string[]) => {
+      if (!editor || displayMode !== "split") return;
+      // In an item of an open hall, the hall editor selects the item and
+      // scrolls the panel just enough to show it (plan 064).
+      if (caretMoved(ids)) return;
       // Inline spans and nodes inside a source-only block have no visual
       // block of their own: reveal the nearest enclosing one that does.
-      if (editor && displayMode === "split")
-        ids.some((id) => revealRitualNode(editor, id));
+      ids.some((id) => revealRitualNode(editor, id));
     },
-    [editor, displayMode],
+    [editor, displayMode, caretMoved],
   );
   // Nodes kept verbatim as "Needs source editing" blocks in visual editing.
   const sourceOnlyIds = React.useMemo(() => {

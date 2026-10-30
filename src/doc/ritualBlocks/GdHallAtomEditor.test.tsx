@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { readFileSync } from "node:fs";
 import {
+  act,
   cleanup,
   fireEvent,
   render,
@@ -12,6 +13,7 @@ import { NodeSelection, Plugin } from "@tiptap/pm/state";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { HallElement } from "../gdHallEditor/hallModel";
+import { byAttr, findNode } from "../gdHallEditor/hallTestFixtures";
 import { type RitualHallLink, RitualHallLinkContext } from "../ritualHallLink";
 import { parseRitualPug, RITUAL_PUG_HEADER } from "../ritualPug";
 import { type RitualSemanticNode, validateRitualSemantic } from "../semantic";
@@ -82,8 +84,8 @@ function Host({
   );
 }
 
-async function openEditor(link: RitualHallLink | null = null) {
-  const rendered = render(<Host link={link} />);
+async function openEditor(link: RitualHallLink | null = null, text = source) {
+  const rendered = render(<Host link={link} text={text} />);
   const button = await screen.findByRole("button", { name: "Edit hall" });
   const editor = current as Editor;
   const before = editor.state.selection.toJSON();
@@ -262,6 +264,7 @@ describe("linked with the ritual source (plan 064)", () => {
     const close = vi.fn();
     const link: RitualHallLink = {
       linked: true,
+      caret: null,
       open: vi.fn(() => close),
       selected: vi.fn(),
     };
@@ -272,16 +275,90 @@ describe("linked with the ritual source (plan 064)", () => {
     const { link, close } = linking();
     const { editor, surface } = await openEditor(link);
     const hallId = hallIn(editor).id;
-    expect(link.open).toHaveBeenCalledWith(hallId);
+    expect(link.open).toHaveBeenCalledWith(hallId, {
+      reveals: expect.any(Function),
+    });
     expect(link.selected).toHaveBeenLastCalledWith(hallId, null);
+    const dais = hallIn(editor).children?.[0] as SemanticElement;
+    const imperator = dais.children?.[0] as SemanticElement;
+    // The Imperator is drawn, but jsdom lays nothing out: the atom has no
+    // height, as a footnote's hidden body, and reveals nothing; laid out,
+    // it does.
+    const { reveals } = vi.mocked(link.open).mock.calls[0][1];
+    const chain = [imperator.id, dais.id, hallId];
+    expect(reveals(chain)).toBe(false);
+    const laidOut = vi
+      .spyOn(HTMLElement.prototype, "getBoundingClientRect")
+      .mockReturnValue(new DOMRect(0, 0, 400, 300));
+    try {
+      expect(reveals(chain)).toBe(true);
+    } finally {
+      laidOut.mockRestore();
+    }
     fireEvent.keyDown(surface, { key: "Tab" });
-    const imperator = (hallIn(editor).children?.[0] as SemanticElement)
-      .children?.[0] as SemanticElement;
     expect(link.selected).toHaveBeenLastCalledWith(hallId, imperator.id);
     fireEvent.keyDown(surface, { key: "Escape" });
     expect(link.selected).toHaveBeenLastCalledWith(hallId, null);
     fireEvent.keyDown(surface, { key: "Escape" });
     await waitFor(() => expect(close).toHaveBeenCalledOnce());
+  }, 60_000);
+
+  it("selects the item the source caret is in", async () => {
+    const { link } = linking();
+    const { editor, rendered } = await openEditor(link);
+    const hall = hallIn(editor) as HallElement;
+    const parent = (id: string) =>
+      findNode(hall, (node) =>
+        (node.children ?? []).some(
+          (child) => child.kind === "element" && child.id === id,
+        ),
+      ) as HallElement;
+    const hegemon = byAttr(hall, "role", "hegemon");
+    const sentinel = byAttr(hall, "role", "sentinel");
+    const ask = (ids: string[], key: number) =>
+      rendered.rerender(
+        <Host link={{ ...link, caret: { ids, key } }} text={source} />,
+      );
+    ask([hegemon.id, parent(hegemon.id).id, hall.id], 1);
+    await waitFor(() =>
+      expect(link.selected).toHaveBeenLastCalledWith(hall.id, hegemon.id),
+    );
+    // Outside the hall: nothing asked, the selection kept.
+    ask(["Note000000000001"], 2);
+    expect(link.selected).toHaveBeenLastCalledWith(hall.id, hegemon.id);
+    ask([sentinel.id, parent(sentinel.id).id, hall.id], 3);
+    await waitFor(() =>
+      expect(link.selected).toHaveBeenLastCalledWith(hall.id, sentinel.id),
+    );
+    // The hall's own line clears it.
+    ask([hall.id], 4);
+    await waitFor(() =>
+      expect(link.selected).toHaveBeenLastCalledWith(hall.id, null),
+    );
+  }, 60_000);
+
+  it("stays open through a read of the source that changes the hall", async () => {
+    const { editor } = await openEditor();
+    const doc = semanticFromTiptap(editor.getJSON());
+    const hall = hallIn(editor);
+    // As typing an attribute in the hall's lines and reading it: the
+    // hall's node view is updated in place, its editor kept.
+    const next = {
+      ...doc,
+      nodes: doc.nodes.map((node) =>
+        node.kind === "element" && node.id === hall.id
+          ? { ...hall, attrs: { ...hall.attrs, dais: 3 } }
+          : node,
+      ),
+    };
+    const surface = screen.getByRole("application");
+    act(() => {
+      editor.commands.setContent(semanticToTiptap(next), {
+        emitUpdate: false,
+      });
+    });
+    expect(hallIn(editor).attrs.dais).toBe(3);
+    expect(screen.getByRole("application")).toBe(surface);
   }, 60_000);
 });
 

@@ -547,8 +547,9 @@ Follow-ups are separate from the completed migration work:
   selecting an item in the drawing moves the source caret to its tag,
   and moving the caret selects the item. The same link in the ritual
   editor's split view, between a hall item and its line in the whole
-  ritual's source, while Edit hall is open: planned and reviewed on 30
-  October 2026 on `gate/ritual-hall-link`
+  ritual's source, while Edit hall is open: planned, built and
+  code-reviewed on 30 October 2026 on `gate/ritual-hall-link`, every
+  commit gated; awaiting merge
   ([plan 064](064-ritual-hall-selection-link.md)). The install
   holds one `@codemirror/view` again (6.43.15) and one
   `@codemirror/commands` (6.11.1), since 30 October 2026.

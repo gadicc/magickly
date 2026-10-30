@@ -130,8 +130,14 @@ export default function GdHallAtomEditor({
     editor: ritualEditorOwner(editor),
     selector: ({ editor: current }) => current.isEditable,
   });
+  /** Whether the atom is drawn: a footnote's canonical body is hidden. */
+  const shown = useCallback(() => {
+    const pos = getPos();
+    const dom = typeof pos === "number" ? editor.view.nodeDOM(pos) : null;
+    return dom instanceof HTMLElement && dom.getBoundingClientRect().height > 0;
+  }, [editor, getPos]);
   // The ritual editor's split view links the selection with its source.
-  const linked = useLinkedHall(hall);
+  const linked = useLinkedHall(hall, gdHallArt, shown);
   const onChange = useCallback(
     (next: HallElement) => writeHallToAtom(editor, getPos(), hall.id, next),
     [editor, getPos, hall.id],

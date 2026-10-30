@@ -4,6 +4,7 @@ import type React from "react";
 import { describe, expect, it } from "vitest";
 import { byAttr, neophyteHall } from "@/doc/gdHallEditor/hallTestFixtures";
 import { printRitualPug } from "@/doc/ritualPug";
+import { ritualPugNodeIdsAtLine } from "@/doc/ritualPugIds";
 import type { RitualSemanticDocument } from "@/doc/semantic";
 import type { RitualEditorLayout } from "@/doc/useRitualEditorLayout";
 import { ritualTagCursor, useRitualHallLink } from "./useRitualHallLink";
@@ -28,6 +29,9 @@ const text = printRitualPug({
 const lines = text.split("\n");
 const lineOf = (id: string) =>
   lines.findIndex((line) => line.includes(`#${id}`)) + 1;
+/** The chain `onCaretNode` reports on the line declaring `id`. */
+const chainAt = (id: string) =>
+  ritualPugNodeIdsAtLine((line) => lines[line - 1] ?? "", lineOf(id));
 
 type Source = Parameters<typeof useRitualHallLink>[0]["source"];
 
@@ -51,16 +55,24 @@ function setup(displayMode: RitualEditorLayout = "split", source = read) {
   const hook = renderHook((props) => useRitualHallLink(props), {
     initialProps: { displayMode, source },
   });
-  const opened = () => {
+  const opened = (reveals = (_ids: readonly string[]) => true) => {
     let close = () => {};
     act(() => {
-      close = hook.result.current.link.open(hall.id);
+      close = hook.result.current.link.open(hall.id, { reveals });
     });
     return () => act(() => close());
   };
   const select = (id: string | null, hallId = hall.id) =>
     act(() => hook.result.current.link.selected(hallId, id));
-  return { hook, opened, select };
+  /** The source caret's chain at the line declaring `id`. */
+  const move = (id: string) => {
+    let answer = false;
+    act(() => {
+      answer = hook.result.current.caretMoved(chainAt(id));
+    });
+    return answer;
+  };
+  return { hook, opened, select, move };
 }
 
 describe("ritualTagCursor", () => {
@@ -169,7 +181,9 @@ describe("the source caret follows the drawing (plan 064)", () => {
     // A hall that closes forgets only its own selection.
     const third = opened();
     act(() => {
-      hook.result.current.link.open("Other00000000001")();
+      hook.result.current.link.open("Other00000000001", {
+        reveals: () => true,
+      })();
     });
     select(sentinel);
     expect(hook.result.current.cursor).not.toBeNull();
@@ -241,6 +255,96 @@ describe("the source caret follows the drawing (plan 064)", () => {
     act(() => hook.result.current.onVisualFocus(elsewhere()));
     hook.rerender({ displayMode: "visual", source: read });
     hook.rerender({ displayMode: "split", source: read });
+    expect(hook.result.current.cursor).toBeNull();
+  });
+});
+
+describe("the source caret selects in the drawing (plan 064)", () => {
+  it("gives the halls the caret while the source leads, on read text", () => {
+    const { hook, opened, move } = setup();
+    opened();
+    expect(hook.result.current.link.caret).toBeNull();
+    expect(move(hegemon)).toBe(true);
+    const caret = hook.result.current.link.caret;
+    expect(caret?.ids).toEqual(chainAt(hegemon));
+    // The same object while nothing changes; a new key for each move.
+    hook.rerender({ displayMode: "split", source: read });
+    expect(hook.result.current.link.caret).toBe(caret);
+    move(hegemon);
+    expect(hook.result.current.link.caret?.key).toBe((caret?.key ?? 0) + 1);
+    // Typing not yet read holds it back; the read gives it again.
+    hook.rerender({ displayMode: "split", source: { ...read, dirty: true } });
+    expect(hook.result.current.link.caret).toBeNull();
+    hook.rerender({ displayMode: "split", source: read });
+    expect(hook.result.current.link.caret?.ids).toEqual(chainAt(hegemon));
+    // The source's editor taking the focus after its caret reported
+    // keeps it; the hall's editor taking it ends it.
+    act(() => hook.result.current.onSourceFocus(inSourceEditor()));
+    expect(hook.result.current.link.caret?.ids).toEqual(chainAt(hegemon));
+    act(() => hook.result.current.onVisualFocus(inHall()));
+    expect(hook.result.current.link.caret).toBeNull();
+    // As does the focus anywhere else in either panel.
+    for (const leave of [
+      () => hook.result.current.onVisualFocus(elsewhere()),
+      () => hook.result.current.onSourceFocus(elsewhere()),
+    ]) {
+      move(hegemon);
+      expect(hook.result.current.link.caret).not.toBeNull();
+      act(leave);
+      expect(hook.result.current.link.caret).toBeNull();
+    }
+    move(hegemon);
+    hook.rerender({ displayMode: "visual", source: read });
+    expect(hook.result.current.link.caret).toBeNull();
+  });
+
+  it("leaves the block follow alone outside an item of a drawn open hall", () => {
+    const { hook, opened, move } = setup();
+    // No hall open: the follow, as before.
+    expect(move(hegemon)).toBe(false);
+    // Open, but the hall would reveal nothing: a container's line, or a
+    // hall that is not drawn (a footnote's hidden canonical body).
+    const close = opened((ids) => ids[0] !== hegemon);
+    expect(move(hegemon)).toBe(false);
+    expect(move(sentinel)).toBe(true);
+    close();
+    opened();
+    expect(move(hegemon)).toBe(true);
+    // The hall's own line, and a line outside it.
+    expect(move(hall.id)).toBe(false);
+    expect(move("Note000000000001")).toBe(false);
+    expect(hook.result.current.link.caret?.ids).toEqual(["Note000000000001"]);
+    // Text not yet read, or in error: nothing will select, so the follow.
+    hook.rerender({ displayMode: "split", source: { ...read, dirty: true } });
+    expect(move(hegemon)).toBe(false);
+    hook.rerender({ displayMode: "split", source: read });
+    expect(move(hegemon)).toBe(true);
+  });
+
+  it("marks the line of the selection the source caret chose", () => {
+    const { hook, opened, select, move } = setup();
+    opened();
+    move(hegemon);
+    // The hall answers with the selection the caret asked for.
+    select(hegemon);
+    expect(hook.result.current.cursor).toBeNull();
+    expect(hook.result.current.marked).toBe(true);
+    // A caret outside the hall keeps the selection, unmarked.
+    move("Note000000000001");
+    expect(hook.result.current.marked).toBe(false);
+    move(sentinel);
+    select(sentinel);
+    expect(hook.result.current.marked).toBe(true);
+    hook.rerender({ displayMode: "split", source: { ...read, dirty: true } });
+    expect(hook.result.current.marked).toBe(false);
+  });
+
+  it("ends the drawing's lead when the source caret moves", () => {
+    const { hook, opened, select, move } = setup();
+    opened();
+    select(hegemon);
+    expect(hook.result.current.cursor).not.toBeNull();
+    move(sentinel);
     expect(hook.result.current.cursor).toBeNull();
   });
 });
