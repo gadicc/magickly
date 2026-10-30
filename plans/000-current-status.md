@@ -548,8 +548,8 @@ Follow-ups are separate from the completed migration work:
   and moving the caret selects the item. TODO (out of its scope): the
   same link in the ritual editor's split view, between a hall item and
   its line in the whole ritual's source
-  ([plan 063](063-hall-selection-link.md#9-out-of-scope)). TODO: the
-  install holds two copies of `@codemirror/view` (6.43.12, which
-  `@uiw/react-codemirror` uses, and 6.38.4); dedupe them.
+  ([plan 063](063-hall-selection-link.md#9-out-of-scope)). The install
+  holds one `@codemirror/view` again (6.43.15) and one
+  `@codemirror/commands` (6.11.1), since 30 October 2026.
 
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.
