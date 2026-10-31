@@ -267,9 +267,9 @@
     "smoke": "node scripts/smoke.mjs"
   },
   "devDependencies": {
-    "@types/node": "24.13.5",
+    "@types/node": "24.19.2",
     "json5": "^2.2.3",
-    "tsx": "^4.23.1",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "valibot": "1.5.0"
   }
