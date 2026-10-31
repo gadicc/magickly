@@ -49,7 +49,7 @@ describe("geomancy reading page", () => {
   it.each([
     [
       "1",
-      "80698 0ae2eb4f926e26dc5fcdd7355607df2bfe9a91a6805b6ef03be76d736ac69165",
+      "79028 a95d2ea9ebf8db61e8e7844e46ff064bc6f34264931daa2aab4fa249534dfc1a",
       [
         "Personality of the Querent",
         "Good, except in war.",
@@ -59,7 +59,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "7",
-      "80649 4a50a4f03dfada0d331f372ccb8ae03bd9f92fba4750903ad49972bda74d3c8a",
+      "78979 2872d55fb7a70ae2105e96b65dbbecd8e22bc0c0737315a21fc18bebb32a95ee",
       [
         "Love, marriage, prostitution",
         "Indifferent.",
@@ -69,7 +69,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "12",
-      "80630 2a8366bb126cc49b738fca12a9d8ab457f9e5569d5cc5ff570acc8e21370190b",
+      "78960 1c1a97ab4aa8b185c651ffc0ff439b447447247a79e9962e6f65d56f8b5fc5f7",
       [
         "Sorrow, hospitals, intrigue",
         "Unfavourable generally.",
