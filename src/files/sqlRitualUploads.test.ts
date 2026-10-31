@@ -1084,3 +1084,60 @@ describe("completed upload and worker fencing", () => {
     expect(await state()).toEqual(before);
   });
 });
+
+describe("uploads to a deleted ritual", () => {
+  const remove = (id: string) =>
+    db
+      .update(rituals)
+      .set({
+        deletedAt: new Date(time),
+        deletedById: actor.creator,
+        purgeAfter: new Date(time + 30 * 86_400_000),
+      })
+      .where(eq(rituals.id, id));
+  const claim = (s: ReturnType<typeof service>, r: InitiateRitualUpload) =>
+    s.publication.claimAuthorized(
+      { operationId: r.operationId, actorId: r.expectedActorId, nowMs: time },
+      signal(),
+    );
+
+  it("refuses initiation as for a missing ritual, even for a global admin", async () => {
+    await remove(ids.public);
+    await remove(ids.group);
+    for (const [who, kind] of [
+      ["creator", "group"],
+      ["global", "public"],
+    ] as const) {
+      verified = actor[who];
+      const s = service();
+      const missing = await s
+        .initiate({ ...request(who, kind), ritualId: createUuidV7() })
+        .catch((error: unknown) => error);
+      expect(missing).toBeInstanceOf(RitualUploadError);
+      expect(missing).toMatchObject({ code: "FORBIDDEN" });
+      await expect(s.initiate(request(who, kind))).rejects.toMatchObject({
+        code: (missing as RitualUploadError).code,
+      });
+    }
+    expect(await state()).toEqual({ intents: [], files: [], links: [] });
+  });
+
+  it("refuses the claim and the finalisation once the ritual is deleted", async () => {
+    const s = service(),
+      r = request();
+    await s.initiate(r);
+    await remove(ids.group);
+    await expect(claim(s, r)).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await db
+      .update(rituals)
+      .set({ deletedAt: null, deletedById: null, purgeAfter: null })
+      .where(eq(rituals.id, ids.group));
+    const c = await claimed(s, request());
+    await remove(ids.group);
+    const before = await state();
+    await expect(commit(s, c)).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(await state()).toEqual(before);
+    expect(before.files).toHaveLength(0);
+    expect(before.links).toHaveLength(0);
+  });
+});

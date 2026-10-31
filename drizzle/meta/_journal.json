@@ -134,6 +134,13 @@
       "when": 1792148003627,
       "tag": "0018_chat_daily_usage",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1793449134246,
+      "tag": "0019_ritual_deletion",
+      "breakpoints": true
     }
   ]
 }

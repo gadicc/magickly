@@ -1071,3 +1071,53 @@ it("projects unexpected actor/provider failures without leaking exception detail
   ).rejects.toMatchObject({ code: "UNAVAILABLE", message: "UNAVAILABLE" });
   expect((await state()).intents).toEqual([]);
 });
+
+it("refuses a deleted parent at every step, as for a missing one", async () => {
+  const remove = () =>
+    db
+      .update(rituals)
+      .set({
+        deletedAt: new Date(time),
+        deletedById: fixture.actors.creator,
+        purgeAfter: new Date(time + 30 * 86_400_000),
+      })
+      .where(eq(rituals.id, fixture.parent.id));
+  const restore = () =>
+    db
+      .update(rituals)
+      .set({ deletedAt: null, deletedById: null, purgeAfter: null })
+      .where(eq(rituals.id, fixture.parent.id));
+  const forbidden = { code: "FORBIDDEN" };
+  // Initiation reserves nothing.
+  await remove();
+  await expect(
+    publisher().initiate(request, fixture.prepared),
+  ).rejects.toMatchObject(forbidden);
+  expect(locations).not.toHaveBeenCalled();
+  expect(await state()).toEqual({ intents: [], assets: [], markers: [] });
+  // A reserved operation cannot be claimed; a claimed one cannot publish.
+  await restore();
+  const service = publisher();
+  await service.initiate(request, fixture.prepared);
+  await remove();
+  await expect(service.claim(request)).rejects.toMatchObject(forbidden);
+  await restore();
+  const { claim } = await start(service);
+  await remove();
+  const before = await state();
+  await expect(
+    service.publish(claim, bundleStorageReceipts(claim)),
+  ).rejects.toMatchObject(forbidden);
+  expect(await state()).toEqual(before);
+  expect(before.markers).toEqual([]);
+  // Completed work is not replayed either.
+  await restore();
+  const result = await service.publish(claim, bundleStorageReceipts(claim));
+  await remove();
+  await expect(service.claim(request)).rejects.toMatchObject(forbidden);
+  await expect(
+    service.initiate(request, fixture.prepared),
+  ).rejects.toMatchObject(forbidden);
+  await expect(service.publish(claim, [])).rejects.toMatchObject(forbidden);
+  expect(result.ritualId).toBe(fixture.parent.id);
+});

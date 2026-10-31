@@ -1,3 +1,4 @@
+export * from "./audit";
 export * from "./auth";
 export * from "./chatUsage";
 export * from "./discourse";

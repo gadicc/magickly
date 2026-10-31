@@ -1086,6 +1086,77 @@ describe("atomic canonical SQL-v2 ritual writes", () => {
   });
 });
 
+describe("writes to a deleted ritual", () => {
+  const remove = (id: string) =>
+    db
+      .update(rituals)
+      .set({
+        deletedAt: when,
+        deletedById: actor.creator,
+        purgeAfter: new Date(when.getTime() + 30 * 86_400_000),
+      })
+      .where(eq(rituals.id, id));
+
+  it("refuses save, title change and publish as for a missing ritual and writes nothing", async () => {
+    await remove(ritualIds.group);
+    await remove(ritualIds.two);
+    const baseline = await counts(),
+      before = await current();
+    const missing = await writer("global")({
+      ...save("group", "global"),
+      ritualId: createUuidV7(),
+    });
+    expect(missing).toMatchObject({ ok: false, code: "NOT_FOUND" });
+    expect(await writer()(save())).toEqual(missing);
+    expect(await writer("global")(save("group", "global"))).toEqual(missing);
+    expect(
+      await writer()({
+        ...save(),
+        title: "A new title",
+      } as SqlRitualWriteRequest),
+    ).toEqual(missing);
+    expect(await writer("global")(publish())).toEqual(missing);
+    expect(await counts()).toEqual(baseline);
+    expect(await current()).toEqual(before);
+  });
+
+  it("refuses a receipt replay after the ritual is deleted, never replaying ok", async () => {
+    const saved = save(),
+      created = create();
+    expect((await writer()(saved)).ok).toBe(true);
+    const made = await writer("global")(created);
+    if (!made.ok) throw new Error("Expected creation");
+    await remove(ritualIds.group);
+    await remove(made.ritualId);
+    const baseline = await counts();
+    expect(await writer()(saved)).toMatchObject({
+      ok: false,
+      code: "FORBIDDEN",
+    });
+    expect(await writer("global")(created)).toMatchObject({
+      ok: false,
+      code: "FORBIDDEN",
+    });
+    expect(await counts()).toEqual(baseline);
+  });
+
+  it("still creates rituals, and loads the parent only while live, for update", async () => {
+    await remove(ritualIds.group);
+    expect(await writer("global")(create())).toMatchObject({ ok: true });
+    queries.length = 0;
+    expect((await writer()(save("two"))).ok).toBe(true);
+    const parentLoads = queries.filter(
+      (query) =>
+        query.startsWith("select") &&
+        query.includes('from "rituals"') &&
+        query.endsWith("for update"),
+    );
+    expect(parentLoads.length).toBeGreaterThan(0);
+    for (const query of parentLoads)
+      expect(query).toContain('"deleted_at" is null');
+  });
+});
+
 describe("SQL-v2 canonical request and receipt constraints", () => {
   it("requires own request properties and rejects negative-zero grade normalization", async () => {
     expect(await writer()(Object.create(save()))).toMatchObject({

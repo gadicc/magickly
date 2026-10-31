@@ -44,6 +44,7 @@ async function main() {
           and a.output_format = 'json-rich-text' and a.output_format_version = '1'
         left join legacy_ritual_compiled_archives legacy on legacy.ritual_id = r.id
           and legacy.claimed_revision_id = r.current_revision_id
+        where r.deleted_at is null
         order by r.id
       `;
       },

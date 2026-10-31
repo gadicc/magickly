@@ -62,6 +62,19 @@ export const rituals = pgTable(
     // A new SQL concurrency token; legacy timestamps remain separate evidence.
     version: bigint("version", { mode: "number" }).notNull().default(0),
     ...history(),
+    // Deletion (plan 065). A deleted ritual is hidden everywhere through
+    // src/doc/sqlPolicy's liveRitual and loadSqlRitualParent; deleting touches
+    // neither updatedAt nor version, so "last edited" stays true.
+    deletedAt: instant("deleted_at"),
+    deletedById: uuid("deleted_by_id").references(() => user.id),
+    // When the nightly purge may remove it for good.
+    purgeAfter: instant("purge_after"),
+    // "Delete permanently" was confirmed: final, restore refused.
+    purgeRequestedAt: instant("purge_requested_at"),
+    // The purge claimed the row; restore is refused from here on.
+    purgeStartedAt: instant("purge_started_at"),
+    // Set just before the first object delete is sent: the point of no return.
+    purgeObjectsDeletedAt: instant("purge_objects_deleted_at"),
   },
   (table) => [
     v7("rituals_id_v7", table.id),
@@ -93,6 +106,22 @@ export const rituals = pgTable(
       "rituals_selected_artifact_requires_revision",
       sql`${table.currentCompiledArtifactId} is null or ${table.currentRevisionId} is not null`,
     ),
+    check(
+      "rituals_deletion_state",
+      sql`
+    (${table.deletedAt} is null and ${table.deletedById} is null and ${table.purgeAfter} is null
+      and ${table.purgeRequestedAt} is null and ${table.purgeStartedAt} is null
+      and ${table.purgeObjectsDeletedAt} is null)
+    or (${table.deletedAt} is not null and ${table.deletedById} is not null
+      and ${table.purgeAfter} is not null and ${table.purgeAfter} >= ${table.deletedAt}
+      and (${table.purgeRequestedAt} is null or ${table.purgeRequestedAt} >= ${table.deletedAt})
+      and (${table.purgeStartedAt} is null or ${table.purgeStartedAt} >= ${table.deletedAt})
+      and (${table.purgeObjectsDeletedAt} is null
+        or (${table.purgeStartedAt} is not null and ${table.purgeObjectsDeletedAt} >= ${table.purgeStartedAt})))`,
+    ),
+    index("rituals_purge_due_idx")
+      .on(table.purgeAfter)
+      .where(sql`${table.purgeAfter} is not null`),
     index("rituals_group_idx").on(table.groupId),
     index("rituals_temple_idx").on(table.templeId),
     index("rituals_creator_idx").on(table.creatorId),

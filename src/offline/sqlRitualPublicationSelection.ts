@@ -1,6 +1,6 @@
 import "server-only";
 
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import type {
   PgDatabase,
   PgQueryResultHKT,
@@ -9,6 +9,7 @@ import type {
 import { rituals } from "../db/schema/rituals";
 import { getRitualAccess } from "../doc/access";
 import {
+  liveRitual,
   loadSqlRitualPrincipal,
   sqlRitualParentFields,
   sqlRitualPolicy,
@@ -109,7 +110,7 @@ export function createSqlRitualPublicationSelectionReader(
           const rows = await tx
             .select(selectionFields)
             .from(rituals)
-            .where(eq(rituals.id, request.ritualId))
+            .where(and(eq(rituals.id, request.ritualId), liveRitual))
             .limit(2);
           if (rows.length !== 1 || !rows[0].currentRevisionId)
             fail("UNAVAILABLE");

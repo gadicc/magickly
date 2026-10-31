@@ -8,6 +8,7 @@ import {
 import { rituals } from "../db/schema/rituals";
 import { getRitualAccess } from "../doc/access";
 import {
+  liveRitual,
   loadSqlRitualPrincipal,
   sqlRitualParentFields,
   sqlRitualPolicy,
@@ -150,7 +151,7 @@ export function createSqlRitualBundleReader(
               title: sql<string>`to_json(${rituals.title})`,
             })
             .from(rituals)
-            .where(eq(rituals.id, bound.ritualId));
+            .where(and(eq(rituals.id, bound.ritualId), liveRitual));
           if (
             !parent ||
             !getRitualAccess(sqlRitualPolicy(parent), principal).read

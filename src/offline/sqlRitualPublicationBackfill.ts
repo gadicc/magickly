@@ -8,7 +8,7 @@ import type {
 } from "drizzle-orm/pg-core";
 import { ritualBundlePublicationIntents } from "../db/schema/ritualBundles";
 import { rituals } from "../db/schema/rituals";
-import { loadSqlRitualPrincipal } from "../doc/sqlPolicy";
+import { liveRitual, loadSqlRitualPrincipal } from "../doc/sqlPolicy";
 import { isUuidV7 } from "../lib/ids";
 import { isRitualBundlePublicationPolicyId } from "./ritualBundlePublication";
 
@@ -94,6 +94,7 @@ export function createSqlRitualPublicationBackfillReader(
             .where(
               and(
                 isNotNull(rituals.currentRevisionId),
+                liveRitual,
                 request.afterRitualId === null
                   ? undefined
                   : gt(rituals.id, request.afterRitualId),

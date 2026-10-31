@@ -26,9 +26,10 @@ import {
 import { compileRitualSource } from "./compileContract";
 import { compileSemanticSource } from "./semanticCompile";
 import {
+  liveRitual,
+  loadSqlRitualParent,
   loadSqlRitualPrincipal,
   type SqlRitualParentRow,
-  sqlRitualParentFields,
   sqlRitualPolicy,
 } from "./sqlPolicy";
 
@@ -201,14 +202,9 @@ function outcome(
     updatedAt: row.updatedAt.toISOString(),
   };
 }
-async function parent(tx: Transaction, id: string) {
-  const [row] = await tx
-    .select(sqlRitualParentFields)
-    .from(rituals)
-    .where(eq(rituals.id, id))
-    .for("update");
-  return row ?? null;
-}
+/** A deleted ritual is missing: saves, publish and receipt replays refuse it. */
+const parent = (tx: Transaction, id: string) =>
+  loadSqlRitualParent(tx, id, "update");
 function expected(row: SqlRitualParentRow, request: Expected) {
   if (!row.currentRevisionId) fail("INVALID_STATE");
   if (
@@ -421,7 +417,7 @@ export function createSqlRitualWriter(
                   ? {}
                   : { title: request.title }),
             })
-            .where(condition)
+            .where(and(condition, liveRitual))
             .returning({ id: rituals.id });
           if (updated.length !== 1) fail("CONFLICT");
           const [saved] = await tx

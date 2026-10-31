@@ -186,6 +186,12 @@ export const ritualsSelect = v.object({
       v.integer(),
     ),
   ),
+  deletedAt: v.nullable(v.date()),
+  deletedById: v.nullable(v.pipe(v.string(), v.uuid())),
+  purgeAfter: v.nullable(v.date()),
+  purgeRequestedAt: v.nullable(v.date()),
+  purgeStartedAt: v.nullable(v.date()),
+  purgeObjectsDeletedAt: v.nullable(v.date()),
 });
 
 export const ritualsInsert = v.object({
@@ -229,6 +235,12 @@ export const ritualsInsert = v.object({
       ),
     ),
   ),
+  deletedAt: v.optional(v.nullable(v.date())),
+  deletedById: v.optional(v.nullable(v.pipe(v.string(), v.uuid()))),
+  purgeAfter: v.optional(v.nullable(v.date())),
+  purgeRequestedAt: v.optional(v.nullable(v.date())),
+  purgeStartedAt: v.optional(v.nullable(v.date())),
+  purgeObjectsDeletedAt: v.optional(v.nullable(v.date())),
 });
 
 export const ritualsUpdate = v.object({
@@ -274,6 +286,12 @@ export const ritualsUpdate = v.object({
       ),
     ),
   ),
+  deletedAt: v.optional(v.nullable(v.date())),
+  deletedById: v.optional(v.nullable(v.pipe(v.string(), v.uuid()))),
+  purgeAfter: v.optional(v.nullable(v.date())),
+  purgeRequestedAt: v.optional(v.nullable(v.date())),
+  purgeStartedAt: v.optional(v.nullable(v.date())),
+  purgeObjectsDeletedAt: v.optional(v.nullable(v.date())),
 });
 
 export type RitualsSelect = v.InferOutput<typeof ritualsSelect>;

@@ -13,6 +13,7 @@ import {
 import { rituals } from "../db/schema/rituals";
 import { getRitualAccess } from "../doc/access";
 import {
+  liveRitual,
   loadSqlRitualPrincipal,
   type SqlRitualParentRow,
   sqlRitualParentFields,
@@ -304,7 +305,7 @@ export function createSqlRitualBundlePublisher(
           const [parent] = await tx
             .select(parentFields)
             .from(rituals)
-            .where(eq(rituals.id, ritualId))
+            .where(and(eq(rituals.id, ritualId), liveRitual))
             .for("share");
           active(signal);
           if (

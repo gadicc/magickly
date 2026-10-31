@@ -11,6 +11,7 @@ import {
   vi,
 } from "vitest";
 import {
+  BUNDLE_FIXTURE_TIME,
   bundleSchema,
   clearRitualBundleFixture,
   ritualBundleFixtureRecords,
@@ -1089,4 +1090,37 @@ describe("stored bundle evidence", () => {
       ).toBeNull();
     },
   );
+});
+
+describe("bundle reads of a deleted ritual", () => {
+  it("returns null for the manifest and every asset, as for a missing ritual", async () => {
+    expect(await reader("global").getManifest(input("global"))).not.toBeNull();
+    expect(await reader().getAsset(assetInput())).not.toBeNull();
+    const removedAt = new Date(BUNDLE_FIXTURE_TIME);
+    await db
+      .update(rituals)
+      .set({
+        deletedAt: removedAt,
+        deletedById: fixture.actors.creator,
+        purgeAfter: new Date(removedAt.getTime() + 30 * 86_400_000),
+      })
+      .where(eq(rituals.id, fixture.parent.id));
+    for (const who of ["creator", "global"] as const) {
+      expect(await reader(who).getManifest(input(who))).toBeNull();
+      expect(
+        await reader(who).getManifest({
+          ...input(who),
+          ritualId: createUuidV7(),
+        }),
+      ).toBeNull();
+      for (const row of saved.rows)
+        expect(
+          await reader(who).getAsset({
+            ...input(who),
+            bundleId: saved.intent.bundleId,
+            assetKey: row.key,
+          }),
+        ).toBeNull();
+    }
+  });
 });

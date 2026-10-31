@@ -404,3 +404,32 @@ describe("changing a ritual's access", () => {
     ).toMatchObject({ ok: false, code: "FORBIDDEN" });
   });
 });
+
+describe("a deleted ritual", () => {
+  it("is missing: read returns null and change is refused as for an unknown ID, leaving the scope as it was", async () => {
+    await db
+      .update(rituals)
+      .set({
+        deletedAt: when,
+        deletedById: who.creator,
+        purgeAfter: new Date(when.getTime() + 30 * 86_400_000),
+      })
+      .where(eq(rituals.id, ids.ritual));
+    const before = await saved();
+    for (const actor of [who.global, who.templeAdmin, who.creator])
+      expect(await service(actor).read(ids.ritual)).toBeNull();
+    const scope = { kind: "temple", templeId: ids.alpha, minGrade: 0 };
+    const missing = await service(who.global).change(
+      request(scope, who.global, createUuidV7()),
+    );
+    expect(missing).toMatchObject({ ok: false, code: "FORBIDDEN" });
+    for (const actor of [who.global, who.templeAdmin])
+      expect(await service(actor).change(request(scope, actor))).toEqual(
+        missing,
+      );
+    expect(
+      await service(who.global).change(request({ kind: "public" }, who.global)),
+    ).toEqual(missing);
+    expect(await saved()).toEqual(before);
+  });
+});

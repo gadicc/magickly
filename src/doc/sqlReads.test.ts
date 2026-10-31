@@ -838,3 +838,47 @@ describe("SQL ritual rendered reads", () => {
     );
   });
 });
+
+describe("SQL ritual reads of a deleted ritual", () => {
+  const remove = (id: string) =>
+    db
+      .update(rituals)
+      .set({
+        deletedAt: when,
+        deletedById: actor.creator,
+        purgeAfter: new Date(when.getTime() + 30 * 86_400_000),
+      })
+      .where(eq(rituals.id, id));
+
+  it("returns null from every reader method as for a missing ID, even for a global admin or the creator", async () => {
+    const id = ritualIds.two;
+    const ids = revisions.get(id)!;
+    await remove(id);
+    for (const name of ["global", "creator"]) {
+      const repository = reader(actor[name]);
+      expect(await repository.getMetadata(id)).toBeNull();
+      expect(await repository.getRendered(id)).toBeNull();
+      expect(await repository.listSourceHistory(id)).toBeNull();
+      expect(await repository.getCurrentSource(id)).toBeNull();
+      expect(await repository.getRevisionSource(id, ids.current)).toBeNull();
+      expect(await repository.getRevisionSource(id, ids.previous)).toBeNull();
+    }
+    expect(
+      queries.some((query) =>
+        query.includes("legacy_ritual_compiled_archives"),
+      ),
+    ).toBe(false);
+  });
+
+  it("omits a deleted ritual from listMetadata and still lists the others", async () => {
+    await remove(ritualIds.public);
+    expect(names(await reader(actor.global).listMetadata())).toEqual([
+      "group",
+      "otherGroup",
+      "otherTemple",
+      "two",
+      "zero",
+    ]);
+    expect(names(await reader(null).listMetadata())).toEqual([]);
+  });
+});

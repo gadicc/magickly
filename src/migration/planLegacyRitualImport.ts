@@ -521,6 +521,13 @@ export function planLegacyRitualImport(
         document.__updatedAt,
         `${location}.__updatedAt`,
       ),
+      // Imported rituals arrive live; the full-row comparison names every column.
+      deletedAt: null,
+      deletedById: null,
+      purgeAfter: null,
+      purgeRequestedAt: null,
+      purgeStartedAt: null,
+      purgeObjectsDeletedAt: null,
     });
     plan.archives.push({
       ritualId: id,

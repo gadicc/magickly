@@ -17,6 +17,7 @@ import {
   type RitualBundleFixture,
   seedRitualBundleFixture,
 } from "../../tests/ritualBundleFixtures";
+import { rituals } from "../db/schema/rituals";
 import { userAccess } from "../db/schema/userProfile";
 import { createUuidV7 } from "../lib/ids";
 import { prepareRitualBundle } from "./prepareRitualBundle";
@@ -142,5 +143,23 @@ describe("SQL ritual publication backfill discovery", () => {
     await expect(authorize(actorId!)).rejects.toMatchObject({
       code: "FORBIDDEN",
     });
+  });
+});
+
+describe("SQL ritual publication backfill of a deleted ritual", () => {
+  it("skips it as if it were missing, pending intents and all", async () => {
+    await reserve(createUuidV7(), actorId!);
+    const removedAt = new Date(BUNDLE_FIXTURE_TIME);
+    await db
+      .update(rituals)
+      .set({
+        deletedAt: removedAt,
+        deletedById: fixture.actors.creator,
+        purgeAfter: new Date(removedAt.getTime() + 30 * 86_400_000),
+      })
+      .where(eq(rituals.id, fixture.parent.id));
+    await expect(
+      reader()({ expectedActorId: actorId!, afterRitualId: null }),
+    ).resolves.toEqual({ exhausted: true, candidates: [] });
   });
 });

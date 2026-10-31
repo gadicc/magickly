@@ -14,6 +14,7 @@ import {
   type RitualPrincipal,
 } from "./access";
 import {
+  liveRitual,
   type SqlRitualParentRow as ParentRow,
   sqlRitualParentFields as parentFields,
   sqlRitualPolicy as policy,
@@ -113,7 +114,9 @@ async function parent(
   const [row] = await tx
     .select(parentFields)
     .from(rituals)
-    .where(and(eq(rituals.id, id), isNotNull(rituals.currentRevisionId)));
+    .where(
+      and(eq(rituals.id, id), isNotNull(rituals.currentRevisionId), liveRitual),
+    );
   if (!row || row.currentRevisionId === null) return null;
   const access = getRitualAccess(policy(row), actor);
   if (!access[required]) return null;
@@ -190,7 +193,7 @@ export function createSqlRitualReader(
           .select({ ...parentFields, templeSlug: temples.slug })
           .from(rituals)
           .leftJoin(temples, eq(temples.id, rituals.templeId))
-          .where(isNotNull(rituals.currentRevisionId))
+          .where(and(isNotNull(rituals.currentRevisionId), liveRitual))
           .orderBy(asc(rituals.id));
         return rows.flatMap((row) => {
           const access = getRitualAccess(policy(row), actor);

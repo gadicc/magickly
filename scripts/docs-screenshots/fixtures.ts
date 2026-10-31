@@ -11,6 +11,7 @@ import {
 } from "../../src/db/schema/rituals";
 import { prepare } from "../../src/doc/prepare";
 import { semanticFromJrt, semanticToJrt } from "../../src/doc/semantic";
+import { liveRitual } from "../../src/doc/sqlPolicy";
 import {
   createSqlRitualWriter,
   type SqlRitualWriteDatabase,
@@ -274,7 +275,7 @@ async function saveIfChanged(
       ritualRevisions,
       eq(ritualRevisions.id, ritualRows.currentRevisionId),
     )
-    .where(eq(ritualRows.id, ritualId));
+    .where(and(eq(ritualRows.id, ritualId), liveRitual));
   const jrt = prepare(pug);
   if (
     !current?.revisionId ||

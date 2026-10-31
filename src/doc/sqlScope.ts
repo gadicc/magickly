@@ -1,6 +1,6 @@
 import "server-only";
 
-import { asc, eq, sql } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import { temples, userGroups } from "../db/schema/memberships";
 import { rituals } from "../db/schema/rituals";
 import { isUuidV7 } from "../lib/ids";
@@ -12,9 +12,9 @@ import {
   sameScope,
 } from "./access";
 import {
+  liveRitual,
+  loadSqlRitualParent,
   loadSqlRitualPrincipal,
-  type SqlRitualParentRow,
-  sqlRitualParentFields,
   sqlRitualPolicy,
 } from "./sqlPolicy";
 import type { SqlRitualWriteDatabase } from "./sqlWrites";
@@ -84,18 +84,12 @@ export function createSqlRitualAccessService(
   getVerifiedActorId: () => Promise<string | null>,
   options: { now?: () => Date } = {},
 ) {
-  async function parent(
+  // A deleted ritual is missing here, so its scope cannot change.
+  const parent = (
     tx: Parameters<Parameters<ReadDatabase["transaction"]>[0]>[0],
     id: string,
     lock: boolean,
-  ) {
-    const query = tx
-      .select(sqlRitualParentFields)
-      .from(rituals)
-      .where(eq(rituals.id, id));
-    const [row] = lock ? await query.for("update") : await query;
-    return (row as SqlRitualParentRow | undefined) ?? null;
-  }
+  ) => loadSqlRitualParent(tx, id, lock ? "update" : undefined);
 
   return {
     /** Editors only; null for everyone else, so existence is not revealed. */
@@ -218,7 +212,7 @@ export function createSqlRitualAccessService(
             await tx
               .update(rituals)
               .set({ ...scopeColumns(scope), updatedAt: now })
-              .where(eq(rituals.id, ritualId));
+              .where(and(eq(rituals.id, ritualId), liveRitual));
             return { ok: true as const, scope };
           },
           { isolationLevel: "read committed", accessMode: "read write" },

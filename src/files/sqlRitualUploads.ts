@@ -9,11 +9,10 @@ import type {
 } from "drizzle-orm/pg-core";
 import { loomFilesTable } from "../db/schema/loomFiles";
 import { ritualFileLinks, ritualUploadIntents } from "../db/schema/ritualFiles";
-import { rituals } from "../db/schema/rituals";
 import { getRitualAccess } from "../doc/access";
 import {
+  loadSqlRitualParent,
   loadSqlRitualPrincipal,
-  sqlRitualParentFields,
   sqlRitualPolicy,
 } from "../doc/sqlPolicy";
 import { createUuidV7 } from "../lib/ids";
@@ -400,11 +399,8 @@ export function createSqlRitualUploads(
             .for("update");
           if (row && row.actorId !== actorId) fail("ACTOR_CHANGED");
           const authorize = async (ritualId: string) => {
-            const [parent] = await tx
-              .select(sqlRitualParentFields)
-              .from(rituals)
-              .where(eq(rituals.id, ritualId))
-              .for("share");
+            // A deleted ritual is missing: no upload starts, claims or finishes.
+            const parent = await loadSqlRitualParent(tx, ritualId, "share");
             active(signal);
             if (
               !parent ||

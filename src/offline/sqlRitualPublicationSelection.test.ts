@@ -10,6 +10,7 @@ import {
   vi,
 } from "vitest";
 import {
+  BUNDLE_FIXTURE_TIME,
   bundleSchema,
   clearRitualBundleFixture,
   type RitualBundleFixture,
@@ -84,5 +85,30 @@ describe("SQL ritual publication selection", () => {
       load({ ...request(), ritualId: createUuidV7().toUpperCase() }),
     ).rejects.toMatchObject({ code: "INVALID_REQUEST" });
     expect(actor).not.toHaveBeenCalled();
+  });
+});
+
+describe("SQL ritual publication selection of a deleted ritual", () => {
+  it("refuses it as for a missing ritual, even for a global admin", async () => {
+    const removedAt = new Date(BUNDLE_FIXTURE_TIME);
+    await db
+      .update(rituals)
+      .set({
+        deletedAt: removedAt,
+        deletedById: fixture.actors.creator,
+        purgeAfter: new Date(removedAt.getTime() + 30 * 86_400_000),
+      })
+      .where(eq(rituals.id, fixture.parent.id));
+    for (const actor of [fixture.actors.creator, fixture.actors.global]) {
+      actorId = actor;
+      const missing = await reader()({
+        ...request(),
+        ritualId: createUuidV7(),
+      }).catch((error: unknown) => error);
+      expect(missing).toMatchObject({ code: "UNAVAILABLE" });
+      await expect(reader()(request())).rejects.toMatchObject({
+        code: (missing as { code: string }).code,
+      });
+    }
   });
 });

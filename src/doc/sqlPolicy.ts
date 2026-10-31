@@ -1,5 +1,5 @@
 import "server-only";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq, isNull } from "drizzle-orm";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { user } from "../db/schema/auth";
 import { templeMemberships, userGroupGrants } from "../db/schema/memberships";
@@ -31,6 +31,34 @@ export type SqlRitualParentRow = Pick<
   typeof rituals.$inferSelect,
   keyof typeof sqlRitualParentFields
 >;
+
+/**
+ * SQL condition: the ritual has not been deleted (plan 065). Every query of
+ * `rituals` uses it or loadSqlRitualParent, so a deleted ritual behaves
+ * exactly like an ID that never existed; src/doc/ritualQueryGuard.test.ts
+ * enforces this.
+ */
+export const liveRitual = isNull(rituals.deletedAt);
+
+/**
+ * The one way to load a ritual's policy row by ID. A deleted ritual is
+ * missing, like an ID that never existed. Writers pass the lock they need:
+ * saves and scope changes take "update", uploads and bundle publications
+ * "share", so a delete (which takes "update") waits for every writer in
+ * flight and every later writer sees it.
+ */
+export async function loadSqlRitualParent(
+  tx: SqlRitualSelectDatabase,
+  id: string,
+  lock?: "update" | "share",
+): Promise<SqlRitualParentRow | null> {
+  const query = tx
+    .select(sqlRitualParentFields)
+    .from(rituals)
+    .where(and(eq(rituals.id, id), liveRitual));
+  const [row] = lock ? await query.for(lock) : await query;
+  return row ?? null;
+}
 
 /** Reconstructs the shared policy without treating malformed mixed scope columns as public. */
 export function sqlRitualPolicy(row: SqlRitualParentRow): RitualPolicy | null {

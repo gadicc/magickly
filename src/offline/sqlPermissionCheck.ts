@@ -1,10 +1,8 @@
 import "server-only";
-import { eq } from "drizzle-orm";
-import { rituals } from "../db/schema/rituals";
 import { getRitualAccess, parseRitualScope } from "../doc/access";
 import {
+  loadSqlRitualParent,
   loadSqlRitualPrincipal,
-  sqlRitualParentFields,
   sqlRitualPolicy,
 } from "../doc/sqlPolicy";
 import type { SqlRitualReadDatabase } from "../doc/sqlReads";
@@ -73,10 +71,9 @@ export function createSqlRitualPermissionChecker(
         async (tx): Promise<RitualPermissionResponseV1> => {
           const principal = await loadSqlRitualPrincipal(tx, actorId);
           if (!principal) return authentication;
-          const [row] = await tx
-            .select(sqlRitualParentFields)
-            .from(rituals)
-            .where(eq(rituals.id, request.ritualId));
+          // A deleted ritual is missing, so it gets exactly the missing row's
+          // denied reply and installed clients purge their copies.
+          const row = await loadSqlRitualParent(tx, request.ritualId);
           if (!row) return { ...base, kind: "denied" };
           const policy = sqlRitualPolicy(row);
           if (!policy || !parseRitualScope(policy.scope)) return temporary;

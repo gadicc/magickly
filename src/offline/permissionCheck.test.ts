@@ -612,3 +612,46 @@ describe("server permission check", () => {
       ).toThrow(RangeError),
   );
 });
+
+describe("server permission check of a deleted ritual", () => {
+  it("denies it with exactly the reply for a missing row", async () => {
+    const id = ritualIds.group,
+      input = request("global", "group");
+    expect((await checker("global")(input))?.kind).toBe("granted");
+    await db
+      .update(rituals)
+      .set({
+        deletedAt: when,
+        deletedById: actor.creator,
+        purgeAfter: new Date(when.getTime() + 30 * 86_400_000),
+      })
+      .where(eq(rituals.id, id));
+    queries.length = 0;
+    const deleted = await checker("global")(input);
+    expect(deleted?.kind).toBe("denied");
+    expect(selectedQueries()).toHaveLength(0);
+    expect(parseRitualPermissionResponse(input, deleted, transport)).toEqual(
+      deleted,
+    );
+    // The same request once the row is gone altogether.
+    await db
+      .update(rituals)
+      .set({ currentRevisionId: null })
+      .where(eq(rituals.id, id));
+    await db
+      .delete(legacyRitualCompiledArchives)
+      .where(eq(legacyRitualCompiledArchives.ritualId, id));
+    await db.delete(ritualRevisions).where(eq(ritualRevisions.ritualId, id));
+    await db.delete(rituals).where(eq(rituals.id, id));
+    const missing = await checker("global")(input);
+    expect(deleted).toEqual(missing);
+    expect(Object.keys(deleted!)).toEqual(Object.keys(missing!));
+    expect(Object.keys(deleted!).sort()).toEqual([
+      "kind",
+      "ownerId",
+      "requestId",
+      "ritualId",
+      "version",
+    ]);
+  });
+});

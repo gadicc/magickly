@@ -1,3 +1,4 @@
+export * from "./generated/audit";
 export * from "./generated/auth";
 export * from "./generated/chatUsage";
 export * from "./generated/discourse";

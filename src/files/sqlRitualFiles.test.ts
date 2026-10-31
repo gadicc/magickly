@@ -4,8 +4,11 @@ import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/pglite";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import * as schema from "../db/schema/index";
+import { createSqlRitualReader } from "../doc/sqlReads";
 import { createUuidV7 } from "../lib/ids";
 import { createSqlRitualFileRepository } from "./repository";
+import { createRitualFileAuthorizer } from "./ritualFileAccess";
+import { formatRitualFileLocator } from "./ritualFileLocator";
 
 vi.mock("server-only", () => ({}));
 vi.mock("../db/neonFull", () => ({ db: {} }));
@@ -155,5 +158,64 @@ describe("SQL ritual file repository", () => {
     await expect(
       createSqlRitualFileRepository(db).findById?.(ids.file),
     ).resolves.toBeNull();
+  });
+});
+
+describe("files of a deleted ritual", () => {
+  it("are unreadable once the ritual is deleted, even by its editor", async () => {
+    const locator = {
+      ritualId: ids.ritual,
+      attachmentId: ids.attachment,
+      fileId: ids.file,
+    };
+    const contentJson = JSON.stringify({
+      children: [{ type: "img", src: formatRitualFileLocator(locator) }],
+    });
+    const revisionId = createUuidV7(),
+      source = "p Synthetic";
+    await db.insert(schema.ritualRevisions).values({
+      id: revisionId,
+      ritualId: ids.ritual,
+      authorId: ids.actor,
+      source,
+      sourceSha256: createHash("sha256").update(source).digest("hex"),
+      sourceFormat: "magickli-pug-shortcuts",
+      sourceFormatVersion: "legacy-unversioned",
+      createdAt: now,
+      updatedAt: now,
+    });
+    await db.insert(schema.legacyRitualCompiledArchives).values({
+      ritualId: ids.ritual,
+      claimedRevisionId: revisionId,
+      contentJson,
+      contentSha256: createHash("sha256").update(contentJson).digest("hex"),
+      serializationVersion: "json-stringify-utf8-v1",
+      importedAt: now,
+    });
+    await db
+      .update(schema.rituals)
+      .set({ currentRevisionId: revisionId })
+      .where(eq(schema.rituals.id, ids.ritual));
+    const readable = async (actor: string | null) => {
+      const record = await createSqlRitualFileRepository(db).findById?.(
+        ids.file,
+      );
+      if (!record) return false;
+      return createRitualFileAuthorizer(
+        createSqlRitualReader(db, async () => actor),
+      )(record, locator);
+    };
+    expect(await readable(null)).toBe(true);
+    expect(await readable(ids.actor)).toBe(true);
+    await db
+      .update(schema.rituals)
+      .set({
+        deletedAt: now,
+        deletedById: ids.actor,
+        purgeAfter: new Date(now.getTime() + 30 * 86_400_000),
+      })
+      .where(eq(schema.rituals.id, ids.ritual));
+    expect(await readable(null)).toBe(false);
+    expect(await readable(ids.actor)).toBe(false);
   });
 });
