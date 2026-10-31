@@ -274,7 +274,9 @@ by `onFocus` on each `<section>` (React's focus events bubble out of
 the node view's portal) and where its target stands:
 
 - in an open hall's editor (inside its node view's
-  `data-gd-hall-editing`, which holds the hall's ID): that hall leads,
+  `data-gd-hall-editing`, which holds the hall's ID), or in one of its
+  popups, portaled to the body (`data-gd-hall-popup`, the same ID;
+  added 31 October 2026): that hall leads,
   with its selection, even one the source chose, whose tag then takes
   the caret, as on the hall editor page; the source's caret stops
   selecting;
@@ -661,4 +663,19 @@ median 38 ms from key to the next frame (at most 60, over 20 keys,
 CDP's round trips included), with no long task; typing in a hall line
 takes a median 17 ms a keystroke, the same as in a ritual line outside
 the hall. No memoising is needed.
+
+31 October 2026: Fable found that **the hall editor's popups dropped its
+lead**. The palette's menus and the properties panel's selects are
+portaled to the body; their focus still reaches the visual section
+through React, but outside `data-gd-hall-editing`, so neither led while
+one was open: the source's mark went, and the drawing's selection lost
+`byDrawing`, until the menu closed and focused the drawing again.
+`GdHallEditor` now marks those popups' roots with
+`data-gd-hall-popup` and the hall's ID (`hallPopup.ts`), and
+`onVisualFocus` treats the focus in one as in that hall's editor.
+Other focus outside the section's DOM still leads nothing: on Safari a
+portaled toolbar menu's focus is what ends the drawing's lead before a
+visual-text insert. `fix(gd): Keep the hall's lead in its menus`, with
+tests in `useRitualHallLink.test.ts`, `GdHallEditor.test.tsx` and
+`SemanticEditor.test.tsx`.
 

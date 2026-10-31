@@ -85,6 +85,7 @@ import {
   usePanelCollapsed,
   windowRoom,
 } from "./hallPanelDock";
+import { HallPopupRootContext, hallPopupRoot } from "./hallPopup";
 import { reorderable, rowPlace, spreadRowEvenly } from "./hallRows";
 
 /** SVG user units per square, as `GdHall` draws. */
@@ -338,6 +339,8 @@ export function GdHallEditor({
   const frame = useRef<number | null>(null);
   const helpId = useId();
   const paletteId = useId();
+  /** Marks the editor's popups, portaled to the body, as this hall's. */
+  const popupRoot = useMemo(() => hallPopupRoot(hall.id), [hall.id]);
   const selectionId = useId();
   /**
    * The panel beside the drawing, or docked at the foot of the box it
@@ -1143,6 +1146,8 @@ export function GdHallEditor({
           onClose={() => setPaletteAnchor(null)}
           disableRestoreFocus={paletteChosen}
           slotProps={{
+            // Portaled to the body: marked as this hall's (hallPopup.ts).
+            root: popupRoot,
             // The menu itself, named by its button.
             list: {
               id: `${paletteId}-menu`,
@@ -1368,40 +1373,42 @@ export function GdHallEditor({
             />
           )}
         </div>
-        <HallProperties
-          view={view}
-          selected={selected}
-          art={art}
-          disabled={!editable}
-          onSetAttr={setAttr}
-          onSetCaption={setCaption}
-          // What the panel's buttons move or add can land under the dock.
-          onScaleStep={(entry, up) => {
-            markReveal();
-            scaleStep(entry, up);
-          }}
-          onDuplicate={(entry) => {
-            markReveal();
-            duplicate(entry);
-          }}
-          onDelete={remove}
-          onStepInRow={(entry, step) => {
-            markReveal();
-            reorderStep(entry, step);
-          }}
-          onSpreadRow={(entry) => {
-            markReveal();
-            spreadRow(entry);
-          }}
-          onStandOn={(entry, value) => {
-            markReveal();
-            standOn(entry, value);
-          }}
-          docked={panelPlace === "docked"}
-          collapsed={panelCollapsed}
-          onCollapsedChange={setPanelCollapsed}
-          onFocusElsewhere={focusSurface}
-        />
+        <HallPopupRootContext value={popupRoot}>
+          <HallProperties
+            view={view}
+            selected={selected}
+            art={art}
+            disabled={!editable}
+            onSetAttr={setAttr}
+            onSetCaption={setCaption}
+            // What the panel's buttons move or add can land under the dock.
+            onScaleStep={(entry, up) => {
+              markReveal();
+              scaleStep(entry, up);
+            }}
+            onDuplicate={(entry) => {
+              markReveal();
+              duplicate(entry);
+            }}
+            onDelete={remove}
+            onStepInRow={(entry, step) => {
+              markReveal();
+              reorderStep(entry, step);
+            }}
+            onSpreadRow={(entry) => {
+              markReveal();
+              spreadRow(entry);
+            }}
+            onStandOn={(entry, value) => {
+              markReveal();
+              standOn(entry, value);
+            }}
+            docked={panelPlace === "docked"}
+            collapsed={panelCollapsed}
+            onCollapsedChange={setPanelCollapsed}
+            onFocusElsewhere={focusSurface}
+          />
+        </HallPopupRootContext>
       </div>
       <div className={styles.visuallyHidden} aria-live="polite">
         {announcement}

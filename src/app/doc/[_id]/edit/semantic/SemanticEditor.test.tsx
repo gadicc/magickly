@@ -784,6 +784,34 @@ it("puts the source caret on the hall item the drawing selects (plan 064)", asyn
   expect(panel().dataset.linkedCaret).toBeUndefined();
 }, 60_000);
 
+it("keeps the drawing's lead in its palette menu and selects (plan 064)", async () => {
+  const { surface, source, panel, tagOf, imperator } = await openLinkedHall();
+  fireEvent.keyDown(surface, { key: "Tab" });
+  await waitFor(() => expect(source().dataset.cursor).toBe(tagOf(imperator)));
+  // A popup hides the rest from assistive technology: held from before.
+  const text = source();
+  const tag = tagOf(imperator);
+  // The palette's menu, portaled to the body, takes the focus.
+  fireEvent.click(screen.getByRole("button", { name: "Add item" }));
+  const menu = await screen.findByRole("menu", { name: "Add item" });
+  await waitFor(() => expect(menu.contains(document.activeElement)).toBe(true));
+  expect(text.dataset.cursor).toBe(tag);
+  expect(panel().dataset.linkedCaret).toBe("true");
+  fireEvent.keyDown(document.activeElement as Element, { key: "Escape" });
+  await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
+  // As does a select of the properties panel's: the officer's role.
+  fireEvent.mouseDown(screen.getByRole("combobox", { name: "Role" }));
+  const listbox = await screen.findByRole("listbox");
+  await waitFor(() =>
+    expect(listbox.contains(document.activeElement)).toBe(true),
+  );
+  expect(text.dataset.cursor).toBe(tag);
+  expect(panel().dataset.linkedCaret).toBe("true");
+  fireEvent.keyDown(listbox, { key: "Escape" });
+  await waitFor(() => expect(screen.queryByRole("listbox")).toBeNull());
+  expect(source().dataset.cursor).toBe(tag);
+}, 60_000);
+
 it("lets the source go while the author types in the visual text (plan 064)", async () => {
   const { surface, source, panel, tagOf, imperator } = await openLinkedHall();
   fireEvent.keyDown(surface, { key: "Tab" });

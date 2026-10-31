@@ -2,6 +2,7 @@
 import { act, renderHook } from "@testing-library/react";
 import type React from "react";
 import { describe, expect, it } from "vitest";
+import { HALL_POPUP_ATTRIBUTE } from "@/doc/gdHallEditor/hallPopup";
 import { byAttr, neophyteHall } from "@/doc/gdHallEditor/hallTestFixtures";
 import { printRitualPug } from "@/doc/ritualPug";
 import { ritualPugNodeIdsAtLine } from "@/doc/ritualPugIds";
@@ -48,6 +49,9 @@ const focusIn = (attributes: Record<string, string>) => {
 const inSourceEditor = () => focusIn({ class: "cm-editor" });
 const inHall = (hallId = hall.id) =>
   focusIn({ "data-gd-hall-editing": hallId });
+/** One of a hall editor's popups, portaled outside the visual panel. */
+const inHallPopup = (hallId = hall.id) =>
+  focusIn({ [HALL_POPUP_ATTRIBUTE]: hallId });
 const elsewhere = () => focusIn({});
 const read: Source = { text, dialect: "pug", dirty: false, conflict: false };
 
@@ -225,6 +229,22 @@ describe("the source caret follows the drawing (plan 064)", () => {
     hook.rerender({ displayMode: "source", source: read });
     hook.rerender({ displayMode: "split", source: read });
     expect(hook.result.current.cursor).toBeNull();
+  });
+
+  it("keeps the lead in the hall editor's popups, portaled outside", () => {
+    const { hook, opened, select } = setup();
+    opened();
+    act(() => hook.result.current.onVisualFocus(inHall()));
+    select(hegemon);
+    expect(hook.result.current.cursor?.line).toBe(lineOf(hegemon));
+    // Its palette's menu or a properties select: still the drawing's.
+    act(() => hook.result.current.onVisualFocus(inHallPopup()));
+    expect(hook.result.current.cursor?.line).toBe(lineOf(hegemon));
+    expect(hook.result.current.marked).toBe(true);
+    // After the source led, the hall's popup leads with its selection.
+    act(() => hook.result.current.onSourceFocus(inSourceEditor()));
+    act(() => hook.result.current.onVisualFocus(inHallPopup()));
+    expect(hook.result.current.cursor?.line).toBe(lineOf(hegemon));
   });
 
   it("lets go when the focus goes elsewhere in either panel", () => {

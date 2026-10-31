@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { HALL_POPUP_ATTRIBUTE } from "@/doc/gdHallEditor/hallPopup";
 import type { RitualSourceCursor } from "@/doc/RitualSourceEditor";
 import type {
   RitualHallCaret,
@@ -225,14 +226,20 @@ export function useRitualHallLink({
       [sourceLeads, noneLeads],
     ),
     /**
-     * The visual section's `onFocus`: in an open hall's editor that hall
-     * leads; anywhere else in the panel, neither does.
+     * The visual section's `onFocus`: in an open hall's editor, or in one
+     * of its popups (portaled to the body, but their focus still reaches
+     * the section through React), that hall leads; anywhere else in the
+     * panel, a toolbar's menu included, neither does.
      */
     onVisualFocus: React.useCallback(
       (event: React.FocusEvent) => {
-        const hallId = focusIn(event, "[data-gd-hall-editing]")?.getAttribute(
-          "data-gd-hall-editing",
-        );
+        const hallId =
+          focusIn(event, "[data-gd-hall-editing]")?.getAttribute(
+            "data-gd-hall-editing",
+          ) ??
+          focusIn(event, `[${HALL_POPUP_ATTRIBUTE}]`)?.getAttribute(
+            HALL_POPUP_ATTRIBUTE,
+          );
         if (hallId) drawingLeads(hallId);
         else noneLeads();
       },

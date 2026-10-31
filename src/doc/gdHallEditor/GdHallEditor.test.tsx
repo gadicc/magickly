@@ -16,6 +16,7 @@ import { GdHallEditor, type GdHallEditorProps } from "./GdHallEditor";
 import { parseNumberField } from "./HallProperties";
 import { hallView } from "./hallEdits";
 import type { HallElement } from "./hallModel";
+import { HALL_POPUP_ATTRIBUTE } from "./hallPopup";
 import {
   byAttr,
   findNode,
@@ -1406,6 +1407,34 @@ describe("hosts (owner's decision, 19 October 2026)", () => {
         (child) => child.kind === "element" && child.attrs.role === "hegemon",
       ),
     ).toBe(true);
+  });
+
+  it("marks its portaled popups with the hall's ID", async () => {
+    const hall = neophyteHall();
+    const { surface } = setup(hall);
+    /** The hall a popup's element is marked with, on its portal's root. */
+    const popupOf = (element: Element) => {
+      const root = element.closest(`[${HALL_POPUP_ATTRIBUTE}]`);
+      expect(root?.parentElement).toBe(document.body);
+      return root?.getAttribute(HALL_POPUP_ATTRIBUTE);
+    };
+    fireEvent.click(screen.getByRole("button", { name: "Add item" }));
+    const menu = await screen.findByRole("menu", { name: "Add item" });
+    expect(popupOf(menu)).toBe(hall.id);
+    fireEvent.keyDown(menu, { key: "Escape" });
+    await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
+    // The Hegemon: a role (a choice field) and where it stands.
+    pointer("pointerDown", surface, at(8, 3));
+    pointer("pointerUp", surface, at(8, 3));
+    for (const name of ["Role", "Stands on"]) {
+      fireEvent.mouseDown(screen.getByRole("combobox", { name }));
+      const listbox = await screen.findByRole("listbox");
+      expect(popupOf(listbox), name).toBe(hall.id);
+      fireEvent.keyDown(listbox, { key: "Escape" });
+      await waitFor(() => expect(screen.queryByRole("listbox")).toBeNull());
+    }
+    // The editor's own root carries no mark: only its popups do.
+    expect(surface.closest(`[${HALL_POPUP_ATTRIBUTE}]`)).toBeNull();
   });
 
   it("stands an object on a host from the panel", async () => {

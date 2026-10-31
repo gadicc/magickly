@@ -28,6 +28,7 @@ import {
 import {
   type KeyboardEvent,
   useCallback,
+  useContext,
   useEffect,
   useId,
   useLayoutEffect,
@@ -42,6 +43,7 @@ import { round2 } from "./hallGeometry";
 import { standOptions, standValue } from "./hallHosts";
 import type { HallElement } from "./hallModel";
 import { hallItemKinds, itemKindLabel } from "./hallPalette";
+import { HallPopupRootContext } from "./hallPopup";
 import { reorderable, rowHasPositions, rowPlace } from "./hallRows";
 
 /**
@@ -319,6 +321,7 @@ function ChoiceField({
     current === "" || options.some(([option]) => option === current)
       ? options
       : [...options, [current, current] as const];
+  const popupRoot = useContext(HallPopupRootContext);
   return (
     <TextField
       select
@@ -332,7 +335,10 @@ function ChoiceField({
           event.target.value === "" ? undefined : event.target.value,
         )
       }
-      slotProps={{ htmlInput: { "data-hall-field": name } }}
+      slotProps={{
+        htmlInput: { "data-hall-field": name },
+        select: { MenuProps: { slotProps: { root: popupRoot } } },
+      }}
     >
       <MenuItem value="">
         <em>Default</em>
@@ -476,6 +482,7 @@ export function HallProperties({
   onFocusElsewhere,
 }: HallPropertiesProps) {
   const headingId = useId();
+  const popupRoot = useContext(HallPopupRootContext);
   const bodyId = useId();
   const body = useRef<HTMLDivElement>(null);
   /** Whether a field in the panel holds the focus. */
@@ -687,7 +694,10 @@ export function HallProperties({
             value={standing ?? ""}
             disabled={disabled}
             onChange={(event) => onStandOn(selected, event.target.value)}
-            slotProps={{ htmlInput: { "data-hall-field": "standsOn" } }}
+            slotProps={{
+              htmlInput: { "data-hall-field": "standsOn" },
+              select: { MenuProps: { slotProps: { root: popupRoot } } },
+            }}
           >
             {stands.map((option) => (
               <MenuItem key={option.value} value={option.value}>
