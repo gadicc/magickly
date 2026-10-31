@@ -42,8 +42,8 @@
   "dependencies": {
     "@ai-sdk/react": "4.0.156",
     "@ampproject/remapping": "^2.3.0",
-    "@aws-sdk/client-s3": "3.1133.0",
-    "@aws-sdk/s3-request-presigner": "3.1133.0",
+    "@aws-sdk/client-s3": "3.1156.0",
+    "@aws-sdk/s3-request-presigner": "3.1156.0",
     "@codemirror/language": "^6.13.1",
     "@codemirror/legacy-modes": "^6.5.5",
     "@codemirror/lint": "^6.9.7",
