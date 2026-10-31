@@ -24,7 +24,9 @@ export default function HallsPage() {
           Floor plans of the fourteen halls of the Outer Order’s grades and the
           Portal, drawn from Regardie’s layouts with our own art. Each hall has
           a page showing where every officer stands, with its sources and the
-          plan to download under CC BY 4.0.
+          plan to download under CC BY 4.0: free to use, even commercially, with
+          credit to Magick.ly. It’s a Creative Commons licence, like
+          Wikipedia’s.
         </Typography>
         <div className={styles.editor}>
           <Button

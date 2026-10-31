@@ -29,8 +29,9 @@ export default function HallEditorPage() {
           <Link href="/gd/halls">fourteen halls</Link>, or build your own from
           composable tags in its Pug source or on the drawing. Download it as
           SVG or PNG: our artwork is{" "}
-          <a href={GD_HALL_LICENCE.url}>{GD_HALL_LICENCE.name}</a>, free to use
-          with credit to {GD_HALL_LICENCE.creator}.
+          <a href={GD_HALL_LICENCE.url}>{GD_HALL_LICENCE.name}</a>, free to use,
+          even commercially, with credit to {GD_HALL_LICENCE.creator}. It’s a
+          Creative Commons licence, like Wikipedia’s.
         </Typography>
         <Typography variant="body2" sx={{ mb: 2 }}>
           Your hall is kept as a draft in this browser only. To save it with its

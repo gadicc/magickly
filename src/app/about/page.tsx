@@ -89,10 +89,11 @@ export default function Sequence() {
             data
           </a>{" "}
           is{" "}
-          <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>,
-          as are the images this app draws, such as the Tree of Life, sigils,
-          tablets, lamens and the <Link href="/gd/halls">temple halls</Link>:
-          use them anywhere, with credit. The marked{" "}
+          <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>{" "}
+          (a Creative Commons licence, like Wikipedia’s), as are the images this
+          app draws, such as the Tree of Life, sigils, tablets, lamens and the{" "}
+          <Link href="/gd/halls">temple halls</Link>: use them anywhere, with
+          credit. The marked{" "}
           <a href="https://github.com/gadicc/magickly/tree/main/src/components">
             components
           </a>{" "}
