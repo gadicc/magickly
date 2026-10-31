@@ -82,6 +82,13 @@ Follow-ups are separate from the completed migration work:
   validation identity rotated with nothing to regenerate. Recorded in the
   [advisory clearance](035-advisory-clearance.md), with the open vite
   advisories and an upload-hardening idea as follow-ups.
+- 31 October 2026: the open Dependabot alerts (undici, fast-uri, vite in
+  both lockfiles, @vitest/mocker) cleared and the tree refreshed within the
+  release-age policy; the sharp, source-map-js and next alerts were already
+  stale. Recorded in the
+  [October dependency refresh](066-october-dependency-refresh.md), with the
+  remaining exact-pin zod, glob and minimatch advisories, the deferred Biome
+  2.6 and identity-bound packages, and their follow-ups.
 
 - TODO: rate limiting for the public component image routes
   (`/api/render/*`, `/api/treeOfLife`). Each distinct query renders through
