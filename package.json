@@ -72,7 +72,7 @@
     "@vercel/functions": "^3.9.8",
     "ai": "7.0.102",
     "astronomy-engine": "2.1.19",
-    "better-auth": "1.7.5",
+    "better-auth": "1.7.12",
     "bson": "^6.10.4",
     "css-tree": "3.2.1",
     "date-fns": "4.4.0",
