@@ -560,5 +560,17 @@ Follow-ups are separate from the completed migration work:
   ([plan 064](064-ritual-hall-selection-link.md)). The install
   holds one `@codemirror/view` again (6.43.15) and one
   `@codemirror/commands` (6.11.1), since 30 October 2026.
+- Deleting rituals: planned on 31 October 2026 on `gate/ritual-deletion`
+  ([plan 065](065-ritual-deletion.md)); Gadi took all fourteen
+  decisions. Delete hides a ritual and Recently deleted restores it for
+  30 days, after which a nightly Vercel cron purges its rows and R2
+  objects; administrators can delete permanently at once. It adds the
+  `audit_events` table that plan 057's audit log can reuse. Neon's
+  point-in-time restore window is 6 hours (free plan) and is not relied
+  on; `CRON_SECRET` is in Vercel Production (31 October 2026). Gadi
+  skipped both spikes (no Vercel cron rehearsal, no preview-bucket
+  delete). TODO after the release: spike 1(d), the first nightly cron run
+  checked in the dashboard and the heartbeat, which is the cron's only
+  test. Not built.
 
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.
