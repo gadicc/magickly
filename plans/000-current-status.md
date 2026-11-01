@@ -1,11 +1,21 @@
 # Modernization status
 
-Updated 15 September 2026. This page supersedes older pending-acceptance notes;
+Updated 1 November 2026. This page supersedes older pending-acceptance notes;
 the [closeout checkpoint](025-pause-checkpoint.md) records preservation and
 continuation boundaries.
 
-Production is live on `4d9d10d37b5a3877d0f9230c5e75ff5a969c7e37`, deployment
-`dpl_HHLsAXCa7vopfkqwiyVuqETkaaL2`, in London (`lhr1`) on Node 24.
+Production is live on `41c6e3717fc8fde947268ea3f422de794995ae20`, deployment
+`dpl_E3tWBJUHYdHzcqLRoQkbzpUmEwrx`, in London (`lhr1`) on Node 24, promoted on
+1 November 2026 by
+[Production release run 41293750989](https://github.com/gadicc/magickly/actions/runs/41293750989),
+which passed its quality job (including `pnpm check:turbopack`), migrations,
+staged checks and promotion. Every change this page records as built, up
+to and including ritual deletion ([plan 065](065-ritual-deletion.md)), is in
+it.
+
+The SQL migration's final release, on 15 September 2026, was
+`4d9d10d37b5a3877d0f9230c5e75ff5a969c7e37`, deployment
+`dpl_HHLsAXCa7vopfkqwiyVuqETkaaL2`.
 [CI/release run 34994058815](https://github.com/gadicc/magick.ly/actions/runs/34994058815)
 succeeded, including migrations, artifact checks, staged acceptance and promotion.
 The final read-only receipt verified the exact deployment, Production target,
@@ -43,12 +53,12 @@ credential then verified all 7,790,234 migrated bytes and MIME types.
   provider settings and backups were preserved. Cleanup receipt:
   `cc54da299fab7458b1b54b10d23ea117f2a2e6586d917db5e911e2c378936c8c`.
 
-The reusable Loom `modernize-app` skill is committed locally as
+The reusable Loom `modernize-app` skill was committed locally on 15 September as
 `b3460006a8482270c4cb9427b6a6bd4af7c2d51e`. The full Deno suite passed
 (64 tests, 634 steps), as did formatting/lint, skill validation and the npm build.
 All six emitted skill resources match source and their references resolve.
-The source commit is not yet pushed or published; Magickly remains pinned to
-Loom 1.27.0. This documentation closeout is separate from the deployed code.
+It has since been published: Magickly moved to Loom 2.0.0 on 17 October and
+is on 2.2.1 since 31 October, whose skills include `modernize-app`.
 
 Normal SQL writes are open. The persistent legacy-upload write denial remains;
 public reads remain available. The old database, old bucket/object bodies and
@@ -123,15 +133,16 @@ Follow-ups are separate from the completed migration work:
   rituals published across the deploy. Since 20 September that profile names
   the renderer alone: the data an image draws is hashed beside it, so a data
   fix no longer bumps it (step 3b of [plan 032](032-data-layer.md#step-3b-1)).
-- The data layer is being rebuilt: `data/` keeps plain JSON tables, one
+- The data layer is rebuilt: `data/` keeps plain JSON tables, one
   declared graph describes every relation, and an eager `assemble()` replaces
   the barrel's in-place linking. See [plan 032](032-data-layer.md). Steps 0
-  to 3 have landed. Step 0 pinned the pages the data changes touch, step 1
-  repaired the links, sentinels and field names the audit found (Luna's god
-  name and the rulers of Cancer and Scorpio changed with it), and step 2
-  built the layer itself: JSON emitted from the JSON5 sources into gitignored
-  `data/dist`, a declared graph over all 26 tables, row types derived from
-  the JSON rather than copied by hand, `assemble()` over the 23 tables the
+  to 3 are recorded here; step 4, the `magick-data` package, further down.
+  Step 0 pinned the pages the data changes touch, step 1 repaired the links,
+  sentinels and field names the audit found (Luna's god name and the rulers
+  of Cancer and Scorpio changed with it), and step 2 built the layer itself:
+  JSON emitted from the JSON5 sources into gitignored `data/dist`, a
+  declared graph over all 26 tables, row types derived from the JSON
+  rather than copied by hand, `assemble()` over the 23 tables the
   graph links in place of the mutation, and a check that the data says what
   the graph says. Nothing a reader sees changed with step 2, no rendered
   image moved, and what a barrel route loads is within 5 KB of what it was.
@@ -298,10 +309,9 @@ Follow-ups are separate from the completed migration work:
   ([plan 032](032-data-layer.md#follow-ups)): a source directory added while
   `pnpm dev` runs is not watched until it restarts, since the watch is one
   watcher per directory.
-- Not yet released: from the next release, anonymous `/api/session` checks
-  return 200 with a null user instead of 401 (changed 17 September). An
-  anonymous tab left open across that release shows a study load error until
-  it reloads; see
+- Released on 18 September 2026 (run 35369283455): anonymous
+  `/api/session` checks return 200 with a null user instead of 401 (changed
+  17 September); see
   [plan 013](013-sql-auth-runtime.md#runtime-entrypoints-prepared).
 
 - The 72 angels of the Shem HaMephorash are complete as of 19 September:
@@ -331,7 +341,10 @@ Follow-ups are separate from the completed migration work:
   [plan 058](058-temple-documents.md).
 
 - Golden Dawn hall diagrams (`gdHall`): composable temple floor plans for the
-  rituals, in progress on `gate/gd-hall`; see [plan 061](061-gd-hall.md).
+  rituals; see [plan 061](061-gd-hall.md). Each stage below was built on
+  its own gate branch and is on `main`: stages A to F and F's follow-ups
+  were released on 22 October 2026 (run 39843512728), stages G and H, the
+  tablet versions and stage I on 31 October (run 41182234108).
   Stages A, B and C are done: rituals hold halls (at the top level or
   in a note, summary, list item or todo), drawn in the reader and as
   one atom in the visual editor, after the planned compiler change
@@ -484,15 +497,15 @@ Follow-ups are separate from the completed migration work:
   that input handling,
   the order-dependent `members` documentation screenshot, a server
   error on the temple membership page seen during the screenshot
-  capture, `pnpm check:turbopack` failing on `main` as well
-  (`next/font/google` in Turbopack, 18 October 2026), and an
-  import-boundary gap:
+  capture, and an import-boundary gap:
   `src/components/entity/entityFields.test.ts` reaches app code through
   `import.meta.glob("../../app/**/fields.ts")`, which the test cannot see
-  ([plan 061](061-gd-hall.md#follow-ups)).
+  ([plan 061](061-gd-hall.md#follow-ups)). `pnpm check:turbopack`, which
+  failed on `main` on 18 October 2026 (`next/font/google` in Turbopack),
+  passes again in the 1 November release run.
 - Search pages for the temple halls: designed and built on 26 October
   2026 on `gate/hall-seo` ([plan 062](062-gd-hall-seo.md)), every commit
-  gated; awaiting review and merge. Each preset hall has a page under
+  gated; released on 31 October 2026. Each preset hall has a page under
   `/gd/hall/<slug>` with its licensed PNG and SVG, the presets are
   listed below the editor, the sitemap lists the images, and the
   editor's exports credit the art. The plan was revised after its
@@ -512,8 +525,8 @@ Follow-ups are separate from the completed migration work:
   now drawn in CC BY hall images (Gadi: fine), and the IPTC Digital
   Source Type, left out as ambiguous for code-drawn art that AI agents
   wrote; revisit if a platform asks or Gadi wants to disclose the AI
-  involvement. After the release: the hall pages in Google's Rich
-  Results Test, the sitemap resubmitted, whether Vercel answers the
+  involvement. TODO now that it is released: the hall pages in Google's
+  Rich Results Test, the sitemap resubmitted, whether Vercel answers the
   image files' conditional requests with a 304
   ([plan 062](062-gd-hall-seo.md#follow-ups)).
 - TODO (Gadi, 26 October 2026; saved for after the current hall work):
@@ -524,8 +537,8 @@ Follow-ups are separate from the completed migration work:
   consents to (donates under) CC BY 4.0, against keeping copyright for
   internal use ([plan 061](061-gd-hall.md#follow-ups)).
 - Temple halls under `/gd/halls` and plan 061's stage I: built on 28
-  October 2026 on `gate/halls-i`, every commit gated; awaiting review
-  and merge. Gadi chose a routed index (`/gd/halls`), hall pages with a
+  October 2026 on `gate/halls-i`, every commit gated; released on 31
+  October 2026. Gadi chose a routed index (`/gd/halls`), hall pages with a
   rail of every hall (a "Jump to hall" select on phones) and the editor
   alone at `/gd/halls/editor`, with permanent redirects from `/gd/hall`
   ([plan 062's amendment](062-gd-hall-seo.md#amendment-the-halls-under-gdhalls-28-october-2026)).
@@ -534,7 +547,7 @@ Follow-ups are separate from the completed migration work:
   `public/pics` are gone, no longer cited as sources, and redirect to
   their halls' SVGs; their `/about` credits are removed
   ([plan 061](061-gd-hall.md#stage-i-plan-28-october-2026)). TODO for
-  Gadi after the deploy: edit the production "0=0 Grade of the
+  Gadi, due since the 31 October deploy: edit the production "0=0 Grade of the
   Neophyte" ritual once to draw the Neophyte hall (a read-only query
   of current revisions and of revisions with unfinished, unexpired
   publications, a local rehearsal, then save and publish at once; no
@@ -550,13 +563,13 @@ Follow-ups are separate from the completed migration work:
 - Linked selection in the hall editor: planned and built on 29 October
   2026 on `gate/hall-sync` ([plan 063](063-hall-selection-link.md)),
   reviewed and answered by Gadi the same day, every commit gated;
-  awaiting review and merge. In `/gd/halls/editor`'s split view,
+  released on 31 October 2026. In `/gd/halls/editor`'s split view,
   selecting an item in the drawing moves the source caret to its tag,
   and moving the caret selects the item. The same link in the ritual
   editor's split view, between a hall item and its line in the whole
   ritual's source, while Edit hall is open: planned, built and
   code-reviewed on 30 October 2026 on `gate/ritual-hall-link`, every
-  commit gated; awaiting merge
+  commit gated; released on 31 October 2026
   ([plan 064](064-ritual-hall-selection-link.md)). The install
   holds one `@codemirror/view` again (6.43.15) and one
   `@codemirror/commands` (6.11.1), since 30 October 2026.
@@ -569,10 +582,11 @@ Follow-ups are separate from the completed migration work:
   point-in-time restore window is 6 hours (free plan) and is not relied
   on; `CRON_SECRET` is in Vercel Production (31 October 2026). Gadi
   skipped both spikes (no Vercel cron rehearsal, no preview-bucket
-  delete). TODO after the release: spike 1(d), the first nightly cron run
+  delete). Built on 1 November 2026 on the same branch and released that
+  day (run 41293750989), commits 3 and 4 in one push. TODO: spike 1(d),
+  the first nightly cron run (03:17 UTC, so first on 2 November 2026)
   checked in the dashboard and the heartbeat, which is the cron's only
-  test. Built on 1 November 2026 on the same branch; commits 3 and 4 reach
-  `main` in one push. **Never roll production back past this release**
+  test. **Never roll production back past this release**
   without first purging what should go: the older code shows every
   soft-deleted ritual again and stops purging (plan 065, risk 12).
 - TODO: a check-only mode for `/api/rituals/permission`, so the
@@ -580,5 +594,20 @@ Follow-ups are separate from the completed migration work:
   descriptor (up to 16 MB) with every grant; it changes the offline
   contract, so it needs its own plan
   ([plan 065](065-ritual-deletion.md#the-code-review-1-november-2026)).
+- 1 November 2026, on `gate/mui-colour-status`, awaiting release: fifteen
+  `Typography` colours that MUI 9 silently dropped are restored. Palette
+  paths such as `color="warning.main"` and `color="text.secondary"` were
+  system props, which MUI 9 removed (the app moved from MUI 7 to 9 on
+  12 September 2026, `458225ce`), so the study sync warnings, the temple
+  pages' confirmations and several notes rendered in the body colour; they
+  now use the palette keys `warning`, `success` and `textSecondary`. The
+  `create-ritual` and `forum-settings` help screenshots were recaptured
+  with them. TODO: the worktree capture (`magickli-docs-capture`) cannot
+  take `forum-settings`, because it gives the server no secrets key and
+  the forum form only renders when keys can be stored; it also starts
+  `next dev` without building `magick-data`, so a fresh worktree needs
+  `pnpm data:build` first. That shot was taken with `capture.mts` against
+  a 127.0.0.1 dev server holding the same local settings and a throwaway
+  secrets key.
 
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.
