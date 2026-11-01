@@ -4,7 +4,8 @@ Status: planned on `gate/ritual-deletion` from `main` at 8c536103.
 Adversarially reviewed (Fable) and revised the same day, then Gadi's
 answers to the open questions folded in, including the two spike
 questions (no rehearsal, no preview-bucket test); see "Review, 31 October
-2026" and "Owner answers, 31 October 2026" at the end. Not built. Read
+2026" and "Owner answers, 31 October 2026" at the end. Built on 1
+November 2026; see "The build" at the end. Read
 [current status](000-current-status.md),
 [plan 057](057-temple-administration.md) (access, removal, the creator
 gap) and [plan 006](006-private-offline.md) (the offline lease) first.
@@ -813,7 +814,11 @@ Only the cron calls them. Every step is safe to repeat.
 2. **The point of no return.** In its own small transaction, set
    `purge_objects_deleted_at` if it is null, before the first
    `DeleteObject` is sent. It errs towards "no return": once set, cancel
-   removal is refused even if that delete then failed.
+   removal is refused even if a later delete fails. One exception keeps
+   the fail-safe of §3 true (code review, Fable 1): when this run set the
+   mark and its **first** delete is refused outright (`AccessDenied` or a
+   403), nothing was deleted, so the failure handling clears the mark
+   again and the ritual stays cancellable.
 3. **Objects** (outside any transaction).
    - `DeleteObject` each recorded key, with a 10-second timeout each. A
      missing object counts as done.
@@ -821,8 +826,11 @@ Only the cron calls them. Every step is safe to repeat.
      prefix and delete what it finds, catching plan 008:17's orphans.
      Any list error is logged by class and ignored, so the purge never
      needs the List permission.
-   - A failed `DeleteObject` stops this ritual. It keeps its state,
-     counts as failed, and the next run retries it.
+   - A failed `DeleteObject` stops this ritual. It keeps its state
+     (except as in step 2), counts as failed, and the next run retries it.
+   - Each ritual also has its own deadline inside the run: past it, the
+     purge stops between objects, the ritual stays claimed, counts as
+     deferred, and continues the next night. Deletes are idempotent.
 4. **Rows** (transaction 2, in foreign-key order). Lock the row again and
    check `purge_started_at`. If the row is gone, another runner finished,
    and that counts as done. Then:
@@ -917,10 +925,15 @@ export async function GET(request: Request) {
 }
 ```
 
-- **Sizing.** A purge is a few round trips and at most a few dozen
-  object deletes, each capped at 10 seconds. The deadline stops new
-  rituals after 45 seconds, and the rest wait for the next night. The
-  corpus is a handful of rituals.
+- **Sizing** (as built, code review S3). Within the 60 seconds no ritual
+  starts after 35, the running one stops deleting objects at 45 and
+  continues the next night, and each request is capped at 10 seconds,
+  leaving time for its rows and the heartbeat. Nothing bounds a ritual's
+  object count, so a large one takes several nights. The batch takes fresh
+  due rituals first, then claimed ones still deleting, and claimed ones
+  that stopped before deleting anything (refusals) last, so a stuck ritual
+  never starves the others. "Within a day" can be about 24.5 hours: the
+  quiet period, then the next 03:17 UTC run.
 - **The heartbeat** is written whatever the outcome, so a run that throws
   still leaves `started_at`.
 - `sameSecret` compares in constant time.
@@ -987,12 +1000,23 @@ export async function GET(request: Request) {
     - It stops when the page unmounts or the account changes, through
       the coordinator registrations the page already holds.
     - It is skipped offline (`navigator.onLine` false), and runs again
-      on the `online` event, as the reader does.
-  - **Cost.**
-    - One POST and one database transaction per downloaded ritual per
-      visit, which is tens at most.
+      on the `online` event once the connection has settled for two
+      seconds (code review S2).
+    - It tells other tabs nothing unless a ritual was denied, and then
+      once per round (code review S1): a grant never invalidates an open
+      reader.
+  - **Cost** (corrected by the code review, S2).
+    - A grant reply carries the whole rendered descriptor, up to 16 MB,
+      so each recheck can download that ritual's text again. The list
+      therefore rechecks a ritual only when its last accepted grant is
+      more than 6 hours old (the stored authorization's local start
+      time), so a visit costs nothing for recently checked rituals and
+      at most one POST and one transaction per stale one.
     - It renews leases without the ritual being read. That is
       acceptable, since renewal requires current access.
+    - A check-only request mode for the permission endpoint would remove
+      the download; it is a follow-up, since it changes the offline
+      contract (plan 000).
   - **Reach.** It does not reach devices that open neither page, so the
     wording names both.
 - **The offline contract stays byte-compatible.** The `denied` body keeps
@@ -1478,6 +1502,13 @@ the purge's fail-safe. `CRON_SECRET` is already in Vercel Production.
     lands. That is intended, and the variable is already set (31
     October 2026). The release also refuses a build whose
     `config.json` lacks the cron.
+12. **Rolling back past this release** (code review S4). An Instant
+    Rollback to a deployment before commit 4 makes every soft-deleted
+    ritual readable again, because the old code never filters
+    `deleted_at`, and stops purging, because the cron belongs to the
+    deployment. Do not roll production back past this release without
+    first purging what should go, or accepting that deleted rituals
+    reappear until the release is restored.
 
 ## The later stage
 
@@ -1608,6 +1639,173 @@ Gadi answered the review's open questions the same day:
 8. **Spike 2: no preview-bucket test.** Gadi chose to rely on the
    fail-safe: a refused delete stops the purge before any row goes, the
    row shows "removal delayed", and a global administrator can cancel
-   the removal (§3, §5). 2(b) is not run.
+   the removal (§3, §5). 2(b) is not run. As first built the fail-safe
+   did not hold for a ritual with objects; the code review's fix (§5,
+   step 2) makes it hold: a refused first delete leaves the ritual
+   cancellable.
 
 Stage 0 therefore needs nothing more from Gadi before the build.
+
+## The build, 1 November 2026
+
+Built on `gate/ritual-deletion` in the commits listed under "Commits and
+gates", rebased onto `main` at dd9562f7.
+
+| Commit | Subject |
+| --- | --- |
+| 2fbcab59 | `docs(plan): Plan ritual deletion` |
+| bc9aec58 | `feat(doc): Hide deleted rituals from every path` |
+| 2da93270 | `feat(doc): Delete and restore rituals` |
+| (tip) | `feat(doc): Purge deleted rituals after 30 days` |
+
+**The screenshots** came from `/usr/local/bin/magickli-docs-capture`
+after Gadi approved migrating his `magickli_dev` (1 November 2026),
+which applied main's pending 0018 as well as 0019. `delete-ritual` and
+`recently-deleted` were taken at commit 3, and `delete-ritual`,
+`recently-deleted` and `delete-permanently` at the tip. Every other shot
+was retaken and looked at: none frames anything this change touches,
+and their differences came from that database's data (rituals other
+agents left in the Example temple among them), so the committed versions
+stay. `forum-settings` timed out waiting for "Connect forum" on the
+temple's administration page, which rendered for the `members` shot; its
+committed image stays too. `recently-deleted` frames the page's own heading, not
+the app bar's.
+
+Where the build departs from the design, or settles what it left open:
+
+- **The guard's allowlist names only what it flags.** `sqlPolicy.ts`,
+  `legacyImportRows.ts` and `planLegacyRitualImport.ts` never use the
+  table as a query's table, so allowing them would be stale entries, which
+  fail. The two `update(rituals)` calls in `sqlWrites.ts` and `sqlScope.ts`
+  carry `liveRitual` in their `where` instead of an allowlist entry. The
+  allowlist is `sqlLegacyImport.ts`, `sqlLifecycle.ts`, `sqlPurge.ts` and
+  the screenshot seed. The guard also flags a re-export of the table
+  outside the schema directory, and a tagged template that interpolates the
+  table after `from`, `join`, `update` or `into`.
+- **The deleted-public check** is `isDeletedPublicRitual` in
+  `sqlLifecycle.ts`, exported from `sqlRuntime.ts` as
+  `isDeletedPublicSqlRitual`, rather than a method of the anonymous reader,
+  so `sqlReads.ts` keeps reading live rituals only.
+- **"Delete ritual…" is never disabled in the menu.** The editor does not
+  know the ritual's scope, so the dialog says "Only a site administrator
+  can delete a public ritual." and keeps Delete disabled instead.
+- **The server actions** live in `src/app/gd/rituals/lifecycleActions.ts`,
+  shared by the editor's dialog, the Undo snackbar and Recently deleted.
+- **Dates are shown in UTC** ("30 November 2026"; the heartbeat "03:17
+  UTC"), like the cron's schedule, so the server and the browser render
+  the same text.
+- **The retired sample is the fourth**, "Retired opening (sample)", since
+  the seed already had three. A sample found by title prefers a live row,
+  then a deleted one, then one being removed.
+- **The purge** marks the point of no return even when a ritual owns no
+  object, which errs towards no return as §5 asks. Storage is built only
+  when something is due, so a run with nothing to do needs no storage
+  settings. A ritual skipped during a run (restored or cancelled meanwhile)
+  counts in none of `purged`, `deferred` or `failed`: `deferred` is the due
+  rituals the run did not reach.
+- **The loom_files guard** keeps a file named by another ritual's link,
+  `legacy_file_snapshots` or `legacy_file_relocations`. The first can never
+  apply: a link binds to its own upload intent, whose `file_id` is unique.
+  The guard protects only the file row's own key; an upload intent's keys
+  and its `ritual-files/{fileId}/` prefix are always fresh, since every
+  upload mints a new file.
+- **A bucket refusal stays claimed** with no point of no return, so Cancel
+  removal is offered for it. Operator step 1 still says to investigate
+  first; nothing enforces it.
+- **The Downloaded rituals recheck** broadcasts each accepted reply, as the
+  reader does, so the list may briefly redraw once per ritual during a
+  round.
+- **The tests caught** a missing pair of parentheses around the purge's
+  `not exists` subqueries (drizzle does not add them to a raw fragment),
+  which would have failed every ritual with an image at the claim, and a
+  late row's colour that MUI 9 ignored (`warning.main` is no longer a
+  Typography colour; `warning` is).
+
+## The code review, 1 November 2026
+
+Opus 5.5 and Fable 5.1 reviewed the branch independently; neither found
+anything blocking. The fixes are folded into the commits they belong to.
+
+**Must fix:**
+
+1. **The R2 fail-safe** (Fable). The point of no return was set before
+   the first delete, so a refused delete left a ritual neither
+   restorable nor cancellable. Now a refusal (`AccessDenied` or 403) of
+   this run's first delete, with nothing deleted, clears this run's mark
+   again; the mark-before-delete order stays for crash safety (§5 step 2,
+   owner answer 8). Tested for both forms of refusal, and that a refusal
+   after one delete, another error and an earlier run's mark keep it.
+2. **Other tabs** (Opus S1). Every accepted recheck called
+   `coordinator.changed()`, invalidating every view in every tab once
+   per ritual. The recheck now broadcasts nothing; the list calls it once
+   at the end of a round, and only after a denial. Tested that a round of
+   grants invalidates nothing.
+3. **Recheck cost** (Opus S2). A grant carries the rendered descriptor,
+   up to 16 MB. The offline contract is unchanged; instead a ritual is
+   rechecked only when its last accepted grant is over 6 hours old
+   (`repository.lastGrantedAtMs`, the stored authorization's local start
+   time), and `online` events are settled for two seconds. The cost line
+   in §6 is corrected, and a check-only request mode is a follow-up.
+4. **Starvation and large rituals** (Opus S3, Fable 3). The batch takes
+   fresh due rituals first, then claimed ones still deleting, then
+   claimed ones that stopped before deleting anything. The running
+   ritual stops between objects at 45 seconds and continues the next
+   night. The route's comment no longer promises "a few dozen deletes".
+   **Declined: `DeleteObjects` batching.** Loom's adapter has only a
+   single-object delete, so batching would bypass it; `DeleteObjects`
+   must carry a checksum header whose R2 support the skipped spike never
+   tested; and it reports per-key errors inside a 200 reply, a new
+   failure mode for the fail-safe above. With the per-ritual deadline a
+   large ritual simply takes more nights.
+5. **Rollback** (Opus S4). Recorded as risk 12 and in plan 000.
+
+**Should fix:**
+
+- **The guard** now also catches `alias(rituals, …)`, destructured and
+  re-bound names, `liveRitual` inside `or(…)` or `not(…)` (counted as
+  unfiltered), `public.rituals` and `"public"."rituals"`, comma joins in
+  raw SQL, `sql.identifier("rituals")` and `sql.raw` of text naming the
+  table, and reads `.js`/`.mjs` files and `tests/` (but not the data in
+  `tests/fixtures`). `tests/ritualBundleFixtures.ts` joins the allowlist.
+  The allowlist is per file: an entry trusts its whole file.
+- **Title confirmation** compares NFC text with whitespace runs
+  collapsed, on the client and the server, still case-sensitive
+  (`src/doc/ritualTitleMatch.ts`).
+- **Delete permanently** is refused on a row already claimed
+  (`REMOVAL_STARTED`) and not offered there. **Cancel removal** is
+  offered only on a delayed row: claimed more than a day ago, or more
+  than 10 minutes ago with nothing deleted, which is how a refused bucket
+  or delete shows, so such a row reads "removal delayed", never "being
+  removed, within a day".
+- **The delete dialog's date** comes from the server (`readDeletion`
+  returns `restoreUntil`), not the browser's clock.
+- **Accessible names** start with the visible text: "Delete permanently:
+  {title}", "Restore: {title}", "Cancel removal: {title}".
+- **The Undo snackbar** drops `?deleted=` from the address once shown,
+  with `history.replaceState` (which Next's router follows) rather than
+  `router.replace`, whose server round trip would re-render the page
+  without the snackbar.
+- **`r2Purge.ts`** throws if Loom's adapter has no delete, instead of
+  succeeding silently.
+- **Wording:** Recently deleted's heading names the temple ("Recently
+  deleted in Example"), only for its members and global administrators;
+  "Nobody can read them meanwhile"; the guide says imported rituals'
+  images stay reachable at their old addresses. The heading and intro
+  are changed in commit 4, where that page's code now lives, rather than
+  in commit 3; both reach `main` in one push.
+- **Counts:** a runner that finds the row already gone counts it as
+  skipped, not purged.
+
+**Noted, not changed:**
+
+- A late upload claim or finalise that locks the ritual row while the
+  purge's row transaction deletes its intents can deadlock with it.
+  Postgres's detector aborts one side; the purge counts as failed and is
+  retried the next night, and the upload is refused anyway, since the
+  ritual is deleted.
+- Two overlapping runs (the "Run" button during the nightly run) share
+  one `cron_runs` row: the second start overwrites the first, and the
+  first's finish then matches nothing. The row locks keep the purges
+  themselves safe.
+- "Within a day" can be about 24.5 hours (§5, Sizing).
+

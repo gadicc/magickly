@@ -1,4 +1,36 @@
+import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
+
+/** The crons the production build must carry: the nightly purge (plan 065). */
+export const EXPECTED_CRONS = [
+  { path: "/api/cron/purge-deleted-rituals", schedule: "17 3 * * *" },
+];
+
+/**
+ * Fails unless the built output's config.json holds exactly the expected
+ * crons. Vercel registers crons from the production deployment's build
+ * output, and its docs do not say that `vercel build` copies vercel.json's
+ * crons there, so the release checks the artifact itself. Needs no network
+ * or credentials; the value is not secret.
+ */
+export function checkBuiltCrons(configFile = ".vercel/output/config.json") {
+  let config;
+  try {
+    config = JSON.parse(readFileSync(configFile, "utf8"));
+  } catch {
+    throw new Error(
+      `The build output config is missing or unreadable: ${configFile}`,
+    );
+  }
+  const crons = Array.isArray(config?.crons)
+    ? config.crons.map(({ path, schedule }) => ({ path, schedule }))
+    : null;
+  if (JSON.stringify(crons) !== JSON.stringify(EXPECTED_CRONS))
+    throw new Error(
+      `The build output's crons are ${JSON.stringify(config?.crons ?? null)}; expected ${JSON.stringify(EXPECTED_CRONS)}`,
+    );
+  return crons;
+}
 
 const terminal = new Set(["succeeded", "failed", "skipped"]);
 const origin = "https://magick.ly";
@@ -213,9 +245,13 @@ if (
 ) {
   try {
     const command = process.argv[2];
-    if (!["preflight", "staged", "promoted"].includes(command))
-      throw new Error("Unknown release check");
-    await createReleaseChecks(process.env)[command]();
+    if (command === "crons") {
+      console.log(`Build crons: ${JSON.stringify(checkBuiltCrons())}`);
+    } else {
+      if (!["preflight", "staged", "promoted"].includes(command))
+        throw new Error("Unknown release check");
+      await createReleaseChecks(process.env)[command]();
+    }
     console.log(`Release ${command} checks passed.`);
   } catch (error) {
     // Network/JSON errors may include response fragments. Only our own fixed

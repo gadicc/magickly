@@ -1,7 +1,7 @@
 import "server-only";
 
 import { and, asc, desc, eq, isNotNull, sql } from "drizzle-orm";
-import { auditEvents } from "../db/schema/audit";
+import { auditEvents, cronRuns } from "../db/schema/audit";
 import { user } from "../db/schema/auth";
 import { temples, userGroups } from "../db/schema/memberships";
 import { rituals } from "../db/schema/rituals";
@@ -9,10 +9,16 @@ import { isUuidV7 } from "../lib/ids";
 import {
   authorizeRitualLifecycle,
   getRitualAccess,
+  type RitualLifecycleAction,
   type RitualPolicy,
   type RitualScope,
 } from "./access";
-import { purgeAfterFor } from "./ritualRetention";
+import {
+  PURGE_QUIET_MS,
+  purgeAfterFor,
+  REMOVAL_LATE_MS,
+} from "./ritualRetention";
+import { confirmsRitualTitle } from "./ritualTitleMatch";
 import {
   loadSqlRitualParent,
   loadSqlRitualPrincipal,
@@ -34,6 +40,8 @@ export interface SqlRitualDeletionInfo {
   scopeName: string;
   /** False for a public ritual unless the caller is a global administrator. */
   canDelete: boolean;
+  /** If deleted now, Recently deleted keeps it until this moment (the server's clock). */
+  restoreUntil: Date;
 }
 
 /** One row of Recently deleted. */
@@ -50,7 +58,21 @@ export interface SqlDeletedRitual {
   purgeAfter: Date;
   /** Restore is refused once a permanent deletion is confirmed or a purge has claimed it. */
   restorable: boolean;
+  /**
+   * `being-removed`: a permanent deletion was confirmed or the purge claimed
+   * it; `removal-delayed`: claimed more than a day ago and not finished;
+   * `removal-overdue`: due more than a day ago and never started, so the
+   * nightly run did not run.
+   */
+  state: "restorable" | "being-removed" | "removal-delayed" | "removal-overdue";
+  /** The caller may delete it permanently now. */
+  canPurge: boolean;
+  /** A global administrator may cancel a removal stuck before any object went. */
+  canCancelRemoval: boolean;
 }
+
+/** The nightly purge's last run, for global administrators. */
+export type SqlPurgeHeartbeat = typeof cronRuns.$inferSelect;
 
 const MESSAGES = {
   INVALID_REQUEST: "The request was not understood. Reload and try again.",
@@ -58,6 +80,11 @@ const MESSAGES = {
   ACCOUNT_CHANGED: "Your signed-in account changed. Switch back and try again.",
   FORBIDDEN: "You do not have permission to do this to this ritual.",
   BEING_REMOVED: "It is being removed and can no longer be restored.",
+  NOT_DELETED: "Only a ritual in Recently deleted can be deleted permanently.",
+  REMOVAL_STARTED: "Its removal has already begun.",
+  TITLE_MISMATCH: "Type the ritual's title exactly to delete it permanently.",
+  NOT_CANCELLABLE:
+    "Its removal can no longer be cancelled: it was requested, or has begun deleting.",
   UNAVAILABLE: "The change could not be saved. Try again.",
 } as const;
 type Code = keyof typeof MESSAGES;
@@ -73,6 +100,8 @@ class LifecycleFailure extends Error {
 const fail = (code: Code): never => {
   throw new LifecycleFailure(code);
 };
+/** A claim older than this with nothing deleted belongs to no running purge. */
+const RUN_MS = 10 * 60_000;
 const canonical = (value: unknown): value is string =>
   isUuidV7(value) && value === value.toLowerCase();
 
@@ -91,8 +120,10 @@ async function lockedRitual(tx: Transaction, id: string) {
     .select({
       ...sqlRitualParentFields,
       deletedAt: rituals.deletedAt,
+      purgeAfter: rituals.purgeAfter,
       purgeRequestedAt: rituals.purgeRequestedAt,
       purgeStartedAt: rituals.purgeStartedAt,
+      purgeObjectsDeletedAt: rituals.purgeObjectsDeletedAt,
     })
     .from(rituals)
     .where(eq(rituals.id, id))
@@ -124,7 +155,7 @@ export async function isDeletedPublicRitual(
 }
 
 /**
- * Deleting and restoring rituals (plan 065). Like changing who can read a
+ * Deleting, restoring and removing rituals for good (plan 065). Like changing who can read a
  * ritual, these are online-only commands with no receipt: each is
  * idempotent in effect. Each takes the caller's grants with share locks and
  * the ritual row FOR UPDATE, so a delete waits for every save, upload and
@@ -142,7 +173,7 @@ export function createSqlRitualLifecycleService(
 
   async function command(
     input: unknown,
-    action: "delete" | "restore",
+    action: RitualLifecycleAction,
     work: (
       tx: Transaction,
       context: {
@@ -150,6 +181,7 @@ export function createSqlRitualLifecycleService(
         ritualId: string;
         row: NonNullable<Awaited<ReturnType<typeof lockedRitual>>>;
         policy: RitualPolicy;
+        request: Record<string, unknown>;
       },
     ) => Promise<void>,
   ): Promise<SqlRitualLifecycleResult> {
@@ -159,7 +191,8 @@ export function createSqlRitualLifecycleService(
         !request ||
         typeof request !== "object" ||
         Array.isArray(request) ||
-        Object.keys(request).length !== 3 ||
+        Object.keys(request).length !== (action === "purge" ? 4 : 3) ||
+        (action === "purge" && typeof request.confirmTitle !== "string") ||
         request.version !== 1 ||
         !canonical(request.expectedActorId) ||
         !canonical(request.ritualId)
@@ -184,7 +217,7 @@ export function createSqlRitualLifecycleService(
             !authorizeRitualLifecycle(policy, principal, action).allowed
           )
             return fail("FORBIDDEN");
-          await work(tx, { actorId, ritualId, row, policy });
+          await work(tx, { actorId, ritualId, row, policy, request });
           return { ok: true as const, ritualId };
         },
         { isolationLevel: "read committed", accessMode: "read write" },
@@ -201,7 +234,7 @@ export function createSqlRitualLifecycleService(
     at: Date,
     actorId: string,
     ritualId: string,
-    action: "delete" | "restore",
+    action: "delete" | "restore" | "purge_requested" | "purge_cancelled",
     policy: RitualPolicy,
   ) {
     await tx.insert(auditEvents).values({
@@ -250,6 +283,7 @@ export function createSqlRitualLifecycleService(
             scopeName: named?.name ?? "",
             canDelete: authorizeRitualLifecycle(policy, principal, "delete")
               .allowed,
+            restoreUntil: purgeAfterFor(now()),
           };
         },
         { isolationLevel: "repeatable read", accessMode: "read only" },
@@ -301,12 +335,83 @@ export function createSqlRitualLifecycleService(
       ),
 
     /**
-     * The deleted rituals the caller may restore, newest first, optionally
-     * for one temple. Global administrators see every one.
+     * Deletes a ritual in Recently deleted for good. It is final at once:
+     * restore is refused from here on. The nightly run carries it out once
+     * the quiet period after its deletion has passed; nothing purges here.
+     * The title must be typed, and is checked here too.
      */
-    async listDeleted(
-      filter: { templeSlug?: string } = {},
-    ): Promise<{ rows: SqlDeletedRitual[]; count: number }> {
+    purgeRitualNow: (input: unknown) =>
+      command(
+        input,
+        "purge",
+        async (tx, { actorId, ritualId, row, policy, request }) => {
+          if (!row.deletedAt) fail("NOT_DELETED");
+          if (row.purgeRequestedAt) return;
+          // A claimed row is the nightly run's, or stuck for an operator.
+          if (row.purgeStartedAt) fail("REMOVAL_STARTED");
+          if (!confirmsRitualTitle(request.confirmTitle as string, row.title))
+            fail("TITLE_MISMATCH");
+          const at = now();
+          const quietEnds = new Date(
+            Math.max(
+              at.getTime(),
+              (row.deletedAt as Date).getTime() + PURGE_QUIET_MS,
+            ),
+          );
+          await tx
+            .update(rituals)
+            .set({
+              purgeRequestedAt: at,
+              purgeAfter:
+                row.purgeAfter && row.purgeAfter < quietEnds
+                  ? row.purgeAfter
+                  : quietEnds,
+            })
+            .where(eq(rituals.id, ritualId));
+          await audit(tx, at, actorId, ritualId, "purge_requested", policy);
+        },
+      ),
+
+    /**
+     * For a purge that stopped before any object was deleted (a storage
+     * outage, a missing permission): makes the ritual restorable again with
+     * a fresh 30 days. Never for a requested permanent deletion, nor once a
+     * delete may have been sent.
+     */
+    cancelRemoval: (input: unknown) =>
+      command(
+        input,
+        "cancel-removal",
+        async (tx, { actorId, ritualId, row, policy }) => {
+          if (
+            !row.deletedAt ||
+            !row.purgeStartedAt ||
+            row.purgeObjectsDeletedAt ||
+            row.purgeRequestedAt
+          )
+            fail("NOT_CANCELLABLE");
+          const at = now();
+          await tx
+            .update(rituals)
+            .set({ purgeStartedAt: null, purgeAfter: purgeAfterFor(at) })
+            .where(eq(rituals.id, ritualId));
+          await audit(tx, at, actorId, ritualId, "purge_cancelled", policy);
+        },
+      ),
+
+    /**
+     * The deleted rituals the caller may restore, newest first, optionally
+     * for one temple. Global administrators see every one, and the nightly
+     * run's heartbeat.
+     */
+    async listDeleted(filter: { templeSlug?: string } = {}): Promise<{
+      rows: SqlDeletedRitual[];
+      count: number;
+      /** The filtered temple's name, for its members and global administrators. */
+      templeName?: string;
+      /** Global administrators only: the last run, or null if none yet. */
+      heartbeat?: SqlPurgeHeartbeat | null;
+    }> {
       const empty = { rows: [], count: 0 };
       const actorId = await getVerifiedActorId();
       if (!canonical(actorId)) return empty;
@@ -321,6 +426,7 @@ export function createSqlRitualLifecycleService(
               purgeAfter: rituals.purgeAfter,
               purgeRequestedAt: rituals.purgeRequestedAt,
               purgeStartedAt: rituals.purgeStartedAt,
+              purgeObjectsDeletedAt: rituals.purgeObjectsDeletedAt,
               deletedBy: user.name,
               templeName: temples.name,
               templeSlug: temples.slug,
@@ -339,7 +445,15 @@ export function createSqlRitualLifecycleService(
               ),
             )
             .orderBy(desc(rituals.deletedAt), asc(rituals.id));
+          const at = now().getTime();
           const rows = found.flatMap((row): SqlDeletedRitual[] => {
+            const started = row.purgeStartedAt?.getTime();
+            // Claimed and late, or claimed and stopped before deleting
+            // anything (a refused bucket or delete): no run holds it now.
+            const delayed =
+              started !== undefined &&
+              (at - started > REMOVAL_LATE_MS ||
+                (!row.purgeObjectsDeletedAt && at - started > RUN_MS));
             const policy = sqlRitualPolicy(row);
             if (
               !policy ||
@@ -359,10 +473,55 @@ export function createSqlRitualLifecycleService(
                 deletedAt: row.deletedAt,
                 purgeAfter: row.purgeAfter,
                 restorable: !row.purgeRequestedAt && !row.purgeStartedAt,
+                state: delayed
+                  ? "removal-delayed"
+                  : !row.purgeStartedAt &&
+                      at - row.purgeAfter.getTime() > REMOVAL_LATE_MS
+                    ? "removal-overdue"
+                    : row.purgeRequestedAt || row.purgeStartedAt
+                      ? "being-removed"
+                      : "restorable",
+                canPurge:
+                  !row.purgeRequestedAt &&
+                  !row.purgeStartedAt &&
+                  authorizeRitualLifecycle(policy, principal, "purge").allowed,
+                // Only on a delayed row: a claim that is still running is
+                // the nightly run's own.
+                canCancelRemoval:
+                  delayed &&
+                  !row.purgeObjectsDeletedAt &&
+                  !row.purgeRequestedAt &&
+                  authorizeRitualLifecycle(policy, principal, "cancel-removal")
+                    .allowed,
               },
             ];
           });
-          return { rows, count: rows.length };
+          let templeName: string | undefined;
+          if (filter.templeSlug !== undefined) {
+            const [temple] = await tx
+              .select({ id: temples.id, name: temples.name })
+              .from(temples)
+              .where(eq(temples.slug, filter.templeSlug));
+            if (
+              temple &&
+              (principal.globalAdmin ||
+                principal.templeMemberships.some(
+                  (membership) => membership.templeId === temple.id,
+                ))
+            )
+              templeName = temple.name;
+          }
+          const listed = {
+            rows,
+            count: rows.length,
+            ...(templeName === undefined ? {} : { templeName }),
+          };
+          if (!principal.globalAdmin) return listed;
+          const [heartbeat] = await tx
+            .select()
+            .from(cronRuns)
+            .where(eq(cronRuns.job, "purge-deleted-rituals"));
+          return { ...listed, heartbeat: heartbeat ?? null };
         },
         { isolationLevel: "repeatable read", accessMode: "read only" },
       );

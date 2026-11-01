@@ -11,6 +11,7 @@ import type { SqlRitualDeletionInfo } from "@/doc/sqlLifecycle";
 import DeleteRitualDialog, {
   DOWNLOADED_COPIES,
   deletionAudience,
+  formatRestoreUntil,
 } from "./DeleteRitualDialog";
 
 const actions = vi.hoisted(() => ({
@@ -29,6 +30,7 @@ const info = (
   scope: { kind: "temple", templeId: "example", minGrade: 1 },
   scopeName: "Example",
   canDelete: true,
+  restoreUntil: new Date("2026-11-30T12:00:00Z"),
   ...overrides,
 });
 
@@ -82,6 +84,21 @@ describe("deletionAudience", () => {
   });
 });
 
+describe("formatRestoreUntil", () => {
+  it("formats the server's moment as a UTC date", () => {
+    expect(formatRestoreUntil(new Date("2026-11-30T12:00:00Z"))).toBe(
+      "30 November 2026",
+    );
+    // Late on 30 November in UTC is already 1 December further east.
+    expect(formatRestoreUntil(new Date("2026-11-30T23:30:00Z"))).toBe(
+      "30 November 2026",
+    );
+    expect(formatRestoreUntil(new Date("2026-12-01T00:30:00Z"))).toBe(
+      "1 December 2026",
+    );
+  });
+});
+
 describe("DeleteRitualDialog", () => {
   it("says who loses the ritual and what happens to downloaded copies, then deletes", async () => {
     const { onDeleted } = show();
@@ -98,7 +115,9 @@ describe("DeleteRitualDialog", () => {
     expect(body).toContain(
       "the next time that device opens that ritual or the Downloaded rituals page while online, and in any case within 14 days.",
     );
-    expect(body).toContain("You can restore it from Recently deleted.");
+    expect(body).toContain(
+      "You can restore it from Recently deleted until 30 November 2026; after that it is gone for good.",
+    );
     expect(screen.queryByText(/unsaved changes/)).toBeNull();
     expect(screen.queryByText("Loading…")).toBeNull();
     fireEvent.click(deleteButton());
@@ -107,6 +126,18 @@ describe("DeleteRitualDialog", () => {
       ritualId,
       expectedActorId: "me",
     });
+  });
+
+  it("shows the server's date, whatever the browser's clock says", async () => {
+    // Not 30 days from any clock here: only the server's answer can say it.
+    actions.loadRitualDeletion.mockResolvedValue(
+      info({ restoreUntil: new Date("2027-03-14T08:00:00Z") }),
+    );
+    show();
+    await screen.findByText(/lose it now/);
+    expect(screen.getByText(/lose it now/).textContent).toContain(
+      "You can restore it from Recently deleted until 14 March 2027; after that it is gone for good.",
+    );
   });
 
   it("warns about unsaved changes and offers the draft for download", async () => {

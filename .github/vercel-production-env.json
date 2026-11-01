@@ -84,6 +84,15 @@
       "sensitive": true
     },
     {
+      "name": "cron secret",
+      "keys": ["CRON_SECRET"],
+      "placeholder": {
+        "key": "CRON_SECRET",
+        "kind": "secret"
+      },
+      "sensitive": true
+    },
+    {
       "name": "Pinecone corpus access",
       "keys": ["PINECONE_API_KEY"],
       "placeholder": {

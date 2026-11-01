@@ -4,6 +4,8 @@ const service = vi.hoisted(() => ({
   readDeletion: vi.fn(),
   deleteRitual: vi.fn(),
   restoreRitual: vi.fn(),
+  purgeRitualNow: vi.fn(),
+  cancelRemoval: vi.fn(),
 }));
 vi.mock("@/auth/session", () => ({ getCurrentSqlUserId: vi.fn() }));
 vi.mock("@/db/neonFull", () => ({ db: {} }));
@@ -11,9 +13,13 @@ vi.mock("@/doc/sqlLifecycle", () => ({
   createSqlRitualLifecycleService: () => service,
 }));
 
-const { deleteRitual, loadRitualDeletion, restoreRitual } = await import(
-  "./lifecycleActions"
-);
+const {
+  cancelRemoval,
+  deleteRitual,
+  loadRitualDeletion,
+  purgeRitualNow,
+  restoreRitual,
+} = await import("./lifecycleActions");
 
 const ritualId = "019a0000-0000-7000-8000-000000000151";
 const expectedActorId = "019a0000-0000-7000-8000-000000000001";
@@ -53,5 +59,28 @@ describe("ritual lifecycle server actions", () => {
   it("loads the dialog's facts", async () => {
     await loadRitualDeletion(ritualId);
     expect(service.readDeletion).toHaveBeenCalledWith(ritualId);
+  });
+
+  it("passes the typed title to a permanent deletion", async () => {
+    await purgeRitualNow({ ritualId, expectedActorId, confirmTitle: "T" });
+    expect(service.purgeRitualNow).toHaveBeenCalledWith({
+      version: 1,
+      expectedActorId,
+      ritualId,
+      confirmTitle: "T",
+    });
+    await purgeRitualNow(undefined as never);
+    expect(service.purgeRitualNow).toHaveBeenLastCalledWith({
+      version: 1,
+      expectedActorId: undefined,
+      ritualId: undefined,
+      confirmTitle: undefined,
+    });
+    await cancelRemoval({ ritualId, expectedActorId });
+    expect(service.cancelRemoval).toHaveBeenCalledWith({
+      version: 1,
+      expectedActorId,
+      ritualId,
+    });
   });
 });

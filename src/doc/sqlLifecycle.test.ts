@@ -14,6 +14,7 @@ vi.mock("server-only", () => ({}));
 
 const {
   auditEvents,
+  cronRuns,
   rituals,
   temples,
   templeMemberships,
@@ -358,6 +359,7 @@ describe("the delete dialog's read", () => {
       scope: { kind: "temple", templeId: ids.alpha, minGrade: 2 },
       scopeName: "Alpha",
       canDelete: true,
+      restoreUntil: new Date(later.getTime() + RETENTION_MS),
     });
     expect(
       await service(who.groupAdmin).readDeletion(ids.groupRitual),
@@ -372,6 +374,13 @@ describe("the delete dialog's read", () => {
     expect(
       await service(who.global).readDeletion(ids.publicRitual),
     ).toMatchObject({ canDelete: true });
+  });
+
+  it("dates the restore deadline from the server's clock", async () => {
+    const now = new Date("2027-02-10T23:45:00.000Z");
+    expect(
+      (await service(who.creator, now).readDeletion(ids.temple))?.restoreUntil,
+    ).toEqual(new Date("2027-03-12T23:45:00.000Z"));
   });
 
   it("reveals nothing to readers, strangers, bad IDs or deleted rituals", async () => {
@@ -433,6 +442,24 @@ describe("Recently deleted", () => {
     expect(await listed(who.global, "nowhere")).toEqual([]);
   });
 
+  it("names the filtered temple for its members and global administrators only", async () => {
+    await deleteAll();
+    const named = async (actor: string, templeSlug?: string) => {
+      const result = await service(actor).listDeleted(
+        templeSlug === undefined ? {} : { templeSlug },
+      );
+      return "templeName" in result ? result.templeName : "(absent)";
+    };
+    expect(await named(who.global, "alpha")).toBe("Alpha");
+    expect(await named(who.creator, "beta")).toBe("Beta");
+    expect(await named(who.member, "alpha")).toBe("Alpha");
+    // Not a member: the slug alone must not reveal the name.
+    expect(await named(who.groupAdmin, "alpha")).toBe("(absent)");
+    expect(await named(who.templeAdmin, "beta")).toBe("(absent)");
+    expect(await named(who.global, "nowhere")).toBe("(absent)");
+    expect(await named(who.global)).toBe("(absent)");
+  });
+
   it("describes each row", async () => {
     await deleteAll();
     await db
@@ -450,6 +477,9 @@ describe("Recently deleted", () => {
       deletedAt: when,
       purgeAfter: new Date(when.getTime() + RETENTION_MS),
       restorable: true,
+      state: "restorable",
+      canPurge: true,
+      canCancelRemoval: false,
     });
     expect(
       rows.find((item) => item.ritualId === ids.groupRitual),
@@ -458,6 +488,8 @@ describe("Recently deleted", () => {
       scopeName: "A group",
       templeSlug: null,
       restorable: false,
+      state: "being-removed",
+      canPurge: false,
     });
     expect(
       rows.find((item) => item.ritualId === ids.publicRitual),
@@ -472,7 +504,130 @@ describe("Recently deleted", () => {
     expect(await service(who.global).listDeleted()).toEqual({
       rows: [],
       count: 0,
+      heartbeat: null,
     });
+    expect(await service(who.creator).listDeleted()).toEqual({
+      rows: [],
+      count: 0,
+    });
+  });
+
+  it("gives purge rights to scope administrators only", async () => {
+    await deleteAll();
+    const rights = async (actor: string) =>
+      Object.fromEntries(
+        (await service(actor).listDeleted()).rows.map((item) => [
+          item.title,
+          item.canPurge,
+        ]),
+      );
+    expect(await rights(who.creator)).toEqual({
+      "Beta ritual": false,
+      "Group ritual": false,
+      "Temple ritual": false,
+    });
+    expect(await rights(who.templeAdmin)).toEqual({ "Temple ritual": true });
+    expect(await rights(who.groupAdmin)).toEqual({ "Group ritual": true });
+  });
+
+  it("names each late state from the clock", async () => {
+    await deleteAll();
+    const at = (iso: string) => new Date(iso);
+    // Due on 30 November; overdue once a day past it and never started.
+    const states = async (now: Date, actor = who.global) =>
+      Object.fromEntries(
+        (await service(actor, now).listDeleted()).rows.map((item) => [
+          item.title,
+          [item.state, item.canPurge, item.canCancelRemoval],
+        ]),
+      )["Temple ritual"];
+    const set = (values: Partial<typeof rituals.$inferInsert>) =>
+      db.update(rituals).set(values).where(eq(rituals.id, ids.temple));
+    expect(await states(at("2026-12-01T09:00:00Z"))).toEqual([
+      "restorable",
+      true,
+      false,
+    ]);
+    expect(await states(at("2026-12-01T10:00:01Z"))).toEqual([
+      "removal-overdue",
+      true,
+      false,
+    ]);
+
+    // Claimed, nothing deleted: the running purge's own for ten minutes.
+    await set({ purgeStartedAt: at("2026-12-01T03:17:00Z") });
+    expect(await states(at("2026-12-01T03:20:00Z"))).toEqual([
+      "being-removed",
+      false,
+      false,
+    ]);
+    expect(await states(at("2026-12-01T03:27:00Z"))).toEqual([
+      "being-removed",
+      false,
+      false,
+    ]);
+    // Then no run holds it (a refused bucket or delete): delayed, cancellable.
+    expect(await states(at("2026-12-01T03:27:01Z"))).toEqual([
+      "removal-delayed",
+      false,
+      true,
+    ]);
+    // Only a global administrator may cancel it.
+    expect(await states(at("2026-12-01T03:27:01Z"), who.templeAdmin)).toEqual([
+      "removal-delayed",
+      false,
+      false,
+    ]);
+    expect(await states(at("2026-12-02T03:17:01Z"))).toEqual([
+      "removal-delayed",
+      false,
+      true,
+    ]);
+
+    // Objects going: still running until a day has passed, never cancellable.
+    await set({ purgeObjectsDeletedAt: at("2026-12-01T03:17:01Z") });
+    expect(await states(at("2026-12-01T12:00:00Z"))).toEqual([
+      "being-removed",
+      false,
+      false,
+    ]);
+    expect(await states(at("2026-12-02T03:17:01Z"))).toEqual([
+      "removal-delayed",
+      false,
+      false,
+    ]);
+
+    // A requested removal that stopped is delayed, but not cancellable.
+    await set({
+      purgeObjectsDeletedAt: null,
+      purgeRequestedAt: at("2026-12-01T03:00:00Z"),
+    });
+    expect(await states(at("2026-12-01T04:00:00Z"))).toEqual([
+      "removal-delayed",
+      false,
+      false,
+    ]);
+  });
+
+  it("shows global administrators the nightly heartbeat", async () => {
+    await db.insert(cronRuns).values({
+      job: "purge-deleted-rituals",
+      startedAt: when,
+      finishedAt: later,
+      outcome: "ok",
+      due: 0,
+      purged: 0,
+      deferred: 0,
+      failed: 0,
+    });
+    expect((await service(who.global).listDeleted()).heartbeat).toMatchObject({
+      startedAt: when,
+      outcome: "ok",
+    });
+    expect(
+      (await service(who.templeAdmin).listDeleted()).heartbeat,
+    ).toBeUndefined();
+    await db.delete(cronRuns);
   });
 });
 
@@ -487,5 +642,183 @@ describe("a deleted public ritual", () => {
     expect(await isDeletedPublicRitual(db, ids.temple)).toBe(false);
     expect(await isDeletedPublicRitual(db, createUuidV7())).toBe(false);
     expect(await isDeletedPublicRitual(db, "not-an-id")).toBe(false);
+  });
+});
+
+describe("deleting permanently", () => {
+  const purge = (actor: string, confirmTitle: unknown, ritualId = ids.temple) =>
+    service(actor, later).purgeRitualNow({
+      ...request(actor, ritualId),
+      confirmTitle,
+    });
+  const deleteAt = (at: Date) =>
+    service(who.creator, at).deleteRitual(request(who.creator));
+
+  it("is final at once, queued for the night after the quiet period", async () => {
+    await deleteAt(new Date("2026-10-31T10:50:00.000Z"));
+    expect(await purge(who.templeAdmin, "  Temple ritual ")).toEqual({
+      ok: true,
+      ritualId: ids.temple,
+    });
+    // Deleted at 10:50, so the quiet period ends at 11:20, after now.
+    expect(await row()).toMatchObject({
+      purgeRequestedAt: later,
+      purgeAfter: new Date("2026-10-31T11:20:00.000Z"),
+      purgeStartedAt: null,
+      deletedAt: new Date("2026-10-31T10:50:00.000Z"),
+    });
+    expect(
+      await service(who.global).restoreRitual(request(who.global)),
+    ).toMatchObject({ code: "BEING_REMOVED" });
+    expect((await audit()).map((event) => event.action)).toEqual([
+      "delete",
+      "purge_requested",
+    ]);
+    // Asking again changes nothing.
+    expect(await purge(who.templeAdmin, "wrong")).toMatchObject({ ok: true });
+    expect(await audit()).toHaveLength(2);
+  });
+
+  it("falls due now once the quiet period has passed", async () => {
+    await deleteAt(when);
+    await purge(who.templeAdmin, "Temple ritual");
+    expect((await row()).purgeAfter).toEqual(later);
+  });
+
+  it("keeps an earlier due date", async () => {
+    await deleteAt(when);
+    await db
+      .update(rituals)
+      .set({ purgeAfter: new Date("2026-10-31T10:30:00.000Z") })
+      .where(eq(rituals.id, ids.temple));
+    await purge(who.templeAdmin, "Temple ritual");
+    expect((await row()).purgeAfter).toEqual(
+      new Date("2026-10-31T10:30:00.000Z"),
+    );
+  });
+
+  it("checks the title on the server, and that it is deleted", async () => {
+    expect(await purge(who.templeAdmin, "Temple ritual")).toMatchObject({
+      code: "NOT_DELETED",
+      message: "Only a ritual in Recently deleted can be deleted permanently.",
+    });
+    await deleteAt(when);
+    expect(await purge(who.templeAdmin, "Temple")).toMatchObject({
+      code: "TITLE_MISMATCH",
+    });
+    expect((await row()).purgeRequestedAt).toBeNull();
+  });
+
+  it("matches the title as the dialog does: NFC and collapsed whitespace", async () => {
+    await deleteAt(when);
+    await db
+      .update(rituals)
+      .set({ title: "Caf\u00e9  ritual" })
+      .where(eq(rituals.id, ids.temple));
+    expect(await purge(who.templeAdmin, "caf\u00e9 ritual")).toMatchObject({
+      code: "TITLE_MISMATCH",
+    });
+    expect(await purge(who.templeAdmin, "Cafe\u0301\tritual")).toEqual({
+      ok: true,
+      ritualId: ids.temple,
+    });
+  });
+
+  it("refuses a ritual whose removal has begun, unless already requested", async () => {
+    await deleteAt(when);
+    await db
+      .update(rituals)
+      .set({ purgeStartedAt: later })
+      .where(eq(rituals.id, ids.temple));
+    expect(await purge(who.templeAdmin, "Temple ritual")).toMatchObject({
+      ok: false,
+      code: "REMOVAL_STARTED",
+      message: "Its removal has already begun.",
+    });
+    expect(await row()).toMatchObject({ purgeRequestedAt: null });
+    expect((await audit()).map((event) => event.action)).toEqual(["delete"]);
+    await db
+      .update(rituals)
+      .set({ purgeRequestedAt: later })
+      .where(eq(rituals.id, ids.temple));
+    expect(await purge(who.templeAdmin, "Temple ritual")).toEqual({
+      ok: true,
+      ritualId: ids.temple,
+    });
+  });
+
+  it("belongs to scope administrators, not creators", async () => {
+    await deleteAt(when);
+    expect(await purge(who.creator, "Temple ritual")).toMatchObject({
+      code: "FORBIDDEN",
+    });
+    expect(await purge(who.global, "Temple ritual")).toMatchObject({
+      ok: true,
+    });
+  });
+
+  it("needs the typed title in the request", async () => {
+    const lifecycle = service(who.templeAdmin);
+    expect(
+      await lifecycle.purgeRitualNow(request(who.templeAdmin)),
+    ).toMatchObject({ code: "INVALID_REQUEST" });
+    expect(
+      await lifecycle.purgeRitualNow({
+        ...request(who.templeAdmin),
+        confirmTitle: 7,
+      }),
+    ).toMatchObject({ code: "INVALID_REQUEST" });
+  });
+});
+
+describe("cancelling a stuck removal", () => {
+  const cancel = (actor: string, now = later) =>
+    service(actor, now).cancelRemoval(request(actor));
+  const stuck = async (values: Partial<typeof rituals.$inferInsert> = {}) => {
+    await service(who.creator, when).deleteRitual(request(who.creator));
+    await db
+      .update(rituals)
+      .set({ purgeStartedAt: later, ...values })
+      .where(eq(rituals.id, ids.temple));
+  };
+
+  it("makes it restorable again with a fresh 30 days, and records it", async () => {
+    await stuck();
+    const now = new Date("2026-11-02T00:00:00.000Z");
+    expect(await cancel(who.global, now)).toEqual({
+      ok: true,
+      ritualId: ids.temple,
+    });
+    expect(await row()).toMatchObject({
+      purgeStartedAt: null,
+      purgeAfter: new Date(now.getTime() + RETENTION_MS),
+      deletedAt: when,
+    });
+    expect((await audit()).at(-1)).toMatchObject({
+      action: "purge_cancelled",
+      actorId: who.global,
+    });
+    expect(
+      await service(who.creator).restoreRitual(request(who.creator)),
+    ).toMatchObject({ ok: true });
+  });
+
+  it("is refused in every other state", async () => {
+    const refused = { ok: false, code: "NOT_CANCELLABLE" };
+    expect(await cancel(who.global)).toMatchObject(refused);
+    await service(who.creator, when).deleteRitual(request(who.creator));
+    expect(await cancel(who.global)).toMatchObject(refused);
+    await stuck({ purgeObjectsDeletedAt: later });
+    expect(await cancel(who.global)).toMatchObject(refused);
+    await db
+      .update(rituals)
+      .set({ purgeObjectsDeletedAt: null, purgeRequestedAt: later })
+      .where(eq(rituals.id, ids.temple));
+    expect(await cancel(who.global)).toMatchObject(refused);
+  });
+
+  it("is for global administrators only", async () => {
+    await stuck();
+    expect(await cancel(who.templeAdmin)).toMatchObject({ code: "FORBIDDEN" });
   });
 });

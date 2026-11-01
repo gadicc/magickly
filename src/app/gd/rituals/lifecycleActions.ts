@@ -46,3 +46,27 @@ export async function restoreRitual(input: {
 }): Promise<SqlRitualLifecycleResult> {
   return service().restoreRitual(lifecycleRequest(input));
 }
+
+/** Deletes a ritual for good once the nightly run comes; the title must be typed. */
+export async function purgeRitualNow(input: {
+  ritualId: string;
+  expectedActorId: string;
+  confirmTitle: string;
+}): Promise<SqlRitualLifecycleResult> {
+  const value =
+    input && typeof input === "object"
+      ? (input as Record<string, unknown>)
+      : {};
+  return service().purgeRitualNow({
+    ...lifecycleRequest(input),
+    confirmTitle: value.confirmTitle,
+  });
+}
+
+/** Global administrators: cancels a removal stuck before any object went. */
+export async function cancelRemoval(input: {
+  ritualId: string;
+  expectedActorId: string;
+}): Promise<SqlRitualLifecycleResult> {
+  return service().cancelRemoval(lifecycleRequest(input));
+}

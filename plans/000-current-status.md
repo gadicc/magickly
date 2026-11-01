@@ -571,6 +571,14 @@ Follow-ups are separate from the completed migration work:
   skipped both spikes (no Vercel cron rehearsal, no preview-bucket
   delete). TODO after the release: spike 1(d), the first nightly cron run
   checked in the dashboard and the heartbeat, which is the cron's only
-  test. Not built.
+  test. Built on 1 November 2026 on the same branch; commits 3 and 4 reach
+  `main` in one push. **Never roll production back past this release**
+  without first purging what should go: the older code shows every
+  soft-deleted ritual again and stops purging (plan 065, risk 12).
+- TODO: a check-only mode for `/api/rituals/permission`, so the
+  Downloaded rituals recheck stops receiving each ritual's rendered
+  descriptor (up to 16 MB) with every grant; it changes the offline
+  contract, so it needs its own plan
+  ([plan 065](065-ritual-deletion.md#the-code-review-1-november-2026)).
 
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.

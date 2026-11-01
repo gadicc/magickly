@@ -37,6 +37,9 @@ const row = (overrides: Partial<SqlDeletedRitual> = {}): SqlDeletedRitual => ({
   deletedAt: new Date("2026-10-31T12:00:00Z"),
   purgeAfter: new Date("2026-11-30T12:00:00Z"),
   restorable: true,
+  state: "restorable",
+  canPurge: false,
+  canCancelRemoval: false,
   ...overrides,
 });
 

@@ -4,6 +4,7 @@ import Image, { type StaticImageData } from "next/image";
 import { pageMetadata } from "@/seo/metadata";
 import createRitual from "./images/create-ritual.webp";
 import createTemple from "./images/create-temple.webp";
+import deletePermanently from "./images/delete-permanently.webp";
 import deleteRitual from "./images/delete-ritual.webp";
 import editMember from "./images/edit-member.webp";
 import editorPhone from "./images/editor-phone.webp";
@@ -448,13 +449,37 @@ export default function TemplesGuide() {
           brings one back as it was, with its history, for everyone who could
           read it before.
         </li>
+        <li>
+          Recently deleted keeps a ritual for 30 days. Then it is removed for
+          good, with its text, its history, its images and its published copies.
+        </li>
       </ul>
       <Figure
         image={recentlyDeleted}
         alt="Recently deleted, listing Retired opening (sample) in Example with who deleted it and when, and a Restore button."
       >
-        Recently deleted, where a deleted ritual can be restored.
+        Recently deleted, where a deleted ritual can be restored, with the date
+        it will be removed.
       </Figure>
+      <p>
+        To remove a ritual sooner, the temple’s administrators (not its creator,
+        unless they are one) can choose <strong>Delete permanently</strong> in
+        Recently deleted and type the ritual’s title. It is final at once,
+        nobody can restore it from then on, and it is removed within a day.
+      </p>
+      <Figure
+        image={deletePermanently}
+        alt="The Delete permanently dialog for Retired opening (sample), with the title being typed and the button still disabled."
+      >
+        Deleting permanently needs the title typed.
+      </Figure>
+      <p>
+        <strong>Recently deleted is the only way back.</strong> Once a ritual is
+        removed, it is gone: neither you nor the site’s administrators can
+        recover it. Rituals carried over from the old Magick.ly in September
+        2026 also stay in the migration’s records until those are retired, and
+        their images stay reachable at their old addresses.
+      </p>
       <p>
         Deleting cannot reach what a member has already read or copied, nor
         drafts an editor left on their own device: those stay there, and can

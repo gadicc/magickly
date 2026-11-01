@@ -30,6 +30,10 @@ import { describe, expect, it } from "vitest";
  */
 const ALLOWED: ReadonlyMap<string, string> = new Map([
   [
+    "src/doc/sqlPurge.ts",
+    "The nightly purge claims and removes deleted rituals, so it reads them on purpose.",
+  ],
+  [
     "scripts/docs-screenshots/fixtures.ts",
     "The screenshot seed finds its samples deleted or not, to restore or recreate them.",
   ],

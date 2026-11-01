@@ -103,6 +103,9 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: pnpm dlx vercel@59.13.1 build --prod --standalone --scope "$VERCEL_ORG_ID"
 
+      - name: Check the build registers the nightly purge cron
+        run: node scripts/release-checks.mjs crons
+
       - name: Reject placeholder leakage
         run: |
           pnpm exec loom db release verify-build-env \

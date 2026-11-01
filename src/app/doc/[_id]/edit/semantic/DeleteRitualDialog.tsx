@@ -30,6 +30,14 @@ export function deletionAudience(info: SqlRitualDeletionInfo): string {
 export const DOWNLOADED_COPIES =
   "A copy downloaded to a member's device is removed the next time that device opens that ritual or the Downloaded rituals page while online, and in any case within 14 days.";
 
+/** "30 November 2026": the server's date, in UTC like the nightly run. */
+export function formatRestoreUntil(until: Date): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    dateStyle: "long",
+    timeZone: "UTC",
+  }).format(until);
+}
+
 /**
  * Confirms deleting a ritual, saying who loses it. Everything is checked
  * again on the server; afterwards the rituals list offers Undo.
@@ -111,7 +119,9 @@ export default function DeleteRitualDialog({
           <>
             <DialogContentText sx={{ mb: 2 }}>
               {deletionAudience(info)} {DOWNLOADED_COPIES} You can restore it
-              from Recently deleted.
+              from Recently deleted until{" "}
+              {formatRestoreUntil(info.restoreUntil)}; after that it is gone for
+              good.
             </DialogContentText>
             {!info.canDelete && (
               <Alert severity="info" sx={{ mb: 2 }}>

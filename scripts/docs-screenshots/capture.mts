@@ -210,6 +210,24 @@ const shots: Shot[] = [
     clip: `[byTextAll('h1', 'Recently deleted').at(-1), document.querySelector('[aria-label="Recently deleted rituals"]').closest('.MuiPaper-root')]`,
   },
   {
+    name: "delete-permanently",
+    persona: "creator",
+    viewport: [1100, 800],
+    open: async (b) => {
+      await b.goto(`${base}/gd/rituals/deleted`);
+      await b.waitFor(
+        `document.body.textContent.includes('Retired opening (sample)')`,
+      );
+      await b.click("button", "Delete permanently");
+      await b.waitFor(`!!document.querySelector('.MuiDialog-paper input')`);
+      // Half the title: the button stays disabled, and nothing is confirmed.
+      await b.type(".MuiDialog-paper input", "Retired open");
+      await sleep(500);
+    },
+    clip: `[...document.querySelectorAll('.MuiDialog-paper')].filter((e) => e.textContent.includes('permanently'))`,
+    padding: 0,
+  },
+  {
     name: "forum-settings",
     persona: "creator",
     viewport: [1000, 900],

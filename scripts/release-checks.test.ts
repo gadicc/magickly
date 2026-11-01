@@ -1,5 +1,12 @@
-import { describe, expect, it, vi } from "vitest";
-import { createReleaseChecks } from "./release-checks.mjs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterAll, describe, expect, it, vi } from "vitest";
+import {
+  checkBuiltCrons,
+  createReleaseChecks,
+  EXPECTED_CRONS,
+} from "./release-checks.mjs";
 
 const env = {
   VERCEL_PROJECT_ID: "project",
@@ -354,5 +361,48 @@ describe("production release state checks", () => {
     await expect(checks.promoted()).rejects.toThrow(
       "changed during verification",
     );
+  });
+});
+
+describe("the build's crons", () => {
+  const directory = mkdtempSync(join(tmpdir(), "magickli-release-crons-"));
+  afterAll(() => rmSync(directory, { recursive: true, force: true }));
+  const config = (value: unknown) => {
+    const file = join(directory, `config-${Math.random()}.json`);
+    writeFileSync(file, JSON.stringify(value));
+    return file;
+  };
+  const cron = EXPECTED_CRONS[0];
+
+  it("matches vercel.json", () => {
+    const vercel = JSON.parse(
+      readFileSync(new URL("../vercel.json", import.meta.url), "utf8"),
+    );
+    expect(vercel.crons).toEqual(EXPECTED_CRONS);
+  });
+
+  it("accepts the right entry", () => {
+    expect(checkBuiltCrons(config({ version: 3, crons: [cron] }))).toEqual([
+      cron,
+    ]);
+  });
+
+  it("fails on a missing file or a missing crons list", () => {
+    expect(() => checkBuiltCrons(join(directory, "absent.json"))).toThrow(
+      "missing or unreadable",
+    );
+    expect(() => checkBuiltCrons(config({ version: 3 }))).toThrow(
+      "crons are null",
+    );
+  });
+
+  it("fails on a wrong path, schedule or extra entry", () => {
+    for (const crons of [
+      [{ ...cron, path: "/api/cron/other" }],
+      [{ ...cron, schedule: "0 3 * * *" }],
+      [cron, cron],
+      [],
+    ])
+      expect(() => checkBuiltCrons(config({ crons }))).toThrow("expected");
   });
 });

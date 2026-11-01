@@ -32,6 +32,7 @@ const sensitive = [
   "PINECONE_API_KEY",
   "DISCOURSE_API_KEY",
   "LOOM_SECRETS_KEY_1",
+  "CRON_SECRET",
 ];
 const directories: string[] = [];
 
@@ -99,6 +100,8 @@ describe("production environment policy after legacy storage relocation", () => 
     "BETTER_AUTH_SECRET",
     "LOOM_SECRETS_KEY_1",
     "LOOM_SECRETS_ACTIVE_KEY",
+    // The nightly purge never runs without it (plan 065).
+    "CRON_SECRET",
   ])("still refuses missing canonical %s", (key) => {
     const paths = fixture(key);
     expect(() =>
