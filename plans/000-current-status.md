@@ -600,7 +600,9 @@ Follow-ups are separate from the completed migration work:
   system props, which MUI 9 removed (the app moved from MUI 7 to 9 on
   12 September 2026, `458225ce`), so the study sync warnings, the temple
   pages' confirmations and several notes rendered in the body colour; they
-  now use the palette keys `warning`, `success` and `textSecondary`. The
+  now use the palette keys `warning`, `success` and `textSecondary`, and
+  `src/muiColorProps.test.ts` fails on a palette path in a component's
+  `color` prop, or in a `color` key passed outside `sx`. The
   `create-ritual` and `forum-settings` help screenshots were recaptured
   with them. TODO: the worktree capture (`magickli-docs-capture`) cannot
   take `forum-settings`, because it gives the server no secrets key and
