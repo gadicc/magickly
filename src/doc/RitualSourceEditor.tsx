@@ -36,6 +36,16 @@ import {
 import type { RitualSourceDialect } from "./ritualSource";
 import type { RitualSourceDiagnostic } from "./ritualSourceDiagnostics";
 
+/**
+ * Pug's legacy mode marks each line's leading whitespace as `indent`,
+ * which is no highlighting tag; mapping it to none leaves it unstyled, as
+ * before, without CodeMirror's "Unknown highlighting tag indent" warning.
+ */
+const pugLanguage = StreamLanguage.define({
+  ...pug,
+  tokenTable: { indent: [] },
+});
+
 const revealId = StateEffect.define<string>();
 /** Marks the caret a host placed (`cursor`), which `onCursor` never echoes. */
 const placedCaret = Annotation.define<boolean>();
@@ -375,7 +385,7 @@ export default function RitualSourceEditor({
         latest.current.onCaretNode?.(ids);
       }),
       ...(dialect === "pug"
-        ? [StreamLanguage.define(pug), ...(foldIds ? [ritualIdFolding()] : [])]
+        ? [pugLanguage, ...(foldIds ? [ritualIdFolding()] : [])]
         : []),
       EditorView.domEventHandlers({
         compositionstart: () => {
