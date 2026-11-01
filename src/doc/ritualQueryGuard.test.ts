@@ -30,6 +30,14 @@ import { describe, expect, it } from "vitest";
  */
 const ALLOWED: ReadonlyMap<string, string> = new Map([
   [
+    "scripts/docs-screenshots/fixtures.ts",
+    "The screenshot seed finds its samples deleted or not, to restore or recreate them.",
+  ],
+  [
+    "src/doc/sqlLifecycle.ts",
+    "Deletes, restores and lists deleted rituals, so it reads them on purpose.",
+  ],
+  [
     "tests/ritualBundleFixtures.ts",
     "A test fixture that builds and resets ritual rows directly.",
   ],

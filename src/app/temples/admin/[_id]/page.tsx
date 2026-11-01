@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { getCurrentSqlUserId } from "@/auth/session";
 import { db } from "@/db/neonFull";
+import { sqlRitualLifecycle } from "@/doc/sqlRuntime";
 import { privateMetadata } from "@/seo/metadata";
 import { canRunDiscourseSync } from "@/temples/discourseSync";
 import { createSqlTempleForumService } from "@/temples/forum";
@@ -65,6 +66,9 @@ export default async function AdminTemplePage({
   const showDiscourseSync =
     !!forum?.settings || (await canRunDiscourseSync(db, actorId));
   const date = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" });
+  const deleted = await sqlRitualLifecycle
+    .listDeleted({ templeSlug: temple.slug })
+    .catch(() => ({ count: 0 }));
 
   return (
     <Container sx={{ my: 2 }}>
@@ -122,6 +126,16 @@ export default async function AdminTemplePage({
           </TableBody>
         </Table>
       </TableContainer>
+
+      {deleted.count > 0 ? (
+        <Typography sx={{ mt: 2 }}>
+          <Link
+            href={`/gd/rituals/deleted?${new URLSearchParams({ temple: temple.slug })}`}
+          >
+            Recently deleted rituals ({deleted.count})
+          </Link>
+        </Typography>
+      ) : null}
 
       <Typography variant="h6" sx={{ mt: 4, mb: 1 }}>
         Join information

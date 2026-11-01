@@ -325,3 +325,53 @@ export function authorizeRitualPublication(
     };
   return { allowed: true };
 }
+
+/** What may be done to a ritual's deletion (plan 065). */
+export type RitualLifecycleAction =
+  | "delete"
+  | "restore"
+  | "purge"
+  | "cancel-removal";
+
+/**
+ * Deleting and restoring need edit access to the ritual as it stands, and a
+ * global administrator for a public one, as taking it out of public does.
+ * Removing it for good belongs to the people who administer its audience:
+ * its group's or temple's administrators, or a global administrator; a
+ * creator who is neither cannot. Cancelling a stuck removal is for global
+ * administrators only. The rule reads the ritual as it stands; while it is
+ * deleted its scope cannot change.
+ */
+export function authorizeRitualLifecycle(
+  policy: RitualPolicy | null,
+  principal: RitualPrincipal | null,
+  action: RitualLifecycleAction,
+): RitualDecision {
+  if (!principal || !isId(principal.userId) || !validPolicy(policy))
+    return { allowed: false, reason: "invalid-policy" };
+  const scope = policy.scope;
+  const globalAdmin = principal.globalAdmin === true;
+  if (action === "delete" || action === "restore") {
+    if (!getRitualAccess(policy, principal).edit)
+      return { allowed: false, reason: "not-an-editor" };
+    if (scope.kind === "public" && !globalAdmin)
+      return { allowed: false, reason: "not-global-admin" };
+    return { allowed: true };
+  }
+  if (action === "cancel-removal")
+    return globalAdmin
+      ? { allowed: true }
+      : { allowed: false, reason: "not-global-admin" };
+  if (
+    globalAdmin ||
+    (scope.kind === "group" &&
+      principal.groupAdminIds.includes(scope.groupId)) ||
+    (scope.kind === "temple" &&
+      principal.templeMemberships.some(
+        (membership) =>
+          membership.templeId === scope.templeId && membership.admin === true,
+      ))
+  )
+    return { allowed: true };
+  return { allowed: false, reason: "not-a-scope-admin" };
+}

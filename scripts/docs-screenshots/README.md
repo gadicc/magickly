@@ -106,8 +106,10 @@ that name that something placed earlier on your `PATH`, such as `~/bin`.
 ## Files
 
 - `fixtures.ts`, `seed.ts` build Example through the app's own temple and ritual
-  services, with fixed operation IDs (a rerun finds the temple by slug, rituals by
-  receipt).
+  services, with fixed operation IDs (a rerun finds the temple by slug, rituals
+  by title in the temple). A deleted sample is restored and a purged one created
+  again, except "Retired opening (sample)", which the seed keeps deleted for the
+  Recently deleted shots.
 - `browser.mts` is a small Chrome DevTools Protocol client (Node's global
   WebSocket), so there is no Playwright dependency.
 - `capture.mts` is the list of shots.

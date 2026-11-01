@@ -1014,6 +1014,29 @@ export class OfflineRitualRepository {
     });
   }
 
+  /**
+   * When this device last had a grant accepted for the ritual, by its own
+   * clock (the request's start), or null if it holds none for this account.
+   * The Downloaded rituals list uses it to skip rituals checked recently.
+   */
+  async lastGrantedAtMs(
+    account: OfflineAccount,
+    ritualId: string,
+  ): Promise<number | null> {
+    account = structuredClone(account);
+    return this.transaction(async () => {
+      await this.account(account);
+      const authorization = await this.db.authorizations.get([
+        account.ownerId,
+        ritualId,
+      ]);
+      return authorization?.accountEpoch === account.epoch &&
+        authorization.grant
+        ? authorization.localStartedAtMs
+        : null;
+    });
+  }
+
   /** Resolve an old URL only through a complete bundle saved after a verified alias delivery. */
   async resolveDownloadedRitualAlias(
     account: OfflineAccount,

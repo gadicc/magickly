@@ -166,3 +166,84 @@ export async function refreshOfflineRitual(
     runtime.coordinator.finish(operation);
   }
 }
+
+/**
+ * What a check-only recheck did: "interrupted" means no reply was accepted
+ * and it may be retried; "fresh" that a grant was accepted recently enough
+ * that nothing was asked.
+ */
+export type OfflineRecheckOutcome =
+  | "denied"
+  | "granted"
+  | "unchanged"
+  | "fresh"
+  | "interrupted";
+
+/**
+ * The Downloaded rituals list rechecks a ritual at most this often. A grant
+ * reply carries the rendered manifest, so rechecking tens of rituals on
+ * every visit would download them all again.
+ */
+export const OFFLINE_RECHECK_INTERVAL_MS = 6 * 60 * 60_000;
+
+/**
+ * Re-ask the server about one downloaded ritual without downloading anything.
+ * A validated denial locks and purges the copy, a grant renews its lease and
+ * every temporary answer leaves the device as it was. Used by the Downloaded
+ * rituals list, where fetching bundles for every entry would be wasteful.
+ */
+export async function recheckOfflineRitual(
+  runtime: Pick<DownloadRuntime, "repository" | "coordinator">,
+  registration: PermissionRegistration,
+  ritualId: string,
+  options: { fetcher?: typeof fetch; now?: () => number } = {},
+): Promise<OfflineRecheckOutcome> {
+  const operation = registration.beginPermissionCheck();
+  if (!operation) return "interrupted";
+  try {
+    const last = await runtime.repository.lastGrantedAtMs(
+      operation.account,
+      ritualId,
+    );
+    const now = (options.now ?? Date.now)();
+    if (
+      last !== null &&
+      now >= last &&
+      now - last < OFFLINE_RECHECK_INTERVAL_MS
+    )
+      return "fresh";
+    const pending = await runtime.repository.beginCheck(
+      operation.account,
+      ritualId,
+    );
+    const delivery = await fetchRitualDelivery(
+      {
+        version: 1,
+        requestId: pending.requestId,
+        expectedActorId: pending.ownerId,
+        ritualId: pending.ritualId,
+      },
+      operation.signal,
+      options.fetcher ?? fetch,
+    );
+    if (!delivery || !runtime.coordinator.currentPermissionCheck(operation))
+      return operation.signal.aborted ? "interrupted" : "unchanged";
+    const outcome = await runtime.repository.acceptPermission(
+      pending,
+      delivery.permission,
+      delivery.bundle
+        ? {
+            bundleId: delivery.bundle.bundleId,
+            manifestSha256: delivery.bundle.manifestSha256,
+          }
+        : undefined,
+    );
+    if (outcome !== "accepted") return "unchanged";
+    // Only a denial or a grant is ever accepted (lease.ts applyPermissionReply).
+    // Nothing is broadcast here: the list tells other tabs once per round,
+    // and only about denials, so a round of grants disturbs no open reader.
+    return delivery.permission.kind === "denied" ? "denied" : "granted";
+  } finally {
+    runtime.coordinator.finish(operation);
+  }
+}

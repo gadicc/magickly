@@ -49,6 +49,8 @@ export default defineConfig({
         "src/doc/sqlWrites.ts",
         "src/doc/sqlScope.ts",
         "src/doc/sqlPolicy.ts",
+        "src/doc/sqlLifecycle.ts",
+        "src/doc/ritualRetention.ts",
         "src/doc/compileContract.ts",
         "src/doc/publicShells.ts",
         "src/doc/publicRituals.ts",

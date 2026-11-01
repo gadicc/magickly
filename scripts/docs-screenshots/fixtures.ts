@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { LOCAL_ACCEPTANCE_USERS } from "../../src/auth/localTestIdentities";
 import { user } from "../../src/db/schema/auth";
@@ -11,11 +11,13 @@ import {
 } from "../../src/db/schema/rituals";
 import { prepare } from "../../src/doc/prepare";
 import { semanticFromJrt, semanticToJrt } from "../../src/doc/semantic";
+import { createSqlRitualLifecycleService } from "../../src/doc/sqlLifecycle";
 import { liveRitual } from "../../src/doc/sqlPolicy";
 import {
   createSqlRitualWriter,
   type SqlRitualWriteDatabase,
 } from "../../src/doc/sqlWrites";
+import { createUuidV7 } from "../../src/lib/ids";
 import {
   createSqlTempleCreator,
   type TempleCreationDatabase,
@@ -28,7 +30,8 @@ import {
 /**
  * Entirely synthetic data for the documentation screenshots: no real temple,
  * member or email appears anywhere. Every operation ID is fixed so a rerun
- * replays instead of duplicating.
+ * replays instead of duplicating; a rerun finds the rituals by title, and
+ * only a purged sample is created again under a fresh one.
  */
 export const SCREENSHOT_TEMPLE = {
   name: "Example",
@@ -103,25 +106,39 @@ summary(summary="Closing")
   task(say role="hiero") The ${hall} is closed.
 `;
 
-/** Temple rituals at three grade thresholds: the same list reads differently per grade. */
+/**
+ * Temple rituals at three grade thresholds: the same list reads differently
+ * per grade. The `retired` sample is kept deleted, for the Recently deleted
+ * shots. Titles are unique in Example, which is how a rerun finds each one.
+ */
 export const SCREENSHOT_RITUALS = [
   {
     operationId: "019a0000-0000-7000-8000-000000000150",
     title: "Neophyte 0=0",
     minGrade: 0,
     pug: null,
+    retired: false,
   },
   {
     operationId: "019a0000-0000-7000-8000-000000000151",
     title: "Zelator 1=10 (sample)",
     minGrade: 1,
     pug: sampleRitual("Zelator", "Zelator Hall"),
+    retired: false,
   },
   {
     operationId: "019a0000-0000-7000-8000-000000000152",
     title: "Adeptus Minor 5=6 (sample)",
     minGrade: 5,
     pug: sampleRitual("Adeptus Minor", "Vault"),
+    retired: false,
+  },
+  {
+    operationId: "019a0000-0000-7000-8000-000000000153",
+    title: "Retired opening (sample)",
+    minGrade: 2,
+    pug: sampleRitual("Theoricus", "Theoricus Hall"),
+    retired: true,
   },
 ] as const;
 
@@ -213,42 +230,99 @@ export async function seedDocsScreenshotFixtures(
     if (!update.ok) throw new Error("DOCS_SCREENSHOTS_UPDATE");
   }
 
+  const lifecycle = createSqlRitualLifecycleService(db, asCreator);
+  const command = (ritualId: string) => ({
+    version: 1,
+    expectedActorId: creator.id,
+    ritualId,
+  });
   const rituals: Record<string, string> = {};
   for (const ritual of SCREENSHOT_RITUALS) {
-    // Conversion assigns fresh node IDs, so a repeat would not be the identical
-    // request its receipt expects: an existing receipt means it is done.
-    const [receipt] = await db
-      .select()
-      .from(ritualWriteReceipts)
-      .where(eq(ritualWriteReceipts.operationId, ritual.operationId));
-    if (receipt) {
-      rituals[ritual.title] = receipt.ritualId;
-      await saveIfChanged(
-        db,
-        asCreator,
-        receipt.ritualId,
-        ritual.pug ?? neophytePug,
-      );
+    const pug = ritual.pug ?? neophytePug;
+    const found = await findSample(db, templeId, ritual.title);
+    if (found?.state === "removing" && ritual.retired) {
+      // Kept deleted already; its removal is left to finish.
+      rituals[ritual.title] = found.id;
       continue;
     }
+    if (found && found.state !== "removing") {
+      rituals[ritual.title] = found.id;
+      if (ritual.retired) {
+        if (found.state === "live") {
+          const deleted = await lifecycle.deleteRitual(command(found.id));
+          if (!deleted.ok)
+            throw new Error(`DOCS_SCREENSHOTS_DELETE_${deleted.code}`);
+        }
+        continue;
+      }
+      if (found.state === "deleted") {
+        const restored = await lifecycle.restoreRitual(command(found.id));
+        if (!restored.ok)
+          throw new Error(`DOCS_SCREENSHOTS_RESTORE_${restored.code}`);
+      }
+      await saveIfChanged(db, asCreator, found.id, pug);
+      continue;
+    }
+    // Not found, or only being removed: create it. Receipts survive a purge,
+    // and conversion assigns fresh node IDs, so replaying a receipt would
+    // neither match its request nor bring the ritual back; a used fixed ID
+    // gives way to a fresh one.
+    const [receipt] = await db
+      .select({ operationId: ritualWriteReceipts.operationId })
+      .from(ritualWriteReceipts)
+      .where(eq(ritualWriteReceipts.operationId, ritual.operationId));
     const written = await createSqlRitualWriter(
       db,
       asCreator,
     )({
       version: 3,
-      operationId: ritual.operationId,
+      operationId: receipt ? createUuidV7() : ritual.operationId,
       expectedActorId: creator.id,
       kind: "create",
       scope: { kind: "temple", templeId, minGrade: ritual.minGrade },
       title: ritual.title,
-      source: JSON.stringify(
-        semanticFromJrt(prepare(ritual.pug ?? neophytePug)),
-      ),
+      source: JSON.stringify(semanticFromJrt(prepare(pug))),
     });
     if (!written.ok) throw new Error(`DOCS_SCREENSHOTS_RITUAL_${written.code}`);
     rituals[ritual.title] = written.ritualId;
+    if (ritual.retired) {
+      const deleted = await lifecycle.deleteRitual(command(written.ritualId));
+      if (!deleted.ok)
+        throw new Error(`DOCS_SCREENSHOTS_DELETE_${deleted.code}`);
+    }
   }
   return { templeId, rituals };
+}
+
+/**
+ * The sample with this title in Example, deleted rows included: live first,
+ * then deleted but restorable, then one being removed (purge requested or
+ * started), which the caller treats as gone. Newest first within each.
+ */
+async function findSample(db: SeedDatabase, templeId: string, title: string) {
+  const rows = await db
+    .select({
+      id: ritualRows.id,
+      deletedAt: ritualRows.deletedAt,
+      purgeRequestedAt: ritualRows.purgeRequestedAt,
+      purgeStartedAt: ritualRows.purgeStartedAt,
+    })
+    .from(ritualRows)
+    .where(and(eq(ritualRows.templeId, templeId), eq(ritualRows.title, title)))
+    .orderBy(desc(ritualRows.id));
+  const states = rows.map((row) => ({
+    id: row.id,
+    state: !row.deletedAt
+      ? ("live" as const)
+      : row.purgeRequestedAt || row.purgeStartedAt
+        ? ("removing" as const)
+        : ("deleted" as const),
+  }));
+  return (
+    states.find((row) => row.state === "live") ??
+    states.find((row) => row.state === "deleted") ??
+    states[0]
+  );
 }
 
 /**

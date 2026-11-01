@@ -14,8 +14,12 @@ import {
   TableRow,
 } from "@mui/material";
 import { connection } from "next/server";
-import { sqlRitualReader } from "@/doc/sqlRuntime";
+import { getCurrentSqlUserId } from "@/auth/session";
+import type { SqlDeletedRitual } from "@/doc/sqlLifecycle";
+import { sqlRitualLifecycle, sqlRitualReader } from "@/doc/sqlRuntime";
+import { isUuidV7 } from "@/lib/ids";
 import { pageMetadata } from "@/seo/metadata";
+import DeletedRitualUndo from "./DeletedRitualUndo";
 import SqlDocAdmin from "./SqlDocAdmin";
 
 export const metadata = pageMetadata("/gd/rituals");
@@ -41,10 +45,27 @@ const builtInDocs = [
   },
 ];
 
-export default async function Rituals() {
+export default async function Rituals({
+  searchParams,
+}: PageProps<"/gd/rituals">) {
   // Session and SQL grants are request-scoped; private catalog rows are never prerendered.
   await connection();
   const privateDocs = await sqlRitualReader.listMetadata().catch(() => []);
+  const deleted = await sqlRitualLifecycle
+    .listDeleted()
+    .catch(() => ({ rows: [] as SqlDeletedRitual[], count: 0 }));
+  // After a delete the editor comes here with the ID, never the title; the
+  // title comes from what the caller may restore.
+  const justDeletedId = (await searchParams).deleted;
+  const justDeleted =
+    typeof justDeletedId === "string" && isUuidV7(justDeletedId)
+      ? deleted.rows.find(
+          (row) => row.ritualId === justDeletedId && row.restorable,
+        )
+      : undefined;
+  const actorId = justDeleted
+    ? await getCurrentSqlUserId().catch(() => null)
+    : null;
   const docs = [
     ...builtInDocs,
     ...privateDocs.map((ritual) => ({
@@ -101,7 +122,22 @@ export default async function Rituals() {
         </TableContainer>
         <p>
           <Link href="/offline/ritual">Open downloaded rituals</Link>
+          {deleted.count > 0 && (
+            <>
+              {" · "}
+              <Link href="/gd/rituals/deleted">
+                Recently deleted ({deleted.count})
+              </Link>
+            </>
+          )}
         </p>
+        {justDeleted && actorId && (
+          <DeletedRitualUndo
+            ritualId={justDeleted.ritualId}
+            title={justDeleted.title}
+            actorId={actorId}
+          />
+        )}
         <SqlDocAdmin />
         <br />
         <p>

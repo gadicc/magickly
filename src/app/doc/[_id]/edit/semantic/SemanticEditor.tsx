@@ -111,6 +111,34 @@ const RitualAccessDialog = React.lazy(() =>
   })),
 );
 
+// Loaded on first use, like the access dialog, with the same offline fallback.
+const DeleteRitualDialog = React.lazy(() =>
+  import("./DeleteRitualDialog").catch(() => ({
+    default: function DeleteRitualUnavailable({
+      onClose,
+    }: {
+      onClose: () => void;
+      ritualId?: string;
+      actorId?: string;
+      open?: boolean;
+      unsavedChanges?: boolean;
+      onDownloadDraft?: () => void;
+    }) {
+      return (
+        <Dialog open onClose={onClose}>
+          <DialogContent>
+            Deleting this ritual could not be loaded. Check your connection and
+            try again.
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={onClose}>Close</Button>
+          </DialogActions>
+        </Dialog>
+      );
+    },
+  })),
+);
+
 type SaveRequest = Extract<SqlRitualWriteRequest, { kind: "save" }>;
 interface SourceState {
   text: string;
@@ -224,6 +252,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   } | null>(null);
   const [menuAnchor, setMenuAnchor] = React.useState<HTMLElement | null>(null);
   const [accessOpen, setAccessOpen] = React.useState(false);
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [conversionNotice, setConversionNotice] = React.useState(true);
   const [publicationMessage, setPublicationMessage] = React.useState<
     string | null
@@ -1259,6 +1288,15 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             Who can read this ritual…
           </MenuItem>
           <MenuItem
+            sx={{ color: "error.main" }}
+            onClick={() => {
+              setMenuAnchor(null);
+              setDeleteOpen(true);
+            }}
+          >
+            Delete ritual…
+          </MenuItem>
+          <MenuItem
             component="a"
             href="/help/ritual-pug"
             target="_blank"
@@ -1275,6 +1313,18 @@ export default function SemanticEditor(props: SemanticEditorProps) {
               actorId={props.actorId}
               open
               onClose={() => setAccessOpen(false)}
+            />
+          </React.Suspense>
+        )}
+        {deleteOpen && (
+          <React.Suspense fallback={null}>
+            <DeleteRitualDialog
+              ritualId={props.ritualId}
+              actorId={props.actorId}
+              open
+              unsavedChanges={unsaved || !!pending}
+              onDownloadDraft={() => downloadDraft(currentDraft())}
+              onClose={() => setDeleteOpen(false)}
             />
           </React.Suspense>
         )}

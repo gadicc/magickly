@@ -5,6 +5,7 @@ import {
   authorizeRevisionUpdate,
   authorizeRitualContentUpdate,
   authorizeRitualCreation,
+  authorizeRitualLifecycle,
   authorizeRitualPublication,
   authorizeRitualScopeChange,
   getRitualAccess,
@@ -743,5 +744,97 @@ describe("changing who can read a ritual", () => {
       allowed: false,
       reason: "not-an-editor",
     });
+  });
+});
+
+describe("authorizeRitualLifecycle", () => {
+  const allowed = (
+    policy: RitualPolicy | null,
+    principal: RitualPrincipal | null,
+  ) =>
+    (["delete", "restore", "purge", "cancel-removal"] as const).map(
+      (action) => authorizeRitualLifecycle(policy, principal, action).allowed,
+    );
+  const global = actor({ globalAdmin: true });
+  const groupAdmin = actor({ groupAdminIds: ["group"], groupIds: ["group"] });
+
+  it("lets a temple creator who is still a member delete but not purge", () => {
+    expect(allowed(templeDoc, creatorMember)).toEqual([
+      true,
+      true,
+      false,
+      false,
+    ]);
+  });
+
+  it("gives a creator removed from the temple nothing", () => {
+    expect(allowed(templeDoc, actor({ userId: "creator" }))).toEqual([
+      false,
+      false,
+      false,
+      false,
+    ]);
+  });
+
+  it("keeps plan 057's gap: a group creator edits without membership", () => {
+    expect(allowed(groupDoc, actor({ userId: "creator" }))).toEqual([
+      true,
+      true,
+      false,
+      false,
+    ]);
+  });
+
+  it("lets scope administrators delete and purge", () => {
+    expect(allowed(templeDoc, member(0, true))).toEqual([
+      true,
+      true,
+      true,
+      false,
+    ]);
+    expect(allowed(groupDoc, groupAdmin)).toEqual([true, true, true, false]);
+    expect(allowed(templeDoc, member(9, true, "other"))).toEqual([
+      false,
+      false,
+      false,
+      false,
+    ]);
+  });
+
+  it("keeps a public ritual to global administrators", () => {
+    expect(allowed(publicDoc, actor({ userId: "creator" }))).toEqual([
+      false,
+      false,
+      false,
+      false,
+    ]);
+    expect(
+      authorizeRitualLifecycle(
+        publicDoc,
+        actor({ userId: "creator" }),
+        "delete",
+      ),
+    ).toEqual({ allowed: false, reason: "not-global-admin" });
+    expect(allowed(publicDoc, global)).toEqual([true, true, true, true]);
+  });
+
+  it("gives cancel-removal to global administrators only", () => {
+    expect(allowed(templeDoc, global)).toEqual([true, true, true, true]);
+    expect(
+      authorizeRitualLifecycle(templeDoc, member(9, true), "cancel-removal"),
+    ).toEqual({ allowed: false, reason: "not-global-admin" });
+  });
+
+  it("refuses readers, anonymous callers and malformed policies", () => {
+    expect(allowed(templeDoc, member(9))).toEqual([false, false, false, false]);
+    expect(authorizeRitualLifecycle(templeDoc, member(9), "delete")).toEqual({
+      allowed: false,
+      reason: "not-an-editor",
+    });
+    expect(allowed(templeDoc, null)).toEqual([false, false, false, false]);
+    expect(allowed(null, global)).toEqual([false, false, false, false]);
+    expect(
+      allowed({ ...templeDoc, scope: { kind: "temple" } as never }, global),
+    ).toEqual([false, false, false, false]);
   });
 });

@@ -1979,3 +1979,53 @@ describe("check-only permissions without complete rendered output", () => {
     ).toMatchObject({ operationId: request.operationId });
   });
 });
+
+describe("last accepted grant time", () => {
+  it("is null without an authorization or after a denial", async () => {
+    const f = fixture();
+    const account = await f.repo.activateAccount(A);
+    expect(await f.repo.lastGrantedAtMs(account, R)).toBeNull();
+    // A begun but unanswered check holds no grant.
+    await f.repo.beginCheck(account, R);
+    expect(await f.repo.lastGrantedAtMs(account, R)).toBeNull();
+
+    const r = await ready(f);
+    expect(await f.repo.lastGrantedAtMs(r.account, R)).toBe(START);
+    const pending = await f.repo.beginCheck(r.account, R);
+    await f.repo.acceptPermission(pending, { ...pending, kind: "denied" });
+    expect((await f.db.authorizations.get([A, R]))?.grant).toBeNull();
+    expect(await f.repo.lastGrantedAtMs(r.account, R)).toBeNull();
+  });
+
+  it("is the local start of the request whose grant was accepted", async () => {
+    const f = fixture();
+    const r = await ready(f);
+    expect(await f.repo.lastGrantedAtMs(r.account, R)).toBe(START);
+    expect(await f.repo.lastGrantedAtMs(r.account, R2)).toBeNull();
+
+    f.now = START + 5_000;
+    const pending = await f.repo.beginCheck(r.account, R);
+    f.now = START + 9_000;
+    // An unanswered check does not move it.
+    expect(await f.repo.lastGrantedAtMs(r.account, R)).toBe(START);
+    expect(await f.repo.acceptPermission(pending, allowed(pending))).toBe(
+      "accepted",
+    );
+    expect(await f.repo.lastGrantedAtMs(r.account, R)).toBe(START + 5_000);
+  });
+
+  it("is null for a grant held under another account epoch", async () => {
+    const f = fixture();
+    const r = await ready(f);
+    const row = await f.db.authorizations.get([A, R]);
+    await f.db.authorizations.put({ ...row!, accountEpoch: createUuidV7() });
+    expect(await f.repo.lastGrantedAtMs(r.account, R)).toBeNull();
+
+    await f.repo.signOut(r.account);
+    await expect(f.repo.lastGrantedAtMs(r.account, R)).rejects.toMatchObject({
+      code: "ACCOUNT",
+    });
+    const again = await f.repo.activateAccount(A);
+    expect(await f.repo.lastGrantedAtMs(again, R)).toBeNull();
+  });
+});

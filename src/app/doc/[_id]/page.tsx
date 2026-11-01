@@ -1,9 +1,11 @@
 import { Box, Typography } from "@mui/material";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { cache, Suspense } from "react";
 import { parseRitualRouteIdentity } from "@/doc/ritualRouteIdentity";
 import {
+  isDeletedPublicSqlRitual,
   publicSqlRitualReader,
   resolveSqlRitualRouteId,
 } from "@/doc/sqlRuntime";
@@ -36,7 +38,12 @@ const loadPublicRitual = cache(async (routeId: string) => {
   const publicDoc = publicRitual
     ? parsePublicDoc(publicRitual.contentJson)
     : null;
-  return { ritualId, publicRitual, publicDoc };
+  // Only asked when nothing public was found, so live rituals pay nothing.
+  const deletedPublic =
+    ritualId && !publicRitual
+      ? await isDeletedPublicSqlRitual(ritualId).catch(() => false)
+      : false;
+  return { ritualId, publicRitual, publicDoc, deletedPublic };
 });
 
 /** Only anonymous, SQL-public rituals are indexed, under their canonical id. */
@@ -62,7 +69,12 @@ export default async function DocPage({ params }: PageProps<"/doc/[_id]">) {
   await connection();
   const routeId = (await params)._id;
   const routeIdentity = parseRitualRouteIdentity(routeId);
-  const { ritualId, publicRitual, publicDoc } = await loadPublicRitual(routeId);
+  const { ritualId, publicRitual, publicDoc, deletedPublic } =
+    await loadPublicRitual(routeId);
+  // A deleted ritual that was public is gone for everyone: a real 404 until
+  // it is purged, decided before anything streams. Any other deleted ritual
+  // renders the private shell, exactly like an unknown ID.
+  if (deletedPublic) notFound();
   if (publicRitual && publicDoc)
     return (
       <Box>

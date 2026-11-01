@@ -27,6 +27,7 @@ const PRIVATE_ROUTES = [
   "/doc/[_id]/edit",
   "/doc/[_id]/edit/semantic",
   "/gd/components",
+  "/gd/rituals/deleted",
   "/offline/ritual",
   "/signin",
   "/study/[_id]",

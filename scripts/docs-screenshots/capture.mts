@@ -178,6 +178,38 @@ const shots: Shot[] = [
     padding: 0,
   },
   {
+    name: "delete-ritual",
+    persona: "creator",
+    viewport: [1100, 800],
+    open: async (b) => {
+      const path = await ritualPath(b, "Zelator 1=10 (sample)");
+      await b.goto(`${base}${path}/edit/semantic`);
+      await b.waitFor(editorReady);
+      await sleep(1500);
+      await b.click("button", "More editor actions");
+      await sleep(400);
+      await b.click("li", "Delete ritual");
+      // Framed without confirming: the sample stays live.
+      await b.waitFor(`document.body.textContent.includes('lose it now')`);
+      await sleep(500);
+    },
+    clip: `[...document.querySelectorAll('.MuiDialog-paper')].filter((e) => e.textContent.includes('Delete “'))`,
+    padding: 0,
+  },
+  {
+    name: "recently-deleted",
+    persona: "creator",
+    viewport: [1000, 800],
+    open: async (b) => {
+      await b.goto(`${base}/gd/rituals/deleted`);
+      await b.waitFor(
+        `document.body.textContent.includes('Retired opening (sample)')`,
+      );
+    },
+    // The app bar's title is an h1 with the same text: frame the page's own.
+    clip: `[byTextAll('h1', 'Recently deleted').at(-1), document.querySelector('[aria-label="Recently deleted rituals"]').closest('.MuiPaper-root')]`,
+  },
+  {
     name: "forum-settings",
     persona: "creator",
     viewport: [1000, 900],

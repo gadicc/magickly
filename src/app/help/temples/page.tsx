@@ -4,6 +4,7 @@ import Image, { type StaticImageData } from "next/image";
 import { pageMetadata } from "@/seo/metadata";
 import createRitual from "./images/create-ritual.webp";
 import createTemple from "./images/create-temple.webp";
+import deleteRitual from "./images/delete-ritual.webp";
 import editMember from "./images/edit-member.webp";
 import editorPhone from "./images/editor-phone.webp";
 import editorSource from "./images/editor-source.webp";
@@ -14,6 +15,7 @@ import joinCode from "./images/join-code.webp";
 import members from "./images/members.webp";
 import myTemples from "./images/my-temples.webp";
 import readerPhone from "./images/reader-phone.webp";
+import recentlyDeleted from "./images/recently-deleted.webp";
 import removeMember from "./images/remove-member.webp";
 import ritualAccess from "./images/ritual-access.webp";
 import ritualList from "./images/ritual-list-grade-1.webp";
@@ -97,6 +99,9 @@ export default function TemplesGuide() {
         </li>
         <li>
           <a href="#access">When access changes</a>
+        </li>
+        <li>
+          <a href="#delete">Deleting a ritual</a>
         </li>
         <li>
           <a href="#offline">Reading offline</a>
@@ -398,6 +403,10 @@ export default function TemplesGuide() {
           app runs, even if the device never reconnects. If the device does
           reconnect sooner, it learns the change as soon as it asks.
         </li>
+        <li>
+          <strong>Delete a ritual</strong> and everyone loses it at once; see{" "}
+          <a href="#delete">Deleting a ritual</a>.
+        </li>
       </ul>
       <p>
         A browser cannot be made tamper-proof, and nothing can unread what a
@@ -407,13 +416,59 @@ export default function TemplesGuide() {
         you have shared in person.
       </p>
 
+      <h2 id="delete">Deleting a ritual</h2>
+      <p>
+        Anyone who can edit a ritual can delete it: the temple’s administrators,
+        and its creator while they remain in the temple. Open the ritual’s
+        editor and choose <strong>Delete ritual…</strong> from the menu. The
+        dialog says who will lose it. A public ritual can only be deleted by
+        Magick.ly’s site administrators.
+      </p>
+      <Figure
+        image={deleteRitual}
+        alt="The Delete ritual dialog for Zelator 1=10 (sample), saying that members of Example at grade 1 and above lose it now."
+      >
+        Deleting asks first, and says who loses the ritual.
+      </Figure>
+      <ul>
+        <li>
+          Deleting hides the ritual from everyone at once, as though it had
+          never existed. Right afterwards the rituals list offers{" "}
+          <strong>Undo</strong>.
+        </li>
+        <li>
+          A copy downloaded to a member’s device is removed the next time that
+          device opens that ritual or the Downloaded rituals page while online,
+          and in any case within 14 days.
+        </li>
+        <li>
+          <strong>Recently deleted</strong>, linked from the rituals list and
+          from the temple’s administration page when there is something in it,
+          lists the deleted rituals you can restore. <strong>Restore</strong>{" "}
+          brings one back as it was, with its history, for everyone who could
+          read it before.
+        </li>
+      </ul>
+      <Figure
+        image={recentlyDeleted}
+        alt="Recently deleted, listing Retired opening (sample) in Example with who deleted it and when, and a Restore button."
+      >
+        Recently deleted, where a deleted ritual can be restored.
+      </Figure>
+      <p>
+        Deleting cannot reach what a member has already read or copied, nor
+        drafts an editor left on their own device: those stay there, and can
+        still be downloaded from the editor’s menu.
+      </p>
+
       <h2 id="offline">Reading offline</h2>
       <p>
         Opening a temple ritual while connected downloads it to your device.
         After that it opens without a connection, images included, until the
         14-day limit above.{" "}
         <Link href="/offline/ritual">Downloaded rituals</Link> lists what your
-        device holds. Signing out removes the downloads.
+        device holds; opened while connected, it also checks each download and
+        removes any you can no longer read. Signing out removes the downloads.
       </p>
 
       <h2 id="forum">Connecting a forum</h2>
