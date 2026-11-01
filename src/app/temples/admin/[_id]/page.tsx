@@ -74,7 +74,7 @@ export default async function AdminTemplePage({
     <Container sx={{ my: 2 }}>
       <Typography variant="h5">{temple.name} Temple</Typography>
       {query.removed ? (
-        <Typography color="success.main" role="status" sx={{ my: 2 }}>
+        <Typography color="success" role="status" sx={{ my: 2 }}>
           The member has been removed.
         </Typography>
       ) : null}

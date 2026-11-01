@@ -1159,7 +1159,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     );
   if (!editor || !ready)
     return (
-      <Typography color="text.secondary" sx={{ p: 2 }}>
+      <Typography color="textSecondary" sx={{ p: 2 }}>
         Verifying account and loading local draft…
       </Typography>
     );
@@ -1198,7 +1198,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         />
         <Typography
           variant="body2"
-          color="text.secondary"
+          color="textSecondary"
           role="status"
           className={styles.status}
           title={

@@ -593,7 +593,7 @@ export default function SqlDocAdmin() {
         aria-label="Ritual creation area"
         sx={{ my: 2, minHeight: reservedHeight }}
       >
-        <Typography sx={{ my: 2 }} color="text.secondary">
+        <Typography sx={{ my: 2 }} color="textSecondary">
           Loading ritual creation access...
         </Typography>
       </Box>
@@ -627,7 +627,7 @@ export default function SqlDocAdmin() {
         <Typography
           id={helpId}
           variant="body2"
-          color="text.secondary"
+          color="textSecondary"
           sx={{ mb: 1 }}
         >
           Choose a title and who can read the ritual. Create opens the new

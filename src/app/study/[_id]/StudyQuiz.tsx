@@ -122,7 +122,7 @@ export default function StudyQuiz({
           </Box>
         </Stack>
         {(saveError || syncWarning) && (
-          <Typography color={saveError ? "error" : "warning.main"}>
+          <Typography color={saveError ? "error" : "warning"}>
             {saveError ?? "Saved on this device; account sync will retry."}
           </Typography>
         )}

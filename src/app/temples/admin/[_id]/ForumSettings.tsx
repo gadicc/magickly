@@ -96,7 +96,7 @@ export function ForumSettings({
               }
               slotProps={{ htmlInput: { maxLength: 512 } }}
             />
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="textSecondary">
               Syncing sends each member’s name, motto, grade and verified email
               addresses to this forum, which creates an account for anyone it
               does not already know. Only connect a forum you run.

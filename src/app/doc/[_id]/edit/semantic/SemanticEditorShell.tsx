@@ -8,7 +8,7 @@ import type { SemanticImportReport } from "@/doc/semanticImportReport";
 const SemanticEditor = dynamic(() => import("./SemanticEditor"), {
   ssr: false,
   loading: () => (
-    <Typography color="text.secondary" sx={{ p: 2 }}>
+    <Typography color="textSecondary" sx={{ p: 2 }}>
       Loading ritual editor…
     </Typography>
   ),

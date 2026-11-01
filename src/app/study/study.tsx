@@ -122,7 +122,7 @@ function StudyPage() {
         ))}
       </Select>
       {runtime.error && (
-        <Typography color="warning.main" sx={{ mt: 1 }}>
+        <Typography color="warning" sx={{ mt: 1 }}>
           Progress is saved on this device. Sync will retry when available.
         </Typography>
       )}

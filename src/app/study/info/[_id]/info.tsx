@@ -52,7 +52,7 @@ export default function StudyInfo({ _id }: { _id: string }) {
     <Container sx={{ p: 2 }}>
       <Typography variant="h4">{runtime.snapshot.setId}</Typography>
       {runtime.error && (
-        <Typography color="warning.main">
+        <Typography color="warning">
           Showing progress saved on this device; sync will retry.
         </Typography>
       )}

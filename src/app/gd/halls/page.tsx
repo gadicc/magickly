@@ -36,13 +36,13 @@ export default function HallsPage() {
           >
             Open the editor
           </Button>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="textSecondary">
             Start from any hall, change it, then export it or share a link.
           </Typography>
         </div>
       </div>
       <HallIndex />
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" color="textSecondary">
         East is at the top of every plan and North on the left.
       </Typography>
     </Container>

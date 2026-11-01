@@ -66,12 +66,12 @@ export default async function TemplePage({
       )}
 
       {query.joined ? (
-        <Typography color="success.main" sx={{ my: 2 }} role="status">
+        <Typography color="success" sx={{ my: 2 }} role="status">
           Your temple membership is active.
         </Typography>
       ) : null}
       {query.left ? (
-        <Typography color="success.main" sx={{ my: 2 }} role="status">
+        <Typography color="success" sx={{ my: 2 }} role="status">
           You have left the temple.
         </Typography>
       ) : null}

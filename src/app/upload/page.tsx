@@ -36,7 +36,7 @@ export default async function UploadFilePage() {
       <Typography variant="h5" component="h1" gutterBottom>
         Attach an image to a ritual
       </Typography>
-      <Typography color="text.secondary">
+      <Typography color="textSecondary">
         Choose a ritual you currently edit. The image is stored privately and
         attached to that ritual; uploading it does not create a public file
         link.
