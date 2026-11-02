@@ -594,9 +594,12 @@ Follow-ups are separate from the completed migration work:
   soft-deleted ritual again and stops purging (plan 065, risk 12).
 - TODO: a check-only mode for `/api/rituals/permission`, so the
   Downloaded rituals recheck stops receiving each ritual's rendered
-  descriptor (up to 16 MB) with every grant; it changes the offline
-  contract, so it needs its own plan
+  descriptor (up to 16 MB) with every grant
   ([plan 065](065-ritual-deletion.md#the-code-review-1-november-2026)).
+  Planned on 1 November 2026 on `gate/check-only-recheck`, not yet
+  built: a version 2 check request for the recheck and the reader's
+  refresh, with version 1 unchanged
+  ([plan 068](068-check-only-permission.md)).
 - 1 November 2026, on `gate/mui-colour-status`, awaiting release: fifteen
   `Typography` colours that MUI 9 silently dropped are restored. Palette
   paths such as `color="warning.main"` and `color="text.secondary"` were
