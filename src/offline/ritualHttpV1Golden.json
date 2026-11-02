@@ -1,0 +1,112 @@
+{
+  "grantWithBundle": {
+    "status": 200,
+    "headers": [
+      ["cache-control", "private, no-store, max-age=0"],
+      ["content-type", "application/json"],
+      ["expires", "0"],
+      ["pragma", "no-cache"],
+      ["vary", "Cookie"],
+      ["x-content-type-options", "nosniff"]
+    ],
+    "body": "{\"version\":1,\"requestId\":\"019947c5-abcd-7000-8000-0000000000a1\",\"ownerId\":\"01900000-0000-7000-8000-000000000001\",\"ritualId\":\"01900000-0000-7000-8000-00000000000e\",\"routeAlias\":null,\"permission\":{\"version\":1,\"requestId\":\"019947c5-abcd-7000-8000-0000000000a1\",\"ownerId\":\"01900000-0000-7000-8000-000000000001\",\"ritualId\":\"01900000-0000-7000-8000-00000000000e\",\"kind\":\"granted\",\"rendered\":{\"kind\":\"available\",\"descriptor\":{\"descriptorSha256\":\"d49433e01b5a7973ef7be9c5fb591b86f3cbe5c6a472a9c19e47e654624f54d6\",\"contentSha256\":\"234d82249fdbcd0c552b7b597e02d5797ce47cdc7dbe0465bd32a455bbc8a380\",\"outputFormat\":\"json-rich-text\",\"outputFormatVersion\":\"1\"}},\"editor\":{\"currentRevisionId\":\"01900000-0000-7000-8000-00000000000f\",\"parentVersion\":7},\"grant\":{\"version\":1,\"leaseId\":\"01900000-0000-7000-8000-0000000f0002\",\"ownerId\":\"01900000-0000-7000-8000-000000000001\",\"ritualId\":\"01900000-0000-7000-8000-00000000000e\",\"checkedAtMs\":1789300800123,\"expiresAtMs\":1790510400123,\"respondedAtMs\":1789300800123,\"sourceEdit\":true}},\"bundle\":{\"bundleId\":\"01900000-0000-7000-8000-000000000011\",\"manifestJson\":\"{\\\"version\\\":1,\\\"bundleId\\\":\\\"01900000-0000-7000-8000-000000000011\\\",\\\"ritualId\\\":\\\"01900000-0000-7000-8000-00000000000e\\\",\\\"descriptor\\\":{\\\"descriptorSha256\\\":\\\"d49433e01b5a7973ef7be9c5fb591b86f3cbe5c6a472a9c19e47e654624f54d6\\\",\\\"contentSha256\\\":\\\"234d82249fdbcd0c552b7b597e02d5797ce47cdc7dbe0465bd32a455bbc8a380\\\",\\\"outputFormat\\\":\\\"json-rich-text\\\",\\\"outputFormatVersion\\\":\\\"1\\\"},\\\"title\\\":\\\"\ufeff Synthetic e\u0301 \u00e9 \ud83c\udf0d\\\\r\\\\n\\\",\\\"renderedJson\\\":\\\"{\\\\n  \\\\\\\"children\\\\\\\": [\\\\n    {\\\\n      \\\\\\\"type\\\\\\\": \\\\\\\"text\\\\\\\",\\\\n      \\\\\\\"value\\\\\\\": \\\\\\\"exact e\u0301 \u00e9 \ud83c\udf0d\\\\\\\\r\\\\\\\\n\\\\\\\"\\\\n    }\\\\n  ]\\\\n}\\\",\\\"assets\\\":[],\\\"occurrences\\\":[]}\",\"manifestSha256\":\"495ba6b014626038781fa3f2d66398bcb408a15d39b71d0a6c31e1d78f1cd56e\"}}"
+  },
+  "routeAlias": {
+    "status": 200,
+    "headers": [
+      ["cache-control", "private, no-store, max-age=0"],
+      ["content-type", "application/json"],
+      ["expires", "0"],
+      ["pragma", "no-cache"],
+      ["vary", "Cookie"],
+      ["x-content-type-options", "nosniff"]
+    ],
+    "body": "{\"version\":1,\"requestId\":\"019947c5-abcd-7000-8000-0000000000a1\",\"ownerId\":\"01900000-0000-7000-8000-000000000001\",\"ritualId\":\"01900000-0000-7000-8000-00000000000e\",\"routeAlias\":\"0123456789abcdef01234567\",\"permission\":{\"version\":1,\"requestId\":\"019947c5-abcd-7000-8000-0000000000a1\",\"ownerId\":\"01900000-0000-7000-8000-000000000001\",\"ritualId\":\"01900000-0000-7000-8000-00000000000e\",\"kind\":\"granted\",\"rendered\":{\"kind\":\"available\",\"descriptor\":{\"descriptorSha256\":\"d49433e01b5a7973ef7be9c5fb591b86f3cbe5c6a472a9c19e47e654624f54d6\",\"contentSha256\":\"234d82249fdbcd0c552b7b597e02d5797ce47cdc7dbe0465bd32a455bbc8a380\",\"outputFormat\":\"json-rich-text\",\"outputFormatVersion\":\"1\"}},\"editor\":{\"currentRevisionId\":\"01900000-0000-7000-8000-00000000000f\",\"parentVersion\":7},\"grant\":{\"version\":1,\"leaseId\":\"01900000-0000-7000-8000-0000000f0002\",\"ownerId\":\"01900000-0000-7000-8000-000000000001\",\"ritualId\":\"01900000-0000-7000-8000-00000000000e\",\"checkedAtMs\":1789300800123,\"expiresAtMs\":1790510400123,\"respondedAtMs\":1789300800123,\"sourceEdit\":true}},\"bundle\":{\"bundleId\":\"01900000-0000-7000-8000-000000000011\",\"manifestJson\":\"{\\\"version\\\":1,\\\"bundleId\\\":\\\"01900000-0000-7000-8000-000000000011\\\",\\\"ritualId\\\":\\\"01900000-0000-7000-8000-00000000000e\\\",\\\"descriptor\\\":{\\\"descriptorSha256\\\":\\\"d49433e01b5a7973ef7be9c5fb591b86f3cbe5c6a472a9c19e47e654624f54d6\\\",\\\"contentSha256\\\":\\\"234d82249fdbcd0c552b7b597e02d5797ce47cdc7dbe0465bd32a455bbc8a380\\\",\\\"outputFormat\\\":\\\"json-rich-text\\\",\\\"outputFormatVersion\\\":\\\"1\\\"},\\\"title\\\":\\\"\ufeff Synthetic e\u0301 \u00e9 \ud83c\udf0d\\\\r\\\\n\\\",\\\"renderedJson\\\":\\\"{\\\\n  \\\\\\\"children\\\\\\\": [\\\\n    {\\\\n      \\\\\\\"type\\\\\\\": \\\\\\\"text\\\\\\\",\\\\n      \\\\\\\"value\\\\\\\": \\\\\\\"exact e\u0301 \u00e9 \ud83c\udf0d\\\\\\\\r\\\\\\\\n\\\\\\\"\\\\n    }\\\\n  ]\\\\n}\\\",\\\"assets\\\":[],\\\"occurrences\\\":[]}\",\"manifestSha256\":\"495ba6b014626038781fa3f2d66398bcb408a15d39b71d0a6c31e1d78f1cd56e\"}}"
+  },
+  "renderingUnavailable": {
+    "status": 200,
+    "headers": [
+      ["cache-control", "private, no-store, max-age=0"],
+      ["content-type", "application/json"],
+      ["expires", "0"],
+      ["pragma", "no-cache"],
+      ["vary", "Cookie"],
+      ["x-content-type-options", "nosniff"]
+    ],
+    "body": "{\"version\":1,\"requestId\":\"019947c5-abcd-7000-8000-0000000000a1\",\"ownerId\":\"01900000-0000-7000-8000-000000000001\",\"ritualId\":\"01900000-0000-7000-8000-00000000000e\",\"routeAlias\":null,\"permission\":{\"version\":1,\"requestId\":\"019947c5-abcd-7000-8000-0000000000a1\",\"ownerId\":\"01900000-0000-7000-8000-000000000001\",\"ritualId\":\"01900000-0000-7000-8000-00000000000e\",\"kind\":\"granted\",\"rendered\":{\"kind\":\"temporarily-unavailable\"},\"editor\":{\"currentRevisionId\":\"01900000-0000-7000-8000-00000000000f\",\"parentVersion\":7},\"grant\":{\"version\":1,\"leaseId\":\"01900000-0000-7000-8000-0000000f0001\",\"ownerId\":\"01900000-0000-7000-8000-000000000001\",\"ritualId\":\"01900000-0000-7000-8000-00000000000e\",\"checkedAtMs\":1789300800123,\"expiresAtMs\":1790510400123,\"respondedAtMs\":1789300800123,\"sourceEdit\":true}},\"bundle\":null}"
+  },
+  "denied": {
+    "status": 200,
+    "headers": [
+      ["cache-control", "private, no-store, max-age=0"],
+      ["content-type", "application/json"],
+      ["expires", "0"],
+      ["pragma", "no-cache"],
+      ["vary", "Cookie"],
+      ["x-content-type-options", "nosniff"]
+    ],
+    "body": "{\"version\":1,\"requestId\":\"019947c5-abcd-7000-8000-0000000000a1\",\"ownerId\":\"01900000-0000-7000-8000-000000000009\",\"ritualId\":\"01900000-0000-7000-8000-00000000000e\",\"routeAlias\":null,\"permission\":{\"version\":1,\"requestId\":\"019947c5-abcd-7000-8000-0000000000a1\",\"ownerId\":\"01900000-0000-7000-8000-000000000009\",\"ritualId\":\"01900000-0000-7000-8000-00000000000e\",\"kind\":\"denied\"},\"bundle\":null}"
+  },
+  "authenticationRequired": {
+    "status": 200,
+    "headers": [
+      ["cache-control", "private, no-store, max-age=0"],
+      ["content-type", "application/json"],
+      ["expires", "0"],
+      ["pragma", "no-cache"],
+      ["vary", "Cookie"],
+      ["x-content-type-options", "nosniff"]
+    ],
+    "body": "{\"version\":1,\"requestId\":\"019947c5-abcd-7000-8000-0000000000a1\",\"ownerId\":\"01900000-0000-7000-8000-000000000001\",\"ritualId\":\"01900000-0000-7000-8000-00000000000e\",\"routeAlias\":null,\"permission\":{\"version\":1,\"requestId\":\"019947c5-abcd-7000-8000-0000000000a1\",\"ownerId\":\"01900000-0000-7000-8000-000000000001\",\"ritualId\":\"01900000-0000-7000-8000-00000000000e\",\"kind\":\"authentication-required\"},\"bundle\":null}"
+  },
+  "invalid": {
+    "extraKey": {
+      "status": 400,
+      "headers": [
+        ["cache-control", "private, no-store, max-age=0"],
+        ["content-type", "application/json"],
+        ["expires", "0"],
+        ["pragma", "no-cache"],
+        ["vary", "Cookie"],
+        ["x-content-type-options", "nosniff"]
+      ],
+      "body": "{\"error\":\"invalid-request\"}"
+    },
+    "missingKey": {
+      "status": 400,
+      "headers": [
+        ["cache-control", "private, no-store, max-age=0"],
+        ["content-type", "application/json"],
+        ["expires", "0"],
+        ["pragma", "no-cache"],
+        ["vary", "Cookie"],
+        ["x-content-type-options", "nosniff"]
+      ],
+      "body": "{\"error\":\"invalid-request\"}"
+    },
+    "unknownAlias": {
+      "status": 400,
+      "headers": [
+        ["cache-control", "private, no-store, max-age=0"],
+        ["content-type", "application/json"],
+        ["expires", "0"],
+        ["pragma", "no-cache"],
+        ["vary", "Cookie"],
+        ["x-content-type-options", "nosniff"]
+      ],
+      "body": "{\"error\":\"invalid-request\"}"
+    },
+    "malformedJson": {
+      "status": 503,
+      "headers": [
+        ["cache-control", "private, no-store, max-age=0"],
+        ["content-type", "application/json"],
+        ["expires", "0"],
+        ["pragma", "no-cache"],
+        ["vary", "Cookie"],
+        ["x-content-type-options", "nosniff"]
+      ],
+      "body": "{\"error\":\"temporarily-unavailable\"}"
+    }
+  }
+}
