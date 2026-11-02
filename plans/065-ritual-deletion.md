@@ -1832,6 +1832,6 @@ Spike 1(d), checked read-only from the Vercel CLI (`vercel logs`,
   outcome is `ok`. `due` is not visible; it was 0 unless a due ritual
   was skipped, which logs nothing, and none was due this soon after
   the release (1(d)).
-- **Not yet seen:** the heartbeat line ("Nightly removal last ran …
-  (ok)") on `/gd/rituals/deleted`, which needs a global administrator's
-  sign-in. Gadi looks.
+- **The heartbeat line:** Gadi, signed in as a global administrator,
+  saw "Nightly removal last ran … (ok)" on `/gd/rituals/deleted` on
+  2 November 2026.

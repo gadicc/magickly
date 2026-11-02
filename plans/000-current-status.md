@@ -587,8 +587,8 @@ Follow-ups are separate from the completed migration work:
   cron's only test, passed: the first nightly run, on 2 November 2026 at
   03:17:25 UTC, reached deployment `dpl_E3tWBJUHYdHzcqLRoQkbzpUmEwrx`
   and returned 200 with no `purge` log line, so nothing was purged,
-  deferred or failed (plan 065, "The first nightly run"). Gadi has still
-  to see its heartbeat line on Recently deleted. **Never roll
+  deferred or failed (plan 065, "The first nightly run"); Gadi saw its
+  heartbeat line, "(ok)", on Recently deleted. **Never roll
   production back past this release**
   without first purging what should go: the older code shows every
   soft-deleted ritual again and stops purging (plan 065, risk 12).
