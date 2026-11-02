@@ -73,6 +73,7 @@ export default defineConfig({
         "src/offline/repository.ts",
         "src/offline/storage.ts",
         "src/offline/permissionContract.ts",
+        "src/offline/ritualCheckContract.ts",
         "src/offline/sqlPermissionCheck.ts",
         "src/offline/lifecycle.ts",
         "src/offline/recovery.ts",

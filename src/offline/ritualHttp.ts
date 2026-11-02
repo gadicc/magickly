@@ -1,9 +1,16 @@
 import "server-only";
 
 import { isUuidV7 } from "../lib/ids";
-import type { RitualPermissionResponseV1 } from "./permissionContract";
+import type {
+  RitualPermissionRequestV1,
+  RitualPermissionResponseV1,
+} from "./permissionContract";
 import { parseRitualPermissionRequest } from "./permissionContract";
 import type { AuthorizedRitualBundleAsset } from "./readRitualBundleAsset";
+import {
+  parseRitualPermissionCheckRequest,
+  type RitualPermissionCheckResponseV2,
+} from "./ritualCheckContract";
 import type { RitualDeliveryResponseV1 } from "./ritualDeliveryContract";
 import type {
   RitualBundleAssetReadRequest,
@@ -82,9 +89,113 @@ function sameDescriptor(
   );
 }
 
+/** One permission answer shared by the v1 delivery and the v2 check. */
+interface PermissionAnswer {
+  routeAlias: string | null;
+  permission: RitualPermissionResponseV1;
+  /** Only a manifest whose descriptor matches the final grant. */
+  manifest: SqlRitualBundleManifest | null;
+}
+
+/** A v2 body is told apart by its own version; every other body stays v1. */
+function isCheckRequest(body: unknown) {
+  return (
+    !!body &&
+    typeof body === "object" &&
+    Object.getOwnPropertyDescriptor(body, "version")?.value === 2
+  );
+}
+
+/**
+ * The alias, permission, manifest lookup and recheck that both versions share,
+ * so a v2 check carries a bundle exactly when a v1 delivery would.
+ */
+async function answerPermission(
+  services: RitualHttpServices,
+  request: Request,
+  input: RitualPermissionRequestV1,
+): Promise<PermissionAnswer | Response> {
+  const requestedAlias = request.headers.get("x-magickli-ritual-alias");
+  let routeAlias: string | null = null;
+  if (requestedAlias !== null) {
+    if (!/^[0-9a-f]{24}$/.test(requestedAlias))
+      return json({ error: "invalid-request" }, 400);
+    const resolved = await services.resolveRouteAlias(requestedAlias);
+    if (resolved !== input.ritualId)
+      return json({ error: "invalid-request" }, 400);
+    routeAlias = requestedAlias;
+  }
+  let permission = await services.checkPermission(input);
+  if (!permission) return json({ error: "invalid-request" }, 400);
+  let manifest: SqlRitualBundleManifest | null = null;
+  if (
+    permission.kind === "granted" &&
+    permission.rendered.kind === "available"
+  ) {
+    const found = await services.getManifest({
+      expectedActorId: input.expectedActorId,
+      ritualId: input.ritualId,
+    });
+    // Manifest lookup performs asynchronous SQL work. Never renew a source
+    // lease with the earlier grant if access changed during that lookup.
+    const currentPermission = await services.checkPermission(input);
+    if (!currentPermission)
+      return json({ error: "temporarily-unavailable" }, 503);
+    permission = currentPermission;
+    if (
+      permission.kind === "granted" &&
+      found &&
+      sameDescriptor(permission, found)
+    )
+      manifest = found;
+  }
+  return { routeAlias, permission, manifest };
+}
+
+function deliveryReply(
+  input: RitualPermissionRequestV1,
+  { routeAlias, permission, manifest }: PermissionAnswer,
+): RitualDeliveryResponseV1 {
+  return {
+    version: 1,
+    requestId: input.requestId,
+    ownerId: input.expectedActorId,
+    ritualId: input.ritualId,
+    routeAlias,
+    permission,
+    bundle: manifest && {
+      bundleId: manifest.manifest.bundleId,
+      manifestJson: manifest.manifestJson,
+      manifestSha256: manifest.manifestSha256,
+    },
+  };
+}
+
+function checkReply(
+  input: RitualPermissionRequestV1,
+  { routeAlias, permission, manifest }: PermissionAnswer,
+): RitualPermissionCheckResponseV2 {
+  return {
+    version: 2,
+    requestId: input.requestId,
+    ownerId: input.expectedActorId,
+    ritualId: input.ritualId,
+    routeAlias,
+    permission,
+    bundle: manifest && {
+      bundleId: manifest.manifest.bundleId,
+      manifestSha256: manifest.manifestSha256,
+    },
+  };
+}
+
 /** Route-handler composition kept separate from live DB/provider construction. */
 export function createRitualHttpHandlers(services: RitualHttpServices) {
   return {
+    /**
+     * A v1 body gets the permission and, for a current grant, the whole
+     * manifest. A v2 body gets the same answer with only the bundle identity.
+     */
     async permission(request: Request): Promise<Response> {
       try {
         if (
@@ -96,55 +207,17 @@ export function createRitualHttpHandlers(services: RitualHttpServices) {
             .toLowerCase() !== "application/json"
         )
           return json({ error: "invalid-request" }, 400);
-        const input = parseRitualPermissionRequest(await boundedJson(request));
+        const body = await boundedJson(request);
+        const check = isCheckRequest(body);
+        const input = check
+          ? parseRitualPermissionCheckRequest(body)
+          : parseRitualPermissionRequest(body);
         if (!input) return json({ error: "invalid-request" }, 400);
-        const requestedAlias = request.headers.get("x-magickli-ritual-alias");
-        let routeAlias: string | null = null;
-        if (requestedAlias !== null) {
-          if (!/^[0-9a-f]{24}$/.test(requestedAlias))
-            return json({ error: "invalid-request" }, 400);
-          const resolved = await services.resolveRouteAlias(requestedAlias);
-          if (resolved !== input.ritualId)
-            return json({ error: "invalid-request" }, 400);
-          routeAlias = requestedAlias;
-        }
-        let permission = await services.checkPermission(input);
-        if (!permission) return json({ error: "invalid-request" }, 400);
-        let bundle: RitualDeliveryResponseV1["bundle"] = null;
-        if (
-          permission.kind === "granted" &&
-          permission.rendered.kind === "available"
-        ) {
-          const manifest = await services.getManifest({
-            expectedActorId: input.expectedActorId,
-            ritualId: input.ritualId,
-          });
-          // Manifest lookup performs asynchronous SQL work. Never renew a source
-          // lease with the earlier grant if access changed during that lookup.
-          const currentPermission = await services.checkPermission(input);
-          if (!currentPermission)
-            return json({ error: "temporarily-unavailable" }, 503);
-          permission = currentPermission;
-          if (
-            permission.kind === "granted" &&
-            manifest &&
-            sameDescriptor(permission, manifest)
-          )
-            bundle = {
-              bundleId: manifest.manifest.bundleId,
-              manifestJson: manifest.manifestJson,
-              manifestSha256: manifest.manifestSha256,
-            };
-        }
-        return json({
-          version: 1,
-          requestId: input.requestId,
-          ownerId: input.expectedActorId,
-          ritualId: input.ritualId,
-          routeAlias,
-          permission,
-          bundle,
-        } satisfies RitualDeliveryResponseV1);
+        const answer = await answerPermission(services, request, input);
+        if (answer instanceof Response) return answer;
+        return json(
+          check ? checkReply(input, answer) : deliveryReply(input, answer),
+        );
       } catch {
         return json({ error: "temporarily-unavailable" }, 503);
       }
