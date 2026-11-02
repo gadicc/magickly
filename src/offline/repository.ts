@@ -1017,7 +1017,9 @@ export class OfflineRitualRepository {
   /**
    * When this device last had a grant accepted for the ritual, by its own
    * clock (the request's start), or null if it holds none for this account.
-   * The Downloaded rituals list uses it to skip rituals checked recently.
+   * The Downloaded rituals list uses it to skip rituals checked recently,
+   * because every check still makes the server read and decode the
+   * ritual's manifest from its database.
    */
   async lastGrantedAtMs(
     account: OfflineAccount,

@@ -1,12 +1,13 @@
 import { createHash } from "node:crypto";
 import { IDBFactory, IDBKeyRange } from "fake-indexeddb";
-import { afterEach, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   OfflineLifecycleCoordinator,
   type OfflineLifecycleState,
 } from "./lifecycle";
 import { LockedRecoveryQueue } from "./recovery";
 import { OfflineRitualRepository } from "./repository";
+import { resetRitualCheckSupportForTests } from "./ritualClientTransport";
 import {
   OFFLINE_RECHECK_INTERVAL_MS,
   recheckOfflineRitual,
@@ -27,49 +28,68 @@ const renderedJson = JSON.stringify({
   type: "root",
   children: [{ type: "img", src: "/owned/image.png#mark" }],
 });
-const descriptor = {
-  descriptorSha256: hash("descriptor"),
-  contentSha256: hash(renderedJson),
-  outputFormat: "json-rich-text" as const,
-  outputFormatVersion: "1" as const,
-};
-const manifest = {
-  version: 1 as const,
-  bundleId: BUNDLE,
-  ritualId: RITUAL,
-  descriptor,
-  title: "Synthetic private ritual",
-  renderedJson,
-  assets: [
-    {
-      key: ASSET,
-      reference: "/owned/image.png",
-      sha256: hash(bytes),
-      mime: "image/png" as const,
-      bytes: bytes.byteLength,
-      purpose: "read" as const,
-    },
-  ],
-  occurrences: [
-    {
-      path: [0],
-      src: "/owned/image.png#mark",
-      displayFragment: "#mark",
-      assetKey: ASSET,
-    },
-  ],
-};
-const manifestJson = JSON.stringify(manifest);
-const manifestSha256 = hash(manifestJson);
+
+/** One published bundle of the synthetic ritual. */
+function release(bundleId: string, title: string) {
+  const descriptor = {
+    descriptorSha256: hash(`descriptor ${title}`),
+    contentSha256: hash(renderedJson),
+    outputFormat: "json-rich-text" as const,
+    outputFormatVersion: "1" as const,
+  };
+  const manifest = {
+    version: 1 as const,
+    bundleId,
+    ritualId: RITUAL,
+    descriptor,
+    title,
+    renderedJson,
+    assets: [
+      {
+        key: ASSET,
+        reference: "/owned/image.png",
+        sha256: hash(bytes),
+        mime: "image/png" as const,
+        bytes: bytes.byteLength,
+        purpose: "read" as const,
+      },
+    ],
+    occurrences: [
+      {
+        path: [0],
+        src: "/owned/image.png#mark",
+        displayFragment: "#mark",
+        assetKey: ASSET,
+      },
+    ],
+  };
+  const manifestJson = JSON.stringify(manifest);
+  return {
+    bundleId,
+    descriptor,
+    manifest,
+    manifestJson,
+    manifestSha256: hash(manifestJson),
+  };
+}
+type Release = ReturnType<typeof release>;
+const CURRENT = release(BUNDLE, "Synthetic private ritual");
+/** A later bundle the server has published since CURRENT was downloaded. */
+const NEXT_BUNDLE = "019947c5-abcd-7000-8000-000000000007";
+const NEXT = release(NEXT_BUNDLE, "Synthetic private ritual, revised");
+const { descriptor, manifestJson, manifestSha256 } = CURRENT;
 const databases: RitualOfflineDatabase[] = [];
 
 afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+  resetRitualCheckSupportForTests();
   for (const database of databases.splice(0)) database.close();
 });
 
 async function setup(hide: () => void = () => {}) {
+  // One clock for the repository and the coordinator, so tests can expire leases.
+  const clock = { now: NOW };
   const database = new RitualOfflineDatabase(
     `download-${crypto.randomUUID()}`,
     {
@@ -78,7 +98,7 @@ async function setup(hide: () => void = () => {}) {
     },
   );
   databases.push(database);
-  const repository = new OfflineRitualRepository(database, () => NOW);
+  const repository = new OfflineRitualRepository(database, () => clock.now);
   const account = await repository.activateAccount(OWNER);
   const stateListeners = new Set<(state: OfflineLifecycleState) => void>();
   const coordinator = new OfflineLifecycleCoordinator(
@@ -87,7 +107,7 @@ async function setup(hide: () => void = () => {}) {
       document: new EventTarget(),
       window: new EventTarget(),
       visible: () => true,
-      now: () => NOW,
+      now: () => clock.now,
       setTimer: () => 1,
       clearTimer: () => {},
       createObjectURL: () => "blob:synthetic",
@@ -111,6 +131,7 @@ async function setup(hide: () => void = () => {}) {
   };
   return {
     account,
+    clock,
     coordinator,
     database,
     repository,
@@ -132,7 +153,25 @@ function deferred<T>() {
   return { promise, resolve };
 }
 
-function transport() {
+function jsonResponse(body: string, status = 200) {
+  return withUrl(
+    new Response(body, {
+      status,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "private, no-store",
+        "Content-Length": String(new TextEncoder().encode(body).byteLength),
+      },
+    }),
+    "https://synthetic.example/api/rituals/permission",
+  );
+}
+
+/**
+ * A server holding `current`: a v2 check gets its identity, a v1 delivery
+ * its manifest, and its one asset is served.
+ */
+function transport(current: Release = CURRENT) {
   return vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const path = String(input);
     if (path === "/api/rituals/permission") {
@@ -143,7 +182,7 @@ function transport() {
         ownerId: OWNER,
         ritualId: RITUAL,
         kind: "granted",
-        rendered: { kind: "available", descriptor },
+        rendered: { kind: "available", descriptor: current.descriptor },
         editor: null,
         grant: {
           version: 1,
@@ -156,27 +195,27 @@ function transport() {
           sourceEdit: false,
         },
       };
-      const body = JSON.stringify({
-        version: 1,
-        requestId: request.requestId,
-        ownerId: OWNER,
-        ritualId: RITUAL,
-        routeAlias: new Headers(init?.headers).get("x-magickli-ritual-alias"),
-        permission,
-        bundle: { bundleId: BUNDLE, manifestJson, manifestSha256 },
-      });
-      return withUrl(
-        new Response(body, {
-          headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": "private, no-store",
-            "Content-Length": String(new TextEncoder().encode(body).byteLength),
-          },
+      const { bundleId, manifestSha256 } = current;
+      return jsonResponse(
+        JSON.stringify({
+          version: request.version === 2 ? 2 : 1,
+          requestId: request.requestId,
+          ownerId: OWNER,
+          ritualId: RITUAL,
+          routeAlias: new Headers(init?.headers).get("x-magickli-ritual-alias"),
+          permission,
+          bundle:
+            request.version === 2
+              ? { bundleId, manifestSha256 }
+              : {
+                  bundleId,
+                  manifestJson: current.manifestJson,
+                  manifestSha256,
+                },
         }),
-        "https://synthetic.example/api/rituals/permission",
       );
     }
-    const assetPath = `/api/rituals/assets/${RITUAL}/${BUNDLE}/${ASSET}`;
+    const assetPath = `/api/rituals/assets/${RITUAL}/${current.bundleId}/${ASSET}`;
     expect(path).toBe(assetPath);
     return withUrl(
       new Response(Uint8Array.from(bytes).buffer, {
@@ -352,15 +391,25 @@ it("retries after cached registration discovery aborts the first check before tr
 
 const LATER_LEASE = "019947c5-abcd-7000-8000-000000000006";
 
-/** A permission-only server: every call must be the permission POST. */
+/**
+ * A permission-only server: every call must be the permission POST. A v2
+ * check gets `bundle` (by default CURRENT's identity on a grant) and a
+ * descriptor with `contentSha256`; a v1 delivery gets CURRENT's manifest.
+ */
 function permissionServer(
   kind: "granted" | "denied" | "temporarily-unavailable",
-  options: { status?: number; expiresAtMs?: number } = {},
+  options: {
+    status?: number;
+    expiresAtMs?: number;
+    bundle?: { bundleId: string; manifestSha256: string } | null;
+    contentSha256?: string;
+  } = {},
 ) {
   return vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     expect(String(input)).toBe("/api/rituals/permission");
     expect(init?.method).toBe("POST");
     const request = JSON.parse(String(init?.body));
+    const check = request.version === 2;
     const head = {
       version: 1,
       requestId: request.requestId,
@@ -372,7 +421,13 @@ function permissionServer(
         ? {
             ...head,
             kind,
-            rendered: { kind: "available", descriptor },
+            rendered: {
+              kind: "available",
+              descriptor:
+                check && options.contentSha256
+                  ? { ...descriptor, contentSha256: options.contentSha256 }
+                  : descriptor,
+            },
             editor: null,
             grant: {
               version: 1,
@@ -386,27 +441,33 @@ function permissionServer(
             },
           }
         : { ...head, kind };
-    const body = JSON.stringify({
-      ...head,
-      routeAlias: null,
-      permission,
-      bundle:
-        kind === "granted"
-          ? { bundleId: BUNDLE, manifestJson, manifestSha256 }
-          : null,
-    });
-    return withUrl(
-      new Response(body, {
-        status: options.status ?? 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "private, no-store",
-          "Content-Length": String(new TextEncoder().encode(body).byteLength),
-        },
+    const bundle = check
+      ? options.bundle !== undefined
+        ? options.bundle
+        : kind === "granted"
+          ? { bundleId: BUNDLE, manifestSha256 }
+          : null
+      : kind === "granted"
+        ? { bundleId: BUNDLE, manifestJson, manifestSha256 }
+        : null;
+    return jsonResponse(
+      JSON.stringify({
+        ...head,
+        version: check ? 2 : 1,
+        routeAlias: new Headers(init?.headers).get("x-magickli-ritual-alias"),
+        permission,
+        bundle,
       }),
-      "https://synthetic.example/api/rituals/permission",
+      options.status,
     );
   });
+}
+
+/** The version of each permission request a fetcher was sent. */
+function versions(fetcher: { mock: { calls: unknown[][] } }) {
+  return fetcher.mock.calls
+    .filter(([input]) => String(input) === "/api/rituals/permission")
+    .map(([, init]) => JSON.parse(String((init as RequestInit).body)).version);
 }
 
 async function downloaded(hide: () => void = () => {}) {
@@ -454,16 +515,22 @@ it("rechecks with the permission request alone and never downloads a bundle or a
   ).resolves.toBe("granted");
   expect(fetcher).toHaveBeenCalledOnce();
   const request = JSON.parse(String(fetcher.mock.calls[0][1]?.body));
-  expect(request).toMatchObject({
-    version: 1,
+  expect(request).toEqual({
+    version: 2,
+    requestId: expect.any(String),
     expectedActorId: OWNER,
     ritualId: RITUAL,
   });
-  // The grant is recorded, but nothing was fetched or installed.
+  // The grant is recorded, but nothing was fetched or installed, and with
+  // no copy the server's identity is not recorded as a verified binding.
   expect(await fixture.repository.readBundle(fixture.account, RITUAL)).toBe(
     null,
   );
   expect((await held(fixture)).assets).toBe(0);
+  expect((await held(fixture)).authorization?.grant?.leaseId).toBe(LATER_LEASE);
+  expect(await fixture.database.checks.get([OWNER, RITUAL])).not.toHaveProperty(
+    "bundleId",
+  );
   close(fixture);
 });
 
@@ -699,4 +766,626 @@ it("treats an unusable permission request as unchanged without sending it", asyn
   ).resolves.toBe("unchanged");
   expect(fetcher).not.toHaveBeenCalled();
   close(fixture);
+});
+
+const FIRST_LEASE = "019947c5-abcd-7000-8000-000000000005";
+
+describe("the recheck's binding rule", () => {
+  it("renews only the authorization when the check names no bundle", async () => {
+    const fixture = await downloaded();
+    const fetcher = permissionServer("granted", { bundle: null });
+    await expect(
+      recheckOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe("granted");
+    expect(versions(fetcher)).toEqual([2]);
+    expect(
+      (await fixture.repository.runtimeState([RITUAL])).resources[0],
+    ).toMatchObject({
+      read: true,
+      leaseId: LATER_LEASE,
+      bundleLeaseId: FIRST_LEASE,
+    });
+    expect(
+      await fixture.database.checks.get([OWNER, RITUAL]),
+    ).not.toHaveProperty("bundleId");
+    close(fixture);
+  });
+
+  it("renews the copy with its identity when the check names it", async () => {
+    const fixture = await downloaded();
+    const fetcher = permissionServer("granted");
+    await expect(
+      recheckOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe("granted");
+    expect(versions(fetcher)).toEqual([2]);
+    expect(
+      (await fixture.repository.runtimeState([RITUAL])).resources[0],
+    ).toMatchObject({ leaseId: LATER_LEASE, bundleLeaseId: LATER_LEASE });
+    expect(await fixture.database.checks.get([OWNER, RITUAL])).toMatchObject({
+      bundleId: BUNDLE,
+      manifestSha256,
+    });
+    close(fixture);
+  });
+
+  it("treats a check naming the copy under other rendered content as temporary", async () => {
+    const fixture = await downloaded();
+    const before = await held(fixture);
+    const accept = vi.spyOn(fixture.repository, "acceptPermission");
+    const fetcher = permissionServer("granted", {
+      contentSha256: hash("other content"),
+    });
+    await expect(
+      recheckOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe("unchanged");
+    expect(versions(fetcher)).toEqual([2]);
+    expect(accept).not.toHaveBeenCalled();
+    expect(await held(fixture)).toEqual(before);
+    close(fixture);
+  });
+
+  it("records no binding for an identity other than the copy's", async () => {
+    const fixture = await downloaded();
+    const fetcher = permissionServer("granted", {
+      bundle: { bundleId: NEXT_BUNDLE, manifestSha256: NEXT.manifestSha256 },
+    });
+    await expect(
+      recheckOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe("granted");
+    expect(versions(fetcher)).toEqual([2]);
+    expect(
+      (await fixture.repository.runtimeState([RITUAL])).resources[0],
+    ).toMatchObject({ leaseId: LATER_LEASE, bundleLeaseId: FIRST_LEASE });
+    expect(
+      await fixture.database.checks.get([OWNER, RITUAL]),
+    ).not.toHaveProperty("bundleId");
+    expect(
+      await fixture.repository.readBundle(fixture.account, RITUAL),
+    ).toMatchObject({ bundleId: BUNDLE });
+    close(fixture);
+  });
+
+  it("records no binding for the copy's bundle ID under another manifest digest", async () => {
+    const fixture = await downloaded();
+    const fetcher = permissionServer("granted", {
+      bundle: { bundleId: BUNDLE, manifestSha256: hash("another manifest") },
+    });
+    await expect(
+      recheckOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe("granted");
+    expect(
+      (await fixture.repository.runtimeState([RITUAL])).resources[0],
+    ).toMatchObject({ leaseId: LATER_LEASE, bundleLeaseId: FIRST_LEASE });
+    expect(
+      await fixture.database.checks.get([OWNER, RITUAL]),
+    ).not.toHaveProperty("bundleId");
+    close(fixture);
+  });
+
+  it("falls back to a v1 delivery on an old server and still renews the copy", async () => {
+    const fixture = await downloaded();
+    const current = permissionServer("granted");
+    const fetcher = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) =>
+        JSON.parse(String(init?.body)).version === 2
+          ? jsonResponse('{"error":"invalid-request"}', 400)
+          : await current(input, init),
+    );
+    await expect(
+      recheckOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe("granted");
+    expect(versions(fetcher)).toEqual([2, 1]);
+    expect(
+      (await fixture.repository.runtimeState([RITUAL])).resources[0],
+    ).toMatchObject({ leaseId: LATER_LEASE, bundleLeaseId: LATER_LEASE });
+    close(fixture);
+  });
+});
+
+describe("the reader's refresh", () => {
+  it("sends a downloaded ritual's first request as v1, with no copy to check", async () => {
+    vi.stubGlobal(
+      "location",
+      new URL(`https://synthetic.example/doc/${RITUAL}`),
+    );
+    const fixture = await setup();
+    const fetcher = transport();
+    await expect(
+      refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe(true);
+    expect(versions(fetcher)).toEqual([1]);
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    close(fixture);
+  });
+
+  it("renews a current copy with one v2 request and no v1 or asset request", async () => {
+    const fixture = await downloaded();
+    const changed = vi.spyOn(fixture.coordinator, "changed");
+    const install = vi.spyOn(fixture.repository, "installBundle");
+    const interrupted = vi.fn();
+    const fetcher = permissionServer("granted");
+    await expect(
+      refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+        onInterrupted: interrupted,
+      }),
+    ).resolves.toBe(true);
+    expect(versions(fetcher)).toEqual([2]);
+    expect(fetcher).toHaveBeenCalledOnce();
+    expect(changed).toHaveBeenCalledOnce();
+    expect(install).not.toHaveBeenCalled();
+    expect(interrupted).not.toHaveBeenCalled();
+    expect(
+      (await fixture.repository.runtimeState([RITUAL])).resources[0],
+    ).toMatchObject({ leaseId: LATER_LEASE, bundleLeaseId: LATER_LEASE });
+    close(fixture);
+  });
+
+  it("keeps the route alias the server confirmed on a current copy", async () => {
+    const fixture = await downloaded();
+    expect(
+      await fixture.repository.resolveDownloadedRitualAlias(
+        fixture.account,
+        ALIAS,
+      ),
+    ).toBeNull();
+    const fetcher = permissionServer("granted");
+    await expect(
+      refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+        routeAlias: ALIAS,
+      }),
+    ).resolves.toBe(true);
+    expect(versions(fetcher)).toEqual([2]);
+    expect(
+      new Headers(fetcher.mock.calls[0][1]?.headers).get(
+        "x-magickli-ritual-alias",
+      ),
+    ).toBe(ALIAS);
+    expect(
+      await fixture.repository.readBundle(fixture.account, RITUAL),
+    ).toMatchObject({ bundleId: BUNDLE, routeAliases: [ALIAS] });
+    expect(
+      await fixture.repository.resolveDownloadedRitualAlias(
+        fixture.account,
+        ALIAS,
+      ),
+    ).toBe(RITUAL);
+    close(fixture);
+  });
+
+  it("checks, then downloads and installs an outdated copy", async () => {
+    const fixture = await downloaded();
+    const changed = vi.spyOn(fixture.coordinator, "changed");
+    const interrupted = vi.fn();
+    const fetcher = transport(NEXT);
+    await expect(
+      refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+        routeAlias: ALIAS,
+        onInterrupted: interrupted,
+      }),
+    ).resolves.toBe(true);
+    expect(versions(fetcher)).toEqual([2, 1]);
+    expect(fetcher.mock.calls.map(([input]) => String(input))).toEqual([
+      "/api/rituals/permission",
+      "/api/rituals/permission",
+      `/api/rituals/assets/${RITUAL}/${NEXT_BUNDLE}/${ASSET}`,
+    ]);
+    const [check, delivery] = fetcher.mock.calls
+      .slice(0, 2)
+      .map(([, init]) => JSON.parse(String(init?.body)));
+    // Two checks of one refresh, so two request IDs.
+    expect(delivery.requestId).not.toBe(check.requestId);
+    expect(
+      new Headers(fetcher.mock.calls[1][1]?.headers).get(
+        "x-magickli-ritual-alias",
+      ),
+    ).toBe(ALIAS);
+    // Once for the check's grant, once for the delivery's, once installed.
+    expect(changed).toHaveBeenCalledTimes(3);
+    expect(interrupted).not.toHaveBeenCalled();
+    expect(
+      await fixture.repository.readBundle(fixture.account, RITUAL),
+    ).toMatchObject({
+      bundleId: NEXT_BUNDLE,
+      manifestSha256: NEXT.manifestSha256,
+      title: NEXT.manifest.title,
+      routeAliases: [ALIAS],
+    });
+    expect(
+      await (
+        await fixture.repository.readAsset(fixture.account, RITUAL, ASSET)
+      )?.text(),
+    ).toBe("synthetic image");
+    close(fixture);
+  });
+
+  it("purges and broadcasts a denial on the check and sends nothing more", async () => {
+    const hide = vi.fn();
+    const fixture = await downloaded(hide);
+    hide.mockClear();
+    const changed = vi.spyOn(fixture.coordinator, "changed");
+    const fetcher = permissionServer("denied");
+    await expect(
+      refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe(true);
+    expect(versions(fetcher)).toEqual([2]);
+    expect(changed).toHaveBeenCalledOnce();
+    expect(hide).toHaveBeenCalled();
+    const after = await held(fixture);
+    expect(after.authorization?.lock).toBe("revoked");
+    expect(after.bundle).toBeUndefined();
+    expect(after.assets).toBe(0);
+    close(fixture);
+  });
+
+  it("purges and broadcasts a denial on the outdated copy's delivery", async () => {
+    const hide = vi.fn();
+    const fixture = await downloaded(hide);
+    hide.mockClear();
+    const changed = vi.spyOn(fixture.coordinator, "changed");
+    const grant = permissionServer("granted", {
+      bundle: { bundleId: NEXT_BUNDLE, manifestSha256: NEXT.manifestSha256 },
+    });
+    const deny = permissionServer("denied");
+    const fetcher = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) =>
+        JSON.parse(String(init?.body)).version === 2
+          ? await grant(input, init)
+          : await deny(input, init),
+    );
+    await expect(
+      refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe(true);
+    expect(versions(fetcher)).toEqual([2, 1]);
+    expect(changed).toHaveBeenCalledTimes(2);
+    expect(hide).toHaveBeenCalled();
+    const after = await held(fixture);
+    expect(after.authorization?.lock).toBe("revoked");
+    expect(after.bundle).toBeUndefined();
+    expect(after.assets).toBe(0);
+    close(fixture);
+  });
+
+  it.each([
+    ["a temporary check", () => permissionServer("temporarily-unavailable")],
+    ["a failed check", () => permissionServer("granted", { status: 503 })],
+    [
+      "a check naming the copy under other rendered content",
+      () =>
+        permissionServer("granted", { contentSha256: hash("other content") }),
+    ],
+  ])("sends nothing more after %s", async (name, server) => {
+    const fixture = await downloaded();
+    const before = await held(fixture);
+    const changed = vi.spyOn(fixture.coordinator, "changed");
+    const accept = vi.spyOn(fixture.repository, "acceptPermission");
+    const fetcher = server();
+    await expect(
+      refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe(false);
+    expect(versions(fetcher)).toEqual([2]);
+    // A temporary reply is offered and paused, as today; one inconsistent
+    // with the copy is never offered.
+    if (name.startsWith("a check naming"))
+      expect(accept).not.toHaveBeenCalled();
+    else await expect(accept.mock.results[0].value).resolves.toBe("paused");
+    expect(changed).not.toHaveBeenCalled();
+    expect(await held(fixture)).toEqual(before);
+    close(fixture);
+  });
+
+  it("stops after a grant with no bundle to offer", async () => {
+    const fixture = await downloaded();
+    const fetcher = permissionServer("granted", { bundle: null });
+    await expect(
+      refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe(true);
+    expect(versions(fetcher)).toEqual([2]);
+    expect(
+      await fixture.repository.readBundle(fixture.account, RITUAL),
+    ).toMatchObject({ bundleId: BUNDLE });
+    close(fixture);
+  });
+
+  it("reports an interruption before the check's reply is accepted", async () => {
+    const fixture = await downloaded();
+    const before = await held(fixture);
+    const started = deferred<void>();
+    const interrupted = vi.fn();
+    const fetcher = vi.fn(
+      async (_input: RequestInfo | URL, init?: RequestInit) =>
+        await new Promise<Response>((_resolve, reject) => {
+          started.resolve();
+          init?.signal?.addEventListener("abort", () =>
+            reject(new DOMException("Aborted", "AbortError")),
+          );
+        }),
+    );
+    const pending = refreshOfflineRitual(
+      fixture.runtime,
+      fixture.registration,
+      RITUAL,
+      { fetcher: fetcher as typeof fetch, onInterrupted: interrupted },
+    );
+    await started.promise;
+    await fixture.coordinator.changed();
+    await expect(pending).resolves.toBe(false);
+    expect(versions(fetcher)).toEqual([2]);
+    expect(interrupted).toHaveBeenCalledOnce();
+    expect(await held(fixture)).toEqual(before);
+    close(fixture);
+  });
+
+  it("reports an interruption of the outdated copy's delivery", async () => {
+    const fixture = await downloaded();
+    const started = deferred<void>();
+    const interrupted = vi.fn();
+    const grant = permissionServer("granted", {
+      bundle: { bundleId: NEXT_BUNDLE, manifestSha256: NEXT.manifestSha256 },
+    });
+    const fetcher = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) =>
+        JSON.parse(String(init?.body)).version === 2
+          ? await grant(input, init)
+          : await new Promise<Response>((_resolve, reject) => {
+              started.resolve();
+              init?.signal?.addEventListener("abort", () =>
+                reject(new DOMException("Aborted", "AbortError")),
+              );
+            }),
+    );
+    const pending = refreshOfflineRitual(
+      fixture.runtime,
+      fixture.registration,
+      RITUAL,
+      { fetcher: fetcher as typeof fetch, onInterrupted: interrupted },
+    );
+    await started.promise;
+    expect(interrupted).not.toHaveBeenCalled();
+    await fixture.coordinator.changed();
+    await expect(pending).resolves.toBe(false);
+    expect(versions(fetcher)).toEqual([2, 1]);
+    expect(interrupted).toHaveBeenCalledOnce();
+    // The check's grant was accepted; the stale copy stays for the retry.
+    expect(
+      await fixture.repository.readBundle(fixture.account, RITUAL),
+    ).toMatchObject({ bundleId: BUNDLE });
+    close(fixture);
+  });
+
+  it("reports an interruption when the outdated copy's delivery cannot start", async () => {
+    const fixture = await downloaded();
+    const interrupted = vi.fn();
+    let calls = 0;
+    const registration = {
+      beginPermissionCheck() {
+        return ++calls === 1
+          ? fixture.registration.beginPermissionCheck()
+          : null;
+      },
+    };
+    const fetcher = transport(NEXT);
+    await expect(
+      refreshOfflineRitual(fixture.runtime, registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+        onInterrupted: interrupted,
+      }),
+    ).resolves.toBe(false);
+    expect(calls).toBe(2);
+    expect(versions(fetcher)).toEqual([2]);
+    expect(interrupted).toHaveBeenCalledOnce();
+    close(fixture);
+  });
+
+  it("falls back to v1 on an old server and renews a current copy", async () => {
+    const fixture = await downloaded();
+    const current = permissionServer("granted");
+    const fetcher = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) =>
+        JSON.parse(String(init?.body)).version === 2
+          ? jsonResponse('{"error":"invalid-request"}', 400)
+          : await current(input, init),
+    );
+    await expect(
+      refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe(true);
+    expect(versions(fetcher)).toEqual([2, 1]);
+    expect(
+      (await fixture.repository.runtimeState([RITUAL])).resources[0],
+    ).toMatchObject({ leaseId: LATER_LEASE, bundleLeaseId: LATER_LEASE });
+
+    // The page now knows the server lacks v2.
+    await expect(
+      refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe(true);
+    expect(versions(fetcher)).toEqual([2, 1, 1]);
+    close(fixture);
+  });
+});
+
+/** A server that predates version 2; `state.serve` answers everything else. */
+function oldServer(state: {
+  serve: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+}) {
+  return vi.fn(async (input: RequestInfo | URL, init?: RequestInit) =>
+    String(input) === "/api/rituals/permission" &&
+    JSON.parse(String(init?.body)).version === 2
+      ? jsonResponse('{"error":"invalid-request"}', 400)
+      : await state.serve(input, init),
+  );
+}
+
+describe("the reader during version skew", () => {
+  it("installs an outdated copy from the fallback's one delivery", async () => {
+    const fixture = await downloaded();
+    const changed = vi.spyOn(fixture.coordinator, "changed");
+    const fetcher = oldServer({ serve: transport(NEXT) });
+    await expect(
+      refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe(true);
+    expect(versions(fetcher)).toEqual([2, 1]);
+    expect(fetcher.mock.calls.map(([input]) => String(input))).toEqual([
+      "/api/rituals/permission",
+      "/api/rituals/permission",
+      `/api/rituals/assets/${RITUAL}/${NEXT_BUNDLE}/${ASSET}`,
+    ]);
+    const [check, retry] = fetcher.mock.calls
+      .slice(0, 2)
+      .map(([, init]) => JSON.parse(String(init?.body)));
+    expect(retry.requestId).toBe(check.requestId);
+    // Once for the grant, once for the install.
+    expect(changed).toHaveBeenCalledTimes(2);
+    expect(
+      await fixture.repository.readBundle(fixture.account, RITUAL),
+    ).toMatchObject({ bundleId: NEXT_BUNDLE, title: NEXT.manifest.title });
+    close(fixture);
+  });
+
+  it("installs an outdated copy with one v1 request once the page knows", async () => {
+    const fixture = await downloaded();
+    const state = { serve: permissionServer("granted") };
+    const fetcher = oldServer(state);
+    await expect(
+      refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe(true);
+    expect(versions(fetcher)).toEqual([2, 1]);
+
+    fetcher.mockClear();
+    state.serve = transport(NEXT);
+    await expect(
+      refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe(true);
+    expect(fetcher.mock.calls.map(([input]) => String(input))).toEqual([
+      "/api/rituals/permission",
+      `/api/rituals/assets/${RITUAL}/${NEXT_BUNDLE}/${ASSET}`,
+    ]);
+    expect(versions(fetcher)).toEqual([1]);
+    expect(
+      await fixture.repository.readBundle(fixture.account, RITUAL),
+    ).toMatchObject({ bundleId: NEXT_BUNDLE });
+    close(fixture);
+  });
+
+  it("renews a current copy with one v1 request once the page knows", async () => {
+    const fixture = await downloaded();
+    const state = { serve: permissionServer("granted") };
+    const fetcher = oldServer(state);
+    await refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+      fetcher: fetcher as typeof fetch,
+    });
+    expect(versions(fetcher)).toEqual([2, 1]);
+
+    fetcher.mockClear();
+    state.serve = permissionServer("granted", { expiresAtMs: NOW + 50_000 });
+    const install = vi.spyOn(fixture.repository, "installBundle");
+    await expect(
+      refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe(true);
+    expect(fetcher).toHaveBeenCalledOnce();
+    expect(versions(fetcher)).toEqual([1]);
+    expect(install).not.toHaveBeenCalled();
+    expect((await held(fixture)).bundle?.authorization.grant).toMatchObject({
+      expiresAtMs: NOW + 50_000,
+    });
+    close(fixture);
+  });
+
+  it("purges and broadcasts a denial in the fallback's v1 reply", async () => {
+    const hide = vi.fn();
+    const fixture = await downloaded(hide);
+    hide.mockClear();
+    const changed = vi.spyOn(fixture.coordinator, "changed");
+    const fetcher = oldServer({ serve: permissionServer("denied") });
+    await expect(
+      refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe(true);
+    expect(versions(fetcher)).toEqual([2, 1]);
+    expect(changed).toHaveBeenCalledOnce();
+    expect(hide).toHaveBeenCalled();
+    const after = await held(fixture);
+    expect(after.authorization?.lock).toBe("revoked");
+    expect(after.bundle).toBeUndefined();
+    expect(after.assets).toBe(0);
+    close(fixture);
+  });
+});
+
+describe("an expired copy", () => {
+  it("is purged by the recheck, which sends v2 and records no binding", async () => {
+    const fixture = await downloaded();
+    fixture.clock.now = NOW + 10_000;
+    const fetcher = permissionServer("granted");
+    await expect(
+      recheckOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+        now: () => NOW + OFFLINE_RECHECK_INTERVAL_MS,
+      }),
+    ).resolves.toBe("granted");
+    expect(versions(fetcher)).toEqual([2]);
+    const after = await held(fixture);
+    expect(after.bundle).toBeUndefined();
+    expect(after.assets).toBe(0);
+    expect(after.authorization?.grant?.leaseId).toBe(LATER_LEASE);
+    expect(
+      await fixture.database.checks.get([OWNER, RITUAL]),
+    ).not.toHaveProperty("bundleId");
+    close(fixture);
+  });
+
+  it("is purged by the reader, which goes straight to v1", async () => {
+    const fixture = await downloaded();
+    fixture.clock.now = NOW + 10_000;
+    const read = vi.spyOn(fixture.repository, "readBundle");
+    const fetcher = transport();
+    await expect(
+      refreshOfflineRitual(fixture.runtime, fixture.registration, RITUAL, {
+        fetcher: fetcher as typeof fetch,
+      }),
+    ).resolves.toBe(true);
+    await expect(read.mock.results[0].value).resolves.toBeNull();
+    expect(versions(fetcher)).toEqual([1]);
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(
+      await fixture.repository.readBundle(fixture.account, RITUAL),
+    ).toMatchObject({ bundleId: BUNDLE });
+    close(fixture);
+  });
 });

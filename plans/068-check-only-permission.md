@@ -3,7 +3,8 @@
 Status: planned on `gate/check-only-recheck` from `main` at 951eff85.
 Adversarially reviewed (Fable) and revised the same day, then Gadi's
 answers folded in as decisions 4 to 6; see "Review, 1 November 2026" at
-the end. Nothing built. Read [current status](000-current-status.md),
+the end. Built on 2 November 2026 on the same branch, awaiting release;
+see "The build" and "The code review" at the end. Read [current status](000-current-status.md),
 [plan 006](006-private-offline.md) (the offline lease) and
 [plan 065](065-ritual-deletion.md#the-code-review-1-november-2026)
 (item 3, which deferred this) first.
@@ -273,15 +274,24 @@ change to the server's database load (risk 5).
 `refreshOfflineRitual` reads the stored copy first.
 
 - **No copy:** today's flow, unchanged (full v1 delivery and install).
-- **A copy:** a check, with the route alias, through the same permission
-  operation. The reply is accepted and broadcast as today, so a denial
-  closes every tab before anything else.
+- **A copy:** a check, with the route alias, through the reader's
+  permission operation. The reply is accepted and broadcast as today, so
+  a denial closes every tab before anything else.
   - Granted, same identity and content hash (row 2 of section 4): done;
     returns true. The alias joins the copy's `routeAliases` through
     `acceptPermission`, as today.
   - Same identity, content hash differs (row 3): temporary; stop.
   - Granted, different identity: a second `beginCheck` and today's full
-    flow (delivery, assets, install) within the same operation.
+    flow (delivery, assets, install) under a **fresh permission
+    operation** from the same registration, checked for the same owner
+    and epoch. As planned, this said "within the same operation", which
+    cannot work: the check's broadcast (`coordinator.changed()`)
+    invalidates and aborts every permission operation
+    (`lifecycle.ts:279`), this one included. If no fresh operation can
+    start, `onInterrupted` fires and the refresh returns false.
+  - When the check itself fell back to a v1 delivery (an older server),
+    that verified delivery is used directly under the same pending
+    check, as today; no second request is sent.
   - Granted with no bundle (rendering temporarily unavailable),
     temporary, or not accepted: stop, as today.
 - `onInterrupted` fires on an abort before the check's reply is accepted
@@ -412,6 +422,10 @@ review, then a Fable review of the final tree.
    retry, which also fails, changes no state and does not set the flag.
 4. **The reader adds a round trip when the copy is out of date.** Only
    when the ritual changed. The common case saves the whole manifest.
+   That open also broadcasts three times instead of two (the check's
+   grant, the delivery's grant, the install), so other tabs' views are
+   hidden and restored once more. The current-copy open still broadcasts
+   once, as before.
 5. **Server database load is unchanged.** Each check still reads and
    decodes the manifest from Postgres, which is why the interval stays
    at 6 hours (decision 4). A cheaper server read is a possible later
@@ -458,3 +472,87 @@ The reviewer confirmed that no spike is needed. An older server answers
 a v2 body with 400 before `checkPermission` (`ritualHttp.ts:99`), and
 the route is never cached: Serwist's runtime routes match GET by
 default, and the private routes are `NetworkOnly`.
+
+## The build, 2 November 2026
+
+Built on `gate/check-only-recheck` by Opus 5.5 subagents at high, in two
+steps (the server's commits 2 and 3, then the client's commit 4), with
+the orchestrator checking each report against the code.
+
+| # | Commit | Notes |
+| --- | --- | --- |
+| 1 | 81c18157 | this plan |
+| 2 | 2f364557 | the golden lives in `ritualHttpV1Golden.integration.test.ts` and `ritualHttpV1Golden.json` |
+| 3 | 4eca95f7 | server dispatch and `ritualCheckContract.ts` |
+| 4 | the commit carrying this record | client, review fixes, plan 000 |
+
+- **The golden** mocks `createUuidV7` with a counter, reset before
+  seeding and again before each case, so lease IDs do not depend on test
+  order. It fixes the clock and builds its fixture without images, so the
+  bytes do not depend on image encoding. It records status, every header
+  and the exact body for a grant with a bundle, a route alias, an
+  unavailable rendering, a denial, a signed-out request, and four
+  invalid requests. It was recorded twice against the untouched handler
+  with identical output, and a one-byte change makes it fail.
+- **Malformed JSON gets 503, not 400**, as it always has (`JSON.parse`
+  throws inside the handler's `try`). The golden records this. An older
+  server answers a malformed v2 body the same way, so the fallback rule
+  is unaffected.
+- **The reply parser takes the v1 request** (as `parseRitualDeliveryResponse`
+  does), because the inner permission is bound to v1. The client keeps
+  the v1 request and sends `{ ...request, version: 2 }`.
+- **Deviation:** the outdated copy's delivery runs under a fresh
+  permission operation (section 6), because the check's broadcast aborts
+  every operation.
+- **The recheck and the reader now call `readBundle` before the
+  request.** Its access check purges a copy whose lease has expired, so
+  such a copy is purged before the request instead of possibly being
+  renewed by it. This follows the rule that every protected read is
+  gated, and changes almost nothing in practice: the catalog's load, the
+  reader's load and the lifecycle's state refresh already read and purge
+  before any recheck can run.
+- **Gates:** `main` at 951eff85 and each commit passed the full clean
+  gate in a throwaway worktree on `/home` with Node 24 and CI's
+  placeholder environment: frozen install, `loom init`, `loom check`,
+  `loom check --production`, `pnpm check`, `typecheck`, `test:coverage`,
+  `build`, the `magick-data` smoke test, the Turbopack build, the
+  compiler-identity diff and a clean tree. `ritualCheckContract.ts`
+  joined the coverage list at 100%.
+- No browser check against a real older and newer server pair; the four
+  version combinations are covered by unit and integration tests.
+
+## The code review, 2 November 2026
+
+Opus 5.5 (high) and Fable 5.1 (high) reviewed `951eff85..` in fresh
+contexts, independently. Neither found anything blocking. Both judged
+the fresh-operation deviation correct and necessary. The fixes are
+folded into commit 4.
+
+**Should fix (both reviewers):**
+
+1. **Two manifests per refresh during skew.** With an older server, the
+   check's v1 fallback verified the full manifest and threw it away, and
+   the reader's outdated branch then fetched it again: twice today's
+   cost, against the compatibility table's promise. The check now hands
+   back the verified delivery when it came from v1, and the reader runs
+   today's flow on it directly.
+2. **This plan was stale** on section 6 (Opus); corrected above.
+
+**Minor (folded in):** tests pin the `readBundle`-first behaviour for an
+expired copy (the recheck purges and sends v2 with no binding; the reader
+purges and goes straight to v1); `checkBinding`'s grant and rendering
+tests, which the parsers already guarantee, are kept as defence in depth
+with a comment; risk 4 records the third broadcast on an outdated open.
+
+**Noted, not changed:**
+
+- The golden pins only the creator's grant (`sourceEdit: true`). A
+  member's grant is covered by the v1/v2 equivalence test, not
+  byte-pinned. Adding one would mean re-recording against the
+  pre-change handler, and the permission object comes from the
+  untouched checker.
+- `refreshOfflineRitual`'s owner comparison cannot fail (the parser binds
+  the owner to the request); it is inherited from the v1 code.
+- `resetRitualCheckSupportForTests` is exported from a client module.
+- Once set, the fallback flag stays until the page reloads, even if the
+  server rolls forward meanwhile (accepted with decision 6).

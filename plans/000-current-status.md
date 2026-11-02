@@ -592,13 +592,13 @@ Follow-ups are separate from the completed migration work:
   production back past this release**
   without first purging what should go: the older code shows every
   soft-deleted ritual again and stops purging (plan 065, risk 12).
-- TODO: a check-only mode for `/api/rituals/permission`, so the
-  Downloaded rituals recheck stops receiving each ritual's rendered
-  descriptor (up to 16 MB) with every grant
-  ([plan 065](065-ritual-deletion.md#the-code-review-1-november-2026)).
-  Planned on 1 November 2026 on `gate/check-only-recheck`, not yet
-  built: a version 2 check request for the recheck and the reader's
-  refresh, with version 1 unchanged
+- 2 November 2026, on `gate/check-only-recheck`, awaiting release: a
+  check-only mode for `/api/rituals/permission`. The Downloaded rituals
+  recheck and the reader's refresh send a version 2 check, which returns
+  the permission and the bundle's identity without the manifest (up to
+  16 MB); the reader asks for the full version 1 delivery only when its
+  copy is out of date or missing, and a server without version 2 gets
+  one version 1 retry. Version 1 is unchanged
   ([plan 068](068-check-only-permission.md)).
 - 1 November 2026, on `gate/mui-colour-status`, awaiting release: fifteen
   `Typography` colours that MUI 9 silently dropped are restored. Palette

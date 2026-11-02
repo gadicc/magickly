@@ -10,12 +10,19 @@ import {
   type RitualBundleManifestV1,
 } from "./ritualBundleManifest";
 import {
+  type AcceptedRitualPermissionCheck,
+  parseRitualPermissionCheckResponse,
+} from "./ritualCheckContract";
+import {
   type AcceptedRitualDelivery,
   parseRitualDeliveryResponse,
 } from "./ritualDeliveryContract";
 
 const DELIVERY_PATH = "/api/rituals/permission";
 const MAX_DELIVERY_BYTES = 17 * 1024 * 1024;
+const MAX_CHECK_BYTES = 64 * 1024;
+/** What a server that predates version 2 answers a v2 body with. */
+const INVALID_REQUEST_BODY = '{"error":"invalid-request"}';
 
 function noStore(response: Response): boolean {
   return (
@@ -70,6 +77,39 @@ async function boundedText(response: Response, limit: number): Promise<string> {
   return new TextDecoder("utf-8", { fatal: true }).decode(body);
 }
 
+/** POST one permission body; `exact` holds the same-origin, uncached JSON rules. */
+async function postPermission(
+  body: object,
+  signal: AbortSignal,
+  fetcher: typeof fetch,
+  routeAlias: string | null,
+): Promise<{ response: Response; exact: boolean }> {
+  const response = await fetcher(DELIVERY_PATH, {
+    method: "POST",
+    credentials: "same-origin",
+    redirect: "error",
+    cache: "no-store",
+    signal,
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      ...(routeAlias ? { "X-Magickli-Ritual-Alias": routeAlias } : {}),
+    },
+    body: JSON.stringify(body),
+  });
+  const mediaType = response.headers
+    .get("content-type")
+    ?.split(";", 1)[0]
+    .trim()
+    .toLowerCase();
+  return {
+    response,
+    exact:
+      exactResponse(response, DELIVERY_PATH) &&
+      mediaType === "application/json",
+  };
+}
+
 /** Fetch and validate the one permission/manifest envelope; failures do not revoke. */
 export async function fetchRitualDelivery(
   request: RitualPermissionRequestV1,
@@ -80,27 +120,12 @@ export async function fetchRitualDelivery(
   const input = parseRitualPermissionRequest(request);
   if (!input) return null;
   try {
-    const response = await fetcher(DELIVERY_PATH, {
-      method: "POST",
-      credentials: "same-origin",
-      redirect: "error",
-      cache: "no-store",
+    const { response, exact } = await postPermission(
+      input,
       signal,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        ...(routeAlias ? { "X-Magickli-Ritual-Alias": routeAlias } : {}),
-      },
-      body: JSON.stringify(input),
-    });
-    const mediaType = response.headers
-      .get("content-type")
-      ?.split(";", 1)[0]
-      .trim()
-      .toLowerCase();
-    const exact =
-      exactResponse(response, DELIVERY_PATH) &&
-      mediaType === "application/json";
+      fetcher,
+      routeAlias,
+    );
     const body = exact
       ? JSON.parse(await boundedText(response, MAX_DELIVERY_BYTES))
       : null;
@@ -116,6 +141,127 @@ export async function fetchRitualDelivery(
     );
   } catch {
     return parseRitualDeliveryResponse(
+      input,
+      null,
+      {
+        status: 0,
+        sameOrigin: false,
+        uncached: false,
+      },
+      routeAlias,
+    );
+  }
+}
+
+/**
+ * Set for the page's lifetime once a server answered a v2 check with
+ * `invalid-request` and the v1 retry with a reply that parsed, so later
+ * checks go straight to v1 and a round of rechecks pays one request per
+ * ritual.
+ */
+let checkUnsupported = false;
+
+/** Test-only: forget that the server lacked version 2 checks. */
+export function resetRitualCheckSupportForTests(): void {
+  checkUnsupported = false;
+}
+
+/**
+ * A check result. After a fallback to v1 it also carries that verified
+ * delivery, so a caller that needs the manifest does not fetch it again;
+ * `bundle` is still the identity alone.
+ */
+export interface RitualCheckResult extends AcceptedRitualPermissionCheck {
+  delivery?: AcceptedRitualDelivery;
+}
+
+/**
+ * A v1 delivery as a check result. Its identity was verified against the
+ * manifest bytes, but `bundle` is kept only as the fallback's result.
+ */
+async function checkByDelivery(
+  input: RitualPermissionRequestV1,
+  signal: AbortSignal,
+  fetcher: typeof fetch,
+  routeAlias: string | null,
+): Promise<RitualCheckResult | null> {
+  const delivery = await fetchRitualDelivery(
+    input,
+    signal,
+    fetcher,
+    routeAlias,
+  );
+  if (!delivery) return null;
+  return {
+    routeAlias: delivery.routeAlias,
+    permission: delivery.permission,
+    bundle: delivery.bundle
+      ? {
+          bundleId: delivery.bundle.bundleId,
+          manifestSha256: delivery.bundle.manifestSha256,
+        }
+      : null,
+    delivery,
+  };
+}
+
+/**
+ * Fetch the permission and the current bundle's identity without its
+ * manifest (a version 2 check); failures do not revoke. `request` is the v1
+ * request the check stands for, which the inner permission is bound to.
+ *
+ * A server that predates version 2 answers exactly 400 `invalid-request`;
+ * only then is the v1 request sent once, with the same request ID. Its
+ * reply comes back as `delivery` beside the permission and identity. The
+ * identity is never proof of manifest bytes the caller holds.
+ */
+export async function fetchRitualCheck(
+  request: RitualPermissionRequestV1,
+  signal: AbortSignal,
+  fetcher: typeof fetch = fetch,
+  routeAlias: string | null = null,
+): Promise<RitualCheckResult | null> {
+  const input = parseRitualPermissionRequest(request);
+  if (!input) return null;
+  if (checkUnsupported)
+    return checkByDelivery(input, signal, fetcher, routeAlias);
+  try {
+    const { response, exact } = await postPermission(
+      { ...input, version: 2 },
+      signal,
+      fetcher,
+      routeAlias,
+    );
+    const text = exact ? await boundedText(response, MAX_CHECK_BYTES) : null;
+    if (
+      response.status === 400 &&
+      text === INVALID_REQUEST_BODY &&
+      !signal.aborted
+    ) {
+      const fallback = await checkByDelivery(
+        input,
+        signal,
+        fetcher,
+        routeAlias,
+      );
+      // Only a parsed v1 reply proves the server lacks v2. A new server's
+      // genuine 400, such as an alias mismatch, fails the retry as well.
+      if (fallback && fallback.permission.kind !== "temporarily-unavailable")
+        checkUnsupported = true;
+      return fallback;
+    }
+    return parseRitualPermissionCheckResponse(
+      input,
+      text === null ? null : JSON.parse(text),
+      {
+        status: response.status,
+        sameOrigin: exact,
+        uncached: exact,
+      },
+      routeAlias,
+    );
+  } catch {
+    return parseRitualPermissionCheckResponse(
       input,
       null,
       {
