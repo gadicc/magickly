@@ -1,6 +1,6 @@
 # Modernization status
 
-Updated 1 November 2026. This page supersedes older pending-acceptance notes;
+Updated 2 November 2026. This page supersedes older pending-acceptance notes;
 the [closeout checkpoint](025-pause-checkpoint.md) records preservation and
 continuation boundaries.
 
@@ -583,10 +583,13 @@ Follow-ups are separate from the completed migration work:
   on; `CRON_SECRET` is in Vercel Production (31 October 2026). Gadi
   skipped both spikes (no Vercel cron rehearsal, no preview-bucket
   delete). Built on 1 November 2026 on the same branch and released that
-  day (run 41293750989), commits 3 and 4 in one push. TODO: spike 1(d),
-  the first nightly cron run (03:17 UTC, so first on 2 November 2026)
-  checked in the dashboard and the heartbeat, which is the cron's only
-  test. **Never roll production back past this release**
+  day (run 41293750989), commits 3 and 4 in one push. Spike 1(d), the
+  cron's only test, passed: the first nightly run, on 2 November 2026 at
+  03:17:25 UTC, reached deployment `dpl_E3tWBJUHYdHzcqLRoQkbzpUmEwrx`
+  and returned 200 with no `purge` log line, so nothing was purged,
+  deferred or failed (plan 065, "The first nightly run"). Gadi has still
+  to see its heartbeat line on Recently deleted. **Never roll
+  production back past this release**
   without first purging what should go: the older code shows every
   soft-deleted ritual again and stops purging (plan 065, risk 12).
 - TODO: a check-only mode for `/api/rituals/permission`, so the

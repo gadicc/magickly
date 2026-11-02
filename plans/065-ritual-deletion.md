@@ -5,7 +5,8 @@ Adversarially reviewed (Fable) and revised the same day, then Gadi's
 answers to the open questions folded in, including the two spike
 questions (no rehearsal, no preview-bucket test); see "Review, 31 October
 2026" and "Owner answers, 31 October 2026" at the end. Built on 1
-November 2026; see "The build" at the end. Read
+November 2026; see "The build" at the end. Its first nightly run
+passed on 2 November 2026; see "The first nightly run". Read
 [current status](000-current-status.md),
 [plan 057](057-temple-administration.md) (access, removal, the creator
 gap) and [plan 006](006-private-offline.md) (the offline lease) first.
@@ -1440,7 +1441,8 @@ does too, except its tests.
 **Before the build:** nothing. Gadi chose 1(d) as the test instead of the
 1(c) rehearsal, and skipped 2(b), the preview-bucket delete, relying on
 the purge's fail-safe. `CRON_SECRET` is already in Vercel Production.
-**After the merge:** 1(d), required: it is the cron's only test.
+**After the merge:** 1(d), required: it is the cron's only test. It
+passed on 2 November 2026; see "The first nightly run" at the end.
 
 ## Risks
 
@@ -1809,3 +1811,27 @@ anything blocking. The fixes are folded into the commits they belong to.
   themselves safe.
 - "Within a day" can be about 24.5 hours (§5, Sizing).
 
+## The first nightly run, 2 November 2026
+
+Spike 1(d), checked read-only from the Vercel CLI (`vercel logs`,
+`vercel inspect`) at 07:37 UTC:
+
+- **It ran:** `GET /api/cron/purge-deleted-rituals` at 03:17:25 UTC on
+  `magickly-qwdv13949-wastelands.vercel.app`, the production deployment
+  `dpl_E3tWBJUHYdHzcqLRoQkbzpUmEwrx` (created 09:48 UTC on 1 November),
+  request `cbgdx-1793589445111-4d24b426cc50`. Vercel called the
+  deployment's own URL, so the SSO protection on the
+  `magickly-wastelands.vercel.app` alias was not in the way.
+- **It returned 200.** The route answers 200 only after
+  `runRitualPurgeJob` has written both halves of the `cron_runs`
+  heartbeat (§5), so the row holds this run, finished.
+- **Counts:** Vercel does not log the reply's body, and the request
+  logged no line at all. Every purged, deferred or failed ritual logs a
+  `purge <id>:` line and a failed run logs `purge-deleted-rituals: run
+  failed`, so purged, deferred and failed were 0 and the heartbeat's
+  outcome is `ok`. `due` is not visible; it was 0 unless a due ritual
+  was skipped, which logs nothing, and none was due this soon after
+  the release (1(d)).
+- **Not yet seen:** the heartbeat line ("Nightly removal last ran …
+  (ok)") on `/gd/rituals/deleted`, which needs a global administrator's
+  sign-in. Gadi looks.
