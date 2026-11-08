@@ -11,11 +11,20 @@ import type {
 } from "./ritualPublicationContract";
 
 /** Persist the fence before attempting purge; authentication never clears cleanupPending. */
-export interface DeviceState {
+export interface ActiveDeviceState {
   key: "active";
   account: OfflineAccount | null;
   cleanupOwnerId: string | null;
 }
+/**
+ * The temple tab `/gd/halls` last showed an account (plan 069, decision 7),
+ * by temple slug. Deleted with the account's other stores on sign-out.
+ */
+export interface HallsTabDeviceState {
+  key: `hallsTab:${string}`;
+  slug: string;
+}
+export type DeviceState = ActiveDeviceState | HallsTabDeviceState;
 export interface StoredCheck extends PendingPermissionCheck {
   /** Set only after an accepted grant; independent of complete rendered output. */
   acceptedLeaseId?: string;

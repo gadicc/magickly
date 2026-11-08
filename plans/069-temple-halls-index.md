@@ -326,6 +326,16 @@ drawn inside a closed `<details>`; stage 2).
     hid every view in the tab 11 times and a reader in another tab 10
     times; a prototype deferring the grants' broadcast, 4 and 3, of
     which opening a tab alone causes 1.
+  - As built (stage 3b, after Fable's review): a grant is deferred only
+    when the device held nothing for that ritual (no authorization,
+    copy or source snapshot), checked inside the transaction that
+    accepts it, so nothing on any tab can be a downgrade; every other
+    reply is told at once. Deferred grants are flushed by one broadcast
+    at most every 2 seconds and at the end, so the first cards fill
+    first without a hide per ritual. A round is pinned to the account
+    and epoch it started under and stops on a change. Accepted limit:
+    another tab's reader opening the same ritual during a round may
+    show it as unavailable until the next flush.
   - **Retry when interrupted**, as the reader does (`onInterrupted`):
     the round's first fetch was interrupted in every spike run, by the
     tab's own start-up.

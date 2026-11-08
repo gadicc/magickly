@@ -25,6 +25,7 @@ import type {
   OfflineRuntimeState,
 } from "./runtimeState";
 import type {
+  ActiveDeviceState,
   DraftInput,
   OfflineDraft,
   OutboxRow,
@@ -415,6 +416,21 @@ export interface AcceptedSourceBinding {
  * App-specific ritual repository. No network, UI, timers, legacy migration or whole-DB deletion.
  * Every data operation rechecks persisted epoch/lease within its IndexedDB transaction.
  */
+const hallsTabKey = (ownerId: string) => `hallsTab:${ownerId}` as const;
+/**
+ * A temple slug by the server's rules: what src/temples/sql.ts accepts as a
+ * slug (validText(slug, 200), no "/") and the schema's non-blank check
+ * (temples_slug_nonempty).
+ */
+const hallsTabSlug = (value: unknown): value is string =>
+  typeof value === "string" &&
+  value.length > 0 &&
+  value.length <= 200 &&
+  !value.includes("\0") &&
+  value.isWellFormed() &&
+  !value.includes("/") &&
+  value.trim().length > 0;
+
 export class OfflineRitualRepository {
   constructor(
     private readonly db: RitualOfflineDatabase,
@@ -424,9 +440,14 @@ export class OfflineRitualRepository {
   private transaction<T>(work: () => Promise<T>): Promise<T> {
     return this.db.transaction("rw", this.db.tables, work);
   }
+  /** The `active` record; the device table also holds per-account settings. */
+  private async activeDevice(): Promise<ActiveDeviceState | undefined> {
+    const state = await this.db.device.get("active");
+    return state?.key === "active" ? state : undefined;
+  }
   private async account(expected: OfflineAccount): Promise<OfflineAccount> {
     requireValue(id(expected.ownerId) && id(expected.epoch), "ACCOUNT");
-    const state = await this.db.device.get("active");
+    const state = await this.activeDevice();
     requireValue(!state?.cleanupOwnerId, "CLEANUP_PENDING");
     requireValue(
       state?.account?.ownerId === expected.ownerId &&
@@ -555,7 +576,7 @@ export class OfflineRitualRepository {
   async activateAccount(ownerId: string): Promise<OfflineAccount> {
     requireValue(id(ownerId), "INVALID");
     return this.transaction(async () => {
-      const state = await this.db.device.get("active");
+      const state = await this.activeDevice();
       requireValue(!state?.cleanupOwnerId, "CLEANUP_PENDING");
       if (state?.account) {
         requireValue(
@@ -591,7 +612,7 @@ export class OfflineRitualRepository {
   /** Explicitly deletes renewable stores only; no whole-database reset or recovery deletion exists. */
   resumeCleanup(): Promise<void> {
     return this.transaction(async () => {
-      const state = await this.db.device.get("active");
+      const state = await this.activeDevice();
       if (!state?.cleanupOwnerId) return;
       const ownerId = state.cleanupOwnerId;
       for (const table of [
@@ -603,11 +624,73 @@ export class OfflineRitualRepository {
       ]) {
         await table.where("ownerId").equals(ownerId).delete();
       }
+      await this.db.device.delete(hallsTabKey(ownerId));
       await this.db.device.put({
         ...state,
         account: null,
         cleanupOwnerId: null,
       });
+    });
+  }
+
+  /**
+   * Whether this device holds anything for the ritual under the active
+   * account's owner: an authorization, a copy or a source snapshot, readable
+   * or not. Read before a bulk fetch's first repository read, which may purge
+   * an unauthorized snapshot; acceptPermission's `observed` checks again.
+   */
+  holdsLocalState(account: OfflineAccount, ritualId: string): Promise<boolean> {
+    account = structuredClone(account);
+    return this.db.transaction(
+      "r",
+      [
+        this.db.device,
+        this.db.authorizations,
+        this.db.bundles,
+        this.db.sources,
+      ],
+      async () => {
+        await this.account(account);
+        requireValue(id(ritualId), "INVALID");
+        const key: [string, string] = [account.ownerId, ritualId];
+        return (
+          (await this.db.authorizations.get(key)) !== undefined ||
+          (await this.db.bundles.get(key)) !== undefined ||
+          (await this.db.sources
+            .where("[ownerId+ritualId]")
+            .equals(key)
+            .count()) > 0
+        );
+      },
+    );
+  }
+
+  /** The temple tab `/gd/halls` last showed the active account, if any. */
+  readHallsTab(account: OfflineAccount): Promise<string | null> {
+    account = structuredClone(account);
+    // Read-only over the device table: the account check reads only it.
+    return this.db.transaction("r", this.db.device, async () => {
+      await this.account(account);
+      const state = await this.db.device.get(hallsTabKey(account.ownerId));
+      return state && "slug" in state && hallsTabSlug(state.slug)
+        ? state.slug
+        : null;
+    });
+  }
+  /** Remember the temple tab for the active account only. */
+  writeHallsTab(account: OfflineAccount, slug: string): Promise<void> {
+    account = structuredClone(account);
+    return this.transaction(async () => {
+      await this.account(account);
+      requireValue(hallsTabSlug(slug), "INVALID");
+      await this.db.device.put({ key: hallsTabKey(account.ownerId), slug });
+    });
+  }
+  clearHallsTab(account: OfflineAccount): Promise<void> {
+    account = structuredClone(account);
+    return this.transaction(async () => {
+      await this.account(account);
+      await this.db.device.delete(hallsTabKey(account.ownerId));
     });
   }
 
@@ -650,24 +733,39 @@ export class OfflineRitualRepository {
    * An omitted bundle binding renews permission/source only. It cannot renew old
    * bundle bytes or authorize installation; supply the ID and manifest digest only
    * for a complete server manifest.
+   *
+   * `observed`, when given, is told whether this device held anything for the
+   * ritual (an authorization, a copy or a source snapshot) when the reply was
+   * accepted, read in the same transaction: a bulk fetch defers a grant's
+   * broadcast only when it held nothing (ritualDownload.ts).
    */
   acceptPermission(
     pending: PendingPermissionCheck,
     reply: PermissionReply,
     bundle?: AcceptedBundleBinding,
     source?: AcceptedSourceBinding,
+    observed?: { priorLocalState: boolean },
   ) {
     pending = structuredClone(pending);
     reply = structuredClone(reply);
     bundle = bundle ? structuredClone(bundle) : undefined;
     source = source ? structuredClone(source) : undefined;
     return this.transaction(async () => {
-      const state = await this.db.device.get("active");
+      const state = await this.activeDevice();
       const current = state?.cleanupOwnerId ? null : (state?.account ?? null);
       const key: [string, string] = [pending.ownerId, pending.ritualId];
       const check = await this.db.checks.get(key);
+      const prior = (await this.db.authorizations.get(key)) ?? null;
+      if (observed)
+        observed.priorLocalState =
+          prior !== null ||
+          (await this.db.bundles.get(key)) !== undefined ||
+          (await this.db.sources
+            .where("[ownerId+ritualId]")
+            .equals(key)
+            .count()) > 0;
       const result = applyPermissionReply(
-        (await this.db.authorizations.get(key)) ?? null,
+        prior,
         pending,
         reply,
         current,
@@ -823,7 +921,7 @@ export class OfflineRitualRepository {
       requireValue((await sha256(asset.blob)) === entry.sha256, "INCOMPLETE");
     }
     return this.transaction(async () => {
-      const state = await this.db.device.get("active");
+      const state = await this.activeDevice();
       const check = await this.db.checks.get([
         pending.ownerId,
         pending.ritualId,
@@ -881,7 +979,7 @@ export class OfflineRitualRepository {
       "INVALID",
     );
     return this.transaction(async () => {
-      const state = await this.db.device.get("active");
+      const state = await this.activeDevice();
       const check = await this.db.checks.get([
         pending.ownerId,
         pending.ritualId,
@@ -1448,7 +1546,7 @@ export class OfflineRitualRepository {
       ? await sha256(publicationPayloadJson)
       : null;
     return this.transaction(async () => {
-      const state = await this.db.device.get("active");
+      const state = await this.activeDevice();
       if (
         state?.cleanupOwnerId ||
         state?.account?.ownerId !== claim.account.ownerId ||
@@ -1957,7 +2055,7 @@ export class OfflineRitualRepository {
     const result = parseRitualPublicationResult(claim.request, resultValue);
     if (!result) return false;
     return this.transaction(async () => {
-      const state = await this.db.device.get("active");
+      const state = await this.activeDevice();
       if (
         state?.cleanupOwnerId ||
         state?.account?.ownerId !== claim.account.ownerId ||
@@ -2022,7 +2120,7 @@ export class OfflineRitualRepository {
     const requested = [...new Set(ritualIds)];
     requireValue(requested.every(id), "INVALID");
     return this.transaction(async () => {
-      const state = await this.db.device.get("active");
+      const state = await this.activeDevice();
       if (!state?.account || state.cleanupOwnerId)
         return {
           account: null,
