@@ -17,11 +17,16 @@ export interface RitualHall {
   name: string;
   /** The top-level title before the hall (else the first after it). */
   context: string | null;
+  /** The index, among the tree's children, of the context's title. */
+  contextAt: number | null;
   /** The `gdHall` row itself. */
   row: RitualRow;
 }
 
 const childrenOf = (row: RitualRow): readonly RitualRow[] => row.children ?? [];
+
+const titleText = (row: RitualRow) =>
+  row.type === "title" && typeof row.text === "string" ? row.text : null;
 
 function captionOf(hall: RitualRow): string | null {
   for (const child of childrenOf(hall))
@@ -94,19 +99,46 @@ export function ritualHalls(tree: RitualRow): RitualHall[] {
     draw(row);
   });
 
-  const titleText = (row: RitualRow) =>
-    row.type === "title" && typeof row.text === "string" ? row.text : null;
   return found.map(({ row, at }, i) => {
-    let context: string | null = null;
-    for (let index = at; index >= 0 && context === null; index--)
-      context = titleText(top[index]);
-    for (let index = at + 1; index < top.length && context === null; index++)
-      context = titleText(top[index]);
+    let contextAt: number | null = null;
+    for (let index = at; index >= 0 && contextAt === null; index--)
+      if (titleText(top[index]) !== null) contextAt = index;
+    for (let index = at + 1; index < top.length && contextAt === null; index++)
+      if (titleText(top[index]) !== null) contextAt = index;
     return {
       ordinal: i + 1,
       name: captionOf(row) ?? `Hall ${i + 1}`,
-      context,
+      context: contextAt === null ? null : titleText(top[contextAt]),
+      contextAt,
       row,
     };
   });
+}
+
+/** A Table of Contents entry: a top-level title, or a hall under one. */
+export type RitualContentsEntry =
+  | { type: "title"; text: string }
+  | { type: "hall"; hall: RitualHall };
+
+/**
+ * The reader's Table of Contents (plan 069, decision 6): the top-level
+ * titles in order, each followed by the halls whose context it is, so a
+ * hall drawn before the first title is listed under that title. Halls with
+ * no title at all come first.
+ */
+export function ritualContents(
+  tree: RitualRow,
+  halls: readonly RitualHall[],
+): RitualContentsEntry[] {
+  const hallsAt = (at: number | null) =>
+    halls
+      .filter((hall) => hall.contextAt === at)
+      .map((hall) => ({ type: "hall" as const, hall }));
+  const entries: RitualContentsEntry[] = hallsAt(null);
+  childrenOf(tree).forEach((row, index) => {
+    const text = titleText(row);
+    if (text === null) return;
+    entries.push({ type: "title", text }, ...hallsAt(index));
+  });
+  return entries;
 }

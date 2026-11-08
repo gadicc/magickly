@@ -15,6 +15,7 @@ import {
   Remove as RemoveIcon,
   ZoomIn as ZoomInIcon,
 } from "@mui/icons-material";
+import GridOnIcon from "@mui/icons-material/GridOn";
 import {
   Box,
   FormControl,
@@ -29,15 +30,35 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 import { Render } from "@/doc/blocks";
 
 import DocContext from "@/doc/context";
-import { type RitualRow, ritualHalls } from "@/doc/ritualHalls";
+import { focusHall, revealHall } from "@/doc/revealHall";
+import {
+  type RitualContentsEntry,
+  type RitualRow,
+  ritualContents,
+  ritualHalls,
+} from "@/doc/ritualHalls";
 import { DocNode } from "@/schemas";
 import "@/../public/fonts/FrankRuehlCLM-stylesheet.css";
 import { roles } from "@/doc/ritualBlocks/roles";
+
+// The halls' sheet and viewer load only for a ritual with halls (plan 069),
+// so other rituals carry no dialog code for them. `loading` gives each its
+// own Suspense boundary: without one, loading would suspend the ritual.
+const nothing = () => null;
+const HallSheet = dynamic(
+  () => import("./HallViewer").then((module) => module.HallSheet),
+  { loading: nothing },
+);
+const HallViewer = dynamic(
+  () => import("./HallViewer").then((module) => module.HallViewer),
+  { loading: nothing },
+);
 
 // Note: make sure not to export anything except the react component
 // in this file, otherwise React Fast Refresh will need to do a
@@ -219,7 +240,17 @@ function ZoomMenu({
   );
 }
 
-function TocMenu({ anchorEl, setAnchorEl, titles, onCloseExtra }) {
+function TocMenu({
+  anchorEl,
+  setAnchorEl,
+  entries,
+  onCloseExtra,
+}: {
+  anchorEl: (EventTarget & HTMLDivElement) | null;
+  setAnchorEl: (anchorEl: null) => void;
+  entries: RitualContentsEntry[];
+  onCloseExtra: (event?: unknown) => void;
+}) {
   return (
     <Menu
       anchorEl={anchorEl}
@@ -260,18 +291,35 @@ function TocMenu({ anchorEl, setAnchorEl, titles, onCloseExtra }) {
         },
       }}
     >
-      {titles.map((title, i) => (
-        <MenuItem
-          key={i}
-          onClick={() => {
-            location.hash = title.replace(/ /g, "_");
-            setAnchorEl(null);
-            onCloseExtra();
-          }}
-        >
-          {title}
-        </MenuItem>
-      ))}
+      {entries.map((entry, i) =>
+        entry.type === "title" ? (
+          <MenuItem
+            // biome-ignore lint/suspicious/noArrayIndexKey: titles may repeat; the list only changes with the ritual
+            key={i}
+            onClick={() => {
+              location.hash = entry.text.replace(/ /g, "_");
+              setAnchorEl(null);
+              onCloseExtra();
+            }}
+          >
+            {entry.text}
+          </MenuItem>
+        ) : (
+          // A hall, under the title it belongs to (plan 069, mock-up D).
+          <MenuItem
+            key={`hall-${entry.hall.ordinal}`}
+            sx={{ pl: 4, color: "primary.main", gap: 1 }}
+            onClick={() => {
+              revealHall(entry.hall.ordinal);
+              setAnchorEl(null);
+              onCloseExtra();
+            }}
+          >
+            <GridOnIcon fontSize="small" aria-hidden="true" />
+            {entry.hall.name}
+          </MenuItem>
+        ),
+      )}
     </Menu>
   );
 }
@@ -386,13 +434,18 @@ export function DocView({
   //const doc = { children: [{ type: "text", value: "hi" }] };
   //const [doc, setDoc] = React.useState(origDoc);
 
-  const titles =
-    doc.children?.filter((c) => c.type === "title").map((b) => b.text) || [];
   // The halls as drawn; their ordinals are the figures' anchors (plan 069).
   const halls = React.useMemo(
     () => (hallNavigation ? ritualHalls(doc as RitualRow) : undefined),
     [doc, hallNavigation],
   );
+  const contents = React.useMemo(
+    () => ritualContents(doc as RitualRow, halls ?? []),
+    [doc, halls],
+  );
+  const [hallSheetOpen, setHallSheetOpen] = React.useState(false);
+  // The index, in `halls`, of the hall in the full-screen viewer.
+  const [viewingHall, setViewingHall] = React.useState<number | null>(null);
 
   type VarDesc = {
     type: "declareVar";
@@ -444,6 +497,15 @@ export function DocView({
   const [nextPos, setNextPos] = React.useState(0);
   const [currentPos, setCurrentPos] = React.useState(0);
   const jumped = React.useRef<number | false>(false);
+  // The hall "Go to it in the ritual" went to, focused once the dialogs
+  // have closed: their own focus restoration runs first, in their effects.
+  const focusAfterClose = React.useRef<number | null>(null);
+  React.useEffect(() => {
+    if (focusAfterClose.current === null) return;
+    if (viewingHall !== null || hallSheetOpen) return;
+    focusHall(focusAfterClose.current);
+    focusAfterClose.current = null;
+  }, [viewingHall, hallSheetOpen]);
 
   React.useEffect(() => {
     function scrollListener(event) {
@@ -534,12 +596,12 @@ export function DocView({
           if (["toggle", "escapeKeyDown"].includes(reason)) setSdOpen(false);
         }}
       >
-        {jumped.current ? (
+        {jumped.current !== false ? (
           <SpeedDialAction
             icon=<ArrowUpwardIcon />
             slotProps={{ tooltip: { title: "Jump Back" } }}
             onClick={() => {
-              if (jumped.current) window.scrollTo(0, jumped.current);
+              if (jumped.current !== false) window.scrollTo(0, jumped.current);
               jumped.current = false;
             }}
           />
@@ -550,6 +612,16 @@ export function DocView({
             onClick={() => {
               jumped.current = window.pageYOffset;
               doc.children?.[nextPos]?.ref?.current?.scrollIntoView(false);
+            }}
+          />
+        )}
+        {halls && halls.length > 0 && (
+          <SpeedDialAction
+            icon=<GridOnIcon />
+            slotProps={{ tooltip: { title: "Halls" } }}
+            onClick={() => {
+              if (halls.length === 1) setViewingHall(0);
+              else setHallSheetOpen(true);
             }}
           />
         )}
@@ -581,8 +653,41 @@ export function DocView({
         anchorEl={tocAnchorEl}
         setAnchorEl={setTocAnchorEl}
         onCloseExtra={() => setSdOpen(false)}
-        titles={titles}
+        entries={contents}
       />
+      {halls && halls.length > 0 && (
+        <>
+          <HallSheet
+            open={hallSheetOpen}
+            halls={halls}
+            onClose={() => {
+              setHallSheetOpen(false);
+              setSdOpen(false);
+            }}
+            onPick={setViewingHall}
+          />
+          <HallViewer
+            halls={halls}
+            index={viewingHall}
+            onIndexChange={setViewingHall}
+            onClose={() => {
+              setViewingHall(null);
+              // Back to the list it was opened from, if any.
+              if (!hallSheetOpen) setSdOpen(false);
+            }}
+            onGoTo={(hall) => {
+              // Armed as Jump to Next arms it, before scrolling; the dialog
+              // closing renders the button as Jump Back.
+              jumped.current = window.pageYOffset;
+              setViewingHall(null);
+              setHallSheetOpen(false);
+              setSdOpen(false);
+              revealHall(hall.ordinal);
+              focusAfterClose.current = hall.ordinal;
+            }}
+          />
+        </>
+      )}
     </>
   );
 }

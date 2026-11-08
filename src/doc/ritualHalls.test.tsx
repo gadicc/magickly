@@ -8,7 +8,7 @@ import { Render } from "./blocks";
 import DocContext from "./context";
 import { prepare } from "./prepare";
 import { roles } from "./ritualBlocks/roles";
-import { type RitualRow, ritualHalls } from "./ritualHalls";
+import { type RitualRow, ritualContents, ritualHalls } from "./ritualHalls";
 
 // The drawing names its hall by caption, so the tests read which hall each
 // figure is, in the order the reader draws them.
@@ -393,5 +393,48 @@ describe("hall anchors", () => {
     expect(ids(view.container)).toEqual([null, null, null]);
     view.rerender(reader(shown, ritualHalls(shown)));
     expect(ids(view.container)).toEqual(["hall-1", "hall-2", "hall-3"]);
+  });
+});
+
+describe("ritualContents", () => {
+  const listed = (tree: RitualRow) =>
+    ritualContents(tree, ritualHalls(tree)).map((entry) =>
+      entry.type === "title" ? entry.text : `  ${entry.hall.name}`,
+    );
+
+  it("lists each hall under its context's title, in drawn order", () => {
+    const tree = doc(
+      note(hall("Before any title")),
+      title("Opening"),
+      note(hall("Opening hall")),
+      title("Advancement"),
+      title("Second part"),
+      note(text("See "), footnote(note(hall("In a footnote")))),
+      note(hall("Second hall")),
+      { type: "footnotes" },
+      title("Closing"),
+    );
+    expect(listed(tree)).toEqual([
+      "Opening",
+      "  Before any title",
+      "  Opening hall",
+      "Advancement",
+      "Second part",
+      "  Second hall",
+      "  In a footnote",
+      "Closing",
+    ]);
+    expect(ritualHalls(tree).map((entry) => entry.contextAt)).toEqual([
+      1, 1, 4, 4,
+    ]);
+  });
+
+  it("lists halls first when there is no title, and titles alone without halls", () => {
+    const tree = doc(note(hall("Alone")), { type: "title", text: 5 });
+    expect(listed(tree)).toEqual(["  Alone"]);
+    expect(
+      ritualContents(doc(title("Only"), note(hall("Not listed"))), []),
+    ).toEqual([{ type: "title", text: "Only" }]);
+    expect(ritualContents({}, [])).toEqual([]);
   });
 });
