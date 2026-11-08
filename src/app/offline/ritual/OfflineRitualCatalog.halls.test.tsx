@@ -57,25 +57,36 @@ const tree = (...halls: [string, string][]) =>
       { type: "note", children: [hall(caption)] },
     ]),
   });
-const BUNDLES: Record<string, { title: string; renderedJson: string }> = {
-  [EQUINOX]: {
-    title: "Equinox Ceremony",
-    renderedJson: tree(["Opening", "Equinox Temple"]),
-  },
-  [ZELATOR]: {
-    title: "1 = 10 Zelator",
-    renderedJson: tree(
-      ["Opening", "Zelator Temple 1"],
-      ["Second Part", "Zelator Temple 2"],
-    ),
-  },
-  [NEOPHYTE]: {
-    title: "0=0 Neophyte",
-    renderedJson: tree(["Opening", "Neophyte Temple"]),
-  },
-  [PLAIN]: { title: "A plain ritual", renderedJson: tree() },
-  [BROKEN]: { title: "A broken copy", renderedJson: "{" },
+type Copy = {
+  title: string;
+  renderedJson: string;
+  bundleId: string;
+  manifestSha256: string;
 };
+const BUNDLES: Record<string, Copy> = Object.fromEntries(
+  Object.entries({
+    [EQUINOX]: {
+      title: "Equinox Ceremony",
+      renderedJson: tree(["Opening", "Equinox Temple"]),
+    },
+    [ZELATOR]: {
+      title: "1 = 10 Zelator",
+      renderedJson: tree(
+        ["Opening", "Zelator Temple 1"],
+        ["Second Part", "Zelator Temple 2"],
+      ),
+    },
+    [NEOPHYTE]: {
+      title: "0=0 Neophyte",
+      renderedJson: tree(["Opening", "Neophyte Temple"]),
+    },
+    [PLAIN]: { title: "A plain ritual", renderedJson: tree() },
+    [BROKEN]: { title: "A broken copy", renderedJson: "{" },
+  }).map(([ritualId, copy]) => [
+    ritualId,
+    { ...copy, bundleId: `bundle-${ritualId}`, manifestSha256: "a".repeat(64) },
+  ]),
+);
 
 type Account = { ownerId: string; epoch: string };
 type State = { phase: "ready"; generation: number; account: Account | null };
@@ -346,6 +357,22 @@ it("keeps a ritual's halls when a re-read finds the same content", async () => {
   );
   await new Promise((done) => setTimeout(done, 10));
   expect(screen.getByText("Neophyte Temple").closest("button")).toBe(card);
+});
+
+it("parses a new copy's halls again", async () => {
+  const fixture = fakeRuntime({ [OWNER]: [NEOPHYTE] });
+  mock.getRuntime.mockReturnValue(fixture.runtime);
+  render(<OfflineRitualCatalog />);
+  await screen.findByText("Neophyte Temple");
+  fixture.runtime.repository.readBundle.mockResolvedValueOnce({
+    ...BUNDLES[NEOPHYTE],
+    renderedJson: tree(["Opening", "Revised Temple"]),
+    bundleId: `bundle-${NEOPHYTE}`,
+    manifestSha256: "b".repeat(64),
+  });
+  act(() => fixture.views.get(NEOPHYTE)?.available());
+  await screen.findByText("Revised Temple");
+  expect(screen.queryByText("Neophyte Temple")).toBeNull();
 });
 
 it("keeps the viewer closed when hidden halls come back", async () => {

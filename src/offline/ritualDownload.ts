@@ -42,13 +42,19 @@ interface PermissionProgress {
   broadcast?: boolean;
   /** What happened, when the reply was accepted or nothing was needed. */
   outcome?: Exclude<OfflineFetchOutcome, "interrupted">;
+  /**
+   * The repository ignored the reply: another tab's check on this ritual
+   * superseded this one. Reported as "interrupted", never "unavailable".
+   */
+  superseded?: boolean;
 }
 
 /**
  * One ritual's result in a bulk fetch: "current" means the device already
  * held the server's bundle, "unavailable" that nothing was accepted or no
  * bundle could be installed, "interrupted" that lifecycle invalidation
- * aborted it before a reply was accepted, so it may be retried.
+ * aborted it, or another tab's check on the ritual superseded it, before a
+ * reply was accepted, so it may be retried.
  */
 export type OfflineFetchOutcome =
   | "downloaded"
@@ -181,7 +187,10 @@ async function applyDelivery(
         delivery.permission,
         binding,
       );
-  if (outcome !== "accepted") return false;
+  if (outcome !== "accepted") {
+    progress.superseded = outcome === "ignored";
+    return false;
+  }
   progress.accepted = true;
   // Deferred only for a grant to a ritual this device held nothing for.
   const deferred =
@@ -388,7 +397,10 @@ export async function refreshOfflineRitual(
       check.permission,
       decision.binding,
     );
-    if (outcome !== "accepted") return false;
+    if (outcome !== "accepted") {
+      progress.superseded = outcome === "ignored";
+      return false;
+    }
     progress.accepted = true;
     await runtime.coordinator.changed();
     progress.broadcast = true;
@@ -436,9 +448,11 @@ export async function refreshOfflineRitual(
     if (!progress.accepted && operation.signal.aborted) interrupted();
     runtime.coordinator.finish(operation);
     if (options.report) {
-      options.report.outcome = wasInterrupted
-        ? "interrupted"
-        : (updated?.outcome ?? progress.outcome ?? "unavailable");
+      // A check another tab superseded may be retried, like an interrupted one.
+      options.report.outcome =
+        wasInterrupted || progress.superseded || updated?.superseded
+          ? "interrupted"
+          : (updated?.outcome ?? progress.outcome ?? "unavailable");
       options.report.broadcastOwed = !!progress.broadcastOwed;
       options.report.broadcast = !!(progress.broadcast || updated?.broadcast);
     }

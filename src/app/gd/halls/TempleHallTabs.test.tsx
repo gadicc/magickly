@@ -235,11 +235,25 @@ function fakeRuntime(options: {
   };
 }
 
-const catalogReply = (rituals: unknown[]) =>
-  new Response(JSON.stringify({ rituals }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
+/** A reply as the catalog route gives it: uncached, from its own URL. */
+const fromCatalog = (
+  body: string,
+  status: number,
+  { url = `${location.origin}/api/rituals/catalog`, redirected = false } = {},
+) => {
+  const response = new Response(body, {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "private, no-store, max-age=0",
+    },
   });
+  Object.defineProperty(response, "url", { value: url });
+  Object.defineProperty(response, "redirected", { value: redirected });
+  return response;
+};
+const catalogReply = (rituals: unknown[]) =>
+  fromCatalog(JSON.stringify({ rituals }), 200);
 
 let frameCallbacks: FrameRequestCallback[] = [];
 const runFrames = () =>
@@ -335,6 +349,7 @@ describe("the open tab", () => {
       "/api/rituals/catalog",
       expect.objectContaining({
         credentials: "same-origin",
+        redirect: "error",
         cache: "no-store",
       }),
     );
@@ -680,7 +695,7 @@ describe("offline", () => {
     mock.getRuntime.mockReturnValue(
       fakeRuntime({ device: [STRAY], remembered: { slug: "example" } }).runtime,
     );
-    fetchSpy.mockResolvedValue(new Response("{}", { status: 503 }));
+    fetchSpy.mockResolvedValue(fromCatalog("{}", 503));
     show();
     await screen.findByText(/cannot be listed just now/);
     expect(mock.recheck).not.toHaveBeenCalled();
@@ -845,7 +860,7 @@ describe("the session and the device account", () => {
 
   it("shows no tabs when the catalog says signed out", async () => {
     mock.getRuntime.mockReturnValue(fakeRuntime({}).runtime);
-    fetchSpy.mockResolvedValue(new Response("{}", { status: 401 }));
+    fetchSpy.mockResolvedValue(fromCatalog("{}", 401));
     show();
     await waitFor(() => expect(fetchSpy).toHaveBeenCalled());
     await new Promise((done) => setTimeout(done, 20));
@@ -856,8 +871,25 @@ describe("the session and the device account", () => {
     window.history.replaceState(null, "", "/gd/halls#temple=example");
     mock.getRuntime.mockReturnValue(fakeRuntime({}).runtime);
     for (const reply of [
-      new Response("not json", { status: 200 }),
-      new Response(JSON.stringify({ rituals: [{}] }), { status: 200 }),
+      fromCatalog("not json", 200),
+      fromCatalog(JSON.stringify({ rituals: [{}] }), 200),
+      // Not the catalog itself: never read, however it parses.
+      fromCatalog(JSON.stringify({ rituals: EXAMPLE }), 200, {
+        redirected: true,
+      }),
+      fromCatalog(JSON.stringify({ rituals: EXAMPLE }), 200, {
+        url: "https://elsewhere.example/api/rituals/catalog",
+      }),
+      fromCatalog(JSON.stringify({ rituals: EXAMPLE }), 200, {
+        url: `${location.origin}/login`,
+      }),
+      (() => {
+        const cached = new Response(JSON.stringify({ rituals: EXAMPLE }));
+        Object.defineProperty(cached, "url", {
+          value: `${location.origin}/api/rituals/catalog`,
+        });
+        return cached;
+      })(),
     ]) {
       fetchSpy.mockResolvedValueOnce(reply);
       show();

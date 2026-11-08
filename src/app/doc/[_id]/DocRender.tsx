@@ -447,7 +447,9 @@ export function DocView({
   // the temple halls' index, or a reload) names a figure the browser could
   // not find at load: every reader route draws the ritual after that, the
   // private one asynchronously. Honoured once, on the first render with
-  // halls, so it never fights the reader's own scrolling afterwards.
+  // halls, so it never fights the reader's own scrolling afterwards. The
+  // hash is then dropped: the private reader remounts this view whenever
+  // its copy is hidden and shown again, and must not be pulled back.
   const hashHonoured = React.useRef(false);
   React.useEffect(() => {
     if (hashHonoured.current || !halls || halls.length === 0) return;
@@ -455,7 +457,9 @@ export function DocView({
     const match = /^#hall-([1-9]\d*)$/.exec(window.location.hash);
     if (!match) return;
     const ordinal = Number(match[1]);
-    if (ordinal <= halls.length) revealHall(ordinal);
+    if (ordinal > halls.length || !revealHall(ordinal)) return;
+    const { pathname, search } = window.location;
+    window.history.replaceState(window.history.state, "", pathname + search);
   }, [halls]);
   const [hallSheetOpen, setHallSheetOpen] = React.useState(false);
   // The index, in `halls`, of the hall in the full-screen viewer.

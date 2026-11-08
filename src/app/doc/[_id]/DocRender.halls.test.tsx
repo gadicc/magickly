@@ -195,6 +195,20 @@ describe("a hall in the address", () => {
     expect(scrolled).toEqual(["hall-2"]);
   });
 
+  it("drops the hash it honoured, so a remounted reader stays put", async () => {
+    history.replaceState({ router: 1 }, "", "/doc/test?x=1#hall-2");
+    render(<DocView doc={threeHalls()} searchParams={null} />);
+    await waitFor(() => expect(scrolled).toEqual(["hall-2"]));
+    expect(location.hash).toBe("");
+    expect(location.pathname + location.search).toBe("/doc/test?x=1");
+    expect(history.state).toEqual({ router: 1 });
+    // The private reader unmounts and remounts its view on every re-show.
+    cleanup();
+    render(<DocView doc={threeHalls()} searchParams={null} />);
+    await new Promise((done) => setTimeout(done, 10));
+    expect(scrolled).toEqual(["hall-2"]);
+  });
+
   it("ignores a hash naming no hall", async () => {
     for (const hash of ["#hall-9", "#hall-0", "#Opening"]) {
       history.replaceState(null, "", `/doc/test${hash}`);

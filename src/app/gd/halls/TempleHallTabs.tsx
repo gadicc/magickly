@@ -8,8 +8,8 @@ import {
   type BrowserOfflineRuntime,
   getBrowserOfflineRuntime,
 } from "@/offline/browserRuntime";
+import { exactResponse } from "@/offline/exactResponse";
 import type { OfflineAccount } from "@/offline/lease";
-import { recheckOmittedDownloads } from "./recheckOmitted";
 import {
   type CatalogRitual,
   chooseTab,
@@ -42,14 +42,17 @@ type Catalog =
   | { kind: "unavailable" }
   | { kind: "signed-out" };
 
+const CATALOG_PATH = "/api/rituals/catalog";
+
 async function fetchCatalog(signal: AbortSignal): Promise<Catalog> {
   if (typeof navigator !== "undefined" && navigator.onLine === false)
     return { kind: "offline" };
   let response: Response;
   try {
-    response = await fetch("/api/rituals/catalog", {
+    response = await fetch(CATALOG_PATH, {
       method: "GET",
       credentials: "same-origin",
+      redirect: "error",
       cache: "no-store",
       headers: { Accept: "application/json" },
       signal,
@@ -57,6 +60,8 @@ async function fetchCatalog(signal: AbortSignal): Promise<Catalog> {
   } catch {
     return { kind: "offline" };
   }
+  // Only the catalog itself, never a redirect or a cached copy, is read.
+  if (!exactResponse(response, CATALOG_PATH)) return { kind: "unavailable" };
   if (response.status === 401) return { kind: "signed-out" };
   if (response.status !== 200) return { kind: "unavailable" };
   try {
@@ -201,13 +206,20 @@ export default function TempleHallTabs({
         setTab(choice.tab);
         if (choice.tab !== hash) writeHash(choice.tab);
         if (offlineRuntime && forAccount && navigator.onLine !== false) {
+          // Loaded here, so signed-out visitors never download the fetch path.
           recheck = () =>
-            void recheckOmittedDownloads(
-              offlineRuntime,
-              forAccount,
-              new Set(next.rituals.map((ritual) => ritual.id)),
-              signal,
-            ).catch(ignore);
+            void import("./recheckOmitted")
+              .then(({ recheckOmittedDownloads }) =>
+                disposed || signal.aborted
+                  ? undefined
+                  : recheckOmittedDownloads(
+                      offlineRuntime,
+                      forAccount,
+                      new Set(next.rituals.map((ritual) => ritual.id)),
+                      signal,
+                    ),
+              )
+              .catch(ignore);
           startRecheck();
         }
       } else if (next.kind === "offline" || next.kind === "unavailable") {

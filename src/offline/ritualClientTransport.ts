@@ -1,6 +1,7 @@
 "use client";
 
 import { isUuidV7 } from "../lib/ids";
+import { exactResponse } from "./exactResponse";
 import {
   parseRitualPermissionRequest,
   type RitualPermissionRequestV1,
@@ -23,31 +24,6 @@ const MAX_DELIVERY_BYTES = 17 * 1024 * 1024;
 const MAX_CHECK_BYTES = 64 * 1024;
 /** What a server that predates version 2 answers a v2 body with. */
 const INVALID_REQUEST_BODY = '{"error":"invalid-request"}';
-
-function noStore(response: Response): boolean {
-  return (
-    response.headers
-      .get("cache-control")
-      ?.toLowerCase()
-      .split(",")
-      .some((value) => value.trim() === "no-store") === true
-  );
-}
-
-function exactResponse(response: Response, path: string): boolean {
-  try {
-    const url = new URL(response.url);
-    return (
-      !response.redirected &&
-      url.origin === location.origin &&
-      url.pathname === path &&
-      url.search === "" &&
-      noStore(response)
-    );
-  } catch {
-    return false;
-  }
-}
 
 async function boundedText(response: Response, limit: number): Promise<string> {
   const length = response.headers.get("content-length");

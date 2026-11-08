@@ -564,6 +564,67 @@ describe("the bulk fetch", () => {
     fixture.close();
   });
 
+  it("retries a ritual whose check another tab superseded", async () => {
+    const fixture = await setup();
+    const fetcher = server(fixture, {}, async (ritualId, count) => {
+      // Another tab on the same temple begins its own check meanwhile.
+      if (ritualId === RITUALS[0] && count === 1)
+        await fixture.repository.beginCheck(fixture.account, ritualId);
+    });
+    const outcomes = await round(fixture, fetcher as typeof fetch);
+    expect(outcomes).toEqual(Array(4).fill("downloaded"));
+    expect(fixture.log.filter((entry) => entry === "fetch:1")).toHaveLength(2);
+    fixture.close();
+  });
+
+  it("leaves a ritual superseded on every attempt waiting, not failed", async () => {
+    const fixture = await setup();
+    const fetcher = server(fixture, {}, async (ritualId) => {
+      if (ritualId === RITUALS[0])
+        await fixture.repository.beginCheck(fixture.account, ritualId);
+    });
+    const outcomes = await round(fixture, fetcher as typeof fetch);
+    expect(outcomes).toEqual([
+      "interrupted",
+      "downloaded",
+      "downloaded",
+      "downloaded",
+    ]);
+    expect(fixture.log.filter((entry) => entry === "fetch:1")).toHaveLength(3);
+    fixture.close();
+  });
+
+  it("retries a copy's check that another tab superseded", async () => {
+    const fixture = await setup();
+    await round(fixture, server(fixture) as typeof fetch);
+    const fetcher = server(fixture, {}, async (ritualId, count) => {
+      if (ritualId === RITUALS[1] && count === 1)
+        await fixture.repository.beginCheck(fixture.account, ritualId);
+    });
+    const outcomes = await round(fixture, fetcher as typeof fetch);
+    expect(outcomes).toEqual(Array(4).fill("current"));
+    fixture.close();
+  });
+
+  it("leaves the reader's refresh of a superseded check as it was", async () => {
+    const fixture = await setup();
+    const onInterrupted = vi.fn();
+    const fetcher = server(fixture, {}, async (ritualId) => {
+      await fixture.repository.beginCheck(fixture.account, ritualId);
+    });
+    expect(
+      await refreshOfflineRitual(
+        fixture.runtime,
+        fixture.registrations[0].registration,
+        RITUALS[0],
+        { fetcher: fetcher as typeof fetch, onInterrupted },
+      ),
+    ).toBe(false);
+    expect(onInterrupted).not.toHaveBeenCalled();
+    expect(fixture.log).toEqual(["fetch:1"]);
+    fixture.close();
+  });
+
   it("reports a grant without a bundle as unavailable", async () => {
     const fixture = await setup();
     const outcomes = await round(

@@ -31,8 +31,12 @@ import {
 type Item = Readonly<{
   id: string;
   title: string;
-  /** The content the halls were parsed from, so a re-read keeps them. */
-  source: string;
+  /**
+   * The copy the halls were parsed from, by its manifest's identity, so a
+   * re-read of the same copy keeps them without holding its content.
+   */
+  bundleId: string;
+  manifestSha256: string;
   halls: readonly RitualHall[];
 }>;
 
@@ -195,18 +199,21 @@ export default function OfflineRitualCatalog() {
           if (disposed) return;
           setItems((current) => {
             const previous = current.find((item) => item.id === ritualId);
-            const source = bundle.renderedJson;
+            const { bundleId, manifestSha256 } = bundle;
             return [
               ...current.filter((item) => item.id !== ritualId),
               {
                 id: ritualId,
                 title: bundle.title,
-                source,
-                // Unchanged content keeps its halls, and drawn thumbnails.
+                bundleId,
+                manifestSha256,
+                // The same copy keeps its halls, and drawn thumbnails.
                 halls:
-                  previous && previous.source === source
+                  previous &&
+                  previous.bundleId === bundleId &&
+                  previous.manifestSha256 === manifestSha256
                     ? previous.halls
-                    : hallsOf(source),
+                    : hallsOf(bundle.renderedJson),
               },
             ].sort((a, b) => a.title.localeCompare(b.title));
           });
