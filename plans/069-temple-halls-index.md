@@ -1,10 +1,12 @@
 # Temple halls index — 8 November 2026
 
-Status: draft, from `main` at 951eff85. Adversarially reviewed (Fable)
-and revised the same day; see "The review" at the end. Spiked the same
-day and revised again; see "The spike". Not yet built. The number is provisional: claim it from `ls plans` and every
-branch's `plans/` at the moment of committing (067 and 068 are taken on
-branches today). Read [current status](000-current-status.md),
+Status: planned on `gate/temple-halls` from `main` at 951eff85.
+Adversarially reviewed (Fable) and revised the same day; see "The
+review". Spiked the same day and revised again; see "The spike". Built
+the same day on the same branch, rebased onto plan 068's
+`gate/check-only-recheck`, every commit gated and reviewed, and the
+whole branch reviewed by Fable; see "The build". Awaiting release,
+which releases plan 068 with it. Read [current status](000-current-status.md),
 [plan 061](061-gd-hall.md) (halls), [plan 062](062-gd-hall-seo.md)
 (`/gd/halls`), [plan 006](006-private-offline.md) (the offline lease)
 and [plan 057](057-temple-administration.md) (temples) first.
@@ -220,8 +222,10 @@ drawn inside a closed `<details>`; stage 2).
 - **The Table of Contents** lists each hall, indented under the title
   before it, and jumps to its anchor.
 - Works on every reader route, offline included, because it walks the
-  `doc` that `DocRender` already holds. No new chunk: the reader already
-  loads `GdHall`.
+  `doc` that `DocRender` already holds. The reader already loads
+  `GdHall`; as built, the sheet and viewer are a separate chunk loaded
+  only for a ritual with halls, which the service worker precaches
+  with the rest of the build.
 
 ### 7. Across rituals: temple tabs on `/gd/halls` (mock-ups E–F)
 
@@ -468,9 +472,9 @@ subagents per the model policy, reviewed fresh.
 Stage 3's bulk fetch changes `src/offline/ritualDownload.ts`, which
 [plan 068](068-check-only-permission.md) rewrites (check-only
 rechecks; built on `gate/check-only-recheck` on 2 November 2026,
-awaiting release). Stages 1 and 2 touch only the reader and are built
-from `main`; stage 3 is built on plan 068's code, after its release or
-on its branch, as Gadi decides.
+awaiting release). Stages 1 and 2 touch only the reader and were built
+from `main`; Gadi chose to build stage 3 on plan 068's branch, so the
+branch was rebased onto it after stage 2 (see "The build").
 
 1. `ritualHalls`, the ordinal map and the anchors (decisions 4, 5),
    with tests over the built-in rituals and footnotes.
@@ -542,6 +546,91 @@ account. The last is stored in the `device` table rather than a new
 table, because a new database version would close the database under
 a tab still running the previous deploy.
 
+## The build, 8 November 2026
+
+Built on `gate/temple-halls` the same day, by Opus 5.5 subagents
+(medium), stage by stage. Gadi chose to build on plan 068's branch
+(the first option offered), so the branch was rebased onto
+`gate/check-only-recheck` after stage 2 and releasing it releases plan
+068 too. Stage 3 became three commits, so the endpoint, the offline
+layer and the page could each be gated and reviewed alone. Every
+commit passed `loom check`, `pnpm check`, `pnpm typecheck`, the full
+coverage run with its per-file thresholds and the production build, in
+the gate worktree with its own install and the CI placeholder
+environment; each was reviewed by a fresh agent (Opus 5.5; Fable 5.1
+for stage 3b, which touches the lease code) and its findings fixed
+before the commit.
+
+| Commit | What |
+| --- | --- |
+| `6cfe06be` | This plan |
+| `4dbd49ab` | Stage 1: `ritualHalls` and the `hall-N` anchors |
+| `84d35155` | Stage 2: the reader's Halls action, sheet, viewer, pan and zoom, contents |
+| `95509f51` | Stage 3a: `GET /api/rituals/catalog` |
+| `834e8b52` | Stage 3b: the bulk fetch and the remembered tab |
+| `c5868087` | Stage 3c: the temple tabs on `/gd/halls` |
+| `9b7c0ae4` | Stage 4: Halls on this device |
+| `a97eb725` | Stage 5: the temples guide and its screenshot |
+| `e8bc1438` | The final review's five findings |
+
+What the reviews and browser checks changed, beyond the decisions'
+as-built notes:
+
+- The ritual editor's preview renders `DocRender`, so it takes
+  `hallNavigation={false}` (stage 1).
+- Jump Back never showed after a jump from the very top of a ritual,
+  for Jump to Next too: it stored scroll position 0 and tested it as
+  false (stage 2).
+- Panning could lose a drawing whose shape differs from the screen's;
+  the pan is now bounded by the drawing itself (stage 2).
+- The catalog is limited to the caller's temples, answers 503 rather
+  than an empty list when it cannot list, and is held to the bundle
+  reader ritual by ritual (stage 3a).
+- A fetch round is pinned to its account and epoch, and deferred grants
+  flush every 2 seconds (stage 3b).
+- Registering a view refreshes the coordinator, so the recheck of
+  omitted downloads registers them in one batch, after the round, and
+  skips fresh ones (stage 3c).
+- Picking Standard is remembered too, so a member of one temple who
+  prefers Standard keeps it; the browser check found that the temple
+  tab came back every visit (stage 3c).
+
+Checked in Chromium (headless, with real touch and wheel input), at
+390 px and 1280 px: the reader's Halls on the built-in Zelator ritual
+(sheet, viewer, pinch to 420 percent, panning at 6 times in four
+directions, swipes, keys, Ctrl and the wheel with page zoom untouched,
+Escape back to the sheet, Go to it, Jump Back, the contents); signed in
+as the local test creator, the Example temple's tab opening by itself,
+its ritual fetched once and read from the device on the next visit, a
+card's Go to it landing on `#hall-1` in the private ritual, Standard
+remembered across a reload; the Downloaded rituals page's section, its
+jump and its viewer.
+
+Not checked in a browser, against the Verification list above: a
+public SQL ritual's Halls; a member of two temples with halls (the
+local fixtures have one); a reader open in another tab during a fetch,
+removal from a temple, and sign-out clearing the tab (covered by tests
+against the real coordinator and repository, not by hand); the network
+off in a production build (the Downloaded page's shell is plan 006's);
+Safari and real phones.
+
+The gate once failed on three tests unrelated to the change (two
+randomized tests timing out and a PDF upload test) with the machine's
+load average near 14; they passed alone and the full gate passed on
+the same tree. A commit was made before that rerun by mistake; the
+rerun on the exact committed tree was clean, so it stands unchanged.
+
+The final review, by Fable 5.1 on the whole branch
+(`gate/check-only-recheck..a97eb725`), found no blocker and judged it
+safe to release; its five minor findings are fixed in `e8bc1438`: the
+reader drops `#hall-N` once honoured, since a private ritual's reader
+remounts on every broadcast and was pulled back to the hall; anonymous
+visitors to `/gd/halls` no longer download the fetch path; the
+Downloaded page compares bundle digests rather than keeping each copy's
+text; the catalog request follows the permission transport's rules
+(`src/offline/exactResponse.ts`); and a check superseded by another
+tab's round is retried rather than shown as could-not-fetch.
+
 ## Follow-ups
 
 - Step 2: halls saved outside rituals, for temples that reuse a hall
@@ -559,3 +648,14 @@ a tab still running the previous deploy.
   that needs a new version.
 - Group-scoped rituals in the index.
 - Export from the viewer, without the public credit.
+- The temple tab does not refresh a device copy; the reader does when
+  the ritual is opened, so a tab can show a hall as it was then.
+- A hall link clicked inside the reader sets `#hall-N` again, so the
+  next remount scrolls back to it once.
+- The halls page makes a second `/api/session` call for signed-in
+  members (its own account activation beside the providers'); it could
+  await the providers' result.
+- The Downloaded page's jump to `#halls` waits at most 2 seconds for
+  copies to read, so a slow one can still push the section down.
+- Check on Safari and a real phone (pinch, swipe, the dialog's scroll
+  lock), and with the network off in a production build.

@@ -617,13 +617,24 @@ Follow-ups are separate from the completed migration work:
   `pnpm data:build` first. That shot was taken with `capture.mts` against
   a 127.0.0.1 dev server holding the same local settings and a throwaway
   secrets key.
-- Temple halls index: planned on 8 November 2026 on `gate/temple-halls`
-  ([plan 069](069-temple-halls-index.md)), reviewed (Fable) and spiked
-  the same day. A Halls action in the reader lists and opens a ritual's
-  halls full screen, and `/gd/halls` gains a tab per temple listing the
-  halls in the temple rituals a member may read, collected from the
-  device's offline copies; offline they are on the Downloaded rituals
-  page. Editing halls outside rituals and shared halls are later steps.
-  Stage 3 builds on plan 068's `ritualDownload.ts`. Not built.
+- Temple halls index: planned, reviewed (Fable), spiked and built on
+  8 November 2026 on `gate/temple-halls`
+  ([plan 069](069-temple-halls-index.md)), every commit gated and
+  reviewed, the whole branch reviewed by Fable; awaiting release. The
+  branch sits on plan 068's `gate/check-only-recheck`, so releasing it
+  releases plan 068 too. A Halls action in the reader lists and opens a
+  ritual's halls full screen; `/gd/halls` gains a tab per temple the
+  member belongs to, listing the halls in its published rituals they
+  may read, fetched to the device; offline they are on the Downloaded
+  rituals page. Editing halls outside rituals and shared halls are
+  later steps. Not checked on Safari, on a real phone or with the
+  network off in a production build (plan 069, "The build").
+- TODO: a hydration mismatch in the Table of Shewbread art inside the
+  Zelator and Theoricus halls, on `main` too (seen 8 November 2026):
+  path coordinates differ in their last digits between server and
+  client, so React warns and keeps the server's attributes. The drawing
+  is the same; round the coordinates as plan 030 did for the Tree,
+  which there moved the image identity: here the hall snapshots and
+  the published hall images would change too.
 
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.
