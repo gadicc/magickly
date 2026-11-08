@@ -61,15 +61,21 @@ class HallBoundary extends Component<
 /**
  * A temple hall diagram, for the reader and the editor alike. `hall` is the
  * compiled `gdHall` row; its content is untrusted and the renderer draws
- * what it can of it.
+ * what it can of it. `id`, the reader's anchor (plan 069), is on the figure,
+ * so it is there before the drawing's chunk loads.
  */
-export function GdHallFrame({ hall }: { hall: HallNode }) {
+export function GdHallFrame({ hall, id }: { hall: HallNode; id?: string }) {
   // `next/dynamic` gives its placeholder no props: the shape goes by CSS.
   const style = {
     "--gd-hall-aspect": estimateHallAspect(hall).toFixed(4),
   } as CSSProperties;
   return (
-    <figure data-ritual-frame="gdHall" className={styles.hall} style={style}>
+    <figure
+      id={id}
+      data-ritual-frame="gdHall"
+      className={styles.hall}
+      style={style}
+    >
       <HallBoundary hall={hall}>
         <GdHallDrawing hall={hall} />
       </HallBoundary>

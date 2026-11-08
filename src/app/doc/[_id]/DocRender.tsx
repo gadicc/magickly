@@ -34,6 +34,7 @@ import React from "react";
 import { Render } from "@/doc/blocks";
 
 import DocContext from "@/doc/context";
+import { type RitualRow, ritualHalls } from "@/doc/ritualHalls";
 import { DocNode } from "@/schemas";
 import "@/../public/fonts/FrankRuehlCLM-stylesheet.css";
 import { roles } from "@/doc/ritualBlocks/roles";
@@ -355,6 +356,12 @@ class ErrorBoundary extends React.Component<{
 interface DocRenderProps {
   doc: DocNode;
   wrapWithErrorBoundary?: boolean;
+  /**
+   * The reader's hall navigation (plan 069): each drawn hall's `hall-N`
+   * anchor, and the Halls actions built on it. On by default; the ritual
+   * editor's preview turns it off, so the editor has no hall ids.
+   */
+  hallNavigation?: boolean;
 }
 
 /** Reads the display variables from the page query. */
@@ -370,6 +377,7 @@ export default function DocRender(props: DocRenderProps) {
 export function DocView({
   doc,
   wrapWithErrorBoundary,
+  hallNavigation = true,
   searchParams,
 }: DocRenderProps & {
   searchParams: Pick<URLSearchParams, "get"> | null;
@@ -380,6 +388,11 @@ export function DocView({
 
   const titles =
     doc.children?.filter((c) => c.type === "title").map((b) => b.text) || [];
+  // The halls as drawn; their ordinals are the figures' anchors (plan 069).
+  const halls = React.useMemo(
+    () => (hallNavigation ? ritualHalls(doc as RitualRow) : undefined),
+    [doc, hallNavigation],
+  );
 
   type VarDesc = {
     type: "declareVar";
@@ -498,10 +511,10 @@ export function DocView({
           <DocContext.Provider value={context}>
             {wrapWithErrorBoundary ? (
               <ErrorBoundary>
-                <Render doc={doc} onChange={undefined} />
+                <Render doc={doc} onChange={undefined} halls={halls} />
               </ErrorBoundary>
             ) : (
-              <Render doc={doc} onChange={undefined} />
+              <Render doc={doc} onChange={undefined} halls={halls} />
             )}
           </DocContext.Provider>
         </div>

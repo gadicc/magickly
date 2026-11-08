@@ -18,6 +18,7 @@ import {
 } from "./ritualBlocks/Frames";
 import { GdHallFrame } from "./ritualBlocks/GdHallFrame";
 import { planRitualFootnotes } from "./ritualFootnotes";
+import { rendersBody } from "./ritualRendersBody";
 import { roleAssignmentIncludes } from "./ritualRoles";
 import { sameOriginPath } from "./sameOriginPath";
 
@@ -290,7 +291,14 @@ class Footnotes extends Node {
 /** A temple hall diagram (plan 061): drawn from the row, never from children. */
 class GdHallBlock extends Node {
   render(key) {
-    return <GdHallFrame key={key} hall={this.block} />;
+    const ordinal = this.hallOrdinals?.get(this.block);
+    return (
+      <GdHallFrame
+        key={key}
+        hall={this.block}
+        id={ordinal ? `hall-${ordinal}` : undefined}
+      />
+    );
   }
 }
 
@@ -398,36 +406,36 @@ Object.setPrototypeOf(registry, null);
 
 // NB: If we don't export "Node", React fast refresh won't pickup Component
 // changes.
-/** Plan footnotes before React rendering while preserving the reader's collection order. */
-export function Render({ doc, onChange }) {
+/**
+ * Plan footnotes before React rendering while preserving the reader's
+ * collection order. `halls`, the reader's `ritualHalls(doc)`, gives each
+ * drawn hall its anchor, `hall-N` (plan 069, decision 5). Only the reader's
+ * `DocView` passes it, and not in the ritual editor's preview
+ * (`hallNavigation={false}`); every other render, such as the editor's
+ * footnote previews, draws halls with no id.
+ *
+ * @param {{
+ *   doc: any;
+ *   onChange: any;
+ *   halls?: readonly import("./ritualHalls").RitualHall[];
+ * }} props
+ */
+export function Render({ doc, onChange, halls }) {
   const root = Node.getBlockNode(doc);
   root.footnotePlan = planRitualFootnotes(
     root,
     (node) => node.block.type,
     (node) => node.children ?? [],
-    (node) => {
-      const { type, say, do: action } = node.block;
-      return type === "task"
-        ? !!(say || action)
-        : ![
-            "declareVar",
-            "img",
-            "br",
-            "grade",
-            "var",
-            "stylesheet",
-            "hr",
-            "cursor",
-            "text",
-            // Drawn whole; its rows are never rendered as ritual content.
-            "gdHall",
-          ].includes(type);
-    },
+    (node) => rendersBody(node.block),
   );
+  const hallOrdinals = halls
+    ? new Map(halls.map((hall) => [hall.row, hall.ordinal]))
+    : undefined;
   // JRT caches child instances without refreshing their parent pointers on
-  // immutable rerenders. Give every node this render's plan directly.
+  // immutable rerenders. Give every node this render's plans directly.
   const attach = (node) => {
     node.footnotePlan = root.footnotePlan;
+    node.hallOrdinals = hallOrdinals;
     for (const child of node.children ?? []) attach(child);
   };
   attach(root);

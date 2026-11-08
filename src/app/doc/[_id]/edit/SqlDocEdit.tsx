@@ -1448,7 +1448,11 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
             overflow: "auto",
           }}
         >
-          <DocRender doc={currentDisplay.doc} wrapWithErrorBoundary={true} />
+          <DocRender
+            doc={currentDisplay.doc}
+            wrapWithErrorBoundary={true}
+            hallNavigation={false}
+          />
         </div>
       </Split>
     </div>

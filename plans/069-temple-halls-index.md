@@ -177,12 +177,18 @@ prototype matched the drawn order exactly (S3).
 
 ### 5. Addressing a hall: by its place
 
-`DocRender` computes `ritualHalls(doc)` once and passes a
-`WeakMap<row, ordinal>` through `DocContext`; `GdHallBlock` gives
-`GdHallFrame` an `id` prop, `hall-N`, set on its `<figure>` (present
-before the drawing's chunk loads), only when the row is in the map. So
-the editor, which renders without the map, gets no ids, and ids stay
-unique. "Go to it in the ritual" sets the hash to it.
+`DocRender` computes `ritualHalls(doc)` once and passes the list to
+`Render` as a `halls` prop, which puts a row-to-ordinal map on every
+node each render, as it does the footnote plan (built as a prop rather
+than the `DocContext` map first planned: a context value could reach a
+nested `Render`, a prop cannot). `GdHallBlock` gives `GdHallFrame` an
+`id` prop, `hall-N`, set on its `<figure>` (present before the
+drawing's chunk loads), only when the row is in the map. The ritual
+editor's own surfaces pass nothing, and its preview pane, which renders
+`DocRender`, turns the anchors off; so the editor gets no ids, and ids
+stay unique. "Go to it in the ritual" sets the hash to it, first
+opening any `<details>` the hall is in (a hall under a `summary` is
+drawn inside a closed `<details>`; stage 2).
 
 - Why: published rituals have no node IDs, and the ordinal is computed
   from the same tree the reader draws.
