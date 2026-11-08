@@ -232,8 +232,25 @@ drawn inside a closed `<details>`; stage 2).
   tests are unchanged.
 - **Who sees the tabs**: only a signed-in visitor (`useSession`). For
   anyone else the island does nothing and calls no endpoint, so
-  crawlers and anonymous visitors never reach `/api/rituals/catalog`
-  or `/api/session`.
+  crawlers and anonymous visitors never reach `/api/rituals/catalog`.
+  (The island adds no `/api/session` call either; the app's providers,
+  `SqlIdentityBridge`, already make one on every page once the session
+  settles, signed out included, which this plan leaves as it is.)
+- As built (stage 3c): the island receives today's content as children,
+  so the Standard tab is the same server-rendered HTML, hydrated in
+  place; the tab row appears once the catalog answers, so content
+  below it moves down once for signed-in members (the earlier "keeps
+  its space" was dropped). Tabs show the temple's name, which the
+  catalog carries. Offline, a temple tab is shown only for a temple the
+  device knows of (the hash's or the remembered one); the Downloaded
+  rituals page is the offline home. A device copy is refreshed when
+  its ritual is opened in the reader, not by the tab, so a tab can show
+  a hall as it was at the last opening. A fetched ritual's halls appear
+  at the round's next flush, up to 2 seconds after it arrives. A
+  ritual whose copy never becomes readable is shown as not available
+  on this device, with a link to it. The reader honours a `#hall-N` in
+  the address when the ritual first appears, so a card's "Go to it in
+  the ritual" lands on the hall.
 - **The open tab**: in the hash, `#temple=<slug>`, written with
   `history.replaceState` so Back leaves the page rather than cycling
   tabs. Opening `/gd/halls` with no hash opens, in order: the tab
@@ -254,8 +271,7 @@ drawn inside a closed `<details>`; stage 2).
     metadata; it would outlive sign-out and show to the next account on
     a shared device.
   - The switch to a remembered tab happens after hydration, so the
-    Standard content may show for a moment first; the tab row keeps its
-    space, so nothing below it jumps until the content swaps.
+    Standard content may show for a moment first.
   - Why the hash: the page stays static and cacheable, and the hash
     never reaches the server or the service worker.
   - Rejected: `/temples/<slug>/halls` (no member-facing temple page
@@ -382,13 +398,17 @@ downloaded ritual's halls, grouped by ritual.
 
 ### 10. Privacy
 
-- Nothing from a private ritual is stored outside the offline database;
-  hall rows and catalog titles live in memory and go on `hide()` or an
-  account change.
+- Nothing from a private ritual is stored outside the offline database.
+  Hall rows live in memory and go on `hide()`; catalog titles and
+  temple names live in memory and go on an account change, as the
+  online ritual list's do. The offline account is used only when it is
+  the signed-in user's.
 - The URL may hold a temple slug, in the hash, which enters the
-  browser's history (and history sync). It is never sent to a server.
-  The remembered tab is in the offline database, per account, deleted
-  on sign-out; nothing is in `localStorage`.
+  browser's history (and history sync). It is never sent to a server,
+  and it is removed from the address on sign-out or an account change
+  while the page is open. The remembered tab (a temple, or Standard) is
+  in the offline database, per account, deleted on sign-out; nothing is
+  in `localStorage`.
 - The viewer offers no export or share in step 1, so the CC BY credit
   of public exports never meets a private hall.
 

@@ -17,13 +17,13 @@ export interface ActiveDeviceState {
   cleanupOwnerId: string | null;
 }
 /**
- * The temple tab `/gd/halls` last showed an account (plan 069, decision 7),
- * by temple slug. Deleted with the account's other stores on sign-out.
+ * The tab `/gd/halls` last showed an account (plan 069, decision 7): a
+ * temple, by slug, or Standard, chosen explicitly. Deleted with the
+ * account's other stores on sign-out.
  */
-export interface HallsTabDeviceState {
-  key: `hallsTab:${string}`;
-  slug: string;
-}
+export type HallsTabDeviceState =
+  | { key: `hallsTab:${string}`; slug: string }
+  | { key: `hallsTab:${string}`; standard: true };
 export type DeviceState = ActiveDeviceState | HallsTabDeviceState;
 export interface StoredCheck extends PendingPermissionCheck {
   /** Set only after an accepted grant; independent of complete rendered output. */

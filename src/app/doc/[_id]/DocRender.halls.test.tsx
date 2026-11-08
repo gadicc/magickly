@@ -9,6 +9,7 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
+import React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { RitualRow } from "@/doc/ritualHalls";
 import type { DocNode } from "@/schemas";
@@ -140,6 +141,77 @@ describe("the Halls action", () => {
         }) as HTMLButtonElement
       ).disabled,
     ).toBe(true);
+  });
+});
+
+describe("a hall in the address", () => {
+  // jsdom has no scrollIntoView: each test records which figures scroll.
+  let scrolled: string[] = [];
+  beforeEach(() => {
+    scrolled = [];
+    Object.defineProperty(Element.prototype, "scrollIntoView", {
+      configurable: true,
+      value(this: Element) {
+        scrolled.push(this.id);
+      },
+    });
+  });
+  afterEach(() => {
+    Reflect.deleteProperty(Element.prototype, "scrollIntoView");
+  });
+  /** A reader whose ritual arrives later, as the private one does. */
+  function Later({ docs }: { docs: DocNode[] }) {
+    const [index, setIndex] = React.useState<number | null>(null);
+    React.useEffect(() => {
+      void Promise.resolve().then(() => setIndex(0));
+    }, []);
+    return index === null ? (
+      <p>Loading</p>
+    ) : (
+      <>
+        <button type="button" onClick={() => setIndex(index + 1)}>
+          Reload
+        </button>
+        <DocView
+          doc={docs[Math.min(index, docs.length - 1)]}
+          searchParams={null}
+        />
+      </>
+    );
+  }
+
+  it("goes to it once when the ritual first appears, opening its details", async () => {
+    history.replaceState(null, "", "/doc/test#hall-2");
+    render(<Later docs={[threeHalls(), threeHalls()]} />);
+    expect(screen.getByText("Loading")).toBeTruthy();
+    await waitFor(() => expect(scrolled).toEqual(["hall-2"]));
+    const details = document
+      .getElementById("hall-2")
+      ?.closest("details") as HTMLDetailsElement;
+    expect(details.open).toBe(true);
+    // A later render, even of a new copy, leaves the reader where it is.
+    fireEvent.click(screen.getByRole("button", { name: "Reload" }));
+    await new Promise((done) => setTimeout(done, 10));
+    expect(scrolled).toEqual(["hall-2"]);
+  });
+
+  it("ignores a hash naming no hall", async () => {
+    for (const hash of ["#hall-9", "#hall-0", "#Opening"]) {
+      history.replaceState(null, "", `/doc/test${hash}`);
+      render(<Later docs={[threeHalls()]} />);
+      await screen.findByRole("button", { name: "Reload" });
+      cleanup();
+    }
+    expect(scrolled).toEqual([]);
+  });
+
+  it("does nothing with hall navigation off", async () => {
+    history.replaceState(null, "", "/doc/test#hall-1");
+    render(
+      <DocView doc={threeHalls()} searchParams={null} hallNavigation={false} />,
+    );
+    await new Promise((done) => setTimeout(done, 10));
+    expect(scrolled).toEqual([]);
   });
 });
 

@@ -289,6 +289,7 @@ describe("the temple ritual catalog", () => {
       id: ids.halls,
       title: "Synthetic halls",
       templeSlug: "synthetic",
+      templeName: "Synthetic temple",
       updatedAt: new Date(BUNDLE_FIXTURE_TIME),
       hallCount: 2,
     });
@@ -481,6 +482,7 @@ describe("GET /api/rituals/catalog", () => {
       id: ids.halls,
       title: "Synthetic halls",
       templeSlug: "synthetic",
+      templeName: "Synthetic temple",
       updatedAt: new Date(BUNDLE_FIXTURE_TIME).toISOString(),
       hallCount: 2,
     });

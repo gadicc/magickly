@@ -443,6 +443,20 @@ export function DocView({
     () => ritualContents(doc as RitualRow, halls ?? []),
     [doc, halls],
   );
+  // A `#hall-N` in the address when the ritual first appears (a link from
+  // the temple halls' index, or a reload) names a figure the browser could
+  // not find at load: every reader route draws the ritual after that, the
+  // private one asynchronously. Honoured once, on the first render with
+  // halls, so it never fights the reader's own scrolling afterwards.
+  const hashHonoured = React.useRef(false);
+  React.useEffect(() => {
+    if (hashHonoured.current || !halls || halls.length === 0) return;
+    hashHonoured.current = true;
+    const match = /^#hall-([1-9]\d*)$/.exec(window.location.hash);
+    if (!match) return;
+    const ordinal = Number(match[1]);
+    if (ordinal <= halls.length) revealHall(ordinal);
+  }, [halls]);
   const [hallSheetOpen, setHallSheetOpen] = React.useState(false);
   // The index, in `halls`, of the hall in the full-screen viewer.
   const [viewingHall, setViewingHall] = React.useState<number | null>(null);

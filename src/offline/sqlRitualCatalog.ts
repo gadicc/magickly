@@ -1,5 +1,6 @@
 import "server-only";
 import { and, inArray, isNotNull, isNull, sql } from "drizzle-orm";
+import { temples } from "../db/schema/memberships";
 import {
   ritualBundlePublicationIntents,
   ritualBundles,
@@ -33,6 +34,8 @@ export interface SqlRitualCatalogEntry {
   id: string;
   title: string;
   templeSlug: string;
+  /** The temple's display name, as its members see it on /temples. */
+  templeName: string;
   updatedAt: Date | null;
   hallCount: number;
 }
@@ -225,10 +228,23 @@ export function createSqlRitualCatalogReader(
                 : 0,
           ]),
         );
+        const names = new Map(
+          (
+            await tx
+              .select({ id: temples.id, name: temples.name })
+              .from(temples)
+              .where(
+                inArray(temples.id, [
+                  ...new Set(listed.map((row) => row.templeId as string)),
+                ]),
+              )
+          ).map((temple) => [temple.id, temple.name]),
+        );
         return listed.map((row) => ({
           id: row.id,
           title: row.title,
           templeSlug: row.templeSlug,
+          templeName: names.get(row.templeId as string) ?? row.templeSlug,
           updatedAt: row.updatedAt,
           hallCount: hallCounts.get(row.id) ?? 0,
         }));

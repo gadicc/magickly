@@ -27,6 +27,7 @@ import type {
 import type {
   ActiveDeviceState,
   DraftInput,
+  HallsTabDeviceState,
   OfflineDraft,
   OutboxRow,
   PublicationAttemptRecord,
@@ -416,6 +417,8 @@ export interface AcceptedSourceBinding {
  * App-specific ritual repository. No network, UI, timers, legacy migration or whole-DB deletion.
  * Every data operation rechecks persisted epoch/lease within its IndexedDB transaction.
  */
+/** A remembered `/gd/halls` tab: a temple by slug, or Standard. */
+export type HallsTabChoice = { slug: string } | { standard: true };
 const hallsTabKey = (ownerId: string) => `hallsTab:${ownerId}` as const;
 /**
  * A temple slug by the server's rules: what src/temples/sql.ts accepts as a
@@ -665,25 +668,37 @@ export class OfflineRitualRepository {
     );
   }
 
-  /** The temple tab `/gd/halls` last showed the active account, if any. */
-  readHallsTab(account: OfflineAccount): Promise<string | null> {
+  /** The tab `/gd/halls` last showed the active account, if any. */
+  readHallsTab(account: OfflineAccount): Promise<HallsTabChoice | null> {
     account = structuredClone(account);
     // Read-only over the device table: the account check reads only it.
     return this.db.transaction("r", this.db.device, async () => {
       await this.account(account);
       const state = await this.db.device.get(hallsTabKey(account.ownerId));
-      return state && "slug" in state && hallsTabSlug(state.slug)
-        ? state.slug
-        : null;
+      if (state && "slug" in state && hallsTabSlug(state.slug))
+        return { slug: state.slug };
+      if (state && "standard" in state && state.standard === true)
+        return { standard: true };
+      return null;
     });
   }
-  /** Remember the temple tab for the active account only. */
-  writeHallsTab(account: OfflineAccount, slug: string): Promise<void> {
+  /** Remember a temple tab, or Standard, for the active account only. */
+  writeHallsTab(
+    account: OfflineAccount,
+    choice: HallsTabChoice,
+  ): Promise<void> {
     account = structuredClone(account);
+    const record: HallsTabDeviceState =
+      "slug" in choice
+        ? { key: hallsTabKey(account.ownerId), slug: choice.slug }
+        : { key: hallsTabKey(account.ownerId), standard: choice.standard };
     return this.transaction(async () => {
       await this.account(account);
-      requireValue(hallsTabSlug(slug), "INVALID");
-      await this.db.device.put({ key: hallsTabKey(account.ownerId), slug });
+      requireValue(
+        "slug" in record ? hallsTabSlug(record.slug) : record.standard === true,
+        "INVALID",
+      );
+      await this.db.device.put(record);
     });
   }
   clearHallsTab(account: OfflineAccount): Promise<void> {
