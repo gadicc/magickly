@@ -270,6 +270,21 @@ const shots: Shot[] = [
     open: (b) => editor(b, "visual"),
   },
   {
+    name: "temple-halls-phone",
+    persona: "creator",
+    viewport: PHONE,
+    open: async (b) => {
+      await b.goto(`${base}/gd/halls#temple=example`);
+      // The tab fetches Neophyte 0=0 to the device, then draws its hall.
+      await b.waitFor(
+        `!!document.querySelector('[role="tabpanel"]:not([hidden]) [data-drawn] svg')`,
+        90_000,
+      );
+      await sleep(800);
+    },
+    clip: `[document.querySelector('[aria-label="Halls by temple"]').closest('.MuiTabs-root'), document.querySelector('[role="tabpanel"]:not([hidden])')]`,
+  },
+  {
     name: "reader-phone",
     persona: "reader",
     viewport: PHONE,

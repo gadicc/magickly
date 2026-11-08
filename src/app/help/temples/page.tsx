@@ -20,6 +20,7 @@ import recentlyDeleted from "./images/recently-deleted.webp";
 import removeMember from "./images/remove-member.webp";
 import ritualAccess from "./images/ritual-access.webp";
 import ritualList from "./images/ritual-list-grade-1.webp";
+import templeHalls from "./images/temple-halls-phone.webp";
 
 export const metadata = pageMetadata("/help/temples");
 
@@ -106,6 +107,9 @@ export default function TemplesGuide() {
         </li>
         <li>
           <a href="#offline">Reading offline</a>
+        </li>
+        <li>
+          <a href="#halls">Temple halls</a>
         </li>
         <li>
           <a href="#forum">Connecting a forum</a>
@@ -495,6 +499,31 @@ export default function TemplesGuide() {
         device holds; opened while connected, it also checks each download and
         removes any you can no longer read. Signing out removes the downloads.
       </p>
+
+      <h2 id="halls">Temple halls</h2>
+      <p>
+        Inside a ritual, the floating button’s <strong>Halls</strong> opens the
+        ritual’s halls full screen. Pinch, or use Ctrl and the scroll wheel, to
+        zoom. <strong>Go to it in the ritual</strong> takes you to the hall in
+        the text.
+      </p>
+      <p>
+        <Link href="/gd/halls">Temple Halls</Link> has a tab for each temple you
+        belong to, listing the halls in its rituals that you can read, and
+        remembers the tab you last chose. Only published rituals appear, and
+        what you see follows your grade, as it does for the rituals themselves.
+        The page downloads those rituals to your device, so their halls work
+        offline. Without a connection, find them under{" "}
+        <Link href="/offline/ritual">Downloaded rituals</Link>, in{" "}
+        <strong>Halls on this device</strong>.
+      </p>
+      <Figure
+        image={templeHalls}
+        alt="The Temple Halls page on a phone with the Example tab open: the Neophyte 0=0 ritual, marked offline, with a thumbnail of its Neophyte Temple hall."
+        maxWidth={300}
+      >
+        A temple’s tab. Tap a hall to open it full screen.
+      </Figure>
 
       <h2 id="forum">Connecting a forum</h2>
       <p>
