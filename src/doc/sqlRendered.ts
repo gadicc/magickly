@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq } from "drizzle-orm";
+import { and, eq, type SQLWrapper } from "drizzle-orm";
 import {
   legacyRitualCompiledArchives,
   ritualCompiledArtifacts,
@@ -9,6 +9,45 @@ import {
   RITUAL_OUTPUT_FORMAT_VERSION,
 } from "./compileContract";
 import type { SqlRitualParentRow, SqlRitualSelectDatabase } from "./sqlPolicy";
+
+type Ref = string | SQLWrapper;
+
+/**
+ * The selected compiled artifact: exactly the parent's pointer, bound to its
+ * current revision and the supported output format. Takes values or the
+ * `rituals` columns, so a batched join applies the same rule.
+ */
+export function selectedSqlArtifact(parent: {
+  currentRevisionId: Ref;
+  currentCompiledArtifactId: Ref;
+}) {
+  return and(
+    eq(ritualCompiledArtifacts.id, parent.currentCompiledArtifactId),
+    eq(ritualCompiledArtifacts.revisionId, parent.currentRevisionId),
+    eq(ritualCompiledArtifacts.outputFormat, RITUAL_OUTPUT_FORMAT),
+    eq(
+      ritualCompiledArtifacts.outputFormatVersion,
+      RITUAL_OUTPUT_FORMAT_VERSION,
+    ),
+  );
+}
+
+/**
+ * The imported archive claimed by the current revision, for a parent with no
+ * selected artifact only. Takes values or the `rituals` columns.
+ */
+export function selectedSqlLegacyArchive(parent: {
+  id: Ref;
+  currentRevisionId: Ref;
+}) {
+  return and(
+    eq(legacyRitualCompiledArchives.ritualId, parent.id),
+    eq(
+      legacyRitualCompiledArchives.claimedRevisionId,
+      parent.currentRevisionId,
+    ),
+  );
+}
 
 /**
  * Transaction-local selected output. Call only after authorizing the parent in
@@ -31,15 +70,10 @@ export async function selectSqlRenderedRitual(
       })
       .from(ritualCompiledArtifacts)
       .where(
-        and(
-          eq(ritualCompiledArtifacts.id, parent.currentCompiledArtifactId),
-          eq(ritualCompiledArtifacts.revisionId, parent.currentRevisionId),
-          eq(ritualCompiledArtifacts.outputFormat, RITUAL_OUTPUT_FORMAT),
-          eq(
-            ritualCompiledArtifacts.outputFormatVersion,
-            RITUAL_OUTPUT_FORMAT_VERSION,
-          ),
-        ),
+        selectedSqlArtifact({
+          currentRevisionId: parent.currentRevisionId,
+          currentCompiledArtifactId: parent.currentCompiledArtifactId,
+        }),
       );
     return artifact ?? null;
   }
@@ -50,13 +84,10 @@ export async function selectSqlRenderedRitual(
     })
     .from(legacyRitualCompiledArchives)
     .where(
-      and(
-        eq(legacyRitualCompiledArchives.ritualId, parent.id),
-        eq(
-          legacyRitualCompiledArchives.claimedRevisionId,
-          parent.currentRevisionId,
-        ),
-      ),
+      selectedSqlLegacyArchive({
+        id: parent.id,
+        currentRevisionId: parent.currentRevisionId,
+      }),
     );
   return archive ?? null;
 }

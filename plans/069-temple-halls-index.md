@@ -282,10 +282,17 @@ drawn inside a closed `<details>`; stage 2).
 - A new uncached endpoint, `GET /api/rituals/catalog`, returns
   `{id, title, templeSlug, updatedAt, hallCount}` for the caller's
   readable **temple** rituals **whose current revision is published**
-  (a member can fetch nothing else), from `listMetadata`'s selection.
-  A count is metadata on a par with the title. Signed out: 401.
-  `Cache-Control: private, no-store`. The temple tabs are the distinct
-  temples in it with at least one hall.
+  (a member can fetch nothing else), from `listMetadata`'s selection,
+  and only in **temples the caller is a member of**, as Gadi asked
+  ("all the temples the user is a member of"): a global administrator
+  reads every temple's rituals, and the tabs would otherwise fetch them
+  all to that device. Publication is decided by the bundle reader's own
+  rule, shared rather than copied, and a test holds the catalog to
+  `getManifest` ritual by ritual. A count is metadata on a par with the
+  title. Signed out: 401; no accepted publication policy or no bundle
+  storage: 503, never an empty list, which would make clients recheck
+  every download. `Cache-Control: private, no-store`. The temple tabs
+  are the distinct temples in it with at least one hall.
 - **`hallCount` is counted in Postgres**, so no ritual content leaves
   the database: occurrences of `"type":"gdHall"` in the selected
   `content_json`. It matched a full parse on all 9 local rituals and

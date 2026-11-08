@@ -17,6 +17,10 @@ import {
 } from "./ritualHttp";
 import { createSqlRitualPermissionChecker } from "./sqlPermissionCheck";
 import { createSqlRitualBundleReader } from "./sqlRitualBundleReads";
+import {
+  createRitualCatalogHandler,
+  createSqlRitualCatalogReader,
+} from "./sqlRitualCatalog";
 
 type RuntimeEnvironment = Readonly<Record<string, string | undefined>>;
 interface RuntimeDependencies {
@@ -97,8 +101,19 @@ export function createSqlRitualRuntime(
         ? readRitualBundleAsset(reader, storage, input, { signal })
         : Promise.resolve(null),
   };
+  const catalog = createSqlRitualCatalogReader(
+    dependencies.db,
+    dependencies.getVerifiedActorId,
+    {
+      acceptedPublicationPolicyIds: policies,
+      deliveryAvailable: storage !== null,
+    },
+  );
   return Object.freeze({
-    handlers: createRitualHttpHandlers(services),
+    handlers: {
+      ...createRitualHttpHandlers(services),
+      catalog: createRitualCatalogHandler(catalog),
+    },
     publicationPoliciesConfigured: policies.length > 0,
     storageConfigured: storage !== null,
   });

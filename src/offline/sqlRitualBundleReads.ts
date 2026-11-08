@@ -10,6 +10,7 @@ import { getRitualAccess } from "../doc/access";
 import {
   liveRitual,
   loadSqlRitualPrincipal,
+  type SqlRitualParentRow,
   sqlRitualParentFields,
   sqlRitualPolicy,
 } from "../doc/sqlPolicy";
@@ -108,6 +109,46 @@ const assetFields = {
   objectKey: sql<string>`to_json(${ritualBundleAssets.objectKey})`,
 };
 
+/** A delivery marker joined to the completed intent it was published from. */
+export const completedIntent = and(
+  eq(ritualBundlePublicationIntents.operationId, ritualBundles.operationId),
+  eq(ritualBundlePublicationIntents.bundleId, ritualBundles.bundleId),
+  eq(ritualBundlePublicationIntents.ritualId, ritualBundles.ritualId),
+  eq(
+    ritualBundlePublicationIntents.currentRevisionId,
+    ritualBundles.currentRevisionId,
+  ),
+);
+
+/** The order the reader picks a ritual's publication in: newest first. */
+export const newestBundleFirst = [
+  desc(ritualBundles.publishedAt),
+  desc(ritualBundles.bundleId),
+];
+
+/** Whether a publication intent was made for exactly this current selection. */
+export function intentBindsSelection(
+  intent: Pick<
+    typeof ritualBundlePublicationIntents.$inferSelect,
+    | "currentRevisionId"
+    | "currentCompiledArtifactId"
+    | "parentVersion"
+    | "contentSha256"
+  >,
+  parent: Pick<
+    SqlRitualParentRow,
+    "currentRevisionId" | "currentCompiledArtifactId" | "version"
+  >,
+  selected: { contentSha256: string },
+) {
+  return (
+    intent.currentRevisionId === parent.currentRevisionId &&
+    intent.currentCompiledArtifactId === parent.currentCompiledArtifactId &&
+    intent.parentVersion === parent.version &&
+    intent.contentSha256 === selected.contentSha256
+  );
+}
+
 /**
  * Inactive current-access reader. Every call verifies the signed-in canonical
  * actor, then reloads identity, policy, selected output and completed publication
@@ -166,27 +207,7 @@ export function createSqlRitualBundleReader(
               intent: ritualBundlePublicationIntents,
             })
             .from(ritualBundles)
-            .innerJoin(
-              ritualBundlePublicationIntents,
-              and(
-                eq(
-                  ritualBundlePublicationIntents.operationId,
-                  ritualBundles.operationId,
-                ),
-                eq(
-                  ritualBundlePublicationIntents.bundleId,
-                  ritualBundles.bundleId,
-                ),
-                eq(
-                  ritualBundlePublicationIntents.ritualId,
-                  ritualBundles.ritualId,
-                ),
-                eq(
-                  ritualBundlePublicationIntents.currentRevisionId,
-                  ritualBundles.currentRevisionId,
-                ),
-              ),
-            )
+            .innerJoin(ritualBundlePublicationIntents, completedIntent)
             .where(
               and(
                 eq(ritualBundles.ritualId, bound.ritualId),
@@ -203,21 +224,11 @@ export function createSqlRitualBundleReader(
                   : eq(ritualBundles.bundleId, bound.bundleId),
               ),
             )
-            .orderBy(
-              desc(ritualBundles.publishedAt),
-              desc(ritualBundles.bundleId),
-            )
+            .orderBy(...newestBundleFirst)
             .limit(1);
           if (!candidate) return null;
           const { marker, intent } = candidate;
-          if (
-            intent.currentRevisionId !== parent.currentRevisionId ||
-            intent.currentCompiledArtifactId !==
-              parent.currentCompiledArtifactId ||
-            intent.parentVersion !== parent.version ||
-            intent.contentSha256 !== selected.contentSha256
-          )
-            return null;
+          if (!intentBindsSelection(intent, parent, selected)) return null;
           const rows = await tx
             .select(assetFields)
             .from(ritualBundleAssets)

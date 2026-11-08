@@ -128,6 +128,28 @@ async function parent(
 }
 
 /**
+ * Every live ritual with a current revision that the principal may read, with
+ * its access and temple slug, in ID order: the ritual list's one selection
+ * and access evaluation, shared by the temple catalog. Call inside the
+ * caller's snapshot, after loading the principal in it.
+ */
+export async function listReadableSqlRituals(
+  tx: ReadDatabase,
+  actor: RitualPrincipal | null,
+) {
+  const rows = await tx
+    .select({ ...parentFields, templeSlug: temples.slug })
+    .from(rituals)
+    .leftJoin(temples, eq(temples.id, rituals.templeId))
+    .where(and(isNotNull(rituals.currentRevisionId), liveRitual))
+    .orderBy(asc(rituals.id));
+  return rows.flatMap((row) => {
+    const access = getRitualAccess(policy(row), actor);
+    return access.read ? [{ row, access }] : [];
+  });
+}
+
+/**
  * Server-only authorization/read repository. getVerifiedActorId must verify the
  * request's current session; never feed it a body/query ID or a cached principal.
  * No auth/session implementation is activated here. Each call reloads persisted
@@ -189,18 +211,11 @@ export function createSqlRitualReader(
     /** One batched grant load and one metadata query, regardless of ritual count. */
     async listMetadata(): Promise<SqlRitualCatalogMetadata[]> {
       return read(async (tx, actor) => {
-        const rows = await tx
-          .select({ ...parentFields, templeSlug: temples.slug })
-          .from(rituals)
-          .leftJoin(temples, eq(temples.id, rituals.templeId))
-          .where(and(isNotNull(rituals.currentRevisionId), liveRitual))
-          .orderBy(asc(rituals.id));
-        return rows.flatMap((row) => {
-          const access = getRitualAccess(policy(row), actor);
-          return access.read
-            ? [{ ...metadata(row, access), templeSlug: row.templeSlug }]
-            : [];
-        });
+        const rows = await listReadableSqlRituals(tx, actor);
+        return rows.map(({ row, access }) => ({
+          ...metadata(row, access),
+          templeSlug: row.templeSlug,
+        }));
       });
     },
     async getMetadata(ritualId: string): Promise<SqlRitualMetadata | null> {
