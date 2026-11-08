@@ -617,5 +617,13 @@ Follow-ups are separate from the completed migration work:
   `pnpm data:build` first. That shot was taken with `capture.mts` against
   a 127.0.0.1 dev server holding the same local settings and a throwaway
   secrets key.
+- Temple halls index: planned on 8 November 2026 on `gate/temple-halls`
+  ([plan 069](069-temple-halls-index.md)), reviewed (Fable) and spiked
+  the same day. A Halls action in the reader lists and opens a ritual's
+  halls full screen, and `/gd/halls` gains a tab per temple listing the
+  halls in the temple rituals a member may read, collected from the
+  device's offline copies; offline they are on the Downloaded rituals
+  page. Editing halls outside rituals and shared halls are later steps.
+  Stage 3 builds on plan 068's `ritualDownload.ts`. Not built.
 
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.
