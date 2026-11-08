@@ -661,7 +661,7 @@ describe("offline", () => {
     await waitFor(() => expect(selectedTab()).toBe("example"));
     expect(fetchSpy).not.toHaveBeenCalled();
     const link = screen.getByRole("link", { name: "Halls on this device" });
-    expect(link.getAttribute("href")).toBe("/offline/ritual");
+    expect(link.getAttribute("href")).toBe("/offline/ritual#halls");
     expect(screen.getByText(/Offline: see/)).toBeTruthy();
     expect(mock.fetchRituals).not.toHaveBeenCalled();
     expect(mock.recheck).not.toHaveBeenCalled();
@@ -1114,6 +1114,10 @@ describe("the viewer", () => {
     act(() => view.hide("change"));
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(screen.queryByText("Zelator Temple 1")).toBeNull();
+    // The halls coming back do not reopen it.
+    act(() => view.available());
+    await screen.findByText("Zelator Temple 1");
+    expect(screen.queryByRole("dialog")).toBeNull();
   });
 });
 

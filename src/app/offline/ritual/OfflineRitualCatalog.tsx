@@ -12,6 +12,13 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
+import { HallGroups, type RitualStatus } from "@/app/gd/halls/HallGroups";
+import { compareRituals } from "@/app/gd/halls/templeHalls";
+import {
+  type RitualHall,
+  type RitualRow,
+  ritualHalls,
+} from "@/doc/ritualHalls";
 import { getBrowserOfflineRuntime } from "@/offline/browserRuntime";
 import type { OfflineAccount } from "@/offline/lease";
 import type { OfflineOperation } from "@/offline/lifecycle";
@@ -20,7 +27,29 @@ import {
   recheckOfflineRitual,
 } from "@/offline/ritualDownload";
 
-type Item = Readonly<{ id: string; title: string }>;
+/** A downloaded ritual, with its halls parsed from the same gated read. */
+type Item = Readonly<{
+  id: string;
+  title: string;
+  /** The content the halls were parsed from, so a re-read keeps them. */
+  source: string;
+  halls: readonly RitualHall[];
+}>;
+
+/**
+ * How long the discovery waits for a listed copy to be read before the
+ * list counts as settled: a copy the coordinator never opens is never read.
+ */
+const SETTLE_AFTER_MS = 2_000;
+
+/** The halls a copy draws; none when its content cannot be read. */
+function hallsOf(renderedJson: string): RitualHall[] {
+  try {
+    return ritualHalls(JSON.parse(renderedJson) as RitualRow);
+  } catch {
+    return [];
+  }
+}
 
 /** Online events within this window are one reconnection. */
 const ONLINE_SETTLE_MS = 2_000;
@@ -33,6 +62,10 @@ const ONLINE_SETTLE_MS = 2_000;
  */
 export default function OfflineRitualCatalog() {
   const [items, setItems] = React.useState<Item[]>([]);
+  // The `#halls` jump happens once per visit, not each time the list refills.
+  const hallsScrolled = React.useRef(false);
+  // Every listed copy has been read, or given up on.
+  const [settled, setSettled] = React.useState(false);
   const [status, setStatus] = React.useState<
     "loading" | "ready" | "locked" | "unavailable"
   >("loading");
@@ -55,8 +88,19 @@ export default function OfflineRitualCatalog() {
     let queue: string[] = [];
     let checking = false;
     let checkPending = false;
+    // The discovery's copies not read yet.
+    let unread = new Set<string>();
+    let settleTimer: ReturnType<typeof setTimeout> | undefined;
+    const markRead = (ritualId: string) => {
+      if (!unread.delete(ritualId) || unread.size > 0 || disposed) return;
+      clearTimeout(settleTimer);
+      setSettled(true);
+    };
 
     const clear = () => {
+      unread = new Set();
+      clearTimeout(settleTimer);
+      setSettled(false);
       for (const registration of registrations.values()) registration.dispose();
       registrations.clear();
       queue = [];
@@ -69,6 +113,7 @@ export default function OfflineRitualCatalog() {
       setStatus("locked");
     };
     const drop = (ritualId: string) => {
+      markRead(ritualId);
       hideEntry(ritualId);
       registrations.get(ritualId)?.dispose();
       registrations.delete(ritualId);
@@ -141,21 +186,35 @@ export default function OfflineRitualCatalog() {
     ) => {
       try {
         const bundle = await runtime.repository.readBundle(account, ritualId);
-        if (!bundle || operation.signal.aborted) return;
+        if (!bundle) {
+          markRead(ritualId);
+          return;
+        }
+        if (operation.signal.aborted) return;
         runtime.coordinator.commit(operation, () => {
           if (disposed) return;
-          setItems((current) =>
-            [
+          setItems((current) => {
+            const previous = current.find((item) => item.id === ritualId);
+            const source = bundle.renderedJson;
+            return [
               ...current.filter((item) => item.id !== ritualId),
               {
                 id: ritualId,
                 title: bundle.title,
+                source,
+                // Unchanged content keeps its halls, and drawn thumbnails.
+                halls:
+                  previous && previous.source === source
+                    ? previous.halls
+                    : hallsOf(source),
               },
-            ].sort((a, b) => a.title.localeCompare(b.title)),
-          );
+            ].sort((a, b) => a.title.localeCompare(b.title));
+          });
           setStatus("ready");
+          markRead(ritualId);
         });
       } catch {
+        markRead(ritualId);
         if (!disposed) setStatus("unavailable");
       } finally {
         runtime.coordinator.finish(operation);
@@ -169,6 +228,16 @@ export default function OfflineRitualCatalog() {
         const ids = await runtime.repository.listDownloadedRitualIds(account);
         if (disposed || currentSequence !== sequence) return;
         if (ids.length === 0) setStatus("ready");
+        // Registering hides each view at once ("startup"), so the copies
+        // count as unread only from here.
+        unread = new Set(ids);
+        if (ids.length === 0) setSettled(true);
+        else
+          settleTimer = setTimeout(() => {
+            if (disposed || currentSequence !== sequence) return;
+            unread = new Set();
+            setSettled(true);
+          }, SETTLE_AFTER_MS);
         for (const ritualId of ids) {
           let registration: ReturnType<typeof runtime.coordinator.register>;
           registration = runtime.coordinator.register({
@@ -220,6 +289,7 @@ export default function OfflineRitualCatalog() {
       disposed = true;
       sequence++;
       queue = [];
+      clearTimeout(settleTimer);
       clearTimeout(onlineTimer);
       window.removeEventListener("online", online);
       unsubscribe();
@@ -264,6 +334,91 @@ export default function OfflineRitualCatalog() {
       <Button sx={{ mt: 2 }} onClick={() => window.location.reload()}>
         Retry
       </Button>
+      {items.length > 0 && (
+        <DeviceHalls items={items} settled={settled} scrolled={hallsScrolled} />
+      )}
+    </Box>
+  );
+}
+
+/**
+ * Halls on this device (plan 069, decision 9): the halls of every
+ * downloaded ritual the list shows, grouped by ritual, grade rituals first.
+ * They come from the list's own reads, so they go with its entries on
+ * hide() and on an account change. Every link is a full navigation, which
+ * the service worker serves from this shell offline. `/gd/halls` links
+ * here as `#halls`; the section is complete only after the reads, too late
+ * for the browser's own jump, so it scrolls itself into view once settled.
+ */
+function DeviceHalls({
+  items,
+  settled,
+  scrolled,
+}: {
+  items: readonly Item[];
+  /** Whether every listed copy has been read (or given up on). */
+  settled: boolean;
+  scrolled: React.RefObject<boolean>;
+}) {
+  const withHalls = React.useMemo(
+    () => items.filter((item) => item.halls.length > 0).sort(compareRituals),
+    [items],
+  );
+  const statuses = React.useMemo(
+    () =>
+      new Map<string, RitualStatus>(
+        withHalls.map((item) => [
+          item.id,
+          { kind: "ready", halls: item.halls },
+        ]),
+      ),
+    [withHalls],
+  );
+  const section = React.useRef<HTMLElement>(null);
+  // Once every row above is in place; then the hash goes, so neither Back
+  // nor a reload jumps again.
+  React.useEffect(() => {
+    if (!settled || scrolled.current) return;
+    scrolled.current = true;
+    if (window.location.hash !== "#halls") return;
+    (section.current as HTMLElement).scrollIntoView();
+    const { pathname, search } = window.location;
+    window.history.replaceState(window.history.state, "", pathname + search);
+  }, [settled, scrolled]);
+  return (
+    <Box
+      component="section"
+      id="halls"
+      ref={section}
+      aria-labelledby="halls-heading"
+      sx={{ mt: 4 }}
+    >
+      <Typography id="halls-heading" variant="h5" component="h2" sx={{ mb: 1 }}>
+        Halls on this device
+      </Typography>
+      {withHalls.length === 0 ? (
+        settled && (
+          <Typography variant="body2">
+            None of these rituals has a temple hall.
+          </Typography>
+        )
+      ) : (
+        <>
+          <Typography variant="body2" sx={{ maxWidth: "40rem" }}>
+            Every hall in the rituals downloaded here. Tap a hall to open it
+            full screen, or a ritual’s name to read it.
+          </Typography>
+          <HallGroups
+            rituals={withHalls}
+            statuses={statuses}
+            idPrefix="device-ritual"
+            fullNavigation
+          />
+          <Typography variant="body2" color="textSecondary">
+            East is at the top of every plan and North on the left.
+          </Typography>
+        </>
+      )}
     </Box>
   );
 }

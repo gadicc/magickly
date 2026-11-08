@@ -1,13 +1,7 @@
 "use client";
 
-import { estimateHallAspect } from "@magick-components/gd/hall/aspect";
-import type { HallNode } from "@magick-components/gd/hall/types";
-import { Alert, Button, CircularProgress, Typography } from "@mui/material";
-import dynamic from "next/dynamic";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Alert, Button, Typography } from "@mui/material";
 import React from "react";
-import { GdHallFrame } from "@/doc/ritualBlocks/GdHallFrame";
 import {
   type RitualHall,
   type RitualRow,
@@ -17,15 +11,9 @@ import type { BrowserOfflineRuntime } from "@/offline/browserRuntime";
 import type { OfflineAccount } from "@/offline/lease";
 import type { OfflineOperation } from "@/offline/lifecycle";
 import { fetchOfflineRituals } from "@/offline/ritualDownload";
-import { createDrawQueue, type DrawQueue } from "./drawQueue";
+import { HallGroups, type RitualStatus } from "./HallGroups";
 import { type CatalogRitual, ignore } from "./templeHalls";
 import styles from "./templeHalls.module.css";
-
-const HallViewer = dynamic(
-  () =>
-    import("@/app/doc/[_id]/HallViewer").then((module) => module.HallViewer),
-  { ssr: false },
-);
 
 type Registration = ReturnType<Runtime["coordinator"]["register"]>;
 type Runtime = Pick<
@@ -33,31 +21,8 @@ type Runtime = Pick<
   "repository" | "coordinator" | "subscribeState"
 >;
 
-/**
- * Where one ritual's halls stand: being read from the device, fetched to
- * it, waiting for the member to fetch it (Save-Data, offline or an
- * interrupted round), failed, fetched but still not readable once the
- * round has settled, or read. A denied ritual leaves the tab.
- */
-type RitualStatus =
-  | { kind: "reading" }
-  | { kind: "fetching" }
-  | { kind: "waiting" }
-  | { kind: "failed" }
-  | { kind: "unreadable" }
-  | { kind: "denied" }
-  | { kind: "ready"; halls: readonly RitualHall[] };
-
 /** How long a copy on the device may take to become readable. */
 const SWEEP_AFTER_MS = 2_000;
-
-/** Thumbnails drawn per animation frame. */
-const THUMBNAILS_PER_FRAME = 2;
-let thumbnailQueue: DrawQueue | undefined;
-const thumbnails = () =>
-  (thumbnailQueue ??= createDrawQueue({ perFrame: THUMBNAILS_PER_FRAME }));
-
-const hallOf = (hall: RitualHall) => hall.row as unknown as HallNode;
 
 /** Whether the browser asks to save data or is offline: fetch on request only. */
 function fetchOnRequestOnly(): boolean {
@@ -65,55 +30,6 @@ function fetchOnRequestOnly(): boolean {
     navigator as Navigator & { connection?: { saveData?: boolean } }
   ).connection;
   return connection?.saveData === true || navigator.onLine === false;
-}
-
-/**
- * A hall's thumbnail, drawn only once it scrolls near the view, and then
- * through the shared queue, a few per frame. Until then it holds the
- * hall's estimated shape.
- */
-function LazyHallThumbnail({ hall }: { hall: RitualHall }) {
-  const ref = React.useRef<HTMLDivElement>(null);
-  const [draw, setDraw] = React.useState(false);
-  const aspect = React.useMemo(() => estimateHallAspect(hallOf(hall)), [hall]);
-  React.useEffect(() => {
-    const element = ref.current as HTMLDivElement;
-    const cancels: (() => void)[] = [];
-    const start = () => {
-      cancels.push(thumbnails().enqueue(() => setDraw(true)));
-    };
-    const cancel = () => {
-      for (const job of cancels) job();
-    };
-    if (typeof IntersectionObserver !== "function") {
-      start();
-      return cancel;
-    }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        start();
-      },
-      { rootMargin: "200px" },
-    );
-    observer.observe(element);
-    return () => {
-      observer.disconnect();
-      cancel();
-    };
-  }, []);
-  return (
-    <div
-      ref={ref}
-      className={styles.thumb}
-      style={draw ? undefined : { aspectRatio: aspect }}
-      data-drawn={draw || undefined}
-      aria-hidden="true"
-    >
-      {draw && <GdHallFrame hall={hallOf(hall)} />}
-    </div>
-  );
 }
 
 /**
@@ -140,15 +56,10 @@ export default function TempleHallsPanel({
   /** Told when a fetch round starts and ends, and false on unmount. */
   onBusy?: (busy: boolean) => void;
 }) {
-  const router = useRouter();
   const [statuses, setStatuses] = React.useState<
     ReadonlyMap<string, RitualStatus>
   >(() => new Map());
   const [fetching, setFetching] = React.useState(false);
-  const [viewer, setViewer] = React.useState<{
-    ritualId: string;
-    index: number | null;
-  } | null>(null);
   const fetchRef = React.useRef<() => void>(ignore);
   const busyRef = React.useRef(onBusy);
   busyRef.current = onBusy;
@@ -183,7 +94,6 @@ export default function TempleHallsPanel({
         map.set(ritualId, { kind: "reading" });
         return map;
       });
-      setViewer((current) => (current?.ritualId === ritualId ? null : current));
     };
     const load = async (
       ritualId: string,
@@ -310,7 +220,6 @@ export default function TempleHallsPanel({
     setStatuses(
       new Map(ids.map((ritualId) => [ritualId, { kind: "reading" }])),
     );
-    setViewer(null);
     for (const ritualId of ids) {
       const registration = runtime.coordinator.register({
         ritualId,
@@ -358,7 +267,6 @@ export default function TempleHallsPanel({
       registrations.clear();
       // Halls are held for this account and tab only.
       setStatuses(new Map());
-      setViewer(null);
     };
   }, [runtime, accountKey, ritualKey]);
 
@@ -368,11 +276,6 @@ export default function TempleHallsPanel({
   const waitingCount = shown.filter(
     (ritual) => statuses.get(ritual.id)?.kind === "waiting",
   ).length;
-  const viewing = viewer ? statuses.get(viewer.ritualId) : undefined;
-  const viewingHalls =
-    viewing?.kind === "ready" && viewing.halls.length > 0
-      ? viewing.halls
-      : null;
 
   return (
     <>
@@ -397,117 +300,16 @@ export default function TempleHallsPanel({
           No rituals with halls are left in this temple for you.
         </Alert>
       ) : (
-        <div className={styles.groups}>
-          {shown.map((ritual) => {
-            const status = statuses.get(ritual.id) ?? { kind: "reading" };
-            const headingId = `temple-ritual-${ritual.id}`;
-            return (
-              <section
-                key={ritual.id}
-                aria-labelledby={headingId}
-                className={styles.group}
-              >
-                <h3>
-                  <Link
-                    id={headingId}
-                    href={`/doc/${ritual.id}`}
-                    prefetch={false}
-                  >
-                    {ritual.title}
-                  </Link>
-                  {status.kind === "ready" && (
-                    <Typography
-                      component="span"
-                      variant="caption"
-                      color="success"
-                    >
-                      ✓ offline
-                    </Typography>
-                  )}
-                </h3>
-                <ul className={styles.halls}>
-                  {status.kind === "ready" ? (
-                    status.halls.map((hall, index) => (
-                      <li key={hall.ordinal}>
-                        <button
-                          type="button"
-                          aria-describedby={headingId}
-                          className={styles.card}
-                          onClick={() =>
-                            setViewer({ ritualId: ritual.id, index })
-                          }
-                        >
-                          <LazyHallThumbnail hall={hall} />
-                          <Typography
-                            component="span"
-                            variant="inherit"
-                            color="primary"
-                            className={styles.name}
-                          >
-                            {hall.name}
-                          </Typography>
-                          {hall.context && (
-                            <span className={styles.context}>
-                              {hall.context}
-                            </span>
-                          )}
-                        </button>
-                      </li>
-                    ))
-                  ) : (
-                    <li>
-                      <div className={styles.placeholder}>
-                        {status.kind === "fetching" ? (
-                          <span>
-                            <CircularProgress
-                              size={16}
-                              aria-hidden="true"
-                              sx={{ display: "block", mx: "auto", mb: 1 }}
-                            />
-                            Fetching this ritual to this device…
-                          </span>
-                        ) : status.kind === "waiting" ? (
-                          "Not on this device yet."
-                        ) : status.kind === "failed" ? (
-                          "This ritual could not be fetched."
-                        ) : status.kind === "unreadable" ? (
-                          <span>
-                            Not available on this device.{" "}
-                            <Link href={`/doc/${ritual.id}`} prefetch={false}>
-                              Open the ritual
-                            </Link>
-                          </span>
-                        ) : (
-                          <CircularProgress
-                            size={16}
-                            aria-label={`Reading ${ritual.title}`}
-                          />
-                        )}
-                      </div>
-                    </li>
-                  )}
-                </ul>
-              </section>
-            );
-          })}
-        </div>
+        <HallGroups
+          rituals={shown}
+          statuses={statuses}
+          idPrefix="temple-ritual"
+          offlineBadge
+        />
       )}
       <Typography variant="body2" color="textSecondary">
         East is at the top of every plan and North on the left.
       </Typography>
-      {viewer && viewingHalls && (
-        <HallViewer
-          halls={viewingHalls}
-          index={viewer.index}
-          onIndexChange={(index) =>
-            setViewer({ ritualId: viewer.ritualId, index })
-          }
-          onClose={() => setViewer({ ritualId: viewer.ritualId, index: null })}
-          onGoTo={(hall) =>
-            router.push(`/doc/${viewer.ritualId}#hall-${hall.ordinal}`)
-          }
-        />
-      )}
     </>
   );
 }

@@ -408,7 +408,7 @@ function TemplePanelContent({
         Offline: see{" "}
         {/* A full navigation: the service worker serves this page's shell
             offline, which an in-app link cannot reach. */}
-        <a href="/offline/ritual">Halls on this device</a>.
+        <a href="/offline/ritual#halls">Halls on this device</a>.
       </Alert>
     );
   if (catalog.kind !== "ready")
