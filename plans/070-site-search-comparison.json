@@ -1,0 +1,688 @@
+[
+  {
+    "profile": {
+      "key": "gemini-embedding-2-768-search-v1",
+      "model": "google/gemini-embedding-2",
+      "revision": "gateway-2026-11-09-v1",
+      "dimensions": 768,
+      "normalization": "l2",
+      "chunker": "words-180-overlap-24-v1",
+      "queryPrefix": "task: search result | query: ",
+      "documentPrefix": "title: {title} | text: "
+    },
+    "catalogueSha256": "e4985d13de3bb969206a7f888a0ea5a83bbed6f0223a2e5b488a08f853af1dda",
+    "passages": 2961,
+    "requested": 0,
+    "tokens": 0,
+    "bytes": 9096192,
+    "elapsedMs": 465,
+    "cases": [
+      {
+        "query": "Planetary hours",
+        "expected": ["/astrology/planetary-hours"],
+        "lexicalRank": 1,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/astrology/planetary-hours",
+          "/astrology",
+          "/books/la-science-cabalistique/chapitre-8",
+          "/astrology/planet/sol",
+          "/astrology/planet/mercury"
+        ],
+        "queryMs": 42,
+        "queryCached": true
+      },
+      {
+        "query": "Tree of Life",
+        "expected": ["/kabbalah/tree"],
+        "lexicalRank": 1,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/kabbalah/tree",
+          "/kabbalah/path/2_5",
+          "/kabbalah/path/8_10",
+          "/kabbalah/path/6_9",
+          "/kabbalah/path/6_7"
+        ],
+        "queryMs": 16,
+        "queryCached": true
+      },
+      {
+        "query": "Qabalah",
+        "expected": ["/kabbalah", "/kabbalah/tree"],
+        "lexicalRank": 1,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/kabbalah",
+          "/books/la-science-cabalistique",
+          "/books",
+          "/kabbalah/yhvh/72angels",
+          "/kabbalah/angel/haamiah"
+        ],
+        "queryMs": 12,
+        "queryCached": true
+      },
+      {
+        "query": "Vehuiah",
+        "expected": ["/kabbalah/angel/vehuiah"],
+        "lexicalRank": 1,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/kabbalah/angel/vehuiah",
+          "/books/la-science-cabalistique/chapitre-6",
+          "/kabbalah/angel/iehuiah",
+          "/kabbalah/angel/veualiah",
+          "/kabbalah/angel/vehuel"
+        ],
+        "queryMs": 17,
+        "queryCached": true
+      },
+      {
+        "query": "draw a sigil from a Hebrew name",
+        "expected": ["/gd/sigils"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/gd/sigils",
+          "/books/la-science-cabalistique/chapitre-10",
+          "/kabbalah/angel/vehuiah",
+          "/astrology/planet/venus",
+          "/kabbalah/yhvh"
+        ],
+        "queryMs": 6,
+        "queryCached": true
+      },
+      {
+        "query": "when is a good time to perform planetary magic",
+        "expected": ["/astrology/planetary-hours"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/astrology/planetary-hours",
+          "/astrology",
+          "/books/la-science-cabalistique/chapitre-9",
+          "/astrology/planet/sol",
+          "/astrology/planet/mercury"
+        ],
+        "queryMs": 8,
+        "queryCached": true
+      },
+      {
+        "query": "find the officers' positions in a Golden Dawn temple",
+        "expected": ["/gd/halls"],
+        "lexicalRank": null,
+        "denseRank": 15,
+        "hybridRank": 15,
+        "top": [
+          "/gd/halls/neophyte",
+          "/gd/halls/portal-1",
+          "/gd/halls/zelator-2",
+          "/gd/halls/zelator-1",
+          "/gd/halls/theoricus-2"
+        ],
+        "queryMs": 7,
+        "queryCached": true
+      },
+      {
+        "query": "practice remembering the Hebrew alphabet",
+        "expected": ["/study"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/study",
+          "/kabbalah/path/4_5",
+          "/kabbalah/path/2_5",
+          "/kabbalah/path/1_2",
+          "/astrology/planet/jupiter"
+        ],
+        "queryMs": 6,
+        "queryCached": true
+      },
+      {
+        "query": "the nineteen invocations of John Dee",
+        "expected": ["/enochian/keys"],
+        "lexicalRank": null,
+        "denseRank": 3,
+        "hybridRank": 3,
+        "top": [
+          "/enochian/oration",
+          "/enochian",
+          "/enochian/keys",
+          "/enochian/dictionary",
+          "/books/la-science-cabalistique/chapitre-6"
+        ],
+        "queryMs": 8,
+        "queryCached": true
+      },
+      {
+        "query": "calculate a divination chart with four mothers",
+        "expected": ["/geomancy/reading"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/geomancy/reading",
+          "/books/la-science-cabalistique/chapitre-4",
+          "/geomancy",
+          "/books/la-science-cabalistique/chapitre-6",
+          "/geomancy/reference"
+        ],
+        "queryMs": 8,
+        "queryCached": true
+      },
+      {
+        "query": "שעות פלנטריות",
+        "expected": ["/astrology/planetary-hours"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/astrology/planetary-hours",
+          "/books/la-science-cabalistique/chapitre-8",
+          "/astrology",
+          "/astrology/planets",
+          "/astrology/planet/sol"
+        ],
+        "queryMs": 17,
+        "queryCached": true
+      },
+      {
+        "query": "עץ החיים בקבלה",
+        "expected": ["/kabbalah/tree", "/kabbalah"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/kabbalah/tree",
+          "/kabbalah/sephirah/keter",
+          "/kabbalah/sephirah/daat",
+          "/kabbalah",
+          "/kabbalah/sephirah/malchut"
+        ],
+        "queryMs": 12,
+        "queryCached": true
+      },
+      {
+        "query": "לצייר סיגיל משם בעברית",
+        "expected": ["/gd/sigils"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/gd/sigils",
+          "/astrology/planets",
+          "/gd",
+          "/books/la-science-cabalistique/chapitre-10",
+          "/enochian/dictionary"
+        ],
+        "queryMs": 10,
+        "queryCached": true
+      },
+      {
+        "query": "ללמוד את האותיות העבריות",
+        "expected": ["/study"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/study",
+          "/books/la-science-cabalistique/chapitre-2",
+          "/astrology/planets",
+          "/enochian/dictionary",
+          "/books/la-science-cabalistique/chapitre-10"
+        ],
+        "queryMs": 12,
+        "queryCached": true
+      },
+      {
+        "query": "heures planétaires",
+        "expected": ["/astrology/planetary-hours"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 2,
+        "top": [
+          "/books/la-science-cabalistique/chapitre-8",
+          "/astrology/planetary-hours",
+          "/astrology",
+          "/books/la-science-cabalistique/chapitre-5",
+          "/astrology/planets"
+        ],
+        "queryMs": 17,
+        "queryCached": true
+      },
+      {
+        "query": "dessiner un sceau avec un nom hébreu",
+        "expected": ["/gd/sigils"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/gd/sigils",
+          "/books/la-science-cabalistique/chapitre-10",
+          "/books/la-science-cabalistique/chapitre-1",
+          "/books/la-science-cabalistique/chapitre-2",
+          "/astrology/planets"
+        ],
+        "queryMs": 10,
+        "queryCached": true
+      },
+      {
+        "query": "les soixante-douze anges",
+        "expected": [
+          "/kabbalah/yhvh/72angels",
+          "/books/la-science-cabalistique/chapitre-6"
+        ],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/kabbalah/yhvh/72angels",
+          "/books/la-science-cabalistique/chapitre-3",
+          "/kabbalah/yhvh",
+          "/books/la-science-cabalistique/chapitre-6",
+          "/books/la-science-cabalistique"
+        ],
+        "queryMs": 11,
+        "queryCached": true
+      },
+      {
+        "query": "惑星時間を計算したい",
+        "expected": ["/astrology/planetary-hours"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/astrology/planetary-hours",
+          "/books/la-science-cabalistique/chapitre-8",
+          "/astrology",
+          "/astrology/planets",
+          "/books/la-science-cabalistique/chapitre-5"
+        ],
+        "queryMs": 19,
+        "queryCached": true
+      },
+      {
+        "query": "生命の樹を表示",
+        "expected": ["/kabbalah/tree"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/kabbalah/tree",
+          "/kabbalah/sephirah/hod",
+          "/kabbalah/path/2_5",
+          "/kabbalah/sephirah/keter",
+          "/kabbalah/sephirah/daat"
+        ],
+        "queryMs": 16,
+        "queryCached": true
+      },
+      {
+        "query": "what does each geomantic figure mean",
+        "expected": ["/geomancy/reference"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/geomancy/reference",
+          "/geomancy/reading",
+          "/geomancy",
+          "/books/la-science-cabalistique/chapitre-6",
+          "/books/la-science-cabalistique/chapitre-4"
+        ],
+        "queryMs": 15,
+        "queryCached": true
+      }
+    ]
+  },
+  {
+    "profile": {
+      "key": "qwen3-embedding-06b-1024-search-v1",
+      "model": "alibaba/qwen3-embedding-0.6b",
+      "revision": "gateway-2026-11-09-v1",
+      "dimensions": 1024,
+      "normalization": "l2",
+      "chunker": "words-180-overlap-24-v1",
+      "queryPrefix": "Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery:",
+      "documentPrefix": "{title}\n"
+    },
+    "catalogueSha256": "e4985d13de3bb969206a7f888a0ea5a83bbed6f0223a2e5b488a08f853af1dda",
+    "passages": 2961,
+    "requested": 59,
+    "tokens": 4965,
+    "bytes": 12128256,
+    "elapsedMs": 7723,
+    "cases": [
+      {
+        "query": "Planetary hours",
+        "expected": ["/astrology/planetary-hours"],
+        "lexicalRank": 1,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/astrology/planetary-hours",
+          "/astrology",
+          "/books/la-science-cabalistique/chapitre-8",
+          "/astrology/planets",
+          "/books/la-science-cabalistique/chapitre-4"
+        ],
+        "queryMs": 21,
+        "queryCached": true
+      },
+      {
+        "query": "Tree of Life",
+        "expected": ["/kabbalah/tree"],
+        "lexicalRank": 1,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/kabbalah/tree",
+          "/kabbalah/path/4_5",
+          "/kabbalah/path/2_3",
+          "/kabbalah/path/2_5",
+          "/kabbalah/path/1_2"
+        ],
+        "queryMs": 16,
+        "queryCached": true
+      },
+      {
+        "query": "Qabalah",
+        "expected": ["/kabbalah", "/kabbalah/tree"],
+        "lexicalRank": 1,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/kabbalah",
+          "/books",
+          "/kabbalah/angel/nanael",
+          "/books/la-science-cabalistique",
+          "/"
+        ],
+        "queryMs": 11,
+        "queryCached": true
+      },
+      {
+        "query": "Vehuiah",
+        "expected": ["/kabbalah/angel/vehuiah"],
+        "lexicalRank": 1,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/kabbalah/angel/vehuiah",
+          "/kabbalah/angel/iehuiah",
+          "/books/la-science-cabalistique/chapitre-6",
+          "/enochian/dictionary",
+          "/kabbalah/angel/hahiuiah"
+        ],
+        "queryMs": 18,
+        "queryCached": true
+      },
+      {
+        "query": "draw a sigil from a Hebrew name",
+        "expected": ["/gd/sigils"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/gd/sigils",
+          "/books/la-science-cabalistique/chapitre-2",
+          "/kabbalah/yhvh/72angels",
+          "/astrology/planets",
+          "/books/la-science-cabalistique/chapitre-8"
+        ],
+        "queryMs": 7,
+        "queryCached": true
+      },
+      {
+        "query": "when is a good time to perform planetary magic",
+        "expected": ["/astrology/planetary-hours"],
+        "lexicalRank": null,
+        "denseRank": 2,
+        "hybridRank": 2,
+        "top": [
+          "/astrology",
+          "/astrology/planetary-hours",
+          "/books/la-science-cabalistique/chapitre-8",
+          "/astrology/planet/mercury",
+          "/astrology/planet/luna"
+        ],
+        "queryMs": 10,
+        "queryCached": true
+      },
+      {
+        "query": "find the officers' positions in a Golden Dawn temple",
+        "expected": ["/gd/halls"],
+        "lexicalRank": null,
+        "denseRank": 9,
+        "hybridRank": 9,
+        "top": [
+          "/gd/halls/neophyte",
+          "/gd/halls/portal-2",
+          "/gd/halls/zelator-2",
+          "/gd/halls/portal-1",
+          "/gd/halls/practicus-3"
+        ],
+        "queryMs": 7,
+        "queryCached": true
+      },
+      {
+        "query": "practice remembering the Hebrew alphabet",
+        "expected": ["/study"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/study",
+          "/enochian/dictionary",
+          "/kabbalah/yhvh/72angels",
+          "/books/la-science-cabalistique/chapitre-2",
+          "/astrology/planets"
+        ],
+        "queryMs": 10,
+        "queryCached": true
+      },
+      {
+        "query": "the nineteen invocations of John Dee",
+        "expected": ["/enochian/keys"],
+        "lexicalRank": null,
+        "denseRank": 5,
+        "hybridRank": 5,
+        "top": [
+          "/enochian/oration",
+          "/enochian",
+          "/kabbalah/angel/vehuiah",
+          "/books/la-science-cabalistique/chapitre-10",
+          "/enochian/keys"
+        ],
+        "queryMs": 10,
+        "queryCached": true
+      },
+      {
+        "query": "calculate a divination chart with four mothers",
+        "expected": ["/geomancy/reading"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/geomancy/reading",
+          "/astrology",
+          "/astrology/planet/zodiac",
+          "/books/la-science-cabalistique/chapitre-4",
+          "/astrology/planet/earth"
+        ],
+        "queryMs": 9,
+        "queryCached": true
+      },
+      {
+        "query": "שעות פלנטריות",
+        "expected": ["/astrology/planetary-hours"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/astrology/planetary-hours",
+          "/books/la-science-cabalistique/chapitre-8",
+          "/astrology",
+          "/books/la-science-cabalistique/chapitre-4",
+          "/astrology/planets"
+        ],
+        "queryMs": 19,
+        "queryCached": true
+      },
+      {
+        "query": "עץ החיים בקבלה",
+        "expected": ["/kabbalah/tree", "/kabbalah"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/kabbalah/tree",
+          "/kabbalah/path/2_5",
+          "/kabbalah/sephirah/gevurah",
+          "/kabbalah/path/2_3",
+          "/kabbalah/path/4_7"
+        ],
+        "queryMs": 21,
+        "queryCached": true
+      },
+      {
+        "query": "לצייר סיגיל משם בעברית",
+        "expected": ["/gd/sigils"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/gd/sigils",
+          "/kabbalah/yhvh/72angels",
+          "/astrology/planet/sol",
+          "/kabbalah/angel/sealiah",
+          "/gd"
+        ],
+        "queryMs": 22,
+        "queryCached": true
+      },
+      {
+        "query": "ללמוד את האותיות העבריות",
+        "expected": ["/study"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/study",
+          "/enochian/dictionary",
+          "/kabbalah/yhvh/72angels",
+          "/kabbalah/angel/iezalel",
+          "/astrology/planets"
+        ],
+        "queryMs": 17,
+        "queryCached": true
+      },
+      {
+        "query": "heures planétaires",
+        "expected": ["/astrology/planetary-hours"],
+        "lexicalRank": null,
+        "denseRank": 2,
+        "hybridRank": 2,
+        "top": [
+          "/books/la-science-cabalistique/chapitre-8",
+          "/astrology/planetary-hours",
+          "/books/la-science-cabalistique/chapitre-4",
+          "/books/la-science-cabalistique/chapitre-5",
+          "/astrology/planets"
+        ],
+        "queryMs": 22,
+        "queryCached": true
+      },
+      {
+        "query": "dessiner un sceau avec un nom hébreu",
+        "expected": ["/gd/sigils"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/gd/sigils",
+          "/books/la-science-cabalistique/chapitre-2",
+          "/books/la-science-cabalistique/chapitre-9",
+          "/books/la-science-cabalistique/chapitre-10",
+          "/books/la-science-cabalistique/chapitre-1"
+        ],
+        "queryMs": 14,
+        "queryCached": true
+      },
+      {
+        "query": "les soixante-douze anges",
+        "expected": [
+          "/kabbalah/yhvh/72angels",
+          "/books/la-science-cabalistique/chapitre-6"
+        ],
+        "lexicalRank": null,
+        "denseRank": 5,
+        "hybridRank": 5,
+        "top": [
+          "/books/la-science-cabalistique/chapitre-3",
+          "/books/la-science-cabalistique/chapitre-2",
+          "/books/la-science-cabalistique/chapitre-8",
+          "/kabbalah/angel/anauel",
+          "/books/la-science-cabalistique/chapitre-6"
+        ],
+        "queryMs": 15,
+        "queryCached": true
+      },
+      {
+        "query": "惑星時間を計算したい",
+        "expected": ["/astrology/planetary-hours"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/astrology/planetary-hours",
+          "/astrology",
+          "/astrology/planet/earth",
+          "/books/la-science-cabalistique/chapitre-8",
+          "/astrology/planet/neptune"
+        ],
+        "queryMs": 22,
+        "queryCached": true
+      },
+      {
+        "query": "生命の樹を表示",
+        "expected": ["/kabbalah/tree"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/kabbalah/tree",
+          "/about",
+          "/kabbalah/path/2_3",
+          "/kabbalah/path/4_5",
+          "/kabbalah/path/3_5"
+        ],
+        "queryMs": 21,
+        "queryCached": true
+      },
+      {
+        "query": "what does each geomantic figure mean",
+        "expected": ["/geomancy/reference"],
+        "lexicalRank": null,
+        "denseRank": 1,
+        "hybridRank": 1,
+        "top": [
+          "/geomancy/reference",
+          "/geomancy",
+          "/geomancy/reading",
+          "/kabbalah/angel/haamiah",
+          "/astrology/zodiac"
+        ],
+        "queryMs": 15,
+        "queryCached": true
+      }
+    ]
+  }
+]

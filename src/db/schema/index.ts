@@ -11,6 +11,7 @@ export * from "./ritualBundles";
 export * from "./ritualCommands";
 export * from "./ritualFiles";
 export * from "./rituals";
+export * from "./searchUsage";
 export * from "./studyProgress";
 export * from "./templeCommands";
 export * from "./userProfile";

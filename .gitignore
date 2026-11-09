@@ -56,3 +56,6 @@ tsconfig.tsbuildinfo
 # Migration skill under development; adopt into Loom only after modernization.
 /.loom/drafts/
 .loom/dev-state.json
+
+# Public JSX prose extracted by search:build before tests/builds.
+/src/search/generated/

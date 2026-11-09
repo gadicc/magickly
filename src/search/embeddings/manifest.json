@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "selected": "gemini-embedding-2-768-search-v1",
+  "catalogueSha256": "e4985d13de3bb969206a7f888a0ea5a83bbed6f0223a2e5b488a08f853af1dda",
+  "profiles": [
+    {
+      "profile": {
+        "key": "gemini-embedding-2-768-search-v1",
+        "model": "google/gemini-embedding-2",
+        "revision": "gateway-2026-11-09-v1",
+        "dimensions": 768,
+        "normalization": "l2",
+        "chunker": "words-180-overlap-24-v1",
+        "queryPrefix": "task: search result | query: ",
+        "documentPrefix": "title: {title} | text: "
+      },
+      "file": "gemini-embedding-2-768-search-v1-f5afe8ce42c8.bin",
+      "sha256": "f5afe8ce42c84caac0b3df48be03059c0395832b7ff7f6537a8ec5abb510fc33",
+      "rows": 2961
+    }
+  ]
+}

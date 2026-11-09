@@ -124,6 +124,7 @@ export default async function (phase: string): Promise<NextConfig> {
     // read by Turbopack (plan 052).
     transpilePackages: ["magick-data"],
     outputFileTracingIncludes: {
+      "/api/search": ["./public/search-vectors/*.bin"],
       // The legacy alias only renders the Tree, which uses the public base fonts.
       "/api/treeOfLife": ["./public/fonts/*.ttf", resvgWasmTraceFile],
       "/api/render/*": [

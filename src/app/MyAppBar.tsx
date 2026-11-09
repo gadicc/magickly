@@ -4,12 +4,10 @@ import {
   AccountCircle,
   ArrowDropDown,
   ArrowDropUp,
-  Close,
   ExpandLess,
   ExpandMore,
   Login,
   Menu as MenuIcon,
-  Search as SearchIcon,
   Share,
 } from "@mui/icons-material";
 import {
@@ -20,8 +18,6 @@ import {
   Divider,
   Drawer,
   IconButton,
-  InputAdornment,
-  InputBase,
   List,
   ListItem,
   ListItemButton,
@@ -44,6 +40,7 @@ import {
 import React from "react";
 import { sqlBrowserLifecycle } from "@/auth/browserLifecycle";
 import { useSession } from "@/auth/client";
+import SearchButton from "@/search/SearchButton";
 // import Link from "@magick-components/Link";
 import { useLegacyRecoveryGate } from "./clientProviders";
 import pathnames, { type Pathnames, type PathnameValue } from "./pathnames";
@@ -275,8 +272,6 @@ function MenuDrawer({
 
 export default function ButtonAppBar() {
   const { pathname, title, known, navParts } = usePathnameInfo();
-  const [search, setSearch] = React.useState("");
-  const [searchOpen, setSearchOpen] = React.useState(false);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   const session = useSession();
@@ -285,8 +280,6 @@ export default function ButtonAppBar() {
   // server until hydration.
   const hydrated = useHydrated();
   const userId = hydrated ? (session.data?.user.id ?? null) : null;
-  // The avatar moves the search box, so it waits for hydration too.
-  const avatarSrc = hydrated ? session.data?.user.image : undefined;
   const recovery = useLegacyRecoveryGate();
   const [signOutPending, setSignOutPending] = React.useState(false);
   const [signOutError, setSignOutError] = React.useState<string | null>(null);
@@ -448,74 +441,7 @@ export default function ButtonAppBar() {
                 whiteSpace: "nowrap",
               }}
             >
-              <div
-                style={{
-                  display: "inline-block",
-                  width: 25,
-                  paddingLeft: 8,
-                  paddingRight: 8,
-                }}
-              >
-                <Box
-                  // Could try merge this with below.
-                  sx={{
-                    display: "block",
-                    position: "absolute",
-                    // top: 6,
-                    marginTop: -3.1,
-                    // This will get much easier once CSS anchor() is baseline
-                    // Each is width 25 + padding 16 = 41, x2 = 82
-                    right: 82 + 16 + (avatarSrc ? 20 : 0),
-                    left: searchOpen
-                      ? 14
-                      : "calc(100% - 82px - 16px - 25px - 16px - 16px" +
-                        (avatarSrc ? " - 20px" : "") +
-                        ")",
-                    transition: "left 0.5s, background 0.2s",
-                    background: searchOpen ? "#80a6f1" : undefined,
-                    "&:hover": {
-                      background: "#80a6f1",
-                    },
-                    borderRadius: 3,
-                  }}
-                >
-                  <InputBase
-                    id="searchInput"
-                    placeholder="Coming soon…"
-                    inputProps={{ "aria-label": "search" }}
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onFocus={() => !searchOpen && setSearchOpen(true)}
-                    onBlur={() => searchOpen && setSearchOpen(false)}
-                    sx={{
-                      paddingTop: 0.5,
-                      paddingBottom: 0.5,
-                      paddingLeft: 1,
-                      color: "white",
-                      width: "100%",
-                    }}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          sx={{
-                            color: "white",
-                            // pointerEvents: searchOpen ? "auto" : "none",
-                          }}
-                          aria-label="toggle search box"
-                          onClick={(e) => {
-                            setSearchOpen(!searchOpen);
-                            if (!searchOpen) {
-                              document.getElementById("searchInput")?.focus();
-                            }
-                          }}
-                        >
-                          {searchOpen ? <Close /> : <SearchIcon />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                  />
-                </Box>
-              </div>
+              <SearchButton />
               <IconButton color="inherit" aria-label="share" onClick={share}>
                 <Share />
               </IconButton>

@@ -33,6 +33,7 @@ const emptyTables = [
   "legacy_file_relocations",
   "temple_forums",
   "chat_daily_usage",
+  "site_search_usage",
   "audit_events",
   "cron_runs",
 ] as const;
@@ -87,7 +88,7 @@ describe("complete legacy import row projection", () => {
       .filter((table) => table !== schema.legacyImportRuns)
       .map((table) => getTableName(table))
       .sort();
-    expect(schemaNames).toHaveLength(39);
+    expect(schemaNames).toHaveLength(40);
     expect(Object.keys(LEGACY_IMPORT_TABLES).sort()).toEqual(schemaNames);
     expect(Object.keys(rows).sort()).toEqual(schemaNames);
     for (const name of Object.keys(rows) as (keyof LegacyImportRows)[]) {
