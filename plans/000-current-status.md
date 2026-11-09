@@ -123,11 +123,22 @@ Follow-ups are separate from the completed migration work:
   dashboards with Search Console after the next release.
 - 9 November 2026: on-site search work (breadcrumbs, a footer, section
   and tool text) in [plan 071](071-on-site-search.md), from a Search
-  Console audit: 3 clicks in 28 days, most sitemap pages unseen.
+  Console audit: 3 clicks in 28 days, most sitemap pages unseen. Stages
+  1 to 4 are built; TODO: the section and tool text (stage 5), after
+  Gadi's answers to its review sheet.
+- TODO (Gadi, 10 November 2026): English search in the Enochian
+  dictionary, with a revamp of its UI and UX. Today the search matches
+  Enochian spellings only (`src/app/enochian/dictionary/dictionary.tsx`);
+  "enochian translator" is a search target of
+  [plan 071](071-on-site-search.md).
+- TODO (Gadi, 10 November 2026): location for the planetary hours, the
+  moon and the geomancy reading from Vercel's request headers instead of
+  get.geojs.io (`src/components/hooks/useGeoIP.ts`), with a place the
+  reader can choose, and no browser permission prompt.
 - TODO: SEO content follow-ups from [plan 028](028-seo.md#follow-ups):
   compute `/astrology/moon` dates only in the browser, prerender the
   `/study` set list, and consider public SQL rituals for the sitemap. The
-  app bar's fuller titles are in [plan 071](071-on-site-search.md). The raw
+  app bar's fuller titles are done ([plan 071](071-on-site-search.md)). The raw
   JSON rows on the entity
   pages are done ([plan 036](036-entity-pages.md)). The archangel data fix
   (17 September) moved the Tree image identity to
@@ -654,3 +665,12 @@ Follow-ups are separate from the completed migration work:
   the published hall images would change too.
 
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.
+
+## Long-term goals
+
+Ideas the owner wants kept in view, far beyond current work:
+
+- A small neural network for translating between Enochian and English
+  (Gadi, 10 November 2026), after the dictionary's English search.
+- Language packs: the site and the data in other languages, beyond the
+  French already given for Lenain (Gadi, 10 November 2026).

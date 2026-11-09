@@ -1,11 +1,14 @@
 # On-site search work — 9 November 2026
 
-Status: decided and reviewed 9 November 2026; the spike next. Read
+Status: stages 1 to 4 built 9 November 2026; stage 5, the text, waits
+on Gadi's answers to the review sheet. Read
 [current status](000-current-status.md) first. This plan
 follows the whole-site SEO of [plan 028](028-seo.md) and the hall pages
 of [plan 062](062-gd-hall-seo.md). It covers what the site itself can
 do; links from other sites, Bing and keyword volumes are out of scope
-(see "Not in scope").
+(see "Not in scope"). It is about ranking in search engines; the site's
+own search box is [plan 070](070-site-search.md), whose number this plan
+gave up on its rebase.
 
 Gadi's decisions of 9 November 2026, after the mock-ups
 (`~/.cache/onsite-seo/seo-nav-mockups.png`: A a row under the bar, B the
@@ -261,6 +264,55 @@ texts are drafted first, so Gadi's review runs while stages 1 to 3 land.
 3. **The footer**, with its route module.
 4. **Small fixes, fuller headings, angel links.**
 5. **Section and tool text**, after Gadi's review of the sheet.
+
+## Stages 1 to 4 (9 November 2026)
+
+Each stage passed the full gate in a clean worktree and had an
+independent review whose findings were folded in before its commit.
+
+- **The bar.** The heading holds only the title; the menu, outside it,
+  keeps Home, the trail and the section's pages in the server HTML
+  (`keepMounted`, `disablePortal`). `src/app/siteNav.ts` resolves a path
+  once for the bar, the footer and the breadcrumbs; members' entries
+  (`admin`, `deleted`) stay out of menus. An angel's or a Sephirah's bar
+  names its section.
+- **Breadcrumbs.** `src/seo/Breadcrumbs.tsx` builds every trail from
+  `siteNav`. The shared `Trail` in `src/components/entity` keeps its
+  link and the app's entity pages render the structured data beside
+  it, since components may not import app code.
+- **The footer.** `src/app/SiteFooter.tsx`, one "Site" landmark, off the
+  routes `showsFooter` lists. The Enochian dictionary's word bar became
+  sticky inside its own box so it stops above the footer.
+- **Stage 4.** The headings of decision 6; angels link their decade's
+  planet and their sign, whose zodiac row is anchored and marked when
+  targeted; the Tree's tooltips; the home tiles. "Meaning" in the angel
+  descriptions (decision 7), which drops one trailing field for 3 of the
+  72, waits on its own branch, `gate/angel-meaning`: the descriptions
+  are in site search's index ([plan 070](070-site-search.md)), whose
+  embeddings must be refreshed in the same commit.
+- **Site search.** Its index takes literal text from page components,
+  and the chat page renders the bar, so the trail's "›" is a constant,
+  not literal text, to keep it out.
+- **Measured again.** In the production build, beside site search's
+  button ([plan 070](070-site-search.md)), the bar's heading box is
+  176 px wide at 360 px, and "Enochian Dictionary" takes 175 px with its
+  menu arrow at 17 px; at 18 px it overflowed. A title over 15
+  characters is set at 17 px on phones; counting characters stands in
+  for measuring.
+- **Left as they are.** The section hubs' tiles keep their short names
+  ("Dictionary", "Reading") beside the section's own heading. Trails now
+  read "Enochian › Enochian Dictionary", repeating the section; better
+  link text, and how search engines show many sites' breadcrumbs.
+
+## Commits
+
+| Commit | Change |
+| --- | --- |
+| 692a2372 | The plan |
+| b19bbc71 | The bar: the heading alone, the crawlable menu, the inline trail |
+| 1bf4b577 | Breadcrumb structured data on every page below a section |
+| bf9c668c | The site footer |
+| 21341e7e | Fuller headings, angel links, the Tree's tooltips, the home tiles |
 
 ## Verification
 
