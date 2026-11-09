@@ -32,78 +32,16 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import NextLink from "next/link";
-import {
-  usePathname,
-  useSearchParams,
-  useSelectedLayoutSegment,
-} from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import React from "react";
 import { sqlBrowserLifecycle } from "@/auth/browserLifecycle";
 import { useSession } from "@/auth/client";
 import SearchButton from "@/search/SearchButton";
 // import Link from "@magick-components/Link";
 import { useLegacyRecoveryGate } from "./clientProviders";
-import pathnames, { type Pathnames, type PathnameValue } from "./pathnames";
-
-// import { SITE_TITLE } from "@/api-lib/consts";
-const SITE_TITLE = "Magick.ly";
-// The static 404 page's segment; the browser's router reports it without the
-// leading slash that the server-side pathname carries.
-const NOT_FOUND_SEGMENT = "_not-found";
-
-/**
- * Titles for dynamic routes. The static map cannot hold them, and its
- * entries are drawer links, which these pages must not become.
- */
-const patternTitles: readonly [RegExp, PathnameValue][] = [
-  [/^\/doc\/[^/]+\/edit\/semantic\/?$/, "Ritual editor"],
-];
-
-/** `known` is false when the path has no title and the site name stands in. */
-function usePathnameInfo() {
-  const browserPathname = usePathname() ?? "/";
-  // The static 404 page is prerendered once, at /_not-found, and served for
-  // every unknown path; its title must not depend on the browser's path.
-  const segment = useSelectedLayoutSegment()?.replace(/^\//, "");
-  const titlePath =
-    segment === NOT_FOUND_SEGMENT ? "/" + NOT_FOUND_SEGMENT : browserPathname;
-  const navParts: { title: string; url: string }[] = [];
-  // if (pathnames[pathname]) return { title: pathnames[pathname], navParts };
-  const pattern = patternTitles.find(([match]) => match.test(titlePath));
-  if (pattern)
-    return {
-      pathname: browserPathname,
-      navParts,
-      title: pattern[1],
-      known: true,
-    };
-
-  let navPath = "";
-
-  let value: Pathnames | PathnameValue | undefined = pathnames;
-  const parts = titlePath.split("/").filter(Boolean);
-  for (let i = 0; i < parts.length; i++) {
-    const part = parts[i];
-    // The loop only continues through sections. Own keys only, so that
-    // /constructor does not resolve to Object.
-    const section = value as Pathnames;
-    value = Object.hasOwn(section, part) ? section[part] : undefined;
-    if (typeof value !== "object") break;
-    if (i === parts.length - 1) break;
-    navPath += "/" + part;
-    navParts.push({ url: navPath, title: value["/"] });
-  }
-
-  const title: PathnameValue | undefined =
-    typeof value === "object" ? value["/"] : value;
-  return {
-    // Sign-in returns to the path the reader actually opened.
-    pathname: browserPathname,
-    navParts,
-    title: title ?? SITE_TITLE,
-    known: title !== undefined,
-  };
-}
+import pathnames from "./pathnames";
+import type { NavLink } from "./siteNav";
+import useSiteNav from "./useSiteNav";
 
 function SignInButton({
   callbackURL,
@@ -270,8 +208,168 @@ function MenuDrawer({
   );
 }
 
+/** Indent per level of the menu's trail. */
+const MENU_INDENT = 9;
+
+/**
+ * Between the trail's sections. A constant, not literal text, so that site
+ * search, which indexes pages' literal JSX, leaves it out (`src/search`).
+ */
+const TRAIL_SEPARATOR = "›";
+
+/**
+ * The sections above the page, beside its title, where the bar is wide
+ * enough (MUI's `sm`, 600 px). Phones show the title and the menu's arrow.
+ */
+function InlineTrail({ trail }: { trail: NavLink[] }) {
+  return (
+    <Box
+      component="nav"
+      aria-label="Breadcrumb"
+      sx={{
+        display: { xs: "none", sm: "block" },
+        // The title keeps its room; the trail gives way first.
+        flexShrink: 3,
+        minWidth: 0,
+        maxWidth: "50%",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+        typography: "h6",
+        height: "1.5em",
+      }}
+    >
+      <Box
+        component="ol"
+        sx={{ display: "inline", listStyle: "none", m: 0, p: 0 }}
+      >
+        {trail.map((link) => (
+          <Box component="li" key={link.url} sx={{ display: "inline" }}>
+            <NextLink
+              href={link.url}
+              style={{
+                color: "rgba(255, 255, 255, 0.78)",
+                textDecoration: "none",
+              }}
+            >
+              {link.title}
+            </NextLink>
+            <Box
+              component="span"
+              aria-hidden
+              sx={{ mx: 0.75, color: "rgba(255, 255, 255, 0.6)" }}
+            >
+              {TRAIL_SEPARATOR}
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  );
+}
+
+/**
+ * The title's menu: Home, the sections above, the page, then the other
+ * pages of its section. Kept mounted and in place (not portalled), so its
+ * links are in the server HTML for search engines; closed, MUI hides it
+ * with `visibility: hidden`, out of the tab order and the accessibility
+ * tree. It sits outside the bar, whose slide transform would otherwise
+ * become the fixed menu's containing block.
+ */
+function NavMenu({
+  anchorEl,
+  onClose,
+  ancestors,
+  current,
+  sectionPages,
+  nested,
+}: {
+  anchorEl: HTMLElement | null;
+  onClose: () => void;
+  ancestors: NavLink[];
+  current: { title: string; url?: string } | null;
+  sectionPages: NavLink[];
+  nested: boolean;
+}) {
+  const trail = [{ title: "Home", url: "/" }, ...ancestors];
+  const level = trail.length;
+  return (
+    <Menu
+      id="nav-menu"
+      anchorEl={anchorEl}
+      open={Boolean(anchorEl)}
+      onClose={onClose}
+      keepMounted
+      disablePortal
+      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      transformOrigin={{ vertical: "top", horizontal: "left" }}
+      sx={{ marginTop: 0.5, marginLeft: -1.8 }}
+      // Links straight in the menu, not inside list items: a div, not a ul.
+      slotProps={{ list: { component: "div" } }}
+    >
+      {trail.map((link, i) => (
+        <MenuItem
+          key={link.url}
+          component={NextLink}
+          href={link.url}
+          onClick={onClose}
+          sx={{ pl: `${16 + MENU_INDENT * i}px` }}
+        >
+          {link.title}
+        </MenuItem>
+      ))}
+      {current?.url ? (
+        // A page below the entry that titles it: the entry, as a link.
+        <MenuItem
+          component={NextLink}
+          href={current.url}
+          onClick={onClose}
+          sx={{ pl: `${16 + MENU_INDENT * level}px` }}
+        >
+          {current.title}
+        </MenuItem>
+      ) : current ? (
+        <MenuItem
+          component="div"
+          aria-current="page"
+          onClick={onClose}
+          sx={{ pl: `${16 + MENU_INDENT * level}px`, color: "red" }}
+        >
+          {current.title}
+        </MenuItem>
+      ) : null}
+      {sectionPages.length ? <Divider /> : null}
+      {sectionPages.map((link) => (
+        <MenuItem
+          key={link.url}
+          component={NextLink}
+          href={link.url}
+          onClick={onClose}
+          // A section page's own pages sit below it; siblings beside it.
+          sx={{ pl: `${16 + MENU_INDENT * (nested ? level + 1 : level)}px` }}
+        >
+          {link.title}
+        </MenuItem>
+      ))}
+    </Menu>
+  );
+}
+
 export default function ButtonAppBar() {
-  const { pathname, title, known, navParts } = usePathnameInfo();
+  const {
+    pathname,
+    title,
+    known,
+    ancestors,
+    sectionPages,
+    childPages,
+    titleUrl,
+  } = useSiteNav();
+  // A page with no title of its own (an angel, a Sephirah) is labelled with
+  // the section it sits in; its own heading names it.
+  const label = known ? title : (ancestors.at(-1)?.title ?? title);
+  const trail = known ? ancestors : ancestors.slice(0, -1);
+  const hasMenu = ancestors.length > 0 || sectionPages.length > 0;
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   const session = useSession();
@@ -288,6 +386,9 @@ export default function ButtonAppBar() {
   const [navAnchorEl, setNavAnchorEl] = React.useState<null | HTMLElement>(
     null,
   );
+  // Back or forward with the menu open can replace its anchor.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: closes on navigation
+  React.useEffect(() => setNavAnchorEl(null), [pathname]);
 
   const handleUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -315,8 +416,6 @@ export default function ButtonAppBar() {
       setSignOutPending(false);
     }
   }
-
-  // console.log(navParts);
 
   function share() {
     const data = {
@@ -349,9 +448,11 @@ export default function ButtonAppBar() {
             >
               <MenuIcon />
             </IconButton>
+            {trail.length ? <InlineTrail trail={trail} /> : null}
             <Typography
               variant="h6"
-              // The bar's title is the page heading wherever it names the page.
+              // The bar's title is the page heading wherever it names the
+              // page, and holds nothing else: the menu sits outside it.
               component={known ? "h1" : "div"}
               sx={{
                 flexGrow: 1,
@@ -362,75 +463,42 @@ export default function ButtonAppBar() {
                 whiteSpace: "nowrap",
               }}
             >
-              {navParts && navParts.length ? (
-                <>
-                  <span
-                    style={{ display: "block" }}
-                    onClick={(e) => setNavAnchorEl(e.currentTarget)}
-                  >
-                    <span style={{ verticalAlign: "top" }}>{title}</span>
-                    {navAnchorEl ? (
-                      <ArrowDropUp
-                        sx={{ verticalAlign: "bottom", marginBottom: 0.5 }}
-                      />
-                    ) : (
-                      <ArrowDropDown
-                        sx={{ verticalAlign: "bottom", marginBottom: 0.5 }}
-                      />
-                    )}
-                  </span>
-                  <Menu
-                    id="nav-menu"
-                    anchorEl={navAnchorEl}
-                    open={Boolean(navAnchorEl)}
-                    onClose={() => setNavAnchorEl(null)}
-                    anchorOrigin={{
-                      vertical: "bottom",
-                      horizontal: "left",
-                    }}
-                    transformOrigin={{
-                      vertical: "top",
-                      horizontal: "left",
-                    }}
-                    sx={{ marginTop: 0.5, marginLeft: -1.8 }}
-                  >
-                    {navParts.map((part, i) => (
-                      <MenuItem
-                        key={part.url}
-                        onClick={() => {
-                          setNavAnchorEl(null);
-                        }}
-                      >
-                        <NextLink
-                          href={part.url}
-                          style={{
-                            color: "inherit",
-                            textDecoration: "none",
-                            paddingLeft: 9 * i,
-                          }}
-                        >
-                          {part.title}
-                        </NextLink>
-                      </MenuItem>
-                    ))}
-                    <MenuItem
-                      onClick={() => {
-                        setNavAnchorEl(null);
-                      }}
-                    >
-                      <span
-                        style={{
-                          paddingLeft: 9 * navParts.length,
-                          color: "red",
-                        }}
-                      >
-                        {title}
-                      </span>
-                    </MenuItem>
-                  </Menu>
-                </>
+              {hasMenu ? (
+                <button
+                  type="button"
+                  aria-haspopup="menu"
+                  aria-controls="nav-menu"
+                  aria-expanded={Boolean(navAnchorEl)}
+                  style={{
+                    display: "block",
+                    cursor: "pointer",
+                    // A plain button, styled as the heading's text.
+                    background: "none",
+                    border: 0,
+                    padding: 0,
+                    color: "inherit",
+                    font: "inherit",
+                    textAlign: "left",
+                    maxWidth: "100%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                  onClick={(e) => setNavAnchorEl(e.currentTarget)}
+                >
+                  <span style={{ verticalAlign: "top" }}>{label}</span>
+                  {navAnchorEl ? (
+                    <ArrowDropUp
+                      sx={{ verticalAlign: "bottom", marginBottom: 0.5 }}
+                    />
+                  ) : (
+                    <ArrowDropDown
+                      sx={{ verticalAlign: "bottom", marginBottom: 0.5 }}
+                    />
+                  )}
+                </button>
               ) : (
-                title
+                label
               )}
             </Typography>
             <div
@@ -500,6 +568,16 @@ export default function ButtonAppBar() {
           </Toolbar>
         </AppBar>
       </HideOnScroll>
+      {hasMenu ? (
+        <NavMenu
+          anchorEl={navAnchorEl}
+          onClose={() => setNavAnchorEl(null)}
+          ancestors={ancestors}
+          current={known ? { title, url: titleUrl } : null}
+          sectionPages={sectionPages}
+          nested={known && childPages}
+        />
+      ) : null}
       <nav>
         <Drawer
           variant="temporary"

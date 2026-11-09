@@ -44,6 +44,19 @@ vi.mock("@mui/material", async (importOriginal) => {
   };
 });
 
+/** The nav menu's markup, from its root to the end of the HTML. */
+function navMenu(html: string) {
+  const id = html.indexOf('id="nav-menu"');
+  expect(id, "nav menu").toBeGreaterThan(-1);
+  // The menu is the bar's last element with links (the drawer is portalled
+  // and renders nothing on the server), so it runs to the end of the HTML.
+  return html.slice(html.lastIndexOf("<div", id));
+}
+
+function hrefsIn(html: string) {
+  return [...html.matchAll(/<a\b[^>]*\shref="([^"]*)"/g)].map(([, h]) => h);
+}
+
 function serverRender(pathname: string, segment: string | null = null) {
   navigation.pathname = pathname;
   navigation.segment = segment;
@@ -76,11 +89,19 @@ describe("MyAppBar on the server", () => {
   });
 
   it("keeps untitled pages out of the heading", () => {
-    for (const pathname of ["/doc/neophyte", "/constructor", "/gd/toString"]) {
+    for (const pathname of ["/doc/neophyte", "/constructor"]) {
       const html = serverRender(pathname);
       expect(html, pathname).not.toContain("<h1");
       expect(html, pathname).toContain("Magick.ly");
+      // Nothing above them, so no menu either.
+      expect(html, pathname).not.toContain('id="nav-menu"');
     }
+    // An unknown path below a section is labelled with that section.
+    const html = serverRender("/gd/toString");
+    expect(html).not.toContain("<h1");
+    expect(html).toContain(
+      '<span style="vertical-align:top">Golden Dawn</span>',
+    );
   });
 
   it("titles the shared 404 page the same for every unknown path", () => {
@@ -99,9 +120,9 @@ describe("MyAppBar on the server", () => {
     expect(browser).toContain('href="/signin?callbackURL=%2Fgd%2Fnope"');
   });
 
-  it("shows the site name below a titled section", () => {
+  it("labels a page below a titled section with that section", () => {
     // The angel pages have no list page of their own, so no title either:
-    // the page's heading is the page's, and the bar shows the breadcrumb.
+    // the page's heading is the page's, and the bar names the section.
     for (const pathname of [
       "/kabbalah/sephirah/keter",
       "/kabbalah/angel/vehuiah",
@@ -109,9 +130,88 @@ describe("MyAppBar on the server", () => {
       const html = serverRender(pathname);
       expect(html, pathname).not.toContain("<h1");
       expect(html, pathname).toContain(
-        '<span style="vertical-align:top">Magick.ly</span>',
+        '<span style="vertical-align:top">Kabbalah</span>',
       );
+      const menu = navMenu(html);
+      expect(hrefsIn(menu), pathname).toEqual([
+        "/",
+        "/kabbalah",
+        "/kabbalah/yhvh",
+        "/kabbalah/tree",
+      ]);
+      // No current item: the bar has no title for the page to show.
+      expect(menu, pathname).not.toContain('aria-current="page"');
+      // Nothing above Kabbalah but Home, so no inline trail.
+      expect(html, pathname).not.toContain('aria-label="Breadcrumb"');
     }
+  });
+
+  it("holds only the page title in the heading", () => {
+    const h1 = serverRender("/kabbalah/tree").match(/<h1\b.*?<\/h1>/s)?.[0];
+    // Emotion inlines its <style> tags when rendered without the app's cache.
+    const text = h1
+      ?.replace(/<style\b.*?<\/style>/gs, "")
+      .replace(/<[^>]*>/g, "");
+    expect(text).toBe("Tree of Life");
+  });
+
+  it("puts the menu's links in the server HTML, hidden until opened", () => {
+    const menu = navMenu(serverRender("/kabbalah/tree"));
+    expect(hrefsIn(menu)).toEqual(["/", "/kabbalah", "/kabbalah/yhvh"]);
+    expect(menu).toMatch(/aria-current="page"[^>]*>Tree of Life</);
+    // Closed, MUI hides the kept-mounted menu.
+    expect(menu).toMatch(/^<div[^>]*class="[^"]*MuiModal-hidden/);
+  });
+
+  it("lists a section page's own pages in its menu", () => {
+    const menu = navMenu(serverRender("/kabbalah"));
+    expect(hrefsIn(menu)).toEqual(["/", "/kabbalah/yhvh", "/kabbalah/tree"]);
+  });
+
+  it("keeps the title of the entry a page sits below", () => {
+    const h1 = (pathname: string) =>
+      serverRender(pathname)
+        .match(/<h1\b.*?<\/h1>/s)?.[0]
+        .replace(/<style\b.*?<\/style>/gs, "")
+        .replace(/<[^>]*>/g, "");
+    expect(h1("/books/la-science-cabalistique/chapitre-1")).toBe(
+      "La Science Cabalistique",
+    );
+    expect(h1("/study/some-set")).toBe("Study");
+    expect(h1("/temples/admin/some-temple")).toBe("Admin");
+    // The menu links the entry rather than marking it as the page.
+    const menu = navMenu(
+      serverRender("/books/la-science-cabalistique/chapitre-1"),
+    );
+    expect(hrefsIn(menu)).toEqual([
+      "/",
+      "/books",
+      "/books/la-science-cabalistique",
+    ]);
+    expect(menu).not.toContain('aria-current="page"');
+    // Nothing above Study, so no menu.
+    expect(serverRender("/study/some-set")).not.toContain('id="nav-menu"');
+  });
+
+  it("leaves members' pages out of the menu", () => {
+    expect(hrefsIn(navMenu(serverRender("/gd/rituals")))).not.toContain(
+      "/gd/rituals/deleted",
+    );
+    expect(hrefsIn(navMenu(serverRender("/temples/admin/x")))).toEqual([
+      "/",
+      "/temples",
+      "/temples/admin",
+    ]);
+  });
+
+  it("shows the sections above the page beside its title", () => {
+    const html = serverRender("/kabbalah/yhvh/72angels");
+    const trail = html.match(
+      /<nav[^>]*aria-label="Breadcrumb".*?<\/nav>/s,
+    )?.[0];
+    expect(hrefsIn(trail ?? "")).toEqual(["/kabbalah", "/kabbalah/yhvh"]);
+    // A top-level page has nothing above it.
+    expect(serverRender("/about")).not.toContain('aria-label="Breadcrumb"');
   });
 
   it("offers no link in the drawer to a page that does not exist", () => {
