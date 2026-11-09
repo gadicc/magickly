@@ -109,6 +109,18 @@ Follow-ups are separate from the completed migration work:
 - TODO: after the SEO release, resubmit `/sitemap.xml` in Search Console and
   remove `/sitemap-0.xml` if it was submitted directly (it is now a 404); see
   [plan 028](028-seo.md#follow-ups).
+- 9 November 2026: SEO and speed are measured with Vercel Web Analytics
+  and Speed Insights (`src/analytics/`), next to Search Console. Public
+  pages report their path; any other page reports only its section
+  (`/temples/*`), unknown paths `/*`, and no query string, because private
+  rituals, temples and invite passwords live in paths. After any private
+  page, Speed Insights sends nothing until a full load, since its vitals
+  carry CSS selectors from the measured page. Accepted limits: repeat
+  views of one private section count once; an outside site's referrer
+  is sent as its browser exposes it (its origin, under the default
+  policy). TODO: turn Web Analytics on in the Vercel project (it was off
+  on 9 November) and check Speed Insights there, then compare the
+  dashboards with Search Console after the next release.
 - TODO: SEO content follow-ups from [plan 028](028-seo.md#follow-ups):
   compute `/astrology/moon` dates only in the browser, prerender the
   `/study` set list, consider public SQL rituals for the sitemap, and give

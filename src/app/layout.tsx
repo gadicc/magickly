@@ -3,6 +3,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import type { Metadata, Viewport } from "next";
 import * as React from "react";
+import VercelInsights from "@/analytics/VercelInsights";
 
 import {
   SITE_DESCRIPTION,
@@ -154,6 +155,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
             </ThemeProvider>
           </AppRouterCacheProvider>
         </StyledJsxRegistry>
+        <VercelInsights />
       </body>
     </html>
   );
