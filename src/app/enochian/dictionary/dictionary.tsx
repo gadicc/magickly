@@ -39,9 +39,12 @@ const s = {
     padding: 22,
     background: "#111", //'rgba(0,0,0,0.9)',
     color: "white",
-    position: "fixed" as const,
+    // Sticky inside the page's own box, so it stays at the bottom while the
+    // list scrolls and stops above the site footer.
+    position: "sticky" as const,
     bottom: 0,
     width: "100%",
+    boxSizing: "border-box" as const,
   },
   floatRight: {
     float: "right" as const,
@@ -121,7 +124,7 @@ export default function Dictionary() {
   }, []);
 
   return (
-    <>
+    <div>
       <div style={s.searchDiv}>
         <TextField
           placeholder="ABC"
@@ -177,6 +180,6 @@ export default function Dictionary() {
           <WordBar word={selected || text} />
         </div>
       ) : null}
-    </>
+    </div>
   );
 }

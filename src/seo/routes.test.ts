@@ -3,43 +3,9 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { pageTrail } from "./Breadcrumbs";
 import { PUBLIC_PAGES } from "./pages";
+import { ENTITY_ROUTES, PRIVATE_ROUTES } from "./routeClasses";
 
 const appDir = path.join(import.meta.dirname, "../app");
-
-/** Dynamic routes whose `generateMetadata` decides per row. */
-const ENTITY_ROUTES = [
-  "/kabbalah/angel/[slug]",
-  "/books/la-science-cabalistique/[division]",
-  "/astrology/planet/[id]",
-  "/doc/[_id]",
-  "/gd/grade/[id]",
-  "/gd/halls/[slug]",
-  "/kabbalah/path/[id]",
-  "/kabbalah/sephirah/[id]",
-];
-
-/** Account, administration, offline and test pages: `noindex`. */
-const PRIVATE_ROUTES = [
-  // Not private, but deliberately not indexed: a duplicate of the eleven
-  // chapter routes, kept for find-in-page and printing. See plan 033.
-  "/books/la-science-cabalistique/texte-integral",
-  "/admin",
-  "/chat/train",
-  "/doc/[_id]/edit",
-  "/doc/[_id]/edit/semantic",
-  "/gd/components",
-  "/gd/rituals/deleted",
-  "/offline/ritual",
-  "/signin",
-  "/study/[_id]",
-  "/study/info/[_id]",
-  "/temples",
-  "/temples/admin",
-  "/temples/admin/[_id]",
-  "/temples/admin/[_id]/membership/[membershipId]",
-  "/temples/join/[slug]/[pass]",
-  "/upload",
-];
 
 function pageRoutes(dir = appDir): { route: string; source: string }[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {

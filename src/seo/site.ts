@@ -34,3 +34,9 @@ export const SITE_OPEN_GRAPH = {
   type: "website",
   siteName: SITE_NAME,
 } as const;
+
+/** The repository the site is built from: its one real profile. */
+export const SITE_REPOSITORY = "https://github.com/gadicc/magickly";
+
+/** The site's forum, a Discourse instance. */
+export const SITE_FORUM = "https://forums.magick.ly";

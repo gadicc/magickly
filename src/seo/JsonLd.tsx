@@ -3,6 +3,7 @@ import {
   SITE_NAME,
   SITE_ORGANIZATION,
   SITE_ORGANIZATION_ID,
+  SITE_REPOSITORY,
   SITE_URL,
 } from "./site";
 
@@ -12,9 +13,6 @@ export const SITE_LOGO = {
   width: 192,
   height: 192,
 } as const;
-
-/** The repository the site is built from: its one real profile. */
-export const SITE_REPOSITORY = "https://github.com/gadicc/magickly";
 
 /**
  * The home page's structured data (plan 062, A13), one graph: the site

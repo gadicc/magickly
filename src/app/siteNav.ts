@@ -44,6 +44,8 @@ export interface SiteNav {
   titleUrl?: string;
   /** The first path segment, or "" on the home page and the 404. */
   topSection: string;
+  /** The path resolved: the browser's, or `/_not-found` on the 404. */
+  path: string;
 }
 
 /**
@@ -87,7 +89,7 @@ export function siteNav(pathname: string, segment: string | null): SiteNav {
 
   const pattern = patternTitles.find(([match]) => match.test(path));
   if (pattern)
-    return { ...none, title: pattern[1], known: true, topSection: "" };
+    return { ...none, title: pattern[1], known: true, topSection: "", path };
 
   const parts = path.split("/").filter(Boolean);
   const ancestors: NavLink[] = [];
@@ -109,6 +111,7 @@ export function siteNav(pathname: string, segment: string | null): SiteNav {
         sectionPages: ancestors.length ? childrenOf(section, url) : [],
         childPages: true,
         topSection: notFound ? "" : (parts[0] ?? ""),
+        path,
       };
     }
     const childUrl = `${url}/${parts[i]}`;
@@ -124,6 +127,7 @@ export function siteNav(pathname: string, segment: string | null): SiteNav {
         childPages: false,
         titleUrl: childUrl,
         topSection: parts[0],
+        path,
       };
     }
     if (last) {
@@ -140,6 +144,7 @@ export function siteNav(pathname: string, segment: string | null): SiteNav {
               : [],
         childPages: typeof value === "object",
         topSection: parts[0],
+        path,
       };
     }
     // A section on the way down.
@@ -152,5 +157,55 @@ export function siteNav(pathname: string, segment: string | null): SiteNav {
     title: titleOf(pathnames),
     known: true,
     topSection: "",
+    path,
   };
+}
+
+/** A section as the footer lists it: its page, then its pages. */
+export interface FooterSection extends NavLink {
+  pages: NavLink[];
+}
+
+/** The footer's sections, in the order readers look for them. */
+const FOOTER_SECTIONS = [
+  "kabbalah",
+  "gd",
+  "enochian",
+  "astrology",
+  "geomancy",
+  "books",
+] as const;
+
+/** Every public section and its pages, from `pathnames.ts`. */
+export function footerSections(): FooterSection[] {
+  return FOOTER_SECTIONS.map((key) => {
+    const section = pathnames[key] as Pathnames;
+    const url = `/${key}`;
+    return { title: section["/"], url, pages: childrenOf(section, url) };
+  });
+}
+
+/**
+ * Where the footer stays out: full-screen screens (the ritual readers and
+ * editors, the hall editor, chat, flashcards), offline pages, and the
+ * members', account and admin pages, which search does not see. Tested
+ * against every route in `src/app`.
+ */
+const NO_FOOTER = [
+  /^\/doc(\/|$)/,
+  /^\/offline(\/|$)/,
+  /^\/chat(\/|$)/,
+  /^\/gd\/halls\/editor\/?$/,
+  /^\/gd\/components\/?$/,
+  /^\/gd\/rituals\/deleted\/?$/,
+  /^\/study\/.+/,
+  /^\/temples(\/|$)/,
+  /^\/admin(\/|$)/,
+  /^\/upload\/?$/,
+  /^\/signin\/?$/,
+];
+
+/** Whether a path shows the site footer. */
+export function showsFooter(pathname: string) {
+  return !NO_FOOTER.some((pattern) => pattern.test(pathname));
 }

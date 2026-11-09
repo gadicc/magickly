@@ -15,6 +15,7 @@ import {
 import theme from "@/theme";
 import ClientProviders from "./clientProviders";
 import MyAppBar from "./MyAppBar";
+import SiteFooter from "./SiteFooter";
 import StyledJsxRegistry from "./StyledJsxRegistry";
 import "@/db";
 
@@ -151,6 +152,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
                 {/* same height as floating AppBar, so page starts beneath it */}
                 <div style={{ height: 56 }}></div>
                 {props.children}
+                <SiteFooter />
               </ClientProviders>
             </ThemeProvider>
           </AppRouterCacheProvider>
