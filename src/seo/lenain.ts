@@ -1,4 +1,5 @@
 import { divisions, leavesOf } from "magick-data/kabbalah/lenain/volume";
+import { breadcrumbList, entityTrail } from "./Breadcrumbs";
 import type { EntityPage } from "./entities";
 
 /**
@@ -141,16 +142,10 @@ export function chapterJsonLd(siteUrl: string, slug: string) {
     },
     {
       "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { name: "Books", item: `${siteUrl}/books` },
-        { name: "La Science Cabalistique", item: `${siteUrl}${BOOK_PATH}` },
-        { name: division.title, item: url },
-      ].map((crumb, index) => ({
-        "@type": "ListItem",
-        position: index + 1,
-        ...crumb,
-      })),
+      ...breadcrumbList(
+        entityTrail(BOOK_PATH, division.title, `${BOOK_PATH}/${division.slug}`),
+        siteUrl,
+      ),
     },
   ];
 }

@@ -198,11 +198,19 @@ describe("the /gd/halls/editor page", { timeout: 20_000 }, () => {
     expect(markup.match(/<style>/g)).toHaveLength(1);
     expect(markup).toContain("kept as a draft in this browser only");
     // The editor described as an app, escaped as every page's JSON-LD is.
-    const script = markup.match(
-      /<script type="application\/ld\+json">([\s\S]*?)<\/script>/,
-    )?.[1];
-    expect(script).not.toContain("<");
-    expect(JSON.parse(script ?? "null")).toEqual(hallEditorJsonLd());
+    // The page's scripts: its breadcrumb trail, then the application.
+    const scripts = [
+      ...markup.matchAll(
+        /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g,
+      ),
+    ].map(([, json]) => json);
+    for (const script of scripts) expect(script).not.toContain("<");
+    const data = scripts.map((json) => JSON.parse(json));
+    expect(data.map((item) => item["@type"])).toEqual([
+      "BreadcrumbList",
+      "WebApplication",
+    ]);
+    expect(data[1]).toEqual(hallEditorJsonLd());
     expect(markup).toContain("<code>/hall</code>");
     // The editor loads after the page: the shell draws no hall, and says
     // so where scripts are off.

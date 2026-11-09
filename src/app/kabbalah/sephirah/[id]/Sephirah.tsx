@@ -17,6 +17,7 @@ import {
 } from "@/components/entity";
 import { FIELD_PATH_LIST_SEPARATOR } from "@/components/kabbalah/fieldPath";
 import TreeOfLife from "@/components/kabbalah/TreeOfLife";
+import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import { isHiddenSephirah } from "@/seo/entities";
 import { RWSName } from "@/tarot";
 import styles from "./sephirah.module.css";
@@ -160,6 +161,13 @@ export default function Sephirah({ sephirah }: { sephirah: SephirahRow }) {
   return (
     <EntityFrame>
       <Trail href="/kabbalah/tree">Tree of Life</Trail>
+      <Breadcrumbs
+        trail={entityTrail(
+          "/kabbalah/tree",
+          sephirah.name.roman,
+          `/kabbalah/sephirah/${sephirah.id}`,
+        )}
+      />
 
       <FigureNav prev={prev} next={next}>
         <TreeOfLife

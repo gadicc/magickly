@@ -1,8 +1,14 @@
+import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
 import Moon from "./moon";
 
 export const metadata = pageMetadata("/astrology/moon");
 
 export default function MoonPage() {
-  return <Moon />;
+  return (
+    <>
+      <PageBreadcrumbs path="/astrology/moon" />
+      <Moon />
+    </>
+  );
 }

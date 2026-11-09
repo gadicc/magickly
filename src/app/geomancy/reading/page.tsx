@@ -1,4 +1,5 @@
 import { pageSearchParams } from "@/lib/pageSearchParams";
+import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
 import GeomancyReading from "./reading";
 import { readingFromSearchParams } from "./readingState";
@@ -15,5 +16,10 @@ export default async function GeomancyReadingPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const initial = readingFromSearchParams(pageSearchParams(await searchParams));
-  return <GeomancyReading initial={initial} />;
+  return (
+    <>
+      <PageBreadcrumbs path="/geomancy/reading" />
+      <GeomancyReading initial={initial} />
+    </>
+  );
 }

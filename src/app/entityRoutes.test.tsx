@@ -26,17 +26,56 @@ const props = (id: string) => ({
 });
 
 const routes = [
-  { name: "planet", Page: Planet, id: "luna", shows: "Luna" },
-  { name: "grade", Page: Grade, id: "1=10", shows: "Zelator" },
-  { name: "sephirah", Page: SephirahPage, id: "hod", shows: "Hod" },
+  {
+    name: "planet",
+    Page: Planet,
+    id: "luna",
+    shows: "Luna",
+    trail: ["/", "/astrology", "/astrology/planets", "/astrology/planet/luna"],
+  },
+  {
+    name: "grade",
+    Page: Grade,
+    id: "1=10",
+    shows: "Zelator",
+    trail: ["/", "/gd", "/gd/grades", "/gd/grade/1=10"],
+  },
+  {
+    name: "sephirah",
+    Page: SephirahPage,
+    id: "hod",
+    shows: "Hod",
+    trail: ["/", "/kabbalah", "/kabbalah/tree", "/kabbalah/sephirah/hod"],
+  },
   // Adjacent text nodes are split by comments, so each of these is one node.
-  { name: "path", Page: PathPage, id: "1_2", shows: "The Fool" },
+  {
+    name: "path",
+    Page: PathPage,
+    id: "1_2",
+    shows: "The Fool",
+    trail: ["/", "/kabbalah", "/kabbalah/tree", "/kabbalah/path/1_2"],
+  },
 ] as const;
 
+/** The URLs of the page's `BreadcrumbList`, relative to the site. */
+function trailOf(html: string) {
+  const lists = [
+    ...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs),
+  ]
+    .map(([, json]) => JSON.parse(json))
+    .filter((data) => data["@type"] === "BreadcrumbList");
+  expect(lists).toHaveLength(1);
+  return lists[0].itemListElement.map(({ item }: { item: string }) =>
+    new URL(item).pathname.replace(/^\/$/, "/"),
+  );
+}
+
 describe("entity routes", () => {
-  for (const { name, Page, id, shows } of routes) {
-    it(`renders the ${name} an id names`, async () => {
-      expect(renderToString(await Page(props(id)))).toContain(shows);
+  for (const { name, Page, id, shows, trail } of routes) {
+    it(`renders the ${name} an id names, with its trail`, async () => {
+      const html = renderToString(await Page(props(id)));
+      expect(html).toContain(shows);
+      expect(trailOf(html)).toEqual(trail);
     });
 
     it(`404s an unknown ${name} id`, async () => {

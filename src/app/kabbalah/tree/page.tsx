@@ -1,4 +1,5 @@
 import React from "react";
+import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
 import TreeOfLife, { TreeOfLifeView } from "./tree";
 import { DEFAULT_TREE_SETTINGS } from "./treeSettings";
@@ -11,10 +12,13 @@ export const metadata = pageMetadata("/kabbalah/tree");
  */
 export default function TreeOfLifePage() {
   return (
-    <React.Suspense
-      fallback={<TreeOfLifeView settings={DEFAULT_TREE_SETTINGS} />}
-    >
-      <TreeOfLife />
-    </React.Suspense>
+    <>
+      <PageBreadcrumbs path="/kabbalah/tree" />
+      <React.Suspense
+        fallback={<TreeOfLifeView settings={DEFAULT_TREE_SETTINGS} />}
+      >
+        <TreeOfLife />
+      </React.Suspense>
+    </>
   );
 }

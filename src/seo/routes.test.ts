@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { pageTrail } from "./Breadcrumbs";
 import { PUBLIC_PAGES } from "./pages";
 
 const appDir = path.join(import.meta.dirname, "../app");
@@ -86,6 +87,15 @@ describe("page routes", () => {
         expect(source, route).toMatch(
           /export const metadata = privateMetadata\("[^"]+"\);/,
         );
+    }
+  });
+
+  it("gives each public page below a section its breadcrumb trail", () => {
+    for (const { route, source } of routes) {
+      if (!(route in PUBLIC_PAGES)) continue;
+      const call = `<PageBreadcrumbs path="${route}" />`;
+      if (pageTrail(route)) expect(source, route).toContain(call);
+      else expect(source, route).not.toContain("PageBreadcrumbs");
     }
   });
 

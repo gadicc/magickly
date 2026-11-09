@@ -2,6 +2,7 @@ import SevenBranchedCandleStick from "@/components/gd/SevenBranchedCandleStick";
 // import { FylfotCross } from "../../pages/hogd/symbols/fylfot-cross";
 import TableOfShewbread from "@/components/gd/TableOfShewbread";
 import Tiles from "@/components/Tiles";
+import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
 
 export const metadata = pageMetadata("/gd/symbols");
@@ -39,7 +40,12 @@ const tiles = [
 ];
 
 function Symbols() {
-  return <Tiles tiles={tiles} />;
+  return (
+    <>
+      <PageBreadcrumbs path="/gd/symbols" />
+      <Tiles tiles={tiles} />
+    </>
+  );
 }
 
 export default Symbols;

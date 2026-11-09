@@ -100,6 +100,7 @@ describe("a temple hall's page", () => {
       expect(
         trail.itemListElement.map((item: { item: string }) => item.item),
       ).toEqual([
+        "https://magick.ly",
         "https://magick.ly/gd",
         "https://magick.ly/gd/halls",
         `https://magick.ly/gd/halls/${slug}`,

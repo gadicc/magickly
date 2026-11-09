@@ -1,4 +1,5 @@
 import { pageSearchParams } from "@/lib/pageSearchParams";
+import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
 import { sigilFromSearchParams } from "./sigilState";
 import Sigils from "./sigils";
@@ -12,8 +13,11 @@ export default async function SigilsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   return (
-    <Sigils
-      initial={sigilFromSearchParams(pageSearchParams(await searchParams))}
-    />
+    <>
+      <PageBreadcrumbs path="/gd/sigils" />
+      <Sigils
+        initial={sigilFromSearchParams(pageSearchParams(await searchParams))}
+      />
+    </>
   );
 }

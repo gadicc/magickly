@@ -1,4 +1,5 @@
 import planets from "magick-data/astrology/planets";
+import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
 import PlanetaryHours, { type HourPlanet } from "./planetaryHours";
 
@@ -22,5 +23,10 @@ const keyOfSolomon: Record<HourPlanet, string> = {
 };
 
 export default function PlanetaryHoursPage() {
-  return <PlanetaryHours keyOfSolomon={keyOfSolomon} />;
+  return (
+    <>
+      <PageBreadcrumbs path="/astrology/planetary-hours" />
+      <PlanetaryHours keyOfSolomon={keyOfSolomon} />
+    </>
+  );
 }

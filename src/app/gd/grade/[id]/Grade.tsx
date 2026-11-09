@@ -13,6 +13,7 @@ import {
 import GradeTree from "@/components/gd/GradeTree";
 import { isPublicRitualId } from "@/doc/publicRituals";
 import { gdHallShortName } from "@/render/contracts/gdHall";
+import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import { gradeHalls, hallPath } from "@/seo/halls";
 import { PUBLIC_PAGES } from "@/seo/pages";
 
@@ -96,6 +97,9 @@ export default function GradePage({ grade }: { grade: GDGradeRow }) {
   return (
     <EntityFrame>
       <Trail href="/gd/grades">Grades</Trail>
+      <Breadcrumbs
+        trail={entityTrail("/gd/grades", title(grade), `/gd/grade/${grade.id}`)}
+      />
 
       <FigureNav prev={prev} next={next}>
         <GradeTree

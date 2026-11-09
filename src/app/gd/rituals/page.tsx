@@ -18,6 +18,7 @@ import { getCurrentSqlUserId } from "@/auth/session";
 import type { SqlDeletedRitual } from "@/doc/sqlLifecycle";
 import { sqlRitualLifecycle, sqlRitualReader } from "@/doc/sqlRuntime";
 import { isUuidV7 } from "@/lib/ids";
+import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
 import DeletedRitualUndo from "./DeletedRitualUndo";
 import SqlDocAdmin from "./SqlDocAdmin";
@@ -77,79 +78,83 @@ export default async function Rituals({
   ];
 
   return (
-    <Container maxWidth="sm">
-      <Box>
-        <p>
-          A collection of public Golden Dawn documents, remodelled for clearer
-          visibility on mobile and other devices, with additional helpful
-          features. When signed in, this list also includes private rituals you
-          are currently authorized to read. See a{" "}
-          <a href="https://www.youtube.com/watch?v=iEFiXtxPxu0">short demo</a>.
-        </p>
-        <TableContainer component={Paper}>
-          <Table aria-label="Rituals">
-            <TableHead>
-              <TableRow>
-                <TableCell>Name</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {docs.map((ritual) => (
-                <TableRow key={ritual.id}>
-                  <TableCell scope="row">
-                    <Link href={`/doc/${ritual.id}`}>{ritual.title}</Link>{" "}
-                    {ritual.templeSlug && (
-                      <Chip
-                        label={ritual.templeSlug}
-                        size="small"
-                        sx={{ mx: 0.5 }}
-                      />
-                    )}{" "}
-                    {ritual.canEdit && (
-                      <IconButton
-                        size="small"
-                        href={`/doc/${ritual.id}/edit`}
-                        aria-label={`Edit ${ritual.title}`}
-                      >
-                        <Edit />
-                      </IconButton>
-                    )}
-                  </TableCell>
+    <>
+      <PageBreadcrumbs path="/gd/rituals" />
+      <Container maxWidth="sm">
+        <Box>
+          <p>
+            A collection of public Golden Dawn documents, remodelled for clearer
+            visibility on mobile and other devices, with additional helpful
+            features. When signed in, this list also includes private rituals
+            you are currently authorized to read. See a{" "}
+            <a href="https://www.youtube.com/watch?v=iEFiXtxPxu0">short demo</a>
+            .
+          </p>
+          <TableContainer component={Paper}>
+            <Table aria-label="Rituals">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <p>
-          <Link href="/offline/ritual">Open downloaded rituals</Link>
-          {deleted.count > 0 && (
-            <>
-              {" · "}
-              <Link href="/gd/rituals/deleted">
-                Recently deleted ({deleted.count})
-              </Link>
-            </>
+              </TableHead>
+              <TableBody>
+                {docs.map((ritual) => (
+                  <TableRow key={ritual.id}>
+                    <TableCell scope="row">
+                      <Link href={`/doc/${ritual.id}`}>{ritual.title}</Link>{" "}
+                      {ritual.templeSlug && (
+                        <Chip
+                          label={ritual.templeSlug}
+                          size="small"
+                          sx={{ mx: 0.5 }}
+                        />
+                      )}{" "}
+                      {ritual.canEdit && (
+                        <IconButton
+                          size="small"
+                          href={`/doc/${ritual.id}/edit`}
+                          aria-label={`Edit ${ritual.title}`}
+                        >
+                          <Edit />
+                        </IconButton>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <p>
+            <Link href="/offline/ritual">Open downloaded rituals</Link>
+            {deleted.count > 0 && (
+              <>
+                {" · "}
+                <Link href="/gd/rituals/deleted">
+                  Recently deleted ({deleted.count})
+                </Link>
+              </>
+            )}
+          </p>
+          {justDeleted && actorId && (
+            <DeletedRitualUndo
+              ritualId={justDeleted.ritualId}
+              title={justDeleted.title}
+              actorId={actorId}
+            />
           )}
-        </p>
-        {justDeleted && actorId && (
-          <DeletedRitualUndo
-            ritualId={justDeleted.ritualId}
-            title={justDeleted.title}
-            actorId={actorId}
-          />
-        )}
-        <SqlDocAdmin />
-        <br />
-        <p>
-          To share private rituals with temple members, open{" "}
-          <Link href="/temples">My Temples</Link>. From there, you can join an
-          existing temple or create and manage one; the{" "}
-          <Link href="/help/temples">temples guide</Link> explains how.
-        </p>
-        <p style={{ fontSize: "80%" }}>
-          <Link href="/about#credits">Image credits</Link>
-        </p>
-      </Box>
-    </Container>
+          <SqlDocAdmin />
+          <br />
+          <p>
+            To share private rituals with temple members, open{" "}
+            <Link href="/temples">My Temples</Link>. From there, you can join an
+            existing temple or create and manage one; the{" "}
+            <Link href="/help/temples">temples guide</Link> explains how.
+          </p>
+          <p style={{ fontSize: "80%" }}>
+            <Link href="/about#credits">Image credits</Link>
+          </p>
+        </Box>
+      </Container>
+    </>
   );
 }

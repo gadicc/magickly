@@ -13,6 +13,7 @@ import {
   Trail,
 } from "@/components/entity";
 import TreeOfLife from "@/components/kabbalah/TreeOfLife";
+import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import { RWSName, RWSPath, trumpNumeral } from "@/tarot";
 import styles from "./path.module.css";
 
@@ -75,6 +76,13 @@ export default function Path({ path }: { path: TreeOfLifePathRow }) {
   return (
     <EntityFrame>
       <Trail href="/kabbalah/tree">Tree of Life</Trail>
+      <Breadcrumbs
+        trail={entityTrail(
+          "/kabbalah/tree",
+          headingOf(path),
+          `/kabbalah/path/${path.id}`,
+        )}
+      />
 
       <FigureNav prev={prev} next={next}>
         {/* Drawn on the tree the path belongs to, so that it is on it. */}

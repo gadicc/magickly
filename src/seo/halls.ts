@@ -21,6 +21,7 @@ import {
   gdHallShortName,
   gdHallTitle,
 } from "@/render/contracts/gdHall";
+import { breadcrumbList, entityTrail } from "./Breadcrumbs";
 import { socialCardImage } from "./cards";
 import type { EntityPage } from "./entities";
 import { seoMetadata } from "./metadata";
@@ -385,19 +386,9 @@ export function hallJsonLd(hall: GdHallEntry) {
   return {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          ["Golden Dawn", `${SITE_URL}/gd`],
-          ["Temple Halls", `${SITE_URL}/gd/halls`],
-          [gdHallShortName(hall), page],
-        ].map(([name, item], index) => ({
-          "@type": "ListItem",
-          position: index + 1,
-          name,
-          item,
-        })),
-      },
+      breadcrumbList(
+        entityTrail("/gd/halls", gdHallShortName(hall), hallPath(hall)),
+      ),
       {
         ...image(files.png, "png"),
         associatedMedia: { "@id": `${page}#svg` },

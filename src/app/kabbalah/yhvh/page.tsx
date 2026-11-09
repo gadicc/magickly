@@ -1,4 +1,5 @@
 import Tiles from "@/components/Tiles";
+import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
 
 export const metadata = pageMetadata("/kabbalah/yhvh");
@@ -14,7 +15,12 @@ const tiles = [
 ];
 
 function Kabbalah() {
-  return <Tiles tiles={tiles} />;
+  return (
+    <>
+      <PageBreadcrumbs path="/kabbalah/yhvh" />
+      <Tiles tiles={tiles} />
+    </>
+  );
 }
 
 export default Kabbalah;

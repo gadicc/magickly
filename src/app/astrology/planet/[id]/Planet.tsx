@@ -14,6 +14,7 @@ import {
   Row,
   Trail,
 } from "@/components/entity";
+import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import { RWSName } from "@/tarot";
 import styles from "./planet.module.css";
 
@@ -113,6 +114,13 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
   return (
     <EntityFrame>
       <Trail href="/astrology/planets">Planets</Trail>
+      <Breadcrumbs
+        trail={entityTrail(
+          "/astrology/planets",
+          planet.name.en.en,
+          `/astrology/planet/${planet.id}`,
+        )}
+      />
 
       <h1>
         {planet.name.en.en}

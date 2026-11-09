@@ -30,6 +30,7 @@ import {
   Trail,
 } from "@/components/entity";
 import { angelSlug } from "@/lib/angelSlugs";
+import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import styles from "./angel.module.css";
 
 /**
@@ -109,6 +110,13 @@ export default function AngelPage({
   return (
     <EntityFrame>
       <Trail href="/kabbalah/yhvh/72angels">The 72 Angels</Trail>
+      <Breadcrumbs
+        trail={entityTrail(
+          "/kabbalah/yhvh/72angels",
+          angel.name.en,
+          `/kabbalah/angel/${angelSlug(no)}`,
+        )}
+      />
 
       <h1>
         {no}. {angel.name.en}
