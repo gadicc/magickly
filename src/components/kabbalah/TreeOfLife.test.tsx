@@ -1,7 +1,7 @@
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import GradeTree from "../gd/GradeTree";
-import TreeOfLife, { labelLines } from "./TreeOfLife";
+import TreeOfLife, { labelLines, pathTitle } from "./TreeOfLife";
 
 const count = (html: string, pattern: RegExp) =>
   html.match(pattern)?.length ?? 0;
@@ -34,6 +34,20 @@ describe("TreeOfLife", () => {
     );
     expect(numbers.length).toBeGreaterThan(200);
     for (const number of numbers) expect(number).toMatch(/^-?\d+(\.\d{1,3})?$/);
+  });
+
+  it("names each path from its data, not its keys", () => {
+    const html = renderToString(<TreeOfLife field="name.he" />);
+    expect(html).toContain("<title>Path 31: Shin (ש), Judgement</title>");
+    expect(html).toContain("<title>Path 11: Aleph (א), The Fool</title>");
+    expect(html).not.toMatch(/pathNo|tarotId|Letter:/);
+    expect(count(html, /<title>Path \d+: /g)).toBe(22);
+    expect(
+      pathTitle(
+        { hebrew: { hebrewLetter: { letter: { he: "ה", name: "He" } } } },
+        "hebrew",
+      ),
+    ).toBe("He (ה)");
   });
 
   it("breaks a list per item, and anything else at its first space", () => {

@@ -28,8 +28,16 @@ export default function signs() {
 
             <TableBody>
               {Object.values(Data.zodiac).map((sign) => (
-                // There are no sign pages yet; only the ruling planet links.
-                <TableRow key={sign.id}>
+                // No sign has a page yet: each row is anchored, for the
+                // angel pages to link to, and marked when it is the target.
+                <TableRow
+                  key={sign.id}
+                  id={sign.id}
+                  sx={{
+                    scrollMarginTop: { xs: "4.5rem", sm: "5rem" },
+                    "&:target": { bgcolor: "action.selected" },
+                  }}
+                >
                   <TableCell scope="row">
                     {sign.name.en} {sign.symbol}
                   </TableCell>

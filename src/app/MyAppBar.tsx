@@ -355,6 +355,13 @@ function NavMenu({
   );
 }
 
+/**
+ * Characters past which a title may not fit a 360 px phone's bar at 20 px.
+ * A count stands in for a measurement, so a few titles that would fit,
+ * such as "Shem HaMephorash", are set smaller too.
+ */
+const LONG_TITLE = 15;
+
 export default function ButtonAppBar() {
   const {
     pathname,
@@ -455,6 +462,12 @@ export default function ButtonAppBar() {
               // page, and holds nothing else: the menu sits outside it.
               component={known ? "h1" : "div"}
               sx={{
+                // A long title is set smaller on a phone: at 360 px,
+                // "Enochian Dictionary" and the menu's arrow take 175 px of
+                // the 176 free at 17 px, beside the search button.
+                ...(label.length > LONG_TITLE && {
+                  fontSize: { xs: "1.0625rem", sm: "1.25rem" },
+                }),
                 flexGrow: 1,
                 display: "inline-block",
                 overflow: "hidden",

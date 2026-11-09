@@ -73,4 +73,15 @@ describe("the angel page", () => {
         );
     }
   });
+
+  it("links the decade's planet and the sign to their pages", async () => {
+    const html = await body(46);
+    // Ariel, the 46th: 16–20° of Scorpio, the 23rd decade, under Sol.
+    expect(html).toMatch(
+      /<a [^>]*href="\/astrology\/zodiac#scorpio"[^>]*>Scorpio<\/a>/,
+    );
+    expect(html).toMatch(
+      /<a [^>]*href="\/astrology\/planet\/sol"[^>]*>Sol<\/a>/,
+    );
+  });
 });

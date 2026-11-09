@@ -36,19 +36,19 @@ const tiles = [
   },
   {
     title: "Enochian",
-    to: "/enochian/",
+    to: "/enochian",
     img: EnochianAngel,
     alt: "Enochian Aethyrs",
   },
   {
     title: "Geomancy",
-    to: "/geomancy/",
+    to: "/geomancy",
     img: GeomancyImg,
     alt: "A shaman pokes holes in the sand",
   },
   {
     title: "Golden Dawn",
-    to: "/gd/",
+    to: "/gd",
     Component: () => <GDLogoSquished width="100%" />,
   },
   {

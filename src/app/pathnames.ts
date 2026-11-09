@@ -34,10 +34,10 @@ const pathnames: Pathnames = {
   chat: "Chat (MagickGPT)",
   enochian: {
     "/": "Enochian",
-    dictionary: "Dictionary",
-    keys: "Keys",
-    oration: "Oration",
-    tablets: "Tablets",
+    dictionary: "Enochian Dictionary",
+    keys: "Enochian Keys",
+    oration: "Oration to God",
+    tablets: "Enochian Tablets",
   },
   gd: {
     "/": "Golden Dawn",
@@ -55,8 +55,8 @@ const pathnames: Pathnames = {
   },
   geomancy: {
     "/": "Geomancy",
-    reading: "Reading",
-    reference: "Reference",
+    reading: "Geomancy Reading",
+    reference: "Geomantic Figures",
   },
   kabbalah: {
     "/": "Kabbalah",

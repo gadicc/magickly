@@ -64,6 +64,20 @@ function SvgLink({
   );
 }
 
+/**
+ * A path's tooltip, which search engines also read: "Path 31: Shin (ש),
+ * Judgement" in the Hermetic attribution, the letter alone in the others.
+ */
+export function pathTitle(path, letterAttr: string) {
+  const attribution = path[letterAttr];
+  const letter = attribution?.hebrewLetter?.letter;
+  if (!letter) return "";
+  const named = `${letter.name} (${letter.he})`;
+  if (letterAttr !== "hermetic") return named;
+  const { pathNo, tarotTitle } = attribution;
+  return `Path ${pathNo}: ${named}${tarotTitle ? `, ${tarotTitle}` : ""}`;
+}
+
 /*
  * Note: originally I used a lot of CSS classes, which worked superbly in the
  * browser, but was very inconsistent when exporting into external programs.
@@ -383,20 +397,7 @@ function TreeOfLife({
                   { path[letterAttr]?.hebrewLetter?.letter?.he }
                 </text>
                 */}
-              <title>
-                {(function () {
-                  // React is super strict that we'll only return ONE thing here.
-                  let out =
-                    "Letter: " + path[letterAttr]?.hebrewLetter?.letter?.he;
-                  if (letterAttr === "hermetic" && path.hermetic)
-                    out +=
-                      ", pathNo: " +
-                      (path.hermetic.pathNo ?? "?") +
-                      ", tarotId: " +
-                      (path.hermetic.tarotId ?? "?");
-                  return out;
-                })()}
-              </title>
+              <title>{pathTitle(path, letterAttr)}</title>
             </SvgLink>
           );
         })}

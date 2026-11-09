@@ -65,6 +65,13 @@ describe("page routes", () => {
     }
   });
 
+  it("links pages at their own paths, not through a redirect", () => {
+    // `/gd/` redirects to `/gd`: a hop for readers, and a link search
+    // credits to the redirect rather than the page.
+    for (const { route, source } of routes)
+      expect(source, route).not.toMatch(/(?:to|href)(?:: |=)"\/[^"]+\/"/);
+  });
+
   it("serves only the prerendered rows of each data route", () => {
     // Otherwise every unknown id renders and caches its own 404.
     for (const { route, source } of routes)

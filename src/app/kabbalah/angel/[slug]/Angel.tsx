@@ -63,13 +63,14 @@ function day([month, dayOfMonth]: MonthDay) {
   return formatter.format(new Date(2001, month - 1, dayOfMonth));
 }
 
-/** The planet a decade falls under, named rather than identified. */
-function planetName(id: string) {
+/** The planet a decade falls under, named and linked to its page. */
+function DecadePlanet({ id }: { id: string }) {
   const planets = Data.planet as Record<
     string,
     { name: { en: { en: string } } }
   >;
-  return Object.hasOwn(planets, id) ? planets[id].name.en.en : id;
+  if (!Object.hasOwn(planets, id)) return <>{id}</>;
+  return <Link href={`/astrology/planet/${id}`}>{planets[id].name.en.en}</Link>;
 }
 
 function clock(minutes: number) {
@@ -161,14 +162,16 @@ export default function AngelPage({
         <Row label="God name">{angel.godName}</Row>
         <Row label="Choir">{choir.name.en}</Row>
         <Row label="Zodiac">
-          {sign.from}–{sign.to}° of {zodiacs[sign.zodiacId].name.en}
+          {sign.from}–{sign.to}° of{" "}
+          <Link href={`/astrology/zodiac#${sign.zodiacId}`}>
+            {zodiacs[sign.zodiacId].name.en}
+          </Link>
         </Row>
         <Row label="Degrees of the sphere">
           {degrees.from}–{degrees.to}
         </Row>
         <Row label="Decade">
-          {/* planetOf gives the id; a reader wants the planet's name. */}
-          {decadeOf(no)} of 36, under {planetName(planetOf(no))}
+          {decadeOf(no)} of 36, under <DecadePlanet id={planetOf(no)} />
         </Row>
         <Row label="Governs the days">
           {day(governed.from)} – {day(governed.to)}
