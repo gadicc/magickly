@@ -1,12 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  Container,
-  FormControlLabel,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Button, Container, Stack, TextField, Typography } from "@mui/material";
 import Link from "next/link";
 import { getCurrentSqlUserId } from "@/auth/session";
 import { db } from "@/db/neonFull";
@@ -16,6 +8,7 @@ import {
   removeTempleMemberAction,
   updateTempleMembershipAction,
 } from "../../../../actions";
+import CheckboxField from "../../../../CheckboxField";
 import { ConfirmAction } from "../../../../ConfirmAction";
 
 export const metadata = privateMetadata("Temple Membership");
@@ -101,14 +94,9 @@ export default async function TemplesAdminEditMembershipPage({
             slotProps={{ htmlInput: { min: 0, max: 6, step: 1 } }}
             helperText="Golden Dawn grade, from 0 through 6."
           />
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="admin"
-                value="true"
-                defaultChecked={membership.admin}
-              />
-            }
+          <CheckboxField
+            name="admin"
+            defaultChecked={membership.admin}
             label="Temple administrator"
           />
           <TextField
