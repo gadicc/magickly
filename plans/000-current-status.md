@@ -106,9 +106,9 @@ Follow-ups are separate from the completed migration work:
   for a 32-letter text, so the edge cache offers no protection against varied
   requests. Nothing in the app rate-limits today; see
   [plan 027](027-component-exports.md#adversarial-review).
-- TODO: after the SEO release, resubmit `/sitemap.xml` in Search Console and
-  remove `/sitemap-0.xml` if it was submitted directly (it is now a 404); see
-  [plan 028](028-seo.md#follow-ups).
+- Done by 9 November 2026: Search Console lists only `/sitemap.xml`
+  (197 pages, 28 images), last read 6 November with no errors;
+  `/sitemap-0.xml` is gone ([plan 028](028-seo.md#follow-ups)).
 - 9 November 2026: SEO and speed are measured with Vercel Web Analytics
   and Speed Insights (`src/analytics/`), next to Search Console. Public
   pages report their path; any other page reports only its section
@@ -118,13 +118,17 @@ Follow-ups are separate from the completed migration work:
   carry CSS selectors from the measured page. Accepted limits: repeat
   views of one private section count once; an outside site's referrer
   is sent as its browser exposes it (its origin, under the default
-  policy). TODO: turn Web Analytics on in the Vercel project (it was off
-  on 9 November) and check Speed Insights there, then compare the
+  policy). Web Analytics was turned on in the Vercel project on
+  9 November. TODO: check Speed Insights there, then compare the
   dashboards with Search Console after the next release.
+- 9 November 2026: on-site search work (breadcrumbs, a footer, section
+  and tool text) in [plan 071](071-on-site-search.md), from a Search
+  Console audit: 3 clicks in 28 days, most sitemap pages unseen.
 - TODO: SEO content follow-ups from [plan 028](028-seo.md#follow-ups):
   compute `/astrology/moon` dates only in the browser, prerender the
-  `/study` set list, consider public SQL rituals for the sitemap, and give
-  the short app bar titles fuller names. The raw JSON rows on the entity
+  `/study` set list, and consider public SQL rituals for the sitemap. The
+  app bar's fuller titles are in [plan 071](071-on-site-search.md). The raw
+  JSON rows on the entity
   pages are done ([plan 036](036-entity-pages.md)). The archangel data fix
   (17 September) moved the Tree image identity to
   `magickli-tree-image-outlines-v2`; see
