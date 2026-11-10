@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { type Place, toPlace } from "./place";
+import { deviceTimeZone } from "./timeZone";
 
 /**
  * Where a place came from: searched for and chosen, the visitor's IP
@@ -31,7 +32,9 @@ export interface PlaceStore {
   /**
    * Remembers a place the reader chose, in this tab, the others and later
    * visits (`localStorage`). A device position is rounded to 3 decimals
-   * (about 100 m) first. Throws a RangeError for coordinates out of range.
+   * (about 100 m) first, and given the device's time zone unless it has
+   * one, so that the planetary hours know its date past the date line.
+   * Throws a RangeError for coordinates out of range.
    */
   setPlace(place: Place, source: "chosen" | "device"): void;
   /** Forgets the chosen place, going back to the IP lookup's. */
@@ -258,6 +261,7 @@ export function createPlaceStore(): PlaceStore {
               ...place,
               latitude: round3(place.latitude),
               longitude: round3(place.longitude),
+              timezone: place.timezone ?? deviceTimeZone(),
             }
           : place,
       );

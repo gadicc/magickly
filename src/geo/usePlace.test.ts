@@ -273,7 +273,19 @@ describe("the place store", () => {
     });
   });
 
-  it("rounds the device's position to 3 decimals before keeping it", () => {
+  /** Pretends the device's clock is in `zone`. */
+  function deviceZone(zone: string) {
+    const real = Intl.DateTimeFormat.prototype.resolvedOptions;
+    vi.spyOn(
+      Intl.DateTimeFormat.prototype,
+      "resolvedOptions",
+    ).mockImplementation(function (this: Intl.DateTimeFormat) {
+      return { ...real.call(this), timeZone: zone };
+    });
+  }
+
+  it("rounds the device's position to 3 decimals and gives it the device's zone", () => {
+    deviceZone("Pacific/Apia");
     store.setPlace(
       { name: "Your location", latitude: 51.508_53, longitude: -0.125_74 },
       "device",
@@ -282,6 +294,7 @@ describe("the place store", () => {
       name: "Your location",
       latitude: 51.509,
       longitude: -0.126,
+      timezone: "Pacific/Apia",
     };
     expect(store.getSnapshot().place).toEqual({
       ...expected,
@@ -290,6 +303,27 @@ describe("the place store", () => {
     expect(
       JSON.parse(localStorage.getItem(CHOSEN_PLACE_KEY) ?? "").place,
     ).toEqual(expected);
+  });
+
+  it("keeps a device position without a zone when the device's is unusable", () => {
+    deviceZone("Not/A_Zone");
+    store.setPlace(
+      { name: "Your location", latitude: 51.5, longitude: -0.1 },
+      "device",
+    );
+    expect(store.getSnapshot().place).toEqual({
+      name: "Your location",
+      latitude: 51.5,
+      longitude: -0.1,
+      source: "device",
+    });
+  });
+
+  it("gives a searched place no zone but its own", () => {
+    deviceZone("Pacific/Apia");
+    const { timezone: _, ...noZone } = tokyo;
+    store.setPlace(noZone, "chosen");
+    expect(store.getSnapshot().place?.timezone).toBeUndefined();
   });
 
   it("keeps a searched place's coordinates as they are", () => {

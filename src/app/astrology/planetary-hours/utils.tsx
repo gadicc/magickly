@@ -1,6 +1,7 @@
 import { differenceInMinutes, format } from "date-fns";
 import SunCalc from "suncalc";
 import type { Place } from "@/geo/place";
+import { utcOffsetMinutes } from "@/geo/timeZone";
 
 // Useful Resources:
 // https://plentifulearth.com/calculate-planetary-hours/
@@ -23,8 +24,11 @@ export const chaldean = [
 /** SunCalc's altitude for sunrise and sunset: -0.833°, for refraction. */
 const HORIZON = (-0.833 * Math.PI) / 180;
 
-/** Where the hours are counted; only the coordinates matter. */
-export type Coordinates = Pick<Place, "latitude" | "longitude">;
+/**
+ * Where the hours are counted: the coordinates, and the place's IANA time
+ * zone when known, which says what date it keeps (see `solarDateOf`).
+ */
+export type Coordinates = Pick<Place, "latitude" | "longitude" | "timezone">;
 
 interface PlanetaryHour {
   /** When the hour begins. */
@@ -47,9 +51,10 @@ interface PlanetaryHoursMeta {
 /**
  * One solar day's planetary hours at a place, or why it has none.
  *
- * `solarDate` is the place's date by the Sun at its longitude, the day the
- * hours belong to, as midnight on the device's clock: for labelling the day,
- * not an instant at the place.
+ * `solarDate` is the place's date on the day the hours belong to (its civil
+ * date at solar noon, or by the Sun at its longitude without a time zone),
+ * as midnight on the device's clock: for labelling the day, not an instant at
+ * the place.
  */
 export type PlanetaryDay =
   | {
@@ -64,13 +69,26 @@ export type PlanetaryDay =
   | { kind: "midnightSun"; solarDate: Date };
 
 /**
- * The place's solar date for the day whose solar noon this is: noon shifted
- * by the longitude (15° to the hour) reads as about 12:00 in UTC, so its UTC
- * date is the place's. Noon, not sunrise, so that it exists on polar days and
- * is never near midnight, whatever the latitude.
+ * The place's date for the day whose solar noon this is, and its weekday.
+ * Noon, not sunrise, so that it exists on polar days and is never near
+ * midnight, whatever the latitude.
+ *
+ * With the place's time zone, it is the civil date there at solar noon:
+ * Apia and Nuku'alofa keep UTC+13 at about 172° and 175° west, so their
+ * calendar is a day ahead of their longitude's. Without one (or with a zone
+ * the runtime doesn't know), noon shifted by the longitude (15° to the hour)
+ * reads as about 12:00 in UTC, so its UTC date is the place's by the Sun.
  */
-function solarDateOf(solarNoon: Date, longitude: number) {
-  const shifted = new Date(solarNoon.getTime() + (longitude / 15) * 3_600_000);
+function solarDateOf(solarNoon: Date, geo: Coordinates) {
+  let offsetMinutes = (geo.longitude / 15) * 60;
+  if (geo.timezone) {
+    try {
+      offsetMinutes = utcOffsetMinutes(geo.timezone, solarNoon);
+    } catch {
+      // An unknown zone: the longitude's date.
+    }
+  }
+  const shifted = new Date(solarNoon.getTime() + offsetMinutes * 60_000);
   return {
     weekday: shifted.getUTCDay(), // 0-6 where 0=Sunday.
     solarDate: new Date(
@@ -90,7 +108,7 @@ function rises(times: { sunrise: Date }) {
  * place: 12 day hours from sunrise to sunset and 12 night hours from sunset
  * to the next sunrise, the first ruled by the planet of the day.
  *
- * The planet of the day is the weekday of the place's solar date, not the
+ * The planet of the day is the weekday of the place's date, not the
  * device's: from London on Monday evening, Tokyo's next sunrise is Tuesday's
  * and Mars rules it. Inside the polar circles a day may have no sunrise and
  * sunset (SunCalc gives Invalid Date), which is returned as `polarNight` or
@@ -101,7 +119,7 @@ export function calcPlanetaryHoursForDayAndLocation(
   geo: Coordinates,
 ): PlanetaryDay {
   const solar = SunCalc.getTimes(date, geo.latitude, geo.longitude);
-  const { weekday, solarDate } = solarDateOf(solar.solarNoon, geo.longitude);
+  const { weekday, solarDate } = solarDateOf(solar.solarNoon, geo);
 
   // SunCalc's sunrise and sunset are both found or both not: the sun either
   // crosses the horizon that day or stays on one side of it.

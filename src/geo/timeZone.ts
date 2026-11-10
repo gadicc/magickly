@@ -40,10 +40,16 @@ export function utcOffsetMinutes(zone: string, date: Date): number {
   return Math.round((wall - instant) / 60_000);
 }
 
-/** The device's IANA time zone, or undefined where the runtime has none. */
+/**
+ * The device's IANA time zone, or undefined where the runtime has none or
+ * names one it can't then use.
+ */
 export function deviceTimeZone(): string | undefined {
   try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone || undefined;
+    const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (!zone) return undefined;
+    formatterFor(zone);
+    return zone;
   } catch {
     return undefined;
   }

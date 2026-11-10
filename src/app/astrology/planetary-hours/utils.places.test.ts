@@ -30,6 +30,18 @@ const tokyo = { latitude: 35.69, longitude: 139.69 };
 const honolulu = { latitude: 21.31, longitude: -157.86 };
 const auckland = { latitude: -36.85, longitude: 174.76 };
 const tromso = { latitude: 69.65, longitude: 18.96 };
+// Past the date line: both keep UTC+13 at about 172° and 175° west, so
+// their calendar is a day ahead of their longitude's.
+const apia = {
+  latitude: -13.833,
+  longitude: -171.767,
+  timezone: "Pacific/Apia",
+};
+const nukualofa = {
+  latitude: -21.139,
+  longitude: -175.204,
+  timezone: "Pacific/Tongatapu",
+};
 const murmansk = { latitude: 68.97, longitude: 33.08 };
 
 // The device is in London: Node reads TZ again when it is assigned.
@@ -122,6 +134,90 @@ describe("the planet of the day at a far place", () => {
       }
     },
   );
+});
+
+describe("the planet of the day where the date is not the longitude's", () => {
+  // Tuesday 10 November, 12:00 UTC: Wednesday 01:00 in Apia and Nuku'alofa.
+  const date = new Date("2026-11-10T12:00:00Z");
+
+  it.each([
+    ["Apia", apia],
+    ["Nuku'alofa", nukualofa],
+  ])("gives %s's Wednesday sunrise Wednesday's rulers", (_, place) => {
+    const day = withHours(calcPlanetaryHoursForDayAndLocation(date, place));
+    const sunrise = day.meta.sunrise.toLocaleString("en-GB", {
+      timeZone: place.timezone,
+      weekday: "long",
+      day: "numeric",
+    });
+    expect(sunrise).toBe("Wednesday 11");
+    expect(format(day.solarDate, "cccc d LLL")).toBe("Wednesday 11 Nov");
+    expect(day.hours[0].planet).toBe("mercury");
+  });
+
+  it("uses the longitude's date for a place without a time zone", () => {
+    const { timezone: _, ...apiaByLongitude } = apia;
+    const day = withHours(
+      calcPlanetaryHoursForDayAndLocation(date, apiaByLongitude),
+    );
+    expect(format(day.solarDate, "cccc d LLL")).toBe("Tuesday 10 Nov");
+    expect(day.hours[0].planet).toBe("mars");
+  });
+
+  it("uses the longitude's date for a zone the runtime doesn't know", () => {
+    const day = withHours(
+      calcPlanetaryHoursForDayAndLocation(date, {
+        ...apia,
+        timezone: "Pacific/Nowhere",
+      }),
+    );
+    expect(format(day.solarDate, "cccc d LLL")).toBe("Tuesday 10 Nov");
+    expect(day.hours[0].planet).toBe("mars");
+  });
+
+  it.each([
+    ["London", london, "Europe/London"],
+    ["Tokyo", tokyo, "Asia/Tokyo"],
+    ["Honolulu", honolulu, "Pacific/Honolulu"],
+    ["Auckland", auckland, "Pacific/Auckland"],
+  ])(
+    "agrees with the longitude at %s, with its time zone, at any hour",
+    (_, place, timezone) => {
+      for (let hour = 0; hour < 24; hour++) {
+        const at = new Date(Date.UTC(2026, 10, 9, hour, 30));
+        const byZone = calcPlanetaryHoursForDayAndLocation(at, {
+          ...place,
+          timezone,
+        });
+        const byLongitude = calcPlanetaryHoursForDayAndLocation(at, place);
+        expect(byZone).toEqual(byLongitude);
+      }
+    },
+  );
+
+  it.each([
+    ["Apia", apia],
+    ["Nuku'alofa", nukualofa],
+  ])("steps through consecutive days at %s", (_, place) => {
+    const now = Date.UTC(2026, 10, 9, 12, 30);
+    const week = [-1, 0, 1, 2, 3, 4, 5, 6].map((d) =>
+      withHours(
+        calcPlanetaryHoursForDayAndLocation(
+          new Date(now + d * DAY_IN_MS),
+          place,
+        ),
+      ),
+    );
+    for (let i = 1; i < week.length; i++) {
+      const [before, after] = [week[i - 1], week[i]];
+      expect(after.solarDate.getTime() - before.solarDate.getTime()).toBe(
+        DAY_IN_MS,
+      );
+      expect(chaldean.indexOf(after.hours[0].planet)).toBe(
+        (chaldean.indexOf(before.hours[0].planet) + 3) % 7,
+      );
+    }
+  });
 });
 
 describe("days without sunrise or sunset", () => {
