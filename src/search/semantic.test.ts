@@ -1,4 +1,7 @@
+import { readdirSync } from "node:fs";
+import { resolve } from "node:path";
 import { beforeAll, describe, expect, it, vi } from "vitest";
+import manifest from "./embeddings/manifest.json";
 import { embedSearchInputs } from "./embeddings/provider";
 import { loadSemanticIndex } from "./embeddings/store";
 import { searchSiteByMeaning } from "./semantic";
@@ -40,6 +43,15 @@ describe("published semantic index integration", () => {
     );
     expect(new Set(results.map((result) => result.path)).size).toBe(
       results.length,
+    );
+  });
+});
+
+describe("the published vector files", () => {
+  it("are only the ones the manifest names, since /api/search bundles every one", () => {
+    const dir = resolve(import.meta.dirname, "../../public/search-vectors");
+    expect(readdirSync(dir).sort()).toEqual(
+      manifest.profiles.map((profile) => profile.file).sort(),
     );
   });
 });
