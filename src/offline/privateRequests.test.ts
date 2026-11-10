@@ -14,6 +14,10 @@ describe("private service-worker response policy", () => {
     "/api/rituals?rsc=1",
     "/api/files/image.png",
     "/api/gongoPoll",
+    // The reader's location (plan 072): the IP lookup is per visitor, and a
+    // place search may only be answered from the browser's HTTP cache.
+    "/api/geo",
+    "/api/places?q=london",
     "/admin?_rsc=123",
     "/temples/admin/123",
     "/temples/join/example/secret",

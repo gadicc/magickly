@@ -21,6 +21,7 @@
       "!assets/fonts/**",
       "!**/*.svg",
       "!src/components/enochian/font/**",
+      "!src/geo/server/*.tsv",
       "!vendor/**"
     ]
   },

@@ -1,0 +1,17 @@
+{"format":2,"source":"Test fixture: a few real places, hand-picked (plan 072)","license":"CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/), GeoNames (https://www.geonames.org/); modified: see README.md","rows":16,"timezones":["America/Chicago","America/New_York","America/Sao_Paulo","America/Toronto","Asia/Hong_Kong","Asia/Kolkata","Europe/Berlin","Europe/Kyiv","Europe/London","Europe/Paris","Europe/Zurich"],"regions":[["BR","São Paulo"],["CA","Ontario"],["CH","Zurich"],["DE","Bavaria"],["FR","Île-de-France"],["GB","England","ENG"],["HK",""],["IN","Maharashtra"],["UA","Kyiv City"],["UA","Volyn"],["US","District of Columbia","DC"],["US","Illinois","IL"],["US","Texas","TX"]]}
+São Paulo	Sao Paulo	0	-23.548	-46.636	2		
+Mumbai		7	19.073	72.883	5		bombay
+London		5	51.509	-0.126	8		londres
+Paris		4	48.853	2.349	9		lutetia
+Kyiv		8	50.454	30.524	7		kiev|kyjiw
+Munich		3	48.137	11.575	6		munchen|monaco di baviera
+Washington		10	38.895	-77.036	1		
+Zürich	Zuerich	2	47.367	8.55	10		zurigo
+Kowloon		6	22.317	114.183	4	1	
+London		1	42.984	-81.233	3		
+Paris 15 Vaugirard		4	48.842	2.3	9	1	
+Lutsk		9	50.747	25.325	7		
+Springfield		11	39.802	-89.644	0		
+Zürich (Kreis 11)	Zuerich (Kreis 11)	2	47.421	8.538	10	1	
+Ottobrunn bei München	Ottobrunn bei Muenchen	3	48.065	11.666	6		
+Paris		12	33.661	-95.556	0		

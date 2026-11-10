@@ -125,6 +125,8 @@ export default async function (phase: string): Promise<NextConfig> {
     transpilePackages: ["magick-data"],
     outputFileTracingIncludes: {
       "/api/search": ["./public/search-vectors/*.bin"],
+      // Read with fs by src/geo/server/places.ts, so not traced on its own.
+      "/api/places": ["./src/geo/server/places.tsv"],
       // The legacy alias only renders the Tree, which uses the public base fonts.
       "/api/treeOfLife": ["./public/fonts/*.ttf", resvgWasmTraceFile],
       "/api/render/*": [

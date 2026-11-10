@@ -47,8 +47,12 @@ exact bytes (as `assets/fonts/README.md` does). Put the citation next to
 what it supports: the plan, the data file or the preset. Commit a
 public-domain file only when it is small and the app needs it, with the
 basis for its status recorded; being on archive.org does not make a work
-public domain. Copyrighted sources (such as the Llewellyn editions of
-Regardie's *The Golden Dawn*) never enter the repository, not even as crops
-or extracted images; only facts taken from them, such as a temple layout,
-drawn with our own art. Material from private temples stays out of the
-repository altogether.
+public domain. One exception (plan 072): data the app serves that is
+generated from a CC BY source, such as `src/geo/server/places.tsv` from
+GeoNames, may be committed when a committed script rebuilds it from an
+archived, hash-pinned copy of the source, with a README beside it giving
+the source, the licence and what we changed. Copyrighted sources (such
+as the Llewellyn editions of Regardie's *The Golden Dawn*) never enter
+the repository, not even as crops or extracted images; only facts taken
+from them, such as a temple layout, drawn with our own art. Material from
+private temples stays out of the repository altogether.
