@@ -65,9 +65,10 @@ export default function Geomancy() {
     <>
       <Container sx={{ my: 1 }}>
         <p>
-          In great appreciation of{" "}
-          <i>The Golden Dawn Journal: Book 1: Divination</i> by Chic & Tabatha
-          Cicero. Buy on{" "}
+          In great appreciation of Mitch and Gail Henson&apos;s “By the Signs of
+          the Earth: Geomancy in the Golden Dawn” in{" "}
+          <i>The Golden Dawn Journal, Book 1: Divination</i>, edited by Chic
+          Cicero and Sandra Tabatha Cicero (Llewellyn, 1994). Buy on{" "}
           <a href="https://www.amazon.com/Golden-Dawn-Journal-Divination-Llewellyns/dp/1567188508">
             Amazon
           </a>{" "}

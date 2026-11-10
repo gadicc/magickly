@@ -534,15 +534,15 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
           invest this working with the truth of what I perceive.
         </div>
         <div style={{ opacity: 0.5, fontSize: "70%", marginTop: 5 }}>
-          Adapted from the Hensen&apos;s &quot;Geomancy in the Golden Dawn&quot;
-          as published in{" "}
+          Adapted from Mitch and Gail Henson&apos;s “By the Signs of the Earth:
+          Geomancy in the Golden Dawn” (p. 155) in{" "}
           <a
             target="_blank"
             href="https://www.amazon.co.uk/Golden-Dawn-Journal-Divination-Bk-1/dp/1567188508"
           >
             The Golden Dawn Journal, Book 1: Divination
           </a>
-          .
+          , edited by Chic Cicero and Sandra Tabatha Cicero (Llewellyn, 1994).
         </div>
         <br />
         <Typography variant="h6" component="h2">

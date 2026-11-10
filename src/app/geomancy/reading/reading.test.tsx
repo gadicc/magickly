@@ -51,12 +51,13 @@ const render = (house: string) =>
  * `useId`s. Nothing else differed.
  */
 describe("geomancy reading page", () => {
-  // Re-pinned when "Mothers" and "Interpretation" became h2s (10 November
-  // 2026); the bytes are otherwise those from before the rekey.
+  // Re-pinned when "Mothers" and "Interpretation" became h2s and when the
+  // credit named the Hensons' essay (10 November 2026); the bytes are
+  // otherwise those from before the rekey.
   it.each([
     [
       "1",
-      "79016 15b077210724fcca6d07009f217ed99a1212067ac402b563d0aa500a860d6de4",
+      "79107 bad99e428c7a81a2a9d92dae1e46f78865211a9e8c386b6d4f46d1f8e25642da",
       [
         "Personality of the Querent",
         "Good, except in war.",
@@ -66,7 +67,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "7",
-      "78967 59e002fd6816b772b4a48c26fbeb56f900493db58e57ec01bf019e7275f25fc3",
+      "79058 525978338a88beab13fba90c471cd4fad61a4815616b9dafc126131715ec1f3b",
       [
         "Love, marriage, prostitution",
         "Indifferent.",
@@ -76,7 +77,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "12",
-      "78948 547cd19bd051edd9628d552baed520526146e604fa265c62025160a6846ba3dd",
+      "79039 e136ee0a22edbbfc62626aac58cc29e6da4261c9fa99b86b3386124a895284fb",
       [
         "Sorrow, hospitals, intrigue",
         "Unfavourable generally.",
