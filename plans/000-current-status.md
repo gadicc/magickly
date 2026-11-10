@@ -126,6 +126,12 @@ Follow-ups are separate from the completed migration work:
   Console audit: 3 clicks in 28 days, most sitemap pages unseen. Stages
   1 to 4 are built; TODO: the section and tool text (stage 5), after
   Gadi's answers to its review sheet.
+- 10 November 2026: the Enochian Keys complete and checked in
+  [plan 073](073-enochian-keys.md): most Keys lack their Enochian (676 of
+  1,014 rows), the 2023 text's source is unknown, so all of it is
+  re-derived from Casaubon (1659) and Crowley (1912), with both
+  traditions' readings and the nineteenth Call. TODO: Gadi's decisions
+  2 to 10, then stages 1 to 5.
 - TODO (Gadi, 10 November 2026): English search in the Enochian
   dictionary, with a revamp of its UI and UX. Today the search matches
   Enochian spellings only (`src/app/enochian/dictionary/dictionary.tsx`);
