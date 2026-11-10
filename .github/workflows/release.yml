@@ -138,6 +138,13 @@ jobs:
           DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
         run: node scripts/release-checks.mjs staged
 
+      # IndexNow (scripts/indexnow.mjs): fingerprint the pages production
+      # serves now, so the pages this release changes can be told apart.
+      # Search notifications never block or fail a release.
+      - name: Fingerprint live pages for IndexNow
+        continue-on-error: true
+        run: node scripts/indexnow.mjs snapshot "$RUNNER_TEMP/indexnow-before.json"
+
       - name: Recheck promotion fence immediately before moving aliases
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -158,3 +165,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
         run: node scripts/release-checks.mjs promoted
+
+      - name: Tell IndexNow which pages changed
+        continue-on-error: true
+        run: node scripts/indexnow.mjs submit "$RUNNER_TEMP/indexnow-before.json"

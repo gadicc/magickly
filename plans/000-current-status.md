@@ -106,6 +106,18 @@ Follow-ups are separate from the completed migration work:
   for a 32-letter text, so the edge cache offers no protection against varied
   requests. Nothing in the app rate-limits today; see
   [plan 027](027-component-exports.md#adversarial-review).
+- 10 November 2026: Bing Webmaster Tools has magick.ly (and the old
+  magick.li); each production release tells IndexNow (Bing, Yandex and
+  the other participating engines; not Google) which pages changed:
+  `scripts/indexnow.mjs` fingerprints every sitemap page before promotion
+  and after, and submits the changed, new and removed ones. The key file
+  is `public/<key>.txt`; the key is public by design. A failed snapshot or
+  submission never fails the release.
+- TODO: Bing reports meta descriptions too short. Seven pages are under
+  70 characters, the thin planet pages (Earth, Uranus, Neptune, the
+  Nodes, the Zodiac at 35 to 50) and `/gd/grade/0=0` (68), and 14 more
+  are under 110; the planets need content, not only longer text (plan
+  028's follow-ups).
 - Done by 9 November 2026: Search Console lists only `/sitemap.xml`
   (197 pages, 28 images), last read 6 November with no errors;
   `/sitemap-0.xml` is gone ([plan 028](028-seo.md#follow-ups)).
@@ -161,7 +173,12 @@ Follow-ups are separate from the completed migration work:
   isn't shown (`src/app/astrology/planetary-hours/planetaryHours.tsx`);
   it behaved the same before [plan 072](072-reader-location.md).
 - TODO: SEO content follow-ups from [plan 028](028-seo.md#follow-ups):
-  consider public SQL rituals for the sitemap. `/study` prerenders its
+  public SQL rituals in the sitemap wait for a "list in search engines"
+  option on the ritual (Gadi, 10 November 2026): marking a ritual public
+  makes it readable by link, which is not the same as asking for it to be
+  advertised, so only rituals whose owner ticks the option would be listed.
+  The built-in rituals (`/doc/neophyte`, `/doc/zelator`,
+  `/doc/theoricus`) are in the sitemap and indexable. `/study` prerenders its
   set list for the default filters, each set linked, as its Suspense
   fallback (10 November 2026). `/astrology/moon` already computes its
   dates only in the browser (`74fe9a51`, "Draw moon phases after
