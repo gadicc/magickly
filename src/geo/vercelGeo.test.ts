@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { placeFromVercelHeaders, UNNAMED_PLACE } from "./vercelGeo";
+import { UNNAMED_PLACE } from "./place";
+import { placeFromVercelHeaders } from "./vercelGeo";
 
 const LONDON = {
   "x-vercel-ip-latitude": "51.5074",

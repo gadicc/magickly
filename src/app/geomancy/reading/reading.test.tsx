@@ -44,12 +44,17 @@ const render = (house: string) =>
  * witnesses and Conjunctio as the judge; each case below lists the chosen
  * house's own meaning, which the closed select still shows, and then what
  * those three figures say in that house, in the order the page prints them.
+ *
+ * Plan 072 changed the bytes once on purpose: while the place is loading the
+ * hours select reads "Planetary Hour for Luna", without the dangling " in "
+ * the GeoIP hook left, and the place chooser's slot before it renumbers two
+ * `useId`s. Nothing else differed.
  */
 describe("geomancy reading page", () => {
   it.each([
     [
       "1",
-      "79028 a95d2ea9ebf8db61e8e7844e46ff064bc6f34264931daa2aab4fa249534dfc1a",
+      "79016 caf895983ee4ce29d3943fff8f5a3dbfaea3734c7f9cc17b498b4204d5a3d88d",
       [
         "Personality of the Querent",
         "Good, except in war.",
@@ -59,7 +64,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "7",
-      "78979 2872d55fb7a70ae2105e96b65dbbecd8e22bc0c0737315a21fc18bebb32a95ee",
+      "78967 dfe9aa67bd3f5c4530a312e80386ec375e2d93ae9b438c774421ba99da7a4516",
       [
         "Love, marriage, prostitution",
         "Indifferent.",
@@ -69,7 +74,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "12",
-      "78960 1c1a97ab4aa8b185c651ffc0ff439b447447247a79e9962e6f65d56f8b5fc5f7",
+      "78948 ea7ac8c5fb8912309b0946828afb3e20820a03b72b23d9d3c4c70bd8f94ea989",
       [
         "Sorrow, hospitals, intrigue",
         "Unfavourable generally.",

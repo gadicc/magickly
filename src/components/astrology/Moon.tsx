@@ -1,6 +1,5 @@
 import lune from "lune";
 
-import useGeoIP from "../hooks/useGeoIP";
 import useHydrated from "../hooks/useHydrated";
 
 const moonMeanInclination = 5.15; // in degrees
@@ -117,7 +116,20 @@ function MoonDrawing({
   );
 }
 
-function MoonWidget({ moonPadding = "10px 0 2px 0" }) {
+/**
+ * Today's moon, drawn as it looks from the viewer's hemisphere.
+ *
+ * `latitude` is the viewer's, when known (the app passes the reader's place,
+ * plan 072); the moon is drawn as from the north until it is known to be
+ * south of the equator.
+ */
+function MoonWidget({
+  moonPadding = "10px 0 2px 0",
+  latitude,
+}: {
+  moonPadding?: string;
+  latitude?: number;
+}) {
   // Pages with this widget are prerendered at build time, so the server can't
   // know today's phase. Hydrate with the unlit disc, then draw the phase.
   const hydrated = useHydrated();
@@ -127,8 +139,8 @@ function MoonWidget({ moonPadding = "10px 0 2px 0" }) {
       ? "\u00a0" // keeps the label's line height
       : namesLocal.en[moonPhaseName(phaseValue)];
 
-  const geo = useGeoIP();
-  const northernHemisphere = !geo || geo.latitude >= 0;
+  // Northern (and the equator) unless the place is known to be south.
+  const northernHemisphere = latitude === undefined || latitude >= 0;
 
   return (
     <div

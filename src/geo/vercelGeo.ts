@@ -4,13 +4,10 @@ import {
   LATITUDE_HEADER_NAME,
   LONGITUDE_HEADER_NAME,
 } from "@vercel/functions/headers";
-import { type Place, toPlace } from "./place";
+import { type Place, toPlace, UNNAMED_PLACE } from "./place";
 
 /** `@vercel/functions` has no constant for this one. */
 export const TIMEZONE_HEADER_NAME = "x-vercel-ip-timezone";
-
-/** The name used when Vercel gives no usable city and no country. */
-export const UNNAMED_PLACE = "Your area";
 
 /** A plain decimal, as Vercel sends: no exponent, hex or empty string. */
 const DECIMAL = /^-?\d+(?:\.\d+)?$/;

@@ -146,7 +146,26 @@ export default function Sequence() {
             </a>{" "}
             by User:AnonMoos, which is public domain.
           </li>
+          <li>
+            The places in the place search on the{" "}
+            <Link href="/astrology/planetary-hours">planetary hours</Link> and{" "}
+            <Link href="/geomancy/reading">geomancy reading</Link> pages: from{" "}
+            <a href="https://www.geonames.org/">GeoNames</a>, under{" "}
+            <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+            . We modified the data, keeping only the towns of 15,000 people or
+            more and the fields the search needs; those changes are under the
+            same licence.
+          </li>
         </ul>
+
+        <h2 id="location">Your location</h2>
+
+        <p>
+          Our host, Vercel, works out your town from your IP address when your
+          request reaches us; no other service is asked. A place you choose
+          stays in your browser, though what you type in the place search is
+          sent to our server to find the places that match.
+        </p>
       </Box>
     </Container>
   );

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { act } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { renderToString } from "react-dom/server";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { hydrateAt, renderAt } from "../../../tests/hydration";
 import MoonWidget, { moonMeanInclination, moonPath } from "./Moon";
 
@@ -8,23 +8,8 @@ import MoonWidget, { moonMeanInclination, moonPath } from "./Moon";
 const buildTime = new Date("2026-09-17T10:16:00Z"); // phase 0.2066
 const visitTime = new Date("2026-10-20T12:00:00Z"); // phase 0.3061
 
-let resolveGeo: (response: unknown) => void;
-
-beforeEach(() => {
-  vi.stubGlobal(
-    "fetch",
-    vi.fn(
-      () =>
-        new Promise((resolve) => {
-          resolveGeo = resolve;
-        }),
-    ),
-  );
-});
-
 afterEach(() => {
   vi.useRealTimers();
-  vi.unstubAllGlobals();
 });
 
 describe("moonPath", () => {
@@ -71,15 +56,26 @@ describe("MoonWidget", () => {
       `rotate(${moonMeanInclination})`,
     );
 
-    // The GeoIP lookup starts after hydration; the southern view is an update.
-    await act(async () => {
-      resolveGeo({ json: async () => ({ latitude: "-33.92" }) });
-      await new Promise((resolve) => setTimeout(resolve, 0));
-    });
-    expect(svg?.getAttribute("transform")).toBe(
-      `rotate(${180 - moonMeanInclination})`,
-    );
-
     await unmount();
+  });
+
+  describe("the hemisphere", () => {
+    const transform = (latitude?: number) => {
+      const holder = document.createElement("div");
+      holder.innerHTML = renderToString(<MoonWidget latitude={latitude} />);
+      return holder.querySelector("svg")?.getAttribute("transform");
+    };
+    const north = `rotate(${moonMeanInclination})`;
+    const south = `rotate(${180 - moonMeanInclination})`;
+
+    it("is northern until the latitude is known", () => {
+      expect(transform()).toBe(north);
+    });
+
+    it("is southern south of the equator, and northern on it", () => {
+      expect(transform(-33.92)).toBe(south);
+      expect(transform(0)).toBe(north);
+      expect(transform(51.5)).toBe(north);
+    });
   });
 });

@@ -1,30 +1,55 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import Data from "magick-data";
+import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import PlanetaryHoursPage from "./page";
 
-// The GeoIP lookup is a fetch; a fixed place stands in for it. It is one
-// object per test, as the hook's state is: the page's effect depends on it,
-// and a new one each render would loop.
+// The place store reads storage and fetches `/api/geo`; a fixed answer
+// stands in for it. It is one object per test, as the store's snapshot is:
+// the page's effect depends on the place, and a new one each render would
+// loop.
 const london = {
-  city: "London",
-  country: "United Kingdom",
+  name: "London",
+  region: "England",
+  country: "GB",
   latitude: 51.5245,
   longitude: -0.1567,
+  timezone: "Europe/London",
+  source: "ip",
 };
-const geo = vi.hoisted(() => ({ place: null as unknown }));
-vi.mock("@magick-components/hooks/useGeoIP", () => ({
-  default: () => geo.place,
+const geo = vi.hoisted(() => ({
+  state: { status: "ready", place: null as unknown },
 }));
+vi.mock("@/geo/usePlace", () => ({
+  default: () => ({ ...geo.state, setPlace: () => {}, clearPlace: () => {} }),
+}));
+const ready = (place: unknown) => ({ status: "ready", place });
 beforeEach(() => {
-  geo.place = london;
+  geo.state = ready(london);
+  // The picker searches only when typed into; nothing here fetches.
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(() => Promise.reject(new Error("no network in tests"))),
+  );
 });
 
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
+
+/** Pretends the device's clock is in `zone`, for the time-zone note. */
+function deviceZone(zone: string) {
+  const real = Intl.DateTimeFormat.prototype.resolvedOptions;
+  vi.spyOn(Intl.DateTimeFormat.prototype, "resolvedOptions").mockImplementation(
+    function (this: Intl.DateTimeFormat) {
+      return { ...real.call(this), timeZone: zone };
+    },
+  );
+}
 
 /**
  * The planetary hours page's select, which reads the Key of Solomon from the
@@ -74,10 +99,11 @@ describe("the planetary hours page", () => {
 
   describe("inside the polar circles", () => {
     const tromso = {
-      city: "Tromsø",
-      country: "Norway",
+      name: "Tromsø",
+      country: "NO",
       latitude: 69.65,
       longitude: 18.96,
+      source: "ip",
     };
     const NO_SUNRISE = "The sun does not rise here on this day.";
     const NO_SUNSET = "The sun does not set here on this day.";
@@ -85,7 +111,7 @@ describe("the planetary hours page", () => {
       "This night has no hours here, since the sun neither rises nor sets the next day.";
 
     function renderTromsoOn(iso: string) {
-      geo.place = tromso;
+      geo.state = ready(tromso);
       vi.useFakeTimers({ toFake: ["Date"] });
       vi.setSystemTime(new Date(iso));
       render(<PlanetaryHoursPage />);
@@ -119,6 +145,108 @@ describe("the planetary hours page", () => {
       expect(tables[2].querySelectorAll("tr")).toHaveLength(12);
       expect(count(text, NO_NIGHT_HOURS)).toBe(1);
       expect(count(text, NO_SUNRISE)).toBe(4);
+    });
+  });
+
+  describe("the place", () => {
+    it("says it is finding the location while loading, and shows no hours", () => {
+      geo.state = { status: "loading", place: null };
+      render(<PlanetaryHoursPage />);
+      expect(screen.getByRole("status").textContent).toBe(
+        "Finding your location…",
+      );
+      expect(screen.queryByRole("combobox")).toBeNull();
+      expect(document.querySelector("table")).toBeNull();
+    });
+
+    it("prerenders the loading line", () => {
+      geo.state = { status: "loading", place: null };
+      expect(renderToString(<PlanetaryHoursPage />)).toContain(
+        "Finding your location…",
+      );
+    });
+
+    it("offers the picker when the location is unknown", () => {
+      geo.state = { status: "unknown", place: null };
+      render(<PlanetaryHoursPage />);
+      expect(document.body.textContent).toContain(
+        "Your location couldn't be found. Choose a place to see its planetary hours.",
+      );
+      expect(
+        screen.getByRole("combobox", { name: "Find a place" }),
+      ).toBeTruthy();
+      expect(document.querySelector("table")).toBeNull();
+    });
+
+    it("names the place, with its coordinates and a way to change it", () => {
+      render(<PlanetaryHoursPage />);
+      expect(document.body.textContent).toContain(
+        "London, England, United Kingdom (51.525, -0.157)",
+      );
+      expect(
+        screen.queryByRole("combobox", { name: "Find a place" }),
+      ).toBeNull();
+      const change = screen.getByRole("button", { name: "Change place" });
+      expect(change.textContent).toBe("Change");
+      expect(change.getAttribute("aria-expanded")).toBe("false");
+      fireEvent.click(change);
+      expect(change.getAttribute("aria-expanded")).toBe("true");
+      expect(
+        screen.getByRole("combobox", { name: "Find a place" }),
+      ).toBeTruthy();
+      expect(screen.getByRole("button", { name: "Close place search" })).toBe(
+        change,
+      );
+    });
+
+    it("notes the device's time zone for a place on another clock", () => {
+      deviceZone("Europe/London");
+      geo.state = ready({
+        name: "Tokyo",
+        country: "JP",
+        latitude: 35.6895,
+        longitude: 139.6917,
+        timezone: "Asia/Tokyo",
+        source: "chosen",
+      });
+      render(<PlanetaryHoursPage />);
+      expect(document.body.textContent).toContain(
+        "Times are in your device's time zone (Europe/London).",
+      );
+    });
+
+    it("has no note when the zones differ only in name", () => {
+      deviceZone("Asia/Calcutta");
+      geo.state = ready({
+        name: "Kolkata",
+        region: "West Bengal",
+        country: "IN",
+        latitude: 22.5626,
+        longitude: 88.363,
+        timezone: "Asia/Kolkata",
+        source: "chosen",
+      });
+      render(<PlanetaryHoursPage />);
+      expect(document.body.textContent).toContain(
+        "Kolkata, West Bengal, India",
+      );
+      expect(document.body.textContent).not.toContain("Times are in");
+    });
+
+    it("has no note for the device's own position", () => {
+      deviceZone("Europe/London");
+      geo.state = ready({
+        name: "Your location",
+        latitude: 35.69,
+        longitude: 139.692,
+        timezone: "Asia/Tokyo",
+        source: "device",
+      });
+      render(<PlanetaryHoursPage />);
+      expect(document.body.textContent).toContain(
+        "Your location (35.690, 139.692)",
+      );
+      expect(document.body.textContent).not.toContain("Times are in");
     });
   });
 });

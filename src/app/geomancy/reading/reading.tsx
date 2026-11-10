@@ -1,5 +1,4 @@
 "use client";
-import useGeoIP from "@magick-components/hooks/useGeoIP";
 import {
   Box,
   Container,
@@ -22,6 +21,9 @@ import React from "react";
 import { upcomingHoursForPlanetAtLocation } from "@/app/astrology/planetary-hours/utils";
 import PlanetarySpirit from "@/components/astrology/planetarySpirits";
 import ExportControls from "@/export/ExportControls";
+import PlaceChooser from "@/geo/PlaceChooser";
+import { UNNAMED_PLACE } from "@/geo/place";
+import usePlace, { type SourcedPlace } from "@/geo/usePlace";
 import { capitalizeFirstLetter, ordinal } from "@/lib/utils";
 import { mothersToString } from "@/render/contracts/astroGeomancyChart";
 import Tetragram from "../Tetragram";
@@ -75,6 +77,18 @@ function romanize(num) {
   // @ts-expect-error: while(i--) ensures digits.pop() is defined.
   while (i--) roman = (key[+digits.pop() + i * 10] || "") + roman;
   return Array(+digits.join("") + 1).join("M") + roman;
+}
+
+/**
+ * Where the hours are, after "Planetary Hour for Mars": "in London", or
+ * for the device's own position "at your location". The IP lookup names a
+ * place it can't place at all `UNNAMED_PLACE` ("Your area"), which reads
+ * "in your area".
+ */
+function wherePhrase(place: SourcedPlace) {
+  if (place.source === "device") return "at your location";
+  if (place.name === UNNAMED_PLACE) return "in your area";
+  return `in ${place.name}`;
 }
 
 function interpretationText(interpretationId: string) {
@@ -205,10 +219,10 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
   const [planetId, setPlanetId] = React.useState<PlanetId>(initial.planetId);
   const [planetHint, setPlanetHint] = React.useState(false);
   const [planetaryHour, setPlanetaryHour] = React.useState(-1);
-  const geo = useGeoIP();
+  const { status, place } = usePlace();
   const planetaryHours = React.useMemo(() => {
-    if (!geo) return [];
-    return upcomingHoursForPlanetAtLocation(planetId, geo).map(
+    if (!place) return [];
+    return upcomingHoursForPlanetAtLocation(planetId, place).map(
       ({ from, to }, i) => ({
         value: i,
         // label: formatFromTo(from, to),
@@ -220,7 +234,7 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
         ],
       }),
     );
-  }, [planetId, geo]);
+  }, [planetId, place]);
 
   const [houseNoStr, setHouseNoStr] = React.useState(initial.house);
   const [mothers, setMothers] = React.useState<TetraRow[]>(initial.mothers);
@@ -398,6 +412,14 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
             }
           />
         </FormGroup>
+        {status === "unknown" ? (
+          <PlaceChooser
+            summary="Your location couldn't be found, so there are no hours to list."
+            label="Choose a place"
+          />
+        ) : status === "ready" ? (
+          <PlaceChooser label="Change place" />
+        ) : null}
         <Select
           size="small"
           value={planetaryHour}
@@ -411,7 +433,8 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
         >
           <MenuItem value={-1}>
             <div style={{ width: "100%", textAlign: "center" }}>
-              Planetary Hour for {planet.name.en.en} in {geo?.city}
+              Planetary Hour for {planet.name.en.en}
+              {place ? ` ${wherePhrase(place)}` : null}
             </div>
           </MenuItem>
           {planetaryHours.map(({ value, labels }) => (

@@ -14,13 +14,23 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Data from "magick-data";
 import Tiles from "@/components/Tiles";
+import usePlace from "@/geo/usePlace";
 import OpenSource from "@/OpenSource";
+
+/**
+ * The moon as seen from the reader's place (plan 072), which the MIT moon
+ * widget can't look up itself: its components import no app code.
+ */
+export function PlaceMoon() {
+  const { place } = usePlace();
+  return <MoonWidget latitude={place?.latitude} />;
+}
 
 // Both previews show live data (the phase, the retrograde dates), so they
 // are informative and screen readers read them.
 const tiles = [
   {
-    Component: MoonWidget,
+    Component: PlaceMoon,
     title: "Moon ☾",
     informative: true,
     to: "moon",

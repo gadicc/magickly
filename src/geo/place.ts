@@ -19,6 +19,13 @@ export interface Place {
   timezone?: string;
 }
 
+/**
+ * The name `/api/geo` gives a place when Vercel's headers have usable
+ * coordinates but no usable city or country; the geomancy reading says "in
+ * your area" for it.
+ */
+export const UNNAMED_PLACE = "Your area";
+
 const COUNTRY = /^[A-Z]{2}$/;
 
 function optionalText(value: unknown, max: number): string | undefined {

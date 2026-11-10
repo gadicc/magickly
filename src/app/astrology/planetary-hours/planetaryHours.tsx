@@ -1,5 +1,4 @@
 "use client";
-import useGeoIP from "@magick-components/hooks/useGeoIP";
 import { ExpandMore } from "@mui/icons-material";
 import {
   Accordion,
@@ -22,6 +21,11 @@ import {
 } from "@mui/material";
 import { format } from "date-fns";
 import React from "react";
+import PlaceChooser from "@/geo/PlaceChooser";
+import PlacePicker from "@/geo/PlacePicker";
+import { placeLabel } from "@/geo/placeLabel";
+import { timeZoneNote } from "@/geo/timeZone";
+import usePlace, { type SourcedPlace } from "@/geo/usePlace";
 import OpenSource from "@/OpenSource";
 import {
   calcPlanetaryHoursForDayAndLocation,
@@ -107,6 +111,49 @@ function PlanetaryHoursForDay({
 }
 
 /**
+ * The place the hours are for, with its coordinates and a way to change it,
+ * and a note when its clock differs from the device's, on which the times
+ * are shown.
+ */
+function PlaceLine({
+  place,
+  week,
+  focusOnMount,
+}: {
+  place: SourcedPlace;
+  week: PlanetaryDay[];
+  /** Focus its button: the place was just chosen in the picker it replaces. */
+  focusOnMount: boolean;
+}) {
+  const note = timeZoneNote(
+    place,
+    week.flatMap((day) =>
+      day.kind === "hours" ? day.hours.map((hour) => hour.date) : [],
+    ),
+  );
+  return (
+    <>
+      <PlaceChooser
+        focusOnMount={focusOnMount}
+        summary={
+          <>
+            {placeLabel(place)}{" "}
+            <span style={{ color: "#aaa" }}>
+              ({place.latitude.toFixed(3)}, {place.longitude.toFixed(3)})
+            </span>
+          </>
+        }
+      />
+      {note ? (
+        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+          {note}
+        </Typography>
+      ) : null}
+    </>
+  );
+}
+
+/**
  * The seven planets of the hours, in the Chaldean order from Sol, as the
  * select has always listed them.
  */
@@ -137,25 +184,46 @@ export default function PlanetaryHours({
   /** Each planet's `keyOfSolomon.en`, Mathers' sentence on its days and hours. */
   keyOfSolomon: Record<HourPlanet, string>;
 }) {
-  const geo = useGeoIP();
+  const { status, place } = usePlace();
   const [planet, setPlanet] = React.useState("");
+  // Set when a place is chosen in the picker shown for an unknown location:
+  // the place line replaces that picker, and takes the focus it held.
+  const [chosenHere, setChosenHere] = React.useState(false);
   const [_upcomingHours, setUpcomingHours] = React.useState<
     { from: Date; to: Date }[]
   >([]);
 
   React.useEffect(() => {
-    if (!geo) return;
-    setUpcomingHours(upcomingHoursForPlanetAtLocation(planet, geo));
-  }, [geo, planet]);
+    if (!place) return;
+    setUpcomingHours(upcomingHoursForPlanetAtLocation(planet, place));
+  }, [place, planet]);
 
-  if (!geo) return "Loading location...";
+  if (!place) {
+    return (
+      <Container sx={{ my: 1 }}>
+        {status === "loading" ? (
+          <Box sx={{ my: 2 }} role="status">
+            Finding your location…
+          </Box>
+        ) : (
+          <Box sx={{ my: 2 }}>
+            <Typography sx={{ mb: 2 }}>
+              Your location couldn&apos;t be found. Choose a place to see its
+              planetary hours.
+            </Typography>
+            <PlacePicker onDone={() => setChosenHere(true)} />
+          </Box>
+        )}
+      </Container>
+    );
+  }
 
   // Steps of exactly 24 hours give consecutive solar days at the place.
   const now = new Date();
   const week = [0, 1, 2, 3, 4, 5, 6].map((d) =>
     calcPlanetaryHoursForDayAndLocation(
       new Date(now.getTime() + d * DAY_IN_MS),
-      geo,
+      place,
     ),
   );
 
@@ -167,10 +235,7 @@ export default function PlanetaryHours({
   return (
     <Container sx={{ my: 1 }}>
       <Box sx={{ my: 2 }}>
-        {geo.city}, {geo.country}{" "}
-        <span style={{ color: "#aaa" }}>
-          ({geo.longitude}, {geo.latitude})
-        </span>
+        <PlaceLine place={place} week={week} focusOnMount={chosenHere} />
       </Box>
       <FormControl fullWidth>
         <InputLabel id="select-planet-label">Planet</InputLabel>
