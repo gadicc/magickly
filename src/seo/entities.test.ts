@@ -2,6 +2,7 @@ import Data from "magick-data";
 import { ANGEL_COUNT } from "magick-data/kabbalah/seventyTwoAngels/derived";
 import { describe, expect, it } from "vitest";
 import {
+  angelPage,
   entityIds,
   entityPages,
   gradePage,
@@ -126,6 +127,14 @@ describe("entity pages", () => {
         "Tree of Life, where it carries the letter Zayin; the Hermetic tree " +
         "omits it.",
     });
+  });
+
+  it("gives an angel's meaning, which searchers ask for by name", () => {
+    expect(angelPage("vehuiah")?.description).toBe(
+      "Vehuiah (והויה), the 1st angel of the Shem HaMephorash: meaning " +
+        '"God elevated and exalted above all things", rules the Hebrews, ' +
+        "god name Jehovah, psalm 3:3.",
+    );
   });
 
   it("rejects unknown and inherited ids", () => {

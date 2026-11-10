@@ -178,7 +178,7 @@ export function angelPage(slug: string): EntityPage | null {
     description: correspondences(
       `${name}${hebrew}, the ${ordinal(angel.no)} angel of the Shem HaMephorash`,
       [
-        angel.attribute.en && `"${angel.attribute.en}"`,
+        angel.attribute.en && `meaning "${angel.attribute.en}"`,
         angel.people.en && `rules ${angel.people.en}`,
         angel.godName && `god name ${angel.godName}`,
         angel.psalm.psalm > 0 &&
