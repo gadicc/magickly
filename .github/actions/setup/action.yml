@@ -1,0 +1,21 @@
+name: Set up verification
+description: Install the recorded runtime and dependencies and verify Loom wiring
+runs:
+  using: composite
+  steps:
+    # pnpm 11's own action installs pnpm (from packageManager) and Node.js.
+    # Keep node@24 in step with .nvmrc.
+    - uses: pnpm/setup@a0881977cd8ea73b1ed212236c99ca10dcc80cf4 # v3.1.1
+      with:
+        runtime: node@24
+        cache: true
+        cache-dependency-path: |
+          pnpm-lock.yaml
+          pnpm-workspace.yaml
+        install: false
+    - run: pnpm install --frozen-lockfile
+      shell: bash
+    - run: pnpm exec loom init
+      shell: bash
+    - run: pnpm exec loom check
+      shell: bash
