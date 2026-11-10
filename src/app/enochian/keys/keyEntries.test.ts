@@ -142,6 +142,19 @@ const NOT_IN_THE_DICTIONARY: Record<string, string> = {
   VONPO: "Casaubon's spelling; the dictionary has VONPHO",
   AQLO: 'Key 18.19\'s "in thy": not in the dictionary',
   ADOHI: "Casaubon's spelling; the dictionary has LOADOHI",
+  LUCIFTIAS: "Casaubon's spelling; the dictionary has LUCIFTIAN",
+  NETAAIB: "Casaubon's spelling; the dictionary has NETAAB",
+  ZYLNA: 'Key 19.58\'s "in it self": not in the dictionary',
+  PIRIPSAX: "Casaubon's spelling; the dictionary has PERIPSAX",
+  LNIBM: 'Key 19.66\'s "one season:": not in the dictionary',
+  PAOMBD: 'Key 19.77\'s "her members": not in the dictionary',
+  AGLTOLTORN: "Casaubon's spelling; the dictionary has TOLTORN",
+  LSMNAD:
+    "L and SMNAD run together; a one-letter part is too short to split on",
+  ORSCATBL: 'Key 19.98\'s "his buildings": not in the dictionary',
+  LCAPIMAO:
+    "L and CAPIMAO run together; a one-letter part is too short to split on",
+  PII: "Casaubon's spelling; the dictionary has PI",
 };
 
 describe("the Keys' dictionary entries", () => {

@@ -398,7 +398,9 @@ rows give Aleister Crowley's form from *The Equinox*, vol. I no. 8
 (London, 1912), marked as his, until Dee's own copy can be read. The
 Golden Dawn's reading of each Key is Crowley's in the same Equinox,
 read word by word against Dee's rows. Key 19, the Call of the Thirty
-Aethyrs, comes in a later stage of plan 073.
+Aethyrs, is Casaubon's (pp. 201-209, the misbound leaves noted), with
+the thirty names as he prints them after it (p. 209) and as Crowley
+gives them (I(8) p. 125; I(5)'s chapter headings).
 
 The words and their English in the re-derived Keys are facts from
 public-domain prints, and **no rights are asserted over them**; the
