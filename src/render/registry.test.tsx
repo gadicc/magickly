@@ -50,9 +50,10 @@ describe("component image registry", () => {
     // name lost its stray hyphen: YHVH Eloah VeDa'at, YHVH Tzvaot.
     // 30011c0c… until the paths' table was renamed treeOfLifePath (plan 052):
     // the table's name is part of the hashed text; no byte moved.
+    // 8db079d7… until Hod's English became "Splendour" (plan 071, stage 5).
     [
       "tree-of-life",
-      "8db079d7e1413ea4b2fc522efc5af9f630f6376e4e5f07528501d42824d42051",
+      "5d5257e1e37cd3c84f09b8a3c29eebf033cc090f9d65cfb533173993352b4220",
     ],
     [
       "astro-geomancy-chart",
