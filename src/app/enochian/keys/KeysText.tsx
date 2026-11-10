@@ -1,24 +1,15 @@
 import Link from "@magick-components/Link";
-import { Box, Container, Typography } from "@mui/material";
-
-const h2 = { variant: "h5", component: "h2", sx: { mt: 3, mb: 1 } } as const;
+import { H2, List, PageText } from "@/app/PageText";
 
 /**
  * What the Keys are and where this page's words come from, below the Keys
  * themselves (plan 071, decision 4; plan 073). What each Key was checked
  * against is said under the Key, from its own record, not here.
  */
-export default function KeysAbout() {
+export default function KeysText() {
   return (
-    <Container
-      maxWidth="md"
-      component="section"
-      aria-labelledby="keys-about"
-      sx={{ my: 4 }}
-    >
-      <Typography {...h2} id="keys-about">
-        The Enochian Keys
-      </Typography>
+    <PageText labelledBy="keys-text">
+      <H2 id="keys-text">The Enochian Keys</H2>
       <p>
         The Keys, or Calls, are invocations in the Enochian language, given to
         John Dee through the scryer Edward Kelley in Cracow between April and
@@ -39,9 +30,9 @@ export default function KeysAbout() {
         the page says what it was checked against, and what not.
       </p>
 
-      <Typography {...h2}>Reading the Keys</Typography>
+      <H2>Reading the Keys</H2>
       <p>Open any Key to read it, and choose how:</p>
-      <Box component="ul" sx={{ pl: 3 }}>
+      <List>
         <li>
           <b>English</b>: Dee&apos;s English, as continuous text.
         </li>
@@ -53,7 +44,7 @@ export default function KeysAbout() {
           <b>Both</b>: every word in order, numbered (1.1, 1.2…), beside its
           English, for study or for learning a Key by heart.
         </li>
-      </Box>
+      </List>
       <p>
         The version switch gives Dee&apos;s spelling, the default, or the Golden
         Dawn&apos;s, which joins or splits some of Dee&apos;s words as it was
@@ -65,8 +56,8 @@ export default function KeysAbout() {
         when a word is not in it.
       </p>
 
-      <Typography {...h2}>Related</Typography>
-      <Box component="ul" sx={{ pl: 3 }}>
+      <H2>Related</H2>
+      <List>
         <li>
           <Link href="/enochian/dictionary">The Enochian dictionary</Link>:
           every word, searchable
@@ -81,7 +72,7 @@ export default function KeysAbout() {
         <li>
           <Link href="/enochian">Enochian</Link>
         </li>
-      </Box>
-    </Container>
+      </List>
+    </PageText>
   );
 }

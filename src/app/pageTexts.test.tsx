@@ -3,14 +3,25 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import sitemap from "@/app/sitemap";
 import AstrologyText from "./astrology/AstrologyText";
+import MoonText from "./astrology/moon/MoonText";
+import PlanetaryHoursText from "./astrology/planetary-hours/PlanetaryHoursText";
 import BooksText from "./books/BooksText";
+import DictionaryText from "./enochian/dictionary/DictionaryText";
 import EnochianText from "./enochian/EnochianText";
+import KeysText from "./enochian/keys/KeysText";
+import OrationText from "./enochian/oration/OrationText";
+import TabletsText from "./enochian/tablets/TabletsText";
 import GoldenDawnText from "./gd/GoldenDawnText";
+import HallsText from "./gd/halls/HallsText";
 import GeomancyText from "./geomancy/GeomancyText";
+import ReadingText from "./geomancy/reading/ReadingText";
+import ReferenceText from "./geomancy/reference/ReferenceText";
 import HomeText from "./HomeText";
 import KabbalahText from "./kabbalah/KabbalahText";
+import TreeText from "./kabbalah/tree/TreeText";
+import AngelsText from "./kabbalah/yhvh/72angels/AngelsText";
 
-/** Each section page's text below its tiles (plan 071, decision 4). */
+/** Each page's text below its tiles or tool (plan 071, decisions 4 and 5). */
 const TEXTS: Record<string, ComponentType> = {
   "/": HomeText,
   "/kabbalah": KabbalahText,
@@ -19,6 +30,17 @@ const TEXTS: Record<string, ComponentType> = {
   "/gd": GoldenDawnText,
   "/geomancy": GeomancyText,
   "/books": BooksText,
+  "/astrology/planetary-hours": PlanetaryHoursText,
+  "/astrology/moon": MoonText,
+  "/geomancy/reading": ReadingText,
+  "/geomancy/reference": ReferenceText,
+  "/enochian/dictionary": DictionaryText,
+  "/enochian/keys": KeysText,
+  "/enochian/tablets": TabletsText,
+  "/enochian/oration": OrationText,
+  "/kabbalah/tree": TreeText,
+  "/kabbalah/yhvh/72angels": AngelsText,
+  "/gd/halls": HallsText,
 };
 
 const listed = new Set(

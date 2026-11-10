@@ -1,6 +1,7 @@
 import planets from "magick-data/astrology/planets";
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
+import PlanetaryHoursText from "./PlanetaryHoursText";
 import PlanetaryHours, { type HourPlanet } from "./planetaryHours";
 
 export const metadata = pageMetadata("/astrology/planetary-hours");
@@ -27,6 +28,7 @@ export default function PlanetaryHoursPage() {
     <>
       <PageBreadcrumbs path="/astrology/planetary-hours" />
       <PlanetaryHours keyOfSolomon={keyOfSolomon} />
+      <PlanetaryHoursText />
     </>
   );
 }

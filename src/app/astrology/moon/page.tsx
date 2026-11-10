@@ -1,5 +1,6 @@
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
+import MoonText from "./MoonText";
 import Moon from "./moon";
 
 export const metadata = pageMetadata("/astrology/moon");
@@ -9,6 +10,7 @@ export default function MoonPage() {
     <>
       <PageBreadcrumbs path="/astrology/moon" />
       <Moon />
+      <MoonText />
     </>
   );
 }

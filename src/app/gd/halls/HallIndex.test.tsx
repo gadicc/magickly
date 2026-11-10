@@ -66,7 +66,12 @@ describe("the temple halls' index", () => {
     // The bar names the page ("Temple Halls") in its own h1.
     const page = renderToString(<HallsPage />);
     expect(page.match(/<h1\b/g)).toBeNull();
-    expect(page.match(/<h2\b/g)).toHaveLength(1);
+    // The intro's heading, then the text's below the index (plan 071).
+    expect(
+      [...page.matchAll(/<h2\b[^>]*>(.*?)<\/h2>/g)].map(([, inner]) =>
+        text(inner),
+      ),
+    ).toEqual(["Golden Dawn temple halls", "Halls and paths", "Related"]);
     expect(text(page)).toContain("Golden Dawn temple halls");
     expect(page).toMatch(/<a[^>]*href="\/gd\/halls\/editor"[^>]*>/);
     expect(text(page)).toContain("Open the editor");

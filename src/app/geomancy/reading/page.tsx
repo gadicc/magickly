@@ -1,6 +1,7 @@
 import { pageSearchParams } from "@/lib/pageSearchParams";
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
+import ReadingText from "./ReadingText";
 import GeomancyReading from "./reading";
 import { readingFromSearchParams } from "./readingState";
 
@@ -20,6 +21,7 @@ export default async function GeomancyReadingPage({
     <>
       <PageBreadcrumbs path="/geomancy/reading" />
       <GeomancyReading initial={initial} />
+      <ReadingText />
     </>
   );
 }

@@ -23,6 +23,7 @@ import React from "react";
 import PlanetarySpirit from "@/components/astrology/planetarySpirits";
 import { capitalizeFirstLetter } from "@/lib/utils";
 import Tetragram from "../Tetragram";
+import { figuresByPairs } from "./pairs";
 
 const _tetragrams = data.tetragram;
 const houses = data.geomanticHouse;
@@ -49,28 +50,7 @@ export default function Geomancy() {
   );
 
   const tetragrams = React.useMemo(() => {
-    if (sortBy === "pairs") {
-      const t = _tetragrams;
-      // prettier-ignore
-      return [
-        t.acquisitio,
-        t.amissio, // gain, loss
-        t.albus,
-        t.rubeus, // white, red
-        t.puella,
-        t.puer, // girl, boy
-        t.laetitia,
-        t.tristitia, // joy, sorrow
-        t.caput_draconis,
-        t.cauda_draconis, // dragon's head, tail
-        t.populus,
-        t.via, // people, way
-        t.conjunctio,
-        t.carcer, // conjunction, prison
-        t.fortuna_major,
-        t.fortuna_minor, // major, minor fortune
-      ];
-    }
+    if (sortBy === "pairs") return figuresByPairs();
 
     const tetragrams = Object.values(_tetragrams);
     if (sortBy === "alpha")

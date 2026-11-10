@@ -1,6 +1,7 @@
 import React from "react";
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
+import TreeText from "./TreeText";
 import TreeOfLife, { TreeOfLifeView } from "./tree";
 import { DEFAULT_TREE_SETTINGS } from "./treeSettings";
 
@@ -19,6 +20,7 @@ export default function TreeOfLifePage() {
       >
         <TreeOfLife />
       </React.Suspense>
+      <TreeText />
     </>
   );
 }

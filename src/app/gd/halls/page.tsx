@@ -3,6 +3,7 @@ import { Button, Container, Typography } from "@mui/material";
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
 import HallIndex from "./HallIndex";
+import HallsText from "./HallsText";
 import styles from "./hallIndex.module.css";
 import TempleHallTabs from "./TempleHallTabs";
 
@@ -54,6 +55,7 @@ export default function HallsPage() {
           </Typography>
         </TempleHallTabs>
       </Container>
+      <HallsText />
     </>
   );
 }

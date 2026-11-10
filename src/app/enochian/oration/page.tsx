@@ -1,5 +1,6 @@
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
+import OrationText from "./OrationText";
 
 export const metadata = pageMetadata("/enochian/oration");
 const s = {
@@ -87,6 +88,7 @@ const Oration = () => (
         <i>The Enochian Magick of Dr. John Dee</i>, Geoffrey James, p. 53-55.
       </p>
     </div>
+    <OrationText />
   </>
 );
 

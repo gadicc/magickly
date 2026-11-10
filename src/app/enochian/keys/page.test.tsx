@@ -33,9 +33,9 @@ describe("/enochian/keys, as the server renders it", () => {
     expect(html).not.toMatch(/<h2\b(?:(?!<\/h2>).)*<p\b/);
     // The text comes after the Keys themselves.
     expect(html.indexOf("Key 19: the Call of the Thirty Aethyrs")).toBeLessThan(
-      html.indexOf('id="keys-about"'),
+      html.indexOf('id="keys-text"'),
     );
-    expect(html).toMatch(/<section[^>]*aria-labelledby="keys-about"/);
+    expect(html).toMatch(/<section[^>]*aria-labelledby="keys-text"/);
   });
 
   it("links the dictionary, the tablets, the Oration and the Enochian hub", () => {
