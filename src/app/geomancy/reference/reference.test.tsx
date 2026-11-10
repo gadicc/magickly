@@ -36,28 +36,29 @@ describe("geomancy reference page", () => {
   const html = renderToString(<GeomancyReference />);
 
   it("renders the same bytes it did before the data was rekeyed", () => {
-    // Re-pinned when the headings became h2s, "Geomanic" and "ofThe" were
-    // corrected and the credit named the Hensons' essay (10 November 2026).
+    // Re-pinned when the headings became h2s and "Geomanic" and "ofThe" were
+    // corrected, and when plan 075 replaced the texts with the Equinox's
+    // table and the houses in our own words (10 November 2026).
     expect(digest(html)).toBe(
-      "62256 f1b2b528b35d406bd30e579d64576fdbcd15508f8e1f6d06e838fb265a96b096",
+      "62257 5618f8259dc1e10d30aac40e0b0b355b2a8053ad2010faa6a25d1fa642ac807e",
     );
   });
 
   it("lists the twelve houses in order", () => {
     expect(
       positions(html, [
-        "Personality of the Querent",
-        "Money, property, finances",
-        "Communication, relatives by blood",
-        "Home, inheritance, possessions",
-        "Women, luxury, drinking",
-        "Employees, sickness",
-        "Love, marriage, prostitution",
-        "Death, Wills, legacies",
-        "Long journeys, relationships",
-        "Fame, reputation, honor",
-        "Friends, social contacts",
-        "Sorrow, hospitals, intrigue",
+        "The querent: their life",
+        "Money and possessions:",
+        "Brothers, sisters and other kin",
+        "Father and forebears;",
+        "Envoys and messengers;",
+        "Illness and its cures;",
+        "Marriage and other unions",
+        "Death, and what comes",
+        "Long journeys; faith",
+        "Honour, rank and reputation;",
+        "Friends; the wealth",
+        "Enemies; servants;",
       ]),
     ).not.toContain(-1);
   });
@@ -65,18 +66,18 @@ describe("geomancy reference page", () => {
   it("lists a tetragram's twelve meanings in house order", () => {
     expect(
       positions(html, [
-        "Happy, success in all things.",
+        "Happy success in all things.",
         "Very prosperous.",
-        "Favor and riches.",
+        "Favour and riches.",
         "Good fortune and success.",
         "Good success.",
-        "Good - especially if it agrees with the 5th.",
+        "Good, especially agreeing with 5th.",
         "Reasonably good.",
-        "Rather good, but not very. The sick shall die.",
-        "Good in all demands.",
-        "Good in suits.",
+        "Rather good, not very, the sick die.",
         "Good in all.",
-        "Unfavourable, pain and loss.",
+        "Good in suits, very prosperous.",
+        "Good in all.",
+        "Unfavourable, pain, and loss.",
       ]),
     ).not.toContain(-1);
   });

@@ -146,16 +146,18 @@ Follow-ups are separate from the completed migration work:
   Sandra Tabatha Cicero (Llewellyn, 1994). The essay is Mitch and Gail
   Henson's "By the Signs of the Earth: Geomancy in the Golden Dawn",
   pp. 145-175; the reading's invocation is on p. 155, and the data's
-  pages (147, 162, 164) fall in it. Both pages and the data files now
-  name it. The other slips the stage 5 review found were fixed the same
-  day: "ofThe", "Geomanic", the reference's and the reading's headings
-  (now `h2`s) and the two `h1`s on `/books` and the book's own page.
-- TODO (Gadi to decide): the geomancy figures' and houses' meanings
-  (`packages/magick-data/src/geomancy/`) and the reading's invocation
-  follow the Hensons' essay closely, in many runs of five or more
-  words, under a credit. AGENTS.md now keeps copyrighted wording out;
-  rewriting them in our own words from public-domain sources would
-  bring them into line.
+  pages (147, 162, 164) fall in it. Both pages and the data files named
+  it until plan 075 replaced its wording the same day. The other slips
+  the stage 5 review found were fixed the same day: "ofThe", "Geomanic",
+  the reference's and the reading's headings (now `h2`s) and the two
+  `h1`s on `/books` and the book's own page.
+- 10 November 2026: the geomancy texts no longer use the Hensons'
+  wording ([plan 075](075-geomancy-own-words.md)). The figures' meanings
+  and the house table are the Golden Dawn's, from Crowley's "A Handbook
+  of Geomancy" (*The Equinox* I(2), 1909), abbreviations spelled out and
+  "evil" read "unfavourable"; the houses and the reading's invocation
+  are in our own words, from Agrippa's *Fourth Book* (Turner, 1655) and
+  *Liber O*. Both pages credit those sources.
 - 10 November 2026: the Enochian Keys complete and checked in
   [plan 073](073-enochian-keys.md): most Keys lack their Enochian (676 of
   1,014 rows), the 2023 text's source is unknown, so all of it is

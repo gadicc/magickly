@@ -51,25 +51,26 @@ const render = (house: string) =>
  * `useId`s. Nothing else differed.
  */
 describe("geomancy reading page", () => {
-  // Re-pinned when "Mothers" and "Interpretation" became h2s and when the
-  // credit named the Hensons' essay (10 November 2026); the bytes are
-  // otherwise those from before the rekey.
+  // Re-pinned when "Mothers" and "Interpretation" became h2s, and when plan
+  // 075 replaced the texts with the Equinox's table, the houses and the
+  // invocation in our own words (10 November 2026); the bytes are otherwise
+  // those from before the rekey.
   it.each([
     [
       "1",
-      "79107 bad99e428c7a81a2a9d92dae1e46f78865211a9e8c386b6d4f46d1f8e25642da",
+      "79423 ab11cc883462e2534f24f6de656cce95246aab0d86f01adb0c74eebdb2bafbc0",
       [
-        "Personality of the Querent",
+        "The querent: their life",
         "Good, except in war.",
-        "Destroy figure if it falls here! Makes judgment worthless.",
-        "Good with good, evil with evil.",
+        "Destroy the figure.",
+        "Good with good, bad with bad.",
       ],
     ],
     [
       "7",
-      "79058 525978338a88beab13fba90c471cd4fad61a4815616b9dafc126131715ec1f3b",
+      "79413 49439a308d164e35a995dab6c762f0bc4a61d3c6db703320e331db44fc1127dd",
       [
-        "Love, marriage, prostitution",
+        "Marriage and other unions",
         "Indifferent.",
         "Unfavourable, war, and fire.",
         "Rather good.",
@@ -77,12 +78,12 @@ describe("geomancy reading page", () => {
     ],
     [
       "12",
-      "79039 e136ee0a22edbbfc62626aac58cc29e6da4261c9fa99b86b3386124a895284fb",
+      "79424 341bf7f3a303be6297b0037fc78edbfb8bdcb216d3cc8f74e89557d27109e2d1",
       [
-        "Sorrow, hospitals, intrigue",
+        "Enemies; servants; imprisonment",
         "Unfavourable generally.",
         "Rather good.",
-        "Medium. Bad for prisoners",
+        "Medium, bad for prisoners.",
       ],
     ],
   ])(

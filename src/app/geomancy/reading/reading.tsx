@@ -521,28 +521,34 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
           </div>
         </div>
         <div style={{ textAlign: "justify", marginTop: 6 }}>
-          In the Divine Name of ADONAI HA-ARETZ (אֲדוֹנָי הָאָרֶץ), I invoke the
-          mighty and power angel URIEL (אוּרִיאֵל), come forth and invest this
-          divination with Truth. I invoke thee, choir of Angels known as ASHIM
-          (אֲשִׁים), thou Souls of Flame, I invoke thee{" "}
-          <u>{archangel?.name.roman.toUpperCase()}</u>, thou Archangel (of
-          Malkuth?) who rules the day and hour of the Planet{" "}
-          <u>{planet.name.en.en}</u>. Come forth{" "}
-          <u>{planet.intelligenceId?.toLocaleUpperCase()}</u> to manifest the
-          Spirit of this working -- the Spirit{" "}
-          <u>{planet.spiritId?.toLocaleUpperCase()}</u>. Come forth I say and
-          invest this working with the truth of what I perceive.
+          In the name of ADONAI HA-ARETZ (אֲדוֹנָי הָאָרֶץ), Lord of the Earth, I call
+          upon URIEL (אוּרִיאֵל), archangel of the North and of Earth, and upon the
+          ASHIM (אֲשִׁים), the angelic choir of Malkuth: be present at this working
+          and guide the hand that marks the points. I call upon{" "}
+          <u>{archangel?.name.roman.toUpperCase()}</u>, archangel ruling the day
+          and hour of <u>{planet.name.en.en}</u>, and upon{" "}
+          <u>{planet.intelligenceId?.toLocaleUpperCase()}</u>, the Intelligence
+          of <u>{planet.name.en.en}</u>, that the spirit{" "}
+          <u>{planet.spiritId?.toLocaleUpperCase()}</u> may serve this
+          divination under their rule. Let the figure show what is true, and
+          nothing else.
         </div>
         <div style={{ opacity: 0.5, fontSize: "70%", marginTop: 5 }}>
-          Adapted from Mitch and Gail Henson&apos;s “By the Signs of the Earth:
-          Geomancy in the Golden Dawn” (p. 155) in{" "}
-          <a
-            target="_blank"
-            href="https://www.amazon.co.uk/Golden-Dawn-Journal-Divination-Bk-1/dp/1567188508"
-          >
-            The Golden Dawn Journal, Book 1: Divination
-          </a>
-          , edited by Chic Cicero and Sandra Tabatha Cicero (Llewellyn, 1994).
+          In our own words, on the Golden Dawn&apos;s order of names as Crowley
+          gives it in{" "}
+          <a href="https://archive.org/details/crowley-equinox_202110/The%20Equinox%20Vol.%201%2C%20No.%202/page/n22/mode/1up">
+            “Liber O”
+          </a>{" "}
+          (<i>The Equinox</i> I(2), 1909). The figures&apos; meanings in the
+          houses are the Golden Dawn&apos;s table from his{" "}
+          <a href="https://archive.org/details/crowley-equinox_202110/The%20Equinox%20Vol.%201%2C%20No.%202/page/n158/mode/1up">
+            “A Handbook of Geomancy”
+          </a>{" "}
+          in the same number; the houses follow{" "}
+          <a href="https://archive.org/details/b20458563/page/n34/mode/1up">
+            Agrippa&apos;s Fourth Book
+          </a>{" "}
+          (Turner, 1655).
         </div>
         <br />
         <Typography variant="h6" component="h2">

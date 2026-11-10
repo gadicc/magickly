@@ -65,18 +65,17 @@ export default function Geomancy() {
     <>
       <Container sx={{ my: 1 }}>
         <p>
-          In great appreciation of Mitch and Gail Henson&apos;s “By the Signs of
-          the Earth: Geomancy in the Golden Dawn” in{" "}
-          <i>The Golden Dawn Journal, Book 1: Divination</i>, edited by Chic
-          Cicero and Sandra Tabatha Cicero (Llewellyn, 1994). Buy on{" "}
-          <a href="https://www.amazon.com/Golden-Dawn-Journal-Divination-Llewellyns/dp/1567188508">
-            Amazon
+          The figures&apos; meanings, and their meanings in each house, are the
+          Golden Dawn&apos;s table as Crowley printed it in{" "}
+          <a href="https://archive.org/details/crowley-equinox_202110/The%20Equinox%20Vol.%201%2C%20No.%202/page/n158/mode/1up">
+            “A Handbook of Geomancy”
+          </a>
+          , <i>The Equinox</i> I(2), 1909, with its abbreviations spelled out
+          and “evil” read as “unfavourable”. What each house governs follows{" "}
+          <a href="https://archive.org/details/b20458563/page/n34/mode/1up">
+            Agrippa&apos;s Fourth Book
           </a>{" "}
-          or{" "}
-          <a href="https://www.goldendawnshop.com/product/basics-of-magic-the-best-of-the-golden-dawn-journal-book-1-divination/">
-            GDShop
-          </a>{" "}
-          (summary).
+          (Turner, 1655), in our own words.
         </p>
 
         <div style={{ textAlign: "center" }}>

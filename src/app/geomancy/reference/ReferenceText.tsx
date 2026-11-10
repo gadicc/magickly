@@ -35,8 +35,8 @@ export default function ReferenceText() {
         intelligences and spirits and the spirits&apos; sigils, then the twelve
         geomantic houses and what each governs. Last come the sixteen figures
         again, each with its general meaning and its meaning in every house. The
-        meanings follow the Golden Dawn&apos;s practice as the Ciceros present
-        it.
+        meanings are the Golden Dawn&apos;s, from Crowley&apos;s handbook of
+        1909, and the houses follow Agrippa.
       </p>
       <H2>Related</H2>
       <List>

@@ -1,78 +1,82 @@
-// Mitch & Gail Henson, "By the Signs of the Earth: Geomancy in the Golden Dawn",
-// in The Golden Dawn Journal, Book 1: Divination, ed. Chic Cicero and Sandra
-// Tabatha Cicero (Llewellyn, 1994), pp. 145-175: p. 162.
+// What each house governs, in our own words (plan 075), from Agrippa's list in
+// "Of Geomancy", Henry Cornelius Agrippa his Fourth Book of Occult Philosophy,
+// tr. Robert Turner (London, 1655), pp. 9-10 (public domain; archive.org
+// b20458563, leaves n34-n35), with the matters Crowley ties to a house in "A
+// Handbook of Geomancy", The Equinox I(2), 1909, pp. 145, 153, 159 (archive.org
+// crowley-equinox_202110). The 5th and 7th follow Agrippa, not modern
+// astrology.
 
 {
   "1": {
     id: 1,
     meaning: {
-      en: "Personality of the Querent, his life, health, habits, behavior and other personal characteristics.",
+      en: "The querent: their life, body, looks, complexion, temperament and present condition, and any question about themselves.",
     },
   },
   "2": {
     id: 2,
     meaning: {
-      en: "Money, property, finances, possible theft through negligence or loss.",
+      en: "Money and possessions: wealth and want, gain and loss, luck with goods, and goods lost by theft or carelessness.",
     },
   },
   "3": {
     id: 3,
     meaning: {
-      en: "Communication, relatives by blood, letters, news, short journeys, writing, other pursuits associated with Mercury.",
+      en: "Brothers, sisters and other kin by blood; short journeys; how far people can be trusted.",
     },
   },
   "4": {
     id: 4,
     meaning: {
-      en: "Home, inheritance, possessions, hidden treasure, environment, retirement, the conclusion of any matter. Information about theft or thieves.",
+      en: "Father and forebears; inheritance and family property; land, houses, fields and hidden treasure; things missing through theft or neglect; and the end of the matter.",
     },
   },
   "5": {
     id: 5,
     meaning: {
-      en: "Women, luxury, drinking, procreation, creation, artistic work. Gambling and speculation.",
+      en: "Envoys and messengers; reports, rumour and news; honours; what follows after a death; pregnancy and unborn young.",
     },
   },
   "6": {
     id: 6,
     meaning: {
-      en: "Employees, sickness, which body parts are most likely to suffer illness or injury. Domestic animals and close relatives other than immediate family.",
+      en: "Illness and its cures; servants and household helpers; cattle and tame animals.",
     },
   },
   "7": {
     id: 7,
     meaning: {
-      en: "Love, marriage, prostitution, partnerships. Public enemies, lawsuits, war opponents, thieves and dishonor.",
+      en: "Marriage and other unions, lawful or not; dealings with associates; quarrels and disputes; lawsuits and cases before a judge.",
     },
   },
   "8": {
     id: 8,
     meaning: {
-      en: "Death, Wills, legacies. Poverty.",
+      en: "Death, and what comes to anyone through a death: legacies, inheritances, a wife's dowry.",
     },
   },
   "9": {
     id: 9,
     meaning: {
-      en: "Long journeys, relationships with foreigners, science, the church, art, religion dreams and divinations.",
+      en: "Long journeys; faith and steadfastness; dreams; religion and sacred learning.",
     },
   },
   "10": {
     id: 10,
     meaning: {
-      en: "Fame, reputation, honor, mother, trade authority.",
+      en: "Honour, rank and reputation; public office and authority.",
     },
   },
   "11": {
     id: 11,
     meaning: {
-      en: "Friends, social contacts, altruistic organizations.",
+      en: "Friends; the wealth and favour of princes and patrons.",
     },
   },
   "12": {
     id: 12,
     meaning: {
-      en: "Sorrow, hospitals, intrigue, prisons, restrictions, unseen dangers, fears.",
+      en: "Enemies; servants; imprisonment; misfortune, and any harm other than death and sickness (those belong to the 8th and 6th).",
     },
   },
 }
