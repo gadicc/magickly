@@ -21,10 +21,11 @@ path, and [LICENSE.txt](./LICENSE.txt) says which file is which:
   they compile to. Among them is `astrology/kameas`, which is code, not
   data: it computes the planetary squares, and writes out only the Sun's,
   a fact from Agrippa ([Sources](#sources)).
-- **The data is [CC BY 4.0](./LICENSE-DATA.txt):** the JSON5 sources,
-  everything the build emits from them, and the Enochian Keys, a text
-  written as TypeScript. Use it anywhere, including commercially, as long as
-  you credit [magick.ly](https://magick.ly).
+- **The data is [CC BY 4.0](./LICENSE-DATA.txt):** the JSON5 sources and
+  everything the build emits from them, the Enochian Keys among them
+  ([Sources](#sources) says which Keys that covers so far). Use it
+  anywhere, including commercially, as long as you credit
+  [magick.ly](https://magick.ly).
 
 The app that reads it is
 [AGPL-3.0-or-later](https://github.com/gadicc/magickly/blob/main/LICENSE.txt);
@@ -229,8 +230,25 @@ or `null`.
 
 ## Texts and values that are not tables
 
-- `magick-data/enochian/keys`: the Enochian Keys, word by word, in the
-  original, transliterated and in English.
+- `magick-data/enochian/keys`: the Enochian Keys, one row per word as
+  Dee received it, with its English. A row holds each work's reading of
+  the word (`readings`: Casaubon's print, with the word as dictated and
+  his pronunciation column; the Golden Dawn's form in *The Equinox* I(8);
+  the 2023 text, for Keys not yet re-derived), where it is printed, and
+  any note, doubt (`uncertain`) or correction (`was`). A version is a
+  rule over the readings, as the tablets' are: `keyVersion(key, version)`
+  gives each word in `dee`, the default (Dee's own copy when it can be
+  read, else Casaubon's, else for a word his print lost Crowley's form,
+  marked `from`), or `gd`, the Equinox's form, with a `marker` where
+  Crowley joins a word to an earlier one, splits it, leaves it out or
+  runs it into the word before. Both give Dee's English, and a word is
+  always looked up by Dee's spelling (`lookup`). Key 19, the Call of the
+  Thirty Aethyrs, marks the rows that change with the Aethyr as slots:
+  `aethyrCall(n, version)` gives the Call for Aethyr n, and `aethyrs`
+  holds the thirty with each work's spelling. Each Key has a `checked`
+  record, the date, the works compared, the fields covered and what was
+  not, and `checkedText` says it in a sentence, so that no page restates
+  it. What the data holds so far is in [Sources](#sources).
 - `magick-data/kabbalah/seventyTwoAngels/text`: Lenain's entries on the
   seventy-two genii in full, in French and in English, loaded on demand.
 - `magick-data/kabbalah/seventyTwoAngels/derived`: what Lenain's four tables
@@ -317,7 +335,7 @@ instead; the data keeps to one of the two.
 
 ## Sources
 
-Most of this is correspondences, which belong to nobody. Four sets are
+Most of this is correspondences, which belong to nobody. Five sets are
 derived from identified works and are worth naming:
 
 **`seventyTwoAngels.json5`, `seventyTwoAngelsText/` and `lenain/`** come from
@@ -360,6 +378,32 @@ of order 6, is written out; the tests check that every square is magic,
 that each starts with his first row, and that Saturn's and Jupiter's are
 his row by row. See
 [plan 061](https://github.com/gadicc/magickly/blob/main/plans/061-gd-hall.md).
+
+**`enochian/keys.json5`** gives the Enochian Keys as Dee received them
+in Cracow from 13 April to 13 July 1584. A re-derived Key is read word by
+word from the page images of Meric Casaubon's printing of Dee's journal,
+*A True & Faithful Relation* (London, 1659; archive.org
+`truefaithfulrela00deej`), which comes from British Library, Cotton MS
+Appendix XLVI: its Enochian with the pronunciation column beside it, and
+its English, word by word for Keys 1 to 4 and as running text for the
+rest, which we split into rows and say so. Each row and Key names its
+pages and leaves, and each Key's `checked` record says what was compared
+and what was not; Dee's own copy, Sloane MS 3191, whose images have been
+offline since 2023, is not.
+
+So far Keys 1 to 3 are re-derived, in Dee's spelling only. Keys 4 to 18
+still carry the text the app had from 2023, whose source is not known;
+they are marked as such, and nothing said here of the sources or the
+licence covers them. The Golden Dawn's reading, from Aleister Crowley's
+*The Equinox*, vol. I no. 8 (London, 1912), and Key 19, the Call of the
+Thirty Aethyrs, come in later stages of plan 073.
+
+The words and their English in the re-derived Keys are facts from
+public-domain prints, and **no rights are asserted over them**; the
+arrangement into rows, the split of the English and the notes are ours,
+under CC BY 4.0. Nothing in them comes from a modern edition or
+transcription, which are in copyright. See
+[plan 073](https://github.com/gadicc/magickly/blob/main/plans/073-enochian-keys.md).
 
 **`enochian/tablets.json5`** gives the Enochian tablets as each source
 prints them, so that both traditions are served. In the owner's words

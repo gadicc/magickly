@@ -2,7 +2,7 @@ import Data from "magick-data";
 import planets from "magick-data/astrology/planets";
 import zodiacs from "magick-data/astrology/zodiac";
 import dictionary from "magick-data/enochian/dictionary";
-import keys from "magick-data/enochian/keys";
+import keys, { aethyrs, keyTitle, keyVersion } from "magick-data/enochian/keys";
 import grades from "magick-data/gd/grades";
 import figures from "magick-data/geomancy/tetragrams";
 import { divisions, leavesOf } from "magick-data/kabbalah/lenain/volume";
@@ -179,21 +179,47 @@ export async function buildSearchCatalogue(): Promise<SearchCatalogue> {
     add("/astrology/zodiac", id, words(zodiac.name), words(zodiac));
   for (const [id, figure] of Object.entries(figures))
     add("/geomancy/reference", id, words(figure.title), words(figure));
+  // Each Key's English, its words in Dee's version and in the Golden
+  // Dawn's where it has one, and the Aethyrs' names (plan 073, decision 10).
   for (const key of keys) {
-    if (!key.key) continue;
+    const title = keyTitle(key);
+    const dee = keyVersion(key, "dee") ?? [];
+    const gd = keyVersion(key, "gd");
+    const joined = (version: typeof dee) =>
+      version.flatMap((word) => (word.word ? [word.word] : [])).join(" ");
     add(
       "/enochian/keys",
       `key-${key.key}-en`,
-      `Key ${key.key}`,
-      key.subkeys.map((part) => part.english).join(" "),
+      title,
+      dee.map((word) => word.english).join(" "),
     );
     add(
       "/enochian/keys",
       `key-${key.key}-eo`,
-      `Key ${key.key} · Enochian`,
-      key.subkeys.map((part) => part.enochianLatin).join(" "),
+      `${title} · Enochian`,
+      joined(dee),
     );
+    if (gd)
+      add(
+        "/enochian/keys",
+        `key-${key.key}-gd`,
+        `${title} · Golden Dawn`,
+        joined(gd),
+      );
   }
+  if (aethyrs.length)
+    add(
+      "/enochian/keys",
+      "aethyrs",
+      "The thirty Aethyrs",
+      aethyrs
+        .map((aethyr) =>
+          [aethyr.n, ...Object.values(aethyr.readings)]
+            .filter((name, index, all) => name && all.indexOf(name) === index)
+            .join(" "),
+        )
+        .join(", "),
+    );
   for (const [word, entry] of Object.entries(dictionary))
     add("/enochian/dictionary", word, word, words(entry.meanings));
 

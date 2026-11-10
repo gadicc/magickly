@@ -1,7 +1,8 @@
 # The Enochian Keys, complete and checked — 10 November 2026
 
-Status: decision 1 settled 10 November 2026 and the spike done; the
-others proposed. Nothing built. Read
+Status: decisions settled 10 November 2026 (Gadi agreed 2 to 10 as
+proposed, with Casaubon's spelling and a search refresh per commit);
+the spike done; building on `gate/enochian-keys`. Read
 [current status](000-current-status.md) first. This plan follows Gadi's
 answers of 10 November 2026 to the text sheet of
 [plan 071](071-on-site-search.md): add the nineteenth Key, the Call of the
@@ -111,7 +112,7 @@ Golden Dawn practice, not Dee's.
 - The Keys are in site search's index (`src/search/catalogue.ts`), so
   every change to them republishes its embeddings (plan 070).
 
-## Decisions proposed
+## Decisions
 
 1. **Provenance first.** Our English and Key 1's accents came from a
    modern transcription we cannot name, and the README offers them under
@@ -156,7 +157,7 @@ Golden Dawn practice, not Dee's.
    numbers the Calls in the order received (Key 18 is his "14"); the
    notes give his number. Rows renumber freely: the numbers are for
    reading along, and no URL uses them.
-   *Spelling (Gadi to decide):* Casaubon's print modernises Dee's
+   *Spelling (agreed):* Casaubon's print modernises Dee's
    English ("thou", "earth", "JOY" for the manuscript's "thow", "erth",
    "IOYE"), so the re-derived English reads as Casaubon prints it. The
    spike's Keys 4 and 18 keep almost every word; only spelling and row
@@ -197,7 +198,8 @@ Golden Dawn practice, not Dee's.
     (`src/search/catalogue.ts` 182–194), and the Keys' changes land in
     as few commits as is sensible, each with its refreshed embeddings
     under the script's $1 guard, the Gateway key passed in alone, as for
-    `gate/angel-meaning`. *Gadi to confirm this as standing approval.*
+    `gate/angel-meaning`. Agreed by Gadi as standing approval for this
+   plan's commits.
 
 ## Stages
 
@@ -225,6 +227,45 @@ Gated commits on `gate/enochian-keys`; Gadi fast-forwards.
 
 Stages 1 to 4 make five commits that change the Keys, each carrying its
 search refresh (decision 10).
+
+## What the reading found (10 November 2026)
+
+Four agents read every Key from the page images; their findings change
+some of the above.
+
+- **Two errors were not errors.** Key 1's UL is Dee's forward reading
+  (the page prints the dictated LU, then "Call it UL"); Key 2 prints no
+  English against OM, with "understand" on FAAIP and "your voices of
+  wonder" on SALD, as the 2023 text had them, and Dee's list gives the
+  three as one item. Both stay; OM's row has empty English and a note.
+  Errors 1, 2, 4 to 9 and 11 are confirmed on the page.
+- **Key 1's accents**: one of the 2023 text's ten is in the print
+  ("lóhólo"); Casaubon gives spoken remarks instead ("accent on the last
+  A"). Keys 2 and 3's pronunciation columns do print accents.
+- **Key 1 has two words Nalvage "hummed"** and did not pronounce (p.
+  84): rows with no word, marked `unspoken`, their English placed by us.
+- **Casaubon prints the thirty Aethyrs' names** (p. 209, leaf n298),
+  after the Call: the `dee` version uses his list, and Crowley's IDOIGO
+  varies with no word given, so its slot stays unfilled. The archive.org
+  scan is misbound: pp. 203–204 are at leaves n286–n287.
+- **Casaubon's print has lost the Enochian of Keys 14 and 15 and of Key
+  16's first twelve words** (pp. 133–138, damaged pages): only scraps
+  survive (Dee's list of first words, p. 200; margin words, p. 193).
+  Those rows take Crowley's form in the `dee` version too, marked as
+  his, until Sloane MS 3191 can be read; their division and English
+  pairing follow Crowley and are ours.
+- **A second reader** checked a random quarter of every Key (312 rows
+  and the thirty Aethyrs, 342 entries, seed 20261110) against the pages
+  before looking at the transcription: 333 agreed in every field. The
+  nine others were three slips (a GD split that is a line-end hyphen,
+  two English splits unflagged, a note's quotation), two print
+  ambiguities ("hotch pot", "Dám") and two judgement calls (Key 16's
+  Equinox page, Key 19's CHIS from the pronunciation); all are
+  corrected or noted, and no reader misread a letter form. The
+  `checked` records say a second reading of every word was not done.
+- **CA in the closing words of Keys 13–18**: Dee's note on p. 193 gives
+  them as "Zacar e ca, od zamran"; Crowley and the 2023 text omit it. It
+  is Dee's, so it is in the `dee` version and marked absent in `gd`.
 
 ## Verification
 

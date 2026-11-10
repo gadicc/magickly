@@ -10,12 +10,18 @@ import type { EnochianTabletID, TabletVersionId } from "./Tablets.ts";
  * here. Squares are counted from 0, as the readings count them.
  */
 
-/** The works the notes cite. */
+/**
+ * The works the notes cite, and the Keys too (`magick-data/enochian/keys`):
+ * one registry, so that no work is cited two ways. `equinox1912` is I(7),
+ * the tablets' issue; the Keys are in I(8), an id of its own.
+ */
 export type TabletWorkId =
   | "sloane3191"
   | "cottonAppXLVI"
   | "casaubon1659"
   | "equinox1912"
+  | "equinox1911no5"
+  | "equinox1912no8"
   | "regardie1940"
   | "greer";
 

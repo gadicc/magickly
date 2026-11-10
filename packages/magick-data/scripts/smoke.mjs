@@ -368,6 +368,7 @@ import sephirot from "magick-data/kabbalah/sephirot";
 import kameas from "magick-data/astrology/kameas";
 import tablets, { WATCHTOWER_IDS, tabletVersion } from "magick-data/enochian/tablets";
 import { squareNote, versionNote } from "magick-data/enochian/tabletNotes";
+import keys, { checkedText, keyByNumber, keyVersion } from "magick-data/enochian/keys";
 import * as tools from "magick-data/tools";
 import sephirotJson from "magick-data/json/kabbalah/sephirot.json" with { type: "json" };
 
@@ -399,6 +400,11 @@ assert.equal(versionNote("raphael")?.title, "Raphael's, 1587");
 assert.equal(tabletVersion(tablets.union)?.grid.map((row) => row.join("")).join(" "), "EXARP HCOMA NANTA BITOM");
 assert.equal(tabletVersion(tablets.union, "dee"), undefined);
 assert.equal(tabletVersion(tablets.fire, "dee")?.grid[0][11], null);
+assert.equal(keyByNumber(1)?.key, 1);
+assert.ok(Object.isFrozen(keys[0]));
+assert.equal(keyVersion(keys[0])?.length, keys[0].rows.length);
+assert.match(keyVersion(keys[0])?.find((word) => word.word)?.word ?? "", /^[A-Z]+$/);
+assert.match(checkedText(keys[0].checked), /checked/i);
 await assert.rejects(import("magick-data/enochian/dictionary"), {
   code: "ERR_PACKAGE_PATH_NOT_EXPORTED",
 });

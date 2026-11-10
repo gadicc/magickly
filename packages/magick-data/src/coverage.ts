@@ -35,6 +35,8 @@ const CHECKED_ELSEWHERE: Record<string, string> = {
   "enochian/dictionary.json5": "integrity.ts",
   // Notes, not a table: their squares and sources are held to the tablets.
   "enochian/tabletNotes.json5": "tabletNotes.test.ts",
+  // A text, one row per word: its structure and sources are held there.
+  "enochian/keys.json5": "keys.test.ts",
 };
 
 function sources(dir: string, prefix = ""): string[] {

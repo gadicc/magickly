@@ -2,16 +2,15 @@ magick-data is under two licences, by path. The repository it comes from
 is AGPL-3.0-or-later; this package is not.
 
 Code: MIT, below.
-  The hand-written modules, src/**/*.ts, other than the text written as
-  TypeScript named under Data; and the modules compiled from them into lib/,
-  which the published package carries.
+  The hand-written modules, src/**/*.ts, and the modules compiled from
+  them into lib/, which the published package carries.
 
 Data: CC BY 4.0, in LICENSE-DATA.txt. Use it anywhere, including
 commercially, as long as you credit magick.ly (https://magick.ly).
   The JSON5 sources, src/**/*.json5; everything the build emits from them
-  into dist/ (the .js, .d.ts and .json of each, and graph.json); and
-  src/enochian/Keys.ts, a text written as TypeScript, with what it compiles
-  to, lib/enochian/Keys.js and lib/enochian/Keys.d.ts.
+  into dist/ (the .js, .d.ts and .json of each, and graph.json), among
+  them the Enochian Keys, src/enochian/keys.json5 (README.md, under
+  Sources, says which of its Keys that covers so far).
 
 Neither: the Enochian dictionary.
   src/enochian/dictionary.json5, what the build emits from it and the

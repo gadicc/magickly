@@ -1,6 +1,5 @@
 "use client";
 import { ExpandMore } from "@mui/icons-material";
-
 import {
   Accordion,
   AccordionDetails,
@@ -9,77 +8,205 @@ import {
   Container,
   FormControl,
   FormControlLabel,
+  InputLabel,
+  MenuItem,
   Radio,
   RadioGroup,
+  Select,
   Typography,
 } from "@mui/material";
-import type { EnochianEntry } from "magick-data/enochian/dictionary";
-import keys, { EnochianKey } from "magick-data/enochian/keys";
 import React from "react";
 import useEnochianFont, { EnochianFont } from "../useEnochianFont";
+import type { KeyEntry } from "./keyEntries";
+import type { PageAethyr, PageGdWord, PageKey, PageWord } from "./keyPage";
 
-/** The entries the page was given, by the word as the Keys spell it. */
-type Entries = Readonly<Record<string, EnochianEntry>>;
+/** The entries the page was given, by Dee's word. */
+type Entries = Readonly<Record<string, readonly KeyEntry[]>>;
 
-const s = {
-  keyParagraph: {
-    textAlign: "justify" as const,
-  },
-  selectedKey: {
-    background: "yellow",
-  },
+export type EnochianLang = "enochian" | "english" | "both";
+export type Version = "dee" | "gd";
+
+const VERSION_TITLES: Record<Version, string> = {
+  dee: "Dee's",
+  gd: "The Golden Dawn's",
 };
 
-function Dictionary({
+/** What the Golden Dawn's version has in place of a word it does not print. */
+const MARKER_TEXT = {
+  joined: "joined to the word before",
+  overlap: "run into the word before",
+  absent: "not in this version",
+} as const;
+
+/** A word as shown: Dee's, with the Golden Dawn's form when that is shown. */
+export interface ShownWord extends PageWord {
+  row: number;
+  gd?: PageGdWord;
+}
+
+/** A Key's words in a version, and on Key 19 for an Aethyr. */
+export function shownWords(key: PageKey, version: Version, aethyr: number) {
+  const changed = key.aethyrs?.[aethyr];
+  const gd = version === "gd" ? key.gd : undefined;
+  return key.words.map((word, index): ShownWord => {
+    // An Aethyr's word replaces the first's whole, never merges into it.
+    const shown: ShownWord = {
+      ...(changed?.dee[index] ?? word),
+      row: index + 1,
+    };
+    if (gd) shown.gd = changed?.gd?.[index] ?? gd[index];
+    return shown;
+  });
+}
+
+/** What a word shows in the Enochian: `null` for none in this version. */
+const enochian = (word: ShownWord) => (word.gd ? word.gd.word : word.word);
+
+const s = {
+  keyParagraph: { textAlign: "justify" as const },
+  selected: { background: "yellow" },
+  word: {
+    background: "none",
+    border: 0,
+    padding: 0,
+    font: "inherit",
+    color: "inherit",
+    cursor: "pointer",
+    textAlign: "inherit" as const,
+  },
+  uncertain: { textDecoration: "underline dotted" },
+  muted: { color: "#666", fontStyle: "italic" as const },
+};
+
+/** A word to click or tab to, which opens its entry. */
+function WordButton({
+  word,
+  selected,
+  onSelect,
+  children,
+  style,
+}: {
+  word: ShownWord;
+  selected: boolean;
+  onSelect: () => void;
+  children: React.ReactNode;
+  style?: React.CSSProperties;
+}) {
+  const note = word.gd?.note ?? word.note;
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      title={
+        word.uncertain ? `Uncertain: ${note ?? "a doubtful reading"}` : note
+      }
+      onClick={onSelect}
+      style={{
+        ...s.word,
+        ...(word.uncertain ? s.uncertain : undefined),
+        ...(selected ? s.selected : undefined),
+        ...style,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function Entry({ part }: { part: KeyEntry }) {
+  const { entry } = part;
+  return (
+    <>
+      <tr>
+        <td style={{ width: "33%", textAlign: "left" }}>{part.key}</td>
+        <td style={{ width: "33%", textAlign: "center" }}>
+          {/* A word with no pronunciation printed the length, a literal 0. */}
+          {entry.pronounciations[0]?.pronounciation}
+        </td>
+        <td style={{ width: "33%", textAlign: "right" }}>
+          {/* An empty list is still a list: the label printed alone. */}
+          {entry.gematria.length ? `Gematria ${entry.gematria.join(", ")}` : ""}
+        </td>
+      </tr>
+      {entry.meanings.map((meaning, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: the entry's own order
+        <tr key={i}>
+          <td colSpan={3} style={{ textAlign: "center" }}>
+            {meaning.meaning} ({meaning.source}) {meaning.source2}{" "}
+            {meaning.note}
+          </td>
+        </tr>
+      ))}
+    </>
+  );
+}
+
+/** The word panel: Dee's word, its entries, the English and any note. */
+export function WordPanel({
   entries,
-  selectedKey,
+  keyNumber,
+  word,
 }: {
   entries: Entries;
-  selectedKey: { key: number; subkey: number };
+  keyNumber: number;
+  word: ShownWord;
 }) {
-  const key = keys[selectedKey.key];
-  const sub = key.subkeys[selectedKey.subkey];
-  const dict = entries[sub.enochianLatin];
+  const parts = word.lookup ? entries[word.lookup] : undefined;
+  const note = word.gd?.note ?? word.note;
+  const gdForm = word.gd?.word;
   return (
     <table width="100%">
       <tbody>
         <tr>
           <td style={{ width: "33%", textAlign: "left" }}>
-            {sub.enochianLatin}
+            {word.lookup ?? "(no Enochian)"}
           </td>
           <td style={{ width: "33%", textAlign: "center" }}>
-            {/* A word with no pronunciation printed the length, a literal 0. */}
-            {dict?.pronounciations[0]?.pronounciation}
+            {gdForm && gdForm !== word.lookup ? `Golden Dawn: ${gdForm}` : ""}
           </td>
           <td
             style={{ width: "33%", textAlign: "right", ...EnochianFont.style }}
           >
-            {sub.enochianLatin}
+            {word.lookup}
           </td>
         </tr>
-        {dict?.meanings.map((meaning, i) => (
-          <tr key={i}>
+        {parts?.length === 2 && (
+          <tr>
             <td colSpan={3} style={{ textAlign: "center" }}>
-              {meaning.meaning} ({meaning.source}) {meaning.source2}{" "}
-              {meaning.note}
+              Found as two words: {parts[0].key} and {parts[1].key}
             </td>
           </tr>
+        )}
+        {parts?.map((part, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: two parts may share a key
+          <Entry key={index} part={part} />
         ))}
+        {word.lookup && !parts && (
+          <tr>
+            <td colSpan={3} style={{ textAlign: "center" }}>
+              Not in the dictionary.
+            </td>
+          </tr>
+        )}
         <tr>
           <td colSpan={3} style={{ textAlign: "center" }}>
-            {sub.english} (Dee book)
+            {word.english} (Dee)
           </td>
         </tr>
+        {(note || word.uncertain || word.from) && (
+          <tr>
+            <td colSpan={3} style={{ textAlign: "center" }}>
+              {word.uncertain ? "Uncertain reading. " : ""}
+              {word.from === "equinox1912no8"
+                ? "Crowley's form, from The Equinox: not in Casaubon's print. "
+                : ""}
+              {note}
+            </td>
+          </tr>
+        )}
         <tr>
-          <td>
-            Key {key.key}.{sub.subkey}
-          </td>
-          <td></td>
-          <td style={{ textAlign: "right" }}>
-            {/* An empty list is still a list: the label printed alone. */}
-            {dict?.gematria.length
-              ? "Gematria " + dict.gematria.join(", ")
-              : ""}
+          <td colSpan={3}>
+            Key {keyNumber}, word {word.row}
           </td>
         </tr>
       </tbody>
@@ -87,176 +214,266 @@ function Dictionary({
   );
 }
 
-function KeyText({
-  enochianKey,
+export interface Selected {
+  key: number;
+  row: number;
+}
+
+export function KeyText({
+  words,
+  keyNumber,
   lang,
   enochianFont,
-  selectedKey,
-  setSelectedKey,
+  selected,
+  onSelect,
 }: {
-  enochianKey: EnochianKey;
-  lang: "enochian" | "english" | "both";
+  words: ShownWord[];
+  keyNumber: number;
+  lang: EnochianLang;
   enochianFont: boolean;
-  selectedKey: { key: number; subkey: number } | null;
-  setSelectedKey: ({ key, subkey }: { key: number; subkey: number }) => void;
+  selected: Selected | null;
+  onSelect: (row: number) => void;
 }) {
-  if (lang === "english")
-    return (
-      <div style={s.keyParagraph}>
-        {enochianKey.subkeys.map((subkey) => (
-          <React.Fragment key={subkey.subkey}>
-            <span
-              style={
-                selectedKey &&
-                selectedKey.key === enochianKey.key &&
-                selectedKey.subkey === subkey.subkey
-                  ? s.selectedKey
-                  : undefined
-              }
-              onClick={() =>
-                setSelectedKey({ key: enochianKey.key, subkey: subkey.subkey })
-              }
-            >
-              {subkey.english}
-            </span>{" "}
-          </React.Fragment>
-        ))}
-      </div>
-    );
-
-  if (lang === "enochian")
-    return (
-      <div
-        style={{ ...s.keyParagraph, ...(enochianFont && EnochianFont.style) }}
-      >
-        {enochianKey.subkeys.map((subkey) => (
-          <React.Fragment key={subkey.subkey}>
-            <span
-              style={
-                selectedKey &&
-                selectedKey.key === enochianKey.key &&
-                selectedKey.subkey === subkey.subkey
-                  ? s.selectedKey
-                  : undefined
-              }
-              onClick={() =>
-                setSelectedKey({ key: enochianKey.key, subkey: subkey.subkey })
-              }
-            >
-              {subkey.enochianLatin}
-            </span>{" "}
-          </React.Fragment>
-        ))}
-      </div>
-    );
+  const isSelected = (word: ShownWord) =>
+    selected?.key === keyNumber && selected.row === word.row;
+  const font = enochianFont ? EnochianFont.style : undefined;
 
   if (lang === "both")
     return (
       <table>
         <tbody>
-          {enochianKey.subkeys.map(
-            (subkey) =>
-              subkey.subkey > 0 && (
-                <tr
-                  key={subkey.subkey}
-                  style={
-                    selectedKey &&
-                    selectedKey.key === enochianKey.key &&
-                    selectedKey.subkey === subkey.subkey
-                      ? s.selectedKey
-                      : undefined
-                  }
-                  onClick={() =>
-                    setSelectedKey({
-                      key: enochianKey.key,
-                      subkey: subkey.subkey,
-                    })
-                  }
-                >
-                  <td>
-                    {enochianKey.key}.{subkey.subkey}
-                  </td>
-                  <td style={enochianFont ? EnochianFont.style : {}}>
-                    {subkey.enochianLatin}
-                  </td>
-                  <td>{subkey.english}</td>
-                </tr>
-              ),
-          )}
+          {words.map((word) => {
+            const shown = enochian(word);
+            const marker = word.gd?.marker;
+            return (
+              <tr
+                key={word.row}
+                style={isSelected(word) ? s.selected : undefined}
+              >
+                <td>
+                  {keyNumber}.{word.row}
+                </td>
+                <td style={shown ? font : undefined}>
+                  {shown || word.unspoken || (marker && marker !== "split") ? (
+                    <WordButton
+                      word={word}
+                      selected={isSelected(word)}
+                      onSelect={() => onSelect(word.row)}
+                      style={shown ? undefined : s.muted}
+                    >
+                      {shown ??
+                        (word.unspoken
+                          ? "(not spoken)"
+                          : `(${MARKER_TEXT[marker as keyof typeof MARKER_TEXT]})`)}
+                    </WordButton>
+                  ) : (
+                    // Nothing to look up: no button with nothing in it.
+                    <span style={s.muted}>(no Enochian yet)</span>
+                  )}
+                </td>
+                <td>{word.english}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     );
 
-  return <div></div>;
+  const text = (word: ShownWord) =>
+    lang === "english" ? word.english : enochian(word);
+  return (
+    <div
+      style={{
+        ...s.keyParagraph,
+        ...(lang === "enochian" ? font : undefined),
+      }}
+    >
+      {words.map((word) => {
+        const shown = text(word);
+        // A word the version leaves out, or joins to another, is not said.
+        if (!shown) return null;
+        return (
+          <React.Fragment key={word.row}>
+            <WordButton
+              word={word}
+              selected={isSelected(word)}
+              onSelect={() => onSelect(word.row)}
+            >
+              {shown}
+            </WordButton>{" "}
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
 }
 
-type EnochianLang = "enochian" | "english" | "both";
+/** The Aethyr picker, for Key 19. */
+function AethyrPicker({
+  aethyrs,
+  aethyr,
+  setAethyr,
+}: {
+  aethyrs: readonly PageAethyr[];
+  aethyr: number;
+  setAethyr: (n: number) => void;
+}) {
+  return (
+    <Box sx={{ mb: 2 }}>
+      <FormControl size="small">
+        <InputLabel id="aethyr-select-label">Aethyr</InputLabel>
+        <Select
+          labelId="aethyr-select-label"
+          id="aethyr-select"
+          value={aethyr}
+          label="Aethyr"
+          onChange={(e) => setAethyr(Number(e.target.value))}
+        >
+          {aethyrs.map((each) => (
+            <MenuItem key={each.n} value={each.n}>
+              {each.n} {each.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <Typography variant="body2" sx={{ mt: 1 }}>
+        One Call for all thirty Aethyrs, with the Aethyr's name in it. Dee
+        counted them as thirty Calls, 19 to 48, and so the 48 Claves Angelicae.
+      </Typography>
+    </Box>
+  );
+}
 
-export default function Keys({ entries }: { entries: Entries }) {
+export default function Keys({
+  keys,
+  aethyrs,
+  entries,
+}: {
+  keys: readonly PageKey[];
+  aethyrs: readonly PageAethyr[];
+  entries: Entries;
+}) {
   const [lang, setLang] = React.useState<EnochianLang>("english");
+  const [version, setVersion] = React.useState<Version>("dee");
+  const [aethyr, setAethyr] = React.useState(1);
   const { enochianFont, EnochianFontToggle } = useEnochianFont();
-  const [selectedKey, setSelectedKey] = React.useState<{
-    key: number;
-    subkey: number;
-  } | null>(null);
+  const [selected, setSelected] = React.useState<Selected | null>(null);
+  const hasGd = keys.some((key) => key.gd);
+
+  /** The version a Key is shown in: Dee's where it has no other. */
+  const versionOf = (key: PageKey): Version =>
+    version === "gd" && key.gd ? "gd" : "dee";
+  const selectedKey = selected && keys.find((key) => key.key === selected.key);
+  const selectedWord =
+    selectedKey &&
+    shownWords(selectedKey, versionOf(selectedKey), aethyr)[
+      (selected?.row ?? 0) - 1
+    ];
 
   return (
     <>
       <Container sx={{ background: "#fafafa" }}>
-        <FormControl>
-          {/*
-          <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel>
-          */}
-          <RadioGroup
-            aria-labelledby="demo-radio-buttons-group-label"
-            defaultValue="female"
-            name="radio-buttons-group"
-            value={lang}
-            onChange={(e) => setLang(e.target.value as EnochianLang)}
-            row
-          >
-            <FormControlLabel
-              value="english"
-              control={<Radio />}
-              label="English"
-            />
-            <FormControlLabel
-              value="enochian"
-              control={<Radio />}
-              label="Enochian"
-            />
-            <FormControlLabel value="both" control={<Radio />} label="Both" />
-            {["enochian", "both"].includes(lang) && <EnochianFontToggle />}
-          </RadioGroup>
-        </FormControl>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 1,
+            alignItems: "center",
+          }}
+        >
+          <FormControl>
+            <RadioGroup
+              aria-label="Show the Keys in"
+              name="keys-language"
+              value={lang}
+              onChange={(e) => setLang(e.target.value as EnochianLang)}
+              row
+            >
+              <FormControlLabel
+                value="english"
+                control={<Radio />}
+                label="English"
+              />
+              <FormControlLabel
+                value="enochian"
+                control={<Radio />}
+                label="Enochian"
+              />
+              <FormControlLabel value="both" control={<Radio />} label="Both" />
+            </RadioGroup>
+          </FormControl>
+          {hasGd && (
+            <FormControl size="small">
+              <InputLabel id="keys-version-label">Version</InputLabel>
+              <Select
+                labelId="keys-version-label"
+                id="keys-version"
+                value={version}
+                label="Version"
+                onChange={(e) => setVersion(e.target.value as Version)}
+              >
+                <MenuItem value="dee">Dee's (default)</MenuItem>
+                <MenuItem value="gd">The Golden Dawn's</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+          {["enochian", "both"].includes(lang) && <EnochianFontToggle />}
+        </Box>
       </Container>
 
       <Container sx={{ background: "#fafafa" }}>
-        {keys.map(
-          (key) =>
-            key.key > 0 && (
-              <Accordion key={key.key}>
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  aria-controls="panel1a-content"
-                  id="panel1a-header"
-                >
-                  <Typography>Key {key.key}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <KeyText
-                    enochianKey={key}
-                    lang={lang}
-                    enochianFont={enochianFont}
-                    selectedKey={selectedKey}
-                    setSelectedKey={setSelectedKey}
+        {keys.map((key) => {
+          // A Key without the Golden Dawn's reading shows Dee's, and says so.
+          const keyVersion = versionOf(key);
+          return (
+            <Accordion key={key.key}>
+              <AccordionSummary
+                expandIcon={<ExpandMore />}
+                aria-controls={`key-${key.key}-content`}
+                id={`key-${key.key}-header`}
+              >
+                <Typography>{key.title}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                {key.aethyrs && (
+                  <AethyrPicker
+                    aethyrs={aethyrs}
+                    aethyr={aethyr}
+                    setAethyr={setAethyr}
                   />
-                </AccordionDetails>
-              </Accordion>
-            ),
-        )}
+                )}
+                {keyVersion !== version && (
+                  <Typography variant="body2" sx={{ mb: 1 }}>
+                    No Golden Dawn reading of this Key yet: Dee's is shown.
+                  </Typography>
+                )}
+                <KeyText
+                  words={shownWords(key, keyVersion, aethyr)}
+                  keyNumber={key.key}
+                  lang={lang}
+                  enochianFont={enochianFont}
+                  selected={selected}
+                  onSelect={(row) =>
+                    setSelected(
+                      selected?.key === key.key && selected.row === row
+                        ? null
+                        : { key: key.key, row },
+                    )
+                  }
+                />
+                <Typography
+                  variant="caption"
+                  component="p"
+                  sx={{ mt: 2, color: "text.secondary" }}
+                >
+                  {VERSION_TITLES[keyVersion]} version. {key.checked}
+                </Typography>
+              </AccordionDetails>
+            </Accordion>
+          );
+        })}
       </Container>
-      {selectedKey && (
+      {selectedWord && selected && (
         <Box
           sx={{
             p: 1,
@@ -265,9 +482,13 @@ export default function Keys({ entries }: { entries: Entries }) {
             background: "rgba(0,0,0,0.8)",
             color: "#fafafa",
           }}
-          onClick={() => setSelectedKey(null)}
+          onClick={() => setSelected(null)}
         >
-          <Dictionary entries={entries} selectedKey={selectedKey} />
+          <WordPanel
+            entries={entries}
+            keyNumber={selected.key}
+            word={selectedWord}
+          />
         </Box>
       )}
     </>

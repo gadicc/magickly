@@ -1,3 +1,8 @@
+import keys, {
+  aethyrs,
+  hasVersion,
+  keyVersion,
+} from "magick-data/enochian/keys";
 import { beforeAll, describe, expect, it } from "vitest";
 import { PUBLIC_PAGES } from "@/seo/pages";
 import { buildSearchCatalogue } from "./catalogue";
@@ -76,5 +81,21 @@ describe("the real public search catalogue", () => {
       catalogue.documents.find((page) => page.path === "/enochian/dictionary")!
         .sections.length,
     ).toBeGreaterThan(1900);
+  });
+
+  it("indexes each Key's English and its words in each version it has", () => {
+    const ids = catalogue.documents
+      .find((page) => page.path === "/enochian/keys")!
+      .sections.map((section) => section.id.replace(/:\d+$/, ""));
+    for (const key of keys) {
+      expect(ids).toContain(`key-${key.key}-en`);
+      // The 2023 text has no Enochian for some Keys: nothing to index.
+      const said = keyVersion(key)?.some((word) => word.word);
+      expect(ids.includes(`key-${key.key}-eo`), `Key ${key.key}`).toBe(said);
+      expect(ids.includes(`key-${key.key}-gd`), `Key ${key.key}`).toBe(
+        hasVersion(key, "gd"),
+      );
+    }
+    expect(ids.includes("aethyrs")).toBe(aethyrs.length > 0);
   });
 });

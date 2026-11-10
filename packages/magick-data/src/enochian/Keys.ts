@@ -1,1115 +1,510 @@
-const keys = [
-  [
-    // 0
-  ],
-  [
-    // 1
-    ["OL", "Ol", "I"],
-    ["SONF", "sonf", "raygne"],
-    ["VORSG", "vorsg,", "over you"],
-    ["GOHO", "gohó", "sayeth"],
-    ["IAD", "Iad", "the God"],
-    ["BALT", "balt", "of Justice"],
-    ["LANSH", "lansh", "in powre exalted"],
-    ["CALZ", "calz", "above the firmaments"],
-    ["VONPHO", "vonpho,", "of wrath:"],
-    ["SOBRA", "sobra", "in Whose"],
-    ["ZOL", "z-ol", "hands"],
-    ["ROR", "ror", "the Sonne"],
-    ["I", "i", "is"],
-    ["TA", "ta", "as"],
-    ["NAZPSAD", "nazpsad", "a sword"],
-    ["OD", "", "and"],
-    ["GRAA", "Graa", "the Moon"],
-    ["TA", "ta", "as"],
-    ["MALPRG", "Malprg", "a through-trusting fire"],
-    ["DS", "ds", "which"],
-    ["HOLQ", "hol-q", "measureth"],
-    ["QAA", "Qa-a", "your garments"],
-    ["NOTHOA", "nothóa", "in the mydst"],
-    ["ZIMZ", "zimz", "of my vestures,"],
-    ["OD", "Od", "and"],
-    ["COMMAH", "commah", "trussed you together"],
-    ["TA", "ta", "as"],
-    ["NOBLOH", "nobloh", "the palms"],
-    ["ZIEN", "zien:", "of my hands:"],
-    ["SOBA", "Soba", "Whose"],
-    ["THIL", "thil", "seats"],
-    ["GNONP", "gnonp", "I garnished"],
-    ["PRGE", "prge", "with the fire"],
-    ["ALDI", "aldi", "of gathering"],
-    ["DS", "Ds", "and"],
-    ["URBS", "urbs", "beautified"],
-    ["OBOLEH", "óbóleh", "your garments"],
-    ["GRSAM", "grsam:", "with admiration,"],
-    ["CASARM", "Casarm", "to whom"],
-    ["OHORELA", "ohoréla", "I made a law"],
-    ["CABA", "cabá", "to govern"],
-    ["PIR", "pir", "the holy ones,"],
-    ["DS", "Ds", "and"],
-    ["ZONRENSG", "zonrensg", "delivered you"],
-    ["CAB", "cab", "a rod"],
-    ["ERM", "erm", "with"],
-    ["IADNAH", "Jadnah:", "the ark of knowledge."],
-    ["PILAH", "Pilah", "Moreover"],
-    ["FARZM", "farzm", "you lifted up your voyces"],
-    ["OD", "", "and"],
-    ["ZNRZA", "znrza", "sware"],
-    ["ADNA", "adna", "obedience"],
-    ["OD", "", "and"],
-    ["GONO", "gono", "faith"],
-    ["IADPIL", "Iäl", "to him"],
-    ["DS", "Ds", "that"],
-    ["HOM", "hom", "liveth"],
-    ["OD", "", "and"],
-    ["TOH", "tóh", "triumpeth,"],
-    ["SOBA", "Soba", "whose"],
-    ["IAOD", "", "beginning"],
-    ["IPAM", "Ipam", "is not"],
-    ["OD", "", "nor"],
-    ["UL", "Lu", "ende"],
-    ["IPAMIS", "Ipâmis", "can not be,"],
-    ["DS", "Ds", "which"],
-    ["LOHOLO", "lóhólo", "shyneth"],
-    ["VEP", "dep", "as a flame"],
-    ["ZOMD", "zomd", "in the myddst"],
-    ["POAMAL", "Poamal", "of your pallace"],
-    ["OD", "od", "and"],
-    ["SONF", "bogpa", "rayngneth"],
-    ["AAI", "aäl", "amongst you"],
-    ["TA", "ta", "as"],
-    ["PIAP", "piap", "the ballance"],
-    ["BALTOH", "piamos", "of righteousnes,"],
-    ["OD", "od", "and"],
-    ["VAOAN", "vaoan", "truth:"],
-    ["ZACAR", "ZACARe", "Move"],
-    ["CA", "c-a", "therfore,"],
-    ["OD", "od", "and"],
-    ["ZAMRAN", "ZAMRAN", "shew yourselves:"],
-    ["ODO", "odo", "open"],
-    ["CICLE", "cicle", "the Mysteries"],
-    ["QAA", "Qaa", "of your Creation:"],
-    ["ZORGE", "zorge,", "Be friendely unto me:"],
-    ["LAP", "lap", "for"],
-    ["ZIRDO", "zirdo", "I am"],
-    ["NOCO", "noco", "the servant"],
-    ["MAD", "MAD", "of the same your God:"],
-    ["HOATH", "Hoath", "the true Worshipper"],
-    ["IAIDA", "Jaida.", "of the Highest."],
-  ],
-  [
-    // 2
-    ["ADGT", "", "Can"],
-    ["UPAAH", "", "the wings"],
-    ["ZONG", "", "of the windes"],
-    ["OM", "", ""],
-    ["FAAIP", "", "understand"],
-    ["SALD", "", "your voyces of wonder"],
-    ["VIV", "", "O you the second"],
-    ["L", "", "of the first,"],
-    ["SOBAM", "", "Whome"],
-    ["IALPRG", "", "the burning flames"],
-    ["IZAZAZ", "", "have framed"],
-    ["PIADPH", "", "within the depths of my Jaws,"],
-    ["CASARMA", "", "whome"],
-    ["ABRAMG", "", "I have prepared"],
-    ["TA", "", "as"],
-    ["TALHO", "", "Cupps"],
-    ["PARACLEDA", "", "for a wedding"],
-    ["Q", "", "or"],
-    ["TA", "", "as"],
-    ["LORSLQ", "", "the flowres"],
-    ["TURBS", "", "in their beawty"],
-    ["OOGE", "", "for the Chamber"],
-    ["BALTOH", "", "of righteousnes"],
-    ["GIUI", "", "Stronger"],
-    ["CHIS", "", "are"],
-    ["LUSD", "", "your fete"],
-    ["ORRI", "", "then the barren stone:"],
-    ["OD", "", "And"],
-    ["MICALP", "", "myghtier"],
-    ["CHIS", "", "are"],
-    ["BIA", "", "your voices"],
-    ["OZONGON", "", "then the manifold windes."],
-    ["LAP", "", "For"],
-    ["NOAN", "", "you are become"],
-    ["TROF", "", "a buylding"],
-    ["CORS", "", "such"],
-    ["TA", "", "as"],
-    ["GE", "", "is not"],
-    ["OQ", "", "but"],
-    ["MANIN", "", "in the mynde"],
-    ["IAIDON", "", "of the all powerfull."],
-    ["TORZU", "", "Arrise"],
-    ["GOHEL", "", "sayeth the First"],
-    ["ZACAR", "", "Move"],
-    ["CA", "", "therefore"],
-    ["CNOQOD", "", "unto his Servants:"],
-    ["ZAMRAN", "", "Shew yourselves"],
-    ["MICALZO", "", "in powre:"],
-    ["OD", "", "And"],
-    ["OZAZM", "", "make me"],
-    ["VRELP", "", "a strong Seething:"],
-    ["LAP", "", "for"],
-    ["ZIR", "", "I am"],
-    ["IOIAD", "", "of him that liveth forever."],
-  ],
-  [
-    // 3
-    ["MICMA", "", "Behold"],
-    ["GOHO", "", "sayeth"],
-    ["IAD", "", "your God,"],
-    ["ZIR", "", "I am"],
-    ["COMSELH", "", "a Circle"],
-    ["AZIEN", "", "on Whose hands"],
-    ["BIAB", "", "stand"],
-    ["OS", "", "12"],
-    ["LONDOH", "", "Kingdoms."],
-    ["NORZ", "", "Six"],
-    ["CHIS", "", "are"],
-    ["OTHIL", "", "the seats"],
-    ["GIGIPAH", "", "of living breath,"],
-    ["UNDL", "", "the rest"],
-    ["CHIS", "", "are"],
-    ["TA", "", "as"],
-    ["PUIM", "", "sharp sickles:"],
-    ["Q", "", "or"],
-    ["MOSPLEH", "", "the horns"],
-    ["TELOCH", "", "of death"],
-    ["QUIIN", "", "wherein"],
-    ["TOLTORG", "", "the Creatures of the earth"],
-    ["CHIS", "", "are"],
-    ["ICHISGE", "", "to are not"],
-    ["M", "", "Except"],
-    ["OZIEN", "", "myne own hand"],
-    ["DS", "", "which"],
-    ["BRGDA", "", "slepe"],
-    ["OD", "", "and"],
-    ["TORZUL", "", "shall ryse."],
-    ["ILI", "", "In the first"],
-    ["EOL", "", "I made you"],
-    ["BALZARG", "", "stuards"],
-    ["OD", "", "and"],
-    ["AALA", "", "placed you"],
-    ["THILN", "", "in seats"],
-    ["OS", "", "12"],
-    ["NETAAB", "", "of government,"],
-    ["DLUGA", "", "giving"],
-    ["VOMZARG", "", "unto every one of you"],
-    ["LONSA", "", "powre"],
-    ["CAPIMALI", "", "successively"],
-    ["VORS", "", "over"],
-    ["CLA", "", "456,"],
-    ["HOMIL", "", "the true ages"],
-    ["COCASB", "", "of tyme,"],
-    ["FAFEN", "", "to the intent that,"],
-    ["IZIZOP", "", "from your highest vessels"],
-    ["OD", "", "and"],
-    ["MIINOAG", "", "the Corners"],
-    ["DE", "", "of"],
-    ["GNETAAB", "", "your governments,"],
-    ["VAUN", "", "you might work"],
-    ["NANAEEL", "", "my powre:"],
-    ["PANPIR", "", "powring downe"],
-    ["MALPIRGI", "", "the fires of life and encrease,"],
-    ["PILD", "", "continually"],
-    ["CAOSG", "", "on the earth"],
-    ["NOAN", "", "Thus you are become"],
-    ["UNALAH", "", "the skirts"],
-    ["BALT", "", "of Justice"],
-    ["OD", "", "and"],
-    ["VOOAN", "", "Truth."],
-    ["DOOIAP", "", "In the name"],
-    ["MAD", "", "of the same, your God"],
-    ["GOHOLOR", "", "Lift up,"],
-    ["GOHUS", "", "I say,"],
-    ["AMIRAN", "", "yourselves."],
-    ["MICMA", "", "Behold"],
-    ["IEHUSOZ", "", "his mercies"],
-    ["CACACOM", "", "florish"],
-    ["OD", "", "and"],
-    ["DOOAIN", "", "Name"],
-    ["NOAR", "", "is become"],
-    ["MICAOLZ", "", "mighty"],
-    ["AAIOM", "", "amongst us"],
-    ["CASARMG", "", "In whom"],
-    ["GOHIA", "", "we say"],
-    ["ZACAR", "", "Move,"],
-    ["UNIGLAG", "", "Descend"],
-    ["OD", "", "and"],
-    ["IMUAMAR", "", "apply yourselves unto us"],
-    ["PUGO", "", "as unto"],
-    ["PLAPLI", "", "partakers"],
-    ["ANANAEL", "", "of the secret wisdom"],
-    ["QAAN", "", "of your Creation."],
-  ],
-  [
-    // 4
-    ["", "", "I have set"],
-    ["", "", "my fete"],
-    ["", "", "in the Sowth"],
-    ["", "", "and"],
-    ["", "", "have loked abowt me"],
-    ["", "", "sayng,"],
-    ["", "", "are not"],
-    ["", "", "the Thunders of encrease"],
-    ["", "", "numbred"],
-    ["", "", "33,"],
-    ["", "", "which"],
-    ["", "", "rayne"],
-    ["", "", "in the second"],
-    ["", "", "Angle,"],
-    ["", "", "under whom"],
-    ["", "", "I have placed"],
-    ["", "", "9639"],
-    ["", "", "Whome"],
-    ["", "", "None"],
-    ["", "", "hath yet numbred,"],
-    ["", "", "but"],
-    ["", "", "one,"],
-    ["", "", "in whome"],
-    ["", "", "the seecond beginning of things"],
-    ["", "", "are"],
-    ["", "", "and"],
-    ["", "", "wax strong"],
-    ["", "", "which"],
-    ["", "", "allso"],
-    ["", "", "successively"],
-    ["", "", "are"],
-    ["", "", "the number of time:"],
-    ["", "", "and"],
-    ["", "", "their powres"],
-    ["", "", "are"],
-    ["", "", "as"],
-    ["", "", "the first"],
-    ["", "", "456:"],
-    ["", "", "Arrise,"],
-    ["", "", "you sonns"],
-    ["", "", "of pleasure,"],
-    ["", "", "and"],
-    ["", "", "viset"],
-    ["", "", "the earth:"],
-    ["", "", "for"],
-    ["", "", "I am"],
-    ["", "", "the Lord"],
-    ["", "", "your God,"],
-    ["", "", "which"],
-    ["", "", "is,"],
-    ["", "", "and"],
-    ["", "", "liveth."],
-    ["", "", "In the name"],
-    ["", "", "of the Creator"],
-    ["", "", "Move,"],
-    ["", "", "and"],
-    ["", "", "shew yourselves"],
-    ["", "", "as pleasant deliverers"],
-    ["", "", "That you may praise him"],
-    ["", "", "amongst"],
-    ["", "", "the sonnes"],
-    ["", "", "of men."],
-  ],
-  [
-    // 5
-    ["", "", "The mighty sounds"],
-    ["", "", "have entered"],
-    ["", "", "into the third"],
-    ["", "", "angle,"],
-    ["", "", "and"],
-    ["", "", "are become"],
-    ["", "", "as"],
-    ["", "", "olives"],
-    ["", "", "in the olive mount"],
-    ["", "", "looking with gladnes"],
-    ["", "", "upon the earth"],
-    ["", "", "and"],
-    ["", "", "dwelling"],
-    ["", "", "in the brightnes of the heavens"],
-    ["", "", "as"],
-    ["", "", "continuall comfortors,"],
-    ["", "", "unto whom"],
-    ["", "", "I fastened"],
-    ["", "", "pillers"],
-    ["", "", "of gladnes"],
-    ["", "", "19"],
-    ["", "", "and"],
-    ["", "", "gave them"],
-    ["", "", "vessels"],
-    ["", "", "to water"],
-    ["", "", "the earth"],
-    ["", "", "with her creatures,"],
-    ["", "", "and"],
-    ["", "", "they are"],
-    ["", "", "the brothers"],
-    ["", "", "of the first"],
-    ["", "", "and"],
-    ["", "", "second"],
-    ["", "", "and"],
-    ["", "", "the beginning"],
-    ["", "", "of their own seats"],
-    ["", "", "which"],
-    ["", "", "are garnished"],
-    ["", "", "with continually burning lamps"],
-    ["", "", "69636"],
-    ["", "", "whose"],
-    ["", "", "numbers"],
-    ["", "", "are"],
-    ["", "", "as"],
-    ["", "", "the first"],
-    ["", "", "the endes"],
-    ["", "", "and"],
-    ["", "", "the contents of tyme."],
-    ["", "", "Therefore"],
-    ["", "", "Come you"],
-    ["", "", "and"],
-    ["", "", "obey"],
-    ["", "", "your creation,"],
-    ["", "", "viset us"],
-    ["", "", "in peace"],
-    ["", "", "and"],
-    ["", "", "comfort"],
-    ["", "", "Conclude us"],
-    ["", "", "as receivers"],
-    ["", "", "of your mysteries:"],
-    ["", "", "for why?"],
-    ["", "", "Our Lord and Mr."],
-    ["", "", "is"],
-    ["", "", "all one."],
-  ],
-  [
-    // 6
-    ["", "", "The spirits"],
-    ["", "", "of ye 4th"],
-    ["", "", "Angle"],
-    ["", "", "are"],
-    ["", "", "Nine,"],
-    ["", "", "Mighty"],
-    ["", "", "in the firmaments of waters,"],
-    ["", "", "Whome"],
-    ["", "", "the first"],
-    ["", "", "hath planted"],
-    ["", "", "a torment"],
-    ["", "", "to the wicked"],
-    ["", "", "and"],
-    ["", "", "a garland"],
-    ["", "", "to the righteous"],
-    ["", "", "giving unto them"],
-    ["", "", "fyrie darts"],
-    ["", "", "to vanne"],
-    ["", "", "the earth"],
-    ["", "", "and"],
-    ["", "", "7699"],
-    ["", "", "continuall Workmen"],
-    ["", "", "whose"],
-    ["", "", "courses"],
-    ["", "", "viset"],
-    ["", "", "with comfort"],
-    ["", "", "the earth"],
-    ["", "", "and"],
-    ["", "", "are"],
-    ["", "", "in government"],
-    ["", "", "and"],
-    ["", "", "contynuance"],
-    ["", "", "as"],
-    ["", "", "the second"],
-    ["", "", "and"],
-    ["", "", "the third"],
-    ["", "", "Wherefore"],
-    ["", "", "hearken unto"],
-    ["", "", "my voyce"],
-    ["", "", "I have talked of you"],
-    ["", "", "and"],
-    ["", "", "I move you"],
-    ["", "", "in power and presence,"],
-    ["", "", "whose"],
-    ["", "", "works"],
-    ["", "", "shall be"],
-    ["", "", "a song of honor"],
-    ["", "", "and"],
-    ["", "", "the praise"],
-    ["", "", "of your God"],
-    ["", "", "in your Creation."],
-  ],
-  [
-    // 7
-    ["", "", "The East"],
-    ["", "", "is"],
-    ["", "", "a howse"],
-    ["", "", "of virgins"],
-    ["", "", "singing praises"],
-    ["", "", "amongst"],
-    ["", "", "the flames of the first glory,"],
-    ["", "", "wherein"],
-    ["", "", "the Lord"],
-    ["", "", "hath opened his mouth"],
-    ["", "", "and"],
-    ["", "", "they are become"],
-    ["", "", "28"],
-    ["", "", "Living dwellings"],
-    ["", "", "in whom"],
-    ["", "", "the strength of men"],
-    ["", "", "rejoyceth"],
-    ["", "", "and"],
-    ["", "", "they are appareled"],
-    ["", "", "with ornaments of brightnes"],
-    ["", "", "such"],
-    ["", "", "as"],
-    ["", "", "work"],
-    ["", "", "wonders"],
-    ["", "", "on all"],
-    ["", "", "creatures"],
-    ["", "", "Whose"],
-    ["", "", "Kingdoms"],
-    ["", "", "and"],
-    ["", "", "continuance"],
-    ["", "", "are"],
-    ["", "", "as"],
-    ["", "", "the third"],
-    ["", "", "and"],
-    ["", "", "fourth"],
-    ["", "", "strong towres"],
-    ["", "", "and"],
-    ["", "", "places of comfort"],
-    ["", "", "The seats"],
-    ["", "", "of mercy"],
-    ["", "", "and"],
-    ["", "", "continuance."],
-    ["", "", "O you Servants"],
-    ["", "", "of Mercy,"],
-    ["", "", "Move,"],
-    ["", "", "Appeare,"],
-    ["", "", "sing praises"],
-    ["", "", "unto the Creator:"],
-    ["", "", "And"],
-    ["", "", "be mighty"],
-    ["", "", "amongst us"],
-    ["", "", "For"],
-    ["", "", "to this remembrance"],
-    ["", "", "is given"],
-    ["", "", "powre"],
-    ["", "", "and"],
-    ["", "", "our strength"],
-    ["", "", "waxeth strong"],
-    ["", "", "in our Comforter."],
-  ],
-  [
-    // 8
-    ["", "", "The Midday"],
-    ["", "", "the first"],
-    ["", "", "is"],
-    ["", "", "as"],
-    ["", "", "the third heaven"],
-    ["", "", "made"],
-    ["", "", "of Hiacynth Pillers"],
-    ["", "", ""],
-    ["", "", "26"],
-    ["", "", "in whome"],
-    ["", "", "the Elders"],
-    ["", "", "are"],
-    ["", "", "become strong"],
-    ["", "", "which"],
-    ["", "", "I have prepared"],
-    ["", "", "for my own righteousnes"],
-    ["", "", "sayth"],
-    ["", "", "the Lord"],
-    ["", "", "whose"],
-    ["", "", "long contynuance"],
-    ["", "", "shall be"],
-    ["", "", "as"],
-    ["", "", "bucklers"],
-    ["", "", "to the stowping"],
-    ["", "", "Dragons"],
-    ["", "", "and"],
-    ["", "", "like unto the harvest"],
-    ["", "", "of a wyddow."],
-    ["", "", "How many"],
-    ["", "", "are"],
-    ["", "", "there"],
-    ["", "", "which"],
-    ["", "", "remayn"],
-    ["", "", "in the glorie"],
-    ["", "", "of the earth"],
-    ["", "", "which"],
-    ["", "", "are"],
-    ["", "", "and"],
-    ["", "", "shall not see"],
-    ["", "", "death"],
-    ["", "", "untyll"],
-    ["", "", "this"],
-    ["", "", "howse"],
-    ["", "", "fall"],
-    ["", "", "and"],
-    ["", "", "the Dragon"],
-    ["", "", "snyck."],
-    ["", "", "Come away,"],
-    ["", "", "for"],
-    ["", "", "the Thunders"],
-    ["", "", "have spoken:"],
-    ["", "", "Come away,"],
-    ["", "", "for"],
-    ["", "", "the Crownes"],
-    ["", "", "of the Temple"],
-    ["", "", "and"],
-    ["", "", "the coat"],
-    ["", "", "of him that is, was and shall be crowned"],
-    ["", "", "are divided"],
-    ["", "", "Come"],
-    ["", "", "Appeare"],
-    ["", "", "to the terror"],
-    ["", "", "of the earth"],
-    ["", "", "and"],
-    ["", "", "to our comfort"],
-    ["", "", "and"],
-    ["", "", "of such"],
-    ["", "", "as"],
-    ["", "", "are prepared."],
-  ],
-  [
-    // 9
-    ["", "", "A mighty"],
-    ["", "", "garde"],
-    ["", "", "of fire"],
-    ["", "", "with two-edged swords"],
-    ["", "", "flaming"],
-    ["", "", "(which"],
-    ["", "", "have"],
-    ["", "", "viols"],
-    ["", "", ":8:"],
-    ["", "", "of wrath"],
-    ["", "", "for two tymes"],
-    ["", "", "and"],
-    ["", "", "a half:"],
-    ["", "", "whose"],
-    ["", "", "wings"],
-    ["", "", "are"],
-    ["", "", "of wormwood,"],
-    ["", "", "and"],
-    ["", "", "of the marrow"],
-    ["", "", "of salt,)"],
-    ["", "", "have setled"],
-    ["", "", "their feete"],
-    ["", "", "in the West,"],
-    ["", "", "and"],
-    ["", "", "are"],
-    ["", "", "measured"],
-    ["", "", "with their Ministers"],
-    ["", "", "9996."],
-    ["", "", "These"],
-    ["", "", "gather up"],
-    ["", "", "the moss"],
-    ["", "", "of the earth"],
-    ["", "", "as"],
-    ["", "", "the rich"],
-    ["", "", "man"],
-    ["", "", "doth"],
-    ["", "", "his threasor:"],
-    ["", "", "Cursed"],
-    ["", "", "ar they"],
-    ["", "", "whose"],
-    ["", "", "iniquities"],
-    ["", "", "they are"],
-    ["", "", "in their eyes"],
-    ["", "", "are"],
-    ["", "", "milstones"],
-    ["", "", "greater"],
-    ["", "", "than the earth"],
-    ["", "", "And"],
-    ["", "", "from their mowthes"],
-    ["", "", "rune"],
-    ["", "", "seas"],
-    ["", "", "of blud:"],
-    ["", "", "Their heds"],
-    ["", "", "are covered"],
-    ["", "", "with diamond:"],
-    ["", "", "and"],
-    ["", "", "uppon"],
-    ["", "", "their heds"],
-    ["", "", "are"],
-    ["", "", "marble"],
-    ["", "", "sleves."],
-    ["", "", "Happie is he,"],
-    ["", "", "on whome"],
-    ["", "", "they frown not."],
-    ["", "", "For why?"],
-    ["", "", "The God"],
-    ["", "", "of righteousnes,"],
-    ["", "", "rejoyceth"],
-    ["", "", "in them."],
-    ["", "", "Come away"],
-    ["", "", "and"],
-    ["", "", "not"],
-    ["", "", "your Viols"],
-    ["", "", "For"],
-    ["", "", "the tyme"],
-    ["", "", "is"],
-    ["", "", "such"],
-    ["", "", "as"],
-    ["", "", "requireth"],
-    ["", "", "comfort."],
-  ],
-  [
-    // 10
-    ["", "", "The Thunders of Judgement and Wrath"],
-    ["", "", "are"],
-    ["", "", "numbred"],
-    ["", "", "and"],
-    ["", "", "are haborowed"],
-    ["", "", "in the North"],
-    ["", "", "in the likenes"],
-    ["", "", "of an oke"],
-    ["", "", "whose"],
-    ["", "", "branches"],
-    ["", "", "are"],
-    ["", "", "Nests"],
-    ["", "", "22"],
-    ["", "", "of lamentation"],
-    ["", "", "and"],
-    ["", "", "weaping"],
-    ["", "", "Layd up"],
-    ["", "", "for"],
-    ["", "", "the earth"],
-    ["", "", "which"],
-    ["", "", "burn"],
-    ["", "", "night"],
-    ["", "", "and"],
-    ["", "", "day:"],
-    ["", "", "and"],
-    ["", "", "vomit out"],
-    ["", "", "the heds"],
-    ["", "", "of scorpions"],
-    ["", "", "and"],
-    ["", "", "live sulphur"],
-    ["", "", "myngled"],
-    ["", "", "with poyson"],
-    ["", "", "These"],
-    ["", "", "be"],
-    ["", "", "The Thunders"],
-    ["", "", "that"],
-    ["", "", "5678"],
-    ["", "", "tymes"],
-    ["", "", "in the 24th part"],
-    ["", "", "of a moment"],
-    ["", "", "rore"],
-    ["", "", "with a hundred"],
-    ["", "", "mighty"],
-    ["", "", ""],
-    ["", "", "earthquakes"],
-    ["", "", "and"],
-    ["", "", "a thousand"],
-    ["", "", "tymes"],
-    ["", "", "as many"],
-    ["", "", "surges"],
-    ["", "", "which"],
-    ["", "", "rest not"],
-    ["", "", "neyther"],
-    ["", "", "know"],
-    ["", "", "at any"],
-    ["", "", ""],
-    ["", "", "tyme"],
-    ["", "", "here"],
-    ["", "", "One"],
-    ["", "", "rock"],
-    ["", "", "bringeth forth"],
-    ["", "", "1000"],
-    ["", "", "even as"],
-    ["", "", "the hart"],
-    ["", "", "of man"],
-    ["", "", "doth"],
-    ["", "", "his thowghts"],
-    ["", "", "wo"],
-    ["", "", "wo"],
-    ["", "", "wo"],
-    ["", "", "wo"],
-    ["", "", "wo"],
-    ["", "", "wo"],
-    ["", "", "yea"],
-    ["", "", "wo"],
-    ["", "", "be to the earth"],
-    ["", "", "For"],
-    ["", "", "her iniquitie"],
-    ["", "", "is"],
-    ["", "", "was"],
-    ["", "", "and shal be"],
-    ["", "", "great."],
-    ["", "", "Come away"],
-    ["", "", "but"],
-    ["", "", "not"],
-    ["", "", "your noyses."],
-  ],
-  [
-    // 11
-    ["", "", "The mighty seat"],
-    ["", "", "groaned"],
-    ["", "", "and"],
-    ["", "", "they were"],
-    ["", "", ":5:"],
-    ["", "", "thunders"],
-    ["", "", "which"],
-    ["", "", "flew"],
-    ["", "", "into the East"],
-    ["", "", "and"],
-    ["", "", "the Egle"],
-    ["", "", "spake"],
-    ["", "", "and"],
-    ["", "", "cryed with a lowde voyce"],
-    ["", "", "Come awaye"],
-    ["", "", "and"],
-    ["", "", "they gathered them together in"],
-    ["", "", "the house"],
-    ["", "", "of death"],
-    ["", "", "of whome"],
-    ["", "", "it is measured"],
-    ["", "", "and"],
-    ["", "", "it"],
-    ["", "", "is"],
-    ["", "", "as"],
-    ["", "", "they are"],
-    ["", "", "whose"],
-    ["", "", "number"],
-    ["", "", "is"],
-    ["", "", "31."],
-    ["", "", "Come away"],
-    ["", "", "For"],
-    ["", "", "I have prepared"],
-    ["", "", "for you"],
-    ["ZACAR", "ZACARe", "Move"],
-    ["CA", "cab", "therfore"],
-    ["OD", "od", "and"],
-    ["ZAMRAN", "ZAMRAN", "shew your selves"],
-    ["ODO", "odo", "open"],
-    ["CICLE", "cicle", "the Mysteries"],
-    ["QAA", "Qaá", "of your Creation"],
-    ["ZORGE", "Zorge", "Be friendely unto me"],
-    ["LAP", "lap", "for"],
-    ["ZIRDO", "zirdo", "I am"],
-    ["NOCO", "noco", "the servant"],
-    ["MAD", "Mad", "of the same your God"],
-    ["HOATH", "Hoath", "the true worshipper"],
-    ["IAIDA", "Iaida.", "of the Highest."],
-  ],
-  [
-    // 12
-    ["", "", "O you"],
-    ["", "", "that"],
-    ["", "", "rayne"],
-    ["", "", "in the sowth"],
-    ["", "", "and"],
-    ["", "", "are"],
-    ["", "", ":28:"],
-    ["", "", "the lanterns"],
-    ["", "", "of sorrow"],
-    ["", "", "bynde up"],
-    ["", "", "your girdles"],
-    ["", "", "and"],
-    ["", "", "viset us"],
-    ["", "", "Bring down"],
-    ["", "", "your trayn"],
-    ["", "", "3663"],
-    ["", "", "that"],
-    ["", "", "the Lord"],
-    ["", "", "may be magnified"],
-    ["", "", "whose"],
-    ["", "", "name"],
-    ["", "", "amongst you"],
-    ["", "", "is"],
-    ["", "", "Wrath"],
-    ["ZACAR", "ZACARe", "Move,"],
-    ["GOHUS", "gohus", "I say,"],
-    ["OD", "od", "and"],
-    ["ZAMRAN", "ZAMRAN,", "shew yourselves"],
-    ["ODO", "odo", "open"],
-    ["CICLE", "cicle", "the mysteries"],
-    ["QAA", "Qáa", "of your Creation"],
-    ["ZORGE", "Zorge,", "be friendly unto me"],
-    ["LAP", "Lap", "for"],
-    ["ZIRDO", "zirdo", "I am"],
-    ["NOCO", "noco", "the servant"],
-    ["MAD", "MAD", "of the same your God,"],
-    ["HOATH", "Hoath", "the true worshipper"],
-    ["IAIDA", "Iaida.", "of the Highest."],
-  ],
-  [
-    // 13
-    ["", "", "Oh you swords"],
-    ["", "", "of the sowth"],
-    ["", "", "which"],
-    ["", "", "have"],
-    ["", "", "42"],
-    ["", "", "eyes"],
-    ["", "", "to styr up"],
-    ["", "", "wrath"],
-    ["", "", "of synn"],
-    ["", "", "making"],
-    ["", "", "men"],
-    ["", "", "drunken"],
-    ["", "", "which"],
-    ["", "", "are"],
-    ["", "", "empty:"],
-    ["", "", "Behold"],
-    ["", "", "the promise"],
-    ["", "", "of God"],
-    ["", "", "and"],
-    ["", "", "his powre"],
-    ["", "", ""],
-    ["", "", "which"],
-    ["", "", "is called"],
-    ["", "", "amongst you"],
-    ["", "", "A bitter sting:"],
-    ["ZACAR", "ZACAR", "Move"],
-    ["OD", "od", "and"],
-    ["ZAMRAN", "ZAMRAN,", "shew yourselves"],
-    ["ODO", "odo", "Open"],
-    ["CICLE", "cicle", "the mysteries"],
-    ["QAA", "Qäa", "of your Creation"],
-    ["ZORGE", "Zorge,", "Be friendly unto me:"],
-    ["LAP", "Lap", "for"],
-    ["ZIRDO", "zirdo", "I am"],
-    ["NOCO", "Noco", "the servant"],
-    ["MAD", "MAD,", "of the same your God"],
-    ["HOATH", "Hoath", "The true worshipper"],
-    ["IAIDA", "Iaida.", "of the Highest"],
-  ],
-  [
-    // 14
-    ["", "", "O you sonns"],
-    ["", "", "of fury"],
-    ["", "", "the dowghters"],
-    ["", "", "of the Just"],
-    ["", "", "which"],
-    ["", "", "sit"],
-    ["", "", "upon"],
-    ["", "", "24"],
-    ["", "", "seats"],
-    ["", "", "vexing"],
-    ["", "", "all"],
-    ["", "", "creatures"],
-    ["", "", "of the earth"],
-    ["", "", "with age"],
-    ["", "", "which"],
-    ["", "", "have"],
-    ["", "", "under you"],
-    ["", "", "1636"],
-    ["", "", "Behold"],
-    ["", "", "the voyce"],
-    ["", "", "of God"],
-    ["", "", "promys"],
-    ["", "", "of him"],
-    ["", "", "which"],
-    ["", "", "is called"],
-    ["", "", "amongst you"],
-    ["", "", "Furye, or Extreme Justice"],
-    ["ZACAR", "ZACAR", "Move"],
-    ["OD", "od", "and"],
-    ["ZAMRAN", "ZAMRAN", "shew yourselves"],
-    ["ODO", "odo", "open"],
-    ["CICLE", "cicle", "the mysteries"],
-    ["QAA", "Qäa", "of your Creation"],
-    ["ZORGE", "Zorge,", "Be friendly unto me"],
-    ["LAP", "Lap", "for"],
-    ["ZIRDO", "zirdo", "I am"],
-    ["NOCO", "Noco", "the servant"],
-    ["MAD", "MAD,", "of the same your God"],
-    ["HOATH", "hoath", "the true worshipper"],
-    ["IAIDA", "Iaida.", "of the Highest."],
-  ],
-  [
-    // 15
-    ["", "", "O thow"],
-    ["", "", "the governor"],
-    ["", "", "of the first"],
-    ["", "", "flame"],
-    ["", "", "under whose"],
-    ["", "", "wyngs"],
-    ["", "", "are"],
-    ["", "", "6739"],
-    ["", "", "which"],
-    ["", "", "weave"],
-    ["", "", "the earth"],
-    ["", "", "with drynes"],
-    ["", "", "which"],
-    ["", "", "knowest"],
-    ["", "", "of the great name"],
-    ["", "", "Righteousnes"],
-    ["", "", "and"],
-    ["", "", "the seale"],
-    ["", "", "of Honor"],
-    ["ZACAR", "ZACAR", "Move"],
-    ["OD", "od", "and"],
-    ["ZAMRAN", "ZAMRAN,", "shew yourselves"],
-    ["ODO", "odo", "open"],
-    ["CICLE", "cicle", "the mysteries"],
-    ["QAA", "Qäa", "of your Creation"],
-    ["ZORGE", "zorge,", "Be friendely unto me"],
-    ["LAP", "Lap", "for"],
-    ["ZIRDO", "zirdo", "I am"],
-    ["NOCO", "Noco", "the servant"],
-    ["MAD", "MAD,", "of the same your God"],
-    ["HOATH", "hoath", "the true worshipper"],
-    ["IAIDA", "Iaida.", "of the Highest."],
-  ],
-  [
-    // 16
-    ["", "", "Oh thow"],
-    ["", "", "second"],
-    ["", "", "flame"],
-    ["", "", "the house"],
-    ["", "", "of Justice"],
-    ["", "", "which"],
-    ["", "", "hast"],
-    ["", "", "thy beginning"],
-    ["", "", "in glory:"],
-    ["", "", "and"],
-    ["", "", "shalt comfort"],
-    ["", "", "the iust:"],
-    ["", "", "which"],
-    ["", "", "walkest"],
-    ["", "", "on the earth"],
-    ["", "", "with feete"],
-    ["", "", "876"],
-    ["", "", "that"],
-    ["", "", "understand"],
-    ["", "", "and"],
-    ["", "", "separate"],
-    ["", "", "creatures:"],
-    ["", "", "great"],
-    ["", "", "art"],
-    ["", "", "thow"],
-    ["", "", "in the God of stretch-forth-and-conquer."],
-    ["ZACAR", "ZACAR", "Move"],
-    ["OD", "od", "and"],
-    ["ZAMRAN", "ZAMRAN", "shew yourselves"],
-    ["ODO", "odo", "Open"],
-    ["CICLE", "cicle", "the mysteries"],
-    ["QAA", "Qäa", "of your Creation"],
-    ["ZORGE", "zorge,", "Be friendly unto me"],
-    ["LAP", "Lap", "for"],
-    ["ZIRDO", "zirdo", "I am"],
-    ["NOCO", "Noco", "the servant"],
-    ["MAD", "Mad", "of the same your God"],
-    ["HOATH", "hoath", "the true worshipper"],
-    ["IAIDA", "Iaida.", "of the Highest."],
-  ],
-  [
-    // 17
-    ["", "", "O thow"],
-    ["", "", "third"],
-    ["", "", "flame"],
-    ["", "", "whose"],
-    ["", "", "wyngs"],
-    ["", "", "are"],
-    ["", "", "thorns"],
-    ["", "", "to styr up"],
-    ["", "", "vexation:"],
-    ["", "", "and"],
-    ["", "", "hast"],
-    ["", "", "7336"],
-    ["", "", "lamps living"],
-    ["", "", "going"],
-    ["", "", "before the"],
-    ["", "", "whose"],
-    ["", "", "God"],
-    ["", "", "is"],
-    ["", "", "Wrath in Angre"],
-    ["", "", "Gyrd up"],
-    ["", "", "thy loynes"],
-    ["", "", "and"],
-    ["", "", "harken"],
-    ["ZACAR", "ZACAR", "Move"],
-    ["OD", "od", "and"],
-    ["ZAMRAN", "ZAMRAN", "shew yourselves"],
-    ["ODO", "odo", "Open"],
-    ["CICLE", "cicle", "the mysteries"],
-    ["QAA", "Qäa", "of your Creation"],
-    ["ZORGE", "zorge,", "Be friendely unto me"],
-    ["LAP", "Lap", "for"],
-    ["ZIRDO", "zirdo", "I am"],
-    ["NOCO", "Noco", "the servant"],
-    ["MAD", "Mad", "of the same your God"],
-    ["HOATH", "hoath", "the true worshipper"],
-    ["IAIDA", "Iaida", "of the Highest."],
-  ],
-  [
-    // 18
-    ["", "", "O thow"],
-    ["", "", "mighty"],
-    ["", "", "light"],
-    ["", "", "and"],
-    ["", "", "burning flame"],
-    ["", "", "of comfort"],
-    ["", "", "which"],
-    ["", "", "openest"],
-    ["", "", "the glory"],
-    ["", "", "of God"],
-    ["", "", "to the center"],
-    ["", "", "of the erth"],
-    ["", "", "In whome"],
-    ["", "", "the secrets of truth"],
-    ["", "", "6332"],
-    ["", "", "have"],
-    ["", "", "their abiding"],
-    ["", "", "which"],
-    ["", "", "is called"],
-    ["", "", "in thy Kingdome"],
-    ["", "", "IOYE"],
-    ["", "", "and"],
-    ["", "", "not to be measured"],
-    ["", "", "Be thow"],
-    ["", "", "a wyndow"],
-    ["", "", "of comfort"],
-    ["", "", "vnto me."],
-    ["ZACAR", "ZACAR", "Move"],
-    ["OD", "od", "and"],
-    ["ZAMRAN", "ZAMRAN", "shew yourselves"],
-    ["ODO", "odo", "Open"],
-    ["CICLE", "cicle", "the mysteries"],
-    ["QAA", "Qäa", "of your Creation"],
-    ["ZORGE", "zorge", "Be friendely unto me"],
-    ["LAP", "Lap", "for"],
-    ["ZIRDO", "zirdo", "I am"],
-    ["NOCO", "Noco", "the servant"],
-    ["MAD", "MAD", "of the same your God"],
-    ["HOATH", "Hoath", "the true worshipper"],
-    ["IAIDA", "Iaida.", "of the Highest."],
-  ],
-];
+import parsed from "../../dist/enochian/keys.js";
+import tabletNotes, { type TabletWork } from "./TabletNotes.ts";
 
+/**
+ * The Enochian Keys (plan 073), one row per word as Dee received it, from
+ * `keys.json5`. A row holds each work's reading of the word (`readings`),
+ * and a version is a rule over them (`keyVersion`), as the tablets have
+ * it: Dee's (`dee`, the default, since the English is Dee's) and the
+ * Golden Dawn's (`gd`). Key 19, the Call of the Thirty Aethyrs, marks the
+ * rows that change with the Aethyr as slots, and `aethyrCall` fills them.
+ * Each Key says what was checked against what (`checked`), for the page
+ * and the README to read rather than restate.
+ */
+
+/**
+ * The works the Keys cite. All but `legacy2023` are in the registry
+ * `magick-data/enochian/tabletNotes` keeps; `legacy2023` is the text the
+ * Keys had from 2023, whose source is not known, and goes once every Key
+ * is re-derived.
+ */
+export type KeyWorkId =
+  | "casaubon1659"
+  | "equinox1912no8"
+  | "equinox1911no5"
+  | "sloane3191"
+  | "legacy2023";
+
+/** What a source was read for: Dee's word, its English, the GD's form. */
+export type KeyField = "enochian" | "english" | "gd";
+
+/** A place in a work: a printed page and the scan's leaf. */
+export interface KeySource {
+  work: KeyWorkId;
+  page?: number;
+  leaf?: number;
+  /** What was read there, when it is not everything the row holds. */
+  field?: KeyField;
+}
+
+/** What Casaubon prints for one of Dee's words. */
+export interface CasaubonReading {
+  /** Dee's word, forward, in capitals: what the dictionary is searched by. */
+  word: string;
+  /** The word as dictated, where that differs (Keys 1 to 4, backwards). */
+  dictated?: string;
+  /** Casaubon's pronunciation column, as printed, accents and all. */
+  pronunciation?: string;
+  /** The capitals as printed where they differ from `word`: damage, a stray mark. */
+  printed?: string;
+}
+
+/**
+ * How a Golden Dawn form stands to Dee's words: `joined`, part of the
+ * form on an earlier row; `split`, one Dee word printed as several;
+ * `absent`, left out; `overlap`, sharing sounds with the word before it
+ * ("das iod" for DSI OD), whose row has the form.
+ */
+export type GdMarker = "joined" | "split" | "absent" | "overlap";
+
+/** The Golden Dawn's form for one of Dee's words (Equinox I(8)). */
+export interface GdReading {
+  word?: string;
+  marker?: GdMarker;
+}
+
+/** A word of the 2023 text, for a Key not yet re-derived. */
+export interface LegacyReading {
+  word: string;
+}
+
+/** Each work's reading of a word. */
+export interface KeyReadings {
+  casaubon1659?: CasaubonReading;
+  equinox1912no8?: GdReading;
+  sloane3191?: { word: string };
+  legacy2023?: LegacyReading;
+}
+
+/** A row of Key 19 that changes with the Aethyr. */
+export type KeySlot = "aethyr" | "idoigo";
+
+/** One of Dee's words, and its English. */
+export interface KeyRow {
+  /**
+   * Dee's English for the word, as Casaubon prints it. On Key 19 it may
+   * hold `{ordinal}`, the Aethyr's ordinal ("first").
+   */
+  english: string;
+  /** The English was split from running text by us (plan 073, decision 4). */
+  englishSplit?: true;
+  readings: KeyReadings;
+  /** Crowley's English, where it differs in substance. */
+  gdEnglish?: string;
+  /** Where the row is printed. */
+  sources?: readonly KeySource[];
+  /** The reading is doubtful: a damaged print, a guessed letter. */
+  uncertain?: true;
+  /**
+   * A word given but not spoken, so no source prints it: Key 1's two words
+   * that Nalvage "hummed" (Casaubon p. 84). Its English and place are
+   * ours, and its note says so.
+   */
+  unspoken?: true;
+  /**
+   * Casaubon's print lost the word (Keys 14 and 15, and 16's first twelve
+   * words): the row has no `casaubon1659` reading, only the Equinox's
+   * form, which Dee's version then shows as Crowley's (`from`). Its note
+   * says so.
+   */
+  notInCasaubon?: true;
+  /** What the 2023 text had, where this row corrects it. */
+  was?: string;
+  note?: string;
+  /** A note on the Golden Dawn's form. */
+  gdNote?: string;
+  slot?: KeySlot;
+}
+
+/** What a Key was checked against, and what not (plan 073, decision 8). */
+export interface KeyChecked {
+  /** When, as YYYY-MM-DD; none for a Key not re-derived. */
+  date?: string;
+  works: readonly KeyWorkId[];
+  covered: readonly KeyField[];
+  /** What was not checked, in words. */
+  notCovered: readonly string[];
+}
+
+/** One Key. */
 export interface EnochianKey {
   key: number;
-  subkeys: EnochianSubkey[];
+  /** Casaubon's number for the Call, in the order received (Key 18 is his 14). */
+  casaubonCall?: number;
+  /** The date it was dictated, as printed. */
+  dictated?: string;
+  note?: string;
+  /** The works and pages the Key is read from. */
+  sources: readonly KeySource[];
+  checked: KeyChecked;
+  rows: readonly KeyRow[];
 }
-export interface EnochianSubkey {
-  subkey: number;
-  enochianLatin: string;
-  enochianTransliteration: string;
-  english: string;
+
+/** The name of an Aethyr in each work that gives it. */
+export interface AethyrReadings {
+  /** The list after the Call, p. 209, as printed ("Lil"): Dee's spelling. */
+  casaubon1659?: string;
+  /** Crowley's table, The Equinox I(8), p. 125. */
+  equinox1912no8: string;
+  /** The chapter headings of "The Vision and the Voice", The Equinox I(5). */
+  equinox1911no5?: string;
+  /** Dee's own copy, when its images can be read again. */
+  sloane3191?: string;
 }
 
-// eslint-disable-next-line no-sparse-arrays
-const output: EnochianKey[] = [{ key: 0, subkeys: [] }];
-keys.forEach((key, keyNo) => {
-  if (keyNo === 0) return;
+/** One of the thirty Aethyrs. */
+export interface Aethyr {
+  /** 1 (LIL) to 30 (TEX). */
+  n: number;
+  readings: AethyrReadings;
+  note?: string;
+  sources: readonly KeySource[];
+}
 
-  // eslint-disable-next-line no-sparse-arrays
-  const keyObj: EnochianKey = {
-    key: keyNo,
-    subkeys: [
-      {
-        subkey: 0,
-        enochianLatin: "",
-        enochianTransliteration: "",
-        english: "",
-      },
-    ],
-  };
-  output.push(keyObj);
+/** What `keys.json5` holds. */
+export interface KeysData {
+  keys: readonly EnochianKey[];
+  aethyrs: readonly Aethyr[];
+}
 
-  key.forEach((subkey, subkeyArrayIndex) => {
-    keyObj.subkeys.push({
-      subkey: subkeyArrayIndex + 1,
-      enochianLatin: subkey[0],
-      enochianTransliteration: subkey[1],
-      english: subkey[2],
-    });
+/** Freezes a value and everything in it. */
+function deepFreeze<T>(value: T): T {
+  if (value && typeof value === "object" && !Object.isFrozen(value)) {
+    Object.freeze(value);
+    for (const each of Object.values(value)) deepFreeze(each);
+  }
+  return value;
+}
+
+const data: KeysData = deepFreeze(parsed as KeysData);
+
+/** The Keys there are, in order. */
+const keys: readonly EnochianKey[] = data.keys;
+
+/** The thirty Aethyrs, or none while Key 19 is not in the data. */
+export const aethyrs: readonly Aethyr[] = data.aethyrs;
+
+/** The versions, each a rule over the readings (`keyVersion`). */
+export const KEY_VERSIONS: readonly ["dee", "gd"] = Object.freeze([
+  "dee",
+  "gd",
+] as const);
+
+/** A version of the Keys. */
+export type KeyVersionId = (typeof KEY_VERSIONS)[number];
+
+/** Dee's, since the English is his. */
+export const DEFAULT_KEY_VERSION: KeyVersionId = "dee";
+
+/** One version's rule. */
+export interface KeyVersionRule {
+  /** The readings a word is taken from: the first one a row has. */
+  readings: readonly (keyof KeyReadings)[];
+}
+
+/**
+ * Each version as a rule. `dee` takes Dee's own copy when it can be read,
+ * then Casaubon's print, then the 2023 text, and last the Equinox's form,
+ * for a word Casaubon's print lost; `gd` the Equinox's form. Both give
+ * Dee's English (plan 073, decision 3), and a word is always looked up by
+ * Dee's spelling, or by Crowley's form where that is all there is.
+ */
+export const KEY_VERSION_RULES: Readonly<Record<KeyVersionId, KeyVersionRule>> =
+  deepFreeze({
+    dee: {
+      readings: ["sloane3191", "casaubon1659", "legacy2023", "equinox1912no8"],
+    },
+    gd: { readings: ["equinox1912no8"] },
   });
-});
 
-export default output;
+/** A Key's word in a version. */
+export interface KeyWord {
+  /** Its row, from 1. Rows renumber freely; nothing should keep these. */
+  row: number;
+  /** The word, or `null`: joined to an earlier one, absent, or not read. */
+  word: string | null;
+  marker?: GdMarker;
+  /** Dee's word, which the dictionary is searched by, whatever the version. */
+  lookup: string | null;
+  english: string;
+  /** The work `word` comes from, where it is not the version's own. */
+  from?: KeyWorkId;
+  uncertain?: true;
+  /** Given but not spoken, so no word is printed (`KeyRow.unspoken`). */
+  unspoken?: true;
+  note?: string;
+  slot?: KeySlot;
+}
+
+const UNITS = [
+  "first",
+  "second",
+  "third",
+  "fourth",
+  "fifth",
+  "sixth",
+  "seventh",
+  "eighth",
+  "ninth",
+];
+
+/** The English ordinals of the thirty Aethyrs, for Key 19's English. */
+export const AETHYR_ORDINALS: readonly string[] = Object.freeze([
+  ...UNITS,
+  "tenth",
+  "eleventh",
+  "twelfth",
+  "thirteenth",
+  "fourteenth",
+  "fifteenth",
+  "sixteenth",
+  "seventeenth",
+  "eighteenth",
+  "nineteenth",
+  "twentieth",
+  ...UNITS.map((unit) => `twenty-${unit}`),
+  "thirtieth",
+]);
+
+/**
+ * A Golden Dawn form as a word to look up: in capitals, without the
+ * hyphens and spaces Crowley prints to show its sounding.
+ */
+function lookupOf(form: string): string {
+  return form.toUpperCase().replace(/[-\s]/g, "");
+}
+
+/** Dee's word for a row: the first reading the `dee` rule finds. */
+function deeWord(
+  row: KeyRow,
+): { word: string; lookup: string; from?: KeyWorkId } | undefined {
+  for (const work of KEY_VERSION_RULES.dee.readings) {
+    const word = row.readings[work]?.word;
+    if (!word) continue;
+    // Crowley's form stands in only for a word Casaubon's print lost.
+    return work === "equinox1912no8"
+      ? { word, lookup: lookupOf(word), from: work }
+      : { word, lookup: word };
+  }
+  return undefined;
+}
+
+/** A Key, by its number. */
+export function keyByNumber(n: number): EnochianKey | undefined {
+  return keys.find((key) => key.key === n);
+}
+
+/**
+ * Whether a Key has a reading in a version. Every Key has Dee's, since its
+ * rows are his words, even where the 2023 text gives only their English.
+ * A Key has the Golden Dawn's when a row Casaubon prints has the
+ * Equinox's form: the forms that stand in for words his print lost do not
+ * make a version on their own.
+ */
+export function hasVersion(key: EnochianKey, version: string): boolean {
+  if (!(KEY_VERSIONS as readonly string[]).includes(version)) return false;
+  if (version === "dee") return true;
+  const rule = KEY_VERSION_RULES[version as KeyVersionId];
+  return key.rows.some(
+    (row) =>
+      !row.notInCasaubon &&
+      rule.readings.some((work) => row.readings[work] !== undefined),
+  );
+}
+
+/** Whether any of the given Keys has the Golden Dawn's reading. */
+export function hasGdReadings(from: readonly EnochianKey[] = keys): boolean {
+  return from.some((key) => hasVersion(key, "gd"));
+}
+
+/**
+ * A Key's words in a version, or `undefined` for a version it has no
+ * reading in, or one not in `KEY_VERSIONS`. The rules:
+ *
+ * - **`dee`**: the first of Sloane MS 3191, Casaubon and the 2023 text
+ *   the row has, or for a word Casaubon's print lost the Equinox's form,
+ *   with `from` and looked up without its hyphens and spaces.
+ * - **`gd`**: the Equinox's form; `null` where Crowley joins the word to
+ *   an earlier one, leaves it out or overlaps it, with the `marker`.
+ *
+ * Both give Dee's English, and the Golden Dawn's notes in `gd`. On Key 19
+ * the Aethyr's slot takes its name (1 to 30, LIL by default): Dee's
+ * spelling in `dee` (Sloane MS 3191's, else Casaubon's list, in capitals
+ * as Dee's words are; Crowley's with `from` where neither has it), the
+ * Equinox's in `gd`; and `{ordinal}` in the English becomes the Aethyr's.
+ * IDOIGO's slot is marked but stays as it is: Crowley says the name may
+ * be varied with the Aethyr and gives no word to vary it to. `table` is
+ * the Aethyrs to take the names from.
+ */
+export function keyVersion(
+  key: EnochianKey,
+  version: string = DEFAULT_KEY_VERSION,
+  aethyr = 1,
+  table: readonly Aethyr[] = aethyrs,
+): readonly KeyWord[] | undefined {
+  if (!hasVersion(key, version)) return undefined;
+  const id = version as KeyVersionId;
+  const theAethyr = table.find((one) => one.n === aethyr);
+  const ordinal = AETHYR_ORDINALS[aethyr - 1] ?? "";
+  return key.rows.map((row, index) => {
+    const dee = deeWord(row);
+    const out: KeyWord = {
+      row: index + 1,
+      word: dee?.word ?? null,
+      lookup: dee?.lookup ?? null,
+      english: row.english.replaceAll("{ordinal}", ordinal),
+    };
+    if (id === "dee" && dee?.from) out.from = dee.from;
+    if (id === "gd") {
+      const gd = row.readings.equinox1912no8;
+      const shown = !gd?.marker || gd.marker === "split";
+      out.word = shown ? (gd?.word ?? null) : null;
+      if (gd?.marker) out.marker = gd.marker;
+    }
+    if (row.uncertain) out.uncertain = true;
+    if (row.unspoken) out.unspoken = true;
+    const note = id === "gd" && row.gdNote ? row.gdNote : row.note;
+    if (note) out.note = note;
+    if (row.slot) {
+      out.slot = row.slot;
+      if (theAethyr) substitute(out, row.slot, id, theAethyr);
+    }
+    return out;
+  });
+}
+
+/**
+ * Fills Key 19's Aethyr slot, in place; IDOIGO's has nothing to fill.
+ *
+ * In the Golden Dawn's version a slot whose row Crowley joins to an
+ * earlier word, leaves out or runs into the one before keeps that: it
+ * shows no word and keeps its marker, and only its lookup takes the
+ * Aethyr's. A shown slot takes the name as one word, so a `split` marker,
+ * which described the first Aethyr's form, is dropped.
+ */
+function substitute(
+  word: KeyWord,
+  slot: KeySlot,
+  version: KeyVersionId,
+  aethyr: Aethyr,
+) {
+  if (slot !== "aethyr") return;
+  const { readings } = aethyr;
+  const dee = readings.sloane3191 ?? readings.casaubon1659;
+  // Looked up by Dee's spelling in either version, as every word is.
+  const lookup = (dee ?? readings.equinox1912no8).toUpperCase();
+  if (version === "dee") {
+    // The row is Dee's word for the first Aethyr.
+    if (aethyr.n === 1 && word.word && !word.from) return;
+    word.word = lookup;
+    word.lookup = lookup;
+    if (dee) delete word.from;
+    else word.from = "equinox1912no8";
+    return;
+  }
+  word.lookup = lookup;
+  if (word.marker && word.marker !== "split") return;
+  word.word = readings.equinox1912no8;
+  delete word.marker;
+}
+
+/**
+ * The Call of Aethyr n (1 to 30) in a version: Key 19 with its slots
+ * filled, or `undefined` without Key 19 or for no such Aethyr.
+ */
+export function aethyrCall(
+  n: number,
+  version: string = DEFAULT_KEY_VERSION,
+): readonly KeyWord[] | undefined {
+  const key = keyByNumber(19);
+  if (!key || !aethyrs.some((aethyr) => aethyr.n === n)) return undefined;
+  return keyVersion(key, version, n);
+}
+
+/** A Key's title: "Key 4", and Key 19 by what it is. */
+export function keyTitle(key: EnochianKey): string {
+  return key.key === 19
+    ? "Key 19: the Call of the Thirty Aethyrs"
+    : `Key ${key.key}`;
+}
+
+/** The 2023 text, which is in no registry: it has no source to cite. */
+const LEGACY_WORK: TabletWork = {
+  title: "The 2023 text of the Keys, whose source is not known",
+  year: 2023,
+};
+
+/** A work the Keys cite, from the registry the tablets' notes keep. */
+export function keyWork(id: KeyWorkId): TabletWork {
+  return id === "legacy2023" ? LEGACY_WORK : tabletNotes.works[id];
+}
+
+/** Short names for the works, for a line of text. */
+const SHORT_NAMES: Readonly<Record<KeyWorkId, string>> = {
+  casaubon1659: "Casaubon's print of Dee's journal (1659)",
+  equinox1912no8: "The Equinox I(8) (1912)",
+  equinox1911no5: "The Equinox I(5) (1911)",
+  sloane3191: "Dee's own copy, Sloane MS 3191",
+  legacy2023: "the 2023 text",
+};
+
+const FIELD_NAMES: Readonly<Record<KeyField, string>> = {
+  enochian: "the Enochian",
+  english: "the English",
+  gd: "the Golden Dawn's reading",
+};
+
+const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+/** "a, b and c". */
+function list(items: readonly string[]): string {
+  return items.length < 2
+    ? (items[0] ?? "")
+    : `${items.slice(0, -1).join(", ")} and ${items.at(-1)}`;
+}
+
+/** A YYYY-MM-DD date as "10 November 2026". */
+function longDate(date: string): string {
+  const [year, month, day] = date.split("-").map(Number);
+  return `${day} ${MONTHS[month - 1]} ${year}`;
+}
+
+/**
+ * What a Key's check covered, as a sentence or two for the page:
+ * "Checked on 10 November 2026 against Casaubon's print of Dee's journal
+ * (1659): the Enochian and the English. Not checked: …".
+ */
+export function checkedText(checked: KeyChecked): string {
+  const not = checked.notCovered.length
+    ? ` Not checked: ${list(checked.notCovered)}.`
+    : "";
+  if (!checked.works.length || !checked.covered.length)
+    return `Not yet checked.${not}`;
+  const when = checked.date ? ` on ${longDate(checked.date)}` : "";
+  const works = list(checked.works.map((work) => SHORT_NAMES[work]));
+  const fields = list(checked.covered.map((field) => FIELD_NAMES[field]));
+  return `Checked${when} against ${works}: ${fields}.${not}`;
+}
+
+/** A source as a line of text: "Meric Casaubon … p.109 (archive.org leaf n198)". */
+export function keySourceText(source: KeySource): string {
+  const work = keyWork(source.work);
+  const page = source.page ? `, p.${source.page}` : "";
+  const leaf = source.leaf ? ` (archive.org leaf n${source.leaf})` : "";
+  return `${work.title}${page}${leaf}`;
+}
+
+export default keys;
