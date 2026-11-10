@@ -128,7 +128,7 @@ function MoonWidget({ moonPadding = "10px 0 2px 0" }) {
       : namesLocal.en[moonPhaseName(phaseValue)];
 
   const geo = useGeoIP();
-  const northernHemisphere = !geo || geo.latitude > 0;
+  const northernHemisphere = !geo || geo.latitude >= 0;
 
   return (
     <div

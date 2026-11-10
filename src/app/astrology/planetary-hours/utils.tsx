@@ -1,5 +1,6 @@
-import { differenceInMinutes, format, getDay } from "date-fns";
+import { differenceInMinutes, format } from "date-fns";
 import SunCalc from "suncalc";
+import type { Place } from "@/geo/place";
 
 // Useful Resources:
 // https://plentifulearth.com/calculate-planetary-hours/
@@ -19,7 +20,14 @@ export const chaldean = [
   "luna", // ☽
 ];
 
+/** SunCalc's altitude for sunrise and sunset: -0.833°, for refraction. */
+const HORIZON = (-0.833 * Math.PI) / 180;
+
+/** Where the hours are counted; only the coordinates matter. */
+export type Coordinates = Pick<Place, "latitude" | "longitude">;
+
 interface PlanetaryHour {
+  /** When the hour begins. */
   date: Date;
   planet: string;
 }
@@ -28,87 +36,183 @@ interface PlanetaryHoursMeta {
   sunrise: Date;
   sunset: Date;
   dayHourInMinutes: number;
-  nightHourInMinutes: number;
+  /**
+   * Null when the sun neither rises nor sets the next day (polar night or
+   * midnight sun begins), so the night has no sunrise to end it and no
+   * hours: `hours` then holds the 12 day hours only.
+   */
+  nightHourInMinutes: number | null;
 }
 
-type PlanetaryHours = PlanetaryHour[] & { meta: PlanetaryHoursMeta };
+/**
+ * One solar day's planetary hours at a place, or why it has none.
+ *
+ * `solarDate` is the place's date by the Sun at its longitude, the day the
+ * hours belong to, as midnight on the device's clock: for labelling the day,
+ * not an instant at the place.
+ */
+export type PlanetaryDay =
+  | {
+      kind: "hours";
+      solarDate: Date;
+      hours: PlanetaryHour[];
+      meta: PlanetaryHoursMeta;
+    }
+  /** The sun stays below the horizon all day. */
+  | { kind: "polarNight"; solarDate: Date }
+  /** The sun stays above the horizon all day. */
+  | { kind: "midnightSun"; solarDate: Date };
 
-export function calcPlanetaryHoursForDayAndLocation(date, geo) {
+/**
+ * The place's solar date for the day whose solar noon this is: noon shifted
+ * by the longitude (15° to the hour) reads as about 12:00 in UTC, so its UTC
+ * date is the place's. Noon, not sunrise, so that it exists on polar days and
+ * is never near midnight, whatever the latitude.
+ */
+function solarDateOf(solarNoon: Date, longitude: number) {
+  const shifted = new Date(solarNoon.getTime() + (longitude / 15) * 3_600_000);
+  return {
+    weekday: shifted.getUTCDay(), // 0-6 where 0=Sunday.
+    solarDate: new Date(
+      shifted.getUTCFullYear(),
+      shifted.getUTCMonth(),
+      shifted.getUTCDate(),
+    ),
+  };
+}
+
+function rises(times: { sunrise: Date }) {
+  return !Number.isNaN(times.sunrise.getTime());
+}
+
+/**
+ * The planetary hours of the solar day SunCalc finds nearest `date` at the
+ * place: 12 day hours from sunrise to sunset and 12 night hours from sunset
+ * to the next sunrise, the first ruled by the planet of the day.
+ *
+ * The planet of the day is the weekday of the place's solar date, not the
+ * device's: from London on Monday evening, Tokyo's next sunrise is Tuesday's
+ * and Mars rules it. Inside the polar circles a day may have no sunrise and
+ * sunset (SunCalc gives Invalid Date), which is returned as `polarNight` or
+ * `midnightSun` rather than as hours.
+ */
+export function calcPlanetaryHoursForDayAndLocation(
+  date: Date,
+  geo: Coordinates,
+): PlanetaryDay {
   const solar = SunCalc.getTimes(date, geo.latitude, geo.longitude);
+  const { weekday, solarDate } = solarDateOf(solar.solarNoon, geo.longitude);
+
+  // SunCalc's sunrise and sunset are both found or both not: the sun either
+  // crosses the horizon that day or stays on one side of it.
+  if (!rises(solar)) {
+    const noon = SunCalc.getPosition(
+      solar.solarNoon,
+      geo.latitude,
+      geo.longitude,
+    );
+    return {
+      kind: noon.altitude > HORIZON ? "midnightSun" : "polarNight",
+      solarDate,
+    };
+  }
+
   const nextDay = new Date(date.getTime() + DAY_IN_MS);
   const solarNext = SunCalc.getTimes(nextDay, geo.latitude, geo.longitude);
-  const dayOfWeek = getDay(date); // 0-6 where 0=Sunday.
-  const chaldeanStartPos = chaldean.indexOf(start[dayOfWeek]);
+  const chaldeanStartPos = chaldean.indexOf(start[weekday]);
 
   // Daytime Hours
   const daytimeMinutes = differenceInMinutes(solar.sunset, solar.sunrise);
   const dayHourInMinutes = daytimeMinutes / 12;
 
   // Nighttime Hours
-  const nighttimeMinutes = differenceInMinutes(solarNext.sunrise, solar.sunset);
-  const nightHourInMinutes = nighttimeMinutes / 12;
+  const nightHourInMinutes = rises(solarNext)
+    ? differenceInMinutes(solarNext.sunrise, solar.sunset) / 12
+    : null;
 
-  const hours = new Array(24) as PlanetaryHours;
-
-  hours.meta = {
-    sunrise: solar.sunrise,
-    sunset: solar.sunset,
-    dayHourInMinutes,
-    nightHourInMinutes,
-  };
-
+  const hours: PlanetaryHour[] = [];
   for (let hour = 0; hour < 12; hour++) {
     const minutesSinceSunrise = dayHourInMinutes * hour;
-    hours[hour] = {
+    hours.push({
       date: new Date(solar.sunrise.getTime() + minutesSinceSunrise * 60_000),
       planet: chaldean[(chaldeanStartPos + hour) % 7],
-    };
+    });
   }
 
-  for (let hour = 12; hour < 24; hour++) {
-    const minutesSinceSunset = nightHourInMinutes * (hour - 12);
-    hours[hour] = {
-      date: new Date(solar.sunset.getTime() + minutesSinceSunset * 60_000),
-      planet: chaldean[(chaldeanStartPos + hour) % 7],
-    };
-  }
-
-  return hours;
-}
-
-export function upcomingHoursForPlanetAtLocation(planet, geo) {
-  const now = new Date();
-  const week = [0, 1, 2, 3, 4, 5, 6].map(
-    (d, i) => new Date(now.getTime() + d * DAY_IN_MS),
-  );
-
-  const hours = [] as { from: Date; to: Date }[];
-  for (const date of week) {
-    const dayHours = calcPlanetaryHoursForDayAndLocation(date, geo);
-    for (let i = 0; i < 24; i++) {
-      const entry = dayHours[i];
-      if (entry.planet === planet && now < entry.date) {
-        hours.push({
-          from: entry.date,
-          to: new Date(
-            entry.date.getTime() +
-              (i < 12
-                ? dayHours.meta.dayHourInMinutes
-                : dayHours.meta.nightHourInMinutes) *
-                60_000,
-          ),
-        });
-      }
+  if (nightHourInMinutes !== null) {
+    for (let hour = 12; hour < 24; hour++) {
+      const minutesSinceSunset = nightHourInMinutes * (hour - 12);
+      hours.push({
+        date: new Date(solar.sunset.getTime() + minutesSinceSunset * 60_000),
+        planet: chaldean[(chaldeanStartPos + hour) % 7],
+      });
     }
   }
 
+  return {
+    kind: "hours",
+    solarDate,
+    hours,
+    meta: {
+      sunrise: solar.sunrise,
+      sunset: solar.sunset,
+      dayHourInMinutes,
+      nightHourInMinutes,
+    },
+  };
+}
+
+/**
+ * When the hour at `index` (0-11 by day, 12-23 by night) of a day's hours
+ * ends.
+ */
+export function hourEnd(day: PlanetaryDay & { kind: "hours" }, index: number) {
+  const minutes =
+    index < 12 ? day.meta.dayHourInMinutes : day.meta.nightHourInMinutes;
+  // A night without an end has no hours in `day.hours` to ask about.
+  if (minutes === null) throw new RangeError(`No night hour ${index}`);
+  return new Date(day.hours[index].date.getTime() + minutes * 60_000);
+}
+
+/**
+ * The planet's hours at the place that begin after now, over about a week.
+ *
+ * The solar days are SunCalc's nearest to now and the six after, plus the one
+ * before, whose night may still be running (after solar midnight, the nearest
+ * day is the coming one). Steps of exactly 24 hours land on consecutive solar
+ * days at any longitude, so none repeats or is skipped. Days without hours
+ * (polar night, midnight sun) and nights without an end contribute nothing.
+ */
+export function upcomingHoursForPlanetAtLocation(
+  planet: string,
+  geo: Coordinates,
+) {
+  const now = new Date();
+  const hours = [] as { from: Date; to: Date }[];
+  for (let d = -1; d < 7; d++) {
+    const day = calcPlanetaryHoursForDayAndLocation(
+      new Date(now.getTime() + d * DAY_IN_MS),
+      geo,
+    );
+    if (day.kind !== "hours") continue;
+    day.hours.forEach((entry, i) => {
+      if (entry.planet === planet && now < entry.date) {
+        hours.push({ from: entry.date, to: hourEnd(day, i) });
+      }
+    });
+  }
+
   return hours;
 }
 
-export const formatFromTo = (from, to) =>
+export const formatFromTo = (from: Date, to: Date) =>
   format(from, "ccc LLL do h:mm") + " - " + format(to, "h:mm aaa");
 
-export const UpcomingHours = ({ hours }) => {
+export const UpcomingHours = ({
+  hours,
+}: {
+  hours: { from: Date; to: Date }[];
+}) => {
   return (
     <ul>
       {hours.map(({ from, to }, i) => (

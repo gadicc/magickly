@@ -26,6 +26,8 @@ import OpenSource from "@/OpenSource";
 import {
   calcPlanetaryHoursForDayAndLocation,
   DAY_IN_MS,
+  hourEnd,
+  type PlanetaryDay,
   upcomingHoursForPlanetAtLocation,
 } from "./utils";
 
@@ -44,17 +46,27 @@ const sxNowRow = {
   },
 };
 
-function PlanetaryHoursForDayAndLocation({ date, geo, planet }) {
-  const hours = calcPlanetaryHoursForDayAndLocation(date, geo);
+// What the page says for a day on which the sun does not cross the horizon
+// (inside the polar circles), and under a day whose night has no sunrise to
+// end it.
+const NO_SUNRISE = "The sun does not rise here on this day.";
+const NO_SUNSET = "The sun does not set here on this day.";
+const NO_NIGHT_HOURS =
+  "This night has no hours here, since the sun neither rises nor sets the next day.";
+
+function PlanetaryHoursForDay({
+  day,
+  planet,
+}: {
+  day: PlanetaryDay;
+  planet: string;
+}) {
+  if (day.kind === "polarNight") return <p>{NO_SUNRISE}</p>;
+  if (day.kind === "midnightSun") return <p>{NO_SUNSET}</p>;
+
+  const { hours, meta } = day;
   const now = new Date();
-  function isNow(hour, i) {
-    const hourInMinutes =
-      hours.meta[i < 12 ? "dayHourInMinutes" : "nightHourInMinutes"];
-    return (
-      now > hour.date &&
-      now.getTime() < hour.date.getTime() + hourInMinutes * 60_000
-    );
-  }
+  const isNow = (i: number) => now > hours[i].date && now < hourEnd(day, i);
 
   return (
     <div>
@@ -69,7 +81,7 @@ function PlanetaryHoursForDayAndLocation({ date, geo, planet }) {
                     background:
                       hour.planet === planet ? "#cc5" : i >= 12 ? "#ccc" : "",
                   },
-                  isNow(hour, i) && sxNowRow,
+                  isNow(i) && sxNowRow,
                 ]}
               >
                 <TableCell>{(i % 12) + 1}</TableCell>
@@ -82,9 +94,13 @@ function PlanetaryHoursForDayAndLocation({ date, geo, planet }) {
           </TableBody>
         </Table>
       </TableContainer>
-      <br />1 daytime hour = {hours.meta.dayHourInMinutes.toFixed(2)} minutes
-      <br />1 nighttime hour = {hours.meta.nightHourInMinutes.toFixed(2)}{" "}
-      minutes
+      <br />1 daytime hour = {meta.dayHourInMinutes.toFixed(2)} minutes
+      <br />
+      {meta.nightHourInMinutes === null ? (
+        NO_NIGHT_HOURS
+      ) : (
+        <>1 nighttime hour = {meta.nightHourInMinutes.toFixed(2)} minutes</>
+      )}
       <br />
     </div>
   );
@@ -134,9 +150,13 @@ export default function PlanetaryHours({
 
   if (!geo) return "Loading location...";
 
+  // Steps of exactly 24 hours give consecutive solar days at the place.
   const now = new Date();
-  const week = [0, 1, 2, 3, 4, 5, 6].map(
-    (d, i) => new Date(now.getTime() + d * DAY_IN_MS),
+  const week = [0, 1, 2, 3, 4, 5, 6].map((d) =>
+    calcPlanetaryHoursForDayAndLocation(
+      new Date(now.getTime() + d * DAY_IN_MS),
+      geo,
+    ),
   );
 
   const planetSelect = SELECT_ORDER.map((value) => ({
@@ -179,7 +199,7 @@ export default function PlanetaryHours({
       </FormControl>
       {/* planet && <UpcomingHours hours={upcomingHours} /> */}
       <Box sx={{ mt: 1 }}>
-        {week.map((date, i) => (
+        {week.map((day, i) => (
           <Accordion key={i} defaultExpanded={i === 0}>
             <AccordionSummary
               expandIcon={<ExpandMore />}
@@ -189,14 +209,10 @@ export default function PlanetaryHours({
                 }
               }
             >
-              <Typography>{format(date, "cccc (LLL d)")}</Typography>
+              <Typography>{format(day.solarDate, "cccc (LLL d)")}</Typography>
             </AccordionSummary>
             <AccordionDetails sx={{ pt: 0, m: 0 }}>
-              <PlanetaryHoursForDayAndLocation
-                date={date}
-                geo={geo}
-                planet={planet}
-              />
+              <PlanetaryHoursForDay day={day} planet={planet} />
             </AccordionDetails>
           </Accordion>
         ))}
