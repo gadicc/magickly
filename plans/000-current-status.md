@@ -131,13 +131,11 @@ Follow-ups are separate from the completed migration work:
   Enochian spellings only (`src/app/enochian/dictionary/dictionary.tsx`);
   "enochian translator" is a search target of
   [plan 071](071-on-site-search.md).
-- TODO (Gadi, 10 November 2026): location for the planetary hours, the
-  moon and the geomancy reading from Vercel's request headers instead of
-  get.geojs.io (`src/components/hooks/useGeoIP.ts`), with a place the
-  reader can choose, and no browser permission prompt. Built on
-  `gate/reader-location` ([plan 072](072-reader-location.md)); before
-  release, open a preview's `/api/geo`, and afterwards reinstall
-  `magickli-docs-capture` so it sets `GEO_FIXTURE=1`.
+- Released on 10 November 2026: location for the planetary hours, the
+  moon and the geomancy reading comes from Vercel's request headers
+  through `/api/geo` instead of get.geojs.io, and the reader can choose
+  a place ([plan 072](072-reader-location.md)). Production's
+  `/api/geo` was checked after release.
 - TODO: show a chosen place's hours on that place's own clock, not the
   device's ([plan 072](072-reader-location.md), decision 2).
 - TODO: between the place's solar midnight and sunrise, the planetary

@@ -5,8 +5,10 @@ spiked the same day (see "The spike"); adversarially reviewed (Fable)
 and revised the same day (see "The review"); Gadi answered its two
 questions the same day (decisions 5 and 6). Built the same day on
 `gate/reader-location` from `main` at 44e2f780, every commit gated and
-the branch independently reviewed; see "The build". Awaiting release,
-which needs Gadi to open a preview's `/api/geo` first.
+the branch independently reviewed; see "The build". Released on 10
+November 2026: `main` fast-forwarded to 8f17825c and pushed; Gadi's
+`curl https://magick.ly/api/geo` returned Tel Aviv with
+`Asia/Jerusalem` and `private, no-store` (see "Release").
 
 Gadi's decisions, 10 November 2026 (questions at the end):
 
@@ -460,13 +462,13 @@ console errors were the auth session's 503s, from having no database.
 **Not verified:**
 
 - Real `x-vercel-ip-*` values, and whether Vercel's firewall lets the
-  development proxy reach `magick.ly/api/geo`: Gadi to open a preview's
-  `/api/geo` before release.
+  development proxy reach `magick.ly/api/geo`. The first was checked
+  after release (see "Release"); the second is still open.
 - `navigator.geolocation` in a real browser (the tests mock it), and
   Safari altogether ([no device](000-current-status.md)).
 - The installed `/usr/local/bin/magickli-docs-capture` is a root-owned
-  copy of `capture-worktree.sh` and lacks `GEO_FIXTURE=1` until it is
-  reinstalled; no shot shows these pages today.
+  copy of `capture-worktree.sh` and lacked `GEO_FIXTURE=1` until it was
+  reinstalled at release; no shot shows these pages today.
 
 ## Open questions for Gadi (answered above)
 
@@ -486,8 +488,15 @@ console errors were the auth session's 503s, from having no database.
 
 ## Release
 
-1. Gadi opens a preview deployment's `/api/geo` and checks the place
-   and the time zone look right.
-2. Fast-forward `main` to `gate/reader-location` and deploy.
-3. Reinstall `magickli-docs-capture` from `capture-worktree.sh`, so its
-   dev server gets `GEO_FIXTURE=1`.
+Released on 10 November 2026. Gadi chose to skip the preview check and
+check production instead, accepting that it might not work at first.
+
+1. `main` fast-forwarded to `gate/reader-location` (8f17825c) and
+   pushed by Gadi.
+2. Gadi reinstalled `magickli-docs-capture` from `capture-worktree.sh`,
+   so its dev server gets `GEO_FIXTURE=1`.
+3. `https://magick.ly/api/geo` answered `200` with
+   `cache-control: private, no-store` and a place named Tel Aviv
+   (country `IL`, time zone `Asia/Jerusalem`, coordinates near the
+   city). There was no region, as designed: Vercel gives only an ISO
+   code for it (see "The spike").
