@@ -3,8 +3,10 @@
 Status: agreed with Gadi on 10 November 2026 (decisions below);
 spiked the same day (see "The spike"); adversarially reviewed (Fable)
 and revised the same day (see "The review"); Gadi answered its two
-questions the same day (decisions 5 and 6). Being built on
-`gate/reader-location` from `main` at 44e2f780.
+questions the same day (decisions 5 and 6). Built the same day on
+`gate/reader-location` from `main` at 44e2f780, every commit gated and
+the branch independently reviewed; see "The build". Awaiting release,
+which needs Gadi to open a preview's `/api/geo` first.
 
 Gadi's decisions, 10 November 2026 (questions at the end):
 
@@ -360,6 +362,112 @@ side of the world it does. **Gadi: in this plan (decision 6).**
 - Browser check at 390 and 1280 px with `GEO_FIXTURE=1`.
 - Gadi opens a preview's `/api/geo` before release.
 
+## The build — 10 November 2026
+
+| Commit | What |
+| --- | --- |
+| 0377722b | This plan |
+| f0fd45c5 | The planet of the day from the place's solar date; polar night and midnight sun |
+| 9cb7dbf5 | `/api/geo` from Vercel's headers, the development proxy, `GEO_FIXTURE` |
+| 64acb119 | GeoNames data, its build script, `/api/places` and its search |
+| a01eef09 | `usePlace`, the picker, the three pages, the about page, search embeddings |
+| 72dd15b1 | The day from the place's own calendar (Samoa, Tonga) |
+
+Opus 5.5 subagents built it in parallel where the files allowed: the
+hours, `/api/geo` and the places data at once, then the client half.
+
+**Where the build differs from the plan above:**
+
+- **Solar noon, not sunrise** (finding 1). The place's date is read at
+  solar noon, which exists on polar days and is never near midnight.
+  The day headings show that date, and the upcoming list also counts
+  the night still running after solar midnight, which it missed before.
+- **The date line** (branch review). Even solar noon shifted by the
+  longitude is wrong where a country keeps the far side's date: Apia
+  and Nuku'alofa (UTC+13) had Tuesday's planets on their Wednesday. The
+  day is now the civil date at solar noon in the place's time zone,
+  falling back to the longitude without one; a device position is given
+  the device's zone when saved. Its own commit, since the fix needs the
+  time-zone helpers of the client commit.
+- **Polar transitions.** A day whose next day has no sunrise has day
+  hours only; the page says the night has no hours.
+- **`src/components` imports no app code or MUI**
+  (`src/components/importBoundary.test.ts`, plan 061), so the picker and
+  chooser live in `src/geo/`, and the moon widget takes the latitude as
+  a prop, which the planets page passes.
+- **The picker opens inline** under the place line rather than in a
+  dialog: at phone width the keyboard and the suggestions share the
+  page's scrolling. It returns focus to its button after a choice and
+  has its own polite status line, since MUI's lives inside the popup.
+- **Search** also knows "uk", "usa" and "uae", and a first-level
+  region's letter code ("paris, tx", "washington, dc"; Canada's codes
+  are numbers, so "london, on" works through "Ontario"). GeoNames' junk
+  alternates beginning "xx" are dropped. Format 2; the file is
+  1,650,444 bytes, SHA-256 `0cf7fb15…748870fd`, and rebuilds
+  byte-identical.
+- **The fixture** lives in `src/geo/fixture.ts`: a Next route module may
+  export only handlers, and the first build of 9cb7dbf5 failed on it.
+- **Site search.** The about page's credit and privacy lines are page
+  prose, so site search's catalogue changed and its semantic index
+  would have switched itself off (`src/search/semantic.test.ts` fails
+  until republished). Gadi chose to have `pnpm search:publish
+  gemini-embedding-2-768-search-v1` run here with the main checkout's
+  environment; two runs embedded 5 passages (859 tokens), the rest from
+  the cache, and the about change moved into a01eef09 so only one
+  commit changes the catalogue.
+
+**The branch review** (a fresh Opus 5.5 agent, reasoning high, on the
+whole branch): one major, the date line above, reproduced here before
+fixing; and minor findings, all fixed: a late device position replacing
+a place chosen meanwhile, lost focus, no announcements, flicker while
+typing, no retry when back online, a dead `onInputChange` guard, the
+about page not saying searches reach our server, a magic "Your area",
+and the search quality items above.
+
+**Gates** (clean worktree on /home, Node 24, CI's placeholder
+environment: frozen install, `loom init` with no diff, `loom check` and
+`--production`, `pnpm check`, typecheck, `test:coverage`, `build`; the
+tip also the magick-data smoke test and the Turbopack build). Machine
+load from other sessions ran at 17–31 for much of the day, and
+`test:coverage` failed only on timing tests outside this change, each
+passing on a re-run:
+
+| Commit | Result |
+| --- | --- |
+| 0377722b | All pass |
+| f0fd45c5 | All pass but coverage: 2 timeouts (`TrainingUpload`, `sqlLegacyImport`); coverage re-run: 3 timeouts (`ritualPug`, `sqlLegacyImport`, `TrainingUpload`); third run, quieter: pass |
+| 9cb7dbf5 | All pass (its first version failed `build` on the route's extra export, see above) |
+| 64acb119 | All pass but coverage: 1 focus-timing failure (`SearchDialog`); re-run: pass |
+| a01eef09 | All pass |
+| 72dd15b1 | All pass, smoke and Turbopack too |
+
+**Browser check** (headless Chromium over CDP at 390×844 and 1280×900,
+the Browser pane being hidden; dev server on 127.0.0.1 with CI's
+placeholder environment): with `GEO_FIXTURE=1` the hours page shows
+"London, England, United Kingdom" with the time-zone note on a device in
+Asia/Jerusalem; "kiev" offers Kyiv, choosing it saves it with
+Europe/Kyiv, returns focus to "Change place", drops the note (same
+offset) and stops calling `/api/geo`; "springfield, il" offers
+Illinois; the open picker shows "Use my precise location" and the
+GeoNames credit; the geomancy reading says "Planetary Hour for Luna in
+London" with "Change place"; no sideways scroll at either width.
+Without the fixture the dev server asks production, which has no
+`/api/geo` yet, and the page says the location couldn't be found with
+the picker open. `/api/geo` answers `private, no-store` and
+`/api/places` `public, max-age=86400, s-maxage=604800`. The only
+console errors were the auth session's 503s, from having no database.
+
+**Not verified:**
+
+- Real `x-vercel-ip-*` values, and whether Vercel's firewall lets the
+  development proxy reach `magick.ly/api/geo`: Gadi to open a preview's
+  `/api/geo` before release.
+- `navigator.geolocation` in a real browser (the tests mock it), and
+  Safari altogether ([no device](000-current-status.md)).
+- The installed `/usr/local/bin/magickli-docs-capture` is a root-owned
+  copy of `capture-worktree.sh` and lacks `GEO_FIXTURE=1` until it is
+  reinstalled; no shot shows these pages today.
+
 ## Open questions for Gadi (answered above)
 
 1. **Place search: A (GeoNames, our route) or B (Open-Meteo)?**
@@ -376,9 +484,10 @@ side of the world it does. **Gadi: in this plan (decision 6).**
    picker?
 4. **Precise location button:** include now (recommended) or later?
 
-## Next steps
+## Release
 
-Commit this plan on `gate/reader-location` to claim
-072, then build there with Opus subagents (medium; high for the store
-and the picker), each commit gated, an independent review of the
-branch, and the browser check.
+1. Gadi opens a preview deployment's `/api/geo` and checks the place
+   and the time zone look right.
+2. Fast-forward `main` to `gate/reader-location` and deploy.
+3. Reinstall `magickli-docs-capture` from `capture-worktree.sh`, so its
+   dev server gets `GEO_FIXTURE=1`.
