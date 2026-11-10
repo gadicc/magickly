@@ -68,6 +68,23 @@ describe("English (plan 074, decision 5)", () => {
     expect(go.mentions).toEqual([]);
   });
 
+  it("keeps short words apart that only a final e divides", () => {
+    for (const [a, b] of [
+      ["note", "not"],
+      ["made", "mad"],
+      ["wine", "win"],
+      ["here", "her"],
+    ])
+      expect(stem(a)).not.toBe(stem(b));
+    expect(
+      search("note").means.some((hit) => /^not\b/i.test(hit.meaning ?? "")),
+    ).toBe(false);
+  });
+
+  it("counts a word typed twice once", () => {
+    expect(keysOf(search("light light").means)).toEqual(["OLPIRT", "OLPRT"]);
+  });
+
   it("never matches inside a word", () => {
     expect(
       search("light").mentions.some((hit) =>
@@ -158,7 +175,7 @@ describe("helpers", () => {
     expect(words("GOD'S Light, (the)")).toEqual(["god", "light", "the"]);
     expect(stem("angels")).toBe(stem("angel"));
     expect(stem("glories")).toBe(stem("glory"));
-    expect(stem("loving")).toBe(stem("love"));
+    expect(stem("dwelling")).toBe(stem("dwell"));
     expect(stem("god")).toBe("god");
     expect(stem("go")).toBe("go");
   });
@@ -188,5 +205,13 @@ describe("helpers", () => {
       { text: "delight", match: false },
     ]);
     expect(highlight("as is", [])).toEqual([{ text: "as is", match: false }]);
+    expect(
+      highlight("Son of Light", ["son", "of", "light"]).filter(
+        (one) => one.match,
+      ),
+    ).toEqual([
+      { text: "Son", match: true },
+      { text: "Light", match: true },
+    ]);
   });
 });

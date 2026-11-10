@@ -12,7 +12,7 @@ describe("/enochian/dictionary, as the server renders it (plan 074)", () => {
     expect(rows.length).toBe(Object.keys(dictionary).length);
     // A row: the word, its script, then its meaning and source.
     expect(html).toMatch(
-      /<span class="dict-word">OLPRT<\/span>.*?<span class="dict-meaning">light<span class="dict-source">EMPM<\/span>/,
+      /<span class="dict-word">OLPRT<\/span>.*?<span class="dict-meaning">light<span class="dict-source"> EMPM<\/span>/,
     );
   });
 

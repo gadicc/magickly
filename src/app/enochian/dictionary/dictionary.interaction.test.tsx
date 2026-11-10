@@ -224,3 +224,107 @@ describe("In the Keys (plan 074, decision 9)", () => {
     vi.unstubAllGlobals();
   });
 });
+
+describe("what the review of 10 November 2026 found (plan 074)", () => {
+  const sheetClose = async () => {
+    const sheet = await screen.findByRole("dialog");
+    return within(sheet).getByRole("button", { name: "Close" });
+  };
+  const params = () => new URLSearchParams(window.location.search);
+
+  it("keeps a query typed just before a word opened, when it closes", async () => {
+    render(<Dictionary uses={{}} />);
+    type("light");
+    // Within the URL's pause: the query is written before the push.
+    fireEvent.click((await screen.findAllByRole("option"))[1]);
+    fireEvent.click(await sheetClose());
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(latinBox()).toHaveProperty("value", "light");
+    expect(params().get("q")).toBe("light");
+  });
+
+  it("keeps a query typed while a word was open, when it closes", async () => {
+    render(<Dictionary uses={{}} />);
+    type("light");
+    fireEvent.click((await screen.findAllByRole("option"))[1]);
+    await screen.findByRole("dialog");
+    type("fire");
+    fireEvent.click(await sheetClose());
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    await waitFor(() => expect(params().get("q")).toBe("fire"));
+    expect(latinBox()).toHaveProperty("value", "fire");
+  });
+
+  it("does not leave the page on a double close", async () => {
+    render(<Dictionary uses={{}} />);
+    type("light");
+    fireEvent.click((await screen.findAllByRole("option"))[1]);
+    const close = await sheetClose();
+    fireEvent.click(close);
+    fireEvent.click(close);
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(window.location.pathname).toBe(PATH);
+  });
+
+  it("closes a word opened from a shared word's link in one go", async () => {
+    window.history.replaceState(null, "", `${PATH}?w=OLPRT`);
+    render(<Dictionary uses={{}} />);
+    await screen.findByRole("dialog");
+    type("power");
+    // The sheet is modal; a word opens from the list behind it as on desktop.
+    fireEvent.keyDown(latinBox(), { key: "ArrowDown" });
+    fireEvent.keyDown(latinBox(), { key: "Enter" });
+    await waitFor(() => expect(params().get("w")).not.toBe("OLPRT"));
+    fireEvent.click(await sheetClose());
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(params().get("w")).toBeNull();
+  });
+
+  it("ignores a word the dictionary does not have", async () => {
+    window.history.replaceState(null, "", `${PATH}?w=constructor`);
+    render(<Dictionary uses={{}} />);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("shows all of a group from the keyboard", async () => {
+    render(<Dictionary uses={{}} />);
+    type("light");
+    await screen.findByText(/^Show all \d+$/);
+    // Two meanings, then 30 mentions, then "Show all".
+    for (let i = 0; i < 33; i++)
+      fireEvent.keyDown(latinBox(), { key: "ArrowDown" });
+    fireEvent.keyDown(latinBox(), { key: "Enter" });
+    expect(screen.queryByText(/^Show all \d+$/)).toBeNull();
+  });
+
+  it("puts the entry in the pane on a wide screen", async () => {
+    const matchMedia = window.matchMedia;
+    window.matchMedia = ((query: string) => ({
+      matches: query.includes("min-width"),
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    })) as typeof window.matchMedia;
+    window.history.replaceState(null, "", `${PATH}?w=OLPRT`);
+    render(<Dictionary uses={{}} />);
+    expect(await screen.findByRole("heading", { name: "OLPRT" })).toBeTruthy();
+    expect(screen.queryByRole("dialog")).toBeNull();
+    window.matchMedia = matchMedia;
+  });
+
+  it("separates a meaning from its source for screen readers", () => {
+    render(<Dictionary uses={{}} />);
+    const olprt = screen
+      .getAllByRole("option")
+      .find((one) => one.querySelector(".dict-word")?.textContent === "OLPRT");
+    expect(olprt?.querySelector(".dict-meaning")?.textContent).toBe(
+      "light EMPM",
+    );
+  });
+});

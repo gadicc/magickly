@@ -99,6 +99,9 @@ export default function Keypad({
       className={docked ? "keypad-docked" : "keypad-dropdown"}
       role="group"
       aria-label={LABELS.keypad}
+      // Nothing in the keypad takes focus, gaps included, so a near miss
+      // leaves the box and its caret alone.
+      onMouseDown={keepFocus}
     >
       <div className="keypad-bar">
         <span>{LABELS.keypadHint}</span>
@@ -108,7 +111,6 @@ export default function Keypad({
             className="keypad-action"
             aria-label={LABELS.backspace}
             tabIndex={-1}
-            onMouseDown={keepFocus}
             onClick={onBackspace}
           >
             {LABELS.backspaceKey}
@@ -117,7 +119,6 @@ export default function Keypad({
             type="button"
             className="keypad-action"
             tabIndex={-1}
-            onMouseDown={keepFocus}
             onClick={onDone}
           >
             {LABELS.done}
@@ -132,7 +133,6 @@ export default function Keypad({
             className="keypad-key"
             aria-label={`${key.name}, ${key.latin}`}
             tabIndex={-1}
-            onMouseDown={keepFocus}
             onClick={() => onLetter(key.id)}
           >
             <span className="keypad-glyph" style={EnochianFont.style}>

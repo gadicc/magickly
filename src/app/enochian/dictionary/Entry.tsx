@@ -36,7 +36,7 @@ const styles = {
   },
   "& ol": { margin: 0, paddingLeft: "22px" },
   "& li": { margin: "3px 0" },
-  "& .entry-source": { color: "text.secondary", fontSize: 12, ml: 0.75 },
+  "& .entry-source": { color: "text.secondary", fontSize: 12 },
   "& .entry-note": { color: "text.secondary", fontSize: 13 },
   "& .entry-actions": { display: "flex", gap: 1, mt: 2, alignItems: "center" },
   "& .entry-uses": { listStyle: "none", margin: 0, padding: 0 },
@@ -113,7 +113,7 @@ export default function Entry({
           <li key={i}>
             {meaning.meaning}
             {sources(meaning) && (
-              <span className="entry-source">{sources(meaning)}</span>
+              <span className="entry-source">{` ${sources(meaning)}`}</span>
             )}
             {meaning.note && <div className="entry-note">{meaning.note}</div>}
           </li>

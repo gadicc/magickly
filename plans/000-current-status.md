@@ -166,11 +166,16 @@ Follow-ups are separate from the completed migration work:
   `gate/enochian-keys`. TODO: Dee's own copy, Sloane MS 3191, when the
   British Library's images return: his accents, the words Casaubon's
   print lost (Keys 14–16) and his Aethyr spellings.
-- TODO (Gadi, 10 November 2026): English search in the Enochian
-  dictionary, with a revamp of its UI and UX. Today the search matches
-  Enochian spellings only (`src/app/enochian/dictionary/dictionary.tsx`);
-  "enochian translator" is a search target of
-  [plan 071](071-on-site-search.md).
+- 10 November 2026: English search in the Enochian dictionary, with a
+  revamp of its page, in [plan 074](074-enochian-dictionary-search.md).
+  The two boxes (Latin, and Enochian right to left) hold one query,
+  searched both ways at once and grouped. Every row carries a meaning,
+  in the prerendered HTML too. An Enochian keypad types by glyph. The
+  entry opens beside the list or in a sheet, with where the Keys use
+  the word. Links keep the search (`?q=`, `?w=`). Built 10 November on
+  `gate/enochian-dictionary-search`. TODO: the app has no dark mode
+  (`src/theme.ts` is light only), so the page's theme colours are
+  untested in dark; the keypad is unchecked on iOS Safari (no device).
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose

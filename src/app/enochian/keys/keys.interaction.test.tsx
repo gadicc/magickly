@@ -1,5 +1,11 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from "@testing-library/react";
 import type { EnochianKey } from "magick-data/enochian/keys";
 import { afterEach, describe, expect, it } from "vitest";
 import { pageKey } from "./keyPage";
@@ -73,4 +79,27 @@ describe("links into the page (plan 074, decision 9)", () => {
     );
     window.history.replaceState(null, "", "/");
   });
+});
+
+it("follows a link's hash when it changes", () => {
+  window.history.replaceState(null, "", "/enochian/keys");
+  Element.prototype.scrollIntoView = () => {};
+  const { container } = render(
+    <Keys
+      keys={[pageKey(KEY)]}
+      aethyrs={[]}
+      entries={{ entries: {}, parts: {} }}
+    />,
+  );
+  const header = screen.getByRole("button", { name: "Key 4" });
+  expect(header.getAttribute("aria-expanded")).toBe("false");
+  act(() => {
+    window.history.replaceState(null, "", "/enochian/keys#key-4-word-1");
+    window.dispatchEvent(new HashChangeEvent("hashchange"));
+  });
+  expect(header.getAttribute("aria-expanded")).toBe("true");
+  expect(container.querySelector('[aria-live="polite"]')?.textContent).toBe(
+    "OTHIL: I have set. Escape closes.",
+  );
+  window.history.replaceState(null, "", "/");
 });

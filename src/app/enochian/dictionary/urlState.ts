@@ -40,10 +40,13 @@ function withParams(changes: Record<string, string | null>) {
   return url.pathname + url.search + url.hash;
 }
 
+/**
+ * Writes the URL with only our own state: Next's patched history methods
+ * copy its internals in and sync its router (`useSearchParams`, the
+ * sign-in link's return URL), but skip state that already carries them.
+ */
 function write(how: "push" | "replace", url: string, mark: boolean) {
-  const state = { ...window.history.state };
-  if (mark) state[MARK] = true;
-  else delete state[MARK];
+  const state = mark ? { [MARK]: true } : null;
   if (how === "push") window.history.pushState(state, "", url);
   else window.history.replaceState(state, "", url);
   window.dispatchEvent(new Event(CHANGED));
@@ -66,10 +69,30 @@ export function useDictionaryUrl() {
     write("replace", withParams({ q: text.trim() || null }), marked);
   }, []);
 
-  /** Opens a word: one history entry, however many words follow it. */
+  /**
+   * Opens a word: one history entry, however many words follow it. On a
+   * link that arrived with a word, the new word replaces it, so one close
+   * leaves the entries.
+   */
   const open = React.useCallback((key: string) => {
     const marked = Boolean(window.history.state?.[MARK]);
-    write(marked ? "replace" : "push", withParams({ w: key }), true);
+    const arrived =
+      !marked && new URL(window.location.href).searchParams.has("w");
+    write(
+      marked || arrived ? "replace" : "push",
+      withParams({ w: key }),
+      !arrived,
+    );
+  }, []);
+
+  // Set while a close goes back, until the traversal lands.
+  const closing = React.useRef(false);
+  React.useEffect(() => {
+    const done = () => {
+      closing.current = false;
+    };
+    window.addEventListener("popstate", done);
+    return () => window.removeEventListener("popstate", done);
   }, []);
 
   /**
@@ -77,8 +100,12 @@ export function useDictionaryUrl() {
    * that arrived with `?w=`, drops it, so closing never leaves the site.
    */
   const close = React.useCallback(() => {
-    if (window.history.state?.[MARK]) window.history.back();
-    else write("replace", withParams({ w: null }), false);
+    // A double tap must not go back twice and leave the page.
+    if (closing.current) return;
+    if (window.history.state?.[MARK]) {
+      closing.current = true;
+      window.history.back();
+    } else write("replace", withParams({ w: null }), false);
   }, []);
 
   return { query, word, setQuery, open, close };

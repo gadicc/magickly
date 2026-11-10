@@ -368,6 +368,9 @@ function AethyrPicker({
   );
 }
 
+/** How long a linked Key takes to open before its word is scrolled to. */
+const WORD_SCROLL_DELAY = 400;
+
 /** Where a link into the page points (plan 074, decision 9). */
 export interface Anchor {
   key: number;
@@ -414,22 +417,43 @@ export default function Keys({
   // A link such as the dictionary's opens its Key, its Aethyr and its word,
   // after hydration and whenever the hash changes.
   React.useEffect(() => {
+    // Pending scrolls, cleared if the page goes before they run.
+    let frame = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const follow = () => {
       const anchor = readAnchor(window.location.hash);
       if (!anchor || !keys.some((key) => key.key === anchor.key)) return;
       setExpanded((was) => new Set(was).add(anchor.key));
       if (anchor.aethyr && aethyrs.some((one) => one.n === anchor.aethyr))
         setAethyr(anchor.aethyr);
-      if (anchor.row) setSelected({ key: anchor.key, row: anchor.row });
-      requestAnimationFrame(() =>
-        document
-          .getElementById(`key-${anchor.key}-header`)
-          ?.scrollIntoView({ block: "start" }),
+      if (anchor.row) {
+        // A link's row is Dee's, as the dictionary counts it.
+        setVersion("dee");
+        setSelected({ key: anchor.key, row: anchor.row });
+      }
+      const header = () => document.getElementById(`key-${anchor.key}-header`);
+      frame = requestAnimationFrame(() =>
+        header()?.scrollIntoView({ block: "start" }),
       );
+      // Once the Key has opened, bring its word into view.
+      clearTimeout(timer);
+      if (anchor.row)
+        timer = setTimeout(
+          () =>
+            header()
+              ?.closest(".MuiAccordion-root")
+              ?.querySelector(".key-word[aria-pressed=true]")
+              ?.scrollIntoView({ block: "center" }),
+          WORD_SCROLL_DELAY,
+        );
     };
     follow();
     window.addEventListener("hashchange", follow);
-    return () => window.removeEventListener("hashchange", follow);
+    return () => {
+      window.removeEventListener("hashchange", follow);
+      cancelAnimationFrame(frame);
+      clearTimeout(timer);
+    };
   }, [keys, aethyrs]);
 
   // Escape closes the word panel, wherever the focus is.

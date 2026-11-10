@@ -5,7 +5,8 @@ Status: options shown to Gadi as mock-ups and settled with him on
 same day (see "The spike"). Adversarially reviewed (Fable) and revised
 the same day (see "The review"). Gadi said to build it, and accepted
 decision 13's description as drafted, the same day. Built on
-`gate/enochian-dictionary-search` (see "Commits"). Read
+`gate/enochian-dictionary-search` the same day, every commit gated,
+and the branch reviewed by Fable and fixed (see "The build"). Read
 [current status](000-current-status.md) first.
 
 This plan takes up the TODO that [plan 071](071-on-site-search.md)
@@ -105,8 +106,12 @@ ranking, and kept in the session notes rather than the repository:
    Done.
    - The letters come from `magick-data/enochian/letters`, laid out
      right to left, and each key is named for its letter ("Un, A").
-   - A key acts on `pointerdown` with `preventDefault`, so the box keeps
-     its focus and caret.
+   - The keypad cancels `mousedown` anywhere on it, gaps included, so
+     the box keeps its focus and caret, and a key acts on click. (The
+     draft said `pointerdown`; cancelling `mousedown` also covers a
+     touch's compatibility events, and click keeps keys usable by
+     assistive technology.) Clicking the box reopens a keypad closed
+     with Esc.
    - On a coarse pointer the box gets `inputmode="none"` after
      hydration, so a phone's own keyboard stays down. A physical
      keyboard still types into both boxes.
@@ -117,8 +122,9 @@ ranking, and kept in the session notes rather than the repository:
    the list keeps its scroll position. Under `prefers-reduced-motion`
    the sheet doesn't animate.
 4. **One bottom panel at a time on phones.** Focusing the Enochian box
-   raises the keypad and closes the sheet. Tapping a word lowers the
-   keypad and raises the sheet. On desktop the keypad drops down under
+   raises the keypad. Tapping a word blurs the box, which lowers the
+   keypad, and raises the sheet. The sheet is modal, so the box can't
+   be focused while it is up; nothing else needs to close it. On desktop the keypad drops down under
    the boxes inside the left pane. Esc or a click outside closes it, and
    it never meets the entry.
 5. **Search as a pure module** (`src/app/enochian/dictionary/search.ts`).
@@ -187,8 +193,11 @@ ranking, and kept in the session notes rather than the repository:
 6. **Rows carry a meaning.** Each row shows the word, its script, and the
    meaning that matched, or its first known meaning when there is no
    query. Words with no known meaning say "meaning unknown", dimmed. The
-   matched words are bold. Rows are plain buttons, not MUI `ButtonBase`,
-   because 1,911 of them must hydrate.
+   matched words are bold (stopwords in a phrase are not). Rows are
+   plain `div role="option"` elements, not MUI `ButtonBase`, because
+   1,911 of them must hydrate; the combobox (decision 12) gives them
+   their keys. A space separates a meaning from its source, so the
+   row reads "light EMPM", not "lightEMPM".
 7. **The server HTML holds the whole list with meanings.** The page stays
    prerendered. Its first render is the unfiltered list, all 1,911 rows
    with no cap, so search engines see "OLPRT … light". The list never
@@ -203,11 +212,19 @@ ranking, and kept in the session notes rather than the repository:
      snapshot, and on `popstate`. A shared link renders the full list
      first, then its query and entry.
    - Closing an entry (swipe, tap outside, close button) goes
-     `history.back()` when the current entry carries our marker.
-     Otherwise, as on a cold `?w=` link, it removes `w` with
-     `replaceState`, so it never leaves the site.
-   - Typing while an entry is open keeps `w` on desktop. On phones,
-     focusing a box closes the sheet (decision 4).
+     `history.back()` when the current entry carries our marker, once
+     however often it is tapped. Otherwise, as on a cold `?w=` link, it
+     removes `w` with `replaceState`, so it never leaves the site. A
+     word opened from a cold `?w=` link replaces it, so one close is
+     enough.
+   - Closing keeps the query in the boxes, though the history entry it
+     goes back to may hold an older one: a query still waiting on its
+     pause is written before a word's entry is pushed, and after a close
+     the boxes' query is written back.
+   - The history state written is our marker alone. Next's patched
+     `pushState` and `replaceState` then copy its internals in and sync
+     its router (`useSearchParams`, the sign-in link's return URL); a
+     state already carrying them (`__NA`) would skip that.
    - "Copy link" copies `/enochian/dictionary?w=WORD`, without `q`. The
      canonical stays `/enochian/dictionary` (`pageMetadata`).
 9. **"In the Keys" in each entry, fetched when it opens.**
@@ -264,9 +281,11 @@ ranking, and kept in the session notes rather than the repository:
       rows without 1,911 tab stops, and Enter opens one. The groups have
       headings.
     - A polite live region announces the number of results.
-    - The sheet traps focus and returns it to the row when it closes. On
-      desktop, focus stays in the list and the pane is labelled by the
-      open word.
+    - The sheet traps focus and returns it to where it was when it
+      opened (MUI's modal). On desktop, focus stays in the list and the
+      pane is labelled by the open word. Only the Latin box moves
+      through the results; the Enochian box leaves the arrows to its
+      caret.
     - The keypad's keys are buttons with names.
 13. **The search description** (`src/seo/pages.ts`) names English lookup,
     the target of "enochian translator". It changes in stage 3, in the
@@ -299,8 +318,8 @@ Each stage is one gated commit on `gate/enochian-dictionary-search`.
 4. **The keypad** (decisions 2 and 4).
 5. **In the Keys.** The route handler, the entry section, and the Keys
    page's anchors (decision 9).
-6. **The record.** This plan's build notes, and current status without
-   the TODO.
+6. **The record.** The final review's fixes, this plan's build notes,
+   and current status without the TODO.
 
 ## The spike — 10 November 2026
 
@@ -363,11 +382,107 @@ plain-button rows; and tests. One finding was refuted: `?q=` causes no
 spurious analytics routes, because the app passes the pathname itself
 and drops query strings (see "What exists").
 
+## The build — 10 November 2026
+
+Built in this order, each stage a commit on
+`gate/enochian-dictionary-search` from `main` at `3c305c78`, then
+rebased the same day onto `4cedc473` (plan 075's geomancy text), by Opus 5.5
+(reasoning high), with Fable 5.2 (reasoning high) reviewing. Where the
+build departed from the plan, the decision above says so in
+parentheses: the fifth tier for forms (5), the Keys map's size and the
+uses' sources (9), no dark mode (10), the refresh moved into stage 3
+(11), the anchors by number (9), and the description shortened to 160
+characters (13).
+
+**The search refresh** (stage 3) ran `pnpm search:publish
+gemini-embedding-2-768-search-v1` with only `AI_GATEWAY_API_KEY` taken
+from the main checkout's environment. The worktree had no embedding
+cache, so it embedded all 3,018 passages (236,780 tokens), not just the
+changed ones: a few cents. The rebase onto plan 075, which had
+refreshed the index for its own text, conflicted only there; the stage
+3 commit was republished from main's index, embedding 20 passages
+(2,714 tokens) from this worktree's cache. The manifest names
+`gemini-embedding-2-768-search-v1-d53330e26464.bin`, the only file left
+in `public/search-vectors`.
+
+**Gates** (a clean worktree on /home with Node 24 and CI's placeholder
+environment: frozen install, `loom init` with no diff, `loom check` and
+`--production`, `pnpm check`, typecheck, `test:coverage`, `build`). The
+machine's load from other sessions ran at 30 to 50.
+
+Before the rebase, from `3c305c78`: `a69964eb`, `e4b97458`,
+`1aeecc0e` and `2a2e5c95` passed; `e973cb53` passed after one re-run of
+5 timeouts outside this change; stage 6's first version failed coverage
+on an unhandled error, the Keys anchor's word-scroll timer firing after
+teardown, so the page now clears its pending scrolls on unmount, and
+its second version passed. After the rebase onto `4cedc473`:
+
+| Commit | Result |
+| --- | --- |
+| e5b1e579 | All pass (7,981 tests) |
+| 97ee7e83 | All pass (8,009 tests) |
+| 02b73697 | All pass (8,022 tests) |
+| 55bfd020 | All pass (8,025 tests) |
+| 2678c80b | All pass (8,030 tests) |
+| Stage 6 (this) | All pass (8,041 tests), smoke and Turbopack too; the build lists `/enochian/dictionary` and `/enochian/dictionary/keys.json` as static. Only this record changed after the gate |
+
+**The final review** (Fable 5.2, reasoning high, fresh, on `main..2a2e5c95`, before the rebase)
+found no blockers and one major. All are fixed in stage 6 with tests,
+except where noted:
+
+1. Closing an entry dropped a query typed since it opened, or typed in
+   the 300 ms before it (decision 8 now says how it is kept).
+2. Our history writes carried Next's `__NA`, so its router never saw
+   `q` or `w`, and the sign-in link's return URL went stale (decision 8).
+3. A double close went back twice and left the page.
+4. The arrow keys' scroll ran on every render, and could park a row
+   under the sticky boxes or the keypad. It now runs when the active row
+   changes, with scroll margins.
+5. The stemmer's final e-drop joined "note" to "not", "made" to "mad",
+   "wine" to "win" and "here" to "her". It now drops an e only where
+   four letters stay (decision 5's examples still hold).
+6. A tap in a keypad gap blurred the box; 7. Esc's keypad could not be
+   reopened without leaving the box (decision 2).
+8. The sheet emptied before it slid away; it now keeps its last entry.
+9. The Enochian box moved the active row without the combobox's
+   attributes; it now leaves the arrows to its caret (decision 12).
+10. The meaning and source ran together for screen readers, and two
+    dimmed texts fell below AA contrast; the dimming is gone.
+11. A Keys link scrolled to the Key, not its word, and kept the Golden
+    Dawn version; it now selects Dee's and scrolls to the word.
+12. Stage 6 was missing, and decisions 4, 6 and 12 described what was
+    not built; they now describe what was.
+13. A word opened from a cold `?w=` link took two closes.
+14. The live count could count a word twice.
+15. "light light" lost its exact hits, and stopwords were bold in
+    phrases.
+16. An unused label, and a plain `<a>` to the Keys page (now the app's
+    `Link`). Left: resetting the groups on mount costs one render.
+
+**The browser check** (headless Chromium over CDP against `next dev` on
+127.0.0.1 with CI's placeholder environment, the Browser pane being
+hidden), at 360, 390 and 1280 px, light only (the app has no dark mode):
+the grouped results for "light", "power" and "god"; the sheet with "In
+the Keys" (IAD, Key 1); the two panes (LONSHI, Key 7); the keypad docked
+at 360 and 390 px (`inputmode="none"`, focus and caret kept, "OLP"
+typed) and dropped down at 1280 px; a cold `?q=power&w=LONSHI`; the
+link into the Keys page (Key 7 open, "power," selected); closing twice
+quickly, which stays on the page and keeps the query; no horizontal
+scroll at 360 px; and no console errors. Not measured: hydration time
+on a production build (the load made timings meaningless). Not checked:
+iOS Safari (no device), a phone's own keyboard staying down (headless
+can't show it), dark mode (none).
+
 ## Commits
 
 | Commit | Change |
 | --- | --- |
-| (this) | The plan |
+| e5b1e579 | Stage 1: the plan |
+| 97ee7e83 | Stage 2: search and the Keys uses, with tests |
+| 02b73697 | Stage 3: the page, its text and description, the search refresh |
+| 55bfd020 | Stage 4: the keypad |
+| 2678c80b | Stage 5: In the Keys, and the Keys page's anchors |
+| (this) | Stage 6: the final review's fixes, this record, current status |
 
 ## Verification
 

@@ -163,8 +163,9 @@ export function stem(word: string): string {
   else if (out.endsWith("ing") && out.length > 5) out = out.slice(0, -3);
   else if (out.endsWith("ed") && out.length > 4) out = out.slice(0, -2);
   else if (/[^su]s$/.test(out)) out = out.slice(0, -1);
-  // "love", "loved", "loving" all become "lov".
-  if (out.length > 3 && out.endsWith("e")) out = out.slice(0, -1);
+  // "spirited" and "spirite" meet "spirit"; but a final e is dropped only
+  // where four letters stay, so "note" is not "not", "made" not "mad".
+  if (out.length > 4 && out.endsWith("e")) out = out.slice(0, -1);
   return out;
 }
 
@@ -377,7 +378,8 @@ export function searchDictionary(
   index: DictionaryIndex,
   query: string,
 ): SearchResult {
-  const all = words(query);
+  // A word typed twice counts once.
+  const all = [...new Set(words(query))];
   const terms = all.every((one) => STOPWORDS.has(one)) ? [] : all;
   const { means, mentions } = terms.length
     ? english(index, terms)
@@ -404,9 +406,11 @@ export interface Segment {
  * the row's bold.
  */
 export function highlight(meaning: string, terms: string[]): Segment[] {
-  if (!terms.length) return [{ text: meaning, match: false }];
-  const exact = new Set(terms);
-  const stems = new Set(terms.map(stem));
+  // In "son of light", "son" and "light" are bold, not every "of".
+  const marked = terms.filter((one) => !STOPWORDS.has(one));
+  if (!marked.length) return [{ text: meaning, match: false }];
+  const exact = new Set(marked);
+  const stems = new Set(marked.map(stem));
   const out: Segment[] = [];
   let last = 0;
   for (const found of meaning.matchAll(/[A-Za-z0-9'’]+/g)) {

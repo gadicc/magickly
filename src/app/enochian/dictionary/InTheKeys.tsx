@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "@magick-components/Link";
 import { Button } from "@mui/material";
 import * as React from "react";
 import type { KeyUse } from "./keyUses";
@@ -62,7 +63,7 @@ export default function InTheKeys({ word }: { word: string }) {
       <ul className="entry-uses">
         {shown.map((use) => (
           <li key={`${use.key}-${use.aethyr}-${use.row}`}>
-            <a href={keysLink(use)}>{LABELS.place(use)}</a>
+            <Link href={keysLink(use)}>{LABELS.place(use)}</Link>
             {use.part && (
               <span className="entry-source">{LABELS.inPart(use.part)}</span>
             )}

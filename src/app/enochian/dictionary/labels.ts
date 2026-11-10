@@ -26,7 +26,6 @@ export const LABELS = {
   copyLink: "Copy link",
   copied: "Link copied",
   close: "Close",
-  entry: (word: string) => `Entry for ${word}`,
   keypad: "Enochian letters",
   keypadHint: "Enochian letters · tap to type",
   backspace: "Delete a letter",

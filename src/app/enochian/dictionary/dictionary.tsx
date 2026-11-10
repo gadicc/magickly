@@ -119,6 +119,9 @@ const styles = {
     borderBottom: 1,
     borderColor: "divider",
     cursor: "pointer",
+    // Clear of the sticky boxes, and of the docked keypad when it is up.
+    scrollMarginTop: 96,
+    scrollMarginBottom: "var(--dict-keypad, 0px)",
     "&:hover": { bgcolor: "action.hover" },
     "&[aria-selected=true]": { bgcolor: "action.selected" },
     "&.dict-active": {
@@ -146,8 +149,8 @@ const styles = {
     whiteSpace: "nowrap",
     "& b": { color: "text.primary" },
   },
-  "& .dict-unknown": { fontStyle: "italic", opacity: 0.7 },
-  "& .dict-source": { fontSize: 11.5, ml: 0.5, opacity: 0.8 },
+  "& .dict-unknown": { fontStyle: "italic" },
+  "& .dict-source": { fontSize: 11.5 },
   "& .dict-more": {
     padding: "12px 16px",
     color: "primary.main",
@@ -215,7 +218,7 @@ const Row = React.memo(function Row({
               segment.text
             ),
           )}
-          {source && <span className="dict-source">{source}</span>}
+          {source && <span className="dict-source">{` ${source}`}</span>}
         </span>
       )}
     </div>
@@ -272,10 +275,26 @@ export default function Dictionary({
 
   // The URL's query fills the boxes on load and on Back; the boxes write it
   // back after a pause. `written` tells our own writes from the others.
+  // Closing an entry keeps what the boxes hold, though the history entry
+  // it goes back to may hold an older query.
   const written = React.useRef<string | null>(null);
+  const textNow = React.useRef(text);
+  textNow.current = text;
+  const lastWord = React.useRef<string | null>(null);
+  const { setQuery } = url;
   React.useEffect(() => {
+    const closed = lastWord.current !== null && url.word === null;
+    lastWord.current = url.word;
+    if (closed) {
+      const kept = textNow.current.trim();
+      if (kept !== url.query) {
+        written.current = kept;
+        setQuery(kept);
+      }
+      return;
+    }
     if (url.query !== written.current) setText(url.query);
-  }, [url.query]);
+  }, [url.query, url.word, setQuery]);
   React.useEffect(() => {
     const trimmed = text.trim();
     if (trimmed === url.query) return;
@@ -346,7 +365,20 @@ export default function Dictionary({
     url.word && Object.hasOwn(dictionary, url.word)
       ? dictionary[url.word]
       : undefined;
-  const { open, close } = url;
+  const { close } = url;
+  // Writes a query still waiting on its pause before the word's history
+  // entry is pushed, so going back finds it.
+  const open = React.useCallback(
+    (key: string) => {
+      const trimmed = textNow.current.trim();
+      if (trimmed !== url.query) {
+        written.current = trimmed;
+        setQuery(trimmed);
+      }
+      url.open(key);
+    },
+    [url.query, url.open, setQuery],
+  );
   const choose = React.useCallback(
     (at: number) => {
       const option = options[at];
@@ -357,12 +389,14 @@ export default function Dictionary({
     [options, open],
   );
 
+  // Scrolls only when the arrow keys move, not on every render.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: on `active` alone
   React.useEffect(() => {
     if (active >= 0)
       document.getElementById(optionId(active))?.scrollIntoView({
         block: "nearest",
       });
-  });
+  }, [active]);
 
   const onKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "ArrowDown") {
@@ -380,29 +414,41 @@ export default function Dictionary({
   const listId = `${idPrefix}-list`;
   const headingId = `${idPrefix}-entry`;
   const total = result
-    ? result.word.length +
-      result.means.length +
-      result.mentions.length +
-      result.spelled.length
+    ? new Set(
+        [result.word, result.means, result.mentions, result.spelled]
+          .flat()
+          .map((hit) => hit.word),
+      ).size
     : ALL.length;
-  const shown = entry && url.word && (
+  const entryOf = (word: string) => (
     <Entry
-      key={url.word}
-      word={url.word}
-      entry={entry}
+      key={word}
+      word={word}
+      entry={dictionary[word]}
       onClose={close}
       headingId={headingId}
     >
-      <InTheKeys word={url.word} />
+      <InTheKeys word={word} />
     </Entry>
   );
+  const shown = entry && url.word ? entryOf(url.word) : null;
+  // The sheet keeps its last entry while it slides away.
+  const lastShown = React.useRef<string | null>(null);
+  if (entry && url.word) lastShown.current = url.word;
 
   let at = -1;
   return (
     <Box sx={styles}>
       <div
         className="dict-left"
-        style={keypad && !desktop ? { paddingBottom: KEYPAD_ROOM } : undefined}
+        style={
+          keypad && !desktop
+            ? ({
+                paddingBottom: KEYPAD_ROOM,
+                "--dict-keypad": `${KEYPAD_ROOM}px`,
+              } as React.CSSProperties)
+            : undefined
+        }
       >
         <div className="dict-search">
           <div className="dict-boxes">
@@ -434,9 +480,9 @@ export default function Dictionary({
               onChange={(event) => setText(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === "Escape") setKeypad(false);
-                onKeyDown(event);
               }}
               onFocus={() => setKeypad(true)}
+              onClick={() => setKeypad(true)}
               onBlur={() => setKeypad(false)}
               style={EnochianFont.style}
             />
@@ -550,7 +596,7 @@ export default function Dictionary({
             mt: 1,
           }}
         />
-        {!desktop && shown}
+        {!desktop && lastShown.current && entryOf(lastShown.current)}
       </SwipeableDrawer>
     </Box>
   );
