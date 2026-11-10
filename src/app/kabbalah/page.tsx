@@ -1,5 +1,6 @@
 import Tiles from "@/components/Tiles";
 import { pageMetadata } from "@/seo/metadata";
+import KabbalahText from "./KabbalahText";
 
 export const metadata = pageMetadata("/kabbalah");
 
@@ -22,7 +23,12 @@ const tiles = [
 ];
 
 function Kabbalah() {
-  return <Tiles tiles={tiles} />;
+  return (
+    <>
+      <Tiles tiles={tiles} />
+      <KabbalahText />
+    </>
+  );
 }
 
 export default Kabbalah;

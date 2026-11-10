@@ -2,6 +2,7 @@ import { Box } from "@mui/material";
 import Tablet from "@/components/enochian/Tablet";
 import Tiles from "@/components/Tiles";
 import { pageMetadata } from "@/seo/metadata";
+import EnochianText from "./EnochianText";
 import dictionaryImg from "./img/dictionary.jpg";
 import enochianAbc from "./img/enochianAbc.png";
 import firstKey from "./img/enochianFirstKey.png";
@@ -48,7 +49,12 @@ const tiles = [
 ];
 
 function Enochian() {
-  return <Tiles tiles={tiles} />;
+  return (
+    <>
+      <Tiles tiles={tiles} />
+      <EnochianText />
+    </>
+  );
 }
 
 export default Enochian;

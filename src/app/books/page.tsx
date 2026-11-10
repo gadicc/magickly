@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { pageMetadata } from "@/seo/metadata";
+import BooksText from "./BooksText";
 
 export const metadata = pageMetadata("/books");
 
@@ -23,6 +24,7 @@ export default function BooksPage() {
           attributes, seals and hours.
         </li>
       </ul>
+      <BooksText />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Tiles from "@/components/Tiles";
 import { pageMetadata } from "@/seo/metadata";
+import GeomancyText from "./GeomancyText";
 import ReadingImgTile from "./img/reading.webp";
 import ReferenceImgTile from "./img/reference.webp";
 
@@ -37,6 +38,7 @@ function GeomancyPage() {
   return (
     <>
       <Tiles tiles={tiles} />
+      <GeomancyText />
     </>
   );
 }

@@ -3,6 +3,7 @@ import { Box } from "@mui/material";
 import Tiles from "@/components/Tiles";
 import { pageMetadata } from "@/seo/metadata";
 import AstrologyTile from "../img/astrology.jpeg";
+import AstrologyText from "./AstrologyText";
 import PlanetaryHoursPic from "./img/planetary-hours.webp";
 
 export const metadata = pageMetadata("/astrology");
@@ -32,6 +33,7 @@ function Astrology() {
   return (
     <>
       <Tiles tiles={tiles} />
+      <AstrologyText />
       <Box sx={{ m: 2, fontSize: "80%" }}>
         <Link href="/about#credits">Image credits</Link>
       </Box>

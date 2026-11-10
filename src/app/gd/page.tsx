@@ -3,6 +3,7 @@ import Tiles from "@/components/Tiles";
 import { GD_HALLS } from "@/render/contracts/gdHall";
 import { hallFiles } from "@/seo/halls";
 import { pageMetadata } from "@/seo/metadata";
+import GoldenDawnText from "./GoldenDawnText";
 
 export const metadata = pageMetadata("/gd");
 
@@ -60,7 +61,12 @@ const tiles = [
 ];
 
 function GD() {
-  return <Tiles tiles={tiles} />;
+  return (
+    <>
+      <Tiles tiles={tiles} />
+      <GoldenDawnText />
+    </>
+  );
 }
 
 export default GD;
