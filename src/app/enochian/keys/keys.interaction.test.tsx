@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { EnochianKey } from "magick-data/enochian/keys";
 import { afterEach, describe, expect, it } from "vitest";
 import { pageKey } from "./keyPage";
-import Keys from "./keys";
+import Keys, { readAnchor } from "./keys";
 
 afterEach(cleanup);
 
@@ -36,5 +36,41 @@ describe("the word panel", () => {
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByText("Not in the dictionary.")).toBeNull();
     expect(live?.textContent).toBe("");
+  });
+});
+
+describe("links into the page (plan 074, decision 9)", () => {
+  it("reads a link's hash", () => {
+    expect(readAnchor("#key-7")).toEqual({ key: 7 });
+    expect(readAnchor("#key-7-word-12")).toEqual({ key: 7, row: 12 });
+    expect(readAnchor("#aethyr-3-word-4")).toEqual({
+      key: 19,
+      aethyr: 3,
+      row: 4,
+    });
+    expect(readAnchor("#key-4-header")).toBeNull();
+    expect(readAnchor("")).toBeNull();
+  });
+
+  it("opens the Key and selects the word a link names", () => {
+    window.history.replaceState(null, "", "/enochian/keys#key-4-word-1");
+    // jsdom lays nothing out.
+    Element.prototype.scrollIntoView = () => {};
+    const { container } = render(
+      <Keys
+        keys={[pageKey(KEY)]}
+        aethyrs={[]}
+        entries={{ entries: {}, parts: {} }}
+      />,
+    );
+    expect(
+      screen
+        .getByRole("button", { name: "Key 4" })
+        .getAttribute("aria-expanded"),
+    ).toBe("true");
+    expect(container.querySelector('[aria-live="polite"]')?.textContent).toBe(
+      "OTHIL: I have set. Escape closes.",
+    );
+    window.history.replaceState(null, "", "/");
   });
 });

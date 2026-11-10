@@ -201,3 +201,26 @@ describe("the Enochian keypad (plan 074, decisions 2 and 4)", () => {
     await waitFor(() => expect(optionWords()[0]).toBe("OL"));
   });
 });
+
+describe("In the Keys (plan 074, decision 9)", () => {
+  it("fetches the uses once and links the first to its Key", async () => {
+    const uses = {
+      OLPIRT: [
+        { key: 18, row: 40, english: "light,", before: "the", after: "of men" },
+        { key: 3, row: 2, english: "light", before: "", after: "" },
+      ],
+    };
+    const fetch = vi.fn(async () => Response.json(uses));
+    vi.stubGlobal("fetch", fetch);
+    window.history.replaceState(null, "", `${PATH}?w=OLPIRT`);
+    render(<Dictionary uses={{}} />);
+    const sheet = await screen.findByRole("dialog");
+    const link = await within(sheet).findByRole("link", { name: "Key 18" });
+    expect(link.getAttribute("href")).toBe("/enochian/keys#key-18-word-40");
+    expect(within(sheet).getByText("light,").tagName).toBe("B");
+    fireEvent.click(within(sheet).getByRole("button", { name: "and 1 more" }));
+    expect(within(sheet).getByRole("link", { name: "Key 3" })).toBeTruthy();
+    expect(fetch).toHaveBeenCalledTimes(1);
+    vi.unstubAllGlobals();
+  });
+});

@@ -6,6 +6,7 @@ import dictionary from "magick-data/enochian/dictionary";
 import * as React from "react";
 import EnochianFont from "../../../components/enochian/enochianFont";
 import Entry from "./Entry";
+import InTheKeys from "./InTheKeys";
 import Keypad from "./Keypad";
 import { LABELS } from "./labels";
 import {
@@ -391,7 +392,9 @@ export default function Dictionary({
       entry={entry}
       onClose={close}
       headingId={headingId}
-    />
+    >
+      <InTheKeys word={url.word} />
+    </Entry>
   );
 
   let at = -1;

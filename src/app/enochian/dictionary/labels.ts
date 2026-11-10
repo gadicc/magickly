@@ -32,4 +32,13 @@ export const LABELS = {
   backspace: "Delete a letter",
   backspaceKey: "⌫",
   done: "Done",
+  inTheKeys: "In the Keys",
+  place: (use: { key: number; aethyr?: number }) =>
+    use.aethyr === undefined
+      ? `Key ${use.key}`
+      : `Key 19, the Call of Aethyr ${use.aethyr}`,
+  inPart: (word: string) => `as part of ${word}`,
+  quoteOpen: (before: string) => (before ? `“…${before} ` : "“"),
+  quoteClose: (after: string) => (after ? ` ${after}…”` : "”"),
+  moreUses: (count: number) => `and ${count} more`,
 } as const;

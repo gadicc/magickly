@@ -368,6 +368,30 @@ function AethyrPicker({
   );
 }
 
+/** Where a link into the page points (plan 074, decision 9). */
+export interface Anchor {
+  key: number;
+  /** On Key 19: the Aethyr to show. */
+  aethyr?: number;
+  /** The word to select, by row from 1. */
+  row?: number;
+}
+
+/**
+ * Reads a link's hash: `#key-7`, `#key-7-word-12`, or `#aethyr-3-word-4`
+ * for Key 19 as the third Aethyr's call. The dictionary's entries link here.
+ */
+export function readAnchor(hash: string): Anchor | null {
+  const found = /^#(key|aethyr)-(\d+)(?:-word-(\d+))?$/.exec(hash);
+  if (!found) return null;
+  const n = Number(found[2]);
+  const row = found[3] ? Number(found[3]) : undefined;
+  const anchor: Anchor =
+    found[1] === "aethyr" ? { key: 19, aethyr: n } : { key: n };
+  if (row) anchor.row = row;
+  return anchor;
+}
+
 export default function Keys({
   keys,
   aethyrs,
@@ -382,7 +406,31 @@ export default function Keys({
   const [aethyr, setAethyr] = React.useState(1);
   const { enochianFont, EnochianFontToggle } = useEnochianFont();
   const [selected, setSelected] = React.useState<Selected | null>(null);
+  const [expanded, setExpanded] = React.useState<ReadonlySet<number>>(
+    () => new Set(),
+  );
   const hasGd = keys.some((key) => key.gd);
+
+  // A link such as the dictionary's opens its Key, its Aethyr and its word,
+  // after hydration and whenever the hash changes.
+  React.useEffect(() => {
+    const follow = () => {
+      const anchor = readAnchor(window.location.hash);
+      if (!anchor || !keys.some((key) => key.key === anchor.key)) return;
+      setExpanded((was) => new Set(was).add(anchor.key));
+      if (anchor.aethyr && aethyrs.some((one) => one.n === anchor.aethyr))
+        setAethyr(anchor.aethyr);
+      if (anchor.row) setSelected({ key: anchor.key, row: anchor.row });
+      requestAnimationFrame(() =>
+        document
+          .getElementById(`key-${anchor.key}-header`)
+          ?.scrollIntoView({ block: "start" }),
+      );
+    };
+    follow();
+    window.addEventListener("hashchange", follow);
+    return () => window.removeEventListener("hashchange", follow);
+  }, [keys, aethyrs]);
 
   // Escape closes the word panel, wherever the focus is.
   React.useEffect(() => {
@@ -462,6 +510,15 @@ export default function Keys({
           return (
             <Accordion
               key={key.key}
+              expanded={expanded.has(key.key)}
+              onChange={(_event, open) =>
+                setExpanded((was) => {
+                  const next = new Set(was);
+                  if (open) next.add(key.key);
+                  else next.delete(key.key);
+                  return next;
+                })
+              }
               // Each Key is a section of the page under its h1.
               slotProps={{ heading: { component: "h2" } }}
             >

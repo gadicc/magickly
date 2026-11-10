@@ -39,6 +39,11 @@ const styles = {
   "& .entry-source": { color: "text.secondary", fontSize: 12, ml: 0.75 },
   "& .entry-note": { color: "text.secondary", fontSize: 13 },
   "& .entry-actions": { display: "flex", gap: 1, mt: 2, alignItems: "center" },
+  "& .entry-uses": { listStyle: "none", margin: 0, padding: 0 },
+  "& .entry-uses li": { margin: "6px 0" },
+  "& .entry-uses a": { color: "primary.main", fontWeight: 500 },
+  "& .entry-quote": { fontSize: 14, color: "text.secondary" },
+  "& .entry-quote b": { color: "text.primary", fontWeight: 500 },
 } as const;
 
 /** "ah (EMPM)" for each of a word's pronunciations. */

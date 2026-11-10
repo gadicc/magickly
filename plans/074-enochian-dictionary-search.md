@@ -229,10 +229,13 @@ ranking, and kept in the session notes rather than the repository:
      recorded as the Aethyr's name, linked to that Aethyr.
    - A word found only as part of a split word (NOR and MOLAP in
      NORMOLAP) records the compound's row, labelled "in NORMOLAP".
-   - The entry shows the first use, "and N more" (expandable), and a link.
-     The Keys page gains anchors read after hydration and on
-     `hashchange`: `#key-N` opens that Key, and `#aethyr-NAME` opens Key
-     19 at that Aethyr.
+   - The entry shows the first use, "and N more" (expandable), and a
+     link (`InTheKeys.tsx`). The Keys page gains anchors read after
+     hydration and on `hashchange` (`readAnchor` in `keys.tsx`; its
+     accordions become controlled): `#key-N` opens that Key,
+     `#key-N-word-R` also selects its word, and `#aethyr-N-word-R` opens
+     Key 19 at that Aethyr and selects the word. (The draft named Aethyrs
+     by name; the build uses the number, which the map already holds.)
    - Only the counts per word (a few KB) are passed to the page as a
      prop, for decision 5's tie-break. Built into the page, the full map
      would have added 147 KB raw and 25 KB gzipped to every load (the
