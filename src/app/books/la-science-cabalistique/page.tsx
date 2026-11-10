@@ -18,7 +18,6 @@ export default function BookPage() {
       <PageBreadcrumbs path="/books/la-science-cabalistique" />
       <div className={styles.reading}>
         <JsonLd data={bookJsonLd(SITE_URL)} />
-        <h1>La Science Cabalistique</h1>
         <p lang="fr">
           <em>
             ou l&apos;art de connaître les bons génies qui influent sur la

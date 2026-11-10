@@ -36,8 +36,10 @@ describe("geomancy reference page", () => {
   const html = renderToString(<GeomancyReference />);
 
   it("renders the same bytes it did before the data was rekeyed", () => {
+    // Re-pinned when the headings became h2s and "Geomanic" and "ofThe"
+    // were corrected (10 November 2026).
     expect(digest(html)).toBe(
-      "62119 863e323249bc2ba11753bf0ba7b675bc0aaebff526d5d343b451657d4374d161",
+      "62129 b6dce3713b74b4aa74981f70ad5fd0b90f788d13b6dc3ed67e70087039d08f97",
     );
   });
 

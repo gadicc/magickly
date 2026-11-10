@@ -65,7 +65,7 @@ export default function Geomancy() {
     <>
       <Container sx={{ my: 1 }}>
         <p>
-          In great appreciation of
+          In great appreciation of{" "}
           <i>The Golden Dawn Journal: Book 1: Divination</i> by Chic & Tabatha
           Cicero. Buy on{" "}
           <a href="https://www.amazon.com/Golden-Dawn-Journal-Divination-Llewellyns/dp/1567188508">
@@ -79,7 +79,7 @@ export default function Geomancy() {
         </p>
 
         <div style={{ textAlign: "center" }}>
-          <Typography variant="h4" sx={{ my: 2 }}>
+          <Typography variant="h4" component="h2" sx={{ my: 2 }}>
             16 Tetragrams
           </Typography>
           <Select
@@ -156,7 +156,12 @@ export default function Geomancy() {
         </Grid>
         <br />
 
-        <Typography variant="h4" sx={{ my: 2 }} style={{ textAlign: "center" }}>
+        <Typography
+          variant="h4"
+          component="h2"
+          sx={{ my: 2 }}
+          style={{ textAlign: "center" }}
+        >
           Spirits and Rulers
         </Typography>
 
@@ -198,8 +203,13 @@ export default function Geomancy() {
         </TableContainer>
         <br />
 
-        <Typography variant="h4" sx={{ my: 2 }} style={{ textAlign: "center" }}>
-          Geomanic Houses
+        <Typography
+          variant="h4"
+          component="h2"
+          sx={{ my: 2 }}
+          style={{ textAlign: "center" }}
+        >
+          Geomantic Houses
         </Typography>
 
         <div style={{ textAlign: "justify" }}>
@@ -214,7 +224,12 @@ export default function Geomancy() {
           ))}
         </div>
 
-        <Typography variant="h4" sx={{ my: 2 }} style={{ textAlign: "center" }}>
+        <Typography
+          variant="h4"
+          component="h2"
+          sx={{ my: 2 }}
+          style={{ textAlign: "center" }}
+        >
           Meanings in the Houses
         </Typography>
 

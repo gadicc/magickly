@@ -9,7 +9,6 @@ export default function BooksPage() {
     <div
       style={{ maxWidth: "42rem", margin: "0 auto", padding: "0 1rem 3rem" }}
     >
-      <h1>Books</h1>
       <p>
         Public-domain works of the Western esoteric tradition, read from their
         original scans and published in full, with an editorial apparatus

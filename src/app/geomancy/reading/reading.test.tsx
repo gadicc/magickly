@@ -51,10 +51,12 @@ const render = (house: string) =>
  * `useId`s. Nothing else differed.
  */
 describe("geomancy reading page", () => {
+  // Re-pinned when "Mothers" and "Interpretation" became h2s (10 November
+  // 2026); the bytes are otherwise those from before the rekey.
   it.each([
     [
       "1",
-      "79016 caf895983ee4ce29d3943fff8f5a3dbfaea3734c7f9cc17b498b4204d5a3d88d",
+      "79016 15b077210724fcca6d07009f217ed99a1212067ac402b563d0aa500a860d6de4",
       [
         "Personality of the Querent",
         "Good, except in war.",
@@ -64,7 +66,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "7",
-      "78967 dfe9aa67bd3f5c4530a312e80386ec375e2d93ae9b438c774421ba99da7a4516",
+      "78967 59e002fd6816b772b4a48c26fbeb56f900493db58e57ec01bf019e7275f25fc3",
       [
         "Love, marriage, prostitution",
         "Indifferent.",
@@ -74,7 +76,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "12",
-      "78948 ea7ac8c5fb8912309b0946828afb3e20820a03b72b23d9d3c4c70bd8f94ea989",
+      "78948 547cd19bd051edd9628d552baed520526146e604fa265c62025160a6846ba3dd",
       [
         "Sorrow, hospitals, intrigue",
         "Unfavourable generally.",

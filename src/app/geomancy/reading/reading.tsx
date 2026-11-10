@@ -545,7 +545,9 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
           .
         </div>
         <br />
-        <Typography variant="h6">Mothers</Typography>
+        <Typography variant="h6" component="h2">
+          Mothers
+        </Typography>
         <span style={{ fontSize: "80%", fontStyle: "italic" }}>
           Tap the rows to toggle between odd &amp; even (or click the dice)
         </span>
@@ -633,7 +635,9 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
           group={false}
         />
         <br />
-        <Typography variant="h6">Interpretation</Typography>
+        <Typography variant="h6" component="h2">
+          Interpretation
+        </Typography>
         <div style={{ color: "#aaa", fontSize: "80%", marginBottom: 10 }}>
           Select the most relevant house to which the question pertains.
         </div>
