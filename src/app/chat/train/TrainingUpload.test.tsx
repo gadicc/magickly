@@ -109,8 +109,11 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 async function selectPdf(name = "synthetic.pdf") {
-  await waitFor(() =>
-    expect(document.querySelector('input[type="file"]')).not.toBeNull(),
+  // FilePond creates its browser input on an animation frame; a busy hosted
+  // runner can take longer than waitFor's default one-second limit.
+  await waitFor(
+    () => expect(document.querySelector('input[type="file"]')).not.toBeNull(),
+    { timeout: 4000 },
   );
   const input = document.querySelector(
     'input[type="file"]',

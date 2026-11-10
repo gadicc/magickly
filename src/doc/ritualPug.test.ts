@@ -444,7 +444,8 @@ describe("Pug surface conveniences", () => {
     }
     // The pool favours fallbacks; enough rounds must still take the pipe path.
     expect(piped).toBeGreaterThan(40);
-  });
+    // All 600 cases run under coverage on the slower hosted CI runners too.
+  }, 15_000);
 
   it("expands shortcuts, retains IDs and inline content, and prints shortcuts by default", () => {
     const source = `${RITUAL_PUG_HEADER}\nHiero#Ab3k9Qp7Zx2Mn5Rs: Hi #[b#Other00000000001 there].\n* Keryx#Third00000000001 Open the door.\n`;
