@@ -1,4 +1,9 @@
 import { useSyncExternalStore } from "react";
+import {
+  CHOSEN_PLACE_KEY,
+  DETECTED_PLACE_KEY,
+  takeEarlyPlaceLookup,
+} from "./earlyPlaceLookup";
 import { type Place, toPlace } from "./place";
 import { deviceTimeZone } from "./timeZone";
 
@@ -43,10 +48,8 @@ export interface PlaceStore {
   dispose(): void;
 }
 
-/** `localStorage`: the place the reader chose, `{ version, source, place }`. */
-export const CHOSEN_PLACE_KEY = "magickli.place";
-/** `sessionStorage`: the IP lookup's place, `{ version, place }`. */
-export const DETECTED_PLACE_KEY = "magickli.place.ip";
+export { CHOSEN_PLACE_KEY, DETECTED_PLACE_KEY };
+
 const VERSION = 1;
 /** How long the IP lookup may take before the place is `unknown`. */
 export const PLACE_LOOKUP_TIMEOUT_MS = 5000;
@@ -110,28 +113,39 @@ function readDetected(): SourcedPlace | null {
 
 const round3 = (degrees: number) => Math.round(degrees * 1000) / 1000;
 
+/** `/api/geo`'s parsed body, or `undefined` when it failed. */
+async function fetchBody(signal: AbortSignal): Promise<unknown> {
+  try {
+    const response = await fetch("/api/geo", { cache: "no-store", signal });
+    return response.ok ? await response.json() : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /**
  * The IP lookup: `/api/geo`'s place, `null` when it answered that it does
  * not know, or `undefined` when it failed (offline, timed out, an error
- * status or an answer that is not one).
+ * status or an answer that is not one). It takes the lookup the page's
+ * `<head>` started, when there is one (`earlyPlaceLookup.ts`).
  */
 async function lookUp(): Promise<Place | null | undefined> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), PLACE_LOOKUP_TIMEOUT_MS);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timedOut = new Promise<undefined>((resolve) => {
+    timer = setTimeout(resolve, PLACE_LOOKUP_TIMEOUT_MS, undefined);
+  });
   try {
-    const response = await fetch("/api/geo", {
-      cache: "no-store",
-      signal: controller.signal,
-    });
-    if (!response.ok) return undefined;
-    const body: unknown = await response.json();
+    const body = await Promise.race([
+      takeEarlyPlaceLookup() ?? fetchBody(controller.signal),
+      timedOut,
+    ]);
     if (!isRecord(body) || !("place" in body)) return undefined;
     if (body.place === null) return null;
     return toPlace(body.place) ?? undefined;
-  } catch {
-    return undefined;
   } finally {
     clearTimeout(timer);
+    controller.abort();
   }
 }
 

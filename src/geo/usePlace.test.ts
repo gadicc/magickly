@@ -64,6 +64,7 @@ beforeEach(() => {
 
 afterEach(() => {
   store.dispose();
+  delete window.__magickliPlaceLookup;
   vi.useRealTimers();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
@@ -220,6 +221,37 @@ describe("the place store", () => {
     await vi.advanceTimersByTimeAsync(1);
     expect(lookup.pending[0].signal.aborted).toBe(true);
     expect(store.getSnapshot()).toEqual({ status: "unknown", place: null });
+  });
+
+  it("takes the lookup the page's head started instead of asking again", async () => {
+    window.__magickliPlaceLookup = Promise.resolve({ place: tokyo });
+    store.subscribe(() => {});
+    await flush();
+    expect(store.getSnapshot().place).toEqual({ ...tokyo, source: "ip" });
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(window.__magickliPlaceLookup).toBeUndefined();
+  });
+
+  it("is unknown when the head's lookup failed, and asks itself on a retry", async () => {
+    window.__magickliPlaceLookup = Promise.resolve(undefined);
+    store.subscribe(() => {});
+    await flush();
+    expect(store.getSnapshot().status).toBe("unknown");
+    window.dispatchEvent(new Event("online"));
+    await flush();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(store.getSnapshot().place).toEqual({ ...london, source: "ip" });
+  });
+
+  it("gives the head's lookup 5 seconds too", async () => {
+    vi.useFakeTimers();
+    window.__magickliPlaceLookup = new Promise(() => {});
+    store.subscribe(() => {});
+    await vi.advanceTimersByTimeAsync(PLACE_LOOKUP_TIMEOUT_MS - 1);
+    expect(store.getSnapshot().status).toBe("loading");
+    await vi.advanceTimersByTimeAsync(1);
+    expect(store.getSnapshot()).toEqual({ status: "unknown", place: null });
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("tries again when the browser comes back online", async () => {

@@ -4,6 +4,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import type { Metadata, Viewport } from "next";
 import * as React from "react";
 import VercelInsights from "@/analytics/VercelInsights";
+import { earlyPlaceLookupScript } from "@/geo/earlyPlaceLookup";
 
 import {
   SITE_DESCRIPTION,
@@ -63,6 +64,10 @@ export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en" dir="ltr">
       <head>
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: our own constant script, no input
+          dangerouslySetInnerHTML={{ __html: earlyPlaceLookupScript }}
+        />
         <link
           rel="apple-touch-icon"
           sizes="57x57"

@@ -500,3 +500,23 @@ check production instead, accepting that it might not work at first.
    (country `IL`, time zone `Asia/Jerusalem`, coordinates near the
    city). There was no region, as designed: Vercel gives only an ISO
    code for it (see "The spike").
+
+## After release: the early lookup
+
+Gadi asked on 10 November 2026 whether the first page load could carry
+the location instead of asking `/api/geo` after hydrating. Rendering
+it into the HTML would make the three pages dynamic (a function per
+view, no CDN copy, an old place in the service worker's copy) and the
+hours are computed in the browser anyway; a proxy setting a cookie
+would also run on every view. Instead an inline script in the root
+layout's `<head>` (`src/geo/earlyPlaceLookup.ts`) starts the request
+while the JavaScript downloads, only on the pages in `PLACE_PAGES` and
+only when nothing is stored, and the store takes its answer once,
+under the same 5-second limit. The pages stay static and `/api/geo` is
+unchanged. A test keeps `PLACE_PAGES` in step with the pages that
+import `usePlace`.
+
+In the dev server (Turbopack, `GEO_FIXTURE=1`) with nothing stored, the
+request started at 85 ms and answered at 95 ms, before the last script
+loaded at 240 ms; it was the page's only `/api/geo` request. A reload
+with the session's place stored, and `/astrology`, made none.
