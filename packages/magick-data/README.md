@@ -391,7 +391,7 @@ pages and leaves, and each Key's `checked` record says what was compared
 and what was not; Dee's own copy, Sloane MS 3191, whose images have been
 offline since 2023, is not.
 
-So far Keys 1 to 3 are re-derived, in Dee's spelling only. Keys 4 to 18
+So far Keys 1 to 10 are re-derived, in Dee's spelling only. Keys 11 to 18
 still carry the text the app had from 2023, whose source is not known;
 they are marked as such, and nothing said here of the sources or the
 licence covers them. The Golden Dawn's reading, from Aleister Crowley's

@@ -17,11 +17,54 @@ import {
  */
 const NOT_IN_THE_DICTIONARY: Record<string, string> = {
   ZOMDV: "Casaubon's V after E.K.'s doubtful X; the dictionary has ZOMD",
-  PIAMOL:
-    'Key 1\'s "of righteousnesse", spelled out letter by letter; not in the dictionary',
+  PIAMOL: "spelled out letter by letter in Key 1; not in the dictionary",
   VIIV: "Casaubon's spelling; the dictionary has VIV",
   IALPURG: "Casaubon's spelling; the dictionary has IALPRG",
   TAPVIN: "one word in Casaubon, two (TA, PUIM) in the dictionary",
+  DSONF: "DS and SONF run together, sharing the S",
+  CRPL: "Casaubon's spelling; the dictionary has CRP",
+  FGAOSGA: "Casaubon prints G for the C of CAOSGA",
+  DSI: "DS and I run together; a one-letter part is too short to split on",
+  DOOAIP: "Casaubon's spelling; the dictionary has DOOIAP",
+  AAF: "A and AF run together; a one-letter part is too short to split on",
+  DUIV: "D and UIV run together; a one-letter part is too short to split on",
+  PIRIPSOL: "Casaubon's spelling; the dictionary has PIRIPSON",
+  QCOCASB:
+    "Q and COCASB run together; a one-letter part is too short to split on",
+  FETHARZI:
+    "F and ETHARZI run together; a one-letter part is too short to split on",
+  BLIORA: "Casaubon's spelling; the dictionary has BLIORAX",
+  SDIU: "S and DIU run together; a one-letter part is too short to split on",
+  MALPURG: "Casaubon's spelling; the dictionary has MALPRG",
+  FBLIARD: "Casaubon's corrected F for T; not in the dictionary",
+  CHIF: 'Key 6.25\'s "are": not in the dictionary',
+  SOBHAATH: 'Key 6.39\'s "whose works": not in the dictionary',
+  ISALMAN:
+    "I and SALMAN run together; a one-letter part is too short to split on",
+  CHISTAD: 'Key 7.27\'s "are as the third": not in the dictionary',
+  QADAH: "Casaubon's spelling; the dictionary has QAADAH",
+  VGEGI: 'Key 7.51\'s "waxeth strong": not in the dictionary',
+  ITA: "I and TA run together; a one-letter part is too short to split on",
+  SOLAMIAN: 'Key 8.14\'s "whose long continuance": not in the dictionary',
+  ABAIUONIN: 'Key 8.17\'s "to the stooping Dragons": not in the dictionary',
+  AZIAGIAR: "Casaubon's spelling; the dictionary has AZIAGIER",
+  IRGILCHISDA: 'Key 8.21\'s "How many are there": not in the dictionary',
+  BUFD: 'Key 8.23\'s "in the glory": not in the dictionary',
+  IADOIASMOMAR: "Casaubon's spelling; the dictionary has IADOIASMOMA",
+  PURGEL: "Casaubon's spelling; the dictionary has PRGE",
+  SOBCA: "Casaubon's spelling; the dictionary has SOBA",
+  CIAL: "C and IAL run together; a one-letter part is too short to split on",
+  ACHILDAO:
+    "A and CHILDAO run together; a one-letter part is too short to split on",
+  ASOBAMA: "Casaubon's spelling; the dictionary has A-SOBAM",
+  ACOCASB:
+    "A and COCASB run together; a one-letter part is too short to split on",
+  ICORSCA: "Casaubon's spelling; the dictionary has ORSCA",
+  AZIAZOR: "Casaubon's spelling; the dictionary has AZIAZIOR",
+  COCASG: "Casaubon's spelling; the dictionary has COCASB",
+  GIZYAX: "Casaubon's spelling; the dictionary has GIXYAX",
+  LPATRALX:
+    "L and PATRALX run together; a one-letter part is too short to split on",
 };
 
 describe("the Keys' dictionary entries", () => {
