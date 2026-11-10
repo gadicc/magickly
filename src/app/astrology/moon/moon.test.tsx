@@ -1,6 +1,9 @@
 // @vitest-environment jsdom
 import { DateTime, Settings } from "luxon";
+import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { moonMeanInclination } from "@/components/astrology/Moon";
+import { resetPlaceStore } from "@/geo/usePlace";
 import { hydrateAt, renderAt } from "../../../../tests/hydration";
 import Moon from "./moon";
 
@@ -16,11 +19,22 @@ const pastTitles = (container: HTMLElement) =>
     (title) => title.textContent,
   );
 
+let answerGeo: (place: unknown) => void;
+
 beforeEach(() => {
-  // The GeoIP lookup never answers; the moon's hemisphere is not under test.
+  localStorage.clear();
+  sessionStorage.clear();
+  resetPlaceStore();
+  // The place lookup answers only when a test calls `answerGeo`.
   vi.stubGlobal(
     "fetch",
-    vi.fn(() => new Promise(() => {})),
+    vi.fn(
+      () =>
+        new Promise((resolve) => {
+          answerGeo = (place) =>
+            resolve({ ok: true, json: async () => ({ place }) });
+        }),
+    ),
   );
   Settings.defaultLocale = "en-GB";
 });
@@ -72,6 +86,28 @@ describe("Moon page", () => {
       "🌓 First Quarter 🌓",
     ]);
 
+    await unmount();
+  });
+});
+
+describe("the Moon page's drawing", () => {
+  it("turns for a place south of the equator", async () => {
+    const html = renderAt(buildTime, <Moon />);
+    const { container, problems, unmount } = await hydrateAt(
+      visitTime,
+      html,
+      <Moon />,
+    );
+    const transform = () =>
+      container.querySelector("svg")?.getAttribute("transform");
+    expect(problems).toEqual([]);
+    expect(transform()).toBe(`rotate(${moonMeanInclination})`);
+
+    await act(async () => {
+      answerGeo({ name: "Cape Town", latitude: -33.92, longitude: 18.42 });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    expect(transform()).toBe(`rotate(${180 - moonMeanInclination})`);
     await unmount();
   });
 });

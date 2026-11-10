@@ -3,6 +3,7 @@ import useHydrated from "@magick-components/hooks/useHydrated";
 import lune from "lune";
 import { DateTime } from "luxon";
 import MoonDrawing from "@/components/astrology/Moon";
+import usePlace from "@/geo/usePlace";
 
 /*
 // https://www.unicode.org/L2/L2017/17304-moon-var.pdf
@@ -19,6 +20,9 @@ export default function Moon() {
   // The page is prerendered at build time and the dates are shown in the
   // viewer's time zone, so hydrate without them.
   const hydrated = useHydrated();
+  // The drawing turns for the reader's hemisphere once the place is known
+  // (plan 072): from the IP lookup, or the place chosen on another page.
+  const { place } = usePlace();
   const now = new Date();
   const hunt = lune.phase_hunt(now);
   const huntNext = lune.phase_hunt(
@@ -62,7 +66,7 @@ export default function Moon() {
 
       <div id="page">
         <div style={{ height: "155px" }}>
-          <MoonDrawing moonPadding="20px 0 10px 0" />
+          <MoonDrawing moonPadding="20px 0 10px 0" latitude={place?.latitude} />
         </div>
 
         <br />

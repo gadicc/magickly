@@ -17,6 +17,7 @@ export const DETECTED_PLACE_KEY = "magickli.place.ip";
  * early start.
  */
 export const PLACE_PAGES = [
+  "/astrology/moon",
   "/astrology/planetary-hours",
   "/astrology/planets",
   "/geomancy/reading",
