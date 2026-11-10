@@ -57,9 +57,11 @@ What it checks, before running anything from the worktree:
 It then gives the worktree's code only the local development settings,
 read (never sourced) from the main checkout's `.env.local`: the database, the
 MinIO storage and the local test login, with a throwaway auth secret and
-placeholder Google values. API keys, secrets keys and the rest stay out of its
-environment. The dev server listens on 127.0.0.1 on a free port and is
-stopped when the run ends or is interrupted.
+placeholder Google values, and `GEO_FIXTURE=1` so `/api/geo` answers a
+synthetic London rather than the capturing machine's real city. API keys,
+secrets keys and the rest stay out of its environment. The dev server
+listens on 127.0.0.1 on a free port and is stopped when the run ends or is
+interrupted.
 
 **What this does not do.** The worktree's code runs as you, with your files:
 it could read the main checkout's `.env.local`, or anything else in your home

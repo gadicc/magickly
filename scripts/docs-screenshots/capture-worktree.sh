@@ -116,8 +116,10 @@ log=$(mktemp -t magickli-docs-capture.XXXXXX.log)
 clean() {
   {
     while IFS= read -r name; do unset "$name" 2>/dev/null || true; done < <(compgen -e)
+    # GEO_FIXTURE=1: /api/geo answers a synthetic London instead of asking
+    # production, which would put this machine's real city in the images.
     export HOME PATH="$run_path" TERM="${TERM:-dumb}" \
-      NODE_ENV=development NEXT_TELEMETRY_DISABLED=1 \
+      NODE_ENV=development NEXT_TELEMETRY_DISABLED=1 GEO_FIXTURE=1 \
       BETTER_AUTH_SECRET="$secret" \
       GOOGLE_CLIENT_ID=docs-capture-google-client \
       GOOGLE_CLIENT_SECRET=docs-capture-google-secret
