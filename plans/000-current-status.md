@@ -124,8 +124,16 @@ Follow-ups are separate from the completed migration work:
 - 9 November 2026: on-site search work (breadcrumbs, a footer, section
   and tool text) in [plan 071](071-on-site-search.md), from a Search
   Console audit: 3 clicks in 28 days, most sitemap pages unseen. Stages
-  1 to 4 are built; TODO: the section and tool text (stage 5), after
-  Gadi's answers to its review sheet.
+  1 to 4 are released; stage 5, the section and tool text, was built
+  10 November on `gate/onsite-texts`, stacked on `gate/enochian-keys`.
+  TODO: other American spellings in the data (such as "favor",
+  "fulfill", "savior") stay until the language packs; Gadi chose
+  "Splendour" alone for now.
+- TODO: slips the stage 5 review found on pages it touched, older than
+  it: the geomancy reference prints "ofThe Golden Dawn Journal" and
+  "Geomanic", and puts `h4`s straight under the `h1`; the reading uses
+  `h6`s; `/books` has two `h1`s; the reading credits "the Hensen's",
+  which may be the Hensons (unchecked).
 - 10 November 2026: the Enochian Keys complete and checked in
   [plan 073](073-enochian-keys.md): most Keys lack their Enochian (676 of
   1,014 rows), the 2023 text's source is unknown, so all of it is

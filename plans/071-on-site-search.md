@@ -1,7 +1,7 @@
 # On-site search work — 9 November 2026
 
-Status: stages 1 to 4 built 9 November 2026; stage 5, the text, waits
-on Gadi's answers to the review sheet. Read
+Status: stages 1 to 4 built 9 November 2026; stage 5, the text, built
+10 November 2026 after Gadi's answers to the review sheet. Read
 [current status](000-current-status.md) first. This plan
 follows the whole-site SEO of [plan 028](028-seo.md) and the hall pages
 of [plan 062](062-gd-hall-seo.md). It covers what the site itself can
@@ -304,6 +304,69 @@ independent review whose findings were folded in before its commit.
   read "Enochian › Enochian Dictionary", repeating the section; better
   link text, and how search engines show many sites' breadcrumbs.
 
+## Stage 5: the text (10 November 2026)
+
+Built on `gate/onsite-texts`, stacked on plan 073's
+`gate/enochian-keys`, since the Enochian texts describe its nineteen
+Keys. Every text went on one sheet for Gadi's review first; his answers
+(10 November 2026), and what became of each:
+
+1. **The nineteenth Key** and 2. **checking every Key**: done in
+   [plan 073](073-enochian-keys.md); the Keys text is its `KeysText`.
+3. **English search** in the dictionary is a follow-up, with a revamp
+   of its UI ([current status](000-current-status.md)); the text says
+   the dictionary looks words up from Enochian. A neural translator is a
+   long-term goal.
+4. **Naming the dictionary's sources** (Schueler, *The Whole Enochian
+   Dictionary*): as drafted.
+5. **Location** became [plan 072](072-reader-location.md); the hours
+   and Moon texts describe its place picker.
+6. **"Nephews"** stays the label; the texts say "Nephews (often called
+   Nieces)".
+7. **The reading's starting figures** stay.
+8. **"Splendour"** in the texts and in the data.
+9. **The Enochian flashcards** link `/study?tags=enochian`, from the
+   dictionary too.
+10. and 11. **The Oration's and the Keys' dates** stay, cited:
+    the British Library's records of Sloane MS 3188
+    (<https://searcharchives.bl.uk/catalog/040-002115572>: the
+    Mysteriorum Libri, 22 December 1581 to 30 May 1583, before the
+    conferences Casaubon printed) and Sloane MS 3191
+    (<https://searcharchives.bl.uk/catalog/040-002115575>: the Calls,
+    13 April to 13 July 1584, Cracow); Casaubon, *A True & Faithful
+    Relation* (1659), archive.org `truefaithfulrela00deej`, p. 78
+    (leaf n171) and pp. 201–209.
+
+What changed from the sheet:
+
+- **Facts that moved since drafting**: the Enochian text names the
+  nineteen Keys and the Golden Dawn's reading; the hours text describes
+  choosing a place, the remembered choice and the time-zone note.
+- **Repeats cut**: where a page already says it above the text, the
+  text doesn't: the 72 angels' Reuchlin and sources; the halls' list,
+  intro and licence (their text keeps how halls follow the paths); the
+  tablets' and versions' notes (their text is how to use the page); the
+  Tree's Sephiroth; the Oration's credit; the books' editing.
+- **An independent review** (Fable) corrected claims the pages don't
+  bear out: the angels' list has no Hebrew names (their pages do); the
+  book is read from a later reissue, not an early printing; the Oration
+  is said three times over each day (its search description too);
+  before sunrise the hours page shows no night hour in progress; the
+  reading marks the witnesses good or bad itself, for the reader to
+  correct.
+- **The figures table** on the geomancy reference is built from the
+  data, by the grid's own meaning pairs (`pairs.ts`), not copied.
+- **Found on the way**: the Moon page drew the northern view for
+  everyone after plan 072, which wired the reader's place to the planets
+  page's Moon only; and site search's index read JSX text with its
+  character references (`Dee&apos;s`). Both fixed, each in its own
+  commit.
+
+`src/app/PageText.tsx` lays every text out as a section named by its
+first `h2`; `src/app/pageTexts.test.tsx` checks that, the heading
+levels, and that every link is a page in the sitemap. The search index
+is refreshed in each commit that changes its text.
+
 ## Commits
 
 | Commit | Change |
@@ -313,6 +376,11 @@ independent review whose findings were folded in before its commit.
 | 1bf4b577 | Breadcrumb structured data on every page below a section |
 | bf9c668c | The site footer |
 | 21341e7e | Fuller headings, angel links, the Tree's tooltips, the home tiles |
+| 1daa85d2 | The Moon page's hemisphere (found in stage 5) |
+| b9b5107f | Site search reads character references (found in stage 5) |
+| bc8af2a3 | Stage 5: the section texts |
+| 78023ec1 | Stage 5: the tool texts |
+| 75ed1ff5 | "Splendour" in the data |
 
 ## Verification
 
