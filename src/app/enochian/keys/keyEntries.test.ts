@@ -65,6 +65,83 @@ const NOT_IN_THE_DICTIONARY: Record<string, string> = {
   GIZYAX: "Casaubon's spelling; the dictionary has GIXYAX",
   LPATRALX:
     "L and PATRALX run together; a one-letter part is too short to split on",
+  TI: "T and I run together; a one-letter part is too short to split on",
+  NIISA: "Casaubon's spelling; the dictionary has NIIS",
+  VONPH: "Casaubon's spelling; the dictionary has VONPHO",
+  JUMD: 'Key 13.22\'s "is called": not in the dictionary',
+  JIROSABE: "Crowley's form, where Casaubon's print lost Dee's",
+  BAJIHIE:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has BAGHIE",
+  PASAHASA:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has PASHS",
+  OIADA:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has OIAD",
+  DAS: "Crowley's form, where Casaubon's print lost Dee's; the dictionary has DS",
+  TARINUTA:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has TRINT",
+  MIRECA:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has MIRC",
+  TAHILA:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has THIL",
+  DODASA:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has DODS",
+  TOLAHAME: "Crowley's form, where Casaubon's print lost Dee's",
+  CAOSAGO:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has CAOSGO",
+  HOMIDA: "Crowley's form, where Casaubon's print lost Dee's",
+  BERINU:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has BERIANU",
+  OROCAHE:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has OROCH",
+  MICAMA:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has MICMA",
+  AISARO:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has AISRO",
+  TOXA: "Crowley's form, where Casaubon's print lost Dee's; the dictionary has TOX",
+  IVAME: "Crowley's form, where Casaubon's print lost Dee's",
+  BALATIMA:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has BALTIM",
+  CASAREMANU:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has CASARMAN",
+  UPAAHI:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has UPAAH",
+  CAHISA:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has CHIS",
+  CAOSAJI:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has CAOSGI",
+  ORESACORE:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has ORSCOR",
+  MONASACI:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has MONASCI",
+  BAEOUIBE:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has BAEQUIB",
+  EMETAJISA:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has EMETGIS",
+  VIVIAPRT: 'Key 16.2\'s "second flame": not in the dictionary',
+  SALAMANU:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has SALMAN",
+  BALATA:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has BALTAN",
+  ACARO:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has ACAR",
+  ODAZODI: "Crowley's form, where Casaubon's print lost Dee's",
+  BUSADA:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has BUSD",
+  BELIORAXA:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has BLIORAX",
+  BALITA:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has BALIT",
+  INUSI:
+    "Crowley's form, where Casaubon's print lost Dee's; the dictionary has INSI",
+  YLS: "Casaubon's spelling; the dictionary has YLSI",
+  DIALPRT:
+    "D and IALPRT run together; a one-letter part is too short to split on",
+  BRINT: "Casaubon's spelling; the dictionary has BRINTS",
+  TAXS: 'Key 17.11\'s "7336": not in the dictionary',
+  TASTAX: "Casaubon's spelling; the dictionary has TUSTAX",
+  VONPO: "Casaubon's spelling; the dictionary has VONPHO",
+  AQLO: 'Key 18.19\'s "in thy": not in the dictionary',
+  ADOHI: "Casaubon's spelling; the dictionary has LOADOHI",
 };
 
 describe("the Keys' dictionary entries", () => {

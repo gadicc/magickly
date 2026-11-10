@@ -285,6 +285,18 @@ describe("the versions", () => {
           note: "lost in Casaubon's print",
         },
         { english: "and", readings: { casaubon1659: { word: "OD" } } },
+        {
+          english: "the beginning",
+          readings: { equinox1912no8: { word: "bial'" } },
+          notInCasaubon: true,
+          note: "lost in Casaubon's print",
+        },
+        {
+          english: "wise",
+          readings: { equinox1912no8: { word: "monasaçi" } },
+          notInCasaubon: true,
+          note: "lost in Casaubon's print",
+        },
       ],
     };
     expect(
@@ -292,6 +304,9 @@ describe("the versions", () => {
     ).toEqual([
       ["vi-vau di-vau", "VIVAUDIVAU", "equinox1912no8"],
       ["OD", "OD", undefined],
+      // Letters only: no apostrophe, no accent.
+      ["bial'", "BIAL", "equinox1912no8"],
+      ["monasaçi", "MONASACI", "equinox1912no8"],
     ]);
     // In the Golden Dawn's the form is its own, and says nothing of `from`.
     expect(hasVersion(lost, "gd")).toBe(false);

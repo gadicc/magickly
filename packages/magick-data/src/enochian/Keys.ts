@@ -271,7 +271,12 @@ export const AETHYR_ORDINALS: readonly string[] = Object.freeze([
  * hyphens and spaces Crowley prints to show its sounding.
  */
 function lookupOf(form: string): string {
-  return form.toUpperCase().replace(/[-\s]/g, "");
+  // Letters only: Crowley's hyphens, spaces, apostrophes ("bial'") and
+  // accents ("monasaçi") are reading aids, not letters of the word.
+  return form
+    .normalize("NFD")
+    .replace(/[^A-Za-z]/g, "")
+    .toUpperCase();
 }
 
 /** Dee's word for a row: the first reading the `dee` rule finds. */
