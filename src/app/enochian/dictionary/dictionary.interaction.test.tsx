@@ -142,3 +142,62 @@ describe("the dictionary page (plan 074)", () => {
     expect(new URLSearchParams(window.location.search).get("w")).toBe("OLPRT");
   });
 });
+
+describe("the Enochian keypad (plan 074, decisions 2 and 4)", () => {
+  const enochianBox = () =>
+    screen.getByLabelText("Enochian, right to left") as HTMLInputElement;
+  const key = (name: string) =>
+    screen.getByRole("button", { name: new RegExp(`^${name},`) });
+
+  it("opens on the Enochian box and types at its caret, keeping focus", () => {
+    render(<Dictionary uses={{}} />);
+    expect(
+      screen.queryByRole("group", { name: "Enochian letters" }),
+    ).toBeNull();
+    const box = enochianBox();
+    act(() => box.focus());
+    expect(
+      screen.getByRole("group", { name: "Enochian letters" }),
+    ).toBeTruthy();
+    expect(screen.getAllByRole("button", { name: /, / })).toHaveLength(21);
+    // Pressing a key must not take focus from the box.
+    const pressed = fireEvent.mouseDown(key("Med"));
+    expect(pressed).toBe(false);
+    fireEvent.click(key("Med"));
+    fireEvent.click(key("Ur"));
+    expect(box.value).toBe("OL");
+    // Type before the L, then delete it again.
+    box.setSelectionRange(1, 1);
+    fireEvent.click(key("Un"));
+    expect(box.value).toBe("OAL");
+    expect(box.selectionStart).toBe(2);
+    fireEvent.click(screen.getByRole("button", { name: "Delete a letter" }));
+    expect(box.value).toBe("OL");
+    expect(document.activeElement).toBe(box);
+  });
+
+  it("closes on Done, on Escape and when the box loses focus", () => {
+    render(<Dictionary uses={{}} />);
+    const keypad = () =>
+      screen.queryByRole("group", { name: "Enochian letters" });
+    act(() => enochianBox().focus());
+    fireEvent.click(screen.getByRole("button", { name: "Done" }));
+    expect(keypad()).toBeNull();
+    act(() => enochianBox().focus());
+    fireEvent.keyDown(enochianBox(), { key: "Escape" });
+    expect(keypad()).toBeNull();
+    act(() => enochianBox().blur());
+    act(() => enochianBox().focus());
+    expect(keypad()).toBeTruthy();
+    act(() => enochianBox().blur());
+    expect(keypad()).toBeNull();
+  });
+
+  it("takes the word typed as a spelling search", async () => {
+    render(<Dictionary uses={{}} />);
+    act(() => enochianBox().focus());
+    fireEvent.click(key("Med"));
+    fireEvent.click(key("Ur"));
+    await waitFor(() => expect(optionWords()[0]).toBe("OL"));
+  });
+});

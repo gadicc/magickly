@@ -6,6 +6,7 @@ import dictionary from "magick-data/enochian/dictionary";
 import * as React from "react";
 import EnochianFont from "../../../components/enochian/enochianFont";
 import Entry from "./Entry";
+import Keypad from "./Keypad";
 import { LABELS } from "./labels";
 import {
   buildIndex,
@@ -32,6 +33,8 @@ const GROUP_ROWS = 30;
 /** How long typing waits before the query is written to the URL. */
 const URL_DELAY = 300;
 const NO_TERMS: string[] = [];
+/** Room left under the list for the docked keypad, so no row hides under it. */
+const KEYPAD_ROOM = 240;
 
 /** Every word, with its first known meaning: the list with no query. */
 const ALL: Hit[] = Object.entries(dictionary).map(([word, entry]) => ({
@@ -160,7 +163,7 @@ const styles = {
     maxHeight: "100vh",
     overflowY: "auto",
     bgcolor: "action.hover",
-    minHeight: 320,
+    height: "100vh",
   },
   "& .dict-choose": { padding: "32px 40px", color: "text.secondary" },
 } as const;
@@ -240,7 +243,31 @@ export default function Dictionary({
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up("md"));
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  // A touch screen gets the keypad in place of its own keyboard; read after
+  // hydration, so the server's HTML has no `inputmode` (decision 2).
+  const coarse = useMediaQuery("(pointer: coarse)");
   const idPrefix = React.useId();
+  const enochianBox = React.useRef<HTMLInputElement>(null);
+  const [keypad, setKeypad] = React.useState(false);
+  // Where the caret goes once the keypad's change has rendered.
+  const caret = React.useRef<number | null>(null);
+  React.useLayoutEffect(() => {
+    if (caret.current === null) return;
+    enochianBox.current?.setSelectionRange(caret.current, caret.current);
+    caret.current = null;
+  });
+
+  /** Puts `letter` at the Enochian box's caret, or deletes before it. */
+  const edit = (letter: string | null) => {
+    const box = enochianBox.current;
+    if (!box) return;
+    const start = box.selectionStart ?? text.length;
+    const end = box.selectionEnd ?? text.length;
+    const from =
+      letter === null && start === end ? Math.max(0, start - 1) : start;
+    caret.current = from + (letter?.length ?? 0);
+    setText(text.slice(0, from) + (letter ?? "") + text.slice(end));
+  };
 
   // The URL's query fills the boxes on load and on Back; the boxes write it
   // back after a pause. `written` tells our own writes from the others.
@@ -370,7 +397,10 @@ export default function Dictionary({
   let at = -1;
   return (
     <Box sx={styles}>
-      <div className="dict-left">
+      <div
+        className="dict-left"
+        style={keypad && !desktop ? { paddingBottom: KEYPAD_ROOM } : undefined}
+      >
         <div className="dict-search">
           <div className="dict-boxes">
             <input
@@ -395,9 +425,16 @@ export default function Dictionary({
               aria-label={LABELS.enochianBox}
               autoComplete="off"
               spellCheck={false}
+              inputMode={coarse ? "none" : undefined}
+              ref={enochianBox}
               value={text}
               onChange={(event) => setText(event.target.value)}
-              onKeyDown={onKeyDown}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") setKeypad(false);
+                onKeyDown(event);
+              }}
+              onFocus={() => setKeypad(true)}
+              onBlur={() => setKeypad(false)}
               style={EnochianFont.style}
             />
           </div>
@@ -405,6 +442,14 @@ export default function Dictionary({
             <span>{LABELS.latinBox}</span>
             <span>{LABELS.enochianBox}</span>
           </div>
+          {keypad && (
+            <Keypad
+              docked={!desktop}
+              onLetter={(letter) => edit(letter)}
+              onBackspace={() => edit(null)}
+              onDone={() => enochianBox.current?.blur()}
+            />
+          )}
         </div>
         <Box component="div" aria-live="polite" sx={visuallyHidden}>
           {result ? LABELS.found(total) : ""}
