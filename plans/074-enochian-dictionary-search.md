@@ -134,8 +134,8 @@ ranking, and kept in the session notes rather than the repository:
      the", "in the", "to the", "your", "i have") folds into the piece
      before it. Articles, "to" and possessives at the start of a piece
      are set aside for both comparison and length.
-   - **Not meanings.** A meaning containing "meaning unknown" never
-     matches. A piece beginning "part in", "var of" or "name from" is a
+   - **Not meanings.** A meaning containing "meaning unknown", or one
+     that is only "unknown", never matches. A piece beginning "part in", "var of" or "name from" is a
      reference: it ranks below every ordinary match. Other pieces of the
      same meaning stay ordinary ("earth, var of caosg" is still "earth").
    - **Words and stems.** Everything compares whole words, never
@@ -147,11 +147,15 @@ ranking, and kept in the session notes rather than the repository:
      find "god".
    - **English tiers**, best first:
      - 0: a piece's words are the query's words.
-     - 1: a piece's words begin with the query's words.
-     - 2: the query's words appear together, in order, inside a piece.
-     - 3: tiers 0 to 2 again on stems, or a longer query's words all in
-       one piece, in any order.
-     References sit below all four.
+     - 1: they are the same on stems ("angel" for "angels").
+     - 2: a piece begins with the query's words, or their stems.
+     - 3: the query's words appear together, in order, inside a piece.
+     - 4: the same on stems, or a longer query's words all in one
+       piece, in any order.
+     References sit five tiers lower, below all of these. (The first
+     draft had four tiers, with stems only in the last. The build moved
+     a piece that is a form of the query into `means`, so "angels" lists
+     MERIFRI ("angel") there.)
    - **Ties** break in this order: tier, which meaning (the first before
      later ones), which sense, which piece, the piece's length in words,
      how often the Keys use the word (more first), then the headword
@@ -161,7 +165,7 @@ ranking, and kept in the session notes rather than the repository:
      ASCHA above MAD.
    - **Each word once in English.** A word appears in `means` or
      `mentions`, never both, at its best hit, and its row shows the
-     meaning that hit. `means` holds tiers 0–1; `mentions` holds tier 2
+     meaning that hit. `means` holds tiers 0–2; `mentions` holds tier 3
      and below. A word may also appear in `spelled`, which matches for a
      different reason.
    - **Stopwords** ("the", "a", "an", "of", "to", "in", "and", "or",
@@ -209,12 +213,16 @@ ranking, and kept in the session notes rather than the repository:
 9. **"In the Keys" in each entry, fetched when it opens.**
    - A force-static route handler, `src/app/enochian/dictionary/keys.json/route.ts`,
      serves a map from each dictionary word to where the Keys say it. It
-     is built from `keys`, `findWord` and `findParts`, moved out of
-     `keyEntries.ts` where they are shared. About 550 words and 940 uses;
-     the spike measured 22 KB gzipped. The entry fetches it once, the
+     is built by `keyUses.ts` from `keys` and `keyEntries.ts`'s
+     `findParts`, imported rather than moved. Built, it holds 612 words
+     and 1,060 uses (141 KB of JSON). The spike's similar map was 22 KB
+     gzipped. The entry fetches it once, the
      first time any entry opens.
-   - Each use records the Key, the row's English, the work its English
-     comes from, and up to three rows of English on either side.
+   - Each use records the Key, the row and its English, and up to
+     three rows of English on either side. (The draft also named the
+     work each row's English comes from. The data doesn't record that
+     per row, so the entry names the Key and links to it, where the
+     sources are.)
      Unspoken rows and rows with no English are skipped.
    - Uses are deduplicated by (Key, row): a Key 19 row counts once, not
      once per Aethyr and version. A use in Key 19's Aethyr slot is
