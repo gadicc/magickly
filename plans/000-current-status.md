@@ -134,7 +134,10 @@ Follow-ups are separate from the completed migration work:
 - TODO (Gadi, 10 November 2026): location for the planetary hours, the
   moon and the geomancy reading from Vercel's request headers instead of
   get.geojs.io (`src/components/hooks/useGeoIP.ts`), with a place the
-  reader can choose, and no browser permission prompt.
+  reader can choose, and no browser permission prompt. Planned and being
+  built in [plan 072](072-reader-location.md).
+- TODO: show a chosen place's hours on that place's own clock, not the
+  device's ([plan 072](072-reader-location.md), decision 2).
 - TODO: SEO content follow-ups from [plan 028](028-seo.md#follow-ups):
   compute `/astrology/moon` dates only in the browser, prerender the
   `/study` set list, and consider public SQL rituals for the sitemap. The
