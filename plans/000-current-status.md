@@ -161,8 +161,11 @@ Follow-ups are separate from the completed migration work:
   isn't shown (`src/app/astrology/planetary-hours/planetaryHours.tsx`);
   it behaved the same before [plan 072](072-reader-location.md).
 - TODO: SEO content follow-ups from [plan 028](028-seo.md#follow-ups):
-  compute `/astrology/moon` dates only in the browser, prerender the
-  `/study` set list, and consider public SQL rituals for the sitemap. The
+  consider public SQL rituals for the sitemap. `/study` prerenders its
+  set list for the default filters, each set linked, as its Suspense
+  fallback (10 November 2026). `/astrology/moon` already computes its
+  dates only in the browser (`74fe9a51`, "Draw moon phases after
+  hydration"). The
   app bar's fuller titles are done ([plan 071](071-on-site-search.md)). The raw
   JSON rows on the entity
   pages are done ([plan 036](036-entity-pages.md)). The archangel data fix

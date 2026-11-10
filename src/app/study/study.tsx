@@ -30,6 +30,33 @@ import { dueCount } from "@/study/scheduling";
 import { sets as allSets, tags as allTags } from "@/study/sets";
 import { useLegacyRecoveryGate } from "../clientProviders";
 
+const sortedTags = [...allTags].sort();
+
+/**
+ * The sets the filters select, by grade then id, less those in progress.
+ * Static data only, so the prerendered page lists them too.
+ */
+function availableSets(
+  gdGrade: string,
+  tags: string[],
+  exclude: ReadonlySet<string> = new Set(),
+) {
+  return Object.values(allSets)
+    .filter((set) => gdGrade === "all" || set.gdGrade === gdGrade)
+    .filter(
+      (set) =>
+        tags[0] === "all" || tags.every((tag) => set.tags?.includes(tag)),
+    )
+    .filter((set) => !exclude.has(set.id))
+    .sort((a, b) => {
+      if (a.gdGrade !== b.gdGrade)
+        return (
+          parseInt(a.gdGrade.split("=")[0]) - parseInt(b.gdGrade.split("=")[0])
+        );
+      return a.id.localeCompare(b.id);
+    });
+}
+
 function StudyPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -76,25 +103,9 @@ function StudyPage() {
     [currentSets],
   );
   const otherSets = React.useMemo(
-    () =>
-      Object.values(allSets)
-        .filter((set) => gdGrade === "all" || set.gdGrade === gdGrade)
-        .filter(
-          (set) =>
-            tags[0] === "all" || tags.every((tag) => set.tags?.includes(tag)),
-        )
-        .filter((set) => !currentSetIds.has(set.id))
-        .sort((a, b) => {
-          if (a.gdGrade !== b.gdGrade)
-            return (
-              parseInt(a.gdGrade.split("=")[0]) -
-              parseInt(b.gdGrade.split("=")[0])
-            );
-          return a.id.localeCompare(b.id);
-        }),
+    () => availableSets(gdGrade, tags, currentSetIds),
     [currentSetIds, gdGrade, tags],
   );
-  const sortedTags = React.useMemo(() => [...allTags].sort(), []);
 
   if (recovery.state === "failed")
     return (
@@ -104,16 +115,76 @@ function StudyPage() {
     );
   if (runtime.error && !runtime.scope)
     return <div>Study progress could not be loaded: {runtime.error}</div>;
-  if (runtime.loading) return <div>Initializing study progress…</div>;
+  if (runtime.loading)
+    return (
+      <StudySetsView
+        gdGrade={gdGrade}
+        tags={tags}
+        currentSets={[]}
+        otherSets={availableSets(gdGrade, tags)}
+        onGdGrade={setGdGrade}
+        onTags={setTags}
+        onOpenSet={(id) => router.push(`/study/${id}`)}
+      />
+    );
 
   return (
+    <StudySetsView
+      gdGrade={gdGrade}
+      tags={tags}
+      currentSets={currentSets}
+      otherSets={otherSets}
+      syncError={!!runtime.error}
+      scope={runtime.scope?.kind ?? "account"}
+      onGdGrade={setGdGrade}
+      onTags={setTags}
+      onOpenSet={(id) => router.push(`/study/${id}`)}
+    />
+  );
+}
+
+/**
+ * Stands in for the progress table until progress has loaded: in the
+ * prerendered page, and in the browser while storage opens.
+ */
+function Initializing() {
+  return (
+    <TableRow>
+      <TableCell colSpan={2}>Initializing study progress…</TableCell>
+    </TableRow>
+  );
+}
+
+/** What the page shows; without `scope`, progress hasn't loaded yet. */
+function StudySetsView({
+  gdGrade,
+  tags,
+  currentSets,
+  otherSets,
+  syncError,
+  scope,
+  onGdGrade,
+  onTags,
+  onOpenSet,
+}: {
+  gdGrade: string;
+  tags: string[];
+  currentSets: ReturnType<typeof materializeStudyCards>[];
+  otherSets: ReturnType<typeof availableSets>;
+  syncError?: boolean;
+  scope?: "anonymous" | "account";
+  onGdGrade?: (event: SelectChangeEvent) => void;
+  onTags?: (event: SelectChangeEvent) => void;
+  onOpenSet?: (id: string) => void;
+}) {
+  return (
     <Container sx={{ py: 1 }}>
-      <Select size="small" value={gdGrade} onChange={setGdGrade}>
+      <Select size="small" value={gdGrade} onChange={onGdGrade}>
         <MenuItem value="all">All Grades</MenuItem>
         <MenuItem value="0=0">0=0</MenuItem>
         <MenuItem value="1=10">1=10</MenuItem>
       </Select>{" "}
-      <Select size="small" value={tags[0]} onChange={setTags}>
+      <Select size="small" value={tags[0]} onChange={onTags}>
         <MenuItem value="all">All Tags</MenuItem>
         {sortedTags.map((tag) => (
           <MenuItem key={tag} value={tag}>
@@ -121,7 +192,7 @@ function StudyPage() {
           </MenuItem>
         ))}
       </Select>
-      {runtime.error && (
+      {syncError && (
         <Typography color="warning" sx={{ mt: 1 }}>
           Progress is saved on this device. Sync will retry when available.
         </Typography>
@@ -142,6 +213,7 @@ function StudyPage() {
             </TableRow>
           </TableHead>
           <TableBody>
+            {!scope && <Initializing />}
             {currentSets.map((set) => {
               const dueCards = dueCount(set);
               const attempts = set.correct + set.incorrect;
@@ -176,7 +248,7 @@ function StudyPage() {
         </Table>
       </TableContainer>
       <br />
-      {runtime.scope?.kind === "anonymous" ? (
+      {!scope ? null : scope === "anonymous" ? (
         <Typography variant="body2" sx={{ mb: 2 }}>
           Anonymous progress is available offline on this device.{" "}
           <Link href="/signin?callbackURL=/study">Sign in</Link> to keep
@@ -210,7 +282,7 @@ function StudyPage() {
                   // on it open a new tab, so only clicks elsewhere on the
                   // row navigate here.
                   if ((event.target as Element).closest("a")) return;
-                  router.push(`/study/${set.id}`);
+                  onOpenSet?.(set.id);
                 }}
               >
                 <TableCell sx={{ padding: "16px 0 16px 10px" }}>
@@ -240,9 +312,23 @@ function StudyPage() {
   );
 }
 
+/**
+ * `useSearchParams` makes the prerender bail out to the browser, so the
+ * fallback prerenders the list for the default filters, which is what the
+ * canonical URL shows. A filtered link shows it until hydration.
+ */
 export default function WrappedStudyPage() {
   return (
-    <React.Suspense>
+    <React.Suspense
+      fallback={
+        <StudySetsView
+          gdGrade="all"
+          tags={["all"]}
+          currentSets={[]}
+          otherSets={availableSets("all", ["all"])}
+        />
+      }
+    >
       <StudyPage />
     </React.Suspense>
   );
