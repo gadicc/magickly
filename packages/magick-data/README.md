@@ -396,8 +396,9 @@ Keys 1 to 18 are re-derived, and nothing of the text the app had from
 and of Key 16's first twelve words (damaged pages, pp. 133-138): those
 rows give Aleister Crowley's form from *The Equinox*, vol. I no. 8
 (London, 1912), marked as his, until Dee's own copy can be read. The
-Golden Dawn's reading of every Key, from the same Equinox, and Key 19,
-the Call of the Thirty Aethyrs, come in later stages of plan 073.
+Golden Dawn's reading of each Key is Crowley's in the same Equinox,
+read word by word against Dee's rows. Key 19, the Call of the Thirty
+Aethyrs, comes in a later stage of plan 073.
 
 The words and their English in the re-derived Keys are facts from
 public-domain prints, and **no rights are asserted over them**; the

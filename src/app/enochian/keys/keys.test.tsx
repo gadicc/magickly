@@ -2,13 +2,23 @@ import type { Aethyr, EnochianKey } from "magick-data/enochian/keys";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { KEY_ENTRIES } from "./keyEntries";
-import { pageAethyrs, pageKey, pageKeys } from "./keyPage";
+import {
+  keysOf,
+  type PageEntries,
+  pageAethyrs,
+  pageEntries,
+  pageKey,
+  pageKeys,
+} from "./keyPage";
 import Keys, {
   type EnochianLang,
   KeyText,
   shownWords,
   WordPanel,
 } from "./keys";
+
+/** No dictionary entries. */
+const NONE: PageEntries = { entries: {}, parts: {} };
 
 /** The text of server HTML, tags dropped. */
 const text = (html: string) =>
@@ -110,7 +120,11 @@ describe("/enochian/keys", () => {
   it("shows every Key in the data, in English, with what each was checked against", () => {
     const keys = pageKeys();
     const html = renderToString(
-      <Keys keys={keys} aethyrs={pageAethyrs()} entries={KEY_ENTRIES} />,
+      <Keys
+        keys={keys}
+        aethyrs={pageAethyrs()}
+        entries={pageEntries(KEY_ENTRIES)}
+      />,
     );
     const shown = text(html);
     for (const key of keys) expect(shown).toContain(key.title);
@@ -130,11 +144,11 @@ describe("/enochian/keys", () => {
       })),
     });
     const without = renderToString(
-      <Keys keys={[dee]} aethyrs={[]} entries={{}} />,
+      <Keys keys={[dee]} aethyrs={[]} entries={NONE} />,
     );
     expect(without).not.toContain('id="keys-version"');
     const withGd = renderToString(
-      <Keys keys={[pageKey(KEY)]} aethyrs={[]} entries={{}} />,
+      <Keys keys={[pageKey(KEY)]} aethyrs={[]} entries={NONE} />,
     );
     expect(withGd).toContain('id="keys-version"');
     expect(withGd).toContain('id="keys-version-label"');
@@ -146,7 +160,7 @@ describe("/enochian/keys", () => {
       <Keys
         keys={[pageKey(KEY), pageKey(CALL, AETHYRS)]}
         aethyrs={pageAethyrs(AETHYRS)}
-        entries={{}}
+        entries={NONE}
       />,
     );
     const shown = text(html);
@@ -157,7 +171,7 @@ describe("/enochian/keys", () => {
     expect(shown).toContain("Calls, 19 to 48");
     expect(shown).toContain("in the first aire");
     const without = renderToString(
-      <Keys keys={[pageKey(KEY)]} aethyrs={[]} entries={{}} />,
+      <Keys keys={[pageKey(KEY)]} aethyrs={[]} entries={NONE} />,
     );
     expect(without).not.toContain('id="aethyr-select"');
   });
@@ -205,7 +219,7 @@ describe("/enochian/keys", () => {
     );
   });
 
-  it("marks an uncertain word, with its note", () => {
+  it("marks an uncertain word, its note in the panel", () => {
     const html = renderToString(
       <KeyText
         words={shownWords(pageKey(KEY), "dee", 1)}
@@ -216,8 +230,11 @@ describe("/enochian/keys", () => {
         onSelect={() => {}}
       />,
     );
-    expect(html).toContain('title="Uncertain: a doubtful letter, p.109"');
-    expect(html).toContain("underline dotted");
+    expect(html).toContain('data-uncertain="" title="Uncertain reading"');
+    // Notes are the panel's: none in the text, and no style per word.
+    expect(html).not.toContain("a doubtful letter");
+    expect(html).not.toMatch(/<button[^>]*style=/);
+    expect(html.match(/class="key-word"/g)).toHaveLength(4);
     // Each word is a button, so the keyboard reaches it.
     expect(html.match(/<button type="button"/g)).toHaveLength(4);
   });
@@ -232,7 +249,7 @@ describe("/enochian/keys", () => {
 
 describe("the word panel", () => {
   const words = shownWords(pageKey(KEY), "gd", 1);
-  const panel = (index: number, entries = {}) =>
+  const panel = (index: number, entries = NONE) =>
     text(
       renderToString(
         <WordPanel entries={entries} keyNumber={4} word={words[index]} />,
@@ -251,12 +268,15 @@ describe("the word panel", () => {
       pronounciations: [],
       meanings: [{ meaning, source: "x", source2: "", note: "" }],
     });
-    const shown = panel(3, {
-      NORMOLAP: [
-        { key: "NOR", entry: entry("sons") },
-        { key: "MOLAP", entry: entry("men") },
-      ],
-    });
+    const shown = panel(
+      3,
+      pageEntries({
+        NORMOLAP: [
+          { key: "NOR", entry: entry("sons") },
+          { key: "MOLAP", entry: entry("men") },
+        ],
+      }),
+    );
     expect(shown).toContain("Found as two words: NOR and MOLAP");
     expect(shown).toContain("sons (x)");
     expect(shown).toContain("men (x)");
@@ -308,7 +328,7 @@ describe("words the page has no Enochian for", () => {
       from: "equinox1912no8",
     });
     const shown = text(
-      renderToString(<WordPanel entries={{}} keyNumber={14} word={lost} />),
+      renderToString(<WordPanel entries={NONE} keyNumber={14} word={lost} />),
     );
     expect(shown).toContain(
       "Crowley's form, from The Equinox: not in Casaubon's print.",
@@ -352,13 +372,59 @@ describe("Key 19's words by Aethyr", () => {
     // Only the words that change are sent.
     expect(Object.keys(page.aethyrs?.[2].dee ?? {})).toEqual(["0"]);
     expect(page.words[0].from).toBe("equinox1912no8");
+    // Whole, and without a lookup that is the word itself.
     expect(page.aethyrs?.[2].dee[0]).toEqual({
       word: "ARN",
-      lookup: "ARN",
       english: "in the second aire",
     });
     const [second] = shownWords(page, "dee", 2);
     expect(second.word).toBe("ARN");
     expect(second.from).toBeUndefined();
+  });
+});
+
+describe("what the page sends", () => {
+  it("leaves out a lookup that is the word, and empty fields", () => {
+    const page = pageKey(KEY);
+    expect(page.words[0]).toEqual({ word: "DSI", english: "which is" });
+    // A Golden Dawn word without a form is its marker alone.
+    expect(page.gd?.[1]).toEqual({ marker: "joined" });
+    // Dee's note is not sent again with the Golden Dawn's word.
+    expect(page.words[3].note).toBe("a doubtful letter, p.109");
+    expect(page.gd?.[3]).toEqual({ word: "nor-mo-lapi" });
+  });
+
+  it("sends each dictionary entry once, with what the panel shows", () => {
+    const entry = {
+      gematria: [],
+      pronounciations: [{ pronounciation: "vrbs", source: "x" }],
+      meanings: [{ meaning: "beautiful", source: "x", source2: "", note: "" }],
+    };
+    const sent = pageEntries({
+      URBS: [{ key: "VRBS", entry }],
+      VRBS: [{ key: "VRBS", entry }],
+      OL: [{ key: "OL", entry }],
+      NORMOLAP: [
+        { key: "NOR", entry },
+        { key: "MOLAP", entry },
+      ],
+    });
+    expect(Object.keys(sent.entries).sort()).toEqual([
+      "MOLAP",
+      "NOR",
+      "OL",
+      "VRBS",
+    ]);
+    expect(sent.entries.OL).toEqual({
+      pronunciation: "vrbs",
+      meanings: [{ meaning: "beautiful", source: "x" }],
+    });
+    expect(sent.parts).toEqual({
+      URBS: ["VRBS"],
+      NORMOLAP: ["NOR", "MOLAP"],
+    });
+    expect(keysOf(sent, "URBS")).toEqual(["VRBS"]);
+    expect(keysOf(sent, "OL")).toEqual(["OL"]);
+    expect(keysOf(sent, "NONE")).toBeUndefined();
   });
 });

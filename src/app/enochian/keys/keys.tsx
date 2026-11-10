@@ -17,11 +17,16 @@ import {
 } from "@mui/material";
 import React from "react";
 import useEnochianFont, { EnochianFont } from "../useEnochianFont";
-import type { KeyEntry } from "./keyEntries";
-import type { PageAethyr, PageGdWord, PageKey, PageWord } from "./keyPage";
-
-/** The entries the page was given, by Dee's word. */
-type Entries = Readonly<Record<string, readonly KeyEntry[]>>;
+import {
+  keysOf,
+  lookupOf,
+  type PageAethyr,
+  type PageEntries,
+  type PageEntry,
+  type PageGdWord,
+  type PageKey,
+  type PageWord,
+} from "./keyPage";
 
 export type EnochianLang = "enochian" | "english" | "both";
 export type Version = "dee" | "gd";
@@ -59,24 +64,30 @@ export function shownWords(key: PageKey, version: Version, aethyr: number) {
   });
 }
 
-/** What a word shows in the Enochian: `null` for none in this version. */
+/** What a word shows in the Enochian: nothing where this version has none. */
 const enochian = (word: ShownWord) => (word.gd ? word.gd.word : word.word);
 
-const s = {
-  keyParagraph: { textAlign: "justify" as const },
-  selected: { background: "yellow" },
-  word: {
+/**
+ * How the words look, set once on the container rather than on each of
+ * the thousand or so buttons: a word is a button that looks like text,
+ * yellow when chosen and dotted when its reading is uncertain.
+ */
+const WORDS_SX = {
+  "& .key-text": { textAlign: "justify" },
+  "& .key-word": {
     background: "none",
     border: 0,
     padding: 0,
     font: "inherit",
     color: "inherit",
     cursor: "pointer",
-    textAlign: "inherit" as const,
+    textAlign: "inherit",
   },
-  uncertain: { textDecoration: "underline dotted" },
-  muted: { color: "#666", fontStyle: "italic" as const },
-};
+  "& .key-word:focus-visible": { outline: "2px solid", outlineOffset: "1px" },
+  "& .key-word[aria-pressed=true], & .key-selected": { background: "yellow" },
+  "& .key-word[data-uncertain]": { textDecoration: "underline dotted" },
+  "& .key-muted": { color: "#666", fontStyle: "italic" },
+} as const;
 
 /** A word to click or tab to, which opens its entry. */
 function WordButton({
@@ -84,48 +95,39 @@ function WordButton({
   selected,
   onSelect,
   children,
-  style,
+  muted,
 }: {
   word: ShownWord;
   selected: boolean;
   onSelect: () => void;
   children: React.ReactNode;
-  style?: React.CSSProperties;
+  muted?: boolean;
 }) {
-  const note = word.gd?.note ?? word.note;
+  // The note itself is in the word panel, which the button opens.
   return (
     <button
       type="button"
+      className={muted ? "key-word key-muted" : "key-word"}
       aria-pressed={selected}
-      title={
-        word.uncertain ? `Uncertain: ${note ?? "a doubtful reading"}` : note
-      }
+      data-uncertain={word.uncertain ? "" : undefined}
+      title={word.uncertain ? "Uncertain reading" : undefined}
       onClick={onSelect}
-      style={{
-        ...s.word,
-        ...(word.uncertain ? s.uncertain : undefined),
-        ...(selected ? s.selected : undefined),
-        ...style,
-      }}
     >
       {children}
     </button>
   );
 }
 
-function Entry({ part }: { part: KeyEntry }) {
-  const { entry } = part;
+function Entry({ dictKey, entry }: { dictKey: string; entry: PageEntry }) {
   return (
     <>
       <tr>
-        <td style={{ width: "33%", textAlign: "left" }}>{part.key}</td>
+        <td style={{ width: "33%", textAlign: "left" }}>{dictKey}</td>
         <td style={{ width: "33%", textAlign: "center" }}>
-          {/* A word with no pronunciation printed the length, a literal 0. */}
-          {entry.pronounciations[0]?.pronounciation}
+          {entry.pronunciation}
         </td>
         <td style={{ width: "33%", textAlign: "right" }}>
-          {/* An empty list is still a list: the label printed alone. */}
-          {entry.gematria.length ? `Gematria ${entry.gematria.join(", ")}` : ""}
+          {entry.gematria ? `Gematria ${entry.gematria.join(", ")}` : ""}
         </td>
       </tr>
       {entry.meanings.map((meaning, i) => (
@@ -147,11 +149,12 @@ export function WordPanel({
   keyNumber,
   word,
 }: {
-  entries: Entries;
+  entries: PageEntries;
   keyNumber: number;
   word: ShownWord;
 }) {
-  const parts = word.lookup ? entries[word.lookup] : undefined;
+  const lookup = lookupOf(word);
+  const parts = lookup ? keysOf(entries, lookup) : undefined;
   const note = word.gd?.note ?? word.note;
   const gdForm = word.gd?.word;
   return (
@@ -159,29 +162,29 @@ export function WordPanel({
       <tbody>
         <tr>
           <td style={{ width: "33%", textAlign: "left" }}>
-            {word.lookup ?? "(no Enochian)"}
+            {lookup ?? "(no Enochian)"}
           </td>
           <td style={{ width: "33%", textAlign: "center" }}>
-            {gdForm && gdForm !== word.lookup ? `Golden Dawn: ${gdForm}` : ""}
+            {gdForm && gdForm !== lookup ? `Golden Dawn: ${gdForm}` : ""}
           </td>
           <td
             style={{ width: "33%", textAlign: "right", ...EnochianFont.style }}
           >
-            {word.lookup}
+            {lookup}
           </td>
         </tr>
         {parts?.length === 2 && (
           <tr>
             <td colSpan={3} style={{ textAlign: "center" }}>
-              Found as two words: {parts[0].key} and {parts[1].key}
+              Found as two words: {parts[0]} and {parts[1]}
             </td>
           </tr>
         )}
         {parts?.map((part, index) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: two parts may share a key
-          <Entry key={index} part={part} />
+          <Entry key={index} dictKey={part} entry={entries.entries[part]} />
         ))}
-        {word.lookup && !parts && (
+        {lookup && !parts && (
           <tr>
             <td colSpan={3} style={{ textAlign: "center" }}>
               Not in the dictionary.
@@ -248,7 +251,7 @@ export function KeyText({
             return (
               <tr
                 key={word.row}
-                style={isSelected(word) ? s.selected : undefined}
+                className={isSelected(word) ? "key-selected" : undefined}
               >
                 <td>
                   {keyNumber}.{word.row}
@@ -259,7 +262,7 @@ export function KeyText({
                       word={word}
                       selected={isSelected(word)}
                       onSelect={() => onSelect(word.row)}
-                      style={shown ? undefined : s.muted}
+                      muted={!shown}
                     >
                       {shown ??
                         (word.unspoken
@@ -268,7 +271,7 @@ export function KeyText({
                     </WordButton>
                   ) : (
                     // Nothing to look up: no button with nothing in it.
-                    <span style={s.muted}>(no Enochian yet)</span>
+                    <span className="key-muted">(no Enochian yet)</span>
                   )}
                 </td>
                 <td>{word.english}</td>
@@ -282,12 +285,7 @@ export function KeyText({
   const text = (word: ShownWord) =>
     lang === "english" ? word.english : enochian(word);
   return (
-    <div
-      style={{
-        ...s.keyParagraph,
-        ...(lang === "enochian" ? font : undefined),
-      }}
-    >
+    <div className="key-text" style={lang === "enochian" ? font : undefined}>
       {words.map((word) => {
         const shown = text(word);
         // A word the version leaves out, or joins to another, is not said.
@@ -351,7 +349,7 @@ export default function Keys({
 }: {
   keys: readonly PageKey[];
   aethyrs: readonly PageAethyr[];
-  entries: Entries;
+  entries: PageEntries;
 }) {
   const [lang, setLang] = React.useState<EnochianLang>("english");
   const [version, setVersion] = React.useState<Version>("dee");
@@ -372,7 +370,7 @@ export default function Keys({
 
   return (
     <>
-      <Container sx={{ background: "#fafafa" }}>
+      <Container sx={{ background: "#fafafa", pt: 1.5 }}>
         <Box
           sx={{
             display: "flex",
@@ -421,7 +419,7 @@ export default function Keys({
         </Box>
       </Container>
 
-      <Container sx={{ background: "#fafafa" }}>
+      <Container sx={{ background: "#fafafa", ...WORDS_SX }}>
         {keys.map((key) => {
           // A Key without the Golden Dawn's reading shows Dee's, and says so.
           const keyVersion = versionOf(key);

@@ -1,7 +1,7 @@
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
 import { KEY_ENTRIES } from "./keyEntries";
-import { pageAethyrs, pageKeys } from "./keyPage";
+import { pageAethyrs, pageEntries, pageKeys } from "./keyPage";
 import Keys from "./keys";
 
 export const metadata = pageMetadata("/enochian/keys");
@@ -14,7 +14,11 @@ export default function KeysPage() {
   return (
     <>
       <PageBreadcrumbs path="/enochian/keys" />
-      <Keys keys={pageKeys()} aethyrs={pageAethyrs()} entries={KEY_ENTRIES} />
+      <Keys
+        keys={pageKeys()}
+        aethyrs={pageAethyrs()}
+        entries={pageEntries(KEY_ENTRIES)}
+      />
     </>
   );
 }
