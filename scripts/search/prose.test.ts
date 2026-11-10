@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { jsxProse } from "./prose";
+import { decodeReferences, jsxProse } from "./prose";
 
 describe("public JSX prose extraction", () => {
   it("reads visible prose without publishing literals from code, props or scripts", () => {
@@ -14,5 +14,13 @@ describe("public JSX prose extraction", () => {
     `);
     expect(text).toBe("Moon phases Waxing and waning. Visible words");
     expect(components.has("Widget")).toBe(true);
+  });
+
+  it("reads character references as the page shows them", () => {
+    const { text } = jsxProse(
+      "export default () => <p>Dee&apos;s &quot;Keys&quot; &amp; Kelley&#39;s&nbsp;tables &#x2014; &unknown;</p>;",
+    );
+    expect(text).toBe(`Dee's "Keys" & Kelley's tables \u2014 &unknown;`);
+    expect(decodeReferences("&#x110000; &mdash;")).toBe("&#x110000; \u2014");
   });
 });

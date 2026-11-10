@@ -2,6 +2,35 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import ts from "typescript";
 
+/** The named references the app's JSX uses, as the browser shows them. */
+const NAMED_REFERENCES: Record<string, string> = {
+  amp: "&",
+  apos: "'",
+  gt: ">",
+  lt: "<",
+  mdash: "\u2014",
+  nbsp: " ",
+  ndash: "\u2013",
+  quot: '"',
+};
+
+/**
+ * JSX text keeps its character references (`Dee&apos;s`); the page shows
+ * the characters, so the index reads those. An unknown name is kept as is.
+ */
+export function decodeReferences(text: string): string {
+  return text.replace(
+    /&(#[xX][0-9a-fA-F]+|#[0-9]+|[a-zA-Z]+);/g,
+    (match, reference: string) => {
+      if (!reference.startsWith("#"))
+        return NAMED_REFERENCES[reference] ?? match;
+      const hex = reference[1] === "x" || reference[1] === "X";
+      const code = Number.parseInt(reference.slice(hex ? 2 : 1), hex ? 16 : 10);
+      return code <= 0x10ffff ? String.fromCodePoint(code) : match;
+    },
+  );
+}
+
 /**
  * Literal, visible JSX prose only. Never evaluates a module, reads arbitrary
  * string constants, or copies source/props/code into the public search index.
@@ -29,7 +58,7 @@ export function jsxProse(source: string): {
       )
     )
       return;
-    if (ts.isJsxText(node)) texts.push(node.text);
+    if (ts.isJsxText(node)) texts.push(decodeReferences(node.text));
     if (
       ts.isJsxExpression(node) &&
       (ts.isJsxElement(node.parent) || ts.isJsxFragment(node.parent)) &&
