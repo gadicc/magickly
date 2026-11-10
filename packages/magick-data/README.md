@@ -23,7 +23,7 @@ path, and [LICENSE.txt](./LICENSE.txt) says which file is which:
   a fact from Agrippa ([Sources](#sources)).
 - **The data is [CC BY 4.0](./LICENSE-DATA.txt):** the JSON5 sources and
   everything the build emits from them, the Enochian Keys among them
-  ([Sources](#sources) says which Keys that covers so far). Use it
+  ([Sources](#sources) says what of the Keys is ours to license). Use it
   anywhere, including commercially, as long as you credit
   [magick.ly](https://magick.ly).
 
@@ -234,8 +234,8 @@ or `null`.
   Dee received it, with its English. A row holds each work's reading of
   the word (`readings`: Casaubon's print, with the word as dictated and
   his pronunciation column; the Golden Dawn's form in *The Equinox* I(8);
-  the 2023 text, for Keys not yet re-derived), where it is printed, and
-  any note, doubt (`uncertain`) or correction (`was`). A version is a
+  room for Dee's own copy, Sloane MS 3191), where it is printed, and any
+  note or doubt (`uncertain`). A version is a
   rule over the readings, as the tablets' are: `keyVersion(key, version)`
   gives each word in `dee`, the default (Dee's own copy when it can be
   read, else Casaubon's, else for a word his print lost Crowley's form,
@@ -248,7 +248,7 @@ or `null`.
   holds the thirty with each work's spelling. Each Key has a `checked`
   record, the date, the works compared, the fields covered and what was
   not, and `checkedText` says it in a sentence, so that no page restates
-  it. What the data holds so far is in [Sources](#sources).
+  it. Where the Keys come from is in [Sources](#sources).
 - `magick-data/kabbalah/seventyTwoAngels/text`: Lenain's entries on the
   seventy-two genii in full, in French and in English, loaded on demand.
 - `magick-data/kabbalah/seventyTwoAngels/derived`: what Lenain's four tables
@@ -380,8 +380,8 @@ his row by row. See
 [plan 061](https://github.com/gadicc/magickly/blob/main/plans/061-gd-hall.md).
 
 **`enochian/keys.json5`** gives the Enochian Keys as Dee received them
-in Cracow from 13 April to 13 July 1584. A re-derived Key is read word by
-word from the page images of Meric Casaubon's printing of Dee's journal,
+in Cracow from 13 April to 13 July 1584. Each Key is read word by word
+from the page images of Meric Casaubon's printing of Dee's journal,
 *A True & Faithful Relation* (London, 1659; archive.org
 `truefaithfulrela00deej`), which comes from British Library, Cotton MS
 Appendix XLVI: its Enochian with the pronunciation column beside it, and
@@ -391,10 +391,10 @@ pages and leaves, and each Key's `checked` record says what was compared
 and what was not; Dee's own copy, Sloane MS 3191, whose images have been
 offline since 2023, is not.
 
-Keys 1 to 18 are re-derived, and nothing of the text the app had from
-2023 remains. Casaubon's print has lost the Enochian of Keys 14 and 15
-and of Key 16's first twelve words (damaged pages, pp. 133-138): those
-rows give Aleister Crowley's form from *The Equinox*, vol. I no. 8
+None of the text the app had from 2023, whose source was not known,
+remains. Casaubon's print has lost the Enochian of parts of Keys 13 to
+16 (damaged pages, pp. 133-138): two words of Key 13, most of Keys 14
+and 15, and Key 16's third to fourteenth words. Those rows give Aleister Crowley's form from *The Equinox*, vol. I no. 8
 (London, 1912), marked as his, until Dee's own copy can be read. The
 Golden Dawn's reading of each Key is Crowley's in the same Equinox,
 read word by word against Dee's rows. Key 19, the Call of the Thirty
@@ -402,7 +402,7 @@ Aethyrs, is Casaubon's (pp. 201-209, the misbound leaves noted), with
 the thirty names as he prints them after it (p. 209) and as Crowley
 gives them (I(8) p. 125; I(5)'s chapter headings).
 
-The words and their English in the re-derived Keys are facts from
+The words and their English are facts from
 public-domain prints, and **no rights are asserted over them**; the
 arrangement into rows, the split of the English and the notes are ours,
 under CC BY 4.0. Nothing in them comes from a modern edition or

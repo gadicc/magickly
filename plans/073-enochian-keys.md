@@ -2,7 +2,7 @@
 
 Status: decisions settled 10 November 2026 (Gadi agreed 2 to 10 as
 proposed, with Casaubon's spelling and a search refresh per commit);
-the spike done; building on `gate/enochian-keys`. Read
+built 10 November 2026 on `gate/enochian-keys` (see "Commits"). Read
 [current status](000-current-status.md) first. This plan follows Gadi's
 answers of 10 November 2026 to the text sheet of
 [plan 071](071-on-site-search.md): add the nineteenth Key, the Call of the
@@ -95,10 +95,9 @@ Crowley's table (I(8) p. 125, checked on the page image) names the thirty:
 20 KHR, 21 ASP, 22 LIN, 23 TOR, 24 NIA, 25 VTI, 26 DES, 27 ZAA, 28 BAG,
 29 RII, 30 TEX; I(5)'s headings have ZON (3), IKH (11), UTI (14) and KHR
 (20). The forms usually given as Dee's (VTA, CHR) come from modern
-books: Casaubon
-does not print the list, and Sloane MS 3191, which does, cannot be read.
-So the data holds Crowley's names, and Dee's spellings wait for the
-manuscript. Crowley also varies IDOIGO (word 40) with the Aethyr; that is
+books. *Corrected by the reading:* Casaubon does print the list (p. 209;
+see "What the reading found"), and the data holds his spellings beside
+Crowley's. Crowley also varies IDOIGO (word 40) with the Aethyr; that is
 Golden Dawn practice, not Dee's.
 
 ### What the app assumes
@@ -211,8 +210,8 @@ Gated commits on `gate/enochian-keys`; Gadi fast-forwards.
    1584, dictated from its last word to its first; Key 18: pp. 137–138,
    English pp. 193–194; Crowley pp. 109 and 123–124). The data shape
    type-checks as a sketch. Estimate: about 2.5 agent-hours to read all
-   1,180 rows, 1.5 for a second pass over a quarter of them, 5 to 6 in
-   all with the code, before Gadi's review.
+   1,180 rows (1,112 in the end), 1.5 for a second pass over a quarter
+   of them, 5 to 6 in all with the code, before Gadi's review.
 1. **The model and Keys 1–3**: readings by source, versions, notes and
    `checked` records, the registry entry; Keys 1–3 re-derived and the
    sure corrections made; the page reading the new shape, Dee version
@@ -248,24 +247,43 @@ some of the above.
   after the Call: the `dee` version uses his list, and Crowley's IDOIGO
   varies with no word given, so its slot stays unfilled. The archive.org
   scan is misbound: pp. 203–204 are at leaves n286–n287.
-- **Casaubon's print has lost the Enochian of Keys 14 and 15 and of Key
-  16's first twelve words** (pp. 133–138, damaged pages): only scraps
+- **Casaubon's print has lost the Enochian of parts of Keys 13 to 16**:
+  13.23–24, 23 of Key 14's 40 words, 14 of Key 15's 32, and 16.3–16.14
+  (pp. 133–138, damaged pages; 16.1–2 come from p. 200's scraps). Commit
+  ea1d0e4f's message says "Keys 14 and 15 and Key 16's first twelve
+  words"; this is the exact extent. Only scraps
   survive (Dee's list of first words, p. 200; margin words, p. 193).
   Those rows take Crowley's form in the `dee` version too, marked as
   his, until Sloane MS 3191 can be read; their division and English
   pairing follow Crowley and are ours.
-- **A second reader** checked a random quarter of every Key (312 rows
-  and the thirty Aethyrs, 342 entries, seed 20261110) against the pages
-  before looking at the transcription: 333 agreed in every field. The
-  nine others were three slips (a GD split that is a line-end hyphen,
-  two English splits unflagged, a note's quotation), two print
-  ambiguities ("hotch pot", "Dám") and two judgement calls (Key 16's
-  Equinox page, Key 19's CHIS from the pronunciation); all are
-  corrected or noted, and no reader misread a letter form. The
+- **A second reader** checked 28% of every Key's rows, drawn at random
+  (312 rows and the thirty Aethyrs, 342 entries, seed 20261110) against
+  the pages before looking at the transcription: 333 agreed in every
+  field. The nine others were three slips (a GD split that is a
+  line-end hyphen, two English splits unflagged, a note's quotation),
+  two print ambiguities ("hotch pot", "Dám") and two judgement calls
+  (Key 16's Equinox page, Key 19's CHIS from the pronunciation); all
+  are corrected or noted, and no reader misread a letter form. The
   `checked` records say a second reading of every word was not done.
 - **CA in the closing words of Keys 13–18**: Dee's note on p. 193 gives
   them as "Zacar e ca, od zamran"; Crowley and the 2023 text omit it. It
   is Dee's, so it is in the `dee` version and marked absent in `gd`.
+
+## Commits
+
+| Commit | Change |
+| --- | --- |
+| 878119f2 | The plan |
+| be6296ae | Stage 1: the model; Keys 1–3 re-derived; the rest carried over |
+| f4e55635 | Stage 2: Keys 4–10 |
+| ea1d0e4f | Stage 2: Keys 11–18; the 2023 text gone |
+| f16fbe7c | Stage 3: the Golden Dawn's reading and the version switch |
+| fc31c2a1 | Stage 4: the Call of the Thirty Aethyrs |
+| (the next) | Stage 5: the page's text, the 2023 code gone, the final review's fixes |
+
+Each commit that changes the Keys carries its own search refresh
+(decision 10), embedding only the passages that changed: a few
+thousand tokens each, well under a cent.
 
 ## Verification
 

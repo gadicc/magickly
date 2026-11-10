@@ -73,9 +73,20 @@ export function findWord(
 const SHORTEST_PART = 2;
 
 /**
+ * Words found as two parts only by accident, which are not split: the
+ * parts the dictionary would give are not what the word is.
+ */
+export const DO_NOT_SPLIT: Readonly<Record<string, string>> = {
+  RESTIL: "REST + IL would read the ending as a word; Dee's RESTEL is one",
+  GMICALZOMA: "GMICALZO + MA leaves a fragment, not the word MA",
+  OMAXA: "OMA + XA leaves a fragment, not a word",
+};
+
+/**
  * The keys a word is filed under: one, or two where it is found only as a
  * first part and the rest, both in the book; `undefined` otherwise. Of the
- * ways to split it, the longest first part that works is taken.
+ * ways to split it, the longest first part that works is taken; a word in
+ * `DO_NOT_SPLIT` is never split.
  */
 export function findParts(
   source: EnochianDictionary,
@@ -84,6 +95,7 @@ export function findParts(
 ): string[] | undefined {
   const whole = findWord(source, word, stripped);
   if (whole !== undefined) return [whole];
+  if (Object.hasOwn(DO_NOT_SPLIT, word)) return undefined;
   for (let at = word.length - SHORTEST_PART; at >= SHORTEST_PART; at--) {
     const first = findWord(source, word.slice(0, at), stripped);
     if (first === undefined) continue;

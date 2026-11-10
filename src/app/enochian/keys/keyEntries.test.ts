@@ -2,6 +2,7 @@ import dictionary from "magick-data/enochian/dictionary";
 import keys, { keyVersion } from "magick-data/enochian/keys";
 import { describe, expect, it } from "vitest";
 import {
+  DO_NOT_SPLIT,
   entriesFor,
   findParts,
   findWord,
@@ -16,6 +17,7 @@ import {
  * 073, decision 9): its sources are copyrighted.
  */
 const NOT_IN_THE_DICTIONARY: Record<string, string> = {
+  ...DO_NOT_SPLIT,
   ZOMDV: "Casaubon's V after E.K.'s doubtful X; the dictionary has ZOMD",
   PIAMOL: "spelled out letter by letter in Key 1; not in the dictionary",
   VIIV: "Casaubon's spelling; the dictionary has VIV",
@@ -117,6 +119,8 @@ const NOT_IN_THE_DICTIONARY: Record<string, string> = {
     "Crowley's form, where Casaubon's print lost Dee's; the dictionary has BAEQUIB",
   EMETAJISA:
     "Crowley's form, where Casaubon's print lost Dee's; the dictionary has EMETGIS",
+  LALPRT:
+    'read from p.200\'s "L al purt", which prints no I; the dictionary has LIALPRT',
   VIVIAPRT: 'Key 16.2\'s "second flame": not in the dictionary',
   SALAMANU:
     "Crowley's form, where Casaubon's print lost Dee's; the dictionary has SALMAN",
@@ -257,6 +261,58 @@ describe("the Keys' dictionary entries", () => {
     );
     // The whole dictionary is 1,911 words; the page ships these.
     expect(Object.keys(dictionary).length).toBe(1911);
+  });
+
+  it("finds these words, and only these, as two entries", () => {
+    // Pinned so that a change to the data or the lookup shows here.
+    const split = Object.entries(KEY_ENTRIES)
+      .filter(([, parts]) => parts.length > 1)
+      .map(([word, parts]) => `${word}=${parts.map((p) => p.key).join("+")}`);
+    expect(split).toEqual([
+      "TAGE=TA+GE",
+      "THILNOS=THILN+OS",
+      "VIVDIV=VIV+DIV",
+      "TALO=TA+LO",
+      "NORQVASAHI=NOR+QUASAHI",
+      "NORMOLAP=NOR+MOLAP",
+      "TAQANIS=TA+QANIS",
+      "TABLIOR=TA+BLIOR",
+      "NAZARTH=NAZ+ARTH",
+      "TAUIU=TA+VIV",
+      "CHISTA=CHIS+TA",
+      "ARCAOSGI=AR+CAOSGI",
+      "TAVIV=TA+VIV",
+      "CORSTA=CORS+TA",
+      "VAULZIRN=VAUL+ZIRN",
+      "TOLHAMI=TOL+HAMI",
+      "OTHILRIT=OTHIL+RIT",
+      "BAZMELO=BAZME+LO",
+      "NAZAVABH=NAZ+AVABH",
+      "DSABRAMG=DS+ABRAMG",
+      "GOHOIAD=GOHO+IAD",
+      "TALOLCIS=TA+LOLCIS",
+      "DSPAAOX=DS+PAAOX",
+      "DSCHIS=DS+CHIS",
+      "OISALMAN=OI+SALMAN",
+      "DSBRIN=DS+BRIN",
+      "CHISHOLQ=CHIS+HOLQ",
+      "LASOLLOR=LAS+OLLOR",
+      "IADBALTOH=IAD+BALTOH",
+      "UNALCHIS=UNAL+CHIS",
+      "PAGEIP=PAGE+IP",
+      "LONSHITOX=LONSHI+TOX",
+      "SABAOOAONA=SABA+OOAONA",
+      "BUSDIRTILB=BUSDIR+TILB",
+      "ELZAPTILB=ELZAP+TILB",
+      "AGTOLTORN=AG+TOLTORN",
+      "OMPTILB=OMP+TILB",
+      "OLCORDZIZ=OL+CORDZIZ",
+      "CACOCASB=CA+COCASB",
+      "ARTABAS=AR+TABAS",
+      "ARCOAZIOR=AR+COAZIOR",
+    ]);
+    for (const word of Object.keys(DO_NOT_SPLIT))
+      expect(findParts(dictionary, word), word).toBeUndefined();
   });
 
   it("takes the words from the Keys, by Dee's spelling, once each", () => {

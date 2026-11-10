@@ -10,7 +10,6 @@ import keys, {
   hasGdReadings,
   hasVersion,
   KEY_VERSIONS,
-  type KeyRow,
   keyByNumber,
   keySourceText,
   keyTitle,
@@ -18,11 +17,6 @@ import keys, {
   keyWork,
 } from "./Keys.ts";
 import tabletNotes from "./TabletNotes.ts";
-
-/** A row carried over from the 2023 text rather than re-derived. */
-const isLegacy = (row: KeyRow) =>
-  row.readings.legacy2023 !== undefined &&
-  row.readings.casaubon1659 === undefined;
 
 /** Every source a Key or its rows cite. */
 const sourcesOf = (key: EnochianKey) => [
@@ -39,21 +33,13 @@ describe("the Keys' data", () => {
     expect(keys.length).toBeGreaterThan(0);
   });
 
-  it("gives every row a Casaubon reading and English, unless carried over", () => {
+  it("gives every row a Casaubon reading and English", () => {
     for (const key of keys)
       key.rows.forEach((row, index) => {
         const where = `Key ${key.key}.${index + 1}`;
-        const empty = Object.keys(row.readings).length === 0;
-        if (isLegacy(row) || (empty && !row.unspoken)) {
-          // The 2023 text, until the Key is re-derived: every row says
-          // something, and the Key says it was not checked.
-          expect(
-            row.english || row.readings.legacy2023?.word,
-            where,
-          ).toBeTruthy();
-          expect(key.checked.covered, where).toEqual([]);
-          return;
-        }
+        // Every row has some reading, or is a word given but not spoken.
+        if (!row.unspoken)
+          expect(Object.keys(row.readings).length, where).toBeGreaterThan(0);
         // Casaubon may print no English against a word (Key 2's OM), and
         // the note then says so.
         if (!row.english.trim()) expect(row.note, where).toMatch(/no English/);
@@ -94,7 +80,7 @@ describe("the Keys' data", () => {
   });
 
   it("cites only works it knows, with a place where it has a scan", () => {
-    const known = new Set([...Object.keys(tabletNotes.works), "legacy2023"]);
+    const known = new Set(Object.keys(tabletNotes.works));
     for (const key of keys) {
       for (const source of sourcesOf(key)) {
         expect(known.has(source.work), `Key ${key.key}: ${source.work}`).toBe(
@@ -110,15 +96,86 @@ describe("the Keys' data", () => {
         expect(known.has(source.work), `Aethyr ${aethyr.n}`).toBe(true);
   });
 
-  it("says where a corrected word comes from", () => {
+  it("says where each correction of the earlier text comes from", () => {
+    const corrections = keys.flatMap((key) =>
+      key.rows.flatMap((row, index) =>
+        /earlier text/.test(row.note ?? "")
+          ? [{ where: `Key ${key.key}.${index + 1}`, note: row.note ?? "" }]
+          : [],
+      ),
+    );
+    // BOGPA, PIAMOL, Key 2's OM, Key 9's "hands" and Key 16's 8763 at least.
+    expect(corrections.length).toBeGreaterThanOrEqual(5);
+    for (const { where, note } of corrections)
+      expect(note, where).toMatch(/\bpp?\.\s?\d+/);
+    const words = (key: number) =>
+      keyByNumber(key)?.rows.map((row) => row.readings.casaubon1659?.word);
+    expect(words(1)).toContain("BOGPA");
+    expect(words(1)).toContain("PIAMOL");
+    expect(keyByNumber(9)?.rows.map((row) => row.english)).toContain(
+      "their hands",
+    );
+    expect(keyByNumber(16)?.rows.map((row) => row.english)).toContain("8763");
+  });
+
+  it("puts its notes plainly, without the readers' working marks", () => {
+    const notes = keys.flatMap((key) => [
+      key.note ?? "",
+      ...key.rows.flatMap((row) => [row.note ?? "", row.gdNote ?? ""]),
+    ]);
+    for (const note of notes)
+      expect(note).not.toMatch(
+        /DAMAGED|NOT IN CASAUBON|SLOT|SECOND READER|plan 073|spike|Keys\.ts|current data|the 2023 text|Use BRINTS/,
+      );
+    // Nor a placeholder in a field where a reading belongs.
+    for (const key of keys)
+      for (const row of key.rows) {
+        const reading = row.readings.casaubon1659;
+        expect(reading?.pronunciation ?? "").not.toMatch(/^\(/);
+        expect(reading?.printed ?? "").not.toMatch(/^\(/);
+      }
+  });
+
+  it("has all nineteen Keys, word by word as read", () => {
+    expect(keys.map((key) => key.rows.length)).toEqual([
+      88, 53, 84, 51, 55, 45, 52, 56, 74, 83, 45, 37, 38, 40, 32, 38, 37, 41,
+      163,
+    ]);
+    const call = keyByNumber(19);
+    expect(call?.rows.filter((row) => row.slot === "aethyr")).toHaveLength(1);
+    expect(call?.rows.filter((row) => row.slot === "idoigo")).toHaveLength(1);
+    expect(aethyrs).toHaveLength(30);
+    for (const aethyr of aethyrs)
+      expect(aethyr.readings.casaubon1659, `Aethyr ${aethyr.n}`).toBeTruthy();
     for (const key of keys)
       key.rows.forEach((row, index) => {
-        if (row.was === undefined) return;
-        // A change from the 2023 text names its source and page.
-        expect(row.note, `Key ${key.key}.${index + 1}`).toMatch(
-          /(Casaubon|Crowley|Equinox|Dee|Sloane)[^]*\bpp?\.\s?\d+/,
-        );
+        const where = `Key ${key.key}.${index + 1}`;
+        expect(row.sources?.length, where).toBeGreaterThan(0);
+        if (row.uncertain) expect(row.note?.trim(), where).toBeTruthy();
       });
+    // Casaubon numbers the Calls from Key 5; the first four have none.
+    expect(keys.slice(0, 4).map((key) => key.casaubonCall)).toEqual([
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+    ]);
+  });
+
+  it("says which Keys stand on Crowley for words Casaubon's print lost", () => {
+    const lost = keys.filter((key) =>
+      key.rows.some((row) => row.notInCasaubon),
+    );
+    expect(lost.map((key) => key.key)).toEqual([13, 14, 15, 16]);
+    for (const key of lost) {
+      const count = key.rows.filter((row) => row.notInCasaubon).length;
+      expect(checkedText(key.checked), `Key ${key.key}`).toContain(
+        `Dee's Enochian for ${count} words Casaubon's print lost`,
+      );
+    }
+    for (const key of keys)
+      if (!lost.includes(key))
+        expect(checkedText(key.checked)).not.toContain("print lost");
   });
 
   it("says what each Key was checked against, from its own record", () => {
@@ -331,20 +388,14 @@ describe("the versions", () => {
     ]);
   });
 
-  it("read a row of the 2023 text, or none, as Dee's", () => {
-    const legacy: EnochianKey = {
+  it("read a row with no reading as no word in Dee's", () => {
+    const none: EnochianKey = {
       ...KEY,
-      rows: [
-        { english: "I", readings: { legacy2023: { word: "OL" } } },
-        { english: "and", readings: {} },
-      ],
+      rows: [{ english: "and", readings: {} }],
     };
-    expect(keyVersion(legacy)?.map((word) => [word.word, word.lookup])).toEqual(
-      [
-        ["OL", "OL"],
-        [null, null],
-      ],
-    );
+    expect(keyVersion(none)?.map((word) => [word.word, word.lookup])).toEqual([
+      [null, null],
+    ]);
   });
 });
 
@@ -568,8 +619,8 @@ describe("the text around the Keys", () => {
     expect(
       keySourceText({ work: "casaubon1659", page: 109, leaf: 198 }),
     ).toMatch(/^Meric Casaubon .*, p\.109 \(archive\.org leaf n198\)$/);
-    expect(keySourceText({ work: "legacy2023" })).toBe(
-      "The 2023 text of the Keys, whose source is not known",
+    expect(keySourceText({ work: "equinox1912no8" })).toMatch(
+      /^The Equinox, vol\. I no\. 8 /,
     );
     expect(keyWork("equinox1912no8").archive?.file).toBe(
       "The Equinox Vol. 1, No. 8",

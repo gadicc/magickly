@@ -214,9 +214,15 @@ export async function buildSearchCatalogue(): Promise<SearchCatalogue> {
       "The thirty Aethyrs",
       aethyrs
         .map((aethyr) =>
-          [aethyr.n, ...Object.values(aethyr.readings)]
-            .filter((name, index, all) => name && all.indexOf(name) === index)
-            .join(" "),
+          // Each name once, whatever its case ("Lil", "LIL").
+          [
+            String(aethyr.n),
+            ...new Map(
+              Object.values(aethyr.readings)
+                .filter(Boolean)
+                .map((name) => [name.toUpperCase(), name]),
+            ).values(),
+          ].join(" "),
         )
         .join(", "),
     );

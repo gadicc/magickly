@@ -1,5 +1,6 @@
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
+import KeysAbout from "./KeysAbout";
 import { KEY_ENTRIES } from "./keyEntries";
 import { pageAethyrs, pageEntries, pageKeys } from "./keyPage";
 import Keys from "./keys";
@@ -19,6 +20,7 @@ export default function KeysPage() {
         aethyrs={pageAethyrs()}
         entries={pageEntries(KEY_ENTRIES)}
       />
+      <KeysAbout />
     </>
   );
 }

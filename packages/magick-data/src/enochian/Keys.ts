@@ -13,17 +13,14 @@ import tabletNotes, { type TabletWork } from "./TabletNotes.ts";
  */
 
 /**
- * The works the Keys cite. All but `legacy2023` are in the registry
- * `magick-data/enochian/tabletNotes` keeps; `legacy2023` is the text the
- * Keys had from 2023, whose source is not known, and goes once every Key
- * is re-derived.
+ * The works the Keys cite, all in the registry
+ * `magick-data/enochian/tabletNotes` keeps.
  */
 export type KeyWorkId =
   | "casaubon1659"
   | "equinox1912no8"
   | "equinox1911no5"
-  | "sloane3191"
-  | "legacy2023";
+  | "sloane3191";
 
 /** What a source was read for: Dee's word, its English, the GD's form. */
 export type KeyField = "enochian" | "english" | "gd";
@@ -63,17 +60,11 @@ export interface GdReading {
   marker?: GdMarker;
 }
 
-/** A word of the 2023 text, for a Key not yet re-derived. */
-export interface LegacyReading {
-  word: string;
-}
-
 /** Each work's reading of a word. */
 export interface KeyReadings {
   casaubon1659?: CasaubonReading;
   equinox1912no8?: GdReading;
   sloane3191?: { word: string };
-  legacy2023?: LegacyReading;
 }
 
 /** A row of Key 19 that changes with the Aethyr. */
@@ -102,14 +93,13 @@ export interface KeyRow {
    */
   unspoken?: true;
   /**
-   * Casaubon's print lost the word (Keys 14 and 15, and 16's first twelve
-   * words): the row has no `casaubon1659` reading, only the Equinox's
-   * form, which Dee's version then shows as Crowley's (`from`). Its note
-   * says so.
+   * Casaubon's print lost the word (damaged pages: parts of Keys 13 to
+   * 16, most of Keys 14 and 15): the row has no `casaubon1659` reading,
+   * only the Equinox's form, which Dee's version then shows as Crowley's
+   * (`from`). Its note says so, and its Key's `checked` record counts
+   * them.
    */
   notInCasaubon?: true;
-  /** What the 2023 text had, where this row corrects it. */
-  was?: string;
   note?: string;
   /** A note on the Golden Dawn's form. */
   gdNote?: string;
@@ -204,15 +194,15 @@ export interface KeyVersionRule {
 
 /**
  * Each version as a rule. `dee` takes Dee's own copy when it can be read,
- * then Casaubon's print, then the 2023 text, and last the Equinox's form,
- * for a word Casaubon's print lost; `gd` the Equinox's form. Both give
+ * then Casaubon's print, and last the Equinox's form, for a word
+ * Casaubon's print lost; `gd` the Equinox's form. Both give
  * Dee's English (plan 073, decision 3), and a word is always looked up by
  * Dee's spelling, or by Crowley's form where that is all there is.
  */
 export const KEY_VERSION_RULES: Readonly<Record<KeyVersionId, KeyVersionRule>> =
   deepFreeze({
     dee: {
-      readings: ["sloane3191", "casaubon1659", "legacy2023", "equinox1912no8"],
+      readings: ["sloane3191", "casaubon1659", "equinox1912no8"],
     },
     gd: { readings: ["equinox1912no8"] },
   });
@@ -301,7 +291,7 @@ export function keyByNumber(n: number): EnochianKey | undefined {
 
 /**
  * Whether a Key has a reading in a version. Every Key has Dee's, since its
- * rows are his words, even where the 2023 text gives only their English.
+ * rows are his words.
  * A Key has the Golden Dawn's when a row Casaubon prints has the
  * Equinox's form: the forms that stand in for words his print lost do not
  * make a version on their own.
@@ -326,8 +316,8 @@ export function hasGdReadings(from: readonly EnochianKey[] = keys): boolean {
  * A Key's words in a version, or `undefined` for a version it has no
  * reading in, or one not in `KEY_VERSIONS`. The rules:
  *
- * - **`dee`**: the first of Sloane MS 3191, Casaubon and the 2023 text
- *   the row has, or for a word Casaubon's print lost the Equinox's form,
+ * - **`dee`**: Sloane MS 3191's word if the row has it, else Casaubon's,
+ *   or for a word Casaubon's print lost the Equinox's form,
  *   with `from` and looked up without its hyphens and spaces.
  * - **`gd`**: the Equinox's form; `null` where Crowley joins the word to
  *   an earlier one, leaves it out or overlaps it, with the `marker`.
@@ -433,15 +423,9 @@ export function keyTitle(key: EnochianKey): string {
     : `Key ${key.key}`;
 }
 
-/** The 2023 text, which is in no registry: it has no source to cite. */
-const LEGACY_WORK: TabletWork = {
-  title: "The 2023 text of the Keys, whose source is not known",
-  year: 2023,
-};
-
 /** A work the Keys cite, from the registry the tablets' notes keep. */
 export function keyWork(id: KeyWorkId): TabletWork {
-  return id === "legacy2023" ? LEGACY_WORK : tabletNotes.works[id];
+  return tabletNotes.works[id];
 }
 
 /** Short names for the works, for a line of text. */
@@ -450,7 +434,6 @@ const SHORT_NAMES: Readonly<Record<KeyWorkId, string>> = {
   equinox1912no8: "The Equinox I(8) (1912)",
   equinox1911no5: "The Equinox I(5) (1911)",
   sloane3191: "Dee's own copy, Sloane MS 3191",
-  legacy2023: "the 2023 text",
 };
 
 const FIELD_NAMES: Readonly<Record<KeyField, string>> = {

@@ -1,8 +1,4 @@
-import keys, {
-  aethyrs,
-  hasVersion,
-  keyVersion,
-} from "magick-data/enochian/keys";
+import keys, { aethyrs, hasVersion } from "magick-data/enochian/keys";
 import { beforeAll, describe, expect, it } from "vitest";
 import { PUBLIC_PAGES } from "@/seo/pages";
 import { buildSearchCatalogue } from "./catalogue";
@@ -89,9 +85,7 @@ describe("the real public search catalogue", () => {
       .sections.map((section) => section.id.replace(/:\d+$/, ""));
     for (const key of keys) {
       expect(ids).toContain(`key-${key.key}-en`);
-      // The 2023 text has no Enochian for some Keys: nothing to index.
-      const said = keyVersion(key)?.some((word) => word.word);
-      expect(ids.includes(`key-${key.key}-eo`), `Key ${key.key}`).toBe(said);
+      expect(ids, `Key ${key.key}`).toContain(`key-${key.key}-eo`);
       expect(ids.includes(`key-${key.key}-gd`), `Key ${key.key}`).toBe(
         hasVersion(key, "gd"),
       );

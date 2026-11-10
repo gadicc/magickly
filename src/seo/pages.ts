@@ -87,8 +87,9 @@ export const PUBLIC_PAGES = {
   "/enochian/keys": {
     title: "The Enochian Keys (Calls)",
     description:
-      "The Enochian Keys, or Calls, in English, in Enochian or side by side, " +
-      "with dictionary lookups for each word.",
+      "The nineteen Enochian Keys, or Calls, with the Call of the Thirty " +
+      "Aethyrs, in Dee's and the Golden Dawn's versions, each word looked up " +
+      "in the dictionary.",
   },
   "/enochian/oration": {
     title: "John Dee's Oration to God",

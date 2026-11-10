@@ -67,10 +67,25 @@ export function shownWords(key: PageKey, version: Version, aethyr: number) {
 /** What a word shows in the Enochian: nothing where this version has none. */
 const enochian = (word: ShownWord) => (word.gd ? word.gd.word : word.word);
 
+/** Read by a screen reader, not shown. */
+const VISUALLY_HIDDEN = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  overflow: "hidden",
+  clip: "rect(0 0 0 0)",
+  whiteSpace: "nowrap",
+} as const;
+
+/** Dee's version shows Crowley's form for this word. */
+const isCrowley = (word: ShownWord) =>
+  !word.gd && word.from === "equinox1912no8";
+
 /**
  * How the words look, set once on the container rather than on each of
  * the thousand or so buttons: a word is a button that looks like text,
- * yellow when chosen and dotted when its reading is uncertain.
+ * yellow when chosen, dotted when its reading is uncertain, and in italic
+ * where the form is Crowley's, standing in for a word Casaubon's print lost.
  */
 const WORDS_SX = {
   "& .key-text": { textAlign: "justify" },
@@ -86,6 +101,7 @@ const WORDS_SX = {
   "& .key-word:focus-visible": { outline: "2px solid", outlineOffset: "1px" },
   "& .key-word[aria-pressed=true], & .key-selected": { background: "yellow" },
   "& .key-word[data-uncertain]": { textDecoration: "underline dotted" },
+  "& .key-word[data-crowley]": { fontStyle: "italic" },
   "& .key-muted": { color: "#666", fontStyle: "italic" },
 } as const;
 
@@ -96,21 +112,29 @@ function WordButton({
   onSelect,
   children,
   muted,
+  crowley,
 }: {
   word: ShownWord;
   selected: boolean;
   onSelect: () => void;
   children: React.ReactNode;
   muted?: boolean;
+  /** The text shown is Crowley's form, in Dee's version. */
+  crowley?: boolean;
 }) {
   // The note itself is in the word panel, which the button opens.
+  const titles = [
+    crowley ? "Crowley's form: not in Casaubon's print" : "",
+    word.uncertain ? "Uncertain reading" : "",
+  ].filter(Boolean);
   return (
     <button
       type="button"
       className={muted ? "key-word key-muted" : "key-word"}
       aria-pressed={selected}
       data-uncertain={word.uncertain ? "" : undefined}
-      title={word.uncertain ? "Uncertain reading" : undefined}
+      data-crowley={crowley ? "" : undefined}
+      title={titles.length ? titles.join(". ") : undefined}
       onClick={onSelect}
     >
       {children}
@@ -263,6 +287,7 @@ export function KeyText({
                       selected={isSelected(word)}
                       onSelect={() => onSelect(word.row)}
                       muted={!shown}
+                      crowley={Boolean(shown && isCrowley(word))}
                     >
                       {shown ??
                         (word.unspoken
@@ -296,6 +321,7 @@ export function KeyText({
               word={word}
               selected={isSelected(word)}
               onSelect={() => onSelect(word.row)}
+              crowley={lang === "enochian" && isCrowley(word)}
             >
               {shown}
             </WordButton>{" "}
@@ -357,6 +383,16 @@ export default function Keys({
   const { enochianFont, EnochianFontToggle } = useEnochianFont();
   const [selected, setSelected] = React.useState<Selected | null>(null);
   const hasGd = keys.some((key) => key.gd);
+
+  // Escape closes the word panel, wherever the focus is.
+  React.useEffect(() => {
+    if (!selected) return;
+    const close = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelected(null);
+    };
+    document.addEventListener("keydown", close);
+    return () => document.removeEventListener("keydown", close);
+  }, [selected]);
 
   /** The version a Key is shown in: Dee's where it has no other. */
   const versionOf = (key: PageKey): Version =>
@@ -424,13 +460,17 @@ export default function Keys({
           // A Key without the Golden Dawn's reading shows Dee's, and says so.
           const keyVersion = versionOf(key);
           return (
-            <Accordion key={key.key}>
+            <Accordion
+              key={key.key}
+              // Each Key is a section of the page under its h1.
+              slotProps={{ heading: { component: "h2" } }}
+            >
               <AccordionSummary
                 expandIcon={<ExpandMore />}
                 aria-controls={`key-${key.key}-content`}
                 id={`key-${key.key}-header`}
               >
-                <Typography>{key.title}</Typography>
+                <Typography component="span">{key.title}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 {key.aethyrs && (
@@ -471,6 +511,12 @@ export default function Keys({
           );
         })}
       </Container>
+      {/* Says politely what opened; the panel itself is not a dialog. */}
+      <Box aria-live="polite" sx={VISUALLY_HIDDEN}>
+        {selectedWord
+          ? `${lookupOf(selectedWord) ?? "No Enochian"}: ${selectedWord.english}. Escape closes.`
+          : ""}
+      </Box>
       {selectedWord && selected && (
         <Box
           sx={{

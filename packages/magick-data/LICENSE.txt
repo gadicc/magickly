@@ -10,7 +10,7 @@ commercially, as long as you credit magick.ly (https://magick.ly).
   The JSON5 sources, src/**/*.json5; everything the build emits from them
   into dist/ (the .js, .d.ts and .json of each, and graph.json), among
   them the Enochian Keys, src/enochian/keys.json5 (README.md, under
-  Sources, says which of its Keys that covers so far).
+  Sources, says what of them is ours to license).
 
 Neither: the Enochian dictionary.
   src/enochian/dictionary.json5, what the build emits from it and the

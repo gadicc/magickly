@@ -130,8 +130,10 @@ Follow-ups are separate from the completed migration work:
   [plan 073](073-enochian-keys.md): most Keys lack their Enochian (676 of
   1,014 rows), the 2023 text's source is unknown, so all of it is
   re-derived from Casaubon (1659) and Crowley (1912), with both
-  traditions' readings and the nineteenth Call. TODO: Gadi's decisions
-  2 to 10, then stages 1 to 5.
+  traditions' readings and the nineteenth Call. Built 10 November on
+  `gate/enochian-keys`. TODO: Dee's own copy, Sloane MS 3191, when the
+  British Library's images return: his accents, the words Casaubon's
+  print lost (Keys 14–16) and his Aethyr spellings.
 - TODO (Gadi, 10 November 2026): English search in the Enochian
   dictionary, with a revamp of its UI and UX. Today the search matches
   Enochian spellings only (`src/app/enochian/dictionary/dictionary.tsx`);

@@ -287,10 +287,10 @@ describe("the word panel", () => {
 });
 
 describe("words the page has no Enochian for", () => {
-  /** A Key of the 2023 text with an English-only row, and one Casaubon lost. */
+  /** A Key with a row not yet read, and one Casaubon's print lost. */
   const PARTLY: EnochianKey = {
     key: 14,
-    sources: [{ work: "legacy2023" }],
+    sources: [{ work: "casaubon1659", page: 133 }],
     checked: { works: [], covered: [], notCovered: ["x"] },
     rows: [
       { english: "O you sons of fury", readings: {} },
@@ -334,6 +334,26 @@ describe("words the page has no Enochian for", () => {
       "Crowley's form, from The Equinox: not in Casaubon's print.",
     );
     expect(shown).toContain("lost in Casaubon's print");
+  });
+
+  it("shows Crowley's form in italic where it stands in, in each view", () => {
+    const render = (lang: EnochianLang, version: "dee" | "gd") =>
+      renderToString(
+        <KeyText
+          words={shownWords(pageKey(PARTLY), version, 1)}
+          keyNumber={14}
+          lang={lang}
+          enochianFont={false}
+          selected={null}
+          onSelect={() => {}}
+        />,
+      );
+    const marked =
+      /<button[^>]*data-crowley=""[^>]*title="Crowley&#x27;s form: not in Casaubon&#x27;s print"[^>]*>Noromi baghie</;
+    expect(render("enochian", "dee")).toMatch(marked);
+    expect(render("both", "dee")).toMatch(marked);
+    // The English is Casaubon's, so nothing there is Crowley's.
+    expect(render("english", "dee")).not.toContain("data-crowley");
   });
 });
 
