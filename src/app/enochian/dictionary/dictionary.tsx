@@ -1,185 +1,509 @@
 "use client";
 
-import { TextField } from "@mui/material";
+import { Box, SwipeableDrawer, useMediaQuery } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import dictionary from "magick-data/enochian/dictionary";
-import React from "react";
+import * as React from "react";
 import EnochianFont from "../../../components/enochian/enochianFont";
+import Entry from "./Entry";
+import { LABELS } from "./labels";
+import {
+  buildIndex,
+  firstKnownMeaning,
+  type Hit,
+  highlight,
+  searchDictionary,
+} from "./search";
+import { useDictionaryUrl } from "./urlState";
 
-const enochianWords = Object.keys(dictionary);
+/**
+ * The Enochian dictionary (plan 074): one query in two boxes, Latin and
+ * Enochian, searched both ways at once; rows that carry a meaning; and the
+ * chosen word's entry in a pane beside the list on desktop, or a sheet over
+ * it on phones.
+ *
+ * With no query the list is every word, which is what the prerendered HTML
+ * holds (decision 7). Its UI words come from `labels.ts`, out of site
+ * search's index (decision 11).
+ */
 
-const s = {
-  searchDiv: {
-    background: "white",
-    padding: "10px 20px",
-    position: "sticky" as const,
-    top: 0,
-    width: "100%",
-    boxShadow: "0px 0px 10px rgba(0,0,0,0.5)",
-  },
-  searchTextField: {
-    width: "45%",
-  },
-  searchTextFieldRight: {
-    width: "45%",
-    float: "right" as const,
-  },
-  resultsDiv: {
-    padding: "10px 0 10px 0",
-    background: "#aaa",
-    minHeight: "500px",
-  },
-  resultsRow: {
-    padding: "0px 20px",
-  },
-  resultsRowSelected: {
-    padding: "0px 20px",
-    background: "#ccc",
-  },
-  dictionary: {
-    padding: 22,
-    background: "#111", //'rgba(0,0,0,0.9)',
-    color: "white",
-    // Sticky inside the page's own box, so it stays at the bottom while the
-    // list scrolls and stops above the site footer.
-    position: "sticky" as const,
-    bottom: 0,
-    width: "100%",
-    boxSizing: "border-box" as const,
-  },
-  floatRight: {
-    float: "right" as const,
-  },
-};
+/** Rows a group shows before "Show all". */
+const GROUP_ROWS = 30;
+/** How long typing waits before the query is written to the URL. */
+const URL_DELAY = 300;
+const NO_TERMS: string[] = [];
 
-function WordBar({ word }) {
-  const dict = dictionary[word];
-  return (
-    <table width="100%">
-      <tbody>
-        <tr>
-          <td style={{ width: "33%", textAlign: "left" }}>{word}</td>
-          <td style={{ width: "33%", textAlign: "center" }}>
-            {dict.pronounciations.length
-              ? dict.pronounciations[0].pronounciation
-              : null}
-          </td>
-          <td
-            style={{ width: "33%", textAlign: "right", ...EnochianFont.style }}
-          >
-            {word}
-          </td>
-        </tr>
-        {dict.meanings.map((meaning, i) => (
-          <tr key={i}>
-            <td colSpan={3} style={{ textAlign: "center" }}>
-              {meaning.meaning} ({meaning.source}) {meaning.source2}{" "}
-              {meaning.note}
-            </td>
-          </tr>
-        ))}
-        <tr>
-          <td></td>
-          <td></td>
-          <td style={{ textAlign: "right" }}>
-            {dict.gematria?.length
-              ? "Gematria " + dict.gematria.join(", ")
-              : ""}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  );
-}
-
-const resultRowRightStyle = { ...s.floatRight, ...EnochianFont.style };
-const ResultRow = React.memo(function ResultRow({
+/** Every word, with its first known meaning: the list with no query. */
+const ALL: Hit[] = Object.entries(dictionary).map(([word, entry]) => ({
   word,
-  onClick,
+  ...firstKnownMeaning(entry),
+  tier: 0,
+}));
+
+const visuallyHidden = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  overflow: "hidden",
+  clip: "rect(0 0 0 0)",
+  whiteSpace: "nowrap",
+} as const;
+
+const styles = {
+  display: { md: "grid" },
+  gridTemplateColumns: { md: "440px minmax(0, 1fr)" },
+  alignItems: "start",
+  "& .dict-left": {
+    borderRight: { md: 1 },
+    borderColor: { md: "divider" },
+    minWidth: 0,
+  },
+  "& .dict-search": {
+    position: "sticky",
+    top: 0,
+    zIndex: 2,
+    bgcolor: "background.paper",
+    borderBottom: 1,
+    borderColor: "divider",
+    padding: "12px 16px 8px",
+  },
+  "& .dict-boxes": {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "10px",
+  },
+  "& .dict-box": {
+    width: "100%",
+    minWidth: 0,
+    height: 44,
+    padding: "0 12px",
+    font: "inherit",
+    fontSize: 16,
+    color: "text.primary",
+    bgcolor: "background.paper",
+    border: 1,
+    borderColor: "divider",
+    borderRadius: 1,
+    outline: "none",
+    "&:focus": { borderColor: "primary.main", boxShadow: 1 },
+  },
+  "& .dict-box-enochian": { fontSize: 22, textTransform: "uppercase" },
+  "& .dict-labels": {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: 1,
+    fontSize: 12,
+    color: "text.secondary",
+    mt: 0.5,
+  },
+  "& .dict-group": {
+    display: "flex",
+    justifyContent: "space-between",
+    padding: "14px 16px 6px",
+    fontSize: 13,
+    fontWeight: 500,
+    letterSpacing: "0.02em",
+    textTransform: "uppercase",
+    color: "primary.main",
+  },
+  "& .dict-count": { color: "text.secondary", fontWeight: 400 },
+  "& .dict-row": {
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr) auto",
+    columnGap: "12px",
+    padding: "8px 16px",
+    borderBottom: 1,
+    borderColor: "divider",
+    cursor: "pointer",
+    "&:hover": { bgcolor: "action.hover" },
+    "&[aria-selected=true]": { bgcolor: "action.selected" },
+    "&.dict-active": {
+      outline: "2px solid",
+      outlineColor: "primary.main",
+      outlineOffset: -2,
+    },
+  },
+  "& .dict-word": {
+    fontWeight: 500,
+    letterSpacing: "0.02em",
+    overflowWrap: "anywhere",
+  },
+  "& .dict-script": {
+    gridRow: "span 2",
+    alignSelf: "center",
+    fontSize: 20,
+    color: "text.secondary",
+  },
+  "& .dict-meaning": {
+    fontSize: 14,
+    color: "text.secondary",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    "& b": { color: "text.primary" },
+  },
+  "& .dict-unknown": { fontStyle: "italic", opacity: 0.7 },
+  "& .dict-source": { fontSize: 11.5, ml: 0.5, opacity: 0.8 },
+  "& .dict-more": {
+    padding: "12px 16px",
+    color: "primary.main",
+    fontSize: 14,
+    fontWeight: 500,
+    cursor: "pointer",
+    "&.dict-active": { textDecoration: "underline" },
+  },
+  "& .dict-nothing": { padding: "16px", color: "text.secondary" },
+  "& .dict-pane": {
+    display: { xs: "none", md: "block" },
+    position: "sticky",
+    top: 0,
+    maxHeight: "100vh",
+    overflowY: "auto",
+    bgcolor: "action.hover",
+    minHeight: 320,
+  },
+  "& .dict-choose": { padding: "32px 40px", color: "text.secondary" },
+} as const;
+
+/** One word's row: the word, its script, and a meaning with its source. */
+const Row = React.memo(function Row({
+  id,
+  hit,
+  terms,
   selected,
+  active,
+  onOpen,
 }: {
-  word: string;
-  onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  id: string;
+  hit: Hit;
+  terms: string[];
   selected: boolean;
+  active: boolean;
+  onOpen: (word: string) => void;
 }) {
+  const source =
+    hit.meaningIndex >= 0
+      ? dictionary[hit.word].meanings[hit.meaningIndex].source
+      : "";
   return (
+    // The box that owns the list (a combobox) moves through the rows with
+    // the arrow keys, so the rows themselves take no focus.
     <div
-      onClick={onClick}
-      style={selected ? s.resultsRowSelected : s.resultsRow}
+      id={id}
+      role="option"
+      aria-selected={selected}
+      className={active ? "dict-row dict-active" : "dict-row"}
+      onClick={() => onOpen(hit.word)}
     >
-      <span>{word}</span>
-      <span style={resultRowRightStyle}>{word}</span>
+      <span className="dict-word">{hit.word}</span>
+      <span className="dict-script" style={EnochianFont.style} aria-hidden>
+        {hit.word}
+      </span>
+      {hit.meaning === null ? (
+        <span className="dict-meaning dict-unknown">{LABELS.unknown}</span>
+      ) : (
+        <span className="dict-meaning">
+          {highlight(hit.meaning, terms).map((segment, i) =>
+            segment.match ? (
+              // biome-ignore lint/suspicious/noArrayIndexKey: the text's own order
+              <b key={i}>{segment.text}</b>
+            ) : (
+              segment.text
+            ),
+          )}
+          {source && <span className="dict-source">{source}</span>}
+        </span>
+      )}
     </div>
   );
 });
 
-export default function Dictionary() {
+/** A group of rows as the list shows it. */
+interface Section {
+  id: string;
+  title: string;
+  hits: Hit[];
+  /** Rows beyond the cap, which "Show all" reveals; 0 when all are shown. */
+  hidden: number;
+}
+
+export default function Dictionary({
+  uses,
+}: {
+  /** How often the Keys say each word, which breaks search's ties. */
+  uses: Readonly<Record<string, number>>;
+}) {
+  const url = useDictionaryUrl();
   const [text, setText] = React.useState("");
-  const [selected, setSelected] = React.useState("");
-  const matches = text
-    ? enochianWords.filter((x) => x.match(text))
-    : enochianWords;
+  const [expanded, setExpanded] = React.useState<Record<string, boolean>>({});
+  const [active, setActive] = React.useState(-1);
+  const theme = useTheme();
+  const desktop = useMediaQuery(theme.breakpoints.up("md"));
+  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const idPrefix = React.useId();
 
-  const onClick = React.useCallback((event) => {
-    setSelected(event.target.innerText);
-  }, []);
+  // The URL's query fills the boxes on load and on Back; the boxes write it
+  // back after a pause. `written` tells our own writes from the others.
+  const written = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    if (url.query !== written.current) setText(url.query);
+  }, [url.query]);
+  React.useEffect(() => {
+    const trimmed = text.trim();
+    if (trimmed === url.query) return;
+    const timer = setTimeout(() => {
+      written.current = trimmed;
+      url.setQuery(trimmed);
+    }, URL_DELAY);
+    return () => clearTimeout(timer);
+  }, [text, url.query, url.setQuery]);
 
+  const index = React.useMemo(() => buildIndex(dictionary, uses), [uses]);
+  // The list can lag a keystroke behind the boxes, so typing stays quick.
+  const deferred = React.useDeferredValue(text.trim());
+  const result = React.useMemo(
+    () => (deferred ? searchDictionary(index, deferred) : null),
+    [index, deferred],
+  );
+  // A new query starts with its groups capped and nothing active.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset on a new query
+  React.useEffect(() => {
+    setExpanded({});
+    setActive(-1);
+  }, [deferred]);
+
+  const sections = React.useMemo((): Section[] => {
+    if (!result)
+      return [{ id: "all", title: LABELS.allWords, hits: ALL, hidden: 0 }];
+    const english = [
+      { id: "means", title: LABELS.means(deferred), hits: result.means },
+      {
+        id: "mentions",
+        title: LABELS.mentions(deferred),
+        hits: result.mentions,
+      },
+    ];
+    const spelled = [
+      { id: "spelled", title: LABELS.spelled(deferred), hits: result.spelled },
+    ];
+    return [
+      { id: "word", title: LABELS.word, hits: result.word },
+      ...(result.lead === "english"
+        ? [...english, ...spelled]
+        : [...spelled, ...english]),
+    ]
+      .filter((one) => one.hits.length)
+      .map((one) => {
+        const all = expanded[one.id] || one.hits.length <= GROUP_ROWS;
+        return {
+          ...one,
+          hits: all ? one.hits : one.hits.slice(0, GROUP_ROWS),
+          hidden: all ? 0 : one.hits.length - GROUP_ROWS,
+        };
+      });
+  }, [result, deferred, expanded]);
+
+  // What the arrow keys move through: each row, and each "Show all".
+  const options = React.useMemo(
+    () =>
+      sections.flatMap((section) => [
+        ...section.hits.map((hit) => ({ word: hit.word, section: section.id })),
+        ...(section.hidden ? [{ word: null, section: section.id }] : []),
+      ]),
+    [sections],
+  );
+  const optionId = (at: number) => `${idPrefix}-option-${at}`;
+
+  const entry =
+    url.word && Object.hasOwn(dictionary, url.word)
+      ? dictionary[url.word]
+      : undefined;
+  const { open, close } = url;
+  const choose = React.useCallback(
+    (at: number) => {
+      const option = options[at];
+      if (!option) return;
+      if (option.word) open(option.word);
+      else setExpanded((was) => ({ ...was, [option.section]: true }));
+    },
+    [options, open],
+  );
+
+  React.useEffect(() => {
+    if (active >= 0)
+      document.getElementById(optionId(active))?.scrollIntoView({
+        block: "nearest",
+      });
+  });
+
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setActive((at) => Math.min(at + 1, options.length - 1));
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setActive((at) => Math.max(at - 1, 0));
+    } else if (event.key === "Enter" && active >= 0) {
+      event.preventDefault();
+      choose(active);
+    }
+  };
+
+  const listId = `${idPrefix}-list`;
+  const headingId = `${idPrefix}-entry`;
+  const total = result
+    ? result.word.length +
+      result.means.length +
+      result.mentions.length +
+      result.spelled.length
+    : ALL.length;
+  const shown = entry && url.word && (
+    <Entry
+      key={url.word}
+      word={url.word}
+      entry={entry}
+      onClose={close}
+      headingId={headingId}
+    />
+  );
+
+  let at = -1;
   return (
-    <div>
-      <div style={s.searchDiv}>
-        <TextField
-          placeholder="ABC"
-          margin="normal"
-          value={text}
-          onChange={(e) => setText(e.target.value.toUpperCase())}
-          type="search"
-          style={s.searchTextField}
-          size="small"
-          variant="standard"
-        />
-        <TextField
-          // since no way to apply placeholder pseudo-selector CSS currently.
-          // placeholder="ABC"
-          placeholder="CBA"
-          margin="normal"
-          value={text}
-          onChange={(e) => setText(e.target.value.toUpperCase())}
-          style={s.searchTextFieldRight}
-          /*
-          InputProps={{
-            sx: {
-              "&::-moz-placeholder": { unicodeBidi: "bidi-override" },
-              "&::-ms-input-placeholder": { unicodeBidi: "bidi-override" },
-              "&::-webkit-input-placeholder": { unicodeBidi: "bidi-override" },
-            },
-          }}
-          */
-          type="search"
-          size="small"
-          variant="standard"
-          slotProps={{
-            htmlInput: {
-              // unicode-bidi prop MUST be in style, can't be via CSS class.
-              style: EnochianFont.style,
-            },
-          }}
-        />
-      </div>
-      <div style={s.resultsDiv}>
-        {matches &&
-          matches.map((word) => (
-            <ResultRow
-              key={word}
-              word={word}
-              selected={word === selected}
-              onClick={onClick}
+    <Box sx={styles}>
+      <div className="dict-left">
+        <div className="dict-search">
+          <div className="dict-boxes">
+            <input
+              className="dict-box"
+              type="search"
+              role="combobox"
+              aria-label={LABELS.latinBox}
+              aria-controls={listId}
+              aria-expanded
+              aria-autocomplete="list"
+              aria-activedescendant={active >= 0 ? optionId(active) : undefined}
+              placeholder={LABELS.latinPlaceholder}
+              autoComplete="off"
+              spellCheck={false}
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              onKeyDown={onKeyDown}
             />
-          ))}
-      </div>
-      {dictionary[selected || text] ? (
-        <div style={s.dictionary}>
-          <WordBar word={selected || text} />
+            <input
+              className="dict-box dict-box-enochian"
+              type="text"
+              aria-label={LABELS.enochianBox}
+              autoComplete="off"
+              spellCheck={false}
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              onKeyDown={onKeyDown}
+              style={EnochianFont.style}
+            />
+          </div>
+          <div className="dict-labels" aria-hidden>
+            <span>{LABELS.latinBox}</span>
+            <span>{LABELS.enochianBox}</span>
+          </div>
         </div>
-      ) : null}
-    </div>
+        <Box component="div" aria-live="polite" sx={visuallyHidden}>
+          {result ? LABELS.found(total) : ""}
+        </Box>
+        <div id={listId} role="listbox" aria-label={LABELS.results}>
+          {sections.map((section) => {
+            const groupId = `${idPrefix}-${section.id}`;
+            return (
+              <div key={section.id} role="group" aria-labelledby={groupId}>
+                <div className="dict-group" id={groupId} role="presentation">
+                  <span>{section.title}</span>
+                  <span className="dict-count">
+                    {(section.hits.length + section.hidden).toLocaleString(
+                      "en",
+                    )}
+                  </span>
+                </div>
+                {section.hits.map((hit) => {
+                  at++;
+                  return (
+                    <Row
+                      key={hit.word}
+                      id={optionId(at)}
+                      hit={hit}
+                      terms={result?.terms ?? NO_TERMS}
+                      selected={hit.word === url.word}
+                      active={at === active}
+                      onOpen={open}
+                    />
+                  );
+                })}
+                {section.hidden > 0 &&
+                  (() => {
+                    at++;
+                    const mine = at;
+                    return (
+                      <div
+                        id={optionId(mine)}
+                        role="option"
+                        aria-selected={false}
+                        className={
+                          mine === active
+                            ? "dict-more dict-active"
+                            : "dict-more"
+                        }
+                        onClick={() => choose(mine)}
+                      >
+                        {LABELS.showAll(section.hits.length + section.hidden)}
+                      </div>
+                    );
+                  })()}
+              </div>
+            );
+          })}
+        </div>
+        {result && !total && (
+          <div className="dict-nothing">{LABELS.nothing(deferred)}</div>
+        )}
+      </div>
+      <section
+        className="dict-pane"
+        aria-labelledby={shown && desktop ? headingId : undefined}
+        aria-label={shown && desktop ? undefined : LABELS.choose}
+      >
+        {desktop && shown ? (
+          shown
+        ) : (
+          <div className="dict-choose">{LABELS.choose}</div>
+        )}
+      </section>
+      <SwipeableDrawer
+        anchor="bottom"
+        open={!desktop && Boolean(shown)}
+        onClose={close}
+        onOpen={() => {}}
+        disableSwipeToOpen
+        transitionDuration={reducedMotion ? 0 : undefined}
+        slotProps={{
+          paper: {
+            role: "dialog",
+            "aria-modal": true,
+            "aria-labelledby": headingId,
+            sx: { borderRadius: "14px 14px 0 0", maxHeight: "85vh" },
+          },
+        }}
+      >
+        <Box
+          aria-hidden
+          sx={{
+            width: 36,
+            height: 4,
+            borderRadius: 2,
+            bgcolor: "divider",
+            mx: "auto",
+            mt: 1,
+          }}
+        />
+        {!desktop && shown}
+      </SwipeableDrawer>
+    </Box>
   );
 }

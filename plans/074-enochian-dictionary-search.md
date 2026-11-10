@@ -239,16 +239,22 @@ ranking, and kept in the session notes rather than the repository:
      spike).
 10. **Theme colours throughout.** No hard-coded colours. The page uses
     the MUI palette, so dark mode works. Both modes are checked for
-    contrast.
-11. **One search refresh, at the end.** UI chrome ("Means", "Show all",
-    "Copy link", "In the Keys", the keypad's labels) is passed as string
-    constants, not JSX text, so stages 2–5 leave site search's index
-    alone. Stage 6 rewrites the page text and the search description,
-    and runs `pnpm search:publish` once in the same commit (Gadi agreed
-    on 10 November 2026). `public/search-vectors` then keeps only the
-    file the manifest names. Until stage 6, the page text on the gate
-    branch still describes the old page. The branch is released whole,
-    so no release shows the mismatch.
+    contrast. (The build found that the app has no dark mode:
+    `src/theme.ts` is light only. The page is ready for one, and the
+    browser check is in light mode only.)
+11. **One search refresh, with the page.** UI chrome ("Means", "Show
+    all", "Copy link", "In the Keys", the keypad's labels) is passed as
+    string constants (`labels.ts`), not JSX text, so it stays out of site
+    search's index. The draft put the text, the description and the
+    refresh in the last stage. The build found that the old
+    `dictionary.tsx` put "( )" into the index (the brackets around each
+    meaning's source), so rewriting it changes the index whatever the
+    labels do. The text, the description and the one refresh (Gadi
+    agreed on 10 November 2026) therefore moved into stage 3, the page's
+    commit. Until stages 4 and 5 land, the text on the gate branch
+    describes the keypad and "In the Keys" ahead of them; the branch is
+    released whole. `public/search-vectors` keeps only the file the
+    manifest names.
 12. **Accessibility.**
     - Both boxes are labelled. The Latin box is a combobox over the
       results, with `aria-activedescendant`, so ↑/↓ move through 1,911
@@ -260,11 +266,13 @@ ranking, and kept in the session notes rather than the repository:
       open word.
     - The keypad's keys are buttons with names.
 13. **The search description** (`src/seo/pages.ts`) names English lookup,
-    the target of "enochian translator". It changes in stage 6, in the
-    commit with the refresh. The text: "Look up Enochian words by
-    their English meaning or their spelling: 1,911 words with
-    pronunciations, sources, gematria, the Enochian script, and where
-    Dee's Keys use them." Gadi accepted it on 10 November 2026.
+    the target of "enochian translator". It changes in stage 3, in the
+    commit with the refresh. Gadi accepted the draft on 10 November
+    2026; at 170 characters it broke the 160 that `src/seo/pages.test.ts`
+    allows, so it shipped without "their" twice and "Enochian" before
+    "script": "Look up Enochian words by English meaning or spelling:
+    1,911 words with pronunciations, sources, gematria, the script, and
+    where Dee's Keys use them."
 
 ## Out of scope
 
@@ -283,14 +291,13 @@ Each stage is one gated commit on `gate/enochian-dictionary-search`.
    with `findWord` and `findParts` shared from `keyEntries.ts`, and its
    tests (decision 9's builder and counts). No UI change.
 3. **The page.** Two boxes, rows with meanings, panes and sheet, URL
-   state, theme colours, keyboard and focus (decisions 1, 3, 6–8, 10
-   and 12).
+   state, theme colours, keyboard and focus; the page text, the search
+   description and the search refresh (decisions 1, 3, 6–8 and 10–13).
 4. **The keypad** (decisions 2 and 4).
 5. **In the Keys.** The route handler, the entry section, and the Keys
    page's anchors (decision 9).
-6. **The text.** `DictionaryText` and the search description, the
-   search refresh, this plan's record, and current status without the
-   TODO (decisions 11 and 13).
+6. **The record.** This plan's build notes, and current status without
+   the TODO.
 
 ## The spike — 10 November 2026
 
@@ -382,7 +389,8 @@ and drops query strings (see "What exists").
   passes.
 - **The full gate** in a clean worktree on /home with Node 24, at every
   commit.
-- **A browser check** at 360, 390 and 1280 px, in light and dark: the
+- **A browser check** at 360, 390 and 1280 px, in light (the app has
+  no dark mode): the
   boxes, the keypad, the sheet and the panes, Back, a shared link, the
   Keys link, hydration time, and no horizontal scroll at 360.
 
