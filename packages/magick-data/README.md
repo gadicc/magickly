@@ -331,7 +331,10 @@ picture as it was.
 
 From 0.1.0, each release is published by the repository's CI when the
 version changes on `main`, with npm provenance naming the commit it was
-built from. A pre-release goes out under the `next` tag, never `latest`.
+built from. CI publishes a pre-release under the `next` tag and a release
+under `latest`. The first version, a release candidate published by hand
+under `next`, may still be what `latest` names until 0.1.0 replaces it:
+the registry points `latest` at a package's only version.
 
 ## Romanised Hebrew
 

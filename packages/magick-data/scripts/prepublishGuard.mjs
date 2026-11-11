@@ -1,5 +1,6 @@
 /**
- * The package's `prepublishOnly` guard (plan 080, decision 3).
+ * The package's `prepublishOnly` and `prepack` guards (plan 080,
+ * decision 3).
  *
  * The source manifest's `exports` point into `./src/`, at TypeScript the
  * tarball does not carry; only `pnpm pack` swaps them for
@@ -13,8 +14,15 @@
  *
  * Neither package manager runs lifecycle scripts when publishing a tarball,
  * and `pnpm pack` drops `prepublishOnly` from the packed manifest, so this
- * guard stops a directory publish and never a tarball. `--ignore-scripts`
- * would skip it; don't.
+ * guard stops a directory publish and never a tarball.
+ *
+ * That left a way round it: `npm pack` packs the source manifest as it is,
+ * `exports` into `./src/` and all, and `npm publish` of that tarball runs
+ * no script. So the same file, run with `--pack` as the `prepack` script,
+ * refuses to pack under anything but pnpm (`npm_config_user_agent`, which
+ * both set for a lifecycle script, starts `pnpm/` under pnpm only).
+ *
+ * `--ignore-scripts` skips both guards; don't.
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -48,15 +56,38 @@ export function refusal(manifest) {
   ].join("\n");
 }
 
+/**
+ * Why the package must not be packed by the tool whose user agent this is,
+ * or `undefined` if it may be: only pnpm applies `publishConfig.exports`.
+ */
+export function packRefusal(userAgent) {
+  if (userAgent?.startsWith("pnpm/")) return undefined;
+  const tool = userAgent?.split(" ")[0] || "an unknown tool";
+  return [
+    `Refusing to pack magick-data with ${tool}: only pnpm pack swaps its`,
+    "exports for publishConfig.exports, and this tarball's would point into",
+    "./src/. Pack and verify it with",
+    "  pnpm --filter magick-data smoke --keep-tarball <path>",
+    "(plan 080, decision 3).",
+  ].join("\n");
+}
+
 if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
   // npm and pnpm name the manifest they are publishing; a lifecycle script
   // runs in the package's directory either way.
-  const path =
-    process.env.npm_package_json || join(process.cwd(), "package.json");
-  const message = refusal(JSON.parse(readFileSync(path, "utf8")));
+  const message = process.argv.includes("--pack")
+    ? packRefusal(process.env.npm_config_user_agent)
+    : refusal(
+        JSON.parse(
+          readFileSync(
+            process.env.npm_package_json || join(process.cwd(), "package.json"),
+            "utf8",
+          ),
+        ),
+      );
   if (message) {
     console.error(message);
     process.exitCode = 1;

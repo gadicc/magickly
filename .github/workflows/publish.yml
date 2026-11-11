@@ -1,14 +1,27 @@
 name: Publish packages
 
 # Plan 080, decision 3: publish magick-data to npm when its version changes
-# on main, through trusted publishing (OIDC) with provenance. It does nothing
-# until the owner's first publish by hand: a package the registry does not
-# have is skipped, and so is a version it already lists.
+# on main, through trusted publishing (OIDC) with provenance, directly with
+# `npm publish` (staged publishing is deferred). It does nothing until the
+# owner's first publish by hand: a package the registry does not have is
+# skipped, and so is a version it already lists.
+#
+# Three stages, so that the npm credential exists only in a job that runs
+# no third-party code (stage A review, H1):
+#
+# - decide: checkout and the decision script, no install. On most pushes
+#   it skips, and nothing else runs.
+# - quality (ci.yml) and build, only when decide says publish, neither with
+#   id-token: build installs, builds, smoke-tests and uploads the verified
+#   tarball with its SHA-256.
+# - publish, in the `npm` environment with id-token: write: downloads the
+#   tarball, checks its SHA-256, decides again from a fresh registry read
+#   and runs `npm publish`. No install, no cache, no package script.
 #
 # Not part of release.yml: its deploy job holds id-token: write in the
 # Production environment, and everything the Vercel build runs there could
-# then mint an npm token. This workflow has its own `npm` environment, which
-# the trusted publisher on npmjs.com names, with this file and the repository.
+# then mint an npm token. The trusted publisher on npmjs.com names this
+# file, the repository and the `npm` environment.
 on:
   push:
     branches: [main]
@@ -22,18 +35,59 @@ concurrency:
   group: npm-publish
   cancel-in-progress: false
 
+env:
+  # Flags for both decisions. Plan 080, stage A′: becomes --expect-exists
+  # with the bump to 0.1.0, once the registry has the package, so that a
+  # 404 then fails instead of skipping.
+  DECISION_FLAGS: ""
+  # Exact, so that publish runs a known npm: trusted publishing needs 11.5.1
+  # or later, and 24.22.2 bundles 11.19.1. In the 24 line of .nvmrc; ci.yml's
+  # dry run uses the same.
+  NPM_NODE_VERSION: 24.22.2
+
 jobs:
+  decide:
+    if: github.repository == 'gadicc/magickly'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      publish: ${{ steps.decide.outputs.publish }}
+      version: ${{ steps.decide.outputs.version }}
+      tag: ${{ steps.decide.outputs.tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NPM_NODE_VERSION }}
+          package-manager-cache: false
+      # From the source manifest, whose version the tarball carries; build
+      # checks that it does.
+      - name: Decide from the registry
+        id: decide
+        run: >-
+          node scripts/npm-publish-decision.mjs
+          --manifest packages/magick-data/package.json $DECISION_FLAGS
+
+  # A green quality run for this exact commit, only when there is something
+  # to publish. release.yml runs the same on every push to main; depending
+  # on its run would tie npm to the deploy's success.
   quality:
+    needs: decide
+    if: github.repository == 'gadicc/magickly' && needs.decide.outputs.publish == 'true'
     uses: ./.github/workflows/ci.yml
 
-  magick-data:
-    needs: quality
+  build:
+    needs: decide
+    if: github.repository == 'gadicc/magickly' && needs.decide.outputs.publish == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    environment: npm
     permissions:
       contents: read
-      id-token: write
+    outputs:
+      sha256: ${{ steps.digest.outputs.sha256 }}
+      integrity: ${{ steps.digest.outputs.integrity }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -53,15 +107,103 @@ jobs:
       # verifies the tarball and keeps it; that file is what is published.
       - name: Build, verify and keep the tarball
         run: pnpm --filter magick-data smoke --keep-tarball "$RUNNER_TEMP/magick-data.tgz"
-      - name: Decide from the registry
+      - name: Check the tarball is the version decided
+        env:
+          DECIDED: ${{ needs.decide.outputs.version }}
+        run: |
+          packed="$(tar -xzOf "$RUNNER_TEMP/magick-data.tgz" package/package.json \
+            | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).version')"
+          echo "decided $DECIDED, packed $packed"
+          test "$packed" = "$DECIDED"
+      - name: Digest the tarball
+        id: digest
+        run: |
+          sha256="$(sha256sum "$RUNNER_TEMP/magick-data.tgz" | cut -d' ' -f1)"
+          integrity="sha512-$(openssl dgst -sha512 -binary "$RUNNER_TEMP/magick-data.tgz" | base64 -w0)"
+          echo "sha256 $sha256"
+          echo "integrity $integrity"
+          echo "sha256=$sha256" >> "$GITHUB_OUTPUT"
+          echo "integrity=$integrity" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: magick-data-publish
+          path: ${{ runner.temp }}/magick-data.tgz
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    needs: [decide, quality, build]
+    if: github.repository == 'gadicc/magickly' && needs.decide.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      # Only for the decision script, which imports nothing but Node's own
+      # modules; nothing is installed and no package script runs.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      # Node.js and the npm it bundles, at an exact version, with no cache
+      # and no registry-url (whose .npmrc would ask for a token, not OIDC).
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NPM_NODE_VERSION }}
+          package-manager-cache: false
+      - name: Require npm 11.5.1 or later
+        run: |
+          version="$(npm --version)"
+          echo "npm $version at $(command -v npm)"
+          node --input-type=module -e '
+            import { compareVersions } from "./scripts/npm-publish-decision.mjs";
+            if (compareVersions(process.argv[1], "11.5.1") < 0) {
+              console.log(`::error::npm ${process.argv[1]} cannot use a trusted publisher, which needs 11.5.1 or later`);
+              process.exit(1);
+            }
+          ' "$version"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: magick-data-publish
+          path: ${{ runner.temp }}/publish
+      - name: Check the tarball is the one build verified
+        env:
+          SHA256: ${{ needs.build.outputs.sha256 }}
+          INTEGRITY: ${{ needs.build.outputs.integrity }}
+        run: |
+          echo "$SHA256  $RUNNER_TEMP/publish/magick-data.tgz" | sha256sum -c -
+          echo "integrity $INTEGRITY"
+      # A fresh registry read: something may have changed since decide.
+      - name: Decide again
         id: decide
-        run: node scripts/npm-publish-decision.mjs "$RUNNER_TEMP/magick-data.tgz"
-      # Trusted publishing needs npm 11.5.1 or later; the npm pinned here is
-      # the one CI's dry run uses, whatever the runtime bundles.
+        run: >-
+          node scripts/npm-publish-decision.mjs
+          "$RUNNER_TEMP/publish/magick-data.tgz" $DECISION_FLAGS
+      - name: Check it is the version decided
+        env:
+          DECIDED: ${{ needs.decide.outputs.version }}
+          VERSION: ${{ steps.decide.outputs.version }}
+        run: test "$VERSION" = "$DECIDED"
+      # Verbose, since npm reports a failed OIDC exchange only at that level
+      # and otherwise says ENEEDAUTH. The registry's CDN caches a packument
+      # for up to five minutes, so a re-run soon after a publish can reach
+      # here for a version npm has; its refusal publishes nothing, and is a
+      # skip rather than a failure.
       - name: Publish with provenance
         if: steps.decide.outputs.publish == 'true'
         env:
           TAG: ${{ steps.decide.outputs.tag }}
-        run: >-
-          pnpm dlx npm@11.18.0 publish "$RUNNER_TEMP/magick-data.tgz"
-          --provenance --access public --tag "$TAG"
+          VERSION: ${{ steps.decide.outputs.version }}
+        run: |
+          set +e
+          npm publish "$RUNNER_TEMP/publish/magick-data.tgz" \
+            --provenance --access public --tag "$TAG" --loglevel verbose \
+            2>&1 | tee "$RUNNER_TEMP/npm-publish.log"
+          status="${PIPESTATUS[0]}"
+          if [ "$status" -ne 0 ] &&
+            grep -q "cannot publish over the previously published versions" "$RUNNER_TEMP/npm-publish.log"; then
+            echo "::warning::npm already has magick-data@$VERSION; nothing was published"
+            exit 0
+          fi
+          exit "$status"

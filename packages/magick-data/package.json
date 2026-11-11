@@ -1,7 +1,23 @@
 {
   "name": "magick-data",
   "version": "0.0.0",
-  "license": "SEE LICENSE IN LICENSE.txt",
+  "description": "Magickal correspondences and reference data: the sephirot, planets, zodiac, Hebrew and Enochian letters, Golden Dawn grades, geomantic figures and more, as typed tables with the links between them",
+  "keywords": [
+    "magick",
+    "correspondences",
+    "kabbalah",
+    "tree of life",
+    "sephirot",
+    "golden dawn",
+    "astrology",
+    "enochian",
+    "geomancy",
+    "alchemy",
+    "hebrew",
+    "occult",
+    "esoteric"
+  ],
+  "license": "(MIT AND CC-BY-4.0)",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gadicc/magickly.git",
@@ -271,6 +287,7 @@
     "typecheck": "tsc -p tsconfig.json",
     "build": "pnpm data:build && rm -rf lib && tsc -p tsconfig.build.json",
     "smoke": "node scripts/smoke.mjs",
+    "prepack": "node scripts/prepublishGuard.mjs --pack",
     "prepublishOnly": "node scripts/prepublishGuard.mjs"
   },
   "devDependencies": {

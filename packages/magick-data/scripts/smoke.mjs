@@ -27,7 +27,9 @@
  *
  * `--keep-tarball <path>` copies the tarball to `<path>` once every step has
  * passed (a relative path is read from where pnpm was run), and that file is
- * what a release publishes, `npm publish <path>` (plan 080, decision 3).
+ * what a release publishes, `npm publish <path>` (plan 080, decision 3). It
+ * prints the file's SHA-256 and npm's `sha512-…` integrity, to compare with
+ * CI's log and, once published, with `npm view magick-data dist.integrity`.
  * `lib/` and `dist/` are git-ignored, so packing again could ship whatever
  * they hold; and `publishConfig.exports` is applied only by `pnpm pack`, so
  * `npm publish` from the package would ship `exports` that point at
@@ -50,6 +52,11 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { refusal } from "./prepublishGuard.mjs";
+import {
+  publishedPathOf,
+  readmeSources,
+  unsettledSources,
+} from "./readmeSources.mjs";
 
 const PACKAGE_DIR = fileURLToPath(new URL("..", import.meta.url));
 const REPO_DIR = join(PACKAGE_DIR, "..", "..");
@@ -159,6 +166,31 @@ try {
       assert(entries.includes(file), `${file} is missing`);
   });
 
+  // The README's test holds its Sources to the JSON5 sources; this holds it
+  // to what the tarball actually carries (plan 080, stage A review, L8).
+  step("the README's Sources name every JSON file in the tarball", () => {
+    const readme = readFileSync(join(PACKAGE_DIR, "README.md"), "utf8");
+    const named = readmeSources(readme).map((row) => publishedPathOf(row.file));
+    const shipped = entries.filter((f) => /^dist\/.*\.json$/.test(f));
+    const sort = (list) => JSON.stringify([...list].sort());
+    assert(
+      sort(named) === sort(shipped),
+      `Sources name ${named.filter((f) => !shipped.includes(f)).join(", ") || "nothing"} not shipped; ` +
+        `shipped without a row: ${shipped.filter((f) => !named.includes(f)).join(", ") || "nothing"}`,
+    );
+  });
+
+  step("no version past 0.0.0 before the provenance sign-off", () => {
+    const readme = readFileSync(join(PACKAGE_DIR, "README.md"), "utf8");
+    const open = unsettledSources(readmeSources(readme));
+    assert(
+      sourceManifest.version === "0.0.0" || open.length === 0,
+      `version ${sourceManifest.version}, but Sources still has open rows: ${open
+        .map((row) => row.file)
+        .join(", ")}`,
+    );
+  });
+
   const fixture = join(work, "fixture");
   const installed = join(fixture, "node_modules", "magick-data");
   mkdirSync(installed, { recursive: true });
@@ -202,6 +234,23 @@ try {
     }
   });
 
+  step("the prepack guard refuses npm and lets pnpm pack", () => {
+    const guard = join(PACKAGE_DIR, "scripts", "prepublishGuard.mjs");
+    const pack = (userAgent) =>
+      run(process.execPath, [guard, "--pack"], {
+        cwd: PACKAGE_DIR,
+        env: { ...process.env, npm_config_user_agent: userAgent },
+        allowFailure: true,
+      });
+    const npm = pack("npm/11.18.0 node/v24.18.0 linux x64 workspaces/false");
+    assert(
+      npm.status === 1 && npm.output.includes("Refusing to pack"),
+      `the guard let npm pack\n${npm.output}`,
+    );
+    const pnpm = pack("pnpm/11.28.2 npm/? node/v24.18.0 linux x64");
+    assert(pnpm.status === 0, `the guard refused pnpm\n${pnpm.output}`);
+  });
+
   step("the prepublishOnly guard refuses the source, not the tarball", () => {
     const guard = join(PACKAGE_DIR, "scripts", "prepublishGuard.mjs");
     const source = run(process.execPath, [guard], {
@@ -222,10 +271,11 @@ try {
     assert(refusal(packed) === undefined, "the guard refuses the tarball");
     // pnpm drops the hook from what it packs, so nothing in the tarball can
     // run it, whatever a package manager does with a tarball's scripts.
-    assert(
-      packed.scripts?.prepublishOnly === undefined,
-      "the tarball carries prepublishOnly",
-    );
+    for (const hook of ["prepublishOnly", "prepack"])
+      assert(
+        packed.scripts?.[hook] === undefined,
+        `the tarball carries ${hook}`,
+      );
   });
 
   writeFileSync(
@@ -479,10 +529,11 @@ console.log("loaded:", Object.keys(data).length, "tables in the barrel");
     step(`keep the verified tarball at ${keepTarball}`, () => {
       mkdirSync(dirname(keepTarball), { recursive: true });
       copyFileSync(tarball, keepTarball);
-      const sha = createHash("sha256")
-        .update(readFileSync(keepTarball))
-        .digest("hex");
+      const bytes = readFileSync(keepTarball);
+      const sha = createHash("sha256").update(bytes).digest("hex");
+      const integrity = createHash("sha512").update(bytes).digest("base64");
       console.log(`   sha256 ${sha}`);
+      console.log(`   integrity sha512-${integrity}`);
     });
 
   console.log(

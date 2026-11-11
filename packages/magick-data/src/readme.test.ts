@@ -1,6 +1,11 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import {
+  readmeSources,
+  UNSETTLED,
+  unsettledSources,
+} from "../scripts/readmeSources.mjs";
 import data from "./data.ts";
 import { type TableName, tables } from "./tables.ts";
 
@@ -149,24 +154,6 @@ function publishedDataFiles(): string[] {
     .sort();
 }
 
-/** The rows of the Markdown table under "## Sources": file and source. */
-function readmeSources(): { file: string; source: string }[] {
-  const section = README.split(/^## /m).find((s) => s.startsWith("Sources"));
-  if (!section) throw new Error("README has no “Sources” section");
-  const lines = section
-    .split("\n")
-    .filter((line) => line.startsWith("|"))
-    .slice(2);
-  return lines.map((line) => {
-    const cells = line
-      .split("|")
-      .slice(1, -1)
-      .map((cell) => cell.trim());
-    if (cells.length !== 2) throw new Error(`malformed row: ${line}`);
-    return { file: cells[0].replace(/`/g, ""), source: cells[1] };
-  });
-}
-
 /** A heading's anchor, as GitHub and npm make it. */
 function slug(heading: string): string {
   return heading
@@ -177,7 +164,7 @@ function slug(heading: string): string {
 }
 
 describe("README's Sources", () => {
-  const rows = readmeSources();
+  const rows = readmeSources(README);
   const anchors = new Set(
     [...README.matchAll(/^#{2,3} (.+)$/gm)].map((m) => slug(m[1])),
   );
@@ -202,5 +189,30 @@ describe("README's Sources", () => {
     expect(source).not.toBe("");
     for (const [, anchor] of source.matchAll(/\]\(#([^)]+)\)/g))
       expect(anchors).toContain(anchor);
+  });
+});
+
+/**
+ * The provenance sign-off, enforced (plan 080, stage A review, M3): no
+ * version past 0.0.0 ships while a Sources row says its source is not
+ * recorded or not known.
+ */
+describe("the provenance sign-off", () => {
+  it("is settled before the version leaves 0.0.0", () => {
+    const open = unsettledSources(readmeSources(README)).map((row) => row.file);
+    expect(pkg.version === "0.0.0" ? [] : open).toEqual([]);
+  });
+
+  it("finds each unsettled phrase, whatever its case", () => {
+    expect(UNSETTLED).toEqual(["not recorded", "not known"]);
+    const rows = [
+      { file: "a.json5", source: "Ours" },
+      { file: "b.json5", source: "the source of `x` is not recorded" },
+      { file: "c.json5", source: "Not known (plan 039)" },
+    ];
+    expect(unsettledSources(rows).map((row) => row.file)).toEqual([
+      "b.json5",
+      "c.json5",
+    ]);
   });
 });
