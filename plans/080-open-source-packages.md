@@ -1,0 +1,727 @@
+# Open source: the packages and their pages — 11 November 2026
+
+Status: plan, not built. Reviewed on 11 November 2026 and revised (see
+[Review](#review-11-november-2026)), then spiked and mocked up the same day
+(see [Before any code](#before-any-code)). Decisions 1–4, the table page's
+layout, the sigils, the fonts and the licence note were settled by Gadi on
+11 November 2026. The rest are recommendations he has not objected to. Read [current status](000-current-status.md),
+[plan 052](052-data-package.md) (the data package) and
+[plan 061](061-gd-hall.md#1-one-hall-model-two-hosts) (the MIT boundary of
+`src/components`) first. The number was free on every branch on
+11 November 2026 (077 is `gate/enochian-translator`, 078
+`gate/planet-pages`, 079 Frank Ruhl Libre); this plan was drafted as 078
+and renumbered when that was taken.
+
+## Background
+
+What was asked and decided before this plan:
+
+- **20 September – 3 October** (plan 032 decision 16, plan 052 decisions
+  2, 3, 9 and 10): two unscoped packages, `magick-data` and
+  `magick-components`. Package code is MIT, data is CC BY 4.0, and the app
+  stays AGPL-3.0-or-later. The app always consumes the workspace copy; the
+  tarball is a projection for others. CI publishes when a package's
+  `version` changes on `main`. The names were to be reserved "at the moment
+  it is ready to do", with Gadi asked first.
+- **22 September**, Gadi: "a component explorer / demo, maybe something
+  along the lines of storybook (but with our own code) … host that in the
+  app, maybe under a new open-source section". Plan 052 recorded it as a
+  follow-up, to be generated from `src/render/registry.tsx`.
+- **3 October** (plan 052): the Enochian dictionary stays in the package
+  for the app and out of the tarball, because its entries come from
+  Schueler's *Enochian Magic: A Practical Manual* and *The Whole Enochian
+  Dictionary*, whose rights are not ours to give.
+- **17–23 October** (plan 061): `src/components/importBoundary.test.ts`
+  makes "imports no app code" a test, with six files listed as known
+  violations. `gd/hall` may import only React and `magick-data`.
+
+What was found on 11 November at `6243ba95`:
+
+- **`magick-data` is mechanically ready.** `publishConfig.exports` points
+  at `lib/` and `dist/`, and CI packs the tarball, installs it into a
+  fixture and type-checks a consumer (`pnpm --filter magick-data smoke`).
+  The README is written and its counts are tested. What is missing is the
+  publish job, `private: true`, the 0.0.0 version and the owner's go-ahead.
+- **The names are still free.** `magick-data`, `magick-components`,
+  `magick-react-components`, `@magickly/data` and `@magickly/components`
+  all returned 404 from the npm registry.
+- **The registry covers seven components, not the set.** Those are the
+  ones with server image contracts (Tree of Life, Enochian tablet, rose
+  sigil, candlestick, shewbread, temple hall), plus `AstroGeomancyChart`,
+  which is app code. Kamea, Moon, Mercury, planetary spirits, Chakras,
+  GradeTree, Lamen and the fylfot cross have no entry. An explorer
+  generated from the registry alone would show fewer than half.
+- **`src/components` is close to a package, but not there.**
+  - Six files are known boundary violations: `Link.tsx` and `Tiles.tsx`
+    (MUI, Next), `astrology/Mercury.tsx` (`next/image`),
+    `astrology/planetarySpirits.tsx` (seven SVGs from the app's `svg/`),
+    `enochian/enochianFont.ts` (`next/font/local`) and `entity/index.tsx`
+    (MUI, the site frame).
+  - `TreeOfLife`, `GdHall` and `RoseSigil` use hooks without
+    `"use client"`. The first draft read that as a defect; the review
+    showed that the first two are built to run as Server Components
+    (decision 7).
+  - The app compiles with `strict: false`. Under `strict: true` the
+    components have 50–65 errors, 45 of them in `TreeOfLife.tsx`
+    (decision 7).
+  - The Enochian font has no licence text (plan 061, "Fonts"), so it
+    cannot ship in an MIT package.
+- **Its third-party runtime imports are few:** `astronomy-engine`, `lune`
+  and `luxon` (Moon, Mercury), `nlopt-js` (rose sigil, loaded on demand)
+  and `dot-prop` (Tree of Life).
+- **The largest published table has 72 rows** (the seventy-two angels).
+  Only the unpublished dictionary is large (1,911 entries).
+- **Dark mode ([plan 076](076-dark-mode.md), on main since 11 November)** edits
+  `Tiles.tsx`, `SevenBranchedCandleStick`, `TableOfShewbread`, `RoseSigil`,
+  `planetarySpirits` and the hall palette. It styles drawings by page CSS
+  around them, not inside the `<svg>`, so it does not change what the
+  components export.
+
+The tool research (11 November, versions from `npm view` that day) is
+summarised where each decision uses it. Its sources are listed
+[at the end](#sources).
+
+## Decisions
+
+### 1. One `/open-source` section (Gadi, 11 November)
+
+| Route | What it holds | Indexed |
+| --- | --- | --- |
+| `/open-source` | The policy (app AGPL; package code MIT, the drawings the components make included; data and the site's hand-drawn images CC BY 4.0; the hall fonts OFL; third-party work under its own licence with a link to `/about#credits`), then one card per package: what it is, `npm i`, a short usage sample and links to its pages, npm and GitHub | yes |
+| `/open-source/data` | Every published table: its subpath, row count, one line on what it is, and the relations `graph.json` gives it; the three ways in (barrel, one table, scoped `assemble()`) | yes |
+| `/open-source/data/[table]` | The table's rows (decision 4), its fields (decision 6) and the import line | no, for now (decision 4) |
+| `/open-source/components` | One tile per component, drawn live at thumbnail size | yes |
+| `/open-source/components/[name]` | The explorer (decision 5) | yes |
+
+- `/about`'s licence section shrinks to two sentences and a link here; its
+  "Design goals" list links here instead of to GitHub directories.
+- `OpenSource.tsx`, the "Magick.ly is open-source…" line under pages, links
+  to `/open-source` as well as to the file.
+- The pages join `siteNav`, the sitemap and site search like any section,
+  except the table pages (decision 4). The footer gains an "Open source"
+  column (Data, Components), and the app bar names the section ("Open
+  source › Data") while the page heading names the item, as on entity
+  pages. They are written in the house voice
+  and checked by the page-text tests.
+- A table that has an entity page (sephirot, planets, grades, paths, the
+  seventy-two) links each row to it. Rows are anchors on the table page,
+  not routes of their own, so no second page competes with the entity
+  pages for the same entity.
+
+### 2. `magick-data` ships first (Gadi, 11 November)
+
+It is ready. The hub and the data pages follow it, and `magick-components`
+follows them ([stages](#stages)). Nothing about the data waits for the
+components.
+
+### 3. Releases: published by CI when the version changes (Gadi, 11 November)
+
+Plan 052's deferred design, as a workflow of its own (as 052 said), with
+the constraints the research and the review found. npm publishes are
+permanent (unpublishing is restricted), so every step below is about not
+shipping the wrong bytes.
+
+- **The manifest gains `repository`** (`url`, and `directory:
+  "packages/magick-data"`), without which npm's provenance check is
+  expected to reject a CI publish, and a **`prepublishOnly` guard** that
+  fails `npm publish` run from the package directory (plan 052's final
+  review: it would ship `exports` that point into `src/`).
+- **The tarball published is the one the smoke test verified.**
+  `scripts/smoke.mjs` gains an option to keep its packed tarball. `lib/`
+  and `dist/` are git-ignored and nothing runs a build before `pnpm
+  pack`, so packing on its own would ship whatever happens to be on disk.
+- **The first publish is by hand, as a pre-release.** npm cannot configure
+  a trusted publisher for a package that does not exist yet, and its
+  dispute policy forbids publishing "simply for the purposes of reserving"
+  a name. Gadi publishes **`0.1.0-rc.0` under `--tag next`** with his own
+  npm login, from a clean checkout of the `main` commit, using the
+  smoke-verified tarball. He then configures the trusted publisher. CI
+  publishes **0.1.0 itself, with provenance**, inside the 48-hour window
+  that, since 2 October 2026, an unvalidated configuration has before it
+  expires. If the window lapses, the configuration is made again. No
+  throwaway 0.1.1 is needed.
+- **`publish.yml`, a workflow of its own** on pushes to `main`, after the
+  quality workflow, in its own GitHub environment (`npm`) with a minimal
+  job: checkout, install, build, smoke, publish. The trusted publisher
+  names `gadicc/magickly`, `publish.yml` and that environment, and the job
+  declares the environment so the OIDC claim matches. Not in
+  `release.yml`: its deploy job already holds `id-token: write` in
+  `Production`, and everything the Vercel build runs could then mint an
+  npm publish token.
+- **What triggers a publish.** For each package the job fetches the npm
+  packument; `npm view` exits 1 with E404 for a missing package, a missing
+  version and some registry failures alike, so it is not used.
+  - A 404 for the package skips it (the first publish is by hand).
+  - Otherwise the job publishes only if the manifest's version is absent
+    from the packument and greater than `latest`.
+  - Any other registry error fails the job.
+
+  Re-runs are therefore no-ops, and merging stage A before the first
+  manual publish does nothing.
+- **The bump is a human edit** in the commit that changes the package, per
+  the README's semver rules. CI cannot tell a rename from a correction.
+- **A provenance sign-off gates the first publish.** The CC BY grant
+  cannot be withdrawn. Before stage A′, every published data file is
+  listed with its source, and the README's "Sources" names every set
+  derived from an identified work. It names five today; the geomancy texts
+  from the Equinox and Agrippa ([plan 075](075-geomancy-own-words.md)) are
+  a sixth. A test then keeps the list and the files in step.
+
+Deferred, at Gadi's request: change detection and automated bumps
+([below](#deferred)).
+
+### 4. The data browser: a table per table, relations as links (Gadi, 11 November)
+
+- **Rows in an MUI `Table`, rendered on the server.** No DataGrid and no
+  virtualisation: 72 rows is the most any published *table* holds. The
+  page is plain HTML and theme-aware (dark mode included), with no client
+  bundle beyond the detail pane.
+- **Texts are not tables.** About ten published subpaths are texts or
+  derived values: the Lenain volume (168 pages), its notes and apparatus,
+  the Enochian Keys (920 kB) and others. `/open-source/data` lists them
+  with what each holds, its size and its import line, and links to the
+  page on the site that presents it. They get no grid.
+- **Columns come from the field manifest** (decision 6), not hand-written
+  lists. A field whose value is an object with named keys, such as
+  localised text (`name.en`, `name.he`), gets one column per key, read from
+  the manifest's `keys` rather than parsed from its display string. Maps
+  (`tetragram.meanings`, `enochianTablet.readings`) and arrays of objects
+  (`marks`) get no columns; they are left to the detail pane (spike,
+  11 November).
+- **Each row is an anchor**, named by the table's `rowKey` from the
+  manifest. That is `id` for most tables, the object key for `angelicOrder`
+  and `godName` (which have no `id` field), `index` for
+  `astrologicalHouse` and `no` for `seventyTwoAngel`.
+- **Search engines.** The table pages are `noindex,follow` and stay out of
+  the sitemap and site search for now: a full dump of the seventy-two
+  would compete with the angel pages. `/open-source` and
+  `/open-source/data` are indexed. Revisit with Search Console data.
+- **Relations become links.** A field `graph.json` declares as a link
+  (`planetId`, `nextId`, …) renders as a link to that row's anchor on its
+  own table's page, so the cycle in the assembled graph becomes
+  navigation, not something a viewer has to draw.
+- **The row detail pane** shows the row's JSON with `react-json-view-lite`
+  (2.5.0: React 18 and 19, no dependencies, 117 kB unpacked, styled by CSS
+  classes mapped to the theme), with "Copy JSON", "Link to row" and, where
+  one exists, the entity page. It opens as an expanded row under the
+  selected one (MUI's collapsible-table pattern), held to the visible
+  width so it does not scroll sideways with the table; a drawer would
+  cover the rows and a side column would squeeze them. It is a client
+  island on the table page.
+- **The layout (Gadi, 11 November, from mock-ups of three):** the import
+  line and counts, then the rows, then the field list, all on one page.
+  A "Fields" link in the rows' heading jumps down, and each column header
+  links to its field's entry. The rows come first because they are the
+  content; the page stays plain HTML that works with find-in-page and
+  print. Fields above the rows pushed the data off the first screen (25
+  field rows for `sephirah`), and tabs hid each column's description from
+  the rows and needed client code. Wide tables scroll sideways inside
+  their frame, with the row-key column sticky.
+- **A field may name its columns.** Following the one-column-per-key rule,
+  `sephirah.color` would take eight columns. The field's schema carries a
+  `v.metadata({ columns: ["queen", "king"] })` hint, read into the
+  manifest, and the table shows those keys (with a swatch from the
+  matching `*Web` value); the rest stay in the detail pane and the field
+  list.
+- **Not `@uiw/react-json-view`.** Its `latest` is still 2.0.0-alpha.44,
+  and nothing documents how it handles cyclic input.
+  **Not `@textea/json-viewer`:** its peers are MUI 6 and React 18.
+- **The dictionary** is not in the browser, since it is not in the
+  package. `/open-source/data` says so and links to `/enochian/dictionary`.
+
+### 5. The component explorer: our own, in the app
+
+The 22 September preference, confirmed by the research:
+
+- **Not Storybook.** Storybook 10.6 supports Next 16 and React 19, but it
+  is a separate app with its own builder and UI. It cannot be a Next route,
+  and it needs its own mocks of `next/image` and `next/font`. Its story
+  files drift from the components ("stories rot"), and its look is not the
+  site's. Ladle has stalled (last release November 2025); React Cosmos is
+  active but is also a separate server. Revisit only if visual-regression
+  testing (Chromatic) becomes a goal.
+- **Each component gets an example module in the package**,
+  `examples/<Name>.examples.tsx`. It exports one or more named examples,
+  each holding only `{ title, props }` and, optionally,
+  `imageHref(props)`, a link to the server image. Examples are
+  type-checked against the component's own props type and rendered by a
+  test, so an example that no longer fits fails the build. They hold no
+  control metadata, which is what keeps them from becoming stories by
+  another name. They ship in the repository, not in the tarball.
+- **The example modules are the component list**, not docgen. Docgen
+  reports every export of a file as a component: 126 across
+  `src/components`, among them `labelLines`, `CANDLESTICK_PLANETS` and
+  internal hall art such as `Rod` (spike, 11 November). A component appears
+  on `/open-source/components` when it has an example module, and its name
+  comes from the module rather than from docgen's `displayName`, which for
+  default exports is the file name.
+- **Controls come from one place: the props types**, as
+  `react-docgen-typescript` reads them (decision 6). A union of literals
+  becomes a choice, a boolean a switch, a number or a string a field, and
+  `string | number` or `string | boolean` a text field whose value is
+  parsed. Literal unions imported from `magick-data` expand to their
+  members (`PlanetId`, `ZodiacId`, `PathId` and `GDGradeId` were checked);
+  arrays of them do not, and get no control. Callbacks, `ref`, `ReactNode`,
+  `CSSProperties` and registries get no control and appear only in the
+  props table. Subject data (`hall`, `highlights`) is chosen through a
+  picker over the component's examples. There is no JSON editor. The server
+  contracts cannot drive controls, as the review found: they expose only
+  `keys` and an opaque `parse`, and their query names are not the
+  components' props (`text` → `sigilText`, `font` → `enochianStyle`), with
+  the mapping in the server-only registry.
+- **The page** shows the live render, the controls, the JSX for the
+  current props (copyable), the props table (decision 6), the component's
+  data inputs where the registry declares them, and links to the source
+  (through `OpenSource`) and, where a server contract exists, to the image
+  URL for the current props.
+- **The explorer is app code (AGPL)**; the examples are MIT with the
+  package.
+
+### 6. API reference generated at build, rendered by us
+
+- **Row fields: a field manifest the data build emits**, not TypeDoc.
+  The row types are generated (`rows.ts`: `interface PlanetRow extends
+  Row<"*", "planet"> {}` over literal declarations in `dist/*.d.ts`), so
+  no hand-written field exists to carry JSDoc, and TypeDoc would not
+  expand the mapped type. `src/build.ts` already reads `schemas.ts` and
+  `graph.ts`; it also writes `dist/fields.json`, shipped and importable as
+  `magick-data/json/fields.json` (about 60–65 kB with descriptions). The
+  spike's prototype typed every field of all 29 tables (158 fields, 199
+  paths, 41 links, all from `graph.ts` with none missing); the schemas use
+  only object, string, number, boolean, picklist, array, tuple, optional
+  and nullable, which `build.ts` already walks (`picklistPaths`).
+  - **Per table:** `rowKey` (decision 4), the field list, and the table's
+    `check` messages as a list of rules (`enochianTablet` has four).
+  - **Per field:** the path; structured type data (`kind`, `of`, `keys`,
+    `values`, `constraints`, `optional`, `nullable`, and
+    `link {to, many, kind}`); a display string; the description. The pages
+    read the structured data, never the display string.
+  - **Maps** are recognised by rule and the rule is written in the build:
+    the same schema under every key, four keys or more
+    (`tetragram.meanings`, keys 1–12; `enochianTablet.readings`, five
+    sources), shown as `readings.*.rows`.
+  - **Texts** have no schema (`build.ts` types them `unknown`). A `texts`
+    section lists each text subpath with its sources, its size (computed),
+    a description and the site page that presents it, from a small `TEXTS`
+    record in `build.ts`. A test holds that record equal to the package's
+    non-table exports.
+  - **Descriptions are authored in `schemas.ts`** with valibot 1.5's
+    `v.description()`, in one form, `v.optional(v.pipe(x,
+    v.description("…")))`, with the wrapper outermost; the generator looks
+    through `.wrapped`. Fields made by `ids()` (49 of them: links, pending
+    or external ids, and the one enum) take theirs through an `about` map,
+    `ids(table, { absent, about: { field: "…" } })`. That keeps the text
+    out of `graph.js`, which ships. `v.pipe` keeps the schema's `.type`,
+    parsing is unchanged, and the schemas never reach consumers (valibot is
+    a dev dependency). Fields that look like links but are not
+    (`alchemySymbol.gdGrade`, `seventyTwoAngel.godName`) say so in their
+    descriptions. `marks[].doubt` becomes a picklist, so its values show.
+  - The table pages render columns, links and the field list from this
+    manifest, so stage C needs no TypeDoc at all. The few helpers
+    (`assemble()`, `rowOf()`, `pathTarget()`, …) are documented by hand on
+    `/open-source/data`, from their JSDoc.
+- **Component props: `react-docgen-typescript` 2.4.0**, behind a script
+  (spike, 11 November). It resolved the aliases with the repo's tsconfig and
+  read all three probe components; a run over `src/components` takes about
+  a second and is byte-stable.
+  - **Options:** `shouldExtractLiteralValuesFromEnum`,
+    `shouldRemoveUndefinedFromOptional`, `savePropValueAsString`. Not
+    `shouldExtractValuesFromUnion`, which turns `string` and `boolean` into
+    enums.
+  - **The prop filter** drops a prop only when *every* declaration is in
+    `node_modules`. Dropping on *any* loses a component's own props that
+    share an SVG attribute's name (`LineOutline`'s `x1`…`offset`);
+    no filter at all gives `LineOutline` 486 props.
+  - **`ref` and `key` are always dropped.** Parsing the package in one call
+    gives five components `Ref<HTMLAnchorElement>`, leaked from `Link`
+    through docgen's cache.
+  - **Defaults longer than about 80 characters are dropped** (`GdHall`'s
+    `art` default is 1.1 kB of source). Defaults set in a function body
+    are invisible to any static tool; move them to the destructuring.
+  - **The output committed is the trimmed manifest** the explorer needs
+    (type, required, short default, description, control), sorted: about
+    30 kB. A freshness test re-runs the script and compares (about a
+    second), as the README's counts are tested. That avoids wiring a
+    generated file into six `package.json` scripts, `pnpm dev` and the
+    Vercel build.
+  - **Not `react-docgen` 8** (Babel): it does not resolve imported types,
+    so `magick-data` ids would get no choices, and it drops untyped props
+    silently. react-docgen-typescript has had no release since June 2025;
+    if TypeScript 7 breaks it, the fallback is a small extractor on the
+    compiler API.
+- **Descriptions are required.** Every table field (in `schemas.ts`), and
+  every component with an example module and each of its props (JSDoc),
+  has one. A test fails on any that is missing, so the reference cannot
+  thin out over time. Loom's JSDoc rule covers the rest of what the
+  packages export. The measured backlog: no table field has a description
+  yet (199 paths, 120 distinct, about 4–6 hours of writing); 73 of 109
+  component props and 8 of 43 components have none.
+- **No TypeDoc.** With rows covered by the manifest and props by docgen,
+  it would document a handful of helpers. That's not worth a dependency
+  pinned to TypeScript 6 when TypeScript 7 is `latest`.
+- **Not API Extractor**, which is built for rolled-up declarations and API
+  review and is heavier than two packages need. **JSR** would generate
+  hosted docs for free, but that is a second registry; deferred.
+
+### 7. `magick-components`: a workspace package like `magick-data`
+
+- **It moves to `packages/magick-components/`.** The app depends on it as
+  `workspace:*` and imports bare `magick-components/…` specifiers. The
+  `@magick-components/*` alias goes from `tsconfig.json`,
+  `vitest.config.mts` and `OpenSource.tsx`'s `url()`, as `@magick-data/*`
+  went in plan 052. The imports are rewritten mechanically: 100 files use
+  `@magick-components/`, 45 use `@/components/` and 3 use relative paths.
+  `biome.json`, four boundary tests and `scripts/gd-hall-fonts/build.py`
+  also name the path.
+- **The six violations leave or are fixed.** Known violations go to zero
+  and the list in `importBoundary.test.ts` is deleted.
+
+  | File | Becomes |
+  | --- | --- |
+  | `Link.tsx`, `Tiles.tsx`, `entity/` | App code, moved to `src/app/` (or `src/ui/`); they are the site's frame, not drawings |
+  | `astrology/Mercury.tsx` | `<img>` in place of `next/image`, with the two images it hard-codes (`/night-sky.jpg`, `/pics/mercury.webp`) passed in as props |
+  | `astrology/planetarySpirits.tsx` | The seven sigils become TSX components in the package (`tsc` cannot ship svgr `.svg` imports). The SVGs in `svg/astrology/spirits/` are Gadi's own drawings, made in Inkscape (Gadi, 11 November 2026), of the traditional seals of the planetary spirits (Agrippa, *De occulta philosophia*, Book II, 1533). Each records the public-domain edition it follows. Copyright Gadi Cohen, MIT like every component (see [the licence note](#the-licence-of-a-drawing-that-is-code)) |
+  | `enochian/enochianFont.ts` | Stays in the app. `Tablet` takes a font family prop, and the README says the consumer supplies an Enochian font |
+
+- **It is strict.** The package's `tsconfig.json` has `strict: true`.
+  That was measured at 50–65 errors depending on the file set (65 in
+  10 files by the review, 50 in 2 by ours; `TreeOfLife.tsx` holds 45),
+  mostly indexing (TS7053) and untyped parameters, not the 16 first
+  counted. `lune` and `nlopt-js` have no types and need declarations.
+  `isolatedDeclarations` adds annotations on top. The app's own
+  `strict: false` is out of scope. Typing `TreeOfLife` is also what gives
+  it controls: 10 of its 15 props are implicit `any` today, and
+  `letterAttr` (a `string`) and `colorScale` (untyped) become literal
+  unions from `magick-data` (docgen spike).
+- **Explicit file extensions.** `tsc` emits relative imports as written,
+  and 216 in the package have no extension. Next's bundlers accept them,
+  but plain Node, Jest and other strict ESM tools fail on every entry
+  (packed-package spike, 11 November). A codemod names every file
+  (`./layout.ts`, `./art/index.ts`) and the build sets
+  `rewriteRelativeImportExtensions`; the declarations keep `.ts`
+  specifiers, as `magick-data`'s do, and a strict consumer type-checks
+  them under `bundler` and `nodenext`. `fontMetrics.json` is imported
+  `with { type: "json" }` or becomes a `.ts` module. A test forbids
+  extensionless relative imports.
+- **`forwardRef` goes.** `SevenBranchedCandleStick`, `Tablet`, `RoseSigil`
+  and `TableOfShewbread` take `ref` as a prop, as `TreeOfLife` and `GdHall`
+  already do; docgen misses the defaults of an
+  `export default forwardRef(function …)`.
+- **`"use client"` only where a module cannot run on the server**, which
+  corrects this plan's first draft. `TreeOfLife` and `GdHall` are built to
+  be Server Components: the Tree guards its one effect with
+  `"useEffect" in React`, the hall uses only `useId` and `useMemo`, which
+  React's server build exports, and `GradeTree` records that marking the
+  Tree `"use client"` pulled the data barrel into client chunks (plan 036,
+  decision 10). The server-only render registry also imports `TreeOfLife`
+  and `RoseSigilImage` for `renderToStaticMarkup`, where a directive would
+  turn them into client references.
+  - `RoseSigil` (hooks) is split from `RoseSigilImage`, and only
+    `RoseSigil` is marked. Every export of a `"use client"` file becomes a
+    client reference, so `RoseSigil.tsx` exports only the component;
+    `letterIJ` and the rest come from `RoseSigilImage`.
+  - `Moon` and `Mercury` are marked, each itself (marking `useHydrated`
+    alone does not make its importers client modules).
+  - The spike confirmed that the directives survive `tsc` as the first
+    statement, and that a packed tarball renders `TreeOfLife`, `GdHall`
+    and `RoseSigilImage` from a Server Component and hydrates `RoseSigil`,
+    under `next build --webpack`, `next build` (Turbopack) and `next dev`
+    with each.
+- **`RoseSigilImage` handles any letter.** Today a letter outside the 22
+  (a final form such as ם, or Latin text) throws during render
+  (`ROSE_LETTERS[-1].length`). Final forms are normalised to their base
+  letters and anything else is skipped, with the behaviour documented and
+  tested.
+- **The smoke test covers the published shape**, beyond magick-data's
+  pack-install-type-check: it loads every entry in plain Node,
+  `renderToStaticMarkup`s the Tree and a hall without a bundler, asserts
+  which built files carry `"use client"` and which do not, and builds a
+  Next fixture under both webpack and Turbopack, rendering from a Server
+  and a Client Component.
+- **Dependencies:**
+  - Peer dependencies: `react` ^19, and `@types/react` ^19 as an optional
+    peer.
+  - Dependencies: `magick-data`, plus `astronomy-engine`, `lune`, `luxon`
+    and `dot-prop`. `magick-data` is a dependency, not a peer: under its
+    semver rules new rows are a minor bump, and a `^0.x` peer range would
+    orphan every published components version at each one. Data
+    publishes first, and the smoke test checks the range.
+  - `nlopt-js`: **a regular dependency** (spike). It is one 909 kB
+    CommonJS file with its WASM inlined as base64, so no bundler has a
+    `.wasm` file to find; webpack puts it in a lazy chunk, outside the
+    server bundle. As an optional peer left uninstalled, both bundlers
+    fail on any page that reaches `RoseSigil` *or* `RoseSigilImage`,
+    because the `import()` sits in the shared `roseSigilGeometry.ts`.
+    So the optimiser (`loadNlopt`, `optimizeSigilPoints`) moves to its own
+    module, which the server-capable `RoseSigilImage` never imports, and
+    gains the catch it lacks around that import. A fresh consumer fails on
+    `Can't resolve 'fs'` from nlopt's Emscripten glue under both bundlers;
+    the package cannot fix that for a dependency's `require`, so the README
+    gives both fixes: webpack's client `resolve.fallback { fs: false }`
+    (the app's `next.config.ts` has it) and Turbopack's
+    `resolveAlias { fs: { browser: "./empty.ts" } }`.
+    **Only consumers of the live `RoseSigil` need it** (Gadi's question,
+    11 November). The error arises only in browser bundles, and only when
+    `nlopt-js` is in the module graph. With the optimiser in its own
+    module, only `RoseSigil` reaches it: the spike's pages with just the
+    Tree and the hall built with `nlopt-js` not installed at all. So no
+    barrel or shared entry re-exports `RoseSigil` (bundlers resolve a
+    re-export's imports even when tree-shaking drops it later), and the
+    smoke fixture has a page that imports every other entry and builds
+    *without* the alias. The README puts the alias under `RoseSigil`, not
+    under installation. `nlopt-js` (MIT, last release 0.1.1, November
+    2020) declares no `browser` field; a `"browser": { "fs": false }` in
+    its own `package.json` would remove the need everywhere, since bundlers
+    honour a package's own field. That is worth a pull request upstream,
+    or a small maintained fork if it stays unmerged.
+- **Fonts (Gadi, 11 November).** The hall's three WOFF2 subsets ship in
+  the package under `fonts/`, about 17 kB together:
+  - Noto Serif Italic, Latin-1, for the labels;
+  - Noto Serif Bold Italic, the letters of East, West, North and South;
+  - the 22 Hebrew letters, for the banners, in **Frank Ruhl Libre Bold**
+    (OFL 1.1, no reserved name). Gadi chose it on 11 November after a
+    side-by-side mock-up, and plan 079 made the change, on main since
+    `9c120dbb`. Plan 079 also replaced FrankRuehl CLM everywhere in the
+    app: its Frank-Ruehl family is plain GPL-2, with no document-embedding
+    exception, contrary to plan 061 decision 7.
+
+  The packed spike measured the three at 16,960 bytes.
+
+  Reasons:
+  - **Measurements.** `fontMetrics.json` measures the labels with exactly
+    these files, and another version of Noto Serif can measure
+    differently. That is why the hall names its own families.
+  - **No setup.** The hall renders correctly offline and without loading
+    fonts from anywhere.
+  - **Nothing new is redistributed.** The app already serves the same
+    files from `public/fonts`, from the public repository.
+
+  The licence is SIL OFL 1.1 (Copyright 2022 The Noto Project Authors), and
+  it declares no reserved font names, so the subsets may keep "Noto" in
+  their names. The package's `LICENSE.txt` says `fonts/` is OFL rather than
+  MIT, by path, as `magick-data`'s says which files are data. The two
+  upstream `OFL.txt` notices ship beside the files, with the sources and
+  hashes from `public/fonts/hall-font-sources.md`. The subsetting script
+  and the TrueType copies resvg uses (`assets/fonts`) stay in the app.
+
+  How a consumer gets them (spike, both tested under both bundlers from a
+  Server Component):
+  - **`import "magick-components/fonts/gd-hall.css"`**, the
+    zero-configuration route: a CSS file with relative `url()`s, generated
+    from `GD_HALL_FONT_FILES` and held equal to it by a test. The bundler
+    emits and hashes the fonts. `sideEffects: ["*.css"]` keeps the import
+    under any bundler.
+  - **`fontBaseUrl`**, unchanged: the consumer serves the files from
+    wherever they like.
+  - A `fontUrls` module built on `new URL(…, import.meta.url)` also works,
+    but needs a per-file URL prop since hashed names defeat a base URL.
+    Added only if the explorer needs it.
+- **The rest follows plan 052:**
+  - `exports` pointing at the TypeScript sources, and `publishConfig`
+    swapping them for `lib/` on publish;
+  - `transpilePackages`;
+  - a pack-install-type-check smoke test in CI;
+  - a README whose counts are tested;
+  - `sideEffects: ["*.css"]` (no CSS modules remain once `entity/`
+    leaves);
+  - MIT `LICENSE.txt`, with `fonts/` under OFL by path
+    ([the licence note](#the-licence-of-a-drawing-that-is-code) says what
+    MIT means for the drawings);
+  - `magick-components` unscoped (plan 052 decision 2);
+  - 0.x while the props settle;
+  - the render identities pinned by tests unchanged by the move, as a
+    stage E gate: moving files must not move a hash.
+- **The fonts in two places** (`public/fonts` and the package's `fonts/`)
+  are held equal by a test, byte for byte.
+
+### The licence of a drawing that is code
+
+The review raised this, and it is a consequence of a policy already in
+force, not a new one. A component whose JSX *is* the drawing (the sigils,
+the lamens, the hall art since stage H of plan 061) is MIT as code, path
+data included. Anyone may take the drawing from the package under MIT. The
+CC BY 4.0 statement covers the images magick.ly serves (pages, downloads,
+`/api/render`), and the READMEs and `/open-source` say exactly that,
+rather than claiming that "images the components draw" are CC BY. A
+drawing meant to stay CC BY only would have to live outside the MIT
+package.
+
+In practice CC BY adds little to a served image of a component's drawing,
+since anyone can render the same drawing from the package under MIT. So
+`/open-source` and the image pages credit those as "drawn by
+magick-components (MIT)"; CC BY keeps its weight for the hand-drawn images
+in `public/` and for the data. Gadi confirmed this note on 11 November.
+
+Two consequences, both checks rather than new policy:
+- **A traced drawing records its source.** Gadi's tracings are his own, but
+  a tracing of a modern edition's redrawing could carry that edition's
+  rights. Each drawing in the package names the public-domain edition it
+  follows (Agrippa, 1533, for the planetary seals), per the house rule on
+  outside sources. Drawings from Regardie stay what they are today: facts
+  such as a layout, drawn in our own art.
+- **CC BY on the data cannot relicense text we do not own.** The packaged
+  texts (Lenain's 1823 volume, the Keys, the seventy-two angels in English
+  and French) must be public domain or our own work, translations and
+  apparatus included. That is what A′'s provenance sign-off checks, and it
+  is the item to take most seriously before the first publish.
+
+### 8. Order against dark mode
+
+The move in decision 7 waited for dark mode (plan 076) and Frank Ruhl
+Libre (plan 079), which touch the same component files. Both are on main
+since 11 November, so nothing now holds stage E back.
+
+## Stages
+
+Each stage is gated commits on a `gate/<name>` branch, in a clean
+worktree, per the house rules.
+
+| Stage | What | Depends on |
+| --- | --- | --- |
+| A | `magick-data` ready to publish: `private` off, `repository`, the `prepublishOnly` guard, the smoke test keeping its tarball, the README's install section and complete Sources with its test; `publish.yml` with the packument rule and its own `npm` environment (inert until the first manual publish), with a `--dry-run` of the verified tarball in CI | — |
+| A′ | The provenance sign-off; Gadi publishes `0.1.0-rc.0 --tag next` by hand and configures the trusted publisher; a version bump to 0.1.0 publishes from CI with provenance within 48 hours | A merged |
+| B | `/open-source` hub; `/about` and `OpenSource.tsx` link to it; nav, sitemap, search | — |
+| C | The field manifest from the data build (`rowKey`, structured types, the map rule, the `texts` section, `ids()`'s `about` map), descriptions for all 199 field paths in `schemas.ts` (about 4–6 hours of writing) and their completeness test; `/open-source/data` (tables, texts and helpers) and the table pages with rows, links and the detail pane | B |
+| E | `packages/magick-components`: move, violations to zero, explicit extensions, strict (typing `TreeOfLife`), ref as a prop, the nlopt optimiser in its own module, `RoseSigilImage` taking any letter, directives where needed, dependencies, fonts with `gd-hall.css`, smoke test (Node load, static render, directives, both bundlers), README; hashes unchanged | — (dark mode and Frank Ruhl Libre are merged) |
+| F | Examples, the committed and trimmed `react-docgen-typescript` manifest with its freshness test, `/open-source/components` and the explorer pages; descriptions and their completeness test for every component with examples | E |
+| G | `magick-components`, published as in A′ | F |
+
+Stage D (TypeDoc) is gone: the field manifest replaced it (decision 6).
+Thumbnails on `/open-source/components` use the `/api/render` image where a
+component has a contract, so the index does not load nlopt's WASM or
+astronomy-engine. Only the explorer page renders live. Help pages with
+screenshots are not affected; none show these routes.
+
+## Before any code
+
+Per Gadi's workflow (assess → discuss → review → spike → plan → build):
+
+1. **Adversarial review of this plan:** done 11 November
+   ([below](#review-11-november-2026)).
+2. **Spikes:** done 11 November, all throwaway, nothing committed. Their
+   findings are folded into decisions 4 to 7 and the stages.
+   - **The field manifest: feasible, with changes.** A prototype generator
+     typed every field of all 29 tables from `schemas.ts` and `graph.ts`;
+     the changes are the structured types, `rowKey`, the map rule, the
+     `texts` section and `ids()`'s `about` map (decision 6).
+   - **`react-docgen-typescript`: fit, behind a script.** It read
+     `TreeOfLife`, `SevenBranchedCandleStick` and `GdHall` and expanded
+     `magick-data` unions. It cannot be the component list, leaks a `ref`
+     type across files, and misses `forwardRef` defaults; our own sources
+     need typing (decisions 5 to 7).
+   - **A packed `magick-components`: works, nothing blocks it.** Directives
+     survive `tsc`; the tarball renders from Server and Client Components
+     under both bundlers. Needed: explicit extensions, the optimiser split,
+     `nlopt-js` as a regular dependency with the `fs` alias documented for
+     both bundlers, and `gd-hall.css` for the fonts (decision 7).
+   - **The publish rule against the live registry (read-only):** the
+     packument tells the cases apart (404 for a missing package; 200 with
+     the version present or absent), where `npm view` exits 1 with E404 for
+     both a missing package and a missing version. Any other status fails
+     the job. `magick-data` and `magick-components` are both free, and so
+     are the forms npm's similarity check compares (`magickdata`,
+     `magick_data`, `magick.data`, `magickcomponents`).
+   - Provenance through `publish.yml` in its own environment is proved by
+     the first CI publish itself (A′), the rc having gone out by hand.
+3. **Visual mock-ups:** done 11 November. Static pages copying the site's
+   shell and both palettes, at 1280 px and 390 px, with the real Tree from
+   `/api/render`, the spike's field manifest and docgen output, and
+   descriptions written for the occasion. They settled the table page's
+   layout (decision 4) and showed the hub's licence wording needed the
+   distinction the licence note draws. The images were throwaway and are
+   not committed.
+
+## Review (11 November 2026)
+
+Fable 5.2 at high effort, fresh context, `loom-torvalds-review`, on the
+first draft and `main` at `0ef4e33f`. Read-only; it did not run builds.
+Findings 1, 2, 5 and 6 were checked against the code before they were
+accepted.
+
+| # | Finding | Disposition |
+| --- | --- | --- |
+| 1 | `"use client"` on `TreeOfLife` and `GdHall` would break their server use (plan 036 decision 10, the render registry) | Accepted; decision 7 rewritten, `RoseSigil` split |
+| 2 | Packing alone can ship stale `lib/`/`dist/`; no `repository` field | Accepted; decision 3 (verified tarball, `repository`, `prepublishOnly`) |
+| 3 | `npm view` E404 cannot tell a missing package from a missing version; stage A was not inert | Accepted; the packument rule |
+| 4 | Publishing from `release.yml`/`Production` lets the deploy's OIDC token mint npm tokens | Accepted; `publish.yml` with its own environment |
+| 5 | Row fields carry no JSDoc and TypeDoc would not expand them | Accepted; the field manifest, TypeDoc dropped, stage D gone |
+| 6 | Contracts cannot drive controls | Accepted; controls from docgen, examples hold props only |
+| 7 | Strict is 50–65 errors, not 16 | Accepted; re-estimated |
+| 8 | README Sources omits plan 075's geomancy texts; no test | Accepted; sign-off gates A′ |
+| 9 | Texts are not tables; the table pages compete with entity pages | Accepted; texts listed, table pages `noindex,follow` |
+| 10 | A `^0.x` peer on `magick-data` orphans components at each minor | Accepted; a dependency |
+| Low | Import counts; `nlopt-js` as an optional peer; Mercury's hard-coded images; live thumbnails; generated JSON wiring; the sigil licence; a throwaway 0.1.1; render identities | All accepted, in decisions 3, 6 and 7, the licence note and the stages |
+
+## Open questions
+
+None. Gadi settled the last ones on 11 November: the planetary-spirit
+sigils are his own drawings and join the package (decision 7), the hall
+fonts ship in it (decision 7, "Fonts"), the licence note stands, and the
+table page puts its fields below its rows (decision 4).
+
+## Deferred
+
+- **Change detection and automated version bumps** (Gadi, 11 November):
+  decide from the commits whether a package changed and by how much
+  (semantic-release, or changesets once outside contributors arrive), in
+  place of the hand bump in decision 3. Revisit after a few hand releases
+  show how often they are wrong or forgotten.
+- **Staged publishing** (`npm stage publish`, approved by a human on
+  npmjs.com), if an unattended release ever goes wrong.
+- **JSR** as a second registry, for its generated documentation.
+- **A view of the assembled graph** (`react-inspector` 9, which handles
+  cycles), if anyone asks to see `assemble()`'s output rather than the
+  tables.
+- **`magick-data/check`** (plan 052 follow-up) and **publishing the
+  dictionary** (plan 052, deferred): unchanged.
+- **Visual-regression testing** of the components, the one reason to
+  reconsider Storybook.
+- **A separate package of plain SVG files** (raised by Gadi, 11 November).
+  Almost every drawing is procedural, drawn from the data, so there is
+  little that is a static file. The seven sigils become components. The
+  site already serves every contract-backed drawing as an SVG or PNG URL,
+  and that is the channel for consumers who don't use React. Revisit when
+  one asks for files. Since the server renderer exists, a package of
+  pre-rendered SVGs (defaults and presets) could then be generated at build
+  from `magick-components`, rather than a second source of drawings.
+
+## Risks
+
+- **A name is taken before it is published.** `magick-components` cannot
+  be reserved without breaking npm's policy, and it ships last. Both names
+  were free on 11 November, as were their punctuation-free forms. Low
+  likelihood for a niche name. If it happens, the fallback is
+  `@magickly/components`, which needs the `magickly` npm organisation;
+  creating that organisation is worth doing at stage A′ either way.
+- **The 48-hour window lapses.** Then the trusted publisher is configured
+  again; nothing is lost.
+- **TypeScript 7.** `react-docgen-typescript` uses the TypeScript compiler
+  API, which TypeScript 7 (the Go port) changes, and it has had no release
+  since June 2025. If the app moves first, the docgen script pins its own
+  TypeScript 6; if that stops working, a small extractor on the compiler
+  API replaces it, writing the same trimmed manifest.
+- **Consumer setup for `nlopt-js`.** Every consumer that renders the
+  live `RoseSigil` needs the `fs` alias. The README states it for both
+  bundlers, and the smoke fixture carries it, so a change in nlopt or Next
+  shows up in CI.
+- **The example modules become stories by another name.** They hold only
+  a title and props (and optionally an image link), are type-checked and
+  are rendered by tests. Anything more is a smell.
+- **An npm publish is permanent.** Hence the verified tarball, the guard,
+  the rc under `next` and the packument rule (decision 3).
+
+## Sources
+
+- Storybook 10 and Next 16: https://storybook.js.org/blog/storybook-10/
+- `@uiw/react-json-view` (2.0.0-alpha.44 on 11 November 2026):
+  https://github.com/uiwjs/react-json-view
+- `@textea/json-viewer` 4.0.1's MUI 6 peer:
+  https://unpkg.com/@textea/json-viewer@4.0.1/README.md
+- npm trusted publishers: https://docs.npmjs.com/trusted-publishers
+- Unvalidated trusted publishers expire after 48 hours (2 October 2026):
+  https://github.blog/changelog/2026-10-02-unvalidated-npm-trusted-publishing-configurations-now-expire
+- npm dispute policy on name reservation:
+  https://docs.npmjs.com/policies/disputes
+- pnpm publish and provenance: https://pnpm.io/cli/publish
+- Versions, peer dependencies and sizes: `npm view <package> version
+  dist-tags peerDependencies dist.unpackedSize`, 11 November 2026.
