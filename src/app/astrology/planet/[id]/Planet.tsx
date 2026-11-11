@@ -1,4 +1,5 @@
 import Link from "@magick-components/Link";
+import Data from "magick-data";
 import type { PlanetRow } from "magick-data/rows";
 import { Fragment } from "react";
 import { chaldean } from "@/app/astrology/planetary-hours/utils";
@@ -27,29 +28,6 @@ function capitalize(text: string) {
 }
 
 /**
- * Uranus, Neptune and the two nodes carry a name and a symbol and nothing
- * else, since the classical attributions end with the seven planets; their
- * page says so rather than showing a table of one row without a word.
- */
-function hasOnlyItsSymbol(planet: PlanetRow) {
-  return !(
-    planet.name.he ||
-    planet.hebrewLetter ||
-    planet.sephirot.length ||
-    planet.godName ||
-    planet.archangel ||
-    planet.intelligenceId ||
-    planet.spiritId ||
-    planet.zodiacs.length ||
-    planet.tetragrams.length ||
-    planet.gdGrade ||
-    planet.alchemySymbol ||
-    planet.magickTypes ||
-    planet.keyOfSolomon
-  );
-}
-
-/**
  * "in Hebrew לבנה, Levanah, “White”", after whatever the lede leads with;
  * the gloss is left out where it only repeats the heading, as the zodiac's
  * and Sol's would.
@@ -68,10 +46,10 @@ function inHebrew(planet: PlanetRow) {
 }
 
 /** The sephirot, each linked to its page, as a list in running text. */
-function sephirotOf(planet: PlanetRow, separator: string) {
+function sephirotOf(planet: PlanetRow) {
   return planet.sephirot.map((sephirah, i) => (
     <Fragment key={sephirah.id}>
-      {i ? separator : null}
+      {i ? ", " : null}
       <Link href={`/kabbalah/sephirah/${sephirah.id}`}>
         {sephirah.name.roman}
       </Link>
@@ -79,33 +57,127 @@ function sephirotOf(planet: PlanetRow, separator: string) {
   ));
 }
 
+/**
+ * A row's own text where it has one (plan 078): Earth, the moderns, the
+ * nodes and the spheres. Otherwise the seven planets' Hebrew names.
+ */
 function PlanetLede({ planet }: { planet: PlanetRow }) {
-  const he = planet.name.he;
-  if (planet.kind === "sphere")
-    return (
-      <Lede>
-        The sphere of {sephirotOf(planet, " and ")}
-        {he ? <>, in Hebrew {inHebrew(planet)}</> : null}.
-      </Lede>
-    );
-  if (he) return <Lede>In Hebrew {inHebrew(planet)}.</Lede>;
-  if (hasOnlyItsSymbol(planet))
-    return (
-      <Lede>
-        The classical correspondences stop at Saturn, the last of the seven
-        planets of antiquity, so this page has only its symbol.
-      </Lede>
-    );
-  // Earth, which has no Hebrew name but does have its grade.
+  if (planet.about) return <Lede>{planet.about.en}</Lede>;
+  if (planet.name.he) return <Lede>In Hebrew {inHebrew(planet)}.</Lede>;
   return null;
+}
+
+interface SeeAlso {
+  href: string;
+  text: string;
+}
+
+const planetLink = (planet: PlanetRow): SeeAlso => ({
+  href: `/astrology/planet/${planet.id}`,
+  text: planetName(planet),
+});
+
+const FIGURES: SeeAlso = {
+  href: "/geomancy/reference",
+  text: "Geomantic figures",
+};
+
+/**
+ * The pages a row's `about` names, linked under it, named as their own
+ * pages name them where they have a row.
+ */
+const SEE_ALSO: Partial<Record<string, SeeAlso[]>> = {
+  earth: [
+    {
+      href: "/kabbalah/sephirah/malchut",
+      text: Data.sephirah.malchut.name.roman,
+    },
+    { href: "/gd/grade/1=10", text: Data.gdGrade["1=10"].name },
+    planetLink(Data.planet["olam-yesodot"]),
+    { href: "/enochian/tablets", text: "Enochian tablets" },
+  ],
+  rahu: [planetLink(Data.planet.ketu), FIGURES],
+  ketu: [planetLink(Data.planet.rahu), FIGURES],
+};
+
+/** The hours are the seven planets' of the Chaldean order, no others. */
+function seeAlsoOf(planet: PlanetRow): SeeAlso[] {
+  return [
+    ...(chaldean.includes(planet.id)
+      ? [{ href: "/astrology/planetary-hours", text: "Planetary hours" }]
+      : []),
+    ...(SEE_ALSO[planet.id] ?? []),
+  ];
+}
+
+/**
+ * The ten heavens, one to each sephirah from Keter to Malchut, after
+ * Mathers (1887); Da'at has none.
+ */
+const HEAVENS = Object.values(Data.sephirah)
+  .flatMap((sephirah) =>
+    sephirah.planet ? [{ sephirah, heaven: sephirah.planet }] : [],
+  )
+  .sort((a, b) => a.sephirah.index - b.sephirah.index);
+
+/**
+ * The ten heavens, on the spheres' pages, each linked but this page's own.
+ * The symbols take a column of their own on the left, empty for a sphere,
+ * so that the names line up.
+ */
+function TenHeavens({ current }: { current: string }) {
+  return (
+    <section aria-labelledby="ten-heavens">
+      <h2 id="ten-heavens">The ten heavens</h2>
+      <table className={styles.heavens}>
+        <thead>
+          <tr>
+            <th scope="col">Heaven</th>
+            <th scope="col">Sephirah</th>
+          </tr>
+        </thead>
+        <tbody>
+          {HEAVENS.map(({ sephirah, heaven }) => (
+            <tr key={sephirah.id}>
+              <td>
+                <span className={styles.symbol} aria-hidden="true">
+                  {heaven.symbol}
+                </span>
+                {heaven.id === current ? (
+                  <span aria-current="page">{planetName(heaven)}</span>
+                ) : (
+                  <Link href={`/astrology/planet/${heaven.id}`}>
+                    {planetName(heaven)}
+                  </Link>
+                )}
+                {/* Each heaven's Hebrew name, the sphere's own among them,
+                    under its English, in line with the name. */}
+                {heaven.name.he ? (
+                  <span className={styles.hebrew}>
+                    <Hebrew>{heaven.name.he.he}</Hebrew>{" "}
+                    <span lang="he-Latn">{heaven.name.he.roman}</span>
+                  </span>
+                ) : null}
+              </td>
+              <td>
+                <Link href={`/kabbalah/sephirah/${sephirah.id}`}>
+                  {sephirah.name.roman}
+                </Link>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
 }
 
 /**
  * A planet's correspondences, or a sphere's (plan 036, "Planet"). The table
  * also holds the three spheres the sephirot name as their planet,
- * `primum-mobile`, `zodiac` and `olam-yesodot`, which carry a name and
- * nothing else, so a sphere's page is its lede. No planet is in a chain, so
- * there are no arrows and no nav.
+ * `primum-mobile`, `zodiac` and `olam-yesodot`, which carry a name and a
+ * text and no correspondences, so a sphere's page is its lede and the ten
+ * heavens. No planet is in a chain, so there are no arrows and no nav.
  *
  * Synchronous, so that `renderToString` can render it; the route looks the
  * row up and hands it over.
@@ -116,6 +188,7 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
   const metal = planet.alchemySymbol;
   const grade = planet.gdGrade;
   const name = planetName(planet);
+  const seeAlso = seeAlsoOf(planet);
 
   return (
     <EntityFrame>
@@ -135,8 +208,10 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
 
       <PlanetLede planet={planet} />
 
-      {/* A sphere has nothing for the table: its sephirah is in the lede. */}
-      {planet.kind === "sphere" ? null : (
+      {/* A sphere has nothing for the table: its sephirah is in the list. */}
+      {planet.kind === "sphere" ? (
+        <TenHeavens current={planet.id} />
+      ) : (
         <EntityTable>
           <Row label="Symbol">
             {planet.symbol ? (
@@ -170,7 +245,7 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
               </Link>
             ) : null}
           </Row>
-          <Row label="Sephirah">{sephirotOf(planet, ", ")}</Row>
+          <Row label="Sephirah">{sephirotOf(planet)}</Row>
           <Row label="God name">
             {planet.godName ? (
               <Name
@@ -255,11 +330,15 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
         </EntityTable>
       )}
 
-      {/* The hours are the seven planets' of the Chaldean order, no others. */}
-      {chaldean.includes(planet.id) ? (
+      {seeAlso.length ? (
         <p className={styles.seeAlso}>
           See also:{" "}
-          <Link href="/astrology/planetary-hours">Planetary hours</Link>
+          {seeAlso.map((link, i) => (
+            <Fragment key={link.href}>
+              {i ? ", " : null}
+              <Link href={link.href}>{link.text}</Link>
+            </Fragment>
+          ))}
         </p>
       ) : null}
     </EntityFrame>

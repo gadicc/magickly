@@ -4,3 +4,41 @@
 .seeAlso {
   margin-top: 1.5em;
 }
+
+/* The ten heavens on a sphere's page: the entity table's rules, with a
+   header row, and the symbols in a slot of their own so the names line up. */
+.heavens {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.92rem;
+}
+
+.heavens th,
+.heavens td {
+  border-top: 1px solid rgba(128, 128, 128, 0.3);
+  padding: 0.45em 0.6em 0.45em 0;
+  text-align: left;
+  vertical-align: top;
+}
+
+.heavens th {
+  border-top: none;
+  font-weight: 600;
+  color: var(--mui-palette-text-secondary);
+}
+
+.symbol {
+  display: inline-block;
+  width: 1.6em;
+}
+
+/* The Hebrew under the name, starting where the name starts. */
+.hebrew {
+  display: block;
+  margin-left: 1.6em;
+  color: var(--mui-palette-text-secondary);
+}
+
+.heavens [aria-current] {
+  font-weight: 600;
+}

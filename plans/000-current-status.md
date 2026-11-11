@@ -113,11 +113,19 @@ Follow-ups are separate from the completed migration work:
   and after, and submits the changed, new and removed ones. The key file
   is `public/<key>.txt`; the key is public by design. A failed snapshot or
   submission never fails the release.
-- TODO: Bing reports meta descriptions too short. Seven pages are under
-  70 characters, the thin planet pages (Earth, Uranus, Neptune, the
-  Nodes, the Zodiac at 35 to 50) and `/gd/grade/0=0` (68), and 14 more
-  are under 110; the planets need content, not only longer text (plan
-  028's follow-ups).
+- 11 November 2026: the planet pages ([plan 078](078-planet-pages.md)).
+  Search Console had `/astrology/planet/sol` as "Discovered – currently
+  not indexed", and the fifteen pages 4 impressions since August. They
+  now lead with the names readers search for ("Sun (Sol) ☉", "North Node
+  (Caput Draconis) ☊"), the seven planets have a Day row, the eight thin
+  rows have texts in our own words from public-domain sources, the
+  spheres list the ten heavens, and every planet description is 110 to
+  160 characters. TODO: two weeks after release, read the planet pages'
+  indexing state again; the grades and sephirot share the problem and
+  wait on that measurement.
+- TODO: Bing reports meta descriptions too short. The planets are done
+  (plan 078); `/gd/grade/0=0` (68 characters) remains, and some of the 14
+  pages under 110 (plan 028's follow-ups).
 - Done by 9 November 2026: Search Console lists only `/sitemap.xml`
   (197 pages, 28 images), last read 6 November with no errors;
   `/sitemap-0.xml` is gone ([plan 028](028-seo.md#follow-ups)).

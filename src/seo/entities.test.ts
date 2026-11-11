@@ -29,14 +29,35 @@ describe("entity pages", () => {
         "day Monday, rules Cancer, letter Gimel, god name Shaddai El Chai, " +
         "archangel Gavriel.",
     );
+  });
+
+  it("gives a row's own description where it has one", () => {
+    // Plan 078: the eight thin rows; the title stays the correspondences'.
     expect(planetPage("primum-mobile")).toMatchObject({
       title: "Primum Mobile Correspondences",
       description:
-        "Correspondences of Primum Mobile (Hebrew ראשית הגלגולים, Roshit HaGilgulim).",
+        "Primum Mobile, Roshit HaGilgulim: the heaven of Keter, first of the ten heavens of the sephirot, and the ten listed in order from Keter to Malchut.",
     });
     expect(planetPage("earth")?.description).toBe(
-      "Correspondences of Earth: symbol ♁.",
+      "Earth ♁ in the Golden Dawn: Malchut, the sphere of the elements and the Zelator grade, 1=10, and why astrology gives the Earth no sign and no day.",
     );
+    const own = Object.values(Data.planet).filter(
+      (planet) => planet.description,
+    );
+    expect(own.map((planet) => planet.id)).toEqual([
+      "primum-mobile",
+      "zodiac",
+      "olam-yesodot",
+      "earth",
+      "uranus",
+      "neptune",
+      "rahu",
+      "ketu",
+    ]);
+    for (const planet of own)
+      expect(planetPage(planet.id)?.description, planet.id).toBe(
+        planet.description?.en,
+      );
   });
 
   it("leads with the name readers search for, where a planet has one", () => {
@@ -50,7 +71,7 @@ describe("entity pages", () => {
     expect(planetPage("rahu")).toMatchObject({
       title: "North Node (Caput Draconis) ☊ Correspondences",
       description:
-        "Correspondences of the North Node (Caput Draconis): symbol ☊.",
+        "The North Node, Caput Draconis ☊: the Dragon’s Head, one of the two points where eclipses happen; favourable like Jupiter and Venus, and Rahu in Sanskrit.",
     });
     expect(planetPage("mercury")?.description).toMatch(
       /^Correspondences of Mercury \(Hebrew כוכב, Kochav\): symbol ☿, day Wednesday, rules Gemini and Virgo, /,
@@ -66,17 +87,11 @@ describe("entity pages", () => {
     ).toEqual(["Sun", "Moon", "North Node", "South Node"]);
   });
 
-  it("gives each of the seven planets a description of a snippet's length", () => {
+  it("gives every planet and sphere a description of a snippet's length", () => {
     // Long enough to say what the page holds, short enough not to be cut.
-    for (const id of [
-      "sol",
-      "luna",
-      "mars",
-      "mercury",
-      "jupiter",
-      "venus",
-      "saturn",
-    ]) {
+    const ids = Object.keys(Data.planet);
+    expect(ids).toHaveLength(15);
+    for (const id of ids) {
       const { length } = planetPage(id)?.description ?? "";
       expect(length, id).toBeGreaterThanOrEqual(110);
       expect(length, id).toBeLessThanOrEqual(160);

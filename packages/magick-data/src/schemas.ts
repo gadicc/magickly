@@ -148,7 +148,8 @@ export const schemas = {
         }),
       ),
     }),
-    // The three spheres of the Tree in this table have a name and nothing else.
+    // The three spheres of the Tree in this table have a name and a text, and
+    // no correspondences.
     symbol: v.optional(v.string()),
     magickTypes: v.optional(en),
     /**
@@ -156,6 +157,13 @@ export const schemas = {
      * Mathers (1888), Book I, chapter II: the seven planets only.
      */
     keyOfSolomon: v.optional(en),
+    /**
+     * A few sentences in our own words on a row the correspondences say
+     * little of, its page's lede; sources in the JSON's header (plan 078).
+     */
+    about: v.optional(en),
+    /** The page's meta description, where the correspondences make a poor one. */
+    description: v.optional(en),
     ...ids("planet", [
       "hebrewLetterId",
       "godNameId",

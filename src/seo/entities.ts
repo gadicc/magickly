@@ -36,7 +36,8 @@ const AND = new Intl.ListFormat("en-GB", { type: "conjunction" });
 /**
  * `/astrology/planet/<id>`, including the Kabbalistic heavens. A common name
  * leads, with the planet's own name beside its Hebrew: "the Sun (Sol, Hebrew
- * שמש, Shemesh)". Each common name so far takes "the".
+ * שמש, Shemesh)". Each common name so far takes "the". A row with a
+ * `description` of its own (plan 078) has that instead.
  */
 export function planetPage(id: string): EntityPage | null {
   const planet = rowOf(Data.planet, id);
@@ -51,18 +52,20 @@ export function planetPage(id: string): EntityPage | null {
   return {
     path: `/astrology/planet/${id}`,
     title: `${planetName(planet)}${planet.symbol ? ` ${planet.symbol}` : ""} Correspondences`,
-    description: correspondences(`Correspondences of ${named}`, [
-      planet.symbol && `symbol ${planet.symbol}`,
-      day && `day ${day}`,
-      planet.zodiacs.length > 0 &&
-        `rules ${AND.format(planet.zodiacs.map((sign) => sign.name.en))}`,
-      planet.hebrewLetter && `letter ${planet.hebrewLetter.letter.name}`,
-      planet.godName?.name.roman && `god name ${planet.godName.name.roman}`,
-      planet.archangel && `archangel ${planet.archangel.name.roman}`,
-      planet.intelligenceId &&
-        `intelligence ${capitalize(planet.intelligenceId)}`,
-      planet.spiritId && `spirit ${capitalize(planet.spiritId)}`,
-    ]),
+    description:
+      planet.description?.en ??
+      correspondences(`Correspondences of ${named}`, [
+        planet.symbol && `symbol ${planet.symbol}`,
+        day && `day ${day}`,
+        planet.zodiacs.length > 0 &&
+          `rules ${AND.format(planet.zodiacs.map((sign) => sign.name.en))}`,
+        planet.hebrewLetter && `letter ${planet.hebrewLetter.letter.name}`,
+        planet.godName?.name.roman && `god name ${planet.godName.name.roman}`,
+        planet.archangel && `archangel ${planet.archangel.name.roman}`,
+        planet.intelligenceId &&
+          `intelligence ${capitalize(planet.intelligenceId)}`,
+        planet.spiritId && `spirit ${capitalize(planet.spiritId)}`,
+      ]),
   };
 }
 

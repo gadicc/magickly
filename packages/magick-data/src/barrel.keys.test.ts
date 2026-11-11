@@ -51,6 +51,9 @@ import data from "./data.ts";
  * and `scents` beside them. Malchut has no scent and Da'at neither stone nor
  * scent, so those keys are absent, and the accessors are there all the same.
  *
+ * Plan 078 gave eight planet rows, the spheres among them, an `about` and a
+ * `description` of their own, which the sampled sphere shows after its name.
+ *
  * The sampled row is each table's first, named so the sample is reproducible;
  * for the one array table left in the barrel that is index `0`.
  */
@@ -61,6 +64,8 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "id",
       "kind",
       "name",
+      "about",
+      "description",
       "hebrewLetter",
       "godName",
       "archangel",

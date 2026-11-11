@@ -77,10 +77,64 @@ function row(html: string, label: string) {
   return found as NonNullable<typeof found>;
 }
 
-const SATURN =
-  "The classical correspondences stop at Saturn, the last of the seven planets of antiquity, so this page has only its symbol.";
+/** The paragraph after the heading: the lede, where the page has one. */
+function ledeOf(html: string) {
+  const found = html.match(/<\/h1><p class="[^"]*lede[^"]*">([\s\S]*?)<\/p>/);
+  return found ? textOf(found[1]) : null;
+}
+
+/** The "See also" line's links, as [href, text]. */
+function seeAlsoOf(html: string) {
+  const line = html.match(/<p class="[^"]*seeAlso[^"]*">([\s\S]*?)<\/p>/)?.[1];
+  return [...(line ?? "").matchAll(/href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/g)].map(
+    ([, href, text]) => [href, textOf(text)],
+  );
+}
+
+/**
+ * The ten heavens' rows: the symbol slot's text, the heaven, where it links
+ * (null for this page's own, which is marked current instead), the sephirah
+ * and where it links.
+ */
+function heavensOf(html: string) {
+  const section = html.match(
+    /<section aria-labelledby="ten-heavens">([\s\S]*?)<\/section>/,
+  )?.[1];
+  if (!section) return null;
+  return [
+    ...section.matchAll(/<tr><td>([\s\S]*?)<\/td><td>([\s\S]*?)<\/td><\/tr>/g),
+  ].map(([, heaven, sephirah]) => {
+    const slot = heaven.match(
+      /^<span class="[^"]*symbol[^"]*" aria-hidden="true">([^<]*)<\/span>/,
+    );
+    // The Hebrew under the name, kept apart from it.
+    const hebrew = heaven.match(/<span class="[^"]*hebrew[^"]*">[\s\S]*$/);
+    const name = heaven.slice(slot?.[0].length ?? 0, hebrew?.index);
+    return {
+      symbol: slot ? slot[1] : "(no slot)",
+      heaven: textOf(name),
+      hebrew: hebrew ? textOf(hebrew[0]) : null,
+      href: hrefsOf(heaven)[0] ?? null,
+      current: heaven.includes('aria-current="page"'),
+      sephirah: textOf(sephirah),
+      sephirahHref: hrefsOf(sephirah)[0],
+    };
+  });
+}
 
 const ids = Object.keys(Data.planet);
+
+/** The rows with a text of their own (plan 078), in the table's order. */
+const ABOUT = [
+  "primum-mobile",
+  "zodiac",
+  "olam-yesodot",
+  "earth",
+  "uranus",
+  "neptune",
+  "rahu",
+  "ketu",
+];
 
 describe("the planet page", () => {
   it("holds every planet and sphere to what every entity page must hold", async () => {
@@ -211,7 +265,7 @@ describe("the planet page", () => {
     expect(row(html, "Archangel").text).toBe("גבריאל Gavriel");
   });
 
-  it("gives Earth its symbol and its grade and no more", async () => {
+  it("gives Earth its text, its symbol and its grade and no more", async () => {
     // Earth has no letter and no Hebrew name, only the grade that is
     // attributed to it, Zelator's.
     const html = await page("earth");
@@ -219,56 +273,159 @@ describe("the planet page", () => {
       { label: "Symbol", text: "♁", hrefs: [] },
       { label: "Grade", text: "1=10 Zelator", hrefs: ["/gd/grade/1=10"] },
     ]);
-    expect(textOf(html)).not.toContain("In Hebrew");
-    expect(textOf(html)).not.toContain(SATURN);
-  });
-
-  it("says why Uranus has only its symbol", async () => {
-    // Decision 4: the page stays, and says the classical attributions stop
-    // at Saturn rather than showing a table with nothing in it.
-    const html = await page("uranus");
-    expect(textOf(html)).toContain(SATURN);
-    expect(rowsOf(html)).toEqual([{ label: "Symbol", text: "⛢", hrefs: [] }]);
-  });
-
-  it("says so on the four with nothing but a name and a symbol, and no others", async () => {
-    // The page says it of a row with nothing else, not of a list of ids, so
-    // this is what holds it to those four and keeps it off Earth's.
-    const said: string[] = [];
-    for (const id of ids)
-      if (textOf(await page(id)).includes(SATURN)) said.push(id);
-    expect(said).toEqual(["uranus", "neptune", "rahu", "ketu"]);
-  });
-
-  it("names a sphere's sephirah in its lede, and draws no table", async () => {
-    // The three spheres are the sephirot's `planet` and have nothing but a
-    // name; the inverse that already existed gives each its sephirah. The
-    // gloss is the one Keter's own row once held as its heaven (plan 039).
-    const html = await page("primum-mobile");
-    expect(textOf(html)).toContain(
-      "The sphere of Keter, in Hebrew ראשית הגלגולים, Roshit HaGilgulim, “First Swirlings”.",
+    expect(ledeOf(html)).toMatch(
+      /^In the Golden Dawn the Earth answers to Malchut, the tenth sephirah, /,
     );
-    expect(hrefsOf(html)).toContain("/kabbalah/sephirah/keter");
-    expect(html).not.toContain("<table");
-    expect(hrefsOf(html)).not.toContain("/astrology/planetary-hours");
+    expect(textOf(html)).not.toContain("In Hebrew");
+  });
 
+  it("leads with a row's own text where it has one, and only there", async () => {
+    // Plan 078: the eight thin pages, as the owner accepted them.
+    const led: string[] = [];
+    for (const id of ids) {
+      const planet = Data.planet[id as keyof typeof Data.planet];
+      const lede = ledeOf(await page(id));
+      if (!planet.about) continue;
+      led.push(id);
+      expect(lede, id).toBe(planet.about.en);
+    }
+    expect(led).toEqual(ABOUT);
+    expect(ledeOf(await page("rahu"))).toBe(
+      "The Dragon’s Head is the Moon’s north node, the point where the Moon’s path crosses the ecliptic going north; the south node, the Dragon’s Tail, lies opposite. Eclipses happen only when the Sun and Moon are near the nodes. Astrologers count the Head favourable, like Jupiter or Venus. In Sanskrit it is Rahu, the demon said to cause eclipses. The geomantic figure Caput Draconis carries its name.",
+    );
+    expect(ledeOf(await page("uranus"))).toMatch(
+      /^William Herschel found Uranus on 13 March 1781 /,
+    );
+    // The seven planets keep their Hebrew names.
+    expect(ledeOf(await page("saturn"))).toBe("In Hebrew שַׁבְּתַאי, Shabbathai.");
+  });
+
+  it("no longer says the correspondences stop at Saturn, of any row", async () => {
+    // It was wrong for the nodes, and the moderns now say why themselves.
+    for (const id of ids)
+      expect(textOf(await page(id)), id).not.toContain("stop at Saturn");
+    expect(rowsOf(await page("uranus"))).toEqual([
+      { label: "Symbol", text: "⛢", hrefs: [] },
+    ]);
+  });
+
+  it("links what a row's text names, under it", async () => {
+    const seen: Record<string, string[][]> = {};
+    for (const id of ids) {
+      const links = seeAlsoOf(await page(id));
+      if (links.length) seen[id] = links;
+    }
+    const hours = [["/astrology/planetary-hours", "Planetary hours"]];
+    expect(seen).toEqual({
+      sol: hours,
+      mercury: hours,
+      venus: hours,
+      earth: [
+        ["/kabbalah/sephirah/malchut", "Malchut"],
+        ["/gd/grade/1=10", "Zelator"],
+        ["/astrology/planet/olam-yesodot", "World of Foundations"],
+        ["/enochian/tablets", "Enochian tablets"],
+      ],
+      luna: hours,
+      mars: hours,
+      jupiter: hours,
+      saturn: hours,
+      rahu: [
+        ["/astrology/planet/ketu", "South Node (Cauda Draconis)"],
+        ["/geomancy/reference", "Geomantic figures"],
+      ],
+      ketu: [
+        ["/astrology/planet/rahu", "North Node (Caput Draconis)"],
+        ["/geomancy/reference", "Geomantic figures"],
+      ],
+    });
+  });
+
+  it("lists the ten heavens on a sphere's page, Keter's to Malchut's", async () => {
+    // From the sephirot's own `planet`, as the sephirah pages read it;
+    // Da'at has none. Each symbol has a slot of its own before the name,
+    // empty for a sphere, so the names line up.
+    const heavens = heavensOf(await page("zodiac"));
+    expect(heavens).toEqual(
+      (
+        [
+          ["", "Primum Mobile", "primum-mobile", "Keter", "keter"],
+          ["", "Zodiac", null, "Chochmah", "chochmah"],
+          ["♄", "Saturn", "saturn", "Binah", "binah"],
+          ["♃", "Jupiter", "jupiter", "Chesed", "hesed"],
+          ["♂", "Mars", "mars", "Gevurah", "gevurah"],
+          ["☉", "Sun (Sol)", "sol", "Tiferet", "tiferet"],
+          ["♀", "Venus", "venus", "Netzach", "netzach"],
+          ["☿", "Mercury", "mercury", "Hod", "hod"],
+          ["☾", "Moon (Luna)", "luna", "Yesod", "yesod"],
+          ["", "World of Foundations", "olam-yesodot", "Malchut", "malchut"],
+        ] as const
+      ).map(([symbol, heaven, id, sephirah, sephirahId]) => ({
+        symbol,
+        heaven,
+        hebrew: expect.any(String),
+        href: id && `/astrology/planet/${id}`,
+        current: id === null,
+        sephirah,
+        sephirahHref: `/kabbalah/sephirah/${sephirahId}`,
+      })),
+    );
+
+    // Each heaven's Hebrew under its name, so a sphere's page keeps its own.
+    expect(heavens?.map((row) => row.hebrew)).toEqual(
+      heavens?.map((row) => {
+        const he = Object.values(Data.planet).find(
+          (planet) => planetName(planet) === row.heaven,
+        )?.name.he;
+        return `${he?.he} ${he?.roman}`;
+      }),
+    );
+    expect(heavens?.[9].hebrew).toBe("עולם היסודות Olam HaYesodot");
+
+    // Each sphere's own row is the one marked current, and not a link.
+    for (const id of ["primum-mobile", "zodiac", "olam-yesodot"]) {
+      const rows = heavensOf(await page(id)) ?? [];
+      const current = rows.filter((row) => row.current);
+      expect(current, id).toHaveLength(1);
+      expect(current[0].href, id).toBeNull();
+      expect(current[0].heaven, id).toBe(
+        planetName(Data.planet[id as keyof typeof Data.planet]),
+      );
+      expect(
+        rows.filter((row) => row.href === null),
+        id,
+      ).toEqual(current);
+    }
+    // Under a heading of its own, which labels the section, and on no
+    // other page.
+    expect(await page("zodiac")).toContain(
+      '<section aria-labelledby="ten-heavens"><h2 id="ten-heavens">The ten heavens</h2>',
+    );
+    for (const id of ids)
+      if (Data.planet[id as keyof typeof Data.planet].kind === "planet")
+        expect(heavensOf(await page(id)), id).toBeNull();
+  });
+
+  it("links a sphere's sephirah from the ten heavens, and has no rows", async () => {
+    // The three spheres are the sephirot's `planet` and have no
+    // correspondences; the inverse gives each its sephirah.
     for (const [id, sephirah] of [
+      ["primum-mobile", "keter"],
       ["zodiac", "chochmah"],
       ["olam-yesodot", "malchut"],
-    ])
-      expect(hrefsOf(await page(id)), id).toContain(
-        `/kabbalah/sephirah/${sephirah}`,
-      );
-    // A gloss that only repeats the heading is left out, as on the sephirah
-    // page: the zodiac's "The Zodiac" under "Zodiac".
-    expect(textOf(await page("zodiac"))).toContain(
-      "The sphere of Chochmah, in Hebrew מזלות, Mazalot.",
-    );
+    ]) {
+      const html = await page(id);
+      const own = heavensOf(html)?.find((row) => row.current);
+      expect(own?.sephirahHref, id).toBe(`/kabbalah/sephirah/${sephirah}`);
+      expect(rowsOf(html), id).toEqual([]);
+      expect(hrefsOf(html), id).not.toContain("/astrology/planetary-hours");
+    }
   });
 
-  it("loses nothing by drawing no table for a sphere", () => {
-    // A sphere's page is its heading and its lede; were a sphere to gain a
-    // correspondence, this is what would say the page must show it.
+  it("loses nothing by drawing no table of correspondences for a sphere", () => {
+    // A sphere's page is its heading, its text and the ten heavens; were a
+    // sphere to gain a correspondence, this is what would say the page must
+    // show it. Its `description` is the route's, its Hebrew name the text's.
     const spheres = Object.values(Data.planet).filter(
       (planet) => planet.kind === "sphere",
     );
@@ -287,7 +444,7 @@ describe("the planet page", () => {
           )
           .map(([key]) => key),
         sphere.id,
-      ).toEqual(["id", "kind", "name", "sephirot"]);
+      ).toEqual(["id", "kind", "name", "about", "description", "sephirot"]);
   });
 
   it("cites the Key of Solomon on the seven planets, and on no other row", async () => {

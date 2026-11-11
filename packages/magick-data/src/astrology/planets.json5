@@ -1,6 +1,38 @@
 {
   /*
+    `about` and `description` (plan 078) are our own words, facts only,
+    from these public-domain sources; "n" is the archive.org BookReader
+    index, archive.org/details/<id>/page/n<N>.
 
+    primum-mobile, zodiac, olam-yesodot: their names and glosses, Mathers,
+      The Kabbalah Unveiled, 1887, Introduction §53, archive.org b24884443,
+      pp. 27–28 (n40–n41). Their places (the Primum Mobile outermost, the
+      fixed stars beyond the planets, the elements below the Moon) are the
+      common Ptolemaic order of the spheres, and mazal is everyday Hebrew
+      for luck; neither is taken from a particular source.
+    earth: The Equinox I(2), 1909, Liber O and "The Temple of Solomon the
+      King", archive.org crowley-equinox_202110, file "The Equinox Vol. 1,
+      No. 2", pp. 22, 242; Mathers, as above, for the sphere of the elements.
+    uranus: Herschel, "Account of a Comet", Phil. Trans. 71 (1781) 492,
+      doi:10.1098/rstl.1781.0056; Bode, Von dem neu entdeckten Planeten,
+      1784, archive.org bub_gb_ZqA5AAAAcAAJ, pp. 95–96 (n98–n99); Wikimedia
+      Commons File:Uranus_symbol.svg and File:Uranus_monogram.svg; Leo,
+      below.
+    neptune: MNRAS 7 (1846) 153, doi:10.1093/mnras/7.9.153; Encke,
+      Astronomische Nachrichten 25 (1847) 49, doi:10.1002/asna.18470250402;
+      Leo, below.
+    uranus and neptune, the modern rulerships and that they were unsettled:
+      Leo, Astrology for All, 1899, ch. XV, archive.org bub_gb_8CwSAAAAYAAJ;
+      The Art of Synthesis, 1st ed. 1912 (archive.org artofsynthesis00leoa,
+      a 1926 copy), pp. 100, 117 (n127, n144); How to Judge a Nativity,
+      archive.org howtojudgenativi00leoa, pp. 27, 123, 126 (n50, n146, n149).
+    rahu: Wilson, A Complete Dictionary of Astrology, 1819, archive.org
+      b29298180, pp. 13, 83 (n44, n114); Lilly, Christian Astrology, 1647,
+      archive.org b30338724, p. 83 (n116); Monier-Williams, A
+      Sanskrit-English Dictionary, 1899, archive.org
+      ASanskritEnglishDictionary, p. 879 (n920).
+    ketu: Wilson and Lilly, as above; Monier-Williams, as above, p. 309
+      (n350).
    */
 
   "primum-mobile": {
@@ -15,6 +47,12 @@
         roman: "Roshit HaGilgulim",
         en: "First Swirlings",
       },
+    },
+    about: {
+      en: "The first of the ten heavens that stand for the sephirot in the visible world, and the heaven of Keter: the outermost sphere, whose turning carries every sphere inside it round with it. Its Hebrew name, Roshit HaGilgulim, means the first swirlings.",
+    },
+    description: {
+      en: "Primum Mobile, Roshit HaGilgulim: the heaven of Keter, first of the ten heavens of the sephirot, and the ten listed in order from Keter to Malchut.",
     },
   },
 
@@ -31,6 +69,12 @@
         en: "The Zodiac",
       },
     },
+    about: {
+      en: "The heaven of Chochmah, the second of the ten: the sphere of the fixed stars and the twelve signs, beyond the seven planets. Its Hebrew name, Mazalot, is the word for the signs, and also for fortune.",
+    },
+    description: {
+      en: "Zodiac, Mazalot: the heaven of Chochmah, the sphere of the fixed stars and the twelve signs, and the ten heavens of the sephirot in order.",
+    },
   },
 
   "olam-yesodot": {
@@ -45,6 +89,12 @@
         roman: "Olam HaYesodot",
         en: "Sphere of the Elements",
       },
+    },
+    about: {
+      en: "The heaven of Malchut, the last of the ten: the world of the four elements below the Moon, where fire, water, air and earth mix and change. Mathers gives it as Cholom Yesodoth, “the breaker of the foundations”.",
+    },
+    description: {
+      en: "World of Foundations, Olam HaYesodot: the heaven of Malchut, the world of the four elements, and the ten heavens of the sephirot in order.",
     },
   },
 
@@ -140,6 +190,12 @@
       en: {
         en: "Earth",
       },
+    },
+    about: {
+      en: "In the Golden Dawn the Earth answers to Malchut, the tenth sephirah, whose heaven is the sphere of the elements, and to the grade of Zelator, 1=10, which is given to the element of Earth. Astrology looks out from the Earth rather than at it, so the Earth rules no sign and no day.",
+    },
+    description: {
+      en: "Earth ♁ in the Golden Dawn: Malchut, the sphere of the elements and the Zelator grade, 1=10, and why astrology gives the Earth no sign and no day.",
     },
   },
 
@@ -259,6 +315,12 @@
         en: "Uranus",
       },
     },
+    about: {
+      en: "William Herschel found Uranus on 13 March 1781 and took it at first for a comet: the first planet discovered since antiquity, and too late for the classical correspondences, which were drawn up for seven. Modern astrologers give it Aquarius, a sign tradition gives to Saturn, though Alan Leo, early in the twentieth century, still called that unsettled. Astronomers write its symbol ⛢, the sign of platinum; astrologers draw ♅, an H for Herschel.",
+    },
+    description: {
+      en: "Uranus ⛢ ♅: found by Herschel in 1781, too late for the classical correspondences; its modern rulership of Aquarius, and its two symbols.",
+    },
   },
 
   neptune: {
@@ -269,6 +331,12 @@
       en: {
         en: "Neptune",
       },
+    },
+    about: {
+      en: "Neptune was found at Berlin in September 1846, close to where Urbain Le Verrier had calculated it must be from the way it pulled Uranus off course. Like Uranus it came too late for the classical correspondences. Modern astrologers give it Pisces, a sign tradition gives to Jupiter; in Alan Leo’s day some gave it Capricorn instead.",
+    },
+    description: {
+      en: "Neptune ♆: found at Berlin in 1846 near where Le Verrier had predicted, too late for the classical correspondences; its modern rulership of Pisces.",
     },
   },
 
@@ -282,6 +350,12 @@
         en: "Caput Draconis",
       },
     },
+    about: {
+      en: "The Dragon’s Head is the Moon’s north node, the point where the Moon’s path crosses the ecliptic going north; the south node, the Dragon’s Tail, lies opposite. Eclipses happen only when the Sun and Moon are near the nodes. Astrologers count the Head favourable, like Jupiter or Venus. In Sanskrit it is Rahu, the demon said to cause eclipses. The geomantic figure Caput Draconis carries its name.",
+    },
+    description: {
+      en: "The North Node, Caput Draconis ☊: the Dragon’s Head, one of the two points where eclipses happen; favourable like Jupiter and Venus, and Rahu in Sanskrit.",
+    },
   },
 
   ketu: {
@@ -293,6 +367,12 @@
       en: {
         en: "Cauda Draconis",
       },
+    },
+    about: {
+      en: "The Dragon’s Tail is the Moon’s south node, the point where the Moon’s path crosses the ecliptic going south, opposite the Head. Astrologers count it unfavourable, like Saturn or Mars, and Lilly found that it made bad things worse. In Sanskrit it is Ketu. The geomantic figure Cauda Draconis carries its name.",
+    },
+    description: {
+      en: "The South Node, Cauda Draconis ☋: the Dragon’s Tail, opposite the Head; unfavourable like Saturn and Mars, Ketu in Sanskrit, and a geomantic figure.",
     },
   },
 }

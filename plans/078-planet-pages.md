@@ -1,7 +1,8 @@
 # Planet pages worth indexing — 11 November 2026
 
-Status: decisions accepted by Gadi on 11 November 2026; the new texts wait
-for his acceptance before they are committed. Read
+Status: decisions accepted by Gadi on 11 November 2026, and the texts on
+the same day; **built on 11 November 2026** on `gate/planet-pages` (see
+"Build"). Read
 [current status](000-current-status.md) first.
 
 ## Background
@@ -17,7 +18,7 @@ them, the planets, grades and all sephirot but Keter are not.
 Links are not what is missing: 103 sitemap pages link to a planet page,
 the indexed angel pages among them. What Google sees from outside is a
 family of fifteen short, alike pages, and it has not judged them worth a
-fetch. Seven of them are close to empty:
+fetch. Eight of them are close to empty:
 
 | Page | Shows | Description |
 | --- | --- | --- |
@@ -45,7 +46,8 @@ unchanged.
 
 ### 2. Our own words for the thin pages
 
-The seven thin rows gain an `about` (English) in `planets.json5`: two or
+The eight thin rows (Earth, Uranus, Neptune, the two nodes and the
+three spheres) gain an `about` (English) in `planets.json5`: two or
 three sentences in our own words, from public-domain sources cited in the
 file's header (see [Sources](#sources)). The page shows it as its lede, in
 place of the sentence it has now; the nodes lose the wrong "stop at
@@ -81,6 +83,33 @@ planet rules; a row with an `about` takes its first sentence. Every one of
 the fifteen descriptions is between 110 and 160 characters, and a test
 says so.
 
+### Build
+
+What the build changed from the decisions above:
+
+- **Descriptions of their own.** The texts' first sentences run past 160
+  characters, so the eight rows with an `about` carry a `description` too,
+  written from it, and `planetPage` uses it; the seven planets keep the
+  generated one with the day and the signs.
+- **The ten heavens are a table**, Heaven and Sephirah, under a heading of
+  its own, with each symbol in a slot of its own before the name so that
+  the names line up (Gadi, 11 November 2026), and each heaven's Hebrew
+  under its name. The lede gives way to the `about`, so without the
+  Hebrew there the sphere pages would lose their Hebrew names.
+- **Headings keep the symbol after the name**, "Sun (Sol) ☉": a heading
+  has nothing to line up with, and search results and screen readers
+  read the word first. The planets list already puts the symbol first.
+- **Links.** There is no page for the element of Earth and no anchor
+  for one Enochian tablet or one geomantic figure, so Earth links
+  `/enochian/tablets` and the nodes `/geomancy/reference`.
+- **Sources.** Mathers §53 gives the heavens' names and glosses only;
+  where the texts place the spheres (the Primum Mobile outermost, the
+  fixed stars beyond the planets, the elements below the Moon) they
+  follow the common Ptolemaic order, and the data file says so.
+- **The weekday table** moved with `dayOf` to
+  `src/components/astrology/planetDays.ts`, so that `src/seo` imports
+  nothing from a route.
+
 ### Not in scope
 
 The grades and the sephirot share the problem and may want the same
@@ -115,7 +144,7 @@ notice and is not used.
 
 1. **Names and descriptions**: `commonName`, title, heading, the list
    page, `planetPage`, the Day row; tests; site search refreshed.
-2. **The texts**: `about` for the seven rows with the source header, the
+2. **The texts**: `about` for the eight rows with the source header, the
    lede, the ten heavens on the sphere pages, the see-also links; tests;
    site search refreshed.
 
