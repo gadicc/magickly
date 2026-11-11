@@ -16,6 +16,7 @@ import {
   TitleFrame,
   TodoFrame,
 } from "./ritualBlocks/Frames";
+import frameStyles from "./ritualBlocks/frames.module.css";
 import { GdHallFrame } from "./ritualBlocks/GdHallFrame";
 import { planRitualFootnotes } from "./ritualFootnotes";
 import { rendersBody } from "./ritualRendersBody";
@@ -337,7 +338,7 @@ class A extends Node {
     ) : (
       <span
         key={key}
-        style={{ textDecoration: "red underline" }}
+        className={frameStyles.blockedLink}
         title={"Blocked href to " + this.block.href}
       >
         {this.renderChildren()}

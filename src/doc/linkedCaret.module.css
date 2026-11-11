@@ -13,3 +13,15 @@
   :global(.cm-editor:not(.cm-focused) .cm-activeLineGutter) {
   background-color: #b9dcf5;
 }
+/* The dark scheme (plan 076, step 5): the same mark in the dark primary. */
+:global(.dark)
+  .panel[data-linked-caret]
+  :global(.cm-editor:not(.cm-focused) .cm-activeLine) {
+  background-color: rgb(138 180 248 / 0.16);
+  box-shadow: inset 3px 0 0 var(--mui-palette-primary-main);
+}
+:global(.dark)
+  .panel[data-linked-caret]
+  :global(.cm-editor:not(.cm-focused) .cm-activeLineGutter) {
+  background-color: rgb(138 180 248 / 0.24);
+}

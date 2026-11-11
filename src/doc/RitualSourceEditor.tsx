@@ -1,6 +1,6 @@
 "use client";
 
-import { StreamLanguage } from "@codemirror/language";
+import { StreamLanguage, syntaxHighlighting } from "@codemirror/language";
 import { pug } from "@codemirror/legacy-modes/mode/pug";
 import {
   type Diagnostic,
@@ -14,14 +14,18 @@ import {
   setDiagnostics,
 } from "@codemirror/lint";
 import { Button } from "@mui/material";
+import { useColorScheme } from "@mui/material/styles";
 import {
   Annotation,
   basicSetup,
+  Compartment,
   Decoration,
   type DecorationSet,
   EditorState,
   EditorView,
+  type Extension,
   keymap,
+  oneDarkHighlightStyle,
   StateEffect,
   StateField,
   WidgetType,
@@ -45,6 +49,76 @@ const pugLanguage = StreamLanguage.define({
   ...pug,
   tokenTable: { indent: [] },
 });
+
+/**
+ * The editor in the dark scheme (plan 076, step 5): Midnight's surfaces
+ * and text, One Dark's syntax colours. Light adds nothing, so the editor
+ * there is CodeMirror's light default, as before. The folded IDs' rules
+ * name `.cm-editor` too, to outrank the light ones in the editor's theme.
+ */
+const darkEditor: Extension = [
+  EditorView.theme(
+    {
+      "&": { color: "#e4e8ef" },
+      ".cm-content": { caretColor: "#8ab4f8" },
+      ".cm-cursor, .cm-dropCursor": { borderLeftColor: "#8ab4f8" },
+      "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection":
+        { backgroundColor: "#2b3d5c" },
+      ".cm-activeLine": { backgroundColor: "#8ab4f80d" },
+      ".cm-activeLineGutter": { backgroundColor: "#1b2333" },
+      ".cm-gutters": {
+        backgroundColor: "#161d29",
+        color: "#7d8799",
+        borderRight: "1px solid rgba(170, 190, 220, 0.16)",
+      },
+      ".cm-panels": { backgroundColor: "#161d29", color: "#e4e8ef" },
+      ".cm-panels.cm-panels-top": {
+        borderBottom: "1px solid rgba(170, 190, 220, 0.16)",
+      },
+      ".cm-panels.cm-panels-bottom": {
+        borderTop: "1px solid rgba(170, 190, 220, 0.16)",
+      },
+      ".cm-searchMatch": {
+        backgroundColor: "#72a1ff59",
+        outline: "1px solid #457dff",
+      },
+      ".cm-searchMatch.cm-searchMatch-selected": {
+        backgroundColor: "#6199ff2f",
+      },
+      ".cm-selectionMatch": { backgroundColor: "#aafe661a" },
+      "&.cm-focused .cm-matchingBracket, &.cm-focused .cm-nonmatchingBracket": {
+        backgroundColor: "#bad0f847",
+      },
+      ".cm-tooltip": {
+        border: "1px solid rgba(170, 190, 220, 0.16)",
+        backgroundColor: "#1b2333",
+        color: "#e4e8ef",
+      },
+      ".cm-tooltip .cm-tooltip-arrow:before": {
+        borderTopColor: "transparent",
+        borderBottomColor: "transparent",
+      },
+      ".cm-tooltip .cm-tooltip-arrow:after": {
+        borderTopColor: "#1b2333",
+        borderBottomColor: "#1b2333",
+      },
+      ".cm-tooltip-autocomplete": {
+        "& > ul > li[aria-selected]": {
+          backgroundColor: "#2b3d5c",
+          color: "#e4e8ef",
+        },
+      },
+      "&.cm-editor .ritual-folded-id": { color: "#a9b2c1" },
+      "&.cm-editor .ritual-folded-id:hover, &.cm-editor .ritual-folded-id:focus-visible":
+        { background: "#8ab4f81f", borderColor: "#8ab4f866" },
+      "&.cm-editor .ritual-folded-id:focus-visible": {
+        outlineColor: "#8ab4f8",
+      },
+    },
+    { dark: true },
+  ),
+  syntaxHighlighting(oneDarkHighlightStyle),
+];
 
 const revealId = StateEffect.define<string>();
 /** Marks the caret a host placed (`cursor`), which `onCursor` never echoes. */
@@ -337,6 +411,14 @@ export default function RitualSourceEditor({
   const caretNode = React.useRef<string | null>(null);
   latest.current = { onChange, value, onCaretNode, onCursor };
   const previousDialect = React.useRef(dialect);
+  // The one place a component reads the colour scheme (plan 076,
+  // decision 3): the editor mounts on the client, after hydration, and
+  // its theme lives in CodeMirror's state, beyond CSS. `colorScheme` is
+  // undefined until MUI resolves it, which reads as light.
+  const dark = useColorScheme().colorScheme === "dark";
+  const [scheme] = React.useState(() => new Compartment());
+  const darkNow = React.useRef(dark);
+  darkNow.current = dark;
   const extensions = React.useMemo(
     () => [
       linter(null),
@@ -350,6 +432,9 @@ export default function RitualSourceEditor({
         },
       ]),
       basicSetup({ foldGutter: false }),
+      // After basicSetup, whose light highlighting is only a fallback.
+      // The scheme as it is now; the effect below keeps it current.
+      scheme.of(darkNow.current ? darkEditor : []),
       EditorView.lineWrapping,
       EditorState.readOnly.of(disabled),
       EditorView.editable.of(!disabled),
@@ -441,7 +526,7 @@ export default function RitualSourceEditor({
         },
       }),
     ],
-    [dialect, foldIds, disabled, label, onCompositionChange, fill],
+    [dialect, foldIds, disabled, label, onCompositionChange, fill, scheme],
   );
   const initialExtensions = React.useRef(extensions);
   React.useLayoutEffect(() => {
@@ -504,6 +589,15 @@ export default function RitualSourceEditor({
       instance.dispatch({ effects: StateEffect.reconfigure.of(extensions) });
     }
   }, [value, dialect, extensions]);
+  // The scheme, after any new state above: a switch reconfigures only the
+  // compartment, and a state rebuilt from extensions made before a switch
+  // gets the scheme back. Every render, since it is one comparison.
+  React.useLayoutEffect(() => {
+    const instance = view.current;
+    if (!instance || (scheme.get(instance.state) === darkEditor) === dark)
+      return;
+    instance.dispatch({ effects: scheme.reconfigure(dark ? darkEditor : []) });
+  });
   // After the value is applied, so a caret for the new text finds it.
   const placed = React.useRef<{
     view: EditorView | null;

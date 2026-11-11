@@ -17,12 +17,14 @@ import { describe, expect, it } from "vitest";
 const PALETTE_MODE_ALLOWED: ReadonlySet<string> = new Set(["src/theme.ts"]);
 
 /**
- * Empty until plan 076 adds its three named readers: the drawer's
- * Light / System / Dark switch (step 6), the `theme-color` effect for an
- * explicit choice (step 6) and the CodeMirror theme in
- * src/doc/RitualSourceEditor.tsx (step 5), which mounts on the client.
+ * Plan 076's three named readers: the CodeMirror theme in
+ * src/doc/RitualSourceEditor.tsx (step 5), which mounts on the client, and
+ * still to come, the drawer's Light / System / Dark switch (step 6) and the
+ * `theme-color` effect for an explicit choice (step 6).
  */
-const USE_COLOR_SCHEME_ALLOWED: ReadonlySet<string> = new Set([]);
+const USE_COLOR_SCHEME_ALLOWED: ReadonlySet<string> = new Set([
+  "src/doc/RitualSourceEditor.tsx",
+]);
 
 /** `palette.mode`, `palette?.mode`, `palette["mode"]`, `{ mode } = …palette`. */
 const PALETTE_MODE =

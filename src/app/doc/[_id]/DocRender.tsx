@@ -568,7 +568,7 @@ export function DocView({
 
   return (
     <>
-      <Box sx={{ background: "#efeae2", p: 2, fontSize: fontSize + "%" }}>
+      <Box sx={{ bgcolor: "ritual.surface", p: 2, fontSize: fontSize + "%" }}>
         <div>
           <ShowVars vars={alwaysVars} context={context} />
           <details>

@@ -14,6 +14,10 @@ interface AppPaletteTokens {
     surface: string;
     /** The reader's own speech bubble. */
     self: string;
+    /** Everyone else's speech bubbles and the title card. */
+    bubble: string;
+    /** A note between bubbles. */
+    note: string;
   };
 }
 
@@ -28,14 +32,26 @@ declare module "@mui/material/styles" {
 const lightTokens: AppPaletteTokens = {
   ink: "#000",
   plate: "transparent",
-  ritual: { surface: "#efeae2", self: "#d9fdd3" },
+  ritual: {
+    surface: "#efeae2",
+    self: "#d9fdd3",
+    bubble: "#fff",
+    note: "#f4f4f4",
+  },
 };
 
-// The ritual values are placeholders until plan 076's step 5.
+// The ritual surface is "A Midnight" (Gadi, 11 November 2026, plan 076
+// step 5): the site's dark background, with slate bubbles and a deep green
+// for the reader's own.
 const darkTokens: AppPaletteTokens = {
   ink: "#d6dae0",
   plate: "#f3f0e8",
-  ritual: { surface: "#1a1f29", self: "#1f3a2c" },
+  ritual: {
+    surface: "#0f141d",
+    self: "#1f3a2c",
+    bubble: "#1b2333",
+    note: "#141a24",
+  },
 };
 
 /**

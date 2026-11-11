@@ -164,3 +164,32 @@
   font-size: 0.875rem;
   color: #b3261e;
 }
+
+/* The dark scheme (plan 076, step 5). Light stays as above. */
+:global(.dark) .block[data-edit-active],
+:global(.dark) .atom[data-edit-active],
+:global(.dark) .token[data-edit-active],
+:global(.dark) .grade[data-edit-active] {
+  outline-color: var(--mui-palette-primary-main);
+}
+:global(.dark) .fallback {
+  border-color: #3b4a62;
+}
+:global(.dark) .label {
+  color: var(--mui-palette-text-secondary);
+}
+:global(.dark) .atom {
+  border-color: #56647a;
+}
+:global(.dark) .token {
+  background: #263350;
+}
+:global(.dark) .footnoteEditor :global(.tiptap) {
+  outline-color: #56647a;
+}
+:global(.dark) .hallLoading {
+  color: var(--mui-palette-text-secondary);
+}
+:global(.dark) .hallFailed {
+  color: #f2b8b5;
+}

@@ -173,3 +173,16 @@
     min-height: 50vh;
   }
 }
+
+/* The dark scheme (plan 076, step 5). Light stays as above. */
+:global(.dark) .surface .panels[data-layout="visual"] .editor,
+:global(.dark) .editor :global(.tiptap) {
+  background: var(--mui-palette-ritual-surface);
+}
+:global(.dark) .visualPanel,
+:global(.dark) .sourcePanel {
+  border-color: var(--mui-palette-divider);
+}
+:global(.dark) .editor :global(.tiptap:focus-visible) {
+  outline-color: var(--mui-palette-primary-main);
+}

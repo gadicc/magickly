@@ -2,6 +2,7 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import type { CSSProperties, ReactNode } from "react";
 import { inkClass } from "@/drawings/Ink";
+import { plateClass } from "@/drawings/plate";
 import {
   canonicalRole,
   parseRoleAssignment,
@@ -9,6 +10,19 @@ import {
 } from "../ritualRoles";
 import styles from "./frames.module.css";
 import type { RitualRolePresentation } from "./roles";
+
+/**
+ * A role name's colours as the variables `.roleColor` reads: its own in
+ * light, its lighter `darkColor` in dark (plan 076, step 5). Unset, the
+ * name inherits the bubble's text colour, as before.
+ */
+function roleColorStyle(role: RitualRolePresentation | undefined) {
+  if (!role?.color) return undefined;
+  return {
+    "--ritual-role": role.color,
+    "--ritual-role-dark": role.darkColor ?? role.color,
+  } as CSSProperties;
+}
 
 /** Formatting slots shared by JRT reading and editor-owned child DOM. */
 export function TaskFrame({
@@ -50,7 +64,10 @@ export function TaskFrame({
         mt: samePreviousRole ? -1 : 0,
         ml: audience === "self" ? 5 : 0,
         mr: audience === "other" ? 5 : 0,
-        background: audience === "self" ? "#d9fdd3" : undefined,
+        // Light: the bubble is the Paper's own white, as before.
+        bgcolor: audience === "self" ? "ritual.self" : "ritual.bubble",
+        // No dark elevation overlay: the bubbles are the chosen colours.
+        backgroundImage: "none",
         position: "relative",
       }}
     >
@@ -72,11 +89,10 @@ export function TaskFrame({
               ? individualRoles.map((entry, index) => (
                   <span
                     key={entry}
-                    style={{
-                      color: Object.hasOwn(roles, entry)
-                        ? roles[entry].color
-                        : undefined,
-                    }}
+                    className={styles.roleColor}
+                    style={roleColorStyle(
+                      Object.hasOwn(roles, entry) ? roles[entry] : undefined,
+                    )}
                   >
                     {index > 0 &&
                       (index === individualRoles.length - 1 ? " and " : ", ")}
@@ -125,7 +141,15 @@ export function TitleFrame({
   children: ReactNode;
 }) {
   return (
-    <Paper data-ritual-frame="title" sx={{ p: 1, mb: 1, background: "#fff" }}>
+    <Paper
+      data-ritual-frame="title"
+      sx={{
+        p: 1,
+        mb: 1,
+        bgcolor: "ritual.bubble",
+        backgroundImage: "none",
+      }}
+    >
       {anchor && <a id={anchor} />}
       <Typography
         variant="h5"
@@ -145,7 +169,13 @@ export function NoteFrame({ children }: { children: ReactNode }) {
     <Paper
       data-ritual-frame="note"
       className={`note ${styles.note}`}
-      sx={{ p: 1, mb: 1, mx: 2.5, background: "#f4f4f4" }}
+      sx={{
+        p: 1,
+        mb: 1,
+        mx: 2.5,
+        bgcolor: "ritual.note",
+        backgroundImage: "none",
+      }}
     >
       {children}
     </Paper>
@@ -279,7 +309,11 @@ export function FootnotesFrame({
   );
 }
 
-/** Receives an already-authorized reader URL or an editor-approved file locator. */
+/**
+ * Receives an already-authorized reader URL or an editor-approved file
+ * locator. In dark every image stands on a light plate (plan 076,
+ * decision 4): members' uploads may be drawn dark on transparent.
+ */
 export function ImageFrame({
   src,
   alt,
@@ -299,7 +333,7 @@ export function ImageFrame({
     // biome-ignore lint/performance/noImgElement: reader URLs and scoped editor file locators
     <img
       data-ritual-frame="img"
-      className={editing ? styles.editImage : undefined}
+      className={`${plateClass} ${styles.image}${editing ? ` ${styles.editImage}` : ""}`}
       src={src}
       alt={alt}
       width={width}

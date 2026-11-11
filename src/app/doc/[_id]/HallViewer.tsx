@@ -17,6 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
+import { DARK_SELECTOR } from "@/colorScheme";
 import { GdHallFrame } from "@/doc/ritualBlocks/GdHallFrame";
 import type { RitualHall } from "@/doc/ritualHalls";
 import { HallPanZoom } from "./HallPanZoom";
@@ -163,6 +164,7 @@ export function HallViewer({
           px: 1,
           py: 1,
           borderBottom: "1px solid #e0e0e0",
+          [DARK_SELECTOR]: { borderColor: "divider" },
         }}
       >
         <IconButton aria-label="Close" onClick={onClose}>
@@ -208,6 +210,7 @@ export function HallViewer({
           px: 1,
           py: 1.5,
           borderTop: "1px solid #e0e0e0",
+          [DARK_SELECTOR]: { borderColor: "divider" },
         }}
       >
         <IconButton
