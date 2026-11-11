@@ -157,6 +157,95 @@ describe("decide", () => {
     );
   });
 
+  // A pull request that bumps to a listed version would skip on main and
+  // never publish (plan 080, second stage A review).
+  it("fails a listed version when the version changed", async () => {
+    const { options } = harness([packument(["0.1.0-rc.0", "0.1.0"], "0.1.0")]);
+    const decision = await decide(manifest, { ...options, changed: true });
+    expect(decision).toMatchObject({
+      action: "fail",
+      cause: "rule",
+      published: true,
+    });
+    expect(decision.reason).toMatch(/already published/);
+  });
+
+  it("decides as usual for a changed version the registry lacks", async () => {
+    const { options } = harness([packument(["0.1.0-rc.0"], "0.1.0-rc.0")]);
+    expect(await decide(manifest, { ...options, changed: true })).toMatchObject(
+      { action: "publish", tag: "latest" },
+    );
+    const missing = harness([new Response(null, { status: 404 })]);
+    expect(
+      await decide(manifest, { ...missing.options, changed: true }),
+    ).toMatchObject({ action: "skip" });
+  });
+
+  describe("after npm refused to publish over the version", () => {
+    const published = (integrity?: string) =>
+      Response.json({
+        name: "magick-data",
+        "dist-tags": { latest: "0.1.0" },
+        versions: {
+          "0.1.0": {
+            version: "0.1.0",
+            ...(integrity && { dist: { integrity } }),
+          },
+        },
+      });
+    const strict = { expectPublished: true, sameContent: true };
+
+    it("skips when the registry has these very bytes", async () => {
+      const { options } = harness([published("sha512-same")]);
+      const decision = await decide(
+        { ...manifest, integrity: "sha512-same" },
+        { ...options, ...strict },
+      );
+      expect(decision).toMatchObject({ action: "skip", published: true });
+      expect(decision).not.toHaveProperty("warning");
+    });
+
+    it("fails when it has other bytes, or none it names", async () => {
+      for (const listed of ["sha512-other", undefined]) {
+        const { options } = harness([published(listed)]);
+        const decision = await decide(
+          { ...manifest, integrity: "sha512-same" },
+          { ...options, ...strict },
+        );
+        expect(decision).toMatchObject({
+          action: "fail",
+          cause: "rule",
+          published: true,
+        });
+        expect(decision.reason).toMatch(/not the bytes that were verified/);
+      }
+    });
+
+    it("fails without a tarball's integrity to compare", async () => {
+      const { options } = harness([published("sha512-same")]);
+      expect(
+        await decide(manifest, { ...options, sameContent: true }),
+      ).toMatchObject({ action: "fail", cause: "rule" });
+    });
+
+    it("fails when the version or the package is not listed", async () => {
+      const absent = harness([packument(["0.1.0-rc.0"], "0.1.0-rc.0")]);
+      const decision = await decide(
+        { ...manifest, integrity: "sha512-same" },
+        { ...absent.options, ...strict },
+      );
+      expect(decision).toMatchObject({ action: "fail", cause: "registry" });
+      expect(decision.reason).toMatch(/not listed/);
+      const missing = harness([new Response(null, { status: 404 })]);
+      expect(
+        await decide(
+          { ...manifest, integrity: "sha512-same" },
+          { ...missing.options, ...strict },
+        ),
+      ).toMatchObject({ action: "fail", cause: "registry" });
+    });
+  });
+
   it("publishes a release above latest under latest", async () => {
     const { options } = harness([packument(["0.1.0-rc.0"], "0.1.0-rc.0")]);
     expect(await decide(manifest, options)).toMatchObject({
@@ -506,11 +595,62 @@ describe("the command line", () => {
     expect(registryOnly.stdout).toMatch(/^::warning::.*answered 403/m);
   });
 
+  it("fails a pull request's bump to a listed version, advisory or not", async () => {
+    answers.set("/cli-g", [
+      200,
+      { "dist-tags": { latest: "0.1.0" }, versions: { "0.1.0": {} } },
+    ]);
+    const path = tarball("cli-g", "0.1.0");
+    expect((await run([path, "--advisory", "registry"])).code).toBe(0);
+    const changed = await run([path, "--changed", "--advisory", "registry"]);
+    expect(changed.code).toBe(1);
+    expect(changed.outputs).toMatchObject({
+      action: "fail",
+      published: "true",
+    });
+  });
+
+  it("checks what npm already has, as publish.yml does after a refusal", async () => {
+    const path = tarball("cli-h", "0.1.0");
+    const strict = [path, "--expect-published", "--same-content"];
+    answers.set("/cli-h", [
+      200,
+      {
+        "dist-tags": { latest: "0.1.0" },
+        versions: { "0.1.0": { dist: { integrity: integrityOf(path) } } },
+      },
+    ]);
+    const same = await run(strict);
+    expect(same.code).toBe(0);
+    expect(same.outputs).toMatchObject({ action: "skip", published: "true" });
+
+    answers.set("/cli-h", [
+      200,
+      {
+        "dist-tags": { latest: "0.1.0" },
+        versions: { "0.1.0": { dist: { integrity: "sha512-other" } } },
+      },
+    ]);
+    const other = await run(strict);
+    expect(other.code).toBe(1);
+    expect(other.stdout).toMatch(/not the bytes that were verified/);
+
+    answers.set("/cli-h", [
+      200,
+      { "dist-tags": { latest: "0.0.9" }, versions: { "0.0.9": {} } },
+    ]);
+    expect((await run(strict)).code).toBe(1);
+  });
+
   it("refuses a usage it does not know", async () => {
     expect((await run([])).code).toBe(1);
     expect(
       (await run(["--advisory", "some", tarball("x", "1.0.0")])).code,
     ).toBe(1);
     expect((await run(["a.tgz", "b.tgz"])).code).toBe(1);
+    const manifest = join(dir, "package.json");
+    writeFileSync(manifest, JSON.stringify({ name: "x", version: "1.0.0" }));
+    const sameContent = await run(["--manifest", manifest, "--same-content"]);
+    expect(sameContent.code).toBe(1);
   });
 });

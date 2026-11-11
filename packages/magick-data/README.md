@@ -354,47 +354,48 @@ the package publishes is below, by its source in `src/` (each is
 published as `magick-data/json/<path>.json`, beside its module and
 declaration), with where it comes from; the sections after the table name
 the works. A test holds the table to the files, so no data file ships
-without a row.
+without a row. "Signed off" is the date the owner checked the row's
+provenance, and no version past 0.0.0 ships while a row has none.
 
-| Data file | Source |
-| --- | --- |
-| `alchemy/elementals.json5` | [Correspondences](#correspondences) |
-| `alchemy/elements.json5` | [Correspondences](#correspondences) |
-| `alchemy/symbols.json5` | [Correspondences](#correspondences) |
-| `alchemy/terms.json5` | [Correspondences](#correspondences); the source of `terms` is not recorded |
-| `astrology/houses.json5` | [Correspondences](#correspondences); the source of `interpretation` is not recorded |
-| `astrology/planets.json5` | [Correspondences](#correspondences); `keyOfSolomon` from [the Key of Solomon](#the-key-of-solomon); the source of `magickTypes` is not known ([plan 039](https://github.com/gadicc/magickly/blob/main/plans/039-correspondence-tables.md)) |
-| `astrology/zodiac.json5` | [Correspondences](#correspondences) |
-| `body/parts.json5` | [Correspondences](#correspondences) |
-| `chakras.json5` | [Correspondences](#correspondences) of the seven-chakra system; the file cites Wikipedia's "Chakra" article |
-| `enochian/keys.json5` | [The Enochian Keys](#the-enochian-keys) |
-| `enochian/letters.json5` | [Correspondences](#correspondences); the source of `pronounciation` and `gematria` is not recorded |
-| `enochian/tabletNotes.json5` | Ours: notes on [the Enochian tablets](#the-enochian-tablets), citing their sources |
-| `enochian/tablets.json5` | [The Enochian tablets](#the-enochian-tablets) |
-| `gd/degrees.json5` | [Correspondences](#correspondences) |
-| `gd/grades.json5` | [Correspondences](#correspondences) |
-| `geomancy/houses.json5` | [Geomancy](#geomancy) |
-| `geomancy/tetragrams.json5` | [Geomancy](#geomancy) |
-| `hebrewLetters.json5` | [Correspondences](#correspondences) |
-| `kabbalah/angelicOrders.json5` | [Correspondences](#correspondences) |
-| `kabbalah/archangels.json5` | [Correspondences](#correspondences) |
-| `kabbalah/christianChoirs.json5` | [Lenain](#lenain): the nine choirs of Pseudo-Dionysius, in his order and with his French |
-| `kabbalah/fourWorlds.json5` | [Correspondences](#correspondences) |
-| `kabbalah/godNames.json5` | [Correspondences](#correspondences) |
-| `kabbalah/kerubim.json5` | [Correspondences](#correspondences) |
-| `kabbalah/lenain/apparatus.json5` | [Lenain](#lenain) |
-| `kabbalah/lenain/evidence.json5` | [Lenain](#lenain) |
-| `kabbalah/lenain/pages.json5` | [Lenain](#lenain) |
-| `kabbalah/paths.json5` | [Correspondences](#correspondences) |
-| `kabbalah/sephirot.json5` | [Correspondences](#correspondences) |
-| `kabbalah/seventyTwoAngels.json5` | [Lenain](#lenain) |
-| `kabbalah/seventyTwoAngelsText/en.json5` | [Lenain](#lenain) |
-| `kabbalah/seventyTwoAngelsText/fr.json5` | [Lenain](#lenain) |
-| `kabbalah/souls.json5` | [Correspondences](#correspondences) |
-| `kabbalah/tribesOfIsrael.json5` | [Correspondences](#correspondences) |
-| `materia/scents.json5` | [Correspondences](#correspondences) |
-| `materia/stones.json5` | [Correspondences](#correspondences) |
-| `graph.json` | Ours: how the tables link, built from `src/graph.ts` |
+| Data file | Source | Signed off |
+| --- | --- | --- |
+| `alchemy/elementals.json5` | [Correspondences](#correspondences) |  |
+| `alchemy/elements.json5` | [Correspondences](#correspondences) |  |
+| `alchemy/symbols.json5` | [Correspondences](#correspondences) |  |
+| `alchemy/terms.json5` | [Correspondences](#correspondences); the source of `terms` is not recorded |  |
+| `astrology/houses.json5` | [Correspondences](#correspondences); the source of `interpretation` is not recorded |  |
+| `astrology/planets.json5` | [Correspondences](#correspondences); `keyOfSolomon` from [the Key of Solomon](#the-key-of-solomon); the source of `magickTypes` is not known ([plan 039](https://github.com/gadicc/magickly/blob/main/plans/039-correspondence-tables.md)) |  |
+| `astrology/zodiac.json5` | [Correspondences](#correspondences) |  |
+| `body/parts.json5` | [Correspondences](#correspondences) |  |
+| `chakras.json5` | [Correspondences](#correspondences) of the seven-chakra system; the file cites Wikipedia's "Chakra" article |  |
+| `enochian/keys.json5` | [The Enochian Keys](#the-enochian-keys) |  |
+| `enochian/letters.json5` | [Correspondences](#correspondences); the source of `pronounciation` and `gematria` is not recorded |  |
+| `enochian/tabletNotes.json5` | Ours: notes on [the Enochian tablets](#the-enochian-tablets), citing their sources |  |
+| `enochian/tablets.json5` | [The Enochian tablets](#the-enochian-tablets) |  |
+| `gd/degrees.json5` | [Correspondences](#correspondences) |  |
+| `gd/grades.json5` | [Correspondences](#correspondences) |  |
+| `geomancy/houses.json5` | [Geomancy](#geomancy) |  |
+| `geomancy/tetragrams.json5` | [Geomancy](#geomancy) |  |
+| `hebrewLetters.json5` | [Correspondences](#correspondences) |  |
+| `kabbalah/angelicOrders.json5` | [Correspondences](#correspondences) |  |
+| `kabbalah/archangels.json5` | [Correspondences](#correspondences) |  |
+| `kabbalah/christianChoirs.json5` | [Lenain](#lenain): the nine choirs of Pseudo-Dionysius, in his order and with his French |  |
+| `kabbalah/fourWorlds.json5` | [Correspondences](#correspondences) |  |
+| `kabbalah/godNames.json5` | [Correspondences](#correspondences) |  |
+| `kabbalah/kerubim.json5` | [Correspondences](#correspondences) |  |
+| `kabbalah/lenain/apparatus.json5` | [Lenain](#lenain) |  |
+| `kabbalah/lenain/evidence.json5` | [Lenain](#lenain) |  |
+| `kabbalah/lenain/pages.json5` | [Lenain](#lenain) |  |
+| `kabbalah/paths.json5` | [Correspondences](#correspondences) |  |
+| `kabbalah/sephirot.json5` | [Correspondences](#correspondences) |  |
+| `kabbalah/seventyTwoAngels.json5` | [Lenain](#lenain) |  |
+| `kabbalah/seventyTwoAngelsText/en.json5` | [Lenain](#lenain) |  |
+| `kabbalah/seventyTwoAngelsText/fr.json5` | [Lenain](#lenain) |  |
+| `kabbalah/souls.json5` | [Correspondences](#correspondences) |  |
+| `kabbalah/tribesOfIsrael.json5` | [Correspondences](#correspondences) |  |
+| `materia/scents.json5` | [Correspondences](#correspondences) |  |
+| `materia/stones.json5` | [Correspondences](#correspondences) |  |
+| `graph.json` | Ours: how the tables link, built from `src/graph.ts` |  |
 
 ### Correspondences
 

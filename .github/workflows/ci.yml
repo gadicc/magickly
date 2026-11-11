@@ -62,7 +62,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      # On a pull request this checks out the merge commit; its first
+      # parent is the base branch it merges into, the version to compare.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 2
       # The Node and npm publish.yml uses; keep the version in step with it.
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
@@ -74,24 +78,26 @@ jobs:
           path: ${{ runner.temp }}/registry
       # Fatal only for what this change controls: on a pull request that
       # changes the package's version, a bump that is not above the
-      # registry's fails. The registry's own errors and state, and anything
-      # on a pull request that leaves the version alone, only warn.
+      # registry's, or names a version it already lists (--changed), fails.
+      # The registry's own errors and state, and anything on a pull request
+      # that leaves the version alone, only warn. The base is the merge
+      # commit's first parent, not the event's base.sha, which can be older.
       - name: Decide as publish.yml would
         id: decide
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          EVENT: ${{ github.event_name }}
         run: |
-          advisory=all
-          if [ -n "$BASE_SHA" ]; then
-            git fetch --no-tags --depth=1 origin "$BASE_SHA"
-            base="$(git show "$BASE_SHA:packages/magick-data/package.json" \
+          flags="--advisory all"
+          if [ "$EVENT" = pull_request ]; then
+            base="$(git show "HEAD^1:packages/magick-data/package.json" \
               | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).version')"
             head="$(node -p 'require("./packages/magick-data/package.json").version')"
             echo "magick-data $base on the base, $head here"
-            if [ "$base" != "$head" ]; then advisory=registry; fi
+            if [ "$base" != "$head" ]; then flags="--advisory registry --changed"; fi
           fi
+          # shellcheck disable=SC2086 # two flags, word-split on purpose
           node scripts/npm-publish-decision.mjs \
-            "$RUNNER_TEMP/registry/magick-data.tgz" --advisory "$advisory"
+            "$RUNNER_TEMP/registry/magick-data.tgz" $flags
       # npm refuses even a dry run of a version the registry lists, and of a
       # pre-release without --tag, so this takes the rule's tag and is
       # skipped once the version is published or the rule could not decide.

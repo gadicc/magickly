@@ -55,7 +55,7 @@ import { refusal } from "./prepublishGuard.mjs";
 import {
   publishedPathOf,
   readmeSources,
-  unsettledSources,
+  unsignedSources,
 } from "./readmeSources.mjs";
 
 const PACKAGE_DIR = fileURLToPath(new URL("..", import.meta.url));
@@ -182,10 +182,10 @@ try {
 
   step("no version past 0.0.0 before the provenance sign-off", () => {
     const readme = readFileSync(join(PACKAGE_DIR, "README.md"), "utf8");
-    const open = unsettledSources(readmeSources(readme));
+    const open = unsignedSources(readmeSources(readme));
     assert(
       sourceManifest.version === "0.0.0" || open.length === 0,
-      `version ${sourceManifest.version}, but Sources still has open rows: ${open
+      `version ${sourceManifest.version}, but Sources has rows not signed off: ${open
         .map((row) => row.file)
         .join(", ")}`,
     );
@@ -234,22 +234,33 @@ try {
     }
   });
 
-  step("the prepack guard refuses npm and lets pnpm pack", () => {
-    const guard = join(PACKAGE_DIR, "scripts", "prepublishGuard.mjs");
-    const pack = (userAgent) =>
-      run(process.execPath, [guard, "--pack"], {
-        cwd: PACKAGE_DIR,
-        env: { ...process.env, npm_config_user_agent: userAgent },
-        allowFailure: true,
-      });
-    const npm = pack("npm/11.18.0 node/v24.18.0 linux x64 workspaces/false");
-    assert(
-      npm.status === 1 && npm.output.includes("Refusing to pack"),
-      `the guard let npm pack\n${npm.output}`,
-    );
-    const pnpm = pack("pnpm/11.28.2 npm/? node/v24.18.0 linux x64");
-    assert(pnpm.status === 0, `the guard refused pnpm\n${pnpm.output}`);
-  });
+  // By npm_execpath, which each package manager sets afresh; npm passes on
+  // an inherited pnpm user agent (plan 080, second stage A review).
+  step(
+    "the prepack guard refuses npm, even under pnpm, and lets pnpm pack",
+    () => {
+      const guard = join(PACKAGE_DIR, "scripts", "prepublishGuard.mjs");
+      const pnpmAgent = "pnpm/11.28.2 npm/? node/v24.18.0 linux x64";
+      const npmCli = "/usr/lib/node_modules/npm/bin/npm-cli.js";
+      const pack = (npm_execpath, npm_config_user_agent) =>
+        run(process.execPath, [guard, "--pack"], {
+          cwd: PACKAGE_DIR,
+          env: { ...process.env, npm_execpath, npm_config_user_agent },
+          allowFailure: true,
+        });
+      for (const [what, result] of [
+        ["npm", pack(npmCli, "npm/11.18.0 node/v24.18.0 linux x64")],
+        ["npm with pnpm's user agent", pack(npmCli, pnpmAgent)],
+        ["no npm_execpath", pack("", pnpmAgent)],
+      ])
+        assert(
+          result.status === 1 && result.output.includes("Refusing to pack"),
+          `the guard let ${what} pack\n${result.output}`,
+        );
+      const pnpm = pack("/opt/pnpm/bin/pnpm.cjs", pnpmAgent);
+      assert(pnpm.status === 0, `the guard refused pnpm\n${pnpm.output}`);
+    },
+  );
 
   step("the prepublishOnly guard refuses the source, not the tarball", () => {
     const guard = join(PACKAGE_DIR, "scripts", "prepublishGuard.mjs");

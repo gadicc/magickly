@@ -17,7 +17,17 @@ import { parseArgs } from "node:util";
  *   or a push that does not bump the version does nothing. When the caller
  *   gives the tarball's integrity and it differs from the registry's for
  *   that version, the decision carries a warning: the content changed
- *   without a bump.
+ *   without a bump. Three options make a listed version stricter:
+ *   - `changed`, for a pull request that changes the version: a listed
+ *     version **fails**, since the bump names one that is taken, and on
+ *     `main` it would skip and never publish;
+ *   - `sameContent`, where the tarball is about to be published: a listed
+ *     version **fails** unless the registry's integrity for it is the
+ *     tarball's, so different bytes under that version are not passed
+ *     over with a warning;
+ *   - `expectPublished`, after npm refused to publish over the version: an
+ *     absent version (or package) **fails**, since npm's refusal says it
+ *     is there.
  * - 200, the version is absent and greater than `dist-tags.latest` (or there
  *   is no `latest`), and for a pre-release greater than `dist-tags.next` as
  *   well (or there is no `next`): **publish**.
@@ -41,7 +51,9 @@ import { parseArgs } from "node:util";
  * The registry's CDN caches a packument for up to five minutes, so a re-run
  * soon after a publish can decide "publish" for a version npm then refuses
  * ("cannot publish over the previously published versions"). That fails
- * safe; publish.yml treats that refusal as a skip.
+ * safe. publish.yml then decides again with `expectPublished` and
+ * `sameContent`: the verified bytes already published are a skip with a
+ * warning; anything else fails.
  *
  * `npm view` is not used: it exits 1 with E404 both for a missing package and
  * for a missing version.
@@ -123,6 +135,12 @@ export function compareVersions(a, b) {
  * @property {string} [registry] The registry's base URL; the public one by
  *   default.
  * @property {boolean} [expectExists] A 404 fails instead of skipping.
+ * @property {boolean} [changed] The version is a pull request's bump: a
+ *   listed version fails instead of skipping.
+ * @property {boolean} [sameContent] A listed version fails unless its
+ *   registry integrity is `integrity`, which must then be given.
+ * @property {boolean} [expectPublished] The version must be listed: a 404
+ *   or an absent version fails.
  */
 
 /**
@@ -198,7 +216,7 @@ export async function decide({ name, version, integrity }, options = {}) {
   }
 
   if (status === 404)
-    return options.expectExists
+    return options.expectExists || options.expectPublished
       ? fail(
           "registry",
           `${name} is not on the registry, which should have it; failing`,
@@ -226,6 +244,22 @@ export async function decide({ name, version, integrity }, options = {}) {
 
   if (Object.hasOwn(packument.versions, version)) {
     const listed = packument.versions[version]?.dist?.integrity;
+    if (options.changed)
+      return {
+        ...fail(
+          "rule",
+          "already published, so a bump to it can never publish; choose a version the registry does not list",
+        ),
+        published: true,
+      };
+    if (options.sameContent && (!integrity || listed !== integrity))
+      return {
+        ...fail(
+          "rule",
+          `published with integrity ${listed ?? "unknown"}, but this tarball's is ${integrity ?? "unknown"}: not the bytes that were verified`,
+        ),
+        published: true,
+      };
     const decision = {
       action: "skip",
       tag,
@@ -236,6 +270,12 @@ export async function decide({ name, version, integrity }, options = {}) {
       decision.warning = `${label} is published with integrity ${listed}, but this tarball's is ${integrity}: its content changed without a version bump`;
     return decision;
   }
+
+  if (options.expectPublished)
+    return fail(
+      "registry",
+      "not listed, though it should be; the registry's cache may be up to five minutes old",
+    );
 
   const distTags = packument["dist-tags"] ?? {};
   // A release is compared with latest; a pre-release with next as well, so
@@ -285,7 +325,9 @@ export function integrityOf(path) {
 }
 
 const USAGE = `Usage: npm-publish-decision.mjs (<tarball> | --manifest <package.json>)
-  [--expect-exists] [--advisory registry|all] [--registry <url>]`;
+  [--expect-exists] [--changed] [--same-content] [--expect-published]
+  [--advisory registry|all] [--registry <url>]
+--same-content needs a tarball.`;
 
 /**
  * The command line, for CI. Reads the name and version from the tarball
@@ -295,7 +337,9 @@ const USAGE = `Usage: npm-publish-decision.mjs (<tarball> | --manifest <package.
  * `tag`, `name` and `version` to the step's outputs; ci.yml and
  * publish.yml read them. Exits 1 when the rule fails, unless `--advisory`
  * covers the failure's cause: `registry` for what the registry says, `all`
- * for any failure. Then it warns instead.
+ * for any failure. Then it warns instead. `--changed`, `--same-content`
+ * and `--expect-published` are {@link DecideOptions}' `changed`,
+ * `sameContent` and `expectPublished`.
  *
  * Its tests run it as CI does, against a local registry (`--registry`).
  *
@@ -316,6 +360,9 @@ export async function main(argv, env = process.env) {
       options: {
         manifest: { type: "string" },
         "expect-exists": { type: "boolean", default: false },
+        changed: { type: "boolean", default: false },
+        "same-content": { type: "boolean", default: false },
+        "expect-published": { type: "boolean", default: false },
         advisory: { type: "string" },
         registry: { type: "string" },
       },
@@ -325,7 +372,8 @@ export async function main(argv, env = process.env) {
       positionals.length > 1 ||
       (tarball === undefined) === (values.manifest === undefined) ||
       (values.advisory !== undefined &&
-        !["registry", "all"].includes(values.advisory))
+        !["registry", "all"].includes(values.advisory)) ||
+      (values["same-content"] && tarball === undefined)
     )
       throw new Error(USAGE);
     const { name, version } = tarball
@@ -335,7 +383,13 @@ export async function main(argv, env = process.env) {
     if (integrity) log(`tarball: ${name}@${version} ${integrity}`);
     const decision = await decide(
       { name, version, integrity },
-      { registry: values.registry, expectExists: values["expect-exists"] },
+      {
+        registry: values.registry,
+        expectExists: values["expect-exists"],
+        changed: values.changed,
+        sameContent: values["same-content"],
+        expectPublished: values["expect-published"],
+      },
     );
     log(`${decision.action}: ${decision.reason}`);
     if (decision.warning) log(annotate("warning", decision.warning));

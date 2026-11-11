@@ -129,7 +129,11 @@ jobs:
           name: magick-data-publish
           path: ${{ runner.temp }}/magick-data.tgz
           if-no-files-found: error
-          retention-days: 1
+          # Re-run all jobs replaces it; re-running only publish, once the
+          # trusted publisher is configured again (up to two days after a
+          # lapsed one, plan 080 A′ step 7), still finds it.
+          retention-days: 3
+          overwrite: true
 
   publish:
     needs: [decide, quality, build]
@@ -173,13 +177,17 @@ jobs:
           INTEGRITY: ${{ needs.build.outputs.integrity }}
         run: |
           echo "$SHA256  $RUNNER_TEMP/publish/magick-data.tgz" | sha256sum -c -
-          echo "integrity $INTEGRITY"
-      # A fresh registry read: something may have changed since decide.
+          integrity="sha512-$(openssl dgst -sha512 -binary "$RUNNER_TEMP/publish/magick-data.tgz" | base64 -w0)"
+          echo "integrity $integrity"
+          test "$integrity" = "$INTEGRITY"
+      # A fresh registry read: something may have changed since decide. A
+      # version published meanwhile must be these very bytes (--same-content),
+      # or this fails rather than skipping with a warning.
       - name: Decide again
         id: decide
         run: >-
           node scripts/npm-publish-decision.mjs
-          "$RUNNER_TEMP/publish/magick-data.tgz" $DECISION_FLAGS
+          "$RUNNER_TEMP/publish/magick-data.tgz" --same-content $DECISION_FLAGS
       - name: Check it is the version decided
         env:
           DECIDED: ${{ needs.decide.outputs.version }}
@@ -188,13 +196,16 @@ jobs:
       # Verbose, since npm reports a failed OIDC exchange only at that level
       # and otherwise says ENEEDAUTH. The registry's CDN caches a packument
       # for up to five minutes, so a re-run soon after a publish can reach
-      # here for a version npm has; its refusal publishes nothing, and is a
-      # skip rather than a failure.
+      # here for a version npm has. Its refusal publishes nothing; a fresh
+      # read then says what npm has: this tarball's integrity is a skip with
+      # a warning, anything else (other bytes, or a version still not
+      # listed) fails.
       - name: Publish with provenance
         if: steps.decide.outputs.publish == 'true'
         env:
           TAG: ${{ steps.decide.outputs.tag }}
           VERSION: ${{ steps.decide.outputs.version }}
+          INTEGRITY: ${{ needs.build.outputs.integrity }}
         run: |
           set +e
           npm publish "$RUNNER_TEMP/publish/magick-data.tgz" \
@@ -203,7 +214,15 @@ jobs:
           status="${PIPESTATUS[0]}"
           if [ "$status" -ne 0 ] &&
             grep -q "cannot publish over the previously published versions" "$RUNNER_TEMP/npm-publish.log"; then
-            echo "::warning::npm already has magick-data@$VERSION; nothing was published"
-            exit 0
+            echo "npm refused: it has magick-data@$VERSION. Checking what it has."
+            # shellcheck disable=SC2086 # flags, word-split on purpose
+            if GITHUB_OUTPUT= node scripts/npm-publish-decision.mjs \
+              "$RUNNER_TEMP/publish/magick-data.tgz" \
+              --expect-published --same-content $DECISION_FLAGS; then
+              echo "::warning::npm already has magick-data@$VERSION, with this tarball's integrity ($INTEGRITY); nothing was published"
+              exit 0
+            fi
+            echo "::error::npm refused magick-data@$VERSION, and the registry does not list it with this tarball's integrity ($INTEGRITY); the decision above says why"
+            exit 1
           fi
           exit "$status"

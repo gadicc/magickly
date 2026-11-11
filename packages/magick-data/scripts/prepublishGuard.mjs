@@ -19,8 +19,15 @@
  * That left a way round it: `npm pack` packs the source manifest as it is,
  * `exports` into `./src/` and all, and `npm publish` of that tarball runs
  * no script. So the same file, run with `--pack` as the `prepack` script,
- * refuses to pack under anything but pnpm (`npm_config_user_agent`, which
- * both set for a lifecycle script, starts `pnpm/` under pnpm only).
+ * refuses to pack under anything but pnpm.
+ *
+ * It asks `npm_execpath`, which every run of a script sets afresh to the
+ * package manager running it: npm to its own `npm-cli.js`, pnpm to its
+ * `pnpm` binary (or `pnpm.cjs`). `npm_config_user_agent` is not enough on
+ * its own: npm passes on one it inherits, so npm run under pnpm (`pnpm exec
+ * npm pack`, or any shell a pnpm script started) looked like pnpm (plan
+ * 080, second stage A review). The guard wants both to say pnpm, and
+ * refuses when either is missing. `pnpm install` never runs `prepack`.
  *
  * `--ignore-scripts` skips both guards; don't.
  */
@@ -56,13 +63,27 @@ export function refusal(manifest) {
   ].join("\n");
 }
 
+/** The basename of pnpm's own executable, as `npm_execpath` names it. */
+const PNPM = /^pnpm(\.[cm]?js|\.exe)?$/i;
+
 /**
- * Why the package must not be packed by the tool whose user agent this is,
- * or `undefined` if it may be: only pnpm applies `publishConfig.exports`.
+ * Why the package must not be packed by the package manager running this
+ * script, or `undefined` if it may be: only pnpm applies
+ * `publishConfig.exports`. `env` is the script's environment; only
+ * `npm_execpath` and `npm_config_user_agent` are read.
+ *
+ * @param {Record<string, string | undefined>} env
  */
-export function packRefusal(userAgent) {
-  if (userAgent?.startsWith("pnpm/")) return undefined;
-  const tool = userAgent?.split(" ")[0] || "an unknown tool";
+export function packRefusal(env) {
+  const execpath = env.npm_execpath ?? "";
+  const userAgent = env.npm_config_user_agent ?? "";
+  const runner = execpath.split(/[\\/]/).pop() ?? "";
+  if (PNPM.test(runner) && userAgent.startsWith("pnpm/")) return undefined;
+  const tool = !execpath
+    ? "an unknown tool (npm_execpath is not set)"
+    : runner === "npm-cli.js"
+      ? `npm (${execpath})`
+      : execpath;
   return [
     `Refusing to pack magick-data with ${tool}: only pnpm pack swaps its`,
     "exports for publishConfig.exports, and this tarball's would point into",
@@ -79,7 +100,7 @@ if (
   // npm and pnpm name the manifest they are publishing; a lifecycle script
   // runs in the package's directory either way.
   const message = process.argv.includes("--pack")
-    ? packRefusal(process.env.npm_config_user_agent)
+    ? packRefusal(process.env)
     : refusal(
         JSON.parse(
           readFileSync(

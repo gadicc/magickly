@@ -1,11 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import {
-  readmeSources,
-  UNSETTLED,
-  unsettledSources,
-} from "../scripts/readmeSources.mjs";
+import { readmeSources, unsignedSources } from "../scripts/readmeSources.mjs";
 import data from "./data.ts";
 import { type TableName, tables } from "./tables.ts";
 
@@ -193,26 +189,56 @@ describe("README's Sources", () => {
 });
 
 /**
- * The provenance sign-off, enforced (plan 080, stage A review, M3): no
- * version past 0.0.0 ships while a Sources row says its source is not
- * recorded or not known.
+ * The provenance sign-off, enforced (plan 080, stage A review, M3, and the
+ * second review): each Sources row carries the date the owner signed it
+ * off, and no version past 0.0.0 ships while one is empty. A date, not a
+ * phrase in the source, so rewording a row cannot pass it.
  */
 describe("the provenance sign-off", () => {
-  it("is settled before the version leaves 0.0.0", () => {
-    const open = unsettledSources(readmeSources(README)).map((row) => row.file);
+  it("is complete before the version leaves 0.0.0", () => {
+    const open = unsignedSources(readmeSources(README)).map((row) => row.file);
     expect(pkg.version === "0.0.0" ? [] : open).toEqual([]);
   });
 
-  it("finds each unsettled phrase, whatever its case", () => {
-    expect(UNSETTLED).toEqual(["not recorded", "not known"]);
-    const rows = [
-      { file: "a.json5", source: "Ours" },
-      { file: "b.json5", source: "the source of `x` is not recorded" },
-      { file: "c.json5", source: "Not known (plan 039)" },
-    ];
-    expect(unsettledSources(rows).map((row) => row.file)).toEqual([
-      "b.json5",
-      "c.json5",
+  const table = (...rows: string[]) =>
+    [
+      "## Sources",
+      "",
+      "| Data file | Source | Signed off |",
+      "| --- | --- | --- |",
+      ...rows,
+      "",
+    ].join("\n");
+
+  it("reads each row's sign-off, a date or nothing", () => {
+    const rows = readmeSources(
+      table(
+        "| `a.json5` | Ours | 2026-11-20 |",
+        "| `b.json5` | Not known |  |",
+      ),
+    );
+    expect(rows).toEqual([
+      { file: "a.json5", source: "Ours", signedOff: "2026-11-20" },
+      { file: "b.json5", source: "Not known", signedOff: "" },
     ]);
+    expect(unsignedSources(rows).map((row) => row.file)).toEqual(["b.json5"]);
+  });
+
+  it("refuses a sign-off that is not a date", () => {
+    for (const signedOff of ["yes", "20 November 2026", "2026-02-30", "x"])
+      expect(() =>
+        readmeSources(table(`| \`a.json5\` | Ours | ${signedOff} |`)),
+      ).toThrow(/must be a date/);
+  });
+
+  it("refuses a table without the column", () => {
+    expect(() =>
+      readmeSources(
+        "## Sources\n\n| Data file | Source |\n| --- | --- |\n| `a.json5` | Ours |\n",
+      ),
+    ).toThrow(/unexpected Sources header/);
+    expect(() => readmeSources(table("| `a.json5` | Ours |"))).toThrow(
+      /malformed row/,
+    );
   });
 });
