@@ -188,6 +188,14 @@ Follow-ups are separate from the completed migration work:
   and every commit passed the CI-equivalent gate. TODOs in the plan's
   follow-ups (account-wide choice, dark help screenshots, PWA splash);
   Safari and iOS are unverified (no device).
+- 11 November 2026: FrankRuehl CLM, which is plain GPL-2, replaced by
+  Frank Ruhl Libre (SIL OFL 1.1) in [plan 079](079-frank-ruhl-libre.md):
+  the Hebrew text font is one self-hosted variable subset with an added
+  upper dot (U+05C4) for Lenain and the angels' pointed names, and the
+  halls' Hebrew is Frank Ruhl Libre Bold, which moves every hall image's
+  identity (profile v2). Built on `gate/frank-ruhl-libre`. TODO: the
+  double precache of the text font and a doubled dagesh in one angel
+  name ([plan 079](079-frank-ruhl-libre.md#follow-ups)); Safari unchecked.
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose

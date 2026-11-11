@@ -15,8 +15,9 @@ centred over each letter: across from the letter's below-vowel anchor
 both of which vary with weight. A letter without those anchors (the final
 forms, which never carry the dot in our texts) takes its ink centre at
 holam's height. The glyphs `ccmp` composes from a letter and its points
-(lamed with dagesh, shin with its dot...) take their letter's anchor. public/fonts/FrankRuhlLibre-OFL.txt, the licence, comes
-from scripts/gd-hall-fonts/build.py, which uses the same source.
+(lamed with dagesh, shin with its dot...) take their letter's anchor.
+public/fonts/FrankRuhlLibre-OFL.txt, the licence, comes from
+scripts/gd-hall-fonts/build.py, which uses the same source.
 
 Run from the repository root:
 
@@ -235,9 +236,9 @@ def subset_font(font: TTFont) -> TTFont:
     return font
 
 
-# What the texts put the dot on, bare and with the points `ccmp` composes
-# into one glyph: dagesh (once, and twice as one name has it), qamats,
-# holam on vav, shin dot.
+# The texts dot alef, yod and lamed, bare or with dagesh (once, and twice
+# as one name has it); the rest cover the other kinds of glyph `ccmp`
+# composes (qamats on alef, holam on vav, shin dot) and two more letters.
 DOTTED = ["א", "י", "ל", "ש", "ב", "ל\u05BC", "ל\u05BC\u05BC", "א\u05BC",
           "י\u05BC", "א\u05B8", "ו\u05B9", "ש\u05C1"]
 

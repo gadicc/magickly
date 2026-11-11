@@ -169,4 +169,52 @@ halls' Hebrew is now Frank Ruhl Libre Bold.
   precaches the new files and none of CLM's.
 - Text: the Lenain reader (chapter 6), an angel page (Lelahel) and the
   Theoricus ritual, before (live site) and after (dev server).
+- Text: every dotted cluster in the data shapes with the dot where it sits
+  on the bare letter, with and without `lang="he"`; undotted text shapes as
+  it did before the dot was added. The reader and Lelahel were shot again
+  after the fix below.
 - Safari: not checked (no device).
+
+## Review
+
+A Fable review of the branch (11 November) found the upper dot fell on
+lamed's ascender wherever the letter carries a dagesh and the text is
+tagged Hebrew: `ccmp` composes those into one glyph, which the first
+build gave no anchor, and its check shaped untagged text. Fixed in
+`24ec0a40`; a second look at that commit found nothing more. Its smaller
+findings (features list, U+0592 count, the OFL notice's footer, the
+trial's weight range) were fixed with it.
+
+## Follow-ups
+
+- `public/fonts/FrankRuhlLibre-Hebrew.woff2` is precached twice: the root
+  layout's import bundles it into `_next/static/media`, and the
+  service worker also precaches all of `public/` (14 KB; CLM did the
+  same). Moving the stylesheet and font out of `public/` would end it.
+- One angel name has a doubled dagesh (`05DC 05BC 05BC 05C4`), in
+  `packages/magick-data/src/kabbalah/seventyTwoAngels.json5` and Lenain's
+  `apparatus.json5`; probably a data slip, to check against the scan.
+
+## Commits
+
+| Commit | What |
+| --- | --- |
+| `f59e33f4` | This plan |
+| `21800693` | The halls' Hebrew in Frank Ruhl Libre Bold (decisions 3–5) |
+| `bb372996` | The Hebrew text font with the added upper dot; CLM removed (decisions 1–2) |
+| `24ec0a40` | The upper dot on composed letters; the review's smaller fixes |
+
+Each was gated in a clean worktree (Node 24.21.0, CI's placeholder
+environment): install, `loom init` clean, `loom check` and `--production`,
+`pnpm check`, typecheck, coverage and build; for the last two also the
+data package's smoke test, the Turbopack check and the built service
+worker's precache list (Frank Ruhl Libre in, CLM out). All passed (8,042
+tests). `21800693`'s first coverage run had 8 timeouts in unrelated tests
+(SQL import, the hall editor, the dictionary's interaction tests) at a
+load average of 27; its rerun passed. On 11 November the branch was
+rebased onto `main` with dark mode ([plan 076](076-dark-mode.md)) and every
+code commit gated again (8,086 tests); `bb372996`'s first coverage run had
+5 timeouts in the same kind of unrelated tests at a load average of 54, and
+its rerun passed. The Lenain reader, Lelahel and the hall editor's banners
+were checked in dark as well as light: the text takes dark mode's colours,
+and the halls keep their light plate, as plan 076 has them.
