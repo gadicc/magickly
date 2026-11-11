@@ -1,10 +1,10 @@
 # Dark mode — 11 November 2026
 
 Status: decisions settled with Gadi on 10 November 2026 (all four
-recommendations below); spiked 10–11 November 2026; reviewed
-adversarially by Fable on 11 November 2026 (see "Review"); **not
-built**.
-Implementation waits for Gadi's go-ahead. Read
+recommendations below), and the ritual reader's colours on 11 November;
+spiked 10–11 November 2026; the design reviewed adversarially by Fable
+on 11 November 2026 (see "Review"); **built on 11 November 2026** on
+`gate/dark-mode` (see "Build" and "Commits"). Read
 [current status](000-current-status.md) first. The Enochian dictionary
 revamp ([plan 074](074-enochian-dictionary-search.md)) found that the app
 has no dark mode; Gadi asked for it to be planned on its own.
@@ -64,11 +64,21 @@ has no dark mode; Gadi asked for it to be planned on its own.
    | --- | --- | --- | --- |
    | `ink` | `#000` | `#d6dae0` | re-inked diagram lines (decision 4) |
    | `plate` | `transparent` | `#f3f0e8` | light card behind "document" drawings |
-   | `ritual.surface` | `#efeae2` | `#1a1f29` (placeholder) | reader and visual editor background |
-   | `ritual.self` | `#d9fdd3` | `#1f3a2c` (placeholder) | the reader's own speech bubble |
+   | `ritual.surface` | `#efeae2` | `#0f141d` | reader and visual editor background |
+   | `ritual.bubble` | `#fff` | `#1b2333` | speech bubbles and the title card |
+   | `ritual.self` | `#d9fdd3` | `#1f3a2c` | the reader's own speech bubble |
+   | `ritual.note` | `#f4f4f4` | `#141a24` | notes |
 
-   The two ritual values are placeholders until step 5, which starts with
-   a mock-up for Gadi to choose from. The `#60a5fa` info-`Alert` override
+   The ritual values are the "Midnight" option Gadi chose from three
+   mock-ups on 11 November 2026 (sheets `dm8`–`dm10`). Role names keep
+   their light colours and get a lighter shade of the same hue in dark
+   (`darkColor` in `src/doc/ritualBlocks/roles.tsx`): Imperator and
+   Hierophant `#ff7a7a`, Praemonstrator `#8ab4f8`, Hiereus `#e4e8ef`,
+   Cancellarius `#e6c34a`, Keryx and Psaltis `#ee8f8f`, Stolistes
+   `#a3a6ff`, Sentinel `#a6adb8`, Chief Adept `#e0b24a`, Second Adept
+   `#ff9d55`, Third Adept `#62c962`. The browser toolbar's dark colour is
+   `#303e58`, what `AppBar.darkBg` renders under MUI's elevation
+   overlay. The `#60a5fa` info-`Alert` override
    stays the base style and gets a dark override with
    `theme.applyStyles("dark", …)` (a light-only rule would need the class,
    so it would fail with JavaScript off).
@@ -271,6 +281,100 @@ reading the palette or the mode today, export safety apart from
 markers, the service worker, the single `<html>` root, and
 `themeColor`'s media form.
 
+## Build (11 November 2026)
+
+Six gated commits, one per step, then the final review's fixes (see
+"Commits"). Implementation ran in Opus subagents (medium for steps 1, 2,
+4 and 6; high for 3 and 5) from briefs written from this plan; steps 4
+and 5, which touch separate files, ran at once in two worktrees.
+
+**How each step was checked.** Tools kept outside the repository with
+the session's notes (they hold no app code):
+
+- *Light parity:* full-page screenshots of the page set below (29 public
+  pages at 390 and 1280 px, plus the open drawer) from a `main`
+  production build (`0ef4e33f`), headless Chromium over CDP, with a fixed
+  clock and `Math.random`, UTC, all origin storage and the HTTP cache
+  cleared before each page, images and fonts awaited, and a pixel compare
+  at 1 % fuzz. Large photo tiles sometimes paint late under load, so a
+  differing page is recaptured up to twice; the few that still differed
+  were checked by eye (always a missing photo tile).
+- *Exports and server images:* sha256 of the `/api/render/*`,
+  `/api/treeOfLife`, OG card and hall image routes, and of the `outerHTML`
+  of every drawing `<svg>` on the seven export pages in light and dark,
+  against `main`. React `useId` values (`_r_x_`) are normalised: they
+  shift whenever the root layout's component tree changes (step 1 added
+  components there), which changes nothing in a drawing. With that, every
+  route byte and every drawing's markup matched `main` at steps 2, 3, 5
+  and 6.
+- *No flash:* first paint with every external script blocked, in each
+  system/stored combination; then no console errors on 33 dark pages.
+- *Print:* `Page.printToPDF` fires `beforeprint`/`afterprint` in headless
+  Chromium; pages printed from dark came out light (mean brightness
+  0.93–0.97) and returned to dark.
+- *Site-search prose:* `prose.json` byte-identical at every step.
+- *The CI-equivalent gate* (frozen install, `loom check` and
+  `--production`, biome, typecheck, magick-data smoke, `test:coverage`,
+  the webpack and Turbopack builds) in a fresh worktree on /home with
+  Node 24, for every commit.
+
+**What the build changed from the plan:**
+
+- The `Alert`'s dark override landed in step 1, not step 2.
+- `DARK_SELECTOR` (`".dark &"`, `src/colorScheme.ts`) lets server
+  components write dark `sx` rules, since they cannot pass
+  `theme.applyStyles` functions to client components. `applyStyles`
+  emits `:where(.dark) &`, with no specificity.
+- Drawings are re-inked through `src/drawings/` (`Ink`, a `display:
+  contents` span, `inkClass` for an existing wrapper, and `plateClass`),
+  all outside the `<svg>`. `treeOfLifeFigure.tsx` needed nothing: it is
+  drawn only inside hall art, on the hall's white paper. The lamen ring
+  and Malkuth's quarters need `!important` (inline styles). The geomancy
+  reference and reading pages' pinned HTML digests were re-pinned for the
+  wrappers; the old digests reproduce without them.
+- The hall editor's panel CSS (`gdHallEditor.module.css`) was done in
+  step 4. The source editor (CodeMirror, also on `/gd/halls/editor`)
+  swaps a dark theme and One Dark highlighting in a compartment.
+- `MyAppBar.tsx` imports the switch through the `@/` alias: `/chat`
+  imports from `MyAppBar` relatively, and the prose extractor follows
+  relative imports, so a relative import put "Theme" into `/chat`'s
+  search prose.
+- The gate caught one bug the step's own checks missed: `Typography`'s
+  `color="text.secondary"` on the switch's caption, which MUI 9 ignores
+  (`src/muiColorProps.test.ts`); fixed in step 6's commit. Two gates
+  failed on 5-second test timeouts while another job loaded the machine
+  and passed on a rerun.
+
+**Final review.** Fable reviewed the whole branch adversarially on
+11 November 2026: no blocker; one major, five minors, all fixed in the
+review commit:
+
+- *Major:* the plate's padding came out of small ritual images
+  (`border-box`), so the 2=9 ritual's 1em inline image vanished in dark.
+  Images now get the plate as a ring (`box-shadow`) that takes none of
+  their size.
+- With `localStorage` blocked, MUI's script sets no class and the page
+  painted light, then dark; a small inline fallback now sets the class
+  from `matchMedia`.
+- The dark toolbar colour is the bar's rendered `#303e58`; the nav menu's
+  current page is `#ff7a7a` (4.67:1 on the menu's real `#323843`).
+- Tests: `ThemeColorMeta` now reads the `media` attribute (jsdom has no
+  `media` property, so the old test passed on an expando); new tests for
+  `PrintInLight` and that each `ink.module.css` rule still matches its
+  drawing.
+- The switch's group is labelled by its visible caption.
+
+Claims the review tried and failed to refute: the re-pinned digests'
+stated reasons; export and server-image safety; the theme-colour metas
+across navigation, reload and a device change; no flash in the editor;
+the drawer closing on links and Esc but not on the switch; the info
+`Alert` in both schemes.
+
+**Not verified:** Safari and iOS (no device), the installed app in
+standalone mode, a printer (only `printToPDF`), the service worker at
+runtime, and signed-in screens beyond the reader and both editors
+(temples administration, chat with messages).
+
 ## Inventory of hard-coded colours
 
 Counts from a repository sweep on 10 November 2026: about 38 files of
@@ -381,11 +485,11 @@ Life image.
 
 `scripts/docs-screenshots` captures stay light (decision 5). Step 1 makes
 the capture set `prefers-color-scheme: light` and clear `mui-mode`, so a
-capture on a machine set to dark still produces light images. Steps 2,
-5 and 6 change screens the help pages show (the bar and drawer, the
-reader and editors), so per AGENTS.md they regenerate the images with
-`/usr/local/bin/magickli-docs-capture`, inspect them, and commit only
-real differences.
+capture on a machine set to dark still produces light images. Light
+mode came out pixel-identical on every screen the help pages show (the
+bar, the reader and both editors; no shot opens the drawer, the one
+light screen that changed), so the images do not change; the capture
+was rerun on the final tree to confirm (see "Build").
 
 ## Follow-ups
 
@@ -398,7 +502,34 @@ real differences.
   (`#ccc`) and Hegemon (`#aaa`) role names on white.
 - TODO: a dark `background_color` for the PWA splash, which the manifest
   cannot vary by scheme.
+- TODO: when the reader's choice is the opposite of the device's, the
+  browser toolbar shows the device's colour until hydration (the
+  theme-color effect runs on the client).
+- TODO: the switch's roving tab stop starts on Light even when another
+  option is pressed (MUI `ToggleButtonGroup`); arrows, Space and Enter
+  work.
+- TODO: low contrast that predates dark mode: the reader's page numbers
+  (2.3:1 on bubbles in dark, 1.4:1 in light).
+- TODO: `chat.module.css` and `RitualSourceEditor.tsx`'s dark theme copy
+  Midnight's hex values; read the palette variables if Midnight is
+  retuned.
+- TODO: the colour-scheme guard test catches `palette.mode` and
+  `useColorScheme` only; a render reading `prefers-color-scheme`,
+  `mui-mode`, the `<html>` class or `theme.palette.*` would pass it.
+- TODO (predates this plan): `/gd/symbols/shewbread` logs a hydration
+  attribute mismatch in development in both schemes (trigonometry rounds
+  differently in Node and Chrome).
 
 ## Commits
 
-None yet.
+| Commit | Change |
+| --- | --- |
+| 86a0c9ac | The plan |
+| d9a93490 | Step 1: the dark scheme and tokens, still off; print stays light |
+| ff6c2d08 | Step 2: the app bar, drawer, footer and home tiles |
+| 70c905f4 | Step 3: drawings re-inked or plated, exports unchanged |
+| f8cb050b | Step 4: the public pages |
+| 5bf9af1a | Step 5: the ritual reader and editors |
+| 78f7b408 | Step 6: dark mode on, the drawer switch and the toolbar colour |
+| 4f4d81c8 | The final review's fixes |
+| (the next) | This plan brought up to date |
