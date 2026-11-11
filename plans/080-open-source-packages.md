@@ -1,7 +1,8 @@
 # Open source: the packages and their pages — 11 November 2026
 
-Status: plan, not built. Reviewed on 11 November 2026 and revised (see
-[Review](#review-11-november-2026)), then spiked and mocked up the same day
+Status: plan; stage A built on `gate/data-publish`, not merged
+([below](#stage-a-11-november-2026)). Reviewed on 11 November 2026 and
+revised (see [Review](#review-11-november-2026)), then spiked and mocked up the same day
 (see [Before any code](#before-any-code)). Decisions 1–4, the table page's
 layout, the sigils, the fonts and the licence note were settled by Gadi on
 11 November 2026. The rest are recommendations he has not objected to. Read [current status](000-current-status.md),
@@ -630,6 +631,127 @@ Per Gadi's workflow (assess → discuss → review → spike → plan → build)
    layout (decision 4) and showed the hub's licence wording needed the
    distinction the licence note draws. The images were throwaway and are
    not committed.
+
+## Stage A (11 November 2026)
+
+Built on `gate/data-publish`, from `33f2644d`; not merged. Each commit was
+gated on its own tree in a clean worktree with a fresh install.
+
+| Commit | What |
+| --- | --- |
+| `90623933` | `feat(magick-data): Make the package publishable` |
+| `f4c39c73` | `ci(publish): Publish magick-data from CI` |
+
+The gate ran the install, `loom init`, `loom check` (and
+`--production`), `pnpm check`, `pnpm typecheck`, the smoke test keeping
+its tarball, the rule and the dry run (from `f4c39c73`, as `ci.yml` now
+does), `pnpm test:coverage`, `pnpm build` and `pnpm check:turbopack`;
+all passed on both commits. On `90623933` the first coverage run had
+eight tests time out under a load average of about 25 and passed whole
+when re-run.
+
+- **The manifest:** `private` gone; `repository` (with `directory`),
+  `homepage` and `bugs` added; the version still 0.0.0.
+- **The guard:** `prepublishOnly` runs `scripts/prepublishGuard.mjs`,
+  which refuses a manifest whose `exports` point into `./src/`. Run in the
+  package directory, `npm publish --dry-run` (npm 11.18.0) and `pnpm
+  publish --dry-run` both exit 1 with its message; `npm publish
+  <tarball> --dry-run` passes. Neither tool runs lifecycle scripts for a
+  tarball, and `pnpm pack` drops `prepublishOnly` (with `prepack`,
+  `prepare`, `postpack` and `publish`) from the manifest it packs, which
+  the smoke test checks. `--ignore-scripts` would skip the guard.
+- **The verified tarball:** `pnpm --filter magick-data smoke
+  --keep-tarball <path>` copies the tarball it verified to `<path>` and
+  prints its SHA-256. CI and `publish.yml` publish that file.
+- **The README:** an install and usage section; a sentence on releases
+  under "Versions"; and a Sources table of every published data file
+  (36 JSON5 sources and `graph.json`) with where each comes from, with a
+  heading per work and a new Geomancy section (plan 075). `readme.test.ts`
+  holds the table to the JSON5 sources the manifest's `files` publish and
+  checks every in-page link in it, so a new data file without a row fails.
+  Rows whose source is not recorded say so; they are the sign-off's
+  questions below.
+- **The packument rule:** `scripts/npm-publish-decision.mjs <tarball>`
+  reads the name and version from the tarball, fetches the abbreviated
+  packument (15-second timeout, two retries on network errors, 429 and
+  5xx) and decides: 404 skip; listed skip; absent and above `latest` (or
+  no `latest`) publish; absent and not above fail; anything else fail. A
+  pre-release publishes under `next`, a release under `latest`; the tag
+  is reported whatever the action, so a dry run can use it. Tested with a
+  mocked `fetch` for every branch. Against the live registry on
+  11 November: `skip: magick-data@0.0.0: magick-data is not on the
+  registry; its first publish is by hand`.
+- **`publish.yml`:** on pushes to `main`, after `ci.yml` through
+  `workflow_call` (as `release.yml` does), one job in the `npm`
+  environment with `contents: read` and `id-token: write`: checkout,
+  pnpm and Node 24, install, smoke keeping the tarball (the smoke test
+  builds the package), decide, and `npm publish <tarball> --provenance
+  --access public --tag <tag>` when the rule says publish. Actions are
+  pinned by SHA; no `NPM_TOKEN`. npm is `pnpm dlx npm@11.18.0`, the
+  version Node 24.18 bundles, since trusted publishing needs 11.5.1 or
+  later and the pnpm-installed runtime's npm is not something the
+  workflow can see in advance.
+- **CI's dry run:** `ci.yml`'s checks job keeps the smoke tarball, runs
+  the rule, and dry-runs `npm publish` of the tarball with the rule's
+  tag. npm 11 refuses even a dry run of a version the registry lists
+  ("You cannot publish over the previously published versions") and of a
+  pre-release without `--tag`, so the dry run takes the rule's tag and is
+  skipped once the version is published; a mistaken bump fails CI before
+  it reaches `main`.
+
+### Stage A′: the owner's steps
+
+In this order. Every command runs from a clean checkout of `main` with
+Node 24 (npm 11.5.1 or later).
+
+1. **The provenance sign-off.** Settle each question below, edit the
+   README's Sources table to match (no row may still say "not recorded"
+   or "not known"), and decide whether a file whose answer is not
+   satisfactory leaves the tarball (a `!dist/…` entry in `files`, as the
+   dictionary has) or its field is removed.
+2. **Bump to `0.1.0-rc.0`** in `packages/magick-data/package.json` and
+   merge to `main`. CI runs `publish.yml`, finds no package on the
+   registry and skips.
+3. **Publish the release candidate by hand**, from a clean checkout of
+   that `main` commit:
+
+   ```sh
+   git clone https://github.com/gadicc/magickly.git && cd magickly
+   pnpm install --frozen-lockfile
+   pnpm --filter magick-data smoke --keep-tarball "$PWD/magick-data.tgz"
+   npm publish ./magick-data.tgz --tag next --access public
+   ```
+
+   with your own npm login (`npm whoami` first). The smoke test builds
+   the package itself; publish only the file it kept.
+4. **Configure the trusted publisher** on npmjs.com, under the package's
+   settings: GitHub Actions, repository `gadicc/magickly`, workflow
+   `publish.yml`, environment `npm`. The 48-hour window starts here. It
+   is also the moment to create the `magickly` organisation on npm
+   ([Risks](#risks)).
+5. **Create the `npm` environment** in the repository's settings
+   (Settings › Environments), limited to the `main` branch. GitHub would
+   create it on `publish.yml`'s first run, without that limit.
+6. **Bump to `0.1.0` within 48 hours** and merge to `main`. The rule
+   finds `0.1.0` absent and above `latest` (the registry points `latest`
+   at the release candidate), and the job publishes it under `latest`
+   with provenance. If the window has lapsed, configure the trusted
+   publisher again first.
+
+### The sign-off's questions
+
+Found while listing every published file; none is decided here.
+
+| File | Question |
+| --- | --- |
+| `astrology/houses.json5` | `interpretation.en`, twelve sentences of up to 24 words, has no recorded source. It was added on 22 September 2024 with the first geomancy reading, the same work whose geomancy texts plan 075 found to follow the Hensons' essay. Check it against that essay and other modern sources, or rewrite it. |
+| `astrology/planets.json5` | `magickTypes` is a modern, unsourced summary (plan 039), and its source was deferred indefinitely on 2 October. Publishing it grants CC BY on text whose author is unknown. |
+| `enochian/letters.json5` | Added on 9 July 2023 in the commit that added the dictionary (`a1653a30`), whose entries come from Schueler and *The Whole Enochian Dictionary*. The names, English equivalents and Golden Dawn attributions are facts; `pronounciation` and `gematria` may follow Schueler's scheme. Confirm where they come from. |
+| `alchemy/terms.json5` | `terms` holds short Golden Dawn phrases (Zelator grade, added 16 January 2023) with no recorded printing. If they are from a modern edition of Regardie, check that the wording is the Order's own and public domain. |
+| `kabbalah/seventyTwoAngels.json5`, `seventyTwoAngelsText/en.json5` | The English is a language model's translation of the repaired French (plan 031). No third party has rights in it, but whether a machine translation carries the copyright that CC BY grants is unsettled; the README says the English is offered under CC BY. Decide whether to keep that claim or offer it as is. |
+| `chakras.json5` | The file's comment cites Wikipedia's "Chakra" article (CC BY-SA). The fields are short facts (names, places, petals, colours, seed syllables); confirm nothing longer was copied. |
+| `geomancy/tetragrams.json5` | Its first line cites Wikipedia's "Geomantic figures"; plan 075 replaced the texts, so the link may only cover the figures' names and dots. Confirm, or drop the link. |
+| `enochian/tablets.json5` | Greer's edition (Llewellyn, in copyright) is one of the readings. The letters are facts and the README says no rights are asserted over them; confirm that reading letters from its redrawn plates is acceptable for a CC BY package. |
 
 ## Review (11 November 2026)
 

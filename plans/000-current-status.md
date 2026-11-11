@@ -215,7 +215,11 @@ Follow-ups are separate from the completed migration work:
   `src/components` becomes `packages/magick-components`. Reviewed by
   Fable, spiked (field manifest, docgen, a packed package in a Next
   fixture, the registry) and mocked up. Both npm names were free on
-  11 November. TODO (waits for Gadi's go-ahead): build stages A to G.
+  11 November. Stage A (the package ready to publish, `publish.yml` with
+  the packument rule, CI's dry run of the verified tarball) is built on
+  `gate/data-publish`, not merged. TODO: merge stage A; then stage A′,
+  Gadi's ([the steps](080-open-source-packages.md#stage-a-the-owners-steps));
+  then, with his go-ahead, stages B to G.
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose
@@ -412,9 +416,11 @@ Follow-ups are separate from the completed migration work:
   provisioned identifier and stays
   ([plan 052](052-data-package.md#magickli-stays)).
 - TODO: publishing `magick-data`, planned in
-  [plan 080](080-open-source-packages.md) (stages A and A′): the package
-  is `private` at 0.0.0 and the CI workflow is not built
-  ([plan 052](052-data-package.md#deferred) has the earlier design). The Enochian
+  [plan 080](080-open-source-packages.md) (stages A and A′): stage A is
+  built on `gate/data-publish`; stage A′ is Gadi's provenance sign-off
+  (eight questions), the release candidate published by hand, the trusted
+  publisher, and 0.1.0 from CI within 48 hours
+  ([the steps](080-open-source-packages.md#stage-a-the-owners-steps)). The Enochian
   dictionary stays out of the tarball whatever is decided: its entries come
   from Schueler's *Enochian Magic: A Practical Manual* and *The Whole
   Enochian Dictionary*, whose rights are not ours to give.
