@@ -236,7 +236,7 @@ export const COMPONENT_IMAGE_REGISTRY: {
     fonts: [
       "NotoSerif-Italic-latin1.ttf",
       "NotoSerif-BoldItalic-compass.ttf",
-      "NotoSerifHebrew-Bold-letters.ttf",
+      "FrankRuhlLibre-Bold-letters.ttf",
       "EnochianPlain.ttf",
     ],
     source: bareHallFonts,

@@ -11,7 +11,7 @@ export const provenance = {
   ...original(
     "Gadi Cohen's own letter banner design: a light pennant on a rod " +
       "with knobs, the letter " +
-      "set in Noto Serif Hebrew Bold (SIL OFL 1.1) by the browser; no glyph " +
+      "set in Frank Ruhl Libre Bold (SIL OFL 1.1) by the browser; no glyph " +
       "outlines are copied into the code.",
   ),
 };

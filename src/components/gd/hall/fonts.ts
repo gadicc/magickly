@@ -3,20 +3,22 @@
  * app's `public/fonts` and `scripts/gd-hall-fonts/build.py` makes them; this
  * package never hard-codes where they are served, so the caller passes the
  * base URL. The family names are the package's own, so a locally installed
- * Noto Serif with other metrics never stands in for the subset the labels
- * were measured with; the stacks fall back to it only when the subset fails.
+ * Noto Serif or Frank Ruhl Libre with other metrics never stands in for the
+ * subset the labels were measured with; the stacks fall back to it only when
+ * the subset fails. Hebrew is Frank Ruhl Libre (SIL OFL 1.1) since
+ * 11 November 2026 (plan 061, decision 7, corrected).
  */
 
 /** The `@font-face` family names the hall draws with. */
 export const GD_HALL_FONT_FAMILIES = {
   serif: "GdHall Noto Serif",
-  hebrew: "GdHall Noto Serif Hebrew",
+  hebrew: "GdHall Frank Ruhl Libre",
 } as const;
 
 /** CSS `font-family` values, each falling back to the installed font. */
 export const GD_HALL_FONT_STACKS = {
   serif: `"${GD_HALL_FONT_FAMILIES.serif}", "Noto Serif", serif`,
-  hebrew: `"${GD_HALL_FONT_FAMILIES.hebrew}", "Noto Serif Hebrew", serif`,
+  hebrew: `"${GD_HALL_FONT_FAMILIES.hebrew}", "Frank Ruhl Libre", serif`,
 } as const;
 
 /** One subset file and the faces it provides. */
@@ -52,7 +54,7 @@ export const GD_HALL_FONT_FILES: readonly GdHallFontFile[] = [
     family: GD_HALL_FONT_FAMILIES.hebrew,
     style: "normal",
     weight: 700,
-    file: "NotoSerifHebrew-Bold-letters.woff2",
+    file: "FrankRuhlLibre-Bold-letters.woff2",
     unicodeRange: "U+5D0-5EA",
   },
 ];

@@ -436,6 +436,18 @@ overflow, centred.
   `Tablet` keeps referring to the font rather than copying outlines. Original
   Enochian letterforms are a follow-up.
 
+**Correction, 11 November 2026 ([plan 079](079-frank-ruhl-libre.md)).**
+The FrankRuehl reason above is wrong: in Culmus's licence the
+document-embedding exception covers only Yoram Gnat's families (Shofar,
+Keter YG, Hadasim, Simple, Stam); Maxim Iorsh's FrankRuehl CLM is plain
+GPL-2, as Debian's packaging lists it. The conclusion stood, but the app's
+own Hebrew text font was CLM, so plan 079 replaced it everywhere with Frank
+Ruhl Libre (SIL OFL 1.1, no Reserved Font Name), and the halls' Hebrew (the
+letter banners, the Tarot keys' letters and the Pantacle's ring) is now
+Frank Ruhl Libre **Bold** in place of Noto Serif Hebrew Bold:
+`FrankRuhlLibre-Bold-letters.woff2` (3,424 bytes) and its TrueType twin,
+from the same build script.
+
 ### 8. Export
 
 `/gd/hall` uses `ExportControls`. For PNG, `ExportControls` gains a

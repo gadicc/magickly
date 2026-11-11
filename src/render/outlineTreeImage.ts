@@ -42,7 +42,7 @@ export const SERVER_FONT_FILES = [
   // their WOFF2 twins in public/fonts by scripts/gd-hall-fonts/build.py.
   "NotoSerif-Italic-latin1.ttf",
   "NotoSerif-BoldItalic-compass.ttf",
-  "NotoSerifHebrew-Bold-letters.ttf",
+  "FrankRuhlLibre-Bold-letters.ttf",
 ] as const;
 export type ServerFontFile = (typeof SERVER_FONT_FILES)[number];
 const sha256 = (bytes: Uint8Array) =>

@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 """Build the temple-hall fonts and their metrics (plan 061, decision 7).
 
-google/fonts ships Noto Serif and Noto Serif Hebrew only as variable fonts.
+google/fonts ships Noto Serif and Frank Ruhl Libre only as variable fonts.
 This script downloads them from a pinned google/fonts commit, checks their
 SHA-256, makes static instances with the fontTools instancer, subsets them
 and writes:
 
 - public/fonts/NotoSerif-Italic-latin1.woff2      labels and captions
 - public/fonts/NotoSerif-BoldItalic-compass.woff2 the compass labels
-- public/fonts/NotoSerifHebrew-Bold-letters.woff2 Hebrew-letter banners
+- public/fonts/FrankRuhlLibre-Bold-letters.woff2 Hebrew letters (banners,
+  Tarot keys, the Pantacle's ring)
 - assets/fonts/NotoSerif-Italic-latin1.ttf, NotoSerif-BoldItalic-compass.ttf
-  and NotoSerifHebrew-Bold-letters.ttf, the same subsets as TrueType for
+  and FrankRuhlLibre-Bold-letters.ttf, the same subsets as TrueType for
   the server's image renderer (resvg reads no WOFF2; plan 062), outside
   public/ so no URL serves them and the service worker never caches them
-- public/fonts/NotoSerif-OFL.txt, NotoSerifHebrew-OFL.txt (upstream notices)
+- public/fonts/NotoSerif-OFL.txt, FrankRuhlLibre-OFL.txt (upstream notices)
 - public/fonts/NotoSans-OFL.txt, NotoSansHebrew-OFL.txt, the notices the
   existing NotoSans-Regular.ttf and NotoSansHebrew-Regular.ttf lacked: their
   own copyright line (name ID 0) above the OFL 1.1 text
@@ -27,7 +28,7 @@ Run from the repository root:
 
 Needs fontTools with brotli, and uharfbuzz for the kern pairs. Outputs are
 deterministic for the same fontTools, brotli and HarfBuzz versions (no
-timestamps are recalculated); public/fonts/Noto-hall-sources.md records the
+timestamps are recalculated); public/fonts/hall-font-sources.md records the
 versions and hashes of the committed files. The JSON is formatted with the
 repository's Biome afterwards so `pnpm check` stays clean.
 """
@@ -58,17 +59,19 @@ SOURCES = {
         "ofl/notoserif/NotoSerif-Italic%5Bwdth,wght%5D.ttf",
         "e87acbc6c0efd0d9a20d6a8cbbda2b266c14be3a3a6f5af8ec9d7b2460570ad1",
     ),
-    "NotoSerifHebrew[wdth,wght].ttf": (
-        "ofl/notoserifhebrew/NotoSerifHebrew%5Bwdth,wght%5D.ttf",
-        "93caef921360788dc3b0e32136bb26f16bc57717ec482d48fc7fd43820617165",
+    # Frank Ruhl Libre (SIL OFL 1.1, no Reserved Font Name), which replaced
+    # Noto Serif Hebrew on 11 November 2026: weight axis only.
+    "FrankRuhlLibre[wght].ttf": (
+        "ofl/frankruhllibre/FrankRuhlLibre%5Bwght%5D.ttf",
+        "f9bf26966681037aae894b031bd0dcf2c1bfdfa128dd0640cf276fe62a338a43",
     ),
     "notoserif-OFL.txt": (
         "ofl/notoserif/OFL.txt",
         "cee9892f9f0cc8fe882c9e9537ee6a89621d86ee7ceaf70b02e2b2b1c25c061a",
     ),
-    "notoserifhebrew-OFL.txt": (
-        "ofl/notoserifhebrew/OFL.txt",
-        "9b9fe028b5ba74d231659a1bbaf0ed09b11e759d1ca6a070999e16d151616b47",
+    "frankruhllibre-OFL.txt": (
+        "ofl/frankruhllibre/OFL.txt",
+        "4e9720b2544d946737e7dfe0027a62c23c7247f0144f08bc437cdcc2e6a7d828",
     ),
     "notosans-OFL.txt": (
         "ofl/notosans/OFL.txt",
@@ -117,8 +120,13 @@ def fetch(cache: Path, name: str) -> bytes:
 
 def static_instance(data: bytes, wght: int) -> TTFont:
     font = TTFont(io.BytesIO(data), recalcTimestamp=False)
+    # Width 100 where the font has a width axis (Noto Serif; not Frank Ruhl
+    # Libre).
+    axes = {"wght": wght, "wdth": 100}
+    present = {axis.axisTag for axis in font["fvar"].axes}
     return instancer.instantiateVariableFont(
-        font, {"wght": wght, "wdth": 100}, updateFontNames=True
+        font, {tag: v for tag, v in axes.items() if tag in present},
+        updateFontNames=True,
     )
 
 
@@ -262,7 +270,7 @@ def main() -> None:
     args.cache.mkdir(parents=True, exist_ok=True)
 
     italic_vf = fetch(args.cache, "NotoSerif-Italic[wdth,wght].ttf")
-    hebrew_vf = fetch(args.cache, "NotoSerifHebrew[wdth,wght].ttf")
+    hebrew_vf = fetch(args.cache, "FrankRuhlLibre[wght].ttf")
 
     italic = subset_font(static_instance(italic_vf, 400), LATIN1)
     italic_ttf = to_bytes(italic)
@@ -275,15 +283,15 @@ def main() -> None:
     outputs = {
         PUBLIC_FONTS / "NotoSerif-Italic-latin1.woff2": to_bytes(italic, "woff2"),
         PUBLIC_FONTS / "NotoSerif-BoldItalic-compass.woff2": to_bytes(bold, "woff2"),
-        PUBLIC_FONTS / "NotoSerifHebrew-Bold-letters.woff2": to_bytes(hebrew, "woff2"),
+        PUBLIC_FONTS / "FrankRuhlLibre-Bold-letters.woff2": to_bytes(hebrew, "woff2"),
         # The same subsets as TrueType, from the same run, for resvg.
         ASSET_FONTS / "NotoSerif-Italic-latin1.ttf": italic_ttf,
         ASSET_FONTS / "NotoSerif-BoldItalic-compass.ttf": bold_ttf,
-        ASSET_FONTS / "NotoSerifHebrew-Bold-letters.ttf": hebrew_ttf,
+        ASSET_FONTS / "FrankRuhlLibre-Bold-letters.ttf": hebrew_ttf,
         PUBLIC_FONTS / "NotoSerif-OFL.txt": ofl_notice(
             fetch(args.cache, "notoserif-OFL.txt")),
-        PUBLIC_FONTS / "NotoSerifHebrew-OFL.txt": ofl_notice(
-            fetch(args.cache, "notoserifhebrew-OFL.txt")),
+        PUBLIC_FONTS / "FrankRuhlLibre-OFL.txt": ofl_notice(
+            fetch(args.cache, "frankruhllibre-OFL.txt")),
     }
     # The 2017 Noto Sans builds carry their own copyright line; the licence
     # text is the same OFL 1.1.
@@ -309,7 +317,7 @@ def main() -> None:
     check_pairs(hebrew_metrics, hebrew_shaped, [
         "אדני", "אוריאל", "כרוב", "פרת", "צפון", "פורלאך", "ארץ",
     ])
-    hebrew_glyphs = TTFont(io.BytesIO(outputs[PUBLIC_FONTS / "NotoSerifHebrew-Bold-letters.woff2"]))
+    hebrew_glyphs = TTFont(io.BytesIO(outputs[PUBLIC_FONTS / "FrankRuhlLibre-Bold-letters.woff2"]))
     shin = hebrew_glyphs["glyf"][hebrew_glyphs.getBestCmap()[0x05E9]]
     document = {
         "comment": "Generated by scripts/gd-hall-fonts/build.py; do not edit.",

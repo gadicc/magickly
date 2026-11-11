@@ -78,20 +78,21 @@ describe("the generated font metrics", () => {
   });
 
   it("measures the Hebrew names in logical order as HarfBuzz shapes them", () => {
-    // Widths in font units from HarfBuzz 14.5.1 on the shipped subset,
-    // right to left with its kern pairs (אל, the first letter on the
-    // right, kerns -29).
+    // Widths in font units from HarfBuzz 14.5.0 on the shipped Frank Ruhl
+    // Libre Bold subset, right to left with its kern pairs (לר kerns -30;
+    // אל, which Noto Serif Hebrew kerned, does not).
     for (const [text, units] of [
-      ["אדני", 1798],
-      ["אוריאל", 2826],
-      ["כרוב", 1928],
-      ["פרת", 1681],
-      ["צפון", 1730],
-      ["פורלאך", 2968],
-      ["ארץ", 1612],
+      ["אדני", 1663],
+      ["אוריאל", 2722],
+      ["כרוב", 1780],
+      ["פרת", 1552],
+      ["צפון", 1596],
+      ["פורלאך", 2852],
+      ["ארץ", 1519],
     ] as const)
       expect(hebrewFont.width(text, 1000), text).toBeCloseTo(units, 9);
-    expect(hebrewFont.kerning("א", "ל")).toBe(-29);
+    expect(hebrewFont.kerning("ל", "ר")).toBe(-30);
+    expect(hebrewFont.kerning("א", "ל")).toBe(0);
     expect(fontMetrics.hebrew.upem).toBe(1000);
   });
 

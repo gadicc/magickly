@@ -29,8 +29,12 @@ import {
  * `gd-hall` contract, and the licence the files carry.
  */
 
-/** The renderer's identity for the halls' images; moves only when it does. */
-export const GD_HALL_IMAGE_PROFILE = "magickli-gd-hall-image-v1";
+/**
+ * The renderer's identity for the halls' images; moves only when it does.
+ * v2: Hebrew in Frank Ruhl Libre Bold instead of Noto Serif Hebrew Bold
+ * (11 November 2026).
+ */
+export const GD_HALL_IMAGE_PROFILE = "magickli-gd-hall-image-v2";
 
 /**
  * The art the images draw with: the package's, the tablets in the bundled
@@ -78,7 +82,7 @@ export function renderGdHallImage(props: GdHallImageProps) {
  */
 const BARE_FAMILIES: readonly [string, string][] = [
   [GD_HALL_FONT_STACKS.serif, "Noto Serif"],
-  [GD_HALL_FONT_STACKS.hebrew, "Noto Serif Hebrew"],
+  [GD_HALL_FONT_STACKS.hebrew, "Frank Ruhl Libre"],
 ].map(([stack, family]) => [
   `font-family="${stack.replaceAll('"', "&quot;")}"`,
   `font-family="${family}"`,

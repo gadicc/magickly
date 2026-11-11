@@ -86,9 +86,9 @@ export function textMeasure(table: FontMetricsTable): TextMeasure {
 export const labelFont = textMeasure(fontMetrics.label);
 /** Noto Serif Bold Italic: the compass labels. */
 export const compassFont = textMeasure(fontMetrics.compass);
-/** Noto Serif Hebrew Bold: the Pantacle's ring, measured in logical order. */
+/** Frank Ruhl Libre Bold: the Pantacle's ring, measured in logical order. */
 export const hebrewFont = textMeasure(fontMetrics.hebrew);
-/** Noto Serif Hebrew Bold's letter body, as fractions of the size. */
+/** Frank Ruhl Libre Bold's letter body, as fractions of the size. */
 export const hebrewLetterBody = {
   top: fontMetrics.hebrew.bodyTop / fontMetrics.hebrew.upem,
   bottom: fontMetrics.hebrew.bodyBottom / fontMetrics.hebrew.upem,

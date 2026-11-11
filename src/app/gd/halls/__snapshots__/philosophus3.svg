@@ -698,7 +698,7 @@
 </rect>
 <g fill="#000000" text-anchor="middle">
 <text y="-31" font-size="11" font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic">XVI</text>
-<text y="12" font-size="36" font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700">פ</text>
+<text y="12" font-size="36" font-family="&quot;GdHall Frank Ruhl Libre&quot;, &quot;Frank Ruhl Libre&quot;, serif" font-weight="700">פ</text>
 <text y="40" font-size="7" font-family="&quot;GdHall Noto Serif&quot;, &quot;Noto Serif&quot;, serif" font-style="italic" style="font-variant-ligatures:none;font-kerning:normal">The Tower</text>
 </g>
 </g>
@@ -719,7 +719,7 @@
 </circle>
 <path d="M-38,-38H38V26L0,45L-38,26Z" fill="url(#_R_0_-art12-fill)" stroke="#000000" stroke-width="0.8">
 </path>
-<text x="0" y="21.057" font-size="62" font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" text-anchor="middle" fill="#000000">מ</text>
+<text x="0" y="19.507" font-size="62" font-family="&quot;GdHall Frank Ruhl Libre&quot;, &quot;Frank Ruhl Libre&quot;, serif" font-weight="700" text-anchor="middle" fill="#000000">מ</text>
 </g>
 <g id="_R_0_-art13">
 <g transform="translate(-50 -50)">
@@ -752,7 +752,7 @@
 </circle>
 <path d="M-38,-38H38V26L0,45L-38,26Z" fill="url(#_R_0_-art14-fill)" stroke="#000000" stroke-width="0.8">
 </path>
-<text x="0" y="21.057" font-size="62" font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" text-anchor="middle" fill="#000000">ע</text>
+<text x="0" y="19.507" font-size="62" font-family="&quot;GdHall Frank Ruhl Libre&quot;, &quot;Frank Ruhl Libre&quot;, serif" font-weight="700" text-anchor="middle" fill="#000000">ע</text>
 </g>
 <g id="_R_0_-art15">
 <defs>
@@ -771,7 +771,7 @@
 </circle>
 <path d="M-38,-38H38V26L0,45L-38,26Z" fill="url(#_R_0_-art15-fill)" stroke="#000000" stroke-width="0.8">
 </path>
-<text x="0" y="21.057" font-size="62" font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" text-anchor="middle" fill="#000000">פ</text>
+<text x="0" y="19.507" font-size="62" font-family="&quot;GdHall Frank Ruhl Libre&quot;, &quot;Frank Ruhl Libre&quot;, serif" font-weight="700" text-anchor="middle" fill="#000000">פ</text>
 </g>
 <g id="_R_0_-art16">
 <defs>
@@ -790,7 +790,7 @@
 </circle>
 <path d="M-38,-38H38V26L0,45L-38,26Z" fill="url(#_R_0_-art16-fill)" stroke="#000000" stroke-width="0.8">
 </path>
-<text x="0" y="21.057" font-size="62" font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" text-anchor="middle" fill="#000000">ר</text>
+<text x="0" y="19.507" font-size="62" font-family="&quot;GdHall Frank Ruhl Libre&quot;, &quot;Frank Ruhl Libre&quot;, serif" font-weight="700" text-anchor="middle" fill="#000000">ר</text>
 </g>
 <g id="_R_0_-art17">
 <defs>
@@ -809,7 +809,7 @@
 </circle>
 <path d="M-38,-38H38V26L0,45L-38,26Z" fill="url(#_R_0_-art17-fill)" stroke="#000000" stroke-width="0.8">
 </path>
-<text x="0" y="21.057" font-size="62" font-family="&quot;GdHall Noto Serif Hebrew&quot;, &quot;Noto Serif Hebrew&quot;, serif" font-weight="700" text-anchor="middle" fill="#000000">ש</text>
+<text x="0" y="19.507" font-size="62" font-family="&quot;GdHall Frank Ruhl Libre&quot;, &quot;Frank Ruhl Libre&quot;, serif" font-weight="700" text-anchor="middle" fill="#000000">ש</text>
 </g>
 </defs>
 <rect x="-151.81" y="-817.21" width="2223.62" height="2971.17" fill="#ffffff">
