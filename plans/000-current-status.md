@@ -379,6 +379,15 @@ Follow-ups are separate from the completed migration work:
   numbers, if Gadi wants them. TODO: two values are no sum of their
   letters (BAEQUIB 186, the letters 196; BASM 110, perhaps BAZM's);
   check them against EMPM.
+- 11 November 2026: an experiment drafted, not built, in
+  [plan 077](077-enochian-translator-experiment.md): can an LLM given our
+  dictionary, the Keys and our own grammar notes translate Enochian well
+  enough to replace the planned neural network? Leave-one-Key-out on the
+  19 Keys, scored against Dee's English and Casaubon's words, with
+  thresholds for building a translator. $100 cap, mostly Opus 5.5. Leitch's
+  *Angelical Language* vol. II is extracted locally for it, outside the
+  repository. TODO: an Enochian expert's review before any translator is
+  shown to readers (the plan's "For an expert" list).
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose
@@ -929,6 +938,8 @@ Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrate
 Ideas the owner wants kept in view, far beyond current work:
 
 - A small neural network for translating between Enochian and English
-  (Gadi, 10 November 2026), after the dictionary's English search.
+  (Gadi, 10 November 2026), after the dictionary's English search. First,
+  [plan 077](077-enochian-translator-experiment.md) tests whether an LLM
+  with our data in its prompt makes one unnecessary.
 - Language packs: the site and the data in other languages, beyond the
   French already given for Lenain (Gadi, 10 November 2026).
