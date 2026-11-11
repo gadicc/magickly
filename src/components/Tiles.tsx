@@ -4,6 +4,8 @@ import Link from "./Link";
 
 /**
  * Linked tiles, each previewing its destination with `img` or `Component`.
+ * Mark a tile `plate` when its image is dark artwork on a transparent
+ * background, so the dark scheme puts it on a light card.
  * Mark a tile `informative` when its preview shows information rather than
  * decoration and has no links of its own, so screen readers read it.
  *
@@ -64,6 +66,9 @@ function Tiles({ tiles }) {
               height: "100%",
               overflow: "hidden",
               color: "primary.main",
+              // A `plate` tile's artwork is dark on transparent: a light
+              // card behind it in dark, nothing in light.
+              ...(tile.plate && { bgcolor: "plate" }),
             }}
           >
             {tile.Component ? (

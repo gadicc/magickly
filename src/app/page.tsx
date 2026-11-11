@@ -1,5 +1,6 @@
 import { AdminPanelSettingsTwoTone } from "@mui/icons-material";
 import { getCurrentSqlViewer } from "@/auth/viewer";
+import { DARK_SELECTOR } from "@/colorScheme";
 import Tiles from "@/components/Tiles";
 import GDLogoSquished from "@/goldendawn-logo-squished.svg";
 import JsonLd, { SITE_JSON_LD } from "@/seo/JsonLd";
@@ -22,6 +23,8 @@ const tiles = [
     to: "/about",
     img: "/pics/about.png",
     alt: "About Icon",
+    // Dark artwork on transparent.
+    plate: true,
   },
   {
     title: "Astrology",
@@ -81,7 +84,13 @@ const tiles = [
 const adminTile = {
   Component: () => (
     <div style={{ textAlign: "center" }}>
-      <AdminPanelSettingsTwoTone sx={{ color: "#555", fontSize: "700%" }} />
+      <AdminPanelSettingsTwoTone
+        sx={{
+          color: "#555",
+          fontSize: "700%",
+          [DARK_SELECTOR]: { color: "text.secondary" },
+        }}
+      />
     </div>
   ),
   title: "Admin",

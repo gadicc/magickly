@@ -1,6 +1,10 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { COLOR_SCHEME_ATTRIBUTE, DEFAULT_COLOR_MODE } from "@/colorScheme";
+import {
+  COLOR_SCHEME_ATTRIBUTE,
+  DARK_SELECTOR,
+  DEFAULT_COLOR_MODE,
+} from "@/colorScheme";
 import theme from "@/theme";
 import RootLayout from "./layout";
 
@@ -75,6 +79,8 @@ it("gives the colour-scheme script and the provider the same scheme", () => {
 
   // The theme's CSS keys the dark scheme on the class the script sets.
   expect(theme.getColorSchemeSelector("dark")).toBe(".dark &");
+  // Server components' `sx` uses the same selector.
+  expect(DARK_SELECTOR).toBe(theme.getColorSchemeSelector("dark"));
   // The script is the first thing in <body>, before anything paints, and
   // sets the class from the stored mode or the default.
   const script = html.match(/<body><script>([\s\S]*?)<\/script>/)?.[1];

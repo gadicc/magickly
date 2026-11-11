@@ -91,22 +91,33 @@ export default function SiteFooter() {
   return (
     <Box
       component="footer"
-      sx={{
-        mt: 6,
-        px: 2,
-        pt: 3,
-        pb: 4,
-        bgcolor: "grey.100",
-        borderTop: 1,
-        borderColor: "divider",
-        color: "text.secondary",
-        fontSize: "0.9rem",
-        displayPrint: "none",
-        "& a:hover, & a:focus-visible": {
-          color: "primary.dark",
-          textDecoration: "underline",
+      sx={[
+        {
+          mt: 6,
+          px: 2,
+          pt: 3,
+          pb: 4,
+          bgcolor: "grey.100",
+          borderTop: 1,
+          borderColor: "divider",
+          color: "text.secondary",
+          fontSize: "0.9rem",
+          displayPrint: "none",
+          "& a:hover, & a:focus-visible": {
+            color: "primary.dark",
+            textDecoration: "underline",
+          },
         },
-      }}
+        // A band on the dark page too, and links that brighten on hover:
+        // the dark scheme's `primary.dark` is dimmer than the text.
+        (theme) =>
+          theme.applyStyles("dark", {
+            bgcolor: "background.paper",
+            "& a:hover, & a:focus-visible": {
+              color: "primary.main",
+            },
+          }),
+      ]}
     >
       <Box
         component="nav"

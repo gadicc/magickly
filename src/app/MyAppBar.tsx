@@ -56,7 +56,9 @@ function SignInButton({
       component={Link}
       disabled={disabled}
       href={`/signin?callbackURL=${encodeURIComponent(callbackURL)}`}
-      sx={{ color: "white" }}
+      // The bar's text colour: white on the light scheme's blue bar and on
+      // the dark scheme's navy one.
+      sx={{ color: "inherit" }}
     >
       <Login />
     </IconButton>
@@ -130,12 +132,28 @@ function MenuDrawer({
   return (
     <Box onClick={handleDrawerToggle}>
       <Typography variant="h6" sx={{ my: 2, mx: 2, textAlign: "left" }}>
-        <Image
+        {/*
+          Dark artwork on transparent, so in dark it sits on a light plate.
+          The plate's padding is taken back from the margins, so the header
+          keeps its layout; light gets no rule at all.
+        */}
+        <Box
+          component={Image}
           src="/pentagram.png"
           alt="Pentagram"
           width={32}
           height={32}
-          style={{ verticalAlign: "middle", marginRight: 12 }}
+          sx={[
+            { verticalAlign: "middle", marginRight: "12px" },
+            (theme) =>
+              theme.applyStyles("dark", {
+                boxSizing: "content-box",
+                bgcolor: "plate",
+                borderRadius: "50%",
+                padding: "3px",
+                margin: "-3px 9px -3px -3px",
+              }),
+          ]}
         />
         <span style={{ verticalAlign: "middle" }}>Magick.ly</span>
       </Typography>
@@ -333,7 +351,14 @@ function NavMenu({
           component="div"
           aria-current="page"
           onClick={onClose}
-          sx={{ pl: `${16 + MENU_INDENT * level}px`, color: "red" }}
+          sx={[
+            { pl: `${16 + MENU_INDENT * level}px`, color: "red" },
+            // Pure red is dim on the dark menu's paper.
+            (theme) =>
+              theme.applyStyles("dark", {
+                color: "error.light",
+              }),
+          ]}
         >
           {current.title}
         </MenuItem>

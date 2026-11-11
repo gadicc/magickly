@@ -17,3 +17,11 @@ export const COLOR_SCHEME_ATTRIBUTE = "class";
  * `"system"`.
  */
 export const DEFAULT_COLOR_MODE: "light" | "dark" | "system" = "light";
+
+/**
+ * The theme's dark-scheme selector (`theme.getColorSchemeSelector("dark")`)
+ * for `sx` in server components, which cannot pass the
+ * `(theme) => theme.applyStyles("dark", …)` function to a client component.
+ * Write `sx={{ color: "#555", [DARK_SELECTOR]: { color: "text.secondary" } }}`.
+ */
+export const DARK_SELECTOR = ".dark &";
