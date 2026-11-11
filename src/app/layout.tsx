@@ -28,6 +28,9 @@ import SiteFooter from "./SiteFooter";
 import StyledJsxRegistry from "./StyledJsxRegistry";
 import ThemeColorMeta from "./ThemeColorMeta";
 import "@/db";
+// The Hebrew text font (plan 079), for every page that names it: the
+// browser fetches the file only where it draws Hebrew in that family.
+import "@/../public/fonts/FrankRuhlLibre.css";
 
 // No canonical here: every page below would inherit it. Open Graph titles and
 // descriptions are left unset so Next fills them from each page's own.

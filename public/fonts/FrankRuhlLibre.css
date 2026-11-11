@@ -1,0 +1,15 @@
+/*
+ * Frank Ruhl Libre, the app's Hebrew text font (plan 079): SIL OFL 1.1, see
+ * FrankRuhlLibre-OFL.txt and hebrew-text-font-sources.md. One variable file
+ * serves every weight; scripts/hebrew-text-font/build.py makes it, adding
+ * the upper dot (U+05C4) Lenain points with. The font has no italic and
+ * none is declared, so the browser slants italic Hebrew itself.
+ */
+@font-face {
+  font-family: "Frank Ruhl Libre";
+  src: url("FrankRuhlLibre-Hebrew.woff2") format("woff2");
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0590-05FF;
+}

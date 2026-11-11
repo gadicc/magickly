@@ -3,8 +3,8 @@
 Status: decided by Gadi on 11 November 2026 (replace FrankRuehl CLM
 everywhere with Frank Ruhl Libre, and set the halls' Hebrew letters in
 Frank Ruhl Libre Bold); built on `gate/frank-ruhl-libre`. Decision 2 (the
-upper dot Frank Ruhl Libre lacks) is the recommended option and waits for
-Gadi's confirmation. Read [current status](000-current-status.md) first.
+upper dot Frank Ruhl Libre lacks) confirmed by Gadi the same day. Read
+[current status](000-current-status.md) first.
 
 ## Background
 
@@ -66,7 +66,7 @@ their licence are deleted. The editor trial points at the new file.
 declares none, so italic Hebrew is the browser's synthesised oblique
 (`font-synthesis` allows it by default), where CLM drew its own obliques.
 
-### 2. Lenain's upper dot, added to the font (awaiting confirmation)
+### 2. Lenain's upper dot, added to the font
 
 Frank Ruhl Libre has no U+05C4 (HEBREW MARK UPPER DOT) and no cantillation
 marks. The repository uses U+05C4 195 times in the Lenain edition (all in
@@ -80,7 +80,7 @@ those pages; Frank Ruhl Libre with another font filling in the dotted
 letters (whole letters switch face mid-word); **Frank Ruhl Libre with an
 upper dot added in the build**; or Noto Serif Hebrew for pointed text.
 
-Built as recommended: the build adds a glyph for U+05C4, a copy of the
+Gadi chose the third. The build adds a glyph for U+05C4, a copy of the
 font's own holam dot, attached by a new mark class centred over each letter
 — across from the letter's below-vowel anchor (the designer's centre for its
 points) at the height of its holam anchor, both varying with weight like the

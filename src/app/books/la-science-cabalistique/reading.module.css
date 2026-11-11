@@ -146,9 +146,9 @@
   cursor: pointer;
 }
 
-/* Hebrew runs, which Roboto cannot set: see the font import on the route. */
+/* Hebrew runs, which Roboto cannot set: see the comment in Reading.tsx. */
 .hebrew {
-  font-family: "Frank Ruehl CLM", "Noto Sans Hebrew", serif;
+  font-family: "Frank Ruhl Libre", "Noto Sans Hebrew", serif;
   font-size: 1.08em;
 }
 

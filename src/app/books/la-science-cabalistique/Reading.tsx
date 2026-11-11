@@ -9,10 +9,9 @@ import {
 import type { Leaf } from "magick-data/kabbalah/lenain/volume";
 import { Fragment, type ReactNode } from "react";
 // Roboto has no Hebrew, and the volume runs 1,223 Hebrew letters through its
-// French. Frank Ruehl CLM is already in public/fonts and covers U+05C4, the
-// upper dot Lenain points his letters with; without this it falls back to
-// whatever the system has.
-import "@/../public/fonts/FrankRuehlCLM-stylesheet.css";
+// French: they are set in Frank Ruhl Libre (the root layout's stylesheet),
+// whose build adds U+05C4, the upper dot Lenain points his letters with
+// (plan 079).
 import styles from "./reading.module.css";
 
 /**

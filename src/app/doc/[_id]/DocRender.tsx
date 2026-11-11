@@ -37,6 +37,7 @@ import { Render } from "@/doc/blocks";
 
 import DocContext from "@/doc/context";
 import { focusHall, revealHall } from "@/doc/revealHall";
+import { roles } from "@/doc/ritualBlocks/roles";
 import {
   type RitualContentsEntry,
   type RitualRow,
@@ -44,8 +45,6 @@ import {
   ritualHalls,
 } from "@/doc/ritualHalls";
 import { DocNode } from "@/schemas";
-import "@/../public/fonts/FrankRuehlCLM-stylesheet.css";
-import { roles } from "@/doc/ritualBlocks/roles";
 
 // The halls' sheet and viewer load only for a ritual with halls (plan 069),
 // so other rituals carry no dialog code for them. `loading` gives each its
@@ -584,7 +583,7 @@ export function DocView({
           className="docBody"
           style={
             {
-              // fontFamily: "Frank Ruehl CLM, Roboto, Helvetica, Arial, sans-serif",
+              // fontFamily: "Frank Ruhl Libre, Roboto, Helvetica, Arial, sans-serif",
             }
           }
         >
