@@ -25,13 +25,18 @@
  * Every step throws on failure and the process exits non-zero; the temporary
  * directory is removed either way.
  *
- * A release must be packed the same way, with `pnpm pack` or `pnpm publish`
- * and never `npm publish` from the package: `publishConfig.exports` is a
- * pnpm feature, and npm would publish the `exports` that point at
- * `./src/*.ts`. A tarball pnpm packed can be published by either.
+ * `--keep-tarball <path>` copies the tarball to `<path>` once every step has
+ * passed (a relative path is read from where pnpm was run), and that file is
+ * what a release publishes, `npm publish <path>` (plan 080, decision 3).
+ * `lib/` and `dist/` are git-ignored, so packing again could ship whatever
+ * they hold; and `publishConfig.exports` is applied only by `pnpm pack`, so
+ * `npm publish` from the package would ship `exports` that point at
+ * `./src/*.ts`. The package's `prepublishOnly` guard refuses that.
  */
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
+  copyFileSync,
   mkdirSync,
   mkdtempSync,
   readdirSync,
@@ -41,8 +46,10 @@ import {
 } from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseArgs } from "node:util";
+import { refusal } from "./prepublishGuard.mjs";
 
 const PACKAGE_DIR = fileURLToPath(new URL("..", import.meta.url));
 const REPO_DIR = join(PACKAGE_DIR, "..", "..");
@@ -53,6 +60,15 @@ const TSC = createRequire(join(REPO_DIR, "package.json")).resolve(
 const sourceManifest = JSON.parse(
   readFileSync(join(PACKAGE_DIR, "package.json"), "utf8"),
 );
+
+const { values: options } = parseArgs({
+  options: { "keep-tarball": { type: "string" } },
+});
+// pnpm runs the script in the package's directory; INIT_CWD is where it was
+// run from, which is what a relative path on its command line means.
+const keepTarball =
+  options["keep-tarball"] &&
+  resolve(process.env.INIT_CWD ?? process.cwd(), options["keep-tarball"]);
 
 /** Runs a command and returns what it printed; a non-zero exit throws. */
 function run(command, args, options = {}) {
@@ -161,6 +177,18 @@ try {
       !("./enochian/dictionary" in manifest.exports),
       "./enochian/dictionary is exported",
     );
+    assert(!manifest.private, "the manifest is private");
+    // npm's provenance check matches the repository against the workflow's.
+    assert(
+      manifest.repository?.url ===
+        "git+https://github.com/gadicc/magickly.git" &&
+        manifest.repository?.directory === "packages/magick-data",
+      "repository does not name gadicc/magickly's packages/magick-data",
+    );
+    assert(
+      manifest.version === sourceManifest.version,
+      `version ${manifest.version}, the source says ${sourceManifest.version}`,
+    );
     // Every target the map names is in the tarball.
     for (const [subpath, target] of Object.entries(manifest.exports)) {
       if (subpath.includes("*")) continue;
@@ -172,6 +200,32 @@ try {
           `${subpath} names ${file}, which is not in the tarball`,
         );
     }
+  });
+
+  step("the prepublishOnly guard refuses the source, not the tarball", () => {
+    const guard = join(PACKAGE_DIR, "scripts", "prepublishGuard.mjs");
+    const source = run(process.execPath, [guard], {
+      cwd: PACKAGE_DIR,
+      env: {
+        ...process.env,
+        npm_package_json: join(PACKAGE_DIR, "package.json"),
+      },
+      allowFailure: true,
+    });
+    assert(
+      source.status === 1 && source.output.includes("Refusing to publish"),
+      `the guard let the source manifest through\n${source.output}`,
+    );
+    const packed = JSON.parse(
+      readFileSync(join(installed, "package.json"), "utf8"),
+    );
+    assert(refusal(packed) === undefined, "the guard refuses the tarball");
+    // pnpm drops the hook from what it packs, so nothing in the tarball can
+    // run it, whatever a package manager does with a tarball's scripts.
+    assert(
+      packed.scripts?.prepublishOnly === undefined,
+      "the tarball carries prepublishOnly",
+    );
   });
 
   writeFileSync(
@@ -420,6 +474,16 @@ console.log("loaded:", Object.keys(data).length, "tables in the barrel");
     const { output } = run(process.execPath, ["load.mjs"], { cwd: fixture });
     process.stdout.write(`   ${output}`);
   });
+
+  if (keepTarball)
+    step(`keep the verified tarball at ${keepTarball}`, () => {
+      mkdirSync(dirname(keepTarball), { recursive: true });
+      copyFileSync(tarball, keepTarball);
+      const sha = createHash("sha256")
+        .update(readFileSync(keepTarball))
+        .digest("hex");
+      console.log(`   sha256 ${sha}`);
+    });
 
   console.log(
     `smoke: ${steps.length} steps passed; ${entries.length} files in the tarball`,

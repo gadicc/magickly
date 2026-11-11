@@ -48,19 +48,26 @@ wording and arrangement.
 
 ## Installing
 
-It is not published yet. When it is:
-
 ```sh
 npm install magick-data
 ```
 
-It has no runtime dependencies.
+It has no runtime dependencies, and it is ES modules only
+([Requirements](#requirements)). In Node, or anything that bundles:
 
-A maintainer publishing it must make the tarball with `pnpm pack` or
-`pnpm publish`, never `npm publish` from this directory: the published
-`exports` come from `publishConfig.exports`, which only pnpm applies, and
-npm would publish the `exports` that point at `./src/*.ts`. A tarball pnpm
-has packed can then be published by either.
+```js
+import data from "magick-data";
+
+const tiferet = data.sephirah.tiferet;
+console.log(tiferet.name.roman, tiferet.planet?.symbol); // Tiferet ☉
+```
+
+TypeScript needs no setup: the declarations ship with the package, and
+every id is a literal type, so a misspelt one is an error. The
+[three ways in](#three-ways-in) below say what each kind of import costs,
+[the tables](#the-tables) list every subpath, and a reader that is not
+JavaScript can take [the JSON](#json). Wherever you use the data, credit
+[magick.ly](https://magick.ly) ([Licences](#licences)).
 
 ## Three ways in
 
@@ -322,6 +329,10 @@ version says nothing about whether anything drawn from the data renders the
 same: a corrected value can change a picture, and a rename can leave every
 picture as it was.
 
+From 0.1.0, each release is published by the repository's CI when the
+version changes on `main`, with npm provenance naming the commit it was
+built from. A pre-release goes out under the `next` tag, never `latest`.
+
 ## Romanised Hebrew
 
 A romanised Hebrew name writes its prefixes as Israel's official
@@ -335,8 +346,61 @@ instead; the data keeps to one of the two.
 
 ## Sources
 
-Most of this is correspondences, which belong to nobody. Five sets are
-derived from identified works and are worth naming:
+Most of this is correspondences, which belong to nobody. Every data file
+the package publishes is below, by its source in `src/` (each is
+published as `magick-data/json/<path>.json`, beside its module and
+declaration), with where it comes from; the sections after the table name
+the works. A test holds the table to the files, so no data file ships
+without a row.
+
+| Data file | Source |
+| --- | --- |
+| `alchemy/elementals.json5` | [Correspondences](#correspondences) |
+| `alchemy/elements.json5` | [Correspondences](#correspondences) |
+| `alchemy/symbols.json5` | [Correspondences](#correspondences) |
+| `alchemy/terms.json5` | [Correspondences](#correspondences); the source of `terms` is not recorded |
+| `astrology/houses.json5` | [Correspondences](#correspondences); the source of `interpretation` is not recorded |
+| `astrology/planets.json5` | [Correspondences](#correspondences); `keyOfSolomon` from [the Key of Solomon](#the-key-of-solomon); the source of `magickTypes` is not known ([plan 039](https://github.com/gadicc/magickly/blob/main/plans/039-correspondence-tables.md)) |
+| `astrology/zodiac.json5` | [Correspondences](#correspondences) |
+| `body/parts.json5` | [Correspondences](#correspondences) |
+| `chakras.json5` | [Correspondences](#correspondences) of the seven-chakra system; the file cites Wikipedia's "Chakra" article |
+| `enochian/keys.json5` | [The Enochian Keys](#the-enochian-keys) |
+| `enochian/letters.json5` | [Correspondences](#correspondences); the source of `pronounciation` and `gematria` is not recorded |
+| `enochian/tabletNotes.json5` | Ours: notes on [the Enochian tablets](#the-enochian-tablets), citing their sources |
+| `enochian/tablets.json5` | [The Enochian tablets](#the-enochian-tablets) |
+| `gd/degrees.json5` | [Correspondences](#correspondences) |
+| `gd/grades.json5` | [Correspondences](#correspondences) |
+| `geomancy/houses.json5` | [Geomancy](#geomancy) |
+| `geomancy/tetragrams.json5` | [Geomancy](#geomancy) |
+| `hebrewLetters.json5` | [Correspondences](#correspondences) |
+| `kabbalah/angelicOrders.json5` | [Correspondences](#correspondences) |
+| `kabbalah/archangels.json5` | [Correspondences](#correspondences) |
+| `kabbalah/christianChoirs.json5` | [Lenain](#lenain): the nine choirs of Pseudo-Dionysius, in his order and with his French |
+| `kabbalah/fourWorlds.json5` | [Correspondences](#correspondences) |
+| `kabbalah/godNames.json5` | [Correspondences](#correspondences) |
+| `kabbalah/kerubim.json5` | [Correspondences](#correspondences) |
+| `kabbalah/lenain/apparatus.json5` | [Lenain](#lenain) |
+| `kabbalah/lenain/evidence.json5` | [Lenain](#lenain) |
+| `kabbalah/lenain/pages.json5` | [Lenain](#lenain) |
+| `kabbalah/paths.json5` | [Correspondences](#correspondences) |
+| `kabbalah/sephirot.json5` | [Correspondences](#correspondences) |
+| `kabbalah/seventyTwoAngels.json5` | [Lenain](#lenain) |
+| `kabbalah/seventyTwoAngelsText/en.json5` | [Lenain](#lenain) |
+| `kabbalah/seventyTwoAngelsText/fr.json5` | [Lenain](#lenain) |
+| `kabbalah/souls.json5` | [Correspondences](#correspondences) |
+| `kabbalah/tribesOfIsrael.json5` | [Correspondences](#correspondences) |
+| `materia/scents.json5` | [Correspondences](#correspondences) |
+| `materia/stones.json5` | [Correspondences](#correspondences) |
+| `graph.json` | Ours: how the tables link, built from `src/graph.ts` |
+
+### Correspondences
+
+The correspondences are traditional, the Golden Dawn's above all, and are
+facts: no one work is their source. What is ours is the collecting,
+wording and arrangement, which is what CC BY 4.0 covers. Where a file also
+holds text from an identified work, its row says so.
+
+### Lenain
 
 **`seventyTwoAngels.json5`, `seventyTwoAngelsText/` and `lenain/`** come from
 Lazare Lenain, *La Science Cabalistique* (Amiens, 1823), read page by page from
@@ -360,6 +424,8 @@ twenty-five were read by a person who reads Hebrew, and each of those carries a
 note saying so. See
 [plan 031](https://github.com/gadicc/magickly/blob/main/plans/031-seventy-two-angels.md).
 
+### The Key of Solomon
+
 **`keyOfSolomon` in `astrology/planets.json5`**, on the seven classical
 planets, is what *The Key of Solomon the King* says each planet's days and
 hours serve for, in S. L. MacGregor Mathers' translation (London, 1888),
@@ -369,7 +435,9 @@ translation is in the public domain and **no rights are asserted over the
 text**. See
 [plan 039](https://github.com/gadicc/magickly/blob/main/plans/039-correspondence-tables.md).
 
-**`astrology/kameas.ts`** gives the squares of Heinrich Cornelius Agrippa,
+### Agrippa's kameas
+
+**`astrology/kameas.ts`**, which is code rather than a data file, gives the squares of Heinrich Cornelius Agrippa,
 *De occulta philosophia libri tres* (Cologne, 1533), book II, chapter 22,
 which the Golden Dawn's diagrams follow. Agrippa died in 1535, the squares
 are facts, and **no rights are asserted over them**. Six are computed by
@@ -378,6 +446,8 @@ of order 6, is written out; the tests check that every square is magic,
 that each starts with his first row, and that Saturn's and Jupiter's are
 his row by row. See
 [plan 061](https://github.com/gadicc/magickly/blob/main/plans/061-gd-hall.md).
+
+### The Enochian Keys
 
 **`enochian/keys.json5`** gives the Enochian Keys as Dee received them
 in Cracow from 13 April to 13 July 1584. Each Key is read word by word
@@ -409,6 +479,8 @@ under CC BY 4.0. Nothing in them comes from a modern edition or
 transcription, which are in copyright. See
 [plan 073](https://github.com/gadicc/magickly/blob/main/plans/073-enochian-keys.md).
 
+### The Enochian tablets
+
 **`enochian/tablets.json5`** gives the Enochian tablets as each source
 prints them, so that both traditions are served. In the owner's words
 (24 October 2026): "we want to accommodate Enochian practitioners from
@@ -431,3 +503,31 @@ they return). The file's comment says where each square comes from. The
 letters are facts, and **no rights are asserted over them**. See
 [plan 061](https://github.com/gadicc/magickly/blob/main/plans/061-gd-hall.md),
 "Tablet versions".
+
+### Geomancy
+
+**`geomancy/tetragrams.json5`**: what each figure means in each house
+(`meanings`) is the Golden Dawn's table as Aleister Crowley printed it in
+"A Handbook of Geomancy", *The Equinox*, vol. I no. 2 (London, 1909),
+pp. 154-156 (archive.org `crowley-equinox_202110`, the file "The Equinox
+Vol. 1, No. 2", leaves n158-n160), read from the page images. The changes
+are editorial and listed cell by cell in plan 075: abbreviations spelled
+out, "evil" and "ill" read "unfavourable" (or "bad" where the Equinox
+pairs good with bad), and a full stop ending each entry. A figure's
+`meaning` is the Equinox's where it gives one, and otherwise our own
+words, from the Equinox's account or Agrippa's *Fourth Book*;
+`translation` is the plain English of the figure's Latin name.
+
+**`geomancy/houses.json5`** says what each house governs, in our own
+words, from Agrippa's list in "Of Geomancy", *Henry Cornelius Agrippa
+his Fourth Book of Occult Philosophy*, translated by Robert Turner
+(London, 1655), pp. 9-10 (archive.org `b20458563`, leaves n34-n35), with
+the matters Crowley ties to a house in the same Handbook (pp. 145, 153
+and 159). The fifth and seventh houses follow Agrippa, not modern
+astrology.
+
+Both works are in the public domain, and **no rights are asserted over
+the Equinox's table or anything quoted from either**; our own words and
+the edits are under CC BY 4.0. Nothing in them comes from a modern
+edition or essay. See
+[plan 075](https://github.com/gadicc/magickly/blob/main/plans/075-geomancy-own-words.md).

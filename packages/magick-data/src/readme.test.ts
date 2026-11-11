@@ -1,4 +1,5 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import data from "./data.ts";
 import { type TableName, tables } from "./tables.ts";
@@ -114,5 +115,92 @@ describe("README's counts of tables", () => {
     expect(prose).toContain(
       `The ${["", "one", "two", "three", "four", "five"][arrays.length]} array tables' modules export no id type.`,
     );
+  });
+});
+
+/**
+ * The data files the package publishes, named as the README's Sources table
+ * names them: each JSON5 source in `src/` whose emitted JSON the manifest's
+ * `files` does not exclude, and the graph (plan 080, decision 3). The
+ * licence is CC BY 4.0 and cannot be withdrawn, so a file must say where it
+ * comes from before it ships.
+ */
+function publishedDataFiles(): string[] {
+  const excluded = (pkg.files as string[])
+    .filter((pattern) => pattern.startsWith("!dist/"))
+    .map(
+      (pattern) =>
+        new RegExp(
+          `^${pattern
+            .slice(1)
+            .replace(/[.+?^${}()|[\]\\]/g, "\\$&")
+            .replace(/\*/g, "[^/]*")}$`,
+        ),
+    );
+  const src = fileURLToPath(new URL(".", import.meta.url));
+  return readdirSync(src, { recursive: true, encoding: "utf8" })
+    .filter((file) => file.endsWith(".json5"))
+    .map((file) => file.split("\\").join("/"))
+    .filter((file) => {
+      const json = `dist/${file.replace(/\.json5$/, ".json")}`;
+      return !excluded.some((pattern) => pattern.test(json));
+    })
+    .concat("graph.json")
+    .sort();
+}
+
+/** The rows of the Markdown table under "## Sources": file and source. */
+function readmeSources(): { file: string; source: string }[] {
+  const section = README.split(/^## /m).find((s) => s.startsWith("Sources"));
+  if (!section) throw new Error("README has no “Sources” section");
+  const lines = section
+    .split("\n")
+    .filter((line) => line.startsWith("|"))
+    .slice(2);
+  return lines.map((line) => {
+    const cells = line
+      .split("|")
+      .slice(1, -1)
+      .map((cell) => cell.trim());
+    if (cells.length !== 2) throw new Error(`malformed row: ${line}`);
+    return { file: cells[0].replace(/`/g, ""), source: cells[1] };
+  });
+}
+
+/** A heading's anchor, as GitHub and npm make it. */
+function slug(heading: string): string {
+  return heading
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s-]/gu, "")
+    .replace(/\s/g, "-");
+}
+
+describe("README's Sources", () => {
+  const rows = readmeSources();
+  const anchors = new Set(
+    [...README.matchAll(/^#{2,3} (.+)$/gm)].map((m) => slug(m[1])),
+  );
+
+  it("names every published data file exactly once", () => {
+    const files = rows.map((row) => row.file);
+    expect(files.length).toBe(new Set(files).size);
+    expect([...files].sort()).toEqual(publishedDataFiles());
+  });
+
+  it("leaves the dictionary out, as the package does", () => {
+    expect(publishedDataFiles()).not.toContain("enochian/dictionary.json5");
+    expect(publishedDataFiles()).toContain("enochian/keys.json5");
+  });
+
+  it("publishes every file it names as JSON", () => {
+    expect(published["./json/*.json"]).toBe("./dist/*.json");
+    expect(published["./graph.json"]).toBe("./dist/graph.json");
+  });
+
+  it.each(rows)("$file says where it comes from", ({ source }) => {
+    expect(source).not.toBe("");
+    for (const [, anchor] of source.matchAll(/\]\(#([^)]+)\)/g))
+      expect(anchors).toContain(anchor);
   });
 });

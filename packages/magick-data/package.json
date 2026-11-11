@@ -1,8 +1,14 @@
 {
   "name": "magick-data",
   "version": "0.0.0",
-  "private": true,
   "license": "SEE LICENSE IN LICENSE.txt",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gadicc/magickly.git",
+    "directory": "packages/magick-data"
+  },
+  "homepage": "https://github.com/gadicc/magickly/tree/main/packages/magick-data#readme",
+  "bugs": "https://github.com/gadicc/magickly/issues",
   "type": "module",
   "sideEffects": false,
   "files": [
@@ -264,7 +270,8 @@
     "data:check": "node --import tsx src/check.ts",
     "typecheck": "tsc -p tsconfig.json",
     "build": "pnpm data:build && rm -rf lib && tsc -p tsconfig.build.json",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "prepublishOnly": "node scripts/prepublishGuard.mjs"
   },
   "devDependencies": {
     "@types/node": "24.19.2",
