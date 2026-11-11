@@ -142,10 +142,25 @@ Published rituals keep their stored bytes, as always.
 Plan 061 gains a dated correction: FrankRuehl CLM is plain GPL-2, and the
 halls' Hebrew is now Frank Ruhl Libre Bold.
 
+### 6. Which Hebrew font for what
+
+Gadi's rule, 11 November 2026:
+
+- **Frank Ruhl Libre** for Hebrew that stands alone: single letters,
+  names and short or large words (the halls' banners, Tarot keys and
+  Pantacle ring; the names on the entity pages; Lenain's pointed names).
+- **Noto Sans Hebrew** for longer running Hebrew, where it reads more
+  clearly.
+- No Noto Serif Hebrew: it is too close to Frank Ruhl Libre to be worth a
+  third face.
+
+New Hebrew in the app follows this rule; `AGENTS.md` points here.
+
 ### Not in scope
 
-- Rituals' Hebrew: still the system font, as it always has been; setting it
-  in Frank Ruhl Libre is the commented line in `DocRender.tsx`.
+- Rituals' Hebrew: still the system font, as it always has been. Setting
+  it would follow decision 6 (Noto Sans Hebrew for running text), not the
+  commented Frank Ruhl Libre line in `DocRender.tsx`, which predates it.
 - `/about#credits` lists no fonts (nor does the hall images' licence
   metadata), so neither gains one.
 - Help screenshots: none shows Hebrew (the Neophyte hall has no letter

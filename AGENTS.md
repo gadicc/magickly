@@ -56,3 +56,10 @@ as the Llewellyn editions of Regardie's *The Golden Dawn*) never enter
 the repository, not even as crops or extracted images; only facts taken
 from them, such as a temple layout, drawn with our own art. Material from
 private temples stays out of the repository altogether.
+
+## Hebrew fonts
+
+Hebrew that stands alone (single letters, names, short or large words) is
+set in Frank Ruhl Libre; longer running Hebrew in Noto Sans Hebrew; Noto
+Serif Hebrew is not used. Plan 079, decision 6, has the rule and where each
+font lives.
