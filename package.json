@@ -43,7 +43,9 @@
     "search:compare": "pnpm data:build && pnpm search:build && loom env -- node --import tsx scripts/search/embed.mts compare",
     "search:publish": "pnpm data:build && pnpm search:build && loom env -- node --import tsx scripts/search/embed.mts publish",
     "search:browser": "node --import tsx scripts/search/browser.mts",
-    "search:watch": "node --import tsx scripts/search/watch.mts"
+    "search:watch": "node --import tsx scripts/search/watch.mts",
+    "translate-eval:testset": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts testset",
+    "translate-eval:baseline": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts baseline"
   },
   "dependencies": {
     "@ai-sdk/react": "4.0.156",
