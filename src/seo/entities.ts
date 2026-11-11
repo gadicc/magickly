@@ -1,6 +1,8 @@
 import Data from "magick-data";
 import { rowOf } from "magick-data/rowOf";
 import type { SephirahRow } from "magick-data/rows";
+import { dayOf } from "@/components/astrology/planetDays";
+import { planetName } from "@/components/astrology/planetName";
 import { angelBySlug, angelSlugs } from "@/lib/angelSlugs";
 import { RWSName } from "@/tarot";
 import type { SeoPage } from "./pages";
@@ -29,19 +31,31 @@ function correspondences(lead: string, fields: (string | false | undefined)[]) {
   return text;
 }
 
-/** `/astrology/planet/<id>`, including the Kabbalistic heavens. */
+const AND = new Intl.ListFormat("en-GB", { type: "conjunction" });
+
+/**
+ * `/astrology/planet/<id>`, including the Kabbalistic heavens. A common name
+ * leads, with the planet's own name beside its Hebrew: "the Sun (Sol, Hebrew
+ * שמש, Shemesh)". Each common name so far takes "the".
+ */
 export function planetPage(id: string): EntityPage | null {
   const planet = rowOf(Data.planet, id);
   if (!planet) return null;
-  const name = planet.name.en.en ?? id;
-  const hebrew = planet.name.he?.he
-    ? ` (Hebrew ${planet.name.he.he}, ${planet.name.he.roman})`
+  const he = planet.name.he?.he
+    ? `Hebrew ${planet.name.he.he}, ${planet.name.he.roman}`
     : "";
+  const named = planet.commonName
+    ? `the ${planet.commonName} (${[planet.name.en.en, he].filter(Boolean).join(", ")})`
+    : `${planet.name.en.en}${he ? ` (${he})` : ""}`;
+  const day = dayOf(id);
   return {
     path: `/astrology/planet/${id}`,
-    title: `${name}${planet.symbol ? ` ${planet.symbol}` : ""} Correspondences`,
-    description: correspondences(`Correspondences of ${name}${hebrew}`, [
+    title: `${planetName(planet)}${planet.symbol ? ` ${planet.symbol}` : ""} Correspondences`,
+    description: correspondences(`Correspondences of ${named}`, [
       planet.symbol && `symbol ${planet.symbol}`,
+      day && `day ${day}`,
+      planet.zodiacs.length > 0 &&
+        `rules ${AND.format(planet.zodiacs.map((sign) => sign.name.en))}`,
       planet.hebrewLetter && `letter ${planet.hebrewLetter.letter.name}`,
       planet.godName?.name.roman && `god name ${planet.godName.name.roman}`,
       planet.archangel && `archangel ${planet.archangel.name.roman}`,

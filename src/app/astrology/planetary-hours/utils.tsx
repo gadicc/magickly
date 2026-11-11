@@ -1,5 +1,6 @@
 import { differenceInMinutes, format } from "date-fns";
 import SunCalc from "suncalc";
+import { dayRulers } from "@/components/astrology/planetDays";
 import type { Place } from "@/geo/place";
 import { utcOffsetMinutes } from "@/geo/timeZone";
 
@@ -9,7 +10,6 @@ import { utcOffsetMinutes } from "@/geo/timeZone";
 // https://www.lunarium.co.uk/articles/planetary-hours-and-days.jsp
 // https://en.wikipedia.org/wiki/Planetary_hours
 
-const start = ["sol", "luna", "mars", "mercury", "jupiter", "venus", "saturn"];
 export const DAY_IN_MS = 60_000 * 60 * 24;
 export const chaldean = [
   "saturn", // ♄
@@ -137,7 +137,7 @@ export function calcPlanetaryHoursForDayAndLocation(
 
   const nextDay = new Date(date.getTime() + DAY_IN_MS);
   const solarNext = SunCalc.getTimes(nextDay, geo.latitude, geo.longitude);
-  const chaldeanStartPos = chaldean.indexOf(start[weekday]);
+  const chaldeanStartPos = chaldean.indexOf(dayRulers[weekday]);
 
   // Daytime Hours
   const daytimeMinutes = differenceInMinutes(solar.sunset, solar.sunrise);

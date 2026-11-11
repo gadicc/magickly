@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { moonMeanInclination } from "@/components/astrology/Moon";
 import { resetPlaceStore } from "@/geo/usePlace";
 import { hydrateAt, renderAt } from "../../../../tests/hydration";
-import { PlaceMoon } from "./planets";
+import Planets, { PlaceMoon } from "./planets";
 
 // The page is prerendered at build time and viewed later.
 const buildTime = new Date("2026-09-17T10:16:00Z");
@@ -85,5 +85,18 @@ describe("the planets page's moon", () => {
   it("stays northern for a place on the equator", async () => {
     const equator = { name: "Quito", latitude: 0, longitude: -78.5 };
     expect((await visit(equator)).transform).toBe(north);
+  });
+});
+
+describe("the planets table", () => {
+  it("names each planet as readers search for it, as its page does", () => {
+    const html = renderAt(buildTime, <Planets />);
+    const links = [
+      ...html.matchAll(/href="\/astrology\/planet\/([^"]+)">([^<]*)</g),
+    ].map(([, id, name]) => [id, name]);
+    expect(links).toContainEqual(["sol", "Sun (Sol)"]);
+    expect(links).toContainEqual(["luna", "Moon (Luna)"]);
+    expect(links).toContainEqual(["rahu", "North Node (Caput Draconis)"]);
+    expect(links).toContainEqual(["mercury", "Mercury"]);
   });
 });

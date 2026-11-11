@@ -6,6 +6,7 @@ export const fields: EntityFields = {
   shown: [
     // The heading, the lede and the Symbol row.
     "name.en",
+    "commonName",
     "name.he",
     "symbol",
     // The Symbol row's second half: the metal, for the seven.

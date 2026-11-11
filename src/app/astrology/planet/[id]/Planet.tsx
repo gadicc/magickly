@@ -3,6 +3,8 @@ import type { PlanetRow } from "magick-data/rows";
 import { Fragment } from "react";
 import { chaldean } from "@/app/astrology/planetary-hours/utils";
 import PlanetarySpirit from "@/components/astrology/planetarySpirits";
+import { dayOf } from "@/components/astrology/planetDays";
+import { planetName } from "@/components/astrology/planetName";
 import {
   EntityFrame,
   EntityTable,
@@ -48,13 +50,15 @@ function hasOnlyItsSymbol(planet: PlanetRow) {
 }
 
 /**
- * "in Hebrew שמש, Shemesh, “Sun”", after whatever the lede leads with; the
- * gloss is left out where it only repeats the heading, as the zodiac's would.
+ * "in Hebrew לבנה, Levanah, “White”", after whatever the lede leads with;
+ * the gloss is left out where it only repeats the heading, as the zodiac's
+ * and Sol's would.
  */
 function inHebrew(planet: PlanetRow) {
   const he = planet.name.he;
   if (!he) return null;
-  const meaning = glossBeside(planet.name.en.en, he.en);
+  // Beside the heading's common name too: Sol's “Sun” is already there.
+  const meaning = glossBeside(planet.commonName ?? planet.name.en.en, he.en);
   return (
     <>
       <Hebrew>{he.he}</Hebrew>, <span lang="he-Latn">{he.roman}</span>
@@ -111,6 +115,7 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
   const path = letter?.hermeticPath;
   const metal = planet.alchemySymbol;
   const grade = planet.gdGrade;
+  const name = planetName(planet);
 
   return (
     <EntityFrame>
@@ -118,13 +123,13 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
       <Breadcrumbs
         trail={entityTrail(
           "/astrology/planets",
-          planet.name.en.en,
+          name,
           `/astrology/planet/${planet.id}`,
         )}
       />
 
       <h1>
-        {planet.name.en.en}
+        {name}
         {planet.symbol ? ` ${planet.symbol}` : null}
       </h1>
 
@@ -146,6 +151,8 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
               </>
             ) : null}
           </Row>
+          {/* The day the planet rules, for the seven the hours count. */}
+          <Row label="Day">{dayOf(planet.id)}</Row>
           <Row label="Hebrew letter">
             {letter ? (
               <>

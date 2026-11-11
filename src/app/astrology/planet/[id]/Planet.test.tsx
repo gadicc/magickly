@@ -1,6 +1,7 @@
 import Data from "magick-data";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
+import { planetName } from "@/components/astrology/planetName";
 import {
   expectEntityPage,
   hrefsOf,
@@ -42,6 +43,7 @@ async function page(id: string) {
 /** The table's labels, in the order the page renders them. */
 const LABELS = [
   "Symbol",
+  "Day",
   "Hebrew letter",
   "Path",
   "Sephirah",
@@ -88,8 +90,8 @@ describe("the planet page", () => {
       expectEntityPage(
         html,
         planet.symbol
-          ? `${planet.name.en.en} ${planet.symbol}`
-          : planet.name.en.en,
+          ? `${planetName(planet)} ${planet.symbol}`
+          : planetName(planet),
       );
       // The dump printed `kind` as a row; its labels are now these, in this
       // order, and nothing else.
@@ -106,9 +108,11 @@ describe("the planet page", () => {
     // all, and the plan's sketch is drawn from it.
     const html = await page("sol");
     expect(rowsOf(html).map((each) => each.label)).toEqual(LABELS);
-    expect(textOf(html)).toContain("In Hebrew שמש, Shemesh, “Sun”");
+    // The gloss “Sun” is left out: the heading already says it.
+    expect(textOf(html)).toContain("In Hebrew שמש, Shemesh.");
 
     expect(row(html, "Symbol").text).toBe("☉ · alchemical 🜚 Gold");
+    expect(row(html, "Day").text).toBe("Sunday");
     expect(row(html, "Hebrew letter").text).toBe("ר Resh · 200 · “head”");
     expect(row(html, "Path")).toMatchObject({
       text: "30, Hod – Yesod, The Sun",
@@ -145,6 +149,40 @@ describe("the planet page", () => {
     expect(operations).toMatch(
       / An editorial summary; its source is not recorded\.$/,
     );
+  });
+
+  it("leads with the name readers search for, where the row has one", async () => {
+    // The heading and the breadcrumb both; the URL and the id stay Sol's.
+    const heading = (html: string) =>
+      textOf(html.match(/<h1>([\s\S]*?)<\/h1>/)?.[1] ?? "");
+    const html = await page("sol");
+    expect(heading(html)).toBe("Sun (Sol) ☉");
+    expect(html).toContain('"name":"Sun (Sol)"');
+    expect(heading(await page("rahu"))).toBe("North Node (Caput Draconis) ☊");
+    expect(heading(await page("ketu"))).toBe("South Node (Cauda Draconis) ☋");
+    expect(heading(await page("mercury"))).toBe("Mercury ☿");
+    // Luna's gloss is not her common name, so it stays.
+    const luna = await page("luna");
+    expect(heading(luna)).toBe("Moon (Luna) ☾");
+    expect(textOf(luna)).toContain("In Hebrew לבנה, Levanah, “White”.");
+  });
+
+  it("gives the seven planets their day, and no other row", async () => {
+    // The days the planetary hours begin from, Sunday the Sun's.
+    const days: Record<string, string> = {};
+    for (const id of ids) {
+      const found = rowsOf(await page(id)).find((each) => each.label === "Day");
+      if (found) days[id] = found.text;
+    }
+    expect(days).toEqual({
+      sol: "Sunday",
+      mercury: "Wednesday",
+      venus: "Friday",
+      luna: "Monday",
+      mars: "Tuesday",
+      jupiter: "Thursday",
+      saturn: "Saturday",
+    });
   });
 
   it("lists every sign a planet rules", async () => {

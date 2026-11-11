@@ -20,14 +20,14 @@ describe("entity pages", () => {
       title: "Saturn ♄ Correspondences",
       description:
         "Correspondences of Saturn (Hebrew שַׁבְּתַאי, Shabbathai): symbol ♄, " +
-        "letter Tav, god name YHVH Elohim, archangel Kassiel, intelligence " +
-        "Agiel, spirit Zazel.",
+        "day Saturday, rules Capricorn and Aquarius, letter Tav, god name " +
+        "YHVH Elohim.",
     });
     // Luna's god name arrived with its id's spelling fix (plans/032).
     expect(planetPage("luna")?.description).toBe(
-      "Correspondences of Luna (Hebrew לבנה, Levanah): symbol ☾, letter " +
-        "Gimel, god name Shaddai El Chai, archangel Gavriel, intelligence " +
-        "Shelachel, spirit Chasmodai.",
+      "Correspondences of the Moon (Luna, Hebrew לבנה, Levanah): symbol ☾, " +
+        "day Monday, rules Cancer, letter Gimel, god name Shaddai El Chai, " +
+        "archangel Gavriel.",
     );
     expect(planetPage("primum-mobile")).toMatchObject({
       title: "Primum Mobile Correspondences",
@@ -37,6 +37,50 @@ describe("entity pages", () => {
     expect(planetPage("earth")?.description).toBe(
       "Correspondences of Earth: symbol ♁.",
     );
+  });
+
+  it("leads with the name readers search for, where a planet has one", () => {
+    expect(planetPage("sol")).toMatchObject({
+      path: "/astrology/planet/sol",
+      title: "Sun (Sol) ☉ Correspondences",
+    });
+    expect(planetPage("sol")?.description).toMatch(
+      /^Correspondences of the Sun \(Sol, Hebrew שמש, Shemesh\): symbol ☉, day Sunday, rules Leo, /,
+    );
+    expect(planetPage("rahu")).toMatchObject({
+      title: "North Node (Caput Draconis) ☊ Correspondences",
+      description:
+        "Correspondences of the North Node (Caput Draconis): symbol ☊.",
+    });
+    expect(planetPage("mercury")?.description).toMatch(
+      /^Correspondences of Mercury \(Hebrew כוכב, Kochav\): symbol ☿, day Wednesday, rules Gemini and Virgo, /,
+    );
+  });
+
+  it("knows every common name, since each is given the article “the”", () => {
+    // A new common name may not take one: check its description, then add it.
+    expect(
+      Object.values(Data.planet).flatMap((planet) =>
+        planet.commonName ? [planet.commonName] : [],
+      ),
+    ).toEqual(["Sun", "Moon", "North Node", "South Node"]);
+  });
+
+  it("gives each of the seven planets a description of a snippet's length", () => {
+    // Long enough to say what the page holds, short enough not to be cut.
+    for (const id of [
+      "sol",
+      "luna",
+      "mars",
+      "mercury",
+      "jupiter",
+      "venus",
+      "saturn",
+    ]) {
+      const { length } = planetPage(id)?.description ?? "";
+      expect(length, id).toBeGreaterThanOrEqual(110);
+      expect(length, id).toBeLessThanOrEqual(160);
+    }
   });
 
   it("describes grades with and without a Sephirah", () => {

@@ -133,6 +133,11 @@ export const schemas = {
     id: v.string(),
     /** Which of the two things this table holds the row is: required of both. */
     kind: v.picklist(["planet", "sphere"]),
+    /**
+     * The everyday English name, where readers search by another than
+     * `name.en.en`: "Sun" for Sol, "North Node" for Caput Draconis.
+     */
+    commonName: v.optional(v.string()),
     name: v.strictObject({
       en,
       he: v.optional(

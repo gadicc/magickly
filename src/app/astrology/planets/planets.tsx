@@ -2,6 +2,7 @@
 
 import MercuryWidget from "@magick-components/astrology/Mercury";
 import MoonWidget from "@magick-components/astrology/Moon";
+import { planetName } from "@magick-components/astrology/planetName";
 import Link from "@magick-components/Link";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -79,7 +80,7 @@ export default function Planets() {
                       </Box>
                     )}
                     <Link href={"/astrology/planet/" + planet.id}>
-                      {planet.name.en.en}
+                      {planetName(planet)}
                     </Link>
                   </TableCell>
 
