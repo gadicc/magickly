@@ -41,4 +41,5 @@ skips it when kerning.
 `FrankRuhlLibre-OFL.txt` (Copyright 2015 The Frank Ruhl Libre Project
 Authors, https://github.com/fontef/frankruhllibre) are the upstream SIL Open
 Font License 1.1 notices from the same commit; neither declares a Reserved
-Font Name.
+Font Name. `FrankRuhlLibre-OFL.txt` ends with a few lines of a GitHub page
+footer; they are in the upstream file, which is kept byte for byte.

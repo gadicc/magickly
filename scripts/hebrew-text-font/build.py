@@ -14,7 +14,8 @@ centred over each letter: across from the letter's below-vowel anchor
 (the designer's centre for its points) at the height of its holam anchor,
 both of which vary with weight. A letter without those anchors (the final
 forms, which never carry the dot in our texts) takes its ink centre at
-holam's height. public/fonts/FrankRuhlLibre-OFL.txt, the licence, comes
+holam's height. The glyphs `ccmp` composes from a letter and its points
+(lamed with dagesh, shin with its dot...) take their letter's anchor. public/fonts/FrankRuhlLibre-OFL.txt, the licence, comes
 from scripts/gd-hall-fonts/build.py, which uses the same source.
 
 Run from the repository root:
@@ -54,6 +55,8 @@ HOLAM = "uni05B9"
 # The Hebrew block, as the CLM stylesheet it replaces declared it.
 HEBREW_BLOCK = range(0x0590, 0x0600)
 LETTERS = range(0x05D0, 0x05EB)
+# locl and mkmk have nothing for Hebrew and are pruned; kept in case a
+# later source adds some.
 LAYOUT_FEATURES = ["ccmp", "locl", "mark", "mkmk", "kern"]
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -150,10 +153,50 @@ def add_upper_dot(font: TTFont) -> None:
         base.BaseAnchor.append(
             top_centre(font, glyph, base, below_class, holam_class)
             if by_glyph.get(glyph) in LETTERS else None)
+    # `ccmp` composes a letter and its points into one glyph (lamed with
+    # dagesh, shin with its dot, alef with qamats...) when the text is
+    # tagged Hebrew, as every page of ours is; each takes the dot where
+    # the letter it starts from has it. Some build on others (shin with
+    # its dot, then dagesh), so repeat until nothing changes.
+    pending = ccmp_ligatures(font)
+    while True:
+        done = []
+        for first, ligature in pending:
+            anchor = bases[first].BaseAnchor[new_class] if first in bases else None
+            if anchor is None:
+                continue
+            base = bases.get(ligature)
+            if base is None:
+                base = bases[ligature] = ot.BaseRecord()
+                base.BaseAnchor = [None] * (new_class + 1)
+            if base.BaseAnchor[new_class] is None:
+                base.BaseAnchor[new_class] = copy.deepcopy(anchor)
+            done.append((first, ligature))
+        if not done:
+            break
+        pending = [pair for pair in pending if pair not in done]
     ordered = sorted(bases, key=font.getGlyphID)
     sub.BaseCoverage.glyphs = ordered
     sub.BaseArray.BaseRecord = [bases[glyph] for glyph in ordered]
     sub.BaseArray.BaseCount = len(ordered)
+
+
+def ccmp_ligatures(font: TTFont) -> list[tuple[str, str]]:
+    """(first component, ligature) for every `ccmp` ligature."""
+    gsub = font["GSUB"].table
+    indices = sorted({index for record in gsub.FeatureList.FeatureRecord
+                      if record.FeatureTag == "ccmp"
+                      for index in record.Feature.LookupListIndex})
+    pairs = []
+    for index in indices:
+        lookup = gsub.LookupList.Lookup[index]
+        for sub in lookup.SubTable:
+            sub = sub.ExtSubTable if lookup.LookupType == 7 else sub
+            if sub.LookupType != 4:
+                continue
+            for first, ligatures in sub.ligatures.items():
+                pairs += [(first, ligature.LigGlyph) for ligature in ligatures]
+    return pairs
 
 
 def top_centre(font, glyph, base, below_class, holam_class):
@@ -192,24 +235,47 @@ def subset_font(font: TTFont) -> TTFont:
     return font
 
 
+# What the texts put the dot on, bare and with the points `ccmp` composes
+# into one glyph: dagesh (once, and twice as one name has it), qamats,
+# holam on vav, shin dot.
+DOTTED = ["א", "י", "ל", "ש", "ב", "ל\u05BC", "ל\u05BC\u05BC", "א\u05BC",
+          "י\u05BC", "א\u05B8", "ו\u05B9", "ש\u05C1"]
+
+
 def check(ttf: bytes) -> None:
-    """The dot sits over each letter that carries it, at every weight."""
+    """The dot sits over each letter that carries it, at every weight,
+    whether or not the text is tagged Hebrew (which selects the `IWR `
+    language system and its ligatures, as browsers do for lang="he")."""
     face = hb.Face(hb.Blob(ttf))
     font = hb.Font(face)
+    dot_glyph = font.get_nominal_glyph(UPPER_DOT)
+
+    def shape(text, language):
+        buf = hb.Buffer()
+        buf.add_str(text + chr(UPPER_DOT))
+        buf.guess_segment_properties()
+        if language:
+            buf.language = language
+        hb.shape(font, buf)
+        dot = next(p for i, p in zip(buf.glyph_infos, buf.glyph_positions)
+                   if i.codepoint == dot_glyph)
+        base = next(p for p in buf.glyph_positions if p.x_advance)
+        return dot, base
+
     for weight in (300, 400, 700, 900):
         font.set_variations({"wght": weight})
-        for letter in "אילשב":
-            buf = hb.Buffer()
-            buf.add_str(letter + chr(UPPER_DOT))
-            buf.guess_segment_properties()
-            hb.shape(font, buf)
-            infos, positions = buf.glyph_infos, buf.glyph_positions
-            # Right to left: the mark comes first, drawn back over the letter.
-            dot = next(p for i, p in zip(infos, positions) if p.x_advance == 0)
-            base = next(p for p in positions if p.x_advance)
-            if not (0 < dot.x_offset < base.x_advance) or dot.y_offset < -20:
-                sys.exit(f"U+05C4 on {letter} at weight {weight}: "
-                         f"offset ({dot.x_offset}, {dot.y_offset})")
+        for language in (None, "he"):
+            for text in DOTTED:
+                dot, base = shape(text, language)
+                bare, _ = shape(text[0], language)
+                if (not (0 < dot.x_offset < base.x_advance)
+                        or dot.y_offset < -20
+                        or (dot.x_offset, dot.y_offset)
+                        != (bare.x_offset, bare.y_offset)):
+                    sys.exit(f"U+05C4 on {text!r} at weight {weight}, "
+                             f"language {language}: offset "
+                             f"({dot.x_offset}, {dot.y_offset}), bare letter "
+                             f"({bare.x_offset}, {bare.y_offset})")
 
 
 def main() -> None:

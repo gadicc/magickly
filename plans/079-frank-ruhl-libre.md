@@ -17,7 +17,7 @@ plain GPL-2, as Debian's packaging also lists it
 [Plan 061](061-gd-hall.md), decision 7, assumed the exception applied. On
 screen that is harmless, but an outlined image or SVG download drawn with
 it would carry GPL-2 font data, and none of it may go into the MIT
-`magick-components` package that plan 078 prepares.
+`magick-components` package that plan 078 (in preparation) sets up.
 
 **Frank Ruhl Libre** (Yanek Iontef; google/fonts
 `ofl/frankruhllibre/FrankRuhlLibre[wght].ttf`) is SIL OFL 1.1,
@@ -49,9 +49,10 @@ fonts and Noto Emoji already use): `FrankRuhlLibre[wght].ttf`, SHA-256
 ### 1. One Hebrew text font, self-hosted, every weight
 
 `scripts/hebrew-text-font/build.py` subsets the pinned variable font to its
-Hebrew block (U+0590–05FF), keeping the weight axis and `ccmp`, `locl`,
-`mark`, `mkmk` and `kern`, as one WOFF2: `public/fonts/FrankRuhlLibre-Hebrew.woff2`,
-14,316 bytes for weights 300–900 (one CLM weight was 18.5 KB).
+Hebrew block (U+0590–05FF), keeping the weight axis and the layout features
+that have anything for Hebrew (`ccmp`, `mark` and `kern`), as one WOFF2:
+`public/fonts/FrankRuhlLibre-Hebrew.woff2`, 14,264 bytes for weights 300–900
+(one CLM weight was 18.5 KB).
 `public/fonts/FrankRuhlLibre.css` declares it as `Frank Ruhl Libre`,
 `font-weight: 300 900`, `unicode-range: U+0590-05FF`;
 `public/fonts/hebrew-text-font-sources.md` records the source, versions and
@@ -59,7 +60,8 @@ hash. No Google Fonts CDN.
 
 The root layout imports the stylesheet, so every page that names the family
 gets it, the entity pages included; the browser downloads the file only on a
-page that draws Hebrew in it (a ritual page does not). The CLM files and
+page that draws Hebrew in it (a ritual page does not; a hall may, as its
+stack's fallback while the hall's own subset loads). The CLM files and
 their licence are deleted. The editor trial points at the new file.
 
 **Obliques: none.** Frank Ruhl Libre has no italic and the stylesheet
@@ -72,8 +74,9 @@ Frank Ruhl Libre has no U+05C4 (HEBREW MARK UPPER DOT) and no cantillation
 marks. The repository uses U+05C4 195 times in the Lenain edition (all in
 chapter 6, the 72 genii) and 195 times in the 72 angels' pointed names,
 always on א, י or ל (sometimes after a dagesh); and U+0592 (accent segol)
-twice in Lenain. The built-in rituals' Hebrew needs nothing the font lacks.
-Ritual drafts in the database were not scanned.
+once in Lenain (in the reader's data, and again in its Markdown download).
+The built-in rituals' Hebrew needs nothing the font lacks. Ritual drafts in
+the database were not scanned.
 
 The options, shown side by side at real sizes on 11 November: keep CLM for
 those pages; Frank Ruhl Libre with another font filling in the dotted
@@ -85,10 +88,17 @@ font's own holam dot, attached by a new mark class centred over each letter
 — across from the letter's below-vowel anchor (the designer's centre for its
 points) at the height of its holam anchor, both varying with weight like the
 font's own anchors. The final forms, which never carry the dot here, take
-their ink centre at holam's height. The script checks with HarfBuzz that the
-dot lands over א, י, ל, ש and ב at weights 300, 400, 700 and 900. OFL allows
-the modified font, and with no Reserved Font Name it keeps its name. U+0592
-falls to the next font in the reader's stack.
+their ink centre at holam's height. Text tagged Hebrew (`lang="he"`, as the
+reader and the entity pages are) selects the font's `IWR ` language system,
+whose `ccmp` composes a letter and its points into one glyph (lamed with
+dagesh, shin with its dot, alef with qamats...); each of those takes its
+letter's anchor. That matters: 21 of the 65 dotted letters in each text are
+lamed with dagesh. The script checks with HarfBuzz that the dot lands where
+it does on the bare letter, for each letter and composed form the texts dot,
+at weights 300, 400, 700 and 900, with and without the language tag. OFL
+allows the modified font, and with no Reserved Font Name it keeps its name.
+U+0592 falls to the next font in the reader's stack (FrankRuehl CLM had
+it).
 
 ### 3. The halls' Hebrew in Frank Ruhl Libre Bold
 

@@ -152,6 +152,8 @@ boundary). The fonts are already here and licensed, and both
 `FrankRuehlCLM-Medium` and `NotoSansHebrew-Regular` cover U+05C4 and U+05BC,
 which is Lenain's pointing exactly; `FrankRuehlCLM-stylesheet.css` is currently
 imported only by `DocRender.tsx` and needs importing here too.
+(11 November 2026: FrankRuehl CLM, plain GPL-2, is replaced by Frank Ruhl
+Libre with an added U+05C4; see [plan 079](079-frank-ruhl-libre.md).)
 
 Each page marker links to the facsimile: `books.google.com/books?id=ZqgpxTZ43HkC&pg=PA53`
 resolves (HTTP 200, parameter preserved through a locale redirect).

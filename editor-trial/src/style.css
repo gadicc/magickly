@@ -1,4 +1,4 @@
-@font-face { font-family: "Trial Hebrew"; src: url("../../public/fonts/FrankRuhlLibre-Hebrew.woff2") format("woff2"); }
+@font-face { font-family: "Trial Hebrew"; src: url("../../public/fonts/FrankRuhlLibre-Hebrew.woff2") format("woff2"); font-weight: 300 900; }
 @font-face { font-family: "Trial Enochian"; src: url("../../assets/fonts/EnochianPlain.ttf") format("truetype"); }
 *:lang(he) { font-family: "Trial Hebrew", serif; }
 *:lang(x-enochian) { font-family: "Trial Enochian", serif; }
