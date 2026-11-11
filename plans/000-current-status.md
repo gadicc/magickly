@@ -175,7 +175,19 @@ Follow-ups are separate from the completed migration work:
   the word. Links keep the search (`?q=`, `?w=`). Built 10 November on
   `gate/enochian-dictionary-search`. TODO: the app has no dark mode
   (`src/theme.ts` is light only), so the page's theme colours are
-  untested in dark; the keypad is unchecked on iOS Safari (no device).
+  untested in dark (planned in [plan 076](076-dark-mode.md), step 4);
+  the keypad is unchecked on iOS Safari (no device).
+- 11 November 2026: dark mode planned in
+  [plan 076](076-dark-mode.md), not built. The device setting by
+  default with a Light / System / Dark switch in the menu drawer, the
+  "Midnight" palette, black line art re-inked and dense drawings on a
+  light plate, while downloads, server images, OG cards, help
+  screenshots and print stay light. MUI's CSS variables and its inline
+  colour-scheme script keep prerendered pages static with no flash
+  (spiked on a production build). Six steps on `gate/dark-mode`,
+  invisible to readers until the last. TODO (waits for Gadi's
+  go-ahead): build it; step 5 starts with a mock-up of the ritual
+  reader's dark colours for Gadi to choose.
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose
