@@ -8,6 +8,7 @@ import VercelInsights from "@/analytics/VercelInsights";
 import {
   COLOR_SCHEME_ATTRIBUTE,
   DEFAULT_COLOR_MODE,
+  noStorageColorSchemeScript,
   THEME_COLOR,
 } from "@/colorScheme";
 import { earlyPlaceLookupScript } from "@/geo/earlyPlaceLookup";
@@ -161,6 +162,10 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         <InitColorSchemeScript
           attribute={COLOR_SCHEME_ATTRIBUTE}
           defaultMode={DEFAULT_COLOR_MODE}
+        />
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: our own constant script, no input
+          dangerouslySetInnerHTML={{ __html: noStorageColorSchemeScript }}
         />
         <StyledJsxRegistry>
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>

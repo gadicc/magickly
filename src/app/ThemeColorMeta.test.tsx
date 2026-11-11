@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { ThemeProvider } from "@mui/material/styles";
-import { act, cleanup, render } from "@testing-library/react";
+import { act, cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, expect, it } from "vitest";
 import { DEFAULT_COLOR_MODE, THEME_COLOR } from "@/colorScheme";
 import theme from "@/theme";
@@ -15,7 +15,8 @@ function addMetas() {
   ]) {
     const meta = document.createElement("meta");
     meta.name = "theme-color";
-    meta.media = media;
+    // An attribute, as Next writes it: jsdom has no `media` property.
+    meta.setAttribute("media", media);
     meta.content = color;
     document.head.append(meta);
   }
@@ -30,9 +31,9 @@ function contents() {
 /** Chooses a mode the reader's way, with the drawer's switch. */
 function choose(label: string) {
   const button = [
-    ...document.querySelectorAll<HTMLButtonElement>(
-      '[aria-label="Theme"] button',
-    ),
+    ...screen
+      .getByRole("group", { name: "Theme" })
+      .querySelectorAll<HTMLButtonElement>("button"),
   ].find((b) => b.textContent === label);
   if (!button) throw new Error(`no ${label} button`);
   button.click();

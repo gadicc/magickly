@@ -9,3 +9,16 @@
   border-radius: 8px;
   padding: 8px;
 }
+
+/*
+ * An image keeps its own size: CssBaseline makes every box border-box, so
+ * padding on an <img> with a given width or height comes out of the image
+ * (a `height: 1em` image in a ritual became a 0×0 picture). The card is a
+ * ring outside the image instead, which takes no layout space. A small
+ * radius rounds the ring without cropping the image's corners much.
+ */
+:global(.dark) img.plate {
+  padding: 0;
+  border-radius: 2px;
+  box-shadow: 0 0 0 4px var(--mui-palette-plate);
+}

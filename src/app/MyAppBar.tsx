@@ -375,10 +375,11 @@ function NavMenu({
           onClick={onClose}
           sx={[
             { pl: `${16 + MENU_INDENT * level}px`, color: "red" },
-            // Pure red is dim on the dark menu's paper.
+            // Pure red is dim on the dark menu's paper (#323843): the
+            // ritual roles' light red reads at 4.67:1 there.
             (theme) =>
               theme.applyStyles("dark", {
-                color: "error.light",
+                color: "#ff7a7a",
               }),
           ]}
         >

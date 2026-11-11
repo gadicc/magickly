@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { ThemeProvider } from "@mui/material/styles";
-import { act } from "@testing-library/react";
+import { act, within } from "@testing-library/react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, expect, it, vi } from "vitest";
@@ -60,6 +60,8 @@ afterEach(() => {
   navigation.segment = null;
   auth.session = { data: null, isPending: true };
   document.body.innerHTML = "";
+  localStorage.clear();
+  document.documentElement.className = "";
 });
 
 const roots: { unmount(): void }[] = [];
@@ -153,9 +155,9 @@ it("hydrates the bar under the theme with a stored choice, and the drawer's swit
   const paper = document.querySelector(".MuiDrawer-paper");
   const choice = (label: string) =>
     [
-      ...(paper?.querySelectorAll<HTMLButtonElement>(
-        '[aria-label="Theme"] button',
-      ) ?? []),
+      ...within(paper as HTMLElement)
+        .getByRole("group", { name: "Theme" })
+        .querySelectorAll<HTMLButtonElement>("button"),
     ].find((b) => b.textContent === label);
   expect(choice("Dark")?.getAttribute("aria-pressed")).toBe("true");
   const settle = () =>
@@ -185,6 +187,4 @@ it("hydrates the bar under the theme with a stored choice, and the drawer's swit
       .querySelector(".MuiDrawer-root")
       ?.classList.contains("MuiModal-hidden"),
   ).toBe(true);
-  localStorage.clear();
-  document.documentElement.className = "";
 });

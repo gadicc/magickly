@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useColorScheme } from "@mui/material/styles";
+import { useId } from "react";
 
 type Mode = "light" | "system" | "dark";
 
@@ -30,19 +31,20 @@ const CHOICES: { value: Mode; label: string; Icon: typeof DarkModeOutlined }[] =
  */
 export default function ThemeSwitch() {
   const { mode, setMode } = useColorScheme();
+  const labelId = useId();
   return (
     <Box sx={{ mt: "auto", flexShrink: 0 }}>
       <Divider />
       <Box sx={{ px: 2, pt: 1, pb: 2 }}>
         <Typography
+          id={labelId}
           variant="body2"
           sx={{ mb: 1, color: "text.secondary" }}
-          aria-hidden
         >
           Theme
         </Typography>
         <ToggleButtonGroup
-          aria-label="Theme"
+          aria-labelledby={labelId}
           color="primary"
           exclusive
           fullWidth

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { ThemeProvider } from "@mui/material/styles";
-import { act } from "@testing-library/react";
+import { act, within } from "@testing-library/react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
@@ -27,9 +27,9 @@ afterEach(() => {
 
 function pressed(container: HTMLElement) {
   return [
-    ...container.querySelectorAll<HTMLButtonElement>(
-      '[aria-label="Theme"] button',
-    ),
+    ...within(container)
+      .getByRole("group", { name: "Theme" })
+      .querySelectorAll<HTMLButtonElement>("button"),
   ]
     .filter((button) => button.getAttribute("aria-pressed") === "true")
     .map((button) => button.textContent);
@@ -37,9 +37,9 @@ function pressed(container: HTMLElement) {
 
 function button(container: HTMLElement, label: string) {
   const found = [
-    ...container.querySelectorAll<HTMLButtonElement>(
-      '[aria-label="Theme"] button',
-    ),
+    ...within(container)
+      .getByRole("group", { name: "Theme" })
+      .querySelectorAll<HTMLButtonElement>("button"),
   ].find((b) => b.textContent === label);
   if (!found) throw new Error(`no ${label} button`);
   return found;
@@ -68,9 +68,19 @@ async function hydrate() {
 
 it("labels the group and each choice", async () => {
   const html = renderToString(<App />);
-  expect(html).toMatch(/role="group"[^>]*aria-label="Theme"/);
   for (const label of ["Light", "System", "Dark"])
     expect(html).toContain(`>${label}</button>`);
+  // The visible caption names the group, so it is read once.
+  const container = document.createElement("div");
+  container.innerHTML = html;
+  document.body.append(container);
+  const group = within(container).getByRole("group", { name: "Theme" });
+  const caption = document.getElementById(
+    group.getAttribute("aria-labelledby") ?? "",
+  );
+  expect(caption?.textContent).toBe("Theme");
+  expect(caption?.hasAttribute("aria-hidden")).toBe(false);
+  expect(group.hasAttribute("aria-label")).toBe(false);
 });
 
 it("selects nothing until mounted, then the stored choice", async () => {

@@ -23,8 +23,13 @@ export const DEFAULT_COLOR_MODE: "light" | "dark" | "system" = "system";
  * white as before dark mode, and the dark app bar's navy. The layout's
  * `viewport.themeColor` gives one per `prefers-color-scheme`, and
  * `ThemeColorMeta` points both at one when the reader picks Light or Dark.
+ *
+ * Dark is the colour the bar renders, not `AppBar.darkBg` (`#1b2b47`) in
+ * src/theme.ts: MUI lays its dark elevation overlay over that, and the bar
+ * comes out `#303e58` (sampled from production screenshots), which the
+ * toolbar should continue.
  */
-export const THEME_COLOR = { light: "#FFFFFF", dark: "#1b2b47" } as const;
+export const THEME_COLOR = { light: "#FFFFFF", dark: "#303e58" } as const;
 
 /**
  * The theme's dark-scheme selector (`theme.getColorSchemeSelector("dark")`)
@@ -33,3 +38,17 @@ export const THEME_COLOR = { light: "#FFFFFF", dark: "#1b2b47" } as const;
  * Write `sx={{ color: "#555", [DARK_SELECTOR]: { color: "text.secondary" } }}`.
  */
 export const DARK_SELECTOR = ".dark &";
+
+/**
+ * The scheme class when storage is blocked, for the root layout's `<body>`
+ * right after `<InitColorSchemeScript>`. MUI's script reads `localStorage`
+ * first, so where that throws it sets no class: the page paints light and
+ * turns dark only after hydration. This adds the default mode's class (the
+ * device's `prefers-color-scheme` for `system`), and only when `<html>` has
+ * neither, so a class MUI's script set always stands. The class names are
+ * MUI's default light and dark scheme names under `COLOR_SCHEME_ATTRIBUTE`.
+ * Plain ES5, as it is not compiled; any error leaves the page light.
+ */
+export const noStorageColorSchemeScript = `(function(){try{var c=document.documentElement.classList;if(c.contains("light")||c.contains("dark"))return;var m=${JSON.stringify(
+  DEFAULT_COLOR_MODE,
+)};if(m==="system")m=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";c.add(m)}catch(e){}})()`;

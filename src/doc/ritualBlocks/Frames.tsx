@@ -333,7 +333,7 @@ export function ImageFrame({
     // biome-ignore lint/performance/noImgElement: reader URLs and scoped editor file locators
     <img
       data-ritual-frame="img"
-      className={`${plateClass} ${styles.image}${editing ? ` ${styles.editImage}` : ""}`}
+      className={`${plateClass}${editing ? ` ${styles.editImage}` : ""}`}
       src={src}
       alt={alt}
       width={width}

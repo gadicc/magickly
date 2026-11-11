@@ -4,6 +4,7 @@ import {
   COLOR_SCHEME_ATTRIBUTE,
   DARK_SELECTOR,
   DEFAULT_COLOR_MODE,
+  noStorageColorSchemeScript,
 } from "@/colorScheme";
 import theme from "@/theme";
 import RootLayout from "./layout";
@@ -88,4 +89,9 @@ it("gives the colour-scheme script and the provider the same scheme", () => {
     `localStorage.getItem("mui-mode") || ${JSON.stringify(DEFAULT_COLOR_MODE)}`,
   );
   expect(script).toContain("document.documentElement.classList.add(");
+  // Then the class for blocked storage, before anything else can paint.
+  const scripts = [
+    ...html.matchAll(/<body>(?:<script>[\s\S]*?<\/script>)*/g),
+  ][0]?.[0].match(/<script>[\s\S]*?<\/script>/g);
+  expect(scripts?.[1]).toBe(`<script>${noStorageColorSchemeScript}</script>`);
 });

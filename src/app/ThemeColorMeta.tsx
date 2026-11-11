@@ -16,7 +16,8 @@ export function applyThemeColor(mode: string | undefined) {
     const scheme =
       mode === "light" || mode === "dark"
         ? mode
-        : /dark/.test(meta.media)
+        : // jsdom has no `HTMLMetaElement.media`; the attribute is the same.
+          /dark/.test(meta.getAttribute("media") ?? "")
           ? "dark"
           : "light";
     const color = THEME_COLOR[scheme];

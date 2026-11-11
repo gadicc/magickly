@@ -189,10 +189,6 @@
 :global(.dark) .roleColor {
   color: var(--ritual-role-dark);
 }
-/* The plate's padding sits inside an image's given size: keep its shape. */
-:global(.dark) .image {
-  object-fit: contain;
-}
 :global(.dark) .page {
   color: #4f5a6c;
 }
