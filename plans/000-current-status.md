@@ -217,11 +217,13 @@ Follow-ups are separate from the completed migration work:
   fixture, the registry) and mocked up. Both npm names were free on
   11 November. Stage A (the package ready to publish, `publish.yml` with
   the packument rule, CI's dry run of the verified tarball) is built on
-  `gate/data-publish` and its adversarial review applied: `id-token`
-  only in a publish job that installs nothing, CI's registry check off
-  the deploy path, CI publishing directly with provenance (Gadi), not
-  merged. TODO: create the `npm` environment, then merge stage A; then
-  the rest of stage A′, Gadi's
+  `gate/data-publish` (rebased onto `c768e5b1`) and both its reviews
+  applied: `id-token` only in a publish job that installs nothing, CI's
+  registry check off the deploy path, CI publishing directly with
+  provenance (Gadi); then a `prepack` guard npm under pnpm cannot pass,
+  a dated sign-off column in the README's Sources, and registry
+  refusals that check what npm has. Not merged. TODO: create the `npm`
+  environment, then merge stage A; then the rest of stage A′, Gadi's
   ([the steps](080-open-source-packages.md#stage-a-the-owners-steps));
   then, with his go-ahead, stages B to G. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups).
@@ -424,9 +426,10 @@ Follow-ups are separate from the completed migration work:
   [plan 080](080-open-source-packages.md) (stages A and A′): stage A is
   built and reviewed on `gate/data-publish`; stage A′ is Gadi's: the `npm`
   environment before the merge, the provenance sign-off (eight
-  questions; tests refuse a version past 0.0.0 while a Sources row is
-  open), the release candidate published by hand, the trusted publisher
-  allowing `npm publish`, 0.1.0 from CI within two days with
+  questions, then a date on every Sources row; tests refuse a version
+  past 0.0.0 while a row has none), the release candidate published by
+  hand, the trusted publisher allowing `npm publish`, 0.1.0 from CI
+  within two days with
   `--expect-exists`, then `next` removed and tokens disallowed
   ([the steps](080-open-source-packages.md#stage-a-the-owners-steps)). The Enochian
   dictionary stays out of the tarball whatever is decided: its entries come

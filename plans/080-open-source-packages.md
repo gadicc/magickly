@@ -186,9 +186,11 @@ shipping the wrong bytes.
   listed with its source, and the README's "Sources" names every set
   derived from an identified work. It names five today; the geomancy texts
   from the Equinox and Agrippa ([plan 075](075-geomancy-own-words.md)) are
-  a sixth. A test then keeps the list and the files in step, and the
-  README test and the smoke test refuse any version past 0.0.0 while a
-  row still says its source is "not recorded" or "not known".
+  a sixth. A test then keeps the list and the files in step. Each row
+  has a "Signed off" column, empty until the owner signs that row off
+  with a date, and the README test and the smoke test refuse any version
+  past 0.0.0 while a row is empty (the second stage A review; matching
+  "not recorded" in the source text could be dodged by rewording).
 
 Deferred, at Gadi's request: change detection and automated bumps
 ([below](#deferred)).
@@ -656,29 +658,41 @@ Per Gadi's workflow (assess → discuss → review → spike → plan → build)
 
 ## Stage A (11 November 2026)
 
-Built on `gate/data-publish`, from `33f2644d`; not merged. Each commit was
-gated on its own tree in a clean worktree with a fresh install.
+Built on `gate/data-publish`, rebased onto `main` at `c768e5b1`; not
+merged. Each code commit was gated on its own tree in a clean worktree
+with a fresh install, after the rebase.
 
 | Commit | What |
 | --- | --- |
-| `90623933` | `feat(magick-data): Make the package publishable` |
-| `f4c39c73` | `ci(publish): Publish magick-data from CI` |
-| `c759379f` | `fix(publish): Apply the stage A review` ([below](#stage-a-review-11-november-2026)) |
+| `093ad7a2` | `feat(magick-data): Make the package publishable` |
+| `bcc5dc36` | `ci(publish): Publish magick-data from CI` |
+| `fc3bedd4` | `fix(publish): Apply the stage A review` ([below](#stage-a-review-11-november-2026)) |
+| `9d34b8d2` | `fix(publish): Apply the second stage A review` ([below](#second-stage-a-review-11-november-2026)) |
 
-The gate ran the install, `loom init`, `loom check` (and
-`--production`), `pnpm check`, `pnpm typecheck`, the smoke test keeping
-its tarball, the rule and the dry run (from `f4c39c73`, as `ci.yml` now
-does), `pnpm test:coverage`, `pnpm build` and `pnpm check:turbopack`;
-all passed on both commits. On `90623933` the first coverage run had
-eight tests time out under a load average of about 25 and passed whole
-when re-run. On `c759379f` the gate ran the same steps, with the rule
-both from the tarball (`--advisory all`, as the `registry` job runs it
-on a pull request that leaves the version alone) and from the manifest
-(as `decide` runs it), the dry run with npm 11.18.0, and `npm pack
---dry-run` in the package, which the `prepack` guard must refuse. All
-passed first time, coverage included (8190 tests). `actionlint` 1.7.12
-found nothing in the three workflows (without shellcheck, which is not
-installed here).
+Every gate ran, one at a time with the Node 24.18.0 of `nvm`: a `git
+clean -ffdx` of the worktree, `pnpm install --frozen-lockfile`, `loom
+init`, `loom check` and `loom check --production` (the tree still
+clean), `pnpm check`, `pnpm typecheck`, the smoke test, the registry
+steps that commit's `ci.yml` runs, `pnpm test:coverage`, `pnpm build`
+and `pnpm check:turbopack`, with `ci.yml`'s placeholder environment and
+no `.env` file. Every step passed on each of these four trees, coverage
+without a re-run, and left the tree clean:
+
+| Commit | Registry steps | Tests |
+| --- | --- | --- |
+| `093ad7a2` | none (the smoke test without `--keep-tarball`, as its `ci.yml`) | 8141 |
+| `bcc5dc36` | the rule on the kept tarball, then `npm publish --dry-run` with its tag, using the local npm 11.18.0, the version its `pnpm dlx` pinned | 8181 |
+| `fc3bedd4` | the `registry` job as on a pull request that leaves the version alone (`--advisory all`), the rule on the manifest as `decide` runs it, the dry run, and `npm pack --dry-run` in the package, refused | 8201 |
+| `9d34b8d2` | as `fc3bedd4`, and `pnpm --filter magick-data exec npm pack --dry-run` and `npm pack` with a `pnpm/` user agent, both refused | 8215 |
+
+The rule said `skip: magick-data@0.0.0: magick-data is not on the
+registry; its first publish is by hand` each time. From `fc3bedd4` CI's
+dry run uses npm 11.19.1 (Node 24.22.2); neither is installed here, so
+the gates used npm 11.19.0 (Node 24.21.0), the nearest. A first gate of
+the second review's commit failed `pnpm typecheck` on a test's `env`
+type; the commit was amended and gated again from scratch. `actionlint`
+1.7.12 found nothing in the three workflows at `bcc5dc36`, `fc3bedd4`
+and `9d34b8d2` (without shellcheck, which is not installed here).
 
 - **The manifest:** `private` gone; `repository` (with `directory`),
   `homepage`, `bugs`, `description` and `keywords` added; `license` is
@@ -686,14 +700,18 @@ installed here).
   `LICENSE.txt` says; the version still 0.0.0.
 - **The guard:** `prepublishOnly` runs `scripts/prepublishGuard.mjs`,
   which refuses a manifest whose `exports` point into `./src/`. Run in the
-  package directory, `npm publish --dry-run` (npm 11.18.0) and `pnpm
-  publish --dry-run` both exit 1 with its message; `npm publish
+  package directory, `npm publish --dry-run` (the local npm, 11.18.0)
+  and `pnpm publish --dry-run` both exit 1 with its message; `npm publish
   <tarball> --dry-run` passes. Neither tool runs lifecycle scripts for a
   tarball, and `pnpm pack` drops `prepublishOnly` (with `prepack`,
   `prepare`, `postpack` and `publish`) from the manifest it packs, which
   the smoke test checks. A `prepack` guard, the same script with
   `--pack`, refuses to pack under anything but pnpm, so `npm pack` cannot
-  make a tarball whose exports point into `./src/` (review, L1).
+  make a tarball whose exports point into `./src/` (review, L1). It asks
+  `npm_execpath`, which npm always sets to its own `npm-cli.js`, as well
+  as the user agent, which npm passes on when it inherits one: `pnpm
+  exec npm pack` packed until the second review. A missing
+  `npm_execpath` refuses; `pnpm install` never runs `prepack`.
   `--ignore-scripts` would skip both guards.
 - **The verified tarball:** `pnpm --filter magick-data smoke
   --keep-tarball <path>` copies the tarball it verified to `<path>` and
@@ -707,7 +725,8 @@ installed here).
   holds the table to the JSON5 sources the manifest's `files` publish and
   checks every in-page link in it, so a new data file without a row fails.
   Rows whose source is not recorded say so; they are the sign-off's
-  questions below.
+  questions below. A "Signed off" column holds the date the owner signed
+  each row off; every row is empty until stage A′ step 3.
 - **The packument rule:** `scripts/npm-publish-decision.mjs <tarball>`
   reads the name and version from the tarball, fetches the abbreviated
   packument (15-second timeout, two retries on network errors, 429 and
@@ -726,8 +745,14 @@ installed here).
   only at verbose, and otherwise says ENEEDAUTH). Every job requires
   `github.repository == 'gadicc/magickly'`. Actions are pinned by SHA; no
   `NPM_TOKEN`. npm's refusal to publish over a listed version, which a
-  packument cached for up to five minutes can lead to on a re-run, is a
-  skip with a warning.
+  packument cached for up to five minutes can lead to on a re-run, makes
+  the job read the registry again (`--expect-published
+  --same-content`): the verified tarball's integrity there is a skip
+  with a warning, other bytes or no listing fail. The job's second
+  decision fails the same way on a version listed with other bytes,
+  and it checks the downloaded tarball's integrity against `build`'s.
+  The tarball artifact is kept three days and overwritten when all jobs
+  are re-run.
 - **npm itself:** `actions/setup-node`, pinned by SHA, installs Node
   24.22.2 exactly, whose bundled npm (11.19.1) publishes; the job fails
   clearly if `npm --version` is below 11.5.1, which trusted publishing
@@ -743,8 +768,10 @@ installed here).
   `main`) waits on registry state the repository does not control: a
   squatter at a higher version, an older commit after the rc, an
   outage (review, M2). On a pull request that changes the package's
-  version, a bump not above the registry's fails; otherwise, and for
-  any registry error, the rule warns (`--advisory`). When the version
+  version (compared with the merge commit's first parent), a bump not
+  above the registry's, or to a version it already lists
+  (`--changed`), fails; otherwise, and for any registry error, the rule
+  warns (`--advisory`). When the version
   is already published, the rule compares the tarball's integrity with
   the registry's and warns on a difference: content changed without a
   bump (L3). npm 11 refuses even a dry run of a version the registry
@@ -774,12 +801,12 @@ later (11.15.0 or later for `npm trust`).
 3. **The provenance sign-off.** Settle each question below, edit the
    README's Sources table to match, and decide whether a file whose
    answer is not satisfactory leaves the tarball (a `!dist/…` entry in
-   `files`, as the dictionary has) or its field is removed. No row may
-   still say "not recorded" or "not known": the README test and the
-   smoke test fail any version past 0.0.0 while one does. Four of the
-   questions (`chakras`, `geomancy/tetragrams`, `enochian/tablets` and
-   the 72 angels' English) have rows that say neither, so no test
-   holds them; they are the owner's to settle all the same.
+   `files`, as the dictionary has) or its field is removed. Then sign
+   off every row of the table, all 37 and not only the eight below, by
+   putting the date (`YYYY-MM-DD`) in its "Signed off" column. Every
+   row is empty until then, and the README test and the smoke test fail
+   any version past 0.0.0 while one is; the date is the only thing they
+   check, so it is the owner's word that the row is right.
 4. **Bump to `0.1.0-rc.0`** in `packages/magick-data/package.json` and
    merge to `main`. `publish.yml`'s `decide` finds no package on the
    registry and skips; nothing else runs.
@@ -824,7 +851,10 @@ later (11.15.0 or later for `npm trust`).
    job printed with `npm view magick-data@0.1.0 dist.integrity`. If the
    publish fails with ENEEDAUTH, the verbose log shows the OIDC
    exchange. If the two days have lapsed, delete the expired
-   configuration, create it again (step 6) and re-run the workflow.
+   configuration and create it again (step 6), then re-run the
+   workflow: **Re-run all jobs** if the run is more than three days
+   old, since the `build` job's tarball artifact is kept three days;
+   within them, re-running only the failed `publish` job is enough.
 8. **Retire the `next` tag:** `npm dist-tag rm magick-data next`, so
    that `npm install magick-data@next` no longer installs the release
    candidate.
@@ -853,7 +883,7 @@ Found while listing every published file; none is decided here.
 An adversarial review of stage A's commits found the following; each was
 checked against the code before it was changed. Gadi decided the
 publishing model the same day: directly with provenance, not staged
-(decision 3). Applied in `c759379f`.
+(decision 3). Applied in `fc3bedd4`.
 
 | # | Finding | Disposition |
 | --- | --- | --- |
@@ -862,19 +892,35 @@ publishing model the same day: directly with provenance, not staged
 | H2 | A′ missed allowing `npm publish` on the trusted publisher, 2FA, disallowing tokens, and re-creating an expired configuration | Fixed in the steps above, with the UI route and `npm trust github … --allow-publish` |
 | M1 | The `npm` environment was created after merging; no repository guard | Fixed: step 1 creates it, limited to `main`, before the merge; every `publish.yml` job requires `gadicc/magickly` (L11) |
 | M2 | `ci.yml`, which `release.yml` reuses, failed on registry state the repository does not control | Fixed: a `registry` job on pull requests and `codex/**` pushes only, outside `verify`'s needs; fatal only for a pull request's own bump |
-| M3 | The provenance sign-off was not enforced | Fixed: the README test and the smoke test refuse a version past 0.0.0 while a Sources row says "not recorded" or "not known" (`UNSETTLED` in `scripts/readmeSources.mjs`) |
+| M3 | The provenance sign-off was not enforced | Fixed: the README test and the smoke test refused a version past 0.0.0 while a Sources row said "not recorded" or "not known". Replaced by the "Signed off" column ([second review](#second-stage-a-review-11-november-2026), 3) |
 | M4 | CI ran twice on every push to `main` | Fixed: `publish.yml` runs `ci.yml` only when publishing, for that exact commit. Depending on `release.yml`'s run instead would tie npm to the deploy's success |
 | L1 | `npm pack` then `npm publish <tgz>` bypassed the guard | Fixed: a `prepack` guard refuses to pack under anything but pnpm; tested both ways, and `npm pack --dry-run` exits 1. `--ignore-scripts` still bypasses it |
 | L2 | A 404 skipped forever | Fixed: `--expect-exists`, switched on with the bump to 0.1.0 (step 7) |
 | L3 | "Published, skip" could not see changed content | Fixed where a tarball exists: the rule warns when the registry's `dist.integrity` differs. See the follow-ups |
 | L4 | Pre-releases were compared with `latest` only; `next` was left on the rc | Fixed: a pre-release must also be above `next`; step 8 removes `next` |
 | L5 | The README said a pre-release is never `latest` | Fixed |
-| L6 | A re-run within the packument's five-minute cache decides "publish" and npm refuses | Fixed: npm's "cannot publish over" refusal is a skip with a warning |
+| L6 | A re-run within the packument's five-minute cache decides "publish" and npm refuses | Fixed: npm's "cannot publish over" refusal is a skip with a warning; the second review (5) has it check what npm has first |
 | L7 | The command line was untested; the registry fixed; a body timeout read as "not JSON" | Fixed: tests run the script against a local registry (`--registry`) and check its outputs; a body timeout is retried and named |
 | L8 | Nothing held the Sources table to the tarball itself | Fixed: the smoke test compares it with the tarball's `dist/**/*.json` |
 | L9 | A′ step 3 cloned `main`'s tip; no integrity to compare | Fixed: `git checkout <sha>`; the smoke test prints the `sha512-…` integrity |
 | L10 | The manifest lacked `description` and `keywords`; `license` was not SPDX | Fixed: both added, and `license` is `(MIT AND CC-BY-4.0)`, which npm accepts. `scripts` and `devDependencies` stay in the packed manifest: `pnpm pack` has no way to drop them short of rewriting the tarball, and neither does anything for a consumer (no install hook) |
 | L13, L14 | Wording on the expiry, 2FA and "disallow tokens" | Fixed in decision 3 and the steps |
+
+### Second stage A review (11 November 2026)
+
+A second review of stage A, after the rebase onto `c768e5b1`. Each
+finding was checked against the code first; findings 1 and 3 were
+reproduced. Applied in `9d34b8d2`.
+
+| # | Finding | Disposition |
+| --- | --- | --- |
+| 1 (medium) | The `prepack` guard keyed on `npm_config_user_agent`, which npm passes on when it inherits one, so `pnpm --filter magick-data exec npm pack --dry-run`, or `npm pack` with a `pnpm/` agent in the environment, packed `exports` into `./src/` | Fixed, reproduced first: the guard also needs `npm_execpath` to be pnpm's (npm always sets its own `npm-cli.js`). A missing one refuses; no install hook runs the guard, which a test holds. Tests for plain npm, npm under pnpm, pnpm, another tool and a missing variable; the smoke test runs three of them, and the gate ran npm itself |
+| 2 (low) | A pull request that bumps to a version the registry lists passed, and on `main` would skip and never publish | Fixed: `--changed`, from the `registry` job when the version changed; a listed version fails |
+| 3 (low) | Matching "not recorded" and "not known" could be dodged by rewording, and four of the eight questions said neither | Fixed: a "Signed off" column, a date or empty, read strictly; every row empty today. Step 3 above says so |
+| 4 (low) | A re-run after a failed publish: the `build` upload had no `overwrite`, and a one-day artifact could lapse before a re-created trusted publisher | Fixed: `overwrite: true` and three days; step 7 says when to re-run all jobs |
+| 5 (low) | The "cannot publish over" skip did not check what npm had | Fixed: the decision script reads again with `--expect-published --same-content`; the same integrity skips with a warning, anything else fails. `--same-content` also makes the second decision fail on a listed version with other bytes, where it warned |
+| 6 (low) | The `registry` job compared with `pull_request.base.sha`, which can be older than the merge commit's base | Fixed: `HEAD^1` of the merge checkout, `fetch-depth: 2` |
+| 7 (low) | The plan recorded hashes and gates from before the rebase, and a dry run with npm 11.18.0 where CI uses 11.19.1 | Fixed: the hashes above, and every code commit gated again after the rebase |
 
 #### Follow-ups
 
