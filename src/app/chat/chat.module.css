@@ -1,0 +1,46 @@
+/*
+ * The chat's own surfaces (plan 076, step 4). Light values are the ones the
+ * page always had; the dark scheme gets the theme's paper and divider.
+ */
+
+/* The band behind an assistant's answer. */
+.assistant {
+  background-color: #f7f7f7;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+
+:global(.dark) .assistant {
+  background-color: var(--mui-palette-background-paper);
+  border-color: var(--mui-palette-divider);
+}
+
+/* Answers fade out under the input bar. */
+.inputBar {
+  background-image: linear-gradient(
+    rgba(255, 255, 255, 0) 0%,
+    rgb(255, 255, 255) 12px
+  );
+}
+
+:global(.dark) .inputBar {
+  background-image: linear-gradient(
+    rgba(15, 20, 29, 0) 0%,
+    var(--mui-palette-background-default) 12px
+  );
+}
+
+/* Tables in a message. */
+:global(.dark) .messages :global(.ai_content) table tr {
+  background-color: var(--mui-palette-background-paper);
+  border-top-color: var(--mui-palette-divider);
+}
+
+:global(.dark) .messages :global(.ai_content) table tbody tr:nth-child(odd) {
+  background-color: var(--mui-palette-action-hover);
+}
+
+:global(.dark) .messages :global(.ai_content) table th,
+:global(.dark) .messages :global(.ai_content) table td {
+  border-color: var(--mui-palette-divider);
+}

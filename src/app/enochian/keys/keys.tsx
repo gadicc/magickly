@@ -16,6 +16,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
+import { DARK_SELECTOR } from "@/colorScheme";
 import useEnochianFont, { EnochianFont } from "../useEnochianFont";
 import {
   keysOf,
@@ -99,10 +100,24 @@ const WORDS_SX = {
     textAlign: "inherit",
   },
   "& .key-word:focus-visible": { outline: "2px solid", outlineOffset: "1px" },
-  "& .key-word[aria-pressed=true], & .key-selected": { background: "yellow" },
+  "& .key-word[aria-pressed=true], & .key-selected": {
+    background: "yellow",
+    // The page's light text needs a darker yellow behind it.
+    [DARK_SELECTOR]: { background: "rgba(250, 204, 21, 0.35)" },
+  },
   "& .key-word[data-uncertain]": { textDecoration: "underline dotted" },
   "& .key-word[data-crowley]": { fontStyle: "italic" },
-  "& .key-muted": { color: "#666", fontStyle: "italic" },
+  "& .key-muted": {
+    color: "#666",
+    fontStyle: "italic",
+    [DARK_SELECTOR]: { color: "text.secondary" },
+  },
+} as const;
+
+/** The pale band behind the controls and the Keys. */
+const BAND_SX = {
+  background: "#fafafa",
+  [DARK_SELECTOR]: { background: "none" },
 } as const;
 
 /** A word to click or tab to, which opens its entry. */
@@ -478,7 +493,7 @@ export default function Keys({
 
   return (
     <>
-      <Container sx={{ background: "#fafafa", pt: 1.5 }}>
+      <Container sx={{ ...BAND_SX, pt: 1.5 }}>
         <Box
           sx={{
             display: "flex",
@@ -527,7 +542,7 @@ export default function Keys({
         </Box>
       </Container>
 
-      <Container sx={{ background: "#fafafa", ...WORDS_SX }}>
+      <Container sx={{ ...BAND_SX, ...WORDS_SX }}>
         {keys.map((key) => {
           // A Key without the Golden Dawn's reading shows Dee's, and says so.
           const keyVersion = versionOf(key);
@@ -606,6 +621,14 @@ export default function Keys({
             bottom: 0,
             background: "rgba(0,0,0,0.8)",
             color: "#fafafa",
+            // On the dark page: a raised panel that hides the Key behind it.
+            [DARK_SELECTOR]: {
+              bgcolor: "background.paper",
+              color: "text.primary",
+              borderTop: 1,
+              borderColor: "divider",
+              boxShadow: 8,
+            },
           }}
           onClick={() => setSelected(null)}
         >

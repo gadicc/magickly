@@ -36,7 +36,7 @@ const tiles = [
           marginTop: 50,
           textAlign: "center",
           fontSize: "200%",
-          color: "black",
+          color: "var(--mui-palette-ink, black)",
           textDecoration: "none",
         }}
       >
@@ -53,7 +53,7 @@ const tiles = [
           marginTop: 30,
           textAlign: "center",
           fontSize: "300%",
-          color: "black",
+          color: "var(--mui-palette-ink, black)",
           textDecoration: "none",
         }}
       >

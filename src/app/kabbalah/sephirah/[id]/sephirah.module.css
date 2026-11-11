@@ -20,6 +20,11 @@
   overflow-wrap: anywhere;
 }
 
+/* A frame that a black or white swatch still shows against. */
+:global(.dark) .swatch {
+  border-color: #5c6676;
+}
+
 /* A line of its own above the colour's name. */
 .scale {
   display: block;

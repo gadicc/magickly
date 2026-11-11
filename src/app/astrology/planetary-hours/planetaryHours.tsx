@@ -85,6 +85,15 @@ function PlanetaryHoursForDay({
                     background:
                       hour.planet === planet ? "#cc5" : i >= 12 ? "#ccc" : "",
                   },
+                  (theme) =>
+                    theme.applyStyles("dark", {
+                      background:
+                        hour.planet === planet
+                          ? "rgba(204, 204, 85, 0.3)"
+                          : i >= 12
+                            ? "rgba(0, 0, 0, 0.35)"
+                            : "",
+                    }),
                   isNow(i) && sxNowRow,
                 ]}
               >

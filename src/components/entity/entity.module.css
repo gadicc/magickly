@@ -79,20 +79,19 @@
   }
 }
 
-/* MUI's text.secondary in the light palette src/theme.ts sets; the theme
-   has no CSS variables for a module to read it from. */
+/* The theme's text.secondary, in either scheme. */
 .secondary {
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--mui-palette-text-secondary);
 }
 
 .note {
   display: block;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--mui-palette-text-secondary);
   font-size: 0.85em;
 }
 
 .aside {
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--mui-palette-text-secondary);
   font-weight: 400;
 }
 

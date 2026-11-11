@@ -19,10 +19,13 @@ import {
   CircularProgress,
   IconButton,
   InputAdornment,
+  type SxProps,
   TextField,
+  type Theme,
 } from "@mui/material";
 import AndroidMagicianAvatar from "@/app/img/android-magician-avatar.png";
 import { UserAvatar } from "../MyAppBar";
+import styles from "./chat.module.css";
 import {
   type ChatMessage,
   type ChatSource,
@@ -126,6 +129,25 @@ function Sources({
   );
 }
 
+/** The Regenerate and Stop chips, which float over the answers. */
+const CHIP_SX: SxProps<Theme> = [
+  {
+    "&:hover": {
+      background: "#dadada",
+    },
+    border: "1px solid #dfdfdf",
+    background: "#f0f0f0",
+    boxShadow: "0 0 5px white",
+  },
+  (theme) =>
+    theme.applyStyles("dark", {
+      "&:hover": { bgcolor: "action.selected" },
+      borderColor: "divider",
+      bgcolor: "background.paper",
+      boxShadow: "none",
+    }),
+];
+
 export default function Chat() {
   const ref = React.useRef<HTMLDivElement>(null);
   const buttonRef = React.useRef<HTMLButtonElement>(null);
@@ -217,18 +239,16 @@ export default function Chat() {
 
   return (
     <>
-      <div id="messages">
+      <div id="messages" className={styles.messages}>
         {messages.map((m) => {
           const sources = messageSources(m);
           return (
             <div
               key={m.id}
+              className={m.role === "assistant" ? styles.assistant : undefined}
               style={{
                 display: "flex",
                 padding: "2px 15px 2px 15px",
-                backgroundColor: m.role === "assistant" ? "#f7f7f7" : "",
-                borderTop: m.role === "assistant" ? "1px solid #ccc" : "",
-                borderBottom: m.role === "assistant" ? "1px solid #ccc" : "",
                 overflowX: "auto",
               }}
             >
@@ -304,14 +324,13 @@ export default function Chat() {
       <div style={{ height: "130px" }}>&nbsp;</div>
       <div ref={ref}></div>
       <div
+        className={styles.inputBar}
         style={{
           position: "fixed",
           bottom: 0,
           left: 0,
           padding: "15px 10px 10px 10px",
           width: "100%",
-          backgroundImage:
-            "linear-gradient(rgba(255, 255, 255, 0) 0%, rgb(255, 255, 255) 12px)",
         }}
       >
         {_messages.length > 0 && !isLoading && (
@@ -329,14 +348,7 @@ export default function Chat() {
               icon={<Autorenew fontSize="small" />}
               label="Regenerate Response"
               onClick={() => void regenerate()}
-              sx={{
-                "&:hover": {
-                  background: "#dadada",
-                },
-                border: "1px solid #dfdfdf",
-                background: "#f0f0f0",
-                boxShadow: "0 0 5px white",
-              }}
+              sx={CHIP_SX}
             />
           </div>
         )}
@@ -354,14 +366,7 @@ export default function Chat() {
               icon={<StopCircle fontSize="small" />}
               label="Stop Generating"
               onClick={() => void stop()}
-              sx={{
-                "&:hover": {
-                  background: "#dadada",
-                },
-                border: "1px solid #dfdfdf",
-                background: "#f0f0f0",
-                boxShadow: "0 0 5px white",
-              }}
+              sx={CHIP_SX}
             />
           </div>
         )}{" "}

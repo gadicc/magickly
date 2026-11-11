@@ -68,7 +68,7 @@ export default function FylfotCross({
           vertical-align: middle;
         }
         td:not(:empty) {
-          border: 1px solid black;
+          border: 1px solid var(--mui-palette-ink, black);
         }
       `}</style>
       <tbody>

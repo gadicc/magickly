@@ -12,6 +12,10 @@
   padding: 5px;
 }
 
+:global(.dark) .letter {
+  background: var(--mui-palette-background-paper);
+}
+
 /* The Hebrew face sets its letters at 1.15em, so 435% of the text here is
    the letter at five times it, as the block had it. */
 .glyph {

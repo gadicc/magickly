@@ -92,6 +92,9 @@
   margin: 0;
   color: #555;
 }
+:global(.dark) .empty {
+  color: var(--mui-palette-text-secondary);
+}
 .share {
   display: grid;
   gap: 0.5rem;

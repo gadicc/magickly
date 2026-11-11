@@ -16,7 +16,7 @@ const tiles = [
           marginTop: 10,
           fontSize: "500%",
           textAlign: "center",
-          color: "black",
+          color: "var(--mui-palette-ink, black)",
         }}
       >
         卍

@@ -35,6 +35,9 @@ import { type GeomancyReadingState, readingSearchParams } from "./readingState";
 const { planet: planets } = data;
 const houses = data.geomanticHouse;
 
+/** The Mothers' grid lines: black, and re-inked in the dark scheme. */
+const MOTHER_BORDER = "1px solid var(--mui-palette-ink, black)";
+
 // https://blog.stevenlevithan.com/archives/javascript-roman-numeral-converter
 function romanize(num) {
   if (!+num) return false;
@@ -573,13 +576,13 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
             <Box key={ti}>
               {ti + 1}
               <br />
-              <Box sx={{ border: "1px solid black", width: 70 }}>
+              <Box sx={{ border: MOTHER_BORDER, width: 70 }}>
                 {tetragram.map((row, i) => (
                   <div
                     key={i}
                     onClick={toggle(ti, i)}
                     style={{
-                      border: "1px solid black",
+                      border: MOTHER_BORDER,
                       height: 40,
                       display: "flex",
                       alignItems: "center",
@@ -594,7 +597,7 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
                 <div
                   onClick={random(ti)}
                   style={{
-                    border: "1px solid black",
+                    border: MOTHER_BORDER,
                     height: 40,
                     display: "flex",
                     alignItems: "center",

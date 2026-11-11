@@ -56,12 +56,14 @@ describe("geomancy reading page", () => {
   // invocation in our own words (10 November 2026), and when plan 076
   // wrapped the tetragrams and the chart in dark-mode ink spans and gave the
   // pentagram's box its ink classes (without them the bytes were 79423
-  // ab11cc88…, 79413 49439a30… and 79424 341bf7f3…); the bytes are
-  // otherwise those from before the rekey.
+  // ab11cc88…, 79413 49439a30… and 79424 341bf7f3…), and when the Mothers'
+  // grid lines became the `ink` variable with black as its fallback (before
+  // that, 80300 83f38421…, 80290 045035b8… and 80301 584de33d…); the bytes
+  // are otherwise those from before the rekey.
   it.each([
     [
       "1",
-      "80300 83f38421d0d5a240f972445a74f9572920521facae4cf242c79cd814063e8921",
+      "80804 a3969ba3076cae1ffd8055ffac3fd874f4205fef1bae056213237e603f186b4e",
       [
         "The querent: their life",
         "Good, except in war.",
@@ -71,7 +73,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "7",
-      "80290 045035b880075d7310d0ae5aff9c5cccd8fd1736cc8fb860d094cb9c67e52160",
+      "80794 95663f49a42e3478aa8f2c60498041a315ccb3ba4599510b1498a0c62c5504fd",
       [
         "Marriage and other unions",
         "Indifferent.",
@@ -81,7 +83,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "12",
-      "80301 584de33d2da6b9048f04c2d9978c03a1a479518e30b15b36f401b789a3523e12",
+      "80805 c2462b01dea953734ec6cec550621d51a465c2d01ca52c4b7047b0bee7a4d61d",
       [
         "Enemies; servants; imprisonment",
         "Unfavourable generally.",

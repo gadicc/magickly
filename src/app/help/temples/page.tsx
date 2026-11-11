@@ -1,6 +1,7 @@
 import Link from "@magick-components/Link";
 import { Box, Container } from "@mui/material";
 import Image, { type StaticImageData } from "next/image";
+import { plateClass } from "@/drawings/plate";
 import { pageMetadata } from "@/seo/metadata";
 import createRitual from "./images/create-ritual.webp";
 import createTemple from "./images/create-temple.webp";
@@ -47,6 +48,8 @@ function Figure({
         src={image}
         alt={alt}
         sizes={`(max-width: ${maxWidth}px) 100vw, ${maxWidth}px`}
+        // Captured light (plan 076, decision 5): a light card in dark.
+        className={plateClass}
         style={{
           width: "100%",
           maxWidth,

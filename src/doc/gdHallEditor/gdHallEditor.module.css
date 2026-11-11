@@ -356,3 +356,29 @@
   width: 22px;
   height: 22px;
 }
+/* The dark scheme (plan 076): the panel, its text and the warnings. The
+   hall drawing itself stays on white, as its exports are. */
+:global(.dark) .hint,
+:global(.dark) .panelTag,
+:global(.dark) .panelNote {
+  color: var(--mui-palette-text-secondary);
+}
+:global(.dark) .notice {
+  color: #f2a29a;
+}
+:global(.dark) .warning {
+  background: rgb(255 193 7 / 0.14);
+  color: #f5d77a;
+}
+:global(.dark) .warning[data-severity="error"] {
+  background: rgb(244 67 54 / 0.16);
+  color: #f2a29a;
+}
+:global(.dark) .warning:hover,
+:global(.dark) .warning:focus-visible {
+  outline-color: var(--mui-palette-primary-main);
+}
+:global(.dark) .panel {
+  border-color: var(--mui-palette-divider);
+  background: var(--mui-palette-background-paper);
+}
