@@ -2,6 +2,7 @@ import SevenBranchedCandleStick from "@/components/gd/SevenBranchedCandleStick";
 // import { FylfotCross } from "../../pages/hogd/symbols/fylfot-cross";
 import TableOfShewbread from "@/components/gd/TableOfShewbread";
 import Tiles from "@/components/Tiles";
+import Ink from "@/drawings/Ink";
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
 
@@ -26,13 +27,21 @@ const tiles = [
     to: "symbols/fylfot-cross",
   },
   {
-    Component: () => <SevenBranchedCandleStick />,
+    Component: () => (
+      <Ink drawing="candlestick">
+        <SevenBranchedCandleStick />
+      </Ink>
+    ),
     // img: "/pics/treeOfLife.jpg",
     title: "7B Candlestick",
     to: "symbols/candlestick",
   },
   {
-    Component: () => <TableOfShewbread />,
+    Component: () => (
+      <Ink drawing="shewbread">
+        <TableOfShewbread />
+      </Ink>
+    ),
     // img: "/pics/treeOfLife.jpg",
     title: "Shewbread Table",
     to: "symbols/shewbread",

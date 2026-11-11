@@ -1,6 +1,7 @@
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import type { CSSProperties, ReactNode } from "react";
+import { inkClass } from "@/drawings/Ink";
 import {
   canonicalRole,
   parseRoleAssignment,
@@ -56,7 +57,10 @@ export function TaskFrame({
       {!samePreviousRole && (
         <div className={styles.role} contentEditable={false}>
           {/* The symbols only repeat the role names beside them. */}
-          <div className={styles.roleSymbol} aria-hidden="true">
+          <div
+            className={`${styles.roleSymbol} ${inkClass("lamen")}`}
+            aria-hidden="true"
+          >
             {individualRoles.map((entry) => (
               <span key={entry}>
                 {Object.hasOwn(roles, entry) ? roles[entry].symbol : undefined}

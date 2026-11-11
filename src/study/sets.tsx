@@ -2,6 +2,7 @@ import Paper from "@mui/material/Paper";
 import data from "magick-data";
 import Tetragram from "@/app/geomancy/Tetragram";
 import { readFieldPath } from "@/components/kabbalah/fieldPath";
+import Ink from "@/drawings/Ink";
 
 // https://stackoverflow.com/a/56773391/1839099
 function omit(key, obj) {
@@ -257,7 +258,11 @@ const sets: Record<string, StudySetData<unknown>> = {
   "geomancy-symbol-names": {
     id: "geomancy-symbol-names",
     data: data.tetragram,
-    question: (item) => <Tetragram id={item.id} />,
+    question: (item) => (
+      <Ink drawing="tetragram">
+        <Tetragram id={item.id} />
+      </Ink>
+    ),
     answer: "title.en",
     gdGrade: "1=10",
     tags: ["geomancy"],

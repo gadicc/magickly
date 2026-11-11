@@ -20,6 +20,7 @@ import { PlanetId } from "magick-data/astrology/planets";
 import React from "react";
 import { upcomingHoursForPlanetAtLocation } from "@/app/astrology/planetary-hours/utils";
 import PlanetarySpirit from "@/components/astrology/planetarySpirits";
+import Ink, { inkClass } from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";
 import PlaceChooser from "@/geo/PlaceChooser";
 import { UNNAMED_PLACE } from "@/geo/place";
@@ -175,7 +176,9 @@ function TetragramStack({
           <Box key={i} sx={{ width: "45px", position: "relative" }}>
             {romanize(i + start)}
             <br />
-            <Tetragram key={i} rows={rows} />
+            <Ink drawing="tetragram">
+              <Tetragram rows={rows} />
+            </Ink>
             <br />
             {!group && (
               <>
@@ -488,7 +491,10 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
           ))}
         </Select>
         <div style={{ display: "flex", justifyContent: "center" }}>
-          <div style={{ position: "relative" }}>
+          <div
+            className={`${inkClass("pentagram")} ${inkClass("spirit")}`}
+            style={{ position: "relative" }}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="-1.1 -1.1 2.2 2.2"
@@ -729,7 +735,9 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
           {interpretationText(interpretationId)}
         </div>
         <br />
-        <AstroGeomancyChart ref={ref} tetragrams={allFigures} width="80%" />
+        <Ink drawing="geomancyChart">
+          <AstroGeomancyChart ref={ref} tetragrams={allFigures} width="80%" />
+        </Ink>
         <ExportControls
           target={ref}
           filename="astroGeomancy"

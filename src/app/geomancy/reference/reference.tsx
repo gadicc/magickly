@@ -21,6 +21,7 @@ import data from "magick-data";
 import { PlanetId } from "magick-data/astrology/planets";
 import React from "react";
 import PlanetarySpirit from "@/components/astrology/planetarySpirits";
+import Ink from "@/drawings/Ink";
 import { capitalizeFirstLetter } from "@/lib/utils";
 import Tetragram from "../Tetragram";
 import { figuresByPairs } from "./pairs";
@@ -127,7 +128,9 @@ export default function Geomancy() {
                 </Grid>
                 <Grid size={4}>
                   <Stack direction="row" spacing={1}>
-                    <Tetragram rows={tetragram.rows} />
+                    <Ink drawing="tetragram">
+                      <Tetragram rows={tetragram.rows} />
+                    </Ink>
                     {showAssoc && (
                       <div
                         style={{
@@ -190,11 +193,13 @@ export default function Geomancy() {
                     </TableCell>
                     <TableCell align="center">
                       {capitalizeFirstLetter(planet.spiritId || "")} &nbsp;
-                      <PlanetarySpirit
-                        id={planet.spiritId}
-                        height="1.1em"
-                        display="inline-block"
-                      />
+                      <Ink drawing="spirit">
+                        <PlanetarySpirit
+                          id={planet.spiritId}
+                          height="1.1em"
+                          display="inline-block"
+                        />
+                      </Ink>
                     </TableCell>
                   </TableRow>
                 ))}

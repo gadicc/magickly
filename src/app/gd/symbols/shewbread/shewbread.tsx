@@ -3,6 +3,7 @@
 import { Container } from "@mui/material";
 import React from "react";
 import TableOfShewbread from "@/components/gd/TableOfShewbread";
+import Ink from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";
 import OpenSource from "@/OpenSource";
 
@@ -11,7 +12,9 @@ export default function CandleStickPage() {
 
   return (
     <Container sx={{ p: 2 }}>
-      <TableOfShewbread ref={ref} />
+      <Ink drawing="shewbread">
+        <TableOfShewbread ref={ref} />
+      </Ink>
       <ExportControls
         target={ref}
         filename="TableOfShewbread-magickly-export"

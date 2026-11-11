@@ -10,6 +10,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Data from "magick-data";
 import GradeTree from "@/components/gd/GradeTree";
+import Ink from "@/drawings/Ink";
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
 
@@ -21,7 +22,9 @@ export default function Grades() {
       <PageBreadcrumbs path="/gd/grades" />
       <Container maxWidth="sm">
         <Box sx={{ my: 4 }}>
-          <GradeTree />
+          <Ink drawing="tree">
+            <GradeTree />
+          </Ink>
 
           <TableContainer component={Paper}>
             <Table aria-label="simple table">

@@ -1,5 +1,6 @@
 import GradeTree from "@/components/gd/GradeTree";
 import Tiles from "@/components/Tiles";
+import Ink from "@/drawings/Ink";
 import { GD_HALLS } from "@/render/contracts/gdHall";
 import { hallFiles } from "@/seo/halls";
 import { pageMetadata } from "@/seo/metadata";
@@ -9,7 +10,11 @@ export const metadata = pageMetadata("/gd");
 
 const tiles = [
   {
-    Component: () => <GradeTree height="120%" />,
+    Component: () => (
+      <Ink drawing="tree">
+        <GradeTree height="120%" />
+      </Ink>
+    ),
     title: "Grades",
     to: "/gd/grades",
   },

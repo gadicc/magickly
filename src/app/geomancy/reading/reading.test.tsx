@@ -53,12 +53,15 @@ const render = (house: string) =>
 describe("geomancy reading page", () => {
   // Re-pinned when "Mothers" and "Interpretation" became h2s, and when plan
   // 075 replaced the texts with the Equinox's table, the houses and the
-  // invocation in our own words (10 November 2026); the bytes are otherwise
-  // those from before the rekey.
+  // invocation in our own words (10 November 2026), and when plan 076
+  // wrapped the tetragrams and the chart in dark-mode ink spans and gave the
+  // pentagram's box its ink classes (without them the bytes were 79423
+  // ab11cc88…, 79413 49439a30… and 79424 341bf7f3…); the bytes are
+  // otherwise those from before the rekey.
   it.each([
     [
       "1",
-      "79423 ab11cc883462e2534f24f6de656cce95246aab0d86f01adb0c74eebdb2bafbc0",
+      "80300 83f38421d0d5a240f972445a74f9572920521facae4cf242c79cd814063e8921",
       [
         "The querent: their life",
         "Good, except in war.",
@@ -68,7 +71,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "7",
-      "79413 49439a308d164e35a995dab6c762f0bc4a61d3c6db703320e331db44fc1127dd",
+      "80290 045035b880075d7310d0ae5aff9c5cccd8fd1736cc8fb860d094cb9c67e52160",
       [
         "Marriage and other unions",
         "Indifferent.",
@@ -78,7 +81,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "12",
-      "79424 341bf7f3a303be6297b0037fc78edbfb8bdcb216d3cc8f74e89557d27109e2d1",
+      "80301 584de33d2da6b9048f04c2d9978c03a1a479518e30b15b36f401b789a3523e12",
       [
         "Enemies; servants; imprisonment",
         "Unfavourable generally.",

@@ -28,6 +28,7 @@ import {
 } from "magick-data/enochian/tablets";
 import React from "react";
 import Tablet, { type TabletSquare } from "@/components/enochian/Tablet";
+import { plateClass } from "@/drawings/plate";
 import ExportControls from "@/export/ExportControls";
 import OpenSource from "@/OpenSource";
 import { componentImageFilename } from "@/render/componentImageUrl";
@@ -409,6 +410,9 @@ export default function Tablets() {
       <br />
 
       <Box
+        // The tablet, its sigil and the note in a sigil's place are drawn
+        // on white paper: a light card behind them in dark.
+        className={plateClass}
         sx={{
           "& [data-square]": { cursor: "pointer" },
           "& > svg": { maxWidth: "100%", height: "auto" },

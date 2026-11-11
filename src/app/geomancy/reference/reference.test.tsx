@@ -38,9 +38,11 @@ describe("geomancy reference page", () => {
   it("renders the same bytes it did before the data was rekeyed", () => {
     // Re-pinned when the headings became h2s and "Geomanic" and "ofThe" were
     // corrected, and when plan 075 replaced the texts with the Equinox's
-    // table and the houses in our own words (10 November 2026).
+    // table and the houses in our own words (10 November 2026), and when
+    // plan 076 wrapped the tetragrams and spirits in dark-mode ink spans
+    // (with the spans removed the bytes are those above, 62257 5618f825…).
     expect(digest(html)).toBe(
-      "62257 5618f8259dc1e10d30aac40e0b0b355b2a8053ad2010faa6a25d1fa642ac807e",
+      "63432 ad73c10ddfb80ca71da09300f423eba460d6b1f4c869f7b4c95fe4ffde4f24d1",
     );
   });
 

@@ -1,5 +1,6 @@
 import Lamen from "@magick-components/gd/Lamen";
 import { Fragment } from "react";
+import Ink from "@/drawings/Ink";
 import { privateMetadata } from "@/seo/metadata";
 
 export const metadata = privateMetadata("Officer Lamens");
@@ -25,10 +26,14 @@ const LAMENS: readonly [officer: string, grade?: string][] = [
 ];
 
 export default function GDComponentTest() {
-  return LAMENS.map(([officer, grade]) => (
-    <Fragment key={`${officer}${grade ?? ""}`}>
-      <Lamen officer={officer} grade={grade} />
-      <br />
-    </Fragment>
-  ));
+  return (
+    <Ink drawing="lamen">
+      {LAMENS.map(([officer, grade]) => (
+        <Fragment key={`${officer}${grade ?? ""}`}>
+          <Lamen officer={officer} grade={grade} />
+          <br />
+        </Fragment>
+      ))}
+    </Ink>
+  );
 }

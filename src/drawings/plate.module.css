@@ -1,0 +1,11 @@
+/*
+ * A light card behind a "document" drawing in the dark scheme (plan 076,
+ * decision 4): the drawing stays exactly as it is, on a surface it was
+ * drawn for. Nothing in light, so light layout does not move; the padding
+ * and radius apply in dark only.
+ */
+:global(.dark) .plate {
+  background-color: var(--mui-palette-plate);
+  border-radius: 8px;
+  padding: 8px;
+}

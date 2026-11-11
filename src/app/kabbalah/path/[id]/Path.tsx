@@ -13,6 +13,7 @@ import {
   Trail,
 } from "@/components/entity";
 import TreeOfLife from "@/components/kabbalah/TreeOfLife";
+import Ink from "@/drawings/Ink";
 import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import { RWSName, RWSPath, trumpNumeral } from "@/tarot";
 import styles from "./path.module.css";
@@ -86,12 +87,14 @@ export default function Path({ path }: { path: TreeOfLifePathRow }) {
 
       <FigureNav prev={prev} next={next}>
         {/* Drawn on the tree the path belongs to, so that it is on it. */}
-        <TreeOfLife
-          height="150px"
-          topText=""
-          activePath={path.id}
-          letterAttr={hermetic ? "hermetic" : "hebrew"}
-        />
+        <Ink drawing="tree">
+          <TreeOfLife
+            height="150px"
+            topText=""
+            activePath={path.id}
+            letterAttr={hermetic ? "hermetic" : "hebrew"}
+          />
+        </Ink>
       </FigureNav>
 
       <h1>{headingOf(path)}</h1>

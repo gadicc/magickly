@@ -40,6 +40,8 @@ const tiles = [
     title: "Tablets",
     to: "/enochian/tablets",
     alt: "Enochian Tablets",
+    // The tablet is drawn for white paper: a light card behind it in dark.
+    plate: true,
     Component: () => (
       <Box sx={{ height: "100%", textAlign: "center", marginTop: 1 }}>
         <Tablet id="earth" height="100%" />

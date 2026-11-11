@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import RoseSigil, { letterIJ } from "@/components/gd/RoseSigil";
+import Ink from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";
 import { parseComponentImageRequest } from "@/render/componentImageRequest";
 import { rectifySigilText } from "@/render/contracts/roseSigil";
@@ -152,13 +153,15 @@ export default function Sigils({
           </div>
         )}
 
-        <RoseSigil
-          ref={ref}
-          sigilText={isValid ? rectified : ""}
-          showRose={showRose}
-          animate={animate}
-          debug={debug}
-        />
+        <Ink drawing="roseSigil">
+          <RoseSigil
+            ref={ref}
+            sigilText={isValid ? rectified : ""}
+            showRose={showRose}
+            animate={animate}
+            debug={debug}
+          />
+        </Ink>
         <ExportControls
           target={ref}
           filename={`RoseSigil-${rectified}`}

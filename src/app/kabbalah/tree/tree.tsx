@@ -7,6 +7,7 @@ import Data from "magick-data";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import Tree from "@/components/kabbalah/TreeOfLife";
+import Ink from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";
 import { type TreeSettings, treeImageLink, treeSettings } from "./treeSettings";
 
@@ -173,18 +174,20 @@ export function TreeOfLifeView({
 
           <br />
 
-          <Tree
-            field={opts.field}
-            topText={opts.topText}
-            bottomText={opts.bottomText}
-            colorScale={opts.colorScale}
-            letterAttr={opts.letterAttr}
-            flip={opts.flip}
-            showDaat={opts.showDaat}
-            fontSize={opts.fontSize}
-            // @ts-expect-error: TODO, came up in recent linting update
-            ref={ref}
-          />
+          <Ink drawing="tree">
+            <Tree
+              field={opts.field}
+              topText={opts.topText}
+              bottomText={opts.bottomText}
+              colorScale={opts.colorScale}
+              letterAttr={opts.letterAttr}
+              flip={opts.flip}
+              showDaat={opts.showDaat}
+              fontSize={opts.fontSize}
+              // @ts-expect-error: TODO, came up in recent linting update
+              ref={ref}
+            />
+          </Ink>
 
           <br />
           <br />

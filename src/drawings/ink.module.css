@@ -1,0 +1,107 @@
+/*
+ * Dark-scheme ink for drawings whose line art is black (plan 076,
+ * decision 4). Each class goes on an element outside the drawing's <svg>,
+ * through <Ink> or `inkClass`, and selects what the drawing already has:
+ * ids, colour attributes and unfilled shapes. Nothing inside the <svg>
+ * changes, so downloads, copies and server images (which clone or render
+ * the markup without page CSS) stay black on white. Symbolic fills keep
+ * their colours; labels drawn on coloured or white shapes keep theirs.
+ *
+ * A rule on an element beats a colour it inherits from a parent's inline
+ * style (the Tree's `<g id="paths">`); a colour in the element's own
+ * inline style needs `!important` (the lamen's outer ring, the Tree's
+ * Malkuth quarters).
+ */
+
+/* A wrapper <Ink> adds: no box, so light layout does not move. */
+.wrap {
+  display: contents;
+}
+
+/* Tetragram: unfilled (black) dots. Also inside the geomancy chart. */
+:global(.dark) .tetragram circle:not([fill]),
+:global(.dark) .geomancyChart circle:not([fill]) {
+  fill: var(--mui-palette-ink);
+}
+
+/*
+ * AstroGeomancyChart: frame and lines (`stroke="black"`) and its house
+ * numbers, signs and planets (unfilled text).
+ */
+:global(.dark) .geomancyChart [stroke="black" i] {
+  stroke: var(--mui-palette-ink);
+}
+:global(.dark) .geomancyChart text:not([fill]) {
+  fill: var(--mui-palette-ink);
+}
+
+/* The geomancy reading's planetary pentagram and circle. */
+:global(.dark) .pentagram svg [stroke="black" i] {
+  stroke: var(--mui-palette-ink);
+}
+
+/* Planetary-spirit sigils (svg/astrology/spirits, inlined by SVGR). */
+:global(.dark) .spirit [fill="#070707" i] {
+  fill: var(--mui-palette-ink);
+}
+
+/*
+ * Seven-branched candlestick and table of shewbread: circles, triangles,
+ * heptagram, pentagram and their unfilled letters. The shewbread's four
+ * inner circles stay white, so the names and kerubim on them stay black.
+ */
+:global(.dark) .candlestick [stroke="black" i],
+:global(.dark) .shewbread [stroke="black" i] {
+  stroke: var(--mui-palette-ink);
+}
+:global(.dark) .candlestick text:not([fill]),
+:global(.dark) .shewbread text:not([fill]) {
+  fill: var(--mui-palette-ink);
+}
+:global(.dark) .shewbread g:has(> circle[fill="white" i]) text:not([fill]) {
+  fill: #000;
+}
+
+/* Rose sigil: the rose's rings and letters, black at 40% (`roseStrokeColor`). */
+:global(.dark) .roseSigil [stroke="rgba(0,0,0,.4)"] {
+  stroke: var(--mui-palette-ink);
+  stroke-opacity: 0.4;
+}
+:global(.dark) .roseSigil [fill="rgba(0,0,0,.4)"] {
+  fill: var(--mui-palette-ink);
+  fill-opacity: 0.4;
+}
+
+/* Chakra figure: the black silhouette behind the coloured chakras. */
+:global(.dark) .chakras path[fill="#000"] {
+  fill: var(--mui-palette-ink);
+}
+
+/* Lamen: the outer ring's edge, an inline style on the svg's first circle. */
+:global(.dark) .lamen svg > circle:first-child {
+  stroke: var(--mui-palette-ink) !important;
+}
+
+/*
+ * Tree of Life: the paths' outlines (inherited from `<g id="paths">`'s
+ * inline style) and the spheres' outlines, which also give Binah's #222
+ * and Malkuth's black quarter an edge. Da'at's dashed outline keeps its
+ * transparency. Labels, the GD grade marks and the white path fills keep
+ * their colours.
+ */
+:global(.dark) .tree :global(#paths) path {
+  stroke: var(--mui-palette-ink);
+}
+:global(.dark)
+  .tree
+  :global(#sephirot)
+  circle[stroke="#000"][stroke-width="1.568"] {
+  stroke: var(--mui-palette-ink);
+}
+:global(.dark) .tree :global(#sephirot) circle[stroke="#000000AA" i] {
+  stroke: var(--mui-palette-ink);
+  stroke-opacity: 0.67;
+}
+:global(.dark) .tree :global(#sephirot) path[style*="stroke:#000000"] {
+  stroke: var(--mui-palette-ink) !important;
+}

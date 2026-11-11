@@ -14,6 +14,7 @@ import {
   Row,
   Trail,
 } from "@/components/entity";
+import Ink from "@/drawings/Ink";
 import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import { RWSName } from "@/tarot";
 import styles from "./planet.module.css";
@@ -191,13 +192,15 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
                 {capitalize(planet.spiritId)}{" "}
                 {/* The component spreads its other props into its style. The
                     sigil is decoration beside the name it draws. */}
-                <PlanetarySpirit
-                  id={planet.spiritId}
-                  aria-hidden
-                  height="1.5em"
-                  display="inline-block"
-                  verticalAlign="middle"
-                />
+                <Ink drawing="spirit">
+                  <PlanetarySpirit
+                    id={planet.spiritId}
+                    aria-hidden
+                    height="1.5em"
+                    display="inline-block"
+                    verticalAlign="middle"
+                  />
+                </Ink>
               </>
             ) : null}
           </Row>

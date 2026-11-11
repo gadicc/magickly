@@ -12,6 +12,7 @@ import {
 } from "@/components/entity";
 import GradeTree from "@/components/gd/GradeTree";
 import { isPublicRitualId } from "@/doc/publicRituals";
+import Ink from "@/drawings/Ink";
 import { gdHallShortName } from "@/render/contracts/gdHall";
 import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import { gradeHalls, hallPath } from "@/seo/halls";
@@ -102,11 +103,13 @@ export default function GradePage({ grade }: { grade: GDGradeRow }) {
       />
 
       <FigureNav prev={prev} next={next}>
-        <GradeTree
-          height="150px"
-          topText=""
-          active={sephirah?.id ?? NO_SPHERE}
-        />
+        <Ink drawing="tree">
+          <GradeTree
+            height="150px"
+            topText=""
+            active={sephirah?.id ?? NO_SPHERE}
+          />
+        </Ink>
       </FigureNav>
 
       <h1>{title(grade)}</h1>

@@ -17,6 +17,7 @@ import {
 } from "@/components/entity";
 import { FIELD_PATH_LIST_SEPARATOR } from "@/components/kabbalah/fieldPath";
 import TreeOfLife from "@/components/kabbalah/TreeOfLife";
+import Ink, { inkClass } from "@/drawings/Ink";
 import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import { isHiddenSephirah } from "@/seo/entities";
 import { RWSName } from "@/tarot";
@@ -170,12 +171,14 @@ export default function Sephirah({ sephirah }: { sephirah: SephirahRow }) {
       />
 
       <FigureNav prev={prev} next={next}>
-        <TreeOfLife
-          height="150px"
-          topText=""
-          active={sephirah.id}
-          showDaat={hidden}
-        />
+        <Ink drawing="tree">
+          <TreeOfLife
+            height="150px"
+            topText=""
+            active={sephirah.id}
+            showDaat={hidden}
+          />
+        </Ink>
       </FigureNav>
 
       <h1>
@@ -273,7 +276,7 @@ export default function Sephirah({ sephirah }: { sephirah: SephirahRow }) {
         </Row>
         <Row label="Chakra">
           {chakra ? (
-            <div className={styles.chakra}>
+            <div className={`${styles.chakra} ${inkClass("chakras")}`}>
               <span>
                 {chakra.name.en}{" "}
                 <Name
