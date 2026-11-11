@@ -1,7 +1,7 @@
 # Open source: the packages and their pages — 11 November 2026
 
-Status: plan; stage A built on `gate/data-publish`, not merged
-([below](#stage-a-11-november-2026)). Reviewed on 11 November 2026 and
+Status: plan; stage A built and reviewed on `gate/data-publish`, not
+merged ([below](#stage-a-11-november-2026)). Reviewed on 11 November 2026 and
 revised (see [Review](#review-11-november-2026)), then spiked and mocked up the same day
 (see [Before any code](#before-any-code)). Decisions 1–4, the table page's
 layout, the sigils, the fonts and the licence note were settled by Gadi on
@@ -136,25 +136,45 @@ shipping the wrong bytes.
   dispute policy forbids publishing "simply for the purposes of reserving"
   a name. Gadi publishes **`0.1.0-rc.0` under `--tag next`** with his own
   npm login, from a clean checkout of the `main` commit, using the
-  smoke-verified tarball. He then configures the trusted publisher. CI
-  publishes **0.1.0 itself, with provenance**, inside the 48-hour window
-  that, since 2 October 2026, an unvalidated configuration has before it
-  expires. If the window lapses, the configuration is made again. No
-  throwaway 0.1.1 is needed.
-- **`publish.yml`, a workflow of its own** on pushes to `main`, after the
-  quality workflow, in its own GitHub environment (`npm`) with a minimal
-  job: checkout, install, build, smoke, publish. The trusted publisher
-  names `gadicc/magickly`, `publish.yml` and that environment, and the job
-  declares the environment so the OIDC claim matches. Not in
+  smoke-verified tarball. He then configures the trusted publisher,
+  allowing `npm publish` explicitly (a configuration made after
+  3 September 2026 allows only `npm stage publish` unless told
+  otherwise). CI publishes **0.1.0 itself, with provenance**, inside the
+  two days that, since 2 October 2026, an unvalidated configuration has
+  before it expires. An expired configuration can be neither used nor
+  edited; it is deleted and made again. No throwaway 0.1.1 is needed.
+- **Published directly, not staged** (Gadi, 11 November): CI runs `npm
+  publish --provenance`, not `npm stage publish` with a human approving
+  each release on npmjs.com with 2FA. With `publish.yml` split as below,
+  the publish credential (the OIDC `id-token`) exists only in a job that
+  runs no third-party code: no install, no cache, no package script,
+  only checkout, Node and npm, the decision script and the verified
+  tarball. What remains is someone with push access to `main` editing
+  `publish.yml`, and that is only Gadi. Staged publishing stays
+  [deferred](#deferred); required reviewers on the `npm` environment
+  are the cheaper hardening if that ever changes.
+- **`publish.yml`, a workflow of its own** on pushes to `main`, in three
+  stages (the [stage A review](#stage-a-review-11-november-2026), H1).
+  `decide` checks out and runs the decision on the source manifest, with
+  no install; on most pushes it skips and nothing else runs. When it says
+  publish, `quality` (`ci.yml`, for that exact commit) and `build`
+  (install, smoke keeping the tarball, its SHA-256 and integrity, an
+  artifact) run without `id-token`. Then `publish`, alone in the `npm`
+  GitHub environment with `id-token: write`, downloads the tarball,
+  checks its SHA-256, decides again and publishes. The trusted publisher
+  names `gadicc/magickly`, `publish.yml` and that environment, and the
+  job declares the environment so the OIDC claim matches. Not in
   `release.yml`: its deploy job already holds `id-token: write` in
   `Production`, and everything the Vercel build runs could then mint an
   npm publish token.
 - **What triggers a publish.** For each package the job fetches the npm
   packument; `npm view` exits 1 with E404 for a missing package, a missing
   version and some registry failures alike, so it is not used.
-  - A 404 for the package skips it (the first publish is by hand).
+  - A 404 for the package skips it (the first publish is by hand). From
+    the bump to 0.1.0, `--expect-exists` makes a 404 fail instead.
   - Otherwise the job publishes only if the manifest's version is absent
-    from the packument and greater than `latest`.
+    from the packument and greater than `latest`, and a pre-release also
+    greater than `next`, so `next` never moves backwards.
   - Any other registry error fails the job.
 
   Re-runs are therefore no-ops, and merging stage A before the first
@@ -166,7 +186,9 @@ shipping the wrong bytes.
   listed with its source, and the README's "Sources" names every set
   derived from an identified work. It names five today; the geomancy texts
   from the Equinox and Agrippa ([plan 075](075-geomancy-own-words.md)) are
-  a sixth. A test then keeps the list and the files in step.
+  a sixth. A test then keeps the list and the files in step, and the
+  README test and the smoke test refuse any version past 0.0.0 while a
+  row still says its source is "not recorded" or "not known".
 
 Deferred, at Gadi's request: change detection and automated bumps
 ([below](#deferred)).
@@ -579,8 +601,8 @@ worktree, per the house rules.
 
 | Stage | What | Depends on |
 | --- | --- | --- |
-| A | `magick-data` ready to publish: `private` off, `repository`, the `prepublishOnly` guard, the smoke test keeping its tarball, the README's install section and complete Sources with its test; `publish.yml` with the packument rule and its own `npm` environment (inert until the first manual publish), with a `--dry-run` of the verified tarball in CI | — |
-| A′ | The provenance sign-off; Gadi publishes `0.1.0-rc.0 --tag next` by hand and configures the trusted publisher; a version bump to 0.1.0 publishes from CI with provenance within 48 hours | A merged |
+| A | `magick-data` ready to publish: `private` off, `repository`, the `prepublishOnly` and `prepack` guards, the smoke test keeping its tarball, the README's install section and complete Sources with its tests; `publish.yml` with the packument rule, in three jobs with `id-token` only in the last, and its own `npm` environment (inert until the first manual publish), with a `--dry-run` of the verified tarball in CI on pull requests | — |
+| A′ | The provenance sign-off; Gadi publishes `0.1.0-rc.0 --tag next` by hand and configures the trusted publisher; a version bump to 0.1.0 publishes from CI with provenance within two days; then `next` removed and tokens disallowed | the `npm` environment, before A merges |
 | B | `/open-source` hub; `/about` and `OpenSource.tsx` link to it; nav, sitemap, search | — |
 | C | The field manifest from the data build (`rowKey`, structured types, the map rule, the `texts` section, `ids()`'s `about` map), descriptions for all 199 field paths in `schemas.ts` (about 4–6 hours of writing) and their completeness test; `/open-source/data` (tables, texts and helpers) and the table pages with rows, links and the detail pane | B |
 | E | `packages/magick-components`: move, violations to zero, explicit extensions, strict (typing `TreeOfLife`), ref as a prop, the nlopt optimiser in its own module, `RoseSigilImage` taking any letter, directives where needed, dependencies, fonts with `gd-hall.css`, smoke test (Node load, static render, directives, both bundlers), README; hashes unchanged | — (dark mode and Frank Ruhl Libre are merged) |
@@ -641,6 +663,7 @@ gated on its own tree in a clean worktree with a fresh install.
 | --- | --- |
 | `90623933` | `feat(magick-data): Make the package publishable` |
 | `f4c39c73` | `ci(publish): Publish magick-data from CI` |
+| `c759379f` | `fix(publish): Apply the stage A review` ([below](#stage-a-review-11-november-2026)) |
 
 The gate ran the install, `loom init`, `loom check` (and
 `--production`), `pnpm check`, `pnpm typecheck`, the smoke test keeping
@@ -648,10 +671,19 @@ its tarball, the rule and the dry run (from `f4c39c73`, as `ci.yml` now
 does), `pnpm test:coverage`, `pnpm build` and `pnpm check:turbopack`;
 all passed on both commits. On `90623933` the first coverage run had
 eight tests time out under a load average of about 25 and passed whole
-when re-run.
+when re-run. On `c759379f` the gate ran the same steps, with the rule
+both from the tarball (`--advisory all`, as the `registry` job runs it
+on a pull request that leaves the version alone) and from the manifest
+(as `decide` runs it), the dry run with npm 11.18.0, and `npm pack
+--dry-run` in the package, which the `prepack` guard must refuse. All
+passed first time, coverage included (8190 tests). `actionlint` 1.7.12
+found nothing in the three workflows (without shellcheck, which is not
+installed here).
 
 - **The manifest:** `private` gone; `repository` (with `directory`),
-  `homepage` and `bugs` added; the version still 0.0.0.
+  `homepage`, `bugs`, `description` and `keywords` added; `license` is
+  the SPDX expression `(MIT AND CC-BY-4.0)`, the files split by path as
+  `LICENSE.txt` says; the version still 0.0.0.
 - **The guard:** `prepublishOnly` runs `scripts/prepublishGuard.mjs`,
   which refuses a manifest whose `exports` point into `./src/`. Run in the
   package directory, `npm publish --dry-run` (npm 11.18.0) and `pnpm
@@ -659,10 +691,15 @@ when re-run.
   <tarball> --dry-run` passes. Neither tool runs lifecycle scripts for a
   tarball, and `pnpm pack` drops `prepublishOnly` (with `prepack`,
   `prepare`, `postpack` and `publish`) from the manifest it packs, which
-  the smoke test checks. `--ignore-scripts` would skip the guard.
+  the smoke test checks. A `prepack` guard, the same script with
+  `--pack`, refuses to pack under anything but pnpm, so `npm pack` cannot
+  make a tarball whose exports point into `./src/` (review, L1).
+  `--ignore-scripts` would skip both guards.
 - **The verified tarball:** `pnpm --filter magick-data smoke
   --keep-tarball <path>` copies the tarball it verified to `<path>` and
-  prints its SHA-256. CI and `publish.yml` publish that file.
+  prints its SHA-256 and npm's `sha512-…` integrity. `publish.yml`
+  publishes that file. The smoke test also holds the README's Sources to
+  the tarball's `dist/**/*.json`.
 - **The README:** an install and usage section; a sentence on releases
   under "Versions"; and a Sources table of every published data file
   (36 JSON5 sources and `graph.json`) with where each comes from, with a
@@ -681,62 +718,120 @@ when re-run.
   mocked `fetch` for every branch. Against the live registry on
   11 November: `skip: magick-data@0.0.0: magick-data is not on the
   registry; its first publish is by hand`.
-- **`publish.yml`:** on pushes to `main`, after `ci.yml` through
-  `workflow_call` (as `release.yml` does), one job in the `npm`
-  environment with `contents: read` and `id-token: write`: checkout,
-  pnpm and Node 24, install, smoke keeping the tarball (the smoke test
-  builds the package), decide, and `npm publish <tarball> --provenance
-  --access public --tag <tag>` when the rule says publish. Actions are
-  pinned by SHA; no `NPM_TOKEN`. npm is `pnpm dlx npm@11.18.0`, the
-  version Node 24.18 bundles, since trusted publishing needs 11.5.1 or
-  later and the pnpm-installed runtime's npm is not something the
-  workflow can see in advance.
-- **CI's dry run:** `ci.yml`'s checks job keeps the smoke tarball, runs
-  the rule, and dry-runs `npm publish` of the tarball with the rule's
-  tag. npm 11 refuses even a dry run of a version the registry lists
-  ("You cannot publish over the previously published versions") and of a
-  pre-release without `--tag`, so the dry run takes the rule's tag and is
-  skipped once the version is published; a mistaken bump fails CI before
-  it reaches `main`.
+- **`publish.yml`:** on pushes to `main`, as decision 3 describes:
+  `decide` (no install), then `quality` and `build` only when it says
+  publish, then `publish` in the `npm` environment, the only job with
+  `id-token: write`: `npm publish <tarball> --provenance --access public
+  --tag <tag> --loglevel verbose` (npm reports a failed OIDC exchange
+  only at verbose, and otherwise says ENEEDAUTH). Every job requires
+  `github.repository == 'gadicc/magickly'`. Actions are pinned by SHA; no
+  `NPM_TOKEN`. npm's refusal to publish over a listed version, which a
+  packument cached for up to five minutes can lead to on a re-run, is a
+  skip with a warning.
+- **npm itself:** `actions/setup-node`, pinned by SHA, installs Node
+  24.22.2 exactly, whose bundled npm (11.19.1) publishes; the job fails
+  clearly if `npm --version` is below 11.5.1, which trusted publishing
+  needs. Not `pnpm dlx npm@…`, which the lockfile does not pin by
+  integrity, and not whatever `npm` is on the runner's `PATH` after
+  `pnpm/setup`, whose `runtime: node@24` floats. The publish job needs
+  no pnpm at all. `ci.yml`'s dry run uses the same Node.
+- **CI's dry run:** `ci.yml`'s `registry` job downloads the smoke
+  tarball from `checks`, runs the rule and dry-runs `npm publish` of
+  it with the rule's tag. It runs on pull requests and `codex/**`
+  pushes only, and is not among `verify`'s needs, so neither
+  `release.yml` nor `publish.yml` (both call `ci.yml` on a push to
+  `main`) waits on registry state the repository does not control: a
+  squatter at a higher version, an older commit after the rc, an
+  outage (review, M2). On a pull request that changes the package's
+  version, a bump not above the registry's fails; otherwise, and for
+  any registry error, the rule warns (`--advisory`). When the version
+  is already published, the rule compares the tarball's integrity with
+  the registry's and warns on a difference: content changed without a
+  bump (L3). npm 11 refuses even a dry run of a version the registry
+  lists and of a pre-release without `--tag`, so the dry run takes the
+  rule's tag and is skipped once the version is published or the rule
+  could not decide.
 
 ### Stage A′: the owner's steps
 
-In this order. Every command runs from a clean checkout of `main` with
-Node 24 (npm 11.5.1 or later).
+In this order. Commands run with Node 24, whose npm must be 11.5.1 or
+later (11.15.0 or later for `npm trust`).
 
-1. **The provenance sign-off.** Settle each question below, edit the
-   README's Sources table to match (no row may still say "not recorded"
-   or "not known"), and decide whether a file whose answer is not
-   satisfactory leaves the tarball (a `!dist/…` entry in `files`, as the
-   dictionary has) or its field is removed.
-2. **Bump to `0.1.0-rc.0`** in `packages/magick-data/package.json` and
-   merge to `main`. CI runs `publish.yml`, finds no package on the
-   registry and skips.
-3. **Publish the release candidate by hand**, from a clean checkout of
-   that `main` commit:
+1. **Before merging stage A, create the `npm` environment** in the
+   repository's settings (Settings › Environments › New environment,
+   `npm`), with a deployment branch rule: "Selected branches and tags",
+   `main` only. A job that names an environment the repository lacks
+   creates it, with no rule, and merging stage A runs `publish.yml`;
+   its `publish` job runs only when there is something to publish, but
+   the rule should exist before anything can name the environment.
+   `main` has no branch protection, so the rule guards against
+   accidents (a workflow on another branch reaching the environment),
+   not against anyone with write access. Optional, later: required
+   reviewers on the environment, which would hold every CI publish for
+   an approval.
+2. **Turn on two-factor authentication** for the npm account, if it is
+   not on. `npm trust` requires it, and step 9 relies on it.
+3. **The provenance sign-off.** Settle each question below, edit the
+   README's Sources table to match, and decide whether a file whose
+   answer is not satisfactory leaves the tarball (a `!dist/…` entry in
+   `files`, as the dictionary has) or its field is removed. No row may
+   still say "not recorded" or "not known": the README test and the
+   smoke test fail any version past 0.0.0 while one does. Four of the
+   questions (`chakras`, `geomancy/tetragrams`, `enochian/tablets` and
+   the 72 angels' English) have rows that say neither, so no test
+   holds them; they are the owner's to settle all the same.
+4. **Bump to `0.1.0-rc.0`** in `packages/magick-data/package.json` and
+   merge to `main`. `publish.yml`'s `decide` finds no package on the
+   registry and skips; nothing else runs.
+5. **Publish the release candidate by hand**, from a clean checkout of
+   exactly the commit step 4 put on `main` (`<sha>`):
 
    ```sh
    git clone https://github.com/gadicc/magickly.git && cd magickly
+   git checkout <sha>
    pnpm install --frozen-lockfile
    pnpm --filter magick-data smoke --keep-tarball "$PWD/magick-data.tgz"
+   npm whoami
    npm publish ./magick-data.tgz --tag next --access public
+   npm view magick-data@0.1.0-rc.0 dist.integrity
    ```
 
-   with your own npm login (`npm whoami` first). The smoke test builds
-   the package itself; publish only the file it kept.
-4. **Configure the trusted publisher** on npmjs.com, under the package's
-   settings: GitHub Actions, repository `gadicc/magickly`, workflow
-   `publish.yml`, environment `npm`. The 48-hour window starts here. It
-   is also the moment to create the `magickly` organisation on npm
+   with your own npm login. The smoke test builds the package itself;
+   publish only the file it kept. It prints the tarball's SHA-256 and
+   `integrity sha512-…`, and `npm view` should print the same integrity.
+6. **Configure the trusted publisher, allowing `npm publish`.** On
+   npmjs.com, the package's Settings › Trusted publishing › GitHub
+   Actions: organization or user `gadicc`, repository `magickly`,
+   workflow filename `publish.yml`, environment name `npm`, and under
+   the allowed actions, **`npm publish`** ticked. A configuration made
+   after 3 September 2026 otherwise allows only `npm stage publish`,
+   and CI's publish would be refused. Or, from the command line:
+
+   ```sh
+   npm trust github magick-data --file publish.yml --repo gadicc/magickly --env npm --allow-publish
+   ```
+
+   The two days start here: a configuration that no publish validates
+   within two days expires, and can then be neither used nor edited.
+   This is also the moment to create the `magickly` organisation on npm
    ([Risks](#risks)).
-5. **Create the `npm` environment** in the repository's settings
-   (Settings › Environments), limited to the `main` branch. GitHub would
-   create it on `publish.yml`'s first run, without that limit.
-6. **Bump to `0.1.0` within 48 hours** and merge to `main`. The rule
-   finds `0.1.0` absent and above `latest` (the registry points `latest`
-   at the release candidate), and the job publishes it under `latest`
-   with provenance. If the window has lapsed, configure the trusted
-   publisher again first.
+7. **Bump to `0.1.0` within the two days**, and in the same commit set
+   `DECISION_FLAGS: "--expect-exists"` in `publish.yml`, so that from
+   then on a 404 fails instead of skipping. Merge to `main`. The rule
+   finds `0.1.0` absent and above `latest` (the registry points
+   `latest` at the release candidate), and the `publish` job publishes
+   it under `latest` with provenance. Compare the integrity the `build`
+   job printed with `npm view magick-data@0.1.0 dist.integrity`. If the
+   publish fails with ENEEDAUTH, the verbose log shows the OIDC
+   exchange. If the two days have lapsed, delete the expired
+   configuration, create it again (step 6) and re-run the workflow.
+8. **Retire the `next` tag:** `npm dist-tag rm magick-data next`, so
+   that `npm install magick-data@next` no longer installs the release
+   candidate.
+9. **Disallow tokens:** once CI's publish has succeeded, set the
+   package's Settings › Publishing access to "Require two-factor
+   authentication and disallow tokens". Trusted publishing uses OIDC
+   and keeps working; no token can publish the package any more.
 
 ### The sign-off's questions
 
@@ -752,6 +847,45 @@ Found while listing every published file; none is decided here.
 | `chakras.json5` | The file's comment cites Wikipedia's "Chakra" article (CC BY-SA). The fields are short facts (names, places, petals, colours, seed syllables); confirm nothing longer was copied. |
 | `geomancy/tetragrams.json5` | Its first line cites Wikipedia's "Geomantic figures"; plan 075 replaced the texts, so the link may only cover the figures' names and dots. Confirm, or drop the link. |
 | `enochian/tablets.json5` | Greer's edition (Llewellyn, in copyright) is one of the readings. The letters are facts and the README says no rights are asserted over them; confirm that reading letters from its redrawn plates is acceptable for a CC BY package. |
+
+### Stage A review (11 November 2026)
+
+An adversarial review of stage A's commits found the following; each was
+checked against the code before it was changed. Gadi decided the
+publishing model the same day: directly with provenance, not staged
+(decision 3). Applied in `c759379f`.
+
+| # | Finding | Disposition |
+| --- | --- | --- |
+| H1 | The publish job held `id-token: write` through install, build, smoke and a run-time npm download, on every push to `main` | Fixed: `decide`, then `quality` and `build` without `id-token`, then `publish` alone in `npm` (decision 3) |
+| H1, L12 | `pnpm dlx npm@11.18.0` is not pinned by integrity | Fixed: `actions/setup-node` by SHA at Node 24.22.2, npm 11.19.1, asserted at 11.5.1 or later; the same Node for CI's dry run |
+| H2 | A′ missed allowing `npm publish` on the trusted publisher, 2FA, disallowing tokens, and re-creating an expired configuration | Fixed in the steps above, with the UI route and `npm trust github … --allow-publish` |
+| M1 | The `npm` environment was created after merging; no repository guard | Fixed: step 1 creates it, limited to `main`, before the merge; every `publish.yml` job requires `gadicc/magickly` (L11) |
+| M2 | `ci.yml`, which `release.yml` reuses, failed on registry state the repository does not control | Fixed: a `registry` job on pull requests and `codex/**` pushes only, outside `verify`'s needs; fatal only for a pull request's own bump |
+| M3 | The provenance sign-off was not enforced | Fixed: the README test and the smoke test refuse a version past 0.0.0 while a Sources row says "not recorded" or "not known" (`UNSETTLED` in `scripts/readmeSources.mjs`) |
+| M4 | CI ran twice on every push to `main` | Fixed: `publish.yml` runs `ci.yml` only when publishing, for that exact commit. Depending on `release.yml`'s run instead would tie npm to the deploy's success |
+| L1 | `npm pack` then `npm publish <tgz>` bypassed the guard | Fixed: a `prepack` guard refuses to pack under anything but pnpm; tested both ways, and `npm pack --dry-run` exits 1. `--ignore-scripts` still bypasses it |
+| L2 | A 404 skipped forever | Fixed: `--expect-exists`, switched on with the bump to 0.1.0 (step 7) |
+| L3 | "Published, skip" could not see changed content | Fixed where a tarball exists: the rule warns when the registry's `dist.integrity` differs. See the follow-ups |
+| L4 | Pre-releases were compared with `latest` only; `next` was left on the rc | Fixed: a pre-release must also be above `next`; step 8 removes `next` |
+| L5 | The README said a pre-release is never `latest` | Fixed |
+| L6 | A re-run within the packument's five-minute cache decides "publish" and npm refuses | Fixed: npm's "cannot publish over" refusal is a skip with a warning |
+| L7 | The command line was untested; the registry fixed; a body timeout read as "not JSON" | Fixed: tests run the script against a local registry (`--registry`) and check its outputs; a body timeout is retried and named |
+| L8 | Nothing held the Sources table to the tarball itself | Fixed: the smoke test compares it with the tarball's `dist/**/*.json` |
+| L9 | A′ step 3 cloned `main`'s tip; no integrity to compare | Fixed: `git checkout <sha>`; the smoke test prints the `sha512-…` integrity |
+| L10 | The manifest lacked `description` and `keywords`; `license` was not SPDX | Fixed: both added, and `license` is `(MIT AND CC-BY-4.0)`, which npm accepts. `scripts` and `devDependencies` stay in the packed manifest: `pnpm pack` has no way to drop them short of rewriting the tarball, and neither does anything for a consumer (no install hook) |
+| L13, L14 | Wording on the expiry, 2FA and "disallow tokens" | Fixed in decision 3 and the steps |
+
+#### Follow-ups
+
+- **Changed content on `main`.** The integrity warning (L3) needs a
+  tarball, so it runs in CI's `registry` job, on pull requests and
+  `codex/**` pushes. A commit pushed straight to `main` that changes the
+  data without a bump is not warned about; `publish.yml`'s `decide` reads
+  only the manifest. If that happens, run the rule on the tarball in a
+  job outside `release.yml`'s path.
+- **Required reviewers on the `npm` environment**, if anyone but Gadi
+  ever gets push access to `main` (decision 3).
 
 ## Review (11 November 2026)
 
@@ -788,8 +922,10 @@ table page puts its fields below its rows (decision 4).
   (semantic-release, or changesets once outside contributors arrive), in
   place of the hand bump in decision 3. Revisit after a few hand releases
   show how often they are wrong or forgotten.
-- **Staged publishing** (`npm stage publish`, approved by a human on
-  npmjs.com), if an unattended release ever goes wrong.
+- **Staged publishing** (`npm stage publish`, each release approved by
+  a human with 2FA on npmjs.com; Gadi, 11 November), if an unattended
+  release ever goes wrong or someone else gains push access to `main`
+  ([decision 3](#3-releases-published-by-ci-when-the-version-changes-gadi-11-november)).
 - **JSR** as a second registry, for its generated documentation.
 - **A view of the assembled graph** (`react-inspector` 9, which handles
   cycles), if anyone asks to see `assemble()`'s output rather than the
@@ -815,8 +951,9 @@ table page puts its fields below its rows (decision 4).
   likelihood for a niche name. If it happens, the fallback is
   `@magickly/components`, which needs the `magickly` npm organisation;
   creating that organisation is worth doing at stage A′ either way.
-- **The 48-hour window lapses.** Then the trusted publisher is configured
-  again; nothing is lost.
+- **The two-day window lapses.** Then the expired trusted publisher,
+  which can no longer be edited, is deleted and configured again;
+  nothing is lost.
 - **TypeScript 7.** `react-docgen-typescript` uses the TypeScript compiler
   API, which TypeScript 7 (the Go port) changes, and it has had no release
   since June 2025. If the app moves first, the docgen script pins its own
@@ -840,7 +977,12 @@ table page puts its fields below its rows (decision 4).
 - `@textea/json-viewer` 4.0.1's MUI 6 peer:
   https://unpkg.com/@textea/json-viewer@4.0.1/README.md
 - npm trusted publishers: https://docs.npmjs.com/trusted-publishers
-- Unvalidated trusted publishers expire after 48 hours (2 October 2026):
+  (read 11 November 2026: allowed actions, `npm stage publish` alone by
+  default after 3 September 2026, the two-day expiry, deleting an expired
+  configuration, "disallow tokens")
+- `npm trust`: https://docs.npmjs.com/cli/v11/commands/npm-trust (npm
+  11.15.0 or later, account 2FA, `--allow-publish`)
+- Unvalidated trusted publishers expire after two days (2 October 2026):
   https://github.blog/changelog/2026-10-02-unvalidated-npm-trusted-publishing-configurations-now-expire
 - npm dispute policy on name reservation:
   https://docs.npmjs.com/policies/disputes

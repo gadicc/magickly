@@ -217,9 +217,14 @@ Follow-ups are separate from the completed migration work:
   fixture, the registry) and mocked up. Both npm names were free on
   11 November. Stage A (the package ready to publish, `publish.yml` with
   the packument rule, CI's dry run of the verified tarball) is built on
-  `gate/data-publish`, not merged. TODO: merge stage A; then stage A′,
-  Gadi's ([the steps](080-open-source-packages.md#stage-a-the-owners-steps));
-  then, with his go-ahead, stages B to G.
+  `gate/data-publish` and its adversarial review applied: `id-token`
+  only in a publish job that installs nothing, CI's registry check off
+  the deploy path, CI publishing directly with provenance (Gadi), not
+  merged. TODO: create the `npm` environment, then merge stage A; then
+  the rest of stage A′, Gadi's
+  ([the steps](080-open-source-packages.md#stage-a-the-owners-steps));
+  then, with his go-ahead, stages B to G. Follow-ups:
+  [plan 080](080-open-source-packages.md#follow-ups).
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose
@@ -417,9 +422,12 @@ Follow-ups are separate from the completed migration work:
   ([plan 052](052-data-package.md#magickli-stays)).
 - TODO: publishing `magick-data`, planned in
   [plan 080](080-open-source-packages.md) (stages A and A′): stage A is
-  built on `gate/data-publish`; stage A′ is Gadi's provenance sign-off
-  (eight questions), the release candidate published by hand, the trusted
-  publisher, and 0.1.0 from CI within 48 hours
+  built and reviewed on `gate/data-publish`; stage A′ is Gadi's: the `npm`
+  environment before the merge, the provenance sign-off (eight
+  questions; tests refuse a version past 0.0.0 while a Sources row is
+  open), the release candidate published by hand, the trusted publisher
+  allowing `npm publish`, 0.1.0 from CI within two days with
+  `--expect-exists`, then `next` removed and tokens disallowed
   ([the steps](080-open-source-packages.md#stage-a-the-owners-steps)). The Enochian
   dictionary stays out of the tarball whatever is decided: its entries come
   from Schueler's *Enochian Magic: A Practical Manual* and *The Whole
