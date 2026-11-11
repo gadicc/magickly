@@ -68,7 +68,23 @@ export class Browser {
     };
     await browser.send("Page.enable");
     await browser.send("Runtime.enable");
+    await browser.forceLightScheme();
     return browser;
+  }
+
+  /**
+   * Help screenshots are always light (plan 076, decision 5), whatever the
+   * capturing machine's setting: the system preference is emulated as
+   * light, and a stored mode is cleared before each page's own scripts run,
+   * so the colour-scheme script finds no `mui-mode` choice.
+   */
+  private async forceLightScheme() {
+    await this.send("Emulation.setEmulatedMedia", {
+      features: [{ name: "prefers-color-scheme", value: "light" }],
+    });
+    await this.send("Page.addScriptToEvaluateOnNewDocument", {
+      source: `try { localStorage.removeItem("mui-mode"); } catch {}`,
+    });
   }
 
   send<T = CdpResult>(method: string, params: object = {}): Promise<T> {

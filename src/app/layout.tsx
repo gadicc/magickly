@@ -1,9 +1,11 @@
 import CssBaseline from "@mui/material/CssBaseline";
+import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import { ThemeProvider } from "@mui/material/styles";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import type { Metadata, Viewport } from "next";
 import * as React from "react";
 import VercelInsights from "@/analytics/VercelInsights";
+import { COLOR_SCHEME_ATTRIBUTE, DEFAULT_COLOR_MODE } from "@/colorScheme";
 import { earlyPlaceLookupScript } from "@/geo/earlyPlaceLookup";
 
 import {
@@ -16,6 +18,7 @@ import {
 import theme from "@/theme";
 import ClientProviders from "./clientProviders";
 import MyAppBar from "./MyAppBar";
+import PrintInLight from "./PrintInLight";
 import SiteFooter from "./SiteFooter";
 import StyledJsxRegistry from "./StyledJsxRegistry";
 import "@/db";
@@ -62,7 +65,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
-    <html lang="en" dir="ltr">
+    // The colour-scheme script sets a class on <html> before React hydrates.
+    <html lang="en" dir="ltr" suppressHydrationWarning>
       <head>
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: our own constant script, no input
@@ -145,11 +149,20 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         <meta property="fb:admins" content="gadicohen" />
       </head>
       <body>
+        <InitColorSchemeScript
+          attribute={COLOR_SCHEME_ATTRIBUTE}
+          defaultMode={DEFAULT_COLOR_MODE}
+        />
         <StyledJsxRegistry>
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-            <ThemeProvider theme={theme}>
+            <ThemeProvider
+              theme={theme}
+              defaultMode={DEFAULT_COLOR_MODE}
+              disableTransitionOnChange
+            >
               {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
               <CssBaseline />
+              <PrintInLight />
               <ClientProviders>
                 {/* Part of the shell: a Suspense boundary here would let React
                   outline the bar after large pages and reveal it by script. */}
