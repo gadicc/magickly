@@ -1,0 +1,67 @@
+name: Publish packages
+
+# Plan 080, decision 3: publish magick-data to npm when its version changes
+# on main, through trusted publishing (OIDC) with provenance. It does nothing
+# until the owner's first publish by hand: a package the registry does not
+# have is skipped, and so is a version it already lists.
+#
+# Not part of release.yml: its deploy job holds id-token: write in the
+# Production environment, and everything the Vercel build runs there could
+# then mint an npm token. This workflow has its own `npm` environment, which
+# the trusted publisher on npmjs.com names, with this file and the repository.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# One publish at a time, and never cancelled halfway: a second push waits,
+# and then finds its version published or bumps past it.
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+jobs:
+  quality:
+    uses: ./.github/workflows/ci.yml
+
+  magick-data:
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      # pnpm 11's own action installs pnpm (from packageManager) and Node.js.
+      # Keep node@24 in step with .nvmrc.
+      - uses: pnpm/setup@a0881977cd8ea73b1ed212236c99ca10dcc80cf4 # v3.1.1
+        with:
+          runtime: node@24
+          cache: true
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            pnpm-workspace.yaml
+          install: false
+      - run: pnpm install --frozen-lockfile
+      # The smoke test builds the package (data:build, then lib/), packs it,
+      # verifies the tarball and keeps it; that file is what is published.
+      - name: Build, verify and keep the tarball
+        run: pnpm --filter magick-data smoke --keep-tarball "$RUNNER_TEMP/magick-data.tgz"
+      - name: Decide from the registry
+        id: decide
+        run: node scripts/npm-publish-decision.mjs "$RUNNER_TEMP/magick-data.tgz"
+      # Trusted publishing needs npm 11.5.1 or later; the npm pinned here is
+      # the one CI's dry run uses, whatever the runtime bundles.
+      - name: Publish with provenance
+        if: steps.decide.outputs.publish == 'true'
+        env:
+          TAG: ${{ steps.decide.outputs.tag }}
+        run: >-
+          pnpm dlx npm@11.18.0 publish "$RUNNER_TEMP/magick-data.tgz"
+          --provenance --access public --tag "$TAG"

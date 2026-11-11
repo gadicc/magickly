@@ -37,8 +37,22 @@ jobs:
       - run: pnpm check
       - run: pnpm typecheck
       # The package's published shape: built, packed, installed into a
-      # fixture, type-checked and loaded (plan 052).
-      - run: pnpm --filter magick-data smoke
+      # fixture, type-checked and loaded (plan 052), keeping the tarball.
+      - run: pnpm --filter magick-data smoke --keep-tarball "$RUNNER_TEMP/magick-data.tgz"
+      # The verified tarball is publishable (plan 080), with the npm and the
+      # dist-tag publish.yml would use. The rule fails a bump that is not
+      # above the published version, here before it reaches main; npm refuses
+      # even a dry run of a version the registry lists, so that is skipped.
+      - name: Decide as publish.yml would
+        id: decide
+        run: node scripts/npm-publish-decision.mjs "$RUNNER_TEMP/magick-data.tgz"
+      - name: Dry-run a publish of the verified tarball
+        if: steps.decide.outputs.published != 'true'
+        env:
+          TAG: ${{ steps.decide.outputs.tag }}
+        run: >-
+          pnpm dlx npm@11.18.0 publish "$RUNNER_TEMP/magick-data.tgz"
+          --dry-run --access public --tag "$TAG"
 
   tests:
     name: Tests (${{ matrix.shard }}/4)
