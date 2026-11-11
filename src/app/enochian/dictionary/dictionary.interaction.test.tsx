@@ -176,6 +176,30 @@ describe("the Enochian keypad (plan 074, decisions 2 and 4)", () => {
     expect(document.activeElement).toBe(box);
   });
 
+  it("moves the list down on a wide screen rather than covering it", () => {
+    const matchMedia = window.matchMedia;
+    window.matchMedia = ((query: string) => ({
+      matches: query.includes("min-width"),
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    })) as typeof window.matchMedia;
+    try {
+      render(<Dictionary uses={{}} />);
+      act(() => enochianBox().focus());
+      const keypad = screen.getByRole("group", { name: "Enochian letters" });
+      // Laid out in the page, not floated over the first matches.
+      expect(getComputedStyle(keypad).position).toBe("static");
+      expect(keypad.closest(".dict-search")).toBeTruthy();
+    } finally {
+      window.matchMedia = matchMedia;
+    }
+  });
+
   it("closes on Done, on Escape and when the box loses focus", () => {
     render(<Dictionary uses={{}} />);
     const keypad = () =>

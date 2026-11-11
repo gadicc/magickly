@@ -28,15 +28,13 @@ const styles = {
     bottom: 0,
     paddingBottom: "calc(10px + env(safe-area-inset-bottom))",
   },
-  "&.keypad-dropdown": {
-    position: "absolute",
-    top: "100%",
-    left: 16,
-    right: 16,
+  // In the sticky search header, so the list moves down below it rather
+  // than hiding its first matches under it.
+  "&.keypad-inline": {
+    marginTop: "8px",
     border: 1,
     borderColor: "divider",
     borderRadius: 2,
-    boxShadow: 6,
   },
   "& .keypad-bar": {
     display: "flex",
@@ -78,9 +76,9 @@ const styles = {
 
 /**
  * The Enochian letters as keys (plan 074, decisions 2 and 4): docked at the
- * foot of a phone's screen in place of its own keyboard, or dropped down
- * under the boxes on desktop. Keys act on click but never take focus, so
- * the Enochian box keeps its caret.
+ * foot of a phone's screen in place of its own keyboard, or under the
+ * boxes on desktop, pushing the list down. Keys act on click but never
+ * take focus, so the Enochian box keeps its caret.
  */
 export default function Keypad({
   docked,
@@ -96,7 +94,7 @@ export default function Keypad({
   return (
     <Box
       sx={styles}
-      className={docked ? "keypad-docked" : "keypad-dropdown"}
+      className={docked ? "keypad-docked" : "keypad-inline"}
       role="group"
       aria-label={LABELS.keypad}
       // Nothing in the keypad takes focus, gaps included, so a near miss

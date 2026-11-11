@@ -124,9 +124,11 @@ ranking, and kept in the session notes rather than the repository:
 4. **One bottom panel at a time on phones.** Focusing the Enochian box
    raises the keypad. Tapping a word blurs the box, which lowers the
    keypad, and raises the sheet. The sheet is modal, so the box can't
-   be focused while it is up; nothing else needs to close it. On desktop the keypad drops down under
+   be focused while it is up; nothing else needs to close it. On desktop the keypad sits under
    the boxes inside the left pane. Esc or a click outside closes it, and
-   it never meets the entry.
+   it never meets the entry. (Changed 11 November: it first dropped down
+   over the list and hid the top matches; it now sits in the sticky
+   search header and moves the list down.)
 5. **Search as a pure module** (`src/app/enochian/dictionary/search.ts`).
    It builds an index once. `searchDictionary(index, query)` returns
    `{ word, means, mentions, spelled }`: `word` is the exact headword or
