@@ -34,6 +34,10 @@ import Link from "next/link";
 import NextLink from "next/link";
 import { useSearchParams } from "next/navigation";
 import React from "react";
+// By alias, not "./ThemeSwitch": site search follows a page's relative
+// imports (scripts/search/prose.ts), and /chat imports this file, so a
+// relative import would put the switch's "Theme" into the chat page's prose.
+import ThemeSwitch from "@/app/ThemeSwitch";
 import { sqlBrowserLifecycle } from "@/auth/browserLifecycle";
 import { useSession } from "@/auth/client";
 import SearchButton from "@/search/SearchButton";
@@ -122,15 +126,19 @@ export function UserAvatar({
   );
 }
 
-function MenuDrawer({
-  handleDrawerToggle,
-}: {
-  handleDrawerToggle: () => void;
-}) {
+/**
+ * The drawer's links. A click anywhere in them closes the drawer. The drawer's
+ * paper is a flex column: they take its height and scroll, and the theme
+ * switch sits below them.
+ */
+function MenuLinks({ handleDrawerToggle }: { handleDrawerToggle: () => void }) {
   const [open, setOpen] = React.useState("");
 
   return (
-    <Box onClick={handleDrawerToggle}>
+    <Box
+      onClick={handleDrawerToggle}
+      sx={{ flex: "1 1 auto", minHeight: 0, overflowY: "auto" }}
+    >
       <Typography variant="h6" sx={{ my: 2, mx: 2, textAlign: "left" }}>
         {/*
           Dark artwork on transparent, so in dark it sits on a light plate.
@@ -223,6 +231,20 @@ function MenuDrawer({
           )}
       </List>
     </Box>
+  );
+}
+
+/** Choosing a theme is outside the links' box, so it keeps the drawer open. */
+function MenuDrawer({
+  handleDrawerToggle,
+}: {
+  handleDrawerToggle: () => void;
+}) {
+  return (
+    <>
+      <MenuLinks handleDrawerToggle={handleDrawerToggle} />
+      <ThemeSwitch />
+    </>
   );
 }
 

@@ -12,11 +12,19 @@
 export const COLOR_SCHEME_ATTRIBUTE = "class";
 
 /**
- * The mode before a reader picks one (stored as `localStorage["mui-mode"]`).
- * Light until dark mode is switched on (plan 076, step 6), which makes it
- * `"system"`.
+ * The mode before a reader picks one in the drawer's Theme switch (stored as
+ * `localStorage["mui-mode"]`): the device's `prefers-color-scheme` (plan 076,
+ * decision 1).
  */
-export const DEFAULT_COLOR_MODE: "light" | "dark" | "system" = "light";
+export const DEFAULT_COLOR_MODE: "light" | "dark" | "system" = "system";
+
+/**
+ * The browser's toolbar colour per scheme (`<meta name="theme-color">`):
+ * white as before dark mode, and the dark app bar's navy. The layout's
+ * `viewport.themeColor` gives one per `prefers-color-scheme`, and
+ * `ThemeColorMeta` points both at one when the reader picks Light or Dark.
+ */
+export const THEME_COLOR = { light: "#FFFFFF", dark: "#1b2b47" } as const;
 
 /**
  * The theme's dark-scheme selector (`theme.getColorSchemeSelector("dark")`)

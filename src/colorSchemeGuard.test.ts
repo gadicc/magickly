@@ -18,12 +18,15 @@ const PALETTE_MODE_ALLOWED: ReadonlySet<string> = new Set(["src/theme.ts"]);
 
 /**
  * Plan 076's three named readers: the CodeMirror theme in
- * src/doc/RitualSourceEditor.tsx (step 5), which mounts on the client, and
- * still to come, the drawer's Light / System / Dark switch (step 6) and the
- * `theme-color` effect for an explicit choice (step 6).
+ * src/doc/RitualSourceEditor.tsx (step 5), which mounts on the client, the
+ * drawer's Light / System / Dark switch, which selects nothing until
+ * mounted, and the `theme-color` effect for an explicit choice (step 6),
+ * which renders nothing.
  */
 const USE_COLOR_SCHEME_ALLOWED: ReadonlySet<string> = new Set([
   "src/doc/RitualSourceEditor.tsx",
+  "src/app/ThemeSwitch.tsx",
+  "src/app/ThemeColorMeta.tsx",
 ]);
 
 /** `palette.mode`, `palette?.mode`, `palette["mode"]`, `{ mode } = …palette`. */

@@ -1,8 +1,11 @@
 // @vitest-environment jsdom
+import { ThemeProvider } from "@mui/material/styles";
 import { act } from "@testing-library/react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, expect, it, vi } from "vitest";
+import { DEFAULT_COLOR_MODE } from "@/colorScheme";
+import theme from "@/theme";
 import MyAppBar from "./MyAppBar";
 
 const auth = vi.hoisted(() => ({
@@ -117,4 +120,71 @@ it("opens the menu from the title and closes it on a choice", async () => {
   link?.addEventListener("click", (e) => e.preventDefault());
   await act(async () => link?.click());
   expect(trigger?.getAttribute("aria-expanded")).toBe("false");
+});
+
+it("hydrates the bar under the theme with a stored choice, and the drawer's switch keeps it open", async () => {
+  localStorage.setItem("mui-mode", "dark");
+  const app = () => (
+    <ThemeProvider theme={theme} defaultMode={DEFAULT_COLOR_MODE}>
+      <MyAppBar />
+    </ThemeProvider>
+  );
+  navigation.pathname = "/kabbalah/tree";
+  const html = renderToString(app());
+  const logged = vi.spyOn(console, "error").mockImplementation(() => {});
+  const container = document.createElement("div");
+  container.innerHTML = html;
+  document.body.append(container);
+  const recoverable = vi.fn();
+  await act(async () => {
+    roots.push(
+      hydrateRoot(container, app(), { onRecoverableError: recoverable }),
+    );
+  });
+  expect(recoverable).not.toHaveBeenCalled();
+  expect(logged).not.toHaveBeenCalled();
+  logged.mockRestore();
+
+  const menu = container.querySelector<HTMLButtonElement>(
+    'button[aria-label="menu"]',
+  );
+  await act(async () => menu?.click());
+  // The drawer is portalled into the body.
+  const paper = document.querySelector(".MuiDrawer-paper");
+  const choice = (label: string) =>
+    [
+      ...(paper?.querySelectorAll<HTMLButtonElement>(
+        '[aria-label="Theme"] button',
+      ) ?? []),
+    ].find((b) => b.textContent === label);
+  expect(choice("Dark")?.getAttribute("aria-pressed")).toBe("true");
+  const settle = () =>
+    act(async () => {
+      // Longer than the drawer's exit transition.
+      await new Promise((resolve) => setTimeout(resolve, 400));
+    });
+  await act(async () => choice("Light")?.click());
+  await settle();
+  expect(choice("Light")?.getAttribute("aria-pressed")).toBe("true");
+  expect(localStorage.getItem("mui-mode")).toBe("light");
+  // Still open: MUI hides a closed, kept-mounted drawer.
+  expect(
+    document
+      .querySelector(".MuiDrawer-root")
+      ?.classList.contains("MuiModal-hidden"),
+  ).toBe(false);
+
+  // A link in the menu still closes it.
+  const link = paper?.querySelector<HTMLAnchorElement>('a[href="/about"]');
+  expect(link).toBeTruthy();
+  link?.addEventListener("click", (e) => e.preventDefault());
+  await act(async () => link?.click());
+  await settle();
+  expect(
+    document
+      .querySelector(".MuiDrawer-root")
+      ?.classList.contains("MuiModal-hidden"),
+  ).toBe(true);
+  localStorage.clear();
+  document.documentElement.className = "";
 });

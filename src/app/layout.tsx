@@ -5,7 +5,11 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import type { Metadata, Viewport } from "next";
 import * as React from "react";
 import VercelInsights from "@/analytics/VercelInsights";
-import { COLOR_SCHEME_ATTRIBUTE, DEFAULT_COLOR_MODE } from "@/colorScheme";
+import {
+  COLOR_SCHEME_ATTRIBUTE,
+  DEFAULT_COLOR_MODE,
+  THEME_COLOR,
+} from "@/colorScheme";
 import { earlyPlaceLookupScript } from "@/geo/earlyPlaceLookup";
 
 import {
@@ -21,6 +25,7 @@ import MyAppBar from "./MyAppBar";
 import PrintInLight from "./PrintInLight";
 import SiteFooter from "./SiteFooter";
 import StyledJsxRegistry from "./StyledJsxRegistry";
+import ThemeColorMeta from "./ThemeColorMeta";
 import "@/db";
 
 // No canonical here: every page below would inherit it. Open Graph titles and
@@ -59,8 +64,12 @@ export const metadata: Metadata = {
   },
 };
 
+// Follows the device; ThemeColorMeta overrides both for an explicit choice.
 export const viewport: Viewport = {
-  themeColor: "#FFFFFF",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: THEME_COLOR.light },
+    { media: "(prefers-color-scheme: dark)", color: THEME_COLOR.dark },
+  ],
 };
 
 export default function RootLayout(props: { children: React.ReactNode }) {
@@ -163,6 +172,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
               {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
               <CssBaseline />
               <PrintInLight />
+              <ThemeColorMeta />
               <ClientProviders>
                 {/* Part of the shell: a Suspense boundary here would let React
                   outline the bar after large pages and reveal it by script. */}
