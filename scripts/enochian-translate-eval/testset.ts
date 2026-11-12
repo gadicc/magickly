@@ -1,5 +1,6 @@
 import type { EnochianDictionary } from "magick-data/enochian/dictionary";
 import type { EnochianKey } from "magick-data/enochian/keys";
+import { ENGLISH_HOMOGRAPHS } from "./cipher.ts";
 import {
   editDistance,
   foldVariants,
@@ -285,17 +286,107 @@ export function buildTestSet(data: SourceData): Fold[] {
   return keys.map((key) => buildFold(key, data));
 }
 
-/** The dictionary a fold's prompt holds in a given book. */
+/**
+ * The forms a fold's closed book takes away, normalised: each removed
+ * headword and the Golden Dawn forms of the held-out rows that removed it.
+ */
+export function removedForms(fold: Fold): Set<string> {
+  const gd = new Map(fold.rows.map((row) => [row.id, row.gd]));
+  const out = new Set<string>();
+  for (const one of fold.removals) {
+    out.add(normEnochian(one.headword));
+    for (const id of one.rows) {
+      const form = gd.get(id);
+      if (form) out.add(normEnochian(form));
+    }
+  }
+  out.delete("");
+  return out;
+}
+
+/**
+ * Whether a word of the context names a removed form: the same after
+ * normalising, two letters or more, and not one of the English words that
+ * are also headwords ("on", "var"). Exact, unlike the removal rule's
+ * containment: inside meanings and GD forms that rule catches English
+ * ("EARTH", "angel", "with") and dozens of forms shared with kept words.
+ */
+export function namesRemovedForm(
+  token: string,
+  forms: ReadonlySet<string>,
+): boolean {
+  if (ENGLISH_HOMOGRAPHS.has(token.toLowerCase())) return false;
+  const norm = normEnochian(token);
+  return norm.length >= 2 && forms.has(norm);
+}
+
+/** A text with every removed form in it replaced by "…". */
+export function redactRemoved(text: string, forms: ReadonlySet<string>) {
+  return text.replace(/[A-Za-z]+/g, (token) =>
+    namesRemovedForm(token, forms) ? "…" : token,
+  );
+}
+
+const closedCache = new WeakMap<
+  Fold,
+  WeakMap<EnochianDictionary, EnochianDictionary>
+>();
+
+/**
+ * The dictionary a fold's prompt holds in a given book. Closed book drops
+ * the removed entries and, from the meanings of the rest, every mention of a
+ * removed form ("Root of OHIO; woe" becomes "Root of …; woe"), so no other
+ * entry glosses a word the book took away.
+ */
 export function contextDictionary(
   fold: Fold,
   book: Book,
   dictionary: EnochianDictionary,
 ): EnochianDictionary {
   if (book === "open") return dictionary;
+  const cached = closedCache.get(fold)?.get(dictionary);
+  if (cached) return cached;
   const removed = new Set(fold.removals.map((one) => one.headword));
-  return Object.fromEntries(
-    Object.entries(dictionary).filter(([headword]) => !removed.has(headword)),
+  const forms = removedForms(fold);
+  const out = Object.fromEntries(
+    Object.entries(dictionary)
+      .filter(([headword]) => !removed.has(headword))
+      .map(([headword, entry]) => [
+        headword,
+        {
+          ...entry,
+          meanings: entry.meanings.map((one) => ({
+            ...one,
+            meaning: redactRemoved(one.meaning, forms),
+          })),
+        },
+      ]),
   );
+  if (!closedCache.has(fold)) closedCache.set(fold, new WeakMap());
+  closedCache.get(fold)?.set(dictionary, out);
+  return out;
+}
+
+/**
+ * The other Keys' rows a fold's prompt holds in a given book. Closed book
+ * drops a row's Golden Dawn form where it names a removed form (row 14.20's
+ * "Oiad", when Key 18 and its OIAD are held out); the row and Dee's English
+ * stay.
+ */
+export function contextRowsFor(fold: Fold, book: Book): KeyRowRecord[] {
+  if (book === "open") return fold.contextRows;
+  const forms = removedForms(fold);
+  return fold.contextRows.map((row) => {
+    // The whole form, or any part of one written in parts ("iala-pire-gahe").
+    const gd = row.gd ?? "";
+    const parts = [
+      gd.replace(/[^A-Za-z]/g, ""),
+      ...(gd.match(/[A-Za-z]+/g) ?? []),
+    ];
+    if (!gd || !parts.some((part) => namesRemovedForm(part, forms))) return row;
+    const { gd: _gd, ...rest } = row;
+    return rest;
+  });
 }
 
 /**

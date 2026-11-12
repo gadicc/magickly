@@ -30,8 +30,8 @@ export const MIN_UNFLAGGED_KEYS = 5;
 /**
  * A task-1 report must have its judge verdicts folded in first: no row left
  * "to judge", in the arm or in A1's hard-row marks. Otherwise the figure
- * would silently count every judged row as wrong. (The judges' step that
- * folds them in is not built yet; see plan 077, "Where the work lives".)
+ * would silently count every judged row as wrong. The judges' step
+ * (`judge.ts`, the `judge` and `judge-a1` commands) folds them in.
  */
 function judged(name: string, r: Report): Report {
   if ((r.pooled.all.counts["to judge"] ?? 0) > 0)

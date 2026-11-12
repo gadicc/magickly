@@ -2,9 +2,9 @@
 
 Status: draft of 10 November 2026; open questions settled 11 November
 2026. Built so far: the grammar notes, the test set, the lookup baseline
-(A1), the answer checker, the scorer, and the bars with the code that
-measures them. Next: the model runner and the judges' step; nothing calls
-the bars until those exist. Read [current status](000-current-status.md) first; this
+(A1), the answer checker, the scorer, the bars with the code that
+measures them, the model runner and the judges' step (11 November, not
+yet run at scale). Read [current status](000-current-status.md) first; this
 plan tests the long-term goal recorded there ("a small neural network for
 translating between Enochian and English") before anyone builds it.
 
@@ -233,7 +233,7 @@ The cap is **$100** for the whole experiment. Prices checked 11 November
 Sonnet 5.5 $2/$10, GPT-6.1 Sol $2/$10; the Batch API halves them. Every
 call goes through Vercel AI Gateway (below).
 
-- **`claude-opus-5-5` does the main run** on all 19 Keys: A2 and A3 in
+- **`anthropic/claude-opus-5.5` does the main run** on all 19 Keys: A2 and A3 in
   both directions, open and closed book (152 calls); A2c in task 1, open
   book only (19); A0 once per Key and direction, plus the recall probe
   (57). That is about 230 calls. Everything goes through
@@ -249,7 +249,7 @@ call goes through Vercel AI Gateway (below).
 - **A4 (the books) runs on Opus only.** At about 270,000 tokens a call
   it is the most expensive arm. Before running it, check whether a
   prompt that long is charged more.
-- **`claude-fable-5-2` runs A3** to show the ceiling. Further Fable runs
+- **`anthropic/claude-fable-5.2` runs A3** to show the ceiling. Further Fable runs
   only for a specific question, within the cap.
 - **A3 on Opus runs a second time on the five Keys**, to measure how
   much scores vary from run to run. The thresholds use the first,
@@ -257,7 +257,7 @@ call goes through Vercel AI Gateway (below).
   noise.
 - **Task 3** runs on Opus with A0, A2 and A3, and on Fable and GPT-6.1
   with A3.
-- **OpenAI `gpt-6.1 sol` at high effort makes occasional checks**, so
+- **OpenAI `openai/gpt-6.1-sol` at high effort makes occasional checks**, so
   the results aren't one model family's opinion of its own work. It
   runs A3 on the five Keys and is the second judge (see Scoring).
   It never receives the books (A4). It goes through the same gateway
@@ -394,15 +394,18 @@ idea waits.
 - The runner: a script under `scripts/enochian-translate-eval/`, run with
   pnpm (`loom.json`'s recorded runner). It calls every model through
   Vercel AI Gateway (`https://ai-gateway.vercel.sh`, model ids such as
-  `anthropic/claude-opus-5-5`), with `AI_GATEWAY_API_KEY` from
+  `anthropic/claude-opus-5.5`; the gateway writes versions with a dot), with `AI_GATEWAY_API_KEY` from
   `.env.local` read through `loom env --`; no key is ever committed. It keeps a running cost total and stops at the cap. It is a
-  development tool only: nothing in the app calls a model.
-- The judges' step: folds both judges' verdicts into the scores before
-  any bar is measured, and `measureBars` refuses a task-1 report with
-  rows still waiting for them. A row both judges accept becomes correct;
-  a row either rejects needs an outcome of its own (task 1's outcomes
-  have none yet), not "correct" or "to judge". A1's to-judge rows are
-  judged once the same way, since they decide which rows are hard.
+  development tool only: nothing in the app calls a model. Its budget
+  check and cap read one ledger in one output directory, as one process
+  sees it, so runs must never be concurrent and must all share one
+  `--out` (the default).
+- The judges' step (built, `judge.ts`): folds both judges' verdicts into
+  the scores before any bar is measured, and `measureBars` refuses a
+  task-1 report with rows still waiting for them. A row both judges
+  accept becomes correct; one both turn down is "rejected", and one they
+  split on is "split"; both count as wrong. A1's to-judge rows are judged
+  once the same way (`judge-a1`), since they decide which rows are hard.
 - The grammar notes for A3: a Markdown file beside the dictionary, in our
   own words, each rule with its page in Laycock or Leitch and, where Dee's
   text shows it, a Key row as an example. It is committed: facts and
@@ -490,7 +493,7 @@ this list, which the experiment adds to as it runs:
 5. Judging: by models, cross-family, with an expert queue. Gadi checks
    a tenth of task 1 for obvious misjudgements and may edit the task-3
    sentences.
-6. Providers: mostly Claude. OpenAI `gpt-6.1 sol` (high) for occasional
+6. Providers: mostly Claude. OpenAI `openai/gpt-6.1-sol` (high) for occasional
    checks and as second judge, never with the books. Astra only as a
    one-off.
 

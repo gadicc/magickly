@@ -12,6 +12,7 @@ import {
 import {
   type Book,
   contextDictionary,
+  contextRowsFor,
   type Fold,
   type KeyRowRecord,
 } from "./testset.ts";
@@ -83,7 +84,7 @@ export function checkContext(
   }
   return {
     entries,
-    rows: new Map(fold.contextRows.map((row) => [row.id, row])),
+    rows: new Map(contextRowsFor(fold, book).map((row) => [row.id, row])),
   };
 }
 
@@ -190,8 +191,8 @@ const englishKey = (text: string) =>
   englishWords(text).map(stemEnglish).join(" ");
 
 /**
- * Aligns every item to a held-out row: by its `row` where that names one;
- * else (task 1) by its `token`, numbered from 1 in the input; else by its
+ * Aligns every item to a held-out row: in task 1 by its `token`, numbered
+ * from 1 in the input; else by its `row` where that names one; else by its
  * source: the input word after normalising (task 1) or the row's English
  * (task 2), taking the first such row not yet claimed. `rows` are task 1's
  * input rows or task 2's scoreable rows. Items that match nothing stay
@@ -209,9 +210,14 @@ export function alignItems(
   const rowKey = (row: KeyRowRecord) =>
     task === 1 ? normEnochian(row.word ?? "") : englishKey(row.english);
   return items.map((item) => {
-    let row = item.row && ids.has(item.row) ? item.row : undefined;
-    if (!row && task === 1 && item.token !== undefined)
-      row = rows[item.token - 1]?.id;
+    // Task 1's input numbers its words and gives no row ids, so a token wins
+    // over a row the model worked out; the two differ wherever a row has no
+    // word (Keys 14–16).
+    let row =
+      task === 1 && item.token !== undefined
+        ? rows[item.token - 1]?.id
+        : undefined;
+    if (!row && item.row && ids.has(item.row)) row = item.row;
     if (!row) {
       const wanted = keyOf(item.source);
       const matches = wanted

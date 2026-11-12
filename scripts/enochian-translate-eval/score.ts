@@ -19,6 +19,7 @@ import {
 import {
   type Book,
   contextDictionary,
+  contextRowsFor,
   type Fold,
   type TestRow,
 } from "./testset.ts";
@@ -31,9 +32,17 @@ import {
 
 /**
  * Task 1, Enochian → English. `to judge`: the script can't settle it and the
- * model judges will. `unknown`: the model said so.
+ * model judges will. `unknown`: the model said so. Once the two judges have
+ * ruled (`judge.ts`), a row both accept becomes `correct`, one both turn down
+ * `rejected`, and one they disagree on `split`; the last two are wrong.
  */
-export type Task1Outcome = "correct" | "to judge" | "unknown" | "missing";
+export type Task1Outcome =
+  | "correct"
+  | "to judge"
+  | "rejected"
+  | "split"
+  | "unknown"
+  | "missing";
 
 /**
  * Task 2, English → Enochian. `synonym` and `near` are reported apart and not
@@ -92,7 +101,7 @@ export function synonymIndex(
     forms.add(norm);
     out.set(key, forms);
   };
-  for (const row of fold.contextRows) {
+  for (const row of contextRowsFor(fold, book)) {
     const form = row.word ?? row.gd;
     if (form && row.english) add(row.english, form);
   }
@@ -145,6 +154,20 @@ export interface RowScore {
   a1?: string;
   /** The answer, deciphered where the arm was A2c. */
   answer?: AnswerItem;
+  /**
+   * Task 1: the answer lists alternatives ("I; my", "fire / flame", or a
+   * comma list hitting several dictionary senses), so the script doesn't
+   * settle it; the judges do.
+   */
+  multiSense?: boolean;
+  /**
+   * Task 1: its item is marked attested and its reference is real, but the
+   * reference's English doesn't agree with the answer's (the checker's
+   * "to judge"); the judges say whether the reference supports it.
+   */
+  refToJudge?: boolean;
+  /** The judges found the reference doesn't support it: an invention. */
+  unsupported?: boolean;
 }
 
 /** One item of an answer, checked. */
@@ -170,6 +193,42 @@ export interface ScoreOptions {
   dictionary: EnochianDictionary;
   /** Arm A2c: the answer's Enochian is deciphered before anything else. */
   cipher?: Cipher;
+  /**
+   * Arm A0: the prompt held no context, so nothing can be attested; every
+   * attested item is checked against an empty context.
+   */
+  emptyContext?: boolean;
+  /**
+   * Model arms: a task-1 answer that lists alternatives goes to the judges
+   * rather than being scored correct by script. A1 (lookup) leaves it off:
+   * its first meaning is what lookup is.
+   */
+  flagAlternatives?: boolean;
+}
+
+/**
+ * Whether a translation offers alternatives rather than one reading: parts
+ * split by ";", "/" or " or ", or a comma list whose parts agree with two
+ * or more different senses the dictionary gives the word.
+ */
+export function listsAlternatives(
+  target: string,
+  meanings: readonly string[] = [],
+): boolean {
+  // Dee's own English ends phrases with ";" ("I am;"): only a separator
+  // inside the translation counts.
+  const inner = target.trim().replace(/[\s.,;:!?]+$/, "");
+  if (/;|[A-Za-z]\s*\/\s*[A-Za-z]|\S\s+or\s+\S/i.test(inner)) return true;
+  const pieces = inner
+    .split(",")
+    .map((one) => one.trim())
+    .filter(Boolean);
+  if (pieces.length < 2) return false;
+  const senses = new Set<number>();
+  meanings.forEach((meaning, i) => {
+    if (pieces.some((piece) => meaningAgrees(piece, meaning))) senses.add(i);
+  });
+  return senses.size >= 2;
 }
 
 /**
@@ -182,17 +241,22 @@ export function scoreFold(
   items: readonly AnswerItem[],
   options: ScoreOptions,
 ): Scores {
-  const { task, book, dictionary, cipher } = options;
+  const { task, book, dictionary, cipher, emptyContext, flagAlternatives } =
+    options;
   const plain = cipher
     ? items.map((item) => decipherItem(item, task, cipher))
     : items;
   const aligned = alignItems(plain, task === 1 ? fold.input : fold.rows, task);
-  const context = checkContext(fold, book, dictionary);
+  const context = emptyContext
+    ? { entries: new Map(), rows: new Map() }
+    : checkContext(fold, book, dictionary);
   const inputWord = new Map(fold.input.map((row) => [row.id, row.word]));
   const scoreable = new Set(fold.rows.map((row) => row.id));
   const first = new Map<string, AnswerItem>();
+  const firstCheck = new Map<string, CheckOutcome>();
   const itemScores: ItemScore[] = aligned.map(({ item, row }) => {
-    if (row && !first.has(row)) first.set(row, item);
+    const isFirst = Boolean(row && !first.has(row));
+    if (row && isFirst) first.set(row, item);
     const word = task === 1 && row ? inputWord.get(row) : undefined;
     // Task 1: an attested item that aligns to no input word (its source is
     // none of them) is about a word the input never gave: an invention.
@@ -204,8 +268,15 @@ export function scoreFold(
       basis: item.basis,
     };
     if (row) out.row = row;
+    if (row && isFirst) firstCheck.set(row, out.check);
     return out;
   });
+  const senses = (word: string) => {
+    const norm = normEnochian(word);
+    return Object.entries(contextDictionary(fold, book, dictionary))
+      .filter(([headword]) => normEnochian(headword) === norm)
+      .flatMap(([, entry]) => entry.meanings.map((one) => one.meaning));
+  };
   const synonyms =
     task === 2 ? synonymIndex(fold, book, dictionary) : new Map();
   const rows = fold.rows.map((row) => {
@@ -223,6 +294,14 @@ export function scoreFold(
     if (item) {
       score.basis = item.basis;
       score.answer = item;
+    }
+    if (task === 1 && item && score.outcome !== "unknown") {
+      // Neither is settled by script: the judges see both.
+      if (flagAlternatives && listsAlternatives(item.target, senses(row.word)))
+        score.multiSense = true;
+      if (firstCheck.get(row.id) === "to judge") score.refToJudge = true;
+      if ((score.multiSense || score.refToJudge) && score.outcome === "correct")
+        score.outcome = "to judge";
     }
     return score;
   });
@@ -261,6 +340,13 @@ export interface Metrics {
   unaligned: number;
   /** Rows answered "unknown" that the book makes knowable. */
   knowableUnknowns: number;
+  /** Task 1: rows whose answer lists alternatives (sent to the judges). */
+  multiSense: number;
+  /**
+   * Task 1: attested items the judges found their reference doesn't
+   * support; counted in `silentInventions` too.
+   */
+  judgedInventions: number;
 }
 
 const rate = (part: number, whole: number) => (whole ? part / whole : 0);
@@ -272,7 +358,8 @@ export function metrics(scores: Scores, book: Book): Metrics {
   for (const one of rows) counts[one.outcome] = (counts[one.outcome] ?? 0) + 1;
   const checks = (check: CheckOutcome) =>
     items.filter((one) => one.check === check).length;
-  const silent = checks("invention");
+  const judgedInventions = rows.filter((one) => one.unsupported).length;
+  const silent = checks("invention") + judgedInventions;
   return {
     rows: rows.length,
     counts,
@@ -295,6 +382,8 @@ export function metrics(scores: Scores, book: Book): Metrics {
         one.outcome === "unknown" &&
         (book === "open" ? one.knowableOpen : one.knowableClosed),
     ).length,
+    multiSense: rows.filter((one) => one.multiSense).length,
+    judgedInventions,
   };
 }
 

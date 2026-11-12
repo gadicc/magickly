@@ -9,6 +9,7 @@ import { normEnochian } from "./normalise.ts";
 import {
   type Book,
   contextDictionary,
+  contextRowsFor,
   type Fold,
   type KeyRowRecord,
 } from "./testset.ts";
@@ -83,8 +84,10 @@ export function serialiseContext(
   options: ContextOptions,
 ): string {
   const using = options.cipher ? fixedCipher : undefined;
-  // Meanings are scanned for Enochian against every headword, so a closed
-  // book does not leave a removed word's name readable inside another entry.
+  // Under the cipher, meanings are scanned for Enochian against every
+  // headword, the removed ones included. What keeps a closed book from
+  // glossing a removed word through another entry, or a row's GD form, is
+  // `contextDictionary` and `contextRowsFor`, which take those mentions out.
   const headwords = new Set(Object.keys(dictionary).map(normEnochian));
   const shown = contextDictionary(fold, options.book, dictionary);
   return [
@@ -92,7 +95,9 @@ export function serialiseContext(
     serialiseDictionary(shown, using, headwords, letterNames(dictionary)),
     "",
     "# The other Keys (Key.row\tword\tDee's English)",
-    ...fold.contextRows.map((row) => serialiseRow(row, using)),
+    ...contextRowsFor(fold, options.book).map((row) =>
+      serialiseRow(row, using),
+    ),
     "",
   ].join("\n");
 }

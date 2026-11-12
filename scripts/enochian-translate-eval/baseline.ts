@@ -7,7 +7,12 @@ import {
 } from "../../src/app/enochian/dictionary/search.ts";
 import type { AnswerItem } from "./answer.ts";
 import { englishWords, FUNCTION_WORDS, normEnochian } from "./normalise.ts";
-import { joinScores, type Scores, scoreFold } from "./score.ts";
+import {
+  joinScores,
+  type Scores,
+  scoreFold,
+  type Task1Outcome,
+} from "./score.ts";
 import { type Book, contextDictionary, type Fold } from "./testset.ts";
 
 /**
@@ -151,15 +156,26 @@ export function a1Scores(
  * decides the "hard" rows: those A1 gets wrong by script, reported with and
  * without the rows its answer sends to the judges. Changes the folds in place
  * and returns the open-book scores, already carrying the outcomes.
+ *
+ * `judged` holds the judges' folded outcome for A1's task-1 "to judge" rows
+ * (`judge-a1`, by row id): with it, those rows become correct, rejected or
+ * split, and the rejected and split ones are hard. A row it lacks stays
+ * "to judge".
  */
 export function markHard(
   folds: Fold[],
   dictionary: EnochianDictionary,
+  judged?: ReadonlyMap<string, Task1Outcome>,
 ): { task1: Scores; task2: Scores } {
   const task1: Scores[] = [];
   const task2: Scores[] = [];
   for (const fold of folds) {
     const scores = a1Scores(fold, "open", dictionary);
+    if (judged)
+      for (const one of scores.task1.rows) {
+        const verdict = judged.get(one.id);
+        if (one.outcome === "to judge" && verdict) one.outcome = verdict;
+      }
     const outcomes = (one: Scores) =>
       new Map(one.rows.map((row) => [row.id, row.outcome as string]));
     const first = outcomes(scores.task1);
