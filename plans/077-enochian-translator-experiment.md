@@ -435,7 +435,13 @@ $100, the recall probe and the first test call included.
    follows its noun. That TILB ends a Key 19 passage ("and her") and
    the pair puts the next passage after it, but Key 19 itself has TILB
    before its noun (OD TILB ADPHAHT DAMPLOZ, "and her unspeakable
-   variety"), so G22 is too strong as written: a question for an expert.
+   variety"), so G22 was too strong as written. G22 now says TILB also
+   stands before its noun, citing that line, and keeps the expert flag.
+   The change came after the check and before any model translated the
+   new text, so every A3 run and every later rubric judging sees the new
+   wording. The rubric's judges saw the old wording in steps 2 and 4;
+   those verdicts stand (the grammar notes are not part of a verdict's
+   key), so the TILB pair stays uncounted and the controls stay at 13.
 5. **The cache check**: two A3 calls on the new text, checking that the
    second reads the prompt from the cache; if it doesn't, Opus runs by
    batch.

@@ -339,15 +339,17 @@ where the sense would be lost.
 ### G22. Possessives are usually implied
 "My", "your", "his" and "their" in the English seldom have a word of
 their own: QAA "your garments", PIAD "your God", ZIEN "of my hands". Two
-possessives are written: TOX "his" and TILB "her" (also TIOBL "in her"),
-and they follow the noun, usually joined to it (LONSHITOX "his power",
-ELZAPTILB "her course").
+possessives are written: TOX "his" and TILB "her" (also TIOBL "in her").
+TOX and TILB usually follow the noun, joined to it (LONSHITOX "his power",
+ELZAPTILB "her course"), but TILB also stands alone before its noun: OD
+TILB ADPHAHT DAMPLOZ "and her unspeakable variety".
 - Sources: Laycock (Weiser, 2001), p. 43, p. 174 (tilb) and p. 176 (tox); Leitch vol. II, ch. 1, "Compounds", pp. 15–17, and "Rarities", pp. 19–22
 - Evidence: attested in many Keys (TOX and TILB in 2)
-- Expert: yes, TOX and TILB rest on Keys 13 and 19 only
+- Expert: yes, TOX and TILB rest on Keys 13 and 19 only in Dee's text, and TILB comes both before and after its noun
 - Example: Key 1.21 QAA = your garments
 - Example: Key 3.3 PIAD = your God
 - Example: Key 13.20 LONSHITOX = his power,
+- Example: Key 19.30 TILB = her
 - Example: Key 19.59 ELZAPTILB = Her course,
 
 ### G23. Relative words: DS, SOBA, CASARM
