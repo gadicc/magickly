@@ -98,7 +98,7 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
   },
   astrologicalHouse: {
     row: "0",
-    keys: ["index", "zodiacId", "motto", "name", "interpretation", "zodiac"],
+    keys: ["index", "zodiacId", "motto", "interpretation", "zodiac"],
   },
   hebrewLetter: {
     row: "alef",

@@ -363,7 +363,7 @@ provenance, and no version past 0.0.0 ships while a row has none.
 | `alchemy/elements.json5` | [Correspondences](#correspondences) |  |
 | `alchemy/symbols.json5` | [Correspondences](#correspondences) |  |
 | `alchemy/terms.json5` | [Correspondences](#correspondences); the source of `terms` is not recorded |  |
-| `astrology/houses.json5` | [Correspondences](#correspondences); the source of `interpretation` is not recorded |  |
+| `astrology/houses.json5` | [Correspondences](#correspondences); `interpretation` is ours, following [Lilly](#lillys-houses); `motto.la` is the mnemonic verse as usually quoted, not from Lilly, and `motto.en` our rendering of it ([Lilly's houses](#lillys-houses)) |  |
 | `astrology/planets.json5` | [Correspondences](#correspondences); `keyOfSolomon` from [the Key of Solomon](#the-key-of-solomon) |  |
 | `astrology/zodiac.json5` | [Correspondences](#correspondences) |  |
 | `body/parts.json5` | [Correspondences](#correspondences) |  |
@@ -535,3 +535,21 @@ the Equinox's table or anything quoted from either**; our own words and
 the edits are under CC BY 4.0. Nothing in them comes from a modern
 edition or essay. See
 [plan 075](https://github.com/gadicc/magickly/blob/main/plans/075-geomancy-own-words.md).
+
+### Lilly's houses
+
+**`interpretation` in `astrology/houses.json5`** says what each of the
+twelve astrological houses signifies, in our own words, from William
+Lilly, *Christian Astrology* (London, 1647), Book I, chapter VII, "Of
+the twelve Houses, their Nature and signification", pp. 50-56
+(archive.org `b30338724`, leaves n84-n90). The houses follow Lilly, not
+modern astrology: the father is the fourth house's and the mother the
+tenth's. Lilly died in 1681 and his book is in the public domain; our
+words are under CC BY 4.0, and nothing in them comes from a modern book
+or website.
+
+**`motto`** is not from Lilly. Its Latin is the mnemonic verse as
+usually quoted, a word for each house: "Vita, lucrum, fratres, genitor,
+nati, valetudo, uxor, mors, pietas, regnum, benefactaque, carcer". We
+found no public-domain printing of it to cite. The table the file
+replaced had *Iter* for the ninth. The English renderings are ours.

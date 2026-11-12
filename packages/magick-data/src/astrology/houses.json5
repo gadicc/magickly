@@ -1,3 +1,15 @@
+// What each house signifies, in our own words, from William Lilly,
+// Christian Astrology (London, 1647), Book I, chap. VII, "Of the twelve
+// Houses, their Nature and signification", pp. 50-56 (public domain;
+// archive.org b30338724, leaves n84-n90). They follow Lilly, not modern
+// astrology: the father is the 4th house's and the mother the 10th's.
+//
+// The mottos are not from Lilly. Their Latin is the mnemonic verse as
+// usually quoted, a word for each house: "Vita, lucrum, fratres, genitor,
+// nati, valetudo, uxor, mors, pietas, regnum, benefactaque, carcer". We
+// found no public-domain printing of it to cite. The table this file
+// replaced had Iter for the ninth. The English renderings are ours.
+
 [
   {
     index: 1,
@@ -6,11 +18,8 @@
       la: "Vita",
       en: "Life",
     },
-    name: {
-      en: "House of Self",
-    },
     interpretation: {
-      en: "Physical appearance, identity and characteristics. Resourcefulness. Outlook and impressions. Ego/personality. Goals. Determination. Beginnings and initiatives.",
+      en: "The life of the one who asks or is born, and their body: stature, colouring, complexion and shape. In a chart for an eclipse, a great conjunction or the Sun's entry into Aries, the common people of the realm.",
     },
   },
   {
@@ -20,11 +29,8 @@
       la: "Lucrum",
       en: "Gain",
     },
-    name: {
-      en: "House of Value",
-    },
     interpretation: {
-      en: "Material and immaterial things of certain value. Money. Possessions and acquisitions. Cultivation. Perseverance. Substance. Self-worth.",
+      en: "The querent's estate and fortune: riches or poverty, money and movable goods, profit and loss. In a lawsuit, a person's friends and helpers.",
     },
   },
   {
@@ -32,13 +38,10 @@
     zodiacId: "gemini",
     motto: {
       la: "Fratres",
-      en: "Order",
-    },
-    name: {
-      en: "House of Sharing",
+      en: "Brothers",
     },
     interpretation: {
-      en: "Communication. Distribution/generosity. Intelligence/development. Siblings, cousins. Locomotion and transportation. Ephemera.",
+      en: "Brothers, sisters, cousins and other kin; neighbours. Short journeys inland and frequent moves. Letters, messengers and rumours.",
     },
   },
   {
@@ -46,13 +49,10 @@
     zodiacId: "cancer",
     motto: {
       la: "Genitor",
-      en: "Parent",
-    },
-    name: {
-      en: "House of Home and Family",
+      en: "Father",
     },
     interpretation: {
-      en: "Ancestry, heritage, roots. Foundation and environment. Mother or caretaker. Housing and the household. Neighborhood matters. Comfort, security/safety. Tidiness. Pets.",
+      en: "The father; lands, houses and inheritance; tilling the ground and hidden treasure; towns, old dwellings, gardens and fields. The end of any matter.",
     },
   },
   {
@@ -62,11 +62,8 @@
       la: "Nati",
       en: "Children",
     },
-    name: {
-      en: "House of Pleasure",
-    },
     interpretation: {
-      en: "Recreational and leisure activities. Things which make for enjoyment and entertainment. Games/gambling/risk. Romance and limerence. Children/fertility. Self-expression. Courage.",
+      en: "Children, and a woman with child: whether a boy or a girl. Pleasure, feasts, taverns and plays. Ambassadors, messengers and agents.",
     },
   },
   {
@@ -76,11 +73,8 @@
       la: "Valetudo",
       en: "Health",
     },
-    name: {
-      en: "House of Health",
-    },
     interpretation: {
-      en: "Routine tasks and duties. Skills or training acquired. Employment (job). Service and being served. Strength, vitality. Wellness and healthcare.",
+      en: "Sickness, its kind and cause, and whether it will be cured. Servants, labourers and tenants; small cattle such as sheep, goats and pigs. The father's brothers and sisters.",
     },
   },
   {
@@ -88,13 +82,10 @@
     zodiacId: "libra",
     motto: {
       la: "Uxor",
-      en: "Spouse",
-    },
-    name: {
-      en: "House of Balance",
+      en: "Wife",
     },
     interpretation: {
-      en: "Partnerships. Marriage and business matters. Diplomacy. Agreements, contracts and all things official. Equilibrium.",
+      en: "Marriage, a wife or husband, sweethearts and all questions of love. Open enemies: the other side in a lawsuit or a war; quarrels and duels. Thieves and theft; runaways and outlaws.",
     },
   },
   {
@@ -104,25 +95,19 @@
       la: "Mors",
       en: "Death",
     },
-    name: {
-      en: "House of Transformation",
-    },
     interpretation: {
-      en: "Cycles of deaths and rebirth. Sexual relationships and commitments of all kinds. Joint funds, finances. Other person's resource. Karma and debt (judgment). Regeneration. Self-transformation.",
+      en: "Death, its kind and manner; the goods of the dead, wills and legacies, and who will inherit. A wife's dowry. Fear and anguish of mind.",
     },
   },
   {
     index: 9,
     zodiacId: "sagittarius",
     motto: {
-      la: "Iter",
-      en: "Passage",
-    },
-    name: {
-      en: "House of Purpose",
+      la: "Pietas",
+      en: "Piety",
     },
     interpretation: {
-      en: "Travel and foreign affairs. Culture. Expansion. Law and ethics. Education/learning/knowledge. Philosophical interests, belief systems. Experience through exploration. Things long-term.",
+      en: "Long journeys and voyages over the sea; foreign lands. Religion and the clergy; dreams and visions; books and learning. The kin of one's wife or husband.",
     },
   },
   {
@@ -130,13 +115,10 @@
     zodiacId: "capricorn",
     motto: {
       la: "Regnum",
-      en: "Kingdom",
-    },
-    name: {
-      en: "House of Enterprise",
+      en: "Kingship",
     },
     interpretation: {
-      en: "Ambitions. Motivations. Career, achievements. Society and government. Father or authority. Notoriety. Advantage.",
+      en: "The mother. Kings, princes, judges and all in authority; honour, preferment and office. A person's trade or profession.",
     },
   },
   {
@@ -144,13 +126,10 @@
     zodiacId: "aquarius",
     motto: {
       la: "Benefacta",
-      en: "Support",
-    },
-    name: {
-      en: "House of Blessings",
+      en: "Good deeds",
     },
     interpretation: {
-      en: "Benefits from effort. Friends and acquaintances of like-minded attitudes. Belonging. Groups, communities, and associations. Charity. Connectedness/networking. Love. Wish fulfillment. Wealth.",
+      en: "Friends and friendship, and whether they are faithful; hope, trust and confidence; praise and blame. A king's favourites, counsellors and allies.",
     },
   },
   {
@@ -158,13 +137,10 @@
     zodiacId: "pisces",
     motto: {
       la: "Carcer",
-      en: "Rehabilitation",
-    },
-    name: {
-      en: "House of Sacrifice",
+      en: "Prison",
     },
     interpretation: {
-      en: "Privacy, refuge; seclusion and retreating. Creativity. Clandestiny↔Revelation. Intuition. Extremes/abundance, but also addictions. Luck, miracles. Releasing/relinquishing, healing/cleansing/rejuvenation, forgiveness, and peacefulness. Finality/completion/conclusion.",
+      en: "Secret enemies and those who work against others in secret; witches. Great cattle such as horses and oxen. Sorrow, imprisonment, every kind of affliction, and a person's own undoing.",
     },
   },
 ]

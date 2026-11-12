@@ -190,7 +190,6 @@ export const schemas = {
   astrologicalHouse: v.strictObject({
     index: v.number(),
     motto: v.strictObject({ la: v.string(), en: v.string() }),
-    name: en,
     interpretation: en,
     ...ids("astrologicalHouse"),
   }),
