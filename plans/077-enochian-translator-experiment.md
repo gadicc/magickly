@@ -1,12 +1,18 @@
 # An Enochian translator: what an LLM can do with our data — 10 November 2026
 
 Status: draft of 10 November 2026; open questions settled 11 November
-2026. Built so far: the grammar notes, the test set, the lookup baseline
-(A1), the answer checker, the scorer, the bars with the code that
-measures them, the model runner and the judges' step (11 November, not
-yet run at scale). Read [current status](000-current-status.md) first; this
-plan tests the long-term goal recorded there ("a small neural network for
-translating between Enochian and English") before anyone builds it.
+2026; redesigned 12 November 2026 to test on new text, after the recall
+probe showed that Opus recites all 19 Keys (see "What the recall probe
+found"), and revised the same day after review showed that lookup in
+the Keys solves almost all of Dee's text. Built so far: the grammar
+notes, the held-out-Key test set, the lookup baseline (A1), the answer
+checker, the scorer, the bars with the code that measures them, the
+model runner and the judges' step. Not yet built: the new text, A1k,
+the new bars and the page's list of limitations. Spent so far: $1.33
+of the $100.
+Read [current status](000-current-status.md) first; this plan tests the
+long-term goal recorded there ("a small neural network for translating
+between Enochian and English") before anyone builds it.
 
 ## The question
 
@@ -37,8 +43,10 @@ an entry, 569 in only one Key, and 472 running words found in some other
 Key (`data-counts.json` in its output).
 
 The dictionary as `WORD<TAB>meaning [source]; …` is 64,533 characters,
-and the Keys as `word<TAB>english` rows about 18,000 more; both fit in
-one prompt (roughly 25,000 tokens) with room to spare.
+the Keys as the runner writes them (with row ids and Golden Dawn forms)
+36,705 more, and the grammar notes 28,520; together about 130,000
+characters, which fit in one prompt (roughly 74,000 tokens, counted
+cautiously) with room to spare.
 
 **What the counts mean.** The Keys are the only parallel text: about a
 thousand words of Enochian with Dee's English beside them. That is several
@@ -49,10 +57,10 @@ And the Keys rarely repeat themselves: over all nineteen, 592 of the
 though: Keys 14 and 15 share almost every word with others, while
 most of Key 19 is its own. WE and EMPM drew many of their meanings
 from the Keys in the first place: 466 of those 592 single-Key words
-still have a dictionary entry under the same spelling. So testing on a
-Key whose words are already in the dictionary measures lookup, not
-translation. The design below separates the two, and the thresholds
-are set above what lookup alone already scores.
+still have a dictionary entry under the same spelling. So a test made
+of words already in our data measures lookup, not translation. The
+design below says which of its tests can show more than lookup, and
+measures the rest against what lookup alone already scores.
 
 ## Outside evidence
 
@@ -63,7 +71,9 @@ language with almost no text online, long-context models translated far
 better than without them, and later models came close to a person who
 studied the same material. Our case is similar in shape and easier in one
 way: Laycock observed that Enochian word order follows English closely, so
-most of the work is choosing words and forms, not reordering.
+most of the work is choosing words and forms, not reordering. It is
+harder in another: Kalamang was chosen because models hadn't seen it,
+and the Keys are all over the web.
 
 ## The books (local copies, never in the repository)
 
@@ -103,77 +113,188 @@ from it, the dictionary cites Leitch as it cites WE and EMPM.
 `~/Documents/Magick/Enochian/derived/leitch-vol2/` (its README gives
 the method, the source's SHA-256 and the checks): 933 entries (122
 compounds) and 366 forms, and Leitch's English index (661 headings,
-816 Angelical words). It covers 621 of the 659 Key words (94%; 663 before folding U/V and
-I/J); for
-495 of 550 comparable words its gloss shares a word with Dee's
-English.
+816 Angelical words). It covers 621 of the 659 Key words (94%; 663
+before folding U/V and I/J); for 495 of 550 comparable words its gloss
+shares a word with Dee's English.
 
 Laycock and Leitch are the two that matter. Schueler and the GD-derived
 works describe a later tradition. They are kept as labelled sources, as
 the dictionary already does, and not used as evidence of what a word
 means in Dee.
 
+## What the recall probe found (11 November 2026)
+
+The first design (see "The first design: held-out Keys") translated
+each Key with that Key taken out of the context, and used a **recall
+probe** to see whether the model knew the Keys anyway: given a Key's
+number and first line, recite its English, then its Enochian. A Key is
+flagged when either recital gets at least half its rows right in order.
+
+Opus 5.5 (medium effort) was flagged on **all 19 Keys**. It recited
+Key 1's English 84 rows of 87 in order and its Enochian 83 of 85, Key 2
+50 of 51 and 50 of 52, and Key 19's Enochian 149 of 162. The lowest was
+Key 15, 16 of 31 English rows, with its Enochian reply blocked. Five of
+the 38 replies were blocked by the provider's content filter and count
+as incomplete; every Key is flagged without them. The probe cost $1.24
+(run `20261111-141524-probe-opus-37be`, outside the repository).
+
+So holding a Key out of the context tests nothing: the model brings it
+back from memory, and the cipher control (A2c) can't help, because the
+first design needed at least five unflagged Keys and there are none. The
+experiment therefore tests on **text the model has never seen**, built
+from our data (below). Swapping words in Dee's clauses isn't enough on
+its own, as the review below found, because lookup in the Keys still
+answers them.
+
+The held-out-Key code stays: a cheaper model that does not recite the
+Keys (Sonnet 5.5 or Haiku 5.5, in a later round) can still be tested
+that way, and the probe, at about $1 a model, says whether it can.
+
 ## Proposal: an experiment, not a product
+
+### What a test with an answer key can show (reviewed 12 November 2026)
+
+Dee's English is the only answer key, and Opus knows it. Hold a Key out
+of the prompt and the model recalls it; leave the Keys in and a script
+can look the answer up. With all 19 Keys in the prompt, giving each word
+its commonest gloss in the Keys is right on 1,029 of 1,055 rows (97.5%)
+into English, and giving each English row its commonest form is right
+on 996 (94.4%) into Enochian. That lookup also solves 176 of the 197
+rows that dictionary lookup (A1) gets wrong. Swapping words between
+clauses doesn't change this: the swapped-in word's own Key row is in the
+prompt too.
+
+So on Dee's words the experiment can show only that the model is **no
+worse than lookup, honest, and not misled by memory**. Made-up words
+whose meaning exists only in the prompt's dictionary show that it reads
+the prompt rather than its memory, though lookup reads them too.
+Whether it does **more than lookup** is tested where no lookup can
+reach:
+- **new joins**: words built by the grammar notes' rules that occur
+  nowhere;
+- **task 3**: new English, compared with what lookup produces for the
+  same sentences.
+
+### The new text (built by script, before any model runs)
+
+About **60 sentences, 600 rows**. Each sentence joins two passages from
+different Keys: runs of three to eight consecutive rows, ending where
+Dee's English has a stop (`;`, `:`, `.`, `?`) where possible. The Keys
+break into 103 such clauses (median 7 rows); longer ones are cut into
+runs. Every Key gives at least one passage, no row is used twice, and
+Key 19's Aethyr-name slot is never used. A little over a third of the
+rows are changed:
+
+| Rows | About | What the key is |
+| --- | --- | --- |
+| Unchanged | 380 | Dee's English and Casaubon's word (or the Equinox reading) for that row |
+| Swapped | 120 | The same, for the row the swapped-in word came from |
+| Planted unknowns | 40 | "unknown": the word exists nowhere |
+| Planted knowns | 20 | The meaning given in the prompt's dictionary and nowhere else |
+| New joins | 40 | Both parts' meanings, in turn |
+
+About 50 of the rows are given in their Golden Dawn spelling, since
+readers paste those.
+
+**Swaps.** A row is replaced by a row from another Key whose English
+has the same shape: a noun phrase for a noun phrase ("the seats" for
+"the horns"), a verb for a verb. Rows that are only function words
+("and", "are", "of") are never swapped. A word may be swapped in only if:
+- every gloss Dee gives it agrees, by the scorer's rule (13 of the 75
+  words that occur more than once fail this, among them QAA, OTHIL,
+  CAOSG, FAFEN and OL);
+- its English maps to that one form in the Keys, so task 2 has one right
+  answer (84 candidate rows fail this);
+- the dictionary's meaning agrees with Dee's gloss (45 words fail);
+- no sense of it shares a content word with the gloss it replaces.
+
+Words with no dictionary entry are allowed, since their Key rows are in
+the prompt. That leaves 588 rows of 474 words, of which only 48 words
+(162 rows) occur more than once; the rest occur once. Each word is
+swapped in once at most. Results on the two kinds are reported apart.
+Any gloss Dee gives the word counts as right, and the judges see every
+attested sense.
+
+**Planted unknowns.** Made-up words, four to eight letters, built from
+the letter pairs Enochian uses. A simple distance rule isn't enough: of
+4,000 such words that are two letters from every form in our data, half
+are "near" a real form by the scorer's own rule, and about a quarter
+split wholly into real forms, so a model could fairly derive a meaning.
+A plant must therefore be:
+- at least three letters from every form in our data (headwords,
+  Casaubon's words, the Golden Dawn's forms);
+- free of any attested form of three or more letters inside it;
+- not splittable wholly into attested forms of two or more letters
+  and the small words of G26 ("DS", "I" and the like);
+- not within one letter of any form after folding C/K, I/Y and U/V/W.
+
+About a quarter of candidates pass. A one-off check against Leitch's
+lexicon (local, private) is recorded with the set. In task 2 the plants
+are English words nothing in our data translates, checked against every
+meaning and Dee's English: some everyday ("bicycle"), some in the Keys'
+register, chosen by script where no form exists ("lantern" and
+"harvest", for instance, both have one).
+
+**Context-only rows.** Two kinds:
+- **20 planted knowns**: made-up words built by the same rule as plants,
+  given an English meaning as ordinary entries in the prompt's
+  dictionary, in alphabetical order with the rest; only the test-set
+  files mark them. No model can know them, so A0 should score at most
+  one: they test whether the model reads the prompt rather than its
+  memory. Lookup over the same prompt gets them too, so they don't show
+  more than lookup. Their meanings share no word with the task-2 plants.
+  The answer checker's context includes them. Task 3, its round trip
+  and its judges use the prompt without them, so a made-up word can't
+  be used there for its English.
+- **40 new joins**: a small word joined to an attested word by the
+  grammar notes' rules (G26, "small words join the next word", and G27,
+  "a shared letter is written once"), where that join is attested
+  nowhere: for example DS "which" or I "is" before a word that never
+  takes it in the Keys. Of 4,504 such joins, 75 are attested and are
+  left out, and a join is used only if it splits into attested parts in
+  exactly one way and has no form within one letter of it. A join is
+  right only when both parts are rendered. In task 2, the joined or the
+  separate forms both count (G30: word boundaries differ between
+  copies). This is the only test where neither lookup nor memory has
+  the answer, and the only place the grammar notes can show an effect.
+
+Fable and GPT-6.1 run on 300 rows (below), so the generator puts every
+planted known and new join into the first 30 sentences, which are
+therefore about 40% changed. The 150 rows for Opus's repeat runs are
+also fixed by the seed.
+
+**Review.** Gadi reads the English of all 60 sentences, changes
+included, and rejects any that can't be read as English at all. They
+need not make sense; Dee's own often barely do. The script, its seed and
+the generated set are committed: they are our own data.
 
 ### Tasks
 
-1. **Enochian → English, a held-out Key.** Translate one Key with that Key
-   removed from the context. The input is the Key's Enochian as running
-   text in row order. Scored **per Key row**: each Enochian word against
-   Dee's English for that row. 614 of the 1,055 rows have several English
-   words ("and the Lord"), so a row is the unit, not an English word.
-2. **English → Enochian, a held-out Key.** Translate Dee's English back,
-   given **row by row**. This leaks where the word boundaries fall, so it is
-   easier than real use; task 3 covers running text. The row's form counts
-   as correct if it is Casaubon's word or the row's Equinox (1912)
-   reading, after normalising spelling (U/V, I/J, case, hyphens). There
-   are two more outcomes, each reported separately and not counted as
-   correct:
-   - **"synonym"**: another form the remaining Keys or the dictionary use
-     for the same English. About 230 rows have an English string that the Keys
-     render with more than one Enochian form.
-   - **"near"**: within two letters of the right form, for forms of five
-     letters or more; shorter forms are right or wrong.
-   Rows lacking either side (57, of which 49 are in Keys 14–16) are left
-   out. That leaves Keys 14–16 with only 17, 18 and 26 scoreable rows.
-3. **New English.** About 30 sentences with no answer key: ten of the
-   kind a practitioner would want in Enochian, ten everyday ones, and ten
-   that use only words attested in the Keys. Drafted with the test set;
-   Gadi may edit or replace any. Judged by models (see Scoring), since
-   there is no answer key and no Enochian expert on the project yet.
+1. **Enochian → English, the new text.** The input is each sentence's
+   Enochian as running text. Scored per row against the answer key: a
+   row is right when it shares a content word with the key's English,
+   after stemming and normalising archaic spelling; where the key is
+   only function words, the answer must use the same set of them. For a
+   swapped row, an answer that agrees with any gloss of the replaced
+   word (its row, its other rows, its dictionary entry) and not with the
+   key is **"recalled"**: wrong, and counted apart.
+2. **English → Enochian, the new text.** The same sentences, given row
+   by row in English. This leaks where the word boundaries fall, so it
+   is easier than real use; task 3 covers running text. Right means the
+   key's Casaubon form or Equinox reading after normalising spelling.
+   "Synonym" (another form our data uses for the same English) and
+   "near" (within two letters, for forms of five letters or more) are
+   reported and don't count. "Recalled" isn't scored here: the model is
+   shown the swapped-in English, so recall can't mislead it.
+3. **New English.** About 60 sentences with no answer key: 20 of the
+   kind a practitioner would want in Enochian, 20 everyday ones, and 20
+   that use only words attested in the Keys. Drafted with the new text,
+   before any model runs; Gadi may edit or replace any. Judged by models
+   (see Scoring), and also translated by lookup (A1) for comparison.
 
-Tasks 1 and 2 run twice:
-
-- **Open book**: the dictionary stays whole; only the held-out Key's rows
-  leave the context. This is the realistic case: text made of known
-  words. It tests choice of sense, form and order.
-- **Closed book**: the dictionary entries for the held-out Key's words
-  that occur in no other Key are removed too. The model cannot know those
-  words. The right answer is "unknown", or a guess from a known root,
-  marked as one. This tests honesty and morphology. The list is computed
-  per fold from `keys.json5`. Removal goes beyond same spelling: an entry
-  goes if its headword matches after normalising (case, U/V, I/J, hyphens,
-  spaces), or if one contains the other and the shorter is at least four
-  letters long. A headword found in any of the remaining 18 Keys is
-  never removed: 105 such headwords, in 180 rows of the other Keys,
-  would otherwise be caught by the containment rule while still counted
-  as knowable (`exemptions.tsv` in the test set's output).
-  Without the wider rule, about 180 rows would still find a variant
-  headword glossed with Dee's word. The test set lists every removal so
-  it can be audited. Closed-book scores are reported in two parts:
-  - accuracy on the rows still knowable,
-  - precision and recall of "unknown".
-  A single accuracy figure would mislead. In Key 19, for instance, 117 of
-  163 rows become unknowable.
-
-A0 has no context, so it runs once per task, not open and closed. It
-also runs a **recall probe**: given a Key's number and first line, recite
-its English, and then its Enochian. A Key is **flagged** when either
-recital gets at least half its rows right in order. Results are reported
-separately for flagged and unflagged Keys. If fewer than five Keys are
-unflagged, the A2c threshold below can't be tested. The result is then
-reported as "memorised: can't separate memory from use of the context",
-and no build decision is made on these data alone.
+Every model sees the whole of our data: nothing is held out, so one
+context serves every call and can be cached. Each task is sent in parts
+of about 75 rows, broken at sentence ends.
 
 ### What each answer must look like
 
@@ -188,14 +309,17 @@ A script checks every item marked "attested":
   spelling ("Raign" → "reign").
 
 An item that fails the first two checks is an **invention**. An item
-that fails only the third goes to the judge.
+that fails only the third goes to the judge, except on a planted row:
+a plant marked "attested" is a silent invention by rule, in either task.
 
-Items marked "derived" or "coined" are never inventions; they are
-scored on whether they are right. This matters in open book: 125
-distinct words found in only one Key have no dictionary entry, so when
-their Key is held out, a right answer for them can only be derived.
-Inventions marked as such are the behaviour we want, and are counted
-separately from silent ones.
+Items marked "derived" or "coined" are never inventions. On a planted
+unknown, "unknown", "derived" and "coined" all pass and are reported
+apart; a "derived" answer must cite a ref whose form is actually inside
+the word, or it is an **unsupported guess**, which counts against the
+plant bar like a plant given as attested. Elsewhere, derived and
+coined items are scored on whether they are right, and the number of
+attested rows the model hedges as derived or unknown is reported, so a
+model can't pass the honesty bar by hedging everything.
 
 ### Arms
 
@@ -203,138 +327,203 @@ separately from silent ones.
 | --- | --- |
 | A0 | Nothing: what the model already knows |
 | A1 | No model: a script glosses each word with its first dictionary meaning, and reverses the index for English |
-| A2 | Our data: the dictionary and the other 18 Keys |
-| A2c | A2 with every Enochian form in the context and the test (headwords, pronunciations, Golden Dawn forms, Enochian quoted inside meanings) under one fixed letter substitution |
-| A3 | A2 plus grammar notes we write ourselves from Laycock and Leitch: rules, not text, with page references. Each fold drops the notes' examples taken from the held-out Key |
-| A4 | A2 plus the books themselves (Laycock, Leitch vol. II). Local only, never a design for production |
+| A1k | No model: as A1, but it first looks the word (or the English) up in the Keys, matching Casaubon's words and the Golden Dawn's forms, and takes its commonest gloss (or form) |
+| A2 | Our data: the dictionary and all 19 Keys |
+| A3 | A2 plus grammar notes we wrote ourselves from Laycock and Leitch: rules, not text, with page references |
 
-A0 and A2c are there because the Keys and their translations are all over
-the web. If A0 already scores well, the model remembered the Keys. A2c
-hides the Enochian forms from that memory, so A2c and A2 together show
-how much is real use of the context. A2c has limits:
-- **Dee's English isn't hidden.** In task 1 the other 18 Keys identify
-  the text, so a model may recall the missing Key's English.
-- **The cipher can be worked out.** In task 2 a model could recall the
-  real Enochian and then apply a cipher it infers from 1,900 enciphered
-  headwords.
-So A2c counts for the decision only in task 1, and only together with
-the recall probe.
+A1k is the baseline for tasks 1 and 2, because a model with the Keys in
+its prompt can do what it does. Its answers go through the judges like
+any arm's, and its figure is the judged one: counted generously, it
+would be right on every row it can't settle by script. A1 stays for comparison with the first
+design. A0 shows what memory alone does. A2 against A3 shows whether the
+grammar notes help, mainly on the new joins.
 
-A4 isn't a clean ceiling either: the books print the Keys with their
-glosses, the held-out one included. It answers a narrower question: do
-the books add anything our data and notes lack? If A3 comes close to
-A4, our own notes carry what the books add, and production never needs
-the books.
+Dropped from the first design: A2c (the cipher) and the closed book,
+because the swapped, planted and context-only rows test memory and
+honesty directly; and A4 (the books), because on these tasks it would
+sit at the same ceiling as A3, and the books can't know planted words.
+A4 can return in a later round if the grammar notes fall short.
 
-### Models and budget (settled 11 November 2026)
+### Models and budget (settled 11 November 2026, revised 12 November)
 
-The cap is **$100** for the whole experiment. Prices checked 11 November
-2026, per million tokens in/out: Opus 5.5 $4/$20, Fable 5.2 $8/$40,
-Sonnet 5.5 $2/$10, GPT-6.1 Sol $2/$10; the Batch API halves them. Every
-call goes through Vercel AI Gateway (below).
+The cap is **$100** for the whole experiment, of which $1.33 is spent
+(the probe and one test call). Prices checked 11 November 2026, per
+million tokens in/out: Opus 5.5 $4/$20, Fable 5.2 $8/$40, Sonnet 5.5
+$2/$10, GPT-6.1 Sol $2/$10; batch halves them, and a cached prompt is
+read at a twentieth of the input price. Every call goes through Vercel
+AI Gateway (below).
 
-- **`anthropic/claude-opus-5.5` does the main run** on all 19 Keys: A2 and A3 in
-  both directions, open and closed book (152 calls); A2c in task 1, open
-  book only (19); A0 once per Key and direction, plus the recall probe
-  (57). That is about 230 calls. Everything goes through
-  the Batch API, because results aren't needed within the hour. Each
-  prompt puts the dictionary first, so it can be cached across folds,
-  and the other Keys after it. Cache hits inside a batch aren't
-  guaranteed, so the estimates assume none. Output, mostly thinking, is
-  the costly part: the first fold runs at `high` and at `medium` effort,
-  and the sweep uses `medium` unless `high` is clearly better.
-- **Five Keys, fixed now: 3, 6, 9, 12 and 18.** They are spread through
-  the Keys, each has at least 37 scoreable rows, and none is one of the
-  thin Keys 14–16. The arms below run on these five only.
-- **A4 (the books) runs on Opus only.** At about 270,000 tokens a call
-  it is the most expensive arm. Before running it, check whether a
-  prompt that long is charged more.
-- **`anthropic/claude-fable-5.2` runs A3** to show the ceiling. Further Fable runs
-  only for a specific question, within the cap.
-- **A3 on Opus runs a second time on the five Keys**, to measure how
-  much scores vary from run to run. The thresholds use the first,
-  full 19-Key run; the second only sets how big a difference counts as
-  noise.
-- **Task 3** runs on Opus with A0, A2 and A3, and on Fable and GPT-6.1
-  with A3.
-- **OpenAI `openai/gpt-6.1-sol` at high effort makes occasional checks**, so
-  the results aren't one model family's opinion of its own work. It
-  runs A3 on the five Keys and is the second judge (see Scoring).
-  It never receives the books (A4). It goes through the same gateway
-  as the Claude calls. OpenAI's Astra is held for one special case if one
-  arises, not planned.
+- **`anthropic/claude-opus-5.5` does the main run**: A0, A2 and A3 once
+  each on all 600 rows, tasks 1 and 2, at `medium` effort. One large
+  text gives more distinct items than repeats would; A3 runs a second
+  time on 150 rows to measure run-to-run noise, and once at `high`
+  effort on the same 150, to see whether `high` is worth its price.
+- **`anthropic/claude-fable-5.2` and OpenAI `openai/gpt-6.1-sol`** (high
+  effort) run A3 on the first 30 sentences (300 rows), which hold every
+  context-only row. GPT
+  is also the second judge (see Scoring), so the results aren't one
+  model family's opinion of its own work. Astra is held for one special
+  case if one arises, not planned.
+- **Task 3** runs on Opus with A0, A2 and A3, on Fable and GPT-6.1 with
+  A3, and through A1, each with its round trip. Its prompt leaves out
+  the planted knowns, so it is cached separately (under $1 more).
 - **Sonnet 5.5 and Haiku 5.5 wait** until Opus passes; they are the
-  cheaper production candidates, tested in a later round.
+  cheaper production candidates, tested in a later round, each after
+  its own recall probe.
 
-Rough allowance within the $100, batched:
+The prompt is larger than first counted: the Keys as the runner writes
+them (row ids and Golden Dawn forms, both needed) are 36,705 characters,
+so A2 is about 101,000 characters and A3 about 130,000, roughly 74,000
+tokens at the runner's cautious 1.8 characters a token. Output, mostly
+thinking, is allowed 12,000 tokens a call at `medium`.
 
-| Part | Allowance |
-| --- | --- |
-| Opus A0–A3, 19 Keys, and the A3 repeat (about 250 calls; input about $20, the rest output) | $50 |
-| A4 on five Keys | $15 |
-| Fable A3 on five Keys | $12 |
-| GPT-6.1 (A3 on five Keys and judging) | $10 |
-| Task 3, round trips and Opus judging | $10 |
+| Part | With cache reads | Without |
+| --- | --- | --- |
+| The cache check (two A3 calls) | $1 | $1 |
+| Opus, tasks 1 and 2 (about 40 calls with context, 16 for A0) | $16 | $28 |
+| Fable 5.2, A3 on 300 rows | $5 | $10 |
+| GPT-6.1 Sol, A3 on 300 rows | $3 | $4 |
+| Task 3: six translations and their round trips | $11 | $15 |
+| Judges, both families (about 375 task-3 judgements, and task-1 rows) | $11 | $14 |
+| The one top-up, if needed (see Scoring) | $5 | $8 |
+| **Total** | **about $52** | **about $80** |
 
-At `high` effort, output alone could exceed the Opus allowance (10,000
-to 30,000 thinking tokens a call), which is why the sweep defaults to
-`medium`. The first Key runs alone. If it projects past $100, the run
-stops and the plan is cut before the rest.
+Both fit in the $98.67 left, with room for blocked parts to be retried,
+but no call so far has read from the cache. So **the
+first paid step is two A3 calls**, checking that the second reads the
+prompt from the cache; if it doesn't, Opus runs by batch. The first full
+A3 run then goes alone, and its cost is checked against this table
+before anything else runs.
 
 ### Scoring
 
-Task 2 is scored by script (see Tasks). Task 1 is scored by script
-first, and model judges handle the rest. Task 3 is scored by model
-judges, because Gadi doesn't read Enochian and there is no expert on the
-project yet:
+Tasks 1 and 2 are scored by script first; in task 1, model judges handle
+the rows the script can't settle. Task 3 is scored by model judges,
+because Gadi doesn't read Enochian and there is no expert on the project
+yet:
 
-- **Task 1 has an answer key** (Dee's English). A row is correct by
-  script if the answer shares a content word with Dee's, after stemming
-  and normalising archaic spelling. Where Dee's English is only function
-  words ("is", "as", "I"), the answer must use the same set of them
-  ("unto you" matches "to you"). Rows the script can't
-  settle go to the judges, who also check near-synonyms. A row the
-  judges disagree on counts as wrong, and the number of such rows is
-  reported, so the true score is somewhere between that figure and that
-  figure plus those rows. Gadi reads a random tenth of the judged rows
-  for obvious misjudgements, which needs English, not Enochian.
+- **Task 1 has an answer key** (above). Rows the script can't settle go
+  to the judges, who also check near-synonyms. A row the judges disagree
+  on counts as wrong, and the number of such rows is reported. Gadi
+  reads a random tenth of the judged rows for obvious misjudgements,
+  which needs English, not Enochian.
 - **Two judges from different model families.** Every row or sentence
-  that reaches a judge is judged by both GPT-6.1 and Opus. Neither
-  family is the only judge of its own work, and agreement between the
-  judges is reported.
+  that reaches a judge is judged by both GPT-6.1 and Opus. A row both
+  accept is right; one both turn down is "rejected", and one they split
+  on is "split"; both count as wrong. Agreement between the judges is
+  reported.
 - **Task 3 has no answer key.** Each judge gets the English, the
   translation, its word-by-word basis and our dictionary, and scores
   against a short rubric: words exist with the meaning used, inventions
   are marked, the forms follow the grammar notes, and the meaning is
-  preserved. A round trip adds evidence that isn't a judge's opinion: a
-  separate call, with no sight of the English, translates the Enochian
-  back using only the dictionary, and the two English versions are
-  compared.
+  preserved. The judges don't know which translations came from lookup.
+  A round trip adds evidence that isn't a judge's opinion: a separate
+  call, with no sight of the English, translates the Enochian back
+  using only the dictionary, and both judges compare the two English
+  versions. A word-for-word lookup round-trips well by construction,
+  which is why every task-3 bar is measured against A1's figure.
+- **The judges are checked.** About 15 deliberately damaged
+  translations go in among the task-3 answers: wrong attested words,
+  unmarked coinages, a dropped clause. If the judges accept more than 3
+  of them, the task-3 bars can't be measured.
+- **Blocked replies.** A part the provider's filter blocks is retried
+  once; if it is blocked again its rows count as wrong, and the number
+  of Opus translation calls blocked is reported against its bar. The probe had 5 of 38 replies blocked, and
+  a translator that is often blocked is no use to readers.
 - **Expert queue.** Anything the judges disagree on, and anything only
   an Enochian expert could settle, goes to a list (see "For an expert"
   below) instead of being decided by a model.
 
-For every arm we report row accuracy (open book; closed book as above),
-silent inventions per 100 rows, marked inventions, and "unknown"s that
-were in fact knowable. Each figure is given in three ways:
-- pooled over all scoreable rows,
-- per Key, with the spread,
-- separately for the "hard" rows, where A1's lookup is wrong.
-Nineteen folds is a small sample, and the five-Key arms smaller still,
-so differences of a few points between arms are noise.
+For every arm we report row accuracy, silent inventions per 100 rows,
+marked inventions, hedged rows, and "unknown"s that were in fact
+knowable, separately for unchanged, swapped (single- and
+multi-occurrence), planted, planted-known and join rows, and pooled;
+and A3 minus A0 on the swapped rows, which shows how much of that
+figure the prompt adds. Each figure has a 95% Wilson interval beside
+it. Bars are decided on the counts below, whose power is given; an
+interval doesn't decide a bar, since at these sizes it would leave
+most bars out of reach. A figure within one row of its bar is
+reported as **marginal**. If any bar is marginal, one top-up is
+allowed, declared now: 200 more rows of the same mix, made by the same
+script with the next seed, run once on Opus A3 and A1k, and the bar
+decided on all the rows together. There is no second top-up.
+
+### Bars for the new text (proposed 12 November 2026)
+
+The bars of 11 November (below) were set for held-out Keys and can't be
+measured now. The new text gets its own, in the same file
+([`src/app/enochian/translate/bars.ts`](../src/app/enochian/translate/bars.ts)),
+quoted word for word here by the same test, and shown on the translator
+page beside the measured figures. Proposed, for arm A3 on Opus:
+
+| Bar | Proposed | What it shows |
+| --- | --- | --- |
+| Enochian to English, unchanged and swapped rows | at least A1k's judged figure less 2 points | no worse than lookup |
+| English to Enochian, unchanged and swapped rows | at least A1k's figure less 3 points | no worse than lookup |
+| Swapped rows right, task 1 | at least 90% (108 of 120) | reads the word in front of it |
+| Recalled answers, task 1 | at most 5% of swapped rows (6 of 120) | not misled by memory |
+| Planted unknowns given as attested, or guessed without support | at most 10% (4 of 40), each task | honest about words that don't exist |
+| Planted knowns right, task 1 | at least 18 of 20, with A0 at most 1 | reads the prompt, not its memory |
+| New joins right, both parts, task 1 | at least 80% (32 of 40) | more than lookup: applies the grammar |
+| Silent inventions | at most 2 per 100 rows, every task | honest about its sources |
+| Task 3, both judges accept | at least A1's share plus 15 points, or 90%, whichever is lower | composes better than lookup |
+| Task 3, round trip keeps the meaning | at least two thirds, and no more than 10 points below A1 | the meaning survives |
+| Task 3, content words given an attested form where one exists | at least 90% (a floor: A1 scores 100% by construction) | uses our data when it can |
+| Opus translation calls blocked by the provider's filter | at most 5%, counted over every call | usable at all |
+
+These sizes give the bars some power. On 120 swapped rows, a model that
+is truly 95% right passes 99% of the time and one that is 85% right
+passes 7%; on 40 planted unknowns, one that claims 5% as attested passes
+95% of the time and one that claims 20% passes 8%; on 40 joins, one
+that is truly 70% right passes 11% of the time. The round trip is a
+floor rather than a margin over A1, because word-for-word lookup round
+trips almost perfectly by construction, and a model that follows the
+grammar notes (no articles, an unwritten "of") may round trip a little
+worse for being more Enochian.
+
+**They are settled after A1 and A1k are scored on the new text (task 3
+through A1 as well, judged), and before any model runs on it.** A1k's
+and A1's figures and the settled bars go into this plan and `bars.ts`
+together, with the date, so the bars can't be fitted to model results.
+
+What a pass means: the model is no worse than lookup on Dee's words, is
+honest, isn't misled by memory, reads our data for words it can't know,
+applies the grammar to new joins, and composes better than lookup by
+the judges' measure without losing meaning in the round trip. It does not mean the Enochian it writes is right: without an
+expert, nothing here can show that (see "For an expert").
+
+If the planted knowns and joins pass but task 3 doesn't, the model reads our
+data but can't compose: the translator stays a lookup tool with a
+model's help in choosing senses. If nothing beats A1k, the translator is
+a better lookup tool (the dictionary's English search, built in
+[plan 074](074-enochian-dictionary-search.md)) and the idea waits.
+
+## The first design: held-out Keys (withdrawn 12 November 2026)
+
+Tasks 1 and 2 were first set on the Keys themselves, in nineteen folds:
+translate one Key with that Key's rows taken out of the context, scored
+row by row against Dee's English and Casaubon's words. Each ran open book
+(the whole dictionary) and closed book (less the entries for words found
+only in the held-out Key), with A2c, the context under a letter cipher,
+to show how much of a score was memory. The recall probe showed that
+Opus recites every Key, so none of this can separate memory from use of
+the context for Opus. The code is kept (`testset.ts`, the closed-book
+removals, the cipher, the probe) for models the probe doesn't flag.
+
+A1 on the held-out Keys, open book (11 November 2026): 81.3% in task 1,
+or 89.1% if every row it sends to the judges were accepted, and 51.9% in
+task 2, with 130 more rows a synonym and 45 near.
 
 ### Thresholds (settled 11 November 2026)
 
-The numbers live in one place,
-[`src/app/enochian/translate/bars.ts`](../src/app/enochian/translate/bars.ts):
-the experiment's results are checked against it (`measureBars` in
-`scripts/enochian-translate-eval/bars.ts`, once the runner and the
-judges' step exist), and the translator page, if one is built, shows the
-same bars beside the measured figures. A bar that can't be measured on
-the results (say, too few Keys left once memorised ones are set aside)
-shows why, and is never counted as met. The list
-below quotes it word for word; `bars.test.ts` fails if they differ, so
-a bar changes in the code and here together, with a new date.
+These bars were set for the held-out Keys. They stay in
+[`src/app/enochian/translate/bars.ts`](../src/app/enochian/translate/bars.ts)
+until the new text's bars replace them (see "Bars for the new text"),
+and are quoted here because `bars.test.ts` keeps the two equal: a bar
+changes in the code and here together, with a new date. The
+experiment's results are checked against them by `measureBars` in
+`scripts/enochian-translate-eval/bars.ts`. A bar that can't be measured
+on the results shows why, and is never counted as met.
 
 Build the LLM translator if all of these hold:
 
@@ -369,42 +558,41 @@ Build the LLM translator if all of these hold:
   only the dictionary, and both judges compare the two English versions.
 
 **Why these numbers.** A1, the lookup script with no model, already
-scores (11 November 2026, open book) 81.3% in task 1, or 89.1% if
-every row it sends to the judges were accepted, and 51.9% in task 2,
-with 130 more rows a synonym and 45 near. The first draft's bar of 85%
-in task 1, and its margin of 10 points over A1 on the hard rows, could
-be met by a model that adds little to lookup. So the bars are set
-above what lookup does: 90% overall, so the model keeps the easy rows;
-half of the rows lookup gets wrong (115 wrong by script, up to 197 with
-the rows A1 sends to the judges), where translation actually happens;
-and 75% in task 2, which the first draft had no bar for. The bars were
-fixed before any model ran, so they can't be fitted to the results.
-Closed book has no bar: it measures honesty about unknown words, and is
-reported with the rest.
-
-If only A4 passes, write better grammar notes and rerun A3. If nothing
-beats A1, the translator is a better lookup tool (the dictionary's English
-search, built in [plan 074](074-enochian-dictionary-search.md)) and the
-idea waits.
+scored 81.3% in task 1 (89.1% generously) and 51.9% in task 2. The first
+draft's bar of 85% in task 1, and its margin of 10 points over A1 on the
+hard rows, could be met by a model that adds little to lookup. So the
+bars were set above what lookup does: 90% overall, so the model keeps
+the easy rows; half of the rows lookup gets wrong (115 wrong by script,
+up to 197 with the rows A1 sends to the judges), where translation
+actually happens; and 75% in task 2. They were fixed before any model
+ran. Closed book had no bar: it measured honesty about unknown words.
 
 ## Where the work lives
 
-- The test set: generated by a script from `keys.json5` and
-  `dictionary.json5`, all our own data. It may be committed.
+- The test sets: generated by scripts from `keys.json5` and
+  `dictionary.json5`, all our own data, with a fixed seed. They may be
+  committed, and the new text and the task-3 sentences are.
 - The runner: a script under `scripts/enochian-translate-eval/`, run with
   pnpm (`loom.json`'s recorded runner). It calls every model through
   Vercel AI Gateway (`https://ai-gateway.vercel.sh`, model ids such as
-  `anthropic/claude-opus-5.5`; the gateway writes versions with a dot), with `AI_GATEWAY_API_KEY` from
-  `.env.local` read through `loom env --`; no key is ever committed. It keeps a running cost total and stops at the cap. It is a
-  development tool only: nothing in the app calls a model. Its budget
-  check and cap read one ledger in one output directory, as one process
-  sees it, so runs must never be concurrent and must all share one
-  `--out` (the default).
-- The judges' step (built, `judge.ts`): folds both judges' verdicts into
-  the scores before any bar is measured, and `measureBars` refuses a
-  task-1 report with rows still waiting for them. A row both judges
-  accept becomes correct; one both turn down is "rejected", and one they
-  split on is "split"; both count as wrong. A1's to-judge rows are judged
+  `anthropic/claude-opus-5.5`; the gateway writes versions with a dot),
+  with `AI_GATEWAY_API_KEY` from `.env.local` read through `loom env --`;
+  no key is ever committed. It keeps a running cost total and stops at
+  the cap. It is a development tool only: nothing in the app calls a
+  model. Its budget check and cap read one ledger in one output
+  directory, as one process sees it, so runs must never be concurrent
+  and must all share one `--out` (the default).
+- Before the first paid run, from the runner's last review (12 November
+  2026): append a batch item's ledger line before its saved reply, so a
+  crash can't leave it saved but unbooked; book a sync reply with no
+  cost and no output at its worst case, as batch already does; treat a
+  cost of $0 looked up for a failed call as unknown; and check the first
+  real batch, including failed items booked at $0, against the
+  gateway's own spend report. Nothing locks out a second run at once;
+  don't start one.
+- The judges' step (`judge.ts`): folds both judges' verdicts into the
+  scores before any bar is measured, and `measureBars` refuses a task-1
+  report with rows still waiting for them. A1's to-judge rows are judged
   once the same way (`judge-a1`), since they decide which rows are hard.
 - The grammar notes for A3: a Markdown file beside the dictionary, in our
   own words, each rule with its page in Laycock or Leitch and, where Dee's
@@ -433,12 +621,33 @@ passages into an agent's context. That once ended an agent's run on
   reconstruction, and that the text is sent to Anthropic.
 - The page shows how accurate the translator is and where it falls
   short: every bar from `src/app/enochian/translate/bars.ts` beside the
-  figure measured for the model it uses, lookup's figure for comparison,
-  the closed-book honesty figures, the date and the model. The figures
-  come from a small results file the runner writes beside `bars.ts`
-  (numbers only, no model output), so the page never states a number by
-  hand. A bar the model in use hasn't been measured against shows as
-  "not measured", never as met.
+  figure measured for the model it uses, with its interval, lookup's
+  figure for comparison, the honesty figures, the date and the model.
+  The figures come from a small results file the runner writes beside
+  `bars.ts` (numbers only, no model output), so the page never states a
+  number by hand. A bar the model in use hasn't been measured against
+  shows as "not measured", never as met.
+- The page also states its **limitations** in plain words, beside the
+  figures. They live in one list in code beside the bars
+  (`src/app/enochian/translate/limitations.ts`), and this plan quotes
+  them word for word under a test, as it does the bars. The list, to be
+  settled with the bars:
+  - The only English we can check against is Dee's, and the model has
+    memorised it, so on Dee's words it was shown to be no worse than
+    looking words up, not better.
+  - Nothing beyond the Keys can be checked against a known answer. New
+    Enochian is reconstruction from Dee's words and our grammar notes,
+    and has been judged only by other AI models, not by anyone who reads
+    Enochian.
+  - Coined and derived words are marked; a word marked as found in our
+    data is checked against it before it is shown.
+  - The figures come from about 600 rows and 60 sentences, and each has
+    a margin of error, shown beside it.
+  - Meanings and rules come from Dee, Laycock and Leitch, and some from
+    later traditions (Schueler, the Golden Dawn); each is labelled with
+    its source.
+  - The text you enter is sent to an AI provider, and the provider may
+    refuse to translate some passages.
 - It builds on the dictionary's English search
   ([plan 074](074-enochian-dictionary-search.md)), which becomes its
   lookup step, and serves the "enochian translator" search target of
@@ -459,9 +668,8 @@ the experiment.
 
 Gadi knows an Enochian expert who might consult. The expert is **not a
 blocker for the experiment**. Tasks 1 and 2 have Dee's text as the
-answer key, and the build-or-not decision rests on them and the
-thresholds above. The expert is a gate **before a translator is shown
-to readers**: the later product plan cannot ship without their review of
+answer key, and the build-or-not decision rests on the bars above. The expert is a gate **before a translator is shown to
+readers**: the later product plan cannot ship without their review of
 a sample. Whether to bring them in earlier is decided again when the
 results are in. Until then, questions only an expert can settle go on
 this list, which the experiment adds to as it runs:
@@ -470,6 +678,12 @@ this list, which the experiment adds to as it runs:
   those both accepted.
 - Derived and coined words: are the forms plausible by the grammar
   notes, or do they just look like Enochian?
+- The new text: whether a swapped word's form suits its new place,
+  whether any planted word is in fact attested somewhere we don't have,
+  and whether the new joins are joins Dee could have written.
+- Task 3: whether the Enochian written for the 60 sentences is
+  Enochian at all. Nothing in the experiment can show that; a sample
+  for the expert is the only check.
 - Glosses where Leitch and Dee's English disagree (about 55 of the 550
   comparable Key words).
 - Each rule in the A3 grammar notes, especially those resting on a
@@ -493,19 +707,35 @@ this list, which the experiment adds to as it runs:
 5. Judging: by models, cross-family, with an expert queue. Gadi checks
    a tenth of task 1 for obvious misjudgements and may edit the task-3
    sentences.
-6. Providers: mostly Claude. OpenAI `openai/gpt-6.1-sol` (high) for occasional
-   checks and as second judge, never with the books. Astra only as a
-   one-off.
+6. Providers: mostly Claude. OpenAI `openai/gpt-6.1-sol` (high) for
+   occasional checks and as second judge, never with the books. Astra
+   only as a one-off.
+7. Test text (12 November 2026): new text built from Dee's clauses with
+   swapped, planted and context-only rows, after the recall probe showed
+   that Opus recites all 19 Keys, and revised as reviewed the same day:
+   on Dee's words the bars are "no worse than lookup in the Keys"
+   (A1k), and only the new joins and task 3 can show more. Its
+   bars are settled once A1 and A1k are scored on it.
+8. The translator page states its limitations as well as its figures,
+   from one list in code that the plan quotes (Gadi, 12 November).
 
 ## Risks
 
-- **Memorisation.** The recall probe and A2c measure it, and a
-  threshold requires A2c to stay close to A2. They don't remove it: Dee's
-  English stays visible, and if the model recites most Keys the
-  experiment can't separate memory from use of the context (see the
-  recall probe).
-- **A small test set.** About a thousand words. Differences of a few
-  points between arms are noise.
+- **Memorisation.** The model knows the Keys and Dee's English, and
+  lookup in the Keys answers almost all of Dee's text. So tasks 1 and 2
+  can only show "no worse than lookup"; the new joins and task 3 carry
+  the case for more.
+- **Synthetic words.** Planted words and new joins are ours, not
+  Dee's. A model that handles them well reads our data well; that is not
+  the same as knowing Enochian.
+- **Text that isn't quite Enochian.** A swapped word keeps its own form,
+  which may not suit its new place, and a swapped sentence may not make
+  sense. Real reader text would make sense, which helps a model choose a
+  word's sense, so on this point the test is harder than real use.
+- **A small test set.** About 600 rows, of which 120 swapped, 40
+  planted, 20 planted knowns and 40 joins. Every figure carries its
+  interval; bars are decided on counts with known power, and one
+  declared top-up is allowed for a marginal result.
 - **Whose Enochian.** Leitch's lexicon includes his own etymologies, and
   Schueler and the Golden Dawn add later readings. Each rule and meaning
   keeps its source, as the dictionary does, so the translator can say
@@ -513,8 +743,9 @@ this list, which the experiment adds to as it runs:
 - **Copyright.** Covered above: books stay local, notes are our own words,
   raw output stays out of the repository.
 - **Model judges.** Without an expert, task 3 is models grading models.
-  Cross-family judging, the round trip and the expert queue limit this.
-  They don't remove it, so task 3 alone never decides the build.
+  Cross-family judging, the round trip, the damaged controls and the
+  expert queue limit this. They don't remove it, so task 3 alone never
+  decides the build, and the page says so.
 - **Expectations.** Beyond the Keys, any translation is reconstruction.
   The experiment measures how honest the model is about that, not only
   how accurate it is.
