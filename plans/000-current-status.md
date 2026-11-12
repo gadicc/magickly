@@ -225,12 +225,28 @@ Follow-ups are separate from the completed migration work:
   refusals that check what npm has. Merged on 12 November, after the
   `npm` environment was created. The provenance clean-up (the copied
   planet and house texts replaced, the Enochian letters in both
-  traditions, citations) is on `gate/provenance`, not merged
+  traditions, citations) is merged too
   ([plan 080](080-open-source-packages.md#the-provenance-clean-up-12-november-2026)).
   TODO: the rest of stage A′, Gadi's
   ([the steps](080-open-source-packages.md#stage-a-the-owners-steps));
   then, with his go-ahead, stages B to G. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups).
+- 12 November 2026: the Enochian dictionary's and Keys' gematria named as
+  Gerald Schueler's (EMPM, 1985), Gadi choosing a label over removal. All
+  190 entries that carry it cite EMPM (a test keeps it so). Each value
+  is marked EMPM with a note that it is his modern system, from Hebrew
+  letter values through the Golden Dawn's attributions, and that
+  neither Dee's angels nor the Golden Dawn assigned the letters number
+  values (Leitch, *The Angelical Language* vol. I ch. 5; Laycock, *The
+  Complete Enochian Dictionary* pp. 43–44); the pages' copy and the
+  dictionary's meta description agree, and the search vectors are
+  republished. Built on `gate/enochian-gematria`, on top of the
+  provenance clean-up.
+  TODO: the few number-words in the Keys that Dee's English gives as
+  numbers (inconsistent, Leitch notes) could be shown as Dee's own
+  numbers, if Gadi wants them. TODO: two values are no sum of their
+  letters (BAEQUIB 186, the letters 196; BASM 110, perhaps BAZM's);
+  check them against EMPM.
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose

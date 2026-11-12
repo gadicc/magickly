@@ -9,6 +9,7 @@ import {
   within,
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { GEMATRIA_NOTE } from "../gematria";
 import Dictionary from "./dictionary";
 
 const PATH = "/enochian/dictionary";
@@ -350,5 +351,36 @@ describe("what the review of 10 November 2026 found (plan 074)", () => {
     expect(olprt?.querySelector(".dict-meaning")?.textContent).toBe(
       "light EMPM",
     );
+  });
+});
+
+describe("the gematria, named as Schueler's", () => {
+  it("names the gematria as Schueler's and says what it is", async () => {
+    window.history.replaceState(null, "", `${PATH}?w=AAI`);
+    render(<Dictionary uses={{}} />);
+    const entry = await screen.findByRole("dialog");
+    const gematria = within(entry).getByText("Gematria").nextElementSibling;
+    expect(gematria?.firstChild?.textContent).toBe("72");
+    expect(gematria?.querySelector(".entry-source")?.textContent).toBe(" EMPM");
+    expect(gematria?.querySelector(".entry-note")?.textContent).toBe(
+      GEMATRIA_NOTE,
+    );
+  });
+
+  it("gives both of a word's values, under one label", async () => {
+    window.history.replaceState(null, "", `${PATH}?w=APOPHRASZ`);
+    render(<Dictionary uses={{}} />);
+    const entry = await screen.findByRole("dialog");
+    const gematria = within(entry).getByText("Gematria").nextElementSibling;
+    expect(gematria?.firstChild?.textContent).toBe("171, 177");
+    expect(gematria?.querySelectorAll(".entry-source")).toHaveLength(1);
+  });
+
+  it("shows no gematria for a word without it", async () => {
+    window.history.replaceState(null, "", `${PATH}?w=OLPIRT`);
+    render(<Dictionary uses={{}} />);
+    const entry = await screen.findByRole("dialog");
+    expect(within(entry).queryByText("Gematria")).toBeNull();
+    expect(within(entry).queryByText(GEMATRIA_NOTE)).toBeNull();
   });
 });

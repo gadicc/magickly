@@ -44,7 +44,10 @@ export default function DictionaryText() {
         <li>the word in Latin letters and in Enochian,</li>
         <li>its pronunciation, where one is recorded,</li>
         <li>each meaning, with the source it comes from,</li>
-        <li>its gematria, the numerical value of its letters, where known,</li>
+        <li>
+          its gematria, where it has one: Gerald Schueler&apos;s numerical value
+          of its letters, explained under Sources,
+        </li>
         <li>
           and where the Keys use the word, with Dee&apos;s English around it.
         </li>
@@ -63,6 +66,17 @@ export default function DictionaryText() {
         pronunciations follow (&quot;ah&quot; for A, &quot;zod&quot; for Z). WE
         is <i>The Whole Enochian Dictionary</i>, an anonymous compilation. A few
         meanings come from the Keys themselves.
+      </p>
+      <p>
+        The gematria is Schueler&apos;s too, and a derivation of his own,
+        published in 1985. He numbers the Enochian letters from the values of
+        Hebrew letters, through the attributions the Golden Dawn gives the
+        Enochian letters; some letters he numbers two ways, so some words have
+        two values. Neither Dee&apos;s angels nor the Golden Dawn assigned the
+        Enochian letters number values, as Aaron Leitch (
+        <i>The Angelical Language</i>, vol. I, ch. 5) and Donald Laycock (
+        <i>The Complete Enochian Dictionary</i>, pp. 43–44) both point out, so
+        each entry marks its gematria as EMPM.
       </p>
       <H2>Related</H2>
       <List>

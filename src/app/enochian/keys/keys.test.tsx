@@ -1,6 +1,7 @@
 import type { Aethyr, EnochianKey } from "magick-data/enochian/keys";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { GEMATRIA_NOTE } from "../gematria";
 import { KEY_ENTRIES } from "./keyEntries";
 import {
   keysOf,
@@ -283,6 +284,35 @@ describe("the word panel", () => {
     expect(shown).not.toContain("Not in the dictionary.");
     expect(shown).toContain("Uncertain reading.");
     expect(shown).toContain("a doubtful letter, p.109");
+  });
+
+  it("names Schueler's gematria and says what it is, once", () => {
+    const entry = (gematria: number[]) => ({
+      gematria,
+      pronounciations: [],
+      meanings: [{ meaning: "m", source: "x", source2: "", note: "" }],
+    });
+    const found = (nor: number[], molap: number[]) =>
+      panel(
+        3,
+        pageEntries({
+          NORMOLAP: [
+            { key: "NOR", entry: entry(nor) },
+            { key: "MOLAP", entry: entry(molap) },
+          ],
+        }),
+      );
+    const shown = found([72, 81], [6]);
+    expect(shown).toContain("Gematria 72, 81 (EMPM)");
+    expect(shown).toContain("Gematria 6 (EMPM)");
+    expect(shown.split(GEMATRIA_NOTE)).toHaveLength(2);
+    expect(found([], [])).not.toContain("Gematria");
+    expect(found([], [])).not.toContain("Schueler");
+    // As NORMOLAP is: NOR has none, MOLAP has one.
+    const one = found([], [143]);
+    expect(one).toContain("Gematria 143 (EMPM)");
+    expect(one.split("Gematria")).toHaveLength(2);
+    expect(one.split(GEMATRIA_NOTE)).toHaveLength(2);
   });
 });
 

@@ -50,10 +50,13 @@ export default function KeysText() {
         Dawn&apos;s, which joins or splits some of Dee&apos;s words as it was
         spoken in the Order. Tap any word to open its entry from the{" "}
         <Link href="/enochian/dictionary">Enochian dictionary</Link>: the
-        pronunciation, the meanings from each source and the gematria. The
-        dictionary comes from other transcriptions, so some words are filed
-        under another spelling or as two words; the page finds those, and says
-        when a word is not in it.
+        pronunciation, the meanings from each source and, where it has one,
+        Gerald Schueler&apos;s modern gematria. EMPM is Schueler&apos;s{" "}
+        <i>Enochian Magic: A Practical Manual</i> (1985); the dictionary&apos;s
+        Sources say how his gematria is made, and that it is neither Dee&apos;s
+        nor the Golden Dawn&apos;s. The dictionary comes from other
+        transcriptions, so some words are filed under another spelling or as two
+        words; the page finds those, and says when a word is not in it.
       </p>
 
       <H2>Related</H2>

@@ -27,5 +27,8 @@ describe("/enochian/dictionary, as the server renders it (plan 074)", () => {
 
   it("has the text below the tool", () => {
     expect(html).toContain("How to search");
+    // Each book's title follows its bracket, with no space between.
+    expect(html).toContain("Aaron Leitch (<i>The Angelical Language</i>");
+    expect(html).toContain("Laycock (<i>The Complete Enochian Dictionary</i>");
   });
 });

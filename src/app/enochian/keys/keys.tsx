@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { DARK_SELECTOR } from "@/colorScheme";
+import { GEMATRIA_NOTE, GEMATRIA_SOURCE } from "../gematria";
 import useEnochianFont, { EnochianFont } from "../useEnochianFont";
 import {
   keysOf,
@@ -166,7 +167,9 @@ function Entry({ dictKey, entry }: { dictKey: string; entry: PageEntry }) {
           {entry.pronunciation}
         </td>
         <td style={{ width: "33%", textAlign: "right" }}>
-          {entry.gematria ? `Gematria ${entry.gematria.join(", ")}` : ""}
+          {entry.gematria
+            ? `Gematria ${entry.gematria.join(", ")} (${GEMATRIA_SOURCE})`
+            : ""}
         </td>
       </tr>
       {entry.meanings.map((meaning, i) => (
@@ -223,6 +226,16 @@ export function WordPanel({
           // biome-ignore lint/suspicious/noArrayIndexKey: two parts may share a key
           <Entry key={index} dictKey={part} entry={entries.entries[part]} />
         ))}
+        {parts?.some((part) => entries.entries[part].gematria) && (
+          <tr>
+            <td
+              colSpan={3}
+              style={{ textAlign: "center", fontSize: 12, opacity: 0.75 }}
+            >
+              {GEMATRIA_NOTE}
+            </td>
+          </tr>
+        )}
         {lookup && !parts && (
           <tr>
             <td colSpan={3} style={{ textAlign: "center" }}>

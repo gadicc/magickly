@@ -6,6 +6,7 @@ import { Box, Button, IconButton } from "@mui/material";
 import type { EnochianEntry } from "magick-data/enochian/dictionary";
 import * as React from "react";
 import EnochianFont from "../../../components/enochian/enochianFont";
+import { GEMATRIA_NOTE, GEMATRIA_SOURCE } from "../gematria";
 import { LABELS } from "./labels";
 import { wordLink } from "./urlState";
 
@@ -64,7 +65,7 @@ const sources = (meaning: EnochianEntry["meanings"][number]) =>
 /**
  * One word's entry, in the desktop pane or the phone's sheet (plan 074,
  * decision 3): the word in Latin letters and in the script, how it is said,
- * each meaning with its source, and its gematria.
+ * each meaning with its source, and its gematria, named as Schueler's.
  */
 export default function Entry({
   word,
@@ -122,7 +123,11 @@ export default function Entry({
       {entry.gematria.length > 0 && (
         <>
           <h3>{LABELS.gematria}</h3>
-          <div>{entry.gematria.join(", ")}</div>
+          <div>
+            {entry.gematria.join(", ")}
+            <span className="entry-source">{` ${GEMATRIA_SOURCE}`}</span>
+            <div className="entry-note">{GEMATRIA_NOTE}</div>
+          </div>
         </>
       )}
       {children}
