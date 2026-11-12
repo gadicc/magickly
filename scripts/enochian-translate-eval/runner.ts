@@ -10,14 +10,15 @@ import {
 } from "node:fs";
 import { dirname, join } from "node:path";
 import type { EnochianDictionary } from "magick-data/enochian/dictionary";
-import {
-  type BarResult,
-  checkBars,
-} from "../../src/app/enochian/translate/bars.ts";
 import type { AnswerItem, Task } from "./answer.ts";
-import { type BarInputs, measureBars } from "./bars.ts";
 import { a1Scores, markHard } from "./baseline.ts";
 import { cipher } from "./cipher.ts";
+import {
+  type BarInputs,
+  type BarResult,
+  checkBars,
+  measureBars,
+} from "./heldout-bars.ts";
 import {
   applyVerdicts,
   EXPERT_QUEUE_HEAD,

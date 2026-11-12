@@ -6,10 +6,22 @@ import { fileURLToPath } from "node:url";
 import realDictionary from "magick-data/enochian/dictionary";
 import keys from "magick-data/enochian/keys";
 import { afterEach, describe, expect, it } from "vitest";
-import type { AnswerItem } from "./answer.ts";
+import {
+  barById,
+  countLine,
+  ROUND_TRIP_KINDS,
+  TRANSLATOR_BARS,
+} from "../../src/app/enochian/translate/bars.ts";
+import {
+  type AnswerItem,
+  checkContextFrom,
+  checkItem,
+  parseRef,
+} from "./answer.ts";
 import { a1Task3 } from "./baseline.ts";
 import { dictionary as fixtureDictionary, row } from "./fixtures.ts";
 import {
+  type JudgedRows,
   type JudgeRow,
   NEW_JUDGE_INSTRUCTIONS,
   newJudgeRequest,
@@ -24,11 +36,10 @@ import {
 } from "./ledger.ts";
 import { MODELS } from "./models.ts";
 import {
-  barValues,
+  barredRoundTrip,
   difference,
   measureNewTextBars,
   type NewTextReport,
-  PROPOSED_NEW_BARS,
 } from "./newbars.ts";
 import {
   NEW_ARMS,
@@ -45,15 +56,21 @@ import {
   task3Parts,
 } from "./newprompt.ts";
 import {
+  barSource,
   blockedCalls,
   cacheCheck,
   cacheProjection,
+  FROM_STORE_CASE,
+  judgeTask3,
   mergeRoundTrips,
+  namedRuns,
   newRunJudgeCases,
+  refillFromStore,
   retryBlocked,
   roundTripStorePath,
   scoreNewRequests,
   task3Pool,
+  task3Summary,
 } from "./newrunner.ts";
 import {
   type NewRowScore,
@@ -71,6 +88,7 @@ import {
   type NewTextRow,
   type NewTextSet,
   newTextRows,
+  prng,
   withPlantedKnowns,
 } from "./newtext.ts";
 import { englishWords, stemEnglish } from "./normalise.ts";
@@ -91,17 +109,27 @@ import {
 } from "./runner.ts";
 import {
   blindId,
+  blockedRoundTrips,
+  type ControlUnit,
   candidate,
+  controlPassages,
+  controlUnits,
   DAMAGES,
   damagedControls,
   dealCases,
+  dropClause,
+  ORIGINAL_SOURCE,
+  originalItems,
   parseRoundTrip,
   parseRubricVerdicts,
   type RoundTripStore,
   roundTripCases,
   roundTripKey,
+  roundTripSpecs,
+  roundTripsFor,
   rubricCases,
   rubricRequest,
+  rubricRow,
   type Task3Candidate,
   task3Report,
   translationText,
@@ -891,62 +919,171 @@ describe("task 3's damaged controls", () => {
   const a1Candidates = sentences.map((one) =>
     candidate("A1", one, a1.get(one.id) ?? []),
   );
-  const controls = damagedControls(a1Candidates, {
+  const check = damagedControls(set, {
     dictionary: realDictionary,
     rows: keyRows,
   });
+  const { originals, controls } = check;
+  const units = controlUnits(set);
+  const unitOf = (id: string) =>
+    units.units.find((one) => one.id === id) as ControlUnit;
 
-  it("are 15, a third of each kind, each of another sentence, by seed", () => {
+  it("pair the new text's passages of Dee's words, as its sentences", () => {
+    const passages = controlPassages(set);
+    expect(passages).toHaveLength(38);
+    expect(units.passages).toBe(38);
+    expect(units.units).toHaveLength(19);
+    expect(check).toMatchObject({ passages: 38, units: 19 });
+    const byId = new Map(passages.map((one) => [one.id, one]));
+    const seen = new Set<string>();
+    for (const unit of units.units) {
+      const parts = unit.id.split(" + ").map((id) => byId.get(id));
+      expect(parts).toHaveLength(2);
+      const [first, second] = parts as ControlUnit[];
+      // Two passages from different Keys, never used twice.
+      for (const one of [first, second]) {
+        expect(seen.has(one.id)).toBe(false);
+        seen.add(one.id);
+        for (const row of one.rows) {
+          expect(["unchanged", "swapped"]).toContain(row.kind);
+          expect(row.gdSpelling).toBeUndefined();
+        }
+      }
+      const key = (one: ControlUnit) => one.rows[0].at.split(".")[0];
+      expect(key(first)).not.toBe(key(second));
+      // Joined as the new text joins a sentence's passages.
+      expect(unit.rows).toEqual([...first.rows, ...second.rows]);
+      expect(unit.english).toBe(`${first.english} ${second.english}`);
+      expect(unit.rows.length).toBeGreaterThanOrEqual(6);
+    }
+    // By seed: another seed pairs them otherwise.
+    expect(controlUnits(set, prng(78)).units).not.toEqual(units.units);
+  });
+
+  it("are 15, five of each kind, each of another pair, by seed", () => {
     expect(controls).toHaveLength(15);
+    expect(originals).toHaveLength(15);
     for (const damage of DAMAGES)
       expect(controls.filter((one) => one.damage === damage)).toHaveLength(5);
     expect(new Set(controls.map((one) => one.sentence)).size).toBe(15);
     expect(
-      damagedControls(a1Candidates, {
-        dictionary: realDictionary,
-        rows: keyRows,
-      }),
-    ).toEqual(controls);
+      damagedControls(set, { dictionary: realDictionary, rows: keyRows }),
+    ).toEqual(check);
     expect(
-      damagedControls(
-        a1Candidates,
-        { dictionary: realDictionary, rows: keyRows },
-        78,
-      ),
+      damagedControls(set, { dictionary: realDictionary, rows: keyRows }, 78)
+        .controls,
     ).not.toEqual(controls);
+  });
+
+  it("have originals that are Dee's rows, attested, citing their Key rows", () => {
+    const context = checkContextFrom(realDictionary, keyRows);
+    for (const one of originals) {
+      const unit = unitOf(one.sentence);
+      expect(one).toMatchObject({
+        source: ORIGINAL_SOURCE,
+        original: true,
+        english: unit.english,
+      });
+      expect(one.damage).toBeUndefined();
+      expect(one.items).toEqual(originalItems(unit));
+      unit.rows.forEach((row, i) => {
+        const item = one.items[i];
+        expect(item).toMatchObject({
+          source: row.english,
+          target: row.enochian,
+          basis: "attested",
+          ref: row.source,
+        });
+        expect(parseRef(item.ref)).toEqual({ kind: "row", id: row.source });
+        expect(["invention", "malformed ref"]).not.toContain(
+          checkItem(item, 2, context),
+        );
+      });
+    }
   });
 
   it("are damaged as they say", () => {
     const headwords = new Set(Object.keys(realDictionary));
     for (const one of controls) {
-      const from = a1Candidates.find(
-        (a) => a.sentence === one.sentence,
-      ) as Task3Candidate;
+      const from = originals.find((a) => a.id === one.of) as Task3Candidate;
+      expect(from.sentence).toBe(one.sentence);
+      expect(one.english).toBe(from.english);
       expect(translationText(one.items)).not.toBe(translationText(from.items));
-      if (one.damage === "dropped clause")
+      if (one.damage === "dropped clause") {
         expect(one.items.length).toBeLessThanOrEqual(from.items.length - 2);
-      else {
+        expect(one.items.length).toBeGreaterThanOrEqual(3);
+        expect(one.items).toEqual(from.items.slice(0, one.items.length));
+      } else {
         expect(one.items).toHaveLength(from.items.length);
+        const at = one.items.findIndex(
+          (item, i) => item.target !== from.items[i].target,
+        );
         const changed = one.items.filter(
           (item, i) => item.target !== from.items[i].target,
         );
         expect(changed).toHaveLength(1);
-        expect(changed[0].basis).toBe("attested");
+        // A misquote of its row: same English, basis and Key-row ref.
+        expect(changed[0]).toEqual({
+          ...from.items[at],
+          target: changed[0].target,
+        });
+        expect(parseRef(changed[0].ref).kind).toBe("row");
+        expect(englishWords(changed[0].source).length).toBeGreaterThan(0);
         expect(headwords.has(changed[0].target)).toBe(
           one.damage === "wrong word",
         );
+        // The judges see a cited Key row beside every word, damaged or not.
+        const [row] = rubricCases([one], keyRows)[0].rows;
+        for (const word of row.words ?? [])
+          expect(word.cited).toMatch(/^Key row /);
       }
     }
   });
 
-  it("go in blind: same ids, shuffled, never beside their own sentence", () => {
-    const pool = [...a1Candidates, ...controls];
+  it("drop the last clause, keeping three rows and leaving two out", () => {
+    const item = (source: string) => ({
+      source,
+      target: "X",
+      basis: "attested" as const,
+      ref: "1.1",
+    });
+    const sources = (list?: { source: string }[]) =>
+      list?.map((one) => one.source);
+    const words = (text: string) => text.split(" ").map(item);
+    // After the last stop that keeps three and leaves two out.
+    expect(sources(dropClause(words("a b c, d e f, g")))).toEqual([
+      "a",
+      "b",
+      "c,",
+    ]);
+    expect(sources(dropClause(words("a b c d, e f")))).toEqual([
+      "a",
+      "b",
+      "c",
+      "d,",
+    ]);
+    // A stop too early (it would keep two) or too late (it would leave one
+    // out) doesn't count: the first three fifths, two left out.
+    expect(sources(dropClause(words("a b, c d e f, g")))).toEqual([
+      "a",
+      "b,",
+      "c",
+      "d",
+      "e",
+    ]);
+    expect(sources(dropClause(words("a b c d e")))).toEqual(["a", "b", "c"]);
+    // Too short to keep three and leave two out.
+    expect(dropClause(words("a b, c d"))).toBeUndefined();
+  });
+
+  it("go in blind: same ids, shuffled, never beside their own passage", () => {
+    const pool = [...a1Candidates, ...originals, ...controls];
     for (const one of pool) expect(one.id).toMatch(/^c[0-9a-f]{10}$/);
     expect(new Set(pool.map((one) => one.id)).size).toBe(pool.length);
     const cases = rubricCases(pool, keyRows);
     expect(cases.flatMap((one) => one.rows)).toHaveLength(pool.length);
     expect(rubricCases(pool, keyRows)).toEqual(cases);
-    const isControl = new Set(controls.map((one) => one.id));
+    const isCheck = new Set([...originals, ...controls].map((one) => one.id));
     const where: number[] = [];
     for (const item of cases) {
       const sentenceOf = item.rows.map(
@@ -954,22 +1091,186 @@ describe("task 3's damaged controls", () => {
       );
       expect(new Set(sentenceOf).size).toBe(sentenceOf.length);
       item.rows.forEach((one, i) => {
-        if (isControl.has(one.row)) where.push(i);
+        if (isCheck.has(one.row)) where.push(i);
       });
       const request = rubricRequest({ dictionary: realDictionary, grammar })(
         item,
         "gpt",
       );
       expect(request.prompt).not.toMatch(
-        /\b(?:control|damage|wrong word|coinage|dropped)/i,
+        /\b(?:control|damage|wrong word|coinage|dropped|original)/i,
       );
       expect(request.prompt).not.toMatch(/\bA1\b/);
       expect(request.id).toMatch(/^T3J-[0-9a-f]{10}_judge-gpt$/);
     }
-    // Controls sit in several places, not one.
     expect(new Set(where).size).toBeGreaterThan(3);
-    // Controls aren't all in the first or last case.
-    expect(dealCases(pool, 15).length).toBe(cases.length);
+  });
+
+  it("are dealt alone once A1's translations are judged", () => {
+    const judgedA1 = new Set(a1Candidates.map((one) => one.id));
+    const pool = [...a1Candidates, ...originals, ...controls];
+    const cases = rubricCases(pool, keyRows, undefined, (row) =>
+      judgedA1.has(row.row),
+    );
+    const rows = cases.flatMap((one) => one.rows.map((r) => r.row));
+    expect(rows.sort()).toEqual(
+      [...originals, ...controls].map((one) => one.id).sort(),
+    );
+    // 30 candidates in two cases: one call per case and judge.
+    expect(cases).toHaveLength(2);
+    // No control beside its own original.
+    for (const item of cases) {
+      const ids = new Set(item.rows.map((one) => one.row));
+      for (const one of controls)
+        expect(ids.has(one.id) && ids.has(one.of as string)).toBe(false);
+    }
+  });
+
+  it("keep A1's ids, judged before the controls changed", () => {
+    // The id A1's translation of T01 was judged under (12 November 2026),
+    // and its key in the verdict store.
+    expect(blindId("A1", "T01")).toBe("cb401aa7f20");
+    expect(a1Candidates[0].id).toBe("cb401aa7f20");
+    expect(
+      verdictKey(
+        rubricRow(a1Candidates[0], new Map(keyRows.map((r) => [r.id, r]))),
+      ),
+    ).toBe(
+      "cb401aa7f20\tniis adrpan aaiom etharzi zamran aaiom gil brin [?] caba\t\t\tefe32bf138a87be2",
+    );
+    expect(roundTripKey(a1Candidates[0])).toMatch(/^cb401aa7f20:[0-9a-f]{12}$/);
+  });
+
+  it("cut round trips into parts of one source each", () => {
+    const parts = (pool: Task3Candidate[]) =>
+      roundTripSpecs(pool, {}, opus, "medium").map((one) =>
+        one.input.map((i) => i.id),
+      );
+    // A1's parts as they were sent on 12 November (run
+    // 20261112-124920-roundtrip-opus-20c0): three of 20, in blind-id order.
+    const a1Parts = parts(a1Candidates);
+    expect(a1Parts.map((one) => one.length)).toEqual([20, 20, 20]);
+    expect(a1Parts.map((one) => [one[0], one.at(-1)])).toEqual([
+      ["c13761f1257", "c58b508523d"],
+      ["c5acf54f5d9", "cb672e8488a"],
+      ["cbc1d6f128d", "cfe915fb147"],
+    ]);
+    // Two sources: never one part across them, numbered on.
+    const model = task3.map((one) =>
+      candidate("r1:A3 opus medium", one, a1.get(one.id) ?? []),
+    );
+    const specs = roundTripSpecs(
+      [...model, ...a1Candidates],
+      {},
+      opus,
+      "medium",
+    );
+    expect(specs.map((one) => one.part)).toEqual([1, 2, 3, 4, 5, 6]);
+    const sourceOf = new Map(
+      [...model, ...a1Candidates].map((one) => [one.id, one.source]),
+    );
+    for (const spec of specs)
+      expect(new Set(spec.input.map((i) => sourceOf.get(i.id))).size).toBe(1);
+    expect(specs.slice(0, 3).map((one) => one.input.map((i) => i.id))).toEqual(
+      a1Parts,
+    );
+  });
+
+  it("never put a control beside its original, however few are left", () => {
+    const pair = [originals[0], controls[0]];
+    expect(dealCases(pair, 15)).toHaveLength(2);
+    const few = [...originals.slice(0, 5), ...controls.slice(0, 5)];
+    for (const item of dealCases(few, 15)) {
+      const units = item.map((one) => one.sentence);
+      expect(new Set(units).size).toBe(units.length);
+    }
+  });
+
+  it("put back rulings the store has and the rubric's file lacks", () => {
+    const rows = new Map(keyRows.map((r) => [r.id, r]));
+    const one = a1Candidates[0];
+    const key = verdictKey(rubricRow(one, rows));
+    const accept = { verdict: "same" as const, reason: "r" };
+    const store = { [key]: { opus: accept, gpt: accept } };
+    const existing: Record<string, JudgedRows> = {};
+    expect(refillFromStore(existing, [one], keyRows, store)).toBe(1);
+    expect(existing[FROM_STORE_CASE][one.id]).toMatchObject({
+      answer: translationText(one.items),
+      outcome: "correct",
+    });
+    // Already there: nothing to add.
+    expect(refillFromStore(existing, [one], keyRows, store)).toBe(0);
+    // One judge only: not put back.
+    expect(
+      refillFromStore({}, [one], keyRows, { [key]: { opus: accept } }),
+    ).toBe(0);
+  });
+
+  it("measure task 3 on one run of a group, or refuse", () => {
+    expect(barSource(["A1", "r1:A3 opus medium"], "A3 opus medium")).toBe(
+      "r1:A3 opus medium",
+    );
+    expect(barSource(["A1"], "A3 opus medium")).toBeUndefined();
+    expect(() =>
+      barSource(["r1:A3 opus medium", "r2:A3 opus medium"], "A3 opus medium"),
+    ).toThrow(/r1 and r2 both have A3 opus medium: name the one/);
+  });
+
+  it("send the judges only what is new", async () => {
+    const out = tempOut();
+    const gateway = fakeGateway((request) => {
+      const rows = JSON.parse(
+        request.prompt.slice(request.prompt.indexOf("\n\n") + 2),
+      ) as { row: string }[];
+      return {
+        text: json({
+          verdicts: rows.map((one) => ({
+            row: one.row,
+            verdict: "accept",
+            reason: "r",
+          })),
+        }),
+      };
+    });
+    const rt = runtime(out, gateway);
+    // A1 first, as on 12 November.
+    await judgeTask3(rt, { candidates: a1Candidates, data, budget: 50 });
+    const first = gateway.calls.length;
+    expect(first).toBeGreaterThan(0);
+    const pool = [...a1Candidates, ...originals, ...controls];
+    const dry = await judgeTask3(rt, {
+      candidates: pool,
+      data,
+      budget: 50,
+      dryRun: true,
+    });
+    expect(dry.rubric.requests).toBe(4);
+    expect(gateway.calls).toHaveLength(first);
+    await judgeTask3(rt, { candidates: pool, data, budget: 50 });
+    const sent = gateway.calls.slice(first);
+    expect(sent).toHaveLength(4);
+    // A crash after the store was written but not the rubric's file: the
+    // next round puts the rulings back and sends nothing.
+    rmSync(join(out, "task3", "judged-rubric.json"));
+    const again = await judgeTask3(rt, {
+      candidates: pool,
+      data,
+      budget: 50,
+      dryRun: true,
+    });
+    expect(again.rubric.requests).toBe(0);
+    await judgeTask3(rt, { candidates: pool, data, budget: 50 });
+    expect(gateway.calls.slice(first)).toHaveLength(4);
+    const report = task3Summary(out, data, pool, a1);
+    expect(report.controls).toMatchObject({
+      count: 15,
+      originals: 15,
+      counted: 15,
+      accepted: 15,
+      waiting: 0,
+    });
+    expect(Object.keys(report.sources)).toEqual(["A1"]);
+    expect(report.sources.A1.waiting).toBe(0);
   });
 });
 
@@ -1102,6 +1403,100 @@ describe("task 3's scoring", () => {
     ).toBe("I am");
   });
 
+  it("counts a round trip blocked twice as not keeping the meaning", () => {
+    const out = tempOut();
+    const one = candidate("A1", sentences[0], a1.get("T01") ?? []);
+    const other = candidate("A1", sentences[1], a1.get("T02") ?? []);
+    const write = (run: string, attempts: number) => {
+      const dir = runDir(out, run);
+      const spec = {
+        part: 1,
+        input: [one, other].map((c) => ({
+          id: c.id,
+          enochian: translationText(c.items),
+        })),
+        model: opus,
+        effort: "medium" as const,
+      };
+      const request = roundTripRequest(spec, fixtureDictionary);
+      writeJson(join(dir, "manifest.json"), {
+        runId: run,
+        kind: "roundtrip",
+        createdAt: "",
+        transport: "sync",
+        budget: 1,
+        projection: 0,
+        requests: [manifestRequest(request, { roundtrip: spec })],
+      } satisfies Manifest);
+      const blocked = (attempt: number) => ({
+        id: request.id,
+        ok: false,
+        finishReason: "content-filter",
+        text: "",
+        tokens: NO_TOKENS,
+        attempt,
+      });
+      writeJson(join(dir, "requests", `${request.id}.json`), blocked(attempts));
+      for (let i = 1; i < attempts; i++)
+        writeJson(
+          join(dir, "requests", `${request.id}.attempt-${i}.json`),
+          blocked(i),
+        );
+    };
+    // Blocked once: not yet retried, so it waits and is asked again.
+    write("rt1", 1);
+    expect(mergeRoundTrips(out, "rt1", [one, other])).toMatchObject({
+      added: 0,
+      blocked: [],
+      left: [one.id, other.id],
+    });
+    // Blocked on its retry too: it stands, never asked again.
+    write("rt2", 2);
+    expect(mergeRoundTrips(out, "rt2", [one, other])).toMatchObject({
+      added: 0,
+      blocked: [one.id, other.id],
+      left: [],
+    });
+    const store = readJson<RoundTripStore>(
+      roundTripStorePath(out),
+    ) as RoundTripStore;
+    expect(store[roundTripKey(one)]).toEqual({
+      english: "",
+      run: "rt2",
+      blocked: true,
+    });
+    expect(roundTripSpecs([one, other], store, opus, "medium")).toEqual([]);
+    expect(roundTripsFor([one, other], store).size).toBe(0);
+    expect(
+      roundTripCases([one, other], roundTripsFor([one, other], store)),
+    ).toEqual([]);
+    const figures = task3Report({
+      candidates: [one, other],
+      sentences: sentences.slice(0, 2),
+      rubric: new Map(),
+      roundTrip: new Map(),
+      roundTrips: roundTripsFor([one, other], store),
+      blockedTrips: blockedRoundTrips([one, other], store),
+      a1,
+      dictionary: fixtureDictionary,
+      keyRows: keyRowsFixture,
+    }).sources.A1;
+    expect(figures.roundTrip).toEqual(share(0, 2));
+    expect(figures.roundTripWaiting).toBe(0);
+  });
+
+  it("reads every run of a kind unless --runs names one of it", () => {
+    const all = ["t3a", "t3b"];
+    expect(namedRuns(undefined, all)).toEqual(all);
+    // --runs naming only new-text runs leaves task 3 unfiltered.
+    expect(namedRuns(["new1", "new2"], all)).toEqual(all);
+    expect(namedRuns(["new1", "t3b"], all)).toEqual(["t3b"]);
+    // And the other way: naming only a task-3 run leaves the new text's.
+    const newText = ["new1", "new2"];
+    expect(namedRuns(["t3b"], newText)).toEqual(newText);
+    expect(namedRuns(["t3b", "new2"], newText)).toEqual(["new2"]);
+  });
+
   it("round-trips each translation once, and only the one asked about", () => {
     const out = tempOut();
     const one = candidate("A1", sentences[0], a1.get("T01") ?? []);
@@ -1143,6 +1538,7 @@ describe("task 3's scoring", () => {
     expect(mergeRoundTrips(out, run, [one, other])).toEqual({
       added: 1,
       left: [other.id],
+      blocked: [],
     });
     const store = readJson<RoundTripStore>(
       roundTripStorePath(out),
@@ -1164,7 +1560,82 @@ describe("task 3's scoring", () => {
       60,
     );
     expect(pool.candidates.filter((one) => one.damage)).toHaveLength(15);
+    expect(pool.candidates.filter((one) => one.original)).toHaveLength(15);
+    expect(pool.controlsFrom).toEqual({ passages: 38, units: 19 });
     expect(blindId("A1", "T01")).not.toBe(blindId("A1", "T02"));
+    // The judges' check is never round-tripped.
+    const specs = roundTripSpecs(pool.candidates, {}, opus, "medium");
+    const asked = new Set(specs.flatMap((one) => one.input.map((i) => i.id)));
+    expect(asked.size).toBe(60);
+    for (const one of pool.candidates)
+      expect(asked.has(one.id)).toBe(one.source === "A1");
+  });
+
+  it("gives each kind of sentence its own figures", () => {
+    const kinds: Task3Sentence[] = [
+      { id: "T01", kind: "practitioner", english: "I am the earth" },
+      { id: "T02", kind: "everyday", english: "be friendly unto me" },
+      { id: "T03", kind: "attested", english: "God of the earth" },
+      { id: "T04", kind: "attested", english: "the earth" },
+    ];
+    const list = kinds.map((one) =>
+      candidate("run:A3 opus medium", one, [item("OL", "I", "OL")]),
+    );
+    const text = translationText(list[0].items);
+    const rubric = new Map(
+      list.map((one, i) => [
+        one.id,
+        {
+          answer: text,
+          outcome: i === 1 ? ("rejected" as const) : ("correct" as const),
+        },
+      ]),
+    );
+    const trips = new Map(list.map((one) => [one.id, "back"]));
+    const roundTrip = new Map(
+      list.slice(0, 3).map((one, i) => [
+        `${one.id}-rt`,
+        {
+          answer: "back",
+          outcome: i === 2 ? ("rejected" as const) : ("correct" as const),
+        },
+      ]),
+    );
+    const figures = task3Report({
+      candidates: list,
+      sentences: kinds,
+      rubric,
+      roundTrip,
+      roundTrips: trips,
+      a1,
+      dictionary: fixtureDictionary,
+      keyRows: keyRowsFixture,
+    }).sources["run:A3 opus medium"];
+    expect(Object.keys(figures.byKind)).toEqual([
+      "practitioner",
+      "everyday",
+      "attested",
+    ]);
+    expect(figures.byKind.practitioner).toMatchObject({
+      sentences: 1,
+      accepted: share(1, 1),
+      roundTrip: share(1, 1),
+    });
+    expect(figures.byKind.everyday.accepted).toEqual(share(0, 1));
+    expect(figures.byKind.attested).toMatchObject({
+      sentences: 2,
+      accepted: share(2, 2),
+      roundTrip: share(0, 2),
+      roundTripWaiting: 1,
+    });
+    expect(figures.accepted).toEqual(share(3, 4));
+    expect(figures.roundTrip).toEqual(share(2, 4));
+    // The round trip's bar is on practitioner and attested: 1 of 3.
+    expect(barredRoundTrip(figures)).toEqual({
+      measured: share(1, 3),
+      waiting: 1,
+      absent: [],
+    });
   });
 });
 
@@ -1225,14 +1696,21 @@ describe("the new text's bars", () => {
       blocked: { calls: 40, blocked: 2 },
     });
     const by = Object.fromEntries(bars.map((one) => [one.id, one]));
-    // A3 478 of 500; A1k 492 of 500 less 2 points: 482 rows. Not met.
+    // A3 478 of 500 against the settled 96.8%: 484 rows. Not met.
     expect(by.toEnglish.measured).toEqual(share(478, 500));
-    expect(by.toEnglish.line).toBeCloseTo(482, 6);
-    expect(by.toEnglish.met).toBe(false);
-    expect(by.toEnglish.marginal).toBe(false);
+    expect(by.toEnglish).toMatchObject({
+      line: 484,
+      needs: 484,
+      met: false,
+      marginal: false,
+    });
+    // A1k is context only, beside the rule.
+    expect(by.toEnglish.rule).toMatch(
+      /\(484 of 500\) \(A1k on the same rows: 492 of 500, 98\.4%\)\.$/,
+    );
     // Swapped 108 of 120: exactly the bar, met and marginal.
     expect(by.swappedRight).toMatchObject({ met: true, marginal: true });
-    expect(by.recalled).toMatchObject({ met: true, marginal: true });
+    expect(by.recalled).toMatchObject({ met: true, marginal: true, needs: 6 });
     expect(by.plantFailures1).toMatchObject({ met: true, marginal: true });
     expect(by.knownsRight).toMatchObject({ met: true, marginal: true });
     // 31 of 40 joins: under 32, within one row.
@@ -1261,18 +1739,145 @@ describe("the new text's bars", () => {
       "task3AttestedForms",
       "blocked",
     ]);
+    // The rules are the settled bars' own.
+    for (const one of bars)
+      expect(
+        TRANSLATOR_BARS.some((bar) =>
+          one.rule.startsWith(bar.rule.replace(/\.$/, "")),
+        ),
+      ).toBe(true);
   });
 
-  it("take their values from the caller", () => {
-    const { bars } = measureNewTextBars(
-      { a3Task1: a3, a1kTask1: a1k },
-      { toEnglishMargin: 0.05, joinsRight: 0.75 },
+  it("draw exact lines: 484 of 500 meets the bar, 483 doesn't", () => {
+    const rows = (right: number) =>
+      reportOf([
+        ["unchanged", "correct", right],
+        ["unchanged", "rejected", 500 - right],
+      ]);
+    const toEnglish = (right: number) =>
+      measureNewTextBars({ a3Task1: rows(right) }).bars[0];
+    expect(toEnglish(484)).toMatchObject({ met: true, marginal: true });
+    expect(toEnglish(483)).toMatchObject({ met: false, marginal: true });
+    expect(toEnglish(485)).toMatchObject({ met: true, marginal: true });
+    expect(toEnglish(482)).toMatchObject({ met: false, marginal: false });
+    const toEnochian = (right: number) =>
+      measureNewTextBars({ a3Task2: rows(right) }).bars[1];
+    expect(toEnochian(465).met).toBe(true);
+    expect(toEnochian(464).met).toBe(false);
+    // Marginal: within one row of the line, either side.
+    const swapped = (right: number) =>
+      measureNewTextBars({
+        a3Task1: reportOf([
+          ["swapped", "correct", right],
+          ["swapped", "rejected", 120 - right],
+        ]),
+      }).bars.find((one) => one.id === "swappedRight");
+    expect(swapped(106)).toMatchObject({ met: false, marginal: false });
+    expect(swapped(107)).toMatchObject({ met: false, marginal: true });
+    expect(swapped(108)).toMatchObject({ met: true, marginal: true });
+    expect(swapped(110)).toMatchObject({ met: true, marginal: false });
+    // Whole-number lines where floating point would slip: A1k's 96% less
+    // 3 points, times 500 rows, is 464.99999999999994.
+    expect((0.96 - 0.03) * 500).not.toBe(465);
+    expect(countLine(barById("toEnochian"), 500)).toBe(465);
+    expect(countLine(barById("toEnglish"), 500)).toBe(484);
+    expect(countLine(barById("task3RoundTrip"), 40)).toBe(27);
+    expect(countLine(barById("task3Accept"), 60)).toBe(40);
+    expect(countLine(barById("recalled"), 120)).toBe(6);
+    expect(countLine(barById("recalled"), 119)).toBe(5);
+  });
+
+  it("scale the knowns' line with a top-up, A0 on its own 20", () => {
+    const knowns = (right: number, rows: number) =>
+      reportOf([
+        ["known", "correct", right],
+        ["known", "unknown", rows - right],
+      ]);
+    const bar = (a3: NewTextReport, a0Report = a0) =>
+      measureNewTextBars({ a3Task1: a3, a0Task1: a0Report }).bars.find(
+        (one) => one.id === "knownsRight",
+      );
+    expect(bar(knowns(18, 20))).toMatchObject({ met: true, needs: 18 });
+    // Pooled with a top-up's 7: 90% of 27 is 25 rows, not 18.
+    expect(bar(knowns(18, 27))).toMatchObject({ met: false, needs: 25 });
+    expect(bar(knowns(25, 27))).toMatchObject({ met: true, needs: 25 });
+    // A0 over 1, or on other than the main set's 20: not met, or not measured.
+    expect(bar(knowns(20, 20), knowns(2, 20))?.met).toBe(false);
+    expect(bar(knowns(20, 20), knowns(1, 27))).toMatchObject({
+      met: undefined,
+      unmeasurable: expect.stringMatching(/27 knowns, not the 20/),
+    });
+    // No A0 yet: the model's count shows, with why it isn't decided.
+    const noA0 = measureNewTextBars({ a3Task1: knowns(19, 20) }).bars.find(
+      (one) => one.id === "knownsRight",
     );
-    const by = Object.fromEntries(bars.map((one) => [one.id, one]));
-    expect(by.toEnglish.met).toBe(true);
-    expect(by.joinsRight.met).toBe(true);
-    expect(() => barValues({ nonsense: 1 } as never)).toThrow(/not a bar/);
-    expect(barValues()).toEqual(PROPOSED_NEW_BARS);
+    expect(noA0).toMatchObject({
+      measured: share(19, 20),
+      met: undefined,
+      unmeasurable: "no A0 task 1",
+    });
+  });
+
+  it("fail closed: no rows, other rows than set, or no A3 yet", () => {
+    // No rows: unmeasurable, never met.
+    const empty = measureNewTextBars({ a3Task1: reportOf([]) }).bars.find(
+      (one) => one.id === "joinsRight",
+    );
+    expect(empty?.unmeasurable).toBe("no rows to measure");
+    expect(empty?.met).toBeUndefined();
+    // Task 3 on 59 sentences, or with a barred kind missing.
+    const short = task3Figures(40, [14, 0, 13]);
+    short.accepted = share(40, 59);
+    const by = Object.fromEntries(
+      measureNewTextBars({
+        task3: { a3: short, controlsWaiting: 0 },
+      }).bars.map((one) => [one.id, one]),
+    );
+    expect(by.task3Accept.unmeasurable).toMatch(
+      /measured on 59 rows, not the 60/,
+    );
+    const noAttested = task3Figures(40, [14, 0, 13]);
+    delete (noAttested.byKind as Record<string, unknown>).attested;
+    expect(
+      measureNewTextBars({
+        task3: { a3: noAttested, controlsWaiting: 0 },
+      }).bars.find((one) => one.id === "task3RoundTrip")?.unmeasurable,
+    ).toBe("no attested sentences in task 3");
+    // Blocked calls: nothing until Opus A3 has run on the new text.
+    const blocked = (inputs: Parameters<typeof measureNewTextBars>[0]) =>
+      measureNewTextBars(inputs).bars.find((one) => one.id === "blocked");
+    const early = blocked({ blocked: { calls: 3, blocked: 0 } });
+    expect(early?.unmeasurable).toBe("no Opus A3 run on the new text yet");
+    expect(early?.met).toBeUndefined();
+    expect(
+      blocked({ a3Task1: a3, blocked: { calls: 40, blocked: 2 } }),
+    ).toMatchObject({ met: true });
+  });
+
+  it("are set on the rows the new text and task 3 hold", () => {
+    const kinds = (kind: string) => rows.filter((one) => one.kind === kind);
+    const planned = (id: Parameters<typeof barById>[0]) => barById(id).planned;
+    expect(planned("toEnglish")).toBe(
+      kinds("unchanged").length + kinds("swapped").length,
+    );
+    expect(planned("toEnochian")).toBe(planned("toEnglish"));
+    expect(planned("swappedRight")).toBe(kinds("swapped").length);
+    expect(planned("recalled")).toBe(kinds("swapped").length);
+    expect(planned("plantFailures")).toBe(kinds("plant").length);
+    expect(planned("knownsRight")).toBe(kinds("known").length);
+    expect(planned("knownsRight")).toBe(set.plantedKnowns.length);
+    expect(planned("joinsRight")).toBe(kinds("join").length);
+    expect(planned("task3Accept")).toBe(task3.length);
+    const sentenceKinds = new Set(task3.map((one) => one.kind));
+    for (const kind of ROUND_TRIP_KINDS) expect(sentenceKinds).toContain(kind);
+    expect(planned("task3RoundTrip")).toBe(
+      task3.filter((one) => ROUND_TRIP_KINDS.includes(one.kind)).length,
+    );
+    expect([...sentenceKinds].sort()).toEqual([
+      "attested",
+      "everyday",
+      "practitioner",
+    ]);
   });
 
   it("refuse rows still waiting for the judges, and failed controls", () => {
@@ -1285,32 +1890,7 @@ describe("the new text's bars", () => {
       a1kTask1: a1k,
       a0Task1: a0,
       task3: {
-        a3: {
-          sentences: 60,
-          accepted: share(50, 60),
-          roundTrip: share(50, 60),
-          attestedForms: share(95, 100),
-          waiting: 0,
-          roundTripWaiting: 0,
-          missing: 0,
-          silentInventions: 0,
-          items: 500,
-          agreed: 60,
-          split: 0,
-        },
-        a1: {
-          sentences: 60,
-          accepted: share(30, 60),
-          roundTrip: share(55, 60),
-          attestedForms: share(100, 100),
-          waiting: 0,
-          roundTripWaiting: 0,
-          missing: 0,
-          silentInventions: 0,
-          items: 400,
-          agreed: 60,
-          split: 0,
-        },
+        a3: task3Figures(50, [20, 20, 20]),
         controlsUnmeasurable:
           "the judges accepted 4 of 15 damaged controls, more than a fifth",
       },
@@ -1319,36 +1899,95 @@ describe("the new text's bars", () => {
     expect(by.toEnglish.unmeasurable).toMatch(/3 rows still waiting/);
     expect(by.swappedRight.unmeasurable).toMatch(/waiting/);
     expect(by.task3Accept.unmeasurable).toMatch(/damaged controls/);
+    expect(by.task3RoundTrip.unmeasurable).toMatch(/damaged controls/);
     expect(by.task3AttestedForms).toMatchObject({ met: true });
+    const later = measureNewTextBars({
+      task3: { a3: task3Figures(50, [20, 20, 20]), controlsWaiting: 3 },
+    }).bars;
+    expect(later.find((one) => one.id === "task3Accept")?.unmeasurable).toMatch(
+      /3 damaged controls or originals still waiting/,
+    );
   });
 
-  it("put the round trip's line at two thirds or A1 less 10 points", () => {
-    const figures = (accepted: number, kept: number) => ({
-      sentences: 60,
-      accepted: share(accepted, 60),
-      roundTrip: share(kept, 60),
-      attestedForms: share(1, 1),
-      waiting: 0,
-      roundTripWaiting: 0,
-      missing: 0,
-      silentInventions: 0,
-      items: 100,
-      agreed: 60,
-      split: 0,
+  it("bar task 3 on two thirds of 60, and the round trip on 40", () => {
+    const bars = (accepted: number, kept: [number, number, number]) =>
+      Object.fromEntries(
+        measureNewTextBars({
+          task3: { a3: task3Figures(accepted, kept), controlsWaiting: 0 },
+        }).bars.map((one) => [one.id, one]),
+      );
+    // Accept: 40 of 60 meets two thirds, 39 doesn't. No A1 needed.
+    expect(bars(40, [0, 0, 0]).task3Accept).toMatchObject({
+      met: true,
+      needs: 40,
+      marginal: true,
     });
-    const { bars } = measureNewTextBars({
-      task3: { a3: figures(45, 50), a1: figures(30, 60), controlsWaiting: 0 },
+    expect(bars(39, [0, 0, 0]).task3Accept.met).toBe(false);
+    // Round trip: practitioner and attested only, 27 of 40.
+    expect(bars(40, [14, 0, 13]).task3RoundTrip).toMatchObject({
+      measured: share(27, 40),
+      needs: 27,
+      met: true,
     });
-    const by = Object.fromEntries(bars.map((one) => [one.id, one]));
-    // A1 50% + 15 points = 65% of 60 = 39; A3 45: met.
-    expect(by.task3Accept).toMatchObject({ met: true });
-    expect(by.task3Accept.line).toBeCloseTo(39, 6);
-    // A1 100% − 10 points = 90% of 60 = 54, above two thirds; A3 50: not met.
-    expect(by.task3RoundTrip.line).toBeCloseTo(54, 6);
-    expect(by.task3RoundTrip.met).toBe(false);
+    expect(bars(40, [13, 20, 13]).task3RoundTrip).toMatchObject({
+      measured: share(26, 40),
+      met: false,
+    });
+    // Waiting everyday round trips don't hold the bar up.
+    const waitingEveryday = task3Figures(40, [14, 0, 13]);
+    waitingEveryday.byKind.everyday.roundTripWaiting = 20;
+    expect(
+      measureNewTextBars({
+        task3: { a3: waitingEveryday, controlsWaiting: 0 },
+      }).bars.find((one) => one.id === "task3RoundTrip")?.met,
+    ).toBe(true);
+    // A1 is context beside the rule.
+    const withA1 = measureNewTextBars({
+      task3: {
+        a3: task3Figures(40, [14, 0, 13]),
+        a1: task3Figures(2, [0, 0, 0]),
+        controlsWaiting: 0,
+      },
+    }).bars.find((one) => one.id === "task3Accept");
+    expect(withA1?.rule).toMatch(/\(40\) \(A1: 2 of 60\)\.$/);
     expect(difference(share(1, 2), share(1, 2)).difference).toBe(0);
   });
 });
+
+/**
+ * Task-3 figures for 60 sentences, 20 of each kind: `accepted` in all, and
+ * round trips kept for practitioner, everyday and attested in turn.
+ */
+function task3Figures(
+  accepted: number,
+  [practitioner, everyday, attested]: [number, number, number],
+) {
+  const group = (kept: number) => ({
+    sentences: 20,
+    accepted: share(0, 20),
+    roundTrip: share(kept, 20),
+    waiting: 0,
+    roundTripWaiting: 0,
+  });
+  return {
+    sentences: 60,
+    accepted: share(accepted, 60),
+    roundTrip: share(practitioner + everyday + attested, 60),
+    attestedForms: share(95, 100),
+    waiting: 0,
+    roundTripWaiting: 0,
+    missing: 0,
+    silentInventions: 0,
+    items: 500,
+    agreed: 60,
+    split: 0,
+    byKind: {
+      practitioner: group(practitioner),
+      everyday: group(everyday),
+      attested: group(attested),
+    },
+  };
+}
 
 describe("offline prices", () => {
   it("follow the plan: a cached read at a twentieth, batch at half", () => {

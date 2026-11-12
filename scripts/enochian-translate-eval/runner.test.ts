@@ -7,11 +7,11 @@ import realDictionary from "magick-data/enochian/dictionary";
 import keys from "magick-data/enochian/keys";
 import { afterEach, describe, expect, it } from "vitest";
 import { type AnswerItem, alignItems } from "./answer.ts";
-import { measureBars } from "./bars.ts";
 import { a1Scores, markHard } from "./baseline.ts";
 import { cipher } from "./cipher.ts";
 import { serialiseContext } from "./context.ts";
 import { entry, row } from "./fixtures.ts";
+import { measureBars } from "./heldout-bars.ts";
 import {
   applyVerdicts,
   foldVerdicts,

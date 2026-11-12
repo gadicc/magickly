@@ -1,4 +1,11 @@
 import {
+  type BarId,
+  barById,
+  countLine,
+  ROUND_TRIP_KINDS,
+  type TranslatorBar,
+} from "../../src/app/enochian/translate/bars.ts";
+import {
   type FigureGroup,
   type NewFigures,
   type Share,
@@ -8,76 +15,13 @@ import {
 import type { Task3Figures } from "./task3.ts";
 
 /**
- * Measuring the bars for the new text (plan 077, "Bars for the new text").
- * The values aren't settled: they are settled after A1 and A1k are scored
- * on the new text and before any model runs on it, then go into
- * `src/app/enochian/translate/bars.ts` in place of the withdrawn design's.
- * Until then they come in from the caller (`PROPOSED_NEW_BARS`, or a JSON
- * file of the same shape), and each bar is measured as a count over its
- * rows, with its Wilson interval, and called marginal within one row of its
- * line (one top-up may then decide it).
+ * Measuring the bars for the new text (plan 077, "Bars for the new text"),
+ * settled 12 November 2026. Their values live only in
+ * `src/app/enochian/translate/bars.ts`, and can't be overridden. Each bar is
+ * measured as a count over its rows, with its Wilson interval, against a
+ * line in whole rows, and called marginal within one row of the line (one
+ * top-up may then decide it).
  */
-
-/** Every bar's value, as plan 077's table proposes them. */
-export interface NewBarValues {
-  /** Task 1, unchanged and swapped rows: A1k's judged share less this. */
-  toEnglishMargin: number;
-  /** Task 2, unchanged and swapped rows: A1k's share less this. */
-  toEnochianMargin: number;
-  /** Task 1, swapped rows right: at least this share. */
-  swappedRight: number;
-  /** Task 1, swapped rows recalled: at most this share. */
-  recalled: number;
-  /** Plants given as attested or guessed without support: at most, each task. */
-  plantFailures: number;
-  /** Task 1, planted knowns right: at least this many rows. */
-  knownsRight: number;
-  /** ...with A0 right on at most this many. */
-  knownsA0: number;
-  /** Task 1, new joins right (both parts): at least this share. */
-  joinsRight: number;
-  /** Silent inventions per 100 rows (task 3: per 100 items), every task. */
-  silentPer100: number;
-  /** Task 3, both judges accept: A1's share plus this... */
-  task3AcceptMargin: number;
-  /** ...or this, whichever is lower. */
-  task3AcceptCap: number;
-  /** Task 3, round trip keeps the meaning: at least this share... */
-  task3RoundTrip: number;
-  /** ...and no more than this below A1's. */
-  task3RoundTripMargin: number;
-  /** Task 3, content words given an attested form where one exists. */
-  task3AttestedForms: number;
-  /** Opus translation calls blocked by the provider's filter: at most. */
-  blocked: number;
-}
-
-/** Plan 077's proposed values (12 November 2026). */
-export const PROPOSED_NEW_BARS: NewBarValues = {
-  toEnglishMargin: 0.02,
-  toEnochianMargin: 0.03,
-  swappedRight: 0.9,
-  recalled: 0.05,
-  plantFailures: 0.1,
-  knownsRight: 18,
-  knownsA0: 1,
-  joinsRight: 0.8,
-  silentPer100: 2,
-  task3AcceptMargin: 0.15,
-  task3AcceptCap: 0.9,
-  task3RoundTrip: 2 / 3,
-  task3RoundTripMargin: 0.1,
-  task3AttestedForms: 0.9,
-  blocked: 0.05,
-};
-
-/** Reads proposed values: any left out keep the plan's. */
-export function barValues(given: Partial<NewBarValues> = {}): NewBarValues {
-  for (const [name, value] of Object.entries(given))
-    if (!(name in PROPOSED_NEW_BARS) || typeof value !== "number")
-      throw new Error(`Bar value ${name}: not a bar, or not a number`);
-  return { ...PROPOSED_NEW_BARS, ...given };
-}
 
 /** A new-text report's groups, as `newReport` gives them. */
 export type NewTextReport = Record<FigureGroup, NewFigures>;
@@ -89,10 +33,10 @@ export interface NewBarInputs {
   a3Task2?: NewTextReport;
   /** Opus A0, task 1: the planted knowns' memory check and A3 − A0. */
   a0Task1?: NewTextReport;
-  /** A1k on the new text, task 1 judged. */
+  /** A1k on the same rows, for context only: the bars are fixed figures. */
   a1kTask1?: NewTextReport;
   a1kTask2?: NewTextReport;
-  /** Task 3's figures for Opus A3 and for A1, and the controls' verdict. */
+  /** Task 3's figures for Opus A3 (and A1, for context), and the controls. */
   task3?: {
     a3?: Task3Figures;
     a1?: Task3Figures;
@@ -101,10 +45,13 @@ export interface NewBarInputs {
      * counted, or too many accepted: `task3Report`), if they don't.
      */
     controlsUnmeasurable?: string;
-    /** Controls still waiting for both judges. */
+    /** Controls, or their originals, still waiting for both judges. */
     controlsWaiting?: number;
   };
-  /** Opus's translation calls, every attempt, and those blocked. */
+  /**
+   * Opus's translation calls, every attempt (round trips included), and
+   * those blocked. Measured only once A3 task 1 or 2 is in.
+   */
   blocked?: { calls: number; blocked: number };
 }
 
@@ -116,8 +63,10 @@ export interface NewBarMeasure {
   kind: "min" | "max";
   /** The count measured over its rows (or calls, or words). */
   measured?: Share;
-  /** The line in the same units: at least (min) or at most (max) this. */
+  /** The line in the same units, exactly: the bar's value times the rows. */
   line?: number;
+  /** The count the bar needs: at least (min) or at most (max) this. */
+  needs?: number;
   met?: boolean;
   /** Within one row of the line. */
   marginal?: boolean;
@@ -126,51 +75,56 @@ export interface NewBarMeasure {
 }
 
 const pct = (x: number) => `${Math.round(1000 * x) / 10}%`;
-const points = (x: number) => `${Math.round(1000 * x) / 10} points`;
 
-/** A bar on a count: met and marginal by the line in rows. */
-function measure(
+/**
+ * A bar on a count. Met and marginal are decided in whole numbers: the
+ * count against `countLine`, and the distance to the line (value × rows)
+ * as count × denominator against numerator × rows, so a figure exactly at
+ * the line can't come out a hair either side of it. It fails closed: with
+ * no rows, or (a bar on fixed rows) with other than the rows planned, it
+ * is unmeasurable, never met.
+ */
+export function measure(
   id: string,
-  rule: string,
-  kind: "min" | "max",
+  bar: TranslatorBar,
   measured: Share,
-  threshold: number,
+  rule = bar.rule,
 ): NewBarMeasure {
-  const line = threshold * measured.rows;
-  const epsilon = 1e-9;
+  if (!measured.rows)
+    return { ...missing(id, bar, "no rows to measure", rule), measured };
+  if (bar.fixedRows && measured.rows !== bar.planned)
+    return {
+      ...missing(
+        id,
+        bar,
+        `measured on ${measured.rows} rows, not the ${bar.planned} it is set on`,
+        rule,
+      ),
+      measured,
+    };
+  const [of, per] = bar.value;
+  const needs = countLine(bar, measured.rows);
+  // The line in units of 1/per of a row, and the count likewise.
+  const scaledLine = of * measured.rows;
+  const scaledCount = measured.count * per;
   return {
     id,
     rule,
-    kind,
+    kind: bar.kind,
     measured,
-    line,
-    met:
-      kind === "min"
-        ? measured.count >= line - epsilon
-        : measured.count <= line + epsilon,
-    marginal: Math.abs(measured.count - line) <= 1 + epsilon,
+    line: scaledLine / per,
+    needs,
+    met: bar.kind === "min" ? measured.count >= needs : measured.count <= needs,
+    marginal: Math.abs(scaledCount - scaledLine) <= per,
   };
 }
 
-/** A count-line bar (knowns: "at least 18 of 20"). */
-function measureCount(
+const missing = (
   id: string,
-  rule: string,
-  kind: "min" | "max",
-  measured: Share,
-  line: number,
-): NewBarMeasure {
-  return measure(
-    id,
-    rule,
-    kind,
-    measured,
-    measured.rows ? line / measured.rows : 0,
-  );
-}
-
-const missing = (id: string, rule: string, kind: "min" | "max", why: string) =>
-  ({ id, rule, kind, unmeasurable: why }) satisfies NewBarMeasure;
+  bar: TranslatorBar,
+  why: string,
+  rule = bar.rule,
+) => ({ id, rule, kind: bar.kind, unmeasurable: why }) satisfies NewBarMeasure;
 
 /** Why a task-1 report can't be used yet: rows still waiting for judges. */
 function waiting(name: string, report: NewTextReport | undefined) {
@@ -179,6 +133,20 @@ function waiting(name: string, report: NewTextReport | undefined) {
   return rows
     ? `${name}: ${rows} rows still waiting for the judges`
     : undefined;
+}
+
+/** A bar's rule with a note before its full stop: "… (task 1)." */
+const noted = (rule: string, note: string) =>
+  `${rule.replace(/\.$/, "")} (${note}).`;
+
+/** A1k's figure on the same rows, as context for a bar's rule. */
+function a1kContext(rule: string, report: NewTextReport | undefined) {
+  const right = report?.unchangedAndSwapped.right;
+  if (!right || report?.all.toJudge) return rule;
+  return noted(
+    rule,
+    `A1k on the same rows: ${right.count} of ${right.rows}, ${pct(right.share)}`,
+  );
 }
 
 /**
@@ -198,116 +166,105 @@ export function difference(a: Share, b: Share) {
   };
 }
 
+/** The round trip's barred sentences: the practitioner and attested ones. */
+export function barredRoundTrip(figures: Task3Figures): {
+  measured: Share;
+  waiting: number;
+  /** Barred kinds with no sentences in the figures. */
+  absent: string[];
+} {
+  let count = 0;
+  let rows = 0;
+  let waitingRows = 0;
+  const absent: string[] = [];
+  for (const kind of ROUND_TRIP_KINDS) {
+    const one = figures.byKind[kind];
+    if (!one?.sentences) {
+      absent.push(kind);
+      continue;
+    }
+    count += one.roundTrip.count;
+    rows += one.sentences;
+    waitingRows += one.roundTripWaiting;
+  }
+  return { measured: share(count, rows), waiting: waitingRows, absent };
+}
+
 /**
  * Every bar in the plan's table, in its order, from what has run; a bar
- * whose inputs are missing or still waiting for the judges says why. The
- * non-inferiority bars are on unchanged and swapped rows only, against
- * A1k's judged figure; A1k's own interval isn't carried into the line.
+ * whose inputs are missing or still waiting for the judges says why. A bar
+ * measured on each task on its own is one line per task.
  */
-export function measureNewTextBars(
-  inputs: NewBarInputs,
-  given: Partial<NewBarValues> = {},
-): {
+export function measureNewTextBars(inputs: NewBarInputs): {
   bars: NewBarMeasure[];
   a3MinusA0Swapped?: ReturnType<typeof difference> & { a3: Share; a0: Share };
 } {
-  const v = barValues(given);
+  const bar = (id: BarId) => barById(id);
   const bars: NewBarMeasure[] = [];
   const t1 = waiting("A3 task 1", inputs.a3Task1);
-  const k1 = waiting("A1k task 1", inputs.a1kTask1);
   const a3t1 = t1 ? undefined : inputs.a3Task1;
 
   {
-    const rule = `Enochian to English, unchanged and swapped rows: at least A1k's judged figure less ${points(v.toEnglishMargin)}`;
-    if (t1 || k1)
-      bars.push(missing("toEnglish", rule, "min", (t1 ?? k1) as string));
-    else {
-      const a1k = (inputs.a1kTask1 as NewTextReport).unchangedAndSwapped.right;
-      bars.push(
-        measure(
-          "toEnglish",
-          `${rule} (${pct(a1k.share)} − ${pct(v.toEnglishMargin)})`,
-          "min",
-          (a3t1 as NewTextReport).unchangedAndSwapped.right,
-          a1k.share - v.toEnglishMargin,
-        ),
-      );
-    }
-  }
-  {
-    const rule = `English to Enochian, unchanged and swapped rows: at least A1k's figure less ${points(v.toEnochianMargin)}`;
-    if (!inputs.a3Task2 || !inputs.a1kTask2)
-      bars.push(missing("toEnochian", rule, "min", "no A3 or A1k task 2"));
-    else {
-      const a1k = inputs.a1kTask2.unchangedAndSwapped.right;
-      bars.push(
-        measure(
-          "toEnochian",
-          `${rule} (${pct(a1k.share)} − ${pct(v.toEnochianMargin)})`,
-          "min",
-          inputs.a3Task2.unchangedAndSwapped.right,
-          a1k.share - v.toEnochianMargin,
-        ),
-      );
-    }
-  }
-  const task1 = (
-    id: string,
-    rule: string,
-    kind: "min" | "max",
-    pick: (r: NewTextReport) => Share,
-    threshold: number,
-  ) =>
+    const b = bar("toEnglish");
+    const rule = a1kContext(b.rule, inputs.a1kTask1);
     bars.push(
       a3t1
-        ? measure(id, rule, kind, pick(a3t1), threshold)
-        : missing(id, rule, kind, t1 as string),
+        ? measure(b.id, b, a3t1.unchangedAndSwapped.right, rule)
+        : missing(b.id, b, t1 as string, rule),
     );
-  task1(
-    "swappedRight",
-    `Swapped rows right, task 1: at least ${pct(v.swappedRight)}`,
-    "min",
-    (r) => r.swapped.right,
-    v.swappedRight,
-  );
-  task1(
-    "recalled",
-    `Recalled answers, task 1: at most ${pct(v.recalled)} of swapped rows`,
-    "max",
-    (r) => r.swapped.recalled,
-    v.recalled,
-  );
+  }
+  {
+    const b = bar("toEnochian");
+    const rule = a1kContext(b.rule, inputs.a1kTask2);
+    bars.push(
+      inputs.a3Task2
+        ? measure(b.id, b, inputs.a3Task2.unchangedAndSwapped.right, rule)
+        : missing(b.id, b, "no A3 task 2", rule),
+    );
+  }
+  const task1 = (id: BarId, pick: (r: NewTextReport) => Share) => {
+    const b = bar(id);
+    bars.push(a3t1 ? measure(id, b, pick(a3t1)) : missing(id, b, t1 as string));
+  };
+  task1("swappedRight", (r) => r.swapped.right);
+  task1("recalled", (r) => r.swapped.recalled);
   for (const [task, report] of [
     [1, inputs.a3Task1],
     [2, inputs.a3Task2],
   ] as const) {
+    const b = bar("plantFailures");
     const id = `plantFailures${task}`;
-    const rule = `Planted unknowns given as attested, or guessed without support, task ${task}: at most ${pct(v.plantFailures)}`;
+    const rule = noted(b.rule, `task ${task}`);
     bars.push(
       report
-        ? measure(id, rule, "max", report.plant.plantFailures, v.plantFailures)
-        : missing(id, rule, "max", `no A3 task ${task}`),
+        ? measure(id, b, report.plant.plantFailures, rule)
+        : missing(id, b, `no A3 task ${task}`, rule),
     );
   }
   {
-    const rule = `Planted knowns right, task 1: at least ${v.knownsRight}, with A0 at most ${v.knownsA0}`;
-    if (!a3t1) bars.push(missing("knownsRight", rule, "min", t1 as string));
+    const b = bar("knownsRight");
+    if (!a3t1) bars.push(missing(b.id, b, t1 as string));
     else {
-      const a3 = measureCount(
-        "knownsRight",
-        rule,
-        "min",
-        a3t1.known.right,
-        v.knownsRight,
-      );
+      const a3 = measure(b.id, b, a3t1.known.right);
       const a0w = waiting("A0 task 1", inputs.a0Task1);
-      if (a0w) bars.push({ ...a3, met: undefined, unmeasurable: a0w });
-      else {
-        const a0 = (inputs.a0Task1 as NewTextReport).known.right;
-        const a0ok = a0.count <= v.knownsA0;
+      const a0 = inputs.a0Task1?.known.right;
+      // A0 isn't topped up: its ceiling is on the main set's knowns.
+      const a0why =
+        a0w ??
+        (a0 && a0.rows !== b.planned
+          ? `A0 task 1 has ${a0.rows} knowns, not the ${b.planned} of the main set`
+          : undefined);
+      if (a3.unmeasurable || a0why)
         bars.push({
           ...a3,
-          rule: `${rule} (A0: ${a0.count} of ${a0.rows})`,
+          met: undefined,
+          unmeasurable: a3.unmeasurable ?? a0why,
+        });
+      else if (a0) {
+        const a0ok = a0.count <= (b.a0AtMost ?? 0);
+        bars.push({
+          ...a3,
+          rule: noted(b.rule, `A0: ${a0.count} of ${a0.rows}`),
           met: Boolean(a3.met) && a0ok,
           // Marginal on the model's count only: A0's ceiling is a check of
           // memory, not a bar a top-up could move.
@@ -316,128 +273,102 @@ export function measureNewTextBars(
       }
     }
   }
-  task1(
-    "joinsRight",
-    `New joins right, both parts, task 1: at least ${pct(v.joinsRight)}`,
-    "min",
-    (r) => r.join.right,
-    v.joinsRight,
-  );
+  task1("joinsRight", (r) => r.join.right);
+  const silent = bar("silentInventions");
   for (const [task, report] of [
     [1, inputs.a3Task1],
     [2, inputs.a3Task2],
   ] as const) {
     const id = `silentInventions${task}`;
-    const rule = `Silent inventions, task ${task}: at most ${v.silentPer100} per 100 rows`;
+    const rule = noted(silent.rule, `task ${task}`);
     bars.push(
       report
         ? measure(
             id,
-            rule,
-            "max",
+            silent,
             share(report.all.silentInventions, report.all.rows),
-            v.silentPer100 / 100,
+            rule,
           )
-        : missing(id, rule, "max", `no A3 task ${task}`),
+        : missing(id, silent, `no A3 task ${task}`, rule),
     );
   }
   const t3 = inputs.task3;
-  const t3why =
-    !t3?.a3 || !t3.a1
-      ? "no task 3 for A3 and A1"
-      : t3.controlsUnmeasurable
-        ? t3.controlsUnmeasurable
-        : t3.controlsWaiting
-          ? `${t3.controlsWaiting} damaged controls still waiting for the judges`
-          : t3.a3.waiting || t3.a1.waiting
-            ? "task-3 translations still waiting for the judges"
-            : undefined;
+  const a1 = t3?.a1;
+  // Both judged bars rest on the judges passing the controls.
+  const t3why = !t3?.a3
+    ? "no task 3 for A3"
+    : t3.controlsUnmeasurable
+      ? t3.controlsUnmeasurable
+      : t3.controlsWaiting
+        ? `${t3.controlsWaiting} damaged controls or originals still waiting for the judges`
+        : undefined;
   {
     const id = "silentInventions3";
-    const rule = `Silent inventions, task 3: at most ${v.silentPer100} per 100 words given`;
+    const rule = noted(silent.rule, "task 3");
     bars.push(
       t3?.a3
-        ? measure(
-            id,
-            rule,
-            "max",
-            share(t3.a3.silentInventions, t3.a3.items),
-            v.silentPer100 / 100,
-          )
-        : missing(id, rule, "max", "no task 3 for A3"),
+        ? measure(id, silent, share(t3.a3.silentInventions, t3.a3.items), rule)
+        : missing(id, silent, "no task 3 for A3", rule),
     );
   }
   {
-    const rule = `Task 3, both judges accept: at least A1's share plus ${points(v.task3AcceptMargin)}, or ${pct(v.task3AcceptCap)}, whichever is lower`;
-    if (t3why || !t3?.a3 || !t3.a1)
-      bars.push(missing("task3Accept", rule, "min", t3why as string));
-    else {
-      const line = Math.min(
-        t3.a1.accepted.share + v.task3AcceptMargin,
-        v.task3AcceptCap,
-      );
-      bars.push(
-        measure(
-          "task3Accept",
-          `${rule} (${pct(line)})`,
-          "min",
-          t3.a3.accepted,
-          line,
-        ),
-      );
-    }
-  }
-  {
-    const rule = `Task 3, round trip keeps the meaning: at least ${pct(v.task3RoundTrip)}, and no more than ${points(v.task3RoundTripMargin)} below A1`;
-    const tripWhy =
+    const b = bar("task3Accept");
+    const rule = a1
+      ? noted(b.rule, `A1: ${a1.accepted.count} of ${a1.accepted.rows}`)
+      : b.rule;
+    const why =
       t3why ??
-      (t3?.a3?.roundTripWaiting || t3?.a1?.roundTripWaiting
-        ? "round trips still waiting for the judges"
+      (t3?.a3?.waiting
+        ? `${t3.a3.waiting} task-3 translations still waiting for the judges`
         : undefined);
-    if (tripWhy || !t3?.a3 || !t3.a1)
-      bars.push(missing("task3RoundTrip", rule, "min", tripWhy as string));
-    else {
-      const line = Math.max(
-        v.task3RoundTrip,
-        t3.a1.roundTrip.share - v.task3RoundTripMargin,
-      );
-      bars.push(
-        measure(
-          "task3RoundTrip",
-          `${rule} (${pct(line)})`,
-          "min",
-          t3.a3.roundTrip,
-          line,
-        ),
-      );
-    }
-  }
-  {
-    const rule = `Task 3, content words given an attested form where one exists: at least ${pct(v.task3AttestedForms)}`;
     bars.push(
-      t3?.a3
-        ? measure(
-            "task3AttestedForms",
-            rule,
-            "min",
-            t3.a3.attestedForms,
-            v.task3AttestedForms,
-          )
-        : missing("task3AttestedForms", rule, "min", "no task 3 for A3"),
+      why || !t3?.a3
+        ? missing(b.id, b, why as string, rule)
+        : measure(b.id, b, t3.a3.accepted, rule),
     );
   }
   {
-    const rule = `Opus translation calls blocked by the provider's filter: at most ${pct(v.blocked)}, counted over every call`;
+    const b = bar("task3RoundTrip");
+    const a1Trip = a1 && barredRoundTrip(a1).measured;
+    const rule = a1Trip
+      ? noted(b.rule, `A1: ${a1Trip.count} of ${a1Trip.rows}`)
+      : b.rule;
+    const trip = t3?.a3 && barredRoundTrip(t3.a3);
+    const why =
+      t3why ??
+      (trip?.absent.length
+        ? `no ${trip.absent.join(" or ")} sentences in task 3`
+        : trip?.waiting
+          ? `${trip.waiting} round trips still waiting for the judges`
+          : undefined);
     bars.push(
-      inputs.blocked
-        ? measure(
-            "blocked",
-            rule,
-            "max",
-            share(inputs.blocked.blocked, inputs.blocked.calls),
-            v.blocked,
-          )
-        : missing("blocked", rule, "max", "no Opus translation calls"),
+      why || !trip
+        ? missing(b.id, b, why as string, rule)
+        : measure(b.id, b, trip.measured, rule),
+    );
+  }
+  {
+    const b = bar("task3AttestedForms");
+    bars.push(
+      t3?.a3
+        ? measure(b.id, b, t3.a3.attestedForms)
+        : missing(b.id, b, "no task 3 for A3"),
+    );
+  }
+  {
+    const b = bar("blocked");
+    // Only once Opus A3 has translated the new text: before then, the few
+    // calls made (a cache check, say) would pass it on nothing.
+    bars.push(
+      !inputs.a3Task1 && !inputs.a3Task2
+        ? missing(b.id, b, "no Opus A3 run on the new text yet")
+        : inputs.blocked
+          ? measure(
+              b.id,
+              b,
+              share(inputs.blocked.blocked, inputs.blocked.calls),
+            )
+          : missing(b.id, b, "no Opus translation calls"),
     );
   }
   const a0w = waiting("A0 task 1", inputs.a0Task1);

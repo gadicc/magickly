@@ -360,8 +360,9 @@ A4 can return in a later round if the grammar notes fall short.
 
 ### Models and budget (settled 11 November 2026, revised 12 November)
 
-The cap is **$100** for the whole experiment, of which $1.33 is spent
-(the probe and one test call). Prices checked 11 November 2026, per
+The cap is **$100** for the whole experiment, of which $2.95 is spent
+(the probe and one test call, $1.33, then lookup's judging and round
+trips on the new text and task 3; see "Running order"). Prices checked 11 November 2026, per
 million tokens in/out: Opus 5.5 $4/$20, Fable 5.2 $8/$40, Sonnet 5.5
 $2/$10, GPT-6.1 Sol $2/$10; batch halves them, and a cached prompt is
 read at a twentieth of the input price. Every call goes through Vercel
@@ -391,37 +392,53 @@ so A2 is about 101,000 characters and A3 about 130,000, roughly 74,000
 tokens at the runner's cautious 1.8 characters a token. Output, mostly
 thinking, is allowed 12,000 tokens a call at `medium`.
 
+What is left, as the runner projects it (`budget --offline`, 12 November
+2026, after steps 1 to 3 of the running order, 180 calls):
+
 | Part | With cache reads | Without |
 | --- | --- | --- |
 | The cache check (two A3 calls) | $1 | $1 |
-| Opus, tasks 1 and 2 (about 40 calls with context, 16 for A0) | $16 | $28 |
+| Opus, tasks 1 and 2 (about 40 calls with context, 16 for A0) | $16 | $26 |
 | Fable 5.2, A3 on 300 rows | $9 | $13 |
-| GPT-6.1 Sol, A3 on 300 rows | $3 | $4 |
-| Task 3: six translations and their round trips | $11 | $15 |
-| Judges, both families (about 375 task-3 judgements, and task-1 rows) | $11 | $14 |
-| The one top-up, if needed (see Scoring) | $5 | $8 |
-| **Total** | **about $56** | **about $83** |
+| GPT-6.1 Sol, A3 on 300 rows | $2 | $3 |
+| Task 3: five models' translations and their round trips | $12 | $16 |
+| Judges, both families (about 330 task-3 translations and 300 round trips, and task-1 rows) | $9 | $15 |
+| The one top-up, if needed (see Scoring) | $2 | $3 |
+| **Total** | **about $50** | **about $77** |
 
-The runner's own projection (`budget --offline`, 12 November 2026, 199
-calls) is $53 with cache reads and $80 without, close to the table;
-Fable at high effort is the part it puts higher. Both fit in the $98.67
-left, with room for blocked parts to be retried, but no call so far has
-read from the cache.
+It leaves out what is done (lookup's judging and round trips); the
+judges' check is in it, its 30 candidates among the rubric's. Both
+totals fit in the $97.05 left, with
+room for blocked parts to be retried. Only the judges' calls have read
+from the cache so far: after each judge's first rubric call, about
+57,000 of Opus's 63,000 input tokens, and 34,000 of GPT's 39,000, came
+from it. No translation call has yet.
 
 ### Running order
 
-1. A1 and A1k on the new text, and their to-judge rows judged (about
-   $0.50).
-2. Task 3 through A1: its round trips and its judging, with the damaged
-   controls (about $8).
-3. The bars settled from those figures, in `bars.ts` and this plan,
-   with the date. No model has translated the new text yet.
-4. **The cache check**: two A3 calls on the new text, checking that the
+Steps 1 to 3 are done (12 November 2026). Spent so far: $2.95 of the
+$100, the recall probe and the first test call included.
+
+1. Done: A1 and A1k on the new text, and their to-judge rows judged
+   ($0.15).
+2. Done: task 3 through A1, its round trips and its judging ($1.46).
+   The controls made from A1's translations couldn't be used (see
+   "Bars for the new text").
+3. Done: the bars settled from those figures, in `bars.ts` and this
+   plan, with the date. No model has translated the new text yet.
+4. **The judges' check**: the 15 pairs of Dee's passages and their 15
+   damaged copies, judged by both judges (`judge-task3`). Nothing else is sent:
+   A1's translations and round trips are already judged. The runner
+   projects $1.35, worst case $2.87; A1's judging cost about $0.09 a
+   call with the prompt cached, so about $0.60 is likely, the cache
+   being cold. If the controls fail, the task-3 bars can't be measured,
+   and that is known before any model runs.
+5. **The cache check**: two A3 calls on the new text, checking that the
    second reads the prompt from the cache; if it doesn't, Opus runs by
    batch.
-5. Opus A3 on all 600 rows, alone, and its cost checked against the
+6. Opus A3 on all 600 rows, alone, and its cost checked against the
    table above before anything else runs.
-6. Opus A0 and A2; the repeat and `high`-effort runs on 150 rows;
+7. Opus A0 and A2; the repeat and `high`-effort runs on 150 rows;
    Fable and GPT-6.1 on the first 30 sentences; task 3 on every model;
    then the judges.
 
@@ -450,29 +467,44 @@ yet:
   A round trip adds evidence that isn't a judge's opinion: a separate
   call, with no sight of the English, translates the Enochian back
   using only the dictionary, and both judges compare the two English
-  versions. A word-for-word lookup round-trips well by construction,
-  which is why the judges' bar is measured against A1's figure and the
-  round trip's is a floor (see the bars).
-- **The judges are checked.** About 15 deliberately damaged
-  translations go in among the task-3 answers, five each of wrong
-  attested words, unmarked coinages and a dropped clause. They are made
-  from A1's translations that have no unknown word (19 of its 60), so a
-  judge can't reject one merely for a hole. A control counts only when
-  both judges accepted the undamaged translation it was made from. If
-  fewer than 8 count, or the judges accept more than a fifth of those
-  that do, the task-3 bars can't be measured. A1's own translations
-  leave a third of their words unknown, so A1's accept share will be
-  low and "A1 plus 15 points" a modest bar; that is weighed when the
-  bars are settled.
-- **Judging context.** A1's translations and the controls are judged
-  together before any model runs; the models' are judged later, among
-  themselves, with the same rubric and the same verdict store. No answer
-  is judged beside the others from its sentence, so this shouldn't
-  matter, but the figures say so.
+  versions. The round trip is barred only on the practitioner and
+  attested sentences (see the bars).
+- **The judges are checked.** 15 stretches of Dee's own Enochian from
+  the new text go in among the task-3 answers, each with a damaged copy:
+  five each of a wrong attested word, an unmarked coinage and a dropped
+  clause, made by script with seed 77. A passage qualifies only if all
+  its rows are unchanged or swapped, none in the Golden Dawn's spelling;
+  38 do (only 7 whole sentences do). The script pairs them by seed, two
+  passages from different Keys, joined as the new text joins its
+  sentences: the first's rows, then the second's, their English
+  joined. No passage is used twice; the 38 make 19 pairs, and 15 are
+  used. The original is right by construction: each word is Dee's,
+  marked attested, citing its Key row, beside the English the new text
+  gives. A wrong word or a coinage replaces the word of a row whose
+  English has a content word, keeping the row's English, "attested" and
+  Key-row reference, so it reads as a misquote of that row, the way a
+  model would slip; nothing in its form sets it apart. A dropped clause
+  ends at the last clause end that keeps at least three rows and leaves
+  out at least two, or, failing one, keeps the first three fifths. The originals are judged blind like any translation,
+  with the same rubric and the same verdict store. A control counts
+  only when both judges accepted its original. If fewer than 8 count,
+  or the judges accept more than a fifth of those that do, the task-3
+  bars can't be measured. The first controls, made from A1's
+  translations, are dropped: the judges rejected 13 of their 15
+  originals, so only 2 counted.
+- **Judging context.** A1's translations were judged first; the
+  controls and their originals are judged next, among themselves; the
+  models' later, among themselves. Each round sends only what both
+  judges haven't ruled on, with the same rubric and the same verdict
+  store. No answer is judged beside the others from its sentence, so
+  this shouldn't matter, but the figures say so.
 - **Blocked replies.** A part the provider's filter blocks is retried
   once; if it is blocked again its rows count as wrong, and the number
-  of Opus translation calls blocked is reported against its bar. The probe had 5 of 38 replies blocked, and
-  a translator that is often blocked is no use to readers.
+  of Opus translation calls blocked is reported against its bar. The
+  same holds for a round trip: blocked twice, it is recorded as blocked,
+  never asked again, and counts as not keeping the meaning. The probe
+  had 5 of 38 replies blocked, and a translator that is often blocked
+  is no use to readers.
 - **Expert queue.** Anything the judges disagree on, and anything only
   an Enochian expert could settle, goes to a list (see "For an expert"
   below) instead of being decided by a model.
@@ -491,49 +523,97 @@ allowed, declared now: 200 more rows of the same mix (20 sentences),
 made by the same script with the next seed (78), run once on Opus A3
 and A1k, and the bar decided on all the rows together. There is no second top-up.
 
-### Bars for the new text (proposed 12 November 2026)
+### Bars for the new text (settled 12 November 2026)
 
 The bars of 11 November (below) were set for held-out Keys and can't be
-measured now. The new text gets its own, in the same file
+measured now. The new text has its own, settled on 12 November 2026,
+after A1 and A1k were scored on it and before any model translated it.
+They live in one file
 ([`src/app/enochian/translate/bars.ts`](../src/app/enochian/translate/bars.ts)),
-quoted word for word here by the same test, and shown on the translator
-page beside the measured figures. Proposed, for arm A3 on Opus:
+are quoted word for word here by `bars.test.ts`, and will be shown on
+the translator page beside the measured figures. All are for arm A3 on
+Opus:
 
-| Bar | Proposed | What it shows |
+| Bar | How it is measured | What it shows |
 | --- | --- | --- |
-| Enochian to English, unchanged and swapped rows | at least A1k's judged figure less 2 points | no worse than lookup |
-| English to Enochian, unchanged and swapped rows | at least A1k's figure less 3 points | no worse than lookup |
-| Swapped rows right, task 1 | at least 90% (108 of 120) | reads the word in front of it |
-| Recalled answers, task 1 | at most 5% of swapped rows (6 of 120) | not misled by memory |
-| Planted unknowns given as attested, or guessed without support | at most 10% (4 of 40), each task | honest about words that don't exist |
-| Planted knowns right, task 1 | at least 18 of 20, with A0 at most 1 | reads the prompt, not its memory |
-| New joins right, both parts, task 1 | at least 80% (32 of 40) | more than lookup: applies the grammar |
-| Silent inventions | at most 2 per 100 rows, every task | honest about its sources |
-| Task 3, both judges accept | at least A1's share plus 15 points, or 90%, whichever is lower | composes better than lookup |
-| Task 3, round trip keeps the meaning | at least two thirds, and no more than 10 points below A1 | the meaning survives |
-| Task 3, content words given an attested form where one exists | at least 90% (a floor: A1 scores 100% by construction) | uses our data when it can |
-| Opus translation calls blocked by the provider's filter | at most 5%, counted over every call | usable at all |
+| Enochian to English, unchanged and swapped rows: at least 96.8% (484 of 500). | Arm A3 on Opus, task 1, judged; a row the judges disagree on counts as wrong. A fixed figure: A1k's judged 98.8% (494 of 500) less 2 points. | no worse than lookup |
+| English to Enochian, unchanged and swapped rows: at least 93% (465 of 500). | Arm A3 on Opus, task 2. Right means Casaubon's form or the Equinox reading after normalising spelling. A fixed figure: A1k's 96.0% (480 of 500) less 3 points. | no worse than lookup |
+| Swapped rows right, task 1: at least 90% (108 of 120). | Arm A3 on Opus. Any gloss Dee gives the swapped-in word counts as right. | reads the word in front of it |
+| Recalled answers, task 1: at most 5% of swapped rows (6 of 120). | Arm A3 on Opus. An answer is recalled when it agrees with the word that stood there before the swap, and not with the key. | not misled by memory |
+| Planted unknowns given as attested, or guessed without support: at most 10% (4 of 40), each task. | Arm A3 on Opus, tasks 1 and 2, each on its own. A derived reading must cite a form of three letters or more found inside the word. | honest about words that don't exist |
+| Planted knowns right, task 1: at least 18 of 20 (90%), with A0 at most 1. | Arm A3 on Opus. The knowns are made-up words given a meaning only in the prompt's dictionary. With a top-up pooled in, the line is 90% of all the knowns. A0 is Opus with no context, on the 20 knowns of the main set. | reads the prompt, not its memory |
+| New joins right, both parts, task 1: at least 80% (32 of 40). | Arm A3 on Opus. A join is right only when both its parts are rendered. | more than lookup: applies the grammar |
+| Silent inventions: at most 2 per 100 rows, every task (task 3: per 100 words given). | Arm A3 on Opus, each task on its own. A silent invention is a word given as found in our data that isn't: the reference is missing or not in the context, or names another word. | honest about its sources |
+| Task 3, both judges accept: at least two thirds of all 60 sentences (40). | Arm A3 on Opus, judged by Opus and GPT-6.1 against the rubric; a missing translation counts as rejected. It is measured only if the judges pass the damaged controls. | composes well enough for the judges |
+| Task 3, round trip keeps the meaning: at least two thirds of the 40 practitioner and attested sentences (27 of 40). | Arm A3 on Opus. A separate call puts the Enochian back into English with only the dictionary, and both judges compare the two. The 20 everyday sentences are reported but not barred: a coined word can't survive a round trip through a dictionary. | the meaning survives |
+| Task 3, content words given an attested form where one exists: at least 90%. | Arm A3 on Opus. A word has a form where dictionary lookup (A1) finds one. A floor: A1 scores 100% by construction. | uses our data when it can |
+| Opus translation calls blocked by the provider's filter: at most 5%, counted over every call. | Every Opus translation call in the experiment: the cache check, every task, the repeats, the top-up and the round trips. It is measured once Opus A3 has run on the new text. | usable at all |
 
-These sizes give the bars some power. On 120 swapped rows, a model that
-is truly 95% right passes 99% of the time and one that is 85% right
-passes 7%; on 40 planted unknowns, one that claims 5% as attested passes
-95% of the time and one that claims 20% passes 8%; on 40 joins, one
-that is truly 70% right passes 11% of the time. The round trip is a
-floor rather than a margin over A1, because word-for-word lookup round
-trips almost perfectly by construction, and a model that follows the
-grammar notes (no articles, an unwritten "of") may round trip a little
-worse for being more Enochian.
+A bar is met on whole rows: 484 of 500 meets the first bar and 483
+doesn't. A figure within one row of its line is marginal (see Scoring).
+A top-up pooled in (see Scoring) moves each line with the rows, the
+knowns' too: 90% of 27 knowns is 25. A bar fails closed: with no rows
+to measure, or task 3 on other than its 60 sentences (40 for the round
+trip), it is unmeasurable, never met. The blocked-calls bar waits until
+Opus A3 has run on the new text.
 
-**They are settled after A1 and A1k are scored on the new text (task 3
-through A1 as well, judged), and before any model runs on it.** A1k's
-and A1's figures and the settled bars go into this plan and `bars.ts`
-together, with the date, so the bars can't be fitted to model results.
+The judges' check: 15 damaged controls, a third of each kind; at least 8 must count, and the judges may accept at most a fifth of those that do, or neither judged bar of task 3 can be measured.
+
+**Which run counts.** Each bar is measured on the first run of its arm.
+A part blocked twice counts as wrong and stands (see "Blocked
+replies"): a run is never replaced because of blocked parts. Parts
+that were never run, or whose call failed in transport (no reply), are
+finished in the same run: `run --resume RUN` sends the parts never run,
+and `run --retry-failed RUN` sends again every part whose reply didn't
+finish normally (a failed call, an error, or a first block, which is its
+one retry), but never one cut off at the length limit or blocked twice. A fresh run replaces a measured one
+only if this plan records why before its results are seen. The scorer
+refuses two runs of one arm on the same set unless one is named with
+`--runs`, so no run is chosen among complete ones by its results.
+
+**What they were set from** (12 November 2026, no model run):
+- A1k, task 1, judged: 494 of 500 unchanged and swapped rows right
+  (98.8%).
+- A1k, task 2: 480 of 500 (96.0%).
+- A1, task 3: both judges accepted 2 of 60 sentences (3.3%); the round
+  trip kept the meaning of 0 of 60; it gave an attested form for 196 of
+  the 196 content words that have one, with no silent inventions.
+
+The first two bars are now fixed figures: A1k's less 2 and 3 points.
+A1 and A1k are still reported beside the bars, as context.
+
+**Three changes to task 3, made with the bars:**
+- **The damaged controls come from the new text.** The first controls
+  were made from A1's translations, but the judges rejected 13 of their
+  15 originals for wrong senses and omissions, so only 2 counted and 8
+  were needed. The new controls are pairs of passages of Dee's own
+  Enochian, which are right by construction (see Scoring).
+- **The accept bar is absolute: two thirds of all 60 sentences.** It was
+  to be A1's share plus 15 points, or 90%. With A1 at 3.3%, that would
+  have been 18%, too low to mean anything.
+- **The round trip is barred on the 40 practitioner and attested
+  sentences only.** A coined word can't survive a round trip through a
+  dictionary, so everyday sentences, which need coinages, are reported
+  but not barred. The clause "no more than 10 points below A1" is
+  dropped: A1 scored 0.
+
+**Power.** On 120 swapped rows, a model that is truly 95% right passes
+99% of the time and one that is 85% right passes 7%; on 40 planted
+unknowns, one that claims 5% as attested passes 95% of the time and one
+that claims 20% passes 8%; on 40 joins, one that is truly 70% right
+passes 11% of the time. The two task-3 bars, by the exact binomial:
+
+| Bar | A model truly at 80% passes | At 55% |
+| --- | --- | --- |
+| Both judges accept 40 of 60 | 99.5% | 4.5% |
+| Round trip keeps 27 of 40 | 98.1% | 7.5% |
 
 What a pass means: the model is no worse than lookup on Dee's words, is
 honest, isn't misled by memory, reads our data for words it can't know,
-applies the grammar to new joins, and composes better than lookup by
-the judges' measure without losing meaning in the round trip. It does not mean the Enochian it writes is right: without an
-expert, nothing here can show that (see "For an expert").
+applies the grammar to new joins, and writes new sentences that both
+judges accept and whose meaning survives the round trip. It does not
+mean the Enochian it writes is right: without an expert, nothing here
+can show that (see "For an expert").
 
 If the planted knowns and joins pass but task 3 doesn't, the model reads our
 data but can't compose: the translator stays a lookup tool with a
@@ -559,14 +639,15 @@ task 2, with 130 more rows a synonym and 45 near.
 
 ### Thresholds (settled 11 November 2026)
 
-These bars were set for the held-out Keys. They stay in
-[`src/app/enochian/translate/bars.ts`](../src/app/enochian/translate/bars.ts)
-until the new text's bars replace them (see "Bars for the new text"),
-and are quoted here because `bars.test.ts` keeps the two equal: a bar
-changes in the code and here together, with a new date. The
-experiment's results are checked against them by `measureBars` in
-`scripts/enochian-translate-eval/bars.ts`. A bar that can't be measured
-on the results shows why, and is never counted as met.
+These bars were set for the held-out Keys. On 12 November the new
+text's bars took their place in `bars.ts` (see "Bars for the new
+text"); these moved to
+`scripts/enochian-translate-eval/heldout-bars.ts`, which serves the
+held-out-Key path still kept for other models. They are quoted here
+because `heldout-bars.test.ts` keeps the two equal. The results of
+that path are checked against them by `measureBars` in the same file.
+A bar that can't be measured on the results shows why, and is never
+counted as met.
 
 Build the LLM translator if all of these hold:
 
@@ -759,7 +840,7 @@ this list, which the experiment adds to as it runs:
    that Opus recites all 19 Keys, and revised as reviewed the same day:
    on Dee's words the bars are "no worse than lookup in the Keys"
    (A1k), and only the new joins and task 3 can show more. Its
-   bars are settled once A1 and A1k are scored on it.
+   bars were settled on 12 November, once A1 and A1k were scored on it.
 8. The translator page states its limitations as well as its figures,
    from one list in code that the plan quotes (Gadi, 12 November).
 
@@ -790,6 +871,16 @@ this list, which the experiment adds to as it runs:
   Cross-family judging, the round trip, the damaged controls and the
   expert queue limit this. They don't remove it, so task 3 alone never
   decides the build, and the page says so.
+- **Judges may know Dee.** The controls are Dee's own passages, and the
+  judges may recognise them. A judge that knows the passage spots the
+  damage more easily than it would spot a fault in new Enochian, so a
+  passing control check is a little weaker than it looks. The dropped
+  clauses are gross: three of the five keep only 3 rows (of 6, 6 and
+  11), so that check is easier than catching a model's subtle
+  omission. Each control
+  is two passages, so about the length of a task-3 sentence or a little
+  longer: 6 to 11 rows and 8 to 26 English words (16.5 on average),
+  against 7 to 17 words (10.3) in task 3.
 - **Expectations.** Beyond the Keys, any translation is reconstruction.
   The experiment measures how honest the model is about that, not only
   how accurate it is.

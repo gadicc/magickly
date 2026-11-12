@@ -2,7 +2,15 @@ import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { AnswerItem } from "./answer.ts";
 import { a1kNewText, a1NewText, a1Task3 } from "./baseline.ts";
-import type { JudgeCase, JudgedRows } from "./judge.ts";
+import {
+  foldVerdicts,
+  type JudgeCase,
+  type JudgedRows,
+  type JudgeRow,
+  sameAnswer,
+  type VerdictStore,
+  verdictKey,
+} from "./judge.ts";
 import {
   type Calibration,
   estimateCost,
@@ -47,9 +55,11 @@ import {
   runDir,
   runJudges,
   runsDir,
+  verdictStorePath,
   writeJson,
 } from "./runner.ts";
 import {
+  blockedRoundTrips,
   candidate,
   damagedControls,
   flatJudged,
@@ -65,11 +75,13 @@ import {
   roundTripsFor,
   rubricCases,
   rubricRequest,
+  rubricRow,
   type Task3Candidate,
   type Task3Report,
   task3Report,
   translationText,
 } from "./task3.ts";
+import type { KeyRowRecord } from "./testset.ts";
 import type { GenerationInfo, ModelRequest } from "./transport.ts";
 
 /**
@@ -620,7 +632,12 @@ export const BASELINE_ANSWERS = { A1: "A1-new-t1", A1k: "A1k-new-t1" } as const;
  * A1 and A1k on the new text, both tasks, scored, with the judges' verdicts
  * on their task-1 rows folded in (`newtext-baseline/judged.json`).
  */
-export function newBaselineScores(out: string, data: EvalData) {
+export function newBaselineScores(
+  out: string,
+  data: EvalData,
+  /** Leave the judges' verdicts out: every row the script can't settle stays to judge. */
+  withVerdicts = true,
+) {
   if (!data.newText) throw new Error("No new text loaded");
   const rows = newTextRows(data.newText);
   const dictionary = tasks12Dictionary(data);
@@ -636,7 +653,7 @@ export function newBaselineScores(out: string, data: EvalData) {
   const scored = Object.fromEntries(
     (["A1", "A1k"] as const).map((arm) => {
       const task1 = scoreNewText(rows, answers[arm].task1, 1, context);
-      applyNewVerdicts(task1, judged[BASELINE_ANSWERS[arm]]);
+      if (withVerdicts) applyNewVerdicts(task1, judged[BASELINE_ANSWERS[arm]]);
       return [
         arm,
         { task1, task2: scoreNewText(rows, answers[arm].task2, 2, context) },
@@ -700,6 +717,38 @@ export function task3RunCandidates(
   return out3;
 }
 
+/**
+ * The task-3 source a bar is measured on: the one source of the group
+ * ("A3 opus medium"), or none. Two runs of the group are refused, as
+ * `barGroup` refuses them for tasks 1 and 2: the one to measure is named
+ * with `--runs`, so a run is never chosen among complete ones by result.
+ */
+export function barSource(
+  sources: readonly string[],
+  group: string,
+): string | undefined {
+  const found = sources.filter((one) => one.endsWith(`:${group}`));
+  if (found.length > 1)
+    throw new Error(
+      `Task-3 runs ${found.map((one) => one.split(":")[0]).join(" and ")} both have ${group}: name the one to measure with --runs`,
+    );
+  return found[0];
+}
+
+/**
+ * The runs of one kind to read when `--runs` names some runs: those of the
+ * kind it names, or all of them when it names none of the kind (it named
+ * only the other kind's). Two runs of one arm are still refused, by
+ * `barGroup` (tasks 1 and 2) and `barSource` (task 3).
+ */
+export function namedRuns(
+  named: readonly string[] | undefined,
+  all: readonly string[],
+): string[] {
+  const mine = named?.filter((one) => all.includes(one)) ?? [];
+  return mine.length ? mine : [...all];
+}
+
 /** Every task-3 run in the output directory, oldest first. */
 export function task3Runs(out: string): string[] {
   const runs = runsDir(out);
@@ -713,8 +762,9 @@ export function task3Runs(out: string): string[] {
 }
 
 /**
- * Task 3's candidates: A1's, the damaged controls made from them, and every
- * named task-3 run's (all of them, by default).
+ * Task 3's candidates: A1's, the judges' check (damaged controls and their
+ * originals, from the new text) and every named task-3 run's (all of them,
+ * by default).
  */
 export function task3Pool(
   out: string,
@@ -726,14 +776,23 @@ export function task3Pool(
   const a1Candidates = sentences.map((one) =>
     candidate("A1", one, a1.get(one.id) ?? []),
   );
-  const controls = damagedControls(a1Candidates, data);
+  const check = data.newText
+    ? damagedControls(data.newText, data)
+    : { passages: 0, units: 0, originals: [], controls: [] };
   const fromRuns = runs.flatMap((run) =>
     task3RunCandidates(out, run, sentences),
   );
   return {
     a1,
-    candidates: [...a1Candidates, ...controls, ...fromRuns],
+    candidates: [
+      ...a1Candidates,
+      ...check.originals,
+      ...check.controls,
+      ...fromRuns,
+    ],
     runs: [...runs],
+    /** How many passages qualified for the controls, and the pairs made. */
+    controlsFrom: { passages: check.passages, units: check.units },
   };
 }
 
@@ -761,7 +820,7 @@ export function mergeRoundTrips(
   out: string,
   run: string,
   candidates: readonly Task3Candidate[],
-): { added: number; left: string[] } {
+): { added: number; left: string[]; blocked: string[] } {
   const dir = runDir(out, run);
   const manifest = readJson<Manifest>(join(dir, "manifest.json"));
   if (!manifest) throw new Error(`No run ${run}`);
@@ -769,6 +828,7 @@ export function mergeRoundTrips(
   const byId = new Map(candidates.map((one) => [one.id, one]));
   let added = 0;
   const left: string[] = [];
+  const blocked: string[] = [];
   for (const request of manifest.requests) {
     const spec = request.roundtrip;
     if (!spec) continue;
@@ -777,24 +837,69 @@ export function mergeRoundTrips(
       raw && !failedRaw(raw)
         ? parseRoundTrip(raw.text)
         : { english: new Map() };
+    // Blocked, and blocked again on its one retry: it stands (plan 077,
+    // "Blocked replies"), recorded so it is never asked again.
+    const stands =
+      raw !== undefined &&
+      isBlocked(raw) &&
+      blockedAttempts(dir, request.id) >= 2;
     for (const { id, enochian } of spec.input) {
       const one = byId.get(id);
-      const english = parsed.english.get(id);
-      if (!one || english === undefined) {
-        left.push(id);
-        continue;
-      }
       // Only for the translation it was asked about.
-      if (translationText(one.items) !== enochian) {
+      if (!one || translationText(one.items) !== enochian) {
         left.push(id);
         continue;
       }
-      store[roundTripKey(one)] = { english, run };
-      added++;
+      const english = parsed.english.get(id);
+      if (english !== undefined) {
+        store[roundTripKey(one)] = { english, run };
+        added++;
+      } else if (stands) {
+        store[roundTripKey(one)] = { english: "", run, blocked: true };
+        blocked.push(id);
+      } else left.push(id);
     }
   }
   writeJson(roundTripStorePath(out), store);
-  return { added, left };
+  return { added, left, blocked };
+}
+
+/** Where `refillFromStore` puts the rulings it takes from the store. */
+export const FROM_STORE_CASE = "T3J-from-store";
+
+/**
+ * Puts into `existing` (the rubric's saved verdicts, by case) every
+ * candidate's rulings that the verdict store has from both judges but the
+ * saved verdicts lack, under `FROM_STORE_CASE`. Returns how many.
+ */
+export function refillFromStore(
+  existing: Record<string, JudgedRows>,
+  candidates: readonly Task3Candidate[],
+  keyRows: readonly KeyRowRecord[],
+  store: VerdictStore,
+): number {
+  const rows = new Map(keyRows.map((row) => [row.id, row]));
+  const have = flatJudged(existing);
+  let added = 0;
+  for (const one of candidates) {
+    if (one.missing || !one.items.length) continue;
+    const row = rubricRow(one, rows);
+    const saved = store[verdictKey(row)];
+    const known = have.get(row.row);
+    if (!saved?.opus || !saved.gpt) continue;
+    if (known?.outcome && sameAnswer(known, row.answer)) continue;
+    existing[FROM_STORE_CASE] = {
+      ...existing[FROM_STORE_CASE],
+      [row.row]: {
+        answer: row.answer,
+        opus: saved.opus,
+        gpt: saved.gpt,
+        outcome: foldVerdicts(saved.opus, saved.gpt),
+      },
+    };
+    added++;
+  }
+  return added;
 }
 
 /** Task 3's judging: the rubric, then the round trips, both judges. */
@@ -814,11 +919,25 @@ export async function judgeTask3(
   const rubricPath = join(task3Dir(out), "judged-rubric.json");
   const tripPath = join(task3Dir(out), "judged-roundtrip.json");
   const before = runtime.ledger.total();
+  // Rulings the verdict store has but the rubric's file lacks (a crash
+  // between the two writes) are put back first; then only what both judges
+  // haven't ruled on is dealt into new cases, so a later round (the
+  // controls, a model's run) never sends again what an earlier one judged,
+  // nor mixes it in to make more calls. A row one judge left out is dealt
+  // again with what remains: it goes out as a new, smaller case (or under
+  // `-retry-N` if its case is unchanged), one call for each judge missing.
+  const verdicts = readJson<VerdictStore>(verdictStorePath(out)) ?? {};
+  const existing = readJson<Record<string, JudgedRows>>(rubricPath) ?? {};
+  refillFromStore(existing, options.candidates, options.data.rows, verdicts);
+  const done = (row: JudgeRow) => {
+    const saved = verdicts[verdictKey(row)];
+    return Boolean(saved?.opus && saved.gpt);
+  };
   const rubric = await runJudges(runtime, {
     run: "task3-rubric",
     dir: join(task3Dir(out), "judge-rubric"),
-    cases: rubricCases(options.candidates, options.data.rows),
-    existing: readJson<Record<string, JudgedRows>>(rubricPath) ?? {},
+    cases: rubricCases(options.candidates, options.data.rows, undefined, done),
+    existing,
     budget: options.budget,
     dryRun: options.dryRun,
     retry: options.retry,
@@ -837,7 +956,12 @@ export async function judgeTask3(
   const cases = roundTripCases(options.candidates, trips);
   if (!options.dryRun && !(left > 0)) {
     runtime.log("No budget left for the round trips' judges; run again.");
-    return { rubric, trips, cases };
+    return {
+      rubric,
+      trips,
+      cases,
+      blocked: blockedRoundTrips(options.candidates, store),
+    };
   }
   const roundTrip = await runJudges(runtime, {
     run: "task3-roundtrip-judge",
@@ -854,7 +978,13 @@ export async function judgeTask3(
     parse: parseRoundTripVerdicts,
   });
   if (!options.dryRun) writeJson(tripPath, roundTrip.judged);
-  return { rubric, roundTrip, trips, cases };
+  return {
+    rubric,
+    roundTrip,
+    trips,
+    cases,
+    blocked: blockedRoundTrips(options.candidates, store),
+  };
 }
 
 /** Task 3's figures from what is saved; written to `task3/report.json`. */
@@ -865,20 +995,24 @@ export function task3Summary(
   a1: ReadonlyMap<string, readonly AnswerItem[]>,
 ): Task3Report {
   const store = readJson<RoundTripStore>(roundTripStorePath(out)) ?? {};
+  // Rulings the verdict store has but the rubric's file lacks are put back
+  // here too, and saved: the file is derived from the store.
+  const rubricPath = join(task3Dir(out), "judged-rubric.json");
+  const rubric = readJson<Record<string, JudgedRows>>(rubricPath) ?? {};
+  const verdicts = readJson<VerdictStore>(verdictStorePath(out)) ?? {};
+  if (refillFromStore(rubric, candidates, data.rows, verdicts))
+    writeJson(rubricPath, rubric);
   const report = task3Report({
     candidates,
     sentences: data.task3 ?? [],
-    rubric: flatJudged(
-      readJson<Record<string, JudgedRows>>(
-        join(task3Dir(out), "judged-rubric.json"),
-      ) ?? {},
-    ),
+    rubric: flatJudged(rubric),
     roundTrip: flatJudged(
       readJson<Record<string, JudgedRows>>(
         join(task3Dir(out), "judged-roundtrip.json"),
       ) ?? {},
     ),
     roundTrips: roundTripsFor(candidates, store),
+    blockedTrips: blockedRoundTrips(candidates, store),
     a1,
     dictionary: data.dictionary,
     keyRows: data.rows,

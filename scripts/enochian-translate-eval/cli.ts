@@ -14,6 +14,7 @@ import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import dictionary from "magick-data/enochian/dictionary";
 import keys from "magick-data/enochian/keys";
+import { BARS_SETTLED } from "../../src/app/enochian/translate/bars.ts";
 import {
   a1kNewText,
   a1NewText,
@@ -53,7 +54,7 @@ import {
   OUTPUT_ALLOWANCE,
   shortName,
 } from "./models.ts";
-import { barValues, measureNewTextBars, type NewBarInputs } from "./newbars.ts";
+import { measureNewTextBars, type NewBarInputs } from "./newbars.ts";
 import {
   NEW_ARMS,
   type NewSpec,
@@ -68,10 +69,12 @@ import {
   BASELINE_ANSWERS,
   type BarRun,
   barGroup,
+  barSource,
   cacheCheck,
   cacheProjection,
   judgeTask3,
   mergeRoundTrips,
+  namedRuns,
   newBaselineDir,
   newBaselineJudgedPath,
   newBaselineScores,
@@ -83,15 +86,14 @@ import {
   scoreNewRequests,
   scoreNewRun,
   task3Pool,
+  task3Runs,
   task3Summary,
 } from "./newrunner.ts";
 import {
   applyNewVerdicts,
   FIGURE_GROUPS,
   type FigureGroup,
-  measureNewBar,
   type NewFigures,
-  type NewTextBar,
   newReport,
   newTextContext,
   scoreNewText,
@@ -156,10 +158,12 @@ import {
 } from "./runner.ts";
 import { joinScores, report } from "./score.ts";
 import {
+  isCheck,
   roundTripCases,
   roundTripJudgeRequest,
   rubricCases,
   rubricRequest,
+  type Task3Figures,
   type Task3Report,
 } from "./task3.ts";
 import {
@@ -493,8 +497,7 @@ function newTable(report: Record<FigureGroup, NewFigures>) {
 /**
  * A1 and A1k on the new text, both tasks, scored by script, with the judges'
  * verdicts on their task-1 rows where `judge-newtext-a1` has them; rows not
- * yet judged stay to judge. With `--bars FILE` (a JSON list
- * of `NewTextBar`), each bar is measured on both arms.
+ * yet judged stay to judge.
  */
 function newtextBaseline(out: string, v: Values) {
   const set = readNewText(v.set ?? NEWTEXT);
@@ -506,9 +509,6 @@ function newtextBaseline(out: string, v: Values) {
     A1: a1NewText(rows, shown, keyRows),
     A1k: a1kNewText(rows, shown, keyRows),
   };
-  const bars: NewTextBar[] = v.bars
-    ? JSON.parse(readFileSync(v.bars, "utf8"))
-    : [];
   const reports: Record<string, unknown> = {};
   // The judges' verdicts on their task-1 rows (`judge-newtext-a1`).
   const judged =
@@ -529,23 +529,11 @@ function newtextBaseline(out: string, v: Values) {
           judged[BASELINE_ANSWERS[arm as keyof typeof BASELINE_ANSWERS]],
         );
       const report = newReport(scores);
-      reports[`${arm}-task${task}`] = {
-        report,
-        bars: bars
-          .filter((bar) => bar.task === task)
-          .map((bar) => measureNewBar(report, bar)),
-        rows: scores.rows,
-      };
+      reports[`${arm}-task${task}`] = { report, rows: scores.rows };
       console.log(
         `\n${arm}, task ${task} (unaligned items ${report.unaligned})`,
       );
       console.table(newTable(report));
-      for (const bar of bars.filter((one) => one.task === task)) {
-        const r = measureNewBar(report, bar);
-        console.log(
-          `  bar ${bar.id}: ${r.measured.count} of ${r.measured.rows} (${withInterval(r.measured)}) ${bar.kind === "min" ? "≥" : "≤"} ${pct(bar.value)}: ${r.met ? "met" : "not met"}${r.marginal ? ", marginal" : ""}`,
-        );
-      }
     }
   const dir = newBaselineDir(out, set.seed);
   write(join(dir, "report.json"), json(reports));
@@ -1335,7 +1323,7 @@ function printAny(out: string, runId: string, probeRun?: string) {
     if (manifest.kind === "roundtrip") {
       const merged = mergeRoundTrips(out, runId, pool.candidates);
       console.log(
-        `Round trips saved: ${merged.added}${merged.left.length ? `; none for ${merged.left.length} (${merged.left.join(", ")})` : ""}.`,
+        `Round trips saved: ${merged.added}${merged.blocked.length ? `; blocked twice, counted as not keeping the meaning: ${merged.blocked.length} (${merged.blocked.join(", ")})` : ""}${merged.left.length ? `; none for ${merged.left.length} (${merged.left.join(", ")})` : ""}.`,
       );
     }
     return printTask3(task3Summary(out, data, pool.candidates, pool.a1));
@@ -1555,11 +1543,19 @@ async function judgeTask3Command(out: string, v: Values) {
     retry: Boolean(v["retry-failed"]),
   });
   const missing = pool.candidates.filter(
-    (one) => !one.damage && !one.missing && !result.trips.has(one.id),
+    (one) =>
+      !isCheck(one) &&
+      !one.missing &&
+      !result.trips.has(one.id) &&
+      !result.blocked.has(one.id),
   ).length;
   if (missing)
     console.log(
       `${missing} candidates have no round trip yet (run roundtrip first); their round trips aren't judged.`,
+    );
+  if (result.blocked.size)
+    console.log(
+      `${result.blocked.size} round trips were blocked twice: they count as not keeping the meaning and aren't judged.`,
     );
   for (const [name, one] of [
     ["rubric", result.rubric],
@@ -1583,7 +1579,19 @@ function task3ReportCommand(out: string, v: Values) {
   const data = evalData(out);
   const pool = task3Pool(out, data, runsOf(v.runs));
   printTask3(task3Summary(out, data, pool.candidates, pool.a1));
+  printControlsFrom(pool.controlsFrom);
 }
+
+/** What the controls were made from: pairs of the new text's passages. */
+function printControlsFrom(from: { passages: number; units: number }) {
+  console.log(
+    `The controls are made from pairs of the new text's passages from different Keys, joined as its sentences are; a passage qualifies with only unchanged and swapped rows, none in the Golden Dawn's spelling (${from.passages} qualify, making ${from.units} pairs).`,
+  );
+}
+
+/** A share as "2/60 3.3% [0.9%–11.4%]". */
+const countShare = (one: Task3Figures["accepted"]) =>
+  `${one.count}/${one.rows} ${withInterval(one)}`;
 
 function printTask3(report: Task3Report) {
   console.table(
@@ -1599,9 +1607,24 @@ function printTask3(report: Task3Report) {
       split: one.split,
     })),
   );
+  console.log("By kind of sentence:");
+  console.table(
+    Object.entries(report.sources).flatMap(([source, one]) =>
+      Object.entries(one.byKind).map(([kind, group]) => ({
+        source,
+        kind,
+        accepted: countShare(group.accepted),
+        "round trip": countShare(group.roundTrip),
+        waiting: group.waiting,
+        "round trip waiting": group.roundTripWaiting,
+      })),
+    ),
+  );
   const c = report.controls;
   console.log(
-    `Damaged controls: ${c.count} made (${Object.entries(c.byDamage)
+    `Damaged controls: ${c.count} made, with ${c.originals} undamaged originals (${Object.entries(
+      c.byDamage,
+    )
       .map(([kind, one]) => `${kind} ${one.count}`)
       .join(
         ", ",
@@ -1618,7 +1641,7 @@ function printTask3(report: Task3Report) {
 /** The new text's bars, from the runs named (all new-text runs by default). */
 function newBarsCommand(out: string, v: Values) {
   const data = evalData(out);
-  const runs = runsOf(v.runs) ?? runsOfKind(out, "newtext");
+  const runs = namedRuns(runsOf(v.runs), runsOfKind(out, "newtext"));
   const opus = MODELS.opus;
   // Each run with the data of its set: the committed one, or a top-up's.
   const sets = new Map<string, EvalData>([["", data]]);
@@ -1656,10 +1679,11 @@ function newBarsCommand(out: string, v: Values) {
   // A1k on the same sets as A3, each with its own judged rows.
   const a1k1 = a1kPooled(out, groups.a3Task1?.sets ?? [data]);
   const a1k2 = a1kPooled(out, groups.a3Task2?.sets ?? [data]);
-  const pool = task3Pool(out, data);
+  const pool = task3Pool(out, data, namedRuns(runsOf(v.runs), task3Runs(out)));
   const t3 = task3Summary(out, data, pool.candidates, pool.a1);
-  const a3Source = Object.keys(t3.sources).find((one) =>
-    one.endsWith(`:A3 ${shortName(opus)} medium`),
+  const a3Source = barSource(
+    Object.keys(t3.sources),
+    `A3 ${shortName(opus)} medium`,
   );
   const inputs: NewBarInputs = {
     a3Task1: groups.a3Task1?.report,
@@ -1687,20 +1711,24 @@ function newBarsCommand(out: string, v: Values) {
     ),
   };
   if (!inputs.blocked?.calls) delete inputs.blocked;
-  const values = barValues(
-    v.values ? JSON.parse(readFileSync(v.values, "utf8")) : {},
-  );
-  const result = measureNewTextBars(inputs, values);
+  const result = measureNewTextBars(inputs);
+  console.log(`The bars settled on ${BARS_SETTLED}:`);
   console.table(
     result.bars.map((one) => ({
       bar: one.id,
-      measured: one.measured
-        ? `${one.measured.count} of ${one.measured.rows} ${withInterval(one.measured)}`
-        : (one.unmeasurable ?? "not measured"),
-      line:
-        one.line === undefined
+      // A figure that can't be judged yet still shows, with why.
+      measured: [
+        one.measured
+          ? `${one.measured.count} of ${one.measured.rows} ${withInterval(one.measured)}`
+          : "",
+        one.unmeasurable ?? (one.measured ? "" : "not measured"),
+      ]
+        .filter(Boolean)
+        .join("; "),
+      needs:
+        one.needs === undefined
           ? ""
-          : `${one.kind === "min" ? "≥" : "≤"} ${one.line.toFixed(1)}`,
+          : `${one.kind === "min" ? "≥" : "≤"} ${one.needs} (line ${one.line?.toFixed(2)})`,
       met: one.met === undefined ? "–" : one.met ? "yes" : "no",
       marginal: one.marginal ? "marginal" : "",
     })),
@@ -1713,7 +1741,7 @@ function newBarsCommand(out: string, v: Values) {
     );
   write(
     join(out, "newbars.json"),
-    json({ values, inputs: { runs }, ...result }),
+    json({ settled: BARS_SETTLED, inputs: { runs }, ...result }),
   );
   console.log(`Written to ${join(out, "newbars.json")}`);
 }
@@ -1769,10 +1797,12 @@ async function budgetCommand(out: string, v: Values) {
       efforts: ["high"],
     }),
   ];
-  // Stand-ins: each of the six sources' candidates as long as A1's.
+  // Stand-ins: each of the five models' candidates as long as A1's. A1's
+  // own are judged and round-tripped already; the judges' check is the
+  // pool's own.
   const pool = task3Pool(out, data, []);
   const a1 = pool.candidates.filter((one) => one.source === "A1");
-  const sources = ["A1", "A0 opus", "A2 opus", "A3 opus", "A3 fable", "A3 gpt"];
+  const sources = ["A0 opus", "A2 opus", "A3 opus", "A3 fable", "A3 gpt"];
   const standIns = sources.flatMap((source) =>
     a1.map((one) => ({
       ...one,
@@ -1783,7 +1813,7 @@ async function budgetCommand(out: string, v: Values) {
   const roundTrips = roundTripPlan(out, standIns, data, opus, "medium").map(
     (one) => one.request,
   );
-  const controls = pool.candidates.filter((one) => one.damage);
+  const controls = pool.candidates.filter(isCheck);
   const rubric = rubricCases([...standIns, ...controls], data.rows);
   const trips = roundTripCases(
     standIns,
@@ -1800,9 +1830,10 @@ async function budgetCommand(out: string, v: Values) {
       judgeNames.map((j) => roundTripJudgeRequest(item, j)),
     ),
   ];
-  // Task 1's judges: each run's to-judge rows taken as A1k's on its rows.
+  // Task 1's judges: each run's to-judge rows taken as A1k's on its rows,
+  // as many as A1k sent before its verdicts were in.
   const baseline = newBaselineScores(out, data);
-  const a1kCase = baseline.cases.find(
+  const a1kCase = newBaselineScores(out, data, false).cases.find(
     (one) => one.answer === BASELINE_ANSWERS.A1k,
   );
   const a1kRows = a1kCase?.rows ?? [];
@@ -1879,7 +1910,7 @@ async function budgetCommand(out: string, v: Values) {
       "sync",
     ],
     [
-      "Task 3: six translations and their round trips",
+      "Task 3: five translations and their round trips",
       [...translations, ...roundTrips],
       "sync",
     ],
@@ -1974,14 +2005,12 @@ const OPTIONS = {
   seed: { type: "string" },
   set: { type: "string" },
   leitch: { type: "string" },
-  bars: { type: "string" },
   subset: { type: "string" },
   rows: { type: "string" },
   newtext: { type: "string" },
   offline: { type: "boolean" },
   prices: { type: "string" },
   runs: { type: "string" },
-  values: { type: "string" },
 } as const;
 
 type Values = Partial<
@@ -2002,7 +2031,7 @@ const USAGE = `usage: cli.ts <command> [options]
                                            offline: the new text, into data/;
                                            with --rows 200 --seed 78 --set
                                            FILE, the top-up set
-  newtext-baseline [--set FILE] [--bars FILE]
+  newtext-baseline [--set FILE]
                                            offline: A1 and A1k on it, with
                                            the judges' verdicts where given
   judge-newtext-a1 --budget USD [--dry-run] [--retry-failed]
@@ -2021,9 +2050,16 @@ const USAGE = `usage: cli.ts <command> [options]
                                            every task-3 run's)
   judge-task3 --budget USD [--runs RUN,…] [--dry-run] [--retry-failed]
                                            task 3's judges, blind, with the
-                                           damaged controls
+                                           damaged controls and their
+                                           originals; only what both judges
+                                           haven't ruled on is sent
   task3-report [--runs RUN,…]              offline: task 3's figures
-  newbars [--runs RUN,…] [--values FILE]   offline: the new text's bars
+  newbars [--runs RUN,…]                   offline: the new text's bars; with
+                                           two runs of one arm, name one (if
+                                           --runs names no new-text run, or
+                                           no task-3 run, every run of that
+                                           kind is read, and two of one arm
+                                           are still refused)
   run [--set folds] --keys K --model opus|fable|gpt --effort high,medium
       --arms A0,A2,A2c,A3 --tasks 1,2 --books open,closed
       --transport sync|batch --budget USD [--dry-run] [--label L]

@@ -1,5 +1,4 @@
-import type { BarResult } from "../../src/app/enochian/translate/bars.ts";
-import { formatBarValue } from "../../src/app/enochian/translate/bars.ts";
+import { type BarResult, formatBarValue } from "./heldout-bars.ts";
 import type { Report } from "./score.ts";
 
 /** How the CLI prints figures. */

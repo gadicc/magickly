@@ -13,7 +13,6 @@ import realDictionary from "magick-data/enochian/dictionary";
 import keys from "magick-data/enochian/keys";
 import { afterEach, describe, expect, it } from "vitest";
 import { type AnswerItem, checkContextFrom, checkItem } from "./answer.ts";
-import { a1Task3 } from "./baseline.ts";
 import { dictionary as fixtureDictionary, row } from "./fixtures.ts";
 import {
   Ledger,
@@ -75,6 +74,7 @@ import {
   candidate,
   DAMAGES,
   damagedControls,
+  ORIGINAL_SOURCE,
   type Task3Candidate,
   task3Report,
   translationText,
@@ -330,43 +330,52 @@ describe("H2: the planted knowns in the dictionary's order", () => {
 // --- H3: the damaged controls ---------------------------------------------------------
 
 describe("H3: damaged controls that test the judges", () => {
-  const a1 = a1Task3(task3, realDictionary, keyRows);
-  const a1Candidates = task3.map((one) =>
-    candidate("A1", one, a1.get(one.id) ?? []),
-  );
-  const controls = damagedControls(a1Candidates, {
+  const { originals, controls } = damagedControls(set, {
     dictionary: realDictionary,
     rows: keyRows,
   });
+  const rows = new Map(newTextRows(set).map((one) => [one.id, one]));
 
-  it("are made only from A1 translations with no unknown word", () => {
+  it("are made only from Dee's own words, right by construction", () => {
     expect(controls).toHaveLength(15);
     for (const damage of DAMAGES)
       expect(controls.filter((one) => one.damage === damage)).toHaveLength(5);
     for (const one of controls) {
-      const original = a1Candidates.find(
-        (a) => a.id === one.of,
-      ) as Task3Candidate;
+      const original = originals.find((a) => a.id === one.of) as Task3Candidate;
       expect(original.sentence).toBe(one.sentence);
       expect(original.items.every((item) => item.basis === "attested")).toBe(
         true,
       );
       expect(translationText(original.items)).not.toContain("[?]");
+      // Every word is a new-text row's word as Dee wrote it.
+      const from = one.sentence.split(" + ").map((id) => id.split("/")[0]);
+      expect(from).toHaveLength(2);
+      const its = set.sentences
+        .filter((s) => from.includes(s.id))
+        .flatMap((s) => s.rows);
+      for (const item of original.items) {
+        const row = its.find((r) => r.enochian === item.target);
+        expect(row && rows.get(row.id)?.kind).toMatch(/^(unchanged|swapped)$/);
+      }
     }
-    // As many as the sentences allow, fewer kinds when they run out.
-    const few = damagedControls(a1Candidates.slice(0, 20), {
-      dictionary: realDictionary,
-      rows: keyRows,
-    });
-    expect(few.length).toBeLessThan(15);
+    // As many as the passages allow, fewer when they run out.
+    const few = damagedControls(
+      { sentences: set.sentences.slice(0, 10) },
+      { dictionary: realDictionary, rows: keyRows },
+    );
+    expect(few.controls.length).toBeLessThan(15);
+    expect(few.originals).toHaveLength(few.controls.length);
   });
 
   it("count only when both judges accepted the original", () => {
     const sentences = task3.slice(0, 12);
     const originals = sentences.map((one) =>
-      candidate("A1", one, [
-        { source: "x", target: "OL", basis: "attested", ref: "OL" },
-      ]),
+      candidate(
+        ORIGINAL_SOURCE,
+        one,
+        [{ source: "x", target: "OL", basis: "attested", ref: "OL" }],
+        { original: true },
+      ),
     );
     const made = originals.map((one, i) => ({
       ...candidate(`control-${i}`, sentences[i], [

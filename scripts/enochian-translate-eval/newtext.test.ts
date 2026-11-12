@@ -6,8 +6,6 @@ import { a1kNewText, a1NewText } from "./baseline.ts";
 import { serialiseDictionary } from "./context.ts";
 import { dictionary as fixtureDictionary, row } from "./fixtures.ts";
 import {
-  measureNewBar,
-  type NewTextBar,
   newFigures,
   newReport,
   newTextContext,
@@ -599,7 +597,7 @@ describe("scoring the new text", () => {
   });
 });
 
-describe("intervals and bars", () => {
+describe("intervals", () => {
   it("gives Wilson's 95% interval", () => {
     const [a, b] = wilson(5, 10);
     expect(a).toBeCloseTo(0.2366, 4);
@@ -608,77 +606,5 @@ describe("intervals and bars", () => {
     expect(wilson(0, 10)[1]).toBeCloseTo(0.2775, 4);
     expect(wilson(10, 10)[0]).toBeCloseTo(0.7225, 4);
     expect(wilson(0, 0)).toEqual([0, 1]);
-  });
-
-  it("measures a bar and calls a figure within one row of it marginal", () => {
-    const bar: NewTextBar = {
-      id: "swapped",
-      task: 1,
-      group: "swapped",
-      measure: "right",
-      kind: "min",
-      value: 0.9,
-    };
-    const figures = (count: number) => {
-      const report = newReport({ task: 1, rows: [], items: [] });
-      return {
-        ...report,
-        swapped: {
-          ...report.swapped,
-          rows: 120,
-          right: {
-            count,
-            rows: 120,
-            share: count / 120,
-            interval: wilson(count, 120),
-          },
-        },
-      };
-    };
-    expect(measureNewBar(figures(106), bar)).toMatchObject({
-      met: false,
-      marginal: false,
-    });
-    expect(measureNewBar(figures(107), bar)).toMatchObject({
-      met: false,
-      marginal: true,
-    });
-    expect(measureNewBar(figures(108), bar)).toMatchObject({
-      met: true,
-      marginal: true,
-    });
-    expect(measureNewBar(figures(110), bar)).toMatchObject({
-      met: true,
-      marginal: false,
-    });
-    const max = {
-      ...bar,
-      measure: "recalled" as const,
-      kind: "max" as const,
-      value: 0.05,
-    };
-    const recalled = (count: number) => {
-      const report = figures(110);
-      return {
-        ...report,
-        swapped: {
-          ...report.swapped,
-          recalled: {
-            count,
-            rows: 120,
-            share: count / 120,
-            interval: wilson(count, 120),
-          },
-        },
-      };
-    };
-    expect(measureNewBar(recalled(6), max)).toMatchObject({
-      met: true,
-      marginal: true,
-    });
-    expect(measureNewBar(recalled(8), max)).toMatchObject({
-      met: false,
-      marginal: false,
-    });
   });
 });
