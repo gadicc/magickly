@@ -222,8 +222,12 @@ Follow-ups are separate from the completed migration work:
   registry check off the deploy path, CI publishing directly with
   provenance (Gadi); then a `prepack` guard npm under pnpm cannot pass,
   a dated sign-off column in the README's Sources, and registry
-  refusals that check what npm has. Not merged. TODO: create the `npm`
-  environment, then merge stage A; then the rest of stage A′, Gadi's
+  refusals that check what npm has. Merged on 12 November, after the
+  `npm` environment was created. The provenance clean-up (the copied
+  planet and house texts replaced, the Enochian letters in both
+  traditions, citations) is on `gate/provenance`, not merged
+  ([plan 080](080-open-source-packages.md#the-provenance-clean-up-12-november-2026)).
+  TODO: the rest of stage A′, Gadi's
   ([the steps](080-open-source-packages.md#stage-a-the-owners-steps));
   then, with his go-ahead, stages B to G. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups).
@@ -398,7 +402,9 @@ Follow-ups are separate from the completed migration work:
   the Key of Solomon verbatim from Mathers. On 2 October the Tree's labels
   were set closer, moving its profile to v4
   ([plan 039](039-correspondence-tables.md#after-the-owners-review)). The
-  source of `magickTypes` is deferred indefinitely.
+  `magickTypes` was removed on 12 November 2026: it was copied from a 2020
+  Llewellyn book
+  ([plan 080](080-open-source-packages.md#the-provenance-clean-up-12-november-2026)).
 - TODO: one small one left by step 3b
   ([plan 032](032-data-layer.md#follow-ups)): the `RENDER_INPUT_SWEEP=1`
   sweep compares the JSX handed to the outliner rather than the outlined

@@ -878,6 +878,47 @@ Found while listing every published file; none is decided here.
 | `geomancy/tetragrams.json5` | Its first line cites Wikipedia's "Geomantic figures"; plan 075 replaced the texts, so the link may only cover the figures' names and dots. Confirm, or drop the link. |
 | `enochian/tablets.json5` | Greer's edition (Llewellyn, in copyright) is one of the readings. The letters are facts and the README says no rights are asserted over them; confirm that reading letters from its redrawn plates is acceptable for a CC BY package. |
 
+### The provenance clean-up (12 November 2026)
+
+Research on 11 November answered the questions above (Gadi's answers the
+same day: source the copied texts afresh, separate the Golden Dawn's
+Enochian from Dee's, trust Leitch over Schueler, keep Greer's readings
+if they are only facts). Built on `gate/provenance`; every row is still
+Gadi's to sign off.
+
+| File | Found | Done |
+| --- | --- | --- |
+| `astrology/planets.json5` | `magickTypes` is verbatim, all 136 words, from David Rankine's "Planetary Magic" in *Llewellyn's Complete Book of Ceremonial Magick* (2020), and was live on the planet pages | Removed from the data, the schema, the planet pages and the geomancy reading, whose planet hint now quotes the Key of Solomon (Mathers, 1888). No replacement: the Key of Solomon row already says what each planet serves for. The text stays in the repository's history since July 2024 |
+| `astrology/houses.json5` | `interpretation.en`, the "House of …" names and the mottos' English are verbatim from Wikipedia's "House (astrology)" table (revision 1245488398, CC BY-SA) | Rewritten in our own words from Lilly, *Christian Astrology* (1647), I.vii, pp. 50–56 (archive.org `b30338724`, leaves n84–n90); no five-word run in common with either revision of the article. The mottos' Latin is the verse as usually quoted, so the ninth is *Pietas* ("Piety") where the table had `Iter` (Gadi, 12 November); their English is translated afresh; `name` is dropped |
+| `enochian/letters.json5` | `pronounciation`, `gematria`, `tarot` and `planet/element` are Schueler's (1985); the gematria and tarot are his own derivations, given by neither Dee nor the Order | `names` and `sounds`, each `gd` and `dee`: the Order's from Regardie vol. 4 (1940) pp. 297–300 and Crowley's Keys in the *Equinox* I(8), Dee's from Sloane MS 3188, his notes in Casaubon (1659), Leitch vol. II and Laycock (facts only). `gematria` and `tarot` dropped. `tetragramId` links the sixteen letters the Order gives the geomantic figures (Regardie vol. 4 p. 77, read by image): Schueler differs for E, G, P, S and T, and our old data followed him |
+| `alchemy/terms.json5` | The Second Knowledge Lecture as printed in Regardie vol. 1 (1937), pp. 119–120; vol. 1 was renewed (R341660) and is in US copyright until the end of 2032 | Cited; the Order's own short phrases, with no rights asserted, outside the CC BY grant |
+| `enochian/tablets.json5` | Greer's plates differ from the 1940 and 1912 prints' letters in one square only, giving Dee's and Raphael's letter; the rest is typography | The `greer` reading stays, with that note; the Seniors are cited from Regardie vol. 3 (1939) p. 73 instead of Greer; Sloane MS 3191 ff. 52r–80v added for when the British Library's images return |
+| `chakras.json5` | Facts only: the longest string is 29 characters | Said so in the README; the Wikipedia link is a reference |
+| `kabbalah/seventyTwoAngels…` | Machine translation of a public-domain text | Unchanged: Gadi keeps the CC BY claim |
+| `geomancy/tetragrams.json5` | The Wikipedia link covers only the names and dots | Unchanged |
+
+Removing `magickTypes` changed the site search catalogue, so the search
+vectors were refreshed with it: `search:compare` embedded the nine
+changed passages with Gemini (29 requests) and the whole Qwen comparison
+profile (3038 requests, whose cache had not been copied), under the
+scripts' conservative input estimate of at most $0.71; `search:publish`
+then requested nothing.
+
+**Commits:**
+
+| Commit | What |
+| --- | --- |
+| `0215209e` | `magickTypes` removed, the search vectors refreshed |
+| `5b207e84` | The houses from Lilly |
+| `ce8d9301` | The alchemy terms and chakras cited |
+| `3c1dba15` | The Enochian letters in both traditions |
+| `438953df` | The tablets' Seniors cited in print, the Greer note |
+
+**Left for Gadi:**
+
+- Vol. 3 p. 73 spells three Seniors unusually (Alphctga, Saiinor,
+  Aaetpoi); nothing reads them.
+
 ### Stage A review (11 November 2026)
 
 An adversarial review of stage A's commits found the following; each was

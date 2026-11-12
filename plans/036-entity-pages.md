@@ -57,10 +57,12 @@ What is wrong beyond the dump:
   the heading, and [Angel.tsx](../src/app/kabbalah/angel/[slug]/Angel.tsx)
   renders its own. The four table routes have no `pathnames` entry and get
   one `h1` each, from the page.
-- Seven planets carry a `magickTypes` string ("Career success and
-  progression, establishing harmony, …") that the geomancy reading shows as
-  a hint and nothing attributes. It arrived in one commit on 26 July 2024,
-  `2f46a40`, with no source. Its wording is a modern intention table's:
+- Seven planets carry a `magickTypes` string, a modern summary of each
+  planet's magical uses (removed on 12 November 2026 as copied; [plan
+  080](080-open-source-packages.md#the-provenance-clean-up-12-november-2026)),
+  that the geomancy reading shows as a hint and nothing attributes. It
+  arrived in one commit on 26 July 2024, `2f46a40`, with no source. Its
+  wording is a modern intention table's:
   Agrippa's *Three Books of Occult Philosophy* (1533), Book I, catalogues the
   stones, plants, animals and body parts under each planet rather than
   operations, and the operations-by-planet lists descend from the grimoires'
@@ -301,8 +303,8 @@ Spirit                 Sorath   [sigil]
 Rules                  ♌︎ Leo
 Geomantic figures      Fortuna Major, Fortuna Minor         → /geomancy/reference
 Grade                  5=6 Adeptus Minor                    → /gd/grade/5=6
-Magical operations     Career success and progression, establishing harmony, …
-                       (an editorial summary)
+Magical operations     (the planet's magickTypes, a modern summary of its
+                       magical uses; removed on 12 November 2026 as copied)
 
 See also: Planetary hours
 ```
