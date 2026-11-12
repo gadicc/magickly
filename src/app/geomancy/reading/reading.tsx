@@ -219,6 +219,60 @@ function TetragramStack({
   );
 }
 
+/**
+ * The Key of Solomon hint under a planet in the open select: three lines at
+ * most, with the whole sentence in the `title`; Saturn's runs to about ten.
+ */
+const HINT_STYLE: React.CSSProperties = {
+  color: "#aaa",
+  maxWidth: 385,
+  fontSize: "70%",
+  whiteSpace: "normal",
+  textAlign: "left",
+  lineHeight: "1em",
+  marginTop: 5,
+  display: "-webkit-box",
+  WebkitBoxOrient: "vertical",
+  WebkitLineClamp: 3,
+  overflow: "hidden",
+};
+
+/**
+ * One planet's row in the planet select. The menu passes the hint as
+ * `children`; the closed select renders the row without it.
+ */
+function PlanetRow({
+  planet,
+  children,
+}: {
+  planet: (typeof planets)[PlanetId];
+  children?: React.ReactNode;
+}) {
+  return (
+    <div>
+      {/* Indented as it was inline in the select, which the page's byte pins hold. */}
+      <style jsx>{`
+                    span {
+                      display: inline-block;
+                      text-align: left;
+                      font-size: 15px;
+                    }
+                  `}</style>
+      <span style={{ width: 20, textAlign: "center", marginRight: 5 }}>
+        {planet.symbol}
+      </span>
+      <span style={{ width: 75 }}>{planet.name.en.en}</span>
+      <span style={{ width: 90 }}>
+        {capitalizeFirstLetter(planet.intelligenceId as string)}
+      </span>
+      <span style={{ width: 120 }}>
+        {capitalizeFirstLetter(planet.spiritId as string)}
+      </span>
+      {children}
+    </div>
+  );
+}
+
 /** A shared link restores its reading once; later changes stay local until the reader copies a new link. */
 function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
   const ref = React.useRef<SVGSVGElement>(null);
@@ -334,6 +388,8 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
           onChange={(event: SelectChangeEvent) =>
             setPlanetId(event.target.value as PlanetId)
           }
+          // The closed select shows the row without its hint.
+          renderValue={(id) => <PlanetRow planet={planets[id as PlanetId]} />}
         >
           <ListSubheader>
             <div>
@@ -355,48 +411,23 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
             .filter((p) => p.spiritId)
             .map((planet) => (
               <MenuItem key={planet.id} value={planet.id}>
-                <div>
-                  <style jsx>{`
-                    span {
-                      display: inline-block;
-                      text-align: left;
-                      font-size: 15px;
-                    }
-                  `}</style>
-                  <span
-                    style={{ width: 20, textAlign: "center", marginRight: 5 }}
-                  >
-                    {planet.symbol}
-                  </span>
-                  <span style={{ width: 75 }}>{planet.name.en.en}</span>
-                  <span style={{ width: 90 }}>
-                    {capitalizeFirstLetter(planet.intelligenceId as string)}
-                  </span>
-                  <span style={{ width: 120 }}>
-                    {capitalizeFirstLetter(planet.spiritId as string)}
-                  </span>
-                  {planetHint && (
+                <PlanetRow planet={planet}>
+                  {planetHint && planet.keyOfSolomon && (
                     <div
-                      style={{
-                        color: "#aaa",
-                        maxWidth: 385,
-                        fontSize: "70%",
-                        whiteSpace: "normal",
-                        textAlign: "left",
-                        lineHeight: "1em",
-                        marginTop: 5,
-                      }}
+                      data-testid="planet-hint"
+                      title={planet.keyOfSolomon.en}
+                      style={HINT_STYLE}
                     >
-                      {planet.magickTypes?.en}
+                      “{planet.keyOfSolomon.en}”
                     </div>
                   )}
-                </div>
+                </PlanetRow>
               </MenuItem>
             ))}
         </Select>
         <FormGroup>
           <FormControlLabel
-            label="Show planetary effect hints"
+            label="Show planetary hints from the Key of Solomon (Mathers, 1888)"
             slotProps={{
               typography: {
                 sx: {

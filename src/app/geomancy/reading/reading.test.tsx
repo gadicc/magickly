@@ -58,12 +58,15 @@ describe("geomancy reading page", () => {
   // pentagram's box its ink classes (without them the bytes were 79423
   // ab11cc88…, 79413 49439a30… and 79424 341bf7f3…), and when the Mothers'
   // grid lines became the `ink` variable with black as its fallback (before
-  // that, 80300 83f38421…, 80290 045035b8… and 80301 584de33d…); the bytes
-  // are otherwise those from before the rekey.
+  // that, 80300 83f38421…, 80290 045035b8… and 80301 584de33d…), and when
+  // the hints switch's label named the Key of Solomon in place of the
+  // removed `magickTypes` (before that, 80804 a3969ba3…, 80794 95663f49…
+  // and 80805 c2462b01…); the bytes are otherwise those from before the
+  // rekey.
   it.each([
     [
       "1",
-      "80804 a3969ba3076cae1ffd8055ffac3fd874f4205fef1bae056213237e603f186b4e",
+      "80837 910f4c74cd3e79a5b2bbeeab85d5dd465dc2172f584a346d90cb30d757331854",
       [
         "The querent: their life",
         "Good, except in war.",
@@ -73,7 +76,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "7",
-      "80794 95663f49a42e3478aa8f2c60498041a315ccb3ba4599510b1498a0c62c5504fd",
+      "80827 bd978df9c9698da1e8de637e6eb291dc54988704bb9a96b023056f4b1483c309",
       [
         "Marriage and other unions",
         "Indifferent.",
@@ -83,7 +86,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "12",
-      "80805 c2462b01dea953734ec6cec550621d51a465c2d01ca52c4b7047b0bee7a4d61d",
+      "80838 88f4df44095ff2fc8105ef0a4f6818067bdf97eb6d1aa56fa54e51b8b42afe64",
       [
         "Enemies; servants; imprisonment",
         "Unfavourable generally.",

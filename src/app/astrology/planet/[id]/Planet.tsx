@@ -316,17 +316,6 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
               </>
             ) : null}
           </Row>
-          <Row label="Magical operations">
-            {planet.magickTypes ? (
-              <>
-                {planet.magickTypes.en}{" "}
-                {/* Decision 3: shown, and marked, until its source is named. */}
-                <Muted block>
-                  An editorial summary; its source is not recorded.
-                </Muted>
-              </>
-            ) : null}
-          </Row>
         </EntityTable>
       )}
 

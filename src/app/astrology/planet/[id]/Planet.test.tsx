@@ -55,7 +55,6 @@ const LABELS = [
   "Geomantic figures",
   "Grade",
   "Key of Solomon",
-  "Magical operations",
 ];
 
 /** Each table row's label, and its value as text and as markup. */
@@ -196,12 +195,6 @@ describe("the planet page", () => {
     // owner's review).
     expect(row(html, "Key of Solomon").text).toBe(
       "“The Days and Hours of the Sun are very good for perfecting experiments regarding temporal wealth, hope, gain, fortune, divination, the favour of princes, to dissolve hostile feeling, and to make friends.” Mathers' translation (1888), Book I, chapter II.",
-    );
-    // Decision 3: shown, and said to be unsourced.
-    const operations = row(html, "Magical operations").text;
-    expect(operations).toMatch(/^Career success and progression, /);
-    expect(operations).toMatch(
-      / An editorial summary; its source is not recorded\.$/,
     );
   });
 

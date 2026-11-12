@@ -118,9 +118,6 @@
     archangelId: "michael",
     intelligenceId: "nakhiel",
     spiritId: "sorath",
-    magickTypes: {
-      en: "Career success and progression, establishing harmony, healing and improving health, leadership skills, acquiring money and resources, promotion, strengthening willpower",
-    },
     // The Key of Solomon in S. L. MacGregor Mathers' translation (1888),
     // Book I, chapter II, p. 12: his sentence on what the planet's days and
     // hours serve for, verbatim, checked against sacred-texts' transcription
@@ -148,9 +145,6 @@
     archangelId: "raphael",
     intelligenceId: "tiriel",
     spiritId: "taphthartharath",
-    magickTypes: {
-      en: "Business success, improving communication skills, developing knowledge and memory, diplomacy, exam success, divination, developing influence, protection when traveling by air and land, learning music",
-    },
     keyOfSolomon: {
       en: "The Days and Hours of Mercury are good to operate for eloquence and intelligence; promptitude in business; science and divination; wonders; apparitions; and answers regarding the future. Thou canst also operate under this Planet for thefts; writings; deceit; and merchandise.",
     },
@@ -174,9 +168,6 @@
     archangelId: "anael",
     intelligenceId: "hagiel",
     spiritId: "kedemel",
-    magickTypes: {
-      en: "Increasing attractiveness and self-confidence, beauty and passion, enhancing creativity, improving fertility, developing friendships, obtaining love",
-    },
     keyOfSolomon: {
       en: "The Days and Hours of Venus are good for forming friendships; for kindness and love; for joyous and pleasant undertakings, and for travelling.",
     },
@@ -219,9 +210,6 @@
     archangelId: "gabriel",
     intelligenceId: "shelachel",
     spiritId: "chasmodai",
-    magickTypes: {
-      en: "Developing clairvoyance and other psychic skills, ensuring safe childbirth, divination, glamour and illusions, lucid dreaming, protection when traveling by sea",
-    },
     keyOfSolomon: {
       en: "The Days and Hours of the Moon are good for embassies; voyages envoys; messages; navigation; reconciliation; love; and the acquisition of merchandise by water.",
     },
@@ -245,9 +233,6 @@
     archangelId: "zamael",
     intelligenceId: "graphiel",
     spiritId: "bartzabel",
-    magickTypes: {
-      en: "Controlling anger, increasing courage, enhancing energy and passion, increasing vigour and sex drive",
-    },
     keyOfSolomon: {
       en: "In the Days and Hours of Mars thou canst make experiments regarding War; to arrive at military honour; to acquire courage; to overthrow enemies; and further to cause ruin, slaughter, cruelty, discord; to wound and to give death.",
     },
@@ -272,9 +257,6 @@
     archangelId: "sachiel",
     intelligenceId: "iophiel",
     spiritId: "hismael",
-    magickTypes: {
-      en: "Career success, developing ambition and enthusiasm, improving fortune and luck, general health, acquiring honour, improving sense of humour, legal matters and dealing with the establishment, developing leadership skills",
-    },
     keyOfSolomon: {
       en: "The Days and Hours of Jupiter are proper for obtaining honours, acquiring riches; contracting friendships, preserving health; and arriving at all that thou canst desire.",
     },
@@ -298,9 +280,6 @@
     archangelId: "cassiel",
     intelligenceId: "agiel",
     spiritId: "zazel",
-    magickTypes: {
-      en: "Performing duty, establishing balance and equilibrium, dispelling illusions, protecting the home, legal matters, developing patience and self-discipline",
-    },
     keyOfSolomon: {
       en: "In the Days and Hours of Saturn thou canst perform experiments to summon the Souls from Hades, but only of those who have died a natural death. Similarly on these days and hours thou canst operate to bring either good or bad fortune to buildings; to have familiar Spirits attend thee in sleep; to cause good or ill success to business, possessions, goods, seeds, fruits, and similar things, in order to acquire learning; to bring destruction and to give death, and to sow hatred and discord.",
     },

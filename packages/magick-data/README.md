@@ -364,7 +364,7 @@ provenance, and no version past 0.0.0 ships while a row has none.
 | `alchemy/symbols.json5` | [Correspondences](#correspondences) |  |
 | `alchemy/terms.json5` | [Correspondences](#correspondences); the source of `terms` is not recorded |  |
 | `astrology/houses.json5` | [Correspondences](#correspondences); the source of `interpretation` is not recorded |  |
-| `astrology/planets.json5` | [Correspondences](#correspondences); `keyOfSolomon` from [the Key of Solomon](#the-key-of-solomon); the source of `magickTypes` is not known ([plan 039](https://github.com/gadicc/magickly/blob/main/plans/039-correspondence-tables.md)) |  |
+| `astrology/planets.json5` | [Correspondences](#correspondences); `keyOfSolomon` from [the Key of Solomon](#the-key-of-solomon) |  |
 | `astrology/zodiac.json5` | [Correspondences](#correspondences) |  |
 | `body/parts.json5` | [Correspondences](#correspondences) |  |
 | `chakras.json5` | [Correspondences](#correspondences) of the seven-chakra system; the file cites Wikipedia's "Chakra" article |  |

@@ -26,7 +26,6 @@ export const fields: EntityFields = {
     "tetragrams",
     "gdGrade",
     "keyOfSolomon.en",
-    "magickTypes.en",
   ],
   omitted: [
     // The URL's; it decides the Planetary hours link and is not printed.

@@ -151,7 +151,6 @@ export const schemas = {
     // The three spheres of the Tree in this table have a name and a text, and
     // no correspondences.
     symbol: v.optional(v.string()),
-    magickTypes: v.optional(en),
     /**
      * The Key of Solomon's operations for a planet's days and hours, after
      * Mathers (1888), Book I, chapter II: the seven planets only.
