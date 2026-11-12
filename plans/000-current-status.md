@@ -229,7 +229,10 @@ Follow-ups are separate from the completed migration work:
   ([plan 080](080-open-source-packages.md#the-provenance-clean-up-12-november-2026)),
   and Gadi signed off every Sources row the same day
   ([plan 080](080-open-source-packages.md#the-sign-off-12-november-2026)).
-  TODO: the rest of stage A′, Gadi's, from the release candidate on
+  `0.1.0-rc.0` was published by hand the same day, and the bump to
+  `0.1.0` with `--expect-exists` follows it
+  ([plan 080](080-open-source-packages.md#the-release-candidate-12-november-2026)).
+  TODO: the rest of stage A′, Gadi's, from 0.1.0's CI publish on
   ([the steps](080-open-source-packages.md#stage-a-the-owners-steps));
   then, with his go-ahead, stages B to G. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups).

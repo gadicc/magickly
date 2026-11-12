@@ -1,6 +1,6 @@
 {
   "name": "magick-data",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0",
   "description": "Magickal correspondences and reference data: the sephirot, planets, zodiac, Hebrew and Enochian letters, Golden Dawn grades, geomantic figures and more, as typed tables with the links between them",
   "keywords": [
     "magick",

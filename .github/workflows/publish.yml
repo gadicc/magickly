@@ -36,10 +36,9 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # Flags for both decisions. Plan 080, stage A′: becomes --expect-exists
-  # with the bump to 0.1.0, once the registry has the package, so that a
-  # 404 then fails instead of skipping.
-  DECISION_FLAGS: ""
+  # Flags for both decisions. Since the bump to 0.1.0 (plan 080, stage A′)
+  # the registry has the package, so a 404 fails instead of skipping.
+  DECISION_FLAGS: "--expect-exists"
   # Exact, so that publish runs a known npm: trusted publishing needs 11.5.1
   # or later, and 24.22.2 bundles 11.19.1. In the 24 line of .nvmrc; ci.yml's
   # dry run uses the same.

@@ -935,6 +935,22 @@ strings in the correspondence files are the Key of Solomon (Mathers,
 075) and Dee's Keys; the rest hold only short facts. Every row reads
 2026-11-12. Step 4, the bump to `0.1.0-rc.0`, followed the same day.
 
+### The release candidate (12 November 2026)
+
+Step 4 is `6a62106f`; on `main`, `publish.yml`'s `decide` found no
+package and skipped. Gadi published `0.1.0-rc.0` by hand from that
+commit (step 5): 209 files, the registry's integrity
+`sha512-xUaZF6fLuNEwHz3/I6tL9LAWA4eDHj6N30r+c2koFJ+MwVyZVkqpmBN8WlwS9VDDSPpu4rSANOM6NQvUrphIFA==`.
+The registry points both `latest` and `next` at it. Four minutes
+before, npm had created `0.0.0-stage`, its own two-file "temporary
+package placeholder for staged publishing", on no tag; it sorts below
+every real version and the publish rule ignores it. The trusted
+publisher is to allow `npm publish` only: CI sets the tag through
+`npm publish --tag`, and removing `next` (step 8) is Gadi's, by hand.
+Step 7's bump to `0.1.0` with `--expect-exists` followed; run against
+the registry before merging, the rule answered "magick-data@0.1.0 is
+new (latest is 0.1.0-rc.0); publish under latest".
+
 ### Stage A review (11 November 2026)
 
 An adversarial review of stage A's commits found the following; each was
