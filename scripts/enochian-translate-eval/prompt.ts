@@ -65,17 +65,17 @@ Never mark a guess as attested. Cite only what is in the material given here; wh
 A "ref" is either a dictionary headword written exactly as the dictionary prints it, or a Key row written as its row id, the Key's number, a dot and the row's number (such as "4.12"). Put nothing else in "ref".`;
 
 /** The line the context starts with, so a reply can be traced to it. */
-const CONTEXT_HEAD = "Reference material: our dictionary and the Keys.";
+export const CONTEXT_HEAD = "Reference material: our dictionary and the Keys.";
 
 /** The grammar notes' heading in an A3 prompt. */
-const GRAMMAR_HEAD = "Reference material: notes on Enochian grammar.";
+export const GRAMMAR_HEAD = "Reference material: notes on Enochian grammar.";
 
 const TASK_TEXT: Record<Task, string> = {
   1: `Translate this Enochian text into English. Its words are numbered in square brackets. Give one item for each numbered word, in order, with the word as "source" and its number as "token".`,
   2: `Translate this English into Enochian. Each line is a row id, a tab, and the English for one Enochian word. Give one item for each row, in order, with the row id as "row", the English as "source" and one Enochian word as "target".`,
 };
 
-const NO_MATERIAL =
+export const NO_MATERIAL =
   "There is no reference material for this request: answer from what you know.";
 
 /** A request's id: what it covers, readable in file names. */

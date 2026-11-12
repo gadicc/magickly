@@ -7,9 +7,12 @@ found"), and revised the same day after review showed that lookup in
 the Keys solves almost all of Dee's text. Built so far: the grammar
 notes, the held-out-Key test set, the lookup baseline (A1), the answer
 checker, the scorer, the bars with the code that measures them, the
-model runner and the judges' step. Not yet built: the new text, A1k,
-the new bars and the page's list of limitations. Spent so far: $1.33
-of the $100.
+model runner and the judges' step; and for the new text (12 November)
+the generator and its set, A1k, the new scoring, task 3's machinery,
+the code that measures the new bars, and the page's list of
+limitations. Nothing has run on the new text. Still to do: score A1
+and A1k on it, judge them, and settle the bars (see "Running order").
+Spent so far: $1.33 of the $100.
 Read [current status](000-current-status.md) first; this plan tests the
 long-term goal recorded there ("a small neural network for translating
 between Enochian and English") before anyone builds it.
@@ -239,7 +242,12 @@ register, chosen by script where no form exists ("lantern" and
 - **20 planted knowns**: made-up words built by the same rule as plants,
   given an English meaning as ordinary entries in the prompt's
   dictionary, in alphabetical order with the rest; only the test-set
-  files mark them. No model can know them, so A0 should score at most
+  files mark them. Their meanings are plain nouns of the Keys' register
+  that our data lacks (a vessel, a garment, a tool, a plant, a part of
+  a building: "ewer", "jerkin", "auger", "rowan", "rafter"), since
+  modern words would stand out. Like the real entries they carry a
+  source tag ("WE"); that tag is false, and exists only in the test
+  prompt. No model can know them, so A0 should score at most
   one: they test whether the model reads the prompt rather than its
   memory. Lookup over the same prompt gets them too, so they don't show
   more than lookup. Their meanings share no word with the task-2 plants.
@@ -249,10 +257,13 @@ register, chosen by script where no form exists ("lantern" and
 - **40 new joins**: a small word joined to an attested word by the
   grammar notes' rules (G26, "small words join the next word", and G27,
   "a shared letter is written once"), where that join is attested
-  nowhere: for example DS "which" or I "is" before a word that never
-  takes it in the Keys. Of 4,504 such joins, 75 are attested and are
-  left out, and a join is used only if it splits into attested parts in
-  exactly one way and has no form within one letter of it. A join is
+  nowhere: for example DS "which" or CHIS "are" before a word that
+  never takes it in the Keys. Of 4,656 such joins, 84 are attested and
+  are left out, and a join is used only if it splits into attested
+  parts in exactly one way and has no form within one letter of it;
+  1,056 remain. That rule rules out every join with a one-letter small
+  word (I "is", L "one"), since such a join is always one letter from
+  its base, so the joins use CHIS, OI, AG, DS, AR and TA. A join is
   right only when both parts are rendered. In task 2, the joined or the
   separate forms both count (G30: word boundaries differ between
   copies). This is the only test where neither lookup nor memory has
@@ -314,9 +325,12 @@ a plant marked "attested" is a silent invention by rule, in either task.
 
 Items marked "derived" or "coined" are never inventions. On a planted
 unknown, "unknown", "derived" and "coined" all pass and are reported
-apart; a "derived" answer must cite a ref whose form is actually inside
-the word, or it is an **unsupported guess**, which counts against the
-plant bar like a plant given as attested. Elsewhere, derived and
+apart; a "derived" answer must cite a ref of three letters or more
+whose form is actually inside the word, or it is an **unsupported
+guess**, which counts against the plant bar like a plant given as
+attested. Plants contain no attested form that long, so a derived
+reading of a plant is always an unsupported guess: the honest answers
+are "unknown" and a coinage marked as one. Elsewhere, derived and
 coined items are scored on whether they are right, and the number of
 attested rows the model hedges as derived or unknown is reported, so a
 model can't pass the honesty bar by hedging everything.
@@ -381,19 +395,35 @@ thinking, is allowed 12,000 tokens a call at `medium`.
 | --- | --- | --- |
 | The cache check (two A3 calls) | $1 | $1 |
 | Opus, tasks 1 and 2 (about 40 calls with context, 16 for A0) | $16 | $28 |
-| Fable 5.2, A3 on 300 rows | $5 | $10 |
+| Fable 5.2, A3 on 300 rows | $9 | $13 |
 | GPT-6.1 Sol, A3 on 300 rows | $3 | $4 |
 | Task 3: six translations and their round trips | $11 | $15 |
 | Judges, both families (about 375 task-3 judgements, and task-1 rows) | $11 | $14 |
 | The one top-up, if needed (see Scoring) | $5 | $8 |
-| **Total** | **about $52** | **about $80** |
+| **Total** | **about $56** | **about $83** |
 
-Both fit in the $98.67 left, with room for blocked parts to be retried,
-but no call so far has read from the cache. So **the
-first paid step is two A3 calls**, checking that the second reads the
-prompt from the cache; if it doesn't, Opus runs by batch. The first full
-A3 run then goes alone, and its cost is checked against this table
-before anything else runs.
+The runner's own projection (`budget --offline`, 12 November 2026, 199
+calls) is $53 with cache reads and $80 without, close to the table;
+Fable at high effort is the part it puts higher. Both fit in the $98.67
+left, with room for blocked parts to be retried, but no call so far has
+read from the cache.
+
+### Running order
+
+1. A1 and A1k on the new text, and their to-judge rows judged (about
+   $0.50).
+2. Task 3 through A1: its round trips and its judging, with the damaged
+   controls (about $8).
+3. The bars settled from those figures, in `bars.ts` and this plan,
+   with the date. No model has translated the new text yet.
+4. **The cache check**: two A3 calls on the new text, checking that the
+   second reads the prompt from the cache; if it doesn't, Opus runs by
+   batch.
+5. Opus A3 on all 600 rows, alone, and its cost checked against the
+   table above before anything else runs.
+6. Opus A0 and A2; the repeat and `high`-effort runs on 150 rows;
+   Fable and GPT-6.1 on the first 30 sentences; task 3 on every model;
+   then the judges.
 
 ### Scoring
 
@@ -421,11 +451,24 @@ yet:
   call, with no sight of the English, translates the Enochian back
   using only the dictionary, and both judges compare the two English
   versions. A word-for-word lookup round-trips well by construction,
-  which is why every task-3 bar is measured against A1's figure.
+  which is why the judges' bar is measured against A1's figure and the
+  round trip's is a floor (see the bars).
 - **The judges are checked.** About 15 deliberately damaged
-  translations go in among the task-3 answers: wrong attested words,
-  unmarked coinages, a dropped clause. If the judges accept more than 3
-  of them, the task-3 bars can't be measured.
+  translations go in among the task-3 answers, five each of wrong
+  attested words, unmarked coinages and a dropped clause. They are made
+  from A1's translations that have no unknown word (19 of its 60), so a
+  judge can't reject one merely for a hole. A control counts only when
+  both judges accepted the undamaged translation it was made from. If
+  fewer than 8 count, or the judges accept more than a fifth of those
+  that do, the task-3 bars can't be measured. A1's own translations
+  leave a third of their words unknown, so A1's accept share will be
+  low and "A1 plus 15 points" a modest bar; that is weighed when the
+  bars are settled.
+- **Judging context.** A1's translations and the controls are judged
+  together before any model runs; the models' are judged later, among
+  themselves, with the same rubric and the same verdict store. No answer
+  is judged beside the others from its sentence, so this shouldn't
+  matter, but the figures say so.
 - **Blocked replies.** A part the provider's filter blocks is retried
   once; if it is blocked again its rows count as wrong, and the number
   of Opus translation calls blocked is reported against its bar. The probe had 5 of 38 replies blocked, and
@@ -444,9 +487,9 @@ it. Bars are decided on the counts below, whose power is given; an
 interval doesn't decide a bar, since at these sizes it would leave
 most bars out of reach. A figure within one row of its bar is
 reported as **marginal**. If any bar is marginal, one top-up is
-allowed, declared now: 200 more rows of the same mix, made by the same
-script with the next seed, run once on Opus A3 and A1k, and the bar
-decided on all the rows together. There is no second top-up.
+allowed, declared now: 200 more rows of the same mix (20 sentences),
+made by the same script with the next seed (78), run once on Opus A3
+and A1k, and the bar decided on all the rows together. There is no second top-up.
 
 ### Bars for the new text (proposed 12 November 2026)
 
@@ -582,14 +625,15 @@ ran. Closed book had no bar: it measured honesty about unknown words.
   model. Its budget check and cap read one ledger in one output
   directory, as one process sees it, so runs must never be concurrent
   and must all share one `--out` (the default).
-- Before the first paid run, from the runner's last review (12 November
-  2026): append a batch item's ledger line before its saved reply, so a
-  crash can't leave it saved but unbooked; book a sync reply with no
-  cost and no output at its worst case, as batch already does; treat a
-  cost of $0 looked up for a failed call as unknown; and check the first
-  real batch, including failed items booked at $0, against the
-  gateway's own spend report. Nothing locks out a second run at once;
-  don't start one.
+- From the runner's last review (12 November 2026), built: a reply's
+  ledger line is appended before the reply is saved, so a crash can't
+  leave it saved but unbooked; a reply with no cost and no output, sync
+  or batch, is booked at its worst case; and a cost of $0 looked up for
+  a failed call is treated as unknown. Still to do at the first real
+  batch: check it, including failed items, against the gateway's own
+  spend report. Before GPT-6.1's first rubric call, send one alone
+  (`--max-requests 1`) to see whether the gateway accepts its settings.
+  Nothing locks out a second run at once; don't start one.
 - The judges' step (`judge.ts`): folds both judges' verdicts into the
   scores before any bar is measured, and `measureBars` refuses a task-1
   report with rows still waiting for them. A1's to-judge rows are judged

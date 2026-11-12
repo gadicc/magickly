@@ -28,6 +28,7 @@ import {
   type JudgedRow,
   type JudgedRows,
   type JudgeName,
+  type JudgeRequestBuilder,
   judgeCase,
   judgeRequest,
   judgeRows,
@@ -56,6 +57,14 @@ import {
 } from "./ledger.ts";
 import { type Effort, type RequestKind, shortName } from "./models.ts";
 import {
+  type NewSpec,
+  newRequest,
+  type RoundTripSpec,
+  roundTripRequest,
+  type Task3Sentence,
+} from "./newprompt.ts";
+import type { NewTextSet } from "./newtext.ts";
+import {
   type KeyProbe,
   probeKey,
   probeRequests,
@@ -75,6 +84,7 @@ import {
 import type { Fold, KeyRowRecord } from "./testset.ts";
 import {
   type BatchReference,
+  cachePrefix,
   type Gateway,
   type ModelRequest,
   type ModelResult,
@@ -159,11 +169,27 @@ export interface ManifestRequest {
   chars: number;
   translate?: TranslateSpec;
   probe?: { key: number; side: Side };
+  /** A request on the new text (tasks 1 and 2) or task 3. */
+  newtext?: NewSpec;
+  /** A task-3 round trip, with the Enochian it translates back. */
+  roundtrip?: RoundTripSpec;
 }
+
+/**
+ * What a run is: the folds' translations, a probe, the new text (tasks 1 and
+ * 2), task 3's translations, its round trips, or the cache check.
+ */
+export type RunKind =
+  | "translate"
+  | "probe"
+  | "newtext"
+  | "task3"
+  | "roundtrip"
+  | "cache-check";
 
 export interface Manifest {
   runId: string;
-  kind: "translate" | "probe";
+  kind: RunKind;
   createdAt: string;
   transport: TransportName;
   budget: number;
@@ -172,6 +198,8 @@ export interface Manifest {
   /** The worst case when the run started. */
   worstCase?: number;
   requests: ManifestRequest[];
+  /** A new-text run on a set other than the committed one (a top-up). */
+  newTextFile?: string;
   /** The `--retry-failed` re-runs, in order. */
   retries?: {
     at: string;
@@ -236,7 +264,10 @@ export interface BatchRecord {
 
 export function manifestRequest(
   request: ModelRequest,
-  extra: Pick<ManifestRequest, "translate" | "probe"> = {},
+  extra: Pick<
+    ManifestRequest,
+    "translate" | "probe" | "newtext" | "roundtrip"
+  > = {},
 ): ManifestRequest {
   return {
     id: request.id,
@@ -254,6 +285,25 @@ const rawPath = (dir: string, id: string) =>
 
 export function readRaw(dir: string, id: string): RawResult | undefined {
   return readJson<RawResult>(rawPath(dir, id));
+}
+
+/**
+ * How many of a request's saved attempts (its reply and those kept aside as
+ * `<id>.attempt-N.json`) the provider's filter blocked.
+ */
+export function blockedAttempts(dir: string, id: string): number {
+  const requests = join(dir, "requests");
+  if (!existsSync(requests)) return 0;
+  const mine = new RegExp(
+    `^${id.replace(/[^A-Za-z0-9_-]/g, "")}(?:\\.attempt-\\d+)?\\.json$`,
+  );
+  return readdirSync(requests)
+    .filter((file) => mine.test(file))
+    .filter(
+      (file) =>
+        readJson<RawResult>(join(requests, file))?.finishReason ===
+        "content-filter",
+    ).length;
 }
 
 /** The batches saved under a run's directory. */
@@ -321,11 +371,16 @@ export function promptKind(request: {
   kind: RequestKind;
   instructions?: readonly string[];
   translate?: TranslateSpec;
+  newtext?: NewSpec;
+  roundtrip?: RoundTripSpec;
 }): string {
   if (request.kind !== "translate") return request.kind;
-  const a0 = request.translate
-    ? request.translate.arm === "A0"
-    : (request.instructions?.length ?? 0) <= 1;
+  const arm = request.translate?.arm ?? request.newtext?.arm;
+  const a0 = arm
+    ? arm === "A0"
+    : request.roundtrip
+      ? false
+      : (request.instructions?.length ?? 0) <= 1;
   return a0 ? "translate-A0" : "translate";
 }
 
@@ -480,8 +535,9 @@ export function failedRaw(raw: RawResult): boolean {
  * Which requests still need running: without `retry`, those with no reply
  * saved (skipped at the budget, or lost in a crash); with it, only those
  * that failed. A reply that came back normally but unreadable, or was cut
- * off at the length limit, is the model's failure and is never re-run. Requests in a batch not yet collected are
- * left alone either way.
+ * off at the length limit, is the model's failure and is never re-run; nor
+ * is one blocked by the provider's filter a second time. Requests in a batch
+ * not yet collected are left alone either way.
  */
 export function pendingRequests(
   dir: string,
@@ -498,9 +554,17 @@ export function pendingRequests(
     if (inBatch.has(one.id)) return false;
     const raw = readRaw(dir, one.id);
     // A reply cut off at the length limit is the model's failure: retrying
-    // it would give the hardest prompts several tries.
+    // it would give the hardest prompts several tries. One the provider's
+    // filter blocked is retried once (plan 077, "Blocked replies"); blocked
+    // again, it stands.
     return retry
-      ? raw !== undefined && failedRaw(raw) && raw.finishReason !== "length"
+      ? raw !== undefined &&
+          failedRaw(raw) &&
+          raw.finishReason !== "length" &&
+          !(
+            raw.finishReason === "content-filter" &&
+            blockedAttempts(dir, one.id) > 1
+          )
       : raw === undefined;
   });
 }
@@ -521,10 +585,11 @@ interface Recorded {
 
 /**
  * A call's cost. A reply: the gateway's figure, else estimated from its
- * tokens; a batch reply with neither a figure nor any output tokens is booked
- * at its worst case, unknown. A failed call: the gateway's figure for its
- * generation if it can say; else, for sync, its worst case, unknown until
- * `spent --reconcile`; for a batch item, nothing (batch APIs bill replies).
+ * tokens; a reply with neither a figure nor any output tokens (sync or batch)
+ * is booked at its worst case, unknown. A failed call: the gateway's figure
+ * for its generation if it can say and it isn't $0; else, for sync, its
+ * worst case, unknown until `spent --reconcile`; for a batch item, nothing
+ * (batch APIs bill replies).
  */
 async function costFor(
   runtime: Runtime,
@@ -535,14 +600,18 @@ async function costFor(
   const price = priceRow(runtime.prices, request.model, transport);
   if (result.ok) {
     const cost = costOf(result.gatewayCost, result.tokens, price);
-    if (transport === "batch" && !cost.exact && result.tokens.output === 0)
+    // A reply with neither the gateway's figure nor any output tokens can't
+    // be priced: booked at its worst case, either transport.
+    if (!cost.exact && result.tokens.output === 0)
       return { cost: request.worst, exact: false, unknown: true };
     return cost;
   }
   const looked = result.generationId
     ? await runtime.gateway.generationCost(result.generationId)
     : undefined;
-  if (looked !== undefined) return { cost: looked, exact: true };
+  // $0 for a failed call usually means the gateway hasn't totted it up yet:
+  // unknown, kept at its worst case for `spent --reconcile`.
+  if (looked !== undefined && looked > 0) return { cost: looked, exact: true };
   if (transport === "batch") return { cost: 0, exact: false };
   return { cost: request.worst, exact: false, unknown: true };
 }
@@ -627,8 +696,10 @@ async function record(
   if (result.generationId) raw.generationId = result.generationId;
   if (result.warnings?.length) raw.warnings = result.warnings;
   if (batch?.reference) raw.batchId = batch.reference.id;
-  writeJson(path, raw);
   observe(runtime, request.promptKind, request.chars, given.tokens.input);
+  // The ledger line first: a crash between the two leaves the call booked
+  // but its reply unsaved, so a later `collect` books it again (on the safe
+  // side), never saved but unbooked.
   runtime.ledger.append({
     id: randomUUID(),
     at,
@@ -645,6 +716,7 @@ async function record(
     ...(result.ok ? {} : { failed: true }),
     ...(attempt > 1 ? { retry: attempt } : {}),
   });
+  writeJson(path, raw);
   return raw;
 }
 
@@ -673,7 +745,9 @@ export interface ExecuteOptions {
  * Runs requests once the budget check (`runRefusal`) passes. Batch starts
  * one batch per model, saving it first (`startBatches`).
  *
- * Sync launches a call only while this run's spending, its calls in flight
+ * Sync sends the first call of each shared prefix alone (`cachePrefix`), so
+ * the rest read it from the cache. It launches a call only while this run's
+ * spending, its calls in flight
  * at their worst case and the next call's worst case fit in the budget and
  * the cap. Before each launch it books that worst case in the ledger as a
  * hold, which the call's own line settles; a crash or Ctrl-C leaves it
@@ -726,6 +800,7 @@ export async function execute(
     const { skipped } = await runSync(requests, {
       gateway: runtime.gateway,
       concurrency: runtime.concurrency,
+      prefixOf: cachePrefix,
       reserve: (request) => {
         const next = worst.get(request.id) ?? 0;
         if (stopped) return false;
@@ -1015,7 +1090,8 @@ export async function reconcile(runtime: Runtime) {
     const cost = entry.lookup
       ? await runtime.gateway.generationCost(entry.lookup)
       : undefined;
-    if (cost === undefined) {
+    // $0 is no answer yet: keep the worst case (as `costFor` does).
+    if (cost === undefined || !(cost > 0)) {
       left.push(`${entry.run}/${entry.request}`);
       continue;
     }
@@ -1065,12 +1141,17 @@ export function failedBooking(
 
 // --- Scoring a run -----------------------------------------------------------
 
-/** The data scoring needs: folds already marked with A1's outcomes. */
+/**
+ * The data scoring needs: folds already marked with A1's outcomes, and the
+ * new text and task 3's sentences where loaded.
+ */
 export interface EvalData {
   dictionary: EnochianDictionary;
   rows: KeyRowRecord[];
   grammar: string;
   folds: Fold[];
+  newText?: NewTextSet;
+  task3?: Task3Sentence[];
 }
 
 /** A1's judged outcomes by row id, for `markHard`. */
@@ -1458,6 +1539,10 @@ export interface JudgeOptions {
   retry?: boolean;
   /** What the expert queue names as the source ("A1", or the run id). */
   source: string;
+  /** Builds a judge's request for a case; the folds' `judgeRequest` if not. */
+  request?: JudgeRequestBuilder;
+  /** Reads a judge's reply; the folds' `parseVerdicts` if not. */
+  parse?: (text: string) => { verdicts: Map<string, Verdict>; error?: string };
 }
 
 export const verdictStorePath = (out: string) => join(out, "verdicts.json");
@@ -1552,8 +1637,9 @@ function planJudges(
       const attempts = log[item.answer]?.[judge] ?? [];
       const last = attempts.at(-1);
       const base = `${item.answer}_judge-${judge}`;
+      const build = options.request ?? judgeRequest;
       const fresh = (id: string) => {
-        const request = judgeRequest(sub, judge, id);
+        const request = build(sub, judge, id);
         return {
           item: sub,
           judge,
@@ -1570,7 +1656,7 @@ function planJudges(
         planned.push(fresh(base));
         continue;
       }
-      const same = judgeRequest(sub, judge, last.id);
+      const same = build(sub, judge, last.id);
       const raw = readRaw(options.dir, last.id);
       if (promptHash(same) === last.promptHash && (!raw || failedRaw(raw))) {
         if (raw && !options.retry) {
@@ -1702,11 +1788,12 @@ function foldJudged(
         };
         if (
           now.rows.length !== attempt.rows.length ||
-          promptHash(judgeRequest(now, judge, attempt.id)) !==
-            attempt.promptHash
+          promptHash(
+            (options.request ?? judgeRequest)(now, judge, attempt.id),
+          ) !== attempt.promptHash
         )
           continue;
-        const parsed = parseVerdicts(raw.text);
+        const parsed = (options.parse ?? parseVerdicts)(raw.text);
         if (parsed.error)
           runtime.log(`${raw.id}: verdicts unreadable (${parsed.error})`);
         for (const [row, verdict] of parsed.verdicts)
@@ -1849,6 +1936,9 @@ export function rebuildRequests(
         entry.translate,
         data,
       );
+    else if (entry.newtext) request = newRequest(entry.newtext, data);
+    else if (entry.roundtrip)
+      request = roundTripRequest(entry.roundtrip, data.dictionary);
     else if (entry.probe)
       request = probePlan(
         data.rows,

@@ -75,17 +75,23 @@ export function checkContext(
   book: Book,
   dictionary: EnochianDictionary,
 ): CheckContext {
-  const entries = new Map<string, EnochianEntry[]>();
-  for (const [headword, entry] of Object.entries(
+  return checkContextFrom(
     contextDictionary(fold, book, dictionary),
-  )) {
+    contextRowsFor(fold, book),
+  );
+}
+
+/** The checker's view of any prompt's dictionary and Key rows. */
+export function checkContextFrom(
+  dictionary: EnochianDictionary,
+  rows: readonly KeyRowRecord[],
+): CheckContext {
+  const entries = new Map<string, EnochianEntry[]>();
+  for (const [headword, entry] of Object.entries(dictionary)) {
     const norm = normEnochian(headword);
     entries.set(norm, [...(entries.get(norm) ?? []), entry]);
   }
-  return {
-    entries,
-    rows: new Map(contextRowsFor(fold, book).map((row) => [row.id, row])),
-  };
+  return { entries, rows: new Map(rows.map((row) => [row.id, row])) };
 }
 
 /** A ref as read: a Key row, a headword, or neither. */
@@ -126,17 +132,23 @@ export function sides(item: AnswerItem, task: Task) {
  * Checks one item against its fold's context. `enochian` is the word the
  * item must be about: in task 1 the aligned input row's word, so a model
  * that renames an unknown word to a known one is caught; by default the
- * item's own Enochian side.
+ * item's own Enochian side. A list gives every spelling of that word that
+ * counts (the new text: a row shown in the Golden Dawn's spelling may cite
+ * Casaubon's word, and the other way about).
  */
 export function checkItem(
   item: AnswerItem,
   task: Task,
   context: CheckContext,
-  enochian: string = sides(item, task).enochian,
+  enochian: string | readonly string[] = sides(item, task).enochian,
 ): CheckOutcome {
   if (item.basis !== "attested") return "not checked";
   const { english } = sides(item, task);
-  const wanted = normEnochian(enochian);
+  const spellings = new Set(
+    (typeof enochian === "string" ? [enochian] : enochian)
+      .map(normEnochian)
+      .filter(Boolean),
+  );
   // An attested item must say where; leaving the ref out is no excuse.
   if (!item.ref?.trim()) return "invention";
   const ref = parseRef(item.ref);
@@ -147,14 +159,14 @@ export function checkItem(
     const forms = [row.word, row.gd]
       .filter((one): one is string => Boolean(one))
       .map(normEnochian);
-    if (!wanted || !forms.includes(wanted)) return "invention";
+    if (!forms.some((form) => spellings.has(form))) return "invention";
     return meaningAgrees(english, row.english) ? "ok" : "to judge";
   }
   // A headword is found by its normalised spelling, so "DIU" finds DIV and a
   // deciphered ref finds its entry.
   const norm = normEnochian(ref.word);
   const entries = context.entries.get(norm);
-  if (!entries || !wanted || norm !== wanted) return "invention";
+  if (!entries || !spellings.has(norm)) return "invention";
   return entries.some((entry) =>
     entry.meanings.some(({ meaning }) => meaningAgrees(english, meaning)),
   )
@@ -200,14 +212,14 @@ const englishKey = (text: string) =>
  */
 export function alignItems(
   items: readonly AnswerItem[],
-  rows: readonly KeyRowRecord[],
+  rows: readonly Pick<KeyRowRecord, "id" | "word" | "english">[],
   task: Task,
 ): Aligned[] {
   const ids = new Set(rows.map((row) => row.id));
   const claimed = new Set<string>();
   const keyOf = (text: string) =>
     task === 1 ? normEnochian(text) : englishKey(text);
-  const rowKey = (row: KeyRowRecord) =>
+  const rowKey = (row: Pick<KeyRowRecord, "word" | "english">) =>
     task === 1 ? normEnochian(row.word ?? "") : englishKey(row.english);
   return items.map((item) => {
     // Task 1's input numbers its words and gives no row ids, so a token wins

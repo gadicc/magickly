@@ -109,15 +109,80 @@ export interface Gateway {
   batchResults(batch: BatchReference): AsyncIterable<ModelResult>;
   /** A generation's cost from the gateway, if it can say. */
   generationCost(id: string): Promise<number | undefined>;
+  /**
+   * What the gateway recorded for a generation (cost and cached tokens), if
+   * it can say; for the cache check.
+   */
+  generationInfo?(id: string): Promise<GenerationInfo | undefined>;
 }
 
-/** The AI SDK's usage as the ledger counts it. */
-export function tokensOf(usage: LanguageModelUsage | undefined): Tokens {
+/** The gateway's record of one generation (`getGenerationInfo`). */
+export interface GenerationInfo {
+  cost: number;
+  promptTokens: number;
+  /** Input tokens read from the cache. */
+  cachedTokens: number;
+  /** Input tokens written to the cache. */
+  cacheCreationTokens: number;
+}
+
+/** A whole number of tokens at `path` in some JSON, if there is one. */
+function count(value: unknown, ...path: string[]): number | undefined {
+  let one = value;
+  for (const key of path)
+    one =
+      one && typeof one === "object"
+        ? (one as Record<string, unknown>)[key]
+        : undefined;
+  return typeof one === "number" && Number.isFinite(one) ? one : undefined;
+}
+
+/**
+ * Cache reads and writes as a provider reports them, where the AI SDK's own
+ * usage leaves them out: its raw usage (Anthropic's
+ * `cache_read_input_tokens` and `cache_creation_input_tokens`, OpenAI's
+ * `cached_tokens`), or the provider's metadata (`anthropic.usage`,
+ * `anthropic.cacheCreationInputTokens`, `openai.cachedPromptTokens`).
+ */
+export function providerCache(
+  raw: unknown,
+  metadata: unknown,
+): { read?: number; write?: number } {
+  const anthropic = (
+    metadata as { anthropic?: { usage?: unknown } } | undefined
+  )?.anthropic?.usage;
+  const read =
+    count(raw, "cache_read_input_tokens") ??
+    count(raw, "prompt_tokens_details", "cached_tokens") ??
+    count(raw, "input_tokens_details", "cached_tokens") ??
+    count(anthropic, "cache_read_input_tokens") ??
+    count(metadata, "openai", "cachedPromptTokens");
+  const write =
+    count(raw, "cache_creation_input_tokens") ??
+    count(anthropic, "cache_creation_input_tokens") ??
+    count(metadata, "anthropic", "cacheCreationInputTokens");
+  return {
+    ...(read === undefined ? {} : { read }),
+    ...(write === undefined ? {} : { write }),
+  };
+}
+
+/**
+ * The AI SDK's usage as the ledger counts it. Cache reads and writes come from
+ * its `inputTokenDetails`; where it leaves them out, from what the provider
+ * reported (`providerCache`), so a cached call is never priced as uncached.
+ */
+export function tokensOf(
+  usage: LanguageModelUsage | undefined,
+  metadata?: unknown,
+): Tokens {
   if (!usage) return { ...NO_TOKENS };
+  const provider = providerCache(usage.raw, metadata);
   return {
     input: usage.inputTokens ?? 0,
-    cached: usage.inputTokenDetails?.cacheReadTokens ?? 0,
-    cacheWrite: usage.inputTokenDetails?.cacheWriteTokens ?? 0,
+    cached: usage.inputTokenDetails?.cacheReadTokens ?? provider.read ?? 0,
+    cacheWrite:
+      usage.inputTokenDetails?.cacheWriteTokens ?? provider.write ?? 0,
     output: usage.outputTokens ?? 0,
     reasoning: usage.outputTokenDetails?.reasoningTokens ?? 0,
   };
@@ -165,12 +230,30 @@ function gatewayField(metadata: unknown, field: string): unknown {
     ?.gateway?.[field];
 }
 
-/** The settings both transports send with a request. */
-function callSettings(request: ModelRequest) {
+/**
+ * An explicit prompt-cache breakpoint for Anthropic models, on a system
+ * message (`providerOptions.anthropic.cacheControl`, passed through by the
+ * gateway); other providers ignore it.
+ */
+export const CACHE_BREAKPOINT = {
+  anthropic: { cacheControl: { type: "ephemeral" } },
+} as const;
+
+/**
+ * The settings both transports send with a request. For sync (`cache`),
+ * every system message after the first (the reference material: a context,
+ * then the grammar notes) ends at a cache breakpoint, so calls that share
+ * the same material read it from the cache whether or not the gateway's own
+ * caching places a breakpoint there; A2 and A3 share the first. Anthropic
+ * allows four. Batch requests carry none: they are reserved and priced as
+ * plain input, and a cache write would cost more than that.
+ */
+export function callSettings(request: ModelRequest, cache = true) {
   return {
-    instructions: request.instructions.map((content) => ({
+    instructions: request.instructions.map((content, i) => ({
       role: "system" as const,
       content,
+      ...(cache && i > 0 && i < 4 ? { providerOptions: CACHE_BREAKPOINT } : {}),
     })),
     prompt: request.prompt,
     reasoning: request.effort,
@@ -244,7 +327,7 @@ export function aiGateway(): Gateway {
           ok: true,
           text,
           finishReason,
-          tokens: tokensOf(usage),
+          tokens: tokensOf(usage, step.providerMetadata),
           gatewayCost: gatewayField(step.providerMetadata, "cost"),
           responseModel: step.response?.modelId,
           warnings: [...(warnings ?? [])],
@@ -262,7 +345,7 @@ export function aiGateway(): Gateway {
           id: request.id,
           type: "text" as const,
           model: request.model,
-          ...callSettings(request),
+          ...callSettings(request, false),
         })),
         providerOptions: { gateway: { idempotencyKey } },
       });
@@ -298,7 +381,7 @@ export function aiGateway(): Gateway {
             ok: true,
             text: item.text,
             finishReason: item.finishReason,
-            tokens: tokensOf(item.usage),
+            tokens: tokensOf(item.usage, item.providerMetadata),
             gatewayCost: gatewayField(item.providerMetadata, "cost"),
             responseModel: item.response?.modelId,
             ...common,
@@ -323,7 +406,33 @@ export function aiGateway(): Gateway {
         return undefined;
       }
     },
+    async generationInfo(id) {
+      const { gateway } = await import("ai");
+      try {
+        const info = await gateway.getGenerationInfo({ id });
+        return {
+          cost: info.totalCost,
+          promptTokens: info.promptTokens,
+          cachedTokens: info.cachedTokens,
+          cacheCreationTokens: info.cacheCreationTokens,
+        };
+      } catch {
+        return undefined;
+      }
+    },
   };
+}
+
+/**
+ * The prompt-cache prefix a request shares with others, if any: its model
+ * and its system messages, when it has reference material (more than the
+ * fixed instructions).
+ */
+export function cachePrefix(request: ModelRequest): string | undefined {
+  if (request.instructions.length < 2) return undefined;
+  return createHash("sha256")
+    .update(JSON.stringify([request.model, request.instructions]))
+    .digest("hex");
 }
 
 /**
@@ -333,6 +442,10 @@ export function aiGateway(): Gateway {
  * asks again; when it says no with none in flight, the rest are skipped and
  * returned by id. So a run never holds more than it may spend, each call in
  * flight counted at its worst case.
+ *
+ * With `prefixOf`, the first call of each prefix goes alone: the next request
+ * with the same prefix waits until it is done, so that it and the rest read
+ * the prefix from the cache rather than each writing it.
  */
 export async function runSync(
   requests: readonly ModelRequest[],
@@ -340,6 +453,8 @@ export async function runSync(
     gateway: Gateway;
     concurrency?: number;
     reserve: (request: ModelRequest) => boolean;
+    /** The cache prefix a request shares (`cachePrefix`), if warmed first. */
+    prefixOf?: (request: ModelRequest) => string | undefined;
     /** The hooks for a call (its timeout, its generation id). */
     hooks?: (request: ModelRequest) => CallHooks;
     onResult: (
@@ -353,6 +468,9 @@ export async function runSync(
   let stopped = false;
   let inFlight = 0;
   let waiting: (() => void)[] = [];
+  /** Prefixes whose first call is in flight, and those done once. */
+  const warming = new Set<string>();
+  const warm = new Set<string>();
   const wake = () => {
     const all = waiting;
     waiting = [];
@@ -366,6 +484,11 @@ export async function runSync(
         skipped.push(request.id);
         continue;
       }
+      const prefix = options.prefixOf?.(request);
+      if (prefix && warming.has(prefix)) {
+        await new Promise<void>((resolve) => waiting.push(resolve));
+        continue;
+      }
       // `reserve` and `next++` run with no await between them, so two
       // workers never take the same request.
       if (!options.reserve(request)) {
@@ -376,6 +499,8 @@ export async function runSync(
       }
       next++;
       inFlight++;
+      const first = prefix !== undefined && !warm.has(prefix);
+      if (first) warming.add(prefix);
       try {
         await options.onResult(
           await options.gateway.generate(request, options.hooks?.(request)),
@@ -383,6 +508,10 @@ export async function runSync(
         );
       } finally {
         inFlight--;
+        if (first) {
+          warming.delete(prefix);
+          warm.add(prefix);
+        }
         wake();
       }
     }

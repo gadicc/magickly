@@ -21,6 +21,7 @@ import {
   contextDictionary,
   contextRowsFor,
   type Fold,
+  type KeyRowRecord,
   type TestRow,
 } from "./testset.ts";
 
@@ -59,7 +60,7 @@ export type Task2Outcome =
 export type Outcome = Task1Outcome | Task2Outcome;
 
 /** Whether an item answers "unknown" rather than a word. */
-function saysUnknown(item: AnswerItem, side: string): boolean {
+export function saysUnknown(item: AnswerItem, side: string): boolean {
   return item.basis === "unknown" || !side.trim() || /^unknown$/i.test(side);
 }
 
@@ -71,7 +72,10 @@ function saysUnknown(item: AnswerItem, side: string): boolean {
  * comma- or semicolon-separated senses. Everything else goes to the judges,
  * so the script never marks a task-1 answer wrong.
  */
-export function scoreTask1(row: TestRow, item?: AnswerItem): Task1Outcome {
+export function scoreTask1(
+  row: Pick<TestRow, "english">,
+  item?: AnswerItem,
+): Task1Outcome {
   if (!item) return "missing";
   if (saysUnknown(item, item.target)) return "unknown";
   return meaningAgrees(row.english, item.target) ? "correct" : "to judge";
@@ -92,6 +96,20 @@ export function synonymIndex(
   book: Book,
   dictionary: EnochianDictionary,
 ): Map<string, Set<string>> {
+  return synonymsFrom(
+    contextRowsFor(fold, book),
+    contextDictionary(fold, book, dictionary),
+  );
+}
+
+/**
+ * The same index from any context: Key rows by their English, headwords by
+ * each piece of their meanings.
+ */
+export function synonymsFrom(
+  rows: readonly KeyRowRecord[],
+  dictionary: EnochianDictionary,
+): Map<string, Set<string>> {
   const out = new Map<string, Set<string>>();
   const add = (english: string, form: string) => {
     const key = englishKey(english);
@@ -101,20 +119,18 @@ export function synonymIndex(
     forms.add(norm);
     out.set(key, forms);
   };
-  for (const row of contextRowsFor(fold, book)) {
+  for (const row of rows) {
     const form = row.word ?? row.gd;
     if (form && row.english) add(row.english, form);
   }
-  for (const [headword, entry] of Object.entries(
-    contextDictionary(fold, book, dictionary),
-  ))
+  for (const [headword, entry] of Object.entries(dictionary))
     for (const { meaning } of entry.meanings)
       for (const piece of meaning.split(/[,;]/)) add(piece, headword);
   return out;
 }
 
 /** The forms that count as right for a row: Casaubon's and the GD's. */
-function rightForms(row: TestRow): string[] {
+function rightForms(row: Pick<TestRow, "word" | "gd">): string[] {
   return [row.word, row.gd]
     .filter((one): one is string => Boolean(one))
     .map(normEnochian);
@@ -122,18 +138,20 @@ function rightForms(row: TestRow): string[] {
 
 /**
  * Task 2 for one row: correct for Casaubon's word or the GD's form after
- * normalising; else a synonym the context uses for the same English; else
- * near, within two letters of a right form of five letters or more.
+ * normalising (or for any of `forms`, where given: the new text's joins);
+ * else a synonym the context uses for the same English; else near, within
+ * two letters of a right form of five letters or more.
  */
 export function scoreTask2(
-  row: TestRow,
+  row: Pick<TestRow, "word" | "gd" | "english">,
   item: AnswerItem | undefined,
   synonyms: ReadonlyMap<string, ReadonlySet<string>>,
+  forms?: readonly string[],
 ): Task2Outcome {
   if (!item) return "missing";
   if (saysUnknown(item, item.target)) return "unknown";
   const answer = normEnochian(item.target);
-  const right = rightForms(row);
+  const right = forms ? forms.map(normEnochian) : rightForms(row);
   if (right.includes(answer)) return "correct";
   if (synonyms.get(englishKey(row.english))?.has(answer)) return "synonym";
   if (right.some((one) => one.length >= 5 && editDistance(one, answer) <= 2))

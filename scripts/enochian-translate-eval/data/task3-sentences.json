@@ -1,0 +1,312 @@
+{
+  "about": "Task 3 of plan 077 (New English): 60 English sentences with no answer key, to be translated into Enochian. 20 practitioner sentences, 20 everyday sentences, and 20 'attested' sentences whose every content word occurs in Dee's English in keys.json5 (checked by script, which also checks that no four consecutive content words follow a Key passage). Drafted by Claude for the owner to read, edit or replace.",
+  "sentences": [
+    {
+      "id": "T01",
+      "kind": "practitioner",
+      "english": "Come down to us in peace and show us what we have asked to see."
+    },
+    {
+      "id": "T02",
+      "kind": "practitioner",
+      "english": "Guardians of the eastern watchtower, protect this circle until the work is done."
+    },
+    {
+      "id": "T03",
+      "kind": "practitioner",
+      "english": "Let this house be a place of light, peace and understanding."
+    },
+    {
+      "id": "T04",
+      "kind": "practitioner",
+      "english": "I dedicate this temple to the pursuit of wisdom and to the service of the highest."
+    },
+    {
+      "id": "T05",
+      "kind": "practitioner",
+      "english": "Why have you not answered when we called?"
+    },
+    {
+      "id": "T06",
+      "kind": "practitioner",
+      "english": "Open the gates of understanding to those who seek with a pure heart."
+    },
+    {
+      "id": "T07",
+      "kind": "practitioner",
+      "english": "Bless this talisman, so that it may guard whoever wears it."
+    },
+    {
+      "id": "T08",
+      "kind": "practitioner",
+      "english": "We do not ask for power over others, only for knowledge of ourselves."
+    },
+    {
+      "id": "T09",
+      "kind": "practitioner",
+      "english": "Spirit of the air, tell me your name and the name of the one who sent you."
+    },
+    {
+      "id": "T10",
+      "kind": "practitioner",
+      "english": "Depart now in peace, and return when you are called again."
+    },
+    {
+      "id": "T11",
+      "kind": "practitioner",
+      "english": "Let no evil thing cross the boundary of this circle."
+    },
+    {
+      "id": "T12",
+      "kind": "practitioner",
+      "english": "The angel who spoke to us last night promised to come again at dawn."
+    },
+    {
+      "id": "T13",
+      "kind": "practitioner",
+      "english": "Grant me the patience to learn this language one word at a time."
+    },
+    {
+      "id": "T14",
+      "kind": "practitioner",
+      "english": "Will you teach us the true names of the four quarters?"
+    },
+    {
+      "id": "T15",
+      "kind": "practitioner",
+      "english": "Protect this home and everyone who sleeps under its roof."
+    },
+    {
+      "id": "T16",
+      "kind": "practitioner",
+      "english": "Here the light of the east was received and kept."
+    },
+    {
+      "id": "T17",
+      "kind": "practitioner",
+      "english": "May whoever carries this stone walk safely and never lose the way."
+    },
+    {
+      "id": "T18",
+      "kind": "practitioner",
+      "english": "Speak plainly, for we are students and not yet masters of your tongue."
+    },
+    {
+      "id": "T19",
+      "kind": "practitioner",
+      "english": "In the name of the creator, I seal this working and close the temple."
+    },
+    {
+      "id": "T20",
+      "kind": "practitioner",
+      "english": "Those who came before us kept these keys in secret; we open them with respect."
+    },
+
+    {
+      "id": "T21",
+      "kind": "everyday",
+      "english": "The train was late again this morning, so I missed the meeting.",
+      "note": "'train' occurs in Dee's English only in the sense of a retinue"
+    },
+    {
+      "id": "T22",
+      "kind": "everyday",
+      "english": "Could you pick up some milk and bread on your way home?"
+    },
+    {
+      "id": "T23",
+      "kind": "everyday",
+      "english": "My phone battery died halfway through the call.",
+      "note": "'phone' and 'battery' have no counterpart in our data"
+    },
+    {
+      "id": "T24",
+      "kind": "everyday",
+      "english": "We are painting the kitchen yellow next weekend."
+    },
+    {
+      "id": "T25",
+      "kind": "everyday",
+      "english": "Our neighbour's dog barks every time the postman comes."
+    },
+    {
+      "id": "T26",
+      "kind": "everyday",
+      "english": "I forgot my password and had to reset it twice.",
+      "note": "'password' and 'reset' have no counterpart in our data"
+    },
+    {
+      "id": "T27",
+      "kind": "everyday",
+      "english": "It rained all afternoon, and the children stayed inside reading."
+    },
+    {
+      "id": "T28",
+      "kind": "everyday",
+      "english": "The doctor said I should drink more water and sleep earlier."
+    },
+    {
+      "id": "T29",
+      "kind": "everyday",
+      "english": "Please turn off the lights when you leave the office."
+    },
+    {
+      "id": "T30",
+      "kind": "everyday",
+      "english": "My sister is learning to play the piano at forty."
+    },
+    {
+      "id": "T31",
+      "kind": "everyday",
+      "english": "The coffee machine at work has been broken since Tuesday.",
+      "note": "'coffee', 'machine' and 'Tuesday' have no counterpart in our data"
+    },
+    {
+      "id": "T32",
+      "kind": "everyday",
+      "english": "We watched a film about penguins and fell asleep before the end."
+    },
+    {
+      "id": "T33",
+      "kind": "everyday",
+      "english": "How much does a ticket to the airport cost?"
+    },
+    {
+      "id": "T34",
+      "kind": "everyday",
+      "english": "He fixed the bicycle chain with a spoon and some patience.",
+      "note": "'bicycle' has no counterpart in our data"
+    },
+    {
+      "id": "T35",
+      "kind": "everyday",
+      "english": "Don't forget to water the tomatoes while I'm away."
+    },
+    {
+      "id": "T36",
+      "kind": "everyday",
+      "english": "The new restaurant on the corner serves excellent soup."
+    },
+    {
+      "id": "T37",
+      "kind": "everyday",
+      "english": "I have been waiting for the plumber since eight o'clock."
+    },
+    {
+      "id": "T38",
+      "kind": "everyday",
+      "english": "She sent me a photograph of the sunset from the beach."
+    },
+    {
+      "id": "T39",
+      "kind": "everyday",
+      "english": "Is the library open on Sunday afternoons?"
+    },
+    {
+      "id": "T40",
+      "kind": "everyday",
+      "english": "My grandmother still writes letters by hand to all her friends."
+    },
+
+    {
+      "id": "T41",
+      "kind": "attested",
+      "english": "The moon gave her light to the field."
+    },
+    {
+      "id": "T42",
+      "kind": "attested",
+      "english": "Who shall open the house of the dragon?"
+    },
+    {
+      "id": "T43",
+      "kind": "attested",
+      "english": "The servants sing in the temple at midday."
+    },
+    {
+      "id": "T44",
+      "kind": "attested",
+      "english": "Let the stranger rest under the oak until night."
+    },
+    {
+      "id": "T45",
+      "kind": "attested",
+      "english": "Her daughters gathered olives in the field."
+    },
+    {
+      "id": "T46",
+      "kind": "attested",
+      "english": "Know that the stone is stronger than the water."
+    },
+    {
+      "id": "T47",
+      "kind": "attested",
+      "english": "My brothers dwell in the north and in the south."
+    },
+    {
+      "id": "T48",
+      "kind": "attested",
+      "english": "Why do the lamps burn so long?"
+    },
+    {
+      "id": "T49",
+      "kind": "attested",
+      "english": "The song of the virgins is a comfort to the widow."
+    },
+    {
+      "id": "T50",
+      "kind": "attested",
+      "english": "The covenant between God and men is true."
+    },
+    {
+      "id": "T51",
+      "kind": "attested",
+      "english": "Six elders sit on a marble seat by the window."
+    },
+    {
+      "id": "T52",
+      "kind": "attested",
+      "english": "The workmen are building a tower of stone."
+    },
+    {
+      "id": "T53",
+      "kind": "attested",
+      "english": "Every day the sun rises in the east."
+    },
+    {
+      "id": "T54",
+      "kind": "attested",
+      "english": "Bring water and salt to the chamber."
+    },
+    {
+      "id": "T55",
+      "kind": "attested",
+      "english": "The wicked shall not see the light of the temple."
+    },
+    {
+      "id": "T56",
+      "kind": "attested",
+      "english": "Her garments were bright and her voice was strong."
+    },
+    {
+      "id": "T57",
+      "kind": "attested",
+      "english": "Many thousands will come to praise the creator."
+    },
+    {
+      "id": "T58",
+      "kind": "attested",
+      "english": "In the midst of the harvest there was great joy."
+    },
+    {
+      "id": "T59",
+      "kind": "attested",
+      "english": "The dragon sleeps in a cave underneath the mount."
+    },
+    {
+      "id": "T60",
+      "kind": "attested",
+      "english": "Hearken to the voice of your master."
+    }
+  ]
+}

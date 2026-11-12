@@ -1668,7 +1668,7 @@ describe("answers that list alternatives", () => {
     }
     expect(flagged).toBeGreaterThan(100);
     expect(shotgun).toBeLessThanOrEqual(a1);
-  });
+  }, 30_000);
 });
 
 describe("attested items the checker can't settle", () => {

@@ -46,13 +46,22 @@
     "search:watch": "node --import tsx scripts/search/watch.mts",
     "translate-eval:testset": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts testset",
     "translate-eval:baseline": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts baseline",
+    "translate-eval:newtext": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts newtext",
+    "translate-eval:newtext-baseline": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts newtext-baseline",
     "translate-eval:run": "pnpm data:build && loom env -- node --import tsx scripts/enochian-translate-eval/cli.ts run",
     "translate-eval:collect": "pnpm data:build && loom env -- node --import tsx scripts/enochian-translate-eval/cli.ts collect",
     "translate-eval:judge": "pnpm data:build && loom env -- node --import tsx scripts/enochian-translate-eval/cli.ts judge",
     "translate-eval:judge-a1": "pnpm data:build && loom env -- node --import tsx scripts/enochian-translate-eval/cli.ts judge-a1",
     "translate-eval:probe": "pnpm data:build && loom env -- node --import tsx scripts/enochian-translate-eval/cli.ts probe",
     "translate-eval:report": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts report",
-    "translate-eval:spent": "loom env -- node --import tsx scripts/enochian-translate-eval/cli.ts spent"
+    "translate-eval:spent": "loom env -- node --import tsx scripts/enochian-translate-eval/cli.ts spent",
+    "translate-eval:judge-newtext-a1": "pnpm data:build && loom env -- node --import tsx scripts/enochian-translate-eval/cli.ts judge-newtext-a1",
+    "translate-eval:cache-check": "pnpm data:build && loom env -- node --import tsx scripts/enochian-translate-eval/cli.ts cache-check",
+    "translate-eval:roundtrip": "pnpm data:build && loom env -- node --import tsx scripts/enochian-translate-eval/cli.ts roundtrip",
+    "translate-eval:judge-task3": "pnpm data:build && loom env -- node --import tsx scripts/enochian-translate-eval/cli.ts judge-task3",
+    "translate-eval:task3-report": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts task3-report",
+    "translate-eval:newbars": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts newbars",
+    "translate-eval:budget": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts budget"
   },
   "dependencies": {
     "@ai-sdk/react": "4.0.156",

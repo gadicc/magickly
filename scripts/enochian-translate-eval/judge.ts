@@ -48,6 +48,36 @@ export interface JudgeRow {
    * doesn't obviously agree: the judges also say whether it supports it.
    */
   cited?: { ref: string; text: string };
+  /**
+   * New text, a swapped row: every English Dee gives the word, on each Key
+   * row where it occurs; any of them is right.
+   */
+  senses?: string[];
+  /**
+   * New text, a join: the small word and the word it is joined to, with
+   * their English; the translation must render both.
+   */
+  join?: {
+    small: string;
+    smallSenses: string[];
+    word: string;
+    english: string;
+  };
+  /** Task 3: the translation word by word (see `task3.ts`). */
+  words?: {
+    enochian: string;
+    english: string;
+    basis: string;
+    ref?: string;
+    cited?: string;
+  }[];
+  /**
+   * What else the question depends on beyond the row id and the answer, for
+   * the verdict store (`verdictKey`): the new text's ids repeat across sets
+   * (a top-up's S01 is another sentence), and task 3 asks two questions of
+   * one translation.
+   */
+  question?: string;
 }
 
 /** The rows of one answer that go to the judges, in one call per judge. */
@@ -192,6 +222,66 @@ export function judgeRequest(
   };
 }
 
+export const NEW_JUDGE_INSTRUCTIONS = `You check English translations of Enochian words, the language of the nineteen Keys (Calls) that John Dee and Edward Kelley recorded, against the reference English for each word in its place.
+
+For each row you get its id, the Enochian word, the reference English for it, the English a translator gave, and the meanings our dictionary lists for the word. Decide whether the translator's English means the same as the reference English for that word in that place.
+
+- "same": the same sense, even in other words or another form of the word. The reference English is free: it adds articles, pronouns and prepositions that the Enochian word may not carry, so their presence or absence alone doesn't make a difference ("of the earth" and "earth" are the same; "move" and "moving" are the same).
+- "different": another sense, or one so vague or broad that it doesn't say what the reference says. A meaning the dictionary lists for the word is still "different" if it isn't a sense the reference gives.
+
+A row with "senses" lists every English Dee gives this word, each from a place where it occurs: the translation is "same" if it means the same as any of them.
+
+A row with "join" is a small word written together with the next word, as the Keys sometimes do: the translation is "same" only if it renders both parts' meanings, the small word's and the word's.
+
+A row marked "alternatives" offers several readings instead of one: it is "same" only if every reading it offers means the same as the reference; otherwise "different".
+
+A row with "cited" names the dictionary entry or Key row the translator said gives this meaning. For those rows also give "supported": true if the cited entry or row gives the word a meaning the translation renders, false if not.
+
+Judge each row on its own. Work through them as you need to, then end your reply with one fenced code block marked json, holding an object with one field, "verdicts": a list with one entry per row, each {"row": the row id, "verdict": "same" or "different", "reason": a short phrase}, adding "supported" for rows with "cited". Write nothing after the block.`;
+
+/** A judge's request for a case of the new text's task-1 rows. */
+export function newJudgeRequest(
+  item: JudgeCase,
+  judge: JudgeName,
+  id = `${item.answer}_judge-${judge}`,
+): ModelRequest {
+  const rows = item.rows.map((one) => ({
+    row: one.row,
+    enochian: one.enochian,
+    reference: one.dee,
+    translation: one.answer,
+    dictionary: one.meanings.length ? one.meanings : ["(no entry)"],
+    ...(one.senses ? { senses: one.senses } : {}),
+    ...(one.join
+      ? {
+          join: {
+            small: one.join.small,
+            "small word's senses": one.join.smallSenses,
+            word: one.join.word,
+            "word's English": one.join.english,
+          },
+        }
+      : {}),
+    ...(one.alternatives ? { alternatives: true } : {}),
+    ...(one.cited ? { cited: one.cited.text } : {}),
+  }));
+  return {
+    id,
+    kind: "judge",
+    model: JUDGES[judge].model,
+    effort: JUDGES[judge].effort,
+    instructions: [NEW_JUDGE_INSTRUCTIONS],
+    prompt: `The rows, as JSON:\n\n${JSON.stringify(rows, null, 1)}`,
+  };
+}
+
+/** A judge's request for a case; `judgeRequest`'s shape. */
+export type JudgeRequestBuilder = (
+  item: JudgeCase,
+  judge: JudgeName,
+  id?: string,
+) => ModelRequest;
+
 const verdictsSchema = z.object({
   verdicts: z.array(
     z.object({
@@ -284,7 +374,8 @@ export function normTranslation(text: string): string {
  * translation, any reference put to the judges with the text cited for it,
  * and whether the alternatives rule applied.
  * The same translation of the same row is the same question in any run or
- * arm, and in A1.
+ * arm, and in A1. A row with a `question` (the new text, task 3) adds its
+ * hash, so a different question about the same id never shares a ruling.
  */
 export function verdictKey(row: JudgeRow): string {
   // The alternatives rule and the cited text (which differs between open and
@@ -292,11 +383,15 @@ export function verdictKey(row: JudgeRow): string {
   const cited = row.cited
     ? `${row.cited.ref}#${createHash("sha256").update(row.cited.text).digest("hex").slice(0, 12)}`
     : "";
+  const question = row.question
+    ? createHash("sha256").update(row.question).digest("hex").slice(0, 16)
+    : "";
   return [
     row.row,
     normTranslation(row.answer),
     cited,
     row.alternatives ? "alternatives" : "",
+    ...(question ? [question] : []),
   ].join("\t");
 }
 

@@ -80,6 +80,46 @@ export async function fetchPrices(
   return out;
 }
 
+/**
+ * Plan 077's prices (USD per million tokens, checked 11 November 2026), for
+ * an offline projection only, where no saved price list has the model: input
+ * and output as the plan gives them, a cache read at a twentieth of the input
+ * price (as the plan says), a cache write at 1.25 times the input price for
+ * Anthropic's models (as the saved list has it for Opus) and none for
+ * OpenAI's, and batch at half of each.
+ */
+export const PLAN_PRICES: Readonly<
+  Record<string, { input: number; output: number; cacheWrite?: number }>
+> = {
+  "anthropic/claude-opus-5.5": { input: 4, output: 20, cacheWrite: 5 },
+  "anthropic/claude-fable-5.2": { input: 8, output: 40, cacheWrite: 10 },
+  "anthropic/claude-sonnet-5.5": { input: 2, output: 10, cacheWrite: 2.5 },
+  "openai/gpt-6.1-sol": { input: 2, output: 10 },
+};
+
+/** `PLAN_PRICES` as the gateway's list would give them, batch rows too. */
+export function planPriceList(models: readonly string[]): PriceList {
+  const out: PriceList = {};
+  const perToken = (usd: number) => String(usd / 1e6);
+  for (const model of models) {
+    const row = PLAN_PRICES[model];
+    if (!row) throw new Error(`Plan 077 gives no price for ${model}`);
+    for (const [id, scale] of [
+      [model, 1],
+      [`${model}-batch`, 0.5],
+    ] as const)
+      out[id] = {
+        input: perToken(row.input * scale),
+        output: perToken(row.output * scale),
+        input_cache_read: perToken((row.input * scale) / 20),
+        ...(row.cacheWrite
+          ? { input_cache_write: perToken(row.cacheWrite * scale) }
+          : {}),
+      };
+  }
+  return out;
+}
+
 /** Token counts as the ledger keeps them. */
 export interface Tokens {
   /** All input tokens, cached or not. */
