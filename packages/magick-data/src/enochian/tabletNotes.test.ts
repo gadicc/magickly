@@ -167,6 +167,14 @@ describe("the tablet notes", () => {
     expect(sourceUrl(regardie)).toBe(
       "https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol4-1940/page/n263",
     );
+    // The Seniors' names, in the consecration of the elemental weapons.
+    const seniors = { work: "regardie1939", page: 73, leaf: 66 } as const;
+    expect(sourceText(seniors)).toBe(
+      "Israel Regardie, The Golden Dawn, vol. 3 (Aries Press, Chicago, 1939), p.73 (archive.org leaf n66)",
+    );
+    expect(sourceUrl(seniors)).toBe(
+      "https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol3-1939/page/n66",
+    );
     expect(sourceUrl({ work: "equinox1912", plate: "III", leaf: 241 })).toBe(
       "https://archive.org/details/crowley-equinox_202110/The%20Equinox%20Vol.%201%2C%20No.%207/page/n241",
     );

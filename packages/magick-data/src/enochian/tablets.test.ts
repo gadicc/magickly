@@ -286,11 +286,12 @@ const row = (grid: Grid, at: number, columns: readonly number[]) =>
 describe("the Golden Dawn's version", () => {
   // The six Seniors of each, read from the centre of the Great Cross
   // outwards: along the seventh row to the left and to the right, then up
-  // and down the sixth and seventh columns. The names are the Greer
-  // edition's (the consecration of the elemental weapons), which settle
+  // and down the sixth and seventh columns. The names are the Order's, from
+  // its consecration of the elemental weapons as Regardie prints it in The
+  // Golden Dawn, vol. 3 (1939), p.73 (archive.org leaf n66), and they settle
   // the squares where the version reads otherwise than Regardie's higher
-  // letter (tablets.json5); it spells three of them Saiinor, Aaetpoi and
-  // Alhectega, where every source's tablet reads Saiinov, Aaetpio and
+  // letter (tablets.json5). That page spells three of them Saiinor, Aaetpoi
+  // and Alphctga, where every source's tablet reads Saiinov, Aaetpio and
   // Alhctga.
   const seniors = (id: EnochianTabletID) => {
     const { grid } = view(id);

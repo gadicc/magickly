@@ -57,6 +57,13 @@
         "item": "IsraelRegardie-TheGoldenDawn-Vol4-1940"
       }
     },
+    "regardie1939": {
+      "title": "Israel Regardie, The Golden Dawn, vol. 3 (Aries Press, Chicago, 1939)",
+      "year": 1939,
+      "archive": {
+        "item": "IsraelRegardie-TheGoldenDawn-Vol3-1939"
+      }
+    },
     "greer": {
       "title": "Israel Regardie, The Golden Dawn, 7th edition, ed. John Michael Greer (Llewellyn)",
       "isbn": "978-0-7387-4399-8"
@@ -695,12 +702,17 @@
       {
         "row": 3,
         "column": 5,
-        "note": "Regardie prints z over x: z is the 1587 letter, x (a capital in the 1584 print) the 1584 one; the Equinox and Greer print x. The Golden Dawn's version takes z, the higher letter; the Senior's name reads Aaozaif in Greer's edition, Aaoxaif in Regardie's.",
+        "note": "Regardie prints z over x: z is the 1587 letter, x (a capital in the 1584 print) the 1584 one; the Equinox and Greer print x. The Golden Dawn's version takes z, the higher letter; the Senior's name reads Aaozaif in Regardie's vol. 3 (1939), p.73, and in Greer's edition, but Aaoxaif in his vol. 4 (1940), p.277.",
         "sources": [
           {
             "work": "regardie1940",
             "page": 270,
             "leaf": 262
+          },
+          {
+            "work": "regardie1940",
+            "page": 277,
+            "leaf": 269
           },
           {
             "work": "equinox1912",
@@ -709,6 +721,11 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "regardie1939",
+            "page": 73,
+            "leaf": 66
           },
           {
             "work": "casaubon1659",
@@ -745,6 +762,11 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "regardie1939",
+            "page": 73,
+            "leaf": 66
           },
           {
             "work": "casaubon1659",
@@ -1092,6 +1114,11 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "regardie1939",
+            "page": 73,
+            "leaf": 66
           }
         ]
       },
@@ -1267,6 +1294,11 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "regardie1939",
+            "page": 73,
+            "leaf": 66
           }
         ]
       },
@@ -1408,6 +1440,11 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "regardie1939",
+            "page": 73,
+            "leaf": 66
           },
           {
             "work": "casaubon1659",
@@ -1771,6 +1808,11 @@
             "work": "greer"
           },
           {
+            "work": "regardie1939",
+            "page": 73,
+            "leaf": 66
+          },
+          {
             "work": "casaubon1659",
             "page": 176,
             "leaf": 265
@@ -1921,6 +1963,11 @@
             "work": "greer"
           },
           {
+            "work": "regardie1939",
+            "page": 73,
+            "leaf": 66
+          },
+          {
             "work": "casaubon1659",
             "page": 176,
             "leaf": 265
@@ -1990,6 +2037,11 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "regardie1939",
+            "page": 73,
+            "leaf": 66
           }
         ]
       },
@@ -2030,6 +2082,11 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "regardie1939",
+            "page": 73,
+            "leaf": 66
           }
         ]
       },
@@ -2205,6 +2262,11 @@
           },
           {
             "work": "greer"
+          },
+          {
+            "work": "regardie1939",
+            "page": 73,
+            "leaf": 66
           }
         ]
       },

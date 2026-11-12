@@ -19,7 +19,14 @@
 //   greer         The Watchtowers redrawn in Regardie, *The Golden Dawn*,
 //                 7th edition, ed. John Michael Greer (Llewellyn, ISBN
 //                 978-0-7387-4399-8), its colour plates "Enochian Tablet:
-//                 The First Watchtower" to "The Fourth Watchtower".
+//                 The First Watchtower" to "The Fourth Watchtower": the
+//                 letters as those plates print them, which are facts.
+//                 Each is a letter the 1940 or the 1912 print gives in
+//                 that square, as its letter or as Regardie's smaller one
+//                 below it, except in Water's row 4 square 9, where Greer
+//                 has e, the letter of Dee's 1584 table and Raphael's of
+//                 1587. Greer's case and mirrored letters are typography.
+//                 No rights are asserted over the reading.
 //   dee1584       Dee and Kelley's tables of June 1584 as Casaubon prints
 //                 Dee's record, *A True & Faithful Relation* (London, 1659;
 //                 from British Library, Cotton MS Appendix XLVI): archive.org
@@ -60,8 +67,10 @@
 // `choices.gd` is the Golden Dawn's version: Regardie's higher letter,
 // which he prefers while allowing both (p.306, leaf n298), except in the
 // squares listed, where both other sources print another letter and the
-// Order's names through the square read it too (the Seniors as the Greer
-// edition's "The Four Elemental Weapons" names them; the names Liber
+// Order's names through the square read it too (the twenty-four Seniors as
+// the Order's consecration of the elemental weapons names them, Regardie,
+// *The Golden Dawn*, vol. 3 (Aries Press, Chicago, 1939), p.73: archive.org
+// item IsraelRegardie-TheGoldenDawn-Vol3-1939, leaf n66; the names Liber
 // Chanokh reads off Water, The Equinox, pp.235-236). There the version
 // takes the Equinox's letter. Water's row 5 square 12 has no higher letter
 // to take: Regardie prints four there, y and l side by side over N and h,

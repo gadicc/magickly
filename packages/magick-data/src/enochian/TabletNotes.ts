@@ -22,6 +22,7 @@ export type TabletWorkId =
   | "equinox1912"
   | "equinox1911no5"
   | "equinox1912no8"
+  | "regardie1939"
   | "regardie1940"
   | "greer";
 

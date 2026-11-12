@@ -535,10 +535,25 @@ table of 1587 are read from Meric Casaubon's printing of Dee's records,
 *A True & Faithful Relation* (London, 1659; archive.org
 `truefaithfulrela00deej`, pp. 175-188 and the "Actio Tertia", p. 15),
 which comes from British Library, Cotton MS Appendix XLVI. Dee's own copy
-in Sloane MS 3191 could not be read: the Library's images have been
-offline since its cyber-attack of 2023 (plan 061 says what to check when
-they return). The file's comment says where each square comes from. The
-letters are facts, and **no rights are asserted over them**. See
+is expected in Sloane MS 3191, ff. 52r-80v, which the Library catalogues
+as the remainder of *Liber Scientiae*
+([catalogue](https://searcharchives.bl.uk/catalog/040-002115575)); it
+could not be read: the Library's images have been offline since its
+cyber-attack of 2023 (plan 061 says what to check when they return). The
+comment at the head of the repository's source file
+([`tablets.json5`](https://github.com/gadicc/magickly/blob/main/packages/magick-data/src/enochian/tablets.json5))
+says where each square comes from; comments do not ship in the package.
+
+The `greer` reading is the letters as Greer's plates print them. Each is
+a letter that the 1940 or the 1912 print gives in that square, as its
+letter or as the smaller letter Regardie prints below it, except in one
+square, Water's row 4, square 9, where Greer gives e, the letter of Dee's
+1584 table and Raphael's of 1587. Greer's case and his mirrored letters
+are typography. The Seniors' names, which settle some of the Golden
+Dawn's choices, are cited from Regardie, *The Golden Dawn*, vol. 3 (Aries
+Press, Chicago, 1939; archive.org `IsraelRegardie-TheGoldenDawn-Vol3-1939`,
+p. 73), which names all twenty-four. The letters are facts, and **no
+rights are asserted over them**, Greer's among them. See
 [plan 061](https://github.com/gadicc/magickly/blob/main/plans/061-gd-hall.md),
 "Tablet versions".
 
