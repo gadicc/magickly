@@ -416,7 +416,7 @@ from it. No translation call has yet.
 
 ### Running order
 
-Steps 1 to 3 are done (12 November 2026). Spent so far: $2.95 of the
+Steps 1 to 4 are done (12 November 2026). Spent so far: $3.59 of the
 $100, the recall probe and the first test call included.
 
 1. Done: A1 and A1k on the new text, and their to-judge rows judged
@@ -426,13 +426,16 @@ $100, the recall probe and the first test call included.
    "Bars for the new text").
 3. Done: the bars settled from those figures, in `bars.ts` and this
    plan, with the date. No model has translated the new text yet.
-4. **The judges' check**: the 15 pairs of Dee's passages and their 15
-   damaged copies, judged by both judges (`judge-task3`). Nothing else is sent:
-   A1's translations and round trips are already judged. The runner
-   projects $1.35, worst case $2.87; A1's judging cost about $0.09 a
-   call with the prompt cached, so about $0.60 is likely, the cache
-   being cold. If the controls fail, the task-3 bars can't be measured,
-   and that is known before any model runs.
+4. Done: the judges' check ($0.65). Both judges accepted 13 of the 15
+   undamaged pairs, so 13 controls count, and they accepted none of
+   those 13 damaged copies (wrong word 0 of 4, coinage 0 of 4, dropped
+   clause 0 of 5): the task-3 bars can be measured. Of the two pairs not
+   accepted, one is a split on BIAB ("stand" or "are"). In the other,
+   both judges rejected TILB before IALPOR under G22, which says TILB
+   follows its noun. That TILB ends a Key 19 passage ("and her") and
+   the pair puts the next passage after it, but Key 19 itself has TILB
+   before its noun (OD TILB ADPHAHT DAMPLOZ, "and her unspeakable
+   variety"), so G22 is too strong as written: a question for an expert.
 5. **The cache check**: two A3 calls on the new text, checking that the
    second reads the prompt from the cache; if it doesn't, Opus runs by
    batch.
