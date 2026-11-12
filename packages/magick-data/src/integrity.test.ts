@@ -90,15 +90,9 @@ describe("the data against the graph", () => {
     ]);
   });
 
-  it("excuses an external field from that only where it is not id-shaped", () => {
-    // `enochianLetter`'s two are "planet/element" and "tarot", which no rule
-    // could find in the data; `treeOfLifePath.external["hermetic.tarotId"]` is
-    // id-shaped, so a typo in it has to fail the same way a link would.
-    const kept = broken("enochianLetter", {
-      A: { id: "A", enochian: "un", title: "Un", english: "A" },
-    });
-    expect(of("not-in-the-data", kept)).toEqual([]);
-
+  it("counts an external field that no row has, as it would a link", () => {
+    // A typo in `treeOfLifePath.external["hermetic.tarotId"]` has to fail
+    // the same way a link would.
     const noTarot = Object.fromEntries(
       Object.entries(tables.treeOfLifePath).map(([id, path]) => {
         const { hermetic, ...rest } = path as Record<string, unknown>;

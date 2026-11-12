@@ -1,212 +1,228 @@
+// The twenty-one letters of the Enochian (Angelical) alphabet, keyed by the
+// Latin letter each is written for. Both traditions are served, as the
+// tablets serve them: the Golden Dawn's (`gd`) and Dee's own (`dee`).
+//
+// `english`: the Latin letters each stands for, from the Golden Dawn's table
+//   in Israel Regardie, *The Golden Dawn*, vol. 4 (Aries Press, Chicago,
+//   1940), p.299: archive.org item IsraelRegardie-TheGoldenDawn-Vol4-1940,
+//   leaf n291.
+// `names.gd`: the letter's name in the same table (p.299, leaf n291).
+// `names.dee`: the name given to Dee and Kelley in the action of 26 March
+//   1583, British Library, Sloane MS 3188 (summary, as archived on 25
+//   October 2026:
+//   https://web.archive.org/web/20261025121954/https://www.esotericarchives.com/dee/sl3188.htm;
+//   the letters as Dee drew them, f.104:
+//   https://commons.wikimedia.org/wiki/File:Enochian_letters_(1583_manuscript).png).
+//   Checked against Aaron Leitch, *The Angelical Language*, vol. II
+//   (Llewellyn, 2010), Lexicon, s.v. each name, and Donald Laycock, *The
+//   Complete Enochian Dictionary* (1978), s.v. each name. The Order's names
+//   differ for B (Pa, Pe), F (Or, Orth), H (Na, Na-hath), N (Drux, Drun), T
+//   (Gisg, Gisa) and V (Van, Vau).
+// `sounds`: how the letter is said, as short respellings in ordinary
+//   English letters, alternatives separated by commas, the usual first.
+//   `gd` is the syllable the Order gives a letter said on its own. Mathers
+//   (S.R.M.D.) and Westcott (S.A.) give the rule and examples in Regardie,
+//   vol. 4, p.297 (leaf n289) and p.300 (n292): a consonant takes the vowel
+//   of its Hebrew letter's name. A, D, M, N, P and S are Westcott's own
+//   list; B, E, F, H, I, O, R, T, X and Z are read from the examples there;
+//   G's hard or soft sound is Mathers'. Where those pages have no example
+//   of the letter said on its own, the value is Crowley's Golden Dawn
+//   reading of the Keys, *The Equinox*, vol. I no. 8 (London, 1912;
+//   archive.org item crowley-equinox_202110): C "ca" and L "el" in
+//   "ca-no-quoda" and "lores-el-qo" (p.104, leaf n134), G "ji" in
+//   "ji-mi-calazodo" (p.113, n143), Q "quo" in "Quo-Co-Casabe" (p.111,
+//   n141) and V "vau" in "vau-pa-ahe" (p.104, n134) and "u" in "ta-pu-ime"
+//   (p.106, n136). p.300's one C, in "Heh-co-em-ah", is not C on its own:
+//   it is joined there to the O after it in the word. The spellings follow
+//   p.297's ("ah", "eh", "ee", "oh"), so Crowley's "ca" is written "kah",
+//   and G's hard sound "ghee".
+//   `dee` is the sound or sounds the letter stands for in Dee's spellings,
+//   read as the English of his day. Dee's own notes beside the Keys, in
+//   Meric Casaubon's print of his journal, *A True & Faithful Relation*
+//   (London, 1659; archive.org item truefaithfulrela00deej, from Cotton MS
+//   Appendix XLVI), give Z on its own as "zod" (pp.191, 193, 199), R on its
+//   own as "ur" (MALPRG "as Malpurg", p.86), Q as "qu" (HOLQ "as Holquu",
+//   p.86), I as y and j (IAD "as Yad", p.86; IAIDA "Jaida", p.79), G as soft
+//   "dg" or hard (pp.192, 199) and C as k (pp.190, 192); `keys.json5`
+//   carries those notes word by word. The rest, and the digraphs a letter
+//   begins (ch, ph, sh, th, as in Dee's THIL and NOTHOA), are facts from
+//   Leitch, vol. II, "General Notes on Angelical Phonology" (pp.33-38),
+//   "Pronunciation Key (Fully Explained)" (pp.95-98) and the Lexicon's
+//   entries for the letter names, and from
+//   Laycock, pp.44-47 (C as s before e and i, X as ks), in our words.
+// `tetragramId`: the geomantic figure the Golden Dawn gives the letter,
+//   with the figure's ruler and sign, in Regardie, vol. 4, "Talismans",
+//   p.77 (leaf n71). Sixteen letters have one; C, D, H, Q and X have none.
+//   The glyphs on p.77 were read against the same book's alphabet on p.299.
+//
+// Gematria and tarot trumps were removed in 2026 (plan 080): they were
+// Gerald Schueler's (*Enochian Magic: A Practical Manual*, Llewellyn, 1985,
+// Table II), his own derivation from the Hebrew letters, and neither Dee
+// nor the Golden Dawn gave the Enochian letters numbers. His signs for E,
+// G, P, S and T also differ from p.77's figures. Only facts are taken from
+// the copyrighted works cited; the wording is ours, under CC BY 4.0.
 {
   A: {
     id: "A",
     enochian: "A",
-    title: "Un",
     english: "A",
-    pronounciation: "ah",
-    "planet/element": "taurus",
-    tarot: "hierophant",
-    gematria: 6,
+    names: { gd: "Un", dee: "Un" },
+    sounds: { gd: "ah", dee: "a" },
+    tetragramId: "amissio",
   },
   B: {
     id: "B",
     enochian: "B",
-    title: "Pe",
     english: "B",
-    pronounciation: "beh",
-    "planet/element": "aries",
-    tarot: "star",
-    gematria: 5,
+    names: { gd: "Pe", dee: "Pa" },
+    sounds: { gd: "beh", dee: "b" },
+    tetragramId: "puer",
   },
   C: {
     id: "C",
     enochian: "C",
-    title: "Veh",
     english: "C,K",
-    pronounciation: "co",
-    "planet/element": "fire",
-    tarot: "judgement",
-    gematria: 300,
+    names: { gd: "Veh", dee: "Veh" },
+    sounds: { gd: "kah", dee: "k, s, ch" },
   },
   D: {
     id: "D",
     enochian: "D",
-    title: "Gal",
     english: "D",
-    pronounciation: "deh",
-    "planet/element": "spirit",
-    tarot: "empress",
-    gematria: 4,
+    names: { gd: "Gal", dee: "Gal" },
+    sounds: { gd: "deh", dee: "d" },
   },
   E: {
     id: "E",
     enochian: "E",
-    title: "Graph",
     english: "E",
-    pronounciation: "ee",
-    "planet/element": "virgo",
-    tarot: "hermit",
-    gematria: 10,
+    names: { gd: "Graph", dee: "Graph" },
+    sounds: { gd: "eh", dee: "e" },
+    tetragramId: "albus",
   },
   F: {
     id: "F",
     enochian: "F",
-    title: "Orth",
     english: "F",
-    pronounciation: "eff",
-    "planet/element": "Cauda Draconis",
-    tarot: "juggler",
-    gematria: 3,
+    names: { gd: "Orth", dee: "Or" },
+    sounds: { gd: "ef", dee: "f" },
+    tetragramId: "cauda_draconis",
   },
   G: {
     id: "G",
     enochian: "G",
-    title: "Ged",
     english: "G",
-    pronounciation: "gee",
-    "planet/element": "cancer",
-    tarot: "chariot",
-    gematria: 8,
+    names: { gd: "Ged", dee: "Ged" },
+    sounds: { gd: "jee, ghee", dee: "g, j" },
+    tetragramId: "fortuna_major",
   },
   H: {
     id: "H",
     enochian: "H",
-    title: "Na-hath",
     english: "H",
-    pronounciation: "heh",
-    "planet/element": "air",
-    tarot: "fool",
-    gematria: 1,
+    names: { gd: "Na-hath", dee: "Na" },
+    sounds: { gd: "heh", dee: "h" },
   },
   I: {
     id: "I",
     enochian: "I",
-    title: "Gon",
     english: "I,Y,J",
-    pronounciation: "ee",
-    "planet/element": "sagittarius",
-    tarot: "temperance",
-    gematria: 60,
+    names: { gd: "Gon", dee: "Gon" },
+    sounds: { gd: "ee", dee: "i, y, j" },
+    tetragramId: "acquisitio",
   },
   L: {
     id: "L",
     enochian: "L",
-    title: "Ur",
     english: "L",
-    pronounciation: "el, leh",
-    "planet/element": "cancer",
-    tarot: "charit",
-    gematria: 8,
+    names: { gd: "Ur", dee: "Ur" },
+    sounds: { gd: "el", dee: "l" },
+    tetragramId: "via",
   },
   M: {
     id: "M",
     enochian: "M",
-    title: "Tal",
     english: "M",
-    pronounciation: "em",
-    "planet/element": "aquarius",
-    tarot: "emperor",
-    gematria: 90,
+    names: { gd: "Tal", dee: "Tal" },
+    sounds: { gd: "em", dee: "m" },
+    tetragramId: "tristitia",
   },
   N: {
     id: "N",
     enochian: "N",
-    title: "Drun",
     english: "N",
-    pronounciation: "en",
-    "planet/element": "scorpio",
-    tarot: "death",
-    gematria: 50,
+    names: { gd: "Drun", dee: "Drux" },
+    sounds: { gd: "en, noo", dee: "n" },
+    tetragramId: "rubeus",
   },
   O: {
     id: "O",
     enochian: "O",
-    title: "Med",
     english: "O",
-    pronounciation: "oh",
-    "planet/element": "libra",
-    tarot: "justice",
-    gematria: 30,
+    names: { gd: "Med", dee: "Med" },
+    sounds: { gd: "oh", dee: "o" },
+    tetragramId: "puella",
   },
   P: {
     id: "P",
     enochian: "P",
-    title: "Mals",
     english: "P",
-    pronounciation: "peh",
-    "planet/element": "leo",
-    tarot: "strength",
-    gematria: 9,
+    names: { gd: "Mals", dee: "Mals" },
+    sounds: { gd: "peh", dee: "p, ph" },
+    tetragramId: "populus",
   },
   Q: {
     id: "Q",
     enochian: "Q",
-    title: "Ger",
     english: "Q",
-    pronounciation: "quo",
-    "planet/element": "water",
-    tarot: "hanged man",
-    gematria: 40,
+    names: { gd: "Ger", dee: "Ger" },
+    sounds: { gd: "quo", dee: "qu" },
   },
   R: {
     id: "R",
     enochian: "R",
-    title: "Don",
     english: "R",
-    pronounciation: "reh, ar",
-    "planet/element": "pisces",
-    tarot: "moon",
-    gematria: 100,
+    names: { gd: "Don", dee: "Don" },
+    sounds: { gd: "reh, ar", dee: "r, ur" },
+    tetragramId: "laetitia",
   },
   S: {
     id: "S",
     enochian: "S",
-    title: "Fam",
     english: "S",
-    pronounciation: "she, ess",
-    "planet/element": "gemini",
-    tarot: "lovers",
-    gematria: 7,
+    names: { gd: "Fam", dee: "Fam" },
+    sounds: { gd: "ess", dee: "s, sh" },
+    tetragramId: "conjunctio",
   },
   T: {
     id: "T",
     enochian: "T",
-    title: "Gisa",
     english: "T",
-    pronounciation: "teh",
-    "planet/element": "leo",
-    tarot: "strength",
-    gematria: 9,
+    names: { gd: "Gisa", dee: "Gisg" },
+    sounds: { gd: "teh", dee: "t, th" },
+    tetragramId: "caput_draconis",
   },
   V: {
     id: "V",
     enochian: "V",
-    title: "Vau",
     english: "U,V,W",
-    pronounciation: "vaa",
-    "planet/element": "capricorn",
-    tarot: "devil",
-    gematria: 70,
+    names: { gd: "Vau", dee: "Van" },
+    sounds: { gd: "vau, oo", dee: "u, v" },
+    tetragramId: "carcer",
   },
   X: {
     id: "X",
     enochian: "X",
-    title: "Pal",
     english: "X",
-    pronounciation: "s, tz",
-    "planet/element": "earth",
-    tarot: "universe",
-    gematria: 400,
+    names: { gd: "Pal", dee: "Pal" },
+    sounds: { gd: "ex", dee: "ks" },
   },
   Z: {
     id: "Z",
     enochian: "Z",
-    title: "Ceph",
     english: "Z",
-    pronounciation: "zod, zee",
-    "planet/element": "leo",
-    tarot: "strength",
-    gematria: 9,
+    names: { gd: "Ceph", dee: "Ceph" },
+    sounds: { gd: "zod", dee: "z, zod" },
+    tetragramId: "fortuna_minor",
   },
 }

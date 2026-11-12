@@ -54,6 +54,12 @@ import data from "./data.ts";
  * Plan 078 gave eight planet rows, the spheres among them, an `about` and a
  * `description` of their own, which the sampled sphere shows after its name.
  *
+ * Plan 080 replaced the Enochian letters' `title` (the Order's names) and
+ * `pronounciation` with `names` and `sounds` in both traditions, dropped
+ * Schueler's `planet/element`, `tarot` and `gematria`, and added a
+ * `tetragramId`, the Golden Dawn's geomantic figure, which gives the letter
+ * `tetragram` and the figure the back-link `enochianLetter`.
+ *
  * The sampled row is each table's first, named so the sample is reproducible;
  * for the one array table left in the barrel that is index `0`.
  */
@@ -118,12 +124,11 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
     keys: [
       "id",
       "enochian",
-      "title",
       "english",
-      "pronounciation",
-      "planet/element",
-      "tarot",
-      "gematria",
+      "names",
+      "sounds",
+      "tetragramId",
+      "tetragram",
     ],
   },
   tetragram: {
@@ -142,6 +147,7 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "zodiac",
       "element",
       "planets",
+      "enochianLetter",
     ],
   },
   geomanticHouse: { row: "1", keys: ["id", "meaning"] },

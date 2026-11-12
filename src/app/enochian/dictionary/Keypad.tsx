@@ -8,7 +8,7 @@ import { LABELS } from "./labels";
 /** The 21 letters, in the order the letters table gives them (A to Z). */
 const KEYS = Object.values(letters).map((letter) => ({
   id: letter.id,
-  name: letter.title,
+  name: letter.names.gd,
   latin: letter.english.replaceAll(",", " "),
 }));
 

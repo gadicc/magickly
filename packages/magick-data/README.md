@@ -369,7 +369,7 @@ provenance, and no version past 0.0.0 ships while a row has none.
 | `body/parts.json5` | [Correspondences](#correspondences) |  |
 | `chakras.json5` | [Correspondences](#correspondences) of the seven-chakra system, facts only: names, places, petals, colours, seed syllables and their elements, and one-to-five-word glosses of the Sanskrit names. The Wikipedia "Chakra" article the file cites is a reference; no share-alike text is copied |  |
 | `enochian/keys.json5` | [The Enochian Keys](#the-enochian-keys) |  |
-| `enochian/letters.json5` | [Correspondences](#correspondences); the source of `pronounciation` and `gematria` is not recorded |  |
+| `enochian/letters.json5` | [The Enochian letters](#the-enochian-letters) |  |
 | `enochian/tabletNotes.json5` | Ours: notes on [the Enochian tablets](#the-enochian-tablets), citing their sources |  |
 | `enochian/tablets.json5` | [The Enochian tablets](#the-enochian-tablets) |  |
 | `gd/degrees.json5` | [Correspondences](#correspondences) |  |
@@ -450,6 +450,40 @@ of order 6, is written out; the tests check that every square is magic,
 that each starts with his first row, and that Saturn's and Jupiter's are
 his row by row. See
 [plan 061](https://github.com/gadicc/magickly/blob/main/plans/061-gd-hall.md).
+
+### The Enochian letters
+
+**`enochian/letters.json5`** gives each letter in both traditions, as
+the tablets do. `english` and the Golden Dawn's names (`names.gd`) are
+the Order's table in Israel Regardie, *The Golden Dawn*, vol. 4 (Aries
+Press, Chicago, 1940; archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`,
+p. 299). Dee's names (`names.dee`) are those of the action of 26 March
+1583 in British Library, Sloane MS 3188, whose f. 104 shows the letters
+as Dee drew them
+([Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Enochian_letters_(1583_manuscript).png)).
+`sounds.gd` is how the Order says a letter on its own, by the rule and
+examples of S. L. MacGregor Mathers and W. Wynn Westcott in the same
+volume (pp. 297 and 300), with Aleister Crowley's Golden Dawn reading of
+the Keys in *The Equinox*, vol. I no. 8 (London, 1912), where those
+pages give no example of the letter on its own. `sounds.dee` is the sound a letter stands for in
+Dee's spellings: his own notes beside the Keys, in Meric Casaubon's
+*A True & Faithful Relation* (London, 1659; archive.org
+`truefaithfulrela00deej`), with facts from Aaron Leitch, *The Angelical
+Language*, vol. II (Llewellyn, 2010), and Donald Laycock, *The Complete
+Enochian Dictionary* (1978), in our words. `tetragramId` is the
+geomantic figure the Golden Dawn gives sixteen of the letters, in
+Regardie, vol. 4, p. 77. The comment at the head of the repository's
+source file
+([`letters.json5`](https://github.com/gadicc/magickly/blob/main/packages/magick-data/src/enochian/letters.json5))
+cites the page or leaf of each; comments do not ship in the package.
+
+Until 2026 the file also gave each letter a number (`gematria`), a tarot
+trump and a sign or element, all from Gerald J. Schueler, *Enochian
+Magic: A Practical Manual* (Llewellyn, 1985). They were removed: the
+numbers and trumps are his own derivation from the Hebrew letters, and
+neither Dee nor the Golden Dawn numbered the Enochian letters. The names,
+equivalents, sounds and figures are facts, and **no rights are asserted
+over them**; the wording and arrangement are ours, under CC BY 4.0.
 
 ### The Enochian Keys
 

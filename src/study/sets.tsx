@@ -443,7 +443,7 @@ const sets: Record<string, StudySetData<unknown>> = {
     data: data.enochianLetter,
     question: "enochian",
     questionFont: "enochian",
-    answer: "title",
+    answer: "names.gd",
     tags: ["enochian"],
     gdGrade: "?",
   } as StudySetData<typeof data.enochianLetter.A>,

@@ -50,12 +50,10 @@ export const graph = {
 
   // ENOCHIAN
   enochianLetter: {
-    external: {
-      // Three namespaces in one field — `taurus`, `fire`, `Cauda Draconis` —
-      // which the format cannot express; a polymorphic `to` is deferred.
-      "planet/element": "polymorphic",
-      // The trump by name, where a path of the Tree names it by rank.
-      tarot: "tarot-deck",
+    links: {
+      // Singular, so the check proves one letter per figure: the Golden
+      // Dawn gives sixteen of the letters a figure each.
+      tetragramId: { to: "tetragram", inverse: "enochianLetter" },
     },
   },
   enochianTablet: {},

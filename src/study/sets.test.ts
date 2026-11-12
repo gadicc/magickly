@@ -30,6 +30,19 @@ describe("study sets", () => {
         expect(card.answer, `${id} ${card.id}`).toBeTruthy();
   });
 
+  it("answer the Enochian letters with the Golden Dawn's names", () => {
+    // The set reads `names.gd`, the Order's names (Regardie, vol. 4, p.299),
+    // which were the letters' old `title`s, so its cards did not change when
+    // Dee's names joined them: B is "Pe" here and "Pa" in Dee.
+    const answers = Object.fromEntries(
+      getSet("enochian-letter-names")
+        .generateCards()
+        .map((card) => [card.id, card.answer]),
+    );
+    expect(answers.B).toBe("Pe");
+    expect(answers.T).toBe("Gisa");
+  });
+
   it("answer the stones from the stone rows, joined", () => {
     // A sephirah's stones are linked rows since plan 039, read through the
     // wildcard as the Tree reads them: lower case, joined with "; ".

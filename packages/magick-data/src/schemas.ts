@@ -210,11 +210,22 @@ export const schemas = {
   enochianLetter: v.strictObject({
     id: v.string(),
     enochian: v.string(),
-    title: v.string(),
+    /** The Latin letters it stands for, comma-separated: "C,K". */
     english: v.string(),
-    pronounciation: v.string(),
-    gematria: v.number(),
-    ...ids("enochianLetter"),
+    /**
+     * The letter's name in each tradition: the Golden Dawn's ("Pe") and the
+     * one given to Dee in 1583 ("Pa"). Sources in the JSON's header.
+     */
+    names: v.strictObject({ gd: v.string(), dee: v.string() }),
+    /**
+     * How the letter is said in each tradition, as short respellings in
+     * ordinary English letters, alternatives separated by ", ", the usual
+     * first. `gd` is the syllable the Order gives the letter said on its
+     * own ("beh", "em", "zod"); `dee` is the sound or sounds it stands for
+     * in Dee's spellings ("b", "k, s, ch", "z, zod").
+     */
+    sounds: v.strictObject({ gd: v.string(), dee: v.string() }),
+    ...ids("enochianLetter", ["tetragramId"]),
   }),
   enochianTablet: v.pipe(
     v.strictObject({

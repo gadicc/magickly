@@ -310,17 +310,11 @@ export function checkIntegrity(
           detail: "no link, pending target, external one or enumeration",
         });
 
-    // An `external` field is exempt only where it is not id-shaped, which is
-    // how the two polymorphic Enochian ones ("planet/element", "tarot") are
-    // parked. An id-shaped one must still be in the data, so that a typo in
+    // An `external` field is held to this like a link, so that a typo in
     // `treeOfLifePath.external["hermetic.tarotId"]` fails here rather than
     // sitting in the graph naming nothing.
-    const external = Object.keys(spec.external ?? {});
     for (const field of declared)
-      if (
-        !fields.has(field) &&
-        !(external.includes(field) && !isIdField(field))
-      )
+      if (!fields.has(field))
         failures.push({
           check: "not-in-the-data",
           where: `${name}.${field}`,
