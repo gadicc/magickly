@@ -933,7 +933,7 @@ water, air and earth", "Uranus on 13 March 1781". The other long
 strings in the correspondence files are the Key of Solomon (Mathers,
 1888), the geomancy houses in our words from Agrippa and Crowley (plan
 075) and Dee's Keys; the rest hold only short facts. Every row reads
-2026-11-12. Next: step 4.
+2026-11-12. Step 4, the bump to `0.1.0-rc.0`, followed the same day.
 
 ### Stage A review (11 November 2026)
 
