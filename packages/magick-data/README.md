@@ -359,43 +359,43 @@ provenance, and no version past 0.0.0 ships while a row has none.
 
 | Data file | Source | Signed off |
 | --- | --- | --- |
-| `alchemy/elementals.json5` | [Correspondences](#correspondences) |  |
-| `alchemy/elements.json5` | [Correspondences](#correspondences) |  |
-| `alchemy/symbols.json5` | [Correspondences](#correspondences) |  |
-| `alchemy/terms.json5` | [Correspondences](#correspondences); `terms` from [the Second Knowledge Lecture](#the-second-knowledge-lecture), with no rights asserted over them |  |
-| `astrology/houses.json5` | [Correspondences](#correspondences); `interpretation` is ours, following [Lilly](#lillys-houses); `motto.la` is the mnemonic verse as usually quoted, not from Lilly, and `motto.en` our rendering of it ([Lilly's houses](#lillys-houses)) |  |
-| `astrology/planets.json5` | [Correspondences](#correspondences); `keyOfSolomon` from [the Key of Solomon](#the-key-of-solomon) |  |
-| `astrology/zodiac.json5` | [Correspondences](#correspondences) |  |
-| `body/parts.json5` | [Correspondences](#correspondences) |  |
-| `chakras.json5` | [Correspondences](#correspondences) of the seven-chakra system, facts only: names, places, petals, colours, seed syllables and their elements, and one-to-five-word glosses of the Sanskrit names. The Wikipedia "Chakra" article the file cites is a reference; no share-alike text is copied |  |
-| `enochian/keys.json5` | [The Enochian Keys](#the-enochian-keys) |  |
-| `enochian/letters.json5` | [The Enochian letters](#the-enochian-letters) |  |
-| `enochian/tabletNotes.json5` | Ours: notes on [the Enochian tablets](#the-enochian-tablets), citing their sources |  |
-| `enochian/tablets.json5` | [The Enochian tablets](#the-enochian-tablets) |  |
-| `gd/degrees.json5` | [Correspondences](#correspondences) |  |
-| `gd/grades.json5` | [Correspondences](#correspondences) |  |
-| `geomancy/houses.json5` | [Geomancy](#geomancy) |  |
-| `geomancy/tetragrams.json5` | [Geomancy](#geomancy) |  |
-| `hebrewLetters.json5` | [Correspondences](#correspondences) |  |
-| `kabbalah/angelicOrders.json5` | [Correspondences](#correspondences) |  |
-| `kabbalah/archangels.json5` | [Correspondences](#correspondences) |  |
-| `kabbalah/christianChoirs.json5` | [Lenain](#lenain): the nine choirs of Pseudo-Dionysius, in his order and with his French |  |
-| `kabbalah/fourWorlds.json5` | [Correspondences](#correspondences) |  |
-| `kabbalah/godNames.json5` | [Correspondences](#correspondences) |  |
-| `kabbalah/kerubim.json5` | [Correspondences](#correspondences) |  |
-| `kabbalah/lenain/apparatus.json5` | [Lenain](#lenain) |  |
-| `kabbalah/lenain/evidence.json5` | [Lenain](#lenain) |  |
-| `kabbalah/lenain/pages.json5` | [Lenain](#lenain) |  |
-| `kabbalah/paths.json5` | [Correspondences](#correspondences) |  |
-| `kabbalah/sephirot.json5` | [Correspondences](#correspondences) |  |
-| `kabbalah/seventyTwoAngels.json5` | [Lenain](#lenain) |  |
-| `kabbalah/seventyTwoAngelsText/en.json5` | [Lenain](#lenain) |  |
-| `kabbalah/seventyTwoAngelsText/fr.json5` | [Lenain](#lenain) |  |
-| `kabbalah/souls.json5` | [Correspondences](#correspondences) |  |
-| `kabbalah/tribesOfIsrael.json5` | [Correspondences](#correspondences) |  |
-| `materia/scents.json5` | [Correspondences](#correspondences) |  |
-| `materia/stones.json5` | [Correspondences](#correspondences) |  |
-| `graph.json` | Ours: how the tables link, built from `src/graph.ts` |  |
+| `alchemy/elementals.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `alchemy/elements.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `alchemy/symbols.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `alchemy/terms.json5` | [Correspondences](#correspondences); `terms` from [the Second Knowledge Lecture](#the-second-knowledge-lecture), with no rights asserted over them | 2026-11-12 |
+| `astrology/houses.json5` | [Correspondences](#correspondences); `interpretation` is ours, following [Lilly](#lillys-houses); `motto.la` is the mnemonic verse as usually quoted, not from Lilly, and `motto.en` our rendering of it ([Lilly's houses](#lillys-houses)) | 2026-11-12 |
+| `astrology/planets.json5` | [Correspondences](#correspondences); `keyOfSolomon` from [the Key of Solomon](#the-key-of-solomon) | 2026-11-12 |
+| `astrology/zodiac.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `body/parts.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `chakras.json5` | [Correspondences](#correspondences) of the seven-chakra system, facts only: names, places, petals, colours, seed syllables and their elements, and one-to-five-word glosses of the Sanskrit names. The Wikipedia "Chakra" article the file cites is a reference; no share-alike text is copied | 2026-11-12 |
+| `enochian/keys.json5` | [The Enochian Keys](#the-enochian-keys) | 2026-11-12 |
+| `enochian/letters.json5` | [The Enochian letters](#the-enochian-letters) | 2026-11-12 |
+| `enochian/tabletNotes.json5` | Ours: notes on [the Enochian tablets](#the-enochian-tablets), citing their sources | 2026-11-12 |
+| `enochian/tablets.json5` | [The Enochian tablets](#the-enochian-tablets) | 2026-11-12 |
+| `gd/degrees.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `gd/grades.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `geomancy/houses.json5` | [Geomancy](#geomancy) | 2026-11-12 |
+| `geomancy/tetragrams.json5` | [Geomancy](#geomancy) | 2026-11-12 |
+| `hebrewLetters.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `kabbalah/angelicOrders.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `kabbalah/archangels.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `kabbalah/christianChoirs.json5` | [Lenain](#lenain): the nine choirs of Pseudo-Dionysius, in his order and with his French | 2026-11-12 |
+| `kabbalah/fourWorlds.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `kabbalah/godNames.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `kabbalah/kerubim.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `kabbalah/lenain/apparatus.json5` | [Lenain](#lenain) | 2026-11-12 |
+| `kabbalah/lenain/evidence.json5` | [Lenain](#lenain) | 2026-11-12 |
+| `kabbalah/lenain/pages.json5` | [Lenain](#lenain) | 2026-11-12 |
+| `kabbalah/paths.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `kabbalah/sephirot.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `kabbalah/seventyTwoAngels.json5` | [Lenain](#lenain) | 2026-11-12 |
+| `kabbalah/seventyTwoAngelsText/en.json5` | [Lenain](#lenain) | 2026-11-12 |
+| `kabbalah/seventyTwoAngelsText/fr.json5` | [Lenain](#lenain) | 2026-11-12 |
+| `kabbalah/souls.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `kabbalah/tribesOfIsrael.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `materia/scents.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `materia/stones.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `graph.json` | Ours: how the tables link, built from `src/graph.ts` | 2026-11-12 |
 
 ### Correspondences
 

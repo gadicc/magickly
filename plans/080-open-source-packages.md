@@ -919,6 +919,22 @@ then requested nothing.
 - Vol. 3 p. 73 spells three Seniors unusually (Alphctga, Saiinor,
   Aaetpoi); nothing reads them.
 
+### The sign-off (12 November 2026)
+
+Gadi signed off all 37 Sources rows on 12 November (A′ step 3), after
+one last check. The paragraphs `c768e5b1` had added to
+`astrology/planets.json5` for the three spheres, Earth, Uranus, Neptune
+and the nodes (sixteen strings, written the day before from
+public-domain sources) were compared with 25 Wikipedia articles on
+their subjects, five-word runs as for the houses. None shares more
+than seven words in a row, and the eleven runs of five to seven are
+stock phrases or facts: "the sphere of the fixed stars and", "fire,
+water, air and earth", "Uranus on 13 March 1781". The other long
+strings in the correspondence files are the Key of Solomon (Mathers,
+1888), the geomancy houses in our words from Agrippa and Crowley (plan
+075) and Dee's Keys; the rest hold only short facts. Every row reads
+2026-11-12. Next: step 4.
+
 ### Stage A review (11 November 2026)
 
 An adversarial review of stage A's commits found the following; each was

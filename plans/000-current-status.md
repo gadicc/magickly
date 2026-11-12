@@ -226,8 +226,10 @@ Follow-ups are separate from the completed migration work:
   `npm` environment was created. The provenance clean-up (the copied
   planet and house texts replaced, the Enochian letters in both
   traditions, citations) is merged too
-  ([plan 080](080-open-source-packages.md#the-provenance-clean-up-12-november-2026)).
-  TODO: the rest of stage A′, Gadi's
+  ([plan 080](080-open-source-packages.md#the-provenance-clean-up-12-november-2026)),
+  and Gadi signed off every Sources row the same day
+  ([plan 080](080-open-source-packages.md#the-sign-off-12-november-2026)).
+  TODO: the rest of stage A′, Gadi's, from the release candidate on
   ([the steps](080-open-source-packages.md#stage-a-the-owners-steps));
   then, with his go-ahead, stages B to G. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups).
@@ -449,7 +451,8 @@ Follow-ups are separate from the completed migration work:
   built and reviewed on `gate/data-publish`; stage A′ is Gadi's: the `npm`
   environment before the merge, the provenance sign-off (eight
   questions, then a date on every Sources row; tests refuse a version
-  past 0.0.0 while a row has none), the release candidate published by
+  past 0.0.0 while a row has none; done 12 November), the release
+  candidate published by
   hand, the trusted publisher allowing `npm publish`, 0.1.0 from CI
   within two days with
   `--expect-exists`, then `next` removed and tokens disallowed
