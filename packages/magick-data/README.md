@@ -23,7 +23,7 @@ path, and [LICENSE.txt](./LICENSE.txt) says which file is which:
   a fact from Agrippa ([Sources](#sources)).
 - **The data is [CC BY 4.0](./LICENSE-DATA.txt):** the JSON5 sources and
   everything the build emits from them, the Enochian Keys among them
-  ([Sources](#sources) says what of the Keys is ours to license). Use it
+  ([Sources](#sources) says, file by file, what is ours to license). Use it
   anywhere, including commercially, as long as you credit
   [magick.ly](https://magick.ly).
 
@@ -362,12 +362,12 @@ provenance, and no version past 0.0.0 ships while a row has none.
 | `alchemy/elementals.json5` | [Correspondences](#correspondences) |  |
 | `alchemy/elements.json5` | [Correspondences](#correspondences) |  |
 | `alchemy/symbols.json5` | [Correspondences](#correspondences) |  |
-| `alchemy/terms.json5` | [Correspondences](#correspondences); the source of `terms` is not recorded |  |
+| `alchemy/terms.json5` | [Correspondences](#correspondences); `terms` from [the Second Knowledge Lecture](#the-second-knowledge-lecture), with no rights asserted over them |  |
 | `astrology/houses.json5` | [Correspondences](#correspondences); `interpretation` is ours, following [Lilly](#lillys-houses); `motto.la` is the mnemonic verse as usually quoted, not from Lilly, and `motto.en` our rendering of it ([Lilly's houses](#lillys-houses)) |  |
 | `astrology/planets.json5` | [Correspondences](#correspondences); `keyOfSolomon` from [the Key of Solomon](#the-key-of-solomon) |  |
 | `astrology/zodiac.json5` | [Correspondences](#correspondences) |  |
 | `body/parts.json5` | [Correspondences](#correspondences) |  |
-| `chakras.json5` | [Correspondences](#correspondences) of the seven-chakra system; the file cites Wikipedia's "Chakra" article |  |
+| `chakras.json5` | [Correspondences](#correspondences) of the seven-chakra system, facts only: names, places, petals, colours, seed syllables and their elements, and one-to-five-word glosses of the Sanskrit names. The Wikipedia "Chakra" article the file cites is a reference; no share-alike text is copied |  |
 | `enochian/keys.json5` | [The Enochian Keys](#the-enochian-keys) |  |
 | `enochian/letters.json5` | [Correspondences](#correspondences); the source of `pronounciation` and `gematria` is not recorded |  |
 | `enochian/tabletNotes.json5` | Ours: notes on [the Enochian tablets](#the-enochian-tablets), citing their sources |  |
@@ -553,3 +553,15 @@ usually quoted, a word for each house: "Vita, lucrum, fratres, genitor,
 nati, valetudo, uxor, mors, pietas, regnum, benefactaque, carcer". We
 found no public-domain printing of it to cite. The table the file
 replaced had *Iter* for the ninth. The English renderings are ours.
+
+### The Second Knowledge Lecture
+
+**`terms` in `alchemy/terms.json5`** are the Golden Dawn's own short
+phrases for each alchemical term, from its Second Knowledge Lecture, one
+of the Zelator (1=10) grade papers, as Israel Regardie printed it in
+*The Golden Dawn*, vol. 1 (Aries Press, Chicago, 1937), pp. 119-120
+(archive.org `IsraelRegardie-thegoldenDawn-vol1-1937`, leaves
+n110-n111), with small changes of form. They are the Order's wording of
+the 1880s and 1890s, not Regardie's, and each is a few words long.
+**No rights are asserted over them**, so the CC BY 4.0 grant does not
+cover them; the choice and arrangement of the table are ours.

@@ -1,3 +1,11 @@
+// `terms` are the Golden Dawn's own short phrases for each, from its Second
+// Knowledge Lecture, one of the Zelator (1=10) grade papers, as printed in
+// Israel Regardie, The Golden Dawn, vol. 1 (Aries Press, Chicago, 1937),
+// pp. 119-120 (archive.org IsraelRegardie-thegoldenDawn-vol1-1937, leaves
+// n110-n111), with small changes of form, such as an "&" for "and" and a
+// dropped "the". They are the Order's wording, not Regardie's, and no
+// rights are asserted over them: the package's CC BY 4.0 grant does not
+// cover them.
 {
   "sol-philosophorum": {
     id: "sol-philosophorum",
