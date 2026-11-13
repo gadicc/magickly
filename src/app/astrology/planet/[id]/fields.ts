@@ -39,5 +39,8 @@ export const fields: EntityFields = {
     "hebrewLetterId",
     "godNameId",
     "archangelId",
+    // The Moon's intelligence of intelligences, not shown yet.
+    "intelligenceOfIntelligences.he",
+    "intelligenceOfIntelligences.roman",
   ],
 };

@@ -340,6 +340,46 @@ export const schemas = {
           ),
         ),
       ),
+      intelligenceOfIntelligences: v.optional(
+        v.pipe(
+          v.strictObject({
+            he: v.pipe(
+              v.string(),
+              v.description(
+                "The name in Hebrew, as Agrippa prints it. Its letters add up to 3321, the sum of the Moon's square, with final mem counted as 600.",
+              ),
+            ),
+            roman: v.pipe(
+              v.strictObject({
+                agrippa1533: v.pipe(
+                  v.string(),
+                  v.description(
+                    "Agrippa's romanisation (1533): Malcha betharsisim hed beruah schehakim.",
+                  ),
+                ),
+                crowley777: v.pipe(
+                  v.string(),
+                  v.description(
+                    "Crowley's, in 777 Revised (1955), Table III, column CXCIV.",
+                  ),
+                ),
+                regardie1940: v.pipe(
+                  v.string(),
+                  v.description(
+                    "The Golden Dawn's, in Regardie's The Golden Dawn, vol. 4 (1940), p. 86.",
+                  ),
+                ),
+              }),
+              v.description(
+                "The name romanised as each source spells it, keyed by source; the data file's header cites each.",
+              ),
+            ),
+          }),
+          v.description(
+            "The Moon's intelligence of intelligences: the name Agrippa gives the Moon in place of a single intelligence (De occulta philosophia, 1533, Book II, chapter 22), which 777 and the Golden Dawn also give. The Moon only; its `intelligenceId` is Shelachel, a short modern name.",
+          ),
+        ),
+      ),
       ...ids("planet", {
         absent: [
           "hebrewLetterId",
@@ -356,7 +396,7 @@ export const schemas = {
           archangelId:
             "The planet's archangel, whose row names the planet back. The seven classical planets only.",
           intelligenceId:
-            "The planet's intelligence: Nakhiel for the Sun. Six are the names Agrippa gives with the planets' magic squares (De occulta philosophia, Book II, chapter 22); the Moon's, Shelachel, is not his. There is no table of intelligences yet. The seven classical planets only.",
+            "The planet's intelligence: Nakhiel for the Sun. Six are the names Agrippa gives with the planets' magic squares (De occulta philosophia, Book II, chapter 22). The Moon's, Shelachel, is a short modern name found in present-day sources, whose origin we have not found in Agrippa, 777 or Heydon; the name Agrippa gives the Moon is `intelligenceOfIntelligences`. There is no table of intelligences yet. The seven classical planets only.",
           spiritId:
             "The planet's spirit, as Agrippa names it beside the intelligence: Sorath for the Sun. There is no table of spirits yet; a geomantic figure's `rulerIds` name the same ones. The seven classical planets only.",
         },

@@ -36,11 +36,34 @@
 
     `intelligenceId` and `spiritId` of the seven planets: the intelligences
     and spirits Agrippa names with the planets' magic squares, De occulta
-    philosophia (1533), Book II, chapter 22, the "tables of the planets".
-    Six intelligences and all seven spirits are his. The Moon's
-    intelligence, Shelachel, is not: Agrippa gives the Moon's intelligence
-    of intelligences a longer name, and where Shelachel comes from is not
-    recorded here.
+    philosophia (Cologne, 1533), Book II, chapter 22, the "tables of the
+    planets", archive.org DeOccultaPhilosophiaLoc1533, pp. cxlviii–cxlix
+    (n163, n164). Six intelligences and all seven spirits are his, up to
+    spelling. Agrippa gives the Moon no intelligence of its own: in its
+    place is an "intelligentia intelligentiarum", which is
+    `intelligenceOfIntelligences` (n164). Its sources:
+      agrippa1533: the name and its Hebrew, as above, numbered 3321, the
+        sum of the Moon's square; the Hebrew adds up to 3321 with final
+        mem counted as 600.
+      The English of 1651, Three Books of Occult Philosophy, p. 243,
+        calls it "The Intelligency of the Intelligence of the Moon" and
+        misprints the name; the line is cut off in archive.org b30335231
+        (n256) and legible in
+        bim_early-english-books-1641-1700_three-books-of-occult-ph_agrippa-henricus-cornel_1651
+        (n271).
+      crowley777: Crowley, 777 Revised (London, 1955), Table III, col.
+        CXCIV, line 13, the transliteration of col. LXXVIII, "Intelligences
+        of the Planets", read in Celephaïs Press's electronic edition,
+        archive.org aleister-crowley-liber-777, p. 20 (n27). We have not
+        seen a scan of the first edition (1909).
+      regardie1940: the Golden Dawn's papers, Regardie, The Golden Dawn,
+        vol. 4 (Chicago, 1940), p. 86, archive.org
+        IsraelRegardie-TheGoldenDawn-Vol4-1940 (n80), "Intelligence of the
+        Intelligences of the Moon".
+    `intelligenceId`'s Shelachel, for the Moon, is a name found in
+    present-day sources. Its origin is not known to us: it is not in
+    Agrippa (1533 or 1651), in 777, in Regardie's fourth volume or in
+    Heydon, Theomagia (1663), archive.org theomagiaortempl00heyd.
    */
 
   "primum-mobile": {
@@ -217,6 +240,14 @@
     godNameId: "shadai-el-chai",
     archangelId: "gabriel",
     intelligenceId: "shelachel",
+    intelligenceOfIntelligences: {
+      he: "מלכא בתרשיתים עד ברוח שחקים",
+      roman: {
+        agrippa1533: "Malcha betharsisim hed beruah schehakim",
+        crowley777: "Malkah Be Tarshishim va A'ad Be Ruah Shehaqim",
+        regardie1940: "Malcah Betarshisim ve-ad Ruachoth ha-Schechalim",
+      },
+    },
     spiritId: "chasmodai",
     keyOfSolomon: {
       en: "The Days and Hours of the Moon are good for embassies; voyages envoys; messages; navigation; reconciliation; love; and the acquisition of merchandise by water.",
