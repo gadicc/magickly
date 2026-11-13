@@ -371,7 +371,8 @@ Follow-ups are separate from the completed migration work:
   The Air sigil's four marks are named as the Golden Dawn names them,
   Yods, drawn as small flames (likely, by our inference, for the 4 over
   the T in Dee's Sigillum Dei Aemeth), and redrawn closer to the
-  Equinox's Plate X, as its sinuous flames, centred over the stem (Gadi:
+  Equinox's Plate X, as its sinuous flames with a point at each end,
+  centred over the stem (Gadi:
   no documented reason for the plate's offset), on `gate/air-yods` on
   top of the source links, not
   merged; Air's pins and four halls' moved, the Yods' paths alone

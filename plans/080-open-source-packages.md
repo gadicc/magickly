@@ -2286,6 +2286,7 @@ heads. Facts only from Regardie; none of his drawings was copied.
 | `b36b3f82` | `fix(magick-data): Name the Air sigil's Yods` |
 | `8835288e` | `fix(enochian): Mark the Yods' reading as ours` |
 | `c5269425` | `fix(components): Draw the Air sigil's Yods as flames` |
+| `f79a59de` | `fix(components): Shape the Yods' left sides and tails` |
 
 Before the rebase, both commits were gated with stage E's gate on their
 own trees (after it each was gated again on its own tree), first side by
@@ -2335,6 +2336,31 @@ step at 0, coverage at the first attempt. Checked again in headless Chromium on 
 worktree's dev server (port 3127, CI's placeholder environment, a
 Chromium of its own on a free port): the Air tablet in both versions,
 light and dark.
+
+**The flames' left sides and tails.** Gadi, comparing the flames with
+the plate again: their upper left was concave where the plate's is
+convex, their lower left convex where the plate's is hollow, and their
+lower end blunt where it could be as pointed as the top. The four
+marks' widths, measured at fifteen heights on an enlarged crop and
+averaged, bore the first two out: our upper left lay up to half a unit
+(of a Yod about 10.5 long) inside the plate's edge, our lower left up
+to 0.7 outside it. `f79a59de` redraws the lower and left segments of
+`AIR_YOD`: the right side runs down to a second point at the bottom, as
+sharp as the top's; from it the left side climbs through a shallow
+hollow, widens in a full convex curve to its widest a little above
+halfway, and returns to the top. Its left edge now lies within about
+0.1 of the plate's at every measured height. Still cubic segments
+placed by eye, not traced; the top point, the right side, the size,
+the lean, the spacing and the centring are as before. The same pins
+moved, the Yods' paths alone (the four hall snapshots changed by
+swapping the path string, and matched the new render as they stood):
+Air's four markup hashes (`78e363ff…`, `adc7e8f1…`, `a0de5c79…`,
+`d37c4131…` before) and the Equinox Air pin (`f885fbfd…` to
+`45b86e79…`) in `Tablet.test`; `id=air` (124,884 to 124,796 bytes) and
+`&font=enochian` (220,223 to 220,135) in `registry.test`, reviewed
+rasterised; Theoricus 1 and 2 and Portal 1 and 2 in `gdHallImage.test`.
+It passed stage E's gate on its own tree with every step at 0,
+coverage at the first attempt.
 
 **For Gadi:** the notes' new text needs a `magick-data` release (a
 patch on its own; it can ride with the pending 0.2.0), and the README's
