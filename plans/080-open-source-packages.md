@@ -1,7 +1,8 @@
 # Open source: the packages and their pages — 11 November 2026
 
-Status: plan; stage A built and reviewed on `gate/data-publish`, not
-merged ([below](#stage-a-11-november-2026)). Reviewed on 11 November 2026 and
+Status: stages A and A′ done, `magick-data` 0.1.0 on npm
+([below](#010-12-and-13-november-2026)); stage B built on
+`gate/open-source-hub`, not merged ([below](#stage-b-13-november-2026)). Reviewed on 11 November 2026 and
 revised (see [Review](#review-11-november-2026)), then spiked and mocked up the same day
 (see [Before any code](#before-any-code)). Decisions 1–4, the table page's
 layout, the sigils, the fonts and the licence note were settled by Gadi on
@@ -1021,6 +1022,108 @@ reproduced. Applied in `9d34b8d2`.
   job outside `release.yml`'s path.
 - **Required reviewers on the `npm` environment**, if anyone but Gadi
   ever gets push access to `main` (decision 3).
+
+## Stage B (13 November 2026)
+
+Built on `gate/open-source-hub` from `ed66f81c`; not merged.
+
+| Commit | What |
+| --- | --- |
+| `47b3bbf8` | `feat(open-source): Add the open-source hub` |
+
+Gated on its own tree in a clean worktree with a fresh install and Node
+24.18.0: `loom init`, both `loom check`s, `pnpm check`, `pnpm
+typecheck`, the data smoke test, `pnpm test:coverage` (no re-run),
+`pnpm build`, `pnpm check:turbopack`, the tree clean after each; every
+step exit 0. A first gate, of the commit before an amend, failed
+`src/analytics/insightsUrl.test.ts`, which requires every top-level
+section to be public or private for Web Analytics; `open-source` was
+added to its public sections.
+
+- **`/open-source`** (`src/app/open-source/`): a paragraph, then
+  "Licences" and "The packages". The licences, each checked against the
+  repository: the app AGPL-3.0-or-later (`LICENSE.txt`); the packages'
+  code MIT, the drawings the components make included, path data and
+  all ([the licence note](#the-licence-of-a-drawing-that-is-code)); the
+  data and the site's hand-drawn images CC BY 4.0, with the images the
+  site serves CC BY too but a component's drawing to be credited "drawn
+  by magick-components (MIT)"; the halls' font subsets (Noto Serif,
+  Frank Ruhl Libre) OFL 1.1, linking `public/fonts/*-OFL.txt`; others'
+  work under its own licence, credited at `/about#credits`; and the
+  Enochian dictionary under none (`packages/magick-data/LICENSE.txt`).
+  The Enochian font is not mentioned: it has no licence text and the
+  page names only the halls' subsets.
+- **The cards** (`PackageCard`): name (also the anchor, `#magick-data`,
+  `#magick-components`), what the package is, then `npm i` and a usage
+  sample only when one is given, and links to npm (only then) and to
+  its directory on GitHub. `magick-data`'s sample is the README's, run
+  against the workspace package (`Tiferet ☉`). `magick-components` has
+  no sample, says "It is not on npm yet" and links `src/components`;
+  stage G gives it a `usage` and its `directory` becomes
+  `packages/magick-components`, and the card then shows the install
+  and the npm link by itself.
+- **Pages that do not exist yet.** The cards link no site page of their
+  own: `/open-source/data` and `/open-source/components` are stages C
+  and F, and each adds its link to its card then (a prop, or a line in
+  the card's text). The components' card links the pages that show
+  them today (the Tree, the tablets, the sigils, the candlestick, the
+  shewbread, the halls). A test fails on any internal link outside the
+  sitemap.
+- **Around it:** `/about`'s licence section is two sentences and a link
+  here, plus its existing line linking the running version's source,
+  which the AGPL asks for and which stays; its design goals link
+  `/open-source#magick-data` and `#magick-components`. `OpenSource.tsx`
+  links "open-source" here before the file. The home page's "Open
+  source, open data" links here, and now says the components are MIT
+  rather than that the images they draw are CC BY.
+- **Navigation:** `pathnames.ts` gains `"open-source": { "/": "Open
+  source" }`, a section with no pages yet, so stage C adds `data:
+  "Data"` and the bar shows "Open source › Data". The drawer now shows
+  a section with at most one page as a single link (it showed an empty
+  list). The page is in `PUBLIC_PAGES`, hence in the sitemap, site
+  search and the social cards, which draw the Tree of Life for the
+  section. The footer's "Open source" column holds "Source code" (the
+  repository), moved from the Magick.ly column, as no page of the
+  section exists yet; stages C and F add Data and Components from
+  `pathnames.ts`. Web Analytics reports its paths in full, as a public
+  section (`src/analytics/insightsUrl.ts`).
+- **Tests:** `pageTexts.test.tsx` checks the hub's text like the other
+  sections' (one section per heading, no skipped level, links only to
+  pages that exist); its link check now admits https links to five
+  named hosts (creativecommons.org, github.com, opensource.org,
+  www.gnu.org, www.npmjs.com) and fails any other. `page.test.tsx`
+  checks the metadata and sitemap entry, each licence named, the data
+  card's install and links, and that the components' card offers no
+  install and no npm link. siteNav, footer, app bar and social card
+  tests cover the section.
+- **Search:** the vectors were refreshed in the same commit.
+  `search:compare` embedded 24 Gemini passages and 245 of the Qwen
+  comparison profile (caches copied from two other worktrees first);
+  `search:publish` requested nothing.
+- **Checked in a browser:** `next dev` on port 3117 from this worktree
+  with `ci.yml`'s placeholder environment, headless Chromium over CDP,
+  at 1280 and 390 px in light and dark: `/open-source`, `/about`, the
+  candlestick page's line, and the drawer. No sideways scroll at 390 px
+  (`scrollWidth` 390); the usage sample scrolls inside its box.
+
+**Left for Gadi:**
+
+- The wording, above all the CC BY sentence for served images ("Where
+  one is a component's drawing, though, anyone may draw the same image
+  from the code under MIT, so credit it as drawn by magick-components
+  (MIT)"), which names a package that is not yet on npm.
+- "Source code" moving into the Open source column.
+
+**Follow-ups:**
+
+- The repository's `README.md` and `src/components/LICENSE.txt` still
+  say that images the app draws are CC BY 4.0, which the licence note
+  corrects. `LICENSE.txt` moves in stage E; the README should then say
+  what `/open-source` says.
+- The image pages (the halls, the symbols, the sigils) still say CC BY
+  4.0 for their downloads; the licence note has them credit component
+  drawings as "drawn by magick-components (MIT)" once that package is
+  published (stage G).
 
 ## Review (11 November 2026)
 

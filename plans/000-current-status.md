@@ -278,8 +278,14 @@ Follow-ups are separate from the completed migration work:
   with provenance through the trusted publisher; on 13 November `next`
   was removed and tokens disallowed, which completes stage A′
   ([plan 080](080-open-source-packages.md#010-12-and-13-november-2026)).
-  TODO: with Gadi's go-ahead, stages B to G. Follow-ups:
-  [plan 080](080-open-source-packages.md#follow-ups).
+  Stage B, the `/open-source` hub (the licences, a card per package,
+  `/about` and the pages' open-source line linking it, its place in the
+  bar, footer, sitemap and search), is built on `gate/open-source-hub`,
+  not merged
+  ([plan 080](080-open-source-packages.md#stage-b-13-november-2026)).
+  TODO: with Gadi's go-ahead, stages C to G. Follow-ups:
+  [plan 080](080-open-source-packages.md#follow-ups) and
+  [stage B's](080-open-source-packages.md#stage-b-13-november-2026).
 - 12 November 2026: the Enochian dictionary's and Keys' gematria named as
   Gerald Schueler's (EMPM, 1985), Gadi choosing a label over removal. All
   190 entries that carry it cite EMPM (a test keeps it so). Each value
