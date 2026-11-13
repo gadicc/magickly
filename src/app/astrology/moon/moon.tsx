@@ -66,7 +66,11 @@ export default function Moon() {
 
       <div id="page">
         <div style={{ height: "155px" }}>
-          <MoonDrawing moonPadding="20px 0 10px 0" latitude={place?.latitude} />
+          <MoonDrawing
+            moonPadding="20px 0 10px 0"
+            latitude={place?.latitude}
+            background="/night-sky.jpg"
+          />
         </div>
 
         <br />

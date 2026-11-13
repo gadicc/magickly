@@ -21,11 +21,12 @@ import Tiles from "@/ui/Tiles";
 
 /**
  * The moon as seen from the reader's place (plan 072), which the MIT moon
- * widget can't look up itself: its components import no app code.
+ * widget can't look up itself: its components import no app code. Its
+ * background is the site's, as Mercury's is.
  */
 export function PlaceMoon() {
   const { place } = usePlace();
-  return <MoonWidget latitude={place?.latitude} />;
+  return <MoonWidget latitude={place?.latitude} background="/night-sky.jpg" />;
 }
 
 /**

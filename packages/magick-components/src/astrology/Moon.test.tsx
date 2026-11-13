@@ -60,6 +60,37 @@ describe("MoonWidget", () => {
     await unmount();
   });
 
+  it("draws the background it is given, quoted, and none of its own", () => {
+    const style = (html: string) =>
+      html.match(/<div style="([^"]*)"/)?.[1] ?? "";
+    expect(style(renderAt(buildTime, <MoonWidget />))).not.toContain(
+      "background:",
+    );
+    expect(renderAt(buildTime, <MoonWidget background="/sky.jpg" />)).toContain(
+      "background:url(&quot;/sky.jpg&quot;)",
+    );
+    expect(
+      renderAt(buildTime, <MoonWidget background={'a") red; x: url("b'} />),
+    ).toContain("background:url(&quot;a\\22 ) red; x: url(\\22 b&quot;)");
+  });
+
+  it("gives each moon on a page its own glow", () => {
+    const html = renderAt(
+      buildTime,
+      <>
+        <MoonWidget />
+        <MoonWidget />
+      </>,
+    );
+    const ids = [...html.matchAll(/<filter id="([^"]+)"/g)].map(([, id]) => id);
+    expect(ids).toHaveLength(2);
+    expect(new Set(ids).size).toBe(2);
+    for (const id of ids) {
+      expect(id).toMatch(/^[A-Za-z0-9_-]+$/);
+      expect(html).toContain(`filter:url(#${id})`);
+    }
+  });
+
   describe("the hemisphere", () => {
     const transform = (latitude?: number) => {
       const holder = document.createElement("div");

@@ -8,7 +8,8 @@
  * is under that licence as well as MIT.
  */
 import lune from "lune";
-
+import { useId } from "react";
+import { cssString } from "../cssString.ts";
 import useHydrated from "../hooks/useHydrated.ts";
 import { moonMeanInclination, moonPath } from "./moonPath.ts";
 
@@ -55,6 +56,8 @@ function MoonDrawing({
   const inclination = northernHemisphere
     ? moonMeanInclination
     : 180 - moonMeanInclination;
+  // Its own glow filter, so that two moons on a page do not share an id.
+  const glow = `moon-glow-${useId().replace(/[^A-Za-z0-9_-]/g, "_")}`;
 
   return (
     <svg
@@ -66,7 +69,7 @@ function MoonDrawing({
       transform={`rotate(${inclination})`}
     >
       <defs>
-        <filter id="glow">
+        <filter id={glow}>
           <feGaussianBlur stdDeviation="5" result="coloredBlur" />
           <feMerge>
             <feMergeNode in="coloredBlur" />
@@ -78,7 +81,7 @@ function MoonDrawing({
       <path
         className="back"
         d="m85,5 a20,20 0 1,1 0,150 a20,20 0 1,1 0,-150"
-        style={{ fill: "white", filter: "url(#glow)" }}
+        style={{ fill: "white", filter: `url(#${glow})` }}
       />
       <path
         className="back"
@@ -103,13 +106,20 @@ function MoonDrawing({
  * plan 072); the moon is drawn as from the north until it is known to be
  * south of the equator.
  */
+export interface MoonWidgetProps {
+  /** Space around the drawing, as CSS `padding`. */
+  moonPadding?: string;
+  /** The viewer's latitude, when known; north of the equator if not. */
+  latitude?: number;
+  /** The tile's background image, a URL, drawn to cover; none if omitted. */
+  background?: string;
+}
+
 function MoonWidget({
   moonPadding = "10px 0 2px 0",
   latitude,
-}: {
-  moonPadding?: string;
-  latitude?: number;
-}) {
+  background,
+}: MoonWidgetProps) {
   // Pages with this widget are prerendered at build time, so the server can't
   // know today's phase. Hydrate with the unlit disc, then draw the phase.
   const hydrated = useHydrated();
@@ -126,7 +136,7 @@ function MoonWidget({
     <div
       style={{
         textAlign: "center",
-        background: "url(/night-sky.jpg)",
+        background: background ? `url(${cssString(background)})` : undefined,
         backgroundSize: "cover",
         height: "100%",
       }}

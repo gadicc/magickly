@@ -2,6 +2,7 @@
 
 import type { DateTime } from "luxon";
 import { type ImgHTMLAttributes, useEffect, useState } from "react";
+import { cssString } from "../cssString.ts";
 import type { Retrograde } from "./mercuryRetrograde.ts";
 
 const NARROW_CHARACTER =
@@ -18,14 +19,6 @@ function emWidth(text: string) {
   let em = 0;
   for (const char of text) em += NARROW_CHARACTER.test(char) ? 0.5 : 1;
   return em;
-}
-
-/**
- * A CSS string of `text`, quoted, with its quotes, backslashes and line
- * breaks escaped, so a URL cannot end the `url()` early.
- */
-function cssString(text: string): string {
-  return `"${text.replace(/["\\\n\r\f]/g, (char) => `\\${char.charCodeAt(0).toString(16)} `)}"`;
 }
 
 export interface MercuryWidgetProps {

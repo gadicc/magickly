@@ -114,4 +114,12 @@ describe("the Mercury tile", () => {
     expect(img).toMatch(/ srcSet="\/_next\/image\?url=%2Fpics%2Fmercury\.webp/);
     expect(html).toContain("background:url(&quot;/night-sky.jpg&quot;)");
   });
+
+  it("gives the Moon tile the night sky too", () => {
+    // The MIT moon draws no background of its own (plan 080).
+    const html = renderAt(buildTime, <Planets />);
+    expect(
+      html.match(/background:url\(&quot;\/night-sky\.jpg&quot;\)/g),
+    ).toHaveLength(2);
+  });
 });

@@ -173,9 +173,11 @@ sigil, and final forms are drawn as their base letters.
 - **An Enochian font.** `Tablet` draws the Latin transliteration unless you
   pass `enochianStyle`, the CSS of a font that sets the Enochian letters.
   The one magick.ly uses has no licence text, so it is not in the package.
-- **Mercury's pictures.** `Mercury` takes its background and the planet's
-  picture as `background` and `image` (a URL, or `<img>` props such as
-  Next's `getImageProps()` gives), and draws none of its own.
+- **The tiles' pictures.** `Moon` and `Mercury` take their background as
+  `background`, a URL drawn to cover, and `Mercury` the planet's picture
+  as `image` (a URL, or `<img>` props such as Next's `getImageProps()`
+  gives). Neither draws a picture of its own; without them the tile has
+  no background.
 - **Links.** `TreeOfLife` links each sphere and path to a root-relative
   path in the scheme magick.ly uses (`/kabbalah/sephirah/tiferet`,
   `/kabbalah/path/1_2`), which on your site is your own path, unless you
