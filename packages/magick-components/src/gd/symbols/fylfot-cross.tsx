@@ -1,13 +1,13 @@
 import data from "magick-data";
 
-const colorFromElement = {
+const colorFromElement: Readonly<Record<string, string>> = {
   fire: "red",
   water: "blue",
   air: "yellow",
   earth: "#333",
 };
 
-const flashingColorFromColor = {
+const flashingColorFromColor: Readonly<Record<string, string>> = {
   red: "green",
   blue: "yellow",
   yellow: "purple",
@@ -32,11 +32,33 @@ export const fylfot = [
   ["earth", null, "aquarius", "gemini", "air"],
 ];
 
-export function typeFromId(id) {
+/** The table a fylfot id is a row of. */
+export function typeFromId(id: string): "planet" | "element" | "zodiac" {
   if (id === "sol") return "planet";
   if (["earth", "air", "water", "fire"].includes(id)) return "element";
   return "zodiac";
 }
+
+/**
+ * The table's class, which scopes its stylesheet: a plain `<style>`, so the
+ * component needs no CSS tooling (it was Next's styled-jsx in the app).
+ */
+const CLASS = "magick-fylfot-cross";
+const STYLE = `
+.${CLASS} {
+  margin: 20px auto;
+  border-collapse: collapse;
+}
+.${CLASS} td {
+  width: 1.5em;
+  font-size: 200%;
+  text-align: center;
+  vertical-align: middle;
+}
+.${CLASS} td:not(:empty) {
+  border: 1px solid var(--mui-palette-ink, black);
+}
+`;
 
 export default function FylfotCross({
   cells = fylfot,
@@ -52,48 +74,65 @@ export default function FylfotCross({
   ) => void;
   showColors: boolean;
 }) {
-  console.log(cells);
-
   return (
-    <table>
-      <style jsx>{`
-        table {
-          margin: 20px auto;
-          border-collapse: collapse;
-        }
-        td {
-          width: 1.5em;
-          font-size: 200%;
-          text-align: center;
-          vertical-align: middle;
-        }
-        td:not(:empty) {
-          border: 1px solid var(--mui-palette-ink, black);
-        }
-      `}</style>
-      <tbody>
-        {cells.map((row, rowIndex) => (
-          <tr key={rowIndex}>
-            {row.map((id, colIndex) => {
-              const correctId = fylfot[rowIndex][colIndex];
-              const isCorrect = id === correctId;
+    <>
+      <style>{STYLE}</style>
+      <table className={CLASS}>
+        <tbody>
+          {cells.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {row.map((id, colIndex) => {
+                const correctId = fylfot[rowIndex][colIndex];
+                const isCorrect = id === correctId;
 
-              const _onClick = () =>
-                onClick && onClick(id, rowIndex, colIndex, correctId as string);
+                const _onClick = () =>
+                  onClick &&
+                  onClick(id, rowIndex, colIndex, correctId as string);
 
-              let background: undefined | string = undefined;
-              let color: undefined | string = undefined;
-              const opacity = isCorrect ? 1 : 0.5;
+                let background: undefined | string = undefined;
+                let color: undefined | string = undefined;
+                const opacity = isCorrect ? 1 : 0.5;
 
-              if (showColors && id !== "sol") {
-                const element = elementFromPos(rowIndex, colIndex);
-                background = colorFromElement[element] as string;
-                color = flashingColorFromColor[background];
-              }
-              const style = { background, color, opacity };
+                if (showColors && id !== "sol") {
+                  const element = elementFromPos(rowIndex, colIndex);
+                  background = colorFromElement[element] as string;
+                  color = flashingColorFromColor[background];
+                }
+                const style = { background, color, opacity };
 
-              if (id === null) return <td key={colIndex} />;
-              if (id === "")
+                if (id === null) return <td key={colIndex} />;
+                if (id === "")
+                  return (
+                    <td
+                      key={colIndex}
+                      onClick={_onClick}
+                      style={{
+                        ...style,
+                        cursor: onClick ? "pointer" : undefined,
+                      }}
+                    >
+                      &nbsp;
+                    </td>
+                  );
+                if (id === "cursor")
+                  return (
+                    <td
+                      key={colIndex}
+                      style={{
+                        ...style,
+                        border: "2px solid " + (showColors ? color : "red"),
+                      }}
+                    >
+                      &nbsp;
+                    </td>
+                  );
+
+                const type = typeFromId(id);
+                const item = (
+                  data[type] as Readonly<Record<string, { symbol: string }>>
+                )[id];
+                // console.log([id, type, item]);
+
                 return (
                   <td
                     key={colIndex}
@@ -101,50 +140,22 @@ export default function FylfotCross({
                     style={{
                       ...style,
                       cursor: onClick ? "pointer" : undefined,
+                      fontFamily: "monospace !important",
                     }}
                   >
-                    &nbsp;
+                    {
+                      // U+FE0E is Unicode Variation Selector VS15,
+                      // i.e. prefer text character to emoji, so
+                      // we can style it ourselves.
+                      item.symbol + "\uFE0E"
+                    }
                   </td>
                 );
-              if (id === "cursor")
-                return (
-                  <td
-                    key={colIndex}
-                    style={{
-                      ...style,
-                      border: "2px solid " + (showColors ? color : "red"),
-                    }}
-                  >
-                    &nbsp;
-                  </td>
-                );
-
-              const type = typeFromId(id);
-              const item = data[type][id];
-              // console.log([id, type, item]);
-
-              return (
-                <td
-                  key={colIndex}
-                  onClick={_onClick}
-                  style={{
-                    ...style,
-                    cursor: onClick ? "pointer" : undefined,
-                    fontFamily: "monospace !important",
-                  }}
-                >
-                  {
-                    // U+FE0E is Unicode Variation Selector VS15,
-                    // i.e. prefer text character to emoji, so
-                    // we can style it ourselves.
-                    item.symbol + "\uFE0E"
-                  }
-                </td>
-              );
-            })}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
   );
 }

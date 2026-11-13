@@ -1,4 +1,7 @@
-import TreeOfLife from "../kabbalah/TreeOfLife.tsx";
+import TreeOfLife, {
+  type TreeOfLifeProps,
+  type TreeSephirah,
+} from "../kabbalah/TreeOfLife.tsx";
 
 /*
  * The Tree with each sephirah numbered and named by its grade and linked to
@@ -11,7 +14,7 @@ import TreeOfLife from "../kabbalah/TreeOfLife.tsx";
  * routes' client chunks (plan 036, decision 10).
  */
 
-function sephirahHref(s) {
+function sephirahHref(s: TreeSephirah) {
   return "/gd/grade/" + s.data.gdGradeId;
 }
 
@@ -19,7 +22,8 @@ function pathHref() {
   return null;
 }
 
-function GradeTree({ ...props }) {
+/** The Tree as the grades' map; any of the Tree's props override these. */
+function GradeTree({ ...props }: TreeOfLifeProps) {
   return (
     <TreeOfLife
       field="gdGrade.id"

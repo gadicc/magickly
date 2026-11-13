@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";

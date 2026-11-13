@@ -4,7 +4,7 @@ import useHydrated from "../hooks/useHydrated.ts";
 
 const moonMeanInclination = 5.15; // in degrees
 
-function moonPhaseName(phase) {
+function moonPhaseName(phase: number) {
   if (phase === 0.5) return "full-moon";
 
   if (phase > 0.5) {

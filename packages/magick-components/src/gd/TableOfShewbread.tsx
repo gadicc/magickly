@@ -36,7 +36,7 @@ function degreesToPointOnCircle(
   };
 }
 
-const yhvH = {
+const yhvH: Readonly<Record<string, string>> = {
   y: "י",
   h: "ה",
   v: "ו",

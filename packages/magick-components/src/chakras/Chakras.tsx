@@ -49,7 +49,9 @@ function Chakras({
             color="#000"
             overflow="visible"
             opacity={
-              opacityActive[(!active || active === chakra.id).toString()]
+              !active || active === chakra.id
+                ? opacityActive.true
+                : opacityActive.false
             }
           ></circle>
         ))}

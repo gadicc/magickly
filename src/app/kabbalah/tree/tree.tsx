@@ -2,7 +2,10 @@
 
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
-import Tree from "magick-components/kabbalah/TreeOfLife";
+import Tree, {
+  type TreeColorScale,
+  type TreePathAttribution,
+} from "magick-components/kabbalah/TreeOfLife";
 import Data from "magick-data";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
@@ -179,12 +182,13 @@ export function TreeOfLifeView({
               field={opts.field}
               topText={opts.topText}
               bottomText={opts.bottomText}
-              colorScale={opts.colorScale}
-              letterAttr={opts.letterAttr}
+              // The query's text, unchecked, as the page has always passed
+              // it; only the image link validates it.
+              colorScale={opts.colorScale as TreeColorScale}
+              letterAttr={opts.letterAttr as TreePathAttribution}
               flip={opts.flip}
               showDaat={opts.showDaat}
               fontSize={opts.fontSize}
-              // @ts-expect-error: TODO, came up in recent linting update
               ref={ref}
             />
           </Ink>

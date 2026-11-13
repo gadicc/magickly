@@ -49,5 +49,14 @@
     "luxon": "3.7.2",
     "magick-data": "workspace:*",
     "nlopt-js": "^0.1.1"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/luxon": "3.7.6",
+    "@types/node": "24.19.2",
+    "@types/react": "^19.3.0",
+    "typescript": "^6.0.3"
   }
 }

@@ -1,4 +1,5 @@
 import Data from "magick-data";
+import type { SephirahRow, TreeOfLifePathRow } from "magick-data/rows";
 import React from "react";
 import { svgCoordinate } from "../svgCoordinate.ts";
 import { FIELD_PATH_LIST_SEPARATOR, readFieldPath } from "./fieldPath.ts";
@@ -11,8 +12,53 @@ import {
   TREE_GEOMETRY,
 } from "./treeOfLifeFigure.tsx";
 
-const _sephirot = Object.values(Data.sephirah);
-const _paths = Data.treeOfLifePath;
+const _sephirot: SephirahRow[] = Object.values(Data.sephirah);
+const _paths: Readonly<Record<string, TreeOfLifePathRow>> = Data.treeOfLifePath;
+
+/**
+ * A scale the sephirot are coloured in, from magick-data's colours: the
+ * Queen's (`queen`) or the King's (`king`), each drawn with its `…Web` value.
+ */
+export type TreeColorScale = keyof SephirahRow["color"] extends infer Key
+  ? Key extends `${infer Scale}Web`
+    ? Scale
+    : never
+  : never;
+
+/**
+ * Which tradition puts the Hebrew letters on the paths: the Golden Dawn's
+ * Hermetic Tree (`hermetic`) or the older Hebrew one (`hebrew`), as
+ * magick-data's paths give each.
+ */
+export type TreePathAttribution = keyof typeof orderedPaths &
+  keyof TreeOfLifePathRow;
+
+/**
+ * What `pathTitle` reads of a path: each attribution's letter, and the
+ * Hermetic Tree's path number and trump. A magick-data path row is one.
+ */
+export type TitledPath = {
+  [A in TreePathAttribution]?: {
+    hebrewLetter?: { letter?: { name: string; he: string } };
+    pathNo?: number;
+    tarotTitle?: string;
+  };
+};
+
+/** A sphere as the Tree draws it, which `sephirahHref` is given. */
+export interface TreeSephirah {
+  /** Its centre. */
+  x: number;
+  y: number;
+  /** Its row in magick-data. */
+  data: SephirahRow;
+  /** Its colour in the scale drawn; quarters are comma-separated. */
+  color: string;
+  /** Its label. */
+  text: string;
+  /** The label's colour, where black would not read on the sphere. */
+  textColor: string | undefined;
+}
 
 /** A label's line height, as a multiple of its font size. */
 const LINE_PITCH = 1.2;
@@ -68,7 +114,10 @@ function SvgLink({
  * A path's tooltip, which search engines also read: "Path 31: Shin (ש),
  * Judgement" in the Hermetic attribution, the letter alone in the others.
  */
-export function pathTitle(path, letterAttr: string) {
+export function pathTitle(
+  path: TitledPath,
+  letterAttr: TreePathAttribution,
+): string {
   const attribution = path[letterAttr];
   const letter = attribution?.hebrewLetter?.letter;
   if (!letter) return "";
@@ -82,6 +131,50 @@ export function pathTitle(path, letterAttr: string) {
  * Note: originally I used a lot of CSS classes, which worked superbly in the
  * browser, but was very inconsistent when exporting into external programs.
  */
+
+export interface TreeOfLifeProps {
+  /** The SVG's width; the container's, `"100%"`, when not given. */
+  width?: string | number;
+  /** The SVG's height; from the width and the figure's shape when not given. */
+  height?: string | number;
+  /** Each sphere's label, Keter first and Da'at eleventh, in place of `field`'s. */
+  labels?: readonly string[];
+  /** The scale the spheres are coloured in. */
+  colorScale?: TreeColorScale;
+  /**
+   * What each sphere is labelled with: a field path into its magick-data
+   * row (`name.he`, `planet.name.en.en`, `stones.*.name.en`), or several
+   * joined by commas, which are drawn space-separated.
+   */
+  field?: string;
+  /** The field path(s) set on an arc above each sphere's label. */
+  topText?: string;
+  /** The field path(s) set on an arc below each sphere's label. */
+  bottomText?: string;
+  /** Whose letters the paths carry. */
+  letterAttr?: TreePathAttribution;
+  /** A sephirah's id: that sphere is drawn and the others faded. */
+  active?: string;
+  /** A path's link, or `null` for none; `/kabbalah/path/<id>` by default. */
+  pathHref?: (path: TreeOfLifePathRow) => string | null;
+  /** A sphere's link, or `null` for none; `/kabbalah/sephirah/<id>` by default. */
+  sephirahHref?: (sephirah: TreeSephirah) => string | null;
+  /** A path's id (`"1_2"`): it is drawn on top and highlighted, the rest faded. */
+  activePath?: string;
+  /** Seen from behind, the body's view; the stylesheet mirrors the figure. */
+  flip?: boolean;
+  /** Draws Da'at, which only the Queen scale colours. */
+  showDaat?: boolean;
+  /** The labels' font size; from `field` when not given. */
+  fontSize?: string | number;
+  /** The `<svg>`; in the browser its links are followed by `location.href`. */
+  ref?: React.RefObject<SVGSVGElement | null>;
+}
+
+const defaultSephirahHref = (s: TreeSephirah) =>
+  "/kabbalah/sephirah/" + s.data.id;
+const defaultPathHref = (path: TreeOfLifePathRow) =>
+  "/kabbalah/path/" + path.id;
 
 function TreeOfLife({
   width,
@@ -100,35 +193,18 @@ function TreeOfLife({
   showDaat,
   fontSize,
   ref,
-}: {
-  width?: string | number;
-  height?: string | number;
-  labels?;
-  colorScale?;
-  field?;
-  topText?: string;
-  bottomText?: string;
-  letterAttr?: string;
-  active?;
-  pathHref?;
-  sephirahHref?;
-  activePath?;
-  /** Seen from behind, the body's view; the stylesheet mirrors the figure. */
-  flip?: boolean;
-  showDaat?;
-  fontSize?;
-  ref?: React.RefObject<SVGSVGElement>;
-}) {
-  const color = colorScale ? colorScale + "Web" : "queenWeb";
+}: TreeOfLifeProps) {
+  const color = `${colorScale || "queen"}Web` as const;
   width = width || "100%";
   field = field || "index";
+  const fieldPaths = field;
 
-  sephirahHref = sephirahHref || ((s) => "/kabbalah/sephirah/" + s.data.id);
-  pathHref = pathHref || ((path) => "/kabbalah/path/" + path.id);
+  sephirahHref = sephirahHref || defaultSephirahHref;
+  pathHref = pathHref || defaultPathHref;
 
   if (!labels)
     labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) =>
-      field
+      fieldPaths
         .split(",")
         .map((field) => readFieldPath(_sephirot[i], field))
         .join(" "),
@@ -147,7 +223,7 @@ function TreeOfLife({
       .join(" "),
   );
 
-  const fontSizeFromFieldName = {
+  const fontSizeFromFieldName: Readonly<Record<string, number>> = {
     index: 32,
     "name.en": 10,
     "name.he": 20,
@@ -163,115 +239,38 @@ function TreeOfLife({
   const pillar = TREE_GEOMETRY.pillars.map((x) => ({ x }));
   const rowStart = TREE_GEOMETRY.rowStart;
 
-  // prettier-ignore
-  const sephirot = [
-    {
-      x: SEPHIRAH_CENTRES[0].x,
-      y: SEPHIRAH_CENTRES[0].y,
-      data: _sephirot[0],
-      color: _sephirot[0].color[color],
-      text: labels[0],
-      textColor: _sephirot[0].color[color + "Text"],
-    },
-    {
-      x: SEPHIRAH_CENTRES[1].x,
-      y: SEPHIRAH_CENTRES[1].y,
-      data: _sephirot[1],
-      color: _sephirot[1].color[color],
-      text: labels[1],
-      textColor: _sephirot[1].color[color + "Text"],
-    },
-    {
-      x: SEPHIRAH_CENTRES[2].x,
-      y: SEPHIRAH_CENTRES[2].y,
-      data: _sephirot[2],
-      color: _sephirot[2].color[color],
-      text: labels[2],
-      textColor: _sephirot[2].color[color + "Text"],
-    },
-    {
-      x: SEPHIRAH_CENTRES[3].x,
-      y: SEPHIRAH_CENTRES[3].y,
-      data: _sephirot[3],
-      color: _sephirot[3].color[color],
-      text: labels[3],
-      textColor: _sephirot[3].color[color + "Text"],
-    },
-    {
-      x: SEPHIRAH_CENTRES[4].x,
-      y: SEPHIRAH_CENTRES[4].y,
-      data: _sephirot[4],
-      color: _sephirot[4].color[color],
-      text: labels[4],
-      textColor: _sephirot[4].color[color + "Text"],
-    },
-    {
-      x: SEPHIRAH_CENTRES[5].x,
-      y: SEPHIRAH_CENTRES[5].y,
-      data: _sephirot[5],
-      color: _sephirot[5].color[color],
-      text: labels[5],
-      textColor: _sephirot[5].color[color + "Text"],
-    },
-    {
-      x: SEPHIRAH_CENTRES[6].x,
-      y: SEPHIRAH_CENTRES[6].y,
-      data: _sephirot[6],
-      color: _sephirot[6].color[color],
-      text: labels[6],
-      textColor: _sephirot[6].color[color + "Text"],
-    },
-    {
-      x: SEPHIRAH_CENTRES[7].x,
-      y: SEPHIRAH_CENTRES[7].y,
-      data: _sephirot[7],
-      color: _sephirot[7].color[color],
-      text: labels[7],
-      textColor: _sephirot[7].color[color + "Text"],
-    },
-    {
-      x: SEPHIRAH_CENTRES[8].x,
-      y: SEPHIRAH_CENTRES[8].y,
-      data: _sephirot[8],
-      color: _sephirot[8].color[color],
-      text: labels[8],
-      textColor: _sephirot[8].color[color + "Text"],
-    },
-    {
-      x: SEPHIRAH_CENTRES[9].x,
-      y: SEPHIRAH_CENTRES[9].y,
-      data: _sephirot[9],
-      color: _sephirot[9].color[color],
-      text: labels[9],
-      textColor: _sephirot[9].color[color + "Text"],
-    },
-  ];
+  const labelled: readonly string[] = labels;
+  /**
+   * The ith sphere: Keter first, Da'at eleventh. Da'at has no King colour,
+   * so in that scale it is drawn unfilled.
+   */
+  const sphere = (i: number): TreeSephirah => ({
+    x: SEPHIRAH_CENTRES[i].x,
+    y: SEPHIRAH_CENTRES[i].y,
+    data: _sephirot[i],
+    color: _sephirot[i].color[color] ?? "none",
+    text: labelled[i] ?? "",
+    textColor: _sephirot[i].color[`${color}Text`],
+  });
+  const sephirot = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(sphere);
 
-  if (showDaat)
-    sephirot.push({
-      x: SEPHIRAH_CENTRES[10].x,
-      y: SEPHIRAH_CENTRES[10].y,
-      data: _sephirot[10],
-      color: _sephirot[10].color[color],
-      text: labels[10],
-      textColor: _sephirot[10].color[color + "Text"],
-    });
+  if (showDaat) sephirot.push(sphere(10));
 
   //console.log(sephirot);
 
-  let pathsToDraw = orderedPaths[letterAttr];
+  let pathIds: string[] = orderedPaths[letterAttr];
   if (activePath) {
     // Bring activePath to top
-    pathsToDraw = pathsToDraw.filter((x) => x !== activePath);
-    pathsToDraw.unshift(activePath);
+    pathIds = pathIds.filter((x) => x !== activePath);
+    pathIds.unshift(activePath);
   }
 
   // Map to path data with that id
-  pathsToDraw = pathsToDraw.map((id) => _paths[id]).reverse();
+  const pathsToDraw = pathIds.map((id) => _paths[id]).reverse();
 
-  const outerSephirot = activePath && activePath.split("_").map(Number);
+  const outerSephirot = activePath ? activePath.split("_").map(Number) : [];
 
-  function sephirahOpacity(sephirah) {
+  function sephirahOpacity(sephirah: TreeSephirah) {
     if (!active && !activePath) return 1;
 
     if (active && active === sephirah.data.id) return 1;
@@ -283,10 +282,13 @@ function TreeOfLife({
     return 0.1;
   }
 
-  function pathLetterPos(path) {
+  function pathLetterPos(path: TreeOfLifePathRow) {
     // Adjust position on path to avoid being covered over by other paths
     // prettier-ignore
-    const specialPositions = {
+    const specialPositions: Record<
+      TreePathAttribution,
+      Readonly<Record<string, number>>
+    > = {
       hebrew: {
         "2_5": 0.3,
         "3_4": 0.3, // Half way to 2_5,3_4 intersection
@@ -449,10 +451,10 @@ function TreeOfLife({
               cx={s.x}
               cy={s.y}
               r={sephirahRadius}
-              fill={s.color.match(",") ? null : s.color}
+              fill={s.color.match(",") ? undefined : s.color}
               style={{
                 // Override a:visited * { inherit } from style.
-                fill: s.color.match(",") ? null : s.color,
+                fill: s.color.match(",") ? undefined : s.color,
               }}
               // Only Da'at is drawn dashed, and only it has these.
               stroke={s.data.color.strokeColor || "#000"}

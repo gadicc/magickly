@@ -129,7 +129,7 @@ describe("Tablet", () => {
     }
   });
 
-  it.each(["water", "fire"])(
+  it.each(["water", "fire"] as const)(
     "draws %s's sigil above its 13 rows of 12",
     (id) => {
       const markup = draw(id);

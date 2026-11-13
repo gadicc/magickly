@@ -47,14 +47,27 @@ function elementFromPosition(x: number, y: number) {
   return "";
 }
 
-const elementColors = {
+/** Each angle's colour, by element; the cross between them has none. */
+const elementColors: Readonly<Record<string, string>> = {
   air: "yellow",
   water: "#59f",
   fire: "#f55",
   earth: "black",
 };
 
-const tabletColors = {
+/** A tablet's colours, where they are not its angles' elements'. */
+interface TabletColors {
+  /** The letters' colour, by angle (`default` where none is given). */
+  color: Readonly<Record<string, string>>;
+  /** The squares' fill, outside the cross. */
+  background: string;
+  /** The border of the cross's squares. */
+  border?: string;
+  /** The border of the other squares. */
+  borderCross?: string;
+}
+
+const tabletColors: Readonly<Record<string, TabletColors>> = {
   earth: {
     color: {
       default: "black",

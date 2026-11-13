@@ -18,7 +18,7 @@
     "check": "biome check .",
     "lint": "biome lint .",
     "format": "biome format --write .",
-    "typecheck": "pnpm data:build && pnpm search:build && next typegen && tsc --noEmit && pnpm --filter magick-data typecheck",
+    "typecheck": "pnpm data:build && pnpm search:build && next typegen && tsc --noEmit && pnpm --filter magick-data typecheck && pnpm --filter magick-components typecheck",
     "test": "pnpm data:build && pnpm search:build && vitest run",
     "test:watch": "pnpm data:build && pnpm search:build && vitest",
     "test:coverage": "pnpm data:build && pnpm search:build && vitest run --coverage",

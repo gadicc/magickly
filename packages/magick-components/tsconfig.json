@@ -1,0 +1,22 @@
+{
+  // The package's own check: every source and test, strict, emitting
+  // nothing (plan 080, decision 7). The app's own tsconfig is not strict;
+  // this one is.
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": ["dom", "dom.iterable", "es2022"],
+    "types": ["node"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "incremental": false
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}
