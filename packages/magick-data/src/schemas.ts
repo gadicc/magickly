@@ -13,7 +13,7 @@
  * because optionality belongs to the data (plan 032, decision 5).
  */
 import * as v from "valibot";
-import { graph } from "./graph.ts";
+import { type Graph, graph } from "./graph.ts";
 import type { TableSpec } from "./graphSpec.ts";
 import type { TableName } from "./tables.ts";
 
@@ -95,24 +95,63 @@ const tabletReading = v.strictObject({
 const byHouse = (value: v.GenericSchema): Entries =>
   Object.fromEntries(HOUSE_NUMBERS.map((no) => [no, value]));
 
+/** The keys of one part of a table's graph entry, if it has that part. */
+type SpecKeys<S, K extends string> = S extends { readonly [P in K]: infer R }
+  ? keyof R & string
+  : never;
+
+/**
+ * A table's id-shaped fields that `ids()` makes: every one the graph
+ * declares, bar the dotted ones, which belong to the block they are in.
+ */
+type IdField<T extends TableName> = Exclude<
+  | SpecKeys<Graph[T], "links">
+  | SpecKeys<Graph[T], "pending">
+  | SpecKeys<Graph[T], "external">
+  | SpecKeys<Graph[T], "enum">,
+  `${string}.${string}`
+>;
+
+/** What `ids()` is told about a table's id-shaped fields. */
+interface IdOptions<T extends TableName> {
+  /** The fields some rows leave out. */
+  absent?: readonly IdField<T>[];
+  /** The fields some rows spell `null`. */
+  nulled?: readonly IdField<T>[];
+  /**
+   * Each field's description, for the field manifest. It is given here,
+   * not in the graph, so that the text stays out of `graph.js`, which
+   * ships.
+   */
+  about?: Partial<Record<IdField<T>, string>>;
+}
+
 /**
  * A table's id-shaped fields, as the graph declares them: an id, or a list of
- * ids where the field name is plural. `absent` names the ones some rows leave
- * out, and `nulled` the ones some rows spell `null`. A dotted field belongs
- * to the block it is in, which the table declares for itself.
+ * ids where the field name is plural, each with its description. `absent`
+ * names the ones some rows leave out, and `nulled` the ones some rows spell
+ * `null`. A dotted field belongs to the block it is in, which the table
+ * declares for itself.
  */
-function ids(
-  table: TableName,
-  absent: readonly string[] = [],
-  nulled: readonly string[] = [],
+function ids<T extends TableName>(
+  table: T,
+  { absent = [], nulled = [], about = {} }: IdOptions<T> = {},
 ): Entries {
   const spec = graph[table] as TableSpec;
   const entries: Entries = {};
+  const described = about as Partial<Record<string, string>>;
 
   const add = (field: string, schema: v.GenericSchema) => {
     if (field.includes(".")) return;
-    const value = nulled.includes(field) ? v.nullable(schema) : schema;
-    entries[field] = absent.includes(field) ? v.optional(value) : value;
+    const description = described[field];
+    let value: v.GenericSchema = description
+      ? v.pipe(schema, v.description(description))
+      : schema;
+    if ((nulled as readonly string[]).includes(field))
+      value = v.nullable(value);
+    entries[field] = (absent as readonly string[]).includes(field)
+      ? v.optional(value)
+      : value;
   };
   const list = (field: string) =>
     field.endsWith("Ids") ? v.array(v.string()) : v.string();
@@ -163,13 +202,15 @@ export const schemas = {
     about: v.optional(en),
     /** The page's meta description, where the correspondences make a poor one. */
     description: v.optional(en),
-    ...ids("planet", [
-      "hebrewLetterId",
-      "godNameId",
-      "archangelId",
-      "intelligenceId",
-      "spiritId",
-    ]),
+    ...ids("planet", {
+      absent: [
+        "hebrewLetterId",
+        "godNameId",
+        "archangelId",
+        "intelligenceId",
+        "spiritId",
+      ],
+    }),
   }),
   zodiac: v.strictObject({
     id: v.string(),
@@ -225,7 +266,7 @@ export const schemas = {
      * in Dee's spellings ("b", "k, s, ch", "z, zod").
      */
     sounds: v.strictObject({ gd: v.string(), dee: v.string() }),
-    ...ids("enochianLetter", ["tetragramId"]),
+    ...ids("enochianLetter", { absent: ["tetragramId"] }),
   }),
   enochianTablet: v.pipe(
     v.strictObject({
@@ -327,7 +368,7 @@ export const schemas = {
     translation: en,
     meaning: en,
     meanings: v.strictObject(byHouse(en)),
-    ...ids("tetragram", [], ["zodiacId"]),
+    ...ids("tetragram", { nulled: ["zodiacId"] }),
   }),
   geomanticHouse: v.strictObject({
     id: v.number(),
@@ -340,15 +381,17 @@ export const schemas = {
     name: v.string(),
     // Portal belongs to no order and has no degree; the first grade has
     // nothing before it and the last nothing after.
-    ...ids("gdGrade", [
-      "elementId",
-      "planetId",
-      "sephirahId",
-      "degreeId",
-      "nextId",
-      "prevId",
-      "orderId",
-    ]),
+    ...ids("gdGrade", {
+      absent: [
+        "elementId",
+        "planetId",
+        "sephirahId",
+        "degreeId",
+        "nextId",
+        "prevId",
+        "orderId",
+      ],
+    }),
   }),
   gdDegree: v.strictObject({
     id: v.string(),
@@ -362,7 +405,7 @@ export const schemas = {
       roman: v.string(),
       en: v.optional(v.string()),
     }),
-    ...ids("archangel", ["planetId", "sephirahId"]),
+    ...ids("archangel", { absent: ["planetId", "sephirahId"] }),
   }),
   angelicOrder: v.strictObject({
     name: v.strictObject({
@@ -429,9 +472,8 @@ export const schemas = {
     // Da'at is not a sephirah of the Tree and has almost none of these; four
     // of the lower spheres share no part of the soul. Da'at has no stone or
     // scent, and Malchut no scent.
-    ...ids(
-      "sephirah",
-      [
+    ...ids("sephirah", {
+      absent: [
         "chakraId",
         "planetId",
         "archangelId",
@@ -443,8 +485,8 @@ export const schemas = {
         "stoneIds",
         "scentIds",
       ],
-      ["soulId"],
-    ),
+      nulled: ["soulId"],
+    }),
   }),
   treeOfLifePath: v.strictObject({
     id: v.string(),
@@ -462,7 +504,7 @@ export const schemas = {
       }),
     ),
     hebrew: v.optional(v.strictObject({ hebrewLetterId: v.string() })),
-    ...ids("treeOfLifePath", ["nextId", "prevId"]),
+    ...ids("treeOfLifePath", { absent: ["nextId", "prevId"] }),
   }),
   soul: v.strictObject({
     id: v.string(),
@@ -553,7 +595,7 @@ export const schemas = {
     category: v.picklist(["principles", "planets"]),
     /** The grade that teaches it, as a number; not a link to the grades. */
     gdGrade: v.number(),
-    ...ids("alchemySymbol", ["planetId"]),
+    ...ids("alchemySymbol", { absent: ["planetId"] }),
   }),
   alchemyTerm: v.strictObject({
     id: v.string(),
@@ -567,7 +609,7 @@ export const schemas = {
     symbol: v.string(),
     name: en,
     /** Spirit has no elemental. */
-    ...ids("element", ["elementalId"]),
+    ...ids("element", { absent: ["elementalId"] }),
   }),
   elemental: v.strictObject({
     id: v.string(),

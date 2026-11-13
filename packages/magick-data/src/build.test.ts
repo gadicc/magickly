@@ -188,7 +188,8 @@ describe("what the watcher rebuilds", () => {
 describe("dist/", () => {
   it("holds a module, a declaration and the JSON for every source", () => {
     const sources = files(SRC).filter((file) => file.endsWith(".json5"));
-    const expected = sources
+    // The field manifest is emitted as a source is, beside the graph.
+    const expected = [...sources, "fields.json5"]
       .flatMap((source) =>
         [".js", ".d.ts", ".json"].map((ext) => source.replace(/\.json5$/, ext)),
       )
@@ -206,14 +207,14 @@ describe("dist/", () => {
       ]);
   });
 
-  it("declares every text unknown and every table its type", () => {
+  it("declares every text and the field manifest unknown, and every table its type", () => {
     const tableFiles = new Set<string>(Object.values(TABLE_FILES));
     for (const file of files(DIST).filter((f) => f.endsWith(".d.ts"))) {
       const declaration = readFileSync(join(DIST, file), "utf8");
       const isTable = tableFiles.has(file.replace(/\.d\.ts$/, ""));
       expect([
         file,
-        declaration.includes("declare const text: unknown;"),
+        /declare const (text|fields): unknown;/.test(declaration),
       ]).toEqual([file, !isTable]);
     }
   });

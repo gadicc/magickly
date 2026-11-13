@@ -34,6 +34,7 @@
     "LICENSE.txt",
     "LICENSE-DATA.txt",
     "!dist/enochian/dictionary.*",
+    "!dist/fields.*",
     "!lib/enochian/Dictionary.*"
   ],
   "exports": {
@@ -78,6 +79,7 @@
     "./materia/stones": "./src/materia/Stones.ts",
     "./materia/scents": "./src/materia/Scents.ts",
     "./enochian/dictionary": "./src/enochian/Dictionary.ts",
+    "./fields": "./src/fields.ts",
     "./enochian/keys": "./src/enochian/Keys.ts",
     "./kabbalah/seventyTwoAngels/derived": "./src/kabbalah/seventyTwoAngelsDerived.ts",
     "./kabbalah/seventyTwoAngels/text": "./src/kabbalah/SeventyTwoAngelsText.ts",
