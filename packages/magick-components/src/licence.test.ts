@@ -1,4 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
+import { join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 /**
@@ -55,5 +57,24 @@ describe("moon-phase's BSD notice", () => {
       read(file).includes("tingletech/moon-phase"),
     );
     expect(naming.sort()).toEqual([...BSD_FILES].sort());
+  });
+});
+
+describe("the package's source", () => {
+  it("holds code, the hall's metrics and test snapshots, nothing else", () => {
+    // Two Inkscape trees of unrecorded provenance sat here unused until
+    // plan 080's "Before publishing"; an asset needs its source recorded
+    // before it joins the MIT package.
+    const src = fileURLToPath(new URL("../src/", import.meta.url));
+    const others = readdirSync(src, { recursive: true, withFileTypes: true })
+      .filter((entry) => entry.isFile())
+      .map((entry) => relative(src, join(entry.parentPath, entry.name)))
+      .filter(
+        (file) =>
+          !/\.tsx?$/.test(file) &&
+          !file.includes("/__snapshots__/") &&
+          file !== "gd/hall/fontMetrics.json",
+      );
+    expect(others).toEqual([]);
   });
 });
