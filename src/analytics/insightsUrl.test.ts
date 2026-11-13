@@ -105,6 +105,7 @@ describe("the sections insightsUrl knows", () => {
       "kabbalah/angel/[slug]/page.tsx",
       "kabbalah/path/[id]/page.tsx",
       "kabbalah/sephirah/[id]/page.tsx",
+      "open-source/data/[table]/page.tsx",
     ]);
     for (const page of dynamic)
       expect(readFileSync(join(APP, page), "utf8"), page).toMatch(

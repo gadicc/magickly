@@ -354,7 +354,7 @@ export const TEXTS: Readonly<Record<string, TextSpec>> = {
     sources: ["kabbalah/lenain/pages"],
     description:
       "Lenain's La Science Cabalistique (1823) leaf by leaf, as printed.",
-    page: "/books/la-science-cabalistique/texte-integral",
+    page: "/books/la-science-cabalistique",
   },
   "./kabbalah/lenain/notes": {
     sources: ["kabbalah/lenain/apparatus"],

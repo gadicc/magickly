@@ -103,11 +103,12 @@ describe("SiteFooter", () => {
     expect(html).toMatch(/aria-current="true"[^>]*>Golden Dawn</);
   });
 
-  it("gives open source a column, with the repository in it", () => {
+  it("gives open source a column, with Data and the repository in it", () => {
     const section = footerSections().find(({ url }) => url === "/open-source");
     expect(section).toMatchObject({
       title: "Open source",
       pages: [
+        { title: "Data", url: "/open-source/data" },
         { title: "Source code", url: "https://github.com/gadicc/magickly" },
       ],
     });

@@ -20,6 +20,8 @@ import HomeText from "./HomeText";
 import KabbalahText from "./kabbalah/KabbalahText";
 import TreeText from "./kabbalah/tree/TreeText";
 import AngelsText from "./kabbalah/yhvh/72angels/AngelsText";
+import DataText from "./open-source/data/DataText";
+import { TABLE_NAMES, tablePath } from "./open-source/data/tables";
 import OpenSourceText from "./open-source/OpenSourceText";
 
 /** Each page's text below its tiles or tool (plan 071, decisions 4 and 5). */
@@ -43,6 +45,7 @@ const TEXTS: Record<string, ComponentType> = {
   "/kabbalah/yhvh/72angels": AngelsText,
   "/gd/halls": HallsText,
   "/open-source": OpenSourceText,
+  "/open-source/data": DataText,
 };
 
 /**
@@ -57,11 +60,14 @@ const OUTSIDE_HOSTS = new Set([
   "www.npmjs.com",
 ]);
 
-const listed = new Set(
-  sitemap().map(
+const listed = new Set([
+  ...sitemap().map(
     (entry) => new URL(entry.url).pathname.replace(/\/$/, "") || "/",
   ),
-);
+  // Pages that exist but stay out of the sitemap: the data tables', which
+  // are not indexed for now (plan 080, decision 4).
+  ...TABLE_NAMES.map(tablePath),
+]);
 
 describe.each(Object.entries(TEXTS))("%s's text", (path, Text) => {
   // Emotion puts its styles inline before each element; they are not the page.

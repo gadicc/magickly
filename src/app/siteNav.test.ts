@@ -87,12 +87,28 @@ describe("siteNav", () => {
     expect(urls(at("/gd").sectionPages)).not.toContain("/gd/rituals/deleted");
   });
 
-  it("names the open-source section, which has no pages of its own yet", () => {
+  it("names the open-source section, and Data under it", () => {
     expect(at("/open-source")).toMatchObject({
       title: "Open source",
       known: true,
       ancestors: [],
-      sectionPages: [],
+      sectionPages: [{ title: "Data", url: "/open-source/data" }],
+      topSection: "open-source",
+    });
+    expect(at("/open-source/data")).toMatchObject({
+      title: "Data",
+      known: true,
+      ancestors: [{ title: "Open source", url: "/open-source" }],
+    });
+  });
+
+  it("lets a data table's page name itself, under Open source › Data", () => {
+    expect(at("/open-source/data/sephirah")).toMatchObject({
+      known: false,
+      ancestors: [
+        { title: "Open source", url: "/open-source" },
+        { title: "Data", url: "/open-source/data" },
+      ],
       topSection: "open-source",
     });
   });

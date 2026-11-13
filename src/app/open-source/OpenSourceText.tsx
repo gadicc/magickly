@@ -131,6 +131,10 @@ export default function OpenSourceText() {
             From 0.1.0, its releases are published by CI with npm provenance.
             The site reads it as anyone else would.
           </p>
+          <p>
+            <Link href="/open-source/data">The data pages</Link> list every
+            table, with its rows and what each of its fields means.
+          </p>
         </PackageCard>
         <PackageCard
           name="magick-components"

@@ -241,6 +241,12 @@ export const PUBLIC_PAGES = {
       "What you may reuse from Magick.ly and how: the app under AGPL, the " +
       "code under MIT, the data and images under CC BY 4.0, and the packages.",
   },
+  "/open-source/data": {
+    title: "Open Data: the magick-data Tables",
+    description:
+      "Every table in magick-data, the site's open data on npm: the sephirot, " +
+      "planets, letters, grades and more, with their rows, fields and links.",
+  },
   "/books": {
     title: "Books",
     description:

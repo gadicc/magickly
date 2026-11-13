@@ -1,0 +1,76 @@
+/* react-json-view-lite's classes, taken over (plan 080, decision 4): its
+   own sheet colours for light or dark by class, and these follow the
+   theme's variables, so the scheme switches with the page. */
+
+.container {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--mui-palette-text-primary);
+}
+
+.child {
+  margin: 0;
+  padding: 0 0 0 1.25em;
+}
+
+.children {
+  margin: 0;
+  padding: 0;
+}
+
+.label {
+  margin-right: 0.4em;
+  color: var(--mui-palette-text-primary);
+}
+
+.clickable {
+  margin-right: 0.4em;
+  color: var(--mui-palette-text-primary);
+  cursor: pointer;
+}
+
+.string {
+  color: var(--mui-palette-success-main);
+}
+
+.number {
+  color: var(--mui-palette-primary-main);
+}
+
+.boolean,
+.null,
+.other {
+  color: var(--mui-palette-secondary-main);
+}
+
+.punctuation {
+  color: var(--mui-palette-text-secondary);
+}
+
+.expand,
+.collapse {
+  margin-right: 0.3em;
+  cursor: pointer;
+  user-select: none;
+  color: var(--mui-palette-text-secondary);
+}
+
+.expand::after {
+  content: "\25B8";
+}
+
+.collapse::after {
+  content: "\25BE";
+}
+
+.collapsed {
+  margin-right: 0.3em;
+  color: var(--mui-palette-text-secondary);
+}
+
+.collapsed::after {
+  content: "…";
+}
