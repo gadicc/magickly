@@ -38,8 +38,16 @@ export function letterIJ(letter: string) {
   return [-1, -1];
 }
 
+/**
+ * Where `letter` sits on the rose: one of its 22 letters, as `roseLetters`
+ * gives them. Anything else, a final form included, throws by name.
+ */
 export function letterPoint(letter: string): Point {
   const [i, j] = letterIJ(letter);
+  if (i < 0)
+    throw new Error(
+      `letterPoint: ${JSON.stringify(letter)} is not one of the rose's 22 letters; roseLetters() gives the letters of a text that it draws`,
+    );
   const points = ROSE_LETTERS[i].length;
   const slice = (2 * Math.PI) / points;
   const offset = -Math.PI / 2 - (i === 1 ? slice / 2 : 0);

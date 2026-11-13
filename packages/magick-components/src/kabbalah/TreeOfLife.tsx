@@ -210,6 +210,14 @@ function TreeOfLife({
       `TreeOfLife: unknown colorScale ${JSON.stringify(scale)}; expected one of ${TREE_COLOR_SCALES.join(", ")}`,
     );
   const color = `${scale}Web` as const;
+  if (!Object.hasOwn(orderedPaths, letterAttr))
+    throw new Error(
+      `TreeOfLife: unknown letterAttr ${JSON.stringify(letterAttr)}; expected one of ${Object.keys(orderedPaths).join(", ")}`,
+    );
+  if (activePath !== undefined && !Object.hasOwn(_paths, activePath))
+    throw new Error(
+      `TreeOfLife: unknown activePath ${JSON.stringify(activePath)}; expected a path's id, one of ${Object.keys(_paths).join(", ")}`,
+    );
   width = width || "100%";
   field = field || "index";
   const fieldPaths = field;

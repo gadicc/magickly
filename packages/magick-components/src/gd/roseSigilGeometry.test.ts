@@ -51,6 +51,13 @@ describe("rose sigil geometry", () => {
     expect(Math.hypot(qof.x, qof.y)).toBeCloseTo(35);
   });
 
+  it("refuses a letter the rose does not have, by name", () => {
+    for (const letter of ["ך", "a", " ", ""])
+      expect(() => letterPoint(letter)).toThrow(
+        `letterPoint: ${JSON.stringify(letter)} is not one of the rose's 22 letters`,
+      );
+  });
+
   it("draws start marker, loops for straight runs, squiggles for repeats and an end bar", () => {
     const single = pathFromPoints({
       points: sigilPoints("א"),

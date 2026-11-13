@@ -7,6 +7,7 @@ import TreeOfLife, {
   pathTitle,
   TREE_COLOR_SCALES,
   type TreeColorScale,
+  type TreePathAttribution,
 } from "./TreeOfLife.tsx";
 
 const count = (html: string, pattern: RegExp) =>
@@ -164,6 +165,34 @@ describe("TreeOfLife", () => {
       renderToString(<TreeOfLife colorScale={"sepia" as TreeColorScale} />),
     ).toThrow(
       'TreeOfLife: unknown colorScale "sepia"; expected one of queen, king',
+    );
+  });
+
+  it("refuses a letter attribution it does not have, by name", () => {
+    expect(() =>
+      renderToString(
+        <TreeOfLife letterAttr={"golden" as TreePathAttribution} />,
+      ),
+    ).toThrow(
+      'TreeOfLife: unknown letterAttr "golden"; expected one of hebrew, hermetic',
+    );
+    // Not an attribution, though every object has one.
+    expect(() =>
+      renderToString(
+        <TreeOfLife letterAttr={"toString" as TreePathAttribution} />,
+      ),
+    ).toThrow('unknown letterAttr "toString"');
+  });
+
+  it("refuses an active path it does not have, by name", () => {
+    for (const id of ["1_9", "2-3", "toString"])
+      expect(() => renderToString(<TreeOfLife activePath={id} />)).toThrow(
+        `TreeOfLife: unknown activePath ${JSON.stringify(id)}; expected a path's id, one of `,
+      );
+    // A path of the other tradition's Tree is drawn on this one, as the
+    // image API has always drawn it.
+    expect(renderToString(<TreeOfLife activePath="2_5" />)).toContain(
+      'id="path2_5"',
     );
   });
 
