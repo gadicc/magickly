@@ -25,6 +25,12 @@ overrides:
   "@serwist/build>zod": ^4.6.6
   "@serwist/next>zod": ^4.6.6
   "@serwist/webpack-plugin>zod": ^4.6.6
+  # Serwist 9.5.13 also pins glob 13.0.6 (minimatch 10), affected by
+  # GHSA-3g3m-2fjr-6pw4 and, through minimatch, GHSA-g3hv-75wg-m249. Glob 14
+  # is a major, but Serwist only calls globSync with cwd, follow, ignore,
+  # nodir and absolute, which it keeps; plan 066 has the comparison.
+  "@serwist/build>glob": ^14.0.2
+  "@serwist/next>glob": ^14.0.2
 
 patchedDependencies:
   json-rich-text@1.3.1: patches/json-rich-text@1.3.1.patch
