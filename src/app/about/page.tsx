@@ -131,6 +131,19 @@ export default function Sequence() {
             by User:AnonMoos, which is public domain.
           </li>
           <li>
+            The Moon&apos;s drawing on the{" "}
+            <Link href="/astrology/moon">Moon</Link> and{" "}
+            <Link href="/astrology/planets">planets</Link> pages: its paths are
+            adapted from{" "}
+            <a href="https://github.com/tingletech/moon-phase">moon-phase</a>,
+            Copyright © 2012, Regents of the University of California, under the{" "}
+            <a href="https://github.com/gadicc/magickly/blob/main/packages/magick-components/LICENSE.txt">
+              BSD 3-Clause License
+            </a>
+            , whose conditions and disclaimer are in the components&apos;
+            licence.
+          </li>
+          <li>
             The places in the place search on the{" "}
             <Link href="/astrology/planetary-hours">planetary hours</Link> and{" "}
             <Link href="/geomancy/reading">geomancy reading</Link> pages: from{" "}

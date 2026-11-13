@@ -114,6 +114,20 @@ describe("/open-source", () => {
     );
   });
 
+  it("puts the packages before the licences, which keep their anchor", () => {
+    // Gadi, 13 November 2026; /about and the hall pages link #licences.
+    const packages = html.indexOf('id="packages"');
+    const licences = html.indexOf('id="licences"');
+    expect(packages).toBeGreaterThan(-1);
+    expect(licences).toBeGreaterThan(packages);
+  });
+
+  it("credits moon-phase's BSD licence for the Moon", () => {
+    expect(text(html)).toContain(
+      "The Moon's two modules adapt code from moon-phase and are also under its BSD 3-Clause License",
+    );
+  });
+
   it("links the components' pages from their card", () => {
     expect(hrefs(card("magick-components"))).toContain(
       "/open-source/components",

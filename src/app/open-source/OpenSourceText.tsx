@@ -14,14 +14,73 @@ const tiferet = data.sephirah.tiferet;
 console.log(tiferet.name.roman, tiferet.planet?.symbol); // Tiferet ☉`;
 
 /**
- * The licence policy, then a card per package (plan 080, decision 1 and
- * "The licence of a drawing that is code"). Until `magick-components` is
+ * A card per package, then the licence policy (plan 080, decision 1 and
+ * "The licence of a drawing that is code"); the packages come first at
+ * Gadi's request (13 November 2026), and `#licences` stays the anchor
+ * `/about` and the hall pages link. Until `magick-components` is
  * on npm (stage G), a served image of a component's drawing is credited to
  * Magick.ly under CC BY 4.0, as the hall pages and files say.
  */
 export default function OpenSourceText() {
   return (
     <>
+      <PageText labelledBy="packages">
+        <H2 id="packages">The packages</H2>
+        <p>
+          Two packages hold the parts of the site most worth reusing: the data,
+          and the components that draw from it.
+        </p>
+        <PackageCard
+          name="magick-data"
+          directory="packages/magick-data"
+          published
+          usage={DATA_USAGE}
+        >
+          <p>
+            Magickal correspondences and reference data: the sephirot, the
+            planets, the zodiac, the Hebrew and Enochian letters, the Golden
+            Dawn grades, the geomantic figures and more, as typed tables of
+            plain rows, with a graph of how they link and the code that joins
+            them. Its code is MIT and its data CC BY 4.0. It is ES modules only,
+            has no runtime dependencies, and carries its own TypeScript types.
+            From 0.1.0, its releases are published by CI with npm provenance.
+            The site reads it as anyone else would.
+          </p>
+          <p>
+            <Link href="/open-source/data">The data pages</Link> list every
+            table, with its rows and what each of its fields means.
+          </p>
+        </PackageCard>
+        <PackageCard
+          name="magick-components"
+          directory="packages/magick-components"
+          published={false}
+        >
+          <p>
+            React components that draw from that data: the{" "}
+            <Link href="/kabbalah/tree">Tree of Life</Link>, the{" "}
+            <Link href="/enochian/tablets">Enochian tablets</Link>, the{" "}
+            <Link href="/gd/sigils">Rose Cross sigils</Link>, the{" "}
+            <Link href="/gd/symbols/candlestick">
+              Seven-Branched Candlestick
+            </Link>
+            , the <Link href="/gd/symbols/shewbread">Table of Shewbread</Link>,
+            the <Link href="/gd/halls">temple halls</Link> and more. Their code
+            is MIT, and so are the drawings they make.
+          </p>
+          <p>
+            <Link href="/open-source/components">
+              The components&apos; pages
+            </Link>{" "}
+            draw each one live, with its props to try and its reference.
+          </p>
+          <p>
+            It is not on npm yet. Until it is, the components are in the
+            app&apos;s repository, under <code>packages/magick-components</code>
+            , where you may copy them under MIT.
+          </p>
+        </PackageCard>
+      </PageText>
       <PageText labelledBy="licences">
         <H2 id="licences">Licences</H2>
         <p>Copyright (c) 2020–2026 Gadi Cohen.</p>
@@ -49,7 +108,9 @@ export default function OpenSourceText() {
             ). That includes the drawings the components make: where a
             component&apos;s code is the drawing, as with the lamens and the
             temple halls&apos; art, its path data is code too, and MIT like the
-            rest.
+            rest. The Moon&apos;s two modules adapt code from moon-phase and are
+            also under its BSD 3-Clause License, as the components&apos; licence
+            says.
           </li>
           <li>
             <b>The data</b> is{" "}
@@ -108,63 +169,6 @@ export default function OpenSourceText() {
             in the published data package.
           </li>
         </List>
-      </PageText>
-      <PageText labelledBy="packages">
-        <H2 id="packages">The packages</H2>
-        <p>
-          Two packages hold the parts of the site most worth reusing: the data,
-          and the components that draw from it.
-        </p>
-        <PackageCard
-          name="magick-data"
-          directory="packages/magick-data"
-          published
-          usage={DATA_USAGE}
-        >
-          <p>
-            Magickal correspondences and reference data: the sephirot, the
-            planets, the zodiac, the Hebrew and Enochian letters, the Golden
-            Dawn grades, the geomantic figures and more, as typed tables of
-            plain rows, with a graph of how they link and the code that joins
-            them. Its code is MIT and its data CC BY 4.0. It is ES modules only,
-            has no runtime dependencies, and carries its own TypeScript types.
-            From 0.1.0, its releases are published by CI with npm provenance.
-            The site reads it as anyone else would.
-          </p>
-          <p>
-            <Link href="/open-source/data">The data pages</Link> list every
-            table, with its rows and what each of its fields means.
-          </p>
-        </PackageCard>
-        <PackageCard
-          name="magick-components"
-          directory="packages/magick-components"
-          published={false}
-        >
-          <p>
-            React components that draw from that data: the{" "}
-            <Link href="/kabbalah/tree">Tree of Life</Link>, the{" "}
-            <Link href="/enochian/tablets">Enochian tablets</Link>, the{" "}
-            <Link href="/gd/sigils">Rose Cross sigils</Link>, the{" "}
-            <Link href="/gd/symbols/candlestick">
-              Seven-Branched Candlestick
-            </Link>
-            , the <Link href="/gd/symbols/shewbread">Table of Shewbread</Link>,
-            the <Link href="/gd/halls">temple halls</Link> and more. Their code
-            is MIT, and so are the drawings they make.
-          </p>
-          <p>
-            <Link href="/open-source/components">
-              The components&apos; pages
-            </Link>{" "}
-            draw each one live, with its props to try and its reference.
-          </p>
-          <p>
-            It is not on npm yet. Until it is, the components are in the
-            app&apos;s repository, under <code>packages/magick-components</code>
-            , where you may copy them under MIT.
-          </p>
-        </PackageCard>
       </PageText>
     </>
   );

@@ -4,7 +4,7 @@ import OpenSourceText from "./OpenSourceText";
 
 export const metadata = pageMetadata("/open-source");
 
-/** The open-source hub: what may be reused, and the packages (plan 080). */
+/** The open-source hub: the packages, and what may be reused (plan 080). */
 export default function OpenSourcePage() {
   return (
     <>

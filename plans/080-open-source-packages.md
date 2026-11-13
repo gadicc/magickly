@@ -1359,7 +1359,8 @@ passed.
 
 **Not done, for Gadi:**
 
-- **The app's credit for moon-phase.** The BSD licence asks that a
+- **The app's credit for moon-phase** (done in stage F's last commit,
+  [below](#after-the-rebase-onto-stage-c-13-november-2026)). The BSD licence asks that a
   binary redistribution reproduce the notice in its documentation or
   other materials; the app serves the Moon's code to browsers. A credit
   in `/about#credits` (moon-phase, its copyright line and the licence,
@@ -1749,6 +1750,54 @@ pages and the index at 1280 px in light and dark; the candlestick at
 390 px in dark. No console error on any of them. On the Tree's page, a
 switch redrew the drawing, updated the image link and marked the
 picker "(edited)".
+
+### After the rebase onto stage C (13 November 2026)
+
+| Commit | What |
+| --- | --- |
+| `24e98b60` | `fix(open-source): Offer no control for a font URL` |
+| (this commit) | `feat(open-source): Lead with the packages` |
+
+- **Rebased gates.** Each rebased commit was gated again on its own
+  tree. `e9bee9b7`, `aeebe7c1` and `8647932e` passed every step,
+  coverage first time, and so did `24e98b60`. The two plans-only
+  commits, `0b1a2fbf` and `fde5591d`, whose code is byte for byte that
+  of `aeebe7c1` and `8647932e`, passed every other step twice, but
+  coverage and its re-run failed in both of their gates at load
+  averages of 35–58: 5-second timeouts in the legacy import, the hall
+  and semantic editors, the dictionary and a few others, and once
+  `TempleHallTabs.test.tsx`'s timing test. Every file that failed passed
+  run alone (410 tests, then 194).
+- **The hardening's new props.** The manifest was regenerated on each
+  rebased commit; the Tree's `id` and `fontBaseUrl`, the Moon's
+  `background` and the fylfot's `ink` came described. The Moon's
+  examples pass the night sky as `background`, as the app's pages do.
+  `24e98b60` gives `fontBaseUrl` (the Tree's and the hall's) no control:
+  it points the drawing at fonts and declares their families for the
+  whole page, which the page, serving the fonts itself, does not need.
+  The Tree's `id` keeps a text field; an id it refuses shows in the
+  drawing's error boundary.
+- **The drawer.** With Data and Components, Open source has two pages,
+  so the drawer lists it as a section like the others, and the hub
+  itself is reached from the bar and the footer; the drawer test that
+  took it for a one-page section now takes Books.
+- **`/open-source` leads with the packages** (Gadi, 13 November: "on
+  /open-source, let's move the packages above the license section"):
+  "The packages" comes before "Licences", which keeps its `#licences`
+  anchor for `/about` and the hall pages; a test holds the order.
+- **The moon-phase credit** ([above](#before-publishing-13-november-2026),
+  "Not done, for Gadi"), approved by Gadi with a vector refresh: a
+  credit in `/about#credits` (moon-phase, its copyright line, the BSD
+  3-Clause licence, linking the components' `LICENSE.txt`) and a
+  sentence after `/open-source`'s MIT line, each held by a test. The
+  vectors were refreshed: `search:compare` requested 5 Gemini and 5
+  Qwen passages, `search:publish` none.
+- **Checked in a browser** (`next dev` on port 3119, headless
+  Chromium): `/open-source` at 390 and 1280 px in light and dark, the
+  packages first and no sideways scroll; the credit on `/about`; the
+  Tree's, the Moon's, the fylfot's and the hall's pages after the
+  rebase, each drawn with no error and no `fontBaseUrl` control, and the
+  Tree's and the Moon's at 390 px in dark.
 
 ## Review (11 November 2026)
 

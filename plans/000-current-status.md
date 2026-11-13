@@ -302,8 +302,8 @@ Follow-ups are separate from the completed migration work:
   stylesheet scoped per instance with its fonts a prop. No render hash
   or pixel moved
   ([plan 080](080-open-source-packages.md#before-publishing-13-november-2026)).
-  Gadi approved the Tree's markup change. TODO: the app's own credit
-  for moon-phase, with a search-vector refresh.
+  Gadi approved the Tree's markup change. The app's own credit for
+  moon-phase is on `/about` and `/open-source`, from stage F.
   Stage C, the field manifest from the data build, a description for
   every table and all 272 field paths with a test that requires them,
   `/open-source/data` and a page per table (rows as anchors, links
@@ -321,7 +321,9 @@ Follow-ups are separate from the completed migration work:
   controls from the props types, the JSX, the props table), which load
   `nlopt-js` and `astronomy-engine` only on the sigil's and Mercury's
   pages, with its review applied (the picker, long names on a phone,
-  JSDoc written for the package's readers, an image parity test)
+  JSDoc written for the package's readers, an image parity test), and
+  rebased onto stage C; its last commit puts `/open-source`'s packages
+  above its licences and adds the moon-phase credit
   ([plan 080](080-open-source-packages.md#stage-f-13-november-2026)).
   TODO: with Gadi's go-ahead, stage G; stage E's and F's deferred
   items. Follow-ups:
