@@ -1160,6 +1160,106 @@ and dark; no sideways scroll at 390 px.
   ("which import no app code") is still untrue for the files
   `importBoundary.test.ts` lists; stage E removes them.
 
+## Stage E (13 November 2026)
+
+Built on `gate/magick-components`, on top of stage B
+(`gate/open-source-hub` at `a0c290c1`); not merged.
+Each code commit was gated on its own tree, as stage A's were
+([above](#stage-a-11-november-2026)); the last also ran the package's own
+smoke test, which CI now runs in a job of its own. The imports were
+rewritten by throwaway scripts, not committed, which can be run again
+after a rebase: a rewrite for the first two commits and a codemod for the
+third.
+
+| Commit | What |
+| --- | --- |
+| `86a41a5e` | `refactor(components): Bring the boundary to zero` |
+| `5cc5d608` | `build(components): Move components into a package` |
+| `9189e246` | `refactor(components): Name every file imported` |
+| `9089b41b` | `refactor(components): Type the package strictly` |
+| `1cc885b3` | `refactor(components): Draw the client boundaries` |
+| `ba1906ae` | `build(components): Prove the published shape` |
+
+- **The boundary.** `Link.tsx`, `Tiles.tsx` and `entity/` moved to
+  `src/ui/`, and the Enochian webfont with its `next/font/local` wrapper
+  to `src/fonts/enochian.ts` and `src/fonts/enochian/`; `Tablet` already
+  took the font's style as `enochianStyle`. `Mercury` takes `background`
+  and `image` (a URL or `<img>` props) and draws an `<img>`; the planets
+  page passes `next/image`'s `getImageProps()`, so it still serves the
+  optimised picture. The seven seals are TSX, from SVGR's output for
+  `svg/astrology/spirits/` as `next.config.ts` ran it: each renders to
+  the markup the SVG import did, which was checked for all seven. The
+  Inkscape files stay as their sources. The known-violations list is
+  gone.
+- **The move.** `src/components` is `packages/magick-components/src`,
+  `workspace:*` in the app, compiled through `transpilePackages`; 164
+  specifiers in 99 files became `magick-components/…`, the alias left
+  `tsconfig.json` and `vitest.config.mts`, and the boundary tests, the
+  font script, `OpenSource`'s `url()` and the GitHub links followed.
+- **Extensions.** All 290 relative specifiers name their file, and
+  `fontMetrics.json` is imported `with { type: "json" }`; the boundary
+  test refuses anything else. Both bundlers build them.
+- **Strict.** The package's `tsconfig.json` is strict and `pnpm
+  typecheck` runs it. On the package's files it reported 64 errors (45
+  in `TreeOfLife.tsx`); it reports none. `TreeOfLifeProps` describes
+  every prop, `colorScale` is `TreeColorScale` and `letterAttr`
+  `TreePathAttribution`, both read from magick-data's types, and
+  `vendor.d.ts` types what the package calls of `lune` and `nlopt-js`.
+  Two things beyond the plan's list turned up: the fylfot cross used
+  Next's styled-jsx, which only Next compiles (elsewhere it would restyle
+  every table on the page), and is now a plain `<style>` scoped by a
+  class; and Da'at in the King scale, which has no colour, is drawn
+  unfilled where it threw.
+- **Client boundaries.** `forwardRef` is gone; the optimiser is
+  `gd/roseSigilOptimizer`, which `RoseSigil` catches failures from;
+  `RoseSigil` is split from `RoseSigilImage` and alone of the two is
+  `"use client"`; `RoseSigilImage` draws final forms as their base
+  letters and leaves out anything else (`roseLetters()`); `Moon` is
+  marked, its path and inclination moved to `astrology/moonPath`. A
+  test holds the client modules to Mercury, Moon and RoseSigil.
+- **The published shape.** 35 entries, each mapped to `lib/` by
+  `publishConfig.exports`, and `./fonts/*`; `license` is
+  `(MIT AND OFL-1.1)`, `sideEffects: ["*.css"]`, react a peer and
+  `@types/react` an optional one, magick-data `workspace:^` (packed as
+  `^0.1.0`) and `@types/luxon` a dependency because the declarations
+  name luxon. `fonts/` holds the three subsets and two notices, byte for
+  byte `public/fonts` (the font script writes both), `SOURCES.md` and
+  `gd-hall.css`, each held by a test. The tarball has 159 files, 187,052
+  bytes packed and 553,802 unpacked (the spike's had 138 and 159,803 and
+  486,836, before the seals, the fonts' notices and sources, and the
+  README). `private` stays, at 0.0.0, until stage G.
+- **The smoke test** (`pnpm --filter magick-components smoke`, about a
+  minute here) packs both packages, checks the listing, the packed
+  manifest and the directives, installs the tarballs with npm
+  (`--before` a week back) into a fixture outside the repository, loads
+  every entry and renders the Tree, a hall and the sigil in plain Node,
+  type-checks a strict consumer under `bundler` and `nodenext`, and
+  builds a Next app with webpack and with Turbopack: every entry but the
+  live sigil with no `fs` stub, then `RoseSigil` with the README's stub.
+  Without the stub, that second app fails under both bundlers with
+  `Can't resolve 'fs'`, which was checked by hand.
+
+Nothing a reader sees moved: every pinned render hash, byte count and
+snapshot passed unchanged in each gate, and the hashed compiler identity
+was not touched. The documentation screenshots show none of the changed
+screens and were not regenerated.
+
+**Deferred:**
+
+- **`isolatedDeclarations`.** On the publish emit it asks for 131
+  annotations, most of them return types on the hall's art; magick-data
+  has it, this package does not yet.
+- **The `prepack` and `prepublishOnly` guards** and a kept tarball, with
+  `publish.yml`, in stage G; `private` refuses a publish until then.
+- **The Tree page's query** is passed to `TreeOfLife` unchecked, as it
+  always was, now through a cast; an unknown `colorScale` or `letterAttr`
+  in the URL still throws. Validating it in `treeSettings()` is a small
+  follow-up.
+- **The seals' citation** names Agrippa's 1533 edition and its chapter
+  but no archive.org item and leaf, which the house rule on outside
+  sources asks for.
+- `actionlint` is not installed here, so the new CI job was not linted.
+
 ## Review (11 November 2026)
 
 Fable 5.2 at high effort, fresh context, `loom-torvalds-review`, on the

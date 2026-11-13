@@ -284,9 +284,20 @@ Follow-ups are separate from the completed migration work:
   not merged, with its review applied (the licence wording narrowed to
   what the repository bears out)
   ([plan 080](080-open-source-packages.md#stage-b-13-november-2026)).
-  TODO: with Gadi's go-ahead, stages C to G. Follow-ups:
-  [plan 080](080-open-source-packages.md#follow-ups) and
-  [stage B's](080-open-source-packages.md#stage-b-13-november-2026).
+  Stage E (13 November) is built on `gate/magick-components`, on top of
+  stage B, not merged: `src/components` is the workspace package
+  `packages/magick-components`, with no app imports left, explicit
+  extensions, a strict check (64 errors to none), `ref` as a prop, the
+  nlopt optimiser in its own module, `RoseSigilImage` drawing any text,
+  `"use client"` on Mercury, Moon and RoseSigil only, the hall fonts with
+  `gd-hall.css`, a README and a smoke test that builds a Next fixture
+  under both bundlers; still private at 0.0.0. No render hash moved
+  ([plan 080](080-open-source-packages.md#stage-e-13-november-2026)).
+  TODO: with Gadi's go-ahead, stages C, F and G; stage E's deferred
+  items. Follow-ups:
+  [plan 080](080-open-source-packages.md#follow-ups),
+  [stage B's](080-open-source-packages.md#stage-b-13-november-2026) and
+  [stage E's](080-open-source-packages.md#stage-e-13-november-2026).
 - 12 November 2026: the Enochian dictionary's and Keys' gematria named as
   Gerald Schueler's (EMPM, 1985), Gadi choosing a label over removal. All
   190 entries that carry it cite EMPM (a test keeps it so). Each value
@@ -681,15 +692,11 @@ Follow-ups are separate from the completed migration work:
   `kameaGeometry`'s cell centres, start and end marks as on the rose;
   `Kamea` hosts it as an overlay through `children`) once the sigil
   system handles the hard cases; recording officer movement between stations, a `gdVault` for
-  the Adeptus Minor Vault, original Enochian letterforms, moving
-  `enochianFont.ts` and the other files the import-boundary test allows out
-  of `src/components` (or off their app imports), embedded fonts in the Tree
+  the Adeptus Minor Vault, original Enochian letterforms, embedded fonts in the Tree
   of Life exports, Firefox and Safari checks of PNG export with embedded fonts,
   a credit for the RWS tarot images and the Pinterest hotlink in `2=9.pug`,
   single-word labels wider than their cell, which the layout cannot keep
-  inside the walls, the README's claim (lines 13–15) that
-  `src/components/LICENSE.txt` lists the components importing app code
-  (it lists none), a hook-free id scheme for `GdHall` before halls are
+  inside the walls, a hook-free id scheme for `GdHall` before halls are
   rendered on the server or exported from the reader, resvg-wasm's
   fallback to Noto Sans for the hall's quoted font stacks, Gadi's call on
   whether a hall's PNG export embeds Enochian Plain for its tablets,
