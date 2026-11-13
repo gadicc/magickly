@@ -1030,8 +1030,11 @@ Built on `gate/open-source-hub` from `ed66f81c`; not merged.
 | Commit | What |
 | --- | --- |
 | `47b3bbf8` | `feat(open-source): Add the open-source hub` |
+| `965b6c5a` | `docs(plans): Record stage B, the open-source hub` |
+| `53a637e4` | `fix(open-source): Apply the stage B review` ([below](#stage-b-review-13-november-2026)) |
+| (this commit) | `docs(plans): Record the stage B review` |
 
-Gated on its own tree in a clean worktree with a fresh install and Node
+Each was gated on its own tree in a clean worktree with a fresh install and Node
 24.18.0: `loom init`, both `loom check`s, `pnpm check`, `pnpm
 typecheck`, the data smoke test, `pnpm test:coverage` (no re-run),
 `pnpm build`, `pnpm check:turbopack`, the tree clean after each; every
@@ -1040,8 +1043,10 @@ step exit 0. A first gate, of the commit before an amend, failed
 section to be public or private for Web Analytics; `open-source` was
 added to its public sections.
 
-- **`/open-source`** (`src/app/open-source/`): a paragraph, then
-  "Licences" and "The packages". The licences, each checked against the
+- **`/open-source`** (`src/app/open-source/`), as first built (the
+  [review](#stage-b-review-13-november-2026) changed its licence
+  wording): a paragraph, then "Licences" and "The packages". The
+  licences, each checked against the
   repository: the app AGPL-3.0-or-later (`LICENSE.txt`); the packages'
   code MIT, the drawings the components make included, path data and
   all ([the licence note](#the-licence-of-a-drawing-that-is-code)); the
@@ -1106,24 +1111,54 @@ added to its public sections.
   candlestick page's line, and the drawer. No sideways scroll at 390 px
   (`scrollWidth` 390); the usage sample scrolls inside its box.
 
+### Stage B review (13 November 2026)
+
+An independent review of `47b3bbf8` and `965b6c5a` found no critical
+issue but licence wording that claimed more than the repository bears
+out. The coordinator decided each finding, following [the licence
+note](#the-licence-of-a-drawing-that-is-code); applied in `53a637e4`,
+on top of `965b6c5a` because stage C had branched from it.
+
+| # | Finding | Disposition |
+| --- | --- | --- |
+| H1 | The root README and `src/components/LICENSE.txt` said the images the app draws are CC BY 4.0 | Fixed now: component code is MIT, path data and the drawings it makes included; CC BY covers the images the site draws and serves, its hand-drawn images and the data. The README names `importBoundary.test.ts` as the list of files still importing app code ("that file" listed none) |
+| M1 | "The images the site serves … are CC BY 4.0" took in photographs that are not ours (credited CC BY-SA) and images whose source is not recorded; the credits sentence promised every item; the fonts bullet left out fonts the site serves | Fixed: CC BY is claimed for "the images the site draws or makes itself"; others' work keeps its own licence, with the credits on About; the fonts bullet names every OFL font whose notice is in the repository (Roboto in `src/fonts/roboto`, Frank Ruhl Libre, the halls' Noto Serif subsets, Noto Sans, Noto Sans Hebrew, Noto Sans Symbols, Noto Sans Devanagari in `public/fonts`) and links those directories. The Enochian webfont is not named |
+| M2 | "Credit it as drawn by magick-components (MIT)" disagreed with the hall pages and the halls' embedded credit (`GD_HALL_LICENCE.creditText`, "Magick.ly, CC BY 4.0") and named a package not on npm | Held back: until stage G the hub says the drawn images are CC BY 4.0 with credit to Magick.ly and their code MIT. **Stage G switches the hub, the hall pages and `GD_HALL_LICENCE`'s `creditText` together**, which moves the hall images' bytes then, not now. A test fails if the hub says "drawn by magick-components" early |
+| M3 | `/about#licence` is the halls' `acquireLicensePage` (XMP and JSON-LD) and no longer said what the images are under | Fixed: one sentence there says the data and the site's drawn images are CC BY 4.0, with credit, and the code MIT, linking `/open-source#licences`; the hall pages' "see About" for MIT links there too. No image bytes change (`GD_HALL_LICENCE` untouched) |
+| M4 | The components' MIT was unqualified for today's `src/components`, and "take the drawing from the package" implied a published package | Fixed: "apart from a few component files that still import code from the app", pointing to the README; the drawing sentence names no package, and the card says the components may be copied from `src/components` under MIT |
+| Low | "Out of the data package" (it is in the workspace); "the app reads them as anyone else would" (not true of the components); the data's CC BY ignored what its README asserts no rights over; licence files unlinked; font links named the fonts; "the npm packages" in the snippet; "open-source" predicatively, two copyright forms, "set out under Open source"; `published` inferred from `usage`; cards not landmarks, two identical "Source on GitHub" links | Fixed: "not in the published data package"; the data card alone says the site reads it as anyone else would; "except where its README says no rights are asserted"; both packages' `LICENSE.txt` and `LICENSE-DATA.txt` linked; font links name the directories; "and the packages"; "is open source" (also on the 72 angels page, whose line now links the hub), "Copyright (c) 2020–2026" on both pages; an explicit `published` prop, an `<article>` labelled by its heading, and `aria-label`s naming the package |
+| Tests | — | Added: each licence item's coverage; the usage sample equal to the README's; the anchors `/about` and the hall pages link exist; `OpenSource.tsx` links the hub; every link into this repository names a path that exists, which also catches the components' card when they move (stage E) |
+
+The prose changed, so the vectors were refreshed again in `53a637e4`:
+`search:compare` embedded 9 Gemini and 9 Qwen passages and
+`search:publish` requested nothing. `53a637e4`'s gate passed every
+step, coverage without a re-run. Checked again in headless Chromium
+(`next dev` on port 3118, a fresh profile) at 1280 and 390 px, light
+and dark; no sideways scroll at 390 px.
+
 **Left for Gadi:**
 
-- The wording, above all the CC BY sentence for served images ("Where
-  one is a component's drawing, though, anyone may draw the same image
-  from the code under MIT, so credit it as drawn by magick-components
-  (MIT)"), which names a package that is not yet on npm.
+- The licence wording as revised.
 - "Source code" moving into the Open source column.
 
 **Follow-ups:**
 
-- The repository's `README.md` and `src/components/LICENSE.txt` still
-  say that images the app draws are CC BY 4.0, which the licence note
-  corrects. `LICENSE.txt` moves in stage E; the README should then say
-  what `/open-source` says.
-- The image pages (the halls, the symbols, the sigils) still say CC BY
-  4.0 for their downloads; the licence note has them credit component
-  drawings as "drawn by magick-components (MIT)" once that package is
-  published (stage G).
+- **No recorded source or licence** for `public/night-sky.jpg`,
+  `public/pics/mercury.webp`, `public/pics/30aethyrs.jpg` and the
+  Enochian webfont (`src/components/enochian/font`; the TTF's notice,
+  `assets/fonts/EnochianPlain-NOTICE.txt`, records it as freeware of
+  unknown terms). The hub claims nothing for them; Gadi to say where
+  they come from.
+- **The fonts are not in `/about`'s credits** (Roboto, Frank Ruhl
+  Libre, the Noto families); the hub names them and their licence.
+- **Stage G** switches the hub's served-image credit, the hall pages
+  and `GD_HALL_LICENCE.creditText` to "drawn by magick-components
+  (MIT)" together, regenerating the hall images (M2).
+- **Stage E:** the components' card's `directory="src/components"`
+  becomes `packages/magick-components` (the repository-link test fails
+  until it does), and `src/components/LICENSE.txt`'s second paragraph
+  ("which import no app code") is still untrue for the files
+  `importBoundary.test.ts` lists; stage E removes them.
 
 ## Review (11 November 2026)
 

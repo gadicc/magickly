@@ -281,7 +281,8 @@ Follow-ups are separate from the completed migration work:
   Stage B, the `/open-source` hub (the licences, a card per package,
   `/about` and the pages' open-source line linking it, its place in the
   bar, footer, sitemap and search), is built on `gate/open-source-hub`,
-  not merged
+  not merged, with its review applied (the licence wording narrowed to
+  what the repository bears out)
   ([plan 080](080-open-source-packages.md#stage-b-13-november-2026)).
   TODO: with Gadi's go-ahead, stages C to G. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups) and
