@@ -358,6 +358,10 @@ Follow-ups are separate from the completed migration work:
   smaller wording, pins and plan fixes) are fixed on top of
   `gate/pd-sigils`
   ([plan 080](080-open-source-packages.md#review-of-the-stacked-branches-13-november-2026)).
+  The home page has an Open source tile, drawn from our own
+  components, and an Open source item in its list, on
+  `gate/home-open-source`, not merged
+  ([plan 080](080-open-source-packages.md#stage-b-13-november-2026)).
   TODO: with Gadi's go-ahead, stage G; stage E's and F's deferred
   items. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups),

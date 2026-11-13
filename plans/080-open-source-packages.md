@@ -1128,6 +1128,21 @@ added to its public sections.
   candlestick page's line, and the drawer. No sideways scroll at 390 px
   (`scrollWidth` 390); the usage sample scrolls inside its box.
 
+**The home page (13 November, later).** At Gadi's request, `613eff1c`
+on `gate/home-open-source` (not merged) gives `/` an Open source tile,
+between Magick Journal and Study, and an Open source item in "What's
+here": the data pages (magick-data, on npm) and the components' pages
+(not on npm yet). The tile's image is drawn by
+`scripts/home-tile/build.mts` from our own components (the Tree of
+Life, an Enochian tablet and a Rose Cross sigil, on cards on a dark
+ground), through the renderer behind `/api/render`; run it again when
+a drawing changes. The footer, the menu, the sitemap and site search
+already had the section; `/about` links the hub; there is no 404 page
+of our own, no section list in the structured data and no shortcuts
+in the manifest. `src/app/page.test.tsx` checks the tiles' order, the
+tile, and that "What's here" links every footer section. The vectors
+were refreshed in the same commit.
+
 ### Stage B review (13 November 2026)
 
 An independent review of `47b3bbf8` and `965b6c5a` found no critical
