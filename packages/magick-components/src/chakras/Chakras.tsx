@@ -1,12 +1,152 @@
-// prettier-ignore
+/**
+ * The seven chakras on a seated figure.
+ *
+ * The figure, a woman seated cross-legged with her hands resting palm up
+ * on her knees, thumb and index finger touching, was drawn for this
+ * package on 13 November 2026 as an original: constructed below from
+ * hand-placed cubic Béziers, one half mirrored onto the other, without
+ * tracing or adapting any image. It replaces an earlier silhouette
+ * (added in fe44a6bf, December 2020) whose source was not recorded
+ * (plan 080, "Before publishing").
+ *
+ * The figure is filled `#000`, which the app's dark ink selects on
+ * (`.chakras path[fill="#000"]`); the chakras keep their colours.
+ */
+
+const WIDTH = 91.414;
+const HEIGHT = 83.244;
+/** The figure's midline, on which the chakras sit. */
+const MID = WIDTH / 2;
+
+/** A point as its distance right of the midline and its height. */
+type Point = readonly [dx: number, y: number];
+/** A cubic Bézier's two control points and its end point. */
+type Curve = readonly [Point, Point, Point];
+
+const format = (value: number) => String(Math.round(value * 1000) / 1000);
+/** A point on the right (`side` 1) or mirrored onto the left (-1). */
+const at = ([dx, y]: Point, side: 1 | -1) =>
+  `${format(MID + side * dx)} ${format(y)}`;
+const curveTo = ([c1, c2, end]: Curve, side: 1 | -1) =>
+  `C${at(c1, side)} ${at(c2, side)} ${at(end, side)}`;
+
+/**
+ * One outline from a right half that starts and ends on the midline: the
+ * half, then its mirror image traced back up to the start.
+ */
+function symmetricOutline(start: Point, half: readonly Curve[]) {
+  const ends = [start, ...half.map(([, , end]) => end)];
+  const back = half
+    .map(([c1, c2], i) => curveTo([c2, c1, ends[i]], -1))
+    .reverse();
+  return `M${at(start, 1)}${half.map((curve) => curveTo(curve, 1)).join("")}${back.join("")}Z`;
+}
+
+/** A closed shape: where it starts, then its Béziers. */
+type Shape = readonly [start: Point, curves: readonly Curve[]];
+
+/** Closed shapes on the right and their mirror images on the left. */
+function mirrored(shapes: readonly Shape[]) {
+  const one = ([start, curves]: Shape, side: 1 | -1) =>
+    `M${at(start, side)}${curves.map((curve) => curveTo(curve, side)).join("")}Z`;
+  return ([1, -1] as const)
+    .flatMap((side) => shapes.map((shape) => one(shape, side)))
+    .join("");
+}
+
+/** A circle as four Béziers, for the hole a hand's fingers ring. */
+function circle([dx, y]: Point, r: number): Shape {
+  const k = 0.5523 * r;
+  return [
+    [dx + r, y],
+    [
+      [
+        [dx + r, y + k],
+        [dx + k, y + r],
+        [dx, y + r],
+      ],
+      [
+        [dx - k, y + r],
+        [dx - r, y + k],
+        [dx - r, y],
+      ],
+      [
+        [dx - r, y - k],
+        [dx - k, y - r],
+        [dx, y - r],
+      ],
+      [
+        [dx + k, y - r],
+        [dx + r, y - k],
+        [dx + r, y],
+      ],
+    ],
+  ];
+}
+
+/**
+ * Head, slender neck, trunk with its waist and hips, and crossed legs,
+ * from the crown round to the seat.
+ */
+// biome-ignore format: one Bézier a line
+const body = symmetricOutline([0, 5.7], [
+  [[3.65, 5.7], [6.6, 9.2], [6.6, 13.5]], // head
+  [[6.6, 17.5], [4.6, 20.4], [2.6, 21.4]], // jaw to the neck
+  [[2.45, 22.8], [2.45, 24.3], [2.8, 25.4]], // neck
+  [[3.6, 27.6], [8, 28.6], [12, 29.8]], // shoulder's slope
+  [[14.8, 30.6], [16.4, 32.6], [16.6, 35.5]], // shoulder
+  [[16.7, 37.8], [15.2, 39], [14.6, 40.5]], // armpit
+  [[13.6, 44.5], [9.6, 47], [9.6, 51.5]], // flank to the waist
+  [[9.6, 55], [12, 57.5], [15, 58.8]], // hip
+  [[22, 60.2], [30, 61], [36, 62.2]], // thigh
+  [[40.8, 62.6], [43.2, 65.2], [42.8, 68.8]], // knee
+  [[42.4, 72.6], [38.4, 74.6], [33, 75.2]], // under the knee
+  [[24, 76.3], [14, 78], [7, 79.2]], // shin
+  [[4, 79.7], [1.5, 79], [0, 78.2]], // where the shins cross
+]);
+
+/**
+ * The arms, each hand resting palm up on its knee, the thumb and index
+ * finger touching in a ring; the space between arm, flank and thigh
+ * stays open.
+ */
+// biome-ignore format: one Bézier a line
+const arms = mirrored([
+  [[11, 29.5], [
+    [[14.8, 30.4], [16.6, 32.4], [16.9, 35.5]], // shoulder, over the body's
+    [[17.4, 40.5], [19.9, 46], [22.7, 50.4]], // upper arm
+    [[23.9, 52.3], [25.2, 53.8], [27, 55.1]], // elbow
+    [[30.5, 57.4], [34, 58.8], [36.6, 59.3]], // forearm to the wrist
+    [[37.4, 59.35], [38.25, 58.6], [38.25, 57.4]], // index finger, rising
+    [[38.25, 56.43], [39.03, 55.65], [40, 55.65]], // the ring's top
+    [[40.97, 55.65], [41.75, 56.43], [41.75, 57.4]], // the thumb
+    [[41.75, 58.2], [42.2, 58.85], [43, 59.1]], // the hand's outer edge
+    [[43.8, 59.35], [44.6, 59.45], [45, 59.6]], // first finger
+    [[45.4, 59.75], [45.35, 60.2], [44.9, 60.25]], // its tip
+    [[44.3, 60.3], [43.8, 60.3], [43.5, 60.35]],
+    [[44.1, 60.4], [44.7, 60.5], [45, 60.7]], // second finger
+    [[45.3, 60.9], [45.1, 61.25], [44.7, 61.2]], // its tip
+    [[44.2, 61.15], [43.8, 61.1], [43.5, 61.15]],
+    [[43.9, 61.3], [44.3, 61.45], [44.45, 61.65]], // third finger
+    [[44.6, 61.95], [44.3, 62.15], [43.9, 62.1]], // its tip
+    [[42.5, 62.3], [40.6, 62.6], [38.8, 62.7]], // palm, on the knee
+    [[34.5, 62.2], [28, 59.6], [24.4, 57]], // under the forearm
+    [[22.6, 55.7], [21.4, 54], [20.4, 52]], // inside the elbow
+    [[18.6, 48.4], [15.8, 44], [15, 40.5]], // inside the upper arm
+    [[14.6, 38], [13, 33], [11, 31]], // back into the shoulder
+  ]],
+  circle([40, 57.4], 1), // inside the thumb and index finger
+]);
+
+/** Each chakra's height on the midline, crown to root. */
 const chakras = [
-  { id: "crown", fill: "#c9f", cx: "111.262", cy: "132.993" },
-  { id: "third-eye", fill: "#A28BE7", cx: "111.262", cy: "142.332" },
-  { id: "throat", fill: "#0ff", cx: "111.262", cy: "155.345" },
-  { id: "heart", fill: "#0f0", cx: "111.262", cy: "169.516" },
-  { id: "solar-plexus", fill: "#ff0", cx: "111.262", cy: "182.237" },
-  { id: "sacral", fill: "#f60", cx: "111.262", cy: "195.468" },
-  { id: "root", fill: "red", cx: "111.262", cy: "205.777" },
+  { id: "crown", fill: "#c9f", cy: 4.68 }, // on the crown
+  { id: "third-eye", fill: "#A28BE7", cy: 14 }, // the brow
+  { id: "throat", fill: "#0ff", cy: 24 },
+  { id: "heart", fill: "#0f0", cy: 37.5 },
+  { id: "solar-plexus", fill: "#ff0", cy: 49 }, // above the navel
+  { id: "sacral", fill: "#f60", cy: 60.5 }, // the lower belly
+  { id: "root", fill: "red", cy: 71.5 }, // the seat
 ];
 
 const opacityActive = { false: 0.2, true: 1 };
@@ -36,36 +176,24 @@ function Chakras({ width, height, active }: ChakrasProps) {
       width={width}
       height={height}
       version="1.1"
-      viewBox="0 0 91.414 83.244"
+      viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
     >
-      <g transform="translate(-64.803 -128.314)">
-        <path
-          fill="#000"
-          fillOpacity="1"
-          fillRule="nonzero"
-          stroke="none"
-          strokeWidth="0.035"
-          d="M150.317 191.879c-2.423 3.482-.678-5.674.328-2.319.084.83.21 1.598-.328 2.319m-11.4 2.003c-3.752 1.581-7.834 1.646-11.643 2.982-2.659.997-4.801.607-4.39-2.628-1.391-3.54-4.394-6.44-2.082-10.525.66-1.72 1.767-9.708 2.136-4.759.515 3.86 1.864 8.508 5.493 10.303 2.899 2.779 7.016 3.215 10.584 4.604zm-37.144-5.635c-3.01 1.958-1.91 7.392-4.561 8.476-3.785-.42-7.547-1.245-11.306-1.712-1.905-.712-3.66-1.378-.263-1.532 3.909-.612 7.531-2.257 10.94-4.171 1.776-4.09 3.637-8.384 4.1-12.983.158 3.315 1.924 8.241 1.09 11.921m-28.813 3.167c-.766 2.803-2.065-.714-1.683-2.028-.335-2.43 1.019.739 1.634 1.457l.049.571m83.257-.072c-1.89-1.41-5.946 4.08-4.436-.753-.32-1.117.278-3.334-.842-3.606-1.93.09-3.56 3.506-6.23 3.418-3.152 2.004-7.135-2.119-9.794-4.07-4.868-1.96-5.07-7.152-6.101-11.612-.176-4.125.286-8.893-2.854-12.148-2.764-2.866-8.1-.956-9.934-5.203-2.946-3.963 1.988-6.683 2.517-10.467-.92-3.362.59-8.088-2.473-10.766-3.817-2.5-10.645-1.37-11.4 3.813.594 3.92-1.619 7.123.93 10.584 2.522 2.927 1.698 7.66-1.902 9.59-3.267.753-7.408.463-8.664 4.557-2.134 3.925.185 8.564-1.746 12.517-.497 3.817-1.068 8.067-5.155 9.661-3.15 1.759-6.23 4.238-9.918 4.539-3.016-.77-5.28-3.842-7.806-4.788-1.684 1.39.847 5.897-1.536 5.233-1.239-.37-3.167-2.031-4.07-.372 1.417.414 2.025.851 1.94 1.84 3.263.28 4.984 3.335 8.254 2.039-2.893 4.298 1.276 8.384 5.083 10.094 2.944 3.156 7.08 5.37 11.47 5.057 11.455.351 22.91.72 34.364 1.06 5-.835 10.52-2.073 13.717-6.35 2.053-2.262 6.095-2.963 6.094-6.658.449-1.243-2.507-3.249-.712-3.524 1.812-.01 2.254 2.405 4.114 2.274 3.791.66-2.244-1.57.295-1.249 1.647.123 5.608.763 5.496-.86-1.288-.398-6.14.166-2.248-1.167 1.04-1.037 2.657-1.75 3.547-2.682"
-        ></path>
-        {chakras.map((chakra) => (
-          <circle
-            key={chakra.id}
-            cx={chakra.cx}
-            cy={chakra.cy}
-            r="4.679"
-            fill={chakra.fill}
-            strokeLinejoin="bevel"
-            strokeWidth="3.315"
-            color="#000"
-            overflow="visible"
-            opacity={
-              !active || active === chakra.id
-                ? opacityActive.true
-                : opacityActive.false
-            }
-          ></circle>
-        ))}
-      </g>
+      <path fill="#000" d={body}></path>
+      <path fill="#000" fillRule="evenodd" d={arms}></path>
+      {chakras.map((chakra) => (
+        <circle
+          key={chakra.id}
+          cx={format(MID)}
+          cy={chakra.cy}
+          r="4.679"
+          fill={chakra.fill}
+          opacity={
+            !active || active === chakra.id
+              ? opacityActive.true
+              : opacityActive.false
+          }
+        ></circle>
+      ))}
     </svg>
   );
 }
