@@ -125,6 +125,35 @@ for what it imports.
 | `hooks/useHydrated` | `useHydrated()`: false on the server and while hydrating, true after |
 | `fonts/*` | The hall's fonts and `gd-hall.css` ([below](#the-halls-fonts)) |
 
+## The Tree on your page
+
+`TreeOfLife` keeps to itself, so that several can share a page:
+
+- **Ids.** The `<svg>`'s id is the `id` you pass (letters, digits, `-`
+  and `_`, starting with a letter) or one from React's `useId`, and every
+  id inside it begins with that id and a hyphen (`tree-sephirot`,
+  `tree-topTextPath0`). The ids are not a styling hook; they may change.
+  `useId` is unique within one React render, so Trees that separate
+  renders put on one page (two `renderToStaticMarkup` calls joined) need
+  an `id` each.
+- **Classes.** Its three layers carry classes you may style by, which are
+  part of its contract (`TREE_LAYER_CLASSES`): `magick-tree-paths` (the
+  paths' outlines), `magick-tree-path-letters` (their letters) and
+  `magick-tree-sephirot` (the spheres and their labels). magick.ly's dark
+  mode re-inks the outlines through them.
+- **Its stylesheet** names only its own `<svg>`, `flip` included.
+- **Without hooks.** `TreeOfLifeSvg`, from the same entry, draws the same
+  Tree with no hooks and needs its `id`: for `renderToStaticMarkup` in a
+  route handler, where React's server build has no dispatcher for
+  `useId`. Links there are left to the browser.
+- **Fonts.** It sets its labels in Noto Sans and Noto Sans Hebrew (both
+  OFL), falling back to Arial and sans-serif, and loads nothing itself:
+  load the two families on your page, or serve `NotoSans-Regular.ttf` and
+  `NotoSansHebrew-Regular.ttf` and pass where they are as `fontBaseUrl`
+  (`<TreeOfLife fontBaseUrl="/fonts" />`). The SVG then carries
+  `@font-face` rules for them, which an exported SVG needs; like any
+  `@font-face`, they define the two families for the whole page.
+
 ## The hall's fonts
 
 `GdHall` measures its labels with the three font subsets in `fonts/`, and
@@ -181,6 +210,8 @@ sigil, and final forms are drawn as their base letters.
   as `image` (a URL, or `<img>` props such as Next's `getImageProps()`
   gives). Neither draws a picture of its own; without them the tile has
   no background.
+- **The Tree's fonts**, Noto Sans and Noto Sans Hebrew, on your page or
+  through `fontBaseUrl` ([above](#the-tree-on-your-page)).
 - **Links.** `TreeOfLife` links each sphere and path to a root-relative
   path in the scheme magick.ly uses (`/kabbalah/sephirah/tiferet`,
   `/kabbalah/path/1_2`), which on your site is your own path, unless you

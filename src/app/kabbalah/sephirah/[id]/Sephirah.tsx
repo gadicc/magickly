@@ -3,6 +3,7 @@ import { FIELD_PATH_LIST_SEPARATOR } from "magick-components/kabbalah/fieldPath"
 import TreeOfLife from "magick-components/kabbalah/TreeOfLife";
 import type { SephirahRow, TreeOfLifePathRow } from "magick-data/rows";
 import Ink, { inkClass } from "@/drawings/Ink";
+import { TREE_FONT_BASE_URL } from "@/fonts/tree";
 import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import { isHiddenSephirah } from "@/seo/entities";
 import { RWSName } from "@/tarot";
@@ -177,6 +178,7 @@ export default function Sephirah({ sephirah }: { sephirah: SephirahRow }) {
             topText=""
             active={sephirah.id}
             showDaat={hidden}
+            fontBaseUrl={TREE_FONT_BASE_URL}
           />
         </Ink>
       </FigureNav>

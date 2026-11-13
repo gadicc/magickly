@@ -102,6 +102,7 @@ function SvgLink({
 }: {
   href?: string | null;
   id?: string;
+  className?: string;
   children: React.ReactNode;
 }) {
   if (!href) return <g {...props}>{children}</g>;
@@ -133,6 +134,8 @@ export function pathTitle(
 /*
  * Note: originally I used a lot of CSS classes, which worked superbly in the
  * browser, but was very inconsistent when exporting into external programs.
+ * So the drawing's look is all in attributes and inline styles; the three
+ * layer classes (TREE_LAYER_CLASSES) are only hooks for the page around it.
  */
 
 export interface TreeOfLifeProps {
@@ -179,6 +182,60 @@ export interface TreeOfLifeProps {
    * `location.href`, a full page load.
    */
   ref?: React.RefObject<SVGSVGElement | null>;
+  /**
+   * The `<svg>`'s id, which its stylesheet is scoped to and every id
+   * inside it begins with (`<id>-paths`, `<id>-topTextPath0`): letters,
+   * digits, `-` and `_`, starting with a letter. One from `useId` when
+   * not given, so that several Trees can share a page.
+   */
+  id?: string;
+  /**
+   * Where Noto Sans and Noto Sans Hebrew are served, as
+   * `NotoSans-Regular.ttf` and `NotoSansHebrew-Regular.ttf` under it. Given
+   * one, the SVG carries `@font-face` rules for them, which an exported SVG
+   * needs; the rules name the families for the whole page, as any
+   * `@font-face` does. Without it the Tree only names the families, and
+   * the page supplies them (or falls back to Arial and sans-serif).
+   */
+  fontBaseUrl?: string;
+}
+
+/**
+ * The class each of the Tree's three layers carries, which a page may
+ * style by (as magick.ly's dark mode does): the paths' outlines, their
+ * letters, and the spheres with their labels. Part of the component's
+ * contract, unlike its ids.
+ */
+export const TREE_LAYER_CLASSES = {
+  paths: "magick-tree-paths",
+  pathLetters: "magick-tree-path-letters",
+  sephirot: "magick-tree-sephirot",
+} as const;
+
+/** A font URL may not end the CSS string or the `<style>` it sits in. */
+const UNSAFE_FONT_URL = /["'()\\<>&\s]/;
+/** An id the stylesheet can name without escaping. */
+const SAFE_ID = /^[A-Za-z][\w-]*$/;
+
+/** `@font-face` rules for the Tree's two families, served under `baseUrl`. */
+function treeFontFaceCss(baseUrl: string): string {
+  if (UNSAFE_FONT_URL.test(baseUrl))
+    throw new Error(
+      `TreeOfLife: unsafe fontBaseUrl ${JSON.stringify(baseUrl)}; it may not hold quotes, brackets, backslashes, spaces or markup characters`,
+    );
+  const base = baseUrl.replace(/\/+$/, "");
+  return [
+    ["Noto Sans", "NotoSans-Regular.ttf"],
+    ["Noto Sans Hebrew", "NotoSansHebrew-Regular.ttf"],
+  ]
+    .map(
+      ([family, file]) => `
+        @font-face {
+          font-family: '${family}';
+          src: local('${family}'), url('${base}/${file}') format('truetype')
+        }`,
+    )
+    .join("");
 }
 
 const defaultSephirahHref = (s: TreeSephirah) =>
@@ -186,7 +243,44 @@ const defaultSephirahHref = (s: TreeSephirah) =>
 const defaultPathHref = (path: TreeOfLifePathRow) =>
   "/kabbalah/path/" + path.id;
 
-function TreeOfLife({
+/**
+ * The Tree of Life, with an `id` from `useId` when none is given, and, in
+ * the browser, given a `ref`, a click on a link setting `location.href`.
+ */
+function TreeOfLife({ id, ref, ...props }: TreeOfLifeProps) {
+  const generatedId = `tree-of-life-${React.useId().replace(/[^A-Za-z0-9_-]/g, "_")}`;
+
+  if ("useEffect" in React) {
+    // biome-ignore lint/correctness/useHookAtTopLevel: doesn't exist on server
+    React.useEffect(() => {
+      ref?.current?.querySelectorAll("a").forEach((a) => {
+        a.onclick = function (e) {
+          if (typeof window === "object") {
+            e.preventDefault();
+            const href = a.getAttribute("xlink:href");
+            // href && router.push(href);  // TODO, maybe accept a router passed in?
+            if (href) location.href = href;
+          }
+        };
+      });
+    }, [ref]);
+  }
+
+  return <TreeOfLifeSvg {...props} id={id ?? generatedId} ref={ref} />;
+}
+
+/** `TreeOfLifeSvg`'s props: the Tree's, its `id` required. */
+export interface TreeOfLifeSvgProps extends TreeOfLifeProps {
+  id: string;
+}
+
+/**
+ * The Tree's drawing alone, with no hooks: for a renderer outside React's
+ * hook dispatcher, such as `renderToStaticMarkup` in a route handler,
+ * where `TreeOfLife`'s `useId` cannot run. It takes its `id`, so two on a
+ * page need two, and leaves links to the browser.
+ */
+export function TreeOfLifeSvg({
   width,
   height,
   labels,
@@ -203,7 +297,15 @@ function TreeOfLife({
   showDaat,
   fontSize,
   ref,
-}: TreeOfLifeProps) {
+  id: rootId,
+  fontBaseUrl,
+}: TreeOfLifeSvgProps) {
+  if (!SAFE_ID.test(rootId))
+    throw new Error(
+      `TreeOfLife: id ${JSON.stringify(rootId)} must be letters, digits, "-" and "_", starting with a letter`,
+    );
+  /** An id inside this Tree. */
+  const local = (name: string) => `${rootId}-${name}`;
   const scale = colorScale || "queen";
   if (!TREE_COLOR_SCALES.includes(scale))
     throw new Error(
@@ -330,25 +432,6 @@ function TreeOfLife({
     return specialPositions[letterAttr][path.id] || 0.5;
   }
 
-  // const innerRef = React.useRef<SVGSVGElement>(null);
-  // React.useImperativeHandle(ref, () => innerRef.current);
-
-  if ("useEffect" in React) {
-    // biome-ignore lint/correctness/useHookAtTopLevel: doesn't exist on server
-    React.useEffect(() => {
-      ref?.current?.querySelectorAll("a").forEach((a) => {
-        a.onclick = function (e) {
-          if (typeof window === "object") {
-            e.preventDefault();
-            const href = a.getAttribute("xlink:href");
-            // href && router.push(href);  // TODO, maybe accept a router passed in?
-            if (href) location.href = href;
-          }
-        };
-      });
-    }, [ref]);
-  }
-
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -358,32 +441,25 @@ function TreeOfLife({
       viewBox={
         -canvasWidth / 2 + " " + 0 + " " + canvasWidth + " " + canvasHeight
       }
-      id="TreeOfLife"
+      id={rootId}
       width={width}
       height={height}
       ref={ref}
     >
       <style type="text/css">
-        {`
-        @font-face {
-          font-family: 'Noto Sans';
-          src: local('Noto Sans'), url('https://magick.ly/fonts/NotoSans-Regular.ttf') format('truetype')
-        }
-        @font-face {
-          font-family: 'Noto Sans Hebrew';
-          src: local("Noto Sans Hebrew"), url('https://magick.ly/fonts/NotoSansHebrew-Regular.ttf') format('truetype')
-        }
-        svg#TreeOfLife {
+        {`${fontBaseUrl === undefined ? "" : treeFontFaceCss(fontBaseUrl)}
+        svg#${rootId} {
           font-family: 'Noto Sans', 'Noto Sans Hebrew', Arial, sans-serif;
         }
-        a:visited * {
+        svg#${rootId} a:visited * {
           fill: inherit;
         }
-      ` + (flip ? "svg#TreeOfLife { transform: rotateY(180deg) }" : "")}
+      ` + (flip ? `svg#${rootId} { transform: rotateY(180deg) }` : "")}
       </style>
       {/* Paths */}
       <g
-        id="paths"
+        id={local("paths")}
+        className={TREE_LAYER_CLASSES.paths}
         style={{
           stroke: "#000",
           strokeWidth: 3,
@@ -405,7 +481,11 @@ function TreeOfLife({
             : null;
 
           return (
-            <SvgLink key={path.id} id={"path" + path.id} href={pathHref(path)}>
+            <SvgLink
+              key={path.id}
+              id={local("path" + path.id)}
+              href={pathHref(path)}
+            >
               <LineOutline
                 x1={start.x}
                 y1={start.y}
@@ -429,7 +509,11 @@ function TreeOfLife({
           );
         })}
       </g>
-      <g id="pathLetters" style={{ fontSize: "100%" }}>
+      <g
+        id={local("pathLetters")}
+        className={TREE_LAYER_CLASSES.pathLetters}
+        style={{ fontSize: "100%" }}
+      >
         {pathsToDraw.map((path) => {
           const parts = path.id.split("_");
           const start = sephirot[Number(parts[0]) - 1];
@@ -452,7 +536,7 @@ function TreeOfLife({
           return (
             <SvgLink
               key={path.id}
-              id={"pathLetter" + path.id}
+              id={local("pathLetter" + path.id)}
               href={pathHref(path)}
             >
               <text
@@ -469,9 +553,9 @@ function TreeOfLife({
           );
         })}
       </g>
-      <g id="sephirot">
+      <g id={local("sephirot")} className={TREE_LAYER_CLASSES.sephirot}>
         {sephirot.map((s, i) => (
-          <SvgLink key={i} id={s.data.id} href={sephirahHref(s)}>
+          <SvgLink key={i} id={local(s.data.id)} href={sephirahHref(s)}>
             <circle
               cx={s.x}
               cy={s.y}
@@ -611,7 +695,7 @@ function TreeOfLife({
               return (
                 <g>
                   <path
-                    id={"topTextPath" + i}
+                    id={local("topTextPath" + i)}
                     d={
                       `M ${point(s.x - radius, s.y)} ` +
                       `c ${point(xValueInset, -yValueOffset)} ` +
@@ -621,7 +705,7 @@ function TreeOfLife({
                   />
 
                   <text
-                    id={"topText_" + i}
+                    id={local("topText_" + i)}
                     style={{
                       fontStyle: "normal",
                       fontWeight: "normal",
@@ -638,7 +722,7 @@ function TreeOfLife({
                     }}
                   >
                     <textPath
-                      xlinkHref={"#topTextPath" + i}
+                      xlinkHref={"#" + local("topTextPath" + i)}
                       textAnchor="middle"
                       dominantBaseline="middle"
                       startOffset="50%"
@@ -648,7 +732,7 @@ function TreeOfLife({
                   </text>
 
                   <path
-                    id={"bottomTextPath" + i}
+                    id={local("bottomTextPath" + i)}
                     d={
                       `M ${point(s.x - radius, s.y)} ` +
                       `c ${point(xValueInset, yValueOffset)} ` +
@@ -658,7 +742,7 @@ function TreeOfLife({
                   />
 
                   <text
-                    id={"bottomText_" + i}
+                    id={local("bottomText_" + i)}
                     style={{
                       fontStyle: "normal",
                       fontWeight: "normal",
@@ -675,7 +759,7 @@ function TreeOfLife({
                     }}
                   >
                     <textPath
-                      xlinkHref={"#bottomTextPath" + i}
+                      xlinkHref={"#" + local("bottomTextPath" + i)}
                       textAnchor="middle"
                       dominantBaseline="middle"
                       startOffset="50%"

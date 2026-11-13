@@ -472,7 +472,7 @@ const { hallPreset } = await import("magick-components/gd/hall/presets");
 const { RoseSigilImage } = await import("magick-components/gd/RoseSigilImage");
 const { sigilPoints } = await import("magick-components/gd/roseSigilGeometry");
 const tree = renderToStaticMarkup(h(TreeOfLife, { field: "name.he", width: 300 }));
-if (!tree.includes('id="TreeOfLife"') || !tree.includes("תפארת")) throw new Error("the Tree: " + tree.slice(0, 200));
+if (!tree.includes('class="magick-tree-sephirot"') || !tree.includes("תפארת")) throw new Error("the Tree: " + tree.slice(0, 200));
 const hall = renderToStaticMarkup(h(GdHall, { hall: hallPreset("neophyte").hall, fontBaseUrl: "/f" }));
 if (!hall.includes("<svg")) throw new Error("the hall: " + hall.slice(0, 200));
 if ((hall.match(/@font-face/g) ?? []).length !== 3) throw new Error("the hall's fonts: " + hall.slice(0, 200));
@@ -520,6 +520,7 @@ export const points: Promise<{ x: number; y: number }[]> = optimizeSigilPoints(s
 export const page = (
   <>
     <TreeOfLife colorScale={scale} letterAttr="hebrew" showDaat />
+    <TreeOfLife id="tree" fontBaseUrl="/fonts" />
     {/* @ts-expect-error: a colour scale magick-data does not have */}
     <TreeOfLife colorScale="sepia" />
     {hall && <GdHall hall={hall} fontBaseUrl="/fonts" />}
@@ -751,7 +752,11 @@ export default nextConfig;
       () => {
         write(join(fixture, "next.config.ts"), nextConfig(false));
         const html = build(bundler)("index");
-        for (const marker of ['id="TreeOfLife"', "תפארת", 'id="client-tree"'])
+        for (const marker of [
+          'class="magick-tree-sephirot"',
+          "תפארת",
+          'id="client-tree"',
+        ])
           assert(html.includes(marker), `the page has ${marker}`);
         for (const [id] of SERVER_DRAWINGS)
           assert(
@@ -760,6 +765,20 @@ export default nextConfig;
             ),
             `the server drew ${id}`,
           );
+        // Three Trees, two from Server Components and one from a Client
+        // Component: each has its own ids, and its labels' curves its own.
+        const trees = [
+          ...html.matchAll(/<svg[^>]* id="(tree-of-life-[^"]+)"/g),
+        ];
+        assert(trees.length === 3, `three Trees (${trees.length})`);
+        const ids = [...html.matchAll(/ id="([^"]+)"/g)].map(([, id]) => id);
+        const repeated = ids.filter((id, i) => ids.indexOf(id) !== i);
+        assert(repeated.length === 0, `no id twice: ${repeated.slice(0, 5)}`);
+        const curves = [...html.matchAll(/ xlink:href="#([^"]+)"/g)];
+        assert(
+          curves.length > 0 && curves.every(([, id]) => ids.includes(id)),
+          "every label's curve is on the page",
+        );
         const css = readdirSync(join(fixture, ".next", "static"), {
           recursive: true,
         }).filter((file) => String(file).endsWith(".woff2"));
@@ -806,7 +825,7 @@ export function Rose() {
         );
         assert(html("rose").includes('stroke="red"'), "with its path");
         assert(
-          html("index").includes('id="TreeOfLife"'),
+          html("index").includes('class="magick-tree-sephirot"'),
           "the Tree still renders",
         );
       },

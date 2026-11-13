@@ -10,6 +10,7 @@ import TableRow from "@mui/material/TableRow";
 import GradeTree from "magick-components/gd/GradeTree";
 import Data from "magick-data";
 import Ink from "@/drawings/Ink";
+import { TREE_FONT_BASE_URL } from "@/fonts/tree";
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
 import Link from "@/ui/Link";
@@ -23,7 +24,7 @@ export default function Grades() {
       <Container maxWidth="sm">
         <Box sx={{ my: 4 }}>
           <Ink drawing="tree">
-            <GradeTree />
+            <GradeTree fontBaseUrl={TREE_FONT_BASE_URL} />
           </Ink>
 
           <TableContainer component={Paper}>

@@ -2,6 +2,7 @@ import GradeTree from "magick-components/gd/GradeTree";
 import type { GDGradeRow } from "magick-data/rows";
 import { isPublicRitualId } from "@/doc/publicRituals";
 import Ink from "@/drawings/Ink";
+import { TREE_FONT_BASE_URL } from "@/fonts/tree";
 import { gdHallShortName } from "@/render/contracts/gdHall";
 import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import { gradeHalls, hallPath } from "@/seo/halls";
@@ -108,6 +109,7 @@ export default function GradePage({ grade }: { grade: GDGradeRow }) {
             height="150px"
             topText=""
             active={sephirah?.id ?? NO_SPHERE}
+            fontBaseUrl={TREE_FONT_BASE_URL}
           />
         </Ink>
       </FigureNav>

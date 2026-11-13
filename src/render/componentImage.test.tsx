@@ -6,7 +6,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 const { calls } = vi.hoisted(() => ({ calls: vi.fn() }));
 vi.mock("magick-components/kabbalah/TreeOfLife", () => ({
-  default: (props) => {
+  // The registry draws the Tree's hook-free half.
+  TreeOfLifeSvg: (props) => {
     calls(props);
     return (
       <svg

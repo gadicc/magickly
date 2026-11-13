@@ -11,6 +11,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import Ink from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";
+import { TREE_FONT_BASE_URL } from "@/fonts/tree";
 import Link from "@/ui/Link";
 import { type TreeSettings, treeImageLink, treeSettings } from "./treeSettings";
 
@@ -189,6 +190,7 @@ export function TreeOfLifeView({
               flip={opts.flip}
               showDaat={opts.showDaat}
               fontSize={opts.fontSize}
+              fontBaseUrl={TREE_FONT_BASE_URL}
               ref={ref}
             />
           </Ink>

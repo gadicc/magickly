@@ -129,9 +129,9 @@ describe("the path page", () => {
     // The Tree is the Hebrew one: it has this path and Binah–Chesed, the
     // other the Hermetic tree omits, and not Netzach–Malchut, which only
     // the Hermetic tree draws.
-    expect(html).toContain('id="path2_5"');
-    expect(html).toContain('id="path3_4"');
-    expect(html).not.toContain('id="path7_10"');
+    expect(html).toMatch(/ id="[\w-]+-path2_5"/);
+    expect(html).toMatch(/ id="[\w-]+-path3_4"/);
+    expect(html).not.toMatch(/ id="[\w-]+-path7_10"/);
   });
 
   it("says a Hermetic-only path is not on the Hebrew tree", async () => {
@@ -142,8 +142,8 @@ describe("the path page", () => {
     expect(textOf(hermetic)).toContain(
       "The Hebrew tree does not draw this path.",
     );
-    expect(html).toContain('id="path7_10"');
-    expect(html).not.toContain('id="path2_5"');
+    expect(html).toMatch(/ id="[\w-]+-path7_10"/);
+    expect(html).not.toMatch(/ id="[\w-]+-path2_5"/);
   });
 
   it("carries the last Hermetic path on to the Hebrew-only ones", async () => {

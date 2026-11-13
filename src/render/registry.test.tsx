@@ -5,6 +5,8 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
+import { TreeOfLifeSvg } from "magick-components/kabbalah/TreeOfLife";
+import type { ReactElement } from "react";
 import { createRitualSvgValidator } from "@/files/validateRitualSvg";
 import { renderComponentImage } from "./componentImage";
 import { COMPONENT_IMAGE_SLUGS, CONTRACTS } from "./contracts";
@@ -90,6 +92,20 @@ describe("component image registry", () => {
     ],
   ] as const)("pins the data %s draws", (slug, sha256) => {
     expect(componentInputsHash(slug)).toBe(sha256);
+  });
+
+  it("draws the Tree without hooks, which a route handler cannot run", () => {
+    // /og's and /api/render's renderToStaticMarkup runs under the server
+    // build of React, where useId has no dispatcher; the build failed on
+    // it. Called as a plain function, a hook would throw here too.
+    const props = CONTRACTS["tree-of-life"].parse(new URLSearchParams());
+    const element = COMPONENT_IMAGE_REGISTRY["tree-of-life"].render(
+      props,
+    ) as ReactElement<Record<string, unknown>>;
+    expect(element.type).toBe(TreeOfLifeSvg);
+    expect(element.props.id).toBe("TreeOfLife");
+    const drawn = (element.type as (p: object) => ReactElement)(element.props);
+    expect(drawn.type).toBe("svg");
   });
 
   it("reproduces the published ritual Tree of Life bytes under the unchanged profile", async () => {

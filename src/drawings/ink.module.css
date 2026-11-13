@@ -2,13 +2,13 @@
  * Dark-scheme ink for drawings whose line art is black (plan 076,
  * decision 4). Each class goes on an element outside the drawing's <svg>,
  * through <Ink> or `inkClass`, and selects what the drawing already has:
- * ids, colour attributes and unfilled shapes. Nothing inside the <svg>
- * changes, so downloads, copies and server images (which clone or render
- * the markup without page CSS) stay black on white. Symbolic fills keep
+ * documented classes, colour attributes and unfilled shapes. Nothing
+ * inside the <svg> changes, so downloads, copies and server images (which
+ * clone or render the markup without page CSS) stay black on white. Symbolic fills keep
  * their colours; labels drawn on coloured or white shapes keep theirs.
  *
  * A rule on an element beats a colour it inherits from a parent's inline
- * style (the Tree's `<g id="paths">`); a colour in the element's own
+ * style (the Tree's paths layer); a colour in the element's own
  * inline style needs `!important` (the lamen's outer ring, the Tree's
  * Malkuth quarters).
  */
@@ -83,25 +83,32 @@
 }
 
 /*
- * Tree of Life: the paths' outlines (inherited from `<g id="paths">`'s
- * inline style) and the spheres' outlines, which also give Binah's #222
- * and Malkuth's black quarter an edge. Da'at's dashed outline keeps its
+ * Tree of Life, by the layer classes it documents (TREE_LAYER_CLASSES; its
+ * ids are its own, per instance): the paths' outlines (inherited from the
+ * paths layer's inline style) and the spheres' outlines, which also give
+ * Binah's #222 and Malkuth's black quarter an edge. Da'at's dashed outline keeps its
  * transparency. Labels, the GD grade marks and the white path fills keep
  * their colours.
  */
-:global(.dark) .tree :global(#paths) path {
+:global(.dark) .tree :global(.magick-tree-paths) path {
   stroke: var(--mui-palette-ink);
 }
 :global(.dark)
   .tree
-  :global(#sephirot)
+  :global(.magick-tree-sephirot)
   circle[stroke="#000"][stroke-width="1.568"] {
   stroke: var(--mui-palette-ink);
 }
-:global(.dark) .tree :global(#sephirot) circle[stroke="#000000AA" i] {
+:global(.dark)
+  .tree
+  :global(.magick-tree-sephirot)
+  circle[stroke="#000000AA" i] {
   stroke: var(--mui-palette-ink);
   stroke-opacity: 0.67;
 }
-:global(.dark) .tree :global(#sephirot) path[style*="stroke:#000000"] {
+:global(.dark)
+  .tree
+  :global(.magick-tree-sephirot)
+  path[style*="stroke:#000000"] {
   stroke: var(--mui-palette-ink) !important;
 }

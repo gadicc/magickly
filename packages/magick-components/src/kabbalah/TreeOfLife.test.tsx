@@ -6,7 +6,9 @@ import TreeOfLife, {
   labelLines,
   pathTitle,
   TREE_COLOR_SCALES,
+  TREE_LAYER_CLASSES,
   type TreeColorScale,
+  TreeOfLifeSvg,
   type TreePathAttribution,
 } from "./TreeOfLife.tsx";
 
@@ -146,8 +148,8 @@ describe("TreeOfLife", () => {
     expect(count(html, /<a /g)).toBe(10);
     expect(count(html, /<a [^>]*xlink:href="\/gd\/grade\//g)).toBe(10);
     // 22 path outlines and their 22 letters, each with its own id.
-    expect(count(html, /<g id="path\d+_\d+">/g)).toBe(22);
-    expect(count(html, /<g id="pathLetter\d+_\d+">/g)).toBe(22);
+    expect(count(html, /<g id="[\w-]+-path\d+_\d+">/g)).toBe(22);
+    expect(count(html, /<g id="[\w-]+-pathLetter\d+_\d+">/g)).toBe(22);
   });
 
   it("draws Da'at in the Queen scale only, as the app does", () => {
@@ -191,8 +193,8 @@ describe("TreeOfLife", () => {
       );
     // A path of the other tradition's Tree is drawn on this one, as the
     // image API has always drawn it.
-    expect(renderToString(<TreeOfLife activePath="2_5" />)).toContain(
-      'id="path2_5"',
+    expect(renderToString(<TreeOfLife activePath="2_5" />)).toMatch(
+      / id="[\w-]+-path2_5"/,
     );
   });
 
@@ -205,5 +207,128 @@ describe("TreeOfLife", () => {
       ),
     );
     expect([...TREE_COLOR_SCALES].sort()).toEqual([...scales].sort());
+  });
+
+  describe("on a page with others", () => {
+    /** Each `<style>`'s text in the markup. */
+    const styles = (html: string) =>
+      [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map(
+        ([, css]) => css,
+      );
+    /** The selectors of a stylesheet's rules, @font-face aside. */
+    const selectors = (css: string) =>
+      [...css.matchAll(/([^{}]+)\{[^{}]*\}/g)]
+        .map(([, selector]) => selector.trim())
+        .filter((selector) => selector !== "@font-face");
+    const ids = (html: string) =>
+      [...html.matchAll(/ id="([^"]+)"/g)].map(([, id]) => id);
+    const two = () =>
+      renderToString(
+        <>
+          <TreeOfLife field="name.he" />
+          <TreeOfLife flip showDaat />
+        </>,
+      );
+
+    it("gives every id it draws its own prefix, so two Trees share none", () => {
+      const html = two();
+      const all = ids(html);
+      expect(new Set(all).size).toBe(all.length);
+      const roots = [...html.matchAll(/<svg[^>]* id="([^"]+)"/g)].map(
+        ([, id]) => id,
+      );
+      expect(roots).toHaveLength(2);
+      for (const root of roots) expect(root).toMatch(/^tree-of-life-[\w-]+$/);
+      for (const id of all)
+        expect(
+          roots.some((root) => id === root || id.startsWith(`${root}-`)),
+          id,
+        ).toBe(true);
+    });
+
+    it("points each label's curve at an id of its own Tree", () => {
+      const html = two();
+      const own = new Set(ids(html));
+      const references = [...html.matchAll(/ xlink:href="#([^"]+)"/g)].map(
+        ([, id]) => id,
+      );
+      expect(references.length).toBeGreaterThan(40);
+      for (const id of references) expect(own.has(id), id).toBe(true);
+    });
+
+    it("scopes every rule to its own svg, and flips only itself", () => {
+      const html = two();
+      const [first, second] = [...html.matchAll(/<svg[^>]* id="([^"]+)"/g)].map(
+        ([, id]) => id,
+      );
+      const [plain, flipped] = styles(html);
+      for (const [css, root] of [
+        [plain, first],
+        [flipped, second],
+      ])
+        for (const selector of selectors(css))
+          expect(selector.startsWith(`svg#${root}`), selector).toBe(true);
+      expect(plain).not.toContain("rotateY");
+      expect(flipped).toContain(`svg#${second} { transform: rotateY(180deg) }`);
+      // No unscoped rule anywhere, such as the old `a:visited *`.
+      expect(html).not.toMatch(/[>}]\s*a:visited/);
+    });
+
+    it("loads no fonts unless it is told where they are", () => {
+      const [css] = styles(renderToString(<TreeOfLife />));
+      expect(css).not.toContain("@font-face");
+      expect(css).not.toContain("url(");
+      expect(css).toContain("font-family: 'Noto Sans', 'Noto Sans Hebrew'");
+      const [served] = styles(
+        renderToString(<TreeOfLife fontBaseUrl="https://example.com/f/" />),
+      );
+      expect(served.match(/@font-face/g)).toHaveLength(2);
+      expect(served).toContain(
+        "src: local('Noto Sans'), url('https://example.com/f/NotoSans-Regular.ttf') format('truetype')",
+      );
+      expect(served).toContain(
+        "src: local('Noto Sans Hebrew'), url('https://example.com/f/NotoSansHebrew-Regular.ttf') format('truetype')",
+      );
+      for (const unsafe of ["/f') x", "/f</style>", "/a b"])
+        expect(() =>
+          renderToString(<TreeOfLife fontBaseUrl={unsafe} />),
+        ).toThrow("TreeOfLife: unsafe fontBaseUrl");
+    });
+
+    it("takes its root id, and prefixes the rest with it", () => {
+      const html = renderToString(<TreeOfLife id="tree" />);
+      expect(html).toMatch(/<svg[^>]* id="tree"/);
+      expect(html).toContain(' id="tree-sephirot"');
+      expect(html).toContain(' id="tree-tiferet"');
+      expect(html).toContain(' xlink:href="#tree-topTextPath0"');
+      expect(styles(html)[0]).toContain("svg#tree {");
+      for (const bad of ["1tree", "a b", 'x"y', ""])
+        expect(() => renderToString(<TreeOfLife id={bad} />)).toThrow(
+          `TreeOfLife: id ${JSON.stringify(bad)} must be letters, digits`,
+        );
+    });
+
+    it("draws without hooks as TreeOfLifeSvg, given its id", () => {
+      // Called as a plain function, outside any render: a hook would throw.
+      const svg = TreeOfLifeSvg({ id: "tree", field: "name.he" });
+      expect(svg.type).toBe("svg");
+      expect(renderToString(<TreeOfLifeSvg id="tree" />)).toBe(
+        renderToString(<TreeOfLife id="tree" />),
+      );
+    });
+
+    it("marks its three layers with the classes it documents", () => {
+      const html = renderToString(<TreeOfLife />);
+      for (const name of Object.values(TREE_LAYER_CLASSES))
+        expect(
+          count(html, new RegExp(`<g [^>]*class="${name}"`, "g")),
+          name,
+        ).toBe(1);
+      expect(html).toMatch(
+        new RegExp(
+          `<g [^>]*class="${TREE_LAYER_CLASSES.paths}"[^>]*style="stroke:#000`,
+        ),
+      );
+    });
   });
 });

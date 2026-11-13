@@ -63,7 +63,9 @@ function rowText(html: string, label: string) {
 
 /** The opacity each sphere of the Tree is drawn at, read off its circle. */
 function sphereOpacities(html: string) {
-  const tree = html.match(/<svg\b[^>]*\bid="TreeOfLife"[\s\S]*?<\/svg>/)?.[0];
+  const tree = html.match(
+    /<svg\b[^>]*\bid="tree-of-life-[^"]*"[\s\S]*?<\/svg>/,
+  )?.[0];
   return [...(tree ?? "").matchAll(/<circle\b[^>]*\br="40"[^>]*>/g)].map(
     ([circle]) => circle.match(/\sopacity="([^"]*)"/)?.[1],
   );

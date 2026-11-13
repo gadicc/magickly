@@ -19,10 +19,10 @@ import Ink, { type InkDrawing, inkClass } from "./Ink";
 
 /**
  * Each dark re-ink rule (plan 076, decision 4) selects inside a drawing by
- * what the drawing already has: ids, colour attributes, unfilled shapes. A
- * change to the drawing's colours would leave the rule matching nothing and
- * the line art black on the dark page, with nothing failing. This reads the
- * rules from ink.module.css and checks that each one's selector, with the
+ * what the drawing already has: classes, colour attributes, unfilled
+ * shapes. A change to the drawing's colours would leave the rule matching
+ * nothing and the line art black on the dark page, with nothing failing.
+ * This reads the rules from ink.module.css and checks that each one's selector, with the
  * real wrapper class, still matches something in the drawing it targets.
  */
 

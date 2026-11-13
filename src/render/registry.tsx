@@ -7,7 +7,7 @@ import SevenBranchedCandleStick, {
   CANDLESTICK_PLANETS,
 } from "magick-components/gd/SevenBranchedCandleStick";
 import TableOfShewbread from "magick-components/gd/TableOfShewbread";
-import TreeOfLife from "magick-components/kabbalah/TreeOfLife";
+import { TreeOfLifeSvg } from "magick-components/kabbalah/TreeOfLife";
 import type { ReactElement } from "react";
 import AstroGeomancyChart from "@/app/geomancy/reading/AstroGeomancyChart";
 import { figuresFromMothers } from "@/app/geomancy/tetragrams";
@@ -136,7 +136,14 @@ export const COMPONENT_IMAGE_REGISTRY: {
   [S in ComponentImageSlug]: ComponentImageRegistration<S>;
 } = {
   "tree-of-life": {
-    render: (props) => <TreeOfLife {...props} flip={false} />,
+    // The Tree without hooks, since a route handler's renderToStaticMarkup
+    // runs outside the dispatcher useId needs, and with the root id the
+    // Tree always had, so that published images keep their bytes under
+    // the unchanged profile (plan 080, "Before publishing"); every other
+    // id is stripped from the outlines.
+    render: (props) => (
+      <TreeOfLifeSvg {...props} flip={false} id="TreeOfLife" />
+    ),
     flip: (props) => props.flip,
     profile: TREE_IMAGE_PROFILE,
     inputs: TREE_INPUTS,

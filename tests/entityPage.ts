@@ -103,8 +103,9 @@ function linksOf(html: string) {
 
 /**
  * Every `href` and `xlink:href` in the markup that leaves the page, decoded,
- * without its query or fragment. A same-page reference, `#topTextPath0`, is
- * not a route: the Tree lays each sphere's labels along a curve it names so.
+ * without its query or fragment. A same-page reference, such as
+ * `#tree-of-life-_S_1_-topTextPath0`, is not a route: the Tree lays each
+ * sphere's labels along a curve it names so.
  */
 export function hrefsOf(html: string) {
   return linksOf(html)
