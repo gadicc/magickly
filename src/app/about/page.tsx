@@ -72,13 +72,16 @@ export default function Sequence() {
         <h2 id="licence">Licence</h2>
 
         <p>
-          Copyright (c) 2020-2026 Gadi Cohen. The app is free software under the{" "}
+          Copyright (c) 2020–2026 Gadi Cohen. The app is free software under the{" "}
           <a href="https://www.gnu.org/licenses/agpl-3.0.html">
             GNU Affero General Public License
           </a>
-          , version 3 or any later version; its data, components and images are
-          under freer licences, set out under{" "}
-          <Link href="/open-source">Open source</Link>.
+          , version 3 or any later version. The data and the images the site
+          draws are{" "}
+          <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>,
+          with credit to Magick.ly, and the code of the data and the components
+          is MIT; <Link href="/open-source#licences">Open source</Link> says
+          what each covers.
         </p>
 
         <p>

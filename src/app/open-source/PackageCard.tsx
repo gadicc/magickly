@@ -24,6 +24,10 @@ export function Code({ children }: { children: string }) {
   );
 }
 
+/** A package's source directory in the repository, on GitHub. */
+export const directoryUrl = (directory: string) =>
+  `${SITE_REPOSITORY}/tree/main/${directory}`;
+
 /**
  * One package on the hub (plan 080, decision 1): what it is, then, once it
  * is on npm, how to install and use it, and links to it. Until it is
@@ -32,6 +36,7 @@ export function Code({ children }: { children: string }) {
 export default function PackageCard({
   name,
   directory,
+  published,
   usage,
   children,
 }: {
@@ -39,15 +44,19 @@ export default function PackageCard({
   name: string;
   /** Where its source is in the repository. */
   directory: string;
-  /** A short usage sample; only a published package has one. */
+  /** Whether it is on npm, so that `npm i` and the npm link work. */
+  published: boolean;
+  /** A short usage sample, shown once the package is published. */
   usage?: string;
   /** What the package is, and anything a reader needs before installing. */
   children: ReactNode;
 }) {
-  const published = usage !== undefined;
+  const headingId = `${name}-heading`;
   return (
     <Box
+      component="article"
       id={name}
+      aria-labelledby={headingId}
       sx={{
         my: 3,
         px: 2,
@@ -60,7 +69,7 @@ export default function PackageCard({
         scrollMarginTop: 72,
       }}
     >
-      <H3>
+      <H3 id={headingId}>
         <Box component="code" sx={{ fontSize: "inherit" }}>
           {name}
         </Box>
@@ -69,17 +78,25 @@ export default function PackageCard({
       {published ? (
         <>
           <Code>{`npm i ${name}`}</Code>
-          <Code>{usage}</Code>
+          {usage ? <Code>{usage}</Code> : null}
         </>
       ) : null}
       <p>
         {published ? (
           <>
-            <Link href={`https://www.npmjs.com/package/${name}`}>On npm</Link>
+            <Link
+              href={`https://www.npmjs.com/package/${name}`}
+              aria-label={`${name} on npm`}
+            >
+              On npm
+            </Link>
             {" · "}
           </>
         ) : null}
-        <Link href={`${SITE_REPOSITORY}/tree/main/${directory}`}>
+        <Link
+          href={directoryUrl(directory)}
+          aria-label={`${name}'s source on GitHub`}
+        >
           Source on GitHub
         </Link>
       </p>

@@ -200,7 +200,7 @@ export default function HallPage({ hall }: { hall: GdHallEntry }) {
             <Link href="https://github.com/gadicc/magickly/tree/main/src/components">
               MIT
             </Link>
-            ; see <Link href="/about#licence">About</Link>.
+            ; see <Link href="/open-source#licences">Open source</Link>.
           </p>
 
           <PrevNext label="More temple halls" prev={prev} next={next} />

@@ -239,7 +239,7 @@ export const PUBLIC_PAGES = {
     title: "Open Source Licences and Packages",
     description:
       "What you may reuse from Magick.ly and how: the app under AGPL, the " +
-      "package code under MIT, the data under CC BY 4.0, and the npm packages.",
+      "code under MIT, the data and images under CC BY 4.0, and the packages.",
   },
   "/books": {
     title: "Books",

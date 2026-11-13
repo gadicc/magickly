@@ -437,8 +437,8 @@ function SevenyTwo() {
       </Container>
       <br />
       <Container sx={{ fontSize: "80%", textAlign: "justify" }}>
-        Magick.ly is open-source. You can see the code used to generate this
-        page{" "}
+        Magick.ly is <Link href="/open-source">open source</Link>. You can see
+        the code used to generate this page{" "}
         <a href="https://github.com/gadicc/magickly/blob/main/src/app/kabbalah/yhvh/72angels/angels.tsx">
           here
         </a>
