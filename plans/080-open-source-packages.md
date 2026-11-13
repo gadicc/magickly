@@ -951,6 +951,22 @@ Step 7's bump to `0.1.0` with `--expect-exists` followed; run against
 the registry before merging, the rule answered "magick-data@0.1.0 is
 new (latest is 0.1.0-rc.0); publish under latest".
 
+### 0.1.0 (12 and 13 November 2026)
+
+Step 7 is `f630052b`. Its `publish.yml` run (43250783458) passed every
+job; `publish` exchanged GitHub's OIDC token for npm's, decided
+"magick-data@0.1.0 is new (latest is 0.1.0-rc.0); publish under
+latest", and published with a signed SLSA v1 provenance statement
+(Sigstore log index 3835347336). npm answered 202 and listed the
+version about five minutes later, under `latest`, with the integrity
+the `build` job printed,
+`sha512-2J5UoTwFOjXniUFw9N/8NoYQH3U7nzUbCz1ZJd8Oaze12fzvgYwczBNt/2qZbqwJKTkLV1xT1LOyIbXDICXSNQ==`.
+On 13 November Gadi removed `next` (step 8; the registry's only tag is
+now `latest`) and set publishing access to require two-factor
+authentication and disallow tokens (step 9, his word; the setting is
+not visible from outside). Stage A′ is done; stages B to G wait for
+his go-ahead.
+
 ### Stage A review (11 November 2026)
 
 An adversarial review of stage A's commits found the following; each was

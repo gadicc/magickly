@@ -229,12 +229,11 @@ Follow-ups are separate from the completed migration work:
   ([plan 080](080-open-source-packages.md#the-provenance-clean-up-12-november-2026)),
   and Gadi signed off every Sources row the same day
   ([plan 080](080-open-source-packages.md#the-sign-off-12-november-2026)).
-  `0.1.0-rc.0` was published by hand the same day, and the bump to
-  `0.1.0` with `--expect-exists` follows it
-  ([plan 080](080-open-source-packages.md#the-release-candidate-12-november-2026)).
-  TODO: the rest of stage A′, Gadi's, from 0.1.0's CI publish on
-  ([the steps](080-open-source-packages.md#stage-a-the-owners-steps));
-  then, with his go-ahead, stages B to G. Follow-ups:
+  `0.1.0-rc.0` was published by hand the same day and `0.1.0` from CI
+  with provenance through the trusted publisher; on 13 November `next`
+  was removed and tokens disallowed, which completes stage A′
+  ([plan 080](080-open-source-packages.md#010-12-and-13-november-2026)).
+  TODO: with Gadi's go-ahead, stages B to G. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups).
 - 12 November 2026: the Enochian dictionary's and Keys' gematria named as
   Gerald Schueler's (EMPM, 1985), Gadi choosing a label over removal. All
@@ -449,20 +448,11 @@ Follow-ups are separate from the completed migration work:
   `magickly`; every other `magickli` is a stored, hashed, sent or
   provisioned identifier and stays
   ([plan 052](052-data-package.md#magickli-stays)).
-- TODO: publishing `magick-data`, planned in
-  [plan 080](080-open-source-packages.md) (stages A and A′): stage A is
-  built and reviewed on `gate/data-publish`; stage A′ is Gadi's: the `npm`
-  environment before the merge, the provenance sign-off (eight
-  questions, then a date on every Sources row; tests refuse a version
-  past 0.0.0 while a row has none; done 12 November), the release
-  candidate published by
-  hand, the trusted publisher allowing `npm publish`, 0.1.0 from CI
-  within two days with
-  `--expect-exists`, then `next` removed and tokens disallowed
-  ([the steps](080-open-source-packages.md#stage-a-the-owners-steps)). The Enochian
-  dictionary stays out of the tarball whatever is decided: its entries come
-  from Schueler's *Enochian Magic: A Practical Manual* and *The Whole
-  Enochian Dictionary*, whose rights are not ours to give.
+- `magick-data` 0.1.0 is on npm (plan 080, stages A and A′, 12 and 13
+  November), published from CI with provenance; see the 11 November
+  entry above. The Enochian dictionary stays out of the tarball: its
+  entries come from Schueler's *Enochian Magic: A Practical Manual* and
+  *The Whole Enochian Dictionary*, whose rights are not ours to give.
 - TODO: a component explorer under `/open-source`, our own rather than
   Storybook, built after `magick-components` is a package
   ([plan 080](080-open-source-packages.md), decision 5 and stage F;
