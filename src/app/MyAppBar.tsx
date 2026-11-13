@@ -127,12 +127,31 @@ export function UserAvatar({
 }
 
 /**
+ * Next prefetches a link's page when the link comes within 200 px of the
+ * viewport, whatever its visibility. Kept mounted, the closed title menu
+ * sits in the viewport under `visibility: hidden`, and the closed drawer
+ * just off its left edge, inside the margin. So every page fetched and
+ * parsed the code of every page they list, the chat's megabyte of
+ * JavaScript among them. Their links prefetch only while they are open.
+ */
+export function menuPrefetch(open: boolean) {
+  return open ? null : false;
+}
+
+/**
  * The drawer's links. A click anywhere in them closes the drawer. The drawer's
  * paper is a flex column: they take its height and scroll, and the theme
  * switch sits below them.
  */
-function MenuLinks({ handleDrawerToggle }: { handleDrawerToggle: () => void }) {
+function MenuLinks({
+  handleDrawerToggle,
+  drawerOpen,
+}: {
+  handleDrawerToggle: () => void;
+  drawerOpen: boolean;
+}) {
   const [open, setOpen] = React.useState("");
+  const prefetch = menuPrefetch(drawerOpen);
 
   return (
     <Box
@@ -179,6 +198,7 @@ function MenuLinks({ handleDrawerToggle }: { handleDrawerToggle: () => void }) {
                 <ListItemButton
                   component={Link}
                   href={key === "/" ? "/" : "/" + key}
+                  prefetch={prefetch}
                 >
                   <ListItemText
                     primary={
@@ -216,6 +236,7 @@ function MenuLinks({ handleDrawerToggle }: { handleDrawerToggle: () => void }) {
                           sx={{ pl: 4 }}
                           component={Link}
                           href={"/" + key + (key2 === "/" ? "" : "/" + key2)}
+                          prefetch={prefetch}
                         >
                           <ListItemText
                             primary={
@@ -237,12 +258,17 @@ function MenuLinks({ handleDrawerToggle }: { handleDrawerToggle: () => void }) {
 /** Choosing a theme is outside the links' box, so it keeps the drawer open. */
 function MenuDrawer({
   handleDrawerToggle,
+  drawerOpen,
 }: {
   handleDrawerToggle: () => void;
+  drawerOpen: boolean;
 }) {
   return (
     <>
-      <MenuLinks handleDrawerToggle={handleDrawerToggle} />
+      <MenuLinks
+        handleDrawerToggle={handleDrawerToggle}
+        drawerOpen={drawerOpen}
+      />
       <ThemeSwitch />
     </>
   );
@@ -333,6 +359,7 @@ function NavMenu({
 }) {
   const trail = [{ title: "Home", url: "/" }, ...ancestors];
   const level = trail.length;
+  const prefetch = menuPrefetch(Boolean(anchorEl));
   return (
     <Menu
       id="nav-menu"
@@ -352,6 +379,7 @@ function NavMenu({
           key={link.url}
           component={NextLink}
           href={link.url}
+          prefetch={prefetch}
           onClick={onClose}
           sx={{ pl: `${16 + MENU_INDENT * i}px` }}
         >
@@ -363,6 +391,7 @@ function NavMenu({
         <MenuItem
           component={NextLink}
           href={current.url}
+          prefetch={prefetch}
           onClick={onClose}
           sx={{ pl: `${16 + MENU_INDENT * level}px` }}
         >
@@ -392,6 +421,7 @@ function NavMenu({
           key={link.url}
           component={NextLink}
           href={link.url}
+          prefetch={prefetch}
           onClick={onClose}
           // A section page's own pages sit below it; siblings beside it.
           sx={{ pl: `${16 + MENU_INDENT * (nested ? level + 1 : level)}px` }}
@@ -654,7 +684,10 @@ export default function ButtonAppBar() {
             },
           }}
         >
-          <MenuDrawer handleDrawerToggle={handleDrawerToggle} />
+          <MenuDrawer
+            handleDrawerToggle={handleDrawerToggle}
+            drawerOpen={drawerOpen}
+          />
         </Drawer>
       </nav>
     </div>

@@ -1,12 +1,15 @@
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import MyAppBar from "./MyAppBar";
+import MyAppBar, { menuPrefetch } from "./MyAppBar";
 
 const navigation = vi.hoisted(() => ({
   pathname: "/",
   segment: null as string | null,
 }));
 const drawer = vi.hoisted(() => ({ inline: false }));
+const links = vi.hoisted(() => ({
+  rendered: [] as { href: string; prefetch: unknown }[],
+}));
 
 vi.mock("next/navigation", () => ({
   usePathname: () => navigation.pathname,
@@ -44,6 +47,18 @@ vi.mock("@mui/material", async (importOriginal) => {
   };
 });
 
+// Each Next link as rendered, with its prefetch setting, which leaves no
+// trace in the markup.
+vi.mock("next/link", async (importOriginal) => {
+  const next = await importOriginal<typeof import("next/link")>();
+  const { createElement } = await import("react");
+  const Recording = (props: React.ComponentProps<typeof next.default>) => {
+    links.rendered.push({ href: String(props.href), prefetch: props.prefetch });
+    return createElement(next.default, props);
+  };
+  return { ...next, default: Recording };
+});
+
 /** The nav menu's markup, from its root to the end of the HTML. */
 function navMenu(html: string) {
   const id = html.indexOf('id="nav-menu"');
@@ -67,6 +82,7 @@ afterEach(() => {
   navigation.pathname = "/";
   navigation.segment = null;
   drawer.inline = false;
+  links.rendered.length = 0;
 });
 
 describe("MyAppBar on the server", () => {
@@ -212,6 +228,33 @@ describe("MyAppBar on the server", () => {
     expect(hrefsIn(trail ?? "")).toEqual(["/kabbalah", "/kabbalah/yhvh"]);
     // A top-level page has nothing above it.
     expect(serverRender("/about")).not.toContain('aria-label="Breadcrumb"');
+  });
+
+  it("prefetches nothing from the closed drawer and title menu", () => {
+    // Hidden but in the viewport, their links would make Next fetch and run
+    // every page they list, the chat's megabyte of code among them.
+    drawer.inline = true;
+    serverRender("/kabbalah/tree");
+    const closed = links.rendered
+      .filter((link) => link.prefetch === false)
+      .map((link) => link.href);
+    expect(closed).toEqual(
+      expect.arrayContaining(["/", "/chat", "/kabbalah", "/kabbalah/yhvh"]),
+    );
+    // Only the links on show prefetch: the trail beside the title and
+    // signing in. The list is exact on purpose: a new link in the bar has
+    // to say whether it may prefetch.
+    expect(
+      links.rendered
+        .filter((link) => link.prefetch !== false)
+        .map((link) => link.href.replace(/\?.*/, "")),
+    ).toEqual(["/kabbalah", "/signin"]);
+  });
+
+  it("lets an open menu's links prefetch as Next would", () => {
+    // null is Next's default, "auto"; false stops viewport and hover alike.
+    expect(menuPrefetch(true)).toBeNull();
+    expect(menuPrefetch(false)).toBe(false);
   });
 
   it("offers no link in the drawer to a page that does not exist", () => {

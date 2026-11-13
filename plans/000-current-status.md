@@ -159,8 +159,33 @@ Follow-ups are separate from the completed migration work:
   views of one private section count once; an outside site's referrer
   is sent as its browser exposes it (its origin, under the default
   policy). Web Analytics was turned on in the Vercel project on
-  9 November. TODO: check Speed Insights there, then compare the
-  dashboards with Search Console after the next release.
+  9 November. On 13 November Speed Insights was checked: on, and a live
+  page sends its vitals. Its scores are read in the Vercel dashboard
+  only, and from 9 to 13 November the site had about 130 visitors, 9 of
+  them from search, so they will be thin for a while.
+- 13 November 2026: Lighthouse (mobile, three runs a page) found pages
+  quick to load (LCP about 1 s, CLS 0, server about 60 ms) but the main
+  thread blocked for up to 17 s. The closed drawer and title menu are
+  kept mounted: the menu hidden with `visibility: hidden` in the
+  viewport, the drawer just off its edge. Next 16 prefetches every link
+  within 200 px of the viewport, hidden or not, so every page fetched
+  and parsed the code of every page they list,
+  among them the chat's 1 MB chunk (the AI SDK, zod, react-markdown and
+  every Prism language). Blocking that chunk took the angel page from
+  69 to 93-96. Their links now prefetch only while their menu is open
+  (`src/app/MyAppBar.tsx`), which halves the JavaScript a page downloads
+  (about 2.7 MB to 1.4 MB unzipped on the planet, angel, 72 angels and
+  hall pages). Timings re-measured on a loaded machine were too noisy to
+  report; re-measure the live site after release. TODO: visible links
+  to `/chat` still prefetch that chunk: the home page's first screen,
+  and the footer's on any short page or once a reader nears the end.
+  Only a lighter chat page closes this: load its Markdown and
+  highlighter lazily, or use Prism's light build with a few languages. TODO: the hall page draws
+  for 2-7 s on a phone CPU even without the chat chunk; profile it. TODO,
+  from Lighthouse: no page has a `<main>` landmark; the 72 angels page
+  logs React hydration error 418 and has a link whose text is "here",
+  and its 72 header links are small touch targets; the angel pages'
+  trail link is low in contrast.
 - 9 November 2026: on-site search work (breadcrumbs, a footer, section
   and tool text) in [plan 071](071-on-site-search.md), from a Search
   Console audit: 3 clicks in 28 days, most sitemap pages unseen. Stages
