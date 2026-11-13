@@ -75,29 +75,32 @@ describe("Tablet", () => {
     // Air's four moved when its sigil was redrawn after the Equinox's
     // Plate X, in place of two fonts' glyphs (plan 080, "The sigils'
     // sources"); 8b12dffc…, 657b0c6f…, c597afb2… and a14408e1… before.
+    // They moved again when its four Yods were refined to the plate's
+    // slim lozenges (plan 080, "The sigils' sources"); 924e6792…,
+    // d56aa4ee…, 0c0c0214… and b92ebc33… before, the Yods' paths alone.
     [
       "air",
       false,
       true,
-      "924e6792363322802fe4b1e0d67f3f53b8792afba575c19ae52f0461721b03de",
+      "f23767051a2292c26998a9b3ad42f382b07eade93367304c4b6b8af7ca012f34",
     ],
     [
       "air",
       false,
       false,
-      "d56aa4ee5abd3e4caf531f14c041429faa04787e6117716310bd9bf114dc7f9e",
+      "f89ff7420cc0fabf016d992887e64c6d34484e79af6d68574abf8225045f3005",
     ],
     [
       "air",
       true,
       true,
-      "0c0c0214e72447b2c9a03cec4087f654c177a0ff37fd07fd775da5ea0de2ca57",
+      "11a0bb4f988494792a0820bb6f756caffa421772541e6df1db26134037b2d8a5",
     ],
     [
       "air",
       true,
       false,
-      "b92ebc33138dfc5a68d3620a1d5f9ea6ac44d79ddb0f73fac90ae002211aa40e",
+      "2b0bc2ed157a2c9e9c34bb35a4c9a587653ccb7dc91c29fdd485bd2658fa552a",
     ],
   ] as const)(
     "draws %s (Enochian %s, frame %s) as it did",
@@ -279,10 +282,11 @@ describe("Tablet", () => {
 
     // The Equinox's Air sigil, drawn after its Plate X (plan 080, "The
     // sigils' sources"), which the hashes above, all in the Golden Dawn's
-    // version, do not reach.
+    // version, do not reach. e2793a22… before its Yods were refined (the
+    // Yods' paths alone moved).
     it("draws the Equinox's Air sigil as it did", () => {
       expect(sha256(renderToStaticMarkup(EquinoxSigils.air()))).toBe(
-        "e2793a22788e02704137ad398ec07933f80b0dbf4bff469b30d905ba5a6c5395",
+        "74105d5eb04ea91d5fe6984011d2b8959457b4edf11255d0aaf1df5fe0db17a1",
       );
     });
 

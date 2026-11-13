@@ -173,18 +173,40 @@ const AIR_TAU =
   "C53 79.5 56 83 58.5 85.5H43.5C46 83 49 79.5 49.8 76" +
   "V24.5C39.5 24.5 28 27 18 33.5Z";
 
-/** One of the four flames over the Tau: a drop, its point up and back. */
-const AIR_FLAME =
-  "M-2.5 -8.5C2 -6.5 3.5 -3 3.2 0A3.2 3.2 0 0 1 -3.2 0" +
-  "C-3.4 -2.5 -1.2 -4.5 -2.5 -8.5Z";
-
-/** The flames' centres along the grid's x, a little over the crossbar. */
-const AIR_FLAME_XS = [33.2, 45.4, 57.6, 69.8];
+/**
+ * One of the four Yods over the Tau, drawn as a small flame: a slim
+ * lozenge, sharp at the top and tapering to a blunt point below, about
+ * 1.8 times as long as it is wide and widest about halfway down, drawn
+ * about its centre. Hand-placed after the Equinox's Plate X (see
+ * `EquinoxSigils`), not traced. Regardie's own drawing (The Golden Dawn,
+ * vol. 4, 1940) gives the flames wavy strokes instead; both versions here
+ * keep the plate's form.
+ */
+const AIR_YOD =
+  "M-1.7 -6C-1.1 -5 1 -3.4 2.3 -1.2C3 0 3 3.1 2.7 4.8" +
+  "Q2.4 5.8 1.5 5.4C-0.1 3.8 -2.6 2.2 -3.7 0.3" +
+  "C-4.1 -0.7 -2.8 -2.4 -2.2 -3.6C-1.9 -4.4 -1.9 -5.1 -1.7 -6Z";
 
 /**
- * Air: a Tau with four flames above it, yellow on mauve within a yellow
- * ring; `plain`, in black alone, as the Equinox's Plate X prints it. Our
- * own drawing after the plate, constructed in code.
+ * The Yods' centres along the grid's x, a little over the crossbar, about
+ * 0.185 of its width apart. Each Yod is about 0.17 of the crossbar's width
+ * long and leans about 32 degrees from vertical, top to the left, as on
+ * the plate.
+ */
+const AIR_YOD_XS = [33.2, 45.4, 57.6, 69.8];
+
+/**
+ * Air: a Tau with four Yods above it, drawn as small flames, yellow on
+ * mauve within a yellow ring; `plain`, in black alone, as the Equinox's
+ * Plate X prints it. The Golden Dawn calls the marks Yods (Regardie, The
+ * Golden Dawn, vol. 4, 1940, p. 307). They stand for the 4 written over
+ * the T at the top of the outer ring of Dee's Sigillum Dei Aemeth (Sloane
+ * MS 3188; The Equinox I(7), 1912, Plate II, archive.org
+ * `crowley-equinox_202110`, "The Equinox Vol. 1, No. 7", leaf n238),
+ * from which the Order took the Watchtowers' sigils (Regardie, p. 308), and
+ * the Order drew Yods as flames (Book T's Ace of Wands, The Equinox I(8),
+ * 1912, p. 153, "The Equinox Vol. 1, No. 8", leaf n183). Our own drawing
+ * after Plate X, constructed in code.
  */
 function AirSigil({ plain = false }: { plain?: boolean }) {
   return (
@@ -199,11 +221,11 @@ function AirSigil({ plain = false }: { plain?: boolean }) {
           transform="scale(1.6) translate(-51 -45.5)"
         >
           <path d={AIR_TAU} />
-          {AIR_FLAME_XS.map((x) => (
+          {AIR_YOD_XS.map((x) => (
             <path
               key={x}
-              d={AIR_FLAME}
-              transform={`translate(${x} 14) rotate(-25)`}
+              d={AIR_YOD}
+              transform={`translate(${x} 11) rotate(-10)`}
             />
           ))}
         </g>
@@ -355,6 +377,9 @@ export const Sigils = {
  * `crowley-equinox_202110`, the file "The Equinox Vol. 1, No. 7", leaf
  * n256. These plain forms are our own drawings after that plate,
  * constructed in code from lines, arcs and curves, with no font's outlines.
+ * Air's is a Tau with four Yods above it, drawn as small flames; the Yods
+ * stand for the 4 over the T in Dee's Sigillum Dei Aemeth (Plate II, leaf
+ * n238), and the Order drew Yods as flames (see `AirSigil`).
  * Of Regardie's coloured sigils (`Sigils`), only Air's form follows the
  * plate: Water and Fire are drawn from Regardie's description of them (The
  * Golden Dawn, vol. 4, 1940, p. 307), and Earth is a cross in four colours.
