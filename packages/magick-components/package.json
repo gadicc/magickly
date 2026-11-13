@@ -2,9 +2,40 @@
   "name": "magick-components",
   "version": "0.0.0",
   "private": true,
-  "description": "React components that draw magickal figures from magick-data: the Tree of Life, Golden Dawn temple halls, lamens, sigils, Enochian tablets, kameas and more",
-  "license": "MIT",
+  "description": "React components that draw magickal figures from magick-data: the Tree of Life, the Golden Dawn's temple halls, lamens and symbols, the rose-cross sigil, the Enochian tablets, the kameas, the planetary spirits' seals and the Moon",
+  "keywords": [
+    "magick",
+    "react",
+    "svg",
+    "tree of life",
+    "kabbalah",
+    "golden dawn",
+    "rose cross",
+    "sigil",
+    "enochian",
+    "kamea",
+    "astrology",
+    "occult",
+    "esoteric"
+  ],
+  "license": "(MIT AND OFL-1.1)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gadicc/magickly.git",
+    "directory": "packages/magick-components"
+  },
+  "homepage": "https://github.com/gadicc/magickly/tree/main/packages/magick-components#readme",
+  "bugs": "https://github.com/gadicc/magickly/issues",
   "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "files": [
+    "lib",
+    "fonts",
+    "README.md",
+    "LICENSE.txt"
+  ],
   "exports": {
     "./astrology/Kamea": "./src/astrology/Kamea.tsx",
     "./astrology/Mercury": "./src/astrology/Mercury.tsx",
@@ -40,24 +71,179 @@
     "./gd/TableOfShewbread": "./src/gd/TableOfShewbread.tsx",
     "./hooks/useHydrated": "./src/hooks/useHydrated.ts",
     "./kabbalah/fieldPath": "./src/kabbalah/fieldPath.ts",
-    "./kabbalah/TreeOfLife": "./src/kabbalah/TreeOfLife.tsx"
+    "./kabbalah/TreeOfLife": "./src/kabbalah/TreeOfLife.tsx",
+    "./fonts/*": "./fonts/*"
   },
-  "peerDependencies": {
-    "react": "^19"
-  },
-  "dependencies": {
-    "astronomy-engine": "2.1.19",
-    "dot-prop": "^10.2.0",
-    "lune": "^0.4.0",
-    "luxon": "3.7.2",
-    "magick-data": "workspace:*",
-    "nlopt-js": "^0.1.1"
+  "publishConfig": {
+    "exports": {
+      "./astrology/Kamea": {
+        "types": "./lib/astrology/Kamea.d.ts",
+        "default": "./lib/astrology/Kamea.js"
+      },
+      "./astrology/Mercury": {
+        "types": "./lib/astrology/Mercury.d.ts",
+        "default": "./lib/astrology/Mercury.js"
+      },
+      "./astrology/mercuryRetrograde": {
+        "types": "./lib/astrology/mercuryRetrograde.d.ts",
+        "default": "./lib/astrology/mercuryRetrograde.js"
+      },
+      "./astrology/Moon": {
+        "types": "./lib/astrology/Moon.d.ts",
+        "default": "./lib/astrology/Moon.js"
+      },
+      "./astrology/moonPath": {
+        "types": "./lib/astrology/moonPath.d.ts",
+        "default": "./lib/astrology/moonPath.js"
+      },
+      "./astrology/planetarySpirits": {
+        "types": "./lib/astrology/planetarySpirits.d.ts",
+        "default": "./lib/astrology/planetarySpirits.js"
+      },
+      "./astrology/planetDays": {
+        "types": "./lib/astrology/planetDays.d.ts",
+        "default": "./lib/astrology/planetDays.js"
+      },
+      "./astrology/planetName": {
+        "types": "./lib/astrology/planetName.d.ts",
+        "default": "./lib/astrology/planetName.js"
+      },
+      "./chakras/Chakras": {
+        "types": "./lib/chakras/Chakras.d.ts",
+        "default": "./lib/chakras/Chakras.js"
+      },
+      "./enochian/Tablet": {
+        "types": "./lib/enochian/Tablet.d.ts",
+        "default": "./lib/enochian/Tablet.js"
+      },
+      "./gd/GradeTree": {
+        "types": "./lib/gd/GradeTree.d.ts",
+        "default": "./lib/gd/GradeTree.js"
+      },
+      "./gd/hall": {
+        "types": "./lib/gd/hall/index.d.ts",
+        "default": "./lib/gd/hall/index.js"
+      },
+      "./gd/hall/aspect": {
+        "types": "./lib/gd/hall/aspect.d.ts",
+        "default": "./lib/gd/hall/aspect.js"
+      },
+      "./gd/hall/attributes": {
+        "types": "./lib/gd/hall/attributes.d.ts",
+        "default": "./lib/gd/hall/attributes.js"
+      },
+      "./gd/hall/describe": {
+        "types": "./lib/gd/hall/describe.d.ts",
+        "default": "./lib/gd/hall/describe.js"
+      },
+      "./gd/hall/GdHall": {
+        "types": "./lib/gd/hall/GdHall.d.ts",
+        "default": "./lib/gd/hall/GdHall.js"
+      },
+      "./gd/hall/layout": {
+        "types": "./lib/gd/hall/layout.d.ts",
+        "default": "./lib/gd/hall/layout.js"
+      },
+      "./gd/hall/planets": {
+        "types": "./lib/gd/hall/planets.d.ts",
+        "default": "./lib/gd/hall/planets.js"
+      },
+      "./gd/hall/presets": {
+        "types": "./lib/gd/hall/presets/index.d.ts",
+        "default": "./lib/gd/hall/presets/index.js"
+      },
+      "./gd/hall/spec": {
+        "types": "./lib/gd/hall/spec.d.ts",
+        "default": "./lib/gd/hall/spec.js"
+      },
+      "./gd/hall/types": {
+        "types": "./lib/gd/hall/types.d.ts",
+        "default": "./lib/gd/hall/types.js"
+      },
+      "./gd/hall/validate": {
+        "types": "./lib/gd/hall/validate.d.ts",
+        "default": "./lib/gd/hall/validate.js"
+      },
+      "./gd/hall/vocabulary": {
+        "types": "./lib/gd/hall/vocabulary.d.ts",
+        "default": "./lib/gd/hall/vocabulary.js"
+      },
+      "./gd/Lamen": {
+        "types": "./lib/gd/Lamen.d.ts",
+        "default": "./lib/gd/Lamen.js"
+      },
+      "./gd/lamenGrades": {
+        "types": "./lib/gd/lamenGrades.d.ts",
+        "default": "./lib/gd/lamenGrades.js"
+      },
+      "./gd/RoseSigil": {
+        "types": "./lib/gd/RoseSigil.d.ts",
+        "default": "./lib/gd/RoseSigil.js"
+      },
+      "./gd/roseSigilGeometry": {
+        "types": "./lib/gd/roseSigilGeometry.d.ts",
+        "default": "./lib/gd/roseSigilGeometry.js"
+      },
+      "./gd/RoseSigilImage": {
+        "types": "./lib/gd/RoseSigilImage.d.ts",
+        "default": "./lib/gd/RoseSigilImage.js"
+      },
+      "./gd/roseSigilOptimizer": {
+        "types": "./lib/gd/roseSigilOptimizer.d.ts",
+        "default": "./lib/gd/roseSigilOptimizer.js"
+      },
+      "./gd/SevenBranchedCandleStick": {
+        "types": "./lib/gd/SevenBranchedCandleStick.d.ts",
+        "default": "./lib/gd/SevenBranchedCandleStick.js"
+      },
+      "./gd/symbols/fylfot-cross": {
+        "types": "./lib/gd/symbols/fylfot-cross.d.ts",
+        "default": "./lib/gd/symbols/fylfot-cross.js"
+      },
+      "./gd/TableOfShewbread": {
+        "types": "./lib/gd/TableOfShewbread.d.ts",
+        "default": "./lib/gd/TableOfShewbread.js"
+      },
+      "./hooks/useHydrated": {
+        "types": "./lib/hooks/useHydrated.d.ts",
+        "default": "./lib/hooks/useHydrated.js"
+      },
+      "./kabbalah/fieldPath": {
+        "types": "./lib/kabbalah/fieldPath.d.ts",
+        "default": "./lib/kabbalah/fieldPath.js"
+      },
+      "./kabbalah/TreeOfLife": {
+        "types": "./lib/kabbalah/TreeOfLife.d.ts",
+        "default": "./lib/kabbalah/TreeOfLife.js"
+      },
+      "./fonts/*": "./fonts/*"
+    }
   },
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "rm -rf lib && tsc -p tsconfig.build.json",
+    "fonts:css": "node scripts/gdHallCss.mjs",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "peerDependencies": {
+    "@types/react": "^19",
+    "react": "^19"
+  },
+  "peerDependenciesMeta": {
+    "@types/react": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@types/luxon": "^3.7.6",
+    "astronomy-engine": "^2.1.19",
+    "dot-prop": "^10.2.0",
+    "lune": "^0.4.0",
+    "luxon": "^3.7.2",
+    "magick-data": "workspace:^",
+    "nlopt-js": "^0.1.1"
   },
   "devDependencies": {
-    "@types/luxon": "3.7.6",
     "@types/node": "24.19.2",
     "@types/react": "^19.3.0",
     "typescript": "^6.0.3"

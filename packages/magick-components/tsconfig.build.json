@@ -1,0 +1,54 @@
+{
+  // The publish emit, into lib/ (plan 080, decision 7). `files` names the
+  // entry points the published exports reach, and tsc follows their
+  // imports, so tests are never compiled; vendor.d.ts types lune and
+  // nlopt-js for the check and emits nothing.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "allowImportingTsExtensions": false,
+    "rewriteRelativeImportExtensions": true,
+    "declaration": true,
+    "rootDir": "src",
+    "outDir": "lib"
+  },
+  "include": [],
+  "files": [
+    "src/vendor.d.ts",
+    "src/astrology/Kamea.tsx",
+    "src/astrology/Mercury.tsx",
+    "src/astrology/mercuryRetrograde.ts",
+    "src/astrology/Moon.tsx",
+    "src/astrology/moonPath.ts",
+    "src/astrology/planetarySpirits.tsx",
+    "src/astrology/planetDays.ts",
+    "src/astrology/planetName.ts",
+    "src/chakras/Chakras.tsx",
+    "src/enochian/Tablet.tsx",
+    "src/gd/GradeTree.tsx",
+    "src/gd/hall/aspect.ts",
+    "src/gd/hall/attributes.ts",
+    "src/gd/hall/describe.ts",
+    "src/gd/hall/GdHall.tsx",
+    "src/gd/hall/index.ts",
+    "src/gd/hall/layout.ts",
+    "src/gd/hall/planets.ts",
+    "src/gd/hall/presets/index.ts",
+    "src/gd/hall/spec.ts",
+    "src/gd/hall/types.ts",
+    "src/gd/hall/validate.ts",
+    "src/gd/hall/vocabulary.ts",
+    "src/gd/Lamen.tsx",
+    "src/gd/lamenGrades.ts",
+    "src/gd/RoseSigil.tsx",
+    "src/gd/roseSigilGeometry.ts",
+    "src/gd/RoseSigilImage.tsx",
+    "src/gd/roseSigilOptimizer.ts",
+    "src/gd/SevenBranchedCandleStick.tsx",
+    "src/gd/symbols/fylfot-cross.tsx",
+    "src/gd/TableOfShewbread.tsx",
+    "src/hooks/useHydrated.ts",
+    "src/kabbalah/fieldPath.ts",
+    "src/kabbalah/TreeOfLife.tsx"
+  ]
+}

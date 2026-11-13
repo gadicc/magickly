@@ -1,18 +1,24 @@
-These components are MIT licensed so that they can be used in other projects,
-although the app around them is AGPL-3.0-or-later (see ../../LICENSE.txt).
+magick-components is under two licences, by path. The repository it comes
+from is AGPL-3.0-or-later (see ../../LICENSE.txt); this package is not.
 
-This licence covers the files in this directory and its subdirectories: the
-components themselves, which import no app code and can be used on their own.
-The tools around them, such as the image export, belong to the app.
+Code: MIT, below.
+  Everything but fonts/: the components, src/**/*.ts and src/**/*.tsx, and
+  the modules compiled from them into lib/, which the published package
+  carries. A component whose code is the drawing (the sigils, the lamens,
+  the hall's art, the planetary spirits' seals) is MIT as code, its path
+  data included, so the drawing may be taken from the package under MIT.
+  The CC BY 4.0 statement in ../../README.md covers the images magick.ly
+  draws and serves, its hand-drawn images and the data, not this code.
 
-MIT covers the drawings these components make: where a component's code is
-the drawing, its path data is code too. The CC BY 4.0 statement in
-../../README.md covers the images magick.ly draws and serves, its hand-drawn
-images and the data, not this code.
+Fonts: SIL Open Font License 1.1.
+  fonts/*.woff2, subsets of Noto Serif (Copyright 2022 The Noto Project
+  Authors; fonts/NotoSerif-OFL.txt) and Frank Ruhl Libre (Copyright 2015
+  The Frank Ruhl Libre Project Authors; fonts/FrankRuhlLibre-OFL.txt).
+  fonts/SOURCES.md says where they come from. fonts/gd-hall.css, which only
+  declares them, is MIT with the code.
 
-The data these components read, in ../magick-data, is CC BY 4.0
-(../magick-data/LICENSE-DATA.txt; its LICENSE.txt says which
-files are data and which are code).
+The data these components read comes from the magick-data package, which
+is licensed by its own files (its code MIT, its data CC BY 4.0).
 
 ---
 

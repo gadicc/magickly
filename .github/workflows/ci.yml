@@ -191,15 +191,27 @@ jobs:
       # Turbopack's development compatibility check from overwriting each other.
       - run: pnpm ${{ matrix.command }}
 
+  # magick-components' published shape (plan 080, decision 7): built and
+  # packed with magick-data, installed by npm into a fixture, loaded in Node,
+  # type-checked, and built by Next with webpack and with Turbopack.
+  components:
+    name: Components package
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: ./.github/actions/setup
+      - run: pnpm --filter magick-components smoke
+
   # Preserve the existing required check, and fail it even if a dependency was
   # skipped or cancelled. Production release still waits for the whole workflow.
   verify:
     if: ${{ always() }}
-    needs: [checks, tests, coverage, build]
+    needs: [checks, tests, coverage, build, components]
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
       - name: Require every verification job to pass
         env:
           RESULTS: ${{ join(needs.*.result, ',') }}
-        run: test "$RESULTS" = success,success,success,success
+        run: test "$RESULTS" = success,success,success,success,success

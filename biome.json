@@ -18,6 +18,7 @@
       "!drizzle/meta/**",
       "!packages/magick-data/dist/**",
       "!public/fonts/**",
+      "!packages/magick-components/fonts/**",
       "!assets/fonts/**",
       "!**/*.svg",
       "!src/fonts/enochian/**",

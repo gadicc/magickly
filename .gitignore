@@ -14,6 +14,7 @@
 # package's compiled modules, which only its publish build writes
 /packages/magick-data/dist/
 /packages/magick-data/lib/
+/packages/magick-components/lib/
 
 # next.js
 /.next/

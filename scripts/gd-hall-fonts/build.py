@@ -15,6 +15,8 @@ and writes:
   the server's image renderer (resvg reads no WOFF2; plan 062), outside
   public/ so no URL serves them and the service worker never caches them
 - public/fonts/NotoSerif-OFL.txt, FrankRuhlLibre-OFL.txt (upstream notices)
+- packages/magick-components/fonts/, the same three WOFF2 subsets and two
+  notices, which the package ships (plan 080)
 - public/fonts/NotoSans-OFL.txt, NotoSansHebrew-OFL.txt, the notices the
   existing NotoSans-Regular.ttf and NotoSansHebrew-Regular.ttf lacked: their
   own copyright line (name ID 0) above the OFL 1.1 text
@@ -98,9 +100,9 @@ NO_LIGATURES = {"liga": False, "clig": False, "dlig": False, "hlig": False,
 ROOT = Path(__file__).resolve().parents[2]
 PUBLIC_FONTS = ROOT / "public" / "fonts"
 ASSET_FONTS = ROOT / "assets" / "fonts"
-METRICS_JSON = (
-    ROOT / "packages" / "magick-components" / "src" / "gd" / "hall" / "fontMetrics.json"
-)
+PACKAGE = ROOT / "packages" / "magick-components"
+PACKAGE_FONTS = PACKAGE / "fonts"
+METRICS_JSON = PACKAGE / "src" / "gd" / "hall" / "fontMetrics.json"
 
 
 def sha256(data: bytes) -> str:
@@ -319,6 +321,13 @@ def main() -> None:
     check_pairs(hebrew_metrics, hebrew_shaped, [
         "אדני", "אוריאל", "כרוב", "פרת", "צפון", "פורלאך", "ארץ",
     ])
+    # magick-components ships the WOFF2 subsets and their notices too, byte
+    # for byte the app's (plan 080, decision 7; a test holds them equal).
+    for name in ("NotoSerif-Italic-latin1.woff2",
+                 "NotoSerif-BoldItalic-compass.woff2",
+                 "FrankRuhlLibre-Bold-letters.woff2",
+                 "NotoSerif-OFL.txt", "FrankRuhlLibre-OFL.txt"):
+        outputs[PACKAGE_FONTS / name] = outputs[PUBLIC_FONTS / name]
     hebrew_glyphs = TTFont(io.BytesIO(outputs[PUBLIC_FONTS / "FrankRuhlLibre-Bold-letters.woff2"]))
     shin = hebrew_glyphs["glyf"][hebrew_glyphs.getBestCmap()[0x05E9]]
     document = {
