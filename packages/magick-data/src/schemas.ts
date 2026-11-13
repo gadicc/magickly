@@ -360,23 +360,23 @@ export const schemas = {
                 crowley777: v.pipe(
                   v.string(),
                   v.description(
-                    "Crowley's, in 777 Revised (1955), Table III, column CXCIV.",
+                    "Crowley's, in 777 Revised (1955), Table III, column CXCIV: a variant of the name, in 777's own spelling, not a romanisation of `he`.",
                   ),
                 ),
                 regardie1940: v.pipe(
                   v.string(),
                   v.description(
-                    "The Golden Dawn's, in Regardie's The Golden Dawn, vol. 4 (1940), p. 86.",
+                    "The Golden Dawn's, in Regardie's The Golden Dawn, vol. 4 (1940), p. 86, which prints it in capitals: a related form of the name, in that source's own spelling, not a romanisation of `he`.",
                   ),
                 ),
               }),
               v.description(
-                "The name romanised as each source spells it, keyed by source; the data file's header cites each.",
+                "The name romanised as each source spells it, keyed by source; the data file's header cites each. Only Agrippa's spells `he`; 777's and Regardie's follow those sources' own spellings of the name.",
               ),
             ),
           }),
           v.description(
-            "The Moon's intelligence of intelligences: the name Agrippa gives the Moon in place of a single intelligence (De occulta philosophia, 1533, Book II, chapter 22), which 777 and the Golden Dawn also give. The Moon only; its `intelligenceId` is Shelachel, a short modern name.",
+            "The Moon's intelligence of intelligences: the name Agrippa gives the Moon in place of a single intelligence (De occulta philosophia, 1533, Book II, chapter 22), of which 777 and the Golden Dawn give variant forms. The Moon only; its `intelligenceId` is Shelachel, a name found in present-day sources.",
           ),
         ),
       ),
@@ -396,7 +396,7 @@ export const schemas = {
           archangelId:
             "The planet's archangel, whose row names the planet back. The seven classical planets only.",
           intelligenceId:
-            "The planet's intelligence: Nakhiel for the Sun. Six are the names Agrippa gives with the planets' magic squares (De occulta philosophia, Book II, chapter 22). The Moon's, Shelachel, is a short modern name found in present-day sources, whose origin we have not found in Agrippa, 777 or Heydon; the name Agrippa gives the Moon is `intelligenceOfIntelligences`. There is no table of intelligences yet. The seven classical planets only.",
+            "The planet's intelligence: Nakhiel for the Sun. Six are the names Agrippa gives with the planets' magic squares (De occulta philosophia, Book II, chapter 22). The Moon's, Shelachel, is a name found in present-day sources; we have not found it in Agrippa, in 777 (the revised edition of 1955) or in Heydon's Theomagia (1663/4); the name Agrippa gives the Moon is `intelligenceOfIntelligences`. There is no table of intelligences yet. The seven classical planets only.",
           spiritId:
             "The planet's spirit, as Agrippa names it beside the intelligence: Sorath for the Sun. There is no table of spirits yet; a geomantic figure's `rulerIds` name the same ones. The seven classical planets only.",
         },

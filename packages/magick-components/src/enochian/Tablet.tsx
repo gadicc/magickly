@@ -353,9 +353,11 @@ export const Sigils = {
  * (1912), "Liber Chanokh", Plate X, one sigil in each corner (Air top
  * left, Water top right, Earth bottom left, Fire bottom right); archive.org
  * `crowley-equinox_202110`, the file "The Equinox Vol. 1, No. 7", leaf
- * n256. All four, here and in Regardie's colours (`Sigils`), are our own
- * drawings after that plate, constructed in code from lines, arcs and
- * curves, with no font's outlines.
+ * n256. These plain forms are our own drawings after that plate,
+ * constructed in code from lines, arcs and curves, with no font's outlines.
+ * Of Regardie's coloured sigils (`Sigils`), only Air's form follows the
+ * plate: Water and Fire are drawn from Regardie's description of them (The
+ * Golden Dawn, vol. 4, 1940, p. 307), and Earth is a cross in four colours.
  */
 export const EquinoxSigils = {
   earth: PlainEarthSigil,

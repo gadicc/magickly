@@ -110,17 +110,17 @@ export function IntelligenceNotes({
           </MuiLink>
           , he names an “intelligence of intelligences” in its place, numbered
           3321, the sum of the Moon&apos;s magic square. Crowley&apos;s{" "}
-          <cite>777</cite> gives the same name, as{" "}
-          <span lang="he-Latn">{classical.roman.crowley777}</span>, and so does
-          the Golden Dawn tradition, as{" "}
+          <cite>777</cite> gives a variant of the name, as{" "}
+          <span lang="he-Latn">{classical.roman.crowley777}</span>, and the
+          Golden Dawn tradition a related form, as{" "}
           <span lang="he-Latn">{classical.roman.regardie1940}</span> in the
           Order&apos;s papers Regardie published. <BackLink n={1} />
         </li>
         <li id={NOTE_IDS.note(2)}>
-          {shelachel} is a short modern name found in present-day sources. We
-          have not found where it comes from: it is not in Agrippa, in{" "}
-          <cite>777</cite> or in Heydon&apos;s <cite>Theomagia</cite> (1663).{" "}
-          <BackLink n={2} />
+          {shelachel} is a name found in present-day sources. We have not found
+          where it comes from, nor found it in Agrippa, in <cite>777</cite> (the
+          revised edition of 1955) or in Heydon&apos;s <cite>Theomagia</cite>{" "}
+          (1663/4). <BackLink n={2} />
         </li>
       </ol>
     </section>

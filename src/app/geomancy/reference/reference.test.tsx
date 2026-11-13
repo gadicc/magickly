@@ -43,9 +43,12 @@ describe("geomancy reference page", () => {
     // (with the spans removed the bytes are those above, 62257 5618f825…),
     // and when the Moon's intelligence gave Agrippa's name beside Shelachel
     // with a note on each (13 November 2026; with the two references and
-    // the notes removed the bytes are those before, 63432 ad73c10d…).
+    // the notes removed the bytes are those before, 63432 ad73c10d…), and
+    // when the notes called 777's and the Golden Dawn's names variants and
+    // said less about Shelachel (13 November 2026; with the notes' old
+    // words the bytes are those before, 66525 40af8b13…).
     expect(digest(html)).toBe(
-      "66525 40af8b13557c55842b2455a7a4220d45110e0829028d0cd8b6f4f3e93ab89d37",
+      "66554 c0f8d8485230125def12727c16f00d72fb6ca0978c0f99b94d0b29adf34a379d",
     );
   });
 

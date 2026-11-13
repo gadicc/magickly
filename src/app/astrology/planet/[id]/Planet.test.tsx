@@ -316,10 +316,10 @@ describe("the planet page", () => {
       ),
     );
     expect(first).toBe(
-      "Malcha betharsisim hed beruah schehakim is the classical name. Agrippa gives the Moon no single intelligence: in De occulta philosophia (1533), Book II, chapter 22, he names an “intelligence of intelligences” in its place, numbered 3321, the sum of the Moon's magic square. Crowley's 777 gives the same name, as Malkah Be Tarshishim va A'ad Be Ruah Shehaqim, and so does the Golden Dawn tradition, as Malcah Betarshisim ve-ad Ruachoth ha-Schechalim in the Order's papers Regardie published. ↩︎",
+      "Malcha betharsisim hed beruah schehakim is the classical name. Agrippa gives the Moon no single intelligence: in De occulta philosophia (1533), Book II, chapter 22, he names an “intelligence of intelligences” in its place, numbered 3321, the sum of the Moon's magic square. Crowley's 777 gives a variant of the name, as Malkah Be Tarshishim va A'ad Be Ruah Shehaqim, and the Golden Dawn tradition a related form, as Malcah Betarshisim ve-ad Ruachoth ha-Schechalim in the Order's papers Regardie published. ↩︎",
     );
     expect(second).toBe(
-      "Shelachel is a short modern name found in present-day sources. We have not found where it comes from: it is not in Agrippa, in 777 or in Heydon's Theomagia (1663). ↩︎",
+      "Shelachel is a name found in present-day sources. We have not found where it comes from, nor found it in Agrippa, in 777 (the revised edition of 1955) or in Heydon's Theomagia (1663/4). ↩︎",
     );
     expect(hrefsOf(notes ?? "")).toContain(
       "https://archive.org/details/DeOccultaPhilosophiaLoc1533/page/n164/mode/1up",

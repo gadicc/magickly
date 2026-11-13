@@ -359,7 +359,7 @@ describe("the gd-hall image", () => {
  * new values after a reviewed change, run this file with GD_HALL_PINS
  * set to a file to write them to. Theoricus 1 and 2 and Portal 1 and 2
  * moved when the Air tablet's sigil was redrawn after the Equinox's Plate
- * X (plan 080, "Before publishing"); their sources were 3c8d2e0a…,
+ * X (plan 080, "The sigils' sources"); their sources were 3c8d2e0a…,
  * dcf02ee9…, f8c29109… and 8c19b493… before.
  */
 const PINS: Record<string, readonly string[]> = {

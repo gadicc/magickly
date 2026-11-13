@@ -73,8 +73,8 @@ describe("Tablet", () => {
       "5d047bcf70775ffc79ce745119e6d7c3f7413604ce68739df454547c7ce8d297",
     ],
     // Air's four moved when its sigil was redrawn after the Equinox's
-    // Plate X, in place of two fonts' glyphs (plan 080, "Before
-    // publishing"); 8b12dffc…, 657b0c6f…, c597afb2… and a14408e1… before.
+    // Plate X, in place of two fonts' glyphs (plan 080, "The sigils'
+    // sources"); 8b12dffc…, 657b0c6f…, c597afb2… and a14408e1… before.
     [
       "air",
       false,
@@ -275,6 +275,15 @@ describe("Tablet", () => {
         for (const version of ["gd", "regardie", "equinox"])
           expect(drawIn(id, version)).not.toContain("data-sigil-note");
       }
+    });
+
+    // The Equinox's Air sigil, drawn after its Plate X (plan 080, "The
+    // sigils' sources"), which the hashes above, all in the Golden Dawn's
+    // version, do not reach.
+    it("draws the Equinox's Air sigil as it did", () => {
+      expect(sha256(renderToStaticMarkup(EquinoxSigils.air()))).toBe(
+        "e2793a22788e02704137ad398ec07933f80b0dbf4bff469b30d905ba5a6c5395",
+      );
     });
 
     it("mirrors its own reversed letters, unless told not to", () => {

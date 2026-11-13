@@ -214,7 +214,7 @@ describe("component image registry", () => {
     // the Golden Dawn's letters, with its O and A reversed (plan 061,
     // "Tablet versions"); then 127,724, 28267bac…, and 223,063, 1a637907…,
     // until its sigil was redrawn after the Equinox's Plate X in place of
-    // two fonts' glyphs (plan 080, "Before publishing"). Reviewed again as
+    // two fonts' glyphs (plan 080, "The sigils' sources"). Reviewed again as
     // rasterised.
     [
       "enochian-tablet",

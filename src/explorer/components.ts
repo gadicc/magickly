@@ -99,7 +99,7 @@ const PAGES: Record<ComponentName, ComponentPage> = {
     title: "Planetary Spirit Sigil",
     description:
       "A React component that draws the geomantic sigils of the seven " +
-      "planetary spirits, Zazel to Chasmodai, after Heydon's Theomagia (1663).",
+      "planetary spirits, Zazel to Chasmodai, after Heydon's Theomagia (1663/4).",
     dark: "spirit",
   },
   Chakras: {
