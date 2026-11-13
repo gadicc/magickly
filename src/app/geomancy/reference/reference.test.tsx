@@ -40,9 +40,12 @@ describe("geomancy reference page", () => {
     // corrected, and when plan 075 replaced the texts with the Equinox's
     // table and the houses in our own words (10 November 2026), and when
     // plan 076 wrapped the tetragrams and spirits in dark-mode ink spans
-    // (with the spans removed the bytes are those above, 62257 5618f825…).
+    // (with the spans removed the bytes are those above, 62257 5618f825…),
+    // and when the Moon's intelligence gave Agrippa's name beside Shelachel
+    // with a note on each (13 November 2026; with the two references and
+    // the notes removed the bytes are those before, 63432 ad73c10d…).
     expect(digest(html)).toBe(
-      "63432 ad73c10ddfb80ca71da09300f423eba460d6b1f4c869f7b4c95fe4ffde4f24d1",
+      "66525 40af8b13557c55842b2455a7a4220d45110e0829028d0cd8b6f4f3e93ab89d37",
     );
   });
 
@@ -82,5 +85,40 @@ describe("geomancy reference page", () => {
         "Unfavourable, pain, and loss.",
       ]),
     ).not.toContain(-1);
+  });
+
+  it("gives the Moon both intelligences, each linked to its note", () => {
+    const cell = html.match(
+      /<span lang="he-Latn">Malcha betharsisim hed beruah schehakim<\/span>[\s\S]*?<\/td>/,
+    )?.[0];
+    expect(cell).toBeDefined();
+    expect(cell).toContain(
+      'href="#intelligence-note-1" id="intelligence-ref-1"',
+    );
+    expect(cell).toMatch(/ \/ <!-- -->Shelachel<sup/);
+    expect(cell).toContain(
+      'href="#intelligence-note-2" id="intelligence-ref-2"',
+    );
+    // The notes follow the table, under a heading of their own.
+    expect(
+      positions(html, [
+        "Spirits and Rulers",
+        '<h3 id="intelligence-notes-heading">Notes</h3>',
+        '<li id="intelligence-note-1">',
+        'href="#intelligence-ref-1"',
+        '<li id="intelligence-note-2">',
+        'href="#intelligence-ref-2"',
+      ]),
+    ).not.toContain(-1);
+    // The other six keep their one name.
+    for (const name of [
+      "Nakhiel",
+      "Tiriel",
+      "Hagiel",
+      "Graphiel",
+      "Iophiel",
+      "Agiel",
+    ])
+      expect(html).toMatch(new RegExp(`<td[^>]*>${name}</td>`));
   });
 });

@@ -1,0 +1,46 @@
+/* The Moon's two intelligences and their notes (Intelligence.tsx). */
+
+/* A reference in the line, kept from widening the line it sits in. */
+.ref {
+  font-size: 0.75em;
+  line-height: 0;
+  margin-left: 0.1em;
+}
+
+/* Where a link to a note or back to its reference stops: below the app
+   bar, which is fixed over the top of the page. */
+.ref a,
+.notes li {
+  scroll-margin-top: 72px;
+}
+
+.notes {
+  margin-top: 2em;
+  font-size: 0.9rem;
+}
+
+.notes ol {
+  margin: 0;
+  padding-left: 1.5em;
+}
+
+.notes li + li {
+  margin-top: 0.5em;
+}
+
+/* The note a reference has just led to, marked as the data pages mark a
+   row (plan 080, stage C): a tint, not a colour change. */
+.notes li:target {
+  background: rgba(128, 128, 128, 0.15);
+  outline: 0.25em solid rgba(128, 128, 128, 0.15);
+}
+
+.back {
+  text-decoration: none;
+}
+
+/* Under a page's own h2, as on the geomancy reference. */
+.notes h3 {
+  font-size: 1.05rem;
+  margin: 0 0 0.5em;
+}

@@ -21,6 +21,12 @@ export const fields: EntityFields = {
     "archangel",
     // Pending links with no table yet, so rendered as text, capitalised.
     "intelligenceId",
+    // The Moon's other intelligence, beside Shelachel in the Intelligence
+    // row, with a note on each (../Intelligence.tsx). The Hebrew is
+    // Agrippa's; of the romanisations, his is in the row and 777's and the
+    // Golden Dawn's in the note.
+    "intelligenceOfIntelligences.he",
+    "intelligenceOfIntelligences.roman",
     "spiritId",
     "zodiacs",
     "tetragrams",
@@ -39,8 +45,5 @@ export const fields: EntityFields = {
     "hebrewLetterId",
     "godNameId",
     "archangelId",
-    // The Moon's intelligence of intelligences, not shown yet.
-    "intelligenceOfIntelligences.he",
-    "intelligenceOfIntelligences.roman",
   ],
 };

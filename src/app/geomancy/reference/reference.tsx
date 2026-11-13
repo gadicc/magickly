@@ -21,6 +21,10 @@ import PlanetarySpirit from "magick-components/astrology/planetarySpirits";
 import data from "magick-data";
 import { PlanetId } from "magick-data/astrology/planets";
 import React from "react";
+import {
+  Intelligence,
+  IntelligenceNotes,
+} from "@/app/astrology/planet/Intelligence";
 import Ink from "@/drawings/Ink";
 import { capitalizeFirstLetter } from "@/lib/utils";
 import Tetragram from "../Tetragram";
@@ -189,7 +193,7 @@ export default function Geomancy() {
                       {planet.symbol} {planet.name.en.en}
                     </TableCell>
                     <TableCell align="center">
-                      {capitalizeFirstLetter(planet.intelligenceId || "")}
+                      <Intelligence planet={planet} />
                     </TableCell>
                     <TableCell align="center">
                       {capitalizeFirstLetter(planet.spiritId || "")} &nbsp;
@@ -206,6 +210,8 @@ export default function Geomancy() {
             </TableBody>
           </Table>
         </TableContainer>
+        {/* The Moon's two intelligences have a note each. */}
+        <IntelligenceNotes planet={data.planet.luna} level={3} />
         <br />
 
         <Typography

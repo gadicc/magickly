@@ -20,9 +20,10 @@ import {
   Trail,
 } from "@/ui/entity";
 import Link from "@/ui/Link";
+import { Intelligence, IntelligenceNotes } from "../Intelligence";
 import styles from "./planet.module.css";
 
-/** The spirits and intelligences are ids, in lower case, with no table yet. */
+/** The spirits are ids, in lower case, with no table yet. */
 function capitalize(text: string) {
   return text[0].toUpperCase() + text.slice(1);
 }
@@ -266,7 +267,9 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
             ) : null}
           </Row>
           <Row label="Intelligence">
-            {planet.intelligenceId ? capitalize(planet.intelligenceId) : null}
+            {planet.intelligenceId ? (
+              <Intelligence planet={planet} hebrew />
+            ) : null}
           </Row>
           <Row label="Spirit">
             {planet.spiritId ? (
@@ -330,6 +333,9 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
           ))}
         </p>
       ) : null}
+
+      {/* The Moon's two intelligences have a note each, at the foot. */}
+      <IntelligenceNotes planet={planet} />
     </EntityFrame>
   );
 }

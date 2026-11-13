@@ -266,6 +266,85 @@ describe("the planet page", () => {
     expect(row(html, "Archangel").text).toBe("גבריאל Gavriel");
   });
 
+  it("gives the Moon both intelligences, each with a note at the foot", async () => {
+    const html = await page("luna");
+    // Agrippa's Hebrew and name, then Shelachel, each with its reference.
+    const intelligence = row(html, "Intelligence");
+    expect(intelligence.text).toBe(
+      "מלכא בתרשיתים עד ברוח שחקים Malcha betharsisim hed beruah schehakim1 / Shelachel2",
+    );
+    // Same-page links only, which `expectEntityPage` holds to ids that
+    // exist; the markup is read below.
+    expect(intelligence.hrefs).toEqual([]);
+    // The Hebrew stands alone, so it is set in Frank Ruhl Libre (plan 079),
+    // as the `Hebrew` of every entity page is.
+    expect(html).toMatch(
+      /<span lang="he" dir="rtl" class="[^"]*hebrew[^"]*">מלכא בתרשיתים עד ברוח שחקים<\/span>/,
+    );
+
+    // The notes come last, under a heading the references are described
+    // by; each reference and its note link to each other.
+    const notes = html.match(
+      /<section id="intelligence-notes" aria-labelledby="intelligence-notes-heading"[^>]*>([\s\S]*?)<\/section>/,
+    )?.[1];
+    expect(notes).toBeDefined();
+    // After the table and the "See also" line.
+    const seeAlso = html.search(/<p class="[^"]*seeAlso/);
+    expect(seeAlso).toBeGreaterThan(html.indexOf("</table>"));
+    expect(html.indexOf('<section id="intelligence-notes"')).toBeGreaterThan(
+      seeAlso,
+    );
+    expect(notes).toContain('<h2 id="intelligence-notes-heading">Notes</h2>');
+    for (const n of [1, 2]) {
+      const ref = html.match(
+        new RegExp(`<a [^>]*href="#intelligence-note-${n}"[^>]*>`),
+      )?.[0];
+      expect(ref).toContain(`id="intelligence-ref-${n}"`);
+      expect(ref).toContain('aria-describedby="intelligence-notes-heading"');
+      const note = notes?.match(
+        new RegExp(`<li id="intelligence-note-${n}">([\\s\\S]*?)</li>`),
+      )?.[1];
+      expect(note).toContain(
+        `href="#intelligence-ref-${n}" aria-label="Back to reference ${n}"`,
+      );
+    }
+    const [first, second] = [1, 2].map((n) =>
+      textOf(
+        notes?.match(
+          new RegExp(`<li id="intelligence-note-${n}">([\\s\\S]*?)</li>`),
+        )?.[1] ?? "",
+      ),
+    );
+    expect(first).toBe(
+      "Malcha betharsisim hed beruah schehakim is the classical name. Agrippa gives the Moon no single intelligence: in De occulta philosophia (1533), Book II, chapter 22, he names an “intelligence of intelligences” in its place, numbered 3321, the sum of the Moon's magic square. Crowley's 777 gives the same name, as Malkah Be Tarshishim va A'ad Be Ruah Shehaqim, and so does the Golden Dawn tradition, as Malcah Betarshisim ve-ad Ruachoth ha-Schechalim in the Order's papers Regardie published. ↩︎",
+    );
+    expect(second).toBe(
+      "Shelachel is a short modern name found in present-day sources. We have not found where it comes from: it is not in Agrippa, in 777 or in Heydon's Theomagia (1663). ↩︎",
+    );
+    expect(hrefsOf(notes ?? "")).toContain(
+      "https://archive.org/details/DeOccultaPhilosophiaLoc1533/page/n164/mode/1up",
+    );
+  });
+
+  it("gives every other planet its one intelligence and no notes", async () => {
+    const intelligences: Record<string, string> = {};
+    for (const id of ids) {
+      if (id === "luna") continue;
+      const html = await page(id);
+      expect(html, id).not.toContain("intelligence-note");
+      const found = rowsOf(html).find((each) => each.label === "Intelligence");
+      if (found) intelligences[id] = found.text;
+    }
+    expect(intelligences).toEqual({
+      sol: "Nakhiel",
+      mercury: "Tiriel",
+      venus: "Hagiel",
+      mars: "Graphiel",
+      jupiter: "Iophiel",
+      saturn: "Agiel",
+    });
+  });
+
   it("gives Earth its text, its symbol and its grade and no more", async () => {
     // Earth has no letter and no Hebrew name, only the grade that is
     // attributed to it, Zelator's.
