@@ -20,6 +20,7 @@ import HomeText from "./HomeText";
 import KabbalahText from "./kabbalah/KabbalahText";
 import TreeText from "./kabbalah/tree/TreeText";
 import AngelsText from "./kabbalah/yhvh/72angels/AngelsText";
+import OpenSourceText from "./open-source/OpenSourceText";
 
 /** Each page's text below its tiles or tool (plan 071, decisions 4 and 5). */
 const TEXTS: Record<string, ComponentType> = {
@@ -41,7 +42,20 @@ const TEXTS: Record<string, ComponentType> = {
   "/kabbalah/tree": TreeText,
   "/kabbalah/yhvh/72angels": AngelsText,
   "/gd/halls": HallsText,
+  "/open-source": OpenSourceText,
 };
+
+/**
+ * The other sites a text may link: licences and where the packages live.
+ * Their pages cannot be checked here, so each host is named on purpose.
+ */
+const OUTSIDE_HOSTS = new Set([
+  "creativecommons.org",
+  "github.com",
+  "opensource.org",
+  "www.gnu.org",
+  "www.npmjs.com",
+]);
 
 const listed = new Set(
   sitemap().map(
@@ -78,7 +92,13 @@ describe.each(Object.entries(TEXTS))("%s's text", (path, Text) => {
     );
     expect(hrefs.length).toBeGreaterThan(0);
     for (const href of hrefs) {
-      const target = new URL(href, "https://magick.ly").pathname;
+      const url = new URL(href, "https://magick.ly");
+      if (url.origin !== "https://magick.ly") {
+        expect(url.protocol, href).toBe("https:");
+        expect(OUTSIDE_HOSTS.has(url.host), href).toBe(true);
+        continue;
+      }
+      const target = url.pathname;
       expect(listed.has(target), href).toBe(true);
       expect(target, href).not.toBe(path);
     }

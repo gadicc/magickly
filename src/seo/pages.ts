@@ -235,6 +235,12 @@ export const PUBLIC_PAGES = {
       "The Shem HaMephorash, the 72-fold name of God drawn from the three " +
       "72-letter verses of Exodus 14:19–21, and the 72 angels named after it.",
   },
+  "/open-source": {
+    title: "Open Source Licences and Packages",
+    description:
+      "What you may reuse from Magick.ly and how: the app under AGPL, the " +
+      "package code under MIT, the data under CC BY 4.0, and the npm packages.",
+  },
   "/books": {
     title: "Books",
     description:

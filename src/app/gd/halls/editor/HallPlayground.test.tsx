@@ -256,7 +256,9 @@ describe("the /gd/halls/editor page", { timeout: 20_000 }, () => {
     const text = markup.indexOf("kept as a draft in this browser only");
     expect(words).toBeLessThan(text);
     expect(text).toBeLessThan(editor);
-    expect(markup.indexOf("Magick.ly is open-source")).toBeGreaterThan(sources);
+    expect(
+      markup.indexOf("You can see the code used to generate this page"),
+    ).toBeGreaterThan(sources);
     // Browsing is its own page (plan 062's amendment): no gallery here,
     // and nothing to hold it below the fold.
     expect(markup).not.toContain('id="halls"');

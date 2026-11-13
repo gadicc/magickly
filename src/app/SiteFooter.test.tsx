@@ -103,6 +103,24 @@ describe("SiteFooter", () => {
     expect(html).toMatch(/aria-current="true"[^>]*>Golden Dawn</);
   });
 
+  it("gives open source a column, with the repository in it", () => {
+    const section = footerSections().find(({ url }) => url === "/open-source");
+    expect(section).toMatchObject({
+      title: "Open source",
+      pages: [
+        { title: "Source code", url: "https://github.com/gadicc/magickly" },
+      ],
+    });
+    const html = render("/open-source");
+    expect(html).toMatch(/aria-current="page"[^>]*>Open source</);
+    // Once, in that column, not again under Magick.ly.
+    expect(
+      hrefs(html).filter(
+        (href) => href === "https://github.com/gadicc/magickly",
+      ),
+    ).toHaveLength(1);
+  });
+
   it("links other sites plainly", () => {
     const html = render("/");
     expect(html).toMatch(/<a href="https:\/\/forums\.magick\.ly"[^>]*>Forum</);

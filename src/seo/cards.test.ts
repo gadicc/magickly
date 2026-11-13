@@ -40,6 +40,10 @@ describe("social cards", () => {
       art: { file: "public/pics/planets2013.jpg", position: "left" },
     });
     expect(socialCard("/about", "About").section).toBe("Magick.ly");
+    expect(socialCard("/open-source", "x")).toMatchObject({
+      section: "Open source",
+      art: { kind: "diagram", slug: "tree-of-life" },
+    });
     // A prefix only matches whole segments.
     expect(socialCard("/gdx", "x").section).toBe("Magick.ly");
   });

@@ -51,16 +51,14 @@ export default function Sequence() {
             </li>
             <li>
               Publish useful magick{" "}
-              <a href="https://github.com/gadicc/magickly/tree/main/packages/magick-data">
-                data
-              </a>{" "}
-              in JSON format with types.
+              <Link href="/open-source#magick-data">data</Link> in JSON format
+              with types.
             </li>
             <li>
               Publish useful magick{" "}
-              <a href="https://github.com/gadicc/magickly/tree/main/src/components">
+              <Link href="/open-source#magick-components">
                 react components
-              </a>
+              </Link>
               .
             </li>
             <li>
@@ -74,30 +72,13 @@ export default function Sequence() {
         <h2 id="licence">Licence</h2>
 
         <p>
-          Copyright (c) 2020-2026 Gadi Cohen. This app is free software under
-          the{" "}
+          Copyright (c) 2020-2026 Gadi Cohen. The app is free software under the{" "}
           <a href="https://www.gnu.org/licenses/agpl-3.0.html">
             GNU Affero General Public License
           </a>
-          , version 3 or any later version: you may use it, change it and run
-          it, and anyone you serve it to may have its source.
-        </p>
-
-        <p>
-          Two parts are deliberately freer. The{" "}
-          <a href="https://github.com/gadicc/magickly/tree/main/packages/magick-data">
-            data
-          </a>{" "}
-          is{" "}
-          <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>{" "}
-          (a Creative Commons licence, like Wikipedia’s), as are the images this
-          app draws, such as the Tree of Life, sigils, tablets, lamens and the{" "}
-          <Link href="/gd/halls">temple halls</Link>: use them anywhere, with
-          credit. The marked{" "}
-          <a href="https://github.com/gadicc/magickly/tree/main/src/components">
-            components
-          </a>{" "}
-          are MIT.
+          , version 3 or any later version; its data, components and images are
+          under freer licences, set out under{" "}
+          <Link href="/open-source">Open source</Link>.
         </p>
 
         <p>

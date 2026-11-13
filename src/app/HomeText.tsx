@@ -98,9 +98,10 @@ export default function HomeText() {
       </p>
       <H3>Open source, open data</H3>
       <p>
-        The app&apos;s code is on GitHub. The data and the images the app draws
-        (the Tree of Life, sigils, tablets and temple halls) are free to reuse
-        under CC BY 4.0, with credit. See <Link href="/about">About</Link>.
+        The app&apos;s code is on GitHub. Its data is free to reuse under CC BY
+        4.0, with credit, and the components that draw the Tree of Life, sigils,
+        tablets and temple halls under MIT. See{" "}
+        <Link href="/open-source">Open source</Link>.
       </p>
     </PageText>
   );

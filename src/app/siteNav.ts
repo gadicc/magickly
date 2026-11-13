@@ -1,3 +1,4 @@
+import { SITE_REPOSITORY } from "@/seo/site";
 import pathnames, { type Pathnames, type PathnameValue } from "./pathnames";
 
 export const SITE_TITLE = "Magick.ly";
@@ -174,14 +175,26 @@ const FOOTER_SECTIONS = [
   "astrology",
   "geomancy",
   "books",
+  "open-source",
 ] as const;
+
+/** Links a section's footer column adds after its own pages. */
+const FOOTER_EXTRAS: Partial<
+  Record<(typeof FOOTER_SECTIONS)[number], NavLink[]>
+> = {
+  "open-source": [{ title: "Source code", url: SITE_REPOSITORY }],
+};
 
 /** Every public section and its pages, from `pathnames.ts`. */
 export function footerSections(): FooterSection[] {
   return FOOTER_SECTIONS.map((key) => {
     const section = pathnames[key] as Pathnames;
     const url = `/${key}`;
-    return { title: section["/"], url, pages: childrenOf(section, url) };
+    return {
+      title: section["/"],
+      url,
+      pages: [...childrenOf(section, url), ...(FOOTER_EXTRAS[key] ?? [])],
+    };
   });
 }
 

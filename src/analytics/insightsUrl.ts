@@ -21,6 +21,7 @@ export const PUBLIC_SECTIONS = new Set([
   "geomancy",
   "help",
   "kabbalah",
+  "open-source",
 ]);
 
 /** Public pages in sections that also hold private ones. */

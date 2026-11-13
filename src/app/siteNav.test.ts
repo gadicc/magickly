@@ -87,6 +87,16 @@ describe("siteNav", () => {
     expect(urls(at("/gd").sectionPages)).not.toContain("/gd/rituals/deleted");
   });
 
+  it("names the open-source section, which has no pages of its own yet", () => {
+    expect(at("/open-source")).toMatchObject({
+      title: "Open source",
+      known: true,
+      ancestors: [],
+      sectionPages: [],
+      topSection: "open-source",
+    });
+  });
+
   it("titles the home page and the ritual editor", () => {
     expect(at("/")).toMatchObject({ title: SITE_TITLE, known: true });
     expect(at("/doc/abc/edit/semantic")).toMatchObject({

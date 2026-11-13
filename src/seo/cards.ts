@@ -104,6 +104,8 @@ const SECTIONS: [prefix: string, section: string, art: CardArt][] = [
   ["/kabbalah/sephirah", "Kabbalah", ART.tree],
   ["/kabbalah/path", "Kabbalah", ART.tree],
   ["/kabbalah", "Kabbalah", ART.kabbalah],
+  // The Tree is drawn by the components from the data: both packages at once.
+  ["/open-source", "Open source", ART.tree],
   ["/study", "Flashcards", ART.study],
   ["/", "Magick.ly", ART.pentagram],
 ];

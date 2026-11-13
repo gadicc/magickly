@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import NextLink from "next/link";
 import React from "react";
 
 const github = "https://github.com/gadicc/magickly/";
@@ -24,8 +25,8 @@ export default function OpenSource({
 
   return (
     <Box sx={{ mt: 1, mb: 1, fontSize: "80%" }}>
-      Magick.ly is open-source. You can see the code used to generate this page
-      in{" "}
+      Magick.ly is <NextLink href="/open-source">open-source</NextLink>. You can
+      see the code used to generate this page in{" "}
       {href ? (
         <a href={url(href)}>{href.split("/").pop()}</a>
       ) : (

@@ -268,5 +268,7 @@ describe("MyAppBar on the server", () => {
     );
     // There is no /kabbalah/angel page, only the pages below it.
     expect(hrefs).not.toContain("/kabbalah/angel");
+    // A section with no pages yet is one link to its own page.
+    expect(hrefs).toContain("/open-source");
   });
 });

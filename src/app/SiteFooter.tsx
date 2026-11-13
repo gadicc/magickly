@@ -1,7 +1,7 @@
 "use client";
 import { Box, Typography } from "@mui/material";
 import NextLink from "next/link";
-import { SITE_FORUM, SITE_REPOSITORY } from "@/seo/site";
+import { SITE_FORUM } from "@/seo/site";
 import pathnames from "./pathnames";
 import { footerSections, type NavLink, showsFooter } from "./siteNav";
 import useSiteNav from "./useSiteNav";
@@ -14,7 +14,6 @@ const SITE_LINKS: NavLink[] = [
   { title: "Temples guide", url: "/help/temples" },
   { title: "Ritual Pug guide", url: "/help/ritual-pug" },
   { title: "Forum", url: SITE_FORUM },
-  { title: "Source code", url: SITE_REPOSITORY },
 ];
 
 const linkStyle = { color: "inherit", textDecoration: "none" } as const;

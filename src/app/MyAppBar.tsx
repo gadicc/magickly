@@ -193,7 +193,8 @@ function MenuLinks({
             return true;
           })
           .map(([key, value]) =>
-            typeof value === "string" || Object.keys(value).length === 2 ? (
+            // A section with at most one page is a link, not a list.
+            typeof value === "string" || Object.keys(value).length <= 2 ? (
               <ListItem key={key} disablePadding>
                 <ListItemButton
                   component={Link}
