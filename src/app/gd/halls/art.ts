@@ -2,7 +2,7 @@ import {
   defaultHallArt,
   type HallArtRegistry,
   tabletArt,
-} from "@magick-components/gd/hall";
+} from "magick-components/gd/hall";
 import enochianFont from "@/fonts/enochian";
 
 /**

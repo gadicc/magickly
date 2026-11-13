@@ -1,4 +1,3 @@
-import type { HallPreset } from "@magick-components/gd/hall/presets";
 import type { JSONContent } from "@tiptap/core";
 import type { Node, ResolvedPos } from "@tiptap/pm/model";
 import {
@@ -7,6 +6,7 @@ import {
   TextSelection,
   type Transaction,
 } from "@tiptap/pm/state";
+import type { HallPreset } from "magick-components/gd/hall/presets";
 import { gdHallSource } from "./gdHallRows";
 import { createRitualNodeId } from "./ritualNodeIds";
 import { HALL_PARENT_TAGS } from "./semantic";

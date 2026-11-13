@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { readFileSync } from "node:fs";
-import { GdHall } from "@magick-components/gd/hall";
-import type { HallNode } from "@magick-components/gd/hall/types";
 import { cleanup, render, screen } from "@testing-library/react";
+import { GdHall } from "magick-components/gd/hall";
+import type { HallNode } from "magick-components/gd/hall/types";
 import { act } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToStaticMarkup } from "react-dom/server";

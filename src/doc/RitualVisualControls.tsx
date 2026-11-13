@@ -1,6 +1,5 @@
 "use client";
 
-import { HALL_PRESETS, hallPreset } from "@magick-components/gd/hall/presets";
 import ArrowDropDown from "@mui/icons-material/ArrowDropDown";
 import FormatBold from "@mui/icons-material/FormatBold";
 import FormatItalic from "@mui/icons-material/FormatItalic";
@@ -26,6 +25,7 @@ import {
 } from "@mui/material";
 import type { Editor, JSONContent } from "@tiptap/core";
 import { useEditorState } from "@tiptap/react";
+import { HALL_PRESETS, hallPreset } from "magick-components/gd/hall/presets";
 import React from "react";
 import { formatRitualFileLocator } from "@/files/ritualFileLocator";
 import Upload from "@/lib/upload";

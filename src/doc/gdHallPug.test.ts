@@ -1,4 +1,4 @@
-import { HALL_PRESETS } from "@magick-components/gd/hall/presets";
+import { HALL_PRESETS } from "magick-components/gd/hall/presets";
 import { describe, expect, it } from "vitest";
 import { gdHallPug, parseHallSource, printHallSource } from "./gdHallPug";
 import { gdHallSource } from "./gdHallRows";

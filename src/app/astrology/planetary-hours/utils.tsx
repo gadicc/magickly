@@ -1,6 +1,6 @@
 import { differenceInMinutes, format } from "date-fns";
+import { dayRulers } from "magick-components/astrology/planetDays";
 import SunCalc from "suncalc";
-import { dayRulers } from "@/components/astrology/planetDays";
 import type { Place } from "@/geo/place";
 import { utcOffsetMinutes } from "@/geo/timeZone";
 

@@ -1,7 +1,5 @@
 "use client";
 
-import { estimateHallAspect } from "@magick-components/gd/hall/aspect";
-import type { HallNode } from "@magick-components/gd/hall/types";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CloseIcon from "@mui/icons-material/Close";
@@ -16,6 +14,8 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
+import { estimateHallAspect } from "magick-components/gd/hall/aspect";
+import type { HallNode } from "magick-components/gd/hall/types";
 import React from "react";
 import { DARK_SELECTOR } from "@/colorScheme";
 import { GdHallFrame } from "@/doc/ritualBlocks/GdHallFrame";

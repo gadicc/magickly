@@ -1,0 +1,53 @@
+{
+  "name": "magick-components",
+  "version": "0.0.0",
+  "private": true,
+  "description": "React components that draw magickal figures from magick-data: the Tree of Life, Golden Dawn temple halls, lamens, sigils, Enochian tablets, kameas and more",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./astrology/Kamea": "./src/astrology/Kamea.tsx",
+    "./astrology/Mercury": "./src/astrology/Mercury.tsx",
+    "./astrology/mercuryRetrograde": "./src/astrology/mercuryRetrograde.ts",
+    "./astrology/Moon": "./src/astrology/Moon.tsx",
+    "./astrology/planetDays": "./src/astrology/planetDays.ts",
+    "./astrology/planetName": "./src/astrology/planetName.ts",
+    "./astrology/planetarySpirits": "./src/astrology/planetarySpirits.tsx",
+    "./chakras/Chakras": "./src/chakras/Chakras.tsx",
+    "./enochian/Tablet": "./src/enochian/Tablet.tsx",
+    "./gd/GradeTree": "./src/gd/GradeTree.tsx",
+    "./gd/Lamen": "./src/gd/Lamen.tsx",
+    "./gd/lamenGrades": "./src/gd/lamenGrades.ts",
+    "./gd/RoseSigil": "./src/gd/RoseSigil.tsx",
+    "./gd/roseSigilGeometry": "./src/gd/roseSigilGeometry.ts",
+    "./gd/SevenBranchedCandleStick": "./src/gd/SevenBranchedCandleStick.tsx",
+    "./gd/TableOfShewbread": "./src/gd/TableOfShewbread.tsx",
+    "./gd/symbols/fylfot-cross": "./src/gd/symbols/fylfot-cross.tsx",
+    "./gd/hall": "./src/gd/hall/index.ts",
+    "./gd/hall/aspect": "./src/gd/hall/aspect.ts",
+    "./gd/hall/attributes": "./src/gd/hall/attributes.ts",
+    "./gd/hall/describe": "./src/gd/hall/describe.ts",
+    "./gd/hall/GdHall": "./src/gd/hall/GdHall.tsx",
+    "./gd/hall/layout": "./src/gd/hall/layout.ts",
+    "./gd/hall/planets": "./src/gd/hall/planets.ts",
+    "./gd/hall/presets": "./src/gd/hall/presets/index.ts",
+    "./gd/hall/spec": "./src/gd/hall/spec.ts",
+    "./gd/hall/types": "./src/gd/hall/types.ts",
+    "./gd/hall/validate": "./src/gd/hall/validate.ts",
+    "./gd/hall/vocabulary": "./src/gd/hall/vocabulary.ts",
+    "./hooks/useHydrated": "./src/hooks/useHydrated.ts",
+    "./kabbalah/fieldPath": "./src/kabbalah/fieldPath.ts",
+    "./kabbalah/TreeOfLife": "./src/kabbalah/TreeOfLife.tsx"
+  },
+  "peerDependencies": {
+    "react": "^19"
+  },
+  "dependencies": {
+    "astronomy-engine": "2.1.19",
+    "dot-prop": "^10.2.0",
+    "lune": "^0.4.0",
+    "luxon": "3.7.2",
+    "magick-data": "workspace:*",
+    "nlopt-js": "^0.1.1"
+  }
+}

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { hydrateAt, renderAt } from "../../../tests/hydration";
+import { hydrateAt, renderAt } from "../../../../tests/hydration";
 import MoonWidget, { moonMeanInclination, moonPath } from "./Moon";
 
 // Pages with the widget are prerendered at build time and viewed later.

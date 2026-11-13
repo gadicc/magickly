@@ -7,8 +7,8 @@ import {
   hallRoot,
   hallViewBox,
   resolveHall,
-} from "@magick-components/gd/hall";
-import { HALL_PRESETS, hallPreset } from "@magick-components/gd/hall/presets";
+} from "magick-components/gd/hall";
+import { HALL_PRESETS, hallPreset } from "magick-components/gd/hall/presets";
 import { renderToStaticMarkup } from "react-dom/server";
 import sharp from "sharp";
 import { describe, expect, it, vi } from "vitest";

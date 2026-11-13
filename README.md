@@ -10,10 +10,11 @@ Copyright (c) 2020-2026 Gadi Cohen.
   [CC BY 4.0](./packages/magick-data/LICENSE-DATA.txt): use it anywhere, with
   credit. That package is licensed by its own files: its code is MIT, and its
   [LICENSE.txt](./packages/magick-data/LICENSE.txt) says which file is which.
-- The **components** in [`src/components/`](./src/components) are
-  [MIT](./src/components/LICENSE.txt), and import no app code. MIT covers
-  the drawings they make: where a component's code is the drawing, its path
-  data is code too.
+- The **components** in
+  [`packages/magick-components/`](./packages/magick-components) are
+  [MIT](./packages/magick-components/LICENSE.txt), and import no app code.
+  MIT covers the drawings they make: where a component's code is the
+  drawing, its path data is code too.
 - **Images the site draws or makes itself**, such as the Tree of Life, sigils,
   tablets, lamens and temple halls, and its hand-drawn images, are CC BY 4.0
   as magick.ly serves them, with credit to Magick.ly. Work by other people

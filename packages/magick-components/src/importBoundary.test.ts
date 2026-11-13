@@ -5,11 +5,12 @@ import { describe, expect, it } from "vitest";
 
 /**
  * The components here are MIT and "import no app code" (LICENSE.txt); plan
- * 061 (decision 1) turns that into a test. Nothing under src/components may
+ * 061 (decision 1) turns that into a test. Nothing in the package may
  * import the app (`@/`), Next (`next`, `next/*`), MUI, Tiptap or
- * ProseMirror, and no component may reach outside the directory by a
- * relative path or through the `@magick-components/` alias (`..` segments
- * included). Tests may also import the shared test helpers in ../../tests.
+ * ProseMirror, and no component may reach outside its `src/` by a relative
+ * path or through its own name, `magick-components/` (`..` segments
+ * included). Tests may also import the shared test helpers in the
+ * repository's tests/.
  */
 const FORBIDDEN = /^(?:@\/|next(?:\/|$)|@mui\/|@tiptap(?:\/|$)|.*prosemirror)/;
 
@@ -17,19 +18,19 @@ const FORBIDDEN = /^(?:@\/|next(?:\/|$)|@mui\/|@tiptap(?:\/|$)|.*prosemirror)/;
 const HALL = "gd/hall/";
 const HALL_PACKAGES = /^(?:react|magick-data)(?:\/|$)/;
 
-const root = path.resolve("src/components");
+const root = path.resolve("packages/magick-components/src");
 const testHelpers = path.resolve("tests");
 const isTest = (file: string) => /\.test\.[cm]?[jt]sx?$/.test(file);
 
 /**
- * Where a relative or `@magick-components/` specifier points, resolved
- * the way tsconfig's paths and the bundlers do (`..` segments and all);
- * undefined for a package. `@/` is forbidden outright above.
+ * Where a relative or `magick-components/` specifier points, resolved the
+ * way the bundlers do (`..` segments and all); undefined for another
+ * package. `@/` is forbidden outright above.
  */
 function target(file: string, name: string): string | undefined {
   if (name.startsWith(".")) return path.resolve(path.dirname(file), name);
-  if (name.startsWith("@magick-components/"))
-    return path.resolve(root, name.slice("@magick-components/".length));
+  if (name.startsWith("magick-components/"))
+    return path.resolve(root, name.slice("magick-components/".length));
   return undefined;
 }
 
@@ -61,7 +62,7 @@ function imports(file: string): string[] {
     .importedFiles.map((imported) => imported.fileName);
 }
 
-describe("src/components import boundary", () => {
+describe("magick-components import boundary", () => {
   const files = sources(root);
 
   it("finds the components, including dynamic imports", () => {
@@ -90,7 +91,7 @@ describe("src/components import boundary", () => {
     expect(Object.fromEntries(found)).toEqual({});
   });
 
-  it("never reaches outside src/components by a path or the alias", () => {
+  it("never reaches outside src/ by a path or its own name", () => {
     const found = files.flatMap((file) =>
       imports(file)
         .filter((name) => escapes(file, name))
@@ -99,16 +100,16 @@ describe("src/components import boundary", () => {
     expect(found).toEqual([]);
   });
 
-  it("resolves the alias and `..` segments before judging", () => {
+  it("resolves its own name and `..` segments before judging", () => {
     const file = path.join(root, "gd/hall/GdHall.tsx");
     const test = path.join(root, "gd/hall/GdHall.test.tsx");
-    expect(escapes(file, "@magick-components/../app/x")).toBe(true);
-    expect(escapes(file, "@magick-components/gd/Lamen")).toBe(false);
+    expect(escapes(file, "magick-components/../app/x")).toBe(true);
+    expect(escapes(file, "magick-components/gd/Lamen")).toBe(false);
     expect(escapes(file, "../../svgCoordinate")).toBe(false);
     expect(escapes(file, "../../../app/x")).toBe(true);
     expect(escapes(test, "../../../app/x")).toBe(true);
-    expect(escapes(test, "../../../../tests/hydration")).toBe(false);
-    expect(escapes(file, "../../../../tests/hydration")).toBe(true);
+    expect(escapes(test, "../../../../../tests/hydration")).toBe(false);
+    expect(escapes(file, "../../../../../tests/hydration")).toBe(true);
     expect(escapes(file, "react")).toBe(false);
   });
 

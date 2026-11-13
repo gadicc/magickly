@@ -18,7 +18,7 @@ and writes:
 - public/fonts/NotoSans-OFL.txt, NotoSansHebrew-OFL.txt, the notices the
   existing NotoSans-Regular.ttf and NotoSansHebrew-Regular.ttf lacked: their
   own copyright line (name ID 0) above the OFL 1.1 text
-- src/components/gd/hall/fontMetrics.json, the advances and GPOS kern pairs
+- packages/magick-components/src/gd/hall/fontMetrics.json, the advances and GPOS kern pairs
   that label wrapping and the Pantacle's ring measure with (no DOM
   measurement)
 
@@ -98,7 +98,9 @@ NO_LIGATURES = {"liga": False, "clig": False, "dlig": False, "hlig": False,
 ROOT = Path(__file__).resolve().parents[2]
 PUBLIC_FONTS = ROOT / "public" / "fonts"
 ASSET_FONTS = ROOT / "assets" / "fonts"
-METRICS_JSON = ROOT / "src" / "components" / "gd" / "hall" / "fontMetrics.json"
+METRICS_JSON = (
+    ROOT / "packages" / "magick-components" / "src" / "gd" / "hall" / "fontMetrics.json"
+)
 
 
 def sha256(data: bytes) -> str:

@@ -1,6 +1,6 @@
+import TreeOfLife from "magick-components/kabbalah/TreeOfLife";
 import type { HebrewLetterRow, TreeOfLifePathRow } from "magick-data/rows";
 import Image from "next/image";
-import TreeOfLife from "@/components/kabbalah/TreeOfLife";
 import Ink from "@/drawings/Ink";
 import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import { RWSName, RWSPath, trumpNumeral } from "@/tarot";

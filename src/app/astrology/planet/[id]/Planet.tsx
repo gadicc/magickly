@@ -1,10 +1,10 @@
+import PlanetarySpirit from "magick-components/astrology/planetarySpirits";
+import { dayOf } from "magick-components/astrology/planetDays";
+import { planetName } from "magick-components/astrology/planetName";
 import Data from "magick-data";
 import type { PlanetRow } from "magick-data/rows";
 import { Fragment } from "react";
 import { chaldean } from "@/app/astrology/planetary-hours/utils";
-import PlanetarySpirit from "@/components/astrology/planetarySpirits";
-import { dayOf } from "@/components/astrology/planetDays";
-import { planetName } from "@/components/astrology/planetName";
 import Ink from "@/drawings/Ink";
 import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import { RWSName } from "@/tarot";

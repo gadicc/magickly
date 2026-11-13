@@ -6,12 +6,12 @@ import {
   hallRoot,
   resolveHall,
   tabletArt,
-} from "@magick-components/gd/hall";
+} from "magick-components/gd/hall";
 import {
   type HallPreset,
   hallPreset,
   hallSourceCitation,
-} from "@magick-components/gd/hall/presets";
+} from "magick-components/gd/hall/presets";
 import { pngWithText, XMP_KEYWORD } from "@/export/pngText";
 import { SITE_URL } from "@/seo/site";
 import {

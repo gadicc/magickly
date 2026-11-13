@@ -41,7 +41,10 @@ describe("public field paths", () => {
 
   it("resolves the fields the grade tree asks the Tree for", () => {
     // Read from the component, so that editing it edits this list.
-    const source = readFileSync("src/components/gd/GradeTree.tsx", "utf8");
+    const source = readFileSync(
+      "packages/magick-components/src/gd/GradeTree.tsx",
+      "utf8",
+    );
     const asked = [
       ...source.matchAll(/(?:field|topText|bottomText)="([^"]*)"/g),
     ]

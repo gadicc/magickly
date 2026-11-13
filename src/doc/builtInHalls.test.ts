@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import { hallPreset } from "@magick-components/gd/hall/presets";
+import { hallPreset } from "magick-components/gd/hall/presets";
 import { describe, expect, it } from "vitest";
 import { gdHall, gdHallShortName } from "@/render/contracts/gdHall";
 import { hallPath } from "@/seo/halls";

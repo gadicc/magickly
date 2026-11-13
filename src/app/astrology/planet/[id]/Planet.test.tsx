@@ -1,7 +1,7 @@
+import { planetName } from "magick-components/astrology/planetName";
 import Data from "magick-data";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { planetName } from "@/components/astrology/planetName";
 import {
   expectEntityPage,
   hrefsOf,
@@ -11,7 +11,7 @@ import Planet from "./page";
 
 // The stand-in for the spirit sigils renders the id it was given, so a page
 // can be held to drawing the right spirit's without its path data.
-vi.mock("@/components/astrology/planetarySpirits", () => ({
+vi.mock("magick-components/astrology/planetarySpirits", () => ({
   default: ({
     id,
     "aria-hidden": hidden,

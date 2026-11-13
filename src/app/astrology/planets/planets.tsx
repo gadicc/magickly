@@ -1,8 +1,5 @@
 "use client";
 
-import MercuryWidget from "@magick-components/astrology/Mercury";
-import MoonWidget from "@magick-components/astrology/Moon";
-import { planetName } from "@magick-components/astrology/planetName";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
@@ -12,6 +9,9 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import MercuryWidget from "magick-components/astrology/Mercury";
+import MoonWidget from "magick-components/astrology/Moon";
+import { planetName } from "magick-components/astrology/planetName";
 import Data from "magick-data";
 import { getImageProps } from "next/image";
 import usePlace from "@/geo/usePlace";
@@ -139,9 +139,9 @@ export default function Planets() {
         <OpenSource
           files={[
             "@/app/astrology/planets/planets.tsx",
-            "@magick-components/astrology/Moon.tsx",
-            "@magick-components/astrology/Mercury.tsx",
-            "@magick-components/astrology/mercuryRetrograde.ts",
+            "magick-components/astrology/Moon.tsx",
+            "magick-components/astrology/Mercury.tsx",
+            "magick-components/astrology/mercuryRetrograde.ts",
           ]}
         />
 

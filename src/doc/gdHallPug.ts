@@ -1,4 +1,4 @@
-import type { HallNode } from "@magick-components/gd/hall/types";
+import type { HallNode } from "magick-components/gd/hall/types";
 import type { HallElement } from "./gdHallEditor/hallModel";
 import { gdHallSource } from "./gdHallRows";
 import {

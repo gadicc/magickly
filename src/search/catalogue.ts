@@ -1,3 +1,5 @@
+import { describeHall } from "magick-components/gd/hall/describe";
+import { hallPreset } from "magick-components/gd/hall/presets";
 import Data from "magick-data";
 import planets from "magick-data/astrology/planets";
 import zodiacs from "magick-data/astrology/zodiac";
@@ -10,8 +12,6 @@ import paths from "magick-data/kabbalah/paths";
 import sephirot from "magick-data/kabbalah/sephirot";
 import angels from "magick-data/kabbalah/seventyTwoAngels";
 import { loadAngelTexts } from "magick-data/kabbalah/seventyTwoAngels/text";
-import { describeHall } from "@/components/gd/hall/describe";
-import { hallPreset } from "@/components/gd/hall/presets";
 import { angelSlug } from "@/lib/angelSlugs";
 import { GD_HALLS, gdHallTitle } from "@/render/contracts/gdHall";
 import { entityPages } from "@/seo/entities";

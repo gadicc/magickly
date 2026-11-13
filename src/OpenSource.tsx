@@ -10,7 +10,7 @@ function url(str: string) {
     "blob/main/" +
     str
       .replace(/^@\//, "src/")
-      .replace(/^@magick-components\//, "src/components/")
+      .replace(/^magick-components\//, "packages/magick-components/src/")
   );
 }
 

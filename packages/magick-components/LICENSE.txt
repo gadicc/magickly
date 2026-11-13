@@ -10,8 +10,8 @@ the drawing, its path data is code too. The CC BY 4.0 statement in
 ../../README.md covers the images magick.ly draws and serves, its hand-drawn
 images and the data, not this code.
 
-The data these components read, in ../../packages/magick-data, is CC BY 4.0
-(../../packages/magick-data/LICENSE-DATA.txt; its LICENSE.txt says which
+The data these components read, in ../magick-data, is CC BY 4.0
+(../magick-data/LICENSE-DATA.txt; its LICENSE.txt says which
 files are data and which are code).
 
 ---

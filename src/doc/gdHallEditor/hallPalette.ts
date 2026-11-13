@@ -1,8 +1,8 @@
 import type {
   ResolvedHall,
   ResolvedObject,
-} from "@magick-components/gd/hall/layout";
-import type { HallArtRegistry } from "@magick-components/gd/hall/types";
+} from "magick-components/gd/hall/layout";
+import type { HallArtRegistry } from "magick-components/gd/hall/types";
 import {
   BOARD_KINDS,
   BOARD_NAMES,
@@ -11,7 +11,7 @@ import {
   CARD_TITLES,
   CORE_ITEM_KINDS,
   HALL_ROLES,
-} from "@magick-components/gd/hall/vocabulary";
+} from "magick-components/gd/hall/vocabulary";
 import type { JsonValue } from "../semantic";
 import { coordinateValue, snapHalf } from "./hallGeometry";
 import { hostAccepts, isHost } from "./hallHostRules";

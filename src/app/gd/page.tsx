@@ -1,4 +1,4 @@
-import GradeTree from "@/components/gd/GradeTree";
+import GradeTree from "magick-components/gd/GradeTree";
 import Ink from "@/drawings/Ink";
 import { GD_HALLS } from "@/render/contracts/gdHall";
 import { hallFiles } from "@/seo/halls";

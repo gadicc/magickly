@@ -2,9 +2,9 @@ import {
   enumAttr,
   numberAttr,
   placedByAt,
-} from "@magick-components/gd/hall/attributes";
-import type { HallNode } from "@magick-components/gd/hall/types";
-import { BANNER_SIDES } from "@magick-components/gd/hall/vocabulary";
+} from "magick-components/gd/hall/attributes";
+import type { HallNode } from "magick-components/gd/hall/types";
+import { BANNER_SIDES } from "magick-components/gd/hall/vocabulary";
 import type { HallSelectable, HallView } from "./hallEdits";
 import { round2 } from "./hallGeometry";
 import {

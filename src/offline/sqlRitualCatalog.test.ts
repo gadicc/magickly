@@ -1,7 +1,7 @@
 import { createMemoryPgliteHarness } from "@gadicc/loom/db/testing";
-import { HALL_PRESETS } from "@magick-components/gd/hall/presets";
 import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/pglite";
+import { HALL_PRESETS } from "magick-components/gd/hall/presets";
 import {
   afterAll,
   afterEach,

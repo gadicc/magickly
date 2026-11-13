@@ -1,6 +1,6 @@
+import TreeOfLife from "magick-components/kabbalah/TreeOfLife";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import TreeOfLife from "@/components/kabbalah/TreeOfLife";
 import { expectEntityPage } from "./entityPage";
 
 /**

@@ -1,8 +1,8 @@
 "use client";
-import useHydrated from "@magick-components/hooks/useHydrated";
 import lune from "lune";
 import { DateTime } from "luxon";
-import MoonDrawing from "@/components/astrology/Moon";
+import MoonDrawing from "magick-components/astrology/Moon";
+import useHydrated from "magick-components/hooks/useHydrated";
 import usePlace from "@/geo/usePlace";
 
 /*

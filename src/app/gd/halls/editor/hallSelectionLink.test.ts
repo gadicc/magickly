@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
-import { HALL_PRESETS } from "@magick-components/gd/hall/presets";
+
 import { act, renderHook } from "@testing-library/react";
+import { HALL_PRESETS } from "magick-components/gd/hall/presets";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { gdHallSource } from "@/doc/gdHallRows";
 import { entryOfHall } from "./hallHistory";

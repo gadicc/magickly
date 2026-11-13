@@ -29,7 +29,7 @@ vi.mock("@/doc/ritualBlocks/GdHallDrawing", () => ({
 
 // Every hall is twice as wide as it is tall, so a 400×300 surface fits it
 // at 368×184, 16 px from the sides and 58 px from the top.
-vi.mock("@magick-components/gd/hall/aspect", () => ({
+vi.mock("magick-components/gd/hall/aspect", () => ({
   estimateHallAspect: () => 2,
 }));
 

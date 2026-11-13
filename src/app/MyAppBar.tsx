@@ -1,5 +1,4 @@
 "use client";
-import useHydrated from "@magick-components/hooks/useHydrated";
 import {
   AccountCircle,
   ArrowDropDown,
@@ -29,6 +28,7 @@ import {
   Typography,
   useScrollTrigger,
 } from "@mui/material";
+import useHydrated from "magick-components/hooks/useHydrated";
 import Image from "next/image";
 import Link from "next/link";
 import NextLink from "next/link";

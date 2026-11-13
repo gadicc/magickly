@@ -3,7 +3,7 @@ import {
   hallPreset,
   hallSourceText,
   hallSourceUrl,
-} from "@magick-components/gd/hall/presets";
+} from "magick-components/gd/hall/presets";
 import {
   GD_HALL_LICENCE,
   GD_HALLS,
@@ -197,7 +197,7 @@ export default function HallPage({ hall }: { hall: GdHallEntry }) {
           <blockquote className={styles.credit}>{credit}</blockquote>
           <p>
             The presets' data and the code that draws them are{" "}
-            <Link href="https://github.com/gadicc/magickly/tree/main/src/components">
+            <Link href="https://github.com/gadicc/magickly/tree/main/packages/magick-components">
               MIT
             </Link>
             ; see <Link href="/open-source#licences">Open source</Link>.

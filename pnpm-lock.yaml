@@ -173,6 +173,9 @@ importers:
       magic-string:
         specifier: ^0.30.10
         version: 0.30.10
+      magick-components:
+        specifier: workspace:*
+        version: link:packages/magick-components
       magick-data:
         specifier: workspace:*
         version: link:packages/magick-data
@@ -351,6 +354,30 @@ importers:
       webpack:
         specifier: ^5.112.2
         version: 5.112.2(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.19.2))(svgo@3.3.5)
+
+  packages/magick-components:
+    dependencies:
+      astronomy-engine:
+        specifier: 2.1.19
+        version: 2.1.19
+      dot-prop:
+        specifier: ^10.2.0
+        version: 10.2.0
+      lune:
+        specifier: ^0.4.0
+        version: 0.4.0
+      luxon:
+        specifier: 3.7.2
+        version: 3.7.2
+      magick-data:
+        specifier: workspace:*
+        version: link:../magick-data
+      nlopt-js:
+        specifier: ^0.1.1
+        version: 0.1.1
+      react:
+        specifier: ^19
+        version: 19.3.1
 
   packages/magick-data:
     devDependencies:

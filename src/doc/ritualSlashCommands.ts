@@ -1,6 +1,5 @@
 "use client";
 
-import { HALL_PRESETS, hallPreset } from "@magick-components/gd/hall/presets";
 import { type Editor, Extension } from "@tiptap/core";
 import { closeHistory } from "@tiptap/pm/history";
 import type { Node } from "@tiptap/pm/model";
@@ -11,6 +10,7 @@ import {
   type Transaction,
 } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
+import { HALL_PRESETS, hallPreset } from "magick-components/gd/hall/presets";
 import {
   caretAfterGdHall,
   gdHallPresetAtom,

@@ -25,7 +25,7 @@
  * helper, not something a page should reach for.
  *
  * A `*` segment reads every element of a list, as
- * [readFieldPath](../../../src/components/kabbalah/fieldPath.ts) does
+ * [readFieldPath](../../magick-components/src/kabbalah/fieldPath.ts) does
  * (plan 039, decision 4): it is valid only directly after a list, a `many`
  * link's accessor or a list-valued field, and the walk carries on inside the
  * elements. What such a path reads is one joined string, so its target is

@@ -1,18 +1,18 @@
 import "server-only";
-import type { ReactElement } from "react";
-import AstroGeomancyChart from "@/app/geomancy/reading/AstroGeomancyChart";
-import { figuresFromMothers } from "@/app/geomancy/tetragrams";
-import Tablet from "@/components/enochian/Tablet";
-import { RoseSigilImage } from "@/components/gd/RoseSigil";
+import Tablet from "magick-components/enochian/Tablet";
+import { RoseSigilImage } from "magick-components/gd/RoseSigil";
 import {
   optimizeSigilPoints,
   sigilPoints,
-} from "@/components/gd/roseSigilGeometry";
+} from "magick-components/gd/roseSigilGeometry";
 import SevenBranchedCandleStick, {
   CANDLESTICK_PLANETS,
-} from "@/components/gd/SevenBranchedCandleStick";
-import TableOfShewbread from "@/components/gd/TableOfShewbread";
-import TreeOfLife from "@/components/kabbalah/TreeOfLife";
+} from "magick-components/gd/SevenBranchedCandleStick";
+import TableOfShewbread from "magick-components/gd/TableOfShewbread";
+import TreeOfLife from "magick-components/kabbalah/TreeOfLife";
+import type { ReactElement } from "react";
+import AstroGeomancyChart from "@/app/geomancy/reading/AstroGeomancyChart";
+import { figuresFromMothers } from "@/app/geomancy/tetragrams";
 import type { ComponentImageProps, ComponentImageSlug } from "./contracts";
 import { mothersFromString } from "./contracts/astroGeomancyChart";
 import { TABLET_IDS } from "./contracts/enochianTablet";

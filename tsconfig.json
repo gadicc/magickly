@@ -9,8 +9,7 @@
     "noEmit": true,
     "incremental": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "@magick-components/*": ["./src/components/*"]
+      "@/*": ["./src/*"]
     },
     "types": ["@serwist/next/typings"],
     "esModuleInterop": true,
@@ -39,6 +38,7 @@
     "node_modules",
     "output",
     "packages/magick-data/dist",
-    "packages/magick-data/lib"
+    "packages/magick-data/lib",
+    "packages/magick-components/lib"
   ]
 }

@@ -2,7 +2,7 @@
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { GD_HALL_FONT_FILES } from "@magick-components/gd/hall";
+import { GD_HALL_FONT_FILES } from "magick-components/gd/hall";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SVG_NAMESPACE } from "@/export/svgExport";
 import {

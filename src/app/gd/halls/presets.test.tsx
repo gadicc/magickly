@@ -3,22 +3,22 @@ import {
   type ResolvedObject,
   resolveHall,
   validateHall,
-} from "@magick-components/gd/hall";
-import { estimateHallAspect } from "@magick-components/gd/hall/aspect";
+} from "magick-components/gd/hall";
+import { estimateHallAspect } from "magick-components/gd/hall/aspect";
 import {
   compassBox,
   FLOOR_SIZE,
   FLOOR_STROKE,
   type Rect,
   WALL_GAP,
-} from "@magick-components/gd/hall/layout";
+} from "magick-components/gd/hall/layout";
 import {
   HALL_PRESETS,
   HALL_SOURCE_WORKS,
   neophyte,
   zelator1,
   zelator2,
-} from "@magick-components/gd/hall/presets";
+} from "magick-components/gd/hall/presets";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { inventoryRitualAssets } from "@/offline/ritualAssetInventory";

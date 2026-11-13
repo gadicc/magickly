@@ -4,24 +4,24 @@ import {
   type ResolvedHall,
   type ResolvedObject,
   resolveHall,
-} from "@magick-components/gd/hall/layout";
-import { PLANET_NAMES, type Planet } from "@magick-components/gd/hall/planets";
+} from "magick-components/gd/hall/layout";
+import { PLANET_NAMES, type Planet } from "magick-components/gd/hall/planets";
 import type {
   HallArtRegistry,
   HallNode,
-} from "@magick-components/gd/hall/types";
+} from "magick-components/gd/hall/types";
 import {
   BOARD_NAMES,
   type BoardKind,
   CARD_TITLES,
   type CardKind,
   roleName,
-} from "@magick-components/gd/hall/vocabulary";
+} from "magick-components/gd/hall/vocabulary";
 import {
   hasGradeLamen,
   LAMEN_GRADE_NAMES,
   type LamenGrade,
-} from "@magick-components/gd/lamenGrades";
+} from "magick-components/gd/lamenGrades";
 import type { JsonValue } from "../semantic";
 import {
   compareRowPaths,

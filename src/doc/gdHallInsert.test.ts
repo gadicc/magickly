@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
-import { HALL_PRESETS } from "@magick-components/gd/hall/presets";
+
 import { Editor, type JSONContent } from "@tiptap/core";
 import { NodeSelection, TextSelection } from "@tiptap/pm/state";
+import { HALL_PRESETS } from "magick-components/gd/hall/presets";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   gdHallInsertionRange,

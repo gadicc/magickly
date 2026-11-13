@@ -1,4 +1,4 @@
-import { HALL_ROLES } from "@magick-components/gd/hall/vocabulary";
+import { HALL_ROLES } from "magick-components/gd/hall/vocabulary";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { TaskFrame } from "./Frames";

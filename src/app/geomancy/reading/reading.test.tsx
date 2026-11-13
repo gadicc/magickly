@@ -6,7 +6,7 @@ import { readingFromSearchParams } from "./readingState";
 
 // The spirit sigils were SVG imports, which vitest could not render, when
 // these bytes were pinned; they carry no data this page is pinned for.
-vi.mock("@/components/astrology/planetarySpirits", () => ({
+vi.mock("magick-components/astrology/planetarySpirits", () => ({
   default: () => null,
 }));
 

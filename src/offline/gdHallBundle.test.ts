@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { GD_HALL_FONT_FILES, validateHall } from "@magick-components/gd/hall";
-import { HALL_PRESETS } from "@magick-components/gd/hall/presets";
-import type { HallNode } from "@magick-components/gd/hall/types";
+import { GD_HALL_FONT_FILES, validateHall } from "magick-components/gd/hall";
+import { HALL_PRESETS } from "magick-components/gd/hall/presets";
+import type { HallNode } from "magick-components/gd/hall/types";
 import { afterEach, expect, it, vi } from "vitest";
 import { gdHallArt } from "../app/gd/halls/art";
 import { GD_HALL_FONT_BASE } from "../app/gd/halls/fontBase";

@@ -17,10 +17,10 @@ import {
   TableRow,
 } from "@mui/material";
 import Typography from "@mui/material/Typography";
+import PlanetarySpirit from "magick-components/astrology/planetarySpirits";
 import data from "magick-data";
 import { PlanetId } from "magick-data/astrology/planets";
 import React from "react";
-import PlanetarySpirit from "@/components/astrology/planetarySpirits";
 import Ink from "@/drawings/Ink";
 import { capitalizeFirstLetter } from "@/lib/utils";
 import Tetragram from "../Tetragram";

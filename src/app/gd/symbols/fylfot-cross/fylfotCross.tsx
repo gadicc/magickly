@@ -9,12 +9,12 @@ import {
   FormGroup,
   Grid,
 } from "@mui/material";
-import data from "magick-data";
-import React from "react";
 import FylfotCross, {
   fylfot,
   typeFromId,
-} from "@/components/gd/symbols/fylfot-cross";
+} from "magick-components/gd/symbols/fylfot-cross";
+import data from "magick-data";
+import React from "react";
 import OpenSource from "@/OpenSource";
 
 function unflat(flat, split = 5) {

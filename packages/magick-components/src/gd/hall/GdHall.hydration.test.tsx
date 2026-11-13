@@ -2,7 +2,7 @@
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, expect, it, vi } from "vitest";
-import { hydrateAt, renderAt } from "../../../../tests/hydration";
+import { hydrateAt, renderAt } from "../../../../../tests/hydration";
 import { GdHall } from "./GdHall";
 import type { HallNode } from "./types";
 

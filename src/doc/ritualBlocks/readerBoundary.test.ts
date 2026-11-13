@@ -3,14 +3,17 @@ import { dirname, relative, resolve } from "node:path";
 import ts from "typescript";
 import { expect, it } from "vitest";
 
-/** A local specifier's file: relative, `@/…` or `@magick-components/…`. */
+/** A local specifier's file: relative, `@/…` or `magick-components/…`. */
 function resolveLocal(from: string, name: string): string | null {
   const stem = name.startsWith(".")
     ? resolve(dirname(from), name)
     : name.startsWith("@/")
       ? resolve("src", name.slice(2))
-      : name.startsWith("@magick-components/")
-        ? resolve("src/components", name.slice("@magick-components/".length))
+      : name.startsWith("magick-components/")
+        ? resolve(
+            "packages/magick-components/src",
+            name.slice("magick-components/".length),
+          )
         : null;
   if (!stem) return null;
   const extensions = [".ts", ".tsx", ".js", ".jsx"];
@@ -96,15 +99,16 @@ it("loads the hall renderer and its art only through import()", () => {
   // Plan 061, decision 1: a ritual without a hall does not carry them,
   // only the few kilobytes that size the placeholder while they load.
   const graph = readerGraph();
-  const hall = /^src\/(?:components\/gd\/hall|app\/gd\/hall)\//;
+  const hall =
+    /^(?:packages\/magick-components\/src\/gd\/hall|src\/app\/gd\/hall)\//;
   expect(files(graph.static).filter((file) => hall.test(file))).toEqual([
-    "src/components/gd/hall/aspect.ts",
-    "src/components/gd/hall/attributes.ts",
-    "src/components/gd/hall/dimensions.ts",
+    "packages/magick-components/src/gd/hall/aspect.ts",
+    "packages/magick-components/src/gd/hall/attributes.ts",
+    "packages/magick-components/src/gd/hall/dimensions.ts",
   ]);
   const lazy = files(graph.lazy);
   expect(lazy).toContain("src/doc/ritualBlocks/GdHallDrawing.tsx");
-  expect(lazy).toContain("src/components/gd/hall/GdHall.tsx");
+  expect(lazy).toContain("packages/magick-components/src/gd/hall/GdHall.tsx");
   expect(lazy).toContain("src/app/gd/halls/art.ts");
-  expect(lazy).toContain("src/components/gd/Lamen.tsx");
+  expect(lazy).toContain("packages/magick-components/src/gd/Lamen.tsx");
 });

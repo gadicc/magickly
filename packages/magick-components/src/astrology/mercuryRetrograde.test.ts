@@ -10,7 +10,7 @@ import { currentOrNextRetrograde, mercuryStations } from "./mercuryRetrograde";
 const horizons: { type: "R" | "D"; date: string }[] = JSON.parse(
   readFileSync(
     new URL(
-      "../../../tests/fixtures/mercuryStationsHorizons.json",
+      "../../../../tests/fixtures/mercuryStationsHorizons.json",
       import.meta.url,
     ),
     "utf8",

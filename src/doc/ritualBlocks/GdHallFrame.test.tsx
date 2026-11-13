@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
-import type { HallNode } from "@magick-components/gd/hall/types";
+
 import { cleanup, render, screen } from "@testing-library/react";
+import type { HallNode } from "magick-components/gd/hall/types";
 import { afterEach, expect, it, vi } from "vitest";
 
 afterEach(() => {

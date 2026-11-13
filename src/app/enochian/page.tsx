@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import Tablet from "@/components/enochian/Tablet";
+import Tablet from "magick-components/enochian/Tablet";
 import { pageMetadata } from "@/seo/metadata";
 import Tiles from "@/ui/Tiles";
 import EnochianText from "./EnochianText";

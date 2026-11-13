@@ -1,4 +1,4 @@
-import type { HallNode } from "@magick-components/gd/hall/types";
+import type { HallNode } from "magick-components/gd/hall/types";
 import { createRitualNodeId } from "./ritualNodeIds";
 import {
   type JsonValue,

@@ -1,18 +1,18 @@
 "use client";
 
-import { GdHall } from "@magick-components/gd/hall/GdHall";
-import type { Rect } from "@magick-components/gd/hall/layout";
-import { hallArtKey } from "@magick-components/gd/hall/spec";
-import type {
-  HallArtRegistry,
-  HallNode,
-} from "@magick-components/gd/hall/types";
-import { validateHall } from "@magick-components/gd/hall/validate";
 import Add from "@mui/icons-material/Add";
 import Check from "@mui/icons-material/Check";
 import Redo from "@mui/icons-material/Redo";
 import Undo from "@mui/icons-material/Undo";
 import { Button, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
+import { GdHall } from "magick-components/gd/hall/GdHall";
+import type { Rect } from "magick-components/gd/hall/layout";
+import { hallArtKey } from "magick-components/gd/hall/spec";
+import type {
+  HallArtRegistry,
+  HallNode,
+} from "magick-components/gd/hall/types";
+import { validateHall } from "magick-components/gd/hall/validate";
 import {
   type CSSProperties,
   type KeyboardEvent,

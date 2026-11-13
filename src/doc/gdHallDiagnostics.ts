@@ -1,8 +1,5 @@
-import type {
-  HallDiagnostic,
-  HallNode,
-} from "@magick-components/gd/hall/types";
-import { validateHall } from "@magick-components/gd/hall/validate";
+import type { HallDiagnostic, HallNode } from "magick-components/gd/hall/types";
+import { validateHall } from "magick-components/gd/hall/validate";
 import { gdHallArt } from "@/app/gd/halls/art";
 import {
   inventoryRitualAssets,

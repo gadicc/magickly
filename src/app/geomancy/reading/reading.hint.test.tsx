@@ -12,7 +12,7 @@ import GeomancyReading from "./reading";
 import { readingFromSearchParams } from "./readingState";
 
 // The spirit sigils are left out; see reading.test.tsx.
-vi.mock("@/components/astrology/planetarySpirits", () => ({
+vi.mock("magick-components/astrology/planetarySpirits", () => ({
   default: () => null,
 }));
 vi.mock("@/geo/usePlace", () => ({

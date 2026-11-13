@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
 
 import { readFileSync } from "node:fs";
-import { HALL_PRESETS } from "@magick-components/gd/hall/presets";
 import {
   act,
   cleanup,
@@ -11,6 +10,7 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
+import { HALL_PRESETS } from "magick-components/gd/hall/presets";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { gdHallPug, parseHallSource, printHallSource } from "@/doc/gdHallPug";

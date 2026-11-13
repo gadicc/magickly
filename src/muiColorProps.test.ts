@@ -184,7 +184,9 @@ describe("no palette paths in MUI color props", () => {
   it("reads the whole tree", () => {
     const relative = files.map((file) => path.relative(repository, file));
     expect(relative).toContain("src/app/study/study.tsx");
-    expect(relative).toContain("src/components/chakras/Chakras.tsx");
+    expect(relative).toContain(
+      "packages/magick-components/src/chakras/Chakras.tsx",
+    );
     expect(relative).toContain("src/Copyright.js");
     expect(relative).not.toContain("src/muiColorProps.test.ts");
     expect(relative.some((file) => file.includes("node_modules"))).toBe(false);

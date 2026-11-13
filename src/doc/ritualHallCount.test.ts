@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { HALL_PRESETS } from "@magick-components/gd/hall/presets";
+import { HALL_PRESETS } from "magick-components/gd/hall/presets";
 import { describe, expect, it } from "vitest";
 import { prepare } from "./prepare";
 import {

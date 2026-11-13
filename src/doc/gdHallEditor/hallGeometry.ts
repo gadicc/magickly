@@ -1,14 +1,14 @@
-import { clamp } from "@magick-components/gd/hall/attributes";
+import { clamp } from "magick-components/gd/hall/attributes";
 import {
   FLOOR_SIZE,
   type Rect,
   type ResolvedHall,
   type ResolvedObject,
-} from "@magick-components/gd/hall/layout";
+} from "magick-components/gd/hall/layout";
 import {
   COORDINATE_RANGE,
   SCALE_RANGE,
-} from "@magick-components/gd/hall/vocabulary";
+} from "magick-components/gd/hall/vocabulary";
 import { noNegativeZero } from "./hallModel";
 
 /**

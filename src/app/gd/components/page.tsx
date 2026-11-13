@@ -1,4 +1,4 @@
-import Lamen from "@magick-components/gd/Lamen";
+import Lamen from "magick-components/gd/Lamen";
 import { Fragment } from "react";
 import Ink from "@/drawings/Ink";
 import { privateMetadata } from "@/seo/metadata";

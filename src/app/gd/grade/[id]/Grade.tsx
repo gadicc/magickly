@@ -1,5 +1,5 @@
+import GradeTree from "magick-components/gd/GradeTree";
 import type { GDGradeRow } from "magick-data/rows";
-import GradeTree from "@/components/gd/GradeTree";
 import { isPublicRitualId } from "@/doc/publicRituals";
 import Ink from "@/drawings/Ink";
 import { gdHallShortName } from "@/render/contracts/gdHall";

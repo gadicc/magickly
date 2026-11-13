@@ -1,6 +1,5 @@
 "use client";
 
-import type { HallNode } from "@magick-components/gd/hall/types";
 import EditOutlined from "@mui/icons-material/EditOutlined";
 import { Button } from "@mui/material";
 import type { NodeViewProps } from "@tiptap/core";
@@ -10,6 +9,7 @@ import {
   NodeViewWrapper,
   useEditorState,
 } from "@tiptap/react";
+import type { HallNode } from "magick-components/gd/hall/types";
 import dynamic from "next/dynamic";
 import {
   Component,

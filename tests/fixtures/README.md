@@ -3,7 +3,7 @@
 ## `mercuryStationsHorizons.json`
 
 Mercury's stations from 2020 to 2035, 101 of them, as reference values for
-`src/components/astrology/mercuryRetrograde.test.ts`. Each entry has the
+`packages/magick-components/src/astrology/mercuryRetrograde.test.ts`. Each entry has the
 station's `type` (`R` where Mercury turns retrograde, `D` where it turns
 direct), the `date` it happens (UTC) and the apparent ecliptic longitude
 `lon` it turns at, in degrees.

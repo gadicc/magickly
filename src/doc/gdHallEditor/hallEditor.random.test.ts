@@ -1,5 +1,5 @@
-import { HALL_PRESETS } from "@magick-components/gd/hall/presets";
-import type { HallAttrSpec } from "@magick-components/gd/hall/types";
+import { HALL_PRESETS } from "magick-components/gd/hall/presets";
+import type { HallAttrSpec } from "magick-components/gd/hall/types";
 import { describe, expect, it } from "vitest";
 import { gdHallArt } from "@/app/gd/halls/art";
 import { gdHallSource } from "../gdHallRows";

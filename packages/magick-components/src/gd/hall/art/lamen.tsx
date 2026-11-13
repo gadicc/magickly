@@ -5,7 +5,7 @@ import type { HallArt, HallArtProps, HallAttrSpec, HallNode } from "../types";
 import { original, PALETTE } from "./shared";
 
 export const provenance = original(
-  "The officers' lamens, drawn by `Lamen` (src/components/gd/Lamen.tsx): " +
+  "The officers' lamens, drawn by `Lamen` (gd/Lamen.tsx): " +
     "the collar's ring, the disc and the officer's glyph; a plain circle " +
     "for an officer without a role.",
 );

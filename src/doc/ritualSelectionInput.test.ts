@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
-import { HALL_PRESETS } from "@magick-components/gd/hall/presets";
+
 import { Editor, type JSONContent } from "@tiptap/core";
 import { GapCursor } from "@tiptap/pm/gapcursor";
 import { NodeSelection, TextSelection } from "@tiptap/pm/state";
+import { HALL_PRESETS } from "magick-components/gd/hall/presets";
 import { afterEach, describe, expect, it } from "vitest";
 import { gdHallPresetAtom } from "./gdHallInsert";
 import { RitualSelectionInput } from "./ritualSelectionInput";

@@ -1,5 +1,5 @@
-import { gdHallFontFaceCss } from "@magick-components/gd/hall";
 import { Box, Container, Typography } from "@mui/material";
+import { gdHallFontFaceCss } from "magick-components/gd/hall";
 import Link from "next/link";
 import OpenSource from "@/OpenSource";
 import { GD_HALL_LICENCE } from "@/render/contracts/gdHall";
@@ -59,8 +59,8 @@ export default function HallEditorPage() {
             files={[
               "/src/app/gd/halls/editor/HallPlayground.tsx",
               "/src/doc/gdHallEditor/GdHallEditor.tsx",
-              "/src/components/gd/hall/GdHall.tsx",
-              "/src/components/gd/hall/presets/index.ts",
+              "/packages/magick-components/src/gd/hall/GdHall.tsx",
+              "/packages/magick-components/src/gd/hall/presets/index.ts",
             ]}
           />
         </Container>

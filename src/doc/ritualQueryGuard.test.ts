@@ -24,8 +24,7 @@ import { describe, expect, it } from "vitest";
  * A use passes when its enclosing statement mentions `liveRitual` outside
  * any `or(…)` or `not(…)` or, in raw SQL, `deleted_at is null`. Anything
  * else needs an ALLOWED entry with its reason, and an entry that no longer
- * matches fails, as in src/components/importBoundary.test.ts. An entry
- * trusts its whole file. Re-exporting the table outside the schema
+ * matches fails. An entry trusts its whole file. Re-exporting the table outside the schema
  * directory is flagged too, since it would hide the name.
  */
 const ALLOWED: ReadonlyMap<string, string> = new Map([

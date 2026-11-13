@@ -1,18 +1,5 @@
 "use client";
 
-import { hallTagSpec } from "@magick-components/gd/hall/spec";
-import type {
-  HallArtRegistry,
-  HallAttrSpec,
-  HallNode,
-} from "@magick-components/gd/hall/types";
-import {
-  BOARD_KINDS,
-  HALL_ROLES,
-  LIGHT_KINDS,
-  PLACEABLE_ATTRIBUTES,
-} from "@magick-components/gd/hall/vocabulary";
-import { GRADE_LAMEN_OFFICERS } from "@magick-components/gd/lamenGrades";
 import Add from "@mui/icons-material/Add";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
@@ -25,6 +12,19 @@ import {
   Switch,
   TextField,
 } from "@mui/material";
+import { hallTagSpec } from "magick-components/gd/hall/spec";
+import type {
+  HallArtRegistry,
+  HallAttrSpec,
+  HallNode,
+} from "magick-components/gd/hall/types";
+import {
+  BOARD_KINDS,
+  HALL_ROLES,
+  LIGHT_KINDS,
+  PLACEABLE_ATTRIBUTES,
+} from "magick-components/gd/hall/vocabulary";
+import { GRADE_LAMEN_OFFICERS } from "magick-components/gd/lamenGrades";
 import {
   type KeyboardEvent,
   useCallback,

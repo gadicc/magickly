@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 const { calls } = vi.hoisted(() => ({ calls: vi.fn() }));
-vi.mock("@/components/kabbalah/TreeOfLife", () => ({
+vi.mock("magick-components/kabbalah/TreeOfLife", () => ({
   default: (props) => {
     calls(props);
     return (

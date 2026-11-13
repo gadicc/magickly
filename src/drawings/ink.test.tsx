@@ -1,20 +1,20 @@
 // @vitest-environment jsdom
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import PlanetarySpirit, {
+  PLANETARY_SPIRIT_IDS,
+} from "magick-components/astrology/planetarySpirits";
+import Chakras from "magick-components/chakras/Chakras";
+import Lamen from "magick-components/gd/Lamen";
+import RoseSigil from "magick-components/gd/RoseSigil";
+import SevenBranchedCandleStick from "magick-components/gd/SevenBranchedCandleStick";
+import TableOfShewbread from "magick-components/gd/TableOfShewbread";
+import TreeOfLife from "magick-components/kabbalah/TreeOfLife";
 import type { ReactElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it } from "vitest";
 import GeomancyReading from "@/app/geomancy/reading/reading";
 import { readingFromSearchParams } from "@/app/geomancy/reading/readingState";
-import PlanetarySpirit, {
-  PLANETARY_SPIRIT_IDS,
-} from "@/components/astrology/planetarySpirits";
-import Chakras from "@/components/chakras/Chakras";
-import Lamen from "@/components/gd/Lamen";
-import RoseSigil from "@/components/gd/RoseSigil";
-import SevenBranchedCandleStick from "@/components/gd/SevenBranchedCandleStick";
-import TableOfShewbread from "@/components/gd/TableOfShewbread";
-import TreeOfLife from "@/components/kabbalah/TreeOfLife";
 import Ink, { type InkDrawing, inkClass } from "./Ink";
 
 /**

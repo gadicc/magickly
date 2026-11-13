@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { DateTime, Settings } from "luxon";
+import { moonMeanInclination } from "magick-components/astrology/Moon";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { moonMeanInclination } from "@/components/astrology/Moon";
 import { resetPlaceStore } from "@/geo/usePlace";
 import { hydrateAt, renderAt } from "../../../../tests/hydration";
 import Moon from "./moon";

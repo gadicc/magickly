@@ -1,11 +1,11 @@
 "use client";
 
-import { gdHallFontFaceCss } from "@magick-components/gd/hall";
 import type { Editor } from "@tiptap/core";
 import { closeHistory, redoNoScroll, undoNoScroll } from "@tiptap/pm/history";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 import type { Command } from "@tiptap/pm/state";
 import { useEditorState } from "@tiptap/react";
+import { gdHallFontFaceCss } from "magick-components/gd/hall";
 import { useCallback, useMemo } from "react";
 import { gdHallArt } from "@/app/gd/halls/art";
 import { GD_HALL_FONT_BASE } from "@/app/gd/halls/fontBase";

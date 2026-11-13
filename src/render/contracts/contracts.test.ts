@@ -1,4 +1,4 @@
-import { WATCHTOWER_VIEWBOX } from "@magick-components/enochian/Tablet";
+import { WATCHTOWER_VIEWBOX } from "magick-components/enochian/Tablet";
 import { TABLET_VERSIONS } from "magick-data/enochian/tablets";
 import { describe, expect, it } from "vitest";
 import { parseComponentImageRequest } from "../componentImageRequest";

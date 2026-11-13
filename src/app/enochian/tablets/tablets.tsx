@@ -12,6 +12,7 @@ import {
   Switch,
   Typography,
 } from "@mui/material";
+import Tablet, { type TabletSquare } from "magick-components/enochian/Tablet";
 import tabletNotes, {
   sourceText,
   sourceUrl,
@@ -27,7 +28,6 @@ import {
   type TabletVersionId,
 } from "magick-data/enochian/tablets";
 import React from "react";
-import Tablet, { type TabletSquare } from "@/components/enochian/Tablet";
 import { plateClass } from "@/drawings/plate";
 import ExportControls from "@/export/ExportControls";
 import OpenSource from "@/OpenSource";
@@ -549,7 +549,7 @@ export default function Tablets() {
       <OpenSource
         files={[
           "/src/app/enochian/tablets/tablets.tsx",
-          "/src/components/enochian/Tablet.tsx",
+          "/packages/magick-components/src/enochian/Tablet.tsx",
           "/packages/magick-data/src/enochian/tablets.json5",
           "/packages/magick-data/src/enochian/tabletNotes.json5",
         ]}

@@ -1,8 +1,8 @@
 "use client";
 
 import { Container } from "@mui/material";
+import TableOfShewbread from "magick-components/gd/TableOfShewbread";
 import React from "react";
-import TableOfShewbread from "@/components/gd/TableOfShewbread";
 import Ink from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";
 import OpenSource from "@/OpenSource";
@@ -23,7 +23,7 @@ export default function CandleStickPage() {
       <OpenSource
         files={[
           "/src/app/gd/symbols/shewbread/shewbread.tsx",
-          "/src/components/gd/TableOfShewbread.tsx",
+          "/packages/magick-components/src/gd/TableOfShewbread.tsx",
         ]}
       />
     </Container>

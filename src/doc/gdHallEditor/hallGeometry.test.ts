@@ -1,7 +1,7 @@
 import {
   type ResolvedObject,
   resolveHall,
-} from "@magick-components/gd/hall/layout";
+} from "magick-components/gd/hall/layout";
 import { describe, expect, it } from "vitest";
 import { gdHallArt } from "@/app/gd/halls/art";
 import {

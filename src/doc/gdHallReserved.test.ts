@@ -1,9 +1,9 @@
 import { readFileSync } from "node:fs";
-import { validateHall } from "@magick-components/gd/hall";
+import { validateHall } from "magick-components/gd/hall";
 import {
   RESERVED_ATTRIBUTES,
   RESERVED_TAGS,
-} from "@magick-components/gd/hall/vocabulary";
+} from "magick-components/gd/hall/vocabulary";
 import { describe, expect, it } from "vitest";
 import { gdHallArt } from "@/app/gd/halls/art";
 import { type JsonValue, validateRitualSemantic } from "./semantic";

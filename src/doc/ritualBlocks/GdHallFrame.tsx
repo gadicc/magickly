@@ -1,5 +1,5 @@
-import { estimateHallAspect } from "@magick-components/gd/hall/aspect";
-import type { HallNode } from "@magick-components/gd/hall/types";
+import { estimateHallAspect } from "magick-components/gd/hall/aspect";
+import type { HallNode } from "magick-components/gd/hall/types";
 import dynamic from "next/dynamic";
 import { Component, type CSSProperties, type ReactNode } from "react";
 import styles from "./frames.module.css";

@@ -1,4 +1,4 @@
-The temple-hall diagrams (`src/components/gd/hall`, plan 061) draw their
+The temple-hall diagrams (`packages/magick-components/src/gd/hall`, plan 061) draw their
 labels and caption in Noto Serif Italic, the compass labels in Noto Serif Bold
 Italic and their Hebrew (the letter banners, the Tarot keys' letters and the
 Pantacle's ring) in Frank Ruhl Libre Bold, which replaced Noto Serif Hebrew
@@ -25,7 +25,7 @@ copyright and licence names.
 | ../../assets/fonts/NotoSerif-Italic-latin1.ttf | the same subset as TrueType, for the server's image renderer (plan 062) | 26112 | b17042575847967023a24dba5b9b4b16aa9fe9a627005acfed7b18ca2c48c6b9 |
 | ../../assets/fonts/NotoSerif-BoldItalic-compass.ttf | the same subset as TrueType | 3908 | d443ee9985cdaf7c3aa1120bfb3971b8f4f1b42896bf2c07cec5833b3336f475 |
 | ../../assets/fonts/FrankRuhlLibre-Bold-letters.ttf | the same subset as TrueType | 7812 | 84304f1b7ce5fcce319b52946a714205d158f5a4ebc6050511090c50b41753ae |
-| ../../src/components/gd/hall/fontMetrics.json | advances and GPOS kern pairs (by class) of the three subsets, in font units | 10250 | db90eb9f1be58f60effd724901321932570ad1d6e6df0b948602f579123a5d3f |
+| ../../packages/magick-components/src/gd/hall/fontMetrics.json | advances and GPOS kern pairs (by class) of the three subsets, in font units | 10250 | db90eb9f1be58f60effd724901321932570ad1d6e6df0b948602f579123a5d3f |
 
 Built with fontTools 4.66.1, Brotli 1.2.0 and uharfbuzz 0.56.2 (HarfBuzz
 14.5.0 in the 11 November 2026 rebuild, which left the Noto Serif files byte

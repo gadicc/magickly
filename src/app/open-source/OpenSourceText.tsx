@@ -41,7 +41,9 @@ export default function OpenSourceText() {
               the data package&apos;s licence
             </Link>
             ,{" "}
-            <Link href={repositoryFile("src/components/LICENSE.txt")}>
+            <Link
+              href={repositoryFile("packages/magick-components/LICENSE.txt")}
+            >
               the components&apos; licence
             </Link>
             ). That includes the drawings the components make: where a
@@ -132,7 +134,7 @@ export default function OpenSourceText() {
         </PackageCard>
         <PackageCard
           name="magick-components"
-          directory="src/components"
+          directory="packages/magick-components"
           published={false}
         >
           <p>
@@ -149,8 +151,8 @@ export default function OpenSourceText() {
           </p>
           <p>
             It is not on npm yet. Until it is, the components are in the
-            app&apos;s repository, under <code>src/components</code>, where you
-            may copy them under MIT.
+            app&apos;s repository, under <code>packages/magick-components</code>
+            , where you may copy them under MIT.
           </p>
         </PackageCard>
       </PageText>

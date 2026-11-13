@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
-import GradeTree from "@magick-components/gd/GradeTree";
 import { cleanup, render, screen } from "@testing-library/react";
+import GradeTree from "magick-components/gd/GradeTree";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import Tiles from "./Tiles";
 

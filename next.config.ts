@@ -117,12 +117,12 @@ export default async function (phase: string): Promise<NextConfig> {
     // css-tree's ESM data entry uses createRequire(import.meta.url). Keep the
     // package native so its relative data paths remain runtime-relative.
     serverExternalPackages: ["pdf-parse", "@resvg/resvg-wasm", "css-tree"],
-    // The data package's exports are its TypeScript sources, compiled here as
+    // The packages' exports are their TypeScript sources, compiled here as
     // the app's own code is. Their relative specifiers end in `.ts`, which
     // both bundlers resolve as written; neither resolves a `.js` specifier to
     // a `.ts` file, and webpack's `extensionAlias`, the one remedy, is not
     // read by Turbopack (plan 052).
-    transpilePackages: ["magick-data"],
+    transpilePackages: ["magick-data", "magick-components"],
     outputFileTracingIncludes: {
       "/api/search": ["./public/search-vectors/*.bin"],
       // Read with fs by src/geo/server/places.ts, so not traced on its own.

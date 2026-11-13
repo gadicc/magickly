@@ -1,7 +1,7 @@
 import Paper from "@mui/material/Paper";
+import { readFieldPath } from "magick-components/kabbalah/fieldPath";
 import data from "magick-data";
 import Tetragram from "@/app/geomancy/Tetragram";
-import { readFieldPath } from "@/components/kabbalah/fieldPath";
 import Ink from "@/drawings/Ink";
 
 // https://stackoverflow.com/a/56773391/1839099

@@ -1,7 +1,7 @@
 import {
   GD_HALL_FONT_FILES,
   gdHallFontFaceRule,
-} from "@magick-components/gd/hall";
+} from "magick-components/gd/hall";
 import { SVG_NAMESPACE } from "@/export/svgExport";
 import { GD_HALL_FONT_BASE } from "../fontBase";
 

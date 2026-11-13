@@ -1,13 +1,13 @@
 import {
   describeHall,
   type HallDescription,
-} from "@magick-components/gd/hall/describe";
+} from "magick-components/gd/hall/describe";
 import {
   HALL_SOURCE_WORKS,
   type HallPreset,
   hallPreset,
   hallSourceUrl,
-} from "@magick-components/gd/hall/presets";
+} from "magick-components/gd/hall/presets";
 import type { Metadata } from "next";
 import {
   GD_HALL_LICENCE,

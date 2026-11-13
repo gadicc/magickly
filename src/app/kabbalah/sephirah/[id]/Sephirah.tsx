@@ -1,7 +1,7 @@
+import Chakras from "magick-components/chakras/Chakras";
+import { FIELD_PATH_LIST_SEPARATOR } from "magick-components/kabbalah/fieldPath";
+import TreeOfLife from "magick-components/kabbalah/TreeOfLife";
 import type { SephirahRow, TreeOfLifePathRow } from "magick-data/rows";
-import Chakras from "@/components/chakras/Chakras";
-import { FIELD_PATH_LIST_SEPARATOR } from "@/components/kabbalah/fieldPath";
-import TreeOfLife from "@/components/kabbalah/TreeOfLife";
 import Ink, { inkClass } from "@/drawings/Ink";
 import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import { isHiddenSephirah } from "@/seo/entities";

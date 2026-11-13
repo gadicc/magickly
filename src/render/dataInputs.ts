@@ -1,10 +1,10 @@
 import "server-only";
 import { createHash } from "node:crypto";
+import { readFieldPath } from "magick-components/kabbalah/fieldPath";
 import data from "magick-data";
 import enochianTablet, {
   TABLET_VERSION_RULES,
 } from "magick-data/enochian/tablets";
-import { readFieldPath } from "@/components/kabbalah/fieldPath";
 
 /**
  * Hashing the data an image draws, so that a data edit moves the identity of

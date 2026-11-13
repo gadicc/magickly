@@ -6,7 +6,7 @@ import PathPage from "./kabbalah/path/[id]/page";
 import SephirahPage from "./kabbalah/sephirah/[id]/page";
 
 // The planet page draws its spirit's sigil, which no route here is held to.
-vi.mock("@/components/astrology/planetarySpirits", () => ({
+vi.mock("magick-components/astrology/planetarySpirits", () => ({
   default: () => null,
 }));
 

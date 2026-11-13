@@ -3,7 +3,7 @@ import { within } from "@testing-library/react";
 import { Settings } from "luxon";
 import { act } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { hydrateAt, renderAt } from "../../../tests/hydration";
+import { hydrateAt, renderAt } from "../../../../tests/hydration";
 import MercuryWidget from "./Mercury";
 
 const defaultLocale = Settings.defaultLocale;

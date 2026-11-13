@@ -15,11 +15,11 @@ import {
   Typography,
 } from "@mui/material";
 import { format } from "date-fns";
+import PlanetarySpirit from "magick-components/astrology/planetarySpirits";
 import data from "magick-data";
 import { PlanetId } from "magick-data/astrology/planets";
 import React from "react";
 import { upcomingHoursForPlanetAtLocation } from "@/app/astrology/planetary-hours/utils";
-import PlanetarySpirit from "@/components/astrology/planetarySpirits";
 import Ink, { inkClass } from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";
 import PlaceChooser from "@/geo/PlaceChooser";
