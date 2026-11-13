@@ -363,8 +363,11 @@ describe("the gd-hall image", () => {
  * dcf02ee9…, f8c29109… and 8c19b493… before. They moved again when its
  * four Yods were refined to the plate's slim lozenges (the same section),
  * the Yods' paths alone; their sources were fd4ba7bf…, 06d82cf0…,
- * a2af63a3… and 2ddc2792… before; and again when the lozenges became the
- * plate's sinuous flames, from 640c6327…, ae07fd8b…, 04b89cda… and 72f58a3c….
+ * a2af63a3… and 2ddc2792… before; again when the lozenges became the
+ * plate's sinuous flames, from 640c6327…, ae07fd8b…, 04b89cda… and
+ * 72f58a3c…; and again when the flames' left sides and lower ends were
+ * brought closer to the plate, from bc1f483a…, aa8e7a73…, 969bbdc8… and
+ * 48611581….
  */
 const PINS: Record<string, readonly string[]> = {
   neophyte: [
@@ -389,18 +392,18 @@ const PINS: Record<string, readonly string[]> = {
     "42f5e185e0a3b973fc893b7edfbd0c35e9783c30db9c07448cffa6d8c7d2a825",
   ],
   "theoricus-1": [
-    "bc1f483add1d1a0e830a087bc9cf113bf0cdad48eab3e0fba2c7a6e9d139de94",
-    "9724a66eb561fde0e1321ef4541788cc3f02cc97fc542fa2530a22d8e7b38e90",
-    "fee68045c6facb0c1c49d485e95a71bdf3035b09af23cb1ea27a95c9746954ab",
-    "6a76a0114d6bb915c6260fa75577bf88740efe28c596e9c245ed66722ae6ea5b",
-    "464685715d0f90aaca4acecde62cae3d1ebfed11d573ff924d3ea59c7adfcd92",
+    "4d9f0a7431254eeecc0216558cd7fd87aa65be8d31629777aa1049743be99024",
+    "d330795a8ad6af3fc1fe330920a229be4ef18742d72f10758d1376750510be1d",
+    "49ce61ef59b5249f828bb02917bec56bf1d18a8f83ad67c14a1bdd176f4556d5",
+    "2a4fc1cb3cde776cb1a4ff928ae5147d37aea79e32db0e8b9337e0edf59d8fd4",
+    "eaca1a113dc710883ff404859fead045b8132ce85c4ff62ae40a26d0f6bf5bda",
   ],
   "theoricus-2": [
-    "aa8e7a73133884a816d09e65c2cb3fb42242ba70b49cdb6ec9f707a598f277f2",
-    "cdf3d5386a0bf6bf3d60dba2cb5f9470f51ea7275a1af9db99129eff33e5241e",
-    "6042a0d5db67b873977a455da14cb9bb438b2abb68b8f407bc509cd0c7d7360a",
-    "02dda5473990b9bdcdfd2b6609d6ecfba5792927c55e281bea83798fe4d8bf3c",
-    "04c24ab2688c6065d354f19c4b641524eeb7438d7cb2fb81fc907a6d72ee4855",
+    "72c860e3bdba8b816d0bfbf02558666d901db112989d2d44261171f0e31c1736",
+    "aafdcfddbb470f434a52fc3055939b1aa888090f397f41567ea80d42dfe0ed7c",
+    "dfbf57f02a5db73f7c02b4609e428a9aebd2191d02272a73157d8df379572904",
+    "7835a03c5973e650d812507ce83b2f86d1613fbb3fee6c24e8747b9aac281e8f",
+    "4d3ed10314e2e03c7e1215e51019ad8569d2eddaf48ff7d985bffa57a4af86b4",
   ],
   "practicus-1": [
     "9bbfd564d558aa4a1453383c46bee6613f50531418c29c8401255e57c8b83d88",
@@ -452,18 +455,18 @@ const PINS: Record<string, readonly string[]> = {
     "59499e84a949e60154b7a2128349b28e8e23f1a6d28908de18bd271de9167c75",
   ],
   "portal-1": [
-    "969bbdc85019050786c29316d6cea891cb8affb7f9b81d8141a98265e0c9c496",
-    "49a9bfb8a84490dff3c99c04943f8c40da790734253f3b5bc81b64f26ca06cd2",
-    "9656c5cf9bd6aa19143f40df106f7da45c7cf28f7bd13e1e528eba8f3f3e7cd0",
-    "7ce2029020cffc0e025be01b81217ffe9cb522ec3d92eb8b3b0cfe76b3d8d3ae",
-    "8781a7d58a4ccc873decfebe90e35532c0b3d18f30c08a6ef0106e0129e2508d",
+    "c97aa8666a049b8c03ac12cdb7b2586f1bb1900e9f47e3fc331c1cb4f69f18d9",
+    "767f1c4f55069979413bfd66689ea3e3cf025b23bbd94fbf1e5c5eacb8a37eb9",
+    "5d2cbcd29ca1c94b83efa2a23b0bd9f11abb03bad4e7c59682934e67606460de",
+    "c47418e18ae01f03a37b69eed6dc2af55ef8781a4c6449f8ca7731b67778ee37",
+    "7e6d8ecd5b6b603c6e5e9169e876894ce050bb0b4ba1f276f110a248c4c223d3",
   ],
   "portal-2": [
-    "48611581f29521f0a37f53dfca7c8b4214b2c0acaff27a8bd7b449469d856ebf",
-    "834f13e8564d2e2953e51a720bb8f4ee2c5565a4c69342bee521bffec31090cd",
-    "29ec82d2db9a2d6c2855fa39a9f3f96876879307acd9752f14f7b90cf4915a3d",
-    "8c5ab66b1b55061ab0fbc070db78d5fd55a8838f2f0644da46e1a3b4e44e2cf1",
-    "e5d9922ee6b32c7077b7352f31746f8dd6dd24543896fb09f3f230b45cb24de7",
+    "11766ad1a432c982874e420589d52fccb4438dc02582a525ed210f5ab089086e",
+    "30641cfb0b1c8d2fecb06e5784309b618e326e4d32da29e9d4a5d538afb13c02",
+    "e503e3bcc38ade471e69964174e161afc5bdb31250cbfadab14f726982e231be",
+    "f95995144c3bbed4754d0f16e487447e151b6bd930317d34f6757fd5be771767",
+    "d1f1f019e056d608f279346a3acc8c864a9a1fa9e55e04d11e8769a0d79f33e3",
   ],
 };
 

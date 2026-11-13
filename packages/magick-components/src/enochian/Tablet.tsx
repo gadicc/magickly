@@ -177,20 +177,22 @@ const AIR_TAU =
  * One of the four Yods over the Tau, drawn as a small flame, as it
  * stands on the page (no rotation), about its centre: the point at the top
  * flicks over to the right and drops into a shallow hollow, the right side
- * swells out and runs down nearly straight to a blunt lower end, and the
- * left side bulges near the top and runs back straight to that end, so
- * the outline has a gentle S along its length. About 1.8 times as long as
- * it is wide. Cubic segments placed by eye against an enlarged crop of
- * the Equinox's Plate X (see `EquinoxSigils`), not traced, and not any
- * font's yod. Regardie's own drawing (The Golden Dawn, vol. 4, 1940) gives
- * the flames wavy strokes instead; both versions here keep the plate's
- * form.
+ * swells out and runs down nearly straight to a second point at the
+ * bottom, as sharp as the top's, and the left side runs down from the top
+ * in a full, convex curve, widest a little above halfway, then turns into
+ * a shallow hollow above the bottom point, so the outline has a gentle S
+ * along its length. About 1.8 times as long as it is wide. Cubic segments
+ * placed by eye against an enlarged crop of the Equinox's Plate X (see
+ * `EquinoxSigils`) and checked against the width of its marks at a few
+ * heights, not traced, and not any font's yod. Regardie's own drawing
+ * (The Golden Dawn, vol. 4, 1940) gives the flames wavy strokes instead;
+ * both versions here keep the plate's form.
  */
 const AIR_YOD =
   "M-1.3 -5.5C-0.8 -4.6 -0.8 -3.2 0.3 -2.4C1.6 -1.5 3.4 -0.8 3.6 1.4" +
-  "C3.8 2.8 3.5 4.3 3 5C2.7 5.4 2 5.3 1.4 4.9" +
-  "C0 3.8 -2.6 2.5 -3.4 0.6C-4.1 -0.9 -3.1 -2.6 -2.3 -3.6" +
-  "C-1.8 -4.2 -1.5 -4.7 -1.3 -5.5Z";
+  "C3.8 2.8 3.6 4.4 2.8 5.5" +
+  "C1.9 4.9 0.6 4 -0.6 3.5C-1.9 2.9 -3.6 1.6 -3.7 -0.3" +
+  "C-3.75 -2.3 -2.9 -4.2 -1.3 -5.5Z";
 
 /**
  * The Yods' centres along the grid's x, a little over the crossbar, about

@@ -78,31 +78,33 @@ describe("Tablet", () => {
     // They moved again when its four Yods were refined to the plate's
     // slim lozenges (plan 080, "The sigils' sources"); 924e6792…,
     // d56aa4ee…, 0c0c0214… and b92ebc33… before, the Yods' paths alone;
-    // and again when the lozenges became the plate's sinuous flames:
-    // f2376705…, f89ff742…, 11a0bb4f… and 2b0bc2ed… before.
+    // again when the lozenges became the plate's sinuous flames:
+    // f2376705…, f89ff742…, 11a0bb4f… and 2b0bc2ed… before; and again when
+    // the flames' left sides and lower ends were brought closer to the
+    // plate: 78e363ff…, adc7e8f1…, a0de5c79… and d37c4131… before.
     [
       "air",
       false,
       true,
-      "78e363fffbc971d24e96e397fcac1f76acab4aa9721a185c47a4dd7749854b75",
+      "6c91cf57accac61ff2a8474db7071b27f166ca728ed7b38a314789f129508cf5",
     ],
     [
       "air",
       false,
       false,
-      "adc7e8f185cfa96802fbaa459f67113f2119e66648f68e96b825bd09600c53bc",
+      "97bd1a3ee76de7b982d5fcc6981b69ffd4083217be8cb1103a2b6aad5ee33136",
     ],
     [
       "air",
       true,
       true,
-      "a0de5c7952d827f85c2a9f0bffbd2adea51e82e4dcb2b08e2b48c811bbf8ea9f",
+      "00f7cadf159da1cac960ba0db71869161ef161c7b5b4ae5d842cabe79208ed13",
     ],
     [
       "air",
       true,
       false,
-      "d37c41311fbb5c4faf871e2b8dd020bfee287575b087351edb6a604eeda968ca",
+      "213aad4e19ab14304423ffa24e0ce8a598486541b1c367651b1334be75c2e834",
     ],
   ] as const)(
     "draws %s (Enochian %s, frame %s) as it did",
@@ -285,11 +287,12 @@ describe("Tablet", () => {
     // The Equinox's Air sigil, drawn after its Plate X (plan 080, "The
     // sigils' sources"), which the hashes above, all in the Golden Dawn's
     // version, do not reach. e2793a22… before its Yods were refined, then
-    // 74105d5e… before they became sinuous flames (the Yods' paths alone
-    // moved each time).
+    // 74105d5e… before they became sinuous flames, then f885fbfd… before
+    // the flames' left sides and lower ends were brought closer to the
+    // plate (the Yods' paths alone moved each time).
     it("draws the Equinox's Air sigil as it did", () => {
       expect(sha256(renderToStaticMarkup(EquinoxSigils.air()))).toBe(
-        "f885fbfd8767401495a77f46655c6cc0c2c3f3c397b87ed769994dfe0d1cdcea",
+        "bd8082f1abbe2af49d82e33057433433d71c437e53b282061c2780b3f0b04070",
       );
     });
 

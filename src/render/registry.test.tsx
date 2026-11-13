@@ -218,18 +218,20 @@ describe("component image registry", () => {
     // 6bdff3d1…, and 220,099, 914fe5eb…, until its four Yods were refined
     // to the plate's slim lozenges (the same section); then 124,856,
     // 8313d75c…, and 220,195, e9c0aebe…, until the lozenges became the
-    // plate's sinuous flames. Reviewed again as rasterised.
+    // plate's sinuous flames; then 124,884, 8952f44a…, and 220,223,
+    // cf25c90c…, until the flames' left sides and lower ends were brought
+    // closer to the plate. Reviewed again as rasterised.
     [
       "enochian-tablet",
       "id=air",
-      124_884,
-      "8952f44a18cde81db521f2cd5a55a26820081fba28d6042a2192f650626848f9",
+      124_796,
+      "dcced8d14f168184211314c9226a675b997a755abe8606eade54acd3f2054253",
     ],
     [
       "enochian-tablet",
       "id=air&font=enochian",
-      220_223,
-      "cf25c90c90427c78b093ad3c431993257615c3ab482fc4108eeda1d0fb121da4",
+      220_135,
+      "48c4507e88fd7567bc76be2727fac48cafa74edc39fa4d58896d151d01b33b26",
     ],
     // One tablet in each other version, reviewed as rasterised (plan 061,
     // "Tablet versions"): Regardie's sigil, the Equinox's in black, and
