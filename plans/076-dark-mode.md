@@ -122,8 +122,10 @@ has no dark mode; Gadi asked for it to be planned on its own.
      `ink`): Tetragram dots (one component behind the geomancy reference,
      reading, chart and study sets), `AstroGeomancyChart`, the reading's
      planetary pentagram, the seven planetary-spirit sigils (`fill
-     #070707` in `svg/astrology/spirits/`), the seven-branched
-     candlestick, the table of shewbread, the rose sigil's petals, the
+     #070707` in `svg/astrology/spirits/`; superseded on 13 November
+     2026: the sigils are redrawn as one `stroke="#000"` path each and
+     that directory is gone, plan 080, "The sigils' sources"), the
+     seven-branched candlestick, the table of shewbread, the rose sigil's petals, the
      chakra figure, the lamen's outer ring, and the
      Tree of Life's outlines (sphere and path strokes only; labels on
      spheres keep their colour, so Binah's `#222` and Malkuth's black
@@ -148,7 +150,9 @@ has no dark mode; Gadi asked for it to be planned on its own.
      Instead the page wraps the drawing in an element with a class (outside
      the cloned `<svg>`), and page CSS keyed on `.dark` and that class
      selects by what the drawing already has: its ids (`#paths`), its
-     colour attributes (`[stroke="#000" i]`, `[fill="#070707"]`) and
+     colour attributes (`[stroke="#000" i]`, `[fill="#070707"]`, the
+     latter superseded on 13 November 2026 when the spirits' sigils
+     became strokes, plan 080, "The sigils' sources") and
      unfilled text (`text:not([fill])`). A rule on a child beats a colour
      the child inherits from a parent's inline style, which covers the
      Tree's paths (`TreeOfLife.tsx`: `style` on `<g id="paths">`). Where

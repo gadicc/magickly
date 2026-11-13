@@ -351,6 +351,12 @@ Follow-ups are separate from the completed migration work:
   ([plan 080](080-open-source-packages.md#the-sigils-sources-13-november-2026)).
   TODO for Gadi: whether the old files' git history matters, and
   whether to credit Heydon on the geomancy reference.
+  A review of the three stacked branches found nothing critical or
+  high; its findings (777's and the Golden Dawn's names are variants of
+  Agrippa's, Regardie's coloured sigils are not all after Plate X, and
+  smaller wording, pins and plan fixes) are fixed on top of
+  `gate/pd-sigils`
+  ([plan 080](080-open-source-packages.md#review-of-the-stacked-branches-13-november-2026)).
   TODO: with Gadi's go-ahead, stage G; stage E's and F's deferred
   items. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups),

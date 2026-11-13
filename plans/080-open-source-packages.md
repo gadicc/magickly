@@ -1207,8 +1207,12 @@ third.
   (a plain URL would load the 52 kB original), which a test holds. The seven seals are TSX, from SVGR's output for
   `svg/astrology/spirits/` as `next.config.ts` ran it: each renders to
   the markup the SVG import did, which was checked for all seven. The
-  Inkscape files stay as their sources. The known-violations list is
-  gone.
+  Inkscape files stay as their sources. (Superseded on 13 November
+  2026: the seals were found to be the Rulers' geomantic sigils traced
+  from a modern printing, redrawn after Heydon, and
+  `svg/astrology/spirits/` removed; see [The sigils'
+  sources](#the-sigils-sources-13-november-2026).) The known-violations
+  list is gone.
 - **The move.** `src/components` is `packages/magick-components/src`,
   `workspace:*` in the app, compiled through `transpilePackages`; 164
   specifiers in 99 files became `magick-components/…`, the alias left
@@ -1434,7 +1438,9 @@ and 1280 px, light and dark, the figure is filled black in light and
 | `c0e2beb6` | `fix(components): Draw the chakras' figure anew` |
 
 It passed stage E's gate (the gate with the package's smoke test) on
-its own tree, every step first time, coverage included.
+its own tree, every step first time, coverage included. After the
+rebase onto stage F both chakras commits were gated again on their own
+trees, and each passed every step first time, coverage included.
 
 ## Stage C (13 November 2026)
 
@@ -1871,8 +1877,8 @@ Moon's `intelligenceId` is Shelachel, added in `7dbc4bdf` (24 July 2024)
 with no source. Agrippa, *De occulta philosophia* (1533), Book II,
 chapter 22, gives the Moon no single intelligence but an
 "intelligentia intelligentiarum", Malcha betharsisim hed beruah
-schehakim; 777 and the Golden Dawn give the same name. Gadi asked for
-both, each with a note.
+schehakim; 777 and the Golden Dawn give variants of it in their own
+spellings. Gadi asked for both, each with a note.
 
 | Commit | What |
 | --- | --- |
@@ -1909,9 +1915,13 @@ both, each with a note.
   schehakim¹ / Shelachel²", the Hebrew in Frank Ruhl Libre, and a
   Notes section closes the page. Note 1 says it is the classical name,
   from Agrippa 1533 II.22 (linked to the scan), where the Moon has an
-  intelligence of intelligences, and gives 777's and the Golden Dawn's
-  spellings; note 2 says Shelachel is a short modern name found in
-  present-day sources, not in Agrippa, 777 or Heydon. Each reference
+  intelligence of intelligences, and gives 777's variant and the
+  Golden Dawn's related form; note 2 says Shelachel is a name found in
+  present-day sources that we have not found in Agrippa, in 777 (the
+  1955 revised edition) or in Heydon's *Theomagia* (1663/4). Both notes
+  were worded so after the [review of the stacked
+  branches](#review-of-the-stacked-branches-13-november-2026); at first
+  note 1 called them the same name. Each reference
   is a link to its note, described by the notes' heading, and each
   note links back; targets stop below the app bar and the note reached
   is tinted. The geomancy reference's spirits table gives the Moon both
@@ -1940,8 +1950,8 @@ both, each with a note.
   worktree with a fresh install and Node 24.18.0, while other agents'
   gates kept the load average between 40 and 60, before the rebase onto
   stage F; after it each commit was gated again on its own tree. The
-  data commit: the first run failed `test-coverage` and its re-run in timeouts in unrelated
-  suites (`sqlLegacyImport`, `r2RitualStorage`, the dictionary keypad,
+  data commit: in the first run, `test-coverage` and its re-run both
+  failed on timeouts in unrelated suites (`sqlLegacyImport`, `r2RitualStorage`, the dictionary keypad,
   the search dialog and six others); those ten files then passed alone
   (322 tests), and a second whole gate passed every step, coverage
   without a re-run. The app commit: `test-coverage` failed in five
@@ -2051,9 +2061,11 @@ Cattan and Fludd, *777*, manuscripts.
   sigils in the example module's comment. The JSDoc is search prose, so
   that commit refreshes the vectors: `search:compare` embedded 2
   passages per profile, `search:publish` none. The Air commit changes
-  no JSDoc or prose; stage F's image parity test, which renders the
-  tablet's examples through the image route and as the component,
-  passes on the new drawing.
+  `AirSigil`'s and `EquinoxSigils`' JSDoc and the README, none of which
+  the props manifest or the search catalogue carries, so neither moved;
+  stage F's image parity test, which renders the tablet's examples
+  through the image route and as the component, passes on the new
+  drawing.
 
 Pins that moved, each after review of the rasterised output: Air's four
 markup hashes in `Tablet.test`; `enochian-tablet?id=air` (127,724 to
@@ -2099,6 +2111,49 @@ timeouts in the legacy import first).
 - **A credit on the page.** The geomancy reference could say the sigils
   follow Heydon (1663/4); that is page prose and needs a search-vector
   refresh, so it was left out.
+
+## Review of the stacked branches (13 November 2026)
+
+An independent review of the eight stacked commits (the chakras'
+figure, the Moon's two intelligences and the sigils' sources, rebased
+onto stage F) found nothing critical or high. Its findings are fixed in
+`0f19ed5d` (`fix(astrology): Say what the sources give, no more`) and
+in this commit, on top of `gate/pd-sigils`, without rebasing.
+
+- **The Moon's name (medium).** 777 and the Golden Dawn were said to
+  give Agrippa's name; they give variants. Agrippa's Hebrew makes 3321
+  only with final mem as 600, while 777 (col. LXXVIII, line 13) counts
+  its final mems as 700 (Crowley's note to col. LXXIX) and its "va A'ad"
+  reads ועד for Agrippa's עד; Regardie (vol. 4, p. 86, in capitals) ends
+  the name in a plural Ruachoth and another last word, without be-.
+  Note 1, the schema's descriptions and the data file's header now say
+  "a variant" and "a related form", and that the 777 and Regardie
+  romanisations follow those sources' own spellings, not `he`.
+- **Regardie's coloured sigils (medium).** `EquinoxSigils`' JSDoc and
+  the components' README said all four follow Plate X. Only Air's form
+  does; the coloured Water and Fire are drawn from Regardie's
+  description (vol. 4, p. 307) and Earth is a cross in four colours.
+  Both now say so.
+- **Smaller corrections.** Shelachel's note and description say we
+  have not found it in Agrippa, in 777 (1955) or in Heydon, not that it
+  is not there, and no longer call it short or modern; *Theomagia* is
+  dated 1663/4 throughout; three tests cite this plan's "The sigils'
+  sources" for the Air redraw; `Tablet.test` pins the Equinox's plain
+  Air sigil (`e2793a22…`), which the tablet hashes did not reach;
+  stage E's record of the seals and plan 076's notes on
+  `svg/astrology/spirits/` are marked superseded; the sigils' and the
+  Moon's sections are corrected where they misstated a commit or a
+  gate, and the chakras' section records its gates after the rebase.
+- **Pins and search.** The geomancy reference's byte pin moves by the
+  notes' words alone (with the old words the bytes are the old 66525
+  `40af8b13…`). The schema's descriptions are search prose, so
+  `0f19ed5d` refreshes the vectors: `search:compare` embedded 1 passage
+  per profile, `search:publish` none.
+
+| Commit | What |
+| --- | --- |
+| `0f19ed5d` | `fix(astrology): Say what the sources give, no more` |
+| (this commit) | `docs(plans): Record the stacked branches' review` |
 
 ## Review (11 November 2026)
 
