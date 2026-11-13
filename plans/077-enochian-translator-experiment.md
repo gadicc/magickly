@@ -13,6 +13,9 @@ the code that measures the new bars, and the page's list of
 limitations. Run on the new text 12 and 13 November 2026 (see
 "Results"): Opus A3 meets every bar for tasks 1 and 2 and fails three
 of task 3's four (acceptance, round trip and attested forms). Spent: $25.74 of the $100.
+Round 2 was designed, then stopped by Gadi on 13 November 2026 (see
+"Round 2"): under "never coin", English into Enochian is mostly a
+lookup problem. The product is planned separately.
 Read [current status](000-current-status.md) first; this plan tests the
 long-term goal recorded there ("a small neural network for translating
 between Enochian and English") before anyone builds it.
@@ -761,6 +764,111 @@ own bars, set before it runs.
 Still to do from "Scoring": Gadi's reading of a random tenth of the
 judged rows for obvious misjudgements has not been done.
 
+## Round 2: designed, then stopped (13 November 2026)
+
+Round 2 was to test composition again with the scoring fixed. It was
+designed decision by decision with Gadi and reviewed twice by Fable.
+Gadi stopped it on 13 November 2026, before any code or call, after a
+free comparison showed there was little left for a model to add. The
+decision record, both reviews' summaries and the analysis scripts are
+in `~/Documents/Magick/Enochian/derived/translate-eval/round2-design/`.
+
+**What round 1's task 3 had measured.** An offline look at the stored
+answers found:
+
+- The attested-forms bar took lookup's first gloss as "the form that
+  exists", which is often the wrong sense (CABA "govern" for "see", an
+  angel's name for "tell"), and many of Dee's forms carry more than the
+  English (ORRI "barren stone" for "stone", EDNAS "as receivers"). About 30 of its 196 forms
+  were wrong senses, so a sound translation topped out near 85%.
+- The round trip's back-translator had only the dictionary, and
+  questions lost their "?". Of the 9 accepted Opus sentences that
+  failed it, 3 failed on the back-translator and 4 on the translation
+  (3 of them forms that carry extra meaning, such as "our Lord and
+  Master" for "master"; 1 a dropped "my"); 2 were mixed.
+- No model with our data marked a word "coined": the prompt praised
+  "unknown" and the grammar notes say not to build new forms. 102 of
+  Opus's 103 "derived" words were Dee's forms used unchanged in another
+  or narrower sense; only one was a newly built word.
+- The judges split on whether "derived" licenses a stretched sense:
+  in 10 of Fable's 11 splits, the Opus judge accepted and the GPT
+  judge rejected.
+
+**Decisions** (Gadi, 13 November 2026):
+
+1. The translator never coins. Where our data has no word, it shows a
+   gap with the English.
+2. Round 2 would fix the scoring and test 60 fresh sentences, with the
+   bars set first. Expert work stays deferred; the list in "For an
+   expert" keeps growing.
+3. A sentence is accepted when it is right as far as it goes: every
+   word given right in sense and form, every gap warranted.
+4. The round trip stays, with the translator's data, and is calibrated
+   before it can count.
+5. No attested-forms bar; needless derivations are reported.
+6. Task 3 gets its own prompt, tried once on the old 60.
+7. Bars for Opus A3, with Fable and GPT-6.1 for comparison and lookup
+   as the baseline.
+8. A fused form (Dee's only form carries more than the English) is a
+   gap that suggests it: [master: nearest GEIAD "our Lord and
+   Master"]. A form is exact only when its gloss differs from the
+   English by filler alone.
+
+**What the reviews found.** The first review reworked decisions 3, 4, 6
+and 7: gaps one per content word, with a script's list of nearby forms
+beside each; bars by kind of sentence; fresh controls for the judges,
+including gaps that must be accepted; calibration on script-built
+sentences, read by the other model family; and power recomputed for
+judges who rejected 2 of 15 known-good passages. The second review
+found two flaws that decided the matter. The repo's list of filler
+words includes "not", "let", "as", "will" and every pronoun, so the
+exact-form rule would have passed IPURAN "SHALL NOT SEE" for "see" and
+PLOSI "AS MANY" for "many": the rule needs its own list. And under
+"never coin, exact form or gap", strict lookup with no model meets
+every bar by construction, so a pass would show nothing about the
+model.
+
+**Opus against strict lookup** (round 1's answers, offline). Strict
+lookup gives a form only when its gloss, back-to-front glosses
+rejoined, has the same content words as the English, with only
+articles, "of", "to", prepositions and auxiliaries ignored. Of Opus
+A3's content words in task 3:
+
+| What Opus did | Words |
+| --- | --- |
+| The form strict lookup gives | 182 |
+| A different form where lookup has an exact one (mostly DS for "who") | 15 |
+| A gap, as lookup would leave | 75 |
+| A gap where lookup has a form | 1 |
+| A fused form (a gap under decision 8) | 22 |
+| A form sharing part of its meaning with the English | 17 |
+| A form sharing no word with the English | 66 |
+
+Of those 66, by an unreviewed hand reading (Claude's, 13 November
+2026): about 16 are right, most of them
+irregular verbs and contractions (came, kept, forgot, said, could,
+don't, I'm) and the rest synonyms (UNIGLAG "descend" for "come down",
+RNAH "sunrise" for "dawn", PAAOX "remain" for "stayed"); about 15 are
+arguable, mostly another word class (TELOCH "death" for "died"); and
+about 35 are stretched or wrong (DLUGA "give" for "dedicate", LONSA
+"power" for "whoever", IP "not" for "never"; two are AR for "protect",
+which a misprint in its gloss hides). A small table of
+irregular verbs and contractions would give a script two thirds of the
+right ones.
+
+**Conclusion.** Under "never coin", English into Enochian is mostly a
+lookup problem: in round 1, a model added about half a dozen synonyms
+to 60 sentences and about 35 stretched words that something must
+catch. This rests on one model's round-1 output, under a prompt that
+did not ask for exact forms. Strict lookup must still choose between
+exact forms (449 English senses have two, 208 three or more), which is
+where a rule or a model can still help. Round 2's budget is unspent.
+The recommendation for the product plan, not yet decided: English into
+Enochian by strict lookup, with the irregular-verb and contraction
+table and gaps that suggest the nearest forms, a model at most
+offering synonyms as marked suggestions; Enochian into English by a
+model with our data, which met every bar.
+
 ## The first design: held-out Keys (withdrawn 12 November 2026)
 
 Tasks 1 and 2 were first set on the Keys themselves, in nineteen folds:
@@ -955,6 +1063,22 @@ this list, which the experiment adds to as it runs:
   single example in the Keys.
 - Where the Golden Dawn reading of a word differs from Dee's, which one
   the translator should prefer by default.
+- Added 13 November 2026, from round 1 and round 2's design:
+  - Fused forms: when Dee's only form carries more than the English
+    (GEIAD "our Lord and Master" for "master", ORRI "barren stone" for
+    "stone", PLOSI "as many" for "many"), may it stand for the narrower
+    word, or must it be a gap?
+  - Whether Enochian with gaps in mid-sentence reads at all, and how a
+    gap should be shown.
+  - TILB before its noun (Key 19's OD TILB ADPHAHT DAMPLOZ): G22 now
+    allows it; is that right?
+  - Round 1's task-3 sentences both judges accepted, and those they
+    split on, as a sample of the Enochian a model writes.
+  - Lookup's wrong-sense glosses (HOMIL "the true ages" for "true") and
+    dictionary-only glosses (Schueler's, angels' names): which should a
+    translator ever offer?
+  - Synonyms a model gave beyond lookup (UNIGLAG "descend" for "come
+    down", PAAOX "remain" for "stayed"): are they sound?
 
 ## Settled questions (11 November 2026)
 

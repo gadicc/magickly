@@ -397,6 +397,16 @@ Follow-ups are separate from the completed migration work:
   By the plan's rule the translator stays a lookup tool with a model's
   help; see its "Results". TODO: Gadi's spot check of a tenth of the
   judged rows.
+- 13 November 2026: plan 077's round 2 designed, then stopped by Gadi
+  before any code or call: under "never coin", English into Enochian
+  is mostly a lookup problem. The product is to be planned separately;
+  the recommendation is strict lookup with gaps that suggest the
+  nearest forms, and a model reading Enochian into English. TODO:
+  lookup should ignore "(see …)" cross-references in glosses (CABA
+  "govern, to; (see 'cab')" matched "see"). TODO: the dictionary glosses AR (`EMPM`) "the
+  sun, to prtect", which keeps lookup from matching "protect"; record
+  a correction beside it as plan 061 does for misprints, once the
+  printing is checked.
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose
