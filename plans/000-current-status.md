@@ -308,9 +308,9 @@ Follow-ups are separate from the completed migration work:
   every table and all 272 field paths with a test that requires them,
   `/open-source/data` and a page per table (rows as anchors, links
   between them, the fields, a JSON detail pane; not indexed), is built
-  on `gate/open-source-data` on top of the components hardening, not
-  merged; the manifest stays out of the published tarball until Gadi
-  signs off its Sources row
+  on `gate/open-source-data` on top of the components hardening, with
+  its review applied, not merged; the manifest stays out of the
+  published tarball until Gadi signs off its Sources row
   ([plan 080](080-open-source-packages.md#stage-c-13-november-2026)).
   TODO: with Gadi's go-ahead, stages F and G; stage E's deferred
   items. Follow-ups:

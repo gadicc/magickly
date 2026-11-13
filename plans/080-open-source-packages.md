@@ -1,10 +1,12 @@
 # Open source: the packages and their pages — 11 November 2026
 
 Status: stages A and A′ done, `magick-data` 0.1.0 on npm
-([below](#010-12-and-13-november-2026)); stage B built on
-`gate/open-source-hub`, not merged ([below](#stage-b-13-november-2026)); stage E built on
-`gate/magick-components` on top of it ([below](#stage-e-13-november-2026)), and stage C on
-`gate/open-source-data` on top of stage E ([below](#stage-c-13-november-2026)), neither merged. Reviewed on 11 November 2026 and
+([below](#010-12-and-13-november-2026)); stages B and E merged
+([below](#stage-b-13-november-2026), [below](#stage-e-13-november-2026));
+the hardening before publishing built on `gate/components-hardening`
+([below](#before-publishing-13-november-2026)), and stage C on
+`gate/open-source-data` on top of it, its review applied
+([below](#stage-c-13-november-2026)); neither merged. Reviewed on 11 November 2026 and
 revised (see [Review](#review-11-november-2026)), then spiked and mocked up the same day
 (see [Before any code](#before-any-code)). Decisions 1–4, the table page's
 layout, the sigils, the fonts and the licence note were settled by Gadi on
@@ -1286,153 +1288,6 @@ branch before the rebase onto `gate/open-source-hub`.
 | 9 (low) | The strict consumer imported a few entries; nothing held the planets page to the optimised image | Fixed: the consumer imports all 35, and a test checks the `/_next/image` source |
 | 10 (low) | `ref` takes no callback ref, undocumented; Mercury's `url()` unquoted | Fixed: documented in the props and the README; the URL is a quoted, escaped CSS string |
 | — | The seals' TSX and their Inkscape files could drift | Fixed: a test runs SVGR as the build did on each file and compares |
-## Stage C (13 November 2026)
-
-Built on `gate/open-source-data`, branched from stage B, rebased three
-times as stage B moved, then onto stage E (`15b1370f`, its review
-applied) and last onto the components hardening (`80ea484a`), so that
-the merge order is a chain: B, E, the hardening, C; not merged. The
-rebase onto E ran E's import rewrite on each commit, so the data pages
-import `@/ui/Link`, with their imports sorted.
-
-| Commit | What |
-| --- | --- |
-| `4ba903e0` | `feat(magick-data): Emit the field manifest` |
-| `d2d18981` | `docs(magick-data): Describe every table and field` |
-| `e9ea6c53` | `feat(open-source): Add the data pages` |
-
-Each was gated on its own tree after the rebase onto the hardening, with
-stage E's gate, in a clean worktree with a fresh install and Node
-24.18.0: `loom init`, both `loom check`s, `pnpm check`, `pnpm
-typecheck`, the data smoke test, `pnpm test:coverage`, `pnpm build`,
-`pnpm check:turbopack`, the components' smoke test, the tree clean
-after each; every step passed. Earlier gates of the same commits on
-stage B had passed too. On this machine, gates run while the load
-average was above 50 (several agents gating at once) timed out in
-unrelated suites (`sqlLegacyImport`, `legacyImportMigrations`, the
-hall editor, the dictionary keypad), different ones each run; such
-runs were discarded and the commits gated again at a lower load.
-
-- **The field manifest** (`src/fieldManifest.ts`, typed by
-  `src/fields.ts`): the build writes `dist/fields.json` (with a module
-  and an `unknown` declaration) after every source, and again after a
-  source rebuilt alone in `--watch`, so the row counts and the texts'
-  sizes are those of the JSON beside it. Per table: `description`,
-  `subpath`, `source`, `shape`, `rows`, `rowKey` (`{ field }`, or
-  `{ key: true }` for `angelicOrder` and `godName`; the build refuses a
-  key that does not name each row once), `rules` (the schema's `v.check`
-  messages: `enochianTablet`'s four) and `fields`. Per field: `path`,
-  structured `type` (`string`, `number` with `constraints`, `boolean`,
-  `picklist` with `values`, `object` with `keys`, `map` with `keys` and
-  `of`, `array` and `tuple` with `of`), `optional`, `nullable`, `link`
-  (`{ kind, to, many }` for links, pending and external ids, all from
-  `graph.ts`), `columns` (from `v.metadata`), `display` and
-  `description`. The graph's `enum` is a picklist, not a link. The map
-  rule: the same schema object under every key, four keys or more, by
-  identity, so an object whose keys merely share a type (a sephirah's
-  colours) is not one; it finds `tetragram.meanings` and
-  `enochianTablet.readings`, listed once at `*`. A schema kind the
-  generator does not read throws. `TEXTS`, in `fieldManifest.ts` rather
-  than `build.ts`, lists the nine text subpaths and one JSON-only text
-  (`json/kabbalah/lenain/evidence.json`, which no module exports) with
-  their sources, sizes, descriptions and pages; a test holds it to the
-  published exports and to every non-table data file bar the
-  dictionary. `ids()` takes `{ absent, nulled, about }`, typed by the
-  graph's field names. The app reads it as `magick-data/fields`, a
-  workspace export only, as the dictionary is.
-- **Not published yet.** `!dist/fields.*` keeps it out of the tarball:
-  as a published data file it needs a row in the README's Sources, and
-  the "Signed off" date is Gadi's to give. The tarball differs from
-  0.1.0 only in that line of the packed `package.json`'s `files`
-  (checked by packing both trees and comparing them file by file); the
-  declarations in `dist/` are unchanged. To ship it as
-  `magick-data/json/fields.json`, which `./json/*.json` already
-  exports: drop the exclusion, add a Sources row (ours, built from
-  `schemas.ts` and `graph.ts`) for Gadi to sign, say so in the README
-  (and in its JSON section), have the smoke test load it, and bump the
-  version: a new published file is a minor change under the README's
-  rules, 0.2.0. A typed `./fields` subpath would also need
-  `publishConfig.exports` and `tsconfig.build.json`.
-- **The descriptions**: all 29 tables and all 272 field paths, 233
-  distinct, written from the data files and their headers in our own
-  words. The shared `{ en }` text is described once ("The text in
-  English."). `fieldManifest.test.ts` fails on a table or field without
-  one, or one that is not a sentence. Where the plan says 199 paths:
-  that was the spike's count before `magickTypes` went (157 top-level
-  fields now, not 158), under a narrower definition; this one counts
-  every key of every object, a map's value once and an array of
-  objects' keys at `[]`. Table descriptions were not asked for; the
-  data page's one line per table needed them.
-- **`marks[].doubt` stays a string** with a check whose message names
-  `low`, `medium` and `high`, not a picklist as decision 6 said: a
-  picklist would state the value literally in `tablets.d.ts`, which is
-  published, and the schema's own comment gives that as the reason it
-  is not one.
-- **`/open-source/data`** (indexed; in the sitemap and site search):
-  the three ways in, every table with its row count, subpath,
-  description and the tables it links to and from, the texts with
-  their size and the page that shows each, the five helpers documented
-  by hand, the JSON, and the dictionary as not in the package. Its
-  counts (the barrel's 26 of 29) are read from the package.
-- **`/open-source/data/[table]`** (`noindex,follow`, an entity route for
-  `routes.test.ts`, out of the sitemap and search): the heading names
-  the table, then its description, import line and counts; the rows;
-  then the fields, nested ones indented, a long object type shown as
-  its kind. Columns per decision 4, with `sephirah.color` showing
-  `queen` and `king` with swatches from the `*Web` values (Malchut's
-  four); maps and arrays of objects only in the detail. The key column
-  is sticky, each row is an anchor (`:target` highlights it), each link
-  field links to its row on its table's page, each header to its
-  field's entry. Hebrew values are set in Frank Ruhl Libre, which also
-  draws Lenain's marks in `name.hePointed` (the system font showed
-  them as missing glyphs).
-- **The detail pane**, the one client island: an expanded row whose
-  content is held to the frame's width by a container query (`100cqi`),
-  with the row's JSON in `react-json-view-lite` 2.5.0 (two levels open)
-  styled from the theme's CSS variables, "Copy JSON", "Link to row" and,
-  for the planets, grades, sephirot, paths and genii, "Its page".
-- **Navigation**: `pathnames.ts` has `data` as a section, `{ "/": "Data"
-  }`, rather than the string stage B foresaw, so a table's page names
-  itself under "Open source › Data" as an entity page does, and the
-  index's bar title is the h1. The drawer still shows Open source as
-  one link (a section with one page). The footer's Open source column
-  lists Data before Source code; the hub's data card links the index.
-- **Checked in a browser**: `next dev` on 127.0.0.1:3118 from the
-  worktree with `ci.yml`'s placeholder environment, headless Chromium
-  over CDP, 1280 and 390 px, light and dark: the index, `sephirah` with
-  a detail open, `seventyTwoAngel`, `enochianTablet` at 390 px,
-  `godName#ehiyeh` and the hub. No sideways scroll at 390 px; a first
-  pass found the texts' long subpaths overflowing, now wrapped.
-- **Search**: the vectors were refreshed in `e9ea6c53` on stage E
-  (caches copied from four worktrees): `search:compare` embedded 4 Qwen
-  passages and the changed Gemini ones (a first run, cut short by a
-  gateway error, embedded those; the count was not kept), and
-  `search:publish` requested nothing. On stage B it had been 95 Qwen
-  passages. They still match on the hardening, which changed no prose. They still match on the hardening, which changed no prose.
-
-**Left for Gadi:**
-
-- The wording of the descriptions, above all where they say where a
-  value comes from (Agrippa for the intelligences and spirits, the
-  Golden Dawn for the double letters and the tribes, Lilly for the
-  houses).
-- Whether to ship the field manifest, with its Sources row and a bump
-  (above).
-- The index's title, "Open Data: the magick-data Tables", and the
-  table pages' layout at 390 px, where only the key and two or three
-  columns show before scrolling.
-
-**Follow-ups:**
-
-- `zodiac.taurus.meaning.en` reads "Bullm"; a data fix is a patch
-  release.
-- The bar on a table's page links Data; the drawer does not list Data
-  until the section has a second page (stage F).
-- **Stage E's import rewrite:** the data pages import
-  `@magick-components/Link` in `data/page.tsx`, `DataText.tsx`,
-  `[table]/TablePage.tsx` and `[table]/RowDetail.tsx`; whichever of C
-  and E lands second re-runs the rewrite over them.
-
 ## Before publishing (13 November 2026)
 
 A final adversarial review of stage E found nine things to settle before
@@ -1514,6 +1369,195 @@ passed.
   full or link it is Gadi's call.
 - `public/night-sky.jpg` is not moon-phase's background (different
   bytes); its own source is not recorded here.
+
+## Stage C (13 November 2026)
+
+Built on `gate/open-source-data`, branched from stage B, rebased three
+times as stage B moved, then onto stage E (`15b1370f`, its review
+applied) and last onto the components hardening (`80ea484a`), so that
+the merge order is a chain: B, E, the hardening, C; not merged. The
+rebase onto E ran E's import rewrite on each commit, so the data pages
+import `@/ui/Link`, with their imports sorted.
+
+| Commit | What |
+| --- | --- |
+| `4ba903e0` | `feat(magick-data): Emit the field manifest` |
+| `d2d18981` | `docs(magick-data): Describe every table and field` |
+| `e9ea6c53` | `feat(open-source): Add the data pages` |
+
+Each was gated on its own tree after the rebase onto the hardening, with
+stage E's gate, in a clean worktree with a fresh install and Node
+24.18.0: `loom init`, both `loom check`s, `pnpm check`, `pnpm
+typecheck`, the data smoke test, `pnpm test:coverage`, `pnpm build`,
+`pnpm check:turbopack`, the components' smoke test, the tree clean
+after each; every step passed. Earlier gates of the same commits on
+stage B had passed too. On this machine, gates run while the load
+average was above 50 (several agents gating at once) timed out in
+unrelated suites (`sqlLegacyImport`, `legacyImportMigrations`, the
+hall editor, the dictionary keypad), different ones each run; such
+runs were discarded and the commits gated again at a lower load.
+
+- **The field manifest** (`src/fieldManifest.ts`, typed by
+  `src/fields.ts`): the build writes `dist/fields.json` (with a module
+  and an `unknown` declaration) after every source, and again after a
+  source rebuilt alone in `--watch`, so the row counts and the texts'
+  sizes are those of the JSON beside it. Per table: `description`,
+  `subpath`, `source`, `shape`, `rows`, `rowKey` (`{ field }`, or
+  `{ key: true }` for `angelicOrder` and `godName`; the build refuses a
+  key that does not name each row once), `rules` (the schema's `v.check`
+  messages: `enochianTablet`'s four) and `fields`. Per field: `path`,
+  structured `type` (`string`, `number` with `constraints`, `boolean`,
+  `picklist` with `values`, `object` with `keys`, `map` with `keys` and
+  `of`, `array` and `tuple` with `of`), `optional`, `nullable`, `link`
+  (`{ kind, to, many }` for links, pending and external ids, all from
+  `graph.ts`), `columns` (from `v.metadata`), `display` and
+  `description`. The graph's `enum` is a picklist, not a link. The map
+  rule: the same schema object under every key, four keys or more, by
+  identity, so an object whose keys merely share a type (a sephirah's
+  colours) is not one; it finds `tetragram.meanings` and
+  `enochianTablet.readings`, listed once at `*`. A schema kind the
+  generator does not read throws. `TEXTS`, in `fieldManifest.ts` rather
+  than `build.ts`, lists the nine text subpaths and one JSON-only text
+  (`json/kabbalah/lenain/evidence.json`, which no module exports) with
+  their sources, sizes, descriptions and pages; a test holds it to the
+  published exports and to every non-table data file bar the
+  dictionary. `ids()` takes `{ absent, nulled, about }`, typed by the
+  graph's field names. The app reads it as `magick-data/fields`, a
+  workspace export only, as the dictionary is.
+- **Not published yet.** `!dist/fields.*` keeps it out of the tarball:
+  as a published data file it needs a row in the README's Sources, and
+  the "Signed off" date is Gadi's to give. Stage C changes the tarball
+  only by that line of the packed `package.json`'s `files` (checked by
+  packing the trees before and after it and comparing them file by
+  file); the declarations in `dist/` are unchanged. The base itself now
+  differs from 0.1.0 in `zodiac.json5` and the README, through main's
+  `1ce38ab0`, not through stage C. To ship it as
+  `magick-data/json/fields.json`, which `./json/*.json` already
+  exports: drop the exclusion, add a Sources row (ours, built from
+  `schemas.ts` and `graph.ts`) for Gadi to sign, say so in the README
+  (and in its JSON section), have the smoke test load it, and bump the
+  version: a new published file is a minor change under the README's
+  rules, 0.2.0. A typed `./fields` subpath would also need
+  `publishConfig.exports` and `tsconfig.build.json`.
+- **The descriptions**: all 29 tables and all 272 field paths, 233
+  distinct, written from the data files and their headers in our own
+  words. The shared `{ en }` text is described once ("The text in
+  English."). `fieldManifest.test.ts` fails on a table or field without
+  one, or one that is not a sentence. Where the plan says 199 paths:
+  that was the spike's count before `magickTypes` went (157 top-level
+  fields now, not 158), under a narrower definition; this one counts
+  every key of every object, a map's value once and an array of
+  objects' keys at `[]`. Table descriptions were not asked for; the
+  data page's one line per table needed them.
+- **`marks[].doubt` stays a string** with a check whose message names
+  `low`, `medium` and `high`, not a picklist as decision 6 said: a
+  picklist would state the value literally in `tablets.d.ts`, which is
+  published, and the schema's own comment gives that as the reason it
+  is not one.
+- **`/open-source/data`** (indexed; in the sitemap and site search):
+  the three ways in, every table with its row count, subpath,
+  description and the tables it links to and from, the texts with
+  their size and the page that shows each, the five helpers documented
+  by hand, the JSON, and the dictionary as not in the package. Its
+  counts (the barrel's 26 of 29) are read from the package.
+- **`/open-source/data/[table]`** (`noindex,follow`, an entity route for
+  `routes.test.ts`, out of the sitemap and search): the heading names
+  the table, then its description, import line and counts; the rows;
+  then the fields, nested ones indented, a long object type shown as
+  its kind. Columns per decision 4, with `sephirah.color` showing
+  `queen` and `king` with swatches from the `*Web` values (Malchut's
+  four); maps and arrays of objects only in the detail. The key column
+  is sticky, each row is an anchor (`:target` highlights it), each link
+  field links to its row on its table's page, each header to its
+  field's entry. Hebrew values are set in Frank Ruhl Libre, which also
+  draws Lenain's marks in `name.hePointed` (the system font showed
+  them as missing glyphs).
+- **The detail pane**, the one client island: an expanded row whose
+  content is held to the frame's width by a container query (`100cqi`),
+  with the row's JSON in `react-json-view-lite` 2.5.0 (two levels open)
+  styled from the theme's CSS variables, "Copy JSON", "Link to row" and,
+  for the planets, grades, sephirot, paths and genii, "Its page".
+- **Navigation**: `pathnames.ts` has `data` as a section, `{ "/": "Data"
+  }`, rather than the string stage B foresaw, so a table's page names
+  itself under "Open source › Data" as an entity page does, and the
+  index's bar title is the h1. The drawer still shows Open source as
+  one link (a section with one page). The footer's Open source column
+  lists Data before Source code; the hub's data card links the index.
+- **Checked in a browser**: `next dev` on 127.0.0.1:3118 from the
+  worktree with `ci.yml`'s placeholder environment, headless Chromium
+  over CDP, 1280 and 390 px, light and dark: the index, `sephirah` with
+  a detail open, `seventyTwoAngel`, `enochianTablet` at 390 px,
+  `godName#ehiyeh` and the hub. No sideways scroll at 390 px; a first
+  pass found the texts' long subpaths overflowing, now wrapped.
+- **Search**: the vectors were refreshed in `e9ea6c53` on stage E
+  (caches copied from four worktrees): `search:compare` embedded 4 Qwen
+  passages and the changed Gemini ones (a first run, cut short by a
+  gateway error, embedded those; the count was not kept), and
+  `search:publish` requested nothing. On stage B it had been 95 Qwen
+  passages. They still match on the hardening, which changed no prose.
+
+**Left for Gadi:**
+
+- The wording of the descriptions, above all where they say where a
+  value comes from (Agrippa for the intelligences and spirits, the
+  Golden Dawn for the double letters and the tribes, Lilly for the
+  houses).
+- Whether to ship the field manifest, with its Sources row and a bump
+  (above).
+- The index's title, "Open Data: the magick-data Tables", and the
+  table pages' layout at 390 px, where only the key and two or three
+  columns show before scrolling.
+
+**Follow-ups:**
+
+- npm's 0.1.0 still has "Bullm" for `zodiac.taurus.meaning.en`; the
+  source reads "Bull" since main's `1ce38ab0`, and the next patch
+  release ships it.
+- The bar on a table's page links Data; the drawer does not list Data
+  until the section has a second page (stage F).
+- **Stage E's import rewrite:** the data pages import
+  `@magick-components/Link` in `data/page.tsx`, `DataText.tsx`,
+  `[table]/TablePage.tsx` and `[table]/RowDetail.tsx`; whichever of C
+  and E lands second re-runs the rewrite over them.
+
+### Stage C review (13 November 2026)
+
+An independent review of `4ba903e0` to `9193b8ea` found no critical or
+high issue. It confirmed that the tarball changes only by the `files`
+line, that the field manifest is right, and that the descriptions it
+sampled (about fifty) are accurate and in our own words. Applied in
+`c8af8b1f`, gated on its own tree like the rest: every step exit 0,
+coverage without a re-run.
+
+| # | Finding | Disposition |
+| --- | --- | --- |
+| M1 | A row a link leads to was not marked: the highlight was `:target`, which the app router's `pushState` never sets | Fixed: the table reads the fragment on mount, on `hashchange` and `popstate`, and just after any click, and marks the row with `aria-current="location"`; links to the same table's rows and the page's own `#field-` links are plain anchors. Tested in jsdom, and in headless Chromium by clicking `gdGrade`'s `nextId` (`#1=10`) and its `sephirahId` to `sephirah#malchut`, and by loading `sephirah#malchut` |
+| M2 | "The data is under CC BY 4.0" left out the exception the hub states | Fixed: "except where the package's README says no rights are asserted", linking the README's Sources, and the hub's licences |
+| Low | "Each is shown on a page of the site", though two texts have none | Fixed: "Most are" |
+| Low | "an id of a intelligence", "an id of a tarot-deck" | Fixed: "an id of an intelligence"; "an id from `tarot-deck`, outside the package" |
+| Low | Lenain's pointed Hebrew drew missing glyphs in the JSON viewer; a lone Hebrew letter in a description was not in Frank Ruhl Libre | Fixed: the viewer's font list starts with Frank Ruhl Libre, which covers only Hebrew (its `unicode-range`); descriptions set Hebrew runs in it |
+| Low | The marked row's sticky key cell let the scrolled cells show through | Fixed: the tint is a layer over the paper |
+| Low | Descriptions: the intelligences' and spirits' source was not in the data file; `tetragram.meaning` understated the edits; code marks in `christianChoir`'s meta description | Fixed: `planets.json5`'s header cites Agrippa, *De occulta philosophia* II.22, for six intelligences and all seven spirits, and says the Moon's Shelachel is not his (a comment: `dist/` is unchanged); the description says so too; `tetragram.meaning` lists the changes its header records; meta descriptions drop code marks, and `christianChoir`'s has none. The README's Sources row is left as it is, for Gadi (below) |
+| Low | `problemsOf` left out inverses that are not unique | Fixed |
+| Low | This plan's "Bullm" follow-up was stale; "differs from 0.1.0 only in that line" | Fixed above |
+| Low | `--watch` did not rebuild for `fieldManifest.ts`, wrote the manifest once per source, and wrote files in place | Fixed: a build input; once per burst; every output written to a temporary file and renamed, a stale `.tmp` pruned by the next build. No test runs the watcher: it would rewrite real sources under a running suite; `rebuildFor` is tested |
+| Low | `constraintsOf` passed over validations it does not read | Fixed: any such step throws, on any kind (`max_value`, `length` tested) |
+| Low | The index gave a text's subpath, not its import line (decision 4) | Fixed: `import * as keys from "magick-data/enochian/keys";`, and a JSON import for `evidence.json` |
+| Low | The RSC payload carries every row's JSON | Measured, not changed: in `next dev`, `/open-source/data/seventyTwoAngel` is 878 kB of HTML, 483 kB of it flight data, of which the rows' JSON is 66 kB raw (about 84 kB escaped). Loading a row's JSON when its detail opens, from a static JSON route, would remove it, at the cost of a request and an offline failure; deferred |
+| Low | Accessibility: the key cell, the status region, "Copied" | Fixed: `<th scope="row">`; the detail row is always in the DOM, hidden when closed, so `aria-controls` names an element; the status region exists before its message; "Copied" reverts after three seconds |
+| Tests | — | Added: the island in jsdom (row header, toggle, JSON, both copy outcomes and the reset, the links, the marked row four ways); ids unique and no row named like a `field-`, `detail-` or frame id; the barrel's left-out tables link to none and from none; the articles, the Hebrew, the links; refused validations |
+
+The prose changed, so the search vectors were refreshed again in
+`c8af8b1f`: `search:compare` embedded the changed Gemini passages (the
+count was not kept) and 4 Qwen ones, and `search:publish` requested
+nothing. Checked again in headless Chromium at 1280 and 390 px, light
+and dark; no sideways scroll at 390 px.
+
+**Left for Gadi:**
+
+- The README's Sources row for `astrology/planets.json5` does not name
+  Agrippa for the intelligences and spirits; its sign-off is yours.
+  Where the Moon's intelligence, Shelachel, comes from is not recorded.
 
 ## Review (11 November 2026)
 
