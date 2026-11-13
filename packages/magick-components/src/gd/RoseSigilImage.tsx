@@ -39,9 +39,9 @@ export interface RoseSigilImageProps {
 }
 
 /**
- * The sigil artwork with no hooks, so the server image route can render it
- * with React's server build; the interactive component adds the optimiser
- * and animation around it.
+ * The sigil's artwork with no hooks, so that a server-side renderer can
+ * draw it with React's server build; `RoseSigil` adds the optimiser and
+ * the animation around it.
  */
 export function RoseSigilImage({
   sigilText,

@@ -126,6 +126,9 @@ export function defaultSource(
   return stringValued(type) ? JSON.stringify(value) : value;
 }
 
+/** Strings in code-point order, the same in every locale. */
+const byCodePoint = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
+
 /** One component's entry: its description and its props, required first. */
 function componentEntry(doc: ComponentDoc): ComponentProps {
   const props = Object.values(doc.props)
@@ -147,7 +150,7 @@ function componentEntry(doc: ComponentDoc): ComponentProps {
     })
     .sort(
       (a, b) =>
-        Number(b.required) - Number(a.required) || a.name.localeCompare(b.name),
+        Number(b.required) - Number(a.required) || byCodePoint(a.name, b.name),
     );
   return { description: doc.description.trim(), props };
 }

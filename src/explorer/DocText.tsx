@@ -6,7 +6,10 @@ import { Fragment, type ReactNode } from "react";
  */
 export function docInline(text: string): ReactNode[] {
   let offset = 0;
-  return text.split(/(`[^`]+`|\*[^*\s][^*]*\*)/).map((part) => {
+  // A split on a capture group starts with "" when the text starts with a
+  // match; empty parts would share their neighbour's key.
+  const parts = text.split(/(`[^`]+`|\*[^*\s][^*]*\*)/).filter(Boolean);
+  return parts.map((part) => {
     // Each part keyed by where it starts in the text.
     const key = offset;
     offset += part.length;

@@ -112,12 +112,12 @@ export interface MoonWidgetProps {
   background?: string;
 }
 
+// magick.ly passes the reader's place as `latitude` (plan 072).
 /**
- * Today's moon, drawn as it looks from the viewer's hemisphere.
- *
- * `latitude` is the viewer's, when known (the app passes the reader's place,
- * plan 072); the moon is drawn as from the north until it is known to be
- * south of the equator.
+ * Today's moon, drawn as it looks from the viewer's hemisphere: as from
+ * the north unless `latitude` puts the viewer south of the equator. The
+ * phase is worked out in the browser, so the server's HTML draws the
+ * unlit disc.
  */
 function MoonWidget({
   moonPadding = "10px 0 2px 0",

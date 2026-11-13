@@ -25,7 +25,7 @@ function pathHref() {
 /**
  * The Tree of Life as the map of the Golden Dawn's grades: each sphere
  * labelled with its grade's number and name, with the grade's element,
- * order and planet below, and linked to the grade's page; the paths are
+ * order and planet below, and linked to `/gd/grade/<id>`; the paths are
  * not linked. Any of `TreeOfLife`'s props override these.
  */
 function GradeTree({ ...props }: TreeOfLifeProps) {

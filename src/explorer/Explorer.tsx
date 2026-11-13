@@ -20,11 +20,13 @@ import { plateClass } from "@/drawings/plate";
 import Link from "@/ui/Link";
 import type { ComponentName } from "./components";
 import {
+  defaultText,
   type ExplorerProps,
   fieldText,
   jsxFor,
   parseValue,
   placeholders,
+  sameProps,
   switchValue,
   withProp,
 } from "./controls";
@@ -85,7 +87,7 @@ function Control({
       </IconButton>
     </Tooltip>
   );
-  const placeholder = set ? undefined : prop.default;
+  const placeholder = set ? undefined : defaultText(prop.default);
   if (control.kind === "switch")
     return (
       <div className={styles.control}>
@@ -122,7 +124,10 @@ function Control({
           >
             {prop.required ? null : (
               <MenuItem value="">
-                <em>not set{prop.default ? ` (${prop.default})` : ""}</em>
+                <em>
+                  not set
+                  {prop.default ? ` (${defaultText(prop.default)})` : ""}
+                </em>
               </MenuItem>
             )}
             {control.options.map((option) => (
@@ -151,7 +156,7 @@ function Control({
             onChange(text === "" ? undefined : Number(text));
           else if (control.kind === "parsed")
             onChange(text === "" ? undefined : parseValue(text, prop.type));
-          else onChange(text);
+          else onChange(text === "" ? undefined : text);
         }}
       />
       {clear}
@@ -159,23 +164,28 @@ function Control({
   );
 }
 
-/** Copies `text`, and says so for a moment. */
+/** Copies `text`, and says so for a moment, to screen readers too. */
 function CopyButton({ text, label }: { text: string; label: string }) {
   const [copied, setCopied] = useState(false);
   return (
-    <Button
-      size="small"
-      startIcon={<ContentCopy fontSize="small" />}
-      aria-label={label}
-      onClick={() =>
-        navigator.clipboard.writeText(text).then(() => {
-          setCopied(true);
-          setTimeout(() => setCopied(false), 1500);
-        })
-      }
-    >
-      {copied ? "Copied" : "Copy"}
-    </Button>
+    <>
+      <span role="status" className={styles.visuallyHidden}>
+        {copied ? "Copied" : ""}
+      </span>
+      <Button
+        size="small"
+        startIcon={<ContentCopy fontSize="small" />}
+        aria-label={label}
+        onClick={() =>
+          navigator.clipboard.writeText(text).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+          })
+        }
+      >
+        {copied ? "Copied" : "Copy"}
+      </Button>
+    </>
   );
 }
 
@@ -202,6 +212,12 @@ export default function Explorer({
   const [chosen, setChosen] = useState(0);
   const example = examples[chosen];
   const [props, setProps] = useState<ExplorerProps>(example.props);
+  const edited = !sameProps(props, example.props);
+  /** Draws an example, the chosen one again included, as it is written. */
+  const choose = (index: number) => {
+    setChosen(index);
+    setProps(examples[index].props);
+  };
   const Live = LIVE[name];
   const controlled = docs.filter((prop) => prop.control);
   const jsx = jsxFor(name, props);
@@ -230,14 +246,18 @@ export default function Explorer({
               labelId="explorer-example"
               label="Example"
               value={chosen}
-              onChange={(event) => {
-                const index = Number(event.target.value);
-                setChosen(index);
-                setProps(examples[index].props);
-              }}
+              renderValue={(index) =>
+                `${examples[index].title}${edited ? " (edited)" : ""}`
+              }
             >
+              {/* A click rather than a change, so that the chosen example
+                  can be picked again to undo the edits. */}
               {examples.map((item, index) => (
-                <MenuItem key={item.title} value={index}>
+                <MenuItem
+                  key={item.title}
+                  value={index}
+                  onClick={() => choose(index)}
+                >
                   {item.title}
                 </MenuItem>
               ))}
@@ -246,6 +266,7 @@ export default function Explorer({
         ) : (
           <Typography variant="body2" sx={{ mb: 2 }}>
             Example: {example.title}
+            {edited ? " (edited)" : ""}
           </Typography>
         )}
         {controlled.length ? (
@@ -279,7 +300,7 @@ export default function Explorer({
           </Typography>
           <CopyButton text={jsx} label={`Copy the JSX for ${name}`} />
         </div>
-        <pre aria-labelledby="explorer-jsx" className={styles.pre}>
+        <pre className={styles.pre}>
           <code>{jsx}</code>
         </pre>
         {elided.length ? (

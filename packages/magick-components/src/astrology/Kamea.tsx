@@ -2,7 +2,7 @@ import kameas, { type KameaPlanetId } from "magick-data/astrology/kameas";
 import type { CSSProperties, ReactNode } from "react";
 import { svgCoordinate } from "../svgCoordinate.ts";
 
-/**
+/*
  * A planet's kamea (magic square) drawn from its numbers, which magick-data
  * computes (`magick-data/astrology/kameas`): a frame, the grid's rules and
  * each number in its cell. It writes no ids, links or stylesheet, so any

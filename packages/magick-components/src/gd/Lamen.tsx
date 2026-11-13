@@ -395,13 +395,14 @@ function EyeOfHorus() {
   );
 }
 
+// Every lamen is drawn for magick.ly: the Keryx's caduceus and the
+// Sentinel's Eye of Horus from geometry since stage H of plan 061 (they
+// were an SVG Repo icon and a game-icons.net path before), the adepts'
+// since its second part.
 /**
- * An officer's lamen: the collar's ring, the disc and the officer's glyph,
- * in a −50…50 box. All of it is drawn for this app, the Keryx's caduceus
- * and the Sentinel's Eye of Horus from geometry since stage H of plan 061
- * (they were an SVG Repo icon and a game-icons.net path before), the
- * adepts' since its second part. Defines no ids, so any number can share
- * a page.
+ * A Golden Dawn officer's lamen: the collar's ring, the disc and the
+ * officer's glyph, in a −50…50 box. It defines no ids, so any number can
+ * share a page.
  */
 export default function Lamen({
   officer,
@@ -418,9 +419,9 @@ export default function Lamen({
    */
   officer: string;
   /**
-   * The grade whose lamen to draw, for an officer who wears another in it
-   * (`lamenGrades.ts`: the Portal's Hiereus and Hegemon); otherwise the
-   * Outer Order's, as the ritual role icons always show.
+   * The grade whose lamen to draw, for an officer who wears another in it:
+   * `portal` for the Portal's Hiereus and Hegemon. Otherwise the Outer
+   * Order's lamen.
    */
   grade?: string;
   /** The SVG's width; from the height when not given, as it is square. */

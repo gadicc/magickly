@@ -121,7 +121,7 @@
     ]
   },
   "GradeTree": {
-    "description": "The Tree of Life as the map of the Golden Dawn's grades: each sphere\nlabelled with its grade's number and name, with the grade's element,\norder and planet below, and linked to the grade's page; the paths are\nnot linked. Any of `TreeOfLife`'s props override these.",
+    "description": "The Tree of Life as the map of the Golden Dawn's grades: each sphere\nlabelled with its grade's number and name, with the grade's element,\norder and planet below, and linked to `/gd/grade/<id>`; the paths are\nnot linked. Any of `TreeOfLife`'s props override these.",
     "props": [
       {
         "name": "active",
@@ -242,7 +242,7 @@
     ]
   },
   "GdHall": {
-    "description": "A Golden Dawn temple hall as inline SVG (plan 061). Pure and SSR-safe:\nlayout comes from `resolveHall`, text widths from the generated font\ntable, and gradient and pattern ids from `useId`, so several halls share\na page. Content is untrusted: strings only reach text nodes, unknown tags\ndraw as dashed placeholders, and nothing is loaded by URL except the\nfonts the caller points at.",
+    "description": "A Golden Dawn temple hall as inline SVG, drawn from a `gdHall` node such\nas a preset's (`magick-components/gd/hall/presets`). It renders on the\nserver as well as in the browser: its layout is computed from the node,\nits labels' widths from the metrics of the fonts the package ships, and\nits gradient and pattern ids from `useId`, so several halls can share a\npage. The node is treated as untrusted: its strings only reach text\nnodes, unknown tags draw as dashed placeholders, and nothing is loaded\nby URL except the fonts `fontBaseUrl` points at.",
     "props": [
       {
         "name": "hall",
@@ -254,7 +254,7 @@
         "name": "art",
         "type": "HallArtRegistry",
         "required": false,
-        "description": "Art by kind; the package's original art unless the app composes more."
+        "description": "The art for each kind of object; the package's own when not given. A\nregistry of your own can add kinds or draw them differently."
       },
       {
         "name": "className",
@@ -293,7 +293,7 @@
     ]
   },
   "Lamen": {
-    "description": "An officer's lamen: the collar's ring, the disc and the officer's glyph,\nin a −50…50 box. All of it is drawn for this app, the Keryx's caduceus\nand the Sentinel's Eye of Horus from geometry since stage H of plan 061\n(they were an SVG Repo icon and a game-icons.net path before), the\nadepts' since its second part. Defines no ids, so any number can share\na page.",
+    "description": "A Golden Dawn officer's lamen: the collar's ring, the disc and the\nofficer's glyph, in a −50…50 box. It defines no ids, so any number can\nshare a page.",
     "props": [
       {
         "name": "officer",
@@ -306,7 +306,7 @@
         "name": "grade",
         "type": "string",
         "required": false,
-        "description": "The grade whose lamen to draw, for an officer who wears another in it\n(`lamenGrades.ts`: the Portal's Hiereus and Hegemon); otherwise the\nOuter Order's, as the ritual role icons always show.",
+        "description": "The grade whose lamen to draw, for an officer who wears another in it:\n`portal` for the Portal's Hiereus and Hegemon. Otherwise the Outer\nOrder's lamen.",
         "control": { "kind": "text" }
       },
       {
@@ -381,7 +381,7 @@
         "type": "string",
         "required": false,
         "default": "\"candlestick\"",
-        "description": "Prefixes the text paths' ids, which are document-wide: two of these\non one page need different prefixes. No hook makes one, because the\nimage routes render this outside React's renderer for hooks.",
+        "description": "Prefixes the text paths' ids, which are document-wide: two of these\non one page need different prefixes. No hook makes one, so that the\ncomponent also renders where React's hooks are not available.",
         "control": { "kind": "text" }
       }
     ]
@@ -394,7 +394,7 @@
         "type": "string",
         "required": false,
         "default": "\"shewbread\"",
-        "description": "Prefixes the text paths' ids, which are document-wide: two of these\non one page need different prefixes. No hook makes one, because the\nimage routes render this outside React's renderer for hooks.",
+        "description": "Prefixes the text paths' ids, which are document-wide: two of these\non one page need different prefixes. No hook makes one, so that the\ncomponent also renders where React's hooks are not available.",
         "control": { "kind": "text" }
       }
     ]
@@ -460,7 +460,7 @@
         "type": "boolean",
         "required": false,
         "default": "true",
-        "description": "CSS border for on-page display; server images omit it since CSS boxes are not SVG.",
+        "description": "Draws a CSS border around the page. Leave it off where the SVG is\nexported or turned into an image, which CSS boxes do not reach.",
         "control": { "kind": "switch" }
       },
       {
@@ -632,7 +632,7 @@
     ]
   },
   "Moon": {
-    "description": "Today's moon, drawn as it looks from the viewer's hemisphere.\n\n`latitude` is the viewer's, when known (the app passes the reader's place,\nplan 072); the moon is drawn as from the north until it is known to be\nsouth of the equator.",
+    "description": "Today's moon, drawn as it looks from the viewer's hemisphere: as from\nthe north unless `latitude` puts the viewer south of the equator. The\nphase is worked out in the browser, so the server's HTML draws the\nunlit disc.",
     "props": [
       {
         "name": "background",
@@ -659,13 +659,13 @@
     ]
   },
   "Mercury": {
-    "description": "Mercury's next or current retrograde, worked out in the browser on today's\ndate and shown in the reader's own date format, under a picture of the\nplanet. The page's HTML has a blank line where the dates go.",
+    "description": "Mercury's next or current retrograde, worked out in the browser on today's\ndate and shown in the reader's own date format, under a picture of the\nplanet. Rendered on the server, it leaves a blank line where the dates\ngo.",
     "props": [
       {
         "name": "background",
         "type": "string",
         "required": false,
-        "description": "The tile's background image, a URL, drawn to cover; none if omitted.",
+        "description": "The widget's background image, a URL, drawn to cover; none if omitted.",
         "control": { "kind": "text" }
       },
       {

@@ -1,5 +1,5 @@
 import { Container, Typography } from "@mui/material";
-import { Fragment } from "react";
+import BreakableName from "@/explorer/BreakableName";
 import { EXPLORER_COMPONENTS } from "@/explorer/components";
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
@@ -29,6 +29,9 @@ export default function ComponentsPage() {
               <Link
                 href={component.path}
                 underline="none"
+                // Fourteen pages' payloads are not worth fetching for a
+                // glance at the index, as with the menus (7ced7fa1).
+                prefetch={false}
                 className={styles.tile}
               >
                 <span className={styles.picture}>
@@ -36,13 +39,7 @@ export default function ComponentsPage() {
                 </span>
                 <span className={styles.caption}>
                   <span className={styles.name}>
-                    {/* A long name breaks between its words. */}
-                    {component.name.split(/(?=[A-Z])/).map((word, index) => (
-                      <Fragment key={word}>
-                        {index ? <wbr /> : null}
-                        {word}
-                      </Fragment>
-                    ))}
+                    <BreakableName name={component.name} />
                   </span>
                   <span className={styles.title}>{component.title}</span>
                 </span>

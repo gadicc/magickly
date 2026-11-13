@@ -1,8 +1,11 @@
-import type { RoseSigilProps } from "../src/gd/RoseSigil.tsx";
+import type { ComponentProps } from "react";
+import type RoseSigilComponent from "../src/gd/RoseSigil.tsx";
 import type { ComponentExamples } from "./types.ts";
 
 /** Sigils of three divine names, as `/gd/sigils` draws them. */
-export const RoseSigil: ComponentExamples<RoseSigilProps> = {
+export const RoseSigil: ComponentExamples<
+  ComponentProps<typeof RoseSigilComponent>
+> = {
   entry: "gd/RoseSigil",
   exportName: "default",
   examples: [

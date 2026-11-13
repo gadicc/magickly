@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  defaultText,
   jsxFor,
   parseValue,
   placeholders,
+  sameProps,
   switchValue,
   withProp,
 } from "./controls";
@@ -84,5 +86,22 @@ describe("jsxFor", () => {
     const hall = { type: "gdHall", children: Array(20).fill({ type: "x" }) };
     expect(jsxFor("GdHall", { hall })).toBe("<GdHall hall={hall} />");
     expect(placeholders({ hall, width: 300 })).toEqual(["hall"]);
+  });
+});
+
+describe("defaultText", () => {
+  it("shows a string default without its quotes, and no empty one", () => {
+    expect(defaultText('"index"')).toBe("index");
+    expect(defaultText('""')).toBeUndefined();
+    expect(defaultText("240")).toBe("240");
+    expect(defaultText(undefined)).toBeUndefined();
+  });
+});
+
+describe("sameProps", () => {
+  it("compares values, not the keys' order", () => {
+    expect(sameProps({ a: 1, b: { c: 2 } }, { b: { c: 2 }, a: 1 })).toBe(true);
+    expect(sameProps({ a: 1 }, { a: 1, b: undefined })).toBe(false);
+    expect(sameProps({ a: 1 }, { a: 2 })).toBe(false);
   });
 });

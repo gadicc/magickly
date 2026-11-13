@@ -32,7 +32,10 @@ const EMPTY_HALL: HallNode = { type: "gdHall" };
 export interface GdHallProps {
   /** The compiled `gdHall` node; anything else draws an empty hall. */
   hall: HallNode;
-  /** Art by kind; the package's original art unless the app composes more. */
+  /**
+   * The art for each kind of object; the package's own when not given. A
+   * registry of your own can add kinds or draw them differently.
+   */
   art?: HallArtRegistry;
   /**
    * Where the hall's WOFF2 subsets are served (such as `/fonts`). When set,
@@ -271,7 +274,7 @@ export interface GdHallSvgProps {
   /** `@font-face` rules carried inside the SVG, if any. */
   fontCss?: string;
   /**
-   * Draw for the server's image renderer (plan 062): the viewBox rounded
+   * Draw for a server-side image renderer: the viewBox rounded
    * outward to whole units, which resvg writes back unchanged, and no
    * `<title>`, `role` or `aria-labelledby`, since outlining drops the
    * title an accessible name would point at.
@@ -303,8 +306,8 @@ export function hallViewBox(
 }
 
 /**
- * The drawing of a resolved hall, without hooks, so a server route with no
- * hook dispatcher can render it (plan 062). `GdHall` draws through it.
+ * The drawing of a resolved hall, without hooks, so a server-side renderer
+ * with no hook dispatcher can render it. `GdHall` draws through it.
  */
 export function GdHallSvg({
   resolved,
@@ -427,13 +430,16 @@ export function GdHallSvg({
   );
 }
 
+// Plan 061 in the magick.ly repository designs the hall and its renderer.
 /**
- * A Golden Dawn temple hall as inline SVG (plan 061). Pure and SSR-safe:
- * layout comes from `resolveHall`, text widths from the generated font
- * table, and gradient and pattern ids from `useId`, so several halls share
- * a page. Content is untrusted: strings only reach text nodes, unknown tags
- * draw as dashed placeholders, and nothing is loaded by URL except the
- * fonts the caller points at.
+ * A Golden Dawn temple hall as inline SVG, drawn from a `gdHall` node such
+ * as a preset's (`magick-components/gd/hall/presets`). It renders on the
+ * server as well as in the browser: its layout is computed from the node,
+ * its labels' widths from the metrics of the fonts the package ships, and
+ * its gradient and pattern ids from `useId`, so several halls can share a
+ * page. The node is treated as untrusted: its strings only reach text
+ * nodes, unknown tags draw as dashed placeholders, and nothing is loaded
+ * by URL except the fonts `fontBaseUrl` points at.
  */
 export function GdHall({
   hall,

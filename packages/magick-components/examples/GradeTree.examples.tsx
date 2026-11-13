@@ -1,8 +1,11 @@
-import type { TreeOfLifeProps } from "../src/kabbalah/TreeOfLife.tsx";
+import type { ComponentProps } from "react";
+import type GradeTreeComponent from "../src/gd/GradeTree.tsx";
 import type { ComponentExamples } from "./types.ts";
 
 /** The Tree as the Golden Dawn's grades, as `/gd/grades` draws it. */
-export const GradeTree: ComponentExamples<TreeOfLifeProps> = {
+export const GradeTree: ComponentExamples<
+  ComponentProps<typeof GradeTreeComponent>
+> = {
   entry: "gd/GradeTree",
   exportName: "default",
   examples: [

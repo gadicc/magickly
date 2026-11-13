@@ -144,8 +144,8 @@ function Branch({ index, idPrefix }: { index: number; idPrefix: string }) {
 export interface SevenBranchedCandleStickProps {
   /**
    * Prefixes the text paths' ids, which are document-wide: two of these
-   * on one page need different prefixes. No hook makes one, because the
-   * image routes render this outside React's renderer for hooks.
+   * on one page need different prefixes. No hook makes one, so that the
+   * component also renders where React's hooks are not available.
    */
   idPrefix?: string;
   /** The `<svg>`, for exporting the drawing. */

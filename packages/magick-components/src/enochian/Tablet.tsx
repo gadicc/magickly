@@ -790,7 +790,10 @@ function Tablet({
   label?: boolean | string;
   /** Page font style for the grid letters; omitted renders the Latin transliteration. */
   enochianStyle?: CSSProperties;
-  /** CSS border for on-page display; server images omit it since CSS boxes are not SVG. */
+  /**
+   * Draws a CSS border around the page. Leave it off where the SVG is
+   * exported or turned into an image, which CSS boxes do not reach.
+   */
   frame?: boolean;
   /** The SVG's width; from the height and the page's shape when not given. */
   width?: string | number;

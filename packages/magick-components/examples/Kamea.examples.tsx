@@ -1,8 +1,9 @@
-import type { KameaProps } from "../src/astrology/Kamea.tsx";
+import type { ComponentProps } from "react";
+import type KameaComponent from "../src/astrology/Kamea.tsx";
 import type { ComponentExamples } from "./types.ts";
 
 /** Three of the seven squares, from the smallest to the largest. */
-export const Kamea: ComponentExamples<KameaProps> = {
+export const Kamea: ComponentExamples<ComponentProps<typeof KameaComponent>> = {
   entry: "astrology/Kamea",
   exportName: "default",
   examples: [

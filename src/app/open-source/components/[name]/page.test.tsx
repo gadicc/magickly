@@ -6,9 +6,10 @@ import ComponentPage from "./ComponentPage";
 import { dynamicParams, generateMetadata, generateStaticParams } from "./page";
 
 const render = (slug: string) =>
-  renderToString(
-    <ComponentPage component={explorerComponent(slug)!} />,
-  ).replace(/<style\b[^>]*>.*?<\/style>/g, "");
+  renderToString(<ComponentPage component={explorerComponent(slug)!} />)
+    .replace(/<style\b[^>]*>.*?<\/style>/g, "")
+    // The heading's name may break between words.
+    .replace(/<wbr\/>/g, "");
 
 describe("/open-source/components/[name]", () => {
   it("prerenders a page per component and no other", async () => {
@@ -58,6 +59,17 @@ describe("/open-source/components/[name]", () => {
     const hall = render("gd-hall");
     expect(hall).toContain(
       'href="/gd/halls/neophyte/golden-dawn-neophyte-temple.svg"',
+    );
+  });
+
+  it("lets a long name break between its words", () => {
+    const html = renderToString(
+      <ComponentPage
+        component={explorerComponent("seven-branched-candlestick")!}
+      />,
+    );
+    expect(html).toContain(
+      "<h1><code>Seven<wbr/>Branched<wbr/>Candle<wbr/>Stick</code></h1>",
     );
   });
 

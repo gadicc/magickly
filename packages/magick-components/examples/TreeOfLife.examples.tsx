@@ -1,12 +1,22 @@
-import type { TreeOfLifeProps } from "../src/kabbalah/TreeOfLife.tsx";
+import type { ComponentProps } from "react";
+import type TreeOfLifeComponent from "../src/kabbalah/TreeOfLife.tsx";
 import type { ComponentExamples } from "./types.ts";
 
-/** The Tree of Life, as `/kabbalah/tree` draws it and with its options. */
-export const TreeOfLife: ComponentExamples<TreeOfLifeProps> = {
+/**
+ * The Tree of Life, first as magick.ly's `/kabbalah/tree` draws it by
+ * default, then with its options.
+ */
+export const TreeOfLife: ComponentExamples<
+  ComponentProps<typeof TreeOfLifeComponent>
+> = {
   entry: "kabbalah/TreeOfLife",
   exportName: "default",
   examples: [
-    { title: "The Queen scale", props: {} },
+    {
+      title: "Roman and English names",
+      props: { field: "name.roman", bottomText: "name.en", fontSize: 10 },
+    },
+    { title: "Numbered, in the Queen scale", props: {} },
     { title: "The King scale", props: { colorScale: "king" } },
     {
       title: "Hebrew names, with Da'at",

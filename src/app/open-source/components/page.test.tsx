@@ -39,7 +39,7 @@ describe("/open-source/components", () => {
 
   it("shows the image route's drawing where there is one", () => {
     expect(tile("/open-source/components/tree-of-life")).toContain(
-      'src="/api/render/tree-of-life"',
+      'src="/api/render/tree-of-life?field=name.roman&amp;bottomText=name.en&amp;fontSize=10"',
     );
     expect(tile("/open-source/components/rose-sigil")).toContain(
       'src="/api/render/rose-sigil?text=',

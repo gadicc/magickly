@@ -78,3 +78,26 @@ export function jsxFor(name: string, props: ExplorerProps): string {
   if (line.length <= 72) return line;
   return `<${name}\n${attributes.map((text) => `  ${text}`).join("\n")}\n/>`;
 }
+
+/**
+ * A default as a field's placeholder shows it: a string without its
+ * quotes, and nothing for the empty string.
+ */
+export function defaultText(source: string | undefined): string | undefined {
+  if (source === undefined || !/^".*"$/.test(source)) return source;
+  const text = JSON.parse(source) as string;
+  return text === "" ? undefined : text;
+}
+
+/** Whether two sets of props draw the same, whatever their keys' order. */
+export function sameProps(a: ExplorerProps, b: ExplorerProps): boolean {
+  const keys = Object.keys(a);
+  return (
+    keys.length === Object.keys(b).length &&
+    keys.every(
+      (key) =>
+        Object.hasOwn(b, key) &&
+        JSON.stringify(a[key]) === JSON.stringify(b[key]),
+    )
+  );
+}

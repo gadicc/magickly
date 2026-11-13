@@ -1,8 +1,11 @@
-import type { FylfotCrossProps } from "../src/gd/symbols/fylfot-cross.tsx";
+import type { ComponentProps } from "react";
+import type FylfotCrossComponent from "../src/gd/symbols/fylfot-cross.tsx";
 import type { ComponentExamples } from "./types.ts";
 
 /** The cross finished, uncoloured, and half filled in. */
-export const FylfotCross: ComponentExamples<FylfotCrossProps> = {
+export const FylfotCross: ComponentExamples<
+  ComponentProps<typeof FylfotCrossComponent>
+> = {
   entry: "gd/symbols/fylfot-cross",
   exportName: "default",
   examples: [

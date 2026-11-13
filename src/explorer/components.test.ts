@@ -21,6 +21,9 @@ describe("the explorer's components", () => {
   it("each have a page at a slug of their name", () => {
     expect(componentSlug("TreeOfLife")).toBe("tree-of-life");
     expect(componentSlug("GdHall")).toBe("gd-hall");
+    expect(componentSlug("SevenBranchedCandleStick")).toBe(
+      "seven-branched-candlestick",
+    );
     expect(explorerComponent("gd-hall")?.name).toBe("GdHall");
     expect(explorerComponent("constructor")).toBeUndefined();
     expect(new Set(EXPLORER_COMPONENTS.map(({ slug }) => slug)).size).toBe(
@@ -44,21 +47,29 @@ describe("the explorer's components", () => {
     );
   });
 
-  it("are each loaded live from the entry their examples name", () => {
+  it("are each loaded live from the entry and export their examples name", () => {
     // live.tsx is a client module of next/dynamic thunks; read its source.
+    // A default export is the module itself; a named one is picked by
+    // `.then((module) => module.<name>)`.
     const source = readFileSync(path.resolve("src/explorer/live.tsx"), "utf8");
     const loaded = Object.fromEntries(
       [
         ...source.matchAll(
-          /^ {2}(\w+): dynamic\(\s*\(\) =>\s*import\("([^"]+)"\)/gm,
+          /^ {2}(\w+): dynamic\(\s*\(\) =>\s*import\("([^"]+)"\)(?:\.then\(\s*\((\w+)\) => \3\.(\w+),?\s*\))?,?\s*\)/gm,
         ),
-      ].map(([, name, specifier]) => [name, specifier]),
+      ].map(([, name, specifier, , exported]) => [
+        name,
+        { specifier, exportName: exported ?? "default" },
+      ]),
     );
     expect(loaded).toEqual(
       Object.fromEntries(
         EXPLORER_COMPONENTS.map((component) => [
           component.name,
-          component.specifier,
+          {
+            specifier: component.specifier,
+            exportName: component.exportName,
+          },
         ]),
       ),
     );

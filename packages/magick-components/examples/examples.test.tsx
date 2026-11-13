@@ -8,6 +8,12 @@ import manifest from "../package.json" with { type: "json" };
 import { COMPONENT_EXAMPLES } from "./index.ts";
 
 const directory = path.resolve("packages/magick-components/examples");
+
+/** Every module a file imports. */
+const imports = (name: string) =>
+  ts
+    .preProcessFile(readFileSync(path.join(directory, name), "utf8"))
+    .importedFiles.map((file) => file.fileName);
 const modules = readdirSync(directory).filter((name) =>
   name.endsWith(".examples.tsx"),
 );
@@ -30,12 +36,35 @@ describe("the component examples (plan 080, decision 5)", () => {
   });
 
   it("import nothing but their component's types and the package's data", () => {
-    for (const name of [...modules, "index.ts", "types.ts"]) {
-      const imported = ts
-        .preProcessFile(readFileSync(path.join(directory, name), "utf8"))
-        .importedFiles.map((file) => file.fileName);
-      for (const specifier of imported)
-        expect(specifier, name).toMatch(/^(?:react|\.\/[\w.]+|\.\.\/src\/)/);
+    // React's types, the examples' own modules, and files under ../src/
+    // with no `..` past it.
+    const allowed =
+      /^(?:react|\.\/[\w.]+\.tsx?|\.\.\/src\/(?!.*\.\.)[\w./-]+\.tsx?)$/;
+    for (const name of [...modules, "index.ts", "types.ts"])
+      for (const specifier of imports(name))
+        expect(specifier, name).toMatch(allowed);
+    expect("react-dom").not.toMatch(allowed);
+    expect("../src/../../app/x.ts").not.toMatch(allowed);
+  });
+
+  it("type each example by the component its entry names", () => {
+    for (const [name, { entry, exportName }] of Object.entries(
+      COMPONENT_EXAMPLES,
+    )) {
+      const source = readFileSync(
+        path.join(directory, `${name}.examples.tsx`),
+        "utf8",
+      );
+      const target = `..${(manifest.exports as Record<string, string>)[`./${entry}`].slice(1)}`;
+      const binding = `${name}Component`;
+      const imported =
+        exportName === "default"
+          ? `import type ${binding} from "${target}";`
+          : `import type { ${exportName} as ${binding} } from "${target}";`;
+      expect(source, name).toContain(imported);
+      expect(source.replace(/\s+/g, ""), name).toContain(
+        `ComponentExamples<ComponentProps<typeof${binding}>>`,
+      );
     }
   });
 

@@ -1,5 +1,6 @@
 import { hallPreset } from "magick-components/gd/hall/presets";
 import { directoryUrl } from "@/app/open-source/PackageCard";
+import BreakableName from "@/explorer/BreakableName";
 import {
   COMPONENT_EXAMPLES,
   COMPONENTS_PATH,
@@ -58,7 +59,9 @@ export default function ComponentPage({
       />
       <Trail href={COMPONENTS_PATH}>Components</Trail>
       <h1>
-        <code>{component.name}</code>
+        <code>
+          <BreakableName name={component.name} />
+        </code>
       </h1>
       <p className={styles.note}>{component.title}, from magick-components</p>
       <DocText text={docs.description} />

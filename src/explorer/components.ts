@@ -141,9 +141,14 @@ export interface ExplorerComponent extends ComponentPage {
   examplesFile: string;
 }
 
+/** Slugs that the words of a name would split where English does not. */
+const SLUGS: Partial<Record<string, string>> = {
+  SevenBranchedCandleStick: "seven-branched-candlestick",
+};
+
 /** `TreeOfLife` → `tree-of-life`: a URL's segment, as the site's are. */
 export const componentSlug = (name: string) =>
-  name.replace(/(?<=[a-z])(?=[A-Z])/g, "-").toLowerCase();
+  SLUGS[name] ?? name.replace(/(?<=[a-z])(?=[A-Z])/g, "-").toLowerCase();
 
 /** Every component, in the examples' order. */
 export const EXPLORER_COMPONENTS: readonly ExplorerComponent[] = (

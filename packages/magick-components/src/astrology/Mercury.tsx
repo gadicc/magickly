@@ -24,7 +24,7 @@ function emWidth(text: string) {
 export interface MercuryWidgetProps {
   /** Space around the picture, as CSS `padding`. */
   padding?: string;
-  /** The tile's background image, a URL, drawn to cover; none if omitted. */
+  /** The widget's background image, a URL, drawn to cover; none if omitted. */
   background?: string;
   /**
    * Mercury's picture, drawn 85 px square and decorative: a URL, or `<img>`
@@ -37,7 +37,8 @@ export interface MercuryWidgetProps {
 /**
  * Mercury's next or current retrograde, worked out in the browser on today's
  * date and shown in the reader's own date format, under a picture of the
- * planet. The page's HTML has a blank line where the dates go.
+ * planet. Rendered on the server, it leaves a blank line where the dates
+ * go.
  */
 function MercuryWidget({
   padding = "10px 0 2px 0",
