@@ -148,12 +148,14 @@ export interface SevenBranchedCandleStickProps {
    * image routes render this outside React's renderer for hooks.
    */
   idPrefix?: string;
+  /** The `<svg>`, for exporting the drawing. */
+  ref?: React.Ref<SVGSVGElement>;
 }
 
-export default React.forwardRef(function SevenBranchedCandleStick(
-  { idPrefix = "candlestick" }: SevenBranchedCandleStickProps,
-  ref: React.Ref<SVGSVGElement>,
-) {
+export default function SevenBranchedCandleStick({
+  idPrefix = "candlestick",
+  ref,
+}: SevenBranchedCandleStickProps) {
   const indexes = [0, 1, 2, 3, 4, 5, 6];
 
   return (
@@ -204,4 +206,4 @@ export default React.forwardRef(function SevenBranchedCandleStick(
       ))}
     </svg>
   );
-});
+}

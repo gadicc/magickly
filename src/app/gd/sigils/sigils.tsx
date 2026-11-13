@@ -11,7 +11,8 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
-import RoseSigil, { letterIJ } from "magick-components/gd/RoseSigil";
+import RoseSigil from "magick-components/gd/RoseSigil";
+import { letterIJ } from "magick-components/gd/RoseSigilImage";
 import React from "react";
 import Ink from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";

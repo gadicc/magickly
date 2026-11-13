@@ -1,10 +1,8 @@
 import "server-only";
 import Tablet from "magick-components/enochian/Tablet";
-import { RoseSigilImage } from "magick-components/gd/RoseSigil";
-import {
-  optimizeSigilPoints,
-  sigilPoints,
-} from "magick-components/gd/roseSigilGeometry";
+import { RoseSigilImage } from "magick-components/gd/RoseSigilImage";
+import { sigilPoints } from "magick-components/gd/roseSigilGeometry";
+import { optimizeSigilPoints } from "magick-components/gd/roseSigilOptimizer";
 import SevenBranchedCandleStick, {
   CANDLESTICK_PLANETS,
 } from "magick-components/gd/SevenBranchedCandleStick";

@@ -237,12 +237,14 @@ export interface TableOfShewbreadProps {
    * image routes render this outside React's renderer for hooks.
    */
   idPrefix?: string;
+  /** The `<svg>`, for exporting the drawing. */
+  ref?: React.Ref<SVGSVGElement>;
 }
 
-export default React.forwardRef(function TableOfShewbread(
-  { idPrefix = "shewbread" }: TableOfShewbreadProps,
-  ref: React.Ref<SVGSVGElement>,
-) {
+export default function TableOfShewbread({
+  idPrefix = "shewbread",
+  ref,
+}: TableOfShewbreadProps) {
   const innerTriangles = [0, 30, 60, 90].map((offset) => [
     degreesToPointOnCircle(30 + offset, innerRadius),
     degreesToPointOnCircle(150 + offset, innerRadius),
@@ -341,4 +343,4 @@ export default React.forwardRef(function TableOfShewbread(
       </g>
     </svg>
   );
-});
+}

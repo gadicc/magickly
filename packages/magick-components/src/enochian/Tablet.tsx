@@ -753,46 +753,46 @@ function Missing({
  * squares as a `<title>` would) unless `label` is false, as for a tablet
  * drawn inside a larger drawing that names itself.
  */
-const Tablet = React.forwardRef(function Tablet(
-  {
-    id,
-    version,
-    reversed = true,
-    alt = false,
-    enochianStyle,
-    frame = true,
-    width,
-    height,
-    label = true,
-    highlights,
-  }: {
-    id: string;
-    /**
-     * One of the data's `TABLET_VERSIONS`; the Golden Dawn's (`gd`) when
-     * absent or unknown.
-     */
-    version?: string;
-    /** Mirror the letters the version reverses (default true). */
-    reversed?: boolean;
-    /**
-     * Draw each square's second letters small in its corner (default
-     * false). Watchtowers only: no source gives the Tablet of Union a
-     * second letter, so its grid has none to draw.
-     */
-    alt?: boolean;
-    /** Squares of a Watchtower's grid to outline, and choose by pointer. */
-    highlights?: TabletHighlights;
-    /** The accessible name: the tablet's own (`true`), another, or none. */
-    label?: boolean | string;
-    /** Page font style for the grid letters; omitted renders the Latin transliteration. */
-    enochianStyle?: CSSProperties;
-    /** CSS border for on-page display; server images omit it since CSS boxes are not SVG. */
-    frame?: boolean;
-    width?: string | number;
-    height?: string | number;
-  },
-  ref: React.Ref<SVGSVGElement>,
-) {
+function Tablet({
+  id,
+  version,
+  reversed = true,
+  alt = false,
+  enochianStyle,
+  frame = true,
+  width,
+  height,
+  label = true,
+  highlights,
+  ref,
+}: {
+  id: string;
+  /**
+   * One of the data's `TABLET_VERSIONS`; the Golden Dawn's (`gd`) when
+   * absent or unknown.
+   */
+  version?: string;
+  /** Mirror the letters the version reverses (default true). */
+  reversed?: boolean;
+  /**
+   * Draw each square's second letters small in its corner (default
+   * false). Watchtowers only: no source gives the Tablet of Union a
+   * second letter, so its grid has none to draw.
+   */
+  alt?: boolean;
+  /** Squares of a Watchtower's grid to outline, and choose by pointer. */
+  highlights?: TabletHighlights;
+  /** The accessible name: the tablet's own (`true`), another, or none. */
+  label?: boolean | string;
+  /** Page font style for the grid letters; omitted renders the Latin transliteration. */
+  enochianStyle?: CSSProperties;
+  /** CSS border for on-page display; server images omit it since CSS boxes are not SVG. */
+  frame?: boolean;
+  width?: string | number;
+  height?: string | number;
+  /** The `<svg>`, for exporting the drawing. */
+  ref?: React.Ref<SVGSVGElement>;
+}) {
   const chosen = versionOf(version);
   const data = tabletOf(id);
   const tablet = tabletVersion(data, chosen);
@@ -851,6 +851,6 @@ const Tablet = React.forwardRef(function Tablet(
       )}
     </svg>
   );
-});
+}
 
 export default Tablet;

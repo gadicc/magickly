@@ -1,8 +1,8 @@
 /**
  * Rose-cross sigil geometry shared by the interactive component and the server
  * renderer. Everything is deterministic for a given letter sequence, including
- * the layout optimisation, which is bounded by evaluation count rather than
- * time so both sides agree. Engines can still differ in the last bit of a
+ * the layout optimisation (roseSigilOptimizer.ts), which is bounded by
+ * evaluation count rather than time so both sides agree. Engines can still differ in the last bit of a
  * trig result, so every number written to SVG goes through `svgCoordinate`.
  */
 
@@ -334,77 +334,28 @@ export function objective(points: Point[], x: number[]) {
   return score;
 }
 
-/** Letter centres for a rectified sigil; letters off the rose are the caller's error. */
-export function sigilPoints(sigilText: string): Point[] {
-  return sigilText.split("").map((letter) => letterPoint(letter));
-}
-
-type NloptModule = {
-  ready: Promise<unknown>;
-  Algorithm: { LN_COBYLA: number };
-  Optimize: new (
-    algorithm: number,
-    dimensions: number,
-  ) => {
-    setMaxObjective(
-      objective: (x: number[]) => number,
-      tolerance: number,
-    ): void;
-    setMaxeval(count: number): void;
-    optimize(start: number[]): { x: number[] };
-  };
-  GC: { flush(): void };
+/** Each final form, with the letter it is on the rose. */
+const FINAL_FORMS: Readonly<Record<string, string>> = {
+  ך: "כ",
+  ם: "מ",
+  ן: "נ",
+  ף: "פ",
+  ץ: "צ",
 };
-type ProcessEvent = "unhandledRejection" | "uncaughtException";
-let nloptModule: Promise<NloptModule> | undefined;
 
 /**
- * Loads the optimiser once per runtime. Its Emscripten glue registers
- * process-wide abort handlers on load in Node, which would replace every
- * later server diagnostic with a WASM abort message; remove exactly those.
+ * The letters of `sigilText` the rose draws, in order: the 22 Hebrew
+ * letters as they are, a final form (ך ם ן ף ץ) as its base letter, and
+ * anything else (spaces, points, Latin text) left out.
  */
-async function loadNlopt(): Promise<NloptModule> {
-  const node =
-    typeof process === "object" && typeof process.listeners === "function"
-      ? (process as NodeJS.EventEmitter)
-      : null;
-  const events: ProcessEvent[] = ["unhandledRejection", "uncaughtException"];
-  const before = new Map(
-    events.map((event) => [event, new Set(node?.listeners(event) ?? [])]),
-  );
-  // The bundler's namespace for this CommonJS module is a snapshot taken before
-  // `ready` attaches the classes, so always go through the live default export.
-  const nlopt = (await import("nlopt-js")).default as NloptModule;
-  await nlopt.ready;
-  if (node)
-    for (const event of events)
-      for (const listener of node.listeners(event))
-        if (!before.get(event)?.has(listener))
-          node.removeListener(event, listener as (...args: unknown[]) => void);
-  return nlopt;
+export function roseLetters(sigilText: string): string[] {
+  return [...sigilText].flatMap((char) => {
+    const letter = FINAL_FORMS[char] ?? char;
+    return letterIJ(letter)[0] >= 0 ? [letter] : [];
+  });
 }
 
-/**
- * Spreads the connecting path with COBYLA so repeated and collinear letters
- * stay readable. Bounded by evaluations, never by wall-clock time, so the
- * browser and the server converge on the same layout.
- */
-export async function optimizeSigilPoints(points: Point[]): Promise<Point[]> {
-  if (points.length === 0) return [];
-  let nlopt: NloptModule;
-  try {
-    nlopt = await (nloptModule ??= loadNlopt());
-  } catch (error) {
-    nloptModule = undefined;
-    throw error;
-  }
-  const opt = new nlopt.Optimize(nlopt.Algorithm.LN_COBYLA, 2 * points.length);
-  try {
-    opt.setMaxObjective(objective.bind(null, points), 1e-4);
-    opt.setMaxeval(SIGIL_MAX_EVALUATIONS);
-    const result = opt.optimize(pointsToArray(points));
-    return arrayToPoints(result.x);
-  } finally {
-    nlopt.GC.flush();
-  }
+/** Letter centres for a sigil, of the letters `roseLetters` keeps. */
+export function sigilPoints(sigilText: string): Point[] {
+  return roseLetters(sigilText).map((letter) => letterPoint(letter));
 }

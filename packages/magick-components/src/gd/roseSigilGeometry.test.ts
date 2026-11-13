@@ -5,12 +5,13 @@ import {
   letterIJ,
   letterPoint,
   objective,
-  optimizeSigilPoints,
   type Point,
   pathFromPoints,
   pointsToArray,
+  roseLetters,
   sigilPoints,
 } from "./roseSigilGeometry.ts";
+import { optimizeSigilPoints } from "./roseSigilOptimizer.ts";
 
 /** One or two doubles away from zero: the size of a Node/Chromium trig difference. */
 const nudge = (value: number) => value * (1 + Number.EPSILON);
@@ -340,4 +341,16 @@ describe("rose sigil geometry", () => {
     expect(long).toHaveLength(32);
     expect(performance.now() - started).toBeLessThan(10_000);
   }, 30_000);
+});
+
+describe("roseLetters", () => {
+  it("keeps the 22 letters, reads final forms as their base letters and drops the rest", () => {
+    expect(roseLetters("אבג")).toEqual(["א", "ב", "ג"]);
+    expect(roseLetters("ךםןףץ")).toEqual(["כ", "מ", "נ", "פ", "צ"]);
+    expect(roseLetters("שָׁלוֹם")).toEqual(["ש", "ל", "ו", "מ"]);
+    expect(roseLetters("a b-ג")).toEqual(["ג"]);
+    expect(roseLetters("")).toEqual([]);
+    expect(sigilPoints("שלום")).toEqual(sigilPoints("שלומ"));
+    expect(sigilPoints("Latin")).toEqual([]);
+  });
 });

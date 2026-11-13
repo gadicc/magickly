@@ -1,8 +1,8 @@
+"use client";
 import lune from "lune";
 
 import useHydrated from "../hooks/useHydrated.ts";
-
-const moonMeanInclination = 5.15; // in degrees
+import { moonMeanInclination, moonPath } from "./moonPath.ts";
 
 function moonPhaseName(phase: number) {
   if (phase === 0.5) return "full-moon";
@@ -31,34 +31,6 @@ const namesLocal = {
     "waning-crescent": "Waning Crescent",
   },
 };
-
-// Based on https://github.com/tingletech/moon-phase/blob/gh-pages/moon-phase.js
-// Reactified, added hemisphere and inclination, filters, etc.
-
-/** SVG path of the moon's lit part for a `lune` phase (0 to 1, 0.5 is full). */
-function moonPath(phase: number) {
-  let mag, sweep;
-
-  // the "sweep-flag" and the direction of movement change every quarter moon
-  // zero and one are both new moon; 0.50 is full moon
-  if (phase <= 0.25) {
-    sweep = [1, 0];
-    mag = 20 - 20 * phase * 4;
-  } else if (phase <= 0.5) {
-    sweep = [0, 0];
-    mag = 20 * (phase - 0.25) * 4;
-  } else if (phase <= 0.75) {
-    sweep = [1, 1];
-    mag = 20 - 20 * (phase - 0.5) * 4;
-  } else if (phase <= 1) {
-    sweep = [0, 1];
-    mag = 20 * (phase - 0.75) * 4;
-  } else {
-    throw new Error("Invalid phase: " + phase);
-  }
-
-  return `m85,5 a${mag},20 0 1,${sweep[0]} 0,150 a20,20 0 1,${sweep[1]} 0,-150`;
-}
 
 function MoonDrawing({
   phase,
@@ -163,5 +135,4 @@ function MoonWidget({
   );
 }
 
-export { moonMeanInclination, moonPath };
 export default MoonWidget;

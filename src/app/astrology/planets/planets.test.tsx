@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { moonMeanInclination } from "magick-components/astrology/Moon";
+import { moonMeanInclination } from "magick-components/astrology/moonPath";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resetPlaceStore } from "@/geo/usePlace";

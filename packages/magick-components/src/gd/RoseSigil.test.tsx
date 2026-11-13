@@ -1,7 +1,8 @@
-import { renderToString } from "react-dom/server";
+import { renderToStaticMarkup, renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import RoseSigil from "./RoseSigil.tsx";
-import { letterPoint } from "./roseSigilGeometry.ts";
+import { RoseSigilImage } from "./RoseSigilImage.tsx";
+import { letterPoint, sigilPoints } from "./roseSigilGeometry.ts";
 
 /** One or two doubles away from zero: the size of a Node/Chromium trig difference. */
 const nudge = (value: number) => value * (1 + Number.EPSILON);
@@ -46,5 +47,22 @@ describe("RoseSigil", () => {
       expect(d).toMatch(/^M 1,25 A /);
       expect(d).not.toContain("NaN");
     }
+  });
+
+  it("draws any text: final forms as their base letters, the rest left out", () => {
+    // A final form or a Latin letter once threw while rendering.
+    const draw = (text: string) =>
+      renderToStaticMarkup(
+        <RoseSigilImage
+          sigilText={text}
+          showRose={false}
+          debug
+          points={sigilPoints(text)}
+        />,
+      );
+    expect(draw("שלום")).toBe(draw("שלומ"));
+    expect(draw("שָׁלוֹם, world")).toBe(draw("שלומ"));
+    expect(draw("Latin")).toBe(draw(""));
+    expect(draw("")).toContain("<path");
   });
 });

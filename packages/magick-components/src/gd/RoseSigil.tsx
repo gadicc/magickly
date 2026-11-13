@@ -1,154 +1,39 @@
+"use client";
 import React from "react";
-import { svgCoordinate } from "../svgCoordinate.ts";
-import {
-  letterIJ,
-  letterPoint,
-  optimizeSigilPoints,
-  type Point,
-  pathFromPoints,
-  ROSE_LETTERS,
-  sigilPoints,
-} from "./roseSigilGeometry.ts";
+import { RoseSigilImage } from "./RoseSigilImage.tsx";
+import { type Point, sigilPoints } from "./roseSigilGeometry.ts";
+import { optimizeSigilPoints } from "./roseSigilOptimizer.ts";
 
-export { letterIJ };
-
-const roseStrokeColor = "rgba(0,0,0,.4)";
-
-export interface RoseSigilImageProps {
-  sigilText: string;
-  showRose: boolean;
-  debug: boolean;
-  /** Letter centres to draw through; the optimised layout when available. */
-  points: Point[];
+export interface RoseSigilProps {
   /**
-   * Draw-on animation class for the connecting path, unique per instance
-   * because a `<style>` inside inline SVG is document-wide; server renders
-   * never animate.
+   * The text to draw. Final forms are drawn as their base letters, and
+   * anything not one of the 22 letters (spaces, points, Latin) is left out.
    */
-  animation?: string;
-  svgRef?: React.Ref<SVGSVGElement>;
-  pathRef?: React.Ref<SVGPathElement>;
+  sigilText: string;
+  /** Draws the rose's three rings of letters behind the sigil. */
+  showRose?: boolean;
+  /** Draws the connecting path on, once the layout is optimised. */
+  animate?: boolean;
+  /** Draws each letter's circle and the unoptimised path too. */
+  debug?: boolean;
+  /** The `<svg>`, for exporting the drawing. */
+  ref?: React.Ref<SVGSVGElement>;
 }
 
 /**
- * The sigil artwork with no hooks, so the server image route can render it
- * with React's server build; the interactive component adds the optimiser
- * and animation around it.
+ * The rose-cross sigil of a Hebrew text, drawn through the letters' places
+ * on the rose. It renders the letter centres first, on the server too, then
+ * spreads repeated and aligned letters with the optimiser once in the
+ * browser, and draws the path on. A client component: the server-safe
+ * drawing is `RoseSigilImage`.
  */
-export function RoseSigilImage({
+export default function RoseSigil({
   sigilText,
-  showRose,
-  debug,
-  points,
-  animation,
-  svgRef,
-  pathRef,
-}: RoseSigilImageProps) {
-  const sigilTokens = sigilText.split("");
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      version="1.1"
-      viewBox="-50 -50 100 100"
-      ref={svgRef}
-    >
-      {animation && (
-        <style>
-          {`.${animation} { animation: ${animation} ${sigilTokens.length / 4}s linear 0s forwards 1; }
-@keyframes ${animation} { to { stroke-dashoffset: 0; } }`}
-        </style>
-      )}
-      {showRose && (
-        <>
-          {" "}
-          <circle
-            cx={0}
-            cy={0}
-            r={10}
-            stroke={roseStrokeColor}
-            strokeWidth={0.5}
-            fill="none"
-          />
-          {ROSE_LETTERS.map((row, i) => (
-            <React.Fragment key={row.join("")}>
-              <circle
-                cx={0}
-                cy={0}
-                r={10 * (i + 2)}
-                stroke={roseStrokeColor}
-                strokeWidth={0.5}
-                fill="none"
-              />
-              {row.map((letter) => {
-                // Labels sit on the letter centres the path is drawn through.
-                const centre = letterPoint(letter);
-                const x = svgCoordinate(centre.x);
-                const y = svgCoordinate(centre.y);
-                return (
-                  <React.Fragment key={letter}>
-                    {debug && (
-                      <circle
-                        cx={x}
-                        cy={y}
-                        r={5}
-                        stroke={roseStrokeColor}
-                        strokeWidth={0.5}
-                        strokeDasharray={0.2}
-                        fill="none"
-                      />
-                    )}
-                    <text
-                      x={x}
-                      y={y}
-                      fill={roseStrokeColor}
-                      textAnchor="middle"
-                      fontSize={10}
-                      dominantBaseline="middle"
-                    >
-                      {letter}
-                    </text>
-                  </React.Fragment>
-                );
-              })}
-            </React.Fragment>
-          ))}
-        </>
-      )}
-
-      {debug && (
-        <path
-          // Letter centres before optimisation
-          stroke="#aa0"
-          fill="none"
-          d={pathFromPoints({ points: sigilPoints(sigilText), sigilTokens })}
-        />
-      )}
-
-      <path
-        // Connecting path
-        stroke="red"
-        fill="none"
-        ref={pathRef}
-        d={pathFromPoints({ points, sigilTokens })}
-      />
-    </svg>
-  );
-}
-
-export default React.forwardRef(function RoseSigil(
-  {
-    sigilText,
-    showRose = true,
-    animate = true,
-    debug = false,
-  }: {
-    sigilText: string;
-    showRose: boolean;
-    animate: boolean;
-    debug: boolean;
-  },
-  ref: React.Ref<SVGSVGElement>,
-) {
+  showRose = true,
+  animate = true,
+  debug = false,
+  ref,
+}: RoseSigilProps) {
   const pathRef = React.useRef<SVGPathElement>(null);
   // useId yields ":r1:"-style ids; CSS identifiers need the colons removed.
   const animation = `rose-sigil-draw-${React.useId().replace(/[^\w-]/g, "")}`;
@@ -158,9 +43,14 @@ export default React.forwardRef(function RoseSigil(
   React.useEffect(() => {
     if (!points.length) return;
     let cancelled = false;
-    optimizeSigilPoints(points).then((result) => {
-      if (!cancelled) setOptimized(result);
-    });
+    optimizeSigilPoints(points).then(
+      (result) => {
+        if (!cancelled) setOptimized(result);
+      },
+      // Without the optimiser (its WASM failed to load) the sigil keeps
+      // the letter centres it was first drawn with.
+      (error) => console.error(error),
+    );
     return () => {
       cancelled = true;
     };
@@ -189,4 +79,4 @@ export default React.forwardRef(function RoseSigil(
       pathRef={pathRef}
     />
   );
-});
+}
