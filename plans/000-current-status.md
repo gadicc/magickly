@@ -312,7 +312,16 @@ Follow-ups are separate from the completed migration work:
   its review applied, not merged; the manifest stays out of the
   published tarball until Gadi signs off its Sources row
   ([plan 080](080-open-source-packages.md#stage-c-13-november-2026)).
-  TODO: with Gadi's go-ahead, stages F and G; stage E's deferred
+  Stage F (13 November) is built on `gate/open-source-components`, on
+  top of stage C, not merged: an example module for each of fourteen
+  components, the `react-docgen-typescript` props manifest committed
+  with a freshness test, a description for every component and prop,
+  `/open-source/components` (a tile each, from `/api/render` where a
+  contract exists) and an explorer page per component (drawn live,
+  controls from the props types, the JSX, the props table), which load
+  `nlopt-js` and `astronomy-engine` only on the sigil's and Mercury's
+  pages ([plan 080](080-open-source-packages.md#stage-f-13-november-2026)).
+  TODO: with Gadi's go-ahead, stage G; stage E's and F's deferred
   items. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups),
   [stage B's](080-open-source-packages.md#stage-b-13-november-2026),
@@ -536,12 +545,10 @@ Follow-ups are separate from the completed migration work:
   entry above. The Enochian dictionary stays out of the tarball: its
   entries come from Schueler's *Enochian Magic: A Practical Manual* and
   *The Whole Enochian Dictionary*, whose rights are not ours to give.
-- TODO: a component explorer under `/open-source`, our own rather than
-  Storybook, built after `magick-components` is a package
-  ([plan 080](080-open-source-packages.md), decision 5 and stage F;
-  first raised in [plan 052](052-data-package.md#follow-ups)). Its
-  controls come from the props types, not from `src/render/registry.tsx`,
-  whose contracts cannot drive them.
+- The component explorer under `/open-source/components`, our own
+  rather than Storybook, first raised in
+  [plan 052](052-data-package.md#follow-ups), is built as plan 080's
+  stage F, not merged; see the 11 November entry above.
 - TODO: ritual editor follow-ups from
   [plan 055](055-ritual-editor-followups.md#follow-ups) (grade and variable
   shortcuts and empty-text normalization are done, see

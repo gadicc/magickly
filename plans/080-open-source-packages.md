@@ -6,7 +6,9 @@ Status: stages A and A′ done, `magick-data` 0.1.0 on npm
 the hardening before publishing built on `gate/components-hardening`
 ([below](#before-publishing-13-november-2026)), and stage C on
 `gate/open-source-data` on top of it, its review applied
-([below](#stage-c-13-november-2026)); neither merged. Reviewed on 11 November 2026 and
+([below](#stage-c-13-november-2026)), and stage F on
+`gate/open-source-components` on top of stage C
+([below](#stage-f-13-november-2026)); none merged. Reviewed on 11 November 2026 and
 revised (see [Review](#review-11-november-2026)), then spiked and mocked up the same day
 (see [Before any code](#before-any-code)). Decisions 1–4, the table page's
 layout, the sigils, the fonts and the licence note were settled by Gadi on
@@ -1558,6 +1560,150 @@ and dark; no sideways scroll at 390 px.
 - The README's Sources row for `astrology/planets.json5` does not name
   Agrippa for the intelligences and spirits; its sign-off is yours.
   Where the Moon's intelligence, Shelachel, comes from is not recorded.
+
+## Stage F (13 November 2026)
+
+Built on `gate/open-source-components`, first on top of stage E
+(`gate/magick-components` at `15b1370f`), then rebased onto stage C
+(`gate/open-source-data` at `1c77eb49`, which carries the components
+hardening); not merged. The SHAs below are the rebased ones. Each code commit
+was gated on its own tree with stage E's gate, which adds the
+components' smoke test.
+
+| Commit | What |
+| --- | --- |
+| `e9bee9b7` | `feat(components): Add examples and a props manifest` |
+| `aeebe7c1` | `feat(open-source): Add the component explorer` |
+| (this commit) | `docs(plans): Record stage F, the component explorer` |
+
+Before the rebase, as `7d4ce30f` and `6b391ade`, every step of both
+gates passed. The first commit's coverage run failed
+once, on `TempleHallTabs.test.tsx`'s timing test ("draws thumbnails
+only in view, a few per frame") on a loaded machine, and the gate's
+re-run passed every test; the second's passed first time.
+
+- **The examples** (`packages/magick-components/examples`): a module
+  per component, `<Name>.examples.tsx`, each exporting its entry, its
+  export and one to seven examples of `{ title, props }`, typed against
+  the component's props by the package's strict check (its `tsconfig`
+  now includes `examples/`). `examples/index.ts` is the component list
+  (decision 5), and a test holds it to the files, checks that each
+  entry is in the package's `exports`, imports nothing but types,
+  `../src/` and React, and renders every example. They are not in the
+  tarball. Fourteen components: `TreeOfLife`, `GradeTree`, `GdHall`,
+  `Lamen`, `RoseSigil`, `SevenBranchedCandleStick`, `TableOfShewbread`,
+  `FylfotCross`, `Tablet`, `Kamea`, `PlanetarySpirit`, `Chakras`,
+  `Moon`, `Mercury`. The plan's optional `imageHref` is not in the
+  examples: the contracts are app code, which MIT examples cannot
+  import, so the image links are the explorer's (below).
+- **The props manifest:** `scripts/component-props.ts` (`pnpm
+  components:props`) runs `react-docgen-typescript` 2.4.0 (a pinned dev
+  dependency) with the options and prop filter decision 6 names, and
+  writes `src/explorer/componentProps.json`, 26 kB, formatted by Biome:
+  each component's JSDoc, and each prop's type, `required`, a default
+  of 80 characters or less, its JSDoc and its control, required props
+  first, then by name. docgen names a default export after its file or
+  its function, so the script finds the default export's declaration
+  with its own TypeScript program and passes it to docgen. docgen
+  gives a string default without quotes, so the script quotes a
+  default when the prop takes strings and the value is not another
+  kind of literal. A test re-runs the script and compares (about a
+  second), and fails on a component or prop without a description.
+- **Descriptions:** Chakras, the candlestick, the shewbread and the
+  Tree had no component description, and 19 props none (Kamea's
+  `className` and `style`, the Moon's two, Chakras' three, Tablet's
+  `id`, `width` and `height`, four of `GdHall`'s, five of `Lamen`'s).
+  All are written; `ChakrasProps` and `MoonWidgetProps` are exported,
+  and `Lamen`'s `width` and `height` are `number | string`, which is
+  what `CSSProperties["width"]` let through, so that they get a
+  control. Two defaults set in the Tree's function body
+  (`colorScale`, `field`) are stated in their descriptions instead of
+  moved, since `||` there also catches an empty string. No drawing
+  changed.
+- **The explorer** (`src/explorer`, app code): `Explorer.tsx`, a client
+  island, holds the chosen example and the current props: a select of
+  the examples, a control per prop from the manifest (decision 5's
+  mapping; a button unsets a prop, a choice offers "not set"), the
+  drawing in an error boundary, the JSX for the current props with a
+  copy button (data too long to show is written `hall={hall}` and the
+  example module linked), and the image route's SVG where it draws the
+  same thing. `images.ts` maps the Tree's, the tablet's and the
+  sigil's props to their contracts' queries and gives no image for a
+  drawing the image cannot show (the tablet's second letters or
+  highlights, the sigil's debug circles); the halls link their
+  published SVG by example. `live.tsx` loads each component through
+  its own `next/dynamic` import, which a test holds to the examples'
+  entries, so the page's HTML has the first example drawn and only
+  the chosen component's chunk loads.
+- **The pages:** `/open-source/components`, a public page, has a tile
+  per component and a text ("About the components"); the tiles use
+  `/api/render` for the Tree, the tablet, the sigil, the candlestick
+  and the shewbread, the Neophyte hall's small PNG for the halls,
+  Mercury's picture without its dates, and draw the other seven on the
+  server (the Grade Tree without its links, which would nest in the
+  tile's). `/open-source/components/<slug>` (`tree-of-life`, …), an
+  entity route, has the name as its heading, the JSDoc, the import
+  line, a note that the package is not on npm yet with no install, the
+  explorer and the props table, which is a list on a phone. Dark mode
+  re-inks or plates each drawing as its own page on the site does.
+- **Around them:** `pathnames.ts` makes Components a section under
+  Open source, so the bar reads "Open source › Components" and a
+  component's page names itself; the footer's column lists Components
+  before Source code; the hub's components card links the index. The
+  index and each component have a title and a description of 110–160
+  characters (the rule `1ce38ab0` set, held by `pages.test.ts` and a
+  new `components.test.ts`), and are in the sitemap, the social cards
+  and site search (the JSDoc and the examples' titles). Web Analytics
+  reports the new dynamic route in full, reviewed in its test. The
+  search vectors were refreshed in the second commit:
+  `search:compare` requested 321 passages of the Qwen comparison
+  profile after the caches were copied, and `search:publish` nothing.
+- **Tests:** the examples and the manifest above; the controls, the
+  JSX writer, the image mapping, the component list; the explorer in
+  jsdom, where a text field and a switch redraw the component and
+  unsetting a prop restores it; the index (a tile each, its pictures,
+  no nested link, no install) and the component pages; the page text,
+  footer, bar, sitemap and route tests.
+- **Checked in a browser:** `next dev` (Turbopack) on port 3119 from
+  this worktree with `ci.yml`'s placeholder environment, headless
+  Chromium over CDP, at 1280 and 390 px in light and dark: the index
+  and the Tree's, the hall's, the sigil's and the tablet's pages, no
+  sideways scroll at 390 px. Every component's page drew with no
+  console error but the shewbread's hydration warning (below). On the
+  Tree's page a switch, a text field and a second text field each
+  changed the drawing, the JSX and the image link. `nlopt-js`'s chunks
+  were requested on the sigil's page only, and `mercuryRetrograde` (with
+  `astronomy-engine`) on Mercury's only; the index requested neither.
+  The same held in production: `next start` of the gate's Turbopack
+  build of `6b391ade` (before the rebase) on port 3120, with each page's scripts searched
+  for the two libraries' own strings and constants, since production
+  chunk names say nothing. The index prefetched all fourteen pages'
+  payloads and loaded neither library; the sigil's page loaded
+  `nlopt-js`, and only Mercury's (as `/astrology/planets` already did)
+  `astronomy-engine`.
+
+**Deferred:**
+
+- **The data inputs** decision 5 lists for the page ("the component's
+  data inputs where the registry declares them"): the specs live in the
+  server-only `src/render/registry.tsx`, beside the renderers, and
+  would need moving to a module of their own first. Not done here.
+- **Components without examples:** `RoseSigilImage` (the sigil's
+  server half, whose `points` the optimiser computes), `KameaFigure` and
+  `GdHallSvg` (building blocks that the drawn components wrap), and the
+  helpers, none of which has a page.
+- **String ids get text fields:** `Tablet`'s `id`, `Lamen`'s `officer`,
+  `Chakras`' `active` and `PlanetarySpirit`'s `id` are `string` in their
+  types, so the explorer offers a text field, not a choice. Narrowing
+  them to unions from magick-data would give choices, and would ask the
+  app's callers, which pass route params, to narrow too.
+- **The Moon** still sets its background to `/night-sky.jpg`, a path of
+  the app's, as Mercury did before stage E; it should take a
+  `background` prop as Mercury does.
+- **A hydration warning** on the Table of Shewbread, in the explorer and
+  on `/gd/symbols/shewbread` alike, from before this stage: React
+  reports server attributes, coordinates among them, that the browser's
+  render does not match.
 
 ## Review (11 November 2026)
 
