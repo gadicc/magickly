@@ -304,11 +304,20 @@ Follow-ups are separate from the completed migration work:
   ([plan 080](080-open-source-packages.md#before-publishing-13-november-2026)).
   Gadi approved the Tree's markup change. TODO: the app's own credit
   for moon-phase, with a search-vector refresh.
-  TODO: with Gadi's go-ahead, stages C, F and G; stage E's deferred
+  Stage C, the field manifest from the data build, a description for
+  every table and all 272 field paths with a test that requires them,
+  `/open-source/data` and a page per table (rows as anchors, links
+  between them, the fields, a JSON detail pane; not indexed), is built
+  on `gate/open-source-data` on top of the components hardening, not
+  merged; the manifest stays out of the published tarball until Gadi
+  signs off its Sources row
+  ([plan 080](080-open-source-packages.md#stage-c-13-november-2026)).
+  TODO: with Gadi's go-ahead, stages F and G; stage E's deferred
   items. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups),
-  [stage B's](080-open-source-packages.md#stage-b-13-november-2026) and
-  [stage E's](080-open-source-packages.md#stage-e-13-november-2026).
+  [stage B's](080-open-source-packages.md#stage-b-13-november-2026),
+  [stage E's](080-open-source-packages.md#stage-e-13-november-2026) and
+  [stage C's](080-open-source-packages.md#stage-c-13-november-2026).
 - 12 November 2026: the Enochian dictionary's and Keys' gematria named as
   Gerald Schueler's (EMPM, 1985), Gadi choosing a label over removal. All
   190 entries that carry it cite EMPM (a test keeps it so). Each value
