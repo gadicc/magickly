@@ -392,3 +392,50 @@ describe("the texts", () => {
     ]);
   });
 });
+
+/**
+ * Every table and every field is described (plan 080, decision 6), so that
+ * the reference cannot thin out: a new field without a description fails
+ * here, and the data pages would otherwise show it with none.
+ */
+describe("the descriptions", () => {
+  it.each(NAMES)("%s: the table and every field have one", (table) => {
+    const entry = fields.tables[table];
+    const missing = entry.fields
+      .filter((f) => !f.description?.trim())
+      .map((f) => f.path);
+    expect(entry.description?.trim(), table).toBeTruthy();
+    expect(missing).toEqual([]);
+  });
+
+  it("are sentences: a capital or a code span first, a full stop last", () => {
+    const all = NAMES.flatMap((table) => [
+      [table, fields.tables[table].description ?? ""],
+      ...fields.tables[table].fields.map((f) => [
+        `${table}.${f.path}`,
+        f.description ?? "",
+      ]),
+    ]);
+    for (const [where, text] of all)
+      expect([where, /^[A-Z0-9`"'(]/.test(text) && text.endsWith(".")]).toEqual(
+        [where, true],
+      );
+  });
+
+  it("say which look like links but are not", () => {
+    expect(field("alchemySymbol", "gdGrade").description).toContain(
+      "not a link",
+    );
+    expect(field("seventyTwoAngel", "godName").description).toContain(
+      "not a link",
+    );
+  });
+
+  it("number 272 field paths, the shared English text described once", () => {
+    const paths = NAMES.flatMap((table) => fields.tables[table].fields);
+    expect(paths).toHaveLength(272);
+    expect(
+      paths.filter((f) => f.description === "The text in English.").length,
+    ).toBeGreaterThan(30);
+  });
+});
