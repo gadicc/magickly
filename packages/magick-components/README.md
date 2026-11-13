@@ -47,7 +47,8 @@ this package is deliberately freer, so that it can travel.
 A drawing after an old source is our own drawing of a public-domain
 printing, cited by page and scan: the planetary spirits' geomantic sigils
 (the Rulers of the geomantic figures) follow John Heydon's *Theomagia*
-(1663/4). Layouts taken from modern books are facts, drawn in our own art.
+(1663/4), and the Enochian Watchtowers' sigils the plate of *The Equinox*
+(1912). Layouts taken from modern books are facts, drawn in our own art.
 
 ## Installing
 

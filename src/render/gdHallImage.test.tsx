@@ -357,7 +357,10 @@ describe("the gd-hall image", () => {
  * medium and small PNGs. The art and the presets are code, so a change to
  * either moves these, and the commit that moves them says why. To list
  * new values after a reviewed change, run this file with GD_HALL_PINS
- * set to a file to write them to.
+ * set to a file to write them to. Theoricus 1 and 2 and Portal 1 and 2
+ * moved when the Air tablet's sigil was redrawn after the Equinox's Plate
+ * X (plan 080, "Before publishing"); their sources were 3c8d2e0a…,
+ * dcf02ee9…, f8c29109… and 8c19b493… before.
  */
 const PINS: Record<string, readonly string[]> = {
   neophyte: [
@@ -382,18 +385,18 @@ const PINS: Record<string, readonly string[]> = {
     "42f5e185e0a3b973fc893b7edfbd0c35e9783c30db9c07448cffa6d8c7d2a825",
   ],
   "theoricus-1": [
-    "3c8d2e0a4cecbd875f0fc55074eccd7d9fd613e85487650e9be7344cc97022cd",
-    "e9293763837985a60a042e287834406722d5ec5518094aba1d379737be52f4e1",
-    "3d3def58784663829533d8038178706067e693a34d7e41ed1b5c34b7f5085d49",
-    "06d9ed918ce4f488681c9f1b13a2b33f890bbf29a2fe43ba17e8cbb00ba8ce27",
-    "65eca8160bd5faa5fad24823310ce7a2d3a87b218489614ab21fd0367eed17eb",
+    "fd4ba7bf90039788ae28704870f242f929469a8a527c57668dbb7c8fd57480d7",
+    "8012c23c83d77dab6384dc0a2ecfdc9a6cd60d6c412ac02dfb28fde7a35959a2",
+    "e2e0100a94578d7941ac2a1856ca19ac87e38100b366b54d587f54ba99b285ba",
+    "3d42ecf9ed12ee5e6d14d1f8c964f296cb0f61934c74c03f2c666b3719141768",
+    "06c767d1b4ec223b8c1dd1ba9f805a1e386be760b20e76b706effe53d31b0892",
   ],
   "theoricus-2": [
-    "dcf02ee9b288fa3ac94e8a1d8d546847e904e189a741359745fc4946a37bc28a",
-    "bfb072ab1a5cd0b3f2f3097d5425d7d78156ee7dfb2b4aed417349719e57a016",
-    "07ba86082b30937fc49e8ae2d53e39034355428ae090375583b9998214b67a88",
-    "68fbc65d0dc32073ee1bdb49d8d47809594a0713599528458a907cba3a5d914e",
-    "08713fe0c21e0d6cc678c5c50af9d8c3974f4905348b94fd75bba8c026616047",
+    "06d82cf01e6291b611951b4c718f188f5cb7181e27d42f62454ed2650f224d39",
+    "c6fc551c2b743563efc37215eaca8927e01ec3c7eb71fa13fbd17b31f26d65c1",
+    "2c2718796339bb7ed0b388d8a008b3d76c4edc7483e4d09521232e2de3dfe65e",
+    "3e8743ef1cd41d27c64c65ecd1ac14e6e7774a4ab22ac3b08677667504c92feb",
+    "630c36a1e0862dfab0ad8d542e8c66fdce9b841810a196f26f9ff100860d96de",
   ],
   "practicus-1": [
     "9bbfd564d558aa4a1453383c46bee6613f50531418c29c8401255e57c8b83d88",
@@ -445,18 +448,18 @@ const PINS: Record<string, readonly string[]> = {
     "59499e84a949e60154b7a2128349b28e8e23f1a6d28908de18bd271de9167c75",
   ],
   "portal-1": [
-    "f8c29109f5fb458eb059550ae9d0c2928d633b2aa0b2bd34088b59da9640a9ad",
-    "d391530f6fed67a1936ac9beeabc5e596087ef9d00dccb30db2b9b8ba959bdfe",
-    "28e254e18629397769be18bec5f1af5a7b4df9f8df431e1aaffeb4a3bad92919",
-    "404d36240079a7c961f4394abd45eae1259aee161b34571f8102da60a75e161b",
-    "27224a4a7b491493c0c976d9b572d68e30bad4072903025373de3545254cfd33",
+    "a2af63a3035c7c06b7e7f29d0798b17328f6151ee7bce276d7dccd4365ae98f0",
+    "7519f968c0cd4763c2b67bb44fe6e768d27bb981460aa5e801e6f9750ab2bae8",
+    "8571ef690e2cf6caa03e102881bc84adeacd4b3248156bf62a26d160c5c405f4",
+    "d05d407b9b18293f1fff9e7c4f8e7d5203351d25526498445f7c771c60f0534e",
+    "85016f1bad6516db37d85aead5934fa8c7cf9158b5075961c5d2dc9290e5e8fd",
   ],
   "portal-2": [
-    "8c19b49308c90658ded105bf839d2c75d87f835903376e32acd01aa52f4a140b",
-    "9b5df68576268310f6667634021d5c052116a775cb5b19989cd6584fa4ac65ae",
-    "ba7d566eb76f560fdec069d3c58feae3cec1d563248db8bef9e5aef459d50af7",
-    "46e8909faa8f4921a468c4462fc34a33323e7bf6734dcdd0da651ce05a505d25",
-    "d8bc1de67bc1082962824ed8371c3e9279abbef7d9c1cfef3fa135522dfc8b96",
+    "2ddc2792bb59e344b72c7ac4115e493e6004ece5f2228964cb6aaab93e6aa751",
+    "9b2388125fbc4a3797b76bbc69b83ecfea218e1a4976f2002edfdde1f4773976",
+    "ca99041e216cb6322aabd952d53c23100da50dc9be5609dead076475c91631b2",
+    "f84914657d449912b85219550b4d99d4810d254410907a22d79b76b9f2f1c342",
+    "fed5bac9531443b6efdf9a1ed5d63b5e637feb9167ae65b4c611081ed8c43b2a",
   ],
 };
 

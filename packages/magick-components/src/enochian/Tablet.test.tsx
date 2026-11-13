@@ -72,29 +72,32 @@ describe("Tablet", () => {
       false,
       "5d047bcf70775ffc79ce745119e6d7c3f7413604ce68739df454547c7ce8d297",
     ],
+    // Air's four moved when its sigil was redrawn after the Equinox's
+    // Plate X, in place of two fonts' glyphs (plan 080, "Before
+    // publishing"); 8b12dffc…, 657b0c6f…, c597afb2… and a14408e1… before.
     [
       "air",
       false,
       true,
-      "8b12dffcf86b0c9553c1b3f629eca465981dd771a455fe7ed189c788598e9faf",
+      "924e6792363322802fe4b1e0d67f3f53b8792afba575c19ae52f0461721b03de",
     ],
     [
       "air",
       false,
       false,
-      "657b0c6f35931f955bdb6a47dd95116082fe92df58472703ca8c18925eec9f4d",
+      "d56aa4ee5abd3e4caf531f14c041429faa04787e6117716310bd9bf114dc7f9e",
     ],
     [
       "air",
       true,
       true,
-      "c597afb22b7138fd0b6d37cd8a516e31f104f81beab78c85a1940fa293d092b6",
+      "0c0c0214e72447b2c9a03cec4087f654c177a0ff37fd07fd775da5ea0de2ca57",
     ],
     [
       "air",
       true,
       false,
-      "a14408e150da608907af43cff9f552700f81169d7f3edca402c64fc57476105f",
+      "b92ebc33138dfc5a68d3620a1d5f9ea6ac44d79ddb0f73fac90ae002211aa40e",
     ],
   ] as const)(
     "draws %s (Enochian %s, frame %s) as it did",
