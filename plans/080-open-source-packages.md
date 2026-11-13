@@ -1373,6 +1373,56 @@ passed.
 - `public/night-sky.jpg` is not moon-phase's background (different
   bytes); its own source is not recorded here.
 
+### The chakras' figure (13 November 2026)
+
+`Chakras` drew its chakras on a seated, meditating silhouette that came
+in with `fe44a6bf` (22 December 2020, "sephirot: add / re-align chakras
++ diagram") with no recorded source. Gadi thought it might have come
+from Shutterstock, licensed for his site but not for redistribution, or
+from an image search; either way it was not ours to give away under
+MIT, and he agreed to an original. Built on `gate/chakras-figure`, from
+`main` at `1c77eb49`, after [stage C](#stage-c-13-november-2026), then
+rebased onto [stage F](#stage-f-13-november-2026); not merged.
+
+The figure was drawn for this package on 13 November 2026 as an
+original, replacing the earlier silhouette of unrecorded source: a
+woman seated cross-legged, her hands resting palm up on her knees,
+thumb and index finger touching. It is constructed in `Chakras.tsx`
+from hand-placed cubic Béziers: the right half of the head, trunk and
+crossed legs as one outline mirrored onto the left, and the arms as a
+mirrored pair, each hand's ring a hole in the arms' path (filled
+`evenodd`). Nothing was traced, sampled or adapted from the old figure
+or from any image; the file's header says so. It keeps the old
+`viewBox`, its role and its ink: two paths filled `#000`, which the
+app's dark ink rule still selects, with the chakras' colours, radius
+and dimming unchanged. The chakras sit on the midline at the crown (on
+top of the head, as before), the brow, the throat, the heart, above the
+navel, the lower belly and the seat. Props and exports are unchanged.
+A first version with the hands in the lap was replaced before landing,
+at Gadi's request; he approved this one on 13 November ("Yes, ship
+it").
+
+Tests hold the figure inside its `viewBox` and symmetric, each hand's
+ring open, every chakra but the crown's on the body under the paths'
+fill rules, and the dimming. Nothing else pinned the drawing, so
+nothing was re-pinned: no render hash, snapshot or byte count covers
+`Chakras`, it has no image contract or registry entry, the
+documentation screenshots show only temples, and the ink test
+(`ink.test.tsx`) and the package's smoke test pass unchanged. Stage F's
+explorer draws it live, its tile included, from its three examples,
+whose props are unchanged; its props manifest, JSX test and image
+parity test (which does not cover `Chakras`) needed nothing.
+In headless Chromium, on the Tiferet, Keter and Malchut pages at 390
+and 1280 px, light and dark, the figure is filled black in light and
+`#d6dae0` in dark, one chakra is lit and nothing scrolls sideways.
+
+| Commit | What |
+| --- | --- |
+| `c0e2beb6` | `fix(components): Draw the chakras' figure anew` |
+
+It passed stage E's gate (the gate with the package's smoke test) on
+its own tree, every step first time, coverage included.
+
 ## Stage C (13 November 2026)
 
 Built on `gate/open-source-data`, branched from stage B, rebased three

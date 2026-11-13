@@ -325,6 +325,12 @@ Follow-ups are separate from the completed migration work:
   rebased onto stage C; its last commit puts `/open-source`'s packages
   above its licences and adds the moon-phase credit
   ([plan 080](080-open-source-packages.md#stage-f-13-november-2026)).
+  The chakras' seated figure, of unrecorded source since 2020, is
+  replaced by an original drawn for the package on 13 November: a
+  woman seated cross-legged, hands on her knees in the meditation
+  mudra. Built on `gate/chakras-figure` on top of stage F, not merged;
+  nothing pinned moved. Gadi approved its look on 13 November
+  ([plan 080](080-open-source-packages.md#the-chakras-figure-13-november-2026)).
   TODO: with Gadi's go-ahead, stage G; stage E's and F's deferred
   items. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups),
