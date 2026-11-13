@@ -148,7 +148,13 @@ export function sephirahWedges(
 ) {
   const rads = Math.PI / 180;
   return colors.map((fill, i) => {
-    // Adapted from https://codepen.io/hari_shanx/pen/NRyPBz
+    // Adapted from https://codepen.io/hari_shanx/pen/NRyPBz (2022), kept
+    // as credit. What it lent is the method: a wedge is a line from the
+    // centre to the arc's start, an arc to its end, and back, its ends
+    // found by the usual polar-to-Cartesian arithmetic. Those few lines
+    // of trigonometry have no expression of their own to protect, so no
+    // licence is needed (plan 080, "Before publishing"); public Pens are
+    // MIT besides (blog.codepen.io/documentation/licensing).
     // 180 - 45; hard coded malkuth angles till we need something else
     const from = (i * 360) / colors.length + 180 - 45;
     const to = ((i + 1) * 360) / colors.length + 180 - 45;

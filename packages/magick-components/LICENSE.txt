@@ -1,5 +1,6 @@
-magick-components is under two licences, by path. The repository it comes
-from is AGPL-3.0-or-later (see ../../LICENSE.txt); this package is not.
+magick-components is under three licences, by path. The repository it
+comes from is AGPL-3.0-or-later (see ../../LICENSE.txt); this package is
+not.
 
 Code: MIT, below.
   Everything but fonts/: the components, src/**/*.ts and src/**/*.tsx, and
@@ -9,6 +10,16 @@ Code: MIT, below.
   data included, so the drawing may be taken from the package under MIT.
   The CC BY 4.0 statement in ../../README.md covers the images magick.ly
   draws and serves, its hand-drawn images and the data, not this code.
+  Two of these files are also under BSD 3-Clause (Moon, next).
+
+Moon: BSD 3-Clause as well as MIT.
+  src/astrology/moonPath.ts and src/astrology/Moon.tsx, and
+  lib/astrology/moonPath.js and lib/astrology/Moon.js compiled from them,
+  adapt phase_junk() in moon-phase.js from tingletech/moon-phase
+  (https://github.com/tingletech/moon-phase/blob/643015a83509ca6a662d1af6e1ac14661852cedb/moon-phase.js):
+  the path of the Moon's lit part and of its disc. They are under the BSD
+  3-Clause License below, whose notice they carry, and our changes to them
+  under MIT.
 
 Fonts: SIL Open Font License 1.1.
   fonts/*.woff2, subsets of Noto Serif (Copyright 2022 The Noto Project
@@ -43,3 +54,36 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+BSD 3-Clause License (src/astrology/moonPath.ts, src/astrology/Moon.tsx
+and what is compiled from them), from moon-phase's LICENSE.md, "License
+for all other files" (its background image is not used here):
+
+Copyright © 2012, Regents of the University of California
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+- Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
+- Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+- Neither the name of the University of California nor the names of its
+  contributors may be used to endorse or promote products derived from this
+  software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.

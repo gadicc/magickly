@@ -16,8 +16,8 @@ describes the published shape that the smoke test checks.
 
 ## Licences
 
-Copyright (c) 2020-2026 Gadi Cohen. The package is under two licences, by
-path, and [LICENSE.txt](./LICENSE.txt) says which file is which:
+Copyright (c) 2020-2026 Gadi Cohen. The package is under three licences,
+by path, and [LICENSE.txt](./LICENSE.txt) says which file is which:
 
 - **The code is MIT**, and that includes the drawings. A component whose
   code *is* the drawing (the sigils, the lamens, the hall's art, the
@@ -25,6 +25,12 @@ path, and [LICENSE.txt](./LICENSE.txt) says which file is which:
   take the drawing from the package under MIT. magick.ly licenses the
   images it serves under CC BY 4.0, but anyone can render the same drawing
   from this package under MIT.
+- **The Moon's paths are also under BSD 3-Clause**: `astrology/moonPath`
+  and `astrology/Moon` adapt `phase_junk()` from
+  [moon-phase](https://github.com/tingletech/moon-phase/blob/643015a83509ca6a662d1af6e1ac14661852cedb/moon-phase.js),
+  Copyright © 2012, Regents of the University of California. Keep its
+  notice, in LICENSE.txt, with copies of those two modules, including in
+  what you build from them.
 - **The hall's three fonts are under the SIL Open Font License 1.1**:
   subsets of Noto Serif and Frank Ruhl Libre in `fonts/`, with their
   notices and [their sources](./fonts/SOURCES.md).

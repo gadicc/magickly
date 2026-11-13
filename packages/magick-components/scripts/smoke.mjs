@@ -248,6 +248,26 @@ try {
     console.log(`  ${listing.length} files`);
   });
 
+  step("moon-phase's BSD notice ships with the code built from it", () => {
+    const licence = readFileSync(join(packed, "LICENSE.txt"), "utf8");
+    assert(
+      licence.includes("BSD 3-Clause License") &&
+        licence.includes("POSSIBILITY OF SUCH DAMAGE."),
+      "LICENSE.txt carries the BSD notice",
+    );
+    for (const file of ["lib/astrology/moonPath.js", "lib/astrology/Moon.js"])
+      assert(
+        /\/\*![^]*tingletech\/moon-phase[^]*Regents of the University of California/.test(
+          readFileSync(join(packed, file), "utf8"),
+        ),
+        `${file} keeps its attribution`,
+      );
+    assert(
+      manifest.license === "(MIT AND OFL-1.1 AND BSD-3-Clause)",
+      `license names BSD-3-Clause (got ${manifest.license})`,
+    );
+  });
+
   step("the packed manifest is the published one", () => {
     assert(
       JSON.stringify(manifest.exports) ===

@@ -14,7 +14,10 @@ Copyright (c) 2020-2026 Gadi Cohen.
   [`packages/magick-components/`](./packages/magick-components) are
   [MIT](./packages/magick-components/LICENSE.txt), and import no app code.
   MIT covers the drawings they make: where a component's code is the
-  drawing, its path data is code too.
+  drawing, its path data is code too. The Moon's two modules adapt code
+  from [moon-phase](https://github.com/tingletech/moon-phase), Copyright ©
+  2012, Regents of the University of California, and are also under its
+  BSD 3-Clause License, whose notice that LICENSE.txt carries.
 - **Images the site draws or makes itself**, such as the Tree of Life, sigils,
   tablets, lamens and temple halls, and its hand-drawn images, are CC BY 4.0
   as magick.ly serves them, with credit to Magick.ly. Work by other people

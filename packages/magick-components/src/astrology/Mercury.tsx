@@ -20,47 +20,6 @@ function emWidth(text: string) {
   return em;
 }
 
-/*
-function MercuryDrawing({ phase, width, height, }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      version="1.1"
-      viewBox="0 0 170 162"
-      width={width}
-      height={height}
-      transform={`rotate(${inclination})`}
-    >
-      <defs>
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="5" result="coloredBlur" />
-          <feMerge>
-            <feMergeNode in="coloredBlur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-
-      <path
-        className="back"
-        d="m85,5 a20,20 0 1,1 0,150 a20,20 0 1,1 0,-150"
-        style={{ fill: "white", filter: "url(#glow)" }}
-      />
-      <path
-        className="back"
-        d="m85,5 a20,20 0 1,1 0,150 a20,20 0 1,1 0,-150"
-        style={{ fill: "black" }}
-      />
-      <path
-        className="moon"
-        d={`m85,5 a${mag},20 0 1,${sweep[0]} 0,150 a20,20 0 1,${sweep[1]} 0,-150`}
-        style={{ fill: "#ebc815" }}
-      />
-    </svg>
-  );
-}
-*/
-
 /**
  * A CSS string of `text`, quoted, with its quotes, backslashes and line
  * breaks escaped, so a URL cannot end the `url()` early.

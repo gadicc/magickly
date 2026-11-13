@@ -1,3 +1,12 @@
+/*!
+ * The lit part's path is adapted from phase_junk() in moon-phase.js:
+ * https://github.com/tingletech/moon-phase/blob/643015a83509ca6a662d1af6e1ac14661852cedb/moon-phase.js
+ * Copyright (c) 2012, Regents of the University of California.
+ * All rights reserved. Used under the BSD 3-Clause License, whose
+ * conditions and disclaimer are in this package's LICENSE.txt; this file
+ * is under that licence as well as MIT.
+ */
+
 /**
  * The Moon drawing's geometry, apart from the client component that draws
  * it, so that it can be imported anywhere (plan 080, decision 7).
@@ -6,8 +15,8 @@
 /** The Moon's orbit's mean inclination to the ecliptic, in degrees. */
 export const moonMeanInclination = 5.15;
 
-// Based on https://github.com/tingletech/moon-phase/blob/gh-pages/moon-phase.js
-// Reactified, added hemisphere and inclination, filters, etc.
+// Ported from moon-phase's phase_junk() (above), which also draws the
+// disc; the hemisphere, the inclination and the glow are ours.
 
 /** SVG path of the moon's lit part for a `lune` phase (0 to 1, 0.5 is full). */
 export function moonPath(phase: number): string {

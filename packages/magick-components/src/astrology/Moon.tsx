@@ -1,4 +1,12 @@
 "use client";
+/*!
+ * The unlit disc's path is adapted from phase_junk() in moon-phase.js:
+ * https://github.com/tingletech/moon-phase/blob/643015a83509ca6a662d1af6e1ac14661852cedb/moon-phase.js
+ * Copyright (c) 2012, Regents of the University of California.
+ * All rights reserved. Used under the BSD 3-Clause License, whose
+ * conditions and disclaimer are in this package's LICENSE.txt; this file
+ * is under that licence as well as MIT.
+ */
 import lune from "lune";
 
 import useHydrated from "../hooks/useHydrated.ts";
