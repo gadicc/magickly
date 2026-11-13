@@ -20,16 +20,24 @@
  *    sigil's image rendered with `renderToStaticMarkup`, no bundler;
  * 4. a strict consumer type-checked under `bundler` and `nodenext`, with
  *    `skipLibCheck` off, and a prop the types must refuse;
- * 5. a Next app built with webpack and with Turbopack, first with every
+ * 5. 3 and 4 again in a second fixture that installs the components'
+ *    tarball alone, so that npm takes magick-data from the registry, as a
+ *    stranger's install would; skipped, saying so, while the registry
+ *    lacks the magick-data version the components were built with;
+ * 6. a Next app built with webpack and with Turbopack, first with every
  *    entry but the live rose sigil and no `fs` stub (nlopt must be out of
  *    reach), then with `RoseSigil` and the stub the README gives; each
  *    build's prerendered HTML is read for the server's drawings.
  *
- * The fixture's dependencies are installed by npm at the versions the
- * repository uses, with `--before` a week back, as the workspace's
- * `minimumReleaseAge` would have it. Every step throws on failure and the
- * process exits non-zero; the temporary directory is removed either way
- * (`--keep` keeps it, and prints where).
+ * The fixtures' dependencies are installed by npm at the exact versions
+ * the repository uses, and npm's `--before` holds what it resolves under
+ * them to a week back, as the workspace's `minimumReleaseAge` would; where
+ * a pinned version, or the floor of one of the components' ranges, is
+ * younger than that (taken early with `--config.minimumReleaseAge=0`),
+ * `--before` moves up to its publish time, which the registry gives
+ * (`installCutoff`). Every step throws on
+ * failure and the process exits non-zero; the temporary directory is
+ * removed either way (`--keep` keeps it, and prints where).
  */
 import { spawnSync } from "node:child_process";
 import {
@@ -185,6 +193,61 @@ function write(file, text) {
   writeFileSync(file, text);
 }
 
+/**
+ * When the registry published `name@version`, or undefined if it has no
+ * such version (or no such package). Any other failure throws.
+ */
+function publishTime(name, version) {
+  const result = spawnSync("npm", ["view", name, "time", "--json"], {
+    encoding: "utf8",
+  });
+  if (result.error) throw result.error;
+  if (result.status !== 0) {
+    if (/E404/.test(`${result.stdout}${result.stderr}`)) return undefined;
+    throw new Error(
+      `npm view ${name} time exited ${result.status}\n${result.stderr}`,
+    );
+  }
+  const time = JSON.parse(result.stdout)[version];
+  return time === undefined ? undefined : new Date(time);
+}
+
+const WEEK = 7 * 24 * 3600 * 1000;
+
+/**
+ * npm's `--before` for installing `pins` ([name, exact version] pairs):
+ * a week back, as the workspace's `minimumReleaseAge` has it, so that the
+ * ranges npm resolves below the pins take nothing fresher; or, where a pin
+ * was published since (the workspace can take one early with
+ * `--config.minimumReleaseAge=0`), the moment that pin was published, so
+ * that npm can still install it. A pin the registry lacks throws.
+ */
+function installCutoff(pins) {
+  let cutoff = Date.now() - WEEK;
+  for (const [name, version] of pins) {
+    const published = publishTime(name, version);
+    assert(published !== undefined, `${name}@${version} is on the registry`);
+    cutoff = Math.max(cutoff, published.getTime());
+  }
+  return new Date(cutoff).toISOString();
+}
+
+/** Installs a fixture's package.json with npm, its versions as of `before`. */
+function npmInstall(dir, before) {
+  run(
+    "npm",
+    [
+      "install",
+      "--no-audit",
+      "--no-fund",
+      "--ignore-scripts",
+      "--loglevel=error",
+      `--before=${before}`,
+    ],
+    { cwd: dir },
+  );
+}
+
 const work = mkdtempSync(join(tmpdir(), "magick-components-smoke-"));
 let failed = false;
 try {
@@ -316,10 +379,47 @@ try {
     );
   });
 
-  // The fixture: what a stranger's project installs.
+  // The fixture: what a stranger's project installs, at the repository's
+  // versions of React, Next and TypeScript.
   const fixture = join(work, "fixture");
-  const before = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
+  const pinned = Object.fromEntries(
+    [
+      "next",
+      "react",
+      "react-dom",
+      "@types/node",
+      "@types/react",
+      "@types/react-dom",
+      "typescript",
+    ].map((name) => [name, installed(name)]),
+  );
+  const { next: _next, ...consumerPins } = pinned;
+  /**
+   * The lowest version each of the components' ranges takes (`^10.2.0`
+   * takes 10.2.0), magick-data's aside: a floor raised to a release
+   * younger than a week must move `--before` up as a pin does.
+   */
+  const floors = Object.entries(manifest.dependencies)
+    .filter(([name]) => name !== "magick-data")
+    .map(([name, range]) => [name, range.match(/^[\^~]?(\d+\.\d+\.\d+)$/)?.[1]])
+    .filter(([, floor]) => floor !== undefined);
+  /** A fixture's dependencies: the pins, React's and Next's at run time. */
+  const fixtureDependencies = (pins, extra) => {
+    const runtime = ["next", "react", "react-dom"];
+    const pick = (keep) =>
+      Object.fromEntries(
+        Object.entries(pins).filter(
+          ([name]) => runtime.includes(name) === keep,
+        ),
+      );
+    return {
+      dependencies: { ...extra, ...pick(true) },
+      devDependencies: pick(false),
+    };
+  };
   step("install both tarballs and Next with npm", () => {
+    const before = installCutoff([...Object.entries(pinned), ...floors]);
+    console.log(`  --before=${before}`);
     write(
       join(fixture, "package.json"),
       `${JSON.stringify(
@@ -327,19 +427,10 @@ try {
           name: "magick-components-smoke",
           private: true,
           type: "module",
-          dependencies: {
+          ...fixtureDependencies(pinned, {
             "magick-components": `file:${tarball}`,
             "magick-data": `file:${dataTarball}`,
-            next: installed("next"),
-            react: installed("react"),
-            "react-dom": installed("react-dom"),
-          },
-          devDependencies: {
-            "@types/node": installed("@types/node"),
-            "@types/react": installed("@types/react"),
-            "@types/react-dom": installed("@types/react-dom"),
-            typescript: installed("typescript"),
-          },
+          }),
           // The components' ^0.x range on magick-data, met by its tarball.
           overrides: { "magick-data": "$magick-data" },
         },
@@ -347,18 +438,7 @@ try {
         2,
       )}\n`,
     );
-    run(
-      "npm",
-      [
-        "install",
-        "--no-audit",
-        "--no-fund",
-        "--ignore-scripts",
-        "--loglevel=error",
-        `--before=${before}`,
-      ],
-      { cwd: fixture },
-    );
+    npmInstall(fixture, before);
     const nested = join(
       fixture,
       "node_modules",
@@ -372,9 +452,10 @@ try {
   const entries = Object.keys(manifest.exports).filter(
     (key) => !key.includes("*"),
   );
-  step("every entry loads in plain Node, and the drawings render", () => {
+  /** Loads every entry in plain Node and renders three drawings. */
+  const loadEntries = (dir) => {
     write(
-      join(fixture, "node-load.mjs"),
+      join(dir, "node-load.mjs"),
       `import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 const entries = ${JSON.stringify(entries)};
@@ -401,13 +482,17 @@ console.log(entries.length, "entries;", tree.length, hall.length, rose.length, "
 `,
     );
     console.log(
-      `  ${run(process.execPath, ["node-load.mjs"], { cwd: fixture }).output.trim()}`,
+      `  ${run(process.execPath, ["node-load.mjs"], { cwd: dir }).output.trim()}`,
     );
-  });
+  };
+  step("every entry loads in plain Node, and the drawings render", () =>
+    loadEntries(fixture),
+  );
 
-  step("a strict consumer type-checks under bundler and nodenext", () => {
+  /** Type-checks a strict consumer of every entry, both resolutions. */
+  const typeCheck = (dir) => {
     write(
-      join(fixture, "types", "consumer.tsx"),
+      join(dir, "types", "consumer.tsx"),
       `${entries
         .map(
           (entry, i) =>
@@ -465,20 +550,81 @@ export const page = (
       ],
     ]) {
       write(
-        join(fixture, "types", `tsconfig.${name}.json`),
+        join(dir, "types", `tsconfig.${name}.json`),
         JSON.stringify({ compilerOptions, files: ["consumer.tsx"] }),
       );
       run(
         process.execPath,
         [
-          join(fixture, "node_modules", "typescript", "bin", "tsc"),
+          join(dir, "node_modules", "typescript", "bin", "tsc"),
           "-p",
           `tsconfig.${name}.json`,
         ],
-        { cwd: join(fixture, "types") },
+        { cwd: join(dir, "types") },
       );
     }
-  });
+  };
+  step("a strict consumer type-checks under bundler and nodenext", () =>
+    typeCheck(fixture),
+  );
+
+  // The same, against the registry's magick-data rather than the
+  // workspace's: what a stranger installs once the components are
+  // published. The fixture above overrides magick-data with its tarball,
+  // so a component that used something magick-data gained since its last
+  // publish would pass there and fail here. Until the registry has the
+  // version the components were built with, there is nothing to compare.
+  const registryData = publishTime("magick-data", dataManifest.version);
+  if (registryData === undefined)
+    console.log(
+      `skip - against the registry's magick-data: it has no ${dataManifest.version}, the version the components were built with`,
+    );
+  else
+    step(
+      `against the registry's magick-data ${dataManifest.version}, every entry loads and type-checks`,
+      () => {
+        const registry = join(work, "registry");
+        const before = installCutoff([
+          ...Object.entries(consumerPins),
+          ...floors,
+          ["magick-data", dataManifest.version],
+        ]);
+        console.log(`  --before=${before}`);
+        write(
+          join(registry, "package.json"),
+          `${JSON.stringify(
+            {
+              name: "magick-components-smoke-registry",
+              private: true,
+              type: "module",
+              // No magick-data and no override: npm resolves the packed
+              // manifest's range from the registry.
+              ...fixtureDependencies(consumerPins, {
+                "magick-components": `file:${tarball}`,
+              }),
+            },
+            null,
+            2,
+          )}\n`,
+        );
+        npmInstall(registry, before);
+        const lock = JSON.parse(
+          readFileSync(join(registry, "package-lock.json"), "utf8"),
+        );
+        const data =
+          lock.packages["node_modules/magick-data"] ??
+          lock.packages[
+            "node_modules/magick-components/node_modules/magick-data"
+          ];
+        assert(
+          data?.resolved?.startsWith("https://registry.npmjs.org/"),
+          `magick-data came from the registry (${data?.resolved})`,
+        );
+        console.log(`  magick-data ${data.version} from the registry`);
+        loadEntries(registry);
+        typeCheck(registry);
+      },
+    );
 
   // The Next app. Its server page imports every entry but the two that
   // reach nlopt, and builds with no fs stub; the second round adds the live
