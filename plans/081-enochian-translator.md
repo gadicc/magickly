@@ -175,13 +175,14 @@ forms where any exist.
     one are folded. Each of the 34 was checked against the book's
     images on 13 November 2026 (the extract is OCR, and 6 other
     misreadings proved to be words we have): 26 are words he writes
-    joined (ODZAMRAN, DSINSI), which the join rule may or may not
-    split, and 8 differ in spelling (PRGEL for PURGEL, ZOMDUX, TORB,
-    TOLHAM, BALTLE, FCAOSGA, VIVIALPRT, BAZEMLO). The spellings, and
-    the joined forms the rule leaves whole (QTA, SOBAIAD) or splits
-    wrongly, go in a small table mapped to Dee's words and cited by
-    page. A spelling is a fact, and no gloss or other text of his is
-    copied. The table lives in the app,
+    joined (ODZAMRAN, DSINSI, QTA, SOBAIAD), 6 differ in spelling
+    (PRGEL for PURGEL, ZOMDUX, TOLHAM, FCAOSGA, VIVIALPRT, BAZEMLO),
+    and 2 are other words at their place (BALTLE at his Key 1.70, TORB
+    at his 10.41, by his numbering), left to the expert. The spellings
+    and the joined forms go in a small table mapped to the Key rows
+    they read, so to Dee's words, and cited by page; the join rule's
+    splits don't matter for them. A spelling is a fact, and no gloss or
+    other text of his is copied. The table lives in the app,
     `src/app/enochian/translate/leitchSpellings.ts`, not in
     `magick-data`, whose published data needs a signed-off Sources row
     (plan 080) and is CC BY 4.0.
@@ -389,8 +390,9 @@ Each step is one gated commit on `gate/enochian-translator`. (Steps
 are lettered so they aren't confused with stages 1 and 2.)
 
 A. **The plan** (this file).
-B. **Data fixes** (decision 22), and the table of Leitch's spellings
-   in the app (decision 13), each checked against his page.
+B. **Data fixes**: AR's typo (decision 22; its "(see …)" half is
+   lookup code, in step C), and the table of Leitch's spellings in the
+   app (decision 13), each checked against his page.
 C. **The lookup module**: tokenising, phrases, tiers, choice, the rule
    tables, pronouns, possessives, gaps and nearest forms; the reading
    line, Golden Dawn and Leitch input and the join rule; the

@@ -90,8 +90,13 @@ same items are on the list of what we need from the Library
 - **The 17 Key rows marked `uncertain`** in `keys.json5`, such as the
   two words Nalvage hummed in Key 1 and left unprinted.
 - **Leitch's spellings that differ from our Keys' and dictionary's**,
-  eight (PRGEL for PURGEL, TOLHAM, BAZEMLO), which plan 081
-  accepts as input: which are Dee's own?
+  six (PRGEL for PURGEL, TOLHAM, BAZEMLO), which plan 081 accepts as
+  input: which are Dee's own?
+- **Leitch's other words**, at his place numbers, which can differ
+  from ours: BALTLE at his 1.70, near Casaubon's PIAMOL "of
+  righteousness" (our 1.72), and TORB at his 10.41, near YOR "roar"
+  and VOHIM "with an hundred" (our 10.40 and 10.41). Which does Dee
+  write?
 - **The words Casaubon's print lost** (Keys 13 to 16), for which
   Crowley's forms stand in, and Dee's accents and Aethyr spellings.
 

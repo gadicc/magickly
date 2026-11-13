@@ -409,10 +409,10 @@ Follow-ups are separate from the completed migration work:
   the recommendation is strict lookup with gaps that suggest the
   nearest forms, and a model reading Enochian into English. TODO:
   lookup should ignore "(see …)" cross-references in glosses (CABA
-  "govern, to; (see 'cab')" matched "see"). TODO: the dictionary
-  glosses AR (`EMPM`) "the sun, to prtect", which keeps lookup from
-  matching "protect"; EMPM prints "protect" (p. 263), so it is our
-  typo, to be corrected.
+  "govern, to; (see 'cab')" matched "see"); plan 081's step C does
+  it. The dictionary glossed AR (`EMPM`) "the sun, to prtect", which
+  kept lookup from matching "protect"; EMPM prints "protect" (p. 263),
+  so it was our typo, corrected in plan 081's step B.
 - 13 November 2026: an Enochian translator by lookup designed in
   [plan 081](081-enochian-translator.md), decision by decision with
   Gadi, reviewed by Fable and spiked. Gadi confirmed its proposals the

@@ -69,10 +69,12 @@ records list Sloane MS 3191 as not covered for every Key.
   capitals as printed (`printed`), and 12 Keys' `checked` records name
   them.
 - **Leitch's spellings that differ from our Keys' and dictionary's**
-  beyond the letters the search takes as one, eight (PRGEL for
-  PURGEL, TOLHAM, BAZEMLO), which
+  beyond the letters the search takes as one: six spellings (PRGEL
+  for PURGEL, TOLHAM, BAZEMLO), which
   [plan 081](081-enochian-translator.md) accepts as input (decision
-  13): which are Dee's own?
+  13), and two other words at their place (BALTLE at his Key 1.70,
+  near our 1.72 PIAMOL; TORB at his 10.41, near our 10.40 YOR and
+  10.41 VOHIM). Which are Dee's own?
 - **Leitch's readings of the words Casaubon's print lost**: his
   lexicon gives Key references in Keys 13 to 16 (TOLHAM at 14.11,
   where we have Crowley's *tolahame*), presumably from Dee's
