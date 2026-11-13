@@ -1,4 +1,5 @@
 import data from "magick-data";
+import type { CSSProperties } from "react";
 
 const colorFromElement: Readonly<Record<string, string>> = {
   fire: "red",
@@ -44,6 +45,8 @@ export function typeFromId(id: string): "planet" | "element" | "zodiac" {
  * component needs no CSS tooling (it was Next's styled-jsx in the app).
  */
 const CLASS = "magick-fylfot-cross";
+/** The custom property `ink` sets on the table, which the borders read. */
+const INK = "--magick-fylfot-cross-ink";
 const STYLE = `
 .${CLASS} {
   margin: 20px auto;
@@ -56,7 +59,7 @@ const STYLE = `
   vertical-align: middle;
 }
 .${CLASS} td:not(:empty) {
-  border: 1px solid var(--mui-palette-ink, black);
+  border: 1px solid var(${INK}, black);
 }
 `;
 
@@ -76,6 +79,11 @@ export interface FylfotCrossProps {
   ) => void;
   /** Colours each arm by its element (default true). */
   showColors?: boolean;
+  /**
+   * The squares' borders, a CSS colour such as a theme's custom property;
+   * black by default.
+   */
+  ink?: string;
 }
 
 /** The fylfot cross of the signs and elements, as a table of squares. */
@@ -83,11 +91,17 @@ export default function FylfotCross({
   cells = fylfot,
   onClick,
   showColors = true,
+  ink,
 }: FylfotCrossProps) {
   return (
     <>
       <style>{STYLE}</style>
-      <table className={CLASS}>
+      <table
+        className={CLASS}
+        style={
+          ink === undefined ? undefined : ({ [INK]: ink } as CSSProperties)
+        }
+      >
         <tbody>
           {cells.map((row, rowIndex) => (
             <tr key={rowIndex}>

@@ -32,4 +32,18 @@ describe("FylfotCross", () => {
     (squares[0].props as { onClick: () => void }).onClick();
     expect(onClick).toHaveBeenCalledWith("fire", 0, 0, "fire");
   });
+
+  it("borders its squares in the ink it is given, black by default", () => {
+    const plain = renderToStaticMarkup(<FylfotCross />);
+    expect(plain).toContain(
+      "border: 1px solid var(--magick-fylfot-cross-ink, black);",
+    );
+    expect(plain).not.toContain("--mui-");
+    expect(plain).toMatch(/<table class="magick-fylfot-cross">/);
+    expect(
+      renderToStaticMarkup(<FylfotCross ink="var(--site-ink, black)" />),
+    ).toMatch(
+      /<table class="magick-fylfot-cross" style="--magick-fylfot-cross-ink:var\(--site-ink, black\)">/,
+    );
+  });
 });

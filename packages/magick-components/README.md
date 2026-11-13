@@ -6,8 +6,11 @@ the Golden Dawn's temple halls, its lamens and symbols, the rose-cross
 sigil, the Enochian tablets, the planetary kameas and the planetary
 spirits' seals, and the Moon's phase. They are the drawings of
 [magick.ly](https://magick.ly), which consumes this package as anyone else
-would. Every figure is an inline SVG, drawn from the data, so it scales,
-prints and can be styled by the page around it.
+would. The figures are drawn from the data as inline SVG, so they scale,
+print and can be styled by the page around them. A few wrap their drawing
+in HTML: the fylfot cross is a table of squares, the Moon and Mercury are
+tiles around a drawing or a picture, and a planetary spirit's seal is
+centred in a `<div>` whose style its props set.
 
 The package is not published yet: it is built and tested in
 [the repository](https://github.com/gadicc/magickly/tree/main/packages/magick-components),
@@ -185,6 +188,11 @@ sigil, and final forms are drawn as their base letters.
   `ref`, it follows a click on a link by setting `location.href` in the
   browser, a full page load rather than your router's navigation. The
   `ref` is a ref object (`useRef`), not a callback ref.
+
+- **Ink, where it is not black.** The fylfot cross borders its squares
+  in black unless you pass `ink`, a CSS colour such as your theme's
+  custom property (`ink="var(--my-ink, black)"`), as magick.ly does for
+  its dark mode.
 
 ## Versions
 

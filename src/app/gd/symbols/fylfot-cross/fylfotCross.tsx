@@ -75,6 +75,7 @@ export default function FylfotCrossPage() {
         cells={testing ? cells : fylfot}
         onClick={crossClick}
         showColors={showColors}
+        ink="var(--mui-palette-ink, black)"
       />
       <div
         style={{
