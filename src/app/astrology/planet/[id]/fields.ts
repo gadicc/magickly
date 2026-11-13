@@ -1,4 +1,4 @@
-import type { EntityFields } from "@/components/entity/fields";
+import type { EntityFields } from "@/ui/entity/fields";
 
 /** The planet page's row, as [Planet.tsx](./Planet.tsx) lays it out. */
 export const fields: EntityFields = {

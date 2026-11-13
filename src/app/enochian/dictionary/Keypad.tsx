@@ -2,7 +2,7 @@
 
 import { Box } from "@mui/material";
 import letters from "magick-data/enochian/letters";
-import EnochianFont from "../../../components/enochian/enochianFont";
+import EnochianFont from "@/fonts/enochian";
 import { LABELS } from "./labels";
 
 /** The 21 letters, in the order the letters table gives them (A to Z). */

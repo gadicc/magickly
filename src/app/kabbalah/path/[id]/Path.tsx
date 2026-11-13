@@ -1,6 +1,9 @@
-import Link from "@magick-components/Link";
 import type { HebrewLetterRow, TreeOfLifePathRow } from "magick-data/rows";
 import Image from "next/image";
+import TreeOfLife from "@/components/kabbalah/TreeOfLife";
+import Ink from "@/drawings/Ink";
+import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
+import { RWSName, RWSPath, trumpNumeral } from "@/tarot";
 import {
   EntityFrame,
   EntityTable,
@@ -11,11 +14,8 @@ import {
   PrevNext,
   Row,
   Trail,
-} from "@/components/entity";
-import TreeOfLife from "@/components/kabbalah/TreeOfLife";
-import Ink from "@/drawings/Ink";
-import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
-import { RWSName, RWSPath, trumpNumeral } from "@/tarot";
+} from "@/ui/entity";
+import Link from "@/ui/Link";
 import styles from "./path.module.css";
 
 /**

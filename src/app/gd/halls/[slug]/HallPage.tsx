@@ -4,15 +4,6 @@ import {
   hallSourceText,
   hallSourceUrl,
 } from "@magick-components/gd/hall/presets";
-import Link from "@magick-components/Link";
-import {
-  EntityFrame,
-  EntityTable,
-  Lede,
-  PrevNext,
-  Row,
-  Trail,
-} from "@/components/entity";
 import {
   GD_HALL_LICENCE,
   GD_HALLS,
@@ -34,6 +25,15 @@ import {
 } from "@/seo/halls";
 import JsonLd from "@/seo/JsonLd";
 import { SITE_URL } from "@/seo/site";
+import {
+  EntityFrame,
+  EntityTable,
+  Lede,
+  PrevNext,
+  Row,
+  Trail,
+} from "@/ui/entity";
+import Link from "@/ui/Link";
 import HallJump from "./HallJump";
 import HallRail from "./HallRail";
 import styles from "./hallPage.module.css";

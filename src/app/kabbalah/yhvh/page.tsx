@@ -1,6 +1,6 @@
-import Tiles from "@/components/Tiles";
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
+import Tiles from "@/ui/Tiles";
 
 export const metadata = pageMetadata("/kabbalah/yhvh");
 

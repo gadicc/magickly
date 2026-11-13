@@ -1,7 +1,7 @@
-import Link from "@magick-components/Link";
 import { Box, Container } from "@mui/material";
 import { ritualPugExamples, ritualPugStarter } from "@/doc/ritualPugExamples";
 import { pageMetadata } from "@/seo/metadata";
+import Link from "@/ui/Link";
 
 export const metadata = pageMetadata("/help/ritual-pug");
 function Example({ source }: { source: string }) {

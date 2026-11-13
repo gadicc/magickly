@@ -1,4 +1,3 @@
-import Link from "@magick-components/Link";
 import Data from "magick-data";
 import zodiacs from "magick-data/astrology/zodiac";
 import christianChoirs from "magick-data/kabbalah/christianChoirs";
@@ -19,6 +18,8 @@ import {
   presidingDaysOf,
   signOf,
 } from "magick-data/kabbalah/seventyTwoAngels/derived";
+import { angelSlug } from "@/lib/angelSlugs";
+import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import {
   EntityFrame,
   EntityTable,
@@ -28,9 +29,8 @@ import {
   PrevNext,
   Row,
   Trail,
-} from "@/components/entity";
-import { angelSlug } from "@/lib/angelSlugs";
-import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
+} from "@/ui/entity";
+import Link from "@/ui/Link";
 import styles from "./angel.module.css";
 
 /**

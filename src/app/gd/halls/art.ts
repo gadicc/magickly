@@ -1,9 +1,9 @@
-import enochianFont from "@magick-components/enochian/enochianFont";
 import {
   defaultHallArt,
   type HallArtRegistry,
   tabletArt,
 } from "@magick-components/gd/hall";
+import enochianFont from "@/fonts/enochian";
 
 /**
  * The app's hall art (plan 061, decision 1): the MIT package's art, all

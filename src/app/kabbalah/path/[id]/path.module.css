@@ -1,5 +1,5 @@
 /* One path. The frame, the table, the trail and the nav are the entity
-   pages' (src/components/entity); these rules are this page's own. */
+   pages' (src/ui/entity); these rules are this page's own. */
 
 /* The letter block the page has always had, now wide enough for the name,
    value and meaning under the letter rather than exactly 100px. */

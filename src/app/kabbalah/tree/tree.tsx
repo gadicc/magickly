@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "@magick-components/Link";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Data from "magick-data";
@@ -9,6 +8,7 @@ import React from "react";
 import Tree from "@/components/kabbalah/TreeOfLife";
 import Ink from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";
+import Link from "@/ui/Link";
 import { type TreeSettings, treeImageLink, treeSettings } from "./treeSettings";
 
 type SetSetting = (key: string, value: string | boolean) => void;

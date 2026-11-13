@@ -1,4 +1,3 @@
-import Link from "@magick-components/Link";
 import {
   Box,
   Table,
@@ -10,6 +9,7 @@ import {
 } from "@mui/material";
 import data from "magick-data";
 import { H2, List, PageText } from "@/app/PageText";
+import Link from "@/ui/Link";
 import { figuresByPairs } from "./pairs";
 
 /**

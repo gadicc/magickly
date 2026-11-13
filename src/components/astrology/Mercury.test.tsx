@@ -63,11 +63,12 @@ describe("MercuryWidget", () => {
       currentOrNextRetrograde: () => undefined,
     }));
 
-    const html = renderAt(new Date("2026-10-30T12:00:00Z"), <MercuryWidget />);
+    const widget = <MercuryWidget image="/pics/mercury.webp" />;
+    const html = renderAt(new Date("2026-10-30T12:00:00Z"), widget);
     const { container, problems, unmount } = await hydrateAt(
       new Date("2026-10-30T12:00:00Z"),
       html,
-      <MercuryWidget />,
+      widget,
     );
 
     expect(problems).toEqual([]);
@@ -77,5 +78,30 @@ describe("MercuryWidget", () => {
     expect(container.querySelector("img")).not.toBeNull();
 
     await unmount();
+  });
+
+  it("draws the picture and background it is given, and none of its own", () => {
+    const at = new Date("2026-10-30T12:00:00Z");
+    const bare = renderAt(at, <MercuryWidget />);
+    expect(bare).not.toContain("<img");
+    expect(bare).not.toContain("url(");
+
+    expect(
+      renderAt(
+        at,
+        <MercuryWidget background="/sky.jpg" image="/mercury.webp" />,
+      ),
+    ).toContain('<img height="85" width="85" alt="" src="/mercury.webp"/>');
+    // Props such as next/image's getImageProps() gives, srcSet and all.
+    const responsive = renderAt(
+      at,
+      <MercuryWidget
+        image={{ src: "/m.webp?w=256", srcSet: "/m.webp?w=96 1x", alt: "" }}
+      />,
+    );
+    expect(responsive).toContain('srcSet="/m.webp?w=96 1x"');
+    expect(renderAt(at, <MercuryWidget background="/sky.jpg" />)).toContain(
+      "background:url(/sky.jpg)",
+    );
   });
 });

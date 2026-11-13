@@ -1,5 +1,5 @@
-import Tiles from "@/components/Tiles";
 import { pageMetadata } from "@/seo/metadata";
+import Tiles from "@/ui/Tiles";
 import KabbalahText from "./KabbalahText";
 
 export const metadata = pageMetadata("/kabbalah");

@@ -1,4 +1,3 @@
-import Link from "@magick-components/Link";
 import { Edit } from "@mui/icons-material";
 import {
   Box,
@@ -20,6 +19,7 @@ import { sqlRitualLifecycle, sqlRitualReader } from "@/doc/sqlRuntime";
 import { isUuidV7 } from "@/lib/ids";
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
+import Link from "@/ui/Link";
 import DeletedRitualUndo from "./DeletedRitualUndo";
 import SqlDocAdmin from "./SqlDocAdmin";
 

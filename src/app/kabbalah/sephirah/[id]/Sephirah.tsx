@@ -1,6 +1,11 @@
-import Link from "@magick-components/Link";
 import type { SephirahRow, TreeOfLifePathRow } from "magick-data/rows";
 import Chakras from "@/components/chakras/Chakras";
+import { FIELD_PATH_LIST_SEPARATOR } from "@/components/kabbalah/fieldPath";
+import TreeOfLife from "@/components/kabbalah/TreeOfLife";
+import Ink, { inkClass } from "@/drawings/Ink";
+import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
+import { isHiddenSephirah } from "@/seo/entities";
+import { RWSName } from "@/tarot";
 import {
   EntityFrame,
   EntityTable,
@@ -14,13 +19,8 @@ import {
   PrevNext,
   Row,
   Trail,
-} from "@/components/entity";
-import { FIELD_PATH_LIST_SEPARATOR } from "@/components/kabbalah/fieldPath";
-import TreeOfLife from "@/components/kabbalah/TreeOfLife";
-import Ink, { inkClass } from "@/drawings/Ink";
-import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
-import { isHiddenSephirah } from "@/seo/entities";
-import { RWSName } from "@/tarot";
+} from "@/ui/entity";
+import Link from "@/ui/Link";
 import styles from "./sephirah.module.css";
 
 /**

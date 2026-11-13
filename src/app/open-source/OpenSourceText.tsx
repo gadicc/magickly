@@ -1,6 +1,6 @@
-import Link from "@magick-components/Link";
 import { H2, List, PageText } from "@/app/PageText";
 import { SITE_REPOSITORY } from "@/seo/site";
+import Link from "@/ui/Link";
 import PackageCard from "./PackageCard";
 
 /** A file in the repository, on GitHub. */
@@ -44,12 +44,7 @@ export default function OpenSourceText() {
             <Link href={repositoryFile("src/components/LICENSE.txt")}>
               the components&apos; licence
             </Link>
-            ), apart from a few component files that still import code from the
-            app, which the{" "}
-            <Link href={repositoryFile("README.md")}>
-              repository&apos;s README
-            </Link>{" "}
-            points to. That includes the drawings the components make: where a
+            ). That includes the drawings the components make: where a
             component&apos;s code is the drawing, as with the lamens and the
             temple halls&apos; art, its path data is code too, and MIT like the
             rest.

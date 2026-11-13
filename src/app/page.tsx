@@ -1,10 +1,10 @@
 import { AdminPanelSettingsTwoTone } from "@mui/icons-material";
 import { getCurrentSqlViewer } from "@/auth/viewer";
 import { DARK_SELECTOR } from "@/colorScheme";
-import Tiles from "@/components/Tiles";
 import GDLogoSquished from "@/goldendawn-logo-squished.svg";
 import JsonLd, { SITE_JSON_LD } from "@/seo/JsonLd";
 import { pageMetadata } from "@/seo/metadata";
+import Tiles from "@/ui/Tiles";
 import HomeText from "./HomeText";
 import AndroidMagician from "./img/android-magician.png";
 import AstrologyTile from "./img/astrology.jpeg";

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "@magick-components/Link";
 import {
   Alert,
   Box,
@@ -32,6 +31,7 @@ import {
   createCreationPublicationHandoff,
   retainCreationPublicationHandoff,
 } from "@/offline/ritualPublicationHandoff";
+import Link from "@/ui/Link";
 
 interface FormState {
   title: string;

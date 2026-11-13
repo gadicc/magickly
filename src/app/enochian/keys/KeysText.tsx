@@ -1,5 +1,5 @@
-import Link from "@magick-components/Link";
 import { H2, List, PageText } from "@/app/PageText";
+import Link from "@/ui/Link";
 
 /**
  * What the Keys are and where this page's words come from, below the Keys

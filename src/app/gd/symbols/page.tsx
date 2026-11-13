@@ -1,10 +1,10 @@
 import SevenBranchedCandleStick from "@/components/gd/SevenBranchedCandleStick";
 // import { FylfotCross } from "../../pages/hogd/symbols/fylfot-cross";
 import TableOfShewbread from "@/components/gd/TableOfShewbread";
-import Tiles from "@/components/Tiles";
 import Ink from "@/drawings/Ink";
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
+import Tiles from "@/ui/Tiles";
 
 export const metadata = pageMetadata("/gd/symbols");
 

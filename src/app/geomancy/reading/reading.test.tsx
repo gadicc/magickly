@@ -4,8 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 import GeomancyReading from "./reading";
 import { readingFromSearchParams } from "./readingState";
 
-// The spirit sigils are SVG imports, which are components under SVGR and plain
-// asset URLs under vitest. They carry no data this page is pinned for.
+// The spirit sigils were SVG imports, which vitest could not render, when
+// these bytes were pinned; they carry no data this page is pinned for.
 vi.mock("@/components/astrology/planetarySpirits", () => ({
   default: () => null,
 }));

@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "@magick-components/Link";
-
 import HelpOutlined from "@mui/icons-material/HelpOutlined";
 import MoreVert from "@mui/icons-material/MoreVert";
 import {
@@ -79,6 +77,7 @@ import { ritualTiptapClientExtensions } from "@/doc/tiptapRitualClient";
 import { useRitualEditorLayout } from "@/doc/useRitualEditorLayout";
 import { createUuidV7 } from "@/lib/ids";
 import { getBrowserOfflineRuntime } from "@/offline/browserRuntime";
+import Link from "@/ui/Link";
 import styles from "./SemanticEditor.module.css";
 import type { SemanticEditorProps } from "./SemanticEditorShell";
 import { useRitualHallLink } from "./useRitualHallLink";

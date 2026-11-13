@@ -9,9 +9,8 @@ import {
 } from "../../../../../tests/entityPage";
 import Planet from "./page";
 
-// The spirit sigils are SVG imports: components under SVGR, data URLs under
-// vitest, which React refuses as a tag name. The stand-in renders the id it
-// was given, so a page can still be held to drawing the right spirit's.
+// The stand-in for the spirit sigils renders the id it was given, so a page
+// can be held to drawing the right spirit's without its path data.
 vi.mock("@/components/astrology/planetarySpirits", () => ({
   default: ({
     id,

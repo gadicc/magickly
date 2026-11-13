@@ -11,7 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import GeomancyReading from "./reading";
 import { readingFromSearchParams } from "./readingState";
 
-// The spirit sigils are SVG imports; see reading.test.tsx.
+// The spirit sigils are left out; see reading.test.tsx.
 vi.mock("@/components/astrology/planetarySpirits", () => ({
   default: () => null,
 }));

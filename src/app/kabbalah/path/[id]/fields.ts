@@ -1,4 +1,4 @@
-import type { EntityFields } from "@/components/entity/fields";
+import type { EntityFields } from "@/ui/entity/fields";
 
 /** The path page's row, as [Path.tsx](./Path.tsx) lays it out. */
 export const fields: EntityFields = {

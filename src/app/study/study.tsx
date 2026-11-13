@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "@magick-components/Link";
 import {
   Chip,
   Container,
@@ -28,6 +27,7 @@ import { useStudyList } from "@/study/client";
 import { materializeStudyCards } from "@/study/reviewContract";
 import { dueCount } from "@/study/scheduling";
 import { sets as allSets, tags as allTags } from "@/study/sets";
+import Link from "@/ui/Link";
 import { useLegacyRecoveryGate } from "../clientProviders";
 
 const sortedTags = [...allTags].sort();

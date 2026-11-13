@@ -3,7 +3,6 @@
 import MercuryWidget from "@magick-components/astrology/Mercury";
 import MoonWidget from "@magick-components/astrology/Moon";
 import { planetName } from "@magick-components/astrology/planetName";
-import Link from "@magick-components/Link";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
@@ -14,9 +13,11 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Data from "magick-data";
-import Tiles from "@/components/Tiles";
+import { getImageProps } from "next/image";
 import usePlace from "@/geo/usePlace";
 import OpenSource from "@/OpenSource";
+import Link from "@/ui/Link";
+import Tiles from "@/ui/Tiles";
 
 /**
  * The moon as seen from the reader's place (plan 072), which the MIT moon
@@ -25,6 +26,21 @@ import OpenSource from "@/OpenSource";
 export function PlaceMoon() {
   const { place } = usePlace();
   return <MoonWidget latitude={place?.latitude} />;
+}
+
+/**
+ * Mercury's picture, through Next's image optimiser as `next/image` would
+ * draw it; the MIT widget takes it, and its background, as props.
+ */
+const mercuryImage = getImageProps({
+  src: "/pics/mercury.webp",
+  height: 85,
+  width: 85,
+  alt: "",
+}).props;
+
+export function SiteMercury() {
+  return <MercuryWidget background="/night-sky.jpg" image={mercuryImage} />;
 }
 
 // Both previews show live data (the phase, the retrograde dates), so they
@@ -37,7 +53,7 @@ const tiles = [
     to: "moon",
   },
   {
-    Component: MercuryWidget,
+    Component: SiteMercury,
     title: "Mercury ☿",
     informative: true,
     to: "planet/mercury",

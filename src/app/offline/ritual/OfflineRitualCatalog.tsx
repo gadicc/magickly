@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "@magick-components/Link";
 import {
   Alert,
   Box,
@@ -26,6 +25,7 @@ import {
   type OfflineRecheckOutcome,
   recheckOfflineRitual,
 } from "@/offline/ritualDownload";
+import Link from "@/ui/Link";
 
 /** A downloaded ritual, with its halls parsed from the same gated read. */
 type Item = Readonly<{

@@ -5,8 +5,7 @@ import Grade from "./gd/grade/[id]/page";
 import PathPage from "./kabbalah/path/[id]/page";
 import SephirahPage from "./kabbalah/sephirah/[id]/page";
 
-// The planet page draws its spirit's sigil, an SVG import: a component under
-// SVGR and a data URL under vitest, which React refuses as a tag name.
+// The planet page draws its spirit's sigil, which no route here is held to.
 vi.mock("@/components/astrology/planetarySpirits", () => ({
   default: () => null,
 }));

@@ -1,5 +1,5 @@
-import Link from "@magick-components/Link";
 import { H2, List, PageText } from "@/app/PageText";
+import Link from "@/ui/Link";
 
 /**
  * How to use the tablets page, below the tablet; the tablets and their

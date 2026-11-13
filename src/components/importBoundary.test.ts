@@ -13,32 +13,6 @@ import { describe, expect, it } from "vitest";
  */
 const FORBIDDEN = /^(?:@\/|next(?:\/|$)|@mui\/|@tiptap(?:\/|$)|.*prosemirror)/;
 
-/**
- * Files that broke the rule before it was a test, with exactly the
- * imports they had. Moving them out of src/components (or replacing the
- * imports) is a follow-up; an entry that no longer applies must be removed.
- */
-const KNOWN_VIOLATIONS: ReadonlyMap<string, readonly string[]> = new Map([
-  ["Link.tsx", ["@mui/material/Link", "next/link"]],
-  ["Tiles.tsx", ["@mui/material", "next/image"]],
-  ["astrology/Mercury.tsx", ["next/image"]],
-  [
-    "astrology/planetarySpirits.tsx",
-    [
-      "@/../svg/astrology/spirits/bartzabel.svg",
-      "@/../svg/astrology/spirits/chasmodai.svg",
-      "@/../svg/astrology/spirits/hismael.svg",
-      "@/../svg/astrology/spirits/kedemel.svg",
-      "@/../svg/astrology/spirits/sorath.svg",
-      "@/../svg/astrology/spirits/taphthartharath.svg",
-      "@/../svg/astrology/spirits/zazel.svg",
-    ],
-  ],
-  // next/font/local; plan 061 lists moving it out as a follow-up.
-  ["enochian/enochianFont.ts", ["next/font/local"]],
-  ["entity/index.tsx", ["@mui/material/Box", "@mui/material/Container"]],
-]);
-
 /** The hall package (plan 061) may import only React and magick-data. */
 const HALL = "gd/hall/";
 const HALL_PACKAGES = /^(?:react|magick-data)(?:\/|$)/;
@@ -113,9 +87,7 @@ describe("src/components import boundary", () => {
           forbidden,
         );
     }
-    expect(Object.fromEntries(found)).toEqual(
-      Object.fromEntries(KNOWN_VIOLATIONS),
-    );
+    expect(Object.fromEntries(found)).toEqual({});
   });
 
   it("never reaches outside src/components by a path or the alias", () => {

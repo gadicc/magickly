@@ -1,4 +1,4 @@
-import type { EntityFields } from "@/components/entity/fields";
+import type { EntityFields } from "@/ui/entity/fields";
 
 /** The sephirah page's row, as [Sephirah.tsx](./Sephirah.tsx) lays it out. */
 export const fields: EntityFields = {

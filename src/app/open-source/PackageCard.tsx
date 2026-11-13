@@ -1,8 +1,8 @@
-import Link from "@magick-components/Link";
 import { Box } from "@mui/material";
 import type { ReactNode } from "react";
 import { H3 } from "@/app/PageText";
 import { SITE_REPOSITORY } from "@/seo/site";
+import Link from "@/ui/Link";
 
 /** One line or a few of code, set apart and scrolling sideways if long. */
 export function Code({ children }: { children: string }) {

@@ -1,5 +1,5 @@
-import Link from "@magick-components/Link";
 import { H2, List, PageText } from "@/app/PageText";
+import Link from "@/ui/Link";
 
 /**
  * How to cast and read a geomancy reading, below the tool (plan 071, decision 5).

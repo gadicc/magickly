@@ -19,10 +19,11 @@
  * `renderToString` throws on an async child and that is how the tests render
  * a page.
  */
-import Link from "@magick-components/Link";
+
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import type { ReactNode } from "react";
+import Link from "@/ui/Link";
 import styles from "./entity.module.css";
 
 /** A page next to this one in its chain: where it is and what it is called. */

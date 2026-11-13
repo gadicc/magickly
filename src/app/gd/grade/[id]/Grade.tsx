@@ -1,5 +1,11 @@
-import Link from "@magick-components/Link";
 import type { GDGradeRow } from "magick-data/rows";
+import GradeTree from "@/components/gd/GradeTree";
+import { isPublicRitualId } from "@/doc/publicRituals";
+import Ink from "@/drawings/Ink";
+import { gdHallShortName } from "@/render/contracts/gdHall";
+import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
+import { gradeHalls, hallPath } from "@/seo/halls";
+import { PUBLIC_PAGES } from "@/seo/pages";
 import {
   EntityFrame,
   EntityTable,
@@ -9,14 +15,8 @@ import {
   PrevNext,
   Row,
   Trail,
-} from "@/components/entity";
-import GradeTree from "@/components/gd/GradeTree";
-import { isPublicRitualId } from "@/doc/publicRituals";
-import Ink from "@/drawings/Ink";
-import { gdHallShortName } from "@/render/contracts/gdHall";
-import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
-import { gradeHalls, hallPath } from "@/seo/halls";
-import { PUBLIC_PAGES } from "@/seo/pages";
+} from "@/ui/entity";
+import Link from "@/ui/Link";
 
 /**
  * One grade of the Golden Dawn, laid out from its row (plan 036, "Grade"):

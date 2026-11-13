@@ -1,5 +1,5 @@
-import Link from "@magick-components/Link";
 import { H2, List, PageText } from "@/app/PageText";
+import Link from "@/ui/Link";
 
 /**
  * Where the Oration comes from and how it is said, below it (plan 071, decision 5).

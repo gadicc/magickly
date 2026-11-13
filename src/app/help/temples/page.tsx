@@ -1,8 +1,8 @@
-import Link from "@magick-components/Link";
 import { Box, Container } from "@mui/material";
 import Image, { type StaticImageData } from "next/image";
 import { plateClass } from "@/drawings/plate";
 import { pageMetadata } from "@/seo/metadata";
+import Link from "@/ui/Link";
 import createRitual from "./images/create-ritual.webp";
 import createTemple from "./images/create-temple.webp";
 import deletePermanently from "./images/delete-permanently.webp";

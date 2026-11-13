@@ -1,5 +1,5 @@
-import Link from "@magick-components/Link";
 import { H2, H3, List, PageText } from "@/app/PageText";
+import Link from "@/ui/Link";
 
 /**
  * What the Kabbalah section holds, below its tiles (plan 071, decision 4).

@@ -1,9 +1,9 @@
 import GradeTree from "@/components/gd/GradeTree";
-import Tiles from "@/components/Tiles";
 import Ink from "@/drawings/Ink";
 import { GD_HALLS } from "@/render/contracts/gdHall";
 import { hallFiles } from "@/seo/halls";
 import { pageMetadata } from "@/seo/metadata";
+import Tiles from "@/ui/Tiles";
 import GoldenDawnText from "./GoldenDawnText";
 
 export const metadata = pageMetadata("/gd");

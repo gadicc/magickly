@@ -1,5 +1,5 @@
-import Link from "@magick-components/Link";
 import { H2, List, PageText } from "@/app/PageText";
+import Link from "@/ui/Link";
 
 /**
  * What the dictionary holds and how to search it, below it (plan 071,

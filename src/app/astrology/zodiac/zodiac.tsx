@@ -1,5 +1,4 @@
 "use client";
-import Link from "@magick-components/Link";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
@@ -10,6 +9,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Data from "magick-data";
+import Link from "@/ui/Link";
 
 const DAY = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",

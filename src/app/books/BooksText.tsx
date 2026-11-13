@@ -1,5 +1,5 @@
-import Link from "@magick-components/Link";
 import { H2, H3 } from "@/app/PageText";
+import Link from "@/ui/Link";
 
 /**
  * How the books are edited, below the list (plan 071, decision 4).

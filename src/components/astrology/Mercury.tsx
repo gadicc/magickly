@@ -1,8 +1,7 @@
 "use client";
 
 import type { DateTime } from "luxon";
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import { type ImgHTMLAttributes, useEffect, useState } from "react";
 import type { Retrograde } from "./mercuryRetrograde";
 
 const NARROW_CHARACTER =
@@ -62,7 +61,29 @@ function MercuryDrawing({ phase, width, height, }) {
 }
 */
 
-function MercuryWidget({ padding = "10px 0 2px 0" }) {
+export interface MercuryWidgetProps {
+  /** Space around the picture, as CSS `padding`. */
+  padding?: string;
+  /** The tile's background image, a URL, drawn to cover; none if omitted. */
+  background?: string;
+  /**
+   * Mercury's picture, drawn 85 px square and decorative: a URL, or `<img>`
+   * props for a responsive one (Next's `getImageProps()` gives them). None
+   * if omitted.
+   */
+  image?: string | ImgHTMLAttributes<HTMLImageElement>;
+}
+
+/**
+ * Mercury's next or current retrograde, worked out in the browser on today's
+ * date and shown in the reader's own date format, under a picture of the
+ * planet. The page's HTML has a blank line where the dates go.
+ */
+function MercuryWidget({
+  padding = "10px 0 2px 0",
+  background,
+  image,
+}: MercuryWidgetProps) {
   // The page is prerendered, and the dates depend on today's date, the
   // viewer's zone and their date format, so they can't be in the HTML.
   // undefined until the calculation answers, then a retrograde or null.
@@ -106,7 +127,7 @@ function MercuryWidget({ padding = "10px 0 2px 0" }) {
     <div
       style={{
         textAlign: "center",
-        background: "url(/night-sky.jpg)",
+        background: background ? `url(${background})` : undefined,
         backgroundSize: "cover",
         height: "100%",
         containerType: "inline-size",
@@ -114,7 +135,15 @@ function MercuryWidget({ padding = "10px 0 2px 0" }) {
     >
       <div style={{ padding }}>
         {/* Decorative: the tile's title already names the planet. */}
-        <Image src="/pics/mercury.webp" height={85} width={85} alt="" />
+        {image && (
+          // biome-ignore lint/performance/noImgElement: the package cannot import next/image; an app passes its getImageProps() here
+          <img
+            height={85}
+            width={85}
+            alt=""
+            {...(typeof image === "string" ? { src: image } : image)}
+          />
+        )}
       </div>
       {/* One line in any locale: 1rem, or smaller when the tile is narrow. */}
       <div

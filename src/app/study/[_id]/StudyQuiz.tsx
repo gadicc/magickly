@@ -8,7 +8,7 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import React from "react";
 import { DARK_SELECTOR } from "@/colorScheme";
-import enochianFont from "@/components/enochian/enochianFont";
+import enochianFont from "@/fonts/enochian";
 import type { StudyMode } from "@/study/reviewContract";
 import { randomCard } from "@/study/scheduling";
 import type { StudyCard, StudySet, StudySetData } from "@/study/sets";

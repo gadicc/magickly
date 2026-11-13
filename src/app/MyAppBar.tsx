@@ -41,7 +41,7 @@ import ThemeSwitch from "@/app/ThemeSwitch";
 import { sqlBrowserLifecycle } from "@/auth/browserLifecycle";
 import { useSession } from "@/auth/client";
 import SearchButton from "@/search/SearchButton";
-// import Link from "@magick-components/Link";
+// import Link from "@/ui/Link";
 import { useLegacyRecoveryGate } from "./clientProviders";
 import pathnames from "./pathnames";
 import type { NavLink } from "./siteNav";

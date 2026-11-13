@@ -5,7 +5,7 @@ import LinkIcon from "@mui/icons-material/Link";
 import { Box, Button, IconButton } from "@mui/material";
 import type { EnochianEntry } from "magick-data/enochian/dictionary";
 import * as React from "react";
-import EnochianFont from "../../../components/enochian/enochianFont";
+import EnochianFont from "@/fonts/enochian";
 import { GEMATRIA_NOTE, GEMATRIA_SOURCE } from "../gematria";
 import { LABELS } from "./labels";
 import { wordLink } from "./urlState";

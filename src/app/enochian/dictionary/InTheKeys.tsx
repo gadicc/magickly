@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "@magick-components/Link";
 import { Button } from "@mui/material";
 import * as React from "react";
+import Link from "@/ui/Link";
 import type { KeyUse } from "./keyUses";
 import { LABELS } from "./labels";
 

@@ -1,9 +1,9 @@
-import Link from "@magick-components/Link";
 import { Box, Container, Typography } from "@mui/material";
 import { connection } from "next/server";
 import { getCurrentSqlUserId } from "@/auth/session";
 import { sqlRitualLifecycle } from "@/doc/sqlRuntime";
 import { privateMetadata } from "@/seo/metadata";
+import Link from "@/ui/Link";
 import { deletedRitualRow, purgeHeartbeatLine } from "./format";
 import RecentlyDeletedList from "./RecentlyDeletedList";
 

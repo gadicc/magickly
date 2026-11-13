@@ -20,7 +20,7 @@
       "!public/fonts/**",
       "!assets/fonts/**",
       "!**/*.svg",
-      "!src/components/enochian/font/**",
+      "!src/fonts/enochian/**",
       "!src/geo/server/*.tsv",
       "!vendor/**"
     ]

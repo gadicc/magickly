@@ -1,4 +1,4 @@
-import type { EntityFields } from "@/components/entity/fields";
+import type { EntityFields } from "@/ui/entity/fields";
 
 /** The grade page's row, as [Grade.tsx](./Grade.tsx) lays it out. */
 export const fields: EntityFields = {

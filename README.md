@@ -11,11 +11,9 @@ Copyright (c) 2020-2026 Gadi Cohen.
   credit. That package is licensed by its own files: its code is MIT, and its
   [LICENSE.txt](./packages/magick-data/LICENSE.txt) says which file is which.
 - The **components** in [`src/components/`](./src/components) are
-  [MIT](./src/components/LICENSE.txt), apart from the few that still import
-  app code, which
-  [`importBoundary.test.ts`](./src/components/importBoundary.test.ts) lists.
-  MIT covers the drawings they make: where a component's code is the drawing,
-  its path data is code too.
+  [MIT](./src/components/LICENSE.txt), and import no app code. MIT covers
+  the drawings they make: where a component's code is the drawing, its path
+  data is code too.
 - **Images the site draws or makes itself**, such as the Tree of Life, sigils,
   tablets, lamens and temple halls, and its hand-drawn images, are CC BY 4.0
   as magick.ly serves them, with credit to Magick.ly. Work by other people

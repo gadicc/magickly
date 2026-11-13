@@ -1,11 +1,14 @@
 // @vitest-environment jsdom
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import type { ReactElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import GeomancyReading from "@/app/geomancy/reading/reading";
 import { readingFromSearchParams } from "@/app/geomancy/reading/readingState";
+import PlanetarySpirit, {
+  PLANETARY_SPIRIT_IDS,
+} from "@/components/astrology/planetarySpirits";
 import Chakras from "@/components/chakras/Chakras";
 import Lamen from "@/components/gd/Lamen";
 import RoseSigil from "@/components/gd/RoseSigil";
@@ -13,12 +16,6 @@ import SevenBranchedCandleStick from "@/components/gd/SevenBranchedCandleStick";
 import TableOfShewbread from "@/components/gd/TableOfShewbread";
 import TreeOfLife from "@/components/kabbalah/TreeOfLife";
 import Ink, { type InkDrawing, inkClass } from "./Ink";
-
-// The spirit sigils are SVG imports: components under SVGR, asset URLs
-// under vitest. Their files are read directly below.
-vi.mock("@/components/astrology/planetarySpirits", () => ({
-  default: () => null,
-}));
 
 /**
  * Each dark re-ink rule (plan 076, decision 4) selects inside a drawing by
@@ -28,7 +25,6 @@ vi.mock("@/components/astrology/planetarySpirits", () => ({
  * rules from ink.module.css and checks that each one's selector, with the
  * real wrapper class, still matches something in the drawing it targets.
  */
-const SPIRITS = path.resolve("svg/astrology/spirits");
 
 /** The drawing each class re-inks, rendered inside its wrapper class. */
 const drawings: Record<InkDrawing, () => string[]> = {
@@ -36,17 +32,11 @@ const drawings: Record<InkDrawing, () => string[]> = {
   tetragram: reading,
   geomancyChart: reading,
   pentagram: reading,
-  // Every planetary spirit's sigil, as the SVG files SVGR inlines.
+  // Every planetary spirit's sigil.
   spirit: () =>
-    readdirSync(SPIRITS)
-      .filter((file) => file.endsWith(".svg"))
-      .map(
-        (file) =>
-          `<span class="${inkClass("spirit")}">${readFileSync(
-            path.join(SPIRITS, file),
-            "utf8",
-          ).replace(/<\?xml[^>]*>/, "")}</span>`,
-      ),
+    PLANETARY_SPIRIT_IDS.map((id) =>
+      wrapped("spirit", <PlanetarySpirit id={id} />),
+    ),
   candlestick: () => [wrapped("candlestick", <SevenBranchedCandleStick />)],
   shewbread: () => [wrapped("shewbread", <TableOfShewbread />)],
   roseSigil: () => [

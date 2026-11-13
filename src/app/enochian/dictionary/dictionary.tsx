@@ -4,7 +4,7 @@ import { Box, SwipeableDrawer, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import dictionary from "magick-data/enochian/dictionary";
 import * as React from "react";
-import EnochianFont from "../../../components/enochian/enochianFont";
+import EnochianFont from "@/fonts/enochian";
 import Entry from "./Entry";
 import InTheKeys from "./InTheKeys";
 import Keypad from "./Keypad";

@@ -1,4 +1,3 @@
-import Link from "@magick-components/Link";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
@@ -13,6 +12,7 @@ import GradeTree from "@/components/gd/GradeTree";
 import Ink from "@/drawings/Ink";
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
+import Link from "@/ui/Link";
 
 export const metadata = pageMetadata("/gd/grades");
 

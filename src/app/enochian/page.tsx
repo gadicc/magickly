@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import Tablet from "@/components/enochian/Tablet";
-import Tiles from "@/components/Tiles";
 import { pageMetadata } from "@/seo/metadata";
+import Tiles from "@/ui/Tiles";
 import EnochianText from "./EnochianText";
 import dictionaryImg from "./img/dictionary.jpg";
 import enochianAbc from "./img/enochianAbc.png";

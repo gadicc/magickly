@@ -8,9 +8,9 @@ specimen in The Equinox (ed. Aleister Crowley), with only a few liberties in
 alphabetic order and design.
 
 Provenance: this is the same font the site has served to browsers since 2024 as
-src/components/enochian/font/enochian-webfont.woff (Font Squirrel kit,
-generated 2018-10-03; fontconfig reports the identical family, style and full
-name). This TTF was added on 2026-09-16 for the server image renderer only:
+src/fonts/enochian/enochian-webfont.woff (src/components/enochian/font until
+plan 080; Font Squirrel kit, generated 2018-10-03; fontconfig reports the
+identical family, style and full name). This TTF was added on 2026-09-16 for the server image renderer only:
 it is read from assets/fonts, which no URL serves and the service worker does
 not precache; the webfont kit remains the only copy delivered to browsers.
 
