@@ -1574,13 +1574,22 @@ components' smoke test.
 | --- | --- |
 | `e9bee9b7` | `feat(components): Add examples and a props manifest` |
 | `aeebe7c1` | `feat(open-source): Add the component explorer` |
-| (this commit) | `docs(plans): Record stage F, the component explorer` |
+| `0b1a2fbf` | `docs(plans): Record stage F, the component explorer` |
+| `8647932e` | `fix(open-source): Apply the stage F review` ([below](#stage-f-review-13-november-2026)) |
+| (this commit) | `docs(plans): Record the stage F review` |
 
-Before the rebase, as `7d4ce30f` and `6b391ade`, every step of both
-gates passed. The first commit's coverage run failed
-once, on `TempleHallTabs.test.tsx`'s timing test ("draws thumbnails
-only in view, a few per frame") on a loaded machine, and the gate's
-re-run passed every test; the second's passed first time.
+Before the rebase, as `7d4ce30f`, `6b391ade`, `b281653a`, `8270c9eb`
+and `c9d513fa`, every step of every gate passed, coverage aside as
+follows. The first commit's coverage run failed once, on
+`TempleHallTabs.test.tsx`'s timing test ("draws thumbnails only in
+view, a few per frame") on a loaded machine, and the gate's re-run
+passed every test. The first gate of `8270c9eb` ran at a load average
+near 58: coverage and its re-run each failed on 5-second timeouts in
+nine unrelated files (the legacy import, the semantic and hall editors,
+the dictionary, R2 storage, the tablets); those nine passed run alone
+(364 tests), and a second whole gate passed every step, coverage first
+time. `c9d513fa`'s coverage failed once on the same timing test and
+passed on its re-run; the second commit's passed first time.
 
 - **The examples** (`packages/magick-components/examples`): a module
   per component, `<Name>.examples.tsx`, each exporting its entry, its
@@ -1704,6 +1713,42 @@ re-run passed every test; the second's passed first time.
   on `/gd/symbols/shewbread` alike, from before this stage: React
   reports server attributes, coordinates among them, that the browser's
   render does not match.
+
+### Stage F review (13 November 2026)
+
+An independent review of `7d4ce30f`, `6b391ade` and `b281653a` (now
+`e9bee9b7`, `aeebe7c1` and `0b1a2fbf`) found
+nothing critical or high; the controls, the image links, the freshness
+test and the tarball held up. The coordinator decided each finding;
+applied in `8647932e` (`8270c9eb` before the rebase).
+
+| # | Finding | Disposition |
+| --- | --- | --- |
+| 1 (medium) | The example picker could not reapply the chosen example, and kept its title after the props were edited | Fixed: each item applies its example on click, the chosen one included, and the picker reads "(edited)" while the props differ from the example's (compared whatever the keys' order). jsdom tests switch, edit and reapply |
+| 2 (medium) | `SevenBranchedCandleStick` in a heading overflowed a 390 px screen | Fixed: `BreakableName` breaks a name between its words, in the heading and the tiles. All fourteen pages checked at 390 px in a browser (no sideways scroll, no heading wider than its box), and a test holds the break |
+| 3 (medium) | JSDoc written for the app (plans, "this app", app files) was shown on the pages, in site search and in the published declarations | Fixed in doc comments only: `GdHall`, its `art`, `GdHallSvg`, `Lamen` and its `grade`, the Moon, Mercury, the tablet's `frame`, both `idPrefix`s, `RoseSigilImage`, the Grade Tree, and the Tree, whose default links are said to be root-relative and changeable. History moved to `//` comments; Kamea's file comment stops being JSDoc. The internal hall modules' comments, which no page shows, are left |
+| 4 (low) | A description starting with a code span gave two parts the same React key | Fixed: empty parts are dropped; a test checks the keys |
+| 5 (low) | `seven-branched-candle-stick` | Fixed: `seven-branched-candlestick`; the other thirteen slugs split where English does |
+| 6 (low) | The Tree's first example drew numbers, not the Tree page's names | Fixed: Roman names, English below, size 10, as `/kabbalah/tree` draws by default; the comment says so |
+| 7 (low) | A cleared text field set `""`; placeholders showed JSON quotes | Fixed: clearing unsets, as for numbers; placeholders show the text |
+| 8 (low) | `aria-labelledby` on `<pre>`; "Copied" not announced; the phone's props list lost its table semantics | Fixed: removed; a status region; explicit table, row, header and cell roles |
+| 9 (low) | The tiles prefetched all fourteen pages | Fixed: `prefetch={false}`, as the menus since `7ced7fa1` |
+| 10 (low) | Tests missing for the choice, number and parsed controls, switching, the image link; no parity between the image and the live drawing; `live.tsx`'s export unchecked; the examples' import check too loose; examples not tied to their entry's component | Fixed: jsdom tests for each; `imageParity.test.tsx` renders every Tree, tablet, candlestick and shewbread example that links an image both through the route's registry from the parsed query and as the component, and compares the markup (the Tree's flip, which the route applies after outlining, and the tablet's border and accessible name, which no image carries, aside); the export is checked; the import pattern refuses `react-dom` and `..` past `src/`; each module types its examples by `ComponentProps` of the component imported from its entry's file, which a test holds |
+| 11 (low) | Props sorted with `localeCompare` | Fixed: code-point order |
+
+The prose changed, so the vectors were refreshed in `8647932e`: before
+the rebase `search:compare` requested 6 Gemini and 6 Qwen passages, and
+on the rebased tree 1 of each (the rest cached); `search:publish`
+requested none either time. On the rebase the Moon's examples took the
+hardening's new `background` prop (`/night-sky.jpg`, as the app's pages
+pass it), and the parity test gives the Tree the fixed root id the
+image route renders it with. Checked again with `next dev` on port 3119 in
+headless Chromium: all fourteen component pages and the index at
+390 px in light; the Tree's, the hall's, the sigil's and the tablet's
+pages and the index at 1280 px in light and dark; the candlestick at
+390 px in dark. No console error on any of them. On the Tree's page, a
+switch redrew the drawing, updated the image link and marked the
+picker "(edited)".
 
 ## Review (11 November 2026)
 

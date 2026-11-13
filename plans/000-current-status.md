@@ -320,7 +320,9 @@ Follow-ups are separate from the completed migration work:
   contract exists) and an explorer page per component (drawn live,
   controls from the props types, the JSX, the props table), which load
   `nlopt-js` and `astronomy-engine` only on the sigil's and Mercury's
-  pages ([plan 080](080-open-source-packages.md#stage-f-13-november-2026)).
+  pages, with its review applied (the picker, long names on a phone,
+  JSDoc written for the package's readers, an image parity test)
+  ([plan 080](080-open-source-packages.md#stage-f-13-november-2026)).
   TODO: with Gadi's go-ahead, stage G; stage E's and F's deferred
   items. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups),
