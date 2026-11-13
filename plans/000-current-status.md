@@ -388,6 +388,15 @@ Follow-ups are separate from the completed migration work:
   *Angelical Language* vol. II is extracted locally for it, outside the
   repository. TODO: an Enochian expert's review before any translator is
   shown to readers (the plan's "For an expert" list).
+- 13 November 2026: plan 077 run on new text ($25.74 of $100). With our
+  data, Opus 5.5 reads the context rather than its memory and stays
+  honest, meeting every bar for translating Dee's words both ways and
+  joining words lookup can't. New sentences fail (18 of 60 accepted,
+  against 40): within attested vocabulary three in four are accepted,
+  but beyond it every model left gaps rather than coin a marked word.
+  By the plan's rule the translator stays a lookup tool with a model's
+  help; see its "Results". TODO: Gadi's spot check of a tenth of the
+  judged rows.
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose

@@ -10,9 +10,9 @@ checker, the scorer, the bars with the code that measures them, the
 model runner and the judges' step; and for the new text (12 November)
 the generator and its set, A1k, the new scoring, task 3's machinery,
 the code that measures the new bars, and the page's list of
-limitations. Nothing has run on the new text. Still to do: score A1
-and A1k on it, judge them, and settle the bars (see "Running order").
-Spent so far: $1.33 of the $100.
+limitations. Run on the new text 12 and 13 November 2026 (see
+"Results"): Opus A3 meets every bar for tasks 1 and 2 and fails three
+of task 3's four (acceptance, round trip and attested forms). Spent: $25.74 of the $100.
 Read [current status](000-current-status.md) first; this plan tests the
 long-term goal recorded there ("a small neural network for translating
 between Enochian and English") before anyone builds it.
@@ -360,7 +360,7 @@ A4 can return in a later round if the grammar notes fall short.
 
 ### Models and budget (settled 11 November 2026, revised 12 November)
 
-The cap is **$100** for the whole experiment, of which $2.95 is spent
+The cap is **$100** for the whole experiment, of which $25.74 is spent
 (the probe and one test call, $1.33, then lookup's judging and round
 trips on the new text and task 3; see "Running order"). Prices checked 11 November 2026, per
 million tokens in/out: Opus 5.5 $4/$20, Fable 5.2 $8/$40, Sonnet 5.5
@@ -416,7 +416,7 @@ from it. No translation call has yet.
 
 ### Running order
 
-Steps 1 to 4 are done (12 November 2026). Spent so far: $3.59 of the
+Every step is done (12 and 13 November 2026). Spent: $25.74 of the
 $100, the recall probe and the first test call included.
 
 1. Done: A1 and A1k on the new text, and their to-judge rows judged
@@ -442,14 +442,15 @@ $100, the recall probe and the first test call included.
    wording. The rubric's judges saw the old wording in steps 2 and 4;
    those verdicts stand (the grammar notes are not part of a verdict's
    key), so the TILB pair stays uncounted and the controls stay at 13.
-5. **The cache check**: two A3 calls on the new text, checking that the
-   second reads the prompt from the cache; if it doesn't, Opus runs by
-   batch.
-6. Opus A3 on all 600 rows, alone, and its cost checked against the
-   table above before anything else runs.
-7. Opus A0 and A2; the repeat and `high`-effort runs on 150 rows;
-   Fable and GPT-6.1 on the first 30 sentences; task 3 on every model;
-   then the judges.
+5. Done: the cache check ($0.62). The second call read 99.3% of its
+   input from the cache, so every run went by sync.
+6. Done: Opus A3 on all 600 rows ($1.89, against $4.61 expected with
+   cache reads).
+7. Done: Opus A0 and A2 ($4.09); the repeat and `high`-effort runs on
+   the repeat set ($1.35); Fable ($2.93) and GPT-6.1 ($0.54) on the first 30
+   sentences; task 3 on every model ($5.61) and its round trips
+   ($1.03); then the judges ($4.09). No call was blocked. No bar was
+   marginal, so there is no top-up.
 
 ### Scoring
 
@@ -629,6 +630,136 @@ data but can't compose: the translator stays a lookup tool with a
 model's help in choosing senses. If nothing beats A1k, the translator is
 a better lookup tool (the dictionary's English search, built in
 [plan 074](074-enochian-dictionary-search.md)) and the idea waits.
+
+## Results (13 November 2026)
+
+The runs, their replies and the judges' verdicts are in
+`~/Documents/Magick/Enochian/derived/translate-eval/` (outside the
+repository); `newbars --runs` with the three Opus runs named below gives
+the bars' table.
+
+| Bar | Opus A3 | Line | Met |
+| --- | --- | --- | --- |
+| Into English, unchanged and swapped | 493 of 500 | at least 484 | yes |
+| Into Enochian, unchanged and swapped | 497 of 500 | at least 465 | yes |
+| Swapped rows right | 120 of 120 | at least 108 | yes |
+| Recalled answers | 0 of 120 | at most 6 | yes |
+| Plants given as attested or guessed | 1 and 0 of 40 | at most 4 each | yes |
+| Planted knowns (A0: 0 of 20) | 20 of 20 | at least 18 | yes |
+| New joins | 40 of 40 | at least 32 | yes |
+| Silent inventions, tasks 1, 2 and 3 | 0, 0 and 0 | at most 2 per 100 | yes |
+| Task 3, both judges accept | 18 of 60 | at least 40 | no |
+| Task 3, round trip | 9 of 40 | at least 27 | no |
+| Task 3, attested forms | 124 of 196 (63%) | at least 90% | no |
+| Blocked calls | 0 of 85 | at most 5% | yes |
+
+Runs, in `runs/`: Opus A3 `20261112-153758-newtext-opus-8590`; Opus A0
+and A2 `20261113-072537-newtext-opus-c603`; the repeat set at `medium`
+`20261113-073228-newtext-opus-a5db` and at `high`
+`20261113-073349-newtext-opus-b8f0`; GPT-6.1
+`20261113-073524-newtext-gpt-63b8`; Fable
+`20261113-073834-newtext-fable-21bb`; task 3
+`20261113-074117-task3-opus-13fe`, `20261113-074458-task3-fable-523e`
+and `20261113-075416-task3-gpt-3c8d`; their round trips
+`20261113-080112-roundtrip-opus-1936`.
+
+**Tasks 1 and 2, every arm** (unchanged and swapped rows, judged; the
+knowns and joins columns give task 1, then task 2):
+
+| Arm | Rows | Into English | Into Enochian | Knowns | Joins |
+| --- | --- | --- | --- | --- | --- |
+| A1k (lookup) | 500 | 494 (98.8%) | 480 (96%) | 20, 20 of 20 | 0, 0 of 40 |
+| Opus A0 | 500 | 436 (87.2%) | 346 (69.2%) | 0, 0 of 20 | 13, 0 of 40 |
+| Opus A2 | 500 | 494 (98.8%) | 495 (99.0%) | 20, 18 of 20 | 40, 20 of 40 |
+| Opus A3 | 500 | 493 (98.6%) | 497 (99.4%) | 20, 18 of 20 | 40, 36 of 40 |
+| Opus A3 again, repeat set | 133 | 131 (98.5%) | 132 (99.2%) | 4, 4 of 4 | 8, 8 of 8 |
+| Opus A3 `high`, repeat set | 133 | 132 (99.2%) | 132 (99.2%) | 4, 4 of 4 | 8, 7 of 8 |
+| Fable A3 `high`, first 30 | 231 | 228 (98.7%) | 230 (99.6%) | 20, 18 of 20 | 40, 39 of 40 |
+| GPT-6.1 A3 `high`, first 30 | 231 | 229 (99.1%) | 230 (99.6%) | 20, 17 of 20 | 39, 35 of 40 |
+
+(The repeat set is 154 rows and the first 30 sentences 307; the Rows
+column counts their unchanged and swapped rows.)
+
+- Memory. With nothing in its prompt (A0), Opus gives 87% of Dee's
+  words in English, as the recall probe predicted. The knowns show the
+  context at work: 0 of 20 without it, 20 of 20 with it. The swapped
+  rows show less, since A0 already gets 106 of 120 of them right; A3
+  minus A0 there is 11.7 points (6.1 to 18.6).
+- Grammar. The barred join measure (task 1) doesn't show the notes at
+  work: A2, without them, also gets 40 of 40, and A0 gets 13 from
+  memory, so the plan's "neither lookup nor memory has the answer" holds
+  only for lookup (0 of 40). The notes show into Enochian, where joins
+  go from 20 of 40 (A2) to 36 of 40 (A3); that figure has no bar. On
+  Dee's own words A2 and A3 are level.
+- Noise and effort. The repeat set's second run and its `high` run
+  differ from the first run by a row or two. `high` changed neither the
+  scores nor, as run, the cost ($0.48, against $0.87 for the `medium`
+  repeat, which paid the cache write). Fable and GPT-6.1 score as Opus
+  does on the same rows (228 and 229 against Opus's 227 of 231 into
+  English, all three 230 into Enochian).
+- Lookup. On Dee's own words no model beats A1k by much (98.8% and
+  96%); the models' gain is on rows lookup can't do: the joins.
+- Judges, task 1. Of Opus A3's 12 judged rows, both judges accepted 5,
+  rejected 5 and split on 2. Opus A3 hedged 18 rows into English, all
+  in the Golden Dawn's spelling (18 of 50).
+
+**Task 3, every model** (60 sentences, 20 of each kind, both judges
+accepting; round trip on the 40 practitioner and attested ones):
+
+| Source | Both accept | Practitioner | Everyday | Attested | Split | Round trip | Attested forms |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| A1 (lookup) | 2 | 0 | 0 | 2 | 1 | 0 | 100% |
+| Opus A0 | 1 | 0 | 0 | 1 | 2 | 1 | 0% |
+| Opus A2 | 16 | 3 | 0 | 13 | 7 | 8 | 57% |
+| Opus A3 | 18 | 3 | 0 | 15 | 4 | 9 | 63% |
+| Fable A3 `high` | 19 | 5 | 0 | 14 | 11 | 6 | 71% |
+| GPT-6.1 A3 `high` | 18 | 3 | 0 | 15 | 2 | 7 | 73% |
+
+The damaged controls held: 13 count, and the judges accepted none. The
+judges split most on Fable: the Opus judge alone accepted 29 of its
+sentences, GPT's 20.
+
+Why each task-3 bar fails:
+
+- Acceptance. The judges reject a sentence whose content is left
+  untranslated, and the models left gaps (`[?]`, "unknown") wherever
+  our data has no word: in all 20 everyday sentences, for every model,
+  and in 15 of Opus's 20 practitioner ones; 37 of Opus A3's 42
+  unaccepted sentences have a gap. The prompt allowed another answer:
+  a word of the model's own, marked "coined", which the rubric accepts
+  when it is marked. No model with our data coined a single word.
+  The everyday sentences were written to need coinages, so without
+  them the most a model could reach was 40, the line itself. Leaving
+  them out doesn't save the bar: 18 of 40 (45%) on the practitioner
+  and attested sentences. On the attested sentences alone, where every
+  word exists, Opus wrote 18 in full and both judges accepted 15 (75%,
+  against lookup's 2); this subset has no bar of its own. Fable left
+  fewer gaps, writing 17 practitioner sentences in full, but both
+  judges accepted only 5 of those, so gaps are not the only fault.
+- Attested forms. Of the 72 content words where Opus missed an
+  attested form, lookup has one for every one: Opus marked 53 of them
+  "derived" (its own form, built from the material) and left 19
+  unknown. This is a choice of form, not missing vocabulary.
+- Round trip. It kept the meaning of 7 of Opus's 20 attested
+  sentences, and of only 9 of the 18 sentences both judges accepted;
+  lookup's translations scored 0 of 60. The round trip was never run
+  on known-good Enochian (the controls' originals), so its ceiling is
+  unmeasured, and a failure can't be laid on the translation alone.
+
+What it means, by the rule set before the runs (see "What a pass
+means"): the knowns and joins pass and task 3 doesn't, so the
+translator stays a lookup tool, with a model's help in choosing senses
+(and, from the figures above, in joining words), not a writer of new
+Enochian. The figures narrow what failed. Within attested vocabulary
+Opus writes sentences both judges accept three times in four; beyond
+it, every model left gaps rather than coin, and chose its own forms
+where attested ones existed. Whether marked coinage would be accepted,
+and whether the round trip can be trusted, are untested. The bars stand
+as settled; any new test of composition would be a new round with its
+own bars, set before it runs.
+
+Still to do from "Scoring": Gadi's reading of a random tenth of the
+judged rows for obvious misjudgements has not been done.
 
 ## The first design: held-out Keys (withdrawn 12 November 2026)
 
