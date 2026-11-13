@@ -199,14 +199,15 @@ const AIR_YOD_XS = [33.2, 45.4, 57.6, 69.8];
  * Air: a Tau with four Yods above it, drawn as small flames, yellow on
  * mauve within a yellow ring; `plain`, in black alone, as the Equinox's
  * Plate X prints it. The Golden Dawn calls the marks Yods (Regardie, The
- * Golden Dawn, vol. 4, 1940, p. 307). They stand for the 4 written over
- * the T at the top of the outer ring of Dee's Sigillum Dei Aemeth (Sloane
- * MS 3188; The Equinox I(7), 1912, Plate II, archive.org
- * `crowley-equinox_202110`, "The Equinox Vol. 1, No. 7", leaf n238),
- * from which the Order took the Watchtowers' sigils (Regardie, p. 308), and
- * the Order drew Yods as flames (Book T's Ace of Wands, The Equinox I(8),
- * 1912, p. 153, "The Equinox Vol. 1, No. 8", leaf n183). Our own drawing
- * after Plate X, constructed in code.
+ * Golden Dawn, vol. 4, 1940, p. 307), and Regardie says the sigils are
+ * taken from Dee's Sigillum Dei Aemeth (p. 308). The T at the top of the
+ * Sigillum's outer ring has a 4 written over it (Sloane MS 3188; The
+ * Equinox I(7), 1912, Plate II, archive.org `crowley-equinox_202110`,
+ * "The Equinox Vol. 1, No. 7", leaf n238), so the four Yods likely stand
+ * for that 4: that is our inference, which no source states. Book T calls
+ * flames Yods (the Ace of Wands, The Equinox I(8), 1912, p. 153, "The
+ * Equinox Vol. 1, No. 8", leaf n183), hence Yods drawn as flames. Our own
+ * drawing after Plate X, constructed in code.
  */
 function AirSigil({ plain = false }: { plain?: boolean }) {
   return (
@@ -377,9 +378,10 @@ export const Sigils = {
  * `crowley-equinox_202110`, the file "The Equinox Vol. 1, No. 7", leaf
  * n256. These plain forms are our own drawings after that plate,
  * constructed in code from lines, arcs and curves, with no font's outlines.
- * Air's is a Tau with four Yods above it, drawn as small flames; the Yods
- * stand for the 4 over the T in Dee's Sigillum Dei Aemeth (Plate II, leaf
- * n238), and the Order drew Yods as flames (see `AirSigil`).
+ * Air's is a Tau with four Yods above it, drawn as small flames; we take
+ * the Yods to stand, likely, for the 4 over the T in Dee's Sigillum Dei
+ * Aemeth (Plate II, leaf n238), an inference no source states (see
+ * `AirSigil`).
  * Of Regardie's coloured sigils (`Sigils`), only Air's form follows the
  * plate: Water and Fire are drawn from Regardie's description of them (The
  * Golden Dawn, vol. 4, 1940, p. 307), and Earth is a cross in four colours.
