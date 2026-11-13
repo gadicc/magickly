@@ -40,9 +40,9 @@
   stroke: var(--mui-palette-ink);
 }
 
-/* Planetary-spirit sigils (svg/astrology/spirits, inlined by SVGR). */
-:global(.dark) .spirit [fill="#070707" i] {
-  fill: var(--mui-palette-ink);
+/* Planetary spirits' geomantic sigils: one black stroke each. */
+:global(.dark) .spirit [stroke="#000"] {
+  stroke: var(--mui-palette-ink);
 }
 
 /*

@@ -1,79 +1,93 @@
 import type { CSSProperties, SVGProps } from "react";
 
 /**
- * The seals of the seven planetary spirits (the daemons of the planets),
- * the traditional ones Agrippa prints with each planet's table in *De
- * occulta philosophia* (Cologne: Soter, 1533), book II, chapter 22, under
- * "Daemonium" among each planet's "signacula sive characteres". In the
- * Library of Congress copy on archive.org, `DeOccultaPhilosophiaLoc1533`,
- * which carries the Public Domain Mark: Saturn's and Jupiter's on p. CXLIX
- * (leaf n164), Mars' and the Sun's on p. CL (n165), Venus' on p. CLI
- * (n166), Mercury's on p. CLII (n167) and the Moon's on p. CLIII (n168).
- * Gadi Cohen drew them in Inkscape; the Inkscape files are
- * `svg/astrology/spirits/` in the magick.ly repository, and the paths below
- * are SVGR's optimisation of them, as the site inlined them before they
- * moved into this package (plan 080, decision 7). Copyright Gadi Cohen,
- * MIT like the rest of the package.
+ * The geomantic sigils of the seven planetary spirits, whom geomancy calls
+ * the Rulers of the figures: Zazel (Saturn), Hismael (Jupiter), Bartzabel
+ * (Mars), Sorath (the Sun), Kedemel (Venus), Taphthartharath (Mercury) and
+ * Chasmodai (the Moon). They are not the spirits' seals that Agrippa prints
+ * with the planets' tables (*De occulta philosophia*, 1533, II.22), which
+ * are other figures.
+ *
+ * Drawn after the earliest printing found of them, John Heydon,
+ * *Theomagia, or The Temple of Wisdome*, vol. 1 (London, 1663/4), book I,
+ * chapter 5, the table of the figures' Rulers and Genii; the Getty Research
+ * Institute's copy on archive.org, `theomagiaortempl00heyd`: p. 13 (leaf
+ * n124) and p. 15 (n126). Book I, chapter 13, p. 46 (n157) prints them
+ * again, with Mercury's, the Sun's and Venus' in other forms; the Golden
+ * Dawn's later forms descend from those of pp. 13 and 15. Each sigil
+ * below names the figure it follows.
+ *
+ * Our own drawing, not a tracing: each is a few hand-placed strokes of one
+ * width on a grid of 100 laid over the printed figure, with round ends. The
+ * viewBox is the stroke's extent, plus a unit. Copyright Gadi Cohen, MIT
+ * like the rest of the package.
  */
 const SIGILS = {
-  /** The spirit of Mars; Agrippa 1533, p. CL. */
+  /** Mars: a tail ending in a spiral; Heydon, p. 13 (n124), first row. */
   bartzabel: {
-    width: 192.01,
-    height: 85.997,
-    viewBox: "-25.43 -11.377 50.86 22.78",
-    d: "M10.186 2.12v-.53C7.638-.15 2.848-5.191 7.805-7.332c.91-.393 1.936-.627 2.91-.79 2.721-.456 5.66-.207 7.934 1.493 4.079 3.048 6.245 8.998 1.062 12.097-5.74 3.432-13.515 2.296-19.579.068-1.31-.482-2.368-1.472-3.704-1.88-3.046-.933-7.439-1.047-10.583-.629-2.861.38-6.378.263-8.996 1.575-.924.464-2.581 1.499-2.193 2.772.45 1.477 2.371.389 3.251.125 3.03-.91 7.152-1.781 10.32-1.618 8.807.453 16.361 5.5 25.4 5.5 4.809 0 9.18-.775 10.967-5.82 3.139-8.86-3.268-16.937-12.555-16.933-2.658 0-6.451.249-8.305 2.43-1.297 1.526-2.55 3.99-2.19 6.036C2.124.407 7.13 2.846 10.186 2.12",
+    viewBox: "16 33 67 39",
+    d:
+      "M27 64C22 64 20 60 21 55C22 50 28 49 34 50C42 51 46 56 51 61" +
+      "C55 65 60 67 66 67C74 67 79 60 78 51C77 43 71 38 65 38" +
+      "C60 38 57 43 58 48C59 53 63 55 66 54",
   },
-  /** The spirit of Venus; Agrippa 1533, p. CLI. */
+  /** Venus: a heart whose lobes curl in; p. 13 (n124), fourth row. */
   kedemel: {
-    width: 160.2,
-    height: 129.54,
-    viewBox: "-21.33 -17.248 42.523 34.386",
-    d: "M-12.616-17.123c-7.515 1.08-11.47 12.743-6.514 18.662 3.549 4.238 10.434 5.09 14.716 8.354 2.28 1.737 3.403 7.258 6.35 7.244 2.388-.012 5.42-4.97 7.144-6.568 2.638-2.445 6.278-4.11 8.551-6.913 5.12-6.315 5.63-19.138-4.583-20.547-3.746-.517-9.342 3.177-10.304 6.8-1.013 3.817.157 9.167 4.748 9.74 4.458.557 9.453-6.881 4.706-9.693-1.741-1.032-6.596-.06-4.698 2.779.933 1.396 2.939-.764 3.5.91.756 2.255-2.112 3.523-3.772 2.427-2.93-1.934-2.541-5.002.025-7.074 2.28-1.843 5.497-2.474 8.177-1.193 2.757 1.318 3.076 4.468 2.54 7.13C16.812.694 11.547 4.419 7.492 8.19c-1.191 1.107-3.55 4.232-5.277 4.275-.975.024-1.32-1.25-1.729-1.918-.926-1.515-2.334-2.909-3.842-3.845-3.557-2.21-8.62-3.285-11.593-6.258-3.927-3.927-2.71-11.299 2.332-13.599 3.124-1.425 7.25.053 9.076 2.804 1.132 1.707 1.913 4.116.128 5.706-1.427 1.272-3.653.783-4.507-.948-1.137-2.304 2.841-.737 2.756-2.154-.14-2.355-3.342-3.025-4.747-1.52-3.29 3.521.725 8.985 4.967 8.615 4.656-.407 7.612-6.2 5.42-10.232-2.46-4.525-8.04-6.962-13.093-6.237",
+    viewBox: "24 25 54 55",
+    d:
+      "M55 44C51 39 53 31 58 30C64 29 67 35 69 43C70 52 72 64 73 75" +
+      "C62 72 47 66 38 58C31 52 29 45 29 39C29 33 33 30 38 30" +
+      "C43 31 46 36 48 43",
   },
-  /** The spirit of Mercury; Agrippa 1533, p. CLII. */
+  /** Mercury: a bar and an upright over a cross; p. 13 (n124), second row. */
   taphthartharath: {
-    width: 154.16,
-    height: 119.71,
-    viewBox: "-20.4 -15.841 40.794 31.677",
-    d: "M19.601 8c0-2.844.895-5.62.783-8.467-.037-.945-.104-2.462-1.328-2.556C16.793-3.198 17.09-.666 15.97.432c-.73.715-2.316.429-3.247.424-.781-.004-1.867.093-2.374-.644-.52-.755-.29-2.19-.268-3.06.066-2.715 1.638-9.252-.857-11.185-1.623-1.257-4.64-.722-6.555-.722-5.134 0-10.228-.504-15.346-.529-2.002-.01-5.486-1.675-6.509.806-.91 2.211-1.492 6.094-1.077 8.455.182 1.04 1.11 3.101 2.498 2.193 2.45-1.602-.873-5.54 1.924-7.237 1.45-.879 3.661-.513 5.28-.513H1.61c1.512 0 4.368-.473 5.285 1.097.627 1.075.271 2.992.271 4.195 0 3.708-.106 8.41-5.286 7.06C.135.317.905-1.454-.175-2.312c-.768-.61-2.095-.097-2.31.815-.21.887-.017 1.956-.14 2.882l-.298 2.117c-.15 1.079-.247 3.948 1.772 2.597.746-.5.616-1.602 1.257-2.218 1.28-1.233 5.02-.959 6.07.47.94 1.282.974 6.425-.414 7.434-1.4 1.018-5.562-.8-4.527 2.813.446 1.554 2.159.594 3.285.645 2.41.107 7.845 1.647 9.625-.703.511-.674.276-1.565-.426-1.995-1.33-.816-2.926.066-3.824-1.647-1.66-3.168-.377-8.915 4.15-6.875 2.732 1.231 2.09 3.974 5.556 3.976",
+    viewBox: "17 19 68 61",
+    d: "M23 24V38M23 31H62V75M22 45V59M22 52H80M80 42V56M57 75H68",
   },
-  /** The spirit of the Moon; Agrippa 1533, p. CLIII. */
+  /** The Moon: like a 5; p. 13 (n124), third row. */
   chasmodai: {
-    width: 119.63,
-    height: 113.15,
-    viewBox: "-15.816 -14.96 31.643 29.929",
-    d: "M-6.09-11.75c.755 2.381.264 4.687.265 7.144 0 .892-.213 2.314.643 2.903 1.85 1.272 3.668-1.08 5.177-1.649 3.833-1.444 11-.08 12.267 4.302 1.698 5.873-1.769 10.82-7.768 11.085-2.091.093-4.03-1.093-6.082-1.005-1.329.058-1.709 1.254-.875 2.252 1.45 1.733 4.922 1.691 6.957 1.691 3.006 0 6.5-.263 8.607-2.67C18.682 5.93 15.37-6.682 6.081-6.723 3.033-6.736.255-5.96-2.65-5.135c-.582-1.597-1.05-5.288.823-6.262 1-.52 2.582-.113 3.675-.084 1.308.034 5.101.968 4.663-1.589-.324-1.89-3.216-1.848-4.663-1.855-4.057-.02-8.114 0-12.171 0-1.423 0-3.768-.258-4.943.726-1.444 1.209.266 2.743 1.504 3.054 2.116.533 5.613.048 7.672-.605",
+    viewBox: "23 20 56 63",
+    d: "M74 25L32 40C42 43 52 50 56 58C58 66 54 74 45 77C38 79 32 78 28 76",
   },
-  /** The spirit of the Sun; Agrippa 1533, p. CL. */
+  /**
+   * The Sun: an upright with a foot, crossed by a bar that curls back on
+   * the left and runs into a long stroke on the right; p. 13 (n124), fifth
+   * row, and p. 15 (n126).
+   */
   sorath: {
-    width: 143.12,
-    height: 135.64,
-    viewBox: "-19.43 -17.94 37.862 35.885",
-    d: "M7.61-17.94c-2.497-.014-5.009.97-6.402 2.867-.866 1.18-1.428 2.531-1.73 3.958-.382 1.797-.356 3.718.616 5.292-2.917.23-5.808.85-8.732 1.035-1.399.088-2.683-.201-2.784-1.83-.207-3.322 2.355-3.134 4.288-4.759.632-.531.646-1.386 0-1.922-.744-.618-1.93-.461-2.826-.461-2.375-.001-6.26-.457-8.452.46-2.903 1.217 1.211 1.956 2.101 2.073.708.093 1.404.11 2.117.112 0 1.468.417 3.768-.665 4.945-1.054 1.146-2.669.54-3.304 2.2 1.113.583 3.015.758 3.697 1.908.6 1.01.272 2.78.272 3.912 0 3.38.072 6.963-.31 10.319-.304 2.661-2.239 1.88-3.839 3.213-.843.703-.47 1.64.46 1.988 2.211.827 5.867.6 8.187.307.847-.108 2.102-.488 2.146-1.536.066-1.588-3.573-1.595-4.111-3.444-.898-3.087-.152-7.371-.152-10.582 0-1.13-.282-2.72.614-3.59 1.002-.97 3.361-.876 4.678-.908 3.509-.083 7.067-.936 10.583-.453 3.86.53 11.721 4.213 10.704 9.184-.88 4.305-7.37 7.76-11.498 6.322-2.122-.739-1.93-2.503-3.347-3.78-.583-.527-1.924-.63-2.313.189-1.386 2.913 3.129 6.27 5.395 6.821 3.672.892 10.423-.381 13.042-3.288 1.219-1.353 1.68-3.475 2.07-5.205.379-1.681.541-3.977-.252-5.556-1.954-3.89-7.782-3.396-9.568-7.144 3.405-.79 8.02-5.746 5.625-9.521-1.332-2.098-3.813-3.111-6.31-3.125zm1.608 3.175c1.89 0 2.61 1.902 1.716 3.647-1.046 2.04-3.852 3.736-6.078 3.926-2.697.23-3.801-2.194-2.213-4.407 1.487-2.072 3.709-2.82 6.182-3.14q.204-.026.393-.026",
+    viewBox: "23 17 68 65",
+    d:
+      "M57 22H65M59 22L61 68H53" +
+      "M43 55C38 60 29 57 28 49C27 42 35 39 42 41C50 43 55 46 62 46" +
+      "C70 46 77 44 81 38M84 26C82 38 85 50 86 62C87 72 83 77 76 77",
   },
-  /** The spirit of Jupiter; Agrippa 1533, p. CXLIX. */
+  /** Jupiter: two strokes meeting in a point; p. 15 (n126), first row. */
   hismael: {
-    width: 126.4,
-    height: 115.48,
-    viewBox: "-16.714 -15.27 33.434 30.547",
-    d: "M1.467-1.86c-6.7.715-10.946-3.737-14.026-8.996-.587-1.002-2.298-3.77-3.765-2.221-1.35 1.425 1.196 5.107 1.817 6.454C-11.93-1.033-7.23 1.194-1.179 1.8c2.386.239 5.907-.608 7.821 1.195 3.288 3.095 4.136 6.382 5.911 10.228.535 1.158 1.464 2.486 2.925 1.919 2.924-1.135-.16-4.91-.669-6.682-1-3.488-2.7-3.71-5.064-6.131C6.998-.487 4.85-3.762 3.471-7.416c-.732-1.94-1.866-7.667-4.386-7.848-1.986-.143-1.937 2-1.614 3.35C-1.674-8.342.47-5.324 1.467-1.86",
+    viewBox: "19 20 63 56",
+    d: "M24 35C38 48 54 60 77 71M49 25L70 69",
   },
-  /** The spirit of Saturn; Agrippa 1533, p. CXLIX. */
+  /**
+   * Saturn: a half-moon with a dot, its straight side up to the right;
+   * p. 15 (n126), fourth row. The dot is a stroke one unit long, which
+   * its round ends make a dot, so the sigil is one stroke in one colour (a
+   * tiny stroked circle would do, but some renderers leave its centre
+   * open).
+   */
   zazel: {
-    width: 150.497,
-    height: 93.808,
-    viewBox: "19.91 12.41 39.819 24.82",
-    d: "M21.777 12.41c-.37-.013-.732.066-1.034.273-1.328.91-.716 5.205-.532 6.607.848 6.454.849 10.289 6.503 14.713 7.786 6.093 18.848 2.36 26.458-1.419 1.687-.838 4.312-1.173 5.71-2.408 1.499-1.324.9-3.726-.949-4.257-3.49-1.002-7.077-.83-10.582-1.46-5.367-.966-12.375-3.549-17.198-6.094-2.572-1.357-4.488-3.502-6.69-5.31a2.96 2.96 0 0 0-1.686-.645zm2.41 5.865c.857-.02 1.795.574 2.34 1.113 1.94 1.923 4.608 2.688 7.066 3.81 1.035.472 2.594.858 3.164 1.94.708 1.347-.64 2.927-.948 4.206-.278 1.154.103 4.093-1.197 4.592-1.065.41-2.932-.288-3.93-.692-3.757-1.52-6.977-5.259-7.56-9.192-.191-1.296-1.145-4.958.49-5.657q.277-.116.575-.12m20.4 8.564c1.968.012 4.459.755 5.939 1.09.75.169 3.12.33 3.12 1.423 0 .942-1.652 1.402-2.326 1.691-2.546 1.09-4.91 2.78-7.673 3.212-.932.146-3.743.402-2.646-1.207v-.264c-.646-1.007-.197-2.07.794-2.646-.617-2.592.826-3.311 2.793-3.3z",
+    viewBox: "25 17 56 59",
+    d:
+      "M41 22C32 31 28 46 30 58C32 67 40 71 50 71C60 71 70 69 76 64Z" +
+      "M43.5 51H44.5",
   },
-} as const satisfies Record<
-  string,
-  { width: number; height: number; viewBox: string; d: string }
->;
+} as const satisfies Record<string, { viewBox: string; d: string }>;
 
-/** A planetary spirit with a seal: `bartzabel`, `kedemel`, … */
+/** The sigils' stroke, in units of the grid of 100 they are drawn on. */
+const STROKE_WIDTH = 7;
+
+/** A planetary spirit with a sigil: `bartzabel`, `kedemel`, … */
 export type PlanetarySpiritId = keyof typeof SIGILS;
 
-/** Every spirit with a seal. */
+/** Every spirit with a sigil. */
 export const PLANETARY_SPIRIT_IDS = Object.keys(SIGILS) as PlanetarySpiritId[];
 
 /** Whether `id` names a spirit this module draws. */
@@ -84,30 +98,35 @@ function Sigil({
   id,
   ...props
 }: { id: PlanetarySpiritId } & SVGProps<SVGSVGElement>) {
-  const { width, height, viewBox, d } = SIGILS[id];
+  const { viewBox, d } = SIGILS[id];
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={width}
-      height={height}
-      viewBox={viewBox}
-      {...props}
-    >
-      <path fill="#070707" d={d} />
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox={viewBox} {...props}>
+      <path
+        d={d}
+        fill="none"
+        stroke="#000"
+        strokeWidth={STROKE_WIDTH}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
 export interface PlanetarySpiritProps extends CSSProperties {
-  /** The spirit, in lower case; none, or an id with no seal, draws nothing. */
+  /**
+   * The spirit (its figures' Ruler), in lower case; none, or an id with no
+   * sigil, draws nothing.
+   */
   id?: string;
-  /** Hides the seal from assistive technology when the text names it. */
+  /** Hides the sigil from assistive technology when the text names it. */
   "aria-hidden"?: boolean;
 }
 
 /**
- * A planetary spirit's seal, centred in a flex box as tall as its container
- * allows. Every prop but `id` and `aria-hidden` is the box's style.
+ * A planetary spirit's geomantic sigil, centred in a flex box as tall as its
+ * container allows. Every prop but `id` and `aria-hidden` is the box's
+ * style.
  */
 export default function PlanetarySpirit(props: PlanetarySpiritProps) {
   // Everything but the id and `aria-hidden` is style, as its callers pass it.
@@ -117,14 +136,13 @@ export default function PlanetarySpirit(props: PlanetarySpiritProps) {
     <div
       aria-hidden={ariaHidden}
       style={{
-        // padding: "0.1em",
         display: "flex",
         alignContent: "center",
         justifyContent: "center",
         ...rest,
       }}
     >
-      <Sigil id={id} height="100%" width={undefined} />
+      <Sigil id={id} height="100%" />
     </div>
   );
 }

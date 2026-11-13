@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import type PlanetarySpiritComponent from "../src/astrology/planetarySpirits.tsx";
 import type { ComponentExamples } from "./types.ts";
 
-/** The seven seals, at a height the flex box takes from its style. */
+/** The seven sigils, at a height the flex box takes from its style. */
 export const PlanetarySpirit: ComponentExamples<
   ComponentProps<typeof PlanetarySpiritComponent>
 > = {

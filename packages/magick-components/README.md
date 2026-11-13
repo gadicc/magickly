@@ -4,12 +4,12 @@ React components that draw magickal figures from
 [magick-data](https://www.npmjs.com/package/magick-data): the Tree of Life,
 the Golden Dawn's temple halls, its lamens and symbols, the rose-cross
 sigil, the Enochian tablets, the planetary kameas and the planetary
-spirits' seals, and the Moon's phase. They are the drawings of
+spirits' geomantic sigils, and the Moon's phase. They are the drawings of
 [magick.ly](https://magick.ly), which consumes this package as anyone else
 would. The figures are drawn from the data as inline SVG, so they scale,
 print and can be styled by the page around them. A few wrap their drawing
 in HTML: the fylfot cross is a table of squares, the Moon and Mercury are
-tiles around a drawing or a picture, and a planetary spirit's seal is
+tiles around a drawing or a picture, and a planetary spirit's sigil is
 centred in a `<div>` whose style its props set.
 
 The package is not published yet: it is built and tested in
@@ -24,7 +24,7 @@ by path, and [LICENSE.txt](./LICENSE.txt) says which file is which:
 
 - **The code is MIT**, and that includes the drawings. A component whose
   code *is* the drawing (the sigils, the lamens, the hall's art, the
-  planetary spirits' seals) is MIT as code, path data and all, so you may
+  planetary spirits' sigils) is MIT as code, path data and all, so you may
   take the drawing from the package under MIT. magick.ly licenses the
   images it serves under CC BY 4.0, but anyone can render the same drawing
   from this package under MIT.
@@ -44,10 +44,10 @@ own files: its code MIT, its data CC BY 4.0, with credit to
 [AGPL-3.0-or-later](https://github.com/gadicc/magickly/blob/main/LICENSE.txt);
 this package is deliberately freer, so that it can travel.
 
-A drawing after an old source cites a public-domain edition of it: the
-planetary spirits' seals are the traditional ones, as Agrippa's *De
-occulta philosophia* (1533) prints them, cited by page. Layouts taken from
-modern books are facts, drawn in our own art.
+A drawing after an old source is our own drawing of a public-domain
+printing, cited by page and scan: the planetary spirits' geomantic sigils
+(the Rulers of the geomantic figures) follow John Heydon's *Theomagia*
+(1663/4). Layouts taken from modern books are facts, drawn in our own art.
 
 ## Installing
 
@@ -115,7 +115,7 @@ for what it imports.
 | `enochian/Tablet` | An Enochian tablet, a Watchtower or the Tablet of Union, in the Golden Dawn's, Dee's or another tradition's letters |
 | `chakras/Chakras` | The seven chakras, in their colours, on the outline of a body |
 | `astrology/Kamea` | A planet's kamea, its magic square |
-| `astrology/planetarySpirits` | The planetary spirits' seals |
+| `astrology/planetarySpirits` | The planetary spirits' geomantic sigils (the Rulers of the figures) |
 | `astrology/Moon` | The Moon's phase today, as seen from either hemisphere (`"use client"`) |
 | `astrology/moonPath` | The Moon drawing's lit part for a phase |
 | `astrology/Mercury` | Mercury's next retrograde, under a picture of the planet you give it (`"use client"`) |

@@ -587,20 +587,20 @@
     ]
   },
   "PlanetarySpirit": {
-    "description": "A planetary spirit's seal, centred in a flex box as tall as its container\nallows. Every prop but `id` and `aria-hidden` is the box's style.",
+    "description": "A planetary spirit's geomantic sigil, centred in a flex box as tall as its\ncontainer allows. Every prop but `id` and `aria-hidden` is the box's\nstyle.",
     "props": [
       {
         "name": "aria-hidden",
         "type": "boolean",
         "required": false,
-        "description": "Hides the seal from assistive technology when the text names it.",
+        "description": "Hides the sigil from assistive technology when the text names it.",
         "control": { "kind": "switch" }
       },
       {
         "name": "id",
         "type": "string",
         "required": false,
-        "description": "The spirit, in lower case; none, or an id with no seal, draws nothing.",
+        "description": "The spirit (its figures' Ruler), in lower case; none, or an id with no\nsigil, draws nothing.",
         "control": { "kind": "text" }
       }
     ]

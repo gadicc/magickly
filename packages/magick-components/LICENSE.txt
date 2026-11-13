@@ -6,7 +6,7 @@ Code: MIT, below.
   Everything but fonts/: the components, src/**/*.ts and src/**/*.tsx, and
   the modules compiled from them into lib/, which the published package
   carries. A component whose code is the drawing (the sigils, the lamens,
-  the hall's art, the planetary spirits' seals) is MIT as code, its path
+  the hall's art, the planetary spirits' sigils) is MIT as code, its path
   data included, so the drawing may be taken from the package under MIT.
   The CC BY 4.0 statement in ../../README.md covers the images magick.ly
   draws and serves, its hand-drawn images and the data, not this code.

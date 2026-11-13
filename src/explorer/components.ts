@@ -96,10 +96,10 @@ const PAGES: Record<ComponentName, ComponentPage> = {
       "seven planets from Saturn's three by three to the Moon's nine by nine.",
   },
   PlanetarySpirit: {
-    title: "Planetary Spirit Seal",
+    title: "Planetary Spirit Sigil",
     description:
-      "A React component that draws the seals of the seven planetary spirits, " +
-      "Zazel to Chasmodai, as Agrippa's De occulta philosophia gives them.",
+      "A React component that draws the geomantic sigils of the seven " +
+      "planetary spirits, Zazel to Chasmodai, after Heydon's Theomagia (1663).",
     dark: "spirit",
   },
   Chakras: {

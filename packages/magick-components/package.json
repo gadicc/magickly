@@ -2,7 +2,7 @@
   "name": "magick-components",
   "version": "0.0.0",
   "private": true,
-  "description": "React components that draw magickal figures from magick-data: the Tree of Life, the Golden Dawn's temple halls, lamens and symbols, the rose-cross sigil, the Enochian tablets, the kameas, the planetary spirits' seals and the Moon",
+  "description": "React components that draw magickal figures from magick-data: the Tree of Life, the Golden Dawn's temple halls, lamens and symbols, the rose-cross sigil, the Enochian tablets, the kameas, the planetary spirits' geomantic sigils and the Moon",
   "keywords": [
     "magick",
     "react",
