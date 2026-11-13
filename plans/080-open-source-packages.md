@@ -1039,6 +1039,13 @@ reproduced. Applied in `9d34b8d2`.
   `astrology/planets.json5`, signed 2026-11-13, needs Gadi's sign-off
   again, since the file now quotes 777 Revised and Regardie's
   spellings beside Agrippa's.
+- **The Air sigil's Yods change the published notes**
+  ([below](#the-air-sigils-yods-13-november-2026)): the tablet notes
+  now say "a Tau with four Yods above it, drawn as small flames" and
+  cite three more sources, a patch to `magick-data`'s published text
+  that can go out with 0.2.0; the version was not bumped. The README's
+  Sources row for `enochian/tabletNotes.json5`, signed 2026-11-12,
+  needs Gadi's sign-off again.
 
 ## Stage B (13 November 2026)
 
@@ -2206,6 +2213,93 @@ zooming; starting zoomed on the outline is possible. The seals'
 provenance text says no image of the book is committed, which stays
 true of the seal art, though one leaf of the same Agrippa copy (n164)
 is now mirrored in the app.
+
+### The Air sigil's Yods (13 November 2026)
+
+Built on `gate/air-yods` from `9c32134f`, with Gadi's approval ("Yes,
+refine them"), then rebased onto [the source
+links](#source-links-and-mirrored-pages-13-november-2026); not merged.
+
+**What the marks are.** The Golden Dawn calls the four marks over the
+Tau Yods: Regardie, *The Golden Dawn*, vol. 4 (1940), p. 307 (archive.org
+`IsraelRegardie-TheGoldenDawn-Vol4-1940`, n299), describes a T with four
+Yods above it, and p. 308 (n300) says the sigils are taken from the
+Sigillum Dei Aemeth. The Yods stand for the 4 written over the T at the
+top of the Sigillum's outer ring (*The Equinox* I(7), Plate II,
+`crowley-equinox_202110`, "The Equinox Vol. 1, No. 7", n238; Dee's
+Sloane MS 3188), and the Order drew Yods as flames (Book T's Ace of
+Wands, "Two-and-twenty leaping Flames, or Yodh", *The Equinox* I(8),
+p. 153, "The Equinox Vol. 1, No. 8", n183). No source supports shin
+heads. Facts only from Regardie; none of his drawings was copied.
+
+**What was done.**
+
+- `AIR_FLAME` became `AIR_YOD`, a hand-placed Bézier lozenge after
+  Plate X (n256), constructed in code and not traced, drawn about its
+  centre and placed with `translate(x 11) rotate(-10)`. Measured on a
+  rasterised render the way the plate was measured (principal axes of
+  each blob, against the crossbar's full width): about 1.82 times as
+  long as wide (the plate 1.8), widest at about 45% of its length (the
+  plate about halfway), its bottom tenth 0.28 of the maximum width (the
+  plate about 0.3, ours before 0.54), 0.17 of the crossbar long (the
+  plate 0.167, ours before 0.18), leaning 32 degrees (kept; the plate
+  about 35), 0.183 of the crossbar apart (kept), and sitting 0.15 of the
+  crossbar above it, centre to top, as on the plate (ours before 0.133).
+  Both versions use it; a comment notes that Regardie's own drawing
+  gives the flames wavy strokes instead.
+- The wording, "a Tau with four Yods above it, drawn as small flames",
+  with why, in `AirSigil`'s and `EquinoxSigils`' JSDoc, the components
+  README and `tabletNotes.json5` (the sigils note and Air's); the
+  sigils note also cites Regardie p. 308, Plate II and the Equinox
+  I(8)'s p. 153.
+- **Two corrections to the brief's measurements.** Ours were not 25%
+  too large: that figure set the plate's crossbar extent (91 px)
+  against our crossbar's filled pixels in its widest row (362 px, where
+  its extent is 426), and measured alike ours were about 8% too long
+  (0.18 against 0.167). And the plate's four Yods sit left of centre,
+  their group's middle about 0.42 of the crossbar from its left end
+  against our 0.5; ours stay centred over the stem, as the 4 sits over
+  the T on Plate II, which a print offset could equally explain. Gadi
+  may want them moved.
+- Pins that moved, each checked to change only the Yods' paths and
+  transforms (putting the old path and transform back into the new
+  markup gives the old hash for all five markup pins): Air's four
+  markup hashes and the Equinox Air pin (`e2793a22…` to `74105d5e…`) in
+  `Tablet.test`; `enochian-tablet?id=air` (124,760 to 124,856 bytes)
+  and `&font=enochian` (220,099 to 220,195) in `registry.test`, reviewed
+  rasterised; Theoricus 1 and 2 and Portal 1 and 2 in
+  `gdHallImage.test`, and their file snapshots, whose diff is the four
+  Yods' paths alone. The explorer's image parity test passed unchanged.
+  The props manifest (`pnpm components:props`) and the search
+  catalogue carry none of the changed text, so neither moved.
+- Checked in headless Chromium on the worktree's dev server (port 3127,
+  CI's placeholder environment): the Air tablet in the Golden Dawn's
+  and the Equinox's versions, light and dark, and the tablets page's
+  sigils note.
+
+| Commit | What |
+| --- | --- |
+| `97fc1604` | `fix(components): Refine the Air sigil's Yods` |
+| `b36b3f82` | `fix(magick-data): Name the Air sigil's Yods` |
+
+Before the rebase, both commits were gated with stage E's gate on their
+own trees (after it each was gated again on its own tree), first side by
+side at a load of up to 105: in each, `test-coverage` and its
+re-run failed only on timing in files neither touches (the hall editor
+and playground, the dictionary's keypad, the semantic editor's delete
+dialog, the legacy SQL import and others, 27 and 35 tests) and on the
+tablets page's tests, which time out the same way; every other step
+passed. All the failing files then passed alone on each tree (11 files,
+478 tests; 13 files, 447 tests), and each whole gate was run once more,
+one after the other: the data commit passed every step, coverage at
+the first attempt; the drawing's passed every step with the coverage step's
+built-in re-run (53 timing failures in 12 files first, at load).
+
+**For Gadi:** the notes' new text needs a `magick-data` release (a
+patch on its own; it can ride with the pending 0.2.0), and the README's
+Sources row for `enochian/tabletNotes.json5`, signed 2026-11-12, needs
+his sign-off again ([follow-ups](#follow-ups)); and whether the Yods
+should move left, as on the plate.
 
 ## Review of the stacked branches (13 November 2026)
 

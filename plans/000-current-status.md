@@ -368,6 +368,15 @@ Follow-ups are separate from the completed migration work:
   precache) and open in a lightbox, on `gate/sigil-sources` on top of
   the home page's, not merged
   ([plan 080](080-open-source-packages.md#source-links-and-mirrored-pages-13-november-2026)).
+  The Air sigil's four marks are named as the Golden Dawn names them,
+  Yods, drawn as small flames (they stand for the 4 over the T in Dee's
+  Sigillum Dei Aemeth), and redrawn as slim lozenges closer to the
+  Equinox's Plate X, on `gate/air-yods` on top of the source links, not
+  merged; Air's pins and four halls' moved, the Yods' paths alone
+  ([plan 080](080-open-source-packages.md#the-air-sigils-yods-13-november-2026)).
+  TODO: the tablet notes' new text goes out with `magick-data` 0.2.0,
+  and Gadi re-signs the `enochian/tabletNotes.json5` Sources row; and
+  whether the Yods should sit left of centre, as on the plate.
   TODO: with Gadi's go-ahead, stage G; stage E's and F's deferred
   items. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups),
