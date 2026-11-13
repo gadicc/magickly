@@ -15,7 +15,8 @@ limitations. Run on the new text 12 and 13 November 2026 (see
 of task 3's four (acceptance, round trip and attested forms). Spent: $25.74 of the $100.
 Round 2 was designed, then stopped by Gadi on 13 November 2026 (see
 "Round 2"): under "never coin", English into Enochian is mostly a
-lookup problem. The product is planned separately.
+lookup problem. The product is planned in
+[plan 081](081-enochian-translator.md).
 Read [current status](000-current-status.md) first; this plan tests the
 long-term goal recorded there ("a small neural network for translating
 between Enochian and English") before anyone builds it.
@@ -867,7 +868,9 @@ The recommendation for the product plan, not yet decided: English into
 Enochian by strict lookup, with the irregular-verb and contraction
 table and gaps that suggest the nearest forms, a model at most
 offering synonyms as marked suggestions; Enochian into English by a
-model with our data, which met every bar.
+model with our data, which met every bar. Settled the same day in
+[plan 081](081-enochian-translator.md): lookup in both directions
+first, an AI reading of Enochian later.
 
 ## The first design: held-out Keys (withdrawn 12 November 2026)
 

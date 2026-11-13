@@ -386,8 +386,11 @@ Follow-ups are separate from the completed migration work:
   19 Keys, scored against Dee's English and Casaubon's words, with
   thresholds for building a translator. $100 cap, mostly Opus 5.5. Leitch's
   *Angelical Language* vol. II is extracted locally for it, outside the
-  repository. TODO: an Enochian expert's review before any translator is
-  shown to readers (the plan's "For an expert" list).
+  repository. TODO: an Enochian expert's review (the plan's "For an
+  expert" list). It was to come before any translator is shown to
+  readers; on 13 November 2026 Gadi decided the lookup translator
+  ([plan 081](081-enochian-translator.md)) ships before it, with a
+  notice above its English-into-Enochian results.
 - 13 November 2026: plan 077 run on new text ($25.74 of $100). With our
   data, Opus 5.5 reads the context rather than its memory and stays
   honest, meeting every bar for translating Dee's words both ways and
@@ -407,6 +410,12 @@ Follow-ups are separate from the completed migration work:
   sun, to prtect", which keeps lookup from matching "protect"; record
   a correction beside it as plan 061 does for misprints, once the
   printing is checked.
+- 13 November 2026: an Enochian translator by lookup designed in
+  [plan 081](081-enochian-translator.md), decision by decision with
+  Gadi, reviewed by Fable and spiked; not built (Gadi says when).
+  Stage 1 is a script in the browser, both directions, never coining
+  a word; stage 2, an AI reading of Enochian on the existing chat
+  allowance, is outlined. The two TODOs above are its step B.
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose
