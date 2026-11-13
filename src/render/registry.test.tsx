@@ -216,19 +216,20 @@ describe("component image registry", () => {
     // until its sigil was redrawn after the Equinox's Plate X in place of
     // two fonts' glyphs (plan 080, "The sigils' sources"); then 124,760,
     // 6bdff3d1…, and 220,099, 914fe5eb…, until its four Yods were refined
-    // to the plate's slim lozenges (the same section). Reviewed again as
-    // rasterised.
+    // to the plate's slim lozenges (the same section); then 124,856,
+    // 8313d75c…, and 220,195, e9c0aebe…, until the lozenges became the
+    // plate's sinuous flames. Reviewed again as rasterised.
     [
       "enochian-tablet",
       "id=air",
-      124_856,
-      "8313d75ce6840fa3c9f51d18604b6121ce5f12e4eca01f8910223ad150c9f0c7",
+      124_884,
+      "8952f44a18cde81db521f2cd5a55a26820081fba28d6042a2192f650626848f9",
     ],
     [
       "enochian-tablet",
       "id=air&font=enochian",
-      220_195,
-      "e9c0aebe524cc1a364995aef37a73847edb61e1c89ad6ec06d24cf7dcb5b0dfd",
+      220_223,
+      "cf25c90c90427c78b093ad3c431993257615c3ab482fc4108eeda1d0fb121da4",
     ],
     // One tablet in each other version, reviewed as rasterised (plan 061,
     // "Tablet versions"): Regardie's sigil, the Equinox's in black, and

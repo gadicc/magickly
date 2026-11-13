@@ -77,30 +77,32 @@ describe("Tablet", () => {
     // sources"); 8b12dffc…, 657b0c6f…, c597afb2… and a14408e1… before.
     // They moved again when its four Yods were refined to the plate's
     // slim lozenges (plan 080, "The sigils' sources"); 924e6792…,
-    // d56aa4ee…, 0c0c0214… and b92ebc33… before, the Yods' paths alone.
+    // d56aa4ee…, 0c0c0214… and b92ebc33… before, the Yods' paths alone;
+    // and again when the lozenges became the plate's sinuous flames:
+    // f2376705…, f89ff742…, 11a0bb4f… and 2b0bc2ed… before.
     [
       "air",
       false,
       true,
-      "f23767051a2292c26998a9b3ad42f382b07eade93367304c4b6b8af7ca012f34",
+      "78e363fffbc971d24e96e397fcac1f76acab4aa9721a185c47a4dd7749854b75",
     ],
     [
       "air",
       false,
       false,
-      "f89ff7420cc0fabf016d992887e64c6d34484e79af6d68574abf8225045f3005",
+      "adc7e8f185cfa96802fbaa459f67113f2119e66648f68e96b825bd09600c53bc",
     ],
     [
       "air",
       true,
       true,
-      "11a0bb4f988494792a0820bb6f756caffa421772541e6df1db26134037b2d8a5",
+      "a0de5c7952d827f85c2a9f0bffbd2adea51e82e4dcb2b08e2b48c811bbf8ea9f",
     ],
     [
       "air",
       true,
       false,
-      "2b0bc2ed157a2c9e9c34bb35a4c9a587653ccb7dc91c29fdd485bd2658fa552a",
+      "d37c41311fbb5c4faf871e2b8dd020bfee287575b087351edb6a604eeda968ca",
     ],
   ] as const)(
     "draws %s (Enochian %s, frame %s) as it did",
@@ -282,11 +284,12 @@ describe("Tablet", () => {
 
     // The Equinox's Air sigil, drawn after its Plate X (plan 080, "The
     // sigils' sources"), which the hashes above, all in the Golden Dawn's
-    // version, do not reach. e2793a22… before its Yods were refined (the
-    // Yods' paths alone moved).
+    // version, do not reach. e2793a22… before its Yods were refined, then
+    // 74105d5e… before they became sinuous flames (the Yods' paths alone
+    // moved each time).
     it("draws the Equinox's Air sigil as it did", () => {
       expect(sha256(renderToStaticMarkup(EquinoxSigils.air()))).toBe(
-        "74105d5eb04ea91d5fe6984011d2b8959457b4edf11255d0aaf1df5fe0db17a1",
+        "f885fbfd8767401495a77f46655c6cc0c2c3f3c397b87ed769994dfe0d1cdcea",
       );
     });
 

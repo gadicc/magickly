@@ -174,24 +174,29 @@ const AIR_TAU =
   "V24.5C39.5 24.5 28 27 18 33.5Z";
 
 /**
- * One of the four Yods over the Tau, drawn as a small flame: a slim
- * lozenge, sharp at the top and tapering to a blunt point below, about
- * 1.8 times as long as it is wide and widest about halfway down, drawn
- * about its centre. Hand-placed after the Equinox's Plate X (see
- * `EquinoxSigils`), not traced. Regardie's own drawing (The Golden Dawn,
- * vol. 4, 1940) gives the flames wavy strokes instead; both versions here
- * keep the plate's form.
+ * One of the four Yods over the Tau, drawn as a small flame, as it
+ * stands on the page (no rotation), about its centre: the point at the top
+ * flicks over to the right and drops into a shallow hollow, the right side
+ * swells out and runs down nearly straight to a blunt lower end, and the
+ * left side bulges near the top and runs back straight to that end, so
+ * the outline has a gentle S along its length. About 1.8 times as long as
+ * it is wide. Cubic segments placed by eye against an enlarged crop of
+ * the Equinox's Plate X (see `EquinoxSigils`), not traced, and not any
+ * font's yod. Regardie's own drawing (The Golden Dawn, vol. 4, 1940) gives
+ * the flames wavy strokes instead; both versions here keep the plate's
+ * form.
  */
 const AIR_YOD =
-  "M-1.7 -6C-1.1 -5 1 -3.4 2.3 -1.2C3 0 3 3.1 2.7 4.8" +
-  "Q2.4 5.8 1.5 5.4C-0.1 3.8 -2.6 2.2 -3.7 0.3" +
-  "C-4.1 -0.7 -2.8 -2.4 -2.2 -3.6C-1.9 -4.4 -1.9 -5.1 -1.7 -6Z";
+  "M-1.3 -5.5C-0.8 -4.6 -0.8 -3.2 0.3 -2.4C1.6 -1.5 3.4 -0.8 3.6 1.4" +
+  "C3.8 2.8 3.5 4.3 3 5C2.7 5.4 2 5.3 1.4 4.9" +
+  "C0 3.8 -2.6 2.5 -3.4 0.6C-4.1 -0.9 -3.1 -2.6 -2.3 -3.6" +
+  "C-1.8 -4.2 -1.5 -4.7 -1.3 -5.5Z";
 
 /**
  * The Yods' centres along the grid's x, a little over the crossbar, about
  * 0.185 of its width apart. Each Yod is about 0.17 of the crossbar's width
- * long and leans about 32 degrees from vertical, top to the left, as on
- * the plate.
+ * long and leans about 34 degrees from vertical, top to the left (the
+ * plate's lean about 35), centred over the stem.
  */
 const AIR_YOD_XS = [33.2, 45.4, 57.6, 69.8];
 
@@ -223,11 +228,7 @@ function AirSigil({ plain = false }: { plain?: boolean }) {
         >
           <path d={AIR_TAU} />
           {AIR_YOD_XS.map((x) => (
-            <path
-              key={x}
-              d={AIR_YOD}
-              transform={`translate(${x} 11) rotate(-10)`}
-            />
+            <path key={x} d={AIR_YOD} transform={`translate(${x} 11)`} />
           ))}
         </g>
       </g>
