@@ -124,4 +124,10 @@ describe("Explorer", () => {
     fireEvent.click(screen.getByRole("switch", { name: "alt" }));
     await waitFor(() => expect(image()).toBeNull());
   });
+
+  it("offers no control for a font URL, which the page does not need", () => {
+    explore("TreeOfLife");
+    expect(screen.queryByLabelText("fontBaseUrl")).toBeNull();
+    expect(screen.getByLabelText("field")).toBeTruthy();
+  });
 });

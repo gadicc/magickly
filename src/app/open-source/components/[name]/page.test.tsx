@@ -46,7 +46,8 @@ describe("/open-source/components/[name]", () => {
 
   it("offers a control for each prop whose type allows one", () => {
     for (const prop of PROPS.TreeOfLife.props) {
-      const label = prop.control ? 1 : 0;
+      // A font URL has no control (Explorer.tsx, UNCONTROLLED).
+      const label = prop.control && prop.name !== "fontBaseUrl" ? 1 : 0;
       expect(
         tree.includes(`>${prop.name}</label>`) ||
           tree.includes(`<code>${prop.name}</code></span></label>`),

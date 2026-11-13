@@ -63,6 +63,15 @@ class DrawingBoundary extends Component<
   }
 }
 
+/**
+ * Props the explorer offers no control for although their type would
+ * allow one: `fontBaseUrl` (the Tree's and the hall's) makes the drawing
+ * load fonts from wherever it is pointed and declares their families for
+ * the whole page. The page supplies the fonts itself, so the drawing
+ * needs no URL; the props table still describes it.
+ */
+const UNCONTROLLED: ReadonlySet<string> = new Set(["fontBaseUrl"]);
+
 /** One prop's control, from its type alone (plan 080, decision 5). */
 function Control({
   prop,
@@ -219,7 +228,9 @@ export default function Explorer({
     setProps(examples[index].props);
   };
   const Live = LIVE[name];
-  const controlled = docs.filter((prop) => prop.control);
+  const controlled = docs.filter(
+    (prop) => prop.control && !UNCONTROLLED.has(prop.name),
+  );
   const jsx = jsxFor(name, props);
   const elided = placeholders(props);
   const image = example.image ?? componentImage(name, props);
