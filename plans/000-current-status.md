@@ -218,7 +218,8 @@ Follow-ups are separate from the completed migration work:
   traditions' readings and the nineteenth Call. Built 10 November on
   `gate/enochian-keys`. TODO: Dee's own copy, Sloane MS 3191, when the
   British Library's images return: his accents, the words Casaubon's
-  print lost (Keys 14–16) and his Aethyr spellings.
+  print lost (Keys 13 to 16) and his Aethyr spellings; an expert may
+  answer sooner ([plan 082](082-enochian-expert-questions.md)).
 - 10 November 2026: English search in the Enochian dictionary, with a
   revamp of its page, in [plan 074](074-enochian-dictionary-search.md).
   The two boxes (Latin, and Enochian right to left) hold one query,
@@ -386,10 +387,11 @@ Follow-ups are separate from the completed migration work:
   19 Keys, scored against Dee's English and Casaubon's words, with
   thresholds for building a translator. $100 cap, mostly Opus 5.5. Leitch's
   *Angelical Language* vol. II is extracted locally for it, outside the
-  repository. TODO: an Enochian expert's review (the plan's "For an
-  expert" list). It was to come before any translator is shown to
-  readers; on 13 November 2026 Gadi decided the lookup translator
-  ([plan 081](081-enochian-translator.md)) ships before it, with a
+  repository. TODO: an Enochian expert's review, from the running list
+  of questions in [plan 082](082-enochian-expert-questions.md). It was
+  to come before any translator is shown to readers; on 13 November
+  2026 Gadi decided that the lookup translator, in
+  [plan 081](081-enochian-translator.md), ships before it, with a
   notice above its English-into-Enochian results.
 - 13 November 2026: plan 077 run on new text ($25.74 of $100). With our
   data, Opus 5.5 reads the context rather than its memory and stays
@@ -416,6 +418,12 @@ Follow-ups are separate from the completed migration work:
   Stage 1 is a script in the browser, both directions, never coining
   a word; stage 2, an AI reading of Enochian on the existing chat
   allowance, is outlined. The two TODOs above are its step B.
+- 13 November 2026: questions for an Enochian expert gathered into one
+  running list, [plan 082](082-enochian-expert-questions.md), from
+  plans 077 and 081, the grammar notes and the Keys. Gadi means to
+  finish as much as we can, then show the expert our work and ask
+  whether they would help. Any work that raises a question only an
+  expert can settle adds it there.
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose

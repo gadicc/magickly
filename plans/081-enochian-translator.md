@@ -391,17 +391,8 @@ G. **The record**: the final review's fixes, build notes here, current
 
 ## For an expert
 
-Plan 077's list carries over, with these from this plan:
-
-- Every rule the tool applies, especially those marked "Expert: yes"
-  in `grammar.md` (G14, G17, G22, G34, G38): are the chips right?
-- Forms that carry a preposition used for the bare word (tier 3,
-  ETHARZI for "peace").
-- Possessives after the noun, written apart (SALMAN TILB): acceptable,
-  or must they be joined?
-- "God's house" as "house God" by G5.
-- Whether Enochian with gaps in mid-sentence reads at all.
-- A sample of English-into-Enochian output, the review Gadi deferred.
+This plan's questions for an expert, with plan 077's, are in
+[plan 082](082-enochian-expert-questions.md), the running list.
 
 ## Verification
 

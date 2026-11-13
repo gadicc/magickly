@@ -800,8 +800,9 @@ answers found:
 1. The translator never coins. Where our data has no word, it shows a
    gap with the English.
 2. Round 2 would fix the scoring and test 60 fresh sentences, with the
-   bars set first. Expert work stays deferred; the list in "For an
-   expert" keeps growing.
+   bars set first. Expert work stays deferred; the list of questions
+   for an expert (now [plan 082](082-enochian-expert-questions.md))
+   keeps growing.
 3. A sentence is accepted when it is right as far as it goes: every
    word given right in sense and form, every gap warranted.
 4. The round trip stays, with the translator's data, and is calibrated
@@ -1048,40 +1049,9 @@ answer key, and the build-or-not decision rests on the bars above. The expert is
 readers**: the later product plan cannot ship without their review of
 a sample. Whether to bring them in earlier is decided again when the
 results are in. Until then, questions only an expert can settle go on
-this list, which the experiment adds to as it runs:
-
-- Task 3: the sentences the two judges disagree on, and a sample of
-  those both accepted.
-- Derived and coined words: are the forms plausible by the grammar
-  notes, or do they just look like Enochian?
-- The new text: whether a swapped word's form suits its new place,
-  whether any planted word is in fact attested somewhere we don't have,
-  and whether the new joins are joins Dee could have written.
-- Task 3: whether the Enochian written for the 60 sentences is
-  Enochian at all. Nothing in the experiment can show that; a sample
-  for the expert is the only check.
-- Glosses where Leitch and Dee's English disagree (about 55 of the 550
-  comparable Key words).
-- Each rule in the A3 grammar notes, especially those resting on a
-  single example in the Keys.
-- Where the Golden Dawn reading of a word differs from Dee's, which one
-  the translator should prefer by default.
-- Added 13 November 2026, from round 1 and round 2's design:
-  - Fused forms: when Dee's only form carries more than the English
-    (GEIAD "our Lord and Master" for "master", ORRI "barren stone" for
-    "stone", PLOSI "as many" for "many"), may it stand for the narrower
-    word, or must it be a gap?
-  - Whether Enochian with gaps in mid-sentence reads at all, and how a
-    gap should be shown.
-  - TILB before its noun (Key 19's OD TILB ADPHAHT DAMPLOZ): G22 now
-    allows it; is that right?
-  - Round 1's task-3 sentences both judges accepted, and those they
-    split on, as a sample of the Enochian a model writes.
-  - Lookup's wrong-sense glosses (HOMIL "the true ages" for "true") and
-    dictionary-only glosses (Schueler's, angels' names): which should a
-    translator ever offer?
-  - Synonyms a model gave beyond lookup (UNIGLAG "descend" for "come
-    down", PAAOX "remain" for "stayed"): are they sound?
+a list. From 13 November 2026 that list is
+[plan 082](082-enochian-expert-questions.md), which carries every item
+this section held.
 
 ## Settled questions (11 November 2026)
 
