@@ -339,6 +339,18 @@ Follow-ups are separate from the completed migration work:
   ([plan 080](080-open-source-packages.md#the-moons-two-intelligences-13-november-2026)).
   TODO: release it as `magick-data` 0.2.0 after Gadi re-signs the
   `astrology/planets.json5` Sources row.
+  On 13 November two drawings were found to come from sources the
+  package cannot use: the planetary spirits' sigils were traced from a
+  1994 Llewellyn printing (and were the Rulers' geomantic sigils, not
+  Agrippa's seals), and the Air Watchtower's sigil was two fonts'
+  glyphs. Both are redrawn as our own drawings in code after
+  public-domain printings, Heydon's *Theomagia* (1663/4) and the
+  Equinox's Plate X (1912), on `gate/pd-sigils` on top of the Moon's
+  two intelligences, not merged; Air's pins and four halls' moved, and
+  the explorer's page for the sigils and the search vectors follow
+  ([plan 080](080-open-source-packages.md#the-sigils-sources-13-november-2026)).
+  TODO for Gadi: whether the old files' git history matters, and
+  whether to credit Heydon on the geomancy reference.
   TODO: with Gadi's go-ahead, stage G; stage E's and F's deferred
   items. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups),

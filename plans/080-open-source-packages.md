@@ -412,7 +412,7 @@ The 22 September preference, confirmed by the research:
   | --- | --- |
   | `Link.tsx`, `Tiles.tsx`, `entity/` | App code, moved to `src/app/` (or `src/ui/`); they are the site's frame, not drawings |
   | `astrology/Mercury.tsx` | `<img>` in place of `next/image`, with the two images it hard-codes (`/night-sky.jpg`, `/pics/mercury.webp`) passed in as props |
-  | `astrology/planetarySpirits.tsx` | The seven sigils become TSX components in the package (`tsc` cannot ship svgr `.svg` imports). The SVGs in `svg/astrology/spirits/` are Gadi's own drawings, made in Inkscape (Gadi, 11 November 2026), of the traditional seals of the planetary spirits (Agrippa, *De occulta philosophia*, Book II, 1533). Each records the public-domain edition it follows. Copyright Gadi Cohen, MIT like every component (see [the licence note](#the-licence-of-a-drawing-that-is-code)) |
+  | `astrology/planetarySpirits.tsx` | The seven sigils become TSX components in the package (`tsc` cannot ship svgr `.svg` imports). The SVGs in `svg/astrology/spirits/` are Gadi's own drawings, made in Inkscape (Gadi, 11 November 2026), of the traditional seals of the planetary spirits (Agrippa, *De occulta philosophia*, Book II, 1533). Each records the public-domain edition it follows. Copyright Gadi Cohen, MIT like every component (see [the licence note](#the-licence-of-a-drawing-that-is-code)). **Superseded 13 November:** the Inkscape files were traced from a 1994 Llewellyn printing, not from Agrippa, and the figures are the Rulers' geomantic sigils, not Agrippa's seals; they were removed and redrawn after Heydon (1663/4), see [the sigils' sources](#the-sigils-sources-13-november-2026) |
   | `enochian/enochianFont.ts` | Stays in the app. `Tablet` takes a font family prop, and the README says the consumer supplies an Enochian font |
 
 - **It is strict.** The package's `tsconfig.json` has `strict: true`.
@@ -588,8 +588,12 @@ Two consequences, both checks rather than new policy:
 - **A traced drawing records its source.** Gadi's tracings are his own, but
   a tracing of a modern edition's redrawing could carry that edition's
   rights. Each drawing in the package names the public-domain edition it
-  follows (Agrippa, 1533, for the planetary seals), per the house rule on
-  outside sources. Drawings from Regardie stay what they are today: facts
+  follows (Heydon, 1663/4, for the planetary spirits' geomantic sigils, and
+  the Equinox's Plate X, 1912, for the Watchtower sigils, since 13
+  November; Agrippa, 1533, was named before and was wrong, see
+  [the sigils' sources](#the-sigils-sources-13-november-2026)), per the
+  house rule on outside sources. The edition named must be the one the
+  drawing was made from, not one it resembles. Drawings from Regardie stay what they are today: facts
   such as a layout, drawn in our own art.
 - **CC BY on the data cannot relicense text we do not own.** The packaged
   texts (Lenain's 1823 volume, the Keys, the seventy-two angels in English
@@ -1275,7 +1279,9 @@ screens and were not regenerated.
   seals as the traditional ones printed in the Library of Congress copy
   of the 1533 edition, by page and leaf, without claiming the Inkscape
   drawings were traced from that printing. Gadi to confirm which edition
-  he drew from, and the citation to name it if it is another.
+  he drew from, and the citation to name it if it is another. Settled
+  13 November: he traced them from a 1994 Llewellyn printing, so they
+  were redrawn ([the sigils' sources](#the-sigils-sources-13-november-2026)).
 - `actionlint` is not installed here, so the new CI job was not linted.
 
 ### Stage E review (13 November 2026)
@@ -1954,6 +1960,146 @@ both, each with a note.
   777's (Malkah Be Tarshishim va A'ad Be Ruah Shehaqim) is the one
   most readers will have met.
 
+## The sigils' sources (13 November 2026)
+
+Two of the package's drawings turned out to come from sources it cannot
+use. They were redrawn on `gate/pd-sigils`, from the components
+hardening at `80ea484a`, as our own drawings after public-domain
+printings, then rebased onto [the Moon's two
+intelligences](#the-moons-two-intelligences-13-november-2026), on top
+of stage F and the chakras' figure; not merged.
+
+- **The seven planetary spirits' sigils** (`astrology/planetarySpirits`)
+  were Gadi's Inkscape tracings of the figures in "By the Signs of the
+  Earth: Geomancy in the Golden Dawn", *The Golden Dawn Journal, Book I:
+  Divination* (Llewellyn, 1994), p. 149, which is in copyright (Gadi
+  confirmed the source on 13 November). They are the geomantic sigils of
+  the Rulers of the figures (Zazel, Hismael, Bartzabel, Sorath, Kedemel,
+  Taphthartharath, Chasmodai), not the spirits' seals that Agrippa prints
+  in book II, chapter 22, so the citation added at stage E was wrong too.
+- **The Air Watchtower's sigil** (`enochian/Tablet`, `AirSigil`, from
+  `07143b49`) was two fonts' glyphs: the Tau is Souvenir Lt BT Light
+  (Bitstream, commercial; IoU 0.977) and the four flames are yods from
+  Frank Ruehl CLM Medium (Culmus, GPL v2; IoU 0.987). Neither can ship
+  under MIT.
+
+**Lineage of the Rulers' sigils.** What could be shown, from the scans:
+
+| Source | Has the sigils? |
+| --- | --- |
+| Agrippa, *De occulta philosophia* (Cologne, 1533), `DeOccultaPhilosophiaLoc1533` | No. II.22 (n164–n168) prints the spirits' seals, other figures; the geomancy tables (n205, n210) have figures and their characters, not these |
+| John Heydon, *Theomagia, or The Temple of Wisdome*, vol. 1 (London, 1663/4), `theomagiaortempl00heyd` (Getty Research Institute) | Yes, twice. Book I, ch. V, "Of the Names of the seven Rulers", pp. 13 and 15 (n124, n126): a Ruler and a Genius for each of the sixteen figures, each with a sigil. Book I, ch. XIII, p. 46 (n157), the Rulers' table again, with Mercury's (an angular hook), the Sun's ("dH") and Venus' (a plain heart) in other forms; the chapter openings repeat them (n127, n130, n133, n137, n146, n149, n153) |
+| Cattan, *The Geomancie* (London, 1591 and 1608), `bim_early-english-books-1475-1640_the-geomancie_cattan-christopher_1591`, `…_cattan-christophe-de_1608` | No Ruler is named in the OCR; the images were not paged through |
+| Agrippa's *Fourth Book*, tr. Turner (London, 1655), "Of Geomancy" | No Ruler is named in the OCR (a reprint, `cu31924006718757`); figures go to planets only |
+| Fludd, *Utriusque cosmi … historia* II (1619), *Fasciculus geomanticus* (1704 ed.) | None of the names in the OCR, which is poor for the Latin; probably not, not proven |
+| Hartmann, *Principles of Astrological Geomancy* (1889), `b24884145` | No |
+| Crowley, "A Handbook of Geomancy", *The Equinox* I(2) (1909), `crowley-equinox_202110`, pp. 141–143 (n146–n147) | Names the Rulers per figure and says to put the Ruler's sigil in the pentagram; prints no sigil |
+| Regardie, *The Golden Dawn* vol. 4 (1940), p. 113 (facts only; in copyright in the UK and EU) | Yes: a "Sigil of Ruler" column with every smooth modern form (the heart with spiral lobes, the "I8", the T over a cross, the "4") |
+
+So the earliest printing found is Heydon's, and no earlier source for
+his glyphs turned up: the names are Agrippa's (II.22), the sigils
+apparently Heydon's own or from a manuscript. The smooth modern forms
+are in print by 1940 at the latest; the 1994 Journal is not where they
+began. Whether Regardie took them from an earlier Golden Dawn manuscript
+could not be shown. The Golden Dawn's forms descend from Heydon's pp. 13
+and 15 (the T over a cross, the crossed upright with loops, the heart
+with curled lobes), not from p. 46. Not checked: the French Cattan
+(1558), the Latin *De geomantia* in Agrippa's *Opera*, the images of
+Cattan and Fludd, *777*, manuscripts.
+
+**What was done.**
+
+- The seven sigils are drawn after Heydon's pp. 13 and 15, cited per
+  sigil by page and leaf: a few hand-placed strokes of one width (7 on a
+  grid of 100) with round ends, placed by eye over the scan, with no
+  auto-tracing and nothing taken from the old paths or the modern forms.
+  The forms are therefore Heydon's: Hismael a V, Chasmodai a sharp 5,
+  Kedemel a heart with its lobes curled in (not spirals), Sorath a
+  crossed upright with a loop each side, Taphthartharath a bar and an
+  upright over a cross. Zazel's dot is a stroke a unit long (a tiny
+  stroked circle left its centre open in resvg). Each viewBox fits the
+  stroke with a unit to spare. The API is unchanged; the sigil is one
+  `stroke="#000"` path, and the dark ink rule follows.
+- `svg/astrology/spirits/` and the SVGR drift test are gone; new tests
+  hold one sigil per planet with a spirit, one round-ended black stroke
+  with no fill or text, the fitted viewBoxes, the box's style props and
+  nothing for an unknown id. **Git history keeps the traced files and
+  paths** (`5843e4a0` onwards, and the TSX from `1cc885b3`).
+- The Air sigil is drawn after the Equinox I(7) (1912), "Liber
+  Chanokh", Plate X, top left (`crowley-equinox_202110`, "The Equinox
+  Vol. 1, No. 7", n256), constructed in code: a flat-topped crossbar
+  arching up to a thin stem, its ends tapering down and out, a foot
+  flaring to a triangle, and four leaning teardrop flames; in black for
+  the Equinox's version and yellow on mauve for Regardie's colours.
+  `EquinoxSigils` cites the plate for all four.
+- Water, Earth and Fire were checked: all are built in code from lines,
+  arcs and curves (Earth's by Gadi in 2023, Water's and Fire's in
+  `3c86990d` and `a05f6615`). Against every installed font, Water's
+  figures b, 6 and 4 match nothing better than 0.83–0.89 IoU (the Air
+  glyphs matched at 0.977 and 0.987).
+- The README, `LICENSE.txt` and the package description call them the
+  spirits' geomantic sigils and cite Heydon and Plate X. The app's pages
+  never cited Agrippa for them, and their prose ("the spirit's sigil",
+  "Spirit / Ruler") stands, so no page prose and no search vector
+  changed before the rebase. No documentation screenshot shows these
+  screens.
+- **On stage F**, whose explorer shows the component's JSDoc, the
+  Rulers' commit also regenerates the props manifest
+  (`pnpm components:props`) for the new JSDoc, gives the explorer's
+  page the title "Planetary Spirit Sigil" and a description of the
+  geomantic sigils after Heydon (it said Agrippa's seals), and says
+  sigils in the example module's comment. The JSDoc is search prose, so
+  that commit refreshes the vectors: `search:compare` embedded 2
+  passages per profile, `search:publish` none. The Air commit changes
+  no JSDoc or prose; stage F's image parity test, which renders the
+  tablet's examples through the image route and as the component,
+  passes on the new drawing.
+
+Pins that moved, each after review of the rasterised output: Air's four
+markup hashes in `Tablet.test`; `enochian-tablet?id=air` (127,724 to
+124,760 bytes) and `&font=enochian` (223,063 to 220,099) in
+`registry.test`; Theoricus 1 and 2 and Portal 1 and 2 in
+`gdHallImage.test` and their file snapshots in
+`src/app/gd/halls/__snapshots__/`, whose halls show the Air tablet (the
+snapshots' diff is the sigil's group alone). The app's tests
+mock `PlanetarySpirit`, so no page hash moved. Checked in headless
+Chromium on the worktree's dev server (port 3123, CI's placeholder
+environment): the geomancy reference's table, a planet's page, the
+reading's pentagram and the Air tablet in both versions, light and dark,
+with the dark ink applied.
+
+| Commit | What |
+| --- | --- |
+| `d5bac748` | `fix(components): Redraw the Rulers' sigils` |
+| `9e26c353` | `fix(components): Redraw the Air sigil after Plate X` |
+
+Before the rebase onto stage F, both commits passed stage E's gate (the
+gate with the package's smoke test) on their own trees, at a load of 30
+to 56; after it each was gated again on its own tree. The Rulers'
+commit's first gate failed only on 5-second timeouts in files it does not touch, in both
+the coverage step and its rerun (the legacy SQL import, the Enochian
+keypad, the semantic editor's delete dialog, the reading's hints, the
+hall editor); those five files passed alone, and the next full gate
+passed with every step at 0. The Air commit's first version failed its
+gate on a real omission, the four halls' file snapshots, which it now
+carries; that gate passed with the coverage step's built-in rerun (two
+timeouts in the legacy import first).
+
+**For Gadi:**
+
+- **History.** The traced SVGs and the font-built paths stay in git
+  history (`5843e4a0`, `07143b49` and their successors). The package's
+  tarball holds only `HEAD`'s files, so publishing is unaffected; whether
+  the public repository's history should be rewritten is a separate
+  call.
+- **The forms.** The new sigils follow Heydon, so they look older and
+  plainer than the forms Golden Dawn readers know (no spiral heart, no
+  "I8", a V for Hismael). Smoother forms of our own after Heydon are
+  possible; the modern ones themselves are not ours to copy.
+- **A credit on the page.** The geomancy reference could say the sigils
+  follow Heydon (1663/4); that is page prose and needs a search-vector
+  refresh, so it was left out.
+
 ## Review (11 November 2026)
 
 Fable 5.2 at high effort, fresh context, `loom-torvalds-review`, on the
@@ -1980,7 +2126,9 @@ accepted.
 None. Gadi settled the last ones on 11 November: the planetary-spirit
 sigils are his own drawings and join the package (decision 7), the hall
 fonts ship in it (decision 7, "Fonts"), the licence note stands, and the
-table page puts its fields below its rows (decision 4).
+table page puts its fields below its rows (decision 4). (The sigils
+turned out on 13 November to be tracings of a modern printing and were
+redrawn after Heydon: [the sigils' sources](#the-sigils-sources-13-november-2026).)
 
 ## Deferred
 
