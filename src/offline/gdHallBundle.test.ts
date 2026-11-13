@@ -103,7 +103,8 @@ it("bundles a ritual with halls for offline reading, rows intact", async () => {
 });
 
 it("serves the hall fonts from the precached public directory", () => {
-  // `next.config.ts` precaches everything in `public` except `docs/`.
+  // `next.config.ts` precaches everything in `public` except `docs/` and
+  // `sources/`.
   expect(GD_HALL_FONT_BASE).toBe("/fonts");
   for (const font of GD_HALL_FONT_FILES)
     expect(existsSync(path.join("public/fonts", font.file)), font.file).toBe(

@@ -17,12 +17,14 @@ import {
 // through it. Trace the physical target while the runtime keeps the stable alias.
 /**
  * Everything under public/ except the docs, which are downloads rather than
- * part of the app shell. Mirrors what @serwist/next would have globbed, minus
- * the directory it gives no way to exclude.
+ * part of the app shell, and the mirrored source pages (public/sources),
+ * about 640 KB of scans that are cached at runtime when viewed (Serwist's
+ * default image rule). Mirrors what @serwist/next would have globbed, minus
+ * the directories it gives no way to exclude.
  */
-function precacheEntries() {
+export function precacheEntries() {
   const publicDir = path.join(process.cwd(), "public");
-  const skip = /^(docs\/|sw\.js|sw\.js\.map|swe-worker-)/;
+  const skip = /^(docs\/|sources\/|sw\.js|sw\.js\.map|swe-worker-)/;
   const walk = (dir: string, prefix = ""): string[] =>
     readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
       const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
