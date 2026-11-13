@@ -99,6 +99,19 @@ function MoonDrawing({
   );
 }
 
+/** Props of the Moon widget. */
+export interface MoonWidgetProps {
+  /** CSS padding around the drawing, inside the night sky. */
+  moonPadding?: string;
+  /**
+   * The viewer's latitude in degrees, south negative: south of the
+   * equator, the moon is drawn turned as it is seen from there.
+   */
+  latitude?: number;
+  /** The widget's background image, a URL, drawn to cover; none if omitted. */
+  background?: string;
+}
+
 /**
  * Today's moon, drawn as it looks from the viewer's hemisphere.
  *
@@ -106,15 +119,6 @@ function MoonDrawing({
  * plan 072); the moon is drawn as from the north until it is known to be
  * south of the equator.
  */
-export interface MoonWidgetProps {
-  /** Space around the drawing, as CSS `padding`. */
-  moonPadding?: string;
-  /** The viewer's latitude, when known; north of the equator if not. */
-  latitude?: number;
-  /** The tile's background image, a URL, drawn to cover; none if omitted. */
-  background?: string;
-}
-
 function MoonWidget({
   moonPadding = "10px 0 2px 0",
   latitude,

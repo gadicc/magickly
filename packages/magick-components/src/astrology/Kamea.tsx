@@ -151,7 +151,9 @@ export interface KameaProps extends KameaFigureProps {
   size?: number | string;
   /** What the square is, for a screen reader ("Kamea of Saturn"). */
   label?: string;
+  /** The `<svg>`'s class. */
   className?: string;
+  /** The `<svg>`'s style. */
   style?: CSSProperties;
 }
 

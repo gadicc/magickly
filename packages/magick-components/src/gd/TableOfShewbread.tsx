@@ -241,6 +241,11 @@ export interface TableOfShewbreadProps {
   ref?: React.Ref<SVGSVGElement>;
 }
 
+/**
+ * The Golden Dawn's Table of Shewbread: the twelve signs of the zodiac on a
+ * circle, with the permutations of the Tetragrammaton and the tribes of
+ * Israel the signs are given.
+ */
 export default function TableOfShewbread({
   idPrefix = "shewbread",
   ref,

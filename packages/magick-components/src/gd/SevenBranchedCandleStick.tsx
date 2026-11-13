@@ -152,6 +152,11 @@ export interface SevenBranchedCandleStickProps {
   ref?: React.Ref<SVGSVGElement>;
 }
 
+/**
+ * The Golden Dawn's seven-branched candlestick: a branch for each of the
+ * seven planets, with its symbol, Hebrew name, archangel and letter, set
+ * about a heptagram.
+ */
 export default function SevenBranchedCandleStick({
   idPrefix = "candlestick",
   ref,

@@ -766,6 +766,10 @@ function Tablet({
   highlights,
   ref,
 }: {
+  /**
+   * The tablet, by its key in the data: `earth`, `air`, `water`, `fire` or
+   * `union`.
+   */
   id: string;
   /**
    * One of the data's `TABLET_VERSIONS`; the Golden Dawn's (`gd`) when
@@ -788,7 +792,9 @@ function Tablet({
   enochianStyle?: CSSProperties;
   /** CSS border for on-page display; server images omit it since CSS boxes are not SVG. */
   frame?: boolean;
+  /** The SVG's width; from the height and the page's shape when not given. */
   width?: string | number;
+  /** The SVG's height; from the width and the page's shape when not given. */
   height?: string | number;
   /** The `<svg>`, for exporting the drawing. */
   ref?: React.Ref<SVGSVGElement>;

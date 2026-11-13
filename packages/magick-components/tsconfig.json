@@ -18,5 +18,10 @@
     "noEmit": true,
     "incremental": false
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "examples/**/*.ts",
+    "examples/**/*.tsx"
+  ]
 }

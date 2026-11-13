@@ -1,0 +1,687 @@
+{
+  "TreeOfLife": {
+    "description": "The Tree of Life: the ten sephirot (eleven with Da'at) coloured in either\nscale and labelled from their magick-data rows, and the twenty-two paths\nwith their Hebrew letters. Each sphere and path is a link, by default to\na root-relative path (`/kabbalah/sephirah/<id>`, `/kabbalah/path/<id>`),\nwhich `sephirahHref` and `pathHref` change or remove. It reads the data\nitself and needs no client code, so it renders as a Server Component.\nIts ids come from `useId` when `id` is not given; given a `ref`, a click\non a link in the browser sets `location.href`.",
+    "props": [
+      {
+        "name": "active",
+        "type": "string",
+        "required": false,
+        "description": "A sephirah's id: that sphere is drawn and the others faded.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "activePath",
+        "type": "string",
+        "required": false,
+        "description": "A path's id (`\"1_2\"`): it is drawn on top and highlighted, the rest faded.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "bottomText",
+        "type": "string",
+        "required": false,
+        "description": "The field path(s) set on an arc below each sphere's label.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "colorScale",
+        "type": "\"king\" | \"queen\"",
+        "required": false,
+        "description": "The scale the spheres are coloured in; the Queen's when not given.",
+        "control": { "kind": "choice", "options": ["king", "queen"] }
+      },
+      {
+        "name": "field",
+        "type": "string",
+        "required": false,
+        "description": "What each sphere is labelled with: a field path into its magick-data\nrow (`name.he`, `planet.name.en.en`, `stones.*.name.en`), or several\njoined by commas, which are drawn space-separated. `index`, the\nsphere's number, when not given.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "flip",
+        "type": "boolean",
+        "required": false,
+        "description": "Seen from behind, the body's view; the stylesheet mirrors the figure.",
+        "control": { "kind": "switch" }
+      },
+      {
+        "name": "fontBaseUrl",
+        "type": "string",
+        "required": false,
+        "description": "Where Noto Sans and Noto Sans Hebrew are served, as\n`NotoSans-Regular.ttf` and `NotoSansHebrew-Regular.ttf` under it. Given\none, the SVG carries `@font-face` rules for them, which an exported SVG\nneeds; the rules name the families for the whole page, as any\n`@font-face` does. Without it the Tree only names the families, and\nthe page supplies them (or falls back to Arial and sans-serif).",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "fontSize",
+        "type": "string | number",
+        "required": false,
+        "description": "The labels' font size; from `field` when not given.",
+        "control": { "kind": "parsed" }
+      },
+      {
+        "name": "height",
+        "type": "string | number",
+        "required": false,
+        "description": "The SVG's height; from the width and the figure's shape when not given.",
+        "control": { "kind": "parsed" }
+      },
+      {
+        "name": "id",
+        "type": "string",
+        "required": false,
+        "description": "The `<svg>`'s id, which its stylesheet is scoped to and every id\ninside it begins with (`<id>-paths`, `<id>-topTextPath0`): letters,\ndigits, `-` and `_`, starting with a letter. One from `useId` when\nnot given, so that several Trees can share a page.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "labels",
+        "type": "readonly string[]",
+        "required": false,
+        "description": "Each sphere's label, Keter first and Da'at eleventh, in place of `field`'s."
+      },
+      {
+        "name": "letterAttr",
+        "type": "\"hebrew\" | \"hermetic\"",
+        "required": false,
+        "description": "Whose letters the paths carry.",
+        "control": { "kind": "choice", "options": ["hebrew", "hermetic"] }
+      },
+      {
+        "name": "pathHref",
+        "type": "((path: TreeOfLifePathRow) => string | null)",
+        "required": false,
+        "description": "A path's link, or `null` for none; `/kabbalah/path/<id>` by default."
+      },
+      {
+        "name": "sephirahHref",
+        "type": "((sephirah: TreeSephirah) => string | null)",
+        "required": false,
+        "description": "A sphere's link, or `null` for none; `/kabbalah/sephirah/<id>` by default."
+      },
+      {
+        "name": "showDaat",
+        "type": "boolean",
+        "required": false,
+        "description": "Draws Da'at. Only the Queen scale colours it, so the King scale leaves\nit out.",
+        "control": { "kind": "switch" }
+      },
+      {
+        "name": "topText",
+        "type": "string",
+        "required": false,
+        "description": "The field path(s) set on an arc above each sphere's label.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "width",
+        "type": "string | number",
+        "required": false,
+        "description": "The SVG's width; the container's, `\"100%\"`, when not given.",
+        "control": { "kind": "parsed" }
+      }
+    ]
+  },
+  "GradeTree": {
+    "description": "The Tree of Life as the map of the Golden Dawn's grades: each sphere\nlabelled with its grade's number and name, with the grade's element,\norder and planet below, and linked to the grade's page; the paths are\nnot linked. Any of `TreeOfLife`'s props override these.",
+    "props": [
+      {
+        "name": "active",
+        "type": "string",
+        "required": false,
+        "description": "A sephirah's id: that sphere is drawn and the others faded.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "activePath",
+        "type": "string",
+        "required": false,
+        "description": "A path's id (`\"1_2\"`): it is drawn on top and highlighted, the rest faded.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "bottomText",
+        "type": "string",
+        "required": false,
+        "description": "The field path(s) set on an arc below each sphere's label.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "colorScale",
+        "type": "\"king\" | \"queen\"",
+        "required": false,
+        "description": "The scale the spheres are coloured in; the Queen's when not given.",
+        "control": { "kind": "choice", "options": ["king", "queen"] }
+      },
+      {
+        "name": "field",
+        "type": "string",
+        "required": false,
+        "description": "What each sphere is labelled with: a field path into its magick-data\nrow (`name.he`, `planet.name.en.en`, `stones.*.name.en`), or several\njoined by commas, which are drawn space-separated. `index`, the\nsphere's number, when not given.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "flip",
+        "type": "boolean",
+        "required": false,
+        "description": "Seen from behind, the body's view; the stylesheet mirrors the figure.",
+        "control": { "kind": "switch" }
+      },
+      {
+        "name": "fontBaseUrl",
+        "type": "string",
+        "required": false,
+        "description": "Where Noto Sans and Noto Sans Hebrew are served, as\n`NotoSans-Regular.ttf` and `NotoSansHebrew-Regular.ttf` under it. Given\none, the SVG carries `@font-face` rules for them, which an exported SVG\nneeds; the rules name the families for the whole page, as any\n`@font-face` does. Without it the Tree only names the families, and\nthe page supplies them (or falls back to Arial and sans-serif).",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "fontSize",
+        "type": "string | number",
+        "required": false,
+        "description": "The labels' font size; from `field` when not given.",
+        "control": { "kind": "parsed" }
+      },
+      {
+        "name": "height",
+        "type": "string | number",
+        "required": false,
+        "description": "The SVG's height; from the width and the figure's shape when not given.",
+        "control": { "kind": "parsed" }
+      },
+      {
+        "name": "id",
+        "type": "string",
+        "required": false,
+        "description": "The `<svg>`'s id, which its stylesheet is scoped to and every id\ninside it begins with (`<id>-paths`, `<id>-topTextPath0`): letters,\ndigits, `-` and `_`, starting with a letter. One from `useId` when\nnot given, so that several Trees can share a page.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "labels",
+        "type": "readonly string[]",
+        "required": false,
+        "description": "Each sphere's label, Keter first and Da'at eleventh, in place of `field`'s."
+      },
+      {
+        "name": "letterAttr",
+        "type": "\"hebrew\" | \"hermetic\"",
+        "required": false,
+        "description": "Whose letters the paths carry.",
+        "control": { "kind": "choice", "options": ["hebrew", "hermetic"] }
+      },
+      {
+        "name": "pathHref",
+        "type": "((path: TreeOfLifePathRow) => string | null)",
+        "required": false,
+        "description": "A path's link, or `null` for none; `/kabbalah/path/<id>` by default."
+      },
+      {
+        "name": "sephirahHref",
+        "type": "((sephirah: TreeSephirah) => string | null)",
+        "required": false,
+        "description": "A sphere's link, or `null` for none; `/kabbalah/sephirah/<id>` by default."
+      },
+      {
+        "name": "showDaat",
+        "type": "boolean",
+        "required": false,
+        "description": "Draws Da'at. Only the Queen scale colours it, so the King scale leaves\nit out.",
+        "control": { "kind": "switch" }
+      },
+      {
+        "name": "topText",
+        "type": "string",
+        "required": false,
+        "description": "The field path(s) set on an arc above each sphere's label.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "width",
+        "type": "string | number",
+        "required": false,
+        "description": "The SVG's width; the container's, `\"100%\"`, when not given.",
+        "control": { "kind": "parsed" }
+      }
+    ]
+  },
+  "GdHall": {
+    "description": "A Golden Dawn temple hall as inline SVG (plan 061). Pure and SSR-safe:\nlayout comes from `resolveHall`, text widths from the generated font\ntable, and gradient and pattern ids from `useId`, so several halls share\na page. Content is untrusted: strings only reach text nodes, unknown tags\ndraw as dashed placeholders, and nothing is loaded by URL except the\nfonts the caller points at.",
+    "props": [
+      {
+        "name": "hall",
+        "type": "HallNode",
+        "required": true,
+        "description": "The compiled `gdHall` node; anything else draws an empty hall."
+      },
+      {
+        "name": "art",
+        "type": "HallArtRegistry",
+        "required": false,
+        "description": "Art by kind; the package's original art unless the app composes more."
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "required": false,
+        "description": "The `<svg>`'s class.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "fontBaseUrl",
+        "type": "string",
+        "required": false,
+        "description": "Where the hall's WOFF2 subsets are served (such as `/fonts`). When set,\nthe SVG carries its own `@font-face` rules; otherwise the page must.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "height",
+        "type": "string | number",
+        "required": false,
+        "description": "The SVG's height; from the width and the hall's shape when not given.",
+        "control": { "kind": "parsed" }
+      },
+      {
+        "name": "style",
+        "type": "CSSProperties",
+        "required": false,
+        "description": "The `<svg>`'s style."
+      },
+      {
+        "name": "width",
+        "type": "string | number",
+        "required": false,
+        "description": "The SVG's width; from the height and the hall's shape when not given.",
+        "control": { "kind": "parsed" }
+      }
+    ]
+  },
+  "Lamen": {
+    "description": "An officer's lamen: the collar's ring, the disc and the officer's glyph,\nin a −50…50 box. All of it is drawn for this app, the Keryx's caduceus\nand the Sentinel's Eye of Horus from geometry since stage H of plan 061\n(they were an SVG Repo icon and a game-icons.net path before), the\nadepts' since its second part. Defines no ids, so any number can share\na page.",
+    "props": [
+      {
+        "name": "officer",
+        "type": "string",
+        "required": true,
+        "description": "The officer, in camel case (`hierophant`, `pastHierophant`,\n`chiefAdept`; `LAMEN_OFFICERS` lists them). Any other draws a plain\nlamen, and an empty one the Hierophant's.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "grade",
+        "type": "string",
+        "required": false,
+        "description": "The grade whose lamen to draw, for an officer who wears another in it\n(`lamenGrades.ts`: the Portal's Hiereus and Hegemon); otherwise the\nOuter Order's, as the ritual role icons always show.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "height",
+        "type": "string | number",
+        "required": false,
+        "description": "The SVG's height; from the width when not given, as it is square.",
+        "control": { "kind": "parsed" }
+      },
+      {
+        "name": "innerCircleStyle",
+        "type": "CSSProperties",
+        "required": false,
+        "description": "Style for the disc, the inner circle."
+      },
+      {
+        "name": "outerCircleStyle",
+        "type": "CSSProperties",
+        "required": false,
+        "description": "Style for the collar's ring, the outer circle."
+      },
+      {
+        "name": "width",
+        "type": "string | number",
+        "required": false,
+        "description": "The SVG's width; from the height when not given, as it is square.",
+        "control": { "kind": "parsed" }
+      }
+    ]
+  },
+  "RoseSigil": {
+    "description": "The rose-cross sigil of a Hebrew text, drawn through the letters' places\non the rose. It renders the letter centres first, on the server too, then\nspreads repeated and aligned letters with the optimiser once in the\nbrowser, and draws the path on. A client component: the server-safe\ndrawing is `RoseSigilImage`.",
+    "props": [
+      {
+        "name": "sigilText",
+        "type": "string",
+        "required": true,
+        "description": "The text to draw. Final forms are drawn as their base letters, and\nanything not one of the 22 letters (spaces, points, Latin) is left out.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "animate",
+        "type": "boolean",
+        "required": false,
+        "default": "true",
+        "description": "Draws the connecting path on, once the layout is optimised.",
+        "control": { "kind": "switch" }
+      },
+      {
+        "name": "debug",
+        "type": "boolean",
+        "required": false,
+        "default": "false",
+        "description": "Draws each letter's circle and the unoptimised path too.",
+        "control": { "kind": "switch" }
+      },
+      {
+        "name": "showRose",
+        "type": "boolean",
+        "required": false,
+        "default": "true",
+        "description": "Draws the rose's three rings of letters behind the sigil.",
+        "control": { "kind": "switch" }
+      }
+    ]
+  },
+  "SevenBranchedCandleStick": {
+    "description": "The Golden Dawn's seven-branched candlestick: a branch for each of the\nseven planets, with its symbol, Hebrew name, archangel and letter, set\nabout a heptagram.",
+    "props": [
+      {
+        "name": "idPrefix",
+        "type": "string",
+        "required": false,
+        "default": "\"candlestick\"",
+        "description": "Prefixes the text paths' ids, which are document-wide: two of these\non one page need different prefixes. No hook makes one, because the\nimage routes render this outside React's renderer for hooks.",
+        "control": { "kind": "text" }
+      }
+    ]
+  },
+  "TableOfShewbread": {
+    "description": "The Golden Dawn's Table of Shewbread: the twelve signs of the zodiac on a\ncircle, with the permutations of the Tetragrammaton and the tribes of\nIsrael the signs are given.",
+    "props": [
+      {
+        "name": "idPrefix",
+        "type": "string",
+        "required": false,
+        "default": "\"shewbread\"",
+        "description": "Prefixes the text paths' ids, which are document-wide: two of these\non one page need different prefixes. No hook makes one, because the\nimage routes render this outside React's renderer for hooks.",
+        "control": { "kind": "text" }
+      }
+    ]
+  },
+  "FylfotCross": {
+    "description": "The fylfot cross of the signs and elements, as a table of squares.",
+    "props": [
+      {
+        "name": "cells",
+        "type": "(string | null)[][]",
+        "required": false,
+        "description": "What each square shows, row by row; the finished cross by default."
+      },
+      {
+        "name": "ink",
+        "type": "string",
+        "required": false,
+        "description": "The squares' borders, a CSS colour such as a theme's custom property;\nblack by default.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "onClick",
+        "type": "((id: string | null, rowIndex: number, colIndex: number, correctId: string) => void)",
+        "required": false,
+        "description": "Called with a square's id and place when it is clicked. Without it the\nsquares take no clicks, so the cross renders as a Server Component."
+      },
+      {
+        "name": "showColors",
+        "type": "boolean",
+        "required": false,
+        "default": "true",
+        "description": "Colours each arm by its element (default true).",
+        "control": { "kind": "switch" }
+      }
+    ]
+  },
+  "Tablet": {
+    "description": "An Enochian tablet in a version (`version`, the Golden Dawn's by\ndefault): a Watchtower's sigil above its grid on a 210 × 297 page, or\nthe Tablet of Union's grid on a page of its own (`tabletViewBox`). The\nversion's reversed letters are mirrored unless `reversed` is false, and\na Watchtower's second letters drawn small in each square's corner when\n`alt` is true. A key the data does not have draws an empty page; a\ntablet the version does not have, its page saying so. It is an image\nnamed by `tabletName` (an `aria-label`, which shows no tooltip over the\nsquares as a `<title>` would) unless `label` is false, as for a tablet\ndrawn inside a larger drawing that names itself.",
+    "props": [
+      {
+        "name": "id",
+        "type": "string",
+        "required": true,
+        "description": "The tablet, by its key in the data: `earth`, `air`, `water`, `fire` or\n`union`.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "alt",
+        "type": "boolean",
+        "required": false,
+        "default": "false",
+        "description": "Draw each square's second letters small in its corner (default\nfalse). Watchtowers only: no source gives the Tablet of Union a\nsecond letter, so its grid has none to draw.",
+        "control": { "kind": "switch" }
+      },
+      {
+        "name": "enochianStyle",
+        "type": "CSSProperties",
+        "required": false,
+        "description": "Page font style for the grid letters; omitted renders the Latin transliteration."
+      },
+      {
+        "name": "frame",
+        "type": "boolean",
+        "required": false,
+        "default": "true",
+        "description": "CSS border for on-page display; server images omit it since CSS boxes are not SVG.",
+        "control": { "kind": "switch" }
+      },
+      {
+        "name": "height",
+        "type": "string | number",
+        "required": false,
+        "description": "The SVG's height; from the width and the page's shape when not given.",
+        "control": { "kind": "parsed" }
+      },
+      {
+        "name": "highlights",
+        "type": "TabletHighlights",
+        "required": false,
+        "description": "Squares of a Watchtower's grid to outline, and choose by pointer."
+      },
+      {
+        "name": "label",
+        "type": "string | boolean",
+        "required": false,
+        "default": "true",
+        "description": "The accessible name: the tablet's own (`true`), another, or none.",
+        "control": { "kind": "parsed" }
+      },
+      {
+        "name": "reversed",
+        "type": "boolean",
+        "required": false,
+        "default": "true",
+        "description": "Mirror the letters the version reverses (default true).",
+        "control": { "kind": "switch" }
+      },
+      {
+        "name": "version",
+        "type": "string",
+        "required": false,
+        "description": "One of the data's `TABLET_VERSIONS`; the Golden Dawn's (`gd`) when\nabsent or unknown.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "width",
+        "type": "string | number",
+        "required": false,
+        "description": "The SVG's width; from the height and the page's shape when not given.",
+        "control": { "kind": "parsed" }
+      }
+    ]
+  },
+  "Kamea": {
+    "description": "A planet's kamea in an `<svg>` of its own, square, `size` across (240 by\ndefault), the frame inset a little from the edge. With a `label` it is an\nimage of that name; without one, decoration.",
+    "props": [
+      {
+        "name": "planet",
+        "type": "\"sol\" | \"mercury\" | \"venus\" | \"luna\" | \"mars\" | \"jupiter\" | \"saturn\"",
+        "required": true,
+        "description": "The planet, by magick-data's id; without one, or with a name that is\nnot one of the seven, an empty frame.",
+        "control": {
+          "kind": "choice",
+          "options": [
+            "sol",
+            "mercury",
+            "venus",
+            "luna",
+            "mars",
+            "jupiter",
+            "saturn"
+          ]
+        }
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": false,
+        "description": "Drawn over the numbers, in the figure's units (centred on 0,0,\n`KAMEA_SIDE` across; `kameaGeometry` places the cells): room for a\nplanet's seal or sigils to come."
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "required": false,
+        "description": "The `<svg>`'s class.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "fontFamily",
+        "type": "string",
+        "required": false,
+        "description": "The numbers' font stack.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "ink",
+        "type": "string",
+        "required": false,
+        "description": "The frame, the rules and the numbers.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "required": false,
+        "description": "What the square is, for a screen reader (\"Kamea of Saturn\").",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "paper",
+        "type": "string",
+        "required": false,
+        "description": "The square's ground.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "size",
+        "type": "string | number",
+        "required": false,
+        "default": "240",
+        "description": "The drawing's width and height (CSS pixels for a number).",
+        "control": { "kind": "parsed" }
+      },
+      {
+        "name": "style",
+        "type": "CSSProperties",
+        "required": false,
+        "description": "The `<svg>`'s style."
+      }
+    ]
+  },
+  "PlanetarySpirit": {
+    "description": "A planetary spirit's seal, centred in a flex box as tall as its container\nallows. Every prop but `id` and `aria-hidden` is the box's style.",
+    "props": [
+      {
+        "name": "aria-hidden",
+        "type": "boolean",
+        "required": false,
+        "description": "Hides the seal from assistive technology when the text names it.",
+        "control": { "kind": "switch" }
+      },
+      {
+        "name": "id",
+        "type": "string",
+        "required": false,
+        "description": "The spirit, in lower case; none, or an id with no seal, draws nothing.",
+        "control": { "kind": "text" }
+      }
+    ]
+  },
+  "Chakras": {
+    "description": "The seven chakras as coloured circles on a figure's silhouette, from the\nroot at the base of its spine to the crown at the top of its head.",
+    "props": [
+      {
+        "name": "active",
+        "type": "string",
+        "required": false,
+        "description": "A chakra's id in magick-data (`root`, `sacral`, `solar-plexus`,\n`heart`, `throat`, `third-eye`, `crown`): that one is drawn and the\nothers faded. All are drawn when it is absent or names none of them.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "height",
+        "type": "string | number",
+        "required": false,
+        "description": "The SVG's height; from the width and the figure's shape when not given.",
+        "control": { "kind": "parsed" }
+      },
+      {
+        "name": "width",
+        "type": "string | number",
+        "required": false,
+        "description": "The SVG's width; from the height and the figure's shape when not given.",
+        "control": { "kind": "parsed" }
+      }
+    ]
+  },
+  "Moon": {
+    "description": "Today's moon, drawn as it looks from the viewer's hemisphere.\n\n`latitude` is the viewer's, when known (the app passes the reader's place,\nplan 072); the moon is drawn as from the north until it is known to be\nsouth of the equator.",
+    "props": [
+      {
+        "name": "background",
+        "type": "string",
+        "required": false,
+        "description": "The widget's background image, a URL, drawn to cover; none if omitted.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "latitude",
+        "type": "number",
+        "required": false,
+        "description": "The viewer's latitude in degrees, south negative: south of the\nequator, the moon is drawn turned as it is seen from there.",
+        "control": { "kind": "number" }
+      },
+      {
+        "name": "moonPadding",
+        "type": "string",
+        "required": false,
+        "default": "\"10px 0 2px 0\"",
+        "description": "CSS padding around the drawing, inside the night sky.",
+        "control": { "kind": "text" }
+      }
+    ]
+  },
+  "Mercury": {
+    "description": "Mercury's next or current retrograde, worked out in the browser on today's\ndate and shown in the reader's own date format, under a picture of the\nplanet. The page's HTML has a blank line where the dates go.",
+    "props": [
+      {
+        "name": "background",
+        "type": "string",
+        "required": false,
+        "description": "The tile's background image, a URL, drawn to cover; none if omitted.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "image",
+        "type": "string | ImgHTMLAttributes<HTMLImageElement>",
+        "required": false,
+        "description": "Mercury's picture, drawn 85 px square and decorative: a URL, or `<img>`\nprops for a responsive one (Next's `getImageProps()` gives them). None\nif omitted."
+      },
+      {
+        "name": "padding",
+        "type": "string",
+        "required": false,
+        "default": "\"10px 0 2px 0\"",
+        "description": "Space around the picture, as CSS `padding`.",
+        "control": { "kind": "text" }
+      }
+    ]
+  }
+}

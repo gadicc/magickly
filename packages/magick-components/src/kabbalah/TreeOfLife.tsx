@@ -145,12 +145,13 @@ export interface TreeOfLifeProps {
   height?: string | number;
   /** Each sphere's label, Keter first and Da'at eleventh, in place of `field`'s. */
   labels?: readonly string[];
-  /** The scale the spheres are coloured in. */
+  /** The scale the spheres are coloured in; the Queen's when not given. */
   colorScale?: TreeColorScale;
   /**
    * What each sphere is labelled with: a field path into its magick-data
    * row (`name.he`, `planet.name.en.en`, `stones.*.name.en`), or several
-   * joined by commas, which are drawn space-separated.
+   * joined by commas, which are drawn space-separated. `index`, the
+   * sphere's number, when not given.
    */
   field?: string;
   /** The field path(s) set on an arc above each sphere's label. */
@@ -244,8 +245,14 @@ const defaultPathHref = (path: TreeOfLifePathRow) =>
   "/kabbalah/path/" + path.id;
 
 /**
- * The Tree of Life, with an `id` from `useId` when none is given, and, in
- * the browser, given a `ref`, a click on a link setting `location.href`.
+ * The Tree of Life: the ten sephirot (eleven with Da'at) coloured in either
+ * scale and labelled from their magick-data rows, and the twenty-two paths
+ * with their Hebrew letters. Each sphere and path is a link, by default to
+ * a root-relative path (`/kabbalah/sephirah/<id>`, `/kabbalah/path/<id>`),
+ * which `sephirahHref` and `pathHref` change or remove. It reads the data
+ * itself and needs no client code, so it renders as a Server Component.
+ * Its ids come from `useId` when `id` is not given; given a `ref`, a click
+ * on a link in the browser sets `location.href`.
  */
 function TreeOfLife({ id, ref, ...props }: TreeOfLifeProps) {
   const generatedId = `tree-of-life-${React.useId().replace(/[^A-Za-z0-9_-]/g, "_")}`;

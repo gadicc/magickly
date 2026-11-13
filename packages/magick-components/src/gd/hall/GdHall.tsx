@@ -39,9 +39,13 @@ export interface GdHallProps {
    * the SVG carries its own `@font-face` rules; otherwise the page must.
    */
   fontBaseUrl?: string;
+  /** The `<svg>`'s class. */
   className?: string;
+  /** The `<svg>`'s style. */
   style?: CSSProperties;
+  /** The SVG's width; from the height and the hall's shape when not given. */
   width?: number | string;
+  /** The SVG's height; from the width and the hall's shape when not given. */
   height?: number | string;
   /** The drawn `<svg>`, for exporting it. */
   ref?: Ref<SVGSVGElement>;

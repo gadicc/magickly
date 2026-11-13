@@ -411,6 +411,11 @@ export default function Lamen({
   outerCircleStyle,
   innerCircleStyle,
 }: {
+  /**
+   * The officer, in camel case (`hierophant`, `pastHierophant`,
+   * `chiefAdept`; `LAMEN_OFFICERS` lists them). Any other draws a plain
+   * lamen, and an empty one the Hierophant's.
+   */
   officer: string;
   /**
    * The grade whose lamen to draw, for an officer who wears another in it
@@ -418,9 +423,13 @@ export default function Lamen({
    * Outer Order's, as the ritual role icons always show.
    */
   grade?: string;
-  width?: React.CSSProperties["width"];
-  height?: React.CSSProperties["width"];
+  /** The SVG's width; from the height when not given, as it is square. */
+  width?: number | string;
+  /** The SVG's height; from the width when not given, as it is square. */
+  height?: number | string;
+  /** Style for the collar's ring, the outer circle. */
   outerCircleStyle?: React.CSSProperties;
+  /** Style for the disc, the inner circle. */
   innerCircleStyle?: React.CSSProperties;
 }) {
   if (!officer) officer = "hierophant";

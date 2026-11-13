@@ -11,15 +11,25 @@ const chakras = [
 
 const opacityActive = { false: 0.2, true: 1 };
 
-function Chakras({
-  width,
-  height,
-  active,
-}: {
+/** Props of `Chakras`. */
+export interface ChakrasProps {
+  /** The SVG's width; from the height and the figure's shape when not given. */
   width?: string | number;
+  /** The SVG's height; from the width and the figure's shape when not given. */
   height?: string | number;
+  /**
+   * A chakra's id in magick-data (`root`, `sacral`, `solar-plexus`,
+   * `heart`, `throat`, `third-eye`, `crown`): that one is drawn and the
+   * others faded. All are drawn when it is absent or names none of them.
+   */
   active?: string;
-}) {
+}
+
+/**
+ * The seven chakras as coloured circles on a figure's silhouette, from the
+ * root at the base of its spine to the crown at the top of its head.
+ */
+function Chakras({ width, height, active }: ChakrasProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

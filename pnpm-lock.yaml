@@ -339,6 +339,9 @@ importers:
       pug-parser:
         specifier: ^6.0.0
         version: 6.0.0
+      react-docgen-typescript:
+        specifier: 2.4.0
+        version: 2.4.0(typescript@6.0.3)
       serwist:
         specifier: ^9.5.13
         version: 9.5.13(browserslist@4.29.4)(typescript@6.0.3)
@@ -4742,6 +4745,11 @@ packages:
   radash@12.1.1:
     resolution: {integrity: sha512-h36JMxKRqrAxVD8201FrCpyeNuUY9Y5zZwujr20fFO77tpUtGa6EZzfKw/3WaiBX95fq7+MpsuMLNdSnORAwSA==}
     engines: {node: '>=14.18.0'}
+
+  react-docgen-typescript@2.4.0:
+    resolution: {integrity: sha512-ZtAp5XTO5HRzQctjPU0ybY0RRCQO19X/8fxn3w7y2VVTUbGHDKULPTL4ky3vB05euSgG5NpALhEhDPvQ56wvXg==}
+    peerDependencies:
+      typescript: '>= 4.3.x'
 
   react-dom@19.3.1:
     resolution: {integrity: sha512-Y0bARz53lhEC1NMCASs0/j+faB/zqt3R8hpvg1e8+61ZVJ4UL0UdC4cBbXfZMcIuhrfgeILTLe+ZeBCavQPtKQ==}
@@ -9791,6 +9799,10 @@ snapshots:
       yargs: 15.4.1
 
   radash@12.1.1: {}
+
+  react-docgen-typescript@2.4.0(typescript@6.0.3):
+    dependencies:
+      typescript: 6.0.3
 
   react-dom@19.3.1(react@19.3.1):
     dependencies:
