@@ -2123,9 +2123,89 @@ timeouts in the legacy import first).
   plainer than the forms Golden Dawn readers know (no spiral heart, no
   "I8", a V for Hismael). Smoother forms of our own after Heydon are
   possible; the modern ones themselves are not ours to copy.
-- **A credit on the page.** The geomancy reference could say the sigils
-  follow Heydon (1663/4); that is page prose and needs a search-vector
-  refresh, so it was left out.
+- **A credit on the page.** Done: see the source links below.
+
+### Source links and mirrored pages (13 November 2026)
+
+Gadi asked for links from our pages to the scans the sigils follow, and
+then for the public-domain pages to be kept in the repository and shown
+in the app ("repo for now"; the app's R2 storage later if this grows).
+Built on `gate/sigil-sources`, from `main` at `9c32134f`, then rebased
+onto the home page's Open source (`gate/home-open-source`, itself
+rebased onto `main` at `dee60a93`); not merged.
+
+- **The links** (`e643c2cc`). `src/drawings/sigilSources.tsx` holds the
+  archive.org page links and which of Heydon's pages each Ruler's sigil
+  follows. A planet page says "Sigil after Heydon, *Theomagia*
+  (1663/4), p. 13" under the Spirit sigil (Hismael and Zazel p. 15);
+  the geomancy reference links both pages under the spirits' table; the
+  explorer's PlanetarySpirit and Tablet pages say what their sigils are
+  drawn after; on the tablets page, the Air tablet in the Golden Dawn's
+  and Regardie's versions links Plate X for the Air sigil's form (the
+  Equinox's version already cites the plate). Each URL was opened in
+  headless Chromium: `/page/n124` and `/page/n126` of
+  `theomagiaortempl00heyd` show pp. 13 and 15, so archive.org's `n` is
+  the leaf as cited; Plate X is `/page/n256` of the item's file "The
+  Equinox Vol. 1, No. 7" (the viewer rewrites it to `/page/243`, an OCR
+  page number; the `n` form is the stable one). Tests hold the package's
+  JSDoc pages and leaves, and the tablet notes' Plate X, to the module.
+  The prose refreshed the search vectors.
+- **The mirror** (`dd089791`). `src/sources/mirroredPages.ts` lists
+  Heydon's pp. 13 and 15 (n124, n126) and Agrippa's p. CXLIX (n164,
+  the Moon's intelligence of intelligences, which the Moon's note
+  links); `pnpm sources:mirror` downloads each leaf's JPEG, checks its
+  SHA-256 and writes a WebP 1600 px wide at quality 75. **643,838 bytes
+  in all**: 228,774, 203,016 and 212,048. `public/sources/README.md`
+  gives the sources, both hashes, what was changed and the basis
+  (Heydon 1663/4, Agrippa 1533; *Bridgeman v. Corel*, Directive
+  2019/790 Art. 14). The hall seals' leaves (n166, n168) are cited in
+  the package's provenance text but linked from no page, so they are
+  not mirrored; the Equinox's Plate X is not either (who drew it is not
+  established; if Fuller, it is in copyright in the UK and EU to 2036).
+  The service worker does not precache `public/sources`; Serwist's
+  default image rule caches a page when it is viewed.
+- **The lightbox** (`7791c03d`). `SourceLink` keeps the archive.org
+  href (so no JavaScript, or a modified click, goes there) and opens
+  `SourceDialog`: MUI's full-screen Dialog, named by the citation, the
+  page in the reader's pan and zoom surface with the cited region
+  outlined, and a caption naming the copy with links to the page and
+  the whole book. The geomancy reference's byte pin moved by the three
+  links' `aria-haspopup` alone.
+
+Checked in headless Chromium on the worktree's dev server (port 3125,
+CI's placeholder environment), at 390 and 1280 px, light and dark: the
+links on each page and the dialog from a planet page, the Moon's note,
+the reference and the explorer; zoom, Escape and focus returning to
+the link. No documentation screenshot shows these screens.
+
+| Commit | What |
+| --- | --- |
+| `e643c2cc` | `feat(app): Link the sigils' source pages` |
+| `dd089791` | `feat(sources): Mirror the cited source pages` |
+| `7791c03d` | `feat(sources): Open cited pages in a lightbox` |
+
+Before the rebase, each commit passed stage E's gate on its own tree;
+after it each was gated again on its own tree. `e643c2cc`'s
+coverage step failed on 5-second timeouts in two files it does not
+touch (the legacy SQL import, the Enochian keypad) and passed on the
+gate's built-in rerun; both files passed alone. The other two were first
+gated side by side at a load of 40 to 67, and both coverage runs of each
+failed on timeouts across a dozen untouched files (the legacy import,
+the keypad, the hall editor, the semantic editor, among others) and, in
+the lightbox's, its own dialog test, whose waits for the dialog's
+lazily loaded module could add up to more than the test's 5 seconds:
+it now allows 20 (the lightbox commit was amended for that before it
+landed). Every failing file passed alone, and both gates, run again
+one after the other, passed with every step at 0, the coverage step at
+the first attempt. The built service worker's precache lists
+`public/fonts` and nothing under `public/sources`.
+
+**For Gadi:** the zoom buttons zoom about the page's centre, as in the
+hall viewer, so on a phone the outlined column needs a drag after
+zooming; starting zoomed on the outline is possible. The seals'
+provenance text says no image of the book is committed, which stays
+true of the seal art, though one leaf of the same Agrippa copy (n164)
+is now mirrored in the app.
 
 ## Review of the stacked branches (13 November 2026)
 

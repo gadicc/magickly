@@ -350,8 +350,7 @@ Follow-ups are separate from the completed migration work:
   two intelligences, not merged; Air's pins and four halls' moved, and
   the explorer's page for the sigils and the search vectors follow
   ([plan 080](080-open-source-packages.md#the-sigils-sources-13-november-2026)).
-  TODO for Gadi: whether the old files' git history matters, and
-  whether to credit Heydon on the geomancy reference.
+  TODO for Gadi: whether the old files' git history matters.
   A review of the three stacked branches found nothing critical or
   high; its findings (777's and the Golden Dawn's names are variants of
   Agrippa's, Regardie's coloured sigils are not all after Plate X, and
@@ -362,6 +361,13 @@ Follow-ups are separate from the completed migration work:
   components, and an Open source item in its list, on
   `gate/home-open-source`, not merged
   ([plan 080](080-open-source-packages.md#stage-b-13-november-2026)).
+  The pages that show the sigils now link the scans they follow
+  (Heydon's pp. 13 and 15, the Equinox's Plate X), and the
+  public-domain pages among them (Heydon's two and Agrippa's p. CXLIX)
+  are mirrored in `public/sources` (643,838 bytes, kept out of the
+  precache) and open in a lightbox, on `gate/sigil-sources` on top of
+  the home page's, not merged
+  ([plan 080](080-open-source-packages.md#source-links-and-mirrored-pages-13-november-2026)).
   TODO: with Gadi's go-ahead, stage G; stage E's and F's deferred
   items. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups),
