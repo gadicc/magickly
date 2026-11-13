@@ -19,6 +19,12 @@ overrides:
   # of a dependency; vendor/corpora holds the one file it reads.
   corpora: file:vendor/corpora
   "@esbuild-kit/core-utils>esbuild": ^0.25.12
+  # Serwist 9.5.13 (the latest 9.x) pins zod 4.6.5, below the 4.6.6 fix for
+  # GHSA-mrhx-c7xc-m3w5; a patch release of the same major. Drop these once
+  # Serwist ships a release that asks for zod >=4.6.6 (plan 066).
+  "@serwist/build>zod": ^4.6.6
+  "@serwist/next>zod": ^4.6.6
+  "@serwist/webpack-plugin>zod": ^4.6.6
 
 patchedDependencies:
   json-rich-text@1.3.1: patches/json-rich-text@1.3.1.patch
