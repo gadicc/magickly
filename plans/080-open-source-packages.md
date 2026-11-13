@@ -1184,9 +1184,10 @@ third.
   `src/ui/`, and the Enochian webfont with its `next/font/local` wrapper
   to `src/fonts/enochian.ts` and `src/fonts/enochian/`; `Tablet` already
   took the font's style as `enochianStyle`. `Mercury` takes `background`
-  and `image` (a URL or `<img>` props) and draws an `<img>`; the planets
-  page passes `next/image`'s `getImageProps()`, so it still serves the
-  optimised picture. The seven seals are TSX, from SVGR's output for
+  and `image` and draws an `<img>`. The plan said the image is passed as a
+  URL; `image` also takes `<img>` props, so that the planets page can pass
+  `next/image`'s `getImageProps()` and still serve the optimised picture
+  (a plain URL would load the 52 kB original), which a test holds. The seven seals are TSX, from SVGR's output for
   `svg/astrology/spirits/` as `next.config.ts` ran it: each renders to
   the markup the SVG import did, which was checked for all seven. The
   Inkscape files stay as their sources. The known-violations list is
@@ -1208,8 +1209,9 @@ third.
   Two things beyond the plan's list turned up: the fylfot cross used
   Next's styled-jsx, which only Next compiles (elsewhere it would restyle
   every table on the page), and is now a plain `<style>` scoped by a
-  class; and Da'at in the King scale, which has no colour, is drawn
-  unfilled where it threw.
+  class; and Da'at in the King scale, which has no colour, threw. The
+  Tree now leaves it out in that scale, as the app does, and refuses an
+  unknown scale by name ([review](#stage-e-review-13-november-2026), 4).
 - **Client boundaries.** `forwardRef` is gone; the optimiser is
   `gd/roseSigilOptimizer`, which `RoseSigil` catches failures from;
   `RoseSigil` is split from `RoseSigilImage` and alone of the two is
@@ -1252,13 +1254,35 @@ screens and were not regenerated.
 - **The `prepack` and `prepublishOnly` guards** and a kept tarball, with
   `publish.yml`, in stage G; `private` refuses a publish until then.
 - **The Tree page's query** is passed to `TreeOfLife` unchecked, as it
-  always was, now through a cast; an unknown `colorScale` or `letterAttr`
-  in the URL still throws. Validating it in `treeSettings()` is a small
-  follow-up.
-- **The seals' citation** names Agrippa's 1533 edition and its chapter
-  but no archive.org item and leaf, which the house rule on outside
-  sources asks for.
+  always was, now through a cast: an unknown `colorScale` throws the
+  Tree's own error, and an unknown `letterAttr` throws as before.
+  Validating both in `treeSettings()` is a small follow-up.
+- **Which edition Gadi's seals follow.** `planetarySpirits.tsx` cites the
+  seals as the traditional ones printed in the Library of Congress copy
+  of the 1533 edition, by page and leaf, without claiming the Inkscape
+  drawings were traced from that printing. Gadi to confirm which edition
+  he drew from, and the citation to name it if it is another.
 - `actionlint` is not installed here, so the new CI job was not linted.
+
+### Stage E review (13 November 2026)
+
+An independent review of the six commits found nothing critical or high.
+Its findings, with the coordinator's decisions, were applied on the same
+branch before the rebase onto `gate/open-source-hub`.
+
+| # | Finding | Disposition |
+| --- | --- | --- |
+| 1 (medium) | The fylfot cross passed a click handler to every square even without `onClick`, so a Server Component page could not prerender it | Fixed: no handler without `onClick`, and `cells` and `showColors` optional. The smoke test's Next page now renders every server-capable component (twelve) under both bundlers, and a unit test checks the cross without `onClick` |
+| 2 (medium) | The seals' citation had no stable reference | Fixed: archive.org `DeOccultaPhilosophiaLoc1533`, a page and leaf for each spirit's seal (pp. CXLIX–CLIII, leaves n164–n168), read from the scans; Gadi to confirm his source (Deferred) |
+| 3 (low) | The misplaced-directive test's pattern could never match | Fixed, with cases that a directive below the first line is caught and one in a comment is not |
+| 4 (low) | Da'at in the King scale was drawn unfilled where the app treats it as invalid, and an unknown scale drew silently | Fixed: the King scale leaves Da'at out; an unknown scale throws by name; tests for both |
+| 5 (low) | The optimiser, `RoseSigilImage` and `moonPath` were outside coverage | Fixed: in coverage at 95/90/95/95; tests for the optimiser's Node and browser loading bring all three to 100 % |
+| 6 (low) | "The marked components are MIT" on `/about` and the root README | Taken from stage B's rewrite in the rebase |
+| 7 (low) | `dataInputs.ts` linked the old path | Fixed |
+| 8 (low) | The README called the Tree's default links magick.ly's, and did not say a click sets `location.href`; no `engines` | Fixed: root-relative links in the site's scheme, the click, and `engines` (`node >=22`) |
+| 9 (low) | The strict consumer imported a few entries; nothing held the planets page to the optimised image | Fixed: the consumer imports all 35, and a test checks the `/_next/image` source |
+| 10 (low) | `ref` takes no callback ref, undocumented; Mercury's `url()` unquoted | Fixed: documented in the props and the README; the URL is a quoted, escaped CSS string |
+| — | The seals' TSX and their Inkscape files could drift | Fixed: a test runs SVGR as the build did on each file and compares |
 
 ## Review (11 November 2026)
 
