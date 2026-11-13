@@ -89,6 +89,16 @@ export default function HomeText() {
           : ask an AI that answers from a library of magickal texts and cites
           its sources.
         </li>
+        <li>
+          <b>
+            <Link href="/open-source">Open source</Link>
+          </b>
+          : the <Link href="/open-source/data">data</Link> behind the site,
+          every table with its rows and fields, on npm as magick-data, and the{" "}
+          <Link href="/open-source/components">components</Link> that draw the
+          Tree of Life, the tablets and the sigils, each shown live with props
+          to try. The components are not on npm yet.
+        </li>
       </List>
       <H3>For temples</H3>
       <p>

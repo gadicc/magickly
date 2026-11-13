@@ -11,6 +11,7 @@ import AstrologyTile from "./img/astrology.jpeg";
 import EnochianAngel from "./img/enochian-angel.webp";
 import GeomancyImg from "./img/geomancy.webp";
 import MagicalTemple from "./img/magical-temple.webp";
+import OpenSourceImg from "./img/open-source.webp";
 import PortaeLucis from "./img/portae_lucis_upsampled.webp";
 import MagicBook from "./img/shutterstock_393367726_768x512.webp";
 import StudyImg from "./img/study.webp";
@@ -66,6 +67,13 @@ const tiles = [
     to: "https://majou.app/",
     img: MagicBook,
     alt: "Glowing Magical Journal",
+  },
+  {
+    title: "Open source",
+    to: "/open-source",
+    // Drawn by scripts/home-tile/build.mts from our own components.
+    img: OpenSourceImg,
+    alt: "The Tree of Life, an Enochian tablet and a Rose Cross sigil",
   },
   {
     title: "Study",
