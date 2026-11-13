@@ -293,6 +293,17 @@ Follow-ups are separate from the completed migration work:
   `gd-hall.css`, a README and a smoke test that builds a Next fixture
   under both bundlers; still private at 0.0.0. No render hash moved
   ([plan 080](080-open-source-packages.md#stage-e-13-november-2026)).
+  A final review's nine findings are fixed on
+  `gate/components-hardening`, not merged: moon-phase's BSD notice for
+  the Moon's paths, the Moon's background as a prop, named errors for
+  unknown Tree ids and rose letters, two stray Inkscape trees deleted,
+  the fylfot's ink as a prop, a smoke-test leg against the registry's
+  magick-data with a robust `--before`, and the Tree's ids and
+  stylesheet scoped per instance with its fonts a prop. No render hash
+  or pixel moved
+  ([plan 080](080-open-source-packages.md#before-publishing-13-november-2026)).
+  Gadi approved the Tree's markup change. TODO: the app's own credit
+  for moon-phase, with a search-vector refresh.
   TODO: with Gadi's go-ahead, stages C, F and G; stage E's deferred
   items. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups),

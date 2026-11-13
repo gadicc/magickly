@@ -1226,8 +1226,9 @@ third.
   `^0.1.0`) and `@types/luxon` a dependency because the declarations
   name luxon. `fonts/` holds the three subsets and two notices, byte for
   byte `public/fonts` (the font script writes both), `SOURCES.md` and
-  `gd-hall.css`, each held by a test. The tarball has 159 files, 187,052
-  bytes packed and 553,802 unpacked (the spike's had 138 and 159,803 and
+  `gd-hall.css`, each held by a test. The tarball had 159 files, 187,052
+  bytes packed and 553,802 unpacked at this stage ([161, 192,411 and
+  569,542 after the hardening](#before-publishing-13-november-2026)) (the spike's had 138 and 159,803 and
   486,836, before the seals, the fonts' notices and sources, and the
   README). `private` stays, at 0.0.0, until stage G.
 - **The smoke test** (`pnpm --filter magick-components smoke`, about a
@@ -1283,6 +1284,88 @@ branch before the rebase onto `gate/open-source-hub`.
 | 9 (low) | The strict consumer imported a few entries; nothing held the planets page to the optimised image | Fixed: the consumer imports all 35, and a test checks the `/_next/image` source |
 | 10 (low) | `ref` takes no callback ref, undocumented; Mercury's `url()` unquoted | Fixed: documented in the props and the README; the URL is a quoted, escaped CSS string |
 | — | The seals' TSX and their Inkscape files could drift | Fixed: a test runs SVGR as the build did on each file and compares |
+
+## Before publishing (13 November 2026)
+
+A final adversarial review of stage E found nine things to settle before
+`magick-components` is published. They were fixed on
+`gate/components-hardening`, from `gate/magick-components` at
+`15b1370f`, one or two gated commits each, in the order below; not
+merged. Every commit passed stage E's gate (the gate with the package's
+smoke test) on its own tree. Twice the coverage step and its rerun failed
+on 5-second timeouts in tests the commit does not touch, on a machine at
+a load of 40 to 60: at `79c9258d` (the legacy SQL import, the Enochian
+keypad) and at the first version of this record (eight files, from the
+hall editor to the import). Each time the failing files passed alone,
+and the next full gate passed. The Tree's first version failed the
+gate's build, which the tests had not caught: see 9.
+
+| Commit | What |
+| --- | --- |
+| `e276898e` | `fix(components): Carry moon-phase's BSD notice` |
+| `1c6d8c92` | `fix(components): Take the Moon's background as a prop` |
+| `ef0cdbaa` | `fix(components): Name unknown Tree ids and letters` |
+| `f2f3e122` | `chore(components): Remove two unused Inkscape trees` |
+| `7e75d587` | `fix(components): Take the fylfot cross's ink as a prop` |
+| `79c9258d` | `test(components): Smoke-test against registry data` |
+| `d63c32e5` | `fix(components): Scope the Tree's ids and stylesheet` |
+
+| # | Finding | What was done |
+| --- | --- | --- |
+| 1 (high) | `moonPath` and the Moon's disc are a near line-for-line port of `phase_junk()` in [tingletech/moon-phase](https://github.com/tingletech/moon-phase/blob/643015a83509ca6a662d1af6e1ac14661852cedb/moon-phase.js), which is BSD 3-Clause, Copyright © 2012, Regents of the University of California (every file but its background image), while the package said MIT and OFL only and cited the source by its `gh-pages` branch | The package's `LICENSE.txt` carries the BSD notice in full and names the two files it covers, by path; `license` is `(MIT AND OFL-1.1 AND BSD-3-Clause)`. Both files open with a `/*!` attribution pinned to `643015a8`, the commit that last changed `moon-phase.js` (checked against the repository's history on 13 November; `gh-pages` has moved since, in April 2026, without touching that file), which `tsc` keeps in `lib/` and minifiers keep in bundles. Mercury lost a commented-out copy of the same drawing. A test and the smoke test hold the notice, the headers, the SPDX expression and the packed `lib/` files. The root README says so. The app's own credit is not yet made: see below |
+| 1 (high) | `treeOfLifeFigure.tsx` credits [a CodePen](https://codepen.io/hari_shanx/pen/NRyPBz) for Malkuth's wedges | Judged to need no licence, recorded beside the code: what was taken (8f38b96d, June 2022) is the method, a line from the centre to the arc's start, an arc to its end, and back, with the ends found by polar-to-Cartesian arithmetic; a few lines of trigonometry with no expression of their own. CodePen makes public Pens MIT besides ([its licensing page](https://blog.codepen.io/documentation/licensing/)). The pen itself sits behind a bot check and no archived copy exists, so it was not compared line by line. The credit stays |
+| 2 (medium) | The Moon drew `url(/night-sky.jpg)`, a 404 off magick.ly, and its glow filter had the fixed id `glow` | `MoonWidget` takes `background` as Mercury does (a URL drawn to cover, quoted and escaped, none if omitted; the escaping is a shared internal module); the filter's id comes from `useId`. The planets page and the Moon page pass the night sky; the README's "What you supply" says so |
+| 3 (low) | An unknown `letterAttr` or `activePath`, or a letter the rose lacks given to `letterPoint()`, failed inside render with a TypeError | Each throws by name with what it takes, as `colorScale` does, checked as own keys; tests. A path of the other tradition's Tree is still drawn, as the image API always has. The Tree page still passes its query through unchecked ([stage E](#stage-e-13-november-2026), deferred) |
+| 4 (low) | `Tree_of_life_gadi.svg` and `Tree_of_life_gadi 2.svg` sat unused under the MIT `src/`, without a recorded source | Deleted, not moved: nothing used them. History: the first came with `TreeOfLife2.js` on 17 June 2020 (`aaf4d4bd`), both were redone in December 2020 (`f305b4ee`, "not actually used in app"; `4eb256b3`, "not used in site"). The second's `dc:title` is the Wikimedia Commons description of [File:Tree_of_life_bahir_Hebrew.svg](https://commons.wikimedia.org/wiki/File:Tree_of_life_bahir_Hebrew.svg) by User:AnonMoos, public domain, which `/about` credits as the Tree glyph's inspiration. A test now holds `src/` to code, the hall's metrics and test snapshots |
+| 5 (low) | The fylfot cross bordered its squares in `var(--mui-palette-ink, black)`, an app token; the README said every figure is an inline SVG | The cross takes `ink`, a CSS colour, set on the table as a custom property its stylesheet reads, black without it; the app passes its token. (`currentColor` would not do: a coloured square sets its own text colour.) The README says which figures wrap their drawing in HTML: the fylfot's table, the Moon's and Mercury's tiles, the spirit's `<div>` |
+| 6 (low) | Stage E's tarball numbers were stale | At `d63c32e5`: 161 files, 192,411 bytes packed and 569,542 unpacked (`pnpm pack` after the build; the two new files are `lib/cssString.js` and its declaration) |
+| 7 (medium) | The smoke test never took magick-data from the registry, so a component using something magick-data gained after its last publish would pass it and fail for a stranger | A second fixture installs the components' tarball alone, so npm resolves the packed `^x.y.z` from the registry; it checks the lockfile says so, loads every entry, renders the three drawings and type-checks the strict consumer. While the registry lacks the version the components were built with, the leg is skipped with a line saying why. It runs today against 0.1.0, which the workspace's magick-data already differs from (its README and a data fix), and passes |
+| 8 (low) | `npm install --before` a week back failed for any pin, or floor of a range, younger than a week, which `--config.minimumReleaseAge=0` allows | `--before` is a week back or, if later, the newest publish time among the exact pins and the floors of the components' ranges, read with `npm view <name> time`. By hand, `magick-data@0.1.0` (published 12 November) fails with `ETARGET` under a week-old cutoff and installs under its own publish time, which the registry leg needs |
+| 9 (high) | TreeOfLife wrote fixed ids (`TreeOfLife`, `paths`, `sephirot`, `keter`…, `topTextPath0`…), so two Trees repeated them and shared each other's label curves; its stylesheet fetched Noto Sans and Noto Sans Hebrew (about 480 kB) from magick.ly for every consumer and redefined both families page-wide; `a:visited *` was unscoped; `flip` turned every Tree on the page | The root's id is the new `id` prop or one from `useId`; every inner id begins with it and a hyphen, and every rule names `svg#<id>`. Fonts come from the new `fontBaseUrl` prop, as GdHall's do; without it the Tree names the families and loads nothing; the app passes `https://magick.ly/fonts` (`src/fonts/tree.ts`). The three layers carry documented classes (`TREE_LAYER_CLASSES`: `magick-tree-paths`, `magick-tree-path-letters`, `magick-tree-sephirot`), which the app's dark ink now selects on. The drawing itself is `TreeOfLifeSvg`, which takes its id and calls no hook, and `TreeOfLife` adds `useId` and the browser's link handling, as `GdHall` wraps `GdHallSvg`: the image registry's `renderToStaticMarkup` in the `/og` and `/api/render` handlers runs under React's server build, where `useId` has no dispatcher, and the first version failed the build's prerender of the social cards on it (tests now call the registry's Tree as a plain function). The registry draws `TreeOfLifeSvg` with `id="TreeOfLife"`, the root its published images have; the outliner strips every other id |
+
+Gadi approved the Tree's markup changing before publishing (13 November:
+"Yes, change it"), on the conditions that it stay visually identical,
+that every pinned hash or snapshot that moves be named, that the dark
+ink keep working and that the documentation screenshots follow any
+screen they show. Nothing a reader sees moved with the Tree's change,
+which was the commit expected to move render hashes. Every pinned render
+hash, byte count and snapshot passed unchanged, the published ritual Tree's 150,785 bytes
+included, because the registry keeps the old root and outlining drops the
+ids and the stylesheet (the tests that moved read the old ids, not
+hashes: three in the package's Tree tests, two path pages', one grade
+page's); eleven more image API queries (flip, the King
+scale with the Hebrew letters, Da'at, active paths and spheres, other
+fields, PNGs) gave byte-identical output before and after. Ten Tree
+variants (the default, Hebrew names, flipped, Da'at, King, an active path
+and sphere, the grades, the stones) rendered to HTML and rasterised by
+headless Chromium, in light and with the dark ink rules, are
+pixel-identical before and after; two Trees on one page differ only in
+that the unflipped one is no longer mirrored. The markup's differences,
+read line by line, are the prefixed ids, the scoped selectors, the three
+classes and a quote in `local('Noto Sans Hebrew')`. The documentation
+screenshots show no Tree and were not regenerated.
+
+Names that changed, for stage F's rebase: `MoonWidgetProps` (new, with
+`background`); `FylfotCrossProps.ink`; `TreeOfLifeProps.id` and
+`.fontBaseUrl` (which `GradeTree` passes through); the exports
+`TreeOfLifeSvg`, `TreeOfLifeSvgProps` and `TREE_LAYER_CLASSES`; `letterPoint()` now throws for a letter the rose
+lacks; the Tree's ids are prefixed and `id="TreeOfLife"` is gone unless
+passed.
+
+**Not done, for Gadi:**
+
+- **The app's credit for moon-phase.** The BSD licence asks that a
+  binary redistribution reproduce the notice in its documentation or
+  other materials; the app serves the Moon's code to browsers. A credit
+  in `/about#credits` (moon-phase, its copyright line and the licence,
+  linking the components' `LICENSE.txt`) and a sentence after
+  `/open-source`'s MIT line were written, but they change page prose,
+  and refreshing the search vectors (`pnpm search:publish`) was refused
+  by the session's permission check, so both were left out, to land
+  with a vector refresh. Whether that credit should quote the notice in
+  full or link it is Gadi's call.
+- `public/night-sky.jpg` is not moon-phase's background (different
+  bytes); its own source is not recorded here.
 
 ## Review (11 November 2026)
 
