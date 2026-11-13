@@ -29,6 +29,7 @@ export const PRIVATE_ROUTES = [
   "/books/la-science-cabalistique/texte-integral",
   "/admin",
   "/chat/train",
+  "/chat/research",
   "/doc/[_id]/edit",
   "/doc/[_id]/edit/semantic",
   "/gd/components",

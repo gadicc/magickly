@@ -515,14 +515,17 @@ describe("a temple's tab", () => {
     );
     const { container } = show();
     await screen.findByText("Equinox Temple");
+    // The tab label can appear before the dynamically loaded panel mounts its effects.
+    // MUI's scrollable tabs observe their edges too.
+    const thumbnailObservers = () =>
+      observers.filter((observer) =>
+        observer.elements.some((element) => element.closest("section")),
+      );
+    await waitFor(() => expect(thumbnailObservers()).toHaveLength(5));
+    const thumbnails = thumbnailObservers();
     const drawn = () => container.querySelectorAll("[data-drawn]").length;
     runFrames();
     expect(drawn()).toBe(0);
-    // MUI's scrollable tabs observe their edges too.
-    const thumbnails = observers.filter((observer) =>
-      observer.elements.some((element) => element.closest("section")),
-    );
-    expect(thumbnails).toHaveLength(5);
     act(() => {
       for (const observer of thumbnails)
         observer.callback(

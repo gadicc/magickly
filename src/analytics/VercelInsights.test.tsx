@@ -79,3 +79,30 @@ describe("VercelInsights", () => {
     ).toBeNull();
   });
 });
+
+it("mounts no telemetry components on a research document", async () => {
+  await render("/chat/research");
+  expect(queue("vaq")).toEqual([]);
+  expect(queue("siq")).toEqual([]);
+  expect(document.querySelector("script")).toBeNull();
+});
+it("drops queued research events and keeps vitals suppressed after returning to a public route", async () => {
+  const { root, VercelInsights } = await render("/gd");
+  const analytics = queue("vaq").find(
+    ([name]) => name === "beforeSend",
+  )?.[1] as (event: { type: "pageview"; url: string }) => unknown;
+  const speed = queue("siq").find(
+    ([name]) => name === "beforeSend",
+  )?.[1] as (event: { type: "vital"; url: string }) => unknown;
+  expect(
+    analytics({
+      type: "pageview",
+      url: "https://magick.ly/chat/research/%ZZ?private=value",
+    }),
+  ).toBeNull();
+  navigation.pathname = "/chat/research";
+  await act(async () => root.render(<VercelInsights />));
+  navigation.pathname = "/gd";
+  await act(async () => root.render(<VercelInsights />));
+  expect(speed({ type: "vital", url: "https://magick.ly/gd" })).toBeNull();
+});

@@ -6,6 +6,7 @@ import {
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { usePathname } from "next/navigation";
 import * as React from "react";
+import { isResearchPath } from "../chat-research/paths";
 import { insightsPath, insightsUrl, isPublicPath } from "./insightsUrl";
 
 type SpeedInsightsBeforeSend = NonNullable<
@@ -46,6 +47,7 @@ export default function VercelInsights() {
     if (!isPublic) shownPrivatePage = true;
   }, [isPublic]);
 
+  if (isResearchPath(path)) return null;
   return (
     <>
       <Analytics
