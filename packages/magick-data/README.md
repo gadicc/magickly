@@ -364,7 +364,7 @@ provenance, and no version past 0.0.0 ships while a row has none.
 | `alchemy/symbols.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `alchemy/terms.json5` | [Correspondences](#correspondences); `terms` from [the Second Knowledge Lecture](#the-second-knowledge-lecture), with no rights asserted over them | 2026-11-12 |
 | `astrology/houses.json5` | [Correspondences](#correspondences); `interpretation` is ours, following [Lilly](#lillys-houses); `motto.la` is the mnemonic verse as usually quoted, not from Lilly, and `motto.en` our rendering of it ([Lilly's houses](#lillys-houses)) | 2026-11-12 |
-| `astrology/planets.json5` | [Correspondences](#correspondences); `keyOfSolomon` from [the Key of Solomon](#the-key-of-solomon) | 2026-11-12 |
+| `astrology/planets.json5` | [Correspondences](#correspondences); `keyOfSolomon` from [the Key of Solomon](#the-key-of-solomon); `about` and `description` are ours, written from public-domain works the file's header cites | 2026-11-13 |
 | `astrology/zodiac.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `body/parts.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `chakras.json5` | [Correspondences](#correspondences) of the seven-chakra system, facts only: names, places, petals, colours, seed syllables and their elements, and one-to-five-word glosses of the Sanskrit names. The Wikipedia "Chakra" article the file cites is a reference; no share-alike text is copied | 2026-11-12 |

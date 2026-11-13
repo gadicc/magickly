@@ -129,7 +129,7 @@ function TenHeavens({ current }: { current: string }) {
   return (
     <section aria-labelledby="ten-heavens">
       <h2 id="ten-heavens">The ten heavens</h2>
-      <table className={styles.heavens}>
+      <table className={styles.heavens} aria-labelledby="ten-heavens">
         <thead>
           <tr>
             <th scope="col">Heaven</th>
@@ -139,7 +139,7 @@ function TenHeavens({ current }: { current: string }) {
         <tbody>
           {HEAVENS.map(({ sephirah, heaven }) => (
             <tr key={sephirah.id}>
-              <td>
+              <th scope="row">
                 <span className={styles.symbol} aria-hidden="true">
                   {heaven.symbol}
                 </span>
@@ -158,7 +158,7 @@ function TenHeavens({ current }: { current: string }) {
                     <span lang="he-Latn">{heaven.name.he.roman}</span>
                   </span>
                 ) : null}
-              </td>
+              </th>
               <td>
                 <Link href={`/kabbalah/sephirah/${sephirah.id}`}>
                   {sephirah.name.roman}

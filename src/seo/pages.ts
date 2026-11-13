@@ -64,7 +64,7 @@ export const PUBLIC_PAGES = {
     title: "Zodiac Signs, Meanings and Rulers",
     description:
       "The twelve signs of the zodiac with their symbols, meanings, date " +
-      "ranges and ruling planets.",
+      "ranges and ruling planets, from Aries the Ram to Pisces the Fish.",
   },
   "/chat": {
     title: "MagickGPT: Ask an AI About Magick",
@@ -115,7 +115,8 @@ export const PUBLIC_PAGES = {
     title: "Golden Dawn Grades",
     description:
       "The grades of the Golden Dawn from Neophyte 0=0 to Ipsissimus 10=1, " +
-      "with their places on the Tree of Life.",
+      "the Portal among them, with their places on the Tree of Life and " +
+      "their correspondences.",
   },
   "/gd/halls": {
     title: "Golden Dawn Temple Halls: Floor Plans",
@@ -212,7 +213,9 @@ export const PUBLIC_PAGES = {
   "/help/ritual-pug": {
     title: "Ritual Pug guide",
     description:
-      "Write rituals with readable Pug source, visual editing and stable block identities.",
+      "How to write a ritual in Ritual Pug, the source view of the ritual " +
+      "editor: source, split and visual layouts, and block identities that " +
+      "survive edits.",
   },
   "/kabbalah": {
     title: "Kabbalah",
@@ -229,8 +232,8 @@ export const PUBLIC_PAGES = {
   "/kabbalah/yhvh": {
     title: "Shem HaMephorash",
     description:
-      "The Shem HaMephorash, the 72-fold name of God drawn from Exodus " +
-      "14:19–21, and the 72 angels named after it.",
+      "The Shem HaMephorash, the 72-fold name of God drawn from the three " +
+      "72-letter verses of Exodus 14:19–21, and the 72 angels named after it.",
   },
   "/books": {
     title: "Books",

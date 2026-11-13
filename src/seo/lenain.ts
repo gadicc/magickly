@@ -23,13 +23,17 @@ export function lenainChapterPage(slug: string): EntityPage | null {
   const division = divisions.find((entry) => entry.slug === slug);
   if (!division) return null;
 
-  const where =
-    division.slug === "preliminaires"
-      ? "The half-title, the 1823 title page, Papus's preface to the reissue, and Lenain's own Avertissement"
-      : `${division.heading} of Lazare Lenain's La Science Cabalistique (Amiens, 1823)`;
+  const preliminaries = division.slug === "preliminaires";
+  const where = preliminaries
+    ? "The half-title, the 1823 title page, Papus's preface to the reissue, and Lenain's own Avertissement"
+    : `${division.heading.replace(/\s*\.$/, "")} of Lazare Lenain's La Science Cabalistique (Amiens, 1823)`;
+  // Lenain's subtitle where he gives one, quoted; otherwise our English
+  // title, so that no chapter is described by its number alone.
   const what = division.subtitle
     ? `: "${division.subtitle.replace(/\s*\.$/, "")}"`
-    : "";
+    : preliminaries
+      ? ""
+      : `: ${division.title}`;
 
   return {
     path: `${BOOK_PATH}/${division.slug}`,

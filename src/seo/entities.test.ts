@@ -103,17 +103,27 @@ describe("entity pages", () => {
       path: "/gd/grade/1=10",
       title: "Zelator 1=10 Grade",
       description:
-        "The Zelator 1=10 grade of the Golden Dawn, attributed to Malchut on " +
-        "the Tree of Life and the element of Earth, with its correspondences.",
+        "The Zelator 1=10 grade of the Golden Dawn's First Order, attributed " +
+        "to Malchut on the Tree of Life and the element of Earth, with its " +
+        "correspondences.",
     });
     expect(gradePage("portal")).toMatchObject({
       title: "Portal Grade",
       description:
-        "The Portal grade of the Golden Dawn and the element of Spirit, with " +
-        "its correspondences.",
+        "The Portal grade of the Golden Dawn and the element of Spirit, " +
+        "between Philosophus 4=7 and Adeptus Minor 5=6, with its " +
+        "correspondences.",
     });
+    // The neighbours where they fit, so the grades with least to say still
+    // fill a snippet.
     expect(gradePage("0=0")?.description).toBe(
-      "The Neophyte 0=0 grade of the Golden Dawn, with its correspondences.",
+      "The Neophyte 0=0 grade of the Golden Dawn's First Order, the grade of " +
+        "entry, before Zelator 1=10, with its correspondences.",
+    );
+    expect(gradePage("10=1")?.description).toBe(
+      "The Ipsissimus 10=1 grade of the Golden Dawn's Third Order, attributed " +
+        "to Keter on the Tree of Life, the last grade, after Magus 9=2, with " +
+        "its correspondences.",
     );
   });
 
@@ -165,18 +175,19 @@ describe("entity pages", () => {
       title: "Tree of Life Path 11: Keter–Chochmah",
       description:
         "Path 11 of the Tree of Life joins Keter and Chochmah. Hermetic " +
-        "attribution: the letter Aleph and The Fool; Hebrew attribution: He.",
+        'attribution: the letter Aleph (א, "ox") and The Fool; Hebrew ' +
+        "attribution: He.",
     });
     // The trump as its Rider–Waite card prints it, as the page names it:
     // tarot-deck's "The Papess/High Priestess" is two decks at once.
     expect(pathPage("1_6")?.description).toBe(
       "Path 13 of the Tree of Life joins Keter and Tiferet. Hermetic " +
-        "attribution: the letter Gimel and The High Priestess; Hebrew " +
-        "attribution: Dalet.",
+        'attribution: the letter Gimel (ג, "camel") and The High Priestess; ' +
+        "Hebrew attribution: Dalet.",
     );
     expect(pathPage("8_10")?.description).toBe(
       "Path 31 of the Tree of Life joins Hod and Malchut. Hermetic " +
-        "attribution: the letter Shin and Judgement.",
+        'attribution: the letter Shin (ש, "tooth") and Judgement.',
     );
     expect(pathPage("2_5")).toEqual({
       path: "/kabbalah/path/2_5",
@@ -193,6 +204,12 @@ describe("entity pages", () => {
       "Vehuiah (והויה), the 1st angel of the Shem HaMephorash: meaning " +
         '"God elevated and exalted above all things", rules the Hebrews, ' +
         "god name Jehovah, psalm 3:3.",
+    );
+    // An angel with less to say gains its degrees of the zodiac, and loses
+    // the full stop Lenain ends its attribute with.
+    expect(angelPage("sitael")?.description).toBe(
+      "Sitaël (סיטאל), the 3rd angel of the Shem HaMephorash: meaning " +
+        '"God, the hope of all creatures", psalm 90:2, 11–15° of Aries.',
     );
   });
 
@@ -219,6 +236,8 @@ describe("entity pages", () => {
     expect(new Set(pages.map((page) => page.path)).size).toBe(pages.length);
     for (const page of pages) {
       expect(page.title.length, page.path).toBeLessThanOrEqual(48);
+      // Bing reports a description under 110 characters as too short.
+      expect(page.description.length, page.path).toBeGreaterThanOrEqual(110);
       expect(page.description.length, page.path).toBeLessThanOrEqual(160);
       expect(page.description, page.path).not.toMatch(/undefined/);
     }

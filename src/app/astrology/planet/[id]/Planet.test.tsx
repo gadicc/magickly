@@ -57,10 +57,17 @@ const LABELS = [
   "Key of Solomon",
 ];
 
-/** Each table row's label, and its value as text and as markup. */
+/**
+ * Each entity table row's label, and its value as text and as markup; the
+ * ten heavens' row headers are not among them.
+ */
 function rowsOf(html: string) {
+  const table = html.replace(
+    /<section aria-labelledby="ten-heavens">[\s\S]*?<\/section>/,
+    "",
+  );
   return [
-    ...html.matchAll(
+    ...table.matchAll(
       /<tr><th scope="row">([\s\S]*?)<\/th><td>([\s\S]*?)<\/td><\/tr>/g,
     ),
   ].map(([, label, value]) => ({
@@ -101,7 +108,9 @@ function heavensOf(html: string) {
   )?.[1];
   if (!section) return null;
   return [
-    ...section.matchAll(/<tr><td>([\s\S]*?)<\/td><td>([\s\S]*?)<\/td><\/tr>/g),
+    ...section.matchAll(
+      /<tr><th scope="row">([\s\S]*?)<\/th><td>([\s\S]*?)<\/td><\/tr>/g,
+    ),
   ].map(([, heaven, sephirah]) => {
     const slot = heaven.match(
       /^<span class="[^"]*symbol[^"]*" aria-hidden="true">([^<]*)<\/span>/,
@@ -389,10 +398,10 @@ describe("the planet page", () => {
         id,
       ).toEqual(current);
     }
-    // Under a heading of its own, which labels the section, and on no
-    // other page.
-    expect(await page("zodiac")).toContain(
-      '<section aria-labelledby="ten-heavens"><h2 id="ten-heavens">The ten heavens</h2>',
+    // Under a heading of its own, which labels the section and the table,
+    // and on no other page.
+    expect(await page("zodiac")).toMatch(
+      /<section aria-labelledby="ten-heavens"><h2 id="ten-heavens">The ten heavens<\/h2><table class="[^"]*" aria-labelledby="ten-heavens">/,
     );
     for (const id of ids)
       if (Data.planet[id as keyof typeof Data.planet].kind === "planet")

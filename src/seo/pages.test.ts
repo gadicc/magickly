@@ -25,7 +25,8 @@ describe("PUBLIC_PAGES", () => {
   it("keeps titles and snippets within search result lengths", () => {
     for (const [path, page] of entries) {
       expect(shownTitle(page).length, path).toBeLessThanOrEqual(60);
-      expect(page.description.length, path).toBeGreaterThanOrEqual(70);
+      // Bing reports a description under 110 characters as too short.
+      expect(page.description.length, path).toBeGreaterThanOrEqual(110);
       expect(page.description.length, path).toBeLessThanOrEqual(160);
     }
   });

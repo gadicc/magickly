@@ -123,9 +123,22 @@ Follow-ups are separate from the completed migration work:
   160 characters. TODO: two weeks after release, read the planet pages'
   indexing state again; the grades and sephirot share the problem and
   wait on that measurement.
-- TODO: Bing reports meta descriptions too short. The planets are done
-  (plan 078); `/gd/grade/0=0` (68 characters) remains, and some of the 14
-  pages under 110 (plan 028's follow-ups).
+- 13 November 2026: no page in the sitemap has a meta description under
+  110 characters, which Bing reports as too short. The planets were done in plan 078; the other
+  13 short pages are fixed. Four hubs (`/astrology/zodiac`, `/gd/grades`,
+  `/help/ritual-pug`, `/kabbalah/yhvh`) have new texts, accepted by Gadi.
+  The grades now name their order and, where they fit, the grades on
+  either side; the paths give their letter's glyph and meaning; the
+  angels give their degrees of the zodiac; a Lenain chapter with no
+  subtitle takes its English title. 94 descriptions change, and the tests
+  hold every public, entity and chapter page to 110–160 characters. Found
+  on the way: the zodiac table printed its dates as raw data and called
+  Taurus "Bullm"; both fixed, the second in `magick-data` (a patch for
+  the next npm release). The ten heavens on the sphere pages have row
+  headers and a name. Not covered: a public SQL ritual's description
+  (`src/app/doc/[_id]/page.tsx`) is its title and 85 characters, so a
+  short title gives under 110; those pages are indexed but not in the
+  sitemap.
 - Done by 9 November 2026: Search Console lists only `/sitemap.xml`
   (197 pages, 28 images), last read 6 November with no errors;
   `/sitemap-0.xml` is gone ([plan 028](028-seo.md#follow-ups)).

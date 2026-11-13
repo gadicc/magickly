@@ -21,7 +21,13 @@
   vertical-align: top;
 }
 
-.heavens th {
+/* Each row's heaven is its header, for a screen reader, and reads as the
+   cell beside it does. */
+.heavens tbody th {
+  font-weight: inherit;
+}
+
+.heavens thead th {
   border-top: none;
   font-weight: 600;
   color: var(--mui-palette-text-secondary);

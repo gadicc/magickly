@@ -1,4 +1,5 @@
 import Data from "magick-data";
+import { signOf } from "magick-data/kabbalah/seventyTwoAngels/derived";
 import { rowOf } from "magick-data/rowOf";
 import type { SephirahRow } from "magick-data/rows";
 import { dayOf } from "@/components/astrology/planetDays";
@@ -69,21 +70,57 @@ export function planetPage(id: string): EntityPage | null {
   };
 }
 
-/** `/gd/grade/<id>`; the id keeps its `=`, as the sitemap always listed it. */
+const ORDERS: Record<string, string> = {
+  "1st": "First",
+  "2nd": "Second",
+  "3rd": "Third",
+};
+
+/** "Zelator 1=10", or "Portal", which has no numbers. */
+function gradeName(grade: { id: string; name: string }) {
+  return /=/.test(grade.id) ? `${grade.name} ${grade.id}` : grade.name;
+}
+
+/**
+ * `/gd/grade/<id>`; the id keeps its `=`, as the sitemap always listed it.
+ * The order and the neighbouring grades are added where they fit a
+ * snippet, so the grades with least to say still say enough (plan 028's
+ * follow-ups).
+ */
 export function gradePage(id: string): EntityPage | null {
   const grade = rowOf(Data.gdGrade, id);
   if (!grade) return null;
-  const numbered = /=/.test(grade.id) ? ` ${grade.id}` : "";
+  const order = grade.orderId ? `'s ${ORDERS[grade.orderId]} Order` : "";
   const place = grade.sephirah
     ? `, attributed to ${grade.sephirah.name.roman} on the Tree of Life`
     : "";
   const element = grade.element?.name.en
     ? ` and the element of ${grade.element.name.en}`
     : "";
+  const { prev, next } = grade;
+  const neighbours =
+    prev && next
+      ? `, between ${gradeName(prev)} and ${gradeName(next)}`
+      : next
+        ? `, the grade of entry, before ${gradeName(next)}`
+        : prev
+          ? `, the last grade, after ${gradeName(prev)}`
+          : "";
+  const lead = `The ${gradeName(grade)} grade of the Golden Dawn`;
+  const tail = ", with its correspondences.";
+  let description = `${lead}${place}${element}${tail}`;
+  for (const candidate of [
+    `${lead}${order}${place}${element}${neighbours}${tail}`,
+    `${lead}${order}${place}${element}${tail}`,
+  ])
+    if (candidate.length <= MAX_DESCRIPTION) {
+      description = candidate;
+      break;
+    }
   return {
     path: `/gd/grade/${grade.id}`,
-    title: `${grade.name}${numbered} Grade`,
-    description: `The ${grade.name}${numbered} grade of the Golden Dawn${place}${element}, with its correspondences.`,
+    title: `${gradeName(grade)} Grade`,
+    description,
   };
 }
 
@@ -145,10 +182,24 @@ export function pathPage(id: string): EntityPage | null {
   // As the Rider–Waite card the page shows prints it, not as tarot-deck has it.
   const trump = RWSName(hermetic.tarotId);
   const hebrew = hebrewLetter ? `; Hebrew attribution: ${hebrewLetter}` : "";
+  // The letter with its glyph and meaning where they fit: "Shin (ש, "tooth")".
+  const letter = hermetic.hebrewLetter;
+  const name = letter?.letter.name;
+  const describe = (lettered: string | undefined) =>
+    `Path ${pathNo} of the Tree of Life joins ${from} and ${to}. Hermetic attribution: the letter ${lettered} and ${trump}${hebrew}.`;
+  const description =
+    [
+      letter?.meaning?.en &&
+        describe(`${name} (${letter.letter.he}, "${letter.meaning.en}")`),
+      letter && describe(`${name} (${letter.letter.he})`),
+    ].find(
+      (candidate): candidate is string =>
+        !!candidate && candidate.length <= MAX_DESCRIPTION,
+    ) ?? describe(name);
   return {
     path: `/kabbalah/path/${id}`,
     title: `Tree of Life Path ${pathNo}: ${joins}`,
-    description: `Path ${pathNo} of the Tree of Life joins ${from} and ${to}. Hermetic attribution: the letter ${hermetic.hebrewLetter?.letter.name} and ${trump}${hebrew}.`,
+    description,
   };
 }
 
@@ -189,17 +240,22 @@ export function angelPage(slug: string): EntityPage | null {
   if (!angel) return null;
   const name = angel.name.en;
   const hebrew = angel.name.he ? ` (${angel.name.he})` : "";
+  const sign = signOf(angel.no);
+  // Lenain ends a few attributes with a full stop, which a quote mid-list
+  // should not keep.
+  const attribute = angel.attribute.en.replace(/\.$/, "");
   return {
     path: `/kabbalah/angel/${slug}`,
     title: `${name}, Angel ${angel.no} of the Shem HaMephorash`,
     description: correspondences(
       `${name}${hebrew}, the ${ordinal(angel.no)} angel of the Shem HaMephorash`,
       [
-        angel.attribute.en && `meaning "${angel.attribute.en}"`,
+        attribute && `meaning "${attribute}"`,
         angel.people.en && `rules ${angel.people.en}`,
         angel.godName && `god name ${angel.godName}`,
         angel.psalm.psalm > 0 &&
           `psalm ${angel.psalm.psalm}:${angel.psalm.verse}`,
+        `${sign.from}–${sign.to}° of ${Data.zodiac[sign.zodiacId].name.en}`,
       ],
     ),
   };

@@ -11,6 +11,20 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Data from "magick-data";
 
+const DAY = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "long",
+  timeZone: "UTC",
+});
+
+/**
+ * A sign's first or last day, `[month, day]`, as "21 March", kept on one
+ * line so that a narrow column wraps only between the two days.
+ */
+function day([month, date]: readonly number[]) {
+  return DAY.format(Date.UTC(2000, month - 1, date)).replace(" ", "\u00a0");
+}
+
 export default function signs() {
   return (
     <Container maxWidth="sm">
@@ -45,7 +59,7 @@ export default function signs() {
                   <TableCell scope="row">{sign.meaning.en}</TableCell>
 
                   <TableCell scope="row">
-                    {JSON.stringify(sign.rulesFrom)}
+                    {`${day(sign.rulesFrom[0])} – ${day(sign.rulesFrom[1])}`}
                   </TableCell>
 
                   <TableCell scope="row">
