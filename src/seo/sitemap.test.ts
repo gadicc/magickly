@@ -3,6 +3,7 @@ import { resolveSitemap } from "next/dist/build/webpack/loaders/metadata/resolve
 import { describe, expect, it } from "vitest";
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
+import { componentPages } from "./components";
 import { entityPages } from "./entities";
 import { hallPages } from "./halls";
 import { lenainPages } from "./lenain";
@@ -16,7 +17,12 @@ describe("sitemap", () => {
       Object.keys(PUBLIC_PAGES).length +
         entityPages().length +
         lenainPages().length +
-        hallPages().length,
+        hallPages().length +
+        componentPages().length,
+    );
+    expect(urls).toContain("https://magick.ly/open-source/components");
+    expect(urls).toContain(
+      "https://magick.ly/open-source/components/tree-of-life",
     );
     expect(urls).toContain("https://magick.ly/gd/halls/zelator-1");
     expect(urls).toContain("https://magick.ly/gd/halls");

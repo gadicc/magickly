@@ -66,10 +66,14 @@ const pathnames: Pathnames = {
     },
     tree: "Tree of Life",
   },
-  // The component pages join it in plan 080's stage F. Data is a section
-  // so that a table's page below it names itself, as an entity page does,
-  // under "Open source › Data".
-  "open-source": { "/": "Open source", data: { "/": "Data" } },
+  // Data and Components are sections, so that a table's page and a
+  // component's page below them name themselves, as an entity page does,
+  // under "Open source › Data" and "Open source › Components".
+  "open-source": {
+    "/": "Open source",
+    data: { "/": "Data" },
+    components: { "/": "Components" },
+  },
   study: "Study", // TODO, from pages router
   temples: {
     "/": "Temples",

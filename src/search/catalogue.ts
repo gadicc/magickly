@@ -12,8 +12,11 @@ import paths from "magick-data/kabbalah/paths";
 import sephirot from "magick-data/kabbalah/sephirot";
 import angels from "magick-data/kabbalah/seventyTwoAngels";
 import { loadAngelTexts } from "magick-data/kabbalah/seventyTwoAngels/text";
+import { COMPONENT_EXAMPLES, EXPLORER_COMPONENTS } from "@/explorer/components";
+import { PROPS } from "@/explorer/props";
 import { angelSlug } from "@/lib/angelSlugs";
 import { GD_HALLS, gdHallTitle } from "@/render/contracts/gdHall";
+import { componentPages } from "@/seo/components";
 import { entityPages } from "@/seo/entities";
 import { hallDescription, hallPath } from "@/seo/halls";
 import { BOOK_PATH, lenainPages } from "@/seo/lenain";
@@ -125,6 +128,7 @@ export async function buildSearchCatalogue(): Promise<SearchCatalogue> {
     ...Object.entries(PUBLIC_PAGES).map(([path, page]) => ({ path, ...page })),
     ...entityPages(),
     ...lenainPages(),
+    ...componentPages(),
     ...GD_HALLS.map((hall) => ({
       path: hallPath(hall),
       title: gdHallTitle(hall),
@@ -266,6 +270,22 @@ export async function buildSearchCatalogue(): Promise<SearchCatalogue> {
       "Officers and furnishings",
       words(describeHall(preset.hall)),
       `${hallPath(hall)}#hall-stations`,
+    );
+  }
+  // Each component's page: its name, its JSDoc and its examples' titles,
+  // as the page shows them (plan 080, stage F).
+  for (const component of EXPLORER_COMPONENTS) {
+    documents.get(component.path)!.aliases.push(component.name);
+    add(
+      component.path,
+      "component",
+      "Component",
+      [
+        PROPS[component.name].description,
+        ...COMPONENT_EXAMPLES[component.name].examples.map(
+          (example) => example.title,
+        ),
+      ].join(" "),
     );
   }
   return { version: 1, documents: [...documents.values()] };

@@ -20,6 +20,7 @@ import HomeText from "./HomeText";
 import KabbalahText from "./kabbalah/KabbalahText";
 import TreeText from "./kabbalah/tree/TreeText";
 import AngelsText from "./kabbalah/yhvh/72angels/AngelsText";
+import ComponentsText from "./open-source/components/ComponentsText";
 import DataText from "./open-source/data/DataText";
 import { TABLE_NAMES, tablePath } from "./open-source/data/tables";
 import OpenSourceText from "./open-source/OpenSourceText";
@@ -46,6 +47,7 @@ const TEXTS: Record<string, ComponentType> = {
   "/gd/halls": HallsText,
   "/open-source": OpenSourceText,
   "/open-source/data": DataText,
+  "/open-source/components": ComponentsText,
 };
 
 /**

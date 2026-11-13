@@ -87,12 +87,15 @@ describe("siteNav", () => {
     expect(urls(at("/gd").sectionPages)).not.toContain("/gd/rituals/deleted");
   });
 
-  it("names the open-source section, and Data under it", () => {
+  it("names the open-source section, and Data and Components under it", () => {
     expect(at("/open-source")).toMatchObject({
       title: "Open source",
       known: true,
       ancestors: [],
-      sectionPages: [{ title: "Data", url: "/open-source/data" }],
+      sectionPages: [
+        { title: "Data", url: "/open-source/data" },
+        { title: "Components", url: "/open-source/components" },
+      ],
       topSection: "open-source",
     });
     expect(at("/open-source/data")).toMatchObject({
@@ -110,6 +113,22 @@ describe("siteNav", () => {
         { title: "Data", url: "/open-source/data" },
       ],
       topSection: "open-source",
+    });
+  });
+
+  it("lets a component's page name itself, under Open source › Components", () => {
+    expect(at("/open-source/components/tree-of-life")).toMatchObject({
+      known: false,
+      ancestors: [
+        { title: "Open source", url: "/open-source" },
+        { title: "Components", url: "/open-source/components" },
+      ],
+      topSection: "open-source",
+    });
+    expect(at("/open-source/components")).toMatchObject({
+      title: "Components",
+      known: true,
+      ancestors: [{ title: "Open source", url: "/open-source" }],
     });
   });
 

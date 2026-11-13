@@ -1,0 +1,111 @@
+/* A component's page (plan 080, decision 5): its heading, the import, the
+   explorer and the props table. */
+
+.importLine {
+  overflow-x: auto;
+  margin: 8px 0;
+  padding: 12px 16px;
+  border-radius: 4px;
+  background: var(--mui-palette-action-hover);
+  font-size: 0.875rem;
+}
+
+.note {
+  font-size: 0.9rem;
+  color: var(--mui-palette-text-secondary);
+}
+
+.tableFrame {
+  overflow-x: auto;
+  border: 1px solid var(--mui-palette-divider);
+  border-radius: 8px;
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+.table th,
+.table td {
+  text-align: start;
+  vertical-align: top;
+  padding: 8px 12px;
+  border-top: 1px solid var(--mui-palette-divider);
+}
+
+.table thead th {
+  border-top: none;
+  font-weight: 600;
+}
+
+/* The prop's name and default stay on one line; a long type wraps. */
+.table tbody th,
+.table td:nth-child(3) {
+  white-space: nowrap;
+}
+
+.table td:nth-child(2) {
+  min-width: 8rem;
+  max-width: 18rem;
+}
+
+.table td:last-child {
+  min-width: 16rem;
+}
+
+.required {
+  font-weight: normal;
+  font-size: 0.8rem;
+  color: var(--mui-palette-text-secondary);
+}
+
+/* On a phone each prop is a block: its name, type and default on a line,
+   its description below them, rather than a table to scroll sideways. */
+@media (max-width: 599.95px) {
+  .tableFrame {
+    overflow-x: visible;
+  }
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .table tr {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 2px 12px;
+    padding: 8px 12px;
+    border-top: 1px solid var(--mui-palette-divider);
+  }
+  .table tbody tr:first-child {
+    border-top: none;
+  }
+  .table th,
+  .table td {
+    display: block;
+    padding: 0;
+    border-top: none;
+    max-width: none;
+    min-width: 0;
+  }
+  .table td:nth-child(2) {
+    min-width: 0;
+    max-width: none;
+    overflow-wrap: anywhere;
+  }
+  .table td:nth-child(3):empty {
+    display: none;
+  }
+  .table td:nth-child(3)::before {
+    content: "Default ";
+    color: var(--mui-palette-text-secondary);
+  }
+  .table td:last-child {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+}

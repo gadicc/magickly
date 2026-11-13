@@ -114,6 +114,12 @@ describe("/open-source", () => {
     );
   });
 
+  it("links the components' pages from their card", () => {
+    expect(hrefs(card("magick-components"))).toContain(
+      "/open-source/components",
+    );
+  });
+
   it("links files and directories of this repository that exist", () => {
     // Also catches a card whose package has moved (stage E).
     const own = hrefs(html).filter((href) =>

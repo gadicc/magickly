@@ -247,6 +247,12 @@ export const PUBLIC_PAGES = {
       "Every table in magick-data, the site's open data on npm: the sephirot, " +
       "planets, letters, grades and more, with their rows, fields and links.",
   },
+  "/open-source/components": {
+    title: "Open Source React Components: magick-components",
+    description:
+      "magick-components, the MIT React components that draw the Tree of " +
+      "Life, the temple halls, the Enochian tablets and more, each live with its props.",
+  },
   "/books": {
     title: "Books",
     description:

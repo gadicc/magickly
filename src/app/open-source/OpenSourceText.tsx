@@ -154,6 +154,12 @@ export default function OpenSourceText() {
             is MIT, and so are the drawings they make.
           </p>
           <p>
+            <Link href="/open-source/components">
+              The components&apos; pages
+            </Link>{" "}
+            draw each one live, with its props to try and its reference.
+          </p>
+          <p>
             It is not on npm yet. Until it is, the components are in the
             app&apos;s repository, under <code>packages/magick-components</code>
             , where you may copy them under MIT.

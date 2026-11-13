@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { GD_HALLS } from "@/render/contracts/gdHall";
+import { componentPages } from "@/seo/components";
 import { entityPages } from "@/seo/entities";
 import { hallFiles, hallPath } from "@/seo/halls";
 import { lenainPages } from "@/seo/lenain";
@@ -17,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       ...Object.keys(PUBLIC_PAGES),
       ...entityPages().map((page) => page.path),
       ...lenainPages().map((page) => page.path),
+      ...componentPages().map((page) => page.path),
     ].map((path) => ({ url: path === "/" ? SITE_URL : SITE_URL + path })),
     // Each temple hall with its two indexable images, the PNG first (plan
     // 062). Next writes them unescaped, so the URLs carry no query.

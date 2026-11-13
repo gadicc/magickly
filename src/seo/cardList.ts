@@ -1,4 +1,5 @@
 import { hallCardArt, type SocialCard, socialCard } from "./cards";
+import { componentPages } from "./components";
 import { entityPages } from "./entities";
 import { hallPages } from "./halls";
 import { lenainPages } from "./lenain";
@@ -16,6 +17,7 @@ export function socialCards(): SocialCard[] {
       .map(([path, page]) => socialCard(path, page.title)),
     ...entityPages().map((page) => socialCard(page.path, page.title)),
     ...lenainPages().map((page) => socialCard(page.path, page.title)),
+    ...componentPages().map((page) => socialCard(page.path, page.title)),
     // Each temple hall's card draws that hall (plan 062).
     ...hallPages().map((page) =>
       socialCard(

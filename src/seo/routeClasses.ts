@@ -19,6 +19,7 @@ export const ENTITY_ROUTES = [
   // table would compete with the pages that present its rows (plan 080,
   // decision 4).
   "/open-source/data/[table]",
+  "/open-source/components/[name]",
 ];
 
 /** Account, administration, offline and test pages: `noindex`. */

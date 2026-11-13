@@ -1,0 +1,92 @@
+/*
+ * The explorer (plan 080, decision 5): the drawing beside its controls
+ * from 900 px, the JSX below both; one column on a phone, the drawing
+ * first.
+ */
+.explorer {
+  display: grid;
+  gap: 16px 24px;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 16px 0 24px;
+}
+
+@media (min-width: 900px) {
+  .explorer {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    grid-template-areas:
+      "stage panel"
+      "code panel";
+    align-items: start;
+  }
+  .stage {
+    grid-area: stage;
+  }
+  .panel {
+    grid-area: panel;
+  }
+  .code {
+    grid-area: code;
+  }
+}
+
+.stage {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  border: 1px solid var(--mui-palette-divider);
+  border-radius: 8px;
+  background: var(--mui-palette-background-paper);
+}
+
+/* The drawing at most 480 px across; an SVG with no size of its own fills it. */
+.drawing {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  justify-content: center;
+}
+
+.drawing > :global(svg:not([width])) {
+  width: 100%;
+  height: auto;
+}
+
+.panel {
+  min-width: 0;
+}
+
+.controls {
+  border: 1px solid var(--mui-palette-divider);
+  border-radius: 8px;
+  margin: 0;
+  padding: 8px 12px 12px;
+  display: grid;
+  gap: 12px;
+}
+
+.controls legend {
+  padding: 0 4px;
+  font-size: 0.875rem;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.codeHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pre {
+  overflow-x: auto;
+  margin: 4px 0 8px;
+  padding: 12px 16px;
+  border-radius: 4px;
+  background: var(--mui-palette-action-hover);
+  font-size: 0.875rem;
+}
