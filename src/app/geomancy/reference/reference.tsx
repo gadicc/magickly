@@ -26,6 +26,11 @@ import {
   IntelligenceNotes,
 } from "@/app/astrology/planet/Intelligence";
 import Ink from "@/drawings/Ink";
+import {
+  HEYDON_PAGES,
+  HeydonCitation,
+  heydonLabel,
+} from "@/drawings/sigilSources";
 import { capitalizeFirstLetter } from "@/lib/utils";
 import Tetragram from "../Tetragram";
 import { figuresByPairs } from "./pairs";
@@ -210,6 +215,17 @@ export default function Geomancy() {
             </TableBody>
           </Table>
         </TableContainer>
+        <Typography variant="body2" sx={{ mt: 1 }}>
+          The sigils are drawn after{" "}
+          <a href={HEYDON_PAGES[13].url}>
+            <HeydonCitation page={13} />
+          </a>{" "}
+          and{" "}
+          <a href={HEYDON_PAGES[15].url} aria-label={heydonLabel(15)}>
+            p. 15
+          </a>
+          .
+        </Typography>
         {/* The Moon's two intelligences have a note each. */}
         <IntelligenceNotes planet={data.planet.luna} level={3} />
         <br />

@@ -191,6 +191,43 @@ describe("/enochian/tablets' notes", () => {
     );
   });
 
+  it("links Plate X for the Air sigil's form where Regardie's colours draw it", () => {
+    render(<Tablets />);
+    // The source lists name the plate in full: "The Equinox, vol. I no. 7…".
+    const plateX = () =>
+      screen.queryAllByRole("link", {
+        name: "The Equinox I(7) (1912), Plate X",
+      });
+    const url =
+      "https://archive.org/details/crowley-equinox_202110/The%20Equinox%20Vol.%201%2C%20No.%207/page/n256";
+    // Earth's sigil is not drawn after the plate.
+    expect(plateX()).toEqual([]);
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: "Tablet" }));
+    fireEvent.click(screen.getByRole("option", { name: "Air" }));
+    for (const version of ["The Golden Dawn's (default)", "Regardie's print"]) {
+      fireEvent.mouseDown(screen.getByRole("combobox", { name: "Version" }));
+      fireEvent.click(screen.getByRole("option", { name: version }));
+      const links = plateX();
+      expect(
+        links.map((link) => link.textContent),
+        version,
+      ).toEqual(["The Equinox I(7) (1912), Plate X"]);
+      expect(links[0].getAttribute("href")).toBe(`${url}/mode/1up`);
+      expect(links[0].closest("p")?.textContent).toBe(
+        "The Air sigil's form is drawn after The Equinox I(7) (1912), Plate X.",
+      );
+    }
+    // The Equinox's own version cites the plate among its sources instead.
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: "Version" }));
+    fireEvent.click(screen.getByRole("option", { name: "The Equinox's" }));
+    expect(plateX()).toEqual([]);
+    expect(
+      screen
+        .getAllByRole("link", { name: /Plate X \(archive\.org leaf n256\)/ })
+        .map((link) => link.getAttribute("href")),
+    ).toContain(url);
+  });
+
   it("outlines the squares where the sources differ, and explains one", () => {
     const { container } = render(<Tablets />);
     fireEvent.mouseDown(screen.getByRole("combobox", { name: "Tablet" }));

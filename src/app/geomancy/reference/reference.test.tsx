@@ -46,9 +46,12 @@ describe("geomancy reference page", () => {
     // the notes removed the bytes are those before, 63432 ad73c10d…), and
     // when the notes called 777's and the Golden Dawn's names variants and
     // said less about Shelachel (13 November 2026; with the notes' old
-    // words the bytes are those before, 66525 40af8b13…).
+    // words the bytes are those before, 66525 40af8b13…), and when a note
+    // under the spirits' table linked Heydon's pages for the sigils (13
+    // November 2026; with that paragraph and its style removed the bytes
+    // are those before, 66554 c0f8d848…).
     expect(digest(html)).toBe(
-      "66554 c0f8d8485230125def12727c16f00d72fb6ca0978c0f99b94d0b29adf34a379d",
+      "67214 6c1a18b343b05c1982dcf4de9c42671e250eaa143e07716a01b9e55d46a05c4c",
     );
   });
 
@@ -123,5 +126,26 @@ describe("geomancy reference page", () => {
       "Agiel",
     ])
       expect(html).toMatch(new RegExp(`<td[^>]*>${name}</td>`));
+  });
+
+  it("links the two pages of Heydon's the sigils are drawn after", () => {
+    const note = html.match(
+      /<p\b[^>]*>The sigils are drawn after[\s\S]*?<\/p>/,
+    )?.[0];
+    expect(note).toBeDefined();
+    expect(note).toContain(
+      '<a href="https://archive.org/details/theomagiaortempl00heyd/page/n124/mode/1up">Heydon, <cite>Theomagia</cite> (1663/4), p. <!-- -->13</a>',
+    );
+    expect(note).toContain(
+      '<a href="https://archive.org/details/theomagiaortempl00heyd/page/n126/mode/1up" aria-label="Heydon, Theomagia (1663/4), p. 15">p. 15</a>',
+    );
+    // Under the table, before the Moon's notes.
+    expect(
+      positions(html, [
+        "</table>",
+        "The sigils are drawn after",
+        '<h3 id="intelligence-notes-heading">Notes</h3>',
+      ]),
+    ).not.toContain(-1);
   });
 });

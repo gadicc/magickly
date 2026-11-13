@@ -29,6 +29,7 @@ import {
 } from "magick-data/enochian/tablets";
 import React from "react";
 import { plateClass } from "@/drawings/plate";
+import { PLATE_X, PlateXCitation } from "@/drawings/sigilSources";
 import ExportControls from "@/export/ExportControls";
 import OpenSource from "@/OpenSource";
 import { componentImageFilename } from "@/render/componentImageUrl";
@@ -240,6 +241,15 @@ function Comparison({
   );
 }
 
+/**
+ * The versions that draw Regardie's coloured sigils, whose Air sigil takes
+ * its form from the Equinox's Plate X (`Sigils` in the package's Tablet).
+ */
+const REGARDIE_SIGILS: ReadonlySet<TabletVersionId> = new Set([
+  "gd",
+  "regardie",
+]);
+
 /** The chosen version: its note and how it differs from the others. */
 function VersionSection({
   id,
@@ -260,6 +270,16 @@ function VersionSection({
       <Typography variant="body1" sx={{ mt: 1 }}>
         {note.sigils}
       </Typography>
+      {id === "air" && REGARDIE_SIGILS.has(note.id) && (
+        // The Equinox's own version cites Plate X among its sources.
+        <Typography variant="body2" sx={{ mt: 1 }}>
+          The Air sigil&apos;s form is drawn after{" "}
+          <a href={PLATE_X.url} rel="noreferrer">
+            <PlateXCitation />
+          </a>
+          .
+        </Typography>
+      )}
       <Sources sources={note.sources} />
       <Typography variant="h6" component="h3" sx={{ mt: 2 }}>
         How it differs from the others
