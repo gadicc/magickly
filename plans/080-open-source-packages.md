@@ -1028,6 +1028,13 @@ reproduced. Applied in `9d34b8d2`.
   job outside `release.yml`'s path.
 - **Required reviewers on the `npm` environment**, if anyone but Gadi
   ever gets push access to `main` (decision 3).
+- **The Moon's two intelligences need a release and a re-signed row**
+  ([below](#the-moons-two-intelligences-13-november-2026)): the new
+  field `planet.intelligenceOfIntelligences` is a minor change,
+  `magick-data` 0.2.0, and the README's Sources row for
+  `astrology/planets.json5`, signed 2026-11-13, needs Gadi's sign-off
+  again, since the file now quotes 777 Revised and Regardie's
+  spellings beside Agrippa's.
 
 ## Stage B (13 November 2026)
 
@@ -1848,6 +1855,104 @@ picker "(edited)".
   Tree's, the Moon's, the fylfot's and the hall's pages after the
   rebase, each drawn with no error and no `fontBaseUrl` control, and the
   Tree's and the Moon's at 390 px in dark.
+
+## The Moon's two intelligences (13 November 2026)
+
+Built on `gate/moon-intelligence` from `1c77eb49`, then rebased onto
+[the chakras' figure](#the-chakras-figure-13-november-2026), on top of
+[stage F](#stage-f-13-november-2026); not merged. The
+Moon's `intelligenceId` is Shelachel, added in `7dbc4bdf` (24 July 2024)
+with no source. Agrippa, *De occulta philosophia* (1533), Book II,
+chapter 22, gives the Moon no single intelligence but an
+"intelligentia intelligentiarum", Malcha betharsisim hed beruah
+schehakim; 777 and the Golden Dawn give the same name. Gadi asked for
+both, each with a note.
+
+| Commit | What |
+| --- | --- |
+| `dd6d805c` | `feat(magick-data): Add Agrippa's name for the Moon` |
+| `c04e860f` | `feat(astrology): Show both names for the Moon` |
+
+- **The data**: `planet.intelligenceOfIntelligences`, on the Moon only:
+  `he`, Agrippa's Hebrew as printed in 1533 (מלכא בתרשיתים עד ברוח
+  שחקים), and `roman`, the name as each source spells it, keyed
+  `agrippa1533`, `crowley777` and `regardie1940` as the tablets key
+  their readings. `intelligenceId` stays. The header of `planets.json5`
+  cites each source by archive.org item and leaf, and every new path
+  has a description (278 field paths). A test holds the Hebrew to
+  Agrippa's number, 3321, the sum of the Moon's square, with final mem
+  at 600.
+- **The sources, checked against the scans on 13 November**: Agrippa
+  1533 (DeOccultaPhilosophiaLoc1533, n163 and n164) for the six other
+  intelligences and the Moon's name. The 1651 English, p. 243, calls it
+  "The Intelligency of the Intelligence of the Moon" and misprints the
+  name (schehalim; its Hebrew has samekh for a tav and he for chet);
+  b30335231's n256 cuts the line off, the EEBO copy's n271 shows it.
+  777: no scan of the 1909 edition was found; the spelling is 777
+  Revised's (1955) Table III, col. CXCIV, line 13, the transliteration
+  of col. LXXVIII, read in Celephaïs Press's electronic edition
+  (archive.org `aleister-crowley-liber-777`, n27). The romanisation
+  columns may be the 1955 edition's additions; the 1909 text is
+  unchecked. The Golden Dawn: Regardie, *The Golden Dawn*, vol. 4
+  (1940), p. 86. Shelachel is in none of these, nor in Heydon's
+  *Theomagia* (1663, `theomagiaortempl00heyd`, its OCR searched). The
+  research of 13 November found it earliest in a present-day shop's
+  list of the seven, which does not say where it comes from.
+- **The pages**: the planet page's Intelligence row for the Moon reads
+  "מלכא בתרשיתים עד ברוח שחקים Malcha betharsisim hed beruah
+  schehakim¹ / Shelachel²", the Hebrew in Frank Ruhl Libre, and a
+  Notes section closes the page. Note 1 says it is the classical name,
+  from Agrippa 1533 II.22 (linked to the scan), where the Moon has an
+  intelligence of intelligences, and gives 777's and the Golden Dawn's
+  spellings; note 2 says Shelachel is a short modern name found in
+  present-day sources, not in Agrippa, 777 or Heydon. Each reference
+  is a link to its note, described by the notes' heading, and each
+  note links back; targets stop below the app bar and the note reached
+  is tinted. The geomancy reference's spirits table gives the Moon both
+  names with the notes under it (its byte pin moves by exactly those
+  insertions). The shared component is
+  `src/app/astrology/planet/Intelligence.tsx`; the other planets render
+  as before.
+- **Not changed**: the geomancy reading's planet menu and invocation
+  still name Shelachel alone: the menu's columns are 90 px and an
+  option cannot hold a note, and the invocation is a text to be spoken.
+  The planets' meta descriptions never reach the intelligence, which
+  the 160-character limit drops.
+- **Search**: the changed `intelligenceId` description is on the data
+  pages, so `dd6d805c` refreshes the vectors: `search:compare` embedded
+  2 passages per profile, `search:publish` none. The planet page's
+  notes are not in the search prose, so `c04e860f` needed no refresh.
+  On the rebase onto stage F, whose catalogue differs, `dd6d805c` took
+  stage F's vectors and was refreshed again on the rebased tree; with
+  the caches warm, neither command requested a passage.
+- **Checked in a browser**: `next dev` on 127.0.0.1:3124 from the
+  worktree with `ci.yml`'s placeholder environment, headless Chromium
+  over CDP, at 1280 and 390 px, light and dark: the Moon's page and the
+  geomancy reference. No sideways scroll at 390 px; a reference lands
+  on its note 72 px from the top and the note's link returns.
+- **Gated** with stage E's gate, each commit on its own tree in a clean
+  worktree with a fresh install and Node 24.18.0, while other agents'
+  gates kept the load average between 40 and 60, before the rebase onto
+  stage F; after it each commit was gated again on its own tree. The
+  data commit: the first run failed `test-coverage` and its re-run in timeouts in unrelated
+  suites (`sqlLegacyImport`, `r2RitualStorage`, the dictionary keypad,
+  the search dialog and six others); those ten files then passed alone
+  (322 tests), and a second whole gate passed every step, coverage
+  without a re-run. The app commit: `test-coverage` failed in five
+  unrelated files (`sqlLegacyImport`, `TaskSettings`, the hall editor,
+  the hall playground, the dictionary), its re-run passed, and every
+  other step passed; the five also passed alone. This commit changes
+  only the plans.
+
+**Left for Gadi:**
+
+- The release, 0.2.0, and the re-signed Sources row
+  ([follow-up](#follow-ups)).
+- Whether the geomancy reading's invocation should call on the
+  classical name.
+- Which spelling to lead with: the page shows Agrippa's, as asked;
+  777's (Malkah Be Tarshishim va A'ad Be Ruah Shehaqim) is the one
+  most readers will have met.
 
 ## Review (11 November 2026)
 

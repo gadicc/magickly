@@ -331,6 +331,14 @@ Follow-ups are separate from the completed migration work:
   mudra. Built on `gate/chakras-figure` on top of stage F, not merged;
   nothing pinned moved. Gadi approved its look on 13 November
   ([plan 080](080-open-source-packages.md#the-chakras-figure-13-november-2026)).
+  The Moon's intelligence now shows both names, Agrippa's "intelligence
+  of intelligences" and Shelachel, each with a note on its source, on
+  the planet page and the geomancy reference, from a new
+  `planet.intelligenceOfIntelligences`; built on
+  `gate/moon-intelligence` on top of the chakras' figure, not merged
+  ([plan 080](080-open-source-packages.md#the-moons-two-intelligences-13-november-2026)).
+  TODO: release it as `magick-data` 0.2.0 after Gadi re-signs the
+  `astrology/planets.json5` Sources row.
   TODO: with Gadi's go-ahead, stage G; stage E's and F's deferred
   items. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups),
