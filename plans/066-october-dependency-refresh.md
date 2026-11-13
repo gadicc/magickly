@@ -96,6 +96,11 @@ packages and not reachable through the verified current paths:
 - **deepmerge GHSA-gcqx-w48m-w2h4** (low, no patched release), through
   `@svgr/plugin-svgo` at build time.
 
+Resolved on 13 November: zod, glob and minimatch are fixed and deepmerge is
+shown unused; see [13 November 2026: Dependabot
+alerts](#13-november-2026-dependabot-alerts). `@vercel/cli-config` 0.3.6 and
+later ask for zod ^4.6.6, so "every release" above held only until then.
+
 ## Deferred
 
 | Package | Available | Reason |
@@ -124,11 +129,68 @@ the root workspace settings do not reach, was resolved with an explicit
 
 - Re-read the Dependabot list after the push and confirm the stale sharp,
   source-map-js and next alerts close.
-- Decide whether to override Serwist's and `@vercel/cli-config`'s exact zod
+- Resolved 13 November ([below](#13-november-2026-dependabot-alerts)):
+  decide whether to override Serwist's and `@vercel/cli-config`'s exact zod
   pins, or wait for upstream releases.
-- After 3 November, check whether Serwist moves to glob 14; otherwise decide
+- Resolved 13 November ([below](#13-november-2026-dependabot-alerts)):
+  after 3 November, check whether Serwist moves to glob 14; otherwise decide
   on an override.
 - Adopt Biome 2.6 with a decision on Markdown and YAML formatting and on
   `noComponentHookFactories`.
 - `loom check` now advises replacing the local OIDC token acquisition in
   `scripts/release-checks.mjs` with Loom's `createGithubActionsOidcFetch`.
+
+## 13 November 2026: Dependabot alerts
+
+Four alerts were open on `main` at `ed66f81c`, all in `pnpm-lock.yaml`. Work
+on branch `gate/dependabot`; each commit passed the full gate (install,
+`loom check --production`, `pnpm check`, typecheck, smoke, coverage, webpack
+and Turbopack builds) on its own tree. No install relaxed
+`minimumReleaseAge`. `pnpm why -r` gave the paths below; none reaches
+`magick-data`, which has no runtime dependencies.
+
+| Alert | Path before | Fix | Commit |
+| --- | --- | --- | --- |
+| #362 zod GHSA-mrhx-c7xc-m3w5 (high), fixed in 4.6.6 | 4.1.11: `@vercel/functions` 3.10.3 → `@vercel/oidc` 4.0.3 → `@vercel/cli-config` 0.3.3 (exact pin), which reads the local Vercel CLI configuration for OIDC token refresh; in 3.10.3 neither the package root nor `/headers` loads `@vercel/oidc`, so the app's imports never loaded it | `@vercel/functions` ^3.11.0 (3.11.1 and 3.11.2 are under seven days old, so 3.11.0 resolved): `@vercel/oidc` 4.0.7 → `@vercel/cli-config` 0.3.7, which asks for zod ^4.6.6 and shares the app's 4.6.7. 3.11.0's root adds an eager `require("./affinity")`, so importing `@vercel/functions` now loads `@vercel/oidc` and `@vercel/cli-config` at module load (checked with `require.cache`; zod itself is not loaded until a token refresh). The app imports the root only from `src/api-lib/ipCheck.ts`, which nothing imports; `src/geo/vercelGeo.ts` imports `/headers`, which loads neither | `810f60b0` |
+| #362, second copy | 4.6.5: `@serwist/build`, `@serwist/next`, `@serwist/webpack-plugin` 9.5.13 (exact pins, build time only); 9.5.13 is the newest 9.x | `"<serwist package>>zod": ^4.6.6` overrides in `pnpm-workspace.yaml`, a patch move; one zod (4.6.7) remains in the lockfile | `0cd92782` |
+| #364 glob GHSA-3g3m-2fjr-6pw4 (moderate), fixed in 14.0.2; #366 minimatch GHSA-g3hv-75wg-m249 (moderate), fixed in 11.0.1 | glob 13.0.6 → minimatch 10.2.6, exact pin of `@serwist/build` and `@serwist/next` 9.5.13, build time only | `"@serwist/build>glob"` and `"@serwist/next>glob"`: ^14.0.2, resolving glob 14.0.4, minimatch 11.0.5, path-scurry 3.0.0 and a new transitive `@isaacs/nonrecursive-glob-match` 1.1.0 (BlueOak-1.0.0, no install scripts); `lru-cache` 11.5.2 dropped out, deduped to 11.5.3 | `eb06fe39` |
+| #363 deepmerge GHSA-gcqx-w48m-w2h4 (low), no fix released | `@svgr/webpack` 8.1.0 (devDependency) → `@svgr/plugin-svgo` 8.1.0 → deepmerge 4.3.1 | none; see below | — |
+
+**Glob 14 compatibility.** Serwist imports only `globSync` and passes `cwd`,
+`follow`, `ignore`, `nodir` and `absolute`, with relative ignore patterns.
+The breaking items in the glob 14 and minimatch 11 changelogs are ignore
+patterns that start with `/`, `ignore` patterns following
+`windowsPathsNoEscape`, an aborted async walk now stopping instead of
+rejecting and carrying on, the removed `debug` option, walker and
+`Minimatch` internals, empty trailing path portions and Windows UNC roots.
+None touches those calls (`globSync` only, POSIX paths, no signal), and
+`globSync` still returns `string[]`. In our
+build only `@serwist/next`'s clean-up of old worker files globs, since
+`next.config.ts` supplies `additionalPrecacheEntries`. Serwist's four call
+shapes, run with glob 13.0.6 and 14.0.4 on a copy of `public/` with worker
+files, `node_modules` folders and symlinks added, returned identical lists.
+The advisories need an aborted async walk (Serwist never passes a signal) or
+a hostile pattern (Serwist's are fixed in its code and our config).
+
+**deepmerge.** `@svgr/plugin-svgo` 8.1.0 declares deepmerge but its
+`dist/index.js`, its only code, never requires it, and no other package in
+the tree imports it, so `mergeObject()` is never called. It runs only when
+webpack or Turbopack load our own SVG files. The alert can be dismissed as
+"vulnerable code not actually used"; the remaining risk is not reachable
+through the verified current paths. Revisit if a release of
+`@svgr/plugin-svgo` starts using deepmerge, or when deepmerge publishes a fix.
+
+**Remaining risk.** None of the four advisories is reachable through the
+verified current paths after these commits; that is not a claim of no risk.
+The overrides run Serwist 9.5.13 against newer zod and glob releases than
+it was published with; the gate's production build runs its worker build.
+The gate builds' `public/sw.js` for `0cd92782` (glob 13) and `eb06fe39`
+(glob 14) differ only in `/_next/` chunk names and the build ID in the
+precache manifest; the worker code and every `public/` entry are
+identical.
+
+**Revisit.** Drop the five Serwist overrides when Serwist ships a release
+whose dependencies ask for zod ^4.6.6 and glob ^14.0.2 (9.x after 9.5.13,
+or 10.0 when it leaves preview); `pnpm why -r glob zod` shows when they have
+become no-ops. If Serwist moves to glob 15, the ^14.0.2 override would force
+it back down, so drop or widen the overrides whenever Serwist updates.

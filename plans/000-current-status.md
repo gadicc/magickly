@@ -99,6 +99,13 @@ Follow-ups are separate from the completed migration work:
   [October dependency refresh](066-october-dependency-refresh.md), with the
   remaining exact-pin zod, glob and minimatch advisories, the deferred Biome
   2.6 and identity-bound packages, and their follow-ups.
+- 13 November 2026: Dependabot alerts #362 (zod), #364 (glob) and #366
+  (minimatch) fixed by a `@vercel/functions` bump and parent-scoped
+  overrides of Serwist's exact zod and glob pins (glob 14 checked against
+  Serwist's calls); #363 (deepmerge, no fix) is declared by
+  `@svgr/plugin-svgo` but never imported, for Gadi to dismiss. Recorded in
+  [plan 066](066-october-dependency-refresh.md#13-november-2026-dependabot-alerts),
+  with when to drop the overrides.
 
 - TODO: rate limiting for the public component image routes
   (`/api/render/*`, `/api/treeOfLife`). Each distinct query renders through
