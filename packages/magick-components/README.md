@@ -35,10 +35,10 @@ own files: its code MIT, its data CC BY 4.0, with credit to
 [AGPL-3.0-or-later](https://github.com/gadicc/magickly/blob/main/LICENSE.txt);
 this package is deliberately freer, so that it can travel.
 
-Each traced drawing names the public-domain edition it follows: the
-planetary spirits' seals follow Agrippa's *De occulta philosophia*
-(1533), for example. Layouts taken from modern books are facts, drawn in
-our own art.
+A drawing after an old source cites a public-domain edition of it: the
+planetary spirits' seals are the traditional ones, as Agrippa's *De
+occulta philosophia* (1533) prints them, cited by page. Layouts taken from
+modern books are facts, drawn in our own art.
 
 ## Installing
 
@@ -170,8 +170,13 @@ sigil, and final forms are drawn as their base letters.
 - **Mercury's pictures.** `Mercury` takes its background and the planet's
   picture as `background` and `image` (a URL, or `<img>` props such as
   Next's `getImageProps()` gives), and draws none of its own.
-- **Links.** `TreeOfLife` links each sphere and path to magick.ly's paths
-  (`/kabbalah/sephirah/…`) unless you pass `sephirahHref` and `pathHref`.
+- **Links.** `TreeOfLife` links each sphere and path to a root-relative
+  path in the scheme magick.ly uses (`/kabbalah/sephirah/tiferet`,
+  `/kabbalah/path/1_2`), which on your site is your own path, unless you
+  pass `sephirahHref` and `pathHref` (return `null` for no link). Given a
+  `ref`, it follows a click on a link by setting `location.href` in the
+  browser, a full page load rather than your router's navigation. The
+  `ref` is a ref object (`useRef`), not a callback ref.
 
 ## Versions
 
@@ -181,6 +186,6 @@ version it was built with (`^0.x`), and moves with it.
 
 ## Requirements
 
-React 19 and an ES module environment: Node 22 or later, or any current
-bundler. The declarations name `.ts` files, as magick-data's do;
+React 19 and an ES module environment: Node 22 or later (`engines`
+says so), or any current bundler. The declarations name `.ts` files, as magick-data's do;
 TypeScript 6 reads them under `bundler` and `nodenext`.

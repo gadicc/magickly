@@ -72,6 +72,75 @@ const CLIENT_MODULES = [
   "lib/astrology/Moon.js",
   "lib/gd/RoseSigil.js",
 ];
+/**
+ * Every component that can render as a Server Component, as the Next page
+ * draws it: [its id on the page, its imports, its JSX]. A component that
+ * passes a function to the browser, such as an event handler it was not
+ * given, fails the page's prerender.
+ */
+const SERVER_DRAWINGS = [
+  [
+    "tree",
+    `import TreeOfLife from "magick-components/kabbalah/TreeOfLife";`,
+    `<TreeOfLife field="name.he" width={300} />`,
+  ],
+  [
+    "grade-tree",
+    `import GradeTree from "magick-components/gd/GradeTree";`,
+    `<GradeTree />`,
+  ],
+  [
+    "hall",
+    `import { GdHall } from "magick-components/gd/hall";\nimport { hallPreset } from "magick-components/gd/hall/presets";`,
+    `<GdHall hall={hallPreset("neophyte")!.hall} />`,
+  ],
+  [
+    "lamen",
+    `import Lamen from "magick-components/gd/Lamen";`,
+    `<Lamen officer="hierophant" />`,
+  ],
+  [
+    "candlestick",
+    `import SevenBranchedCandleStick from "magick-components/gd/SevenBranchedCandleStick";`,
+    `<SevenBranchedCandleStick />`,
+  ],
+  [
+    "shewbread",
+    `import TableOfShewbread from "magick-components/gd/TableOfShewbread";`,
+    `<TableOfShewbread />`,
+  ],
+  [
+    "fylfot",
+    `import FylfotCross from "magick-components/gd/symbols/fylfot-cross";`,
+    `<FylfotCross />`,
+  ],
+  [
+    "rose",
+    `import { RoseSigilImage } from "magick-components/gd/RoseSigilImage";\nimport { sigilPoints } from "magick-components/gd/roseSigilGeometry";`,
+    `<RoseSigilImage sigilText="שלום" showRose debug={false} points={sigilPoints("שלום")} />`,
+  ],
+  [
+    "tablet",
+    `import Tablet from "magick-components/enochian/Tablet";`,
+    `<Tablet id="water" />`,
+  ],
+  [
+    "kamea",
+    `import Kamea from "magick-components/astrology/Kamea";`,
+    `<Kamea planet="saturn" />`,
+  ],
+  [
+    "spirit",
+    `import PlanetarySpirit from "magick-components/astrology/planetarySpirits";`,
+    `<PlanetarySpirit id="zazel" height="2em" />`,
+  ],
+  [
+    "chakras",
+    `import Chakras from "magick-components/chakras/Chakras";`,
+    `<Chakras />`,
+  ],
+];
+
 /** The entries only the live rose sigil needs, which reach nlopt-js. */
 const NLOPT_ENTRIES = ["./gd/RoseSigil", "./gd/roseSigilOptimizer"];
 
@@ -319,7 +388,14 @@ console.log(entries.length, "entries;", tree.length, hall.length, rose.length, "
   step("a strict consumer type-checks under bundler and nodenext", () => {
     write(
       join(fixture, "types", "consumer.tsx"),
-      `import TreeOfLife, { type TreeColorScale } from "magick-components/kabbalah/TreeOfLife";
+      `${entries
+        .map(
+          (entry, i) =>
+            `import * as entry${i} from "magick-components/${entry.slice(2)}";`,
+        )
+        .join("\n")}
+export const all = [${entries.map((_, i) => `entry${i}`).join(", ")}];
+import TreeOfLife, { type TreeColorScale } from "magick-components/kabbalah/TreeOfLife";
 import { GdHall, type HallNode } from "magick-components/gd/hall";
 import { hallPreset } from "magick-components/gd/hall/presets";
 import RoseSigil from "magick-components/gd/RoseSigil";
@@ -406,12 +482,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           `import * as entry${i} from "magick-components/${entry.slice(2)}";`,
       )
       .join("\n")}
-import TreeOfLife from "magick-components/kabbalah/TreeOfLife";
-import { GdHall } from "magick-components/gd/hall";
-import { hallPreset } from "magick-components/gd/hall/presets";
-import { RoseSigilImage } from "magick-components/gd/RoseSigilImage";
-import { sigilPoints } from "magick-components/gd/roseSigilGeometry";
-import Tablet from "magick-components/enochian/Tablet";
+${SERVER_DRAWINGS.map(([, imports]) => imports).join("\n")}
 import MoonWidget from "magick-components/astrology/Moon";
 import MercuryWidget from "magick-components/astrology/Mercury";
 import { ClientTree } from "./ClientTree";
@@ -419,13 +490,9 @@ import { ClientTree } from "./ClientTree";
 const loaded = [${serverEntries.map((_, i) => `entry${i}`).join(", ")}];
 
 export default function Page() {
-  const hall = hallPreset("neophyte")?.hall;
   return (
     <main data-entries={loaded.length}>
-      <div id="server-tree"><TreeOfLife field="name.he" width={300} /></div>
-      {hall && <div id="server-hall"><GdHall hall={hall} /></div>}
-      <div id="server-rose"><RoseSigilImage sigilText="שלום" showRose debug={false} points={sigilPoints("שלום")} /></div>
-      <div id="server-tablet"><Tablet id="water" /></div>
+${SERVER_DRAWINGS.map(([id, , jsx]) => `      <div id="server-${id}">${jsx}</div>`).join("\n")}
       <MoonWidget />
       <MercuryWidget image="/m.webp" />
       <ClientTree />
@@ -518,15 +585,15 @@ export default nextConfig;
       () => {
         write(join(fixture, "next.config.ts"), nextConfig(false));
         const html = build(bundler)("index");
-        for (const marker of [
-          'id="TreeOfLife"',
-          "תפארת",
-          'id="server-hall"',
-          'id="server-rose"',
-          'id="server-tablet"',
-          'id="client-tree"',
-        ])
+        for (const marker of ['id="TreeOfLife"', "תפארת", 'id="client-tree"'])
           assert(html.includes(marker), `the page has ${marker}`);
+        for (const [id] of SERVER_DRAWINGS)
+          assert(
+            new RegExp(`id="server-${id}"><(svg|table|style|div)[ >]`).test(
+              html,
+            ),
+            `the server drew ${id}`,
+          );
         const css = readdirSync(join(fixture, ".next", "static"), {
           recursive: true,
         }).filter((file) => String(file).endsWith(".woff2"));

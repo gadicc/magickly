@@ -60,20 +60,30 @@ const STYLE = `
 }
 `;
 
-export default function FylfotCross({
-  cells = fylfot,
-  onClick,
-  showColors = true,
-}: {
-  cells: (string | null)[][];
+/** Props of the fylfot cross. */
+export interface FylfotCrossProps {
+  /** What each square shows, row by row; the finished cross by default. */
+  cells?: (string | null)[][];
+  /**
+   * Called with a square's id and place when it is clicked. Without it the
+   * squares take no clicks, so the cross renders as a Server Component.
+   */
   onClick?: (
     id: string | null,
     rowIndex: number,
     colIndex: number,
     correctId: string,
   ) => void;
-  showColors: boolean;
-}) {
+  /** Colours each arm by its element (default true). */
+  showColors?: boolean;
+}
+
+/** The fylfot cross of the signs and elements, as a table of squares. */
+export default function FylfotCross({
+  cells = fylfot,
+  onClick,
+  showColors = true,
+}: FylfotCrossProps) {
   return (
     <>
       <style>{STYLE}</style>
@@ -85,9 +95,9 @@ export default function FylfotCross({
                 const correctId = fylfot[rowIndex][colIndex];
                 const isCorrect = id === correctId;
 
-                const _onClick = () =>
-                  onClick &&
-                  onClick(id, rowIndex, colIndex, correctId as string);
+                const _onClick = onClick
+                  ? () => onClick(id, rowIndex, colIndex, correctId as string)
+                  : undefined;
 
                 let background: undefined | string = undefined;
                 let color: undefined | string = undefined;

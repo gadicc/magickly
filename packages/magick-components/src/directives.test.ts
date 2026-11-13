@@ -27,6 +27,17 @@ function sources(directory: string): string[] {
   });
 }
 
+/**
+ * Whether a module has a `"use client"` statement after its first line,
+ * where it is no directive at all; a comment that names one does not count.
+ */
+function misplacedDirective(source: string): boolean {
+  return source
+    .split("\n")
+    .slice(1)
+    .some((line) => /^\s*["']use client["'];?\s*$/.test(line));
+}
+
 const relative = (file: string) =>
   path.relative(root, file).split(path.sep).join("/");
 
@@ -42,11 +53,22 @@ describe("client directives", () => {
 
   it("puts the directive nowhere but a module's first line", () => {
     const misplaced = files.filter((file) =>
-      /^(?!^)\s*"use client";/m.test(
-        readFileSync(file, "utf8").split("\n").slice(1).join("\n"),
-      ),
+      misplacedDirective(readFileSync(file, "utf8")),
     );
     expect(misplaced.map(relative)).toEqual([]);
+  });
+
+  it("finds a directive below the first line, and not one in a comment", () => {
+    expect(misplacedDirective('"use client";\nimport x from "y";\n')).toBe(
+      false,
+    );
+    expect(misplacedDirective('import x from "y";\n"use client";\n')).toBe(
+      true,
+    );
+    expect(misplacedDirective('// x\n  "use client";\n')).toBe(true);
+    expect(
+      misplacedDirective('/**\n * marked "use client" it carried\n */\n'),
+    ).toBe(false);
   });
 
   it("has each client module export only its component and types", () => {

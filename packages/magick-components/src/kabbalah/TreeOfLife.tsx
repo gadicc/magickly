@@ -25,6 +25,9 @@ export type TreeColorScale = keyof SephirahRow["color"] extends infer Key
     : never
   : never;
 
+/** The colour scales, as `colorScale` takes them. */
+export const TREE_COLOR_SCALES: readonly TreeColorScale[] = ["queen", "king"];
+
 /**
  * Which tradition puts the Hebrew letters on the paths: the Golden Dawn's
  * Hermetic Tree (`hermetic`) or the older Hebrew one (`hebrew`), as
@@ -163,11 +166,18 @@ export interface TreeOfLifeProps {
   activePath?: string;
   /** Seen from behind, the body's view; the stylesheet mirrors the figure. */
   flip?: boolean;
-  /** Draws Da'at, which only the Queen scale colours. */
+  /**
+   * Draws Da'at. Only the Queen scale colours it, so the King scale leaves
+   * it out.
+   */
   showDaat?: boolean;
   /** The labels' font size; from `field` when not given. */
   fontSize?: string | number;
-  /** The `<svg>`; in the browser its links are followed by `location.href`. */
+  /**
+   * The `<svg>`, as a ref object (`useRef`); a callback ref is not
+   * accepted. Given one, a click on a link in the browser sets
+   * `location.href`, a full page load.
+   */
   ref?: React.RefObject<SVGSVGElement | null>;
 }
 
@@ -194,7 +204,12 @@ function TreeOfLife({
   fontSize,
   ref,
 }: TreeOfLifeProps) {
-  const color = `${colorScale || "queen"}Web` as const;
+  const scale = colorScale || "queen";
+  if (!TREE_COLOR_SCALES.includes(scale))
+    throw new Error(
+      `TreeOfLife: unknown colorScale ${JSON.stringify(scale)}; expected one of ${TREE_COLOR_SCALES.join(", ")}`,
+    );
+  const color = `${scale}Web` as const;
   width = width || "100%";
   field = field || "index";
   const fieldPaths = field;
@@ -241,20 +256,22 @@ function TreeOfLife({
 
   const labelled: readonly string[] = labels;
   /**
-   * The ith sphere: Keter first, Da'at eleventh. Da'at has no King colour,
-   * so in that scale it is drawn unfilled.
+   * The ith sphere: Keter first, Da'at eleventh. Da'at has no King
+   * colour, so in that scale it is left out (below).
    */
   const sphere = (i: number): TreeSephirah => ({
     x: SEPHIRAH_CENTRES[i].x,
     y: SEPHIRAH_CENTRES[i].y,
     data: _sephirot[i],
-    color: _sephirot[i].color[color] ?? "none",
+    // Every sphere but Da'at is coloured in both scales (magick-data).
+    color: _sephirot[i].color[color] as string,
     text: labelled[i] ?? "",
     textColor: _sephirot[i].color[`${color}Text`],
   });
   const sephirot = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(sphere);
 
-  if (showDaat) sephirot.push(sphere(10));
+  if (showDaat && _sephirot[10].color[color] !== undefined)
+    sephirot.push(sphere(10));
 
   //console.log(sephirot);
 

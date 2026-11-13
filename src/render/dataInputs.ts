@@ -13,7 +13,8 @@ import enochianTablet, {
  * A per-table content hash would re-identify every published Tree when a
  * `scent` typo is fixed. What is hashed here instead is the *resolved* value
  * of each field the component actually reads: the same dotted paths the
- * render passes to [readFieldPath](../components/kabbalah/fieldPath.ts),
+ * render passes to
+ * [readFieldPath](../../packages/magick-components/src/kabbalah/fieldPath.ts),
  * resolved over the assembled barrel. Because links are resolved before
  * hashing, an edit two hops away is covered without naming the table it is
  * in — repointing `sephirah.keter.archangelId` changes the resolved

@@ -101,7 +101,11 @@ describe("MercuryWidget", () => {
     );
     expect(responsive).toContain('srcSet="/m.webp?w=96 1x"');
     expect(renderAt(at, <MercuryWidget background="/sky.jpg" />)).toContain(
-      "background:url(/sky.jpg)",
+      "background:url(&quot;/sky.jpg&quot;)",
     );
+    // A URL cannot close the url() and add rules of its own.
+    expect(
+      renderAt(at, <MercuryWidget background={'a") red; x: url("b'} />),
+    ).toContain("background:url(&quot;a\\22 ) red; x: url(\\22 b&quot;)");
   });
 });

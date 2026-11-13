@@ -101,3 +101,17 @@ describe("the planets table", () => {
     expect(links).toContainEqual(["mercury", "Mercury"]);
   });
 });
+
+describe("the Mercury tile", () => {
+  it("passes the widget an optimised picture and the night sky", () => {
+    // The MIT widget draws a plain <img>; the page keeps Next's optimiser
+    // by passing it next/image's getImageProps() (plan 080, stage E).
+    const html = renderAt(buildTime, <Planets />);
+    const img = html.match(/<img [^>]*alt=""[^>]*>/)?.[0] ?? "";
+    expect(img).toMatch(
+      / src="\/_next\/image\?url=%2Fpics%2Fmercury\.webp&amp;w=\d+/,
+    );
+    expect(img).toMatch(/ srcSet="\/_next\/image\?url=%2Fpics%2Fmercury\.webp/);
+    expect(html).toContain("background:url(&quot;/night-sky.jpg&quot;)");
+  });
+});

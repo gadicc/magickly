@@ -61,6 +61,14 @@ function MercuryDrawing({ phase, width, height, }) {
 }
 */
 
+/**
+ * A CSS string of `text`, quoted, with its quotes, backslashes and line
+ * breaks escaped, so a URL cannot end the `url()` early.
+ */
+function cssString(text: string): string {
+  return `"${text.replace(/["\\\n\r\f]/g, (char) => `\\${char.charCodeAt(0).toString(16)} `)}"`;
+}
+
 export interface MercuryWidgetProps {
   /** Space around the picture, as CSS `padding`. */
   padding?: string;
@@ -127,7 +135,7 @@ function MercuryWidget({
     <div
       style={{
         textAlign: "center",
-        background: background ? `url(${background})` : undefined,
+        background: background ? `url(${cssString(background)})` : undefined,
         backgroundSize: "cover",
         height: "100%",
         containerType: "inline-size",

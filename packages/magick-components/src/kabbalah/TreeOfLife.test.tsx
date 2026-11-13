@@ -1,7 +1,13 @@
+import sephirot from "magick-data/kabbalah/sephirot";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import GradeTree from "../gd/GradeTree.tsx";
-import TreeOfLife, { labelLines, pathTitle } from "./TreeOfLife.tsx";
+import TreeOfLife, {
+  labelLines,
+  pathTitle,
+  TREE_COLOR_SCALES,
+  type TreeColorScale,
+} from "./TreeOfLife.tsx";
 
 const count = (html: string, pattern: RegExp) =>
   html.match(pattern)?.length ?? 0;
@@ -141,5 +147,34 @@ describe("TreeOfLife", () => {
     // 22 path outlines and their 22 letters, each with its own id.
     expect(count(html, /<g id="path\d+_\d+">/g)).toBe(22);
     expect(count(html, /<g id="pathLetter\d+_\d+">/g)).toBe(22);
+  });
+
+  it("draws Da'at in the Queen scale only, as the app does", () => {
+    // Da'at has no King colour, so the King scale leaves it out.
+    const spheres = (html: string) => count(html, /<circle /g);
+    const queen = spheres(renderToString(<TreeOfLife showDaat />));
+    expect(queen).toBe(spheres(renderToString(<TreeOfLife />)) + 1);
+    expect(renderToString(<TreeOfLife colorScale="king" showDaat />)).toBe(
+      renderToString(<TreeOfLife colorScale="king" />),
+    );
+  });
+
+  it("refuses a colour scale it does not have, by name", () => {
+    expect(() =>
+      renderToString(<TreeOfLife colorScale={"sepia" as TreeColorScale} />),
+    ).toThrow(
+      'TreeOfLife: unknown colorScale "sepia"; expected one of queen, king',
+    );
+  });
+
+  it("lists every scale magick-data colours the sephirot in", () => {
+    const scales = new Set(
+      Object.values(sephirot).flatMap((row) =>
+        Object.keys(row.color).flatMap(
+          (key) => key.match(/^(.+)Web$/)?.[1] ?? [],
+        ),
+      ),
+    );
+    expect([...TREE_COLOR_SCALES].sort()).toEqual([...scales].sort());
   });
 });

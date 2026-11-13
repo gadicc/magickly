@@ -30,6 +30,9 @@
   "sideEffects": [
     "*.css"
   ],
+  "engines": {
+    "node": ">=22"
+  },
   "files": [
     "lib",
     "fonts",
