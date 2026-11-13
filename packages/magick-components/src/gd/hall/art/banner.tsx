@@ -1,7 +1,7 @@
-import { enumAttr } from "../attributes";
-import type { HallArt, HallArtProps, HallNode } from "../types";
-import { points } from "./geometry";
-import { original, PALETTE, variantOf } from "./shared";
+import { enumAttr } from "../attributes.ts";
+import type { HallArt, HallArtProps, HallNode } from "../types.ts";
+import { points } from "./geometry.ts";
+import { original, PALETTE, variantOf } from "./shared.ts";
 
 export const provenance = {
   ...original(

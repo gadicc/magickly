@@ -1,7 +1,7 @@
 import kameas from "magick-data/astrology/kameas";
 import planets from "magick-data/astrology/planets";
 import { describe, expect, it } from "vitest";
-import { KAMEA_PLANET_IDS, PLANET_NAMES, PLANETS } from "./planets";
+import { KAMEA_PLANET_IDS, PLANET_NAMES, PLANETS } from "./planets.ts";
 
 describe("the hall's planets", () => {
   it("name magick-data's planets, as its table names them", () => {

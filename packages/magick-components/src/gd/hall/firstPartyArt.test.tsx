@@ -1,16 +1,16 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { KameaFigure } from "../../astrology/Kamea";
-import { defaultHallArt } from "./art";
-import { PALETTE } from "./art/shared";
-import { TABLET_ELEMENTS, tabletArt } from "./art/symbols";
-import { romanNumeral, TRUMPS } from "./art/tarotKey";
-import { GD_HALL_FONT_STACKS } from "./fonts";
-import { resolveHall } from "./layout";
-import { KAMEA_PLANET_IDS, PLANETS } from "./planets";
-import type { HallArt, HallArtProps, HallNode } from "./types";
-import { validateHall } from "./validate";
-import { CARD_KINDS, CARD_TITLES } from "./vocabulary";
+import { KameaFigure } from "../../astrology/Kamea.tsx";
+import { defaultHallArt } from "./art/index.ts";
+import { PALETTE } from "./art/shared.ts";
+import { TABLET_ELEMENTS, tabletArt } from "./art/symbols.tsx";
+import { romanNumeral, TRUMPS } from "./art/tarotKey.tsx";
+import { GD_HALL_FONT_STACKS } from "./fonts.ts";
+import { resolveHall } from "./layout.ts";
+import { KAMEA_PLANET_IDS, PLANETS } from "./planets.ts";
+import type { HallArt, HallArtProps, HallNode } from "./types.ts";
+import { validateHall } from "./validate.ts";
+import { CARD_KINDS, CARD_TITLES } from "./vocabulary.ts";
 
 const draw = (art: HallArt, node: HallNode, id = "t") => {
   const box = typeof art.box === "function" ? art.box(node) : art.box;

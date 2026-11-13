@@ -1,21 +1,26 @@
-import { enumAttr } from "../attributes";
-import type { HallArt, HallArtProps, HallAttrSpec, HallNode } from "../types";
-import { CARD_KINDS, CARD_TITLES, type CardKind } from "../vocabulary";
-import { flipped, points, polar, smoothPath } from "./geometry";
+import { enumAttr } from "../attributes.ts";
+import type {
+  HallArt,
+  HallArtProps,
+  HallAttrSpec,
+  HallNode,
+} from "../types.ts";
+import { CARD_KINDS, CARD_TITLES, type CardKind } from "../vocabulary.ts";
+import { flipped, points, polar, smoothPath } from "./geometry.ts";
 import {
   ITEM_DETAIL,
   ITEM_OUTLINE,
   original,
   PALETTE,
   variantOf,
-} from "./shared";
+} from "./shared.ts";
 import {
   CARD_BOX,
   CardFrame,
   CardNumeral,
   CardTitle,
   romanNumeral,
-} from "./tarotKey";
+} from "./tarotKey.tsx";
 
 export const provenance = original(
   "Emblem cards drawn from geometry in the flat-emblem style, in the " +

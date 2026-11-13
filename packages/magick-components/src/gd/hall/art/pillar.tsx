@@ -1,7 +1,7 @@
-import { booleanAttr, enumAttr } from "../attributes";
-import type { HallArt, HallArtProps, HallNode } from "../types";
-import { triangle } from "./geometry";
-import { original, PALETTE, variantOf } from "./shared";
+import { booleanAttr, enumAttr } from "../attributes.ts";
+import type { HallArt, HallArtProps, HallNode } from "../types.ts";
+import { triangle } from "./geometry.ts";
+import { original, PALETTE, variantOf } from "./shared.ts";
 
 export const provenance = original(
   "Redrawn from geometry after Gadi Cohen's hall drawings: a disc with a " +

@@ -1,6 +1,6 @@
-import type { HallNode } from "../types";
-import { CARD_LABELS } from "../vocabulary";
-import { type HallPreset, regardie1938 } from "./types";
+import type { HallNode } from "../types.ts";
+import { CARD_LABELS } from "../vocabulary.ts";
+import { type HallPreset, regardie1938 } from "./types.ts";
 
 /**
  * The Portal halls, from Regardie's 1938 first edition (plan 061,

@@ -1,4 +1,4 @@
-import { dais, type HallPreset, regardie1938 } from "./types";
+import { dais, type HallPreset, regardie1938 } from "./types.ts";
 
 /**
  * The Neophyte hall, after Regardie 1938, vol. 2, p.11. The Banner of the

@@ -1,8 +1,8 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import SevenBranchedCandleStick from "./SevenBranchedCandleStick";
-import TableOfShewbread from "./TableOfShewbread";
+import SevenBranchedCandleStick from "./SevenBranchedCandleStick.tsx";
+import TableOfShewbread from "./TableOfShewbread.tsx";
 
 /**
  * Every hook these modules can reach through "react", named or on the

@@ -1,7 +1,7 @@
-import { svgCoordinate } from "../../../svgCoordinate";
-import type { Planet } from "../planets";
-import type { Point } from "./geometry";
-import { ITEM_DETAIL, ITEM_OUTLINE, PALETTE, publicDomain } from "./shared";
+import { svgCoordinate } from "../../../svgCoordinate.ts";
+import type { Planet } from "../planets.ts";
+import type { Point } from "./geometry.ts";
+import { ITEM_DETAIL, ITEM_OUTLINE, PALETTE, publicDomain } from "./shared.ts";
 
 /**
  * The planets' seals, drawn after the woodcuts of Agrippa's *De occulta

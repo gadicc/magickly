@@ -3,12 +3,17 @@ import {
   TABLET_VERSIONS,
 } from "magick-data/enochian/tablets";
 import type { CSSProperties, ReactNode } from "react";
-import Tablet, { UNION_VIEWBOX } from "../../../enochian/Tablet";
-import SevenBranchedCandleStick from "../../SevenBranchedCandleStick";
-import TableOfShewbread from "../../TableOfShewbread";
-import { booleanAttr, enumAttr } from "../attributes";
-import type { HallArt, HallArtProps, HallAttrSpec, HallNode } from "../types";
-import { original, PALETTE, sameForEveryNode, variantOf } from "./shared";
+import Tablet, { UNION_VIEWBOX } from "../../../enochian/Tablet.tsx";
+import SevenBranchedCandleStick from "../../SevenBranchedCandleStick.tsx";
+import TableOfShewbread from "../../TableOfShewbread.tsx";
+import { booleanAttr, enumAttr } from "../attributes.ts";
+import type {
+  HallArt,
+  HallArtProps,
+  HallAttrSpec,
+  HallNode,
+} from "../types.ts";
+import { original, PALETTE, sameForEveryNode, variantOf } from "./shared.ts";
 
 export const tabletProvenance = original(
   "Draws the package's own Enochian Tablet component (Gadi Cohen) on a " +

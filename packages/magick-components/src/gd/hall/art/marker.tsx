@@ -1,6 +1,6 @@
-import { enumAttr } from "../attributes";
-import type { HallArt, HallArtProps, HallNode } from "../types";
-import { original, PALETTE, variantOf } from "./shared";
+import { enumAttr } from "../attributes.ts";
+import type { HallArt, HallArtProps, HallNode } from "../types.ts";
+import { original, PALETTE, variantOf } from "./shared.ts";
 
 export const provenance = original(
   "A labelled box or circle, as the book marks objects and the candidate.",

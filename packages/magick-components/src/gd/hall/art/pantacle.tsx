@@ -1,9 +1,9 @@
-import { svgCoordinate } from "../../../svgCoordinate";
-import { GD_HALL_FONT_STACKS } from "../fonts";
-import { hebrewFont, labelFont, type TextMeasure } from "../labels";
-import type { HallArt } from "../types";
-import { points } from "./geometry";
-import { original, PALETTE, sameForEveryNode } from "./shared";
+import { svgCoordinate } from "../../../svgCoordinate.ts";
+import { GD_HALL_FONT_STACKS } from "../fonts.ts";
+import { hebrewFont, labelFont, type TextMeasure } from "../labels.ts";
+import type { HallArt } from "../types.ts";
+import { points } from "./geometry.ts";
+import { original, PALETTE, sameForEveryNode } from "./shared.ts";
 
 export const provenance = {
   ...original(

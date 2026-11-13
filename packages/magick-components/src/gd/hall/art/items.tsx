@@ -1,8 +1,8 @@
-import { enumAttr } from "../attributes";
-import type { HallArt, HallArtProps, HallNode } from "../types";
-import { CROSS_FORMS, type CrossForm, HALL_COLOURS } from "../vocabulary";
-import { points } from "./geometry";
-import { original, variantOf } from "./shared";
+import { enumAttr } from "../attributes.ts";
+import type { HallArt, HallArtProps, HallNode } from "../types.ts";
+import { CROSS_FORMS, type CrossForm, HALL_COLOURS } from "../vocabulary.ts";
+import { points } from "./geometry.ts";
+import { original, variantOf } from "./shared.ts";
 
 const COLOUR_NAMES = [...HALL_COLOURS.keys()];
 

@@ -1,10 +1,10 @@
 import hebrewLetters, { type HebrewLetter } from "magick-data/hebrewLetters";
 import paths, { type Path } from "magick-data/kabbalah/paths";
-import { specNumberAttr } from "../attributes";
-import { GD_HALL_FONT_STACKS } from "../fonts";
-import { LINE_HEIGHT, wrapText } from "../labels";
-import type { HallArt, HallArtProps, HallAttrSpec } from "../types";
-import { original, PALETTE, variantOf } from "./shared";
+import { specNumberAttr } from "../attributes.ts";
+import { GD_HALL_FONT_STACKS } from "../fonts.ts";
+import { LINE_HEIGHT, wrapText } from "../labels.ts";
+import type { HallArt, HallArtProps, HallAttrSpec } from "../types.ts";
+import { original, PALETTE, variantOf } from "./shared.ts";
 
 export const provenance = original(
   "A simplified tarot trump drawn from geometry: a framed card with its " +

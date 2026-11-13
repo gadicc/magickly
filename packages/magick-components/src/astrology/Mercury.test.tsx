@@ -3,8 +3,8 @@ import { within } from "@testing-library/react";
 import { Settings } from "luxon";
 import { act } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { hydrateAt, renderAt } from "../../../../tests/hydration";
-import MercuryWidget from "./Mercury";
+import { hydrateAt, renderAt } from "../../../../tests/hydration.ts";
+import MercuryWidget from "./Mercury.tsx";
 
 const defaultLocale = Settings.defaultLocale;
 const defaultZone = Settings.defaultZone;
@@ -59,7 +59,7 @@ describe("MercuryWidget", () => {
   });
 
   it("says so when no retrograde comes back", async () => {
-    vi.doMock("./mercuryRetrograde", () => ({
+    vi.doMock("./mercuryRetrograde.ts", () => ({
       currentOrNextRetrograde: () => undefined,
     }));
 

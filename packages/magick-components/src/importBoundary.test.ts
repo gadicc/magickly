@@ -105,12 +105,37 @@ describe("magick-components import boundary", () => {
     const test = path.join(root, "gd/hall/GdHall.test.tsx");
     expect(escapes(file, "magick-components/../app/x")).toBe(true);
     expect(escapes(file, "magick-components/gd/Lamen")).toBe(false);
-    expect(escapes(file, "../../svgCoordinate")).toBe(false);
+    expect(escapes(file, "../../svgCoordinate.ts")).toBe(false);
     expect(escapes(file, "../../../app/x")).toBe(true);
     expect(escapes(test, "../../../app/x")).toBe(true);
     expect(escapes(test, "../../../../../tests/hydration")).toBe(false);
     expect(escapes(file, "../../../../../tests/hydration")).toBe(true);
     expect(escapes(file, "react")).toBe(false);
+  });
+
+  // tsc emits relative specifiers as written (rewriting .ts to .js), and
+  // plain Node, like other strict ES module tools, resolves neither an
+  // extensionless file nor a directory (plan 080, decision 7).
+  it("names the file in every relative import", () => {
+    const vague = files.flatMap((file) =>
+      imports(file)
+        .filter(
+          (name) => name.startsWith(".") && !/\.(?:tsx?|json)$/.test(name),
+        )
+        .map((name) => `${path.relative(root, file)}: ${name}`),
+    );
+    expect(vague).toEqual([]);
+  });
+
+  it("imports JSON as JSON", () => {
+    const bare = files.flatMap((file) =>
+      [
+        ...readFileSync(file, "utf8").matchAll(
+          /from\s+"(\.[^"]*\.json)"(?!\s+with\s*\{\s*type:\s*"json"\s*\})/g,
+        ),
+      ].map((match) => `${path.relative(root, file)}: ${match[1]}`),
+    );
+    expect(bare).toEqual([]);
   });
 
   it("keeps the hall package to React and magick-data", () => {

@@ -1,7 +1,7 @@
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import RoseSigil from "./RoseSigil";
-import { letterPoint } from "./roseSigilGeometry";
+import RoseSigil from "./RoseSigil.tsx";
+import { letterPoint } from "./roseSigilGeometry.ts";
 
 /** One or two doubles away from zero: the size of a Node/Chromium trig difference. */
 const nudge = (value: number) => value * (1 + Number.EPSILON);

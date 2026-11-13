@@ -1,11 +1,11 @@
-import type { HallArt } from "../types";
+import type { HallArt } from "../types.ts";
 import {
   ITEM_DETAIL,
   ITEM_OUTLINE,
   original,
   PALETTE,
   sameForEveryNode,
-} from "./shared";
+} from "./shared.ts";
 
 export const gongProvenance = original(
   "A gong on its frame, drawn from geometry: two posts and a bar, the " +

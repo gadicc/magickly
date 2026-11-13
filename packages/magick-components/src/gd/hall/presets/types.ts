@@ -1,4 +1,4 @@
-import type { HallNode } from "../types";
+import type { HallNode } from "../types.ts";
 
 /**
  * A ready-made hall (plan 061, Presets): a `gdHall` row tree, copied into a

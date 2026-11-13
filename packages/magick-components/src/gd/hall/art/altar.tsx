@@ -1,7 +1,7 @@
-import { enumAttr } from "../attributes";
-import type { HallArt, HallArtProps, HallNode } from "../types";
-import { ALTAR_KINDS } from "../vocabulary";
-import { original, PALETTE, variantOf } from "./shared";
+import { enumAttr } from "../attributes.ts";
+import type { HallArt, HallArtProps, HallNode } from "../types.ts";
+import { ALTAR_KINDS } from "../vocabulary.ts";
+import { original, PALETTE, variantOf } from "./shared.ts";
 
 export const provenance = original(
   "The altar seen from above: the black double cube as a black square, as " +

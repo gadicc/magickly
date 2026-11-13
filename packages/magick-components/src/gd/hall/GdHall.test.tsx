@@ -2,17 +2,17 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { defaultHallArt } from "./art";
+import { defaultHallArt } from "./art/index.ts";
 import {
   GD_HALL_FONT_FILES,
   GD_HALL_FONT_STACKS,
   gdHallFontFaceCss,
   gdHallFontFaceRule,
-} from "./fonts";
-import { GdHall } from "./GdHall";
-import { MAX_HALL_LABEL_LINES } from "./layout";
-import type { HallArt, HallNode } from "./types";
-import { CROSS_FORMS } from "./vocabulary";
+} from "./fonts.ts";
+import { GdHall } from "./GdHall.tsx";
+import { MAX_HALL_LABEL_LINES } from "./layout.ts";
+import type { HallArt, HallNode } from "./types.ts";
+import { CROSS_FORMS } from "./vocabulary.ts";
 
 const hall = (attrs: Record<string, unknown>, ...children: unknown[]) =>
   ({ type: "gdHall", ...attrs, children }) as HallNode;

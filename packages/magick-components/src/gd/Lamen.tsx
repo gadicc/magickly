@@ -1,12 +1,12 @@
 import type * as React from "react";
-import { flipped, type Point } from "./hall/art/geometry";
+import { flipped, type Point } from "./hall/art/geometry.ts";
 import {
   CupOnOctagram,
   PortalHegemon,
   PortalHiereus,
   RoseCross,
   TriangleInPentagram,
-} from "./lamenGlyphs";
+} from "./lamenGlyphs.tsx";
 
 /** The colours of a lamen with the Calvary cross of Tiphareth. */
 interface CrossLamenColours {

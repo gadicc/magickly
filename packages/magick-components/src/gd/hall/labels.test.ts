@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import fontMetrics from "./fontMetrics.json";
+import fontMetrics from "./fontMetrics.json" with { type: "json" };
 import {
   compassFont,
   hebrewFont,
@@ -9,7 +9,7 @@ import {
   MAX_LABEL_LINES,
   textMeasure,
   wrapText,
-} from "./labels";
+} from "./labels.ts";
 
 /** The dais lamen's width at its drawing scale: the label box. */
 const DAIS = 2.31;

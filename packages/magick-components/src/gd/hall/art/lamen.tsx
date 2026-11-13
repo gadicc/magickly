@@ -1,8 +1,13 @@
-import Lamen, { LAMEN_OFFICERS } from "../../Lamen";
-import { hasGradeLamen, LAMEN_GRADES } from "../../lamenGrades";
-import { enumAttr, stringAttr } from "../attributes";
-import type { HallArt, HallArtProps, HallAttrSpec, HallNode } from "../types";
-import { original, PALETTE } from "./shared";
+import Lamen, { LAMEN_OFFICERS } from "../../Lamen.tsx";
+import { hasGradeLamen, LAMEN_GRADES } from "../../lamenGrades.ts";
+import { enumAttr, stringAttr } from "../attributes.ts";
+import type {
+  HallArt,
+  HallArtProps,
+  HallAttrSpec,
+  HallNode,
+} from "../types.ts";
+import { original, PALETTE } from "./shared.ts";
 
 export const provenance = original(
   "The officers' lamens, drawn by `Lamen` (gd/Lamen.tsx): " +

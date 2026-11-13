@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { hydrateAt, renderAt } from "../../../../tests/hydration";
-import MoonWidget, { moonMeanInclination, moonPath } from "./Moon";
+import { hydrateAt, renderAt } from "../../../../tests/hydration.ts";
+import MoonWidget, { moonMeanInclination, moonPath } from "./Moon.tsx";
 
 // Pages with the widget are prerendered at build time and viewed later.
 const buildTime = new Date("2026-09-17T10:16:00Z"); // phase 0.2066

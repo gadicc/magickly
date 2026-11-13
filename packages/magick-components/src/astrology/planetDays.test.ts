@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dayOf, dayRulers } from "./planetDays";
+import { dayOf, dayRulers } from "./planetDays.ts";
 
 describe("dayOf", () => {
   it("names the day each of the seven rules, whatever the local zone", () => {

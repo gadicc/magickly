@@ -1,7 +1,10 @@
 import { readFileSync } from "node:fs";
 import { Settings } from "luxon";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { currentOrNextRetrograde, mercuryStations } from "./mercuryRetrograde";
+import {
+  currentOrNextRetrograde,
+  mercuryStations,
+} from "./mercuryRetrograde.ts";
 
 /**
  * Mercury's stations as NASA JPL Horizons gives them, fitted from its

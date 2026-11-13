@@ -1,6 +1,6 @@
-import { svgCoordinate } from "../svgCoordinate";
-import { type Point, points, polar } from "./hall/art/geometry";
-import { PALETTE } from "./hall/art/shared";
+import { svgCoordinate } from "../svgCoordinate.ts";
+import { type Point, points, polar } from "./hall/art/geometry.ts";
+import { PALETTE } from "./hall/art/shared.ts";
 
 /**
  * The glyphs `Lamen` draws in colour (plan 061, stage H, part 2), from the

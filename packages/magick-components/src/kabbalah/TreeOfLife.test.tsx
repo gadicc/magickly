@@ -1,7 +1,7 @@
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import GradeTree from "../gd/GradeTree";
-import TreeOfLife, { labelLines, pathTitle } from "./TreeOfLife";
+import GradeTree from "../gd/GradeTree.tsx";
+import TreeOfLife, { labelLines, pathTitle } from "./TreeOfLife.tsx";
 
 const count = (html: string, pattern: RegExp) =>
   html.match(pattern)?.length ?? 0;

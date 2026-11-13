@@ -1,5 +1,5 @@
 import React from "react";
-import { svgCoordinate } from "../svgCoordinate";
+import { svgCoordinate } from "../svgCoordinate.ts";
 import {
   letterIJ,
   letterPoint,
@@ -8,7 +8,7 @@ import {
   pathFromPoints,
   ROSE_LETTERS,
   sigilPoints,
-} from "./roseSigilGeometry";
+} from "./roseSigilGeometry.ts";
 
 export { letterIJ };
 

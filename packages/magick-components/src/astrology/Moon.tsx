@@ -1,6 +1,6 @@
 import lune from "lune";
 
-import useHydrated from "../hooks/useHydrated";
+import useHydrated from "../hooks/useHydrated.ts";
 
 const moonMeanInclination = 5.15; // in degrees
 

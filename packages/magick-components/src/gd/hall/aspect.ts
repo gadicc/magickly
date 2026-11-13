@@ -4,7 +4,7 @@ import {
   numberAttr,
   placedByAt,
   stringAttr,
-} from "./attributes";
+} from "./attributes.ts";
 import {
   BANNER_ROW_GAP,
   CAPTION_GAP,
@@ -17,8 +17,8 @@ import {
   LABEL_GAP,
   WALL_GAP,
   WALL_STROKE,
-} from "./dimensions";
-import type { HallNode } from "./types";
+} from "./dimensions.ts";
+import type { HallNode } from "./types.ts";
 
 /**
  * Figures the layout takes from its font metrics and scales, which this

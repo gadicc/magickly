@@ -1,6 +1,6 @@
 import kameas, { type KameaPlanetId } from "magick-data/astrology/kameas";
 import type { CSSProperties, ReactNode } from "react";
-import { svgCoordinate } from "../svgCoordinate";
+import { svgCoordinate } from "../svgCoordinate.ts";
 
 /**
  * A planet's kamea (magic square) drawn from its numbers, which magick-data

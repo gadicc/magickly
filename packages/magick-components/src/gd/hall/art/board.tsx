@@ -1,12 +1,12 @@
-import { TreeFigure } from "../../../kabbalah/treeOfLifeFigure";
-import { svgCoordinate } from "../../../svgCoordinate";
-import { enumAttr } from "../attributes";
-import { GD_HALL_FONT_STACKS } from "../fonts";
-import { LINE_HEIGHT, wrapText } from "../labels";
-import type { HallArt, HallArtProps, HallNode } from "../types";
-import { BOARD_KINDS, BOARD_NAMES, type BoardKind } from "../vocabulary";
-import { Platform, sized } from "./platform";
-import { original, PALETTE, variantOf } from "./shared";
+import { TreeFigure } from "../../../kabbalah/treeOfLifeFigure.tsx";
+import { svgCoordinate } from "../../../svgCoordinate.ts";
+import { enumAttr } from "../attributes.ts";
+import { GD_HALL_FONT_STACKS } from "../fonts.ts";
+import { LINE_HEIGHT, wrapText } from "../labels.ts";
+import type { HallArt, HallArtProps, HallNode } from "../types.ts";
+import { BOARD_KINDS, BOARD_NAMES, type BoardKind } from "../vocabulary.ts";
+import { Platform, sized } from "./platform.tsx";
+import { original, PALETTE, variantOf } from "./shared.ts";
 
 export const provenance = original(
   "A board on a stand: a white rectangle sized in squares. The Flaming " +

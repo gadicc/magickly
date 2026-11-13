@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import Lamen from "./Lamen";
-import { GRADE_LAMEN_OFFICERS, hasGradeLamen } from "./lamenGrades";
+import Lamen from "./Lamen.tsx";
+import { GRADE_LAMEN_OFFICERS, hasGradeLamen } from "./lamenGrades.ts";
 
 const render = (officer: string) =>
   renderToStaticMarkup(<Lamen officer={officer} />);

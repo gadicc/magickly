@@ -1,5 +1,5 @@
-import type { HallArt } from "../types";
-import { mirrored, type Point, pathPoint, polar } from "./geometry";
+import type { HallArt } from "../types.ts";
+import { mirrored, type Point, pathPoint, polar } from "./geometry.ts";
 import {
   HIGHLIGHT,
   ITEM_DETAIL,
@@ -7,7 +7,7 @@ import {
   original,
   PALETTE,
   sameForEveryNode,
-} from "./shared";
+} from "./shared.ts";
 
 /**
  * The rose, the salt, the bread and the fan (plan 061, stage H): flat

@@ -5,11 +5,11 @@ import {
   useId,
   useMemo,
 } from "react";
-import { svgCoordinate } from "../../svgCoordinate";
-import { defaultHallArt } from "./art";
-import { Placeholder } from "./art/placeholder";
-import { PALETTE } from "./art/shared";
-import { GD_HALL_FONT_STACKS, gdHallFontFaceCss } from "./fonts";
+import { svgCoordinate } from "../../svgCoordinate.ts";
+import { defaultHallArt } from "./art/index.ts";
+import { Placeholder } from "./art/placeholder.tsx";
+import { PALETTE } from "./art/shared.ts";
+import { GD_HALL_FONT_STACKS, gdHallFontFaceCss } from "./fonts.ts";
 import {
   FLOOR_SIZE,
   FLOOR_STROKE,
@@ -19,8 +19,8 @@ import {
   resolveHall,
   WALL_GAP,
   WALL_STROKE,
-} from "./layout";
-import type { HallArt, HallArtRegistry, HallNode } from "./types";
+} from "./layout.ts";
+import type { HallArt, HallArtRegistry, HallNode } from "./types.ts";
 
 /** SVG user units per checker square: text stays at a large font size. */
 const UNIT = 100;

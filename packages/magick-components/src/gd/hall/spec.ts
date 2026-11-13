@@ -1,5 +1,5 @@
-import { stringAttr } from "./attributes";
-import type { HallArtRegistry, HallNode } from "./types";
+import { stringAttr } from "./attributes.ts";
+import type { HallArtRegistry, HallNode } from "./types.ts";
 import {
   CORE_ITEM_KINDS,
   HALL_TAGS,
@@ -10,7 +10,7 @@ import {
   MAX_HALL_NODES,
   PLACEABLE_ATTRIBUTES,
   reservedTag,
-} from "./vocabulary";
+} from "./vocabulary.ts";
 
 /**
  * What the validator and the layout resolver share (plan 061, decision

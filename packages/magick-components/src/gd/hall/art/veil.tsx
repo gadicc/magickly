@@ -1,5 +1,5 @@
-import type { HallArt } from "../types";
-import { original, PALETTE, sameForEveryNode } from "./shared";
+import type { HallArt } from "../types.ts";
+import { original, PALETTE, sameForEveryNode } from "./shared.ts";
 
 export const provenance = original(
   "A curtain seen from above: a band with its pleats, drawn from geometry.",

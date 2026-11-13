@@ -22,7 +22,7 @@ describe("optimiser loading", () => {
       }),
     }));
     const { optimizeSigilPoints, sigilPoints } = await import(
-      "./roseSigilGeometry"
+      "./roseSigilGeometry.ts"
     );
     await expect(optimizeSigilPoints(sigilPoints("אב"))).rejects.toThrow(
       "wasm unavailable",

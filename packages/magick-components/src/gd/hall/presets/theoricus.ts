@@ -1,5 +1,5 @@
-import type { HallNode } from "../types";
-import { dais, type HallPreset, regardie1938 } from "./types";
+import type { HallNode } from "../types.ts";
+import { dais, type HallPreset, regardie1938 } from "./types.ts";
 
 /**
  * The East of both parts: the Air tablet standing over the edge of the

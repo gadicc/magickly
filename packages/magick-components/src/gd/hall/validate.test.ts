@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { defaultHallArt } from "./art";
+import { defaultHallArt } from "./art/index.ts";
 import {
   booleanAttr,
   clamp,
@@ -11,11 +11,11 @@ import {
   readNumber,
   readString,
   stringAttr,
-} from "./attributes";
-import { HEBREW_LETTER_SPELLINGS, hebrewLetter } from "./hebrewLetters";
-import { hallArtKey, hallTagSpec, itemKindKnown } from "./spec";
-import type { HallArt, HallAttrSpec, HallNode } from "./types";
-import { validateHall } from "./validate";
+} from "./attributes.ts";
+import { HEBREW_LETTER_SPELLINGS, hebrewLetter } from "./hebrewLetters.ts";
+import { hallArtKey, hallTagSpec, itemKindKnown } from "./spec.ts";
+import type { HallArt, HallAttrSpec, HallNode } from "./types.ts";
+import { validateHall } from "./validate.ts";
 import {
   hallPoint,
   MAX_HALL_DEPTH,
@@ -23,7 +23,7 @@ import {
   RESERVED_ATTRIBUTES,
   RESERVED_TAGS,
   roleName,
-} from "./vocabulary";
+} from "./vocabulary.ts";
 
 const hall = (...children: unknown[]): HallNode =>
   ({ type: "gdHall", children }) as HallNode;

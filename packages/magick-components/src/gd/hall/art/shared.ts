@@ -1,4 +1,4 @@
-import type { HallArtProvenance } from "../types";
+import type { HallArtProvenance } from "../types.ts";
 
 /** Provenance of art drawn for this package from geometry. */
 export function original(notes: string): HallArtProvenance {

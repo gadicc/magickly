@@ -3,16 +3,16 @@
  * validator, the layout resolver and the SVG renderer, with the package's
  * original art. MIT; see ../../LICENSE.txt.
  */
-export { defaultHallArt } from "./art";
-export { TABLET_ELEMENTS, tabletArt } from "./art/symbols";
-export { romanNumeral, TRUMPS } from "./art/tarotKey";
+export { defaultHallArt } from "./art/index.ts";
+export { TABLET_ELEMENTS, tabletArt } from "./art/symbols.tsx";
+export { romanNumeral, TRUMPS } from "./art/tarotKey.tsx";
 export {
   describeHall,
   type HallDescription,
   type HallStation,
   hallObjectName,
   hallStation,
-} from "./describe";
+} from "./describe.ts";
 export {
   GD_HALL_FONT_FAMILIES,
   GD_HALL_FONT_FILES,
@@ -20,7 +20,7 @@ export {
   type GdHallFontFile,
   gdHallFontFaceCss,
   gdHallFontFaceRule,
-} from "./fonts";
+} from "./fonts.ts";
 export {
   GdHall,
   type GdHallProps,
@@ -29,8 +29,8 @@ export {
   type HallDrawings,
   hallRoot,
   hallViewBox,
-} from "./GdHall";
-export { labelFont, wrapText } from "./labels";
+} from "./GdHall.tsx";
+export { labelFont, wrapText } from "./labels.ts";
 export {
   DEFAULT_SCALES,
   type Rect,
@@ -39,6 +39,6 @@ export {
   type ResolvedObject,
   type ResolveHallOptions,
   resolveHall,
-} from "./layout";
-export type * from "./types";
-export { type ValidateHallOptions, validateHall } from "./validate";
+} from "./layout.ts";
+export type * from "./types.ts";
+export { type ValidateHallOptions, validateHall } from "./validate.ts";

@@ -1,4 +1,4 @@
-import fontMetrics from "./fontMetrics.json";
+import fontMetrics from "./fontMetrics.json" with { type: "json" };
 
 /**
  * Text measurement for hall labels (plan 061, decision 6). Widths come from

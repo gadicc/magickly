@@ -1,6 +1,6 @@
 import sephirot from "magick-data/kabbalah/sephirot";
 import type { SVGProps } from "react";
-import { svgCoordinate } from "../svgCoordinate";
+import { svgCoordinate } from "../svgCoordinate.ts";
 
 /**
  * The Tree of Life's figure, shared by `TreeOfLife` and the drawings that

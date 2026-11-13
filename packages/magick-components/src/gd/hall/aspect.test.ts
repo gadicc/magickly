@@ -6,16 +6,16 @@ import {
   estimateHallAspect,
   HEBREW_LETTER_SCALE,
   LABEL_LINE,
-} from "./aspect";
-import { COORDINATE_RANGE } from "./dimensions";
-import { compassFont, LABEL_SIZE, LINE_HEIGHT } from "./labels";
+} from "./aspect.ts";
+import { COORDINATE_RANGE } from "./dimensions.ts";
+import { compassFont, LABEL_SIZE, LINE_HEIGHT } from "./labels.ts";
 import {
   CAPTION_SIZE,
   COMPASS_SIZE,
   DEFAULT_SCALES,
   resolveHall,
-} from "./layout";
-import type { HallNode } from "./types";
+} from "./layout.ts";
+import type { HallNode } from "./types.ts";
 
 const drawn = (hall: HallNode) => {
   const { viewBox } = resolveHall(hall);

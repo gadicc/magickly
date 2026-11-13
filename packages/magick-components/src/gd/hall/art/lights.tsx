@@ -1,14 +1,19 @@
-import { enumAttr } from "../attributes";
-import type { HallArt, HallArtProps, HallAttrSpec, HallNode } from "../types";
-import { LIGHT_COLOURS, type LightColour } from "../vocabulary";
-import { pathPoint } from "./geometry";
+import { enumAttr } from "../attributes.ts";
+import type {
+  HallArt,
+  HallArtProps,
+  HallAttrSpec,
+  HallNode,
+} from "../types.ts";
+import { LIGHT_COLOURS, type LightColour } from "../vocabulary.ts";
+import { pathPoint } from "./geometry.ts";
 import {
   HIGHLIGHT,
   ITEM_DETAIL,
   ITEM_OUTLINE,
   original,
   PALETTE,
-} from "./shared";
+} from "./shared.ts";
 
 const GLASS: ReadonlyMap<LightColour, string> = new Map([
   ["red", PALETTE.glassRed],

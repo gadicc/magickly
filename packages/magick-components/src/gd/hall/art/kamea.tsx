@@ -1,17 +1,22 @@
-import { KameaFigure } from "../../../astrology/Kamea";
-import { svgCoordinate } from "../../../svgCoordinate";
-import { enumAttr } from "../attributes";
-import { GD_HALL_FONT_STACKS } from "../fonts";
-import { wrapText } from "../labels";
+import { KameaFigure } from "../../../astrology/Kamea.tsx";
+import { svgCoordinate } from "../../../svgCoordinate.ts";
+import { enumAttr } from "../attributes.ts";
+import { GD_HALL_FONT_STACKS } from "../fonts.ts";
+import { wrapText } from "../labels.ts";
 import {
   KAMEA_PLANET_IDS,
   PLANET_NAMES,
   PLANETS,
   type Planet,
-} from "../planets";
-import type { HallArt, HallArtProps, HallAttrSpec, HallNode } from "../types";
-import { SEALS, sealProvenance } from "./seals";
-import { original, PALETTE, variantOf } from "./shared";
+} from "../planets.ts";
+import type {
+  HallArt,
+  HallArtProps,
+  HallAttrSpec,
+  HallNode,
+} from "../types.ts";
+import { SEALS, sealProvenance } from "./seals.tsx";
+import { original, PALETTE, variantOf } from "./shared.ts";
 
 export const kameaProvenance = original(
   "A planet's magic square drawn from its numbers, which magick-data " +

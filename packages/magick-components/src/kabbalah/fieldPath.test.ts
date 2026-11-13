@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readFieldPath } from "./fieldPath";
+import { readFieldPath } from "./fieldPath.ts";
 
 describe("field path lookup", () => {
   const record = { name: { en: "Crown", roman: "Keter" }, index: 1 };

@@ -4,7 +4,7 @@ import kameas, {
 } from "magick-data/astrology/kameas";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import Kamea, { KAMEA_SIDE, KameaFigure, kameaGeometry } from "./Kamea";
+import Kamea, { KAMEA_SIDE, KameaFigure, kameaGeometry } from "./Kamea.tsx";
 
 /** The numbers drawn, in document order. */
 const numbers = (markup: string) =>

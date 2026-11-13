@@ -1,24 +1,24 @@
-import type { HallArtRegistry } from "../types";
-import { altarArt } from "./altar";
-import { breadArt, fanArt, roseArt, saltArt } from "./altarItems";
-import { bannerArt } from "./banner";
-import { boardArt } from "./board";
-import { cardArt } from "./cards";
-import { brazierArt, candleArt, gongArt } from "./furnishings";
-import { hebrewLetterArt } from "./hebrewLetter";
-import { crossArt, pentagramArt, triangleArt } from "./items";
-import { kameaArt, sealArt } from "./kamea";
-import { lamenArt } from "./lamen";
-import { lightningArt } from "./lightning";
-import { lampArt, lanternArt } from "./lights";
-import { markerArt } from "./marker";
-import { pantacleArt } from "./pantacle";
-import { pillarArt } from "./pillar";
-import { platformArt, throneArt } from "./platform";
-import { candlestickArt, shewbreadArt, tabletArt } from "./symbols";
-import { tarotKeyArt } from "./tarotKey";
-import { veilArt } from "./veil";
-import { censerArt, chaliceArt, cupArt } from "./vessels";
+import type { HallArtRegistry } from "../types.ts";
+import { altarArt } from "./altar.tsx";
+import { breadArt, fanArt, roseArt, saltArt } from "./altarItems.tsx";
+import { bannerArt } from "./banner.tsx";
+import { boardArt } from "./board.tsx";
+import { cardArt } from "./cards.tsx";
+import { brazierArt, candleArt, gongArt } from "./furnishings.tsx";
+import { hebrewLetterArt } from "./hebrewLetter.tsx";
+import { crossArt, pentagramArt, triangleArt } from "./items.tsx";
+import { kameaArt, sealArt } from "./kamea.tsx";
+import { lamenArt } from "./lamen.tsx";
+import { lightningArt } from "./lightning.tsx";
+import { lampArt, lanternArt } from "./lights.tsx";
+import { markerArt } from "./marker.tsx";
+import { pantacleArt } from "./pantacle.tsx";
+import { pillarArt } from "./pillar.tsx";
+import { platformArt, throneArt } from "./platform.tsx";
+import { candlestickArt, shewbreadArt, tabletArt } from "./symbols.tsx";
+import { tarotKeyArt } from "./tarotKey.tsx";
+import { veilArt } from "./veil.tsx";
+import { censerArt, chaliceArt, cupArt } from "./vessels.tsx";
 
 /**
  * The package's own art, all original (MIT). The app composes its art over

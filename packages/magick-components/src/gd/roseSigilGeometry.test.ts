@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SVG_COORDINATE_DECIMALS, svgCoordinate } from "../svgCoordinate";
+import { SVG_COORDINATE_DECIMALS, svgCoordinate } from "../svgCoordinate.ts";
 import {
   largeArc,
   letterIJ,
@@ -10,7 +10,7 @@ import {
   pathFromPoints,
   pointsToArray,
   sigilPoints,
-} from "./roseSigilGeometry";
+} from "./roseSigilGeometry.ts";
 
 /** One or two doubles away from zero: the size of a Node/Chromium trig difference. */
 const nudge = (value: number) => value * (1 + Number.EPSILON);

@@ -1,17 +1,21 @@
-import { hasGradeLamen, LAMEN_GRADE_NAMES, LAMEN_GRADES } from "../lamenGrades";
-import { enumAttr, numberAttr, readAttr } from "./attributes";
-import { hebrewLetter } from "./hebrewLetters";
-import { MAX_LABEL_LINES } from "./labels";
-import { DEFAULT_DAIS, MAX_HALL_LABEL_LINES, resolveHall } from "./layout";
-import { PLANETS } from "./planets";
-import { hallPlacement, hallTagSpec, itemKindKnown, walkHall } from "./spec";
+import {
+  hasGradeLamen,
+  LAMEN_GRADE_NAMES,
+  LAMEN_GRADES,
+} from "../lamenGrades.ts";
+import { enumAttr, numberAttr, readAttr } from "./attributes.ts";
+import { hebrewLetter } from "./hebrewLetters.ts";
+import { MAX_LABEL_LINES } from "./labels.ts";
+import { DEFAULT_DAIS, MAX_HALL_LABEL_LINES, resolveHall } from "./layout.ts";
+import { PLANETS } from "./planets.ts";
+import { hallPlacement, hallTagSpec, itemKindKnown, walkHall } from "./spec.ts";
 import type {
   HallArtRegistry,
   HallAttrSpec,
   HallDiagnostic,
   HallNode,
   HallSeverity,
-} from "./types";
+} from "./types.ts";
 import {
   ALTAR_KINDS,
   BOARD_KINDS,
@@ -26,7 +30,7 @@ import {
   RESERVED_ATTRIBUTES,
   reservedTag,
   roleName,
-} from "./vocabulary";
+} from "./vocabulary.ts";
 
 /** What the validator knows beyond the package's own vocabulary. */
 export interface ValidateHallOptions {

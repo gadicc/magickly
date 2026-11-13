@@ -6,7 +6,7 @@ import {
   labelFont,
   MAX_LABEL_LINES,
   wrapText,
-} from "./labels";
+} from "./labels.ts";
 import {
   BANNER_ROW_GAP,
   CAPTION_GAP,
@@ -23,10 +23,10 @@ import {
   resolveHall,
   WALL_GAP,
   WALL_STROKE,
-} from "./layout";
-import type { HallArt, HallNode } from "./types";
-import { validateHall } from "./validate";
-import { MAX_HALL_DEPTH, MAX_HALL_NODES } from "./vocabulary";
+} from "./layout.ts";
+import type { HallArt, HallNode } from "./types.ts";
+import { validateHall } from "./validate.ts";
+import { MAX_HALL_DEPTH, MAX_HALL_NODES } from "./vocabulary.ts";
 
 const provenance = {
   origin: "original",

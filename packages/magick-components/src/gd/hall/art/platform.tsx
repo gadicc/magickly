@@ -1,7 +1,7 @@
-import { clamp, numberAttr } from "../attributes";
-import type { HallArt, HallArtProps, HallNode } from "../types";
-import { SIZE_RANGE } from "../vocabulary";
-import { original, PALETTE, sameForEveryNode } from "./shared";
+import { clamp, numberAttr } from "../attributes.ts";
+import type { HallArt, HallArtProps, HallNode } from "../types.ts";
+import { SIZE_RANGE } from "../vocabulary.ts";
+import { original, PALETTE, sameForEveryNode } from "./shared.ts";
 
 export const provenance = original(
   "A white rectangle with a black outline, sized in squares by w and h.",

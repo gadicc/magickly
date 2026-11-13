@@ -1,5 +1,5 @@
-import type { HallNode } from "../types";
-import { dais, type HallPreset, regardie1938 } from "./types";
+import type { HallNode } from "../types.ts";
+import { dais, type HallPreset, regardie1938 } from "./types.ts";
 
 /** The Zelator's letters above the East: Shin, Tau and Qoph. */
 const LETTERS: HallNode = {

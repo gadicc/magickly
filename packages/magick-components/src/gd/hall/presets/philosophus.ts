@@ -1,5 +1,5 @@
-import type { HallNode } from "../types";
-import { type HallPreset, regardie1938 } from "./types";
+import type { HallNode } from "../types.ts";
+import { type HallPreset, regardie1938 } from "./types.ts";
 
 /**
  * The Philosophus halls (4=7), from the diagrams and rubrics of

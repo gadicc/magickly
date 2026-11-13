@@ -1,10 +1,10 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { defaultHallArt } from "./art";
-import { tabletArt } from "./art/symbols";
-import { GdHall, GdHallSvg, hallRoot, hallViewBox } from "./GdHall";
-import { resolveHall } from "./layout";
-import { HALL_PRESETS } from "./presets";
+import { defaultHallArt } from "./art/index.ts";
+import { tabletArt } from "./art/symbols.tsx";
+import { GdHall, GdHallSvg, hallRoot, hallViewBox } from "./GdHall.tsx";
+import { resolveHall } from "./layout.ts";
+import { HALL_PRESETS } from "./presets/index.ts";
 
 /**
  * Every hook these modules can reach through "react", recorded as it is

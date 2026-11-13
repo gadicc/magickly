@@ -2,7 +2,7 @@
 
 import type { DateTime } from "luxon";
 import { type ImgHTMLAttributes, useEffect, useState } from "react";
-import type { Retrograde } from "./mercuryRetrograde";
+import type { Retrograde } from "./mercuryRetrograde.ts";
 
 const NARROW_CHARACTER =
   /[\p{sc=Latin}\p{sc=Cyrillic}\p{sc=Greek}\p{sc=Hebrew}\p{sc=Arabic}\p{sc=Common}\p{sc=Inherited}]/u;
@@ -94,7 +94,7 @@ function MercuryWidget({
     // The ephemeris is worth about 22kB gzipped, so it loads here rather
     // than with the page.
     const update = () =>
-      import("./mercuryRetrograde")
+      import("./mercuryRetrograde.ts")
         .then(({ currentOrNextRetrograde }) => {
           if (current)
             setRetrograde(currentOrNextRetrograde(new Date()) ?? null);

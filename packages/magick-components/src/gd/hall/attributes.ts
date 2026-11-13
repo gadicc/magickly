@@ -1,5 +1,5 @@
-import { HALL_POINTS } from "./dimensions";
-import type { HallAttrSpec, HallNode } from "./types";
+import { HALL_POINTS } from "./dimensions.ts";
+import type { HallAttrSpec, HallNode } from "./types.ts";
 
 /** An attribute read against its spec: absent, invalid, or a value. */
 export type AttrReading<T> =

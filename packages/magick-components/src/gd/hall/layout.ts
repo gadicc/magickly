@@ -5,7 +5,7 @@ import {
   numberAttr,
   placedByAt,
   stringAttr,
-} from "./attributes";
+} from "./attributes.ts";
 import {
   BANNER_ROW_GAP,
   CAPTION_GAP,
@@ -18,7 +18,7 @@ import {
   LABEL_GAP,
   WALL_GAP,
   WALL_STROKE,
-} from "./dimensions";
+} from "./dimensions.ts";
 import {
   compassFont,
   LABEL_SIZE,
@@ -26,7 +26,7 @@ import {
   labelFont,
   type TextLine,
   wrapText,
-} from "./labels";
+} from "./labels.ts";
 import {
   hallArtKey,
   hallNodesInBounds,
@@ -34,8 +34,13 @@ import {
   hallRole,
   hallTagSpec,
   pathKey,
-} from "./spec";
-import type { HallArt, HallArtBox, HallArtRegistry, HallNode } from "./types";
+} from "./spec.ts";
+import type {
+  HallArt,
+  HallArtBox,
+  HallArtRegistry,
+  HallNode,
+} from "./types.ts";
 import {
   BANNER_SIDES,
   type BannerSide,
@@ -52,7 +57,7 @@ import {
   roleName,
   SCALE_RANGE,
   SIZE_RANGE,
-} from "./vocabulary";
+} from "./vocabulary.ts";
 
 /**
  * The layout resolver (plan 061, decision 4): pure functions from a hall
@@ -75,7 +80,7 @@ export {
   LABEL_GAP,
   WALL_GAP,
   WALL_STROKE,
-} from "./dimensions";
+} from "./dimensions.ts";
 
 /**
  * The narrowest box a label wraps in, in squares: a label under an item

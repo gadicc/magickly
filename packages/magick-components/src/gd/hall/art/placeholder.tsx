@@ -1,6 +1,6 @@
-import { GD_HALL_FONT_STACKS } from "../fonts";
-import { wrapText } from "../labels";
-import { original, PALETTE } from "./shared";
+import { GD_HALL_FONT_STACKS } from "../fonts.ts";
+import { wrapText } from "../labels.ts";
+import { original, PALETTE } from "./shared.ts";
 
 export const provenance = original(
   "A dashed box naming a component that has no art.",

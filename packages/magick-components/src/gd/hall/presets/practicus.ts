@@ -1,5 +1,5 @@
-import type { HallNode } from "../types";
-import { type HallPreset, regardie1938 } from "./types";
+import type { HallNode } from "../types.ts";
+import { type HallPreset, regardie1938 } from "./types.ts";
 
 /**
  * The Practicus halls (3=8), from the diagrams of Regardie's 1938 first

@@ -1,7 +1,7 @@
 import Data from "magick-data";
 import React from "react";
-import { svgCoordinate } from "../svgCoordinate";
-import { FIELD_PATH_LIST_SEPARATOR, readFieldPath } from "./fieldPath";
+import { svgCoordinate } from "../svgCoordinate.ts";
+import { FIELD_PATH_LIST_SEPARATOR, readFieldPath } from "./fieldPath.ts";
 import {
   LineOutline,
   ORDERED_PATHS as orderedPaths,
@@ -9,7 +9,7 @@ import {
   SEPHIRAH_CENTRES,
   sephirahWedges,
   TREE_GEOMETRY,
-} from "./treeOfLifeFigure";
+} from "./treeOfLifeFigure.tsx";
 
 const _sephirot = Object.values(Data.sephirah);
 const _paths = Data.treeOfLifePath;

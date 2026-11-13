@@ -1,15 +1,15 @@
-import { neophyte } from "./neophyte";
+import { neophyte } from "./neophyte.ts";
 import {
   philosophus1,
   philosophus2,
   philosophus3,
   philosophus4,
-} from "./philosophus";
-import { portal1, portal2 } from "./portal";
-import { practicus1, practicus2, practicus3 } from "./practicus";
-import { theoricus1, theoricus2 } from "./theoricus";
-import type { HallPreset } from "./types";
-import { zelator1, zelator2 } from "./zelator";
+} from "./philosophus.ts";
+import { portal1, portal2 } from "./portal.ts";
+import { practicus1, practicus2, practicus3 } from "./practicus.ts";
+import { theoricus1, theoricus2 } from "./theoricus.ts";
+import type { HallPreset } from "./types.ts";
+import { zelator1, zelator2 } from "./zelator.ts";
 
 export {
   dais,
@@ -20,7 +20,7 @@ export {
   hallSourceCitation,
   hallSourceText,
   hallSourceUrl,
-} from "./types";
+} from "./types.ts";
 export {
   neophyte,
   philosophus1,

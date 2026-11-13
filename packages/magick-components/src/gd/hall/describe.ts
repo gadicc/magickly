@@ -1,21 +1,21 @@
-import { defaultHallArt } from "./art";
-import { TRUMPS } from "./art/tarotKey";
-import { hebrewLetter } from "./hebrewLetters";
+import { defaultHallArt } from "./art/index.ts";
+import { TRUMPS } from "./art/tarotKey.tsx";
+import { hebrewLetter } from "./hebrewLetters.ts";
 import {
   FLOOR_SIZE,
   type ResolvedHall,
   type ResolvedObject,
   resolveHall,
-} from "./layout";
-import { PLANET_NAMES, type Planet } from "./planets";
-import type { HallArtRegistry, HallNode } from "./types";
+} from "./layout.ts";
+import { PLANET_NAMES, type Planet } from "./planets.ts";
+import type { HallArtRegistry, HallNode } from "./types.ts";
 import {
   BOARD_NAMES,
   type BoardKind,
   CARD_TITLES,
   type CardKind,
   roleName,
-} from "./vocabulary";
+} from "./vocabulary.ts";
 
 /**
  * A hall in words (plan 062): who stands where, what is on each altar and

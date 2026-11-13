@@ -1,5 +1,5 @@
-import type { HallArt } from "../types";
-import { mirrored } from "./geometry";
+import type { HallArt } from "../types.ts";
+import { mirrored } from "./geometry.ts";
 import {
   HIGHLIGHT,
   ITEM_DETAIL,
@@ -7,7 +7,7 @@ import {
   original,
   PALETTE,
   sameForEveryNode,
-} from "./shared";
+} from "./shared.ts";
 
 /**
  * The vessels (plan 061, stage H): flat emblems in the hall's palette

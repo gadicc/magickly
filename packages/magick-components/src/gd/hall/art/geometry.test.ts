@@ -7,7 +7,7 @@ import {
   polar,
   smoothPath,
   triangle,
-} from "./geometry";
+} from "./geometry.ts";
 
 describe("the art's geometry helpers", () => {
   it("writes points and triangles rounded", () => {

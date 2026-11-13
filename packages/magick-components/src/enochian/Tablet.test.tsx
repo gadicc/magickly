@@ -9,7 +9,7 @@ import Tablet, {
   tabletViewBox,
   UNION_VIEWBOX,
   WATCHTOWER_VIEWBOX,
-} from "./Tablet";
+} from "./Tablet.tsx";
 
 const draw = (
   id: string,

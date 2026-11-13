@@ -1,5 +1,5 @@
-import { COORDINATE_RANGE, HALL_POINTS } from "./dimensions";
-import type { HallAttrSpec } from "./types";
+import { COORDINATE_RANGE, HALL_POINTS } from "./dimensions.ts";
+import type { HallAttrSpec } from "./types.ts";
 
 /**
  * The hall vocabulary (plan 061, decision 5): what each tag is and which

@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
-import type { HallNode } from "../types";
-import { validateHall } from "../validate";
-import { RESERVED_ATTRIBUTES, RESERVED_TAGS } from "../vocabulary";
+import type { HallNode } from "../types.ts";
+import { validateHall } from "../validate.ts";
+import { RESERVED_ATTRIBUTES, RESERVED_TAGS } from "../vocabulary.ts";
 import {
   dais,
   HALL_PRESETS,
   hallPreset,
   hallSourceText,
   hallSourceUrl,
-} from ".";
+} from "./index.ts";
 
 const nodes = (node: HallNode): HallNode[] => [
   node,

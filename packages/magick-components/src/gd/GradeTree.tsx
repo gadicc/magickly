@@ -1,4 +1,4 @@
-import TreeOfLife from "../kabbalah/TreeOfLife";
+import TreeOfLife from "../kabbalah/TreeOfLife.tsx";
 
 /*
  * The Tree with each sephirah numbered and named by its grade and linked to

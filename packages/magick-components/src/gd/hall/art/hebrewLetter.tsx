@@ -1,11 +1,11 @@
-import { svgCoordinate } from "../../../svgCoordinate";
-import { stringAttr } from "../attributes";
-import { GD_HALL_FONT_STACKS } from "../fonts";
-import { hebrewLetter } from "../hebrewLetters";
-import { hebrewLetterBody } from "../labels";
-import type { HallArt, HallArtProps, HallNode } from "../types";
-import { pennantPath, Rod } from "./banner";
-import { original, PALETTE, variantOf } from "./shared";
+import { svgCoordinate } from "../../../svgCoordinate.ts";
+import { stringAttr } from "../attributes.ts";
+import { GD_HALL_FONT_STACKS } from "../fonts.ts";
+import { hebrewLetter } from "../hebrewLetters.ts";
+import { hebrewLetterBody } from "../labels.ts";
+import type { HallArt, HallArtProps, HallNode } from "../types.ts";
+import { pennantPath, Rod } from "./banner.tsx";
+import { original, PALETTE, variantOf } from "./shared.ts";
 
 export const provenance = {
   ...original(

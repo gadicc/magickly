@@ -6,7 +6,7 @@
  * trig result, so every number written to SVG goes through `svgCoordinate`.
  */
 
-import { svgCoordinate } from "../svgCoordinate";
+import { svgCoordinate } from "../svgCoordinate.ts";
 
 export const ROSE_LETTERS = [
   ["א", "מ", "ש"],

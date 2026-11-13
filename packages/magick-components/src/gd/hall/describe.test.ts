@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { describeHall, type HallDescription, hallObjectName } from "./describe";
-import { HALL_PRESETS } from "./presets";
+import {
+  describeHall,
+  type HallDescription,
+  hallObjectName,
+} from "./describe.ts";
+import { HALL_PRESETS } from "./presets/index.ts";
 
 /** A description as lines, so a change reads as a diff of lines. */
 function lines(description: HallDescription) {

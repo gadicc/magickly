@@ -1,4 +1,4 @@
-import { svgCoordinate } from "../../../svgCoordinate";
+import { svgCoordinate } from "../../../svgCoordinate.ts";
 
 /** SVG `points` for a polygon, rounded so server and browser agree. */
 export function points(list: readonly (readonly [number, number])[]): string {
