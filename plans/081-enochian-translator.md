@@ -2,8 +2,10 @@
 
 Status: designed with Gadi on 13 November 2026, decision by decision,
 adversarially reviewed by Fable, spiked, and revised after the spike
-(the same day). A few details are this plan's proposals, listed under
-"Proposed here, for Gadi". Not built: Gadi says when. Read
+(the same day). Gadi then confirmed the plan's proposals, adding
+Leitch's spellings as input ("Confirmed with Gadi"), and said to
+build it. It is built step by step on `gate/enochian-translator`.
+Read
 [current status](000-current-status.md) first.
 
 [Plan 077](077-enochian-translator-experiment.md) asked whether an LLM
@@ -79,16 +81,16 @@ final form.
    weighted.
 3. **Its own page, and a preview in the dictionary.** The tool is
    `/enochian/translate`. The dictionary shows a one-line "as a
-   sentence" preview for a query of several words (three or more is
-   proposed here), linking to the page, as a new group in
-   `searchDictionary`'s results. Both run the same code.
+   sentence" preview for a query of three words or more, linking to
+   the page, as a new group in `searchDictionary`'s results. Both run
+   the same code.
 4. **The direction is guessed, with a switch.** Both readings are
-   scored: the share of words that are Enochian headwords or Key words
-   against the share that are English words. English wins a tie. The
-   guess shows beside the box, "Reading as English → Enochian ·
-   switch". An input of one or two words that scores on both sides
-   ("I", "fire", "a man") shows both readings.
-   The preview uses the same guess.
+   scored: the share of words that are Enochian headwords, Key words
+   or Leitch's spellings (decision 13) against the share that are
+   English words. English wins a tie. The guess shows beside the
+   box, "Reading as English → Enochian · switch". An input of one or
+   two words that scores on both sides ("I", "fire", "a man") shows
+   both readings. The preview uses the same guess.
 5. **Both directions ship before an expert review** (overriding plan
    077's gate, which held "before a translator is shown to readers").
    English into Enochian shows a short notice
@@ -156,18 +158,33 @@ forms where any exist.
     "God's house" is reordered "house God" by G5, with a chip. Joining
     would build a form Dee didn't write.
 12. **Gaps.** A gap shows the nearest forms, each with its source:
-    [master: nearest GEIAD "our Lord and Master"]. Proposed here: one
-    gap per content word, and nearest forms from `searchDictionary`'s
-    "means" group and Key line glosses sharing the word's stem. Many
+    [master: nearest GEIAD "our Lord and Master"]. One gap per content
+    word, and nearest forms from `searchDictionary`'s "means" group
+    and Key line glosses sharing the word's stem. Many
     gaps have none (in the spike, 50 of 236 had any).
 
 ### Enochian into English
 
-13. **Lookup from the Keys, then the dictionary.** Casaubon's words
-    and (proposed here) Crowley's Golden Dawn readings (G38) are both
-    accepted, the
-    latter mapped to Dee's word; a Golden Dawn form spanning two of
-    Dee's words carries both glosses.
+13. **Lookup from the Keys, then the dictionary.** Casaubon's words,
+    Crowley's Golden Dawn readings (G38) and Leitch's spellings are
+    accepted, the latter two mapped to Dee's word and labelled with
+    their source; a Golden Dawn form spanning two of Dee's words
+    carries both glosses. Leitch's spellings (vol. II's lexicon) are
+    few. Of the forms in his lexicon with a Key reference, all but 34
+    are Key words or headwords once the letters the search takes as
+    one are folded. Each of the 34 was checked against the book's
+    images on 13 November 2026 (the extract is OCR, and 6 other
+    misreadings proved to be words we have): 26 are words he writes
+    joined (ODZAMRAN, DSINSI), which the join rule may or may not
+    split, and 8 differ in spelling (PRGEL for PURGEL, ZOMDUX, TORB,
+    TOLHAM, BALTLE, FCAOSGA, VIVIALPRT, BAZEMLO). The spellings, and
+    the joined forms the rule leaves whole (QTA, SOBAIAD) or splits
+    wrongly, go in a small table mapped to Dee's words and cited by
+    page. A spelling is a fact, and no gloss or other text of his is
+    copied. The table lives in the app,
+    `src/app/enochian/translate/leitchSpellings.ts`, not in
+    `magick-data`, whose published data needs a signed-off Sources row
+    (plan 080) and is CC BY 4.0.
 14. **The reading line uses Dee's own English where it can.** Where
     the input matches a run of consecutive Key lines, the line shows
     those lines' English. Elsewhere it joins cleaned glosses: Dee's
@@ -214,8 +231,8 @@ forms where any exist.
     word under a test, as plan 077 did; plan 077's list stays for its
     own record. The list Gadi accepted, with three items reworded to
     stay true under this design (the review found the first two too
-    strong; the third changed when possessives moved after their noun);
-    the rewordings are for Gadi to confirm:
+    strong; the third changed when possessives moved after their noun),
+    which Gadi confirmed on 13 November 2026:
     - This translator looks words up; it doesn't understand sentences.
       Each word is a form from Dee's Keys or our dictionary, labelled
       with its source, or a gap. Grammar words follow our notes' rules,
@@ -249,15 +266,15 @@ forms where any exist.
       of error, since the tool looks in the Keys themselves. The
       spike's: 944 of 1,054 (89.6%).
 
-    Proposed here: no margin of error on the coverage figure either,
-    since the 60 sentences are not a sample of what readers type. The
+    No margin of error on the coverage figure either, since the 60
+    sentences are not a sample of what readers type. The
     date is the commit's, not a test's.
 
 ### Data fixes before it ships
 
-22. **AR's misprint** ("the sun, to prtect", `dictionary.json5:1695`,
-    `EMPM`) is kept as printed with a correction recorded beside it,
-    as plan 061 does for misprints, once the printing is checked; and
+22. **AR's "the sun, to prtect"** (`dictionary.json5:1695`, `EMPM`)
+    is our transcription's typo, not the book's: EMPM prints "protect"
+    (p. 263, checked 13 November 2026), so it is corrected; and
     lookup ignores "(see …)" cross-references in glosses (CABA "govern,
     to; (see 'cab')" matched "see"). Both are current-status TODOs.
 
@@ -341,10 +358,10 @@ no Q, `spike/noq/`). Measured:
 Seven decisions changed after it (7, 8, 9, 10, 11, 15 and 21, as
 marked above).
 
-## Proposed here, for Gadi
+## Confirmed with Gadi (13 November 2026)
 
-Details the decisions left open, which this plan fills in; each stands
-unless Gadi changes it:
+Details the decisions left open, which this plan proposed and Gadi
+confirmed:
 
 - The dictionary preview at three words or more (decision 3).
 - One gap per content word; nearest forms from the "means" group and
@@ -352,7 +369,10 @@ unless Gadi changes it:
 - Crowley's Golden Dawn readings accepted as input (decision 13).
 - The rewording of three limitations (decision 20).
 - No margin of error on the coverage figure (decision 21).
-- Leitch's and Sloane's spellings out of scope (below).
+- Leitch's spellings accepted as input too, since they are few
+  (decision 13; proposed out of scope, changed by Gadi). Sloane MS
+  3191's spellings wait for the British Library
+  ([plan 083](083-british-library-needs.md)).
 
 ## Out of scope
 
@@ -360,20 +380,21 @@ unless Gadi changes it:
 - A page for the grammar notes (chips use a popover).
 - Any change to plan 074's ranking beyond the new group.
 - Editing the dictionary's text beyond decision 22.
-- Leitch's or Sloane's spellings as input (only Casaubon's and
-  Crowley's).
+- Sloane MS 3191's spellings as input, until the British Library's
+  images return ([plan 083](083-british-library-needs.md)).
 
 ## Steps
 
-Each step is one gated commit on a `gate/` branch, when Gadi says to
-build. (Steps are lettered so they aren't confused with stages 1 and
-2.)
+Each step is one gated commit on `gate/enochian-translator`. (Steps
+are lettered so they aren't confused with stages 1 and 2.)
 
 A. **The plan** (this file).
-B. **Data fixes** (decision 22).
+B. **Data fixes** (decision 22), and the table of Leitch's spellings
+   in the app (decision 13), each checked against his page.
 C. **The lookup module**: tokenising, phrases, tiers, choice, the rule
    tables, pronouns, possessives, gaps and nearest forms; the reading
-   line, Golden Dawn input and the join rule; the direction guess. A
+   line, Golden Dawn and Leitch input and the join rule; the
+   direction guess. A
    pure module, shared spelling and split code with `keyEntries.ts`,
    and the slim data table built from `magick-data`. Tests on the real
    data, including the spike's common words and the join rule's
@@ -402,7 +423,8 @@ This plan's questions for an expert, with plan 077's, are in
   a gap; "never" a gap; "God's house" reordered with its
   chip; a contraction expanded; a dictionary-only form labelled; the
   join rule's right and wrong held-out splits pinned; Q not a prefix;
-  Golden Dawn input; the direction guess on short and mixed input.
+  Golden Dawn input; Leitch's (PRGEL to PURGEL, SOBAIAD kept whole
+  and mapped); the direction guess on short and mixed input.
 - **The figures test**: a fresh run equals the committed numbers.
 - **Component tests**: tiles, chips, gaps, the notice, the live
   region, fragment state (a cold `#q=`), the keypad, the preview's lazy
@@ -428,4 +450,6 @@ This plan's questions for an expert, with plan 077's, are in
 - **Copyright.** No new text enters the repository: the Keys' English
   is Casaubon (1659) and Crowley (1912), public domain; the
   dictionary's text is already in the package and stays out of the
-  published artefact (plan 052); the grammar notes are our own words.
+  published artefact (plan 052); the grammar notes are our own words;
+  Leitch's spellings are facts, cited by page, in the app and not the
+  published package.

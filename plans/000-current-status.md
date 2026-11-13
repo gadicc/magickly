@@ -218,8 +218,9 @@ Follow-ups are separate from the completed migration work:
   traditions' readings and the nineteenth Call. Built 10 November on
   `gate/enochian-keys`. TODO: Dee's own copy, Sloane MS 3191, when the
   British Library's images return: his accents, the words Casaubon's
-  print lost (Keys 13 to 16) and his Aethyr spellings; an expert may
-  answer sooner ([plan 082](082-enochian-expert-questions.md)).
+  print lost (Keys 13 to 16) and his Aethyr spellings, listed in
+  [plan 083](083-british-library-needs.md); an expert may answer
+  sooner ([plan 082](082-enochian-expert-questions.md)).
 - 10 November 2026: English search in the Enochian dictionary, with a
   revamp of its page, in [plan 074](074-enochian-dictionary-search.md).
   The two boxes (Latin, and Enochian right to left) hold one query,
@@ -408,13 +409,14 @@ Follow-ups are separate from the completed migration work:
   the recommendation is strict lookup with gaps that suggest the
   nearest forms, and a model reading Enochian into English. TODO:
   lookup should ignore "(see …)" cross-references in glosses (CABA
-  "govern, to; (see 'cab')" matched "see"). TODO: the dictionary glosses AR (`EMPM`) "the
-  sun, to prtect", which keeps lookup from matching "protect"; record
-  a correction beside it as plan 061 does for misprints, once the
-  printing is checked.
+  "govern, to; (see 'cab')" matched "see"). TODO: the dictionary
+  glosses AR (`EMPM`) "the sun, to prtect", which keeps lookup from
+  matching "protect"; EMPM prints "protect" (p. 263), so it is our
+  typo, to be corrected.
 - 13 November 2026: an Enochian translator by lookup designed in
   [plan 081](081-enochian-translator.md), decision by decision with
-  Gadi, reviewed by Fable and spiked; not built (Gadi says when).
+  Gadi, reviewed by Fable and spiked. Gadi confirmed its proposals the
+  same day, adding Leitch's spellings as input, and said to build it.
   Stage 1 is a script in the browser, both directions, never coining
   a word; stage 2, an AI reading of Enochian on the existing chat
   allowance, is outlined. The two TODOs above are its step B.
@@ -424,6 +426,11 @@ Follow-ups are separate from the completed migration work:
   finish as much as we can, then show the expert our work and ask
   whether they would help. Any work that raises a question only an
   expert can settle adds it there.
+- 13 November 2026: what we need from the British Library gathered into
+  one running list, [plan 083](083-british-library-needs.md): the
+  tables' and the Keys' readings from Dee's own copy, Sloane MS 3191,
+  whose images were still unavailable that day, and the doubtful
+  readings.
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose
@@ -784,7 +791,8 @@ Follow-ups are separate from the completed migration work:
   (Peterson ff.53v–54r, Vovina and Burford ff.55v–56r), the 1587
   capitals, the Black Cross's placement, the letters Dee struck through
   in 1584, the two Fire squares where Sloane and Cotton differ, and the
-  images' licence. TODO from earlier: Gadi's call on the Chiefs on the new presets' daises
+  images' licence; all now in [plan 083](083-british-library-needs.md).
+  TODO from earlier: Gadi's call on the Chiefs on the new presets' daises
   (after the merge; he leans towards Greer's redraws), the stage F
   markers and placeholders Gadi has yet to decide on (Eden and the Fall,
   with a proposal to make the pictures shown to the candidate cards

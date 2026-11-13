@@ -78,8 +78,9 @@ that carries "in": are the chips right?
 ## Dee's text
 
 These may be answered by an expert who has read Dee's manuscripts,
-before the British Library's images of Sloane MS 3191 return
-([plan 073](073-enochian-keys.md)).
+before the British Library's images of Sloane MS 3191 return. The
+same items are on the list of what we need from the Library
+([plan 083](083-british-library-needs.md)).
 
 - **Long s read as f:** Casaubon's print has BUFD (Key 8) and CAFAFAM
   (Key 18) where Leitch has BUSD "glory" and CASASAM "abiding"; the
@@ -88,6 +89,9 @@ before the British Library's images of Sloane MS 3191 return
   What does Dee write?
 - **The 17 Key rows marked `uncertain`** in `keys.json5`, such as the
   two words Nalvage hummed in Key 1 and left unprinted.
+- **Leitch's spellings that differ from our Keys' and dictionary's**,
+  eight (PRGEL for PURGEL, TOLHAM, BAZEMLO), which plan 081
+  accepts as input: which are Dee's own?
 - **The words Casaubon's print lost** (Keys 13 to 16), for which
   Crowley's forms stand in, and Dee's accents and Aethyr spellings.
 
