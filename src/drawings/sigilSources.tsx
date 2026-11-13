@@ -1,11 +1,13 @@
 import type { PlanetarySpiritId } from "magick-components/astrology/planetarySpirits";
+import { archivePageUrl, MIRRORED_PAGES } from "@/sources/mirroredPages";
 
 /**
  * The public-domain printings our redrawn sigils follow, as links to the
  * leaf of each scan on archive.org (plan 080, "The sigils' sources"). The
  * package's JSDoc cites the same pages and leaves; `sigilSources.test`
  * holds the two to each other. A leaf is archive.org's page index, the
- * `n…` of its page URLs.
+ * `n…` of its page URLs. Heydon's pages are mirrored in the app
+ * (`src/sources/mirroredPages.ts`); the Equinox's plate is not.
  */
 
 /** archive.org's single-page view of one leaf of an item, or of a file in it. */
@@ -20,8 +22,16 @@ const leafUrl = (item: string, leaf: number, file?: string) =>
  * the Getty Research Institute's copy, `theomagiaortempl00heyd`.
  */
 export const HEYDON_PAGES = {
-  13: { leaf: 124, url: leafUrl("theomagiaortempl00heyd", 124) },
-  15: { leaf: 126, url: leafUrl("theomagiaortempl00heyd", 126) },
+  13: {
+    leaf: MIRRORED_PAGES.heydon13.leaf,
+    url: archivePageUrl(MIRRORED_PAGES.heydon13),
+    mirror: "heydon13",
+  },
+  15: {
+    leaf: MIRRORED_PAGES.heydon15.leaf,
+    url: archivePageUrl(MIRRORED_PAGES.heydon15),
+    mirror: "heydon15",
+  },
 } as const;
 
 /** A page of Heydon's with Rulers' sigils on it. */

@@ -46,6 +46,7 @@ export function HallPanZoom({
   aspect,
   active,
   onSwipe,
+  label = "Hall drawing",
   children,
 }: {
   /** The drawing's width over its height, to fit it to the surface. */
@@ -53,6 +54,8 @@ export function HallPanZoom({
   /** Whether the viewer is open: only then are the keys its own. */
   active: boolean;
   onSwipe?: (direction: "next" | "previous") => void;
+  /** The surface's accessible name: what it shows. */
+  label?: string;
   children: React.ReactNode;
 }) {
   const surface = React.useRef<HTMLDivElement>(null);
@@ -256,7 +259,7 @@ export function HallPanZoom({
     <Box
       ref={surface}
       role="group"
-      aria-label="Hall drawing"
+      aria-label={label}
       data-scale={view.scale}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}

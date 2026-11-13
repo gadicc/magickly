@@ -32,6 +32,7 @@ import {
   heydonLabel,
 } from "@/drawings/sigilSources";
 import { capitalizeFirstLetter } from "@/lib/utils";
+import SourceLink from "@/sources/SourceLink";
 import Tetragram from "../Tetragram";
 import { figuresByPairs } from "./pairs";
 
@@ -217,13 +218,17 @@ export default function Geomancy() {
         </TableContainer>
         <Typography variant="body2" sx={{ mt: 1 }}>
           The sigils are drawn after{" "}
-          <a href={HEYDON_PAGES[13].url}>
+          <SourceLink plain page={HEYDON_PAGES[13].mirror}>
             <HeydonCitation page={13} />
-          </a>{" "}
+          </SourceLink>{" "}
           and{" "}
-          <a href={HEYDON_PAGES[15].url} aria-label={heydonLabel(15)}>
+          <SourceLink
+            plain
+            page={HEYDON_PAGES[15].mirror}
+            aria-label={heydonLabel(15)}
+          >
             p. 15
-          </a>
+          </SourceLink>
           .
         </Typography>
         {/* The Moon's two intelligences have a note each. */}

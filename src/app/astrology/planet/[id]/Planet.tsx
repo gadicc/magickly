@@ -1,4 +1,3 @@
-import MuiLink from "@mui/material/Link";
 import PlanetarySpirit from "magick-components/astrology/planetarySpirits";
 import { dayOf } from "magick-components/astrology/planetDays";
 import { planetName } from "magick-components/astrology/planetName";
@@ -13,6 +12,7 @@ import {
   rulerSigilPage,
 } from "@/drawings/sigilSources";
 import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
+import SourceLink from "@/sources/SourceLink";
 import { RWSName } from "@/tarot";
 import {
   EntityFrame,
@@ -41,9 +41,9 @@ function SigilSource({ spiritId }: { spiritId: string }) {
   return (
     <Muted block>
       Sigil after{" "}
-      <MuiLink href={HEYDON_PAGES[page].url}>
+      <SourceLink page={HEYDON_PAGES[page].mirror}>
         <HeydonCitation page={page} />
-      </MuiLink>
+      </SourceLink>
       .
     </Muted>
   );

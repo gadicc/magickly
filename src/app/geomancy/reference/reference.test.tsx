@@ -49,9 +49,12 @@ describe("geomancy reference page", () => {
     // words the bytes are those before, 66525 40af8b13…), and when a note
     // under the spirits' table linked Heydon's pages for the sigils (13
     // November 2026; with that paragraph and its style removed the bytes
-    // are those before, 66554 c0f8d848…).
+    // are those before, 66554 c0f8d848…), and when those links and the
+    // Moon's note's link to Agrippa came to open the mirrored page in a
+    // dialog (13 November 2026; with their three aria-haspopup attributes
+    // removed the bytes are those before, 67214 6c1a18b3…).
     expect(digest(html)).toBe(
-      "67214 6c1a18b343b05c1982dcf4de9c42671e250eaa143e07716a01b9e55d46a05c4c",
+      "67283 a3a296e89bf9601d810a9d0d0833035cb5ac5a4f00dfe1a9975fa1fa7fef9ccc",
     );
   });
 
@@ -134,10 +137,10 @@ describe("geomancy reference page", () => {
     )?.[0];
     expect(note).toBeDefined();
     expect(note).toContain(
-      '<a href="https://archive.org/details/theomagiaortempl00heyd/page/n124/mode/1up">Heydon, <cite>Theomagia</cite> (1663/4), p. <!-- -->13</a>',
+      '<a href="https://archive.org/details/theomagiaortempl00heyd/page/n124/mode/1up" aria-haspopup="dialog">Heydon, <cite>Theomagia</cite> (1663/4), p. <!-- -->13</a>',
     );
     expect(note).toContain(
-      '<a href="https://archive.org/details/theomagiaortempl00heyd/page/n126/mode/1up" aria-label="Heydon, Theomagia (1663/4), p. 15">p. 15</a>',
+      '<a href="https://archive.org/details/theomagiaortempl00heyd/page/n126/mode/1up" aria-label="Heydon, Theomagia (1663/4), p. 15" aria-haspopup="dialog">p. 15</a>',
     );
     // Under the table, before the Moon's notes.
     expect(

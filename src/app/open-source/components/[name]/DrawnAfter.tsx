@@ -6,6 +6,7 @@ import {
   PlateXCitation,
 } from "@/drawings/sigilSources";
 import type { ComponentName } from "@/explorer/components";
+import SourceLink from "@/sources/SourceLink";
 import Link from "@/ui/Link";
 
 /**
@@ -24,13 +25,13 @@ export default function DrawnAfter({
     return (
       <p className={className}>
         The sigils are drawn after{" "}
-        <Link href={HEYDON_PAGES[13].url}>
+        <SourceLink page={HEYDON_PAGES[13].mirror}>
           <HeydonCitation page={13} />
-        </Link>{" "}
+        </SourceLink>{" "}
         and{" "}
-        <Link href={HEYDON_PAGES[15].url} aria-label={heydonLabel(15)}>
+        <SourceLink page={HEYDON_PAGES[15].mirror} aria-label={heydonLabel(15)}>
           p. 15
-        </Link>
+        </SourceLink>
         .
       </p>
     );

@@ -80,8 +80,10 @@ describe("/open-source/components/[name]", () => {
       /<a [^>]*href="https:\/\/archive.org\/details\/theomagiaortempl00heyd\/page\/n124\/mode\/1up"[^>]*>Heydon, <cite>Theomagia<\/cite> \(1663\/4\), p. <!-- -->13<\/a>/,
     );
     expect(spirit).toMatch(
-      /<a [^>]*aria-label="Heydon, Theomagia \(1663\/4\), p. 15"[^>]*href="https:\/\/archive.org\/details\/theomagiaortempl00heyd\/page\/n126\/mode\/1up"[^>]*>p. 15<\/a>/,
+      /<a [^>]*href="https:\/\/archive.org\/details\/theomagiaortempl00heyd\/page\/n126\/mode\/1up"[^>]*aria-label="Heydon, Theomagia \(1663\/4\), p. 15"[^>]*>p. 15<\/a>/,
     );
+    // Each opens the mirrored page in a dialog.
+    expect(spirit.match(/aria-haspopup="dialog"/g)).toHaveLength(2);
     expect(render("tablet")).toMatch(
       /<a [^>]*href="https:\/\/archive.org\/details\/crowley-equinox_202110\/The%20Equinox%20Vol.%201%2C%20No.%207\/page\/n256\/mode\/1up"[^>]*><cite>The Equinox<\/cite> I\(7\) \(1912\), Plate X<\/a>/,
     );

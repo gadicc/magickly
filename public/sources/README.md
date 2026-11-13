@@ -1,7 +1,10 @@
 # Mirrored source pages
 
 Pages of public-domain books that the site cites, so a reader can see the
-cited page without leaving it. `src/sources/mirroredPages.ts` is the manifest:
+cited page without leaving it: the source links on the planet pages, the
+geomancy reference and the component explorer open them in a dialog
+(`src/sources/SourceLink.tsx`), and without JavaScript the same links go to
+the page on archive.org. `src/sources/mirroredPages.ts` is the manifest:
 each page's item, leaf, download URL and SHA-256, the region outlined on it,
 and the committed file's size and hash.
 

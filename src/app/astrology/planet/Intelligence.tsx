@@ -1,5 +1,6 @@
 import MuiLink from "@mui/material/Link";
 import type { PlanetRow } from "magick-data/rows";
+import SourceLink from "@/sources/SourceLink";
 import { Hebrew } from "@/ui/entity";
 import styles from "./intelligence.module.css";
 
@@ -19,10 +20,6 @@ export const NOTE_IDS = {
   note: (n: 1 | 2) => `intelligence-note-${n}`,
   ref: (n: 1 | 2) => `intelligence-ref-${n}`,
 } as const;
-
-/** The Moon's intelligence of intelligences, in Agrippa's 1533 printing. */
-const AGRIPPA_1533 =
-  "https://archive.org/details/DeOccultaPhilosophiaLoc1533/page/n164/mode/1up";
 
 /** The ids are lower case, with no table yet. */
 function capitalize(text: string) {
@@ -105,9 +102,11 @@ export function IntelligenceNotes({
         <li id={NOTE_IDS.note(1)}>
           <span lang="he-Latn">{classical.roman.agrippa1533}</span> is the
           classical name. Agrippa gives the Moon no single intelligence: in{" "}
-          <MuiLink href={AGRIPPA_1533}>
+          {/* The Moon's intelligence of intelligences, in Agrippa's 1533
+              printing: a link to the scan, opening our mirror of it. */}
+          <SourceLink page="agrippa149">
             <cite>De occulta philosophia</cite> (1533), Book II, chapter 22
-          </MuiLink>
+          </SourceLink>
           , he names an “intelligence of intelligences” in its place, numbered
           3321, the sum of the Moon&apos;s magic square. Crowley&apos;s{" "}
           <cite>777</cite> gives a variant of the name, as{" "}
