@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import fields from "magick-data/fields";
 import type { TableName } from "magick-data/tables";
 import { renderToString } from "react-dom/server";
@@ -37,6 +38,15 @@ const ids = (html: string) =>
 
 const listed = new Set(sitemap().map((entry) => new URL(entry.url).pathname));
 
+/** The ids the site's frame gives its own elements, read from its source. */
+const LAYOUT_IDS = new Set(
+  ["../../../layout.tsx", "../../../MyAppBar.tsx", "../../../SiteFooter.tsx"]
+    .map((file) => readFileSync(new URL(file, import.meta.url), "utf8"))
+    .flatMap((source) =>
+      [...source.matchAll(/\bid="([^"]+)"/g)].map(([, id]) => id),
+    ),
+);
+
 describe("/open-source/data/[table]", () => {
   it("has a page for every table and no other", () => {
     expect(generateStaticParams()).toEqual(
@@ -52,6 +62,12 @@ describe("/open-source/data/[table]", () => {
     expect(metadata.alternates?.canonical).toBe("/open-source/data/sephirah");
     expect(metadata.title).toBe("sephirah: a magick-data table");
     expect(metadata.description).toBe(fields.tables.sephirah.description);
+    for (const table of TABLE_NAMES) {
+      const { description } = await generateMetadata({
+        params: Promise.resolve({ table }),
+      } as never);
+      expect(description, table).not.toContain("`");
+    }
   });
 
   it("stays out of the sitemap and site search", async () => {
@@ -82,9 +98,17 @@ describe("/open-source/data/[table]", () => {
       expect(keys).toHaveLength(fields.tables[table].rows);
       expect(new Set(keys).size).toBe(keys.length);
       for (const key of keys) expect(anchors.has(key), key).toBe(true);
-      // Nothing else on the page answers to a row's name.
-      expect(keys).not.toContain("rows");
-      expect(keys).not.toContain("fields");
+    });
+
+    it("gives nothing else on the page, or around it, a row's name", () => {
+      const all = [...html.matchAll(/\sid="([^"]*)"/g)].map(([, id]) =>
+        decode(id),
+      );
+      expect(all.length, "ids are unique").toBe(new Set(all).size);
+      for (const [key] of rowsOf(table)) {
+        expect(key, key).not.toMatch(/^(field|detail)-/);
+        expect(LAYOUT_IDS.has(key), key).toBe(false);
+      }
     });
 
     it("links each column's header and each field to its entry", () => {
@@ -128,6 +152,33 @@ describe("/open-source/data/[table]", () => {
       "treeOfLifePath",
       "seventyTwoAngel",
     ]);
+  });
+});
+
+describe("a table's field list", () => {
+  it("says what an id that is not a link names, with the right article", () => {
+    const planet = render("planet").replace(/<!-- -->/g, "");
+    expect(planet).toContain(
+      "an id of an intelligence, which has no table yet",
+    );
+    expect(planet).toContain("an id of a spirit, which has no table yet");
+    const paths = render("treeOfLifePath").replace(/<!-- -->/g, "");
+    expect(paths).toContain(
+      "an id from <code>tarot-deck</code>, outside the package",
+    );
+  });
+
+  it("sets Hebrew that stands alone in a Hebrew face", () => {
+    expect(render("hebrewLetter")).toMatch(
+      /The letter itself: <span[^>]*lang="he"[^>]*dir="rtl"[^>]*>א<\/span>/,
+    );
+  });
+
+  it("links a row of the same table on the page, and another table's by its page", () => {
+    const grades = render("gdGrade");
+    expect(hrefs(grades)).toContain("#1=10");
+    expect(hrefs(grades)).toContain("/open-source/data/sephirah#malchut");
+    expect(hrefs(grades)).not.toContain("/open-source/data/gdGrade#1=10");
   });
 });
 

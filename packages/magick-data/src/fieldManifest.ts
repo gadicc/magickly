@@ -123,9 +123,26 @@ const rulesOf = (steps: PipeItem[]) =>
       typeof step.message === "string" ? step.message : `check ${i + 1}`,
     );
 
-function constraintsOf(steps: PipeItem[]): Constraints | undefined {
+/** The pipe steps the manifest reads; any other validation throws. */
+const READ_STEPS = new Set([
+  "regex",
+  "integer",
+  "min_value",
+  "check",
+  "description",
+  "metadata",
+]);
+
+function constraintsOf(
+  steps: PipeItem[],
+  path: string,
+): Constraints | undefined {
   const constraints: Constraints = {};
   for (const step of steps) {
+    if (!READ_STEPS.has(step.type))
+      throw new Error(
+        `${path || "the row"}: a ${step.type} ${step.kind}, which the field manifest does not read`,
+      );
     if (step.type === "regex")
       constraints.pattern = (step.requirement as RegExp).source;
     else if (step.type === "integer") constraints.integer = true;
@@ -157,11 +174,12 @@ function isMap(entries: Record<string, SchemaNode>) {
 
 /** A schema's type, structured; an object's keys, not their types. */
 function typeOf(node: SchemaNode, path: string): FieldType {
-  const steps = stepsOf(node);
+  // Read for every kind, so that a validation the manifest cannot state
+  // throws wherever it is, not only on strings and numbers.
+  const constraints = constraintsOf(stepsOf(node), path);
   switch (node.type) {
     case "string":
     case "number": {
-      const constraints = constraintsOf(steps);
       return constraints
         ? { kind: node.type, constraints }
         : { kind: node.type };

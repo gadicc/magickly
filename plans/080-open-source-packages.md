@@ -1408,7 +1408,7 @@ runs were discarded and the commits gated again at a lower load.
   passages and the changed Gemini ones (a first run, cut short by a
   gateway error, embedded those; the count was not kept), and
   `search:publish` requested nothing. On stage B it had been 95 Qwen
-  passages. They still match on the hardening, which changed no prose.
+  passages. They still match on the hardening, which changed no prose. They still match on the hardening, which changed no prose.
 
 **Left for Gadi:**
 

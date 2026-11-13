@@ -3,7 +3,10 @@
    theme's variables, so the scheme switches with the page. */
 
 .container {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* Frank Ruhl Libre covers only Hebrew (its unicode-range), so it sets
+     the Hebrew names, Lenain's pointed ones among them, and nothing else. */
+  font-family:
+    "Frank Ruhl Libre", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.85rem;
   line-height: 1.4;
   white-space: pre-wrap;

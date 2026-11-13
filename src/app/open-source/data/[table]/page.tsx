@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { plainText } from "../Described";
 import { isTableName, TABLE_NAMES, tableFields, tablePath } from "../tables";
 import TablePage from "./TablePage";
 
@@ -22,7 +23,7 @@ export async function generateMetadata({
   if (!isTableName(table)) notFound();
   return {
     title: `${table}: a magick-data table`,
-    description: tableFields(table).description,
+    description: plainText(tableFields(table).description ?? ""),
     alternates: { canonical: tablePath(table) },
     robots: { index: false, follow: true },
   };

@@ -1,4 +1,5 @@
 import { Box, Container, Typography } from "@mui/material";
+import MuiLink from "@mui/material/Link";
 import type { Field } from "magick-data/fields";
 import type { TableName } from "magick-data/tables";
 import type { ReactNode } from "react";
@@ -34,8 +35,21 @@ const LONG = 60;
  */
 const BELOW_BAR = "72px";
 
-/** A link to a row of another table, or this one. */
-function RowLink({ table, id }: { table: string; id: string }) {
+/**
+ * A link to a row: a plain anchor on this table's page, so that the
+ * browser moves to it and says so (`hashchange`), and the router's link to
+ * another table's page.
+ */
+function RowLink({
+  table,
+  id,
+  from,
+}: {
+  table: string;
+  id: string;
+  from: string;
+}) {
+  if (table === from) return <MuiLink href={`#${id}`}>{id}</MuiLink>;
   return <Link href={rowHref(table, id)}>{id}</Link>;
 }
 
@@ -62,7 +76,15 @@ function Swatches({ css }: { css: string }) {
 }
 
 /** One value as a cell shows it. */
-function Value({ field, value }: { field: Field; value: unknown }): ReactNode {
+function Value({
+  field,
+  value,
+  table,
+}: {
+  field: Field;
+  value: unknown;
+  table: string;
+}): ReactNode {
   if (value === undefined) return null;
   if (value === null)
     return (
@@ -76,7 +98,7 @@ function Value({ field, value }: { field: Field; value: unknown }): ReactNode {
     return ids.map((id, i) => (
       <Box component="span" key={id} sx={{ whiteSpace: "nowrap" }}>
         {i ? ", " : ""}
-        <RowLink table={link.to} id={id} />
+        <RowLink table={link.to} id={id} from={table} />
       </Box>
     ));
   }
@@ -124,16 +146,24 @@ function Value({ field, value }: { field: Field; value: unknown }): ReactNode {
 }
 
 /** A row's cell for one column, with a swatch where the column is a colour. */
-function Cell({ column, row }: { column: Column; row: Row }) {
+function Cell({
+  column,
+  row,
+  table,
+}: {
+  column: Column;
+  row: Row;
+  table: string;
+}) {
   const { field, parent } = column;
   const value = valueAt(row, field.path);
   const web = parent && valueAt(row, `${field.path}Web`);
   if (typeof web !== "string" || value === undefined)
-    return <Value field={field} value={value} />;
+    return <Value field={field} value={value} table={table} />;
   return (
     <Box component="span" sx={{ whiteSpace: "nowrap" }}>
       <Swatches css={web} />
-      <Value field={field} value={value} />
+      <Value field={field} value={value} table={table} />
     </Box>
   );
 }
@@ -150,13 +180,18 @@ function LinkNote({ field }: { field: Field }) {
         {many} in <Link href={tablePath(link.to)}>{link.to}</Link>
       </>
     );
+  if (link.kind === "pending")
+    return (
+      <>
+        {" · "}
+        {many} of {/^[aeiou]/.test(link.to) ? "an" : "a"} {link.to}, which has
+        no table yet
+      </>
+    );
   return (
     <>
       {" · "}
-      {many} of a {link.to}
-      {link.kind === "pending"
-        ? ", which has no table yet"
-        : ", outside the package"}
+      {many} from <code>{link.to}</code>, outside the package
     </>
   );
 }
@@ -243,27 +278,32 @@ export default function TablePage({ table }: { table: TableName }) {
       <Box component="section" aria-labelledby="rows">
         <Box sx={{ display: "flex", alignItems: "baseline", gap: 2 }}>
           <H2 id="rows">Rows</H2>
-          <Link href="#fields">Fields</Link>
+          <MuiLink href="#fields">Fields</MuiLink>
         </Box>
         <RowsTable
           keyHeader={
             keyField ? (
-              <Link href={`#${fieldAnchor(keyField.path)}`}>
+              <MuiLink href={`#${fieldAnchor(keyField.path)}`}>
                 <code>{keyField.path}</code>
-              </Link>
+              </MuiLink>
             ) : (
               "key"
             )
           }
           headers={columns.map(({ field }) => (
-            <Link key={field.path} href={`#${fieldAnchor(field.path)}`}>
+            <MuiLink key={field.path} href={`#${fieldAnchor(field.path)}`}>
               <code>{field.path}</code>
-            </Link>
+            </MuiLink>
           ))}
           rows={rows.map(([key, row]) => ({
             key,
             cells: columns.map((column) => (
-              <Cell key={column.field.path} column={column} row={row} />
+              <Cell
+                key={column.field.path}
+                column={column}
+                row={row}
+                table={table}
+              />
             )),
             json: row,
             entity: entityHref(table, key, row),

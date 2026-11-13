@@ -309,6 +309,27 @@ describe("the field manifest", () => {
     });
   });
 
+  it("refuses a validation it does not read, wherever it is", () => {
+    expect(() =>
+      manifestOf(
+        v.strictObject({
+          id: v.string(),
+          n: v.pipe(v.number(), v.maxValue(3)),
+        }),
+      ),
+    ).toThrow(
+      "n: a max_value validation, which the field manifest does not read",
+    );
+    expect(() =>
+      manifestOf(
+        v.strictObject({
+          id: v.string(),
+          list: v.pipe(v.array(v.string()), v.length(2)),
+        }),
+      ),
+    ).toThrow("list: a length validation");
+  });
+
   it("refuses a schema it does not read, rather than passing over it", () => {
     expect(() =>
       manifestOf(

@@ -1,10 +1,11 @@
+import Data from "magick-data";
 import fields from "magick-data/fields";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import sitemap from "@/app/sitemap";
 import OpenSourcePage from "../page";
 import DataPage, { metadata } from "./page";
-import { TABLE_NAMES, tablePath } from "./tables";
+import { relationsOf, TABLE_NAMES, tablePath } from "./tables";
 
 // Emotion puts its styles inline before each element; they are not the page,
 // and nor are the markers React puts between adjacent pieces of text.
@@ -58,6 +59,35 @@ describe("/open-source/data", () => {
         expect(hrefs(html)).toContain(text.page);
       }
     }
+  });
+
+  it("is right that the tables the barrel leaves out link to none and from none", () => {
+    // Not the converse: geomanticHouse links nothing and is in the barrel.
+    const left = TABLE_NAMES.filter((name) => !Object.hasOwn(Data, name));
+    expect(left.length).toBeGreaterThan(0);
+    for (const name of left)
+      expect(relationsOf(name), name).toEqual({
+        to: [],
+        from: [],
+        self: false,
+      });
+  });
+
+  it("gives each text its import line, and its page only where it has one", () => {
+    expect(html).toContain(
+      "import * as keys from &quot;magick-data/enochian/keys&quot;;",
+    );
+    expect(html).toContain(
+      "import evidence from &quot;magick-data/json/kabbalah/lenain/evidence.json&quot; with { type: &quot;json&quot; };",
+    );
+    expect(html).toContain("Most are shown on a page of the site.");
+  });
+
+  it("says the data's licence with its exception", () => {
+    expect(html).toContain("The data is under CC BY 4.0, except where");
+    expect(hrefs(html)).toContain(
+      "https://github.com/gadicc/magickly/tree/main/packages/magick-data#sources",
+    );
   });
 
   it("says the barrel leaves out the tables that link to nothing", () => {

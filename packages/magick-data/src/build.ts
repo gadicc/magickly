@@ -61,6 +61,7 @@ import {
   mkdir,
   readdir,
   readFile,
+  rename,
   rm,
   stat,
   writeFile,
@@ -131,9 +132,10 @@ const TABLE_OF_SOURCE = new Map(
  * What `dist/` holds, and this build owns. Nothing is written as `.mjs` or
  * `.d.mts` any more — they are what the dictionary was emitted as before
  * every source became a module — and they are listed so that a `dist/` an
- * older build left behind loses them as stale.
+ * older build left behind loses them as stale; so is a `.tmp` that a write
+ * cut short left behind.
  */
-const OUTPUTS = [".json", ".js", ".d.ts", ".mjs", ".d.mts"];
+const OUTPUTS = [".json", ".js", ".d.ts", ".mjs", ".d.mts", ".tmp"];
 
 /** Every `*.json5` under `src/`, relative to it. */
 async function sources(dir = DATA_DIR): Promise<string[]> {
@@ -152,7 +154,17 @@ async function writeIfChanged(path: string, content: string) {
   const already = await readFile(path, "utf8").catch(() => null);
   if (already === content) return false;
   await mkdir(dirname(path), { recursive: true });
-  await writeFile(path, content);
+  // Whole or not at all: a bundler or the field manifest reading the file
+  // while it is written sees the old bytes or the new, never half.
+  // A `.tmp` left by a build that died here is pruned as stale by the next.
+  const temporary = `${path}.${process.pid}.tmp`;
+  try {
+    await writeFile(temporary, content);
+    await rename(temporary, path);
+  } catch (error) {
+    await rm(temporary, { force: true });
+    throw error;
+  }
   return true;
 }
 
@@ -440,10 +452,11 @@ export async function setup() {
 
 /**
  * The modules whose edit changes what the whole build writes: the graph is
- * `dist/graph.json`, and the schemas' picklists decide what each table's
- * declaration states as a literal. Relative to `src/`.
+ * `dist/graph.json`, the schemas' picklists decide what each table's
+ * declaration states as a literal, and all three make the field manifest.
+ * Relative to `src/`.
  */
-const BUILD_INPUTS = new Set(["graph.ts", "schemas.ts"]);
+const BUILD_INPUTS = new Set(["graph.ts", "schemas.ts", "fieldManifest.ts"]);
 
 /**
  * What the watcher does about a changed file, named relative to `src/`:
@@ -467,8 +480,9 @@ export function rebuildFor(name: string): "source" | "all" | null {
  * the next save fixes, and a file that has gone sends the whole build round
  * again, which is what prunes the outputs it explained.
  *
- * An edit to [graph.ts](./graph.ts) or [schemas.ts](./schemas.ts) runs the
- * whole build again in a child process, since this one imported both when
+ * An edit to [graph.ts](./graph.ts), [schemas.ts](./schemas.ts) or
+ * [fieldManifest.ts](./fieldManifest.ts) runs the whole build again in a
+ * child process, since this one imported them when
  * it started and an ES module cannot be imported twice. From then on this
  * process's copies are stale, so every later rebuild goes to a child too;
  * restarting the task returns to rebuilding one source in-process. The
@@ -480,7 +494,7 @@ async function watchData() {
   const { tables, texts } = await buildData();
   const script = fileURLToPath(import.meta.url);
 
-  // Set once graph.ts or schemas.ts has changed under this process.
+  // Set once a build input has changed under this process.
   let stale = false;
   // One child at a time; a change while one runs asks for one more after it.
   let child: Promise<void> | null = null;
@@ -515,10 +529,23 @@ async function watchData() {
   const rebuild = async (name: string) => {
     try {
       for (const out of await buildOne(name)) console.log(`data: ${out}`);
-      for (const out of await buildFields()) console.log(`data: ${out}`);
+      return true;
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") await buildData();
       else console.error(`data: ${name}: ${(error as Error).message}`);
+      return false;
+    }
+  };
+
+  // The field manifest reads every table's JSON, so it is written once
+  // after a burst of sources, not once per source.
+  const rebuildSources = async (names: string[]) => {
+    const built = await Promise.all(names.map(rebuild));
+    if (!built.some(Boolean)) return;
+    try {
+      for (const out of await buildFields()) console.log(`data: ${out}`);
+    } catch (error) {
+      console.error(`data: the field manifest: ${(error as Error).message}`);
     }
   };
 
@@ -535,7 +562,7 @@ async function watchData() {
     if (changed.length) stale = true;
     if (stale && (changed.length || names.length))
       rebuildAll(changed.length ? changed.join(" and ") : names.join(", "));
-    else for (const name of names) void rebuild(name);
+    else if (names.length) void rebuildSources(names);
   };
 
   // One watcher per directory, and deliberately not one recursive watcher
@@ -565,7 +592,7 @@ async function watchData() {
 
   console.log(
     `data: watching ${tables + texts} sources in ${dirs.length} directories, ` +
-      `and ${[...BUILD_INPUTS].join(" and ")}`,
+      `and ${[...BUILD_INPUTS].join(", ")}`,
   );
 }
 

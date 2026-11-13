@@ -42,6 +42,18 @@ export function importLine(table: TableName) {
   return `import ${importName(table)} from "magick-data/${subpath.slice(2)}";`;
 }
 
+/**
+ * The line that imports a text: the whole module, whose exports differ
+ * from text to text, or a JSON file that has no module, as JSON.
+ */
+export function textImportLine(subpath: string) {
+  const specifier = `magick-data/${subpath.slice(2)}`;
+  const name = (subpath.split("/").at(-1) as string).replace(/\.json$/, "");
+  return subpath.endsWith(".json")
+    ? `import ${name} from "${specifier}" with { type: "json" };`
+    : `import * as ${name} from "${specifier}";`;
+}
+
 export type Row = Record<string, unknown>;
 
 /** A table's rows with the key each is named by, in the file's order. */

@@ -1,6 +1,6 @@
 "use client";
 import { Box, Button } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { type defaultStyles, JsonView } from "react-json-view-lite";
 import Link from "@/ui/Link";
 import styles from "./jsonView.module.css";
@@ -35,6 +35,9 @@ const shallow = (level: number) => level < 2;
  * A row's detail (plan 080, decision 4): its JSON as written, and ways to
  * take it away: a copy, a link to the row, and its page where it has one.
  */
+/** How long "Copied" stays before the button reads "Copy JSON" again. */
+export const COPIED_FOR = 3000;
+
 export default function RowDetail({
   rowKey,
   json,
@@ -45,6 +48,11 @@ export default function RowDetail({
   entity?: string;
 }) {
   const [copied, setCopied] = useState<"yes" | "no" | null>(null);
+  useEffect(() => {
+    if (copied !== "yes") return;
+    const reset = setTimeout(() => setCopied(null), COPIED_FOR);
+    return () => clearTimeout(reset);
+  }, [copied]);
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(JSON.stringify(json, null, 2));
@@ -73,11 +81,10 @@ export default function RowDetail({
             Its page
           </Button>
         ) : null}
-        {copied === "no" ? (
-          <Box component="span" role="status" sx={{ alignSelf: "center" }}>
-            The browser refused the clipboard.
-          </Box>
-        ) : null}
+        {/* Always there, so that a screen reader announces what is put in it. */}
+        <Box component="span" role="status" sx={{ alignSelf: "center" }}>
+          {copied === "no" ? "The browser refused the clipboard." : ""}
+        </Box>
       </Box>
       <JsonView
         data={json as object}

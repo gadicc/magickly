@@ -5,6 +5,7 @@ import type { TableName } from "magick-data/tables";
 import { Fragment } from "react";
 import { H2, List, PageText } from "@/app/PageText";
 import { siteNav } from "@/app/siteNav";
+import { SITE_REPOSITORY } from "@/seo/site";
 import Link from "@/ui/Link";
 import { Code } from "../PackageCard";
 import Described from "./Described";
@@ -14,6 +15,7 @@ import {
   TABLE_NAMES,
   tableFields,
   tablePath,
+  textImportLine,
 } from "./tables";
 
 const BARREL = `import data from "magick-data";
@@ -112,9 +114,16 @@ export default function DataText() {
         </p>
         <Code>{SCOPED}</Code>
         <p>
-          The data is under <Link href="/open-source#licences">CC BY 4.0</Link>:
-          use it anywhere, as long as you credit <Link href="/">magick.ly</Link>
-          .
+          The data is under CC BY 4.0, except where{" "}
+          <Link
+            href={`${SITE_REPOSITORY}/tree/main/packages/magick-data#sources`}
+          >
+            the package&apos;s README
+          </Link>{" "}
+          says no rights are asserted, as over public-domain texts and plain
+          facts: use it anywhere, as long as you credit Magick.ly.{" "}
+          <Link href="/open-source#licences">The licences</Link> are set out on
+          the open-source page.
         </p>
       </PageText>
 
@@ -137,7 +146,7 @@ export default function DataText() {
         <H2 id="texts">Texts and derived values</H2>
         <p>
           These subpaths hold texts, or values computed from the tables, rather
-          than rows of a table. Each is shown on a page of the site.
+          than rows of a table. Most are shown on a page of the site.
         </p>
         <List>
           {texts.map(([subpath, text]) => (
@@ -146,7 +155,8 @@ export default function DataText() {
               key={subpath}
               sx={{ mb: 1.5, overflowWrap: "anywhere" }}
             >
-              <code>magick-data/{subpath.slice(2)}</code>:{" "}
+              <code>{textImportLine(subpath)}</code>
+              <br />
               <Described text={text.description} />
               <Box
                 component="span"
@@ -187,6 +197,7 @@ export default function DataText() {
           <li>
             <code>problemsOf(assembled)</code> lists those problems: a link that
             names no row, a link one way that the other row does not return, an
+            inverse that should name one row but would name several, and an
             accessor that would hide a field.
           </li>
           <li>

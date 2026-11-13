@@ -164,11 +164,12 @@ describe("what the watcher rebuilds", () => {
     expect(rebuildFor("kabbalah/lenain/pages.json5")).toBe("source");
   });
 
-  it("rebuilds everything for the graph or the schemas", () => {
-    // Both decide what dist/ holds: graph.json, and the literals a
-    // picklist makes of a declaration.
+  it("rebuilds everything for the graph, the schemas or the field manifest", () => {
+    // Each decides what dist/ holds: graph.json, the literals a picklist
+    // makes of a declaration, and fields.json.
     expect(rebuildFor("graph.ts")).toBe("all");
     expect(rebuildFor("schemas.ts")).toBe("all");
+    expect(rebuildFor("fieldManifest.ts")).toBe("all");
   });
 
   it("ignores everything else, editors' scratch files among them", () => {

@@ -356,9 +356,9 @@ export const schemas = {
           archangelId:
             "The planet's archangel, whose row names the planet back. The seven classical planets only.",
           intelligenceId:
-            "The planet's intelligence, named with its kamea in Agrippa's tables of the planets (De occulta philosophia, Book II, chapter 22): Nakhiel for the Sun. There is no table of intelligences yet. The seven classical planets only.",
+            "The planet's intelligence: Nakhiel for the Sun. Six are the names Agrippa gives with the planets' magic squares (De occulta philosophia, Book II, chapter 22); the Moon's, Shelachel, is not his. There is no table of intelligences yet. The seven classical planets only.",
           spiritId:
-            "The planet's spirit, named in the same tables beside its intelligence: Sorath for the Sun. There is no table of spirits yet; a geomantic figure's `rulerIds` name the same ones. The seven classical planets only.",
+            "The planet's spirit, as Agrippa names it beside the intelligence: Sorath for the Sun. There is no table of spirits yet; a geomantic figure's `rulerIds` name the same ones. The seven classical planets only.",
         },
       }),
     }),
@@ -736,7 +736,7 @@ export const schemas = {
       meaning: v.pipe(
         en,
         v.description(
-          'What the figure means in general, from the Golden Dawn\'s table as Crowley printed it in "A Handbook of Geomancy", The Equinox I(2) (1909), with abbreviations spelled out.',
+          'What the figure means in general, from the Golden Dawn\'s table as Crowley printed it in "A Handbook of Geomancy", The Equinox I(2) (1909), with editorial changes only: abbreviations spelled out, "evil" and "ill" read as "unfavourable" (or "bad" in the paired formulas of five figures), and a full stop at the end of each entry.',
         ),
       ),
       meanings: v.pipe(
@@ -745,7 +745,7 @@ export const schemas = {
             v.pipe(
               en,
               v.description(
-                "What the figure means in that house, from the same table.",
+                "What the figure means in that house, from the same table, with the same changes.",
               ),
             ),
           ),
@@ -928,7 +928,7 @@ export const schemas = {
       ...ids("christianChoir"),
     }),
     v.description(
-      "The nine choirs of angels of Pseudo-Dionysius, in the order Lenain gives them through the seventy-two genii. They are not the Kabbalistic orders of `angelicOrder`.",
+      "The nine choirs of angels of Pseudo-Dionysius, in the order Lenain gives them through the seventy-two genii. They are not the Kabbalistic orders of the angelicOrder table.",
     ),
   ),
   fourWorlds: v.pipe(
