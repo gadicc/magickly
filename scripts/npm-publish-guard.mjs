@@ -1,15 +1,19 @@
 /**
- * The package's `prepublishOnly` and `prepack` guards (plan 080,
- * decision 3).
+ * The packages' `prepublishOnly` and `prepack` guards (plan 080, decision 3,
+ * and stage G), shared by magick-data and magick-components. Each package
+ * runs it from its own directory:
  *
- * The source manifest's `exports` point into `./src/`, at TypeScript the
- * tarball does not carry; only `pnpm pack` swaps them for
- * `publishConfig.exports`. So `npm publish` or `pnpm publish` run in this
- * directory would ship either a broken package or whatever `lib/` and
- * `dist/` happen to hold. What may be published is the tarball the smoke
- * test verified:
+ *   "prepack": "node ../../scripts/npm-publish-guard.mjs --pack",
+ *   "prepublishOnly": "node ../../scripts/npm-publish-guard.mjs"
  *
- *   pnpm --filter magick-data smoke --keep-tarball <path>
+ * A package's source manifest has `exports` that point into `./src/`, at
+ * TypeScript the tarball does not carry; only `pnpm pack` swaps them for
+ * `publishConfig.exports`. So `npm publish` or `pnpm publish` run in the
+ * package's directory would ship either a broken package or whatever
+ * `lib/` (and magick-data's `dist/`) happen to hold. What may be published
+ * is the tarball the package's smoke test verified:
+ *
+ *   pnpm --filter <package> smoke --keep-tarball <path>
  *   npm publish <path> …
  *
  * Neither package manager runs lifecycle scripts when publishing a tarball,
@@ -57,7 +61,7 @@ export function refusal(manifest) {
     `Refusing to publish ${manifest.name} from its source manifest:`,
     `${intoSrc.length} of its exports point into ./src/ (${intoSrc[0]}, …).`,
     "Publish the tarball the smoke test verified instead:",
-    "  pnpm --filter magick-data smoke --keep-tarball <path>",
+    `  pnpm --filter ${manifest.name} smoke --keep-tarball <path>`,
     "  npm publish <path> --access public",
     "(plan 080, decision 3).",
   ].join("\n");
@@ -67,14 +71,15 @@ export function refusal(manifest) {
 const PNPM = /^pnpm(\.[cm]?js|\.exe)?$/i;
 
 /**
- * Why the package must not be packed by the package manager running this
- * script, or `undefined` if it may be: only pnpm applies
+ * Why the package `name` must not be packed by the package manager running
+ * this script, or `undefined` if it may be: only pnpm applies
  * `publishConfig.exports`. `env` is the script's environment; only
  * `npm_execpath` and `npm_config_user_agent` are read.
  *
  * @param {Record<string, string | undefined>} env
+ * @param {string} name
  */
-export function packRefusal(env) {
+export function packRefusal(env, name) {
   const execpath = env.npm_execpath ?? "";
   const userAgent = env.npm_config_user_agent ?? "";
   const runner = execpath.split(/[\\/]/).pop() ?? "";
@@ -85,10 +90,10 @@ export function packRefusal(env) {
       ? `npm (${execpath})`
       : execpath;
   return [
-    `Refusing to pack magick-data with ${tool}: only pnpm pack swaps its`,
+    `Refusing to pack ${name} with ${tool}: only pnpm pack swaps its`,
     "exports for publishConfig.exports, and this tarball's would point into",
     "./src/. Pack and verify it with",
-    "  pnpm --filter magick-data smoke --keep-tarball <path>",
+    `  pnpm --filter ${name} smoke --keep-tarball <path>`,
     "(plan 080, decision 3).",
   ].join("\n");
 }
@@ -97,18 +102,17 @@ if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
-  // npm and pnpm name the manifest they are publishing; a lifecycle script
-  // runs in the package's directory either way.
+  // npm and pnpm name the manifest they are packing or publishing; a
+  // lifecycle script runs in the package's directory either way.
+  const manifest = JSON.parse(
+    readFileSync(
+      process.env.npm_package_json || join(process.cwd(), "package.json"),
+      "utf8",
+    ),
+  );
   const message = process.argv.includes("--pack")
-    ? packRefusal(process.env)
-    : refusal(
-        JSON.parse(
-          readFileSync(
-            process.env.npm_package_json || join(process.cwd(), "package.json"),
-            "utf8",
-          ),
-        ),
-      );
+    ? packRefusal(process.env, manifest.name)
+    : refusal(manifest);
   if (message) {
     console.error(message);
     process.exitCode = 1;

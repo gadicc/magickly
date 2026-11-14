@@ -30,6 +30,18 @@
  *    reach), then with `RoseSigil` and the stub the README gives; each
  *    build's prerendered HTML is read for the server's drawings.
  *
+ * `--keep-tarball <path>` copies the components' tarball to `<path>` once
+ * every step has passed (a relative path is read from where pnpm was run),
+ * and that file is what a release publishes, `npm publish <path>` (plan
+ * 080, decision 3 and stage G), as magick-data's smoke test keeps its own.
+ * It prints the file's SHA-256 and npm's `sha512-…` integrity, to compare
+ * with CI's log and, once published, with `npm view magick-components
+ * dist.integrity`. `lib/` is git-ignored, so packing again could ship
+ * whatever it holds; and `publishConfig.exports` is applied only by `pnpm
+ * pack`, so `npm pack` or `npm publish` in the package would ship
+ * `exports` that point at `./src/`. The shared guard,
+ * `scripts/npm-publish-guard.mjs`, refuses both, and steps below prove it.
+ *
  * The fixtures' dependencies are installed by npm at the exact versions
  * the repository uses, and npm's `--before` holds what it resolves under
  * them to a week back, as the workspace's `minimumReleaseAge` would; where
@@ -41,7 +53,9 @@
  * removed either way (`--keep` keeps it, and prints where).
  */
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
+  copyFileSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
@@ -51,17 +65,26 @@ import {
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
+import { refusal } from "../../../scripts/npm-publish-guard.mjs";
 
 const PACKAGE_DIR = fileURLToPath(new URL("..", import.meta.url));
 const REPO_DIR = join(PACKAGE_DIR, "..", "..");
 const DATA_DIR = join(REPO_DIR, "packages", "magick-data");
 
 const { values: options } = parseArgs({
-  options: { keep: { type: "boolean" } },
+  options: {
+    keep: { type: "boolean" },
+    "keep-tarball": { type: "string" },
+  },
 });
+// pnpm runs the script in the package's directory; INIT_CWD is where it was
+// run from, which is what a relative path on its command line means.
+const keepTarball =
+  options["keep-tarball"] &&
+  resolve(process.env.INIT_CWD ?? process.cwd(), options["keep-tarball"]);
 
 const sourceManifest = JSON.parse(
   readFileSync(join(PACKAGE_DIR, "package.json"), "utf8"),
@@ -360,6 +383,76 @@ try {
       "magick-data has a published version",
     );
     assert(manifest.peerDependencies?.react === "^19", "react ^19 is a peer");
+    // npm's provenance check matches the repository against the workflow's.
+    assert(
+      manifest.repository?.url ===
+        "git+https://github.com/gadicc/magickly.git" &&
+        manifest.repository?.directory === "packages/magick-components",
+      "repository names gadicc/magickly's packages/magick-components",
+    );
+    assert(
+      manifest.version === sourceManifest.version,
+      `version ${manifest.version}, the source says ${sourceManifest.version}`,
+    );
+  });
+
+  // By npm_execpath, which each package manager sets afresh; npm passes on
+  // an inherited pnpm user agent (plan 080, second stage A review).
+  step(
+    "the prepack guard refuses npm, even under pnpm, and lets pnpm pack",
+    () => {
+      const guard = join(REPO_DIR, "scripts", "npm-publish-guard.mjs");
+      const pnpmAgent = "pnpm/11.28.2 npm/? node/v24.18.0 linux x64";
+      const npmCli = "/usr/lib/node_modules/npm/bin/npm-cli.js";
+      const pack = (npm_execpath, npm_config_user_agent) =>
+        run(process.execPath, [guard, "--pack"], {
+          cwd: PACKAGE_DIR,
+          env: {
+            ...process.env,
+            npm_package_json: join(PACKAGE_DIR, "package.json"),
+            npm_execpath,
+            npm_config_user_agent,
+          },
+          allowFailure: true,
+        });
+      for (const [what, result] of [
+        ["npm", pack(npmCli, "npm/11.18.0 node/v24.18.0 linux x64")],
+        ["npm with pnpm's user agent", pack(npmCli, pnpmAgent)],
+        ["no npm_execpath", pack("", pnpmAgent)],
+      ])
+        assert(
+          result.status === 1 &&
+            result.output.includes("Refusing to pack magick-components"),
+          `the guard let ${what} pack\n${result.output}`,
+        );
+      const pnpm = pack("/opt/pnpm/bin/pnpm.cjs", pnpmAgent);
+      assert(pnpm.status === 0, `the guard refused pnpm\n${pnpm.output}`);
+    },
+  );
+
+  step("the prepublishOnly guard refuses the source, not the tarball", () => {
+    const guard = join(REPO_DIR, "scripts", "npm-publish-guard.mjs");
+    const source = run(process.execPath, [guard], {
+      cwd: PACKAGE_DIR,
+      env: {
+        ...process.env,
+        npm_package_json: join(PACKAGE_DIR, "package.json"),
+      },
+      allowFailure: true,
+    });
+    assert(
+      source.status === 1 &&
+        source.output.includes("Refusing to publish magick-components"),
+      `the guard let the source manifest through\n${source.output}`,
+    );
+    assert(refusal(manifest) === undefined, "the guard refuses the tarball");
+    // pnpm drops the hooks from what it packs, so nothing in the tarball
+    // can run them, whatever a package manager does with its scripts.
+    for (const hook of ["prepublishOnly", "prepack"])
+      assert(
+        manifest.scripts?.[hook] === undefined,
+        `the tarball carries ${hook}`,
+      );
   });
 
   step('only MercuryWidget, MoonWidget and RoseSigil are "use client"', () => {
@@ -932,6 +1025,16 @@ export function Rose() {
         );
       },
     );
+  if (keepTarball)
+    step(`keep the verified tarball at ${keepTarball}`, () => {
+      mkdirSync(dirname(keepTarball), { recursive: true });
+      copyFileSync(tarball, keepTarball);
+      const bytes = readFileSync(keepTarball);
+      const sha = createHash("sha256").update(bytes).digest("hex");
+      const integrity = createHash("sha512").update(bytes).digest("base64");
+      console.log(`   sha256 ${sha}`);
+      console.log(`   integrity sha512-${integrity}`);
+    });
 } catch (error) {
   failed = true;
   console.error(error instanceof Error ? error.message : error);

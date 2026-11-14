@@ -1,27 +1,38 @@
 name: Publish packages
 
-# Plan 080, decision 3: publish magick-data to npm when its version changes
-# on main, through trusted publishing (OIDC) with provenance, directly with
-# `npm publish` (staged publishing is deferred). It does nothing until the
-# owner's first publish by hand: a package the registry does not have is
-# skipped, and so is a version it already lists.
+# Plan 080, decision 3 and stage G: publish magick-data and magick-components
+# to npm when a package's version changes on main, through trusted
+# publishing (OIDC) with provenance, directly with `npm publish` (staged
+# publishing is deferred). A package's first version is published by hand:
+# a package the registry does not have is skipped (until DECISION_FLAGS
+# gives it --expect-exists), and so is a version the registry already
+# lists.
 #
 # Three stages, so that the npm credential exists only in a job that runs
 # no third-party code (stage A review, H1):
 #
-# - decide: checkout and the decision script, no install. On most pushes
-#   it skips, and nothing else runs.
-# - quality (ci.yml) and build, only when decide says publish, neither with
-#   id-token: build installs, builds, smoke-tests and uploads the verified
-#   tarball with its SHA-256.
-# - publish, in the `npm` environment with id-token: write: downloads the
-#   tarball, checks its SHA-256, decides again from a fresh registry read
-#   and runs `npm publish`. No install, no cache, no package script.
+# - decide: checkout and the decision script for each package, no install.
+#   On most pushes both skip, and nothing else runs. Its output lists the
+#   packages to publish, each with its version and dist-tag.
+# - quality (ci.yml, once) and build (a leg per package to publish), only
+#   when decide lists one, neither with id-token: build installs, builds,
+#   smoke-tests and uploads the package's verified tarball with its SHA-256.
+# - publish, a leg per package, in the `npm` environment with id-token:
+#   write: downloads its tarball, checks its SHA-256, decides again from a
+#   fresh registry read and runs `npm publish`. No install, no cache, no
+#   package script.
+#
+# Each package is decided, built and published on its own. A package that
+# skips is not built. One whose decision fails is left out of the list and
+# fails decide once the other is decided; one whose build fails has a
+# publish leg that fails at its first step, finding no digest from its
+# build leg. Either way the other package goes ahead. A failed quality run
+# stops both: it tests the one commit both would be published from.
 #
 # Not part of release.yml: its deploy job holds id-token: write in the
 # Production environment, and everything the Vercel build runs there could
-# then mint an npm token. The trusted publisher on npmjs.com names this
-# file, the repository and the `npm` environment.
+# then mint an npm token. Each package's trusted publisher on npmjs.com
+# names this file, the repository and the `npm` environment.
 on:
   push:
     branches: [main]
@@ -30,15 +41,20 @@ permissions:
   contents: read
 
 # One publish at a time, and never cancelled halfway: a second push waits,
-# and then finds its version published or bumps past it.
+# and then finds its versions published or bumps past them.
 concurrency:
   group: npm-publish
   cancel-in-progress: false
 
 env:
-  # Flags for both decisions. Since the bump to 0.1.0 (plan 080, stage A′)
-  # the registry has the package, so a 404 fails instead of skipping.
-  DECISION_FLAGS: "--expect-exists"
+  # The decision's flags for each package, in both decisions; a package
+  # without a key fails its decision. --expect-exists makes a 404 fail
+  # instead of skipping, from the bump to 0.1.0 that follows a package's
+  # first publish by hand (plan 080: stage A′ step 7 for magick-data, stage
+  # G′ step 7 for magick-components). Until then a 404 skips, since the
+  # package is not on npm yet.
+  DECISION_FLAGS: >-
+    {"magick-data": "--expect-exists", "magick-components": ""}
   # Exact, so that publish runs a known npm: trusted publishing needs 11.5.1
   # or later, and 24.22.2 bundles 11.19.1. In the 24 line of .nvmrc; ci.yml's
   # dry run uses the same.
@@ -50,9 +66,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      publish: ${{ steps.decide.outputs.publish }}
-      version: ${{ steps.decide.outputs.version }}
-      tag: ${{ steps.decide.outputs.tag }}
+      # A JSON list of {package, version, tag}, one per package to publish,
+      # [] when there is none; set even when a package's decision failed,
+      # so that the other can still publish.
+      packages: ${{ steps.decide.outputs.packages }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -61,32 +78,72 @@ jobs:
         with:
           node-version: ${{ env.NPM_NODE_VERSION }}
           package-manager-cache: false
-      # From the source manifest, whose version the tarball carries; build
+      # From each source manifest, whose version the tarball carries; build
       # checks that it does.
-      - name: Decide from the registry
+      - name: Decide each package from the registry
         id: decide
-        run: >-
-          node scripts/npm-publish-decision.mjs
-          --manifest packages/magick-data/package.json $DECISION_FLAGS
+        run: |
+          packages='[]'
+          failed=''
+          for package in magick-data magick-components; do
+            echo "::group::$package"
+            out="$RUNNER_TEMP/decide-$package"
+            if flags="$(node scripts/npm-publish-flags.mjs "$package")" &&
+              # shellcheck disable=SC2086 # flags, word-split on purpose
+              GITHUB_OUTPUT="$out" node scripts/npm-publish-decision.mjs \
+                --manifest "packages/$package/package.json" $flags; then
+              if grep -qx 'publish=true' "$out"; then
+                version="$(sed -n 's/^version=//p' "$out")"
+                tag="$(sed -n 's/^tag=//p' "$out")"
+                packages="$(jq -c --arg p "$package" --arg v "$version" --arg t "$tag" \
+                  '. + [{package: $p, version: $v, tag: $t}]' <<<"$packages")"
+              fi
+            else
+              failed="$failed $package"
+            fi
+            echo "::endgroup::"
+          done
+          echo "to publish: $packages"
+          echo "packages=$packages" >> "$GITHUB_OUTPUT"
+          if [ -n "$failed" ]; then
+            echo "::error::the decision failed for$failed, which is not published"
+            exit 1
+          fi
 
   # A green quality run for this exact commit, only when there is something
   # to publish. release.yml runs the same on every push to main; depending
   # on its run would tie npm to the deploy's success.
   quality:
     needs: decide
-    if: github.repository == 'gadicc/magickly' && needs.decide.outputs.publish == 'true'
+    if: >-
+      !cancelled() && github.repository == 'gadicc/magickly' &&
+      needs.decide.outputs.packages != '' && needs.decide.outputs.packages != '[]'
     uses: ./.github/workflows/ci.yml
 
   build:
     needs: decide
-    if: github.repository == 'gadicc/magickly' && needs.decide.outputs.publish == 'true'
+    if: >-
+      !cancelled() && github.repository == 'gadicc/magickly' &&
+      needs.decide.outputs.packages != '' && needs.decide.outputs.packages != '[]'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     permissions:
       contents: read
+    strategy:
+      # One package's failure must not cancel the other's build.
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.decide.outputs.packages) }}
+    # A leg sets only its own package's outputs, so each name is unique
+    # across the matrix and survives the other leg.
     outputs:
-      sha256: ${{ steps.digest.outputs.sha256 }}
-      integrity: ${{ steps.digest.outputs.integrity }}
+      magick-data-sha256: ${{ steps.digest.outputs['magick-data-sha256'] }}
+      magick-data-integrity: ${{ steps.digest.outputs['magick-data-integrity'] }}
+      magick-components-sha256: ${{ steps.digest.outputs['magick-components-sha256'] }}
+      magick-components-integrity: ${{ steps.digest.outputs['magick-components-integrity'] }}
+    env:
+      PACKAGE: ${{ matrix.package }}
+      DECIDED: ${{ matrix.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -102,31 +159,29 @@ jobs:
             pnpm-workspace.yaml
           install: false
       - run: pnpm install --frozen-lockfile
-      # The smoke test builds the package (data:build, then lib/), packs it,
-      # verifies the tarball and keeps it; that file is what is published.
+      # The package's smoke test builds it, packs it, verifies the tarball
+      # and keeps it; that file is what is published.
       - name: Build, verify and keep the tarball
-        run: pnpm --filter magick-data smoke --keep-tarball "$RUNNER_TEMP/magick-data.tgz"
-      - name: Check the tarball is the version decided
-        env:
-          DECIDED: ${{ needs.decide.outputs.version }}
+        run: pnpm --filter "$PACKAGE" smoke --keep-tarball "$RUNNER_TEMP/$PACKAGE.tgz"
+      - name: Check the tarball is the package and version decided
         run: |
-          packed="$(tar -xzOf "$RUNNER_TEMP/magick-data.tgz" package/package.json \
-            | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).version')"
-          echo "decided $DECIDED, packed $packed"
-          test "$packed" = "$DECIDED"
+          packed="$(tar -xzOf "$RUNNER_TEMP/$PACKAGE.tgz" package/package.json \
+            | node -p 'const m = JSON.parse(require("fs").readFileSync(0, "utf8")); `${m.name}@${m.version}`')"
+          echo "decided $PACKAGE@$DECIDED, packed $packed"
+          test "$packed" = "$PACKAGE@$DECIDED"
       - name: Digest the tarball
         id: digest
         run: |
-          sha256="$(sha256sum "$RUNNER_TEMP/magick-data.tgz" | cut -d' ' -f1)"
-          integrity="sha512-$(openssl dgst -sha512 -binary "$RUNNER_TEMP/magick-data.tgz" | base64 -w0)"
+          sha256="$(sha256sum "$RUNNER_TEMP/$PACKAGE.tgz" | cut -d' ' -f1)"
+          integrity="sha512-$(openssl dgst -sha512 -binary "$RUNNER_TEMP/$PACKAGE.tgz" | base64 -w0)"
           echo "sha256 $sha256"
           echo "integrity $integrity"
-          echo "sha256=$sha256" >> "$GITHUB_OUTPUT"
-          echo "integrity=$integrity" >> "$GITHUB_OUTPUT"
+          echo "$PACKAGE-sha256=$sha256" >> "$GITHUB_OUTPUT"
+          echo "$PACKAGE-integrity=$integrity" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
-          name: magick-data-publish
-          path: ${{ runner.temp }}/magick-data.tgz
+          name: ${{ matrix.package }}-publish
+          path: ${{ runner.temp }}/${{ matrix.package }}.tgz
           if-no-files-found: error
           # Re-run all jobs replaces it; re-running only publish, once the
           # trusted publisher is configured again (up to two days after a
@@ -136,14 +191,34 @@ jobs:
 
   publish:
     needs: [decide, quality, build]
-    if: github.repository == 'gadicc/magickly' && needs.decide.outputs.publish == 'true'
+    # Not on build's result, which is failure when either leg fails: each
+    # leg requires its own package's digest instead.
+    if: >-
+      !cancelled() && github.repository == 'gadicc/magickly' &&
+      needs.decide.outputs.packages != '' && needs.decide.outputs.packages != '[]' &&
+      needs.quality.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: npm
     permissions:
       contents: read
       id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.decide.outputs.packages) }}
+    env:
+      PACKAGE: ${{ matrix.package }}
+      DECIDED: ${{ matrix.version }}
+      SHA256: ${{ needs.build.outputs[format('{0}-sha256', matrix.package)] }}
+      INTEGRITY: ${{ needs.build.outputs[format('{0}-integrity', matrix.package)] }}
     steps:
+      - name: Require this package's build
+        run: |
+          if [ -z "$SHA256" ] || [ -z "$INTEGRITY" ]; then
+            echo "::error::build left no digest for $PACKAGE: its build leg failed, and nothing is published"
+            exit 1
+          fi
       # Only for the decision script, which imports nothing but Node's own
       # modules; nothing is installed and no package script runs.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -168,15 +243,12 @@ jobs:
           ' "$version"
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
-          name: magick-data-publish
+          name: ${{ matrix.package }}-publish
           path: ${{ runner.temp }}/publish
       - name: Check the tarball is the one build verified
-        env:
-          SHA256: ${{ needs.build.outputs.sha256 }}
-          INTEGRITY: ${{ needs.build.outputs.integrity }}
         run: |
-          echo "$SHA256  $RUNNER_TEMP/publish/magick-data.tgz" | sha256sum -c -
-          integrity="sha512-$(openssl dgst -sha512 -binary "$RUNNER_TEMP/publish/magick-data.tgz" | base64 -w0)"
+          echo "$SHA256  $RUNNER_TEMP/publish/$PACKAGE.tgz" | sha256sum -c -
+          integrity="sha512-$(openssl dgst -sha512 -binary "$RUNNER_TEMP/publish/$PACKAGE.tgz" | base64 -w0)"
           echo "integrity $integrity"
           test "$integrity" = "$INTEGRITY"
       # A fresh registry read: something may have changed since decide. A
@@ -184,14 +256,16 @@ jobs:
       # or this fails rather than skipping with a warning.
       - name: Decide again
         id: decide
-        run: >-
-          node scripts/npm-publish-decision.mjs
-          "$RUNNER_TEMP/publish/magick-data.tgz" --same-content $DECISION_FLAGS
-      - name: Check it is the version decided
+        run: |
+          flags="$(node scripts/npm-publish-flags.mjs "$PACKAGE")"
+          # shellcheck disable=SC2086 # flags, word-split on purpose
+          node scripts/npm-publish-decision.mjs \
+            "$RUNNER_TEMP/publish/$PACKAGE.tgz" --same-content $flags
+      - name: Check it is the package and version decided
         env:
-          DECIDED: ${{ needs.decide.outputs.version }}
+          NAME: ${{ steps.decide.outputs.name }}
           VERSION: ${{ steps.decide.outputs.version }}
-        run: test "$VERSION" = "$DECIDED"
+        run: test "$NAME@$VERSION" = "$PACKAGE@$DECIDED"
       # Verbose, since npm reports a failed OIDC exchange only at that level
       # and otherwise says ENEEDAUTH. The registry's CDN caches a packument
       # for up to five minutes, so a re-run soon after a publish can reach
@@ -204,24 +278,24 @@ jobs:
         env:
           TAG: ${{ steps.decide.outputs.tag }}
           VERSION: ${{ steps.decide.outputs.version }}
-          INTEGRITY: ${{ needs.build.outputs.integrity }}
         run: |
           set +e
-          npm publish "$RUNNER_TEMP/publish/magick-data.tgz" \
+          npm publish "$RUNNER_TEMP/publish/$PACKAGE.tgz" \
             --provenance --access public --tag "$TAG" --loglevel verbose \
             2>&1 | tee "$RUNNER_TEMP/npm-publish.log"
           status="${PIPESTATUS[0]}"
           if [ "$status" -ne 0 ] &&
             grep -q "cannot publish over the previously published versions" "$RUNNER_TEMP/npm-publish.log"; then
-            echo "npm refused: it has magick-data@$VERSION. Checking what it has."
+            echo "npm refused: it has $PACKAGE@$VERSION. Checking what it has."
+            flags="$(node scripts/npm-publish-flags.mjs "$PACKAGE")" || exit 1
             # shellcheck disable=SC2086 # flags, word-split on purpose
             if GITHUB_OUTPUT= node scripts/npm-publish-decision.mjs \
-              "$RUNNER_TEMP/publish/magick-data.tgz" \
-              --expect-published --same-content $DECISION_FLAGS; then
-              echo "::warning::npm already has magick-data@$VERSION, with this tarball's integrity ($INTEGRITY); nothing was published"
+              "$RUNNER_TEMP/publish/$PACKAGE.tgz" \
+              --expect-published --same-content $flags; then
+              echo "::warning::npm already has $PACKAGE@$VERSION, with this tarball's integrity ($INTEGRITY); nothing was published"
               exit 0
             fi
-            echo "::error::npm refused magick-data@$VERSION, and the registry does not list it with this tarball's integrity ($INTEGRITY); the decision above says why"
+            echo "::error::npm refused $PACKAGE@$VERSION, and the registry does not list it with this tarball's integrity ($INTEGRITY); the decision above says why"
             exit 1
           fi
           exit "$status"

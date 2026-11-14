@@ -289,8 +289,8 @@
     "typecheck": "tsc -p tsconfig.json",
     "build": "pnpm data:build && rm -rf lib && tsc -p tsconfig.build.json",
     "smoke": "node scripts/smoke.mjs",
-    "prepack": "node scripts/prepublishGuard.mjs --pack",
-    "prepublishOnly": "node scripts/prepublishGuard.mjs"
+    "prepack": "node ../../scripts/npm-publish-guard.mjs --pack",
+    "prepublishOnly": "node ../../scripts/npm-publish-guard.mjs"
   },
   "devDependencies": {
     "@types/node": "24.19.2",

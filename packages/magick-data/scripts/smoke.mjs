@@ -33,7 +33,8 @@
  * `lib/` and `dist/` are git-ignored, so packing again could ship whatever
  * they hold; and `publishConfig.exports` is applied only by `pnpm pack`, so
  * `npm publish` from the package would ship `exports` that point at
- * `./src/*.ts`. The package's `prepublishOnly` guard refuses that.
+ * `./src/*.ts`. The package's `prepublishOnly` guard refuses that
+ * (`scripts/npm-publish-guard.mjs`, shared with magick-components).
  */
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -51,7 +52,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
-import { refusal } from "./prepublishGuard.mjs";
+import { refusal } from "../../../scripts/npm-publish-guard.mjs";
 import {
   publishedPathOf,
   readmeSources,
@@ -239,7 +240,7 @@ try {
   step(
     "the prepack guard refuses npm, even under pnpm, and lets pnpm pack",
     () => {
-      const guard = join(PACKAGE_DIR, "scripts", "prepublishGuard.mjs");
+      const guard = join(REPO_DIR, "scripts", "npm-publish-guard.mjs");
       const pnpmAgent = "pnpm/11.28.2 npm/? node/v24.18.0 linux x64";
       const npmCli = "/usr/lib/node_modules/npm/bin/npm-cli.js";
       const pack = (npm_execpath, npm_config_user_agent) =>
@@ -263,7 +264,7 @@ try {
   );
 
   step("the prepublishOnly guard refuses the source, not the tarball", () => {
-    const guard = join(PACKAGE_DIR, "scripts", "prepublishGuard.mjs");
+    const guard = join(REPO_DIR, "scripts", "npm-publish-guard.mjs");
     const source = run(process.execPath, [guard], {
       cwd: PACKAGE_DIR,
       env: {

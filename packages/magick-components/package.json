@@ -166,7 +166,9 @@
     "typecheck": "tsc -p tsconfig.json",
     "build": "rm -rf lib && tsc -p tsconfig.build.json",
     "fonts:css": "node scripts/gdHallCss.mjs",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "prepack": "node ../../scripts/npm-publish-guard.mjs --pack",
+    "prepublishOnly": "node ../../scripts/npm-publish-guard.mjs"
   },
   "peerDependencies": {
     "@types/react": "^19",
