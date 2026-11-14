@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-14",
+  "coverage": {
+    "sentences": 60,
+    "gapFree": 4,
+    "words": 622,
+    "forms": 284,
+    "chips": 113,
+    "ruleForms": 41,
+    "gaps": 225,
+    "gapsWithNearest": 44,
+    "byKind": {
+      "practitioner": {
+        "sentences": 20,
+        "gapFree": 1,
+        "words": 250,
+        "forms": 119,
+        "chips": 40,
+        "ruleForms": 16,
+        "gaps": 91,
+        "gapsWithNearest": 17
+      },
+      "everyday": {
+        "sentences": 20,
+        "gapFree": 0,
+        "words": 201,
+        "forms": 46,
+        "chips": 42,
+        "ruleForms": 14,
+        "gaps": 113,
+        "gapsWithNearest": 13
+      },
+      "attested": {
+        "sentences": 20,
+        "gapFree": 3,
+        "words": 171,
+        "forms": 119,
+        "chips": 31,
+        "ruleForms": 11,
+        "gaps": 21,
+        "gapsWithNearest": 14
+      }
+    }
+  },
+  "selfCheck": { "rows": 1054, "found": 946 }
+}

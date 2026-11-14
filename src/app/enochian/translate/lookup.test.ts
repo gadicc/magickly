@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import dictionary from "magick-data/enochian/dictionary";
 import { describe, expect, it } from "vitest";
 import { englishTokens, wordKey } from "./english.ts";
+import { selfCheck } from "./figures.ts";
 import { cleanGloss, dictionaryGlosses } from "./glosses.ts";
 import { buildKeysTable } from "./keysTable.ts";
 import { LEITCH_SPELLINGS } from "./leitchSpellings.ts";
@@ -252,6 +253,24 @@ describe("English into Enochian (decisions 6–12)", () => {
     expect(enochian("do the work")).not.toMatch(/^·G16/);
   });
 
+  it("takes an article at a phrase's edge only where Dee's gloss has it", () => {
+    // ODO is "open": "the" is the gates', and shows its chip.
+    expect(enochian("Open the gates")).toMatch(/^ODO ·G4 /);
+    expect(enochian("building a house")).toBe("TROF ·G4 SALMAN");
+    // SALMAN is Dee's "the house": the article is his.
+    expect(enochian("the house")).toBe("SALMAN");
+    // A leading article no phrase of its own begins with is a chip, and
+    // Dee's longer phrase starts at the next word.
+    expect(enochian("the earth quakes")).toBe("·G4 GIZYAX");
+    expect(enochian("the third flame")).toBe("·G4 DIALPRT");
+    // Past tier 2's "of": MAD is "of the same your God".
+    expect(enochian("the same your God")).toBe("MAD");
+    // Any of Dee's rows may hold the article: VONPH is "the wrath" at 13.8.
+    expect(enochian("the wrath")).toBe("VONPH");
+    // A trailing vocative "O" is the next word's.
+    expect(translator.toEnochian("come o lord").tokens[0].span).toEqual([0, 1]);
+  });
+
   it("matches no phrase across the end of a clause", () => {
     expect(enochian("I am. The Lord your God")).toBe("ZIR ENAY PIAD");
     expect(enochian("I am the Lord your God")).not.toBe("ZIR ENAY PIAD");
@@ -405,34 +424,10 @@ describe("English into Enochian (decisions 6–12)", () => {
   });
 
   it("gives Dee's own word back for nearly all his content rows", () => {
-    // The self-consistency figure is step D's; this guards against a
-    // collapse, near the spike's 944 of 1,054.
-    let total = 0;
-    let found = 0;
-    for (const [, keyRows] of lookup.keyRows) {
-      const { tokens } = translator.toEnochian(
-        keyRows.map((row) => row.english).join(" "),
-      );
-      let at = 0;
-      for (const row of keyRows) {
-        const width = englishTokens(row.english).length;
-        const [from, to] = [at, at + width];
-        at = to;
-        if (!row.word || !row.core.length) continue;
-        total++;
-        if (
-          tokens.some(
-            (one) =>
-              one.kind === "form" &&
-              one.span[0] < to &&
-              one.span[1] > from &&
-              lookup.display.get(row.folded) === one.form,
-          )
-        )
-          found++;
-      }
-    }
-    expect(total).toBe(1054);
+    // The self-consistency figure is step D's (`figures.ts`); this guards
+    // against a collapse, near the spike's 944 of 1,054.
+    const { rows, found } = selfCheck(translator);
+    expect(rows).toBe(1054);
     expect(found).toBeGreaterThanOrEqual(940);
   });
 });

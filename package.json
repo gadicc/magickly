@@ -61,7 +61,8 @@
     "translate-eval:judge-task3": "pnpm data:build && loom env -- node --import tsx scripts/enochian-translate-eval/cli.ts judge-task3",
     "translate-eval:task3-report": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts task3-report",
     "translate-eval:newbars": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts newbars",
-    "translate-eval:budget": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts budget"
+    "translate-eval:budget": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts budget",
+    "translator:figures": "pnpm data:build && node --import tsx scripts/enochian-translator-figures.ts"
   },
   "dependencies": {
     "@ai-sdk/react": "4.0.156",

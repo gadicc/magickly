@@ -114,7 +114,12 @@ forms where any exist.
    gives VORSG, "cast down" ADRPAN, "his power" LONSHITOX. A phrase
    must lie within one Key line's English to match a line gloss.
 7. **Exact forms, in tiers** (changed after the spike). A gloss
-   matches when it equals the English: tier 1 apart from articles;
+   matches when it equals the English: tier 1 apart from articles
+   (though a phrase begins or ends with "a", "an" or "the", or ends
+   with a vocative "O", only where one of the matched glosses does, so "Open the gates" doesn't take the
+   article into ODO "open"; an article left over takes its chip, and
+   the phrase starts at the next word, so "the earth quakes" is
+   GIZYAX; added in step D);
    tier 2 apart from a leading "of" or "to"; tier 3 apart from one
    preposition, shown with a chip ("carries 'in'"). Be-forms,
    negation and pronouns are never ignored, so ZIRDO "I am" is not a
@@ -266,7 +271,10 @@ forms where any exist.
       everyday and attested): the share of words given a form, a rule
       chip or a gap, and the gap-free sentences, by kind. A form that
       a rule gives (a form of "to be", a negation, a pronoun) counts as
-      a rule chip, as in the spike, since each shows its chip. This is the
+      a rule chip, as in the spike, since each shows its chip. A form
+      for one of Dee's phrases counts for each of its words, an
+      article inside it included; a contraction counts as the words it
+      stands for. This is the
       honest measure of new English, and the main figure. The
       spike's, under the final rules: forms 51%, chips 11%, gaps 38%;
       gap-free 1 of 20 practitioner, 0 of 20 everyday, 3 of 20

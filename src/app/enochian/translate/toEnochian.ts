@@ -135,6 +135,40 @@ export interface ToEnochian {
   tokens: readonly EnochianToken[];
 }
 
+/** Articles a phrase begins or ends with only where its gloss does. */
+const EDGE_ARTICLES: ReadonlySet<string> = new Set(["a", "an", "the"]);
+
+/**
+ * Whether a phrase may begin and end where it does. Tier 1 ignores
+ * articles, so "Open the" would find ODO "open" and take the article of
+ * the next word, with no chip; an article at a phrase's edge belongs to
+ * it only where one of the matched glosses has it there too (Dee's "the
+ * house"), past a leading "of" or "to" (tier 2) or the preposition a
+ * gloss carries (tier 3). Otherwise the tables give it its chip (G4), as
+ * they do a lone "the". A leading vocative "O" is Dee's ("O you
+ * heavens"); a trailing one is the next word's.
+ */
+function keepsEdgeArticles(span: readonly string[], found: Match): boolean {
+  const first = span[0];
+  const last = span[span.length - 1];
+  const skip = new Set([
+    "of",
+    "to",
+    ...(found.preposition ? [found.preposition] : []),
+  ]);
+  const fits = (gloss: string) => {
+    const words = englishWords(gloss);
+    let from = 0;
+    while (from < words.length - 1 && skip.has(words[from])) from++;
+    return (
+      (!EDGE_ARTICLES.has(first) || words[from] === first) &&
+      ((!EDGE_ARTICLES.has(last) && last !== "o") ||
+        words[words.length - 1] === last)
+    );
+  };
+  return found.glosses.some(fits);
+}
+
 /** The longest phrase tried, in words (decision 6). */
 const MAX_PHRASE = 6;
 
@@ -260,6 +294,8 @@ interface Match {
   source: FormToken["source"];
   /** The gloss it matched, for the tense chip. */
   gloss: string;
+  /** Every gloss of the form that matched, for its edge articles. */
+  glosses: readonly string[];
   preposition?: string;
   alternatives: FormOption[];
 }
@@ -395,6 +431,7 @@ function fromDee(
     tier,
     source: { kind: "keys", rows: chosen.rows.map(place) },
     gloss: chosen.rows[0].english,
+    glosses: chosen.rows.map((row) => row.english),
     ...(chosen.preposition ? { preposition: chosen.preposition } : {}),
     alternatives,
   };
@@ -428,6 +465,11 @@ function fromDictionary(
     tier,
     source: dictionarySource(lookup, hit),
     gloss: hit.origin.kind === "dictionary" ? hit.origin.gloss : "",
+    glosses: hits.flatMap((one) =>
+      one.form === form && one.origin.kind === "dictionary"
+        ? [one.origin.gloss]
+        : [],
+    ),
     ...(hit.preposition ? { preposition: hit.preposition } : {}),
     alternatives: rest.map(([other, { hit: theirs }]) =>
       option(lookup, other, dictionarySource(lookup, theirs)),
@@ -704,42 +746,64 @@ function reorder(items: readonly Working[]): EnochianToken[] {
   return out;
 }
 
+/**
+ * The longest phrase from `at`, of two words or more, with its match;
+ * none if no phrase matches (decision 6). Phrases stay within one
+ * gloss: a possessive ends one, since its word moves, and none crosses
+ * the end of a clause ("I am. The Lord your God" is not ZIRENAIAD).
+ */
+function phraseAt(
+  lookup: Lookup,
+  tokens: readonly EnglishToken[],
+  at: number,
+): { n: number; found: Match } | undefined {
+  let longest = Math.min(MAX_PHRASE, tokens.length - at);
+  for (let n = 1; n < longest; n++)
+    if (tokens[at + n - 1].possessive || tokens[at + n - 1].endsClause)
+      longest = n;
+  for (let n = longest; n >= 2; n--) {
+    const span = tokens.slice(at, at + n).map((one) => one.word);
+    const core = coreKeys(span);
+    // A lone grammar word, with only articles beside it, is the tables'
+    // (decisions 7 and 9): "of a" must not find DE.
+    if (!core.length || (core.length === 1 && !isContent(core[0]))) continue;
+    const found = match(lookup, span);
+    if (found && keepsEdgeArticles(span, found)) return { n, found };
+  }
+  return undefined;
+}
+
 /** English into Enochian (see the module's comment). */
 export function toEnochian(lookup: Lookup, text: string): ToEnochian {
   const tokens = englishTokens(text);
   const items: Working[] = [];
   let at = 0;
   while (at < tokens.length) {
-    let taken = false;
-    // Longest phrase first, within one gloss (decision 6). A possessive
-    // ends a phrase, since its word moves, and no phrase crosses the end
-    // of a clause ("I am. The Lord your God" is not ZIRENAIAD).
-    let longest = Math.min(MAX_PHRASE, tokens.length - at);
-    for (let n = 1; n < longest; n++)
-      if (tokens[at + n - 1].possessive || tokens[at + n - 1].endsClause)
-        longest = n;
-    for (let n = longest; n >= 2; n--) {
-      const span = tokens.slice(at, at + n).map((one) => one.word);
-      const core = coreKeys(span);
-      // A lone grammar word, with only articles beside it, is the tables'
-      // (decisions 7 and 9): "of a" must not find DE.
-      if (!core.length || (core.length === 1 && !isContent(core[0]))) continue;
-      const found = match(lookup, span);
-      if (!found) continue;
-      const last = tokens[at + n - 1];
-      items.push({
-        token: matchedForm(lookup, baseOf(tokens, at, at + n), found),
-        content: true,
-        endsClause: last.endsClause,
-        ...(last.possessive ? { moves: "G5" as RuleId } : {}),
-      });
-      at += n;
-      taken = true;
-      break;
+    const here = phraseAt(lookup, tokens, at);
+    // An article no phrase of its own begins with is its neighbour's:
+    // when the next word starts a phrase reaching further, the article
+    // takes its chip (G4) and matching starts again there.
+    if (EDGE_ARTICLES.has(tokens[at].word) && !tokens[at].endsClause) {
+      const next = phraseAt(lookup, tokens, at + 1);
+      if (next && (!here || next.n + 1 > here.n)) {
+        items.push(single(lookup, tokens, at));
+        at++;
+        continue;
+      }
     }
-    if (taken) continue;
-    items.push(single(lookup, tokens, at));
-    at++;
+    if (!here) {
+      items.push(single(lookup, tokens, at));
+      at++;
+      continue;
+    }
+    const last = tokens[at + here.n - 1];
+    items.push({
+      token: matchedForm(lookup, baseOf(tokens, at, at + here.n), here.found),
+      content: true,
+      endsClause: last.endsClause,
+      ...(last.possessive ? { moves: "G5" as RuleId } : {}),
+    });
+    at += here.n;
   }
   return { input: "english", tokens: reorder(items) };
 }
