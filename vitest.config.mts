@@ -62,6 +62,7 @@ export default defineConfig({
         "src/chat-research/readAdoption.ts",
         "src/chat-research/retentionWorker.ts",
         "src/chat-research/retentionProfile.ts",
+        "src/chat-research/managedRetentionProfile.ts",
         "src/chat-research/publication.ts",
         "src/chat-research/http.ts",
         "src/chat-research/httpIngress.ts",

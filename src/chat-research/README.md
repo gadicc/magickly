@@ -96,3 +96,18 @@ performance control until a co-located measurement establishes its cold-load
 budget. This factory grants no source processing, opens no route and starts no
 model request. Database custody, ingress, retention and runtime adoption remain
 separate requirements.
+
+## Managed cleanup profile preparation
+
+`managedRetentionProfile.ts` defines an inactive, separately versioned profile for
+reviewed Vercel Node22/London releases. It binds worker-artifact, dependency-lock,
+critical-input and project-scope digests without putting a deployment ID into the
+profile digest. These identify release inputs; they prove neither an actual Node
+binary nor runtime custody. An independent protected-release adoption must still
+bind the real deployed code, project, region, runtime policy and database target.
+
+The local binary-pinned profile is unchanged. Both parsers reject the other's
+format. Existing publication/startup and local workers deliberately do not consume
+the managed profile. Retention, cadence, stale-health limits, cleanup scope and
+stop conditions are preserved, but no managed worker, route, scheduler, grant,
+window or activation follows from preparing this data.

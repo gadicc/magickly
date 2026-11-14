@@ -171,3 +171,19 @@ runtime configuration, authenticated ingress, bounded reads and resource cleanup
 it must not deploy the application, invoke models or change production aliases.
 Native SQL retrieval remains an alternative requiring separate relevance and
 runtime acceptance, rather than an assumed equivalent to the current BM25 path.
+
+## Managed profile checkpoint
+
+A distinct schema2 managed-retention profile now prepares the original logical
+maintenance target from bounded owned facts. It retains the local policy's packet
+retention, purge lag, hourly cadence, stale-health fence, full-namespace scope and
+native stop condition. Worker-artifact, dependency-lock, critical-input and
+project-scope digests bind release identity independently of a deployment ID.
+Node22/London/Vercel are the first reviewed policy shape; broadening that shape
+requires an explicit source/runtime review.
+
+This is data compilation only. Actual protected-release custody, managed worker
+and scheduler implementation, native target/role adoption, hosted publication,
+ingress and health acceptance remain required. The local binary format and its
+consumers remain unchanged and reject this distinct profile. No existing route
+accepts or activates the managed format.
