@@ -123,7 +123,23 @@ to clients in both supported protocols. The new private adapter's permissions do
 not govern that older path, and repository separation does not remove an existing
 hosted index. This candidate currently preserves that behavior.
 
-A release decision must explicitly address whether to disable legacy corpus chat,
-replace its index with approved public sources, or intentionally defer that work.
-Do not describe this branch as having resolved the older runtime's source privacy.
-No live index query, removal or production setting change is performed here.
+Operator decision: keep legacy chat unchanged while finishing only the new engine.
+Legacy retrieval, its two response protocols and source delivery are outside this
+change. No legacy disablement, index replacement or private-operator conversion
+is adopted. Do not describe this branch as having resolved the older runtime's
+source privacy. No live index query, removal or production setting change is
+performed here.
+
+## Preparation status
+
+The generic engine is prepared for integration with the research adapter disabled.
+The current code has passed full tests and strict coverage, type/quality/Loom/data
+checks, both builds, populated-database migration rehearsals and independent
+reviews. The legacy-chat policy decision is resolved; it is not a release blocker
+for this scoped preparation.
+
+A production merge/release remains a separate action. It would apply four additive
+migrations and create five empty tables through the existing release workflow.
+The actual target/role checks and staged smoke/promotion gates remain required.
+No approved public corpus, source grant, operator binding or model allowance is
+created by completing this preparation.
