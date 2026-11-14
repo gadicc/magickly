@@ -1,6 +1,5 @@
 // @vitest-environment jsdom
 import { DateTime, Settings } from "luxon";
-import { MOON_MEAN_INCLINATION } from "magick-components/astrology/moonPath";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resetPlaceStore } from "@/geo/usePlace";
@@ -10,6 +9,8 @@ import Moon from "./moon";
 // The page is prerendered at build time and viewed in a later lunation.
 const buildTime = new Date("2026-09-17T10:16:00Z");
 const visitTime = new Date("2026-10-20T12:00:00Z");
+/** The Moon's mean inclination, which the drawing turns it by. */
+const MOON_MEAN_INCLINATION = 5.15;
 const { defaultLocale } = Settings;
 
 const dates = (container: HTMLElement) =>
@@ -99,15 +100,15 @@ describe("the Moon page's drawing", () => {
       <Moon />,
     );
     const transform = () =>
-      container.querySelector("svg")?.getAttribute("transform");
+      container.querySelector("svg > g")?.getAttribute("transform");
     expect(problems).toEqual([]);
-    expect(transform()).toBe(`rotate(${MOON_MEAN_INCLINATION})`);
+    expect(transform()).toBe(`rotate(${MOON_MEAN_INCLINATION} 85 81)`);
 
     await act(async () => {
       answerGeo({ name: "Cape Town", latitude: -33.92, longitude: 18.42 });
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
-    expect(transform()).toBe(`rotate(${180 - MOON_MEAN_INCLINATION})`);
+    expect(transform()).toBe(`rotate(${180 - MOON_MEAN_INCLINATION} 85 81)`);
     await unmount();
   });
 });

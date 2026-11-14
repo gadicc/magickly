@@ -19,8 +19,13 @@ export const MOON_MEAN_INCLINATION = 5.15;
 // Ported from moon-phase's phase_junk() (above), which also draws the
 // disc; the hemisphere, the inclination and the glow are ours.
 
-/** SVG path of the moon's lit part for a `lune` phase (0 to 1, 0.5 is full). */
+/**
+ * SVG path of the moon's lit part for a `lune` phase (0 to 1, 0.5 is
+ * full); a `RangeError` for anything else, NaN included.
+ */
 export function moonPath(phase: number): string {
+  if (!(phase >= 0 && phase <= 1))
+    throw new RangeError(`moonPath: phase ${phase} is not between 0 and 1`);
   let mag, sweep;
 
   // the "sweep-flag" and the direction of movement change every quarter moon
@@ -34,11 +39,9 @@ export function moonPath(phase: number): string {
   } else if (phase <= 0.75) {
     sweep = [1, 1];
     mag = 20 - 20 * (phase - 0.5) * 4;
-  } else if (phase <= 1) {
+  } else {
     sweep = [0, 1];
     mag = 20 * (phase - 0.75) * 4;
-  } else {
-    throw new Error("Invalid phase: " + phase);
   }
 
   return `m85,5 a${mag},20 0 1,${sweep[0]} 0,150 a20,20 0 1,${sweep[1]} 0,-150`;

@@ -44,7 +44,6 @@
     "./astrology/mercuryRetrograde": "./src/astrology/mercuryRetrograde.ts",
     "./astrology/MercuryWidget": "./src/astrology/MercuryWidget.tsx",
     "./astrology/Moon": "./src/astrology/Moon.tsx",
-    "./astrology/moonPath": "./src/astrology/moonPath.ts",
     "./astrology/MoonWidget": "./src/astrology/MoonWidget.tsx",
     "./astrology/PlanetarySpirit": "./src/astrology/PlanetarySpirit.tsx",
     "./chakras/Chakras": "./src/chakras/Chakras.tsx",
@@ -83,10 +82,6 @@
       "./astrology/Moon": {
         "types": "./lib/astrology/Moon.d.ts",
         "default": "./lib/astrology/Moon.js"
-      },
-      "./astrology/moonPath": {
-        "types": "./lib/astrology/moonPath.d.ts",
-        "default": "./lib/astrology/moonPath.js"
       },
       "./astrology/MoonWidget": {
         "types": "./lib/astrology/MoonWidget.d.ts",

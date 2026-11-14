@@ -62,6 +62,28 @@ describe("FylfotCross", () => {
     });
   });
 
+  it("gives null as expected where the finished cross has no square", () => {
+    const onCellClick = vi.fn();
+    // [1][0] has no square in the finished cross; a sixth row has none at all.
+    const cells: FylfotCell[][] = [[], ["", "cursor", null], ["aries"]];
+    cells.push(["", ""], [], ["fire"]);
+    const squares = elements(FylfotCross({ cells, onCellClick })).filter(
+      ({ type, props }) =>
+        type === "td" && (props as { onClick?: unknown }).onClick,
+    );
+    // The cursor's square and the places with no square take no clicks.
+    expect(squares).toHaveLength(5);
+    for (const square of squares)
+      (square.props as { onClick: () => void }).onClick();
+    expect(onCellClick.mock.calls.map(([click]) => click)).toEqual([
+      { id: "", row: 1, column: 0, expected: null },
+      { id: "aries", row: 2, column: 0, expected: "taurus" },
+      { id: "", row: 3, column: 0, expected: "virgo" },
+      { id: "", row: 3, column: 1, expected: null },
+      { id: "fire", row: 5, column: 0, expected: null },
+    ]);
+  });
+
   it("sets its symbols in a monospace font that survives a client render", () => {
     expect(renderToStaticMarkup(<FylfotCross />)).toContain(
       "font-family:monospace",

@@ -34,8 +34,8 @@ by path, and [LICENSE.txt](./LICENSE.txt) says which file is which:
   take the drawing from the package under MIT. magick.ly licenses the
   images it serves under CC BY 4.0, but anyone can render the same drawing
   from this package under MIT.
-- **The Moon's paths are also under BSD 3-Clause**: `astrology/moonPath`
-  and `astrology/Moon` adapt `phase_junk()` from
+- **The Moon's paths are also under BSD 3-Clause**: `astrology/Moon` and
+  the module of its paths adapt `phase_junk()` from
   [moon-phase](https://github.com/tingletech/moon-phase/blob/643015a83509ca6a662d1af6e1ac14661852cedb/moon-phase.js),
   Copyright © 2012, Regents of the University of California. Keep its
   notice, in LICENSE.txt, with copies of those two modules, including in
@@ -95,7 +95,7 @@ in the browser. Three need the browser, and are marked `"use client"`:
 
 A client module's exports all become client references, so each of these
 exports only its component. Their helpers live in modules of their own
-(`astrology/moonPath`, `gd/RoseSigilImage`, `gd/roseSigilGeometry`).
+(`astrology/Moon`, `gd/RoseSigilImage`, `gd/roseSigilGeometry`).
 
 The Moon's drawing alone, `astrology/Moon`, needs no browser: it draws a
 phase you give it, or a date's, which a page that knows the date passes:
@@ -142,7 +142,6 @@ assembled graph, so they import magick-data's root entry, every table.
 | `astrology/PlanetarySpirit` | A planetary spirit's geomantic sigil (the Rulers of the figures) |
 | `astrology/Moon` | The Moon in a phase you give, or a date's, as seen from either hemisphere |
 | `astrology/MoonWidget` | A tile of today's Moon and its phase's name, as seen from the viewer's hemisphere (`"use client"`) |
-| `astrology/moonPath` | The Moon drawing's lit part for a phase |
 | `astrology/MercuryWidget` | A tile of Mercury's current or next retrograde, under a picture of the planet you give it (`"use client"`) |
 | `astrology/mercuryRetrograde` | Mercury's stations and retrogrades, from astronomy-engine |
 | `fonts/*` | The hall's fonts and `gd-hall.css` ([below](#the-halls-fonts)) |

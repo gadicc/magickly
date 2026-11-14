@@ -652,7 +652,7 @@
         "name": "date",
         "type": "Date",
         "required": false,
-        "description": "The day whose phase to draw, worked out by `lune`. `phase`, when\ngiven, wins."
+        "description": "The day whose phase to draw, worked out by `lune`. `phase`, when\ngiven, wins. An invalid `Date` throws a `RangeError`."
       },
       {
         "name": "height",
@@ -673,7 +673,7 @@
         "name": "phase",
         "type": "number",
         "required": false,
-        "description": "The phase to draw, from 0 to 1 as `lune` gives it: 0 and 1 are new,\n0.5 full. With neither this nor `date`, only the unlit disc is drawn.",
+        "description": "The phase to draw, from 0 to 1 as `lune` gives it: 0 and 1 are new,\n0.5 full; anything else throws a `RangeError`. With neither this nor\n`date`, only the unlit disc is drawn.",
         "control": { "kind": "number" }
       },
       {

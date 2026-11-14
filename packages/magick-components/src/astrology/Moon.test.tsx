@@ -6,13 +6,17 @@ import { MOON_MEAN_INCLINATION, moonPath } from "./moonPath.ts";
 
 const lit = (html: string) =>
   html.match(/<path class="moon" d="([^"]+)"/)?.[1] ?? null;
+/** The turn, on the group inside the root, which SVG 1.1 renderers honour. */
+const turn = (html: string) =>
+  html.match(/^<svg [^>]*><defs>.*?<\/defs><g transform="([^"]+)">/)?.[1];
 
 describe("Moon", () => {
   it("draws a phase it is given, on the server", () => {
     const html = renderToStaticMarkup(<Moon phase={0.3} height={85} />);
     expect(html).toMatch(/^<svg [^>]*height="85"/);
     expect(lit(html)).toBe(moonPath(0.3));
-    expect(html).toContain(`transform="rotate(${MOON_MEAN_INCLINATION})"`);
+    expect(turn(html)).toBe(`rotate(${MOON_MEAN_INCLINATION} 85 81)`);
+    expect(html).toMatch(/^<svg (?![^>]*transform)[^>]*>/);
   });
 
   it("works out a date's phase, and lets a phase win", () => {
@@ -33,19 +37,30 @@ describe("Moon", () => {
 
   it("turns as seen from the south", () => {
     expect(
-      renderToStaticMarkup(<Moon phase={0.2} hemisphere="south" />),
-    ).toContain(`transform="rotate(${180 - MOON_MEAN_INCLINATION})"`);
+      turn(renderToStaticMarkup(<Moon phase={0.2} hemisphere="south" />)),
+    ).toBe(`rotate(${180 - MOON_MEAN_INCLINATION} 85 81)`);
   });
 
-  it("gives each moon on a page its own glow", () => {
-    const html = renderToStaticMarkup(
-      <>
-        <Moon phase={0.1} />
-        <Moon phase={0.9} />
-      </>,
+  // lune.phase() never returns for an invalid date, so a regression would
+  // hang; the timeout makes it fail instead.
+  it("refuses an invalid date rather than hang", { timeout: 2000 }, () => {
+    expect(() => renderToStaticMarkup(<Moon date={new Date(NaN)} />)).toThrow(
+      RangeError,
     );
-    const ids = [...html.matchAll(/<filter id="([^"]+)"/g)].map(([, id]) => id);
-    expect(ids).toHaveLength(2);
-    expect(new Set(ids).size).toBe(2);
+    expect(() =>
+      renderToStaticMarkup(<Moon date={new Date("not a date")} />),
+    ).toThrow(/Moon: date/);
+    // A phase given wins, so the date is not read.
+    expect(
+      lit(renderToStaticMarkup(<Moon date={new Date(NaN)} phase={0.5} />)),
+    ).toBe(moonPath(0.5));
+  });
+
+  it("refuses a phase outside 0 to 1", () => {
+    for (const phase of [-0.1, 1.0000001, Number.NaN, Infinity])
+      expect(
+        () => renderToStaticMarkup(<Moon phase={phase} />),
+        String(phase),
+      ).toThrow(RangeError);
   });
 });

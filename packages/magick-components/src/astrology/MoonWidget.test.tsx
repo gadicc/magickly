@@ -25,8 +25,13 @@ describe("moonPath", () => {
     expect(moonPath(1)).toBe("m85,5 a20,20 0 1,0 0,150 a20,20 0 1,1 0,-150");
   });
 
-  it("rejects a phase past one lunation", () => {
-    expect(() => moonPath(1.01)).toThrow("Invalid phase: 1.01");
+  it("refuses a phase outside 0 to 1, as a RangeError", () => {
+    expect(() => moonPath(1.01)).toThrow(
+      "moonPath: phase 1.01 is not between 0 and 1",
+    );
+    // A negative phase drew an ellipse wider than the disc.
+    for (const phase of [-0.1, -1, 1.0000001, 2, Number.NaN, -Infinity])
+      expect(() => moonPath(phase), String(phase)).toThrow(RangeError);
   });
 });
 
@@ -52,9 +57,9 @@ describe("MoonWidget", () => {
       moonPath(0.3061426907762426),
     );
     expect(container.textContent).toBe("Waxing Gibbous");
-    const svg = container.querySelector("svg");
+    const svg = container.querySelector("svg > g");
     expect(svg?.getAttribute("transform")).toBe(
-      `rotate(${MOON_MEAN_INCLINATION})`,
+      `rotate(${MOON_MEAN_INCLINATION} 85 81)`,
     );
 
     await unmount();
@@ -95,10 +100,10 @@ describe("MoonWidget", () => {
     const transform = (latitude?: number) => {
       const holder = document.createElement("div");
       holder.innerHTML = renderToString(<MoonWidget latitude={latitude} />);
-      return holder.querySelector("svg")?.getAttribute("transform");
+      return holder.querySelector("svg > g")?.getAttribute("transform");
     };
-    const north = `rotate(${MOON_MEAN_INCLINATION})`;
-    const south = `rotate(${180 - MOON_MEAN_INCLINATION})`;
+    const north = `rotate(${MOON_MEAN_INCLINATION} 85 81)`;
+    const south = `rotate(${180 - MOON_MEAN_INCLINATION} 85 81)`;
 
     it("is northern until the latitude is known", () => {
       expect(transform()).toBe(north);

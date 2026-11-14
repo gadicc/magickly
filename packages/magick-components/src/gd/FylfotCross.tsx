@@ -60,13 +60,19 @@ export type FylfotCell = FylfotSymbolId | FylfotBlank | null;
 
 /** A square a click landed on, as `onCellClick` is given it. */
 export interface FylfotCellClick {
-  /** What the square showed. */
-  id: FylfotCell;
+  /**
+   * What the square showed: a symbol, or `""` for an empty square. The
+   * cursor's square and the places with no square take no clicks.
+   */
+  id: FylfotSymbolId | "";
   /** Its row and column, from 0 at the top left. */
   row: number;
   column: number;
-  /** The symbol the finished cross has there. */
-  expected: FylfotSymbolId;
+  /**
+   * The symbol the finished cross has there, or `null` where it has no
+   * square, as `cells` may put one where the finished cross has none.
+   */
+  expected: FylfotSymbolId | null;
 }
 
 /** The tables the squares' symbols come from. */
@@ -149,15 +155,16 @@ export function FylfotCross({
                 const expected = FYLFOT_CELLS[rowIndex]?.[colIndex] ?? null;
                 const isCorrect = id === expected;
 
-                const onClick = onCellClick
-                  ? () =>
-                      onCellClick({
-                        id,
-                        row: rowIndex,
-                        column: colIndex,
-                        expected: expected as FylfotSymbolId,
-                      })
-                  : undefined;
+                const onClick =
+                  onCellClick && id !== null && id !== "cursor"
+                    ? () =>
+                        onCellClick({
+                          id,
+                          row: rowIndex,
+                          column: colIndex,
+                          expected,
+                        })
+                    : undefined;
 
                 let background: undefined | string = undefined;
                 let color: undefined | string = undefined;

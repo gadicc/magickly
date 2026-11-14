@@ -32,15 +32,18 @@ describe("the README", () => {
     );
   });
 
-  it("builds every entry it publishes", () => {
+  it("builds every entry it publishes, and names no other", () => {
     const file = new URL("../tsconfig.build.json", import.meta.url).pathname;
     const { config } = ts.readConfigFile(file, ts.sys.readFile);
     const sources = Object.values(manifest.exports as Record<string, string>)
       .filter((target) => target.startsWith("./src/"))
       .map((target) => target.slice(2));
-    expect(sources.filter((source) => !config.files.includes(source))).toEqual(
-      [],
+    // The modules the entries import are built as tsc follows them; the
+    // list names only the entries, and the types tsc needs to check them.
+    const named = (config.files as string[]).filter(
+      (source) => source !== "src/vendor.d.ts",
     );
+    expect([...named].sort()).toEqual([...sources].sort());
   });
 
   it("marks the client components it names as such", () => {

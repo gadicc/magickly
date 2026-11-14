@@ -1,6 +1,5 @@
 // @vitest-environment jsdom
 
-import { MOON_MEAN_INCLINATION } from "magick-components/astrology/moonPath";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resetPlaceStore } from "@/geo/usePlace";
@@ -10,6 +9,8 @@ import Planets, { PlaceMoon } from "./planets";
 // The page is prerendered at build time and viewed later.
 const buildTime = new Date("2026-09-17T10:16:00Z");
 const visitTime = new Date("2026-10-20T12:00:00Z"); // Waxing Gibbous
+/** The Moon's mean inclination, which the drawing turns it by. */
+const MOON_MEAN_INCLINATION = 5.15;
 
 let answerGeo: (place: unknown) => void;
 
@@ -34,8 +35,8 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const north = `rotate(${MOON_MEAN_INCLINATION})`;
-const south = `rotate(${180 - MOON_MEAN_INCLINATION})`;
+const north = `rotate(${MOON_MEAN_INCLINATION} 85 81)`;
+const south = `rotate(${180 - MOON_MEAN_INCLINATION} 85 81)`;
 
 /**
  * Hydrates the planets page's moon, then lets `/api/geo` answer `place`
@@ -44,7 +45,7 @@ const south = `rotate(${180 - MOON_MEAN_INCLINATION})`;
 async function visit(place?: unknown) {
   const html = renderAt(buildTime, <PlaceMoon />);
   const view = await hydrateAt(visitTime, html, <PlaceMoon />);
-  const svg = view.container.querySelector("svg");
+  const svg = view.container.querySelector("svg > g");
   const hydrated = svg?.getAttribute("transform");
   if (place !== undefined) {
     await act(async () => {
