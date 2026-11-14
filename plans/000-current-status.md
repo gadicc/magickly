@@ -382,6 +382,11 @@ Follow-ups are separate from the completed migration work:
   top of the source links, not
   merged; Air's pins and four halls' moved, the Yods' paths alone
   ([plan 080](080-open-source-packages.md#the-air-sigils-yods-13-november-2026)).
+  On a phone (below 600 px) the source dialog now opens zoomed on the
+  outline, at 3× or more, showing a column's head or a line's start;
+  wider screens fit the whole page, and reset still shows it, on
+  `gate/source-zoom`, not merged
+  ([plan 080](080-open-source-packages.md#source-links-and-mirrored-pages-13-november-2026)).
   The tablet notes' new text goes out with `magick-data` 0.2.0
   ([plan 080](080-open-source-packages.md#magick-data-020-14-november-2026)).
   TODO: with Gadi's go-ahead, stage G; stage E's and F's deferred

@@ -2205,6 +2205,62 @@ provenance text says no image of the book is committed, which stays
 true of the seal art, though one leaf of the same Agrippa copy (n164)
 is now mirrored in the app.
 
+**Opening on the outline** (14 November 2026). Gadi approved starting
+zoomed on the outline on a phone ("sounds good. do it."). Built on
+`gate/source-zoom` from `main` at `b38521d9`; not merged.
+
+- Below MUI's `sm` breakpoint (600 px, as the dialog's title already
+  uses) `SourceDialog` passes the page's `highlight` to `HallPanZoom`
+  as `focus`; wider screens fit the whole page as before. The media
+  query is read before the first render (`noSsr`: the dialog only
+  renders in the browser), and the surface applies the focus when it
+  is first measured, in the layout effect, before the first paint: in
+  headless Chromium the surface's scale was already 3 when it entered
+  the DOM and on its first animation frame, so the page does not open
+  fitted and then jump.
+- `focusView` (`src/doc/hallPanZoom.ts`) fits the region within a 24
+  px margin, but at no less than 3× and no more than 6×. Fitting alone
+  would barely zoom: Heydon's Rulers' column is 89% of the page's
+  height (1.08× on a phone) and Agrippa's line nearly two-thirds of
+  its width (1.5×), and at either the type and sigils stay too small.
+  At 3× a phone shows Heydon's column with three sigils and their
+  names, and Agrippa's line legibly. The brief asked for the region
+  centred; it is centred on each axis where it fits, but where it
+  does not, its start is shown instead (the column's head, the line's
+  number 3321), since centring a column five screens tall would open
+  on its middle sigils. The page still covers the surface, so the
+  column sits at the page's left edge and the line under the page's
+  heading.
+- Reset (the button, a double tap and the 0 key) still shows the
+  whole page; it is the one way back to it. Pinch, drag and the
+  buttons work from the zoomed view as before.
+- `HallPanZoom`'s `focus` is optional and read once; the reader's
+  halls pass none, and their tests passed unchanged, with no pin
+  moved (the viewer renders only inside its dialog).
+- Tests: `focusView`'s fit, its 3× floor and 6× ceiling, the start of
+  an overflowing region, and Heydon's and Agrippa's regions on a
+  390×700 surface; `SourceDialog.test.tsx` opens the dialog at 390
+  px (3×, zooms out, resets to 1×) and 1280 px (1×, whole page).
+
+Checked in headless Chromium on the worktree's dev server (port 3141,
+CI's placeholder environment, browsed as 127.0.0.1) at 390×844 and
+1280×900, light and dark, for all three pages, with a one-finger drag
+down the column and a pinch back to the whole page at 390. No
+documentation screenshot shows these dialogs (`scripts/docs-screenshots`
+captures the temples, the ritual list and form, the editor and the
+reader, none of which opens a source page or a hall's viewer), so none
+was regenerated, and no page prose changed, so the search vectors
+stand.
+
+| Commit | What |
+| --- | --- |
+| `d57e6722` | `feat(sources): Open cited pages on the outline` |
+
+It passed stage E's gate on its own tree with every step at 0, the
+coverage step at the first attempt, and again after it was rebased onto
+`gate/data-020` (the [0.2.0 release](#magick-data-020-14-november-2026)),
+the only conflict being plan 000's status entry.
+
 ### The Air sigil's Yods (13 November 2026)
 
 Built on `gate/air-yods` from `9c32134f`, with Gadi's approval ("Yes,
