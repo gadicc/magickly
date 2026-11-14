@@ -1,5 +1,6 @@
 import { WATCHTOWER_VIEWBOX } from "magick-components/enochian/Tablet";
 import { ROSE_VERSIONS } from "magick-components/gd/roseSigilGeometry";
+import { CANDLESTICK_VERSIONS } from "magick-components/gd/SevenBranchedCandlestick";
 import { TABLET_VERSIONS } from "magick-data/enochian/tablets";
 import { describe, expect, it } from "vitest";
 import { parseComponentImageRequest } from "../componentImageRequest";
@@ -22,6 +23,7 @@ import {
   rectifySigilText,
   SIGIL_MAX_LETTERS,
 } from "./roseSigil";
+import { CANDLESTICK_IMAGE_VERSIONS } from "./sevenBranchedCandlestick";
 import {
   type ComponentImageContract,
   contractViewBox,
@@ -72,7 +74,13 @@ describe("component image contracts", () => {
       "id=fire&version=dee",
       "version=equinox&font=enochian",
     ],
-    "seven-branched-candlestick": ["", "width=300", "width=100&height=100"],
+    "seven-branched-candlestick": [
+      "",
+      "width=300",
+      "width=100&height=100",
+      "version=modern",
+      "version=equinox1909&width=300",
+    ],
     "table-of-shewbread": ["", "width=300"],
     "rose-sigil": [
       "text=גדי",
@@ -252,6 +260,31 @@ describe("component image contracts", () => {
         parse("enochian-tablet", "id=fire&version=dee&font=enochian"),
       ),
     ).toBe("enochian-fire-tablet-dee-glyphs");
+  });
+
+  it("offers the candlestick's versions, the 1909 figure by default", () => {
+    expect([...CANDLESTICK_IMAGE_VERSIONS]).toEqual([...CANDLESTICK_VERSIONS]);
+    expect(parse("seven-branched-candlestick").version).toBe("equinox1909");
+    expect(
+      componentImageQuery({
+        slug: "seven-branched-candlestick",
+        props: parse("seven-branched-candlestick", "version=equinox1909"),
+      }).toString(),
+    ).toBe("");
+    expect(
+      CONTRACTS["seven-branched-candlestick"].filename(
+        parse("seven-branched-candlestick", "version=modern"),
+      ),
+    ).toBe("seven-branched-candlestick-modern");
+    expect(
+      CONTRACTS["seven-branched-candlestick"].filename(
+        parse("seven-branched-candlestick"),
+      ),
+    ).toBe("seven-branched-candlestick");
+    for (const query of ["version=Modern", "version=equinox", "version=gd"])
+      expect(() => parse("seven-branched-candlestick", query)).toThrow(
+        InvalidComponentImageRequest,
+      );
   });
 
   it("offers the rose's versions, the Golden Dawn's by default", () => {

@@ -57,6 +57,9 @@ describe("componentImage", () => {
     expect(componentImage("SevenBranchedCandlestick", {})).toBe(
       "/api/render/seven-branched-candlestick",
     );
+    expect(
+      componentImage("SevenBranchedCandlestick", { version: "modern" }),
+    ).toBe("/api/render/seven-branched-candlestick?version=modern");
     expect(componentImage("TableOfShewbread", {})).toBe(
       "/api/render/table-of-shewbread",
     );

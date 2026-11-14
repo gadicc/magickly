@@ -105,6 +105,19 @@ describe("a data change and the images it can reach", () => {
     expect([...changedSlugs(base, after)]).toEqual(["tree-of-life"]);
   }, 120_000);
 
+  it("reaches a sephirah's archangel on the candlestick of 1909", async () => {
+    // Binah's archangel stands on Saturn's lamp in the 1909 figure, which
+    // the Zelator's second hall draws; the Tree prints it too.
+    const after = await withChange("archangel", (rows) => {
+      (rows.tzaphkiel as { name: { he: string } }).name.he = "צפקאל";
+    });
+    expect([...changedSlugs(base, after)]).toEqual([
+      "tree-of-life",
+      "seven-branched-candlestick",
+      "gd-hall",
+    ]);
+  }, 120_000);
+
   it("follows a repointed link without the id itself being listed", async () => {
     const after = await withChange("sephirah", (rows) => {
       (rows.keter as { godNameId: string }).godNameId = "elohim";

@@ -94,7 +94,9 @@ export function componentImage(name: string, props: Props): string | null {
         version: text(props.version),
       });
     case "SevenBranchedCandlestick":
-      return viaContract("seven-branched-candlestick", {});
+      return viaContract("seven-branched-candlestick", {
+        version: text(props.version),
+      });
     case "TableOfShewbread":
       return viaContract("table-of-shewbread", {});
     default:

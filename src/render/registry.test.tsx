@@ -72,9 +72,13 @@ describe("component image registry", () => {
       "enochian-tablet",
       "1212086a363070af3b7b2eed54a28c9f2b967c8ccfefb1c8c152d2cdfd2327d8",
     ],
+    // a8a08155… until the candlestick drew the Equinox's figure of 1909
+    // too (plan 080, "The rose's and the candlestick's versions"): the
+    // spec reads the sephirot's archangels, and the planets in that
+    // figure's order.
     [
       "seven-branched-candlestick",
-      "a8a081550bbcdd43f319e960754eae84e56a384a1fe1b11474c850b5c256cad9",
+      "b65a8939e9be64412a8c81f2db02b061b44a5cb72b9432a2236d35676b2e2fe4",
     ],
     // Moved once, by Manasseh's Hebrew name (plan 032's data fixes); the five
     // above did not, which is what decision 10 is for.
@@ -150,6 +154,7 @@ describe("component image registry", () => {
     ["enochian-tablet", "font=enochian", 840, 1188, 300],
     ["enochian-tablet", "id=fire&version=dee", 840, 1188, 300],
     ["seven-branched-candlestick", "", 1024, 1024, 60],
+    ["seven-branched-candlestick", "version=modern", 1024, 1024, 60],
     ["table-of-shewbread", "", 1024, 1024, 130],
     ["rose-sigil", "text=גדי", 1024, 1024, 26],
     ["rose-sigil", "text=שלום&rose=false&width=200", 200, 200, 1],
@@ -275,9 +280,19 @@ describe("component image registry", () => {
       126_699,
       "5226c936496d6417ff0890865e1ce489d07f9d11b3f7ab553c5bad3df97574ee",
     ],
+    // The Equinox's figure of 1909, the default since 14 November 2026
+    // (plan 080, "The rose's and the candlestick's versions"), reviewed
+    // as rasterised. The modern drawing, the default before, keeps its
+    // bytes under `version=modern`.
     [
       "seven-branched-candlestick",
       "",
+      87_746,
+      "f20b1474e88bacdfdd0a221af664a60858a90fadf1f65c81abfd4025a294a5a7",
+    ],
+    [
+      "seven-branched-candlestick",
+      "version=modern",
       52_363,
       "5d8b637f7ceb159014b1bf7322b51456a8bd2b730bdb699883288ed6bf063331",
     ],

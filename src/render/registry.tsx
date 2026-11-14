@@ -102,16 +102,30 @@ const TREE_INPUTS: DataInputsSpec = [
   },
 ];
 
+/**
+ * Both versions' lamps: the planets in the default's order, with the
+ * planetary angels the modern one draws, and the archangels of the
+ * planets' sephirot, which the 1909 figure draws. The component finds
+ * each sephirah by its planet, so every sephirah's planet is read; the
+ * archangels only of the seven it finds, so that Metatron's name, say,
+ * moves only the Tree.
+ */
 const CANDLESTICK_INPUTS: DataInputsSpec = [
   {
     table: "planet",
-    rows: CANDLESTICK_PLANETS,
+    rows: CANDLESTICK_PLANETS.equinox1909,
     fields: [
       "symbol",
       "archangel.name.he",
       "hebrewLetter.letter.he",
       "name.he.he",
     ],
+  },
+  { table: "sephirah", rows: "*", fields: ["planetId"] },
+  {
+    table: "sephirah",
+    rows: ["binah", "gevurah", "netzach", "yesod", "hesed", "tiferet", "hod"],
+    fields: ["archangel.name.he"],
   },
 ];
 
@@ -233,7 +247,7 @@ export const COMPONENT_IMAGE_REGISTRY: {
     ],
   },
   "seven-branched-candlestick": {
-    render: () => <SevenBranchedCandlestick />,
+    render: (props) => <SevenBranchedCandlestick version={props.version} />,
     profile: COMPONENT_IMAGE_PROFILE,
     inputs: CANDLESTICK_INPUTS,
   },

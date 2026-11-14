@@ -1108,207 +1108,170 @@
 </circle>
 <svg x="-50" y="-50" width="100" height="100" viewBox="0 0 100 100">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="-50 -50 100 100">
-<circle cx="0" cy="0" r="40" fill="none" stroke="black" stroke-width=".5">
+<path d="M 0 -18.5 L -8.027 16.668 L 14.464 -11.535 L -18.036 4.117 L 18.036 4.117 L -14.464 -11.535 L 8.027 16.668 Z" fill="none" stroke="black" stroke-width=".5">
+</path>
+<circle cx="0" cy="0" r="3.4" fill="none" stroke="black" stroke-width=".5">
 </circle>
-<circle cx="0" cy="0" r="25" fill="none" stroke="black" stroke-width=".5">
+<text x="0" y="-10.175" text-anchor="middle" dominant-baseline="middle" font-size="3.5">♄</text>
+<text x="7.955" y="-6.344" text-anchor="middle" dominant-baseline="middle" font-size="3.5">♂</text>
+<text x="9.92" y="2.264" text-anchor="middle" dominant-baseline="middle" font-size="3.5">♀</text>
+<text x="4.415" y="9.167" text-anchor="middle" dominant-baseline="middle" font-size="3.5">☾</text>
+<text x="-4.415" y="9.167" text-anchor="middle" dominant-baseline="middle" font-size="3.5">♃</text>
+<text x="-9.92" y="2.264" text-anchor="middle" dominant-baseline="middle" font-size="3.5">☉</text>
+<text x="-7.955" y="-6.344" text-anchor="middle" dominant-baseline="middle" font-size="3.5">☿</text>
+<g transform="rotate(0 0 -29)">
+<circle cx="0" cy="-29" r="10.5" fill="none" stroke="black" stroke-width="0.5">
 </circle>
-<path d="M -10.84709347793896 22.524221697560474 L 1.5308084989341915e-15 -25 L 10.847093477938959 22.524221697560478 L -19.545787061700747 -15.587245046468334 L 24.37319780454559 5.563023348907862 L -24.37319780454559 5.563023348907863 L 19.545787061700747 -15.587245046468338 L -10.84709347793896 22.524221697560474 L 1.5308084989341915e-15 -25" fill="none" stroke="black" stroke-width=".5">
+<path d="M 0 -38.7 L -8.4 -24.15 L 8.4 -24.15 Z" fill="none" stroke="black" stroke-width="0.5">
 </path>
-<g transform="rotate(0 1.9839278146187122e-15 -32.4)">
-<circle cx="1.9839278146187122e-15" cy="-32.4" r="7.4" fill="none" stroke="black" stroke-width="0.5">
+<text x="0" y="-29" text-anchor="middle" dominant-baseline="middle" font-size="5" font-weight="bold">ת</text>
+<g>
+<path id="_R_0_-art11-candlestick-path-0-l0" d="M -9.786 -23.35 L 0 -40.3" fill="none" stroke="none">
+</path>
+<text>
+<textPath font-size="3" href="#_R_0_-art11-candlestick-path-0-l0" text-anchor="middle" startOffset="50%">שבתאי</textPath>
+</text>
+</g>
+<g>
+<path id="_R_0_-art11-candlestick-path-0-l1" d="M 0 -40.3 L 9.786 -23.35" fill="none" stroke="none">
+</path>
+<text>
+<textPath font-size="3" href="#_R_0_-art11-candlestick-path-0-l1" text-anchor="middle" startOffset="50%">צפקיאל</textPath>
+</text>
+</g>
+<text x="0" y="-21.55" text-anchor="middle" font-size="2.3">Ephesus</text>
+</g>
+<g transform="rotate(51.429 22.673 -18.081)">
+<circle cx="22.673" cy="-18.081" r="10.5" fill="none" stroke="black" stroke-width="0.5">
 </circle>
-<path d="M 2.412554194320286e-15 -25.4 L -6.062177826491069 -35.9 L 6.06217782649107 -35.9 L 2.412554194320286e-15 -25.4" fill="none" stroke="black" stroke-width="0.5">
+<path d="M 22.673 -27.781 L 14.273 -13.231 L 31.074 -13.231 Z" fill="none" stroke="black" stroke-width="0.5">
 </path>
-<text x="1.9839278146187122e-15" y="-32.4" transform="rotate(180 1.9839278146187122e-15 -32.4)" text-anchor="middle" dominant-baseline="middle" font-size="4" font-weight="bold">♀</text>
+<text x="22.673" y="-18.081" text-anchor="middle" dominant-baseline="middle" font-size="5" font-weight="bold">פ</text>
 <g>
-<path id="_R_0_-art11-candlestick-path-0-l0" d="M 2.4982794702606007e-15 -24 L -7.274613391789282 -36.6" fill="none" stroke="none">
+<path id="_R_0_-art11-candlestick-path-1-l0" d="M 12.887 -12.431 L 22.673 -29.381" fill="none" stroke="none">
 </path>
 <text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-0-l0" text-anchor="middle" startOffset="50%">אנאל</textPath>
+<textPath font-size="3" href="#_R_0_-art11-candlestick-path-1-l0" text-anchor="middle" startOffset="50%">מאדים</textPath>
 </text>
 </g>
 <g>
-<path id="_R_0_-art11-candlestick-path-0-l1" d="M 10.305702305034819 -38.35 L -10.305702305034817 -38.35" fill="none" stroke="none">
+<path id="_R_0_-art11-candlestick-path-1-l1" d="M 22.673 -29.381 L 32.459 -12.431" fill="none" stroke="none">
 </path>
 <text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-0-l1" text-anchor="middle" startOffset="50%">ד</textPath>
+<textPath font-size="3" href="#_R_0_-art11-candlestick-path-1-l1" text-anchor="middle" startOffset="50%">חמאל</textPath>
 </text>
 </g>
-<g>
-<path id="_R_0_-art11-candlestick-path-0-l2" d="M 7.274613391789284 -36.6 L 2.4982794702606007e-15 -24" fill="none" stroke="none">
-</path>
-<text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-0-l2" text-anchor="middle" startOffset="50%">נגה</textPath>
-</text>
+<text x="22.673" y="-10.631" text-anchor="middle" font-size="2.3">Pergamos</text>
 </g>
-</g>
-<g transform="rotate(51.42857142857143 25.331340031964164 -20.201069580222963)">
-<circle cx="25.331340031964164" cy="-20.201069580222963" r="7.4" fill="none" stroke="black" stroke-width="0.5">
+<g transform="rotate(102.857 28.273 6.453)">
+<circle cx="28.273" cy="6.453" r="10.5" fill="none" stroke="black" stroke-width="0.5">
 </circle>
-<path d="M 25.331340031964164 -13.201069580222963 L 19.269162205473094 -23.701069580222963 L 31.393517858455233 -23.701069580222967 L 25.331340031964164 -13.201069580222963" fill="none" stroke="black" stroke-width="0.5">
+<path d="M 28.273 -3.247 L 19.872 11.303 L 36.673 11.303 Z" fill="none" stroke="black" stroke-width="0.5">
 </path>
-<text x="25.331340031964164" y="-20.201069580222963" transform="rotate(180 25.331340031964164 -20.201069580222963)" text-anchor="middle" dominant-baseline="middle" font-size="4" font-weight="bold">☿</text>
+<text x="28.273" y="6.453" text-anchor="middle" dominant-baseline="middle" font-size="5" font-weight="bold">ד</text>
 <g>
-<path id="_R_0_-art11-candlestick-path-1-l0" d="M 25.331340031964164 -11.801069580222963 L 18.05672664017488 -24.401069580222966" fill="none" stroke="none">
+<path id="_R_0_-art11-candlestick-path-2-l0" d="M 18.487 12.103 L 28.273 -4.847" fill="none" stroke="none">
 </path>
 <text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-1-l0" text-anchor="middle" startOffset="50%">רפאל</textPath>
+<textPath font-size="3" href="#_R_0_-art11-candlestick-path-2-l0" text-anchor="middle" startOffset="50%">נגה</textPath>
 </text>
 </g>
 <g>
-<path id="_R_0_-art11-candlestick-path-1-l1" d="M 35.63704233699898 -26.15106958022297 L 15.025637726929345 -26.151069580222966" fill="none" stroke="none">
+<path id="_R_0_-art11-candlestick-path-2-l1" d="M 28.273 -4.847 L 38.059 12.103" fill="none" stroke="none">
 </path>
 <text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-1-l1" text-anchor="middle" startOffset="50%">ב</textPath>
+<textPath font-size="3" href="#_R_0_-art11-candlestick-path-2-l1" text-anchor="middle" startOffset="50%">הניאל</textPath>
 </text>
 </g>
-<g>
-<path id="_R_0_-art11-candlestick-path-1-l2" d="M 32.60595342375345 -24.401069580222966 L 25.331340031964164 -11.801069580222963" fill="none" stroke="none">
-</path>
-<text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-1-l2" text-anchor="middle" startOffset="50%">כוכב</textPath>
-</text>
+<text x="28.273" y="13.903" text-anchor="middle" font-size="2.3">Thyatira</text>
 </g>
-</g>
-<g transform="rotate(102.85714285714286 31.587664354691086 7.209678260184589)">
-<circle cx="31.587664354691086" cy="7.209678260184589" r="7.4" fill="none" stroke="black" stroke-width="0.5">
+<g transform="rotate(154.286 12.583 26.128)">
+<circle cx="12.583" cy="26.128" r="10.5" fill="none" stroke="black" stroke-width="0.5">
 </circle>
-<path d="M 31.587664354691086 14.209678260184589 L 25.525486528200016 3.709678260184588 L 37.64984218118215 3.7096782601845857 L 31.587664354691086 14.209678260184589" fill="none" stroke="black" stroke-width="0.5">
+<path d="M 12.583 16.428 L 4.182 30.978 L 20.983 30.978 Z" fill="none" stroke="black" stroke-width="0.5">
 </path>
-<text x="31.587664354691086" y="7.209678260184589" transform="rotate(180 31.587664354691086 7.209678260184589)" text-anchor="middle" dominant-baseline="middle" font-size="4" font-weight="bold">☉</text>
+<text x="12.583" y="26.128" text-anchor="middle" dominant-baseline="middle" font-size="5" font-weight="bold">ג</text>
 <g>
-<path id="_R_0_-art11-candlestick-path-2-l0" d="M 31.587664354691086 15.60967826018459 L 24.3130509629018 3.0096782601845877" fill="none" stroke="none">
+<path id="_R_0_-art11-candlestick-path-3-l0" d="M 2.797 31.778 L 12.583 14.828" fill="none" stroke="none">
 </path>
 <text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-2-l0" text-anchor="middle" startOffset="50%">מיכאל</textPath>
+<textPath font-size="3" href="#_R_0_-art11-candlestick-path-3-l0" text-anchor="middle" startOffset="50%">לבנה</textPath>
 </text>
 </g>
 <g>
-<path id="_R_0_-art11-candlestick-path-2-l1" d="M 41.8933666597259 1.2596782601845833 L 21.281962049656265 1.2596782601845877" fill="none" stroke="none">
+<path id="_R_0_-art11-candlestick-path-3-l1" d="M 12.583 14.828 L 22.369 31.778" fill="none" stroke="none">
 </path>
 <text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-2-l1" text-anchor="middle" startOffset="50%">ר</textPath>
+<textPath font-size="3" href="#_R_0_-art11-candlestick-path-3-l1" text-anchor="middle" startOffset="50%">גבריאל</textPath>
 </text>
 </g>
-<g>
-<path id="_R_0_-art11-candlestick-path-2-l2" d="M 38.862277746480366 3.009678260184585 L 31.587664354691086 15.60967826018459" fill="none" stroke="none">
-</path>
-<text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-2-l2" text-anchor="middle" startOffset="50%">שמש</textPath>
-</text>
+<text x="12.583" y="33.578" text-anchor="middle" font-size="2.3">Laodicea</text>
 </g>
-</g>
-<g transform="rotate(154.28571428571428 14.05783314740889 29.191391320038374)">
-<circle cx="14.05783314740889" cy="29.191391320038374" r="7.4" fill="none" stroke="black" stroke-width="0.5">
+<g transform="rotate(205.714 -12.583 26.128)">
+<circle cx="-12.583" cy="26.128" r="10.5" fill="none" stroke="black" stroke-width="0.5">
 </circle>
-<path d="M 14.05783314740889 36.19139132003838 L 7.995655320917819 25.691391320038374 L 20.12001097389996 25.69139132003837 L 14.05783314740889 36.19139132003838" fill="none" stroke="black" stroke-width="0.5">
+<path d="M -12.583 16.428 L -20.983 30.978 L -4.182 30.978 Z" fill="none" stroke="black" stroke-width="0.5">
 </path>
-<text x="14.05783314740889" y="29.191391320038374" transform="rotate(180 14.05783314740889 29.191391320038374)" text-anchor="middle" dominant-baseline="middle" font-size="4" font-weight="bold">♂</text>
+<text x="-12.583" y="26.128" text-anchor="middle" dominant-baseline="middle" font-size="5" font-weight="bold">כ</text>
 <g>
-<path id="_R_0_-art11-candlestick-path-3-l0" d="M 14.05783314740889 37.591391320038376 L 6.783219755619605 24.991391320038375" fill="none" stroke="none">
+<path id="_R_0_-art11-candlestick-path-4-l0" d="M -22.369 31.778 L -12.583 14.828" fill="none" stroke="none">
 </path>
 <text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-3-l0" text-anchor="middle" startOffset="50%">זמאל</textPath>
+<textPath font-size="3" href="#_R_0_-art11-candlestick-path-4-l0" text-anchor="middle" startOffset="50%">צדק</textPath>
 </text>
 </g>
 <g>
-<path id="_R_0_-art11-candlestick-path-3-l1" d="M 24.363535452443706 23.241391320038367 L 3.7521308423740702 23.241391320038375" fill="none" stroke="none">
+<path id="_R_0_-art11-candlestick-path-4-l1" d="M -12.583 14.828 L -2.797 31.778" fill="none" stroke="none">
 </path>
 <text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-3-l1" text-anchor="middle" startOffset="50%">פ</textPath>
+<textPath font-size="3" href="#_R_0_-art11-candlestick-path-4-l1" text-anchor="middle" startOffset="50%">צדקיאל</textPath>
 </text>
 </g>
-<g>
-<path id="_R_0_-art11-candlestick-path-3-l2" d="M 21.332446539198173 24.99139132003837 L 14.05783314740889 37.591391320038376" fill="none" stroke="none">
-</path>
-<text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-3-l2" text-anchor="middle" startOffset="50%">מאדים</textPath>
-</text>
+<text x="-12.583" y="33.578" text-anchor="middle" font-size="2.3">Philadelphia</text>
 </g>
-</g>
-<g transform="rotate(205.71428571428572 -14.057833147408893 29.19139132003837)">
-<circle cx="-14.057833147408893" cy="29.19139132003837" r="7.4" fill="none" stroke="black" stroke-width="0.5">
+<g transform="rotate(257.143 -28.273 6.453)">
+<circle cx="-28.273" cy="6.453" r="10.5" fill="none" stroke="black" stroke-width="0.5">
 </circle>
-<path d="M -14.057833147408893 36.19139132003837 L -20.120010973899962 25.69139132003837 L -7.995655320917824 25.691391320038367 L -14.057833147408893 36.19139132003837" fill="none" stroke="black" stroke-width="0.5">
+<path d="M -28.273 -3.247 L -36.673 11.303 L -19.872 11.303 Z" fill="none" stroke="black" stroke-width="0.5">
 </path>
-<text x="-14.057833147408893" y="29.19139132003837" transform="rotate(180 -14.057833147408893 29.19139132003837)" text-anchor="middle" dominant-baseline="middle" font-size="4" font-weight="bold">♃</text>
+<text x="-28.273" y="6.453" text-anchor="middle" dominant-baseline="middle" font-size="5" font-weight="bold">ר</text>
 <g>
-<path id="_R_0_-art11-candlestick-path-4-l0" d="M -14.057833147408893 37.59139132003837 L -21.332446539198177 24.991391320038367" fill="none" stroke="none">
+<path id="_R_0_-art11-candlestick-path-5-l0" d="M -38.059 12.103 L -28.273 -4.847" fill="none" stroke="none">
 </path>
 <text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-4-l0" text-anchor="middle" startOffset="50%">סחיאל</textPath>
+<textPath font-size="3" href="#_R_0_-art11-candlestick-path-5-l0" text-anchor="middle" startOffset="50%">שמש</textPath>
 </text>
 </g>
 <g>
-<path id="_R_0_-art11-candlestick-path-4-l1" d="M -3.7521308423740756 23.241391320038364 L -24.363535452443713 23.241391320038367" fill="none" stroke="none">
+<path id="_R_0_-art11-candlestick-path-5-l1" d="M -28.273 -4.847 L -18.487 12.103" fill="none" stroke="none">
 </path>
 <text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-4-l1" text-anchor="middle" startOffset="50%">כ</textPath>
+<textPath font-size="3" href="#_R_0_-art11-candlestick-path-5-l1" text-anchor="middle" startOffset="50%">רפאל</textPath>
 </text>
 </g>
-<g>
-<path id="_R_0_-art11-candlestick-path-4-l2" d="M -6.78321975561961 24.991391320038367 L -14.057833147408893 37.59139132003837" fill="none" stroke="none">
-</path>
-<text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-4-l2" text-anchor="middle" startOffset="50%">צדק</textPath>
-</text>
+<text x="-28.273" y="13.903" text-anchor="middle" font-size="2.3">Smyrna</text>
 </g>
-</g>
-<g transform="rotate(257.14285714285717 -31.587664354691086 7.20967826018459)">
-<circle cx="-31.587664354691086" cy="7.20967826018459" r="7.4" fill="none" stroke="black" stroke-width="0.5">
+<g transform="rotate(308.571 -22.673 -18.081)">
+<circle cx="-22.673" cy="-18.081" r="10.5" fill="none" stroke="black" stroke-width="0.5">
 </circle>
-<path d="M -31.587664354691086 14.209678260184589 L -37.64984218118216 3.709678260184589 L -25.525486528200016 3.7096782601845866 L -31.587664354691086 14.209678260184589" fill="none" stroke="black" stroke-width="0.5">
+<path d="M -22.673 -27.781 L -31.074 -13.231 L -14.273 -13.231 Z" fill="none" stroke="black" stroke-width="0.5">
 </path>
-<text x="-31.587664354691086" y="7.20967826018459" transform="rotate(180 -31.587664354691086 7.20967826018459)" text-anchor="middle" dominant-baseline="middle" font-size="4" font-weight="bold">♄</text>
+<text x="-22.673" y="-18.081" text-anchor="middle" dominant-baseline="middle" font-size="5" font-weight="bold">ב</text>
 <g>
-<path id="_R_0_-art11-candlestick-path-5-l0" d="M -31.587664354691086 15.609678260184591 L -38.86227774648037 3.0096782601845886" fill="none" stroke="none">
+<path id="_R_0_-art11-candlestick-path-6-l0" d="M -32.459 -12.431 L -22.673 -29.381" fill="none" stroke="none">
 </path>
 <text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-5-l0" text-anchor="middle" startOffset="50%">כסיאל</textPath>
+<textPath font-size="3" href="#_R_0_-art11-candlestick-path-6-l0" text-anchor="middle" startOffset="50%">כוכב</textPath>
 </text>
 </g>
 <g>
-<path id="_R_0_-art11-candlestick-path-5-l1" d="M -21.28196204965627 1.2596782601845842 L -41.893366659725906 1.2596782601845886" fill="none" stroke="none">
+<path id="_R_0_-art11-candlestick-path-6-l1" d="M -22.673 -29.381 L -12.887 -12.431" fill="none" stroke="none">
 </path>
 <text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-5-l1" text-anchor="middle" startOffset="50%">ת</textPath>
+<textPath font-size="3" href="#_R_0_-art11-candlestick-path-6-l1" text-anchor="middle" startOffset="50%">מיכאל</textPath>
 </text>
 </g>
-<g>
-<path id="_R_0_-art11-candlestick-path-5-l2" d="M -24.313050962901805 3.009678260184586 L -31.587664354691086 15.609678260184591" fill="none" stroke="none">
-</path>
-<text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-5-l2" text-anchor="middle" startOffset="50%">שַׁבְּתַאי</textPath>
-</text>
-</g>
-</g>
-<g transform="rotate(308.57142857142856 -25.331340031964167 -20.20106958022296)">
-<circle cx="-25.331340031964167" cy="-20.20106958022296" r="7.4" fill="none" stroke="black" stroke-width="0.5">
-</circle>
-<path d="M -25.331340031964167 -13.20106958022296 L -31.393517858455237 -23.70106958022296 L -19.269162205473098 -23.701069580222963 L -25.331340031964167 -13.20106958022296" fill="none" stroke="black" stroke-width="0.5">
-</path>
-<text x="-25.331340031964167" y="-20.20106958022296" transform="rotate(180 -25.331340031964167 -20.20106958022296)" text-anchor="middle" dominant-baseline="middle" font-size="4" font-weight="bold">☾</text>
-<g>
-<path id="_R_0_-art11-candlestick-path-6-l0" d="M -25.331340031964167 -11.80106958022296 L -32.60595342375345 -24.40106958022296" fill="none" stroke="none">
-</path>
-<text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-6-l0" text-anchor="middle" startOffset="50%">גבריאל</textPath>
-</text>
-</g>
-<g>
-<path id="_R_0_-art11-candlestick-path-6-l1" d="M -15.02563772692935 -26.151069580222966 L -35.63704233699899 -26.15106958022296" fill="none" stroke="none">
-</path>
-<text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-6-l1" text-anchor="middle" startOffset="50%">ג</textPath>
-</text>
-</g>
-<g>
-<path id="_R_0_-art11-candlestick-path-6-l2" d="M -18.056726640174887 -24.401069580222963 L -25.331340031964167 -11.80106958022296" fill="none" stroke="none">
-</path>
-<text>
-<textPath font-size="3" href="#_R_0_-art11-candlestick-path-6-l2" text-anchor="middle" startOffset="50%">לבנה</textPath>
-</text>
-</g>
+<text x="-22.673" y="-10.631" text-anchor="middle" font-size="2.3">Sardis</text>
 </g>
 </svg>
 </svg>

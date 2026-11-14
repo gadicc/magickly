@@ -130,7 +130,7 @@ export const DRAWING_QUERIES: Record<ComponentImageSlug, readonly string[]> = {
   ],
   "astro-geomancy-chart": ["", "m=2222111122221111"],
   "enochian-tablet": ["", "id=air", "id=water", "id=fire", "font=enochian"],
-  "seven-branched-candlestick": [""],
+  "seven-branched-candlestick": ["", "version=modern"],
   "table-of-shewbread": [""],
   "rose-sigil": ["text=א&rose=false"],
   // Every hall: between them they draw every tablet, trump and board.

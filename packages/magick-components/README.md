@@ -133,7 +133,7 @@ assembled graph, so they import magick-data's root entry, every table.
 | `gd/RoseSigilImage` | The same sigil with no hooks, for the server, from points you give it |
 | `gd/roseSigilGeometry` | The rose's letters and where a text's letters stand on it, on either version of the rose: `ROSE_LETTERS`, `roseRings()`, `roseLetters()`, `letterPoint()` and `sigilPoints()`, with `ROSE_VERSIONS` and `ROSE_VERSION_NOTES` |
 | `gd/roseSigilOptimizer` | `optimizeSigilPoints()`, the layout optimiser (nlopt, compiled to WASM) |
-| `gd/SevenBranchedCandlestick` | The seven-branched candlestick, with its planets |
+| `gd/SevenBranchedCandlestick` | The seven-branched candlestick, with its planets, in two versions: *The Equinox*'s figure of 1909 (the default) and the modern arrangement (`CANDLESTICK_VERSIONS`, `CANDLESTICK_VERSION_NOTES`) |
 | `gd/TableOfShewbread` | The table of shewbread, with the signs and the tribes |
 | `gd/FylfotCross` | The fylfot cross of the signs and elements |
 | `enochian/Tablet` | An Enochian tablet, a Watchtower or the Tablet of Union, in the Golden Dawn's, Dee's or another tradition's letters |

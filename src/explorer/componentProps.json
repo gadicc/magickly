@@ -373,7 +373,7 @@
     ]
   },
   "SevenBranchedCandlestick": {
-    "description": "The Golden Dawn's seven-branched candlestick: a branch for each of the\nseven planets, with its symbol, Hebrew name, archangel and letter, set\nabout a heptagram.",
+    "description": "The Golden Dawn's seven-branched candlestick, in a version (`version`):\nby default the figure of *The Equinox* I(2) (1909), seven lamps about a\ncentral one, each with its double letter, the planet's Hebrew name, the\narchangel of its Sephirah and one of the seven churches, joined by a\nheptagram in the Chaldean order; or the modern arrangement, a branch\nfor each planet with its symbol, Hebrew name, planetary angel and\nletter, set about a heptagram.",
     "props": [
       {
         "name": "idPrefix",
@@ -382,6 +382,13 @@
         "default": "\"candlestick\"",
         "description": "Prefixes the text paths' ids, which are document-wide: two of these\non one page need different prefixes. No hook makes one, so that the\ncomponent also renders where React's hooks are not available.",
         "control": { "kind": "text" }
+      },
+      {
+        "name": "version",
+        "type": "\"equinox1909\" | \"modern\"",
+        "required": false,
+        "description": "Which candlestick (`CANDLESTICK_VERSIONS`): the figure of *The\nEquinox* I(2) (1909), Diagram 17 (`equinox1909`), when not given or\nnot a version, or the arrangement of recent editions (`modern`).\n`CANDLESTICK_VERSION_NOTES` says where each comes from.",
+        "control": { "kind": "choice", "options": ["equinox1909", "modern"] }
       }
     ]
   },
