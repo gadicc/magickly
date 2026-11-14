@@ -1,6 +1,6 @@
 import { Container } from "@mui/material";
 import { pageMetadata } from "@/seo/metadata";
-import OpenSourceText from "./OpenSourceText";
+import OpenSourceText, { COMPONENTS_ON_NPM } from "./OpenSourceText";
 
 export const metadata = pageMetadata("/open-source");
 
@@ -12,8 +12,10 @@ export default function OpenSourcePage() {
         <p>
           Magick.ly is open source. Its code is public, and the parts most worth
           reusing elsewhere, the data and the components that draw from it, are
-          under freer licences than the app, so that they can travel. The data
-          is on npm; the components will follow.
+          under freer licences than the app, so that they can travel.{" "}
+          {COMPONENTS_ON_NPM
+            ? "Both are on npm."
+            : "The data is on npm; the components will follow."}
         </p>
       </Container>
       <OpenSourceText />

@@ -6,7 +6,13 @@ import sitemap from "@/app/sitemap";
 import OpenSource from "@/OpenSource";
 import { GD_HALL_LICENCE } from "@/render/contracts/gdHall";
 import { SITE_REPOSITORY } from "@/seo/site";
-import { DATA_USAGE } from "./OpenSourceText";
+import {
+  COMPONENTS_ON_NPM,
+  COMPONENTS_USAGE,
+  DATA_USAGE,
+  isOnNpm,
+} from "./OpenSourceText";
+import PackageCard from "./PackageCard";
 import OpenSourcePage, { metadata } from "./page";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
@@ -26,6 +32,8 @@ const text = (markup: string) =>
     .replace(/<[^>]+>/g, "")
     .replace(/&quot;/g, '"')
     .replace(/&#x27;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
     .replace(/&amp;/g, "&");
 
 /** A package's card: its whole `<article>`. */
@@ -115,17 +123,67 @@ describe("/open-source", () => {
     expect(sample).toBe(DATA_USAGE);
   });
 
-  it("offers no install of a package that is not on npm", () => {
-    const components = card("magick-components");
-    expect(components).toContain("not on npm yet");
-    expect(components).not.toContain("npm i");
-    expect(hrefs(components)).not.toContain(
+  it("shows the components' usage exactly as their README does", () => {
+    // The smoke test type-checks and builds every TSX block of the packed
+    // README, this one included.
+    const readme = readFileSync(
+      `${root}packages/magick-components/README.md`,
+      "utf8",
+    );
+    const installing = readme.slice(readme.indexOf("## Installing"));
+    const sample = installing.match(/```tsx\n(.*?)\n```/s)?.[1];
+    expect(sample).toBe(COMPONENTS_USAGE);
+  });
+
+  // The hub cannot ask the registry: a version past 0.0.0 is published
+  // (stage G; the first, 0.1.0-rc.0, by hand from that commit).
+  it("takes the components for published once they are past 0.0.0", () => {
+    expect(isOnNpm("0.0.0")).toBe(false);
+    expect(isOnNpm("0.1.0-rc.0")).toBe(true);
+    expect(isOnNpm("0.1.0")).toBe(true);
+    expect(COMPONENTS_ON_NPM).toBe(isOnNpm(manifest.version));
+  });
+
+  it("offers the components to install once published, with their usage", () => {
+    const published = strip(
+      renderToString(
+        <PackageCard
+          name="magick-components"
+          directory="packages/magick-components"
+          published
+          usage={COMPONENTS_USAGE}
+        >
+          <p>About.</p>
+        </PackageCard>,
+      ),
+    );
+    expect(published).toContain("npm i magick-components");
+    expect(text(published)).toContain(COMPONENTS_USAGE);
+    expect(hrefs(published)).toContain(
       "https://www.npmjs.com/package/magick-components",
     );
-    expect(components).toContain(
-      'aria-label="magick-components&#x27;s source on GitHub"',
-    );
+    // The page's card is this one until then.
+    if (COMPONENTS_ON_NPM)
+      expect(card("magick-components")).toContain("npm i magick-components");
   });
+
+  it.skipIf(COMPONENTS_ON_NPM)(
+    "offers no install of a package that is not on npm",
+    () => {
+      expect(text(html)).toContain(
+        "The data is on npm; the components will follow.",
+      );
+      const components = card("magick-components");
+      expect(components).toContain("not on npm yet");
+      expect(components).not.toContain("npm i");
+      expect(hrefs(components)).not.toContain(
+        "https://www.npmjs.com/package/magick-components",
+      );
+      expect(components).toContain(
+        'aria-label="magick-components&#x27;s source on GitHub"',
+      );
+    },
+  );
 
   it("puts the packages before the licences, which keep their anchor", () => {
     // Gadi, 13 November 2026; /about and the hall pages link #licences.

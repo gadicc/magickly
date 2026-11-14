@@ -1,6 +1,7 @@
 import { H2, List, PageText } from "@/app/PageText";
 import { SITE_REPOSITORY } from "@/seo/site";
 import Link from "@/ui/Link";
+import componentsManifest from "../../../packages/magick-components/package.json";
 import PackageCard from "./PackageCard";
 
 /** A file in the repository, on GitHub. */
@@ -12,6 +13,28 @@ export const DATA_USAGE = `import data from "magick-data";
 
 const tiferet = data.sephirah.tiferet;
 console.log(tiferet.name.roman, tiferet.planet?.symbol); // Tiferet ☉`;
+
+/**
+ * The components' usage sample, exactly as their README's "Installing"
+ * gives it, which the package's smoke test type-checks and builds.
+ */
+export const COMPONENTS_USAGE = `import TreeOfLife from "magick-components/kabbalah/TreeOfLife";
+
+export default function Page() {
+  return <TreeOfLife field="name.he" colorScale="queen" width={300} />;
+}`;
+
+/**
+ * Whether a package at `version` is on npm, as far as the hub can tell
+ * (plan 080, stage G): it does not ask the registry, so a version past
+ * 0.0.0 counts. The first version, 0.1.0-rc.0, is published by hand from
+ * the commit that bumps to it, and npm's `latest` then names it, so `npm
+ * i` works from that publish; until it, the card is a little early.
+ */
+export const isOnNpm = (version: string) => version !== "0.0.0";
+
+/** Whether magick-components is on npm, by its manifest's version. */
+export const COMPONENTS_ON_NPM = isOnNpm(componentsManifest.version);
 
 /**
  * A card per package, then the licence policy (plan 080, decision 1 and
@@ -54,7 +77,8 @@ export default function OpenSourceText() {
         <PackageCard
           name="magick-components"
           directory="packages/magick-components"
-          published={false}
+          published={COMPONENTS_ON_NPM}
+          usage={COMPONENTS_USAGE}
         >
           <p>
             React components that draw from that data: the{" "}
@@ -74,11 +98,14 @@ export default function OpenSourceText() {
             </Link>{" "}
             draw each one live, with its props to try and its reference.
           </p>
-          <p>
-            It is not on npm yet. Until it is, the components are in the
-            app&apos;s repository, under <code>packages/magick-components</code>
-            , where you may copy them under MIT.
-          </p>
+          {COMPONENTS_ON_NPM ? null : (
+            <p>
+              It is not on npm yet. Until it is, the components are in the
+              app&apos;s repository, under{" "}
+              <code>packages/magick-components</code>, where you may copy them
+              under MIT.
+            </p>
+          )}
         </PackageCard>
       </PageText>
       <PageText labelledBy="licences">
