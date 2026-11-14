@@ -1,4 +1,14 @@
 {
+  /*
+    tetragrammatonPermutation: the Twelve Banners of the Name, Crowley,
+    777 (London and Felling-on-Tyne: Walter Scott Publishing Co., 1909),
+    col. CXL. No scan of the 1909 printing was found at a stable address
+    (archive.org has only later typed texts), so none is linked. Each is
+    one of the twelve orders of the Name's letters, each once, and the
+    schema's description says how the two He's, h and H, are told apart.
+    Until magick-data 0.2.1 Cancer had Leo's hvyH and Sagittarius
+    Capricorn's Hyhv.
+  */
   aries: {
     id: "aries",
     no: 1,
@@ -84,7 +94,7 @@
     elementId: "water",
     quadruplicity: "cardinal",
     tribeOfIsraelId: "issachar",
-    tetragrammatonPermutation: "hvyH",
+    tetragrammatonPermutation: "hvHy",
   },
 
   leo: {
@@ -194,7 +204,7 @@
     elementId: "fire",
     quadruplicity: "mutable",
     tribeOfIsraelId: "benjamin",
-    tetragrammatonPermutation: "Hyhv",
+    tetragrammatonPermutation: "vyHh",
   },
 
   capricorn: {

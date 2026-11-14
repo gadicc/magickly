@@ -104,6 +104,12 @@ Follow-ups are separate from the completed migration work:
   the two changed Sources rows signed again; on `gate/data-020`,
   published by CI when main is pushed
   ([plan 080](080-open-source-packages.md#magick-data-020-14-november-2026)).
+- 14 November 2026: `magick-data` 0.2.1, a patch from the provenance
+  check: Cancer and Sagittarius had Leo's and Capricorn's permutations of
+  the Name, now their own after 777, and the kameas' test and notes name
+  Agrippa's two misprints the squares correct; the zodiac row signed
+  again. On `gate/data-021`, published by CI when main is pushed
+  ([plan 080](080-open-source-packages.md#magick-data-021-14-november-2026)).
 - 13 November 2026: Dependabot alerts #362 (zod), #364 (glob) and #366
   (minimatch) fixed by a `@vercel/functions` bump and parent-scoped
   overrides of Serwist's exact zod and glob pins (glob 14 checked against
