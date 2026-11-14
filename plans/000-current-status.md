@@ -118,6 +118,12 @@ Follow-ups are separate from the completed migration work:
   moved, and the hub's card ready for npm; on `gate/stage-g`, not
   merged. The owner's steps to the first publish are G′
   ([plan 080](080-open-source-packages.md#stage-g-14-november-2026)).
+  After the final review: `publish.yml` never publishes the components
+  depending on a magick-data npm lacks (it waits for one the same run
+  publishes), the decision refuses 0.0.0, the credit wording matches the
+  files', and G′ bumps on a branch that reaches `main` only after the
+  hand publish
+  ([review](080-open-source-packages.md#stage-g-review-14-november-2026)).
 - 13 November 2026: Dependabot alerts #362 (zod), #364 (glob) and #366
   (minimatch) fixed by a `@vercel/functions` bump and parent-scoped
   overrides of Serwist's exact zod and glob pins (glob 14 checked against

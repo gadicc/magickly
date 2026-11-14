@@ -28,8 +28,9 @@ export default function Page() {
  * Whether a package at `version` is on npm, as far as the hub can tell
  * (plan 080, stage G): it does not ask the registry, so a version past
  * 0.0.0 counts. The first version, 0.1.0-rc.0, is published by hand from
- * the commit that bumps to it, and npm's `latest` then names it, so `npm
- * i` works from that publish; until it, the card is a little early.
+ * the commit that bumps to it, on a branch that reaches `main` only once
+ * npm has it (stage G′), and npm's `latest` then names it, so `npm i`
+ * works whenever the site offers it.
  */
 export const isOnNpm = (version: string) => version !== "0.0.0";
 
