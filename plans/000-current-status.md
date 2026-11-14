@@ -487,8 +487,9 @@ Follow-ups are separate from the completed migration work:
   record what the build settled and its known limits. TODO: the
   follow-ups in
   [plan 081](081-enochian-translator.md#follow-ups) (Safari unchecked;
-  the dictionary's query in the sign-in link; parts of speech for
-  "do").
+  parts of speech for "do"). The same day the sign-in link stopped
+  sending the dictionary's text to the server as it was typed (a
+  prefetch of its address, query and all; plan 081 has the details).
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose

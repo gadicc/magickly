@@ -627,12 +627,24 @@ This plan's questions for an expert, with plan 077's, are in
 - Safari is unchecked (no device). Each fragment write is two
   `replaceState` calls (ours and Next's); older WebKit allowed 100 in
   30 seconds, which steady keypad typing could reach.
-- The dictionary's `?q=` reaches the server by plan 074's design, and
-  for signed-out readers also in the sign-in link's `callbackURL`;
-  with the preview inviting sentences there, whether the link should
-  keep the query is open.
 - Parts of speech for "do" and its kin (known limits above).
 - An expert's review of a sample of English into Enochian
   ([plan 082](082-enochian-expert-questions.md)), which decides how
   far the notice can be softened.
 - Stage 2, designed separately.
+
+Done after the build:
+
+- 14 November 2026: the sign-in link sent the dictionary's text as it
+  was typed. For signed-out readers the bar's link is
+  `/signin?callbackURL=…`, carrying the page's query, and Next 16
+  prefetches a link's exact address whenever it changes, so a
+  production build sent "the", "the house", "the house of" and "the
+  house of God" to the server while that was typed, unclicked. The
+  link no longer prefetches; the bar prefetches the bare `/signin`
+  instead, and Next builds the navigation with the query from it. The
+  same build now sends nothing while typing. Following the link still
+  sends the query, as `callbackURL`, so sign-in returns the reader to
+  their search: kept, since it is their click (Gadi, 14 November
+  2026). The dictionary's `?q=` also reaches the server when a page is
+  loaded with it (plan 074).

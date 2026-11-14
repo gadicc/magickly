@@ -18,12 +18,27 @@ const auth = vi.hoisted(() => ({
 const navigation = vi.hoisted(() => ({
   pathname: "/gd/rituals",
   segment: null as string | null,
+  search: "",
 }));
+// One router for every render, as Next's is, recording what it prefetches.
+const router = vi.hoisted(() => {
+  const prefetched: string[] = [];
+  const invalidate: (() => void)[] = [];
+  return {
+    prefetched,
+    invalidate,
+    prefetch: (href: string, options?: { onInvalidate?: () => void }) => {
+      prefetched.push(href);
+      if (options?.onInvalidate) invalidate.push(options.onInvalidate);
+    },
+  };
+});
 
 vi.mock("next/navigation", () => ({
   usePathname: () => navigation.pathname,
   useSelectedLayoutSegment: () => navigation.segment,
-  useSearchParams: () => new URLSearchParams(),
+  useSearchParams: () => new URLSearchParams(navigation.search),
+  useRouter: () => router,
 }));
 vi.mock("@/auth/client", () => ({ useSession: () => auth.session }));
 vi.mock("@/auth/browserLifecycle", () => ({ sqlBrowserLifecycle: {} }));
@@ -49,15 +64,20 @@ it("hydrates the signed-out server bar even when the client already knows the us
   expect(recoverable).not.toHaveBeenCalled();
   expect(logged).not.toHaveBeenCalled();
   logged.mockRestore();
-  // After hydration the signed-in controls replace the sign-in button.
+  // After hydration the signed-in controls replace the sign-in button,
+  // and nothing is prefetched for signing in.
   expect(
     container.querySelector('[aria-label="account of current user"]'),
   ).toBeTruthy();
+  expect(router.prefetched).toEqual([]);
 });
 
 afterEach(() => {
   navigation.pathname = "/gd/rituals";
   navigation.segment = null;
+  navigation.search = "";
+  router.prefetched.length = 0;
+  router.invalidate.length = 0;
   auth.session = { data: null, isPending: true };
   document.body.innerHTML = "";
   localStorage.clear();
@@ -187,4 +207,25 @@ it("hydrates the bar under the theme with a stored choice, and the drawer's swit
       .querySelector(".MuiDrawer-root")
       ?.classList.contains("MuiModal-hidden"),
   ).toBe(true);
+});
+
+it("prefetches the bare sign-in route, never the page's query", async () => {
+  // Disabled while the session is pending: nothing is prefetched.
+  navigation.search = "q=the+house+of+God";
+  await hydrateAt("/enochian/dictionary", null, null);
+  expect(router.prefetched).toEqual([]);
+
+  auth.session = { data: null, isPending: false };
+  const bar = await hydrateAt("/enochian/dictionary", null, null);
+  // The link still returns to the search after signing in, but only a
+  // click sends it; what is prefetched is the route without the query.
+  expect(
+    bar.querySelector('a[aria-label="sign in"]')?.getAttribute("href"),
+  ).toBe(
+    `/signin?callbackURL=${encodeURIComponent("/enochian/dictionary?q=the+house+of+God")}`,
+  );
+  // Once, and again only when Next drops it as stale.
+  expect(router.prefetched).toEqual(["/signin"]);
+  act(() => router.invalidate.at(-1)?.());
+  expect(router.prefetched).toEqual(["/signin", "/signin"]);
 });

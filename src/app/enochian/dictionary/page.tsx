@@ -7,8 +7,10 @@ import { buildKeyUses, countUses } from "./keyUses";
 /**
  * The query is in the address (`?q=`, plan 074), so it is not private
  * here: it reaches the server whenever the page is loaded with one, and
- * the signed-out sign-in link's `callbackURL` carries it too
- * (`MyAppBar.tsx`). This policy does less: requests the page makes, such
+ * when a signed-out reader follows the sign-in link, whose `callbackURL`
+ * carries it so sign-in returns to the search (`MyAppBar.tsx`; the link
+ * doesn't prefetch, and the bar prefetches only the bare route, so typing
+ * sends nothing). This policy does less: requests the page makes, such
  * as the translator's preview loading the Keys table, send only the
  * origin as their referrer, not the query (plan 081, decision 19). The
  * translator's own page keeps its text in the fragment instead.
