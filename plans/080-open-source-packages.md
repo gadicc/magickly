@@ -2570,7 +2570,8 @@ stranger would trip on: entry names that break the package's own
 pattern, props that mean two things, app defaults, exports nobody
 should depend on, and the Moon's drawing not exported at all. Gadi
 decided every item the same day. Built on `gate/components-api`, from
-`main` at `15ae8087`; not merged. Stage G (dropping `private`, the
+`main` at `15ae8087`, then rebased with stage G onto `main` at
+`6d6bfab6` ([below](#the-rebase-onto-main-14-november-2026)); not merged. Stage G (dropping `private`, the
 publish guards, `publish.yml`) stays separate, as do composable JSX hall
 tags and `isolatedDeclarations`.
 
@@ -2745,12 +2746,12 @@ changed (the halls draw the same markup) and were not regenerated.
 
 | Commit | What |
 | --- | --- |
-| `6dd6cc20` | `refactor(components): Split the hall's entries` |
-| `248833cc` | `refactor(components): Rename and trim the entries` |
-| `bab8fee7` | `refactor(components): Settle the props and defaults` |
-| `6223de5b` | `refactor(components): Spell identifiers the American way` |
-| `c97bfc45` | `feat(components): Draw the Moon on its own` |
-| `3094b0fc` | `refactor(components): Name the default hall art in capitals` |
+| `f1e1402a` | `refactor(components): Split the hall's entries` |
+| `c0c29f73` | `refactor(components): Rename and trim the entries` |
+| `e13df1de` | `refactor(components): Settle the props and defaults` |
+| `92c5d1e6` | `refactor(components): Spell identifiers the American way` |
+| `775606da` | `feat(components): Draw the Moon on its own` |
+| `16e1fe62` | `refactor(components): Name the default hall art in capitals` |
 | (this commit) | `docs(plans): Record the API before publishing` |
 
 Every code commit passed stage E's gate (the gate with the package's
@@ -2787,7 +2788,7 @@ tests), and a second whole gate passed every step.
 
 ### After the review (14 November 2026)
 
-An adversarial review of this branch at `725cc65e`, which rendered the
+An adversarial review of this branch at `de1dfec3`, which rendered the
 new API rather than only reading it, found a hang, types that said less
 than the code, markup that was not XML, and a default that changed the
 drawing when stated. Gadi decided every item the same day, and the five
@@ -2879,27 +2880,27 @@ documentation screenshots were not regenerated.
 
 | Commit | What |
 | --- | --- |
-| `0e2a94ca` | `fix(components): Refuse an invalid Moon date` |
-| `dd16404d` | `fix(components): Settle the Tree's defaults` |
-| `3d6cf541` | `fix(components): Make label={false} decorative` |
-| `7159318f` | `refactor(components): Settle the hall's names` |
-| `be3adca3` | `docs(components): Check the README's TS blocks` |
+| `b680d3b2` | `fix(components): Refuse an invalid Moon date` |
+| `d1e8bf17` | `fix(components): Settle the Tree's defaults` |
+| `a0c3cf8d` | `fix(components): Make label={false} decorative` |
+| `caf04c63` | `refactor(components): Settle the hall's names` |
+| `2b104b44` | `docs(components): Check the README's TS blocks` |
 | (this commit) | `docs(plans): Record the API after its review` |
 
 Every code commit passed stage E's gate on its own tree, every step at
 0. Two needed their whole gate run again, both on timing tests in files
-they do not touch, at load averages up to 29: `dd16404d` failed
+they do not touch, at load averages up to 29: `d1e8bf17` failed
 `TempleHallTabs.test.tsx`'s frame-timing test (its automatic rerun
-passed), and `be3adca3` that test and then, on the rerun, a `TIMEOUT` in
+passed), and `2b104b44` that test and then, on the rerun, a `TIMEOUT` in
 `r2RitualStorage.test.ts`. Each file passed alone on the same tree, and
-a second whole gate passed every step. `3d6cf541`'s subject was
+a second whole gate passed every step. `a0c3cf8d`'s subject was
 reworded after its gate, which ran on it as `d57bb475`; its tree,
 `6c24c6a0`, is the one the gate checked.
 
 ## Stage G (14 November 2026)
 
 `magick-components` made publishable the way `magick-data` is, on
-`gate/stage-g` from `gate/components-api` at `76c9d854`; not merged. The
+`gate/stage-g` from `gate/components-api` at `ddcc2395`; not merged. The
 version stays 0.0.0: the owner bumps it after the sign-off
 ([G′](#stage-g-the-owners-steps)). Each code commit passed stage E's
 gate on its own tree.
@@ -2941,7 +2942,7 @@ gate on its own tree.
 - **The kept tarball.** `pnpm --filter magick-components smoke
   --keep-tarball <path>` keeps the verified tarball and prints its
   SHA-256 and `integrity sha512-…`, as magick-data's does. At
-  `163def6b`, version 0.0.0: 169 files, 196,765 bytes packed and 592,027
+  `ca2eaa4d`, version 0.0.0: 169 files, 196,765 bytes packed and 592,027
   unpacked (161, 192,411 and 569,542 at the hardening), SHA-256
   `20567d9375847e6057da38f405c28eaf62e056ac1bfd66e8b7b48be3918f99eb`,
   integrity
@@ -3028,10 +3029,10 @@ planned.
 
 | Commit | What |
 | --- | --- |
-| `661e0545` | `ci(publish): Publish magick-components too` |
-| `5366d241` | `build(components): Make the package publishable` |
-| `c3dbb322` | `feat(gd): Credit the drawn halls to the components` |
-| `163def6b` | `feat(open-source): Ready the components' card` |
+| `f3c28ac9` | `ci(publish): Publish magick-components too` |
+| `1c467dcb` | `build(components): Make the package publishable` |
+| `3981a5b3` | `feat(gd): Credit the drawn halls to the components` |
+| `ca2eaa4d` | `feat(open-source): Ready the components' card` |
 | (this commit) | `docs(plans): Record stage G` |
 
 Every code commit passed stage E's gate on its own tree, every step at
@@ -3153,6 +3154,20 @@ already exist from stage A′.
    package's Settings › Publishing access to "Require two-factor
    authentication and disallow tokens".
 
+
+### The rebase onto main (14 November 2026)
+
+The 18 commits of the API work and stage G were built on `main` at
+`15ae8087`. Before they were merged, `main` gained `6d6bfab6`, which
+speeds up a test in `scripts/enochian-translate-eval/runner.test.ts`
+that had timed out twice in CI and held back `magick-data` 0.2.0's
+publish. The branch was rebased onto it, and the commit hashes in this
+plan are the rebased ones.
+
+The rebase touched no file of the branch: each rebased commit's tree
+differs from the tree its gate passed only in that test file, which
+passed its own gate as `6d6bfab6`. The tip, with this note, was gated
+again on its own tree.
 ## Review (11 November 2026)
 
 Fable 5.2 at high effort, fresh context, `loom-torvalds-review`, on the
