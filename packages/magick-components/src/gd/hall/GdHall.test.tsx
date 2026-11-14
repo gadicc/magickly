@@ -3,7 +3,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { defaultHallArt } from "./art/index.ts";
+import { DEFAULT_HALL_ART } from "./art/index.ts";
 import {
   GD_HALL_FONT_FILES,
   GD_HALL_FONT_STACKS,
@@ -265,7 +265,7 @@ describe("GdHall", () => {
       provenance: { origin: "thirdParty", author: "test", license: "test" },
     };
     const markup = render(hall({}, floor({ type: "item", kind: "cup" })), {
-      art: new Map([...defaultHallArt, ["item:cup", cup]]),
+      art: new Map([...DEFAULT_HALL_ART, ["item:cup", cup]]),
     });
     expect(markup).toContain('data-art="cup"');
     expect(markup).not.toContain("stroke-dasharray");
@@ -449,7 +449,7 @@ describe("fonts", () => {
 
 describe("art provenance", () => {
   it("ships only original MIT art in the package", () => {
-    for (const [kind, art] of defaultHallArt) {
+    for (const [kind, art] of DEFAULT_HALL_ART) {
       expect(art.provenance.origin, kind).toBe("original");
       expect(art.provenance.license, kind).toBe("MIT");
       expect(art.provenance.author, kind).toContain("Gadi Cohen");

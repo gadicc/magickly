@@ -1,4 +1,4 @@
-import { defaultHallArt } from "./art/index.ts";
+import { DEFAULT_HALL_ART } from "./art/index.ts";
 import { TRUMPS } from "./art/tarotKey.tsx";
 import { hebrewLetter } from "./hebrewLetters.ts";
 import {
@@ -186,7 +186,7 @@ const isWithin = (inner: readonly number[], outer: readonly number[]) =>
  */
 export function describeHall(
   hall: HallNode,
-  art: HallArtRegistry = defaultHallArt,
+  art: HallArtRegistry = DEFAULT_HALL_ART,
 ): HallDescription {
   const resolved = resolveHall(hall, { art });
   const objects = resolved.objects.slice(0, MAX_DESCRIBED);

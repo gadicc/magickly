@@ -22,10 +22,10 @@ import { censerArt, chaliceArt, cupArt } from "./vessels.tsx";
 
 /**
  * The package's own art, all original (MIT). The app composes its art over
- * this — `new Map([...defaultHallArt, ["tablet", tabletArt(font)]])` — and
+ * this — `new Map([...DEFAULT_HALL_ART, ["tablet", tabletArt(font)]])` — and
  * anything still missing draws as a placeholder.
  */
-export const defaultHallArt: HallArtRegistry = new Map([
+export const DEFAULT_HALL_ART: HallArtRegistry = new Map([
   ["altar", altarArt],
   ["platform", platformArt],
   ["throne", throneArt],

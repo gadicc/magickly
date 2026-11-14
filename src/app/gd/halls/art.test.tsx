@@ -1,5 +1,5 @@
 import {
-  defaultHallArt,
+  DEFAULT_HALL_ART,
   GdHall,
   type HallArt,
   type HallArtProps,
@@ -55,7 +55,7 @@ describe("the app's hall art", () => {
   });
 
   it("keeps the package's own art original and MIT", () => {
-    for (const [key, art] of defaultHallArt) {
+    for (const [key, art] of DEFAULT_HALL_ART) {
       expect(art.provenance.origin, key).toBe("original");
       expect(art.provenance.license, key).toBe("MIT");
       // The app gives the tablet its Enochian font, and takes the rest.

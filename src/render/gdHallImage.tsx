@@ -1,5 +1,5 @@
 import {
-  defaultHallArt,
+  DEFAULT_HALL_ART,
   GD_HALL_FONT_STACKS,
   GdHallSvg,
   type HallArtRegistry,
@@ -44,7 +44,7 @@ export const GD_HALL_IMAGE_PROFILE = "magickli-gd-hall-image-v2";
  * two to one layout.
  */
 export const hallImageArt: HallArtRegistry = new Map([
-  ...defaultHallArt,
+  ...DEFAULT_HALL_ART,
   ["tablet", tabletArt({ fontFamily: "Enochian" })],
 ]);
 

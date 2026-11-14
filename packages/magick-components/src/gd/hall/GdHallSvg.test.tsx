@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { defaultHallArt } from "./art/index.ts";
+import { DEFAULT_HALL_ART } from "./art/index.ts";
 import { tabletArt } from "./art/symbols.tsx";
 import { GdHall, GdHallSvg, hallRoot, hallViewBox } from "./GdHall.tsx";
 import { resolveHall } from "./layout.ts";
@@ -28,7 +28,7 @@ vi.mock("react", async (importOriginal) => {
 
 // The tablets as the image route draws them: in the bundled Enochian font.
 const art = new Map([
-  ...defaultHallArt,
+  ...DEFAULT_HALL_ART,
   ["tablet", tabletArt({ fontFamily: "Enochian" })],
 ]);
 

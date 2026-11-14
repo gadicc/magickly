@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { defaultHallArt } from "./art/index.ts";
+import { DEFAULT_HALL_ART } from "./art/index.ts";
 import {
   booleanAttr,
   clamp,
@@ -467,7 +467,7 @@ describe("validateHall", () => {
   });
 
   it("checks an officer's grade against the lamens it changes", () => {
-    const art = defaultHallArt;
+    const art = DEFAULT_HALL_ART;
     const result = validateHall(
       hall(
         floor(

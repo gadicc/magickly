@@ -6,7 +6,7 @@ import {
   useMemo,
 } from "react";
 import { svgCoordinate } from "../../svgCoordinate.ts";
-import { defaultHallArt } from "./art/index.ts";
+import { DEFAULT_HALL_ART } from "./art/index.ts";
 import { Placeholder } from "./art/placeholder.tsx";
 import { PALETTE } from "./art/shared.ts";
 import { GD_HALL_FONT_STACKS, gdHallFontFaceCss } from "./fonts.ts";
@@ -443,7 +443,7 @@ export function GdHallSvg({
  */
 export function GdHall({
   hall,
-  art = defaultHallArt,
+  art = DEFAULT_HALL_ART,
   fontBaseUrl,
   className,
   style,

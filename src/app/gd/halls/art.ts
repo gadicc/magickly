@@ -1,5 +1,5 @@
 import {
-  defaultHallArt,
+  DEFAULT_HALL_ART,
   type HallArtRegistry,
   tabletArt,
 } from "magick-components/gd/hall";
@@ -13,6 +13,6 @@ import enochianFont from "@/fonts/enochian";
  * third-party list, which stage H emptied.
  */
 export const gdHallArt: HallArtRegistry = new Map([
-  ...defaultHallArt,
+  ...DEFAULT_HALL_ART,
   ["tablet", tabletArt(enochianFont.style)],
 ]);

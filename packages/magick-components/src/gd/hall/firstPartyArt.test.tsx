@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { KameaFigure } from "../../astrology/Kamea.tsx";
-import { defaultHallArt } from "./art/index.ts";
+import { DEFAULT_HALL_ART } from "./art/index.ts";
 import { PALETTE } from "./art/shared.ts";
 import { TABLET_ELEMENTS, tabletArt } from "./art/symbols.tsx";
 import { romanNumeral, TRUMPS } from "./art/tarotKey.tsx";
@@ -25,7 +25,7 @@ const draw = (art: HallArt, node: HallNode, id = "t") => {
     </svg>,
   );
 };
-const art = (key: string) => defaultHallArt.get(key) as HallArt;
+const art = (key: string) => DEFAULT_HALL_ART.get(key) as HallArt;
 const hall = (...children: unknown[]): HallNode =>
   ({ type: "gdHall", children: [{ type: "floor", children }] }) as HallNode;
 
@@ -156,7 +156,7 @@ describe("the tarot keys", () => {
           { type: "tarotKey", n: -0.5 },
           { type: "tarotKey", n: 21 },
         ),
-        { art: defaultHallArt },
+        { art: DEFAULT_HALL_ART },
       ).map((d) => [d.severity, d.message]),
     ).toEqual([
       ["warning", "tarotKey: n=30 is outside 0–21 and is clamped"],
@@ -211,7 +211,7 @@ describe("the emblem cards", () => {
           { type: "card", kind: "fool" },
           { type: "card", kind: "null" },
         ),
-        { art: defaultHallArt },
+        { art: DEFAULT_HALL_ART },
       ).map((d) => [d.severity, d.message]),
     ).toEqual([
       ["warning", "card: no kind; drawn blank"],
@@ -223,7 +223,7 @@ describe("the emblem cards", () => {
   it("is drawn the size of a tarot key", () => {
     const { objects } = resolveHall(
       hall({ type: "card", kind: "pan" }, { type: "tarotKey", n: 13 }),
-      { art: defaultHallArt },
+      { art: DEFAULT_HALL_ART },
     );
     expect(objects[0].width).toBeCloseTo(objects[1].width);
     expect(objects[0].height).toBeCloseTo(1.62);
@@ -270,7 +270,7 @@ describe("the Enochian tablets", () => {
     }
     expect(
       validateHall(hall({ type: "tablet", element: "spirit" }), {
-        art: defaultHallArt,
+        art: DEFAULT_HALL_ART,
       }).map((d) => d.message),
     ).toEqual([
       'tablet: element="spirit" is not one of earth, air, water, fire, union',
@@ -320,11 +320,11 @@ describe("the Enochian tablets", () => {
     expect(
       validateHall(
         hall(node({ version: "raphael", reversed: false, alt: true })),
-        { art: defaultHallArt },
+        { art: DEFAULT_HALL_ART },
       ),
     ).toEqual([]);
     expect(
-      validateHall(hall(node({ alt: "yes" })), { art: defaultHallArt }).map(
+      validateHall(hall(node({ alt: "yes" })), { art: DEFAULT_HALL_ART }).map(
         (d) => d.message,
       ),
     ).toEqual(['tablet: alt="yes" is not a boolean']);
@@ -359,7 +359,7 @@ describe("the altars, the veil and the furnishings", () => {
           { type: "altar", kind: "red", x: 8, y: 3 },
           { type: "altar", kind: "null", x: 13, y: 3 },
         ),
-        { art: defaultHallArt },
+        { art: DEFAULT_HALL_ART },
       ).map((d) => d.message),
     ).toEqual([
       'altar: kind="red" is not one of black, white',
@@ -435,7 +435,7 @@ describe("the boards", () => {
         { type: "board", kind: "eden", w: 3, x: 3, y: 12 },
         { type: "board", kind: "null", x: 9, y: 12 },
       ),
-      { art: defaultHallArt },
+      { art: DEFAULT_HALL_ART },
     ).map((d) => [d.severity, d.message]);
     expect(found).toEqual([
       [
@@ -458,7 +458,7 @@ describe("the boards", () => {
     // The unknown kind's board is drawn at its w.
     const { objects } = resolveHall(
       hall({ type: "board", kind: "eden", w: 3, x: 3, y: 12 }),
-      { art: defaultHallArt },
+      { art: DEFAULT_HALL_ART },
     );
     expect(objects[0].width).toBeCloseTo(3, 6);
   });
@@ -567,7 +567,7 @@ describe("the kameas and seals", () => {
         // The legacy path's spelling of null: read as absent, drawn empty.
         { type: "kamea", planet: "null", x: 12, y: 3 },
       ),
-      { art: defaultHallArt },
+      { art: DEFAULT_HALL_ART },
     ).map((d) => [d.severity, d.message]);
     expect(found).toEqual([
       ["warning", "kamea: no planet; drawn as an empty square"],
@@ -709,7 +709,7 @@ describe("the items redrawn in stage H", () => {
   it("check a light's colour, which only the lights take", () => {
     const diagnostics = (node: Record<string, unknown>) =>
       validateHall(hall({ type: "item", x: 4, y: 4, ...node }), {
-        art: defaultHallArt,
+        art: DEFAULT_HALL_ART,
       });
     expect(diagnostics({ kind: "lamp", light: "white" })).toEqual([]);
     expect(diagnostics({ kind: "lantern", light: "red" })).toEqual([]);

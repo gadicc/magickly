@@ -7,7 +7,7 @@
  * magick.ly's editor's toolkit is `magick-components/gd/hall/editor`,
  * which is not stable. MIT; see ../../LICENSE.txt.
  */
-export { defaultHallArt } from "./art/index.ts";
+export { DEFAULT_HALL_ART } from "./art/index.ts";
 export { TABLET_ELEMENTS, tabletArt } from "./art/symbols.tsx";
 export { estimateHallAspect } from "./aspect.ts";
 export {
