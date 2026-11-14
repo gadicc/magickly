@@ -10,7 +10,9 @@ import { describe, expect, it } from "vitest";
  * ProseMirror, and no component may reach outside its `src/` by a relative
  * path or through its own name, `magick-components/` (`..` segments
  * included). Tests may also import the shared test helpers in the
- * repository's tests/.
+ * repository's tests/, and its release scripts in scripts/ (the README's
+ * provenance sign-off is read as magick-data's is, plan 080 stage G);
+ * neither ships.
  */
 const FORBIDDEN = /^(?:@\/|next(?:\/|$)|@mui\/|@tiptap(?:\/|$)|.*prosemirror)/;
 
@@ -19,7 +21,7 @@ const HALL = "gd/hall/";
 const HALL_PACKAGES = /^(?:react|magick-data)(?:\/|$)/;
 
 const root = path.resolve("packages/magick-components/src");
-const testHelpers = path.resolve("tests");
+const testHelpers = [path.resolve("tests"), path.resolve("scripts")];
 const isTest = (file: string) => /\.test\.[cm]?[jt]sx?$/.test(file);
 
 /**
@@ -43,7 +45,7 @@ function escapes(file: string, name: string): boolean {
   return (
     resolved !== undefined &&
     !inside(root, resolved) &&
-    !(isTest(file) && inside(testHelpers, resolved))
+    !(isTest(file) && testHelpers.some((helpers) => inside(helpers, resolved)))
   );
 }
 
@@ -110,17 +112,23 @@ describe("magick-components import boundary", () => {
     expect(escapes(test, "../../../app/x")).toBe(true);
     expect(escapes(test, "../../../../../tests/hydration")).toBe(false);
     expect(escapes(file, "../../../../../tests/hydration")).toBe(true);
+    expect(escapes(test, "../../../../../scripts/x.mjs")).toBe(false);
+    expect(escapes(file, "../../../../../scripts/x.mjs")).toBe(true);
     expect(escapes(file, "react")).toBe(false);
   });
 
   // tsc emits relative specifiers as written (rewriting .ts to .js), and
   // plain Node, like other strict ES module tools, resolves neither an
-  // extensionless file nor a directory (plan 080, decision 7).
+  // extensionless file nor a directory (plan 080, decision 7). A test may
+  // also name a release script, which is .mjs.
   it("names the file in every relative import", () => {
     const vague = files.flatMap((file) =>
       imports(file)
         .filter(
-          (name) => name.startsWith(".") && !/\.(?:tsx?|json)$/.test(name),
+          (name) =>
+            name.startsWith(".") &&
+            !/\.(?:tsx?|json)$/.test(name) &&
+            !(isTest(file) && /\.mjs$/.test(name)),
         )
         .map((name) => `${path.relative(root, file)}: ${name}`),
     );

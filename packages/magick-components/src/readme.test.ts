@@ -1,6 +1,10 @@
 import { existsSync, readFileSync } from "node:fs";
 import ts from "typescript";
 import { describe, expect, it } from "vitest";
+import {
+  signOffRows,
+  unsignedRows,
+} from "../../../scripts/provenance-sign-off.mjs";
 
 /**
  * The README's table of entry points, held to the package's exports (plan
@@ -66,5 +70,71 @@ describe("the README", () => {
       expect(existsSync(new URL(`../${file}`, import.meta.url)), file).toBe(
         true,
       );
+  });
+});
+
+/**
+ * The provenance sign-off (plan 080, stage G), as magick-data's: each row
+ * of the README's Provenance table carries the date the owner signed it
+ * off, and no version past 0.0.0 ships while one is empty. The smoke test
+ * checks the same of the packed README.
+ */
+describe("the provenance sign-off", () => {
+  const PROVENANCE = { section: "Provenance", firstColumn: "Drawing" };
+  const rows = signOffRows(README, PROVENANCE);
+  it("is complete before the version leaves 0.0.0", () => {
+    const open = unsignedRows(rows).map((row) => row.item);
+    expect(manifest.version === "0.0.0" ? [] : open).toEqual([]);
+  });
+
+  // Each row's first cell names the entries that draw it, as `subpath`.
+  it("covers every entry, and names nothing else", () => {
+    const subpaths = rows.flatMap((row) =>
+      [...row.item.matchAll(/\(([^)]+)\)$/g)].flatMap((match) =>
+        match[1].split(", "),
+      ),
+    );
+    // The tablet's letters, sigils and Yods are rows of their own.
+    expect([...new Set(subpaths)].sort()).toEqual(
+      Object.keys(manifest.exports)
+        .map((key) => key.slice(2))
+        .sort(),
+    );
+  });
+
+  it("says where each drawing comes from", () => {
+    expect(rows.length).toBeGreaterThan(10);
+    for (const row of rows) expect(row.source, row.item).not.toBe("");
+  });
+
+  it("reads a sign-off as a date or nothing, and nothing else", () => {
+    const table = (...lines: string[]) =>
+      [
+        "## Provenance",
+        "",
+        "| Drawing | Source | Signed off |",
+        "| --- | --- | --- |",
+        ...lines,
+        "",
+      ].join("\n");
+    expect(
+      signOffRows(
+        table("| `a` | Ours | 2026-11-20 |", "| `b` | Not known |  |"),
+        PROVENANCE,
+      ).map((row) => [row.item, row.signedOff]),
+    ).toEqual([
+      ["a", "2026-11-20"],
+      ["b", ""],
+    ]);
+    for (const signedOff of ["yes", "20 November 2026", "2026-02-30"])
+      expect(() =>
+        signOffRows(table(`| \`a\` | Ours | ${signedOff} |`), PROVENANCE),
+      ).toThrow(/must be a date/);
+    expect(() =>
+      signOffRows(
+        "## Provenance\n\n| Drawing | Source |\n| --- | --- |\n",
+        PROVENANCE,
+      ),
+    ).toThrow(/unexpected Provenance header/);
   });
 });

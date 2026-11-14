@@ -18,10 +18,10 @@ attributes may change in any release. What is part of it is each
 component's props and the classes a component documents as a styling hook
 (the Tree's layers, [below](#the-tree-on-your-page)).
 
-The package is not published yet: it is built and tested in
+It is built and tested in
 [the repository](https://github.com/gadicc/magickly/tree/main/packages/magick-components),
-and the first release will be announced there. Until then, what follows
-describes the published shape that the smoke test checks.
+whose smoke test installs the packed tarball as a stranger would and
+checks the published shape this README describes.
 
 ## Licences
 
@@ -307,8 +307,42 @@ The props are still settling, so the package stays at 0.x: a minor version
 may change them, and a patch will not. It depends on magick-data at the
 version it was built with (`^0.x`), and moves with it.
 
+From 0.1.0, each release is published by the repository's CI when the
+version changes on `main`, with npm provenance naming the commit it was
+built from, as magick-data's are. CI publishes a pre-release under the
+`next` tag and a release under `latest`. The first version, the release
+candidate 0.1.0-rc.0, is published by hand.
+
 ## Requirements
 
 React 19 and an ES module environment: Node 22 or later (`engines`
 says so), or any current bundler. The declarations name `.ts` files, as magick-data's do;
 TypeScript 6 reads them under `bundler` and `nodenext`.
+
+## Provenance
+
+Every drawing here is either drawn in code from magick-data's tables or
+our own drawing after a source, and the table below says which, with the
+source. The code is MIT and that cannot be taken back, so "Signed off"
+is the date the owner checked the row's provenance, and no version past
+0.0.0 ships while a row has none; a test holds the first column to the
+package's entries.
+
+| Drawing | Source | Signed off |
+| --- | --- | --- |
+| The planetary spirits' sigils (`astrology/PlanetarySpirit`) | Our own drawings of 13 November 2026 after John Heydon, *Theomagia*, vol. 1 (London, 1663/4), book I, ch. V, pp. 13 and 15 (archive.org `theomagiaortempl00heyd`, leaves n124 and n126): a few strokes of one width placed by eye over the scan, not traced. They replace tracings of a 1994 printing in copyright, which the repository's history keeps and the package does not |  |
+| The Enochian tablets' letters (`enochian/Tablet`) | magick-data's `enochian/tablets.json5`, in each tradition's reading, signed off in its Sources; the tablet draws them as text |  |
+| The Watchtowers' sigils (`enochian/Tablet`) | Drawn in code from lines, arcs and curves. The plain sigils, and the form of Air's in colour, after *The Equinox* I(7) (1912), Plate X (archive.org `crowley-equinox_202110`, "The Equinox Vol. 1, No. 7", leaf n256); the coloured Water and Fire sigils from Regardie's description, *The Golden Dawn*, vol. 4 (1940); Earth's a cross in four colours |  |
+| The Air sigil's four Yods (`enochian/Tablet`) | Regardie, *The Golden Dawn*, vol. 4 (1940), p. 307 (archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`, leaf n299) describes a Tau with four Yods above it; drawn as small flames after Plate X (above), hand-placed curves in code, not traced. That the Yods stand for the 4 over the T of Dee's Sigillum Dei Aemeth (*The Equinox* I(7), Plate II, leaf n238) is our inference, not a source's. They replace two fonts' glyphs, which the repository's history keeps |  |
+| The kameas (`astrology/Kamea`) | A grid drawn in code around magick-data's squares (`magick-data/astrology/kameas`), which are Agrippa's, *De occulta philosophia* (Cologne, 1533), book II, ch. 22 |  |
+| The rose-cross sigil (`gd/RoseSigil`, `gd/RoseSigilImage`, `gd/roseSigilGeometry`, `gd/roseSigilOptimizer`) | Drawn in code: the rose's letters are geometry written out in `gd/roseSigilGeometry`, and the sigil's path is laid out by the optimiser over them |  |
+| The temple halls' art (`gd/hall`, `gd/hall/presets`, `gd/hall/editor`) | Our own art, in code. The halls' layouts are facts from Regardie, *The Golden Dawn*, vol. 2 (Aries Press, Chicago, 1938), cited for each hall by page and archive.org leaf (`IsraelRegardie-TheGoldenDawn-Vol2-1938`); no drawing of his is copied. The Moon's and Venus' seals follow Agrippa's woodcuts (1533), book II, ch. 22, pp. CLI and CLIII (archive.org `DeOccultaPhilosophiaLoc1533`, leaves n166 and n168), their geometry only. Each art records its source in its `provenance` |  |
+| The halls' fonts (`fonts/*`) | Subsets of Noto Serif and Frank Ruhl Libre under the SIL Open Font License 1.1, made from google/fonts at a pinned commit; [fonts/SOURCES.md](./fonts/SOURCES.md) gives the files, their hashes and how they are made |  |
+| The Moon (`astrology/Moon`, `astrology/MoonWidget`) | The paths of the lit part and the disc adapt `phase_junk()` from moon-phase, Copyright © 2012 Regents of the University of California, under the BSD 3-Clause License, at a pinned commit (see [Licences](#licences)); the phase comes from lune (Apache-2.0, a dependency). The tile draws no picture of its own |  |
+| Mercury's retrogrades (`astrology/MercuryWidget`, `astrology/mercuryRetrograde`) | Our code, MIT, computing the stations with astronomy-engine (MIT, a dependency). The tile draws no picture of its own: the planet's is the page's |  |
+| The Tree of Life and the Grade Tree (`kabbalah/TreeOfLife`, `kabbalah/fieldPath`, `gd/GradeTree`) | Drawn in code, its labels and colours from magick-data's sephirot and paths |  |
+| The lamens (`gd/Lamen`, `gd/lamenGrades`) | Drawn in code. The officers' lamens and collars are facts from Regardie, *The Golden Dawn*, vol. 3 (Aries Press, 1939), pp. 82–84 and 88–90, and the Portal's from vol. 2 (1938), p. 156 (archive.org leaf n149); the rings' colours are our own convention. `gd/Lamen`'s comment cites these pages and the modern works it compared |  |
+| The seven-branched candlestick (`gd/SevenBranchedCandlestick`) | Drawn in code, its planets from magick-data |  |
+| The table of shewbread (`gd/TableOfShewbread`) | Drawn in code, its signs and tribes from magick-data |  |
+| The fylfot cross (`gd/FylfotCross`) | A table of squares in code, its signs and elements from magick-data |  |
+| The chakras (`chakras/Chakras`) | The seated figure is an original drawing of 13 November 2026, hand-placed curves in code, nothing traced or adapted; it replaces a silhouette of unrecorded source, which the repository's history keeps. The chakras' places and colours are magick-data's `chakras.json5` |  |

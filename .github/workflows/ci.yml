@@ -48,19 +48,26 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  # The verified tarball is publishable (plan 080, decision 3): the decision
-  # publish.yml would make, and a dry run of its publish with the same npm.
-  # Only on a pull request or a codex/** push, never when release.yml or
-  # publish.yml calls this workflow (a push to main), so that the registry's
-  # state, which the repository does not control (a squatter at a higher
-  # version, an older commit after a publish, an outage), never blocks a
-  # deploy; publish.yml decides for itself. Not in verify's needs, which
-  # keeps the required check as it was.
+  # Each verified tarball is publishable (plan 080, decision 3 and stage G):
+  # the decision publish.yml would make, and a dry run of its publish with
+  # the same npm, a leg per package. Only on a pull request or a codex/**
+  # push, never when release.yml or publish.yml calls this workflow (a push
+  # to main), so that the registry's state, which the repository does not
+  # control (a squatter at a higher version, an older commit after a
+  # publish, an outage), never blocks a deploy; publish.yml decides for
+  # itself. Not in verify's needs, which keeps the required check as it
+  # was.
   registry:
     if: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/codex/')) }}
-    needs: checks
+    needs: [checks, components]
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [magick-data, magick-components]
+    env:
+      PACKAGE: ${{ matrix.package }}
     steps:
       # On a pull request this checks out the merge commit; its first
       # parent is the base branch it merges into, the version to compare.
@@ -74,7 +81,7 @@ jobs:
           package-manager-cache: false
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
-          name: magick-data-tarball
+          name: ${{ matrix.package }}-tarball
           path: ${{ runner.temp }}/registry
       # Fatal only for what this change controls: on a pull request that
       # changes the package's version, a bump that is not above the
@@ -89,15 +96,15 @@ jobs:
         run: |
           flags="--advisory all"
           if [ "$EVENT" = pull_request ]; then
-            base="$(git show "HEAD^1:packages/magick-data/package.json" \
+            base="$(git show "HEAD^1:packages/$PACKAGE/package.json" \
               | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).version')"
-            head="$(node -p 'require("./packages/magick-data/package.json").version')"
-            echo "magick-data $base on the base, $head here"
+            head="$(node -p 'require(`./packages/${process.env.PACKAGE}/package.json`).version')"
+            echo "$PACKAGE $base on the base, $head here"
             if [ "$base" != "$head" ]; then flags="--advisory registry --changed"; fi
           fi
           # shellcheck disable=SC2086 # two flags, word-split on purpose
           node scripts/npm-publish-decision.mjs \
-            "$RUNNER_TEMP/registry/magick-data.tgz" $flags
+            "$RUNNER_TEMP/registry/$PACKAGE.tgz" $flags
       # npm refuses even a dry run of a version the registry lists, and of a
       # pre-release without --tag, so this takes the rule's tag and is
       # skipped once the version is published or the rule could not decide.
@@ -106,7 +113,7 @@ jobs:
         env:
           TAG: ${{ steps.decide.outputs.tag }}
         run: >-
-          npm publish "$RUNNER_TEMP/registry/magick-data.tgz"
+          npm publish "$RUNNER_TEMP/registry/$PACKAGE.tgz"
           --dry-run --access public --tag "$TAG"
 
   tests:
@@ -193,7 +200,8 @@ jobs:
 
   # magick-components' published shape (plan 080, decision 7): built and
   # packed with magick-data, installed by npm into a fixture, loaded in Node,
-  # type-checked, and built by Next with webpack and with Turbopack.
+  # type-checked, and built by Next with webpack and with Turbopack, keeping
+  # the tarball (stage G).
   components:
     name: Components package
     runs-on: ubuntu-latest
@@ -201,7 +209,15 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup
-      - run: pnpm --filter magick-components smoke
+      - run: pnpm --filter magick-components smoke --keep-tarball "$RUNNER_TEMP/magick-components.tgz"
+      # For the registry job, which runs only on its own events (above).
+      - if: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/codex/')) }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: magick-components-tarball
+          path: ${{ runner.temp }}/magick-components.tgz
+          if-no-files-found: error
+          retention-days: 1
 
   # Preserve the existing required check, and fail it even if a dependency was
   # skipped or cancelled. Production release still waits for the whole workflow.

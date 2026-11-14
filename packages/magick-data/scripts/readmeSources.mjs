@@ -3,25 +3,13 @@
  * test (plan 080, decision 3). The test holds it to the JSON5 sources the
  * manifest publishes; the smoke test holds it to the JSON files in the
  * tarball itself; both refuse a version past 0.0.0 while a row is not
- * signed off.
+ * signed off. The table is read as magick-components' is
+ * (`scripts/provenance-sign-off.mjs`).
  */
-
-/** A sign-off: the date the owner settled the row's provenance. */
-const DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
-
-/**
- * Whether `text` is a real calendar date written `YYYY-MM-DD`.
- *
- * @param {string} text
- */
-function isDate(text) {
-  const match = DATE.exec(text);
-  if (!match) return false;
-  const date = new Date(`${text}T00:00:00Z`);
-  return (
-    !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === text
-  );
-}
+import {
+  signOffRows,
+  unsignedRows,
+} from "../../../scripts/provenance-sign-off.mjs";
 
 /**
  * @typedef {object} SourcesRow
@@ -42,26 +30,10 @@ function isDate(text) {
  * @returns {SourcesRow[]}
  */
 export function readmeSources(readme) {
-  const section = readme.split(/^## /m).find((s) => s.startsWith("Sources"));
-  if (!section) throw new Error("README has no “Sources” section");
-  const lines = section.split("\n").filter((line) => line.startsWith("|"));
-  const header = lines[0]
-    ?.split("|")
-    .slice(1, -1)
-    .map((cell) => cell.trim());
-  if (JSON.stringify(header) !== '["Data file","Source","Signed off"]')
-    throw new Error(`unexpected Sources header: ${lines[0]}`);
-  return lines.slice(2).map((line) => {
-    const cells = line
-      .split("|")
-      .slice(1, -1)
-      .map((cell) => cell.trim());
-    if (cells.length !== 3) throw new Error(`malformed row: ${line}`);
-    const [file, source, signedOff] = cells;
-    if (signedOff !== "" && !isDate(signedOff))
-      throw new Error(`sign-off must be a date (YYYY-MM-DD) or empty: ${line}`);
-    return { file: file.replace(/`/g, ""), source, signedOff };
-  });
+  return signOffRows(readme, {
+    section: "Sources",
+    firstColumn: "Data file",
+  }).map(({ item, source, signedOff }) => ({ file: item, source, signedOff }));
 }
 
 /**
@@ -70,7 +42,7 @@ export function readmeSources(readme) {
  * @param {SourcesRow[]} rows
  */
 export function unsignedSources(rows) {
-  return rows.filter(({ signedOff }) => signedOff === "");
+  return unsignedRows(rows);
 }
 
 /**

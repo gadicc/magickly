@@ -13,7 +13,10 @@
  *    hall's JSON metrics, the fonts and their notices, the README and the
  *    licence, and no source, test or script; a manifest whose exports are
  *    the published ones and whose magick-data range is the version it was
- *    built with;
+ *    built with, not private, naming the repository and the source's
+ *    version; no version past 0.0.0 while a row of the README's Provenance
+ *    is not signed off; and the publish guards, which refuse npm and the
+ *    source manifest and let pnpm and the tarball through;
  * 2. which built files carry `"use client"`, first: MercuryWidget,
  *    MoonWidget and RoseSigil, and no other;
  * 3. every entry loaded in plain Node, and the Tree, a hall and the rose
@@ -69,6 +72,10 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { refusal } from "../../../scripts/npm-publish-guard.mjs";
+import {
+  signOffRows,
+  unsignedRows,
+} from "../../../scripts/provenance-sign-off.mjs";
 
 const PACKAGE_DIR = fileURLToPath(new URL("..", import.meta.url));
 const REPO_DIR = join(PACKAGE_DIR, "..", "..");
@@ -383,6 +390,7 @@ try {
       "magick-data has a published version",
     );
     assert(manifest.peerDependencies?.react === "^19", "react ^19 is a peer");
+    assert(!manifest.private, "the manifest is not private");
     // npm's provenance check matches the repository against the workflow's.
     assert(
       manifest.repository?.url ===
@@ -393,6 +401,20 @@ try {
     assert(
       manifest.version === sourceManifest.version,
       `version ${manifest.version}, the source says ${sourceManifest.version}`,
+    );
+  });
+
+  // The packed README's, as the README test checks the source's (stage G).
+  step("no version past 0.0.0 before the provenance sign-off", () => {
+    const readme = readFileSync(join(packed, "README.md"), "utf8");
+    const open = unsignedRows(
+      signOffRows(readme, { section: "Provenance", firstColumn: "Drawing" }),
+    );
+    assert(
+      manifest.version === "0.0.0" || open.length === 0,
+      `version ${manifest.version}, but Provenance has rows not signed off: ${open
+        .map((row) => row.item)
+        .join("; ")}`,
     );
   });
 
