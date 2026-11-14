@@ -101,6 +101,19 @@ const GRADE_LAMENS: ReadonlyMap<string, GlyphLamen> = new Map([
   ["portal:hegemon", { ring: "yellow", disc: "white", Glyph: PortalHegemon }],
 ]);
 
+/**
+ * The Hegemon's Calvary cross is black on a white disc: "the black
+ * Calvary Cross" on a black collar (Regardie, *The Golden Dawn*, vol. 3,
+ * Aries Press, 1939, Z.1, p. 95; archive.org
+ * `IsraelRegardie-TheGoldenDawn-Vol3-1939`, leaf n87), and Mathers'
+ * manuscript sheet of the lamens has a black cross on white with a black
+ * border. The other floor officers' glyphs are white on black. His ring
+ * stays white, as every floor officer's, rather than his black collar's,
+ * which would vanish into the outline: the rings are our convention.
+ */
+const HEGEMON_DISC = "white";
+const HEGEMON_CROSS = "#000";
+
 /** The officers whose lamen `Lamen` draws; any other draws the same plain one. */
 export const LAMEN_OFFICERS: ReadonlySet<string> = new Set([
   ...CROSS_LAMENS.keys(),
@@ -459,7 +472,10 @@ export function Lamen({
   const _discStyle = {
     color: "#000",
     overflow: "visible",
-    fill: crossLamen?.disc ?? glyphLamen?.disc ?? "#000",
+    fill:
+      crossLamen?.disc ??
+      glyphLamen?.disc ??
+      (glyph === "hegemon" ? HEGEMON_DISC : "#000"),
     stroke: "#000",
     strokeWidth: 1,
     paintOrder: "stroke fill markers",
@@ -487,9 +503,7 @@ export function Lamen({
       {glyph === "hegemon" && (
         <path
           d="M 0 0 h2.482v2.02h-2.482v5.043h-2.02v-5.043h-2.482v-2.02h2.481v-2.515h2.02z"
-          style={{
-            fill: "white",
-          }}
+          style={{ fill: HEGEMON_CROSS }}
           transform="scale(7.2) translate(1,-2.2)"
         />
       )}

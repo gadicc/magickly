@@ -59,8 +59,14 @@ describe("Lamen", () => {
     expect(render("pastHierophant")).not.toContain('fill="white"');
   });
 
-  it("draws the floor officers white on black", () => {
-    for (const officer of ["hiereus", "hegemon", "stolistes", "dadouchos"])
+  it("draws the Hegemon's cross black on white, in the white ring", () => {
+    // Regardie 1939, vol. 3, p. 95 (leaf n87): "the black Calvary Cross".
+    expect(fills(render("hegemon"))).toEqual(["white", "white", "#000"]);
+    expect(render("hegemon")).toContain("2.482");
+  });
+
+  it("draws the other floor officers white on black", () => {
+    for (const officer of ["hiereus", "stolistes", "dadouchos"])
       expect(fills(render(officer)), officer).toEqual([
         "white",
         "#000",

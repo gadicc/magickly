@@ -89,9 +89,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="100" viewBox="-50 -50 100 100">
 <circle cx="0" cy="0" r="49" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;stroke-dasharray:none;paint-order:stroke fill markers;stop-color:#000">
 </circle>
-<circle cx="0" cy="0" r="42" style="color:#000;overflow:visible;fill:#000;stroke:#000;stroke-width:1;paint-order:stroke fill markers;stop-color:#000">
+<circle cx="0" cy="0" r="42" style="color:#000;overflow:visible;fill:white;stroke:#000;stroke-width:1;paint-order:stroke fill markers;stop-color:#000">
 </circle>
-<path d="M 0 0 h2.482v2.02h-2.482v5.043h-2.02v-5.043h-2.482v-2.02h2.481v-2.515h2.02z" style="fill:white" transform="scale(7.2) translate(1,-2.2)">
+<path d="M 0 0 h2.482v2.02h-2.482v5.043h-2.02v-5.043h-2.482v-2.02h2.481v-2.515h2.02z" style="fill:#000" transform="scale(7.2) translate(1,-2.2)">
 </path>
 </svg>
 </g>
