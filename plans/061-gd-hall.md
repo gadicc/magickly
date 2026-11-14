@@ -4272,6 +4272,9 @@ already saying it is the default.
 
 ### British Library follow-up
 
+From 13 November 2026 this list is kept, with the Keys' needs, in
+[plan 083](083-british-library-needs.md).
+
 The Library's Rhysida ransomware attack of October 2023 took its
 Digitised Manuscripts service offline. About 1,000 manuscripts returned
 in October 2024, and recovery was reported as ongoing in 2026. On 24

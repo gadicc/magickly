@@ -1,14 +1,19 @@
 "use client";
 
-import { Box, SwipeableDrawer, useMediaQuery } from "@mui/material";
+import { Box, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import dictionary from "magick-data/enochian/dictionary";
 import * as React from "react";
 import EnochianFont from "@/fonts/enochian";
+import { visuallyHidden } from "@/ui/visuallyHidden";
+import { LINE_STYLES } from "../translate/lineStyles";
+import { wordCount } from "../translate/tokens";
 import Entry from "./Entry";
+import EntrySheet from "./EntrySheet";
 import InTheKeys from "./InTheKeys";
 import Keypad from "./Keypad";
 import { LABELS } from "./labels";
+import PreviewShell, { PreviewBoundary } from "./PreviewShell";
 import {
   buildIndex,
   firstKnownMeaning,
@@ -17,6 +22,7 @@ import {
   searchDictionary,
 } from "./search";
 import { useDictionaryUrl } from "./urlState";
+import { useKeypadBox } from "./useKeypadBox";
 
 /**
  * The Enochian dictionary (plan 074): one query in two boxes, Latin and
@@ -28,6 +34,15 @@ import { useDictionaryUrl } from "./urlState";
  * holds (decision 7). Its UI words come from `labels.ts`, out of site
  * search's index (decision 11).
  */
+
+/**
+ * The translator's preview as a lazy component: loaded, with the lookup
+ * and the Keys, only for a query of `PREVIEW_WORDS` words or more (plan
+ * 081, decisions 3 and 19), so the dictionary's own load doesn't grow.
+ */
+const lazyPreview = () => React.lazy(() => import("./SentencePreview"));
+/** The fewest words a query has for the translator's preview. */
+const PREVIEW_WORDS = 3;
 
 /** Rows a group shows before "Show all". */
 const GROUP_ROWS = 30;
@@ -43,15 +58,6 @@ const ALL: Hit[] = Object.entries(dictionary).map(([word, entry]) => ({
   ...firstKnownMeaning(entry),
   tier: 0,
 }));
-
-const visuallyHidden = {
-  position: "absolute",
-  width: 1,
-  height: 1,
-  overflow: "hidden",
-  clip: "rect(0 0 0 0)",
-  whiteSpace: "nowrap",
-} as const;
 
 const styles = {
   display: { md: "grid" },
@@ -160,6 +166,36 @@ const styles = {
     "&.dict-active": { textDecoration: "underline" },
   },
   "& .dict-nothing": { padding: "16px", color: "text.secondary" },
+  // The translator's preview: a group of one line and a link.
+  "& .dict-preview": { borderBottom: 1, borderColor: "divider" },
+  "& .dict-preview-line": {
+    ...LINE_STYLES,
+    padding: "0 16px",
+    // The label's line, two of text and the note under English into
+    // Enochian (18 px), kept while it loads, so the frame never grows when
+    // the line arrives, whichever way it reads.
+    minHeight: 84,
+    "& .tr-line": { margin: 0, fontSize: 16 },
+    "& .tr-line-label": { minHeight: 18, lineHeight: "18px" },
+    // Two lines at most, then an ellipsis; the link opens the whole. The
+    // text is only clipped, so screen readers still read all of it.
+    "& .tr-line-text": {
+      display: "-webkit-box",
+      WebkitBoxOrient: "vertical",
+      WebkitLineClamp: 2,
+      overflow: "hidden",
+      lineHeight: "24px",
+    },
+  },
+  // The preview's notes under its line: unreviewed, or cut short.
+  "& .dict-preview-note": {
+    display: "block",
+    margin: 0,
+    fontSize: 12,
+    lineHeight: "18px",
+    color: "text.secondary",
+  },
+  "& .dict-preview-open": { padding: "4px 16px 10px", fontSize: 14 },
   "& .dict-pane": {
     display: { xs: "none", md: "block" },
     position: "sticky",
@@ -246,32 +282,16 @@ export default function Dictionary({
   const [active, setActive] = React.useState(-1);
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up("md"));
-  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   // A touch screen gets the keypad in place of its own keyboard; read after
   // hydration, so the server's HTML has no `inputmode` (decision 2).
   const coarse = useMediaQuery("(pointer: coarse)");
   const idPrefix = React.useId();
-  const enochianBox = React.useRef<HTMLInputElement>(null);
-  const [keypad, setKeypad] = React.useState(false);
-  // Where the caret goes once the keypad's change has rendered.
-  const caret = React.useRef<number | null>(null);
-  React.useLayoutEffect(() => {
-    if (caret.current === null) return;
-    enochianBox.current?.setSelectionRange(caret.current, caret.current);
-    caret.current = null;
-  });
-
-  /** Puts `letter` at the Enochian box's caret, or deletes before it. */
-  const edit = (letter: string | null) => {
-    const box = enochianBox.current;
-    if (!box) return;
-    const start = box.selectionStart ?? text.length;
-    const end = box.selectionEnd ?? text.length;
-    const from =
-      letter === null && start === end ? Math.max(0, start - 1) : start;
-    caret.current = from + (letter?.length ?? 0);
-    setText(text.slice(0, from) + (letter ?? "") + text.slice(end));
-  };
+  const {
+    box: enochianBox,
+    keypad,
+    setKeypad,
+    edit,
+  } = useKeypadBox<HTMLInputElement>(text, setText);
 
   // The URL's query fills the boxes on load and on Back; the boxes write it
   // back after a pause. `written` tells our own writes from the others.
@@ -308,6 +328,23 @@ export default function Dictionary({
   const index = React.useMemo(() => buildIndex(dictionary, uses), [uses]);
   // The list can lag a keystroke behind the boxes, so typing stays quick.
   const deferred = React.useDeferredValue(text.trim());
+  // The translator's preview, from three words (plan 081, decision 3). If
+  // its code fails to load, React.lazy keeps the failure, so the next
+  // query makes a fresh one and tries again.
+  const showPreview = React.useMemo(
+    () => wordCount(deferred) >= PREVIEW_WORDS,
+    [deferred],
+  );
+  const [SentencePreview, setSentencePreview] = React.useState(lazyPreview);
+  const [previewAttempt, setPreviewAttempt] = React.useState(0);
+  const previewFailedFor = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    const failed = previewFailedFor.current;
+    if (failed === null || failed === deferred) return;
+    previewFailedFor.current = null;
+    setSentencePreview(lazyPreview);
+    setPreviewAttempt((n) => n + 1);
+  }, [deferred]);
   const result = React.useMemo(
     () => (deferred ? searchDictionary(index, deferred) : null),
     [index, deferred],
@@ -500,9 +537,25 @@ export default function Dictionary({
             />
           )}
         </div>
-        <Box component="div" aria-live="polite" sx={visuallyHidden}>
+        <div aria-live="polite" style={visuallyHidden}>
           {result ? LABELS.found(total) : ""}
-        </Box>
+        </div>
+        {
+          // Outside the listbox, which may hold only options: the preview
+          // holds a line and a link (plan 081, decision 3).
+          showPreview && (
+            <PreviewBoundary
+              key={previewAttempt}
+              onError={() => {
+                previewFailedFor.current = deferred;
+              }}
+            >
+              <React.Suspense fallback={<PreviewShell query={deferred} />}>
+                <SentencePreview query={deferred} />
+              </React.Suspense>
+            </PreviewBoundary>
+          )
+        }
         <div id={listId} role="listbox" aria-label={LABELS.results}>
           {sections.map((section) => {
             const groupId = `${idPrefix}-${section.id}`;
@@ -569,35 +622,13 @@ export default function Dictionary({
           <div className="dict-choose">{LABELS.choose}</div>
         )}
       </section>
-      <SwipeableDrawer
-        anchor="bottom"
+      <EntrySheet
         open={!desktop && Boolean(shown)}
         onClose={close}
-        onOpen={() => {}}
-        disableSwipeToOpen
-        transitionDuration={reducedMotion ? 0 : undefined}
-        slotProps={{
-          paper: {
-            role: "dialog",
-            "aria-modal": true,
-            "aria-labelledby": headingId,
-            sx: { borderRadius: "14px 14px 0 0", maxHeight: "85vh" },
-          },
-        }}
+        headingId={headingId}
       >
-        <Box
-          aria-hidden
-          sx={{
-            width: 36,
-            height: 4,
-            borderRadius: 2,
-            bgcolor: "divider",
-            mx: "auto",
-            mt: 1,
-          }}
-        />
         {!desktop && lastShown.current && entryOf(lastShown.current)}
-      </SwipeableDrawer>
+      </EntrySheet>
     </Box>
   );
 }

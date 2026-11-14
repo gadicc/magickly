@@ -75,8 +75,8 @@ export const PUBLIC_PAGES = {
   "/enochian": {
     title: "Enochian Magick",
     description:
-      "Enochian magick of John Dee and Edward Kelley: the Keys, a dictionary, " +
-      "the elemental tablets, Dee's Oration to God and letter flashcards.",
+      "Enochian magick of John Dee and Edward Kelley: the Keys, a dictionary " +
+      "and translator, the elemental tablets, Dee's Oration to God and flashcards.",
   },
   "/enochian/dictionary": {
     title: "Enochian Dictionary",
@@ -97,6 +97,12 @@ export const PUBLIC_PAGES = {
     description:
       "John Dee's Oration to God, to be spoken every day, three times over, from " +
       "Geoffrey James's The Enochian Magick of Dr. John Dee.",
+  },
+  "/enochian/translate": {
+    title: "Enochian Translator",
+    description:
+      "Translate English into Enochian and Enochian into English by looking " +
+      "words up in Dee's Keys and our dictionary, each word with its source.",
   },
   "/enochian/tablets": {
     title: "Enochian Elemental Tablets",

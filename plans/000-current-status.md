@@ -256,8 +256,9 @@ Follow-ups are separate from the completed migration work:
   traditions' readings and the nineteenth Call. Built 10 November on
   `gate/enochian-keys`. TODO: Dee's own copy, Sloane MS 3191, when the
   British Library's images return: his accents, the words Casaubon's
-  print lost (Keys 13 to 16) and his Aethyr spellings; an expert may
-  answer sooner ([plan 082](082-enochian-expert-questions.md)).
+  print lost (Keys 13 to 16) and his Aethyr spellings, listed in
+  [plan 083](083-british-library-needs.md); an expert may answer
+  sooner ([plan 082](082-enochian-expert-questions.md)).
 - 10 November 2026: English search in the Enochian dictionary, with a
   revamp of its page, in [plan 074](074-enochian-dictionary-search.md).
   The two boxes (Latin, and Enochian right to left) hold one query,
@@ -490,24 +491,52 @@ Follow-ups are separate from the completed migration work:
   before any code or call: under "never coin", English into Enochian
   is mostly a lookup problem. The product is to be planned separately;
   the recommendation is strict lookup with gaps that suggest the
-  nearest forms, and a model reading Enochian into English. TODO:
-  lookup should ignore "(see …)" cross-references in glosses (CABA
-  "govern, to; (see 'cab')" matched "see"). TODO: the dictionary glosses AR (`EMPM`) "the
-  sun, to prtect", which keeps lookup from matching "protect"; record
-  a correction beside it as plan 061 does for misprints, once the
-  printing is checked.
+  nearest forms, and a model reading Enochian into English. Lookup
+  now ignores "(see …)" cross-references in glosses (CABA "govern,
+  to; (see 'cab')" matched "see"), done in plan 081's step C. The
+  dictionary glossed AR (`EMPM`) "the sun, to prtect", which
+  kept lookup from matching "protect"; EMPM prints "protect" (p. 263),
+  so it was our typo, corrected in plan 081's step B.
 - 13 November 2026: an Enochian translator by lookup designed in
   [plan 081](081-enochian-translator.md), decision by decision with
-  Gadi, reviewed by Fable and spiked; not built (Gadi says when).
+  Gadi, reviewed by Fable and spiked. Gadi confirmed its proposals the
+  same day, adding Leitch's spellings as input, and said to build it.
   Stage 1 is a script in the browser, both directions, never coining
   a word; stage 2, an AI reading of Enochian on the existing chat
-  allowance, is outlined. The two TODOs above are its step B.
+  allowance, is outlined. The two fixes above were its steps B and C.
+  TODO:
+  `keys.json5` marks the rows whose English we divided
+  (`englishSplit`) but not where each of Dee's units begins (his entry
+  of two words glossed together, or a line we split over several
+  words), which the notes give only in prose. Recorded as data, the
+  reading line could mark a run's edge that cuts a unit (plan 081,
+  decision 14). Key 12's SOBA (row 19) lacks the flag though DOOAIN's
+  note says "whose name" is split over the two.
 - 13 November 2026: questions for an Enochian expert gathered into one
   running list, [plan 082](082-enochian-expert-questions.md), from
   plans 077 and 081, the grammar notes and the Keys. Gadi means to
   finish as much as we can, then show the expert our work and ask
   whether they would help. Any work that raises a question only an
   expert can settle adds it there.
+- 13 November 2026: what we need from the British Library gathered into
+  one running list, [plan 083](083-british-library-needs.md): the
+  tables' and the Keys' readings from Dee's own copy, Sloane MS 3191,
+  whose images were still unavailable that day, and the doubtful
+  readings.
+- 14 November 2026: plan 081's stage 1 built on
+  `gate/enochian-translator`, in steps B to G, each gated and
+  adversarially reviewed, then a final review by Fable: the lookup
+  translator at `/enochian/translate`, both directions in the browser,
+  with the text only in the URL fragment, and an "as a sentence"
+  preview in the dictionary from three words. Of the 60 test sentences'
+  622 words, 45% get a form, 18% a rule chip and 37% a gap; Dee's
+  English gives his word back on 946 of 1,054 rows. Its "Build notes"
+  record what the build settled and its known limits. TODO: the
+  follow-ups in
+  [plan 081](081-enochian-translator.md#follow-ups) (Safari unchecked;
+  parts of speech for "do"). The same day the sign-in link stopped
+  sending the dictionary's text to the server as it was typed (a
+  prefetch of its address, query and all; plan 081 has the details).
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose
@@ -874,7 +903,8 @@ Follow-ups are separate from the completed migration work:
   (Peterson ff.53v–54r, Vovina and Burford ff.55v–56r), the 1587
   capitals, the Black Cross's placement, the letters Dee struck through
   in 1584, the two Fire squares where Sloane and Cotton differ, and the
-  images' licence. TODO from earlier: Gadi's call on the Chiefs on the new presets' daises
+  images' licence; all now in [plan 083](083-british-library-needs.md).
+  TODO from earlier: Gadi's call on the Chiefs on the new presets' daises
   (after the merge; he leans towards Greer's redraws), the stage F
   markers and placeholders Gadi has yet to decide on (Eden and the Fall,
   with a proposal to make the pictures shown to the candidate cards

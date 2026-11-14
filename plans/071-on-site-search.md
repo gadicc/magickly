@@ -71,7 +71,8 @@ impressions):
 | `/astrology/planetary-hours` | planetary hours calculator, planetary hours today | – | – |
 | `/geomancy/reading` | geomancy reading online, geomancy generator | – | – |
 | `/geomancy/reference` | sixteen geomantic figures, geomantic figure meanings | 61 | 10.7 |
-| `/enochian/dictionary` | enochian dictionary, enochian words, enochian translator | – | – |
+| `/enochian/dictionary` | enochian dictionary, enochian words | – | – |
+| `/enochian/translate` | enochian translator | – | – |
 | `/enochian/keys` | enochian keys, enochian calls, 19 keys | – | – |
 | `/enochian/oration` | john dee oration to god | 37 | 20.7 |
 | `/kabbalah/tree` | interactive tree of life, tree of life diagram | – | – |

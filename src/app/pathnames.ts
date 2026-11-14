@@ -38,6 +38,7 @@ const pathnames: Pathnames = {
     keys: "Enochian Keys",
     oration: "Oration to God",
     tablets: "Enochian Tablets",
+    translate: "Enochian Translator",
   },
   gd: {
     "/": "Golden Dawn",

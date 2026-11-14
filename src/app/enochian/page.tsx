@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import Tablet from "magick-components/enochian/Tablet";
+import EnochianFont from "@/fonts/enochian";
 import { pageMetadata } from "@/seo/metadata";
 import Tiles from "@/ui/Tiles";
 import EnochianText from "./EnochianText";
@@ -35,6 +36,29 @@ const tiles = [
     title: "Dictionary",
     to: "/enochian/dictionary",
     alt: "Screenshot of the Enochian dictionary",
+  },
+  {
+    title: "Translator",
+    to: "/enochian/translate",
+    alt: "Enochian translator",
+    // Dee's first words, "I reign over you", in the script.
+    Component: () => (
+      <Box
+        sx={{
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          fontSize: 40,
+          px: 1,
+          pb: 5,
+        }}
+        style={EnochianFont.style}
+      >
+        OL SONF VORSG
+      </Box>
+    ),
   },
   {
     title: "Tablets",

@@ -307,7 +307,8 @@ thousand tokens each, well under a cent.
   image, and the second pass samples them.
 - **Sloane MS 3191 stays unread**: Dee's accents, his continuous English
   for the nineteenth Call and his Aethyr spellings wait for it; the
-  `checked` records say so.
+  `checked` records say so. From 13 November 2026 what we need from it
+  is listed in [plan 083](083-british-library-needs.md).
 - **Copyright**: sources are Casaubon (1659) and Crowley (1912) only;
   agents print no long passages.
 - **Size**: about 1,000 rows to derive and check, plus the GD reading.

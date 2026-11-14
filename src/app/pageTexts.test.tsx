@@ -11,6 +11,7 @@ import EnochianText from "./enochian/EnochianText";
 import KeysText from "./enochian/keys/KeysText";
 import OrationText from "./enochian/oration/OrationText";
 import TabletsText from "./enochian/tablets/TabletsText";
+import TranslatorText from "./enochian/translate/TranslatorText";
 import GoldenDawnText from "./gd/GoldenDawnText";
 import HallsText from "./gd/halls/HallsText";
 import GeomancyText from "./geomancy/GeomancyText";
@@ -42,6 +43,7 @@ const TEXTS: Record<string, ComponentType> = {
   "/enochian/keys": KeysText,
   "/enochian/tablets": TabletsText,
   "/enochian/oration": OrationText,
+  "/enochian/translate": TranslatorText,
   "/kabbalah/tree": TreeText,
   "/kabbalah/yhvh/72angels": AngelsText,
   "/gd/halls": HallsText,

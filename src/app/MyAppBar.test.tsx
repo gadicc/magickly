@@ -14,6 +14,7 @@ const links = vi.hoisted(() => ({
 vi.mock("next/navigation", () => ({
   usePathname: () => navigation.pathname,
   useSelectedLayoutSegment: () => navigation.segment,
+  useRouter: () => ({ prefetch: () => {} }),
   // Static prerendering bails out of anything that reads the query.
   useSearchParams: () => {
     throw new Error("Bail out to client-side rendering: useSearchParams()");
@@ -241,14 +242,20 @@ describe("MyAppBar on the server", () => {
     expect(closed).toEqual(
       expect.arrayContaining(["/", "/chat", "/kabbalah", "/kabbalah/yhvh"]),
     );
-    // Only the links on show prefetch: the trail beside the title and
-    // signing in. The list is exact on purpose: a new link in the bar has
-    // to say whether it may prefetch.
+    // Only the links on show prefetch: the trail beside the title. The
+    // list is exact on purpose: a new link in the bar has to say whether
+    // it may prefetch. Signing in prefetches its bare route by hand, since
+    // its link carries the page's query.
     expect(
       links.rendered
         .filter((link) => link.prefetch !== false)
-        .map((link) => link.href.replace(/\?.*/, "")),
-    ).toEqual(["/kabbalah", "/signin"]);
+        .map((link) => link.href),
+    ).toEqual(["/kabbalah"]);
+    expect(
+      links.rendered.filter((link) => link.href.startsWith("/signin")),
+    ).toEqual([
+      { href: "/signin?callbackURL=%2Fkabbalah%2Ftree", prefetch: false },
+    ]);
   });
 
   it("lets an open menu's links prefetch as Next would", () => {

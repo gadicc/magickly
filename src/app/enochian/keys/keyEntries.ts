@@ -10,6 +10,14 @@ import keys, {
   KEY_VERSIONS,
   keyVersion,
 } from "magick-data/enochian/keys";
+import { findParts, unhyphenated } from "./dictionaryKeys";
+
+export {
+  DO_NOT_SPLIT,
+  findParts,
+  findWord,
+  spellings,
+} from "./dictionaryKeys";
 
 /**
  * The dictionary entries the Keys need, resolved on the server.
@@ -30,80 +38,9 @@ import keys, {
  * `NOR` and `MOLAP`), so a word found no other way is tried as two entries,
  * a first part and the rest, and both are given (plan 073, decision 9). A
  * word is always looked up by Dee's spelling, whatever the version shows.
+ * Those rules live in `dictionaryKeys.ts`, without the data, so the
+ * translator can share them in the browser.
  */
-
-/** A word's spellings to try, in order, the word itself first. */
-export function spellings(word: string): string[] {
-  const tried = [word, word.replaceAll("U", "V"), word.replaceAll("V", "U")];
-  return tried.filter((one, index) => tried.indexOf(one) === index);
-}
-
-/**
- * The dictionary's keys without their hyphens, each mapped to the key it came
- * from. A key that strips to one already there keeps the earlier one, which
- * is the order the file is written in.
- */
-function unhyphenated(source: EnochianDictionary) {
-  const index = new Map<string, string>();
-  for (const key of Object.keys(source)) {
-    // A trailing hyphen marks an affix, which no word should resolve to.
-    if (key.endsWith("-")) continue;
-    const stripped = key.replaceAll("-", "");
-    if (stripped !== key && !index.has(stripped)) index.set(stripped, key);
-  }
-  return index;
-}
-
-/** The key a word is filed under, or `undefined` if it is not in the book. */
-export function findWord(
-  source: EnochianDictionary,
-  word: string,
-  stripped = unhyphenated(source),
-): string | undefined {
-  const tried = spellings(word);
-  for (const one of tried) if (Object.hasOwn(source, one)) return one;
-  for (const one of tried) {
-    const found = stripped.get(one.replaceAll("-", ""));
-    if (found !== undefined) return found;
-  }
-  return undefined;
-}
-
-/** The shortest part a word is split into: one letter is too easily found. */
-const SHORTEST_PART = 2;
-
-/**
- * Words found as two parts only by accident, which are not split: the
- * parts the dictionary would give are not what the word is.
- */
-export const DO_NOT_SPLIT: Readonly<Record<string, string>> = {
-  RESTIL: "REST + IL would read the ending as a word; Dee's RESTEL is one",
-  GMICALZOMA: "GMICALZO + MA leaves a fragment, not the word MA",
-  OMAXA: "OMA + XA leaves a fragment, not a word",
-};
-
-/**
- * The keys a word is filed under: one, or two where it is found only as a
- * first part and the rest, both in the book; `undefined` otherwise. Of the
- * ways to split it, the longest first part that works is taken; a word in
- * `DO_NOT_SPLIT` is never split.
- */
-export function findParts(
-  source: EnochianDictionary,
-  word: string,
-  stripped = unhyphenated(source),
-): string[] | undefined {
-  const whole = findWord(source, word, stripped);
-  if (whole !== undefined) return [whole];
-  if (Object.hasOwn(DO_NOT_SPLIT, word)) return undefined;
-  for (let at = word.length - SHORTEST_PART; at >= SHORTEST_PART; at--) {
-    const first = findWord(source, word.slice(0, at), stripped);
-    if (first === undefined) continue;
-    const rest = findWord(source, word.slice(at), stripped);
-    if (rest !== undefined) return [first, rest];
-  }
-  return undefined;
-}
 
 /**
  * Every word the Keys look up, in the order the Keys say them: Dee's, in

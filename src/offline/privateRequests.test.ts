@@ -10,6 +10,13 @@ const origin = "https://magickly.example.test";
 describe("private service-worker response policy", () => {
   it.each([
     "/api/auth/get-session",
+    "/chat/research",
+    "/chat/research/api",
+    "/chat/research?_rsc=private",
+    "/chat/%72esearch/api",
+    "/chat%2fresearch/%ZZ",
+    "/chat/research/%ZZ",
+
     "/api/session",
     "/api/rituals?rsc=1",
     "/api/files/image.png",
@@ -76,6 +83,18 @@ describe("private service-worker response policy", () => {
         "pages-rsc-prefetch",
         new Map([
           [origin + "/admin?_rsc=123", new Response("private")],
+          [
+            origin + "/chat//research?_rsc=alias",
+            new Response("private research shell"),
+          ],
+          [
+            origin + "//chat/research?_rsc=alias",
+            new Response("private research shell"),
+          ],
+          [
+            origin + "/chat/%5Cresearch?_rsc=alias",
+            new Response("private research shell"),
+          ],
           [origin + "/astrology", new Response("public")],
         ]),
       ],
@@ -128,3 +147,18 @@ describe("private service-worker response policy", () => {
     );
   });
 });
+
+it.each(["//chat/research", "/chat//research", "/chat/%5Cresearch"])(
+  "bypasses Next-normalized redirect aliases before default cache rules: %s",
+  (path) => {
+    const url = new URL(origin + path);
+    expect(isPrivateRuntimeUrl(url, origin)).toBe(true);
+    expect(
+      (
+        privateRuntimeCaching(origin)[0].matcher as (input: {
+          url: URL;
+        }) => boolean
+      )({ url }),
+    ).toBe(true);
+  },
+);

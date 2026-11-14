@@ -114,3 +114,25 @@ describe("the sections insightsUrl knows", () => {
       );
   });
 });
+
+it.each([
+  "/chat/research",
+  "/chat/research/api?_rsc=private",
+  "/chat/%72esearch/answer",
+  "/%63hat/research",
+  "/chat%2fresearch/%ZZ",
+  "/chat/research/%ZZ",
+  "/chat/research/%",
+  "/chat/research%2f%ZZ",
+])("drops research telemetry for %s", (path) => {
+  expect(insightsUrl(at(path))).toBeNull();
+  expect(isPublicPath(new URL(at(path)).pathname)).toBe(false);
+});
+
+it.each(["//chat/research", "/chat//research", "/chat/%5Cresearch"])(
+  "drops normalized research redirect aliases %s",
+  (path) => {
+    expect(insightsUrl(at(path))).toBeNull();
+    expect(isPublicPath(path)).toBe(false);
+  },
+);

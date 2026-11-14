@@ -26,7 +26,7 @@ function loadUses() {
 }
 
 /** The Keys page's anchor for a use: the Key (or Aethyr) and the word. */
-export function keysLink(use: KeyUse) {
+export function keysLink(use: Pick<KeyUse, "key" | "row" | "aethyr">) {
   const place =
     use.aethyr === undefined ? `key-${use.key}` : `aethyr-${use.aethyr}`;
   return `/enochian/keys#${place}-word-${use.row}`;

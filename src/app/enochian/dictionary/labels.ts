@@ -40,4 +40,31 @@ export const LABELS = {
   quoteOpen: (before: string) => (before ? `“…${before} ` : "“"),
   quoteClose: (after: string) => (after ? ` ${after}…”` : "”"),
   moreUses: (count: number) => `and ${count} more`,
+  // The translator's preview, for a query of three words or more (plan
+  // 081, decision 3).
+  preview: "As a sentence",
+  previewDirection: (english: boolean) =>
+    english ? "English → Enochian" : "Enochian → English",
+  previewWaiting: "…",
+  previewLoading: "Translating…",
+  /** Read between the preview's name and its direction. */
+  previewSeparator: ", ",
+  /** Read after a line's label, which stands on a line of its own. */
+  previewLabelEnd: ": ",
+  previewGapOpen: "[",
+  previewGapClose: "]",
+  previewNoForm: "(no form)",
+  previewForms: (leftOut: number) =>
+    leftOut === 0
+      ? "Word by word"
+      : leftOut === 1
+        ? "Word by word, 1 word left out by rule"
+        : `Word by word, ${leftOut.toLocaleString("en")} words left out by rule`,
+  /** Under English into Enochian: the page's notice in short (decision 5). */
+  previewUnreviewed: "No one who reads Enochian has reviewed this.",
+  /** Read between the line and the note under it. */
+  previewNoteBefore: ". ",
+  previewCut: (max: number) =>
+    `Only the first ${max.toLocaleString("en")} words are read.`,
+  openInTranslator: "Open in the translator",
 } as const;

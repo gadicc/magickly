@@ -57,6 +57,11 @@ vi.mock("./clientProviders", () => ({
 }));
 vi.mock("./MyAppBar", () => ({ default: () => null }));
 vi.mock("./SiteFooter", () => ({ default: () => null }));
+// The synchronous renderer exercises theme wiring; Next streams the separately
+// tested lazy site shell in the real app.
+vi.mock("./SiteChromeLoader", () => ({
+  default: ({ children }: { children: React.ReactNode }) => children,
+}));
 vi.mock("./StyledJsxRegistry", () => ({
   default: ({ children }: { children: React.ReactNode }) => children,
 }));

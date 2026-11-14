@@ -31,7 +31,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import NextLink from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 // By alias, not "./ThemeSwitch": site search follows a page's relative
 // imports (scripts/search/prose.ts), and /chat imports this file, so a
@@ -47,6 +47,14 @@ import pathnames from "./pathnames";
 import type { NavLink } from "./siteNav";
 import useSiteNav from "./useSiteNav";
 
+/**
+ * A default link's prefetch. Next's options type wants its `PrefetchKind`
+ * enum, which it exports only from its internals, so the value is cast.
+ */
+const PREFETCH_AUTO = "auto" as NonNullable<
+  Parameters<ReturnType<typeof useRouter>["prefetch"]>[1]
+>["kind"];
+
 function SignInButton({
   callbackURL,
   disabled,
@@ -54,12 +62,34 @@ function SignInButton({
   callbackURL: string;
   disabled: boolean;
 }) {
+  const router = useRouter();
+  // The link doesn't prefetch: Next would request its exact address, query
+  // and all, so every new query on the page (a dictionary search, typed
+  // word by word) would reach the server with no click. The bare route is
+  // prefetched instead, and Next builds /signin?callbackURL=… from it,
+  // again whenever Next drops it as stale, as it would for a link.
+  React.useEffect(() => {
+    if (disabled) return;
+    let live = true;
+    const prefetch = () => {
+      if (live)
+        router.prefetch("/signin", {
+          kind: PREFETCH_AUTO,
+          onInvalidate: prefetch,
+        });
+    };
+    prefetch();
+    return () => {
+      live = false;
+    };
+  }, [disabled, router]);
   return (
     <IconButton
       aria-label="sign in"
       component={Link}
       disabled={disabled}
       href={`/signin?callbackURL=${encodeURIComponent(callbackURL)}`}
+      prefetch={false}
       // The bar's text colour: white on the light scheme's blue bar and on
       // the dark scheme's navy one.
       sx={{ color: "inherit" }}

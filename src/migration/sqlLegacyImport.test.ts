@@ -189,6 +189,84 @@ describe("fenced atomic legacy import", () => {
       (await db.select().from(schema.legacyImportRuns))[0].completedAt,
     ).toBeNull();
   });
+  it("refuses a target containing private research accounting without clearing or adopting it", async () => {
+    const { service, checkpoint } = fixture();
+    const now = Date.now();
+    await db.insert(schema.chatResearchWindows).values({
+      id: "01993000-0000-7000-8000-eeeeeeeeeeef",
+      approvalSha256: "e".repeat(64),
+      actorId: contract.binding.runId,
+      corpusVersion: "f".repeat(64),
+      model: "synthetic/accounting",
+      processorProfile: "synthetic_profile",
+      beginsAt: new Date(now - 1000),
+      expiresAt: new Date(now + 599000),
+      maxRequests: 1,
+      perRequestPico: 1000000000,
+      totalPico: 1000000000,
+    });
+    await refused(service.prepare(checkpoint), "TARGET_CHANGED");
+    const [window] = await db.select().from(schema.chatResearchWindows);
+    const permitId = "01993000-0000-7000-8000-eeeeeeeeeeed";
+    await db.insert(schema.chatResearchPermits).values({
+      id: permitId,
+      windowId: window.id,
+      operationId: permitId,
+      actorId: window.actorId,
+      sessionId: permitId,
+      descriptorSha256: "a".repeat(64),
+      requestSha256: "b".repeat(64),
+      sourceContextSha256: "c".repeat(64),
+      upperPico: 1,
+      quoteExpiresAt: new Date(now + 50000),
+      reservedAt: new Date(now),
+      state: "reserved",
+    });
+    const packetJson = "Synthetic private request";
+    await db.insert(schema.chatResearchArtifacts).values({
+      permitId,
+      kind: "request",
+      packetJson,
+      packetSha256: createHash("sha256").update(packetJson).digest("hex"),
+      jobCreatedAt: new Date(now),
+      storedAt: new Date(now),
+      retainUntil: new Date(now + 30 * 24 * 60 * 60 * 1000),
+    });
+    await refused(service.prepare(checkpoint), "TARGET_CHANGED");
+    expect(await count("chat_research_artifacts")).toBe(1);
+    expect(await count("chat_research_windows")).toBe(1);
+    expect(await count("legacy_import_runs")).toBe(0);
+    expect(await count("auth_user")).toBe(0);
+  });
+  it("refuses maintenance metadata without clearing or adopting operational authority", async () => {
+    const { service, checkpoint } = fixture(),
+      cutoff = Date.now() + 3600000;
+    await db.insert(schema.chatResearchMaintenance).values({
+      profileSha256: "a".repeat(64),
+      targetSha256: "b".repeat(64),
+      artifactSchema: "public",
+      artifactTableOid: 1,
+      publicationCutoff: new Date(cutoff),
+      coverageThrough: new Date(cutoff + 721 * 3600000),
+    });
+    await refused(service.prepare(checkpoint), "TARGET_CHANGED");
+    expect(await count("chat_research_maintenance")).toBe(1);
+    expect(await count("legacy_import_runs")).toBe(0);
+    expect(await count("auth_user")).toBe(0);
+  });
+  it("refuses a target containing source policies without clearing or adopting permissions", async () => {
+    const { service, checkpoint } = fixture();
+    const policyJson = "{}";
+    await db.insert(schema.chatResearchSourcePolicies).values({
+      corpusVersion: "a".repeat(64),
+      policyJson,
+      policySha256: createHash("sha256").update(policyJson).digest("hex"),
+    });
+    await refused(service.prepare(checkpoint), "TARGET_CHANGED");
+    expect(await count("chat_research_source_policies")).toBe(1);
+    expect(await count("legacy_import_runs")).toBe(0);
+    expect(await count("auth_user")).toBe(0);
+  });
   it("refuses a nonempty target during initial preparation", async () => {
     const { service, checkpoint } = fixture();
     await db.insert(schema.verification).values({

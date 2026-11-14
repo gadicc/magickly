@@ -21,9 +21,15 @@ export function seoMetadata(path: string, page: SeoPage): Metadata {
   };
 }
 
-/** Metadata for a static route listed in the public page registry. */
-export function pageMetadata(path: PublicPath): Metadata {
-  return seoMetadata(path, PUBLIC_PAGES[path]);
+/**
+ * Metadata for a static route listed in the public page registry, with
+ * any of the page's own settings that aren't about search (`referrer`).
+ */
+export function pageMetadata(
+  path: PublicPath,
+  own: Pick<Metadata, "referrer"> = {},
+): Metadata {
+  return { ...seoMetadata(path, PUBLIC_PAGES[path]), ...own };
 }
 
 /** Account, administration and offline pages stay out of search results. */

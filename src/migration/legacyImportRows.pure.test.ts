@@ -34,6 +34,11 @@ const emptyTables = [
   "temple_forums",
   "chat_daily_usage",
   "site_search_usage",
+  "chat_research_windows",
+  "chat_research_permits",
+  "chat_research_source_policies",
+  "chat_research_artifacts",
+  "chat_research_maintenance",
   "audit_events",
   "cron_runs",
 ] as const;
@@ -88,7 +93,7 @@ describe("complete legacy import row projection", () => {
       .filter((table) => table !== schema.legacyImportRuns)
       .map((table) => getTableName(table))
       .sort();
-    expect(schemaNames).toHaveLength(40);
+    expect(schemaNames).toHaveLength(45);
     expect(Object.keys(LEGACY_IMPORT_TABLES).sort()).toEqual(schemaNames);
     expect(Object.keys(rows).sort()).toEqual(schemaNames);
     for (const name of Object.keys(rows) as (keyof LegacyImportRows)[]) {

@@ -14,7 +14,7 @@ function requireSetting(name: string) {
 }
 
 /** One SQL auth instance. Next loads deployment environment variables itself. */
-export const sqlAuth = createSqlAuth({
+export const sqlAuthOptions = Object.freeze({
   db,
   // An explicit deployment origin prevents Preview from borrowing Production's
   // ROOT_URL/NEXTAUTH_URL or accepting an untrusted request Host header.
@@ -24,3 +24,6 @@ export const sqlAuth = createSqlAuth({
   googleClientSecret: requireSetting("GOOGLE_CLIENT_SECRET"),
   localTestLoginEnabled: isBetterAuthLocalTestLoginEnabled(process.env),
 });
+
+/** The login route and private research readers use this identical server-owned configuration. */
+export const sqlAuth = createSqlAuth(sqlAuthOptions);

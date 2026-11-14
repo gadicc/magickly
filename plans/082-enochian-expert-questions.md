@@ -41,8 +41,9 @@ others as safe as we think? Seventeen are marked yes: G6, G7, G9, G10,
 G12, G14, G15, G17, G18, G19, G22, G23, G24, G28, G34, G38 and G39.
 Of these, plan 081's tool applies G14, G17, G22, G34 and G38, so those
 come first, then G12 and G24, which rest, as G34 does, on a single
-example in the Keys. Plan 081's chips name G4, G5 and G16, and a form
-that carries "in": are the chips right?
+example in the Keys. Plan 081's chips also name G4, G5, G13, G16,
+G21 and G33, its splits G26, G27 and G30, and a form that carries "in"
+(or "I", for ZIR): are the chips right?
 
 - **TILB before its noun:** G22 now allows it, from Key 19's OD TILB
   ADPHAHT DAMPLOZ. Is that right?
@@ -78,8 +79,9 @@ that carries "in": are the chips right?
 ## Dee's text
 
 These may be answered by an expert who has read Dee's manuscripts,
-before the British Library's images of Sloane MS 3191 return
-([plan 073](073-enochian-keys.md)).
+before the British Library's images of Sloane MS 3191 return. The
+same items are on the list of what we need from the Library
+([plan 083](083-british-library-needs.md)).
 
 - **Long s read as f:** Casaubon's print has BUFD (Key 8) and CAFAFAM
   (Key 18) where Leitch has BUSD "glory" and CASASAM "abiding"; the
@@ -88,6 +90,14 @@ before the British Library's images of Sloane MS 3191 return
   What does Dee write?
 - **The 17 Key rows marked `uncertain`** in `keys.json5`, such as the
   two words Nalvage hummed in Key 1 and left unprinted.
+- **Leitch's spellings that differ from our Keys' and dictionary's**,
+  six (PRGEL for PURGEL, TOLHAM, BAZEMLO), which plan 081 accepts as
+  input: which are Dee's own?
+- **Leitch's other words**, at his place numbers, which can differ
+  from ours: BALTLE at his 1.70, near Casaubon's PIAMOL "of
+  righteousness" (our 1.72), and TORB at his 10.41, near YOR "roar"
+  and VOHIM "with an hundred" (our 10.40 and 10.41). Which does Dee
+  write?
 - **The words Casaubon's print lost** (Keys 13 to 16), for which
   Crowley's forms stand in, and Dee's accents and Aethyr spellings.
 

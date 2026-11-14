@@ -1,3 +1,4 @@
+import { isResearchPath, RESEARCH_PAGE_PATH } from "../chat-research/paths";
 /**
  * Which paths Vercel Web Analytics and Speed Insights may see.
  *
@@ -51,7 +52,8 @@ const ENCODED_SEPARATOR = /%2f|%5c|\\/i;
 
 /** Whether a pathname is a public page that may be reported in full. */
 export function isPublicPath(pathname: string): boolean {
-  if (ENCODED_SEPARATOR.test(pathname)) return false;
+  if (isResearchPath(pathname) || ENCODED_SEPARATOR.test(pathname))
+    return false;
   if (PUBLIC_PATHS.has(pathname)) return true;
   const section = pathname.split("/")[1];
   return section !== undefined && PUBLIC_SECTIONS.has(section);
@@ -62,6 +64,7 @@ export function isPublicPath(pathname: string): boolean {
  * section's name (`/temples/*`), or `/*`.
  */
 export function insightsPath(pathname: string): string {
+  if (isResearchPath(pathname)) return RESEARCH_PAGE_PATH;
   const path = pathname.replace(/\/+$/, "") || "/";
   if (isPublicPath(path)) return path;
   const [, section = "", ...rest] = path.split("/");
@@ -77,6 +80,7 @@ export function insightsPath(pathname: string): string {
 export function insightsUrl(url: string): string | null {
   try {
     const parsed = new URL(url);
+    if (isResearchPath(parsed.pathname)) return null;
     return parsed.origin + insightsPath(parsed.pathname);
   } catch {
     return null;
