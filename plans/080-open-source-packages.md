@@ -2771,17 +2771,130 @@ tests), and a second whole gate passed every step.
 
 - **Chakras' `active`** names a chakra, not a sephirah, so it was left;
   `activeChakra` would match `activeSephirah` and `activePath`, if Gadi
-  wants it before publishing.
+  wants it before publishing. Done after the review, below.
 - **`RoseSigilImage`** still requires `showRose` and `debug`; the review
-  listed both as low.
+  listed both as low. Done after the review, below.
 - **The spirit's dark ink.** `ink.module.css` still selects
   `[stroke="#000"]`: passing a CSS variable as `ink` would change the
   light markup, and a variable in a presentation attribute is not
-  reliable across browsers.
+  reliable across browsers. After the review, below, the attribute
+  stays `#000` and `ink` is the path's style, so both hold.
 - **Prop types without names** (`Tablet`, `Lamen`) and the review's other
-  medium and low items, which add rather than rename.
+  medium and low items, which add rather than rename. `Tablet`'s are
+  `TabletProps` since the review; `Lamen`'s are still unnamed.
 - Stage E's deferrals stand: `isolatedDeclarations`, the publish guards
   and `publish.yml` (stage G), and checking the Tree page's query.
+
+### After the review (14 November 2026)
+
+An adversarial review of this branch at `725cc65e`, which rendered the
+new API rather than only reading it, found a hang, types that said less
+than the code, markup that was not XML, and a default that changed the
+drawing when stated. Gadi decided every item the same day, and the five
+commits below fix them on the same branch, on top of the seven above.
+
+- **The Moon.** `lune.phase()` never returns for an invalid `Date`: its
+  solution of Kepler's equation loops until it converges, and NaN never
+  does. `Moon` now throws a `RangeError` naming `date`, and one naming
+  `phase` outside 0 to 1; `moonPath` throws one for anything outside
+  [0, 1], where a negative phase drew an ellipse wider than the disc.
+  Those tests run under a timeout, so a regression fails rather than
+  hangs. The hemisphere's turn moved from the root `<svg>`, which SVG
+  1.1 renderers ignore, to a group inside it, turned about the viewBox's
+  middle (85, 81), where a browser turns an inline `<svg>`; no pin
+  covers the Moon's markup. `astrology/moonPath` is no longer an entry
+  (only tests imported it), so there are 23; the module is private and
+  keeps moon-phase's notice, and a test now holds the build's file list
+  to the exports exactly.
+- **`FylfotCellClick`.** `expected` is `FylfotSymbolId | null`, since a
+  square of `cells` may stand where the finished cross has none, and
+  `id` a symbol or `""`, the only squares that take clicks. The cast is
+  gone.
+- **The Tree as XML.** `TreeOfLifeSvg` declares `xmlns:xlink` right after
+  `xmlns`. The image renderer added that declaration to every image's
+  root, the Tree's and the other five slugs' alike, so removing it, as
+  the decision had it, would have moved every other image's bytes; it
+  now adds it only where a root lacks it. The Tree's roots are the
+  patched ones byte for byte, so no pin moved, not even by the
+  declaration. A jsdom test parses the default Tree, a linked one and
+  the Grade Tree as XML; nothing else in the package writes `xlink:`.
+- **The Tree's defaults.** `name.roman` is 10 in the size table, so
+  `<TreeOfLife />` is the Tree with its five defaults stated, which a
+  test holds. The image registry passes 12 for `field=name.roman`
+  without `fontSize`, as the API always drew it, and the explorer's
+  image links ask for 10; the Tree page always passes its size.
+- **`activeSephirah`** throws on `""` and on ids the Tree does not have,
+  as `activePath` does; the app passes an id or `null`, and the image
+  contract only the ids it lists.
+- **Chakras' `active` is `activeChakra`**, meaning what `activeSephirah`
+  does: not given, all lit; `null`, none; an unknown id throws. Its
+  JSDoc had said an unknown id lit all, where it faded all.
+- **`label={false}` is decorative**: `Tablet` and `Kamea` set
+  `aria-hidden="true"`, and the README states the convention once. The
+  hall's art and the tablet image drew `Tablet` with `label={false}`, so
+  to keep their markup the drawing moved to a private `tabletSvg.tsx`,
+  whose `TabletSvg` takes its root's accessibility attributes from its
+  caller: the hall's art gives none, and the image registry's `source`
+  step takes `aria-hidden` off again. The eight tablet render pins hash
+  `TabletSvg`, the hall's drawing, under the same values, and a test
+  holds `label={false}` to it plus `aria-hidden`. `Tablet`'s props are
+  `TabletProps`.
+- **The spirit's ink.** The path keeps `stroke="#000"`, which the app's
+  dark ink selects, and a caller's `ink` is its style, which takes
+  `var()` and wins over a page's rules. Without `ink` the markup is as
+  it was.
+- **`RoseSigilImage`**'s `showRose` and `debug` are optional, `true` and
+  `false` by default, as `RoseSigil`'s are.
+- **`gd/hall`** exports `BannerSide` and `HallArtDefinition`, which its
+  public types used: the review's `ArtDefinition`, named as `HallArt`
+  and `HallArtBox` are. The five `Resolved…` types are `HallResolved…`,
+  as `HallRect` is; `ResolvedHall` keeps its name. `hallObjectName`,
+  `hallStation` and `TABLET_ELEMENTS` left the entry, and since the
+  editor uses none of them they are private rather than in
+  `gd/hall/editor`. `hallColor` and `hallPoint` read separate spellings,
+  so `hallColor("centre")` is `centre`. `roseLetters()` and
+  `sigilPoints()` take `text`. `tabletArt`'s documentation says that a
+  hall tablet's `reversed` and `alt` are `Tablet`'s `mirrorReversed` and
+  `showSecondLetters`.
+- **The hall editor** shows a stored `centre` or `grey` as `center` or
+  `gray`, once, and writes nothing until a value is chosen.
+- **The explorer** gives `string | null` and `string | false` props a
+  text field again: the Tree's `activeSephirah`, `activeChakra` and the
+  labels.
+- **The README's `ts` blocks** compile: `next.config.ts` is typed with
+  `NextConfig` and exports it, and the stylesheet's import has a note
+  and a two-line `css.d.ts`. The smoke test checks every TypeScript
+  block, each a file of its own. Next's declarations do not check with
+  `skipLibCheck` off, so a block that imports Next is checked in a
+  third program, set as the Next fixture's tsconfig is, which takes
+  every block; a config made wrong on purpose failed it.
+
+**Nothing a reader sees moved.** No render or image pin's value
+changed, and every one passed on each commit's tree; the image API's
+query names are as they were. The explorer's props tables say what the
+props now do, and no component's description, which the search
+catalogue reads, changed, so the vectors were not refreshed. The halls
+draw the same markup and no documented screen changed, so the
+documentation screenshots were not regenerated.
+
+| Commit | What |
+| --- | --- |
+| `0e2a94ca` | `fix(components): Refuse an invalid Moon date` |
+| `dd16404d` | `fix(components): Settle the Tree's defaults` |
+| `3d6cf541` | `fix(components): Make label={false} decorative` |
+| `7159318f` | `refactor(components): Settle the hall's names` |
+| `be3adca3` | `docs(components): Check the README's TS blocks` |
+| (this commit) | `docs(plans): Record the API after its review` |
+
+Every code commit passed stage E's gate on its own tree, every step at
+0. Two needed their whole gate run again, both on timing tests in files
+they do not touch, at load averages up to 29: `dd16404d` failed
+`TempleHallTabs.test.tsx`'s frame-timing test (its automatic rerun
+passed), and `be3adca3` that test and then, on the rerun, a `TIMEOUT` in
+`r2RitualStorage.test.ts`. Each file passed alone on the same tree, and
+a second whole gate passed every step. `3d6cf541`'s subject was
+reworded after its gate, which ran on it as `d57bb475`; its tree,
+`6c24c6a0`, is the one the gate checked.
 
 ## Review (11 November 2026)
 

@@ -407,6 +407,14 @@ Follow-ups are separate from the completed migration work:
   `MoonWidget` and `MercuryWidget`. No pin moved; the explorer's
   Mercury page redirects to `mercury-widget`
   ([plan 080](080-open-source-packages.md#the-api-before-publishing-14-november-2026)).
+  After a second review the same day, on the same branch: the Moon
+  refuses an invalid date rather than hang, the Tree is well-formed XML
+  and stating its defaults draws the bare Tree, `activeSephirah` and the
+  renamed `activeChakra` throw on ids they do not have, `label={false}`
+  marks a drawing decorative, the spirit's `ink` takes `var()`, and
+  `gd/hall` exports the types its own use, named `Hall…`. Still no pin
+  moved
+  ([plan 080](080-open-source-packages.md#after-the-review-14-november-2026)).
   TODO: with Gadi's go-ahead, stage G; stage E's and F's deferred
   items. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups),
