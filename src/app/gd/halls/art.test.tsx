@@ -40,7 +40,7 @@ describe("the app's hall art", () => {
       const { provenance } = art;
       expect(["original", "thirdParty"], key).toContain(provenance.origin);
       expect(provenance.author, key).not.toBe("");
-      expect(provenance.licence, key).not.toBe("");
+      expect(provenance.license, key).not.toBe("");
       if (provenance.origin === "thirdParty")
         expect(provenance.source, key).toBeTruthy();
     }
@@ -57,7 +57,7 @@ describe("the app's hall art", () => {
   it("keeps the package's own art original and MIT", () => {
     for (const [key, art] of defaultHallArt) {
       expect(art.provenance.origin, key).toBe("original");
-      expect(art.provenance.licence, key).toBe("MIT");
+      expect(art.provenance.license, key).toBe("MIT");
       // The app gives the tablet its Enochian font, and takes the rest.
       if (key === "tablet")
         expect(gdHallArt.get(key)?.provenance).toBe(art.provenance);

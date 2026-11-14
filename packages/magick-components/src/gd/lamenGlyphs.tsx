@@ -27,10 +27,10 @@ const circle = (cx: number, cy: number, r: number) => {
 };
 
 /** A star polygon of `n` points, `outer` and `inner` radii, a point up. */
-const star = (n: number, outer: number, inner: number, centre?: Point) =>
+const star = (n: number, outer: number, inner: number, center?: Point) =>
   points(
     Array.from({ length: 2 * n }, (_, i) =>
-      polar(i % 2 ? inner : outer, -90 + (i * 180) / n, centre),
+      polar(i % 2 ? inner : outer, -90 + (i * 180) / n, center),
     ),
   );
 
@@ -186,15 +186,15 @@ const HEX_OVER = [0, 120, 240].map((angle) => {
     ]);
   };
   const black = 1.1 * (BAND + 2 * EDGE);
-  return { black: piece(black), colour: piece(black + 1) };
+  return { black: piece(black), color: piece(black + 1) };
 });
 
 /** A band along a triangle: black edges, the colour between. */
-function Band({ at, colour }: { at: string; colour: string }) {
+function Band({ at, color }: { at: string; color: string }) {
   return (
     <>
       <polygon points={at} stroke={PALETTE.ink} strokeWidth={BAND + 2 * EDGE} />
-      <polygon points={at} stroke={colour} strokeWidth={BAND} />
+      <polygon points={at} stroke={color} strokeWidth={BAND} />
     </>
   );
 }
@@ -203,16 +203,16 @@ function Band({ at, colour }: { at: string; colour: string }) {
 function Hexagram({ up, down }: { up: string; down: string }) {
   return (
     <g fill="none" strokeLinejoin="miter">
-      <Band at={HEX_DOWN} colour={down} />
-      <Band at={HEX_UP} colour={up} />
-      {HEX_OVER.map(({ black, colour }) => (
+      <Band at={HEX_DOWN} color={down} />
+      <Band at={HEX_UP} color={up} />
+      {HEX_OVER.map(({ black, color }) => (
         <g key={black}>
           <polyline
             points={black}
             stroke={PALETTE.ink}
             strokeWidth={BAND + 2 * EDGE}
           />
-          <polyline points={colour} stroke={down} strokeWidth={BAND} />
+          <polyline points={color} stroke={down} strokeWidth={BAND} />
         </g>
       ))}
     </g>

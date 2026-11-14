@@ -143,9 +143,9 @@ describe("Kamea", () => {
   });
 
   it("draws what it is given over the numbers, in the square's frame", () => {
-    const { centre } = kameaGeometry(3);
-    const [x1, y1] = centre(0, 0);
-    const [x2, y2] = centre(2, 2);
+    const { center } = kameaGeometry(3);
+    const [x1, y1] = center(0, 0);
+    const [x2, y2] = center(2, 2);
     const overlay = <path d={`M${x1},${y1}L${x2},${y2}`} stroke="red" />;
     const markup = renderToStaticMarkup(
       <svg>
@@ -169,16 +169,16 @@ describe("Kamea", () => {
 describe("kameaGeometry", () => {
   it("divides the square into its order's cells, centred on 0,0", () => {
     for (let order = 3; order <= 9; order++) {
-      const { cell, centre } = kameaGeometry(order);
+      const { cell, center } = kameaGeometry(order);
       expect(cell * order).toBeCloseTo(KAMEA_SIDE, 10);
-      const [left, top] = centre(0, 0);
-      const [right, bottom] = centre(order - 1, order - 1);
+      const [left, top] = center(0, 0);
+      const [right, bottom] = center(order - 1, order - 1);
       expect(left).toBeCloseTo(-KAMEA_SIDE / 2 + cell / 2, 10);
       expect(top).toBeCloseTo(left, 10);
       expect(right).toBeCloseTo(-left, 10);
       expect(bottom).toBeCloseTo(-top, 10);
     }
     // Rows go down and columns across.
-    expect(kameaGeometry(4).centre(0, 3)).toEqual([36, -36]);
+    expect(kameaGeometry(4).center(0, 3)).toEqual([36, -36]);
   });
 });

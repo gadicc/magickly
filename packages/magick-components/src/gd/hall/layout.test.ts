@@ -31,7 +31,7 @@ import { MAX_HALL_DEPTH, MAX_HALL_NODES } from "./vocabulary.ts";
 const provenance = {
   origin: "original",
   author: "test",
-  licence: "MIT",
+  license: "MIT",
 } as const;
 const drawing = (width: number, height = width): HallArt => ({
   Component: () => null,

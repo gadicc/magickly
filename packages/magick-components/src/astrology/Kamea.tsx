@@ -29,7 +29,7 @@ export interface KameaGeometry {
   /** A cell's side, in the figure's units. */
   cell: number;
   /** A cell's centre, by its row from the top and its column from the left. */
-  centre(row: number, column: number): [x: number, y: number];
+  center(row: number, column: number): [x: number, y: number];
 }
 
 /** The geometry of a square of `order` cells a side, in `KameaFigure`. */
@@ -39,7 +39,7 @@ export function kameaGeometry(order: number): KameaGeometry {
   return {
     order,
     cell,
-    centre: (row, column) => [
+    center: (row, column) => [
       -half + (column + 0.5) * cell,
       -half + (row + 0.5) * cell,
     ],
@@ -102,7 +102,7 @@ export function KameaFigure({
         {children}
       </>
     );
-  const { order, cell, centre } = kameaGeometry(square.length);
+  const { order, cell, center } = kameaGeometry(square.length);
   const size = cell * NUMBER_SIZE;
   const rules = Array.from({ length: order - 1 }, (_, i) =>
     svgCoordinate(-half + (i + 1) * cell),
@@ -127,7 +127,7 @@ export function KameaFigure({
       >
         {square.flatMap((row, i) =>
           row.map((value, j) => {
-            const [x, y] = centre(i, j);
+            const [x, y] = center(i, j);
             return (
               <text
                 key={value}

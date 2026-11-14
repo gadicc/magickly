@@ -37,7 +37,7 @@ export const HALL_POINT_OFFSETS: ReadonlyMap<
   HallPoint,
   readonly [number, number]
 > = new Map([
-  ["centre", [0, 0]],
+  ["center", [0, 0]],
   ["north", [-1, 0]],
   ["south", [1, 0]],
   ["east", [0, -1]],
@@ -54,8 +54,11 @@ export type LabelPosition = (typeof LABEL_POSITIONS)[number];
 export const BANNER_SIDES = ["east", "north", "south", "west"] as const;
 export type BannerSide = (typeof BANNER_SIDES)[number];
 
-/** The named colours art attributes may use; never raw CSS or URLs. */
-export const HALL_COLOURS: ReadonlyMap<string, string> = new Map([
+/**
+ * The named colours art attributes may use; never raw CSS or URLs. A hall
+ * may also write `grey`, which `hallColor` reads as `gray`.
+ */
+export const HALL_COLORS: ReadonlyMap<string, string> = new Map([
   ["none", "none"],
   ["white", "#ffffff"],
   ["black", "#000000"],
@@ -64,9 +67,23 @@ export const HALL_COLOURS: ReadonlyMap<string, string> = new Map([
   ["yellow", "#ffe000"],
   ["gold", "#d4a017"],
   ["green", "#108010"],
-  ["grey", "#888888"],
+  ["gray", "#888888"],
 ]);
-const COLOUR_NAMES = [...HALL_COLOURS.keys()];
+
+/** Other spellings a hall may use, each with the vocabulary's own. */
+const SPELLINGS: ReadonlyMap<string, string> = new Map([
+  ["centre", "center"],
+  ["grey", "gray"],
+]);
+
+/** Every name a colour attribute takes: the colours', and `grey`. */
+export const HALL_COLOR_NAMES: readonly string[] = [
+  ...HALL_COLORS.keys(),
+  "grey",
+];
+
+/** Every name `at` and `anchor` take: the points', and `centre`. */
+const POINT_NAMES: readonly string[] = [...HALL_POINTS, "centre"];
 
 /**
  * The colours a light burns (stage H): the red lamps of the altar and the
@@ -74,8 +91,8 @@ const COLOUR_NAMES = [...HALL_COLOURS.keys()];
  * Zelator's and Theoricus' lanterns, and the Portal's white lamp. Lamps
  * and lanterns take one as `light`.
  */
-export const LIGHT_COLOURS = ["red", "yellow", "white"] as const;
-export type LightColour = (typeof LIGHT_COLOURS)[number];
+export const LIGHT_COLORS = ["red", "yellow", "white"] as const;
+export type LightColor = (typeof LIGHT_COLORS)[number];
 
 /** The item kinds that are lights, and take `light`. */
 export const LIGHT_KINDS: ReadonlySet<string> = new Set(["lamp", "lantern"]);
@@ -105,8 +122,8 @@ const size = number(...SIZE_RANGE);
 export const PLACEABLE_ATTRIBUTES: ReadonlyMap<string, HallAttrSpec> = new Map([
   ["x", coordinate],
   ["y", coordinate],
-  ["at", enumOf([...HALL_POINTS, "center"])],
-  ["anchor", enumOf([...HALL_POINTS, "center"])],
+  ["at", enumOf(POINT_NAMES)],
+  ["anchor", enumOf(POINT_NAMES)],
   ["scale", number(...SCALE_RANGE)],
   ["label", text],
   ["labelPos", enumOf(LABEL_POSITIONS)],
@@ -290,8 +307,8 @@ export const HALL_TAGS: ReadonlyMap<string, HallTagSpec> = new Map<
       ["kind", text],
       ["form", enumOf(CROSS_FORMS)],
       ["dir", enumOf(["up", "down"])],
-      ["fill", enumOf(COLOUR_NAMES)],
-      ["stroke", enumOf(COLOUR_NAMES)],
+      ["fill", enumOf(HALL_COLOR_NAMES)],
+      ["stroke", enumOf(HALL_COLOR_NAMES)],
     ]),
   ],
   [
@@ -305,8 +322,8 @@ export const HALL_TAGS: ReadonlyMap<string, HallTagSpec> = new Map<
         ["size", number(0.05, 4)],
         ["x", coordinate],
         ["y", coordinate],
-        ["at", enumOf([...HALL_POINTS, "center"])],
-        ["anchor", enumOf([...HALL_POINTS, "center"])],
+        ["at", enumOf(POINT_NAMES)],
+        ["anchor", enumOf(POINT_NAMES)],
       ]),
     },
   ],
@@ -439,10 +456,30 @@ export function roleName(role: string): string {
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
 
-/** Normalises the `center` spelling of `centre`. */
+/**
+ * A value of a hall's `at` or `anchor` as the vocabulary spells it:
+ * `center` for `centre`, which halls written before it may hold.
+ */
 export function hallPoint(value: string | undefined): HallPoint | undefined {
   if (value === undefined) return undefined;
-  return value === "center" ? "centre" : (value as HallPoint);
+  return (SPELLINGS.get(value) ?? value) as HallPoint;
+}
+
+/**
+ * A colour name of a hall's as the vocabulary spells it: `gray` for
+ * `grey`, which halls written before it may hold.
+ */
+export function hallColor(value: string | undefined): string | undefined {
+  if (value === undefined) return undefined;
+  return SPELLINGS.get(value) ?? value;
+}
+
+/**
+ * Whether a value is another spelling of one the vocabulary has, which a
+ * hall may hold but an editor need not offer: `centre`, `grey`.
+ */
+export function hallSpellingAlias(value: string): boolean {
+  return SPELLINGS.has(value);
 }
 
 /** Item kinds the package draws itself; the registry may add more. */

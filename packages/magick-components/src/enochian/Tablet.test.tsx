@@ -200,8 +200,8 @@ describe("Tablet", () => {
     expect(markup).not.toContain(
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100',
     );
-    for (const colour of ["#d4a000", "#2255cc", "black", "#e22"])
-      expect(markup).toContain(`fill:${colour}`);
+    for (const color of ["#d4a000", "#2255cc", "black", "#e22"])
+      expect(markup).toContain(`fill:${color}`);
     expect(draw("union", true)).toContain("font-family:Enochian");
   });
 

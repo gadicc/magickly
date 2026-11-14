@@ -44,7 +44,7 @@ export interface HallDiagnostic {
 export interface HallArtProvenance {
   origin: "original" | "thirdParty";
   author: string;
-  licence: string;
+  license: string;
   /**
    * Where it was taken from: for third-party or ported art, or for
    * original art drawn after a cited public-domain source.

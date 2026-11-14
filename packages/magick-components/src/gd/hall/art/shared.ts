@@ -5,7 +5,7 @@ export function original(notes: string): HallArtProvenance {
   return {
     origin: "original",
     author: "Gadi Cohen (the gdHall package)",
-    licence: "MIT",
+    license: "MIT",
     notes,
   };
 }

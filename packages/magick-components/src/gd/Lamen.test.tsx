@@ -112,10 +112,10 @@ describe("Lamen", () => {
     // and the rose; the green pentagram and red triangle; the orange
     // octagram and blue cup.
     const chief = render("chiefAdept");
-    for (const colour of ["#ffe000", "#d92128", "#406ab3", "#2c2b29"])
-      expect(chief).toContain(`fill="${colour}"`);
-    for (const colour of ["#a9aa66", "#8f5642", "#444f41"])
-      expect(chief).toContain(`fill="${colour}"`);
+    for (const color of ["#ffe000", "#d92128", "#406ab3", "#2c2b29"])
+      expect(chief).toContain(`fill="${color}"`);
+    for (const color of ["#a9aa66", "#8f5642", "#444f41"])
+      expect(chief).toContain(`fill="${color}"`);
     expect(render("secondAdept")).toMatch(/fill="#108010"[^]*fill="#d92128"/);
     expect(render("thirdAdept")).toMatch(/fill="#ff8c1a"[^]*fill="#406ab3"/);
   });
@@ -128,8 +128,8 @@ describe("Lamen", () => {
     // yellow collar.
     const hiereus = portal("hiereus");
     expect(fills(hiereus)).toEqual(["red", "#000"]);
-    for (const colour of ["#a9aa66", "#444f41", "#2c2b29", "#8f5642"])
-      expect(hiereus).toContain(`fill="${colour}"`);
+    for (const color of ["#a9aa66", "#444f41", "#2c2b29", "#8f5642"])
+      expect(hiereus).toContain(`fill="${color}"`);
     expect(hiereus).toContain('stroke="#ffffff"');
     const hegemon = portal("hegemon");
     expect(fills(hegemon)).toEqual(["yellow", "white"]);

@@ -141,13 +141,13 @@ describe("Chakras", () => {
     for (const ring of [rings[1], rings[3]]) {
       const xs = ring.map(([x]) => x);
       const ys = ring.map(([, y]) => y);
-      const centre: Point = [
+      const center: Point = [
         (Math.min(...xs) + Math.max(...xs)) / 2,
         (Math.min(...ys) + Math.max(...ys)) / 2,
       ];
-      expect(onBody(centre)).toBe(false);
+      expect(onBody(center)).toBe(false);
       // Just outside the hole is the hand.
-      expect(onBody([centre[0], Math.max(...ys) + 0.2])).toBe(true);
+      expect(onBody([center[0], Math.max(...ys) + 0.2])).toBe(true);
     }
   });
 

@@ -1,14 +1,20 @@
 import { enumAttr } from "../attributes.ts";
 import type { HallArt, HallArtProps, HallNode } from "../types.ts";
-import { CROSS_FORMS, type CrossForm, HALL_COLOURS } from "../vocabulary.ts";
+import {
+  CROSS_FORMS,
+  type CrossForm,
+  HALL_COLOR_NAMES,
+  HALL_COLORS,
+  hallColor,
+} from "../vocabulary.ts";
 import { points } from "./geometry.ts";
 import { original, variantOf } from "./shared.ts";
 
-const COLOUR_NAMES = [...HALL_COLOURS.keys()];
-
 /** A named colour from the node, or the art's default; never raw CSS. */
-const colour = (node: HallNode, name: "fill" | "stroke", fallback: string) =>
-  HALL_COLOURS.get(enumAttr(node, name, COLOUR_NAMES) ?? fallback) as string;
+const color = (node: HallNode, name: "fill" | "stroke", fallback: string) =>
+  HALL_COLORS.get(
+    hallColor(enumAttr(node, name, HALL_COLOR_NAMES)) ?? fallback,
+  ) as string;
 
 const direction = (node: HallNode) =>
   enumAttr(node, "dir", ["up", "down"]) ?? "up";
@@ -99,8 +105,8 @@ function Cross({ node }: HallArtProps) {
         <path
           key={d}
           d={d}
-          fill={colour(node, "fill", "red")}
-          stroke={colour(node, "stroke", "yellow")}
+          fill={color(node, "fill", "red")}
+          stroke={color(node, "stroke", "yellow")}
           strokeWidth={3}
           strokeLinejoin="miter"
         />
@@ -117,8 +123,8 @@ export const crossArt: HallArt = {
   variant: (node) =>
     variantOf(
       crossForm(node),
-      colour(node, "fill", "red"),
-      colour(node, "stroke", "yellow"),
+      color(node, "fill", "red"),
+      color(node, "stroke", "yellow"),
     ),
   provenance: crossProvenance,
 };
@@ -137,8 +143,8 @@ function Triangle({ node }: HallArtProps) {
         [SIDE / 2, (s * HEIGHT) / 2],
         [-SIDE / 2, (s * HEIGHT) / 2],
       ])}
-      fill={colour(node, "fill", "none")}
-      stroke={colour(node, "stroke", "white")}
+      fill={color(node, "fill", "none")}
+      stroke={color(node, "stroke", "white")}
       strokeWidth={11}
       strokeLinejoin="miter"
     />
@@ -152,8 +158,8 @@ export const triangleArt: HallArt = {
   variant: (node) =>
     variantOf(
       direction(node),
-      colour(node, "fill", "none"),
-      colour(node, "stroke", "white"),
+      color(node, "fill", "none"),
+      color(node, "stroke", "white"),
     ),
   provenance: triangleProvenance,
 };
@@ -171,8 +177,8 @@ function Pentagram({ node }: HallArtProps) {
   return (
     <polygon
       points={points(star)}
-      fill={colour(node, "fill", "none")}
-      stroke={colour(node, "stroke", "white")}
+      fill={color(node, "fill", "none")}
+      stroke={color(node, "stroke", "white")}
       strokeWidth={5}
       strokeLinejoin="miter"
     />
@@ -186,8 +192,8 @@ export const pentagramArt: HallArt = {
   variant: (node) =>
     variantOf(
       direction(node),
-      colour(node, "fill", "none"),
-      colour(node, "stroke", "white"),
+      color(node, "fill", "none"),
+      color(node, "stroke", "white"),
     ),
   provenance: pentagramProvenance,
 };

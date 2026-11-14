@@ -20,6 +20,7 @@ import type {
 import {
   BOARD_KINDS,
   HALL_ROLES,
+  hallSpellingAlias,
   hallTagSpec,
   LIGHT_KINDS,
   PLACEABLE_ATTRIBUTES,
@@ -370,9 +371,10 @@ function Field(props: FieldProps) {
     return (
       <ChoiceField
         {...props}
-        // `center` is `centre`'s other spelling: offer one.
+        // Offer the vocabulary's spellings, `center` and `gray`, not the
+        // `centre` and `grey` a hall may also hold.
         options={spec.values
-          .filter((option) => option !== "center")
+          .filter((option) => !hallSpellingAlias(option))
           .map(
             (option) =>
               [

@@ -191,7 +191,7 @@ export function reparentNode(
       typeof entry.node.attrs.anchor === "string"
         ? entry.node.attrs.anchor
         : undefined,
-    ) ?? "centre";
+    ) ?? "center";
   const [ax, ay] = HALL_POINT_OFFSETS.get(anchor) as readonly [number, number];
   const point = {
     x: object.cx + (ax * object.width) / 2,

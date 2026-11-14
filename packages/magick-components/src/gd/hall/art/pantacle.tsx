@@ -67,7 +67,7 @@ interface RingGlyph {
  */
 function ringGlyphs(
   text: string,
-  centre: number,
+  center: number,
   font: TextMeasure,
   size: number,
   rightToLeft: boolean,
@@ -82,7 +82,7 @@ function ringGlyphs(
       font.width(char, size) / 2;
     const fromMiddle = along - total / 2;
     const radians = (rightToLeft ? -fromMiddle : fromMiddle) / BASELINE;
-    return [{ char, angle: centre + (radians * 180) / Math.PI }];
+    return [{ char, angle: center + (radians * 180) / Math.PI }];
   });
 }
 

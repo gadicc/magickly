@@ -23,7 +23,7 @@ import {
   HALL_ROLES,
   type HallTagRole,
   IDENTIFIER,
-  LIGHT_COLOURS,
+  LIGHT_COLORS,
   LIGHT_KINDS,
   MAX_HALL_DEPTH,
   MAX_HALL_NODES,
@@ -271,7 +271,7 @@ export function validateHall(
           LIGHT_KINDS.has(kind) &&
           fill !== undefined &&
           (text("light") !== undefined ||
-            !(LIGHT_COLOURS as readonly string[]).includes(fill))
+            !(LIGHT_COLORS as readonly string[]).includes(fill))
         )
           report(
             path,

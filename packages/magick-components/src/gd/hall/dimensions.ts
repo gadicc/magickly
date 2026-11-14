@@ -29,10 +29,11 @@ export const DEFAULT_PADDING = 0.5;
 /**
  * Named points on a box: `at` on the parent, `anchor` on the object
  * (re-exported by the vocabulary); here so the placeholder estimate
- * reads `at` as the resolver does.
+ * reads `at` as the resolver does. A hall may also write `centre`, which
+ * `hallPoint` reads as `center`.
  */
 export const HALL_POINTS = [
-  "centre",
+  "center",
   "north",
   "south",
   "east",

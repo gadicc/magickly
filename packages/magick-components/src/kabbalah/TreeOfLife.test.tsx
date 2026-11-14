@@ -88,10 +88,10 @@ describe("TreeOfLife", () => {
     // Centred on the sphere: Binah's two lines sit either side of the
     // centre a one-line label would take.
     const single = renderToString(<TreeOfLife field="name.roman" />);
-    const centre = Number(
+    const center = Number(
       single.match(/<text[^>]* y="([\d.-]+)"[^>]*>Binah<\/text>/)?.[1],
     );
-    expect((y("pearl") + y("star sapphire")) / 2).toBeCloseTo(centre, 3);
+    expect((y("pearl") + y("star sapphire")) / 2).toBeCloseTo(center, 3);
   });
 
   it("spaces lines by a CSS font size, and by 10 where there is none", () => {

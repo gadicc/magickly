@@ -786,10 +786,10 @@ export function resolveHall(
     defaults: { x?: number; y?: number },
   ) => {
     const node = item.node;
-    const at = hallPoint(enumAttr(node, "at", [...HALL_POINTS, "center"]));
+    const at = hallPoint(enumAttr(node, "at", [...HALL_POINTS, "centre"]));
     const anchor =
-      hallPoint(enumAttr(node, "anchor", [...HALL_POINTS, "center"])) ??
-      "centre";
+      hallPoint(enumAttr(node, "anchor", [...HALL_POINTS, "centre"])) ??
+      "center";
     const x = coordinate(numberAttr(node, "x"));
     const y = coordinate(numberAttr(node, "y"));
     let px: number;
@@ -801,7 +801,7 @@ export function resolveHall(
       px = bx + (x ?? 0);
       py = by + (y ?? 0);
     } else {
-      const [cx, cy] = point(frame.box, "centre");
+      const [cx, cy] = point(frame.box, "center");
       px = x ?? defaults.x ?? cx;
       py = y ?? defaults.y ?? cy;
     }
@@ -915,13 +915,13 @@ export function resolveHall(
       side === "east" || side === "west"
         ? numberAttr(node, "x")
         : numberAttr(node, "y");
-    const centre = clamp(along ?? FLOOR_SIZE / 2, 0, FLOOR_SIZE);
+    const center = clamp(along ?? FLOOR_SIZE / 2, 0, FLOOR_SIZE);
     const width = clamp(numberAttr(node, "width") ?? 2, 0, FLOOR_SIZE);
     doors.push({
       path,
       side,
-      from: centre - width / 2,
-      to: centre + width / 2,
+      from: center - width / 2,
+      to: center + width / 2,
     });
   };
 

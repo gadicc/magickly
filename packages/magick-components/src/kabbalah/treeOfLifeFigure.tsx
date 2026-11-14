@@ -122,7 +122,7 @@ export const TREE_GEOMETRY = {
 const [severity, equilibrium, mercy] = TREE_GEOMETRY.pillars;
 
 /** Each sphere's centre, Kether to Malkuth, then Daat. */
-export const SEPHIRAH_CENTRES: readonly { x: number; y: number }[] = [
+export const SEPHIRAH_CENTERS: readonly { x: number; y: number }[] = [
   [equilibrium, 0],
   [mercy, 1],
   [severity, 1],
@@ -184,7 +184,7 @@ export function TreeFigure({
   flash?: boolean;
 }) {
   const { canvasWidth, canvasHeight } = TREE_GEOMETRY;
-  const centre = (index: number) => SEPHIRAH_CENTRES[index - 1];
+  const center = (index: number) => SEPHIRAH_CENTERS[index - 1];
   return (
     <svg
       width={width}
@@ -202,16 +202,16 @@ export function TreeFigure({
           return (
             <LineOutline
               key={id}
-              x1={centre(a).x}
-              y1={centre(a).y}
-              x2={centre(b).x}
-              y2={centre(b).y}
+              x1={center(a).x}
+              y1={center(a).y}
+              x2={center(b).x}
+              y2={center(b).y}
               offset={8.5}
             />
           );
         })}
       </g>
-      {SEPHIRAH_CENTRES.slice(0, 10).map(({ x, y }, index) => {
+      {SEPHIRAH_CENTERS.slice(0, 10).map(({ x, y }, index) => {
         const colors = rows[index].color.queenWeb.split(",");
         return (
           <g key={rows[index].id}>
@@ -238,7 +238,7 @@ export function TreeFigure({
       })}
       {flash && (
         <polyline
-          points={SEPHIRAH_CENTRES.slice(0, 10)
+          points={SEPHIRAH_CENTERS.slice(0, 10)
             .map(({ x, y }) => point(x, y))
             .join(" ")}
           fill="none"

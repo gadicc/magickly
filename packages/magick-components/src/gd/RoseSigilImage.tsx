@@ -86,9 +86,9 @@ export function RoseSigilImage({
               />
               {row.map((letter) => {
                 // Labels sit on the letter centres the path is drawn through.
-                const centre = letterPoint(letter);
-                const x = svgCoordinate(centre.x);
-                const y = svgCoordinate(centre.y);
+                const center = letterPoint(letter);
+                const x = svgCoordinate(center.x);
+                const y = svgCoordinate(center.y);
                 return (
                   <React.Fragment key={letter}>
                     {debug && (

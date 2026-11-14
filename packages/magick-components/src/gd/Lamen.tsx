@@ -9,7 +9,7 @@ import {
 } from "./lamenGlyphs.tsx";
 
 /** The colours of a lamen with the Calvary cross of Tiphareth. */
-interface CrossLamenColours {
+interface CrossLamenColors {
   /** The outer ring: a colour, or `stripes` (red and white). */
   ring: string;
   /** The disc inside it. */
@@ -48,7 +48,7 @@ interface CrossLamenColours {
  *   (Thoth, 2004): pp. 80–81, the collars and the Past Hierophant's
  *   smaller lamen; pp. 96–97, the ring in the charge colour.
  */
-const CROSS_LAMENS: ReadonlyMap<string, CrossLamenColours> = new Map([
+const CROSS_LAMENS: ReadonlyMap<string, CrossLamenColors> = new Map([
   ["imperator", { ring: "red", disc: "green" }],
   ["praemonstrator", { ring: "#48f", disc: "orange" }],
   ["cancellarius", { ring: "yellow", disc: "#b5b" }],

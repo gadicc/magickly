@@ -8,7 +8,7 @@ import {
   LineOutline,
   ORDERED_PATHS as orderedPaths,
   point,
-  SEPHIRAH_CENTRES,
+  SEPHIRAH_CENTERS,
   sephirahWedges,
   TREE_GEOMETRY,
 } from "./treeOfLifeFigure.tsx";
@@ -329,8 +329,8 @@ export function TreeOfLifeSvg({
    * colour, so in that scale it is left out (below).
    */
   const sphere = (i: number): TreeSephirah => ({
-    x: SEPHIRAH_CENTRES[i].x,
-    y: SEPHIRAH_CENTRES[i].y,
+    x: SEPHIRAH_CENTERS[i].x,
+    y: SEPHIRAH_CENTERS[i].y,
     data: _sephirot[i],
     // Every sphere but Da'at is coloured in both scales (magick-data).
     color: _sephirot[i].color[color] as string,

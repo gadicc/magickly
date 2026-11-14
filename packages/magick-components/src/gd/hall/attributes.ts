@@ -154,5 +154,5 @@ export function clamp(value: number, min: number, max: number): number {
  * resolver, the placeholder estimate and the editor's rows share.
  */
 export function placedByAt(node: HallNode): boolean {
-  return enumAttr(node, "at", [...HALL_POINTS, "center"]) !== undefined;
+  return enumAttr(node, "at", [...HALL_POINTS, "centre"]) !== undefined;
 }

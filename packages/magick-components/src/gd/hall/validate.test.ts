@@ -1,3 +1,5 @@
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { defaultHallArt } from "./art/index.ts";
 import {
@@ -12,12 +14,15 @@ import {
   readString,
   stringAttr,
 } from "./attributes.ts";
+import { GdHall } from "./GdHall.tsx";
 import { HEBREW_LETTER_SPELLINGS, hebrewLetter } from "./hebrewLetters.ts";
 import { hallArtKey, hallTagSpec, itemKindKnown } from "./spec.ts";
 import type { HallArt, HallAttrSpec, HallNode } from "./types.ts";
 import { validateHall } from "./validate.ts";
 import {
+  hallColor,
   hallPoint,
+  hallSpellingAlias,
   MAX_HALL_DEPTH,
   MAX_HALL_NODES,
   RESERVED_ATTRIBUTES,
@@ -91,12 +96,42 @@ describe("attribute readers", () => {
   });
 });
 
+describe("the hall's other spellings", () => {
+  it("takes centre and grey as center and gray, without a warning", () => {
+    const hall = (at: string, fill: string): HallNode => ({
+      type: "gdHall",
+      children: [
+        {
+          type: "floor",
+          children: [
+            { type: "altar", at },
+            { type: "item", kind: "triangle", at, anchor: at, fill },
+          ],
+        },
+      ],
+    });
+    expect(validateHall(hall("centre", "grey"))).toEqual([]);
+    expect(validateHall(hall("center", "gray"))).toEqual([]);
+    const draw = (node: HallNode) =>
+      renderToStaticMarkup(createElement(GdHall, { hall: node }));
+    expect(draw(hall("centre", "grey"))).toBe(draw(hall("center", "gray")));
+    expect(draw(hall("center", "gray"))).toContain("#888888");
+  });
+});
+
 describe("vocabulary helpers", () => {
   it("names roles and normalises points", () => {
     expect(roleName("pastHierophant")).toBe("Past Hierophant");
     expect(roleName("candidateOfTheNight")).toBe("Candidate Of The Night");
     expect(roleName("constructor")).toBe("Constructor");
-    expect(hallPoint("center")).toBe("centre");
+    expect(hallPoint("centre")).toBe("center");
+    expect(hallPoint("center")).toBe("center");
+    expect(hallColor("grey")).toBe("gray");
+    expect(hallColor("red")).toBe("red");
+    expect(hallColor(undefined)).toBeUndefined();
+    expect(hallSpellingAlias("centre")).toBe(true);
+    expect(hallSpellingAlias("grey")).toBe(true);
+    expect(hallSpellingAlias("center")).toBe(false);
     expect(hallPoint("north")).toBe("north");
     expect(hallPoint(undefined)).toBeUndefined();
   });
@@ -233,7 +268,7 @@ describe("validateHall", () => {
       ["warning", "unknown tag unicorn; drawn as a placeholder"],
       [
         "error",
-        'altar: at="middle" is not one of centre, north, south, east, west, northEast, northWest, southEast, southWest, center',
+        'altar: at="middle" is not one of center, north, south, east, west, northEast, northWest, southEast, southWest, centre',
       ],
       ["warning", "altar: unknown attribute colour"],
       ["error", 'pillar: kind="grey" is not one of black, white'],
@@ -327,7 +362,7 @@ describe("validateHall", () => {
           Component: () => null,
           box: { width: 1, height: 1 },
           variant: () => "",
-          provenance: { origin: "thirdParty", author: "?", licence: "?" },
+          provenance: { origin: "thirdParty", author: "?", license: "?" },
         },
       ],
       [
@@ -342,7 +377,7 @@ describe("validateHall", () => {
           provenance: {
             origin: "original",
             author: "Gadi Cohen",
-            licence: "MIT",
+            license: "MIT",
           },
         },
       ],
@@ -352,7 +387,7 @@ describe("validateHall", () => {
           Component: () => null,
           box: { width: 1, height: 1 },
           variant: () => "",
-          provenance: { origin: "original", author: "x", licence: "MIT" },
+          provenance: { origin: "original", author: "x", license: "MIT" },
         },
       ],
       [
@@ -361,7 +396,7 @@ describe("validateHall", () => {
           Component: () => null,
           box: { width: 1, height: 1 },
           variant: () => "",
-          provenance: { origin: "original", author: "x", licence: "MIT" },
+          provenance: { origin: "original", author: "x", license: "MIT" },
         },
       ],
     ]);
@@ -393,7 +428,7 @@ describe("validateHall", () => {
       box: { width: 1, height: 1 },
       attributes: new Map(attributes),
       variant: () => "",
-      provenance: { origin: "original", author: "x", licence: "MIT" },
+      provenance: { origin: "original", author: "x", license: "MIT" },
     });
     const art = new Map<string, HallArt>([
       ["item:lamp", declares([["glow", { kind: "boolean" }]])],
@@ -624,7 +659,7 @@ describe("validateHall", () => {
               Component: () => null,
               box: { width: 1, height: 1 },
               variant: () => "",
-              provenance: { origin: "original", author: "x", licence: "MIT" },
+              provenance: { origin: "original", author: "x", license: "MIT" },
             },
           ],
         ]),

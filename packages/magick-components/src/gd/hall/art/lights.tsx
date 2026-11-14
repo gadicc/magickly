@@ -5,7 +5,7 @@ import type {
   HallAttrSpec,
   HallNode,
 } from "../types.ts";
-import { LIGHT_COLOURS, type LightColour } from "../vocabulary.ts";
+import { LIGHT_COLORS, type LightColor } from "../vocabulary.ts";
 import { pathPoint } from "./geometry.ts";
 import {
   HIGHLIGHT,
@@ -15,7 +15,7 @@ import {
   PALETTE,
 } from "./shared.ts";
 
-const GLASS: ReadonlyMap<LightColour, string> = new Map([
+const GLASS: ReadonlyMap<LightColor, string> = new Map([
   ["red", PALETTE.glassRed],
   ["yellow", PALETTE.glassYellow],
   ["white", PALETTE.glassWhite],
@@ -26,17 +26,17 @@ const GLASS: ReadonlyMap<LightColour, string> = new Map([
  * red, a lantern yellow). Halls written before stage H named the glass
  * with `fill`, which still counts when it is one of the light colours.
  */
-export function lightColour(node: HallNode, fallback: LightColour) {
+export function lightColor(node: HallNode, fallback: LightColor) {
   return (
-    enumAttr(node, "light", LIGHT_COLOURS) ??
-    enumAttr(node, "fill", LIGHT_COLOURS) ??
+    enumAttr(node, "light", LIGHT_COLORS) ??
+    enumAttr(node, "fill", LIGHT_COLORS) ??
     fallback
   );
 }
 
 /** The attribute the lamp and the lantern add to an item's. */
 const LIGHT_ATTRIBUTES: ReadonlyMap<string, HallAttrSpec> = new Map([
-  ["light", { kind: "enum", values: LIGHT_COLOURS }],
+  ["light", { kind: "enum", values: LIGHT_COLORS }],
 ]);
 
 export const provenance = original(
@@ -105,14 +105,14 @@ function Lantern({ glass }: { glass: string }) {
  * tall, a lantern yellow and 2.38), and saved halls and the presets name
  * both. `light` picks the colour of either.
  */
-const lightArt = (fallback: LightColour): HallArt => {
+const lightArt = (fallback: LightColor): HallArt => {
   const glassOf = (node: HallNode) =>
-    GLASS.get(lightColour(node, fallback)) as string;
+    GLASS.get(lightColor(node, fallback)) as string;
   return {
     Component: ({ node }: HallArtProps) => <Lantern glass={glassOf(node)} />,
     box: { width: 60.09, height: 100 },
     attributes: LIGHT_ATTRIBUTES,
-    variant: (node) => lightColour(node, fallback),
+    variant: (node) => lightColor(node, fallback),
     provenance,
   };
 };

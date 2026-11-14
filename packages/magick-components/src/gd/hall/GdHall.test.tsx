@@ -262,7 +262,7 @@ describe("GdHall", () => {
       Component: () => <circle r={10} data-art="cup" />,
       box: { width: 20, height: 20 },
       variant: () => "",
-      provenance: { origin: "thirdParty", author: "test", licence: "test" },
+      provenance: { origin: "thirdParty", author: "test", license: "test" },
     };
     const markup = render(hall({}, floor({ type: "item", kind: "cup" })), {
       art: new Map([...defaultHallArt, ["item:cup", cup]]),
@@ -451,7 +451,7 @@ describe("art provenance", () => {
   it("ships only original MIT art in the package", () => {
     for (const [kind, art] of defaultHallArt) {
       expect(art.provenance.origin, kind).toBe("original");
-      expect(art.provenance.licence, kind).toBe("MIT");
+      expect(art.provenance.license, kind).toBe("MIT");
       expect(art.provenance.author, kind).toContain("Gadi Cohen");
     }
   });

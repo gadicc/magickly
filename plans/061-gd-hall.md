@@ -281,9 +281,12 @@ gdHall(dais=4, wall="gradient")
 - **Hosts** (`altar`, `platform`, `throne`, `board`) give their children a
   frame whose origin is the host's centre, in the host's unscaled squares. The
   children scale and move with the host.
-- **`at`** works in every frame: `centre`, `north`, `south`, `east`, `west`
+- **`at`** works in every frame: `center`, `north`, `south`, `east`, `west`
   and the four corners name a point on the parent's box (on the floor, the
   floor's centre and walls). With `at`, x and y are offsets from that point.
+  (`centre` until plan 080's API before publishing, 14 November 2026: the
+  vocabulary now spells it `center`, and `gray` for `grey`, and still reads
+  the old spellings wherever a hall holds them.)
 - **Anchor**: an object's centre by default; `anchor` overrides it.
 - **Scale and cells** (settled 17–18 October 2026): `scale=1` gives an
   object a cell of 2 × 2 squares. Its art fills the cell, aspect kept, or

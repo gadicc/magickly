@@ -51,8 +51,8 @@ describe("the pantacle", () => {
     const anticlockwise = [...clockwise].reverse().join("");
     expect(clockwise).toContain("SAPEREAUDE");
     expect(anticlockwise).toBe("פרתצפוןפורלאךארץEDUAEREPASאדניאוריאלכרוב");
-    for (const colour of ["#a9aa66", "#444f41", "#2c2b29", "#8f5642"])
-      expect(markup).toContain(`fill="${colour}"`);
+    for (const color of ["#a9aa66", "#444f41", "#2c2b29", "#8f5642"])
+      expect(markup).toContain(`fill="${color}"`);
   });
 
   it("draws each letter alone, so every renderer keeps their order", () => {

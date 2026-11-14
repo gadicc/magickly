@@ -102,11 +102,11 @@ export function smoothPath(
  * The point `r` from `centre` at `degrees`, measured clockwise from East
  * on the screen (y down).
  */
-export function polar(r: number, degrees: number, centre: Point = [0, 0]) {
+export function polar(r: number, degrees: number, center: Point = [0, 0]) {
   const angle = (degrees * Math.PI) / 180;
   return [
-    centre[0] + r * Math.cos(angle),
-    centre[1] + r * Math.sin(angle),
+    center[0] + r * Math.cos(angle),
+    center[1] + r * Math.sin(angle),
   ] as const;
 }
 

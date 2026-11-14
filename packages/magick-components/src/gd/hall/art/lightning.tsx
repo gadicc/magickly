@@ -1,6 +1,6 @@
 import { enumAttr } from "../attributes.ts";
 import type { HallArt, HallArtProps, HallNode } from "../types.ts";
-import { HALL_COLOURS } from "../vocabulary.ts";
+import { HALL_COLOR_NAMES, HALL_COLORS, hallColor } from "../vocabulary.ts";
 import { points } from "./geometry.ts";
 import { original, PALETTE, variantOf } from "./shared.ts";
 
@@ -24,12 +24,10 @@ const ZIGZAG: readonly (readonly [number, number])[] = [
   [1.4, 40.2],
 ];
 
-const COLOUR_NAMES = [...HALL_COLOURS.keys()];
-
 /** `stroke` names a colour, so the flash shows on the black altar too. */
 const inkOf = (node: HallNode) => {
-  const name = enumAttr(node, "stroke", COLOUR_NAMES);
-  return name === undefined ? PALETTE.ink : (HALL_COLOURS.get(name) as string);
+  const name = hallColor(enumAttr(node, "stroke", HALL_COLOR_NAMES));
+  return name === undefined ? PALETTE.ink : (HALL_COLORS.get(name) as string);
 };
 
 function Lightning({ node }: HallArtProps) {
