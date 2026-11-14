@@ -1,22 +1,21 @@
 import {
-  type Rect,
+  type HallArtRegistry,
+  type HallNode,
+  type HallRect,
   type ResolvedDoor,
   type ResolvedHall,
   type ResolvedObject,
   resolveHall,
-} from "magick-components/gd/hall/layout";
-import { PLANET_NAMES, type Planet } from "magick-components/gd/hall/planets";
-import type {
-  HallArtRegistry,
-  HallNode,
-} from "magick-components/gd/hall/types";
+} from "magick-components/gd/hall";
 import {
   BOARD_NAMES,
   type BoardKind,
   CARD_TITLES,
   type CardKind,
+  HALL_PLANET_NAMES,
+  type HallPlanet,
   roleName,
-} from "magick-components/gd/hall/vocabulary";
+} from "magick-components/gd/hall/editor";
 import {
   hasGradeLamen,
   LAMEN_GRADE_NAMES,
@@ -167,7 +166,7 @@ export function hallNodeName(node: HallElement): string {
     return title ? `Card: ${title}` : "Card";
   }
   if (tag === "kamea" || tag === "seal") {
-    const planet = PLANET_NAMES.get(text(node, "planet") as Planet);
+    const planet = HALL_PLANET_NAMES.get(text(node, "planet") as HallPlanet);
     const name = tag === "kamea" ? "Kamea" : "Seals";
     return planet ? `${name} of ${planet}` : name;
   }
@@ -227,7 +226,7 @@ export interface RowDragPreview {
    */
   preview: HallElement;
   /** Where the dragged child lands: the insertion mark. */
-  slot: Rect;
+  slot: HallRect;
 }
 
 /**

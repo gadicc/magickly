@@ -1,5 +1,4 @@
-import type { HallNode } from "magick-components/gd/hall/types";
-import { validateHall } from "magick-components/gd/hall/validate";
+import { type HallNode, validateHall } from "magick-components/gd/hall";
 import { gdHallArt } from "@/app/gd/halls/art";
 
 /**

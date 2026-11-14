@@ -196,7 +196,7 @@ export const DEFAULT_SCALES: ReadonlyMap<string, number> = new Map([
 export const PLACEHOLDER_BOX: HallArtBox = { width: 100, height: 100 };
 
 /** An axis-aligned rectangle in floor squares. */
-export interface Rect {
+export interface HallRect {
   x0: number;
   y0: number;
   x1: number;
@@ -208,7 +208,7 @@ export interface ResolvedLabel {
   lines: readonly { text: string; x: number; y: number }[];
   size: number;
   anchor: "start" | "middle" | "end";
-  bounds: Rect;
+  bounds: HallRect;
 }
 
 /** A placed object: its art, centre, scale and labels. */
@@ -282,14 +282,14 @@ export interface ResolvedHall {
   dais: number;
   wall: "plain" | "gradient";
   /** The outer wall line (centre of its stroke). */
-  outer: Rect;
+  outer: HallRect;
   doors: readonly ResolvedDoor[];
   objects: readonly ResolvedObject[];
   compass: readonly ResolvedCompassLabel[];
   caption?: ResolvedLabel;
   captionText?: string;
   labelSize: number;
-  viewBox: Rect;
+  viewBox: HallRect;
   /** What the layout had to cut, which the validator reports. */
   cuts: ResolvedCuts;
 }
@@ -316,7 +316,7 @@ interface Frame {
   /** Floor squares per frame unit. */
   unit: number;
   /** The parent's box in frame units, for `at`. */
-  box: Rect;
+  box: HallRect;
 }
 
 type Context = "floor" | "dais";
@@ -348,7 +348,7 @@ interface PreparedLabel {
   pos: LabelPosition;
 }
 
-const point = (box: Rect, name: HallPoint): [number, number] => {
+const point = (box: HallRect, name: HallPoint): [number, number] => {
   const [fx, fy] = HALL_POINT_OFFSETS.get(name) as readonly [number, number];
   return [
     (box.x0 + box.x1) / 2 + (fx * (box.x1 - box.x0)) / 2,
@@ -356,7 +356,7 @@ const point = (box: Rect, name: HallPoint): [number, number] => {
   ];
 };
 
-const union = (a: Rect, b: Rect): Rect => ({
+const union = (a: HallRect, b: HallRect): HallRect => ({
   x0: Math.min(a.x0, b.x0),
   y0: Math.min(a.y0, b.y0),
   x1: Math.max(a.x1, b.x1),
@@ -364,7 +364,7 @@ const union = (a: Rect, b: Rect): Rect => ({
 });
 
 /** The box a compass word's letters fill, in floor squares. */
-export function compassBox(label: ResolvedCompassLabel): Rect {
+export function compassBox(label: ResolvedCompassLabel): HallRect {
   const width = compassFont.width(label.text, label.size);
   const up = compassFont.top * label.size;
   const down = compassFont.bottom * label.size;
@@ -398,7 +398,7 @@ export function compassBox(label: ResolvedCompassLabel): Rect {
  */
 function clearOf(
   label: ResolvedCompassLabel,
-  rects: readonly Rect[],
+  rects: readonly HallRect[],
 ): ResolvedCompassLabel {
   const box = compassBox(label);
   // Distances outward from the floor along the label's side, and the span
@@ -409,14 +409,14 @@ function clearOf(
     North: { sign: -1, along: "x", across: "y" },
     South: { sign: 1, along: "x", across: "y" },
   }[label.text];
-  const out = (rect: Rect) => {
+  const out = (rect: HallRect) => {
     const lo = side.along === "x" ? rect.x0 : rect.y0;
     const hi = side.along === "x" ? rect.x1 : rect.y1;
     return side.sign > 0 ? [lo, hi] : [-hi, -lo];
   };
   const [start, end] = out(box);
   const depth = end - start;
-  const across = (rect: Rect) =>
+  const across = (rect: HallRect) =>
     side.across === "x" ? [rect.x0, rect.x1] : [rect.y0, rect.y1];
   const [c0, c1] = across(box);
   const inTheWay = rects
@@ -463,7 +463,7 @@ const textHeight = (lines: number, size: number) =>
       (lines - 1) * size * LINE_HEIGHT;
 
 /** Lays out the lines of a label around an object's box. */
-function placeLabel(label: PreparedLabel, object: Rect): ResolvedLabel {
+function placeLabel(label: PreparedLabel, object: HallRect): ResolvedLabel {
   const { lines, size, pos } = label;
   const advance = size * LINE_HEIGHT;
   const cx = (object.x0 + object.x1) / 2;
@@ -509,7 +509,7 @@ function placeLabel(label: PreparedLabel, object: Rect): ResolvedLabel {
  */
 function placeLabels(
   labels: readonly PreparedLabel[],
-  object: Rect,
+  object: HallRect,
 ): ResolvedLabel[] {
   const edge = { ...object };
   return labels.map((label) => {
@@ -551,7 +551,7 @@ function placeInner(lines: TextLine[], size: number, cx: number, cy: number) {
 /** Lays out a free label's lines centred in its own box. */
 function placeText(
   text: { lines: TextLine[]; size: number },
-  box: Rect,
+  box: HallRect,
 ): ResolvedLabel {
   const x = (box.x0 + box.x1) / 2;
   const first = box.y0 + labelFont.top * text.size;
@@ -584,13 +584,13 @@ export function resolveHall(
   const labelSize = clamp(numberAttr(hall, "labelSize") ?? LABEL_SIZE, 0.05, 4);
 
   const eastWall = -Math.max(dais, WALL_GAP);
-  const outer: Rect = {
+  const outer: HallRect = {
     x0: -WALL_GAP,
     y0: eastWall,
     x1: FLOOR_SIZE + WALL_GAP,
     y1: FLOOR_SIZE + WALL_GAP,
   };
-  const floorBox: Rect = { x0: 0, y0: 0, x1: FLOOR_SIZE, y1: FLOOR_SIZE };
+  const floorBox: HallRect = { x0: 0, y0: 0, x1: FLOOR_SIZE, y1: FLOOR_SIZE };
   const floorFrame: Frame = { ox: 0, oy: 0, unit: 1, box: floorBox };
 
   // The validator's walk decides which nodes are inside the node and depth
@@ -822,7 +822,7 @@ export function resolveHall(
     const unit = frame.unit * fit;
     const width = item.w * unit;
     const height = item.h * unit;
-    const rect: Rect = {
+    const rect: HallRect = {
       x0: cx - width / 2,
       y0: cy - height / 2,
       x1: cx + width / 2,
@@ -1034,7 +1034,7 @@ export function resolveHall(
     // included: a side label taller than a banner, or a label wider than
     // the banner it is under in a North or South row, reaches across.
     const reach = (item: Prepared, side: "before" | "after") => {
-      const box: Rect = {
+      const box: HallRect = {
         x0: -item.w / 2,
         y0: -item.h / 2,
         x1: item.w / 2,
@@ -1092,7 +1092,7 @@ export function resolveHall(
   }
 
   // Bounds: the walls, every object and label, then the caption below.
-  let bounds: Rect = {
+  let bounds: HallRect = {
     x0: outer.x0 - WALL_STROKE / 2,
     y0: outer.y0 - WALL_STROKE / 2,
     x1: outer.x1 + WALL_STROKE / 2,
@@ -1137,7 +1137,7 @@ export function resolveHall(
   const south = side("marginSouth");
   const east = side("marginEast");
   const west = side("marginWest");
-  const viewBox: Rect = {
+  const viewBox: HallRect = {
     x0: north === undefined ? bounds.x0 - padding : outer.x0 - north,
     x1: south === undefined ? bounds.x1 + padding : outer.x1 + south,
     y0: east === undefined ? bounds.y0 - padding : outer.y0 - east,

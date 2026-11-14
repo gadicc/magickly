@@ -93,26 +93,18 @@ exports only its component. Their helpers live in modules of their own
 
 ## The entry points
 
-Each is a subpath of the package; there is no barrel, so a page pays only
-for what it imports.
+Each is a subpath of the package; there is no root entry. Most subpaths
+are one module, and `gd/hall` gathers the hall's: its exports come from
+several modules, and the package declares no side effects but its CSS,
+so a bundler takes from it only the modules whose exports a page uses.
 
 | Subpath | What it is |
 | --- | --- |
 | `kabbalah/TreeOfLife` | The Tree of Life, its spheres labelled from any field of magick-data's sephirot, in the Queen or King scale, with the Hermetic or the Hebrew letters on its paths |
 | `kabbalah/fieldPath` | `readFieldPath()`, which reads a dotted field path (`planet.name.en.en`, `stones.*.name.en`) from a row, as the Tree's labels do |
 | `gd/GradeTree` | The Tree as the map of the Golden Dawn's grades |
-| `gd/hall` | `GdHall`, a Golden Dawn temple hall drawn from a hall description, with its layout, validation, description and art |
+| `gd/hall` | `GdHall` (also the default export), a Golden Dawn temple hall drawn from a hall description, and what a page needs to draw, check or describe one: the description's types, `validateHall()`, `describeHall()`, `estimateHallAspect()`, `GdHallSvg` and the layout it draws, the default art and the fonts |
 | `gd/hall/presets` | The halls of the grades, Neophyte to Philosophus and the Portal, as descriptions `GdHall` draws |
-| `gd/hall/GdHall` | `GdHall` and `GdHallSvg` alone |
-| `gd/hall/aspect` | A hall's proportions without laying it out, which a page sizes its frame by before the drawing loads |
-| `gd/hall/attributes` | Reading and checking a hall node's attributes |
-| `gd/hall/describe` | A hall in words: its stations and objects |
-| `gd/hall/layout` | `resolveHall()`, which places a hall's objects and labels |
-| `gd/hall/planets` | The planets a hall's kameas and seals name |
-| `gd/hall/spec` | What the validator and the layout share: each tag's specification, where it may stand, and the size limits |
-| `gd/hall/types` | The hall's types |
-| `gd/hall/validate` | `validateHall()`, the warnings for a hall description |
-| `gd/hall/vocabulary` | The kinds of hall object and the names they take |
 | `gd/Lamen` | An officer's lamen |
 | `gd/lamenGrades` | Which grades' lamens each officer wears |
 | `gd/RoseSigil` | The rose-cross sigil of a Hebrew text, optimised and drawn on in the browser (`"use client"`) |
@@ -134,6 +126,12 @@ for what it imports.
 | `astrology/planetName` | A planet's name as readers search for it: "Sun (Sol)", "Mercury" |
 | `hooks/useHydrated` | `useHydrated()`: false on the server and while hydrating, true after |
 | `fonts/*` | The hall's fonts and `gd-hall.css` ([below](#the-halls-fonts)) |
+
+### Not stable
+
+| Subpath | What it is |
+| --- | --- |
+| `gd/hall/editor` | The toolkit of magick.ly's hall editor: the hall vocabulary, the attribute readers and the layout's measures that the editor reads beyond `gd/hall`. It serves that editor and may change in any release, a patch included |
 
 ## The Tree on your page
 

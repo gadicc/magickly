@@ -52,17 +52,8 @@
     "./enochian/Tablet": "./src/enochian/Tablet.tsx",
     "./gd/GradeTree": "./src/gd/GradeTree.tsx",
     "./gd/hall": "./src/gd/hall/index.ts",
-    "./gd/hall/aspect": "./src/gd/hall/aspect.ts",
-    "./gd/hall/attributes": "./src/gd/hall/attributes.ts",
-    "./gd/hall/describe": "./src/gd/hall/describe.ts",
-    "./gd/hall/GdHall": "./src/gd/hall/GdHall.tsx",
-    "./gd/hall/layout": "./src/gd/hall/layout.ts",
-    "./gd/hall/planets": "./src/gd/hall/planets.ts",
+    "./gd/hall/editor": "./src/gd/hall/editor.ts",
     "./gd/hall/presets": "./src/gd/hall/presets/index.ts",
-    "./gd/hall/spec": "./src/gd/hall/spec.ts",
-    "./gd/hall/types": "./src/gd/hall/types.ts",
-    "./gd/hall/validate": "./src/gd/hall/validate.ts",
-    "./gd/hall/vocabulary": "./src/gd/hall/vocabulary.ts",
     "./gd/Lamen": "./src/gd/Lamen.tsx",
     "./gd/lamenGrades": "./src/gd/lamenGrades.ts",
     "./gd/RoseSigil": "./src/gd/RoseSigil.tsx",
@@ -127,49 +118,13 @@
         "types": "./lib/gd/hall/index.d.ts",
         "default": "./lib/gd/hall/index.js"
       },
-      "./gd/hall/aspect": {
-        "types": "./lib/gd/hall/aspect.d.ts",
-        "default": "./lib/gd/hall/aspect.js"
-      },
-      "./gd/hall/attributes": {
-        "types": "./lib/gd/hall/attributes.d.ts",
-        "default": "./lib/gd/hall/attributes.js"
-      },
-      "./gd/hall/describe": {
-        "types": "./lib/gd/hall/describe.d.ts",
-        "default": "./lib/gd/hall/describe.js"
-      },
-      "./gd/hall/GdHall": {
-        "types": "./lib/gd/hall/GdHall.d.ts",
-        "default": "./lib/gd/hall/GdHall.js"
-      },
-      "./gd/hall/layout": {
-        "types": "./lib/gd/hall/layout.d.ts",
-        "default": "./lib/gd/hall/layout.js"
-      },
-      "./gd/hall/planets": {
-        "types": "./lib/gd/hall/planets.d.ts",
-        "default": "./lib/gd/hall/planets.js"
+      "./gd/hall/editor": {
+        "types": "./lib/gd/hall/editor.d.ts",
+        "default": "./lib/gd/hall/editor.js"
       },
       "./gd/hall/presets": {
         "types": "./lib/gd/hall/presets/index.d.ts",
         "default": "./lib/gd/hall/presets/index.js"
-      },
-      "./gd/hall/spec": {
-        "types": "./lib/gd/hall/spec.d.ts",
-        "default": "./lib/gd/hall/spec.js"
-      },
-      "./gd/hall/types": {
-        "types": "./lib/gd/hall/types.d.ts",
-        "default": "./lib/gd/hall/types.js"
-      },
-      "./gd/hall/validate": {
-        "types": "./lib/gd/hall/validate.d.ts",
-        "default": "./lib/gd/hall/validate.js"
-      },
-      "./gd/hall/vocabulary": {
-        "types": "./lib/gd/hall/vocabulary.d.ts",
-        "default": "./lib/gd/hall/vocabulary.js"
       },
       "./gd/Lamen": {
         "types": "./lib/gd/Lamen.d.ts",

@@ -6,7 +6,7 @@ import {
   type HallNode,
   validateHall,
 } from "magick-components/gd/hall";
-import { HALL_ROLES } from "magick-components/gd/hall/vocabulary";
+import { HALL_ROLES } from "magick-components/gd/hall/editor";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { gdHallArt } from "./art";

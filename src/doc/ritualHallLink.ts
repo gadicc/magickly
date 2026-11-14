@@ -1,6 +1,6 @@
 "use client";
 
-import type { HallArtRegistry } from "magick-components/gd/hall/types";
+import type { HallArtRegistry } from "magick-components/gd/hall";
 import {
   createContext,
   useCallback,

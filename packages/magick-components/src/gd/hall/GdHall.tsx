@@ -478,3 +478,5 @@ export function GdHall({
     />
   );
 }
+
+export default GdHall;

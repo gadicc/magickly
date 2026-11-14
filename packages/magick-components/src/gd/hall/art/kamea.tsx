@@ -4,10 +4,10 @@ import { enumAttr } from "../attributes.ts";
 import { GD_HALL_FONT_STACKS } from "../fonts.ts";
 import { wrapText } from "../labels.ts";
 import {
-  KAMEA_PLANET_IDS,
-  PLANET_NAMES,
-  PLANETS,
-  type Planet,
+  HALL_KAMEA_PLANET_IDS,
+  HALL_PLANET_NAMES,
+  HALL_PLANETS,
+  type HallPlanet,
 } from "../planets.ts";
 import type {
   HallArt,
@@ -29,10 +29,10 @@ export { sealProvenance };
 export const provenance = [kameaProvenance, sealProvenance];
 
 /** `planet`: one of the seven. */
-export const PLANET_SPEC: HallAttrSpec = { kind: "enum", values: PLANETS };
+export const PLANET_SPEC: HallAttrSpec = { kind: "enum", values: HALL_PLANETS };
 
-const planetOf = (node: HallNode): Planet | undefined =>
-  enumAttr(node, "planet", PLANETS);
+const planetOf = (node: HallNode): HallPlanet | undefined =>
+  enumAttr(node, "planet", HALL_PLANETS);
 
 /**
  * The shared `KameaFigure` in the hall's fonts and palette. Its square is
@@ -42,7 +42,7 @@ function Kamea({ node }: HallArtProps) {
   const planet = planetOf(node);
   return (
     <KameaFigure
-      planet={planet && KAMEA_PLANET_IDS.get(planet)}
+      planet={planet && HALL_KAMEA_PLANET_IDS.get(planet)}
       fontFamily={GD_HALL_FONT_STACKS.serif}
       paper={PALETTE.paper}
       ink={PALETTE.ink}
@@ -71,7 +71,7 @@ function Seal({ node }: HallArtProps) {
   const planet = planetOf(node);
   const Drawn = planet && SEALS.get(planet);
   if (Drawn) return <Drawn />;
-  const name = planet && PLANET_NAMES.get(planet);
+  const name = planet && HALL_PLANET_NAMES.get(planet);
   const lines = name ? wrapText(`Seals of ${name}`, SEAL_WIDTH, SEAL_SIZE) : [];
   const advance = SEAL_SIZE * 1.2;
   const first = SEAL_SIZE * 0.36 - ((lines.length - 1) * advance) / 2;

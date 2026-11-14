@@ -460,7 +460,7 @@ try {
 import { renderToStaticMarkup } from "react-dom/server";
 const entries = ${JSON.stringify(entries)};
 // Types alone: it loads, and has nothing to export at run time.
-const typesOnly = ["./gd/hall/types"];
+const typesOnly = [];
 for (const entry of entries) {
   const module = await import("magick-components/" + entry.slice(2));
   if (Object.keys(module).length === 0 && !typesOnly.includes(entry))

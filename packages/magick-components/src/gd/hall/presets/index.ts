@@ -12,7 +12,6 @@ import type { HallPreset } from "./types.ts";
 import { zelator1, zelator2 } from "./zelator.ts";
 
 export {
-  dais,
   HALL_SOURCE_WORKS,
   type HallPreset,
   type HallPresetSource,

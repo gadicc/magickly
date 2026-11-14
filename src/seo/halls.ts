@@ -1,7 +1,4 @@
-import {
-  describeHall,
-  type HallDescription,
-} from "magick-components/gd/hall/describe";
+import { describeHall, type HallDescription } from "magick-components/gd/hall";
 import {
   HALL_SOURCE_WORKS,
   type HallPreset,

@@ -15,9 +15,7 @@ import type { ComponentName } from "./components";
 export const LIVE: Record<ComponentName, ComponentType<any>> = {
   TreeOfLife: dynamic(() => import("magick-components/kabbalah/TreeOfLife")),
   GradeTree: dynamic(() => import("magick-components/gd/GradeTree")),
-  GdHall: dynamic(() =>
-    import("magick-components/gd/hall/GdHall").then((module) => module.GdHall),
-  ),
+  GdHall: dynamic(() => import("magick-components/gd/hall")),
   Lamen: dynamic(() => import("magick-components/gd/Lamen")),
   RoseSigil: dynamic(() => import("magick-components/gd/RoseSigil")),
   SevenBranchedCandleStick: dynamic(

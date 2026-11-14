@@ -1,9 +1,9 @@
-import { readBoolean, readNumber } from "magick-components/gd/hall/attributes";
-import { hallTagSpec } from "magick-components/gd/hall/spec";
-import type {
-  HallArtRegistry,
-  HallNode,
-} from "magick-components/gd/hall/types";
+import type { HallArtRegistry, HallNode } from "magick-components/gd/hall";
+import {
+  hallTagSpec,
+  readBoolean,
+  readNumber,
+} from "magick-components/gd/hall/editor";
 import { gdHallRow } from "../gdHallRows";
 import type { JsonValue, RitualSemanticNode } from "../semantic";
 

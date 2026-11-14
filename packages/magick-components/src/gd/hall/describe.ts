@@ -7,7 +7,7 @@ import {
   type ResolvedObject,
   resolveHall,
 } from "./layout.ts";
-import { PLANET_NAMES, type Planet } from "./planets.ts";
+import { HALL_PLANET_NAMES, type HallPlanet } from "./planets.ts";
 import type { HallArtRegistry, HallNode } from "./types.ts";
 import {
   BOARD_NAMES,
@@ -73,7 +73,7 @@ const TABLET_NAMES: Record<string, string> = {
 function planetInWords(planet: unknown): string {
   if (planet === "moon") return "the Moon";
   if (planet === "sun") return "the Sun";
-  return PLANET_NAMES.get(planet as Planet) ?? "a planet";
+  return HALL_PLANET_NAMES.get(planet as HallPlanet) ?? "a planet";
 }
 
 /**

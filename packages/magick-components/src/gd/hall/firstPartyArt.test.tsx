@@ -7,7 +7,7 @@ import { TABLET_ELEMENTS, tabletArt } from "./art/symbols.tsx";
 import { romanNumeral, TRUMPS } from "./art/tarotKey.tsx";
 import { GD_HALL_FONT_STACKS } from "./fonts.ts";
 import { resolveHall } from "./layout.ts";
-import { KAMEA_PLANET_IDS, PLANETS } from "./planets.ts";
+import { HALL_KAMEA_PLANET_IDS, HALL_PLANETS } from "./planets.ts";
 import type { HallArt, HallArtProps, HallNode } from "./types.ts";
 import { validateHall } from "./validate.ts";
 import { CARD_KINDS, CARD_TITLES } from "./vocabulary.ts";
@@ -486,18 +486,18 @@ describe("the kameas and seals", () => {
   });
 
   it("draws the shared Kamea's figure, in the hall's font and palette", () => {
-    const figure = (planet?: (typeof PLANETS)[number]) =>
+    const figure = (planet?: (typeof HALL_PLANETS)[number]) =>
       renderToStaticMarkup(
         <svg aria-hidden="true">
           <KameaFigure
-            planet={planet && KAMEA_PLANET_IDS.get(planet)}
+            planet={planet && HALL_KAMEA_PLANET_IDS.get(planet)}
             fontFamily={GD_HALL_FONT_STACKS.serif}
             paper={PALETTE.paper}
             ink={PALETTE.ink}
           />
         </svg>,
       );
-    for (const planet of PLANETS)
+    for (const planet of HALL_PLANETS)
       expect(draw(art("kamea"), { type: "kamea", planet }), planet).toBe(
         figure(planet),
       );

@@ -1,4 +1,4 @@
-import { describeHall } from "magick-components/gd/hall/describe";
+import { describeHall } from "magick-components/gd/hall";
 import { hallPreset } from "magick-components/gd/hall/presets";
 import Data from "magick-data";
 import planets from "magick-data/astrology/planets";

@@ -43,7 +43,7 @@ describe("the explorer's components", () => {
       'import TreeOfLife from "magick-components/kabbalah/TreeOfLife";',
     );
     expect(importLine(explorerComponent("gd-hall")!)).toBe(
-      'import { GdHall } from "magick-components/gd/hall/GdHall";',
+      'import GdHall from "magick-components/gd/hall";',
     );
   });
 

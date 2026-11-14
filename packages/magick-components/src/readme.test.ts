@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
+import ts from "typescript";
 import { describe, expect, it } from "vitest";
 
 /**
@@ -28,6 +29,17 @@ describe("the README", () => {
   it("publishes the same entry points it develops with", () => {
     expect(Object.keys(manifest.publishConfig.exports).sort()).toEqual(
       Object.keys(manifest.exports).sort(),
+    );
+  });
+
+  it("builds every entry it publishes", () => {
+    const file = new URL("../tsconfig.build.json", import.meta.url).pathname;
+    const { config } = ts.readConfigFile(file, ts.sys.readFile);
+    const sources = Object.values(manifest.exports as Record<string, string>)
+      .filter((target) => target.startsWith("./src/"))
+      .map((target) => target.slice(2));
+    expect(sources.filter((source) => !config.files.includes(source))).toEqual(
+      [],
     );
   });
 

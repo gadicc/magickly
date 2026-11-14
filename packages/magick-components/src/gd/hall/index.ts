@@ -1,11 +1,15 @@
 /**
- * Golden Dawn temple-hall diagrams (plan 061): the hall model, its
- * validator, the layout resolver and the SVG renderer, with the package's
- * original art. MIT; see ../../LICENSE.txt.
+ * Golden Dawn temple halls (plan 061): `GdHall`, which draws a hall from
+ * a hall description, and what a page needs to draw, check or describe
+ * one: the types of the description, `validateHall`, `describeHall`,
+ * `estimateHallAspect`, the layout `GdHallSvg` draws from, the default
+ * art and the fonts. The presets are `magick-components/gd/hall/presets`;
+ * magick.ly's editor's toolkit is `magick-components/gd/hall/editor`,
+ * which is not stable. MIT; see ../../LICENSE.txt.
  */
 export { defaultHallArt } from "./art/index.ts";
 export { TABLET_ELEMENTS, tabletArt } from "./art/symbols.tsx";
-export { romanNumeral, TRUMPS } from "./art/tarotKey.tsx";
+export { estimateHallAspect } from "./aspect.ts";
 export {
   describeHall,
   type HallDescription,
@@ -23,6 +27,7 @@ export {
 } from "./fonts.ts";
 export {
   GdHall,
+  GdHall as default,
   type GdHallProps,
   GdHallSvg,
   type GdHallSvgProps,
@@ -30,10 +35,11 @@ export {
   hallRoot,
   hallViewBox,
 } from "./GdHall.tsx";
-export { labelFont, wrapText } from "./labels.ts";
 export {
-  DEFAULT_SCALES,
-  type Rect,
+  type HallRect,
+  type ResolvedCompassLabel,
+  type ResolvedCuts,
+  type ResolvedDoor,
   type ResolvedHall,
   type ResolvedLabel,
   type ResolvedObject,

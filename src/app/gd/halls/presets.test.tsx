@@ -1,17 +1,17 @@
 import {
+  estimateHallAspect,
   GdHall,
+  type HallRect,
   type ResolvedObject,
   resolveHall,
   validateHall,
 } from "magick-components/gd/hall";
-import { estimateHallAspect } from "magick-components/gd/hall/aspect";
 import {
   compassBox,
   FLOOR_SIZE,
   FLOOR_STROKE,
-  type Rect,
   WALL_GAP,
-} from "magick-components/gd/hall/layout";
+} from "magick-components/gd/hall/editor";
 import {
   HALL_PRESETS,
   HALL_SOURCE_WORKS,
@@ -186,7 +186,7 @@ describe.each([zelator1, zelator2].map((preset) => [preset.id, preset]))(
 
     it("overlaps nothing else: objects, labels or compass words", () => {
       const north = [tablet, lamp, salt];
-      const box = (rect: Rect) => ({
+      const box = (rect: HallRect) => ({
         north: rect.x0,
         south: rect.x1,
         east: rect.y0,

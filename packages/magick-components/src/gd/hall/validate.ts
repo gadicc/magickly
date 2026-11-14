@@ -7,7 +7,7 @@ import { enumAttr, numberAttr, readAttr } from "./attributes.ts";
 import { hebrewLetter } from "./hebrewLetters.ts";
 import { MAX_LABEL_LINES } from "./labels.ts";
 import { DEFAULT_DAIS, MAX_HALL_LABEL_LINES, resolveHall } from "./layout.ts";
-import { PLANETS } from "./planets.ts";
+import { HALL_PLANETS } from "./planets.ts";
 import { hallPlacement, hallTagSpec, itemKindKnown, walkHall } from "./spec.ts";
 import type {
   HallArtRegistry,
@@ -305,7 +305,7 @@ export function validateHall(
         break;
       case "kamea":
       case "seal":
-        if (nullChoice("planet", PLANETS)) break;
+        if (nullChoice("planet", HALL_PLANETS)) break;
         if (text("planet") === undefined)
           report(
             path,

@@ -14,8 +14,7 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import { estimateHallAspect } from "magick-components/gd/hall/aspect";
-import type { HallNode } from "magick-components/gd/hall/types";
+import { estimateHallAspect, type HallNode } from "magick-components/gd/hall";
 import React from "react";
 import { DARK_SELECTOR } from "@/colorScheme";
 import { GdHallFrame } from "@/doc/ritualBlocks/GdHallFrame";

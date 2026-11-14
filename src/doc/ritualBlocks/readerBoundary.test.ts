@@ -26,28 +26,98 @@ function resolveLocal(from: string, name: string): string | null {
   );
 }
 
+const parse = (file: string) =>
+  ts.createSourceFile(
+    file,
+    readFileSync(file, "utf8"),
+    ts.ScriptTarget.Latest,
+    true,
+  );
+
+/**
+ * Whether a file of magick-components does nothing but re-export, as
+ * `gd/hall`'s entry does. The package declares no side effects but its
+ * CSS, so a bundler takes from such a barrel only the modules whose
+ * exports are imported (webpack's `sideEffects`, Turbopack's tree
+ * shaking), and so does the graph below.
+ */
+function isBarrel(file: string, source: ts.SourceFile): boolean {
+  return (
+    relative(process.cwd(), file).startsWith("packages/magick-components/") &&
+    source.statements.every(
+      (statement) =>
+        ts.isExportDeclaration(statement) &&
+        statement.moduleSpecifier !== undefined &&
+        (statement.isTypeOnly ||
+          (statement.exportClause !== undefined &&
+            ts.isNamedExports(statement.exportClause))),
+    )
+  );
+}
+
+/**
+ * The names an import takes by value, or `undefined` when it takes the
+ * module whole (a default, a namespace or a bare import).
+ */
+function importedNames(node: ts.ImportDeclaration): string[] | undefined {
+  const clause = node.importClause;
+  if (!clause || clause.name) return undefined;
+  const bindings = clause.namedBindings;
+  if (!bindings || !ts.isNamedImports(bindings)) return undefined;
+  return bindings.elements
+    .filter((element) => !element.isTypeOnly)
+    .map((element) => (element.propertyName ?? element.name).text);
+}
+
 /**
  * The reader's import graph from `blocks.jsx`: what it loads up front
  * (`static`, type-only imports aside) and what only `import()` reaches
- * (`lazy`), with every specifier its files name.
+ * (`lazy`), with every specifier its files name. Named imports from a
+ * barrel of the package follow only the modules that export those names.
  */
 function readerGraph() {
   const graph = { static: new Set<string>(), lazy: new Set<string>() };
   const specifiers: { file: string; name: string }[] = [];
-  const inspect = (file: string, lazy: boolean) => {
+  const inspect = (
+    file: string,
+    lazy: boolean,
+    names: readonly string[] | undefined,
+  ) => {
+    const source = parse(file);
+    if (names !== undefined && isBarrel(file, source)) {
+      for (const statement of source.statements) {
+        if (
+          !ts.isExportDeclaration(statement) ||
+          statement.isTypeOnly ||
+          !statement.exportClause ||
+          !ts.isNamedExports(statement.exportClause)
+        )
+          continue;
+        const taken = statement.exportClause.elements
+          .filter(
+            (element) =>
+              !element.isTypeOnly && names.includes(element.name.text),
+          )
+          .map((element) => (element.propertyName ?? element.name).text);
+        if (taken.length === 0) continue;
+        const name = (statement.moduleSpecifier as ts.StringLiteral).text;
+        specifiers.push({ file, name });
+        const next = resolveLocal(file, name);
+        if (next) inspect(next, lazy, taken);
+      }
+      return;
+    }
     if (graph.static.has(file) || (lazy && graph.lazy.has(file))) return;
     graph.lazy.delete(file);
     (lazy ? graph.lazy : graph.static).add(file);
-    const source = ts.createSourceFile(
-      file,
-      readFileSync(file, "utf8"),
-      ts.ScriptTarget.Latest,
-      true,
-    );
-    const follow = (name: string, viaImport: boolean) => {
+    const follow = (
+      name: string,
+      viaImport: boolean,
+      imported?: readonly string[],
+    ) => {
       specifiers.push({ file, name });
       const next = resolveLocal(file, name);
-      if (next) inspect(next, lazy || viaImport);
+      if (next) inspect(next, lazy || viaImport, imported);
     };
     const visit = (node: ts.Node) => {
       if (
@@ -58,7 +128,12 @@ function readerGraph() {
         const typeOnly = ts.isImportDeclaration(node)
           ? node.importClause?.isTypeOnly === true
           : node.isTypeOnly;
-        if (!typeOnly) follow(node.moduleSpecifier.text, false);
+        if (!typeOnly)
+          follow(
+            node.moduleSpecifier.text,
+            false,
+            ts.isImportDeclaration(node) ? importedNames(node) : undefined,
+          );
       } else if (
         ts.isCallExpression(node) &&
         node.expression.kind === ts.SyntaxKind.ImportKeyword
@@ -74,7 +149,7 @@ function readerGraph() {
     };
     visit(source);
   };
-  inspect(resolve("src/doc/blocks.jsx"), false);
+  inspect(resolve("src/doc/blocks.jsx"), false, undefined);
   return { ...graph, specifiers };
 }
 

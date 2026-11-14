@@ -16,7 +16,7 @@ import {
   TextField,
   Tooltip,
 } from "@mui/material";
-import { GdHall } from "magick-components/gd/hall/GdHall";
+import { GdHall, type HallNode } from "magick-components/gd/hall";
 import {
   HALL_PRESETS,
   type HallPreset,
@@ -24,7 +24,6 @@ import {
   hallSourceText,
   hallSourceUrl,
 } from "magick-components/gd/hall/presets";
-import type { HallNode } from "magick-components/gd/hall/types";
 import React from "react";
 import { GdHallEditor } from "@/doc/gdHallEditor/GdHallEditor";
 import { type HallElement, hallRowOf } from "@/doc/gdHallEditor/hallModel";

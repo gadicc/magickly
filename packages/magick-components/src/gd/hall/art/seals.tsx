@@ -1,5 +1,5 @@
 import { svgCoordinate } from "../../../svgCoordinate.ts";
-import type { Planet } from "../planets.ts";
+import type { HallPlanet } from "../planets.ts";
 import type { Point } from "./geometry.ts";
 import { ITEM_DETAIL, ITEM_OUTLINE, PALETTE, publicDomain } from "./shared.ts";
 
@@ -202,7 +202,9 @@ function VenusSeal() {
 }
 
 /** The seals drawn so far, by planet; the others are a placeholder. */
-export const SEALS: ReadonlyMap<Planet, () => React.ReactElement> = new Map([
-  ["moon", MoonSeal],
-  ["venus", VenusSeal],
-]);
+export const SEALS: ReadonlyMap<HallPlanet, () => React.ReactElement> = new Map(
+  [
+    ["moon", MoonSeal],
+    ["venus", VenusSeal],
+  ],
+);

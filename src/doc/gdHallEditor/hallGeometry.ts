@@ -1,14 +1,13 @@
-import { clamp } from "magick-components/gd/hall/attributes";
-import {
-  FLOOR_SIZE,
-  type Rect,
-  type ResolvedHall,
-  type ResolvedObject,
-} from "magick-components/gd/hall/layout";
+import type {
+  HallRect,
+  ResolvedHall,
+  ResolvedObject,
+} from "magick-components/gd/hall";
 import {
   COORDINATE_RANGE,
+  FLOOR_SIZE,
   SCALE_RANGE,
-} from "magick-components/gd/hall/vocabulary";
+} from "magick-components/gd/hall/editor";
 import { noNegativeZero } from "./hallModel";
 
 /**
@@ -24,6 +23,10 @@ export interface Point {
   x: number;
   y: number;
 }
+
+/** Clamps to a range, as the hall's resolver does. */
+export const clamp = (value: number, min: number, max: number): number =>
+  Math.min(max, Math.max(min, value));
 
 /** Positions are written to two decimals (decision 4). */
 export const round2 = (value: number): number =>
@@ -163,7 +166,7 @@ export function moveDoor(
 export const MIN_HIT_SIZE = 0.6;
 
 /** An object's drawn box. */
-export function objectRect(object: ResolvedObject): Rect {
+export function objectRect(object: ResolvedObject): HallRect {
   return {
     x0: object.cx - object.width / 2,
     y0: object.cy - object.height / 2,
@@ -176,7 +179,7 @@ export function objectRect(object: ResolvedObject): Rect {
  * All an object draws: its box, its labels and its text, in one rect, so
  * that revealing it shows its name too (plan 063).
  */
-export function drawnRect(object: ResolvedObject): Rect {
+export function drawnRect(object: ResolvedObject): HallRect {
   return [
     ...object.labels.map((label) => label.bounds),
     ...(object.text ? [object.text.bounds] : []),
@@ -196,7 +199,7 @@ export function drawnRect(object: ResolvedObject): Rect {
  * Where a pointer hits an object: its box, at least `MIN_HIT_SIZE` across,
  * and its labels and text.
  */
-export function hitRects(object: ResolvedObject): Rect[] {
+export function hitRects(object: ResolvedObject): HallRect[] {
   const half = (size: number) => Math.max(size, MIN_HIT_SIZE) / 2;
   return [
     {
@@ -210,7 +213,7 @@ export function hitRects(object: ResolvedObject): Rect[] {
   ];
 }
 
-const inside = (rect: Rect, point: Point) =>
+const inside = (rect: HallRect, point: Point) =>
   point.x >= rect.x0 &&
   point.x <= rect.x1 &&
   point.y >= rect.y0 &&
@@ -222,8 +225,8 @@ export const DOOR_HIT_DEPTH = 0.45;
 /** Where a pointer hits a door: a band across its wall line. */
 export function doorRect(
   door: ResolvedHall["doors"][number],
-  outer: Rect,
-): Rect {
+  outer: HallRect,
+): HallRect {
   const line =
     door.side === "west"
       ? outer.y1
@@ -251,7 +254,7 @@ export interface HallHit {
  * draw over earlier ones, a host's children over the host); then doors.
  */
 export function hitTest(hall: ResolvedHall, point: Point): HallHit | null {
-  const at = (rects: readonly Rect[]) =>
+  const at = (rects: readonly HallRect[]) =>
     rects.some((rect) => inside(rect, point));
   for (let index = hall.objects.length - 1; index >= 0; index--) {
     const object = hall.objects[index];

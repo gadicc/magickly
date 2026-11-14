@@ -1,8 +1,7 @@
 "use client";
 
 import { CircularProgress, Typography } from "@mui/material";
-import { estimateHallAspect } from "magick-components/gd/hall/aspect";
-import type { HallNode } from "magick-components/gd/hall/types";
+import { estimateHallAspect, type HallNode } from "magick-components/gd/hall";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

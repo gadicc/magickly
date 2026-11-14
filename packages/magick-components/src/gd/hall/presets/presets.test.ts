@@ -3,12 +3,12 @@ import type { HallNode } from "../types.ts";
 import { validateHall } from "../validate.ts";
 import { RESERVED_ATTRIBUTES, RESERVED_TAGS } from "../vocabulary.ts";
 import {
-  dais,
   HALL_PRESETS,
   hallPreset,
   hallSourceText,
   hallSourceUrl,
 } from "./index.ts";
+import { dais } from "./types.ts";
 
 const nodes = (node: HallNode): HallNode[] => [
   node,

@@ -9,7 +9,7 @@ import {
   NodeViewWrapper,
   useEditorState,
 } from "@tiptap/react";
-import type { HallNode } from "magick-components/gd/hall/types";
+import type { HallNode } from "magick-components/gd/hall";
 import dynamic from "next/dynamic";
 import {
   Component,

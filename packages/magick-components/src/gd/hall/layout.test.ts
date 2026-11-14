@@ -13,12 +13,12 @@ import {
   COMPASS_GAP,
   COMPASS_SIZE,
   DEFAULT_SCALES,
+  type HallRect,
   LABEL_GAP,
   MARKER_TEXT_SCALE,
   MARKER_TEXT_WIDTH,
   MAX_HALL_LABEL_LINES,
   MIN_LABEL_WIDTH,
-  type Rect,
   type ResolvedObject,
   resolveHall,
   WALL_GAP,
@@ -815,7 +815,7 @@ describe("resolveHall: marker text", () => {
       lines.map((line) => line.text),
     );
     expect(marker.inner?.size).toBeCloseTo(size);
-    const bounds = marker.inner?.bounds as Rect;
+    const bounds = marker.inner?.bounds as HallRect;
     expect((bounds.x0 + bounds.x1) / 2).toBeCloseTo(8);
     expect(bounds.y0).toBeGreaterThan(marker.cy - marker.height / 2);
     expect(bounds.y1).toBeLessThan(marker.cy + marker.height / 2);

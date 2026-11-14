@@ -12,18 +12,18 @@ import {
   Switch,
   TextField,
 } from "@mui/material";
-import { hallTagSpec } from "magick-components/gd/hall/spec";
 import type {
   HallArtRegistry,
   HallAttrSpec,
   HallNode,
-} from "magick-components/gd/hall/types";
+} from "magick-components/gd/hall";
 import {
   BOARD_KINDS,
   HALL_ROLES,
+  hallTagSpec,
   LIGHT_KINDS,
   PLACEABLE_ATTRIBUTES,
-} from "magick-components/gd/hall/vocabulary";
+} from "magick-components/gd/hall/editor";
 import { GRADE_LAMEN_OFFICERS } from "magick-components/gd/lamenGrades";
 import {
   type KeyboardEvent,

@@ -1,17 +1,13 @@
-import { clamp } from "magick-components/gd/hall/attributes";
-import {
-  DEFAULT_SCALES,
-  type ResolvedHall,
-  type ResolvedObject,
-} from "magick-components/gd/hall/layout";
+import type { ResolvedHall, ResolvedObject } from "magick-components/gd/hall";
 import {
   COORDINATE_RANGE,
+  DEFAULT_SCALES,
   HALL_POINT_OFFSETS,
   hallPoint,
   SCALE_RANGE,
-} from "magick-components/gd/hall/vocabulary";
+} from "magick-components/gd/hall/editor";
 import { type HallSelectable, type HallView, hallNodeName } from "./hallEdits";
-import { objectRect, type Point, round2 } from "./hallGeometry";
+import { clamp, objectRect, type Point, round2 } from "./hallGeometry";
 import { HOST_TAKES, hostAccepts, isHost } from "./hallHostRules";
 import {
   ensureFloor,

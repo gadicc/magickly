@@ -5,14 +5,14 @@ import Check from "@mui/icons-material/Check";
 import Redo from "@mui/icons-material/Redo";
 import Undo from "@mui/icons-material/Undo";
 import { Button, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
-import { GdHall } from "magick-components/gd/hall/GdHall";
-import type { Rect } from "magick-components/gd/hall/layout";
-import { hallArtKey } from "magick-components/gd/hall/spec";
-import type {
-  HallArtRegistry,
-  HallNode,
-} from "magick-components/gd/hall/types";
-import { validateHall } from "magick-components/gd/hall/validate";
+import {
+  GdHall,
+  type HallArtRegistry,
+  type HallNode,
+  type HallRect,
+  validateHall,
+} from "magick-components/gd/hall";
+import { hallArtKey } from "magick-components/gd/hall/editor";
 import {
   type CSSProperties,
   type KeyboardEvent,
@@ -197,7 +197,7 @@ type Gesture = {
   /** Where the press began, in squares (a scale is measured from it). */
   start: Point;
   /** The drawing's view box when the press began, held for the gesture. */
-  box: Rect;
+  box: HallRect;
   /** CSS pixels per square at the start. */
   pixels: number;
   moved: boolean;
@@ -291,7 +291,7 @@ export function GdHallEditor({
   /** The node a running drag moves, for the host it would land on. */
   const [gestureNode, setGestureNode] = useState<string | null>(null);
   /** Where a row child being reordered will land, marked on the drawing. */
-  const [slot, setSlot] = useState<Rect | null>(null);
+  const [slot, setSlot] = useState<HallRect | null>(null);
   /** The palette group whose menu is open, and its button. */
   const [paletteAnchor, setPaletteAnchor] = useState<HTMLElement | null>(null);
   /** Kept as the menu closes, so its entries stay while it fades. */
@@ -330,7 +330,7 @@ export function GdHallEditor({
   /** The last hall sent, until the host echoes it back as `hall`. */
   const echo = useRef<HallElement | null>(null);
   /** The view box held while a gesture runs (the drawing does not rescale). */
-  const [heldBox, setHeldBox] = useState<Rect | null>(null);
+  const [heldBox, setHeldBox] = useState<HallRect | null>(null);
   /**
    * The palette's choice moves the focus to the drawing, not back to the
    * group's button.
@@ -615,7 +615,7 @@ export function GdHallEditor({
    */
   const gesturePreview = (
     current: Gesture,
-  ): { hall: HallElement; slot?: Rect } | null => {
+  ): { hall: HallElement; slot?: HallRect } | null => {
     if (current.kind === "move" && current.snap) {
       const base = currentView();
       if (!base.byId.has(current.id)) return null;
@@ -1444,7 +1444,7 @@ const scaled = (entry: HallSelectable, hall: HallElement) =>
  * percent of the frame: the whole frame when they agree, beyond it where
  * a drag has taken an object past the held view box.
  */
-const placeWithin = (drawn: Rect, frame: Rect): CSSProperties => {
+const placeWithin = (drawn: HallRect, frame: HallRect): CSSProperties => {
   const width = frame.x1 - frame.x0;
   const height = frame.y1 - frame.y0;
   return {
@@ -1456,7 +1456,7 @@ const placeWithin = (drawn: Rect, frame: Rect): CSSProperties => {
 };
 
 /** A square of `size` centred on a point, in squares. */
-const square = (cx: number, cy: number, size: number): Rect => ({
+const square = (cx: number, cy: number, size: number): HallRect => ({
   x0: cx - size / 2,
   y0: cy - size / 2,
   x1: cx + size / 2,
@@ -1464,7 +1464,13 @@ const square = (cx: number, cy: number, size: number): Rect => ({
 });
 
 /** A rectangle in squares, drawn in the overlay's user units. */
-function SquareRect({ rect, className }: { rect: Rect; className: string }) {
+function SquareRect({
+  rect,
+  className,
+}: {
+  rect: HallRect;
+  className: string;
+}) {
   return (
     <rect
       x={rect.x0 * UNIT}
@@ -1483,8 +1489,8 @@ function HitBox({
   className,
   corner,
 }: {
-  rect: Rect;
-  box: Rect;
+  rect: HallRect;
+  box: HallRect;
   className: string;
   corner?: string;
 }) {

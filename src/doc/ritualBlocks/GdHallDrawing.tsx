@@ -1,5 +1,8 @@
-import { GdHall, gdHallFontFaceCss } from "magick-components/gd/hall";
-import type { HallNode } from "magick-components/gd/hall/types";
+import {
+  GdHall,
+  gdHallFontFaceCss,
+  type HallNode,
+} from "magick-components/gd/hall";
 import { gdHallArt } from "@/app/gd/halls/art";
 import { GD_HALL_FONT_BASE } from "@/app/gd/halls/fontBase";
 
