@@ -11,7 +11,8 @@ local-only and must not be enabled on Vercel.
 
 This checkpoint supplies inert foundations, not a hosted entry. The existing
 research routes remain disabled in an unconfigured main-site build. No hosted
-flag, storage target, scheduler or allowance has been adopted.
+flag, concrete database target, scheduler or allowance has been installed.
+The selected architecture is now local ingestion into Neon; R2 is deferred.
 
 Implemented:
 
@@ -42,28 +43,35 @@ Implemented:
 
 ## Storage decision
 
-Await the operator's choice between a separate server-only private object bucket
-and a backend retaining all text on the local machine. Do not infer permission to
-copy extracted text from an earlier embedding or model-request approval.
+The selected first architecture is local preparation/ingestion into Neon. Keep
+original documents and rendered page images local; store versioned derived
+passages, citation metadata and selected cached document embeddings in private
+server-side database tables. The existing SQL prototype controls are feasibility
+evidence, not an installed production corpus adapter. Exact model/input/config
+bindings are required when reusing vectors; no new model calls follow from a
+storage decision.
 
-The proposed object-store bridge preserves the existing canonical compiler and
-lexical control, avoiding a simultaneous retrieval migration. PostgreSQL remains
-responsible for authentication, source policy, native accounting, packets and
-retention health. Moving chunk text/search to Neon is a separate backend decision,
-not a prerequisite for this bridge. A local backend avoids bulk text replication
-but adds authenticated service-to-service transport and availability dependencies.
+R2 artifact storage is deferred until after the initial text service is online.
+The optional Get-only adapter remains inactive. Large images, original documents
+or immutable rebuild snapshots can be considered separately later. A live backend
+on the ingestion machine is not required by the selected Neon architecture.
 
-R2 buckets are private by default, but custom domains and r2.dev are separate
-public access surfaces. Both must remain disabled; runtime code cannot prove
-provider settings from descriptor strings. Use a separate bucket and bucket-scoped
-Object Read Only token, never the browser-upload files bucket/token.
-[Cloudflare bucket access](https://developers.cloudflare.com/r2/buckets/public-buckets/),
-[API tokens](https://developers.cloudflare.com/r2/api/tokens/).
+The database importer, dataset/version semantics, query/index selection and
+restricted writer/reader roles remain to be implemented and reviewed. Verify the
+intended target, extension support, available capacity and permissions first.
+Vercel Sensitive variables cannot be recovered through CLI; use an approved direct
+migration/ingestion credential under the existing release boundary. Do not fall
+back to a development database or rotate credentials to bypass access restrictions.
+
+Actual source admission, derived-data ingestion, hosting and model spending are
+separate scopes. Preserve the selected operator-only audience; source and target
+facts belong in the private companion. Original-document storage and private
+collection publication must not be inferred from derived-result ingestion.
 
 ## Remaining hosted implementation
 
-1. Bind the chosen storage account, bucket/jurisdiction or backend, corpus digest,
-   actual operator, site origin and physical native database target in a new
+1. Bind the intended Neon endpoint/database, restricted roles, corpus relations,
+   dataset digest, actual operator, site origin and native target in a new
    domain-separated hosted intent. Keep actual values and credentials outside Git.
    Local startup approvals must not be repurposed as hosted approvals.
 2. Build the hosted page/API composition. Perform the canonical operator gate
@@ -86,13 +94,15 @@ Object Read Only token, never the browser-upload files bucket/token.
    Session-level cleanup locks need a direct connection; Neon transaction pooling
    does not preserve session advisory locks.
    [Neon pooling](https://neon.com/docs/connect/connection-pooling).
-5. Measure actual authorized hosted cold loads, peak memory, warm behavior,
-   revocation and metadata-only reads before choosing caching or SQL retrieval.
+5. Implement and measure the SQL corpus adapter: exact/ANN/lexical controls with
+   real source filters and planner behaviour, bounded candidate budgets, warm/cold
+   latency, memory, revocation and metadata-only retained reads. Do not infer
+   relevance or semantic equivalence from matching vector neighbours alone.
    Keep text out of build tracing/static assets. Function limits and plan capacity
    are release inputs, not inferred from successful local loading.
    [Vercel function limits](https://vercel.com/docs/functions/limitations).
 6. Review an exact release: empty additive schema scope, target/credential custody,
-   corpus transfer, finite model allowance, staged authenticated/denied tests,
+   derived-data import, finite model allowance, staged authenticated/denied tests,
    cleanup installation/health, monitoring and rollback. No implicit pilot renewal.
 
 ## Evidence and limits
