@@ -3069,8 +3069,8 @@ already exist from stage A′.
 
 Everything for the first publish stays on `gate/stage-g` until npm has
 the release candidate: stage G, the sign-off's commit, the bump to
-`0.1.0-rc.0` and, still to come, the rose-cross sigil's and the
-candlestick's versions. Only `gate/data-021` reaches `main` first, so
+`0.1.0-rc.0`, and the rose-cross sigil's and the candlestick's versions,
+which are there now ([below](#the-roses-and-the-candlesticks-versions-14-november-2026)). Only `gate/data-021` reaches `main` first, so
 that CI publishes magick-data 0.2.1, which the components' manifest
 needs; the branch, built on it, is then published by hand from its own
 commit and reaches `main` only once npm has it ([the
@@ -3102,11 +3102,11 @@ keeps CI from publishing.
      that the row is right. The provenance check
      ([below](#the-provenance-check-14-november-2026)) settled the Tree
      and the Grade Tree, the lamens, the table of shewbread, the fylfot
-     cross and the kameas. Two rows it did not settle: **the rose-cross
-     sigil**, whose rose's letters are geometry written in
-     `gd/roseSigilGeometry`, and **the candlestick**; both get
-     selectable versions first, and their rows change with them. Edit a
-     row first if its answer changes it.
+     cross and the kameas. The two rows it left open, **the rose-cross
+     sigil** and **the candlestick**, are settled now: both drawings
+     have versions, and each row names every version and its source
+     ([below](#the-roses-and-the-candlesticks-versions-14-november-2026)).
+     Edit a row first if its answer changes it.
    - **The bump to `0.1.0-rc.0`**, in
      `packages/magick-components/package.json`. The same commit changes
      the notes that say the components are not on npm yet, which nothing
@@ -3361,7 +3361,8 @@ approved the fixes; on `gate/stage-g`, after the second
 - **The rose-cross sigil and the candlestick.** Each differs in places
   from the 1909–39 sources, and both are to get selectable versions
   after research still under way. Their rows are as they were, and G′
-  step 3 waits for them.
+  step 3 waits for them. Both were settled
+  [below](#the-roses-and-the-candlesticks-versions-14-november-2026).
 
 The README's Provenance rows for the Tree, the lamens, the shewbread,
 the fylfot cross and the kameas now give these sources (`fa5cb4c5`);
@@ -3375,6 +3376,141 @@ npm.
 | `b2159ba9` | `fix(components): Name the shewbread's archangels` |
 | `fa5cb4c5` | `docs(components): Give five drawings their sources` |
 | (this commit) | `docs(plans): Record the provenance check` (G′, the rebase) |
+
+Each passed stage E's gate on its own tree, every step at 0, coverage
+at the first attempt.
+
+### The rose's and the candlestick's versions (14 November 2026)
+
+The provenance check found that the rose of 22 petals and the
+seven-branched candlestick each differ from some of the 1909–39 sources,
+which differ among themselves. A research pass read them against
+public-domain scans, citing each by archive.org item and leaf, with
+scripts that output facts only; modern editions were looked at for
+comparison, never cited for more than a fact. Gadi chose to offer each
+drawing's readings as versions, as the Enochian tablets offer theirs,
+and decided their ids, names, defaults and notes. On `gate/stage-g`,
+after [the provenance check](#the-provenance-check-14-november-2026).
+
+**What was found.**
+
+- **The rose.** The seven double letters run round the middle ring in
+  the order of the rainbow, as the Order coloured them: Peh, Resh, Beth,
+  Daleth (at the foot, over Lamed), Gimel, Tau, Kaph. Two witnesses
+  print that order: the figure Crowley printed from the Order's papers,
+  *The Equinox* I(3) (1910), Diagram 63, plate facing p. 210 (archive.org
+  `crowley-equinox_202110`, "The Equinox Vol. 1, No. 3", leaf n220), and
+  the colour key to the rose in "The Complete Symbol of the Tarot", I(8)
+  (1912), plate facing p. 145 ("The Equinox Vol. 1, No. 8", leaf n174).
+  Regardie's *The Golden Dawn*, vol. 3 (1939), ends the ring Gimel, Kaph,
+  Tau, in its text, p. 53, and in Diagram 20, p. 56
+  (`IsraelRegardie-TheGoldenDawn-Vol3-1939`, leaves n46 and n49), so
+  that Kaph lies to the right and Tau above it, and violet comes before
+  indigo among the petals. Later editors have treated his order as a
+  transposition, but it lives on in drawings made from his book:
+  Wikimedia Commons' Rose Cross Lamen was drawn in it in 2008 and
+  redrawn in the Equinox's order in 2018. The package drew the
+  Equinox's.
+- **The candlestick.** The Zelator ritual describes the lamps:
+  Regardie's text of 1938, vol. 2, p. 62
+  (`IsraelRegardie-TheGoldenDawn-Vol2-1938`, leaf n56), puts on each the
+  archangel's name on the triangle's right, the sphere's name on its
+  left and the double letter beneath its base, but does not say which
+  planet goes where. The one public-domain figure is *The Equinox* I(2)
+  (1909), p. 265, Diagram 17 (leaf n266): Saturn at the top, then
+  clockwise Mars, Venus, the Moon, Jupiter, the Sun and Mercury, so that
+  the star, from Saturn, runs through the planets in the Chaldean order
+  and every second lamp backwards from the Sun gives the days of the
+  week. Each triangle points outward with its double letter inside it,
+  the planet's Hebrew name on its left, the archangel of the planet's
+  Sephirah on its right and one of the seven churches of Asia under its
+  base; the planets' symbols stand on the star's arms, and a lamp at the
+  centre. The research's table of letter, planet, sphere's name,
+  archangel and church was checked against the scan, each lamp turned
+  apex up, and holds for all seven, with one thing it did not say: the
+  Mars lamp alone has its two names the other way about. The package
+  drew a modern arrangement, found in recent editions (the 2015
+  Llewellyn edition of Regardie's *The Golden Dawn*): Venus at the top
+  and the planets in the order of the rose's doubles, Agrippa's
+  planetary angels for the archangels of the Sephiroth, the triangles
+  pointing inward, no churches and no central lamp, and a star that
+  gives no week. No public-domain source has it.
+
+**What was built.** Each drawing takes a `version` prop, as `Tablet`
+does, and its entry exports the versions, the default, the id's type
+and a note for each (a title for a menu, a footnote, and the sources
+with links to their scans): `ROSE_VERSIONS` (`gd`, `regardie1939`),
+`DEFAULT_ROSE_VERSION`, `RoseVersionId` and `ROSE_VERSION_NOTES` from
+`gd/roseSigilGeometry`; `CANDLESTICK_VERSIONS` (`equinox1909`,
+`modern`), `DEFAULT_CANDLESTICK_VERSION`, `CandlestickVersionId` and
+`CANDLESTICK_VERSION_NOTES` from `gd/SevenBranchedCandlestick`. An id
+that is not a version draws the default.
+
+- **The rose** keeps the Equinox's order as `gd`, the default, and adds
+  Regardie's as `regardie1939`. `roseRings()`, `letterPoint()` and
+  `sigilPoints()` take the version, as do `RoseSigil` and
+  `RoseSigilImage`; the optimiser lays out whatever points it is given.
+  Nothing drawn by default moved: every sigil pin passed unchanged, and
+  1,968 renders by the old and new `RoseSigilImage` were byte-identical.
+  Tests hold that Regardie's rose changes exactly the sigils through
+  Kaph or Tau, over every word of one to three letters, and draws any
+  other identically, optimised too.
+- **The candlestick** draws Diagram 17 by default (`equinox1909`), in
+  our own art in the modern drawing's stroke widths and fonts, its
+  lettering not traced: seven lamps, the triangles apex outward, the
+  letter inside, the names along the sides, the church under the base,
+  the symbols on the arms, the central lamp and the star in the Chaldean
+  order. The planets' names, letters and the Sephiroth's archangels are
+  magick-data's, without points; the churches are a table in the
+  component citing the figure, since magick-data has none. Where the
+  figure departs from the 1938 text it is followed (the letter inside,
+  the churches), and a comment says so; its Mars lamp is drawn as the
+  other six and the text have it. magick-data spells three names
+  otherwise than the figure (נגה for נוגה, חמאל for כמאל, הניאל for
+  האניאל); they were kept, and the comment names them. `version="modern"`
+  draws the old markup byte for byte.
+- **The app.** `/gd/sigils` and `/gd/symbols/candlestick` have a
+  version menu and the chosen version's note, in the tablets' page's
+  style (a shared `src/drawings/DrawingVersion.tsx`); the sigil's shared
+  links carry its version. The image API takes an optional `version` on
+  both slugs, omitted from canonical links at its default: `gd` for the
+  rose, so no rose link changes, and `equinox1909` for the candlestick,
+  so a link made before draws the 1909 figure and `version=modern` the
+  old one. The explorer has both props, as choices, and an example of
+  each new version. Hall art draws the default; a hall choosing its
+  candlestick's version is for later.
+- **The README's Provenance rows** for both drawings name each version
+  and its source; the rose's construction is Gadi's own geometry, and
+  the modern candlestick's order a fact from the Llewellyn edition,
+  cited by name with nothing copied. "Signed off" is empty.
+
+**What moved.** No rose pin. For the candlestick: the default image's
+pin (52,363 bytes and `5d8b637f…`, now 87,746 and `f20b1474…`), which
+`version=modern` keeps as a pin of its own, and its inputs hash
+(`a8a08155…`, now `b65a8939…`: the spec reads the sephirot's planets
+and the seven archangels it draws, so Metatron's name still moves only
+the Tree); and the Zelator's second hall, its five pins and its
+snapshot. The hall's source differs from the old inside the
+candlestick's `<svg>` alone, and with the default set to `modern` every
+hall pin and snapshot passed unchanged. A new pin holds Shabbathai on
+Regardie's rose; both new images were reviewed as rasterised. No
+documentation screenshot shows either drawing (the halls they show are
+the Neophyte's), so none was recaptured. The search vectors were
+refreshed in both feature commits for the new examples' titles and the
+candlestick's description: `search:compare` embedded one passage of
+each profile each time, `search:publish` none.
+
+**For Gadi:** whether the 1909 version should draw the Mars lamp's
+names as the figure has them; whether magick-data should take the
+figure's three spellings, or the churches as a table (both out of scope
+here); and the two rows' sign-off, with the others.
+
+| Commit | What |
+| --- | --- |
+| `f9d59965` | `feat(components): Give the rose its two versions` |
+| `49c7d111` | `feat(components): Draw the candlestick of 1909` |
+| `a4309318` | `docs(components): Source the rose and candlestick` |
+| (this commit) | `docs(plans): Record the two drawings' versions` (G′) |
 
 Each passed stage E's gate on its own tree, every step at 0, coverage
 at the first attempt.

@@ -130,6 +130,13 @@ Follow-ups are separate from the completed migration work:
   and G′ merging only `gate/data-021` before the hand publish; the rose
   and candlestick rows wait for their versions
   ([plan 080](080-open-source-packages.md#the-provenance-check-14-november-2026)).
+  Then the versions: the rose in the Equinox's order by default and
+  Regardie's of 1939 (Kaph and Tau exchanged), with no sigil pin moved;
+  the candlestick as *The Equinox* I(2)'s Diagram 17 (1909) by default
+  and the modern arrangement byte for byte as `modern`, Zelator 2's pins
+  moving in the candlestick alone; menus and notes on both pages, an
+  optional `version` in the image API, and both Provenance rows settled
+  ([plan 080](080-open-source-packages.md#the-roses-and-the-candlesticks-versions-14-november-2026)).
 - 13 November 2026: Dependabot alerts #362 (zod), #364 (glob) and #366
   (minimatch) fixed by a `@vercel/functions` bump and parent-scoped
   overrides of Serwist's exact zod and glob pins (glob 14 checked against
@@ -512,6 +519,12 @@ Follow-ups are separate from the completed migration work:
   hours page's first day is the coming one, so the night hour in progress
   isn't shown (`src/app/astrology/planetary-hours/planetaryHours.tsx`);
   it behaved the same before [plan 072](072-reader-location.md).
+- TODO: the candlestick of 1909's loose ends: the seven churches as a
+  magick-data table rather than the component's own, whether magick-data
+  should spell Venus, Khamael and Haniel as the figure does (נוגה, כמאל,
+  האניאל), whether its Mars lamp should keep the figure's swapped names,
+  and a hall's data choosing its candlestick's version
+  ([plan 080](080-open-source-packages.md#the-roses-and-the-candlesticks-versions-14-november-2026)).
 - TODO: SEO content follow-ups from [plan 028](028-seo.md#follow-ups):
   public SQL rituals in the sitemap wait for a "list in search engines"
   option on the ritual (Gadi, 10 November 2026): marking a ritual public
