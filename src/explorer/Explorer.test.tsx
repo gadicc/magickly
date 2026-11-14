@@ -47,10 +47,10 @@ describe("Explorer", () => {
     const { drawing, jsx } = explore("Chakras");
     await waitFor(() => expect(drawing()).toContain("<svg"));
     expect(drawing()).not.toContain('opacity="0.2"');
-    const active = screen.getByLabelText("active");
+    const active = screen.getByLabelText("activeChakra");
     fireEvent.change(active, { target: { value: "heart" } });
     await waitFor(() => expect(drawing()).toContain('opacity="0.2"'));
-    expect(jsx()).toBe('<Chakras height={240} active="heart" />');
+    expect(jsx()).toBe('<Chakras height={240} activeChakra="heart" />');
     fireEvent.change(active, { target: { value: "" } });
     await waitFor(() => expect(drawing()).not.toContain('opacity="0.2"'));
     expect(jsx()).toBe("<Chakras height={240} />");

@@ -42,11 +42,17 @@ export async function renderComponentImage(
   // import check, as in the previous image route.
   const { renderToStaticMarkup } = await import("react-dom/server");
   const element = await registration.render(request.props as never);
-  // This exact replacement is part of the recorded source digest.
-  const markup = renderToStaticMarkup(element).replace(
-    'xmlns="http://www.w3.org/2000/svg"',
-    'xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"',
-  );
+  // Every image's root declares the xlink prefix, as it always has: the
+  // Tree's declares it itself, and the others gain it here. The exact
+  // root is part of the recorded source digest and of the image's bytes.
+  const rendered = renderToStaticMarkup(element);
+  const root = rendered.match(/^<svg\b[^>]*>/)?.[0] ?? "";
+  const markup = root.includes(" xmlns:xlink=")
+    ? rendered
+    : rendered.replace(
+        'xmlns="http://www.w3.org/2000/svg"',
+        'xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"',
+      );
   const svg = registration.source ? registration.source(markup) : markup;
   const outlined = await outlineComponentImage(svg, {
     profile: registration.profile,

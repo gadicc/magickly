@@ -6,14 +6,15 @@
         "name": "activePath",
         "type": "string",
         "required": false,
-        "description": "A path's id (`\"1_2\"`): it is drawn on top and highlighted, the rest faded.",
+        "description": "A path's id (`\"1_2\"`): it is drawn on top and highlighted, the rest\nfaded. Any other value throws.",
         "control": { "kind": "text" }
       },
       {
         "name": "activeSephirah",
         "type": "string | null",
         "required": false,
-        "description": "A sephirah's id: that sphere is drawn and the others faded. `null`\nfades them all; not given, none is faded."
+        "description": "A sephirah's id (`\"tiferet\"`): that sphere is drawn and the others\nfaded. `null` fades them all; not given, none is faded. Any other\nvalue throws, as for `activePath`.",
+        "control": { "kind": "text" }
       },
       {
         "name": "bottomText",
@@ -54,7 +55,7 @@
         "name": "fontSize",
         "type": "string | number",
         "required": false,
-        "description": "The labels' font size. When not given, from `field` if it is given\n(32 for `index`, 20 for `name.he`, 12 for `name.roman`, otherwise 10),\nand 10 with the default field.",
+        "description": "The labels' font size. When not given, from `field`: 32 for `index`,\n20 for `name.he` and `godName.name.he`, otherwise 10.",
         "control": { "kind": "parsed" }
       },
       {
@@ -126,14 +127,15 @@
         "name": "activePath",
         "type": "string",
         "required": false,
-        "description": "A path's id (`\"1_2\"`): it is drawn on top and highlighted, the rest faded.",
+        "description": "A path's id (`\"1_2\"`): it is drawn on top and highlighted, the rest\nfaded. Any other value throws.",
         "control": { "kind": "text" }
       },
       {
         "name": "activeSephirah",
         "type": "string | null",
         "required": false,
-        "description": "A sephirah's id: that sphere is drawn and the others faded. `null`\nfades them all; not given, none is faded."
+        "description": "A sephirah's id (`\"tiferet\"`): that sphere is drawn and the others\nfaded. `null` fades them all; not given, none is faded. Any other\nvalue throws, as for `activePath`.",
+        "control": { "kind": "text" }
       },
       {
         "name": "bottomText",
@@ -174,7 +176,7 @@
         "name": "fontSize",
         "type": "string | number",
         "required": false,
-        "description": "The labels' font size. When not given, from `field` if it is given\n(32 for `index`, 20 for `name.he`, 12 for `name.roman`, otherwise 10),\nand 10 with the default field.",
+        "description": "The labels' font size. When not given, from `field`: 32 for `index`,\n20 for `name.he` and `godName.name.he`, otherwise 10.",
         "control": { "kind": "parsed" }
       },
       {
@@ -462,7 +464,8 @@
         "name": "label",
         "type": "string | false",
         "required": false,
-        "description": "The drawing's accessible name: the tablet's own (`tabletName`) when\nnot given, this one when a string, and none when `false`."
+        "description": "The drawing's accessible name: the tablet's own (`tabletName`) when\nnot given, this one when a string, and none when `false`.",
+        "control": { "kind": "text" }
       },
       {
         "name": "mirrorReversed",
@@ -555,7 +558,8 @@
         "name": "label",
         "type": "string | false",
         "required": false,
-        "description": "The drawing's accessible name: the square's own (\"Kamea of Saturn\")\nwhen not given, this one when a string, and none when `false`."
+        "description": "The drawing's accessible name: the square's own (\"Kamea of Saturn\")\nwhen not given, this one when a string, and none when `false`.",
+        "control": { "kind": "text" }
       },
       {
         "name": "paper",
@@ -623,10 +627,10 @@
     "description": "The seven chakras as coloured circles on a figure's silhouette, from the\nroot at the base of its spine to the crown at the top of its head.",
     "props": [
       {
-        "name": "active",
-        "type": "string",
+        "name": "activeChakra",
+        "type": "string | null",
         "required": false,
-        "description": "A chakra's id in magick-data (`root`, `sacral`, `solar-plexus`,\n`heart`, `throat`, `third-eye`, `crown`): that one is drawn and the\nothers faded. All are drawn when it is absent or names none of them.",
+        "description": "A chakra's id in magick-data (`root`, `sacral`, `solar-plexus`,\n`heart`, `throat`, `third-eye`, `crown`): that one is drawn and the\nothers faded. `null` fades them all; not given, none is faded. Any\nother value throws, as the Tree's `activeSephirah` does.",
         "control": { "kind": "text" }
       },
       {

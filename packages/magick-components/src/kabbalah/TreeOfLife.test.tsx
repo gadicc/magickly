@@ -175,8 +175,10 @@ describe("TreeOfLife", () => {
   });
 
   it("draws by default as the Tree page does", () => {
-    // Roman names at 10, numbered above and named in English below.
-    expect(renderToString(<TreeOfLife id="t" />)).toBe(
+    // Roman names at 10, numbered above and named in English below: stating
+    // the five documented defaults draws exactly the bare Tree.
+    const bare = renderToString(<TreeOfLife id="t" />);
+    expect(bare).toBe(
       renderToString(
         <TreeOfLife
           id="t"
@@ -185,13 +187,14 @@ describe("TreeOfLife", () => {
           bottomText="name.en"
           colorScale="queen"
           letterAttr="hermetic"
-          fontSize={10}
         />,
       ),
     );
-    // A field given sizes its own labels, as it did.
-    expect(renderToString(<TreeOfLife id="t" field="name.roman" />)).toBe(
-      renderToString(<TreeOfLife id="t" field="name.roman" fontSize={12} />),
+    expect(bare).toBe(renderToString(<TreeOfLife id="t" fontSize={10} />));
+    expect(bare).toBe(renderToString(<TreeOfLife id="t" field="name.roman" />));
+    // A field of another size sizes its own labels.
+    expect(renderToString(<TreeOfLife id="t" field="index" />)).toBe(
+      renderToString(<TreeOfLife id="t" field="index" fontSize={32} />),
     );
   });
 
@@ -238,6 +241,17 @@ describe("TreeOfLife", () => {
         <TreeOfLife letterAttr={"toString" as TreePathAttribution} />,
       ),
     ).toThrow('unknown letterAttr "toString"');
+  });
+
+  it("refuses an active sephirah it does not have, by name", () => {
+    for (const id of ["", "bogus", "Tiferet", "toString"])
+      expect(() => renderToString(<TreeOfLife activeSephirah={id} />)).toThrow(
+        `TreeOfLife: unknown activeSephirah ${JSON.stringify(id)}; expected a sephirah's id, one of keter, `,
+      );
+    // Da'at is a sephirah, drawn or not.
+    expect(() =>
+      renderToString(<TreeOfLife activeSephirah="daat" />),
+    ).not.toThrow();
   });
 
   it("refuses an active path it does not have, by name", () => {

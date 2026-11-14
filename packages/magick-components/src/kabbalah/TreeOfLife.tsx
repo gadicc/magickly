@@ -127,8 +127,9 @@ export interface TreeOfLifeProps {
   /** Whose letters the paths carry: `hermetic` when not given. */
   letterAttr?: TreePathAttribution;
   /**
-   * A sephirah's id: that sphere is drawn and the others faded. `null`
-   * fades them all; not given, none is faded.
+   * A sephirah's id (`"tiferet"`): that sphere is drawn and the others
+   * faded. `null` fades them all; not given, none is faded. Any other
+   * value throws, as for `activePath`.
    */
   activeSephirah?: string | null;
   /**
@@ -141,7 +142,10 @@ export interface TreeOfLifeProps {
    * Without it the spheres are not links.
    */
   sephirahHref?: (sephirah: SephirahRow) => string | null;
-  /** A path's id (`"1_2"`): it is drawn on top and highlighted, the rest faded. */
+  /**
+   * A path's id (`"1_2"`): it is drawn on top and highlighted, the rest
+   * faded. Any other value throws.
+   */
   activePath?: string;
   /** Seen from behind, the body's view; the stylesheet mirrors the figure. */
   flip?: boolean;
@@ -151,9 +155,8 @@ export interface TreeOfLifeProps {
    */
   showDaat?: boolean;
   /**
-   * The labels' font size. When not given, from `field` if it is given
-   * (32 for `index`, 20 for `name.he`, 12 for `name.roman`, otherwise 10),
-   * and 10 with the default field.
+   * The labels' font size. When not given, from `field`: 32 for `index`,
+   * 20 for `name.he` and `godName.name.he`, otherwise 10.
    */
   fontSize?: string | number;
   /** The `<svg>`, for exporting the drawing. */
@@ -276,13 +279,19 @@ export function TreeOfLifeSvg({
     throw new Error(
       `TreeOfLife: unknown letterAttr ${JSON.stringify(letterAttr)}; expected one of ${Object.keys(orderedPaths).join(", ")}`,
     );
+  if (
+    activeSephirah !== undefined &&
+    activeSephirah !== null &&
+    !Object.hasOwn(Data.sephirah, activeSephirah)
+  )
+    throw new Error(
+      `TreeOfLife: unknown activeSephirah ${JSON.stringify(activeSephirah)}; expected a sephirah's id, one of ${Object.keys(Data.sephirah).join(", ")}, or null for none`,
+    );
   if (activePath !== undefined && !Object.hasOwn(_paths, activePath))
     throw new Error(
       `TreeOfLife: unknown activePath ${JSON.stringify(activePath)}; expected a path's id, one of ${Object.keys(_paths).join(", ")}`,
     );
   width = width || "100%";
-  // The Tree page's size for its default field; a given field sizes its own.
-  if (!fontSize && !field) fontSize = 10;
   field = field || "name.roman";
   const fieldPaths = field;
 
@@ -307,11 +316,13 @@ export function TreeOfLifeSvg({
       .join(" "),
   );
 
+  // `name.roman` is the Tree page's 10, so that the defaults stated are
+  // the defaults; the image API, whose links predate the page, gives 12.
   const fontSizeFromFieldName: Readonly<Record<string, number>> = {
     index: 32,
     "name.en": 10,
     "name.he": 20,
-    "name.roman": 12,
+    "name.roman": 10,
     "godName.name.he": 20,
   };
 
@@ -394,6 +405,9 @@ export function TreeOfLifeSvg({
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
+      // The links and the labels' text paths are `xlink:href`, which an
+      // XML parser rejects without the prefix declared.
+      xmlnsXlink="http://www.w3.org/1999/xlink"
       version="1.1"
       // viewBox="0 0 316 600"
       // viewBox={"0 0 " + canvasWidth + " " + canvasHeight}

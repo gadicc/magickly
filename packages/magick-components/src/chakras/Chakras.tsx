@@ -160,16 +160,28 @@ export interface ChakrasProps {
   /**
    * A chakra's id in magick-data (`root`, `sacral`, `solar-plexus`,
    * `heart`, `throat`, `third-eye`, `crown`): that one is drawn and the
-   * others faded. All are drawn when it is absent or names none of them.
+   * others faded. `null` fades them all; not given, none is faded. Any
+   * other value throws, as the Tree's `activeSephirah` does.
    */
-  active?: string;
+  activeChakra?: string | null;
 }
+
+/** Each chakra's id, which `activeChakra` takes. */
+const CHAKRA_IDS: readonly string[] = chakras.map((chakra) => chakra.id);
 
 /**
  * The seven chakras as coloured circles on a figure's silhouette, from the
  * root at the base of its spine to the crown at the top of its head.
  */
-export function Chakras({ width, height, active }: ChakrasProps) {
+export function Chakras({ width, height, activeChakra }: ChakrasProps) {
+  if (
+    activeChakra !== undefined &&
+    activeChakra !== null &&
+    !CHAKRA_IDS.includes(activeChakra)
+  )
+    throw new Error(
+      `Chakras: unknown activeChakra ${JSON.stringify(activeChakra)}; expected a chakra's id, one of ${CHAKRA_IDS.join(", ")}, or null for none`,
+    );
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -188,7 +200,7 @@ export function Chakras({ width, height, active }: ChakrasProps) {
           r="4.679"
           fill={chakra.fill}
           opacity={
-            !active || active === chakra.id
+            activeChakra === undefined || activeChakra === chakra.id
               ? opacityActive.true
               : opacityActive.false
           }

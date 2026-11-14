@@ -67,9 +67,12 @@ export function componentImage(name: string, props: Props): string | null {
         letterAttr: text(props.letterAttr),
         flip: flag(props.flip),
         showDaat: flag(props.showDaat),
+        // The component sizes `name.roman` at 10, the API at 12.
         fontSize:
           number(props.fontSize) ??
-          (text(props.field) ? undefined : String(10)),
+          ((text(props.field) || "name.roman") === "name.roman"
+            ? String(10)
+            : undefined),
         active: text(props.activeSephirah),
         activePath: text(props.activePath),
       });

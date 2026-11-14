@@ -143,10 +143,16 @@ export const COMPONENT_IMAGE_REGISTRY: {
     // the unchanged profile (plan 080, "Before publishing"); every other
     // id is stripped from the outlines. The query's `active` is the Tree's
     // `activeSephirah`, and the links are the ones the Tree drew by default
-    // before it drew none, which the source SVG has always carried.
+    // before it drew none, which the source SVG has always carried. Its
+    // root declares the xlink prefix itself (plan 080, "After the review").
     render: ({ active, ...props }) => (
       <TreeOfLifeSvg
         {...props}
+        // The API sized `name.roman` labels at 12 before the Tree's own
+        // default became the page's 10; its links keep their bytes.
+        fontSize={
+          props.fontSize ?? (props.field === "name.roman" ? 12 : undefined)
+        }
         activeSephirah={active}
         sephirahHref={sephirahHref}
         pathHref={pathHref}

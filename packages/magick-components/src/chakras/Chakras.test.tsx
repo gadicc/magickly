@@ -152,11 +152,25 @@ describe("Chakras", () => {
   });
 
   it("dims every chakra but the active one", () => {
-    for (const [index, id] of ORDER.entries()) {
-      const lit = parse(renderToStaticMarkup(<Chakras active={id} />)).circles;
-      expect(lit.map((circle) => circle.opacity)).toEqual(
-        ORDER.map((_, i) => (i === index ? 1 : 0.2)),
+    const opacities = (html: string) =>
+      parse(html).circles.map((circle) => circle.opacity);
+    for (const [index, id] of ORDER.entries())
+      expect(
+        opacities(renderToStaticMarkup(<Chakras activeChakra={id} />)),
+      ).toEqual(ORDER.map((_, i) => (i === index ? 1 : 0.2)));
+    // null dims them all, and none is dimmed without one.
+    expect(
+      opacities(renderToStaticMarkup(<Chakras activeChakra={null} />)),
+    ).toEqual(ORDER.map(() => 0.2));
+    expect(opacities(renderToStaticMarkup(<Chakras />))).toEqual(
+      ORDER.map(() => 1),
+    );
+  });
+
+  it("refuses a chakra it does not have, by name", () => {
+    for (const id of ["", "bogus", "Heart", "toString"])
+      expect(() => renderToStaticMarkup(<Chakras activeChakra={id} />)).toThrow(
+        `Chakras: unknown activeChakra ${JSON.stringify(id)}; expected a chakra's id, one of crown, `,
       );
-    }
   });
 });

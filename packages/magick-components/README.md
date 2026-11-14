@@ -158,7 +158,9 @@ Without props, `TreeOfLife` draws as magick.ly's Tree page does by
 default: each sphere's Roman name (`field="name.roman"`), numbered above
 (`topText="index"`) and named in English below (`bottomText="name.en"`),
 in the Queen scale (`colorScale="queen"`), with the Hermetic Tree's
-letters on its paths (`letterAttr="hermetic"`):
+letters on its paths (`letterAttr="hermetic"`), and its labels at 10
+(`fontSize`; another field sizes its own, 32 for `index` and 20 for
+Hebrew). Stating a default draws the same Tree as leaving it out:
 
 ```tsx
 import { TreeOfLife } from "magick-components/kabbalah/TreeOfLife";
@@ -167,8 +169,10 @@ export const Tree = () => <TreeOfLife width={300} />;
 ```
 
 `activeSephirah` draws one sphere and fades the rest (`null` fades them
-all), and `activePath` does the same for a path. The spheres and paths
-are links only where you give them one ([below](#what-you-supply)).
+all), and `activePath` does the same for a path; an id the Tree does not
+have throws. The spheres and paths are links only where you give them
+one ([below](#what-you-supply)). The `<svg>` is well-formed XML, its
+links and its labels' curves `xlink:href` with the prefix declared.
 
 It keeps to itself, so that several can share a page:
 

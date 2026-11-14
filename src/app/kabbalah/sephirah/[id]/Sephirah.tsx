@@ -293,7 +293,7 @@ export default function Sephirah({ sephirah }: { sephirah: SephirahRow }) {
                   script="sa"
                 />
               </span>
-              <Chakras height="80px" active={chakra.id} />
+              <Chakras height="80px" activeChakra={chakra.id} />
             </div>
           ) : null}
         </Row>

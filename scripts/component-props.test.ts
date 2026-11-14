@@ -54,6 +54,9 @@ describe("controlOf", () => {
     expect(controlOf({ name: "string" })).toEqual({ kind: "text" });
     expect(controlOf({ name: "string | number" })).toEqual({ kind: "parsed" });
     expect(controlOf({ name: "string | boolean" })).toEqual({ kind: "parsed" });
+    // A field cannot type null or false; it sets the string.
+    expect(controlOf({ name: "string | null" })).toEqual({ kind: "text" });
+    expect(controlOf({ name: "string | false" })).toEqual({ kind: "text" });
   });
 
   it("gives none to callbacks, objects, nodes and mixed unions", () => {

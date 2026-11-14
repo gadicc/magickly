@@ -10,7 +10,7 @@ export const Chakras: ComponentExamples<
   exportName: "default",
   examples: [
     { title: "All seven", props: { height: 240 } },
-    { title: "The heart", props: { height: 240, active: "heart" } },
-    { title: "The crown", props: { height: 240, active: "crown" } },
+    { title: "The heart", props: { height: 240, activeChakra: "heart" } },
+    { title: "The crown", props: { height: 240, activeChakra: "crown" } },
   ],
 };

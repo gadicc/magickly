@@ -68,7 +68,8 @@ function stringLiteral(value: unknown): string | undefined {
  * The control a prop's type allows (plan 080, decision 5): a union of
  * string literals is a choice, a boolean a switch, a number or a string a
  * field, and a union of `string` with `number` or `boolean` a text field
- * whose value is parsed. Anything else (callbacks, objects, nodes, styles)
+ * whose value is parsed; a string that may also be `null` or `false` a
+ * text field. Anything else (callbacks, objects, nodes, styles)
  * has none and appears only in the props table.
  */
 export function controlOf(type: PropItem["type"]): PropControl | undefined {
@@ -85,6 +86,13 @@ export function controlOf(type: PropItem["type"]): PropControl | undefined {
   if (type.name === "number") return { kind: "number" };
   if (type.name === "string") return { kind: "text" };
   const parts = new Set(members(type.name));
+  // `null` and `false` (`activeSephirah`, `label`) are values no field can
+  // type; the field sets the string, and clearing it unsets the prop.
+  if (
+    parts.has("string") &&
+    [...parts].every((part) => ["string", "null", "false"].includes(part))
+  )
+    return { kind: "text" };
   if (
     parts.has("string") &&
     parts.size > 1 &&
