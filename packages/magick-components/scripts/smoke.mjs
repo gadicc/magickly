@@ -20,7 +20,7 @@
  *    sigil's image rendered with `renderToStaticMarkup`, no bundler;
  * 4. a strict consumer type-checked under `bundler` and `nodenext`, with
  *    `skipLibCheck` off, and a prop the types must refuse, with the
- *    README's TSX examples;
+ *    README's TSX and TS examples;
  * 5. 3 and 4 again in a second fixture that installs the components'
  *    tarball alone, so that npm takes magick-data from the registry, as a
  *    stranger's install would; skipped, saying so, while the registry
@@ -494,20 +494,32 @@ console.log(entries.length, "entries;", tree.length, hall.length, rose.length, "
   );
 
   /**
-   * The README's TSX examples, each a module of its own, as the packed
-   * README has them: the consumer below type-checks them too.
+   * The README's TypeScript examples, TSX and TS, each a file of its own,
+   * as the packed README has them: the consumer below type-checks them
+   * too, in one program, so a declaration one block gives (`*.css`) holds
+   * for another.
    */
   const readmeExamples = [
     ...readFileSync(join(packed, "README.md"), "utf8").matchAll(
-      /^( *)```tsx\n([^]*?)^\1```$/gm,
+      /^( *)```(tsx?)\n([^]*?)^\1```$/gm,
     ),
-  ].map(([, indent, code]) => code.replace(new RegExp(`^${indent}`, "gm"), ""));
-  assert(readmeExamples.length > 0, "the README has TSX examples");
+  ].map(([, indent, lang, code]) => ({
+    lang,
+    code: code.replace(new RegExp(`^${indent}`, "gm"), ""),
+  }));
+  for (const lang of ["tsx", "ts"])
+    assert(
+      readmeExamples.some((example) => example.lang === lang),
+      `the README has ${lang} examples`,
+    );
 
   /** Type-checks a strict consumer of every entry, both resolutions. */
   const typeCheck = (dir) => {
-    const examples = readmeExamples.map((code, i) => {
-      const file = `readme${i}.tsx`;
+    const examples = readmeExamples.map(({ lang, code }, i) => {
+      // A block that opens by naming its file (`// css.d.ts`) is written
+      // as one, so that a declaration file is one.
+      const named = code.match(/^\/\/ ([\w.-]+\.(?:d\.ts|tsx?))\n/)?.[1];
+      const file = named ? `readme${i}-${named}` : `readme${i}.${lang}`;
       write(join(dir, "types", file), code);
       return file;
     });
@@ -595,6 +607,12 @@ export const page = (
       lib: ["dom", "es2022"],
       types: [],
     };
+    // Next's own declarations do not check with skipLibCheck off, so an
+    // example that imports Next (next.config.ts) is checked below as a
+    // Next app checks it, and the rest here as well.
+    const plain = examples.filter(
+      (_, i) => !/^import [^\n]* from "next";$/m.test(readmeExamples[i].code),
+    );
     for (const [name, compilerOptions] of [
       ["bundler", { ...base, module: "esnext", moduleResolution: "bundler" }],
       [
@@ -606,7 +624,7 @@ export const page = (
         join(dir, "types", `tsconfig.${name}.json`),
         JSON.stringify({
           compilerOptions,
-          files: ["consumer.tsx", ...examples],
+          files: ["consumer.tsx", ...plain],
         }),
       );
       run(
@@ -619,9 +637,38 @@ export const page = (
         { cwd: join(dir, "types") },
       );
     }
+    if (!existsSync(join(dir, "node_modules", "next"))) return;
+    // Every example, as a Next app's tsconfig (the fixture's below) checks it.
+    write(
+      join(dir, "types", "tsconfig.next.json"),
+      JSON.stringify({
+        compilerOptions: {
+          strict: true,
+          skipLibCheck: true,
+          noEmit: true,
+          jsx: "react-jsx",
+          target: "es2022",
+          lib: ["dom", "dom.iterable", "esnext"],
+          module: "esnext",
+          moduleResolution: "bundler",
+          isolatedModules: true,
+        },
+        files: examples,
+      }),
+    );
+    run(
+      process.execPath,
+      [
+        join(dir, "node_modules", "typescript", "bin", "tsc"),
+        "-p",
+        "tsconfig.next.json",
+      ],
+      { cwd: join(dir, "types") },
+    );
   };
-  step("a strict consumer type-checks under bundler and nodenext", () =>
-    typeCheck(fixture),
+  step(
+    "a strict consumer type-checks under bundler and nodenext, and the README's examples as a Next app",
+    () => typeCheck(fixture),
   );
 
   // The same, against the registry's magick-data rather than the

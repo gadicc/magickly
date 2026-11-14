@@ -215,6 +215,14 @@ Ruhl Libre stands in for them. Load them in one of two ways:
   ```
 
   The package's `sideEffects` keeps the import under any bundler.
+  TypeScript 6 checks that a side-effect import names a module it knows
+  of. Next's types, which `next-env.d.ts` brings in, declare CSS files;
+  elsewhere, a declaration file of your own does:
+
+  ```ts
+  // css.d.ts
+  declare module "*.css";
+  ```
 - **Serve the files yourself** and pass where they are as `fontBaseUrl`
   (`<GdHall hall={…} fontBaseUrl="/fonts" />`); the SVG then carries its
   own `@font-face` rules, which an exported SVG needs.
@@ -228,7 +236,9 @@ fail with `Can't resolve 'fs'` until you stub it out:
 
 ```ts
 // next.config.ts
-const nextConfig = {
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
   // Turbopack (next dev, and next build since Next 16): empty.ts is an
   // empty module of your own.
   turbopack: { resolveAlias: { fs: { browser: "./empty.ts" } } },
@@ -239,6 +249,8 @@ const nextConfig = {
     return config;
   },
 };
+
+export default nextConfig;
 ```
 
 Only `RoseSigil` and `gd/roseSigilOptimizer` reach nlopt; a page that
