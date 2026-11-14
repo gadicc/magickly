@@ -143,3 +143,21 @@ migrations and create five empty tables through the existing release workflow.
 The actual target/role checks and staged smoke/promotion gates remain required.
 No approved public corpus, source grant, operator binding or model allowance is
 created by completing this preparation.
+
+## Deployment readiness qualification
+
+The generic coordinator now shares the original prepare-source deadline with its
+reader factory and the inner authorization gate. A factory that uses the entire
+budget must not start principal I/O; principal work that uses the remaining budget
+must not start snapshot/fence I/O. Regression controls also preserve successful
+completion just within the budget. This change neither grants authority nor
+renews a spending scope.
+
+The shipped Next bootstrap explicitly selects read-only generation policy and
+requires the reviewed local runtime. It is not a hosted replacement chat service
+that can be enabled by changing one environment variable. Before an active
+replacement, adopt the deployment audience and source collection, implement and
+review the actual generation authority/transport and its durable spending,
+reconciliation and cleanup ownership, then verify the staged target. The private
+operator/source scope does not authorize a public corpus. An inactive engine
+merge and an active legacy-chat switch remain distinct milestones.

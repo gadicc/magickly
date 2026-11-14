@@ -575,20 +575,99 @@ it("settles a cancelled in-flight attempted request independently and never retr
   await expect(job.execute(active())).rejects.toThrow(RESEARCH_JOB_ERROR);
 });
 
-it("counts a blocking source-reader factory inside the monotonic source gate instead of renewing its deadline", async () => {
+it("does not start source I/O when its factory has consumed the prepare deadline", async () => {
   const now = performance.now(),
     base = options.createSourceReaders;
-  let elapsed = 0;
+  let elapsed = 0,
+    factoryReached = false;
+  const principal = vi.fn<ResearchSourceReaders["readPrincipal"]>(),
+    snapshot = vi.fn<ResearchSourceReaders["loadSnapshot"]>(),
+    fence = vi.fn<ResearchSourceReaders["readFence"]>();
   vi.spyOn(performance, "now").mockImplementation(() => now + elapsed);
   options.createSourceReaders = (...args) => {
+    factoryReached = true;
+    const readers = base(...args);
+    principal.mockImplementation(readers.readPrincipal);
+    snapshot.mockImplementation(readers.loadSnapshot);
+    fence.mockImplementation(readers.readFence);
     elapsed = RESEARCH_JOB_GATE_TIMEOUT_MS;
-    return base(...args);
+    return {
+      ...readers,
+      readPrincipal: principal,
+      loadSnapshot: snapshot,
+      readFence: fence,
+    };
   };
   await expect(
     createResearchAnswerJob(options).execute(active()),
   ).rejects.toThrow(RESEARCH_JOB_ERROR);
+  expect(factoryReached).toBe(true);
+  expect(principal).not.toHaveBeenCalled();
+  expect(snapshot).not.toHaveBeenCalled();
+  expect(fence).not.toHaveBeenCalled();
   expect(transactionCount).toBe(0);
   expect(requestFetch).not.toHaveBeenCalled();
+});
+
+it.each([100, 200])(
+  "does not begin snapshot I/O when principal work consumes the remaining prepare budget (%i ms)",
+  async (principalMs) => {
+    const now = performance.now(),
+      base = options.createSourceReaders;
+    let elapsed = 0;
+    const principal = vi.fn<ResearchSourceReaders["readPrincipal"]>(),
+      snapshot = vi.fn<ResearchSourceReaders["loadSnapshot"]>(),
+      fence = vi.fn<ResearchSourceReaders["readFence"]>();
+    vi.spyOn(performance, "now").mockImplementation(() => now + elapsed);
+    options.createSourceReaders = (...args) => {
+      const readers = base(...args);
+      principal.mockImplementation(async (signal) => {
+        elapsed += principalMs;
+        return readers.readPrincipal(signal);
+      });
+      snapshot.mockImplementation(readers.loadSnapshot);
+      fence.mockImplementation(readers.readFence);
+      elapsed += RESEARCH_JOB_GATE_TIMEOUT_MS - 100;
+      return {
+        ...readers,
+        readPrincipal: principal,
+        loadSnapshot: snapshot,
+        readFence: fence,
+      };
+    };
+    await expect(
+      createResearchAnswerJob(options).execute(active()),
+    ).rejects.toThrow(RESEARCH_JOB_ERROR);
+    expect(principal).toHaveBeenCalledOnce();
+    expect(snapshot).not.toHaveBeenCalled();
+    expect(fence).not.toHaveBeenCalled();
+    expect(transactionCount).toBe(0);
+    expect(requestFetch).not.toHaveBeenCalled();
+  },
+);
+
+it("allows source preparation that finishes just within the original factory-inclusive budget", async () => {
+  const now = performance.now(),
+    base = options.createSourceReaders;
+  let elapsed = 0;
+  vi.spyOn(performance, "now").mockImplementation(() => now + elapsed);
+  options.createSourceReaders = (stage, binding) => {
+    const readers = base(stage, binding);
+    if (stage !== "prepare") return readers;
+    elapsed += RESEARCH_JOB_GATE_TIMEOUT_MS - 100;
+    return {
+      ...readers,
+      readPrincipal: async (signal) => {
+        elapsed += 99;
+        return readers.readPrincipal(signal);
+      },
+    };
+  };
+  expect((await createResearchAnswerJob(options).execute(active())).state).toBe(
+    "completed",
+  );
+  expect((await balance()).requestsUsed).toBe(1);
+  expect(requestFetch).toHaveBeenCalledOnce();
 });
 it("never stores or delivers a credential echoed by an otherwise valid model response", async () => {
   const raw = gatewayResponseFixture();

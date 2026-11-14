@@ -127,14 +127,20 @@ export function createResearchAnswerJob(options: ResearchAnswerJobOptions) {
       use: ResearchSourceUse,
       signal: AbortSignal,
     ) => {
-      // Include synchronous factory work in the outer deadline; it must not start a fresh lifetime after blocking.
-      await within(signal, (s) =>
-        requireResearchSourceAccess(
-          packet.context,
-          use,
-          createSourceReaders(stage, priceBinding),
-          s,
-        ),
+      // Share the original deadline with the inner gate so blocking factory work
+      // cannot leave time for source I/O after the outer operation has expired.
+      const sourceDeadline = performance.now() + RESEARCH_JOB_GATE_TIMEOUT_MS;
+      await within(
+        signal,
+        (s) =>
+          requireResearchSourceAccess(
+            packet.context,
+            use,
+            createSourceReaders(stage, priceBinding),
+            s,
+            sourceDeadline,
+          ),
+        sourceDeadline,
       );
     };
     const generation = {
