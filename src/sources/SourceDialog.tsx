@@ -1,6 +1,14 @@
 "use client";
 import CloseIcon from "@mui/icons-material/Close";
-import { Box, Dialog, IconButton, Link, Typography } from "@mui/material";
+import {
+  Box,
+  Dialog,
+  IconButton,
+  Link,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import React from "react";
 import { HallPanZoom } from "@/app/doc/[_id]/HallPanZoom";
 import { DARK_SELECTOR } from "@/colorScheme";
@@ -15,7 +23,9 @@ import {
  * A mirrored page of a cited book, full screen: the page, which pinches,
  * drags and zooms as a hall does in the reader, with the cited passage
  * outlined, and a caption naming the copy with links to the page and the
- * whole book on archive.org. MUI's Dialog traps focus and closes on Escape.
+ * whole book on archive.org. On a phone it opens zoomed on the outline,
+ * which the whole page shows too small to see. MUI's Dialog traps focus
+ * and closes on Escape.
  */
 export default function SourceDialog({
   page,
@@ -29,6 +39,11 @@ export default function SourceDialog({
   const titleId = React.useId();
   const captionId = React.useId();
   const { highlight, output } = page;
+  // Read before the first render (the dialog renders only in the browser),
+  // so the page does not open fitted and then jump to the outline.
+  const narrow = useMediaQuery(useTheme().breakpoints.down("sm"), {
+    noSsr: true,
+  });
   return (
     <Dialog
       fullScreen
@@ -68,6 +83,7 @@ export default function SourceDialog({
         aspect={output.width / output.height}
         active={open}
         label={`${page.label}, the printed page`}
+        focus={narrow ? highlight : undefined}
       >
         <Box sx={{ position: "relative" }}>
           {/* A static file in public/, already sized: next/image would

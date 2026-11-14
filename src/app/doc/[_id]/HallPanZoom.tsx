@@ -9,6 +9,7 @@ import {
   arrowPan,
   clampView,
   fitDrawing,
+  focusView,
   IDENTITY,
   isDoubleTap,
   MAX_SCALE,
@@ -16,6 +17,7 @@ import {
   type Point,
   panBy,
   pinch,
+  type Region,
   swipeDirection,
   TAP_DISTANCE,
   type Tap,
@@ -40,13 +42,15 @@ type Gesture =
  * keys pan, and a double tap resets. At 1×, a sideways swipe or ← and →
  * call `onSwipe` instead. The surface takes every touch (`touch-action:
  * none`), or iOS Safari would zoom the page. Its parent gives it a new
- * `key` to reset it.
+ * `key` to reset it. With `focus`, it opens zoomed on that region of the
+ * drawing rather than on the whole of it.
  */
 export function HallPanZoom({
   aspect,
   active,
   onSwipe,
   label = "Hall drawing",
+  focus,
   children,
 }: {
   /** The drawing's width over its height, to fit it to the surface. */
@@ -56,6 +60,12 @@ export function HallPanZoom({
   onSwipe?: (direction: "next" | "previous") => void;
   /** The surface's accessible name: what it shows. */
   label?: string;
+  /**
+   * The region of the drawing to open on (`focusView`), read when the
+   * surface is first measured; later changes are ignored. Reset, double
+   * tap and 0 still show the whole drawing.
+   */
+  focus?: Region;
   children: React.ReactNode;
 }) {
   const surface = React.useRef<HTMLDivElement>(null);
@@ -79,8 +89,10 @@ export function HallPanZoom({
     [],
   );
   // Event handlers read the latest values without re-subscribing.
-  const latest = React.useRef({ size, onSwipe });
-  latest.current = { size, onSwipe };
+  const latest = React.useRef({ size, onSwipe, focus });
+  latest.current = { size, onSwipe, focus };
+  // Whether the surface has had a size yet: the first opens on `focus`.
+  const sized = React.useRef(false);
   const pointers = React.useRef(new Map<number, Point>());
   const gesture = React.useRef<Gesture | null>(null);
   // Whether the gesture had two fingers at any time: then it is no swipe.
@@ -92,14 +104,25 @@ export function HallPanZoom({
     const measure = () => {
       const { width, height } = element.getBoundingClientRect();
       setMeasured({ width, height });
-      commit(clampView(viewRef.current, fitDrawing({ width, height }, aspect)));
+      const fitted = fitDrawing({ width, height }, aspect);
+      const { focus } = latest.current;
+      // Before the first paint, so the view does not jump to the region.
+      if (!sized.current && width > 0 && height > 0) {
+        sized.current = true;
+        if (focus) {
+          commit(focusView(focus, fitted));
+          announce();
+          return;
+        }
+      }
+      commit(clampView(viewRef.current, fitted));
     };
     measure();
     if (typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     return () => observer.disconnect();
-  }, [aspect, commit]);
+  }, [aspect, announce, commit]);
 
   const zoom = React.useCallback(
     (action: "in" | "out" | "reset") => {
