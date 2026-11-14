@@ -4,20 +4,20 @@
     "sentences": 60,
     "gapFree": 4,
     "words": 622,
-    "forms": 284,
-    "chips": 113,
+    "forms": 280,
+    "chips": 115,
     "ruleForms": 41,
-    "gaps": 225,
+    "gaps": 227,
     "gapsWithNearest": 44,
     "byKind": {
       "practitioner": {
         "sentences": 20,
         "gapFree": 1,
         "words": 250,
-        "forms": 119,
-        "chips": 40,
+        "forms": 117,
+        "chips": 41,
         "ruleForms": 16,
-        "gaps": 91,
+        "gaps": 92,
         "gapsWithNearest": 17
       },
       "everyday": {
@@ -34,10 +34,10 @@
         "sentences": 20,
         "gapFree": 3,
         "words": 171,
-        "forms": 119,
-        "chips": 31,
+        "forms": 117,
+        "chips": 32,
         "ruleForms": 11,
-        "gaps": 21,
+        "gaps": 22,
         "gapsWithNearest": 14
       }
     }

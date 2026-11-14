@@ -96,7 +96,8 @@ const BOTH_UP_TO = 2;
 
 /**
  * Scores both readings (decision 4): the share of words that are English
- * against the share that are Enochian; English wins a tie.
+ * against the share that are Enochian (ours, Crowley's, Leitch's, or one
+ * the join rule splits); English wins a tie.
  */
 export function guessDirection(lookup: Lookup, text: string): DirectionGuess {
   const english = englishWords(text);
@@ -107,8 +108,12 @@ export function guessDirection(lookup: Lookup, text: string): DirectionGuess {
       .length,
     english.length,
   );
+  // A word the join rule reads (DSSALMAN) is Enochian too (decision 15).
   const enochianScore = share(
-    enochian.filter((word) => lookup.enochianWords.has(word)).length,
+    enochian.filter(
+      (word) =>
+        lookup.enochianWords.has(word) || joinSplits(lookup, word).length > 0,
+    ).length,
     enochian.length,
   );
   const typed = text.trim().split(/\s+/).filter(Boolean).length;

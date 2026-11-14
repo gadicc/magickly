@@ -85,8 +85,9 @@ final form.
    the page, as a new group in `searchDictionary`'s results. Both run
    the same code.
 4. **The direction is guessed, with a switch.** Both readings are
-   scored: the share of words that are Enochian headwords, Key words
-   or Leitch's spellings (decision 13) against the share that are
+   scored: the share of words that are Enochian headwords, Key words,
+   Leitch's spellings (decision 13) or words the join rule splits
+   (decision 15) against the share that are
    English words. English wins a tie. The guess shows beside the
    box, "Reading as English → Enochian · switch". An input of one or
    two words that scores on both sides ("I", "fire", "a man") shows
@@ -119,13 +120,18 @@ forms where any exist.
    with a vocative "O", only where one of the matched glosses does, so "Open the gates" doesn't take the
    article into ODO "open"; an article left over takes its chip, and
    the phrase starts at the next word, so "the earth quakes" is
-   GIZYAX; added in step D);
+   GIZYAX; added in step D; and grammar words alone, such as "I am"
+   ZIR, take a form only where Dee wrote them, exactly, so "of his"
+   doesn't find CNOQOD through WE's "servants, his"; added in step E);
    tier 2 apart from a leading "of" or "to"; tier 3 apart from one
    preposition, shown with a chip ("carries 'in'"). Be-forms,
    negation and pronouns are never ignored, so ZIRDO "I am" is not a
    form of "I". WE's inverted entries ("PEACE, IN") are read only as
    written forwards ("in peace"), so ETHARZI is a tier-3 form of
-   "peace" (as the spike corrected it).
+   "peace" (as the spike corrected it). A pronoun tail inverts too
+   ("servants, his" is "his servants", never "his"), though the head
+   stays a gloss of its own; a pronoun head is the meaning (TILB
+   "HER, OF" is "of her"; added in step E).
 8. **Choosing between forms** (changed after the spike). The best
    tier first. Among forms matched on Dee's own lines, the one he uses
    most for that sense, counting the closing formula of Keys 1 and

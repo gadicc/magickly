@@ -1,11 +1,13 @@
 "use client";
 
-import { Box, SwipeableDrawer, useMediaQuery } from "@mui/material";
+import { Box, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import dictionary from "magick-data/enochian/dictionary";
 import * as React from "react";
 import EnochianFont from "@/fonts/enochian";
+import { visuallyHidden } from "@/ui/visuallyHidden";
 import Entry from "./Entry";
+import EntrySheet from "./EntrySheet";
 import InTheKeys from "./InTheKeys";
 import Keypad from "./Keypad";
 import { LABELS } from "./labels";
@@ -17,6 +19,7 @@ import {
   searchDictionary,
 } from "./search";
 import { useDictionaryUrl } from "./urlState";
+import { useKeypadBox } from "./useKeypadBox";
 
 /**
  * The Enochian dictionary (plan 074): one query in two boxes, Latin and
@@ -43,15 +46,6 @@ const ALL: Hit[] = Object.entries(dictionary).map(([word, entry]) => ({
   ...firstKnownMeaning(entry),
   tier: 0,
 }));
-
-const visuallyHidden = {
-  position: "absolute",
-  width: 1,
-  height: 1,
-  overflow: "hidden",
-  clip: "rect(0 0 0 0)",
-  whiteSpace: "nowrap",
-} as const;
 
 const styles = {
   display: { md: "grid" },
@@ -246,32 +240,16 @@ export default function Dictionary({
   const [active, setActive] = React.useState(-1);
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up("md"));
-  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   // A touch screen gets the keypad in place of its own keyboard; read after
   // hydration, so the server's HTML has no `inputmode` (decision 2).
   const coarse = useMediaQuery("(pointer: coarse)");
   const idPrefix = React.useId();
-  const enochianBox = React.useRef<HTMLInputElement>(null);
-  const [keypad, setKeypad] = React.useState(false);
-  // Where the caret goes once the keypad's change has rendered.
-  const caret = React.useRef<number | null>(null);
-  React.useLayoutEffect(() => {
-    if (caret.current === null) return;
-    enochianBox.current?.setSelectionRange(caret.current, caret.current);
-    caret.current = null;
-  });
-
-  /** Puts `letter` at the Enochian box's caret, or deletes before it. */
-  const edit = (letter: string | null) => {
-    const box = enochianBox.current;
-    if (!box) return;
-    const start = box.selectionStart ?? text.length;
-    const end = box.selectionEnd ?? text.length;
-    const from =
-      letter === null && start === end ? Math.max(0, start - 1) : start;
-    caret.current = from + (letter?.length ?? 0);
-    setText(text.slice(0, from) + (letter ?? "") + text.slice(end));
-  };
+  const {
+    box: enochianBox,
+    keypad,
+    setKeypad,
+    edit,
+  } = useKeypadBox<HTMLInputElement>(text, setText);
 
   // The URL's query fills the boxes on load and on Back; the boxes write it
   // back after a pause. `written` tells our own writes from the others.
@@ -500,9 +478,9 @@ export default function Dictionary({
             />
           )}
         </div>
-        <Box component="div" aria-live="polite" sx={visuallyHidden}>
+        <div aria-live="polite" style={visuallyHidden}>
           {result ? LABELS.found(total) : ""}
-        </Box>
+        </div>
         <div id={listId} role="listbox" aria-label={LABELS.results}>
           {sections.map((section) => {
             const groupId = `${idPrefix}-${section.id}`;
@@ -569,35 +547,13 @@ export default function Dictionary({
           <div className="dict-choose">{LABELS.choose}</div>
         )}
       </section>
-      <SwipeableDrawer
-        anchor="bottom"
+      <EntrySheet
         open={!desktop && Boolean(shown)}
         onClose={close}
-        onOpen={() => {}}
-        disableSwipeToOpen
-        transitionDuration={reducedMotion ? 0 : undefined}
-        slotProps={{
-          paper: {
-            role: "dialog",
-            "aria-modal": true,
-            "aria-labelledby": headingId,
-            sx: { borderRadius: "14px 14px 0 0", maxHeight: "85vh" },
-          },
-        }}
+        headingId={headingId}
       >
-        <Box
-          aria-hidden
-          sx={{
-            width: 36,
-            height: 4,
-            borderRadius: 2,
-            bgcolor: "divider",
-            mx: "auto",
-            mt: 1,
-          }}
-        />
         {!desktop && lastShown.current && entryOf(lastShown.current)}
-      </SwipeableDrawer>
+      </EntrySheet>
     </Box>
   );
 }

@@ -36,6 +36,11 @@ export interface KeyPlace {
   row: number;
   /** Dee's English there. */
   english: string;
+  /**
+   * The English is our division of Dee's running English there
+   * (`englishSplit`), not a unit of his: shown marked as ours.
+   */
+  split?: true;
 }
 
 /** Where a form comes from. */
@@ -304,6 +309,7 @@ const place = (row: Row): KeyPlace => ({
   key: row.key,
   row: row.row,
   english: row.english,
+  ...(row.split ? { split: true as const } : {}),
 });
 
 /** The dictionary keys a folded form opens. */
@@ -768,7 +774,11 @@ function phraseAt(
     // (decisions 7 and 9): "of a" must not find DE.
     if (!core.length || (core.length === 1 && !isContent(core[0]))) continue;
     const found = match(lookup, span);
-    if (found && keepsEdgeArticles(span, found)) return { n, found };
+    if (!found || !keepsEdgeArticles(span, found)) continue;
+    // Grammar words alone ("I am", "under you") take a form only from an
+    // exact gloss: tier 2 would read "of your" as a gloss "your".
+    if (!core.some(isContent) && found.tier !== 1) continue;
+    return { n, found };
   }
   return undefined;
 }

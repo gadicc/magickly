@@ -118,6 +118,7 @@ const place = (row: Row): KeyPlace => ({
   key: row.key,
   row: row.row,
   english: row.english,
+  ...(row.split ? { split: true as const } : {}),
 });
 
 /**

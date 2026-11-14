@@ -32,6 +32,11 @@ export default function EnochianText() {
           gematria.
         </li>
         <li>
+          <Link href="/enochian/translate">The Enochian translator</Link>:
+          English into Enochian and Enochian into English, by looking each word
+          up in Dee&apos;s Keys and the dictionary, with its source shown.
+        </li>
+        <li>
           <Link href="/enochian/tablets">The Enochian tablets</Link>: the four
           elemental Watchtowers of Earth, Air, Water and Fire, with the Tablet
           of Union. Choose the Golden Dawn&apos;s version or Dee&apos;s own of

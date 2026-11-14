@@ -10,20 +10,28 @@ import { GEMATRIA_NOTE, GEMATRIA_SOURCE } from "../gematria";
 import { LABELS } from "./labels";
 import { wordLink } from "./urlState";
 
-const styles = {
+/** An entry's layout, shared with the translator's Key rows. */
+export const ENTRY_STYLES = {
   padding: { xs: "8px 16px 20px", md: "32px 40px" },
+  // The word and its script side by side; where both don't fit, the
+  // script wraps below rather than the word breaking.
   "& .entry-head": {
     display: "flex",
+    flexWrap: "wrap",
     alignItems: "baseline",
     justifyContent: "space-between",
-    gap: 2,
+    columnGap: 2,
   },
   "& h2": {
     margin: 0,
     fontSize: { xs: 24, md: 34 },
     fontWeight: 500,
     letterSpacing: "0.03em",
-    overflowWrap: "anywhere",
+    // Unlike `anywhere`, `break-word` keeps the whole word as the
+    // heading's narrowest width, so the script wraps first; capped at the
+    // line, the word breaks only if it is wider than the pane by itself.
+    overflowWrap: "break-word",
+    maxWidth: "100%",
   },
   "& .entry-script": { fontSize: { xs: 34, md: 48 }, lineHeight: 1 },
   "& .entry-said": { color: "text.secondary", fontSize: 14, mt: 0.5 },
@@ -95,7 +103,7 @@ export default function Entry({
   };
   const pronunciation = said(entry);
   return (
-    <Box sx={styles}>
+    <Box sx={ENTRY_STYLES}>
       <div className="entry-head">
         <h2 id={headingId}>{word}</h2>
         <span className="entry-script" style={EnochianFont.style}>

@@ -257,6 +257,21 @@ describe("English into Enochian (decisions 6–12)", () => {
     // ODO is "open": "the" is the gates', and shows its chip.
     expect(enochian("Open the gates")).toMatch(/^ODO ·G4 /);
     expect(enochian("building a house")).toBe("TROF ·G4 SALMAN");
+    // CNOQOD's "servants, his" is "his servants", so "of his" is G5 and
+    // TOX after the noun; an exact gloss of grammar words still counts.
+    expect(enochian("under you")).toBe("OROCH");
+    // A pronoun at the head is the meaning: TILB "HER, OF", TLB "HIM, OF".
+    expect(enochian("of her")).toBe("TILB");
+    expect(enochian("of him")).toBe("TLB");
+    expect(dictionaryGlosses("HER, IN")).toEqual(["IN HER"]);
+    // A tail with a pronoun keeps the head: "beauty" is still TVRBS.
+    expect(dictionaryGlosses("BEAUTY, IN THEIR")).toEqual([
+      "BEAUTY",
+      "IN THEIR BEAUTY",
+    ]);
+    expect(enochian("thou art")).toBe("GEH");
+    expect(enochian("the gates of his holy house")).not.toMatch(/CNOQOD/);
+    expect(enochian("the gates of his holy house")).toMatch(/TOX/);
     // SALMAN is Dee's "the house": the article is his.
     expect(enochian("the house")).toBe("SALMAN");
     // A leading article no phrase of its own begins with is a chip, and
@@ -813,6 +828,7 @@ describe("the direction guess (decision 4)", () => {
       ["DS", "enochian"],
       ["torzu gohe", "enochian"],
       ["oisalman", "enochian"],
+      ["DSSALMAN", "enochian"],
       ["zir", "enochian"],
     ];
     for (const [text, language] of cases)

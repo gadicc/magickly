@@ -1,4 +1,9 @@
-import { englishWords, FUNCTION_WORDS, PREPOSITIONS } from "./english.ts";
+import {
+  englishWords,
+  FUNCTION_WORDS,
+  PREPOSITIONS,
+  PRONOUNS,
+} from "./english.ts";
 
 /**
  * The glosses a dictionary meaning offers for lookup (plan 081, decisions
@@ -9,7 +14,8 @@ import { englishWords, FUNCTION_WORDS, PREPOSITIONS } from "./english.ts";
  *
  * The Whole Enochian Dictionary inverts: "PEACE, IN" is "in peace", and is
  * read only forwards (decision 7), so ETHARZI is "peace" at tier 3, with
- * its "in" shown, and not at tier 1.
+ * its "in" shown, and not at tier 1. A pronoun tail inverts too: CNOQOD
+ * "servants, his" is "his servants" and "servants", not "his".
  */
 
 /** A sense that is a pointer or an admission, not a meaning. */
@@ -23,6 +29,12 @@ const SEE = /\(see [^()]*\)/gi;
 const NOTES = /\([^()]*\)|\[[^[\]]*\]/g;
 
 const isFunction = (word: string) => FUNCTION_WORDS.has(word);
+/**
+ * A grammar word in a tail, pronouns included: WE's "servants, his"
+ * inverts as "PEACE, IN" does, and is "his servants", never "his". At
+ * the head a pronoun is the meaning: TILB "HER, OF" is "of her".
+ */
+const isTailWord = (word: string) => isFunction(word) || PRONOUNS.has(word);
 const hasContent = (text: string) => !englishWords(text).every(isFunction);
 
 /** Its pieces at commas, trimmed. */
@@ -45,16 +57,24 @@ export function dictionaryGlosses(meaning: string): string[] {
     const whole = piecesOf(sense.replace(/[()[\]]/g, " "));
     const tail = whole.length === 2 ? englishWords(whole[1]) : [];
     const inverted =
-      tail.length > 0 && hasContent(whole[0]) && tail.every(isFunction);
-    // Read only forwards when the tail is a real preposition (decision 7):
-    // "PEACE, IN" is "in peace", never "peace".
+      tail.length > 0 && hasContent(whole[0]) && tail.every(isTailWord);
+    // Read only forwards when the tail is a real preposition alone
+    // (decision 7): "PEACE, IN" is "in peace", never "peace". With a
+    // pronoun ("BEAUTY, IN THEIR") the head stays a gloss too, as before.
     const onlyForwards =
       inverted &&
+      !tail.some((one) => PRONOUNS.has(one)) &&
       tail.some((one) => PREPOSITIONS.has(one) && one !== "of" && one !== "to");
     const firstHasContent = pieces.length > 0 && hasContent(pieces[0]);
     pieces.forEach((piece, at) => {
-      if (at === 0 ? !onlyForwards : hasContent(piece) || !firstHasContent)
-        out.push(piece);
+      if (at === 0) {
+        if (!onlyForwards) out.push(piece);
+        return;
+      }
+      // A later piece of grammar words (an inverted tail, "his" or "of")
+      // is no gloss of its own unless the first piece is grammar too.
+      const words = englishWords(piece);
+      if (!words.every(isTailWord) || !firstHasContent) out.push(piece);
     });
     if (inverted) out.push(`${whole[1]} ${whole[0]}`);
   }

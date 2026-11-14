@@ -127,6 +127,9 @@ export default async function (phase: string): Promise<NextConfig> {
       "/api/search": ["./public/search-vectors/*.bin"],
       // Read with fs by src/geo/server/places.ts, so not traced on its own.
       "/api/places": ["./src/geo/server/places.tsv"],
+      // Read with fs by src/app/enochian/translate/ruleNotes.server.ts when
+      // the page is prerendered; listed in case it is ever rendered again.
+      "/enochian/translate": ["./packages/magick-data/src/enochian/grammar.md"],
       // The legacy alias only renders the Tree, which uses the public base fonts.
       "/api/treeOfLife": ["./public/fonts/*.ttf", resvgWasmTraceFile],
       "/api/render/*": [
