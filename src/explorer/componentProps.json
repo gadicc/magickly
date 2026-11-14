@@ -464,7 +464,7 @@
         "name": "label",
         "type": "string | false",
         "required": false,
-        "description": "The drawing's accessible name: the tablet's own (`tabletName`) when\nnot given, this one when a string, and none when `false`.",
+        "description": "The drawing's accessible name: the tablet's own (`tabletName`) when\nnot given, this one when a string. `false` marks it decorative,\nhidden from assistive technology (`aria-hidden`).",
         "control": { "kind": "text" }
       },
       {
@@ -558,7 +558,7 @@
         "name": "label",
         "type": "string | false",
         "required": false,
-        "description": "The drawing's accessible name: the square's own (\"Kamea of Saturn\")\nwhen not given, this one when a string, and none when `false`.",
+        "description": "The drawing's accessible name: the square's own (\"Kamea of Saturn\")\nwhen not given, this one when a string. `false` marks it decorative,\nhidden from assistive technology (`aria-hidden`).",
         "control": { "kind": "text" }
       },
       {
@@ -605,7 +605,7 @@
         "type": "string",
         "required": false,
         "default": "\"#000\"",
-        "description": "The sigil's stroke, a CSS colour; black (`#000`) by default.",
+        "description": "The sigil's stroke, a CSS colour such as a theme's custom property\n(`var(--my-ink, black)`); black by default. It is set as the path's\nstyle, over its `stroke=\"#000\"` attribute.",
         "control": { "kind": "text" }
       },
       {

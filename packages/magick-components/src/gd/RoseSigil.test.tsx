@@ -83,4 +83,15 @@ describe("RoseSigil", () => {
     expect(draw(true)).toContain('stroke="#aa0"');
     expect(draw(false)).not.toContain('stroke="#aa0"');
   });
+
+  it("draws the rose and no debugging unless told otherwise, as RoseSigil does", () => {
+    const points = sigilPoints("אבג");
+    expect(
+      renderToStaticMarkup(<RoseSigilImage text="אבג" points={points} />),
+    ).toBe(
+      renderToStaticMarkup(
+        <RoseSigilImage text="אבג" showRose debug={false} points={points} />,
+      ),
+    );
+  });
 });

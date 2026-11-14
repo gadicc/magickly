@@ -9,6 +9,7 @@ import Tablet, {
   WATCHTOWER_VIEWBOX,
 } from "./Tablet.tsx";
 import { EquinoxSigils, Sigils } from "./tabletSigils.tsx";
+import { TabletSvg } from "./tabletSvg.tsx";
 
 const draw = (
   id: string,
@@ -27,6 +28,18 @@ const draw = (
     />,
   );
 
+/** A tablet as the hall's art draws it: the drawing alone, unnamed. */
+const drawPlain = (id: string, enochian: boolean, frame: boolean) =>
+  renderToStaticMarkup(
+    <TabletSvg
+      tablet={id}
+      enochianStyle={enochian ? { fontFamily: "Enochian" } : undefined}
+      frame={frame}
+      width={210}
+      height={297}
+    />,
+  );
+
 const sha256 = (text: string) =>
   createHash("sha256").update(text).digest("hex");
 
@@ -40,8 +53,10 @@ const letters = (markup: string) =>
 
 describe("Tablet", () => {
   // Earth and Air in the Golden Dawn's version, the default since the
-  // versions came (plan 061, "Tablet versions"); unnamed (`label={false}`),
-  // as the hall and the image route draw them. Until then they drew
+  // versions came (plan 061, "Tablet versions"); unnamed, as the hall
+  // draws them (`TabletSvg`) and the image route serves them (`label={false}`
+  // with its `aria-hidden` taken off; hashed as `label={false}` until
+  // that marked the tablet decorative). Until then they drew
   // Raphael's 1587 letters with capital Ps (431f2c1b…, 47076de7…,
   // 5dce9c66…, 070a31f9…; 2a3099a8…, 9a45aad1…, 16975aae…, 3005bd54…,
   // hashed on main before stage G, bd26b64): only their letters and
@@ -108,7 +123,14 @@ describe("Tablet", () => {
   ] as const)(
     "draws %s (Enochian %s, frame %s) as it did",
     (id, enochian, frame, hash) => {
-      expect(sha256(draw(id, enochian, frame, false))).toBe(hash);
+      expect(sha256(drawPlain(id, enochian, frame))).toBe(hash);
+      // label={false} is the same drawing, marked decorative.
+      expect(draw(id, enochian, frame, false)).toBe(
+        drawPlain(id, enochian, frame).replace(
+          /^(<svg [^>]*)>/,
+          '$1 aria-hidden="true">',
+        ),
+      );
     },
   );
 
@@ -121,7 +143,7 @@ describe("Tablet", () => {
     );
   });
 
-  it("names each tablet as an image, and is unnamed when told", () => {
+  it("names each tablet as an image, and is decorative when told", () => {
     const named = {
       earth: "Enochian Watchtower of Earth",
       air: "Enochian Watchtower of Air",
@@ -145,6 +167,7 @@ describe("Tablet", () => {
       const unnamed = draw(id, false, true, false);
       expect(unnamed).not.toContain("aria-label");
       expect(unnamed).not.toContain('role="img"');
+      expect(unnamed).toMatch(/^<svg [^>]*aria-hidden="true"/);
     }
   });
 

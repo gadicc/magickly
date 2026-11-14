@@ -67,6 +67,8 @@ describe("Kamea", () => {
     const unnamed = renderToStaticMarkup(<Kamea planet="luna" label={false} />);
     expect(unnamed).not.toContain("role=");
     expect(unnamed).not.toContain("aria-label");
+    // Decorative, as it was before it had a name.
+    expect(unnamed).toMatch(/^<svg [^>]*aria-hidden="true"/);
   });
 
   it("writes no ids, links or stylesheet, so many can share a page", () => {

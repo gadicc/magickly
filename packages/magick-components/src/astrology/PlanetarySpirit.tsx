@@ -98,14 +98,21 @@ function Sigil({
   spirit,
   ink,
   ...props
-}: { spirit: PlanetarySpiritId; ink: string } & SVGProps<SVGSVGElement>) {
+}: { spirit: PlanetarySpiritId; ink?: string } & SVGProps<SVGSVGElement>) {
   const { viewBox, d } = SIGILS[spirit];
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox={viewBox} {...props}>
+      {/*
+        Black in the attribute, which a page's stylesheet may select and
+        re-ink; a caller's ink in the style, which takes a custom property
+        (`var(--ink)`) as a presentation attribute may not, and wins over
+        the page's rules.
+      */}
       <path
         d={d}
         fill="none"
-        stroke={ink}
+        stroke="#000"
+        style={ink === undefined ? undefined : { stroke: ink }}
         strokeWidth={STROKE_WIDTH}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -125,7 +132,12 @@ export interface PlanetarySpiritProps {
   className?: string;
   /** The box's style, over its own `display: flex` and centring. */
   style?: CSSProperties;
-  /** The sigil's stroke, a CSS colour; black (`#000`) by default. */
+  /**
+   * The sigil's stroke, a CSS colour such as a theme's custom property
+   * (`var(--my-ink, black)`); black by default. It is set as the path's
+   * style, over its `stroke="#000"` attribute.
+   * @default "#000"
+   */
   ink?: string;
   /** Hides the sigil from assistive technology when the text names it. */
   "aria-hidden"?: boolean;
@@ -139,7 +151,7 @@ export function PlanetarySpirit({
   spirit,
   className,
   style,
-  ink = "#000",
+  ink,
   "aria-hidden": ariaHidden,
 }: PlanetarySpiritProps) {
   if (spirit === undefined || !isPlanetarySpiritId(spirit)) return null;

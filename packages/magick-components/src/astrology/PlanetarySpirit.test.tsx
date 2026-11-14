@@ -132,10 +132,25 @@ describe("the planetary spirits' geomantic sigils", () => {
     expect(html).not.toMatch(/<svg[^>]* width=/);
   });
 
-  it("inks the sigil in the colour it is given", () => {
+  it("inks the sigil in the colour it is given, over its black", () => {
+    // In the style, where a custom property works; the attribute stays the
+    // black a page's stylesheet may select (as magick.ly's dark mode does).
+    const path = (html: string) => html.match(/<path [^>]*>/)?.[0];
     expect(
-      renderToStaticMarkup(<PlanetarySpirit spirit="zazel" ink="#d6dae0" />),
-    ).toContain('stroke="#d6dae0"');
+      path(
+        renderToStaticMarkup(<PlanetarySpirit spirit="zazel" ink="#d6dae0" />),
+      ),
+    ).toMatch(/ stroke="#000" style="stroke:#d6dae0"/);
+    expect(
+      path(
+        renderToStaticMarkup(
+          <PlanetarySpirit spirit="zazel" ink="var(--ink, black)" />,
+        ),
+      ),
+    ).toContain('style="stroke:var(--ink, black)"');
+    expect(
+      path(renderToStaticMarkup(<PlanetarySpirit spirit="zazel" />)),
+    ).not.toContain("style=");
   });
 
   it("draws nothing for an id without a sigil", () => {

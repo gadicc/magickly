@@ -160,7 +160,8 @@ export interface KameaProps extends KameaFigureProps {
   height?: number | string;
   /**
    * The drawing's accessible name: the square's own ("Kamea of Saturn")
-   * when not given, this one when a string, and none when `false`.
+   * when not given, this one when a string. `false` marks it decorative,
+   * hidden from assistive technology (`aria-hidden`).
    */
   label?: string | false;
   /** The `<svg>`'s class. */
@@ -202,6 +203,7 @@ export function Kamea({
       style={style}
       role={name ? "img" : undefined}
       aria-label={name}
+      aria-hidden={name ? undefined : true}
     >
       <KameaFigure {...figure} />
     </svg>

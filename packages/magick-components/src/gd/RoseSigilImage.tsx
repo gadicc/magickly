@@ -17,10 +17,10 @@ export interface RoseSigilImageProps {
    * anything not one of the 22 letters (spaces, points, Latin) is left out.
    */
   text: string;
-  /** Draws the rose's three rings of letters behind the sigil. */
-  showRose: boolean;
-  /** Draws each letter's circle and the unoptimised path too. */
-  debug: boolean;
+  /** Draws the rose's three rings of letters behind the sigil (default true). */
+  showRose?: boolean;
+  /** Draws each letter's circle and the unoptimised path too (default false). */
+  debug?: boolean;
   /** Letter centres to draw through; the optimised layout when available. */
   points: SigilPoint[];
   /**
@@ -42,8 +42,8 @@ export interface RoseSigilImageProps {
  */
 export function RoseSigilImage({
   text,
-  showRose,
-  debug,
+  showRose = true,
+  debug = false,
   points,
   animation,
   ref,

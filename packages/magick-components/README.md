@@ -280,11 +280,14 @@ sigil, and final forms are drawn as their base letters.
   and a planetary spirit's sigil is drawn, in black unless you pass `ink`,
   a CSS colour such as your theme's custom property
   (`ink="var(--my-ink, black)"`), as magick.ly does for the cross in its
-  dark mode.
-- **Accessible names, where you want others.** `Tablet` and `Kamea` are
-  images named for what they draw ("Enochian Watchtower of Fire", "Kamea
-  of Saturn"). Pass `label` to name one otherwise, or `label={false}` for
-  none, as for a drawing inside one that names itself.
+  dark mode. The sigil's path keeps its `stroke="#000"` attribute, which
+  your stylesheet may select, and takes `ink` as its style, which wins.
+- **Labels.** `label` means one thing wherever a drawing takes it
+  (`Tablet`, `Kamea`). Not given, the drawing is an image named for what
+  it draws ("Enochian Watchtower of Fire", "Kamea of Saturn"); a string
+  names it otherwise; and `label={false}` marks it decorative, hidden
+  from assistive technology (`aria-hidden`), as for a drawing inside one
+  that names itself or beside text that says what it is.
 
 ## Versions
 

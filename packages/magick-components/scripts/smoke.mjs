@@ -537,6 +537,7 @@ import { Kamea } from "magick-components/astrology/Kamea";
 import Lamen from "magick-components/gd/Lamen";
 import FylfotCross, { FYLFOT_CELLS, type FylfotCellClick } from "magick-components/gd/FylfotCross";
 import { GradeTree } from "magick-components/gd/GradeTree";
+import Chakras from "magick-components/chakras/Chakras";
 
 const scale: TreeColorScale = "king";
 const sephirahHref: TreeOfLifeProps["sephirahHref"] = (sephirah) => "/s/" + sephirah.id;
@@ -560,6 +561,11 @@ export const page = (
     {hall && <GdHall hall={hall} fontBaseUrl="/fonts" />}
     <RoseSigil text="שלום" animate={false} />
     <RoseSigilImage text="אב" showRose debug={false} points={[]} />
+    <RoseSigilImage text="אב" points={sigilPoints("אב")} />
+    <Chakras activeChakra="heart" />
+    <Chakras activeChakra={null} />
+    {/* @ts-expect-error: the chakra is activeChakra, as the Tree's sphere is activeSephirah */}
+    <Chakras active="heart" />
     <Tablet tablet="air" />
     <Tablet tablet="earth" frame label={false} mirrorReversed={false} showSecondLetters />
     {/* @ts-expect-error: the tablet is tablet, an id is a DOM id */}

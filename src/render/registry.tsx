@@ -191,14 +191,16 @@ export const COMPONENT_IMAGE_REGISTRY: {
       <Tablet
         tablet={props.id}
         version={props.version}
-        // The image keeps the bytes it was published with; a page that
-        // shows it gives it its own alt text.
+        // A page that shows the image gives it its own alt text.
         label={false}
         enochianStyle={
           props.font === "enochian" ? { fontFamily: "Enochian" } : undefined
         }
       />
     ),
+    // `label={false}` marks the drawing decorative, `aria-hidden`, which
+    // the published images' root never carried; they keep their bytes.
+    source: (svg) => svg.replace(/^(<svg\b[^>]*?) aria-hidden="true"/, "$1"),
     profile: COMPONENT_IMAGE_PROFILE,
     fonts: ["EnochianPlain.ttf"],
     // The sigils are drawn in the component; the letters, which of them are

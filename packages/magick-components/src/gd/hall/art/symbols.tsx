@@ -3,7 +3,7 @@ import {
   TABLET_VERSIONS,
 } from "magick-data/enochian/tablets";
 import type { CSSProperties, ReactNode } from "react";
-import Tablet, { UNION_VIEWBOX } from "../../../enochian/Tablet.tsx";
+import { TabletSvg, UNION_VIEWBOX } from "../../../enochian/tabletSvg.tsx";
 import SevenBranchedCandlestick from "../../SevenBranchedCandlestick.tsx";
 import TableOfShewbread from "../../TableOfShewbread.tsx";
 import { booleanAttr, enumAttr } from "../attributes.ts";
@@ -115,12 +115,12 @@ export function tabletArt(enochianStyle?: CSSProperties): HallArt {
         />
         {element && (
           <g transform={`translate(${-board.width / 2} ${-board.height / 2})`}>
-            <Tablet
+            {/* Unnamed: the hall is the image, and names itself. */}
+            <TabletSvg
               tablet={element}
               version={look.version}
               mirrorReversed={look.reversed}
               showSecondLetters={look.alt}
-              label={false}
               width={board.width}
               height={board.height}
               enochianStyle={enochianStyle}
