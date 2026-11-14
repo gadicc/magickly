@@ -19,7 +19,8 @@
  * 3. every entry loaded in plain Node, and the Tree, a hall and the rose
  *    sigil's image rendered with `renderToStaticMarkup`, no bundler;
  * 4. a strict consumer type-checked under `bundler` and `nodenext`, with
- *    `skipLibCheck` off, and a prop the types must refuse;
+ *    `skipLibCheck` off, and a prop the types must refuse, with the
+ *    README's TSX examples;
  * 5. 3 and 4 again in a second fixture that installs the components'
  *    tarball alone, so that npm takes magick-data from the registry, as a
  *    stranger's install would; skipped, saying so, while the registry
@@ -109,8 +110,8 @@ const SERVER_DRAWINGS = [
   ],
   [
     "candlestick",
-    `import SevenBranchedCandleStick from "magick-components/gd/SevenBranchedCandleStick";`,
-    `<SevenBranchedCandleStick />`,
+    `import SevenBranchedCandlestick from "magick-components/gd/SevenBranchedCandlestick";`,
+    `<SevenBranchedCandlestick />`,
   ],
   [
     "shewbread",
@@ -119,7 +120,7 @@ const SERVER_DRAWINGS = [
   ],
   [
     "fylfot",
-    `import FylfotCross from "magick-components/gd/symbols/fylfot-cross";`,
+    `import FylfotCross from "magick-components/gd/FylfotCross";`,
     `<FylfotCross />`,
   ],
   [
@@ -139,7 +140,7 @@ const SERVER_DRAWINGS = [
   ],
   [
     "spirit",
-    `import PlanetarySpirit from "magick-components/astrology/planetarySpirits";`,
+    `import PlanetarySpirit from "magick-components/astrology/PlanetarySpirit";`,
     `<PlanetarySpirit id="zazel" height="2em" />`,
   ],
   [
@@ -459,11 +460,9 @@ try {
       `import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 const entries = ${JSON.stringify(entries)};
-// Types alone: it loads, and has nothing to export at run time.
-const typesOnly = [];
 for (const entry of entries) {
   const module = await import("magick-components/" + entry.slice(2));
-  if (Object.keys(module).length === 0 && !typesOnly.includes(entry))
+  if (Object.keys(module).length === 0)
     throw new Error(entry + " exports nothing");
 }
 const { default: TreeOfLife } = await import("magick-components/kabbalah/TreeOfLife");
@@ -489,8 +488,24 @@ console.log(entries.length, "entries;", tree.length, hall.length, rose.length, "
     loadEntries(fixture),
   );
 
+  /**
+   * The README's TSX examples, each a module of its own, as the packed
+   * README has them: the consumer below type-checks them too.
+   */
+  const readmeExamples = [
+    ...readFileSync(join(packed, "README.md"), "utf8").matchAll(
+      /^```tsx\n([^]*?)^```$/gm,
+    ),
+  ].map(([, code]) => code);
+  assert(readmeExamples.length > 0, "the README has TSX examples");
+
   /** Type-checks a strict consumer of every entry, both resolutions. */
   const typeCheck = (dir) => {
+    const examples = readmeExamples.map((code, i) => {
+      const file = `readme${i}.tsx`;
+      write(join(dir, "types", file), code);
+      return file;
+    });
     write(
       join(dir, "types", "consumer.tsx"),
       `${entries
@@ -510,11 +525,11 @@ import { optimizeSigilPoints } from "magick-components/gd/roseSigilOptimizer";
 import Tablet from "magick-components/enochian/Tablet";
 import MercuryWidget from "magick-components/astrology/Mercury";
 import { currentOrNextRetrograde } from "magick-components/astrology/mercuryRetrograde";
-import PlanetarySpirit from "magick-components/astrology/planetarySpirits";
+import PlanetarySpirit from "magick-components/astrology/PlanetarySpirit";
 
 const scale: TreeColorScale = "king";
 const hall: HallNode | undefined = hallPreset("neophyte")?.hall;
-const end = currentOrNextRetrograde(new Date())?.end.toISODate();
+const end: string | undefined = currentOrNextRetrograde(new Date())?.end.toISOString();
 export const points: Promise<{ x: number; y: number }[]> = optimizeSigilPoints(sigilPoints("אב"));
 
 export const page = (
@@ -552,7 +567,10 @@ export const page = (
     ]) {
       write(
         join(dir, "types", `tsconfig.${name}.json`),
-        JSON.stringify({ compilerOptions, files: ["consumer.tsx"] }),
+        JSON.stringify({
+          compilerOptions,
+          files: ["consumer.tsx", ...examples],
+        }),
       );
       run(
         process.execPath,

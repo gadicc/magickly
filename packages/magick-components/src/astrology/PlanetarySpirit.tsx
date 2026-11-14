@@ -128,7 +128,7 @@ export interface PlanetarySpiritProps extends CSSProperties {
  * container allows. Every prop but `id` and `aria-hidden` is the box's
  * style.
  */
-export default function PlanetarySpirit(props: PlanetarySpiritProps) {
+export function PlanetarySpirit(props: PlanetarySpiritProps) {
   // Everything but the id and `aria-hidden` is style, as its callers pass it.
   const { id, "aria-hidden": ariaHidden, ...rest } = props;
   if (id === undefined || !isPlanetarySpiritId(id)) return null;
@@ -146,3 +146,5 @@ export default function PlanetarySpirit(props: PlanetarySpiritProps) {
     </div>
   );
 }
+
+export default PlanetarySpirit;

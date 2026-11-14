@@ -22,9 +22,6 @@ describe("componentImage", () => {
   });
 
   it("has none for what the image cannot draw", () => {
-    expect(
-      componentImage("RoseSigil", { sigilText: "אדני", debug: true }),
-    ).toBe(null);
     expect(componentImage("RoseSigil", { sigilText: "abc" })).toBe(null);
     expect(componentImage("Tablet", { id: "union" })).toBe(null);
     expect(componentImage("Tablet", { id: "water", alt: true })).toBe(null);
@@ -37,7 +34,7 @@ describe("componentImage", () => {
     expect(componentImage("Tablet", { id: "fire", version: "dee" })).toBe(
       "/api/render/enochian-tablet?id=fire&version=dee",
     );
-    expect(componentImage("SevenBranchedCandleStick", {})).toBe(
+    expect(componentImage("SevenBranchedCandlestick", {})).toBe(
       "/api/render/seven-branched-candlestick",
     );
     expect(componentImage("TableOfShewbread", {})).toBe(

@@ -1,4 +1,4 @@
-import type { PlanetarySpiritId } from "magick-components/astrology/planetarySpirits";
+import type { PlanetarySpiritId } from "magick-components/astrology/PlanetarySpirit";
 import { archivePageUrl, MIRRORED_PAGES } from "@/sources/mirroredPages";
 
 /**

@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { RoseSigilImage } from "./RoseSigilImage.tsx";
-import { type Point, sigilPoints } from "./roseSigilGeometry.ts";
+import { type SigilPoint, sigilPoints } from "./roseSigilGeometry.ts";
 import { optimizeSigilPoints } from "./roseSigilOptimizer.ts";
 
 export interface RoseSigilProps {
@@ -14,8 +14,6 @@ export interface RoseSigilProps {
   showRose?: boolean;
   /** Draws the connecting path on, once the layout is optimised. */
   animate?: boolean;
-  /** Draws each letter's circle and the unoptimised path too. */
-  debug?: boolean;
   /** The `<svg>`, for exporting the drawing. */
   ref?: React.Ref<SVGSVGElement>;
 }
@@ -27,18 +25,17 @@ export interface RoseSigilProps {
  * browser, and draws the path on. A client component: the server-safe
  * drawing is `RoseSigilImage`.
  */
-export default function RoseSigil({
+export function RoseSigil({
   sigilText,
   showRose = true,
   animate = true,
-  debug = false,
   ref,
 }: RoseSigilProps) {
   const pathRef = React.useRef<SVGPathElement>(null);
   // useId yields ":r1:"-style ids; CSS identifiers need the colons removed.
   const animation = `rose-sigil-draw-${React.useId().replace(/[^\w-]/g, "")}`;
   const points = React.useMemo(() => sigilPoints(sigilText), [sigilText]);
-  const [optimized, setOptimized] = React.useState<Point[] | null>(null);
+  const [optimized, setOptimized] = React.useState<SigilPoint[] | null>(null);
 
   React.useEffect(() => {
     if (!points.length) return;
@@ -72,7 +69,7 @@ export default function RoseSigil({
     <RoseSigilImage
       sigilText={sigilText}
       showRose={showRose}
-      debug={debug}
+      debug={false}
       points={optimized || points}
       animation={animate ? animation : undefined}
       svgRef={ref}
@@ -80,3 +77,5 @@ export default function RoseSigil({
     />
   );
 }
+
+export default RoseSigil;

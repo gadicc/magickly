@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { DateTime, Settings } from "luxon";
-import { moonMeanInclination } from "magick-components/astrology/moonPath";
+import { MOON_MEAN_INCLINATION } from "magick-components/astrology/moonPath";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resetPlaceStore } from "@/geo/usePlace";
@@ -101,13 +101,13 @@ describe("the Moon page's drawing", () => {
     const transform = () =>
       container.querySelector("svg")?.getAttribute("transform");
     expect(problems).toEqual([]);
-    expect(transform()).toBe(`rotate(${moonMeanInclination})`);
+    expect(transform()).toBe(`rotate(${MOON_MEAN_INCLINATION})`);
 
     await act(async () => {
       answerGeo({ name: "Cape Town", latitude: -33.92, longitude: 18.42 });
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
-    expect(transform()).toBe(`rotate(${180 - moonMeanInclination})`);
+    expect(transform()).toBe(`rotate(${180 - MOON_MEAN_INCLINATION})`);
     await unmount();
   });
 });

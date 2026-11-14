@@ -1,16 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { SVG_COORDINATE_DECIMALS, svgCoordinate } from "../svgCoordinate.ts";
+import { letterPoint, roseLetters, sigilPoints } from "./roseSigilGeometry.ts";
 import {
   largeArc,
   letterIJ,
-  letterPoint,
   objective,
-  type Point,
   pathFromPoints,
   pointsToArray,
-  roseLetters,
-  sigilPoints,
-} from "./roseSigilGeometry.ts";
+  type SigilPoint,
+} from "./roseSigilInternals.ts";
 import { optimizeSigilPoints } from "./roseSigilOptimizer.ts";
 
 /** One or two doubles away from zero: the size of a Node/Chromium trig difference. */
@@ -18,8 +16,8 @@ const nudge = (value: number) => value * (1 + Number.EPSILON);
 
 /** Centre and radius SVG gives `A radius,radius 0 large,sweep to` (SVG 2, B.2.4). */
 function arcCircle(
-  from: Point,
-  to: Point,
+  from: SigilPoint,
+  to: SigilPoint,
   radius: number,
   large: boolean,
   sweep: boolean,
@@ -111,7 +109,7 @@ describe("rose sigil geometry", () => {
       / L 0,35 L -17\.5,-30\.311 L -12\.99,7\.5 L -11\.004,7\.263 L -14\.976,7\.737$/,
     );
     // End bars across rising, falling and vertical lines, +x end first.
-    const bar = (points: Point[]) =>
+    const bar = (points: SigilPoint[]) =>
       pathFromPoints({ points, sigilTokens: ["א", "ב"] })
         .match(/ L (\S+) L (\S+)$/)
         ?.slice(1);
@@ -205,7 +203,7 @@ describe("rose sigil geometry", () => {
         }
     }
     // Only ties change: directions 1e-6 apart still decide the bend.
-    const bend = (previous: Point, nextNext: Point) =>
+    const bend = (previous: SigilPoint, nextNext: SigilPoint) =>
       pathFromPoints({
         points: [previous, { x: 0, y: 0 }, { x: 0, y: 0.5 }, nextNext],
         sigilTokens: ["א", "ב", "ב", "ג"],
@@ -245,7 +243,7 @@ describe("rose sigil geometry", () => {
   });
 
   it("draws large arcs as quarters of the same circle that rounding keeps", () => {
-    const cases: Array<[Point, Point]> = [
+    const cases: Array<[SigilPoint, SigilPoint]> = [
       // An ordinary loop.
       [
         { x: 1.931, y: 24.02 },

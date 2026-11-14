@@ -404,7 +404,7 @@ function EyeOfHorus() {
  * officer's glyph, in a −50…50 box. It defines no ids, so any number can
  * share a page.
  */
-export default function Lamen({
+export function Lamen({
   officer,
   grade,
   width,
@@ -520,3 +520,5 @@ export default function Lamen({
     </svg>
   );
 }
+
+export default Lamen;

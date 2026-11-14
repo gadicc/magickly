@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { moonMeanInclination } from "magick-components/astrology/moonPath";
+import { MOON_MEAN_INCLINATION } from "magick-components/astrology/moonPath";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resetPlaceStore } from "@/geo/usePlace";
@@ -34,8 +34,8 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const north = `rotate(${moonMeanInclination})`;
-const south = `rotate(${180 - moonMeanInclination})`;
+const north = `rotate(${MOON_MEAN_INCLINATION})`;
+const south = `rotate(${180 - MOON_MEAN_INCLINATION})`;
 
 /**
  * Hydrates the planets page's moon, then lets `/api/geo` answer `place`

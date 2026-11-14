@@ -1,9 +1,7 @@
 "use client";
 
-import type { DateTime } from "luxon";
 import { type ImgHTMLAttributes, useEffect, useState } from "react";
 import { cssString } from "../cssString.ts";
-import type { Retrograde } from "./mercuryRetrograde.ts";
 
 const NARROW_CHARACTER =
   /[\p{sc=Latin}\p{sc=Cyrillic}\p{sc=Greek}\p{sc=Hebrew}\p{sc=Arabic}\p{sc=Common}\p{sc=Inherited}]/u;
@@ -40,25 +38,37 @@ export interface MercuryWidgetProps {
  * planet. Rendered on the server, it leaves a blank line where the dates
  * go.
  */
-function MercuryWidget({
+export function MercuryWidget({
   padding = "10px 0 2px 0",
   background,
   image,
 }: MercuryWidgetProps) {
   // The page is prerendered, and the dates depend on today's date, the
   // viewer's zone and their date format, so they can't be in the HTML.
-  // undefined until the calculation answers, then a retrograde or null.
-  const [retrograde, setRetrograde] = useState<Retrograde | null>();
+  // undefined until the calculation answers, then the retrograde's dates
+  // as the viewer writes them, or null.
+  const [retrograde, setRetrograde] = useState<{
+    start: string;
+    end: string;
+  } | null>();
 
   useEffect(() => {
     let current = true;
     // The ephemeris is worth about 22kB gzipped, so it loads here rather
     // than with the page.
     const update = () =>
-      import("./mercuryRetrograde.ts")
-        .then(({ currentOrNextRetrograde }) => {
+      Promise.all([import("./mercuryRetrograde.ts"), import("luxon")])
+        .then(([{ currentOrNextRetrograde }, { DateTime }]) => {
+          const d = (date: Date) =>
+            DateTime.fromJSDate(date).toLocaleString({
+              month: "short",
+              day: "2-digit",
+            });
+          const found = currentOrNextRetrograde(new Date());
           if (current)
-            setRetrograde(currentOrNextRetrograde(new Date()) ?? null);
+            setRetrograde(
+              found ? { start: d(found.start), end: d(found.end) } : null,
+            );
         })
         .catch((error) => {
           console.error(error);
@@ -77,10 +87,8 @@ function MercuryWidget({
     };
   }, []);
 
-  const d = (date: DateTime) =>
-    date.toLocaleString({ month: "short", day: "2-digit" });
   let label = "\u00a0"; // keeps the label's line height
-  if (retrograde) label = `Retro ${d(retrograde.start)} – ${d(retrograde.end)}`;
+  if (retrograde) label = `Retro ${retrograde.start} – ${retrograde.end}`;
   else if (retrograde === null) label = "Retro dates unknown";
   const fitCqi = Math.floor(1000 / emWidth(label)) / 10;
 

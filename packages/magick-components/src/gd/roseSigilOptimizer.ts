@@ -9,10 +9,10 @@
 import {
   arrayToPoints,
   objective,
-  type Point,
   pointsToArray,
   SIGIL_MAX_EVALUATIONS,
-} from "./roseSigilGeometry.ts";
+  type SigilPoint,
+} from "./roseSigilInternals.ts";
 
 type NloptModule = {
   ready: Promise<unknown>;
@@ -64,7 +64,9 @@ async function loadNlopt(): Promise<NloptModule> {
  * stay readable. Bounded by evaluations, never by wall-clock time, so the
  * browser and the server converge on the same layout.
  */
-export async function optimizeSigilPoints(points: Point[]): Promise<Point[]> {
+export async function optimizeSigilPoints(
+  points: SigilPoint[],
+): Promise<SigilPoint[]> {
   if (points.length === 0) return [];
   let nlopt: NloptModule;
   try {

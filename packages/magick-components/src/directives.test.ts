@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
  * the server image renderer draws TreeOfLife and RoseSigilImage, where a
  * directive would make them client references. Every export of a client
  * module becomes a client reference too, so one exports only its
- * component (and types, which are erased).
+ * component, by name and as the default (and types, which are erased).
  */
 const root = path.resolve("packages/magick-components/src");
 const CLIENT_MODULES = [
@@ -72,13 +72,20 @@ describe("client directives", () => {
   });
 
   it("has each client module export only its component and types", () => {
-    const extra = client.flatMap((file) =>
-      [
-        ...readFileSync(file, "utf8").matchAll(
-          /^export (?!default |interface |type )(.*)$/gm,
-        ),
-      ].map((match) => `${relative(file)}: ${match[1]}`),
-    );
+    const extra = client.flatMap((file) => {
+      const source = readFileSync(file, "utf8");
+      // The component, by name and as the default.
+      const component = source.match(/^export default (\w+);$/m)?.[1];
+      return [
+        ...source.matchAll(/^export (?!default |interface |type )(.*)$/gm),
+      ]
+        .filter(
+          (match) =>
+            component === undefined ||
+            !match[1].startsWith(`function ${component}(`),
+        )
+        .map((match) => `${relative(file)}: ${match[1]}`);
+    });
     expect(extra).toEqual([]);
   });
 });

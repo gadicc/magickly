@@ -12,7 +12,7 @@ import {
 import FylfotCross, {
   fylfot,
   typeFromId,
-} from "magick-components/gd/symbols/fylfot-cross";
+} from "magick-components/gd/FylfotCross";
 import data from "magick-data";
 import React from "react";
 import OpenSource from "@/OpenSource";

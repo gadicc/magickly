@@ -2,7 +2,8 @@ import Data from "magick-data";
 import type { SephirahRow, TreeOfLifePathRow } from "magick-data/rows";
 import React from "react";
 import { svgCoordinate } from "../svgCoordinate.ts";
-import { FIELD_PATH_LIST_SEPARATOR, readFieldPath } from "./fieldPath.ts";
+import { readFieldPath } from "./fieldPath.ts";
+import { labelLines, pathTitle } from "./treeLabels.ts";
 import {
   LineOutline,
   ORDERED_PATHS as orderedPaths,
@@ -36,18 +37,6 @@ export const TREE_COLOR_SCALES: readonly TreeColorScale[] = ["queen", "king"];
 export type TreePathAttribution = keyof typeof orderedPaths &
   keyof TreeOfLifePathRow;
 
-/**
- * What `pathTitle` reads of a path: each attribution's letter, and the
- * Hermetic Tree's path number and trump. A magick-data path row is one.
- */
-export type TitledPath = {
-  [A in TreePathAttribution]?: {
-    hebrewLetter?: { letter?: { name: string; he: string } };
-    pathNo?: number;
-    tarotTitle?: string;
-  };
-};
-
 /** A sphere as the Tree draws it, which `sephirahHref` is given. */
 export interface TreeSephirah {
   /** Its centre. */
@@ -77,23 +66,6 @@ function fontSizeNumber(size: unknown): number {
   return Number.isFinite(value) && value > 0 ? value : 10;
 }
 
-/**
- * A sphere's label as the lines it is drawn on. A list, which field paths
- * join with "; " (`stones.*.name.en`), takes a line per item, so "star ruby;
- * turquoise" breaks between the stones and not inside one; anything else
- * breaks at its first space, as the Tree always has. Blank words are
- * dropped, as they always were.
- */
-export function labelLines(text: string): string[] {
-  if (text.includes(FIELD_PATH_LIST_SEPARATOR))
-    return text
-      .split(FIELD_PATH_LIST_SEPARATOR)
-      .map((item) => item.trim())
-      .filter((item) => item !== "");
-  const words = text.split(" ").filter((word) => word !== "");
-  return words.length > 1 ? [words[0], words.slice(1).join(" ")] : words;
-}
-
 /** A link, or a plain group when `href` is empty (GradeTree's paths). */
 function SvgLink({
   href,
@@ -112,23 +84,6 @@ function SvgLink({
       {children}
     </a>
   );
-}
-
-/**
- * A path's tooltip, which search engines also read: "Path 31: Shin (ש),
- * Judgement" in the Hermetic attribution, the letter alone in the others.
- */
-export function pathTitle(
-  path: TitledPath,
-  letterAttr: TreePathAttribution,
-): string {
-  const attribution = path[letterAttr];
-  const letter = attribution?.hebrewLetter?.letter;
-  if (!letter) return "";
-  const named = `${letter.name} (${letter.he})`;
-  if (letterAttr !== "hermetic") return named;
-  const { pathNo, tarotTitle } = attribution;
-  return `Path ${pathNo}: ${named}${tarotTitle ? `, ${tarotTitle}` : ""}`;
 }
 
 /*
@@ -254,7 +209,7 @@ const defaultPathHref = (path: TreeOfLifePathRow) =>
  * Its ids come from `useId` when `id` is not given; given a `ref`, a click
  * on a link in the browser sets `location.href`.
  */
-function TreeOfLife({ id, ref, ...props }: TreeOfLifeProps) {
+export function TreeOfLife({ id, ref, ...props }: TreeOfLifeProps) {
   const generatedId = `tree-of-life-${React.useId().replace(/[^A-Za-z0-9_-]/g, "_")}`;
 
   if ("useEffect" in React) {

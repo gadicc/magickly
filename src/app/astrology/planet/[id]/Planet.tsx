@@ -1,6 +1,4 @@
-import PlanetarySpirit from "magick-components/astrology/planetarySpirits";
-import { dayOf } from "magick-components/astrology/planetDays";
-import { planetName } from "magick-components/astrology/planetName";
+import PlanetarySpirit from "magick-components/astrology/PlanetarySpirit";
 import Data from "magick-data";
 import type { PlanetRow } from "magick-data/rows";
 import { Fragment } from "react";
@@ -11,6 +9,8 @@ import {
   HeydonCitation,
   rulerSigilPage,
 } from "@/drawings/sigilSources";
+import { dayOf } from "@/lib/planetDays";
+import { planetName } from "@/lib/planetName";
 import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import SourceLink from "@/sources/SourceLink";
 import { RWSName } from "@/tarot";

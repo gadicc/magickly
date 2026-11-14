@@ -3,9 +3,9 @@ import Tablet from "magick-components/enochian/Tablet";
 import { RoseSigilImage } from "magick-components/gd/RoseSigilImage";
 import { sigilPoints } from "magick-components/gd/roseSigilGeometry";
 import { optimizeSigilPoints } from "magick-components/gd/roseSigilOptimizer";
-import SevenBranchedCandleStick, {
+import SevenBranchedCandlestick, {
   CANDLESTICK_PLANETS,
-} from "magick-components/gd/SevenBranchedCandleStick";
+} from "magick-components/gd/SevenBranchedCandlestick";
 import TableOfShewbread from "magick-components/gd/TableOfShewbread";
 import { TreeOfLifeSvg } from "magick-components/kabbalah/TreeOfLife";
 import type { ReactElement } from "react";
@@ -210,7 +210,7 @@ export const COMPONENT_IMAGE_REGISTRY: {
     ],
   },
   "seven-branched-candlestick": {
-    render: () => <SevenBranchedCandleStick />,
+    render: () => <SevenBranchedCandlestick />,
     profile: COMPONENT_IMAGE_PROFILE,
     inputs: CANDLESTICK_INPUTS,
   },

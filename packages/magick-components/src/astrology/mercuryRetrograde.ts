@@ -71,8 +71,11 @@ export function mercuryStations(from: Date, to: Date, stepDays = 2): Station[] {
   return stations;
 }
 
-/** A retrograde as the dates the viewer's own zone puts its stations on. */
-export type Retrograde = { start: DateTime; end: DateTime };
+/**
+ * A retrograde as the dates the viewer's own zone puts its stations on:
+ * each the start of its local day.
+ */
+export type Retrograde = { start: Date; end: Date };
 
 /** The start of the local date `minutes` after `time`. */
 function localDate(time: Date, minutes: number) {
@@ -97,6 +100,9 @@ export function currentOrNextRetrograde(now: Date): Retrograde | undefined {
 
     const end = localDate(next.time, MARGIN_MINUTES);
     if (now.getTime() <= end.endOf("day").toMillis())
-      return { start: localDate(station.time, -MARGIN_MINUTES), end };
+      return {
+        start: localDate(station.time, -MARGIN_MINUTES).toJSDate(),
+        end: end.toJSDate(),
+      };
   }
 }

@@ -97,6 +97,11 @@ Each is a subpath of the package; there is no root entry. Most subpaths
 are one module, and `gd/hall` gathers the hall's: its exports come from
 several modules, and the package declares no side effects but its CSS,
 so a bundler takes from it only the modules whose exports a page uses.
+Each component is its entry's default export and a named export too
+(`import TreeOfLife from …` or `import { TreeOfLife } from …`). Each
+component imports only the magick-data tables it draws, except
+`TreeOfLife` and `GradeTree`: a sphere's label may be any field of the
+assembled graph, so they import magick-data's root entry, every table.
 
 | Subpath | What it is |
 | --- | --- |
@@ -109,22 +114,19 @@ so a bundler takes from it only the modules whose exports a page uses.
 | `gd/lamenGrades` | Which grades' lamens each officer wears |
 | `gd/RoseSigil` | The rose-cross sigil of a Hebrew text, optimised and drawn on in the browser (`"use client"`) |
 | `gd/RoseSigilImage` | The same sigil with no hooks, for the server, from points you give it |
-| `gd/roseSigilGeometry` | The rose's letters and the sigil's geometry, `roseLetters()` and `sigilPoints()` among them |
+| `gd/roseSigilGeometry` | The rose's letters and where a text's letters stand on it: `ROSE_LETTERS`, `roseLetters()`, `letterPoint()` and `sigilPoints()` |
 | `gd/roseSigilOptimizer` | `optimizeSigilPoints()`, the layout optimiser (nlopt, compiled to WASM) |
-| `gd/SevenBranchedCandleStick` | The seven-branched candlestick, with its planets |
+| `gd/SevenBranchedCandlestick` | The seven-branched candlestick, with its planets |
 | `gd/TableOfShewbread` | The table of shewbread, with the signs and the tribes |
-| `gd/symbols/fylfot-cross` | The fylfot cross of the signs and elements |
+| `gd/FylfotCross` | The fylfot cross of the signs and elements |
 | `enochian/Tablet` | An Enochian tablet, a Watchtower or the Tablet of Union, in the Golden Dawn's, Dee's or another tradition's letters |
 | `chakras/Chakras` | The seven chakras, in their colours, on the outline of a body |
 | `astrology/Kamea` | A planet's kamea, its magic square |
-| `astrology/planetarySpirits` | The planetary spirits' geomantic sigils (the Rulers of the figures) |
+| `astrology/PlanetarySpirit` | A planetary spirit's geomantic sigil (the Rulers of the figures) |
 | `astrology/Moon` | The Moon's phase today, as seen from either hemisphere (`"use client"`) |
 | `astrology/moonPath` | The Moon drawing's lit part for a phase |
 | `astrology/Mercury` | Mercury's next retrograde, under a picture of the planet you give it (`"use client"`) |
 | `astrology/mercuryRetrograde` | Mercury's stations and retrogrades, from astronomy-engine |
-| `astrology/planetDays` | Which planet rules each day of the week |
-| `astrology/planetName` | A planet's name as readers search for it: "Sun (Sol)", "Mercury" |
-| `hooks/useHydrated` | `useHydrated()`: false on the server and while hydrating, true after |
 | `fonts/*` | The hall's fonts and `gd-hall.css` ([below](#the-halls-fonts)) |
 
 ### Not stable

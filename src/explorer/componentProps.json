@@ -356,14 +356,6 @@
         "control": { "kind": "switch" }
       },
       {
-        "name": "debug",
-        "type": "boolean",
-        "required": false,
-        "default": "false",
-        "description": "Draws each letter's circle and the unoptimised path too.",
-        "control": { "kind": "switch" }
-      },
-      {
         "name": "showRose",
         "type": "boolean",
         "required": false,
@@ -373,7 +365,7 @@
       }
     ]
   },
-  "SevenBranchedCandleStick": {
+  "SevenBranchedCandlestick": {
     "description": "The Golden Dawn's seven-branched candlestick: a branch for each of the\nseven planets, with its symbol, Hebrew name, archangel and letter, set\nabout a heptagram.",
     "props": [
       {

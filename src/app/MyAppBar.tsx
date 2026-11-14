@@ -28,7 +28,6 @@ import {
   Typography,
   useScrollTrigger,
 } from "@mui/material";
-import useHydrated from "magick-components/hooks/useHydrated";
 import Image from "next/image";
 import Link from "next/link";
 import NextLink from "next/link";
@@ -41,6 +40,7 @@ import ThemeSwitch from "@/app/ThemeSwitch";
 import { sqlBrowserLifecycle } from "@/auth/browserLifecycle";
 import { useSession } from "@/auth/client";
 import SearchButton from "@/search/SearchButton";
+import useHydrated from "@/ui/useHydrated";
 // import Link from "@/ui/Link";
 import { useLegacyRecoveryGate } from "./clientProviders";
 import pathnames from "./pathnames";

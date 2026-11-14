@@ -1,4 +1,4 @@
-import SevenBranchedCandleStick from "magick-components/gd/SevenBranchedCandleStick";
+import SevenBranchedCandlestick from "magick-components/gd/SevenBranchedCandlestick";
 // import { FylfotCross } from "../../pages/hogd/symbols/fylfot-cross";
 import TableOfShewbread from "magick-components/gd/TableOfShewbread";
 import Ink from "@/drawings/Ink";
@@ -29,7 +29,7 @@ const tiles = [
   {
     Component: () => (
       <Ink drawing="candlestick">
-        <SevenBranchedCandleStick />
+        <SevenBranchedCandlestick />
       </Ink>
     ),
     // img: "/pics/treeOfLife.jpg",

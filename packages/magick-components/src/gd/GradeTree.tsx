@@ -28,7 +28,7 @@ function pathHref() {
  * order and planet below, and linked to `/gd/grade/<id>`; the paths are
  * not linked. Any of `TreeOfLife`'s props override these.
  */
-function GradeTree({ ...props }: TreeOfLifeProps) {
+export function GradeTree({ ...props }: TreeOfLifeProps) {
   return (
     <TreeOfLife
       field="gdGrade.id"

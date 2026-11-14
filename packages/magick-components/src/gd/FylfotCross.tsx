@@ -1,4 +1,6 @@
-import data from "magick-data";
+import elements from "magick-data/alchemy/elements";
+import planets from "magick-data/astrology/planets";
+import zodiac from "magick-data/astrology/zodiac";
 import type { CSSProperties } from "react";
 
 const colorFromElement: Readonly<Record<string, string>> = {
@@ -32,6 +34,9 @@ export const fylfot = [
   ["virgo", null, "libra", null, null],
   ["earth", null, "aquarius", "gemini", "air"],
 ];
+
+/** The tables the squares' symbols come from. */
+const TABLES = { planet: planets, element: elements, zodiac };
 
 /** The table a fylfot id is a row of. */
 export function typeFromId(id: string): "planet" | "element" | "zodiac" {
@@ -87,7 +92,7 @@ export interface FylfotCrossProps {
 }
 
 /** The fylfot cross of the signs and elements, as a table of squares. */
-export default function FylfotCross({
+export function FylfotCross({
   cells = fylfot,
   onClick,
   showColors = true,
@@ -151,9 +156,10 @@ export default function FylfotCross({
                     </td>
                   );
 
-                const type = typeFromId(id);
                 const item = (
-                  data[type] as Readonly<Record<string, { symbol: string }>>
+                  TABLES[typeFromId(id)] as Readonly<
+                    Record<string, { symbol: string }>
+                  >
                 )[id];
                 // console.log([id, type, item]);
 
@@ -183,3 +189,5 @@ export default function FylfotCross({
     </>
   );
 }
+
+export default FylfotCross;

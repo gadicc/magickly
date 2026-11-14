@@ -2,8 +2,8 @@
 import lune from "lune";
 import { DateTime } from "luxon";
 import MoonDrawing from "magick-components/astrology/Moon";
-import useHydrated from "magick-components/hooks/useHydrated";
 import usePlace from "@/geo/usePlace";
+import useHydrated from "@/ui/useHydrated";
 
 /*
 // https://www.unicode.org/L2/L2017/17304-moon-var.pdf

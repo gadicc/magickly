@@ -1,10 +1,14 @@
 import { readFileSync } from "node:fs";
-import { Settings } from "luxon";
+import { DateTime, Settings } from "luxon";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   currentOrNextRetrograde,
   mercuryStations,
 } from "./mercuryRetrograde.ts";
+
+/** A retrograde's date in the zone the test sets, as luxon gives it. */
+const isoDate = (date: Date | undefined) =>
+  date && DateTime.fromJSDate(date).toISODate();
 
 /**
  * Mercury's stations as NASA JPL Horizons gives them, fitted from its
@@ -61,7 +65,7 @@ describe("currentOrNextRetrograde", () => {
   it("gives the retrograde in progress, then the next one", () => {
     // Mercury turns retrograde 24 Oct 2026 and direct on 13 Nov.
     const dates = (retrograde = currentOrNextRetrograde(new Date())) =>
-      `${retrograde?.start.toISODate()} to ${retrograde?.end.toISODate()}`;
+      `${isoDate(retrograde?.start)} to ${isoDate(retrograde?.end)}`;
 
     at("2026-09-18T12:00:00Z", "Europe/London", () =>
       expect(dates()).toBe("2026-10-24 to 2026-11-13"),
@@ -81,12 +85,12 @@ describe("currentOrNextRetrograde", () => {
   it("gives each viewer the dates of their own zone", () => {
     // Mercury turns direct at 2026-11-13 15:52 UTC, the 14th in Auckland.
     at("2026-11-01T12:00:00Z", "Europe/London", () =>
-      expect(currentOrNextRetrograde(new Date())?.end.toISODate()).toBe(
+      expect(isoDate(currentOrNextRetrograde(new Date())?.end)).toBe(
         "2026-11-13",
       ),
     );
     at("2026-11-01T12:00:00Z", "Pacific/Auckland", () =>
-      expect(currentOrNextRetrograde(new Date())?.end.toISODate()).toBe(
+      expect(isoDate(currentOrNextRetrograde(new Date())?.end)).toBe(
         "2026-11-14",
       ),
     );
@@ -97,7 +101,7 @@ describe("currentOrNextRetrograde", () => {
     // 9th in New York. Twelve minutes either way changes that date, so the
     // later one is used.
     at("2020-03-01T12:00:00Z", "America/New_York", () =>
-      expect(currentOrNextRetrograde(new Date())?.end.toISODate()).toBe(
+      expect(isoDate(currentOrNextRetrograde(new Date())?.end)).toBe(
         "2020-03-10",
       ),
     );
@@ -110,14 +114,14 @@ describe("currentOrNextRetrograde", () => {
       const retrograde = currentOrNextRetrograde(now);
       if (!retrograde) throw new Error(`No retrograde at ${now.toISOString()}`);
 
-      expect(retrograde.start.toMillis()).toBeLessThanOrEqual(
-        retrograde.end.toMillis(),
+      expect(retrograde.start.getTime()).toBeLessThanOrEqual(
+        retrograde.end.getTime(),
       );
       // It hasn't finished, and Mercury turns retrograde every 116 days.
-      expect(retrograde.end.endOf("day").toMillis()).toBeGreaterThanOrEqual(
-        now.getTime(),
-      );
-      expect(retrograde.start.toMillis()).toBeLessThan(
+      expect(
+        DateTime.fromJSDate(retrograde.end).endOf("day").toMillis(),
+      ).toBeGreaterThanOrEqual(now.getTime());
+      expect(retrograde.start.getTime()).toBeLessThan(
         now.getTime() + 130 * 86400_000,
       );
     }

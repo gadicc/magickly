@@ -4,7 +4,7 @@
  * pure contracts are imported. The contracts' query names are not the
  * components' props (`text` for `sigilText`), so each component maps its
  * own, and a drawing the image cannot show (second letters on a tablet,
- * a sigil's debug circles) has no image.
+ * highlighted squares) has no image.
  */
 import { componentImagePath } from "@/render/componentImageUrl";
 import { CONTRACTS, type ComponentImageSlug } from "@/render/contracts";
@@ -41,7 +41,7 @@ export const IMAGE_COMPONENTS = [
   "TreeOfLife",
   "Tablet",
   "RoseSigil",
-  "SevenBranchedCandleStick",
+  "SevenBranchedCandlestick",
   "TableOfShewbread",
 ] as const;
 
@@ -75,12 +75,11 @@ export function componentImage(name: string, props: Props): string | null {
         version: text(props.version),
       });
     case "RoseSigil":
-      if (props.debug === true) return null;
       return viaContract("rose-sigil", {
         text: text(props.sigilText),
         rose: flag(props.showRose),
       });
-    case "SevenBranchedCandleStick":
+    case "SevenBranchedCandlestick":
       return viaContract("seven-branched-candlestick", {});
     case "TableOfShewbread":
       return viaContract("table-of-shewbread", {});

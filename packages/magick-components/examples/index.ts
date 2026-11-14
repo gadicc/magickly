@@ -12,7 +12,7 @@ import { Mercury } from "./Mercury.examples.tsx";
 import { Moon } from "./Moon.examples.tsx";
 import { PlanetarySpirit } from "./PlanetarySpirit.examples.tsx";
 import { RoseSigil } from "./RoseSigil.examples.tsx";
-import { SevenBranchedCandleStick } from "./SevenBranchedCandleStick.examples.tsx";
+import { SevenBranchedCandlestick } from "./SevenBranchedCandlestick.examples.tsx";
 import { TableOfShewbread } from "./TableOfShewbread.examples.tsx";
 import { Tablet } from "./Tablet.examples.tsx";
 import { TreeOfLife } from "./TreeOfLife.examples.tsx";
@@ -30,7 +30,7 @@ export const COMPONENT_EXAMPLES = {
   GdHall,
   Lamen,
   RoseSigil,
-  SevenBranchedCandleStick,
+  SevenBranchedCandlestick,
   TableOfShewbread,
   FylfotCross,
   Tablet,

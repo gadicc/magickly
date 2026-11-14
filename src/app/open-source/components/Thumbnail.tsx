@@ -1,10 +1,10 @@
 import Kamea from "magick-components/astrology/Kamea";
 import Moon from "magick-components/astrology/Moon";
-import PlanetarySpirit from "magick-components/astrology/planetarySpirits";
+import PlanetarySpirit from "magick-components/astrology/PlanetarySpirit";
 import Chakras from "magick-components/chakras/Chakras";
+import FylfotCross from "magick-components/gd/FylfotCross";
 import GradeTree from "magick-components/gd/GradeTree";
 import Lamen from "magick-components/gd/Lamen";
-import FylfotCross from "magick-components/gd/symbols/fylfot-cross";
 import type { ComponentType } from "react";
 import { inkClass } from "@/drawings/Ink";
 import { plateClass } from "@/drawings/plate";

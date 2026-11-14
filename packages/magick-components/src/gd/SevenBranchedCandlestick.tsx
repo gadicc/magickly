@@ -1,6 +1,18 @@
-import data from "magick-data";
-import { PlanetId } from "magick-data/astrology/planets";
+import { assemble } from "magick-data/assemble";
+import planetRows, { type PlanetId } from "magick-data/astrology/planets";
+import hebrewLetterRows from "magick-data/hebrewLetters";
+import archangelRows from "magick-data/kabbalah/archangels";
 import React from "react";
+
+/**
+ * The planets with their archangels and letters joined: the three tables
+ * the branches read, rather than the whole barrel.
+ */
+const data = assemble({
+  planet: planetRows,
+  archangel: archangelRows,
+  hebrewLetter: hebrewLetterRows,
+});
 
 interface Point {
   x: number;
@@ -141,7 +153,7 @@ function Branch({ index, idPrefix }: { index: number; idPrefix: string }) {
 }
 
 /** Props of the diagram. */
-export interface SevenBranchedCandleStickProps {
+export interface SevenBranchedCandlestickProps {
   /**
    * Prefixes the text paths' ids, which are document-wide: two of these
    * on one page need different prefixes. No hook makes one, so that the
@@ -157,10 +169,10 @@ export interface SevenBranchedCandleStickProps {
  * seven planets, with its symbol, Hebrew name, archangel and letter, set
  * about a heptagram.
  */
-export default function SevenBranchedCandleStick({
+export function SevenBranchedCandlestick({
   idPrefix = "candlestick",
   ref,
-}: SevenBranchedCandleStickProps) {
+}: SevenBranchedCandlestickProps) {
   const indexes = [0, 1, 2, 3, 4, 5, 6];
 
   return (
@@ -212,3 +224,5 @@ export default function SevenBranchedCandleStick({
     </svg>
   );
 }
+
+export default SevenBranchedCandlestick;

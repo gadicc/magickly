@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import PlanetarySpirit, {
   isPlanetarySpiritId,
   PLANETARY_SPIRIT_IDS,
-} from "./planetarySpirits.tsx";
+} from "./PlanetarySpirit.tsx";
 
 /** Half the sigils' stroke width (7), the ink beyond each line's centre. */
 const HALF_STROKE = 3.5;

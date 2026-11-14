@@ -1,7 +1,7 @@
 "use client";
 
 import { Container } from "@mui/material";
-import SevenBranchedCandleStick from "magick-components/gd/SevenBranchedCandleStick";
+import SevenBranchedCandlestick from "magick-components/gd/SevenBranchedCandlestick";
 import React from "react";
 import Ink from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";
@@ -13,7 +13,7 @@ export default function CandleStickPage() {
   return (
     <Container sx={{ p: 2 }}>
       <Ink drawing="candlestick">
-        <SevenBranchedCandleStick ref={ref} />
+        <SevenBranchedCandlestick ref={ref} />
       </Ink>
       <ExportControls
         target={ref}
@@ -23,7 +23,7 @@ export default function CandleStickPage() {
       <OpenSource
         files={[
           "/src/app/gd/symbols/candlestick/candlestick.tsx",
-          "/packages/magick-components/src/gd/SevenBranchedCandleStick.tsx",
+          "/packages/magick-components/src/gd/SevenBranchedCandlestick.tsx",
         ]}
       />
     </Container>

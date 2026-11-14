@@ -243,7 +243,7 @@ function Comparison({
 
 /**
  * The versions that draw Regardie's coloured sigils, whose Air sigil takes
- * its form from the Equinox's Plate X (`Sigils` in the package's Tablet).
+ * its form from the Equinox's Plate X (`Sigils` in the package's `tabletSigils.tsx`).
  */
 const REGARDIE_SIGILS: ReadonlySet<TabletVersionId> = new Set([
   "gd",

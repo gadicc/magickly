@@ -12,12 +12,13 @@ import {
   TextField,
 } from "@mui/material";
 import RoseSigil from "magick-components/gd/RoseSigil";
-import { letterIJ } from "magick-components/gd/RoseSigilImage";
+import { ROSE_LETTERS } from "magick-components/gd/roseSigilGeometry";
 import React from "react";
 import Ink from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";
 import { parseComponentImageRequest } from "@/render/componentImageRequest";
 import { rectifySigilText } from "@/render/contracts/roseSigil";
+import DebugSigil from "./DebugSigil";
 
 export default function Sigils({
   initial,
@@ -35,7 +36,7 @@ export default function Sigils({
 
   const charsValid = rectified
     .split("")
-    .map((letter) => letterIJ(letter)[0] >= 0);
+    .map((letter) => ROSE_LETTERS.some((ring) => ring.includes(letter)));
   const isValid = charsValid.indexOf(false) === -1;
 
   // Links only exist for text the server contract accepts; the text is the
@@ -155,13 +156,20 @@ export default function Sigils({
         )}
 
         <Ink drawing="roseSigil">
-          <RoseSigil
-            ref={ref}
-            sigilText={isValid ? rectified : ""}
-            showRose={showRose}
-            animate={animate}
-            debug={debug}
-          />
+          {debug ? (
+            <DebugSigil
+              ref={ref}
+              sigilText={isValid ? rectified : ""}
+              showRose={showRose}
+            />
+          ) : (
+            <RoseSigil
+              ref={ref}
+              sigilText={isValid ? rectified : ""}
+              showRose={showRose}
+              animate={animate}
+            />
+          )}
         </Ink>
         <ExportControls
           target={ref}

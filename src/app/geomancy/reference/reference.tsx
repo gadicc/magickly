@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@mui/material";
 import Typography from "@mui/material/Typography";
-import PlanetarySpirit from "magick-components/astrology/planetarySpirits";
+import PlanetarySpirit from "magick-components/astrology/PlanetarySpirit";
 import data from "magick-data";
 import { PlanetId } from "magick-data/astrology/planets";
 import React from "react";

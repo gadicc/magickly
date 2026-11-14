@@ -1,5 +1,5 @@
 import Tablet from "magick-components/enochian/Tablet";
-import SevenBranchedCandleStick from "magick-components/gd/SevenBranchedCandleStick";
+import SevenBranchedCandlestick from "magick-components/gd/SevenBranchedCandlestick";
 import TableOfShewbread from "magick-components/gd/TableOfShewbread";
 import TreeOfLife from "magick-components/kabbalah/TreeOfLife";
 import { type ComponentType, createElement } from "react";
@@ -24,7 +24,7 @@ import { componentImage } from "./images";
  * ids are stripped from the outlines), where the page's comes from `useId`.
  */
 const CASES: [
-  "TreeOfLife" | "Tablet" | "SevenBranchedCandleStick" | "TableOfShewbread",
+  "TreeOfLife" | "Tablet" | "SevenBranchedCandlestick" | "TableOfShewbread",
   // biome-ignore lint/suspicious/noExplicitAny: each takes its examples' props
   ComponentType<any>,
   ComponentImageSlug,
@@ -32,8 +32,8 @@ const CASES: [
   ["TreeOfLife", TreeOfLife, "tree-of-life"],
   ["Tablet", Tablet, "enochian-tablet"],
   [
-    "SevenBranchedCandleStick",
-    SevenBranchedCandleStick,
+    "SevenBranchedCandlestick",
+    SevenBranchedCandlestick,
     "seven-branched-candlestick",
   ],
   ["TableOfShewbread", TableOfShewbread, "table-of-shewbread"],

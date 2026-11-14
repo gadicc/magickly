@@ -3,7 +3,7 @@ import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { hydrateAt, renderAt } from "../../../../tests/hydration.ts";
 import MoonWidget from "./Moon.tsx";
-import { moonMeanInclination, moonPath } from "./moonPath.ts";
+import { MOON_MEAN_INCLINATION, moonPath } from "./moonPath.ts";
 
 // Pages with the widget are prerendered at build time and viewed later.
 const buildTime = new Date("2026-09-17T10:16:00Z"); // phase 0.2066
@@ -54,7 +54,7 @@ describe("MoonWidget", () => {
     expect(container.textContent).toBe("Waxing Gibbous");
     const svg = container.querySelector("svg");
     expect(svg?.getAttribute("transform")).toBe(
-      `rotate(${moonMeanInclination})`,
+      `rotate(${MOON_MEAN_INCLINATION})`,
     );
 
     await unmount();
@@ -97,8 +97,8 @@ describe("MoonWidget", () => {
       holder.innerHTML = renderToString(<MoonWidget latitude={latitude} />);
       return holder.querySelector("svg")?.getAttribute("transform");
     };
-    const north = `rotate(${moonMeanInclination})`;
-    const south = `rotate(${180 - moonMeanInclination})`;
+    const north = `rotate(${MOON_MEAN_INCLINATION})`;
+    const south = `rotate(${180 - MOON_MEAN_INCLINATION})`;
 
     it("is northern until the latitude is known", () => {
       expect(transform()).toBe(north);

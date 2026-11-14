@@ -1,10 +1,10 @@
-import { dayOf } from "magick-components/astrology/planetDays";
-import { planetName } from "magick-components/astrology/planetName";
 import Data from "magick-data";
 import { signOf } from "magick-data/kabbalah/seventyTwoAngels/derived";
 import { rowOf } from "magick-data/rowOf";
 import type { SephirahRow } from "magick-data/rows";
 import { angelBySlug, angelSlugs } from "@/lib/angelSlugs";
+import { dayOf } from "@/lib/planetDays";
+import { planetName } from "@/lib/planetName";
 import { RWSName } from "@/tarot";
 import type { SeoPage } from "./pages";
 

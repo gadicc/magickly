@@ -162,7 +162,7 @@ export interface KameaProps extends KameaFigureProps {
  * default), the frame inset a little from the edge. With a `label` it is an
  * image of that name; without one, decoration.
  */
-export default function Kamea({
+export function Kamea({
   size = 240,
   label,
   className,
@@ -185,3 +185,5 @@ export default function Kamea({
     </svg>
   );
 }
+
+export default Kamea;

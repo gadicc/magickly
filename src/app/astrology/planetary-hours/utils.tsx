@@ -1,8 +1,8 @@
 import { differenceInMinutes, format } from "date-fns";
-import { dayRulers } from "magick-components/astrology/planetDays";
 import SunCalc from "suncalc";
 import type { Place } from "@/geo/place";
 import { utcOffsetMinutes } from "@/geo/timeZone";
+import { dayRulers } from "@/lib/planetDays";
 
 // Useful Resources:
 // https://plentifulearth.com/calculate-planetary-hours/

@@ -4,7 +4,7 @@ import {
 } from "magick-data/enochian/tablets";
 import type { CSSProperties, ReactNode } from "react";
 import Tablet, { UNION_VIEWBOX } from "../../../enochian/Tablet.tsx";
-import SevenBranchedCandleStick from "../../SevenBranchedCandleStick.tsx";
+import SevenBranchedCandlestick from "../../SevenBranchedCandlestick.tsx";
 import TableOfShewbread from "../../TableOfShewbread.tsx";
 import { booleanAttr, enumAttr } from "../attributes.ts";
 import type {
@@ -24,7 +24,7 @@ export const shewbreadProvenance = original(
   "Draws the package's own TableOfShewbread diagram (Gadi Cohen) on a disc.",
 );
 export const candlestickProvenance = original(
-  "Draws the package's own SevenBranchedCandleStick diagram (Gadi Cohen) " +
+  "Draws the package's own SevenBranchedCandlestick diagram (Gadi Cohen) " +
     "on a disc.",
 );
 
@@ -194,7 +194,7 @@ export const shewbreadArt: HallArt = {
 export const candlestickArt: HallArt = {
   Component: ({ defId }: HallArtProps) => (
     <Disc>
-      <SevenBranchedCandleStick idPrefix={defId("candlestick")} />
+      <SevenBranchedCandlestick idPrefix={defId("candlestick")} />
     </Disc>
   ),
   box: { width: 100, height: 100 },

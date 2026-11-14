@@ -1,7 +1,7 @@
 import { isValidElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import FylfotCross from "./fylfot-cross.tsx";
+import FylfotCross from "./FylfotCross.tsx";
 
 /** Every element in a tree a component returned, its own included. */
 function elements(node: ReactNode): { type: unknown; props: object }[] {

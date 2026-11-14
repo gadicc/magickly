@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { PLANETARY_SPIRIT_IDS } from "magick-components/astrology/planetarySpirits";
+import { PLANETARY_SPIRIT_IDS } from "magick-components/astrology/PlanetarySpirit";
 import tabletNotes, { sourceUrl } from "magick-data/enochian/tabletNotes";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -49,7 +49,7 @@ describe("the sigils' sources", () => {
   });
 
   it("cites the pages and leaves the package's JSDoc cites", () => {
-    const spirits = packageSource("astrology/planetarySpirits.tsx");
+    const spirits = packageSource("astrology/PlanetarySpirit.tsx");
     expect(spirits).toContain("`theomagiaortempl00heyd`");
     // The module's header: "p. 13 (leaf n124) and p. 15 (n126)".
     for (const [page, { leaf }] of Object.entries(HEYDON_PAGES))
@@ -59,7 +59,7 @@ describe("the sigils' sources", () => {
     // Each sigil's own comment names the page this module links for it.
     const raw = readFileSync(
       new URL(
-        "../../packages/magick-components/src/astrology/planetarySpirits.tsx",
+        "../../packages/magick-components/src/astrology/PlanetarySpirit.tsx",
         import.meta.url,
       ),
       "utf8",
@@ -73,7 +73,7 @@ describe("the sigils' sources", () => {
       expect(at, id).toBeGreaterThan(0);
       expect(comment, id).toContain(`p. ${page} (n${HEYDON_PAGES[page].leaf})`);
     }
-    const tablet = packageSource("enochian/Tablet.tsx");
+    const tablet = packageSource("enochian/tabletSigils.tsx");
     expect(tablet).toContain(
       '`crowley-equinox_202110`, the file "The Equinox Vol. 1, No. 7", leaf ' +
         `n${PLATE_X.leaf}`,

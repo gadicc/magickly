@@ -62,7 +62,7 @@ const PAGES: Record<ComponentName, ComponentPage> = {
       "name, traced through its letters on the rose and spread by an optimiser.",
     dark: "roseSigil",
   },
-  SevenBranchedCandleStick: {
+  SevenBranchedCandlestick: {
     title: "Seven-Branched Candlestick",
     description:
       "A React component that draws the Golden Dawn's seven-branched " +
@@ -141,14 +141,9 @@ export interface ExplorerComponent extends ComponentPage {
   examplesFile: string;
 }
 
-/** Slugs that the words of a name would split where English does not. */
-const SLUGS: Partial<Record<string, string>> = {
-  SevenBranchedCandleStick: "seven-branched-candlestick",
-};
-
 /** `TreeOfLife` → `tree-of-life`: a URL's segment, as the site's are. */
 export const componentSlug = (name: string) =>
-  SLUGS[name] ?? name.replace(/(?<=[a-z])(?=[A-Z])/g, "-").toLowerCase();
+  name.replace(/(?<=[a-z])(?=[A-Z])/g, "-").toLowerCase();
 
 /** Every component, in the examples' order. */
 export const EXPLORER_COMPONENTS: readonly ExplorerComponent[] = (

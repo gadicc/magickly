@@ -11,7 +11,7 @@ import lune from "lune";
 import { useId } from "react";
 import { cssString } from "../cssString.ts";
 import useHydrated from "../hooks/useHydrated.ts";
-import { moonMeanInclination, moonPath } from "./moonPath.ts";
+import { MOON_MEAN_INCLINATION, moonPath } from "./moonPath.ts";
 
 function moonPhaseName(phase: number) {
   if (phase === 0.5) return "full-moon";
@@ -54,8 +54,8 @@ function MoonDrawing({
   northernHemisphere?: boolean;
 }) {
   const inclination = northernHemisphere
-    ? moonMeanInclination
-    : 180 - moonMeanInclination;
+    ? MOON_MEAN_INCLINATION
+    : 180 - MOON_MEAN_INCLINATION;
   // Its own glow filter, so that two moons on a page do not share an id.
   const glow = `moon-glow-${useId().replace(/[^A-Za-z0-9_-]/g, "_")}`;
 
@@ -119,7 +119,7 @@ export interface MoonWidgetProps {
  * phase is worked out in the browser, so the server's HTML draws the
  * unlit disc.
  */
-function MoonWidget({
+export function MoonWidget({
   moonPadding = "10px 0 2px 0",
   latitude,
   background,

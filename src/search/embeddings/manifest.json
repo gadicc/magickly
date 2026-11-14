@@ -1,7 +1,7 @@
 {
   "version": 1,
   "selected": "gemini-embedding-2-768-search-v1",
-  "catalogueSha256": "04547b93edc801b493c95ca97c5f302482b028dfe3dc3124452599e2dd04f755",
+  "catalogueSha256": "f5815651049d50dfe4a44aa40fcdbd801d66042c6cbcfc43f90de0053f9665e9",
   "profiles": [
     {
       "profile": {
@@ -14,8 +14,8 @@
         "queryPrefix": "task: search result | query: ",
         "documentPrefix": "title: {title} | text: "
       },
-      "file": "gemini-embedding-2-768-search-v1-525751902d2d.bin",
-      "sha256": "525751902d2dd902dbecff551bb5a97ec9863a631e7e3b4223b11b3da5b6e500",
+      "file": "gemini-embedding-2-768-search-v1-aaf03490f171.bin",
+      "sha256": "aaf03490f171dcd63320ea8d5ab5cea574b5deaf8937c97a9de0e62446fabd88",
       "rows": 3059
     }
   ]

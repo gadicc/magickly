@@ -16,7 +16,7 @@ describe("RoseSigil", () => {
     // The server render and the first client render both draw the letter
     // centres; the optimised layout only arrives after hydration.
     const render = () =>
-      renderToString(<RoseSigil sigilText="אבג" showRose animate debug />);
+      renderToString(<RoseSigil sigilText="אבג" showRose animate />);
     const server = render();
     const yod = letterPoint("י");
     const { cos, sin } = Math;
@@ -39,10 +39,10 @@ describe("RoseSigil", () => {
     // A browser stops drawing a path at its first NaN, so a NaN in the
     // opening move drops the whole path.
     const html = renderToString(
-      <RoseSigil sigilText="דדדבבב" showRose={false} animate debug />,
+      <RoseSigil sigilText="דדדבבב" showRose={false} animate />,
     );
     const paths = [...html.matchAll(/<path [^>]*\bd="([^"]*)"/g)];
-    expect(paths).toHaveLength(2);
+    expect(paths).toHaveLength(1);
     for (const [, d] of paths) {
       expect(d).toMatch(/^M 1,25 A /);
       expect(d).not.toContain("NaN");
@@ -64,5 +64,23 @@ describe("RoseSigil", () => {
     expect(draw("שָׁלוֹם, world")).toBe(draw("שלומ"));
     expect(draw("Latin")).toBe(draw(""));
     expect(draw("")).toContain("<path");
+  });
+
+  it("draws the letters' circles and the first path when debugging", () => {
+    const draw = (debug: boolean) =>
+      renderToStaticMarkup(
+        <RoseSigilImage
+          sigilText="אבג"
+          showRose
+          debug={debug}
+          points={sigilPoints("אבג")}
+        />,
+      );
+    const circles = (html: string) => html.match(/<circle /g)?.length ?? 0;
+    // Four rings, and with debug a circle round each of the 22 letters.
+    expect(circles(draw(false))).toBe(4);
+    expect(circles(draw(true))).toBe(26);
+    expect(draw(true)).toContain('stroke="#aa0"');
+    expect(draw(false)).not.toContain('stroke="#aa0"');
   });
 });

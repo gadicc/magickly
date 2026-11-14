@@ -3,14 +3,13 @@ import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import GradeTree from "../gd/GradeTree.tsx";
 import TreeOfLife, {
-  labelLines,
-  pathTitle,
   TREE_COLOR_SCALES,
   TREE_LAYER_CLASSES,
   type TreeColorScale,
   TreeOfLifeSvg,
   type TreePathAttribution,
 } from "./TreeOfLife.tsx";
+import { labelLines, pathTitle } from "./treeLabels.ts";
 
 const count = (html: string, pattern: RegExp) =>
   html.match(pattern)?.length ?? 0;

@@ -169,7 +169,7 @@ export interface ChakrasProps {
  * The seven chakras as coloured circles on a figure's silhouette, from the
  * root at the base of its spine to the crown at the top of its head.
  */
-function Chakras({ width, height, active }: ChakrasProps) {
+export function Chakras({ width, height, active }: ChakrasProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

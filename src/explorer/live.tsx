@@ -18,19 +18,17 @@ export const LIVE: Record<ComponentName, ComponentType<any>> = {
   GdHall: dynamic(() => import("magick-components/gd/hall")),
   Lamen: dynamic(() => import("magick-components/gd/Lamen")),
   RoseSigil: dynamic(() => import("magick-components/gd/RoseSigil")),
-  SevenBranchedCandleStick: dynamic(
-    () => import("magick-components/gd/SevenBranchedCandleStick"),
+  SevenBranchedCandlestick: dynamic(
+    () => import("magick-components/gd/SevenBranchedCandlestick"),
   ),
   TableOfShewbread: dynamic(
     () => import("magick-components/gd/TableOfShewbread"),
   ),
-  FylfotCross: dynamic(
-    () => import("magick-components/gd/symbols/fylfot-cross"),
-  ),
+  FylfotCross: dynamic(() => import("magick-components/gd/FylfotCross")),
   Tablet: dynamic(() => import("magick-components/enochian/Tablet")),
   Kamea: dynamic(() => import("magick-components/astrology/Kamea")),
   PlanetarySpirit: dynamic(
-    () => import("magick-components/astrology/planetarySpirits"),
+    () => import("magick-components/astrology/PlanetarySpirit"),
   ),
   Chakras: dynamic(() => import("magick-components/chakras/Chakras")),
   Moon: dynamic(() => import("magick-components/astrology/Moon")),

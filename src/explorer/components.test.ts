@@ -21,7 +21,7 @@ describe("the explorer's components", () => {
   it("each have a page at a slug of their name", () => {
     expect(componentSlug("TreeOfLife")).toBe("tree-of-life");
     expect(componentSlug("GdHall")).toBe("gd-hall");
-    expect(componentSlug("SevenBranchedCandleStick")).toBe(
+    expect(componentSlug("SevenBranchedCandlestick")).toBe(
       "seven-branched-candlestick",
     );
     expect(explorerComponent("gd-hall")?.name).toBe("GdHall");

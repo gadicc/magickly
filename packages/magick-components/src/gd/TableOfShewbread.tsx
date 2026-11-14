@@ -246,7 +246,7 @@ export interface TableOfShewbreadProps {
  * circle, with the permutations of the Tetragrammaton and the tribes of
  * Israel the signs are given.
  */
-export default function TableOfShewbread({
+export function TableOfShewbread({
   idPrefix = "shewbread",
   ref,
 }: TableOfShewbreadProps) {
@@ -349,3 +349,5 @@ export default function TableOfShewbread({
     </svg>
   );
 }
+
+export default TableOfShewbread;

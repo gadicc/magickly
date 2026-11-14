@@ -1,16 +1,13 @@
 import React from "react";
 import { svgCoordinate } from "../svgCoordinate.ts";
 import {
-  letterIJ,
   letterPoint,
-  type Point,
   pathFromPoints,
   ROSE_LETTERS,
   roseLetters,
+  type SigilPoint,
   sigilPoints,
-} from "./roseSigilGeometry.ts";
-
-export { letterIJ, roseLetters, sigilPoints };
+} from "./roseSigilInternals.ts";
 
 const roseStrokeColor = "rgba(0,0,0,.4)";
 
@@ -25,7 +22,7 @@ export interface RoseSigilImageProps {
   /** Draws each letter's circle and the unoptimised path too. */
   debug: boolean;
   /** Letter centres to draw through; the optimised layout when available. */
-  points: Point[];
+  points: SigilPoint[];
   /**
    * Draw-on animation class for the connecting path, unique per instance
    * because a `<style>` inside inline SVG is document-wide; server renders
@@ -142,3 +139,5 @@ export function RoseSigilImage({
     </svg>
   );
 }
+
+export default RoseSigilImage;

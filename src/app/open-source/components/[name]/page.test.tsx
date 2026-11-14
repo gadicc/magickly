@@ -70,7 +70,7 @@ describe("/open-source/components/[name]", () => {
       />,
     );
     expect(html).toContain(
-      "<h1><code>Seven<wbr/>Branched<wbr/>Candle<wbr/>Stick</code></h1>",
+      "<h1><code>Seven<wbr/>Branched<wbr/>Candlestick</code></h1>",
     );
   });
 

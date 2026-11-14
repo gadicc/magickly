@@ -3,13 +3,12 @@ import tablets, { tabletVersion } from "magick-data/enochian/tablets";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import Tablet, {
-  EquinoxSigils,
-  Sigils,
   tabletName,
   tabletViewBox,
   UNION_VIEWBOX,
   WATCHTOWER_VIEWBOX,
 } from "./Tablet.tsx";
+import { EquinoxSigils, Sigils } from "./tabletSigils.tsx";
 
 const draw = (
   id: string,

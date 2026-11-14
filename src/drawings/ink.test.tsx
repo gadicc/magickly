@@ -3,11 +3,11 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import PlanetarySpirit, {
   PLANETARY_SPIRIT_IDS,
-} from "magick-components/astrology/planetarySpirits";
+} from "magick-components/astrology/PlanetarySpirit";
 import Chakras from "magick-components/chakras/Chakras";
 import Lamen from "magick-components/gd/Lamen";
 import RoseSigil from "magick-components/gd/RoseSigil";
-import SevenBranchedCandleStick from "magick-components/gd/SevenBranchedCandleStick";
+import SevenBranchedCandlestick from "magick-components/gd/SevenBranchedCandlestick";
 import TableOfShewbread from "magick-components/gd/TableOfShewbread";
 import TreeOfLife from "magick-components/kabbalah/TreeOfLife";
 import type { ReactElement } from "react";
@@ -37,12 +37,12 @@ const drawings: Record<InkDrawing, () => string[]> = {
     PLANETARY_SPIRIT_IDS.map((id) =>
       wrapped("spirit", <PlanetarySpirit id={id} />),
     ),
-  candlestick: () => [wrapped("candlestick", <SevenBranchedCandleStick />)],
+  candlestick: () => [wrapped("candlestick", <SevenBranchedCandlestick />)],
   shewbread: () => [wrapped("shewbread", <TableOfShewbread />)],
   roseSigil: () => [
     wrapped(
       "roseSigil",
-      <RoseSigil sigilText="אבג" showRose animate={false} debug={false} />,
+      <RoseSigil sigilText="אבג" showRose animate={false} />,
     ),
   ],
   chakras: () => [wrapped("chakras", <Chakras />)],

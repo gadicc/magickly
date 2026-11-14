@@ -2,7 +2,7 @@ import { Fragment } from "react";
 
 /**
  * A component's name, free to break between its words on a narrow screen
- * (`SevenBranchedCandleStick` is wider than a phone at a heading's size).
+ * (`SevenBranchedCandlestick` is wider than a phone at a heading's size).
  */
 export default function BreakableName({ name }: { name: string }) {
   let offset = 0;

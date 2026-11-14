@@ -13,7 +13,7 @@
  */
 
 /** The Moon's orbit's mean inclination to the ecliptic, in degrees. */
-export const moonMeanInclination = 5.15;
+export const MOON_MEAN_INCLINATION = 5.15;
 
 // Ported from moon-phase's phase_junk() (above), which also draws the
 // disc; the hemisphere, the inclination and the glow are ours.

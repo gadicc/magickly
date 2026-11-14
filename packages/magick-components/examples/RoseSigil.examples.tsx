@@ -15,8 +15,8 @@ export const RoseSigil: ComponentExamples<
       props: { sigilText: "אהיה", showRose: false },
     },
     {
-      title: "Agla, showing the letters' circles",
-      props: { sigilText: "אגלא", debug: true },
+      title: "Agla, drawn at once",
+      props: { sigilText: "אגלא", animate: false },
     },
   ],
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import SevenBranchedCandleStick from "./SevenBranchedCandleStick.tsx";
+import SevenBranchedCandlestick from "./SevenBranchedCandlestick.tsx";
 import TableOfShewbread from "./TableOfShewbread.tsx";
 
 /**
@@ -36,9 +36,9 @@ describe("the Shewbread and the candlestick on one page", () => {
     const markup = renderToStaticMarkup(
       <div>
         <TableOfShewbread />
-        <SevenBranchedCandleStick />
+        <SevenBranchedCandlestick />
         <TableOfShewbread idPrefix="second-shewbread" />
-        <SevenBranchedCandleStick idPrefix="second-candlestick" />
+        <SevenBranchedCandlestick idPrefix="second-candlestick" />
       </div>,
     );
     const { ids, hrefs } = idsAndHrefs(markup);
@@ -55,7 +55,7 @@ describe("the Shewbread and the candlestick on one page", () => {
     const markup = renderToStaticMarkup(
       <svg aria-hidden="true">
         <TableOfShewbread />
-        <SevenBranchedCandleStick />
+        <SevenBranchedCandlestick />
       </svg>,
     );
     expect(markup).toContain("<textPath");
