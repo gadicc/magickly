@@ -71,12 +71,13 @@ export default function ComponentPage({
         <code>{importLine(component)}</code>
       </pre>
       <p className={styles.note}>
-        magick-components is not on npm yet. Until it is, the component is in{" "}
+        magick-components is on npm, under MIT (
+        <Link href="/open-source#magick-components">how to install it</Link>
+        ), and its source is in{" "}
         <Link href={directoryUrl("packages/magick-components")}>
           the app&apos;s repository
         </Link>
-        , where you may copy it under MIT (
-        <Link href="/open-source#magick-components">more</Link>).
+        .
       </p>
       <Explorer
         name={component.name}

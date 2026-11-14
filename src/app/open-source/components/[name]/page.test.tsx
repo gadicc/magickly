@@ -34,8 +34,8 @@ describe("/open-source/components/[name]", () => {
     expect(tree).toContain(
       "import TreeOfLife from &quot;magick-components/kabbalah/TreeOfLife&quot;;",
     );
-    expect(tree).toContain("magick-components is not on npm yet.");
-    expect(tree).not.toMatch(/npm i\b/);
+    expect(tree).toContain("magick-components is on npm, under MIT");
+    expect(tree).toContain('href="/open-source#magick-components"');
   });
 
   it("lists every prop docgen read, with its description", () => {

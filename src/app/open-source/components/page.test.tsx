@@ -64,8 +64,8 @@ describe("/open-source/components", () => {
       );
   });
 
-  it("says the package is not on npm, and offers no install", () => {
-    expect(html).toContain("They are not on npm yet.");
-    expect(html).not.toMatch(/npm i\b/);
+  it("says the package is on npm, and links the hub's install", () => {
+    expect(html).toContain("They are on npm");
+    expect(html).toContain('href="/open-source#magick-components"');
   });
 });

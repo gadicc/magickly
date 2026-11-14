@@ -97,7 +97,7 @@ export default function HomeText() {
           every table with its rows and fields, on npm as magick-data, and the{" "}
           <Link href="/open-source/components">components</Link> that draw the
           Tree of Life, the tablets and the sigils, each shown live with props
-          to try. The components are not on npm yet.
+          to try, on npm as magick-components.
         </li>
       </List>
       <H3>For temples</H3>

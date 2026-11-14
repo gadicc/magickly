@@ -4,8 +4,8 @@ import Link from "@/ui/Link";
 
 /**
  * What the components are and how to use them, below the tiles (plan 080,
- * decisions 5 and 7). Until stage G, the package is not on npm, and the
- * text says so rather than offer an install that would fail.
+ * decisions 5 and 7). The package is on npm from 0.1.0-rc.0 (stage G′),
+ * and the hub's card offers the install.
  */
 export default function ComponentsText() {
   return (
@@ -30,12 +30,14 @@ export default function ComponentsText() {
           The <Link href="/open-source#licences">licences</Link> say more.
         </li>
         <li>
-          <b>They are not on npm yet.</b> Until they are, they live in{" "}
+          <b>They are on npm</b> as{" "}
+          <Link href="/open-source#magick-components">magick-components</Link>,
+          and each page shows the line that imports its component. Their source
+          is in{" "}
           <Link href={directoryUrl("packages/magick-components")}>
             the app&apos;s repository
           </Link>
-          , where you may copy them under MIT. The import lines show the paths
-          the package will have.
+          .
         </li>
         <li>
           <b>Most render on the server</b> as plain SVG, with no client code.
