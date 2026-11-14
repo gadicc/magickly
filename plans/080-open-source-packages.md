@@ -2492,6 +2492,75 @@ tree, every step at 0, coverage at the first attempt.
 | `7021aee5` | `feat(magick-data): Release 0.2.0` |
 | (this commit) | `docs(plans): Record magick-data 0.2.0` |
 
+## magick-data 0.2.1 (14 November 2026)
+
+A patch, from the provenance check of `magick-components` and
+`magick-data` before the components' first publish. Gadi approved the
+fixes. `bf8f249a` corrects the data and `(this commit)` bumps
+`magick-data` to 0.2.1 and records it; on `gate/data-021` from `main` at
+`6d6bfab6`, not merged.
+
+- **The banners of the Name.** Cancer had Leo's permutation of YHVH,
+  `hvyH`, and Sagittarius Capricorn's, `Hyhv`, so the twelve signs had
+  ten banners and the table of shewbread drew two of them twice. Crowley's
+  *777* (1909), col. CXL, "Twelve Banners of the Name", gives Cancer
+  הוהי and Sagittarius ויהה.
+- **Which He is which.** The field writes `h` for the first He and `H`
+  for the final He, which Hebrew does not tell apart, so the two new
+  values follow how the other ten are made: the cardinal signs turn
+  YHVH round (Aries `yhvH`, Libra `vHyh`, Capricorn `Hyhv`), each
+  kerubic sign swaps the last two letters of the cardinal sign before it
+  (Taurus `yhHv`, Leo `hvyH`, Scorpio `vHhy`, Aquarius `Hyvh`) and each
+  mutable sign the middle two (Gemini `yvhH`, Virgo `hHvy`, Pisces
+  `Hhyv`). All ten fit, and the rule makes Cancer `hvHy` and Sagittarius
+  `vyHh`, which are 777's letters. The schema's description, which said
+  "Two signs may share one", now gives the rule, and
+  `astrology/zodiac.test.ts` holds the twelve to the twelve orders of
+  יהוה, each once, and to the rule.
+- **The citation.** No scan of the 1909 printing was found at a stable
+  address: archive.org has typed texts only (`aleister-crowley-liber-777`,
+  a 2002 transcription, and `aleister-crowley-777-revised`, an e-text of
+  the 1955 revision), and Wikimedia Commons, HathiTrust and Google Books
+  gave nothing. The file's header cites the book and the column with no
+  link, and says so.
+- **The kameas' wording.** The test said the squares were Agrippa's "row
+  by row as he writes them", and the module and the README that the
+  constructions give "exactly" his squares. The 1533 printing has two
+  misprints that the squares correct: Venus, row 4, column 5, printed 45
+  for the 43 of his Hebrew table (leaf n166), and the Moon, row 1,
+  column 8, printed 45 for 54 in both his tables (leaf n168), archive.org
+  `DeOccultaPhilosophiaLoc1533`. All three now say so, and the test pins
+  the two numbers. No value changed.
+- **The pins.** The table of shewbread's data pin and bytes in the
+  registry, Zelator 2's five hall pins and its preset snapshot moved.
+  With the old two values put back, each renders its old pin exactly,
+  and the source SVGs the outliner was given differ in two `textPath`s
+  alone, Cancer's (`הויהּ` to `הוהּי`) and Sagittarius' (`הּיהו` to
+  `ויהּה`). No other pin moved: besides the table, which Zelator 2's
+  hall draws, only the data browser shows the field.
+- **Search vectors.** The catalogue changed with the data; the vectors
+  were refreshed in `bf8f249a` (3,059 passages; 18 embedded by
+  `search:compare` for the comparison profile, from warm caches, none by
+  `search:publish`).
+- **The sign-off.** `astrology/zodiac.json5`'s Sources row says where the
+  permutations come from and is signed `2026-11-14`, as for 0.2.0; that
+  date is Gadi's to confirm before the merge. The kameas have no row:
+  `kameas.ts` is code, with its own README section, which now names the
+  misprints.
+
+`publish.yml`'s decision, run on the bump's tree against the registry:
+publish `magick-data@0.2.1`, new (latest is 0.2.0), under `latest`. It
+goes out when Gadi pushes `main`, before the components' release
+candidate, whose manifest will need `^0.2.1`.
+
+Both commits passed stage E's gate on their own trees, every step at 0,
+coverage at the first attempt.
+
+| Commit | What |
+| --- | --- |
+| `bf8f249a` | `fix(magick-data): Give each sign its own banner` |
+| (this commit) | `fix(magick-data): Release 0.2.1` (the bump and this section) |
+
 ## Review (11 November 2026)
 
 Fable 5.2 at high effort, fresh context, `loom-torvalds-review`, on the
