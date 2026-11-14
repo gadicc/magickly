@@ -110,6 +110,14 @@ Follow-ups are separate from the completed migration work:
   Agrippa's two misprints the squares correct; the zodiac row signed
   again. On `gate/data-021`, published by CI when main is pushed
   ([plan 080](080-open-source-packages.md#magick-data-021-14-november-2026)).
+- 14 November 2026: stage G, `magick-components` publishable: no longer
+  private (still 0.0.0), `publish.yml` deciding, building and publishing
+  each package on its own, the guards shared, the smoke test keeping the
+  verified tarball, a Provenance table awaiting the owner's sign-off, the
+  halls credited as drawn by magick-components (MIT) with their PNG pins
+  moved, and the hub's card ready for npm; on `gate/stage-g`, not
+  merged. The owner's steps to the first publish are G′
+  ([plan 080](080-open-source-packages.md#stage-g-14-november-2026)).
 - 13 November 2026: Dependabot alerts #362 (zod), #364 (glob) and #366
   (minimatch) fixed by a `@vercel/functions` bump and parent-scoped
   overrides of Serwist's exact zod and glob pins (glob 14 checked against

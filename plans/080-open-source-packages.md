@@ -2896,6 +2896,263 @@ a second whole gate passed every step. `3d6cf541`'s subject was
 reworded after its gate, which ran on it as `d57bb475`; its tree,
 `6c24c6a0`, is the one the gate checked.
 
+## Stage G (14 November 2026)
+
+`magick-components` made publishable the way `magick-data` is, on
+`gate/stage-g` from `gate/components-api` at `76c9d854`; not merged. The
+version stays 0.0.0: the owner bumps it after the sign-off
+([G′](#stage-g-the-owners-steps)). Each code commit passed stage E's
+gate on its own tree.
+
+- **`publish.yml` publishes both packages**, each decided, built and
+  published on its own. `decide` runs the decision for both manifests,
+  with no install, and outputs the list to publish (`[{package, version,
+  tag}]`); `build` and `publish` are matrices over that list, without
+  fail-fast, and `quality` runs once. A package that skips is not built.
+  One whose decision fails is left out while the other is decided, and
+  then fails `decide`; the other goes ahead. One whose build fails leaves
+  no digest, and its `publish` leg fails at its first step: `publish`
+  cannot wait on `build`'s result, which a matrix reports as failure when
+  either leg fails, without one package blocking the other. The SHA-256
+  and integrity pass through per-package job outputs
+  (`magick-data-sha256` and so on), whose names are unique across the
+  matrix, so neither leg's overwrites the other's. Every hardening
+  property stays: no install, cache or package script in `publish`, the
+  digest checks, the fresh second decision with `--same-content`, the
+  "previously published" handling and the npm version check; artifacts
+  and tarballs are named for the package.
+- **Per-package flags.** `DECISION_FLAGS` is a JSON object, read by
+  `scripts/npm-publish-flags.mjs`: `--expect-exists` for magick-data and
+  none for magick-components, so that a 404 skips until its first
+  publish by hand. A package without a key fails its decision, and a
+  test fails if magick-components passes 0.1.0 without
+  `--expect-exists`, so G′ step 7 cannot be half done.
+- **`ci.yml`**: the components job keeps its tarball and the registry
+  job, which decides as `publish.yml` would and dry-runs the publish,
+  runs a leg per package.
+- **The guards** moved from magick-data to `scripts/npm-publish-guard.mjs`,
+  named for the package whose directory runs them, and
+  magick-components' `prepack` and `prepublishOnly` run it: `npm pack`
+  and `npm publish` in its directory are refused (checked by hand as well
+  as by the tests). magick-data's own guard has no version check; its
+  version checks are its smoke test's and README test's, and the
+  components now have the same: the packed version is the source's, and
+  no version past 0.0.0 ships while a Provenance row is unsigned.
+- **The kept tarball.** `pnpm --filter magick-components smoke
+  --keep-tarball <path>` keeps the verified tarball and prints its
+  SHA-256 and `integrity sha512-…`, as magick-data's does. At
+  `163def6b`, version 0.0.0: 169 files, 196,765 bytes packed and 592,027
+  unpacked (161, 192,411 and 569,542 at the hardening), SHA-256
+  `20567d9375847e6057da38f405c28eaf62e056ac1bfd66e8b7b48be3918f99eb`,
+  integrity
+  `sha512-Vz/SXTxNCCA1NMWVdhiNtM1/AzGNmCsFPXwRUk5fnqPodi2Jsqzz599G/UTFSsdfhLaBchUA6jwE28HtG3/NCw==`;
+  its manifest depends on `magick-data` `^0.2.0`, and its registry
+  fixture ran against magick-data 0.2.0 from npm. `npm publish
+  --dry-run` of it, as `ci.yml`'s registry leg runs it, packs the same
+  integrity and 169 files.
+- **`private` dropped**, the smoke test asserting the packed manifest is
+  not private. The README says how releases go out instead of "not
+  published yet", so that the first tarball does not say otherwise.
+- **The sign-off.** The README's Provenance table has a row per drawing
+  or asset whose provenance matters, its source as this plan and the
+  modules record it, and an empty "Signed off" column. The README test
+  and the smoke test fail any version past 0.0.0 while a row has no date
+  (`scripts/provenance-sign-off.mjs`, which magick-data's
+  `readmeSources.mjs` now wraps), and the test holds the rows' entries
+  to the package's exports. The package's import-boundary test lets its
+  tests, only, import the repository's `scripts/`.
+- **The credit switch** (stage B review M2). `GD_HALL_LICENCE.creditText`
+  is "Magick.ly, drawn by magick-components (MIT)" (was "Magick.ly, CC BY
+  4.0"); the images stay CC BY 4.0 by Magick.ly. Keeping "Magick.ly"
+  first keeps the gallery's and the editor's "with credit to Magick.ly"
+  true, which were not part of M2. A hall page's caption adds "drawn by
+  magick-components (MIT)", its example credit uses the credit text, and
+  its licence section says the same image may be drawn from the package
+  under MIT. The hub says to credit a component's drawing as drawn by
+  magick-components (MIT), and the hand-drawn images to Magick.ly. The
+  test that forbade that wording early now ties it to the package no
+  longer being private, and to the credit the hall files carry. The
+  editor's exported XMP credit follows `creditText` too.
+- **The pins.** Every hall's full, medium and small PNG moved in
+  `gdHallImage.test`, 42 pins, each with its old value in a comment. A
+  throwaway test rendered each PNG, swapped the credit string back in its
+  iTXt chunk (length and CRC redone) and got the old pin exactly, one
+  occurrence each, 23 bytes longer. The 14 source and 14 SVG pins did not
+  move: the SVG's metadata carries the creator and notice, not the credit
+  text. No documentation screenshot shows these screens, so none was
+  regenerated.
+- **Search vectors.** The hub's prose is in the search catalogue, which
+  the first gate of the credit commit showed (the manifest test failed);
+  the vectors were refreshed in it (`search:compare` embedded 3 passages
+  of the Qwen comparison profile, from warm caches; 3,062 passages, from
+  3,061) and again in the hub commit, whose opening sentence about npm is
+  now an expression that the prose extractor leaves out (4 passages per
+  profile; 3,061 passages). `search:publish` embedded none either time.
+  The bump will change no extracted prose; the card's "not on npm yet"
+  paragraph, JSX inside the condition, stays in the extracted prose
+  after it, which is harmless but stale.
+- **The hub card** has the README's "Installing" sample, which the smoke
+  test type-checks and builds, and offers `npm i`, the sample and the npm
+  link once the package is on npm. The hub cannot ask the registry, so it
+  takes a version past 0.0.0 for published: between merging the bump to
+  0.1.0-rc.0 and G′ step 5 the card is a little early. At 0.0.0 nothing a
+  reader sees changed.
+- `actionlint` is not installed here, so neither workflow was linted.
+  Both parse as YAML; `decide`'s script was run locally against the
+  registry, for both manifests and for its failure paths (below). The
+  matrix outputs rely on GitHub's documented rule that a matrix job's
+  outputs of different names all survive.
+
+The decision, `decide`'s script run locally on this branch's tree,
+first before magick-data 0.2.0 was on npm, then after:
+
+```
+publish: magick-data@0.2.0 is new (latest is 0.1.0); publish under latest
+skip: magick-components@0.0.0: magick-components is not on the registry; its first publish is by hand
+to publish: [{"package":"magick-data","version":"0.2.0","tag":"latest"}]
+
+skip: magick-data@0.2.0 is already published
+skip: magick-components@0.0.0: magick-components is not on the registry; its first publish is by hand
+to publish: []
+```
+
+With `--expect-exists` for magick-components it fails that package
+("not on the registry, which should have it") and still lists
+magick-data; with no key for it, "DECISION_FLAGS has no flags for
+magick-components", likewise.
+
+**Not taken:** stage E's small deferral, validating the Tree page's
+query in `treeSettings()`, changes what the page does with a bad query
+and is left; `isolatedDeclarations` and the JSX halls stay out, as
+planned.
+
+| Commit | What |
+| --- | --- |
+| `661e0545` | `ci(publish): Publish magick-components too` |
+| `5366d241` | `build(components): Make the package publishable` |
+| `c3dbb322` | `feat(gd): Credit the drawn halls to the components` |
+| `163def6b` | `feat(open-source): Ready the components' card` |
+| (this commit) | `docs(plans): Record stage G` |
+
+Every code commit passed stage E's gate on its own tree, every step at
+0, coverage at the first attempt. Two failed a first gate on real
+omissions and were amended before anything was built on them: the
+publishable commit (then `317d122e`) because the package's
+import-boundary test refused its README test's import of
+`scripts/provenance-sign-off.mjs`, and the credit commit (then
+`848cf530`, gated as `200287a3`) because the hub's prose had changed the
+search catalogue; the hub commit was then refreshed likewise before its
+gate.
+
+**For Gadi:**
+
+- **The credit's wording.** "Magick.ly, drawn by magick-components
+  (MIT)" is this stage's reading of the plan's "drawn by
+  magick-components (MIT)": a credit line that names nobody read oddly
+  in Google's `creditText`, and keeping Magick.ly first leaves the halls
+  gallery's and the editor's "with credit to Magick.ly" true. The
+  editor's own `HALL_ART_CREDIT` still says CC BY 4.0 by Magick.ly; M2
+  did not name it.
+- **Mercury's widget is not BSD.** Only the Moon's two modules adapt
+  moon-phase; Mercury's row says MIT, with astronomy-engine (MIT) as a
+  dependency.
+- **The sign-off rows this plan does not settle** are listed in G′
+  step 3.
+
+### Stage G′: the owner's steps
+
+In this order, with Node 24 (npm 11.5.1 or later; 11.15.0 or later for
+`npm trust`). The `npm` environment, 2FA and the `magickly` organisation
+already exist from stage A′.
+
+1. **Push `main` and wait for magick-data 0.2.0.** `publish.yml`
+   publishes it ([above](#magick-data-020-14-november-2026)). The
+   components' release candidate depends on `magick-data` `^0.2.0`
+   (`workspace:^`, packed from 0.2.0), so do not publish it before
+   `npm view magick-data@0.2.0 dist.integrity` answers. (Done by 12:53
+   on 14 November: it answered
+   `sha512-kTzQQeVGLJpoZQtarsTcZeQPD/4MATl8B5fQNzwI8/SsW5h9D/z/ljuR5DsQuLTWZOe73TUh/TwazYUtLvimVg==`.)
+   Check that the name is still free: `npm view magick-components`
+   should fail with E404 ([Risks](#risks)).
+2. **Merge stage G.** `publish.yml`'s `decide` skips magick-components
+   (404) and, magick-data being published, skips it too.
+3. **The provenance sign-off.** Read each row of the README's
+   Provenance table against the drawing, settle the rows below, and put
+   the date (`YYYY-MM-DD`) in every row's "Signed off". The tests check
+   only the date; it is the owner's word that the row is right. Rows
+   this plan does not settle:
+   - **The rose-cross sigil**: the rose's letters are geometry written
+     in `gd/roseSigilGeometry`; no source for that layout is recorded.
+   - **The Tree of Life and the Grade Tree**: drawn in code from
+     magick-data; no source for the drawing's layout is recorded.
+   - **The lamens**: `gd/Lamen`'s comment cites Regardie vols. 2 and 3
+     (1938–39) for the lamens and collars, and compares Zalewski (1991)
+     and the Ciceros (2004), modern works, for the rings and the
+     Hierophant's nemyss; confirm that nothing but facts came from the
+     modern ones.
+   - **The candlestick, the shewbread and the fylfot cross**: drawn in
+     code from magick-data, with no source recorded for their layouts.
+   - **The kameas' figure** is a plain grid around Agrippa's squares;
+     confirm.
+   Edit a row first if its answer changes it.
+4. **Bump to `0.1.0-rc.0`** in `packages/magick-components/package.json`
+   and merge to `main`. `decide` finds no package on the registry and
+   skips it; nothing else runs for it. From this commit the hub's card
+   offers `npm i magick-components`.
+5. **Publish the release candidate by hand**, from a clean checkout of
+   exactly the commit step 4 put on `main` (`<sha>`):
+
+   ```sh
+   git clone https://github.com/gadicc/magickly.git && cd magickly
+   git checkout <sha>
+   pnpm install --frozen-lockfile
+   pnpm --filter magick-components smoke --keep-tarball "$PWD/magick-components.tgz"
+   npm whoami
+   npm publish ./magick-components.tgz --tag next --access public
+   npm view magick-components@0.1.0-rc.0 dist.integrity
+   ```
+
+   with your own npm login. The smoke test builds both packages itself,
+   and its registry fixture now installs magick-data 0.2.0 from npm;
+   publish only the file it kept. It prints the tarball's SHA-256 and
+   `integrity sha512-…`, and `npm view` should print the same integrity.
+6. **Configure the trusted publisher, allowing `npm publish`.** On
+   npmjs.com, the package's Settings › Trusted publishing › GitHub
+   Actions: user `gadicc`, repository `magickly`, workflow filename
+   `publish.yml`, environment name `npm`, and under the allowed actions
+   **`npm publish`** ticked. Or:
+
+   ```sh
+   npm trust github magick-components --file publish.yml --repo gadicc/magickly --env npm --allow-publish
+   ```
+
+   The two days start here: a configuration no publish validates within
+   two days expires, and can then be neither used nor edited.
+7. **Bump to `0.1.0` within the two days**, and in the same commit set
+   magick-components' flags in `publish.yml`'s `DECISION_FLAGS` to
+   `--expect-exists`:
+
+   ```yaml
+   DECISION_FLAGS: >-
+     {"magick-data": "--expect-exists", "magick-components": "--expect-exists"}
+   ```
+
+   (`scripts/npm-publish-flags.test.ts` fails a 0.1.0 without it). Merge
+   to `main`. The rule finds `0.1.0` absent and above `latest` (which
+   names the release candidate), and the `publish` job's
+   magick-components leg publishes it under `latest` with provenance.
+   Compare the integrity its `build` leg printed with `npm view
+   magick-components@0.1.0 dist.integrity`. If the publish fails with
+   ENEEDAUTH, the verbose log shows the OIDC exchange. If the two days
+   have lapsed, delete the expired configuration and create it again
+   (step 6), then re-run the workflow: **Re-run all jobs** if the run is
+   more than three days old (the tarball artifact is kept three days);
+   within them, re-running only the failed `publish` leg is enough.
+8. **Retire the `next` tag:** `npm dist-tag rm magick-components next`.
+9. **Disallow tokens:** once CI's publish has succeeded, set the
+   package's Settings › Publishing access to "Require two-factor
+   authentication and disallow tokens".
+
 ## Review (11 November 2026)
 
 Fable 5.2 at high effort, fresh context, `loom-torvalds-review`, on the
