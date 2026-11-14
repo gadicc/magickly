@@ -48,7 +48,13 @@ A drawing after an old source is our own drawing of a public-domain
 printing, cited by page and scan: the planetary spirits' geomantic sigils
 (the Rulers of the geomantic figures) follow John Heydon's *Theomagia*
 (1663/4), and the Enochian Watchtowers' plain sigils, and the form of
-Air's in colour, the plate of *The Equinox* (1912). The coloured Water and
+Air's in colour, the plate of *The Equinox* (1912). Air's is a Tau with
+four Yods above it, drawn as small flames (Regardie, *The Golden Dawn*,
+vol. 4, 1940, p. 307). Regardie says the sigils are taken from Dee's
+Sigillum Dei Aemeth (p. 308), whose T carries a 4 above it (*The
+Equinox* I(7), Plate II, archive.org `crowley-equinox_202110`, leaf
+n238), so the four Yods likely stand for that 4; the inference is ours,
+not a source's. The form follows Plate X (leaf n256). The coloured Water and
 Fire sigils are drawn from Regardie's description of them (1940), and
 Earth's is a cross in four colours. Layouts taken from modern books are
 facts, drawn in our own art.

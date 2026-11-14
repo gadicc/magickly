@@ -6,7 +6,13 @@ import type { PlanetRow } from "magick-data/rows";
 import { Fragment } from "react";
 import { chaldean } from "@/app/astrology/planetary-hours/utils";
 import Ink from "@/drawings/Ink";
+import {
+  HEYDON_PAGES,
+  HeydonCitation,
+  rulerSigilPage,
+} from "@/drawings/sigilSources";
 import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
+import SourceLink from "@/sources/SourceLink";
 import { RWSName } from "@/tarot";
 import {
   EntityFrame,
@@ -26,6 +32,21 @@ import styles from "./planet.module.css";
 /** The spirits are ids, in lower case, with no table yet. */
 function capitalize(text: string) {
   return text[0].toUpperCase() + text.slice(1);
+}
+
+/** Where the spirit's sigil is drawn from: Heydon's page, linked to its scan. */
+function SigilSource({ spiritId }: { spiritId: string }) {
+  const page = rulerSigilPage(spiritId);
+  if (!page) return null;
+  return (
+    <Muted block>
+      Sigil after{" "}
+      <SourceLink page={HEYDON_PAGES[page].mirror}>
+        <HeydonCitation page={page} />
+      </SourceLink>
+      .
+    </Muted>
+  );
 }
 
 /**
@@ -286,6 +307,7 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
                     verticalAlign="middle"
                   />
                 </Ink>
+                <SigilSource spiritId={planet.spiritId} />
               </>
             ) : null}
           </Row>

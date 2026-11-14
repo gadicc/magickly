@@ -40,6 +40,7 @@
     "schema:gen": "loom db schema-gen",
     "components:props": "node --import tsx scripts/component-props.ts",
     "search:build": "node --import tsx scripts/search/buildProse.ts",
+    "sources:mirror": "node --import tsx scripts/sources/mirror.mts",
     "search:compare": "pnpm data:build && pnpm search:build && loom env -- node --import tsx scripts/search/embed.mts compare",
     "search:publish": "pnpm data:build && pnpm search:build && loom env -- node --import tsx scripts/search/embed.mts publish",
     "search:browser": "node --import tsx scripts/search/browser.mts",

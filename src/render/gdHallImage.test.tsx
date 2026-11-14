@@ -360,7 +360,14 @@ describe("the gd-hall image", () => {
  * set to a file to write them to. Theoricus 1 and 2 and Portal 1 and 2
  * moved when the Air tablet's sigil was redrawn after the Equinox's Plate
  * X (plan 080, "The sigils' sources"); their sources were 3c8d2e0a…,
- * dcf02ee9…, f8c29109… and 8c19b493… before.
+ * dcf02ee9…, f8c29109… and 8c19b493… before. They moved again when its
+ * four Yods were refined to the plate's slim lozenges (the same section),
+ * the Yods' paths alone; their sources were fd4ba7bf…, 06d82cf0…,
+ * a2af63a3… and 2ddc2792… before; again when the lozenges became the
+ * plate's sinuous flames, from 640c6327…, ae07fd8b…, 04b89cda… and
+ * 72f58a3c…; and again when the flames' left sides and lower ends were
+ * brought closer to the plate, from bc1f483a…, aa8e7a73…, 969bbdc8… and
+ * 48611581….
  */
 const PINS: Record<string, readonly string[]> = {
   neophyte: [
@@ -385,18 +392,18 @@ const PINS: Record<string, readonly string[]> = {
     "42f5e185e0a3b973fc893b7edfbd0c35e9783c30db9c07448cffa6d8c7d2a825",
   ],
   "theoricus-1": [
-    "fd4ba7bf90039788ae28704870f242f929469a8a527c57668dbb7c8fd57480d7",
-    "8012c23c83d77dab6384dc0a2ecfdc9a6cd60d6c412ac02dfb28fde7a35959a2",
-    "e2e0100a94578d7941ac2a1856ca19ac87e38100b366b54d587f54ba99b285ba",
-    "3d42ecf9ed12ee5e6d14d1f8c964f296cb0f61934c74c03f2c666b3719141768",
-    "06c767d1b4ec223b8c1dd1ba9f805a1e386be760b20e76b706effe53d31b0892",
+    "4d9f0a7431254eeecc0216558cd7fd87aa65be8d31629777aa1049743be99024",
+    "d330795a8ad6af3fc1fe330920a229be4ef18742d72f10758d1376750510be1d",
+    "49ce61ef59b5249f828bb02917bec56bf1d18a8f83ad67c14a1bdd176f4556d5",
+    "2a4fc1cb3cde776cb1a4ff928ae5147d37aea79e32db0e8b9337e0edf59d8fd4",
+    "eaca1a113dc710883ff404859fead045b8132ce85c4ff62ae40a26d0f6bf5bda",
   ],
   "theoricus-2": [
-    "06d82cf01e6291b611951b4c718f188f5cb7181e27d42f62454ed2650f224d39",
-    "c6fc551c2b743563efc37215eaca8927e01ec3c7eb71fa13fbd17b31f26d65c1",
-    "2c2718796339bb7ed0b388d8a008b3d76c4edc7483e4d09521232e2de3dfe65e",
-    "3e8743ef1cd41d27c64c65ecd1ac14e6e7774a4ab22ac3b08677667504c92feb",
-    "630c36a1e0862dfab0ad8d542e8c66fdce9b841810a196f26f9ff100860d96de",
+    "72c860e3bdba8b816d0bfbf02558666d901db112989d2d44261171f0e31c1736",
+    "aafdcfddbb470f434a52fc3055939b1aa888090f397f41567ea80d42dfe0ed7c",
+    "dfbf57f02a5db73f7c02b4609e428a9aebd2191d02272a73157d8df379572904",
+    "7835a03c5973e650d812507ce83b2f86d1613fbb3fee6c24e8747b9aac281e8f",
+    "4d3ed10314e2e03c7e1215e51019ad8569d2eddaf48ff7d985bffa57a4af86b4",
   ],
   "practicus-1": [
     "9bbfd564d558aa4a1453383c46bee6613f50531418c29c8401255e57c8b83d88",
@@ -448,18 +455,18 @@ const PINS: Record<string, readonly string[]> = {
     "59499e84a949e60154b7a2128349b28e8e23f1a6d28908de18bd271de9167c75",
   ],
   "portal-1": [
-    "a2af63a3035c7c06b7e7f29d0798b17328f6151ee7bce276d7dccd4365ae98f0",
-    "7519f968c0cd4763c2b67bb44fe6e768d27bb981460aa5e801e6f9750ab2bae8",
-    "8571ef690e2cf6caa03e102881bc84adeacd4b3248156bf62a26d160c5c405f4",
-    "d05d407b9b18293f1fff9e7c4f8e7d5203351d25526498445f7c771c60f0534e",
-    "85016f1bad6516db37d85aead5934fa8c7cf9158b5075961c5d2dc9290e5e8fd",
+    "c97aa8666a049b8c03ac12cdb7b2586f1bb1900e9f47e3fc331c1cb4f69f18d9",
+    "767f1c4f55069979413bfd66689ea3e3cf025b23bbd94fbf1e5c5eacb8a37eb9",
+    "5d2cbcd29ca1c94b83efa2a23b0bd9f11abb03bad4e7c59682934e67606460de",
+    "c47418e18ae01f03a37b69eed6dc2af55ef8781a4c6449f8ca7731b67778ee37",
+    "7e6d8ecd5b6b603c6e5e9169e876894ce050bb0b4ba1f276f110a248c4c223d3",
   ],
   "portal-2": [
-    "2ddc2792bb59e344b72c7ac4115e493e6004ece5f2228964cb6aaab93e6aa751",
-    "9b2388125fbc4a3797b76bbc69b83ecfea218e1a4976f2002edfdde1f4773976",
-    "ca99041e216cb6322aabd952d53c23100da50dc9be5609dead076475c91631b2",
-    "f84914657d449912b85219550b4d99d4810d254410907a22d79b76b9f2f1c342",
-    "fed5bac9531443b6efdf9a1ed5d63b5e637feb9167ae65b4c611081ed8c43b2a",
+    "11766ad1a432c982874e420589d52fccb4438dc02582a525ed210f5ab089086e",
+    "30641cfb0b1c8d2fecb06e5784309b618e326e4d32da29e9d4a5d538afb13c02",
+    "e503e3bcc38ade471e69964174e161afc5bdb31250cbfadab14f726982e231be",
+    "f95995144c3bbed4754d0f16e487447e151b6bd930317d34f6757fd5be771767",
+    "d1f1f019e056d608f279346a3acc8c864a9a1fa9e55e04d11e8769a0d79f33e3",
   ],
 };
 

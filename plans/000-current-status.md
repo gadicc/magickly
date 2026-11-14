@@ -99,6 +99,11 @@ Follow-ups are separate from the completed migration work:
   [October dependency refresh](066-october-dependency-refresh.md), with the
   remaining exact-pin zod, glob and minimatch advisories, the deferred Biome
   2.6 and identity-bound packages, and their follow-ups.
+- 14 November 2026: `magick-data` 0.2.0, with the Moon's
+  `intelligenceOfIntelligences`, the tablet notes' Yods and "Bull", and
+  the two changed Sources rows signed again; on `gate/data-020`,
+  published by CI when main is pushed
+  ([plan 080](080-open-source-packages.md#magick-data-020-14-november-2026)).
 - 13 November 2026: Dependabot alerts #362 (zod), #364 (glob) and #366
   (minimatch) fixed by a `@vercel/functions` bump and parent-scoped
   overrides of Serwist's exact zod and glob pins (glob 14 checked against
@@ -339,8 +344,8 @@ Follow-ups are separate from the completed migration work:
   `planet.intelligenceOfIntelligences`; built on
   `gate/moon-intelligence` on top of the chakras' figure, not merged
   ([plan 080](080-open-source-packages.md#the-moons-two-intelligences-13-november-2026)).
-  TODO: release it as `magick-data` 0.2.0 after Gadi re-signs the
-  `astrology/planets.json5` Sources row.
+  Released as `magick-data` 0.2.0 on 14 November
+  ([plan 080](080-open-source-packages.md#magick-data-020-14-november-2026)).
   On 13 November two drawings were found to come from sources the
   package cannot use: the planetary spirits' sigils were traced from a
   1994 Llewellyn printing (and were the Rulers' geomantic sigils, not
@@ -351,14 +356,40 @@ Follow-ups are separate from the completed migration work:
   two intelligences, not merged; Air's pins and four halls' moved, and
   the explorer's page for the sigils and the search vectors follow
   ([plan 080](080-open-source-packages.md#the-sigils-sources-13-november-2026)).
-  TODO for Gadi: whether the old files' git history matters, and
-  whether to credit Heydon on the geomancy reference.
+  TODO for Gadi: whether the old files' git history matters.
   A review of the three stacked branches found nothing critical or
   high; its findings (777's and the Golden Dawn's names are variants of
   Agrippa's, Regardie's coloured sigils are not all after Plate X, and
   smaller wording, pins and plan fixes) are fixed on top of
   `gate/pd-sigils`
   ([plan 080](080-open-source-packages.md#review-of-the-stacked-branches-13-november-2026)).
+  The home page has an Open source tile, drawn from our own
+  components, and an Open source item in its list, on
+  `gate/home-open-source`, not merged
+  ([plan 080](080-open-source-packages.md#stage-b-13-november-2026)).
+  The pages that show the sigils now link the scans they follow
+  (Heydon's pp. 13 and 15, the Equinox's Plate X), and the
+  public-domain pages among them (Heydon's two and Agrippa's p. CXLIX)
+  are mirrored in `public/sources` (643,838 bytes, kept out of the
+  precache) and open in a lightbox, on `gate/sigil-sources` on top of
+  the home page's, not merged
+  ([plan 080](080-open-source-packages.md#source-links-and-mirrored-pages-13-november-2026)).
+  The Air sigil's four marks are named as the Golden Dawn names them,
+  Yods, drawn as small flames (likely, by our inference, for the 4 over
+  the T in Dee's Sigillum Dei Aemeth), and redrawn closer to the
+  Equinox's Plate X, as its sinuous flames with a point at each end,
+  centred over the stem (Gadi:
+  no documented reason for the plate's offset), on `gate/air-yods` on
+  top of the source links, not
+  merged; Air's pins and four halls' moved, the Yods' paths alone
+  ([plan 080](080-open-source-packages.md#the-air-sigils-yods-13-november-2026)).
+  On a phone (below 600 px) the source dialog now opens zoomed on the
+  outline, at 3× or more, showing a column's head or a line's start;
+  wider screens fit the whole page, and reset still shows it, on
+  `gate/source-zoom`, not merged
+  ([plan 080](080-open-source-packages.md#source-links-and-mirrored-pages-13-november-2026)).
+  The tablet notes' new text goes out with `magick-data` 0.2.0
+  ([plan 080](080-open-source-packages.md#magick-data-020-14-november-2026)).
   TODO: with Gadi's go-ahead, stage G; stage E's and F's deferred
   items. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups),

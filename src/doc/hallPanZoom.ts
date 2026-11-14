@@ -136,6 +136,68 @@ export function zoomAt(
   );
 }
 
+/** A rectangle as fractions of the drawing's width and height, from its top left. */
+export interface Region {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/** The margin kept around a region the view opens on, in CSS pixels. */
+export const FOCUS_MARGIN = 24;
+/**
+ * The least zoom a view opens on a region at. The mirrored pages' type is
+ * small: at less than about 3× a phone shows it too small to read, however
+ * well the region fits.
+ */
+export const FOCUS_MIN_SCALE = 3;
+
+/**
+ * The view that opens on `region` of the drawing: as large as fits within
+ * the margin, but at least `minScale` (and at most 6×). On each axis the
+ * region is centred where it fits; where it does not, its start (its top,
+ * or its left) is shown, so a tall column opens at its head and a long line
+ * at its beginning. The drawing still covers the surface, as `clampView`
+ * keeps it.
+ */
+export function focusView(
+  region: Region,
+  size: Size,
+  minScale = FOCUS_MIN_SCALE,
+): View {
+  const drawing = size.drawing ?? {
+    left: 0,
+    top: 0,
+    width: size.width,
+    height: size.height,
+  };
+  const left = drawing.left + region.x * drawing.width;
+  const top = drawing.top + region.y * drawing.height;
+  const width = region.width * drawing.width;
+  const height = region.height * drawing.height;
+  if (!(width > 0 && height > 0)) return clampView(IDENTITY, size);
+  const fit = Math.min(
+    (size.width - 2 * FOCUS_MARGIN) / width,
+    (size.height - 2 * FOCUS_MARGIN) / height,
+  );
+  const scale = clampScale(Math.max(minScale, fit));
+  const axis = (surface: number, start: number, length: number) => {
+    const shown = length * scale;
+    return shown <= surface - 2 * FOCUS_MARGIN
+      ? (surface - shown) / 2 - start * scale
+      : FOCUS_MARGIN - start * scale;
+  };
+  return clampView(
+    {
+      scale,
+      x: axis(size.width, left, width),
+      y: axis(size.height, top, height),
+    },
+    size,
+  );
+}
+
 /** Zooms by `factor` about the surface's centre (the buttons and keys). */
 export function zoomBy(view: View, factor: number, size: Size): View {
   return zoomAt(

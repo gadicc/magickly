@@ -173,18 +173,48 @@ const AIR_TAU =
   "C53 79.5 56 83 58.5 85.5H43.5C46 83 49 79.5 49.8 76" +
   "V24.5C39.5 24.5 28 27 18 33.5Z";
 
-/** One of the four flames over the Tau: a drop, its point up and back. */
-const AIR_FLAME =
-  "M-2.5 -8.5C2 -6.5 3.5 -3 3.2 0A3.2 3.2 0 0 1 -3.2 0" +
-  "C-3.4 -2.5 -1.2 -4.5 -2.5 -8.5Z";
-
-/** The flames' centres along the grid's x, a little over the crossbar. */
-const AIR_FLAME_XS = [33.2, 45.4, 57.6, 69.8];
+/**
+ * One of the four Yods over the Tau, drawn as a small flame, as it
+ * stands on the page (no rotation), about its centre: the point at the top
+ * flicks over to the right and drops into a shallow hollow, the right side
+ * swells out and runs down nearly straight to a second point at the
+ * bottom, as sharp as the top's, and the left side runs down from the top
+ * in a full, convex curve, widest a little above halfway, then turns into
+ * a shallow hollow above the bottom point, so the outline has a gentle S
+ * along its length. About 1.8 times as long as it is wide. Cubic segments
+ * placed by eye against an enlarged crop of the Equinox's Plate X (see
+ * `EquinoxSigils`) and checked against the width of its marks at a few
+ * heights, not traced, and not any font's yod. Regardie's own drawing
+ * (The Golden Dawn, vol. 4, 1940) gives the flames wavy strokes instead;
+ * both versions here keep the plate's form.
+ */
+const AIR_YOD =
+  "M-1.3 -5.5C-0.8 -4.6 -0.8 -3.2 0.3 -2.4C1.6 -1.5 3.4 -0.8 3.6 1.4" +
+  "C3.8 2.8 3.6 4.4 2.8 5.5" +
+  "C1.9 4.9 0.6 4 -0.6 3.5C-1.9 2.9 -3.6 1.6 -3.7 -0.3" +
+  "C-3.75 -2.3 -2.9 -4.2 -1.3 -5.5Z";
 
 /**
- * Air: a Tau with four flames above it, yellow on mauve within a yellow
- * ring; `plain`, in black alone, as the Equinox's Plate X prints it. Our
- * own drawing after the plate, constructed in code.
+ * The Yods' centres along the grid's x, a little over the crossbar, about
+ * 0.185 of its width apart. Each Yod is about 0.17 of the crossbar's width
+ * long and leans about 34 degrees from vertical, top to the left (the
+ * plate's lean about 35), centred over the stem.
+ */
+const AIR_YOD_XS = [33.2, 45.4, 57.6, 69.8];
+
+/**
+ * Air: a Tau with four Yods above it, drawn as small flames, yellow on
+ * mauve within a yellow ring; `plain`, in black alone, as the Equinox's
+ * Plate X prints it. The Golden Dawn calls the marks Yods (Regardie, The
+ * Golden Dawn, vol. 4, 1940, p. 307), and Regardie says the sigils are
+ * taken from Dee's Sigillum Dei Aemeth (p. 308). The T at the top of the
+ * Sigillum's outer ring has a 4 written over it (Sloane MS 3188; The
+ * Equinox I(7), 1912, Plate II, archive.org `crowley-equinox_202110`,
+ * "The Equinox Vol. 1, No. 7", leaf n238), so the four Yods likely stand
+ * for that 4: that is our inference, which no source states. Book T calls
+ * flames Yods (the Ace of Wands, The Equinox I(8), 1912, p. 153, "The
+ * Equinox Vol. 1, No. 8", leaf n183), hence Yods drawn as flames. Our own
+ * drawing after Plate X, constructed in code.
  */
 function AirSigil({ plain = false }: { plain?: boolean }) {
   return (
@@ -199,12 +229,8 @@ function AirSigil({ plain = false }: { plain?: boolean }) {
           transform="scale(1.6) translate(-51 -45.5)"
         >
           <path d={AIR_TAU} />
-          {AIR_FLAME_XS.map((x) => (
-            <path
-              key={x}
-              d={AIR_FLAME}
-              transform={`translate(${x} 14) rotate(-25)`}
-            />
+          {AIR_YOD_XS.map((x) => (
+            <path key={x} d={AIR_YOD} transform={`translate(${x} 11)`} />
           ))}
         </g>
       </g>
@@ -355,6 +381,10 @@ export const Sigils = {
  * `crowley-equinox_202110`, the file "The Equinox Vol. 1, No. 7", leaf
  * n256. These plain forms are our own drawings after that plate,
  * constructed in code from lines, arcs and curves, with no font's outlines.
+ * Air's is a Tau with four Yods above it, drawn as small flames; we take
+ * the Yods to stand, likely, for the 4 over the T in Dee's Sigillum Dei
+ * Aemeth (Plate II, leaf n238), an inference no source states (see
+ * `AirSigil`).
  * Of Regardie's coloured sigils (`Sigils`), only Air's form follows the
  * plate: Water and Fire are drawn from Regardie's description of them (The
  * Golden Dawn, vol. 4, 1940, p. 307), and Earth is a cross in four colours.

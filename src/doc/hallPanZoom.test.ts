@@ -4,7 +4,10 @@ import {
   arrowPan,
   clampScale,
   clampView,
+  FOCUS_MARGIN,
+  FOCUS_MIN_SCALE,
   fitDrawing,
+  focusView,
   IDENTITY,
   isDoubleTap,
   MAX_SCALE,
@@ -276,5 +279,93 @@ describe("clampView with a drawing narrower than the surface", () => {
 
   it("is the identity at 1×", () => {
     expect(clampView({ scale: 1, x: 40, y: -40 }, phone)).toEqual(IDENTITY);
+  });
+});
+
+describe("focusView", () => {
+  // No drawing: the region is a fraction of the 400×300 surface.
+  it("fits a region within the margin and centres it", () => {
+    // 80×60: 352/80 = 4.4 wide, 252/60 = 4.2 high.
+    const region = { x: 0.25, y: 0.25, width: 0.2, height: 0.2 };
+    const view = focusView(region, size);
+    expect(view.scale).toBeCloseTo(4.2);
+    const centre = shown(view, { x: 140, y: 105 });
+    expect(centre.x).toBeCloseTo(200);
+    expect(centre.y).toBeCloseTo(150);
+  });
+
+  it("zooms no further than 6×", () => {
+    const view = focusView({ x: 0.4, y: 0.4, width: 0.05, height: 0.05 }, size);
+    expect(view.scale).toBe(MAX_SCALE);
+    expect(shown(view, { x: 170, y: 127.5 })).toEqual({ x: 200, y: 150 });
+  });
+
+  it("zooms at least 3×, showing the start of a region that overflows", () => {
+    // 200×150 fits at 1.68×; at 3× it is larger than the surface.
+    const view = focusView({ x: 0.1, y: 0.1, width: 0.5, height: 0.5 }, size);
+    expect(view.scale).toBe(FOCUS_MIN_SCALE);
+    expect(shown(view, { x: 40, y: 30 })).toEqual({
+      x: FOCUS_MARGIN,
+      y: FOCUS_MARGIN,
+    });
+    // With a lower floor, it fits the region.
+    expect(
+      focusView({ x: 0.1, y: 0.1, width: 0.5, height: 0.5 }, size, 1).scale,
+    ).toBeCloseTo(1.68);
+  });
+
+  it("opens a tall column at its head and a long line at its start", () => {
+    // Heydon's p. 13 and its Rulers' column on a 390×700 phone.
+    const phone = fitDrawing({ width: 390, height: 700 }, 1600 / 2729);
+    const { drawing } = phone;
+    const column = { x: 0.02, y: 0.05, width: 0.145, height: 0.89 };
+    const view = focusView(column, phone);
+    expect(view.scale).toBe(FOCUS_MIN_SCALE);
+    const head = shown(view, {
+      x: drawing.left + column.x * drawing.width,
+      y: drawing.top + column.y * drawing.height,
+    });
+    expect(head.y).toBeCloseTo(FOCUS_MARGIN);
+    // Centring it would bring the page's left edge inside the surface:
+    // the edge stays at the surface's.
+    expect(view.x + drawing.left * view.scale).toBeCloseTo(0);
+    expect(head.x).toBeGreaterThan(0);
+
+    // Agrippa's p. CXLIX and the Moon's line of 3321.
+    const agrippa = fitDrawing({ width: 390, height: 700 }, 1600 / 2158);
+    const line = { x: 0.11, y: 0.139, width: 0.635, height: 0.032 };
+    const lineView = focusView(line, agrippa);
+    expect(lineView.scale).toBe(FOCUS_MIN_SCALE);
+    const start = shown(lineView, {
+      x: agrippa.drawing.left + line.x * agrippa.drawing.width,
+      y:
+        agrippa.drawing.top +
+        (line.y + line.height / 2) * agrippa.drawing.height,
+    });
+    expect(start.x).toBeCloseTo(FOCUS_MARGIN);
+    // Near the head of the page: centring it would bring the page's top
+    // edge inside the surface, so the edge stays at the surface's.
+    expect(lineView.y + agrippa.drawing.top * lineView.scale).toBeCloseTo(0);
+    expect(start.y).toBeGreaterThan(0);
+    expect(start.y).toBeLessThan(350);
+  });
+
+  it("keeps the drawing covering the surface", () => {
+    const view = focusView({ x: 0, y: 0, width: 0.5, height: 0.5 }, size);
+    expect(view).toEqual(clampView(view, size));
+    expect(view.x).toBe(0);
+    expect(view.y).toBe(0);
+  });
+
+  it("shows the whole drawing for an empty region or surface", () => {
+    expect(focusView({ x: 0.5, y: 0.5, width: 0, height: 0.1 }, size)).toEqual(
+      IDENTITY,
+    );
+    expect(
+      focusView(
+        { x: 0.1, y: 0.1, width: 0.2, height: 0.2 },
+        fitDrawing({ width: 0, height: 0 }, 1),
+      ),
+    ).toEqual(IDENTITY);
   });
 });

@@ -1032,13 +1032,11 @@ reproduced. Applied in `9d34b8d2`.
   job outside `release.yml`'s path.
 - **Required reviewers on the `npm` environment**, if anyone but Gadi
   ever gets push access to `main` (decision 3).
-- **The Moon's two intelligences need a release and a re-signed row**
-  ([below](#the-moons-two-intelligences-13-november-2026)): the new
-  field `planet.intelligenceOfIntelligences` is a minor change,
-  `magick-data` 0.2.0, and the README's Sources row for
-  `astrology/planets.json5`, signed 2026-11-13, needs Gadi's sign-off
-  again, since the file now quotes 777 Revised and Regardie's
-  spellings beside Agrippa's.
+- **Done: the Moon's two intelligences and the Air sigil's Yods**
+  ([the Moon](#the-moons-two-intelligences-13-november-2026),
+  [the Yods](#the-air-sigils-yods-13-november-2026)) go out in
+  `magick-data` 0.2.0, with both Sources rows signed again
+  ([below](#magick-data-020-14-november-2026)).
 
 ## Stage B (13 November 2026)
 
@@ -1127,6 +1125,21 @@ added to its public sections.
   at 1280 and 390 px in light and dark: `/open-source`, `/about`, the
   candlestick page's line, and the drawer. No sideways scroll at 390 px
   (`scrollWidth` 390); the usage sample scrolls inside its box.
+
+**The home page (13 November, later).** At Gadi's request, `613eff1c`
+on `gate/home-open-source` (not merged) gives `/` an Open source tile,
+between Magick Journal and Study, and an Open source item in "What's
+here": the data pages (magick-data, on npm) and the components' pages
+(not on npm yet). The tile's image is drawn by
+`scripts/home-tile/build.mts` from our own components (the Tree of
+Life, an Enochian tablet and a Rose Cross sigil, on cards on a dark
+ground), through the renderer behind `/api/render`; run it again when
+a drawing changes. The footer, the menu, the sitemap and site search
+already had the section; `/about` links the hub; there is no 404 page
+of our own, no section list in the structured data and no shortcuts
+in the manifest. `src/app/page.test.tsx` checks the tiles' order, the
+tile, and that "What's here" links every footer section. The vectors
+were refreshed in the same commit.
 
 ### Stage B review (13 November 2026)
 
@@ -1583,8 +1596,8 @@ runs were discarded and the commits gated again at a lower load.
 **Follow-ups:**
 
 - npm's 0.1.0 still has "Bullm" for `zodiac.taurus.meaning.en`; the
-  source reads "Bull" since main's `1ce38ab0`, and the next patch
-  release ships it.
+  source reads "Bull" since main's `1ce38ab0`, and 0.2.0 ships it
+  ([below](#magick-data-020-14-november-2026)).
 - The bar on a table's page links Data; the drawer does not list Data
   until the section has a second page (stage F).
 - **Stage E's import rewrite:** the data pages import
@@ -2108,9 +2121,298 @@ timeouts in the legacy import first).
   plainer than the forms Golden Dawn readers know (no spiral heart, no
   "I8", a V for Hismael). Smoother forms of our own after Heydon are
   possible; the modern ones themselves are not ours to copy.
-- **A credit on the page.** The geomancy reference could say the sigils
-  follow Heydon (1663/4); that is page prose and needs a search-vector
-  refresh, so it was left out.
+- **A credit on the page.** Done: see the source links below.
+
+### Source links and mirrored pages (13 November 2026)
+
+Gadi asked for links from our pages to the scans the sigils follow, and
+then for the public-domain pages to be kept in the repository and shown
+in the app ("repo for now"; the app's R2 storage later if this grows).
+Built on `gate/sigil-sources`, from `main` at `9c32134f`, then rebased
+onto the home page's Open source (`gate/home-open-source`, itself
+rebased onto `main` at `dee60a93`); not merged.
+
+- **The links** (`e643c2cc`). `src/drawings/sigilSources.tsx` holds the
+  archive.org page links and which of Heydon's pages each Ruler's sigil
+  follows. A planet page says "Sigil after Heydon, *Theomagia*
+  (1663/4), p. 13" under the Spirit sigil (Hismael and Zazel p. 15);
+  the geomancy reference links both pages under the spirits' table; the
+  explorer's PlanetarySpirit and Tablet pages say what their sigils are
+  drawn after; on the tablets page, the Air tablet in the Golden Dawn's
+  and Regardie's versions links Plate X for the Air sigil's form (the
+  Equinox's version already cites the plate). Each URL was opened in
+  headless Chromium: `/page/n124` and `/page/n126` of
+  `theomagiaortempl00heyd` show pp. 13 and 15, so archive.org's `n` is
+  the leaf as cited; Plate X is `/page/n256` of the item's file "The
+  Equinox Vol. 1, No. 7" (the viewer rewrites it to `/page/243`, an OCR
+  page number; the `n` form is the stable one). Tests hold the package's
+  JSDoc pages and leaves, and the tablet notes' Plate X, to the module.
+  The prose refreshed the search vectors.
+- **The mirror** (`dd089791`). `src/sources/mirroredPages.ts` lists
+  Heydon's pp. 13 and 15 (n124, n126) and Agrippa's p. CXLIX (n164,
+  the Moon's intelligence of intelligences, which the Moon's note
+  links); `pnpm sources:mirror` downloads each leaf's JPEG, checks its
+  SHA-256 and writes a WebP 1600 px wide at quality 75. **643,838 bytes
+  in all**: 228,774, 203,016 and 212,048. `public/sources/README.md`
+  gives the sources, both hashes, what was changed and the basis
+  (Heydon 1663/4, Agrippa 1533; *Bridgeman v. Corel*, Directive
+  2019/790 Art. 14). The hall seals' leaves (n166, n168) are cited in
+  the package's provenance text but linked from no page, so they are
+  not mirrored; the Equinox's Plate X is not either (who drew it is not
+  established; if Fuller, it is in copyright in the UK and EU to 2036).
+  The service worker does not precache `public/sources`; Serwist's
+  default image rule caches a page when it is viewed.
+- **The lightbox** (`7791c03d`). `SourceLink` keeps the archive.org
+  href (so no JavaScript, or a modified click, goes there) and opens
+  `SourceDialog`: MUI's full-screen Dialog, named by the citation, the
+  page in the reader's pan and zoom surface with the cited region
+  outlined, and a caption naming the copy with links to the page and
+  the whole book. The geomancy reference's byte pin moved by the three
+  links' `aria-haspopup` alone.
+
+Checked in headless Chromium on the worktree's dev server (port 3125,
+CI's placeholder environment), at 390 and 1280 px, light and dark: the
+links on each page and the dialog from a planet page, the Moon's note,
+the reference and the explorer; zoom, Escape and focus returning to
+the link. No documentation screenshot shows these screens.
+
+| Commit | What |
+| --- | --- |
+| `e643c2cc` | `feat(app): Link the sigils' source pages` |
+| `dd089791` | `feat(sources): Mirror the cited source pages` |
+| `7791c03d` | `feat(sources): Open cited pages in a lightbox` |
+
+Before the rebase, each commit passed stage E's gate on its own tree;
+after it each was gated again on its own tree. `e643c2cc`'s
+coverage step failed on 5-second timeouts in two files it does not
+touch (the legacy SQL import, the Enochian keypad) and passed on the
+gate's built-in rerun; both files passed alone. The other two were first
+gated side by side at a load of 40 to 67, and both coverage runs of each
+failed on timeouts across a dozen untouched files (the legacy import,
+the keypad, the hall editor, the semantic editor, among others) and, in
+the lightbox's, its own dialog test, whose waits for the dialog's
+lazily loaded module could add up to more than the test's 5 seconds:
+it now allows 20 (the lightbox commit was amended for that before it
+landed). Every failing file passed alone, and both gates, run again
+one after the other, passed with every step at 0, the coverage step at
+the first attempt. The built service worker's precache lists
+`public/fonts` and nothing under `public/sources`.
+
+**For Gadi:** the zoom buttons zoom about the page's centre, as in the
+hall viewer, so on a phone the outlined column needs a drag after
+zooming; starting zoomed on the outline is possible. The seals'
+provenance text says no image of the book is committed, which stays
+true of the seal art, though one leaf of the same Agrippa copy (n164)
+is now mirrored in the app.
+
+**Opening on the outline** (14 November 2026). Gadi approved starting
+zoomed on the outline on a phone ("sounds good. do it."). Built on
+`gate/source-zoom` from `main` at `b38521d9`; not merged.
+
+- Below MUI's `sm` breakpoint (600 px, as the dialog's title already
+  uses) `SourceDialog` passes the page's `highlight` to `HallPanZoom`
+  as `focus`; wider screens fit the whole page as before. The media
+  query is read before the first render (`noSsr`: the dialog only
+  renders in the browser), and the surface applies the focus when it
+  is first measured, in the layout effect, before the first paint: in
+  headless Chromium the surface's scale was already 3 when it entered
+  the DOM and on its first animation frame, so the page does not open
+  fitted and then jump.
+- `focusView` (`src/doc/hallPanZoom.ts`) fits the region within a 24
+  px margin, but at no less than 3× and no more than 6×. Fitting alone
+  would barely zoom: Heydon's Rulers' column is 89% of the page's
+  height (1.08× on a phone) and Agrippa's line nearly two-thirds of
+  its width (1.5×), and at either the type and sigils stay too small.
+  At 3× a phone shows Heydon's column with three sigils and their
+  names, and Agrippa's line legibly. The brief asked for the region
+  centred; it is centred on each axis where it fits, but where it
+  does not, its start is shown instead (the column's head, the line's
+  number 3321), since centring a column five screens tall would open
+  on its middle sigils. The page still covers the surface, so the
+  column sits at the page's left edge and the line under the page's
+  heading.
+- Reset (the button, a double tap and the 0 key) still shows the
+  whole page; it is the one way back to it. Pinch, drag and the
+  buttons work from the zoomed view as before.
+- `HallPanZoom`'s `focus` is optional and read once; the reader's
+  halls pass none, and their tests passed unchanged, with no pin
+  moved (the viewer renders only inside its dialog).
+- Tests: `focusView`'s fit, its 3× floor and 6× ceiling, the start of
+  an overflowing region, and Heydon's and Agrippa's regions on a
+  390×700 surface; `SourceDialog.test.tsx` opens the dialog at 390
+  px (3×, zooms out, resets to 1×) and 1280 px (1×, whole page).
+
+Checked in headless Chromium on the worktree's dev server (port 3141,
+CI's placeholder environment, browsed as 127.0.0.1) at 390×844 and
+1280×900, light and dark, for all three pages, with a one-finger drag
+down the column and a pinch back to the whole page at 390. No
+documentation screenshot shows these dialogs (`scripts/docs-screenshots`
+captures the temples, the ritual list and form, the editor and the
+reader, none of which opens a source page or a hall's viewer), so none
+was regenerated, and no page prose changed, so the search vectors
+stand.
+
+| Commit | What |
+| --- | --- |
+| `d57e6722` | `feat(sources): Open cited pages on the outline` |
+
+It passed stage E's gate on its own tree with every step at 0, the
+coverage step at the first attempt, and again after it was rebased onto
+`gate/data-020` (the [0.2.0 release](#magick-data-020-14-november-2026)),
+the only conflict being plan 000's status entry.
+
+### The Air sigil's Yods (13 November 2026)
+
+Built on `gate/air-yods` from `9c32134f`, with Gadi's approval ("Yes,
+refine them"), then rebased onto [the source
+links](#source-links-and-mirrored-pages-13-november-2026); not merged.
+
+**What the marks are.** The Golden Dawn calls the four marks over the
+Tau Yods: Regardie, *The Golden Dawn*, vol. 4 (1940), p. 307 (archive.org
+`IsraelRegardie-TheGoldenDawn-Vol4-1940`, n299), describes a T with four
+Yods above it, and p. 308 (n300) says the sigils are taken from the
+Sigillum Dei Aemeth. The T at the top of the Sigillum's outer ring
+carries a 4 (*The Equinox* I(7), Plate II, `crowley-equinox_202110`,
+"The Equinox Vol. 1, No. 7", n238; Dee's Sloane MS 3188), so the four
+Yods likely stand for that 4. **That is our inference; no source states
+it**, and the code, README and notes mark it as ours. Book T calls
+flames Yods (the Ace of Wands, "Two-and-twenty leaping Flames, or
+Yodh", *The Equinox* I(8), p. 153, "The Equinox Vol. 1, No. 8", n183). No source supports shin
+heads. Facts only from Regardie; none of his drawings was copied.
+
+**What was done.**
+
+- `AIR_FLAME` became `AIR_YOD`, first a hand-placed Bézier lozenge
+  (since redrawn as flames, below) after Plate X (n256), constructed in
+  code and not traced, drawn about its
+  centre and placed with `translate(x 11) rotate(-10)`. Measured on a
+  rasterised render the way the plate was measured (principal axes of
+  each blob, against the crossbar's full width): about 1.82 times as
+  long as wide (the plate 1.8), widest at about 45% of its length (the
+  plate about halfway), its bottom tenth 0.28 of the maximum width (the
+  plate about 0.3, ours before 0.54), 0.17 of the crossbar long (the
+  plate 0.167, ours before 0.18), leaning 32 degrees (kept; the plate
+  about 35), 0.183 of the crossbar apart (kept), and sitting 0.15 of the
+  crossbar above it, centre to top, as on the plate (ours before 0.133).
+  Both versions use it; a comment notes that Regardie's own drawing
+  gives the flames wavy strokes instead.
+- The wording, "a Tau with four Yods above it, drawn as small flames",
+  with the sources and our inference, in `AirSigil`'s and
+  `EquinoxSigils`' JSDoc, the components README and `tabletNotes.json5` (the sigils note and Air's); the
+  sigils note also cites Regardie p. 308, Plate II and the Equinox
+  I(8)'s p. 153.
+- **Two corrections to the brief's measurements.** Ours were not 25%
+  too large: that figure set the plate's crossbar extent (91 px)
+  against our crossbar's filled pixels in its widest row (362 px, where
+  its extent is 426), and measured alike ours were about 8% too long
+  (0.18 against 0.167). And the plate's four Yods sit left of centre,
+  their group's middle about 0.42 of the crossbar from its left end
+  against our 0.5; ours stay centred over the stem, as the 4 sits over
+  the T on Plate II, which a print offset could equally explain.
+  **Gadi's decision:** with no documented reason for the offset, they
+  stay centred.
+- Pins that moved, each checked to change only the Yods' paths and
+  transforms (putting the old path and transform back into the new
+  markup gives the old hash for all five markup pins): Air's four
+  markup hashes and the Equinox Air pin (`e2793a22…` to `74105d5e…`) in
+  `Tablet.test`; `enochian-tablet?id=air` (124,760 to 124,856 bytes)
+  and `&font=enochian` (220,099 to 220,195) in `registry.test`, reviewed
+  rasterised; Theoricus 1 and 2 and Portal 1 and 2 in
+  `gdHallImage.test`, and their file snapshots, whose diff is the four
+  Yods' paths alone. The explorer's image parity test passed unchanged.
+  The props manifest (`pnpm components:props`) and the search
+  catalogue carry none of the changed text, so neither moved.
+- Checked in headless Chromium on the worktree's dev server (port 3127,
+  CI's placeholder environment): the Air tablet in the Golden Dawn's
+  and the Equinox's versions, light and dark, and the tablets page's
+  sigils note.
+
+| Commit | What |
+| --- | --- |
+| `97fc1604` | `fix(components): Refine the Air sigil's Yods` |
+| `b36b3f82` | `fix(magick-data): Name the Air sigil's Yods` |
+| `8835288e` | `fix(enochian): Mark the Yods' reading as ours` |
+| `c5269425` | `fix(components): Draw the Air sigil's Yods as flames` |
+| `f79a59de` | `fix(components): Shape the Yods' left sides and tails` |
+
+Before the rebase, both commits were gated with stage E's gate on their
+own trees (after it each was gated again on its own tree), first side by
+side at a load of up to 105: in each, `test-coverage` and its
+re-run failed only on timing in files neither touches (the hall editor
+and playground, the dictionary's keypad, the semantic editor's delete
+dialog, the legacy SQL import and others, 27 and 35 tests) and on the
+tablets page's tests, which time out the same way; every other step
+passed. All the failing files then passed alone on each tree (11 files,
+478 tests; 13 files, 447 tests), and each whole gate was run once more,
+one after the other: the data commit passed every step, coverage at
+the first attempt; the drawing's passed every step with the coverage step's
+built-in re-run (53 timing failures in 12 files first, at load). The
+plans commit passed every step with the coverage step's
+re-run (one frame-timing failure in `TempleHallTabs.test` first).
+
+A first version of the wording said the Yods stand for the Sigillum's 4,
+which no source states; `8835288e` gives what Regardie and Plate II
+each say and marks the reading as our inference, in the notes, both
+JSDoc comments and the README. It moves no drawing or pin.
+Before the rebase it passed stage E's gate with the coverage step's
+built-in re-run (one timeout in `hallEditor.random.test` first); every other step passed.
+
+**The Yods as flames.** Gadi, comparing the lozenges with the plate,
+asked for its curves: the plate's marks are not symmetric lozenges but
+sinuous flames. `c5269425` redraws `AIR_YOD` as that outline, cubic
+segments placed by eye against an enlarged crop of Plate X and not
+traced, nor taken from any font's yod: the point flicks over to the
+right and drops into a shallow hollow, the right side swells out and
+runs down nearly straight to a blunt lower end, and the left side
+bulges near the top and runs back straight to it, a gentle S along the
+length. It is drawn as it stands on the page, with no rotation
+(`translate(x 11)`). Measured as above: 0.17 of the crossbar long, 1.78
+times as long as wide, widest about halfway, its bottom tenth 0.33 of
+the widest, leaning about 34 degrees (the plate about 35), with the
+spacing and height kept and the group centred. The same pins moved
+again, each checked the same way to change only the Yods' paths and
+transforms: Air's four markup hashes (`f2376705…`, `f89ff742…`,
+`11a0bb4f…`, `2b0bc2ed…` before) and the Equinox Air pin (`74105d5e…`
+to `f885fbfd…`) in `Tablet.test`; `id=air` (124,856 to 124,884 bytes)
+and `&font=enochian` (220,195 to 220,223) in `registry.test`, reviewed
+rasterised; Theoricus 1 and 2 and Portal 1 and 2 in `gdHallImage.test`
+and their snapshots, whose diff is the four Yods' paths alone.
+
+Before the rebase it passed stage E's gate on its own tree with every
+step at 0, coverage at the first attempt. Checked again in headless Chromium on the
+worktree's dev server (port 3127, CI's placeholder environment, a
+Chromium of its own on a free port): the Air tablet in both versions,
+light and dark.
+
+**The flames' left sides and tails.** Gadi, comparing the flames with
+the plate again: their upper left was concave where the plate's is
+convex, their lower left convex where the plate's is hollow, and their
+lower end blunt where it could be as pointed as the top. The four
+marks' widths, measured at fifteen heights on an enlarged crop and
+averaged, bore the first two out: our upper left lay up to half a unit
+(of a Yod about 10.5 long) inside the plate's edge, our lower left up
+to 0.7 outside it. `f79a59de` redraws the lower and left segments of
+`AIR_YOD`: the right side runs down to a second point at the bottom, as
+sharp as the top's; from it the left side climbs through a shallow
+hollow, widens in a full convex curve to its widest a little above
+halfway, and returns to the top. Its left edge now lies within about
+0.1 of the plate's at every measured height. Still cubic segments
+placed by eye, not traced; the top point, the right side, the size,
+the lean, the spacing and the centring are as before. The same pins
+moved, the Yods' paths alone (the four hall snapshots changed by
+swapping the path string, and matched the new render as they stood):
+Air's four markup hashes (`78e363ff…`, `adc7e8f1…`, `a0de5c79…`,
+`d37c4131…` before) and the Equinox Air pin (`f885fbfd…` to
+`45b86e79…`) in `Tablet.test`; `id=air` (124,884 to 124,796 bytes) and
+`&font=enochian` (220,223 to 220,135) in `registry.test`, reviewed
+rasterised; Theoricus 1 and 2 and Portal 1 and 2 in `gdHallImage.test`.
+It passed stage E's gate on its own tree with every step at 0,
+coverage at the first attempt.
+
+**For Gadi:** the notes' new text needs a `magick-data` release (a
+patch on its own; it can ride with the pending 0.2.0), and the README's
+Sources row for `enochian/tabletNotes.json5`, signed 2026-11-12, needs
+his sign-off again ([follow-ups](#follow-ups)).
 
 ## Review of the stacked branches (13 November 2026)
 
@@ -2154,6 +2456,41 @@ in this commit, on top of `gate/pd-sigils`, without rebasing.
 | --- | --- |
 | `0f19ed5d` | `fix(astrology): Say what the sources give, no more` |
 | (this commit) | `docs(plans): Record the stacked branches' review` |
+
+## magick-data 0.2.0 (14 November 2026)
+
+Gadi asked for the release on 14 November, after the source links, the
+home tile and the Yods were merged. `7021aee5` bumps `magick-data` to
+0.2.0, a minor while the version is 0.x, for the new field
+`planet.intelligenceOfIntelligences`. It also ships what main gained
+since 0.1.0: the tablet notes' wording of the Air sigil, with three more
+sources, and "Bull" for `zodiac.taurus.meaning.en`.
+
+**The sign-off.** Two Sources rows' files changed after they were
+signed: `astrology/planets.json5` (signed 2026-11-13 at `1ce38ab0`; the
+Moon's field and its header note came after, in `dd6d805c` and
+`0f19ed5d`) and `enochian/tabletNotes.json5` (signed 2026-11-12 at
+`b3e29099`; the sigils and Air notes changed in `b36b3f82` and
+`8835288e`). Both diffs were read: names, spellings and citations, and
+our own words, with no copied book text and nothing from private
+temple material. Both rows are signed 2026-11-14, and the planets row
+now names the new field and its sources, which it did not. Nothing
+enforces that a row is signed again after its file changes (the test
+only requires a date); that stays the owner's check.
+
+The README's note on the first version no longer says the release
+candidate may still be what `latest` names; npm's `latest` is 0.1.0.
+`publish.yml`'s decision, run on the commit's tree against the
+registry: publish `magick-data@0.2.0`, new, under `latest`. It goes out
+when Gadi pushes main.
+
+It passed stage E's gate (with the components' smoke test) on its own
+tree, every step at 0, coverage at the first attempt.
+
+| Commit | What |
+| --- | --- |
+| `7021aee5` | `feat(magick-data): Release 0.2.0` |
+| (this commit) | `docs(plans): Record magick-data 0.2.0` |
 
 ## Review (11 November 2026)
 

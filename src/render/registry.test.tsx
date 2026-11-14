@@ -214,19 +214,24 @@ describe("component image registry", () => {
     // the Golden Dawn's letters, with its O and A reversed (plan 061,
     // "Tablet versions"); then 127,724, 28267bac…, and 223,063, 1a637907…,
     // until its sigil was redrawn after the Equinox's Plate X in place of
-    // two fonts' glyphs (plan 080, "The sigils' sources"). Reviewed again as
-    // rasterised.
+    // two fonts' glyphs (plan 080, "The sigils' sources"); then 124,760,
+    // 6bdff3d1…, and 220,099, 914fe5eb…, until its four Yods were refined
+    // to the plate's slim lozenges (the same section); then 124,856,
+    // 8313d75c…, and 220,195, e9c0aebe…, until the lozenges became the
+    // plate's sinuous flames; then 124,884, 8952f44a…, and 220,223,
+    // cf25c90c…, until the flames' left sides and lower ends were brought
+    // closer to the plate. Reviewed again as rasterised.
     [
       "enochian-tablet",
       "id=air",
-      124_760,
-      "6bdff3d1003f6f7516b0298f1a037e741a1f036f0bad084d469019d9c9b246a1",
+      124_796,
+      "dcced8d14f168184211314c9226a675b997a755abe8606eade54acd3f2054253",
     ],
     [
       "enochian-tablet",
       "id=air&font=enochian",
-      220_099,
-      "914fe5eb400e70bbb8f5df84b7e0fbc93b4c03dc1d78c50d47515e0ac9e16981",
+      220_135,
+      "48c4507e88fd7567bc76be2727fac48cafa74edc39fa4d58896d151d01b33b26",
     ],
     // One tablet in each other version, reviewed as rasterised (plan 061,
     // "Tablet versions"): Regardie's sigil, the Equinox's in black, and

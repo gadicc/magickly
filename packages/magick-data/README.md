@@ -332,9 +332,8 @@ picture as it was.
 From 0.1.0, each release is published by the repository's CI when the
 version changes on `main`, with npm provenance naming the commit it was
 built from. CI publishes a pre-release under the `next` tag and a release
-under `latest`. The first version, a release candidate published by hand
-under `next`, may still be what `latest` names until 0.1.0 replaces it:
-the registry points `latest` at a package's only version.
+under `latest`. The first version, the release candidate 0.1.0-rc.0, was
+published by hand.
 
 ## Romanised Hebrew
 
@@ -364,13 +363,13 @@ provenance, and no version past 0.0.0 ships while a row has none.
 | `alchemy/symbols.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `alchemy/terms.json5` | [Correspondences](#correspondences); `terms` from [the Second Knowledge Lecture](#the-second-knowledge-lecture), with no rights asserted over them | 2026-11-12 |
 | `astrology/houses.json5` | [Correspondences](#correspondences); `interpretation` is ours, following [Lilly](#lillys-houses); `motto.la` is the mnemonic verse as usually quoted, not from Lilly, and `motto.en` our rendering of it ([Lilly's houses](#lillys-houses)) | 2026-11-12 |
-| `astrology/planets.json5` | [Correspondences](#correspondences); `keyOfSolomon` from [the Key of Solomon](#the-key-of-solomon); `about` and `description` are ours, written from public-domain works the file's header cites | 2026-11-13 |
+| `astrology/planets.json5` | [Correspondences](#correspondences); `keyOfSolomon` from [the Key of Solomon](#the-key-of-solomon); `about` and `description` are ours, written from public-domain works the file's header cites; `intelligenceOfIntelligences`, the Moon's, is the name and its Hebrew from [Agrippa](#agrippas-kameas)'s table of the Moon, with 777's and Regardie's spellings of it beside his, names only, as the header cites them | 2026-11-14 |
 | `astrology/zodiac.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `body/parts.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `chakras.json5` | [Correspondences](#correspondences) of the seven-chakra system, facts only: names, places, petals, colours, seed syllables and their elements, and one-to-five-word glosses of the Sanskrit names. The Wikipedia "Chakra" article the file cites is a reference; no share-alike text is copied | 2026-11-12 |
 | `enochian/keys.json5` | [The Enochian Keys](#the-enochian-keys) | 2026-11-12 |
 | `enochian/letters.json5` | [The Enochian letters](#the-enochian-letters) | 2026-11-12 |
-| `enochian/tabletNotes.json5` | Ours: notes on [the Enochian tablets](#the-enochian-tablets), citing their sources | 2026-11-12 |
+| `enochian/tabletNotes.json5` | Ours: notes on [the Enochian tablets](#the-enochian-tablets), citing their sources | 2026-11-14 |
 | `enochian/tablets.json5` | [The Enochian tablets](#the-enochian-tablets) | 2026-11-12 |
 | `gd/degrees.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `gd/grades.json5` | [Correspondences](#correspondences) | 2026-11-12 |

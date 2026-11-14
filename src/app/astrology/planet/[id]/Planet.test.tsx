@@ -189,7 +189,13 @@ describe("the planet page", () => {
     expect(row(html, "Archangel").text).toBe("מיכאל Michael");
     expect(row(html, "Intelligence").text).toBe("Nakhiel");
     // The sigil is decoration beside the name, hidden from a screen reader.
-    expect(row(html, "Spirit").text).toBe("Sorath [sigil of sorath, hidden]");
+    // Below it, the page of Heydon's it is drawn after, linked to its scan.
+    expect(row(html, "Spirit")).toMatchObject({
+      text: "Sorath [sigil of sorath, hidden]Sigil after Heydon, Theomagia (1663/4), p. 13.",
+      hrefs: [
+        "https://archive.org/details/theomagiaortempl00heyd/page/n124/mode/1up",
+      ],
+    });
     expect(row(html, "Rules").text).toBe("♌︎ Leo");
     expect(row(html, "Geomantic figures")).toMatchObject({
       text: "Fortuna Major, Fortuna Minor",
@@ -264,6 +270,28 @@ describe("the planet page", () => {
     // Gabriel is the one archangel with an English form of the name, which
     // is not a meaning and is not quoted as one.
     expect(row(html, "Archangel").text).toBe("גבריאל Gavriel");
+  });
+
+  it("links each spirit's sigil to the page of Heydon's it follows", async () => {
+    const pages: Record<string, "p. 13" | "p. 15"> = {
+      saturn: "p. 15",
+      jupiter: "p. 15",
+      mars: "p. 13",
+      sol: "p. 13",
+      venus: "p. 13",
+      mercury: "p. 13",
+      luna: "p. 13",
+    };
+    const leaves = { "p. 13": "n124", "p. 15": "n126" };
+    for (const [id, cited] of Object.entries(pages)) {
+      const spirit = row(await page(id), "Spirit");
+      expect(spirit.text, id).toMatch(
+        new RegExp(`Sigil after Heydon, Theomagia \\(1663/4\\), ${cited}\\.$`),
+      );
+      expect(spirit.hrefs, id).toEqual([
+        `https://archive.org/details/theomagiaortempl00heyd/page/${leaves[cited]}/mode/1up`,
+      ]);
+    }
   });
 
   it("gives the Moon both intelligences, each with a note at the foot", async () => {

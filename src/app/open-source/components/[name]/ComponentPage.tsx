@@ -18,6 +18,7 @@ import { SITE_REPOSITORY } from "@/seo/site";
 import { EntityFrame, Trail } from "@/ui/entity";
 import Link from "@/ui/Link";
 import styles from "./componentPage.module.css";
+import DrawnAfter from "./DrawnAfter";
 import PropsTable from "./PropsTable";
 
 /**
@@ -65,6 +66,7 @@ export default function ComponentPage({
       </h1>
       <p className={styles.note}>{component.title}, from magick-components</p>
       <DocText text={docs.description} />
+      <DrawnAfter name={component.name} className={styles.note} />
       <pre className={styles.importLine}>
         <code>{importLine(component)}</code>
       </pre>
