@@ -32,3 +32,98 @@ The existing main release workflow runs migrations regardless of feature enablem
 merging/releasing this adapter therefore requires a separate schema decision. No
 migration, reindex, source grant or production activation is performed by preparing
 or testing this branch.
+
+## Integration and release proposal
+
+Keep the additive migrations together with the generic engine, and leave research
+unconfigured on the hosted app. This keeps the schema journal coherent and lets
+normal CI exercise the shipped contracts. Approval to prepare this candidate is
+separate from approval to merge it into the production release branch.
+
+| Migration | New objects | Purpose |
+| --- | --- | --- |
+| 0021 | `chat_research_windows`, `chat_research_permits` | Finite request accounting, reservations and dispatch state |
+| 0022 | `chat_research_source_policies`; policy function and three triggers | Versioned source permissions and protection against resets |
+| 0023 | `chat_research_artifacts`; artifact function and three triggers | Bounded retained packets and expired one-way tombstones |
+| 0024 | `chat_research_maintenance`; maintenance function and two triggers | Cleanup target ownership and finite coverage evidence |
+
+The four files create five empty tables, three trigger functions, eight triggers
+and nine indexes including primary keys. Their foreign keys, indexes and triggers
+attach only to the new research tables. They do not rewrite old application data,
+create extensions, copy a collection, grant source access, install a schedule or
+activate a model allowance. They use the existing `uuid_generate_v7()` dependency.
+
+No `GRANT`, `REVOKE` or row-level security policy is installed by these files.
+New table privileges depend on the actual migration owner and its default ACLs;
+a feature flag is not database isolation. The current local-only gate also refuses
+hosted Vercel/CI activation. No private corpus configuration belongs in hosted
+variables or this repository.
+
+## Upgrade evidence
+
+`tests/chat-research/migrationUpgrade.test.ts` runs the installed Drizzle migrator
+on an exact old migration prefix with synthetic existing users and a completed
+legacy-import singleton. It verifies that:
+
+- old rows, relation identities, ACLs, constraints and triggers remain unchanged;
+- all five research tables start empty, with the expected functions and triggers;
+- the actual auth cutover predicate still accepts the completed singleton, and
+  ordinary user/session writes continue to work;
+- a collision in the final migration rolls back the entire pending batch and
+  migration journal while preserving the preexisting collision and old rows;
+- a successful rerun adds no duplicate journal entries;
+- a shadow creation schema causes refusal and no committed misplaced tables.
+
+The RAM test uses Loom's UUID fixture instead of migration 0000's extension. A
+separate disposable native PostgreSQL 18 control uses the real `pg_uuidv7`, exact
+SQL bytes and explicit transaction batches. It checks old-object preservation,
+late-failure rollback and actual separate-role privileges. With no default grants,
+the runtime role can still write old tables but cannot read the new packet table.
+An explicit default SELECT grant is inherited, demonstrating why the actual target
+ACLs need review before any future data adoption. The native batch control does
+not substitute for running the Node migration client against the release target.
+
+These are synthetic compatibility checks, not live Neon acceptance, deployed
+Google-auth acceptance or expert corpus-accuracy labels. Collection-specific
+verification receipts and local infrastructure identities stay private.
+
+## Release boundary and recovery
+
+Before an approved release, verify the intended main baseline and exact pending
+migration prefix, target project/branch/database and migration/runtime roles using
+the existing Loom release workflow. The role must resolve unqualified creation to
+`public`, have the existing UUID function, and have the intended default ACLs.
+Refuse unexpected preexisting research objects, schema drift or an unresolved
+previous release. Do not drop conflicting objects or rewrite saved import hashes
+as a shortcut. Completed runtime auth readiness is distinct from replaying an old
+schema-bound import operation; such old maintenance artifacts remain immutable.
+
+The normal release stages the built app, applies compatible migrations, verifies
+the staged deployment and only then promotes it. Its existing smoke checks remain
+required. Research routes must stay unavailable on the hosted deployment, and no
+source grants, real packets or model window are seeded as part of the release.
+
+If migration fails, withhold promotion and inspect the exact migration journal and
+catalog. The installed migrator's pending batch is transactional; its initial
+schema/journal bootstrap is separate. If later build/promotion checks fail after a
+successful migration, keep old code serving against the additive empty tables and
+resolve the release state. Do not automatically run destructive down migrations,
+reset accounting evidence or drop retained data. Any later cleanup is a separate
+reviewed change with actual-state and retention checks.
+
+Remaining release decision: approve shipping these four additive migrations with
+research disabled, or defer merging the candidate. No production operation is
+performed by the tests or by preparing this proposal.
+
+## Separate legacy-chat boundary
+
+The existing `/chat` API remains a separate code path. When its Pinecone corpus is
+configured, `src/app/chat/server.ts` sends retrieved source passages and metadata
+to clients in both supported protocols. The new private adapter's permissions do
+not govern that older path, and repository separation does not remove an existing
+hosted index. This candidate currently preserves that behavior.
+
+A release decision must explicitly address whether to disable legacy corpus chat,
+replace its index with approved public sources, or intentionally defer that work.
+Do not describe this branch as having resolved the older runtime's source privacy.
+No live index query, removal or production setting change is performed here.
