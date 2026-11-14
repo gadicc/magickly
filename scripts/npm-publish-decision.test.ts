@@ -19,6 +19,7 @@ import {
   decide,
   integrityOf,
   isPrerelease,
+  isUnreleased,
   tarballManifest,
 } from "./npm-publish-decision.mjs";
 
@@ -118,6 +119,54 @@ describe("decide", () => {
     expect(decision).toMatchObject({ action: "skip", tag: "latest" });
     expect(decision.published).toBeUndefined();
     expect(decision.reason).toMatch(/first publish is by hand/);
+  });
+
+  // Stage G review, M1: 0.0.0 is never published, but a package npm does
+  // not have yet still skips, since its first publish is by hand.
+  describe("at 0.0.0", () => {
+    const unreleased = { ...manifest, version: "0.0.0" };
+
+    it("still skips a package the registry does not have", async () => {
+      const { options } = harness([new Response(null, { status: 404 })]);
+      expect(await decide(unreleased, options)).toMatchObject({
+        action: "skip",
+      });
+    });
+
+    it.each([
+      ["npm's placeholder", packument(["0.0.0-stage"], "0.0.0-stage")],
+      ["no versions at all", packument([])],
+      ["0.0.0 itself", packument(["0.0.0"], "0.0.0")],
+      ["later versions", packument(["0.1.0"], "0.1.0")],
+    ])("fails when the registry has %s", async (_, reply) => {
+      const { options } = harness([reply]);
+      const decision = await decide(unreleased, options);
+      expect(decision).toMatchObject({ action: "fail", cause: "rule" });
+      expect(decision.reason).toMatch(/never published; bump it first/);
+    });
+
+    it("fails however the decision is asked", async () => {
+      for (const flags of [
+        { sameContent: true },
+        { changed: true },
+        { expectExists: true },
+      ]) {
+        const { options } = harness([packument(["0.0.0-stage"])]);
+        expect(
+          await decide(
+            { ...unreleased, integrity: "sha512-x" },
+            { ...options, ...flags },
+          ),
+        ).toMatchObject({ action: "fail", cause: "rule" });
+      }
+    });
+
+    it("counts build metadata as 0.0.0, and not a pre-release", () => {
+      expect(isUnreleased("0.0.0")).toBe(true);
+      expect(isUnreleased("0.0.0+build.1")).toBe(true);
+      expect(isUnreleased("0.0.0-stage")).toBe(false);
+      expect(isUnreleased("0.0.1")).toBe(false);
+    });
   });
 
   it("names next for a pre-release it skips, for a dry run's sake", async () => {
@@ -608,6 +657,29 @@ describe("the command line", () => {
       action: "fail",
       published: "true",
     });
+  });
+
+  it("refuses 0.0.0 in publish.yml's second decision, and skips it on a 404", async () => {
+    answers.set("/cli-z", [
+      200,
+      {
+        "dist-tags": { latest: "0.0.0-stage" },
+        versions: { "0.0.0-stage": {} },
+      },
+    ]);
+    const placeholder = await run([
+      tarball("cli-z", "0.0.0"),
+      "--same-content",
+    ]);
+    expect(placeholder.code).toBe(1);
+    expect(placeholder.outputs).toMatchObject({
+      action: "fail",
+      publish: "false",
+    });
+    expect(placeholder.stdout).toMatch(/never published/);
+    const absent = await run([tarball("cli-y", "0.0.0"), "--same-content"]);
+    expect(absent.code).toBe(0);
+    expect(absent.outputs).toMatchObject({ action: "skip", publish: "false" });
   });
 
   it("checks what npm already has, as publish.yml does after a refusal", async () => {

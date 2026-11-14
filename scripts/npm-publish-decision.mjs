@@ -13,6 +13,10 @@ import { parseArgs } from "node:util";
  *   have. Once it exists, `expectExists` turns a 404 into a **fail**, so a
  *   registry that loses the package, or a misspelt name, cannot skip quietly
  *   forever.
+ * - 200 and the version is 0.0.0, the version a package keeps until its
+ *   first release: **fail**. npm may create a `0.0.0-stage` placeholder
+ *   before a first publish, against which 0.0.0 would otherwise be new
+ *   (stage G review, M1).
  * - 200 and the version is listed: **skip**. It is published, so a re-run
  *   or a push that does not bump the version does nothing. When the caller
  *   gives the tarball's integrity and it differs from the registry's for
@@ -68,7 +72,14 @@ const ACCEPT =
 const SEMVER =
   /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*)?$/;
 
-function parse(version) {
+/**
+ * A semantic version's release (`[major, minor, patch]`) and pre-release
+ * identifiers; throws on anything else.
+ *
+ * @param {string} version
+ * @returns {{ release: number[], prerelease: string[] }}
+ */
+export function parseVersion(version) {
   const match = SEMVER.exec(version);
   if (!match) throw new Error(`Not a semantic version: ${version}`);
   return {
@@ -79,7 +90,7 @@ function parse(version) {
 
 /** Whether a version carries a pre-release tag, such as `0.1.0-rc.0`. */
 export function isPrerelease(version) {
-  return parse(version).prerelease.length > 0;
+  return parseVersion(version).prerelease.length > 0;
 }
 
 /**
@@ -87,8 +98,8 @@ export function isPrerelease(version) {
  * equal, positive if higher. Build metadata is ignored, as the spec says.
  */
 export function compareVersions(a, b) {
-  const x = parse(a);
-  const y = parse(b);
+  const x = parseVersion(a);
+  const y = parseVersion(b);
   for (let i = 0; i < 3; i++)
     if (x.release[i] !== y.release[i]) return x.release[i] - y.release[i];
   // A version without a pre-release is higher than one with.
@@ -111,22 +122,15 @@ export function compareVersions(a, b) {
 }
 
 /**
- * @typedef {object} Decision
- * @property {"publish" | "skip" | "fail"} action
- * @property {"latest" | "next"} [tag] The dist-tag the version publishes
- *   under, whatever the action, so that a dry run can name it; absent only
- *   when the version is not semantic.
- * @property {boolean} [published] True when the registry already lists the
- *   version, which npm would refuse to publish again, even in a dry run.
- * @property {"rule" | "registry"} [cause] Why it failed, on a failure: the
- *   manifest's version, or the registry's state or answer.
- * @property {string} [warning] Something to look at that does not change
- *   the action, such as published content that differs from the tarball.
- * @property {string} reason One line for the log.
+ * Whether a version is 0.0.0 (build metadata aside), the version a package
+ * keeps until its first release, which CI never publishes.
  */
+export function isUnreleased(version) {
+  return compareVersions(version, "0.0.0") === 0;
+}
 
 /**
- * @typedef {object} DecideOptions
+ * @typedef {object} FetchOptions
  * @property {typeof fetch} [fetch]
  * @property {(ms: number) => Promise<void>} [wait]
  * @property {number} [retries] Retries after a network error, a timeout,
@@ -134,49 +138,27 @@ export function compareVersions(a, b) {
  * @property {number} [timeoutMs] Per request, body included; 15 s.
  * @property {string} [registry] The registry's base URL; the public one by
  *   default.
- * @property {boolean} [expectExists] A 404 fails instead of skipping.
- * @property {boolean} [changed] The version is a pull request's bump: a
- *   listed version fails instead of skipping.
- * @property {boolean} [sameContent] A listed version fails unless its
- *   registry integrity is `integrity`, which must then be given.
- * @property {boolean} [expectPublished] The version must be listed: a 404
- *   or an absent version fails.
  */
 
 /**
- * Fetches the packument and applies the rule above to `name` at `version`.
- * `integrity`, the tarball's `sha512-…` integrity, is compared with the
- * registry's when the version is already published.
+ * The registry's abbreviated packument for `name`: `{ status: 200,
+ * packument }`, `{ status: 404 }` when the registry does not have the
+ * package, or `{ error }`, one line saying why there is no answer (any
+ * other status, a network error or timeout after the retries, or a body
+ * that is not a packument). The decision below and
+ * `npm-publish-dependencies.mjs` share it.
  *
- * @param {{ name: string, version: string, integrity?: string }} manifest
- * @param {DecideOptions} [options]
- * @returns {Promise<Decision>}
+ * @param {string} name
+ * @param {FetchOptions} [options]
+ * @returns {Promise<{ status: 200, packument: { versions: Record<string, any>, "dist-tags"?: Record<string, string> } } | { status: 404 } | { error: string }>}
  */
-export async function decide({ name, version, integrity }, options = {}) {
+export async function fetchPackument(name, options = {}) {
   const request = options.fetch ?? fetch;
   const wait =
     options.wait ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
   const retries = options.retries ?? 2;
   const timeoutMs = options.timeoutMs ?? 15_000;
   const registry = (options.registry ?? REGISTRY).replace(/\/*$/, "/");
-  const label = `${name}@${version}`;
-  let tag;
-  try {
-    tag = isPrerelease(version) ? "next" : "latest";
-  } catch (error) {
-    return {
-      action: "fail",
-      cause: "rule",
-      reason: `${label}: ${error.message}`,
-    };
-  }
-  const fail = (cause, reason) => ({
-    action: "fail",
-    tag,
-    cause,
-    reason: `${label}: ${reason}`,
-  });
-
   // A scoped name keeps its @ and escapes only the slash, as npm does.
   const url = `${registry}${name.replace("/", "%2f")}`;
   let status;
@@ -211,11 +193,88 @@ export async function decide({ name, version, integrity }, options = {}) {
           : `the registry could not be reached (${error.name})`;
     }
     if (attempt >= retries)
-      return fail("registry", `${problem}, ${attempt + 1} times; failing`);
+      return { error: `${problem}, ${attempt + 1} times; failing` };
     await wait(2_000 * (attempt + 1));
   }
 
-  if (status === 404)
+  if (status === 404) return { status };
+  if (status !== 200) return { error: `the registry answered ${status}` };
+  let packument;
+  try {
+    packument = JSON.parse(body);
+  } catch {
+    return { error: "the registry's answer is not JSON" };
+  }
+  if (
+    !packument ||
+    typeof packument.versions !== "object" ||
+    packument.versions === null
+  )
+    return { error: "the registry's answer has no versions" };
+  return { status, packument };
+}
+
+/**
+ * @typedef {object} Decision
+ * @property {"publish" | "skip" | "fail"} action
+ * @property {"latest" | "next"} [tag] The dist-tag the version publishes
+ *   under, whatever the action, so that a dry run can name it; absent only
+ *   when the version is not semantic.
+ * @property {boolean} [published] True when the registry already lists the
+ *   version, which npm would refuse to publish again, even in a dry run.
+ * @property {"rule" | "registry"} [cause] Why it failed, on a failure: the
+ *   manifest's version, or the registry's state or answer.
+ * @property {string} [warning] Something to look at that does not change
+ *   the action, such as published content that differs from the tarball.
+ * @property {string} reason One line for the log.
+ */
+
+/**
+ * @typedef {FetchOptions & DecideFlags} DecideOptions
+ */
+
+/**
+ * @typedef {object} DecideFlags
+ * @property {boolean} [expectExists] A 404 fails instead of skipping.
+ * @property {boolean} [changed] The version is a pull request's bump: a
+ *   listed version fails instead of skipping.
+ * @property {boolean} [sameContent] A listed version fails unless its
+ *   registry integrity is `integrity`, which must then be given.
+ * @property {boolean} [expectPublished] The version must be listed: a 404
+ *   or an absent version fails.
+ */
+
+/**
+ * Fetches the packument and applies the rule above to `name` at `version`.
+ * `integrity`, the tarball's `sha512-…` integrity, is compared with the
+ * registry's when the version is already published.
+ *
+ * @param {{ name: string, version: string, integrity?: string }} manifest
+ * @param {DecideOptions} [options]
+ * @returns {Promise<Decision>}
+ */
+export async function decide({ name, version, integrity }, options = {}) {
+  const label = `${name}@${version}`;
+  let tag;
+  try {
+    tag = isPrerelease(version) ? "next" : "latest";
+  } catch (error) {
+    return {
+      action: "fail",
+      cause: "rule",
+      reason: `${label}: ${error.message}`,
+    };
+  }
+  const fail = (cause, reason) => ({
+    action: "fail",
+    tag,
+    cause,
+    reason: `${label}: ${reason}`,
+  });
+
+  const fetched = await fetchPackument(name, options);
+  if (fetched.error) return fail("registry", fetched.error);
+  if (fetched.status === 404)
     return options.expectExists || options.expectPublished
       ? fail(
           "registry",
@@ -226,21 +285,17 @@ export async function decide({ name, version, integrity }, options = {}) {
           tag,
           reason: `${label}: ${name} is not on the registry; its first publish is by hand`,
         };
-  if (status !== 200)
-    return fail("registry", `the registry answered ${status}`);
-
-  let packument;
-  try {
-    packument = JSON.parse(body);
-  } catch {
-    return fail("registry", "the registry's answer is not JSON");
-  }
-  if (
-    !packument ||
-    typeof packument.versions !== "object" ||
-    packument.versions === null
-  )
-    return fail("registry", "the registry's answer has no versions");
+  // Never 0.0.0, the version a package keeps until its first release (stage
+  // G review, M1). The registry may hold the package, or the placeholder
+  // npm creates before a first publish (0.0.0-stage), and 0.0.0 would then
+  // be "new" and publish. A 404 above still skips: the first publish is by
+  // hand.
+  if (isUnreleased(version))
+    return fail(
+      "rule",
+      "0.0.0 is the version a package keeps until its first release, and is never published; bump it first",
+    );
+  const { packument } = fetched;
 
   if (Object.hasOwn(packument.versions, version)) {
     const listed = packument.versions[version]?.dist?.integrity;

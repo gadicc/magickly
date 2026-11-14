@@ -25,9 +25,11 @@
  * Every step throws on failure and the process exits non-zero; the temporary
  * directory is removed either way.
  *
- * `--keep-tarball <path>` copies the tarball to `<path>` once every step has
- * passed (a relative path is read from where pnpm was run), and that file is
- * what a release publishes, `npm publish <path>` (plan 080, decision 3). It
+ * `--keep-tarball <path>` removes any file at `<path>` first, so that a
+ * failed run leaves none from an earlier one, and copies the tarball there
+ * once every step has passed (a relative path is read from where pnpm was
+ * run). That file is what a release publishes, `npm publish <path>` (plan
+ * 080, decision 3). It
  * prints the file's SHA-256 and npm's `sha512-…` integrity, to compare with
  * CI's log and, once published, with `npm view magick-data dist.integrity`.
  * `lib/` and `dist/` are git-ignored, so packing again could ship whatever
@@ -77,6 +79,8 @@ const { values: options } = parseArgs({
 const keepTarball =
   options["keep-tarball"] &&
   resolve(process.env.INIT_CWD ?? process.cwd(), options["keep-tarball"]);
+// A failed run must not leave an earlier run's tarball to be published.
+if (keepTarball) rmSync(keepTarball, { force: true });
 
 /** Runs a command and returns what it printed; a non-zero exit throws. */
 function run(command, args, options = {}) {

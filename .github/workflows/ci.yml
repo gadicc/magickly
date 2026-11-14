@@ -201,7 +201,10 @@ jobs:
   # magick-components' published shape (plan 080, decision 7): built and
   # packed with magick-data, installed by npm into a fixture, loaded in Node,
   # type-checked, and built by Next with webpack and with Turbopack, keeping
-  # the tarball (stage G).
+  # the tarball (stage G). That tarball is only dry-run, never published, so
+  # a magick-data npm lacks skips the registry fixture, as it always has
+  # (--allow-unpublished-data): a push that bumps both packages must not
+  # fail here, where publish.yml's quality run and every deploy would stop.
   components:
     name: Components package
     runs-on: ubuntu-latest
@@ -209,7 +212,9 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup
-      - run: pnpm --filter magick-components smoke --keep-tarball "$RUNNER_TEMP/magick-components.tgz"
+      - run: >-
+          pnpm --filter magick-components smoke --allow-unpublished-data
+          --keep-tarball "$RUNNER_TEMP/magick-components.tgz"
       # For the registry job, which runs only on its own events (above).
       - if: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/codex/')) }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7

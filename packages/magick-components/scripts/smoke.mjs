@@ -26,17 +26,23 @@
  *    README's TSX and TS examples;
  * 5. 3 and 4 again in a second fixture that installs the components'
  *    tarball alone, so that npm takes magick-data from the registry, as a
- *    stranger's install would; skipped, saying so, while the registry
- *    lacks the magick-data version the components were built with;
+ *    stranger's install would. While the registry lacks the magick-data
+ *    version the components were built with, it is skipped, saying so,
+ *    unless the tarball is kept past 0.0.0: a release's tarball fails
+ *    instead (stage G review, H1), and `--allow-unpublished-data` skips
+ *    it after all, for a run that publishes that magick-data too
+ *    (`registryFixture.mjs` has the rule);
  * 6. a Next app built with webpack and with Turbopack, first with every
  *    entry but the live rose sigil and no `fs` stub (nlopt must be out of
  *    reach), then with `RoseSigil` and the stub the README gives; each
  *    build's prerendered HTML is read for the server's drawings.
  *
- * `--keep-tarball <path>` copies the components' tarball to `<path>` once
- * every step has passed (a relative path is read from where pnpm was run),
- * and that file is what a release publishes, `npm publish <path>` (plan
- * 080, decision 3 and stage G), as magick-data's smoke test keeps its own.
+ * `--keep-tarball <path>` removes any file at `<path>` first, so that a
+ * failed run leaves none from an earlier one, and copies the components'
+ * tarball there once every step has passed (a relative path is read from
+ * where pnpm was run). That file is what a release publishes, `npm publish
+ * <path>` (plan 080, decision 3 and stage G), as magick-data's smoke test
+ * keeps its own.
  * It prints the file's SHA-256 and npm's `sha512-…` integrity, to compare
  * with CI's log and, once published, with `npm view magick-components
  * dist.integrity`. `lib/` is git-ignored, so packing again could ship
@@ -76,6 +82,7 @@ import {
   signOffRows,
   unsignedRows,
 } from "../../../scripts/provenance-sign-off.mjs";
+import { registryFixture } from "./registryFixture.mjs";
 
 const PACKAGE_DIR = fileURLToPath(new URL("..", import.meta.url));
 const REPO_DIR = join(PACKAGE_DIR, "..", "..");
@@ -85,6 +92,7 @@ const { values: options } = parseArgs({
   options: {
     keep: { type: "boolean" },
     "keep-tarball": { type: "string" },
+    "allow-unpublished-data": { type: "boolean" },
   },
 });
 // pnpm runs the script in the package's directory; INIT_CWD is where it was
@@ -92,6 +100,8 @@ const { values: options } = parseArgs({
 const keepTarball =
   options["keep-tarball"] &&
   resolve(process.env.INIT_CWD ?? process.cwd(), options["keep-tarball"]);
+// A failed run must not leave an earlier run's tarball to be published.
+if (keepTarball) rmSync(keepTarball, { force: true });
 
 const sourceManifest = JSON.parse(
   readFileSync(join(PACKAGE_DIR, "package.json"), "utf8"),
@@ -791,9 +801,20 @@ export const page = (
   // published. The fixture above overrides magick-data with its tarball,
   // so a component that used something magick-data gained since its last
   // publish would pass there and fail here. Until the registry has the
-  // version the components were built with, there is nothing to compare.
+  // version the components were built with, there is nothing to compare,
+  // and a tarball kept for a release fails (registryFixture.mjs).
   const registryData = publishTime("magick-data", dataManifest.version);
-  if (registryData === undefined)
+  const againstRegistry = registryFixture({
+    version: manifest.version,
+    keepTarball: Boolean(keepTarball),
+    allowUnpublishedData: Boolean(options["allow-unpublished-data"]),
+    dataPublished: registryData !== undefined,
+  });
+  if (againstRegistry === "fail")
+    throw new Error(
+      `against the registry's magick-data: it has no ${dataManifest.version}, the version the components were built with, so ${manifest.name}@${manifest.version} kept for a release could never be installed; publish magick-data first, or pass --allow-unpublished-data when the same run publishes it`,
+    );
+  if (againstRegistry === "skip")
     console.log(
       `skip - against the registry's magick-data: it has no ${dataManifest.version}, the version the components were built with`,
     );

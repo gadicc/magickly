@@ -19,8 +19,9 @@ name: Publish packages
 #   smoke-tests and uploads the package's verified tarball with its SHA-256.
 # - publish, a leg per package, in the `npm` environment with id-token:
 #   write: downloads its tarball, checks its SHA-256, decides again from a
-#   fresh registry read and runs `npm publish`. No install, no cache, no
-#   package script.
+#   fresh registry read, requires npm to have what the tarball depends on
+#   among this repository's packages, and runs `npm publish`. No install,
+#   no cache, no package script.
 #
 # Each package is decided, built and published on its own. A package that
 # skips is not built. One whose decision fails is left out of the list and
@@ -28,6 +29,14 @@ name: Publish packages
 # publish leg that fails at its first step, finding no digest from its
 # build leg. Either way the other package goes ahead. A failed quality run
 # stops both: it tests the one commit both would be published from.
+#
+# magick-components depends on magick-data at the version it was built with,
+# and a version npm publishes is permanent, so the components are never
+# published depending on a magick-data npm lacks (stage G review, H1): their
+# build leg's smoke test fails such a tarball, unless this run publishes
+# that magick-data too, and their publish leg then waits for npm to list it,
+# a few minutes at most, before publishing. magick-data's legs wait on
+# nothing. Bumping magick-data in an earlier push stays the simple path.
 #
 # Not part of release.yml: its deploy job holds id-token: write in the
 # Production environment, and everything the Vercel build runs there could
@@ -144,6 +153,7 @@ jobs:
     env:
       PACKAGE: ${{ matrix.package }}
       DECIDED: ${{ matrix.version }}
+      PACKAGES: ${{ needs.decide.outputs.packages }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -160,9 +170,17 @@ jobs:
           install: false
       - run: pnpm install --frozen-lockfile
       # The package's smoke test builds it, packs it, verifies the tarball
-      # and keeps it; that file is what is published.
+      # and keeps it; that file is what is published. The components' smoke
+      # fails a kept tarball whose magick-data npm lacks, unless this run
+      # publishes that magick-data too; their publish leg then waits for it.
       - name: Build, verify and keep the tarball
-        run: pnpm --filter "$PACKAGE" smoke --keep-tarball "$RUNNER_TEMP/$PACKAGE.tgz"
+        run: |
+          flags=()
+          if [ "$PACKAGE" = magick-components ] &&
+            jq -e 'any(.[]; .package == "magick-data")' <<<"$PACKAGES" >/dev/null; then
+            flags+=(--allow-unpublished-data)
+          fi
+          pnpm --filter "$PACKAGE" smoke --keep-tarball "$RUNNER_TEMP/$PACKAGE.tgz" "${flags[@]}"
       - name: Check the tarball is the package and version decided
         run: |
           packed="$(tar -xzOf "$RUNNER_TEMP/$PACKAGE.tgz" package/package.json \
@@ -198,7 +216,8 @@ jobs:
       needs.decide.outputs.packages != '' && needs.decide.outputs.packages != '[]' &&
       needs.quality.result == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # Up to five minutes of it waiting for a package of the same run.
+    timeout-minutes: 15
     environment: npm
     permissions:
       contents: read
@@ -266,6 +285,19 @@ jobs:
           NAME: ${{ steps.decide.outputs.name }}
           VERSION: ${{ steps.decide.outputs.version }}
         run: test "$NAME@$VERSION" = "$PACKAGE@$DECIDED"
+      # A version published depending on one of this repository's packages
+      # at a version npm lacks could never be installed, and could not be
+      # taken back (stage G review, H1). Reads the tarball's manifest with
+      # tar and asks the registry; nothing from the tarball runs. Waits, a
+      # few minutes at most, for a package this run publishes, which may be
+      # moments behind; fails at once for any other.
+      - name: Require its dependencies on this repository's packages on npm
+        if: steps.decide.outputs.publish == 'true'
+        env:
+          PACKAGES: ${{ needs.decide.outputs.packages }}
+        run: >-
+          node scripts/npm-publish-dependencies.mjs
+          "$RUNNER_TEMP/publish/$PACKAGE.tgz" --same-run "$PACKAGES"
       # Verbose, since npm reports a failed OIDC exchange only at that level
       # and otherwise says ENEEDAUTH. The registry's CDN caches a packument
       # for up to five minutes, so a re-run soon after a publish can reach
