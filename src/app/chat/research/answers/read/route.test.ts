@@ -1,8 +1,8 @@
 import { expect, it, vi } from "vitest";
 
 const handle = vi.hoisted(() => vi.fn(async () => new Response("Synthetic")));
-vi.mock("@/chat-research/localServer", () => ({
-  handleLocalResearchRequest: handle,
+vi.mock("@/chat-research/webServer", () => ({
+  handleResearchRequest: handle,
 }));
 
 import { POST, runtime } from "./route";

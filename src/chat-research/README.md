@@ -51,3 +51,15 @@ The generic offline section helper is documented in
 `scripts/chat-research/section-candidates/README.md`. Its candidates are not a
 production retriever or semantic gold labels. Its derived parents require their
 own registration and processing context before use.
+
+
+## Operator service purpose
+
+`operatorStartup.ts` proposes and validates a new intent/native approval binding;
+it never renews the earlier fixed trial. `operatorDeployment.ts` uses separate
+pins, and the old `localBootstrap.ts` continues to select read-only generation.
+`operatorNodeServer.ts` supplies the loopback-only closed-surface outer listener.
+Its actual immutable custom-server packaging, custody and adoption are required;
+unrestricted `next start` is not an approved operator service launcher. See the
+plan for target provisioning, cleanup and independent adoption order. No new live
+scope or service is started by installing or importing these modules.

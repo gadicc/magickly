@@ -13,8 +13,11 @@ vi.mock("next/navigation", () => ({
     throw Error("Synthetic404");
   },
 }));
-vi.mock("@/chat-research/localDeployment", () => ({
-  readResearchLocalDeployment: state.gate,
+vi.mock("@/chat-research/webDeployment", () => ({
+  readResearchWebDeployment: state.gate,
+}));
+vi.mock("@/chat-research/ResearchOperatorChat", () => ({
+  ResearchOperatorChat: () => null,
 }));
 vi.mock("@/chat-research/ResearchSavedAnswers", () => ({
   ResearchSavedAnswers: () => null,
@@ -36,6 +39,8 @@ vi.mock("@/chat-research/previewSession", () => ({
   readPrivateResearchPreviewSession: state.session,
 }));
 
+import { ResearchOperatorChat } from "@/chat-research/ResearchOperatorChat";
+import { ResearchSavedAnswers } from "@/chat-research/ResearchSavedAnswers";
 import ResearchPage, { metadata, runtime } from "./page";
 
 afterEach(() => {
@@ -60,18 +65,24 @@ it("waits for an incoming request before evaluating the private shell gate", asy
   expect(state.gate).toHaveBeenCalledOnce();
   expect(state.dbReads + state.authReads).toBe(0);
 });
-it("renders the unconfigured shell only after the valid local gate, without passing identity/configuration", async () => {
-  state.gate.mockReturnValue({ origin: "http://localhost:4179" });
-  state.session.mockResolvedValue({
-    expiresAt: 2000000000000,
-    identity: "synthetic-session-key",
-  });
-  const element = await ResearchPage();
-  expect(element.props).toEqual({ expiresAt: 2000000000000 });
-  expect(element.key).toBe("synthetic-session-key");
-  expect(metadata.robots).toEqual({ index: false });
-  expect(runtime).toBe("nodejs");
-});
+it.each(["reader", "operator"])(
+  "renders only the %s shell after its valid gate, without passing identity/configuration",
+  async (mode) => {
+    state.gate.mockReturnValue({ mode, origin: "http://localhost:4179" });
+    state.session.mockResolvedValue({
+      expiresAt: 2000000000000,
+      identity: "synthetic-session-key",
+    });
+    const element = await ResearchPage();
+    expect(element.type).toBe(
+      mode === "operator" ? ResearchOperatorChat : ResearchSavedAnswers,
+    );
+    expect(element.props).toEqual({ expiresAt: 2000000000000 });
+    expect(element.key).toBe("synthetic-session-key");
+    expect(metadata.robots).toEqual({ index: false });
+    expect(runtime).toBe("nodejs");
+  },
+);
 it("treats malformed local settings as unavailable without leaking diagnostics", async () => {
   state.gate.mockImplementation(() => {
     throw Error("Private path and secret");

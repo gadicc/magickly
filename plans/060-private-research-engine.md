@@ -161,3 +161,59 @@ review the actual generation authority/transport and its durable spending,
 reconciliation and cleanup ownership, then verify the staged target. The private
 operator/source scope does not authorize a public corpus. An inactive engine
 merge and an active legacy-chat switch remain distinct milestones.
+
+
+## Separate operator question service
+
+The next target is operator-only research using independently reviewed private
+sources, with answers/citations only. The existing public legacy chat remains
+unchanged until a separate cutover discussion. No source corpus, operator identity
+or allowance is shipped in this repository.
+
+The new operator startup is distinct from the archive reader and the old fixed
+trial. A domain-separated intent normalizes only the known approval link using
+an internal sentinel, rebuilds existing canonical child formats, then binds the
+result into the native approval hash. Final preparation requires that exact
+identity and recompiles every derived digest. Changing the actor, corpus/policy,
+window, limits, retention/read terms, runtime, endpoint or physical target creates
+a different intent. Preparation is data, never consent or a renewable allowance.
+
+The old reader opt-in and startup pins remain read-only. The new independently
+opted-in entry uses separate pins and immutable-deployment startup packages under
+an external owner-only `operator-startups` directory beneath a separate OS-owned
+operator-service root. The old reader root is not modified or borrowed. Ambiguous purposes, hosted
+Vercel/CI settings, bad pins and unsupported origins refuse. The private shell
+suppresses ordinary client persistence, navigation, analytics and service workers
+for either private intent, including invalid/ambiguous configurations; that
+conservative UI suppression grants no API authority.
+
+The owner-local Node listener binds only IPv4 loopback. Before Next sees a request,
+it refuses unrelated routes, source resources, auth/file/legacy APIs, server
+actions, routing override headers, aliases, upgrades and Expect handshakes. Only
+the research shell, four POST APIs and required static assets proceed to their
+own authorization. Do not substitute unrestricted `next start` for this listener.
+No global proxy or behavior change is added to ordinary public-site requests.
+
+Activation sequence remains separate: provision/attest an isolated physical target
+before final OID-bound intent preparation; build and verify an immutable app/code
+image independently of startup configuration; adopt exact source/account/window
+and budget scope; establish independently owned matching cleanup/health coverage;
+pin the final startup and verify the actual launcher, Gateway account/secret,
+endpoint and DDL custody. The consumed fixed trial and its cleanup owner cannot
+supply any of those. Ten requests/24h is an existing format maximum, not adopted
+spending. No dates, grants, windows or renewal are installed by these compilers.
+
+A Next custom-server runtime must include and test the complete runtime it uses.
+Do not combine its packaging contract with the generated standalone server.
+Source-level and synthetic native/listener controls are not proof of an installed,
+adopted running service. Actual runtime packaging/attestation, cleanup, a new
+finite request allowance and staged acceptance remain required before activation.
+
+
+The selected hosting destination is a private operator route on the main site,
+without publishing a link or replacing public chat. An unlinked URL is not an
+authorization boundary. The owner-local entry above is a verified control, not
+the hosted main-site adapter: its local flags must not be enabled on Vercel.
+Hosted preparation must add route-scoped privacy, fresh operator authorization
+and server-only external corpus/storage/cleanup custody; source transfer, live
+allowance, deployment and cutover are separate adoption steps.

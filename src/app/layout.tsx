@@ -72,8 +72,11 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout(props: { children: React.ReactNode }) {
-  // The private reader mounts no app navigation, browser DB/recovery bridge, analytics or service worker.
-  if (process.env.MAGICKLI_PRIVATE_RESEARCH_LOCAL === "1")
+  // Private reader and operator service mount no app navigation, browser DB/recovery bridge, analytics or service worker.
+  if (
+    process.env.MAGICKLI_PRIVATE_RESEARCH_LOCAL === "1" ||
+    process.env.MAGICKLI_PRIVATE_RESEARCH_OPERATOR === "1"
+  )
     return (
       <html lang="en" dir="ltr" className="light">
         <body>

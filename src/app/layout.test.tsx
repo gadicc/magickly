@@ -58,6 +58,7 @@ afterEach(() => {
 });
 it("renders the ordinary app shell while the private flag is absent", () => {
   vi.stubEnv("MAGICKLI_PRIVATE_RESEARCH_LOCAL", undefined);
+  vi.stubEnv("MAGICKLI_PRIVATE_RESEARCH_OPERATOR", undefined);
   const html = renderToStaticMarkup(
     <RootLayout>
       <p>synthetic-content</p>
@@ -75,26 +76,36 @@ it("renders the ordinary app shell while the private flag is absent", () => {
   ])
     expect(html).toContain(text);
 });
-it("mounts only the reader theme and content in private mode", () => {
-  vi.stubEnv("MAGICKLI_PRIVATE_RESEARCH_LOCAL", "1");
-  const html = renderToStaticMarkup(
-    <RootLayout>
-      <p>synthetic-content</p>
-    </RootLayout>,
-  );
-  expect(html).toContain("synthetic-content");
-  expect(html).toContain('class="light"');
-  expect(themes).toEqual([
-    expect.objectContaining({ defaultMode: "light", storageManager: null }),
-  ]);
-  for (const text of [
-    "synthetic-place-lookup",
-    "synthetic-analytics",
-    "synthetic-client-providers",
-    "synthetic-app-bar",
-    "synthetic-site-footer",
-    "synthetic-print-theme",
-    "synthetic-toolbar-theme",
-  ])
-    expect(html).not.toContain(text);
-});
+it.each(["reader", "operator", "ambiguous"])(
+  "mounts only the private theme/content for %s intent, without granting service authority",
+  (mode) => {
+    vi.stubEnv(
+      "MAGICKLI_PRIVATE_RESEARCH_LOCAL",
+      mode !== "operator" ? "1" : undefined,
+    );
+    vi.stubEnv(
+      "MAGICKLI_PRIVATE_RESEARCH_OPERATOR",
+      mode !== "reader" ? "1" : undefined,
+    );
+    const html = renderToStaticMarkup(
+      <RootLayout>
+        <p>synthetic-content</p>
+      </RootLayout>,
+    );
+    expect(html).toContain("synthetic-content");
+    expect(html).toContain('class="light"');
+    expect(themes).toEqual([
+      expect.objectContaining({ defaultMode: "light", storageManager: null }),
+    ]);
+    for (const text of [
+      "synthetic-place-lookup",
+      "synthetic-analytics",
+      "synthetic-client-providers",
+      "synthetic-app-bar",
+      "synthetic-site-footer",
+      "synthetic-print-theme",
+      "synthetic-toolbar-theme",
+    ])
+      expect(html).not.toContain(text);
+  },
+);

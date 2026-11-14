@@ -61,6 +61,10 @@ import {
   RESEARCH_MODEL_ID,
   RESEARCH_PROCESSOR_PROFILE,
 } from "./modelRequest";
+import {
+  loadResearchOperatorStartup,
+  proposeResearchOperatorStartup,
+} from "./operatorStartup";
 import { RESEARCH_READ_API_PATH } from "./paths";
 import {
   inspectResearchPublication,
@@ -151,13 +155,8 @@ beforeAll(async () => {
     );
 });
 afterAll(() => client.close());
-beforeEach(async () => {
-  vi.stubGlobal(
-    "fetch",
-    vi.fn(async () => {
-      throw Error("Unexpected network");
-    }),
-  );
+/** Synthetic RAM database only; never an application maintenance API. */
+async function resetSyntheticResearchRows() {
   await client.exec(
     "alter table public.chat_research_source_policies disable trigger chat_research_source_policy_truncate; alter table public.chat_research_artifacts disable trigger chat_research_artifact_delete; alter table public.chat_research_maintenance disable trigger chat_research_maintenance_delete",
   );
@@ -170,6 +169,15 @@ beforeEach(async () => {
       "alter table public.chat_research_source_policies enable trigger chat_research_source_policy_truncate; alter table public.chat_research_artifacts enable trigger chat_research_artifact_delete; alter table public.chat_research_maintenance enable trigger chat_research_maintenance_delete",
     );
   }
+}
+beforeEach(async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () => {
+      throw Error("Unexpected network");
+    }),
+  );
+  await resetSyntheticResearchRows();
   await db.delete(authSchema.user);
   for (const id of [POLICY_OWNER, POLICY_OTHER])
     await fixture.saveUser(
@@ -2802,4 +2810,147 @@ it("captures each policy method getter once so restrictions cannot disappear aft
   expect(deny).toHaveBeenCalledOnce();
   expect(requestFetch).not.toHaveBeenCalled();
   expect(await db.select().from(permits)).toHaveLength(0);
+});
+
+it("the new operator startup requires its own native approval and supports signed questions, history, retained reads, revocation and caps", async () => {
+  const facts = inspectResearchPublication(pub),
+    service = prepareResearchConfiguredServiceDocument({
+      ...document,
+      web_runtime: { ...document.web_runtime, kind: "immutable-deployment" },
+    }),
+    proposal = proposeResearchOperatorStartup({
+      schema_version: 1,
+      kind: "private-operator-query-service-startup",
+      service_document_json: service.documentJson,
+      publication_input: {
+        sourcePolicyJson: facts.source_policy_json,
+        sourcePolicySha256: facts.source_policy_sha256,
+        retentionProfileJson: facts.retention_profile_json,
+        retentionProfileSha256: querySha(facts.retention_profile_json),
+        readEnvelopeJson: facts.read_envelope_json,
+        readEnvelopeSha256: facts.read_envelope_sha256,
+        sourceStorage: facts.source_storage,
+      },
+    }),
+    packageInput = JSON.parse(proposal.documentJson),
+    proposed = prepareResearchPublication(packageInput.publication_input),
+    owner = join(root, "owner"),
+    corpus = join(owner, "runtime-corpora", document.corpus_manifest_sha256);
+  mkdirSync(owner, { mode: 0o700 });
+  mkdirSync(join(owner, "operator-startups"), { mode: 0o700 });
+  mkdirSync(join(owner, "runtime-corpora"), { mode: 0o700 });
+  mkdirSync(corpus, { mode: 0o700 });
+  writeFileSync(
+    join(owner, "operator-startups", proposal.documentSha256 + ".json"),
+    proposal.documentJson,
+    { mode: 0o400 },
+  );
+  for (const name of ["manifest.json", "catalog.json", "units.jsonl"])
+    writeFileSync(join(corpus, name), readFileSync(join(artifactDir, name)), {
+      mode: 0o400,
+    });
+  chmodSync(corpus, 0o500);
+  try {
+    const handle = loadResearchOperatorStartup({
+      root: owner,
+      independentlyAdoptedStartupSha256: proposal.documentSha256,
+      runtimeRevision: document.web_runtime.revision,
+      authorityEndpointIdentity: document.authority_endpoint_identity,
+      database: options.database,
+      authOptions: options.authOptions,
+      apiKey: options.apiKey,
+      priceFetch,
+      requestFetch,
+    });
+    // A newly compiled proposal cannot reinterpret the already installed old scope.
+    expect((await handle(request())).status).toBe(503);
+    await noGeneration();
+    await resetSyntheticResearchRows();
+    await createSqlResearchPublisher(db, proposed, proposed.sha256).publish(
+      signal(),
+    );
+    // Fresh cleanup coverage, not the previous profile's successful receipt.
+    expect((await handle(request())).status).toBe(503);
+    expect(requestFetch).not.toHaveBeenCalled();
+    const target = inspectResearchPublication(proposed).target,
+      maintenance = createSqlResearchMaintenance(db, {
+        scope: target.scope,
+        storage: target.storage,
+        maintenanceSchema: target.maintenanceSchema,
+        profileSha256: target.profileSha256,
+        artifactTableOid: target.artifactTableOid,
+      });
+    try {
+      const run = await maintenance.begin(signal());
+      expect(run).not.toBeNull();
+      await maintenance.finish(run!, { permits: 0, packets: 0 }, signal());
+    } finally {
+      await maintenance.release();
+    }
+    expect((await handle(request("Synthetic?", otherHeaders))).status).not.toBe(
+      200,
+    );
+    expect(requestFetch).not.toHaveBeenCalled();
+    const first = await handle(request());
+    expect(first.status).toBe(200);
+    const parentId = first.headers.get("x-magickli-research-answer-id")!;
+    await collectResearchAnswer(first, parentId, signal());
+    const login = new Headers(
+        (await fixture.login({ userId: POLICY_OWNER })).headers,
+      ),
+      listed = await handle(archiveRequest(login));
+    expect(listed.status).toBe(200);
+    const parent = parseResearchAnswerArchive(await listed.json()).entries[0],
+      next = request("What does that mean?", login),
+      follow = () =>
+        new Request(next.url, {
+          method: "POST",
+          headers: next.headers,
+          body: JSON.stringify({
+            question: "What does that mean?",
+            mode: "passage",
+            previous_answer: {
+              permit_id: parent.permit_id,
+              expected_answer_id: parent.answer_id,
+            },
+          }),
+        }),
+      second = await handle(follow());
+    expect(second.status).toBe(200);
+    const childId = second.headers.get("x-magickli-research-answer-id")!,
+      child = await collectResearchAnswer(second, childId, signal()),
+      current = await handle(archiveRequest(login)),
+      summary = parseResearchAnswerArchive(await current.json()).entries.find(
+        (e) => e.answer_id === childId,
+      )!;
+    expect(summary.input_kind).toBe("follow_up");
+    const reopened = await handle(readRequest(summary.permit_id, login));
+    expect(reopened.status).toBe(200);
+    expect(await collectResearchAnswer(reopened, childId, signal())).toEqual(
+      child,
+    );
+    expect(requestFetch).toHaveBeenCalledTimes(2);
+    await db.update(policies).set({ state: "revoked" });
+    expect((await handle(follow())).status).toBe(503);
+    expect((await handle(readRequest(summary.permit_id, login))).status).toBe(
+      503,
+    );
+    expect(requestFetch).toHaveBeenCalledTimes(2);
+    await db.update(policies).set({ state: "published" });
+    const third = await handle(request());
+    expect(third.status).toBe(200);
+    await collectResearchAnswer(
+      third,
+      third.headers.get("x-magickli-research-answer-id")!,
+      signal(),
+    );
+    expect((await handle(request())).status).not.toBe(200);
+    expect(requestFetch).toHaveBeenCalledTimes(3);
+    expect(await db.select().from(permits)).toHaveLength(3);
+    expect((await db.select().from(windows))[0].approvalSha256).toBe(
+      proposal.intentSha256,
+    );
+  } finally {
+    chmodSync(corpus, 0o700);
+  }
 });

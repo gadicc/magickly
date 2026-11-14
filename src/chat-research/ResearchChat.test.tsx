@@ -19,6 +19,7 @@ import {
 } from "./browserRequest";
 import { catalogFixture } from "./catalog.fixture";
 import { ResearchChat } from "./ResearchChat";
+import { ResearchOperatorChat } from "./ResearchOperatorChat";
 import { ResearchSavedAnswers } from "./ResearchSavedAnswers";
 
 const auth = vi.hoisted(() => ({ value: {} as Record<string, unknown> }));
@@ -1273,4 +1274,21 @@ it("replaces saved reader state and ignores a late old-session archive when its 
     screen.queryByRole("region", { name: "Saved completed answers" }),
   ).toBeNull();
   expect(request).not.toHaveBeenCalled();
+});
+
+it("uses the server-authenticated operator shell without browser session fields and sends no work before asking", async () => {
+  auth.value = new Proxy(
+    {},
+    {
+      get() {
+        throw Error("Unexpected browser auth state access");
+      },
+    },
+  );
+  request.mockResolvedValue(answerFixture());
+  render(<ResearchOperatorChat expiresAt={Date.now() + 60000} />);
+  expect(request).not.toHaveBeenCalled();
+  ask("Synthetic operator question");
+  await screen.findByRole("article", { name: "Research answer" });
+  expect(request).toHaveBeenCalledOnce();
 });
