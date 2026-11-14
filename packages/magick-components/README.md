@@ -317,7 +317,7 @@ From 0.1.0, each release is published by the repository's CI when the
 version changes on `main`, with npm provenance naming the commit it was
 built from, as magick-data's are. CI publishes a pre-release under the
 `next` tag and a release under `latest`. The first version, the release
-candidate 0.1.0-rc.0, is published by hand.
+candidate 0.1.0-rc.0, was published by hand.
 
 ## Requirements
 

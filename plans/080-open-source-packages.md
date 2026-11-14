@@ -3517,6 +3517,35 @@ here); and the two rows' sign-off, with the others.
 Each passed stage E's gate on its own tree, every step at 0, coverage
 at the first attempt.
 
+### The release candidate and 0.1.0 (14 November 2026)
+
+G′ steps 1 to 6, done the same day:
+
+- magick-data 0.2.1 reached `main` as the gated merge `cb307dc5` (main
+  had moved on with 18 commits of other work) and CI published it under
+  `latest` with provenance, its integrity
+  `sha512-aK1mfIgSkDVqt0ADFU8XP7N2OyxGZ7QBgvC3mZOMY9zrFCccJDJxNl5gyEcTon0Q2e1OmvABJQhEWUuQ3aLB4Q==`,
+  the tarball the branch's gate had built.
+- `main` was merged into `gate/stage-g` (`dba26695`), Gadi's sign-off
+  (`d4b30158`) and the bump to 0.1.0-rc.0 (`fa6ca3d6`) followed, each
+  gated. CI passed on the branch pushed as `codex/components-rc`, its
+  `registry` job building the same tarball and skipping the publish.
+- Gadi published `magick-components@0.1.0-rc.0` by hand from a clean
+  clone of `fa6ca3d6`: 173 files, depending on `magick-data` `^0.2.1`,
+  integrity
+  `sha512-bXDM1w0zzyt8fPOt6FbOJvRNz7Kc+Mkmz5/PqJIEjYZaighjVhsMlhBl0IuN2O9ZN5MJeK7BDtUPNDDR4JLqmA==`,
+  the same as the branch's smoke test and CI built. The registry lists
+  it under both `next` and `latest` (npm points `latest` at a package's
+  only version), every export under `./lib`; it has no provenance, being
+  published by hand. npm's `0.0.0-stage` placeholder is there too, and
+  the decision refuses 0.0.0.
+- `main` was fast-forwarded to `fa6ca3d6` and pushed.
+
+Step 8 is this commit: the version is 0.1.0, and `DECISION_FLAGS` gives
+magick-components `--expect-exists`. Merged to `main` once the trusted
+publisher is configured (step 7) and within its two days, CI publishes
+0.1.0 under `latest` with provenance.
+
 ## Review (11 November 2026)
 
 Fable 5.2 at high effort, fresh context, `loom-torvalds-review`, on the

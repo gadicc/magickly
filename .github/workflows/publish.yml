@@ -60,10 +60,10 @@ env:
   # without a key fails its decision. --expect-exists makes a 404 fail
   # instead of skipping, from the bump to 0.1.0 that follows a package's
   # first publish by hand (plan 080: stage A′ step 7 for magick-data, stage
-  # G′ step 7 for magick-components). Until then a 404 skips, since the
-  # package is not on npm yet.
+  # G′ step 8 for magick-components). A package added later skips a 404
+  # until its own first publish by hand.
   DECISION_FLAGS: >-
-    {"magick-data": "--expect-exists", "magick-components": ""}
+    {"magick-data": "--expect-exists", "magick-components": "--expect-exists"}
   # Exact, so that publish runs a known npm: trusted publishing needs 11.5.1
   # or later, and 24.22.2 bundles 11.19.1. In the 24 line of .nvmrc; ci.yml's
   # dry run uses the same.

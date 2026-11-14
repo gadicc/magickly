@@ -36,7 +36,7 @@ describe("DECISION_FLAGS", () => {
 
   // Its first version, the release candidate, is published by hand, so
   // until then a 404 skips; the bump to 0.1.0 sets --expect-exists in the
-  // same commit (stage G′, step 7), or this fails.
+  // same commit (stage G′, step 8), or this fails.
   it("lets magick-components skip a 404 only until its 0.1.0", () => {
     const { version } = JSON.parse(
       readFileSync(

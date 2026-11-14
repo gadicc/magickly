@@ -137,6 +137,12 @@ Follow-ups are separate from the completed migration work:
   moving in the candlestick alone; menus and notes on both pages, an
   optional `version` in the image API, and both Provenance rows settled
   ([plan 080](080-open-source-packages.md#the-roses-and-the-candlesticks-versions-14-november-2026)).
+- 14 November 2026: `magick-components@0.1.0-rc.0` published by hand
+  from `fa6ca3d6` (integrity as CI built it), and `main` fast-forwarded
+  to it; the bump to 0.1.0, with `--expect-exists` for the components, is
+  on `gate/components-010` for CI to publish once the trusted publisher
+  is configured
+  ([plan 080](080-open-source-packages.md#the-release-candidate-and-010-14-november-2026)).
 - 13 November 2026: Dependabot alerts #362 (zod), #364 (glob) and #366
   (minimatch) fixed by a `@vercel/functions` bump and parent-scoped
   overrides of Serwist's exact zod and glob pins (glob 14 checked against
