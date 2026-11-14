@@ -133,7 +133,11 @@ function rowCitations(text: string, key: number): string[] {
 }
 
 describe("translation prompts of the real data", () => {
-  it("never hold a row of the held-out Key in their context", () => {
+  // Builds five prompts for every fold: about 0.8 s here and five times
+  // that on CI's runners, too near the 5 s default.
+  it("never hold a row of the held-out Key in their context", {
+    timeout: 30_000,
+  }, () => {
     for (const fold of realFolds) {
       for (const [arm, task, book] of [
         ["A3", 1, "open"],
@@ -295,12 +299,14 @@ describe("grammar notes for a fold", () => {
     for (const fold of realFolds) {
       const notes = stripGrammar(grammar, fold, "closed");
       const removed = closedRemovals(fold);
+      // Once per fold: building the set for every token of the notes took
+      // the test past its timeout on CI's runners.
+      const heldOut = heldOutWords(fold);
       const named = [...notes.matchAll(/[A-Za-z]+/g)]
         .map((one) => one[0])
         .filter(
           (token) =>
-            namesRemoved(token, removed) ||
-            namesHeldOutWord(token, heldOutWords(fold)),
+            namesRemoved(token, removed) || namesHeldOutWord(token, heldOut),
         );
       expect(named, `Key ${fold.key}`).toEqual([]);
       expect(rowCitations(notes, fold.key)).toEqual([]);
