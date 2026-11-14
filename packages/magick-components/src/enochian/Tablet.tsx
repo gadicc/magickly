@@ -510,54 +510,59 @@ function Missing({
  * An Enochian tablet in a version (`version`, the Golden Dawn's by
  * default): a Watchtower's sigil above its grid on a 210 × 297 page, or
  * the Tablet of Union's grid on a page of its own (`tabletViewBox`). The
- * version's reversed letters are mirrored unless `reversed` is false, and
- * a Watchtower's second letters drawn small in each square's corner when
- * `alt` is true. A key the data does not have draws an empty page; a
- * tablet the version does not have, its page saying so. It is an image
- * named by `tabletName` (an `aria-label`, which shows no tooltip over the
- * squares as a `<title>` would) unless `label` is false, as for a tablet
- * drawn inside a larger drawing that names itself.
+ * version's reversed letters are mirrored unless `mirrorReversed` is
+ * false, and a Watchtower's second letters drawn small in each square's
+ * corner when `showSecondLetters` is true. A key the data does not have
+ * draws an empty page; a tablet the version does not have, its page
+ * saying so. It is an image named by `tabletName` (an `aria-label`, which
+ * shows no tooltip over the squares as a `<title>` would) unless `label`
+ * names it otherwise or is false, as for a tablet drawn inside a larger
+ * drawing that names itself.
  */
 export function Tablet({
-  id,
+  tablet: tabletId,
   version,
-  reversed = true,
-  alt = false,
+  mirrorReversed = true,
+  showSecondLetters = false,
   enochianStyle,
-  frame = true,
+  frame = false,
   width,
   height,
-  label = true,
+  label,
   highlights,
   ref,
 }: {
   /**
-   * The tablet, by its key in the data: `earth`, `air`, `water`, `fire` or
-   * `union`.
+   * The tablet, by its key in magick-data: `earth`, `air`, `water`, `fire`
+   * or `union`.
    */
-  id: string;
+  tablet: string;
   /**
    * One of the data's `TABLET_VERSIONS`; the Golden Dawn's (`gd`) when
    * absent or unknown.
    */
   version?: string;
   /** Mirror the letters the version reverses (default true). */
-  reversed?: boolean;
+  mirrorReversed?: boolean;
   /**
    * Draw each square's second letters small in its corner (default
    * false). Watchtowers only: no source gives the Tablet of Union a
    * second letter, so its grid has none to draw.
    */
-  alt?: boolean;
+  showSecondLetters?: boolean;
   /** Squares of a Watchtower's grid to outline, and choose by pointer. */
   highlights?: TabletHighlights;
-  /** The accessible name: the tablet's own (`true`), another, or none. */
-  label?: boolean | string;
+  /**
+   * The drawing's accessible name: the tablet's own (`tabletName`) when
+   * not given, this one when a string, and none when `false`.
+   */
+  label?: string | false;
   /** Page font style for the grid letters; omitted renders the Latin transliteration. */
   enochianStyle?: CSSProperties;
   /**
-   * Draws a CSS border around the page. Leave it off where the SVG is
-   * exported or turned into an image, which CSS boxes do not reach.
+   * Draws a CSS border around the page (default false). Leave it off
+   * where the SVG is exported or turned into an image, which CSS boxes do
+   * not reach.
    */
   frame?: boolean;
   /** The SVG's width; from the height and the page's shape when not given. */
@@ -567,6 +572,7 @@ export function Tablet({
   /** The `<svg>`, for exporting the drawing. */
   ref?: React.Ref<SVGSVGElement>;
 }) {
+  const id = tabletId;
   const chosen = versionOf(version);
   const data = tabletOf(id);
   const tablet = tabletVersion(data, chosen);
@@ -575,8 +581,9 @@ export function Tablet({
     sigils && Object.hasOwn(sigils, id)
       ? sigils[id as keyof typeof sigils]
       : undefined;
-  const name = label === true ? tabletName(id, chosen) : label || undefined;
-  const options = { reversed, alt };
+  const name =
+    label === undefined ? tabletName(id, chosen) : label || undefined;
+  const options = { reversed: mirrorReversed, alt: showSecondLetters };
 
   return (
     <svg

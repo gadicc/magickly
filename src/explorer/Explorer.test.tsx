@@ -105,15 +105,15 @@ describe("Explorer", () => {
     expect(picker().textContent).toBe("Earth, the Golden Dawn's");
     choose("Example", "Fire in Dee's version");
     await waitFor(() =>
-      expect(jsx()).toBe('<Tablet id="fire" version="dee" />'),
+      expect(jsx()).toBe('<Tablet tablet="fire" version="dee" frame />'),
     );
-    fireEvent.click(screen.getByRole("switch", { name: "alt" }));
+    fireEvent.click(screen.getByRole("switch", { name: "showSecondLetters" }));
     await waitFor(() =>
       expect(picker().textContent).toBe("Fire in Dee's version (edited)"),
     );
     choose("Example", "Fire in Dee's version");
     await waitFor(() =>
-      expect(jsx()).toBe('<Tablet id="fire" version="dee" />'),
+      expect(jsx()).toBe('<Tablet tablet="fire" version="dee" frame />'),
     );
     expect(picker().textContent).toBe("Fire in Dee's version");
   });
@@ -121,7 +121,7 @@ describe("Explorer", () => {
   it("links the image while the image can draw the props, and not after", async () => {
     const { image } = explore("Tablet");
     expect(image()).toBe("/api/render/enochian-tablet");
-    fireEvent.click(screen.getByRole("switch", { name: "alt" }));
+    fireEvent.click(screen.getByRole("switch", { name: "showSecondLetters" }));
     await waitFor(() => expect(image()).toBeNull());
   });
 

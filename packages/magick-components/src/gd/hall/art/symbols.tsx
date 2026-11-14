@@ -116,11 +116,10 @@ export function tabletArt(enochianStyle?: CSSProperties): HallArt {
         {element && (
           <g transform={`translate(${-board.width / 2} ${-board.height / 2})`}>
             <Tablet
-              id={element}
+              tablet={element}
               version={look.version}
-              reversed={look.reversed}
-              alt={look.alt}
-              frame={false}
+              mirrorReversed={look.reversed}
+              showSecondLetters={look.alt}
               label={false}
               width={board.width}
               height={board.height}

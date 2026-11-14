@@ -10,7 +10,12 @@ would. The figures are drawn from the data as inline SVG, so they scale,
 print and can be styled by the page around them. A few wrap their drawing
 in HTML: the fylfot cross is a table of squares, the Moon and Mercury are
 tiles around a drawing or a picture, and a planetary spirit's sigil is
-centred in a `<div>` whose style its props set.
+centred in a `<div>` you may style.
+
+The markup inside a drawing is not part of the API: its elements, ids and
+attributes may change in any release. What is part of it is each
+component's props and the classes a component documents as a styling hook
+(the Tree's layers, [below](#the-tree-on-your-page)).
 
 The package is not published yet: it is built and tested in
 [the repository](https://github.com/gadicc/magickly/tree/main/packages/magick-components),
@@ -137,7 +142,23 @@ assembled graph, so they import magick-data's root entry, every table.
 
 ## The Tree on your page
 
-`TreeOfLife` keeps to itself, so that several can share a page:
+Without props, `TreeOfLife` draws as magick.ly's Tree page does by
+default: each sphere's Roman name (`field="name.roman"`), numbered above
+(`topText="index"`) and named in English below (`bottomText="name.en"`),
+in the Queen scale (`colorScale="queen"`), with the Hermetic Tree's
+letters on its paths (`letterAttr="hermetic"`):
+
+```tsx
+import { TreeOfLife } from "magick-components/kabbalah/TreeOfLife";
+
+export const Tree = () => <TreeOfLife width={300} />;
+```
+
+`activeSephirah` draws one sphere and fades the rest (`null` fades them
+all), and `activePath` does the same for a path. The spheres and paths
+are links only where you give them one ([below](#what-you-supply)).
+
+It keeps to itself, so that several can share a page:
 
 - **Ids.** The `<svg>`'s id is the `id` you pass (letters, digits, `-`
   and `_`, starting with a letter) or one from React's `useId`, and every
@@ -155,7 +176,7 @@ assembled graph, so they import magick-data's root entry, every table.
 - **Without hooks.** `TreeOfLifeSvg`, from the same entry, draws the same
   Tree with no hooks and needs its `id`: for `renderToStaticMarkup` in a
   route handler, where React's server build has no dispatcher for
-  `useId`. Links there are left to the browser.
+  `useId`.
 - **Fonts.** It sets its labels in Noto Sans and Noto Sans Hebrew (both
   OFL), falling back to Arial and sans-serif, and loads nothing itself:
   load the two families on your page, or serve `NotoSans-Regular.ttf` and
@@ -222,18 +243,31 @@ sigil, and final forms are drawn as their base letters.
   no background.
 - **The Tree's fonts**, Noto Sans and Noto Sans Hebrew, on your page or
   through `fontBaseUrl` ([above](#the-tree-on-your-page)).
-- **Links.** `TreeOfLife` links each sphere and path to a root-relative
-  path in the scheme magick.ly uses (`/kabbalah/sephirah/tiferet`,
-  `/kabbalah/path/1_2`), which on your site is your own path, unless you
-  pass `sephirahHref` and `pathHref` (return `null` for no link). Given a
-  `ref`, it follows a click on a link by setting `location.href` in the
-  browser, a full page load rather than your router's navigation. The
-  `ref` is a ref object (`useRef`), not a callback ref.
+- **Links.** `TreeOfLife` and `GradeTree` link nothing unless you pass
+  `sephirahHref` and `pathHref`. Each is given the sphere's or the path's
+  magick-data row and returns a URL, or `null` for no link; the links are
+  plain SVG links, which the browser follows:
 
-- **Ink, where it is not black.** The fylfot cross borders its squares
-  in black unless you pass `ink`, a CSS colour such as your theme's
-  custom property (`ink="var(--my-ink, black)"`), as magick.ly does for
-  its dark mode.
+  ```tsx
+  import { TreeOfLife } from "magick-components/kabbalah/TreeOfLife";
+
+  export const LinkedTree = () => (
+    <TreeOfLife
+      sephirahHref={(sephirah) => `/sephirot/${sephirah.id}`}
+      pathHref={(path) => `/paths/${path.id}`}
+    />
+  );
+  ```
+
+- **Ink, where it is not black.** The fylfot cross borders its squares,
+  and a planetary spirit's sigil is drawn, in black unless you pass `ink`,
+  a CSS colour such as your theme's custom property
+  (`ink="var(--my-ink, black)"`), as magick.ly does for the cross in its
+  dark mode.
+- **Accessible names, where you want others.** `Tablet` and `Kamea` are
+  images named for what they draw ("Enochian Watchtower of Fire", "Kamea
+  of Saturn"). Pass `label` to name one otherwise, or `label={false}` for
+  none, as for a drawing inside one that names itself.
 
 ## Versions
 

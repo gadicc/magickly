@@ -126,12 +126,12 @@ const SERVER_DRAWINGS = [
   [
     "rose",
     `import { RoseSigilImage } from "magick-components/gd/RoseSigilImage";\nimport { sigilPoints } from "magick-components/gd/roseSigilGeometry";`,
-    `<RoseSigilImage sigilText="שלום" showRose debug={false} points={sigilPoints("שלום")} />`,
+    `<RoseSigilImage text="שלום" showRose debug={false} points={sigilPoints("שלום")} />`,
   ],
   [
     "tablet",
     `import Tablet from "magick-components/enochian/Tablet";`,
-    `<Tablet id="water" />`,
+    `<Tablet tablet="water" />`,
   ],
   [
     "kamea",
@@ -141,7 +141,7 @@ const SERVER_DRAWINGS = [
   [
     "spirit",
     `import PlanetarySpirit from "magick-components/astrology/PlanetarySpirit";`,
-    `<PlanetarySpirit id="zazel" height="2em" />`,
+    `<PlanetarySpirit spirit="zazel" style={{ height: "2em" }} />`,
   ],
   [
     "chakras",
@@ -475,7 +475,7 @@ if (!tree.includes('class="magick-tree-sephirot"') || !tree.includes("תפארת
 const hall = renderToStaticMarkup(h(GdHall, { hall: hallPreset("neophyte").hall, fontBaseUrl: "/f" }));
 if (!hall.includes("<svg")) throw new Error("the hall: " + hall.slice(0, 200));
 if ((hall.match(/@font-face/g) ?? []).length !== 3) throw new Error("the hall's fonts: " + hall.slice(0, 200));
-const rose = renderToStaticMarkup(h(RoseSigilImage, { sigilText: "שלום", showRose: true, debug: false, points: sigilPoints("שלום") }));
+const rose = renderToStaticMarkup(h(RoseSigilImage, { text: "שלום", showRose: true, debug: false, points: sigilPoints("שלום") }));
 if (!rose.includes('stroke="red"')) throw new Error("the rose sigil: " + rose.slice(0, 200));
 console.log(entries.length, "entries;", tree.length, hall.length, rose.length, "bytes of markup");
 `,
@@ -494,9 +494,9 @@ console.log(entries.length, "entries;", tree.length, hall.length, rose.length, "
    */
   const readmeExamples = [
     ...readFileSync(join(packed, "README.md"), "utf8").matchAll(
-      /^```tsx\n([^]*?)^```$/gm,
+      /^( *)```tsx\n([^]*?)^\1```$/gm,
     ),
-  ].map(([, code]) => code);
+  ].map(([, indent, code]) => code.replace(new RegExp(`^${indent}`, "gm"), ""));
   assert(readmeExamples.length > 0, "the README has TSX examples");
 
   /** Type-checks a strict consumer of every entry, both resolutions. */
@@ -515,7 +515,7 @@ console.log(entries.length, "entries;", tree.length, hall.length, rose.length, "
         )
         .join("\n")}
 export const all = [${entries.map((_, i) => `entry${i}`).join(", ")}];
-import TreeOfLife, { type TreeColorScale } from "magick-components/kabbalah/TreeOfLife";
+import TreeOfLife, { type TreeColorScale, type TreeOfLifeProps } from "magick-components/kabbalah/TreeOfLife";
 import { GdHall, type HallNode } from "magick-components/gd/hall";
 import { hallPreset } from "magick-components/gd/hall/presets";
 import RoseSigil from "magick-components/gd/RoseSigil";
@@ -526,8 +526,16 @@ import Tablet from "magick-components/enochian/Tablet";
 import MercuryWidget from "magick-components/astrology/Mercury";
 import { currentOrNextRetrograde } from "magick-components/astrology/mercuryRetrograde";
 import PlanetarySpirit from "magick-components/astrology/PlanetarySpirit";
+import { Kamea } from "magick-components/astrology/Kamea";
+import Lamen from "magick-components/gd/Lamen";
+import FylfotCross, { FYLFOT_CELLS, type FylfotCellClick } from "magick-components/gd/FylfotCross";
+import { GradeTree } from "magick-components/gd/GradeTree";
 
 const scale: TreeColorScale = "king";
+const sephirahHref: TreeOfLifeProps["sephirahHref"] = (sephirah) => "/s/" + sephirah.id;
+const pathHref: TreeOfLifeProps["pathHref"] = (path) => (path.id === "1_2" ? null : "/p/" + path.id);
+const onCellClick = ({ id, row, column, expected }: FylfotCellClick) =>
+  console.log(id, row, column, expected === FYLFOT_CELLS[row][column]);
 const hall: HallNode | undefined = hallPreset("neophyte")?.hall;
 const end: string | undefined = currentOrNextRetrograde(new Date())?.end.toISOString();
 export const points: Promise<{ x: number; y: number }[]> = optimizeSigilPoints(sigilPoints("אב"));
@@ -536,14 +544,25 @@ export const page = (
   <>
     <TreeOfLife colorScale={scale} letterAttr="hebrew" showDaat />
     <TreeOfLife id="tree" fontBaseUrl="/fonts" />
+    <TreeOfLife activeSephirah={null} sephirahHref={sephirahHref} pathHref={pathHref} />
+    <GradeTree activeSephirah="tiferet" sephirahHref={(s) => "/g/" + s.gdGradeId} />
     {/* @ts-expect-error: a colour scale magick-data does not have */}
     <TreeOfLife colorScale="sepia" />
+    {/* @ts-expect-error: the Tree's sphere is activeSephirah */}
+    <TreeOfLife active="tiferet" />
     {hall && <GdHall hall={hall} fontBaseUrl="/fonts" />}
-    <RoseSigil sigilText="שלום" animate={false} />
-    <RoseSigilImage sigilText="אב" showRose debug={false} points={[]} />
+    <RoseSigil text="שלום" animate={false} />
+    <RoseSigilImage text="אב" showRose debug={false} points={[]} />
+    <Tablet tablet="air" />
+    <Tablet tablet="earth" frame label={false} mirrorReversed={false} showSecondLetters />
+    {/* @ts-expect-error: the tablet is tablet, an id is a DOM id */}
     <Tablet id="air" />
     <MercuryWidget image="/m.webp" />
-    <PlanetarySpirit id="zazel" height="1em" />
+    <PlanetarySpirit spirit="zazel" style={{ height: "1em" }} ink="currentColor" className="seal" />
+    <Kamea planet="saturn" width={120} label="Saturn's square" />
+    <Kamea planet="luna" height="4em" label={false} />
+    <Lamen officer="hierophant" ringStyle={{ fill: "gold" }} discStyle={{ stroke: "red" }} />
+    <FylfotCross cells={[["fire", "", "cursor", null, "water"]]} onCellClick={onCellClick} />
     {end}
   </>
 );
@@ -825,7 +844,7 @@ import * as optimizer from "magick-components/gd/roseSigilOptimizer";
 export function Rose() {
   return (
     <div id="client-rose" data-optimizer={typeof optimizer.optimizeSigilPoints}>
-      <RoseSigil sigilText="שלום" />
+      <RoseSigil text="שלום" />
     </div>
   );
 }

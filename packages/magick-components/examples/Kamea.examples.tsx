@@ -9,7 +9,7 @@ export const Kamea: ComponentExamples<ComponentProps<typeof KameaComponent>> = {
   examples: [
     {
       title: "Saturn, three by three",
-      props: { planet: "saturn", label: "Kamea of Saturn" },
+      props: { planet: "saturn" },
     },
     {
       title: "The Sun, six by six",

@@ -11,6 +11,7 @@ import { TreeOfLifeSvg } from "magick-components/kabbalah/TreeOfLife";
 import type { ReactElement } from "react";
 import AstroGeomancyChart from "@/app/geomancy/reading/AstroGeomancyChart";
 import { figuresFromMothers } from "@/app/geomancy/tetragrams";
+import { pathHref, sephirahHref } from "@/app/kabbalah/treeLinks";
 import type { ComponentImageProps, ComponentImageSlug } from "./contracts";
 import { mothersFromString } from "./contracts/astroGeomancyChart";
 import { TABLET_IDS } from "./contracts/enochianTablet";
@@ -140,9 +141,18 @@ export const COMPONENT_IMAGE_REGISTRY: {
     // runs outside the dispatcher useId needs, and with the root id the
     // Tree always had, so that published images keep their bytes under
     // the unchanged profile (plan 080, "Before publishing"); every other
-    // id is stripped from the outlines.
-    render: (props) => (
-      <TreeOfLifeSvg {...props} flip={false} id="TreeOfLife" />
+    // id is stripped from the outlines. The query's `active` is the Tree's
+    // `activeSephirah`, and the links are the ones the Tree drew by default
+    // before it drew none, which the source SVG has always carried.
+    render: ({ active, ...props }) => (
+      <TreeOfLifeSvg
+        {...props}
+        activeSephirah={active}
+        sephirahHref={sephirahHref}
+        pathHref={pathHref}
+        flip={false}
+        id="TreeOfLife"
+      />
     ),
     flip: (props) => props.flip,
     profile: TREE_IMAGE_PROFILE,
@@ -173,9 +183,8 @@ export const COMPONENT_IMAGE_REGISTRY: {
     // generated family for the same glyphs.
     render: (props) => (
       <Tablet
-        id={props.id}
+        tablet={props.id}
         version={props.version}
-        frame={false}
         // The image keeps the bytes it was published with; a page that
         // shows it gives it its own alt text.
         label={false}
@@ -224,7 +233,7 @@ export const COMPONENT_IMAGE_REGISTRY: {
     // The same bounded optimiser as the page, so the link reproduces the drawn sigil.
     render: async (props) => (
       <RoseSigilImage
-        sigilText={props.text}
+        text={props.text}
         showRose={props.rose}
         debug={false}
         points={await optimizeSigilPoints(sigilPoints(props.text))}

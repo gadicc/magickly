@@ -550,12 +550,14 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
               />
             </svg>
             <PlanetarySpirit
-              id={planet.spiritId}
-              width={70}
-              height={70}
-              position="absolute"
-              top="39%"
-              left="40%"
+              spirit={planet.spiritId}
+              style={{
+                width: 70,
+                height: 70,
+                position: "absolute",
+                top: "39%",
+                left: "40%",
+              }}
               //border="1px solid black"
             />
           </div>

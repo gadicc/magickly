@@ -13,12 +13,12 @@ import Planet from "./page";
 // can be held to drawing the right spirit's without its path data.
 vi.mock("magick-components/astrology/PlanetarySpirit", () => ({
   default: ({
-    id,
+    spirit,
     "aria-hidden": hidden,
   }: {
-    id: string;
+    spirit: string;
     "aria-hidden"?: boolean;
-  }) => `[sigil of ${id}${hidden ? ", hidden" : ""}]`,
+  }) => `[sigil of ${spirit}${hidden ? ", hidden" : ""}]`,
 }));
 
 /**

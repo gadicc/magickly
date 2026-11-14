@@ -9,14 +9,14 @@ export const RoseSigil: ComponentExamples<
   entry: "gd/RoseSigil",
   exportName: "default",
   examples: [
-    { title: "Adonai", props: { sigilText: "אדני" } },
+    { title: "Adonai", props: { text: "אדני" } },
     {
       title: "Eheieh, without the rose",
-      props: { sigilText: "אהיה", showRose: false },
+      props: { text: "אהיה", showRose: false },
     },
     {
       title: "Agla, drawn at once",
-      props: { sigilText: "אגלא", animate: false },
+      props: { text: "אגלא", animate: false },
     },
   ],
 };

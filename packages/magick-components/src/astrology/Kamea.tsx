@@ -1,4 +1,5 @@
 import kameas, { type KameaPlanetId } from "magick-data/astrology/kameas";
+import planets from "magick-data/astrology/planets";
 import type { CSSProperties, ReactNode } from "react";
 import { svgCoordinate } from "../svgCoordinate.ts";
 
@@ -147,39 +148,60 @@ export function KameaFigure({
 
 export interface KameaProps extends KameaFigureProps {
   planet: KameaPlanetId;
-  /** The drawing's width and height (CSS pixels for a number). */
-  size?: number | string;
-  /** What the square is, for a screen reader ("Kamea of Saturn"). */
-  label?: string;
+  /**
+   * The drawing's width (CSS pixels for a number); the height's when only
+   * that is given, as it is square, and 240 when neither is.
+   */
+  width?: number | string;
+  /**
+   * The drawing's height (CSS pixels for a number); the width's when only
+   * that is given, and 240 when neither is.
+   */
+  height?: number | string;
+  /**
+   * The drawing's accessible name: the square's own ("Kamea of Saturn")
+   * when not given, this one when a string, and none when `false`.
+   */
+  label?: string | false;
   /** The `<svg>`'s class. */
   className?: string;
   /** The `<svg>`'s style. */
   style?: CSSProperties;
 }
 
+/** The square's own name: "Kamea of Saturn", "Kamea of Sol". */
+function kameaName(planet: string | undefined): string {
+  return planet !== undefined && Object.hasOwn(kameas, planet)
+    ? `Kamea of ${planets[planet as KameaPlanetId].name.en.en}`
+    : "Kamea";
+}
+
 /**
- * A planet's kamea in an `<svg>` of its own, square, `size` across (240 by
- * default), the frame inset a little from the edge. With a `label` it is an
- * image of that name; without one, decoration.
+ * A planet's kamea in an `<svg>` of its own, square, 240 across unless
+ * `width` or `height` says otherwise, the frame inset a little from the
+ * edge. It is an image named by its planet ("Kamea of Saturn") unless
+ * `label` names it otherwise or is false.
  */
 export function Kamea({
-  size = 240,
+  width,
+  height,
   label,
   className,
   style,
   ...figure
 }: KameaProps) {
+  const name =
+    label === undefined ? kameaName(figure.planet) : label || undefined;
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="-50 -50 100 100"
-      width={size}
-      height={size}
+      width={width ?? height ?? 240}
+      height={height ?? width ?? 240}
       className={className}
       style={style}
-      role={label ? "img" : undefined}
-      aria-label={label}
-      aria-hidden={label ? undefined : true}
+      role={name ? "img" : undefined}
+      aria-label={name}
     >
       <KameaFigure {...figure} />
     </svg>

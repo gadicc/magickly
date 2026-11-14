@@ -159,13 +159,13 @@ export default function Sigils({
           {debug ? (
             <DebugSigil
               ref={ref}
-              sigilText={isValid ? rectified : ""}
+              text={isValid ? rectified : ""}
               showRose={showRose}
             />
           ) : (
             <RoseSigil
               ref={ref}
-              sigilText={isValid ? rectified : ""}
+              text={isValid ? rectified : ""}
               showRose={showRose}
               animate={animate}
             />

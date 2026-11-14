@@ -35,15 +35,12 @@ const drawings: Record<InkDrawing, () => string[]> = {
   // Every planetary spirit's sigil.
   spirit: () =>
     PLANETARY_SPIRIT_IDS.map((id) =>
-      wrapped("spirit", <PlanetarySpirit id={id} />),
+      wrapped("spirit", <PlanetarySpirit spirit={id} />),
     ),
   candlestick: () => [wrapped("candlestick", <SevenBranchedCandlestick />)],
   shewbread: () => [wrapped("shewbread", <TableOfShewbread />)],
   roseSigil: () => [
-    wrapped(
-      "roseSigil",
-      <RoseSigil sigilText="אבג" showRose animate={false} />,
-    ),
+    wrapped("roseSigil", <RoseSigil text="אבג" showRose animate={false} />),
   ],
   chakras: () => [wrapped("chakras", <Chakras />)],
   lamen: () => [wrapped("lamen", <Lamen officer="hierophant" />)],

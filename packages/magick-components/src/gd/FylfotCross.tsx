@@ -27,19 +27,55 @@ function elementFromPos(row: number, col: number) {
   return "invalid-position";
 }
 
-export const fylfot = [
+/**
+ * The finished cross, row by row: each square's symbol by its id in
+ * magick-data, and `null` where the cross has no square.
+ */
+export const FYLFOT_CELLS = [
   ["fire", "sagittarius", "leo", null, "water"],
   [null, null, "aries", null, "pisces"],
   ["taurus", "capricorn", "sol", "cancer", "scorpio"],
   ["virgo", null, "libra", null, null],
   ["earth", null, "aquarius", "gemini", "air"],
-];
+] as const;
+
+/** A symbol of the cross, by its id in magick-data: `aries`, `fire`, `sol`. */
+export type FylfotSymbolId = Exclude<
+  (typeof FYLFOT_CELLS)[number][number],
+  null
+>;
+
+/**
+ * A square that shows no symbol, for a cross being filled in: `""` is an
+ * empty square, which takes clicks, and `"cursor"` the square being
+ * filled now, outlined.
+ */
+export type FylfotBlank = "" | "cursor";
+
+/**
+ * What a square shows: a symbol, a blank, or `null` where there is no
+ * square.
+ */
+export type FylfotCell = FylfotSymbolId | FylfotBlank | null;
+
+/** A square a click landed on, as `onCellClick` is given it. */
+export interface FylfotCellClick {
+  /** What the square showed. */
+  id: FylfotCell;
+  /** Its row and column, from 0 at the top left. */
+  row: number;
+  column: number;
+  /** The symbol the finished cross has there. */
+  expected: FylfotSymbolId;
+}
 
 /** The tables the squares' symbols come from. */
 const TABLES = { planet: planets, element: elements, zodiac };
 
-/** The table a fylfot id is a row of. */
-export function typeFromId(id: string): "planet" | "element" | "zodiac" {
+/** The magick-data table a symbol of the cross is a row of. */
+export function fylfotSymbolTable(
+  id: FylfotSymbolId,
+): "planet" | "element" | "zodiac" {
   if (id === "sol") return "planet";
   if (["earth", "air", "water", "fire"].includes(id)) return "element";
   return "zodiac";
@@ -70,18 +106,17 @@ const STYLE = `
 
 /** Props of the fylfot cross. */
 export interface FylfotCrossProps {
-  /** What each square shows, row by row; the finished cross by default. */
-  cells?: (string | null)[][];
   /**
-   * Called with a square's id and place when it is clicked. Without it the
-   * squares take no clicks, so the cross renders as a Server Component.
+   * What each square shows, row by row; the finished cross,
+   * `FYLFOT_CELLS`, by default.
    */
-  onClick?: (
-    id: string | null,
-    rowIndex: number,
-    colIndex: number,
-    correctId: string,
-  ) => void;
+  cells?: readonly (readonly FylfotCell[])[];
+  /**
+   * Called when a symbol or an empty square is clicked, with what it
+   * showed, where it is and what belongs there. Without it the squares
+   * take no clicks, so the cross renders as a Server Component.
+   */
+  onCellClick?: (click: FylfotCellClick) => void;
   /** Colours each arm by its element (default true). */
   showColors?: boolean;
   /**
@@ -93,8 +128,8 @@ export interface FylfotCrossProps {
 
 /** The fylfot cross of the signs and elements, as a table of squares. */
 export function FylfotCross({
-  cells = fylfot,
-  onClick,
+  cells = FYLFOT_CELLS,
+  onCellClick,
   showColors = true,
   ink,
 }: FylfotCrossProps) {
@@ -111,11 +146,17 @@ export function FylfotCross({
           {cells.map((row, rowIndex) => (
             <tr key={rowIndex}>
               {row.map((id, colIndex) => {
-                const correctId = fylfot[rowIndex][colIndex];
-                const isCorrect = id === correctId;
+                const expected = FYLFOT_CELLS[rowIndex]?.[colIndex] ?? null;
+                const isCorrect = id === expected;
 
-                const _onClick = onClick
-                  ? () => onClick(id, rowIndex, colIndex, correctId as string)
+                const onClick = onCellClick
+                  ? () =>
+                      onCellClick({
+                        id,
+                        row: rowIndex,
+                        column: colIndex,
+                        expected: expected as FylfotSymbolId,
+                      })
                   : undefined;
 
                 let background: undefined | string = undefined;
@@ -134,10 +175,10 @@ export function FylfotCross({
                   return (
                     <td
                       key={colIndex}
-                      onClick={_onClick}
+                      onClick={onClick}
                       style={{
                         ...style,
-                        cursor: onClick ? "pointer" : undefined,
+                        cursor: onCellClick ? "pointer" : undefined,
                       }}
                     >
                       &nbsp;
@@ -157,7 +198,7 @@ export function FylfotCross({
                   );
 
                 const item = (
-                  TABLES[typeFromId(id)] as Readonly<
+                  TABLES[fylfotSymbolTable(id)] as Readonly<
                     Record<string, { symbol: string }>
                   >
                 )[id];
@@ -166,11 +207,13 @@ export function FylfotCross({
                 return (
                   <td
                     key={colIndex}
-                    onClick={_onClick}
+                    onClick={onClick}
                     style={{
                       ...style,
-                      cursor: onClick ? "pointer" : undefined,
-                      fontFamily: "monospace !important",
+                      cursor: onCellClick ? "pointer" : undefined,
+                      // Inline, so no page font overrides it; a value with
+                      // `!important` React drops on the client.
+                      fontFamily: "monospace",
                     }}
                   >
                     {

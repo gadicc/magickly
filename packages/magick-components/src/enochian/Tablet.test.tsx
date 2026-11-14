@@ -14,11 +14,11 @@ const draw = (
   id: string,
   enochian = false,
   frame = true,
-  label: boolean | string = true,
+  label?: string | false,
 ) =>
   renderToStaticMarkup(
     <Tablet
-      id={id}
+      tablet={id}
       enochianStyle={enochian ? { fontFamily: "Enochian" } : undefined}
       frame={frame}
       width={210}
@@ -112,6 +112,15 @@ describe("Tablet", () => {
     },
   );
 
+  it("draws no frame unless asked", () => {
+    expect(renderToStaticMarkup(<Tablet tablet="earth" />)).not.toContain(
+      "border",
+    );
+    expect(renderToStaticMarkup(<Tablet tablet="earth" frame />)).toContain(
+      'style="border:1px solid black"',
+    );
+  });
+
   it("names each tablet as an image, and is unnamed when told", () => {
     const named = {
       earth: "Enochian Watchtower of Earth",
@@ -129,6 +138,7 @@ describe("Tablet", () => {
       );
       // No <title>: it would show a tooltip over every square.
       expect(markup).not.toContain("<title>");
+      expect(draw(id, false, true, undefined)).toBe(markup);
       expect(draw(id, false, true, "Shown here")).toContain(
         'aria-label="Shown here"',
       );
@@ -198,7 +208,7 @@ describe("Tablet", () => {
   it("outlines the squares it is given, the selected one more boldly", () => {
     const markup = renderToStaticMarkup(
       <Tablet
-        id="water"
+        tablet="water"
         highlights={{
           squares: [
             { row: 4, column: 11 },
@@ -230,10 +240,10 @@ describe("Tablet", () => {
     const drawIn = (
       id: string,
       version: string,
-      options: { reversed?: boolean; alt?: boolean } = {},
+      options: { mirrorReversed?: boolean; showSecondLetters?: boolean } = {},
     ) =>
       renderToStaticMarkup(
-        <Tablet id={id} version={version} frame={false} {...options} />,
+        <Tablet tablet={id} version={version} {...options} />,
       );
     const mirrored = (markup: string) =>
       [
@@ -303,14 +313,14 @@ describe("Tablet", () => {
       expect(mirrored(drawIn("earth", "raphael"))).toEqual(["a"]);
       expect(mirrored(drawIn("fire", "raphael"))).toEqual(["p", "a"]);
       for (const version of ["gd", "equinox", "dee", "raphael"])
-        expect(mirrored(drawIn("water", version, { reversed: false }))).toEqual(
-          [],
-        );
+        expect(
+          mirrored(drawIn("water", version, { mirrorReversed: false })),
+        ).toEqual([]);
     });
 
     it("draws second letters small in a corner when asked", () => {
       expect(corner(drawIn("water", "gd"))).toEqual([]);
-      const water = drawIn("water", "gd", { alt: true });
+      const water = drawIn("water", "gd", { showSecondLetters: true });
       const marks = tabletVersion(tablets.water, "gd")?.marks ?? [];
       expect(corner(water)).toEqual(
         marks.filter((mark) => mark.alt).map((mark) => mark.alt?.join("")),
@@ -325,10 +335,12 @@ describe("Tablet", () => {
         /<text x="240.5" y="88" data-alt="" style="font-size:6px;text-anchor:end[^"]*">ylh</,
       );
       // Dee's empty Fire squares show Raphael's letters there.
-      expect(corner(drawIn("fire", "dee", { alt: true }))).toEqual(
-        expect.arrayContaining(["a", "v"]),
-      );
-      expect(corner(drawIn("water", "equinox", { alt: true }))).toEqual([]);
+      expect(
+        corner(drawIn("fire", "dee", { showSecondLetters: true })),
+      ).toEqual(expect.arrayContaining(["a", "v"]));
+      expect(
+        corner(drawIn("water", "equinox", { showSecondLetters: true })),
+      ).toEqual([]);
     });
 
     it("names a version other than the Golden Dawn's", () => {
@@ -338,7 +350,7 @@ describe("Tablet", () => {
       expect(tabletName("fire", "gd")).toBe("Enochian Watchtower of Fire");
       expect(tabletName("spirit", "dee")).toBe("Enochian tablet");
       expect(
-        renderToStaticMarkup(<Tablet id="air" version="equinox" />),
+        renderToStaticMarkup(<Tablet tablet="air" version="equinox" />),
       ).toContain(
         'aria-label="Enochian Watchtower of Air, the Equinox&#x27;s version"',
       );

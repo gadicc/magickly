@@ -205,9 +205,8 @@ export default function Geomancy() {
                       {capitalizeFirstLetter(planet.spiritId || "")} &nbsp;
                       <Ink drawing="spirit">
                         <PlanetarySpirit
-                          id={planet.spiritId}
-                          height="1.1em"
-                          display="inline-block"
+                          spirit={planet.spiritId}
+                          style={{ height: "1.1em", display: "inline-block" }}
                         />
                       </Ink>
                     </TableCell>

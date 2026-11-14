@@ -1,14 +1,7 @@
 {
   "TreeOfLife": {
-    "description": "The Tree of Life: the ten sephirot (eleven with Da'at) coloured in either\nscale and labelled from their magick-data rows, and the twenty-two paths\nwith their Hebrew letters. Each sphere and path is a link, by default to\na root-relative path (`/kabbalah/sephirah/<id>`, `/kabbalah/path/<id>`),\nwhich `sephirahHref` and `pathHref` change or remove. It reads the data\nitself and needs no client code, so it renders as a Server Component.\nIts ids come from `useId` when `id` is not given; given a `ref`, a click\non a link in the browser sets `location.href`.",
+    "description": "The Tree of Life: the ten sephirot (eleven with Da'at) coloured in either\nscale and labelled from their magick-data rows, and the twenty-two paths\nwith their Hebrew letters. Without props it draws as magick.ly's Tree\npage does by default. A sphere or a path is a link only where\n`sephirahHref` or `pathHref` gives it one, a plain link the browser\nfollows. It reads the data itself and needs no client code, so it\nrenders as a Server Component. Its ids come from `useId` when `id` is\nnot given.",
     "props": [
-      {
-        "name": "active",
-        "type": "string",
-        "required": false,
-        "description": "A sephirah's id: that sphere is drawn and the others faded.",
-        "control": { "kind": "text" }
-      },
       {
         "name": "activePath",
         "type": "string",
@@ -17,24 +10,30 @@
         "control": { "kind": "text" }
       },
       {
+        "name": "activeSephirah",
+        "type": "string | null",
+        "required": false,
+        "description": "A sephirah's id: that sphere is drawn and the others faded. `null`\nfades them all; not given, none is faded."
+      },
+      {
         "name": "bottomText",
         "type": "string",
         "required": false,
-        "description": "The field path(s) set on an arc below each sphere's label.",
+        "description": "The field path(s) set on an arc below each sphere's label, as `field`\ntakes them; `name.en` when not given, and none when empty.",
         "control": { "kind": "text" }
       },
       {
         "name": "colorScale",
         "type": "\"king\" | \"queen\"",
         "required": false,
-        "description": "The scale the spheres are coloured in; the Queen's when not given.",
+        "description": "The scale the spheres are coloured in: `queen` when not given.",
         "control": { "kind": "choice", "options": ["king", "queen"] }
       },
       {
         "name": "field",
         "type": "string",
         "required": false,
-        "description": "What each sphere is labelled with: a field path into its magick-data\nrow (`name.he`, `planet.name.en.en`, `stones.*.name.en`), or several\njoined by commas, which are drawn space-separated. `index`, the\nsphere's number, when not given.",
+        "description": "What each sphere is labelled with: a field path into its magick-data\nrow (`name.he`, `planet.name.en.en`, `stones.*.name.en`; `index` is\nthe sphere's number), or several joined by commas, which are drawn\nspace-separated. `name.roman` when not given or empty.",
         "control": { "kind": "text" }
       },
       {
@@ -55,7 +54,7 @@
         "name": "fontSize",
         "type": "string | number",
         "required": false,
-        "description": "The labels' font size; from `field` when not given.",
+        "description": "The labels' font size. When not given, from `field` if it is given\n(32 for `index`, 20 for `name.he`, 12 for `name.roman`, otherwise 10),\nand 10 with the default field.",
         "control": { "kind": "parsed" }
       },
       {
@@ -82,20 +81,20 @@
         "name": "letterAttr",
         "type": "\"hebrew\" | \"hermetic\"",
         "required": false,
-        "description": "Whose letters the paths carry.",
+        "description": "Whose letters the paths carry: `hermetic` when not given.",
         "control": { "kind": "choice", "options": ["hebrew", "hermetic"] }
       },
       {
         "name": "pathHref",
         "type": "((path: TreeOfLifePathRow) => string | null)",
         "required": false,
-        "description": "A path's link, or `null` for none; `/kabbalah/path/<id>` by default."
+        "description": "Each path's link, given its magick-data row, or `null` for none.\nWithout it the paths are not links."
       },
       {
         "name": "sephirahHref",
-        "type": "((sephirah: TreeSephirah) => string | null)",
+        "type": "((sephirah: SephirahRow) => string | null)",
         "required": false,
-        "description": "A sphere's link, or `null` for none; `/kabbalah/sephirah/<id>` by default."
+        "description": "Each sphere's link, given its magick-data row, or `null` for none.\nWithout it the spheres are not links."
       },
       {
         "name": "showDaat",
@@ -108,7 +107,7 @@
         "name": "topText",
         "type": "string",
         "required": false,
-        "description": "The field path(s) set on an arc above each sphere's label.",
+        "description": "The field path(s) set on an arc above each sphere's label, as `field`\ntakes them; `index` when not given, and none when empty.",
         "control": { "kind": "text" }
       },
       {
@@ -121,15 +120,8 @@
     ]
   },
   "GradeTree": {
-    "description": "The Tree of Life as the map of the Golden Dawn's grades: each sphere\nlabelled with its grade's number and name, with the grade's element,\norder and planet below, and linked to `/gd/grade/<id>`; the paths are\nnot linked. Any of `TreeOfLife`'s props override these.",
+    "description": "The Tree of Life as the map of the Golden Dawn's grades: each sphere\nlabelled with its grade's number and name, with the grade's element,\norder and planet below. Like the Tree, it links nothing unless given\n`sephirahHref` or `pathHref` (a sphere's row names its grade as\n`gdGradeId`). Any of `TreeOfLife`'s props override these.",
     "props": [
-      {
-        "name": "active",
-        "type": "string",
-        "required": false,
-        "description": "A sephirah's id: that sphere is drawn and the others faded.",
-        "control": { "kind": "text" }
-      },
       {
         "name": "activePath",
         "type": "string",
@@ -138,24 +130,30 @@
         "control": { "kind": "text" }
       },
       {
+        "name": "activeSephirah",
+        "type": "string | null",
+        "required": false,
+        "description": "A sephirah's id: that sphere is drawn and the others faded. `null`\nfades them all; not given, none is faded."
+      },
+      {
         "name": "bottomText",
         "type": "string",
         "required": false,
-        "description": "The field path(s) set on an arc below each sphere's label.",
+        "description": "The field path(s) set on an arc below each sphere's label, as `field`\ntakes them; `name.en` when not given, and none when empty.",
         "control": { "kind": "text" }
       },
       {
         "name": "colorScale",
         "type": "\"king\" | \"queen\"",
         "required": false,
-        "description": "The scale the spheres are coloured in; the Queen's when not given.",
+        "description": "The scale the spheres are coloured in: `queen` when not given.",
         "control": { "kind": "choice", "options": ["king", "queen"] }
       },
       {
         "name": "field",
         "type": "string",
         "required": false,
-        "description": "What each sphere is labelled with: a field path into its magick-data\nrow (`name.he`, `planet.name.en.en`, `stones.*.name.en`), or several\njoined by commas, which are drawn space-separated. `index`, the\nsphere's number, when not given.",
+        "description": "What each sphere is labelled with: a field path into its magick-data\nrow (`name.he`, `planet.name.en.en`, `stones.*.name.en`; `index` is\nthe sphere's number), or several joined by commas, which are drawn\nspace-separated. `name.roman` when not given or empty.",
         "control": { "kind": "text" }
       },
       {
@@ -176,7 +174,7 @@
         "name": "fontSize",
         "type": "string | number",
         "required": false,
-        "description": "The labels' font size; from `field` when not given.",
+        "description": "The labels' font size. When not given, from `field` if it is given\n(32 for `index`, 20 for `name.he`, 12 for `name.roman`, otherwise 10),\nand 10 with the default field.",
         "control": { "kind": "parsed" }
       },
       {
@@ -203,20 +201,20 @@
         "name": "letterAttr",
         "type": "\"hebrew\" | \"hermetic\"",
         "required": false,
-        "description": "Whose letters the paths carry.",
+        "description": "Whose letters the paths carry: `hermetic` when not given.",
         "control": { "kind": "choice", "options": ["hebrew", "hermetic"] }
       },
       {
         "name": "pathHref",
         "type": "((path: TreeOfLifePathRow) => string | null)",
         "required": false,
-        "description": "A path's link, or `null` for none; `/kabbalah/path/<id>` by default."
+        "description": "Each path's link, given its magick-data row, or `null` for none.\nWithout it the paths are not links."
       },
       {
         "name": "sephirahHref",
-        "type": "((sephirah: TreeSephirah) => string | null)",
+        "type": "((sephirah: SephirahRow) => string | null)",
         "required": false,
-        "description": "A sphere's link, or `null` for none; `/kabbalah/sephirah/<id>` by default."
+        "description": "Each sphere's link, given its magick-data row, or `null` for none.\nWithout it the spheres are not links."
       },
       {
         "name": "showDaat",
@@ -229,7 +227,7 @@
         "name": "topText",
         "type": "string",
         "required": false,
-        "description": "The field path(s) set on an arc above each sphere's label.",
+        "description": "The field path(s) set on an arc above each sphere's label, as `field`\ntakes them; `index` when not given, and none when empty.",
         "control": { "kind": "text" }
       },
       {
@@ -303,6 +301,12 @@
         "control": { "kind": "text" }
       },
       {
+        "name": "discStyle",
+        "type": "CSSProperties",
+        "required": false,
+        "description": "Style for the disc, the inner circle."
+      },
+      {
         "name": "grade",
         "type": "string",
         "required": false,
@@ -317,13 +321,7 @@
         "control": { "kind": "parsed" }
       },
       {
-        "name": "innerCircleStyle",
-        "type": "CSSProperties",
-        "required": false,
-        "description": "Style for the disc, the inner circle."
-      },
-      {
-        "name": "outerCircleStyle",
+        "name": "ringStyle",
         "type": "CSSProperties",
         "required": false,
         "description": "Style for the collar's ring, the outer circle."
@@ -341,7 +339,7 @@
     "description": "The rose-cross sigil of a Hebrew text, drawn through the letters' places\non the rose. It renders the letter centres first, on the server too, then\nspreads repeated and aligned letters with the optimiser once in the\nbrowser, and draws the path on. A client component: the server-safe\ndrawing is `RoseSigilImage`.",
     "props": [
       {
-        "name": "sigilText",
+        "name": "text",
         "type": "string",
         "required": true,
         "description": "The text to draw. Final forms are drawn as their base letters, and\nanything not one of the 22 letters (spaces, points, Latin) is left out.",
@@ -396,9 +394,9 @@
     "props": [
       {
         "name": "cells",
-        "type": "(string | null)[][]",
+        "type": "readonly (readonly FylfotCell[])[]",
         "required": false,
-        "description": "What each square shows, row by row; the finished cross by default."
+        "description": "What each square shows, row by row; the finished cross,\n`FYLFOT_CELLS`, by default."
       },
       {
         "name": "ink",
@@ -408,10 +406,10 @@
         "control": { "kind": "text" }
       },
       {
-        "name": "onClick",
-        "type": "((id: string | null, rowIndex: number, colIndex: number, correctId: string) => void)",
+        "name": "onCellClick",
+        "type": "((click: FylfotCellClick) => void)",
         "required": false,
-        "description": "Called with a square's id and place when it is clicked. Without it the\nsquares take no clicks, so the cross renders as a Server Component."
+        "description": "Called when a symbol or an empty square is clicked, with what it\nshowed, where it is and what belongs there. Without it the squares\ntake no clicks, so the cross renders as a Server Component."
       },
       {
         "name": "showColors",
@@ -424,22 +422,14 @@
     ]
   },
   "Tablet": {
-    "description": "An Enochian tablet in a version (`version`, the Golden Dawn's by\ndefault): a Watchtower's sigil above its grid on a 210 × 297 page, or\nthe Tablet of Union's grid on a page of its own (`tabletViewBox`). The\nversion's reversed letters are mirrored unless `reversed` is false, and\na Watchtower's second letters drawn small in each square's corner when\n`alt` is true. A key the data does not have draws an empty page; a\ntablet the version does not have, its page saying so. It is an image\nnamed by `tabletName` (an `aria-label`, which shows no tooltip over the\nsquares as a `<title>` would) unless `label` is false, as for a tablet\ndrawn inside a larger drawing that names itself.",
+    "description": "An Enochian tablet in a version (`version`, the Golden Dawn's by\ndefault): a Watchtower's sigil above its grid on a 210 × 297 page, or\nthe Tablet of Union's grid on a page of its own (`tabletViewBox`). The\nversion's reversed letters are mirrored unless `mirrorReversed` is\nfalse, and a Watchtower's second letters drawn small in each square's\ncorner when `showSecondLetters` is true. A key the data does not have\ndraws an empty page; a tablet the version does not have, its page\nsaying so. It is an image named by `tabletName` (an `aria-label`, which\nshows no tooltip over the squares as a `<title>` would) unless `label`\nnames it otherwise or is false, as for a tablet drawn inside a larger\ndrawing that names itself.",
     "props": [
       {
-        "name": "id",
+        "name": "tablet",
         "type": "string",
         "required": true,
-        "description": "The tablet, by its key in the data: `earth`, `air`, `water`, `fire` or\n`union`.",
+        "description": "The tablet, by its key in magick-data: `earth`, `air`, `water`, `fire`\nor `union`.",
         "control": { "kind": "text" }
-      },
-      {
-        "name": "alt",
-        "type": "boolean",
-        "required": false,
-        "default": "false",
-        "description": "Draw each square's second letters small in its corner (default\nfalse). Watchtowers only: no source gives the Tablet of Union a\nsecond letter, so its grid has none to draw.",
-        "control": { "kind": "switch" }
       },
       {
         "name": "enochianStyle",
@@ -451,8 +441,8 @@
         "name": "frame",
         "type": "boolean",
         "required": false,
-        "default": "true",
-        "description": "Draws a CSS border around the page. Leave it off where the SVG is\nexported or turned into an image, which CSS boxes do not reach.",
+        "default": "false",
+        "description": "Draws a CSS border around the page (default false). Leave it off\nwhere the SVG is exported or turned into an image, which CSS boxes do\nnot reach.",
         "control": { "kind": "switch" }
       },
       {
@@ -470,18 +460,24 @@
       },
       {
         "name": "label",
-        "type": "string | boolean",
+        "type": "string | false",
         "required": false,
-        "default": "true",
-        "description": "The accessible name: the tablet's own (`true`), another, or none.",
-        "control": { "kind": "parsed" }
+        "description": "The drawing's accessible name: the tablet's own (`tabletName`) when\nnot given, this one when a string, and none when `false`."
       },
       {
-        "name": "reversed",
+        "name": "mirrorReversed",
         "type": "boolean",
         "required": false,
         "default": "true",
         "description": "Mirror the letters the version reverses (default true).",
+        "control": { "kind": "switch" }
+      },
+      {
+        "name": "showSecondLetters",
+        "type": "boolean",
+        "required": false,
+        "default": "false",
+        "description": "Draw each square's second letters small in its corner (default\nfalse). Watchtowers only: no source gives the Tablet of Union a\nsecond letter, so its grid has none to draw.",
         "control": { "kind": "switch" }
       },
       {
@@ -501,7 +497,7 @@
     ]
   },
   "Kamea": {
-    "description": "A planet's kamea in an `<svg>` of its own, square, `size` across (240 by\ndefault), the frame inset a little from the edge. With a `label` it is an\nimage of that name; without one, decoration.",
+    "description": "A planet's kamea in an `<svg>` of its own, square, 240 across unless\n`width` or `height` says otherwise, the frame inset a little from the\nedge. It is an image named by its planet (\"Kamea of Saturn\") unless\n`label` names it otherwise or is false.",
     "props": [
       {
         "name": "planet",
@@ -542,6 +538,13 @@
         "control": { "kind": "text" }
       },
       {
+        "name": "height",
+        "type": "string | number",
+        "required": false,
+        "description": "The drawing's height (CSS pixels for a number); the width's when only\nthat is given, and 240 when neither is.",
+        "control": { "kind": "parsed" }
+      },
+      {
         "name": "ink",
         "type": "string",
         "required": false,
@@ -550,10 +553,9 @@
       },
       {
         "name": "label",
-        "type": "string",
+        "type": "string | false",
         "required": false,
-        "description": "What the square is, for a screen reader (\"Kamea of Saturn\").",
-        "control": { "kind": "text" }
+        "description": "The drawing's accessible name: the square's own (\"Kamea of Saturn\")\nwhen not given, this one when a string, and none when `false`."
       },
       {
         "name": "paper",
@@ -563,23 +565,22 @@
         "control": { "kind": "text" }
       },
       {
-        "name": "size",
-        "type": "string | number",
-        "required": false,
-        "default": "240",
-        "description": "The drawing's width and height (CSS pixels for a number).",
-        "control": { "kind": "parsed" }
-      },
-      {
         "name": "style",
         "type": "CSSProperties",
         "required": false,
         "description": "The `<svg>`'s style."
+      },
+      {
+        "name": "width",
+        "type": "string | number",
+        "required": false,
+        "description": "The drawing's width (CSS pixels for a number); the height's when only\nthat is given, as it is square, and 240 when neither is.",
+        "control": { "kind": "parsed" }
       }
     ]
   },
   "PlanetarySpirit": {
-    "description": "A planetary spirit's geomantic sigil, centred in a flex box as tall as its\ncontainer allows. Every prop but `id` and `aria-hidden` is the box's\nstyle.",
+    "description": "A planetary spirit's geomantic sigil, centred in a flex box as tall as its\ncontainer allows.",
     "props": [
       {
         "name": "aria-hidden",
@@ -589,11 +590,32 @@
         "control": { "kind": "switch" }
       },
       {
-        "name": "id",
+        "name": "className",
         "type": "string",
         "required": false,
-        "description": "The spirit (its figures' Ruler), in lower case; none, or an id with no\nsigil, draws nothing.",
+        "description": "The box's class.",
         "control": { "kind": "text" }
+      },
+      {
+        "name": "ink",
+        "type": "string",
+        "required": false,
+        "default": "\"#000\"",
+        "description": "The sigil's stroke, a CSS colour; black (`#000`) by default.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "spirit",
+        "type": "string",
+        "required": false,
+        "description": "The spirit (its figures' Ruler), by its `PlanetarySpiritId`, in lower\ncase; none, or an id with no sigil, draws nothing.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "style",
+        "type": "CSSProperties",
+        "required": false,
+        "description": "The box's style, over its own `display: flex` and centring."
       }
     ]
   },
@@ -641,11 +663,11 @@
         "control": { "kind": "number" }
       },
       {
-        "name": "moonPadding",
+        "name": "padding",
         "type": "string",
         "required": false,
         "default": "\"10px 0 2px 0\"",
-        "description": "CSS padding around the drawing, inside the night sky.",
+        "description": "Space around the drawing, inside the background, as CSS `padding`.",
         "control": { "kind": "text" }
       }
     ]

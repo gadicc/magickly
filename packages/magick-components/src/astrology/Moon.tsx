@@ -101,8 +101,8 @@ function MoonDrawing({
 
 /** Props of the Moon widget. */
 export interface MoonWidgetProps {
-  /** CSS padding around the drawing, inside the night sky. */
-  moonPadding?: string;
+  /** Space around the drawing, inside the background, as CSS `padding`. */
+  padding?: string;
   /**
    * The viewer's latitude in degrees, south negative: south of the
    * equator, the moon is drawn turned as it is seen from there.
@@ -120,7 +120,7 @@ export interface MoonWidgetProps {
  * unlit disc.
  */
 export function MoonWidget({
-  moonPadding = "10px 0 2px 0",
+  padding = "10px 0 2px 0",
   latitude,
   background,
 }: MoonWidgetProps) {
@@ -145,7 +145,7 @@ export function MoonWidget({
         height: "100%",
       }}
     >
-      <div style={{ padding: moonPadding }}>
+      <div style={{ padding: padding }}>
         <MoonDrawing
           phase={phaseValue}
           height="85"

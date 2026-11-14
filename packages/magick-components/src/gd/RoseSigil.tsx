@@ -9,7 +9,7 @@ export interface RoseSigilProps {
    * The text to draw. Final forms are drawn as their base letters, and
    * anything not one of the 22 letters (spaces, points, Latin) is left out.
    */
-  sigilText: string;
+  text: string;
   /** Draws the rose's three rings of letters behind the sigil. */
   showRose?: boolean;
   /** Draws the connecting path on, once the layout is optimised. */
@@ -26,7 +26,7 @@ export interface RoseSigilProps {
  * drawing is `RoseSigilImage`.
  */
 export function RoseSigil({
-  sigilText,
+  text,
   showRose = true,
   animate = true,
   ref,
@@ -34,7 +34,7 @@ export function RoseSigil({
   const pathRef = React.useRef<SVGPathElement>(null);
   // useId yields ":r1:"-style ids; CSS identifiers need the colons removed.
   const animation = `rose-sigil-draw-${React.useId().replace(/[^\w-]/g, "")}`;
-  const points = React.useMemo(() => sigilPoints(sigilText), [sigilText]);
+  const points = React.useMemo(() => sigilPoints(text), [text]);
   const [optimized, setOptimized] = React.useState<SigilPoint[] | null>(null);
 
   React.useEffect(() => {
@@ -67,12 +67,12 @@ export function RoseSigil({
 
   return (
     <RoseSigilImage
-      sigilText={sigilText}
+      text={text}
       showRose={showRose}
       debug={false}
       points={optimized || points}
       animation={animate ? animation : undefined}
-      svgRef={ref}
+      ref={ref}
       pathRef={pathRef}
     />
   );

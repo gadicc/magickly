@@ -37,8 +37,8 @@ export const TREE_COLOR_SCALES: readonly TreeColorScale[] = ["queen", "king"];
 export type TreePathAttribution = keyof typeof orderedPaths &
   keyof TreeOfLifePathRow;
 
-/** A sphere as the Tree draws it, which `sephirahHref` is given. */
-export interface TreeSephirah {
+/** A sphere as the Tree draws it. */
+interface TreeSephirah {
   /** Its centre. */
   x: number;
   y: number;
@@ -66,7 +66,7 @@ function fontSizeNumber(size: unknown): number {
   return Number.isFinite(value) && value > 0 ? value : 10;
 }
 
-/** A link, or a plain group when `href` is empty (GradeTree's paths). */
+/** A link, or a plain group when `href` is empty or not given. */
 function SvgLink({
   href,
   children,
@@ -93,6 +93,11 @@ function SvgLink({
  * layer classes (TREE_LAYER_CLASSES) are only hooks for the page around it.
  */
 
+/**
+ * The Tree's props. Without any it draws as magick.ly's Tree page does by
+ * default: Roman names, numbered above and named in English below, in the
+ * Queen scale, with the Hermetic Tree's letters, and no links.
+ */
 export interface TreeOfLifeProps {
   /** The SVG's width; the container's, `"100%"`, when not given. */
   width?: string | number;
@@ -100,27 +105,42 @@ export interface TreeOfLifeProps {
   height?: string | number;
   /** Each sphere's label, Keter first and Da'at eleventh, in place of `field`'s. */
   labels?: readonly string[];
-  /** The scale the spheres are coloured in; the Queen's when not given. */
+  /** The scale the spheres are coloured in: `queen` when not given. */
   colorScale?: TreeColorScale;
   /**
    * What each sphere is labelled with: a field path into its magick-data
-   * row (`name.he`, `planet.name.en.en`, `stones.*.name.en`), or several
-   * joined by commas, which are drawn space-separated. `index`, the
-   * sphere's number, when not given.
+   * row (`name.he`, `planet.name.en.en`, `stones.*.name.en`; `index` is
+   * the sphere's number), or several joined by commas, which are drawn
+   * space-separated. `name.roman` when not given or empty.
    */
   field?: string;
-  /** The field path(s) set on an arc above each sphere's label. */
+  /**
+   * The field path(s) set on an arc above each sphere's label, as `field`
+   * takes them; `index` when not given, and none when empty.
+   */
   topText?: string;
-  /** The field path(s) set on an arc below each sphere's label. */
+  /**
+   * The field path(s) set on an arc below each sphere's label, as `field`
+   * takes them; `name.en` when not given, and none when empty.
+   */
   bottomText?: string;
-  /** Whose letters the paths carry. */
+  /** Whose letters the paths carry: `hermetic` when not given. */
   letterAttr?: TreePathAttribution;
-  /** A sephirah's id: that sphere is drawn and the others faded. */
-  active?: string;
-  /** A path's link, or `null` for none; `/kabbalah/path/<id>` by default. */
+  /**
+   * A sephirah's id: that sphere is drawn and the others faded. `null`
+   * fades them all; not given, none is faded.
+   */
+  activeSephirah?: string | null;
+  /**
+   * Each path's link, given its magick-data row, or `null` for none.
+   * Without it the paths are not links.
+   */
   pathHref?: (path: TreeOfLifePathRow) => string | null;
-  /** A sphere's link, or `null` for none; `/kabbalah/sephirah/<id>` by default. */
-  sephirahHref?: (sephirah: TreeSephirah) => string | null;
+  /**
+   * Each sphere's link, given its magick-data row, or `null` for none.
+   * Without it the spheres are not links.
+   */
+  sephirahHref?: (sephirah: SephirahRow) => string | null;
   /** A path's id (`"1_2"`): it is drawn on top and highlighted, the rest faded. */
   activePath?: string;
   /** Seen from behind, the body's view; the stylesheet mirrors the figure. */
@@ -130,14 +150,14 @@ export interface TreeOfLifeProps {
    * it out.
    */
   showDaat?: boolean;
-  /** The labels' font size; from `field` when not given. */
-  fontSize?: string | number;
   /**
-   * The `<svg>`, as a ref object (`useRef`); a callback ref is not
-   * accepted. Given one, a click on a link in the browser sets
-   * `location.href`, a full page load.
+   * The labels' font size. When not given, from `field` if it is given
+   * (32 for `index`, 20 for `name.he`, 12 for `name.roman`, otherwise 10),
+   * and 10 with the default field.
    */
-  ref?: React.RefObject<SVGSVGElement | null>;
+  fontSize?: string | number;
+  /** The `<svg>`, for exporting the drawing. */
+  ref?: React.Ref<SVGSVGElement>;
   /**
    * The `<svg>`'s id, which its stylesheet is scoped to and every id
    * inside it begins with (`<id>-paths`, `<id>-topTextPath0`): letters,
@@ -194,41 +214,19 @@ function treeFontFaceCss(baseUrl: string): string {
     .join("");
 }
 
-const defaultSephirahHref = (s: TreeSephirah) =>
-  "/kabbalah/sephirah/" + s.data.id;
-const defaultPathHref = (path: TreeOfLifePathRow) =>
-  "/kabbalah/path/" + path.id;
-
 /**
  * The Tree of Life: the ten sephirot (eleven with Da'at) coloured in either
  * scale and labelled from their magick-data rows, and the twenty-two paths
- * with their Hebrew letters. Each sphere and path is a link, by default to
- * a root-relative path (`/kabbalah/sephirah/<id>`, `/kabbalah/path/<id>`),
- * which `sephirahHref` and `pathHref` change or remove. It reads the data
- * itself and needs no client code, so it renders as a Server Component.
- * Its ids come from `useId` when `id` is not given; given a `ref`, a click
- * on a link in the browser sets `location.href`.
+ * with their Hebrew letters. Without props it draws as magick.ly's Tree
+ * page does by default. A sphere or a path is a link only where
+ * `sephirahHref` or `pathHref` gives it one, a plain link the browser
+ * follows. It reads the data itself and needs no client code, so it
+ * renders as a Server Component. Its ids come from `useId` when `id` is
+ * not given.
  */
-export function TreeOfLife({ id, ref, ...props }: TreeOfLifeProps) {
+export function TreeOfLife({ id, ...props }: TreeOfLifeProps) {
   const generatedId = `tree-of-life-${React.useId().replace(/[^A-Za-z0-9_-]/g, "_")}`;
-
-  if ("useEffect" in React) {
-    // biome-ignore lint/correctness/useHookAtTopLevel: doesn't exist on server
-    React.useEffect(() => {
-      ref?.current?.querySelectorAll("a").forEach((a) => {
-        a.onclick = function (e) {
-          if (typeof window === "object") {
-            e.preventDefault();
-            const href = a.getAttribute("xlink:href");
-            // href && router.push(href);  // TODO, maybe accept a router passed in?
-            if (href) location.href = href;
-          }
-        };
-      });
-    }, [ref]);
-  }
-
-  return <TreeOfLifeSvg {...props} id={id ?? generatedId} ref={ref} />;
+  return <TreeOfLifeSvg {...props} id={id ?? generatedId} />;
 }
 
 /** `TreeOfLifeSvg`'s props: the Tree's, its `id` required. */
@@ -240,7 +238,7 @@ export interface TreeOfLifeSvgProps extends TreeOfLifeProps {
  * The Tree's drawing alone, with no hooks: for a renderer outside React's
  * hook dispatcher, such as `renderToStaticMarkup` in a route handler,
  * where `TreeOfLife`'s `useId` cannot run. It takes its `id`, so two on a
- * page need two, and leaves links to the browser.
+ * page need two.
  */
 export function TreeOfLifeSvg({
   width,
@@ -249,9 +247,9 @@ export function TreeOfLifeSvg({
   colorScale,
   field,
   topText = "index",
-  bottomText = "",
+  bottomText = "name.en",
   letterAttr = "hermetic",
-  active,
+  activeSephirah,
   pathHref,
   sephirahHref,
   activePath,
@@ -283,11 +281,10 @@ export function TreeOfLifeSvg({
       `TreeOfLife: unknown activePath ${JSON.stringify(activePath)}; expected a path's id, one of ${Object.keys(_paths).join(", ")}`,
     );
   width = width || "100%";
-  field = field || "index";
+  // The Tree page's size for its default field; a given field sizes its own.
+  if (!fontSize && !field) fontSize = 10;
+  field = field || "name.roman";
   const fieldPaths = field;
-
-  sephirahHref = sephirahHref || defaultSephirahHref;
-  pathHref = pathHref || defaultPathHref;
 
   if (!labels)
     labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) =>
@@ -360,9 +357,9 @@ export function TreeOfLifeSvg({
   const outerSephirot = activePath ? activePath.split("_").map(Number) : [];
 
   function sephirahOpacity(sephirah: TreeSephirah) {
-    if (!active && !activePath) return 1;
+    if (activeSephirah === undefined && !activePath) return 1;
 
-    if (active && active === sephirah.data.id) return 1;
+    if (activeSephirah && activeSephirah === sephirah.data.id) return 1;
 
     if (activePath) {
       if (outerSephirot.includes(sephirah.data.index)) return 1;
@@ -446,7 +443,7 @@ export function TreeOfLifeSvg({
             <SvgLink
               key={path.id}
               id={local("path" + path.id)}
-              href={pathHref(path)}
+              href={pathHref?.(path)}
             >
               <LineOutline
                 x1={start.x}
@@ -499,7 +496,7 @@ export function TreeOfLifeSvg({
             <SvgLink
               key={path.id}
               id={local("pathLetter" + path.id)}
-              href={pathHref(path)}
+              href={pathHref?.(path)}
             >
               <text
                 key={path.id}
@@ -517,7 +514,7 @@ export function TreeOfLifeSvg({
       </g>
       <g id={local("sephirot")} className={TREE_LAYER_CLASSES.sephirot}>
         {sephirot.map((s, i) => (
-          <SvgLink key={i} id={local(s.data.id)} href={sephirahHref(s)}>
+          <SvgLink key={i} id={local(s.data.id)} href={sephirahHref?.(s.data)}>
             <circle
               cx={s.x}
               cy={s.y}

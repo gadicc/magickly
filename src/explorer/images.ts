@@ -2,7 +2,7 @@
  * The server image of what the explorer draws, where the image route has a
  * contract for the component (plan 080, decision 5). Client-safe: only the
  * pure contracts are imported. The contracts' query names are not the
- * components' props (`text` for `sigilText`), so each component maps its
+ * components' props (`id` for `tablet`), so each component maps its
  * own, and a drawing the image cannot show (second letters on a tablet,
  * highlighted squares) has no image.
  */
@@ -55,28 +55,38 @@ export function componentImage(name: string, props: Props): string | null {
     case "TreeOfLife":
       // Labels and links of the caller's own reach the drawing, not a query.
       if (props.labels !== undefined) return null;
+      // A sephirah the query cannot name: none lit.
+      if (props.activeSephirah === null) return null;
+      // The component's defaults, which are not the image's (its query
+      // keeps the Tree's first ones): the Tree page's.
       return viaContract("tree-of-life", {
-        field: text(props.field),
-        topText: text(props.topText),
-        bottomText: text(props.bottomText),
+        field: text(props.field) || "name.roman",
+        topText: text(props.topText) ?? "index",
+        bottomText: text(props.bottomText) ?? "name.en",
         colorScale: text(props.colorScale),
         letterAttr: text(props.letterAttr),
         flip: flag(props.flip),
         showDaat: flag(props.showDaat),
-        fontSize: number(props.fontSize),
-        active: text(props.active),
+        fontSize:
+          number(props.fontSize) ??
+          (text(props.field) ? undefined : String(10)),
+        active: text(props.activeSephirah),
         activePath: text(props.activePath),
       });
     case "Tablet":
-      if (props.reversed === false || props.alt === true || props.highlights)
+      if (
+        props.mirrorReversed === false ||
+        props.showSecondLetters === true ||
+        props.highlights
+      )
         return null;
       return viaContract("enochian-tablet", {
-        id: text(props.id),
+        id: text(props.tablet),
         version: text(props.version),
       });
     case "RoseSigil":
       return viaContract("rose-sigil", {
-        text: text(props.sigilText),
+        text: text(props.text),
         rose: flag(props.showRose),
       });
     case "SevenBranchedCandlestick":

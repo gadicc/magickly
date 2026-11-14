@@ -45,16 +45,28 @@ describe("Kamea", () => {
 
   it("is an <svg> of its own, square, sized and labelled as asked", () => {
     const labelled = renderToStaticMarkup(
-      <Kamea planet="luna" size={180} label="Kamea of Luna" className="k" />,
+      <Kamea
+        planet="luna"
+        width={180}
+        label="The Moon's square"
+        className="k"
+      />,
     );
     expect(labelled).toMatch(
-      /^<svg xmlns="http:\/\/www.w3.org\/2000\/svg" viewBox="-50 -50 100 100" width="180" height="180" class="k" role="img" aria-label="Kamea of Luna">/,
+      /^<svg xmlns="http:\/\/www.w3.org\/2000\/svg" viewBox="-50 -50 100 100" width="180" height="180" class="k" role="img" aria-label="The Moon&#x27;s square">/,
     );
-    expect(labelled).not.toContain("aria-hidden");
     const plain = renderToStaticMarkup(<Kamea planet="luna" />);
     expect(plain).toContain('width="240" height="240"');
-    expect(plain).toContain('aria-hidden="true"');
-    expect(plain).not.toContain("role=");
+    expect(plain).toContain('role="img" aria-label="Kamea of Luna"');
+    expect(
+      renderToStaticMarkup(<Kamea planet="saturn" height={90} />),
+    ).toContain('width="90" height="90"');
+    expect(
+      renderToStaticMarkup(<Kamea planet="sol" width={60} height="4em" />),
+    ).toContain('width="60" height="4em"');
+    const unnamed = renderToStaticMarkup(<Kamea planet="luna" label={false} />);
+    expect(unnamed).not.toContain("role=");
+    expect(unnamed).not.toContain("aria-label");
   });
 
   it("writes no ids, links or stylesheet, so many can share a page", () => {

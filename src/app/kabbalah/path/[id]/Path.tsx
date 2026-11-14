@@ -1,6 +1,7 @@
 import TreeOfLife from "magick-components/kabbalah/TreeOfLife";
 import type { HebrewLetterRow, TreeOfLifePathRow } from "magick-data/rows";
 import Image from "next/image";
+import { pathHref, sephirahHref } from "@/app/kabbalah/treeLinks";
 import Ink from "@/drawings/Ink";
 import { TREE_FONT_BASE_URL } from "@/fonts/tree";
 import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
@@ -91,9 +92,13 @@ export default function Path({ path }: { path: TreeOfLifePathRow }) {
         <Ink drawing="tree">
           <TreeOfLife
             height="150px"
+            field="index"
             topText=""
+            bottomText=""
             activePath={path.id}
             letterAttr={hermetic ? "hermetic" : "hebrew"}
+            sephirahHref={sephirahHref}
+            pathHref={pathHref}
             fontBaseUrl={TREE_FONT_BASE_URL}
           />
         </Ink>

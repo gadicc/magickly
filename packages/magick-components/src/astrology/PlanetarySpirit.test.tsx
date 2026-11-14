@@ -61,7 +61,7 @@ function pathPoints(d: string) {
 
 /** A sigil's markup, its svg's viewBox and its paths' attributes. */
 function sigil(id: string) {
-  const html = renderToStaticMarkup(<PlanetarySpirit id={id} />);
+  const html = renderToStaticMarkup(<PlanetarySpirit spirit={id} />);
   const viewBox = html
     .match(/viewBox="([^"]+)"/)?.[1]
     .split(" ")
@@ -113,20 +113,36 @@ describe("the planetary spirits' geomantic sigils", () => {
     }
   });
 
-  it("sizes the sigil by its box's height and passes the rest as style", () => {
+  it("sizes the sigil by its box's height, styled by its style", () => {
     const html = renderToStaticMarkup(
-      <PlanetarySpirit id="zazel" aria-hidden height="1.5em" color="red" />,
+      <PlanetarySpirit
+        spirit="zazel"
+        aria-hidden
+        className="seal"
+        style={{ height: "1.5em", color: "red" }}
+      />,
     );
-    expect(html).toMatch(/^<div aria-hidden="true" style="[^"]*height:1.5em/);
+    expect(html).toMatch(
+      /^<div aria-hidden="true" class="seal" style="[^"]*height:1.5em/,
+    );
     expect(html).toContain("color:red");
+    expect(html).toContain('stroke="#000"');
     expect(html).toContain('<svg xmlns="http://www.w3.org/2000/svg"');
     expect(html).toContain('height="100%"');
     expect(html).not.toMatch(/<svg[^>]* width=/);
   });
 
+  it("inks the sigil in the colour it is given", () => {
+    expect(
+      renderToStaticMarkup(<PlanetarySpirit spirit="zazel" ink="#d6dae0" />),
+    ).toContain('stroke="#d6dae0"');
+  });
+
   it("draws nothing for an id without a sigil", () => {
     expect(isPlanetarySpiritId("constructor")).toBe(false);
-    expect(renderToStaticMarkup(<PlanetarySpirit id="constructor" />)).toBe("");
+    expect(renderToStaticMarkup(<PlanetarySpirit spirit="constructor" />)).toBe(
+      "",
+    );
     expect(renderToStaticMarkup(<PlanetarySpirit />)).toBe("");
   });
 });

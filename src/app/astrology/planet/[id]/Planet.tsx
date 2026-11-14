@@ -300,11 +300,13 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
                     sigil is decoration beside the name it draws. */}
                 <Ink drawing="spirit">
                   <PlanetarySpirit
-                    id={planet.spiritId}
+                    spirit={planet.spiritId}
                     aria-hidden
-                    height="1.5em"
-                    display="inline-block"
-                    verticalAlign="middle"
+                    style={{
+                      height: "1.5em",
+                      display: "inline-block",
+                      verticalAlign: "middle",
+                    }}
                   />
                 </Ink>
                 <SigilSource spiritId={planet.spiritId} />

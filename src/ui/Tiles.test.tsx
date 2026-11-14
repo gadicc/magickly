@@ -3,6 +3,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import GradeTree from "magick-components/gd/GradeTree";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { gradeHref } from "@/app/kabbalah/treeLinks";
 import Tiles from "./Tiles";
 
 afterEach(() => {
@@ -19,7 +20,9 @@ describe("Tiles", () => {
       <Tiles
         tiles={[
           {
-            Component: () => <GradeTree height="120%" />,
+            Component: () => (
+              <GradeTree height="120%" sephirahHref={gradeHref} />
+            ),
             title: "Grades",
             to: "/gd/grades",
           },

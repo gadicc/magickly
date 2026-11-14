@@ -409,8 +409,8 @@ export function Lamen({
   grade,
   width,
   height,
-  outerCircleStyle,
-  innerCircleStyle,
+  ringStyle,
+  discStyle,
 }: {
   /**
    * The officer, in camel case (`hierophant`, `pastHierophant`,
@@ -429,9 +429,9 @@ export function Lamen({
   /** The SVG's height; from the width when not given, as it is square. */
   height?: number | string;
   /** Style for the collar's ring, the outer circle. */
-  outerCircleStyle?: React.CSSProperties;
+  ringStyle?: React.CSSProperties;
   /** Style for the disc, the inner circle. */
-  innerCircleStyle?: React.CSSProperties;
+  discStyle?: React.CSSProperties;
 }) {
   if (!officer) officer = "hierophant";
   const gradeLamen =
@@ -441,7 +441,7 @@ export function Lamen({
   const crossLamen = CROSS_LAMENS.get(officer);
   const glyphLamen = gradeLamen ?? GLYPH_LAMENS.get(officer);
 
-  const _outerCircleStyle = {
+  const _ringStyle = {
     color: "#000",
     overflow: "visible",
     fill:
@@ -453,10 +453,10 @@ export function Lamen({
     strokeDasharray: "none",
     paintOrder: "stroke fill markers",
     stopColor: "#000",
-    ...outerCircleStyle,
+    ...ringStyle,
   };
 
-  const _innerCircleStyle = {
+  const _discStyle = {
     color: "#000",
     overflow: "visible",
     fill: crossLamen?.disc ?? glyphLamen?.disc ?? "#000",
@@ -464,7 +464,7 @@ export function Lamen({
     strokeWidth: 1,
     paintOrder: "stroke fill markers",
     stopColor: "#000",
-    ...innerCircleStyle,
+    ...discStyle,
   };
 
   return (
@@ -476,9 +476,9 @@ export function Lamen({
       viewBox="-50 -50 100 100"
       // style={{ border: "1px solid blue" }}
     >
-      <circle cx={0} cy={0} r={RING_RADIUS} style={_outerCircleStyle} />
+      <circle cx={0} cy={0} r={RING_RADIUS} style={_ringStyle} />
       {crossLamen?.ring === "stripes" && <path d={RING_STRIPES} fill="white" />}
-      <circle cx={0} cy={0} r={42} style={_innerCircleStyle} />
+      <circle cx={0} cy={0} r={42} style={_discStyle} />
       {crossLamen && (
         <TipharethCalvaryCross
           style={{ fill: crossLamen.cross ?? crossLamen.ring }}

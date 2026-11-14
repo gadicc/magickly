@@ -44,7 +44,7 @@ const tiles = [
     plate: true,
     Component: () => (
       <Box sx={{ height: "100%", textAlign: "center", marginTop: 1 }}>
-        <Tablet id="earth" height="100%" />
+        <Tablet tablet="earth" height="100%" frame />
       </Box>
     ),
   },

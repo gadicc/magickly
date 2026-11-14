@@ -439,10 +439,11 @@ export default function Tablets() {
         }}
       >
         <Tablet
-          id={id}
+          tablet={id}
           version={version}
-          reversed={reversed}
-          alt={alt}
+          mirrorReversed={reversed}
+          showSecondLetters={alt}
+          frame
           enochianStyle={enochianFont ? EnochianFont.style : undefined}
           ref={ref}
           highlights={

@@ -8,21 +8,28 @@ export const Tablet: ComponentExamples<ComponentProps<typeof TabletComponent>> =
     entry: "enochian/Tablet",
     exportName: "default",
     examples: [
-      { title: "Earth, the Golden Dawn's", props: { id: "earth" } },
-      { title: "Fire in Dee's version", props: { id: "fire", version: "dee" } },
+      {
+        title: "Earth, the Golden Dawn's",
+        props: { tablet: "earth", frame: true },
+      },
+      {
+        title: "Fire in Dee's version",
+        props: { tablet: "fire", version: "dee", frame: true },
+      },
       {
         title: "Water, with second letters",
-        props: { id: "water", alt: true },
+        props: { tablet: "water", showSecondLetters: true, frame: true },
       },
       {
         title: "Air, its letters unreversed",
-        props: { id: "air", reversed: false },
+        props: { tablet: "air", mirrorReversed: false, frame: true },
       },
-      { title: "The Tablet of Union", props: { id: "union" } },
+      { title: "The Tablet of Union", props: { tablet: "union", frame: true } },
       {
         title: "Earth, a square outlined",
         props: {
-          id: "earth",
+          tablet: "earth",
+          frame: true,
           highlights: {
             squares: [
               { row: 0, column: 0 },

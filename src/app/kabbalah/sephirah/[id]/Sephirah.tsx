@@ -2,6 +2,7 @@ import Chakras from "magick-components/chakras/Chakras";
 import { FIELD_PATH_LIST_SEPARATOR } from "magick-components/kabbalah/fieldPath";
 import TreeOfLife from "magick-components/kabbalah/TreeOfLife";
 import type { SephirahRow, TreeOfLifePathRow } from "magick-data/rows";
+import { pathHref, sephirahHref } from "@/app/kabbalah/treeLinks";
 import Ink, { inkClass } from "@/drawings/Ink";
 import { TREE_FONT_BASE_URL } from "@/fonts/tree";
 import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
@@ -175,9 +176,13 @@ export default function Sephirah({ sephirah }: { sephirah: SephirahRow }) {
         <Ink drawing="tree">
           <TreeOfLife
             height="150px"
+            field="index"
             topText=""
-            active={sephirah.id}
+            bottomText=""
+            activeSephirah={sephirah.id}
             showDaat={hidden}
+            sephirahHref={sephirahHref}
+            pathHref={pathHref}
             fontBaseUrl={TREE_FONT_BASE_URL}
           />
         </Ink>

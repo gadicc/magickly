@@ -1,5 +1,6 @@
 import GradeTree from "magick-components/gd/GradeTree";
 import type { GDGradeRow } from "magick-data/rows";
+import { gradeHref } from "@/app/kabbalah/treeLinks";
 import { isPublicRitualId } from "@/doc/publicRituals";
 import Ink from "@/drawings/Ink";
 import { TREE_FONT_BASE_URL } from "@/fonts/tree";
@@ -38,14 +39,6 @@ const PILLAR: Readonly<Record<string, string>> = {
   mercy: "Pillar of Mercy",
   middle: "Middle Pillar",
 };
-
-/**
- * An `active` that names no sphere. The Tree lights every sphere when
- * `active` is absent, so a grade with no sephirah passes this instead, and
- * every sphere is drawn dimmed: the figure says what the missing Sephirah
- * row says (decision 16).
- */
-const NO_SPHERE = "none";
 
 /** "Theoricus 2=9", or "Portal": the name, and the id where it is numbers. */
 function title(grade: GDGradeRow) {
@@ -108,7 +101,11 @@ export default function GradePage({ grade }: { grade: GDGradeRow }) {
           <GradeTree
             height="150px"
             topText=""
-            active={sephirah?.id ?? NO_SPHERE}
+            // A grade with no sephirah lights none, and every sphere is drawn
+            // dimmed: the figure says what the missing Sephirah row says
+            // (decision 16).
+            activeSephirah={sephirah?.id ?? null}
+            sephirahHref={gradeHref}
             fontBaseUrl={TREE_FONT_BASE_URL}
           />
         </Ink>

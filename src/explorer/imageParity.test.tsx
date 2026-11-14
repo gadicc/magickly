@@ -8,6 +8,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
+import { pathHref, sephirahHref } from "@/app/kabbalah/treeLinks";
 import { CONTRACTS, type ComponentImageSlug } from "@/render/contracts";
 import { COMPONENT_IMAGE_REGISTRY } from "@/render/registry";
 import { COMPONENT_EXAMPLES } from "./components";
@@ -21,7 +22,8 @@ import { componentImage } from "./images";
  * outlined image instead), and the tablet's frame and label, a CSS border
  * and an accessible name that no image carries, are set as the route sets
  * them; the Tree takes the fixed root id the route gives it (its other
- * ids are stripped from the outlines), where the page's comes from `useId`.
+ * ids are stripped from the outlines), where the page's comes from `useId`,
+ * and the links the route's source SVG carries, which outlining drops.
  */
 const CASES: [
   "TreeOfLife" | "Tablet" | "SevenBranchedCandlestick" | "TableOfShewbread",
@@ -69,7 +71,7 @@ describe.each(CASES)("%s's image", (name, live, slug) => {
         name === "Tablet"
           ? { ...props, frame: false, label: false }
           : name === "TreeOfLife"
-            ? { ...props, id: "TreeOfLife" }
+            ? { ...props, id: "TreeOfLife", sephirahHref, pathHref }
             : props;
       expect(image).toBe(renderToStaticMarkup(createElement(live, own)));
     },

@@ -16,7 +16,7 @@ describe("RoseSigil", () => {
     // The server render and the first client render both draw the letter
     // centres; the optimised layout only arrives after hydration.
     const render = () =>
-      renderToString(<RoseSigil sigilText="אבג" showRose animate />);
+      renderToString(<RoseSigil text="אבג" showRose animate />);
     const server = render();
     const yod = letterPoint("י");
     const { cos, sin } = Math;
@@ -39,7 +39,7 @@ describe("RoseSigil", () => {
     // A browser stops drawing a path at its first NaN, so a NaN in the
     // opening move drops the whole path.
     const html = renderToString(
-      <RoseSigil sigilText="דדדבבב" showRose={false} animate />,
+      <RoseSigil text="דדדבבב" showRose={false} animate />,
     );
     const paths = [...html.matchAll(/<path [^>]*\bd="([^"]*)"/g)];
     expect(paths).toHaveLength(1);
@@ -54,7 +54,7 @@ describe("RoseSigil", () => {
     const draw = (text: string) =>
       renderToStaticMarkup(
         <RoseSigilImage
-          sigilText={text}
+          text={text}
           showRose={false}
           debug
           points={sigilPoints(text)}
@@ -70,7 +70,7 @@ describe("RoseSigil", () => {
     const draw = (debug: boolean) =>
       renderToStaticMarkup(
         <RoseSigilImage
-          sigilText="אבג"
+          text="אבג"
           showRose
           debug={debug}
           points={sigilPoints("אבג")}

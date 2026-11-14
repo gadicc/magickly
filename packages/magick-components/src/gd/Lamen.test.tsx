@@ -179,8 +179,8 @@ describe("Lamen", () => {
         officer="hegemon"
         width={30}
         height={25}
-        outerCircleStyle={{ fill: "grey" }}
-        innerCircleStyle={{ stroke: "blue" }}
+        ringStyle={{ fill: "grey" }}
+        discStyle={{ stroke: "blue" }}
       />,
     );
     expect(markup).toContain('width="30" height="25"');

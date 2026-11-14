@@ -9,6 +9,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import GradeTree from "magick-components/gd/GradeTree";
 import Data from "magick-data";
+import { gradeHref } from "@/app/kabbalah/treeLinks";
 import Ink from "@/drawings/Ink";
 import { TREE_FONT_BASE_URL } from "@/fonts/tree";
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
@@ -24,7 +25,10 @@ export default function Grades() {
       <Container maxWidth="sm">
         <Box sx={{ my: 4 }}>
           <Ink drawing="tree">
-            <GradeTree fontBaseUrl={TREE_FONT_BASE_URL} />
+            <GradeTree
+              sephirahHref={gradeHref}
+              fontBaseUrl={TREE_FONT_BASE_URL}
+            />
           </Ink>
 
           <TableContainer component={Paper}>

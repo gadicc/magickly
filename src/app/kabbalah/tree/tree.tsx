@@ -9,6 +9,7 @@ import Tree, {
 import Data from "magick-data";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
+import { pathHref, sephirahHref } from "@/app/kabbalah/treeLinks";
 import Ink from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";
 import { TREE_FONT_BASE_URL } from "@/fonts/tree";
@@ -190,6 +191,8 @@ export function TreeOfLifeView({
               flip={opts.flip}
               showDaat={opts.showDaat}
               fontSize={opts.fontSize}
+              sephirahHref={sephirahHref}
+              pathHref={pathHref}
               fontBaseUrl={TREE_FONT_BASE_URL}
               ref={ref}
             />

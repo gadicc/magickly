@@ -15,15 +15,15 @@ import React from "react";
  * not drawn on.
  */
 export default function DebugSigil({
-  sigilText,
+  text,
   showRose,
   ref,
 }: {
-  sigilText: string;
+  text: string;
   showRose: boolean;
   ref?: React.Ref<SVGSVGElement>;
 }) {
-  const points = React.useMemo(() => sigilPoints(sigilText), [sigilText]);
+  const points = React.useMemo(() => sigilPoints(text), [text]);
   const [optimized, setOptimized] = React.useState<{
     from: SigilPoint[];
     to: SigilPoint[];
@@ -45,11 +45,11 @@ export default function DebugSigil({
 
   return (
     <RoseSigilImage
-      sigilText={sigilText}
+      text={text}
       showRose={showRose}
       debug
       points={optimized?.from === points ? optimized.to : points}
-      svgRef={ref}
+      ref={ref}
     />
   );
 }

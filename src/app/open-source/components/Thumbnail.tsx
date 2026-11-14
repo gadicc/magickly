@@ -17,8 +17,6 @@ import { GD_HALLS } from "@/render/contracts/gdHall";
 import { hallFiles } from "@/seo/halls";
 import styles from "./components.module.css";
 
-const noLink = () => null;
-
 /**
  * The components drawn live on the index, on the server: none of them
  * loads `nlopt-js` or `astronomy-engine` (the note under plan 080's
@@ -26,10 +24,8 @@ const noLink = () => null;
  */
 // biome-ignore lint/suspicious/noExplicitAny: each takes its first example's props
 const LIVE_TILES: Partial<Record<string, ComponentType<any>>> = {
-  // A tile is a link, so the Tree's own links would nest in it.
-  GradeTree: (props: object) => (
-    <GradeTree {...props} sephirahHref={noLink} pathHref={noLink} />
-  ),
+  // A tile is a link; the Grade Tree draws none of its own.
+  GradeTree,
   Lamen,
   FylfotCross,
   Kamea,

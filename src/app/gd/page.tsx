@@ -1,4 +1,5 @@
 import GradeTree from "magick-components/gd/GradeTree";
+import { gradeHref } from "@/app/kabbalah/treeLinks";
 import Ink from "@/drawings/Ink";
 import { TREE_FONT_BASE_URL } from "@/fonts/tree";
 import { GD_HALLS } from "@/render/contracts/gdHall";
@@ -13,7 +14,11 @@ const tiles = [
   {
     Component: () => (
       <Ink drawing="tree">
-        <GradeTree height="120%" fontBaseUrl={TREE_FONT_BASE_URL} />
+        <GradeTree
+          height="120%"
+          sephirahHref={gradeHref}
+          fontBaseUrl={TREE_FONT_BASE_URL}
+        />
       </Ink>
     ),
     title: "Grades",

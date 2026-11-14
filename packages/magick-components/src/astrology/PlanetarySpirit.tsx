@@ -95,16 +95,17 @@ export const isPlanetarySpiritId = (id: string): id is PlanetarySpiritId =>
   Object.hasOwn(SIGILS, id);
 
 function Sigil({
-  id,
+  spirit,
+  ink,
   ...props
-}: { id: PlanetarySpiritId } & SVGProps<SVGSVGElement>) {
-  const { viewBox, d } = SIGILS[id];
+}: { spirit: PlanetarySpiritId; ink: string } & SVGProps<SVGSVGElement>) {
+  const { viewBox, d } = SIGILS[spirit];
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox={viewBox} {...props}>
       <path
         d={d}
         fill="none"
-        stroke="#000"
+        stroke={ink}
         strokeWidth={STROKE_WIDTH}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -113,36 +114,47 @@ function Sigil({
   );
 }
 
-export interface PlanetarySpiritProps extends CSSProperties {
+/** Props of `PlanetarySpirit`. */
+export interface PlanetarySpiritProps {
   /**
-   * The spirit (its figures' Ruler), in lower case; none, or an id with no
-   * sigil, draws nothing.
+   * The spirit (its figures' Ruler), by its `PlanetarySpiritId`, in lower
+   * case; none, or an id with no sigil, draws nothing.
    */
-  id?: string;
+  spirit?: string;
+  /** The box's class. */
+  className?: string;
+  /** The box's style, over its own `display: flex` and centring. */
+  style?: CSSProperties;
+  /** The sigil's stroke, a CSS colour; black (`#000`) by default. */
+  ink?: string;
   /** Hides the sigil from assistive technology when the text names it. */
   "aria-hidden"?: boolean;
 }
 
 /**
  * A planetary spirit's geomantic sigil, centred in a flex box as tall as its
- * container allows. Every prop but `id` and `aria-hidden` is the box's
- * style.
+ * container allows.
  */
-export function PlanetarySpirit(props: PlanetarySpiritProps) {
-  // Everything but the id and `aria-hidden` is style, as its callers pass it.
-  const { id, "aria-hidden": ariaHidden, ...rest } = props;
-  if (id === undefined || !isPlanetarySpiritId(id)) return null;
+export function PlanetarySpirit({
+  spirit,
+  className,
+  style,
+  ink = "#000",
+  "aria-hidden": ariaHidden,
+}: PlanetarySpiritProps) {
+  if (spirit === undefined || !isPlanetarySpiritId(spirit)) return null;
   return (
     <div
       aria-hidden={ariaHidden}
+      className={className}
       style={{
         display: "flex",
         alignContent: "center",
         justifyContent: "center",
-        ...rest,
+        ...style,
       }}
     >
-      <Sigil id={id} height="100%" />
+      <Sigil spirit={spirit} ink={ink} height="100%" />
     </div>
   );
 }

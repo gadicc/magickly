@@ -10,15 +10,18 @@ import {
   Grid,
 } from "@mui/material";
 import FylfotCross, {
-  fylfot,
-  typeFromId,
+  FYLFOT_CELLS,
+  type FylfotCell,
+  type FylfotCellClick,
+  type FylfotSymbolId,
+  fylfotSymbolTable,
 } from "magick-components/gd/FylfotCross";
 import data from "magick-data";
 import React from "react";
 import OpenSource from "@/OpenSource";
 
-function unflat(flat, split = 5) {
-  const unflat: (string | null)[][] = [[], [], [], [], []];
+function unflat(flat: FylfotCell[], split = 5) {
+  const unflat: FylfotCell[][] = [[], [], [], [], []];
   for (let i = 0, row = -1; i < flat.length; i++) {
     if (i % split === 0) row++;
     console.log(unflat);
@@ -27,7 +30,7 @@ function unflat(flat, split = 5) {
   return unflat;
 }
 
-const fylfotEmpty = [
+const fylfotEmpty: FylfotCell[][] = [
   ["cursor", "", "", null, ""],
   [null, null, "", null, ""],
   ["", "", "", "", ""],
@@ -35,27 +38,29 @@ const fylfotEmpty = [
   ["", null, "", "", ""],
 ];
 
-const fylfotSymbols = fylfot.flat(2).filter(Boolean) as string[];
+const fylfotSymbols = FYLFOT_CELLS.flat().filter(
+  (id): id is FylfotSymbolId => id !== null,
+);
 fylfotSymbols.sort();
 
 export default function FylfotCrossPage() {
   const [showColors, setShowColors] = React.useState(true);
-  const [cells, setCells] = React.useState<(string | null)[][]>(fylfotEmpty);
-  const [used, setUsed] = React.useState<string[]>([]);
+  const [cells, setCells] = React.useState<FylfotCell[][]>(fylfotEmpty);
+  const [used, setUsed] = React.useState<FylfotCell[]>([]);
   const [testing, setTesting] = React.useState(false);
 
-  function crossClick(id: string, rowIndex, colIndex, correctId) {
-    console.log({ id, rowIndex, colIndex, correctId });
+  function crossClick({ id, row, column, expected }: FylfotCellClick) {
+    console.log({ id, row, column, expected });
     setUsed(used.filter((item) => item !== id));
     const flat = cells.flat(2);
     if (used.length < fylfotSymbols.length) flat[flat.indexOf("cursor")] = "";
     if (id) flat[flat.indexOf(id)] = "cursor";
     const newCells = unflat(flat);
-    if (!id) newCells[rowIndex][colIndex] = "cursor";
+    if (!id) newCells[row][column] = "cursor";
     setCells(newCells);
   }
 
-  function optionsClick(id: string) {
+  function optionsClick(id: FylfotSymbolId) {
     setUsed([...used, id]);
 
     const flat = cells.flat(2);
@@ -72,8 +77,8 @@ export default function FylfotCrossPage() {
   return (
     <Container sx={{ p: 2 }}>
       <FylfotCross
-        cells={testing ? cells : fylfot}
-        onClick={crossClick}
+        cells={testing ? cells : FYLFOT_CELLS}
+        onCellClick={crossClick}
         showColors={showColors}
         ink="var(--mui-palette-ink, black)"
       />
@@ -89,7 +94,7 @@ export default function FylfotCrossPage() {
       {testing && (
         <div>
           {fylfotSymbols.map((id) => {
-            const type = typeFromId(id);
+            const type = fylfotSymbolTable(id);
             const item = data[type][id];
             const inUse = used.includes(id);
             // console.log(item);

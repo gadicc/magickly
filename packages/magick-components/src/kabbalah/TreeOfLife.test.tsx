@@ -131,24 +131,79 @@ describe("TreeOfLife", () => {
     );
   });
 
-  it("links every path and sephirah by default", () => {
+  it("links nothing by default", () => {
     const html = renderToString(<TreeOfLife />);
-    // 22 path outlines, 22 path letters and 10 sephirot.
-    expect(count(html, /<a /g)).toBe(54);
-    expect(count(html, /<a [^>]*xlink:href="\/kabbalah\//g)).toBe(54);
-    // Every id is its own: a path, its letter, and each sephirah.
+    expect(count(html, /<a /g)).toBe(0);
+    // 22 path outlines and their 22 letters, and 10 sephirot, each a group
+    // with its own id.
+    expect(count(html, /<g id="[\w-]+-path\d+_\d+">/g)).toBe(22);
+    expect(count(html, /<g id="[\w-]+-pathLetter\d+_\d+">/g)).toBe(22);
     const ids = [...html.matchAll(/ id="([^"]+)"/g)].map(([, id]) => id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("draws paths without a destination as plain groups", () => {
-    // GradeTree links only the sephirot, to their grades.
-    const html = renderToString(<GradeTree />);
+  it("links what its href functions name, given each its row", () => {
+    const seen: string[] = [];
+    const html = renderToString(
+      <TreeOfLife
+        sephirahHref={(sephirah) => {
+          seen.push(`sephirah ${sephirah.id} ${sephirah.index}`);
+          return `/s/${sephirah.id}`;
+        }}
+        pathHref={(path) => {
+          seen.push(`path ${path.id}`);
+          return path.id === "1_2" ? null : `/p/${path.id}`;
+        }}
+      />,
+    );
+    expect(seen).toContain("sephirah tiferet 6");
+    expect(seen).toContain("path 6_9");
+    // 21 paths outlined and lettered, and 10 sephirot; 1_2 is no link.
+    expect(count(html, /<a /g)).toBe(52);
+    expect(count(html, /<a [^>]*xlink:href="\/s\/tiferet"/g)).toBe(1);
+    expect(count(html, /<a [^>]*xlink:href="\/p\/6_9"/g)).toBe(2);
+    expect(count(html, /<g id="[\w-]+-path1_2">/g)).toBe(1);
+  });
+
+  it("links the Grade Tree's spheres only where it is told to", () => {
+    expect(count(renderToString(<GradeTree />), /<a /g)).toBe(0);
+    const html = renderToString(
+      <GradeTree sephirahHref={(s) => `/gd/grade/${s.gdGradeId}`} />,
+    );
     expect(count(html, /<a /g)).toBe(10);
     expect(count(html, /<a [^>]*xlink:href="\/gd\/grade\//g)).toBe(10);
-    // 22 path outlines and their 22 letters, each with its own id.
-    expect(count(html, /<g id="[\w-]+-path\d+_\d+">/g)).toBe(22);
-    expect(count(html, /<g id="[\w-]+-pathLetter\d+_\d+">/g)).toBe(22);
+  });
+
+  it("draws by default as the Tree page does", () => {
+    // Roman names at 10, numbered above and named in English below.
+    expect(renderToString(<TreeOfLife id="t" />)).toBe(
+      renderToString(
+        <TreeOfLife
+          id="t"
+          field="name.roman"
+          topText="index"
+          bottomText="name.en"
+          colorScale="queen"
+          letterAttr="hermetic"
+          fontSize={10}
+        />,
+      ),
+    );
+    // A field given sizes its own labels, as it did.
+    expect(renderToString(<TreeOfLife id="t" field="name.roman" />)).toBe(
+      renderToString(<TreeOfLife id="t" field="name.roman" fontSize={12} />),
+    );
+  });
+
+  it("fades every sphere for a null activeSephirah, and none without one", () => {
+    const faded = (html: string) => count(html, /<circle [^>]*opacity="0.1"/g);
+    expect(faded(renderToString(<TreeOfLife />))).toBe(0);
+    expect(faded(renderToString(<TreeOfLife activeSephirah="tiferet" />))).toBe(
+      9,
+    );
+    expect(faded(renderToString(<TreeOfLife activeSephirah={null} />))).toBe(
+      10,
+    );
   });
 
   it("draws Da'at in the Queen scale only, as the app does", () => {
