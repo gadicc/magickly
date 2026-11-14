@@ -2543,8 +2543,8 @@ fixes. `bf8f249a` corrects the data and `a88d9c6d` bumps
   `search:compare` for the comparison profile, from warm caches, none by
   `search:publish`).
 - **The sign-off.** `astrology/zodiac.json5`'s Sources row says where the
-  permutations come from and is signed `2026-11-14`, as for 0.2.0; that
-  date is Gadi's to confirm before the merge. The kameas have no row:
+  permutations come from and is signed `2026-11-14`, as for 0.2.0; Gadi
+  confirmed that date on 14 November 2026. The kameas have no row:
   `kameas.ts` is code, with its own README section, which now names the
   misprints.
 
@@ -3107,6 +3107,8 @@ keeps CI from publishing.
      have versions, and each row names every version and its source
      ([below](#the-roses-and-the-candlesticks-versions-14-november-2026)).
      Edit a row first if its answer changes it.
+     **Done:** Gadi signed off every row, all 16, on 14 November 2026
+     (`2026-11-14` in each "Signed off").
    - **The bump to `0.1.0-rc.0`**, in
      `packages/magick-components/package.json`. The same commit changes
      the notes that say the components are not on npm yet, which nothing
