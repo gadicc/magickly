@@ -124,6 +124,12 @@ Follow-ups are separate from the completed migration work:
   files', and G′ bumps on a branch that reaches `main` only after the
   hand publish
   ([review](080-open-source-packages.md#stage-g-review-14-november-2026)).
+  After the provenance check: rebased onto `gate/data-021` (magick-data
+  0.2.1), the Hegemon's lamen a black cross on white, the shewbread's
+  archangels named in Hebrew, five Provenance rows given their sources,
+  and G′ merging only `gate/data-021` before the hand publish; the rose
+  and candlestick rows wait for their versions
+  ([plan 080](080-open-source-packages.md#the-provenance-check-14-november-2026)).
 - 13 November 2026: Dependabot alerts #362 (zod), #364 (glob) and #366
   (minimatch) fixed by a `@vercel/functions` bump and parent-scoped
   overrides of Serwist's exact zod and glob pins (glob 14 checked against

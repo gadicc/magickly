@@ -2496,7 +2496,7 @@ tree, every step at 0, coverage at the first attempt.
 
 A patch, from the provenance check of `magick-components` and
 `magick-data` before the components' first publish. Gadi approved the
-fixes. `bf8f249a` corrects the data and `(this commit)` bumps
+fixes. `bf8f249a` corrects the data and `a88d9c6d` bumps
 `magick-data` to 0.2.1 and records it; on `gate/data-021` from `main` at
 `6d6bfab6`, not merged.
 
@@ -2559,7 +2559,7 @@ coverage at the first attempt.
 | Commit | What |
 | --- | --- |
 | `bf8f249a` | `fix(magick-data): Give each sign its own banner` |
-| (this commit) | `fix(magick-data): Release 0.2.1` (the bump and this section) |
+| `a88d9c6d` | `fix(magick-data): Release 0.2.1` (the bump and this section) |
 
 ## The API before publishing (14 November 2026)
 
@@ -2746,12 +2746,12 @@ changed (the halls draw the same markup) and were not regenerated.
 
 | Commit | What |
 | --- | --- |
-| `f1e1402a` | `refactor(components): Split the hall's entries` |
-| `c0c29f73` | `refactor(components): Rename and trim the entries` |
-| `e13df1de` | `refactor(components): Settle the props and defaults` |
-| `92c5d1e6` | `refactor(components): Spell identifiers the American way` |
-| `775606da` | `feat(components): Draw the Moon on its own` |
-| `16e1fe62` | `refactor(components): Name the default hall art in capitals` |
+| `4afe2791` | `refactor(components): Split the hall's entries` |
+| `6117d63b` | `refactor(components): Rename and trim the entries` |
+| `96dd79cf` | `refactor(components): Settle the props and defaults` |
+| `ea0fafca` | `refactor(components): Spell identifiers the American way` |
+| `99299701` | `feat(components): Draw the Moon on its own` |
+| `66680a08` | `refactor(components): Name the default hall art in capitals` |
 | (this commit) | `docs(plans): Record the API before publishing` |
 
 Every code commit passed stage E's gate (the gate with the package's
@@ -2788,7 +2788,7 @@ tests), and a second whole gate passed every step.
 
 ### After the review (14 November 2026)
 
-An adversarial review of this branch at `de1dfec3`, which rendered the
+An adversarial review of this branch at `82ac507c`, which rendered the
 new API rather than only reading it, found a hang, types that said less
 than the code, markup that was not XML, and a default that changed the
 drawing when stated. Gadi decided every item the same day, and the five
@@ -2880,27 +2880,27 @@ documentation screenshots were not regenerated.
 
 | Commit | What |
 | --- | --- |
-| `b680d3b2` | `fix(components): Refuse an invalid Moon date` |
-| `d1e8bf17` | `fix(components): Settle the Tree's defaults` |
-| `a0c3cf8d` | `fix(components): Make label={false} decorative` |
-| `caf04c63` | `refactor(components): Settle the hall's names` |
-| `2b104b44` | `docs(components): Check the README's TS blocks` |
+| `66b07f94` | `fix(components): Refuse an invalid Moon date` |
+| `533d8a21` | `fix(components): Settle the Tree's defaults` |
+| `f2a1bb4e` | `fix(components): Make label={false} decorative` |
+| `cc89e97e` | `refactor(components): Settle the hall's names` |
+| `87b52643` | `docs(components): Check the README's TS blocks` |
 | (this commit) | `docs(plans): Record the API after its review` |
 
 Every code commit passed stage E's gate on its own tree, every step at
 0. Two needed their whole gate run again, both on timing tests in files
-they do not touch, at load averages up to 29: `d1e8bf17` failed
+they do not touch, at load averages up to 29: `533d8a21` failed
 `TempleHallTabs.test.tsx`'s frame-timing test (its automatic rerun
-passed), and `2b104b44` that test and then, on the rerun, a `TIMEOUT` in
+passed), and `87b52643` that test and then, on the rerun, a `TIMEOUT` in
 `r2RitualStorage.test.ts`. Each file passed alone on the same tree, and
-a second whole gate passed every step. `a0c3cf8d`'s subject was
+a second whole gate passed every step. `f2a1bb4e`'s subject was
 reworded after its gate, which ran on it as `d57bb475`; its tree,
 `6c24c6a0`, is the one the gate checked.
 
 ## Stage G (14 November 2026)
 
 `magick-components` made publishable the way `magick-data` is, on
-`gate/stage-g` from `gate/components-api` at `ddcc2395`; not merged. The
+`gate/stage-g` from `gate/components-api` at `dd34e92f`; not merged. The
 version stays 0.0.0: the owner bumps it after the sign-off
 ([G′](#stage-g-the-owners-steps)). Each code commit passed stage E's
 gate on its own tree.
@@ -2942,7 +2942,8 @@ gate on its own tree.
 - **The kept tarball.** `pnpm --filter magick-components smoke
   --keep-tarball <path>` keeps the verified tarball and prints its
   SHA-256 and `integrity sha512-…`, as magick-data's does. At
-  `ca2eaa4d`, version 0.0.0: 169 files, 196,765 bytes packed and 592,027
+  `ca2eaa4d` (before the [second rebase](#the-rebase-onto-main-14-november-2026),
+  now `15caf323`), version 0.0.0: 169 files, 196,765 bytes packed and 592,027
   unpacked (161, 192,411 and 569,542 at the hardening), SHA-256
   `20567d9375847e6057da38f405c28eaf62e056ac1bfd66e8b7b48be3918f99eb`,
   integrity
@@ -3029,10 +3030,10 @@ planned.
 
 | Commit | What |
 | --- | --- |
-| `f3c28ac9` | `ci(publish): Publish magick-components too` |
-| `1c467dcb` | `build(components): Make the package publishable` |
-| `3981a5b3` | `feat(gd): Credit the drawn halls to the components` |
-| `ca2eaa4d` | `feat(open-source): Ready the components' card` |
+| `75db1631` | `ci(publish): Publish magick-components too` |
+| `dbd4051f` | `build(components): Make the package publishable` |
+| `32efbf3e` | `feat(gd): Credit the drawn halls to the components` |
+| `15caf323` | `feat(open-source): Ready the components' card` |
 | (this commit) | `docs(plans): Record stage G` |
 
 Every code commit passed stage E's gate on its own tree, every step at
@@ -3066,60 +3067,60 @@ In this order, with Node 24 (npm 11.5.1 or later; 11.15.0 or later for
 `npm trust`). The `npm` environment, 2FA and the `magickly` organisation
 already exist from stage A′.
 
-The bump to the release candidate is committed on a branch, published by
-hand from that branch's commit, and reaches `main` only once npm has it
-([the review](#stage-g-review-14-november-2026), M1, L2 and L8). The
-site, deployed from `main`, then never names a package npm does not
-have, and `publish.yml` never sees `0.1.0-rc.0` before npm does: npm may
-create a `0.0.0-stage` placeholder before a first publish, and with the
-package on the registry a 404 no longer keeps CI from publishing.
+Everything for the first publish stays on `gate/stage-g` until npm has
+the release candidate: stage G, the sign-off's commit, the bump to
+`0.1.0-rc.0` and, still to come, the rose-cross sigil's and the
+candlestick's versions. Only `gate/data-021` reaches `main` first, so
+that CI publishes magick-data 0.2.1, which the components' manifest
+needs; the branch, built on it, is then published by hand from its own
+commit and reaches `main` only once npm has it ([the
+review](#stage-g-review-14-november-2026), M1, L2 and L8). The site,
+deployed from `main`, then never names a package npm does not have, nor
+credits a hall to it (L8), and `publish.yml` never sees `0.1.0-rc.0`
+before npm does: npm may create a `0.0.0-stage` placeholder before a
+first publish, and with the package on the registry a 404 no longer
+keeps CI from publishing.
 
-1. **Push `main` and wait for magick-data 0.2.0.** `publish.yml`
-   publishes it ([above](#magick-data-020-14-november-2026)). The
-   components' release candidate depends on `magick-data` `^0.2.0`
-   (`workspace:^`, packed from 0.2.0), so do not publish it before
-   `npm view magick-data@0.2.0 dist.integrity` answers. (Done by 12:53
-   on 14 November: it answered
+1. **Merge `gate/data-021` alone into `main` and push it**: `git switch
+   main && git merge --ff-only gate/data-021 && git push origin main`.
+   `publish.yml` publishes magick-data 0.2.1
+   ([above](#magick-data-021-14-november-2026)); stage G is not merged.
+   (`main` already had 0.2.0, by 12:53 on 14 November:
    `sha512-kTzQQeVGLJpoZQtarsTcZeQPD/4MATl8B5fQNzwI8/SsW5h9D/z/ljuR5DsQuLTWZOe73TUh/TwazYUtLvimVg==`.)
    Check that the name is still free: `npm view magick-components`
    should fail with E404 ([Risks](#risks)).
-2. **Merge stage G.** `publish.yml`'s `decide` skips magick-components
-   (404: its first publish is by hand) and, magick-data being published,
-   skips it too.
-3. **The provenance sign-off.** Read each row of the README's
-   Provenance table against the drawing, settle the rows below, and put
-   the date (`YYYY-MM-DD`) in every row's "Signed off". The tests check
-   only the date; it is the owner's word that the row is right. At
-   0.0.0 nothing publishes, so this may land on `main`. Rows this plan
-   does not settle:
-   - **The rose-cross sigil**: the rose's letters are geometry written
-     in `gd/roseSigilGeometry`; no source for that layout is recorded.
-   - **The Tree of Life and the Grade Tree**: drawn in code from
-     magick-data; no source for the drawing's layout is recorded.
-   - **The lamens**: `gd/Lamen`'s comment cites Regardie vols. 2 and 3
-     (1938–39) for the lamens and collars, and compares Zalewski (1991)
-     and the Ciceros (2004), modern works, for the rings and the
-     Hierophant's nemyss; confirm that nothing but facts came from the
-     modern ones.
-   - **The candlestick, the shewbread and the fylfot cross**: drawn in
-     code from magick-data, with no source recorded for their layouts.
-   - **The kameas' figure** is a plain grid around Agrippa's squares;
-     confirm.
-   Edit a row first if its answer changes it.
-4. **Bump to `0.1.0-rc.0` on a branch, not `main`**: `git switch -c
-   components-rc main`, and set the version in
-   `packages/magick-components/package.json`. The same commit changes
-   the notes that say the components are not on npm yet, which nothing
-   switches: the home page's Open source item (`src/app/HomeText.tsx`),
-   the components' index (`ComponentsText.tsx`) and each component's
-   page (`ComponentPage.tsx`), with their tests, and refreshes the search
-   vectors for that prose. An agent can prepare and gate the commit.
-   Push the branch, not `main` (a pull request runs `ci.yml`, whose
-   `registry` job decides and dry-runs the publish), and do not merge
+2. **Wait for magick-data 0.2.1.** The components' release candidate
+   depends on `magick-data` `^0.2.1` (`workspace:^`, packed from
+   0.2.1), so go on only once `npm view magick-data@0.2.1
+   dist.integrity` answers.
+3. **The provenance sign-off and the bump, on the branch.** Both are
+   commits on `gate/stage-g` (or a branch from its tip), after the
+   rose-cross sigil's and the candlestick's versions have landed there:
+   - **The sign-off.** Read each row of the README's Provenance table
+     against the drawing and put the date (`YYYY-MM-DD`) in every row's
+     "Signed off". The tests check only the date; it is the owner's word
+     that the row is right. The provenance check
+     ([below](#the-provenance-check-14-november-2026)) settled the Tree
+     and the Grade Tree, the lamens, the table of shewbread, the fylfot
+     cross and the kameas. Two rows it did not settle: **the rose-cross
+     sigil**, whose rose's letters are geometry written in
+     `gd/roseSigilGeometry`, and **the candlestick**; both get
+     selectable versions first, and their rows change with them. Edit a
+     row first if its answer changes it.
+   - **The bump to `0.1.0-rc.0`**, in
+     `packages/magick-components/package.json`. The same commit changes
+     the notes that say the components are not on npm yet, which nothing
+     switches: the home page's Open source item (`src/app/HomeText.tsx`),
+     the components' index (`ComponentsText.tsx`) and each component's
+     page (`ComponentPage.tsx`), with their tests, and refreshes the
+     search vectors for that prose. An agent can prepare and gate the
+     commit.
+4. **Push the branch for CI**, not `main`: a pull request runs `ci.yml`,
+   whose `registry` job decides and dry-runs the publish. Do not merge
    it yet.
 5. **Publish the release candidate by hand**, from a clean checkout of
-   exactly that branch's commit (`<sha>`), each command only if the one
-   before it succeeded:
+   exactly the branch's tip that CI passed (`<sha>`), each command only
+   if the one before it succeeded:
 
    ```sh
    git clone https://github.com/gadicc/magickly.git && cd magickly &&
@@ -3134,19 +3135,20 @@ package on the registry a 404 no longer keeps CI from publishing.
    ```
 
    with your own npm login. The smoke test builds both packages itself,
-   and its registry fixture installs magick-data 0.2.0 from npm; with
-   `--keep-tarball` past 0.0.0 it fails, rather than skipping, if npm
-   lacks that version. The `test` line refuses a tarball of any other
-   version. Publish only the file it kept. It prints the tarball's
-   SHA-256 and `integrity sha512-…`, and `npm view` should print the
-   same integrity; if it answers E404, npm's CDN has not caught up, so
-   run it again in a minute or two.
+   and its registry fixture installs magick-data 0.2.1 from npm, as the
+   tarball's `^0.2.1` asks; with `--keep-tarball` past 0.0.0 it fails,
+   rather than skipping, if npm lacks that version. The `test` line
+   refuses a tarball of any other version. Publish only the file it
+   kept. It prints the tarball's SHA-256 and `integrity sha512-…`, and
+   `npm view` should print the same integrity; if it answers E404, npm's
+   CDN has not caught up, so run it again in a minute or two.
 6. **Fast-forward `main` to the branch and push it**: `git switch main
-   && git merge --ff-only components-rc && git push origin main` (if
-   `main` has moved since, `git merge --no-ff components-rc`, so that
+   && git merge --ff-only gate/stage-g && git push origin main` (if
+   `main` has moved since, `git merge --no-ff gate/stage-g`, so that
    the published commit stays in its history). `decide` finds
-   `0.1.0-rc.0` published and skips it, and from this push the site
-   offers `npm i magick-components`, which now works.
+   `0.1.0-rc.0` published and skips it, and magick-data 0.2.1 too, and
+   from this push the site offers `npm i magick-components`, which now
+   works, and credits the halls to it.
 7. **Configure the trusted publisher, allowing `npm publish`.** On
    npmjs.com, the package's Settings › Trusted publishing › GitHub
    Actions: user `gadicc`, repository `magickly`, workflow filename
@@ -3208,6 +3210,55 @@ differs from the tree its gate passed only in that test file, which
 passed its own gate as `6d6bfab6`. The tip, with this note, was gated
 again on its own tree.
 
+**Again, onto `gate/data-021` (14 November).** The branch was rebased
+onto `a88d9c6d`, so that the components build on magick-data 0.2.1
+([above](#magick-data-021-14-november-2026)) and its manifest asks
+`^0.2.1`. Each rebased commit's tree was compared with the tree its
+gate passed (`git diff --name-only old new`). Only the first,
+`4afe2791`, differs by exactly what `gate/data-021` changed (the same
+patch), so its gate still covers it. The data changed the search
+catalogue, so the six commits that refresh the vectors conflicted and
+had them refreshed again for their own trees, and every commit after
+the first carries vectors of its own; the credit commit's Zelator 2 PNG
+pins conflicted too and were taken again, each its 0.2.1 value with the
+credit swapped (checked as before, 23 bytes, one occurrence). Those 21
+were each gated again on their own trees (below). The hashes in this
+plan are the rebased ones; the kept tarball's figures under
+[stage G](#stage-g-14-november-2026) are `ca2eaa4d`'s, before this
+rebase, when the manifest asked `^0.2.0`.
+
+| Before | After | Commit |
+| --- | --- | --- |
+| `f1e1402a` | `4afe2791` | `refactor(components): Split the hall's entries` |
+| `c0c29f73` | `6117d63b` | `refactor(components): Rename and trim the entries` |
+| `e13df1de` | `96dd79cf` | `refactor(components): Settle the props and defaults` |
+| `92c5d1e6` | `ea0fafca` | `refactor(components): Spell identifiers the American way` |
+| `775606da` | `99299701` | `feat(components): Draw the Moon on its own` |
+| `16e1fe62` | `66680a08` | `refactor(components): Name the default hall art in capitals` |
+| `de1dfec3` | `82ac507c` | `docs(plans): Record the API before publishing` |
+| `b680d3b2` | `66b07f94` | `fix(components): Refuse an invalid Moon date` |
+| `d1e8bf17` | `533d8a21` | `fix(components): Settle the Tree's defaults` |
+| `a0c3cf8d` | `f2a1bb4e` | `fix(components): Make label={false} decorative` |
+| `caf04c63` | `cc89e97e` | `refactor(components): Settle the hall's names` |
+| `2b104b44` | `87b52643` | `docs(components): Check the README's TS blocks` |
+| `ddcc2395` | `dd34e92f` | `docs(plans): Record the API after its review` |
+| `f3c28ac9` | `75db1631` | `ci(publish): Publish magick-components too` |
+| `1c467dcb` | `dbd4051f` | `build(components): Make the package publishable` |
+| `3981a5b3` | `32efbf3e` | `feat(gd): Credit the drawn halls to the components` |
+| `ca2eaa4d` | `15caf323` | `feat(open-source): Ready the components' card` |
+| `72daf544` | `24f7f1a5` | `docs(plans): Record stage G` |
+| `0198b6b9` | `923055bf` | `docs(plans): Record the rebase onto main` |
+| `b4d62841` | `00ca46d0` | `ci(publish): Refuse an uninstallable publish` |
+| `42591bee` | `0edd722b` | `fix(open-source): Give the credit the files carry` |
+| `e1559b56` | `36d52cdc` | `docs(plans): Record the stage G review` |
+
+The 21 from `6117d63b` to `36d52cdc` each passed stage E's gate again
+on their own trees, every step at 0, coverage at the first attempt;
+`4afe2791` keeps `f1e1402a`'s. The vectors were refreshed from warm
+caches: `search:compare` embedded 3 passages for each of its two
+profiles in the credit commit and in the card's, none in the other
+four, and `search:publish` none.
+
 ### Stage G review (14 November 2026)
 
 A final adversarial review of stage G, on the rebased branch, before the
@@ -3218,7 +3269,7 @@ first publish. Its findings and what was done, on `gate/stage-g`:
 | H1 | If one push bumped both packages and magick-data's leg failed or lost the race, the components still published `magick-data: ^X` for an X npm lacked, permanently; the smoke test's registry fixture only skipped then | `scripts/npm-publish-dependencies.mjs` runs in `publish` before `npm publish`, for every package: it reads the tarball's manifest with `tar`, and each dependency on a package of this repository needs a version on npm satisfying its range. It waits for one this run publishes, asking every 15 s for five minutes, and fails at once for any other; Node's modules only, nothing from the tarball runs, and magick-data's leg waits on nothing. The components' smoke test fails a tarball kept past 0.0.0 against a magick-data npm lacks, unless `--allow-unpublished-data`: `publish.yml`'s build leg passes it only when the run publishes magick-data, `ci.yml` always (below) |
 | M1 | With npm's `0.0.0-stage` placeholder on the registry, the decision would publish 0.0.0 | The decision refuses 0.0.0 whenever the registry has the package, in both of `publish.yml`'s decisions; a 404 still skips, since the first publish is by hand. G′ keeps the bump off `main` until npm has it |
 | L1 | The card's "not on npm yet" paragraph, JSX inside a condition, would stay in the search catalogue after the bump | Removed. At 0.0.0 the card still offers no `npm i` and links the source, and the page's opening, an expression the catalogue leaves out, says the components will follow |
-| L2, L8 | The site, deployed from `main`, could name the package before npm had it, between the bump reaching `main` and the hand publish | G′ bumps on a branch, publishes from its commit, and only then moves `main` |
+| L2, L8 | The site, deployed from `main`, could name the package before npm had it, between the bump reaching `main` and the hand publish; and merging stage G first (G′ step 2 as it stood) would deploy the halls' credit "drawn by magick-components (MIT)" before npm had the package | G′ bumps on a branch, publishes from its commit, and only then moves `main`. Since the provenance check, L8 is closed too: only `gate/data-021` (magick-data 0.2.1) reaches `main` first, and stage G, the sign-off and the bump stay on `gate/stage-g` until npm has the release candidate, `main` then fast-forwarding to the published commit (G′ steps 1–6) |
 | L3 | The hub said to credit "drawn by magick-components (MIT)", the files carry "Magick.ly, drawn by magick-components (MIT)", and the test said they agreed while asserting two different strings | The hub and `/about` give the files' credit; the test asserts that the hub's instruction contains `GD_HALL_LICENCE.creditText` |
 | L4 | A hall page said the package draws "the same image", but the served image sets the tablets in the app's Enochian font, which the package does not ship | "The same drawing", on the hall pages and the hub; the test follows |
 | L5 | Nothing pinned the editor's exported XMP credit | `exportCredit.test.ts` ties it to `creditText`; `dc:description` is unchanged |
@@ -3236,7 +3287,7 @@ Two things beyond the findings:
 - **Three notes say the components are not on npm yet** with no
   condition: the home page's Open source item, the components' index and
   each component's page. Stage G's "the bump will change no extracted
-  prose" was wrong; G′ step 4 now changes them in the bump's commit, with
+  prose" was wrong; G′ step 3 now changes them in the bump's commit, with
   the search vectors. Likewise the card is no longer "a little early"
   after the bump, since `main` gets it only after the publish.
 
@@ -3254,8 +3305,8 @@ sign-off, which fails a version past 0.0.0 first.
 
 | Commit | What |
 | --- | --- |
-| `b4d62841` | `ci(publish): Refuse an uninstallable publish` (H1, M1, L7) |
-| `42591bee` | `fix(open-source): Give the credit the files carry` (L1, L3–L6) |
+| `00ca46d0` | `ci(publish): Refuse an uninstallable publish` (H1, M1, L7) |
+| `0edd722b` | `fix(open-source): Give the credit the files carry` (L1, L3–L6) |
 | (this commit) | `docs(plans): Record the stage G review` (G′, and `isOnNpm`'s comment) |
 
 Each passed stage E's gate on its own tree, every step at 0, but for
@@ -3264,6 +3315,69 @@ average near 37, in files it does not touch. They passed alone, the
 gate's rerun passed, and so did the whole gate run again. The credit
 commit refreshed the search vectors (3,061 passages; 52 embedded by `search:compare` for
 the Gemini profile from warm caches, none by `search:publish`).
+
+### The provenance check (14 November 2026)
+
+Before the first publish, two research passes read the drawings whose
+Provenance rows G′ left open against public-domain scans, citing each
+by archive.org item and leaf, with scripts that output facts only.
+Modern editions were looked at for comparison, never cited. Gadi
+approved the fixes; on `gate/stage-g`, after the second
+[rebase](#the-rebase-onto-main-14-november-2026), and in magick-data
+0.2.1 ([above](#magick-data-021-14-november-2026)).
+
+- **The Tree and the Grade Tree.** Our own construction, four equal
+  circles through each other's centres. Its proportions agree within
+  1–2 % with the Minutum Mundum plate in Regardie's vol. 1 (1937, leaf
+  n182); the six spheres round Tiphareth are vol. 2's hexagram (1938,
+  p. 195); the arrangement is Kircher's (1653). No source describes the
+  circles. Only the row changed.
+- **The lamens.** Drawn from geometry; compared with Mathers' manuscript
+  sheet and a modern edition's figure, nothing was copied. One fault:
+  the Hegemon's was a white cross on a black disc, where Regardie's
+  vol. 3 (1939), p. 95 (leaf n87), gives the black Calvary cross and
+  Mathers' sheet a black cross on white with a black border. It is now
+  a black cross on a white disc, the ring white as every floor
+  officer's, by our convention (`850b4bc1`). Every hall but the
+  Portal's draws him, so twelve halls' pins and snapshots moved, each
+  in that lamen's two fills alone, and the five documentation
+  screenshots that show him were recaptured.
+- **The fylfot cross.** The code's table matches the Third Knowledge
+  Lecture's in Regardie's vol. 1 (1937), p. 131 (leaf n122), square for
+  square. The Equinox I(2)'s Diagram 14 (1909) is unlabelled and
+  mirrored.
+- **The kameas.** All seven squares match Agrippa's of 1533 cell by
+  cell, but for two misprints in his printing that the squares correct:
+  Venus, row 4, column 5 (45 for 43, leaf n166) and the Moon, row 1,
+  column 8 (45 for 54, leaf n168). magick-data 0.2.1 says so where it
+  had said "as he writes them".
+- **The table of shewbread.** Its composition follows the Zelator
+  ritual and the Equinox I(2)'s Diagram 16. Two faults: the inner
+  circles printed the archangels' ids, `raphael` and so on, in
+  lower-case Latin, now their Hebrew names from magick-data, as the
+  other labels are (`b2159ba9`); and Cancer and Sagittarius repeated
+  Leo's and Capricorn's permutations of the Name, a data bug fixed in
+  magick-data 0.2.1.
+- **The rose-cross sigil and the candlestick.** Each differs in places
+  from the 1909–39 sources, and both are to get selectable versions
+  after research still under way. Their rows are as they were, and G′
+  step 3 waits for them.
+
+The README's Provenance rows for the Tree, the lamens, the shewbread,
+the fylfot cross and the kameas now give these sources (`fa5cb4c5`);
+every "Signed off" cell is still empty. G′ was rewritten (L8, above):
+only `gate/data-021` reaches `main` before the release candidate is on
+npm.
+
+| Commit | What |
+| --- | --- |
+| `850b4bc1` | `fix(components): Draw the Hegemon's cross in black` |
+| `b2159ba9` | `fix(components): Name the shewbread's archangels` |
+| `fa5cb4c5` | `docs(components): Give five drawings their sources` |
+| (this commit) | `docs(plans): Record the provenance check` (G′, the rebase) |
+
+Each passed stage E's gate on its own tree, every step at 0, coverage
+at the first attempt.
 
 ## Review (11 November 2026)
 
