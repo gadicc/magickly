@@ -2561,6 +2561,228 @@ coverage at the first attempt.
 | `bf8f249a` | `fix(magick-data): Give each sign its own banner` |
 | (this commit) | `fix(magick-data): Release 0.2.1` (the bump and this section) |
 
+## The API before publishing (14 November 2026)
+
+Once `magick-components` is on npm, every rename is a breaking change, so
+its public API was settled before the first publish. A fresh-eyes review
+by Fable 5.2 (14 November, on `main` at `15ae8087`) listed what a
+stranger would trip on: entry names that break the package's own
+pattern, props that mean two things, app defaults, exports nobody
+should depend on, and the Moon's drawing not exported at all. Gadi
+decided every item the same day. Built on `gate/components-api`, from
+`main` at `15ae8087`; not merged. Stage G (dropping `private`, the
+publish guards, `publish.yml`) stays separate, as do composable JSX hall
+tags and `isolatedDeclarations`.
+
+### Decisions (Gadi, 14 November 2026)
+
+1. **Entry names.** A PascalCase entry is one component:
+   `astrology/PlanetarySpirit`, `gd/FylfotCross`,
+   `gd/SevenBranchedCandlestick`. Every component module has a default
+   export and a named export of its component, `GdHall` included.
+2. **The Tree's click handler goes.** The effect that set `onclick` on
+   each link when given a `ref` is deleted; `ref` is
+   `React.Ref<SVGSVGElement>`; plain links navigate.
+3. **Tree defaults.** No links unless `sephirahHref` or `pathHref` is
+   given. The defaults are the Tree page's (`TEXT_DEFAULTS`): `field`
+   `name.roman`, `topText` `index`, `bottomText` `name.en`,
+   `colorScale` `queen`, `letterAttr` `hermetic`. `Tablet`'s `frame` is
+   off by default. Every app and registry call site that relied on the
+   old defaults passes them, so nothing moves.
+4. **`PlanetarySpirit`** takes `{ spirit, className, style, ink,
+   "aria-hidden" }`, no longer every CSS property as a prop; `ink` is the
+   stroke, black by default.
+5. **Consistent names.** `id` is a DOM id only: `Tablet`'s data key is
+   `tablet` and the spirit's `spirit`, as `Kamea` has `planet` and
+   `Lamen` `officer`. Moon's `moonPadding` is `padding`; RoseSigil's
+   `sigilText` is `text` and `svgRef` `ref`; Lamen's circle styles are
+   `ringStyle` and `discStyle`; Kamea's `size` is `width` and `height`;
+   Tablet's `alt` and `reversed` are `showSecondLetters` and
+   `mirrorReversed`; the Tree's `active` is `activeSephirah`, `null`
+   lighting none. Both href functions are given the same kind of thing,
+   and `label` means one thing everywhere. `topText`, `bottomText` and
+   `letterAttr` stay, as the image API's names.
+6. **Spelling.** Identifiers are American (`color`, `license`, `center`,
+   `gray`); prose stays British. The hall description's documented
+   spellings become `center` and `gray`, with `centre` and `grey`
+   accepted where a hall is read, so stored rituals keep working.
+7. **The hall's entries.** `gd/hall` (stable): what a page needs to
+   draw, check or describe a hall. `gd/hall/presets` (stable), as
+   before. `gd/hall/editor` (new, unstable): what magick.ly's editor
+   reads beyond those. The other hall subpaths go.
+8. **Trim the exports.** The app's hooks and helpers move into the app;
+   the rose sigil's optimiser internals and test-only exports become
+   private; generic names get specific ones; lower-case exported
+   constants take the package's upper case; `RoseSigil` loses `debug`;
+   the retrograde is `Date`s, so luxon leaves the public types.
+9. **Moon and Mercury.** The tiles are `astrology/MoonWidget` and
+   `astrology/MercuryWidget`; `astrology/Moon` is the reusable drawing,
+   server-capable. moon-phase's notice stays on every file with its
+   code.
+10. **FylfotCross.** `onCellClick({ id, row, column, expected })`, a
+    read-only `FYLFOT_CELLS`, a documented type for `""` and `"cursor"`,
+    and a font a client render keeps.
+11. **README.** A sentence that a drawing's markup is not API, apart from
+    documented classes and props; the entry table and every example
+    current and type-checked by the smoke test; the "pays only for what
+    it imports" claim made true or corrected.
+
+### What changed
+
+The entries (24 and `fonts/*`, from 35):
+
+| Before | Now |
+| --- | --- |
+| `astrology/planetarySpirits` | `astrology/PlanetarySpirit` |
+| `gd/symbols/fylfot-cross` | `gd/FylfotCross` |
+| `gd/SevenBranchedCandleStick` | `gd/SevenBranchedCandlestick` |
+| `astrology/Moon` (the tile) | `astrology/MoonWidget` |
+| (none) | `astrology/Moon`, the drawing |
+| `astrology/Mercury` | `astrology/MercuryWidget` |
+| `gd/hall/GdHall`, `gd/hall/aspect`, `gd/hall/describe`, `gd/hall/layout`, `gd/hall/types`, `gd/hall/validate` | `gd/hall` |
+| `gd/hall/attributes`, `gd/hall/planets`, `gd/hall/spec`, `gd/hall/vocabulary` | `gd/hall/editor` for what the editor reads; the rest private |
+| `hooks/useHydrated`, `astrology/planetName`, `astrology/planetDays` | the app: `src/ui/useHydrated.ts`, `src/lib/planetName.ts`, `src/lib/planetDays.ts` (the package keeps a private copy of the hook) |
+
+The props:
+
+| Component | Before | Now |
+| --- | --- | --- |
+| `TreeOfLife`, `GradeTree` | `active` (a sephirah; the grade page passed `"none"`) | `activeSephirah`, `null` for none lit |
+| | links by default (`/kabbalah/…`, the Grade Tree's `/gd/grade/…`) | none without `sephirahHref` or `pathHref` |
+| | `sephirahHref` given a wrapper (`s.data` the row) | given the `SephirahRow`, as `pathHref` is given the path's row |
+| | `field` `index`, `bottomText` empty, size from the field | `name.roman`, `name.en`, and 10 with the default field |
+| | `ref` a ref object, with the click handler | `React.Ref<SVGSVGElement>`, no handler |
+| `Tablet` | `id`, `alt`, `reversed` | `tablet`, `showSecondLetters`, `mirrorReversed` |
+| | `frame` on | off |
+| | `label`: `true`, a string or `false` | a string or `false`; not given, its own name |
+| `PlanetarySpirit` | `id`, and every CSS property | `spirit`, `className`, `style`, `ink`, `aria-hidden` |
+| `MoonWidget` | `moonPadding` | `padding` |
+| `RoseSigil`, `RoseSigilImage` | `sigilText`, `svgRef` | `text`, `ref`; `RoseSigil` without `debug` |
+| `Lamen` | `outerCircleStyle`, `innerCircleStyle` | `ringStyle`, `discStyle` |
+| `Kamea` | `size`; no `label`, decoration | `width`, `height`; not given, named for its planet ("Kamea of Saturn"), `false` for none |
+| `FylfotCross` | `onClick(id, rowIndex, colIndex, correctId)` | `onCellClick({ id, row, column, expected })` |
+| `Moon` (new) | | `date`, `phase`, `width`, `height`, `hemisphere` (`north` or `south`) |
+
+The exports:
+
+| Before | Now |
+| --- | --- |
+| `fylfot`, `typeFromId` | `FYLFOT_CELLS`, `fylfotSymbolTable`; new `FylfotSymbolId`, `FylfotBlank`, `FylfotCell`, `FylfotCellClick` |
+| `Point` (the sigil's) | `SigilPoint` |
+| `Planet`, `PLANETS`, `PLANET_NAMES` (the hall's) | `HallPlanet`, `HALL_PLANETS`, `HALL_PLANET_NAMES` (in `gd/hall/editor`) |
+| `Rect` | `HallRect` |
+| `defaultHallArt` | `DEFAULT_HALL_ART` |
+| `moonMeanInclination` | `MOON_MEAN_INCLINATION` |
+| `HALL_COLOURS`, `LIGHT_COLOURS`, `LightColour` | `HALL_COLORS`, `LIGHT_COLORS`, `LightColor` (private) |
+| `HallArtProvenance.licence` | `license` |
+| `KameaGeometry.centre()` | `center()` |
+| `Retrograde` of luxon `DateTime`s | of `Date`s, each the start of its local day |
+| `hallPoint()` gave `centre` for `center` | gives `center` for `centre`; new `hallColor()` and `hallSpellingAlias()` in `gd/hall/editor` |
+| `clamp`, `attr`, `IDENTIFIER`, `dais`, `romanNumeral`, `TRUMPS`, `labelFont`, `wrapText`, the hall's aspect and layout constants | private (the editor has its own `clamp`) |
+| `objective`, `arrayToPoints`, `pointsToArray`, `largeArc`, `letterIJ`, `SIGIL_MAX_EVALUATIONS`, `pathFromPoints`, and `RoseSigilImage`'s re-exports | private, in `roseSigilInternals.ts`; `gd/roseSigilGeometry` keeps `ROSE_LETTERS`, `roseLetters`, `letterPoint`, `sigilPoints` and `SigilPoint` |
+| `Sigils`, `EquinoxSigils`, `VERSION_NAMES`; `TitledPath`, `labelLines`, `pathTitle`, `TreeSephirah` | private (`tabletSigils.tsx`, `treeLabels.ts`) |
+
+How it was done, where the decisions left a choice:
+
+- **The href functions** are both given the magick-data row: the
+  sephirah's `SephirahRow`, as `pathHref` already took the path's. The
+  wrapper's other fields were the drawing's own.
+- **The Tree's font size.** The page draws at 10 with its default field,
+  where `fontSize` from `name.roman` would be 12, so a bare Tree takes
+  10, and a field you give still sizes its own labels (32 for `index`,
+  20 for `name.he`). The image API always gives a field, so its sizes
+  are unchanged.
+- **`label`**: a string names the drawing, `false` leaves it unnamed (no
+  role, no name), and not given, the component names it itself.
+  `Kamea` now does too, from its planet's row ("Kamea of Saturn", "Kamea
+  of Sol", as the hall names them), where it was hidden as decoration.
+- **The sigil's `Point`.** The decisions keep it and also rename generic
+  names; it is `SigilPoint`.
+- **`RoseSigil`'s `debug`.** `/gd/sigils` keeps its Debug view through
+  an app component, `DebugSigil`, that draws `RoseSigilImage` with
+  `debug` and the optimised points; it is not drawn on.
+- **The retrograde's dates.** `MercuryWidget` formats them with luxon
+  inside its lazy import, beside the ephemeris, as before, so luxon is
+  not in the tile's first chunk.
+- **The hall barrel.** `estimateHallAspect` is in `gd/hall`, and the
+  reader imports it from there before the drawing loads. Since the
+  package declares no side effects but its CSS, a bundler takes only
+  `aspect.ts` and what it imports. The reader's boundary test now
+  follows named imports through a re-exporting entry as a bundler does,
+  and the production builds were checked: under webpack the art's chunk
+  is reached only through `import()` (`react-loadable-manifest.json`),
+  and under Turbopack it is in none of the reader's entry chunks.
+- **The hall's spellings.** The readers normalise: `hallPoint()` and the
+  new `hallColor()`, in the layout, the art and the editor; the
+  validator takes both; the editor offers and writes the vocabulary's.
+  The presets keep `centre` where they had it, since the built-in `0=0`
+  ritual holds the Neophyte preset's Pug, which a test holds equal to
+  it.
+- **The magick-data barrel.** The candlestick and the fylfot cross now
+  import the three tables each draws; the Tree and the Grade Tree keep
+  the root entry, since a label may be any field of the graph, and the
+  README says so.
+- **The smoke test** type-checks the README's TSX examples, indented
+  ones included, beside a consumer of the new props with
+  `@ts-expect-error` on old names, and renders the Moon in its Next
+  page. A test holds `tsconfig.build.json`'s files to the exports.
+
+**Nothing a reader sees moved.** Every pinned render hash, byte count
+and snapshot passed unchanged in each gate. The image API keeps its
+query names and its defaults: its Tree maps `active` to
+`activeSephirah`, and draws the links its source SVG always carried.
+The explorer's examples keep their drawings (the Tree's state the old
+defaults, the tablets `frame`), and its image links state the new
+defaults. The explorer gains pages for the Moon's drawing (at `moon`,
+where the tile was) and the tile (`moon-widget`); Mercury's tile moved
+to `mercury-widget`, with a permanent redirect from `mercury`, held by
+a test. The search vectors were refreshed in the second, third and
+fifth commits: `search:compare` embedded what the copied caches lacked
+(326 passages of the Qwen comparison profile in the second, whose
+Gemini count was not kept), then 5 of each profile in the third and the
+fifth; `search:publish` embedded none. The documentation screenshots show no screen whose drawing
+changed (the halls draw the same markup) and were not regenerated.
+
+| Commit | What |
+| --- | --- |
+| `6dd6cc20` | `refactor(components): Split the hall's entries` |
+| `248833cc` | `refactor(components): Rename and trim the entries` |
+| `bab8fee7` | `refactor(components): Settle the props and defaults` |
+| `6223de5b` | `refactor(components): Spell identifiers the American way` |
+| `c97bfc45` | `feat(components): Draw the Moon on its own` |
+| `3094b0fc` | `refactor(components): Name the default hall art in capitals` |
+| (this commit) | `docs(plans): Record the API before publishing` |
+
+Every code commit passed stage E's gate (the gate with the package's
+smoke test) on its own tree, every step at 0. Three failed a first gate
+and were fixed before anything was built on them. The first version of
+the hall split left `editor.ts` out of `tsconfig.build.json`, so the
+smoke test found the entry missing from the tarball; a test now holds
+the build's files to the exports. Its second failed only the formatter.
+The first version of the entries commit took `RoseSigil`'s `debug`,
+which had covered `RoseSigilImage`'s debug circles inside the rose, and
+coverage fell to 87.5 % of its branches; a test of the debug drawing
+restored it. The Moon's commit failed coverage and its rerun on
+5-second timeouts in `sqlLegacyImport.test.ts`, the known flake, at a
+load average near 29; the file passed alone on the same tree (48
+tests), and a second whole gate passed every step.
+
+**Deferred, and for Gadi:**
+
+- **Chakras' `active`** names a chakra, not a sephirah, so it was left;
+  `activeChakra` would match `activeSephirah` and `activePath`, if Gadi
+  wants it before publishing.
+- **`RoseSigilImage`** still requires `showRose` and `debug`; the review
+  listed both as low.
+- **The spirit's dark ink.** `ink.module.css` still selects
+  `[stroke="#000"]`: passing a CSS variable as `ink` would change the
+  light markup, and a variable in a presentation attribute is not
+  reliable across browsers.
+- **Prop types without names** (`Tablet`, `Lamen`) and the review's other
+  medium and low items, which add rather than rename.
+- Stage E's deferrals stand: `isolatedDeclarations`, the publish guards
+  and `publish.yml` (stage G), and checking the Tree page's query.
+
 ## Review (11 November 2026)
 
 Fable 5.2 at high effort, fresh context, `loom-torvalds-review`, on the

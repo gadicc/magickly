@@ -395,6 +395,18 @@ Follow-ups are separate from the completed migration work:
   ([plan 080](080-open-source-packages.md#source-links-and-mirrored-pages-13-november-2026)).
   The tablet notes' new text goes out with `magick-data` 0.2.0
   ([plan 080](080-open-source-packages.md#magick-data-020-14-november-2026)).
+  The components' public API is settled before the first publish
+  (14 November), on `gate/components-api`, not merged: PascalCase
+  entries, one component each, named and default; the hall's twelve
+  subpaths down to `gd/hall`, `gd/hall/presets` and an unstable
+  `gd/hall/editor`; the Tree linking nothing and defaulting to the Tree
+  page's look, its click handler gone; consistent props (`tablet`,
+  `spirit`, `activeSephirah`, `text`, `ref`, `label`); American
+  identifiers, with `centre` and `grey` still read in halls; trimmed
+  exports; the Moon's drawing as `astrology/Moon` and the tiles as
+  `MoonWidget` and `MercuryWidget`. No pin moved; the explorer's
+  Mercury page redirects to `mercury-widget`
+  ([plan 080](080-open-source-packages.md#the-api-before-publishing-14-november-2026)).
   TODO: with Gadi's go-ahead, stage G; stage E's and F's deferred
   items. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups),
