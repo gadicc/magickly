@@ -46,23 +46,38 @@ separate from approval to merge it into the production release branch.
 | 0022 | `chat_research_source_policies`; policy function and three triggers | Versioned source permissions and protection against resets |
 | 0023 | `chat_research_artifacts`; artifact function and three triggers | Bounded retained packets and expired one-way tombstones |
 | 0024 | `chat_research_maintenance`; maintenance function and two triggers | Cleanup target ownership and finite coverage evidence |
+| 0025 | `vector` extension; `chat_research_corpus` schema with six tables and three guard functions | Empty immutable derived-corpus snapshots and exact vector/input membership |
 
-The four files create five empty tables, three trigger functions, eight triggers
+The first four files create five empty tables, three trigger functions, eight triggers
 and nine indexes including primary keys. Their foreign keys, indexes and triggers
 attach only to the new research tables. They do not rewrite old application data,
 create extensions, copy a collection, grant source access, install a schedule or
 activate a model allowance. They use the existing `uuid_generate_v7()` dependency.
 
-No `GRANT`, `REVOKE` or row-level security policy is installed by these files.
+No `GRANT`, `REVOKE` or row-level security policy is installed by 0021–0024.
 New table privileges depend on the actual migration owner and its default ACLs;
 a feature flag is not database isolation. The current local-only gate also refuses
-hosted Vercel/CI activation. No private corpus configuration belongs in hosted
-variables or this repository.
+hosted Vercel/CI activation. Concrete corpus bindings remain outside this repository until separately reviewed hosted activation.
+
+Migration 0025 installs pgvector in `public` only when absent, refuses a differently
+located existing extension, and never upgrades or relocates an installed one.
+It revokes PUBLIC and named default grants on its new private objects only;
+existing tables and global default privileges remain unchanged. The database
+owner and roles inheriting its privileges remain trusted: these ACLs do not
+restrict an application using the same owner credential. The release role must
+be able to install the extension; synthetic local success is not hosted proof.
+Local PostgreSQL images must also have the extension's operating-system files
+installed before running this migration. A SQL migration can enable an available
+extension, but cannot install a missing server package. Keep the existing server
+major and coordinate shared-container maintenance separately. See the
+[pinned upstream build instructions](https://github.com/pgvector/pgvector/blob/f37c13f68b57d2c3472b2214fbcff699d6d34876/README.md#installation).
+Its controlled SQL search path is restored before the next migration in the
+shared transaction. No corpus rows or source grants are seeded.
 
 ## Upgrade evidence
 
 `tests/chat-research/migrationUpgrade.test.ts` runs the installed Drizzle migrator
-on an exact old migration prefix with synthetic existing users and a completed
+on the exact extension-free 0021–0024 upgrade prefix with synthetic existing users and a completed
 legacy-import singleton. It verifies that:
 
 - old rows, relation identities, ACLs, constraints and triggers remain unchanged;
@@ -82,6 +97,14 @@ the runtime role can still write old tables but cannot read the new packet table
 An explicit default SELECT grant is inherited, demonstrating why the actual target
 ACLs need review before any future data adoption. The native batch control does
 not substitute for running the Node migration client against the release target.
+
+The new 0025 migration has a separate native PostgreSQL/pgvector rehearsal with
+an actual compiler-produced synthetic corpus: both vector dimensions, exact
+binary hashes, deduplicated membership, invalid projection/orphan rollback,
+sealed-row mutation refusal and private-object ACL checks. It checks temporary
+type shadowing and same-transaction search-path restoration. PGlite does not
+simulate vector support. Private tooling records exact SQL/driver/fixture hashes
+and confirms disposable-container cleanup before publishing success.
 
 These are synthetic compatibility checks, not live Neon acceptance, deployed
 Google-auth acceptance or expert corpus-accuracy labels. Collection-specific
@@ -111,7 +134,7 @@ resolve the release state. Do not automatically run destructive down migrations,
 reset accounting evidence or drop retained data. Any later cleanup is a separate
 reviewed change with actual-state and retention checks.
 
-Remaining release decision: approve shipping these four additive migrations with
+Remaining release decision: approve shipping these five additive migrations with
 research disabled, or defer merging the candidate. No production operation is
 performed by the tests or by preparing this proposal.
 
@@ -138,8 +161,8 @@ checks, both builds, populated-database migration rehearsals and independent
 reviews. The legacy-chat policy decision is resolved; it is not a release blocker
 for this scoped preparation.
 
-A production merge/release remains a separate action. It would apply four additive
-migrations and create five empty tables through the existing release workflow.
+A production merge/release remains a separate action. It would apply five additive
+migrations, install pgvector when absent and create eleven empty tables through the existing release workflow.
 The actual target/role checks and staged smoke/promotion gates remain required.
 No approved public corpus, source grant, operator binding or model allowance is
 created by completing this preparation.

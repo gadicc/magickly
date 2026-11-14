@@ -2,6 +2,7 @@ export * from "./generated/audit";
 export * from "./generated/auth";
 export * from "./generated/chatResearch";
 export * from "./generated/chatResearchArtifacts";
+export * from "./generated/chatResearchCorpus";
 export * from "./generated/chatResearchMaintenance";
 export * from "./generated/chatResearchPolicy";
 export * from "./generated/chatUsage";

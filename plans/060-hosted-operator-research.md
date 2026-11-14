@@ -56,9 +56,21 @@ The optional Get-only adapter remains inactive. Large images, original documents
 or immutable rebuild snapshots can be considered separately later. A live backend
 on the ingestion machine is not required by the selected Neon architecture.
 
-The database importer, dataset/version semantics, query/index selection and
-restricted writer/reader roles remain to be implemented and reviewed. Verify the
-intended target, extension support, available capacity and permissions first.
+Migration 0025 now defines the empty private corpus store: immutable sealed
+snapshots, checked source/unit projections, independent model spaces and exact
+binary-vector/input membership. The dataset key is the canonical corpus manifest
+hash; the embedding-space set is frozen at sealing. Adding a model to the same
+unchanged corpus needs a separate versioning design, not an appended space.
+SQL guards establish relational integrity, not canonical compiler provenance or
+source permission. A future importer must use the genuine compiler, pinned
+manifest and exact cached-input checks before COPY.
+
+The migration ships through the normal staged main release, never through the
+importer. The importer must verify the installed schema/journal and refuse drift.
+It does not install extensions or create tables. The production importer, SQL
+retrieval/index selection and restricted writer/reader composition remain to be
+implemented and reviewed. Database ownership is a trusted boundary; revoking
+PUBLIC access cannot constrain a runtime sharing the migration owner's role.
 Vercel Sensitive variables cannot be recovered through CLI; use an approved direct
 migration/ingestion credential under the existing release boundary. Do not fall
 back to a development database or rotate credentials to bypass access restrictions.
