@@ -12,8 +12,8 @@ import { describe, expect, it } from "vitest";
  */
 const root = path.resolve("packages/magick-components/src");
 const CLIENT_MODULES = [
-  "astrology/Mercury.tsx",
-  "astrology/Moon.tsx",
+  "astrology/MercuryWidget.tsx",
+  "astrology/MoonWidget.tsx",
   "gd/RoseSigil.tsx",
 ];
 

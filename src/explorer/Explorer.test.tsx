@@ -81,13 +81,13 @@ describe("Explorer", () => {
   });
 
   it("parses a number field and a text field of string | number", async () => {
-    const moon = explore("Moon");
+    const moon = explore("MoonWidget");
     fireEvent.change(screen.getByLabelText("latitude"), {
       target: { value: "12.5" },
     });
     await waitFor(() =>
       expect(moon.jsx()).toBe(
-        '<Moon background="/night-sky.jpg" latitude={12.5} />',
+        '<MoonWidget background="/night-sky.jpg" latitude={12.5} />',
       ),
     );
     cleanup();

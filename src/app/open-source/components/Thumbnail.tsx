@@ -1,5 +1,6 @@
 import Kamea from "magick-components/astrology/Kamea";
 import Moon from "magick-components/astrology/Moon";
+import MoonWidget from "magick-components/astrology/MoonWidget";
 import PlanetarySpirit from "magick-components/astrology/PlanetarySpirit";
 import Chakras from "magick-components/chakras/Chakras";
 import FylfotCross from "magick-components/gd/FylfotCross";
@@ -20,7 +21,8 @@ import styles from "./components.module.css";
 /**
  * The components drawn live on the index, on the server: none of them
  * loads `nlopt-js` or `astronomy-engine` (the note under plan 080's
- * stages). The Moon is a client component, which brings only `lune`.
+ * stages). The Moon's widget is a client component, which brings only
+ * `lune`, as the Moon's drawing does.
  */
 // biome-ignore lint/suspicious/noExplicitAny: each takes its first example's props
 const LIVE_TILES: Partial<Record<string, ComponentType<any>>> = {
@@ -32,6 +34,7 @@ const LIVE_TILES: Partial<Record<string, ComponentType<any>>> = {
   PlanetarySpirit,
   Chakras,
   Moon,
+  MoonWidget,
 };
 
 /**
@@ -63,7 +66,7 @@ export default function Thumbnail({
         className={`${styles.image} ${plateClass}`}
       />
     );
-  if (component.name === "Mercury")
+  if (component.name === "MercuryWidget")
     return (
       <div className={styles.mercury}>
         {/* biome-ignore lint/performance/noImgElement: a small static picture */}

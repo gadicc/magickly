@@ -1,4 +1,3 @@
-"use client";
 /*!
  * The unlit disc's path is adapted from phase_junk() in moon-phase.js:
  * https://github.com/tingletech/moon-phase/blob/643015a83509ca6a662d1af6e1ac14661852cedb/moon-phase.js
@@ -9,53 +8,51 @@
  */
 import lune from "lune";
 import { useId } from "react";
-import { cssString } from "../cssString.ts";
-import useHydrated from "../hooks/useHydrated.ts";
 import { MOON_MEAN_INCLINATION, moonPath } from "./moonPath.ts";
 
-function moonPhaseName(phase: number) {
-  if (phase === 0.5) return "full-moon";
-
-  if (phase > 0.5) {
-    if (phase === 0.75) return "last-quarter";
-    if (phase > 0.75) return "waning-crescent";
-    return "waning-gibbous";
-  } else {
-    if (phase === 0) return "new-moon";
-    if (phase === 0.25) return "first-quarter";
-    if (phase > 0.25) return "waxing-gibbous";
-    return "waxing-crescent";
-  }
+/** Props of `Moon`. */
+export interface MoonProps {
+  /**
+   * The day whose phase to draw, worked out by `lune`. `phase`, when
+   * given, wins.
+   */
+  date?: Date;
+  /**
+   * The phase to draw, from 0 to 1 as `lune` gives it: 0 and 1 are new,
+   * 0.5 full. With neither this nor `date`, only the unlit disc is drawn.
+   */
+  phase?: number;
+  /** The SVG's width; from the height and the drawing's shape when not given. */
+  width?: string | number;
+  /** The SVG's height; from the width and the drawing's shape when not given. */
+  height?: string | number;
+  /**
+   * The hemisphere it is seen from, which turns the Moon as it looks from
+   * there: `north` by default.
+   */
+  hemisphere?: "north" | "south";
 }
 
-const namesLocal = {
-  en: {
-    "new-moon": "New Moon",
-    "waxing-crescent": "Waxing Crescent",
-    "first-quarter": "First Quarter",
-    "waxing-gibbous": "Waxing Gibbous",
-    "full-moon": "Full Moon",
-    "waning-gibbous": "Waning Gibbous",
-    "last-quarter": "Last Quarter",
-    "waning-crescent": "Waning Crescent",
-  },
-};
-
-function MoonDrawing({
+/**
+ * The Moon in a phase, lit in gold on its unlit disc with a soft glow,
+ * turned as it looks from either hemisphere: a phase you give, or a
+ * date's. It needs no browser, so it renders on the server; today's phase
+ * is a date the page knows. Its glow's id comes from `useId`, so several
+ * can share a page.
+ */
+export function Moon({
+  date,
   phase,
   width,
   height,
-  northernHemisphere = true,
-}: {
-  /** Omit to draw only the unlit disc. */
-  phase?: number;
-  width?: string | number;
-  height?: string | number;
-  northernHemisphere?: boolean;
-}) {
-  const inclination = northernHemisphere
-    ? MOON_MEAN_INCLINATION
-    : 180 - MOON_MEAN_INCLINATION;
+  hemisphere = "north",
+}: MoonProps) {
+  const drawn =
+    phase ?? (date === undefined ? undefined : lune.phase(date).phase);
+  const inclination =
+    hemisphere === "south"
+      ? 180 - MOON_MEAN_INCLINATION
+      : MOON_MEAN_INCLINATION;
   // Its own glow filter, so that two moons on a page do not share an id.
   const glow = `moon-glow-${useId().replace(/[^A-Za-z0-9_-]/g, "_")}`;
 
@@ -88,10 +85,10 @@ function MoonDrawing({
         d="m85,5 a20,20 0 1,1 0,150 a20,20 0 1,1 0,-150"
         style={{ fill: "black" }}
       />
-      {phase === undefined ? null : (
+      {drawn === undefined ? null : (
         <path
           className="moon"
-          d={moonPath(phase)}
+          d={moonPath(drawn)}
           style={{ fill: "#ebc815" }}
         />
       )}
@@ -99,62 +96,4 @@ function MoonDrawing({
   );
 }
 
-/** Props of the Moon widget. */
-export interface MoonWidgetProps {
-  /** Space around the drawing, inside the background, as CSS `padding`. */
-  padding?: string;
-  /**
-   * The viewer's latitude in degrees, south negative: south of the
-   * equator, the moon is drawn turned as it is seen from there.
-   */
-  latitude?: number;
-  /** The widget's background image, a URL, drawn to cover; none if omitted. */
-  background?: string;
-}
-
-// magick.ly passes the reader's place as `latitude` (plan 072).
-/**
- * Today's moon, drawn as it looks from the viewer's hemisphere: as from
- * the north unless `latitude` puts the viewer south of the equator. The
- * phase is worked out in the browser, so the server's HTML draws the
- * unlit disc.
- */
-export function MoonWidget({
-  padding = "10px 0 2px 0",
-  latitude,
-  background,
-}: MoonWidgetProps) {
-  // Pages with this widget are prerendered at build time, so the server can't
-  // know today's phase. Hydrate with the unlit disc, then draw the phase.
-  const hydrated = useHydrated();
-  const phaseValue = hydrated ? lune.phase(new Date()).phase : undefined;
-  const phaseNameLocal =
-    phaseValue === undefined
-      ? "\u00a0" // keeps the label's line height
-      : namesLocal.en[moonPhaseName(phaseValue)];
-
-  // Northern (and the equator) unless the place is known to be south.
-  const northernHemisphere = latitude === undefined || latitude >= 0;
-
-  return (
-    <div
-      style={{
-        textAlign: "center",
-        background: background ? `url(${cssString(background)})` : undefined,
-        backgroundSize: "cover",
-        height: "100%",
-      }}
-    >
-      <div style={{ padding: padding }}>
-        <MoonDrawing
-          phase={phaseValue}
-          height="85"
-          northernHemisphere={northernHemisphere}
-        />
-      </div>
-      <div style={{ color: "#cc5" }}>{phaseNameLocal}</div>
-    </div>
-  );
-}
-
-export default MoonWidget;
+export default Moon;

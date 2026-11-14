@@ -8,8 +8,9 @@
  */
 
 /**
- * The Moon drawing's geometry, apart from the client component that draws
- * it, so that it can be imported anywhere (plan 080, decision 7).
+ * The Moon drawing's geometry, a module of its own so that it can be
+ * imported anywhere, `MoonWidget`'s client module included (plan 080,
+ * decision 7).
  */
 
 /** The Moon's orbit's mean inclination to the ecliptic, in degrees. */

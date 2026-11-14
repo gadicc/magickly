@@ -4,7 +4,7 @@ import { Settings } from "luxon";
 import { act } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { hydrateAt, renderAt } from "../../../../tests/hydration.ts";
-import MercuryWidget from "./Mercury.tsx";
+import MercuryWidget from "./MercuryWidget.tsx";
 
 const defaultLocale = Settings.defaultLocale;
 const defaultZone = Settings.defaultZone;

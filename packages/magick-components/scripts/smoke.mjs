@@ -14,8 +14,8 @@
  *    licence, and no source, test or script; a manifest whose exports are
  *    the published ones and whose magick-data range is the version it was
  *    built with;
- * 2. which built files carry `"use client"`, first: Mercury, Moon and
- *    RoseSigil, and no other;
+ * 2. which built files carry `"use client"`, first: MercuryWidget,
+ *    MoonWidget and RoseSigil, and no other;
  * 3. every entry loaded in plain Node, and the Tree, a hall and the rose
  *    sigil's image rendered with `renderToStaticMarkup`, no bundler;
  * 4. a strict consumer type-checked under `bundler` and `nodenext`, with
@@ -77,8 +77,8 @@ const installed = (name) =>
 
 /** The modules that must, and alone may, start with "use client". */
 const CLIENT_MODULES = [
-  "lib/astrology/Mercury.js",
-  "lib/astrology/Moon.js",
+  "lib/astrology/MercuryWidget.js",
+  "lib/astrology/MoonWidget.js",
   "lib/gd/RoseSigil.js",
 ];
 /**
@@ -147,6 +147,11 @@ const SERVER_DRAWINGS = [
     "chakras",
     `import Chakras from "magick-components/chakras/Chakras";`,
     `<Chakras />`,
+  ],
+  [
+    "moon",
+    `import Moon from "magick-components/astrology/Moon";`,
+    `<Moon phase={0.3} height={85} />`,
   ],
 ];
 
@@ -357,7 +362,7 @@ try {
     assert(manifest.peerDependencies?.react === "^19", "react ^19 is a peer");
   });
 
-  step('only Mercury, Moon and RoseSigil are "use client"', () => {
+  step('only MercuryWidget, MoonWidget and RoseSigil are "use client"', () => {
     const client = listing
       .filter((file) => file.endsWith(".js"))
       .filter((file) =>
@@ -523,7 +528,9 @@ import { RoseSigilImage } from "magick-components/gd/RoseSigilImage";
 import { sigilPoints } from "magick-components/gd/roseSigilGeometry";
 import { optimizeSigilPoints } from "magick-components/gd/roseSigilOptimizer";
 import Tablet from "magick-components/enochian/Tablet";
-import MercuryWidget from "magick-components/astrology/Mercury";
+import MercuryWidget from "magick-components/astrology/MercuryWidget";
+import { MoonWidget } from "magick-components/astrology/MoonWidget";
+import Moon from "magick-components/astrology/Moon";
 import { currentOrNextRetrograde } from "magick-components/astrology/mercuryRetrograde";
 import PlanetarySpirit from "magick-components/astrology/PlanetarySpirit";
 import { Kamea } from "magick-components/astrology/Kamea";
@@ -558,6 +565,11 @@ export const page = (
     {/* @ts-expect-error: the tablet is tablet, an id is a DOM id */}
     <Tablet id="air" />
     <MercuryWidget image="/m.webp" />
+    <MoonWidget latitude={-33.9} padding="4px" background="/sky.jpg" />
+    <Moon date={new Date()} width={60} hemisphere="south" />
+    <Moon phase={0.5} />
+    {/* @ts-expect-error: the widget's padding is padding */}
+    <MoonWidget moonPadding="4px" />
     <PlanetarySpirit spirit="zazel" style={{ height: "1em" }} ink="currentColor" className="seal" />
     <Kamea planet="saturn" width={120} label="Saturn's square" />
     <Kamea planet="luna" height="4em" label={false} />
@@ -687,8 +699,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       )
       .join("\n")}
 ${SERVER_DRAWINGS.map(([, imports]) => imports).join("\n")}
-import MoonWidget from "magick-components/astrology/Moon";
-import MercuryWidget from "magick-components/astrology/Mercury";
+import MoonWidget from "magick-components/astrology/MoonWidget";
+import MercuryWidget from "magick-components/astrology/MercuryWidget";
 import { ClientTree } from "./ClientTree";
 
 const loaded = [${serverEntries.map((_, i) => `entry${i}`).join(", ")}];

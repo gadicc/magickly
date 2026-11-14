@@ -4,12 +4,13 @@ React components that draw magickal figures from
 [magick-data](https://www.npmjs.com/package/magick-data): the Tree of Life,
 the Golden Dawn's temple halls, its lamens and symbols, the rose-cross
 sigil, the Enochian tablets, the planetary kameas and the planetary
-spirits' geomantic sigils, and the Moon's phase. They are the drawings of
+spirits' geomantic sigils, and the Moon in its phases. They are the drawings of
 [magick.ly](https://magick.ly), which consumes this package as anyone else
 would. The figures are drawn from the data as inline SVG, so they scale,
 print and can be styled by the page around them. A few wrap their drawing
-in HTML: the fylfot cross is a table of squares, the Moon and Mercury are
-tiles around a drawing or a picture, and a planetary spirit's sigil is
+in HTML: the fylfot cross is a table of squares, `MoonWidget` and
+`MercuryWidget` are tiles around a drawing or a picture, and a planetary
+spirit's sigil is
 centred in a `<div>` you may style.
 
 The markup inside a drawing is not part of the API: its elements, ids and
@@ -88,13 +89,24 @@ Most of the components use no hooks, or only `useId` and `useMemo`, and
 render as Server Components, in plain Node with `renderToStaticMarkup`, or
 in the browser. Three need the browser, and are marked `"use client"`:
 
-- `astrology/Moon`, which works out today's phase after hydration;
-- `astrology/Mercury`, which works out Mercury's next retrograde;
+- `astrology/MoonWidget`, which works out today's phase after hydration;
+- `astrology/MercuryWidget`, which works out Mercury's next retrograde;
 - `gd/RoseSigil`, which optimises and animates the sigil.
 
 A client module's exports all become client references, so each of these
 exports only its component. Their helpers live in modules of their own
 (`astrology/moonPath`, `gd/RoseSigilImage`, `gd/roseSigilGeometry`).
+
+The Moon's drawing alone, `astrology/Moon`, needs no browser: it draws a
+phase you give it, or a date's, which a page that knows the date passes:
+
+```tsx
+import { Moon } from "magick-components/astrology/Moon";
+
+export const Tonight = ({ date }: { date: Date }) => (
+  <Moon date={date} height={85} hemisphere="south" />
+);
+```
 
 ## The entry points
 
@@ -128,9 +140,10 @@ assembled graph, so they import magick-data's root entry, every table.
 | `chakras/Chakras` | The seven chakras, in their colours, on the outline of a body |
 | `astrology/Kamea` | A planet's kamea, its magic square |
 | `astrology/PlanetarySpirit` | A planetary spirit's geomantic sigil (the Rulers of the figures) |
-| `astrology/Moon` | The Moon's phase today, as seen from either hemisphere (`"use client"`) |
+| `astrology/Moon` | The Moon in a phase you give, or a date's, as seen from either hemisphere |
+| `astrology/MoonWidget` | A tile of today's Moon and its phase's name, as seen from the viewer's hemisphere (`"use client"`) |
 | `astrology/moonPath` | The Moon drawing's lit part for a phase |
-| `astrology/Mercury` | Mercury's next retrograde, under a picture of the planet you give it (`"use client"`) |
+| `astrology/MercuryWidget` | A tile of Mercury's current or next retrograde, under a picture of the planet you give it (`"use client"`) |
 | `astrology/mercuryRetrograde` | Mercury's stations and retrogrades, from astronomy-engine |
 | `fonts/*` | The hall's fonts and `gd-hall.css` ([below](#the-halls-fonts)) |
 
@@ -236,8 +249,9 @@ sigil, and final forms are drawn as their base letters.
 - **An Enochian font.** `Tablet` draws the Latin transliteration unless you
   pass `enochianStyle`, the CSS of a font that sets the Enochian letters.
   The one magick.ly uses has no licence text, so it is not in the package.
-- **The tiles' pictures.** `Moon` and `Mercury` take their background as
-  `background`, a URL drawn to cover, and `Mercury` the planet's picture
+- **The tiles' pictures.** `MoonWidget` and `MercuryWidget` take their
+  background as `background`, a URL drawn to cover, and `MercuryWidget`
+  the planet's picture
   as `image` (a URL, or `<img>` props such as Next's `getImageProps()`
   gives). Neither draws a picture of its own; without them the tile has
   no background.

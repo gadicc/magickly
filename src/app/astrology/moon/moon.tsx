@@ -1,7 +1,7 @@
 "use client";
 import lune from "lune";
 import { DateTime } from "luxon";
-import MoonDrawing from "magick-components/astrology/Moon";
+import MoonWidget from "magick-components/astrology/MoonWidget";
 import usePlace from "@/geo/usePlace";
 import useHydrated from "@/ui/useHydrated";
 
@@ -66,7 +66,7 @@ export default function Moon() {
 
       <div id="page">
         <div style={{ height: "155px" }}>
-          <MoonDrawing
+          <MoonWidget
             padding="20px 0 10px 0"
             latitude={place?.latitude}
             background="/night-sky.jpg"

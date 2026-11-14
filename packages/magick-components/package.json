@@ -41,10 +41,11 @@
   ],
   "exports": {
     "./astrology/Kamea": "./src/astrology/Kamea.tsx",
-    "./astrology/Mercury": "./src/astrology/Mercury.tsx",
     "./astrology/mercuryRetrograde": "./src/astrology/mercuryRetrograde.ts",
+    "./astrology/MercuryWidget": "./src/astrology/MercuryWidget.tsx",
     "./astrology/Moon": "./src/astrology/Moon.tsx",
     "./astrology/moonPath": "./src/astrology/moonPath.ts",
+    "./astrology/MoonWidget": "./src/astrology/MoonWidget.tsx",
     "./astrology/PlanetarySpirit": "./src/astrology/PlanetarySpirit.tsx",
     "./chakras/Chakras": "./src/chakras/Chakras.tsx",
     "./enochian/Tablet": "./src/enochian/Tablet.tsx",
@@ -71,13 +72,13 @@
         "types": "./lib/astrology/Kamea.d.ts",
         "default": "./lib/astrology/Kamea.js"
       },
-      "./astrology/Mercury": {
-        "types": "./lib/astrology/Mercury.d.ts",
-        "default": "./lib/astrology/Mercury.js"
-      },
       "./astrology/mercuryRetrograde": {
         "types": "./lib/astrology/mercuryRetrograde.d.ts",
         "default": "./lib/astrology/mercuryRetrograde.js"
+      },
+      "./astrology/MercuryWidget": {
+        "types": "./lib/astrology/MercuryWidget.d.ts",
+        "default": "./lib/astrology/MercuryWidget.js"
       },
       "./astrology/Moon": {
         "types": "./lib/astrology/Moon.d.ts",
@@ -86,6 +87,10 @@
       "./astrology/moonPath": {
         "types": "./lib/astrology/moonPath.d.ts",
         "default": "./lib/astrology/moonPath.js"
+      },
+      "./astrology/MoonWidget": {
+        "types": "./lib/astrology/MoonWidget.d.ts",
+        "default": "./lib/astrology/MoonWidget.js"
       },
       "./astrology/PlanetarySpirit": {
         "types": "./lib/astrology/PlanetarySpirit.d.ts",

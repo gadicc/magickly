@@ -16,10 +16,11 @@
   "files": [
     "src/vendor.d.ts",
     "src/astrology/Kamea.tsx",
-    "src/astrology/Mercury.tsx",
+    "src/astrology/MercuryWidget.tsx",
     "src/astrology/mercuryRetrograde.ts",
     "src/astrology/Moon.tsx",
     "src/astrology/moonPath.ts",
+    "src/astrology/MoonWidget.tsx",
     "src/astrology/PlanetarySpirit.tsx",
     "src/chakras/Chakras.tsx",
     "src/enochian/Tablet.tsx",

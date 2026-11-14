@@ -48,8 +48,8 @@ describe("the README", () => {
       ...README.matchAll(/^\| `([^`]+)` \|[^\n]*\(`"use client"`\) \|$/gm),
     ].map((match) => match[1]);
     expect(marked.sort()).toEqual([
-      "astrology/Mercury",
-      "astrology/Moon",
+      "astrology/MercuryWidget",
+      "astrology/MoonWidget",
       "gd/RoseSigil",
     ]);
   });

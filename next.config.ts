@@ -6,6 +6,7 @@ import {
   PHASE_DEVELOPMENT_SERVER,
   PHASE_PRODUCTION_BUILD,
 } from "next/constants";
+import { COMPONENT_REDIRECTS } from "./src/explorer/redirects";
 import { legacyStaticImageAliases } from "./src/files/legacyStaticImages";
 import { RITUAL_PUBLICATION_STATIC_PATHS } from "./src/files/ritualPublicationStaticPaths";
 import {
@@ -113,6 +114,8 @@ export default async function (phase: string): Promise<NextConfig> {
       ...HALL_REDIRECTS,
       // The old temple drawings, retired for the halls' own images.
       ...RETIRED_DRAWING_REDIRECTS,
+      // Explorer pages of components renamed before the first publish.
+      ...COMPONENT_REDIRECTS,
     ],
     // See also alternative with patch-package:
     // https://stackoverflow.com/a/77722836/1839099

@@ -2,19 +2,17 @@ import type { ComponentProps } from "react";
 import type MoonComponent from "../src/astrology/Moon.tsx";
 import type { ComponentExamples } from "./types.ts";
 
-/**
- * Today's moon from either hemisphere, on the night sky magick.ly serves
- * at `/night-sky.jpg`, as `/astrology/planets` draws it; an app passes its
- * own picture.
- */
+/** The Moon in its quarters and full, from the north and from the south. */
 export const Moon: ComponentExamples<ComponentProps<typeof MoonComponent>> = {
   entry: "astrology/Moon",
   exportName: "default",
   examples: [
-    { title: "From the north", props: { background: "/night-sky.jpg" } },
+    { title: "Waxing crescent", props: { phase: 0.15, height: 160 } },
+    { title: "First quarter", props: { phase: 0.25, height: 160 } },
+    { title: "Full", props: { phase: 0.5, height: 160 } },
     {
-      title: "From Cape Town",
-      props: { background: "/night-sky.jpg", latitude: -33.9 },
+      title: "Waning gibbous, from the south",
+      props: { phase: 0.65, height: 160, hemisphere: "south" },
     },
   ],
 };

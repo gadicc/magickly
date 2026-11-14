@@ -52,7 +52,7 @@ describe("/open-source/components", () => {
   it("draws the rest live on the server, Mercury as its picture", () => {
     expect(tile("/open-source/components/kamea")).toContain("<svg");
     expect(tile("/open-source/components/fylfot-cross")).toContain("<table");
-    expect(tile("/open-source/components/mercury")).toContain(
+    expect(tile("/open-source/components/mercury-widget")).toContain(
       'src="/pics/mercury.webp"',
     );
   });

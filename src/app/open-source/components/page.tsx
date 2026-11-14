@@ -29,7 +29,7 @@ export default function ComponentsPage() {
               <Link
                 href={component.path}
                 underline="none"
-                // Fourteen pages' payloads are not worth fetching for a
+                // Fifteen pages' payloads are not worth fetching for a
                 // glance at the index, as with the menus (7ced7fa1).
                 prefetch={false}
                 className={styles.tile}

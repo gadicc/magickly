@@ -8,8 +8,9 @@ import { GdHall } from "./GdHall.examples.tsx";
 import { GradeTree } from "./GradeTree.examples.tsx";
 import { Kamea } from "./Kamea.examples.tsx";
 import { Lamen } from "./Lamen.examples.tsx";
-import { Mercury } from "./Mercury.examples.tsx";
+import { MercuryWidget } from "./MercuryWidget.examples.tsx";
 import { Moon } from "./Moon.examples.tsx";
+import { MoonWidget } from "./MoonWidget.examples.tsx";
 import { PlanetarySpirit } from "./PlanetarySpirit.examples.tsx";
 import { RoseSigil } from "./RoseSigil.examples.tsx";
 import { SevenBranchedCandlestick } from "./SevenBranchedCandlestick.examples.tsx";
@@ -38,7 +39,8 @@ export const COMPONENT_EXAMPLES = {
   PlanetarySpirit,
   Chakras,
   Moon,
-  Mercury,
+  MoonWidget,
+  MercuryWidget,
 } as const satisfies Record<string, ComponentExamples>;
 
 /** A component's name in the explorer. */

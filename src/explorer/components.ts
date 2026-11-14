@@ -110,12 +110,18 @@ const PAGES: Record<ComponentName, ComponentPage> = {
     dark: "chakras",
   },
   Moon: {
+    title: "Moon Phase Drawing",
+    description:
+      "A React component that draws the Moon in any phase, or a date's, as it " +
+      "looks from either hemisphere, as SVG that renders on the server too.",
+  },
+  MoonWidget: {
     title: "Moon Phase",
     description:
       "A React component that draws today's Moon as it looks from the viewer's " +
       "hemisphere, with the name of its phase, worked out in the browser.",
   },
-  Mercury: {
+  MercuryWidget: {
     title: "Mercury Retrograde",
     description:
       "A React component that shows Mercury's current or next retrograde in " +

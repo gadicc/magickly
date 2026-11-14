@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import type MercuryComponent from "../src/astrology/Mercury.tsx";
+import type MercuryWidgetComponent from "../src/astrology/MercuryWidget.tsx";
 import type { ComponentExamples } from "./types.ts";
 
 /**
@@ -7,10 +7,10 @@ import type { ComponentExamples } from "./types.ts";
  * The two images are the paths magick.ly serves them at; an app passes its
  * own.
  */
-export const Mercury: ComponentExamples<
-  ComponentProps<typeof MercuryComponent>
+export const MercuryWidget: ComponentExamples<
+  ComponentProps<typeof MercuryWidgetComponent>
 > = {
-  entry: "astrology/Mercury",
+  entry: "astrology/MercuryWidget",
   exportName: "default",
   examples: [
     {

@@ -646,7 +646,47 @@
     ]
   },
   "Moon": {
-    "description": "Today's moon, drawn as it looks from the viewer's hemisphere: as from\nthe north unless `latitude` puts the viewer south of the equator. The\nphase is worked out in the browser, so the server's HTML draws the\nunlit disc.",
+    "description": "The Moon in a phase, lit in gold on its unlit disc with a soft glow,\nturned as it looks from either hemisphere: a phase you give, or a\ndate's. It needs no browser, so it renders on the server; today's phase\nis a date the page knows. Its glow's id comes from `useId`, so several\ncan share a page.",
+    "props": [
+      {
+        "name": "date",
+        "type": "Date",
+        "required": false,
+        "description": "The day whose phase to draw, worked out by `lune`. `phase`, when\ngiven, wins."
+      },
+      {
+        "name": "height",
+        "type": "string | number",
+        "required": false,
+        "description": "The SVG's height; from the width and the drawing's shape when not given.",
+        "control": { "kind": "parsed" }
+      },
+      {
+        "name": "hemisphere",
+        "type": "\"north\" | \"south\"",
+        "required": false,
+        "default": "\"north\"",
+        "description": "The hemisphere it is seen from, which turns the Moon as it looks from\nthere: `north` by default.",
+        "control": { "kind": "choice", "options": ["north", "south"] }
+      },
+      {
+        "name": "phase",
+        "type": "number",
+        "required": false,
+        "description": "The phase to draw, from 0 to 1 as `lune` gives it: 0 and 1 are new,\n0.5 full. With neither this nor `date`, only the unlit disc is drawn.",
+        "control": { "kind": "number" }
+      },
+      {
+        "name": "width",
+        "type": "string | number",
+        "required": false,
+        "description": "The SVG's width; from the height and the drawing's shape when not given.",
+        "control": { "kind": "parsed" }
+      }
+    ]
+  },
+  "MoonWidget": {
+    "description": "Today's moon in a tile, with its phase's name: `Moon` drawn as it looks\nfrom the viewer's hemisphere, as from the north unless `latitude` puts\nthe viewer south of the equator. The phase is worked out in the\nbrowser, so the server's HTML draws the unlit disc.",
     "props": [
       {
         "name": "background",
@@ -672,7 +712,7 @@
       }
     ]
   },
-  "Mercury": {
+  "MercuryWidget": {
     "description": "Mercury's next or current retrograde, worked out in the browser on today's\ndate and shown in the reader's own date format, under a picture of the\nplanet. Rendered on the server, it leaves a blank line where the dates\ngo.",
     "props": [
       {

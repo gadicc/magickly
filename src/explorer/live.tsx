@@ -32,5 +32,8 @@ export const LIVE: Record<ComponentName, ComponentType<any>> = {
   ),
   Chakras: dynamic(() => import("magick-components/chakras/Chakras")),
   Moon: dynamic(() => import("magick-components/astrology/Moon")),
-  Mercury: dynamic(() => import("magick-components/astrology/Mercury")),
+  MoonWidget: dynamic(() => import("magick-components/astrology/MoonWidget")),
+  MercuryWidget: dynamic(
+    () => import("magick-components/astrology/MercuryWidget"),
+  ),
 };
