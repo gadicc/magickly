@@ -419,7 +419,14 @@ Follow-ups are separate from the completed migration work:
   same day, adding Leitch's spellings as input, and said to build it.
   Stage 1 is a script in the browser, both directions, never coining
   a word; stage 2, an AI reading of Enochian on the existing chat
-  allowance, is outlined. The two TODOs above are its step B.
+  allowance, is outlined. The two TODOs above are its step B. TODO:
+  `keys.json5` marks the rows whose English we divided
+  (`englishSplit`) but not where each of Dee's units begins (his entry
+  of two words glossed together, or a line we split over several
+  words), which the notes give only in prose. Recorded as data, the
+  reading line could mark a run's edge that cuts a unit (plan 081,
+  decision 14). Key 12's SOBA (row 19) lacks the flag though DOOAIN's
+  note says "whose name" is split over the two.
 - 13 November 2026: questions for an Enochian expert gathered into one
   running list, [plan 082](082-enochian-expert-questions.md), from
   plans 077 and 081, the grammar notes and the Keys. Gadi means to

@@ -463,26 +463,26 @@ describe("Enochian into English (decisions 13–16)", () => {
     const { line } = translator.toEnglish("BALT IAD GOHO");
     expect(line.map((one) => one.kind)).toEqual(["word", "word", "word"]);
     expect(lineText(line)).toBe("of Justice the God saith");
-    // ZIRDO's gloss is only ever our split of Dee's English: on its tile,
-    // not on the line (decision 14).
+    // ZIRDO's gloss is only ever our split of Dee's English: on the line,
+    // marked as ours (decision 14).
     const zirdo = translator.toEnglish("ZIRDO");
     expect(zirdo.line).toEqual([
-      { kind: "tile-only", text: "", tokens: [0, 1] },
+      { kind: "ours", text: "I am", tokens: [0, 1] },
     ]);
     expect(zirdo.tokens[0].readings[0].words[0]).toMatchObject({
       gloss: "I am",
       ours: true,
     });
     expect(lineText(translator.toEnglish("BALT ZIRDO").line)).toBe(
-      "of Justice …",
+      "of Justice ‹I am›",
     );
     // A part of a split, not the whole word: DS "which" stays on the line.
     expect(translator.toEnglish("DSSALMAN").line).toEqual([
       { kind: "word", text: "which", tokens: [0, 1], parts: [0, 1] },
-      { kind: "tile-only", text: "", tokens: [0, 1], parts: [1, 2] },
+      { kind: "ours", text: "the house", tokens: [0, 1], parts: [1, 2] },
     ]);
     expect(lineText(translator.toEnglish("LSALMAN").line)).toBe(
-      "of the first …",
+      "of the first ‹the house›",
     );
     // A form spanning two of Dee's words, both his own glosses: one segment.
     expect(translator.toEnglish("sobrazod-ol").line).toEqual([
@@ -490,16 +490,45 @@ describe("Enochian into English (decisions 13–16)", () => {
     ]);
   });
 
-  it("leaves 60 of Dee's 660 words, alone, only on their tiles", () => {
-    // Their only English is our split of his running English; the page
-    // may yet show it marked instead, so it stays on the word.
-    const tileOnly = [...lookup.keyForms.keys()].filter((one) =>
-      translator
-        .toEnglish(one)
-        .line.some((segment) => segment.kind === "tile-only"),
+  it("keeps a run whole where it starts or ends on a row we divided", () => {
+    // FARZM's English ends where we cut Dee's running English, but the
+    // words are his; the data doesn't record his units' edges yet.
+    expect(translator.toEnglish("PILAH FARZM").line).toEqual([
+      {
+        kind: "dee",
+        text: "moreover you lifted up your voices",
+        tokens: [0, 2],
+      },
+    ]);
+    // The Keys' close, every row of it divided in Key 1, is still his.
+    const close = translator.toEnglish(
+      "ZACAR CA OD ZAMRAN ODO CICLE QAA ZORGE LAP ZIRDO NOCO MAD HOATH IAIDA",
+    ).line;
+    expect(close.map((one) => one.kind)).toEqual(["dee"]);
+    // Alone, a divided word is marked; two parts of one word each on
+    // their own.
+    expect(lineText(translator.toEnglish("FARZM").line)).toBe(
+      "‹you lifted up your voices›",
     );
-    expect(tileOnly).toHaveLength(60);
-    expect(tileOnly).toContain("ZIRDO");
+    expect(lineText(translator.toEnglish("COMOBLIORT").line)).toBe(
+      "‹a window› ‹of comfort›",
+    );
+  });
+
+  it("marks 60 of Dee's 660 words, alone, as read by our division", () => {
+    // Their only English is our split of his running English.
+    const lines = [...lookup.keyForms.keys()].map(
+      (one) => [one, translator.toEnglish(one).line] as const,
+    );
+    // An `ours` segment always carries its English.
+    for (const [one, line] of lines)
+      for (const segment of line)
+        if (segment.kind === "ours") expect(segment.text, one).not.toBe("");
+    const ours = lines
+      .filter(([, line]) => line.some((segment) => segment.kind === "ours"))
+      .map(([one]) => one);
+    expect(ours).toHaveLength(60);
+    expect(ours).toContain("ZIRDO");
   });
 
   it("gives a dictionary-only word a short gloss, with its source", () => {

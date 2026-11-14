@@ -190,9 +190,17 @@ forms where any exist.
     the input matches a run of consecutive Key lines, the line shows
     those lines' English. Elsewhere it joins cleaned glosses: Dee's
     punctuation stripped, rows where we split Dee's English
-    (`englishSplit`) shown as tiles only, and a short gloss defined for
-    dictionary-only words (a first meaning is often a raw string).
-    It is labelled "word by word".
+    (`englishSplit`) shown with that English, marked as our division,
+    and a short gloss defined for dictionary-only words (a first
+    meaning is often a raw string). It is labelled "word by word".
+    A run that begins or ends on a divided row still shows Dee's
+    English unmarked: the words are his, and only where that row's
+    English starts or stops is ours. The data records which rows we
+    divided but not where Dee's own units begin, so such an edge can't
+    yet be told from one he fixed; a follow-up in plan 000 is to
+    record them. (Changed 14 November 2026: divided rows were to be blank on
+    the line, but 60 Key words, SALMAN "the house" and OLPIRT "light"
+    among them, have no other English.)
 15. **Joined words are split by rule, and marked** (changed after the
     spike). Only a word not
     found whole. In front: G26's small words (DS, I, CHIS, TA, L, AR,
@@ -256,7 +264,9 @@ forms where any exist.
     test checks against a fresh run:
     - **Coverage on 60 sentences** (plan 077's task 3: practitioner,
       everyday and attested): the share of words given a form, a rule
-      chip or a gap, and the gap-free sentences, by kind. This is the
+      chip or a gap, and the gap-free sentences, by kind. A form that
+      a rule gives (a form of "to be", a negation, a pronoun) counts as
+      a rule chip, as in the spike, since each shows its chip. This is the
       honest measure of new English, and the main figure. The
       spike's, under the final rules: forms 51%, chips 11%, gaps 38%;
       gap-free 1 of 20 practitioner, 0 of 20 everyday, 3 of 20
@@ -359,7 +369,7 @@ no Q, `spike/noq/`). Measured:
 Seven decisions changed after it (7, 8, 9, 10, 11, 15 and 21, as
 marked above).
 
-## Confirmed with Gadi (13 November 2026)
+## Confirmed with Gadi (13 and 14 November 2026)
 
 Details the decisions left open, which this plan proposed and Gadi
 confirmed:
@@ -374,6 +384,9 @@ confirmed:
   (decision 13; proposed out of scope, changed by Gadi). Sloane MS
   3191's spellings wait for the British Library
   ([plan 083](083-british-library-needs.md)).
+- The Key words whose only English is our division of Dee's are
+  shown on the reading line, marked as ours, not blanked (decision 14;
+  14 November).
 
 ## Out of scope
 

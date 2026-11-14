@@ -44,7 +44,8 @@ export interface ReadWord {
   rows: readonly KeyPlace[];
   /**
    * The gloss is from a row where we split Dee's running English
-   * (`englishSplit`), so shown on its tile, not as his (decision 14).
+   * (`englishSplit`), so shown marked as ours, on its tile and the line
+   * (decision 14).
    */
   ours: boolean;
   /** For a dictionary-only word: the headword's cited work. */
@@ -80,12 +81,12 @@ export interface ReadToken {
 export interface LineSegment {
   /**
    * `dee`: a run of Dee's lines, his English; `word`: glosses word by
-   * word; `tile-only`: a word whose gloss is our split of Dee's English
-   * (`englishSplit`), shown on its tile, not on the line, so `text` is
-   * empty (decision 14); `unglossed`: a word we have with no known
-   * meaning; `missing`: a word not in our data, `text` as typed.
+   * word; `ours`: a word whose only English is our division of Dee's
+   * running English (`englishSplit`), shown marked as ours (decision
+   * 14), never empty; `unglossed`: a word we have with no known meaning;
+   * `missing`: a word not in our data, `text` as typed.
    */
-  kind: "dee" | "word" | "tile-only" | "unglossed" | "missing";
+  kind: "dee" | "word" | "ours" | "unglossed" | "missing";
   text: string;
   /** The tokens it covers, `[from, to)`, in `tokens`. */
   tokens: readonly [number, number];
@@ -97,8 +98,8 @@ export interface LineSegment {
   /**
    * For a reading of several words (a split, a Golden Dawn form spanning
    * two of Dee's, one of Leitch's joined forms), which of them, `[from,
-   * to)`: each part whose gloss is only our split of Dee's English is a
-   * `tile-only` segment of its own, and the rest stay on the line.
+   * to)`: each part whose gloss is only our split of Dee's English is an
+   * `ours` segment of its own, and the rest are run together.
    */
   parts?: readonly [number, number];
 }
@@ -628,77 +629,88 @@ export const readingGloss = (reading: Reading) =>
     .join(" ");
 
 /**
+ * A word's segments, word by word: a split that fits twice gives both
+ * readings, Dee's own parts run together and each part whose gloss is
+ * only our split an `ours` segment.
+ */
+function wordSegments(token: ReadToken, at: number, out: LineSegment[]) {
+  if (!token.readings.length) {
+    out.push({ kind: "missing", text: token.input, tokens: [at, at + 1] });
+    return;
+  }
+  const readings =
+    token.readings[0].via === "split" ? token.readings : [token.readings[0]];
+  readings.forEach((reading, index) => {
+    const which = readings.length > 1 ? { reading: index } : {};
+    const several = reading.words.length > 1;
+    let from = 0;
+    const push = (kind: "word" | "ours", text: string, to: number) =>
+      out.push({
+        kind: text ? kind : "unglossed",
+        text,
+        tokens: [at, at + 1],
+        ...which,
+        ...(several ? { parts: [from, to] as const } : {}),
+      });
+    // Dee's own parts run together; each of ours alone, marked.
+    const flush = (to: number) => {
+      if (to > from)
+        push(
+          "word",
+          reading.words
+            .slice(from, to)
+            .map((one) => one.gloss)
+            .filter(Boolean)
+            .join(" "),
+          to,
+        );
+    };
+    reading.words.forEach((one, part) => {
+      if (!one.ours) return;
+      flush(part);
+      from = part;
+      push("ours", one.gloss, part + 1);
+      from = part + 1;
+    });
+    flush(reading.words.length);
+  });
+}
+
+/**
  * The reading line (decision 14): each run of Dee's lines as his English,
- * the rest word by word; a split that fits twice gives both readings,
- * each part whose gloss is only our split marked `tile-only`.
+ * the rest word by word (`wordSegments`). A run's words are his even where
+ * its first or last row is one we divided: only where that row's English
+ * starts or stops is ours, and the data doesn't yet record where his own
+ * units begin (plan 000's follow-ups).
  */
 function readingLine(tokens: readonly ReadToken[]): LineSegment[] {
   const out: LineSegment[] = [];
   for (let at = 0; at < tokens.length; at++) {
     const token = tokens[at];
-    if (token.run !== undefined) {
-      let end = at + 1;
-      while (end < tokens.length && tokens[end].run === token.run) end++;
-      out.push({
-        kind: "dee",
-        text: tokens
-          .slice(at, end)
-          .map((one) => readingGloss(one.readings[0]))
-          .filter(Boolean)
-          .join(" "),
-        tokens: [at, end],
-      });
-      at = end - 1;
+    if (token.run === undefined) {
+      wordSegments(token, at, out);
       continue;
     }
-    if (!token.readings.length) {
-      out.push({ kind: "missing", text: token.input, tokens: [at, at + 1] });
-      continue;
-    }
-    const readings =
-      token.readings[0].via === "split" ? token.readings : [token.readings[0]];
-    readings.forEach((reading, index) => {
-      const which = readings.length > 1 ? { reading: index } : {};
-      const several = reading.words.length > 1;
-      let from = 0;
-      // Dee's own parts on the line, run together; each of ours alone.
-      const flush = (to: number) => {
-        if (to <= from) return;
-        const text = reading.words
-          .slice(from, to)
-          .map((one) => one.gloss)
-          .filter(Boolean)
-          .join(" ");
-        out.push({
-          kind: text ? "word" : "unglossed",
-          text,
-          tokens: [at, at + 1],
-          ...which,
-          ...(several ? { parts: [from, to] as const } : {}),
-        });
-      };
-      reading.words.forEach((one, part) => {
-        if (!one.ours) return;
-        flush(part);
-        out.push({
-          kind: "tile-only",
-          text: "",
-          tokens: [at, at + 1],
-          ...which,
-          ...(several ? { parts: [part, part + 1] as const } : {}),
-        });
-        from = part + 1;
-      });
-      flush(reading.words.length);
+    let end = at + 1;
+    while (end < tokens.length && tokens[end].run === token.run) end++;
+    out.push({
+      kind: "dee",
+      text: tokens
+        .slice(at, end)
+        .map((one) => readingGloss(one.readings[0]))
+        .filter(Boolean)
+        .join(" "),
+      tokens: [at, end],
     });
+    at = end - 1;
   }
   return out;
 }
 
 /**
  * The line as plain text, for tests and logs: a word not found shown
- * `[AS TYPED?]`, a tile-only word or part `…`, a word's second reading
- * after ` / `.
+ * `[AS TYPED?]`, our division of Dee's English `‹so›`, a word's second
+ * reading after ` / `.
  */
 export function lineText(line: readonly LineSegment[]): string {
   const out: string[] = [];
@@ -713,8 +725,8 @@ export function lineText(line: readonly LineSegment[]): string {
     out.push(
       one.kind === "missing"
         ? `[${one.text}?]`
-        : one.kind === "tile-only"
-          ? "…"
+        : one.kind === "ours"
+          ? `‹${one.text}›`
           : one.text,
     );
   });
