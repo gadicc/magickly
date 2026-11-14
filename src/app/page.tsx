@@ -8,12 +8,12 @@ import Tiles from "@/ui/Tiles";
 import HomeText from "./HomeText";
 import AndroidMagician from "./img/android-magician.png";
 import AstrologyTile from "./img/astrology.jpeg";
+import MagicBook from "./img/Enchanted Book and Cosmic Nebula.png";
 import EnochianAngel from "./img/enochian-angel.webp";
 import GeomancyImg from "./img/geomancy.webp";
 import MagicalTemple from "./img/magical-temple.webp";
 import OpenSourceImg from "./img/open-source.webp";
 import PortaeLucis from "./img/portae_lucis_upsampled.webp";
-import MagicBook from "./img/shutterstock_393367726_768x512.webp";
 import StudyImg from "./img/study.webp";
 
 export const metadata = pageMetadata("/");
