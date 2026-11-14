@@ -99,6 +99,11 @@ Follow-ups are separate from the completed migration work:
   [October dependency refresh](066-october-dependency-refresh.md), with the
   remaining exact-pin zod, glob and minimatch advisories, the deferred Biome
   2.6 and identity-bound packages, and their follow-ups.
+- 14 November 2026: `magick-data` 0.2.0, with the Moon's
+  `intelligenceOfIntelligences`, the tablet notes' Yods and "Bull", and
+  the two changed Sources rows signed again; on `gate/data-020`,
+  published by CI when main is pushed
+  ([plan 080](080-open-source-packages.md#magick-data-020-14-november-2026)).
 - 13 November 2026: Dependabot alerts #362 (zod), #364 (glob) and #366
   (minimatch) fixed by a `@vercel/functions` bump and parent-scoped
   overrides of Serwist's exact zod and glob pins (glob 14 checked against
@@ -338,8 +343,8 @@ Follow-ups are separate from the completed migration work:
   `planet.intelligenceOfIntelligences`; built on
   `gate/moon-intelligence` on top of the chakras' figure, not merged
   ([plan 080](080-open-source-packages.md#the-moons-two-intelligences-13-november-2026)).
-  TODO: release it as `magick-data` 0.2.0 after Gadi re-signs the
-  `astrology/planets.json5` Sources row.
+  Released as `magick-data` 0.2.0 on 14 November
+  ([plan 080](080-open-source-packages.md#magick-data-020-14-november-2026)).
   On 13 November two drawings were found to come from sources the
   package cannot use: the planetary spirits' sigils were traced from a
   1994 Llewellyn printing (and were the Rulers' geomantic sigils, not
@@ -377,8 +382,8 @@ Follow-ups are separate from the completed migration work:
   top of the source links, not
   merged; Air's pins and four halls' moved, the Yods' paths alone
   ([plan 080](080-open-source-packages.md#the-air-sigils-yods-13-november-2026)).
-  TODO: the tablet notes' new text goes out with `magick-data` 0.2.0,
-  and Gadi re-signs the `enochian/tabletNotes.json5` Sources row.
+  The tablet notes' new text goes out with `magick-data` 0.2.0
+  ([plan 080](080-open-source-packages.md#magick-data-020-14-november-2026)).
   TODO: with Gadi's go-ahead, stage G; stage E's and F's deferred
   items. Follow-ups:
   [plan 080](080-open-source-packages.md#follow-ups),

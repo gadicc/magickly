@@ -1032,20 +1032,11 @@ reproduced. Applied in `9d34b8d2`.
   job outside `release.yml`'s path.
 - **Required reviewers on the `npm` environment**, if anyone but Gadi
   ever gets push access to `main` (decision 3).
-- **The Moon's two intelligences need a release and a re-signed row**
-  ([below](#the-moons-two-intelligences-13-november-2026)): the new
-  field `planet.intelligenceOfIntelligences` is a minor change,
-  `magick-data` 0.2.0, and the README's Sources row for
-  `astrology/planets.json5`, signed 2026-11-13, needs Gadi's sign-off
-  again, since the file now quotes 777 Revised and Regardie's
-  spellings beside Agrippa's.
-- **The Air sigil's Yods change the published notes**
-  ([below](#the-air-sigils-yods-13-november-2026)): the tablet notes
-  now say "a Tau with four Yods above it, drawn as small flames" and
-  cite three more sources, a patch to `magick-data`'s published text
-  that can go out with 0.2.0; the version was not bumped. The README's
-  Sources row for `enochian/tabletNotes.json5`, signed 2026-11-12,
-  needs Gadi's sign-off again.
+- **Done: the Moon's two intelligences and the Air sigil's Yods**
+  ([the Moon](#the-moons-two-intelligences-13-november-2026),
+  [the Yods](#the-air-sigils-yods-13-november-2026)) go out in
+  `magick-data` 0.2.0, with both Sources rows signed again
+  ([below](#magick-data-020-14-november-2026)).
 
 ## Stage B (13 November 2026)
 
@@ -1605,8 +1596,8 @@ runs were discarded and the commits gated again at a lower load.
 **Follow-ups:**
 
 - npm's 0.1.0 still has "Bullm" for `zodiac.taurus.meaning.en`; the
-  source reads "Bull" since main's `1ce38ab0`, and the next patch
-  release ships it.
+  source reads "Bull" since main's `1ce38ab0`, and 0.2.0 ships it
+  ([below](#magick-data-020-14-november-2026)).
 - The bar on a table's page links Data; the drawer does not list Data
   until the section has a second page (stage F).
 - **Stage E's import rewrite:** the data pages import
@@ -2409,6 +2400,41 @@ in this commit, on top of `gate/pd-sigils`, without rebasing.
 | --- | --- |
 | `0f19ed5d` | `fix(astrology): Say what the sources give, no more` |
 | (this commit) | `docs(plans): Record the stacked branches' review` |
+
+## magick-data 0.2.0 (14 November 2026)
+
+Gadi asked for the release on 14 November, after the source links, the
+home tile and the Yods were merged. `7021aee5` bumps `magick-data` to
+0.2.0, a minor while the version is 0.x, for the new field
+`planet.intelligenceOfIntelligences`. It also ships what main gained
+since 0.1.0: the tablet notes' wording of the Air sigil, with three more
+sources, and "Bull" for `zodiac.taurus.meaning.en`.
+
+**The sign-off.** Two Sources rows' files changed after they were
+signed: `astrology/planets.json5` (signed 2026-11-13 at `1ce38ab0`; the
+Moon's field and its header note came after, in `dd6d805c` and
+`0f19ed5d`) and `enochian/tabletNotes.json5` (signed 2026-11-12 at
+`b3e29099`; the sigils and Air notes changed in `b36b3f82` and
+`8835288e`). Both diffs were read: names, spellings and citations, and
+our own words, with no copied book text and nothing from private
+temple material. Both rows are signed 2026-11-14, and the planets row
+now names the new field and its sources, which it did not. Nothing
+enforces that a row is signed again after its file changes (the test
+only requires a date); that stays the owner's check.
+
+The README's note on the first version no longer says the release
+candidate may still be what `latest` names; npm's `latest` is 0.1.0.
+`publish.yml`'s decision, run on the commit's tree against the
+registry: publish `magick-data@0.2.0`, new, under `latest`. It goes out
+when Gadi pushes main.
+
+It passed stage E's gate (with the components' smoke test) on its own
+tree, every step at 0, coverage at the first attempt.
+
+| Commit | What |
+| --- | --- |
+| `7021aee5` | `feat(magick-data): Release 0.2.0` |
+| (this commit) | `docs(plans): Record magick-data 0.2.0` |
 
 ## Review (11 November 2026)
 
