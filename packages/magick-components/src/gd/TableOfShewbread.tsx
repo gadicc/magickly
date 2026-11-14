@@ -1,5 +1,6 @@
 import { assemble } from "magick-data/assemble";
 import zodiacRows from "magick-data/astrology/zodiac";
+import archangels from "magick-data/kabbalah/archangels";
 import tribeRows from "magick-data/kabbalah/tribesOfIsrael";
 import React from "react";
 
@@ -8,7 +9,8 @@ import React from "react";
  * the tribes with `tribesOfIsrael[zodiac.tribeOfIsraelId]` by hand, which is
  * the join `tribeOfIsraelId` has declared in the graph since step 2. Scoped
  * rather than the barrel on purpose — the barrel would put all 23 of its
- * tables in this route's chunk, and this needs two.
+ * tables in this route's chunk, and this needs two, and the archangels'
+ * names.
  */
 const { zodiac } = assemble({
   zodiac: zodiacRows,
@@ -155,12 +157,21 @@ function Branch({
   );
 }
 
-const innerCircleData = [
-  { angelId: "raphael", kerub: "אדם", symbol: "👨" },
-  { angelId: "michael", kerub: "אריה", symbol: "🦁" },
-  { angelId: "gabriel", kerub: "נשר", symbol: "🦅" },
-  { angelId: "uriel", kerub: "שור", symbol: "🐂" },
-];
+/**
+ * The archangels of the quarters, each with the Kerub of its element: their
+ * names in Hebrew, as the figure's other labels are, from magick-data.
+ */
+const innerCircleData = (
+  [
+    { angelId: "raphael", kerub: "אדם", symbol: "👨" },
+    { angelId: "michael", kerub: "אריה", symbol: "🦁" },
+    { angelId: "gabriel", kerub: "נשר", symbol: "🦅" },
+    { angelId: "uriel", kerub: "שור", symbol: "🐂" },
+  ] as const
+).map((circle) => ({
+  ...circle,
+  angelName: archangels[circle.angelId].name.he,
+}));
 
 const innerRadius = 23.5;
 const pentagramRadius = innerRadius * 0.45;
@@ -185,6 +196,7 @@ const innerCircles = innerCircleData.map((data, index) => ({
 
 function TextOnCircle({
   text,
+  pathKey = text,
   center,
   radius,
   position,
@@ -192,6 +204,8 @@ function TextOnCircle({
   idPrefix,
 }: {
   text: string;
+  /** Names the text's path in its id; the text unless given. */
+  pathKey?: string;
   center: Point;
   radius: number;
   position: "inner-top" | "inner-bottom";
@@ -199,7 +213,7 @@ function TextOnCircle({
   idPrefix: string;
 }) {
   const fontSize = 2.5;
-  const textPathId = `${idPrefix}-text-path-${text}-${position}`;
+  const textPathId = `${idPrefix}-text-path-${pathKey}-${position}`;
   radius -= offset;
 
   return (
@@ -321,7 +335,8 @@ export function TableOfShewbread({
               strokeWidth=".35"
             />
             <TextOnCircle
-              text={circle.angelId}
+              text={circle.angelName}
+              pathKey={circle.angelId}
               center={raphaelCircleCenter}
               radius={circle.radius}
               position="inner-top"

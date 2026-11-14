@@ -119,13 +119,19 @@ const CANDLESTICK_INPUTS: DataInputsSpec = [
  * The signs are drawn by position, so their key order counts. Each sign's
  * tribe is read through its link, as the component reads it, so only the
  * twelve tribes the signs name are hashed: Levi and Joseph, whom no sign
- * names and the table never draws, are not (plan 052).
+ * names and the table never draws, are not (plan 052). The four
+ * archangels of the quarters are drawn by name.
  */
 const SHEWBREAD_INPUTS: DataInputsSpec = [
   {
     table: "zodiac",
     rows: "*",
     fields: ["symbol", "tetragrammatonPermutation", "tribeOfIsrael.name.he"],
+  },
+  {
+    table: "archangel",
+    rows: ["raphael", "michael", "gabriel", "uriel"],
+    fields: ["name.he"],
   },
 ];
 
