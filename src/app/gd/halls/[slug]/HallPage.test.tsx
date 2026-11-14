@@ -94,7 +94,7 @@ describe("a temple hall's page", () => {
         `${gdHallTitle(hall)}, by Magick.ly, drawn by magick-components (MIT), https://magick.ly/gd/halls/${slug}, CC BY 4.0`,
       );
       expect(text).toContain(
-        "so you may also draw the same image from the package under MIT",
+        "so you may also make the same drawing from the package under MIT",
       );
       expect(text).toContain("Regardie 1938, vol. 2, p.");
       expect(text).not.toMatch(/public\/pics|older drawing/);

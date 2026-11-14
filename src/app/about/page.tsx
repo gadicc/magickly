@@ -79,9 +79,11 @@ export default function Sequence() {
           , version 3 or any later version. The data and the images the site
           draws are{" "}
           <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>,
-          with credit to Magick.ly, and the code of the data and the components
-          is MIT; <Link href="/open-source#licences">Open source</Link> says
-          what each covers.
+          with credit to Magick.ly, or for a drawing a component makes, to
+          Magick.ly, drawn by magick-components (MIT). The code of the data and
+          the components is MIT;{" "}
+          <Link href="/open-source#licences">Open source</Link> says what each
+          covers.
         </p>
 
         <p>

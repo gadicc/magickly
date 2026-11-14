@@ -78,7 +78,7 @@ describe("/open-source", () => {
       /is CC BY 4\.0 .*except where its README says no rights are asserted/,
     );
     expect(licence("The images the site draws or makes itself")).toMatch(
-      /are CC BY 4\.0 too.*The code that draws them is MIT.*credit it as drawn by magick-components \(MIT\)\. Credit the hand-drawn images to Magick\.ly\./,
+      /are CC BY 4\.0 too.*The code that draws them is MIT.*anyone may make the same drawing from the package under MIT\. Credit such an image to Magick\.ly, drawn by magick-components \(MIT\), and the hand-drawn images to Magick\.ly\./,
     );
     expect(licence("The fonts")).toMatch(/SIL Open Font License 1\.1/);
     expect(licence("Work by others")).toMatch(/keeps its own licence/);
@@ -89,14 +89,15 @@ describe("/open-source", () => {
   // Plan 080, stage B review M2: the hub, the hall pages and the halls'
   // embedded credit switch together, and stage G switched them when the
   // package became publishable (no longer private). They must agree: the
-  // credit the hub tells others to give is the one the hall files carry.
+  // credit the hub tells others to give is the one the hall files carry
+  // (stage G review, L3).
   it("credits served drawings as the components', as the halls' files do", () => {
     expect(manifest.private).toBeUndefined();
     expect(GD_HALL_LICENCE.creditText).toBe(
       "Magick.ly, drawn by magick-components (MIT)",
     );
-    expect(text(html)).toContain(
-      "credit it as drawn by magick-components (MIT)",
+    expect(licence("The images the site draws or makes itself")).toContain(
+      `Credit such an image to ${GD_HALL_LICENCE.creditText},`,
     );
   });
 
@@ -174,7 +175,6 @@ describe("/open-source", () => {
         "The data is on npm; the components will follow.",
       );
       const components = card("magick-components");
-      expect(components).toContain("not on npm yet");
       expect(components).not.toContain("npm i");
       expect(hrefs(components)).not.toContain(
         "https://www.npmjs.com/package/magick-components",

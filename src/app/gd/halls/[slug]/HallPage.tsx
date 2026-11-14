@@ -202,7 +202,7 @@ export default function HallPage({ hall }: { hall: GdHallEntry }) {
             <Link href="https://github.com/gadicc/magickly/tree/main/packages/magick-components">
               MIT
             </Link>
-            , so you may also draw the same image from the package under MIT;
+            , so you may also make the same drawing from the package under MIT;
             see <Link href="/open-source#licences">Open source</Link>.
           </p>
 

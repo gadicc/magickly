@@ -41,8 +41,11 @@ export const COMPONENTS_ON_NPM = isOnNpm(componentsManifest.version);
  * "The licence of a drawing that is code"); the packages come first at
  * Gadi's request (13 November 2026), and `#licences` stays the anchor
  * `/about` and the hall pages link. Since stage G, a served image of a
- * component's drawing is credited as drawn by magick-components (MIT), as
- * the hall pages and files say, and the hand-drawn images to Magick.ly.
+ * component's drawing is credited to "Magick.ly, drawn by
+ * magick-components (MIT)", `GD_HALL_LICENCE.creditText`, as the hall
+ * pages and files say, and the hand-drawn images to Magick.ly. The card
+ * says nothing of npm until the package is there: prose inside a condition
+ * stays in the search catalogue after it flips (stage G review, L1).
  */
 export default function OpenSourceText() {
   return (
@@ -98,14 +101,6 @@ export default function OpenSourceText() {
             </Link>{" "}
             draw each one live, with its props to try and its reference.
           </p>
-          {COMPONENTS_ON_NPM ? null : (
-            <p>
-              It is not on npm yet. Until it is, the components are in the
-              app&apos;s repository, under{" "}
-              <code>packages/magick-components</code>, where you may copy them
-              under MIT.
-            </p>
-          )}
         </PackageCard>
       </PageText>
       <PageText labelledBy="licences">
@@ -166,9 +161,9 @@ export default function OpenSourceText() {
             are CC BY 4.0 too, wherever they are served: on its pages, as
             downloads or from its image API. The code that draws them is MIT, as
             above, so where one is a component&apos;s drawing, as the Tree, the
-            tablets and the halls are, anyone may draw the same image from the
-            package under MIT: credit it as drawn by magick-components (MIT).
-            Credit the hand-drawn images to Magick.ly.
+            tablets and the halls are, anyone may make the same drawing from the
+            package under MIT. Credit such an image to Magick.ly, drawn by
+            magick-components (MIT), and the hand-drawn images to Magick.ly.
           </li>
           <li>
             <b>The fonts</b>: the site&apos;s text is set in Roboto and its
