@@ -108,6 +108,7 @@ export default defineConfig({
         "src/chat-research/remoteCorpus.ts",
         "src/chat-research/privateCorpusStore.ts",
         "src/chat-research/sqlCorpusMetadata.ts",
+        "src/chat-research/sqlCorpusBundle.ts",
         "src/chat-research/browserWorker.ts",
         "src/chat-research/workerProtocol.ts",
         "src/chat-research/ResearchHostedChat.tsx",

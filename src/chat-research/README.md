@@ -79,3 +79,20 @@ configuration uses this port.
 Deadline/destroy checks reject late results; they do not cancel already-started
 driver work or prove connection/backend closure. Actual connection, COMMIT and
 session lifetimes still need explicit hosting/driver adoption.
+
+
+## Canonical SQL bundle control
+
+`sqlCorpusBundle.ts` is a separate inactive full-bundle object port. It preserves
+canonical compilation and the existing BM25 pipeline. Before reading units it
+checks the sealed manifest and exact encoded row size, with a 32 MiB unit-file
+cap. It verifies sorted canonical JSONL bytes and their digest while streaming.
+The original loader deadline applies through SQL, encoding and delivery; unread
+rows are released on cancellation, abort, expiry and destruction. This does not
+prove termination of already-started driver or backend work.
+
+Use the metadata-only port for retained reads. Full-bundle generation remains a
+performance control until a co-located measurement establishes its cold-load
+budget. This factory grants no source processing, opens no route and starts no
+model request. Database custody, ingress, retention and runtime adoption remain
+separate requirements.

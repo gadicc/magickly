@@ -154,3 +154,20 @@ byte-for-byte unchanged. No real key or application secret configuration changed
 Expert-reviewed held-out quality acceptance, later image/upload features and
 public legacy-chat cutover remain separate roadmap work. None is established by
 structural/security tests or by this hosting preparation.
+
+
+## SQL reader checkpoint
+
+The inactive metadata reader supports retained citations without loading passage
+bodies. The separate canonical full-bundle reader preserves the current compiler
+and BM25 behavior, with byte/hash verification, a 32 MiB unit-file cap and the
+original absolute deadline. Neither reader changes default configuration or
+provides operator/source authorization by itself.
+
+Measure the full path in the intended hosting region before adopting it. A local
+network diagnostic is insufficient to accept or reject co-located performance.
+Any temporary cloud probe needs a separately reviewed Preview-only scope, private
+runtime configuration, authenticated ingress, bounded reads and resource cleanup;
+it must not deploy the application, invoke models or change production aliases.
+Native SQL retrieval remains an alternative requiring separate relevance and
+runtime acceptance, rather than an assumed equivalent to the current BM25 path.
