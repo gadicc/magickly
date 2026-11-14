@@ -67,13 +67,21 @@ manifest and exact cached-input checks before COPY.
 
 The migration ships through the normal staged main release, never through the
 importer. The importer must verify the installed schema/journal and refuse drift.
-It does not install extensions or create tables. The production importer, SQL
-retrieval/index selection and restricted writer/reader composition remain to be
-implemented and reviewed. Database ownership is a trusted boundary; revoking
+It does not install extensions or create tables. The bounded ingestion executor and actual intake receipts belong in the private
+companion. SQL retrieval/index selection and restricted writer/reader composition
+remain inactive preparation work; no private target facts belong in this plan. Database ownership is a trusted boundary; revoking
 PUBLIC access cannot constrain a runtime sharing the migration owner's role.
 Vercel Sensitive variables cannot be recovered through CLI; use an approved direct
 migration/ingestion credential under the existing release boundary. Do not fall
 back to a development database or rotate credentials to bypass access restrictions.
+
+The generic SQL metadata port is now prepared separately. It serves only sealed
+manifest/catalog objects through fresh read-only root transactions. The existing
+remote loader retains canonical source gates and metadata-handle compilation and
+passes its original absolute end into the port; late SQL results cannot start a
+new data query after that end. Units are refused before SQL, so generation still
+needs a separate search/materialization adapter. This installs no route, database
+adoption, source grant or retention/hosting configuration.
 
 Actual source admission, derived-data ingestion, hosting and model spending are
 separate scopes. Preserve the selected operator-only audience; source and target

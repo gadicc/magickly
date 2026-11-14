@@ -39,6 +39,8 @@ export interface ResearchRemoteCorpusOptions {
   readonly readObject: (
     name: ResearchCorpusObjectName,
     signal: AbortSignal,
+    /** Original monotonic absolute loader end; never restart a budget inside an object port. */
+    deadlineAt: number,
   ) => Promise<ResearchPrivateCorpusObject>;
 }
 function fail(): never {
@@ -129,7 +131,7 @@ export async function loadResearchRemoteCorpus(
           };
           bounded.addEventListener("abort", stop, { once: true });
           try {
-            object = await Promise.resolve(readObject(name, bounded)).then(
+            object = await Promise.resolve(readObject(name, bounded, end)).then(
               (value) => {
                 try {
                   active();

@@ -63,3 +63,19 @@ Its actual immutable custom-server packaging, custody and adoption are required;
 unrestricted `next start` is not an approved operator service launcher. See the
 plan for target provisioning, cleanup and independent adoption order. No new live
 scope or service is started by installing or importing these modules.
+
+## SQL metadata port
+
+`sqlCorpusMetadata.ts` is an inactive object port for `manifest.json` and
+`catalog.json` only. It uses a separately adopted database root, sealed dataset
+and catalog-revision pins, fresh read-only transactions and the loader's original
+absolute deadline. `loadResearchRemoteCorpus` supplies that deadline and repeats
+current source gates and canonical checks. The resulting catalog supports
+retained-answer citations; it cannot become a generation corpus. Passage/object
+requests fail before SQL. Database/role/native custody, operator ingress and
+source grants remain separate hosted-adoption requirements. No route or default
+configuration uses this port.
+
+Deadline/destroy checks reject late results; they do not cancel already-started
+driver work or prove connection/backend closure. Actual connection, COMMIT and
+session lifetimes still need explicit hosting/driver adoption.
