@@ -41,6 +41,12 @@ import { createSqlResearchReadHttpHandler } from "./readHttp";
 import { inspectResearchRequestArtifact } from "./requestArtifact";
 import type { ResearchRetainedArchiveBinding } from "./retainedArchive";
 import type { ResearchRetainedReadBinding } from "./retainedDelivery";
+import {
+  inspectResearchRuntimeCatalog,
+  inspectResearchRuntimeCorpus,
+  type PreparedResearchRuntimeCatalog,
+  type PreparedResearchRuntimeCorpus,
+} from "./runtimeCorpus";
 import type { ResearchSourceContext } from "./sourceAuthorization";
 import { parseResearchSourceContext } from "./sourceAuthorization";
 
@@ -132,7 +138,12 @@ export interface ResearchConfiguredServiceOptions {
   readonly documentJson: string;
   readonly independentlyAdoptedDocumentSha256: string;
   readonly publication: PreparedResearchPublication;
-  readonly corpusRoot: string;
+  /** Existing immutable owner-local input. Exactly one of corpusRoot/preparedCorpus/preparedCatalog is required. */
+  readonly corpusRoot?: string;
+  /** Genuine server-owned canonical bytes loaded through a separately reviewed private storage boundary. Never caller-supplied ports or a claimed hash. */
+  readonly preparedCorpus?: PreparedResearchRuntimeCorpus;
+  /** Catalog-only snapshot is accepted only with explicit read-only generation policy. */
+  readonly preparedCatalog?: PreparedResearchRuntimeCatalog;
   /** Actual already-created Loom root from the approved endpoint; endpoint provenance cannot be recovered from a generic SQL object. */
   readonly database: ResearchHttpOptions["database"];
   readonly authOptions: ResearchHttpOptions["authOptions"];
@@ -210,11 +221,36 @@ export function createConfiguredResearchApplication(
     )
       fail();
     const runTransaction: typeof transaction = transaction.bind(database);
-    // Own the real loader's ports; an arbitrary object's claimed manifest/catalog revision is insufficient.
-    const loaded = loadPrivateResearchCorpus(
-      options.corpusRoot,
-      document.corpus_manifest_sha256,
-    );
+    // Either loader creates owned ports from genuine hash-checked canonical data.
+    // Requiring an opaque preparation preserves the original no-arbitrary-ports
+    // boundary for hosted storage without touching the owner-local reader.
+    const corpusRoot = options.corpusRoot,
+      preparedCorpus = options.preparedCorpus,
+      preparedCatalog = options.preparedCatalog;
+    if (
+      [corpusRoot, preparedCorpus, preparedCatalog].filter(
+        (value) => value !== undefined,
+      ).length !== 1
+    )
+      fail();
+    const loaded =
+      typeof corpusRoot === "string"
+        ? loadPrivateResearchCorpus(corpusRoot, document.corpus_manifest_sha256)
+        : preparedCorpus !== undefined
+          ? inspectResearchRuntimeCorpus(
+              preparedCorpus,
+              document.corpus_manifest_sha256,
+            )
+          : preparedCatalog !== undefined && generation === "read-only"
+            ? {
+                ...inspectResearchRuntimeCatalog(
+                  preparedCatalog,
+                  document.corpus_manifest_sha256,
+                ),
+                search: fail,
+                materialize: fail,
+              }
+            : fail();
     if (loaded.catalog.revision !== scope.corpusVersion) fail();
     const expected = JSON.stringify([
         scope,

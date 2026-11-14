@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, expect, it, vi } from "vitest";
 
+vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 const themes = vi.hoisted(() => [] as Record<string, unknown>[]);
 vi.mock("@mui/material/CssBaseline", () => ({ default: () => null }));
 vi.mock("@mui/material/styles", () => ({

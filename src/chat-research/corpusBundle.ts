@@ -235,3 +235,90 @@ function prepareOrder(input: ResearchCatalogInput) {
     source.units.sort((a, b) => compare(a.id, b.id));
   return canonical(input) + "\n";
 }
+
+/** Compile only pinned catalog metadata for retained reads. No unit text or generation/search port is loaded. */
+export function compileResearchCorpusMetadata(
+  bundle: Pick<ResearchCorpusBundle, "manifestSha256" | "manifest" | "catalog">,
+) {
+  try {
+    const expected = bundle.manifestSha256,
+      header = bounded(
+        bundle.manifest,
+        RESEARCH_CORPUS_FILE_LIMITS["manifest.json"],
+      ),
+      catalogText = bounded(
+        bundle.catalog,
+        RESEARCH_CORPUS_FILE_LIMITS["catalog.json"],
+      );
+    if (
+      expected.length !== 64 ||
+      !/^[a-f0-9]{64}$/.test(expected) ||
+      hash(header) !== expected
+    )
+      fail();
+    const raw = parse(header, RESEARCH_CORPUS_FILE_LIMITS["manifest.json"]) as {
+        files?: { "units.jsonl"?: { bytes?: number; sha256?: string } };
+        text_and_id_utf8_bytes?: number;
+      },
+      bytes = raw.files?.["units.jsonl"]?.bytes,
+      digest = raw.files?.["units.jsonl"]?.sha256,
+      textBytes = raw.text_and_id_utf8_bytes;
+    if (
+      !Number.isSafeInteger(bytes) ||
+      bytes! < 0 ||
+      bytes! > RESEARCH_CORPUS_FILE_LIMITS["units.jsonl"] ||
+      typeof digest !== "string" ||
+      digest.length !== 64 ||
+      !/^[a-f0-9]{64}$/.test(digest) ||
+      !Number.isSafeInteger(textBytes) ||
+      textBytes! < 0 ||
+      textBytes! > 64 * 1024 * 1024
+    )
+      fail();
+    const input = parse(
+        catalogText,
+        RESEARCH_CORPUS_FILE_LIMITS["catalog.json"],
+      ) as ResearchCatalogInput,
+      catalog = compileResearchCatalog(input),
+      stats = Object.freeze({
+        corpus_version: catalog.revision,
+        source_count: catalog.sourceCount,
+        unit_count: catalog.unitCount,
+        physical_pdf_pages: input.sources.reduce((n, s) => n + s.pdf_pages, 0),
+        native_units: input.sources.reduce(
+          (n, s) =>
+            n + s.units.filter((u) => u.extraction === "native_text").length,
+          0,
+        ),
+        unverified_ocr_units: input.sources.reduce(
+          (n, s) =>
+            n + s.units.filter((u) => u.extraction === "unverified_ocr").length,
+          0,
+        ),
+        text_and_id_utf8_bytes: textBytes!,
+      }),
+      files = Object.freeze({
+        "catalog.json": Object.freeze({
+          bytes: Buffer.byteLength(catalogText),
+          sha256: hash(catalogText),
+        }),
+        "units.jsonl": Object.freeze({ bytes: bytes!, sha256: digest! }),
+      });
+    if (
+      !Number.isSafeInteger(stats.physical_pdf_pages) ||
+      prepareOrder(input) !== catalogText ||
+      canonical({
+        schema_version: 1,
+        purpose: "magickli-private-runtime-corpus-v1",
+        ...stats,
+        files,
+      }) +
+        "\n" !==
+        header
+    )
+      fail();
+    return Object.freeze({ manifestSha256: expected, catalog, stats, files });
+  } catch {
+    return fail();
+  }
+}

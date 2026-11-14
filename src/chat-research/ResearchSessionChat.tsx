@@ -68,9 +68,12 @@ function draftSelection({
 export function SessionResearchChat({
   expiresAt,
   readOnly = false,
+  requestFetch,
 }: {
   expiresAt: number;
   readOnly?: boolean;
+  /** Optional same-origin transport with a current worker compatibility check at actual fetch dispatch. */
+  requestFetch?: typeof fetch;
 }) {
   const [draft, setDraft] = useState<ResearchQuestionDraft>(() => ({
       question: "",
@@ -209,7 +212,7 @@ export function SessionResearchChat({
     updateDraft({ scope: "selected", catalog: null, bookChoices: ["", ""] });
     try {
       const result = parseResearchBookCatalog(
-        await requestResearchBookCatalog(controller.signal),
+        await requestResearchBookCatalog(controller.signal, requestFetch),
       );
       if (mayCommit(controller, ownEpoch)) updateDraft({ catalog: result });
     } catch {
@@ -239,7 +242,7 @@ export function SessionResearchChat({
     invalidatePrior();
     try {
       const result = parseResearchAnswerArchive(
-        await requestResearchAnswerArchive(controller.signal),
+        await requestResearchAnswerArchive(controller.signal, requestFetch),
       );
       if (mayCommit(controller, ownEpoch)) setArchive(result);
     } catch {
@@ -276,6 +279,7 @@ export function SessionResearchChat({
       const result = await requestRetainedResearchAnswer(
         selected,
         controller.signal,
+        requestFetch,
       );
       if (
         result.answer_id !== selected.answer_id ||
@@ -378,7 +382,11 @@ export function SessionResearchChat({
     setError(false);
     setAnswer(null);
     try {
-      const result = await requestResearchAnswer(input, controller.signal);
+      const result = await requestResearchAnswer(
+        input,
+        controller.signal,
+        requestFetch,
+      );
       if (
         !controller.signal.aborted &&
         epoch.current === ownEpoch &&

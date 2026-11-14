@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { describe, expect, it, vi } from "vitest";
 import {
   compileResearchCorpusBundle,
+  compileResearchCorpusMetadata,
   prepareResearchCorpusBundle,
   RESEARCH_CORPUS_BUNDLE_ERROR,
   type ResearchCorpusBundle,
@@ -314,4 +315,65 @@ it("refuses an unsafe aggregate physical page count", () => {
   expect(() => prepareResearchCorpusBundle(input, values)).toThrow(
     RESEARCH_CORPUS_BUNDLE_ERROR,
   );
+});
+
+it("verifies exact metadata counts, hashes, order and bounds without materializing text", () => {
+  const bundle = make(),
+    metadata = compileResearchCorpusMetadata(bundle);
+  expect(metadata.catalog.revision).toBe(fixture.catalog.revision);
+  expect(metadata.files["units.jsonl"].sha256).toBe(sha(bundle.units));
+  expect(metadata.stats.source_count).toBe(3);
+  expect(() =>
+    compileResearchCorpusMetadata({ ...bundle, catalog: bundle.catalog + " " }),
+  ).toThrow();
+  expect(() =>
+    compileResearchCorpusMetadata({
+      ...bundle,
+      manifestSha256: "f".repeat(64),
+    }),
+  ).toThrow();
+});
+it.each([
+  "unit-bytes",
+  "unit-sha",
+  "text-bytes",
+  "source-count",
+  "extra",
+  "missing-files",
+])("refuses re-signed invalid metadata: %s", (kind) => {
+  const bundle = make(),
+    header = JSON.parse(bundle.manifest);
+  if (kind === "unit-bytes") header.files["units.jsonl"].bytes = -1;
+  if (kind === "unit-sha") header.files["units.jsonl"].sha256 = "bad";
+  if (kind === "text-bytes")
+    header.text_and_id_utf8_bytes = 64 * 1024 * 1024 + 1;
+  if (kind === "source-count") header.source_count = 2;
+  if (kind === "extra") header.extra = true;
+  if (kind === "missing-files") delete header.files;
+  // Sort all object keys like the existing canonical encoder so each failure
+  // reaches structural/count validation rather than mere root key order.
+  const canonical = (value: unknown): string =>
+    Array.isArray(value)
+      ? "[" + value.map(canonical).join(",") + "]"
+      : value && typeof value === "object"
+        ? "{" +
+          Object.keys(value)
+            .sort()
+            .map(
+              (key) =>
+                JSON.stringify(key) +
+                ":" +
+                canonical((value as Record<string, unknown>)[key]),
+            )
+            .join(",") +
+          "}"
+        : JSON.stringify(value);
+  const manifest = canonical(header) + "\n";
+  expect(() =>
+    compileResearchCorpusMetadata({
+      ...bundle,
+      manifest,
+      manifestSha256: sha(manifest),
+    }),
+  ).toThrow(RESEARCH_CORPUS_BUNDLE_ERROR);
 });

@@ -88,6 +88,10 @@ import type { ResearchRetainedReadBinding } from "./retainedDelivery";
 import * as retainedModule from "./retainedDelivery";
 import { prepareResearchRetentionProfile } from "./retentionProfile";
 import { RESEARCH_LOCAL_RETRIEVAL_PROFILE } from "./retrieval";
+import {
+  prepareResearchRuntimeCatalog,
+  prepareResearchRuntimeCorpus,
+} from "./runtimeCorpus";
 import { parseResearchSourcePrincipal } from "./sourceAuthorization";
 import {
   prepareResearchSourcePolicy,
@@ -2953,4 +2957,92 @@ it("the new operator startup requires its own native approval and supports signe
   } finally {
     chmodSync(corpus, 0o700);
   }
+});
+
+it("accepts only genuine prepared canonical corpus ports without any private filesystem load", async () => {
+  const bundle = prepareResearchCorpusBundle(
+      q.input,
+      texts.map((text, i) => ({ unit_id: "unit" + (i + 1), text })),
+    ),
+    preparedCorpus = prepareResearchRuntimeCorpus(bundle),
+    next = { ...options, corpusRoot: undefined, preparedCorpus };
+  // Removing the local bundle proves the prepared path does not fall back to it.
+  chmodSync(artifactDir, 0o700);
+  rmSync(join(artifactDir, "manifest.json"));
+  const app = createConfiguredResearchApplication(next),
+    response = await app.handleQuestion(request());
+  expect(response.status).toBe(200);
+  await collectResearchAnswer(
+    response,
+    response.headers.get("x-magickli-research-answer-id")!,
+    signal(),
+  );
+  expect(requestFetch).toHaveBeenCalledOnce();
+  expect(() =>
+    createConfiguredResearchApplication({
+      ...next,
+      preparedCorpus: { ...preparedCorpus },
+    }),
+  ).toThrow(RESEARCH_CONFIGURED_SERVICE_ERROR);
+  expect(() =>
+    createConfiguredResearchApplication({ ...next, corpusRoot: root }),
+  ).toThrow(RESEARCH_CONFIGURED_SERVICE_ERROR);
+  expect(() =>
+    createConfiguredResearchApplication({ ...options, corpusRoot: undefined }),
+  ).toThrow(RESEARCH_CONFIGURED_SERVICE_ERROR);
+});
+
+it("accepts a genuine catalog-only snapshot for retained routes but never for generation", async () => {
+  const first = await application().handleQuestion(request());
+  expect(first.status).toBe(200);
+  const answerId = first.headers.get("x-magickli-research-answer-id")!,
+    answer = await collectResearchAnswer(first, answerId, signal());
+  await db.update(windows).set({ stopped: new Date() });
+  await mutateCatalogPolicy((sources) => {
+    for (const source of sources) {
+      source.rights.generation = false;
+      source.rights.processor_profiles = [];
+      source.grants[0].capabilities.generation = false;
+      source.grants[0].capabilities.processor_profiles = [];
+    }
+  });
+  const bundle = prepareResearchCorpusBundle(
+      q.input,
+      texts.map((text, i) => ({ unit_id: "unit" + (i + 1), text })),
+    ),
+    preparedCatalog = prepareResearchRuntimeCatalog(bundle),
+    next = { ...options, corpusRoot: undefined, preparedCatalog };
+  expect(() => createConfiguredResearchApplication(next)).toThrow(
+    RESEARCH_CONFIGURED_SERVICE_ERROR,
+  );
+  chmodSync(artifactDir, 0o700);
+  rmSync(join(artifactDir, "units.jsonl"));
+  rmSync(join(artifactDir, "manifest.json"));
+  const key = vi.fn(() => {
+    throw Error("Unexpected retained-read key access");
+  });
+  const app = createConfiguredResearchApplication({
+    ...next,
+    apiKey: key,
+    generation: "read-only",
+  });
+  expect((await app.handleQuestion(request())).status).toBe(403);
+  const listed = await app.handleArchive(archiveRequest());
+  expect(listed.status).toBe(200);
+  const entry = parseResearchAnswerArchive(await listed.json()).entries[0];
+  const reopened = await app.handleRetainedRead(readRequest(entry.permit_id));
+  expect(reopened.status).toBe(200);
+  expect(await collectResearchAnswer(reopened, answerId, signal())).toEqual(
+    answer,
+  );
+  expect(requestFetch).toHaveBeenCalledOnce();
+  expect(priceFetch).toHaveBeenCalledOnce();
+  expect(key).not.toHaveBeenCalled();
+  expect(() =>
+    createConfiguredResearchApplication({
+      ...next,
+      generation: "read-only",
+      preparedCatalog: { ...preparedCatalog },
+    }),
+  ).toThrow(RESEARCH_CONFIGURED_SERVICE_ERROR);
 });

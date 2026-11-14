@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { readPrivateResearchPreviewSession as actualRead } from "./previewSession";
+import {
+  readPrivateResearchPreviewSession as actualRead,
+  readPrivateResearchOperatorSession,
+} from "./previewSession";
 
 // Deliberately small fake SQL/auth ports; real Drizzle mode/adapter behavior is covered in authDatabase.test.
 const readPrivateResearchPreviewSession = (
@@ -146,4 +149,66 @@ it("does not accept a late native COMMIT acknowledgement", async () => {
       new AbortController().signal,
     ),
   ).rejects.toThrow();
+});
+
+it("binds the operator-only shell to the actual fresh signed canonical account, never browser email or roles", async () => {
+  const { db } = fixture(),
+    owner = "019aa111-0000-7000-8000-000000000001",
+    other = "019aa111-0000-7000-8000-000000000003";
+  m.read.mockResolvedValue({
+    user: {
+      id: other,
+      email: "synthetic-operator@example.test",
+      role: "admin",
+    },
+    session: {
+      id: "019aa111-0000-7000-8000-000000000002",
+      expiresAt: new Date(2000000000000),
+    },
+  });
+  expect(
+    await readPrivateResearchOperatorSession(
+      db as never,
+      settings,
+      new Headers(),
+      new AbortController().signal,
+      owner,
+    ),
+  ).toBeNull();
+  m.read.mockResolvedValue({
+    user: { id: owner },
+    session: {
+      id: "019aa111-0000-7000-8000-000000000002",
+      expiresAt: new Date(2000000000000),
+    },
+  });
+  const session = await readPrivateResearchOperatorSession(
+    db as never,
+    settings,
+    new Headers(),
+    new AbortController().signal,
+    owner,
+  );
+  expect(session?.expiresAt).toBe(2000000000000);
+  expect(JSON.stringify(session)).not.toContain(owner);
+  expect(m.read).toHaveBeenCalledTimes(2);
+});
+it.each([
+  "operator@example.test",
+  "admin",
+  "019AA111-0000-7000-8000-000000000001",
+  "../operator",
+])("refuses noncanonical operator binding before SQL/auth: %s", async (id) => {
+  const { db } = fixture();
+  await expect(
+    readPrivateResearchOperatorSession(
+      db as never,
+      settings,
+      new Headers(),
+      new AbortController().signal,
+      id,
+    ),
+  ).rejects.toThrow("Private operator session unavailable");
+  expect(db.transaction).not.toHaveBeenCalled();
+  expect(m.read).not.toHaveBeenCalled();
 });

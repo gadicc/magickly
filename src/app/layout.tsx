@@ -1,15 +1,9 @@
 import CssBaseline from "@mui/material/CssBaseline";
-import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import { ThemeProvider } from "@mui/material/styles";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import type { Metadata, Viewport } from "next";
 import * as React from "react";
-import {
-  COLOR_SCHEME_ATTRIBUTE,
-  DEFAULT_COLOR_MODE,
-  noStorageColorSchemeScript,
-  THEME_COLOR,
-} from "@/colorScheme";
+import { THEME_COLOR } from "@/colorScheme";
 import { earlyPlaceLookupScript } from "@/geo/earlyPlaceLookup";
 
 import {
@@ -20,10 +14,7 @@ import {
   SITE_URL,
 } from "@/seo/site";
 import theme from "@/theme";
-import PrintInLight from "./PrintInLight";
-import SiteChromeLoader from "./SiteChromeLoader";
-import StyledJsxRegistry from "./StyledJsxRegistry";
-import ThemeColorMeta from "./ThemeColorMeta";
+import RoutedSiteShell from "./RoutedSiteShell";
 // Load the Hebrew font only where the browser draws that family.
 import "@/../public/fonts/FrankRuhlLibre.css";
 
@@ -178,29 +169,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         <meta property="fb:admins" content="gadicohen" />
       </head>
       <body>
-        <InitColorSchemeScript
-          attribute={COLOR_SCHEME_ATTRIBUTE}
-          defaultMode={DEFAULT_COLOR_MODE}
-        />
-        <script
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: our own constant script, no input
-          dangerouslySetInnerHTML={{ __html: noStorageColorSchemeScript }}
-        />
-        <StyledJsxRegistry>
-          <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-            <ThemeProvider
-              theme={theme}
-              defaultMode={DEFAULT_COLOR_MODE}
-              disableTransitionOnChange
-            >
-              {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-              <CssBaseline />
-              <PrintInLight />
-              <ThemeColorMeta />
-              <SiteChromeLoader>{props.children}</SiteChromeLoader>
-            </ThemeProvider>
-          </AppRouterCacheProvider>
-        </StyledJsxRegistry>
+        <RoutedSiteShell>{props.children}</RoutedSiteShell>
       </body>
     </html>
   );
