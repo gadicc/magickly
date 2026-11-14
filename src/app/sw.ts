@@ -1,6 +1,7 @@
 import { defaultCache } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import { Serwist } from "serwist";
+import { replyToResearchWorkerProbe } from "../chat-research/workerProtocol";
 import { createPublicRitualShells } from "../doc/publicShells";
 import {
   clearLegacyPrivateResponses,
@@ -56,3 +57,6 @@ self.addEventListener("activate", (event) =>
     ),
   ),
 );
+
+// Static capability reply only; private source/session access remains server-side.
+self.addEventListener("message", replyToResearchWorkerProbe);

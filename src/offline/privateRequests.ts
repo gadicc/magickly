@@ -1,4 +1,5 @@
 import { NetworkOnly, type RuntimeCaching } from "serwist";
+import { isResearchPath } from "../chat-research/paths";
 import { isPublicRitualId } from "../doc/publicRituals";
 import { isUuidV7 } from "../lib/ids";
 
@@ -11,6 +12,7 @@ export function isPrivateRuntimeUrl(url: URL, origin: string): boolean {
   } catch {
     return true;
   }
+  if (isResearchPath(path)) return true;
   if (path === "/_next/image") {
     const source = url.searchParams.get("url");
     if (!source) return false;

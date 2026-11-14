@@ -1,16 +1,9 @@
 import CssBaseline from "@mui/material/CssBaseline";
-import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import { ThemeProvider } from "@mui/material/styles";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import type { Metadata, Viewport } from "next";
 import * as React from "react";
-import VercelInsights from "@/analytics/VercelInsights";
-import {
-  COLOR_SCHEME_ATTRIBUTE,
-  DEFAULT_COLOR_MODE,
-  noStorageColorSchemeScript,
-  THEME_COLOR,
-} from "@/colorScheme";
+import { THEME_COLOR } from "@/colorScheme";
 import { earlyPlaceLookupScript } from "@/geo/earlyPlaceLookup";
 
 import {
@@ -21,15 +14,8 @@ import {
   SITE_URL,
 } from "@/seo/site";
 import theme from "@/theme";
-import ClientProviders from "./clientProviders";
-import MyAppBar from "./MyAppBar";
-import PrintInLight from "./PrintInLight";
-import SiteFooter from "./SiteFooter";
-import StyledJsxRegistry from "./StyledJsxRegistry";
-import ThemeColorMeta from "./ThemeColorMeta";
-import "@/db";
-// The Hebrew text font (plan 079), for every page that names it: the
-// browser fetches the file only where it draws Hebrew in that family.
+import RoutedSiteShell from "./RoutedSiteShell";
+// Load the Hebrew font only where the browser draws that family.
 import "@/../public/fonts/FrankRuhlLibre.css";
 
 // No canonical here: every page below would inherit it. Open Graph titles and
@@ -77,6 +63,27 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout(props: { children: React.ReactNode }) {
+  // Private reader and operator service mount no app navigation, browser DB/recovery bridge, analytics or service worker.
+  if (
+    process.env.MAGICKLI_PRIVATE_RESEARCH_LOCAL === "1" ||
+    process.env.MAGICKLI_PRIVATE_RESEARCH_OPERATOR === "1"
+  )
+    return (
+      <html lang="en" dir="ltr" className="light">
+        <body>
+          <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+            <ThemeProvider
+              theme={theme}
+              defaultMode="light"
+              storageManager={null}
+            >
+              <CssBaseline />
+              {props.children}
+            </ThemeProvider>
+          </AppRouterCacheProvider>
+        </body>
+      </html>
+    );
   return (
     // The colour-scheme script sets a class on <html> before React hydrates.
     <html lang="en" dir="ltr" suppressHydrationWarning>
@@ -162,38 +169,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         <meta property="fb:admins" content="gadicohen" />
       </head>
       <body>
-        <InitColorSchemeScript
-          attribute={COLOR_SCHEME_ATTRIBUTE}
-          defaultMode={DEFAULT_COLOR_MODE}
-        />
-        <script
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: our own constant script, no input
-          dangerouslySetInnerHTML={{ __html: noStorageColorSchemeScript }}
-        />
-        <StyledJsxRegistry>
-          <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-            <ThemeProvider
-              theme={theme}
-              defaultMode={DEFAULT_COLOR_MODE}
-              disableTransitionOnChange
-            >
-              {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-              <CssBaseline />
-              <PrintInLight />
-              <ThemeColorMeta />
-              <ClientProviders>
-                {/* Part of the shell: a Suspense boundary here would let React
-                  outline the bar after large pages and reveal it by script. */}
-                <MyAppBar />
-                {/* same height as floating AppBar, so page starts beneath it */}
-                <div style={{ height: 56 }}></div>
-                {props.children}
-                <SiteFooter />
-              </ClientProviders>
-            </ThemeProvider>
-          </AppRouterCacheProvider>
-        </StyledJsxRegistry>
-        <VercelInsights />
+        <RoutedSiteShell>{props.children}</RoutedSiteShell>
       </body>
     </html>
   );

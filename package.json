@@ -63,7 +63,8 @@
     "translate-eval:task3-report": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts task3-report",
     "translate-eval:newbars": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts newbars",
     "translate-eval:budget": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts budget",
-    "translator:figures": "pnpm data:build && node --import tsx scripts/enochian-translator-figures.ts"
+    "translator:figures": "pnpm data:build && node --import tsx scripts/enochian-translator-figures.ts",
+    "test:chat-research": "vitest run src/chat-research src/app/chat/research scripts/chat-research tests/chat-research tests/authDatabase.test.ts"
   },
   "dependencies": {
     "@ai-sdk/react": "4.0.156",

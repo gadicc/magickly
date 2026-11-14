@@ -1,0 +1,10 @@
+{
+  "kind": "synthetic-no-history-byte-golden",
+  "baseline_commit": "89cfb88b",
+  "expires_at_ms": 1700000060000,
+  "question": "Synthetic compatibility question?",
+  "window_id": "019aa111-0000-7000-8000-000000000011",
+  "operation_id": "019aa111-0000-7000-8000-000000000012",
+  "body_sha256": "8910aa74d954907876a106b59dc1047b6a721bb8672d34753562e224ea2db531",
+  "packet_sha256": "37fdcb668bfdb39fc43465d24262ea70c08fecbc3046d6d2e151353cade4b8d6"
+}

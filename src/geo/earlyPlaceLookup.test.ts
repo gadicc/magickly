@@ -62,6 +62,20 @@ describe("earlyPlaceLookupScript", () => {
     },
   );
 
+  it.each([
+    "/chat/research",
+    "/chat/research/answers/read",
+    "/chat%2fresearch",
+  ])(
+    "reads no location storage or network on private research route %s",
+    (path) => {
+      const storage = vi.spyOn(Storage.prototype, "getItem");
+      runOn(path);
+      expect(storage).not.toHaveBeenCalled();
+      expect(fetchMock).not.toHaveBeenCalled();
+    },
+  );
+
   it("does nothing when the reader chose a place", () => {
     localStorage.setItem(CHOSEN_PLACE_KEY, "{}");
     runOn("/geomancy/reading");

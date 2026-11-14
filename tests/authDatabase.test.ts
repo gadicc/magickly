@@ -17,6 +17,7 @@ import {
   getFreshSqlSession,
   getFreshSqlUserId,
 } from "../src/auth/sqlAuth";
+import { readPrivateResearchPreviewSession } from "../src/chat-research/previewSession";
 import { ensureLegacyId } from "../src/db/legacyIds";
 import * as schema from "../src/db/schema";
 import { loadSqlRitualPrincipal } from "../src/doc/sqlPolicy";
@@ -757,4 +758,38 @@ describe("synthetic PGlite auth migration", () => {
       ).every((email) => email.verified),
     ).toBe(true);
   });
+});
+
+it("reads a valid private reader session under READ ONLY without renewing it, and preserves an expired row on refusal", async () => {
+  await importSynthetic();
+  const auth = await createTestAuth(),
+    login = await handlerSignIn(auth),
+    settings = {
+      baseURL: origin,
+      secret: "synthetic-auth-schema-test-secret-over-thirty-two-characters",
+      googleClientId: "synthetic-client",
+      googleClientSecret: "synthetic-secret",
+    };
+  const before = await db.select().from(schema.session),
+    hint = await readPrivateResearchPreviewSession(
+      db,
+      settings,
+      new Headers({ cookie: login.cookie }),
+      new AbortController().signal,
+    );
+  expect(hint?.expiresAt).toBe(before[0].expiresAt.getTime());
+  expect(await db.select().from(schema.session)).toEqual(before);
+  await db
+    .update(schema.session)
+    .set({ expiresAt: new Date(Date.now() - 1000) });
+  const expired = await db.select().from(schema.session);
+  await expect(
+    readPrivateResearchPreviewSession(
+      db,
+      settings,
+      new Headers({ cookie: login.cookie }),
+      new AbortController().signal,
+    ),
+  ).rejects.toThrow(/^Private reader session unavailable$/);
+  expect(await db.select().from(schema.session)).toEqual(expired);
 });
