@@ -4,11 +4,16 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import sitemap from "@/app/sitemap";
 import OpenSource from "@/OpenSource";
+import { GD_HALL_LICENCE } from "@/render/contracts/gdHall";
 import { SITE_REPOSITORY } from "@/seo/site";
 import { DATA_USAGE } from "./OpenSourceText";
 import OpenSourcePage, { metadata } from "./page";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
+/** magick-components' manifest. */
+const manifest = JSON.parse(
+  readFileSync(`${root}packages/magick-components/package.json`, "utf8"),
+);
 
 // Emotion puts its styles inline before each element; they are not the page.
 const strip = (markup: string) =>
@@ -65,7 +70,7 @@ describe("/open-source", () => {
       /is CC BY 4\.0 .*except where its README says no rights are asserted/,
     );
     expect(licence("The images the site draws or makes itself")).toMatch(
-      /are CC BY 4\.0 too, with credit to Magick\.ly.*The code that draws them is MIT/,
+      /are CC BY 4\.0 too.*The code that draws them is MIT.*credit it as drawn by magick-components \(MIT\)\. Credit the hand-drawn images to Magick\.ly\./,
     );
     expect(licence("The fonts")).toMatch(/SIL Open Font License 1\.1/);
     expect(licence("Work by others")).toMatch(/keeps its own licence/);
@@ -73,10 +78,18 @@ describe("/open-source", () => {
     expect(hrefs(html)).toContain("/about#credits");
   });
 
-  it("credits served drawings to Magick.ly until the components are on npm", () => {
-    // Plan 080: stage G switches the hub, the hall pages and the halls'
-    // embedded credit together.
-    expect(html).not.toContain("drawn by magick-components");
+  // Plan 080, stage B review M2: the hub, the hall pages and the halls'
+  // embedded credit switch together, and stage G switched them when the
+  // package became publishable (no longer private). They must agree: the
+  // credit the hub tells others to give is the one the hall files carry.
+  it("credits served drawings as the components', as the halls' files do", () => {
+    expect(manifest.private).toBeUndefined();
+    expect(GD_HALL_LICENCE.creditText).toBe(
+      "Magick.ly, drawn by magick-components (MIT)",
+    );
+    expect(text(html)).toContain(
+      "credit it as drawn by magick-components (MIT)",
+    );
   });
 
   it("offers the published package to install, with links to npm and GitHub", () => {

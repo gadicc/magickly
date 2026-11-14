@@ -59,7 +59,7 @@ export default function HallPage({ hall }: { hall: GdHallEntry }) {
   const neighbour = (entry: GdHallEntry | undefined) =>
     entry && { href: hallPath(entry), label: gdHallShortName(entry) };
   const title = gdHallTitle(hall);
-  const credit = `${title}, by ${GD_HALL_LICENCE.creator}, ${SITE_URL}${hallPath(hall)}, ${GD_HALL_LICENCE.name}`;
+  const credit = `${title}, by ${GD_HALL_LICENCE.creditText}, ${SITE_URL}${hallPath(hall)}, ${GD_HALL_LICENCE.name}`;
   const prev = neighbour(GD_HALLS[index - 1]);
   const next = neighbour(GD_HALLS[index + 1]);
   // The select's choices, from the same groups and labels as the rail.
@@ -102,8 +102,9 @@ export default function HallPage({ hall }: { hall: GdHallEntry }) {
           />
           <figcaption className={styles.caption}>
             Floor plan © 2026 Magick.ly,{" "}
-            <Link href={GD_HALL_LICENCE.url}>CC BY 4.0</Link>. Free to reuse
-            with credit (<Link href="#licence">how</Link>).
+            <Link href={GD_HALL_LICENCE.url}>CC BY 4.0</Link>, drawn by
+            magick-components (MIT). Free to reuse with credit (
+            <Link href="#licence">how</Link>).
           </figcaption>
         </figure>
 
@@ -196,11 +197,13 @@ export default function HallPage({ hall }: { hall: GdHallEntry }) {
           </p>
           <blockquote className={styles.credit}>{credit}</blockquote>
           <p>
-            The presets' data and the code that draws them are{" "}
+            It is drawn by magick-components, whose code, the presets&apos; data
+            included, is{" "}
             <Link href="https://github.com/gadicc/magickly/tree/main/packages/magick-components">
               MIT
             </Link>
-            ; see <Link href="/open-source#licences">Open source</Link>.
+            , so you may also draw the same image from the package under MIT;
+            see <Link href="/open-source#licences">Open source</Link>.
           </p>
 
           <PrevNext label="More temple halls" prev={prev} next={next} />

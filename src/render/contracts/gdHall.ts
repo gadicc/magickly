@@ -190,13 +190,16 @@ export function gdHall(slug: string): GdHallEntry | undefined {
 /**
  * The licence the halls' images are published under (Gadi, 26 October
  * 2026): the one source of the URL, credit and notice the files, the
- * pages' JSON-LD and the editor's exports state.
+ * pages' JSON-LD and the editor's exports state. The images stay CC BY
+ * 4.0, but anyone may draw them from magick-components under MIT, so
+ * they are credited as its drawings (plan 080, "The licence of a drawing
+ * that is code", and stage G; it was "Magick.ly, CC BY 4.0" before).
  */
 export const GD_HALL_LICENCE = {
   url: "https://creativecommons.org/licenses/by/4.0/",
   name: "CC BY 4.0",
   creator: "Magick.ly",
-  creditText: "Magick.ly, CC BY 4.0",
+  creditText: "Magick.ly, drawn by magick-components (MIT)",
   copyrightNotice: "© 2026 Magick.ly. Licensed under CC BY 4.0",
   acquireLicensePage: `${SITE_URL}/about#licence`,
 } as const;

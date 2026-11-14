@@ -48,7 +48,9 @@ function expectLicensable(image: Record<string, unknown>) {
     name: "Magick.ly",
     url: "https://magick.ly/",
   });
-  expect(image.creditText).toBe("Magick.ly, CC BY 4.0");
+  // Plan 080, stage G: credited as magick-components' drawing, which anyone
+  // may draw under MIT; still CC BY 4.0, by Magick.ly.
+  expect(image.creditText).toBe("Magick.ly, drawn by magick-components (MIT)");
   expect(image.copyrightNotice).toBe(
     "© 2026 Magick.ly. Licensed under CC BY 4.0",
   );
@@ -86,7 +88,13 @@ describe("a temple hall's page", () => {
       }
       const text = textOf(markup);
       expect(text).toContain(
-        "Floor plan © 2026 Magick.ly, CC BY 4.0. Free to reuse with credit",
+        "Floor plan © 2026 Magick.ly, CC BY 4.0, drawn by magick-components (MIT). Free to reuse with credit (how)",
+      );
+      expect(text).toContain(
+        `${gdHallTitle(hall)}, by Magick.ly, drawn by magick-components (MIT), https://magick.ly/gd/halls/${slug}, CC BY 4.0`,
+      );
+      expect(text).toContain(
+        "so you may also draw the same image from the package under MIT",
       );
       expect(text).toContain("Regardie 1938, vol. 2, p.");
       expect(text).not.toMatch(/public\/pics|older drawing/);

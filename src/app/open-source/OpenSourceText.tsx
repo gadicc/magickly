@@ -17,9 +17,9 @@ console.log(tiferet.name.roman, tiferet.planet?.symbol); // Tiferet ☉`;
  * A card per package, then the licence policy (plan 080, decision 1 and
  * "The licence of a drawing that is code"); the packages come first at
  * Gadi's request (13 November 2026), and `#licences` stays the anchor
- * `/about` and the hall pages link. Until `magick-components` is
- * on npm (stage G), a served image of a component's drawing is credited to
- * Magick.ly under CC BY 4.0, as the hall pages and files say.
+ * `/about` and the hall pages link. Since stage G, a served image of a
+ * component's drawing is credited as drawn by magick-components (MIT), as
+ * the hall pages and files say, and the hand-drawn images to Magick.ly.
  */
 export default function OpenSourceText() {
   return (
@@ -136,9 +136,12 @@ export default function OpenSourceText() {
           <li>
             <b>The images the site draws or makes itself</b>, such as the Tree
             of Life, the tablets, the temple halls and its hand-drawn images,
-            are CC BY 4.0 too, with credit to Magick.ly, wherever they are
-            served: on its pages, as downloads or from its image API. The code
-            that draws them is MIT, as above.
+            are CC BY 4.0 too, wherever they are served: on its pages, as
+            downloads or from its image API. The code that draws them is MIT, as
+            above, so where one is a component&apos;s drawing, as the Tree, the
+            tablets and the halls are, anyone may draw the same image from the
+            package under MIT: credit it as drawn by magick-components (MIT).
+            Credit the hand-drawn images to Magick.ly.
           </li>
           <li>
             <b>The fonts</b>: the site&apos;s text is set in Roboto and its
