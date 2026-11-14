@@ -12,9 +12,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { buildKeysTable } from "../translate/keysTable";
 import { forgetTranslator } from "../translate/load";
 import { KEYS_TABLE_URL } from "../translate/lookup";
+import { MAX_WORDS } from "../translate/tokens";
 import Dictionary from "./dictionary";
 
 const TABLE = buildKeysTable();
+/** The note under English into Enochian, after its hidden separator. */
+const UNREVIEWED = ". No one who reads Enochian has reviewed this.";
 
 /** Every request the page made. */
 let requests: string[] = [];
@@ -78,7 +81,7 @@ describe("the dictionary's preview of the translator (plan 081, decision 3)", ()
     type("the light of master");
     await waitFor(() =>
       expect(line()).toBe(
-        "Word by word, 2 words left out by rule: OLPIRT [master] (no form)",
+        `Word by word, 2 words left out by rule: OLPIRT [master] (no form)${UNREVIEWED}`,
       ),
     );
     expect(
@@ -139,7 +142,9 @@ describe("the dictionary's preview of the translator (plan 081, decision 3)", ()
     expect(screen.getByText("Translating…")).toBeTruthy();
     expect(link()).toBe("/enochian/translate#q=light+of+God");
     release();
-    await waitFor(() => expect(line()).toBe("Word by word: OLPIRT MAD"));
+    await waitFor(() =>
+      expect(line()).toBe(`Word by word: OLPIRT MAD${UNREVIEWED}`),
+    );
   });
 
   it("shows nothing if the Keys fail to load", async () => {
@@ -169,7 +174,9 @@ describe("the dictionary's preview of the translator (plan 081, decision 3)", ()
     type("light of");
     await waitFor(() => expect(preview()).toBeNull());
     type("light of God");
-    await waitFor(() => expect(line()).toBe("Word by word: OLPIRT MAD"));
+    await waitFor(() =>
+      expect(line()).toBe(`Word by word: OLPIRT MAD${UNREVIEWED}`),
+    );
     expect(requests).toEqual([KEYS_TABLE_URL, KEYS_TABLE_URL]);
   });
 
@@ -196,16 +203,36 @@ describe("the dictionary's preview of the translator (plan 081, decision 3)", ()
   it("follows the query: updates once loaded, and goes below three words", async () => {
     render(<Dictionary uses={{}} />);
     type("light of God");
-    await waitFor(() => expect(line()).toBe("Word by word: OLPIRT MAD"));
+    await waitFor(() =>
+      expect(line()).toBe(`Word by word: OLPIRT MAD${UNREVIEWED}`),
+    );
     type("light of master");
     await waitFor(() =>
       expect(line()).toBe(
-        "Word by word, 1 word left out by rule: OLPIRT [master] (no form)",
+        `Word by word, 1 word left out by rule: OLPIRT [master] (no form)${UNREVIEWED}`,
       ),
     );
     type("light of");
     await waitFor(() => expect(preview()).toBeNull());
     expect(requests).toHaveLength(1);
+  });
+
+  it("says nothing of review under Enochian into English", async () => {
+    render(<Dictionary uses={{}} />);
+    type("OL SONF VORSG");
+    await waitFor(() => expect(line()).toBeTruthy());
+    expect(line()).not.toContain("reviewed");
+  });
+
+  it("reads only the first 500 words, and says so; the link keeps all", async () => {
+    render(<Dictionary uses={{}} />);
+    const text = `${Array(MAX_WORDS).fill("light").join(" ")} master`;
+    type(text);
+    await waitFor(() =>
+      expect(line()).toMatch(/Only the first 500 words are read\.$/),
+    );
+    expect(line()).not.toContain("master");
+    expect(new URLSearchParams(link().split("#")[1]).get("q")).toBe(text);
   });
 
   it("reads the Enochian box's input", async () => {

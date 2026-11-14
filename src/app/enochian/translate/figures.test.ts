@@ -32,15 +32,20 @@ const { date, ...committed } = JSON.parse(
 /** A translator that gives these tokens for any text, over these Key rows. */
 function stub(
   tokens: readonly Partial<EnochianToken>[],
-  keyRows: readonly { english: string }[] = [],
+  keyRows: readonly {
+    english: string;
+    word?: string;
+    folded?: string;
+    core?: string[];
+  }[] = [],
 ): Translator {
   return {
     toEnochian: () => ({ input: "english", tokens }),
     lookup: {
       keyRows: new Map([
-        [1, keyRows.map((row) => ({ ...row, word: "", core: [] }))],
+        [1, keyRows.map((row) => ({ word: "", core: [], ...row }))],
       ]),
-      display: new Map(),
+      display: new Map(keyRows.map((row) => [row.folded, row.word])),
     },
   } as unknown as Translator;
 }
@@ -140,14 +145,18 @@ describe("the figures' guards", () => {
     ).toThrow("unknown kind odd");
   });
 
-  it("throws where a Key's rows and its running text disagree", () => {
-    // A bracketed note across two rows: apart, each keeps its words;
-    // run together, the note goes.
-    expect(() =>
-      selfCheck(stub([], [{ english: "fire (of" }, { english: "God) here" }])),
-    ).toThrow("Key 1: rows and text disagree");
-    expect(() =>
-      selfCheck(stub([], [{ english: "fire of" }, { english: "God here" }])),
-    ).not.toThrow();
+  it("counts a row's words without our notes, as the text it gives", () => {
+    // "[or]" is our note in Dee's English, left out of the text and of
+    // the row's words, so the second row's word is the text's third.
+    const rows = [
+      { english: "rest [or] labour" },
+      { english: "God here", word: "B", folded: "B", core: ["god"] },
+    ];
+    const at = (span: [number, number]) =>
+      selfCheck(stub([{ ...form(span), form: "B" }], rows));
+    expect(at([2, 3])).toEqual({ rows: 1, found: 1 });
+    expect(at([3, 4])).toEqual({ rows: 1, found: 1 });
+    expect(at([1, 2])).toEqual({ rows: 1, found: 0 });
+    expect(at([4, 5])).toEqual({ rows: 1, found: 0 });
   });
 });

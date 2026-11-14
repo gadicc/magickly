@@ -1,5 +1,6 @@
 import { englishTokens } from "./english.ts";
 import type { EnochianToken, Translator } from "./lookup.ts";
+import { withoutNotes } from "./tokens.ts";
 
 /**
  * The translator's two figures (plan 081, decision 21), computed from the
@@ -191,16 +192,16 @@ export function selfCheck(translator: Translator): SelfCheck {
   const { lookup } = translator;
   let rows = 0;
   let found = 0;
-  for (const [key, keyRows] of lookup.keyRows) {
-    const text = keyRows.map((row) => row.english).join(" ");
-    const { tokens } = translator.toEnochian(text);
-    const rowWords: string[] = [];
+  for (const keyRows of lookup.keyRows.values()) {
+    // Dee's English without our bracketed notes ("rest not [or] labour"),
+    // which a reader's text keeps. `englishTokens` reads each word on its
+    // own, so the rows' words, counted apart, are the text's.
+    const english = keyRows.map((row) => withoutNotes(row.english));
+    const { tokens } = translator.toEnochian(english.join(" "));
     let at = 0;
-    for (const row of keyRows) {
+    for (const [index, row] of keyRows.entries()) {
       const from = at;
-      const words = englishTokens(row.english).map((one) => one.word);
-      rowWords.push(...words);
-      at += words.length;
+      at += englishTokens(english[index]).length;
       if (!row.word || !row.core.length) continue;
       rows++;
       if (
@@ -214,11 +215,6 @@ export function selfCheck(translator: Translator): SelfCheck {
       )
         found++;
     }
-    // The rows' words, taken apart, must be the running text's, or the
-    // spans above point at the wrong row.
-    const textWords = englishTokens(text).map((one) => one.word);
-    if (rowWords.join(" ") !== textWords.join(" "))
-      throw new Error(`Key ${key}: rows and text disagree`);
   }
   return { rows, found };
 }

@@ -60,5 +60,11 @@ export const LABELS = {
       : leftOut === 1
         ? "Word by word, 1 word left out by rule"
         : `Word by word, ${leftOut.toLocaleString("en")} words left out by rule`,
+  /** Under English into Enochian: the page's notice in short (decision 5). */
+  previewUnreviewed: "No one who reads Enochian has reviewed this.",
+  /** Read between the line and the note under it. */
+  previewNoteBefore: ". ",
+  previewCut: (max: number) =>
+    `Only the first ${max.toLocaleString("en")} words are read.`,
   openInTranslator: "Open in the translator",
 } as const;

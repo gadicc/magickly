@@ -5,18 +5,21 @@ import {
   AUXILIARIES,
   BE,
   coreKeys,
+  coreWords,
   type EnglishToken,
   englishTokens,
   englishWords,
   IRREGULAR,
-  isVerbForm,
+  isVerbWord,
   NEGATION,
   PREPOSITIONS,
   PRONOUNS,
+  readAs,
+  sameWord,
   withoutLeadingOfTo,
   wordKey,
 } from "./english.ts";
-import { dictionaryGlosses } from "./glosses.ts";
+import { lookupGlosses } from "./glosses.ts";
 import { joinSplits } from "./joins.ts";
 import type { IndexHit, Lookup, Row, Tiers } from "./lookupData.ts";
 
@@ -84,15 +87,24 @@ export interface FormOption {
 
 /** A note on a tile: what a rule changed about it. */
 export type TileChip =
-  /** Tier 3: the gloss carries a preposition the English lacks. */
-  | { kind: "carries"; preposition: string }
+  /**
+   * The form carries a word the English lacks: tier 3's preposition, or
+   * the "I" in ZIR "I am" for a lone "am" (G13).
+   */
+  | { kind: "carries"; word: string }
   /** Moved after its noun: a possessive (G5 for "'s", G22 for TOX, TILB). */
   | { kind: "reordered"; rule: RuleId }
   /**
    * A verb read in its one form (G16): "came" as Dee's "come", "killed"
    * as "kill"; `plain` is the gloss's word.
    */
-  | { kind: "tense"; rule: RuleId; plain: string };
+  | { kind: "tense"; rule: RuleId; plain: string }
+  /**
+   * A superlative read as its base ("greatest" as Dee's "great"), or the
+   * other way: a near match, which no rule explains; `plain` is the
+   * gloss's word.
+   */
+  | { kind: "base"; plain: string };
 
 interface Base {
   /** The English it stands for, as typed. */
@@ -203,6 +215,13 @@ const POSSESSIVES: ReadonlySet<string> = new Set([
  */
 const PRONOUN_TABLE: Readonly<Record<string, string>> = { his: "TOX" };
 
+/**
+ * A pronoun read as another's exact form: "hers" is Dee's "her" alone
+ * (TILB), as "the light is hers". Only this pair: no grammar word is
+ * otherwise an inflection's base ("herring" is not "her").
+ */
+const PRONOUN_AS: Readonly<Record<string, string>> = { hers: "her" };
+
 /** "To be" (G13, G14), and negation (G33, G34): decision 9's table. */
 const RULE_FORMS: Readonly<Record<string, [string, RuleId]>> = {
   is: ["I", "G13"],
@@ -235,6 +254,22 @@ const GAP_WORDS: ReadonlySet<string> = new Set([
 ]);
 
 const CONJUNCTIONS: ReadonlySet<string> = new Set(["and", "or", "but", "nor"]);
+
+/**
+ * Words that begin a question or a clause of their own: no verb follows
+ * an auxiliary through them ("I do what I will").
+ */
+const WH_WORDS: ReadonlySet<string> = new Set([
+  "how",
+  "what",
+  "when",
+  "where",
+  "which",
+  "who",
+  "whom",
+  "whose",
+  "why",
+]);
 
 /** "Have" as a verb of its own or an auxiliary: which, by what follows. */
 const HAVE: ReadonlySet<string> = new Set([
@@ -273,6 +308,42 @@ function participleNext(word: string) {
     Object.hasOwn(IRREGULAR, word) ||
     (word.length > 3 && /(?:ed|en)$/.test(word))
   );
+}
+
+/** What makes a following "will" a noun: an article or possessive. */
+const NOUN_BEFORE: ReadonlySet<string> = new Set([
+  "a",
+  "an",
+  "the",
+  ...POSSESSIVES,
+  "thine",
+]);
+
+/** Auxiliaries and modals no other auxiliary comes before. */
+const MODALS: ReadonlySet<string> = new Set([
+  ...[...AUXILIARIES].filter((one) => !HAVE.has(one)),
+  "can",
+  "could",
+  "may",
+  "might",
+  "must",
+  "should",
+  "would",
+]);
+
+/**
+ * Whether an auxiliary other than "have" ("do", "shall", "will") is one
+ * here, by its neighbours (G16). Nearly always: before a verb, "not", a
+ * subject ("Do you", "Do men die") or anything else. Not right after an
+ * article or possessive, where it is a noun ("thy will", "the will to
+ * live"); nor before a determiner (as before: "do the work"), a wh-word,
+ * another auxiliary or the clause's end, where it is a verb of its own
+ * ("Do what thou wilt", "thou wilt shall be", "as thou wilt"; the caller
+ * checks the end).
+ */
+function auxiliaryBefore(previous: string | undefined, next: string): boolean {
+  if (previous !== undefined && NOUN_BEFORE.has(previous)) return false;
+  return !DETERMINERS.has(next) && !WH_WORDS.has(next) && !MODALS.has(next);
 }
 
 /** A word that carries meaning of its own: what "her" must come before. */
@@ -356,25 +427,43 @@ const glossLength = (hit: IndexHit) =>
 function match(lookup: Lookup, span: readonly string[]): Match | undefined {
   // The words as written first, then with irregular verbs read plain, so
   // "rose" the flower is tried before "rise".
+  const words = coreWords(span);
   return (
-    matchIn(lookup, lookup.tiers.literal, coreKeys(span, true)) ??
-    matchIn(lookup, lookup.tiers.plain, coreKeys(span))
+    matchIn(lookup, lookup.tiers.literal, words, true) ??
+    matchIn(lookup, lookup.tiers.plain, words, false)
+  );
+}
+
+/**
+ * A tier's hits for typed words: those under the words' keys whose own
+ * words are the same words (`sameWord`), since a key only finds
+ * candidates ("stare" is filed with "stars").
+ */
+function hitsFor(
+  tier: ReadonlyMap<string, readonly IndexHit[]>,
+  words: readonly string[],
+  literal: boolean,
+): IndexHit[] {
+  return (tier.get(coreKeys(words, literal).join(" ")) ?? []).filter(
+    (hit) =>
+      hit.words.length === words.length &&
+      hit.words.every((one, at) => sameWord(words[at], one, literal)),
   );
 }
 
 function matchIn(
   lookup: Lookup,
   [tier1, tier2, tier3]: Tiers,
-  core: readonly string[],
+  words: readonly string[],
+  literal: boolean,
 ): Match | undefined {
-  if (!core.length) return undefined;
-  const bare = withoutLeadingOfTo(core).join(" ");
-  const whole = core.join(" ");
+  if (!words.length) return undefined;
+  const bare = withoutLeadingOfTo(words);
   const tries: [1 | 2 | 3, readonly IndexHit[]][] = [
-    [1, tier1.get(whole) ?? []],
+    [1, hitsFor(tier1, words, literal)],
     // English "of light" against a gloss "light", or "light" against "of light".
-    [2, [...(tier2.get(bare) ?? []), ...(tier1.get(bare) ?? [])]],
-    [3, tier3.get(whole) ?? []],
+    [2, [...hitsFor(tier2, bare, literal), ...hitsFor(tier1, bare, literal)]],
+    [3, hitsFor(tier3, words, literal)],
   ];
   for (const [tier, hits] of tries) {
     if (!hits.length) continue;
@@ -390,9 +479,9 @@ function matchIn(
  * (articles aside), or `undefined`: a pronoun's exact form.
  */
 function deeExact(lookup: Lookup, word: string): Match | undefined {
-  const hits = (
-    lookup.tiers.literal[0].get(coreKeys([word], true).join(" ")) ?? []
-  ).filter((hit) => hit.origin.kind === "key");
+  const hits = hitsFor(lookup.tiers.literal[0], [word], true).filter(
+    (hit) => hit.origin.kind === "key",
+  );
   return hits.length ? fromDee(lookup, 1, hits, hits) : undefined;
 }
 
@@ -483,6 +572,26 @@ function fromDictionary(
   };
 }
 
+/** Dee's rows by each key of their English, built once per index. */
+const rowsByKeyCache = new WeakMap<Lookup, Map<string, Row[]>>();
+
+function rowsByKey(lookup: Lookup): Map<string, Row[]> {
+  let byKey = rowsByKeyCache.get(lookup);
+  if (!byKey) {
+    byKey = new Map();
+    for (const row of lookup.rows) {
+      if (!row.folded || row.formula === "repeat") continue;
+      for (const key of new Set(row.core)) {
+        const list = byKey.get(key) ?? [];
+        list.push(row);
+        byKey.set(key, list);
+      }
+    }
+    rowsByKeyCache.set(lookup, byKey);
+  }
+  return byKey;
+}
+
 /**
  * A gap's nearest forms (decision 12): Dee's lines whose English shares
  * the word's stem, shortest first, then the dictionary's "means" group.
@@ -490,6 +599,7 @@ function fromDictionary(
  */
 function nearest(lookup: Lookup, word: string): FormOption[] {
   const key = wordKey(word);
+  const same = (one: string) => sameWord(word, one);
   if (
     ARTICLES.has(word) ||
     PRONOUNS.has(word) ||
@@ -498,12 +608,11 @@ function nearest(lookup: Lookup, word: string): FormOption[] {
   )
     return [];
   const out = new Map<string, FormOption>();
-  const rows = lookup.rows
-    .filter(
-      (row) => row.folded && row.formula !== "repeat" && row.core.includes(key),
-    )
+  const rows = rowsByKey(lookup)
+    .get(key)
+    ?.filter((row) => row.words.some(same))
     .sort((a, b) => a.core.length - b.core.length);
-  for (const row of rows) {
+  for (const row of rows ?? []) {
     if (out.size >= NEAREST) break;
     if (out.has(row.folded)) continue;
     out.set(
@@ -516,10 +625,9 @@ function nearest(lookup: Lookup, word: string): FormOption[] {
     const folded = foldSpelling(hit.word);
     if (!folded || out.has(folded) || hit.meaning === null) continue;
     // Search reads "(see 'cab')" as English; lookup does not (decision 22).
-    const glossKeys = dictionaryGlosses(hit.meaning).flatMap((gloss) =>
-      englishWords(gloss).map(wordKey),
-    );
-    if (!glossKeys.includes(key)) continue;
+    // A letter's name is no meaning either ("Mals" for P).
+    const glossWords = lookupGlosses(hit.meaning).flatMap(englishWords);
+    if (!glossWords.some(same)) continue;
     out.set(
       folded,
       option(lookup, folded, {
@@ -564,6 +672,7 @@ function ruleForm(
   base: Base,
   form: string,
   rule: RuleId,
+  chips: readonly TileChip[] = [],
 ): FormToken {
   const own = (lookup.keyForms.get(form) ?? []).filter(
     (row) => row.formula !== "repeat",
@@ -578,9 +687,22 @@ function ruleForm(
       joined: joinedRows(lookup, form).map(place),
     }),
     rule,
-    chips: [],
+    chips,
     alternatives: [],
   };
+}
+
+/**
+ * Whether a gloss's word is a verb: by its own form (`isVerbWord`), as
+ * an infinitive in our English ("to reign"), or where our English has a
+ * verb form of it ("dwelling"); never a word only seen as an adjective
+ * ("great").
+ */
+function isVerb(lookup: Lookup, word: string): boolean {
+  if (isVerbWord(word) || lookup.infinitives.has(word)) return true;
+  return (lookup.englishVocabulary.get(wordKey(word)) ?? []).some(
+    (one) => one !== word && isVerbWord(one) && sameWord(one, word),
+  );
 }
 
 function matchedForm(
@@ -591,14 +713,15 @@ function matchedForm(
 ): FormToken {
   const chips: TileChip[] = [];
   if (found.tier === 3 && found.preposition)
-    chips.push({ kind: "carries", preposition: found.preposition });
+    chips.push({ kind: "carries", word: found.preposition });
   const glossWords = englishWords(found.gloss);
   for (const word of base.words) {
-    if (!isVerbForm(word)) continue;
-    // The gloss's word this one met by its key: "come" for "came".
-    const plain = glossWords.find((one) => wordKey(one) === wordKey(word));
-    if (plain && plain !== word)
-      chips.push({ kind: "tense", rule: "G16", plain });
+    // The gloss's word this one met: "come" for "came".
+    const plain = glossWords.find((one) => sameWord(word, one));
+    if (!plain) continue;
+    const how = readAs(word, plain, isVerb(lookup, plain));
+    if (how === "tense") chips.push({ kind: "tense", rule: "G16", plain });
+    else if (how === "base") chips.push({ kind: "base", plain });
   }
   return {
     kind: "form",
@@ -639,16 +762,36 @@ function baseOf(
   };
 }
 
+/** A gap's nearest forms, each word's looked up once per text. */
+type NearestCache = Map<string, FormOption[]>;
+
+function nearestOnce(
+  lookup: Lookup,
+  word: string,
+  cache: NearestCache,
+): FormOption[] {
+  let found = cache.get(word);
+  if (!found) {
+    found = nearest(lookup, word);
+    cache.set(word, found);
+  }
+  return found;
+}
+
 /** One word no phrase took (decision 9's table, then lookup). */
 function single(
   lookup: Lookup,
   tokens: readonly EnglishToken[],
   at: number,
+  cache: NearestCache,
 ): Working {
   const { word, possessive, endsClause } = tokens[at];
   const next = endsClause ? undefined : tokens[at + 1]?.word;
+  // The word before, within the clause: none at a clause's start.
+  const previous =
+    at > 0 && !tokens[at - 1].endsClause ? tokens[at - 1].word : undefined;
   const base = baseOf(tokens, at, at + 1);
-  const content = isContent(word);
+  let content = isContent(word);
   const moves = possessive ? { moves: "G5" as RuleId } : {};
   const chip = (rule: RuleId): Working => ({
     token: { kind: "chip", ...base, rule },
@@ -670,7 +813,10 @@ function single(
     const rule: RuleId = POSSESSIVES.has(word) ? "G22" : "G21";
     // Possessives follow their noun, written apart (decision 11).
     const follows = rule === "G22" ? { moves: "G22" as RuleId } : {};
-    const exact = deeExact(lookup, word);
+    const exact = deeExact(
+      lookup,
+      Object.hasOwn(PRONOUN_AS, word) ? PRONOUN_AS[word] : word,
+    );
     if (exact)
       return {
         token: matchedForm(lookup, base, exact, rule),
@@ -678,7 +824,9 @@ function single(
         endsClause,
         ...follows,
       };
-    const form = PRONOUN_TABLE[word];
+    const form = Object.hasOwn(PRONOUN_TABLE, word)
+      ? PRONOUN_TABLE[word]
+      : undefined;
     if (form)
       return {
         token: ruleForm(lookup, base, form, rule),
@@ -688,24 +836,42 @@ function single(
       };
     return gap([]);
   }
-  const ruled = RULE_FORMS[word];
-  if (ruled)
+  const ruled = Object.hasOwn(RULE_FORMS, word) ? RULE_FORMS[word] : undefined;
+  if (ruled) {
+    // A lone "am" is ZIR "I am": it carries its "I", shown, since the
+    // English may say it elsewhere ("I really am").
+    const carries: TileChip[] =
+      word === "am" ? [{ kind: "carries", word: "I" }] : [];
     return {
-      token: ruleForm(lookup, base, ruled[0], ruled[1]),
+      token: ruleForm(lookup, base, ruled[0], ruled[1], carries),
       content: false,
       endsClause,
     };
-  if (GAP_WORDS.has(word)) return gap(nearest(lookup, word));
+  }
+  if (GAP_WORDS.has(word)) return gap(nearestOnce(lookup, word, cache));
   if (AUXILIARIES.has(word) && next !== undefined) {
     // An auxiliary before its verb, or before its subject in a question
     // ("do you", "shall I"); "have" before a noun is "possess" (G16).
     const subject = PRONOUNS.has(next) && !DETERMINERS.has(next);
     const auxiliary = HAVE.has(word)
       ? subject || participleNext(next)
-      : subject || !DETERMINERS.has(next);
+      : auxiliaryBefore(previous, next);
     if (auxiliary) return chip("G16");
   }
   const found = BE.has(word) ? undefined : match(lookup, [word]);
+  if (AUXILIARIES.has(word)) content = true;
+  if (MODALS.has(word)) {
+    // "Do", "will" or "shall" not an auxiliary here: a verb of its own,
+    // or a noun ("his will"). It takes a form only where a gloss is that
+    // word alone, or its plain form ("did" is GNAY "do"), not another
+    // sense of it ("RISE, SHALL"). "Have" as a verb is a verb in any
+    // tense ("had" is BRIN "have").
+    const plain = Object.hasOwn(IRREGULAR, word) ? IRREGULAR[word] : word;
+    const alone = (gloss: string) =>
+      [word, plain].includes(coreWords(englishWords(gloss)).join(" "));
+    if (!found || found.tier !== 1 || !found.glosses.some(alone))
+      return gap(nearestOnce(lookup, word, cache));
+  }
   if (found)
     return {
       token: matchedForm(lookup, base, found),
@@ -713,7 +879,7 @@ function single(
       endsClause,
       ...moves,
     };
-  return gap(nearest(lookup, word));
+  return gap(nearestOnce(lookup, word, cache));
 }
 
 /**
@@ -769,7 +935,7 @@ function phraseAt(
       longest = n;
   for (let n = longest; n >= 2; n--) {
     const span = tokens.slice(at, at + n).map((one) => one.word);
-    const core = coreKeys(span);
+    const core = coreWords(span);
     // A lone grammar word, with only articles beside it, is the tables'
     // (decisions 7 and 9): "of a" must not find DE.
     if (!core.length || (core.length === 1 && !isContent(core[0]))) continue;
@@ -787,6 +953,7 @@ function phraseAt(
 export function toEnochian(lookup: Lookup, text: string): ToEnochian {
   const tokens = englishTokens(text);
   const items: Working[] = [];
+  const cache: NearestCache = new Map();
   let at = 0;
   while (at < tokens.length) {
     const here = phraseAt(lookup, tokens, at);
@@ -796,13 +963,27 @@ export function toEnochian(lookup: Lookup, text: string): ToEnochian {
     if (EDGE_ARTICLES.has(tokens[at].word) && !tokens[at].endsClause) {
       const next = phraseAt(lookup, tokens, at + 1);
       if (next && (!here || next.n + 1 > here.n)) {
-        items.push(single(lookup, tokens, at));
+        items.push(single(lookup, tokens, at, cache));
         at++;
         continue;
       }
     }
+    // "Am I" is "I am" asked: Dee's ZIR takes both words, as for "I am".
+    const asked =
+      !here && tokens[at].word === "am" && !tokens[at].endsClause
+        ? tokens[at + 1]?.word === "i" && match(lookup, ["i", "am"])
+        : undefined;
+    if (asked) {
+      items.push({
+        token: matchedForm(lookup, baseOf(tokens, at, at + 2), asked),
+        content: false,
+        endsClause: tokens[at + 1].endsClause,
+      });
+      at += 2;
+      continue;
+    }
     if (!here) {
-      items.push(single(lookup, tokens, at));
+      items.push(single(lookup, tokens, at, cache));
       at++;
       continue;
     }

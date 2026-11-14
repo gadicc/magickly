@@ -293,17 +293,25 @@ function partWord(lookup: Lookup, folded: string): ReadWord {
   };
 }
 
-/** Edit distance, for a word not found (decision 16). */
-function editDistance(a: string, b: string): number {
+/**
+ * Edit distance, for a word not found (decision 16), or `most + 1` once
+ * it must exceed `most`: a row's smallest cell never shrinks, so a word
+ * already too far is dropped early.
+ */
+function editDistance(a: string, b: string, most: number): number {
   let previous = Array.from({ length: b.length + 1 }, (_, j) => j);
   for (let i = 1; i <= a.length; i++) {
     const current = [i];
-    for (let j = 1; j <= b.length; j++)
+    let least = i;
+    for (let j = 1; j <= b.length; j++) {
       current[j] = Math.min(
         previous[j] + 1,
         current[j - 1] + 1,
         previous[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
       );
+      least = Math.min(least, current[j]);
+    }
+    if (least > most) return most + 1;
     previous = current;
   }
   return previous[b.length];
@@ -358,7 +366,7 @@ function nearestSpellings(
   )
     for (const word of byLength.get(length) ?? []) {
       if (stats) stats.distances++;
-      const distance = editDistance(folded, word);
+      const distance = editDistance(folded, word, most);
       if (distance <= most)
         found.push({ word, distance, key: lookup.keyForms.has(word) });
     }
@@ -610,12 +618,13 @@ export function toEnglish(
       }
       continue;
     }
-    const readings = readOne(lookup, folded[at]);
+    // A word in another script folds to "": not found, and near nothing.
+    const readings = folded[at] ? readOne(lookup, folded[at]) : [];
     tokens.push({
       input: typed[at],
       span: [at, at + 1],
       readings,
-      nearest: readings.length ? [] : nearestOf(folded[at]),
+      nearest: readings.length || !folded[at] ? [] : nearestOf(folded[at]),
     });
     at++;
   }

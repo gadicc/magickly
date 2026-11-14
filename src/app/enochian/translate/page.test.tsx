@@ -2,6 +2,7 @@ import dictionary from "magick-data/enochian/dictionary";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import FIGURES from "./figures.json";
+import { shares } from "./labels";
 import TranslatePage from "./page";
 
 /** The page as the server renders it, which is what search engines read. */
@@ -31,11 +32,15 @@ describe("/enochian/translate, as the server renders it (plan 081)", () => {
       timeZone: "UTC",
     });
     expect(html).toContain(`Measured ${day}`);
-    expect(html).toContain(`forms ${share(coverage.forms, coverage.words)}`);
-    expect(html).toContain(
-      `rule chips ${share(coverage.chips, coverage.words)}`,
+    // The three shares add up to 100 (largest remainder).
+    const [forms, chips, gaps] = shares(
+      [coverage.forms, coverage.chips, coverage.gaps],
+      coverage.words,
     );
-    expect(html).toContain(`gaps ${share(coverage.gaps, coverage.words)}`);
+    expect(forms + chips + gaps).toBe(100);
+    expect(html).toContain(`forms ${forms}%`);
+    expect(html).toContain(`rule chips ${chips}%`);
+    expect(html).toContain(`gaps ${gaps}%`);
     expect(html).toContain(`of ${coverage.words} words`);
     for (const [kind, counts] of Object.entries(coverage.byKind))
       expect(html).toContain(
@@ -46,6 +51,15 @@ describe("/enochian/translate, as the server renders it (plan 081)", () => {
       `${selfCheck.found} of ${selfCheck.rows.toLocaleString("en")} words (${share(selfCheck.found, selfCheck.rows)})`,
     );
     expect(html).not.toMatch(/margin of error|±/);
+  });
+
+  it("rounds the coverage shares to sum to 100, by largest remainder", () => {
+    // 280, 115 and 227 of 622 are 45.02%, 18.49% and 36.50%: rounded each
+    // alone they show 99%.
+    expect(shares([280, 115, 227], 622)).toEqual([45, 18, 37]);
+    expect(shares([1, 1, 1], 3)).toEqual([34, 33, 33]);
+    expect(shares([0, 0, 0], 0)).toEqual([0, 0, 0]);
+    expect(shares([2, 0, 0], 2)).toEqual([100, 0, 0]);
   });
 
   it("has the text below the tool", () => {

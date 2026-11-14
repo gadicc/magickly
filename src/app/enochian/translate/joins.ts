@@ -60,9 +60,9 @@ function knownWhole(
 
 /**
  * Every way the rule splits a folded word, in the rule's order: front
- * words first, then behind. Two are shown when two fit (OISALMAN is OI
- * SALMAN or OI ISALMAN). `exclude` holds words out of the known ones, to
- * test the rule on words it would otherwise find whole.
+ * words first, then behind. Two are shown when two fit (ODSONF is OD
+ * SONF or OD DSONF, by G27's shared letter). `exclude` holds words out of
+ * the known ones, to test the rule on words it would otherwise find whole.
  */
 export function joinSplits(
   lookup: Lookup,

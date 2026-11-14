@@ -1,9 +1,9 @@
 import { readFileSync } from "node:fs";
 import dictionary from "magick-data/enochian/dictionary";
 import { describe, expect, it } from "vitest";
-import { englishTokens, wordKey } from "./english.ts";
-import { selfCheck } from "./figures.ts";
-import { cleanGloss, dictionaryGlosses } from "./glosses.ts";
+import { englishTokens, englishWords, sameWord, wordKey } from "./english.ts";
+import { givenWords, selfCheck } from "./figures.ts";
+import { cleanGloss, dictionaryGlosses, lookupGlosses } from "./glosses.ts";
 import { buildKeysTable } from "./keysTable.ts";
 import { LEITCH_SPELLINGS } from "./leitchSpellings.ts";
 import {
@@ -15,7 +15,9 @@ import {
   type ReadToken,
   readingGloss,
 } from "./lookup.ts";
+import { isEnglishWord } from "./lookupData.ts";
 import { type SpellingStats, toEnglish } from "./toEnglish.ts";
+import { firstWords, MAX_WORDS } from "./tokens.ts";
 
 const translator = createTranslator(buildKeysTable(), dictionary);
 const { lookup } = translator;
@@ -121,7 +123,7 @@ describe("English words as compared", () => {
 
   it("keeps the note-stripping linear on unclosed brackets", () => {
     const text = `${"(".repeat(100_000)}light`;
-    expect(englishTokens(text).map((one) => one.word)).toEqual(["light"]);
+    expect(englishWords(text)).toEqual(["light"]);
     expect(cleanGloss(`light${",".repeat(100_000)}`)).toBe("light");
   });
 });
@@ -168,7 +170,7 @@ describe("English into Enochian (decisions 6–12)", () => {
     expect(form("peace")).toMatchObject({
       form: "ETHARZI",
       tier: 3,
-      chips: [{ kind: "carries", preposition: "in" }],
+      chips: [{ kind: "carries", word: "in" }],
       source: { kind: "dictionary", headword: "ETHARZI" },
     });
     expect(form("in peace")).toMatchObject({ form: "ETHARZI", tier: 1 });
@@ -886,5 +888,369 @@ describe("the rules it names", () => {
     };
     for (const [rule, subject] of Object.entries(expected))
       expect(title(rule), rule).toMatch(subject);
+  });
+});
+
+describe("the final review's findings (plan 081, stage 1)", () => {
+  /** The tokens' kinds and spans: every typed word covered once. */
+  const covered = (text: string) => givenWords(translator, text).length;
+
+  it("M1: keeps a letter's name out of English into Enochian", () => {
+    expect(enochian("male and female")).toBe("[male] OD [female]");
+    expect(enochian("a pale horse")).toBe("·G4 [pale] [horse]");
+    expect(enochian("tell a tale")).toBe("[tell] ·G4 [tale]");
+    for (const name of ["fame", "gale", "graph", "don", "med", "un", "mals"]) {
+      const one = only(name);
+      expect(one.kind, name).toBe("gap");
+      if (one.kind === "gap")
+        expect(
+          one.nearest.map((near) => near.form),
+          name,
+        ).toEqual([]);
+    }
+    // WE's letter entries, as English into Enochian reads them.
+    expect(lookupGlosses("Mals (P)")).toEqual([]);
+    expect(lookupGlosses("GAL, ENOCHIAN LETTER D")).toEqual([
+      "ENOCHIAN LETTER D",
+    ]);
+    // Reading Enochian still shows the name as WE gives it.
+    expect(dictionaryGlosses("Mals (P)")).toEqual(["Mals"]);
+    // "or" is Q's meaning, not a letter's name.
+    expect(enochian("fire or water")).toBe("PRGE Q ZIN");
+  });
+
+  it("M2: matches a word only as itself or a regular inflection", () => {
+    for (const word of [
+      "stare",
+      "mane",
+      "rode",
+      "fore",
+      "site",
+      "sole",
+      "rune",
+      "sine",
+      "theme",
+    ])
+      expect(only(word).kind, word).toBe("gap");
+    expect(enochian("a doe")).toBe("·G4 [doe]");
+    // Regular inflections still meet: -ing, -ed, plurals, doubling.
+    expect(form("making").form).toBe("EOLIS");
+    expect(form("loved")).toMatchObject({
+      form: "TOANT",
+      chips: [{ kind: "tense", rule: "G16", plain: "love" }],
+    });
+    expect(form("stars").form).toBe("AOIVEAE");
+    expect(form("houses").form).toBe("SALMAN");
+    expect(form("running").form).toBe("PARM");
+    for (const [typed, gloss] of [
+      ["making", "make"],
+      ["loved", "love"],
+      ["stars", "star"],
+      ["houses", "house"],
+      ["stopped", "stop"],
+      ["glories", "glory"],
+      ["carried", "carry"],
+      ["walketh", "walk"],
+      ["loved", "loving"],
+    ])
+      expect(sameWord(typed, gloss, true), `${typed} ${gloss}`).toBe(true);
+    for (const [typed, gloss] of [
+      ["stare", "star"],
+      ["stare", "stars"],
+      ["mane", "man"],
+      ["doe", "does"],
+      ["theme", "them"],
+      ["stared", "stars"],
+    ])
+      expect(sameWord(typed, gloss), `${typed} ${gloss}`).toBe(false);
+    // An irregular verb meets its plain form only on the second try.
+    expect(sameWord("came", "come", true)).toBe(false);
+    expect(sameWord("came", "come")).toBe(true);
+    // Dee's final e is a spelling of his, modernised on both sides.
+    expect(form("brightness").form).toBe("LUCIFTIAS");
+  });
+
+  it("M3: gives every typed word a form, chip or gap, brackets and scripts too", () => {
+    expect(enochian("the house (of God)")).toBe("SALMAN MAD");
+    expect(covered("the house (of God)")).toBe(4);
+    expect(
+      englishTokens("God [the Father] almighty").map((one) => one.word),
+    ).toEqual(["god", "the", "father", "almighty"]);
+    expect(covered("(fire) water [earth] air")).toBe(4);
+    expect(enochian("fire שלום water")).toBe("PRGE [שלום] ZIN");
+    expect(enochian("привет fire")).toBe("[привет] PRGE");
+    expect(enochian("æther")).toBe("[æther]");
+    expect(enochian("straße")).toBe("[straße]");
+    // Dee's English and glosses still drop their notes.
+    expect(englishWords("Mals (P)")).toEqual(["mals"]);
+    // Enochian into English: a word in another script is not found, and
+    // near nothing.
+    const { tokens } = translator.toEnglish("OL straße SONF שלום");
+    expect(tokens.map((one) => one.input)).toEqual([
+      "OL",
+      "straße",
+      "SONF",
+      "שלום",
+    ]);
+    expect(tokens[1]).toMatchObject({ readings: [], nearest: [] });
+    expect(tokens[3]).toMatchObject({ readings: [], nearest: [] });
+    // And the guess counts it, on the English side.
+    expect(translator.guessDirection("fire שלום water")).toMatchObject({
+      language: "english",
+    });
+  });
+
+  it("L1: reads a closing quote after an s as a quote while one is open", () => {
+    const possessive = (text: string) =>
+      englishTokens(text)
+        .filter((one) => one.possessive)
+        .map((one) => one.surface);
+    expect(possessive("I said 'yes' to him")).toEqual([]);
+    expect(possessive("He said ‘the heavens’ fall")).toEqual([]);
+    expect(possessive("'Open the gates' said God")).toEqual([]);
+    expect(possessive("the angels' song")).toEqual(["angels'"]);
+    expect(possessive("'tis God's will")).toEqual(["God's"]);
+    // An elision's apostrophe is its word's, and opens no quote.
+    expect(possessive("'Tis the angels' song")).toEqual(["angels'"]);
+    expect(possessive("'Twas the angels' song")).toEqual(["angels'"]);
+    expect(enochian("'Tis the angels' song")).toBe("['Tis] ·G4 [song] MERIFRI");
+    // Nothing moves: the forms keep the English order.
+    const spans = translator
+      .toEnochian("I said 'yes' to him")
+      .tokens.map((one) => one.span[0]);
+    expect(spans).toEqual([...spans].sort((a, b) => a - b));
+  });
+
+  it("L2: keeps do, will and shall where they are not auxiliaries", () => {
+    const kinds = (text: string) =>
+      translator
+        .toEnochian(text)
+        .tokens.map((one) => `${one.english}:${one.kind}`);
+    const law = kinds("Do what thou wilt shall be the whole of the law");
+    expect(law[0]).toBe("Do:form");
+    expect(law).toContain("wilt:gap");
+    expect(law).toContain("shall be:form");
+    expect(kinds("thy will be done")).toContain("will:gap");
+    expect(enochian("his will is law")).toBe("[will] TOX I OHORELA");
+    expect(kinds("the will to live")).toContain("will:gap");
+    // Still auxiliaries before a verb, "not" or a subject.
+    expect(enochian("don't go")).toBe("·G16 IP [go]");
+    expect(enochian("Will you teach us")).toMatch(/^·G16 NONCF/);
+    expect(enochian("Who shall open the house")).toMatch(/·G16 ODO SALMAN$/);
+    expect(enochian("Many thousands will come")).toMatch(/·G16 NIIS$/);
+    // As at HEAD: after "that", "many", "some" or "this", before a noun
+    // subject, a preposition or a comma, still an auxiliary.
+    for (const text of [
+      "the light that will shine",
+      "the fire that shall burn",
+      "many will come",
+      "some shall die",
+      "this will be",
+      "Do men die",
+      "Do angels sing",
+      "Shall angels sing",
+      "Will light come",
+      "the light will in time come",
+      "and he will, in the end, come",
+    ])
+      expect(
+        translator
+          .toEnochian(text)
+          .tokens.some(
+            (one) =>
+              one.kind === "chip" &&
+              one.rule === "G16" &&
+              /^(?:do|will|shall)$/i.test(one.english),
+          ),
+        text,
+      ).toBe(true);
+    // "shall" is never TORZUL's "RISE, SHALL", which is "shall rise".
+    expect(lookupGlosses("RISE, SHALL")).toEqual(["RISE", "SHALL RISE"]);
+    expect(enochian("shall rise")).toBe("TORZUL");
+    // A main verb or noun takes a form only from a gloss of it alone, or
+    // of its plain form.
+    expect(enochian("as thou wilt")).toBe("TA ILS [wilt]");
+    expect(form("did")).toMatchObject({
+      form: "GNAY",
+      chips: [{ kind: "tense", rule: "G16", plain: "do" }],
+    });
+    expect(enochian("shall")).toBe("[shall]");
+    // Not fixed: "do" before a noun object is still read as an auxiliary.
+    expect(enochian("I do magic")).toBe("OL ·G16 [magic]");
+  });
+
+  it("L3: reads WE's PRONOUN, OF as the possessive", () => {
+    expect(dictionaryGlosses("HIM, OF")).toEqual(["HIS", "OF HIM"]);
+    expect(dictionaryGlosses("HER, OF")).toEqual(["HER", "OF HER"]);
+    expect(dictionaryGlosses("them, of")).toEqual(["their", "of them"]);
+    expect(english("TOX")).toBe("his");
+    expect(english("TILB")).toBe("her");
+    expect(english("SALMAN TOX")).toBe("‹the house› his");
+    expect(english("SALMANTOX")).toBe("‹the house› his");
+    // English into Enochian is as before.
+    expect(enochian("his house")).toBe("SALMAN TOX");
+  });
+
+  it("L4: reads only the first 500 words, each gap's nearest once", () => {
+    expect(MAX_WORDS).toBe(500);
+    const long = `${Array(MAX_WORDS).fill("fire").join(" ")} water`;
+    expect(firstWords(long)).toEqual({
+      text: Array(MAX_WORDS).fill("fire").join(" "),
+      cut: true,
+    });
+    expect(firstWords("fire 1 2 ? water", 1)).toEqual({
+      text: "fire 1 2 ?",
+      cut: true,
+    });
+    expect(firstWords("fire water")).toEqual({
+      text: "fire water",
+      cut: false,
+    });
+    // Words joined by commas or dashes count one by one.
+    const joined = Array(3000).fill("fire").join(",");
+    expect(firstWords(joined)).toEqual({
+      text: `${Array(MAX_WORDS).fill("fire").join(",")},`,
+      cut: true,
+    });
+    expect(firstWords(Array(600).fill("fire").join("—")).cut).toBe(true);
+    // A word gapped twice shares its nearest forms, looked up once.
+    const [first, , second] = translator.toEnochian("master and master").tokens;
+    if (first.kind !== "gap" || second.kind !== "gap") throw new Error("gaps");
+    expect(first.nearest.length).toBeGreaterThan(0);
+    expect(second.nearest).toBe(first.nearest);
+  });
+
+  it("L6: names a split the page really makes", () => {
+    const [dssalman] = translator.toEnglish("DSSALMAN").tokens;
+    expect(dssalman.readings[0]).toMatchObject({
+      via: "split",
+      rules: ["G26"],
+    });
+    expect(translator.joinSplits("ODSONF").map((one) => one.parts)).toEqual([
+      ["OD", "SONF"],
+      ["OD", "DSONF"],
+    ]);
+  });
+
+  it("L7: folds the I of 'am I', and marks a lone am as carrying it", () => {
+    expect(only("am I")).toMatchObject({ form: "ZIR", span: [0, 2] });
+    expect(enochian("who am I")).toBe("[who] ZIR");
+    const [, , am] = translator.toEnochian("I really am").tokens;
+    expect(am).toMatchObject({
+      form: "ZIR",
+      rule: "G13",
+      chips: [{ kind: "carries", word: "I" }],
+    });
+    expect(form("I am").chips).toEqual([]);
+  });
+
+  it("L8: reads a superlative as a near match, naming no verb rule", () => {
+    expect(form("greatest")).toMatchObject({
+      form: "DRILPA",
+      chips: [{ kind: "base", plain: "great" }],
+    });
+    // Two inflections of one word: a near match, or a tense by a verb's.
+    expect(form("soundest").chips).toEqual([{ kind: "base", plain: "sounds" }]);
+    expect(form("completest").chips).toEqual([
+      { kind: "tense", rule: "G16", plain: "completed" },
+    ]);
+  });
+
+  it("L8: keeps G16 for a verb's second person in -est", () => {
+    const second = (text: string) => {
+      const last = translator.toEnochian(text).tokens.at(-1);
+      return last?.kind === "form" ? last.chips : [];
+    };
+    // The gloss's word decides: a verb ("reign" by Dee's "raigneth").
+    for (const [text, plain] of [
+      ["thou knowest", "know"],
+      ["thou dwellest", "dwell"],
+      ["thou reignest", "reign"],
+      ["thou speakest", "speaking"],
+      ["thou visitest", "visiting"],
+      ["thou, O Lord, knowest", "know"],
+    ])
+      expect(second(text), text).toEqual([
+        { kind: "tense", rule: "G16", plain },
+      ]);
+    // Alone, where the gloss's word is a verb.
+    expect(second("speakest")).toEqual([
+      { kind: "tense", rule: "G16", plain: "speaking" },
+    ]);
+    expect(second("knowest")).toEqual([
+      { kind: "tense", rule: "G16", plain: "know" },
+    ]);
+    // An adjective's superlative stays a near match, "thou" or not.
+    const chipsOf = (text: string, at: number) => {
+      const one = translator.toEnochian(text).tokens[at];
+      return one.kind === "form" ? one.chips : [];
+    };
+    for (const [text, at, plain] of [
+      ["thou art the greatest", 2, "great"],
+      ["O thou greatest light", 2, "great"],
+      ["thou brightest star", 1, "bright"],
+      ["thou the strongest", 2, "strong"],
+    ] as const)
+      expect(chipsOf(text, at), text).toEqual([{ kind: "base", plain }]);
+  });
+
+  it("reads hers as Dee's her, as before, and no other pronoun so", () => {
+    expect(enochian("the light is hers")).toBe("·G4 OLPIRT I TILB");
+    expect(form("hers")).toMatchObject({ form: "TILB", rule: "G21" });
+    expect(enochian("hers is the light")).toBe("TILB I ·G4 OLPIRT");
+    for (const word of ["ours", "yours", "theirs", "thine", "herring"])
+      expect(only(word).kind, word).toBe("gap");
+  });
+
+  it("M1/M2: takes no grammar word as an inflection's base", () => {
+    for (const word of [
+      "hissing",
+      "hissed",
+      "herring",
+      "butting",
+      "untilled",
+      "cal",
+      "marred",
+      "marring",
+      "canned",
+    ])
+      expect(only(word).kind, word).toBe("gap");
+    expect(enochian("a red herring")).toBe("·G4 [red] [herring]");
+    for (const [typed, gloss] of [
+      ["hissing", "his"],
+      ["herring", "her"],
+      ["butting", "but"],
+      ["untilled", "until"],
+      ["cal", "called"],
+      ["marred", "mars"],
+      ["hers", "her"],
+    ])
+      expect(sameWord(typed, gloss), `${typed} ${gloss}`).toBe(false);
+    // Doubling still read where English doubles.
+    expect(form("equalled")).toMatchObject({ form: "PARACH" });
+    expect(sameWord("marred", "mar")).toBe(true);
+    expect(sameWord("travelled", "travel")).toBe(true);
+    expect(sameWord("beginning", "begin")).toBe(true);
+  });
+
+  it("L9: keeps an Enochian word a gloss names out of the English", () => {
+    expect(translator.guessDirection("OHIO OHIO OHIO").language).toBe(
+      "enochian",
+    );
+    expect(isEnglishWord(lookup, "ohio")).toBe(false);
+    expect(isEnglishWord(lookup, "babalon")).toBe(false);
+    // Real English stays, an Enochian spelling or not.
+    expect(isEnglishWord(lookup, "fire")).toBe(true);
+    expect(isEnglishWord(lookup, "paid")).toBe(true);
+    // Nor is "mad" English through "made".
+    expect(isEnglishWord(lookup, "made")).toBe(true);
+    expect(isEnglishWord(lookup, "mad")).toBe(false);
+  });
+
+  it("L11: looks up a reader's word as its own, never an inherited one", () => {
+    expect(englishTokens("constructor")[0].word).toBe("constructor");
+    expect(
+      enochian("constructor toString hasOwnProperty __proto__ valueOf"),
+    ).toBe("[constructor] [toString] [hasOwnProperty] [proto] [valueOf]");
   });
 });

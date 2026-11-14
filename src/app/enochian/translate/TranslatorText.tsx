@@ -68,10 +68,10 @@ export default function TranslatorText() {
         Below the reading, each word shows what it was read as and why: a place
         in the Keys, a dictionary entry, a Golden Dawn spelling from the form
         Crowley printed in 1912, or one of Aaron Leitch&apos;s spellings, with
-        its page. A word written joined to another, such as OISALMAN, &quot;this
-        house&quot;, is split by a rule from our notes, and the split says which
-        rule made it. A word we don&apos;t have shows the nearest spellings we
-        do.
+        its page. A word written joined to another, such as DSSALMAN, DS
+        &quot;which&quot; and SALMAN &quot;the house&quot;, is split by a rule
+        from our notes, and the split says which rule made it. A word we
+        don&apos;t have shows the nearest spellings we do.
       </p>
       <p>
         Tap any word to open its dictionary entry, beside the results on a wide

@@ -1,10 +1,11 @@
-import { englishWords, wordKey } from "./english.ts";
+import { englishTokens } from "./english.ts";
 import { type JoinSplit, joinSplits } from "./joins.ts";
 import type { KeysTable } from "./keysTable.ts";
 import {
   buildLookup,
   enochianWords,
   fold,
+  isEnglishWord,
   type Lookup,
   type LookupDictionary,
 } from "./lookupData.ts";
@@ -101,19 +102,19 @@ const BOTH_UP_TO = 2;
  * the join rule splits); English wins a tie.
  */
 export function guessDirection(lookup: Lookup, text: string): DirectionGuess {
-  const english = englishWords(text);
+  const english = englishTokens(text).map((one) => one.word);
   const enochian = enochianWords(text).map(fold);
   const share = (hits: number, of: number) => (of ? hits / of : 0);
   const englishScore = share(
-    english.filter((word) => lookup.englishVocabulary.has(wordKey(word)))
-      .length,
+    english.filter((word) => isEnglishWord(lookup, word)).length,
     english.length,
   );
   // A word the join rule reads (DSSALMAN) is Enochian too (decision 15).
   const enochianScore = share(
     enochian.filter(
       (word) =>
-        lookup.enochianWords.has(word) || joinSplits(lookup, word).length > 0,
+        word !== "" &&
+        (lookup.enochianWords.has(word) || joinSplits(lookup, word).length > 0),
     ).length,
     enochian.length,
   );

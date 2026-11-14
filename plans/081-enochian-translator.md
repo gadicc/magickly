@@ -4,8 +4,9 @@ Status: designed with Gadi on 13 November 2026, decision by decision,
 adversarially reviewed by Fable, spiked, and revised after the spike
 (the same day). Gadi then confirmed the plan's proposals, adding
 Leitch's spellings as input ("Confirmed with Gadi"), and said to
-build it. It is built step by step on `gate/enochian-translator`.
-Read
+build it. Stage 1 was built on `gate/enochian-translator` in steps B
+to G (13 and 14 November 2026); "Build notes" records what the build
+settled and changed, and "Follow-ups" what is left. Read
 [current status](000-current-status.md) first.
 
 [Plan 077](077-enochian-translator-experiment.md) asked whether an LLM
@@ -80,10 +81,14 @@ final form.
    chat turn, so stage 2 settles whether it counts as one or is
    weighted.
 3. **Its own page, and a preview in the dictionary.** The tool is
-   `/enochian/translate`. The dictionary shows a one-line "as a
-   sentence" preview for a query of three words or more, linking to
-   the page, as a new group in `searchDictionary`'s results. Both run
-   the same code.
+   `/enochian/translate`. The dictionary shows an "as a sentence"
+   preview for a query of three words or more, linking to the page.
+   Both run the same code. (As built in step F: the preview is its own
+   section above the list, not a group in `searchDictionary`'s
+   results, since the lookup loads later and a listbox may hold only
+   options; it shows the guessed reading only, in at most two lines,
+   and English into Enochian carries a one-line form of decision 5's
+   notice.)
 4. **The direction is guessed, with a switch.** Both readings are
    scored: the share of words that are Enochian headwords, Key words,
    Leitch's spellings (decision 13) or words the join rule splits
@@ -114,14 +119,23 @@ forms where any exist.
    words), Dee's line glosses before dictionary meanings. "over you"
    gives VORSG, "cast down" ADRPAN, "his power" LONSHITOX. A phrase
    must lie within one Key line's English to match a line gloss.
+   No phrase crosses `.`, `!`, `?`, `;`, `:` or a possessive; commas
+   and line breaks don't end one. Notes in brackets are dropped from
+   Dee's English and the glosses, never from what the reader types,
+   and a word in another script is a gap. The page and the preview
+   read the first 500 words and say so.
 7. **Exact forms, in tiers** (changed after the spike). A gloss
-   matches when it equals the English: tier 1 apart from articles
+   matches when it equals the English, a word matching only itself or
+   a regular inflection of it (-s, -es, -ies, -ied, -ed, -ing, -eth,
+   -est), so "stare" doesn't find "stars" (step G). A letter's name in
+   WE ("Pal (X)") is not a gloss. Tier 1 apart from articles
    (though a phrase begins or ends with "a", "an" or "the", or ends
    with a vocative "O", only where one of the matched glosses does, so "Open the gates" doesn't take the
    article into ODO "open"; an article left over takes its chip, and
    the phrase starts at the next word, so "the earth quakes" is
    GIZYAX; added in step D; and grammar words alone, such as "I am"
-   ZIR, take a form only where Dee wrote them, exactly, so "of his"
+   ZIR, take a form only from a gloss that is exactly them, Dee's or the
+   dictionary's (OROCH "under you", TILB "of her"), so "of his"
    doesn't find CNOQOD through WE's "servants, his"; added in step E);
    tier 2 apart from a leading "of" or "to"; tier 3 apart from one
    preposition, shown with a chip ("carries 'in'"). Be-forms,
@@ -149,18 +163,23 @@ forms where any exist.
    | --- | --- | --- |
    | the, a, an | G4 | left out, chip |
    | of | G5 | left out, chip (DE is never chosen: the tool can't tell where Dee would write it; forms like OIAD "of God" still come through phrases) |
-   | have, shall, do, will (auxiliaries) | G16 | left out, chip |
-   | is, are, was, I am | G13, G14 | Dee's forms (I, CHIS, ZIROP, ZIR) |
+   | have, shall, do, will (auxiliaries) | G16 | left out, chip; right after an article or possessive the word is a noun ("thy will"), and before a wh-word, a determiner, another auxiliary or a clause's end a main verb ("Do what thou wilt"), looked up only by a gloss that is that word alone; "have" before a noun is looked up (BRIN) |
+   | is, are, was, were, art, I am, am I | G13, G14 | Dee's forms (I, CHIS, ZIROP, ZIROM, GEH, ZIR); a lone "am" is ZIR, marked as carrying "I" |
    | a verb's tense or person | G16 | the verb's one form, by an irregular-verb table (came, kept, forgot, said, gave) |
    | not | G33 | IP, a separate word before the one it negates (GE, which follows its word by G32, is never chosen) |
    | no, none | G34 | AG |
-   | to (infinitive), let, never, a lone be or been, modals (can, could, may, must) | | a gap, unless a phrase matches (G17's "let" forms come through phrases) |
+   | to (infinitive), let, never, a lone be or been, modals (can, could, may, might, must, should, would) | | a gap, unless a phrase matches (G17's "let" forms come through phrases) |
+
+   The auxiliaries include their old and inflected forms (did, does,
+   doth, had, has, hast, hath, shalt, wilt). A superlative read as its
+   base ("greatest" as "great") is marked a near match, with no rule.
 
 10. **Pronouns** (changed after the spike). A pronoun with an exact
     form takes it (OL "I", TILB "her", TOX "his"). One without becomes
     a visible gap, not an "implied" chip: otherwise "he killed her" and
     "she killed him" come out the same. "Her" becomes TILB only before a
-    content word ("her house"); elsewhere it is an object and a gap.
+    content word ("her house") or standing alone; elsewhere it is an
+    object and a gap.
     Phrases come first, so "her course" gives Dee's own ELZAPTILB.
 11. **Possessives follow their noun, written apart** (changed after
     the spike). TOX and TILB come after the noun, as Dee mostly writes
@@ -171,8 +190,9 @@ forms where any exist.
 12. **Gaps.** A gap shows the nearest forms, each with its source:
     [master: nearest GEIAD "our Lord and Master"]. One gap per content
     word, and nearest forms from `searchDictionary`'s "means" group
-    and Key line glosses sharing the word's stem. Many
-    gaps have none (in the spike, 50 of 236 had any).
+    and Key line glosses sharing the word's stem, three at most; none
+    for a grammar word or a stem under three letters. Many gaps have
+    none (as built, 44 of the 60 sentences' 227 gaps have any).
 
 ### Enochian into English
 
@@ -218,12 +238,13 @@ forms where any exist.
     OI, AG) and OD (G30), with I and L only before a Key word. Behind:
     TOX, TILB (G22). The rest a known word of three letters or more,
     allowing G27's shared letter. Two readings shown when two fit
-    (OISALMAN). Each split is marked with the rule that made it ("split
+    (ODSONF: OD SONF or OD DSONF). Each split is marked with the rule that made it ("split
     by rule G26"; G30 for OD, G22 for TOX and TILB, G27 for a shared
     letter). Q is not a prefix: in the spike it gave 2 wrong splits, no
     right ones, and a third of the false splits of typos.
 16. **A word still not found** shows "not in our data" with the
-    nearest spellings by edit distance (plan 074 has none).
+    nearest spellings by edit distance (plan 074 has none): one edit
+    for a word of four letters or fewer, two otherwise, five shown.
 
 ### The page
 
@@ -241,10 +262,13 @@ forms where any exist.
 19. **Nothing leaves the browser.** The lookup runs client-side. The
     text goes in the URL fragment (`#q=…&dir=…`), never the query
     string, so it never reaches the server. The Keys
-    table is slim and lazily loaded (about 15 KB gzipped, with the
-    dictionary's meanings about 37 KB in all); the dictionary's
-    preview loads it only for a query of three words or more (plan
-    074, decision 9, rejected 25 KB on that page).
+    table is slim and lazily loaded (as built, 12.5 KB gzipped; the
+    page also loads the dictionary module the entries use, about 31 KB);
+    the dictionary's preview loads the table and the lookup only for a
+    query of three words or more (about 25 KB together; plan 074,
+    decision 9, rejected 25 KB on that page's first load). The
+    dictionary's own text is in its query string by plan 074's design,
+    so its page sends only the origin as Referer.
 20. **The limitations, per mode.** The lookup stage has its own list in
     `limitations.ts`, structured per mode so stage 2 adds its own
     (that the text goes to Anthropic). This plan quotes it word for
@@ -281,19 +305,20 @@ forms where any exist.
       for one of Dee's phrases counts for each of its words, an
       article inside it included; a contraction counts as the words it
       stands for. This is the
-      honest measure of new English, and the main figure. The
-      spike's, under the final rules: forms 51%, chips 11%, gaps 38%;
+      honest measure of new English, and the main figure. As built,
+      of 622 words: forms 280 (45%), rule chips 115 (18%; 41 of them
+      forms a rule gives), gaps 227 (37%; 44 with a nearest form);
       gap-free 1 of 20 practitioner, 0 of 20 everyday, 3 of 20
-      attested.
+      attested. (The spike's: 51%, 11% and 38%.)
     - **Dee's English in, Dee's Enochian out**, each Key's English as
       running text: the share of his content rows whose word comes
       back. It is labelled a self-consistency check and has no margin
-      of error, since the tool looks in the Keys themselves. The
-      spike's: 944 of 1,054 (89.6%).
+      of error, since the tool looks in the Keys themselves. As
+      built, 946 of 1,054 (89.8%; the spike's 944).
 
     No margin of error on the coverage figure either, since the 60
     sentences are not a sample of what readers type. The
-    date is the commit's, not a test's.
+    date is the day the script last ran, not a test's.
 
 ### Data fixes before it ships
 
@@ -402,6 +427,117 @@ confirmed:
   shown on the reading line, marked as ours, not blanked (decision 14;
   14 November).
 
+## Build notes (14 November 2026)
+
+Stage 1 was built in steps B to G on `gate/enochian-translator`, each
+a gated commit after an adversarial review (Opus 5.5) and, for the
+pages, a browser check at 360, 390 and 1280 px; the branch then had a
+final review (Fable 5.2). What the build settled or changed, by step:
+
+- **B** (efcee38e). AR's typo corrected. `leitchSpellings.ts` maps the
+  32 forms in Leitch's lexicon that our data lacks to the Key rows they
+  read (6 spelled differently, 26 written joined), each checked against
+  his page; it lives in the app, not in `magick-data`.
+- **C** (9599da8d). The lookup module, as decisions 6 to 16 describe.
+  Choices the decisions left open:
+  - a grammar word alone ("of a", "in the") goes to the rule tables,
+    not to a phrase, so "of a" no longer finds DE, and ADGT "can" is a
+    gap (a modal alone, decision 9);
+  - a lone "her" is TILB, but "killed her" leaves "her" a gap
+    (decision 10); "you" is NONCF, with NONCI as the other form;
+    "thee" and "ye" are gaps, since no source glosses them alone;
+  - "to" before a verb is always a gap;
+  - "'s" moves the possessor after the next content word, with a G5
+    chip, and TOX and TILB move likewise (G22);
+  - Golden Dawn spans take the following rows Crowley marks joined;
+    Key 19's Aethyr slot fills from any Aethyr's name.
+- **C, amended** (22ea524d). Decision 14 changed (as above). A run of
+  Dee's lines stays his English even where its first or last row is
+  one we divided: a rule from the flags alone marked Key 1's close as
+  ours. Current status has the TODO.
+- **D** (b73264f4). The figures script and file. A phrase now begins
+  or ends with "a", "an" or "the" only where its gloss does, so "Open
+  the" is no longer ODO.
+- **E** (3fa58a2d). The page. Lookup changes the reviews found:
+  - WE glosses its pronouns after the noun as it does prepositions
+    (CNOQOD "servants, his"), so those invert too: "of his" no longer
+    finds CNOQOD, and "my hands" is OZIEN;
+  - grammar words alone take a form only from an exact gloss (tier 1):
+    "of your" no longer finds MAD, while OROCH "under you" and TILB
+    "of her" stay;
+  - the direction guess counts words the join rule splits (DSSALMAN);
+  - a Key place carries `split`, so an entry marks our division too.
+
+  Decision 20's "per mode" became one list for the lookup, beside
+  which stage 2 adds its own; the six items are the same in both
+  directions. The popovers carry the 12 notes the lookup can name
+  (G4, G5, G13, G14, G16, G21, G22, G26, G27, G30, G33, G34), parsed
+  on the server; no other part of `grammar.md` is sent. Site search's
+  vectors were republished for the page.
+- **F** (20e98e72). The preview, drawn apart from `searchDictionary`
+  (decision 3, as amended). Below three words nothing loads; from
+  three, about 12.5 KB of code and 12.5 KB of data, gzipped; the
+  dictionary's first load grew about 2 KB. The preview and the page
+  count words with one function, so they agree on when a text reads
+  both ways. Since the dictionary's text is in its query string (plan
+  074), its page now sends only the origin as Referer, and the Keys
+  table is fetched the same way.
+- **G** (14 November 2026). The final review (Fable 5.2) found no
+  path by which the text reaches the server, and no crash, hang or
+  varying output in 80,000 fuzzed inputs both ways. It found wrong
+  forms given without a mark and words dropped without a tile, fixed
+  here:
+  - WE's letter names ("Pal (X)") were read as glosses, so "a pale
+    horse" gave X;
+  - dropping a final "e" joined different words ("stare" found "stars",
+    "site" "sit"); a word now matches only itself or a regular
+    inflection (decision 7), and Dee's spellings with a final "e"
+    (aire, brightnesse) went into the spelling table;
+  - what the reader typed in brackets, and words in other scripts,
+    were dropped; they are read now, as gaps where nothing matches;
+  - a closing quote after an "s" was read as a possessive and moved;
+  - "will", "do" and "shall" as nouns or main verbs were left out as
+    auxiliaries ("thy will be done"); decision 9 has the guard, and a
+    modal after its verb in a WE gloss is read as in front of it, so
+    TORZUL "rise, shall" no longer stands for a lone "shall";
+  - TOX read back as "him" (WE's "HIM, OF"); it reads "his";
+  - "am I" gave ZIR OL; a superlative named G16, the rule for verbs;
+  - Key 10's OHIO OHIO OHIO was guessed English, through a gloss that
+    names it;
+  - the page and the preview read the first 500 words and say so, and
+    nearest forms are found once per word (a long paste had blocked
+    the page for seconds);
+  - the preview's English into Enochian now says no one who reads
+    Enochian has reviewed it (decision 5);
+  - the page's split example, OISALMAN, is a Key word found whole;
+    DSSALMAN replaces it.
+
+  None of them changed the figures. Site search's vectors were
+  republished for the page's prose.
+
+The held-out join figure is 20 right and 5 wrong, the five the tests
+pin (ARCAOSGI, IOIAD, IZIZOP, OIAD, TATAN). A script that checks only
+against Dee's words counts a sixth, TALOLCIS, wrong: TA + LOLCIS "as
+buckles" is a right reading, but LOLCIS is in the dictionary only.
+
+Known limits, none of them hidden by the page:
+- a possessive moves past one word only, so "his holy house" gives
+  holy TOX house;
+- a word can match another's gloss: "wound" finds OZONGON by "wind";
+  "a rose" gives TORZULP "rose up" (tier 3);
+- malformed English is taken as it comes: "the the earth quakes" keeps
+  "the the earth" as CAOSGI, and "God's a house" is not reordered (the
+  article's chip stops the move);
+- "do" before a noun is still taken for an auxiliary ("I do magic"),
+  and one before an article as a main verb ("Do the angels sing",
+  "Why do the lamps burn"): telling them apart needs parts of speech
+  the data doesn't give;
+- inflection can still meet another word: "caste" finds ADRPHT
+  through "casteth"; words in -eed don't meet their inflections, and a
+  comparative in -er is not read as its base;
+- "123" is one gap; PAOC's reading-line gloss is the first piece of a
+  raw gloss (a data question).
+
 ## Out of scope
 
 - Stage 2's design and build.
@@ -417,10 +553,10 @@ Each step is one gated commit on `gate/enochian-translator`. (Steps
 are lettered so they aren't confused with stages 1 and 2.)
 
 A. **The plan** (this file).
-B. **Data fixes**: AR's typo (decision 22; its "(see …)" half is
+B. **Data fixes** (efcee38e): AR's typo (decision 22; its "(see …)" half is
    lookup code, in step C), and the table of Leitch's spellings in the
    app (decision 13), each checked against his page.
-C. **The lookup module**: tokenising, phrases, tiers, choice, the rule
+C. **The lookup module** (9599da8d; amended in 22ea524d): tokenising, phrases, tiers, choice, the rule
    tables, pronouns, possessives, gaps and nearest forms; the reading
    line, Golden Dawn and Leitch input and the join rule; the
    direction guess. A
@@ -429,15 +565,15 @@ C. **The lookup module**: tokenising, phrases, tiers, choice, the rule
    data, including the spike's common words and the join rule's
    held-out cases.
 D. **The figures script** and its numbers file, with the test
-   (decision 21).
-E. **The page**: layout, keypad, fragment state, the notice, the
+   (decision 21; b73264f4).
+E. **The page** (3fa58a2d): layout, keypad, fragment state, the notice, the
    limitations (per mode, quoted here under a test), the figures, rule
    popovers, entry sheet and pane, accessibility; page text and
    metadata (`src/seo/pages.ts`), and plan 071's "enochian translator"
    target moved here from the dictionary.
-F. **The dictionary preview** (decision 3), lazily loaded.
+F. **The dictionary preview** (decision 3), lazily loaded (20e98e72).
 G. **The record**: the final review's fixes, build notes here, current
-   status.
+   status (14 November 2026).
 
 ## For an expert
 
@@ -466,8 +602,8 @@ This plan's questions for an expert, with plan 077's, are in
 
 ## Risks
 
-- **English into Enochian is mostly gaps for everyday English** (59%
-  of words in the spike's everyday sentences). The notice and the
+- **English into Enochian is mostly gaps for everyday English** (56%
+  of words in the everyday sentences as built; 59% in the spike). The notice and the
   figures say so; readers may still be disappointed.
 - **Readers may take the output for Enochian an expert would write.**
   The notice, the labels and the chips are the only guard until the
@@ -482,3 +618,21 @@ This plan's questions for an expert, with plan 077's, are in
   published artefact (plan 052); the grammar notes are our own words;
   Leitch's spellings are facts, cited by page, in the app and not the
   published package.
+
+## Follow-ups
+
+- Record where each of Dee's own units begins (decision 14), so the
+  reading line can mark a run's edge that cuts one; Key 12's SOBA
+  lacks its `englishSplit` flag. In current status.
+- Safari is unchecked (no device). Each fragment write is two
+  `replaceState` calls (ours and Next's); older WebKit allowed 100 in
+  30 seconds, which steady keypad typing could reach.
+- The dictionary's `?q=` reaches the server by plan 074's design, and
+  for signed-out readers also in the sign-in link's `callbackURL`;
+  with the preview inviting sentences there, whether the link should
+  keep the query is open.
+- Parts of speech for "do" and its kin (known limits above).
+- An expert's review of a sample of English into Enochian
+  ([plan 082](082-enochian-expert-questions.md)), which decides how
+  far the notice can be softened.
+- Stage 2, designed separately.

@@ -15,6 +15,7 @@ import { TRANSLATOR_LIMITATIONS } from "./limitations";
 import { forgetTranslator } from "./load";
 import { KEYS_TABLE_URL } from "./lookup";
 import { lookupRuleNotes } from "./ruleNotes.server";
+import { MAX_WORDS } from "./tokens";
 import Translator from "./translator";
 
 const PATH = "/enochian/translate";
@@ -373,7 +374,49 @@ describe("the translator page (plan 081, step E)", () => {
   });
 });
 
+describe("a long paste", () => {
+  it("reads only the first 500 words, says so, and keeps all in the fragment", async () => {
+    const { container } = arrive();
+    const text = `${Array(MAX_WORDS).fill("light").join(" ")} master`;
+    type(text);
+    await waitFor(() => expect(tiles()).toHaveLength(MAX_WORDS));
+    expect(tiles().join(" ")).not.toContain("master");
+    expect(screen.getByText("Only the first 500 words are read.").tagName).toBe(
+      "P",
+    );
+    await waitFor(() =>
+      expect(liveRegion(container)).toMatch(
+        /^English into Enochian: .* Only the first 500 words are read\.$/,
+      ),
+    );
+    expect(new URLSearchParams(window.location.hash.slice(1)).get("q")).toBe(
+      text,
+    );
+    // Up to the cap, nothing is said.
+    type(Array(MAX_WORDS).fill("light").join(" "));
+    await waitFor(() =>
+      expect(
+        screen.queryByText("Only the first 500 words are read."),
+      ).toBeNull(),
+    );
+  });
+});
+
 describe("English into Enochian (decisions 5 and 17)", () => {
+  it("reads a superlative as its base, a near match with no rule", async () => {
+    arrive("#q=greatest");
+    await waitFor(() => expect(tiles()).toHaveLength(1));
+    const [greatest] = tiles();
+    expect(greatest).toMatch(/^DRILPA.*near match: read as “great”/);
+    expect(greatest).not.toContain("rule G16");
+  });
+
+  it("marks a lone am as carrying its I", async () => {
+    arrive("#q=I%20really%20am");
+    await waitFor(() => expect(tiles()).toHaveLength(3));
+    expect(tiles()[2]).toMatch(/^ZIR.*carries “I”/);
+  });
+
   it("puts the notice and the limitations above the tiles", async () => {
     arrive("#q=house");
     await waitFor(() => expect(tiles()).toHaveLength(1));

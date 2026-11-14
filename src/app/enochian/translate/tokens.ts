@@ -1,5 +1,3 @@
-import { words } from "../dictionary/search.ts";
-
 /**
  * The translator's tokenisers (plan 081): its English words and its
  * Enochian words, as the lookup reads them. A module of their own, small
@@ -23,17 +21,21 @@ export interface EnglishToken {
 
 /**
  * Dee's and Casaubon's spellings, modernised on both sides, so a reader's
- * "shew" or "show" meets either.
+ * "shew" or "show" meets either. A final e of his ("brightnesse",
+ * "aire") is here, not taken off every word, so "stare" is not "star".
  */
 const ARCHAIC: Readonly<Record<string, string>> = {
   adde: "add",
+  aire: "air",
   alwayes: "always",
   apparaild: "apparelled",
   ballance: "balance",
   bee: "be",
   binde: "bind",
   bloud: "blood",
+  brightnesse: "brightness",
   creatour: "creator",
+  darknesse: "darkness",
   doth: "do",
   drinesse: "dryness",
   encrease: "increase",
@@ -42,6 +44,7 @@ const ARCHAIC: Readonly<Record<string, string>> = {
   firmamets: "firmaments",
   flowres: "flowers",
   furie: "fury",
+  gladnesse: "gladness",
   glorie: "glory",
   governour: "governor",
   harboured: "harbored",
@@ -51,6 +54,7 @@ const ARCHAIC: Readonly<Record<string, string>> = {
   hiacynth: "hyacinth",
   honour: "honor",
   labour: "labor",
+  likenesse: "likeness",
   loynes: "loins",
   mee: "me",
   milstones: "millstones",
@@ -67,6 +71,7 @@ const ARCHAIC: Readonly<Record<string, string>> = {
   raigne: "reign",
   range: "reign",
   rejoyceth: "rejoiceth",
+  righteousnes: "righteousness",
   righteousnesse: "righteousness",
   runne: "run",
   saith: "say",
@@ -78,6 +83,7 @@ const ARCHAIC: Readonly<Record<string, string>> = {
   sware: "swore",
   terrour: "terror",
   untill: "until",
+  vanne: "van",
   voyce: "voice",
   walkest: "walk",
   whome: "whom",
@@ -110,41 +116,98 @@ export function deaccent(text: string): string {
 }
 
 /**
- * Bracketed and parenthesised text is a note, not English to translate.
- * No bracket inside, so each match stops at the next opening one and the
- * scan stays linear.
+ * Bracketed and parenthesised text in Dee's English or a gloss is a note,
+ * not English to translate (never in what a reader types). No bracket
+ * inside, so each match stops at the next opening one and the scan stays
+ * linear.
  */
 const NOTES = /\[[^[\]]*\]|\([^()]*\)/g;
+
+/**
+ * A word as typed: letters in any script, digits and apostrophes. A word
+ * not in Latin letters ("שלום") is still a word, which no gloss matches,
+ * so it becomes a gap rather than vanishing.
+ */
+const WORD = /[\p{L}\p{N}']+/gu;
 
 /** Punctuation that ends a clause: no phrase is matched across it. */
 const CLAUSE_END = /[.!?;:]/;
 
+/** An opening single quote: a curly one, or a straight one before a word. */
+const OPENING_QUOTE = "‘";
+
 /**
- * The English words of a text, contractions expanded, each with how it
- * was typed. Shared with `words()` from `search.ts`, which takes off a
- * possessive "'s"; here that is kept as a flag, since G5 moves the word.
+ * Old elisions written with a leading apostrophe ("'Tis", "'twas"): the
+ * apostrophe is part of the word, not a quote opening.
+ */
+const ELISION =
+  /^'(?:tis|twas|twere|twill|twould|em|gainst|neath|tween|twixt|mid|midst|round|til|cause)$/i;
+
+/**
+ * The English words of a text a reader typed, contractions expanded, each
+ * with how it was typed. Every word is kept, brackets and all, so each
+ * becomes a form, a chip or a gap. Shared with `words()` from `search.ts`,
+ * which takes off a possessive "'s"; here that is kept as a flag, since G5
+ * moves the word. A closing quote after an "s" ("I said 'yes'") is a
+ * quote, not a possessive "s'", while a quote is open.
  */
 export function englishTokens(text: string): EnglishToken[] {
+  return tokenize(text, false);
+}
+
+/**
+ * The compared words of Dee's English or a gloss: as `englishTokens`, but
+ * bracketed notes left out (WE's "Mals (P)" is "Mals").
+ */
+export function englishWords(text: string): string[] {
+  return tokenize(text, true).map((one) => one.word);
+}
+
+/** Dee's English or a gloss with its bracketed notes out (see `NOTES`). */
+export function withoutNotes(text: string): string {
+  return text.replace(NOTES, " ");
+}
+
+function tokenize(text: string, dropNotes: boolean): EnglishToken[] {
   const out: EnglishToken[] = [];
-  const cleaned = deaccent(text).replaceAll("’", "'").replace(NOTES, " ");
-  const found = [...cleaned.matchAll(/[A-Za-z0-9']+/g)];
+  let cleaned = deaccent(text).replaceAll("’", "'");
+  if (dropNotes) cleaned = withoutNotes(cleaned);
+  const found = [...cleaned.matchAll(WORD)];
+  let quoted = false;
   found.forEach((match, at) => {
     const [typed] = match;
+    const previous = found[at - 1];
+    const gap = cleaned.slice(
+      previous ? previous.index + previous[0].length : 0,
+      match.index,
+    );
+    if (gap.includes(OPENING_QUOTE)) quoted = true;
+    if (/^'+$/.test(typed)) {
+      quoted = !quoted;
+      return;
+    }
+    if (typed.startsWith("'") && !ELISION.test(typed.replace(/'+$/, "")))
+      quoted = true;
     const end = match.index + typed.length;
     const between = cleaned.slice(end, found[at + 1]?.index ?? cleaned.length);
     const endsClause = CLAUSE_END.test(between);
+    // "s'" closes an open quote; only outside one is it a plural possessive.
+    const possessive = /'s$/i.test(typed) || (/s'$/i.test(typed) && !quoted);
+    if (typed.endsWith("'")) quoted = false;
     let expanded = typed.toLowerCase();
     for (const [pattern, replacement] of CONTRACTIONS)
       expanded = expanded.replace(pattern, replacement);
     const pieces = expanded.split(" ").filter(Boolean);
     const contraction = pieces.length > 1 ? typed : undefined;
     pieces.forEach((piece, index) => {
-      const [word] = words(piece);
+      // As `words()` reads it, for any script: no possessive "'s", no
+      // apostrophes.
+      const word = piece.replace(/'s$/, "").replaceAll("'", "");
       if (!word) return;
       out.push({
-        word: ARCHAIC[word] ?? word,
+        word: Object.hasOwn(ARCHAIC, word) ? ARCHAIC[word] : word,
         surface: contraction ? piece : typed,
-        possessive: !contraction && /(?:'s|s')$/i.test(typed),
+        possessive: !contraction && possessive,
         endsClause: endsClause && index === pieces.length - 1,
         ...(contraction ? { contraction } : {}),
       });
@@ -153,14 +216,13 @@ export function englishTokens(text: string): EnglishToken[] {
   return out;
 }
 
-/** The compared words of a text (a gloss, say). */
-export function englishWords(text: string): string[] {
-  return englishTokens(text).map((one) => one.word);
-}
-
-/** An Enochian text's words, as typed, with Crowley's hyphens kept in. */
+/**
+ * An Enochian text's words, as typed, with Crowley's hyphens kept in.
+ * Letters in any script make a word, as in `englishTokens`, so a word not
+ * in Latin letters is shown as not found rather than dropped.
+ */
 export function enochianWords(text: string): string[] {
-  return deaccent(text).match(/[A-Za-z]+(?:['-][A-Za-z]+)*/g) ?? [];
+  return deaccent(text).match(/\p{L}+(?:['-]\p{L}+)*/gu) ?? [];
 }
 
 /**
@@ -172,4 +234,30 @@ export function enochianWords(text: string): string[] {
  */
 export function wordCount(text: string): number {
   return text.split(/\s+/).filter((word) => /\p{L}/u.test(word)).length;
+}
+
+/**
+ * The most words the lookup reads of a text, on the page and in the
+ * dictionary's preview: a long paste would otherwise hold the browser
+ * for seconds. The URL's fragment still keeps the whole text.
+ */
+export const MAX_WORDS = 500;
+
+/**
+ * A text cut after its first `max` words, and whether anything was cut.
+ * Words are counted as the tokenisers find them, runs of letters (with
+ * digits and apostrophes), so words joined by commas or dashes count
+ * one by one.
+ */
+export function firstWords(
+  text: string,
+  max = MAX_WORDS,
+): { text: string; cut: boolean } {
+  let seen = 0;
+  for (const match of text.matchAll(/[\p{L}\p{M}\p{N}']+/gu)) {
+    if (!/\p{L}/u.test(match[0])) continue;
+    if (++seen > max)
+      return { text: text.slice(0, match.index).trimEnd(), cut: true };
+  }
+  return { text, cut: false };
 }

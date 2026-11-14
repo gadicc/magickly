@@ -10,16 +10,18 @@ import {
   AUXILIARIES,
   BE,
   coreKeys,
+  coreWords,
   deaccent,
   englishWords,
   IRREGULAR,
   NEGATION,
   PREPOSITIONS,
   PRONOUNS,
+  sameWord,
   withoutLeadingOfTo,
   wordKey,
 } from "./english.ts";
-import { dictionaryGlosses } from "./glosses.ts";
+import { lookupGlosses } from "./glosses.ts";
 import type { KeysTable } from "./keysTable.ts";
 import { LEITCH_SPELLINGS, type LeitchSpelling } from "./leitchSpellings.ts";
 import { enochianWords } from "./tokens.ts";
@@ -66,6 +68,8 @@ export interface Row {
   formula?: "first" | "repeat";
   /** The English as compared (`coreKeys`). */
   core: readonly string[];
+  /** The words `core` keys, articles out (`coreWords`). */
+  words: readonly string[];
 }
 
 /** Where a gloss came from: one of Dee's rows, or a dictionary meaning. */
@@ -89,6 +93,12 @@ export interface IndexHit {
   origin: Origin;
   /** Tier 3: the preposition the gloss carries beyond the English. */
   preposition?: string;
+  /**
+   * The gloss's words its key was made from, in order: what each typed
+   * word must be the same word as (`sameWord`), since a key only finds
+   * candidates ("stare" and "stars" share one).
+   */
+  words: readonly string[];
 }
 
 /** One headword (or several that fold the same), with its meanings. */
@@ -148,8 +158,16 @@ export interface Lookup {
   /** Leitch's spellings, folded, to their entries. */
   leitch: ReadonlyMap<string, readonly LeitchSpelling[]>;
   aethyrs: readonly AethyrName[];
-  /** Word keys that count as English for the direction guess. */
-  englishVocabulary: ReadonlySet<string>;
+  /**
+   * Words that count as English for the direction guess, by their key
+   * (`wordKey`); see `isEnglishWord`.
+   */
+  englishVocabulary: ReadonlyMap<string, readonly string[]>;
+  /**
+   * Words our English writes as an infinitive ("to reign"): verbs, for an
+   * "-est" read as a verb's second person (G16).
+   */
+  infinitives: ReadonlySet<string>;
   /** Folded words that count as Enochian for it. */
   enochianWords: ReadonlySet<string>;
   /** `search.ts`'s index, for a gap's nearest forms (decision 12). */
@@ -166,8 +184,15 @@ const MARKERS: Readonly<Record<string, GdMarker>> = {
   s: "split",
 };
 
-/** A word folded for lookup: accents off, then `foldSpelling`. */
-export const fold = (word: string) => foldSpelling(deaccent(word));
+/**
+ * A word folded for lookup: accents off, then `foldSpelling`; "" for a
+ * word with letters outside the Latin alphabet ("שלום", "straße"), which
+ * no source spells.
+ */
+export function fold(word: string): string {
+  const plain = deaccent(word);
+  return /[^\P{L}A-Za-z]/u.test(plain) ? "" : foldSpelling(plain);
+}
 
 const ORDINAL_UNITS = [
   "first",
@@ -238,6 +263,7 @@ function readRows(table: KeysTable): Row[] {
           ? { formula: key === 1 ? "first" : "repeat" }
           : {}),
         core: coreKeys(englishWords(text)),
+        words: coreWords(englishWords(text)),
       } as Row);
     });
   }
@@ -252,18 +278,39 @@ function addGloss(
   origin: Origin,
   literal: boolean,
 ) {
-  const core = coreKeys(englishWords(gloss), literal);
-  if (!core.length) return;
-  push(tiers[0], core.join(" "), { form, origin });
-  const bare = withoutLeadingOfTo(core);
-  if (bare.length && bare.length !== core.length)
-    push(tiers[1], bare.join(" "), { form, origin });
-  if (core.length < 2) return;
-  core.forEach((word, at) => {
+  const words = coreWords(englishWords(gloss));
+  if (!words.length) return;
+  const core = coreKeys(words, literal);
+  push(tiers[0], core.join(" "), { form, origin, words });
+  const bare = withoutLeadingOfTo(words);
+  if (bare.length && bare.length !== words.length)
+    push(tiers[1], coreKeys(bare, literal).join(" "), {
+      form,
+      origin,
+      words: bare,
+    });
+  if (words.length < 2) return;
+  words.forEach((word, at) => {
     if (!PREPOSITIONS.has(word)) return;
-    const rest = [...core.slice(0, at), ...core.slice(at + 1)];
-    push(tiers[2], rest.join(" "), { form, origin, preposition: word });
+    const rest = [...words.slice(0, at), ...words.slice(at + 1)];
+    push(tiers[2], coreKeys(rest, literal).join(" "), {
+      form,
+      origin,
+      preposition: word,
+      words: rest,
+    });
   });
+}
+
+/**
+ * Whether a word counts as English for the direction guess: the same
+ * word as one in Dee's English, a gloss, or the grammar tables
+ * (`sameWord`), so "mad" is not English through "made".
+ */
+export function isEnglishWord(lookup: Lookup, word: string): boolean {
+  return (lookup.englishVocabulary.get(wordKey(word)) ?? []).some((one) =>
+    sameWord(word, one),
+  );
 }
 
 /** The dictionary as `search.ts` takes it, from meanings alone. */
@@ -328,7 +375,7 @@ export function buildLookup(
       add(row.english, row.folded, { kind: "key", row });
   for (const [folded, word] of dictionary)
     for (const { meaning, source: work, headword } of word.meanings)
-      for (const gloss of dictionaryGlosses(meaning))
+      for (const gloss of lookupGlosses(meaning))
         add(gloss, folded, {
           kind: "dictionary",
           headword,
@@ -361,18 +408,50 @@ export function buildLookup(
     ordinal: ORDINALS[index] ?? "",
   }));
 
-  const englishVocabulary = new Set<string>();
+  const englishVocabulary = new Map<string, string[]>();
+  const addEnglish = (word: string) => {
+    const key = wordKey(word);
+    const list = englishVocabulary.get(key);
+    if (!list) englishVocabulary.set(key, [word]);
+    else if (!list.includes(word)) list.push(word);
+  };
   for (const row of rows)
-    for (const word of englishWords(row.english))
-      englishVocabulary.add(wordKey(word));
-  for (const word of dictionary.values())
-    for (const { meaning } of word.meanings)
-      for (const gloss of dictionaryGlosses(meaning)) {
-        if (gloss.includes("'") || /\b(?:var|letter)\b/i.test(gloss)) continue;
-        for (const one of englishWords(gloss))
-          if (one.length > 1 || "aio".includes(one))
-            englishVocabulary.add(wordKey(one));
-      }
+    for (const word of englishWords(row.english)) addEnglish(word);
+  // An Enochian word a gloss names ("Root of OHIO", "I give Ga") is a
+  // reference, not English: it counts only where some gloss writes it in
+  // lower case, as English ("fire").
+  const glosses = [...dictionary.values()].flatMap((word) =>
+    word.meanings.flatMap(({ meaning }) => lookupGlosses(meaning)),
+  );
+  const lowerCase = new Set(
+    glosses.flatMap((gloss) =>
+      englishWords(
+        (gloss.match(/[\p{L}\p{N}']+/gu) ?? ([] as string[]))
+          .filter((one) => one === one.toLowerCase())
+          .join(" "),
+      ),
+    ),
+  );
+  const enochianForm = (word: string) =>
+    keyForms.has(fold(word)) || dictionary.has(fold(word));
+  for (const gloss of glosses) {
+    if (gloss.includes("'") || /\b(?:var|letter)\b/i.test(gloss)) continue;
+    for (const one of englishWords(gloss))
+      if (
+        (one.length > 1 || "aio".includes(one)) &&
+        (lowerCase.has(one) || !enochianForm(one))
+      )
+        addEnglish(one);
+  }
+  const infinitives = new Set<string>();
+  for (const text of [...rows.map((row) => row.english), ...glosses]) {
+    const words = englishWords(text);
+    words.forEach((word, at) => {
+      const next = words[at + 1];
+      if (word === "to" && next && !ARTICLES.has(next) && !PRONOUNS.has(next))
+        infinitives.add(next);
+    });
+  }
   for (const set of [
     ARTICLES,
     PREPOSITIONS,
@@ -383,7 +462,7 @@ export function buildLookup(
     new Set(Object.keys(IRREGULAR)),
     new Set(["and", "or", "but", "if", "so", "yes", "what", "who"]),
   ])
-    for (const word of set) englishVocabulary.add(wordKey(word));
+    for (const word of set) addEnglish(word);
 
   const enochian = new Set<string>([
     ...keyForms.keys(),
@@ -411,6 +490,7 @@ export function buildLookup(
     leitch,
     aethyrs,
     englishVocabulary,
+    infinitives,
     enochianWords: enochian,
     // `search.ts` types its index on full entries but reads only meanings.
     search: buildIndex(asEntries(source), uses),

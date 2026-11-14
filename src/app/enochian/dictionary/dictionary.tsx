@@ -171,8 +171,10 @@ const styles = {
   "& .dict-preview-line": {
     ...LINE_STYLES,
     padding: "0 16px",
-    // The label's line and two of text, kept while it loads.
-    minHeight: 66,
+    // The label's line, two of text and the note under English into
+    // Enochian (18 px), kept while it loads, so the frame never grows when
+    // the line arrives, whichever way it reads.
+    minHeight: 84,
     "& .tr-line": { margin: 0, fontSize: 16 },
     "& .tr-line-label": { minHeight: 18, lineHeight: "18px" },
     // Two lines at most, then an ellipsis; the link opens the whole. The
@@ -184,6 +186,14 @@ const styles = {
       overflow: "hidden",
       lineHeight: "24px",
     },
+  },
+  // The preview's notes under its line: unreviewed, or cut short.
+  "& .dict-preview-note": {
+    display: "block",
+    margin: 0,
+    fontSize: 12,
+    lineHeight: "18px",
+    color: "text.secondary",
   },
   "& .dict-preview-open": { padding: "4px 16px 10px", fontSize: 14 },
   "& .dict-pane": {

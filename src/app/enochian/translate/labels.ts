@@ -37,6 +37,23 @@ const count = (n: number, one: string, many: string) =>
 const percent = (part: number, whole: number) =>
   whole ? `${Math.round((part / whole) * 100)}%` : "0%";
 
+/**
+ * Whole percentages of parts that make up `whole`, summing to 100: each
+ * rounded down, then the points left over given to the largest remainders
+ * (the first on a tie), so 45% + 18% + 36% (99) is shown 45% + 18% + 37%.
+ */
+export function shares(parts: readonly number[], whole: number): number[] {
+  if (!whole) return parts.map(() => 0);
+  const exact = parts.map((part) => (part / whole) * 100);
+  const out = exact.map(Math.floor);
+  const left = 100 - out.reduce((sum, one) => sum + one, 0);
+  const order = exact
+    .map((one, at) => ({ at, remainder: one - Math.floor(one) }))
+    .sort((a, b) => b.remainder - a.remainder || a.at - b.at);
+  for (const { at } of order.slice(0, Math.max(0, left))) out[at]++;
+  return out;
+}
+
 export const LABELS = {
   latinBox: "English or Latin letters",
   enochianBox: "Enochian, right to left",
@@ -49,6 +66,8 @@ export const LABELS = {
   onlyAs: (language: Language) => `only as ${NAMES[language]}`,
   bothWays: "both ways",
   loading: "Loading the Keys…",
+  cut: (max: number) =>
+    `Only the first ${max.toLocaleString("en")} words are read.`,
   failed: "The Keys didn’t load.",
   retry: "Try again",
   resultsHeading: (language: Language) => direction(language),
@@ -68,7 +87,8 @@ export const LABELS = {
       ? "near match: without “of” or “to”"
       : "near match: but for a preposition",
   byRule: "by rule",
-  carries: (preposition: string) => `carries “${preposition}”`,
+  carries: (word: string) => `carries “${word}”`,
+  base: (plain: string) => `near match: read as “${plain}”`,
   reordered: "moved after its noun,",
   tense: (plain: string) => `read as “${plain}”,`,
   contraction: (from: string) => `from “${from}”`,
@@ -132,13 +152,15 @@ export const LABELS = {
     coverageHeading: "New English, 60 sentences",
     coverageAbout:
       "Sentences with no answer to check against, written for plan 077’s test: 20 a practitioner might want in Enochian, 20 everyday ones, and 20 that use only words found in Dee’s English. Each English word gets a form, a rule chip or a gap.",
-    coverage: (forms: number, chips: number, gaps: number, words: number) =>
-      [
-        `forms ${percent(forms, words)}`,
-        `rule chips ${percent(chips, words)}`,
-        `gaps ${percent(gaps, words)}`,
+    coverage: (forms: number, chips: number, gaps: number, words: number) => {
+      const [f, c, g] = shares([forms, chips, gaps], words);
+      return [
+        `forms ${f}%`,
+        `rule chips ${c}%`,
+        `gaps ${g}%`,
         `of ${count(words, "word", "words")}`,
-      ] as const,
+      ] as const;
+    },
     gapFreeHeading: "Sentences with no gap",
     gapFree: (kind: string, n: number, of: number) => `${kind} ${n} of ${of}`,
     kinds: {

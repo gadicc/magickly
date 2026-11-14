@@ -5,6 +5,7 @@ import { visuallyHidden } from "@/ui/visuallyHidden";
 import { ReadingLine } from "../translate/lineParts";
 import { loadTranslator } from "../translate/load";
 import type { ToEnochian, Translator } from "../translate/lookup";
+import { firstWords, MAX_WORDS } from "../translate/tokens";
 import { LABELS } from "./labels";
 import PreviewShell from "./PreviewShell";
 
@@ -36,9 +37,11 @@ export default function SentencePreview({ query }: { query: string }) {
       live = false;
     };
   }, []);
+  // Only the first `MAX_WORDS` words are read, as on the page.
+  const read = React.useMemo(() => firstWords(query), [query]);
   const translation = React.useMemo(
-    () => translator?.translate(query) ?? null,
-    [translator, query],
+    () => translator?.translate(read.text) ?? null,
+    [translator, read.text],
   );
   if (failed) return null;
   if (!translation) return <PreviewShell query={query} />;
@@ -55,6 +58,9 @@ export default function SentencePreview({ query }: { query: string }) {
       ) : (
         toEnglish && <ReadingLine line={toEnglish.line} />
       )}
+      {read.cut && (
+        <p className="dict-preview-note">{LABELS.previewCut(MAX_WORDS)}</p>
+      )}
     </PreviewShell>
   );
 }
@@ -63,6 +69,8 @@ export default function SentencePreview({ query }: { query: string }) {
  * English into Enochian in one line: each form, and each gap as its
  * English in brackets, marked as having no form. The words a rule leaves
  * out are counted in the label, since the line has no tiles to show them.
+ * Under the line, the page's notice in short (decision 5): no one who
+ * reads Enochian has reviewed it.
  */
 function FormsLine({ result }: { result: ToEnochian }) {
   const shown = result.tokens.filter((token) => token.kind !== "chip");
@@ -89,6 +97,8 @@ function FormsLine({ result }: { result: ToEnochian }) {
           </React.Fragment>
         ))}
       </span>
+      <span style={visuallyHidden}>{LABELS.previewNoteBefore}</span>
+      <span className="dict-preview-note">{LABELS.previewUnreviewed}</span>
     </p>
   );
 }

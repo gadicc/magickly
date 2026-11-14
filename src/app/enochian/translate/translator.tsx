@@ -41,6 +41,7 @@ import type {
   Translation,
 } from "./lookup";
 import type { RuleNotes } from "./ruleNotes";
+import { firstWords, MAX_WORDS } from "./tokens";
 
 /**
  * The Enochian translator (plan 081, decisions 4, 5 and 17–20): one text
@@ -440,10 +441,13 @@ function Alternatives({ token }: { token: FormToken }) {
   );
 }
 
-/** A note a rule put on a tile: what it carries, moved, or read plain. */
+/**
+ * A note a rule put on a tile: what it carries, moved, or read plain; or
+ * a superlative read as its base, a near match no rule explains.
+ */
 function ChipNote({ chip }: { chip: TileChip }) {
-  if (chip.kind === "carries")
-    return <span>{LABELS.carries(chip.preposition)}</span>;
+  if (chip.kind === "carries") return <span>{LABELS.carries(chip.word)}</span>;
+  if (chip.kind === "base") return <span>{LABELS.base(chip.plain)}</span>;
   return (
     <span>
       {chip.kind === "reordered" ? LABELS.reordered : LABELS.tense(chip.plain)}{" "}
@@ -454,7 +458,13 @@ function ChipNote({ chip }: { chip: TileChip }) {
 
 /** A key for a tile's chip: a tile has at most one of each kind and rule. */
 const chipKey = (chip: TileChip) =>
-  `${chip.kind}-${chip.kind === "carries" ? chip.preposition : chip.rule}`;
+  `${chip.kind}-${
+    chip.kind === "carries"
+      ? chip.word
+      : chip.kind === "base"
+        ? chip.plain
+        : chip.rule
+  }`;
 
 /** The form, its script and its English, which opens the word. */
 function FormButton({
@@ -912,26 +922,33 @@ export default function Translator({ notes }: { notes: RuleNotes }) {
   const translator = useTranslator(asked || trimmed !== "");
   // The results can lag a keystroke behind the boxes, so typing stays quick.
   const deferred = React.useDeferredValue(trimmed);
+  // Only the first `MAX_WORDS` words are read; the fragment keeps all.
+  const read = React.useMemo(() => firstWords(deferred), [deferred]);
   // A text with no words ("?", "123") is no result: no notice, no tiles.
   const translation = React.useMemo(() => {
-    if (!translator.translator || !deferred) return null;
+    if (!translator.translator || !read.text) return null;
     const found = translator.translator.translate(
-      deferred,
+      read.text,
       chosen ?? undefined,
     );
     const tokens =
       (found.toEnochian?.tokens.length ?? 0) +
       (found.toEnglish?.tokens.length ?? 0);
     return tokens ? found : null;
-  }, [translator.translator, deferred, chosen]);
+  }, [translator.translator, read.text, chosen]);
+  const cut = translation !== null && read.cut;
   // The live region speaks once typing pauses, as the URL is written, not
   // at every keystroke.
   const [announced, setAnnounced] = React.useState("");
   React.useEffect(() => {
-    const summary = translation ? summarise(translation) : "";
+    const summary = translation
+      ? [summarise(translation), cut && LABELS.cut(MAX_WORDS)]
+          .filter(Boolean)
+          .join(" ")
+      : "";
     const timer = setTimeout(() => setAnnounced(summary), URL_DELAY);
     return () => clearTimeout(timer);
-  }, [translation]);
+  }, [translation, cut]);
 
   const open = React.useCallback((one: Opened) => setOpened(one), []);
   const close = React.useCallback(() => setOpened(null), []);
@@ -1042,6 +1059,7 @@ export default function Translator({ notes }: { notes: RuleNotes }) {
           <div aria-live="polite" style={visuallyHidden}>
             {announced}
           </div>
+          {cut && <p className="tr-status">{LABELS.cut(MAX_WORDS)}</p>}
           {trimmed && translator.status === "loading" && (
             <p className="tr-status">{LABELS.loading}</p>
           )}

@@ -41,8 +41,9 @@ others as safe as we think? Seventeen are marked yes: G6, G7, G9, G10,
 G12, G14, G15, G17, G18, G19, G22, G23, G24, G28, G34, G38 and G39.
 Of these, plan 081's tool applies G14, G17, G22, G34 and G38, so those
 come first, then G12 and G24, which rest, as G34 does, on a single
-example in the Keys. Plan 081's chips name G4, G5 and G16, and a form
-that carries "in": are the chips right?
+example in the Keys. Plan 081's chips also name G4, G5, G13, G16,
+G21 and G33, its splits G26, G27 and G30, and a form that carries "in"
+(or "I", for ZIR): are the chips right?
 
 - **TILB before its noun:** G22 now allows it, from Key 19's OD TILB
   ADPHAHT DAMPLOZ. Is that right?
