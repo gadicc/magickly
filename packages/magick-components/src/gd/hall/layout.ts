@@ -204,7 +204,7 @@ export interface HallRect {
 }
 
 /** A laid-out label: lines with baselines, in floor squares. */
-export interface ResolvedLabel {
+export interface HallResolvedLabel {
   lines: readonly { text: string; x: number; y: number }[];
   size: number;
   anchor: "start" | "middle" | "end";
@@ -212,7 +212,7 @@ export interface ResolvedLabel {
 }
 
 /** A placed object: its art, centre, scale and labels. */
-export interface ResolvedObject {
+export interface HallResolvedObject {
   /** Child indices from the root; also a stable React key. */
   path: readonly number[];
   node: HallNode;
@@ -230,11 +230,11 @@ export interface ResolvedObject {
   /** Drawn size, in squares. */
   width: number;
   height: number;
-  labels: readonly ResolvedLabel[];
+  labels: readonly HallResolvedLabel[];
   /** Lines of a free `label`, which draws as text instead of art. */
-  text?: ResolvedLabel;
+  text?: HallResolvedLabel;
   /** Text drawn inside the object over its art: a marker's `text`. */
-  inner?: ResolvedLabel;
+  inner?: HallResolvedLabel;
   /**
    * The frame the node's own `x` and `y` are read in: its origin and
    * floor squares per frame unit (1 on the floor and in rows; a host's
@@ -259,7 +259,7 @@ export interface ResolvedObject {
 }
 
 /** A gap in a wall. */
-export interface ResolvedDoor {
+export interface HallResolvedDoor {
   /** Child indices from the root. */
   path: readonly number[];
   side: BannerSide;
@@ -269,7 +269,7 @@ export interface ResolvedDoor {
 }
 
 /** A compass word, its baseline point and rotation. */
-export interface ResolvedCompassLabel {
+export interface HallResolvedCompassLabel {
   text: "East" | "West" | "North" | "South";
   x: number;
   y: number;
@@ -283,19 +283,19 @@ export interface ResolvedHall {
   wall: "plain" | "gradient";
   /** The outer wall line (centre of its stroke). */
   outer: HallRect;
-  doors: readonly ResolvedDoor[];
-  objects: readonly ResolvedObject[];
-  compass: readonly ResolvedCompassLabel[];
-  caption?: ResolvedLabel;
+  doors: readonly HallResolvedDoor[];
+  objects: readonly HallResolvedObject[];
+  compass: readonly HallResolvedCompassLabel[];
+  caption?: HallResolvedLabel;
   captionText?: string;
   labelSize: number;
   viewBox: HallRect;
   /** What the layout had to cut, which the validator reports. */
-  cuts: ResolvedCuts;
+  cuts: HallResolvedCuts;
 }
 
 /** What the layout cut to stay bounded or to honour a margin. */
-export interface ResolvedCuts {
+export interface HallResolvedCuts {
   /** Nodes with a label, free text or caption cut to MAX_LABEL_LINES. */
   truncated: readonly (readonly number[])[];
   /** The first node whose label lines the hall's line budget dropped. */
@@ -364,7 +364,7 @@ const union = (a: HallRect, b: HallRect): HallRect => ({
 });
 
 /** The box a compass word's letters fill, in floor squares. */
-export function compassBox(label: ResolvedCompassLabel): HallRect {
+export function compassBox(label: HallResolvedCompassLabel): HallRect {
   const width = compassFont.width(label.text, label.size);
   const up = compassFont.top * label.size;
   const down = compassFont.bottom * label.size;
@@ -397,9 +397,9 @@ export function compassBox(label: ResolvedCompassLabel): HallRect {
  * thousands of objects cost a sort.
  */
 function clearOf(
-  label: ResolvedCompassLabel,
+  label: HallResolvedCompassLabel,
   rects: readonly HallRect[],
-): ResolvedCompassLabel {
+): HallResolvedCompassLabel {
   const box = compassBox(label);
   // Distances outward from the floor along the label's side, and the span
   // across it that a rectangle must share to be in the way.
@@ -463,7 +463,7 @@ const textHeight = (lines: number, size: number) =>
       (lines - 1) * size * LINE_HEIGHT;
 
 /** Lays out the lines of a label around an object's box. */
-function placeLabel(label: PreparedLabel, object: HallRect): ResolvedLabel {
+function placeLabel(label: PreparedLabel, object: HallRect): HallResolvedLabel {
   const { lines, size, pos } = label;
   const advance = size * LINE_HEIGHT;
   const cx = (object.x0 + object.x1) / 2;
@@ -471,7 +471,7 @@ function placeLabel(label: PreparedLabel, object: HallRect): ResolvedLabel {
   const height = textHeight(lines.length, size);
   let firstBaseline: number;
   let x: number;
-  let anchor: ResolvedLabel["anchor"] = "middle";
+  let anchor: HallResolvedLabel["anchor"] = "middle";
   if (pos === "bottom") {
     firstBaseline = object.y1 + LABEL_GAP + labelFont.top * size;
     x = cx;
@@ -510,7 +510,7 @@ function placeLabel(label: PreparedLabel, object: HallRect): ResolvedLabel {
 function placeLabels(
   labels: readonly PreparedLabel[],
   object: HallRect,
-): ResolvedLabel[] {
+): HallResolvedLabel[] {
   const edge = { ...object };
   return labels.map((label) => {
     const placed = placeLabel(label, edge);
@@ -545,14 +545,14 @@ function placeInner(lines: TextLine[], size: number, cx: number, cy: number) {
       x1: cx + widest / 2,
       y1: top + textHeight(lines.length, size),
     },
-  } satisfies ResolvedLabel;
+  } satisfies HallResolvedLabel;
 }
 
 /** Lays out a free label's lines centred in its own box. */
 function placeText(
   text: { lines: TextLine[]; size: number },
   box: HallRect,
-): ResolvedLabel {
+): HallResolvedLabel {
   const x = (box.x0 + box.x1) / 2;
   const first = box.y0 + labelFont.top * text.size;
   return {
@@ -617,8 +617,8 @@ export function resolveHall(
     lineBudget -= kept.length;
     return kept;
   };
-  const objects: ResolvedObject[] = [];
-  const doors: ResolvedDoor[] = [];
+  const objects: HallResolvedObject[] = [];
+  const doors: HallResolvedDoor[] = [];
   const floorItems: { node: HallNode; path: readonly number[] }[] = [];
   const rows: {
     node: HallNode;
@@ -828,7 +828,7 @@ export function resolveHall(
       x1: cx + width / 2,
       y1: cy + height / 2,
     };
-    const resolved: ResolvedObject = {
+    const resolved: HallResolvedObject = {
       path: item.path,
       node,
       artKey: item.artKey,
@@ -981,7 +981,7 @@ export function resolveHall(
   const clearance = showCompass
     ? COMPASS_GAP + compassDepth + BANNER_ROW_GAP
     : COMPASS_GAP;
-  const besideWalls: ResolvedCompassLabel[] = showCompass
+  const besideWalls: HallResolvedCompassLabel[] = showCompass
     ? [
         {
           text: "East",
@@ -1109,7 +1109,7 @@ export function resolveHall(
     if (object.inner) bounds = union(bounds, object.inner.bounds);
   }
   for (const label of compass) bounds = union(bounds, compassBox(label));
-  let caption: ResolvedLabel | undefined;
+  let caption: HallResolvedLabel | undefined;
   if (captionText) {
     const lines = wrapText(captionText, FLOOR_SIZE, CAPTION_SIZE);
     if (lines.at(-1)?.truncated)

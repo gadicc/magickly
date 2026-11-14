@@ -1,7 +1,7 @@
 import type {
   HallRect,
+  HallResolvedObject,
   ResolvedHall,
-  ResolvedObject,
 } from "magick-components/gd/hall";
 import {
   COORDINATE_RANGE,
@@ -61,7 +61,7 @@ export type MoveAttrs = { x?: number; y?: number };
  * then rounded to two decimals and clamped to the coordinate range.
  */
 export function moveAttrs(
-  object: Pick<ResolvedObject, "frame" | "position">,
+  object: Pick<HallResolvedObject, "frame" | "position">,
   delta: Point,
   snap: boolean,
 ): MoveAttrs {
@@ -82,7 +82,7 @@ export function moveAttrs(
  * so 9.4 nudges to 9.9.
  */
 export function nudgeAttrs(
-  object: Pick<ResolvedObject, "position">,
+  object: Pick<HallResolvedObject, "position">,
   step: Point,
 ): MoveAttrs {
   const result: MoveAttrs = {};
@@ -104,7 +104,7 @@ export const scaleValue = (value: number): number =>
  * centre.
  */
 export function dragScale(
-  object: Pick<ResolvedObject, "cx" | "cy" | "scale">,
+  object: Pick<HallResolvedObject, "cx" | "cy" | "scale">,
   start: Point,
   point: Point,
 ): number {
@@ -166,7 +166,7 @@ export function moveDoor(
 export const MIN_HIT_SIZE = 0.6;
 
 /** An object's drawn box. */
-export function objectRect(object: ResolvedObject): HallRect {
+export function objectRect(object: HallResolvedObject): HallRect {
   return {
     x0: object.cx - object.width / 2,
     y0: object.cy - object.height / 2,
@@ -179,7 +179,7 @@ export function objectRect(object: ResolvedObject): HallRect {
  * All an object draws: its box, its labels and its text, in one rect, so
  * that revealing it shows its name too (plan 063).
  */
-export function drawnRect(object: ResolvedObject): HallRect {
+export function drawnRect(object: HallResolvedObject): HallRect {
   return [
     ...object.labels.map((label) => label.bounds),
     ...(object.text ? [object.text.bounds] : []),
@@ -199,7 +199,7 @@ export function drawnRect(object: ResolvedObject): HallRect {
  * Where a pointer hits an object: its box, at least `MIN_HIT_SIZE` across,
  * and its labels and text.
  */
-export function hitRects(object: ResolvedObject): HallRect[] {
+export function hitRects(object: HallResolvedObject): HallRect[] {
   const half = (size: number) => Math.max(size, MIN_HIT_SIZE) / 2;
   return [
     {

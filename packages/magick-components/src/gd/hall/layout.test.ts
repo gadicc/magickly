@@ -14,12 +14,12 @@ import {
   COMPASS_SIZE,
   DEFAULT_SCALES,
   type HallRect,
+  type HallResolvedObject,
   LABEL_GAP,
   MARKER_TEXT_SCALE,
   MARKER_TEXT_WIDTH,
   MAX_HALL_LABEL_LINES,
   MIN_LABEL_WIDTH,
-  type ResolvedObject,
   resolveHall,
   WALL_GAP,
   WALL_STROKE,
@@ -79,10 +79,10 @@ const only = (node: HallNode) => {
   const { objects } = resolve(node);
   return objects;
 };
-const at = (objects: readonly ResolvedObject[], path: number[]) =>
+const at = (objects: readonly HallResolvedObject[], path: number[]) =>
   objects.find(
     (object) => object.path.join() === path.join(),
-  ) as ResolvedObject;
+  ) as HallResolvedObject;
 const labelDepth = (lines = 1, size = LABEL_SIZE) =>
   LABEL_GAP +
   (labelFont.top + labelFont.bottom) * size +
@@ -731,7 +731,7 @@ describe("resolveHall: labels", () => {
 });
 
 describe("resolveHall: bounded label output", () => {
-  const lineCount = (objects: readonly ResolvedObject[]) =>
+  const lineCount = (objects: readonly HallResolvedObject[]) =>
     objects.reduce(
       (sum, object) =>
         sum +

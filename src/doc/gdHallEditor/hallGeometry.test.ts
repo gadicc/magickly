@@ -1,4 +1,7 @@
-import { type ResolvedObject, resolveHall } from "magick-components/gd/hall";
+import {
+  type HallResolvedObject,
+  resolveHall,
+} from "magick-components/gd/hall";
 import { describe, expect, it } from "vitest";
 import { gdHallArt } from "@/app/gd/halls/art";
 import {
@@ -27,12 +30,12 @@ import { hallFromPug, neophyteHall } from "./hallTestFixtures";
 const resolved = (hall = neophyteHall()) =>
   resolveHall(hallRowOf(hall) ?? { type: "gdHall" }, { art: gdHallArt });
 const object = (
-  objects: readonly ResolvedObject[],
+  objects: readonly HallResolvedObject[],
   path: number[],
-): ResolvedObject =>
+): HallResolvedObject =>
   objects.find(
     (candidate) => candidate.path.join() === path.join(),
-  ) as ResolvedObject;
+  ) as HallResolvedObject;
 const isNegativeZero = (value: number | undefined) => Object.is(value, -0);
 
 describe("rounding and snapping", () => {

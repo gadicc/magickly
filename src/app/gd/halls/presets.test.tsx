@@ -2,7 +2,7 @@ import {
   estimateHallAspect,
   GdHall,
   type HallRect,
-  type ResolvedObject,
+  type HallResolvedObject,
   resolveHall,
   validateHall,
 } from "magick-components/gd/hall";
@@ -139,7 +139,7 @@ describe("the neophyte Dadouchos", () => {
       art: gdHallArt,
     }).objects.find(
       (object) => object.node.role === "dadouchos",
-    ) as ResolvedObject;
+    ) as HallResolvedObject;
     const [label] = dadouchos.labels;
     expect(label.lines.map((line) => line.text)).toEqual(["Dadouchos"]);
     expect(label.bounds.x1).toBeLessThan(FLOOR_SIZE - FLOOR_STROKE / 2);
@@ -158,11 +158,11 @@ describe.each([zelator1, zelator2].map((preset) => [preset.id, preset]))(
     const find = (artKey: string) =>
       objects.find(
         (object) => object.artKey === artKey && object.cx < 2,
-      ) as ResolvedObject;
+      ) as HallResolvedObject;
     const tablet = find("tablet");
     const lamp = find("item:lantern");
     const salt = find("item:salt");
-    const edges = (o: ResolvedObject) => ({
+    const edges = (o: HallResolvedObject) => ({
       north: o.cx - o.width / 2,
       south: o.cx + o.width / 2,
       east: o.cy - o.height / 2,
@@ -192,7 +192,7 @@ describe.each([zelator1, zelator2].map((preset) => [preset.id, preset]))(
         east: rect.y0,
         west: rect.y1,
       });
-      const labels = (object: ResolvedObject) =>
+      const labels = (object: HallResolvedObject) =>
         [...object.labels, ...(object.text ? [object.text] : [])].map((label) =>
           box(label.bounds),
         );
@@ -253,7 +253,7 @@ describe("the Enochian tablets of the Philosophus and Portal halls", () => {
       for (const object of objects)
         if (object.artKey === "marker")
           expect(String(object.node.text)).not.toMatch(/tablet/i);
-      const edges = (o: ResolvedObject) => ({
+      const edges = (o: HallResolvedObject) => ({
         north: o.cx - o.width / 2,
         south: o.cx + o.width / 2,
         east: o.cy - o.height / 2,
@@ -270,7 +270,7 @@ describe("the Enochian tablets of the Philosophus and Portal halls", () => {
         if (element === "union") expect(edges(tablet).west).toBeLessThan(-5);
         // Clear of every other object, and of every label and marker text
         // (an officer's name included).
-        const rects = (object: ResolvedObject) => [
+        const rects = (object: HallResolvedObject) => [
           ...(object.artKey === "label" ? [] : [edges(object)]),
           ...[
             ...object.labels,

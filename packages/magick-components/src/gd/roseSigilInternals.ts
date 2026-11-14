@@ -373,18 +373,18 @@ const FINAL_FORMS: Readonly<Record<string, string>> = {
 };
 
 /**
- * The letters of `sigilText` the rose draws, in order: the 22 Hebrew
- * letters as they are, a final form (ך ם ן ף ץ) as its base letter, and
- * anything else (spaces, points, Latin text) left out.
+ * The letters of `text` the rose draws, in order: the 22 Hebrew letters
+ * as they are, a final form (ך ם ן ף ץ) as its base letter, and anything
+ * else (spaces, points, Latin text) left out.
  */
-export function roseLetters(sigilText: string): string[] {
-  return [...sigilText].flatMap((char) => {
+export function roseLetters(text: string): string[] {
+  return [...text].flatMap((char) => {
     const letter = FINAL_FORMS[char] ?? char;
     return letterIJ(letter)[0] >= 0 ? [letter] : [];
   });
 }
 
 /** Letter centres for a sigil, of the letters `roseLetters` keeps. */
-export function sigilPoints(sigilText: string): SigilPoint[] {
-  return roseLetters(sigilText).map((letter) => letterPoint(letter));
+export function sigilPoints(text: string): SigilPoint[] {
+  return roseLetters(text).map((letter) => letterPoint(letter));
 }

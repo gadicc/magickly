@@ -74,8 +74,9 @@ export const TABLET_VERSION_LABELS: Readonly<
 /**
  * How a hall tablet is drawn, as its attributes say: the version (the
  * Golden Dawn's, `gd`, when absent, so that a hall never needs to say),
- * whether reversed letters are mirrored (yes when absent) and whether
- * second letters are drawn (no when absent).
+ * whether reversed letters are mirrored (`reversed`, `Tablet`'s
+ * `mirrorReversed`; yes when absent) and whether second letters are
+ * drawn (`alt`, its `showSecondLetters`; no when absent).
  */
 function tabletLook(node: HallNode) {
   return {
@@ -93,7 +94,9 @@ function tabletLook(node: HallNode) {
  * 2 squares at scale 1. `version` draws another version than the Golden
  * Dawn's (`tablet(element="fire", version="dee")`), whose board is the
  * same; `reversed=false` draws reversed letters plain, and `alt` draws
- * second letters in the squares' corners. `enochianStyle` is the app's
+ * second letters in the squares' corners: `Tablet`'s `mirrorReversed`
+ * and `showSecondLetters`, under the names halls have always stored.
+ * `enochianStyle` is the app's
  * Enochian font; without it the grid shows the transliteration. The
  * package never loads that font itself.
  */

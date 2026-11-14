@@ -2,9 +2,9 @@ import {
   type HallArtRegistry,
   type HallNode,
   type HallRect,
-  type ResolvedDoor,
+  type HallResolvedDoor,
+  type HallResolvedObject,
   type ResolvedHall,
-  type ResolvedObject,
   resolveHall,
 } from "magick-components/gd/hall";
 import {
@@ -68,8 +68,8 @@ export interface HallSelectable {
   id: string;
   rowPath: readonly number[];
   node: HallElement;
-  object?: ResolvedObject;
-  door?: ResolvedDoor;
+  object?: HallResolvedObject;
+  door?: HallResolvedDoor;
 }
 
 /** A hall with its compiled row, its layout and what can be selected. */
@@ -92,7 +92,7 @@ export function hallView(hall: HallElement, art: HallArtRegistry): HallView {
   const selectables: HallSelectable[] = [];
   const add = (
     rowPath: readonly number[],
-    found: { object?: ResolvedObject; door?: ResolvedDoor },
+    found: { object?: HallResolvedObject; door?: HallResolvedDoor },
   ) => {
     const id = index.byRowPath.get(rowPathKey(rowPath));
     const node = id === undefined ? undefined : index.byId.get(id)?.node;

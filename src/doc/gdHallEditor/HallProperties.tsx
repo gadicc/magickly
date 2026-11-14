@@ -20,6 +20,8 @@ import type {
 import {
   BOARD_KINDS,
   HALL_ROLES,
+  hallColor,
+  hallPoint,
   hallSpellingAlias,
   hallTagSpec,
   LIGHT_KINDS,
@@ -353,6 +355,13 @@ function ChoiceField({
   );
 }
 
+/** A value as the vocabulary spells it: `center` for `centre`, `gray` for `grey`. */
+function vocabularySpelling(value: FieldProps["value"]): FieldProps["value"] {
+  if (typeof value !== "string" || !hallSpellingAlias(value)) return value;
+  const point = hallPoint(value);
+  return point !== value ? point : hallColor(value);
+}
+
 function Field(props: FieldProps) {
   const { name, spec, value, disabled, onCommit, art } = props;
   const label = props.label ?? fieldLabel(name);
@@ -371,6 +380,10 @@ function Field(props: FieldProps) {
     return (
       <ChoiceField
         {...props}
+        // A stored `centre` or `grey` shows as the vocabulary's spelling,
+        // which the list offers; the hall keeps what it holds until a
+        // value is chosen.
+        value={vocabularySpelling(value)}
         // Offer the vocabulary's spellings, `center` and `gray`, not the
         // `centre` and `grey` a hall may also hold.
         options={spec.values

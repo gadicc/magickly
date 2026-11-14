@@ -129,6 +129,9 @@ describe("vocabulary helpers", () => {
     expect(hallColor("grey")).toBe("gray");
     expect(hallColor("red")).toBe("red");
     expect(hallColor(undefined)).toBeUndefined();
+    // Each reads its own spellings only: a colour is never a point.
+    expect(hallColor("centre")).toBe("centre");
+    expect(hallPoint("grey")).toBe("grey");
     expect(hallSpellingAlias("centre")).toBe(true);
     expect(hallSpellingAlias("grey")).toBe(true);
     expect(hallSpellingAlias("center")).toBe(false);

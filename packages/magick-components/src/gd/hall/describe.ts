@@ -3,8 +3,8 @@ import { TRUMPS } from "./art/tarotKey.tsx";
 import { hebrewLetter } from "./hebrewLetters.ts";
 import {
   FLOOR_SIZE,
+  type HallResolvedObject,
   type ResolvedHall,
-  type ResolvedObject,
   resolveHall,
 } from "./layout.ts";
 import { HALL_PLANET_NAMES, type HallPlanet } from "./planets.ts";
@@ -145,9 +145,9 @@ export function hallObjectName(node: HallNode): string | undefined {
 
 /** Where an object stands, in words, from its centre on the floor. */
 export function hallStation(
-  object: ResolvedObject,
+  object: HallResolvedObject,
   hall: ResolvedHall,
-  altar?: ResolvedObject,
+  altar?: HallResolvedObject,
 ): string {
   const { cx, cy } = object;
   const { outer } = hall;
@@ -197,7 +197,7 @@ export function describeHall(
         Number(a.node.kind === "white") - Number(b.node.kind === "white"),
     );
   const main = altarObjects.find((object) => object.node.kind !== "white");
-  const onAltar = (object: ResolvedObject) =>
+  const onAltar = (object: HallResolvedObject) =>
     altarObjects.find((altar) => isWithin(object.path, altar.path));
   const officers: HallStation[] = [];
   const furniture: HallStation[] = [];

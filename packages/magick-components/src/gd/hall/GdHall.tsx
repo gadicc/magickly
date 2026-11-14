@@ -13,9 +13,9 @@ import { GD_HALL_FONT_STACKS, gdHallFontFaceCss } from "./fonts.ts";
 import {
   FLOOR_SIZE,
   FLOOR_STROKE,
+  type HallResolvedLabel,
+  type HallResolvedObject,
   type ResolvedHall,
-  type ResolvedLabel,
-  type ResolvedObject,
   resolveHall,
   WALL_GAP,
   WALL_STROKE,
@@ -59,7 +59,7 @@ const labelTextStyle: CSSProperties = {
   fontKerning: "normal",
 };
 
-function Lines({ label }: { label: ResolvedLabel }) {
+function Lines({ label }: { label: HallResolvedLabel }) {
   return (
     <>
       {label.lines.map((line, index) => (
@@ -145,7 +145,7 @@ function Chrome({
 }
 
 /** Text drawn over an object's art, in the labels' face. */
-function Inner({ label }: { label: ResolvedLabel }) {
+function Inner({ label }: { label: HallResolvedLabel }) {
   return (
     <g
       fontFamily={GD_HALL_FONT_STACKS.serif}
@@ -162,9 +162,9 @@ function Inner({ label }: { label: ResolvedLabel }) {
  * One drawing in the hall's `<defs>`: the first object drawn with it, and
  * its art (none for the placeholder).
  */
-export interface ArtDefinition {
+export interface HallArtDefinition {
   id: string;
-  object: ResolvedObject;
+  object: HallResolvedObject;
   art?: HallArt;
 }
 
@@ -176,12 +176,12 @@ export interface ArtDefinition {
  * same on the server and the client.
  */
 function artDefinitions(
-  objects: readonly ResolvedObject[],
+  objects: readonly HallResolvedObject[],
   art: HallArtRegistry,
   id: string,
 ) {
-  const definitions = new Map<string, ArtDefinition>();
-  const uses = new Map<ResolvedObject, string>();
+  const definitions = new Map<string, HallArtDefinition>();
+  const uses = new Map<HallResolvedObject, string>();
   for (const object of objects) {
     if (object.text) continue;
     const drawn = object.missing ? undefined : art.get(object.artKey);
@@ -205,7 +205,7 @@ function artDefinitions(
 }
 
 /** A drawing in `<defs>`, centred on the origin in its art units. */
-function ArtDefinitionGroup({ definition }: { definition: ArtDefinition }) {
+function ArtDefinitionGroup({ definition }: { definition: HallArtDefinition }) {
   const { id, object, art } = definition;
   return (
     <g id={id}>
@@ -227,7 +227,7 @@ function HallObject({
   object,
   use,
 }: {
-  object: ResolvedObject;
+  object: HallResolvedObject;
   use: string | undefined;
 }): ReactNode {
   if (object.text || use === undefined) return null;
@@ -244,8 +244,8 @@ function HallObject({
 
 /** The drawings of a hall, as `GdHall` memoises them. */
 export interface HallDrawings {
-  definitions: readonly ArtDefinition[];
-  uses: ReadonlyMap<ResolvedObject, string>;
+  definitions: readonly HallArtDefinition[];
+  uses: ReadonlyMap<HallResolvedObject, string>;
 }
 
 /**

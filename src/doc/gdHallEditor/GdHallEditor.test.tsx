@@ -697,6 +697,38 @@ describe("the properties panel", () => {
     );
   });
 
+  it("shows a stored centre and grey as the vocabulary spells them, once", async () => {
+    const { changes } = setup(
+      hallFromPug(
+        "gdHall",
+        "  floor",
+        '    item(kind="cup", at="centre", fill="grey")',
+      ),
+    );
+    key(screen.getByRole("application"), "Tab");
+    for (const [name, shown, other] of [
+      ["At (a point of its parent)", "center", "centre"],
+      ["Fill", "gray", "grey"],
+    ]) {
+      const field = screen.getByRole("combobox", { name });
+      expect(field.textContent, name).toBe(shown);
+      fireEvent.mouseDown(field);
+      const listbox = await screen.findByRole("listbox");
+      const options = within(listbox)
+        .getAllByRole("option")
+        .map((option) => option.textContent);
+      expect(
+        options.filter((option) => option === shown),
+        name,
+      ).toHaveLength(1);
+      expect(options, name).not.toContain(other);
+      fireEvent.keyDown(listbox, { key: "Escape" });
+      await waitFor(() => expect(screen.queryByRole("listbox")).toBeNull());
+    }
+    // Showing it is not writing it: the hall still holds its spellings.
+    expect(changes).toEqual([]);
+  });
+
   it("offers a light's colour, and colours only to the items that draw them", () => {
     setup(
       hallFromPug(

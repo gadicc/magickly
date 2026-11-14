@@ -27,7 +27,7 @@ function Marker({ node }: HallArtProps) {
 
 /**
  * A marker: text in a box or circle, for objects without art yet. The
- * layout sets the text over it (`ResolvedObject.inner`), so it counts
+ * layout sets the text over it (`HallResolvedObject.inner`), so it counts
  * against the hall's label lines.
  */
 export const markerArt: HallArt = {

@@ -1,7 +1,7 @@
 import type {
   HallArtRegistry,
+  HallResolvedObject,
   ResolvedHall,
-  ResolvedObject,
 } from "magick-components/gd/hall";
 import {
   BOARD_KINDS,
@@ -330,7 +330,7 @@ const CLEARANCE = 0.5;
  * tries.
  */
 function freeSpot(
-  objects: readonly ResolvedObject[],
+  objects: readonly HallResolvedObject[],
   start: { x: number; y: number },
 ): { x: number; y: number } {
   const taken = (spot: { x: number; y: number }) =>

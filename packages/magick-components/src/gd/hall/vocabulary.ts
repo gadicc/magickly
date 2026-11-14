@@ -70,9 +70,13 @@ export const HALL_COLORS: ReadonlyMap<string, string> = new Map([
   ["gray", "#888888"],
 ]);
 
-/** Other spellings a hall may use, each with the vocabulary's own. */
-const SPELLINGS: ReadonlyMap<string, string> = new Map([
+/** Other spellings of a point a hall may use, each with the vocabulary's. */
+const POINT_SPELLINGS: ReadonlyMap<string, string> = new Map([
   ["centre", "center"],
+]);
+
+/** Other spellings of a colour a hall may use, each with the vocabulary's. */
+const COLOR_SPELLINGS: ReadonlyMap<string, string> = new Map([
   ["grey", "gray"],
 ]);
 
@@ -462,7 +466,7 @@ export function roleName(role: string): string {
  */
 export function hallPoint(value: string | undefined): HallPoint | undefined {
   if (value === undefined) return undefined;
-  return (SPELLINGS.get(value) ?? value) as HallPoint;
+  return (POINT_SPELLINGS.get(value) ?? value) as HallPoint;
 }
 
 /**
@@ -471,7 +475,7 @@ export function hallPoint(value: string | undefined): HallPoint | undefined {
  */
 export function hallColor(value: string | undefined): string | undefined {
   if (value === undefined) return undefined;
-  return SPELLINGS.get(value) ?? value;
+  return COLOR_SPELLINGS.get(value) ?? value;
 }
 
 /**
@@ -479,7 +483,7 @@ export function hallColor(value: string | undefined): string | undefined {
  * hall may hold but an editor need not offer: `centre`, `grey`.
  */
 export function hallSpellingAlias(value: string): boolean {
-  return SPELLINGS.has(value);
+  return POINT_SPELLINGS.has(value) || COLOR_SPELLINGS.has(value);
 }
 
 /** Item kinds the package draws itself; the registry may add more. */

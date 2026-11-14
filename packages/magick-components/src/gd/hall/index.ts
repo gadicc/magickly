@@ -8,14 +8,12 @@
  * which is not stable. MIT; see ../../LICENSE.txt.
  */
 export { DEFAULT_HALL_ART } from "./art/index.ts";
-export { TABLET_ELEMENTS, tabletArt } from "./art/symbols.tsx";
+export { tabletArt } from "./art/symbols.tsx";
 export { estimateHallAspect } from "./aspect.ts";
 export {
   describeHall,
   type HallDescription,
   type HallStation,
-  hallObjectName,
-  hallStation,
 } from "./describe.ts";
 export {
   GD_HALL_FONT_FAMILIES,
@@ -31,20 +29,22 @@ export {
   type GdHallProps,
   GdHallSvg,
   type GdHallSvgProps,
+  type HallArtDefinition,
   type HallDrawings,
   hallRoot,
   hallViewBox,
 } from "./GdHall.tsx";
 export {
   type HallRect,
-  type ResolvedCompassLabel,
-  type ResolvedCuts,
-  type ResolvedDoor,
+  type HallResolvedCompassLabel,
+  type HallResolvedCuts,
+  type HallResolvedDoor,
+  type HallResolvedLabel,
+  type HallResolvedObject,
   type ResolvedHall,
-  type ResolvedLabel,
-  type ResolvedObject,
   type ResolveHallOptions,
   resolveHall,
 } from "./layout.ts";
 export type * from "./types.ts";
 export { type ValidateHallOptions, validateHall } from "./validate.ts";
+export type { BannerSide } from "./vocabulary.ts";

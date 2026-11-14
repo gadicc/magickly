@@ -1,4 +1,7 @@
-import type { ResolvedHall, ResolvedObject } from "magick-components/gd/hall";
+import type {
+  HallResolvedObject,
+  ResolvedHall,
+} from "magick-components/gd/hall";
 import {
   COORDINATE_RANGE,
   DEFAULT_SCALES,
@@ -98,7 +101,7 @@ export function compatibleHosts(view: HallView, id: string): HallSelectable[] {
  */
 const objectOrder = (view: HallView, entry: HallSelectable) =>
   (view.resolved as ResolvedHall).objects.indexOf(
-    entry.object as ResolvedObject,
+    entry.object as HallResolvedObject,
   );
 
 /** Where a drop lands: a host (by ID), or the floor. */
@@ -143,7 +146,7 @@ export function standsOn(
  * kind a host takes has one under its art key, but an item of a kind the
  * art does not know, which takes items' default.
  */
-const defaultScale = (object: ResolvedObject): number =>
+const defaultScale = (object: HallResolvedObject): number =>
   DEFAULT_SCALES.get(object.artKey) ?? (DEFAULT_SCALES.get("item") as number);
 
 /**
@@ -163,7 +166,7 @@ export function reparentNode(
   if (!reparentable(view, id) || standsOn(view, id, target)) return view.hall;
   // A reparentable node is a drawn object.
   const entry = view.byId.get(id) as HallSelectable;
-  const object = entry.object as ResolvedObject;
+  const object = entry.object as HallResolvedObject;
   let hall = view.hall;
   let parentId: string;
   let frame: { ox: number; oy: number; unit: number };
@@ -270,7 +273,7 @@ export function standOptions(view: HallView, id: string): HallStandOption[] {
     ...hosts.map((host, index) => {
       const name = names[index];
       const shared = names.filter((other) => other === name).length > 1;
-      const object = host.object as ResolvedObject;
+      const object = host.object as HallResolvedObject;
       return {
         value: host.id,
         label: shared
