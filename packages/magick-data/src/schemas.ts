@@ -455,7 +455,7 @@ export const schemas = {
       tetragrammatonPermutation: v.pipe(
         v.string(),
         v.description(
-          "The order of the four letters of the Tetragrammaton, YHVH, that the Golden Dawn gives the sign, written y, h, v and H for Yod, He, Vav and the final He: Aries is yhvH. Two signs may share one.",
+          "The order of the four letters of the Tetragrammaton, YHVH, that the Golden Dawn gives the sign, its banner of the Name, written y, h, v and H for Yod, the first He, Vav and the final He: Aries is yhvH. The twelve signs have the twelve orders of the Name, each once. Which He is which follows from how they are made: the cardinal signs turn YHVH round (Aries yhvH, Cancer hvHy, Libra vHyh, Capricorn Hyhv), and each kerubic sign swaps the last two letters of the cardinal sign before it, each mutable sign the middle two (Taurus yhHv, Gemini yvhH).",
         ),
       ),
       ...ids("zodiac", {

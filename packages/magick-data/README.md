@@ -364,7 +364,7 @@ provenance, and no version past 0.0.0 ships while a row has none.
 | `alchemy/terms.json5` | [Correspondences](#correspondences); `terms` from [the Second Knowledge Lecture](#the-second-knowledge-lecture), with no rights asserted over them | 2026-11-12 |
 | `astrology/houses.json5` | [Correspondences](#correspondences); `interpretation` is ours, following [Lilly](#lillys-houses); `motto.la` is the mnemonic verse as usually quoted, not from Lilly, and `motto.en` our rendering of it ([Lilly's houses](#lillys-houses)) | 2026-11-12 |
 | `astrology/planets.json5` | [Correspondences](#correspondences); `keyOfSolomon` from [the Key of Solomon](#the-key-of-solomon); `about` and `description` are ours, written from public-domain works the file's header cites; `intelligenceOfIntelligences`, the Moon's, is the name and its Hebrew from [Agrippa](#agrippas-kameas)'s table of the Moon, with 777's and Regardie's spellings of it beside his, names only, as the header cites them | 2026-11-14 |
-| `astrology/zodiac.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `astrology/zodiac.json5` | [Correspondences](#correspondences); `tetragrammatonPermutation` is the Twelve Banners of the Name, Crowley's *777* (1909), col. CXL, as the file's header cites it: the twelve orders of YHVH's letters, one to a sign | 2026-11-14 |
 | `body/parts.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `chakras.json5` | [Correspondences](#correspondences) of the seven-chakra system, facts only: names, places, petals, colours, seed syllables and their elements, and one-to-five-word glosses of the Sanskrit names. The Wikipedia "Chakra" article the file cites is a reference; no share-alike text is copied | 2026-11-12 |
 | `enochian/keys.json5` | [The Enochian Keys](#the-enochian-keys) | 2026-11-12 |
@@ -444,10 +444,14 @@ text**. See
 *De occulta philosophia libri tres* (Cologne, 1533), book II, chapter 22,
 which the Golden Dawn's diagrams follow. Agrippa died in 1535, the squares
 are facts, and **no rights are asserted over them**. Six are computed by
-the standard constructions, which give exactly his squares, and the Sun's,
-of order 6, is written out; the tests check that every square is magic,
-that each starts with his first row, and that Saturn's and Jupiter's are
-his row by row. See
+the standard constructions, which give his squares, and the Sun's, of
+order 6, is written out. Two numbers of the 1533 printing are misprints,
+corrected to make the squares magic: Venus, row 4, column 5, printed 45
+for the 43 of his Hebrew table, and the Moon, row 1, column 8, printed 45
+for 54 in both his tables (archive.org `DeOccultaPhilosophiaLoc1533`,
+leaves n166 and n168). The tests check that every square is magic,
+that each starts with his first row (the Moon's as corrected), and that
+Saturn's and Jupiter's are his row by row. See
 [plan 061](https://github.com/gadicc/magickly/blob/main/plans/061-gd-hall.md).
 
 ### The Enochian letters

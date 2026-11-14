@@ -8,11 +8,16 @@ import type { PlanetId } from "./Planets.ts";
  * from a later edition.
  *
  * The odd and the doubly even squares are built by the standard
- * constructions, which give exactly Agrippa's squares; the Sun's, of order
- * 6, has no such simple construction and is written out. The tests check
- * that every square is magic, that each starts with Agrippa's first row,
- * and that Saturn's and Jupiter's are his row by row. Moved here from the
- * app's hall diagrams (plan 061, "Follow-ups after stage F").
+ * constructions, which give Agrippa's squares; the Sun's, of order 6, has
+ * no such simple construction and is written out. Two numbers of the 1533
+ * printing are misprints, corrected here to make the squares magic: Venus,
+ * row 4, column 5, printed 45 for the 43 of his Hebrew table (archive.org
+ * DeOccultaPhilosophiaLoc1533, leaf n166), and the Moon, row 1, column 8,
+ * printed 45 for 54 in both his tables (leaf n168). The tests check that
+ * every square is magic, that each starts with Agrippa's first row (the
+ * Moon's as corrected), and that Saturn's and Jupiter's are his row by
+ * row. Moved here from the app's hall diagrams (plan 061, "Follow-ups
+ * after stage F").
  */
 
 /** A square, row by row from the top, each row from the left. */

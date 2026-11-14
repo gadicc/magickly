@@ -78,8 +78,12 @@ describe("the kameas", () => {
     }
   });
 
-  it("are Agrippa's squares, row by row as he writes them", () => {
-    // De occulta philosophia (1533), II.22: each square's first row.
+  it("are Agrippa's squares, with the 1533 printing's two misprints corrected", () => {
+    // De occulta philosophia (1533), II.22 (archive.org
+    // DeOccultaPhilosophiaLoc1533): each square's first row. Two numbers are
+    // corrected to make the squares magic: Venus, row 4, column 5, printed
+    // 45, is 43, as his Hebrew table gives it (leaf n166); the Moon, row 1,
+    // column 8, printed 45 in both his tables, is 54 (leaf n168).
     expect(KAMEA_PLANETS.map((planet) => kameas[planet][0].join(" "))).toEqual([
       "4 9 2",
       "4 14 15 1",
@@ -100,6 +104,8 @@ describe("the kameas", () => {
       [5, 11, 10, 8],
       [16, 2, 3, 13],
     ]);
+    expect(kameas.venus[3][4]).toBe(43);
+    expect(kameas.luna[0][7]).toBe(54);
     // The Moon's centre is 41, as every odd square's is its middle number.
     expect(kameas.luna[4][4]).toBe(41);
   });

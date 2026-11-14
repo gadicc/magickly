@@ -384,12 +384,15 @@ const PINS: Record<string, readonly string[]> = {
     "578cb9d986175aa98e4b79818255229253a289d6ad2b3aadef5ea817fb24902d",
     "c4d57ea026d42d05fbac83c42d0d7e65908ec8f698a310e502e20dc10fb95c81",
   ],
+  // Moved by Cancer's and Sagittarius' permutations of the Name on the
+  // table of shewbread (magick-data 0.2.1), those two labels alone; from
+  // 83fb7da1…, ebc9924a…, 7b7ff735…, ebf86b37… and 42f5e185….
   "zelator-2": [
-    "83fb7da16cdc3715aa7596ba7ae3f714006d0900d0c09b43c2dfe495d68cc977",
-    "ebc9924a4d5657e18b777d553e5afc643944e6da8128117b850bca49b955b0dd",
-    "7b7ff73572eb3f75f81cca7f4e8e29addcfcf67f3b4c9b8774e7e3285f9d2e2e",
-    "ebf86b37259d69a22bcefe9309a9842fd0dc608b43cd4b7b3bad3cb7d92bf429",
-    "42f5e185e0a3b973fc893b7edfbd0c35e9783c30db9c07448cffa6d8c7d2a825",
+    "b6aac4cd3fb60b52771333d7de1e55e97192e90a6d19d225e0f827ec39a3747d",
+    "85d11121b69e9911f3c02f717d94ebb36b16a122f39b77fa1cf57b819744f878",
+    "0e9393fca8948b4c179410234774fe3427fb65f2d7c78e8d47791a22553a3bbb",
+    "ee6aead8e53f138182eb68fbda982c7642c099a859b7149a9b6325adb5d6d5f1",
+    "0cff95bea8c29ed2909db9675835a1c45ad649845fd09004518973ce5b567c5a",
   ],
   "theoricus-1": [
     "4d9f0a7431254eeecc0216558cd7fd87aa65be8d31629777aa1049743be99024",

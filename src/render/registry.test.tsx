@@ -80,10 +80,12 @@ describe("component image registry", () => {
     // above did not, which is what decision 10 is for.
     // dfd57ffb… until the spec read the tribes through the signs' links, so
     // the two tribes no sign names — Levi and Joseph — stopped being hashed
-    // (plan 052); no byte moved.
+    // (plan 052); no byte moved. 02b94228… until Cancer and Sagittarius
+    // stopped repeating Leo's and Capricorn's permutations of the Name
+    // (magick-data 0.2.1).
     [
       "table-of-shewbread",
-      "02b9422812bc7b475a7bf847b935c31434651fe7790f4af8fb93895db0d2653b",
+      "440ffebf3f43dd5a7de730b8b90d5809f4e74b98df9c8032248e931178971790",
     ],
     // No table at all, so no data edit can ever move this one.
     [
@@ -262,11 +264,14 @@ describe("component image registry", () => {
     ],
     // 136,294 bytes and df3c3791… until Manasseh's Hebrew name stopped being
     // Benjamin's; the Gemini branch is one glyph shorter and one wider.
+    // 136,643 bytes and 34e0fce1… until Cancer's and Sagittarius'
+    // permutations of the Name were corrected (magick-data 0.2.1), those
+    // two labels alone.
     [
       "table-of-shewbread",
       "",
-      136_643,
-      "34e0fce138e4b50930aac5b226e71fbe452eb1ba7db5a9bb1929e0300e106e1b",
+      136_683,
+      "c6555c7874a44ef9f1f3e92a6d2602f8be41aea169c667a720a0bd9534e6c31e",
     ],
     [
       "seven-branched-candlestick",
