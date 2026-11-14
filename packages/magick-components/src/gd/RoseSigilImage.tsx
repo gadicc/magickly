@@ -3,8 +3,9 @@ import { svgCoordinate } from "../svgCoordinate.ts";
 import {
   letterPoint,
   pathFromPoints,
-  ROSE_LETTERS,
+  type RoseVersionId,
   roseLetters,
+  roseRings,
   type SigilPoint,
   sigilPoints,
 } from "./roseSigilInternals.ts";
@@ -19,6 +20,12 @@ export interface RoseSigilImageProps {
   text: string;
   /** Draws the rose's three rings of letters behind the sigil (default true). */
   showRose?: boolean;
+  /**
+   * Which rose (`ROSE_VERSIONS`): the Golden Dawn's (`gd`) when not given
+   * or not a version, or Regardie's of 1939 (`regardie1939`), which
+   * exchanges Kaph and Tau. Give the `points` of the same version.
+   */
+  version?: RoseVersionId;
   /** Draws each letter's circle and the unoptimised path too (default false). */
   debug?: boolean;
   /** Letter centres to draw through; the optimised layout when available. */
@@ -43,6 +50,7 @@ export interface RoseSigilImageProps {
 export function RoseSigilImage({
   text,
   showRose = true,
+  version,
   debug = false,
   points,
   animation,
@@ -74,7 +82,7 @@ export function RoseSigilImage({
             strokeWidth={0.5}
             fill="none"
           />
-          {ROSE_LETTERS.map((row, i) => (
+          {roseRings(version).map((row, i) => (
             <React.Fragment key={row.join("")}>
               <circle
                 cx={0}
@@ -86,7 +94,7 @@ export function RoseSigilImage({
               />
               {row.map((letter) => {
                 // Labels sit on the letter centres the path is drawn through.
-                const center = letterPoint(letter);
+                const center = letterPoint(letter, version);
                 const x = svgCoordinate(center.x);
                 const y = svgCoordinate(center.y);
                 return (
@@ -125,7 +133,10 @@ export function RoseSigilImage({
           // Letter centres before optimisation
           stroke="#aa0"
           fill="none"
-          d={pathFromPoints({ points: sigilPoints(text), sigilTokens })}
+          d={pathFromPoints({
+            points: sigilPoints(text, version),
+            sigilTokens,
+          })}
         />
       )}
 

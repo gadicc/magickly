@@ -362,6 +362,13 @@
         "default": "true",
         "description": "Draws the rose's three rings of letters behind the sigil.",
         "control": { "kind": "switch" }
+      },
+      {
+        "name": "version",
+        "type": "\"gd\" | \"regardie1939\"",
+        "required": false,
+        "description": "Which rose the sigil is traced on (`ROSE_VERSIONS`): the Golden\nDawn's (`gd`) when not given or not a version, or Regardie's of 1939\n(`regardie1939`), which exchanges Kaph and Tau. `ROSE_VERSION_NOTES`\nsays where each comes from.",
+        "control": { "kind": "choice", "options": ["gd", "regardie1939"] }
       }
     ]
   },

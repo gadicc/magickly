@@ -131,7 +131,7 @@ assembled graph, so they import magick-data's root entry, every table.
 | `gd/lamenGrades` | Which grades' lamens each officer wears |
 | `gd/RoseSigil` | The rose-cross sigil of a Hebrew text, optimised and drawn on in the browser (`"use client"`) |
 | `gd/RoseSigilImage` | The same sigil with no hooks, for the server, from points you give it |
-| `gd/roseSigilGeometry` | The rose's letters and where a text's letters stand on it: `ROSE_LETTERS`, `roseLetters()`, `letterPoint()` and `sigilPoints()` |
+| `gd/roseSigilGeometry` | The rose's letters and where a text's letters stand on it, on either version of the rose: `ROSE_LETTERS`, `roseRings()`, `roseLetters()`, `letterPoint()` and `sigilPoints()`, with `ROSE_VERSIONS` and `ROSE_VERSION_NOTES` |
 | `gd/roseSigilOptimizer` | `optimizeSigilPoints()`, the layout optimiser (nlopt, compiled to WASM) |
 | `gd/SevenBranchedCandlestick` | The seven-branched candlestick, with its planets |
 | `gd/TableOfShewbread` | The table of shewbread, with the signs and the tribes |
@@ -258,6 +258,12 @@ draws the sigil on the server with `RoseSigilImage`, or uses nothing of the
 sigil, needs no stub. If the optimiser fails to load, `RoseSigil` keeps the
 letters' centres it first drew. Text that is not Hebrew is left out of the
 sigil, and final forms are drawn as their base letters.
+
+The rose has two versions, which differ in where Kaph and Tau stand on its
+middle ring: the Golden Dawn's, as *The Equinox* printed it (`gd`, the
+default), and Regardie's of 1939 (`version="regardie1939"`).
+`ROSE_VERSION_NOTES`, from `gd/roseSigilGeometry`, names each and says
+where it comes from; give `sigilPoints()` the same version as the drawing.
 
 ## What you supply
 

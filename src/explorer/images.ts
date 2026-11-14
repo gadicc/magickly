@@ -91,6 +91,7 @@ export function componentImage(name: string, props: Props): string | null {
       return viaContract("rose-sigil", {
         text: text(props.text),
         rose: flag(props.showRose),
+        version: text(props.version),
       });
     case "SevenBranchedCandlestick":
       return viaContract("seven-branched-candlestick", {});

@@ -26,6 +26,14 @@ describe("componentImage", () => {
     expect(componentImage("RoseSigil", { text: "אדני", showRose: false })).toBe(
       `/api/render/rose-sigil?text=${encodeURIComponent("אדני")}&rose=false`,
     );
+    expect(
+      componentImage("RoseSigil", { text: "כתר", version: "regardie1939" }),
+    ).toBe(
+      `/api/render/rose-sigil?text=${encodeURIComponent("כתר")}&version=regardie1939`,
+    );
+    expect(componentImage("RoseSigil", { text: "כתר", version: "gd" })).toBe(
+      `/api/render/rose-sigil?text=${encodeURIComponent("כתר")}`,
+    );
   });
 
   it("has none for what the image cannot draw", () => {

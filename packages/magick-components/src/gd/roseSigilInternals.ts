@@ -14,13 +14,58 @@ import { svgCoordinate } from "../svgCoordinate.ts";
 
 /**
  * The rose's 22 letters on its three rings, inner to outer: the three
- * mothers, the seven doubles and the twelve singles.
+ * mothers, the seven doubles and the twelve singles. Each ring runs
+ * anticlockwise from the top. This is the default version's rose
+ * (`gd`); `roseRings` gives any version's.
  */
 export const ROSE_LETTERS = [
   ["א", "מ", "ש"],
   ["פ", "ר", "ב", "ד", "ג", "ת", "כ"],
   ["ה", "ו", "ז", "ח", "ט", "י", "ל", "נ", "ס", "ע", "צ", "ק"],
 ];
+
+/**
+ * The versions of the rose, which differ only in the order of the seven
+ * double letters on its middle ring: the Golden Dawn's (`gd`, the
+ * default), as *The Equinox* printed it in 1910 and 1912, and Regardie's
+ * of 1939 (`regardie1939`), which exchanges Tau and Kaph. A new version
+ * is a new id; neither of these moves.
+ */
+export const ROSE_VERSIONS = ["gd", "regardie1939"] as const;
+
+/** A version of the rose. */
+export type RoseVersionId = (typeof ROSE_VERSIONS)[number];
+
+/** The version a rose is drawn in unless another is asked for. */
+export const DEFAULT_ROSE_VERSION: RoseVersionId = "gd";
+
+/** Each version's rings, inner to outer, as `ROSE_LETTERS` gives the default's. */
+const VERSION_RINGS: Readonly<
+  Record<RoseVersionId, readonly (readonly string[])[]>
+> = {
+  gd: ROSE_LETTERS,
+  // Regardie's vol. 3 (1939), p. 53 and Diagram 20: ... Gimel, Kaph, Tau.
+  regardie1939: [
+    ROSE_LETTERS[0],
+    ["פ", "ר", "ב", "ד", "ג", "כ", "ת"],
+    ROSE_LETTERS[2],
+  ],
+};
+
+/** A version by its id, or the default for anything that is none. */
+export function roseVersion(version?: string): RoseVersionId {
+  return (ROSE_VERSIONS as readonly string[]).includes(version ?? "")
+    ? (version as RoseVersionId)
+    : DEFAULT_ROSE_VERSION;
+}
+
+/**
+ * The rings of a version's rose, inner to outer, each anticlockwise from
+ * the top; the default's (`ROSE_LETTERS`) for an id that is not a version.
+ */
+export function roseRings(version?: string): readonly (readonly string[])[] {
+  return VERSION_RINGS[roseVersion(version)];
+}
 
 /** Evaluation cap for the layout optimiser; identical on every platform. */
 export const SIGIL_MAX_EVALUATIONS = 20_000;
@@ -36,9 +81,11 @@ function svgPair(point: SigilPoint) {
   return `${svgCoordinate(point.x)},${svgCoordinate(point.y)}`;
 }
 
-export function letterIJ(letter: string) {
-  for (let i = 0; i < ROSE_LETTERS.length; i++) {
-    const row = ROSE_LETTERS[i];
+/** A letter's ring and place on it in a version's rose; [-1, -1] for none. */
+export function letterIJ(letter: string, version?: string) {
+  const rings = roseRings(version);
+  for (let i = 0; i < rings.length; i++) {
+    const row = rings[i];
     const j = row.indexOf(letter);
     if (j >= 0) {
       return [i, j];
@@ -48,16 +95,17 @@ export function letterIJ(letter: string) {
 }
 
 /**
- * Where `letter` sits on the rose: one of its 22 letters, as `roseLetters`
- * gives them. Anything else, a final form included, throws by name.
+ * Where `letter` sits on the rose of `version` (the default's when not
+ * given or not a version): one of its 22 letters, as `roseLetters` gives
+ * them. Anything else, a final form included, throws by name.
  */
-export function letterPoint(letter: string): SigilPoint {
-  const [i, j] = letterIJ(letter);
+export function letterPoint(letter: string, version?: string): SigilPoint {
+  const [i, j] = letterIJ(letter, version);
   if (i < 0)
     throw new Error(
       `letterPoint: ${JSON.stringify(letter)} is not one of the rose's 22 letters; roseLetters() gives the letters of a text that it draws`,
     );
-  const points = ROSE_LETTERS[i].length;
+  const points = roseRings(version)[i].length;
   const slice = (2 * Math.PI) / points;
   const offset = -Math.PI / 2 - (i === 1 ? slice / 2 : 0);
   const angle = offset - slice * j;
@@ -375,7 +423,8 @@ const FINAL_FORMS: Readonly<Record<string, string>> = {
 /**
  * The letters of `text` the rose draws, in order: the 22 Hebrew letters
  * as they are, a final form (ך ם ן ף ץ) as its base letter, and anything
- * else (spaces, points, Latin text) left out.
+ * else (spaces, points, Latin text) left out. Every version's rose has
+ * the same 22 letters, so this is the same in each.
  */
 export function roseLetters(text: string): string[] {
   return [...text].flatMap((char) => {
@@ -384,7 +433,10 @@ export function roseLetters(text: string): string[] {
   });
 }
 
-/** Letter centres for a sigil, of the letters `roseLetters` keeps. */
-export function sigilPoints(text: string): SigilPoint[] {
-  return roseLetters(text).map((letter) => letterPoint(letter));
+/**
+ * Letter centres for a sigil, of the letters `roseLetters` keeps, on the
+ * rose of `version` (the default's when not given or not a version).
+ */
+export function sigilPoints(text: string, version?: string): SigilPoint[] {
+  return roseLetters(text).map((letter) => letterPoint(letter, version));
 }

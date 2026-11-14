@@ -2,6 +2,7 @@
 import { Clear } from "@mui/icons-material";
 
 import {
+  Box,
   Checkbox,
   Container,
   FormControlLabel,
@@ -12,8 +13,15 @@ import {
   TextField,
 } from "@mui/material";
 import RoseSigil from "magick-components/gd/RoseSigil";
-import { ROSE_LETTERS } from "magick-components/gd/roseSigilGeometry";
+import {
+  DEFAULT_ROSE_VERSION,
+  ROSE_LETTERS,
+  ROSE_VERSION_NOTES,
+  ROSE_VERSIONS,
+  type RoseVersionId,
+} from "magick-components/gd/roseSigilGeometry";
 import React from "react";
+import { VersionNote, VersionSelect } from "@/drawings/DrawingVersion";
 import Ink from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";
 import { parseComponentImageRequest } from "@/render/componentImageRequest";
@@ -23,11 +31,12 @@ import DebugSigil from "./DebugSigil";
 export default function Sigils({
   initial,
 }: {
-  initial: { text: string; rose: boolean };
+  initial: { text: string; rose: boolean; version: RoseVersionId };
 }) {
   const ref = React.useRef<SVGSVGElement>(null);
   const [sigilText, setSigilText] = React.useState(initial.text);
   const [showRose, setShowRose] = React.useState(initial.rose);
+  const [version, setVersion] = React.useState(initial.version);
   const [animate, setAnimate] = React.useState(true);
   const [showKeys, setShowKeys] = React.useState(false);
   const [debug, setDebug] = React.useState(false);
@@ -46,6 +55,7 @@ export default function Sigils({
     try {
       const params = new URLSearchParams({ text: rectified });
       if (!showRose) params.set("rose", "false");
+      if (version !== DEFAULT_ROSE_VERSION) params.set("version", version);
       return {
         slug: "rose-sigil" as const,
         props: parseComponentImageRequest("rose-sigil", params).props,
@@ -58,6 +68,8 @@ export default function Sigils({
     ? () => {
         const params = new URLSearchParams({ text: link.props.text });
         if (!link.props.rose) params.set("rose", "false");
+        if (link.props.version && link.props.version !== DEFAULT_ROSE_VERSION)
+          params.set("version", link.props.version);
         return `/gd/sigils?${params}`;
       }
     : undefined;
@@ -65,29 +77,47 @@ export default function Sigils({
   return (
     <div>
       <Container sx={{ py: 2 }}>
-        <TextField
-          placeholder="Sigil text"
-          size="small"
-          value={sigilText}
-          dir="rtl"
-          lang="he"
-          onChange={(e) => setSigilText(e.target.value)}
-          slotProps={{
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => {
-                      setSigilText("");
-                    }}
-                  >
-                    <Clear />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 1,
+            alignItems: "center",
           }}
-        />
+        >
+          <TextField
+            placeholder="Sigil text"
+            size="small"
+            value={sigilText}
+            dir="rtl"
+            lang="he"
+            onChange={(e) => setSigilText(e.target.value)}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => {
+                        setSigilText("");
+                      }}
+                    >
+                      <Clear />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+          <VersionSelect
+            id="rose-version-select"
+            size="small"
+            versions={ROSE_VERSIONS}
+            notes={ROSE_VERSION_NOTES}
+            defaultVersion={DEFAULT_ROSE_VERSION}
+            value={version}
+            onChange={setVersion}
+          />
+        </Box>
         {!isValid && (
           <div>
             Invalid characters:{" "}
@@ -161,21 +191,27 @@ export default function Sigils({
               ref={ref}
               text={isValid ? rectified : ""}
               showRose={showRose}
+              version={version}
             />
           ) : (
             <RoseSigil
               ref={ref}
               text={isValid ? rectified : ""}
               showRose={showRose}
+              version={version}
               animate={animate}
             />
           )}
         </Ink>
         <ExportControls
           target={ref}
-          filename={`RoseSigil-${rectified}`}
+          filename={`RoseSigil-${rectified}${version === DEFAULT_ROSE_VERSION ? "" : `-${version}`}`}
           link={link}
           share={share}
+        />
+        <VersionNote
+          note={ROSE_VERSION_NOTES[version]}
+          headingId="rose-version"
         />
       </Container>
     </div>

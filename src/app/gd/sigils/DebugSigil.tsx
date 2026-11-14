@@ -1,6 +1,7 @@
 "use client";
 import { RoseSigilImage } from "magick-components/gd/RoseSigilImage";
 import {
+  type RoseVersionId,
   type SigilPoint,
   sigilPoints,
 } from "magick-components/gd/roseSigilGeometry";
@@ -17,13 +18,18 @@ import React from "react";
 export default function DebugSigil({
   text,
   showRose,
+  version,
   ref,
 }: {
   text: string;
   showRose: boolean;
+  version?: RoseVersionId;
   ref?: React.Ref<SVGSVGElement>;
 }) {
-  const points = React.useMemo(() => sigilPoints(text), [text]);
+  const points = React.useMemo(
+    () => sigilPoints(text, version),
+    [text, version],
+  );
   const [optimized, setOptimized] = React.useState<{
     from: SigilPoint[];
     to: SigilPoint[];
@@ -47,6 +53,7 @@ export default function DebugSigil({
     <RoseSigilImage
       text={text}
       showRose={showRose}
+      version={version}
       debug
       points={optimized?.from === points ? optimized.to : points}
       ref={ref}

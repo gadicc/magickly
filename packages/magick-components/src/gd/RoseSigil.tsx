@@ -1,7 +1,11 @@
 "use client";
 import React from "react";
 import { RoseSigilImage } from "./RoseSigilImage.tsx";
-import { type SigilPoint, sigilPoints } from "./roseSigilGeometry.ts";
+import {
+  type RoseVersionId,
+  type SigilPoint,
+  sigilPoints,
+} from "./roseSigilGeometry.ts";
 import { optimizeSigilPoints } from "./roseSigilOptimizer.ts";
 
 export interface RoseSigilProps {
@@ -12,6 +16,13 @@ export interface RoseSigilProps {
   text: string;
   /** Draws the rose's three rings of letters behind the sigil. */
   showRose?: boolean;
+  /**
+   * Which rose the sigil is traced on (`ROSE_VERSIONS`): the Golden
+   * Dawn's (`gd`) when not given or not a version, or Regardie's of 1939
+   * (`regardie1939`), which exchanges Kaph and Tau. `ROSE_VERSION_NOTES`
+   * says where each comes from.
+   */
+  version?: RoseVersionId;
   /** Draws the connecting path on, once the layout is optimised. */
   animate?: boolean;
   /** The `<svg>`, for exporting the drawing. */
@@ -28,13 +39,17 @@ export interface RoseSigilProps {
 export function RoseSigil({
   text,
   showRose = true,
+  version,
   animate = true,
   ref,
 }: RoseSigilProps) {
   const pathRef = React.useRef<SVGPathElement>(null);
   // useId yields ":r1:"-style ids; CSS identifiers need the colons removed.
   const animation = `rose-sigil-draw-${React.useId().replace(/[^\w-]/g, "")}`;
-  const points = React.useMemo(() => sigilPoints(text), [text]);
+  const points = React.useMemo(
+    () => sigilPoints(text, version),
+    [text, version],
+  );
   const [optimized, setOptimized] = React.useState<SigilPoint[] | null>(null);
 
   React.useEffect(() => {
@@ -69,6 +84,7 @@ export function RoseSigil({
     <RoseSigilImage
       text={text}
       showRose={showRose}
+      version={version}
       debug={false}
       points={optimized || points}
       animation={animate ? animation : undefined}

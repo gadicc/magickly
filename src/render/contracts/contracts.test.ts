@@ -1,4 +1,5 @@
 import { WATCHTOWER_VIEWBOX } from "magick-components/enochian/Tablet";
+import { ROSE_VERSIONS } from "magick-components/gd/roseSigilGeometry";
 import { TABLET_VERSIONS } from "magick-data/enochian/tablets";
 import { describe, expect, it } from "vitest";
 import { parseComponentImageRequest } from "../componentImageRequest";
@@ -16,7 +17,11 @@ import {
   InvalidComponentImageRequest,
   isComponentImageSlug,
 } from "./index";
-import { rectifySigilText, SIGIL_MAX_LETTERS } from "./roseSigil";
+import {
+  ROSE_IMAGE_VERSIONS,
+  rectifySigilText,
+  SIGIL_MAX_LETTERS,
+} from "./roseSigil";
 import {
   type ComponentImageContract,
   contractViewBox,
@@ -69,7 +74,13 @@ describe("component image contracts", () => {
     ],
     "seven-branched-candlestick": ["", "width=300", "width=100&height=100"],
     "table-of-shewbread": ["", "width=300"],
-    "rose-sigil": ["text=גדי", "text=אבג&rose=false", "text=שלום&width=50"],
+    "rose-sigil": [
+      "text=גדי",
+      "text=אבג&rose=false",
+      "text=שלום&width=50",
+      "text=שבתאי&version=regardie1939",
+      "text=כתר&rose=false&version=regardie1939&width=50",
+    ],
     // Sizes are PNG-only, so they round-trip in gdHall.test.ts.
     "gd-hall": ["", "hall=zelator-1", "hall=portal-2"],
   };
@@ -241,6 +252,30 @@ describe("component image contracts", () => {
         parse("enochian-tablet", "id=fire&version=dee&font=enochian"),
       ),
     ).toBe("enochian-fire-tablet-dee-glyphs");
+  });
+
+  it("offers the rose's versions, the Golden Dawn's by default", () => {
+    expect([...ROSE_IMAGE_VERSIONS]).toEqual([...ROSE_VERSIONS]);
+    expect(parse("rose-sigil", "text=גדי").version).toBe("gd");
+    expect(
+      componentImageQuery({
+        slug: "rose-sigil",
+        props: parse("rose-sigil", "text=גדי&version=gd"),
+      }).toString(),
+    ).toBe(new URLSearchParams({ text: "גדי" }).toString());
+    expect(
+      CONTRACTS["rose-sigil"].filename(
+        parse("rose-sigil", "text=כתר&version=regardie1939"),
+      ),
+    ).toBe("rose-sigil-כתר-regardie1939");
+    for (const query of [
+      "text=א&version=regardie",
+      "text=א&version=Regardie1939",
+      "text=א&version=equinox1910",
+    ])
+      expect(() => parse("rose-sigil", query)).toThrow(
+        InvalidComponentImageRequest,
+      );
   });
 
   it("rejects unknown tablets and keys on the new slugs", () => {

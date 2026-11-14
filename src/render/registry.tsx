@@ -249,13 +249,17 @@ export const COMPONENT_IMAGE_REGISTRY: {
       <RoseSigilImage
         text={props.text}
         showRose={props.rose}
+        version={props.version}
         debug={false}
-        points={await optimizeSigilPoints(sigilPoints(props.text))}
+        points={
+          await optimizeSigilPoints(sigilPoints(props.text, props.version))
+        }
       />
     ),
     profile: COMPONENT_IMAGE_PROFILE,
-    // The rose's letters are geometry, written out in roseSigilGeometry.ts;
-    // this image reads no table, and no data edit can move its identity.
+    // The rose's letters are geometry, written out in roseSigilGeometry.ts
+    // for each version; this image reads no table, and no data edit can
+    // move its identity.
     inputs: [],
   },
   "gd-hall": {

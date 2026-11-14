@@ -24,10 +24,22 @@ export function rectifySigilText(text: string): string {
   return text.replace(/[ךםןףץ]/g, (letter) => FINAL_FORMS[letter]);
 }
 
+/**
+ * The roses a sigil is traced on, the Golden Dawn's (`gd`) first and by
+ * default: the package's `ROSE_VERSIONS`, written out so that the
+ * contracts do not pull in the geometry; a test holds the two equal.
+ */
+export const ROSE_IMAGE_VERSIONS = ["gd", "regardie1939"] as const;
+
 export interface RoseSigilProps extends ImageDimensions {
   /** Rectified rose letters, at least one and at most SIGIL_MAX_LETTERS. */
   text: string;
   rose: boolean;
+  /**
+   * Which rose: the Golden Dawn's when absent, as for a link made before
+   * the versions.
+   */
+  version?: (typeof ROSE_IMAGE_VERSIONS)[number];
 }
 
 /**
@@ -39,7 +51,7 @@ export const roseSigil: ComponentImageContract<RoseSigilProps> = {
   slug: "rose-sigil",
   viewBox: SIGIL_VIEWBOX,
   rasterDefault: { width: 1024, height: 1024 },
-  keys: ["text", "rose"],
+  keys: ["text", "rose", "version"],
   personal: true,
   parse(searchParams) {
     const raw = searchParams.get("text") ?? "";
@@ -51,13 +63,17 @@ export const roseSigil: ComponentImageContract<RoseSigilProps> = {
       rose:
         choice(searchParams.get("rose") ?? "true", ["true", "false"]) ===
         "true",
+      version: choice(searchParams.get("version") || "gd", ROSE_IMAGE_VERSIONS),
       ...parseDimensions(searchParams, SIGIL_VIEWBOX),
     };
   },
   canonicalize(props) {
     const pairs: Array<[string, string]> = [["text", props.text]];
     if (!props.rose) pairs.push(["rose", "false"]);
+    if (props.version && props.version !== "gd")
+      pairs.push(["version", props.version]);
     return [...pairs, ...canonicalDimensions(props)];
   },
-  filename: (props) => `rose-sigil-${props.text}`,
+  filename: (props) =>
+    `rose-sigil-${props.text}${props.version && props.version !== "gd" ? `-${props.version}` : ""}`,
 };

@@ -307,6 +307,15 @@ describe("component image registry", () => {
       707,
       "ef44185a356b72d97765be00496d220c081000e1db734398748b643f8bef96d4",
     ],
+    // Shabbathai on Regardie's rose of 1939, through Tau where Kaph is on
+    // the default rose (plan 080, "The rose's and the candlestick's
+    // versions"). Reviewed as rasterised.
+    [
+      "rose-sigil",
+      "text=שבתאי&version=regardie1939",
+      13_416,
+      "f0cee48b841170777cb539592daa0ad9def91dde18f39d23989bdf051ccde852",
+    ],
   ] as const)(
     "pins the reviewed bytes of %s?%s so a silent font fallback fails",
     async (slug, query, byteSize, sha256) => {
@@ -324,5 +333,26 @@ describe("component image registry", () => {
     const bare = await render("rose-sigil", "text=אב&rose=false");
     expect(rose.byteSize).toBeGreaterThan(bare.byteSize);
     expect(hash(rose.bytes)).toBe(rose.sha256);
+  });
+
+  it("traces a sigil through Kaph or Tau differently on Regardie's rose", async () => {
+    const regardie = "&version=regardie1939";
+    // A name without either letter: the same sigil; the rose behind it
+    // differs in those two letters' labels alone.
+    for (const query of ["text=אדני&rose=false", "text=גדי&rose=false"])
+      expect((await render("rose-sigil", query + regardie)).sha256).toBe(
+        (await render("rose-sigil", query)).sha256,
+      );
+    expect((await render("rose-sigil", `text=גדי${regardie}`)).sha256).not.toBe(
+      (await render("rose-sigil", "text=גדי")).sha256,
+    );
+    for (const query of ["text=שבתאי&rose=false", "text=כתר&rose=false"])
+      expect((await render("rose-sigil", query + regardie)).sha256).not.toBe(
+        (await render("rose-sigil", query)).sha256,
+      );
+    // The default, named or not, is one image.
+    expect((await render("rose-sigil", "text=גדי&version=gd")).sha256).toBe(
+      (await render("rose-sigil", "text=גדי")).sha256,
+    );
   });
 });
