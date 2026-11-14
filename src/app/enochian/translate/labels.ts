@@ -82,6 +82,8 @@ export const LABELS = {
   deeLine: "Dee’s own English",
   wordByWord: "word by word",
   mixedLine: "Dee’s own English, and word by word where marked",
+  /** Read after the line's label, which stands on a line of its own. */
+  lineLabelEnd: ": ",
   ours: "our division of Dee’s English",
   oursOpen: "‹",
   oursClose: "›",

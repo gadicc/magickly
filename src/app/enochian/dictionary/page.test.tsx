@@ -1,7 +1,7 @@
 import dictionary from "magick-data/enochian/dictionary";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import DictionaryPage from "./page";
+import DictionaryPage, { metadata } from "./page";
 
 /** The page as the server renders it, which is what search engines read. */
 const html = renderToString(<DictionaryPage />);
@@ -23,6 +23,13 @@ describe("/enochian/dictionary, as the server renders it (plan 074)", () => {
   it("opens no entry: the URL is read in the browser", () => {
     expect(html).not.toContain('role="dialog"');
     expect(html).toContain("Choose a word to see its entry.");
+  });
+
+  it("sends only its origin as the referrer, never the query", () => {
+    // The query is in the address (?q=); Next writes this as
+    // <meta name="referrer" content="strict-origin">.
+    expect(metadata.referrer).toBe("strict-origin");
+    expect(metadata.alternates?.canonical).toBe("/enochian/dictionary");
   });
 
   it("has the text below the tool", () => {

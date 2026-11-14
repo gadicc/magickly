@@ -43,9 +43,11 @@ describe("page routes", () => {
 
   it("gives each page the metadata its class requires", () => {
     for (const { route, source } of routes) {
+      // A page may add its own non-search settings (the dictionary's
+      // referrer), so only the call's start is fixed.
       if (route in PUBLIC_PAGES)
         expect(source, route).toContain(
-          `export const metadata = pageMetadata("${route}");`,
+          `export const metadata = pageMetadata("${route}"`,
         );
       else if (ENTITY_ROUTES.includes(route))
         expect(source, route).toMatch(/export async function generateMetadata/);

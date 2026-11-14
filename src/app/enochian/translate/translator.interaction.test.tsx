@@ -106,6 +106,8 @@ describe("the translator page (plan 081, step E)", () => {
     type("I reign over you");
     await waitFor(() => expect(liveRegion(container)).toMatch(/3 forms/));
     expect(requests.map((one) => one.url)).toEqual([KEYS_TABLE_URL]);
+    // Only the origin as its referrer, wherever the page is loaded from.
+    expect(requests[0].init?.referrerPolicy).toBe("origin");
   });
 
   it("sends no text anywhere: no request carries it, nor the query string", async () => {
@@ -525,7 +527,7 @@ describe("Enochian into English (decisions 13–17)", () => {
     await waitFor(() => expect(tiles()).toHaveLength(3));
     const line = within(results()).getByText("I Raign over you");
     expect(line.closest(".tr-line")?.textContent).toBe(
-      "Dee’s own EnglishI Raign over you",
+      "Dee’s own English: I Raign over you",
     );
   });
 
@@ -534,7 +536,7 @@ describe("Enochian into English (decisions 13–17)", () => {
     await waitFor(() => expect(tiles()).toHaveLength(2));
     const line = results().querySelector(".tr-line");
     expect(line?.textContent).toBe(
-      "word by wordof Justice ‹I am› (our division of Dee’s English)",
+      "word by word: of Justice ‹I am› (our division of Dee’s English)",
     );
     // The tile marks it too.
     expect(tiles()[1]).toContain("‹I am›");
@@ -545,7 +547,7 @@ describe("Enochian into English (decisions 13–17)", () => {
     await waitFor(() => expect(tiles()).toHaveLength(4));
     const line = results().querySelector(".tr-line");
     expect(line?.textContent).toBe(
-      "Dee’s own English, and word by word where markedI Raign over you word by wordof Justice",
+      "Dee’s own English, and word by word where marked: I Raign over you word by word: of Justice",
     );
   });
 
@@ -574,7 +576,7 @@ describe("Enochian into English (decisions 13–17)", () => {
       /^SALMANXnot in our datanearest spellings: .*SALMAN/,
     );
     expect(results().querySelector(".tr-line")?.textContent).toBe(
-      "word by word[SALMANX?] (not in our data)",
+      "word by word: [SALMANX?] (not in our data)",
     );
   });
 

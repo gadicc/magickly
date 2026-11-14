@@ -17,7 +17,8 @@ let loading: Promise<Translator> | undefined;
 
 /** The translator, fetched and built once; a failure may be retried. */
 export function loadTranslator(): Promise<Translator> {
-  loading ??= fetch(KEYS_TABLE_URL)
+  // The dictionary's address holds its query: send only the origin.
+  loading ??= fetch(KEYS_TABLE_URL, { referrerPolicy: "origin" })
     .then((response) => {
       if (!response.ok)
         throw new Error(`${KEYS_TABLE_URL}: ${response.status}`);

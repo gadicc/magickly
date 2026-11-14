@@ -22,6 +22,9 @@ import {
 import { dictionaryGlosses } from "./glosses.ts";
 import type { KeysTable } from "./keysTable.ts";
 import { LEITCH_SPELLINGS, type LeitchSpelling } from "./leitchSpellings.ts";
+import { enochianWords } from "./tokens.ts";
+
+export { enochianWords } from "./tokens.ts";
 
 /**
  * The translator's index, built once from the slim Keys table and the
@@ -162,11 +165,6 @@ const MARKERS: Readonly<Record<string, GdMarker>> = {
   a: "absent",
   s: "split",
 };
-
-/** An Enochian text's words, as typed, with Crowley's hyphens kept in. */
-export function enochianWords(text: string): string[] {
-  return deaccent(text).match(/[A-Za-z]+(?:['-][A-Za-z]+)*/g) ?? [];
-}
 
 /** A word folded for lookup: accents off, then `foldSpelling`. */
 export const fold = (word: string) => foldSpelling(deaccent(word));

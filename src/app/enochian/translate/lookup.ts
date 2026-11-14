@@ -10,6 +10,7 @@ import {
 } from "./lookupData.ts";
 import { type ToEnglish, toEnglish } from "./toEnglish.ts";
 import { type ToEnochian, toEnochian } from "./toEnochian.ts";
+import { wordCount } from "./tokens.ts";
 
 /**
  * The Enochian translator's lookup (plan 081, stage 1): a pure module,
@@ -116,7 +117,7 @@ export function guessDirection(lookup: Lookup, text: string): DirectionGuess {
     ).length,
     enochian.length,
   );
-  const typed = text.trim().split(/\s+/).filter(Boolean).length;
+  const typed = wordCount(text);
   return {
     language: enochianScore > englishScore ? "enochian" : "english",
     english: englishScore,

@@ -22,6 +22,8 @@ import {
 } from "./fragment";
 import { LABELS } from "./labels";
 import { TRANSLATOR_LIMITATIONS } from "./limitations";
+import { Guess, Ours, ReadingLine } from "./lineParts";
+import { LINE_STYLES } from "./lineStyles";
 import { useTranslator } from "./load";
 import type {
   EnochianToken,
@@ -29,7 +31,6 @@ import type {
   FormToken,
   KeyPlace,
   Language,
-  LineSegment,
   Reading,
   ReadToken,
   ReadWord,
@@ -235,27 +236,7 @@ const styles = {
   },
   "& .tr-words": { display: "flex", flexWrap: "wrap", gap: "4px 12px" },
   "& .tr-or": { fontSize: 12, color: "text.secondary" },
-  "& .tr-line": { fontSize: 18, margin: "0 0 12px", overflowWrap: "anywhere" },
-  "& .tr-line-label": {
-    display: "block",
-    fontSize: 12,
-    color: "text.secondary",
-  },
-  "& .tr-wbw": {
-    borderBottom: "1px dotted",
-    borderColor: "text.secondary",
-  },
-  "& .tr-tag": {
-    fontSize: 11,
-    color: "text.secondary",
-    border: 1,
-    borderColor: "divider",
-    borderRadius: 0.5,
-    padding: "0 4px",
-    marginRight: "4px",
-    verticalAlign: "middle",
-  },
-  "& .tr-missing": { fontStyle: "italic" },
+  ...LINE_STYLES,
   "& .tr-limits": {
     margin: "4px 0 0",
     paddingLeft: "20px",
@@ -565,101 +546,6 @@ function EnochianTile({ token }: { token: EnochianToken }) {
   );
 }
 
-/** Our division of Dee's English, marked by text, not colour alone. */
-function Ours({ text }: { text: string }) {
-  return (
-    <span className="tr-ours">
-      <span aria-hidden>{LABELS.oursOpen}</span>
-      {text}
-      <span aria-hidden>{LABELS.oursClose}</span>
-      <span style={visuallyHidden}>{` (${LABELS.ours})`}</span>
-    </span>
-  );
-}
-
-/** A segment of the reading line. */
-function Segment({ segment }: { segment: LineSegment }) {
-  if (segment.kind === "ours") return <Ours text={segment.text} />;
-  if (segment.kind === "missing")
-    return (
-      <span className="tr-missing">
-        [{segment.text}?]
-        <span style={visuallyHidden}>{` (${LABELS.notFound})`}</span>
-      </span>
-    );
-  if (segment.kind === "unglossed")
-    return <span className="tr-missing">({LABELS.unknown})</span>;
-  return <>{segment.text}</>;
-}
-
-/**
- * The reading line (decision 14): Dee's own English for a run of his
- * lines, and the rest word by word, tagged so; a word read two ways shows
- * both, "/" between.
- */
-function ReadingLine({ line }: { line: readonly LineSegment[] }) {
-  const words = line.filter((one) => one.kind !== "dee").length;
-  const label =
-    words === 0
-      ? LABELS.deeLine
-      : words === line.length
-        ? LABELS.wordByWord
-        : LABELS.mixedLine;
-  // Runs of segments: Dee's, or word by word.
-  const groups: { dee: boolean; from: number; to: number }[] = [];
-  line.forEach((one, at) => {
-    const dee = one.kind === "dee";
-    const last = groups[groups.length - 1];
-    if (last && last.dee === dee) last.to = at + 1;
-    else groups.push({ dee, from: at, to: at + 1 });
-  });
-  const mixed = groups.length > 1;
-  const pieces = (from: number, to: number) => {
-    const out: React.ReactNode[] = [];
-    for (let at = from; at < to; at++) {
-      const one = line[at];
-      const before = line[at - 1];
-      if (at > from) {
-        const second =
-          one.reading !== undefined &&
-          before?.tokens[0] === one.tokens[0] &&
-          before.reading !== one.reading;
-        out.push(
-          second ? (
-            <React.Fragment key={`or-${at}`}>
-              {" "}
-              <span aria-hidden>/</span>
-              <span style={visuallyHidden}>{LABELS.or}</span>{" "}
-            </React.Fragment>
-          ) : (
-            " "
-          ),
-        );
-      }
-      out.push(<Segment key={at} segment={one} />);
-    }
-    return out;
-  };
-  return (
-    <p className="tr-line">
-      <span className="tr-line-label">{label}</span>
-      {groups.map((group, index) => (
-        <React.Fragment key={group.from}>
-          {index > 0 && " "}
-          {group.dee || !mixed ? (
-            pieces(group.from, group.to)
-          ) : (
-            <span className="tr-wbw">
-              <span className="tr-tag">{LABELS.wordByWord}</span>
-              {pieces(group.from, group.to)}
-            </span>
-          )}
-        </React.Fragment>
-      ))}
-    </p>
-  );
-}
-
 /** How a reading came: Dee's place, a source's form, or a split by rule. */
 function ViaNote({ reading }: { reading: Reading }) {
   const first = reading.words[0];
@@ -920,79 +806,6 @@ function OpenedView({
       <InTheKeys word={key} />
     </Entry>
   ));
-}
-
-/**
- * The direction's line beside the boxes (decision 4): what the text is
- * read as, and the switch.
- */
-function Guess({
-  translation,
-  chosen,
-  onChoose,
-}: {
-  translation: Translation;
-  chosen: Language | null;
-  onChoose: (language: Language | null) => void;
-}) {
-  const { guess } = translation;
-  const other = (language: Language): Language =>
-    language === "english" ? "enochian" : "english";
-  if (!chosen && guess.both)
-    return (
-      <>
-        <span>{LABELS.readingBoth}</span>
-        <span aria-hidden>·</span>
-        <button
-          type="button"
-          className="tr-switch"
-          onClick={() => onChoose("english")}
-        >
-          {LABELS.onlyAs("english")}
-        </button>
-        <span aria-hidden>·</span>
-        <button
-          type="button"
-          className="tr-switch"
-          onClick={() => onChoose("enochian")}
-        >
-          {LABELS.onlyAs("enochian")}
-        </button>
-      </>
-    );
-  const reading = chosen ?? guess.language;
-  const next = other(reading);
-  return (
-    <>
-      <span>
-        {LABELS.readingAs(reading)}
-        {chosen && ` (${LABELS.chosen})`}
-      </span>
-      <span aria-hidden>·</span>
-      <button
-        type="button"
-        className="tr-switch"
-        // Back to the guess when that is where the switch goes.
-        onClick={() =>
-          onChoose(next === guess.language && !guess.both ? null : next)
-        }
-      >
-        {LABELS.switchTo}
-      </button>
-      {chosen && guess.both && (
-        <>
-          <span aria-hidden>·</span>
-          <button
-            type="button"
-            className="tr-switch"
-            onClick={() => onChoose(null)}
-          >
-            {LABELS.bothWays}
-          </button>
-        </>
-      )}
-    </>
-  );
 }
 
 /**

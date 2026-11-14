@@ -6,11 +6,14 @@ import dictionary from "magick-data/enochian/dictionary";
 import * as React from "react";
 import EnochianFont from "@/fonts/enochian";
 import { visuallyHidden } from "@/ui/visuallyHidden";
+import { LINE_STYLES } from "../translate/lineStyles";
+import { wordCount } from "../translate/tokens";
 import Entry from "./Entry";
 import EntrySheet from "./EntrySheet";
 import InTheKeys from "./InTheKeys";
 import Keypad from "./Keypad";
 import { LABELS } from "./labels";
+import PreviewShell, { PreviewBoundary } from "./PreviewShell";
 import {
   buildIndex,
   firstKnownMeaning,
@@ -31,6 +34,15 @@ import { useKeypadBox } from "./useKeypadBox";
  * holds (decision 7). Its UI words come from `labels.ts`, out of site
  * search's index (decision 11).
  */
+
+/**
+ * The translator's preview as a lazy component: loaded, with the lookup
+ * and the Keys, only for a query of `PREVIEW_WORDS` words or more (plan
+ * 081, decisions 3 and 19), so the dictionary's own load doesn't grow.
+ */
+const lazyPreview = () => React.lazy(() => import("./SentencePreview"));
+/** The fewest words a query has for the translator's preview. */
+const PREVIEW_WORDS = 3;
 
 /** Rows a group shows before "Show all". */
 const GROUP_ROWS = 30;
@@ -154,6 +166,26 @@ const styles = {
     "&.dict-active": { textDecoration: "underline" },
   },
   "& .dict-nothing": { padding: "16px", color: "text.secondary" },
+  // The translator's preview: a group of one line and a link.
+  "& .dict-preview": { borderBottom: 1, borderColor: "divider" },
+  "& .dict-preview-line": {
+    ...LINE_STYLES,
+    padding: "0 16px",
+    // The label's line and two of text, kept while it loads.
+    minHeight: 66,
+    "& .tr-line": { margin: 0, fontSize: 16 },
+    "& .tr-line-label": { minHeight: 18, lineHeight: "18px" },
+    // Two lines at most, then an ellipsis; the link opens the whole. The
+    // text is only clipped, so screen readers still read all of it.
+    "& .tr-line-text": {
+      display: "-webkit-box",
+      WebkitBoxOrient: "vertical",
+      WebkitLineClamp: 2,
+      overflow: "hidden",
+      lineHeight: "24px",
+    },
+  },
+  "& .dict-preview-open": { padding: "4px 16px 10px", fontSize: 14 },
   "& .dict-pane": {
     display: { xs: "none", md: "block" },
     position: "sticky",
@@ -286,6 +318,23 @@ export default function Dictionary({
   const index = React.useMemo(() => buildIndex(dictionary, uses), [uses]);
   // The list can lag a keystroke behind the boxes, so typing stays quick.
   const deferred = React.useDeferredValue(text.trim());
+  // The translator's preview, from three words (plan 081, decision 3). If
+  // its code fails to load, React.lazy keeps the failure, so the next
+  // query makes a fresh one and tries again.
+  const showPreview = React.useMemo(
+    () => wordCount(deferred) >= PREVIEW_WORDS,
+    [deferred],
+  );
+  const [SentencePreview, setSentencePreview] = React.useState(lazyPreview);
+  const [previewAttempt, setPreviewAttempt] = React.useState(0);
+  const previewFailedFor = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    const failed = previewFailedFor.current;
+    if (failed === null || failed === deferred) return;
+    previewFailedFor.current = null;
+    setSentencePreview(lazyPreview);
+    setPreviewAttempt((n) => n + 1);
+  }, [deferred]);
   const result = React.useMemo(
     () => (deferred ? searchDictionary(index, deferred) : null),
     [index, deferred],
@@ -481,6 +530,22 @@ export default function Dictionary({
         <div aria-live="polite" style={visuallyHidden}>
           {result ? LABELS.found(total) : ""}
         </div>
+        {
+          // Outside the listbox, which may hold only options: the preview
+          // holds a line and a link (plan 081, decision 3).
+          showPreview && (
+            <PreviewBoundary
+              key={previewAttempt}
+              onError={() => {
+                previewFailedFor.current = deferred;
+              }}
+            >
+              <React.Suspense fallback={<PreviewShell query={deferred} />}>
+                <SentencePreview query={deferred} />
+              </React.Suspense>
+            </PreviewBoundary>
+          )
+        }
         <div id={listId} role="listbox" aria-label={LABELS.results}>
           {sections.map((section) => {
             const groupId = `${idPrefix}-${section.id}`;

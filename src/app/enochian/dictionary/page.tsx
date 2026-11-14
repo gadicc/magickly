@@ -4,7 +4,14 @@ import DictionaryText from "./DictionaryText";
 import Dictionary from "./dictionary";
 import { buildKeyUses, countUses } from "./keyUses";
 
-export const metadata = pageMetadata("/enochian/dictionary");
+/**
+ * The query is in the address (`?q=`, plan 074), so requests from the
+ * page, such as the translator's preview loading, send only the origin
+ * as their referrer, never the query (plan 081, decision 19).
+ */
+export const metadata = pageMetadata("/enochian/dictionary", {
+  referrer: "strict-origin",
+});
 
 /**
  * How often the Keys say each word, worked out here so the browser gets a
