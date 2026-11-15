@@ -1,10 +1,11 @@
 # Composable JSX halls — 15 November 2026
 
-Status: designed, reviewed and spiked; not built. Gadi settled the
-assessment's twelve decisions on 14 November 2026. A Fable 5.2 review
-and the spikes then led to seven recommended changes (R1–R7), which
-wait for his word ([Changes after the review](#changes-after-the-review)).
-Implementation starts when he says so. Read
+Status: stage 1, the strict types, built on `gate/jsx-halls`, reviewed
+and bumped to 0.2.0 ([below](#stage-1-built-15-november-2026)); stage 2,
+the JSX tags, not built. Gadi settled the assessment's twelve decisions
+on 14 November 2026, and on 15 November the seven changes (R1–R7) that
+a Fable 5.2 review and the spikes led to
+([Changes after the review](#changes-after-the-review)). Read
 [current status](000-current-status.md),
 [plan 061](061-gd-hall.md) (the hall format) and
 [plan 080](080-open-source-packages.md) (the packages and their
@@ -162,8 +163,8 @@ needs.
 
 ## Changes after the review
 
-Recommended; **not settled until Gadi says so.** Each with its before and
-after.
+Settled by Gadi on 15 November 2026, all seven as recommended. Each with
+its before and after.
 
 **R1. `GdHallProps` stays the data form's props** (decision 4, how it is
 typed). One `GdHall`, `hall` xor children, as settled; only the names
@@ -316,6 +317,71 @@ On `gate/jsx-halls`, each commit gated on its own tree.
    fast-forwards `main` and pushes; CI publishes. Then integrity on npm
    is compared with the build leg's.
 
+### Stage 1 built (15 November 2026)
+
+Built by an Opus 5.5 agent (high effort) on `gate/jsx-halls`, from
+`main` at `20d03cd1`, each commit gated on its own tree.
+
+- **The validator** skips a value that is `undefined` before any other
+  check, so an `undefined` attribute of any name, and `children:
+  undefined`, are absent (R5). A required value set to `undefined` still
+  warns as missing.
+- **`nodes.ts`**: a `<Tag>Node` and a `<Tag>Attributes` alias per tag
+  (stage 2's tag props reuse the second), `HallPlaced`,
+  `GdHallAttributes`, `ItemKind`, `HallRole`, `HallColor`, the child
+  unions (`HallPlaceableNode`, `HallHostNode`, `HallContentNode`,
+  `GdHallChildNode`) and `HallStrictNode`; the vocabulary's own types
+  (`HallPoint`, `CrossForm`, `BannerSide` …) are re-exported from it.
+  Beyond the plan: a board with a diagram rejects `w` and `h` (the
+  validator warns); `grade` is typed only on the Hiereus and Hegemon,
+  the roles that take it; caption, label and door accept
+  `children: []`, which the validator accepts; a lamp's legacy `fill`
+  is left out.
+- **The type tests** are `nodes.test.ts`, a Vitest file whose
+  `@ts-expect-error` lines and `expectTypeOf(…).toExtend<HallNode>()`
+  the package's and the app's `tsc` check (`pnpm typecheck`); the
+  package had no type tests before. Each directive was checked to hide
+  the intended error. Runtime tests hold `HallRole`, `HallColor`,
+  `ItemKind`, the tag list, the lamen grades' roles and each tag's
+  attribute names to the vocabulary and `DEFAULT_HALL_ART`.
+- **The presets** are typed `GdHallNode`; their JSON is unchanged but
+  for Neophyte's `center`, and `src/doc/0=0.pug` changed in that line
+  only. No pin, snapshot or drawing moved.
+- **The app** leaves `undefined` values out of a hall's Pug source, as
+  JSON does (`src/doc/gdHallRows.ts`), since the codec refuses them and
+  the validator now passes them.
+- **README**: a section "A hall on your page" (a preset, a typed hall,
+  `validateHall` with `{art: DEFAULT_HALL_ART}`, and what the types leave
+  to the validator: ranges, letter names, text length); "Versions" for
+  0.2.0, naming the narrowed `HallPreset.hall` and how to widen it, the
+  Neophyte change, and the validator's reading of `undefined`.
+
+One cost, accepted: since the officer is a union (the `grade` rule), an
+item inside an officer is reported against the floor's whole child union
+rather than as "only labels".
+
+### Stage 1 review (15 November 2026)
+
+A fresh Opus 5.5 reviewer (high effort), given this plan, the diff and
+the code, found nothing that had to be fixed before release, and
+verified that every node type is an alias assignable to `HallNode`, the
+nesting matches `spec.ts`, the unions match the vocabulary and the art,
+R2 holds exactly, and the presets' data is unchanged but for Neophyte.
+What it asked for, done in `6d1cc4c9`, `04a7f282` and `dc525442`:
+
+- After R5 the validator passed a hall with an `undefined` value that
+  the app's codec throws on; the app now drops such values.
+- "Versions" understated the narrowing of `HallPreset.hall`.
+- No test held `ItemKind`, the tag list or the attribute names to the
+  runtime data.
+- `grade` on every role, leaf nodes refusing `children: []`, "missing
+  value" type tests anchored on a generic error, and a README that said
+  the types check "what the validator would".
+
+Kept as it was: the `*Attributes` aliases stay public, and the type
+names keep the package's mixed prefixes (`BannerSide` and `CrossForm`
+beside `HallPoint` and `HallPlanet`).
+
 ### Stage 2: JSX tags (0.3.0)
 
 On the same branch after 0.2.0 is published, or a new one from `main`.
@@ -389,4 +455,17 @@ exact tree. After each publish, npm's `dist.integrity` against the
 
 ## Commits
 
-None yet.
+On `gate/jsx-halls`, each gated on its own tree (every step exit 0).
+
+| Commit | What |
+| --- | --- |
+| `e3811104` | This plan; plan 080 records the 0.1.0 publish |
+| `8ec9f8fd` | The validator reads `undefined` as absent (R5) |
+| `abfe0f31` | The strict hall node types and their tests |
+| `83ab0c02` | The presets typed strictly; Neophyte at `center`; `0=0.pug` |
+| `e2e6b101` | README: the strict types, "Versions" |
+| `6d1cc4c9` | The app leaves `undefined` out of a hall's source |
+| `04a7f282` | Review fixes: `grade`, `children: []`, unions held to the data |
+| `dc525442` | README: what the types leave to the validator |
+| `3e29621a` | `main` merged (`412ebcf7`) |
+| this commit | magick-components 0.2.0; this plan's stage 1 record |

@@ -147,9 +147,12 @@ Follow-ups are separate from the completed migration work:
   `20d03cd1` through the trusted publisher, with provenance, its
   integrity the build job's; `latest` is 0.1.0
   ([plan 080](080-open-source-packages.md#010-on-npm-14-november-2026)).
-- 15 November 2026: composable JSX halls designed, reviewed and spiked:
-  strict per-tag node types for 0.2.0, then `gd/hall/tags` for 0.3.0;
-  seven changes from the review wait for Gadi; not built
+- 15 November 2026: composable JSX halls designed, reviewed and spiked,
+  and the review's seven changes settled. Stage 1, strict per-tag hall
+  node types, typed presets (Neophyte's altar `at="center"`) and the
+  validator reading `undefined` as absent, built on `gate/jsx-halls`,
+  reviewed, and bumped to magick-components 0.2.0 for CI to publish when
+  `main` is pushed; stage 2, `gd/hall/tags` for 0.3.0, not built
   ([plan 084](084-composable-jsx-halls.md)).
 - 13 November 2026: Dependabot alerts #362 (zod), #364 (glob) and #366
   (minimatch) fixed by a `@vercel/functions` bump and parent-scoped
