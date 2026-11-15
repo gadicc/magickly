@@ -1,5 +1,5 @@
-import { englishTokens } from "./english.ts";
 import type { EnochianToken, Translator } from "./lookup.ts";
+import { readerTokens } from "./toEnochian.ts";
 import { withoutNotes } from "./tokens.ts";
 
 /**
@@ -108,7 +108,7 @@ export interface GivenWord {
 
 /**
  * Each English word of `text` and what it was given, in the input's
- * order. A word is one of `englishTokens`: a contraction counts as the
+ * order. A word is one of `readerTokens`: a contraction counts as the
  * words it expands to ("don't" is "do" and "not", each classed on its
  * own), and a possessive's "'s" is part of its word. A token covers its
  * `span` of those words, so a phrase counts once per word it takes, its
@@ -119,7 +119,7 @@ export interface GivenWord {
  */
 export function givenWords(translator: Translator, text: string): GivenWord[] {
   const out: (GivenWord | undefined)[] = new Array(
-    englishTokens(text).length,
+    readerTokens(translator.lookup, text).length,
   ).fill(undefined);
   for (const token of translator.toEnochian(text).tokens) {
     const [from, to] = token.span;
@@ -194,14 +194,14 @@ export function selfCheck(translator: Translator): SelfCheck {
   let found = 0;
   for (const keyRows of lookup.keyRows.values()) {
     // Dee's English without our bracketed notes ("rest not [or] labour"),
-    // which a reader's text keeps. `englishTokens` reads each word on its
+    // which a reader's text keeps. `readerTokens` reads each word on its
     // own, so the rows' words, counted apart, are the text's.
     const english = keyRows.map((row) => withoutNotes(row.english));
     const { tokens } = translator.toEnochian(english.join(" "));
     let at = 0;
     for (const [index, row] of keyRows.entries()) {
       const from = at;
-      at += englishTokens(english[index]).length;
+      at += readerTokens(lookup, english[index]).length;
       if (!row.word || !row.core.length) continue;
       rows++;
       if (

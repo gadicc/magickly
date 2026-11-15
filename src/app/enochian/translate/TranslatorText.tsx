@@ -13,7 +13,7 @@ export default function TranslatorText() {
         This translator works by looking words up, both ways: English into
         Enochian, and Enochian into English. It looks in Dee&apos;s nineteen
         Keys first, where every Enochian word stands beside Dee&apos;s own
-        English, then in our dictionary of 1,911 words. It doesn&apos;t
+        English, then in our dictionary of 1,917 words. It doesn&apos;t
         understand sentences, and it never invents a word: every word it gives
         has a source, and the source is shown.
       </p>

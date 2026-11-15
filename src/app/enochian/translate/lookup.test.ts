@@ -17,6 +17,7 @@ import {
 } from "./lookup.ts";
 import { isEnglishWord } from "./lookupData.ts";
 import { type SpellingStats, toEnglish } from "./toEnglish.ts";
+import { readerTokens } from "./toEnochian.ts";
 import { firstWords, MAX_WORDS } from "./tokens.ts";
 
 const translator = createTranslator(buildKeysTable(), dictionary);
@@ -634,7 +635,9 @@ describe("Enochian into English (decisions 13–16)", () => {
   it("never shows a spelling no source prints", () => {
     const printed = new Set<string>([
       ...lookup.rows.flatMap((row) => [row.word, row.gd]),
-      ...Object.keys(dictionary),
+      // A headword in capitals, as every source prints Enochian: the
+      // transcription's "fatesged" is shown FATESGED.
+      ...Object.keys(dictionary).map((one) => one.toUpperCase()),
       ...LEITCH_SPELLINGS.map((one) => one.word),
       // Key 19's slot: the Aethyrs' names, in the capitals Dee's words have.
       ...buildKeysTable().aethyrs.flat(),
@@ -1252,5 +1255,270 @@ describe("the final review's findings (plan 081, stage 1)", () => {
     expect(
       enochian("constructor toString hasOwnProperty __proto__ valueOf"),
     ).toBe("[constructor] [toString] [hasOwnProperty] [proto] [valueOf]");
+  });
+});
+
+describe("lookup and data fixes (15 November 2026)", () => {
+  /** A gap's nearest forms, as shown. */
+  const nearestOf = (text: string) => {
+    const one = only(text);
+    if (one.kind !== "gap") throw new Error(`${text}: ${one.kind}`);
+    return one.nearest.map((option) => option.form);
+  };
+
+  it("reads Casaubon's 'range' as reign in his English only", () => {
+    // Key 12.2's "that range" is DSONF "that reign"; a reader's "range"
+    // is a range, never SONF "Raign".
+    expect(englishWords("that range")).toEqual(["that", "reign"]);
+    expect(englishTokens("range")[0].word).toBe("range");
+    expect(englishTokens("bee")[0].word).toBe("bee");
+    expect(enochian("range")).toBe("[range]");
+    expect(enochian("the range")).toBe("·G4 [range]");
+    expect(form("reign").form).toBe("SONF");
+    expect(form("that reign").form).toBe("DSONF");
+  });
+
+  it("reads a compass point's -ern adjective as a near match, and no other -ern", () => {
+    for (const [typed, form_, plain] of [
+      ["eastern", "RAAS", "east"],
+      ["northern", "LUCAL", "north"],
+      ["southern", "BABAGE", "south"],
+    ])
+      expect(form(typed)).toMatchObject({
+        form: form_,
+        tier: 1,
+        chips: [{ kind: "base", plain }],
+      });
+    expect(form("western").chips).toContainEqual({
+      kind: "base",
+      plain: "west",
+    });
+    expect(enochian("stern fern concern modern")).toBe(
+      "[stern] [fern] [concern] [modern]",
+    );
+    for (const word of ["stern", "fern", "concern", "modern", "govern"])
+      expect(wordKey(word)).toBe(word);
+    expect(form("govern").form).toBe("CABA");
+  });
+
+  it("files SAAIX, the stray 'Servient', as SAIX's partner", () => {
+    expect(Object.hasOwn(dictionary, "Servient")).toBe(false);
+    expect(dictionary.SAAIX.meanings).toEqual([
+      { meaning: "Servient Angel AIR OF WATER", source: "WE" },
+    ]);
+    // Each of the sixteen lesser angles has four Servient Angels, each
+    // in four letters and five.
+    const counts = new Map<string, number>();
+    for (const { meanings } of Object.values(dictionary))
+      for (const { meaning } of meanings) {
+        const angle = /^Servient Angel ([A-Z]+ OF [A-Z]+)(?: \(VAR\))?$/.exec(
+          meaning,
+        )?.[1];
+        if (angle) counts.set(angle, (counts.get(angle) ?? 0) + 1);
+      }
+    expect(counts.size).toBe(16);
+    expect(new Set(counts.values())).toEqual(new Set([8]));
+  });
+
+  it("parts meanings that ran into the next WE entry", () => {
+    const meanings = (head: string) =>
+      dictionary[head].meanings.map((one) => one.meaning);
+    expect(meanings("BOOAPIS")).toEqual(["SERVE, LET HER SERVE THEM"]);
+    expect(meanings("BORMILA")).toEqual(["ANGEL VENUS IN SATURN"]);
+    expect(meanings("TILB")).toEqual(["HER, OF", "HER"]);
+    expect(meanings("TIO")).toEqual(["TOP LINE OF TABLET OF 12 SQUAR"]);
+    expect(meanings("PAOC")).toEqual(["Servient Angel WATER OF AIR"]);
+    expect(meanings("PAOMBD")).toEqual([
+      'members, her (poss."limbs"?)',
+      "her members",
+    ]);
+    expect(meanings("RXAO")).toEqual(["Servient Angel EARTH OF EARTH"]);
+    expect(meanings("RXPAO")).toEqual(["Servient Angel EARTH OF EARTH"]);
+    expect(meanings("PUIM")).toEqual(["SICKLES, SHARP"]);
+    expect(meanings("PURGEL")).toEqual(["FIRE OF FIRE", "of fires"]);
+    expect(meanings("DIALIOAI")).toEqual(["PART IN ARN"]);
+    expect(meanings("DIARI")).toEqual(["Servient Angel WATER OF AIR"]);
+    expect(meanings("BZIZA")).toEqual(["Kerubic Archangel FIRE OF FIRE"]);
+    expect(meanings("C")[0]).toBe("Veh (C or K)");
+    expect(enochian("let her serve them")).toBe("BOOAPIS");
+  });
+
+  it("reads Dee's 'apparail'd' as -ed, and a reader's 'd as would only after a pronoun", () => {
+    expect(englishWords("they are apparail'd")).toEqual([
+      "they",
+      "are",
+      "apparelled",
+    ]);
+    const zonac = lookup.rows.find((row) => row.word === "ZONAC");
+    expect(zonac?.words).toEqual(["they", "are", "apparelled"]);
+    expect(form("they are apparelled").form).toBe("ZONAC");
+    expect(englishWords("apparaild")).toEqual(["apparelled"]);
+    const read = (text: string) =>
+      readerTokens(lookup, text).map((one) => one.word);
+    expect(read("know'st giv'n")).toEqual(["knowest", "given"]);
+    // "-ed" only for a verb our English has; "would" after anything else.
+    expect(read("call'd mov'd apparail'd")).toEqual([
+      "called",
+      "moved",
+      "apparelled",
+    ]);
+    for (const before of [
+      "I",
+      "what",
+      "where",
+      "how",
+      "why",
+      "when",
+      "here",
+      "this",
+      "everyone",
+      "God",
+    ])
+      expect(read(`${before}'d`)).toEqual([before.toLowerCase(), "would"]);
+    // As HEAD read it, a verb our English lacks is "would" too.
+    expect(read("lov'd")).toEqual(["lov", "would"]);
+    expect(enochian("Why'd you go")).toBe("BAGLE [would] NONCF [go]");
+    // The figures count the same words the lookup reads.
+    expect(givenWords(translator, "the seal call'd")).toHaveLength(3);
+  });
+
+  it("leaves WE's editorial notes out of the glosses, abbreviations read whole", () => {
+    expect(lookupGlosses("KNOWLEDGE, UNDEFILED K.")).toEqual([
+      "KNOWLEDGE",
+      "UNDEFILED KNOWLEDGE",
+    ]);
+    expect(lookupGlosses("continuance, long cont.")).toEqual([
+      "continuance",
+      "long continuance",
+    ]);
+    expect(lookupGlosses("BEGINNING, THE B. OF")).toEqual([
+      "BEGINNING",
+      "THE BEGINNING OF",
+    ]);
+    expect(lookupGlosses("phrase: ‘first,the Daughter of Light’")).toEqual([
+      "first",
+      "the Daughter of Light",
+    ]);
+    expect(lookupGlosses("SPEECH FROM GOD, VAR. 4")).toEqual([
+      "SPEECH FROM GOD",
+    ]);
+    expect(lookupGlosses("WHOSE, VAR ON 'SOBA'")).toEqual(["WHOSE"]);
+    expect(lookupGlosses("FIRST - VAR ON 'ILI'")).toEqual(["FIRST"]);
+    expect(lookupGlosses("anger, wrath. var on 'vonph'?")).toEqual([
+      "anger",
+      "wrath",
+    ]);
+    expect(lookupGlosses("ALT. PART IN LIN")).toEqual([]);
+    expect(
+      lookupGlosses("Abbreviation for Alt. Part in LIN; Angel of the East"),
+    ).toEqual(["Angel of the East"]);
+    expect(
+      lookupGlosses("Initiation, Visitation; n.Initiate, visit; v."),
+    ).toEqual(["Initiation", "Visitation", "Initiate", "visit"]);
+    expect(lookupGlosses("LETTERS OF T12SQR")).toEqual([]);
+    expect(lookupGlosses('given, p.t. "to give"')).toEqual(["given"]);
+    // Real glosses stay, a variant's mark in brackets aside.
+    expect(lookupGlosses("IN THE 24TH PART")).toEqual(["IN THE 24TH PART"]);
+    expect(lookupGlosses("42")).toEqual(["42"]);
+    expect(lookupGlosses("I give Ga")).toEqual(["I give Ga"]);
+    // A quote left without its pair goes; an apostrophe stays.
+    for (const meaning of [
+      "'It ends with [the goddess] El’; ‘Completed by the goddess’",
+      "‘that which you have within yourself'",
+      "'is moving’; completed; ending",
+      "root of ‘interiority: within, inside, self-hood', power",
+    ])
+      for (const gloss of lookupGlosses(meaning))
+        expect(gloss, meaning).not.toMatch(/['"‘’]/);
+    expect(lookupGlosses("God’s glory spread out")).toEqual([
+      "God’s glory spread out",
+    ]);
+    expect(lookupGlosses("KING OF AIR TABLET (VAR)")).toEqual([
+      "KING OF AIR TABLET",
+    ]);
+    // A letter's name, with "or" between its letters, or after a letter.
+    expect(lookupGlosses("Veh (C or K)")).toEqual([]);
+    expect(lookupGlosses("U Val (U, V, W)")).toEqual([]);
+    expect(dictionaryGlosses("Veh (C or K)")).toEqual(["Veh"]);
+    // None reaches the index.
+    const words = new Set(
+      [lookup.tiers.literal, lookup.tiers.plain].flatMap((tiers) =>
+        tiers.flatMap((tier) =>
+          [...tier.values()].flat().flatMap((hit) => hit.words),
+        ),
+      ),
+    );
+    for (const note of ["var", "cont", "t12sqr", "phrase", "abbreviation"])
+      expect(words.has(note), note).toBe(false);
+  });
+
+  it("reads WE's 'NOUN, ADJECTIVE' as one meaning where Dee writes it so", () => {
+    const { deePairs } = lookup;
+    expect(lookupGlosses("SICKLES, SHARP", deePairs)).toEqual([
+      "SICKLES",
+      "SHARP SICKLES",
+    ]);
+    expect(lookupGlosses("SICKLES, SHARP")).toEqual(["SICKLES", "SHARP"]);
+    for (const [meaning, inverted] of [
+      ["STONE, BARREN", "BARREN STONE"],
+      ["dwellings, living", "living dwellings"],
+      ["towers, strong", "strong towers"],
+      ["THINGS, ALL", "ALL THINGS"],
+    ])
+      expect(lookupGlosses(meaning, deePairs)).toContain(inverted);
+    // Two meanings stay two where Dee has no such phrase.
+    expect(lookupGlosses("midday, noon", deePairs)).toEqual(["midday", "noon"]);
+    expect(lookupGlosses("WINDS, MANIFOLD", deePairs)).toEqual([
+      "WINDS",
+      "MANIFOLD",
+    ]);
+    expect(enochian("sharp sickles")).toBe("PUIM");
+    expect(only("sharp").kind).toBe("gap");
+    expect(english("PUIM")).toBe("sickles");
+  });
+
+  it("reads a letter's name only where the word has no other meaning", () => {
+    expect(english("C")).toBe("o");
+    expect(english("C NOQOD")).toMatch(/^o /);
+    expect(english("S")).toBe("fourth");
+    // A Key word, or a letter with no other meaning, as before.
+    expect(english("A")).toBe("i");
+    expect(english("B")).toBe("pa");
+    expect(english("P")).toBe("eight");
+  });
+
+  it("shows a dictionary-only form as its headword, in capitals", () => {
+    expect(lookup.display.get("FATESGED")).toBe("FATESGED");
+    expect(lookup.display.get("ONPHE")).toBe("ONPHE");
+    expect(lookup.display.get("LVTVDAH")).toBe("LUTUDAH");
+    // Of two headwords, the one written plain; WE's division otherwise.
+    expect(lookup.display.get("ABAI")).toBe("ABAI");
+    expect(lookup.display.get("ASOBAM")).toBe("A-SOBAM");
+    // A Key word by Casaubon's spelling, not its fold.
+    expect(lookup.display.get("IPVRAN")).toBe("IPURAN");
+    expect(word("FATESGED").readings[0].words[0].word).toBe("FATESGED");
+    // The headword whose meaning matched, and the entry it opens.
+    expect(form("thrice great")).toMatchObject({
+      form: "LUTUDAH",
+      entries: ["lutudah"],
+    });
+    expect(form("begotten").alternatives).toContainEqual(
+      expect.objectContaining({ form: "ONPHE", entries: ["onphe"] }),
+    );
+    expect(form("attacking")).toMatchObject({
+      form: "A-BAI",
+      entries: ["A-BAI"],
+    });
+  });
+
+  it("gives a preposition or conjunction only nearest forms of grammar words (decision 12)", () => {
+    expect(nearestOf("yet")).toEqual([]);
+    expect(nearestOf("from")).toEqual([]);
+    expect(nearestOf("through")).toEqual([]);
+    expect(nearestOf("down")).toEqual([]);
+    expect(nearestOf("under")).toEqual(["CASARMI", "OROCH", "CASARMAN"]);
+    // A content word's are as before.
+    expect(nearestOf("show")).toEqual(["ZAMRAN"]);
+    expect(nearestOf("master")[0]).toBe("GEIAD");
   });
 });

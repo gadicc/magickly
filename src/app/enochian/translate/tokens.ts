@@ -23,14 +23,15 @@ export interface EnglishToken {
  * Dee's and Casaubon's spellings, modernised on both sides, so a reader's
  * "shew" or "show" meets either. A final e of his ("brightnesse",
  * "aire") is here, not taken off every word, so "stare" is not "star".
+ * A spelling of his that is another word today is in `SOURCE_SPELLINGS`.
  */
 const ARCHAIC: Readonly<Record<string, string>> = {
   adde: "add",
   aire: "air",
   alwayes: "always",
   apparaild: "apparelled",
+  apparailed: "apparelled",
   ballance: "balance",
-  bee: "be",
   binde: "bind",
   bloud: "blood",
   brightnesse: "brightness",
@@ -69,7 +70,6 @@ const ARCHAIC: Readonly<Record<string, string>> = {
   poyson: "poison",
   raign: "reign",
   raigne: "reign",
-  range: "reign",
   rejoyceth: "rejoiceth",
   righteousnes: "righteousness",
   righteousnesse: "righteousness",
@@ -93,8 +93,21 @@ const ARCHAIC: Readonly<Record<string, string>> = {
 };
 
 /**
+ * Spellings of Dee's and Casaubon's that are other words today, read as
+ * his only in his English and the glosses: his "that range" (DSONF) is
+ * "that reign", but a reader's "range" is a range, never SONF.
+ */
+const SOURCE_SPELLINGS: Readonly<Record<string, string>> = {
+  ...ARCHAIC,
+  range: "reign",
+};
+
+/**
  * Contractions, expanded before `words()` would strip "'s" (decision 6):
- * in order, since "can't" must not become "ca not".
+ * in order, since "can't" must not become "ca not". Only in what a reader
+ * types. A "'d" is "would" ("I'd go"), though "had" or "did" is as
+ * often meant ("where'd you go"), which nothing here can tell apart; only
+ * an old verb's elision is "-ed" (`englishTokens`' `isVerb`).
  */
 const CONTRACTIONS: readonly [RegExp, string][] = [
   [/\bcan't\b/, "can not"],
@@ -109,6 +122,49 @@ const CONTRACTIONS: readonly [RegExp, string][] = [
   [/'d\b/, " would"],
   [/\b(it|that|he|she|what|there|here|who|where|how|this)'s\b/, "$1 is"],
 ];
+
+/**
+ * Old elisions at a word's end: "know'st" is "knowest", "giv'n" "given",
+ * in Dee's English and the reader's alike. Without them the apostrophe
+ * would just go ("knowst").
+ */
+const ELISIONS: readonly [RegExp, string][] = [
+  [/(?<=\p{L})'st$/u, "est"],
+  [/(?<=\p{L})'n$/u, "en"],
+];
+
+/**
+ * A verb's "-ed" elided: Dee's "apparail'd" is "apparailed". Always so in
+ * his English and the glosses, which have no "'d" for "would"; in a
+ * reader's text only for a verb (`englishTokens`).
+ */
+const ELIDED_ED = /^(\p{L}+)'d$/u;
+
+/**
+ * Words a reader's "'d" follows as "would", whatever the data says:
+ * pronouns, question words and the like ("they'd", "why'd", "there'd").
+ */
+const WOULD_AFTER: ReadonlySet<string> = new Set([
+  "he",
+  "here",
+  "how",
+  "i",
+  "it",
+  "she",
+  "that",
+  "there",
+  "they",
+  "this",
+  "thou",
+  "we",
+  "what",
+  "when",
+  "where",
+  "who",
+  "why",
+  "ye",
+  "you",
+]);
 
 /** Accents off ("naïve" is "naive"), as for Crowley's forms. */
 export function deaccent(text: string): string {
@@ -149,15 +205,22 @@ const ELISION =
  * becomes a form, a chip or a gap. Shared with `words()` from `search.ts`,
  * which takes off a possessive "'s"; here that is kept as a flag, since G5
  * moves the word. A closing quote after an "s" ("I said 'yes'") is a
- * quote, not a possessive "s'", while a quote is open.
+ * quote, not a possessive "s'", while a quote is open. A "'d" is "would"
+ * unless `isVerb` says its "-ed" form is a verb ("lov'd" is "loved"); a
+ * pronoun's or question word's never is ("I'd", "why'd").
  */
-export function englishTokens(text: string): EnglishToken[] {
-  return tokenize(text, false);
+export function englishTokens(
+  text: string,
+  isVerb?: (word: string) => boolean,
+): EnglishToken[] {
+  return tokenize(text, false, isVerb);
 }
 
 /**
  * The compared words of Dee's English or a gloss: as `englishTokens`, but
- * bracketed notes left out (WE's "Mals (P)" is "Mals").
+ * bracketed notes left out (WE's "Mals (P)" is "Mals"), no contraction
+ * expanded (his "apparail'd" is an elision, not "apparail would"), and his
+ * spellings that are other words today read as his (`SOURCE_SPELLINGS`).
  */
 export function englishWords(text: string): string[] {
   return tokenize(text, true).map((one) => one.word);
@@ -168,10 +231,19 @@ export function withoutNotes(text: string): string {
   return text.replace(NOTES, " ");
 }
 
-function tokenize(text: string, dropNotes: boolean): EnglishToken[] {
+/**
+ * `source` is Dee's English or a gloss, as `englishWords` reads it;
+ * otherwise the text is a reader's, as `englishTokens` reads it.
+ */
+function tokenize(
+  text: string,
+  source: boolean,
+  isVerb?: (word: string) => boolean,
+): EnglishToken[] {
   const out: EnglishToken[] = [];
+  const spellings = source ? SOURCE_SPELLINGS : ARCHAIC;
   let cleaned = deaccent(text).replaceAll("’", "'");
-  if (dropNotes) cleaned = withoutNotes(cleaned);
+  if (source) cleaned = withoutNotes(cleaned);
   const found = [...cleaned.matchAll(WORD)];
   let quoted = false;
   found.forEach((match, at) => {
@@ -195,7 +267,19 @@ function tokenize(text: string, dropNotes: boolean): EnglishToken[] {
     const possessive = /'s$/i.test(typed) || (/s'$/i.test(typed) && !quoted);
     if (typed.endsWith("'")) quoted = false;
     let expanded = typed.toLowerCase();
-    for (const [pattern, replacement] of CONTRACTIONS)
+    const stem = ELIDED_ED.exec(expanded)?.[1];
+    const ed = stem && `${stem}ed`;
+    if (
+      ed &&
+      (source ||
+        (!WOULD_AFTER.has(stem) &&
+          !!isVerb?.(Object.hasOwn(spellings, ed) ? spellings[ed] : ed)))
+    )
+      expanded = ed;
+    else if (!source)
+      for (const [pattern, replacement] of CONTRACTIONS)
+        expanded = expanded.replace(pattern, replacement);
+    for (const [pattern, replacement] of ELISIONS)
       expanded = expanded.replace(pattern, replacement);
     const pieces = expanded.split(" ").filter(Boolean);
     const contraction = pieces.length > 1 ? typed : undefined;
@@ -205,7 +289,7 @@ function tokenize(text: string, dropNotes: boolean): EnglishToken[] {
       const word = piece.replace(/'s$/, "").replaceAll("'", "");
       if (!word) return;
       out.push({
-        word: Object.hasOwn(ARCHAIC, word) ? ARCHAIC[word] : word,
+        word: Object.hasOwn(spellings, word) ? spellings[word] : word,
         surface: contraction ? piece : typed,
         possessive: !contraction && possessive,
         endsClause: endsClause && index === pieces.length - 1,

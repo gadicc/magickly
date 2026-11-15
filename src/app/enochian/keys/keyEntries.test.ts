@@ -53,7 +53,6 @@ const NOT_IN_THE_DICTIONARY: Record<string, string> = {
   IRGILCHISDA: 'Key 8.21\'s "How many are there": not in the dictionary',
   BUFD: 'Key 8.23\'s "in the glory": not in the dictionary',
   IADOIASMOMAR: "Casaubon's spelling; the dictionary has IADOIASMOMA",
-  PURGEL: "Casaubon's spelling; the dictionary has PRGE",
   SOBCA: "Casaubon's spelling; the dictionary has SOBA",
   CIAL: "C and IAL run together; a one-letter part is too short to split on",
   ACHILDAO:
@@ -151,7 +150,6 @@ const NOT_IN_THE_DICTIONARY: Record<string, string> = {
   ZYLNA: 'Key 19.58\'s "in it self": not in the dictionary',
   PIRIPSAX: "Casaubon's spelling; the dictionary has PERIPSAX",
   LNIBM: 'Key 19.66\'s "one season:": not in the dictionary',
-  PAOMBD: 'Key 19.77\'s "her members": not in the dictionary',
   AGLTOLTORN: "Casaubon's spelling; the dictionary has TOLTORN",
   LSMNAD:
     "L and SMNAD run together; a one-letter part is too short to split on",
@@ -259,8 +257,8 @@ describe("the Keys' dictionary entries", () => {
     expect(Object.keys(KEY_ENTRIES)).toHaveLength(
       words.length - missing.length,
     );
-    // The whole dictionary is 1,911 words; the page ships these.
-    expect(Object.keys(dictionary).length).toBe(1911);
+    // The whole dictionary is 1,917 words; the page ships these.
+    expect(Object.keys(dictionary).length).toBe(1917);
   });
 
   it("finds these words, and only these, as two entries", () => {

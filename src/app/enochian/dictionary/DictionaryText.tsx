@@ -12,7 +12,7 @@ export default function DictionaryText() {
     <PageText labelledBy="dictionary-text">
       <H2 id="dictionary-text">About the dictionary</H2>
       <p>
-        This is a searchable dictionary of 1,911 Enochian words, the language
+        This is a searchable dictionary of 1,917 Enochian words, the language
         Dee and Kelley recorded in the 1580s. Every word is shown in Latin
         letters and in the Enochian script, with its meaning.
       </p>
