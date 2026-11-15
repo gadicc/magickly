@@ -1,9 +1,12 @@
+import { readFileSync } from "node:fs";
 import { createElement, Fragment, type ReactElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import ts from "typescript";
 import { describe, expect, it } from "vitest";
 import { GdHall } from "./GdHall.tsx";
+import * as Entry from "./index.ts";
 import { HALL_PRESETS } from "./presets/index.ts";
+import { neophyte } from "./presets/neophyte.ts";
 import * as Hall from "./tags.ts";
 import type { HallNode } from "./types.ts";
 import { hallFromTags } from "./walk.ts";
@@ -134,4 +137,67 @@ describe("each preset as tags", () => {
       );
     },
   );
+});
+
+describe("the README's hall written as tags", () => {
+  const README = readFileSync(
+    new URL("../../../README.md", import.meta.url),
+    "utf8",
+  );
+  /** The README's TSX block that imports the tags and says `marker`. */
+  const block = (marker: string) => {
+    const found = [...README.matchAll(/^```tsx\n([^]*?)^```$/gm)]
+      .map(([, code]) => code)
+      .filter(
+        (code) =>
+          code.includes('from "magick-components/gd/hall/tags"') &&
+          code.includes(marker),
+      );
+    expect(found, marker).toHaveLength(1);
+    return found[0];
+  };
+  /** A README module's exports, its imports given the package's own. */
+  const run = (source: string): Record<string, unknown> => {
+    const { outputText } = ts.transpileModule(source, {
+      compilerOptions: {
+        jsx: ts.JsxEmit.React,
+        target: ts.ScriptTarget.ES2022,
+        module: ts.ModuleKind.CommonJS,
+        esModuleInterop: false,
+      },
+    });
+    const modules: Record<string, unknown> = {
+      react: { createElement, Fragment },
+      "magick-components/gd/hall": Entry,
+      "magick-components/gd/hall/tags": Hall,
+    };
+    const exports: Record<string, unknown> = {};
+    new Function("require", "exports", "React", outputText)(
+      (name: string) => modules[name],
+      exports,
+      { createElement, Fragment },
+    );
+    return exports;
+  };
+
+  it("is the Neophyte preset", () => {
+    const { Neophyte } = run(block("export const Neophyte")) as {
+      Neophyte: () => ReactElement;
+    };
+    const { hall, diagnostics } = hallFromTags(Neophyte());
+    expect(diagnostics).toEqual([]);
+    expect(hall).toStrictEqual(neophyte.hall);
+  });
+
+  it("gives your own art's tags their nodes", () => {
+    const { hall, diagnostics } = run(block("defineHallItem")) as {
+      hall: HallNode;
+      diagnostics: unknown[];
+    };
+    expect(diagnostics).toEqual([]);
+    expect(hall.children?.[0].children).toStrictEqual([
+      { type: "serpentTree", coils: 3, at: "center" },
+      { type: "item", kind: "sistrum", metal: "gold", x: 4, y: 12 },
+    ]);
+  });
 });

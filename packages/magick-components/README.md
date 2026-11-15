@@ -127,7 +127,7 @@ assembled graph, so they import magick-data's root entry, every table.
 | `gd/GradeTree` | The Tree as the map of the Golden Dawn's grades |
 | `gd/hall` | `GdHall` (also the default export), a Golden Dawn temple hall drawn from a hall description, and what a page needs to draw, check or describe one: the description's types, lenient and strict ([below](#a-hall-on-your-page)), `validateHall()`, `describeHall()`, `estimateHallAspect()`, `GdHallSvg` and the layout it draws, the default art and the fonts |
 | `gd/hall/presets` | The halls of the grades, Neophyte to Philosophus and the Portal, as descriptions `GdHall` draws |
-| `gd/hall/tags` | The hall's tags, for writing a hall as JSX in `GdHall` (`import * as Hall`, then `<Hall.Floor>`, `<Hall.Pillar>` …), with `defineHallTag()` and `defineHallItem()` for your own art's tags and item kinds, and `hallFromTags()`, which gives the hall the tags describe as data |
+| `gd/hall/tags` | The hall's tags, for writing a hall as JSX in `GdHall` (`import * as Hall`, then `<Hall.Floor>`, `<Hall.Pillar>` …; [below](#a-hall-written-as-tags)), with `defineHallTag()` and `defineHallItem()` for your own art's tags and item kinds, and `hallFromTags()`, which gives the hall the tags describe as data |
 | `gd/Lamen` | An officer's lamen |
 | `gd/lamenGrades` | Which grades' lamens each officer wears |
 | `gd/RoseSigil` | The rose-cross sigil of a Hebrew text, optimised and drawn on in the browser (`"use client"`) |
@@ -279,6 +279,123 @@ export const diagnostics = validateHall(neophyte.hall, {
 });
 ```
 
+### A hall written as tags
+
+The same halls can be written as JSX, with the tags of
+`gd/hall/tags`, one per tag of the description, as `GdHall`'s children.
+The hall's own attributes (`wall`, `dais`, `compass`, `padding`,
+`labelSize` and the margins) are then `GdHall`'s props. A `GdHall`
+takes `hall` or tags, never both. The Neophyte preset, written so:
+
+```tsx
+import { GdHall } from "magick-components/gd/hall";
+import * as Hall from "magick-components/gd/hall/tags";
+
+const DAIS = [
+  "imperator",
+  "cancellarius",
+  "hierophant",
+  "pastHierophant",
+  "praemonstrator",
+] as const;
+
+export const Neophyte = () => (
+  <GdHall wall="gradient">
+    <Hall.Dais>
+      {DAIS.map((role) => (
+        <Hall.Officer key={role} role={role} />
+      ))}
+    </Hall.Dais>
+    <Hall.Floor>
+      <Hall.Banner kind="east" x={9.57} y={-0.06} />
+      <Hall.Pillar kind="black" x={4} y={3} glow />
+      <Hall.Officer role="hegemon" x={8} y={3} labelPos="top" />
+      <Hall.Pillar kind="white" x={12} y={3} glow />
+      <Hall.Altar at="center">
+        <Hall.Item kind="cross" y={-0.36} />
+        <Hall.Item kind="triangle" y={0.24} />
+        <Hall.Item kind="rose" at="east" x={0.08} />
+        <Hall.Item kind="salt" at="north" y={-0.3} />
+        <Hall.Item kind="bread" at="north" x={0.05} y={0.34} />
+        <Hall.Item kind="lamp" at="south" />
+        <Hall.Item kind="cup" at="west" y={0.1} />
+      </Hall.Altar>
+      <Hall.Officer role="stolistes" x={1.05} y={8} labelPos="bottom" />
+      <Hall.Officer role="dadouchos" x={14.75} y={8} labelPos="bottom" />
+      <Hall.Platform x={8} y={14.5} w={4} h={3}>
+        <Hall.Officer role="hiereus" labelPos="top" />
+      </Hall.Platform>
+      <Hall.Banner kind="west" x={4.8} y={14.3} />
+      <Hall.Officer role="keryx" x={14} y={15} labelPos="top" />
+      <Hall.Door x={14} width={2} />
+      <Hall.Officer role="sentinel" x={14} y={17.15} labelPos="bottom" />
+    </Hall.Floor>
+    <Hall.Caption text="Neophyte Temple" />
+  </GdHall>
+);
+```
+
+`GdHall` reads the tags; they render nothing themselves. The rules:
+
+- **Tags and Fragments only.** A component of your own inside a hall is
+  not drawn: `GdHall` cannot see what it would render. Write a shared
+  piece as a function and call it in braces, `{pillars()}`. `null`,
+  `undefined` and booleans are skipped, so `{grade > 0 && <Hall.Veil />}`
+  and `.map()` work; text is a prop (`text`), and text or numbers as
+  children do not compile.
+- **The props are typed, the nesting is not.** Each tag takes its
+  node's attributes, as strictly as the strict node types do, but JSX
+  gives every element one type, so TypeScript cannot tell an altar on
+  the dais from one on the floor: `validateHall()` does. For the same
+  reason a hall built from tags is a `HallNode`.
+- **Build the hall where `GdHall` runs.** Tags passed through a client
+  component's props arrive as `null`, and the hall draws empty. A
+  Server Component that hands a hall to a client component hands it
+  the data, `hallFromTags(<GdHall …>…</GdHall>).hall`, which takes the
+  root's attributes from that `GdHall` and ignores what only draws
+  (`width`, `className` …). Its `diagnostics` list what it dropped.
+- **Warnings are for development.** When `process.env.NODE_ENV` is not
+  `production`, `GdHall` warns once about each child it dropped and
+  about tags that gave no hall at all, and a tag warns when React
+  renders it, outside a `GdHall` or across a client boundary. From a
+  Server Component the warnings appear in the server's terminal, not the
+  browser's console.
+- **Keys are optional.** React does not ask for keys on tags in an
+  array, since it never renders them; Biome's `useJsxKeyInIterable`
+  still does.
+- **One error reads oddly.** A `GdHall` given both `hall` and children
+  reports that `GdHallNode` is not assignable to `undefined`: the
+  children chose the tags form, which takes no `hall`.
+
+Your own art's tags and item kinds get tags of their own, typed by the
+props you give them; a hall that uses them is a `HallNode`:
+
+```tsx
+import { GdHall, type HallNode } from "magick-components/gd/hall";
+import * as Hall from "magick-components/gd/hall/tags";
+
+// A node type your art registers as `serpentTree`, and an item kind it
+// registers as `item:sistrum`.
+const SerpentTree = Hall.defineHallTag<Hall.HallPlaced & { coils?: number }>(
+  "serpentTree",
+);
+const Sistrum = Hall.defineHallItem<{ metal?: "gold" | "silver" }>("sistrum");
+
+export const { hall, diagnostics } = Hall.hallFromTags(
+  <GdHall>
+    <Hall.Floor>
+      <SerpentTree coils={3} at="center" />
+      <Sistrum metal="gold" x={4} y={12} />
+    </Hall.Floor>
+  </GdHall>,
+);
+export const same: HallNode = hall;
+```
+
+`<Sistrum metal="gold" x={4} y={12} />` is `{type: "item", kind:
+"sistrum", metal: "gold", x: 4, y: 12}`. Besides the tags, `Hall.`
+offers `defineHallTag`, `defineHallItem` and `hallFromTags`.
+
 ## The hall's fonts
 
 `GdHall` measures its labels with the three font subsets in `fonts/`, and
@@ -409,6 +526,15 @@ candidate 0.1.0-rc.0, was published by hand.
   `at="centre"`; the two draw the same.
 - `validateHall()` reads an attribute or `children` set to `undefined`
   as absent, as the layout does: it reports fewer problems, never more.
+
+0.3.0 adds the hall tags, `gd/hall/tags`, and `GdHall`'s tags form. It
+changes nothing a 0.2.0 page uses: `GdHallProps` still describes the
+`hall` form, now with `children?: never`, and `GdHall` takes
+`GdHallProps | GdHallTagsProps`; both extend `GdHallRenderProps`, the
+props that only draw. A wrapper that extends, destructures or forwards
+`GdHallProps` still compiles. In development, `GdHall` and the tags
+warn on the console as above, the package's first reading of
+`NODE_ENV`; in production they stay silent.
 
 ## Requirements
 
