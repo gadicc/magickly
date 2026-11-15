@@ -35,6 +35,12 @@ const CLIENT_REFERENCE = Symbol.for("react.client.reference");
 const isClientReference = (type: object) =>
   (type as { $$typeof?: unknown }).$$typeof === CLIENT_REFERENCE;
 
+/** `GdHall`, marked as the root the walk reads; returns it. */
+export function markHallRoot<C extends object>(component: C): C {
+  Object.defineProperty(component, HALL_TAG, { value: "gdHall" });
+  return component;
+}
+
 /** The node type a component stands for, if it is a hall tag. */
 export function hallTagOf(type: unknown): string | undefined {
   if (typeof type !== "function" && (typeof type !== "object" || !type))

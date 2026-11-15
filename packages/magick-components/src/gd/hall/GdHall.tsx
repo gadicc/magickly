@@ -23,7 +23,7 @@ import {
 import type { GdHallAttributes } from "./nodes.ts";
 import type { HallChildren } from "./tags.ts";
 import type { HallArt, HallArtRegistry, HallNode } from "./types.ts";
-import { HALL_TAG, hallFromRootProps, warnInDevelopment } from "./walk.ts";
+import { hallFromRootProps, markHallRoot, warnInDevelopment } from "./walk.ts";
 
 /** SVG user units per checker square: text stays at a large font size. */
 const UNIT = 100;
@@ -460,7 +460,11 @@ export function GdHallSvg({
  * nodes, unknown tags draw as dashed placeholders, and nothing is loaded
  * by URL except the fonts `fontBaseUrl` points at.
  */
-export function GdHall(
+// The walk reads a `<GdHall>` element by the marker `markHallRoot` gives
+// it (`hallFromTags`), and so never imports this module. A pure call, so
+// that a bundler drops GdHall, and the walk with it, from a page that
+// draws with `GdHallSvg` alone.
+export const GdHall = /*#__PURE__*/ markHallRoot(function GdHall(
   props: (GdHallProps & { children?: never }) | GdHallTagsProps,
 ) {
   const {
@@ -559,10 +563,6 @@ export function GdHall(
       ref={ref}
     />
   );
-}
-
-// The walk reads a `<GdHall>` element by this marker (`hallFromTags`), and
-// so never imports this module.
-Object.defineProperty(GdHall, HALL_TAG, { value: "gdHall" });
+});
 
 export default GdHall;

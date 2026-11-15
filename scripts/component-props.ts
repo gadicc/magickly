@@ -193,6 +193,32 @@ function describedAs(
   return { ...doc, props };
 }
 
+/**
+ * The JSDoc of a file's export, for a component docgen reads through the
+ * function a call wraps (`markHallRoot(function GdHall …)`), which has
+ * none of its own.
+ */
+function exportDocumentation(
+  program: ts.Program,
+  file: string,
+  exportName: string,
+): string {
+  const checker = program.getTypeChecker();
+  const source = program.getSourceFile(file);
+  const module = source && checker.getSymbolAtLocation(source);
+  const exported = module
+    ? checker
+        .getExportsOfModule(module)
+        .find((symbol) => symbol.escapedName === exportName)
+    : undefined;
+  if (!exported) return "";
+  const symbol =
+    exported.flags & ts.SymbolFlags.Alias
+      ? checker.getAliasedSymbol(exported)
+      : exported;
+  return ts.displayPartsToString(symbol.getDocumentationComment(checker));
+}
+
 /** Strings in code-point order, the same in every locale. */
 const byCodePoint = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
 
@@ -237,9 +263,10 @@ function packageProgram(files: string[]): ts.Program {
 }
 
 /**
- * The declarations each file's default export resolves to. docgen names a
- * default export after its file (`fylfotcross`) or its function, so the
- * script finds it by declaration instead and calls it `default`.
+ * The declarations each file's default export resolves to, and the
+ * function a call wraps into it. docgen names a default export after its
+ * file (`fylfotcross`) or its function, so the script finds it by
+ * declaration instead and calls it `default`.
  */
 function defaultDeclarations(program: ts.Program, files: string[]) {
   const checker = program.getTypeChecker();
@@ -257,7 +284,18 @@ function defaultDeclarations(program: ts.Program, files: string[]) {
       exported.flags & ts.SymbolFlags.Alias
         ? checker.getAliasedSymbol(exported)
         : exported;
-    for (const declaration of target.declarations ?? []) found.add(declaration);
+    for (const declaration of target.declarations ?? []) {
+      found.add(declaration);
+      // A component wrapped by a call (`GdHall = markHallRoot(function
+      // GdHall …)`): docgen also names it by the function it wraps.
+      const initializer = ts.isVariableDeclaration(declaration)
+        ? declaration.initializer
+        : undefined;
+      if (initializer && ts.isCallExpression(initializer))
+        for (const argument of initializer.arguments)
+          if (ts.isFunctionExpression(argument) || ts.isArrowFunction(argument))
+            found.add(argument);
+    }
   }
   return found;
 }
@@ -295,9 +333,14 @@ export function componentProps(): PropsManifest {
     );
     if (!doc) throw new Error(`docgen found no ${exportName} in ${entry}`);
     const described = DESCRIBED_PROPS[name];
-    result[name] = componentEntry(
-      described ? describedAs(doc, program, file, described) : doc,
-    );
+    const withProps = described
+      ? describedAs(doc, program, file, described)
+      : doc;
+    result[name] = componentEntry({
+      ...withProps,
+      description:
+        withProps.description || exportDocumentation(program, file, exportName),
+    });
   }
   return result;
 }

@@ -1,5 +1,7 @@
+import { readFileSync } from "node:fs";
 import type { ComponentProps, ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import ts from "typescript";
 import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import {
   GdHall,
@@ -78,6 +80,29 @@ describe("GdHall drawn from tags", () => {
     expect(Hall.hallFromTags(<GdHall hall={neophyte.hall} />).hall).toBe(
       neophyte.hall,
     );
+  });
+
+  it("is marked by a pure call, with no top-level side effect", () => {
+    // A bundler then drops GdHall, and the walk, from a page that draws
+    // with GdHallSvg alone.
+    const source = readFileSync(
+      new URL("./GdHall.tsx", import.meta.url),
+      "utf8",
+    );
+    const parsed = ts.createSourceFile(
+      "GdHall.tsx",
+      source,
+      ts.ScriptTarget.Latest,
+    );
+    expect(
+      parsed.statements
+        .filter((statement) => ts.isExpressionStatement(statement))
+        .map((statement) => statement.getText(parsed)),
+    ).toEqual([]);
+    expect(source).toContain(
+      "export const GdHall = /*#__PURE__*/ markHallRoot(function GdHall(",
+    );
+    expect(GdHall.name).toBe("GdHall");
   });
 
   it("warns once in development about what the walk dropped", () => {
