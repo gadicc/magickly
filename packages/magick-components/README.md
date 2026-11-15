@@ -217,10 +217,11 @@ export const Neophyte = () => <GdHall hall={neophyte.hall} />;
 hall a ritual stores may hold anything, and draws what it can. To write
 a hall in code, type it with the strict node types, one per tag
 (`GdHallNode`, `FloorNode`, `OfficerNode` …), as the presets are typed.
-TypeScript then checks what the validator would: which tag may stand
-where, the values each attribute takes, and the values a tag needs (an
-officer's `role`, an item's `kind`, a caption's `text`, a door's place
-along its wall). They are type aliases, so any strict node is a
+TypeScript then checks much of what the validator checks: which tag may
+stand where, the values each attribute takes, and the values a tag needs
+(an officer's `role`, an item's `kind`, a caption's `text`, a door's
+place along its wall). Ranges, letter names and the length of text are
+left to the validator. They are type aliases, so any strict node is a
 `HallNode`:
 
 ```tsx
@@ -260,8 +261,11 @@ does not take. A hall that uses a tag or an item kind your own art adds
 is a `HallNode`.
 
 `validateHall()` checks any hall, typed or stored, and returns what it
-finds; it never throws. Give it the art you draw with: without it, the
-tags the art adds (`tarotKey`, `tablet`, `kamea` …) are unknown.
+finds; it never throws. Give it the art you draw with: without it, what
+the art adds is unknown to it: the tags (`tarotKey`, `tablet`, `kamea`
+…), the item kinds `pantacle` and `lightning`, a light's `light`, an
+officer's `grade` and a tablet's `element`, `version`, `reversed` and
+`alt`.
 
 ```ts
 import { DEFAULT_HALL_ART, validateHall } from "magick-components/gd/hall";
@@ -390,10 +394,18 @@ built from, as magick-data's are. CI publishes a pre-release under the
 `next` tag and a release under `latest`. The first version, the release
 candidate 0.1.0-rc.0, was published by hand.
 
-0.2.0 adds the strict hall node types and changes two things, as a 0.x
-minor may: `HallPreset.hall` narrows from `HallNode` to `GdHallNode`,
-which is still a `HallNode`, and the Neophyte preset's altar is
-`at="center"`, no longer `at="centre"`; the two draw the same.
+0.2.0 adds the strict hall node types and changes three things, as a
+0.x minor may:
+
+- `HallPreset.hall` narrows from `HallNode` to `GdHallNode`, which is
+  still a `HallNode`. Code that reads an attribute off a preset's nodes
+  by name (`preset.hall.children?.map((c) => c.x)`), or assigns a
+  `HallNode` to `preset.hall`, stops compiling; widen the hall first:
+  `const hall: HallNode = preset.hall`.
+- The Neophyte preset's altar is `at="center"`, no longer
+  `at="centre"`; the two draw the same.
+- `validateHall()` reads an attribute or `children` set to `undefined`
+  as absent, as the layout does: it reports fewer problems, never more.
 
 ## Requirements
 
