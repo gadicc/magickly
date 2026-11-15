@@ -21,6 +21,7 @@ import {
   WALL_STROKE,
 } from "./layout.ts";
 import type { GdHallAttributes } from "./nodes.ts";
+import type { HallChildren } from "./tags.ts";
 import type { HallArt, HallArtRegistry, HallNode } from "./types.ts";
 import { HALL_TAG, hallFromRootProps, warnInDevelopment } from "./walk.ts";
 
@@ -30,8 +31,10 @@ const u = (squares: number) => svgCoordinate(squares * UNIT);
 
 const EMPTY_HALL: HallNode = { type: "gdHall" };
 
-/** Props of `GdHall` that draw, in either form. */
-export interface GdHallRenderProps {
+/** Props of `GdHall`. */
+export interface GdHallProps {
+  /** The compiled `gdHall` node; anything else draws an empty hall. */
+  hall: HallNode;
   /**
    * The art for each kind of object; the package's own when not given. A
    * registry of your own can add kinds or draw them differently.
@@ -54,13 +57,8 @@ export interface GdHallRenderProps {
   ref?: Ref<SVGSVGElement>;
 }
 
-/** Props of `GdHall` drawing a hall description, `hall`. */
-export interface GdHallProps extends GdHallRenderProps {
-  /** The compiled `gdHall` node; anything else draws an empty hall. */
-  hall: HallNode;
-  /** No children: a hall is drawn from `hall` or from tags, not both. */
-  children?: never;
-}
+/** Props of `GdHall` that draw, in either form: all but `hall`. */
+export type GdHallRenderProps = Omit<GdHallProps, "hall">;
 
 /**
  * Props of `GdHall` drawing a hall written as tags
@@ -72,7 +70,7 @@ export type GdHallTagsProps = GdHallRenderProps &
     /** No `hall`: a hall is drawn from `hall` or from tags, not both. */
     hall?: never;
     /** The hall's tags: `<Hall.Floor>`, `<Hall.Caption>` …, and Fragments. */
-    children: ReactNode;
+    children: HallChildren;
   };
 
 const labelTextStyle: CSSProperties = {
@@ -462,7 +460,9 @@ export function GdHallSvg({
  * nodes, unknown tags draw as dashed placeholders, and nothing is loaded
  * by URL except the fonts `fontBaseUrl` points at.
  */
-export function GdHall(props: GdHallProps | GdHallTagsProps) {
+export function GdHall(
+  props: (GdHallProps & { children?: never }) | GdHallTagsProps,
+) {
   const {
     hall,
     art = DEFAULT_HALL_ART,
@@ -487,8 +487,8 @@ export function GdHall(props: GdHallProps | GdHallTagsProps) {
     marginEast,
     marginWest,
   } = props as Partial<GdHallTagsProps>;
-  // JSX makes new children on each render, so this walks each time; the
-  // walk is cheap beside the layout.
+  // JSX makes new children on each render, so in the tags form this
+  // walks, and the layout below is resolved, on every render.
   const walked = useMemo(
     () =>
       hall === undefined
@@ -521,6 +521,10 @@ export function GdHall(props: GdHallProps | GdHallTagsProps) {
       marginWest,
     ],
   );
+  if (!walked && children !== undefined)
+    warnInDevelopment(
+      "GdHall was given both `hall` and children: it draws `hall` and ignores the children",
+    );
   if (walked) {
     for (const diagnostic of walked.diagnostics)
       warnInDevelopment(`GdHall: ${diagnostic.message}`);

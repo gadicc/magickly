@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import {
@@ -130,15 +130,20 @@ describe("GdHall drawn from tags", () => {
     expect(warn).not.toHaveBeenCalled();
   });
 
-  it("draws the data form as before, its children aside", () => {
+  it("draws the data form as before, its children aside, with a warning", () => {
     const warn = quiet();
     const data = renderToStaticMarkup(<GdHall hall={neophyte.hall} />);
+    expect(warn).not.toHaveBeenCalled();
     const props = {
       hall: neophyte.hall,
       children: <Hall.Floor />,
     } as unknown as GdHallProps;
     expect(renderToStaticMarkup(<GdHall {...props} />)).toBe(data);
-    expect(warn).not.toHaveBeenCalled();
+    expect(warn.mock.calls).toEqual([
+      [
+        "GdHall was given both `hall` and children: it draws `hall` and ignores the children",
+      ],
+    ]);
   });
 });
 
@@ -154,6 +159,24 @@ describe("GdHall's props types (R1)", () => {
       const { id: _id, ...rest } = props;
       return <GdHall hall={neophyte.hall} {...rest} />;
     };
+    // 0.2.0's GdHallProps has no children, so a wrapper may add its own.
+    interface Captioned extends GdHallProps {
+      children?: ReactNode;
+    }
+    const Captioned = ({ children, ...rest }: Captioned) => (
+      <figure>
+        <GdHall {...rest} />
+        <figcaption>{children}</figcaption>
+      </figure>
+    );
+    const Titled = ({
+      children,
+      ...rest
+    }: GdHallProps & { children?: ReactNode }) => (
+      <div title={String(children)}>
+        <GdHall {...rest} />
+      </div>
+    );
     const Spread = (props: ComponentProps<typeof GdHall>) => (
       <GdHall {...props} />
     );
@@ -163,6 +186,8 @@ describe("GdHall's props types (R1)", () => {
           <Framed hall={neophyte.hall} frame="gold" />
           <Forward id="x" width={10} />
           <Spread hall={neophyte.hall} />
+          <Captioned hall={neophyte.hall}>Neophyte</Captioned>
+          <Titled hall={neophyte.hall}>Neophyte</Titled>
         </>,
       ),
     ).toContain("<svg");
@@ -179,6 +204,8 @@ describe("GdHall's props types (R1)", () => {
     </GdHall>;
     // @ts-expect-error the tags form needs its tags
     <GdHall wall="plain" />;
+    // @ts-expect-error text is a prop of a tag, never a child of the hall
+    <GdHall wall="plain">Some text</GdHall>;
     // @ts-expect-error a misspelt render prop is refused in either form
     <GdHall widht={3}>
       <Hall.Floor />

@@ -528,13 +528,19 @@ candidate 0.1.0-rc.0, was published by hand.
   as absent, as the layout does: it reports fewer problems, never more.
 
 0.3.0 adds the hall tags, `gd/hall/tags`, and `GdHall`'s tags form. It
-changes nothing a 0.2.0 page uses: `GdHallProps` still describes the
-`hall` form, now with `children?: never`, and `GdHall` takes
-`GdHallProps | GdHallTagsProps`; both extend `GdHallRenderProps`, the
-props that only draw. A wrapper that extends, destructures or forwards
-`GdHallProps` still compiles. In development, `GdHall` and the tags
-warn on the console as above, the package's first reading of
-`NODE_ENV`; in production they stay silent.
+changes nothing a 0.2.0 page compiles against: `GdHallProps` is as it
+was, the `hall` form's props, and `GdHall` takes `(GdHallProps &
+{ children?: never }) | GdHallTagsProps`, where `GdHallRenderProps`,
+the props that only draw, is `GdHallProps` without `hall`. A wrapper
+that extends, destructures or forwards `GdHallProps` still compiles.
+`ComponentProps<typeof GdHall>` is now that union, and `Omit` over a
+union flattens it: to leave a prop out, write `Omit<GdHallProps, …>`
+for the `hall` form or `Omit<GdHallTagsProps, …>` for tags. In
+development, `GdHall` and the tags warn on the console as above, the
+package's first reading of `NODE_ENV`; in production they stay
+silent. That includes `<GdHall hall={hall} />` while `hall` is still
+`undefined` (data loading, say): it draws the empty hall it drew
+before, and now warns that it did.
 
 ## Requirements
 
