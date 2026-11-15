@@ -125,7 +125,7 @@ assembled graph, so they import magick-data's root entry, every table.
 | `kabbalah/TreeOfLife` | The Tree of Life, its spheres labelled from any field of magick-data's sephirot, in the Queen or King scale, with the Hermetic or the Hebrew letters on its paths |
 | `kabbalah/fieldPath` | `readFieldPath()`, which reads a dotted field path (`planet.name.en.en`, `stones.*.name.en`) from a row, as the Tree's labels do |
 | `gd/GradeTree` | The Tree as the map of the Golden Dawn's grades |
-| `gd/hall` | `GdHall` (also the default export), a Golden Dawn temple hall drawn from a hall description, and what a page needs to draw, check or describe one: the description's types, `validateHall()`, `describeHall()`, `estimateHallAspect()`, `GdHallSvg` and the layout it draws, the default art and the fonts |
+| `gd/hall` | `GdHall` (also the default export), a Golden Dawn temple hall drawn from a hall description, and what a page needs to draw, check or describe one: the description's types, lenient and strict ([below](#a-hall-on-your-page)), `validateHall()`, `describeHall()`, `estimateHallAspect()`, `GdHallSvg` and the layout it draws, the default art and the fonts |
 | `gd/hall/presets` | The halls of the grades, Neophyte to Philosophus and the Portal, as descriptions `GdHall` draws |
 | `gd/Lamen` | An officer's lamen |
 | `gd/lamenGrades` | Which grades' lamens each officer wears |
@@ -200,6 +200,77 @@ It keeps to itself, so that several can share a page:
   (`<TreeOfLife fontBaseUrl="/fonts" />`). The SVG then carries
   `@font-face` rules for them, which an exported SVG needs; like any
   `@font-face`, they define the two families for the whole page.
+
+## A hall on your page
+
+`GdHall` draws a Golden Dawn temple hall from its description: a tree of
+nodes, `{type, …attributes, children}`, as the presets are.
+
+```tsx
+import { GdHall } from "magick-components/gd/hall";
+import { neophyte } from "magick-components/gd/hall/presets";
+
+export const Neophyte = () => <GdHall hall={neophyte.hall} />;
+```
+
+`GdHall` and `validateHall()` take a `HallNode`, which is lenient: a
+hall a ritual stores may hold anything, and draws what it can. To write
+a hall in code, type it with the strict node types, one per tag
+(`GdHallNode`, `FloorNode`, `OfficerNode` …), as the presets are typed.
+TypeScript then checks what the validator would: which tag may stand
+where, the values each attribute takes, and the values a tag needs (an
+officer's `role`, an item's `kind`, a caption's `text`, a door's place
+along its wall). They are type aliases, so any strict node is a
+`HallNode`:
+
+```tsx
+import { GdHall, type GdHallNode } from "magick-components/gd/hall";
+
+const hall: GdHallNode = {
+  type: "gdHall",
+  children: [
+    {
+      type: "floor",
+      children: [
+        { type: "pillar", kind: "black", x: 4, y: 3 },
+        { type: "pillar", kind: "white", x: 12, y: 3 },
+        {
+          type: "altar",
+          at: "center",
+          children: [{ type: "item", kind: "cross", form: "calvary" }],
+        },
+        { type: "officer", role: "hiereus", x: 8, y: 14 },
+        { type: "door", side: "north", y: 12 },
+      ],
+    },
+    { type: "caption", text: "A hall" },
+  ],
+};
+
+export const Hall = () => <GdHall hall={hall} />;
+```
+
+The floor is 16 squares each way, `x` running North to South and `y`
+East to West, with the dais beyond its East edge. The strict types
+offer only the vocabulary's spellings, `center` and `gray`, which
+stored halls may also write `centre` and `grey`. An item takes only its
+kind's attributes (`form` on a cross, `light` on a lamp or a lantern);
+as anywhere in TypeScript, only an object literal is checked for one it
+does not take. A hall that uses a tag or an item kind your own art adds
+is a `HallNode`.
+
+`validateHall()` checks any hall, typed or stored, and returns what it
+finds; it never throws. Give it the art you draw with: without it, the
+tags the art adds (`tarotKey`, `tablet`, `kamea` …) are unknown.
+
+```ts
+import { DEFAULT_HALL_ART, validateHall } from "magick-components/gd/hall";
+import { neophyte } from "magick-components/gd/hall/presets";
+
+export const diagnostics = validateHall(neophyte.hall, {
+  art: DEFAULT_HALL_ART,
+});
+```
 
 ## The hall's fonts
 
@@ -318,6 +389,11 @@ version changes on `main`, with npm provenance naming the commit it was
 built from, as magick-data's are. CI publishes a pre-release under the
 `next` tag and a release under `latest`. The first version, the release
 candidate 0.1.0-rc.0, was published by hand.
+
+0.2.0 adds the strict hall node types and changes two things, as a 0.x
+minor may: `HallPreset.hall` narrows from `HallNode` to `GdHallNode`,
+which is still a `HallNode`, and the Neophyte preset's altar is
+`at="center"`, no longer `at="centre"`; the two draw the same.
 
 ## Requirements
 
