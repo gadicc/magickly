@@ -3,6 +3,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 import * as v from "valibot";
 import { parseBoundedResearchJson } from "./boundedJson";
+import { readResearchManagedRetentionProfile } from "./managedRetentionProfile";
 import {
   prepareResearchReadEnvelope,
   type ResearchReadEnvelopeInput,
@@ -45,6 +46,11 @@ export interface PreparedResearchPublication {
   readonly kind: "prepared_private_research_publication";
   readonly sha256: string;
 }
+/** Separate opaque preparation for managed hosting. Existing local publishers/startups cannot consume it. */
+export interface PreparedResearchManagedPublication {
+  readonly kind: "prepared_private_research_managed_publication";
+  readonly sha256: string;
+}
 /** Private metadata for the trusted publisher only. Never emit these fields directly to an HTTP client or commit a real operator's record. */
 export interface ResearchPublicationFacts {
   readonly document_json: string;
@@ -59,7 +65,8 @@ export interface ResearchPublicationFacts {
   readonly read_envelope_sha256: string;
   readonly read_until_ms: number;
 }
-const publications = new WeakMap<object, ResearchPublicationFacts>();
+const publications = new WeakMap<object, ResearchPublicationFacts>(),
+  managedPublications = new WeakMap<object, ResearchPublicationFacts>();
 function fail(): never {
   throw Error(RESEARCH_PUBLICATION_ERROR);
 }
@@ -71,16 +78,25 @@ function covers(
 ) {
   return (from === null || from <= begins) && (until === null || until >= ends);
 }
-/** Bind existing canonical formats without generating dates/IDs, stripping grants or installing any policy. This first publisher supports one operator/window per physical artifact namespace. */
-export function prepareResearchPublication(
+function compilePublication(
   value: ResearchPublicationInput,
-): PreparedResearchPublication {
+  runtime: "local",
+): PreparedResearchPublication;
+function compilePublication(
+  value: ResearchPublicationInput,
+  runtime: "managed",
+): PreparedResearchManagedPublication;
+function compilePublication(
+  value: ResearchPublicationInput,
+  runtime: "local" | "managed",
+): PreparedResearchPublication | PreparedResearchManagedPublication {
   try {
     const p = v.parse(shape, value),
-      profile = readResearchRetentionProfile(
-        p.retentionProfileJson,
-        p.retentionProfileSha256,
-      ),
+      profile = (
+        runtime === "local"
+          ? readResearchRetentionProfile
+          : readResearchManagedRetentionProfile
+      )(p.retentionProfileJson, p.retentionProfileSha256),
       target = profile.target,
       sources = parseResearchSourceStorage(
         p.sourceStorage as ResearchSourceStorage,
@@ -145,8 +161,11 @@ export function prepareResearchPublication(
         fail();
     }
     const document = {
-        schema_version: 1,
-        kind: "private-operator-first-window-publication",
+        schema_version: runtime === "local" ? 1 : 2,
+        kind:
+          runtime === "local"
+            ? "private-operator-first-window-publication"
+            : "private-operator-managed-window-publication",
         mode: "one-window-and-profile-per-physical-artifact-namespace",
         scope: target.scope,
         accounting_storage: target.storage,
@@ -167,10 +186,13 @@ export function prepareResearchPublication(
       digest = sha(json);
     if (Buffer.byteLength(json, "utf8") > 8192) fail();
     const prepared = Object.freeze({
-      kind: "prepared_private_research_publication" as const,
+      kind:
+        runtime === "local"
+          ? ("prepared_private_research_publication" as const)
+          : ("prepared_private_research_managed_publication" as const),
       sha256: digest,
     });
-    publications.set(prepared, {
+    (runtime === "local" ? publications : managedPublications).set(prepared, {
       document_json: json,
       document_sha256: digest,
       target,
@@ -187,6 +209,30 @@ export function prepareResearchPublication(
   } catch {
     return fail();
   }
+}
+/** Bind the original local formats. Its canonical bytes and strict binary-pinned retention contract remain unchanged. */
+export function prepareResearchPublication(
+  value: ResearchPublicationInput,
+): PreparedResearchPublication {
+  return compilePublication(value, "local");
+}
+/**
+ * Bind only the explicit managed profile, with a distinct document identity and opaque handle.
+ * This prepares data; it supplies no consent, deployment custody, policy/window write or
+ * cleanup health. Existing local publishers/startups reject this handle and format.
+ */
+export function prepareResearchManagedPublication(
+  value: ResearchPublicationInput,
+): PreparedResearchManagedPublication {
+  return compilePublication(value, "managed");
+}
+/** Owned copies of managed facts for a separately reviewed future managed publisher/startup. Never a local publication handle. */
+export function inspectResearchManagedPublication(
+  value: PreparedResearchManagedPublication,
+): ResearchPublicationFacts {
+  const state = managedPublications.get(value);
+  if (!state) fail();
+  return structuredClone(state);
 }
 /** Owned copies of private compiler facts only. A copied/serialized handle never becomes a valid preparation or an adoption. */
 export function inspectResearchPublication(
