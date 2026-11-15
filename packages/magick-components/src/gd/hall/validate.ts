@@ -83,6 +83,9 @@ export function validateHall(
     for (const name of Object.keys(node)) {
       if (name === "type") continue;
       const value = node[name];
+      // `undefined` is absent, as the layout reads it (attributes.ts):
+      // a typed hall may spell an attribute it leaves out so.
+      if (value === undefined) continue;
       if (name === "children") {
         if (!Array.isArray(value))
           report(path, "error", `${tag}: children must be a list`, name);

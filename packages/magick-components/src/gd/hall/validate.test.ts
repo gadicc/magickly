@@ -301,6 +301,40 @@ describe("validateHall", () => {
     ]);
   });
 
+  it("reads undefined as absent, for attributes and for children", () => {
+    expect(
+      validateHall({
+        type: "gdHall",
+        children: [{ type: "floor", children: undefined }],
+      }),
+    ).toEqual([]);
+    expect(
+      validateHall({
+        type: "gdHall",
+        children: [
+          { type: "floor", children: [{ type: "pillar", x: undefined }] },
+        ],
+      }),
+    ).toEqual([]);
+    // Absent, so neither reserved, unknown nor misnamed; and a value the
+    // tag needs, set to undefined, is missing as if left out.
+    expect(
+      validateHall(
+        hall(
+          floor(
+            {
+              type: "altar",
+              src: undefined,
+              nonsense: undefined,
+              "bad-name": undefined,
+            },
+            { type: "marker", text: undefined },
+          ),
+        ),
+      ).map((d) => d.message),
+    ).toEqual(["marker: no text"]);
+  });
+
   it("warns that a door is clamped to the floor's 0–16, as drawn", () => {
     const result = validateHall(
       hall(
