@@ -1080,12 +1080,17 @@ export default nextConfig;
             ),
             `the server drew ${id}`,
           );
-        // The hall written as tags draws as its hallFromTags data does.
+        // The hall written as tags draws as its hallFromTags data does,
+        // and draws the hall: its caption, a label child and its objects.
+        const tagsHall = hallSvg(html, "server-hall-tags");
         assert(
-          hallSvg(html, "server-hall-tags") ===
-            hallSvg(html, "server-hall-bridge"),
+          tagsHall === hallSvg(html, "server-hall-bridge"),
           "the hall drawn from tags is the hall drawn from their data",
         );
+        for (const text of [">Tags</text>", ">West</text>", ">Hierophant<"])
+          assert(tagsHall.includes(text), `the tags hall draws ${text}`);
+        const uses = tagsHall.match(/<use /g)?.length ?? 0;
+        assert(uses >= 6, `the tags hall places its objects (${uses})`);
         // Three Trees, two from Server Components and one from a Client
         // Component: each has its own ids, and its labels' curves its own.
         const trees = [
