@@ -543,6 +543,13 @@ Follow-ups are separate from the completed migration work:
   parts of speech for "do"). The same day the sign-in link stopped
   sending the dictionary's text to the server as it was typed (a
   prefetch of its address, query and all; plan 081 has the details).
+- 15 November 2026: a layout pass on the Enochian dictionary, built on
+  `gate/dictionary-ux`
+  ([plan 074](074-enochian-dictionary-search.md#the-layout-pass--15-november-2026)):
+  on desktop the list and the pane scroll on their own and the page's
+  text fills the pane until a word opens; on a phone an info button
+  shows it. Site-wide, the spacer under the app bar now matches the
+  bar, which covered 8px of every page from 600px wide.
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose

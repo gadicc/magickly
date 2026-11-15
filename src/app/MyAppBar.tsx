@@ -119,8 +119,19 @@ function SignInWithQuery({
   );
 }
 
+/**
+ * Hides the bar while the page scrolls down and brings it back on the way
+ * up. While it is hidden, `<html data-app-bar-hidden>` lets a page's
+ * sticky parts, such as the dictionary's search boxes, follow it in CSS
+ * without a scroll trigger of their own.
+ */
 function HideOnScroll({ children }) {
   const trigger = useScrollTrigger();
+  React.useEffect(() => {
+    const root = document.documentElement;
+    root.toggleAttribute("data-app-bar-hidden", trigger);
+    return () => root.removeAttribute("data-app-bar-hidden");
+  }, [trigger]);
 
   return (
     <Slide appear={false} direction="down" in={!trigger}>

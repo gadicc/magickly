@@ -19,10 +19,19 @@ export const LABELS = {
     count === 1 ? "1 word found" : `${count.toLocaleString("en")} words found`,
   unknown: "meaning unknown",
   results: "Words",
-  choose: "Choose a word to see its entry.",
+  /** The phone's button that shows the page's text above the list. */
+  about: "About the dictionary",
   said: "Said",
+  /** Around a pronunciation's source: "ah (EMPM)". */
+  saidSourceOpen: " (",
+  saidSourceClose: ")",
   meanings: "Meanings",
   gematria: "Gematria",
+  /** A source's full name, shown on hovering its short form. */
+  sourceNames: {
+    EMPM: "Gerald Schueler, Enochian Magic: A Practical Manual",
+    WE: "The Whole Enochian Dictionary",
+  } as Readonly<Record<string, string>>,
   copyLink: "Copy link",
   copied: "Link copied",
   close: "Close",

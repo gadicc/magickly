@@ -12,7 +12,7 @@ describe("/enochian/dictionary, as the server renders it (plan 074)", () => {
     expect(rows.length).toBe(Object.keys(dictionary).length);
     // A row: the word, its script, then its meaning and source.
     expect(html).toMatch(
-      /<span class="dict-word">OLPRT<\/span>.*?<span class="dict-meaning">light<span class="dict-source"> EMPM<\/span>/,
+      /<span class="dict-word">OLPRT<\/span>.*?<span class="dict-meaning">light<span class="dict-source"> <abbr title="[^"]*Schueler[^"]*">EMPM<\/abbr><\/span>/,
     );
   });
 
@@ -22,7 +22,7 @@ describe("/enochian/dictionary, as the server renders it (plan 074)", () => {
 
   it("opens no entry: the URL is read in the browser", () => {
     expect(html).not.toContain('role="dialog"');
-    expect(html).toContain("Choose a word to see its entry.");
+    expect(html).not.toMatch(/class="[^"]*dict-about-off/);
   });
 
   it("sends only its origin as the referrer, never the query", () => {
@@ -32,8 +32,14 @@ describe("/enochian/dictionary, as the server renders it (plan 074)", () => {
     expect(metadata.alternates?.canonical).toBe("/enochian/dictionary");
   });
 
-  it("has the text below the tool", () => {
-    expect(html).toContain("How to search");
+  it("has the text once, in the pane, before the list", () => {
+    expect(html.match(/How to search/g)).toHaveLength(1);
+    const about = html.indexOf('class="dict-about"');
+    expect(about).toBeGreaterThan(html.indexOf('class="dict-pane"'));
+    expect(html.indexOf("How to search")).toBeGreaterThan(about);
+    expect(html.indexOf('role="listbox"')).toBeGreaterThan(
+      html.indexOf("How to search"),
+    );
     // Each book's title follows its bracket, with no space between.
     expect(html).toContain("Aaron Leitch (<i>The Angelical Language</i>");
     expect(html).toContain("Laycock (<i>The Complete Enochian Dictionary</i>");
