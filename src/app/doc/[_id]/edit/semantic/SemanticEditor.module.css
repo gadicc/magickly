@@ -1,20 +1,14 @@
-/* The revision editor fills the viewport below the app bar's 56px spacer, so
-   the window never scrolls and the header and toolbars stay in view. */
+/* The revision editor fills the viewport below the app bar's spacer, so the
+   window never scrolls and the header and toolbars stay in view. */
 .surface {
   box-sizing: border-box;
-  height: calc(100dvh - 56px);
+  height: calc(100dvh - var(--app-bar, 56px));
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.5rem 1rem 1rem;
   max-width: 1600px;
   margin: 0 auto;
-}
-/* The app bar is 64px from 600px wide; the layout's spacer stays 56px. */
-@media (min-width: 600px) {
-  .surface {
-    padding-top: calc(8px + 0.5rem);
-  }
 }
 .header,
 .sourceActions {

@@ -2,8 +2,10 @@ import { H2, List, PageText } from "@/app/PageText";
 import Link from "@/ui/Link";
 
 /**
- * What the dictionary holds and how to search it, below it (plan 071,
- * decision 5); rewritten for English search (plan 074).
+ * What the dictionary holds and how to search it (plan 071, decision 5);
+ * rewritten for English search (plan 074). The page hands it to the
+ * dictionary, which shows it in the pane on desktop and behind an info
+ * button on a phone.
  */
 export default function DictionaryText() {
   return (

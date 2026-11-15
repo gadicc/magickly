@@ -1,6 +1,7 @@
 "use client";
 
-import { Box, useMediaQuery } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import { Box, IconButton, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import dictionary from "magick-data/enochian/dictionary";
 import * as React from "react";
@@ -14,6 +15,7 @@ import InTheKeys from "./InTheKeys";
 import Keypad from "./Keypad";
 import { LABELS } from "./labels";
 import PreviewShell, { PreviewBoundary } from "./PreviewShell";
+import SourceName from "./SourceName";
 import {
   buildIndex,
   firstKnownMeaning,
@@ -29,6 +31,13 @@ import { useKeypadBox } from "./useKeypadBox";
  * Enochian, searched both ways at once; rows that carry a meaning; and the
  * chosen word's entry in a pane beside the list on desktop, or a sheet over
  * it on phones.
+ *
+ * On desktop it fills the window below the app bar, and the list and the
+ * pane scroll on their own; the pane holds the page's text until a word is
+ * chosen. On a phone the page scrolls as one, and an info button shows the
+ * text above the list. The text is in the HTML once either way, for search
+ * engines and site search, and CSS alone decides where it shows, since
+ * which screen it is on is known only after hydration.
  *
  * With no query the list is every word, which is what the prerendered HTML
  * holds (decision 7). Its UI words come from `labels.ts`, out of site
@@ -62,21 +71,39 @@ const ALL: Hit[] = Object.entries(dictionary).map(([word, entry]) => ({
 const styles = {
   display: { md: "grid" },
   gridTemplateColumns: { md: "440px minmax(0, 1fr)" },
-  alignItems: "start",
+  gridTemplateRows: { md: "auto minmax(0, 1fr)" },
+  gridTemplateAreas: { md: '"search pane" "list pane"' },
+  // The window below the bar, though never so short the list vanishes.
+  height: { md: "calc(100dvh - var(--app-bar, 64px))" },
+  minHeight: { md: 480 },
   "& .dict-left": {
+    gridArea: "list",
     borderRight: { md: 1 },
     borderColor: { md: "divider" },
     minWidth: 0,
+    overflowY: { md: "auto" },
+    // Its end doesn't scroll the window on to the footer; the pane's does.
+    overscrollBehavior: { md: "contain" },
   },
   "& .dict-search": {
-    position: "sticky",
-    top: 0,
+    gridArea: "search",
+    // On a phone it stays at the top as the page scrolls, under the app
+    // bar while the bar shows, moving as the bar hides and comes back
+    // (`data-app-bar-hidden`, from MyAppBar's HideOnScroll).
+    position: { xs: "sticky", md: "static" },
+    top: "var(--app-bar, 56px)",
+    transition: "top 200ms ease-out",
+    "@media (prefers-reduced-motion: reduce)": { transition: "none" },
     zIndex: 2,
     bgcolor: "background.paper",
     borderBottom: 1,
     borderColor: "divider",
+    // After `borderColor`, whose colour the `1px solid` would reset.
+    borderRight: { md: 1 },
+    borderRightColor: { md: "divider" },
     padding: "12px 16px 8px",
   },
+  "[data-app-bar-hidden] & .dict-search": { top: 0 },
   "& .dict-boxes": {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
@@ -101,10 +128,19 @@ const styles = {
   "& .dict-labels": {
     display: "flex",
     justifyContent: "space-between",
+    alignItems: "center",
     gap: 1,
     fontSize: 12,
     color: "text.secondary",
     mt: 0.5,
+  },
+  "& .dict-labels-end": { display: "flex", alignItems: "center", gap: "2px" },
+  // A 24px target that doesn't make the row of labels taller.
+  "& .dict-info": {
+    display: { md: "none" },
+    padding: "3px",
+    my: "-5px",
+    mr: "-3px",
   },
   "& .dict-group": {
     display: "flex",
@@ -125,8 +161,10 @@ const styles = {
     borderBottom: 1,
     borderColor: "divider",
     cursor: "pointer",
-    // Clear of the sticky boxes, and of the docked keypad when it is up.
-    scrollMarginTop: 96,
+    // Clear of the phone's sticky boxes and the bar above them, and of
+    // the docked keypad when it is up; on desktop the list scrolls below
+    // the boxes.
+    scrollMarginTop: { xs: "calc(96px + var(--app-bar, 56px))", md: 0 },
     scrollMarginBottom: "var(--dict-keypad, 0px)",
     "&:hover": { bgcolor: "action.hover" },
     "&[aria-selected=true]": { bgcolor: "action.selected" },
@@ -136,6 +174,7 @@ const styles = {
       outlineOffset: -2,
     },
   },
+  "[data-app-bar-hidden] & .dict-row": { scrollMarginTop: { xs: 96, md: 0 } },
   "& .dict-word": {
     fontWeight: 500,
     letterSpacing: "0.02em",
@@ -157,6 +196,7 @@ const styles = {
   },
   "& .dict-unknown": { fontStyle: "italic" },
   "& .dict-source": { fontSize: 11.5 },
+  "& abbr[title]": { textDecoration: "none", cursor: "help" },
   "& .dict-more": {
     padding: "12px 16px",
     color: "primary.main",
@@ -197,15 +237,25 @@ const styles = {
   },
   "& .dict-preview-open": { padding: "4px 16px 10px", fontSize: 14 },
   "& .dict-pane": {
-    display: { xs: "none", md: "block" },
-    position: "sticky",
-    top: 0,
-    maxHeight: "100vh",
-    overflowY: "auto",
+    gridArea: "pane",
+    minWidth: 0,
+    overflowY: { md: "auto" },
     bgcolor: "action.hover",
-    height: "100vh",
   },
-  "& .dict-choose": { padding: "32px 40px", color: "text.secondary" },
+  "& .dict-pane-entry": { maxWidth: 760 },
+  // The page's text: in the pane on desktop until a word is chosen, and
+  // above the list on a phone when its info button is pressed.
+  // `flow-root` keeps the text's margins inside its shaded box.
+  "& .dict-about": {
+    display: { xs: "none", md: "flow-root" },
+    borderBottom: { xs: 1, md: 0 },
+    // After the border, whose `1px solid` would reset its colour.
+    borderBottomColor: { xs: "divider" },
+    // Lined up with an entry's text rather than centred in the pane.
+    "& > section": { mx: { md: 0 }, px: { md: 5 } },
+  },
+  "& .dict-about.dict-about-open": { display: "flow-root" },
+  "& .dict-about.dict-about-off": { display: { md: "none" } },
 } as const;
 
 /** One word's row: the word, its script, and a meaning with its source. */
@@ -254,7 +304,12 @@ const Row = React.memo(function Row({
               segment.text
             ),
           )}
-          {source && <span className="dict-source">{` ${source}`}</span>}
+          {source && (
+            <span className="dict-source">
+              {" "}
+              <SourceName name={source} />
+            </span>
+          )}
         </span>
       )}
     </div>
@@ -272,9 +327,12 @@ interface Section {
 
 export default function Dictionary({
   uses,
+  children: about,
 }: {
   /** How often the Keys say each word, which breaks search's ties. */
   uses: Readonly<Record<string, number>>;
+  /** The page's text, for the pane until a word is chosen. */
+  children?: React.ReactNode;
 }) {
   const url = useDictionaryUrl();
   const [text, setText] = React.useState("");
@@ -285,6 +343,12 @@ export default function Dictionary({
   // A touch screen gets the keypad in place of its own keyboard; read after
   // hydration, so the server's HTML has no `inputmode` (decision 2).
   const coarse = useMediaQuery("(pointer: coarse)");
+  const [aboutOpen, setAboutOpen] = React.useState(false);
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const listRef = React.useRef<HTMLDivElement>(null);
+  /** Whether a word has been revealed in the list, or opened from it. */
+  const revealed = React.useRef(false);
+  const paneRef = React.useRef<HTMLElement>(null);
   const idPrefix = React.useId();
   const {
     box: enochianBox,
@@ -349,11 +413,13 @@ export default function Dictionary({
     () => (deferred ? searchDictionary(index, deferred) : null),
     [index, deferred],
   );
-  // A new query starts with its groups capped and nothing active.
+  // A new query starts with its groups capped, nothing active, and the
+  // desktop's list at its top.
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset on a new query
   React.useEffect(() => {
     setExpanded({});
     setActive(-1);
+    if (listRef.current) listRef.current.scrollTop = 0;
   }, [deferred]);
 
   const sections = React.useMemo((): Section[] => {
@@ -412,6 +478,8 @@ export default function Dictionary({
         written.current = trimmed;
         setQuery(trimmed);
       }
+      // A word opened here is in view; only a shared link's is revealed.
+      revealed.current = true;
       url.open(key);
     },
     [url.query, url.open, setQuery],
@@ -469,15 +537,149 @@ export default function Dictionary({
     </Entry>
   );
   const shown = entry && url.word ? entryOf(url.word) : null;
+  const inPane = desktop && Boolean(shown);
   // The sheet keeps its last entry while it slides away.
   const lastShown = React.useRef<string | null>(null);
   if (entry && url.word) lastShown.current = url.word;
 
+  // A shared link's word is shown in the desktop's list once, when its
+  // query's results are in, so the list doesn't open far above it.
+  React.useEffect(() => {
+    if (revealed.current || !desktop || !url.word || deferred !== url.query)
+      return;
+    revealed.current = true;
+    // The list alone: scrollIntoView would move the window as well.
+    const list = listRef.current;
+    const row = list?.querySelector('[aria-selected="true"]');
+    if (!list || !row) return;
+    const rowBox = row.getBoundingClientRect();
+    list.scrollTop +=
+      rowBox.top -
+      list.getBoundingClientRect().top -
+      (list.clientHeight - rowBox.height) / 2;
+  }, [desktop, url.word, url.query, deferred]);
+
+  // Each entry, and the text after one, starts at the pane's top.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: on the word alone
+  React.useEffect(() => {
+    if (paneRef.current) paneRef.current.scrollTop = 0;
+  }, [url.word]);
+
+  // Escape closes the desktop's entry from anywhere on the page, before
+  // the search box's own Escape clears the query; not from the keypad,
+  // whose Escape closes it, nor from a menu or dialog elsewhere.
+  React.useEffect(() => {
+    if (!inPane) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented || event.isComposing)
+        return;
+      const target = event.target as Node;
+      if (target !== document.body && !rootRef.current?.contains(target))
+        return;
+      event.preventDefault();
+      close();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [inPane, close]);
+
+  const aboutId = `${idPrefix}-about`;
+  const toggleAbout = () => {
+    // Opened above the list, so it is brought into view.
+    if (!aboutOpen) window.scrollTo({ top: 0 });
+    setAboutOpen(!aboutOpen);
+  };
+
   let at = -1;
   return (
-    <Box sx={styles}>
+    <Box sx={styles} ref={rootRef}>
+      <div className="dict-search">
+        <div className="dict-boxes">
+          <input
+            className="dict-box"
+            type="search"
+            role="combobox"
+            aria-label={LABELS.latinBox}
+            aria-controls={listId}
+            aria-expanded
+            aria-autocomplete="list"
+            aria-activedescendant={active >= 0 ? optionId(active) : undefined}
+            placeholder={LABELS.latinPlaceholder}
+            autoComplete="off"
+            spellCheck={false}
+            value={text}
+            onChange={(event) => setText(event.target.value)}
+            onKeyDown={onKeyDown}
+          />
+          <input
+            className="dict-box dict-box-enochian"
+            type="text"
+            aria-label={LABELS.enochianBox}
+            autoComplete="off"
+            spellCheck={false}
+            inputMode={coarse ? "none" : undefined}
+            ref={enochianBox}
+            value={text}
+            onChange={(event) => setText(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key !== "Escape") return;
+              // Closes the keypad, not the entry as well (see above).
+              if (keypad) event.preventDefault();
+              setKeypad(false);
+            }}
+            onFocus={() => setKeypad(true)}
+            onClick={() => setKeypad(true)}
+            onBlur={() => setKeypad(false)}
+            style={EnochianFont.style}
+          />
+        </div>
+        <div className="dict-labels">
+          <span aria-hidden>{LABELS.latinBox}</span>
+          <span className="dict-labels-end">
+            <span aria-hidden>{LABELS.enochianBox}</span>
+            <IconButton
+              className="dict-info"
+              size="small"
+              aria-label={LABELS.about}
+              aria-expanded={aboutOpen}
+              aria-controls={aboutId}
+              onClick={toggleAbout}
+            >
+              <InfoOutlinedIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          </span>
+        </div>
+        {keypad && (
+          <Keypad
+            docked={!desktop}
+            onLetter={(letter) => edit(letter)}
+            onBackspace={() => edit(null)}
+            onDone={() => enochianBox.current?.blur()}
+          />
+        )}
+      </div>
+      <section
+        className="dict-pane"
+        ref={paneRef}
+        aria-labelledby={inPane ? headingId : undefined}
+      >
+        {inPane && <div className="dict-pane-entry">{shown}</div>}
+        <div
+          id={aboutId}
+          className={[
+            "dict-about",
+            aboutOpen && "dict-about-open",
+            inPane && "dict-about-off",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          {about}
+        </div>
+      </section>
       <div
         className="dict-left"
+        ref={listRef}
         style={
           keypad && !desktop
             ? ({
@@ -487,56 +689,6 @@ export default function Dictionary({
             : undefined
         }
       >
-        <div className="dict-search">
-          <div className="dict-boxes">
-            <input
-              className="dict-box"
-              type="search"
-              role="combobox"
-              aria-label={LABELS.latinBox}
-              aria-controls={listId}
-              aria-expanded
-              aria-autocomplete="list"
-              aria-activedescendant={active >= 0 ? optionId(active) : undefined}
-              placeholder={LABELS.latinPlaceholder}
-              autoComplete="off"
-              spellCheck={false}
-              value={text}
-              onChange={(event) => setText(event.target.value)}
-              onKeyDown={onKeyDown}
-            />
-            <input
-              className="dict-box dict-box-enochian"
-              type="text"
-              aria-label={LABELS.enochianBox}
-              autoComplete="off"
-              spellCheck={false}
-              inputMode={coarse ? "none" : undefined}
-              ref={enochianBox}
-              value={text}
-              onChange={(event) => setText(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Escape") setKeypad(false);
-              }}
-              onFocus={() => setKeypad(true)}
-              onClick={() => setKeypad(true)}
-              onBlur={() => setKeypad(false)}
-              style={EnochianFont.style}
-            />
-          </div>
-          <div className="dict-labels" aria-hidden>
-            <span>{LABELS.latinBox}</span>
-            <span>{LABELS.enochianBox}</span>
-          </div>
-          {keypad && (
-            <Keypad
-              docked={!desktop}
-              onLetter={(letter) => edit(letter)}
-              onBackspace={() => edit(null)}
-              onDone={() => enochianBox.current?.blur()}
-            />
-          )}
-        </div>
         <div aria-live="polite" style={visuallyHidden}>
           {result ? LABELS.found(total) : ""}
         </div>
@@ -611,17 +763,6 @@ export default function Dictionary({
           <div className="dict-nothing">{LABELS.nothing(deferred)}</div>
         )}
       </div>
-      <section
-        className="dict-pane"
-        aria-labelledby={shown && desktop ? headingId : undefined}
-        aria-label={shown && desktop ? undefined : LABELS.choose}
-      >
-        {desktop && shown ? (
-          shown
-        ) : (
-          <div className="dict-choose">{LABELS.choose}</div>
-        )}
-      </section>
       <EntrySheet
         open={!desktop && Boolean(shown)}
         onClose={close}

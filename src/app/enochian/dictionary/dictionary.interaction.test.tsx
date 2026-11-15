@@ -354,6 +354,241 @@ describe("what the review of 10 November 2026 found (plan 074)", () => {
   });
 });
 
+/** A wide screen: every `min-width` query matches. */
+function wide() {
+  const matchMedia = window.matchMedia;
+  window.matchMedia = ((query: string) => ({
+    matches: query.includes("min-width"),
+    media: query,
+    onchange: null,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  })) as typeof window.matchMedia;
+  return () => {
+    window.matchMedia = matchMedia;
+  };
+}
+
+describe("the page's text, and the desktop's pane", () => {
+  const about = () =>
+    document.querySelector(".dict-about") as HTMLElement | null;
+
+  it("holds the text in the pane until a word opens, then again", async () => {
+    const narrow = wide();
+    try {
+      render(
+        <Dictionary uses={{}}>
+          <p>About the dictionary</p>
+        </Dictionary>,
+      );
+      expect(about()?.closest(".dict-pane")).toBeTruthy();
+      expect(about()?.className).toBe("dict-about");
+      fireEvent.click(
+        screen
+          .getAllByRole("option")
+          .find((one) => one.textContent?.startsWith("OLPRT")) as HTMLElement,
+      );
+      expect(
+        await screen.findByRole("heading", { name: "OLPRT" }),
+      ).toBeTruthy();
+      expect(about()?.className).toContain("dict-about-off");
+      fireEvent.click(screen.getByRole("button", { name: "Close" }));
+      await waitFor(() => expect(about()?.className).toBe("dict-about"));
+    } finally {
+      narrow();
+    }
+  });
+
+  it("shows the text on a phone from its info button", () => {
+    const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    render(
+      <Dictionary uses={{}}>
+        <p>About the dictionary</p>
+      </Dictionary>,
+    );
+    const info = screen.getByRole("button", { name: "About the dictionary" });
+    expect(info.getAttribute("aria-expanded")).toBe("false");
+    expect(info.getAttribute("aria-controls")).toBe(about()?.id);
+    fireEvent.click(info);
+    expect(info.getAttribute("aria-expanded")).toBe("true");
+    expect(about()?.className).toContain("dict-about-open");
+    expect(scrollTo).toHaveBeenCalledWith({ top: 0 });
+    fireEvent.click(info);
+    expect(about()?.className).toBe("dict-about");
+    scrollTo.mockRestore();
+  });
+
+  it("closes the desktop's entry on Escape, before the search clears", async () => {
+    const narrow = wide();
+    try {
+      window.history.replaceState(null, "", `${PATH}?q=light&w=OLPRT`);
+      render(<Dictionary uses={{}} />);
+      expect(
+        await screen.findByRole("heading", { name: "OLPRT" }),
+      ).toBeTruthy();
+      const escape = fireEvent.keyDown(latinBox(), { key: "Escape" });
+      // Default prevented, so the search box keeps its query.
+      expect(escape).toBe(false);
+      await waitFor(() =>
+        expect(screen.queryByRole("heading", { name: "OLPRT" })).toBeNull(),
+      );
+      expect(new URL(window.location.href).searchParams.get("q")).toBe("light");
+    } finally {
+      narrow();
+    }
+  });
+
+  it("closes the keypad on Escape, not the entry with it", async () => {
+    const narrow = wide();
+    try {
+      window.history.replaceState(null, "", `${PATH}?w=OLPRT`);
+      render(<Dictionary uses={{}} />);
+      expect(
+        await screen.findByRole("heading", { name: "OLPRT" }),
+      ).toBeTruthy();
+      const box = screen.getByLabelText("Enochian, right to left");
+      act(() => (box as HTMLInputElement).focus());
+      expect(
+        screen.getByRole("group", { name: "Enochian letters" }),
+      ).toBeTruthy();
+      fireEvent.keyDown(box, { key: "Escape" });
+      expect(
+        screen.queryByRole("group", { name: "Enochian letters" }),
+      ).toBeNull();
+      expect(screen.getByRole("heading", { name: "OLPRT" })).toBeTruthy();
+    } finally {
+      narrow();
+    }
+  });
+
+  it("leaves Escape alone on a phone, where the sheet has its own", async () => {
+    window.history.replaceState(null, "", `${PATH}?q=light&w=OLPRT`);
+    render(<Dictionary uses={{}} />);
+    expect(await screen.findByRole("dialog")).toBeTruthy();
+    expect(fireEvent.keyDown(document.body, { key: "Escape" })).toBe(true);
+  });
+
+  it("ignores Escape from outside the dictionary, and while composing", async () => {
+    const narrow = wide();
+    try {
+      window.history.replaceState(null, "", `${PATH}?w=OLPRT`);
+      render(<Dictionary uses={{}} />);
+      expect(
+        await screen.findByRole("heading", { name: "OLPRT" }),
+      ).toBeTruthy();
+      const menu = document.createElement("button");
+      document.body.append(menu);
+      expect(fireEvent.keyDown(menu, { key: "Escape" })).toBe(true);
+      expect(
+        fireEvent.keyDown(latinBox(), { key: "Escape", isComposing: true }),
+      ).toBe(true);
+      expect(screen.getByRole("heading", { name: "OLPRT" })).toBeTruthy();
+      menu.remove();
+    } finally {
+      narrow();
+    }
+  });
+
+  describe("the desktop's list, scrolled on its own", () => {
+    /**
+     * Each value the list's scrollTop is set to. jsdom lays nothing out,
+     * so the chosen row is put 500px down the list and the rest at 0:
+     * a reveal sets 500.
+     */
+    function listScrolls() {
+      const sets: number[] = [];
+      const set = vi
+        .spyOn(Element.prototype, "scrollTop", "set")
+        .mockImplementation(function (this: Element, value: number) {
+          if (this.classList.contains("dict-left")) sets.push(value);
+        });
+      const box = vi
+        .spyOn(Element.prototype, "getBoundingClientRect")
+        .mockImplementation(function (this: Element) {
+          const top = this.getAttribute("aria-selected") === "true" ? 500 : 0;
+          return DOMRect.fromRect({ y: top, height: 0 });
+        });
+      return {
+        sets,
+        restore: () => {
+          set.mockRestore();
+          box.mockRestore();
+        },
+      };
+    }
+
+    it("reveals a shared link's word, once its results are in", async () => {
+      const narrow = wide();
+      const { sets, restore } = listScrolls();
+      try {
+        window.history.replaceState(null, "", `${PATH}?q=light&w=OLPRT`);
+        render(<Dictionary uses={{}} />);
+        expect(
+          await screen.findByRole("heading", { name: "OLPRT" }),
+        ).toBeTruthy();
+        await waitFor(() => expect(sets).toContain(500));
+        // Once: the list is left alone after.
+        expect(sets.filter((one) => one === 500)).toHaveLength(1);
+      } finally {
+        restore();
+        narrow();
+      }
+    });
+
+    it("leaves the list where it is when a word is opened from it", async () => {
+      const narrow = wide();
+      const { sets, restore } = listScrolls();
+      try {
+        render(<Dictionary uses={{}} />);
+        fireEvent.click(
+          screen
+            .getAllByRole("option")
+            .find((one) => one.textContent?.startsWith("OLPRT")) as HTMLElement,
+        );
+        expect(
+          await screen.findByRole("heading", { name: "OLPRT" }),
+        ).toBeTruthy();
+        expect(sets).not.toContain(500);
+      } finally {
+        restore();
+        narrow();
+      }
+    });
+
+    it("goes back to its top for a new search", async () => {
+      const { sets, restore } = listScrolls();
+      try {
+        render(<Dictionary uses={{}} />);
+        sets.length = 0;
+        type("light");
+        await waitFor(() => expect(sets).toEqual([0]));
+      } finally {
+        restore();
+      }
+    });
+  });
+
+  it("gives a pronunciation's source in full on hovering", async () => {
+    window.history.replaceState(null, "", `${PATH}?w=OLPRT`);
+    render(<Dictionary uses={{}} />);
+    const said = (await screen.findByText(/^Said /)) as HTMLElement;
+    expect(said.querySelector("abbr")?.title).toContain("Schueler");
+  });
+
+  it("names a source in full on hovering its short form", () => {
+    render(<Dictionary uses={{}} />);
+    const olprt = screen
+      .getAllByRole("option")
+      .find((one) => one.querySelector(".dict-word")?.textContent === "OLPRT");
+    const abbr = olprt?.querySelector("abbr");
+    expect(abbr?.textContent).toBe("EMPM");
+    expect(abbr?.title).toContain("Enochian Magic: A Practical Manual");
+  });
+});
+
 describe("the gematria, named as Schueler's", () => {
   it("names the gematria as Schueler's and says what it is", async () => {
     window.history.replaceState(null, "", `${PATH}?w=AAI`);

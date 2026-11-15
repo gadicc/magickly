@@ -8,6 +8,7 @@ import * as React from "react";
 import EnochianFont from "@/fonts/enochian";
 import { GEMATRIA_NOTE, GEMATRIA_SOURCE } from "../gematria";
 import { LABELS } from "./labels";
+import SourceName from "./SourceName";
 import { wordLink } from "./urlState";
 
 /** An entry's layout, shared with the translator's Key rows. */
@@ -46,6 +47,7 @@ export const ENTRY_STYLES = {
   "& ol": { margin: 0, paddingLeft: "22px" },
   "& li": { margin: "3px 0" },
   "& .entry-source": { color: "text.secondary", fontSize: 12 },
+  "& abbr[title]": { textDecoration: "none", cursor: "help" },
   "& .entry-note": { color: "text.secondary", fontSize: 13 },
   "& .entry-actions": { display: "flex", gap: 1, mt: 2, alignItems: "center" },
   "& .entry-uses": { listStyle: "none", margin: 0, padding: 0 },
@@ -56,19 +58,40 @@ export const ENTRY_STYLES = {
 } as const;
 
 /** "ah (EMPM)" for each of a word's pronunciations. */
-function said(entry: EnochianEntry) {
-  return entry.pronounciations
-    .map((one) =>
-      [one.pronounciation, one.source && `(${one.source})`]
-        .filter(Boolean)
-        .join(" "),
-    )
-    .join("; ");
+function Said({ entry }: { entry: EnochianEntry }) {
+  return entry.pronounciations.map((one, i) => (
+    // biome-ignore lint/suspicious/noArrayIndexKey: the entry's own order
+    <React.Fragment key={i}>
+      {i ? "; " : ""}
+      {one.pronounciation}
+      {one.source && (
+        <>
+          {LABELS.saidSourceOpen}
+          <SourceName name={one.source} />
+          {LABELS.saidSourceClose}
+        </>
+      )}
+    </React.Fragment>
+  ));
 }
 
 /** "WE, Holy Table of Practice perimeter": a meaning's sources. */
-const sources = (meaning: EnochianEntry["meanings"][number]) =>
-  [meaning.source, meaning.source2].filter(Boolean).join(", ");
+function Sources({ meaning }: { meaning: EnochianEntry["meanings"][number] }) {
+  const names = [...new Set([meaning.source, meaning.source2])].filter(
+    (name): name is string => Boolean(name),
+  );
+  if (!names.length) return null;
+  return (
+    <span className="entry-source">
+      {names.map((name, i) => (
+        <React.Fragment key={name}>
+          {i ? ", " : " "}
+          <SourceName name={name} />
+        </React.Fragment>
+      ))}
+    </span>
+  );
+}
 
 /**
  * One word's entry, in the desktop pane or the phone's sheet (plan 074,
@@ -101,7 +124,6 @@ export default function Entry({
       // bar holds the same link.
     }
   };
-  const pronunciation = said(entry);
   return (
     <Box sx={ENTRY_STYLES}>
       <div className="entry-head">
@@ -110,9 +132,9 @@ export default function Entry({
           {word}
         </span>
       </div>
-      {pronunciation && (
+      {entry.pronounciations.length > 0 && (
         <div className="entry-said">
-          {LABELS.said} {pronunciation}
+          {LABELS.said} <Said entry={entry} />
         </div>
       )}
       <h3>{LABELS.meanings}</h3>
@@ -121,9 +143,7 @@ export default function Entry({
           // biome-ignore lint/suspicious/noArrayIndexKey: the entry's own order
           <li key={i}>
             {meaning.meaning}
-            {sources(meaning) && (
-              <span className="entry-source">{` ${sources(meaning)}`}</span>
-            )}
+            <Sources meaning={meaning} />
             {meaning.note && <div className="entry-note">{meaning.note}</div>}
           </li>
         ))}
@@ -133,7 +153,10 @@ export default function Entry({
           <h3>{LABELS.gematria}</h3>
           <div>
             {entry.gematria.join(", ")}
-            <span className="entry-source">{` ${GEMATRIA_SOURCE}`}</span>
+            <span className="entry-source">
+              {" "}
+              <SourceName name={GEMATRIA_SOURCE} />
+            </span>
             <div className="entry-note">{GEMATRIA_NOTE}</div>
           </div>
         </>

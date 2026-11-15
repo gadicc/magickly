@@ -525,3 +525,54 @@ can't show it), dark mode (none).
 - **Copyright.** The dictionary's text is already in the repository, and
   this plan adds none of it. The Keys' English is Casaubon (1659) or
   Crowley (1912), both public domain. Agents print no long passages.
+
+## The layout pass — 15 November 2026
+
+Gadi asked for the list to scroll on its own and for the page's text to
+fill the empty pane; a UX pass on the page added the rest.
+
+- **Desktop fills the window below the app bar.** The list and the pane
+  are their own scroll boxes. The list's end doesn't carry on into the
+  window, the pane's does, to the footer. A new search puts the list
+  back at its top, and a shared word's row is centred in it once, by
+  moving the list alone (`scrollIntoView` moved the window too and hid
+  the search boxes under the bar). A word opened from the list is never
+  re-centred. A shared word past a capped group's first 30 rows isn't
+  drawn, so it isn't revealed.
+- **The page's text** is in the HTML once, inside the pane, and CSS
+  places it, since the screen is known only after hydration: in the pane
+  on desktop until a word opens, and again when it closes; on a phone
+  behind an info button beside the box labels, as a disclosure above the
+  list. A bottom sheet like the entry's would need a portal, which the
+  server's HTML doesn't hold. The page passes the text as a child, not a
+  prop, because site search (plan 070) reads children and skips
+  attributes; its extracted prose for the page is unchanged.
+- **The phone's sticky boxes follow the app bar**, under it while it
+  shows and at the top while it hides. The bar's HideOnScroll marks
+  `<html data-app-bar-hidden>` and CSS does the rest, so the page needs
+  no scroll trigger of its own (a second one could disagree with the
+  bar's at first, and re-rendered 1,911 rows at every flip).
+- **The spacer under the app bar** was 56px while the bar is 64px from
+  600px wide, so every page lost 8px under it. `SiteChrome` now sets
+  `--app-bar` from the toolbar's own sizes and the spacer uses it; the
+  revision editor's 8px padding that made up for it is gone, its layout
+  unchanged.
+- **Smaller things:** the desktop entry is at most 760px wide, so the
+  word, its script and the close button stay together, and the page's
+  text lines up with it; EMPM and WE give their full names on hover, in
+  the rows, the meanings, the gematria and the pronunciation; Escape
+  closes the desktop entry, before the search box's own Escape clears
+  the query, but not while it is closing the keypad, during IME
+  composition, or from a menu or dialog outside the dictionary.
+- **Tried and dropped:** `content-visibility: auto` on the rows. Rows
+  never drawn take their estimated height, and any error over 1,900 rows
+  (79 against 62 px at first) moved a shared word's row far out of view.
+- **Checked:** the component and server-render tests (a shared word
+  revealed once, a clicked word left in place, the list's reset, Escape's
+  cases, the text once in the pane), site search's extracted prose
+  unchanged on every page, and headless Chromium at 1400, 1920 and
+  390 px. The revision editor's help screenshots recapture byte for
+  byte. A fresh-context review (Opus, high) found the clicked-word
+  re-centring, the phone text's border colour, the pronunciation's
+  missing full name and the second scroll trigger; all fixed. Not
+  checked on Safari (no device).

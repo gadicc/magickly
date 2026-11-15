@@ -30,8 +30,11 @@ export default function DictionaryPage() {
   return (
     <>
       <PageBreadcrumbs path="/enochian/dictionary" />
-      <Dictionary uses={uses} />
-      <DictionaryText />
+      {/* As a child, not a prop: site search reads children's text and
+          skips attributes' (plan 070). */}
+      <Dictionary uses={uses}>
+        <DictionaryText />
+      </Dictionary>
     </>
   );
 }
