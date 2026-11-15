@@ -17,7 +17,8 @@ import type {
  * The strict hall node types (plan 084, stage 1): one per tag, with the
  * nesting `spec.ts` allows, the values the vocabulary knows and the
  * values a tag needs to draw what it names. Write a hall with them, as the
- * presets are, and TypeScript checks it as the validator would.
+ * presets are, and TypeScript checks much of what the validator checks;
+ * ranges, letter names and the length of text are left to the validator.
  *
  * Every one is a type alias, never an interface: an interface has no
  * implicit index signature, so it would not be assignable to `HallNode`,
@@ -157,6 +158,12 @@ export type FloorAttributes = Record<never, never>;
 export type CaptionAttributes = { text: string };
 
 /**
+ * A leaf's children: none. `[]` means the same as no `children`, as in a
+ * `HallNode`, and the validator takes it without a word.
+ */
+type NoChildren = { children?: readonly [] };
+
+/**
  * A door in the outer wall, drawn at its centre along the wall (0–16, the
  * floor's squares) and `width` wide (2 unless given): along the East or
  * West wall (the West unless `side` says otherwise) by `x`, along the
@@ -166,12 +173,23 @@ export type DoorAttributes =
   | { side?: "east" | "west"; x: number; width?: number }
   | { side: "north" | "south"; y: number; width?: number };
 
+/**
+ * The officers who wear a lamen of their own in some grade (`LamenGrade`):
+ * the Portal's Hiereus and Hegemon. Only they take a `grade`; on anyone
+ * else the validator warns that it is ignored.
+ */
+export type GradeLamenRole = "hiereus" | "hegemon";
+
 /** An officer, drawn as the role's lamen and labelled with its name. */
-export type OfficerAttributes = HallPlaced & {
-  role: HallRole;
-  /** A grade in which the officer wears another lamen (the Portal's Hiereus and Hegemon). */
-  grade?: LamenGrade;
-};
+export type OfficerAttributes = HallPlaced &
+  (
+    | {
+        role: GradeLamenRole;
+        /** A grade in which the officer wears another lamen. */
+        grade?: LamenGrade;
+      }
+    | { role: Exclude<HallRole, GradeLamenRole> }
+  );
 
 /** A lamen on its own, unlabelled unless `label` says. */
 export type LamenAttributes = OfficerAttributes;
@@ -345,7 +363,7 @@ export type LabelAttributes = {
 // The nodes: `{type} & attributes & {children}`, nested as `spec.ts` allows.
 
 /** A label node. */
-export type LabelNode = { type: "label" } & LabelAttributes;
+export type LabelNode = { type: "label" } & LabelAttributes & NoChildren;
 
 /** A placeable's children: the lines of its label. */
 type LabelChildren = { children?: readonly LabelNode[] };
@@ -411,11 +429,11 @@ export type HallHostNode = AltarNode | PlatformNode | ThroneNode | BoardNode;
 export type DaisNode = { type: "dais" } & DaisAttributes & ContentChildren;
 export type BannersNode = { type: "banners" } & BannersAttributes &
   ContentChildren;
-export type DoorNode = { type: "door" } & DoorAttributes;
+export type DoorNode = { type: "door" } & DoorAttributes & NoChildren;
 export type FloorNode = { type: "floor" } & FloorAttributes & {
     children?: readonly (HallContentNode | DoorNode)[];
   };
-export type CaptionNode = { type: "caption" } & CaptionAttributes;
+export type CaptionNode = { type: "caption" } & CaptionAttributes & NoChildren;
 
 /** What the `gdHall` root holds. */
 export type GdHallChildNode =
