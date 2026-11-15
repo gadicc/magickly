@@ -97,7 +97,6 @@ const POINTS = {
   southWest: true,
 } as const;
 const POSITIONS = { top: true, bottom: true, left: true, right: true } as const;
-const SPREADS = { even: true, ends: true } as const;
 const COLORS = {
   none: true,
   white: true,
@@ -128,12 +127,16 @@ const PLACED_VALUES = {
 /**
  * What the types say each enumerated attribute takes; compared with the
  * specs' values below, without their other spellings (`centre`, `grey`).
+ * `satisfies` checks only the object literals written here for excess
+ * keys, not the shared sets above, so a hand-written union such as a
+ * row's `spread` has its values written inline; the shared sets' types
+ * come from the vocabulary or are held to it by a test below.
  */
 const VALUES = {
   gdHall: { wall: { plain: true, gradient: true } },
-  dais: { spread: SPREADS },
+  dais: { spread: { even: true, ends: true } },
   banners: {
-    spread: SPREADS,
+    spread: { even: true, ends: true },
     side: { east: true, north: true, south: true, west: true },
   },
   door: { side: { east: true, north: true, south: true, west: true } },
