@@ -363,7 +363,8 @@ export const Neophyte = () => (
   client boundary. Where `process.env.NODE_ENV` cannot be read at all, as
   on a page loaded without a bundler, they stay silent. From a Server
   Component the warnings appear in the server's terminal, not the
-  browser's console.
+  browser's console, and since each is given once per process, a
+  long-running development server repeats none until it restarts.
 - **Keys are optional.** React does not ask for keys on tags in an
   array, since it never renders them; Biome's `useJsxKeyInIterable`
   still does.
@@ -539,9 +540,12 @@ takes `(GdHallProps & { children?: never }) | GdHallTagsProps`, where
 still compiles. One that hands `GdHall` children of its own, which
 0.2.0 ignored, no longer does: children now mean tags, so leave them
 out of what reaches `GdHall`.
-`ComponentProps<typeof GdHall>` is now that union, and `Omit` over a
-union flattens it: to leave a prop out, write `Omit<GdHallProps, …>`
-for the `hall` form or `Omit<GdHallTagsProps, …>` for tags. In
+`ComponentProps<typeof GdHall>` is now that union, in which `hall` may
+be missing: code that types its props so and destructures `hall`, reads
+it as a `HallNode`, or leaves a prop out with `Omit` (which flattens a
+union) no longer compiles. Name the form instead: `GdHallProps`, or
+`Omit<GdHallProps, …>`, for the `hall` form, and `GdHallTagsProps` for
+tags. In
 development, `GdHall` and the tags warn on the console as above, the
 package's first reading of `NODE_ENV`; in production they stay
 silent. That includes `<GdHall hall={hall} />` while `hall` is still

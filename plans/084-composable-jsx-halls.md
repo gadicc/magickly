@@ -151,7 +151,9 @@ Two further checks by the orchestrating session the same day:
   *last* overload, so whichever form comes last is what wrappers see.
 - **Keeping the name `GdHallProps` for the data form** and typing the
   parameter as `GdHallProps | GdHallTagsProps` keeps all three patterns
-  and `ComponentProps<typeof GdHall>` compiling, with the single short
+  compiling, and `ComponentProps<typeof GdHall>` for spreading and
+  assigning (not for destructuring `hall`, which the union lets be
+  missing; the final review of 0.3.0), with the single short
   errors of S3 (`'wall' does not exist on type … GdHallProps`;
   `'widht' … Did you mean 'width'?`). Docgen still flattens it, so the
   explorer's manifest must be told which form to describe.
@@ -551,6 +553,34 @@ entry is documented as a namespace.
 The 0.3.0 bump commit corrects "Versions": a wrapper that hands
 `GdHall` children of its own, which 0.2.0 ignored, no longer compiles.
 
+### Final review before 0.3.0 (15 November 2026)
+
+Fable 5.2 (high effort) on the exact tree of the bump, `26b64870`,
+found nothing that blocked the release. It compiled a 36-pattern
+0.2.0-style consumer against npm's 0.2.0 and the packed 0.3.0 under
+TypeScript 6.0.3 and 5.9.3, `nodenext` and `bundler`, `skipLibCheck`
+off; ran the walk from the tarball in plain Node, with two copies of the
+package in one tree; built webpack and Turbopack fixtures with an erased
+tags page, a client reference and a `"use client"` tags page, and ran
+Turbopack dev and the browser; measured tree shaking (`Pillar` alone 870
+bytes; `GdHallSvg` with the art 87,302 and no walk); and ran the publish
+decision read-only ("magick-components@0.3.0 is new (latest is 0.2.0);
+publish under latest"; 179 files).
+
+Taken before the release, in the README only: of its five consumer
+patterns that broke, "Versions" named two; the other three type their
+props as `ComponentProps<typeof GdHall>` and destructure `hall` or read
+it as a `HallNode`, which the union lets be missing. "Versions" now says
+so and names `GdHallProps` and `GdHallTagsProps` instead, and the
+warnings' paragraph says that a long-running development server gives
+each once. Left for 0.3.1 (follow-ups): `hallFromTags(<GdHall
+hall={null}/>)` returns `null` against its type, a `GdHall` reached
+through a `"use client"` re-export is refused with a misleading message,
+`hall` with root attributes from JavaScript is ignored without a
+warning, and a comment in `walk.ts` still speaks of a dropped child's
+own path. The halls' Provenance row now names `gd/hall/tags` under its
+14 November sign-off; whether to sign it again is Gadi's.
+
 ## Verification
 
 Every commit: the CI-equivalent gate on its exact tree (install, Loom
@@ -571,6 +601,12 @@ exact tree. After each publish, npm's `dist.integrity` against the
 
 ## Follow-ups
 
+- A 0.3.1 patch for the final review's leftovers: a `null` `hall` read
+  as absent by `hallFromTags`; a client reference to `GdHall` given its
+  own message; a development warning for `hall` with root attributes;
+  `walk.ts`' comment on dropped children's paths.
+- Gadi: confirm, or sign again, the README's Provenance row for the
+  halls, which names `gd/hall/tags` under the 14 November date.
 - `describe.ts:137-140` names `gong`, `brazier` and `candle` as node
   types, a dead branch since they are item kinds; delete it when the file
   is next touched.
@@ -605,7 +641,8 @@ On `gate/jsx-halls`, each gated on its own tree (every step exit 0).
 | `76c1adc8` | Review: dropped children's paths, `NODE_ENV`, `Object.hasOwn`, refused names |
 | `2c69df6f` | Review: the smoke test's tags hall must draw |
 | `c7aebb20` | Review: `GdHall`'s JSDoc names tags; search vectors |
-| this commit | magick-components 0.3.0; this plan's stage 2 record |
+| `26b64870` | magick-components 0.3.0; this plan's stage 2 record |
+| this commit | README: `ComponentProps<typeof GdHall>`; the final review's record |
 
 `694ac018` passed its gate on the coverage rerun (the known
 `sqlLegacyImport` timeout); `c7aebb20`'s first gate timed out in
