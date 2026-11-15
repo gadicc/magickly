@@ -1,6 +1,7 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 import { hasGradeLamen, LAMEN_GRADES } from "../lamenGrades.ts";
 import { DEFAULT_HALL_ART } from "./art/index.ts";
+import type * as Entry from "./index.ts";
 import type {
   AltarNode,
   BannerNode,
@@ -42,6 +43,7 @@ import {
   HALL_COLORS,
   HALL_ROLES,
   HALL_TAGS,
+  hallSpellingAlias,
 } from "./vocabulary.ts";
 
 /*
@@ -63,6 +65,133 @@ type Tag = HallStrictNode["type"];
 type AttributeNames = {
   [T in Tag]: Record<AttributeName<Extract<HallStrictNode, { type: T }>>, true>;
 };
+
+/** An attribute's values in a tag's node type, across a union's members. */
+type AttributeValue<T extends Tag, A extends PropertyKey> =
+  Extract<HallStrictNode, { type: T }> extends infer Node
+    ? Node extends unknown
+      ? A extends keyof Node
+        ? NonNullable<Node[A]>
+        : never
+      : never
+    : never;
+/** For each tag, the values the types allow each attribute that has some. */
+type AttributeValues = {
+  [T in Tag]?: {
+    [A in AttributeName<Extract<HallStrictNode, { type: T }>>]?: Record<
+      AttributeValue<T, A> & string,
+      true
+    >;
+  };
+};
+
+const POINTS = {
+  center: true,
+  north: true,
+  south: true,
+  east: true,
+  west: true,
+  northEast: true,
+  northWest: true,
+  southEast: true,
+  southWest: true,
+} as const;
+const POSITIONS = { top: true, bottom: true, left: true, right: true } as const;
+const SPREADS = { even: true, ends: true } as const;
+const COLORS = {
+  none: true,
+  white: true,
+  black: true,
+  red: true,
+  blue: true,
+  yellow: true,
+  gold: true,
+  green: true,
+  gray: true,
+} as const;
+const PLANETS = {
+  saturn: true,
+  jupiter: true,
+  mars: true,
+  sun: true,
+  venus: true,
+  mercury: true,
+  moon: true,
+} as const;
+const GRADES = { portal: true } as const;
+const PLACED_VALUES = {
+  at: POINTS,
+  anchor: POINTS,
+  labelPos: POSITIONS,
+} as const;
+
+/**
+ * What the types say each enumerated attribute takes; compared with the
+ * specs' values below, without their other spellings (`centre`, `grey`).
+ */
+const VALUES = {
+  gdHall: { wall: { plain: true, gradient: true } },
+  dais: { spread: SPREADS },
+  banners: {
+    spread: SPREADS,
+    side: { east: true, north: true, south: true, west: true },
+  },
+  door: { side: { east: true, north: true, south: true, west: true } },
+  officer: { ...PLACED_VALUES, grade: GRADES },
+  lamen: { ...PLACED_VALUES, grade: GRADES },
+  marker: { ...PLACED_VALUES, shape: { box: true, circle: true } },
+  altar: { ...PLACED_VALUES, kind: { black: true, white: true } },
+  platform: PLACED_VALUES,
+  throne: PLACED_VALUES,
+  board: {
+    ...PLACED_VALUES,
+    kind: {
+      flamingSword: true,
+      minutumMundum: true,
+      gardenOfEden: true,
+      theFall: true,
+    },
+  },
+  pillar: { ...PLACED_VALUES, kind: { black: true, white: true } },
+  banner: { ...PLACED_VALUES, kind: { east: true, west: true } },
+  veil: PLACED_VALUES,
+  shewbread: PLACED_VALUES,
+  candlestick: PLACED_VALUES,
+  hebrewLetter: PLACED_VALUES,
+  item: {
+    ...PLACED_VALUES,
+    form: {
+      latin: true,
+      calvary: true,
+      greek: true,
+      greekFiveSquares: true,
+      fourTriangles: true,
+    },
+    dir: { up: true, down: true },
+    fill: COLORS,
+    stroke: COLORS,
+    light: { red: true, yellow: true, white: true },
+  },
+  tarotKey: PLACED_VALUES,
+  card: {
+    ...PLACED_VALUES,
+    kind: { pan: true, devil: true, death: true, typhon: true },
+  },
+  tablet: {
+    ...PLACED_VALUES,
+    element: { earth: true, air: true, water: true, fire: true, union: true },
+    version: {
+      gd: true,
+      regardie: true,
+      equinox: true,
+      dee: true,
+      raphael: true,
+    },
+  },
+  kamea: { ...PLACED_VALUES, planet: PLANETS },
+  seal: { ...PLACED_VALUES, planet: PLANETS },
+  label: { at: POINTS, anchor: POINTS, pos: POSITIONS },
+} satisfies AttributeValues;
 
 const PLACED = {
   x: true,
@@ -276,6 +405,14 @@ describe("the strict node types", () => {
     expect(validateHall(lenient, { art: DEFAULT_HALL_ART })).toEqual([]);
   });
 
+  it("narrow a door by its side", () => {
+    const along = (door: DoorNode) =>
+      door.side === "north" || door.side === "south" ? door.y : door.x;
+    expect(along({ type: "door", side: "north", y: 3 })).toBe(3);
+    expect(along({ type: "door", side: "south", y: 4 })).toBe(4);
+    expect(along({ type: "door", x: 5 })).toBe(5);
+  });
+
   it("take any role without a grade", () => {
     const officer = (role: HallRole): OfficerNode => ({
       type: "officer",
@@ -469,16 +606,50 @@ describe("the strict unions", () => {
     );
   });
 
+  /** A tag's specs: for an item, every kind's. */
+  const specsOf = (tag: string) =>
+    (tag === "item"
+      ? artItemKinds.map((kind): HallNode => ({ type: "item", kind }))
+      : [{ type: tag }]
+    ).flatMap((node) => [
+      ...(hallTagSpec(tag, DEFAULT_HALL_ART, node)?.attributes ?? []),
+    ]);
+
   it("hold each tag's attributes to its spec and its art's", () => {
-    for (const [tag, names] of Object.entries(ATTRIBUTES)) {
-      const nodes: HallNode[] =
-        tag === "item"
-          ? artItemKinds.map((kind) => ({ type: "item", kind }))
-          : [{ type: tag }];
-      const spec = nodes.flatMap((node) => [
-        ...(hallTagSpec(tag, DEFAULT_HALL_ART, node)?.attributes.keys() ?? []),
-      ]);
-      expect(sorted(Object.keys(names)), tag).toEqual(sorted(spec));
+    for (const tag of Object.keys(ATTRIBUTES)) {
+      const names = Object.keys(ATTRIBUTES[tag as Tag]);
+      const spec = specsOf(tag).map(([name]) => name);
+      expect(sorted(names), tag).toEqual(sorted(spec));
     }
+  });
+
+  it("hold each attribute's values to its spec's, the old spellings aside", () => {
+    for (const tag of Object.keys(ATTRIBUTES)) {
+      const typed: Record<string, Record<string, true>> = VALUES[
+        tag as keyof typeof VALUES
+      ] ?? {};
+      const specs = new Map<string, string[]>();
+      for (const [name, spec] of specsOf(tag))
+        if (spec.kind === "enum")
+          specs.set(name, [
+            ...(specs.get(name) ?? []),
+            ...spec.values.filter((value) => !hallSpellingAlias(value)),
+          ]);
+      expect(sorted(Object.keys(typed)), tag).toEqual(sorted(specs.keys()));
+      for (const [name, values] of specs)
+        expect(sorted(Object.keys(typed[name])), `${tag}.${name}`).toEqual(
+          sorted(values),
+        );
+    }
+  });
+});
+
+describe("the gd/hall entry", () => {
+  it("exports the vocabulary's types the strict types use", () => {
+    expectTypeOf<Entry.LamenGrade>().toEqualTypeOf<"portal">();
+    expectTypeOf<Entry.TabletVersionId>().toEqualTypeOf<
+      "gd" | "regardie" | "equinox" | "dee" | "raphael"
+    >();
+    expectTypeOf<Entry.DoorNode>().toEqualTypeOf<DoorNode>();
   });
 });

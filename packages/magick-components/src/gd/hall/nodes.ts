@@ -1,3 +1,7 @@
+// The strict hall node types (plan 084, stage 1): one per tag, nested as
+// spec.ts allows. nodes.test.ts holds the hand-written unions and each
+// tag's attribute names and values to the vocabulary and the default art.
+
 import type { TabletVersionId } from "magick-data/enochian/tablets";
 import type { LamenGrade } from "../lamenGrades.ts";
 import type { TABLET_ELEMENTS } from "./art/symbols.tsx";
@@ -14,11 +18,12 @@ import type {
 } from "./vocabulary.ts";
 
 /**
- * The strict hall node types (plan 084, stage 1): one per tag, with the
- * nesting `spec.ts` allows, the values the vocabulary knows and the
- * values a tag needs to draw what it names. Write a hall with them, as the
- * presets are, and TypeScript checks much of what the validator checks;
- * ranges, letter names and the length of text are left to the validator.
+ * The strict hall node types: one per tag, with the nesting a hall
+ * allows, the values the vocabulary knows and the values a tag needs to
+ * draw what it names. Write a hall with them, as the presets are, and
+ * TypeScript checks much of what the validator checks; ranges, finite
+ * and whole numbers, letter names, the length of text and the hall's
+ * bounds are left to the validator.
  *
  * Every one is a type alias, never an interface: an interface has no
  * implicit index signature, so it would not be assignable to `HallNode`,
@@ -40,13 +45,14 @@ export type {
   HallPlanet,
   HallPoint,
   LabelPosition,
+  LamenGrade,
   LightColor,
+  TabletVersionId,
 };
 
 /**
- * An officer's role: a key of the vocabulary's `HALL_ROLES` (a test holds
- * the two together). A `HallNode` may name any other role, which draws a
- * plain lamen.
+ * An officer's role: a key of the vocabulary's `HALL_ROLES`. A `HallNode`
+ * may name any other role, which draws a plain lamen.
  */
 export type HallRole =
   | "imperator"
@@ -66,7 +72,7 @@ export type HallRole =
 
 /**
  * A colour an item's `fill` or `stroke` takes: a key of the vocabulary's
- * `HALL_COLORS` (a test holds the two together), never raw CSS.
+ * `HALL_COLORS`, never raw CSS.
  */
 export type HallColor =
   | "none"
@@ -109,7 +115,10 @@ export type HallPlaced = {
    * `w` × `h` instead); 0.05–10. Each kind has its own default.
    */
   scale?: number;
-  /** Replaces the default label (an officer's role name); `""` hides it. */
+  /**
+   * The object's label, in place of an officer's role name; `""` hides it.
+   * Label children are drawn as well.
+   */
   label?: string;
   /** Where the label stands: `top` on the dais, `bottom` elsewhere. */
   labelPos?: LabelPosition;
@@ -171,7 +180,8 @@ type NoChildren = { children?: readonly [] };
  */
 export type DoorAttributes =
   | { side?: "east" | "west"; x: number; width?: number }
-  | { side: "north" | "south"; y: number; width?: number };
+  | { side: "north"; y: number; width?: number }
+  | { side: "south"; y: number; width?: number };
 
 /**
  * The officers who wear a lamen of their own in some grade (`LamenGrade`):
@@ -339,7 +349,9 @@ type HallPlanetAttributes = HallPlaced & { planet: HallPlanet };
 
 /**
  * A label: free text in the floor or a row, or, as a child of a
- * placeable or a host, one more line of its label, which `pos` places.
+ * placeable or a host, a label of the object's own, set at `pos` after
+ * the object's `label` (labels on one side stack outwards). On an officer
+ * without `label`, its label children stand in place of the role's name.
  */
 export type LabelAttributes = {
   text: string;
@@ -360,12 +372,12 @@ export type LabelAttributes = {
 };
 
 // ---------------------------------------------------------------------------
-// The nodes: `{type} & attributes & {children}`, nested as `spec.ts` allows.
+// The nodes: `{type} & attributes & {children}`, nested as spec.ts allows.
 
 /** A label node. */
 export type LabelNode = { type: "label" } & LabelAttributes & NoChildren;
 
-/** A placeable's children: the lines of its label. */
+/** A placeable's children: labels of its own. */
 type LabelChildren = { children?: readonly LabelNode[] };
 
 export type OfficerNode = { type: "officer" } & OfficerAttributes &

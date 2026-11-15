@@ -220,9 +220,11 @@ a hall in code, type it with the strict node types, one per tag
 TypeScript then checks much of what the validator checks: which tag may
 stand where, the values each attribute takes, and the values a tag needs
 (an officer's `role`, an item's `kind`, a caption's `text`, a door's
-place along its wall). Ranges, letter names and the length of text are
-left to the validator. They are type aliases, so any strict node is a
-`HallNode`:
+place along its wall). It leaves the rest to the validator: ranges,
+numbers that are not finite (`NaN`, `Infinity`), whole numbers where
+one is needed (a tarot key's `n`), letter names (an empty `letter`
+included), the length of text, and the hall's bounds (24 deep, 4000
+nodes). They are type aliases, so any strict node is a `HallNode`:
 
 ```tsx
 import { GdHall, type GdHallNode } from "magick-components/gd/hall";
