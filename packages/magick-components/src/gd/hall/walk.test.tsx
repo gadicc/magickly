@@ -48,7 +48,7 @@ const pillars = () => (
 const report = (element: Parameters<typeof hallFromTags>[0]) =>
   hallFromTags(element).diagnostics.map((diagnostic) => {
     expect(diagnostic.severity).toBe("error");
-    return `${diagnostic.path.join(".")}: ${diagnostic.message}`;
+    return `[${diagnostic.path}] #${diagnostic.child}: ${diagnostic.message}`;
   });
 
 describe("hallTagOf", () => {
@@ -121,7 +121,7 @@ describe("the walk", () => {
     } satisfies HallNode);
   });
 
-  it("gives each dropped child its own path, holes and Fragments counted", () => {
+  it("names each dropped child by its parent's path and its place", () => {
     const Wrapper = () => pillars();
     expect(
       report(
@@ -143,11 +143,11 @@ describe("the walk", () => {
         </Root>,
       ),
     ).toEqual([
-      "0.3: gdHall > floor[0], child 3: Wrapper is not a hall tag; write it as a function and call it in braces: {wrapper()}",
-      '0.4: gdHall > floor[0], child 4: the text "loose" is not drawn; text belongs in a prop such as text',
-      "0.5: gdHall > floor[0], child 5: <div> is not a hall tag; a hall draws only tags",
-      "0.1.1: gdHall > floor[0] > altar[1], child 1: the number 7 is not drawn; text belongs in a prop such as text",
-      '1: gdHall, child 1: the text "after" is not drawn; text belongs in a prop such as text',
+      "[0] #3: gdHall > floor[0], child 3: Wrapper is not a hall tag; write it as a function and call it in braces: {wrapper()}",
+      '[0] #4: gdHall > floor[0], child 4: the text "loose" is not drawn; text belongs in a prop such as text',
+      "[0] #5: gdHall > floor[0], child 5: <div> is not a hall tag; a hall draws only tags",
+      "[0,1] #1: gdHall > floor[0] > altar[1], child 1: the number 7 is not drawn; text belongs in a prop such as text",
+      '[] #1: gdHall, child 1: the text "after" is not drawn; text belongs in a prop such as text',
     ]);
   });
 
@@ -208,7 +208,7 @@ describe("the walk", () => {
       <Root>
         <Floor>{children as ReactNode}</Floor>
       </Root>,
-    ).map((line) => line.replace(/^0\.\d+: gdHall > floor\[0\], /, ""));
+    ).map((line) => line.replace(/^\[0\] #\d+: gdHall > floor\[0\], /, ""));
     expect(lines).toEqual([
       'child 0: the text "text" is not drawn; text belongs in a prop such as text',
       "child 1: the number 12 is not drawn; text belongs in a prop such as text",
@@ -233,6 +233,26 @@ describe("the walk", () => {
     });
   });
 
+  it("never gives a dropped child a kept node's path", () => {
+    const { hall, diagnostics } = hallFromTags(
+      <Root>
+        <Floor>
+          <Pillar x={1} />
+          {"text"}
+          <Pillar x={99} />
+        </Floor>
+      </Root>,
+    );
+    expect(diagnostics.map(({ path, child }) => ({ path, child }))).toEqual([
+      { path: [0], child: 1 },
+    ]);
+    // [0, 1] is the second pillar's, which the validator would name.
+    expect(hall.children?.[0].children?.[1]).toEqual({
+      type: "pillar",
+      x: 99,
+    });
+  });
+
   it("reports text in a leaf and keeps the leaf", () => {
     const { hall, diagnostics } = hallFromTags(
       <Root>
@@ -242,7 +262,9 @@ describe("the walk", () => {
     expect(hall.children).toEqual([
       { type: "caption", text: "Neophyte", children: [] },
     ]);
-    expect(diagnostics.map((diagnostic) => diagnostic.path)).toEqual([[0, 0]]);
+    expect(diagnostics.map(({ path, child }) => ({ path, child }))).toEqual([
+      { path: [0], child: 0 },
+    ]);
   });
 
   it("keeps an empty list of children, as data's children: []", () => {
@@ -253,6 +275,18 @@ describe("the walk", () => {
         </Root>,
       ).hall.children,
     ).toEqual([{ type: "pillar", children: [] }]);
+  });
+
+  it("keeps props that share a name with Object's own", () => {
+    expect(
+      hallFromTags(
+        <Root>
+          <SerpentTree constructor="a" toString="b" valueOf="c" />
+        </Root>,
+      ).hall.children,
+    ).toEqual([
+      { type: "serpentTree", constructor: "a", toString: "b", valueOf: "c" },
+    ]);
   });
 
   it("drops key, ref, a type prop and undefined values", () => {

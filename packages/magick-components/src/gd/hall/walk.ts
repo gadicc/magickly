@@ -66,9 +66,10 @@ export interface HallFromTags {
   /**
    * What the walk could not read, as errors: text, DOM elements, other
    * components and anything else that is not a hall tag, each dropped.
-   * A dropped child's path is its parent's, then the child's place among
-   * the parent's children as written, counted after Fragments and arrays
-   * are flattened and with `null`, `undefined` and booleans counted too.
+   * A dropped child has no node, so its diagnostic's `path` is its
+   * parent's, and `child` its place among the parent's children as
+   * written: counted after Fragments and arrays are flattened, with
+   * `null`, `undefined` and booleans counted too.
    */
   diagnostics: HallDiagnostic[];
 }
@@ -199,7 +200,11 @@ function attributesOf(
 ): Record<string, unknown> {
   const attributes: Record<string, unknown> = {};
   for (const [name, value] of Object.entries(props)) {
-    if (value === undefined || NOT_ATTRIBUTES.has(name) || name in fixed)
+    if (
+      value === undefined ||
+      NOT_ATTRIBUTES.has(name) ||
+      Object.hasOwn(fixed, name)
+    )
       continue;
     if (root && !ROOT.has(name)) continue;
     attributes[name] = value;
@@ -249,7 +254,8 @@ function walkChildren(
       return;
     const drop = (message: string) =>
       diagnostics.push({
-        path: [...path, place],
+        path,
+        child: place,
         severity: "error",
         message: `${where}, child ${place}: ${message}`,
       });
@@ -339,16 +345,25 @@ export function hallFromTags(element: ReactElement): HallFromTags {
 const warned = new Set<string>();
 
 /**
- * Warns once per message per process, in development only: where
- * `process.env.NODE_ENV` is not `production`, and not at all where there
- * is no `process` (a page loaded without a bundler).
+ * Whether this is a development build: `process.env.NODE_ENV` is not
+ * `production`. Bundlers write the value in place of the expression, and
+ * some (Vite) define no `process`; where nothing does, as on a page
+ * loaded without a bundler, reading it throws, and that is no
+ * development build.
  */
+export function inDevelopment(
+  nodeEnv: () => string | undefined = () => process.env.NODE_ENV,
+): boolean {
+  try {
+    return nodeEnv() !== "production";
+  } catch {
+    return false;
+  }
+}
+
+/** Warns once per message per process, in development only. */
 export function warnInDevelopment(message: string): void {
-  if (
-    typeof process !== "undefined" &&
-    process.env.NODE_ENV !== "production" &&
-    !warned.has(message)
-  ) {
+  if (!warned.has(message) && inDevelopment()) {
     warned.add(message);
     console.warn(message);
   }

@@ -35,6 +35,11 @@ export interface HallDiagnostic {
   path: readonly number[];
   /** The attribute concerned, when the problem is one attribute. */
   attribute?: string;
+  /**
+   * For a child that `hallFromTags` dropped, which has no node: its place
+   * among the children of the node at `path`, as written.
+   */
+  child?: number;
   severity: HallSeverity;
   /** A sentence for the author, naming the tag and the value. */
   message: string;

@@ -9,7 +9,7 @@ import * as Hall from "./tags.ts";
 import type { HallNode } from "./types.ts";
 import { validateHall } from "./validate.ts";
 import { HALL_TAGS } from "./vocabulary.ts";
-import { HALL_TAG, hallTagOf } from "./walk.ts";
+import { HALL_TAG, hallTagOf, inDevelopment } from "./walk.ts";
 
 // The tags entry (plan 084, stage 2): one tag per strict node type but
 // the root, typed by the node's attributes, read by the walk. The type
@@ -192,6 +192,20 @@ describe("the tags", () => {
     ]);
   });
 
+  it("read NODE_ENV, and warn nowhere it cannot be read", () => {
+    expect(inDevelopment()).toBe(true);
+    expect(inDevelopment(() => "development")).toBe(true);
+    expect(inDevelopment(() => undefined)).toBe(true);
+    expect(inDevelopment(() => "production")).toBe(false);
+    // A page with no bundler, or one that defines no `process` (Vite
+    // writes the value in, so the read never reaches `process`).
+    expect(
+      inDevelopment(() => {
+        throw new ReferenceError("process is not defined");
+      }),
+    ).toBe(false);
+  });
+
   it("stay silent in production", () => {
     vi.stubEnv("NODE_ENV", "production");
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
@@ -233,6 +247,15 @@ describe("defineHallTag", () => {
     ]);
     // @ts-expect-error its props are what it was given
     <SerpentTree coils="three" />;
+  });
+
+  it("refuses the root and the item, which have tags of their own", () => {
+    expect(() => Hall.defineHallTag("gdHall")).toThrow(
+      'defineHallTag cannot make a "gdHall" tag: the root is GdHall',
+    );
+    expect(() => Hall.defineHallTag("item")).toThrow(
+      'defineHallTag cannot make a "item" tag: use defineHallItem(kind) for an item kind',
+    );
   });
 
   it("places by default", () => {

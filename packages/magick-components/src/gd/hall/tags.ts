@@ -96,11 +96,17 @@ function makeTag<P>(
  * A tag for a node type your own art draws, typed by its props (each a
  * string, number or boolean): `const SerpentTree =
  * defineHallTag<HallPlaced & { coils?: number }>("serpentTree")`. A hall
- * that uses it is a `HallNode`, not a strict `GdHallNode`.
+ * that uses it is a `HallNode`, not a strict `GdHallNode`. It refuses
+ * `gdHall`, the root, which is `GdHall`, and `item`, whose kinds
+ * `defineHallItem` makes tags for.
  */
 export function defineHallTag<P extends object = HallPlaced>(
   type: string,
 ): HallTag<P & Holds> {
+  if (type === "gdHall" || type === "item")
+    throw new Error(
+      `defineHallTag cannot make a "${type}" tag: ${type === "item" ? "use defineHallItem(kind) for an item kind" : "the root is GdHall"}`,
+    );
   return makeTag<P & Holds>(type, pascal(type));
 }
 

@@ -353,12 +353,16 @@ export const Neophyte = () => (
   Server Component that hands a hall to a client component hands it
   the data, `hallFromTags(<GdHall …>…</GdHall>).hall`, which takes the
   root's attributes from that `GdHall` and ignores what only draws
-  (`width`, `className` …). Its `diagnostics` list what it dropped.
+  (`width`, `className` …). Its `diagnostics` list what it dropped: a
+  dropped child has no node, so each names its parent's `path` and,
+  as `child`, its place among the parent's children as written.
 - **Warnings are for development.** When `process.env.NODE_ENV` is not
-  `production`, `GdHall` warns once about each child it dropped and
-  about tags that gave no hall at all, and a tag warns when React
-  renders it, outside a `GdHall` or across a client boundary. From a
-  Server Component the warnings appear in the server's terminal, not the
+  `production`, `GdHall` warns once about each child it dropped, about
+  tags that gave no hall at all and about `hall` given with children,
+  and a tag warns when React renders it, outside a `GdHall` or across a
+  client boundary. Where `process.env.NODE_ENV` cannot be read at all, as
+  on a page loaded without a bundler, they stay silent. From a Server
+  Component the warnings appear in the server's terminal, not the
   browser's console.
 - **Keys are optional.** React does not ask for keys on tags in an
   array, since it never renders them; Biome's `useJsxKeyInIterable`
