@@ -1,8 +1,10 @@
 # Composable JSX halls — 15 November 2026
 
-Status: stage 1, the strict types, built on `gate/jsx-halls`, reviewed
-and bumped to 0.2.0 ([below](#stage-1-built-15-november-2026)); stage 2,
-the JSX tags, not built. Gadi settled the assessment's twelve decisions
+Status: stage 1, the strict types, is magick-components 0.2.0, on npm
+since 15 November 2026 ([below](#stage-1-built-15-november-2026)); stage
+2, the JSX tags, built on `gate/jsx-halls`, reviewed and bumped to 0.3.0
+([below](#stage-2-built-15-november-2026)), for CI to publish when `main`
+is pushed. Gadi settled the assessment's twelve decisions
 on 14 November 2026, and on 15 November the seven changes (R1–R7) that
 a Fable 5.2 review and the spikes led to
 ([Changes after the review](#changes-after-the-review)). Read
@@ -462,7 +464,92 @@ On the same branch after 0.2.0 is published, or a new one from `main`.
 7. **Reviews, bump to 0.3.0, publish**, as in stage 1.
 
 The explorer keeps its `hall` examples (its examples are props objects,
-which cannot hold children), so no page and no docs screenshot changes.
+which cannot hold children), so no docs screenshot changes.
+
+### 0.2.0 on npm (15 November 2026)
+
+Gadi fast-forwarded `main` to `6182ca6e` and pushed; "Publish packages"
+run `43739984001` passed every job and published
+`magick-components@0.2.0` under `latest` through the trusted publisher.
+npm's integrity,
+`sha512-aPMpjZQ16P2DAF3qUEfFAa/cs3FNhQYROjIzV4dMaVZRSc6mzfzoHh4v7xwyovQbBxu3CORl9hTo3TGadBXNYw==`,
+is the one the run's `build` job logged; 175 files, with an SLSA
+provenance attestation. The registry showed it about a minute after the
+publish job's `PUT` was accepted.
+
+### Stage 2 built (15 November 2026)
+
+Built by an Opus 5.5 agent (high effort) on `gate/jsx-halls`, on top of
+0.2.0's `6182ca6e`, each commit gated on its own tree.
+
+- **The walk** (`walk.ts`) and `hallFromTags`, as items 1 and R7 say. A
+  dropped child's diagnostic carries its parent's `path` and a new
+  optional `child` on `HallDiagnostic`, its place among the children as
+  written, so a path always names a node that is in the hall (R4). The
+  walk refuses functions, promises, plain objects, `memo`, `lazy`,
+  `forwardRef`, Suspense, context elements and client references (the
+  proxy a Server Component sees), each with its own message; a `type`
+  prop is dropped, and props are read with `Object.hasOwn`.
+- **`gd/hall/tags`**: the 25 tags, each made by a `/*#__PURE__*/`
+  factory and named `Hall.Pillar` and so on in warnings;
+  `defineHallTag`, which refuses `gdHall` and `item`; `defineHallItem`,
+  whose `kind` no prop can override (a second symbol fixes it);
+  `hallFromTags`; the `<Tag>Props` types and `HallChildren`, which keeps
+  strings and numbers out of a tag's or `GdHall`'s children at compile
+  time (R6). A rendered tag warns once in development (R4). Development
+  is `process.env.NODE_ENV !== "production"`, read in `try`, so a bundle
+  that replaces it without a `process` (Vite in the browser) warns too,
+  and one with neither stays silent.
+- **`GdHall`**: `GdHallProps` byte for byte as in 0.2.0; the parameter
+  is `(GdHallProps & { children?: never }) | GdHallTagsProps` (R1);
+  `GdHallRenderProps` is `GdHallProps` without `hall`. It warns in
+  development when its children give no node, and when a JavaScript
+  caller passes both `hall` and children. It carries the tags' marker
+  through a `/*#__PURE__*/` helper, without a top-level statement, so
+  a bundle of `GdHallSvg` and `DEFAULT_HALL_ART` alone leaves the walk
+  out: 87,302 bytes minified against 104,879 with a top-level
+  `Object.defineProperty` (esbuild 0.28.2 over `lib/`).
+- **The explorer** still describes `GdHallProps`:
+  `scripts/component-props.ts` narrows `GdHall` to that type, reads a
+  component wrapped in a call as its export, and takes the export's
+  JSDoc. `componentProps.json` changed in `GdHall`'s description alone,
+  which now names the tags form; the site-search vectors were refreshed
+  with it. No docs screenshot shows the explorer.
+- **The smoke test** draws a Server Component page with tags and a
+  Client Component drawing `hallFromTags`' data, under webpack and
+  Turbopack, and checks they are the same hall and not an empty one.
+- **README**: the entry's row, "A hall written as tags" with the
+  Neophyte (a test holds it equal to the preset), the rules, and
+  "Versions" for 0.3.0.
+- **The playground** respells `at`, `anchor`, `fill` and `stroke` before
+  matching a preset, so a link to the Neophyte hall from before 0.2.0
+  finds it again.
+- **Provenance**: `gd/hall/tags` was added to the halls' signed-off row
+  of the README's table, its date kept; the tags draw nothing of their
+  own.
+- `ab72f7ac` also writes the rows' `spread` values inline in the type
+  test, so they are held to the spec both ways, which the final review
+  of 0.2.0 found they were not.
+
+### Stage 2 review (15 November 2026)
+
+A fresh Opus 5.5 reviewer (high effort) found nothing that broke drawing
+or hydration, and one claim false: `GdHallProps` had gained
+`children?: never`, which broke a 0.2.0 wrapper with children of its own
+while the README said none broke. Fixed in `694ac018` to `c7aebb20`,
+with the rest of what it asked: the top-level marker that kept the walk
+in every bundle, a smoke check that would pass two empty halls, text
+compiling under `GdHall`, dropped children's paths that could name a
+kept node, no warnings under Vite, props named after `Object.prototype`'s
+members dropped, `defineHallTag("gdHall")` making a root, no warning for
+both forms at once, `GdHall`'s JSDoc silent on tags, and a README line
+on `Omit` over the union. Kept: the tags entry's `KameaProps` and
+`TabletProps` share names with types in `astrology/Kamea` and
+`enochian/Tablet`, which only a named import of both would meet; the
+entry is documented as a namespace.
+
+The 0.3.0 bump commit corrects "Versions": a wrapper that hands
+`GdHall` children of its own, which 0.2.0 ignored, no longer compiles.
 
 ## Verification
 
@@ -505,4 +592,22 @@ On `gate/jsx-halls`, each gated on its own tree (every step exit 0).
 | `3e29621a` | `main` merged (`412ebcf7`) |
 | `e3e00d3e` | magick-components 0.2.0; this plan's stage 1 record |
 | `c4d0c4d1` | Final review fixes: doors by wall, two exports, values held |
-| this commit | The final review's record |
+| `6182ca6e` | The final review's record; **0.2.0**, published |
+| `ab72f7ac` | Rows' `spread` values held both ways |
+| `e210f3a2` | The walk and `hallFromTags` |
+| `f771a63b` | The `gd/hall/tags` entry |
+| `dcd6f6fe` | `GdHall`'s tags form; the explorer keeps `GdHallProps` |
+| `bc32cbc4` | The smoke test draws a hall written as tags |
+| `dccc0441` | README: the hall tags |
+| `d477f9d0` | The playground matches a preset with old spellings |
+| `694ac018` | Review: `GdHallProps` as in 0.2.0, `HallChildren` under `GdHall`, both forms warned |
+| `1cd493d3` | Review: `GdHall` marked without a side effect |
+| `76c1adc8` | Review: dropped children's paths, `NODE_ENV`, `Object.hasOwn`, refused names |
+| `2c69df6f` | Review: the smoke test's tags hall must draw |
+| `c7aebb20` | Review: `GdHall`'s JSDoc names tags; search vectors |
+| this commit | magick-components 0.3.0; this plan's stage 2 record |
+
+`694ac018` passed its gate on the coverage rerun (the known
+`sqlLegacyImport` timeout); `c7aebb20`'s first gate timed out in
+unrelated tests at a load of about 42 and passed whole when run again
+on the same commit.

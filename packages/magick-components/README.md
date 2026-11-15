@@ -531,12 +531,14 @@ candidate 0.1.0-rc.0, was published by hand.
 - `validateHall()` reads an attribute or `children` set to `undefined`
   as absent, as the layout does: it reports fewer problems, never more.
 
-0.3.0 adds the hall tags, `gd/hall/tags`, and `GdHall`'s tags form. It
-changes nothing a 0.2.0 page compiles against: `GdHallProps` is as it
-was, the `hall` form's props, and `GdHall` takes `(GdHallProps &
-{ children?: never }) | GdHallTagsProps`, where `GdHallRenderProps`,
-the props that only draw, is `GdHallProps` without `hall`. A wrapper
-that extends, destructures or forwards `GdHallProps` still compiles.
+0.3.0 adds the hall tags, `gd/hall/tags`, and `GdHall`'s tags form.
+`GdHallProps` is as it was, the `hall` form's props, and `GdHall`
+takes `(GdHallProps & { children?: never }) | GdHallTagsProps`, where
+`GdHallRenderProps`, the props that only draw, is `GdHallProps` without
+`hall`. A wrapper that extends, destructures or forwards `GdHallProps`
+still compiles. One that hands `GdHall` children of its own, which
+0.2.0 ignored, no longer does: children now mean tags, so leave them
+out of what reaches `GdHall`.
 `ComponentProps<typeof GdHall>` is now that union, and `Omit` over a
 union flattens it: to leave a prop out, write `Omit<GdHallProps, …>`
 for the `hall` form or `Omit<GdHallTagsProps, …>` for tags. In
