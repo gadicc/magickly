@@ -382,6 +382,38 @@ Kept as it was: the `*Attributes` aliases stay public, and the type
 names keep the package's mixed prefixes (`BannerSide` and `CrossForm`
 beside `HallPoint` and `HallPlanet`).
 
+### Final review before 0.2.0 (15 November 2026)
+
+Fable 5.2 (high effort) on the exact tree of the bump, `e3e00d3e`, found
+nothing that blocked the release. It ran the type check, the whole suite
+(594 files), Biome and the components' smoke test (175 files, `nodes.js`
+and `nodes.d.ts` the two new); compiled a 0.1.0-style consumer against
+the packed tarball under TypeScript 6.0.3 and 5.9.3, `nodenext` and
+`bundler`, `skipLibCheck` off (only what "Versions" names breaks); and
+ran the publish decision read-only ("magick-components 0.2.0 is new
+(latest is 0.1.0); publish under latest"). Taken before the release, in
+`c4d0c4d1`, since each is public API once 0.2.0 is out:
+
+- A door could not be narrowed by `side`
+  (`d.side === "north" || d.side === "south" ? d.y : d.x` failed on `x`),
+  the North and South wall sharing one member; it has one member per wall
+  now, and a test reads a door so.
+- `LamenGrade` and `TabletVersionId`, named by the node types, were not
+  exported from `gd/hall`.
+- The tests held attribute names, not values: every enumerated
+  attribute's values are now held to its spec, both ways.
+- `LabelAttributes`' JSDoc said a label child adds a line; on an officer
+  without `label` it stands in place of the role's name.
+- The README's list of what the types leave to the validator lacked
+  non-finite numbers, an empty `letter`, whole numbers for `n` and the
+  hall's bounds.
+- Notes about this plan and its tests were in published JSDoc.
+
+Left for stage 2: the editor's playground (`HallPlayground.tsx`) finds a
+preset by comparing Pug text, so a link to the Neophyte hall made before
+0.2.0 (`at="centre"`) is now named a custom hall when exported, though it
+draws the same.
+
 ### Stage 2: JSX tags (0.3.0)
 
 On the same branch after 0.2.0 is published, or a new one from `main`.
@@ -424,7 +456,10 @@ On the same branch after 0.2.0 is published, or a new one from `main`.
    keys optional, though Biome asks for them); "Versions" for 0.3.0. If
    `GdHall`'s JSDoc changes, the site-search vectors are refreshed in the
    same commit (`src/search/catalogue.ts` reads it).
-6. **Reviews, bump to 0.3.0, publish**, as in stage 1.
+6. **The playground's preset match** reads `centre` and `grey` as
+   `center` and `gray` before comparing, so a link made before 0.2.0
+   still finds Neophyte (the final review of stage 1).
+7. **Reviews, bump to 0.3.0, publish**, as in stage 1.
 
 The explorer keeps its `hall` examples (its examples are props objects,
 which cannot hold children), so no page and no docs screenshot changes.
@@ -468,4 +503,6 @@ On `gate/jsx-halls`, each gated on its own tree (every step exit 0).
 | `04a7f282` | Review fixes: `grade`, `children: []`, unions held to the data |
 | `dc525442` | README: what the types leave to the validator |
 | `3e29621a` | `main` merged (`412ebcf7`) |
-| this commit | magick-components 0.2.0; this plan's stage 1 record |
+| `e3e00d3e` | magick-components 0.2.0; this plan's stage 1 record |
+| `c4d0c4d1` | Final review fixes: doors by wall, two exports, values held |
+| this commit | The final review's record |
