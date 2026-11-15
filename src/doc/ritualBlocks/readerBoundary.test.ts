@@ -184,6 +184,11 @@ it("loads the hall renderer and its art only through import()", () => {
   const lazy = files(graph.lazy);
   expect(lazy).toContain("src/doc/ritualBlocks/GdHallDrawing.tsx");
   expect(lazy).toContain("packages/magick-components/src/gd/hall/GdHall.tsx");
+  // GdHall's walk comes with it, and the tags not at all (plan 084).
+  expect(lazy).toContain("packages/magick-components/src/gd/hall/walk.ts");
+  expect([...files(graph.static), ...lazy]).not.toContain(
+    "packages/magick-components/src/gd/hall/tags.ts",
+  );
   expect(lazy).toContain("src/app/gd/halls/art.ts");
   expect(lazy).toContain("packages/magick-components/src/gd/Lamen.tsx");
 });

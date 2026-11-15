@@ -134,6 +134,65 @@ export function defaultSource(
   return stringValued(type) ? JSON.stringify(value) : value;
 }
 
+/**
+ * The props type a page describes, for a component that takes a union of
+ * props types, which docgen flattens into one. `GdHall` takes
+ * `GdHallProps | GdHallTagsProps` (plan 084, R1): flattened, `hall`
+ * would be optional and the tags form's root attributes would be
+ * controls that do nothing beside an example's `hall`. The examples are
+ * props objects, which hold no children, so the page describes the data
+ * form.
+ */
+const DESCRIBED_PROPS: Readonly<Record<string, string>> = {
+  GdHall: "GdHallProps",
+};
+
+/**
+ * A doc with only the props of `typeName`, exported from `file`: its
+ * members, required and described as it declares them (docgen joins the
+ * JSDoc of a prop's declarations across a union), and none it types
+ * `never`.
+ */
+function describedAs(
+  doc: ComponentDoc,
+  program: ts.Program,
+  file: string,
+  typeName: string,
+): ComponentDoc {
+  const checker = program.getTypeChecker();
+  const source = program.getSourceFile(file);
+  const module = source && checker.getSymbolAtLocation(source);
+  const exported = module
+    ? checker
+        .getExportsOfModule(module)
+        .find((symbol) => symbol.escapedName === typeName)
+    : undefined;
+  if (!exported) throw new Error(`${file} exports no ${typeName}`);
+  const symbol =
+    exported.flags & ts.SymbolFlags.Alias
+      ? checker.getAliasedSymbol(exported)
+      : exported;
+  const members = new Map<string, ts.Symbol>();
+  const declared = checker.getDeclaredTypeOfSymbol(symbol);
+  for (const member of declared.getProperties()) {
+    const type = checker.getNonNullableType(checker.getTypeOfSymbol(member));
+    if (!(type.flags & ts.TypeFlags.Never)) members.set(member.name, member);
+  }
+  const props: ComponentDoc["props"] = {};
+  for (const [name, prop] of Object.entries(doc.props)) {
+    const member = members.get(name);
+    if (member)
+      props[name] = {
+        ...prop,
+        required: (member.flags & ts.SymbolFlags.Optional) === 0,
+        description: ts.displayPartsToString(
+          member.getDocumentationComment(checker),
+        ),
+      };
+  }
+  return { ...doc, props };
+}
+
 /** Strings in code-point order, the same in every locale. */
 const byCodePoint = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
 
@@ -235,7 +294,10 @@ export function componentProps(): PropsManifest {
         candidate.filePath === file && candidate.displayName === exportName,
     );
     if (!doc) throw new Error(`docgen found no ${exportName} in ${entry}`);
-    result[name] = componentEntry(doc);
+    const described = DESCRIBED_PROPS[name];
+    result[name] = componentEntry(
+      described ? describedAs(doc, program, file, described) : doc,
+    );
   }
   return result;
 }

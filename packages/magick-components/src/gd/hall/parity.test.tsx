@@ -1,14 +1,17 @@
 import { createElement, Fragment, type ReactElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import ts from "typescript";
 import { describe, expect, it } from "vitest";
+import { GdHall } from "./GdHall.tsx";
 import { HALL_PRESETS } from "./presets/index.ts";
 import * as Hall from "./tags.ts";
 import type { HallNode } from "./types.ts";
-import { HALL_TAG, hallFromTags } from "./walk.ts";
+import { hallFromTags } from "./walk.ts";
 
 // Each preset printed as tags, as an author would write it, compiled and
-// walked back: the walk must give the preset's data exactly (plan 084,
-// S5). The printer is the seed of a `hallToJsx`, which is not in scope.
+// walked back: the walk must give the preset's data exactly, and GdHall
+// the same SVG from the tags as from the data (plan 084, S5). The
+// printer is the seed of a `hallToJsx`, which is not in scope.
 
 /** A string the printer may write as a JSX attribute without escaping. */
 const PLAIN = /^[^"&{}<>\\\n]*$/;
@@ -78,13 +81,7 @@ function compile(source: string, scope: TagScope): ReactElement {
   )({ createElement, Fragment }, scope.GdHall, scope.Hall) as ReactElement;
 }
 
-/** The package's tags, and a root the walk reads as `GdHall`. */
-const scope: TagScope = {
-  GdHall: Object.defineProperty((): null => null, HALL_TAG, {
-    value: "gdHall",
-  }),
-  Hall,
-};
+const scope: TagScope = { GdHall, Hall };
 
 describe("each preset as tags", () => {
   it("prints as an author would write it", () => {
@@ -122,6 +119,19 @@ describe("each preset as tags", () => {
       expect(diagnostics).toEqual([]);
       expect(hall).toStrictEqual(preset.hall);
       expect(JSON.stringify(hall)).toBe(JSON.stringify(preset.hall));
+    },
+  );
+
+  it.each(HALL_PRESETS.map((preset) => [preset.id, preset] as const))(
+    "%s draws as its data does",
+    (_id, preset) => {
+      const fromTags = renderToStaticMarkup(
+        compile(hallToTags(preset.hall), scope),
+      );
+      expect(fromTags.length).toBeGreaterThan(5000);
+      expect(fromTags).toBe(
+        renderToStaticMarkup(<GdHall hall={preset.hall} />),
+      );
     },
   );
 });

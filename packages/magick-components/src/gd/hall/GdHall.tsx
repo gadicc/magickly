@@ -20,7 +20,9 @@ import {
   WALL_GAP,
   WALL_STROKE,
 } from "./layout.ts";
+import type { GdHallAttributes } from "./nodes.ts";
 import type { HallArt, HallArtRegistry, HallNode } from "./types.ts";
+import { HALL_TAG, hallFromRootProps, warnInDevelopment } from "./walk.ts";
 
 /** SVG user units per checker square: text stays at a large font size. */
 const UNIT = 100;
@@ -28,10 +30,8 @@ const u = (squares: number) => svgCoordinate(squares * UNIT);
 
 const EMPTY_HALL: HallNode = { type: "gdHall" };
 
-/** Props of `GdHall`. */
-export interface GdHallProps {
-  /** The compiled `gdHall` node; anything else draws an empty hall. */
-  hall: HallNode;
+/** Props of `GdHall` that draw, in either form. */
+export interface GdHallRenderProps {
   /**
    * The art for each kind of object; the package's own when not given. A
    * registry of your own can add kinds or draw them differently.
@@ -53,6 +53,27 @@ export interface GdHallProps {
   /** The drawn `<svg>`, for exporting it. */
   ref?: Ref<SVGSVGElement>;
 }
+
+/** Props of `GdHall` drawing a hall description, `hall`. */
+export interface GdHallProps extends GdHallRenderProps {
+  /** The compiled `gdHall` node; anything else draws an empty hall. */
+  hall: HallNode;
+  /** No children: a hall is drawn from `hall` or from tags, not both. */
+  children?: never;
+}
+
+/**
+ * Props of `GdHall` drawing a hall written as tags
+ * (`magick-components/gd/hall/tags`): the root's attributes are props,
+ * and the tags its children.
+ */
+export type GdHallTagsProps = GdHallRenderProps &
+  GdHallAttributes & {
+    /** No `hall`: a hall is drawn from `hall` or from tags, not both. */
+    hall?: never;
+    /** The hall's tags: `<Hall.Floor>`, `<Hall.Caption>` …, and Fragments. */
+    children: ReactNode;
+  };
 
 const labelTextStyle: CSSProperties = {
   fontVariantLigatures: "none",
@@ -441,18 +462,75 @@ export function GdHallSvg({
  * nodes, unknown tags draw as dashed placeholders, and nothing is loaded
  * by URL except the fonts `fontBaseUrl` points at.
  */
-export function GdHall({
-  hall,
-  art = DEFAULT_HALL_ART,
-  fontBaseUrl,
-  className,
-  style,
-  width,
-  height,
-  ref,
-}: GdHallProps) {
+export function GdHall(props: GdHallProps | GdHallTagsProps) {
+  const {
+    hall,
+    art = DEFAULT_HALL_ART,
+    fontBaseUrl,
+    className,
+    style,
+    width,
+    height,
+    ref,
+  } = props;
+  // The children form's: undefined in the data form, as its types say.
+  const {
+    children,
+    dais,
+    wall,
+    compass,
+    padding,
+    labelSize,
+    margin,
+    marginNorth,
+    marginSouth,
+    marginEast,
+    marginWest,
+  } = props as Partial<GdHallTagsProps>;
+  // JSX makes new children on each render, so this walks each time; the
+  // walk is cheap beside the layout.
+  const walked = useMemo(
+    () =>
+      hall === undefined
+        ? hallFromRootProps({
+            children,
+            dais,
+            wall,
+            compass,
+            padding,
+            labelSize,
+            margin,
+            marginNorth,
+            marginSouth,
+            marginEast,
+            marginWest,
+          })
+        : undefined,
+    [
+      hall,
+      children,
+      dais,
+      wall,
+      compass,
+      padding,
+      labelSize,
+      margin,
+      marginNorth,
+      marginSouth,
+      marginEast,
+      marginWest,
+    ],
+  );
+  if (walked) {
+    for (const diagnostic of walked.diagnostics)
+      warnInDevelopment(`GdHall: ${diagnostic.message}`);
+    if (!walked.hall.children?.length)
+      warnInDevelopment(
+        "GdHall drew an empty hall: it was given no `hall`, and its children gave no hall node. Across a client boundary tags arrive as null: build the hall where GdHall runs, or pass hallFromTags(…).hall instead",
+      );
+  }
   const id = useId().replace(/[^A-Za-z0-9_-]/g, "_");
-  const root = hallRoot(hall);
+  const root = hallRoot(walked ? walked.hall : (hall as HallNode));
   const resolved = useMemo(() => resolveHall(root, { art }), [root, art]);
   const drawings = useMemo(
     () => artDefinitions(resolved.objects, art, id),
@@ -478,5 +556,9 @@ export function GdHall({
     />
   );
 }
+
+// The walk reads a `<GdHall>` element by this marker (`hallFromTags`), and
+// so never imports this module.
+Object.defineProperty(GdHall, HALL_TAG, { value: "gdHall" });
 
 export default GdHall;

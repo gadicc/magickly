@@ -8,9 +8,10 @@ import {
   type ReactNode,
   Suspense,
 } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
+import type { GdHallAttributes } from "./nodes.ts";
 import type { HallNode } from "./types.ts";
-import { HALL_TAG, hallFromTags, hallTagOf } from "./walk.ts";
+import { HALL_TAG, hallFromTags, hallTagOf, ROOT_ATTRIBUTES } from "./walk.ts";
 
 // The walk's contract is the marker, so these tests mark components of
 // their own; the tags entry's tests hold its tags to the same marker.
@@ -267,7 +268,7 @@ describe("the walk", () => {
 });
 
 describe("hallFromTags", () => {
-  it("reads the root's attributes and ignores what only draws", () => {
+  it("reads the root's attributes alone, not what only draws", () => {
     const ref = createRef<SVGSVGElement>();
     expect(
       hallFromTags(
@@ -282,6 +283,7 @@ describe("hallFromTags", () => {
           wall="plain"
           compass={false}
           dais={0}
+          unknown="dropped"
         >
           <Dais />
         </Root>,
@@ -293,6 +295,12 @@ describe("hallFromTags", () => {
       dais: 0,
       children: [{ type: "dais" }],
     });
+  });
+
+  it("knows every root attribute the types do", () => {
+    expectTypeOf<(typeof ROOT_ATTRIBUTES)[number]>().toEqualTypeOf<
+      keyof GdHallAttributes
+    >();
   });
 
   it("returns the hall a GdHall is given", () => {

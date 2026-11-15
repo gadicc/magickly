@@ -30,6 +30,22 @@ describe("the component props manifest (plan 080, decision 6)", () => {
     ]);
     expect(missing).toEqual([]);
   });
+
+  it("describes GdHall's data form, not the union it takes (plan 084, R1)", () => {
+    const props = committed.GdHall.props;
+    expect(props.map((prop) => [prop.name, prop.required])).toEqual([
+      ["hall", true],
+      ["art", false],
+      ["className", false],
+      ["fontBaseUrl", false],
+      ["height", false],
+      ["style", false],
+      ["width", false],
+    ]);
+    expect(props[0].description).toBe(
+      "The compiled `gdHall` node; anything else draws an empty hall.",
+    );
+  });
 });
 
 describe("controlOf", () => {

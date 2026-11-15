@@ -1,4 +1,5 @@
 import { Fragment, isValidElement, type ReactElement } from "react";
+import type { GdHallAttributes } from "./nodes.ts";
 import type { HallDiagnostic, HallNode } from "./types.ts";
 
 // The walk from hall tags to a hall node (plan 084, stage 2). Tags are
@@ -66,16 +67,24 @@ export interface HallFromTags {
   diagnostics: HallDiagnostic[];
 }
 
-/** `GdHall`'s props that draw: never part of the hall. */
-const RENDER_PROPS: ReadonlySet<string> = new Set([
-  "hall",
-  "art",
-  "fontBaseUrl",
-  "className",
-  "style",
-  "width",
-  "height",
-]);
+/**
+ * The root's attributes, which `GdHall` takes as props in the children
+ * form; its other props (`width`, `art`, `className` …) only draw.
+ */
+export const ROOT_ATTRIBUTES = [
+  "dais",
+  "wall",
+  "compass",
+  "padding",
+  "labelSize",
+  "margin",
+  "marginNorth",
+  "marginSouth",
+  "marginEast",
+  "marginWest",
+] as const satisfies readonly (keyof GdHallAttributes)[];
+
+const ROOT: ReadonlySet<string> = new Set(ROOT_ATTRIBUTES);
 
 /** Props no node takes: React's own, the tree's and the node's type. */
 const NOT_ATTRIBUTES: ReadonlySet<string> = new Set([
@@ -178,7 +187,7 @@ function refusalOf(child: unknown): string {
 
 /** A node's attributes from an element's props. */
 function attributesOf(
-  props: Record<string, unknown>,
+  props: Readonly<Record<string, unknown>>,
   root: boolean,
   fixed: Readonly<Record<string, unknown>> = {},
 ): Record<string, unknown> {
@@ -186,7 +195,7 @@ function attributesOf(
   for (const [name, value] of Object.entries(props)) {
     if (value === undefined || NOT_ATTRIBUTES.has(name) || name in fixed)
       continue;
-    if (root && RENDER_PROPS.has(name)) continue;
+    if (root && !ROOT.has(name)) continue;
     attributes[name] = value;
   }
   return attributes;
@@ -270,8 +279,8 @@ function walkChildren(
 
 /**
  * The hall a `GdHall`'s props give in the children form: a `gdHall`
- * node with the root attributes among the props (what draws, such as
- * `width` and `art`, aside) and the children walked.
+ * node with the root attributes among the props (`ROOT_ATTRIBUTES`, in
+ * the props' order) and the children walked.
  */
 export function hallFromRootProps(
   props: Readonly<Record<string, unknown>>,
