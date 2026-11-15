@@ -1,3 +1,4 @@
+import { validateHall } from "magick-components/gd/hall";
 import { HALL_PRESETS } from "magick-components/gd/hall/presets";
 import { describe, expect, it } from "vitest";
 import { gdHallPug, parseHallSource, printHallSource } from "./gdHallPug";
@@ -64,6 +65,40 @@ describe("a hall's own source, as /gd/halls/editor shows it", () => {
     const without = printHallSource(hall, { ids: false });
     expect(without).toBe(gdHallPug(HALL_PRESETS[0].hall));
     expect(compiled([parseHallSource(without)])).toEqual(compiled([hall]));
+  });
+
+  it("leaves out undefined values, as JSON and validateHall do", () => {
+    const hall = {
+      type: "gdHall",
+      dais: undefined,
+      children: [
+        {
+          type: "floor",
+          children: [
+            { type: "pillar", kind: "black", x: undefined, y: 3 },
+            { type: "item", kind: "cup", children: undefined },
+          ],
+        },
+        { type: "caption", text: "Hall", children: undefined },
+      ],
+    };
+    expect(validateHall(hall)).toEqual([]);
+    expect(gdHallPug(hall)).toBe(
+      gdHallPug({
+        type: "gdHall",
+        children: [
+          {
+            type: "floor",
+            children: [
+              { type: "pillar", kind: "black", y: 3 },
+              { type: "item", kind: "cup" },
+            ],
+          },
+          { type: "caption", text: "Hall" },
+        ],
+      }),
+    );
+    expect(gdHallPug(hall)).not.toContain("undefined");
   });
 
   it("writes a light's colour in the Pug", () => {
