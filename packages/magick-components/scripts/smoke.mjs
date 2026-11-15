@@ -20,10 +20,11 @@
  * 2. which built files carry `"use client"`, first: MercuryWidget,
  *    MoonWidget and RoseSigil, and no other;
  * 3. every entry loaded in plain Node, and the Tree, a hall and the rose
- *    sigil's image rendered with `renderToStaticMarkup`, no bundler;
+ *    sigil's image rendered with `renderToStaticMarkup`, no bundler, and
+ *    a hall written as tags drawn as its `hallFromTags` data is;
  * 4. a strict consumer type-checked under `bundler` and `nodenext`, with
  *    `skipLibCheck` off, and a prop the types must refuse, with the
- *    README's TSX and TS examples;
+ *    README's TSX and TS examples; it writes a hall with the tags;
  * 5. 3 and 4 again in a second fixture that installs the components'
  *    tarball alone, so that npm takes magick-data from the registry, as a
  *    stranger's install would. While the registry lacks the magick-data
@@ -35,7 +36,9 @@
  * 6. a Next app built with webpack and with Turbopack, first with every
  *    entry but the live rose sigil and no `fs` stub (nlopt must be out of
  *    reach), then with `RoseSigil` and the stub the README gives; each
- *    build's prerendered HTML is read for the server's drawings.
+ *    build's prerendered HTML is read for the server's drawings, among
+ *    them a hall written as tags in a Server Component, which must be
+ *    the hall a Client Component draws from those tags' data.
  *
  * `--keep-tarball <path>` removes any file at `<path>` first, so that a
  * failed run leaves none from an earlier one, and copies the components'
@@ -121,11 +124,24 @@ const CLIENT_MODULES = [
   "lib/astrology/MoonWidget.js",
   "lib/gd/RoseSigil.js",
 ];
+/** A small hall written with the hall tags, as GdHall's children. */
+const TAGS_HALL = `<GdHall wall="gradient" compass={false}>
+  <Hall.Dais><Hall.Officer role="hierophant" /></Hall.Dais>
+  <Hall.Floor>
+    {[4, 12].map((x) => <Hall.Pillar key={x} kind={x < 8 ? "black" : "white"} x={x} y={3} />)}
+    <Hall.Altar at="center"><Hall.Item kind="cross" form="calvary" /></Hall.Altar>
+    <Hall.Officer role="hiereus" x={8} y={14}><Hall.Label text="West" /></Hall.Officer>
+  </Hall.Floor>
+  <Hall.Caption text="Tags" />
+</GdHall>`;
+
 /**
  * Every component that can render as a Server Component, as the Next page
  * draws it: [its id on the page, its imports, its JSX]. A component that
  * passes a function to the browser, such as an event handler it was not
- * given, fails the page's prerender.
+ * given, fails the page's prerender. The hall written as tags is drawn
+ * twice: by GdHall on the server, and from hallFromTags' data by GdHall
+ * in a Client Component, as a page hands a hall across that boundary.
  */
 const SERVER_DRAWINGS = [
   [
@@ -142,6 +158,16 @@ const SERVER_DRAWINGS = [
     "hall",
     `import { GdHall } from "magick-components/gd/hall";\nimport { hallPreset } from "magick-components/gd/hall/presets";`,
     `<GdHall hall={hallPreset("neophyte")!.hall} />`,
+  ],
+  [
+    "hall-tags",
+    `import * as Hall from "magick-components/gd/hall/tags";`,
+    TAGS_HALL,
+  ],
+  [
+    "hall-bridge",
+    `import { ClientHall } from "./ClientHall";`,
+    `<ClientHall hall={Hall.hallFromTags(${TAGS_HALL}).hall} />`,
   ],
   [
     "lamen",
@@ -224,6 +250,19 @@ function step(name, fn) {
   const result = fn();
   console.log(`ok - ${name} (${((Date.now() - t0) / 1000).toFixed(1)}s)`);
   return result;
+}
+
+/**
+ * The hall drawn in an element of the page with this id, its `useId`
+ * prefix replaced, so that two drawings of one hall compare equal.
+ */
+function hallSvg(html, id) {
+  const svg = html.match(
+    new RegExp(`id="${id}"><svg[^>]*>[^]*?</svg></div>`),
+  )?.[0];
+  const prefix = svg?.match(/aria-labelledby="([^"]+)-title"/)?.[1];
+  assert(svg && prefix, `a hall in #${id}`);
+  return svg.replace(`id="${id}">`, "").replaceAll(`${prefix}-`, "ID-");
 }
 
 /** Every file path an `exports` value names. */
@@ -598,6 +637,7 @@ for (const entry of entries) {
 const { default: TreeOfLife } = await import("magick-components/kabbalah/TreeOfLife");
 const { GdHall } = await import("magick-components/gd/hall");
 const { hallPreset } = await import("magick-components/gd/hall/presets");
+const Hall = await import("magick-components/gd/hall/tags");
 const { RoseSigilImage } = await import("magick-components/gd/RoseSigilImage");
 const { sigilPoints } = await import("magick-components/gd/roseSigilGeometry");
 const tree = renderToStaticMarkup(h(TreeOfLife, { field: "name.he", width: 300 }));
@@ -605,6 +645,10 @@ if (!tree.includes('class="magick-tree-sephirot"') || !tree.includes("תפארת
 const hall = renderToStaticMarkup(h(GdHall, { hall: hallPreset("neophyte").hall, fontBaseUrl: "/f" }));
 if (!hall.includes("<svg")) throw new Error("the hall: " + hall.slice(0, 200));
 if ((hall.match(/@font-face/g) ?? []).length !== 3) throw new Error("the hall's fonts: " + hall.slice(0, 200));
+const tags = h(GdHall, { wall: "gradient" }, h(Hall.Floor, null, h(Hall.Pillar, { kind: "white", x: 12, y: 3 })), h(Hall.Caption, { text: "Tags" }));
+const data = Hall.hallFromTags(tags);
+if (data.diagnostics.length || data.hall.children?.[0]?.children?.[0]?.type !== "pillar") throw new Error("the tags' data: " + JSON.stringify(data));
+if (renderToStaticMarkup(tags) !== renderToStaticMarkup(h(GdHall, { hall: data.hall }))) throw new Error("the hall drawn from tags differs from its data's");
 const rose = renderToStaticMarkup(h(RoseSigilImage, { text: "שלום", showRose: true, debug: false, points: sigilPoints("שלום") }));
 if (!rose.includes('stroke="red"')) throw new Error("the rose sigil: " + rose.slice(0, 200));
 console.log(entries.length, "entries;", tree.length, hall.length, rose.length, "bytes of markup");
@@ -675,8 +719,23 @@ import Lamen from "magick-components/gd/Lamen";
 import FylfotCross, { FYLFOT_CELLS, type FylfotCellClick } from "magick-components/gd/FylfotCross";
 import { GradeTree } from "magick-components/gd/GradeTree";
 import Chakras from "magick-components/chakras/Chakras";
+import * as Hall from "magick-components/gd/hall/tags";
 
 const scale: TreeColorScale = "king";
+const Sistrum = Hall.defineHallItem<{ metal?: "gold" | "silver" }>("sistrum");
+const SerpentTree = Hall.defineHallTag<Hall.HallPlaced & { coils?: number }>("serpentTree");
+const pillars = () => [4, 12].map((x) => <Hall.Pillar key={x} kind={x < 8 ? "black" : "white"} x={x} y={3} />);
+const tagged = (
+  <GdHall wall="gradient" width={300}>
+    <Hall.Floor>
+      {pillars()}
+      <Hall.Altar at="center"><Sistrum metal="gold" /></Hall.Altar>
+      <SerpentTree coils={3} x={8} y={12} />
+    </Hall.Floor>
+    <Hall.Caption text="Tags" />
+  </GdHall>
+);
+export const tagsHall: HallNode = Hall.hallFromTags(tagged).hall;
 const sephirahHref: TreeOfLifeProps["sephirahHref"] = (sephirah) => "/s/" + sephirah.id;
 const pathHref: TreeOfLifeProps["pathHref"] = (path) => (path.id === "1_2" ? null : "/p/" + path.id);
 const onCellClick = ({ id, row, column, expected }: FylfotCellClick) =>
@@ -718,6 +777,13 @@ export const page = (
     <Kamea planet="luna" height="4em" label={false} />
     <Lamen officer="hierophant" ringStyle={{ fill: "gold" }} discStyle={{ stroke: "red" }} />
     <FylfotCross cells={[["fire", "", "cursor", null, "water"]]} onCellClick={onCellClick} />
+    {tagged}
+    {/* @ts-expect-error: a caption's text is a prop, not a child */}
+    <Hall.Caption text="a">Neophyte Temple</Hall.Caption>
+    {/* @ts-expect-error: an officer's role is one the vocabulary knows */}
+    <Hall.Officer role="hegemen" />
+    {/* @ts-expect-error: the tags form takes no hall, and the data form no root attributes */}
+    <GdHall hall={hall!} wall="plain" />
     {end}
   </>
 );
@@ -907,6 +973,17 @@ ${SERVER_DRAWINGS.map(([id, , jsx]) => `      <div id="server-${id}">${jsx}</div
 `,
   );
   write(
+    join(fixture, "app", "ClientHall.tsx"),
+    `"use client";
+import { GdHall, type HallNode } from "magick-components/gd/hall";
+
+/** A hall drawn from data in a Client Component, where tags would be erased. */
+export function ClientHall({ hall }: { hall: HallNode }) {
+  return <GdHall hall={hall} />;
+}
+`,
+  );
+  write(
     join(fixture, "app", "ClientTree.tsx"),
     `"use client";
 import TreeOfLife from "magick-components/kabbalah/TreeOfLife";
@@ -1003,6 +1080,12 @@ export default nextConfig;
             ),
             `the server drew ${id}`,
           );
+        // The hall written as tags draws as its hallFromTags data does.
+        assert(
+          hallSvg(html, "server-hall-tags") ===
+            hallSvg(html, "server-hall-bridge"),
+          "the hall drawn from tags is the hall drawn from their data",
+        );
         // Three Trees, two from Server Components and one from a Client
         // Component: each has its own ids, and its labels' curves its own.
         const trees = [
