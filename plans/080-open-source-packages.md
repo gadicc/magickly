@@ -3546,6 +3546,18 @@ magick-components `--expect-exists`. Merged to `main` once the trusted
 publisher is configured (step 7) and within its two days, CI publishes
 0.1.0 under `latest` with provenance.
 
+### 0.1.0 on npm (14 November 2026)
+
+`main` reached `20d03cd1` (the bump) and CI's "Publish packages" run
+`43637914440` published `magick-components@0.1.0` through the trusted
+publisher, every job green. npm's integrity,
+`sha512-KnjtHTWPv5ZvvYnRGnAmhzlCRymnzjvymomO+wkdyOikTp/e6cHnbbsLhVjyClfNlmTl/EL2VXMB/CWd4O9I4Q==`,
+is the one the run's `build` job logged for the tarball it kept; 173
+files, with an SLSA provenance attestation on the registry. On
+15 November 2026 the dist-tags list only `latest`, at 0.1.0: `next`,
+which pointed at 0.1.0-rc.0, is gone. Composable JSX halls, the next
+release, are [plan 084](084-composable-jsx-halls.md).
+
 ## Review (11 November 2026)
 
 Fable 5.2 at high effort, fresh context, `loom-torvalds-review`, on the

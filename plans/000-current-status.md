@@ -143,6 +143,14 @@ Follow-ups are separate from the completed migration work:
   on `gate/components-010` for CI to publish once the trusted publisher
   is configured
   ([plan 080](080-open-source-packages.md#the-release-candidate-and-010-14-november-2026)).
+- 14 November 2026: `magick-components@0.1.0` published by CI from
+  `20d03cd1` through the trusted publisher, with provenance, its
+  integrity the build job's; `latest` is 0.1.0
+  ([plan 080](080-open-source-packages.md#010-on-npm-14-november-2026)).
+- 15 November 2026: composable JSX halls designed, reviewed and spiked:
+  strict per-tag node types for 0.2.0, then `gd/hall/tags` for 0.3.0;
+  seven changes from the review wait for Gadi; not built
+  ([plan 084](084-composable-jsx-halls.md)).
 - 13 November 2026: Dependabot alerts #362 (zod), #364 (glob) and #366
   (minimatch) fixed by a `@vercel/functions` bump and parent-scoped
   overrides of Serwist's exact zod and glob pins (glob 14 checked against
