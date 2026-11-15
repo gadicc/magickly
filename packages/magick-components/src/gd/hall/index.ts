@@ -5,6 +5,7 @@
  * such as `GdHallNode`), `validateHall`, `describeHall`,
  * `estimateHallAspect`, the layout `GdHallSvg` draws from, the default
  * art and the fonts. The presets are `magick-components/gd/hall/presets`;
+ * the tags, for writing a hall as JSX, `magick-components/gd/hall/tags`;
  * magick.ly's editor's toolkit is `magick-components/gd/hall/editor`,
  * which is not stable. MIT; see ../../LICENSE.txt.
  */

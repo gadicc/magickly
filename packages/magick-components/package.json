@@ -52,6 +52,7 @@
     "./gd/hall": "./src/gd/hall/index.ts",
     "./gd/hall/editor": "./src/gd/hall/editor.ts",
     "./gd/hall/presets": "./src/gd/hall/presets/index.ts",
+    "./gd/hall/tags": "./src/gd/hall/tags.ts",
     "./gd/Lamen": "./src/gd/Lamen.tsx",
     "./gd/lamenGrades": "./src/gd/lamenGrades.ts",
     "./gd/RoseSigil": "./src/gd/RoseSigil.tsx",
@@ -117,6 +118,10 @@
       "./gd/hall/presets": {
         "types": "./lib/gd/hall/presets/index.d.ts",
         "default": "./lib/gd/hall/presets/index.js"
+      },
+      "./gd/hall/tags": {
+        "types": "./lib/gd/hall/tags.d.ts",
+        "default": "./lib/gd/hall/tags.js"
       },
       "./gd/Lamen": {
         "types": "./lib/gd/Lamen.d.ts",

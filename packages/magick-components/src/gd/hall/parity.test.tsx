@@ -1,10 +1,9 @@
 import { createElement, Fragment, type ReactElement } from "react";
 import ts from "typescript";
 import { describe, expect, it } from "vitest";
-import { DEFAULT_HALL_ART } from "./art/index.ts";
 import { HALL_PRESETS } from "./presets/index.ts";
+import * as Hall from "./tags.ts";
 import type { HallNode } from "./types.ts";
-import { HALL_TAGS } from "./vocabulary.ts";
 import { HALL_TAG, hallFromTags } from "./walk.ts";
 
 // Each preset printed as tags, as an author would write it, compiled and
@@ -79,28 +78,12 @@ function compile(source: string, scope: TagScope): ReactElement {
   )({ createElement, Fragment }, scope.GdHall, scope.Hall) as ReactElement;
 }
 
-/** A component marked as a hall tag. */
-function marked(type: string) {
-  const tag = (): null => null;
-  Object.defineProperty(tag, HALL_TAG, { value: type });
-  return tag;
-}
-
-/** The vocabulary's tags and those the default art adds. */
-const TYPES = new Set([
-  ...HALL_TAGS.keys(),
-  ...[...DEFAULT_HALL_ART.keys()].filter((key) => !key.includes(":")),
-]);
-
-/** Tags marked as the walk reads them, one per tag. */
+/** The package's tags, and a root the walk reads as `GdHall`. */
 const scope: TagScope = {
-  GdHall: marked("gdHall"),
-  Hall: Object.fromEntries(
-    [...TYPES].map((type) => [
-      tagName(type).slice("Hall.".length),
-      marked(type),
-    ]),
-  ),
+  GdHall: Object.defineProperty((): null => null, HALL_TAG, {
+    value: "gdHall",
+  }),
+  Hall,
 };
 
 describe("each preset as tags", () => {

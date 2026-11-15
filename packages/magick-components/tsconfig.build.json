@@ -28,6 +28,7 @@
     "src/gd/hall/editor.ts",
     "src/gd/hall/index.ts",
     "src/gd/hall/presets/index.ts",
+    "src/gd/hall/tags.ts",
     "src/gd/Lamen.tsx",
     "src/gd/lamenGrades.ts",
     "src/gd/RoseSigil.tsx",
