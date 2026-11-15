@@ -1,7 +1,8 @@
 /**
  * Golden Dawn temple halls (plan 061): `GdHall`, which draws a hall from
  * a hall description, and what a page needs to draw, check or describe
- * one: the types of the description, `validateHall`, `describeHall`,
+ * one: the types of the description (`HallNode`, and strict ones per tag
+ * such as `GdHallNode`), `validateHall`, `describeHall`,
  * `estimateHallAspect`, the layout `GdHallSvg` draws from, the default
  * art and the fonts. The presets are `magick-components/gd/hall/presets`;
  * magick.ly's editor's toolkit is `magick-components/gd/hall/editor`,
@@ -45,6 +46,6 @@ export {
   type ResolveHallOptions,
   resolveHall,
 } from "./layout.ts";
+export type * from "./nodes.ts";
 export type * from "./types.ts";
 export { type ValidateHallOptions, validateHall } from "./validate.ts";
-export type { BannerSide } from "./vocabulary.ts";
