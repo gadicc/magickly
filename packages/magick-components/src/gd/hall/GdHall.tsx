@@ -452,10 +452,12 @@ export function GdHallSvg({
 // Plan 061 in the magick.ly repository designs the hall and its renderer.
 /**
  * A Golden Dawn temple hall as inline SVG, drawn from a `gdHall` node such
- * as a preset's (`magick-components/gd/hall/presets`). It renders on the
- * server as well as in the browser: its layout is computed from the node,
- * its labels' widths from the metrics of the fonts the package ships, and
- * its gradient and pattern ids from `useId`, so several halls can share a
+ * as a preset's (`magick-components/gd/hall/presets`), or from a hall
+ * written as tags, its children (`magick-components/gd/hall/tags`), with
+ * the hall's own attributes as its props. It renders on the server as
+ * well as in the browser: its layout is computed from the node, its
+ * labels' widths from the metrics of the fonts the package ships, and its
+ * gradient and pattern ids from `useId`, so several halls can share a
  * page. The node is treated as untrusted: its strings only reach text
  * nodes, unknown tags draw as dashed placeholders, and nothing is loaded
  * by URL except the fonts `fontBaseUrl` points at.

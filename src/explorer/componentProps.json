@@ -242,7 +242,7 @@
     ]
   },
   "GdHall": {
-    "description": "A Golden Dawn temple hall as inline SVG, drawn from a `gdHall` node such\nas a preset's (`magick-components/gd/hall/presets`). It renders on the\nserver as well as in the browser: its layout is computed from the node,\nits labels' widths from the metrics of the fonts the package ships, and\nits gradient and pattern ids from `useId`, so several halls can share a\npage. The node is treated as untrusted: its strings only reach text\nnodes, unknown tags draw as dashed placeholders, and nothing is loaded\nby URL except the fonts `fontBaseUrl` points at.",
+    "description": "A Golden Dawn temple hall as inline SVG, drawn from a `gdHall` node such\nas a preset's (`magick-components/gd/hall/presets`), or from a hall\nwritten as tags, its children (`magick-components/gd/hall/tags`), with\nthe hall's own attributes as its props. It renders on the server as\nwell as in the browser: its layout is computed from the node, its\nlabels' widths from the metrics of the fonts the package ships, and its\ngradient and pattern ids from `useId`, so several halls can share a\npage. The node is treated as untrusted: its strings only reach text\nnodes, unknown tags draw as dashed placeholders, and nothing is loaded\nby URL except the fonts `fontBaseUrl` points at.",
     "props": [
       {
         "name": "hall",
