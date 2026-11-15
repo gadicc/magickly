@@ -1,4 +1,4 @@
-import type { HallNode } from "../types.ts";
+import type { HallContentNode } from "../nodes.ts";
 import { CARD_LABELS } from "../vocabulary.ts";
 import { type HallPreset, regardie1938 } from "./types.ts";
 
@@ -10,13 +10,15 @@ import { type HallPreset, regardie1938 } from "./types.ts";
  */
 
 /** The five paths from the Portal, across the East of the floor. */
-const PATHS: readonly HallNode[] = [
-  ["mem", 1.1],
-  ["ayin", 4.5],
-  ["samekh", 8],
-  ["nun", 11.4],
-  ["kaph", 14.9],
-].map(([letter, x]) => ({
+const PATHS: readonly HallContentNode[] = (
+  [
+    ["mem", 1.1],
+    ["ayin", 4.5],
+    ["samekh", 8],
+    ["nun", 11.4],
+    ["kaph", 14.9],
+  ] as const
+).map(([letter, x]) => ({
   type: "hebrewLetter",
   letter,
   x,
@@ -28,7 +30,7 @@ const PATHS: readonly HallNode[] = [
  * The East behind the veil: the Chief Adept, the small white altar
  * between the pillars, the veil across the dais.
  */
-const EAST: readonly HallNode[] = [
+const EAST: readonly HallContentNode[] = [
   { type: "officer", role: "chiefAdept", x: 8, y: -3.8, labelPos: "right" },
   { type: "pillar", kind: "black", x: 5.7, y: -2 },
   { type: "altar", kind: "white", x: 8, y: -2, scale: 0.5 },
@@ -43,7 +45,7 @@ const EAST: readonly HallNode[] = [
  * Emblem cards, each labelled as the diagram labels it (Gadi's option
  * (d), 24 October 2026).
  */
-const FIGURES: readonly HallNode[] = (
+const FIGURES: readonly HallContentNode[] = (
   [
     ["pan", 1.2, 5],
     ["devil", 1.2, 11.2],
@@ -59,7 +61,7 @@ const FIGURES: readonly HallNode[] = (
 }));
 
 /** The Earth tablet on the North wall, the Fire tablet on the South. */
-const SIDES: readonly HallNode[] = [
+const SIDES: readonly HallContentNode[] = [
   { type: "tablet", element: "earth", x: -0.31, y: 8, anchor: "north" },
   { type: "tablet", element: "fire", x: 16.31, y: 8, anchor: "south" },
 ];

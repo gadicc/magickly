@@ -1,8 +1,8 @@
-import type { HallNode } from "../types.ts";
+import type { BannersNode, HallContentNode } from "../nodes.ts";
 import { dais, type HallPreset, regardie1938 } from "./types.ts";
 
 /** The Zelator's letters above the East: Shin, Tau and Qoph. */
-const LETTERS: HallNode = {
+const LETTERS: BannersNode = {
   type: "banners",
   children: [
     { type: "hebrewLetter", letter: "shin", x: 3.41 },
@@ -17,18 +17,18 @@ const LETTERS: HallNode = {
  * and the salt at its West end. It is the Theoricus board's size (the
  * default scale, 2.69 squares along the wall).
  */
-const NORTH: readonly HallNode[] = [
+const NORTH: readonly HallContentNode[] = [
   { type: "tablet", element: "earth", anchor: "north", x: -0.31, y: 8 },
   { type: "item", kind: "lantern", x: 0.8, y: 5.3 },
   { type: "item", kind: "salt", x: 0.8, y: 10.55, scale: 1.04 },
 ];
 
-const BANNERS: readonly HallNode[] = [
+const BANNERS: readonly HallContentNode[] = [
   { type: "banner", kind: "west", x: 6.42, y: -0.84 },
   { type: "banner", kind: "east", x: 9.52, y: -0.84 },
 ];
 
-const PILLARS: readonly HallNode[] = [
+const PILLARS: readonly HallContentNode[] = [
   { type: "pillar", kind: "black", x: 5, y: 11 },
   { type: "pillar", kind: "white", x: 11, y: 11 },
 ];

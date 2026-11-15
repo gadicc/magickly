@@ -24,7 +24,7 @@ export const neophyte: HallPreset = {
           { type: "pillar", kind: "white", x: 12, y: 3, glow: true },
           {
             type: "altar",
-            at: "centre",
+            at: "center",
             children: [
               { type: "item", kind: "cross", y: -0.36 },
               { type: "item", kind: "triangle", y: 0.24 },

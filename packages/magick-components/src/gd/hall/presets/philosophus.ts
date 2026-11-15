@@ -1,4 +1,4 @@
-import type { HallNode } from "../types.ts";
+import type { GdHallNode, HallContentNode } from "../nodes.ts";
 import { type HallPreset, regardie1938 } from "./types.ts";
 
 /**
@@ -13,7 +13,7 @@ import { type HallPreset, regardie1938 } from "./types.ts";
  * scale 1, 2 squares along the wall: at the default it would overlap the
  * lamp, the incense and, in 4=7, the Hegemon.
  */
-const FIRE: readonly HallNode[] = [
+const FIRE: readonly HallContentNode[] = [
   {
     type: "tablet",
     element: "fire",
@@ -27,7 +27,7 @@ const FIRE: readonly HallNode[] = [
 ];
 
 /** The altar between two candles, a trump on it. */
-const altar = (trump: number): HallNode[] => [
+const altar = (trump: number): HallContentNode[] => [
   { type: "item", kind: "candle", x: 6.2, y: 8 },
   { type: "altar", x: 8, y: 8, children: [{ type: "tarotKey", n: trump }] },
   { type: "item", kind: "candle", x: 9.8, y: 8 },
@@ -45,7 +45,7 @@ function pathHall(
   letters: readonly string[],
   trump: number,
   title: string,
-): HallNode {
+): GdHallNode {
   return {
     type: "gdHall",
     dais: 4,

@@ -1,11 +1,11 @@
-import type { HallNode } from "../types.ts";
+import type { HallContentNode } from "../nodes.ts";
 import { dais, type HallPreset, regardie1938 } from "./types.ts";
 
 /**
  * The East of both parts: the Air tablet standing over the edge of the
  * dais, a lantern before it and the Pantacle, the Theoricus' badge.
  */
-const AIR: readonly HallNode[] = [
+const AIR: readonly HallContentNode[] = [
   { type: "tablet", element: "air", x: 7.97, y: 0.63 },
   { type: "item", kind: "lantern", x: 7, y: 1.66 },
   { type: "item", kind: "pantacle", x: 9.07, y: 1.83 },

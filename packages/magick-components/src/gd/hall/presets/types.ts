@@ -1,4 +1,4 @@
-import type { HallNode } from "../types.ts";
+import type { DaisNode, GdHallNode } from "../nodes.ts";
 
 /**
  * A ready-made hall (plan 061, Presets): a `gdHall` row tree, copied into a
@@ -19,7 +19,8 @@ export interface HallPreset {
    * rubric. Never empty.
    */
   sources: readonly HallPresetSource[];
-  hall: HallNode;
+  /** The hall, strictly typed; any `GdHallNode` is a `HallNode`. */
+  hall: GdHallNode;
 }
 
 /**
@@ -95,15 +96,17 @@ export function hallSourceUrl(source: HallPresetSource): string {
  * predecessor, spread evenly, the row centred in the dais, labels
  * included.
  */
-export function dais(): HallNode {
+export function dais(): DaisNode {
   return {
     type: "dais",
-    children: [
-      "imperator",
-      "cancellarius",
-      "hierophant",
-      "pastHierophant",
-      "praemonstrator",
-    ].map((role) => ({ type: "officer", role })),
+    children: (
+      [
+        "imperator",
+        "cancellarius",
+        "hierophant",
+        "pastHierophant",
+        "praemonstrator",
+      ] as const
+    ).map((role) => ({ type: "officer", role })),
   };
 }

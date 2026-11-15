@@ -1,4 +1,4 @@
-import type { HallNode } from "../types.ts";
+import type { GdHallNode } from "../nodes.ts";
 import { type HallPreset, regardie1938 } from "./types.ts";
 
 /**
@@ -16,7 +16,7 @@ import { type HallPreset, regardie1938 } from "./types.ts";
  * trump on the altar between two candles, incense in the South, and the
  * Hiereus and Hegemon in the West, each with a red lamp.
  */
-function pathHall(letter: string, trump: number, title: string): HallNode {
+function pathHall(letter: string, trump: number, title: string): GdHallNode {
   return {
     type: "gdHall",
     dais: 4,
