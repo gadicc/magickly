@@ -16,6 +16,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { gdHallPug, parseHallSource, printHallSource } from "@/doc/gdHallPug";
 import { hallEditorJsonLd } from "@/seo/halls";
 import HallPlayground, {
+  canonicalSpellings,
   clipped,
   exportFilename,
   HALL_LAYOUT_KEY,
@@ -24,6 +25,7 @@ import HallPlayground, {
   validHall,
 } from "./HallPlayground";
 import { HALL_DRAFT_KEY, MAX_HALL_DRAFT } from "./hallDraft";
+import { entryOfSource } from "./hallHistory";
 import { readShareHash, shareFragment } from "./hallShare";
 import HallPage from "./page";
 
@@ -390,6 +392,51 @@ describe("presets", { timeout: 20_000 }, () => {
     expect(a.hall?.id).not.toBe(b.hall?.id);
     expect(matchingPreset(a)).toBe(HALL_PRESETS[0]);
     expect(matchingPreset({ ...a, hall: null })).toBeUndefined();
+  });
+
+  it("knows a Neophyte copied before 0.2.0, at centre", () => {
+    const source = gdHallPug(HALL_PRESETS[0].hall);
+    expect(source).toContain('at="center"');
+    const old = entryOfSource(source.replace('at="center"', 'at="centre"'));
+    expect(old.hall && printHallSource(old.hall, { ids: false })).toContain(
+      'at="centre"',
+    );
+    expect(matchingPreset(old)).toBe(HALL_PRESETS[0]);
+    // Only a point or a colour is respelled, never text.
+    const caption = entryOfSource(
+      source.replace('text="Neophyte Temple"', 'text="centre"'),
+    );
+    expect(matchingPreset(caption)).toBeUndefined();
+    expect(
+      printHallSource(canonicalSpellings(caption.hall!), { ids: false }),
+    ).toContain('text="centre"');
+  });
+
+  it("reads grey as gray where a colour stands", () => {
+    const { hall } = entryOfSource(
+      gdHallPug({
+        type: "gdHall",
+        children: [
+          {
+            type: "floor",
+            children: [
+              { type: "item", kind: "cross", fill: "grey", anchor: "centre" },
+              { type: "marker", text: "grey" },
+            ],
+          },
+        ],
+      }),
+    );
+    expect(canonicalSpellings(hall!)).toMatchObject({
+      children: [
+        {
+          children: [
+            { attrs: { fill: "gray", anchor: "center" } },
+            { attrs: { text: "grey" } },
+          ],
+        },
+      ],
+    });
   });
 });
 

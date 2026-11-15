@@ -17,6 +17,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { GdHall, type HallNode } from "magick-components/gd/hall";
+import { hallColor, hallPoint } from "magick-components/gd/hall/editor";
 import {
   HALL_PRESETS,
   type HallPreset,
@@ -92,16 +93,48 @@ export const presetEntry = (preset: HallPreset): HallEntry =>
 
 let presetsByPug: Map<string, HallPreset> | undefined;
 
+/** The attributes that take a point or a colour, with their spellers. */
+const SPELLED: Readonly<Record<string, (value: string) => string | undefined>> =
+  { at: hallPoint, anchor: hallPoint, fill: hallColor, stroke: hallColor };
+
+/**
+ * A hall with the vocabulary's spellings: `center` for `centre` and
+ * `gray` for `grey`, which halls written before 0.2.0 may hold and which
+ * draw the same. Other attributes, text among them, are left as written.
+ */
+export function canonicalSpellings(hall: HallElement): HallElement {
+  const attrs = Object.fromEntries(
+    Object.entries(hall.attrs).map(([name, value]) => [
+      name,
+      typeof value === "string" && Object.hasOwn(SPELLED, name)
+        ? (SPELLED[name](value) ?? value)
+        : value,
+    ]),
+  );
+  return {
+    ...hall,
+    attrs,
+    ...(hall.children && {
+      children: hall.children.map((child) =>
+        child.kind === "element" ? canonicalSpellings(child) : child,
+      ),
+    }),
+  };
+}
+
 /**
  * The preset a hall is an unchanged copy of (its Pug without IDs is the
- * preset's), if any. Undefined for source that holds no hall.
+ * preset's, the old spellings read as the new), if any. Undefined for
+ * source that holds no hall.
  */
 export function matchingPreset(entry: HallEntry): HallPreset | undefined {
   if (!entry.hall) return undefined;
   presetsByPug ??= new Map(
     HALL_PRESETS.map((preset) => [gdHallPug(preset.hall), preset]),
   );
-  return presetsByPug.get(printHallSource(entry.hall, { ids: false }));
+  return presetsByPug.get(
+    printHallSource(canonicalSpellings(entry.hall), { ids: false }),
+  );
 }
 
 /**
