@@ -30,6 +30,10 @@ const fake = vi.hoisted(() => ({
   controlGone: true,
   controllerPid: 10,
   packetPid: 20,
+  goneMisses: 0,
+  startedBad: false,
+  releaseFailure: "",
+  endFailurePid: 0,
 }));
 vi.mock("server-only", () => ({}));
 vi.mock("postgres", () => ({
@@ -43,6 +47,7 @@ vi.mock("postgres", () => ({
       closed: false,
       end: vi.fn(async () => {
         fake.events.push(`close:${pid}`);
+        if (pid === fake.endFailurePid) throw Error("Synthetic end refusal");
         if (pid === fake.packetPid && fake.packetCloseFails)
           throw Error("Synthetic close failure");
         pool.closed = true;
@@ -50,6 +55,7 @@ vi.mock("postgres", () => ({
     };
     fake.pools.push(pool);
     // Exercise the actual bound-host callback; the scripted certificate is not an actual TLS handshake.
+    options.onnotice({ message: "Synthetic suppressed private notice" });
     options.ssl.checkServerIdentity(
       fake.badPeer ? "wrong.example" : options.host,
       { subjectaltname: `DNS:${options.host}` },
@@ -65,7 +71,9 @@ vi.mock("postgres", () => ({
               gone:
                 params?.[0] === fake.controllerPid
                   ? fake.controlGone
-                  : fake.gone,
+                  : fake.goneMisses-- > 0
+                    ? false
+                    : fake.gone,
             },
           ];
         }
@@ -123,7 +131,11 @@ vi.mock("./sqlMaintenance", () => ({
           isObserver ? "observe-committed-run" : "inspect-started",
         );
         return {
-          state: isObserver ? "healthy" : "started",
+          state: isObserver
+            ? "healthy"
+            : fake.startedBad
+              ? "healthy"
+              : "started",
           run_id: fake.observerRunWrong && isObserver ? "wrong" : "same-run",
           revision: isObserver ? 2 : 1,
         };
@@ -138,6 +150,8 @@ vi.mock("./sqlMaintenance", () => ({
       }),
       release: vi.fn(async () => {
         fake.events.push("release");
+        if (fake.releaseFailure === (isObserver ? "observer" : "control"))
+          throw Error("Synthetic release refusal");
       }),
     };
   }),
@@ -181,6 +195,10 @@ beforeEach(() => {
     controlGone: true,
     controllerPid: 10,
     packetPid: 20,
+    goneMisses: 0,
+    startedBad: false,
+    releaseFailure: "",
+    endFailurePid: 0,
   });
   vi.clearAllMocks();
 });
@@ -424,4 +442,79 @@ it("rejects an accidental async credential resolver without an unhandled private
   ).rejects.toThrow(RESEARCH_MANAGED_CLEANUP_ERROR);
   expect(observed).toHaveBeenCalledTimes(1);
   expect(fake.pools).toEqual([]);
+});
+
+it("refuses a promise-valued credential resolver without an unhandled private rejection", async () => {
+  const o = options();
+  Object.defineProperty(o, "connection", {
+    value: Promise.reject(Error("synthetic private resolver diagnostic")),
+  });
+  await expect(runResearchManagedCleanup(o, active())).rejects.toThrow(
+    RESEARCH_MANAGED_CLEANUP_ERROR,
+  );
+  expect(fake.pools).toHaveLength(0);
+});
+it("rejects nonfinite inherited work bounds before credentials", async () => {
+  const o = options();
+  await expect(runResearchManagedCleanup(o, active(), NaN)).rejects.toThrow();
+  expect(o.connection).not.toHaveBeenCalled();
+});
+it("waits for a just-closed packet backend to disappear before finishing health", async () => {
+  fake.goneMisses = 1;
+  expect((await runResearchManagedCleanup(options(), active())).status).toBe(
+    "healthy",
+  );
+  expect(fake.events.filter((e) => e === "native-packet-absence")).toHaveLength(
+    2,
+  );
+});
+it.each(["control", "observer"])(
+  "cannot report health after %s release acknowledgement fails",
+  async (which) => {
+    fake.releaseFailure = which;
+    if (which === "observer") fake.finishAckLost = true;
+    expect((await runResearchManagedCleanup(options(), active())).status).toBe(
+      "failed",
+    );
+  },
+);
+it.each([10, 30])(
+  "cannot report health after actual pool %s closure fails",
+  async (pid) => {
+    fake.endFailurePid = pid;
+    if (pid === 30) fake.finishAckLost = true;
+    expect((await runResearchManagedCleanup(options(), active())).status).toBe(
+      "failed",
+    );
+  },
+);
+it("requires the acknowledged started state before opening a packet pool", async () => {
+  fake.startedBad = true;
+  expect((await runResearchManagedCleanup(options(), active())).status).toBe(
+    "failed",
+  );
+  expect(fake.pools).toHaveLength(1);
+  expect(fake.events).not.toContain("purge-start");
+});
+it("refuses sharing the control and packet backend identity", async () => {
+  fake.packetPid = fake.controllerPid;
+  expect((await runResearchManagedCleanup(options(), active())).status).toBe(
+    "failed",
+  );
+  expect(fake.events).not.toContain("purge-start");
+});
+it("does not open any socket if a delayed password getter exhausts the work budget", async () => {
+  const o = options(),
+    clock = vi.spyOn(performance, "now").mockReturnValue(0);
+  Object.defineProperty(o, "connection", {
+    value: () => ({
+      ...identity,
+      get password() {
+        clock.mockReturnValue(40001);
+        return "a".repeat(64);
+      },
+    }),
+  });
+  expect((await runResearchManagedCleanup(o, active())).status).toBe("failed");
+  expect(fake.pools).toHaveLength(0);
 });

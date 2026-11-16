@@ -96,3 +96,44 @@ and native gates, compose the main-site shell/APIs, and verify the full path und
 its original deadline. Current constructor/scripted lifecycle tests and isolated
 native SQL tests do not establish hosted role custody, end-to-end acceptance,
 answer quality, cold latency or production readiness.
+
+
+## Request-owned SQL composition checkpoint
+
+`createResearchManagedSqlService` is an unregistered HTTPS POST factory for the
+four existing research API paths. It does not read environment variables or
+change the Next route/page dispatch. Independently adopted origin/operator/startup
+pins and an app auth root precede private startup loading. Its initial signed
+session check also fences the exact current token, session, owner and expiry in
+native read-only SQL. A conservative native TTL includes SQL and COMMIT time;
+it can only shorten the original eight-second ingress/startup bound.
+
+Each request binds the authority and separate corpus reader's transaction methods,
+checks native database/role/relation OIDs, and passes the existing remote loader
+fresh source readers for every object. The initial canonical identity uses the
+main app's public auth tables; other auth layouts need explicit integration.
+This first factory requires one intrinsic evidence snapshot per source and refuses
+ambiguity before corpus reads. The generic policy/publication formats retain their
+broader compatibility. No snapshot is selected merely because its hash sorts first.
+
+Questions prepare the full canonical corpus. Catalogue and saved-answer paths
+prepare metadata only and avoid generation/provider option getters. Catalogue
+bootstrap remains capped at the original spending-window expiry; archive and
+answer reads use the independently adopted retained-read expiry. This distinction
+does not extend the original window or create an AI allowance.
+
+There is one operation slot per service instance, held through the delegated core
+handler. Unsettled SQL/configuration work at a bounded return poisons the instance
+until process replacement, rather than authorizing another load. This is not a
+distributed concurrency or physical connection-termination guarantee. Root identity
+checks persist after handoff; the core then owns provider and independent settlement
+lifetimes, including teardown after request cancellation. There is no startup,
+corpus, session or authorization cache.
+
+Focused tests include scripted timing/mutation/concurrency controls plus genuine
+PGlite signed-auth, native SQL, current policy, nine-column reader grants, canonical
+corpus compilation and configured-handler dispatch. These are synthetic data and
+local database controls. They do not prove a deployed Neon client's TLS/ACL custody,
+actual restricted runtime/cleanup operation, full-corpus cold latency or answer
+quality. Main-site shell/Next registration, protected release/credential adoption,
+scheduling and enabled operator acceptance remain pending.

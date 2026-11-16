@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   readPrivateResearchPreviewSession as actualRead,
+  readPrivateResearchManagedOperatorPrincipal,
   readPrivateResearchOperatorSession,
 } from "./previewSession";
 
@@ -35,10 +36,19 @@ const settings = {
   googleClientId: "synthetic",
   googleClientSecret: "synthetic",
 };
-function fixture(mode = { readonly: "on", isolation: "read committed" }) {
+function fixture(
+  mode = { readonly: "on", isolation: "read committed" },
+  lease: { now: number; expires: number }[] = [
+    { now: Date.now(), expires: 2000000000000 },
+  ],
+) {
   const tx = {
       execute: vi.fn(async () => []),
-      select: vi.fn(() => ({ from: vi.fn(async () => [mode]) })),
+      select: vi.fn((fields) =>
+        fields.readonly
+          ? { from: vi.fn(async () => [mode]) }
+          : { from: () => ({ where: async () => lease }) },
+      ),
     },
     db = {
       transaction: vi.fn(
@@ -211,4 +221,186 @@ it.each([
   ).rejects.toThrow("Private operator session unavailable");
   expect(db.transaction).not.toHaveBeenCalled();
   expect(m.read).not.toHaveBeenCalled();
+});
+
+it("returns the canonical server-only principal without token/profile fields and preserves the original ingress deadline", async () => {
+  const { db } = fixture(),
+    owner = "019aa111-0000-7000-8000-000000000001",
+    session = "019aa111-0000-7000-8000-000000000002";
+  m.read.mockResolvedValue({
+    user: { id: owner, email: "synthetic@example.test" },
+    session: {
+      id: session,
+      token: "private-synthetic-token",
+      expiresAt: new Date(2000000000000),
+    },
+  });
+  const p = await readPrivateResearchManagedOperatorPrincipal(
+    db as never,
+    settings,
+    new Headers(),
+    new AbortController().signal,
+    owner,
+    performance.now() + 8000,
+  );
+  expect(p).toEqual({
+    subject: { kind: "user", user_id: owner, session_id: session },
+    expiresAt: 2000000000000,
+    deadlineAt: expect.any(Number),
+  });
+  expect(JSON.stringify(p)).not.toMatch(/token|email|synthetic/);
+});
+it.each([NaN, Infinity, -1])(
+  "refuses invalid/elapsed managed inherited deadlines before SQL: %s",
+  async (end) => {
+    const { db } = fixture();
+    await expect(
+      readPrivateResearchManagedOperatorPrincipal(
+        db as never,
+        settings,
+        new Headers(),
+        new AbortController().signal,
+        "019aa111-0000-7000-8000-000000000001",
+        end,
+      ),
+    ).rejects.toThrow("Private operator session unavailable");
+    expect(db.transaction).not.toHaveBeenCalled();
+  },
+);
+it("refuses malformed managed session identity without treating an auth mock as grant authority", async () => {
+  const { db } = fixture(),
+    owner = "019aa111-0000-7000-8000-000000000001";
+  m.read.mockResolvedValue({
+    user: { id: owner },
+    session: {
+      id: "not-a-canonical-session",
+      expiresAt: new Date(2000000000000),
+    },
+  });
+  await expect(
+    readPrivateResearchManagedOperatorPrincipal(
+      db as never,
+      settings,
+      new Headers(),
+      new AbortController().signal,
+      owner,
+      performance.now() + 8000,
+    ),
+  ).rejects.toThrow("Private operator session unavailable");
+});
+
+it("rejects a natively expired session even while the app wall clock still accepts the adapter session", async () => {
+  const { db } = fixture(undefined, [
+      { now: 2000000000001, expires: 2000000000000 },
+    ]),
+    owner = "019aa111-0000-7000-8000-000000000001";
+  m.read.mockResolvedValue({
+    user: { id: owner },
+    session: {
+      id: "019aa111-0000-7000-8000-000000000002",
+      token: "synthetic-token",
+      expiresAt: new Date(2000000000000),
+    },
+  });
+  await expect(
+    readPrivateResearchManagedOperatorPrincipal(
+      db as never,
+      settings,
+      new Headers(),
+      new AbortController().signal,
+      owner,
+      performance.now() + 8000,
+    ),
+  ).rejects.toThrow("Private operator session unavailable");
+});
+it("charges COMMIT acknowledgement time against a short native session TTL", async () => {
+  const clock = vi.spyOn(performance, "now").mockReturnValue(0),
+    f = fixture(undefined, [{ now: 1000, expires: 1005 }]),
+    owner = "019aa111-0000-7000-8000-000000000001";
+  m.read.mockResolvedValue({
+    user: { id: owner },
+    session: {
+      id: "019aa111-0000-7000-8000-000000000002",
+      token: "synthetic-token",
+      expiresAt: new Date(2000000000000),
+    },
+  });
+  f.db.transaction.mockImplementationOnce(async (work) => {
+    const value = await work(f.tx);
+    clock.mockReturnValue(6);
+    return value;
+  });
+  await expect(
+    readPrivateResearchManagedOperatorPrincipal(
+      f.db as never,
+      settings,
+      new Headers(),
+      new AbortController().signal,
+      owner,
+      8000,
+    ),
+  ).rejects.toThrow("Private operator session unavailable");
+});
+it("requires the native session/token/owner fence to still find a row", async () => {
+  const { db } = fixture(undefined, []),
+    owner = "019aa111-0000-7000-8000-000000000001";
+  m.read.mockResolvedValue({
+    user: { id: owner },
+    session: {
+      id: "019aa111-0000-7000-8000-000000000002",
+      token: "synthetic-token",
+      expiresAt: new Date(2000000000000),
+    },
+  });
+  await expect(
+    readPrivateResearchManagedOperatorPrincipal(
+      db as never,
+      settings,
+      new Headers(),
+      new AbortController().signal,
+      owner,
+      performance.now() + 8000,
+    ),
+  ).rejects.toThrow("Private operator session unavailable");
+});
+
+it("ends a hung native COMMIT wait when the observed short session lease expires", async () => {
+  vi.useFakeTimers();
+  try {
+    const f = fixture(undefined, [{ now: 1000, expires: 1005 }]),
+      owner = "019aa111-0000-7000-8000-000000000001";
+    m.read.mockResolvedValue({
+      user: { id: owner },
+      session: {
+        id: "019aa111-0000-7000-8000-000000000002",
+        token: "synthetic-token",
+        expiresAt: new Date(2000000000000),
+      },
+    });
+    let entered!: () => void;
+    const ready = new Promise<void>((r) => {
+      entered = r;
+    });
+    f.db.transaction.mockImplementationOnce(async (work) => {
+      await work(f.tx);
+      entered();
+      return new Promise(() => {});
+    });
+    const result = readPrivateResearchManagedOperatorPrincipal(
+      f.db as never,
+      settings,
+      new Headers(),
+      new AbortController().signal,
+      owner,
+      performance.now() + 8000,
+    ).then(
+      () => "accepted",
+      () => "refused",
+    );
+    await ready;
+    await vi.advanceTimersByTimeAsync(6);
+    expect(await result).toBe("refused");
+  } finally {
+    vi.useRealTimers();
+  }
 });

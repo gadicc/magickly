@@ -18,6 +18,7 @@ import { prepareResearchOperatorStartup } from "./operatorStartup";
 import { prepareResearchManagedPublication } from "./publication";
 import { prepareResearchReadEnvelope } from "./readAdoption";
 import { prepareResearchRuntimeCorpus } from "./runtimeCorpus";
+import { prepareResearchSourcePolicy } from "./sourcePolicy";
 
 vi.mock("server-only", () => ({}));
 afterEach(() => vi.restoreAllMocks());
@@ -263,4 +264,64 @@ it("rejects a self-consistent declared Node22 app under the actual Node24 runtim
   ).toThrow(configured.RESEARCH_CONFIGURED_SERVICE_ERROR);
   expect(o.database.transaction).not.toHaveBeenCalled();
   expect(o.apiKey).not.toHaveBeenCalled();
+});
+
+it("refuses noncanonical service bytes and invalid proposals before any assembly", () => {
+  const value = input();
+  Object.assign(value, {
+    service_document_json: value.service_document_json + " ",
+  });
+  expect(() => prepareResearchManagedOperatorStartup(value)).toThrow();
+  expect(() =>
+    proposeResearchManagedOperatorStartup({
+      ...input(),
+      service_document_json: "{",
+    }),
+  ).toThrow();
+});
+it("rejects a canonically valid but oversized private startup before intent/assembly", () => {
+  const value = input(),
+    policy = JSON.parse(value.publication_input.sourcePolicyJson);
+  policy.sources[0].evidence_versions = Array.from({ length: 18000 }, (_, i) =>
+    i.toString(16).padStart(64, "0"),
+  );
+  const source = prepareResearchSourcePolicy({
+      schema_version: policy.schema_version,
+      scope: policy.scope,
+      sources: policy.sources,
+    }),
+    profile = JSON.parse(value.publication_input.retentionProfileJson),
+    scope = { ...profile.scope, corpusVersion: source.corpusVersion },
+    sourceStorage = {
+      ...value.publication_input.sourceStorage,
+      corpusVersion: source.corpusVersion,
+    },
+    retention = prepareResearchManagedRetentionProfile({ ...profile, scope }),
+    read = prepareResearchReadEnvelope({
+      ...JSON.parse(value.publication_input.readEnvelopeJson),
+      original_scope: scope,
+      source_storage: sourceStorage,
+    }),
+    publicationInput = {
+      ...value.publication_input,
+      sourcePolicyJson: source.policyJson,
+      sourcePolicySha256: source.policySha256,
+      retentionProfileJson: retention.document_json,
+      retentionProfileSha256: retention.document_sha256,
+      readEnvelopeJson: read.document_json,
+      readEnvelopeSha256: read.document_sha256,
+      sourceStorage,
+    },
+    publication = prepareResearchManagedPublication(publicationInput),
+    service = configured.prepareResearchConfiguredServiceDocument({
+      ...JSON.parse(value.service_document_json),
+      publication_sha256: publication.sha256,
+    });
+  expect(() =>
+    proposeResearchManagedOperatorStartup({
+      ...value,
+      publication_input: publicationInput,
+      service_document_json: service.documentJson,
+    }),
+  ).toThrow();
 });
