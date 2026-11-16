@@ -154,8 +154,10 @@ Follow-ups are separate from the completed migration work:
   the build job's. Stage 2, `gd/hall/tags` (`import * as Hall`,
   `<GdHall><Hall.Floor>…</Hall.Floor></GdHall>`), `hallFromTags`,
   `defineHallTag` and `defineHallItem`, is 0.3.0, published by CI on
-  16 November the same way; a 0.3.1 patch and a provenance re-sign are
-  its follow-ups ([plan 084](084-composable-jsx-halls.md)).
+  16 November the same way, and 0.3.1, the final review's leftovers
+  (edge cases JavaScript callers reach), bumped on `gate/hall-tags-031`
+  for CI to publish when `main` is pushed; a provenance re-sign is the
+  owner's follow-up ([plan 084](084-composable-jsx-halls.md)).
 - 13 November 2026: Dependabot alerts #362 (zod), #364 (glob) and #366
   (minimatch) fixed by a `@vercel/functions` bump and parent-scoped
   overrides of Serwist's exact zod and glob pins (glob 14 checked against

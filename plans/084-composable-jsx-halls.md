@@ -3,7 +3,8 @@
 Status: done. Stage 1, the strict types, is magick-components 0.2.0,
 on npm since 15 November 2026 ([below](#020-on-npm-15-november-2026));
 stage 2, the JSX tags, is 0.3.0, on npm since 16 November
-([below](#030-on-npm-16-november-2026)); the follow-ups are
+([below](#030-on-npm-16-november-2026)), with the final review's
+leftovers in 0.3.1 ([below](#031-16-november-2026)); the follow-ups are
 [below](#follow-ups). Gadi settled the assessment's twelve decisions
 on 14 November 2026, and on 15 November the seven changes (R1–R7) that
 a Fable 5.2 review and the spikes led to
@@ -596,6 +597,38 @@ npm's integrity,
 is the one the run's `build` job logged; 179 files, with an SLSA
 provenance attestation.
 
+### 0.3.1 (16 November 2026)
+
+At Gadi's word, built on `gate/hall-tags-031`, from
+`main` at `58f1a224`: the four leftovers of the final review of 0.3.0,
+none reachable from TypeScript.
+
+- `hallFromTags(<GdHall hall={null} />)` returned `null` as the hall; a
+  `null` `hall` now counts as none there and in `GdHall`, which draws
+  its tags, or warns of an empty hall as for `undefined`.
+- A `GdHall` imported through a `"use client"` module reaches a Server
+  Component as a client reference, which `hallFromTags` refused as
+  "another element"; it now names it and says where to import `GdHall`
+  from. The walk reads only `$$typeof` on it, which React's proxies
+  answer.
+- `GdHall` given `hall` with root attributes warns in development,
+  naming them in `ROOT_ATTRIBUTES`' order; one passed as `undefined`
+  (a wrapper forwarding `wall={props.wall}`) does not count.
+- `walk.ts`' comment on dropped children names their parent's path and
+  `child`.
+
+A fresh Opus 5.5 review (high effort) found nothing to fix first. It
+built a real client reference with Next's vendored
+`react-server-dom-webpack` (`createClientModuleProxy`, under
+`--conditions=react-server`): `hallFromTags` gave the new message and
+nothing threw, while reading the hall-tag symbol on it directly does
+throw, so `hallTagOf`'s check comes first where it must. It found the
+`undefined` guard untested (a filter of `name in props` passed every
+test); `c2ada306` pins it, with a mutation check, and two tests on a
+`null` hall's warnings. `hall`'s JSDoc keeps "anything else draws an
+empty hall" (it feeds the explorer's manifest and the site-search
+vectors); README "Versions" says what `null` does.
+
 ## Verification
 
 Every commit: the CI-equivalent gate on its exact tree (install, Loom
@@ -616,10 +649,6 @@ exact tree. After each publish, npm's `dist.integrity` against the
 
 ## Follow-ups
 
-- A 0.3.1 patch for the final review's leftovers: a `null` `hall` read
-  as absent by `hallFromTags`; a client reference to `GdHall` given its
-  own message; a development warning for `hall` with root attributes;
-  `walk.ts`' comment on dropped children's paths.
 - Gadi: confirm, or sign again, the README's Provenance row for the
   halls, which names `gd/hall/tags` under the 14 November date.
 - `src/files/r2RitualStorage.test.ts:651` ("retains an unknown late
@@ -663,7 +692,10 @@ On `gate/jsx-halls`, each gated on its own tree (every step exit 0).
 | `26b64870` | magick-components 0.3.0; this plan's stage 2 record |
 | `13c4dfa8` | README: `ComponentProps<typeof GdHall>`; the final review's record |
 | `f28a0ae3` | `main` merged (`cfde699f`); search vectors rebuilt; **0.3.0**, published |
-| this commit | 0.3.0 on npm |
+| `58f1a224` | 0.3.0 on npm |
+| `c3ddd19c` | 0.3.1: a `null` hall, a client reference, `hall` with root attributes, a comment |
+| `c2ada306` | 0.3.1 review: the warnings' edge cases pinned |
+| this commit | magick-components 0.3.1; its record |
 
 `694ac018` passed its gate on the coverage rerun (the known
 `sqlLegacyImport` timeout); `c7aebb20`'s first gate timed out in

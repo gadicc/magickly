@@ -553,6 +553,13 @@ silent. That includes `<GdHall hall={hall} />` while `hall` is still
 `undefined` (data loading, say): it draws the empty hall it drew
 before, and now warns that it did.
 
+0.3.1 mends edge cases a JavaScript caller can reach, none of which
+TypeScript allows: `hall={null}` counts as no `hall` in `GdHall` and in
+`hallFromTags`, so `GdHall` draws its tags, or warns of an empty hall
+as it does for `undefined`; `hallFromTags` given a `GdHall` imported
+through a `"use client"` module says so; and `GdHall` given `hall`
+with root attributes warns in development that it ignores them.
+
 ## Requirements
 
 React 19 and an ES module environment: Node 22 or later (`engines`
