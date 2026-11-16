@@ -5,6 +5,7 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
+  realpathSync,
   writeFileSync,
 } from "node:fs";
 import { homedir } from "node:os";
@@ -37,21 +38,28 @@ import {
   newJudgeRequest,
 } from "./judge.ts";
 import {
+  bookedAt,
   CHARS_PER_TOKEN,
+  callCosts,
   EXPERIMENT_CAP_USD,
   fetchPrices,
   Ledger,
+  type LedgerEntry,
+  ledgerCap,
   ledgerTotals,
   type PriceList,
   planPriceList,
+  STAGE2,
   type TransportName,
 } from "./ledger.ts";
 import {
+  CACHING,
   type Effort,
   efforts,
   MODELS,
   modelId,
   OUTPUT_ALLOWANCE,
+  STAGE2_MODELS,
   shortName,
 } from "./models.ts";
 import { measureNewTextBars, type NewBarInputs } from "./newbars.ts";
@@ -70,6 +78,7 @@ import {
   type BarRun,
   barGroup,
   barSource,
+  blockedRuns,
   cacheCheck,
   cacheProjection,
   judgeTask3,
@@ -83,6 +92,7 @@ import {
   opusBlocked,
   retryBlocked,
   roundTripPlan,
+  runRequestKeys,
   scoreNewRequests,
   scoreNewRun,
   task3Pool,
@@ -121,6 +131,7 @@ import {
   a1JudgedPath,
   a1Verdicts,
   blockedAttempts,
+  calibrationPath,
   collect,
   costs,
   createRunDir,
@@ -134,6 +145,7 @@ import {
   manifestRequest,
   markFolds,
   newRunId,
+  noReasoningReplies,
   type ProbeFile,
   pendingRequests,
   probePlan,
@@ -143,6 +155,7 @@ import {
   readRaw,
   rebuildRequests,
   reconcile,
+  repeatCheck,
   reserved,
   runBars,
   runDir,
@@ -560,7 +573,7 @@ const TASK3 = fileURLToPath(
  * The test set, its folds marked with A1's (judged) outcomes, the notes, the
  * new text (the committed set, or `newTextFile`) and task 3's sentences.
  */
-function evalData(out: string, newTextFile?: string): EvalData {
+export function evalData(out: string, newTextFile?: string): EvalData {
   const data = source();
   return {
     ...data,
@@ -657,19 +670,30 @@ function requireGatewayKey() {
 }
 
 /** A runtime with the gateway's prices: fetched now, or a run's saved ones. */
-async function runtimeFor(
+export async function runtimeFor(
   out: string,
   models: readonly string[],
   options: { prices?: PriceList; concurrency?: number } = {},
 ): Promise<Runtime> {
+  const ledger = new Ledger(ledgerPath(out));
   return {
     out,
     gateway: aiGateway(),
     prices: options.prices ?? (await fetchPrices(models)),
-    ledger: new Ledger(ledgerPath(out)),
+    ledger,
     log: (text) => console.log(text),
     concurrency: options.concurrency,
+    cap: ledgerCap(ledger.entries()).cap,
   };
+}
+
+/**
+ * The cap in words: the ledger's cap, and how plan 081's stage 2 sets it
+ * (`ledgerCap`).
+ */
+function capText(ledger: Ledger): string {
+  const { cap, before, since } = ledgerCap(ledger.entries());
+  return `the ${usd(cap)} cap (plan 077's ${usd(EXPERIMENT_CAP_USD)}, with plan 081 stage 2 held to ${usd(STAGE2.capUsd)} on top of the ${usd(before)} booked before ${STAGE2.from.slice(0, 10)}; stage 2 has booked ${usd(since)})`;
 }
 
 /**
@@ -721,7 +745,7 @@ function summarise(
     [
       `${requests.length} requests by ${transport}: expected ${usd(expected)}, worst case ${usd(worst)}`,
       `(input at ${CHARS_PER_TOKEN} chars a token${calibrated ? `, or as measured: ${calibrated}` : ", until runs measure it"}${transport === "sync" ? "; priced as cache writes" : ""}; expected = output allowance per kind and effort, worst = maxOutputTokens)`,
-      `spent so far ${usd(runtime.ledger.total())}${held ? ` + ${usd(held)} reserved for batches not yet collected` : ""} of the ${usd(EXPERIMENT_CAP_USD)} cap; --budget ${usd(budget)}`,
+      `spent so far ${usd(runtime.ledger.total())}${held ? ` + ${usd(held)} reserved for batches not yet collected` : ""} of ${capText(runtime.ledger)}; --budget ${usd(budget)}`,
       transport === "batch"
         ? "A batch can't be stopped once started, so it is checked and reserved at its worst case."
         : "Sync holds each call in flight at its worst case and launches only what fits.",
@@ -1117,7 +1141,8 @@ async function spentCommand(out: string, v: Values) {
       `Reconciled ${done.fixed} failed calls (change ${usd(done.change)}).${done.left.length ? ` Still unknown, kept at worst case: ${done.left.join(", ")}` : ""}`,
     );
   }
-  const totals = ledgerTotals(new Ledger(ledgerPath(out)).entries());
+  const ledger = new Ledger(ledgerPath(out));
+  const totals = ledgerTotals(ledger.entries());
   if (!Object.keys(totals.byRun).length)
     console.log("No calls in the ledger yet.");
   const table = (rows: typeof totals.byModel) =>
@@ -1136,7 +1161,7 @@ async function spentCommand(out: string, v: Values) {
   }
   const held = reserved(out);
   console.log(
-    `Spent ${usd(totals.total)}${totals.unknown ? ` (${usd(totals.unknown)} of it failed calls booked at worst case; \`spent --reconcile\` looks them up)` : ""}${held ? ` + ${usd(held)} reserved for batches not yet collected` : ""} of the ${usd(EXPERIMENT_CAP_USD)} cap.`,
+    `Spent ${usd(totals.total)}${totals.unknown ? ` (${usd(totals.unknown)} of it failed calls booked at worst case; \`spent --reconcile\` looks them up)` : ""}${held ? ` + ${usd(held)} reserved for batches not yet collected` : ""} of ${capText(ledger)}.`,
   );
 }
 
@@ -1166,16 +1191,20 @@ async function pricesFor(
     ))
       saved[id] ??= row;
   const wanted = [...new Set(models)];
-  const missing = wanted.filter((one) => !saved[one] || !saved[`${one}-batch`]);
+  // A saved list has a model's batch row wherever the gateway lists one;
+  // some models (GPT-6.1 Terra, Gemini 3.8 Flash) have none.
+  const missing = wanted.filter((one) => !saved[one]);
   const have = wanted.filter((one) => !missing.includes(one));
   console.log(
-    `Offline prices: ${have.map(shortName).join(", ") || "none"} from a saved price list${missing.length ? `; ${missing.map(shortName).join(", ")} from plan 077's prices of 11 November` : ""}.`,
+    `Offline prices: ${have.map(shortName).join(", ") || "none"} from a saved price list${missing.length ? `; ${missing.map(shortName).join(", ")} from the prices recorded in ledger.ts (plan 077's of 11 November, or the gateway's list of 15 November)` : ""}.`,
   );
   return {
     ...Object.fromEntries(
       have.flatMap((one) => [
         [one, saved[one]],
-        [`${one}-batch`, saved[`${one}-batch`]],
+        ...(saved[`${one}-batch`]
+          ? [[`${one}-batch`, saved[`${one}-batch`]]]
+          : []),
       ]),
     ),
     ...planPriceList(missing),
@@ -1211,7 +1240,7 @@ function setOf(text: string | undefined): "folds" | "new" | "task3" {
 }
 
 /** A run on the new text (tasks 1 and 2) or task 3. */
-async function runNew(
+export async function runNew(
   out: string,
   v: Values,
   set: "new" | "task3",
@@ -1242,20 +1271,34 @@ async function runNew(
     );
     specs.length = most;
   }
-  const requests = specs.map((spec) => newRequest(spec, data));
+  const kind: RunKind = set === "task3" ? "task3" : "newtext";
+  const planned = specs.map((spec) => newRequest(spec, data));
+  const bySpec = new Map(planned.map((one, i) => [one.id, specs[i]]));
+  const check = repeatCheck(out, kind, planned, {
+    again: v.again,
+    skipHeld: v["skip-held"],
+  });
+  const requests = check.requests;
+  if (v["skip-held"] && check.held.length)
+    console.log(
+      `--skip-held: ${planned.length - requests.length} of ${planned.length} requests are held by earlier runs (${check.held.map((one) => `${one.run}: ${one.ids.length}`).join("; ")}); sending the other ${requests.length}`,
+    );
+  const repeated = check.refusal;
   const runtime = await runtimeFor(out, [model], {
     prices: await pricesFor(out, [model], v),
     concurrency: concurrencyOf(v.concurrency),
   });
-  const bySpec = new Map(requests.map((one, i) => [one.id, specs[i]]));
   const refused = summarise(runtime, requests, transport, budget, (one) =>
     newGroupName(bySpec.get(one.id) as NewSpec),
   );
   printCacheProjection(runtime, requests, transport);
-  if (v["dry-run"]) return console.log("Dry run: no call made.");
+  if (v["dry-run"])
+    return console.log(
+      `${repeated ? `WOULD REFUSE: ${repeated}\n` : ""}Dry run: no call made.`,
+    );
   if (refused) throw new Error(`Refused: ${refused}`);
+  if (repeated) throw new Error(`Refused: ${repeated}`);
   requireGatewayKey();
-  const kind: RunKind = set === "task3" ? "task3" : "newtext";
   const runId = newRunId(v.label ?? `${kind}-${shortName(model)}`);
   const dir = createRunDir(out, runId);
   writeJson(join(dir, "prices.json"), runtime.prices);
@@ -1268,8 +1311,8 @@ async function runNew(
     projection: costs(runtime, requests, transport).expected,
     worstCase: costs(runtime, requests, transport).worst,
     ...(v.newtext ? { newTextFile: v.newtext } : {}),
-    requests: requests.map((one, i) =>
-      manifestRequest(one, { newtext: specs[i] }),
+    requests: requests.map((one) =>
+      manifestRequest(one, { newtext: bySpec.get(one.id) as NewSpec }),
     ),
   } satisfies Manifest);
   console.log(`Run ${runId}`);
@@ -1305,7 +1348,86 @@ function printNewRun(out: string, runId: string, data: EvalData) {
     join(runDir(out, runId), "judged.json"),
   );
   if (judged) console.log("Judged:", judgedCounts(Object.values(judged)));
+  const flat = noReasoningReplies(runDir(out, runId), result.manifest);
+  if (flat.length)
+    console.log(
+      `WARNING: ${flat.length} of ${result.manifest.requests.length} sync replies reported no reasoning tokens from a model asked to reason: ${flat.join(", ")}`,
+    );
+  printCallCosts(out, [runId]);
   console.log(`Written to ${runDir(out, runId)}`);
+}
+
+/**
+ * A ledger entry's group for `callCosts`: the model, then arm, task and
+ * effort for a request on the new text (a cache check's calls are task-1
+ * parts, so they join task 1), else the request id.
+ */
+export function readingGroup(entry: LedgerEntry): string {
+  const [, arm, task, effort] =
+    entry.request.match(/^N-(A\w+)-t(\d)-.*-(medium|high)$/) ?? [];
+  return `${shortName(entry.model)} ${arm ? `${arm} task ${task} ${effort}` : entry.request}`;
+}
+
+/**
+ * Some runs' cost a call, by model, arm, task and effort, from the ledger,
+ * each labelled: the mean over every call as run; a cold call (a reply that
+ * read nothing from the cache: the first with a prefix, or one whose read
+ * missed); and a warm call (one that read the shared prompt), with the share
+ * of the warm calls' input read cached. A task-1 call is one "Read with AI"
+ * of a part (about 75 words): cold is what a reading costs when no one has
+ * read lately, warm when the cache holds the prompt.
+ */
+export function printCallCosts(out: string, runs: readonly string[]) {
+  const rows = callCosts(
+    new Ledger(ledgerPath(out)).entries(),
+    runs,
+    readingGroup,
+  );
+  if (!rows.length) return;
+  const each = (one: { calls: number; mean?: number }) =>
+    one.mean === undefined ? "none" : `$${one.mean.toFixed(4)} (${one.calls})`;
+  console.log("\nCost a call, from the ledger; each with its number of calls:");
+  console.table(
+    rows.map((one) => ({
+      group: one.group,
+      calls: one.calls,
+      cost: usd(one.cost),
+      "mean, all calls": `$${one.mean.toFixed(4)}`,
+      "cold: read nothing cached": each(one.cold),
+      "warm: read the cache": each(one.warm),
+      "warm calls' input read cached": one.warm.calls
+        ? pct(one.warm.cachedShare)
+        : "–",
+      failed: one.failed,
+      "input a reply": Math.round(one.input),
+      "output a reply": Math.round(one.output),
+      runs: one.runs.join(", "),
+    })),
+  );
+}
+
+/**
+ * `call-costs [--runs RUN,…]`: what a call costs per model, from the ledger,
+ * offline. By default over plan 081 stage 2's new-text runs and cache checks
+ * (those booked from `STAGE2.from` on), so rounds aren't pooled and each
+ * model's cold figure includes its cache check's first call; each group
+ * names the runs it used.
+ */
+export function callCostsCommand(out: string, v: Values) {
+  const at = bookedAt(new Ledger(ledgerPath(out)).entries());
+  const stage2 = new Set(
+    new Ledger(ledgerPath(out))
+      .entries()
+      .filter((one) => at(one) >= STAGE2.from)
+      .map((one) => one.run),
+  );
+  const runs =
+    runsOf(v.runs) ??
+    [...runsOfKind(out, "cache-check"), ...runsOfKind(out, "newtext")]
+      .filter((run) => stage2.has(run))
+      .sort();
+  if (!runs.length) return console.log("No runs.");
+  printCallCosts(out, runs);
 }
 
 /** Scores and prints a run of any kind from its saved replies. */
@@ -1326,7 +1448,11 @@ function printAny(out: string, runId: string, probeRun?: string) {
         `Round trips saved: ${merged.added}${merged.blocked.length ? `; blocked twice, counted as not keeping the meaning: ${merged.blocked.length} (${merged.blocked.join(", ")})` : ""}${merged.left.length ? `; none for ${merged.left.length} (${merged.left.join(", ")})` : ""}.`,
       );
     }
-    return printTask3(task3Summary(out, data, pool.candidates, pool.a1));
+    return printTask3(
+      task3Summary(out, data, pool.candidates, pool.a1, {
+        onWrite: (path) => console.log(`Task 3's figures written to ${path}`),
+      }),
+    );
   }
   if (manifest.kind === "cache-check")
     return console.log(
@@ -1409,7 +1535,7 @@ async function cacheCheckCommand(out: string, v: Values) {
   console.log(
     result.reads
       ? `The second call read ${pct(result.secondReadShare)} of its input from the cache: run by sync.`
-      : `The second call read ${pct(result.secondReadShare)} of its input from the cache: no cache reads, so per plan 077 Opus runs by batch (--transport batch).`,
+      : `The second call read ${pct(result.secondReadShare)} of its input from the cache: no cache reads, so per plan 077 the model runs by batch (--transport batch) where the gateway lists a batch price for it${runtime.prices[`${model}-batch`] ? "" : " (it lists none for this model: run by sync, uncached, and budget for it)"}.`,
   );
   console.log(`Written to ${join(dir, "cache-check.json")}`);
 }
@@ -1572,13 +1698,23 @@ async function judgeTask3Command(out: string, v: Values) {
       );
   }
   if (v["dry-run"]) return console.log("Dry run: no call made.");
-  printTask3(task3Summary(out, data, pool.candidates, pool.a1));
+  printTask3(
+    task3Summary(out, data, pool.candidates, pool.a1, {
+      force: v.force,
+      onWrite: (path) => console.log(`Task 3's figures written to ${path}`),
+    }),
+  );
 }
 
 function task3ReportCommand(out: string, v: Values) {
   const data = evalData(out);
   const pool = task3Pool(out, data, runsOf(v.runs));
-  printTask3(task3Summary(out, data, pool.candidates, pool.a1));
+  printTask3(
+    task3Summary(out, data, pool.candidates, pool.a1, {
+      force: v.force,
+      onWrite: (path) => console.log(`Task 3's figures written to ${path}`),
+    }),
+  );
   printControlsFrom(pool.controlsFrom);
 }
 
@@ -1639,10 +1775,23 @@ function printTask3(report: Task3Report) {
 }
 
 /** The new text's bars, from the runs named (all new-text runs by default). */
-function newBarsCommand(out: string, v: Values) {
+export function newBarsCommand(out: string, v: Values) {
+  // newbars.json is plan 077 round 1's record: never replaced by accident.
+  const file = join(
+    out,
+    v.model ? `newbars-${shortName(modelId(v.model))}.json` : "newbars.json",
+  );
+  if (!v.model && existsSync(file) && !v.force)
+    throw new Error(
+      `${file} holds plan 077 round 1's bars and is kept: pass --model M to measure a model into newbars-M.json, or --force to replace it`,
+    );
   const data = evalData(out);
   const runs = namedRuns(runsOf(v.runs), runsOfKind(out, "newtext"));
   const opus = MODELS.opus;
+  // The bars are set for Opus; `--model` measures another model's A3 against
+  // the same lines (plan 081's stage 2). The knowns' memory check stays
+  // Opus's A0, as the bar says, and task 3 is Opus's alone.
+  const model = modelId(v.model ?? "opus");
   // Each run with the data of its set: the committed one, or a top-up's.
   const sets = new Map<string, EvalData>([["", data]]);
   const barRuns: BarRun[] = runs.flatMap((run) => {
@@ -1658,13 +1807,13 @@ function newBarsCommand(out: string, v: Values) {
     a3Task1: barGroup(out, barRuns, {
       arm: "A3",
       task: 1,
-      model: opus,
+      model,
       effort: "medium",
     }),
     a3Task2: barGroup(out, barRuns, {
       arm: "A3",
       task: 2,
-      model: opus,
+      model,
       effort: "medium",
     }),
     a0Task1: barGroup(out, barRuns, {
@@ -1680,10 +1829,25 @@ function newBarsCommand(out: string, v: Values) {
   const a1k1 = a1kPooled(out, groups.a3Task1?.sets ?? [data]);
   const a1k2 = a1kPooled(out, groups.a3Task2?.sets ?? [data]);
   const pool = task3Pool(out, data, namedRuns(runsOf(v.runs), task3Runs(out)));
-  const t3 = task3Summary(out, data, pool.candidates, pool.a1);
+  // Read only: the bars never rewrite a run's files or task 3's report.
+  const t3 = task3Summary(out, data, pool.candidates, pool.a1, {
+    write: false,
+  });
   const a3Source = barSource(
     Object.keys(t3.sources),
-    `A3 ${shortName(opus)} medium`,
+    `A3 ${shortName(model)} medium`,
+  );
+  const blockedFrom = blockedRuns(
+    runsOf(v.runs),
+    Object.fromEntries(
+      (["cache-check", "newtext", "task3", "roundtrip"] as const).map(
+        (kind) => [kind, runsOfKind(out, kind)],
+      ),
+    ),
+    (run) =>
+      runRequestKeys(
+        readJson<Manifest>(join(runDir(out, run), "manifest.json")),
+      ),
   );
   const inputs: NewBarInputs = {
     a3Task1: groups.a3Task1?.report,
@@ -1697,22 +1861,32 @@ function newBarsCommand(out: string, v: Values) {
       controlsUnmeasurable: t3.controls.unmeasurable,
       controlsWaiting: t3.controls.waiting,
     },
-    // Every Opus translation call: the cache check's, tasks 1 to 3, the
-    // repeats, top-ups and round trips.
-    blocked: opusBlocked(
-      out,
-      [
-        ...runsOfKind(out, "cache-check"),
-        ...runsOfKind(out, "newtext"),
-        ...runsOfKind(out, "task3"),
-        ...runsOfKind(out, "roundtrip"),
-      ],
-      opus,
-    ),
+    // Every translation call of the model in the runs counted: the cache
+    // check's, tasks 1 to 3, the repeats, top-ups and round trips.
+    blocked: opusBlocked(out, blockedFrom, model),
   };
   if (!inputs.blocked?.calls) delete inputs.blocked;
+  // What each figure was measured on, as the runs resolved.
+  const resolved = {
+    a3Task1: groups.a3Task1?.runs ?? [],
+    a3Task2: groups.a3Task2?.runs ?? [],
+    a0Task1: groups.a0Task1?.runs ?? [],
+    task3: a3Source ?? null,
+    blocked: blockedFrom.filter((run) =>
+      readJson<Manifest>(
+        join(runDir(out, run), "manifest.json"),
+      )?.requests.some(
+        (one) => one.kind === "translate" && one.model === model,
+      ),
+    ),
+  };
+  console.log(
+    `task3: ${resolved.task3 ?? "none"}; blocked calls counted in: ${resolved.blocked.join(", ") || "none"}`,
+  );
   const result = measureNewTextBars(inputs);
-  console.log(`The bars settled on ${BARS_SETTLED}:`);
+  console.log(
+    `The bars settled on ${BARS_SETTLED}${v.model ? `, for A3 on ${shortName(model)}` : ""}:`,
+  );
   console.table(
     result.bars.map((one) => ({
       bar: one.id,
@@ -1740,10 +1914,14 @@ function newBarsCommand(out: string, v: Values) {
       `A3 − A0 on swapped rows: ${pct(d.a3.share)} − ${pct(d.a0.share)} = ${(100 * d.difference).toFixed(1)} points [${(100 * d.interval[0]).toFixed(1)} to ${(100 * d.interval[1]).toFixed(1)}]`,
     );
   write(
-    join(out, "newbars.json"),
-    json({ settled: BARS_SETTLED, inputs: { runs }, ...result }),
+    file,
+    json({
+      settled: BARS_SETTLED,
+      inputs: { runs, ...(v.model ? { model } : {}), resolved },
+      ...result,
+    }),
   );
-  console.log(`Written to ${join(out, "newbars.json")}`);
+  console.log(`Written to ${file}`);
 }
 
 /** The runs of one kind in the output directory, oldest first. */
@@ -1764,7 +1942,8 @@ function runsOfKind(out: string, kind: RunKind): string[] {
  * Where a run's requests depend on replies not yet in (round trips, the
  * judges), stand-ins of the same size are built from A1's and A1k's answers.
  */
-async function budgetCommand(out: string, v: Values) {
+export async function budgetCommand(out: string, v: Values) {
+  if (v.models) return modelsBudget(out, v);
   const data = evalData(out);
   const models = [MODELS.opus, MODELS.fable, MODELS.gpt];
   const runtime = await runtimeFor(out, models, {
@@ -1965,7 +2144,152 @@ async function budgetCommand(out: string, v: Values) {
     },
   ]);
   console.log(
-    `Spent so far ${usd(spentSoFar(runtime))} of the ${usd(EXPERIMENT_CAP_USD)} cap. Expected cost: input at ${CHARS_PER_TOKEN} characters a token (or as runs have measured it), output at each kind's allowance (translate ${OUTPUT_ALLOWANCE.translate.medium}/${OUTPUT_ALLOWANCE.translate.high}, judge ${OUTPUT_ALLOWANCE.judge.medium}/${OUTPUT_ALLOWANCE.judge.high} at medium/high).`,
+    `Spent so far ${usd(spentSoFar(runtime))} of ${capText(runtime.ledger)}. Expected cost: input at ${CHARS_PER_TOKEN} characters a token (or as runs have measured it), output at each kind's allowance (translate ${OUTPUT_ALLOWANCE.translate.medium}/${OUTPUT_ALLOWANCE.translate.high}, judge ${OUTPUT_ALLOWANCE.judge.medium}/${OUTPUT_ALLOWANCE.judge.high} at medium/high).`,
+  );
+}
+
+/** `--models`: short names, comma-separated, or "stage2" for plan 081's. */
+function modelsOf(text: string): string[] {
+  const names =
+    text === "stage2"
+      ? [...STAGE2_MODELS]
+      : text.split(",").map((one) => one.trim());
+  return [...new Set(names.map(modelId))];
+}
+
+/**
+ * Task 1's judges for one run on a subset, before it has run: its to-judge
+ * rows taken as A1k's on the same rows (as `budget` does), in parts of 75,
+ * each part to both judges.
+ */
+function task1JudgeStandIns(
+  out: string,
+  data: EvalData,
+  subset: "all" | "first30" | "repeat",
+  label: string,
+): ModelRequest[] {
+  const a1k = newBaselineScores(out, data, false).cases.find(
+    (one) => one.answer === BASELINE_ANSWERS.A1k,
+  );
+  const ids = new Set(newTextRowsOf(data, subset).map((one) => one.id));
+  const rows = (a1k?.rows ?? []).filter((one) => ids.has(one.row));
+  return chunk(rows, 75).flatMap((part, i) =>
+    (["opus", "gpt"] as const).map((judge) =>
+      newJudgeRequest(
+        { answer: `stand-in-${label}-${subset}-${i}`, key: 0, rows: part },
+        judge,
+      ),
+    ),
+  );
+}
+
+/**
+ * Plan 081 stage 2's projection, offline with `--offline` (or `--prices
+ * FILE`): for each model, arm A3 on tasks 1 and 2 at `medium` on the subset,
+ * the cache check before it (two of those calls, for every model but Opus,
+ * whose caching plan 077 checked), and the judges on its task-1 rows; with
+ * cache reads and without, against the ledger's cap. It also gives each
+ * step a `--budget` that its own check will pass.
+ */
+async function modelsBudget(out: string, v: Values) {
+  const data = evalData(out);
+  const models = modelsOf(v.models as string);
+  const [subset, ...more] = listOf("subset", v.subset ?? "all", SUBSETS);
+  if (more.length) throw new Error("--subset takes one subset");
+  const judges = [JUDGES.opus.model, JUDGES.gpt.model];
+  const runtime = await runtimeFor(out, [...models, ...judges], {
+    prices: await pricesFor(out, [...new Set([...models, ...judges])], v, true),
+  });
+  // Every row with the characters a token the runs have measured, as a
+  // run's own check has them (`summarise`).
+  runtime.calibration = readJson(calibrationPath(out)) ?? {};
+  const rows: Record<string, string | number>[] = [];
+  let withReads = 0;
+  let without = 0;
+  const add = (
+    model: string,
+    part: string,
+    requests: readonly ModelRequest[],
+  ) => {
+    // A --budget the run's own check passes: what it expects (as cache
+    // writes, `runRefusal`) or every input uncached, whichever is more,
+    // plus the dearest call's worst case, which it holds while in flight.
+    const { expected } = costs(runtime, requests, "sync");
+    const dearest = Math.max(
+      ...requests.map((one) => costs(runtime, [one], "sync").worst),
+    );
+    const one = cacheProjection(
+      requests,
+      runtime.prices,
+      "sync",
+      runtime.calibration ?? {},
+    );
+    const batch = requests.every(
+      (request) => runtime.prices[`${request.model}-batch`],
+    )
+      ? usd(
+          cacheProjection(
+            requests,
+            runtime.prices,
+            "batch",
+            runtime.calibration ?? {},
+          ).without,
+        )
+      : "none listed";
+    withReads += one.withReads;
+    without += one.without;
+    rows.push({
+      model: shortName(model),
+      part,
+      calls: requests.length,
+      "with cache reads": usd(one.withReads),
+      without: usd(one.without),
+      batch,
+      "--budget": Math.ceil(Math.max(expected, one.without) + dearest),
+    });
+  };
+  for (const model of models) {
+    const requests = planNewSpecs(
+      {
+        arms: ["A3"],
+        tasks: [1, 2],
+        subset,
+        model,
+        efforts: ["medium"],
+      },
+      data,
+    ).map((spec) => newRequest(spec, data));
+    if (model !== MODELS.opus)
+      add(
+        model,
+        `cache check (${CACHING[model as keyof typeof CACHING] ?? "?"} caching)`,
+        cacheCheckRequests(data, model, "medium"),
+      );
+    add(model, `A3 tasks 1 and 2, ${subset}`, requests);
+    add(
+      model,
+      "judges, task 1 (as many rows as A1k's)",
+      task1JudgeStandIns(out, data, subset, shortName(model)),
+    );
+  }
+  rows.push({
+    model: "Total",
+    part: "",
+    calls: rows.reduce((n, one) => n + Number(one.calls), 0),
+    "with cache reads": usd(withReads),
+    without: usd(without),
+    batch: "",
+    "--budget": "",
+  });
+  console.table(rows);
+  const spent = spentSoFar(runtime);
+  const cap = runtime.cap;
+  console.log(
+    [
+      `Spent so far ${usd(spent)} of ${capText(runtime.ledger)}: ${usd(cap - spent)} left.`,
+      `The total ${without <= cap - spent ? "fits" : "DOES NOT FIT"} in it without cache reads (${usd(without)})${withReads <= cap - spent ? "" : ", and not even with them"}.`,
+      `Expected cost: input at ${CHARS_PER_TOKEN} characters a token (or as runs have measured it), output at each kind's allowance (translate ${OUTPUT_ALLOWANCE.translate.medium}, judge ${OUTPUT_ALLOWANCE.judge.medium}/${OUTPUT_ALLOWANCE.judge.high} for the Opus/GPT judges); plan 077's Opus A3 used about 4,900 output tokens a call. The judges' rows are stand-ins: A1k's to-judge rows.`,
+    ].join("\n"),
   );
 }
 
@@ -2000,6 +2324,10 @@ const OPTIONS = {
   resume: { type: "string" },
   "max-requests": { type: "string" },
   "dry-run": { type: "boolean" },
+  again: { type: "boolean" },
+  "skip-held": { type: "boolean" },
+  force: { type: "boolean" },
+  models: { type: "string" },
   wait: { type: "boolean" },
   reconcile: { type: "boolean" },
   seed: { type: "string" },
@@ -2013,13 +2341,25 @@ const OPTIONS = {
   runs: { type: "string" },
 } as const;
 
-type Values = Partial<
+export type Values = Partial<
   Record<
-    Exclude<keyof typeof OPTIONS, "dry-run" | "wait" | "reconcile" | "offline">,
+    Exclude<
+      keyof typeof OPTIONS,
+      | "dry-run"
+      | "again"
+      | "skip-held"
+      | "force"
+      | "wait"
+      | "reconcile"
+      | "offline"
+    >,
     string
   >
 > & {
   "dry-run"?: boolean;
+  again?: boolean;
+  "skip-held"?: boolean;
+  force?: boolean;
   wait?: boolean;
   reconcile?: boolean;
   offline?: boolean;
@@ -2044,6 +2384,12 @@ const USAGE = `usage: cli.ts <command> [options]
   run --set new --subset all|first30|repeat --model M --effort E
       --arms A0,A2,A3 --tasks 1,2 --transport sync|batch --budget USD
       [--dry-run [--offline | --prices FILE]] [--newtext FILE]
+      [--again | --skip-held]              M: ${Object.keys(MODELS).join(", ")};
+                                           refused if an earlier run has
+                                           some of the same requests:
+                                           --skip-held sends only the rest
+                                           (finishing a partial run),
+                                           --again repeats them all
   run --set task3 --model M --effort E --arms A0,A2,A3 --budget USD
   roundtrip --budget USD [--runs RUN,…] [--model opus] [--dry-run]
                                            task 3's round trips (A1's and
@@ -2053,13 +2399,34 @@ const USAGE = `usage: cli.ts <command> [options]
                                            damaged controls and their
                                            originals; only what both judges
                                            haven't ruled on is sent
-  task3-report [--runs RUN,…]              offline: task 3's figures
-  newbars [--runs RUN,…]                   offline: the new text's bars; with
-                                           two runs of one arm, name one (if
-                                           --runs names no new-text run, or
-                                           no task-3 run, every run of that
-                                           kind is read, and two of one arm
-                                           are still refused)
+  task3-report [--runs RUN,…] [--force]    offline: task 3's figures (round
+                                           1's task3/report.json is kept:
+                                           a dated file unless --force)
+  budget --models stage2|M,… [--subset all|first30] [--offline | --prices FILE]
+                                           project plan 081 stage 2: A3 on
+                                           tasks 1 and 2 per model, its cache
+                                           check and judges, and a --budget
+                                           for each run
+  newbars [--runs RUN,…] [--model M]       offline, read-only (writes only
+                                           newbars*.json): the new text's
+                                           bars; with two runs of one arm,
+                                           name one (if --runs names no
+                                           new-text run, or no task-3 run,
+                                           every run of that kind is read,
+                                           and two of one arm are still
+                                           refused); with --runs, blocked
+                                           calls are counted in the named
+                                           runs and in runs that aren't
+                                           alternatives to them; --model
+                                           measures another model's A3 on
+                                           the same lines, into
+                                           newbars-M.json; newbars.json
+                                           (round 1's) is kept unless
+                                           --force
+  call-costs [--runs RUN,…]                offline: a call's cost per model,
+                                           cold, warm and mean, with the
+                                           runs used (default: stage 2's
+                                           new-text runs and cache checks)
   run [--set folds] --keys K --model opus|fable|gpt --effort high,medium
       --arms A0,A2,A2c,A3 --tasks 1,2 --books open,closed
       --transport sync|batch --budget USD [--dry-run] [--label L]
@@ -2119,6 +2486,7 @@ async function main() {
   else if (command === "judge-task3") await judgeTask3Command(out, values);
   else if (command === "task3-report") task3ReportCommand(out, values);
   else if (command === "newbars") newBarsCommand(out, values);
+  else if (command === "call-costs") callCostsCommand(out, values);
   else if (command === "budget") await budgetCommand(out, values);
   else {
     console.error(USAGE);
@@ -2126,7 +2494,12 @@ async function main() {
   }
 }
 
-main().catch((error: Error) => {
-  console.error(error.message);
-  process.exitCode = 1;
-});
+// Run only as the CLI, so tests can import its commands.
+if (
+  process.argv[1] &&
+  realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)
+)
+  main().catch((error: Error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });

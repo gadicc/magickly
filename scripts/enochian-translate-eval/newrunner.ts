@@ -470,14 +470,34 @@ export function newGroups(scored: readonly NewScoredRequest[]): NewGroup[] {
   });
 }
 
-/** Scores a new-text run and writes its scores and report beside its replies. */
-export function scoreNewRun(out: string, run: string, data: EvalData) {
+/**
+ * Scores a new-text run from its saved replies, writing nothing: what the
+ * bars read (`barGroup`), so measuring them never rewrites a run's files.
+ */
+export function measureNewRun(out: string, run: string, data: EvalData) {
   const dir = runDir(out, run);
   const manifest = readJson<Manifest>(join(dir, "manifest.json"));
   if (!manifest) throw new Error(`No run ${run} in ${runsDir(out)}`);
   const { scored, notRun } = scoreNewRequests(manifest, dir, data);
-  const pooled = newGroups(scored);
-  const blocked = blockedCalls(dir);
+  return {
+    manifest,
+    scored,
+    notRun,
+    groups: newGroups(scored),
+    blocked: blockedCalls(dir),
+  };
+}
+
+/**
+ * Scores a new-text run and writes its scores and report beside its replies
+ * (`report RUN`, and after a run or its judges): with the code and data of
+ * the time, so only a command about that run should call it.
+ */
+export function scoreNewRun(out: string, run: string, data: EvalData) {
+  const dir = runDir(out, run);
+  const result = measureNewRun(out, run, data);
+  const { scored, notRun, blocked } = result;
+  const pooled = result.groups;
   writeJson(join(dir, "scores.json"), {
     run,
     requests: scored.map((one) => ({
@@ -502,7 +522,7 @@ export function scoreNewRun(out: string, run: string, data: EvalData) {
     blocked,
     notRun,
   });
-  return { manifest, scored, notRun, groups: pooled, blocked };
+  return result;
 }
 
 /** A run for the bars: its manifest and the data its set needs. */
@@ -521,12 +541,15 @@ export interface BarWant {
 }
 
 /**
- * One arm's figures for the bars: the run on the committed set (subset
- * "all"), pooled with any runs of it on top-up sets (plan 077: "the bar
- * decided on all the rows together"). Refuses, rather than measure:
+ * One arm's figures for the bars: its rows on the committed set (subset
+ * "all"), pooled with any on top-up sets (plan 077: "the bar decided on all
+ * the rows together"). A set's rows may come from one run or from several
+ * whose requests don't overlap and together cover it exactly: a run cut
+ * short and finished with `run --skip-held`. Refuses, rather than measure:
  * - a run with requests never run (resume it first);
- * - a run whose rows aren't its set's (it ran on part of it);
- * - two runs on the same set that both match (name one with `--runs`);
+ * - two runs with any of the same requests on one set (name the one to
+ *   measure with `--runs`);
+ * - runs that leave some of their set's rows out;
  * - a top-up run with no run on the committed set.
  * `undefined` when no run matches.
  */
@@ -537,10 +560,13 @@ export function barGroup(
 ):
   | { report: ReturnType<typeof newReport>; runs: string[]; sets: EvalData[] }
   | undefined {
-  const found: { run: string; data: EvalData; scores: NewScores }[] = [];
+  const bySeed = new Map<
+    number,
+    { run: string; data: EvalData; scores: NewScores; ids: string[] }[]
+  >();
   for (const one of runs) {
     if (one.manifest.kind !== "newtext") continue;
-    const result = scoreNewRun(out, one.run, one.data);
+    const result = measureNewRun(out, one.run, one.data);
     const group = result.groups.find(
       (g) =>
         g.spec.arm === want.arm &&
@@ -554,35 +580,55 @@ export function barGroup(
       throw new Error(
         `Run ${one.run} has requests never run (${result.notRun.join(", ")}): resume it before measuring the bars`,
       );
-    const rows = newTextRows(one.data.newText as NewTextSet).length;
-    if (group.report.all.rows !== rows)
-      throw new Error(
-        `Run ${one.run}: ${group.name} covers ${group.report.all.rows} rows, its set ${rows}`,
-      );
-    found.push({ run: one.run, data: one.data, scores: group.scores });
-  }
-  const seeds = new Map<number, string[]>();
-  for (const one of found) {
     const seed = (one.data.newText as NewTextSet).seed;
-    seeds.set(seed, [...(seeds.get(seed) ?? []), one.run]);
+    const ids = result.scored
+      .filter((scored) => newGroupName(scored.spec) === group.name)
+      .map((scored) => scored.id);
+    bySeed.set(seed, [
+      ...(bySeed.get(seed) ?? []),
+      { run: one.run, data: one.data, scores: group.scores, ids },
+    ]);
   }
-  for (const [seed, list] of seeds)
-    if (list.length > 1)
+  const sets = new Map<
+    number,
+    { runs: string[]; data: EvalData; scores: NewScores }
+  >();
+  for (const [seed, pieces] of bySeed) {
+    const held = new Map<string, string>();
+    for (const piece of pieces)
+      for (const id of piece.ids) {
+        const other = held.get(id);
+        if (other)
+          throw new Error(
+            `Runs ${other} and ${piece.run} both have ${want.arm} task ${want.task} on the seed-${seed} set: name the one to measure with --runs`,
+          );
+        held.set(id, piece.run);
+      }
+    const scores = joinNewScores(pieces.map((piece) => piece.scores));
+    const rows = newTextRows(pieces[0].data.newText as NewTextSet).length;
+    const covered = newReport(scores).all.rows;
+    if (covered !== rows)
       throw new Error(
-        `Runs ${list.join(" and ")} both have ${want.arm} task ${want.task} on the seed-${seed} set: name the one to measure with --runs`,
+        `Run${pieces.length > 1 ? "s" : ""} ${pieces.map((piece) => piece.run).join(" + ")}: ${want.arm} task ${want.task} covers ${covered} rows, its set ${rows}`,
       );
-  const main = found.find((one) => one.data.newText?.seed === COMMITTED_SEED);
+    sets.set(seed, {
+      runs: pieces.map((piece) => piece.run),
+      data: pieces[0].data,
+      scores,
+    });
+  }
+  const main = sets.get(COMMITTED_SEED);
   if (!main) {
-    if (found.length)
+    if (sets.size)
       throw new Error(
-        `Top-up runs (${found.map((one) => one.run).join(", ")}) but no run on the committed set`,
+        `Top-up runs (${[...sets.values()].flatMap((one) => one.runs).join(", ")}) but no run on the committed set`,
       );
     return undefined;
   }
-  const all = [main, ...found.filter((one) => one !== main)];
+  const all = [main, ...[...sets.values()].filter((one) => one !== main)];
   return {
     report: newReport(joinNewScores(all.map((one) => one.scores))),
-    runs: all.map((one) => one.run),
+    runs: all.flatMap((one) => one.runs),
     sets: all.map((one) => one.data),
   };
 }
@@ -747,6 +793,59 @@ export function namedRuns(
 ): string[] {
   const mine = named?.filter((one) => all.includes(one)) ?? [];
   return mine.length ? mine : [...all];
+}
+
+/**
+ * The runs whose translation calls the blocked-calls bar counts (plan 077:
+ * "every Opus translation call in the experiment"). Without `--runs`, every
+ * run. With it, a kind with no run named counts all its runs, and a run not
+ * named counts unless it is an alternative to a named run of its kind: it
+ * holds one of the same requests (`runRequestKeys`). So plan 077's recorded
+ * `--runs` (its Opus A3 and A0 runs) still counts its cache check, repeats,
+ * task 3 and both round-trip runs, and leaves out stage 2's Opus control,
+ * the A3 run it didn't choose; the control leaves out round 1's.
+ */
+export function blockedRuns(
+  named: readonly string[] | undefined,
+  byKind: Readonly<Record<string, readonly string[]>>,
+  keysOf: (run: string) => readonly string[],
+): string[] {
+  const out: string[] = [];
+  for (const runs of Object.values(byKind)) {
+    const chosen = runs.filter((one) => named?.includes(one));
+    if (!chosen.length) {
+      out.push(...runs);
+      continue;
+    }
+    const taken = new Set(chosen.flatMap(keysOf));
+    out.push(
+      ...runs.filter(
+        (one) => chosen.includes(one) || !keysOf(one).some((k) => taken.has(k)),
+      ),
+    );
+  }
+  return out.sort();
+}
+
+/**
+ * A run's requests as `blockedRuns` compares them, decided from the
+ * requests themselves:
+ * - a new-text run's by request id (arm, task, subset, part, model and
+ *   effort) and set, whatever the prompt: a later round re-runs the same
+ *   parts on changed data (stage 2's Opus control and round 1's A3 run hold
+ *   the same ids with different prompts), and is an alternative all the
+ *   same;
+ * - any other run's by request id and prompt hash: only an exact repeat is
+ *   an alternative, so runs that complement each other, or redo some ids
+ *   with another prompt (round 1's two round-trip runs), both count.
+ */
+export function runRequestKeys(manifest: Manifest | undefined): string[] {
+  if (!manifest) return [];
+  return manifest.requests.map((one) =>
+    manifest.kind === "newtext"
+      ? `${one.id} ${manifest.newTextFile ?? ""}`
+      : `${one.id} ${one.promptHash}`,
+  );
 }
 
 /** Every task-3 run in the output directory, oldest first. */
@@ -987,12 +1086,28 @@ export async function judgeTask3(
   };
 }
 
-/** Task 3's figures from what is saved; written to `task3/report.json`. */
+/**
+ * Task 3's figures from what is saved, written beside its verdicts unless
+ * `write` is false (`newbars`, which only reads). `task3/report.json` holds
+ * plan 077 round 1's figures, scored with the dictionary of the time; it is
+ * written only when it doesn't exist yet, or with `force`. Otherwise the
+ * figures go to a dated file beside it (`keptRecordPath`), and `onWrite`
+ * hears where.
+ */
 export function task3Summary(
   out: string,
   data: EvalData,
   candidates: readonly Task3Candidate[],
   a1: ReadonlyMap<string, readonly AnswerItem[]>,
+  {
+    write = true,
+    force = false,
+    onWrite,
+  }: {
+    write?: boolean;
+    force?: boolean;
+    onWrite?: (path: string) => void;
+  } = {},
 ): Task3Report {
   const store = readJson<RoundTripStore>(roundTripStorePath(out)) ?? {};
   // Rulings the verdict store has but the rubric's file lacks are put back
@@ -1000,7 +1115,7 @@ export function task3Summary(
   const rubricPath = join(task3Dir(out), "judged-rubric.json");
   const rubric = readJson<Record<string, JudgedRows>>(rubricPath) ?? {};
   const verdicts = readJson<VerdictStore>(verdictStorePath(out)) ?? {};
-  if (refillFromStore(rubric, candidates, data.rows, verdicts))
+  if (refillFromStore(rubric, candidates, data.rows, verdicts) && write)
     writeJson(rubricPath, rubric);
   const report = task3Report({
     candidates,
@@ -1017,6 +1132,30 @@ export function task3Summary(
     dictionary: data.dictionary,
     keyRows: data.rows,
   });
-  writeJson(join(task3Dir(out), "report.json"), report);
+  if (write) {
+    const path = keptRecordPath(join(task3Dir(out), "report.json"), force);
+    writeJson(path, report);
+    onWrite?.(path);
+  }
   return report;
+}
+
+/**
+ * Where to write a record that must not be overwritten by accident (round
+ * 1's `task3/report.json`): the path itself if it doesn't exist yet, or
+ * with `force`; else the same name with the time added
+ * (`report-20261116-120000.json`).
+ */
+export function keptRecordPath(
+  path: string,
+  force = false,
+  now = new Date(),
+): string {
+  if (force || !existsSync(path)) return path;
+  const stamp = now
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace("T", "-")
+    .slice(0, 15);
+  return path.replace(/(\.json)?$/, `-${stamp}$1`);
 }

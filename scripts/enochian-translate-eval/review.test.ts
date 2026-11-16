@@ -15,6 +15,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { type AnswerItem, checkContextFrom, checkItem } from "./answer.ts";
 import { dictionary as fixtureDictionary, row } from "./fixtures.ts";
 import {
+  EXPERIMENT_CAP_USD,
   Ledger,
   type LedgerEntry,
   NO_TOKENS,
@@ -169,6 +170,8 @@ function runtime(out: string, gateway: Gateway, ledger?: Ledger): Runtime {
     out,
     gateway,
     prices,
+    // Plan 077\'s cap, as its runs had it.
+    cap: EXPERIMENT_CAP_USD,
     ledger: ledger ?? new Ledger(ledgerPath(out)),
     log: () => {},
     concurrency: 1,

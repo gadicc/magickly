@@ -349,6 +349,79 @@ forms where any exist.
 What stage 1 must leave for it: a pure lookup module that runs in the
 browser and on the server alike, and the per-mode limitations.
 
+### Decided with Gadi (15 November 2026)
+
+- Reader text may leave the browser where that adds value (decision 19
+  and the last limitation change with stage 2).
+- Every AI Gateway call a reader triggers draws on their daily chat
+  allowance, or the anonymous group's. A reading counts as one
+  submission, plus one per 100 words; readings are capped at 500
+  words, as the lookup is. Site search keeps its own daily limit.
+- Gap hints ("related: RNAH 'sunrise'") and related words on
+  dictionary entries come from a table built once from embeddings, so
+  readers trigger no AI call for them (the spike: the bare word's
+  nearest glosses, shown above a cut-off, 95% good or related for
+  about 30% of content gaps).
+- Several cheaper models are tested before one is chosen (below).
+
+### The model test (written before any result)
+
+Plan 077's arm A3 on its tasks 1 and 2, all 600 rows, scored against
+the same bars, for Claude Sonnet 5.5 and Haiku 5.5, GPT-6.1 Terra,
+GPT-6 Luna and Gemini 3.8 Flash, each at medium reasoning through the
+Gateway, with plan 077's two judges. Opus 5.5 runs again first as a
+control: the dictionary changed on 15 November (seven WE meanings
+parted), so A3's context differs from round 1's, and the cheaper
+models are compared with Opus on the same context. Its result does not
+replace round 1's. The test books against plan 077's ledger, capped at
+$15 for work from 14 November on (estimate about $6). The model chosen
+is the cheapest per reading that meets every task-1 and task-2 bar;
+it then gets its own recall probe before it ships. Measured cost per
+reading so far: Opus about $0.11 and GPT-6.1 Sol about $0.06 (plan
+077's round 1).
+
+### The model test's results (15 and 16 November 2026)
+
+Run as written, for $5.53 against plan 077's ledger. Plan 077's bars
+for tasks 1 and 2. A reading is a task-1 call (about 75 words of
+Enochian with the 52,000 to 82,000 tokens of context); "warm" reads
+the context from the provider's cache, "cold" writes it, as a reading
+does after the cache has expired. Costs are from the ledger, which
+matches the Gateway's to the cent: each model's stage-2 run, its
+cold figure including its cache check's first call (Opus had none in
+stage 2, so its cold figure is the run's first call).
+
+| Model | Into English (≥ 484 of 500) | Into Enochian (≥ 465 of 500) | Joins (≥ 32 of 40) | Silent inventions, tasks 1 and 2 (≤ 12 of 600 each) | Reading, warm | Reading, cold |
+| --- | --- | --- | --- | --- | --- | --- |
+| Opus 5.5 (control) | 494 | 496 | 40 | 0, 0 | $0.114 | $0.511 |
+| Gemini 3.8 Flash | 495 | 496 | 40 | 0, 0 | $0.067 | $0.100 |
+| Sonnet 5.5 | 496 | 488 | 36 | 2, 0 | $0.043 | $0.240 |
+| GPT-6.1 Terra | 493 | 494 | 39 | 2, 0 | $0.015 | $0.078 |
+| GPT-6 Luna | 485, marginal | 476 | 38 | 9, 11 (marginal) | $0.0026 | $0.0086 |
+| Haiku 5.5 | 484 | 430, fails | 30, fails | 6, 7 | $0.0046 | $0.014 |
+
+Every model met the swapped-rows, recall, plant and knowns bars except
+Haiku, which also gave 5 planted unknowns as words into Enochian. The
+Opus control matched round 1 within a row or two on every bar. Gemini
+Flash's implicit caching missed entirely on 4 of its 8 task-1 calls
+(its warm calls read 87% from the cache), and it wrote about three
+times the others' output, so its cost is both higher and less
+predictable. Sonnet's calls all reported zero reasoning tokens, so
+whether it thought at medium effort is unverified; the runner now
+warns when a model meant to reason reports none.
+
+**Chosen: GPT-6.1 Terra** (Gadi, 16 November 2026). The rule written
+above picks the cheapest model meeting every bar, which is Luna; but
+Luna met two bars within a row of their lines, where plan 077's
+procedure is a declared top-up, and it made 9 silent inventions into
+English (the reading's own direction) against Terra's 2. A silent
+invention is the one error a reader cannot see, and Luna would save
+about 1.2 cents a warm reading (about 7 a cold one), so Terra is
+chosen over the rule's letter, without a top-up. Terra still gets its
+own recall probe before it ships, and the design should keep its
+cache warm where the provider allows a longer retention, since a cold
+reading costs five times a warm one.
+
 ## The stage-1 review (Fable, 13 November 2026)
 
 The review prototyped the design against the data and plan 074's

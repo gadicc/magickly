@@ -953,6 +953,22 @@ ran. Closed book had no bar: it measured honesty about unknown words.
   but one rejected made-up word now counts as "near" a headword rather
   than "contains" one, so `newtext.json`'s `meta.madeUp` tally reads
   near 299 and contains 78 (was 298 and 79).
+  On 16 November `newbars`, run for plan 081's model test, rescored
+  every new-text run against the 15 November dictionary. A
+  regeneration at 3c1c5486 (round 1's code and data) matched the
+  rewritten runs' `report.json` and `scores.json` byte for byte; only
+  `task3/report.json` differed (attested forms 126 of 198, and 9 of
+  the 15 damaged controls counted with 4 waiting, which left two task-3
+  bars unmeasurable). It was restored from that regeneration, which
+  reproduces every figure under "Results" (the overwritten copy is kept
+  beside it), and `newbars` now writes only its own `newbars*.json`,
+  refuses to overwrite `newbars.json` (round 1's record) without
+  `--force`, and counts blocked calls as it did for round 1: the
+  recorded command, with `--force`, still gives 0 of 85. Rescored
+  today, round 1's task-3 bars differ (the dictionary changed); the
+  restored file keeps round 1's. A run of a kind round 1's command
+  doesn't name (a later cache check, task-3 run or round trip) would
+  join that blocked count; `newbars` records which runs it counted.
 - The runner: a script under `scripts/enochian-translate-eval/`, run with
   pnpm (`loom.json`'s recorded runner). It calls every model through
   Vercel AI Gateway (`https://ai-gateway.vercel.sh`, model ids such as
