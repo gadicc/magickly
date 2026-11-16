@@ -1,24 +1,24 @@
 {
-  "date": "2026-11-14",
+  "date": "2026-11-15",
   "coverage": {
     "sentences": 60,
     "gapFree": 4,
     "words": 622,
-    "forms": 280,
-    "chips": 115,
+    "forms": 283,
+    "chips": 113,
     "ruleForms": 41,
-    "gaps": 227,
-    "gapsWithNearest": 44,
+    "gaps": 226,
+    "gapsWithNearest": 37,
     "byKind": {
       "practitioner": {
         "sentences": 20,
         "gapFree": 1,
         "words": 250,
-        "forms": 117,
-        "chips": 41,
+        "forms": 120,
+        "chips": 39,
         "ruleForms": 16,
-        "gaps": 92,
-        "gapsWithNearest": 17
+        "gaps": 91,
+        "gapsWithNearest": 15
       },
       "everyday": {
         "sentences": 20,
@@ -28,7 +28,7 @@
         "chips": 42,
         "ruleForms": 14,
         "gaps": 113,
-        "gapsWithNearest": 13
+        "gapsWithNearest": 9
       },
       "attested": {
         "sentences": 20,
@@ -38,9 +38,9 @@
         "chips": 32,
         "ruleForms": 11,
         "gaps": 22,
-        "gapsWithNearest": 14
+        "gapsWithNearest": 13
       }
     }
   },
-  "selfCheck": { "rows": 1054, "found": 946 }
+  "selfCheck": { "rows": 1054, "found": 945 }
 }

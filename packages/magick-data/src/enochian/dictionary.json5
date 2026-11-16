@@ -3963,7 +3963,17 @@
     "gematria": [],
     "meanings": [
       {
-        "meaning": "SERVE, LET HER SERVE THEMBORMILA ANGEL VENUS IN SATURN",
+        "meaning": "SERVE, LET HER SERVE THEM",
+        "source": "WE"
+      }
+    ],
+    "pronounciations": []
+  },
+  "BORMILA": {
+    "gematria": [],
+    "meanings": [
+      {
+        "meaning": "ANGEL VENUS IN SATURN",
         "source": "WE"
       }
     ],
@@ -4316,7 +4326,7 @@
     "gematria": [],
     "meanings": [
       {
-        "meaning": "Kerubic Archangel FIRE OF FIREC Veh (C or K)",
+        "meaning": "Kerubic Archangel FIRE OF FIRE",
         "source": "WE"
       }
     ],
@@ -4325,6 +4335,10 @@
   "C": {
     "gematria": [],
     "meanings": [
+      {
+        "meaning": "Veh (C or K)",
+        "source": "WE"
+      },
       {
         "meaning": "of, unto,on, with; o,oh",
         "source": "WE"
@@ -5857,7 +5871,17 @@
     "gematria": [],
     "meanings": [
       {
-        "meaning": "PART IN ARNDIARI Servient Angel WATER OF AIR",
+        "meaning": "PART IN ARN",
+        "source": "WE"
+      }
+    ],
+    "pronounciations": []
+  },
+  "DIARI": {
+    "gematria": [],
+    "meanings": [
+      {
+        "meaning": "Servient Angel WATER OF AIR",
         "source": "WE"
       }
     ],
@@ -16304,8 +16328,23 @@
     "gematria": [],
     "meanings": [
       {
-        "meaning": "Servient Angel WATER OF AIRPAOMBD members, her (poss.\"limbs\"?)",
+        "meaning": "Servient Angel WATER OF AIR",
         "source": "WE"
+      }
+    ],
+    "pronounciations": []
+  },
+  "PAOMBD": {
+    "gematria": [],
+    "meanings": [
+      {
+        "meaning": "members, her (poss.\"limbs\"?)",
+        "source": "WE"
+      },
+      {
+        "meaning": "her members",
+        "source": "Keys",
+        "source2": "Key 19"
       }
     ],
     "pronounciations": []
@@ -17326,8 +17365,23 @@
     "gematria": [],
     "meanings": [
       {
-        "meaning": "SICKLES, SHARPPURGEL FIRE OF FIRE",
+        "meaning": "SICKLES, SHARP",
         "source": "WE"
+      }
+    ],
+    "pronounciations": []
+  },
+  "PURGEL": {
+    "gematria": [],
+    "meanings": [
+      {
+        "meaning": "FIRE OF FIRE",
+        "source": "WE"
+      },
+      {
+        "meaning": "of fires",
+        "source": "Keys",
+        "source2": "Key 9"
       }
     ],
     "pronounciations": []
@@ -17991,7 +18045,17 @@
     "gematria": [],
     "meanings": [
       {
-        "meaning": "Servient Angel EARTH OF EARTHRXPAO Servient Angel EARTH OF EARTH",
+        "meaning": "Servient Angel EARTH OF EARTH",
+        "source": "WE"
+      }
+    ],
+    "pronounciations": []
+  },
+  "RXPAO": {
+    "gematria": [],
+    "meanings": [
+      {
+        "meaning": "Servient Angel EARTH OF EARTH",
         "source": "WE"
       }
     ],
@@ -18051,6 +18115,16 @@
         "source": "EMPM"
       }
     ]
+  },
+  "SAAIX": {
+    "gematria": [],
+    "meanings": [
+      {
+        "meaning": "Servient Angel AIR OF WATER",
+        "source": "WE"
+      }
+    ],
+    "pronounciations": []
   },
   "SAANIR": {
     "gematria": [],
@@ -18454,16 +18528,6 @@
     "meanings": [
       {
         "meaning": "MOURNING, LAMENTATION",
-        "source": "WE"
-      }
-    ],
-    "pronounciations": []
-  },
-  "Servient": {
-    "gematria": [],
-    "meanings": [
-      {
-        "meaning": "Angel AIR OF WATER",
         "source": "WE"
       }
     ],
@@ -19451,7 +19515,17 @@
         "source": "WE"
       },
       {
-        "meaning": "HERTIO TOP LINE OF TABLET OF 12 SQUAR",
+        "meaning": "HER",
+        "source": "WE"
+      }
+    ],
+    "pronounciations": []
+  },
+  "TIO": {
+    "gematria": [],
+    "meanings": [
+      {
+        "meaning": "TOP LINE OF TABLET OF 12 SQUAR",
         "source": "WE"
       }
     ],

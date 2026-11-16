@@ -27,7 +27,7 @@ export default function EnochianText() {
         </li>
         <li>
           <Link href="/enochian/dictionary">The Enochian dictionary</Link>:
-          1,911 words, written in Latin letters and in the Enochian script, with
+          1,917 words, written in Latin letters and in the Enochian script, with
           pronunciations, meanings and their sources, and Gerald Schueler&apos;s
           gematria.
         </li>

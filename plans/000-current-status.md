@@ -563,6 +563,19 @@ Follow-ups are separate from the completed migration work:
   text fills the pane until a word opens; on a phone an info button
   shows it. Site-wide, the spacer under the app bar now matches the
   bar, which covered 8px of every page from 600px wide.
+- 15 November 2026: the translator's lookup and data fixed after a
+  spike on meaning-based suggestions (WordNet, embeddings, a
+  part-of-speech tagger; $0.015): "range" no longer gives SONF, the
+  compass adjectives read as their points, Dee's "'d" is -ed, WE's
+  editorial notes stay out of the glosses, and seven WE meanings that
+  ran into the next entry are parted (1,917 words; plan 081's
+  "Follow-ups" has the list). TODO: check against the printed WE
+  whether BORMILA is the headword, PURGEL's "FIRE OF FIRE", TIO's "12
+  SQUAR" (ours or WE's), "GO (LE)" and GAPH's "I give Ga"; the
+  Kerubic Archangel meanings that lack their element
+  (`dictionary.json5` lines 1624, 7152, 9337, 9531, 13711, 13941,
+  17073) and HXGSD's "FIR E OF AIR"; "Childrenof the Light" (IHEHUDZ)
+  and "living braeth" (GIGIPAH).
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose

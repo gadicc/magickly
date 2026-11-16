@@ -1,4 +1,3 @@
-import { englishTokens } from "./english.ts";
 import { type JoinSplit, joinSplits } from "./joins.ts";
 import type { KeysTable } from "./keysTable.ts";
 import {
@@ -10,7 +9,7 @@ import {
   type LookupDictionary,
 } from "./lookupData.ts";
 import { type ToEnglish, toEnglish } from "./toEnglish.ts";
-import { type ToEnochian, toEnochian } from "./toEnochian.ts";
+import { readerTokens, type ToEnochian, toEnochian } from "./toEnochian.ts";
 import { wordCount } from "./tokens.ts";
 
 /**
@@ -102,7 +101,7 @@ const BOTH_UP_TO = 2;
  * the join rule splits); English wins a tie.
  */
 export function guessDirection(lookup: Lookup, text: string): DirectionGuess {
-  const english = englishTokens(text).map((one) => one.word);
+  const english = readerTokens(lookup, text).map((one) => one.word);
   const enochian = enochianWords(text).map(fold);
   const share = (hits: number, of: number) => (of ? hits / of : 0);
   const englishScore = share(

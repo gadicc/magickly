@@ -1,6 +1,6 @@
 import { findParts } from "../keys/dictionaryKeys.ts";
 import { deaccent, englishWords } from "./english.ts";
-import { cleanGloss, dictionaryGlosses } from "./glosses.ts";
+import { cleanGloss, dictionaryGlosses, namesALetter } from "./glosses.ts";
 import { BEHIND, FRONT, joinSplits } from "./joins.ts";
 import type { LeitchSpelling } from "./leitchSpellings.ts";
 import {
@@ -27,8 +27,9 @@ export type ReadVia = "keys" | "gd" | "leitch" | "dictionary" | "split";
 export interface ReadWord {
   /**
    * As shown, always as a source prints it: Casaubon's word, the
-   * dictionary's headword, an Aethyr's name, or, where Casaubon's print
-   * lost Dee's word (`notInCasaubon`), Crowley's form as he prints it.
+   * dictionary's headword in capitals (the one whose meaning it reads),
+   * an Aethyr's name, or, where Casaubon's print lost Dee's word
+   * (`notInCasaubon`), Crowley's form as he prints it.
    */
   word: string;
   /**
@@ -211,16 +212,27 @@ function gdReading(lookup: Lookup, rows: readonly Row[]): Reading {
 /**
  * A dictionary-only word's short gloss (decision 14): the first meaning's
  * shortest gloss without a comma, since a first meaning is often a raw
- * string ("I, my"; "govern, to; (see 'cab')").
+ * string ("I, my"; "govern, to; (see 'cab')"), with the headword it is
+ * filed under. A letter's name is no reading where the word has another
+ * meaning: C is "o", not "Veh".
  */
 function shortGloss(lookup: Lookup, folded: string) {
   const word = lookup.dictionary.get(folded);
   if (!word) return undefined;
   let best:
-    | { at: number; length: number; gloss: string; work: string }
+    | {
+        at: number;
+        length: number;
+        gloss: string;
+        work: string;
+        headword: string;
+      }
     | undefined;
-  word.meanings.forEach(({ meaning, source }, at) => {
-    for (const gloss of dictionaryGlosses(meaning)) {
+  const named = word.meanings.map(({ meaning }) => namesALetter(meaning));
+  const skipNames = named.includes(false);
+  word.meanings.forEach(({ meaning, source, headword }, at) => {
+    if (skipNames && named[at]) return;
+    for (const gloss of dictionaryGlosses(meaning, lookup.deePairs)) {
       if (gloss.includes(",")) continue;
       const length = englishWords(gloss).length;
       if (
@@ -230,11 +242,11 @@ function shortGloss(lookup: Lookup, folded: string) {
           (length < best.length ||
             (length === best.length && gloss < best.gloss)))
       )
-        best = { at, length, gloss, work: source };
+        best = { at, length, gloss, work: source, headword };
     }
   });
   return {
-    headword: word.headwords[0],
+    headword: best?.headword ?? word.headwords[0],
     gloss: best ? cleanGloss(best.gloss).toLowerCase() : "",
     work: best?.work ?? word.meanings[0]?.source,
   };
@@ -244,7 +256,7 @@ function dictionaryWord(lookup: Lookup, folded: string): ReadWord | undefined {
   const found = shortGloss(lookup, folded);
   if (!found) return undefined;
   return {
-    word: found.headword,
+    word: found.headword.toUpperCase(),
     gloss: found.gloss,
     entries: [found.headword],
     rows: [],

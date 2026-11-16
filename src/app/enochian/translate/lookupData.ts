@@ -21,7 +21,7 @@ import {
   withoutLeadingOfTo,
   wordKey,
 } from "./english.ts";
-import { lookupGlosses } from "./glosses.ts";
+import { type DeePairs, lookupGlosses, pairsOf } from "./glosses.ts";
 import type { KeysTable } from "./keysTable.ts";
 import { LEITCH_SPELLINGS, type LeitchSpelling } from "./leitchSpellings.ts";
 import { enochianWords } from "./tokens.ts";
@@ -153,8 +153,16 @@ export interface Lookup {
    * verbs read plain (`plain`), which a lookup tries second.
    */
   tiers: { literal: Tiers; plain: Tiers };
-  /** A folded form as shown: Casaubon's commonest spelling, or the headword. */
+  /**
+   * A folded form as shown: Casaubon's commonest spelling, or the headword
+   * in capitals (`shownHeadword`).
+   */
   display: ReadonlyMap<string, string>;
+  /**
+   * Each two words Dee writes in a row, for reading WE's inverted
+   * adjectives and verbs ("SICKLES, SHARP"; see `DeePairs`).
+   */
+  deePairs: DeePairs;
   /** Leitch's spellings, folded, to their entries. */
   leitch: ReadonlyMap<string, readonly LeitchSpelling[]>;
   aethyrs: readonly AethyrName[];
@@ -270,6 +278,18 @@ function readRows(table: KeysTable): Row[] {
   return rows;
 }
 
+/**
+ * A dictionary-only word as a form is shown (decision 8): its headword as
+ * the source prints it, in capitals as every source prints Enochian, so
+ * the transcription's "fatesged" is FATESGED; WE's divisions ("A-SOBAM")
+ * stay, being its print. Of several headwords that fold alike, one in
+ * capitals and letters only comes first ("ABAI" over "A-BAI").
+ */
+function shownHeadword(headwords: readonly string[]): string {
+  const plain = headwords.find((one) => /^[A-Z]+(?: [A-Z]+)*$/.test(one));
+  return plain ?? headwords[0].toUpperCase();
+}
+
 /** Adds a gloss to one set of tiers (decision 7). */
 function addGloss(
   tiers: Map<string, IndexHit[]>[],
@@ -364,6 +384,11 @@ export function buildLookup(
       word.meanings.push({ meaning, source: work, headword });
   }
 
+  // Within one row's English, so a pair never spans a row break.
+  const deePairs = new Set<string>();
+  for (const row of rows)
+    for (const pair of pairsOf(englishWords(row.english))) deePairs.add(pair);
+
   const literal = [0, 1, 2].map(() => new Map<string, IndexHit[]>());
   const plain = [0, 1, 2].map(() => new Map<string, IndexHit[]>());
   const add = (gloss: string, form: string, origin: Origin) => {
@@ -375,7 +400,7 @@ export function buildLookup(
       add(row.english, row.folded, { kind: "key", row });
   for (const [folded, word] of dictionary)
     for (const { meaning, source: work, headword } of word.meanings)
-      for (const gloss of lookupGlosses(meaning))
+      for (const gloss of lookupGlosses(meaning, deePairs))
         add(gloss, folded, {
           kind: "dictionary",
           headword,
@@ -395,7 +420,8 @@ export function buildLookup(
     display.set(folded, best);
   }
   for (const [folded, word] of dictionary)
-    if (!display.has(folded)) display.set(folded, word.headwords[0]);
+    if (!display.has(folded))
+      display.set(folded, shownHeadword(word.headwords));
 
   const leitch = new Map<string, LeitchSpelling[]>();
   for (const one of LEITCH_SPELLINGS) push(leitch, fold(one.word), one);
@@ -421,7 +447,7 @@ export function buildLookup(
   // reference, not English: it counts only where some gloss writes it in
   // lower case, as English ("fire").
   const glosses = [...dictionary.values()].flatMap((word) =>
-    word.meanings.flatMap(({ meaning }) => lookupGlosses(meaning)),
+    word.meanings.flatMap(({ meaning }) => lookupGlosses(meaning, deePairs)),
   );
   const lowerCase = new Set(
     glosses.flatMap((gloss) =>
@@ -487,6 +513,7 @@ export function buildLookup(
       plain: plain as unknown as Tiers,
     },
     display,
+    deePairs,
     leitch,
     aethyrs,
     englishVocabulary,

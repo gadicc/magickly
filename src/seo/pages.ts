@@ -81,7 +81,7 @@ export const PUBLIC_PAGES = {
   "/enochian/dictionary": {
     title: "Enochian Dictionary",
     description:
-      "Look up Enochian words by English meaning or spelling: 1,911 words " +
+      "Look up Enochian words by English meaning or spelling: 1,917 words " +
       "with pronunciations, sources, the script, where Dee's Keys use them " +
       "and Schueler's gematria.",
   },

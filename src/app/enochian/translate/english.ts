@@ -279,6 +279,22 @@ const NOT_EST: ReadonlySet<string> = new Set([
 ]);
 
 /**
+ * Adjectives in "-ern" and the word each is of: a compass point's, read
+ * as it ("eastern" as Dee's "East"), with a near-match chip as for a
+ * superlative. Only these four: "-ern" is no ending of "stern", "modern"
+ * or "govern".
+ */
+const ERN: Readonly<Record<string, string>> = {
+  eastern: "east",
+  northern: "north",
+  southern: "south",
+  western: "west",
+};
+
+/** An "-ern" adjective's compass point (`ERN`), or the word. */
+const ofErn = (word: string) => (Object.hasOwn(ERN, word) ? ERN[word] : word);
+
+/**
  * The regular endings `bases` takes off, longest first, with the shortest
  * word each applies to: as `search.ts`'s `stem`, so "sing" keeps its
  * "-ing" and "is" its "s", plus Dee's "-eth" and the superlative's "-est".
@@ -358,6 +374,7 @@ const syllables = (word: string) => word.match(/[aeiouy]+/g)?.length ?? 0;
  * which two inflections may share only by chance ("marred" and "mars").
  */
 function bases(word: string, loose = false): string[] {
+  if (Object.hasOwn(ERN, word)) return [word, ERN[word]];
   const out = [word];
   const suffix = suffixOf(word);
   if (!suffix || Object.hasOwn(IRREGULAR, word) || GRAMMAR.has(word))
@@ -395,6 +412,7 @@ function bases(word: string, loose = false): string[] {
  * `sameWord` decides.
  */
 function bucket(word: string): string {
+  if (Object.hasOwn(ERN, word)) return bucket(ERN[word]);
   const suffix = suffixOf(word);
   let out =
     suffix === "ies" || suffix === "ied"
@@ -465,11 +483,12 @@ export function isVerbWord(word: string): boolean {
  * How a typed word met a different word of its gloss, for its chip: as a
  * verb in another tense or person (`tense`, G16's to show: "killed" for
  * "kill", "walketh", "came" for "come", "knowest" for "know"), as a
- * superlative read as its base or the other way (`base`, a near match no
- * rule explains: "greatest" for "great"), or neither (`undefined`: "stars"
- * for "star"). An "-est" is a verb's second person where the gloss's word
- * is a verb (`glossIsVerb`: "know", "speaking", "reign"), and a
- * superlative otherwise ("great", "bright"), "thou" before it or not.
+ * superlative or an "-ern" adjective read as its base or the other way
+ * (`base`, a near match no rule explains: "greatest" for "great",
+ * "eastern" for "east"), or neither (`undefined`: "stars" for "star").
+ * An "-est" is a verb's second person where the gloss's word is a verb
+ * (`glossIsVerb`: "know", "speaking", "reign"), and a superlative
+ * otherwise ("great", "bright"), "thou" before it or not.
  */
 export function readAs(
   typed: string,
@@ -477,6 +496,7 @@ export function readAs(
   glossIsVerb: boolean,
 ): "tense" | "base" | undefined {
   if (typed === gloss) return undefined;
+  if (ofErn(typed) !== typed || ofErn(gloss) !== gloss) return "base";
   if (Object.hasOwn(IRREGULAR, typed)) return "tense";
   const mine = suffixOf(typed);
   if (mine === "ed" || mine === "eth") return "tense";

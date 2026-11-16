@@ -253,7 +253,13 @@ const GAP_WORDS: ReadonlySet<string> = new Set([
   "would",
 ]);
 
-const CONJUNCTIONS: ReadonlySet<string> = new Set(["and", "or", "but", "nor"]);
+const CONJUNCTIONS: ReadonlySet<string> = new Set([
+  "and",
+  "or",
+  "but",
+  "nor",
+  "yet",
+]);
 
 /**
  * Words that begin a question or a clause of their own: no verb follows
@@ -391,12 +397,26 @@ function entriesOf(lookup: Lookup, form: string): string[] {
   return findParts(lookup.source, word, lookup.stripped) ?? [];
 }
 
-function option(lookup: Lookup, form: string, source: FormSource): FormOption {
+/**
+ * A form as shown and the entries it opens: a dictionary-only form as the
+ * headword whose meaning matched, in capitals (WE's A-BAI "attacking",
+ * not ABAI), so the tile and its entry agree; any other as `display`.
+ */
+function shown(
+  lookup: Lookup,
+  form: string,
+  source: FormSource,
+): Pick<FormOption, "form" | "entries"> {
+  if (source.kind === "dictionary" && !lookup.keyForms.has(form))
+    return { form: source.headword.toUpperCase(), entries: [source.headword] };
   return {
     form: lookup.display.get(form) ?? form,
     entries: entriesOf(lookup, form),
-    source,
   };
+}
+
+function option(lookup: Lookup, form: string, source: FormSource): FormOption {
+  return { ...shown(lookup, form, source), source };
 }
 
 /** A dictionary hit's source. */
@@ -595,11 +615,21 @@ function rowsByKey(lookup: Lookup): Map<string, Row[]> {
 /**
  * A gap's nearest forms (decision 12): Dee's lines whose English shares
  * the word's stem, shortest first, then the dictionary's "means" group.
- * None for grammar words, or a stem under three letters.
+ * None for articles, pronouns or forms of "be", or a stem under three
+ * letters. A preposition or conjunction takes only English where every
+ * other word is grammar too (OROCH "under you", CASARMI "under whom"),
+ * not a phrase it is part of: "from" is not IZIZOP "from the highest
+ * vessels", nor "yet" CORMPO "hath yet numbred".
  */
 function nearest(lookup: Lookup, word: string): FormOption[] {
   const key = wordKey(word);
   const same = (one: string) => sameWord(word, one);
+  // For a grammar word, English whose other words are grammar too.
+  const grammar = PREPOSITIONS.has(word) || CONJUNCTIONS.has(word);
+  const fits = (words: readonly string[]) =>
+    words.some(same) &&
+    (!grammar ||
+      words.every((one) => same(one) || !isContent(one) || WH_WORDS.has(one)));
   if (
     ARTICLES.has(word) ||
     PRONOUNS.has(word) ||
@@ -610,7 +640,7 @@ function nearest(lookup: Lookup, word: string): FormOption[] {
   const out = new Map<string, FormOption>();
   const rows = rowsByKey(lookup)
     .get(key)
-    ?.filter((row) => row.words.some(same))
+    ?.filter((row) => fits(row.words))
     .sort((a, b) => a.core.length - b.core.length);
   for (const row of rows ?? []) {
     if (out.size >= NEAREST) break;
@@ -626,8 +656,12 @@ function nearest(lookup: Lookup, word: string): FormOption[] {
     if (!folded || out.has(folded) || hit.meaning === null) continue;
     // Search reads "(see 'cab')" as English; lookup does not (decision 22).
     // A letter's name is no meaning either ("Mals" for P).
-    const glossWords = lookupGlosses(hit.meaning).flatMap(englishWords);
-    if (!glossWords.some(same)) continue;
+    if (
+      !lookupGlosses(hit.meaning, lookup.deePairs).some((gloss) =>
+        fits(englishWords(gloss)),
+      )
+    )
+      continue;
     out.set(
       folded,
       option(lookup, folded, {
@@ -705,6 +739,20 @@ function isVerb(lookup: Lookup, word: string): boolean {
   );
 }
 
+/**
+ * A reader's English as the lookup reads it (`englishTokens`), a "'d"
+ * read as "-ed" only where that is a verb our English has ("call'd",
+ * "mov'd"); elsewhere it is "would" ("why'd", "everyone'd", and "lov'd",
+ * since our English has no "loved").
+ */
+export function readerTokens(lookup: Lookup, text: string): EnglishToken[] {
+  return englishTokens(text, (word) =>
+    (lookup.englishVocabulary.get(wordKey(word)) ?? []).some(
+      (one) => sameWord(word, one) && isVerb(lookup, one),
+    ),
+  );
+}
+
 function matchedForm(
   lookup: Lookup,
   base: Base,
@@ -726,8 +774,7 @@ function matchedForm(
   return {
     kind: "form",
     ...base,
-    form: lookup.display.get(found.form) ?? found.form,
-    entries: entriesOf(lookup, found.form),
+    ...shown(lookup, found.form, found.source),
     source: found.source,
     tier: found.tier,
     ...(rule ? { rule } : {}),
@@ -951,7 +998,7 @@ function phraseAt(
 
 /** English into Enochian (see the module's comment). */
 export function toEnochian(lookup: Lookup, text: string): ToEnochian {
-  const tokens = englishTokens(text);
+  const tokens = readerTokens(lookup, text);
   const items: Working[] = [];
   const cache: NearestCache = new Map();
   let at = 0;

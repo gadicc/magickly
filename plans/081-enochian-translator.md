@@ -192,7 +192,9 @@ forms where any exist.
     word, and nearest forms from `searchDictionary`'s "means" group
     and Key line glosses sharing the word's stem, three at most; none
     for a grammar word or a stem under three letters. Many gaps have
-    none (as built, 44 of the 60 sentences' 227 gaps have any).
+    none (as built, 37 of the 60 sentences' 226 gaps have any; 44 of
+    227 before the fixes of 15 November, which left a preposition or
+    conjunction only nearest forms of grammar words).
 
 ### Enochian into English
 
@@ -305,16 +307,18 @@ forms where any exist.
       for one of Dee's phrases counts for each of its words, an
       article inside it included; a contraction counts as the words it
       stands for. This is the
-      honest measure of new English, and the main figure. As built,
-      of 622 words: forms 280 (45%), rule chips 115 (18%; 41 of them
-      forms a rule gives), gaps 227 (37%; 44 with a nearest form);
-      gap-free 1 of 20 practitioner, 0 of 20 everyday, 3 of 20
-      attested. (The spike's: 51%, 11% and 38%.)
+      honest measure of new English, and the main figure. After the
+      fixes of 15 November, of 622 words: forms 283 (46%), rule chips
+      113 (18%; 41 of them forms a rule gives), gaps 226 (36%; 37 with
+      a nearest form); gap-free 1 of 20 practitioner, 0 of 20
+      everyday, 3 of 20 attested. (As built on 14 November: 280, 115
+      and 227; the spike's: 51%, 11% and 38%.)
     - **Dee's English in, Dee's Enochian out**, each Key's English as
       running text: the share of his content rows whose word comes
       back. It is labelled a self-consistency check and has no margin
-      of error, since the tool looks in the Keys themselves. As
-      built, 946 of 1,054 (89.8%; the spike's 944).
+      of error, since the tool looks in the Keys themselves. 945 of
+      1,054 (89.7%) after the fixes of 15 November; 946 as built, and
+      the spike's 944.
 
     No margin of error on the coverage figure either, since the 60
     sentences are not a sample of what readers type. The
@@ -648,3 +652,36 @@ Done after the build:
   their search: kept, since it is their click (Gadi, 14 November
   2026). The dictionary's `?q=` also reaches the server when a page is
   loaded with it (plan 074).
+- 15 November 2026: lookup and data fixes, found by the meaning spike
+  (see current status):
+  - "range" gave SONF at tier 1, since Casaubon prints "that range" for
+    DSONF; that spelling is now read only in Dee's English, so a
+    reader's "range" is a gap. The self-check loses that row (945).
+  - "eastern", "northern", "southern" and "western" read as their
+    compass point (RAAS "the East" and so on) with the near-match
+    chip, as superlatives are.
+  - Contractions are expanded only in the reader's text, so Dee's
+    "apparail'd" (ZONAC) reads "apparelled", not "apparail would"; a
+    final "'d", "'st" or "'n" reads as -ed, -est or -en.
+  - WE's editorial notes no longer reach the glosses ("var. 4", "alt.
+    part in lin", part-of-speech marks), and its abbreviations read in
+    full ("undefiled k." is "undefiled knowledge").
+  - A dictionary-only form shows as its headword in capitals.
+  - A preposition or conjunction (now "yet" too) takes only nearest
+    forms of grammar words, so "from" no longer suggests GENS.
+  - The dictionary's data: seven WE meanings that ran into the next
+    entry are parted, adding BORMILA, TIO, PAOMBD, RXPAO, PURGEL and
+    DIARI (1,917 words), and the stray headword "Servient" is SAAIX,
+    the five-letter partner of SAIX.
+
+  Forms 283, chips 113, gaps 226 (37 with a nearest form).
+
+  Left as known limits: a new headword can pull a near English word
+  into reading as Enochian ("my diary" through DIARI), and WE's noun
+  "n. Initiate" (ORLO) now matches "initiated" with a tense chip. WE's
+  "X, Y" meanings are read as one phrase "Y X" only where Dee writes
+  it so (PUIM "sharp sickles", ORRI "barren stone"); others stay two
+  glosses (OZONGON "winds, manifold", HOATH "worshiper, true", GOHED
+  "one, everlasting"). A reader's "'d" is "would" unless its stem is a
+  verb our English has (call'd is called); "lov'd" still reads "lov
+  would".
