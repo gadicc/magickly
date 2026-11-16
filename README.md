@@ -44,6 +44,14 @@ The retained SQL/provenance cases live in
 storage behavior. Both files remain part of the complete suite. The focused
 command retains Vitest's existing data-generation setup.
 
+`pnpm test:local` adds Loom's optional local worker/core controls after the same
+data and search preparation. It preserves the existing Vitest pool and config;
+file filters can be passed as arguments. `auto` is a CPU/quota ceiling rather
+than a tuned worker count, and an unknown local quota falls back to one worker.
+CI ignores local worker requests and exclusion while retaining available
+capacity and deliberate runner limits. This does not coordinate an aggregate
+worker budget across projects. The existing test and watch tasks remain available.
+
 First, run the development server:
 
 ```bash
