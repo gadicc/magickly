@@ -27,12 +27,13 @@ vi.mock("../../src/db/neonFull", () => ({ db: {} }));
 
 const journal = JSON.parse(readFileSync("drizzle/meta/_journal.json", "utf8"));
 // This fixture retains the extension-free accounting prefix; native pgvector
-// rehearsal covers the new corpus migration separately.
+// rehearsal covers pgvector separately; include the new extension-free window guard.
 const pending = [
   "0021_wooden_rocket_raccoon",
   "0022_massive_whiplash",
   "0023_lethal_hydra",
   "0024_chat_research_maintenance",
+  "0026_chat_research_window_guard",
 ];
 const tables = [
   "chat_research_artifacts",
@@ -46,7 +47,11 @@ function folder(name: string, end: number) {
   const path = join(root, name);
   mkdirSync(join(path, "meta"), { recursive: true });
   // Omit only 0000: the in-memory test engine has Loom's UUID fixture already.
-  const entries = journal.entries.slice(1, end);
+  const entries = journal.entries
+    .slice(1, end)
+    .filter(
+      (entry: { tag: string }) => entry.tag !== "0025_chat_research_corpus",
+    );
   writeFileSync(
     join(path, "meta/_journal.json"),
     JSON.stringify({ ...journal, entries }),
@@ -56,7 +61,7 @@ function folder(name: string, end: number) {
   return path;
 }
 const before = folder("before", 21),
-  after = folder("after", 25);
+  after = folder("after", 27);
 afterAll(() => rmSync(root, { recursive: true, force: true }));
 
 type Client = Awaited<ReturnType<typeof createMemoryPgliteHarness>>["client"];
@@ -123,11 +128,16 @@ async function journalRows(client: Client) {
 
 it("upgrades exact populated old migrations with the installed migrator, preserves auth readiness and leaves research empty", async () => {
   expect(
-    journal.entries.slice(21, 25).map((entry: { tag: string }) => entry.tag),
+    journal.entries
+      .slice(21)
+      .filter(
+        (entry: { tag: string }) => entry.tag !== "0025_chat_research_corpus",
+      )
+      .map((entry: { tag: string }) => entry.tag),
   ).toEqual(pending);
   expect(
     journal.entries.slice(25).map((entry: { tag: string }) => entry.tag),
-  ).toEqual(["0025_chat_research_corpus"]);
+  ).toEqual(["0025_chat_research_corpus", "0026_chat_research_window_guard"]);
   expect(readMigrationFiles({ migrationsFolder: before })).toHaveLength(20);
   const { client, db } = await fixture();
   try {
@@ -158,17 +168,17 @@ it("upgrades exact populated old migrations with the installed migrator, preserv
           `select count(*)::integer as n from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.proname like 'chat_research_%'`,
         )
       ).rows,
-    ).toEqual([{ n: 3 }]);
+    ).toEqual([{ n: 4 }]);
     expect(
       (
         await client.query(
           `select count(*)::integer as n from pg_trigger where tgname like 'chat_research_%' and not tgisinternal`,
         )
       ).rows,
-    ).toEqual([{ n: 8 }]);
+    ).toEqual([{ n: 9 }]);
     const currentJournal = await journalRows(client);
     expect(currentJournal.slice(0, 20)).toEqual(baselineJournal);
-    expect(currentJournal).toHaveLength(24);
+    expect(currentJournal).toHaveLength(25);
     // Hashes recorded by the installed migrator must bind the actual pending bytes.
     expect(currentJournal.slice(20).map((row) => row.hash)).toEqual(
       readMigrationFiles({ migrationsFolder: after })

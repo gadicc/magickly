@@ -9,9 +9,12 @@ import {
 } from "./boundedWork";
 import { RESEARCH_MAINTENANCE_LOCK_PREFIX } from "./maintenanceTarget";
 import {
+  inspectResearchManagedPublication,
   inspectResearchPublication,
+  type PreparedResearchManagedPublication,
   type PreparedResearchPublication,
   RESEARCH_PUBLICATION_ERROR,
+  type ResearchPublicationFacts,
 } from "./publication";
 import type {
   ResearchAdmissionDatabase,
@@ -49,7 +52,7 @@ export interface ResearchPublicationTableOids {
 type Step = <T>(work: () => PromiseLike<T>) => Promise<T>;
 function context(
   database: ResearchAdmissionDatabase,
-  prepared: PreparedResearchPublication,
+  readFacts: () => ResearchPublicationFacts,
   independentlyAdoptedSha256: string,
   inheritedDeadlineAt?: number,
   expectedTableOids?: ResearchPublicationTableOids,
@@ -104,7 +107,7 @@ function context(
       ))
   )
     fail();
-  const facts = inspectResearchPublication(prepared);
+  const facts = readFacts();
   if (
     facts.document_sha256 !== independentlyAdoptedSha256 ||
     performance.now() >= end
@@ -339,11 +342,32 @@ export function createSqlResearchPublisher(
 ) {
   const c = context(
     database,
-    prepared,
+    () => inspectResearchPublication(prepared),
     independentlyAdoptedSha256,
     inheritedDeadlineAt,
     expectedTableOids,
   );
+  return publisher(c);
+}
+/** Explicit managed publication entry. Same native target/mutex/deadline/one-shot checks; no local handle conversion or automatic adoption. */
+export function createSqlResearchManagedPublisher(
+  database: ResearchAdmissionDatabase,
+  prepared: PreparedResearchManagedPublication,
+  independentlyAdoptedSha256: string,
+  inheritedDeadlineAt?: number,
+  expectedTableOids?: ResearchPublicationTableOids,
+) {
+  return publisher(
+    context(
+      database,
+      () => inspectResearchManagedPublication(prepared),
+      independentlyAdoptedSha256,
+      inheritedDeadlineAt,
+      expectedTableOids,
+    ),
+  );
+}
+function publisher(c: ReturnType<typeof context>) {
   return Object.freeze({
     async publish(signal: AbortSignal): Promise<ResearchPublicationReceipt> {
       return c.run(signal, false, async (tx, step, guard, oids) => {
@@ -452,11 +476,37 @@ export async function observeSqlResearchPublication(
 ): Promise<ResearchPublicationObservation> {
   const c = context(
     database,
-    prepared,
+    () => inspectResearchPublication(prepared),
     independentlyAdoptedSha256,
     inheritedDeadlineAt,
     expectedTableOids,
   );
+  return observe(c, signal);
+}
+/** Fresh descriptive observation for the managed format after actual writer settlement. Does not adopt or repair it. */
+export async function observeSqlResearchManagedPublication(
+  database: ResearchAdmissionDatabase,
+  prepared: PreparedResearchManagedPublication,
+  independentlyAdoptedSha256: string,
+  signal: AbortSignal,
+  inheritedDeadlineAt?: number,
+  expectedTableOids?: ResearchPublicationTableOids,
+): Promise<ResearchPublicationObservation> {
+  return observe(
+    context(
+      database,
+      () => inspectResearchManagedPublication(prepared),
+      independentlyAdoptedSha256,
+      inheritedDeadlineAt,
+      expectedTableOids,
+    ),
+    signal,
+  );
+}
+async function observe(
+  c: ReturnType<typeof context>,
+  signal: AbortSignal,
+): Promise<ResearchPublicationObservation> {
   return c.run(signal, true, async (tx, step, guard, oids) => {
     const r = await c.snapshot(tx, step, guard, oids);
     const configuration =

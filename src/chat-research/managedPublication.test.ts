@@ -1,10 +1,8 @@
 /** Synthetic configuration only; no identities, credentials, deployment, SQL or model calls. */
 import { createHash } from "node:crypto";
 import { expect, it, vi } from "vitest";
-import {
-  prepareResearchManagedRetentionProfile,
-  type ResearchManagedRetentionProfileInput,
-} from "./managedRetentionProfile";
+import { managedPublicationFixture as fixture } from "./managedPublication.fixture";
+import { prepareResearchManagedRetentionProfile } from "./managedRetentionProfile";
 import {
   inspectResearchManagedPublication,
   inspectResearchPublication,
@@ -19,35 +17,7 @@ import { prepareResearchSourcePolicy } from "./sourcePolicy";
 
 vi.mock("server-only", () => ({}));
 const sha = (s: string) => createHash("sha256").update(s).digest("hex");
-function fixture() {
-  const f = publicationFixture(),
-    profileInput: ResearchManagedRetentionProfileInput = {
-      ...f.retentionInput,
-      schema_version: 2,
-      kind: "private-research-managed-retention",
-      runtime: {
-        platform: "vercel",
-        node_major: 22,
-        region: "lhr1",
-        worker_artifact_sha256: "1".repeat(64),
-        dependency_lock_sha256: "2".repeat(64),
-        critical_inputs_sha256: "3".repeat(64),
-        project_scope_sha256: "4".repeat(64),
-        custody_contract: "independently-reviewed-protected-release",
-      },
-    },
-    profile = prepareResearchManagedRetentionProfile(profileInput);
-  return {
-    ...f,
-    profile,
-    profileInput,
-    managedInput: {
-      ...f.input,
-      retentionProfileJson: profile.document_json,
-      retentionProfileSha256: profile.document_sha256,
-    },
-  };
-}
+
 it("binds the managed runtime into a distinct publication without changing the budget/read/source scope", () => {
   const f = fixture(),
     local = prepareResearchPublication(f.input),

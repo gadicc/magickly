@@ -19,6 +19,7 @@ import { createSqlResearchCatalogHttpHandler } from "./catalogHttp";
 import { loadPrivateResearchCorpus } from "./corpusFiles";
 import {
   createSqlResearchHttpHandler,
+  createSqlResearchManagedHttpHandler,
   type ResearchHttpAdoptionPorts,
   type ResearchHttpJobBinding,
   type ResearchHttpOptions,
@@ -26,14 +27,21 @@ import {
   type ResearchHttpServiceBinding,
 } from "./http";
 import {
+  prepareResearchManagedRetentionProfile,
+  type ResearchManagedRetentionProfileInput,
+} from "./managedRetentionProfile";
+import {
   RESEARCH_API_PATH,
   RESEARCH_ARCHIVE_API_PATH,
   RESEARCH_CATALOG_API_PATH,
   RESEARCH_READ_API_PATH,
 } from "./paths";
 import {
+  inspectResearchManagedPublication,
   inspectResearchPublication,
+  type PreparedResearchManagedPublication,
   type PreparedResearchPublication,
+  type ResearchPublicationFacts,
 } from "./publication";
 import { inspectResearchQuery, type PreparedResearchQuery } from "./query";
 import { createResearchReadAdoptionPorts } from "./readAdoption";
@@ -49,6 +57,8 @@ import {
 } from "./runtimeCorpus";
 import type { ResearchSourceContext } from "./sourceAuthorization";
 import { parseResearchSourceContext } from "./sourceAuthorization";
+
+import { copyResearchSourceAuthOptions } from "./sqlSourceReaders";
 
 export const RESEARCH_CONFIGURED_SERVICE_ERROR =
   "Private research startup unavailable";
@@ -161,6 +171,13 @@ export interface ResearchConfiguredServiceOptions {
   readonly priceFetch?: typeof fetch;
   readonly requestFetch?: typeof fetch;
 }
+/** Managed deployment input only. Runtime matching checks configuration; trusted outer custody still has to establish actual code/account/endpoint ownership. */
+export interface ResearchConfiguredManagedServiceOptions
+  extends Omit<ResearchConfiguredServiceOptions, "publication" | "corpusRoot"> {
+  readonly publication: PreparedResearchManagedPublication;
+  /** Independently reviewed cleanup release facts, never copied from an unadopted startup document as proof of custody. */
+  readonly managedCleanupRuntime: ResearchManagedRetentionProfileInput["runtime"];
+}
 /**
  * Load the actual independently pinned private bundle and internally construct real HTTP adoption guards.
  * The outer reviewed immutable deployment/non-watch launcher owns consent, code and authoritative endpoint,
@@ -174,12 +191,76 @@ export function createConfiguredResearchApplication(
   options: ResearchConfiguredServiceOptions,
 ) {
   try {
-    const prepared = prepareResearchConfiguredServiceDocument(
-      parseBoundedResearchJson(
-        options.documentJson,
-        8192,
-      ) as ResearchConfiguredServiceDocument,
+    return createApplication(
+      options,
+      inspectResearchPublication(options.publication),
+      (params) =>
+        createSqlResearchHttpHandler({
+          ...params,
+          publication: options.publication,
+        }),
     );
+  } catch {
+    return fail();
+  }
+}
+/** Explicit managed assembly from genuine SQL-loaded canonical preparations. No local-file fallback, grant, deployment or provider call. */
+export function createConfiguredResearchManagedApplication(
+  options: ResearchConfiguredManagedServiceOptions,
+) {
+  try {
+    const runtimeInput = options.runtime,
+      runtime = Object.freeze({
+        kind: runtimeInput.kind,
+        revision: runtimeInput.revision,
+        authorityEndpointIdentity: runtimeInput.authorityEndpointIdentity,
+      }),
+      facts = inspectResearchManagedPublication(options.publication),
+      profile = prepareResearchManagedRetentionProfile({
+        ...(parseBoundedResearchJson(
+          facts.retention_profile_json,
+          8192,
+        ) as ResearchManagedRetentionProfileInput),
+        runtime: options.managedCleanupRuntime,
+      });
+    if (
+      runtime.kind !== "immutable-deployment" ||
+      Number(process.versions.node.split(".")[0]) !==
+        profile.runtime.node_major ||
+      profile.document_json !== facts.retention_profile_json ||
+      "corpusRoot" in options
+    )
+      fail();
+    return createApplication(
+      options,
+      facts,
+      (params) =>
+        createSqlResearchManagedHttpHandler({
+          ...params,
+          publication: options.publication,
+        }),
+      runtime,
+    );
+  } catch {
+    return fail();
+  }
+}
+function createApplication(
+  options: Omit<ResearchConfiguredServiceOptions, "publication">,
+  facts: ResearchPublicationFacts,
+  createQuestionHandler: (
+    params: Omit<ResearchHttpOptions, "publication">,
+  ) => ReturnType<typeof createSqlResearchHttpHandler>,
+  capturedRuntime?: ResearchConfiguredServiceOptions["runtime"],
+) {
+  try {
+    const authOptions = copyResearchSourceAuthOptions(options.authOptions),
+      prepared = prepareResearchConfiguredServiceDocument(
+        parseBoundedResearchJson(
+          options.documentJson,
+          8192,
+        ) as ResearchConfiguredServiceDocument,
+      );
     if (
       prepared.documentJson !== options.documentJson ||
       prepared.documentSha256 !==
@@ -189,13 +270,14 @@ export function createConfiguredResearchApplication(
     const document = JSON.parse(
         prepared.documentJson,
       ) as ResearchConfiguredServiceDocument,
-      facts = inspectResearchPublication(options.publication),
       database = options.database,
       transaction = database.transaction,
+      runtimeInput = capturedRuntime ?? options.runtime,
       actualRuntime = {
-        kind: options.runtime.kind,
-        revision: options.runtime.revision,
+        kind: runtimeInput.kind,
+        revision: runtimeInput.revision,
       },
+      authorityEndpointIdentity = runtimeInput.authorityEndpointIdentity,
       scope = facts.target.scope,
       generation = options.generation,
       createGenerationPorts =
@@ -214,8 +296,7 @@ export function createConfiguredResearchApplication(
       typeof transaction !== "function" ||
       facts.document_sha256 !== document.publication_sha256 ||
       JSON.stringify(actualRuntime) !== JSON.stringify(document.web_runtime) ||
-      options.runtime.authorityEndpointIdentity !==
-        document.authority_endpoint_identity ||
+      authorityEndpointIdentity !== document.authority_endpoint_identity ||
       document.native_target.table_oids.artifacts !==
         facts.target.artifactTableOid
     )
@@ -452,10 +533,9 @@ export function createConfiguredResearchApplication(
       sourceContext(query.context);
       return query;
     };
-    const questionHandler = createSqlResearchHttpHandler({
+    const questionHandler = createQuestionHandler({
       database,
-      authOptions: options.authOptions,
-      publication: options.publication,
+      authOptions,
       independentlyAdoptedManifestSha256: document.publication_sha256,
       origin: document.origin,
       catalog: loaded.catalog,
@@ -633,7 +713,7 @@ export function createConfiguredResearchApplication(
       scope,
       storage: facts.target.storage,
       sourceStorage: facts.source_storage,
-      authOptions: options.authOptions,
+      authOptions,
       origin: document.origin,
       readUntilMs: readAdoption.readUntilMs,
       async requireServiceReadActive(signal, end) {
@@ -691,7 +771,7 @@ export function createConfiguredResearchApplication(
     };
     const handleCatalog = createSqlResearchCatalogHttpHandler({
       database,
-      authOptions: options.authOptions,
+      authOptions,
       sourceStorage: facts.source_storage,
       actorId: scope.actorId,
       origin: document.origin,
@@ -801,7 +881,7 @@ export function createConfiguredResearchApplication(
       scope,
       storage: facts.target.storage,
       sourceStorage: facts.source_storage,
-      authOptions: options.authOptions,
+      authOptions,
       catalog: loaded.catalog,
       readUntilMs: readAdoption.readUntilMs,
       origin: document.origin,

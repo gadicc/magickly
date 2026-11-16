@@ -41,8 +41,11 @@ import {
   prepareResearchQuote,
 } from "./pricing";
 import {
+  inspectResearchManagedPublication,
   inspectResearchPublication,
+  type PreparedResearchManagedPublication,
   type PreparedResearchPublication,
+  type ResearchPublicationFacts,
 } from "./publication";
 import { inspectResearchQuery, type PreparedResearchQuery } from "./query";
 import {
@@ -139,14 +142,36 @@ export interface ResearchHttpOptions {
   /** Fixed provider sender only. No endpoint/provider is accepted from a request. */
   readonly requestFetch?: typeof fetch;
 }
+/** Explicit managed counterpart; local constructors continue to reject managed handles. */
+export interface ResearchManagedHttpOptions
+  extends Omit<ResearchHttpOptions, "publication"> {
+  readonly publication: PreparedResearchManagedPublication;
+}
 /**
  * Own the entire bounded question HTTP pipeline with actual fresh SQL identity/source readers. Constructor/import performs no I/O.
  * No route is enabled here. The caller must independently verify code/target/audience/source/retention/provider adoption before supplying ports.
  * Each ready POST is a new server operation; this API promises no automatic replay, history selection or refund.
  */
 export function createSqlResearchHttpHandler(options: ResearchHttpOptions) {
-  const facts = inspectResearchPublication(options.publication),
-    originalTarget = facts.target,
+  return createHandler(
+    options,
+    inspectResearchPublication(options.publication),
+  );
+}
+/** Managed entry with identical native/session/source/budget/provider fences. Constructor performs no I/O and activates no route. */
+export function createSqlResearchManagedHttpHandler(
+  options: ResearchManagedHttpOptions,
+) {
+  return createHandler(
+    options,
+    inspectResearchManagedPublication(options.publication),
+  );
+}
+function createHandler(
+  options: Omit<ResearchHttpOptions, "publication">,
+  facts: ResearchPublicationFacts,
+) {
+  const originalTarget = facts.target,
     target = Object.freeze({
       ...originalTarget,
       scope: Object.freeze({ ...originalTarget.scope }),

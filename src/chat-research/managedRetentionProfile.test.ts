@@ -71,7 +71,7 @@ it.each([
 );
 it.each([
   { platform: "other" },
-  { node_major: 24 },
+  { node_major: 26 },
   { region: "iad1" },
   { custody_contract: "self-attested" },
   { worker_artifact_sha256: "0".repeat(63) + "\n" },
@@ -166,4 +166,18 @@ it("does not re-read caller scope getters when binding the final target", () => 
   expect(p.target.scope.actorId).toBe(
     JSON.parse(p.document_json).scope.actorId,
   );
+});
+
+it("binds the explicit Node24 app profile separately from the prior Node22 profile", () => {
+  const original = prepare(input()),
+    next = prepare({
+      ...input(),
+      runtime: { ...input().runtime, node_major: 24 },
+    });
+  expect(next.document_sha256).not.toBe(original.document_sha256);
+  expect(next.target.targetSha256).not.toBe(original.target.targetSha256);
+  expect(() => read(next.document_json, original.document_sha256)).toThrow();
+  expect(
+    read(next.document_json, next.document_sha256).runtime.node_major,
+  ).toBe(24);
 });

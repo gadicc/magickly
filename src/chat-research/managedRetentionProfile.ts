@@ -20,7 +20,7 @@ export const RESEARCH_MANAGED_RETENTION_ERROR =
 const hash = v.pipe(v.string(), v.length(64), v.regex(/^[a-f0-9]{64}$/));
 const runtime = v.strictObject({
   platform: v.literal("vercel"),
-  node_major: v.literal(22),
+  node_major: v.picklist([22, 24]),
   region: v.literal("lhr1"),
   worker_artifact_sha256: hash,
   dependency_lock_sha256: hash,

@@ -183,6 +183,13 @@
       "when": 1794656923794,
       "tag": "0025_chat_research_corpus",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1794817627111,
+      "tag": "0026_chat_research_window_guard",
+      "breakpoints": true
     }
   ]
 }

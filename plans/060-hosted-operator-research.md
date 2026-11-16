@@ -187,3 +187,31 @@ and scheduler implementation, native target/role adoption, hosted publication,
 ingress and health acceptance remain required. The local binary format and its
 consumers remain unchanged and reject this distinct profile. No existing route
 accepts or activates the managed format.
+
+
+## Managed runtime checkpoint
+
+Explicit managed SQL publication, startup, application and cleanup factories now
+reuse the existing source/session/native/accounting gates without accepting a
+managed handle through a local-only constructor. Node 22 and Node 24 profiles
+are distinct; the actual process major must match. The current site's Node 24
+setting needs its own hosted acceptance rather than inheriting Node 22 results.
+
+The unregistered cleanup HTTP adapter authenticates before loading private
+configuration. It preserves the original forty-second work budget plus a
+separate fifteen-second settlement allowance, native exclusivity, packet-pool
+closure and exact final-acknowledgement reconciliation. No schedule, token,
+credential or app route is installed. See
+[managed runtime foundations](../src/chat-research/MANAGED-RUNTIME.md).
+
+Migration 0026 freezes published window scope, conservative holds and irreversible
+stopping. This permits a narrowly granted column UPDATE privilege solely for
+cleanup row locks. Settlement preserves an existing native stop timestamp exactly.
+Synthetic native privilege tests and actual SQL ledger/migration tests cover these
+contracts; scripted client-lifecycle tests do not establish hosted client custody
+or complete service acceptance.
+
+Remaining work includes separately adopted restricted roles and credential
+custody, authenticated main-site ingress and SQL-object composition, verified
+hourly scheduling, protected-release acceptance and a fresh finite model scope.
+The source remains inactive and legacy chat remains unchanged.

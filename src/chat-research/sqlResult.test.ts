@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { createMemoryPgliteHarness } from "@gadicc/loom/db/testing";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, expect, it, vi } from "vitest";
 import {
   chatResearchPermits as permits,
@@ -1738,3 +1738,98 @@ it("completes an explicit history child from actual paired data, binds private i
     audit.events.some((e) => e.params.includes(parent.receipt.permitId)),
   ).toBe(false);
 });
+
+it.each(["metadata", "paired-result"] as const)(
+  "preserves a native microsecond stop through actual %s terminal settlement under the window guard",
+  async (kind) => {
+    await client.exec(
+      readFileSync(
+        new URL(
+          "../../drizzle/0026_chat_research_window_guard.sql",
+          import.meta.url,
+        ),
+        "utf8",
+      ),
+    );
+    try {
+      const [{ at }] = (
+        await client.query<{ at: string }>(
+          "select (date_trunc('milliseconds',clock_timestamp()-interval '250 milliseconds')+interval '500 microseconds')::text at",
+        )
+      ).rows;
+      // Freeze only native ledger clock probes in the SAME millisecond. All actual
+      // reserve/dispatch/stop/settlement SQL and the migration trigger still run.
+      const precise: ResearchAdmissionDatabase = {
+        transaction: (work, config) =>
+          db.transaction(async (tx) => {
+            const controlled = new Proxy(tx, {
+              get(target, key) {
+                if (key === "select")
+                  return (fields?: Record<string, unknown>) =>
+                    Reflect.apply(target.select, target, [
+                      fields &&
+                      Object.keys(fields).length === 1 &&
+                      "now" in fields
+                        ? {
+                            now: sql<Date>`date_trunc('milliseconds',${at}::timestamptz)`.mapWith(
+                              (value: string | Date) => new Date(value),
+                            ),
+                          }
+                        : fields,
+                    ]);
+                const value = Reflect.get(target, key, target);
+                return typeof value === "function" ? value.bind(target) : value;
+              },
+            });
+            return work(controlled);
+          }, config),
+      };
+      store = createSqlResearchAdmission(precise, scope);
+      const job = await prepare("transport");
+      await store.stopGeneration(active());
+      await client.query(
+        "update public.chat_research_windows set stopped_at=$1::timestamptz where id=$2",
+        [at, scope.windowId],
+      );
+      // This is precisely the old rounded-down overwrite: ensure it is rejected,
+      // then require the genuine terminal path to commit without changing the stop.
+      await expect(
+        client.query(
+          "update public.chat_research_windows set stopped_at=date_trunc('milliseconds',stopped_at) where id=$1",
+          [scope.windowId],
+        ),
+      ).rejects.toMatchObject({ code: "23514" });
+      if (kind === "metadata")
+        await store.finish(
+          job.claim,
+          { outcome: "failed", reportedPico: null, responseSha256: null },
+          active(),
+        );
+      else
+        await store.finishWithResult(
+          job.claim,
+          artifact,
+          job.prepared,
+          active(),
+        );
+      const [{ same }] = (
+        await client.query<{ same: boolean }>(
+          "select stopped_at=$1::timestamptz same from public.chat_research_windows where id=$2",
+          [at, scope.windowId],
+        )
+      ).rows;
+      expect(same).toBe(true);
+      expect((await permit(job.receipt.permitId)).state).toBe(
+        kind === "metadata" ? "failed" : "indeterminate",
+      );
+      expect(await windowRow()).toMatchObject({
+        requestsUsed: 1,
+        heldPico: quote.upperPico,
+      });
+    } finally {
+      await client.exec(
+        "drop trigger chat_research_window_update on public.chat_research_windows;drop function public.chat_research_window_change();",
+      );
+    }
+  },
+);

@@ -936,10 +936,11 @@ export function createSqlResearchAdmission(
           )
           .returning();
         if (!saved) fail();
+        // Preserve an earlier native stop exactly; ledger clocks round to milliseconds.
         if (outcome !== "completed")
           await tx
             .update(windows)
-            .set({ stopped: now })
+            .set({ stopped: sql`coalesce(${windows.stopped}, ${now})` })
             .where(eq(windows.id, scope.windowId));
         return status(saved);
       });
@@ -1032,10 +1033,11 @@ export function createSqlResearchAdmission(
           )
           .returning();
         if (!saved) fail();
+        // Preserve an earlier native stop exactly; ledger clocks round to milliseconds.
         if (terminal.state !== "completed")
           await tx
             .update(windows)
-            .set({ stopped: now })
+            .set({ stopped: sql`coalesce(${windows.stopped}, ${now})` })
             .where(eq(windows.id, scope.windowId));
         return status(saved);
       });
