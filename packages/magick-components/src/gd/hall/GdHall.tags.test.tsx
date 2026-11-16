@@ -189,6 +189,18 @@ describe("GdHall given hall in JavaScript", () => {
     ]);
   });
 
+  it("gives that warning once, and never in production", () => {
+    const warn = quiet();
+    const props = { hall: neophyte.hall, padding: 1 } as unknown as GdHallProps;
+    renderToStaticMarkup(<GdHall {...props} />);
+    renderToStaticMarkup(<GdHall {...props} />);
+    expect(warn).toHaveBeenCalledTimes(1);
+    vi.stubEnv("NODE_ENV", "production");
+    const margin = { hall: neophyte.hall, margin: 1 } as unknown as GdHallProps;
+    renderToStaticMarkup(<GdHall {...margin} />);
+    expect(warn).toHaveBeenCalledTimes(1);
+  });
+
   it("does not count a root attribute that is undefined", () => {
     const warn = quiet();
     // A wrapper passing its own optional props on: wall={props.wall}.
@@ -218,13 +230,22 @@ describe("GdHall given hall in JavaScript", () => {
   it("reads a hall of null as none, drawing its tags", () => {
     const warn = quiet();
     const tags = renderToStaticMarkup(
-      <GdHall wall="plain">
+      <GdHall wall="gradient" dais={3}>
         <Hall.Floor>{pillars()}</Hall.Floor>
       </GdHall>,
     );
+    // Not the defaults, so a root attribute lost would show.
+    expect(tags).not.toBe(
+      renderToStaticMarkup(
+        <GdHall>
+          <Hall.Floor>{pillars()}</Hall.Floor>
+        </GdHall>,
+      ),
+    );
     const props = {
       hall: null,
-      wall: "plain",
+      wall: "gradient",
+      dais: 3,
       children: <Hall.Floor>{pillars()}</Hall.Floor>,
     } as unknown as GdHallTagsProps;
     expect(renderToStaticMarkup(<GdHall {...props} />)).toBe(tags);

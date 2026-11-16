@@ -553,12 +553,16 @@ silent. That includes `<GdHall hall={hall} />` while `hall` is still
 `undefined` (data loading, say): it draws the empty hall it drew
 before, and now warns that it did.
 
-0.3.1 mends edge cases a JavaScript caller can reach, none of which
-TypeScript allows: `hall={null}` counts as no `hall` in `GdHall` and in
-`hallFromTags`, so `GdHall` draws its tags, or warns of an empty hall
-as it does for `undefined`; `hallFromTags` given a `GdHall` imported
-through a `"use client"` module says so; and `GdHall` given `hall`
-with root attributes warns in development that it ignores them.
+0.3.1 mends three edge cases. `hall={null}`, which only JavaScript
+(or TypeScript without `strictNullChecks`) can write, counts as no
+`hall` in `GdHall` and in `hallFromTags`: `GdHall` draws its tags with
+its root attributes, or warns of an empty hall as it does for
+`undefined`. `hallFromTags` given a `GdHall` imported through a
+`"use client"` module says so. And `GdHall` given `hall` with root
+attributes warns in development that it ignores them: a literal
+`<GdHall hall={…} wall="plain" />` does not compile, but a wrapper
+whose props extend `GdHallProps` with `wall` or `padding` and spread
+them into `GdHall` does, and now hears of it.
 
 ## Requirements
 

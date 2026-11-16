@@ -1,5 +1,6 @@
 import {
   createContext,
+  createElement,
   createRef,
   Fragment,
   forwardRef,
@@ -394,6 +395,24 @@ describe("hallFromTags", () => {
           'hallFromTags was given a client component: a GdHall imported through a "use client" module is one, and a Server Component cannot read it. Import GdHall from "magick-components/gd/hall" where you call hallFromTags',
       },
     ]);
+  });
+
+  it("names a client component that is an object, as a module's export may be", () => {
+    const client = new Proxy(
+      {},
+      {
+        get(_target, name) {
+          if (name === "$$typeof") return Symbol.for("react.client.reference");
+          if (name === "displayName" || name === "defaultProps")
+            return undefined;
+          throw new Error(`Cannot access ${String(name)} on the server`);
+        },
+      },
+    );
+    const element = createElement(client as unknown as (props: object) => null);
+    expect(hallFromTags(element).diagnostics[0]?.message).toMatch(
+      /^hallFromTags was given a client component/,
+    );
   });
 
   it("refuses anything but a GdHall element", () => {

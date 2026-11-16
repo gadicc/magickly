@@ -600,8 +600,11 @@ provenance attestation.
 ### 0.3.1 (16 November 2026)
 
 At Gadi's word, built on `gate/hall-tags-031`, from
-`main` at `58f1a224`: the four leftovers of the final review of 0.3.0,
-none reachable from TypeScript.
+`main` at `58f1a224`: the four leftovers of the final review of 0.3.0.
+A `null` `hall` is JavaScript's (or TypeScript's without
+`strictNullChecks`); a client reference, and `hall` with root
+attributes spread from a wrapper's props, are reachable from typed
+code too.
 
 - `hallFromTags(<GdHall hall={null} />)` returned `null` as the hall; a
   `null` `hall` now counts as none there and in `GdHall`, which draws
@@ -625,7 +628,24 @@ nothing threw, while reading the hall-tag symbol on it directly does
 throw, so `hallTagOf`'s check comes first where it must. It found the
 `undefined` guard untested (a filter of `name in props` passed every
 test); `c2ada306` pins it, with a mutation check, and two tests on a
-`null` hall's warnings. `hall`'s JSDoc keeps "anything else draws an
+`null` hall's warnings.
+
+Fable 5.2's final review (high effort) of the bump's tree, `572e5119`,
+found nothing that blocked the release. It built real client
+references with Next's vendored `react-server-dom-webpack` and
+`-turbopack` (`registerClientReference`, `createClientModuleProxy`'s
+named, default and module proxies) against the built `lib/`: as root,
+each gave the new message, and nothing threw. The decision said
+"magick-components@0.3.1 is new (latest is 0.3.0); publish under
+latest"; the smoke test packed 179 files, the same list as 0.3.0;
+`GdHall.d.ts` was unchanged. Taken before the release, in the commit
+after the bump: the README and this plan said TypeScript reaches none
+of the three cases, when typed code reaches two; the `null` hall's
+test used the default `wall`, so a lost root attribute would not show;
+the new warning's once-only and production silence, and a client
+reference that is an object, were untested (each mutation passed); and
+the attribute check behind the warning now runs only in development.
+`hall`'s JSDoc keeps "anything else draws an
 empty hall" (it feeds the explorer's manifest and the site-search
 vectors); README "Versions" says what `null` does.
 
@@ -695,7 +715,8 @@ On `gate/jsx-halls`, each gated on its own tree (every step exit 0).
 | `58f1a224` | 0.3.0 on npm |
 | `c3ddd19c` | 0.3.1: a `null` hall, a client reference, `hall` with root attributes, a comment |
 | `c2ada306` | 0.3.1 review: the warnings' edge cases pinned |
-| this commit | magick-components 0.3.1; its record |
+| `572e5119` | magick-components 0.3.1; its record |
+| this commit | 0.3.1 final review: README wording, three tests, the check in development only |
 
 `694ac018` passed its gate on the coverage rerun (the known
 `sqlLegacyImport` timeout); `c7aebb20`'s first gate timed out in

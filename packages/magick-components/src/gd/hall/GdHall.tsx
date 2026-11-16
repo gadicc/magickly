@@ -25,6 +25,7 @@ import type { HallChildren } from "./tags.ts";
 import type { HallArt, HallArtRegistry, HallNode } from "./types.ts";
 import {
   hallFromRootProps,
+  inDevelopment,
   markHallRoot,
   ROOT_ATTRIBUTES,
   warnInDevelopment,
@@ -537,9 +538,12 @@ export const GdHall = /*#__PURE__*/ markHallRoot(function GdHall(
       warnInDevelopment(
         "GdHall was given both `hall` and children: it draws `hall` and ignores the children",
       );
-    const ignored = ROOT_ATTRIBUTES.filter(
-      (name) => (props as Partial<GdHallTagsProps>)[name] !== undefined,
-    );
+    // Only for the warning, which production never gives.
+    const ignored = inDevelopment()
+      ? ROOT_ATTRIBUTES.filter(
+          (name) => (props as Partial<GdHallTagsProps>)[name] !== undefined,
+        )
+      : [];
     if (ignored.length > 0)
       warnInDevelopment(
         `GdHall was given \`hall\` with ${ignored.map((name) => `\`${name}\``).join(", ")}: it draws \`hall\` as it is and ignores them; set them on the hall node instead`,
