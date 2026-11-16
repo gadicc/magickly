@@ -31,6 +31,19 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a pull request.
 
 ## Development
 
+`pnpm test` runs the complete suite after its data and search prerequisites.
+For a focused legacy file-import planning loop, run:
+
+```bash
+pnpm exec vitest run src/migration/planLegacyFileImport.test.ts
+```
+
+These planning cases use synthetic values and reject runtime database imports.
+The retained SQL/provenance cases live in
+`src/migration/planLegacyFileImport.sql.test.ts`; run that file when changing
+storage behavior. Both files remain part of the complete suite. The focused
+command retains Vitest's existing data-generation setup.
+
 First, run the development server:
 
 ```bash
