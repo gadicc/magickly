@@ -16,6 +16,66 @@ import {
 /** The whole experiment's cap, in US dollars. The only place it is set. */
 export const EXPERIMENT_CAP_USD = 100;
 
+/**
+ * Plan 081's stage 2 (cheaper models on plan 077's tasks 1 and 2) books
+ * into the same ledger, in the same output directory, since its runs reuse
+ * the judges' verdict store and Opus's A0 and round-1 runs. It may add at
+ * most `capUsd` to what the ledger held before `from`: plan 077's spend,
+ * all of it booked by 13 November 2026.
+ */
+export const STAGE2 = {
+  from: "2026-11-14T00:00:00.000Z",
+  capUsd: 15,
+} as const;
+
+/**
+ * The cap every check applies to the ledger's total: the experiment's,
+ * lowered so that what is booked from `stage.from` on adds at most
+ * `stage.capUsd` to what was booked before it. A late correction (a
+ * `--reconcile` line, or the line settling a hold) counts on the date of the
+ * entry it corrects (`bookedAt`), so a call booked before `stage.from` and
+ * corrected after it stays before.
+ */
+export function ledgerCap(
+  entries: readonly LedgerEntry[],
+  stage: { from: string; capUsd: number } = STAGE2,
+): { cap: number; before: number; since: number } {
+  const at = bookedAt(entries);
+  let before = 0;
+  let since = 0;
+  for (const one of entries)
+    if (at(one) < stage.from) before += one.cost;
+    else since += one.cost;
+  return {
+    cap: Math.min(EXPERIMENT_CAP_USD, before + stage.capUsd),
+    before,
+    since,
+  };
+}
+
+/**
+ * When an entry's cost counts as booked: a correction (`reconciles`) on the
+ * date of the entry it corrects, a settling line (`settles`) on its hold's,
+ * followed through chains (a reconciled settling line counts on the hold's
+ * date); anything else, or a correction whose entry isn't in the ledger, on
+ * its own.
+ */
+export function bookedAt(
+  entries: readonly LedgerEntry[],
+): (entry: LedgerEntry) => string {
+  const byId = new Map(entries.map((one) => [one.id, one]));
+  return (entry) => {
+    let one = entry;
+    const seen = new Set<string>();
+    for (;;) {
+      const next = byId.get(one.reconciles ?? one.settles ?? "");
+      if (!next || seen.has(next.id)) return one.at;
+      seen.add(next.id);
+      one = next;
+    }
+  };
+}
+
 /** The gateway's public price list; needs no key. */
 export const PRICES_URL = "https://ai-gateway.vercel.sh/v1/models";
 
@@ -97,11 +157,160 @@ export const PLAN_PRICES: Readonly<
   "openai/gpt-6.1-sol": { input: 2, output: 10 },
 };
 
-/** `PLAN_PRICES` as the gateway's list would give them, batch rows too. */
+/**
+ * Plan 081 stage 2's models as the gateway's public list gave them on
+ * 15 November 2026 (`PRICES_URL`, base rates only: no regional, priority or
+ * "fast" tiers), for an offline projection only. GPT-6.1 Terra and Gemini
+ * 3.8 Flash have no batch rows, so they can't run by batch; Gemini lists no
+ * cache write. Haiku's prices rise fivefold from 100,001 input tokens, and
+ * the OpenAI models' from 272,001.
+ */
+export const LISTED_PRICES: Readonly<PriceList> = {
+  "anthropic/claude-sonnet-5.5": {
+    input: "0.000002",
+    output: "0.00001",
+    input_cache_read: "0.0000001",
+    input_cache_write: "0.0000025",
+  },
+  "anthropic/claude-sonnet-5.5-batch": {
+    input: "0.000001",
+    output: "0.000005",
+    input_cache_read: "0.00000005",
+    input_cache_write: "0.00000125",
+  },
+  "anthropic/claude-haiku-5.5": {
+    input: "0.0000001",
+    output: "0.0000005",
+    input_cache_read: "0.00000001",
+    input_cache_write: "0.000000125",
+    input_tiers: [
+      { cost: "0.0000001", min: 0, max: 100001 },
+      { cost: "0.0000005", min: 100001 },
+    ],
+    output_tiers: [
+      { cost: "0.0000005", min: 0, max: 100001 },
+      { cost: "0.0000025", min: 100001 },
+    ],
+    input_cache_read_tiers: [
+      { cost: "0.00000001", min: 0, max: 100001 },
+      { cost: "0.00000005", min: 100001 },
+    ],
+    input_cache_write_tiers: [
+      { cost: "0.000000125", min: 0, max: 100001 },
+      { cost: "0.000000625", min: 100001 },
+    ],
+  },
+  "anthropic/claude-haiku-5.5-batch": {
+    input: "0.00000005",
+    output: "0.00000025",
+    input_cache_read: "0.000000005",
+    input_cache_write: "0.0000000625",
+    input_tiers: [
+      { cost: "0.00000005", min: 0, max: 100001 },
+      { cost: "0.00000025", min: 100001 },
+    ],
+    output_tiers: [
+      { cost: "0.00000025", min: 0, max: 100001 },
+      { cost: "0.00000125", min: 100001 },
+    ],
+    input_cache_read_tiers: [
+      { cost: "0.000000005", min: 0, max: 100001 },
+      { cost: "0.000000025", min: 100001 },
+    ],
+    input_cache_write_tiers: [
+      { cost: "0.0000000625", min: 0, max: 100001 },
+      { cost: "0.0000003125", min: 100001 },
+    ],
+  },
+  "openai/gpt-6.1-terra": {
+    input: "0.000001",
+    output: "0.000005",
+    input_cache_read: "0.00000005",
+    input_cache_write: "0.00000125",
+    input_tiers: [
+      { cost: "0.000001", min: 0, max: 272001 },
+      { cost: "0.000002", min: 272001 },
+    ],
+    output_tiers: [
+      { cost: "0.000005", min: 0, max: 272001 },
+      { cost: "0.0000075", min: 272001 },
+    ],
+    input_cache_read_tiers: [
+      { cost: "0.00000005", min: 0, max: 272001 },
+      { cost: "0.0000001", min: 272001 },
+    ],
+    input_cache_write_tiers: [
+      { cost: "0.00000125", min: 0, max: 272001 },
+      { cost: "0.0000025", min: 272001 },
+    ],
+  },
+  "openai/gpt-6-luna": {
+    input: "0.0000001",
+    output: "0.0000005",
+    input_cache_read: "0.00000001",
+    input_cache_write: "0.000000125",
+    input_tiers: [
+      { cost: "0.0000001", min: 0, max: 272001 },
+      { cost: "0.0000002", min: 272001 },
+    ],
+    output_tiers: [
+      { cost: "0.0000005", min: 0, max: 272001 },
+      { cost: "0.00000075", min: 272001 },
+    ],
+    input_cache_read_tiers: [
+      { cost: "0.00000001", min: 0, max: 272001 },
+      { cost: "0.00000002", min: 272001 },
+    ],
+    input_cache_write_tiers: [
+      { cost: "0.000000125", min: 0, max: 272001 },
+      { cost: "0.00000025", min: 272001 },
+    ],
+  },
+  "openai/gpt-6-luna-batch": {
+    input: "0.00000005",
+    output: "0.00000025",
+    input_cache_read: "0.000000005",
+    input_cache_write: "0.0000000625",
+    input_tiers: [
+      { cost: "0.00000005", min: 0, max: 272001 },
+      { cost: "0.0000001", min: 272001 },
+    ],
+    output_tiers: [
+      { cost: "0.00000025", min: 0, max: 272001 },
+      { cost: "0.000000375", min: 272001 },
+    ],
+    input_cache_read_tiers: [
+      { cost: "0.000000005", min: 0, max: 272001 },
+      { cost: "0.00000001", min: 272001 },
+    ],
+    input_cache_write_tiers: [
+      { cost: "0.0000000625", min: 0, max: 272001 },
+      { cost: "0.000000125", min: 272001 },
+    ],
+  },
+  "google/gemini-3.8-flash": {
+    input: "0.00000075",
+    output: "0.00000375",
+    input_cache_read: "0.000000075",
+  },
+};
+
+/**
+ * Prices for an offline projection, as the gateway's list would give them:
+ * `LISTED_PRICES` for a model it has (with its batch row where listed),
+ * else `PLAN_PRICES` with batch rows at half.
+ */
 export function planPriceList(models: readonly string[]): PriceList {
   const out: PriceList = {};
   const perToken = (usd: number) => String(usd / 1e6);
   for (const model of models) {
+    const listed = LISTED_PRICES[model];
+    if (listed) {
+      out[model] = listed;
+      const batch = LISTED_PRICES[`${model}-batch`];
+      if (batch) out[`${model}-batch`] = batch;
+      continue;
+    }
     const row = PLAN_PRICES[model];
     if (!row) throw new Error(`Plan 077 gives no price for ${model}`);
     for (const [id, scale] of [
@@ -229,16 +438,23 @@ export interface Projectable {
 }
 
 /**
- * A request's input cost: its estimated tokens, priced as a cache write
- * where the call asks for caching (sync), since the first call with a given
- * prefix writes it.
+ * A request's cost with `output` tokens out: its estimated input, priced as
+ * a cache write where the call asks for caching (sync), since the first call
+ * with a given prefix writes it. Input and output are priced together, so a
+ * tiered price (Haiku's, fivefold from 100,001 input tokens) charges the
+ * output at the tier its input falls in, as the provider does.
  */
-function inputCost(request: Projectable, price: Pricing, caching: boolean) {
+function costWith(
+  request: Projectable,
+  price: Pricing,
+  caching: boolean,
+  output: number,
+) {
   const input = estimateTokens(request.chars, request.charsPerToken);
   return estimateCost(
     caching && price.input_cache_write
-      ? { ...NO_TOKENS, input, cacheWrite: input }
-      : { ...NO_TOKENS, input },
+      ? { ...NO_TOKENS, input, cacheWrite: input, output }
+      : { ...NO_TOKENS, input, output },
     price,
   );
 }
@@ -252,12 +468,11 @@ export function projectCost(
   price: Pricing,
   caching = false,
 ): number {
-  return (
-    inputCost(request, price, caching) +
-    estimateCost(
-      { ...NO_TOKENS, output: OUTPUT_ALLOWANCE[request.kind][request.effort] },
-      price,
-    )
+  return costWith(
+    request,
+    price,
+    caching,
+    OUTPUT_ALLOWANCE[request.kind][request.effort],
   );
 }
 
@@ -271,15 +486,11 @@ export function worstCost(
   price: Pricing,
   caching = false,
 ): number {
-  return (
-    inputCost(request, price, caching) +
-    estimateCost(
-      {
-        ...NO_TOKENS,
-        output: MAX_OUTPUT_TOKENS[request.kind][request.effort],
-      },
-      price,
-    )
+  return costWith(
+    request,
+    price,
+    caching,
+    MAX_OUTPUT_TOKENS[request.kind][request.effort],
   );
 }
 
@@ -388,6 +599,107 @@ export function unreconciled(entries: readonly LedgerEntry[]): (LedgerEntry & {
 /** Whether an entry is a call's own line (not a hold, note or correction). */
 const isCall = (one: LedgerEntry) =>
   !one.hold && !one.reconciles && !one.holdFor;
+
+/** Calls' mean cost: how many, and their mean (none when there are none). */
+export interface CallMean {
+  calls: number;
+  mean?: number;
+}
+
+/** What one group of calls cost (`callCosts`). */
+export interface CallCosts {
+  group: string;
+  /** Every attempt, failed ones included. */
+  calls: number;
+  /** Their cost, corrections (`--reconcile`) included. */
+  cost: number;
+  /** The mean over every call: what a call cost on average, as run. */
+  mean: number;
+  /** Attempts that failed; counted in `calls` and `mean`, not below. */
+  failed: number;
+  /**
+   * Replies that read nothing from the cache: the price of a call with a
+   * cold cache, a first call's or one whose cache read missed.
+   */
+  cold: CallMean;
+  /** Replies that read the shared prompt from the cache. */
+  warm: CallMean & {
+    /** The share of the warm replies' input that was read cached. */
+    cachedShare: number;
+  };
+  /** Mean input and output tokens a reply. */
+  input: number;
+  output: number;
+  /** The runs its calls came from, in the order first seen. */
+  runs: string[];
+}
+
+/**
+ * Calls by group (`groupOf` the entry), each attempt once at its own cost
+ * with any correction of it added, split by whether the reply read the
+ * cache: for plan 081's question of what a reading costs on each model, cold
+ * and warm. A failed attempt counts in the mean over all calls but in
+ * neither cold nor warm, since its tokens (none, or a cut-off reply's) say
+ * nothing about the cache. A hold left unsettled (a crash) is no call.
+ */
+export function callCosts(
+  entries: readonly LedgerEntry[],
+  runs: readonly string[],
+  groupOf: (entry: LedgerEntry) => string,
+): CallCosts[] {
+  const wanted = new Set(runs);
+  const corrections = new Map<string, number>();
+  for (const one of entries)
+    if (one.reconciles)
+      corrections.set(
+        one.reconciles,
+        (corrections.get(one.reconciles) ?? 0) + one.cost,
+      );
+  const out = new Map<string, LedgerEntry[]>();
+  for (const one of entries)
+    if (wanted.has(one.run) && isCall(one)) {
+      const group = groupOf(one);
+      out.set(group, [...(out.get(group) ?? []), one]);
+    }
+  // A call's own cost: a settling line's `actual` (its line books only the
+  // difference from the hold), plus what `--reconcile` corrected.
+  const cost = (one: LedgerEntry) =>
+    (one.actual ?? one.cost) + (corrections.get(one.id) ?? 0);
+  const sum = (list: LedgerEntry[], of: (one: LedgerEntry) => number) =>
+    list.reduce((total, one) => total + of(one), 0);
+  const mean = (list: LedgerEntry[]): CallMean =>
+    list.length
+      ? { calls: list.length, mean: sum(list, cost) / list.length }
+      : { calls: 0 };
+  return [...out].map(([group, calls]) => {
+    const replies = calls.filter((one) => !one.failed);
+    const warm = replies.filter((one) => one.tokens.cached > 0);
+    const cold = replies.filter((one) => one.tokens.cached === 0);
+    const warmInput = sum(warm, (one) => one.tokens.input);
+    const total = sum(calls, cost);
+    return {
+      group,
+      calls: calls.length,
+      cost: total,
+      mean: total / calls.length,
+      failed: calls.length - replies.length,
+      cold: mean(cold),
+      warm: {
+        ...mean(warm),
+        cachedShare: warmInput
+          ? sum(warm, (one) => one.tokens.cached) / warmInput
+          : 0,
+      },
+      input: replies.length
+        ? sum(replies, (one) => one.tokens.input) / replies.length
+        : 0,
+      output: replies.length
+        ? sum(replies, (one) => one.tokens.output) / replies.length
+        : 0,
+      runs: [...new Set(calls.map((one) => one.run))],
+    };
+  });
+}
 
 /** Totals by model and by run, for `spent`. */
 export function ledgerTotals(entries: readonly LedgerEntry[]) {

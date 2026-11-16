@@ -28,6 +28,7 @@ import {
   verdictKey,
 } from "./judge.ts";
 import {
+  EXPERIMENT_CAP_USD,
   estimateCost,
   Ledger,
   NO_TOKENS,
@@ -265,6 +266,8 @@ function runtime(out: string, gateway: Gateway, concurrency = 1): Runtime {
     out,
     gateway,
     prices,
+    // Plan 077\'s cap, as its runs had it.
+    cap: EXPERIMENT_CAP_USD,
     ledger: new Ledger(ledgerPath(out)),
     log: () => {},
     concurrency,

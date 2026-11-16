@@ -56,7 +56,12 @@ import {
   unreconciled,
   worstCost,
 } from "./ledger.ts";
-import { type Effort, type RequestKind, shortName } from "./models.ts";
+import {
+  type Effort,
+  expectsReasoning,
+  type RequestKind,
+  shortName,
+} from "./models.ts";
 import {
   type NewSpec,
   newRequest,
@@ -233,6 +238,12 @@ export interface RawResult {
   exact: boolean;
   /** Booked at its worst case: the call failed and its cost isn't known. */
   unknown?: boolean;
+  /**
+   * A sync reply that reported no reasoning tokens from a model expected to
+   * reason (`expectsReasoning`): kept as a reply, but flagged, since the
+   * effort setting may not have reached the model.
+   */
+  noReasoning?: boolean;
   attempt: number;
   at: string;
 }
@@ -263,6 +274,81 @@ export interface BatchRecord {
   error?: string;
 }
 
+/**
+ * Earlier runs of a kind that already hold some of these requests: the same
+ * id and the same prompt (model, effort, instructions and input), so a new
+ * run would pay for them again. Each with the ids it holds. A run is
+ * finished with `--resume` or `--retry-failed`, never started afresh.
+ */
+export function earlierRuns(
+  out: string,
+  kind: RunKind,
+  requests: readonly ModelRequest[],
+): { run: string; ids: string[] }[] {
+  const runs = runsDir(out);
+  if (!existsSync(runs)) return [];
+  const wanted = new Map(requests.map((one) => [one.id, promptHash(one)]));
+  const found: { run: string; ids: string[] }[] = [];
+  for (const name of readdirSync(runs).sort()) {
+    const manifest = readJson<Manifest>(join(runs, name, "manifest.json"));
+    if (manifest?.kind !== kind) continue;
+    const ids = manifest.requests
+      .filter((one) => wanted.get(one.id) === one.promptHash)
+      .map((one) => one.id);
+    if (ids.length) found.push({ run: name, ids });
+  }
+  return found;
+}
+
+/**
+ * What a new run on the new text or task 3 may send, given the runs before
+ * it (`earlierRuns`): plan 077 finishes a run rather than starting it again.
+ * - By default a request an earlier run already holds refuses the run.
+ * - `skipHeld` sends only the requests no earlier run holds, as a new run:
+ *   for finishing a partial run (one cut short by `--max-requests`, say),
+ *   whose parts never planned can't be `--resume`d. Refused if none is
+ *   left.
+ * - `again` sends them all: a deliberate repeat, whose reason plan 077 asks
+ *   to be recorded before its results are seen.
+ */
+export function repeatCheck(
+  out: string,
+  kind: RunKind,
+  requests: readonly ModelRequest[],
+  options: { again?: boolean; skipHeld?: boolean } = {},
+): {
+  requests: ModelRequest[];
+  held: { run: string; ids: string[] }[];
+  refusal?: string;
+} {
+  if (options.again && options.skipHeld)
+    throw new Error("--again and --skip-held can't be used together");
+  if (options.again) return { requests: [...requests], held: [] };
+  const held = earlierRuns(out, kind, requests);
+  if (options.skipHeld) {
+    const taken = new Set(held.flatMap((one) => one.ids));
+    const left = requests.filter((one) => !taken.has(one.id));
+    return {
+      requests: left,
+      held,
+      ...(left.length
+        ? {}
+        : {
+            refusal: `earlier runs hold all ${requests.length} of these requests (${held.map((one) => one.run).join(", ")}): nothing left to run`,
+          }),
+    };
+  }
+  return {
+    requests: [...requests],
+    held,
+    ...(held.length
+      ? {
+          refusal: `${held.map((one) => `${one.run} already has ${one.ids.length} of these ${requests.length} requests`).join("; ")}: finish it with run --resume RUN (parts never sent) or --retry-failed RUN (failed parts), pass --skip-held to send only the requests no run holds, or --again for a deliberate repeat (plan 077: record why before its results are seen)`,
+        }
+      : {}),
+  };
+}
+
 export function manifestRequest(
   request: ModelRequest,
   extra: Pick<
@@ -286,6 +372,28 @@ const rawPath = (dir: string, id: string) =>
 
 export function readRaw(dir: string, id: string): RawResult | undefined {
   return readJson<RawResult>(rawPath(dir, id));
+}
+
+/**
+ * A run's sync replies with no reasoning tokens from a model expected to
+ * reason, judged from the tokens saved, so replies saved before the
+ * `noReasoning` flag existed are found too.
+ */
+export function noReasoningReplies(
+  dir: string,
+  manifest: Pick<Manifest, "requests">,
+): string[] {
+  return manifest.requests
+    .map((one) => readRaw(dir, one.id))
+    .filter(
+      (raw): raw is RawResult =>
+        raw !== undefined &&
+        raw.ok &&
+        raw.transport === "sync" &&
+        raw.tokens.reasoning === 0 &&
+        expectsReasoning(raw.model),
+    )
+    .map((raw) => raw.id);
 }
 
 /**
@@ -360,6 +468,13 @@ export interface Runtime {
   calibration?: Calibration;
   /** A sync call's time limit; `CALL_TIMEOUT_MS` by default. */
   callTimeoutMs?: number;
+  /**
+   * The cap on the ledger's total. Required, with no default, so a new way
+   * of building a runtime can't fall back to plan 077's $100: the CLI sets
+   * it from the ledger (`ledgerCap`), so plan 081's stage 2 is held to its
+   * own share.
+   */
+  cap: number;
 }
 
 /** How long a sync call may take before it is aborted (and failed). */
@@ -496,6 +611,10 @@ export function runRefusal(
   transport: TransportName,
   budget: number,
 ): string | undefined {
+  // Fail closed: a runtime built without its cap never falls back to plan
+  // 077's.
+  if (!(runtime.cap > 0))
+    return `no cap set on this runtime (${runtime.cap}); it must come from the ledger (ledgerCap)`;
   const spent = spentSoFar(runtime);
   const calibration = calibrationOf(runtime);
   if (transport === "batch")
@@ -503,12 +622,14 @@ export function runRefusal(
       spent,
       projection: worstCase(requests, runtime.prices, "batch", calibration),
       budget,
+      cap: runtime.cap,
       what: "worst case",
     });
   const expected = refusal({
     spent,
     projection: projection(requests, runtime.prices, "sync", calibration),
     budget,
+    cap: runtime.cap,
     what: "expected",
   });
   if (expected) return expected;
@@ -520,6 +641,7 @@ export function runRefusal(
     spent,
     projection: dearest,
     budget,
+    cap: runtime.cap,
     what: "one call's worst case",
   });
 }
@@ -633,6 +755,9 @@ interface Hold {
  *   came in started with one);
  * - it came in a batch and reports no reasoning tokens, though every request
  *   here asks for reasoning.
+ * A sync reply with no reasoning tokens, from a model expected to reason,
+ * is kept (a model may choose not to think on an easy call) but flagged
+ * `noReasoning` in its saved reply, with a warning in the log.
  */
 async function record(
   runtime: Runtime,
@@ -656,6 +781,15 @@ async function record(
     problems.push(`finish reason "${given.finishReason ?? "none"}"`);
   if (given.ok && transport === "batch" && given.tokens.reasoning === 0)
     problems.push(`no reasoning tokens at effort ${request.effort}`);
+  const noReasoning =
+    given.ok &&
+    transport === "sync" &&
+    given.tokens.reasoning === 0 &&
+    expectsReasoning(request.model);
+  if (noReasoning)
+    runtime.log(
+      `WARNING: ${request.id}: ${request.model} reported no reasoning tokens at effort ${request.effort}; the setting may not have reached it (flagged noReasoning in its reply)`,
+    );
   if (given.ok && problems.length) {
     result.ok = false;
     result.error = problems.join("; ");
@@ -691,6 +825,7 @@ async function record(
     at,
   };
   if (unknown) raw.unknown = true;
+  if (noReasoning) raw.noReasoning = true;
   if (result.finishReason) raw.finishReason = result.finishReason;
   if (result.responseModel) raw.responseModel = result.responseModel;
   if (result.error) raw.error = result.error;
@@ -805,7 +940,16 @@ export async function execute(
       reserve: (request) => {
         const next = worst.get(request.id) ?? 0;
         if (stopped) return false;
-        if (!mayLaunch({ spentBefore, spentThisRun, inFlight, next, budget }))
+        if (
+          !mayLaunch({
+            spentBefore,
+            spentThisRun,
+            inFlight,
+            next,
+            budget,
+            cap: runtime.cap,
+          })
+        )
           return false;
         inFlight += next;
         const hold = { id: randomUUID(), cost: next };
