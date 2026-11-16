@@ -189,8 +189,34 @@ describe("GdHall given hall in JavaScript", () => {
     ]);
   });
 
+  it("does not count a root attribute that is undefined", () => {
+    const warn = quiet();
+    // A wrapper passing its own optional props on: wall={props.wall}.
+    const props = {
+      hall: neophyte.hall,
+      wall: undefined,
+      compass: undefined,
+    } as unknown as GdHallProps;
+    renderToStaticMarkup(<GdHall {...props} />);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it("reads a hall of null alone as none, warning of an empty hall", async () => {
+    // A fresh module: the empty-hall warning was given above, once.
+    vi.resetModules();
+    const { GdHall: Fresh } = await import("./GdHall.tsx");
+    const warn = quiet();
+    const props = { hall: null } as unknown as GdHallProps;
+    expect(renderToStaticMarkup(<Fresh {...props} />)).toBe(
+      renderToStaticMarkup(<GdHall hall={{ type: "gdHall" }} />),
+    );
+    expect(warn.mock.calls.flat()).toEqual([
+      expect.stringMatching(/^GdHall drew an empty hall/),
+    ]);
+  });
+
   it("reads a hall of null as none, drawing its tags", () => {
-    quiet();
+    const warn = quiet();
     const tags = renderToStaticMarkup(
       <GdHall wall="plain">
         <Hall.Floor>{pillars()}</Hall.Floor>
@@ -202,6 +228,7 @@ describe("GdHall given hall in JavaScript", () => {
       children: <Hall.Floor>{pillars()}</Hall.Floor>,
     } as unknown as GdHallTagsProps;
     expect(renderToStaticMarkup(<GdHall {...props} />)).toBe(tags);
+    expect(warn).not.toHaveBeenCalled();
   });
 });
 
