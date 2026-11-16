@@ -637,7 +637,9 @@ references with Next's vendored `react-server-dom-webpack` and
 named, default and module proxies) against the built `lib/`: as root,
 each gave the new message, and nothing threw. The decision said
 "magick-components@0.3.1 is new (latest is 0.3.0); publish under
-latest"; the smoke test packed 179 files, the same list as 0.3.0;
+latest"; the smoke test packed 179 files, the same list as a 0.3.0
+tarball built locally (npm's own was not fetched; its `fileCount` is
+179);
 `GdHall.d.ts` was unchanged. Taken before the release, in the commit
 after the bump: the README and this plan said TypeScript reaches none
 of the three cases, when typed code reaches two; the `null` hall's
@@ -648,6 +650,17 @@ the attribute check behind the warning now runs only in development.
 `hall`'s JSDoc keeps "anything else draws an
 empty hall" (it feeds the explorer's manifest and the site-search
 vectors); README "Versions" says what `null` does.
+
+0.3.1's first gate on `52fd90d8` failed coverage twice at a load
+average above 40: 5–10 s timeouts across unrelated tests, then
+`src/chat-research/ResearchHostedChat.test.tsx` (from `main`'s research
+commits), which passed three runs of three alone; run again on the same
+commit, the gate passed on its coverage rerun. Gadi fast-forwarded
+`main` to `52fd90d8` and pushed; run `43856915166` passed and published
+`magick-components@0.3.1` under `latest`. npm's integrity,
+`sha512-gaeNjZ3RAD2PwTspbZyeylovPb7ug5ji6tPlv9uJ6KYybBxPufkAQhCvprklwxQmokzX4PCyVoDmXhOzgNuKKw==`,
+is the one the run's `build` job logged; 179 files, with an SLSA
+provenance attestation.
 
 ## Verification
 
@@ -716,7 +729,8 @@ On `gate/jsx-halls`, each gated on its own tree (every step exit 0).
 | `c3ddd19c` | 0.3.1: a `null` hall, a client reference, `hall` with root attributes, a comment |
 | `c2ada306` | 0.3.1 review: the warnings' edge cases pinned |
 | `572e5119` | magick-components 0.3.1; its record |
-| this commit | 0.3.1 final review: README wording, three tests, the check in development only |
+| `52fd90d8` | 0.3.1 final review: README wording, three tests, the check in development only; **0.3.1**, published |
+| this commit | 0.3.1 on npm |
 
 `694ac018` passed its gate on the coverage rerun (the known
 `sqlLegacyImport` timeout); `c7aebb20`'s first gate timed out in
