@@ -1,10 +1,10 @@
 # Composable JSX halls — 15 November 2026
 
-Status: stage 1, the strict types, is magick-components 0.2.0, on npm
-since 15 November 2026 ([below](#stage-1-built-15-november-2026)); stage
-2, the JSX tags, built on `gate/jsx-halls`, reviewed and bumped to 0.3.0
-([below](#stage-2-built-15-november-2026)), for CI to publish when `main`
-is pushed. Gadi settled the assessment's twelve decisions
+Status: done. Stage 1, the strict types, is magick-components 0.2.0,
+on npm since 15 November 2026 ([below](#020-on-npm-15-november-2026));
+stage 2, the JSX tags, is 0.3.0, on npm since 16 November
+([below](#030-on-npm-16-november-2026)); the follow-ups are
+[below](#follow-ups). Gadi settled the assessment's twelve decisions
 on 14 November 2026, and on 15 November the seven changes (R1–R7) that
 a Fable 5.2 review and the spikes led to
 ([Changes after the review](#changes-after-the-review)). Read
@@ -581,6 +581,21 @@ warning, and a comment in `walk.ts` still speaks of a dropped child's
 own path. The halls' Provenance row now names `gd/hall/tags` under its
 14 November sign-off; whether to sign it again is Gadi's.
 
+### 0.3.0 on npm (16 November 2026)
+
+`main` had gained `cfde699f` (the Enochian lookup fix), which
+republished the site-search vectors as `c7aebb20` had, so `main` was
+merged into the branch at `f28a0ae3` and the vectors rebuilt from the
+merged text; the merge's gate passed (its first coverage run timed out
+under load, the rerun passed), and the package's code is the tree the
+final review read. Gadi fast-forwarded `main` to `f28a0ae3` and pushed;
+"Publish packages" run `43840075710` passed every job and published
+`magick-components@0.3.0` under `latest` through the trusted publisher.
+npm's integrity,
+`sha512-Pf9bkbcX8iWKHfdkjz5Mj1vjLSk3F6QRgLF6ebDMIHF+v4f17W8TZSsfI0e460APavFIm71oFpY4J23lQoG79Q==`,
+is the one the run's `build` job logged; 179 files, with an SLSA
+provenance attestation.
+
 ## Verification
 
 Every commit: the CI-equivalent gate on its exact tree (install, Loom
@@ -607,6 +622,10 @@ exact tree. After each publish, npm's `dist.integrity` against the
   `walk.ts`' comment on dropped children's paths.
 - Gadi: confirm, or sign again, the README's Provenance row for the
   halls, which names `gd/hall/tags` under the 14 November date.
+- `src/files/r2RitualStorage.test.ts:651` ("retains an unknown late
+  write …") failed once in `13c4dfa8`'s gate with the store's own
+  `TIMEOUT` after 111 ms, and passed on the rerun: a timing-dependent
+  test, unrelated to this plan.
 - `describe.ts:137-140` names `gong`, `brazier` and `candle` as node
   types, a dead branch since they are item kinds; delete it when the file
   is next touched.
@@ -642,7 +661,9 @@ On `gate/jsx-halls`, each gated on its own tree (every step exit 0).
 | `2c69df6f` | Review: the smoke test's tags hall must draw |
 | `c7aebb20` | Review: `GdHall`'s JSDoc names tags; search vectors |
 | `26b64870` | magick-components 0.3.0; this plan's stage 2 record |
-| this commit | README: `ComponentProps<typeof GdHall>`; the final review's record |
+| `13c4dfa8` | README: `ComponentProps<typeof GdHall>`; the final review's record |
+| `f28a0ae3` | `main` merged (`cfde699f`); search vectors rebuilt; **0.3.0**, published |
+| this commit | 0.3.0 on npm |
 
 `694ac018` passed its gate on the coverage rerun (the known
 `sqlLegacyImport` timeout); `c7aebb20`'s first gate timed out in
