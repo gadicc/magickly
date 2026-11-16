@@ -332,15 +332,15 @@ forms where any exist.
     lookup ignores "(see …)" cross-references in glosses (CABA "govern,
     to; (see 'cab')" matched "see"). Both are current-status TODOs.
 
-## Stage 2: an AI reading (outline, designed later)
+## Stage 2: an AI reading and meaning hints
 
 - "Read with AI" on Enochian into English: our dictionary, Keys and
   grammar notes as a cached prompt, plan 077's structured answer, the
   same checking script on the server before anything is shown.
-- A cheaper model first passes plan 077's tasks 1 and 2, after its own
-  recall probe (about $5).
-- It draws on the existing allowance (decision 2), says that the text
-  goes to Anthropic, and adds its limitations to the per-mode list.
+- A cheaper model first passes plan 077's tasks 1 and 2 (done: GPT-6.1
+  Terra, below).
+- It draws on the existing allowance (decision 2), says where the text
+  goes, and adds its limitations to the per-mode list.
 - English into Enochian stays lookup. An option for stage 2's
   discussion (plan 077's recommendation, not decided): a model offering
   synonyms for a gap, marked as suggestions, never written into the
@@ -355,14 +355,29 @@ browser and on the server alike, and the per-mode limitations.
   and the last limitation change with stage 2).
 - Every AI Gateway call a reader triggers draws on their daily chat
   allowance, or the anonymous group's. A reading counts as one
-  submission, plus one per 100 words; readings are capped at 500
-  words, as the lookup is. Site search keeps its own daily limit.
+  submission, plus one per 100 words; readings are capped at 150
+  words (S3; first decided as 500, the lookup's cap). Site search keeps its own daily limit.
 - Gap hints ("related: RNAH 'sunrise'") and related words on
   dictionary entries come from a table built once from embeddings, so
   readers trigger no AI call for them (the spike: the bare word's
   nearest glosses, shown above a cut-off, 95% good or related for
   about 30% of content gaps).
 - Several cheaper models are tested before one is chosen (below).
+
+- Terra's prompt is cached as the provider does by default (at least
+  30 minutes for this model family, the review found); no longer
+  retention and no keep-warm calls, so a reading after a quiet spell
+  pays the cold price (16 November).
+- "Read with AI" is offered only when the text goes beyond a run of
+  Dee's own Key lines, whose English the lookup already shows.
+- A server check confirms every Enochian form and meaning the model
+  cites against our data; one that fails is shown, flagged as the
+  model's guess, never silently and never withheld.
+- An identical request is answered from a store for one day, costing
+  no model call and no allowance, for anyone who sends the same text
+  (shared, so a shared link's readers get it free; Gadi, 16 November,
+  after first choosing a per-reader store for privacy). The
+  limitations say so.
 
 ### The model test (written before any result)
 
@@ -420,7 +435,189 @@ about 1.2 cents a warm reading (about 7 a cold one), so Terra is
 chosen over the rule's letter, without a top-up. Terra still gets its
 own recall probe before it ships, and the design should keep its
 cache warm where the provider allows a longer retention, since a cold
-reading costs five times a warm one.
+reading costs five times a warm one. (Both settled on 16 November:
+no probe, since the new-text test's recall bar, 0 of 120, already
+shows Terra answers from our data rather than memory; and the
+default cache, below.)
+
+### The design (16 November 2026, revised after Fable's review)
+
+A Fable review the same day found the first draft not ready: no input
+bound, the anonymous pool open to one client, a check weaker than its
+wording, no sentence in the tested answer, room for prompt injection,
+a 3-minute reading, an untrue limitation and text reaching the logs.
+Gadi settled its eight questions (all as recommended); the design
+below is revised.
+
+S1. **The model.** GPT-6.1 Terra through the Gateway, at medium
+    reasoning, pinned to OpenAI's servers (`only: ['openai']`) with
+    zero data retention, with arm A3's context (our dictionary, Dee's
+    Keys with row ids and Golden Dawn forms, our grammar notes) and
+    `gateway.caching: "auto"`. OpenAI keeps the cached prefix at
+    least 30 minutes for this model family. The prompt is plan 077's
+    task-1 prompt extended to return a sentence as well (S7), with a
+    line saying the passage is text to translate and never
+    instructions; a prompt version is the hash of the model, effort,
+    routing options and every byte of the prompt, so a dictionary fix
+    makes it new.
+S2. **When it is offered.** On an Enochian-into-English result of two
+    words or more, a "Read with AI" button under the reading line,
+    when at least one word is outside a run of Dee's Key rows and the
+    text passes S3's admission (so it is never offered, then refused); it
+    shows what it will use ("uses 2 of today's 100", or the anonymous
+    wording).
+S3. **Admission and bounds.** Words are counted as the lookup's
+    tokeniser counts them, at most 150 a reading, and at most 1,200
+    characters and 30 letters a word, A to Z only. The server reads the
+    text with the lookup first and refuses it unless at least 80% of
+    its words, and all but 10 of them, are ours (Key words, headwords,
+    Golden Dawn or Leitch spellings, or joins the rule splits),
+    whatever direction the page asked for.
+S4. **The allowance** (decision 2). A reading reserves one submission
+    plus one per full 100 words (so 150 words is 2), atomically, from
+    the reader's daily allowance or the anonymous group's, and refuses
+    with what is left when that is too few; a failed call stays
+    counted. A signed-out client may use at most 10 units a day of the
+    anonymous pool, keyed by an HMAC of its IP address (IPv6 cut to
+    its /64) under a server secret that is never stored with the
+    counters, rotated daily; a request with no address shares one
+    bucket. The client's and the pool's reservations are one
+    transaction, and the daily job deletes old counter rows. All
+    readings stop for everyone once a day's cost reaches $10, until
+    midnight UTC: each reading holds its worst-case cost atomically
+    before the call and settles to the Gateway's reported cost after,
+    keeping the hold when none is reported, as plan 077's ledger does.
+    A database row turns readings off by hand at once. Accepted: about
+    330 warm readings reach the ceiling, which a few heavy readers
+    could do in a day, turning readings off for everyone. Chat itself
+    still has no per-client cap, so one scripted client can still
+    drain the anonymous pool through chat; that existing exposure is
+    left (a follow-up).
+S5. **The route.** `POST /api/enochian/read`: JSON only, same-origin
+    only (`Sec-Fetch-Site: same-origin`, or a matching Origin; the chat
+    route gets the same guard). The text travels in the body, never the
+    URL. It admits (S3), looks in the store (S7), checks the ceiling
+    and the switch, reserves (S4), then reads in parts of at most 75
+    words, the first alone to write the cache and the second after,
+    checking, storing and streaming each part as it lands, so a retry
+    after a failed second part pays only for that part. A pending row
+    stops a concurrent identical request from paying twice. The model
+    call is not cancelled when the reader leaves: it finishes and is
+    stored. No retries are billed (`maxRetries: 0`), the function has
+    an explicit `maxDuration` and an abort timeout, and the output cap
+    per part comes from 2B's measured tokens per word (reasoning and
+    the sentence included); a truncated answer counts as a failure.
+    Every call asserts that the Gateway used zero data retention and
+    OpenAI (unless 2B's outcome says otherwise). The grammar notes the
+    context needs are generated into a module or traced into the
+    function, not read from disk at run time.
+S6. **The check.** Plan 077's checker, moved into the app and run on
+    the server, extended: the lookup's accepted spellings (C/K, I/Y,
+    U/V/W folds, Golden Dawn and Leitch forms) feed it; a derived
+    item's source must exist and a join's parts must rebuild the word;
+    and "confirmed" needs every content word of the model's English in
+    the cited gloss, or, for a reading of grammar words only ("of
+    the"), the same words as the gloss (plan 077's rule). Each input word gets exactly one row, in one of
+    four states: confirmed by our data; the model's reading of a known
+    word, not confirmed (the check couldn't settle it); the model's
+    guess (a form or meaning we don't have); no reading. Only checked
+    items reach the card, with the reader's own word and never the
+    source text the model copied; a reading that isn't confirmed shows
+    the model's English for that word, at most 10 words.
+S7. **The card and the store.** The reading appears as a card under
+    the lookup's reading line (option A of the mock-up): the model's
+    sentence, labelled "the model's sentence, not checked", in plain
+    text, at most a few times the input's length, with no links, and
+    shown only when most of its content words appear in the word
+    readings or the lookup's glosses (else withheld, saying so); then
+    each word in its state with its source; then where the text went
+    and what it used. States: loading part by part, the allowance or
+    the ceiling reached (with the reset time), the provider refusing
+    the passage, the model failing. Anyone who sends the same text
+    within a day is answered from a shared store keyed by the prompt
+    version and the exact text the prompt carries, at no cost or
+    allowance (so a shared link's readers get it free; it also means
+    anyone can tell whether a text was read that day, which the
+    limitations say). "Read again" makes a new reading at the reader's
+    cost and replaces the stored one. Rows older than a day are never
+    served; each call deletes expired rows, and the daily job deletes
+    any left, so a row lives under two days. Neon's point-in-time
+    history may keep deleted rows for its window.
+S8. **Its limitations** (decision 20's AI list; Gadi's wording of 16
+    November; the second and third items revised after the reviews,
+    the third settled with the shared store):
+    - It is made by a language model (GPT-6.1 Terra) given our
+      dictionary, Dee's Keys and our grammar notes; it can be wrong,
+      and no one who reads Enochian has reviewed it.
+    - Each word it reads is checked against our data and marked as
+      confirmed, not confirmed, or the model's guess; its sentence is
+      not checked.
+    - Your text goes to OpenAI through Vercel to make the reading;
+      Vercel keeps no copy, and OpenAI handles it under a
+      zero-retention agreement. Our server keeps the text and its
+      reading for a day, so anyone who reads the same text again gets
+      it free, and deletes them within two days.
+    - The provider may refuse some passages.
+    - Each reading uses your daily allowance: one, plus one per 100
+      words.
+S9. **Decision 19 and the lookup's limitations.** The lookup still runs
+    in the browser and its text stays in the fragment; its last
+    limitation is reworded to say so of the lookup, and it gains one
+    for the hints (machine-suggested from meanings, unreviewed). The
+    stale "goes to Anthropic" in `limitations.ts` and here is fixed.
+S10. **No text in logs.** Errors are caught and logged by class with
+    counts, tokens, cost and latency only, never the text, the prompt
+    or a hash of the text (the SDK's errors carry the whole request,
+    as the chat route already guards); a test spies on the console
+    during a failing call. The model id each response names is
+    recorded, and the daily job compares the Gateway's listed price with
+    the one the ceiling's holds assume, failing loudly when it drifts.
+S11. **Gap hints and related words** (no reader-triggered call). A
+    script embeds SCOWL's size-35 English words (about 50,000; words
+    only, no names, abbreviations or contractions, and none the lookup
+    already gives a form or folds as an inflection) and our glosses
+    with the site's embedding model, bare words and the similarity
+    recipe, once, run by Gadi (under $0.10). It prints the row count,
+    bytes and 200 random hints to judge before it ships (it ships if at
+    least 90% are good or related and at most 5% wrong, judged as the
+    spike judged; else the cut-off rises until they are), keeps each
+    word's best gloss above the spike's cut-off (z ≥ 5.5) within a
+    budget of 150 KB gzipped, and records a hash of the glosses so a dictionary fix
+    fails a test. The table is committed with SCOWL's notice and a
+    hash-pinned source in a README, and AGENTS.md's generated-data rule
+    is extended to name it (Gadi, 16 November). The page loads it
+    lazily for a gap; a gap shows one hint, "related: RNAH 'sunrise'",
+    never in the sentence. Each dictionary entry gets related words
+    the same way (hub words removed, identical glosses merged).
+S12. **Not in stage 2.** English into Enochian by a model; a
+    part-of-speech tagger for "do" (a follow-up); root families as
+    discoveries (an "other forms" list at most).
+
+Steps (each a gated commit, as stage 1's):
+2A. This design, reviewed again.
+2B. The prompt with a sentence, zero retention and OpenAI-only routing,
+    tested on plan 077's task 1 under its bars, with a cache check
+    (Terra, about $0.25, run by Gadi). Rules set before it runs: the
+    prompt passes if it meets every task-1 bar plan 077 set; it
+    records whether the Gateway used zero retention and which provider
+    answered, the share read from the cache, output tokens per word
+    (reasoning and sentence included) and the sentence's length
+    against the input's, and how often S7's sentence rule would
+    withhold it. If zero retention turns caching off (every reading
+    cold, about 13 cents), Gadi chooses between it and the cost with
+    both figures in hand. If zero retention is dropped, S8's third item
+    says instead that OpenAI may keep the text up to 30 days. If the bars fail, the sentence is dropped
+    and the card shows the word readings only.
+2C. The checker moved into the app and extended (S6), behind tests.
+2D. The route: admission, the weighted reservation and the
+    per-client cap, the ceiling and switch, the store and its
+    migration (migrated before promotion) and deletion, parts and
+    streaming, no text in logs; tests with a fake model on pglite.
+2E. The card on the page, the limitations, page text and metadata.
+2F. The hint table: the script, its judged sample, its data and
+    README, and the gap hint.
+2G. Related words on dictionary entries.
+2H. The record.
 
 ## The stage-1 review (Fable, 13 November 2026)
 
