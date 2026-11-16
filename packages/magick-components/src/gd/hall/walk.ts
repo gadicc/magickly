@@ -221,7 +221,8 @@ const isIterable = (value: object): value is Iterable<unknown> =>
  * arrays and other iterables are flattened into the parent; `null`,
  * `undefined` and booleans (what `cond && <Tag />` leaves) are skipped;
  * the nodes take their indices among the nodes kept. Anything else is
- * reported, with its own path, and dropped.
+ * dropped and reported at its parent's path, with `child` its place
+ * among the parent's children as written.
  */
 function walkChildren(
   children: unknown,
@@ -311,34 +312,40 @@ export function hallFromRootProps(
  * The hall a `<GdHall>` element draws, as data: its root attributes and
  * its tags walked into nodes, with what the walk dropped. Props that only
  * draw (`width`, `className`, `art` …) are ignored, and a `GdHall` given
- * `hall` returns that hall. It renders nothing, so a Server Component can
- * build a hall with tags and hand the data to a client component, which
- * would receive tags as `null`.
+ * `hall` returns that hall (a `hall` of `null` counts as none). It renders
+ * nothing, so a Server Component can build a hall with tags and hand the
+ * data to a client component, which would receive tags as `null`.
  *
  * Anything but a `<GdHall>` element gives an empty hall and an error.
  */
 export function hallFromTags(element: ReactElement): HallFromTags {
   if (isValidElement(element) && hallTagOf(element.type) === "gdHall") {
     const props = element.props as Readonly<Record<string, unknown>>;
-    return props.hall !== undefined
+    return props.hall !== undefined && props.hall !== null
       ? { hall: props.hall as HallNode, diagnostics: [] }
       : hallFromRootProps(props);
   }
+  const refused = (message: string): HallFromTags => ({
+    hall: { type: "gdHall" },
+    diagnostics: [{ path: [], severity: "error", message }],
+  });
+  if (
+    isValidElement(element) &&
+    (typeof element.type === "function" ||
+      (typeof element.type === "object" && element.type !== null)) &&
+    isClientReference(element.type)
+  )
+    return refused(
+      `hallFromTags was given a client component: a GdHall imported through a "use client" module is one, and a Server Component cannot read it. Import GdHall from "magick-components/gd/hall" where you call hallFromTags`,
+    );
   const what = isValidElement(element)
     ? hallTagOf(element.type) !== undefined
       ? `a ${hallTagOf(element.type)} tag`
       : "another element"
     : "something that is not an element";
-  return {
-    hall: { type: "gdHall" },
-    diagnostics: [
-      {
-        path: [],
-        severity: "error",
-        message: `hallFromTags takes a <GdHall> element and was given ${what}; wrap the tags in <GdHall>`,
-      },
-    ],
-  };
+  return refused(
+    `hallFromTags takes a <GdHall> element and was given ${what}; wrap the tags in <GdHall>`,
+  );
 }
 
 /** Messages already warned of in this process. */

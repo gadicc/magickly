@@ -351,6 +351,51 @@ describe("hallFromTags", () => {
     });
   });
 
+  it("reads a hall of null as none, as GdHall does", () => {
+    const nothing = null as unknown as HallNode;
+    expect(
+      hallFromTags(
+        <Root hall={nothing} wall="plain">
+          <Floor />
+        </Root>,
+      ),
+    ).toEqual({
+      hall: { type: "gdHall", wall: "plain", children: [{ type: "floor" }] },
+      diagnostics: [],
+    });
+  });
+
+  it("names a client component given as the root", () => {
+    // A GdHall imported through a "use client" module, as a Server
+    // Component sees it: a proxy that throws on anything React does not
+    // read (react-server-dom-webpack's deepProxyHandlers).
+    const client = new Proxy(() => null, {
+      get(_target, name) {
+        if (name === "$$typeof") return Symbol.for("react.client.reference");
+        if (name === "name") return "";
+        if (name === "displayName" || name === "defaultProps") return undefined;
+        throw new Error(`Cannot access ${String(name)} on the server`);
+      },
+    });
+    const ClientHall = client as unknown as (props: {
+      children?: unknown;
+    }) => null;
+    const { hall, diagnostics } = hallFromTags(
+      <ClientHall>
+        <Floor />
+      </ClientHall>,
+    );
+    expect(hall).toEqual({ type: "gdHall" });
+    expect(diagnostics).toEqual([
+      {
+        path: [],
+        severity: "error",
+        message:
+          'hallFromTags was given a client component: a GdHall imported through a "use client" module is one, and a Server Component cannot read it. Import GdHall from "magick-components/gd/hall" where you call hallFromTags',
+      },
+    ]);
+  });
+
   it("refuses anything but a GdHall element", () => {
     const wrong = [
       [<Floor key="f" />, "a floor tag"],

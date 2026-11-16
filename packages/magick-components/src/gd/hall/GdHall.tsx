@@ -23,7 +23,12 @@ import {
 import type { GdHallAttributes } from "./nodes.ts";
 import type { HallChildren } from "./tags.ts";
 import type { HallArt, HallArtRegistry, HallNode } from "./types.ts";
-import { hallFromRootProps, markHallRoot, warnInDevelopment } from "./walk.ts";
+import {
+  hallFromRootProps,
+  markHallRoot,
+  ROOT_ATTRIBUTES,
+  warnInDevelopment,
+} from "./walk.ts";
 
 /** SVG user units per checker square: text stays at a large font size. */
 const UNIT = 100;
@@ -497,7 +502,7 @@ export const GdHall = /*#__PURE__*/ markHallRoot(function GdHall(
   // walks, and the layout below is resolved, on every render.
   const walked = useMemo(
     () =>
-      hall === undefined
+      hall === undefined || hall === null
         ? hallFromRootProps({
             children,
             dais,
@@ -527,10 +532,19 @@ export const GdHall = /*#__PURE__*/ markHallRoot(function GdHall(
       marginWest,
     ],
   );
-  if (!walked && children !== undefined)
-    warnInDevelopment(
-      "GdHall was given both `hall` and children: it draws `hall` and ignores the children",
+  if (!walked) {
+    if (children !== undefined)
+      warnInDevelopment(
+        "GdHall was given both `hall` and children: it draws `hall` and ignores the children",
+      );
+    const ignored = ROOT_ATTRIBUTES.filter(
+      (name) => (props as Partial<GdHallTagsProps>)[name] !== undefined,
     );
+    if (ignored.length > 0)
+      warnInDevelopment(
+        `GdHall was given \`hall\` with ${ignored.map((name) => `\`${name}\``).join(", ")}: it draws \`hall\` as it is and ignores them; set them on the hall node instead`,
+      );
+  }
   if (walked) {
     for (const diagnostic of walked.diagnostics)
       warnInDevelopment(`GdHall: ${diagnostic.message}`);

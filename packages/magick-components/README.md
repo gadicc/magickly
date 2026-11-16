@@ -358,9 +358,9 @@ export const Neophyte = () => (
   as `child`, its place among the parent's children as written.
 - **Warnings are for development.** When `process.env.NODE_ENV` is not
   `production`, `GdHall` warns once about each child it dropped, about
-  tags that gave no hall at all and about `hall` given with children,
-  and a tag warns when React renders it, outside a `GdHall` or across a
-  client boundary. Where `process.env.NODE_ENV` cannot be read at all, as
+  tags that gave no hall at all, and about `hall` given with children
+  or with root attributes, which it ignores; a tag warns when React
+  renders it, outside a `GdHall` or across a client boundary. Where `process.env.NODE_ENV` cannot be read at all, as
   on a page loaded without a bundler, they stay silent. From a Server
   Component the warnings appear in the server's terminal, not the
   browser's console, and since each is given once per process, a

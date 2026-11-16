@@ -172,6 +172,39 @@ describe("GdHall drawn from tags", () => {
   });
 });
 
+describe("GdHall given hall in JavaScript", () => {
+  it("warns that root attributes beside `hall` are ignored", () => {
+    const warn = quiet();
+    const data = renderToStaticMarkup(<GdHall hall={neophyte.hall} />);
+    const props = {
+      hall: neophyte.hall,
+      wall: "plain",
+      dais: 2,
+    } as unknown as GdHallProps;
+    expect(renderToStaticMarkup(<GdHall {...props} />)).toBe(data);
+    expect(warn.mock.calls).toEqual([
+      [
+        "GdHall was given `hall` with `dais`, `wall`: it draws `hall` as it is and ignores them; set them on the hall node instead",
+      ],
+    ]);
+  });
+
+  it("reads a hall of null as none, drawing its tags", () => {
+    quiet();
+    const tags = renderToStaticMarkup(
+      <GdHall wall="plain">
+        <Hall.Floor>{pillars()}</Hall.Floor>
+      </GdHall>,
+    );
+    const props = {
+      hall: null,
+      wall: "plain",
+      children: <Hall.Floor>{pillars()}</Hall.Floor>,
+    } as unknown as GdHallTagsProps;
+    expect(renderToStaticMarkup(<GdHall {...props} />)).toBe(tags);
+  });
+});
+
 describe("GdHall's props types (R1)", () => {
   it("keep 0.1.0's wrappers compiling", () => {
     interface Framed extends GdHallProps {
