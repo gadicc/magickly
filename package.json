@@ -64,7 +64,8 @@
     "translate-eval:newbars": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts newbars",
     "translate-eval:budget": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts budget",
     "translator:figures": "pnpm data:build && node --import tsx scripts/enochian-translator-figures.ts",
-    "test:chat-research": "vitest run src/chat-research src/app/chat/research scripts/chat-research tests/chat-research tests/authDatabase.test.ts"
+    "test:chat-research": "vitest run src/chat-research src/app/chat/research scripts/chat-research tests/chat-research tests/authDatabase.test.ts",
+    "test:local": "pnpm data:build && pnpm search:build && loom test run --workers auto --cpu-mode exclude -- vitest run"
   },
   "dependencies": {
     "@ai-sdk/react": "4.0.156",
@@ -78,7 +79,7 @@
     "@emotion/cache": "11.14.0",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
-    "@gadicc/loom": "2.2.1",
+    "@gadicc/loom": "2.3.1",
     "@hookform/resolvers": "^5.9.2",
     "@langchain/core": "^1.3.0",
     "@langchain/textsplitters": "^1.0.2",
