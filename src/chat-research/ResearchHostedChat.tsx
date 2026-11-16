@@ -3,7 +3,13 @@ import { useEffect, useState } from "react";
 import { createResearchBrowserFetch } from "./browserWorker";
 import { SessionResearchChat } from "./ResearchSessionChat";
 /** Server-authenticated operator shell. Existing controllers must prove research NetworkOnly compatibility before any private UI/API work. */
-export function ResearchHostedChat({ expiresAt }: { expiresAt: number }) {
+export function ResearchHostedChat({
+  expiresAt,
+  readOnly = false,
+}: {
+  expiresAt: number;
+  readOnly?: boolean;
+}) {
   const [state, setState] = useState<
     | { kind: "checking" }
     | { kind: "blocked" }
@@ -57,6 +63,7 @@ export function ResearchHostedChat({ expiresAt }: { expiresAt: number }) {
     <SessionResearchChat
       key={state.sequence}
       expiresAt={expiresAt}
+      readOnly={readOnly}
       requestFetch={state.requestFetch}
     />
   );

@@ -9,6 +9,12 @@ import { withinResearchDeadline } from "./boundedWork";
 import type { ResearchConfiguredServiceDocument } from "./configuredService";
 import { cancelBody, failure, jsonContentType } from "./httpIngress";
 import {
+  assertResearchManagedNativeRole,
+  prepareResearchManagedNativeRole,
+  type ResearchManagedNativeRole,
+  researchManagedNativeRoleProjection,
+} from "./managedNativeRole";
+import {
   createResearchManagedOperatorStartup,
   prepareResearchManagedOperatorStartup,
   RESEARCH_MANAGED_STARTUP_BYTE_LIMIT,
@@ -61,6 +67,7 @@ const corpusTargetShape = v.strictObject({
   role: name,
   datasetsOid: oid,
   unitsOid: oid,
+  roleOid: v.optional(oid),
 });
 /** Independently adopted restricted reader target; hashes do not establish credential, endpoint or release custody. */
 export type ResearchManagedCorpusNativeTarget = v.InferInput<
@@ -84,6 +91,7 @@ export interface ResearchManagedSqlServiceOptions {
   readonly origin: string;
   readonly operatorId: string;
   readonly startupSha256: string;
+  readonly authNativeTarget?: ResearchManagedNativeRole;
   readonly database: ResearchManagedOperatorStartupOptions["database"];
   readonly authOptions: ResearchManagedOperatorStartupOptions["authOptions"];
   readonly loadPrivateOptions: (
@@ -95,11 +103,19 @@ export interface ResearchManagedSqlServiceOptions {
 /** Capture native identities in one fresh read-only statement before source/object reads. Does not adopt grants or prove effective ACLs/TLS/custody. */
 async function native(
   database: ResearchSourceDatabase,
-  expected: { database: string; role: string },
+  expected: { database: string; role: string; roleOid?: number },
   tables: readonly { schema: string; name: string; oid: number }[],
   signal: AbortSignal,
   end: number,
 ) {
+  const nativeRole =
+    expected.roleOid === undefined
+      ? undefined
+      : prepareResearchManagedNativeRole({
+          database: expected.database,
+          role: expected.role,
+          roleOid: expected.roleOid,
+        });
   const active = () => {
     signal.throwIfAborted();
     if (performance.now() >= end) fail();
@@ -137,6 +153,7 @@ async function native(
             role: sql<string>`current_user`,
             readOnly: sql<string>`pg_catalog.current_setting('transaction_read_only')`,
             isolation: sql<string>`pg_catalog.current_setting('transaction_isolation')`,
+            ...(nativeRole ? researchManagedNativeRoleProjection() : {}),
             now: sql<number>`pg_catalog.floor(extract(epoch from pg_catalog.statement_timestamp())*1000)::double precision`.mapWith(
               Number,
             ),
@@ -160,6 +177,8 @@ async function native(
   if (!called || rows.length !== tables.length) fail();
   const now = rows[0].now;
   if (!Number.isSafeInteger(now) || now < 0) fail();
+  if (nativeRole)
+    for (const row of rows) assertResearchManagedNativeRole(row, nativeRole);
   for (const table of tables) {
     const found = rows.filter(
       (r) => r.schema === table.schema && r.name === table.name,
@@ -187,6 +206,10 @@ export function createResearchManagedSqlService(
       operatorId = options.operatorId,
       startupSha256 = v.parse(hash, options.startupSha256),
       database = options.database,
+      authNativeTarget =
+        options.authNativeTarget === undefined
+          ? undefined
+          : prepareResearchManagedNativeRole(options.authNativeTarget),
       authOptions = copyResearchSourceAuthOptions(options.authOptions),
       u = new URL(expectedOrigin);
     if (
@@ -206,7 +229,10 @@ export function createResearchManagedSqlService(
       fail();
     let inFlight = false,
       poisoned = false;
-    return async function handleRequest(request: Request): Promise<Response> {
+    return async function handleRequest(
+      request: Request,
+      inheritedIngressDeadlineAt?: number,
+    ): Promise<Response> {
       let end = performance.now() + 8000;
       const pendingRoots = new Set<Promise<unknown>>();
       const tracked = async <T>(task: PromiseLike<T>) => {
@@ -225,6 +251,10 @@ export function createResearchManagedSqlService(
       let owned = request,
         response: Response | undefined;
       try {
+        if (inheritedIngressDeadlineAt !== undefined) {
+          if (!Number.isFinite(inheritedIngressDeadlineAt)) fail();
+          end = Math.min(end, inheritedIngressDeadlineAt);
+        }
         const method = request.method,
           url = request.url,
           headers = new Headers(request.headers),
@@ -346,6 +376,7 @@ export function createResearchManagedSqlService(
                   bounded,
                   operatorId,
                   end,
+                  authNativeTarget,
                 );
               active();
               bounded.throwIfAborted();
@@ -454,7 +485,12 @@ export function createResearchManagedSqlService(
                 (nativeSignal) =>
                   native(
                     authority,
-                    document.native_target,
+                    {
+                      ...document.native_target,
+                      ...(authNativeTarget
+                        ? { roleOid: authNativeTarget.roleOid }
+                        : {}),
+                    },
                     authorityTables,
                     nativeSignal,
                     end,

@@ -114,6 +114,8 @@ const authorityRows = () =>
     oid,
     database: doc.native_target.database,
     role: doc.native_target.role,
+    roleOid: 701,
+    unsafeRole: false,
     readOnly: "on",
     isolation: "read committed",
     now: facts.target.scope.beginsAtMs + 1,
@@ -126,6 +128,8 @@ const corpusRows = () =>
     ...r,
     database: readerTarget.database,
     role: readerTarget.role,
+    roleOid: 702,
+    unsafeRole: false,
     readOnly: "on",
     isolation: "read committed",
     now: facts.target.scope.beginsAtMs + 1,
@@ -766,3 +770,60 @@ it("retained assembly supplies an inert key that cannot resolve even on accident
   ).toBe(200);
   expect(s.key).not.toHaveBeenCalled();
 });
+
+it.each([NaN, Infinity, -1])(
+  "refuses invalid/expired inherited ingress before authentication: %s",
+  async (end) => {
+    const s = setup();
+    expect(
+      (await createResearchManagedSqlService(s.options)(request(), end)).status,
+    ).toBe(503);
+    expect(m.auth).not.toHaveBeenCalled();
+    expect(s.loadPrivateOptions).not.toHaveBeenCalled();
+  },
+);
+it("does not renew an inherited entry budget after slow auth resolves", async () => {
+  const s = setup(),
+    end = performance.now() + 5000;
+  m.auth.mockImplementation(async () => {
+    vi.spyOn(performance, "now").mockReturnValue(end + 1);
+    return principal;
+  });
+  expect(
+    (await createResearchManagedSqlService(s.options)(request(), end)).status,
+  ).toBe(503);
+  expect(s.loadPrivateOptions).not.toHaveBeenCalled();
+});
+
+it.each(["correct", "authority-oid", "reader-oid", "reader-flags"])(
+  "carries independently adopted native role pins through hosted SQL gates: %s",
+  async (mode) => {
+    const s = setup(),
+      badReader = database(() =>
+        corpusRows().map((row) => ({ ...row, unsafeRole: true })),
+      );
+    const options: ResearchManagedSqlServiceOptions = {
+      ...s.options,
+      authNativeTarget: {
+        database: doc.native_target.database,
+        role: doc.native_target.role,
+        roleOid: mode === "authority-oid" ? 999 : 701,
+      },
+      loadPrivateOptions: async () => ({
+        ...s.privateOptions,
+        corpusDatabase:
+          mode === "reader-flags"
+            ? (badReader as never)
+            : s.privateOptions.corpusDatabase,
+        corpusNativeTarget: {
+          ...readerTarget,
+          roleOid: mode === "reader-oid" ? 999 : 702,
+        },
+      }),
+    };
+    const result = await createResearchManagedSqlService(options)(request());
+    expect(result.status).toBe(mode === "correct" ? 200 : 503);
+    if (mode !== "correct") expect(m.bundle).not.toHaveBeenCalled();
+    expect(m.auth.mock.calls[0][6]).toEqual(options.authNativeTarget);
+  },
+);

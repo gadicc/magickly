@@ -28,6 +28,16 @@ const runtime = v.strictObject({
   project_scope_sha256: hash,
   custody_contract: v.literal("independently-reviewed-protected-release"),
 });
+/** Validate independently adopted cleanup release facts without deriving them from a startup document. */
+export function parseResearchManagedRuntime(
+  value: unknown,
+): ResearchManagedRetentionProfileInput["runtime"] {
+  try {
+    return Object.freeze(v.parse(runtime, value));
+  } catch {
+    throw Error(RESEARCH_MANAGED_RETENTION_ERROR);
+  }
+}
 const shape = v.strictObject({
   schema_version: v.literal(2),
   kind: v.literal("private-research-managed-retention"),

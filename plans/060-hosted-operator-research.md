@@ -9,8 +9,8 @@ Deployment, private corpus transfer, production schema changes and new model
 spending require their own concrete adoption. Existing local-only flags remain
 local-only and must not be enabled on Vercel.
 
-This checkpoint supplies inert foundations, not a hosted entry. The existing
-research routes remain disabled in an unconfigured main-site build. No hosted
+This checkpoint supplies an inactive hosted entry. The existing research routes
+remain disabled in an unconfigured main-site build. No hosted
 flag, concrete database target, scheduler or allowance has been installed.
 The selected architecture is now local ingestion into Neon; R2 is deferred.
 
@@ -185,8 +185,8 @@ requires an explicit source/runtime review.
 This is data compilation only. Actual protected-release custody, managed worker
 and scheduler implementation, native target/role adoption, hosted publication,
 ingress and health acceptance remain required. The local binary format and its
-consumers remain unchanged and reject this distinct profile. No existing route
-accepts or activates the managed format.
+consumers remain unchanged and reject this distinct profile. The managed format is accepted only through the later inactive hosted entry; no
+concrete deployment configuration or service activation is installed.
 
 
 ## Managed runtime checkpoint
@@ -215,3 +215,59 @@ Remaining work includes separately adopted restricted roles and credential
 custody, authenticated main-site ingress and SQL-object composition, verified
 hourly scheduling, protected-release acceptance and a fresh finite model scope.
 The source remains inactive and legacy chat remains unchanged.
+
+## Inactive Next entry checkpoint
+
+The existing research page and four POST routes now dispatch to a distinct
+managed deployment only when `MAGICKLI_PRIVATE_RESEARCH_MANAGED=1`. This does not
+enable the existing local flags on Vercel. The cheap descriptor requires a
+production Node24 runtime, London, the exact HTTPS site/auth origin, independently
+adopted operator/role OIDs and domain-separated endpoint/config/startup digests.
+A flag alone is insufficient. No concrete configuration is included in Git.
+
+The page freshly checks the canonical operator and returns only an opaque shell
+key, conservative session expiry and read-only mode through the existing worker
+privacy gate. Page and API share a canonical descriptor projection; UI-only fields
+cannot fork shared startup. Every API independently repeats authorization.
+Runtime/auth resources may be shared, but corpus, session, source and answer
+authority are not cached. Corpus credentials, protected startup and provider keys
+remain behind the fresh operator gate. Native-window mode still needs a separately
+adopted finite window; read-only mode refuses question dispatch without model work.
+
+The dedicated postgres.js roots use certificate/hostname-verified direct Neon TLS,
+restricted role names, independently pinned database/role OIDs, bounded pools and
+server timeouts. Role safety is observed inside the existing deadline-bound native
+queries: no parent membership, elevated flags or object ownership, including
+database ownership. The original ingress deadline covers bootstrap and auth and
+can only shorten the eight-second budget. Provider/settlement lifetimes after
+handoff retain their independent bounds. No hidden transport query renews a gate.
+The URL's `channel_binding=require` is validated as a configuration requirement;
+it does not establish that postgres.js negotiated libpq-style channel binding.
+Actual driver/TLS and hosted lifecycle acceptance remain required.
+
+Protected runtime inputs (all server-only, never `NEXT_PUBLIC_*`):
+
+| Variable | Purpose |
+| --- | --- |
+| `MAGICKLI_PRIVATE_RESEARCH_MANAGED` | Explicit hosted-purpose opt-in |
+| `MAGICKLI_MANAGED_DEPLOYMENT_JSON` | Bounded independently adopted descriptor; no password |
+| `MAGICKLI_MANAGED_RUNTIME_DATABASE_URL` | Dedicated runtime credential; ordinary app DB is discarded |
+| `MAGICKLI_MANAGED_PRIVATE_JSON` | Hash-pinned startup, generation mode, relation OIDs and cleanup facts |
+| `MAGICKLI_MANAGED_CORPUS_DATABASE_URL` | Separate narrow corpus reader; loaded after operator auth |
+| `AI_GATEWAY_API_KEY` | Existing provider credential; accessed only when generation needs it |
+
+These are input contracts, not instructions to install secrets. Measure the exact
+protected configuration against the hosting platform's actual per-variable and
+combined limits before custody adoption. Source parser bounds are not a platform
+capacity guarantee. Vercel currently permits64KB combined per deployment for
+Node runtimes; account for existing site variables as well as this configuration.
+See [environment variable limits](https://vercel.com/docs/environment-variables#environment-variable-size),
+checked16 November2026. No original documents, rendered images or corpus text belong
+in deployment artifacts or these configuration values.
+
+Remaining release gates are actual driver/host custody and full canonical-path
+latency, exact source/publication intent, cleanup client/scheduler acceptance,
+fresh bounded generation approval and staged operator/denied/revocation checks.
+The inactive source can be reviewed independently of those live adoptions. No
+cron, credential transfer, enabled service or legacy-chat replacement is installed
+by this checkpoint.

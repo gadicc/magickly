@@ -132,7 +132,8 @@ export function createResearchServerIngress<D extends ResearchLocalDeployment>(
                   ? expected.host
                   : key === "x-forwarded-proto"
                     ? expected.protocol.slice(0, -1)
-                    : expected.port || "80")
+                    : expected.port ||
+                      (expected.protocol === "https:" ? "443" : "80"))
             );
           },
         ) ||

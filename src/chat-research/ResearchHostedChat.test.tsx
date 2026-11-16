@@ -69,6 +69,7 @@ it("mounts no private child until compatibility passes and gives it only the gua
   expect(state.child.mock.calls.at(-1)?.[0]).toEqual({
     expiresAt: 2000000000000,
     requestFetch,
+    readOnly: false,
   });
 });
 it("blocks an old worker without changing app state, registering, unregistering or mounting private UI", async () => {
@@ -135,4 +136,15 @@ it("remounts the private child after a same-batch successful controller check", 
   expect(screen.getByText("synthetic-private-ui")).toBeTruthy();
   expect(state.mount).toHaveBeenCalledTimes(2);
   expect(state.unmount).toHaveBeenCalledTimes(1);
+});
+
+it("keeps saved-only hosted UI behind the same worker probe and guarded transport", async () => {
+  const requestFetch = vi.fn();
+  state.ready.mockResolvedValue(requestFetch);
+  render(<ResearchHostedChat expiresAt={2000000000000} readOnly />);
+  await screen.findByText("synthetic-private-ui");
+  expect(state.child.mock.calls.at(-1)?.[0]).toMatchObject({
+    readOnly: true,
+    requestFetch,
+  });
 });

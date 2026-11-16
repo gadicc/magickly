@@ -4,6 +4,7 @@ const state = vi.hoisted(() => ({
   connection: vi.fn(async () => {}),
   gate: vi.fn(),
   session: vi.fn(),
+  managedSession: vi.fn(),
   dbReads: 0,
   authReads: 0,
 }));
@@ -15,6 +16,12 @@ vi.mock("next/navigation", () => ({
 }));
 vi.mock("@/chat-research/webDeployment", () => ({
   readResearchWebDeployment: state.gate,
+}));
+vi.mock("@/chat-research/managedBootstrap", () => ({
+  readManagedResearchPageSession: state.managedSession,
+}));
+vi.mock("@/chat-research/ResearchHostedChat", () => ({
+  ResearchHostedChat: () => null,
 }));
 vi.mock("@/chat-research/ResearchOperatorChat", () => ({
   ResearchOperatorChat: () => null,
@@ -39,6 +46,7 @@ vi.mock("@/chat-research/previewSession", () => ({
   readPrivateResearchPreviewSession: state.session,
 }));
 
+import { ResearchHostedChat } from "@/chat-research/ResearchHostedChat";
 import { ResearchOperatorChat } from "@/chat-research/ResearchOperatorChat";
 import { ResearchSavedAnswers } from "@/chat-research/ResearchSavedAnswers";
 import ResearchPage, { metadata, runtime } from "./page";
@@ -47,6 +55,7 @@ afterEach(() => {
   state.connection.mockClear();
   state.gate.mockReset();
   state.session.mockReset();
+  state.managedSession.mockReset();
   state.dbReads = state.authReads = 0;
 });
 it("waits for an incoming request before evaluating the private shell gate", async () => {
@@ -100,5 +109,38 @@ it.each([null, "failure"])(
     const element = await ResearchPage();
     expect(element.type).toBe("p");
     expect(JSON.stringify(element)).not.toContain("Private secret");
+  },
+);
+
+it.each(["read-only", "native-window"])(
+  "renders the hosted privacy guard for managed %s without serializing server pins",
+  async (generation) => {
+    state.gate.mockReturnValue({
+      mode: "managed",
+      generation,
+      operatorId: "synthetic-private-operator",
+    });
+    state.managedSession.mockResolvedValue({
+      identity: "synthetic-key",
+      expiresAt: 2000000000000,
+    });
+    const element = await ResearchPage();
+    expect(element.type).toBe(ResearchHostedChat);
+    expect(element.key).toBe("synthetic-key");
+    expect(element.props).toEqual({
+      expiresAt: 2000000000000,
+      readOnly: generation === "read-only",
+    });
+    expect(state.dbReads + state.authReads).toBe(0);
+  },
+);
+it.each([null, "reject"])(
+  "does not reveal a managed shell to an unavailable/nonoperator session: %s",
+  async (failure) => {
+    state.gate.mockReturnValue({ mode: "managed" });
+    if (failure === null) state.managedSession.mockResolvedValue(null);
+    else state.managedSession.mockRejectedValue(Error("synthetic-private"));
+    await expect(ResearchPage()).rejects.toThrow(/^Synthetic404$/);
+    expect(state.dbReads + state.authReads).toBe(0);
   },
 );

@@ -37,7 +37,14 @@ const settings = {
   googleClientSecret: "synthetic",
 };
 function fixture(
-  mode = { readonly: "on", isolation: "read committed" },
+  mode: {
+    readonly: string;
+    isolation: string;
+    database?: string;
+    role?: string;
+    roleOid?: number;
+    unsafeRole?: boolean;
+  } = { readonly: "on", isolation: "read committed" },
   lease: { now: number; expires: number }[] = [
     { now: Date.now(), expires: 2000000000000 },
   ],
@@ -244,6 +251,7 @@ it("returns the canonical server-only principal without token/profile fields and
     performance.now() + 8000,
   );
   expect(p).toEqual({
+    identity: expect.stringMatching(/^[a-f0-9]{64}$/),
     subject: { kind: "user", user_id: owner, session_id: session },
     expiresAt: 2000000000000,
     deadlineAt: expect.any(Number),
@@ -403,4 +411,95 @@ it("ends a hung native COMMIT wait when the observed short session lease expires
   } finally {
     vi.useRealTimers();
   }
+});
+
+it("bounds managed shell expiry and reset identity by the fresher native session expiry", async () => {
+  const expires = Date.now() + 10000,
+    { db } = fixture(undefined, [{ now: Date.now(), expires }]),
+    owner = "019aa111-0000-7000-8000-000000000001";
+  m.read.mockResolvedValue({
+    user: { id: owner },
+    session: {
+      id: "019aa111-0000-7000-8000-000000000002",
+      token: "synthetic",
+      expiresAt: new Date(2000000000000),
+    },
+  });
+  const value = await readPrivateResearchManagedOperatorPrincipal(
+    db as never,
+    settings,
+    new Headers(),
+    new AbortController().signal,
+    owner,
+    performance.now() + 8000,
+  );
+  expect(value?.expiresAt).toBe(expires);
+  expect(value?.identity).toMatch(/^[a-f0-9]{64}$/);
+});
+it.each([
+  { roleOid: 702 },
+  { unsafeRole: true },
+  { database: "other" },
+  { role: "owner" },
+])(
+  "denies hosted native identity drift before canonical account rows: %j",
+  async (delta) => {
+    const native = {
+        database: "synthetic_db",
+        role: "synthetic_role",
+        roleOid: 701,
+      },
+      { db } = fixture({
+        readonly: "on",
+        isolation: "read committed",
+        ...native,
+        unsafeRole: false,
+        ...delta,
+      });
+    await expect(
+      readPrivateResearchManagedOperatorPrincipal(
+        db as never,
+        settings,
+        new Headers(),
+        new AbortController().signal,
+        "019aa111-0000-7000-8000-000000000001",
+        performance.now() + 8000,
+        native,
+      ),
+    ).rejects.toThrow();
+    expect(m.read).not.toHaveBeenCalled();
+  },
+);
+it("checks a correct hosted native pin within the already bounded readonly auth operation", async () => {
+  const native = {
+      database: "synthetic_db",
+      role: "synthetic_role",
+      roleOid: 701,
+    },
+    { db } = fixture({
+      readonly: "on",
+      isolation: "read committed",
+      ...native,
+      unsafeRole: false,
+    }),
+    owner = "019aa111-0000-7000-8000-000000000001";
+  m.read.mockResolvedValue({
+    user: { id: owner },
+    session: {
+      id: "019aa111-0000-7000-8000-000000000002",
+      token: "synthetic",
+      expiresAt: new Date(2000000000000),
+    },
+  });
+  expect(
+    await readPrivateResearchManagedOperatorPrincipal(
+      db as never,
+      settings,
+      new Headers(),
+      new AbortController().signal,
+      owner,
+      performance.now() + 8000,
+      native,
+    ),
+  ).not.toBeNull();
 });

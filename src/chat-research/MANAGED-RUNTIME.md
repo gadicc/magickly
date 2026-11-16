@@ -135,5 +135,18 @@ PGlite signed-auth, native SQL, current policy, nine-column reader grants, canon
 corpus compilation and configured-handler dispatch. These are synthetic data and
 local database controls. They do not prove a deployed Neon client's TLS/ACL custody,
 actual restricted runtime/cleanup operation, full-corpus cold latency or answer
-quality. Main-site shell/Next registration, protected release/credential adoption,
-scheduling and enabled operator acceptance remain pending.
+quality. Protected release/credential adoption, scheduling and enabled hosted operator
+acceptance remain pending; inactive Next registration is described below.
+
+## Inactive main-site entry
+
+The new `managedDeployment` / `managedServer` / `managedBootstrap` path composes
+the existing Next page and POST routes behind a distinct absent-by-default managed
+flag. It does not adopt actual credentials, source intent, allowance or scheduling.
+See [hosted entry inputs and remaining gates](../../plans/060-hosted-operator-research.md#inactive-next-entry-checkpoint).
+
+`managedDatabase` provides a dedicated lazy postgres.js/Drizzle root. Native role
+OID/flags/membership/ownership projections run inside existing auth and corpus
+fences, rather than inserting hidden asynchronous transport checks. Full local
+synthetic tests and a native projection rehearsal establish source contracts;
+actual Node TLS, hosted custody and complete service acceptance remain separate.

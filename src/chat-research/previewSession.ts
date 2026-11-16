@@ -6,6 +6,12 @@ import { PgTransaction } from "drizzle-orm/pg-core";
 import { createSqlAuth, getFreshSqlSession } from "../auth/sqlAuth";
 import { isUuidV7 } from "../lib/ids";
 import { withinResearchDeadline } from "./boundedWork";
+import {
+  assertResearchManagedNativeRole,
+  prepareResearchManagedNativeRole,
+  type ResearchManagedNativeRole,
+  researchManagedNativeRoleProjection,
+} from "./managedNativeRole";
 import type { ResearchSourceSubject } from "./sourceAuthorization";
 import {
   copyResearchSourceAuthOptions,
@@ -22,12 +28,17 @@ async function readPrivateResearchSession(
   operatorId: string | null,
   inheritedDeadlineAt?: number,
   includeSubject = false,
+  nativeTarget?: ResearchManagedNativeRole,
 ) {
   const started = performance.now(),
     end = Math.min(started + 8000, inheritedDeadlineAt ?? Infinity),
     options = copyResearchSourceAuthOptions(settings),
     ownedHeaders = new Headers(headers);
   try {
+    const native =
+      nativeTarget === undefined
+        ? undefined
+        : prepareResearchManagedNativeRole(nativeTarget);
     if (
       inheritedDeadlineAt !== undefined &&
       (typeof inheritedDeadlineAt !== "number" ||
@@ -67,6 +78,7 @@ async function readPrivateResearchSession(
                   .select({
                     readonly: sql<string>`current_setting('transaction_read_only')`,
                     isolation: sql<string>`current_setting('transaction_isolation')`,
+                    ...(native ? researchManagedNativeRoleProjection() : {}),
                   })
                   .from(sql`(select 1) preview_auth_guard`);
                 assert();
@@ -75,6 +87,7 @@ async function readPrivateResearchSession(
                   mode.isolation !== "read committed"
                 )
                   throw Error();
+                if (native) assertResearchManagedNativeRole(mode, native);
                 const current = await getFreshSqlSession(
                   createSqlAuth({ ...options, db: tx }),
                   ownedHeaders,
@@ -85,6 +98,7 @@ async function readPrivateResearchSession(
                   (operatorId !== null && current.user.id !== operatorId)
                 )
                   return null;
+                let nativeExpiresAt: number | undefined;
                 if (includeSubject) {
                   const nativeStarted = performance.now(),
                     token = current.session.token;
@@ -120,6 +134,7 @@ async function readPrivateResearchSession(
                     rows[0].expires <= rows[0].now
                   )
                     throw Error();
+                  nativeExpiresAt = rows[0].expires;
                   // Query start is conservative: SQL, adapter and COMMIT time consume
                   // the observed remaining native TTL rather than resetting it.
                   nativeSessionEnd = Math.min(
@@ -133,7 +148,10 @@ async function readPrivateResearchSession(
                   );
                   nativeTimer.unref?.();
                 }
-                const expiresAt = current.session.expiresAt.getTime(),
+                const expiresAt = Math.min(
+                    current.session.expiresAt.getTime(),
+                    nativeExpiresAt ?? Infinity,
+                  ),
                   identity = createHash("sha256")
                     .update(
                       JSON.stringify([
@@ -219,7 +237,9 @@ export async function readPrivateResearchManagedOperatorPrincipal(
   signal: AbortSignal,
   independentlyBoundOperatorId: string,
   inheritedDeadlineAt: number,
+  nativeTarget?: ResearchManagedNativeRole,
 ): Promise<Readonly<{
+  identity: string;
   subject: ResearchSourceSubject;
   expiresAt: number;
   deadlineAt: number;
@@ -239,6 +259,7 @@ export async function readPrivateResearchManagedOperatorPrincipal(
       independentlyBoundOperatorId,
       inheritedDeadlineAt,
       true,
+      nativeTarget,
     );
     if (!value) return null;
     const subject = value.subject;
@@ -258,6 +279,7 @@ export async function readPrivateResearchManagedOperatorPrincipal(
     )
       throw Error();
     return Object.freeze({
+      identity: value.identity,
       subject,
       expiresAt: value.expiresAt,
       deadlineAt: value.deadlineAt,
