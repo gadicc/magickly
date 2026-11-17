@@ -682,12 +682,17 @@ exact tree. After each publish, npm's `dist.integrity` against the
 
 ## Follow-ups
 
-- Gadi: confirm, or sign again, the README's Provenance row for the
-  halls, which names `gd/hall/tags` under the 14 November date.
-- `src/files/r2RitualStorage.test.ts:651` ("retains an unknown late
-  write …") failed once in `13c4dfa8`'s gate with the store's own
-  `TIMEOUT` after 111 ms, and passed on the rerun: a timing-dependent
-  test, unrelated to this plan.
+- Done 17 November 2026: the README's Provenance row for the halls,
+  which names `gd/hall/tags`, was signed again at Gadi's word; the
+  packed README carries the new date from the next release.
+- Done 17 November 2026: `src/files/r2RitualStorage.test.ts:651`
+  ("retains an unknown late write …") failed in `13c4dfa8`'s and
+  `572e5119`'s gates with the store's own `TIMEOUT`, and passed on the
+  reruns. The test gave its store a 30 ms deadline so the first write
+  would time out, and the reconciling retry then had to finish inside
+  the same real 30 ms; under a loaded coverage run it did not (14 of 48
+  parallel runs). `9bd9eb33` fakes the timers for that test and advances
+  exactly 30 ms; 96 runs under the same load passed.
 - `describe.ts:137-140` names `gong`, `brazier` and `candle` as node
   types, a dead branch since they are item kinds; delete it when the file
   is next touched.

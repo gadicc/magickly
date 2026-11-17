@@ -156,8 +156,8 @@ Follow-ups are separate from the completed migration work:
   `defineHallTag` and `defineHallItem`, is 0.3.0, published by CI on
   16 November the same way, and 0.3.1, the final review's leftovers
   (a `null` hall, a client reference as root, `hall` with root
-  attributes), published the same way that day; a provenance re-sign
-  is the owner's follow-up
+  attributes), published the same way that day; the halls' Provenance
+  row, which names `gd/hall/tags`, was signed again on 17 November
   ([plan 084](084-composable-jsx-halls.md)).
 - 13 November 2026: Dependabot alerts #362 (zod), #364 (glob) and #366
   (minimatch) fixed by a `@vercel/functions` bump and parent-scoped
