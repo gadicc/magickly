@@ -197,11 +197,11 @@ managed handle through a local-only constructor. Node 22 and Node 24 profiles
 are distinct; the actual process major must match. The current site's Node 24
 setting needs its own hosted acceptance rather than inheriting Node 22 results.
 
-The unregistered cleanup HTTP adapter authenticates before loading private
+The initially unregistered cleanup HTTP adapter authenticates before loading private
 configuration. It preserves the original forty-second work budget plus a
 separate fifteen-second settlement allowance, native exclusivity, packet-pool
-closure and exact final-acknowledgement reconciliation. No schedule, token,
-credential or app route is installed. See
+closure and exact final-acknowledgement reconciliation. No schedule, token or credential is installed. The later independent cleanup
+entry registers a default-disabled route; it does not activate a worker. See
 [managed runtime foundations](../src/chat-research/MANAGED-RUNTIME.md).
 
 Migration 0026 freezes published window scope, conservative holds and irreversible
@@ -271,3 +271,18 @@ fresh bounded generation approval and staged operator/denied/revocation checks.
 The inactive source can be reviewed independently of those live adoptions. No
 cron, credential transfer, enabled service or legacy-chat replacement is installed
 by this checkpoint.
+
+## Independent cleanup route checkpoint
+
+The main-site cleanup route is now registered behind its own disabled-by-default
+flag. Query availability is independent so retention can continue after questions
+stop. No scheduler, token, secret custody, profile adoption or cleanup-role use
+is installed. The entry authenticates its dedicated bearer before importing the
+runner or reading protected profile/credentials, preserving original40s work,
+8s setup and15s independent settlement bounds.
+
+Native cleanup attestation now requires an independently adopted role OID as
+well as the shared role flags/membership/all-ownership projection and persistent
+artifact relation/PID checks. Keep source-only route validation distinct from
+actual managed cleanup/health acceptance. See
+[cleanup input contract and scheduler boundary](../src/chat-research/MANAGED-RUNTIME.md#independent-disabled-cleanup-entry).

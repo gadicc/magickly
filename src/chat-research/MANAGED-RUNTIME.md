@@ -21,7 +21,8 @@ formats, opaque handles and binary-pinned cleanup contract.
   It requires the exact adopted profile and endpoint/database/role identity,
   non-owner restricted role flags, no memberships and the physical artifact OID.
   These checks are not a complete effective-privilege audit or custody attestation.
-- `createResearchManagedCleanupHttpHandler` is an unregistered GET adapter under
+- `createResearchManagedCleanupHttpHandler` is a token-gated GET adapter, exposed
+  only by the independently disabled entry under
   `/chat/research/cleanup`. A fixed-format bearer check precedes private option
   loading. It invokes only cleanup and exports no question/source/read capability.
 
@@ -100,7 +101,8 @@ answer quality, cold latency or production readiness.
 
 ## Request-owned SQL composition checkpoint
 
-`createResearchManagedSqlService` is an unregistered HTTPS POST factory for the
+`createResearchManagedSqlService` is the HTTPS POST factory used by the
+independently disabled main-site entry for the
 four existing research API paths. It does not read environment variables or
 change the Next route/page dispatch. Independently adopted origin/operator/startup
 pins and an app auth root precede private startup loading. Its initial signed
@@ -150,3 +152,45 @@ OID/flags/membership/ownership projections run inside existing auth and corpus
 fences, rather than inserting hidden asynchronous transport checks. Full local
 synthetic tests and a native projection rehearsal establish source contracts;
 actual Node TLS, hosted custody and complete service acceptance remain separate.
+
+## Independent disabled cleanup entry
+
+`GET /chat/research/cleanup` now has a distinct absent-by-default managed cleanup
+entry. It imports no query bootstrap or canonical account/session configuration.
+Its original40s work end is captured before cheap descriptor parsing. Bearer
+authentication precedes lazy runner import and protected profile loading inside
+one8s config bound; the worker retains its independent15s settlement allowance.
+The route requests60s platform headroom. This is not a hosted timing or physical
+shutdown guarantee. No cron stanza is registered.
+
+The descriptor binds HTTPS origin, independent profile/config/connection digests,
+cleanup role OID and release facts for Node24/London. The separate private JSON
+contains only a profile document. Only after profile/runtime validation does a
+callback read the dedicated cleanup URL: exact `magickli_research_cleanup_v1`,
+64hex password, direct certificate-verifying Neon target, with no app DB, runtime
+role, corpus-reader or environment fallback. Recreated role names, NOLOGIN, parent
+memberships, elevated flags and all object ownership are refused through the
+shared native projection inside the existing bounded query. The artifact physical
+OID/PID fences and native exclusive maintenance lifecycle remain in place.
+
+| Server-only input | Purpose |
+| --- | --- |
+| `MAGICKLI_PRIVATE_RESEARCH_MANAGED_CLEANUP` | Independent opt-in; cleanup may outlive question availability |
+| `MAGICKLI_MANAGED_CLEANUP_DEPLOYMENT_JSON` | Cheap independently adopted target/release pins |
+| `MAGICKLI_MANAGED_CLEANUP_SECRET` | Dedicated256-bit bearer; not an operator cookie or global cron fallback |
+| `MAGICKLI_MANAGED_CLEANUP_PRIVATE_JSON` | Hash-pinned profile JSON only |
+| `MAGICKLI_MANAGED_CLEANUP_DATABASE_URL` | Dedicated cleanup login, resolved after profile/runtime validation |
+
+None of these inputs is installed by the source change. Actual scheduler custody
+and authentication must be adopted together: native Vercel Cron sends the
+project-wide `CRON_SECRET`, not a job-specific arbitrary variable. This entry
+does not silently reuse or rotate that secret. A reviewed credential mapping or
+a scheduler able to send the dedicated bearer remains an operational choice.
+[Vercel cron authentication](https://vercel.com/docs/schedules/cron-jobs/manage-cron-jobs#securing-cron-jobs),
+checked17 November2026.
+
+Synthetic route/credential/lazy-import/role/deadline controls and an exact native
+projection rehearsal do not establish actual cleanup transport, real packet
+purging/health settlement, hosted custody or scheduled delivery. Those remain
+explicit launch gates before generation is enabled. The frozen local retention
+owner and installed local binaries are unchanged.

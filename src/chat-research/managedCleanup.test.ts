@@ -21,6 +21,9 @@ const fake = vi.hoisted(() => ({
   badPeer: false,
   privileged: false,
   memberships: false,
+  ownsAnything: false,
+  noLogin: false,
+  roleOid: 321,
   wrongRole: false,
   replacedOid: false,
   packetCloseFails: false,
@@ -77,24 +80,34 @@ vi.mock("postgres", () => ({
             },
           ];
         }
-        fake.events.push(`attest:${pid}`);
-        return [
-          {
-            database: "synthetic_research",
-            role: fake.wrongRole ? "wrong_role" : "synthetic_cleanup",
-            owner: "synthetic_owner",
-            privileged: fake.privileged,
-            memberships: fake.memberships,
-            pid,
-            oid: 1234,
-          },
-        ];
+        throw Error("Unexpected unfenced raw catalog query");
       }),
     };
   }),
 }));
 vi.mock("drizzle-orm/postgres-js", () => ({
   drizzle: vi.fn((pool) => ({
+    select: () => ({
+      from: () => ({
+        where: async () => {
+          fake.events.push(`attest:${pool.pid}`);
+          return [
+            {
+              database: "synthetic_research",
+              role: fake.wrongRole ? "wrong_role" : "synthetic_cleanup",
+              roleOid: fake.roleOid,
+              unsafeRole:
+                fake.privileged ||
+                fake.memberships ||
+                fake.ownsAnything ||
+                fake.noLogin,
+              pid: pool.pid,
+              oid: 1234,
+            },
+          ];
+        },
+      }),
+    }),
     transaction: async (work: (tx: unknown) => unknown) =>
       work({
         execute: vi.fn(async () => {}),
@@ -172,6 +185,7 @@ function options(): ResearchManagedCleanupOptions {
     documentJson: profile.document_json,
     independentlyAdoptedProfileSha256: profile.document_sha256,
     managedCleanupRuntime: runtime,
+    independentlyAdoptedRoleOid: 321,
     independentlyAdoptedConnectionSha256:
       researchManagedCleanupConnectionIdentity(identity),
     connection: vi.fn(() => ({ ...identity, password: "a".repeat(64) })),
@@ -186,6 +200,9 @@ beforeEach(() => {
     badPeer: false,
     privileged: false,
     memberships: false,
+    ownsAnything: false,
+    noLogin: false,
+    roleOid: 321,
     wrongRole: false,
     replacedOid: false,
     packetCloseFails: false,
@@ -207,6 +224,8 @@ it("does not resolve credentials or connect before exact profile/runtime/connect
   for (const change of [
     { independentlyAdoptedProfileSha256: "f".repeat(64) },
     { independentlyAdoptedConnectionSha256: "bad" },
+    { independentlyAdoptedRoleOid: 0 },
+    { independentlyAdoptedRoleOid: Number.NaN },
     {
       managedCleanupRuntime: {
         ...options().managedCleanupRuntime,
@@ -272,19 +291,23 @@ it("finishes health only after the packet pool closes and native PID absence is 
     });
   }
 });
-it.each(["badPeer", "privileged", "memberships", "wrongRole"] as const)(
-  "refuses native %s before acquisition or purge",
-  async (flag) => {
-    fake[flag] = true;
-    expect(await runResearchManagedCleanup(options(), active())).toEqual({
-      status: "failed",
-      reconciled: false,
-    });
-    expect(fake.events).not.toContain("begin");
-    expect(fake.events).not.toContain("purge-start");
-    expect(fake.pools.every((p) => p.closed)).toBe(true);
-  },
-);
+it.each([
+  "badPeer",
+  "privileged",
+  "memberships",
+  "wrongRole",
+  "ownsAnything",
+  "noLogin",
+] as const)("refuses native %s before acquisition or purge", async (flag) => {
+  fake[flag] = true;
+  expect(await runResearchManagedCleanup(options(), active())).toEqual({
+    status: "failed",
+    reconciled: false,
+  });
+  expect(fake.events).not.toContain("begin");
+  expect(fake.events).not.toContain("purge-start");
+  expect(fake.pools.every((p) => p.closed)).toBe(true);
+});
 it("does not start packet work when the physical target mutex is busy", async () => {
   fake.busy = true;
   expect(await runResearchManagedCleanup(options(), active())).toEqual({
@@ -517,4 +540,14 @@ it("does not open any socket if a delayed password getter exhausts the work budg
   });
   expect((await runResearchManagedCleanup(o, active())).status).toBe("failed");
   expect(fake.pools).toHaveLength(0);
+});
+
+it("refuses a recreated cleanup role before acquiring maintenance or opening the packet pool", async () => {
+  fake.roleOid = 322;
+  expect((await runResearchManagedCleanup(options(), active())).status).toBe(
+    "failed",
+  );
+  expect(fake.events).not.toContain("begin");
+  expect(fake.pools).toHaveLength(1);
+  expect(fake.pools[0].closed).toBe(true);
 });

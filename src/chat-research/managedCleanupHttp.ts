@@ -2,10 +2,7 @@
 import "server-only";
 import { createHash, timingSafeEqual } from "node:crypto";
 import { withinResearchDeadline } from "./boundedWork";
-import {
-  type ResearchManagedCleanupOptions,
-  runResearchManagedCleanup,
-} from "./managedCleanup";
+import type { ResearchManagedCleanupOptions } from "./managedCleanup";
 import { RESEARCH_PAGE_PATH } from "./paths";
 export const RESEARCH_MANAGED_CLEANUP_PATH = RESEARCH_PAGE_PATH + "/cleanup";
 /** Independently adopted server settings only. A bearer token permits this one cleanup operation, never source access, answers or provider work. */
@@ -44,9 +41,21 @@ export function createResearchManagedCleanupHttpHandler(
     typeof load !== "function"
   )
     throw Error("Private cleanup unavailable");
-  return async (request: Request): Promise<Response> => {
-    const end = performance.now() + 40000;
+  return async (
+    request: Request,
+    inheritedWorkDeadlineAt?: number,
+  ): Promise<Response> => {
+    const end = Math.min(
+      performance.now() + 40000,
+      inheritedWorkDeadlineAt ?? Infinity,
+    );
     try {
+      if (
+        (inheritedWorkDeadlineAt !== undefined &&
+          !Number.isFinite(inheritedWorkDeadlineAt)) ||
+        performance.now() >= end
+      )
+        throw Error();
       const u = new URL(request.url);
       if (
         request.method !== "GET" ||
@@ -75,11 +84,21 @@ export function createResearchManagedCleanupHttpHandler(
       const configEnd = Math.min(end, performance.now() + 8000);
       const adopted = await withinResearchDeadline(
         request.signal,
-        async (signal) => await load(signal, configEnd),
+        async (signal) => {
+          const { runResearchManagedCleanup } = await import(
+            "./managedCleanup"
+          );
+          signal.throwIfAborted();
+          if (performance.now() >= configEnd) throw Error();
+          const options = await load(signal, configEnd);
+          signal.throwIfAborted();
+          if (performance.now() >= configEnd) throw Error();
+          return { runResearchManagedCleanup, options };
+        },
         configEnd,
       );
-      const result = await runResearchManagedCleanup(
-        adopted,
+      const result = await adopted.runResearchManagedCleanup(
+        adopted.options,
         request.signal,
         end,
       );

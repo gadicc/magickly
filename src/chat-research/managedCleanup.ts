@@ -9,6 +9,8 @@ import * as v from "valibot";
 import { createUuidV7 } from "../lib/ids";
 import { parseBoundedResearchJson } from "./boundedJson";
 import { withinResearchDeadline } from "./boundedWork";
+import { researchManagedCleanupNativeProjection } from "./managedCleanupNative";
+import { assertResearchManagedNativeRole } from "./managedNativeRole";
 import {
   prepareResearchManagedRetentionProfile,
   type ResearchManagedRetentionProfileInput,
@@ -70,6 +72,8 @@ export interface ResearchManagedCleanupOptions {
   readonly documentJson: string;
   readonly independentlyAdoptedProfileSha256: string;
   readonly independentlyAdoptedConnectionSha256: string;
+  /** Native role identity from independent adoption; a recreated role name is insufficient. */
+  readonly independentlyAdoptedRoleOid: number;
   readonly managedCleanupRuntime: ResearchManagedRetentionProfileInput["runtime"];
   readonly connection: () => ResearchManagedCleanupConnection;
 }
@@ -120,6 +124,10 @@ async function run(
     Number(process.versions.node.split(".")[0]) !== profile.runtime.node_major
   )
     fail();
+  const roleOid = v.parse(
+    v.pipe(v.number(), v.safeInteger(), v.minValue(1), v.maxValue(4294967295)),
+    input.independentlyAdoptedRoleOid,
+  );
   const expectedIdentity = v.parse(
     hash,
     input.independentlyAdoptedConnectionSha256,
@@ -210,35 +218,26 @@ async function run(
   ) {
     const [r] = await step(
       () =>
-        connection.unsafe<
-          {
-            database: string;
-            role: string;
-            owner: string;
-            privileged: boolean;
-            memberships: boolean;
-            pid: number;
-            oid: number;
-          }[]
-        >(
-          `select pg_catalog.current_database() as database,current_user as role,pg_catalog.pg_backend_pid() pid,
-      (select pg_catalog.pg_get_userbyid(datdba) from pg_catalog.pg_database where datname=pg_catalog.current_database()) as owner,
-      (select rolsuper or rolcreatedb or rolcreaterole or rolinherit or rolreplication or rolbypassrls from pg_catalog.pg_roles where rolname=current_user) as privileged,
-      exists(select 1 from pg_catalog.pg_auth_members where member=(select oid from pg_catalog.pg_roles where rolname=current_user)) as memberships,
-      (select c.oid::bigint::double precision from pg_catalog.pg_class c join pg_catalog.pg_namespace n on n.oid=c.relnamespace where n.nspname=$1 and c.relname='chat_research_artifacts' and c.relkind='r' and c.relpersistence='p') oid`,
-          [target.storage.schemaName],
-        ),
+        drizzle(connection)
+          .select(
+            researchManagedCleanupNativeProjection(target.storage.schemaName),
+          )
+          .from(sql`pg_catalog.pg_roles r`)
+          .where(sql`r.rolname=current_user`),
       end,
       s,
     );
+    if (r)
+      assertResearchManagedNativeRole(r, {
+        database: identity.database,
+        role: identity.role,
+        roleOid,
+      });
     if (
       !r ||
       !peers.get(connection)?.() ||
       r.database !== identity.database ||
       r.role !== identity.role ||
-      r.owner === identity.role ||
-      r.privileged !== false ||
-      r.memberships !== false ||
       !Number.isSafeInteger(r.pid) ||
       r.pid < 1 ||
       r.oid !== target.artifactTableOid ||
