@@ -6,6 +6,12 @@ import dictionary from "magick-data/enochian/dictionary";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { buildKeysTable } from "../../src/app/enochian/translate/keysTable.ts";
 import { createTranslator } from "../../src/app/enochian/translate/lookup.ts";
+import {
+  lookupGlosses,
+  SENTENCE_RULE_SHARE,
+  sentenceEvidence,
+  sentenceRule,
+} from "../../src/app/enochian/translate/reading/sentence.ts";
 import { evalData, newBarsCommand } from "./cli.ts";
 import { EXPERIMENT_CAP_USD, Ledger, NO_TOKENS } from "./ledger.ts";
 import { MODELS } from "./models.ts";
@@ -37,12 +43,6 @@ import {
   runDir,
   writeJson,
 } from "./runner.ts";
-import {
-  lookupGlosses,
-  SENTENCE_RULE_SHARE,
-  sentenceEvidence,
-  sentenceRule,
-} from "./sentence.ts";
 import {
   aiGateway,
   cachePrefix,

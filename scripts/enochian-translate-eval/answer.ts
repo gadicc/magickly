@@ -2,13 +2,18 @@ import type {
   EnochianDictionary,
   EnochianEntry,
 } from "magick-data/enochian/dictionary";
-import type { Cipher } from "./cipher.ts";
+import {
+  type Basis,
+  parseRef,
+  type ReadingItem,
+} from "../../src/app/enochian/translate/reading/item.ts";
 import {
   englishWords,
   meaningAgrees,
   normEnochian,
   stemEnglish,
-} from "./normalise.ts";
+} from "../../src/app/enochian/translate/reading/normalise.ts";
+import type { Cipher } from "./cipher.ts";
 import {
   type Book,
   contextDictionary,
@@ -22,23 +27,18 @@ import {
  * the script that checks every item marked "attested".
  */
 
-/** How the model says it knows a word. */
-export type Basis = "attested" | "derived" | "coined" | "unknown";
-
 export type Task = 1 | 2;
 
-/** One word of an answer. */
-export interface AnswerItem {
+/**
+ * One word of an answer: the reading's item (`ReadingItem`, in the app,
+ * whose checker reads the same answers), in either task.
+ */
+export interface AnswerItem extends ReadingItem {
   /** The word given: Enochian in task 1, English in task 2. */
   source: string;
   /** The translation: English in task 1, Enochian in task 2. */
   target: string;
   basis: Basis;
-  /**
-   * A dictionary headword or a Key row ("K.R") in the context; required for
-   * "attested", else optional.
-   */
-  ref?: string;
   /** The held-out row this item answers ("K.R"). */
   row?: string;
   /** Task 1: the input token it answers, as numbered in the input ("[3]"). */
@@ -92,33 +92,6 @@ export function checkContextFrom(
     entries.set(norm, [...(entries.get(norm) ?? []), entry]);
   }
   return { entries, rows: new Map(rows.map((row) => [row.id, row])) };
-}
-
-/** A ref as read: a Key row, a headword, or neither. */
-export type ParsedRef =
-  | { kind: "row"; id: string }
-  | { kind: "headword"; word: string }
-  | { kind: "malformed" };
-
-/**
- * Reads a ref in the forms a model is likely to write: "2.3", "Key 2.3",
- * "2.03", "Key 2, row 3", "2:3" for a row; "OL", "OL (dictionary)",
- * "dictionary: OL", "'OL'" for a headword. Anything else is malformed.
- */
-export function parseRef(ref: string | undefined): ParsedRef {
-  let text = (ref ?? "").trim().replace(/^['"‘“]+|['"’”]+$/g, "");
-  const row = text.match(
-    /^(?:key\s*)?(\d{1,2})\s*(?:[.:]|,?\s*row)\s*0*(\d{1,3})$/i,
-  );
-  if (row) return { kind: "row", id: `${Number(row[1])}.${Number(row[2])}` };
-  text = text
-    .replace(/^(?:dictionary|dict|entry|headword)\s*[:\s]\s*/i, "")
-    .replace(/\s*[([](?:dictionary|dict|entry|headword|WE|EMPM)[)\]]\s*$/i, "")
-    .trim()
-    .replace(/^['"‘“]+|['"’”]+$/g, "");
-  if (/^[A-Za-z][A-Za-z\- ()]*$/.test(text) && normEnochian(text))
-    return { kind: "headword", word: text };
-  return { kind: "malformed" };
 }
 
 /** The item's Enochian and English sides for a task. */

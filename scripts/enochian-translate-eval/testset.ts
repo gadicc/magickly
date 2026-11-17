@@ -1,12 +1,12 @@
 import type { EnochianDictionary } from "magick-data/enochian/dictionary";
 import type { EnochianKey } from "magick-data/enochian/keys";
-import { ENGLISH_HOMOGRAPHS } from "./cipher.ts";
 import {
   editDistance,
   foldVariants,
   meaningAgrees,
   normEnochian,
-} from "./normalise.ts";
+} from "../../src/app/enochian/translate/reading/normalise.ts";
+import { ENGLISH_HOMOGRAPHS } from "./cipher.ts";
 
 /**
  * The test set of plan 077: nineteen folds, each holding one Key out.

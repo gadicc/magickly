@@ -1,13 +1,20 @@
 import type { EnochianDictionary } from "magick-data/enochian/dictionary";
 import {
+  type Basis,
+  parseRef,
+} from "../../src/app/enochian/translate/reading/item.ts";
+import {
+  englishWords,
+  meaningAgrees,
+  normEnochian,
+} from "../../src/app/enochian/translate/reading/normalise.ts";
+import {
   type AnswerItem,
   alignItems,
-  type Basis,
   type CheckContext,
   type CheckOutcome,
   checkContextFrom,
   checkItem,
-  parseRef,
   type Task,
 } from "./answer.ts";
 import {
@@ -18,7 +25,6 @@ import {
   sameAnswer,
 } from "./judge.ts";
 import type { NewTextRow, RowKind } from "./newtext.ts";
-import { englishWords, meaningAgrees, normEnochian } from "./normalise.ts";
 import {
   listsAlternatives,
   type Outcome,

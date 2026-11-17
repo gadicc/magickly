@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 import type { EnochianDictionary } from "magick-data/enochian/dictionary";
 import { z } from "zod";
-import { parseRef } from "./answer.ts";
+import { parseRef } from "../../src/app/enochian/translate/reading/item.ts";
+import { normEnochian } from "../../src/app/enochian/translate/reading/normalise.ts";
 import { type Effort, MODELS } from "./models.ts";
-import { normEnochian } from "./normalise.ts";
 import { parseReply } from "./reply.ts";
 import type { Scores, Task1Outcome } from "./score.ts";
 import {

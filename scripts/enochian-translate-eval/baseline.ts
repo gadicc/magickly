@@ -5,8 +5,12 @@ import {
   type Hit,
   searchDictionary,
 } from "../../src/app/enochian/dictionary/search.ts";
+import {
+  englishWords,
+  FUNCTION_WORDS,
+  normEnochian,
+} from "../../src/app/enochian/translate/reading/normalise.ts";
 import type { AnswerItem } from "./answer.ts";
-import { englishWords, FUNCTION_WORDS, normEnochian } from "./normalise.ts";
 import {
   englishKey,
   joinScores,

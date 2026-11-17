@@ -2,13 +2,20 @@ import dictionaryData from "magick-data/enochian/dictionary";
 import keys from "magick-data/enochian/keys";
 import letters from "magick-data/enochian/letters";
 import { describe, expect, it } from "vitest";
+import { parseRef } from "../../src/app/enochian/translate/reading/item.ts";
 import {
-  alignItems,
-  checkContext,
-  checkItem,
-  decipherItem,
-  parseRef,
-} from "./answer.ts";
+  contentStems,
+  editDistance,
+  englishAgrees,
+  englishWords,
+  foldVariants,
+  isFunctionOnly,
+  meaningAgrees,
+  normEnochian,
+  sharesContentWord,
+  stemEnglish,
+} from "../../src/app/enochian/translate/reading/normalise.ts";
+import { alignItems, checkContext, checkItem, decipherItem } from "./answer.ts";
 import { a1Task1, a1Task2, markHard } from "./baseline.ts";
 import {
   cipher,
@@ -24,18 +31,6 @@ import {
   task1Input,
 } from "./context.ts";
 import { data, dictionary, entry, row } from "./fixtures.ts";
-import {
-  contentStems,
-  editDistance,
-  englishAgrees,
-  englishWords,
-  foldVariants,
-  isFunctionOnly,
-  meaningAgrees,
-  normEnochian,
-  sharesContentWord,
-  stemEnglish,
-} from "./normalise.ts";
 import {
   figures,
   report,

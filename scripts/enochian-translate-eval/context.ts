@@ -1,11 +1,11 @@
 import type { EnochianDictionary } from "magick-data/enochian/dictionary";
+import { normEnochian } from "../../src/app/enochian/translate/reading/normalise.ts";
 import {
   type Cipher,
   encipherMeaning,
   cipher as fixedCipher,
   letterNames,
 } from "./cipher.ts";
-import { normEnochian } from "./normalise.ts";
 import {
   type Book,
   contextDictionary,

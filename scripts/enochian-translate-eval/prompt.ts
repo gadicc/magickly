@@ -1,9 +1,9 @@
 import type { EnochianDictionary } from "magick-data/enochian/dictionary";
+import { foldVariants } from "../../src/app/enochian/translate/reading/normalise.ts";
 import type { Task } from "./answer.ts";
 import { serialiseContext, task1Input, task2Input } from "./context.ts";
 import type { Effort } from "./models.ts";
 import { shortName } from "./models.ts";
-import { foldVariants } from "./normalise.ts";
 import type { Book, Fold } from "./testset.ts";
 import type { ModelRequest } from "./transport.ts";
 

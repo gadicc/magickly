@@ -4,6 +4,13 @@ import {
   createTranslator,
   type Translator,
 } from "../../src/app/enochian/translate/lookup.ts";
+import {
+  englishLength,
+  lookupGlosses,
+  type SentenceVerdict,
+  sentenceEvidence,
+  sentenceRule,
+} from "../../src/app/enochian/translate/reading/sentence.ts";
 import { type NewSpec, partRows, tasks12Dictionary } from "./newprompt.ts";
 import type { NewTextRow } from "./newtext.ts";
 import { parseAnswer, parseSentence } from "./reply.ts";
@@ -15,13 +22,6 @@ import {
   readRaw,
   writeJson,
 } from "./runner.ts";
-import {
-  englishLength,
-  lookupGlosses,
-  type SentenceVerdict,
-  sentenceEvidence,
-  sentenceRule,
-} from "./sentence.ts";
 
 /**
  * Plan 081's step 2B: what the reading's prompt (arm A3s) costs and gives,

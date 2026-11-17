@@ -671,6 +671,87 @@ What 2B was to record:
   else, not a wrong arrangement of the right words; the card's label,
   "the model's sentence, not checked", carries the rest.
 
+### 2C build notes (17 November 2026)
+
+The checker is `src/app/enochian/translate/reading/check.ts`
+(`checkReading`), pure and server-side, beside what moved there from
+plan 077's scripts: `normalise.ts`, S7's `sentence.ts`, and the item
+type and `parseRef` (`item.ts`). The experiment's scripts import them
+from the app; plan 077's checker (`checkItem`) is unchanged, its tests
+pass with only their imports changed, its prompts hash the same, and
+2B's reading measures recompute to the saved `summary` and per-call
+`rule`. The decisions S6 left open:
+
+- **A word is the lookup's token.** One row for each, numbered from 1
+  as the prompt will number them, so one of Crowley's spaced forms
+  ("das iod") is one word. An item with no token or one out of range is
+  dropped and counted, never shown; several on one word are a join.
+- **Confirmed** needs basis "attested" or "derived" (a coinage claims
+  no source, so it is never confirmed), a ref that resolves in our data,
+  and its English in that source's gloss. One item is accepted for a
+  word the lookup reads as one word (never one it reads only in parts:
+  "das iod" is DSI and OD, so one item citing Key 4.40 reads half of
+  it) when the lookup offers its row for that word, or its headword as
+  the word's only entry, or when it is the word whole in one of our
+  spellings: a fold, Crowley's whole form (never one of his spaced
+  parts, so TA is not Key 4.32's "ta el-o"), or Leitch's spelling of one
+  row. A Key word whose entries are its parts (TAGE opens TA and GE) is
+  read in parts: GE's "not, only" is not TAGE's. A headword is found by
+  the lookup's fold, so a ref with no dictionary entry (DSONF is only a
+  Key word) doesn't resolve. A row's gloss is its English; a
+  headword's, any one of its meanings. Key 19's slot is LIL's row, and
+  every Aethyr read there opens LIL's entry: another Aethyr is accepted
+  there only by the slot's row, checked against the lookup's gloss for
+  it ("in the second air" for ARN) and shown as that Aethyr, never by
+  LIL's headword.
+- **English in a gloss.** Every content word of the model's English
+  (stemmed, Dee's spellings folded, as plan 077 compares) is in one
+  gloss. A reading of grammar words only needs the gloss's words, or a
+  comma-separated piece's where the gloss itself is grammar words only:
+  "I" meets "I, my", but "of the" does not meet CAOSGO's "earth, of
+  the". A negation in the English (not, no, nor, never, none, neither,
+  "-n't") needs the same word in the gloss, since plan 077's normalising
+  takes "not" and "no" as grammar words ("not reign" would meet
+  "reign"); plan 077's own scoring is unchanged.
+- **Joins** are checked only as the lookup reads the word: one of its
+  readings in parts (a split, G27's shared letter included, a form
+  spanning rows, or a Key word's entries, TA + GE for TAGE), matched
+  part by part, each part resolving and
+  holding as above. Our spellings alone would rebuild nonsense from
+  one-letter headwords (L + D + S), so there is no free concatenation:
+  a known word whose parts aren't a reading of the lookup's is
+  unconfirmed. A word with more than 8 items is not checked
+  (unconfirmed, or the model's guess), its English still shown, cut.
+- **Known** means the lookup has any reading of the word. A reading of
+  one it hasn't is the model's guess, whatever its parts or refs.
+- **Sources** appear only on confirmed and unconfirmed rows, for refs
+  accepted for that very word (for a join, when its parts are the
+  lookup's reading), as our data names them: the dictionary's key (of
+  headwords that fold alike, the one the model wrote, else the first),
+  or the Key and row with Dee's word there (in Key 19's slot, the
+  Aethyr read). A guess or no reading has none.
+- **English.** Each item's target is made plain text once, before any
+  check: NFKC (fullwidth, mathematical and circled letters and
+  ligatures become plain letters, so "ｎｏｔ reign" is "not reign"),
+  controls and format characters removed. Every check and the row read
+  that same text. A row's English is its items' plain targets joined,
+  cut at 10 words (`cut`). "No reading" is no item, basis "unknown",
+  English with no words or only "unknown", or English with a link (a
+  scheme, "www.", an address with "@", or a dotted name ending in two
+  letters or more; "e.g." is no link): such a row shows no English at
+  all.
+- **The sentence.** S7's evidence is the rows' English as shown plus the
+  lookup's glosses (`tokenGlosses`, the passage read once). Beyond
+  `sentenceRule`, the checker withholds a sentence with a link, or
+  longer than 4 times the passage's words (at least 12): S7's "a few
+  times", from 2B's 1.96 at most. Shown, it is plain text; withheld, the
+  result has only the reason and S7's counts, no word of the model's
+  (the eval's measures keep `sentenceRule`'s full verdict).
+- **Cost.** The check is linear in the items and the passage: a passage
+  S3 admits (150 words, 10 of them a letter off ours) with 20 items a
+  word checks in well under 100 ms. The lookup's own reading dominates:
+  150 near-miss words take it about 110 ms, which S3 never admits.
+
 ## The stage-1 review (Fable, 13 November 2026)
 
 The review prototyped the design against the data and plan 074's

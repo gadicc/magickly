@@ -12,6 +12,7 @@ import { fileURLToPath } from "node:url";
 import realDictionary from "magick-data/enochian/dictionary";
 import keys from "magick-data/enochian/keys";
 import { afterEach, describe, expect, it } from "vitest";
+import { sharesContentWord } from "../../src/app/enochian/translate/reading/normalise.ts";
 import { type AnswerItem, checkContextFrom, checkItem } from "./answer.ts";
 import { dictionary as fixtureDictionary, row } from "./fixtures.ts";
 import {
@@ -55,7 +56,6 @@ import {
   withPlantedKnowns,
   wordInfo,
 } from "./newtext.ts";
-import { sharesContentWord } from "./normalise.ts";
 import {
   blockedAttempts,
   collect,

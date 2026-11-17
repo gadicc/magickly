@@ -5,12 +5,20 @@ import {
   JUDGES_CHECK,
   judgesPass,
 } from "../../src/app/enochian/translate/bars.ts";
+import { parseRef } from "../../src/app/enochian/translate/reading/item.ts";
+import {
+  contentStems,
+  englishWords,
+  FUNCTION_WORDS,
+  normEnochian,
+  sharesContentWord,
+  stemEnglish,
+} from "../../src/app/enochian/translate/reading/normalise.ts";
 import {
   type AnswerItem,
   type CheckContext,
   checkContextFrom,
   checkItem,
-  parseRef,
 } from "./answer.ts";
 import {
   JUDGES,
@@ -39,14 +47,6 @@ import {
   prng,
   shuffle,
 } from "./newtext.ts";
-import {
-  contentStems,
-  englishWords,
-  FUNCTION_WORDS,
-  normEnochian,
-  sharesContentWord,
-  stemEnglish,
-} from "./normalise.ts";
 import { GRAMMAR_HEAD } from "./prompt.ts";
 import { parseReply } from "./reply.ts";
 import type { KeyRowRecord } from "./testset.ts";
