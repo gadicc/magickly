@@ -1143,6 +1143,6 @@ Ideas the owner wants kept in view, far beyond current work:
   French already given for Lenain (Gadi, 10 November 2026).
   [Plan 086](086-internationalization.md) records the 17 November URL,
   preference, public ritual translation, SEO and analytics design;
-  the worktree now implements the locale foundation, language preferences and
-  initial Hebrew home/About editions. Ritual edition routing waits for the
+  the locale foundation, language preferences and initial Hebrew home/About
+  editions are implemented. Ritual edition routing waits for the
   separate translation project; see the plan’s implementation record.

@@ -819,3 +819,18 @@ The Enochian/i18n integration passed the full local suite: 635 files passed,
 3 skipped; 12,367 tests passed, 18 skipped. Typechecking, formatting and the
 webpack production build also passed. Main's independently running Next patch
 update is kept separate; its uncommitted package files are not overwritten.
+
+
+The separately completed Next patch (`6a1c1dd6`, Next 16.4.6) is included
+unchanged. Its lockfile integration retains the i18n dependencies and MUI RTL
+plugin; a frozen install passed supply-chain policy checks. The earlier Next
+16.4.3 advisory observations are historical and are superseded by that separate
+patch. Final combined validation is recorded below before updating main.
+
+
+Final combined Next 16.4.6/i18n validation passed: 635 test files, 12,367 tests
+(3 files/18 tests skipped), complete typechecking, formatting, both webpack
+and Turbopack production builds, and both production browser gates. Webpack
+also verified the real offline UUID fallback. The resolved frozen install
+passed supply-chain policy checks. Main's untracked ritual-localization plan
+is preserved, and the i18n branch/worktree are retained for follow-up work.
