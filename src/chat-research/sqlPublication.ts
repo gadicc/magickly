@@ -20,6 +20,7 @@ import type {
   ResearchAdmissionDatabase,
   ResearchAdmissionTransaction,
 } from "./sqlAdmission";
+import { researchRelationShareLock } from "./sqlRelationLock";
 
 const fail = (): never => {
   throw Error(RESEARCH_PUBLICATION_ERROR);
@@ -223,7 +224,13 @@ function context(
                 fail();
               await step(() =>
                 tx.execute(
-                  sql`lock table ${sql.join([p, m, w, r, a], sql`, `)} in access share mode`,
+                  researchRelationShareLock([
+                    [p, "corpus_version"],
+                    [m, "profile_sha256"],
+                    [w, "id"],
+                    [r, "id"],
+                    [a, "permit_id"],
+                  ]),
                 ),
               );
               const oids: number[] = [];

@@ -16,6 +16,7 @@ import type {
   ResearchAdmissionDatabase,
   ResearchAdmissionTransaction,
 } from "./sqlAdmission";
+import { researchRelationShareLock } from "./sqlRelationLock";
 
 const ERROR = "Private research artifact storage unavailable";
 const fail = (): never => {
@@ -47,7 +48,12 @@ export async function lockResearchArtifacts(
 ) {
   assertReady();
   await tx.execute(
-    sql`lock table ${sql.identifier(namespace)}.${sql.identifier("chat_research_artifacts")} in access share mode`,
+    researchRelationShareLock([
+      [
+        sql`${sql.identifier(namespace)}.${sql.identifier("chat_research_artifacts")}`,
+        "permit_id",
+      ],
+    ]),
   );
   assertReady();
   const rows = await tx

@@ -23,6 +23,7 @@ import {
   type ResearchMaintenanceRun,
   type ResearchMaintenanceState,
 } from "./sqlMaintenance";
+import { researchRelationShareLock } from "./sqlRelationLock";
 export const RESEARCH_MANAGED_CLEANUP_ERROR =
   "Private managed research cleanup unavailable";
 const fail: () => never = () => {
@@ -308,7 +309,12 @@ async function run(
             packetRoot.transaction(async (tx) => {
               assertTick();
               await tx.execute(
-                sql`lock table ${sql.identifier(target.storage.schemaName)}.chat_research_artifacts in access share mode`,
+                researchRelationShareLock([
+                  [
+                    sql`${sql.identifier(target.storage.schemaName)}.${sql.identifier("chat_research_artifacts")}`,
+                    "permit_id",
+                  ],
+                ]),
               );
               assertTick();
               const [r] = await tx

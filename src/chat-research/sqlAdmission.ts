@@ -29,6 +29,7 @@ import {
   formatResearchHistoryCandidate,
   type ResearchCompletedHistoryCandidate,
 } from "./historyCandidate";
+import { researchRelationShareLock } from "./sqlRelationLock";
 
 export type {
   ResearchAccountingScope,
@@ -222,7 +223,16 @@ export function createSqlResearchAdmission(
         // Qualified locks fail if migration is missing and prevent concurrent table replacement.
         // Search-path order alone would still fall through to pg_temp if durable tables were absent.
         await tx.execute(
-          sql`lock table ${sql.identifier(namespace)}.${sql.identifier("chat_research_windows")}, ${sql.identifier(namespace)}.${sql.identifier("chat_research_permits")} in access share mode`,
+          researchRelationShareLock([
+            [
+              sql`${sql.identifier(namespace)}.${sql.identifier("chat_research_windows")}`,
+              "id",
+            ],
+            [
+              sql`${sql.identifier(namespace)}.${sql.identifier("chat_research_permits")}`,
+              "id",
+            ],
+          ]),
         );
         assertReadReady?.();
         const durable = await tx

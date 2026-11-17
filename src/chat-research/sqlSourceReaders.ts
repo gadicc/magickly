@@ -34,6 +34,7 @@ import {
   readResearchSourcePolicy,
   researchPolicySnapshot,
 } from "./sourcePolicy";
+import { researchRelationShareLock } from "./sqlRelationLock";
 
 type Transaction = Pick<PgDatabase<PgQueryResultHKT>, "select" | "execute">;
 /** Confirmed root transactions only. Supply full auth-compatible Drizzle transactions;
@@ -341,7 +342,18 @@ function sqlSourceReaders(
             fail();
           await step(() =>
             tx.execute(
-              sql`lock table ${sessions},${users},${policies}${windows ? sql`,${windows}` : sql``}${maintenanceTable ? sql`,${maintenanceTable},${artifactTable}` : sql``} in access share mode`,
+              researchRelationShareLock([
+                [sessions, "id"],
+                [users, "id"],
+                [policies, "corpus_version"],
+                ...(windows ? [[windows, "id"] as const] : []),
+                ...(maintenanceTable && artifactTable
+                  ? [
+                      [maintenanceTable, "profile_sha256"] as const,
+                      [artifactTable, "permit_id"] as const,
+                    ]
+                  : []),
+              ]),
             ),
           );
           const durable = await step(() =>

@@ -22,6 +22,7 @@ import type {
   ResearchAdmissionTransaction,
 } from "./sqlAdmission";
 import { lockResearchArtifacts } from "./sqlArtifacts";
+import { researchRelationShareLock } from "./sqlRelationLock";
 
 function fail(): never {
   throw Error(RESEARCH_MAINTENANCE_ERROR);
@@ -189,7 +190,12 @@ export function createSqlResearchMaintenance(
                   fail();
                 if (lockTables) {
                   await step(() =>
-                    tx.execute(sql`lock table ${m},${w} in access share mode`),
+                    tx.execute(
+                      researchRelationShareLock([
+                        [m, "profile_sha256"],
+                        [w, "id"],
+                      ]),
+                    ),
                   );
                   await step(() =>
                     lockResearchArtifacts(tx, namespace, assert),

@@ -38,6 +38,7 @@ export default defineConfig({
         "src/chat-research/sqlAdmission.ts",
         "src/chat-research/accountingScope.ts",
         "src/chat-research/sqlArtifacts.ts",
+        "src/chat-research/sqlRelationLock.ts",
         "src/chat-research/requestArtifact.ts",
         "src/chat-research/resultArtifact.ts",
         "src/chat-research/sourceAuthorization.ts",

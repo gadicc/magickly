@@ -693,7 +693,7 @@ it("samples quote time only after the artifact lock is acquired, never stranding
                       result = await target.execute(query);
                     if (
                       text.includes(
-                        'lock table "public"."chat_research_artifacts"',
+                        'from "public"."chat_research_artifacts" as "research_lock_0" where false',
                       )
                     ) {
                       delayedLocks++;
