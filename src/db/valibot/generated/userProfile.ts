@@ -186,16 +186,19 @@ export type UserAccessUpdate = v.InferInput<typeof userAccessUpdate>;
 export const userProfileSelect = v.object({
   userId: v.pipe(v.string(), v.uuid()),
   displayName: v.nullable(v.string()),
+  uiLocale: v.nullable(v.string()),
 });
 
 export const userProfileInsert = v.object({
   userId: v.pipe(v.string(), v.uuid()),
   displayName: v.optional(v.nullable(v.string())),
+  uiLocale: v.optional(v.nullable(v.string())),
 });
 
 export const userProfileUpdate = v.object({
   userId: v.optional(v.pipe(v.string(), v.uuid())),
   displayName: v.optional(v.nullable(v.string())),
+  uiLocale: v.optional(v.nullable(v.string())),
 });
 
 export type UserProfileSelect = v.InferOutput<typeof userProfileSelect>;

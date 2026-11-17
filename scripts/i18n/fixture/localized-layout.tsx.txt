@@ -1,0 +1,12 @@
+import Document from "../../../Document";
+import { isLocale } from "../../../messages";
+export default async function Layout({ children, params }) {
+  const { locale } = await params;
+  // The page rejects unsupported locales before lookup. Throwing from this
+  // root would bypass its own not-found document boundary.
+  return (
+    <Document locale={isLocale(locale) && locale !== "en" ? locale : "en"}>
+      {children}
+    </Document>
+  );
+}

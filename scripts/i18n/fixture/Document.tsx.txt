@@ -1,0 +1,23 @@
+import ClientShell from "./ClientShell";
+export default function Document({ locale = "en", editor = false, children }) {
+  if (
+    process.env.MAGICKLI_PRIVATE_RESEARCH_LOCAL === "1" ||
+    process.env.MAGICKLI_PRIVATE_RESEARCH_OPERATOR === "1"
+  )
+    return (
+      <html lang="en" dir="ltr">
+        <body>
+          <main data-research="true">Isolated research document</main>
+        </body>
+      </html>
+    );
+  return (
+    <html lang={locale} dir={locale === "he" ? "rtl" : "ltr"}>
+      <body>
+        <ClientShell locale={locale} editor={editor}>
+          {children}
+        </ClientShell>
+      </body>
+    </html>
+  );
+}

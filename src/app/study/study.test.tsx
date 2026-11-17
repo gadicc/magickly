@@ -1,7 +1,7 @@
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { sets } from "@/study/sets";
-import StudyRoute from "./page";
+import StudyRoute from "../(public)/study/page";
 
 // Next's prerender bails out to the browser at `useSearchParams`, so the
 // server renders the Suspense fallback. Throwing here does the same under

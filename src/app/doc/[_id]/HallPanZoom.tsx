@@ -28,6 +28,8 @@ import {
   zoomBy,
   zoomKey,
 } from "@/doc/hallPanZoom";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
+import UiText from "@/i18n/UiText";
 
 /** The gesture in progress, from where it (or its latest phase) began. */
 type Gesture =
@@ -68,6 +70,8 @@ export function HallPanZoom({
   focus?: Region;
   children: React.ReactNode;
 }) {
+  const { t: translateUi } = useUiLanguage();
+
   const surface = React.useRef<HTMLDivElement>(null);
   const [measured, setMeasured] = React.useState({ width: 0, height: 0 });
   const size = React.useMemo(
@@ -340,7 +344,7 @@ export function HallPanZoom({
             whiteSpace: "nowrap",
           }}
         >
-          Pinch or Ctrl+scroll to zoom
+          <UiText message={/*i18n*/ "Pinch or Ctrl+scroll to zoom"} />
         </Box>
       )}
       <Paper
@@ -356,21 +360,21 @@ export function HallPanZoom({
         }}
       >
         <IconButton
-          aria-label="Zoom in"
+          aria-label={translateUi(/*i18n*/ "Zoom in")}
           disabled={view.scale >= MAX_SCALE}
           onClick={() => zoom("in")}
         >
           <AddIcon />
         </IconButton>
         <IconButton
-          aria-label="Zoom out"
+          aria-label={translateUi(/*i18n*/ "Zoom out")}
           disabled={!zoomed}
           onClick={() => zoom("out")}
         >
           <RemoveIcon />
         </IconButton>
         <IconButton
-          aria-label="Reset zoom"
+          aria-label={translateUi(/*i18n*/ "Reset zoom")}
           disabled={!zoomed && view.x === 0 && view.y === 0}
           onClick={() => zoom("reset")}
         >

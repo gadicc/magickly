@@ -1,0 +1,16 @@
+import { notFound } from "next/navigation";
+import { resolveReader } from "../../../../reader";
+export async function generateMetadata({ params }) {
+  return (await resolveReader((await params).id)).kind === "public"
+    ? { alternates: { canonical: "https://magick.ly/doc/public" } }
+    : { robots: { index: false } };
+}
+export default async function Page({ params }) {
+  const result = await resolveReader((await params).id);
+  if (result.kind === "deleted") notFound();
+  return result.kind === "public" ? (
+    <h1>Published synthetic ritual</h1>
+  ) : (
+    <h1 id="private-reader">Private downloaded-reader fallback</h1>
+  );
+}

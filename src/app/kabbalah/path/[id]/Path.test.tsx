@@ -2,7 +2,7 @@ import Data from "magick-data";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { expectEntityPage, textOf } from "../../../../../tests/entityPage";
-import PathPage from "./page";
+import PathPage from "../../../(public)/kabbalah/path/[id]/page";
 
 /**
  * The path page, laid out from its row (plan 036).

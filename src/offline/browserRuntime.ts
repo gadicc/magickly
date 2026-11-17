@@ -5,7 +5,7 @@ import {
   OfflineLifecycleCoordinator,
   type OfflineLifecycleState,
 } from "./lifecycle";
-import { LockedRecoveryQueue } from "./recovery";
+import { LockedRecoveryQueue, watchRecoveryDeparture } from "./recovery";
 import { OfflineRitualRepository } from "./repository";
 import { RitualOfflineDatabase } from "./storage";
 
@@ -54,6 +54,7 @@ export function createBrowserOfflineRuntime(
 ): BrowserOfflineRuntime {
   const repository = new OfflineRitualRepository(database);
   const recovery = new LockedRecoveryQueue();
+  watchRecoveryDeparture(recovery, window);
   const listeners = new Set<(state: OfflineLifecycleState) => void>();
   const channel =
     typeof BroadcastChannel === "function"

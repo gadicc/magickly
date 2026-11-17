@@ -65,7 +65,7 @@ describe("nothing renders by colour mode", () => {
       path.relative(repository, file),
     );
     expect(relative).toContain("src/theme.ts");
-    expect(relative).toContain("src/app/layout.tsx");
+    expect(relative).toContain("src/app/Document.tsx");
     expect(relative).toContain(self);
   });
 

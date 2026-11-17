@@ -1,6 +1,8 @@
 "use client";
 import { Box, Typography } from "@mui/material";
 import NextLink from "next/link";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
+import { publicEdition } from "@/i18n/publications";
 import { SITE_FORUM } from "@/seo/site";
 import pathnames from "./pathnames";
 import { footerSections, type NavLink, showsFooter } from "./siteNav";
@@ -11,9 +13,9 @@ const SITE_LINKS: NavLink[] = [
   { title: pathnames.about as string, url: "/about" },
   { title: pathnames.study as string, url: "/study" },
   { title: pathnames.chat as string, url: "/chat" },
-  { title: "Temples guide", url: "/help/temples" },
-  { title: "Ritual Pug guide", url: "/help/ritual-pug" },
-  { title: "Forum", url: SITE_FORUM },
+  { title: /*i18n*/ "Temples guide", url: "/help/temples" },
+  { title: /*i18n*/ "Ritual Pug guide", url: "/help/ritual-pug" },
+  { title: /*i18n*/ "Forum", url: SITE_FORUM },
 ];
 
 const linkStyle = { color: "inherit", textDecoration: "none" } as const;
@@ -25,16 +27,21 @@ function FooterLink({
   link: NavLink;
   current: "page" | "true" | undefined;
 }) {
+  const { t, locale } = useUiLanguage();
   const external = /^https?:/.test(link.url);
   return (
     <Box component="li" sx={{ py: 0.25 }}>
       {external ? (
         <a href={link.url} style={linkStyle}>
-          {link.title}
+          {t(link.title)}
         </a>
       ) : (
-        <NextLink href={link.url} style={linkStyle} aria-current={current}>
-          {link.title}
+        <NextLink
+          href={publicEdition(link.url, locale) ?? link.url}
+          style={linkStyle}
+          aria-current={current}
+        >
+          {t(link.title)}
         </NextLink>
       )}
     </Box>
@@ -56,6 +63,7 @@ function currentOf(path: string, url: string) {
 }
 
 export default function SiteFooter() {
+  const { t, locale } = useUiLanguage();
   // `path` is the 404's own path wherever it is served, so the server and
   // the browser decide alike.
   const { path } = useSiteNav();
@@ -68,11 +76,11 @@ export default function SiteFooter() {
         sx={{ fontSize: "0.95rem", fontWeight: 600, mb: 0.5 }}
       >
         <NextLink
-          href={heading.url}
+          href={publicEdition(heading.url, locale) ?? heading.url}
           style={linkStyle}
           aria-current={currentOf(path, heading.url)}
         >
-          {heading.title}
+          {t(heading.title)}
         </NextLink>
       </Typography>
       <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0 }}>
@@ -120,7 +128,7 @@ export default function SiteFooter() {
     >
       <Box
         component="nav"
-        aria-label="Site"
+        aria-label={t(/*i18n*/ "Site")}
         sx={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",

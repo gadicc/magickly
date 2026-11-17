@@ -98,6 +98,11 @@ that name that something placed earlier on your `PATH`, such as `~/bin`.
 
 ## Adding a shot
 
+The worktree helper creates ephemeral development-only auth and sealing keys;
+it never reads deployed sealing keys. The latter lets the synthetic forum
+settings form render. Capture waits use visible `innerText`, because serialized
+Lingui catalogs also contain UI words inside page scripts.
+
 1. Add a `Shot` to the list in `capture.mts`: a `name` (the file name), a `persona`
    (`creator` is a temple administrator, `reader` a grade 1 member), an optional
    `viewport`, an `open` function that gets the page into the wanted state, and

@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { PUBLIC_TRANSLATIONS, publicAlternates } from "@/i18n/publications";
 import { GD_HALLS } from "@/render/contracts/gdHall";
 import { componentPages } from "@/seo/components";
 import { entityPages } from "@/seo/entities";
@@ -19,7 +20,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       ...entityPages().map((page) => page.path),
       ...lenainPages().map((page) => page.path),
       ...componentPages().map((page) => page.path),
-    ].map((path) => ({ url: path === "/" ? SITE_URL : SITE_URL + path })),
+      ...Object.values(PUBLIC_TRANSLATIONS).flatMap((translations) =>
+        Object.values(translations),
+      ),
+    ].map((path) => ({
+      url: path === "/" ? SITE_URL : SITE_URL + path,
+      ...(publicAlternates(path)
+        ? {
+            alternates: {
+              languages: Object.fromEntries(
+                Object.entries(publicAlternates(path)!).map(([locale, url]) => [
+                  locale,
+                  SITE_URL + (url === "/" ? "" : url),
+                ]),
+              ),
+            },
+          }
+        : {}),
+    })),
     // Each temple hall with its two indexable images, the PNG first (plan
     // 062). Next writes them unescaped, so the URLs carry no query.
     ...GD_HALLS.map((hall) => {

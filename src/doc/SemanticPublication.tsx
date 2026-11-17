@@ -2,6 +2,7 @@
 
 import { Alert, Button } from "@mui/material";
 import React from "react";
+import UiText from "@/i18n/UiText";
 import { createUuidV7 } from "@/lib/ids";
 import {
   parseRitualPublicationRequest,
@@ -247,15 +248,15 @@ export default function SemanticPublication({
     : request && !renew
       ? "Retry publication"
       : renew
-        ? "Publish current saved version"
-        : "Publish saved version for download";
+        ? /*i18n*/ "Publish current saved version"
+        : /*i18n*/ "Publish saved version for download";
   return (
     <>
       {!compact && message && (
         <Alert
           severity={message === "Published for download." ? "success" : "info"}
         >
-          {message}
+          <UiText message={message} />
         </Alert>
       )}
       {label && (
@@ -267,7 +268,13 @@ export default function SemanticPublication({
             request && !renew ? setAttempt((value) => value + 1) : void start()
           }
         >
-          {compact && label !== "Retry publication" ? "Publish" : label}
+          <UiText
+            message={
+              compact && label !== "Retry publication"
+                ? /*i18n*/ "Publish"
+                : label
+            }
+          />
         </Button>
       )}
     </>

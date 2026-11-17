@@ -1,0 +1,1432 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-11-17 11:51+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+
+#. js-lingui-explicit-id
+#: src/i18n/publicMetadata.ts
+msgid "Magick.ly: Open Source Magick Reference and Tools"
+msgstr "Magick.ly: Open Source Magick Reference and Tools"
+
+#. js-lingui-explicit-id
+#: src/i18n/publicMetadata.ts
+msgid "Free, open source reference and tools for Western esoteric study: Kabbalah, the Golden Dawn, Enochian magick, astrology, geomancy and flashcards."
+msgstr "Free, open source reference and tools for Western esoteric study: Kabbalah, the Golden Dawn, Enochian magick, astrology, geomancy and flashcards."
+
+#. js-lingui-explicit-id
+#: src/i18n/publicMetadata.ts
+msgid "About Magick.ly, an open source reference app for magickal study with MIT-licensed data and components. A reference, not an instruction app."
+msgstr "About Magick.ly, an open source reference app for magickal study with MIT-licensed data and components. A reference, not an instruction app."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+#: src/app/doc/[_id]/edit/semantic/DeleteRitualDialog.tsx
+#: src/app/temples/ConfirmAction.tsx
+#: src/asyncConfirm.tsx
+msgid "Cancel"
+msgstr "Cancel"
+
+#. js-lingui-explicit-id
+#: src/asyncConfirm.tsx
+msgid "OK"
+msgstr "OK"
+
+#. js-lingui-explicit-id
+#: src/search/SearchButton.tsx
+msgid "Search the site"
+msgstr "Search the site"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Close search"
+msgstr "Close search"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search pages and content"
+msgstr "Search pages and content"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "A name, a phrase, an idea…"
+msgstr "A name, a phrase, an idea…"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Finding related pages…"
+msgstr "Finding related pages…"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search by meaning"
+msgstr "Search by meaning"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/PrivateRitualReader.tsx
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+#: src/i18n/AccountLocaleSync.tsx
+#: src/search/SearchDialog.tsx
+msgid "Retry"
+msgstr "Retry"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search results"
+msgstr "Search results"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+#: src/i18n/publicMetadata.ts
+msgid "About"
+msgstr "About"
+
+#. js-lingui-explicit-id
+#: src/i18n/AccountLocaleSync.tsx
+msgid "This browser could not retain the language sync state. Keep this tab open and retry."
+msgstr "This browser could not retain the language sync state. Keep this tab open and retry."
+
+#. js-lingui-explicit-id
+#: src/i18n/AccountLocaleSync.tsx
+msgid "This browser’s language was changed, but your account preference has not been saved. Retry when online."
+msgstr "This browser’s language was changed, but your account preference has not been saved. Retry when online."
+
+#. js-lingui-explicit-id
+#: src/i18n/LanguageSwitcher.tsx
+msgid "Language"
+msgstr "Language"
+
+#. js-lingui-explicit-id
+#: src/i18n/LanguageSwitcher.tsx
+msgid "The language could not be loaded. Try again."
+msgstr "The language could not be loaded. Try again."
+
+#. js-lingui-explicit-id
+#: src/i18n/LocaleProvider.tsx
+msgid "The language changed in this tab, but this browser could not save the preference."
+msgstr "The language changed in this tab, but this browser could not save the preference."
+
+#. js-lingui-explicit-id
+#: src/doc/useRitualEditorLayout.ts
+msgid "Source"
+msgstr "Source"
+
+#. js-lingui-explicit-id
+#: src/doc/useRitualEditorLayout.ts
+msgid "Split"
+msgstr "Split"
+
+#. js-lingui-explicit-id
+#: src/doc/useRitualEditorLayout.ts
+msgid "Visual"
+msgstr "Visual"
+
+#. js-lingui-explicit-id
+#: src/doc/RitualSourceEditor.tsx
+msgid "Ritual semantic source"
+msgstr "Ritual semantic source"
+
+#. js-lingui-explicit-id
+#: src/doc/SemanticPublication.tsx
+msgid "Publish current saved version"
+msgstr "Publish current saved version"
+
+#. js-lingui-explicit-id
+#: src/doc/SemanticPublication.tsx
+msgid "Publish saved version for download"
+msgstr "Publish saved version for download"
+
+#. js-lingui-explicit-id
+#: src/doc/SemanticPublication.tsx
+msgid "Publish"
+msgstr "Publish"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Magick.ly"
+msgstr "Magick.ly"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Admin"
+msgstr "Admin"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Astrology"
+msgstr "Astrology"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Moon Phases"
+msgstr "Moon Phases"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Planetary Hours"
+msgstr "Planetary Hours"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Planets"
+msgstr "Planets"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Zodiac"
+msgstr "Zodiac"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Books"
+msgstr "Books"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "La Science Cabalistique"
+msgstr "La Science Cabalistique"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Chat (MagickGPT)"
+msgstr "Chat (MagickGPT)"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Enochian"
+msgstr "Enochian"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Enochian Dictionary"
+msgstr "Enochian Dictionary"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Enochian Keys"
+msgstr "Enochian Keys"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Oration to God"
+msgstr "Oration to God"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Enochian Tablets"
+msgstr "Enochian Tablets"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Enochian Translator"
+msgstr "Enochian Translator"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Golden Dawn"
+msgstr "Golden Dawn"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Grades"
+msgstr "Grades"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Temple Halls"
+msgstr "Temple Halls"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Hall Editor"
+msgstr "Hall Editor"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Rituals"
+msgstr "Rituals"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/gd/rituals/deleted/page.tsx
+#: src/app/pathnames.ts
+msgid "Recently deleted"
+msgstr "Recently deleted"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Sigils"
+msgstr "Sigils"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Symbols"
+msgstr "Symbols"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Seven-Branched Candlestick"
+msgstr "Seven-Branched Candlestick"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Fylfot Cross"
+msgstr "Fylfot Cross"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Table of Shewbread"
+msgstr "Table of Shewbread"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Geomancy"
+msgstr "Geomancy"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Geomancy Reading"
+msgstr "Geomancy Reading"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Geomantic Figures"
+msgstr "Geomantic Figures"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Kabbalah"
+msgstr "Kabbalah"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Shem HaMephorash"
+msgstr "Shem HaMephorash"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "72 Angels"
+msgstr "72 Angels"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Tree of Life"
+msgstr "Tree of Life"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Open source"
+msgstr "Open source"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Data"
+msgstr "Data"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Components"
+msgstr "Components"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Study"
+msgstr "Study"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
+#: src/app/pathnames.ts
+msgid "Temples"
+msgstr "Temples"
+
+#. js-lingui-explicit-id
+#: src/app/siteNav.ts
+msgid "Ritual editor"
+msgstr "Ritual editor"
+
+#. js-lingui-explicit-id
+#: src/app/siteNav.ts
+msgid "Source code"
+msgstr "Source code"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "sign in"
+msgstr "sign in"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "Home"
+msgstr "Home"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "menu"
+msgstr "menu"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "share"
+msgstr "share"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "account of current user"
+msgstr "account of current user"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "Signing out…"
+msgstr "Signing out…"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "Logout"
+msgstr "Logout"
+
+#. js-lingui-explicit-id
+#: src/app/RouteNotFound.tsx
+msgid "Page not found"
+msgstr "Page not found"
+
+#. js-lingui-explicit-id
+#: src/app/RouteNotFound.tsx
+msgid "The page is unavailable or does not exist."
+msgstr "The page is unavailable or does not exist."
+
+#. js-lingui-explicit-id
+#: src/app/RouteNotFound.tsx
+msgid "Return home"
+msgstr "Return home"
+
+#. js-lingui-explicit-id
+#: src/app/SiteFooter.tsx
+msgid "Temples guide"
+msgstr "Temples guide"
+
+#. js-lingui-explicit-id
+#: src/app/SiteFooter.tsx
+msgid "Ritual Pug guide"
+msgstr "Ritual Pug guide"
+
+#. js-lingui-explicit-id
+#: src/app/SiteFooter.tsx
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Forum"
+msgstr "Forum"
+
+#. js-lingui-explicit-id
+#: src/app/SiteFooter.tsx
+msgid "Site"
+msgstr "Site"
+
+#. js-lingui-explicit-id
+#: src/app/ThemeSwitch.tsx
+msgid "Light"
+msgstr "Light"
+
+#. js-lingui-explicit-id
+#: src/app/ThemeSwitch.tsx
+msgid "System"
+msgstr "System"
+
+#. js-lingui-explicit-id
+#: src/app/ThemeSwitch.tsx
+msgid "Dark"
+msgstr "Dark"
+
+#. js-lingui-explicit-id
+#: src/app/ThemeSwitch.tsx
+msgid "Theme"
+msgstr "Theme"
+
+#. js-lingui-explicit-id
+#: src/app/clientProviders.tsx
+msgid "Retry recovery"
+msgstr "Retry recovery"
+
+#. js-lingui-explicit-id
+#: src/app/clientProviders.tsx
+msgid "Old browser storage could not be verified. Public content and sign-out remain available, but sign-in stays locked until recovery succeeds."
+msgstr "Old browser storage could not be verified. Public content and sign-out remain available, but sign-in stays locked until recovery succeeds."
+
+#. js-lingui-explicit-id
+#: src/app/clientProviders.tsx
+msgid "Checking this browser for offline work before allowing sign-in…"
+msgstr "Checking this browser for offline work before allowing sign-in…"
+
+#. js-lingui-explicit-id
+#: src/app/temples/CreateTempleForm.tsx
+msgid "New temple name"
+msgstr "New temple name"
+
+#. js-lingui-explicit-id
+#: src/app/temples/CreateTempleForm.tsx
+msgid "Creating…"
+msgstr "Creating…"
+
+#. js-lingui-explicit-id
+#: src/app/temples/CreateTempleForm.tsx
+msgid "Create temple"
+msgstr "Create temple"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/DiscourseSyncButton.tsx
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Discourse"
+msgstr "Discourse"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/DiscourseSyncButton.tsx
+msgid "Match each member to a forum account (creating one if needed), name it after their motto, and give it the forum group, title and badge for their grade. The page will show the result when the sync finishes."
+msgstr "Match each member to a forum account (creating one if needed), name it after their motto, and give it the forum group, title and badge for their grade. The page will show the result when the sync finishes."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/DiscourseSyncButton.tsx
+msgid "Synchronizing…"
+msgstr "Synchronizing…"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/DiscourseSyncButton.tsx
+msgid "Synchronize with Discourse"
+msgstr "Synchronize with Discourse"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/DiscourseSyncButton.tsx
+msgid "Discourse sync is running."
+msgstr "Discourse sync is running."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/DiscourseSyncButton.tsx
+msgid "Discourse sync results"
+msgstr "Discourse sync results"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "What the sync does"
+msgstr "What the sync does"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Forum connections are switched off on this server: it cannot protect the keys at the moment."
+msgstr "Forum connections are switched off on this server: it cannot protect the keys at the moment."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "The saved API key can no longer be read, so this forum is not being synced. Enter the forum’s address, API username and key again."
+msgstr "The saved API key can no longer be read, so this forum is not being synced. Enter the forum’s address, API username and key again."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Forum address"
+msgstr "Forum address"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "https://forum.example.org"
+msgstr "https://forum.example.org"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "API username"
+msgstr "API username"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "The forum administrator the key acts as; usually system."
+msgstr "The forum administrator the key acts as; usually system."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "API key"
+msgstr "API key"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Syncing sends each member’s name, motto, grade and verified email addresses to this forum, which creates an account for anyone it does not already know. Only connect a forum you run."
+msgstr "Syncing sends each member’s name, motto, grade and verified email addresses to this forum, which creates an account for anyone it does not already know. Only connect a forum you run."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Update forum"
+msgstr "Update forum"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Connect forum"
+msgstr "Connect forum"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Disconnect"
+msgstr "Disconnect"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Join code"
+msgstr "Join code"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Save join code"
+msgstr "Save join code"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Clear the code and save to disable new invitations."
+msgstr "Clear the code and save to disable new invitations."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Copy invitation link"
+msgstr "Copy invitation link"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Set a join code to create an invitation link."
+msgstr "Set a join code to create an invitation link."
+
+#. js-lingui-explicit-id
+#: src/app/signin/SignInButton.tsx
+msgid "We could not start sign-in. Check your connection and try again."
+msgstr "We could not start sign-in. Check your connection and try again."
+
+#. js-lingui-explicit-id
+#: src/app/signin/SignInButton.tsx
+msgid "Opening Google…"
+msgstr "Opening Google…"
+
+#. js-lingui-explicit-id
+#: src/app/signin/SignInButton.tsx
+msgid "Continue with Google"
+msgstr "Continue with Google"
+
+#. js-lingui-explicit-id
+#: src/app/signin/SignInButton.tsx
+msgid "Local development"
+msgstr "Local development"
+
+#. js-lingui-explicit-id
+#: src/app/signin/SignInButton.tsx
+msgid "Creator"
+msgstr "Creator"
+
+#. js-lingui-explicit-id
+#: src/app/signin/SignInButton.tsx
+msgid "Reader"
+msgstr "Reader"
+
+#. js-lingui-explicit-id
+#: src/app/signin/SignInButton.tsx
+msgid "Test admin"
+msgstr "Test admin"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/PrivateRitualReader.tsx
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "Downloaded rituals"
+msgstr "Downloaded rituals"
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "Loading downloaded rituals"
+msgstr "Loading downloaded rituals"
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "Downloaded rituals are unavailable on this device."
+msgstr "Downloaded rituals are unavailable on this device."
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "No verified offline account is active. Open a downloaded ritual once while signed in and online."
+msgstr "No verified offline account is active. Open a downloaded ritual once while signed in and online."
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "No unexpired ritual downloads were found."
+msgstr "No unexpired ritual downloads were found."
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "Halls on this device"
+msgstr "Halls on this device"
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "None of these rituals has a temple hall."
+msgstr "None of these rituals has a temple hall."
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "Every hall in the rituals downloaded here. Tap a hall to open it full screen, or a ritual’s name to read it."
+msgstr "Every hall in the rituals downloaded here. Tap a hall to open it full screen, or a ritual’s name to read it."
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "East is at the top of every plan and North on the left."
+msgstr "East is at the top of every plan and North on the left."
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualEntry.tsx
+msgid "Loading offline rituals"
+msgstr "Loading offline rituals"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/DocLoader.tsx
+msgid "Ritual not found."
+msgstr "Ritual not found."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/DocRender.tsx
+msgid "decrease font size"
+msgstr "decrease font size"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/DocRender.tsx
+msgid "increase font size"
+msgstr "increase font size"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/DocRender.tsx
+msgid "More Variables"
+msgstr "More Variables"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/HallPanZoom.tsx
+msgid "Pinch or Ctrl+scroll to zoom"
+msgstr "Pinch or Ctrl+scroll to zoom"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/HallPanZoom.tsx
+msgid "Zoom in"
+msgstr "Zoom in"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/HallPanZoom.tsx
+msgid "Zoom out"
+msgstr "Zoom out"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/HallPanZoom.tsx
+msgid "Reset zoom"
+msgstr "Reset zoom"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/HallViewer.tsx
+msgid "Halls in this ritual"
+msgstr "Halls in this ritual"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+#: src/app/doc/[_id]/HallViewer.tsx
+msgid "Close"
+msgstr "Close"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/HallViewer.tsx
+msgid "Previous hall"
+msgstr "Previous hall"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/HallViewer.tsx
+msgid "Go to it in the ritual"
+msgstr "Go to it in the ritual"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/HallViewer.tsx
+msgid "Next hall"
+msgstr "Next hall"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/PrivateRitualReader.tsx
+msgid "Loading ritual"
+msgstr "Loading ritual"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/PrivateRitualReader.tsx
+msgid "This ritual is unavailable on this device. Connect and retry to check access."
+msgstr "This ritual is unavailable on this device. Connect and retry to check access."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/PrivateRitualReader.tsx
+msgid "Open the original ritual link to use the offline reader."
+msgstr "Open the original ritual link to use the offline reader."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Loading ritual source..."
+msgstr "Loading ritual source..."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Ritual source is locked or unavailable. Connect and retry with the authorized account."
+msgstr "Ritual source is locked or unavailable. Connect and retry with the authorized account."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Ritual editor panes"
+msgstr "Ritual editor panes"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Publishing saved version..."
+msgstr "Publishing saved version..."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Retry publication"
+msgstr "Retry publication"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Preparing publication attempt..."
+msgstr "Preparing publication attempt..."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Start new publication attempt"
+msgstr "Start new publication attempt"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Retry keeps the exact retained save request and operation ID."
+msgstr "Retry keeps the exact retained save request and operation ID."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Preparing recovery..."
+msgstr "Preparing recovery..."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Download recovery"
+msgstr "Download recovery"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Attach image"
+msgstr "Attach image"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Attached image source reference"
+msgstr "Attached image source reference"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Insert image"
+msgstr "Insert image"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Ritual preview pane"
+msgstr "Ritual preview pane"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/DeleteRitualDialog.tsx
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+msgid "Loading…"
+msgstr "Loading…"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/DeleteRitualDialog.tsx
+msgid "Only a site administrator can delete a public ritual."
+msgstr "Only a site administrator can delete a public ritual."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/DeleteRitualDialog.tsx
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Download draft"
+msgstr "Download draft"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/DeleteRitualDialog.tsx
+msgid "Your unsaved changes stay on this device as a draft."
+msgstr "Your unsaved changes stay on this device as a draft."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/DeleteRitualDialog.tsx
+msgid "Delete"
+msgstr "Delete"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+msgid "Who can read this ritual"
+msgstr "Who can read this ritual"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+msgid "Only administrators of a temple or group can change this."
+msgstr "Only administrators of a temple or group can change this."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+msgid "Readable by"
+msgstr "Readable by"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+msgid "Minimum grade"
+msgstr "Minimum grade"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+msgid "I understand"
+msgstr "I understand"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Saving…"
+msgstr "Saving…"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Save"
+msgstr "Save"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Who can read this ritual could not be loaded. Check your connection and try again."
+msgstr "Who can read this ritual could not be loaded. Check your connection and try again."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Deleting this ritual could not be loaded. Check your connection and try again."
+msgstr "Deleting this ritual could not be loaded. Check your connection and try again."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "The pending save is confirmed, but local recovery changed. Download this draft before reloading."
+msgstr "The pending save is confirmed, but local recovery changed. Download this draft before reloading."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "The pending save is confirmed. Reload this page to open the current revision."
+msgstr "The pending save is confirmed. Reload this page to open the current revision."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Download recovered draft"
+msgstr "Download recovered draft"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "The local draft could not be loaded. Reload this page before editing."
+msgstr "The local draft could not be loaded. Reload this page before editing."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Verifying account and loading local draft…"
+msgstr "Verifying account and loading local draft…"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Publishing…"
+msgstr "Publishing…"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Save not confirmed"
+msgstr "Save not confirmed"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Unsaved changes"
+msgstr "Unsaved changes"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Saved"
+msgstr "Saved"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Untitled ritual"
+msgstr "Untitled ritual"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Title"
+msgstr "Title"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Editor layout"
+msgstr "Editor layout"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Retry save"
+msgstr "Retry save"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "More editor actions"
+msgstr "More editor actions"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "View ritual"
+msgstr "View ritual"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Who can read this ritual…"
+msgstr "Who can read this ritual…"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Delete ritual…"
+msgstr "Delete ritual…"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Ritual Pug guide (opens in a new tab)"
+msgstr "Ritual Pug guide (opens in a new tab)"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "This is a semantic conversion of the current Pug revision. Saving creates a new revision; the original source remains in history."
+msgstr "This is a semantic conversion of the current Pug revision. Saving creates a new revision; the original source remains in history."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/semantic/page.tsx
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+#: src/app/doc/[_id]/edit/semantic/SemanticEditorShell.tsx
+msgid "Open Pug editor"
+msgstr "Open Pug editor"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Confirm pending save"
+msgstr "Confirm pending save"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Discard local draft"
+msgstr "Discard local draft"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "A save is pending. Retry it unchanged before making another edit."
+msgstr "A save is pending. Retry it unchanged before making another edit."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Semantic source panel"
+msgstr "Semantic source panel"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "This older Ritual Text draft is being recovered. Correct or resolve its source changes to convert it to Pug. Pending saves must be confirmed first. Download the draft to keep its original recovery buffer before changing it. Ritual Text uses command lines and quoted text fragments."
+msgstr "This older Ritual Text draft is being recovered. Correct or resolve its source changes to convert it to Pug. Pending saves must be confirmed first. Download the draft to keep its original recovery buffer before changing it. Ritual Text uses command lines and quoted text fragments."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Ritual source"
+msgstr "Ritual source"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Pug uses indentation for blocks and #[…] for inline formatting. Valid edits update the visual panel as you type."
+msgstr "Pug uses indentation for blocks and #[…] for inline formatting. Valid edits update the visual panel as you type."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Both panels changed. Apply source to replace visual changes, or discard source changes."
+msgstr "Both panels changed. Apply source to replace visual changes, or discard source changes."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Apply source"
+msgstr "Apply source"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Discard source changes"
+msgstr "Discard source changes"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Visual editor panel"
+msgstr "Visual editor panel"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditorShell.tsx
+msgid "Loading ritual editor…"
+msgstr "Loading ritual editor…"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/upload/page.tsx
+msgid "Attach an Image"
+msgstr "Attach an Image"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/upload/page.tsx
+msgid "Attach an image to a ritual"
+msgstr "Attach an image to a ritual"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/chat/train/page.tsx
+#: src/app/(private)/gd/rituals/deleted/page.tsx
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+#: src/app/(private)/temples/admin/page.tsx
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+#: src/app/(private)/temples/page.tsx
+#: src/app/(private)/upload/page.tsx
+msgid "Sign in"
+msgstr "Sign in"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/upload/page.tsx
+msgid "Choose a ritual you currently edit. The image is stored privately and attached to that ritual; uploading it does not create a public file link."
+msgstr "Choose a ritual you currently edit. The image is stored privately and attached to that ritual; uploading it does not create a public file link."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/upload/page.tsx
+msgid "You do not currently have an editable ritual to attach an image to."
+msgstr "You do not currently have an editable ritual to attach an image to."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "My Temples"
+msgstr "My Temples"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "You are not currently a member of any temples."
+msgstr "You are not currently a member of any temples."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "admin"
+msgstr "admin"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Leave"
+msgstr "Leave"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Your temple membership is active."
+msgstr "Your temple membership is active."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "You have left the temple."
+msgstr "You have left the temple."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Join an existing temple"
+msgstr "Join an existing temple"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Enter the slug and private join code supplied by that organization. You will review the temple name before membership is created."
+msgstr "Enter the slug and private join code supplied by that organization. You will review the temple name before membership is created."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Temple slug"
+msgstr "Temple slug"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Continue"
+msgstr "Continue"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
+#: src/app/(private)/temples/page.tsx
+msgid "Create a new temple"
+msgstr "Create a new temple"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Creating a temple starts a new organization that you administer. It does not request membership in an existing organization."
+msgstr "Creating a temple starts a new organization that you administer. It does not request membership in an existing organization."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Create or manage temples"
+msgstr "Create or manage temples"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
+#: src/app/(private)/temples/page.tsx
+msgid "What are temples, and what can I do as an administrator?"
+msgstr "What are temples, and what can I do as an administrator?"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+msgid "Join Temple"
+msgstr "Join Temple"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+msgid "No temple matches that slug and join code."
+msgstr "No temple matches that slug and join code."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+msgid "The temple’s administrators will see your name and can change your grade and motto. If they connect a forum to the temple, syncing it sends your name, motto, grade and verified email addresses to that forum. You can leave at any time from My Temples."
+msgstr "The temple’s administrators will see your name and can change your grade and motto. If they connect a forum to the temple, syncing it sends your name, motto, grade and verified email addresses to that forum. You can leave at any time from My Temples."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+msgid "Confirm and join"
+msgstr "Confirm and join"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+msgid "Back to temples"
+msgstr "Back to temples"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
+msgid "Temple Administration"
+msgstr "Temple Administration"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
+msgid "Temples you administer"
+msgstr "Temples you administer"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
+msgid "You do not currently administer any temples."
+msgstr "You do not currently administer any temples."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
+msgid "Your global administrator grant allows you to manage every temple."
+msgstr "Your global administrator grant allows you to manage every temple."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
+msgid "My Temples page"
+msgstr "My Temples page"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Manage Temple"
+msgstr "Manage Temple"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "This temple was not found, or you cannot manage it."
+msgstr "This temple was not found, or you cannot manage it."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Back to temple administration"
+msgstr "Back to temple administration"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "The member has been removed."
+msgstr "The member has been removed."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Members"
+msgstr "Members"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Grade"
+msgstr "Grade"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Name or motto"
+msgstr "Name or motto"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Added"
+msgstr "Added"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Edit"
+msgstr "Edit"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Temple administrator"
+msgstr "Temple administrator"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Join information"
+msgstr "Join information"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Temple Membership"
+msgstr "Temple Membership"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "This membership was not found, or you cannot manage its temple."
+msgstr "This membership was not found, or you cannot manage its temple."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Edit Membership"
+msgstr "Edit Membership"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Motto"
+msgstr "Motto"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Golden Dawn grade, from 0 through 6."
+msgstr "Golden Dawn grade, from 0 through 6."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Member since"
+msgstr "Member since"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Optional. Clear the field if the date is unknown."
+msgstr "Optional. Clear the field if the date is unknown."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Save membership"
+msgstr "Save membership"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Remove from temple"
+msgstr "Remove from temple"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "They can rejoin at grade 0 if they still have the join code. Change or clear it under Join information if you do not want that."
+msgstr "They can rejoin at grade 0 if they still have the join code. Change or clear it under Join information if you do not want that."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/study/info/[_id]/page.tsx
+msgid "Flashcard Progress"
+msgstr "Flashcard Progress"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/study/[_id]/page.tsx
+msgid "Flashcards"
+msgstr "Flashcards"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/signin/page.tsx
+msgid "Sign In"
+msgstr "Sign In"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/signin/page.tsx
+msgid "Sign in to Magickly"
+msgstr "Sign in to Magickly"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/signin/page.tsx
+msgid "Use the same Google account as before to find your temples, rituals and study progress."
+msgstr "Use the same Google account as before to find your temples, rituals and study progress."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/gd/rituals/deleted/page.tsx
+msgid "Deleted rituals you can restore. Nobody can read them meanwhile, and each is removed for good 30 days after it was deleted."
+msgstr "Deleted rituals you can restore. Nobody can read them meanwhile, and each is removed for good 30 days after it was deleted."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/gd/rituals/deleted/page.tsx
+msgid "Back to rituals"
+msgstr "Back to rituals"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/gd/rituals/deleted/page.tsx
+msgid "Every deleted ritual"
+msgstr "Every deleted ritual"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/page.tsx
+msgid "Edit Ritual"
+msgstr "Edit Ritual"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/page.tsx
+msgid "Open ritual editor"
+msgstr "Open ritual editor"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/page.tsx
+msgid "Ritual source is unavailable."
+msgstr "Ritual source is unavailable."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/semantic/page.tsx
+msgid "Edit ritual"
+msgstr "Edit ritual"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/semantic/page.tsx
+msgid "Ritual is unavailable."
+msgstr "Ritual is unavailable."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/semantic/page.tsx
+msgid "Ritual editing is unavailable."
+msgstr "Ritual editing is unavailable."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/semantic/page.tsx
+msgid "This semantic revision needs repair before editing."
+msgstr "This semantic revision needs repair before editing."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/semantic/page.tsx
+msgid "This ritual changed while opening the editor. Reload to use its current revision."
+msgstr "This ritual changed while opening the editor. Reload to use its current revision."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/semantic/page.tsx
+msgid "This source format is not supported by the new editor."
+msgstr "This source format is not supported by the new editor."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/chat/train/page.tsx
+msgid "Chat Training"
+msgstr "Chat Training"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/chat/train/page.tsx
+msgid "Chat training"
+msgstr "Chat training"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/admin/page.tsx
+msgid "Administration"
+msgstr "Administration"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/admin/page.tsx
+msgid "Global administrator access is required."
+msgstr "Global administrator access is required."

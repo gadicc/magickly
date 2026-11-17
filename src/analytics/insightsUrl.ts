@@ -1,4 +1,6 @@
 import { isResearchPath, RESEARCH_PAGE_PATH } from "../chat-research/paths";
+import { localizedPath, privacyPath } from "../i18n/locales";
+import { isPublishedLocalizedPath } from "../i18n/publications";
 /**
  * Which paths Vercel Web Analytics and Speed Insights may see.
  *
@@ -54,6 +56,7 @@ const ENCODED_SEPARATOR = /%2f|%5c|\\/i;
 export function isPublicPath(pathname: string): boolean {
   if (isResearchPath(pathname) || ENCODED_SEPARATOR.test(pathname))
     return false;
+  if (isPublishedLocalizedPath(pathname)) return true;
   if (PUBLIC_PATHS.has(pathname)) return true;
   const section = pathname.split("/")[1];
   return section !== undefined && PUBLIC_SECTIONS.has(section);
@@ -63,11 +66,12 @@ export function isPublicPath(pathname: string): boolean {
  * The path to report for a pathname: a public page's own path, another
  * section's name (`/temples/*`), or `/*`.
  */
-export function insightsPath(pathname: string): string {
-  if (isResearchPath(pathname)) return RESEARCH_PAGE_PATH;
+export function insightsPath(pathname: string, preserveLocale = false): string {
+  if (isResearchTelemetryPath(pathname)) return RESEARCH_PAGE_PATH;
   const path = pathname.replace(/\/+$/, "") || "/";
-  if (isPublicPath(path)) return path;
-  const [, section = "", ...rest] = path.split("/");
+  if (isPublicPath(path))
+    return preserveLocale ? path : localizedPath(path).path;
+  const [, section = "", ...rest] = privacyPath(path).split("/");
   if (ENCODED_SEPARATOR.test(path) || !PRIVATE_SECTIONS.has(section))
     return "/*";
   return `/${section}${rest.length ? "/*" : ""}`;
@@ -77,12 +81,27 @@ export function insightsPath(pathname: string): string {
  * `insightsPath` applied to a full URL, keeping its origin. Null when the
  * URL does not parse, so nothing is sent.
  */
-export function insightsUrl(url: string): string | null {
+export function insightsUrl(
+  url: string,
+  preserveLocale = false,
+): string | null {
   try {
     const parsed = new URL(url);
-    if (isResearchPath(parsed.pathname)) return null;
-    return parsed.origin + insightsPath(parsed.pathname);
+    if (isResearchTelemetryPath(parsed.pathname)) return null;
+    return parsed.origin + insightsPath(parsed.pathname, preserveLocale);
   } catch {
     return null;
   }
+}
+
+/** Fail closed for research paths even behind unsupported or encoded prefixes. */
+function isResearchTelemetryPath(path: string): boolean {
+  const ascii = path
+    .replace(/%([a-f0-9]{2})/gi, (raw, byte: string) => {
+      const code = Number.parseInt(byte, 16);
+      return code < 128 ? String.fromCharCode(code) : raw;
+    })
+    .replaceAll("\\", "/")
+    .replace(/\/+/g, "/");
+  return isResearchPath(path) || isResearchPath(privacyPath(ascii));
 }

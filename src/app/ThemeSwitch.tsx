@@ -13,14 +13,15 @@ import {
 } from "@mui/material";
 import { useColorScheme } from "@mui/material/styles";
 import { useId } from "react";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
 
 type Mode = "light" | "system" | "dark";
 
 const CHOICES: { value: Mode; label: string; Icon: typeof DarkModeOutlined }[] =
   [
-    { value: "light", label: "Light", Icon: LightModeOutlined },
-    { value: "system", label: "System", Icon: SettingsBrightness },
-    { value: "dark", label: "Dark", Icon: DarkModeOutlined },
+    { value: "light", label: /*i18n*/ "Light", Icon: LightModeOutlined },
+    { value: "system", label: /*i18n*/ "System", Icon: SettingsBrightness },
+    { value: "dark", label: /*i18n*/ "Dark", Icon: DarkModeOutlined },
   ];
 
 /**
@@ -30,6 +31,7 @@ const CHOICES: { value: Mode; label: string; Icon: typeof DarkModeOutlined }[] =
  * mounted. The choice stays in `localStorage` (MUI's `mui-mode`).
  */
 export default function ThemeSwitch() {
+  const { t } = useUiLanguage();
   const { mode, setMode } = useColorScheme();
   const labelId = useId();
   return (
@@ -41,7 +43,7 @@ export default function ThemeSwitch() {
           variant="body2"
           sx={{ mb: 1, color: "text.secondary" }}
         >
-          Theme
+          {t(/*i18n*/ "Theme")}
         </Typography>
         <ToggleButtonGroup
           aria-labelledby={labelId}
@@ -68,7 +70,7 @@ export default function ThemeSwitch() {
               }}
             >
               <Icon fontSize="small" />
-              {label}
+              {t(label)}
             </ToggleButton>
           ))}
         </ToggleButtonGroup>

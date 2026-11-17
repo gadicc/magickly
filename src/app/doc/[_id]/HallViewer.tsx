@@ -19,6 +19,8 @@ import React from "react";
 import { DARK_SELECTOR } from "@/colorScheme";
 import { GdHallFrame } from "@/doc/ritualBlocks/GdHallFrame";
 import type { RitualHall } from "@/doc/ritualHalls";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
+import UiText from "@/i18n/UiText";
 import { HallPanZoom } from "./HallPanZoom";
 
 const hallOf = (hall: RitualHall) => hall.row as unknown as HallNode;
@@ -67,7 +69,7 @@ export function HallSheet({
         variant="subtitle1"
         sx={{ px: 2, py: 1.5, fontWeight: 500 }}
       >
-        Halls in this ritual
+        <UiText message={/*i18n*/ "Halls in this ritual"} />
       </Typography>
       <List disablePadding sx={{ overflowY: "auto" }}>
         {halls.map((hall, index) => (
@@ -117,6 +119,8 @@ export function HallViewer({
   onClose: () => void;
   onGoTo: (hall: RitualHall) => void;
 }) {
+  const { t: translateUi } = useUiLanguage();
+
   const titleId = React.useId();
   const last = React.useRef(0);
   if (index !== null) last.current = index;
@@ -166,7 +170,10 @@ export function HallViewer({
           [DARK_SELECTOR]: { borderColor: "divider" },
         }}
       >
-        <IconButton aria-label="Close" onClick={onClose}>
+        <IconButton
+          aria-label={translateUi(/*i18n*/ "Close")}
+          onClick={onClose}
+        >
           <CloseIcon />
         </IconButton>
         {/* Announced as a whole when the hall changes. */}
@@ -214,18 +221,18 @@ export function HallViewer({
       >
         <IconButton
           ref={previousButton}
-          aria-label="Previous hall"
+          aria-label={translateUi(/*i18n*/ "Previous hall")}
           disabled={previous === null}
           onClick={() => step(previous, true)}
         >
           <ChevronLeftIcon />
         </IconButton>
         <Button variant="contained" onClick={() => onGoTo(hall)}>
-          Go to it in the ritual
+          <UiText message={/*i18n*/ "Go to it in the ritual"} />
         </Button>
         <IconButton
           ref={nextButton}
-          aria-label="Next hall"
+          aria-label={translateUi(/*i18n*/ "Next hall")}
           disabled={next === null}
           onClick={() => step(next, true)}
         >

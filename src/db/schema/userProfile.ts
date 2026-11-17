@@ -1,6 +1,8 @@
+import { sql } from "drizzle-orm";
 import {
   bigint,
   boolean,
+  check,
   jsonb,
   pgTable,
   text,
@@ -16,12 +18,22 @@ import { account, user } from "./auth";
 import { uuidV7 } from "./ids";
 
 /** App-owned public profile fields cannot be overwritten by the auth adapter. */
-export const userProfile = pgTable("user_profile", {
-  userId: uuid("user_id")
-    .primaryKey()
-    .references(() => user.id, { onDelete: "cascade" }),
-  displayName: text("display_name"),
-});
+export const userProfile = pgTable(
+  "user_profile",
+  {
+    userId: uuid("user_id")
+      .primaryKey()
+      .references(() => user.id, { onDelete: "cascade" }),
+    displayName: text("display_name"),
+    uiLocale: text("ui_locale").$type<"en" | "he">(),
+  },
+  (table) => [
+    check(
+      "user_profile_ui_locale_check",
+      sql`${table.uiLocale} in ('en', 'he')`,
+    ),
+  ],
+);
 
 /** App-owned global access; group/temple grants belong to their later domain schemas. */
 export const userAccess = pgTable("user_access", {

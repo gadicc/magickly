@@ -7,7 +7,7 @@ import {
   hrefsOf,
   textOf,
 } from "../../../../../tests/entityPage";
-import Grade from "./page";
+import Grade from "../../../(public)/gd/grade/[id]/page";
 
 /**
  * The grade page (plan 036, "Grade"), rendered through its route for every

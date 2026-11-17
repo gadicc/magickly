@@ -7,7 +7,7 @@ import {
   hrefsOf,
   textOf,
 } from "../../../../../tests/entityPage";
-import Planet from "./page";
+import Planet from "../../../(public)/astrology/planet/[id]/page";
 
 // The stand-in for the spirit sigils renders the id it was given, so a page
 // can be held to drawing the right spirit's without its path data.

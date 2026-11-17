@@ -15,6 +15,8 @@ import {
   loadRitualDeletion,
 } from "@/app/gd/rituals/lifecycleActions";
 import type { SqlRitualDeletionInfo } from "@/doc/sqlLifecycle";
+import EnglishText from "@/i18n/EnglishText";
+import UiText from "@/i18n/UiText";
 
 /** Who loses the ritual the moment it is deleted. */
 export function deletionAudience(info: SqlRitualDeletionInfo): string {
@@ -114,18 +116,28 @@ export default function DeleteRitualDialog({
         {info ? `Delete “${info.title}”?` : "Delete ritual"}
       </DialogTitle>
       <DialogContent>
-        {loading && <DialogContentText>Loading…</DialogContentText>}
+        {loading && (
+          <DialogContentText>
+            <UiText message={/*i18n*/ "Loading…"} />
+          </DialogContentText>
+        )}
         {info && (
           <>
             <DialogContentText sx={{ mb: 2 }}>
-              {deletionAudience(info)} {DOWNLOADED_COPIES} You can restore it
-              from Recently deleted until{" "}
-              {formatRestoreUntil(info.restoreUntil)}; after that it is gone for
-              good.
+              {deletionAudience(info)} {DOWNLOADED_COPIES}{" "}
+              <EnglishText>
+                You can restore it from Recently deleted until
+              </EnglishText>{" "}
+              {formatRestoreUntil(info.restoreUntil)}
+              <EnglishText>; after that it is gone for good.</EnglishText>
             </DialogContentText>
             {!info.canDelete && (
               <Alert severity="info" sx={{ mb: 2 }}>
-                Only a site administrator can delete a public ritual.
+                <UiText
+                  message={
+                    /*i18n*/ "Only a site administrator can delete a public ritual."
+                  }
+                />
               </Alert>
             )}
             {unsavedChanges && (
@@ -139,12 +151,16 @@ export default function DeleteRitualDialog({
                       size="small"
                       onClick={onDownloadDraft}
                     >
-                      Download draft
+                      <UiText message={/*i18n*/ "Download draft"} />
                     </Button>
                   )
                 }
               >
-                Your unsaved changes stay on this device as a draft.
+                <UiText
+                  message={
+                    /*i18n*/ "Your unsaved changes stay on this device as a draft."
+                  }
+                />
               </Alert>
             )}
           </>
@@ -153,7 +169,7 @@ export default function DeleteRitualDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={deleting}>
-          Cancel
+          <UiText message={/*i18n*/ "Cancel"} />
         </Button>
         <Button
           color="error"
@@ -161,7 +177,7 @@ export default function DeleteRitualDialog({
           disabled={!info?.canDelete || deleting}
           onClick={confirm}
         >
-          Delete
+          <UiText message={/*i18n*/ "Delete"} />
         </Button>
       </DialogActions>
     </Dialog>

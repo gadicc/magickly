@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { useId, useState } from "react";
 import { useFormStatus } from "react-dom";
+import UiText from "@/i18n/UiText";
 
 function ConfirmButton({ form, children }: { form: string; children: string }) {
   const { pending } = useFormStatus();
@@ -86,7 +87,7 @@ export function ConfirmAction({
         </DialogContent>
         <DialogActions>
           <Button type="button" onClick={() => setOpen(false)}>
-            Cancel
+            <UiText message={/*i18n*/ "Cancel"} />
           </Button>
           <ConfirmButton form={formId}>{confirmLabel}</ConfirmButton>
         </DialogActions>

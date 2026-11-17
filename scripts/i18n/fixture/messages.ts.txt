@@ -1,0 +1,13 @@
+import { setupI18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import { messages as en } from "./locales/en/messages";
+import { messages as he } from "./locales/he/messages";
+
+export const catalogs = { en, he };
+export function greeting(locale: "en" | "he") {
+  // Every server render owns its instance; no mutable process-global locale.
+  const i18n = setupI18n({ locale, messages: { [locale]: catalogs[locale] } });
+  return i18n._(msg`Compiler compatibility proof`);
+}
+export const isLocale = (value: string): value is "en" | "he" =>
+  value === "en" || value === "he";

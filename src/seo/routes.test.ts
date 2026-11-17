@@ -12,7 +12,11 @@ function pageRoutes(dir = appDir): { route: string; source: string }[] {
     const file = path.join(dir, entry.name);
     if (entry.isDirectory()) return pageRoutes(file);
     if (entry.name !== "page.tsx") return [];
-    const route = `/${path.relative(appDir, dir).split(path.sep).join("/")}`;
+    const route = `/${path
+      .relative(appDir, dir)
+      .split(path.sep)
+      .filter((segment) => !/^\(.+\)$/.test(segment))
+      .join("/")}`;
     return [
       {
         route: route === "/" ? route : route.replace(/\/$/, ""),
@@ -53,7 +57,7 @@ describe("page routes", () => {
         expect(source, route).toMatch(/export async function generateMetadata/);
       else
         expect(source, route).toMatch(
-          /export const metadata = privateMetadata\("[^"]+"\);/,
+          /(?:export const metadata = privateMetadata|export async function generateMetadata)/,
         );
     }
   });

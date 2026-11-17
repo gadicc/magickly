@@ -136,6 +136,8 @@ it("upgrades exact populated old migrations with the installed migrator, preserv
       .map((entry: { tag: string }) => entry.tag),
   ).toEqual(pending);
   expect(
+    // This rehearsal isolates research's migrations; later app-profile changes
+    // have their own preservation test in i18n/preferenceMigration.test.ts.
     journal.entries.slice(25, 27).map((entry: { tag: string }) => entry.tag),
   ).toEqual(["0025_chat_research_corpus", "0026_chat_research_window_guard"]);
   expect(readMigrationFiles({ migrationsFolder: before })).toHaveLength(20);

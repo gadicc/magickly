@@ -1,0 +1,2 @@
+ALTER TABLE "user_profile" ADD COLUMN "ui_locale" text;--> statement-breakpoint
+ALTER TABLE "user_profile" ADD CONSTRAINT "user_profile_ui_locale_check" CHECK ("user_profile"."ui_locale" in ('en', 'he'));

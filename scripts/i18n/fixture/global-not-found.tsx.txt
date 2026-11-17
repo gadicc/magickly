@@ -1,0 +1,10 @@
+export const metadata = { title: "Not found", robots: { index: false } };
+export default function NotFound() {
+  return (
+    <html lang="en" dir="ltr">
+      <body>
+        <h1>Not found</h1>
+      </body>
+    </html>
+  );
+}

@@ -1,0 +1,29 @@
+.error-document {
+  background: #fff;
+  color: #111;
+  color-scheme: light;
+  font-family: system-ui, sans-serif;
+}
+.error-document.dark {
+  background: #0f141d;
+  color: #e4e8ef;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  .error-document:not(.light) {
+    background: #0f141d;
+    color: #e4e8ef;
+    color-scheme: dark;
+  }
+}
+.error-document body {
+  margin: 0;
+}
+.error-document main {
+  margin: 10vh auto;
+  max-width: 36rem;
+  padding: 2rem;
+}
+.error-document a {
+  color: inherit;
+}

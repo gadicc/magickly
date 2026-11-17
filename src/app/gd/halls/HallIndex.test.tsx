@@ -2,8 +2,8 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { GD_HALLS } from "@/render/contracts/gdHall";
 import { hallFiles } from "@/seo/halls";
+import HallsPage from "../../(public)/gd/halls/page";
 import HallIndex from "./HallIndex";
-import HallsPage from "./page";
 
 /** The text a reader sees: MUI's inline styles and the tags dropped. */
 const text = (html: string) =>

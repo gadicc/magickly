@@ -17,6 +17,9 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import { useDeferredValue, useEffect, useId, useRef, useState } from "react";
+import EnglishText from "@/i18n/EnglishText";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
+import UiText from "@/i18n/UiText";
 import { type LoadedSearchEngine, loadSearchEngine } from "./client";
 import type { SearchResult } from "./types";
 
@@ -35,6 +38,8 @@ export default function SearchDialog({
   open: boolean;
   onClose: () => void;
 }) {
+  const { t: translateUi } = useUiLanguage();
+
   const titleId = useId();
   const statusId = useId();
   const input = useRef<HTMLInputElement>(null);
@@ -165,8 +170,11 @@ export default function SearchDialog({
           justifyContent: "space-between",
         }}
       >
-        Search Magick.ly
-        <IconButton aria-label="Close search" onClick={onClose}>
+        <EnglishText>Search Magick.ly</EnglishText>
+        <IconButton
+          aria-label={translateUi(/*i18n*/ "Close search")}
+          onClick={onClose}
+        >
           <Close />
         </IconButton>
       </DialogTitle>
@@ -174,8 +182,8 @@ export default function SearchDialog({
         <TextField
           autoFocus
           inputRef={input}
-          label="Search pages and content"
-          placeholder="A name, a phrase, an idea…"
+          label={translateUi(/*i18n*/ "Search pages and content")}
+          placeholder={translateUi(/*i18n*/ "A name, a phrase, an idea…")}
           fullWidth
           value={query}
           onChange={(event) => changeQuery(event.target.value)}
@@ -221,7 +229,13 @@ export default function SearchDialog({
               disabled={query.trim().length < 2 || semanticLoading}
               onClick={() => void searchMeaning()}
             >
-              {semanticLoading ? "Finding related pages…" : "Search by meaning"}
+              <UiText
+                message={
+                  semanticLoading
+                    ? /*i18n*/ "Finding related pages…"
+                    : /*i18n*/ "Search by meaning"
+                }
+              />
             </Button>
           </Box>
         ) : null}
@@ -239,7 +253,7 @@ export default function SearchDialog({
                 color="inherit"
                 onClick={() => setAttempt((value) => value + 1)}
               >
-                Retry
+                <UiText message={/*i18n*/ "Retry"} />
               </Button>
             }
           >
@@ -280,7 +294,7 @@ export default function SearchDialog({
         ) : null}
         <List
           ref={resultsRef}
-          aria-label="Search results"
+          aria-label={translateUi(/*i18n*/ "Search results")}
           sx={{ mx: -1, opacity: query !== deferredQuery ? 0.6 : 1 }}
           onKeyDown={(event) => {
             if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;

@@ -17,9 +17,65 @@ import { ritualPugNodeIdsAtLine } from "@/doc/ritualPugIds";
 import { printRitualText } from "@/doc/ritualText";
 import { semanticFromJrt } from "@/doc/semantic";
 import { RITUAL_EDITOR_LAYOUT_KEY } from "@/doc/useRitualEditorLayout";
+import LocaleProvider, { useUiLanguage } from "@/i18n/LocaleProvider";
 import { createUuidV7 } from "@/lib/ids";
+import { messages as englishMessages } from "@/locales/en/messages.js";
+import { LockedRecoveryQueue } from "@/offline/recovery";
 import SemanticEditor from "./SemanticEditor";
 import type { SemanticEditorProps } from "./SemanticEditorShell";
+
+const localeRouter = vi.hoisted(() => ({ refresh: vi.fn() }));
+vi.mock("next/navigation", () => ({ useRouter: () => localeRouter }));
+
+function ChooseHebrew() {
+  const { choose } = useUiLanguage();
+  return (
+    <button type="button" onClick={() => void choose("he")}>
+      Choose Hebrew
+    </button>
+  );
+}
+
+it("keeps editor fields, source selection and scroll through a language switch and server refresh", async () => {
+  mock.load.mockResolvedValue(undefined);
+  const setup = props();
+  mock.owner = setup.actorId;
+  const app = (value: SemanticEditorProps) => (
+    <LocaleProvider locale="en" messages={englishMessages} policy="private">
+      <ChooseHebrew />
+      <SemanticEditor {...value} />
+    </LocaleProvider>
+  );
+  const view = render(app(setup));
+  const title = (await screen.findByRole("textbox", {
+    name: "Title",
+  })) as HTMLInputElement;
+  fireEvent.change(title, { target: { value: "Unsaved synthetic title" } });
+  const source = screen.getByRole("textbox", {
+    name: "Ritual semantic source",
+  }) as HTMLTextAreaElement;
+  const text = source.value.replace("Welcome.", "Unsaved synthetic words.");
+  fireEvent.change(source, { target: { value: text } });
+  source.setSelectionRange(12, 15);
+  source.scrollTop = 180;
+  fireEvent.click(screen.getByRole("button", { name: "Choose Hebrew" }));
+  await waitFor(() => expect(document.documentElement.lang).toBe("he"));
+  expect(document.documentElement.dir).toBe("rtl");
+  await waitFor(() => expect(localeRouter.refresh).toHaveBeenCalled());
+  view.rerender(
+    app({ ...setup, initialDocument: structuredClone(setup.initialDocument) }),
+  );
+  expect(screen.getByRole("textbox", { name: "כותרת" })).toBe(title);
+  expect(title.value).toBe("Unsaved synthetic title");
+  expect(source.isConnected).toBe(true);
+  expect(source.value).toBe(text);
+  expect([
+    source.selectionStart,
+    source.selectionEnd,
+    source.scrollTop,
+  ]).toEqual([12, 15, 180]);
+  expect(document.cookie).toContain("magickly-ui-locale=he");
+});
 
 // jsdom has no range layout; Tiptap asks for it when the insert command focuses.
 Object.defineProperty(Range.prototype, "getClientRects", {
@@ -84,8 +140,10 @@ vi.mock("@/doc/sqlEditorClient", () => ({
     };
   }),
 }));
+let recoveryQueue = new LockedRecoveryQueue();
 vi.mock("@/offline/browserRuntime", () => ({
   getBrowserOfflineRuntime: () => ({
+    recovery: recoveryQueue,
     coordinator: {
       state: {
         get phase() {
@@ -164,6 +222,10 @@ async function changeTitle(value = "Trial ritual, edited") {
 
 afterEach(() => {
   cleanup();
+  document.documentElement.lang = "en";
+  document.documentElement.dir = "ltr";
+  document.cookie = "magickly-ui-locale=; Path=/; Max-Age=0";
+  recoveryQueue = new LockedRecoveryQueue();
   localStorage.clear();
   vi.clearAllMocks();
   mock.owner = "";
@@ -2420,4 +2482,57 @@ it("offers superseded recovered annotations for download without persisting them
     ).toBeNull(),
   );
   expect(mock.saveDraft).toHaveBeenCalledTimes(calls);
+});
+
+it("holds a document departure until the debounce-window draft is durable", async () => {
+  mock.load.mockResolvedValue(undefined);
+  let finish!: () => void;
+  mock.saveDraft.mockImplementationOnce(
+    () =>
+      new Promise<void>((resolve) => {
+        finish = resolve;
+      }),
+  );
+  const setup = props();
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  await changeTitle("Typed just before leaving");
+  const link = document.createElement("a");
+  link.href = "/about";
+  document.body.append(link);
+  onTestFinished(() => link.remove());
+  const navigate = vi.fn((event: Event) => event.preventDefault());
+  link.addEventListener("click", navigate);
+  fireEvent.click(link);
+  await waitFor(() => expect(mock.saveDraft).toHaveBeenCalledOnce());
+  expect(mock.saveDraft.mock.lastCall?.[0]).toMatchObject({
+    ownerId: setup.actorId,
+    title: "Typed just before leaving",
+  });
+  expect(navigate).not.toHaveBeenCalled();
+  await act(async () => finish());
+  await waitFor(() => expect(navigate).toHaveBeenCalledOnce());
+});
+
+it("warns during an unload only until the latest local draft is persisted", async () => {
+  mock.load.mockResolvedValue(undefined);
+  let finish!: () => void;
+  mock.saveDraft.mockImplementationOnce(
+    () =>
+      new Promise<void>((resolve) => {
+        finish = resolve;
+      }),
+  );
+  const setup = props();
+  mock.owner = setup.actorId;
+  render(<SemanticEditor {...setup} />);
+  await changeTitle("Recover this on reload");
+  const pending = new Event("beforeunload", { cancelable: true });
+  window.dispatchEvent(pending);
+  expect(pending.defaultPrevented).toBe(true);
+  await waitFor(() => expect(mock.saveDraft).toHaveBeenCalledOnce());
+  await act(async () => finish());
+  const durable = new Event("beforeunload", { cancelable: true });
+  window.dispatchEvent(durable);
+  expect(durable.defaultPrevented).toBe(false);
 });

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, ButtonGroup } from "@mui/material";
+import UiText from "@/i18n/UiText";
 import {
   RITUAL_EDITOR_LAYOUTS,
   type RitualEditorLayout,
@@ -42,7 +43,7 @@ export function RitualLayoutSwitch({
           variant={value === layout ? "contained" : "outlined"}
           onClick={() => onChoose(layout)}
         >
-          {name}
+          <UiText message={name} />
         </Button>
       ))}
     </ButtonGroup>

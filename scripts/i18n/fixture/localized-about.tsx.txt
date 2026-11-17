@@ -1,0 +1,11 @@
+import { greeting } from "../../../../messages";
+export const dynamicParams = false;
+export function generateStaticParams() {
+  return [{ locale: "he" }];
+}
+export const metadata = {
+  alternates: { canonical: "https://magick.ly/he/about" },
+};
+export default function Page() {
+  return <h1>{greeting("he")}</h1>;
+}

@@ -1,0 +1,140 @@
+import { Alert, Button } from "@mui/material";
+import { connection } from "next/server";
+import { getCurrentSqlUserId } from "@/auth/session";
+import { RITUAL_SOURCE_FORMAT } from "@/doc/compileContract";
+import {
+  type RitualSemanticDocument,
+  semanticFromJrt,
+  validateRitualSemantic,
+} from "@/doc/semantic";
+import { SEMANTIC_SOURCE_FORMAT } from "@/doc/semanticCompile";
+import {
+  createSemanticImportReport,
+  type SemanticImportReport,
+} from "@/doc/semanticImportReport";
+import { withoutEmptyText } from "@/doc/semanticNormalize";
+import { resolveSqlRitualRouteId, sqlRitualReader } from "@/doc/sqlRuntime";
+import EnglishText from "@/i18n/EnglishText";
+import { privateUiMetadata } from "@/i18n/server";
+import UiText from "@/i18n/UiText";
+import SemanticEditorShell from "../../../../../doc/[_id]/edit/semantic/SemanticEditorShell";
+
+export async function generateMetadata() {
+  return privateUiMetadata(/*i18n*/ "Edit ritual");
+}
+
+export default async function SemanticEditPage({
+  params,
+}: {
+  params: Promise<{ _id: string }>;
+}) {
+  await connection();
+  const ritualId = await resolveSqlRitualRouteId((await params)._id).catch(
+    () => null,
+  );
+  if (!ritualId)
+    return (
+      <Alert severity="info" sx={{ m: 2 }}>
+        <UiText message={/*i18n*/ "Ritual is unavailable."} />
+      </Alert>
+    );
+  const [actorId, current] = await Promise.all([
+    getCurrentSqlUserId(),
+    sqlRitualReader.getCurrentSource(ritualId),
+  ]);
+  if (!actorId || !current || !current.ritual.canEdit)
+    return (
+      <Alert severity="info" sx={{ m: 2 }}>
+        <UiText message={/*i18n*/ "Ritual editing is unavailable."} />
+      </Alert>
+    );
+  let document: RitualSemanticDocument;
+  let importReport: SemanticImportReport | undefined;
+  try {
+    if (current.revision.sourceFormat === SEMANTIC_SOURCE_FORMAT) {
+      const value: unknown = JSON.parse(current.revision.source);
+      if (validateRitualSemantic(value).length)
+        return (
+          <Alert severity="error" sx={{ m: 2 }}>
+            <UiText
+              message={
+                /*i18n*/ "This semantic revision needs repair before editing."
+              }
+            />
+          </Alert>
+        );
+      document = value as RitualSemanticDocument;
+    } else if (current.revision.sourceFormat === RITUAL_SOURCE_FORMAT) {
+      const rendered = await sqlRitualReader.getRendered(ritualId);
+      const latest = await sqlRitualReader.getCurrentSource(ritualId);
+      if (
+        !rendered ||
+        !latest ||
+        latest.currentRevisionId !== current.currentRevisionId ||
+        latest.version !== current.version
+      )
+        return (
+          <Alert severity="info" sx={{ m: 2 }}>
+            <UiText
+              message={
+                /*i18n*/ "This ritual changed while opening the editor. Reload to use its current revision."
+              }
+            />
+          </Alert>
+        );
+      const jrt: unknown = JSON.parse(rendered.contentJson);
+      document = semanticFromJrt(jrt);
+      importReport = createSemanticImportReport(jrt, document);
+      if (!importReport.lossless)
+        return (
+          <Alert severity="error" sx={{ m: 2 }}>
+            <EnglishText>
+              This ritual could not be converted without changing its reader
+              tree. Its saved revision is unchanged.
+            </EnglishText>
+            <Button href={`/doc/${ritualId}/edit?legacy=1`}>
+              <UiText message={/*i18n*/ "Open Pug editor"} />
+            </Button>
+          </Alert>
+        );
+    } else {
+      return (
+        <Alert severity="info" sx={{ m: 2 }}>
+          <UiText
+            message={
+              /*i18n*/ "This source format is not supported by the new editor."
+            }
+          />
+        </Alert>
+      );
+    }
+  } catch {
+    return (
+      <Alert severity="error" sx={{ m: 2 }}>
+        <EnglishText>The ritual could not be converted safely.</EnglishText>
+        {current.revision.sourceFormat === RITUAL_SOURCE_FORMAT && (
+          <Button href={`/doc/${ritualId}/edit?legacy=1`}>
+            <UiText message={/*i18n*/ "Open Pug editor"} />
+          </Button>
+        )}
+      </Alert>
+    );
+  }
+  // After the import report's exact check: empty text renders nothing.
+  document = withoutEmptyText(document);
+  return (
+    <SemanticEditorShell
+      key={ritualId}
+      ritualId={ritualId}
+      actorId={actorId}
+      title={current.ritual.title}
+      revisionId={current.currentRevisionId}
+      parentVersion={current.version}
+      initialDocument={document}
+      importReport={importReport}
+      importedFromLegacy={
+        current.revision.sourceFormat === RITUAL_SOURCE_FORMAT
+      }
+    />
+  );
+}

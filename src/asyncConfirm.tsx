@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import React from "react";
+import UiText from "@/i18n/UiText";
 
 const state: {
   resolve: ((value: boolean | PromiseLike<boolean>) => void) | null;
@@ -56,18 +57,22 @@ export function ConfirmDialog() {
       aria-describedby="alert-dialog-description"
       keepMounted
     >
-      {title && <DialogTitle id="alert-dialog-title">{title}</DialogTitle>}
+      {title && (
+        <DialogTitle id="alert-dialog-title">
+          <UiText message={title} />
+        </DialogTitle>
+      )}
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          {text}
+          <UiText message={text} />
         </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button variant="outlined" onClick={close(false)}>
-          {cancelText || `Cancel`}
+          <UiText message={cancelText || /*i18n*/ "Cancel"} />
         </Button>
         <Button variant="contained" onClick={close(true)} autoFocus>
-          {okText || `OK`}
+          <UiText message={okText || /*i18n*/ "OK"} />
         </Button>
       </DialogActions>
     </Dialog>

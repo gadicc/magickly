@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import ts from "typescript";
+import { pageSourceForRoute } from "../../src/i18n/routePlacement";
 
 /** The named references the app's JSX uses, as the browser shows them. */
 const NAMED_REFERENCES: Record<string, string> = {
@@ -116,6 +117,12 @@ export function pageProse(root: string, path: string): string {
       if (child && child.startsWith(resolve(root, "src") + "/")) read(child);
     }
   }
-  read(resolve(root, "src/app", path.slice(1), "page.tsx"));
+  const placement = pageSourceForRoute(path);
+  const grouped = placement ? resolve(root, "src/app", placement) : null;
+  read(
+    grouped && existsSync(grouped)
+      ? grouped
+      : resolve(root, "src/app", path.slice(1), "page.tsx"),
+  );
   return [...new Set(texts)].join("\n\n");
 }

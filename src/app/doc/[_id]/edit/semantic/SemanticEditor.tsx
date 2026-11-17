@@ -74,7 +74,11 @@ import {
   visualRitualState,
 } from "@/doc/tiptapRitual";
 import { ritualTiptapClientExtensions } from "@/doc/tiptapRitualClient";
+import { useDraftDeparture } from "@/doc/useDraftDeparture";
 import { useRitualEditorLayout } from "@/doc/useRitualEditorLayout";
+import EnglishText from "@/i18n/EnglishText";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
+import UiText from "@/i18n/UiText";
 import { createUuidV7 } from "@/lib/ids";
 import { getBrowserOfflineRuntime } from "@/offline/browserRuntime";
 import Link from "@/ui/Link";
@@ -98,11 +102,16 @@ const RitualAccessDialog = React.lazy(() =>
       return (
         <Dialog open onClose={onClose}>
           <DialogContent>
-            Who can read this ritual could not be loaded. Check your connection
-            and try again.
+            <UiText
+              message={
+                /*i18n*/ "Who can read this ritual could not be loaded. Check your connection and try again."
+              }
+            />
           </DialogContent>
           <DialogActions>
-            <Button onClick={onClose}>Close</Button>
+            <Button onClick={onClose}>
+              <UiText message={/*i18n*/ "Close"} />
+            </Button>
           </DialogActions>
         </Dialog>
       );
@@ -126,11 +135,16 @@ const DeleteRitualDialog = React.lazy(() =>
       return (
         <Dialog open onClose={onClose}>
           <DialogContent>
-            Deleting this ritual could not be loaded. Check your connection and
-            try again.
+            <UiText
+              message={
+                /*i18n*/ "Deleting this ritual could not be loaded. Check your connection and try again."
+              }
+            />
           </DialogContent>
           <DialogActions>
-            <Button onClick={onClose}>Close</Button>
+            <Button onClick={onClose}>
+              <UiText message={/*i18n*/ "Close"} />
+            </Button>
           </DialogActions>
         </Dialog>
       );
@@ -161,6 +175,8 @@ function downloadDraft(draft: SemanticDraft) {
 }
 
 export default function SemanticEditor(props: SemanticEditorProps) {
+  const { t: translateUi } = useUiLanguage();
+
   const [document, setDocument] = React.useState(props.initialDocument);
   const [source, setSource] = React.useState<SourceState>(() => ({
     text: printRitualSource(props.initialDocument),
@@ -294,12 +310,20 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   const liveDraft = React.useRef<SemanticDraft | null>(null);
   const draftScheduled = React.useRef(false);
   const draftWrites = React.useRef<Promise<void>>(Promise.resolve());
+  const pendingDraftWrites = React.useRef(0);
+  const durableDraft = React.useRef<SemanticDraft | null>(null);
+  const recoveryQueue = React.useRef<
+    ReturnType<typeof getBrowserOfflineRuntime>["recovery"] | null
+  >(null);
   const draftWriteVersion = React.useRef(0);
   const accessGeneration = React.useRef(0);
 
   const queueDraftWrite = React.useCallback(
     (operation: () => Promise<unknown>) => {
-      const next = draftWrites.current.then(operation);
+      pendingDraftWrites.current++;
+      const next = draftWrites.current.then(operation).finally(() => {
+        pendingDraftWrites.current--;
+      });
       draftWrites.current = next.then(
         () => {},
         () => {},
@@ -309,12 +333,53 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     [],
   );
 
+  useDraftDeparture({
+    pending: () =>
+      Boolean(
+        manualRecoveryDraft ||
+          pendingDraftWrites.current ||
+          recoveryQueue.current?.state.pending ||
+          (!skipPersist.current &&
+            liveDraft.current &&
+            liveDraft.current !== durableDraft.current),
+      ),
+    flush: async () => {
+      if (manualRecoveryDraft)
+        throw new Error("Download the retained recovery draft before leaving.");
+      const snapshot = liveDraft.current;
+      if (
+        !skipPersist.current &&
+        snapshot &&
+        snapshot !== durableDraft.current
+      ) {
+        draftWriteVersion.current++;
+        draftScheduled.current = false;
+        await queueDraftWrite(async () => {
+          await saveSemanticDraft(snapshot);
+          durableDraft.current = snapshot;
+        });
+      }
+      await draftWrites.current;
+      const recovery = recoveryQueue.current;
+      if (recovery?.state.pending) {
+        await recovery.retry();
+        if (recovery.state.pending)
+          throw new Error("Local recovery could not be persisted.");
+      }
+    },
+    failed: () =>
+      setError(
+        "Local edits could not be saved. Correct unfinished fields or download recovery before leaving.",
+      ),
+  });
+
   const editor = useEditor({
     extensions: ritualTiptapClientExtensions,
     content: initialVisual.content,
     immediatelyRender: false,
     editorProps: {
       attributes: {
+        dir: "ltr",
         role: "textbox",
         "aria-label": "Ritual visual editor",
         "aria-multiline": "true",
@@ -420,8 +485,15 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       seenReady = true;
       accessGeneration.current++;
       const recovery = liveDraft.current;
-      if (recovery)
-        void saveSemanticDraft(structuredClone(recovery)).catch(() => {});
+      if (recovery) {
+        const snapshot = structuredClone(recovery);
+        runtime?.recovery.add({
+          persist: async () => {
+            await draftWrites.current;
+            await saveSemanticDraft(snapshot);
+          },
+        });
+      }
       liveDraft.current = null;
       skipPersist.current = true;
       editor.setEditable(false);
@@ -535,6 +607,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     };
     try {
       runtime = getBrowserOfflineRuntime();
+      recoveryQueue.current = runtime.recovery;
       const current = runtime;
       void (async () => {
         await current.start();
@@ -733,21 +806,12 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       draftScheduled.current = false;
       if (skipPersist.current || writeVersion !== draftWriteVersion.current)
         return;
-      const draft: SemanticDraft = {
-        ownerId: props.actorId,
-        ritualId: props.ritualId,
-        baseRevisionId: base.revisionId,
-        baseVersion: base.version,
-        title,
-        documentJson: stringify(document),
-        sourceBuffer: source.text,
-        sourceDialect: source.dialect,
-        sourceDirty: source.dirty,
-        sourceConflict: source.conflict,
-        pending,
-        updatedAt: Date.now(),
-      };
-      void queueDraftWrite(() => saveSemanticDraft(draft)).catch(() =>
+      const draft = liveDraft.current;
+      if (!draft) return;
+      void queueDraftWrite(async () => {
+        await saveSemanticDraft(draft);
+        durableDraft.current = draft;
+      }).catch(() =>
         setError(
           "The local draft could not be saved. Download a recovery copy.",
         ),
@@ -771,12 +835,25 @@ export default function SemanticEditor(props: SemanticEditorProps) {
     () => () => {
       // Leaving the page cancels the debounce; keep its edits recoverable.
       const draft = liveDraft.current;
-      if (draftScheduled.current && draft && !skipPersist.current)
-        void queueDraftWrite(() =>
-          saveSemanticDraft({ ...draft, updatedAt: Date.now() }),
-        ).catch(() => {});
+      if (draft && draft !== durableDraft.current && !skipPersist.current) {
+        const snapshot = structuredClone(draft);
+        const version = draftWriteVersion.current;
+        const persist = async () => {
+          await draftWrites.current;
+          if (
+            skipPersist.current ||
+            version !== draftWriteVersion.current ||
+            draft === durableDraft.current
+          )
+            return;
+          await saveSemanticDraft(snapshot);
+          durableDraft.current = draft;
+        };
+        if (recoveryQueue.current) recoveryQueue.current.add({ persist });
+        else void persist().catch(() => {});
+      }
     },
-    [queueDraftWrite],
+    [],
   );
 
   const currentDraft = (): SemanticDraft => ({
@@ -1137,15 +1214,19 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   if (reloadRequired)
     return (
       <Alert severity="success" sx={{ m: 2 }}>
-        {manualRecoveryDraft
-          ? "The pending save is confirmed, but local recovery changed. Download this draft before reloading."
-          : "The pending save is confirmed. Reload this page to open the current revision."}
+        <UiText
+          message={
+            manualRecoveryDraft
+              ? /*i18n*/ "The pending save is confirmed, but local recovery changed. Download this draft before reloading."
+              : /*i18n*/ "The pending save is confirmed. Reload this page to open the current revision."
+          }
+        />
         {manualRecoveryDraft && (
           <Button
             disabled={access !== "ready"}
             onClick={() => downloadDraft(manualRecoveryDraft)}
           >
-            Download recovered draft
+            <UiText message={/*i18n*/ "Download recovered draft"} />
           </Button>
         )}
       </Alert>
@@ -1153,24 +1234,30 @@ export default function SemanticEditor(props: SemanticEditorProps) {
   if (recoveryBlocked)
     return (
       <Alert severity="error" sx={{ m: 2 }}>
-        The local draft could not be loaded. Reload this page before editing.
+        <UiText
+          message={
+            /*i18n*/ "The local draft could not be loaded. Reload this page before editing."
+          }
+        />
       </Alert>
     );
   if (!editor || !ready)
     return (
       <Typography color="textSecondary" sx={{ p: 2 }}>
-        Verifying account and loading local draft…
+        <UiText
+          message={/*i18n*/ "Verifying account and loading local draft…"}
+        />
       </Typography>
     );
   const saveStatus = saving
-    ? "Saving…"
+    ? /*i18n*/ "Saving…"
     : publishing
-      ? "Publishing…"
+      ? /*i18n*/ "Publishing…"
       : pending
-        ? "Save not confirmed"
+        ? /*i18n*/ "Save not confirmed"
         : unsaved
-          ? "Unsaved changes"
-          : "Saved";
+          ? /*i18n*/ "Unsaved changes"
+          : /*i18n*/ "Saved";
   return (
     <Box
       className={styles.surface}
@@ -1182,7 +1269,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         <TextField
           className={styles.title}
           variant="standard"
-          placeholder="Untitled ritual"
+          placeholder={translateUi(/*i18n*/ "Untitled ritual")}
           value={title}
           // Read-only, not disabled, while saving: no grey flash on every save.
           disabled={access !== "ready" || retryPending || !!stale}
@@ -1191,7 +1278,11 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             setTitle(event.target.value);
           }}
           slotProps={{
-            htmlInput: { "aria-label": "Title", readOnly: !!pending },
+            htmlInput: {
+              "aria-label": translateUi(/*i18n*/ "Title"),
+              dir: "auto",
+              readOnly: !!pending,
+            },
             input: { sx: { fontSize: "1.25rem" } },
           }}
         />
@@ -1206,10 +1297,10 @@ export default function SemanticEditor(props: SemanticEditorProps) {
               : undefined
           }
         >
-          {saveStatus}
+          <UiText message={saveStatus} />
         </Typography>
         <RitualLayoutSwitch
-          label="Editor layout"
+          label={translateUi(/*i18n*/ "Editor layout")}
           value={displayMode}
           onChoose={chooseMode}
           withoutSplit={narrow}
@@ -1247,10 +1338,12 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           title={`Save (${modifierLabel}S)`}
           onClick={saveWithPending}
         >
-          {retryPending ? "Retry save" : "Save"}
+          <UiText
+            message={retryPending ? /*i18n*/ "Retry save" : /*i18n*/ "Save"}
+          />
         </EditorActionButton>
         <IconButton
-          aria-label="More editor actions"
+          aria-label={translateUi(/*i18n*/ "More editor actions")}
           aria-haspopup="menu"
           aria-expanded={!!menuAnchor || undefined}
           onClick={(event) => setMenuAnchor(event.currentTarget)}
@@ -1269,14 +1362,14 @@ export default function SemanticEditor(props: SemanticEditorProps) {
               downloadDraft(currentDraft());
             }}
           >
-            Download draft
+            <UiText message={/*i18n*/ "Download draft"} />
           </MenuItem>
           <MenuItem
             component={Link}
             href={`/doc/${props.ritualId}`}
             onClick={() => setMenuAnchor(null)}
           >
-            View ritual
+            <UiText message={/*i18n*/ "View ritual"} />
           </MenuItem>
           <MenuItem
             onClick={() => {
@@ -1284,7 +1377,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
               setAccessOpen(true);
             }}
           >
-            Who can read this ritual…
+            <UiText message={/*i18n*/ "Who can read this ritual…"} />
           </MenuItem>
           <MenuItem
             sx={{ color: "error.main" }}
@@ -1293,7 +1386,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
               setDeleteOpen(true);
             }}
           >
-            Delete ritual…
+            <UiText message={/*i18n*/ "Delete ritual…"} />
           </MenuItem>
           <MenuItem
             component="a"
@@ -1302,7 +1395,9 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             rel="noopener noreferrer"
             onClick={() => setMenuAnchor(null)}
           >
-            Ritual Pug guide (opens in a new tab)
+            <UiText
+              message={/*i18n*/ "Ritual Pug guide (opens in a new tab)"}
+            />
           </MenuItem>
         </Menu>
         {accessOpen && (
@@ -1331,15 +1426,20 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       <div className={styles.notices}>
         {props.importedFromLegacy && conversionNotice && (
           <Alert severity="info" onClose={() => setConversionNotice(false)}>
-            This is a semantic conversion of the current Pug revision. Saving
-            creates a new revision; the original source remains in history.
+            <UiText
+              message={
+                /*i18n*/ "This is a semantic conversion of the current Pug revision. Saving creates a new revision; the original source remains in history."
+              }
+            />
           </Alert>
         )}
         {props.importReport && props.importReport.opaqueCount > 0 && (
           <Alert severity="warning">
-            {props.importReport.opaqueCount} unsupported legacy blocks are
-            preserved. Inspect them in ritual source; they cannot be edited
-            visually.
+            {props.importReport.opaqueCount}{" "}
+            <EnglishText>
+              unsupported legacy blocks are preserved. Inspect them in ritual
+              source; they cannot be edited visually.
+            </EnglishText>
           </Alert>
         )}
         {visualIssue && (
@@ -1357,7 +1457,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                     }))
                   }
                 >
-                  Show line {issueLine}
+                  <EnglishText>Show line</EnglishText> {issueLine}
                 </Button>
               ) : undefined
             }
@@ -1367,7 +1467,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
               ` The first structure that needs source editing is on line ${issueLine}.`}
             {props.importedFromLegacy && (
               <Button href={`/doc/${props.ritualId}/edit?legacy=1`}>
-                Open Pug editor
+                <UiText message={/*i18n*/ "Open Pug editor"} />
               </Button>
             )}
           </Alert>
@@ -1399,7 +1499,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                         } else show();
                       }}
                     >
-                      Show line {line}
+                      <EnglishText>Show line</EnglishText> {line}
                     </Button>
                   ) : undefined
                 }
@@ -1409,7 +1509,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                   : `${count} structures can only be edited in ritual source; they appear as “Needs source editing” blocks.`}
                 {props.importedFromLegacy && (
                   <Button href={`/doc/${props.ritualId}/edit?legacy=1`}>
-                    Open Pug editor
+                    <UiText message={/*i18n*/ "Open Pug editor"} />
                   </Button>
                 )}
               </Alert>
@@ -1417,22 +1517,24 @@ export default function SemanticEditor(props: SemanticEditorProps) {
           })()}
         {stale && (
           <Alert severity="warning">
-            A local draft needs recovery or belongs to an older revision. Review
-            it before editing this ritual.{" "}
+            <EnglishText>
+              A local draft needs recovery or belongs to an older revision.
+              Review it before editing this ritual.
+            </EnglishText>{" "}
             <Button
               disabled={access !== "ready"}
               onClick={() => {
                 if (access === "ready") downloadDraft(stale);
               }}
             >
-              Download draft
+              <UiText message={/*i18n*/ "Download draft"} />
             </Button>{" "}
             {stale.pending && (
               <Button
                 disabled={access !== "ready" || saving}
                 onClick={confirmStalePending}
               >
-                Confirm pending save
+                <UiText message={/*i18n*/ "Confirm pending save"} />
               </Button>
             )}{" "}
             <Button
@@ -1447,7 +1549,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                 );
               }}
             >
-              Discard local draft
+              <UiText message={/*i18n*/ "Discard local draft"} />
             </Button>
           </Alert>
         )}
@@ -1460,7 +1562,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                 if (access === "ready") downloadDraft(stale ?? currentDraft());
               }}
             >
-              Download draft
+              <UiText message={/*i18n*/ "Download draft"} />
             </Button>
           </Alert>
         )}
@@ -1474,25 +1576,30 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         )}
         {retryPending && (
           <Alert severity="warning">
-            A save is pending. Retry it unchanged before making another edit.
+            <UiText
+              message={
+                /*i18n*/ "A save is pending. Retry it unchanged before making another edit."
+              }
+            />
           </Alert>
         )}
       </div>
-      <Box className={styles.panels} data-layout={displayMode}>
+      <Box className={styles.panels} data-layout={displayMode} dir="ltr">
         {displayMode !== "visual" && (
           <section
+            dir="ltr"
             className={`${styles.sourcePanel} ${linkedCaret.panel}`}
-            aria-label="Semantic source panel"
+            aria-label={translateUi(/*i18n*/ "Semantic source panel")}
             data-linked-caret={hallLink.marked || undefined}
             onFocus={hallLink.onSourceFocus}
           >
             {source.dialect === "ritual-text" && (
               <Alert severity="info">
-                This older Ritual Text draft is being recovered. Correct or
-                resolve its source changes to convert it to Pug. Pending saves
-                must be confirmed first. Download the draft to keep its original
-                recovery buffer before changing it. Ritual Text uses command
-                lines and quoted text fragments.
+                <UiText
+                  message={
+                    /*i18n*/ "This older Ritual Text draft is being recovered. Correct or resolve its source changes to convert it to Pug. Pending saves must be confirmed first. Download the draft to keep its original recovery buffer before changing it. Ritual Text uses command lines and quoted text fragments."
+                  }
+                />
               </Alert>
             )}
             <RitualSourceEditor
@@ -1508,17 +1615,23 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                     component="h2"
                     className={styles.panelTitle}
                   >
-                    Ritual source
+                    <UiText message={/*i18n*/ "Ritual source"} />
                   </Typography>
                   {source.dialect === "pug" && (
-                    <Tooltip title="Pug uses indentation for blocks and #[…] for inline formatting. Valid edits update the visual panel as you type.">
+                    <Tooltip
+                      title={translateUi(
+                        /*i18n*/ "Pug uses indentation for blocks and #[…] for inline formatting. Valid edits update the visual panel as you type.",
+                      )}
+                    >
                       <IconButton
                         size="small"
                         component={Link}
                         href="/help/ritual-pug"
                         target="_blank"
                         rel="noopener noreferrer"
-                        aria-label="Ritual Pug guide (opens in a new tab)"
+                        aria-label={translateUi(
+                          /*i18n*/ "Ritual Pug guide (opens in a new tab)",
+                        )}
                       >
                         <HelpOutlined fontSize="small" />
                       </IconButton>
@@ -1543,14 +1656,19 @@ export default function SemanticEditor(props: SemanticEditorProps) {
             />
             {sourceError?.source === source.text && (
               <Alert severity="warning">
-                {sourceError.message}. The visual panel shows the last valid
-                source.
+                {sourceError.message}
+                <EnglishText>
+                  . The visual panel shows the last valid source.
+                </EnglishText>
               </Alert>
             )}
             {source.conflict && (
               <Alert severity="warning">
-                Both panels changed. Apply source to replace visual changes, or
-                discard source changes.
+                <UiText
+                  message={
+                    /*i18n*/ "Both panels changed. Apply source to replace visual changes, or discard source changes."
+                  }
+                />
               </Alert>
             )}
             <Box className={styles.sourceActions}>
@@ -1561,7 +1679,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                     access !== "ready" || !source.dirty || !!pending || !!stale
                   }
                 >
-                  Apply source
+                  <UiText message={/*i18n*/ "Apply source"} />
                 </Button>
               )}
               <EditorActionButton
@@ -1594,7 +1712,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
                 }}
                 disabled={access !== "ready" || !!pending || !!stale}
               >
-                Discard source changes
+                <UiText message={/*i18n*/ "Discard source changes"} />
               </EditorActionButton>
             </Box>
           </section>
@@ -1602,7 +1720,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
         {displayMode !== "source" && (
           <section
             className={styles.visualPanel}
-            aria-label="Visual editor panel"
+            aria-label={translateUi(/*i18n*/ "Visual editor panel")}
             aria-busy={(sourceSyncing && !sourceProblem) || undefined}
             onFocus={hallLink.onVisualFocus}
           >
@@ -1631,7 +1749,7 @@ export default function SemanticEditor(props: SemanticEditorProps) {
       </Box>
       <Snackbar
         open={!!notice}
-        message={notice}
+        message={<UiText message={notice} />}
         autoHideDuration={6000}
         onClose={(_event, reason) => {
           if (reason !== "clickaway") setNotice(null);

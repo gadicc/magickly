@@ -1,0 +1,23 @@
+import { pageSearchParams } from "@/lib/pageSearchParams";
+import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
+import { pageMetadata } from "@/seo/metadata";
+import { sigilFromSearchParams } from "../../../gd/sigils/sigilState";
+import Sigils from "../../../gd/sigils/sigils";
+
+export const metadata = pageMetadata("/gd/sigils");
+
+/** Shared sigil text is resolved on the server; the page never writes it back to the URL. */
+export default async function SigilsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return (
+    <>
+      <PageBreadcrumbs path="/gd/sigils" />
+      <Sigils
+        initial={sigilFromSearchParams(pageSearchParams(await searchParams))}
+      />
+    </>
+  );
+}

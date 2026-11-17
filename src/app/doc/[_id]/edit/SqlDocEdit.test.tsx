@@ -105,6 +105,9 @@ function deferred<T>() {
   return { promise, reject, resolve };
 }
 const runtime = {
+  get recovery() {
+    return recoveryQueue;
+  },
   start: vi.fn().mockResolvedValue(undefined),
   refreshVerifiedAccount: vi.fn().mockResolvedValue(true),
   subscribeState: vi.fn((listener: (state: RuntimeState) => void) => {
@@ -1247,4 +1250,37 @@ it("moves an acknowledged create handoff into the gated outbox before publicatio
   expect(
     localStorage.getItem(creationPublicationHandoffKey(ids.owner, ids.ritualA)),
   ).toBeNull();
+});
+
+it("awaits the latest source draft before following an app-bar style link", async () => {
+  const stored = deferred<{
+    id: string;
+    localVersion: number;
+    conflict: boolean;
+  }>();
+  render(<SqlDocEdit ritualId={ids.ritualA} />);
+  const input = await screen.findByLabelText("Ritual source");
+  mock.preserve.mockClear();
+  mock.preserve.mockImplementationOnce(() => stored.promise);
+  fireEvent.input(input, { target: { value: "p Typed before leaving" } });
+  const link = document.createElement("a");
+  link.href = "/about";
+  document.body.append(link);
+  const navigate = vi.fn((event: Event) => event.preventDefault());
+  link.addEventListener("click", navigate);
+  try {
+    fireEvent.click(link);
+    await waitFor(() => expect(mock.preserve).toHaveBeenCalledOnce());
+    expect(mock.preserve.mock.lastCall?.[0]).toMatchObject({
+      ownerId: ids.owner,
+      source: "p Typed before leaving",
+    });
+    expect(navigate).not.toHaveBeenCalled();
+    await act(async () =>
+      stored.resolve({ id: ids.ritualB, localVersion: 1, conflict: false }),
+    );
+    await waitFor(() => expect(navigate).toHaveBeenCalledOnce());
+  } finally {
+    link.remove();
+  }
 });

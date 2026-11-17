@@ -1,0 +1,45 @@
+import { isBetterAuthLocalTestLoginEnabled } from "@gadicc/loom/next/auth";
+import { Container, Typography } from "@mui/material";
+import { safeAuthCallbackURL } from "@/auth/callbackURL";
+import { privateUiMetadata } from "@/i18n/server";
+import UiText from "@/i18n/UiText";
+import SignInButton from "../../signin/SignInButton";
+
+export async function generateMetadata() {
+  return privateUiMetadata(/*i18n*/ "Sign In");
+}
+
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackURL?: string; callbackUrl?: string }>;
+}) {
+  const query = await searchParams;
+  const callbackURL = safeAuthCallbackURL(
+    query.callbackURL ?? query.callbackUrl,
+  );
+  return (
+    <Container maxWidth="sm" sx={{ my: 4 }}>
+      <Typography variant="h4" component="h1" gutterBottom>
+        <UiText message={/*i18n*/ "Sign in to Magickly"} />
+      </Typography>
+      <Typography sx={{ mb: 3 }}>
+        <UiText
+          message={
+            /*i18n*/ "Use the same Google account as before to find your temples, rituals and study progress."
+          }
+        />
+      </Typography>
+      <SignInButton
+        callbackURL={callbackURL}
+        localTestLoginEnabled={isBetterAuthLocalTestLoginEnabled(process.env)}
+        showLocalTestAdmin={process.env.MAGICKLI_LOCAL_ACCEPTANCE === "1"}
+        localTestSeedCommand={
+          process.env.MAGICKLI_LOCAL_ACCEPTANCE === "1"
+            ? "local-acceptance:seed"
+            : "local-development:seed"
+        }
+      />
+    </Container>
+  );
+}

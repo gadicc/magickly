@@ -1,0 +1,19 @@
+import { connection } from "next/server";
+import Document from "../../../../Document";
+import { preference } from "../../../../preference";
+import { resolveReader } from "../../../../reader";
+export default async function Layout({ children, params }) {
+  await connection();
+  const result = await resolveReader((await params).id);
+  return (
+    <Document
+      locale={
+        result.kind === "public" || result.kind === "deleted"
+          ? "en"
+          : await preference()
+      }
+    >
+      {children}
+    </Document>
+  );
+}

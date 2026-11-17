@@ -1,0 +1,10 @@
+import Document from "../../Document";
+import { preference } from "../../preference";
+export const metadata = { robots: { index: false } };
+export default async function Layout({ children }) {
+  return (
+    <Document locale={await preference()} editor>
+      {children}
+    </Document>
+  );
+}

@@ -14,9 +14,9 @@ export const RITUAL_EDITOR_LAYOUTS: readonly (readonly [
   RitualEditorLayout,
   string,
 ])[] = [
-  ["source", "Source"],
-  ["split", "Split"],
-  ["visual", "Visual"],
+  ["source", /*i18n*/ "Source"],
+  ["split", /*i18n*/ "Split"],
+  ["visual", /*i18n*/ "Visual"],
 ];
 
 /**
