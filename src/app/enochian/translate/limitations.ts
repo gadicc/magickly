@@ -13,7 +13,7 @@ export type TranslationMode = "lookup" | "ai";
 
 /**
  * The translator's limitations, per mode of translation (plan 081,
- * decision 20). The lookup's six hold for both directions, and the page
+ * decision 20). The lookup's seven hold for both directions, and the page
  * shows them once, whichever direction it reads in; the AI reading's five
  * (S8) are shown with its card. Plan 081 quotes both lists word for word,
  * in this order.
@@ -28,6 +28,7 @@ export const TRANSLATOR_LIMITATIONS: Readonly<
     "Joined words are split by a rule from our notes. Each split is marked, and outside Dee's own text it may be wrong.",
     "Meanings and rules come from Dee, Laycock and Leitch, and some from later traditions (Schueler, the Golden Dawn). Each is labelled with its source.",
     "The lookup runs in your browser, and your text stays in the page's address after the # sign, which isn't sent anywhere. Only an AI reading sends it, when you ask for one.",
+    "A gap may show a related word. It is suggested by a machine from how close the meanings are, it is never put into the translation, and no one has reviewed it.",
   ],
   ai: [
     "It is made by a language model (GPT-6.1 Terra) given our dictionary, Dee's Keys and our grammar notes; it can be wrong, and no one who reads Enochian has reviewed it.",

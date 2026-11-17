@@ -46,7 +46,8 @@ export default function TranslatorText() {
         </li>
         <li>
           a <b>gap</b>, for a word we have no Enochian for, with the nearest
-          forms we have when there are any.
+          forms we have when there are any, and sometimes a related word: a
+          machine&apos;s suggestion from meanings, never put in the translation.
         </li>
       </List>
       <p>

@@ -352,8 +352,11 @@ function auxiliaryBefore(previous: string | undefined, next: string): boolean {
   return !DETERMINERS.has(next) && !WH_WORDS.has(next) && !MODALS.has(next);
 }
 
-/** A word that carries meaning of its own: what "her" must come before. */
-function isContent(word: string | undefined) {
+/**
+ * A word that carries meaning of its own: what "her" must come before,
+ * and the only kind of gap a hint is offered for (plan 081, S11).
+ */
+export function isContent(word: string | undefined) {
   return (
     word !== undefined &&
     ![
@@ -590,6 +593,24 @@ function fromDictionary(
       option(lookup, other, dictionarySource(lookup, theirs)),
     ),
   };
+}
+
+/**
+ * The forms one of our glosses leads to, best first, as a tile offers
+ * them (decision 8): Dee's forms for it, then the dictionary's; none
+ * when no gloss is exactly that English. A gap's hint shows them
+ * (plan 081, S11), and the hint table's script lists them the same way.
+ */
+export function glossOptions(lookup: Lookup, gloss: string): FormOption[] {
+  const words = coreWords(englishWords(gloss));
+  if (!words.length) return [];
+  const hits = hitsFor(lookup.tiers.literal[0], words, true);
+  if (!hits.length) return [];
+  const fromKeys = hits.filter((hit) => hit.origin.kind === "key");
+  const found = fromKeys.length
+    ? fromDee(lookup, 1, fromKeys, hits)
+    : fromDictionary(lookup, 1, hits);
+  return [option(lookup, found.form, found.source), ...found.alternatives];
 }
 
 /** Dee's rows by each key of their English, built once per index. */

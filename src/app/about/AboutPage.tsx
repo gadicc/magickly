@@ -200,6 +200,20 @@ export default function AboutPage() {
               }}
             />
           </li>
+          <li>
+            <UiRichText
+              message={
+                /*i18n*/ "The English words behind the related-word hints on the <0>Enochian translator</0>: from <1>SCOWL</1> (Spell Checking Oriented Word Lists), Copyright © 2000-2018 Kevin Atkinson and the others its notice names, used under that notice, which is given in full in the <2>hints' README</2>. We kept only the common words the translator has no Enochian for."
+              }
+              components={{
+                0: <Link href="/enochian/translate" />,
+                1: <a href="http://wordlist.aspell.net/" />,
+                2: (
+                  <a href="https://github.com/gadicc/magickly/blob/main/src/app/enochian/translate/hints/README.md" />
+                ),
+              }}
+            />
+          </li>
         </ul>
 
         <h2 id="location">

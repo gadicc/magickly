@@ -33,7 +33,7 @@ describe("the lookup's limitations (plan 081, decision 20)", () => {
     expect(
       bullets(
         plan,
-        "to say it of the lookup (S9, step 2E):",
+        "and one added for the gap hints (S9, step 2F):",
         "21. **Figures, script-only**",
       ),
     ).toEqual(TRANSLATOR_LIMITATIONS.lookup.map(flat));

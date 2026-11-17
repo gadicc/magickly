@@ -10,6 +10,7 @@ import {
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { USES_URL } from "../dictionary/InTheKeys";
+import { forgetHints, HINTS_URL } from "./hints/load";
 import { buildKeysTable } from "./keysTable";
 import { TRANSLATOR_LIMITATIONS } from "./limitations";
 import { forgetTranslator } from "./load";
@@ -29,7 +30,10 @@ const notes = lookupRuleNotes();
 
 /** Every request the page made: its URL and anything sent with it. */
 let requests: { url: string; init?: RequestInit }[] = [];
-/** Serves the real slim Keys table, as the route does. */
+/**
+ * Serves the real slim Keys table, as the route does, and an empty hint
+ * table (`hints.interaction.test.tsx` tests the hints).
+ */
 function serveTable(fail = false) {
   vi.stubGlobal(
     "fetch",
@@ -38,6 +42,7 @@ function serveTable(fail = false) {
       if (fail) return new Response("", { status: 503 });
       if (String(url) === KEYS_TABLE_URL) return Response.json(TABLE);
       if (String(url) === USES_URL) return Response.json({});
+      if (String(url) === HINTS_URL) return Response.json({ hints: [] });
       return new Response("", { status: 404 });
     }),
   );
@@ -47,6 +52,7 @@ beforeEach(() => {
   window.history.replaceState(null, "", PATH);
   requests = [];
   forgetTranslator();
+  forgetHints();
   serveTable();
 });
 afterEach(() => {
@@ -111,7 +117,9 @@ describe("the translator page (plan 081, step E)", () => {
     await waitFor(() => expect(tiles()).toHaveLength(1));
     type("I reign over you");
     await waitFor(() => expect(liveRegion(container)).toMatch(/3 forms/));
-    expect(requests.map((one) => one.url)).toEqual([KEYS_TABLE_URL]);
+    // The hint table comes with the first English result, whatever it
+    // holds (plan 081, S11).
+    expect(requests.map((one) => one.url)).toEqual([KEYS_TABLE_URL, HINTS_URL]);
     // Only the origin as its referrer, wherever the page is loaded from.
     expect(requests[0].init?.referrerPolicy).toBe("origin");
   });
@@ -127,11 +135,12 @@ describe("the translator page (plan 081, step E)", () => {
       vi.advanceTimersByTime(400);
     });
     await waitFor(() => expect(tiles().length).toBeGreaterThan(0));
-    // Open a tile: the entry's "In the Keys" fetches its map, also blind.
+    // Open a tile: the entry's "In the Keys" fetches its map, also blind;
+    // the result fetches the whole hint table, blind too.
     fireEvent.click(results().querySelector(".tr-open") as HTMLElement);
-    await waitFor(() => expect(requests.length).toBe(2));
+    await waitFor(() => expect(requests.length).toBe(3));
     for (const { url, init } of requests) {
-      expect([KEYS_TABLE_URL, USES_URL]).toContain(url);
+      expect([KEYS_TABLE_URL, USES_URL, HINTS_URL]).toContain(url);
       expect(url).not.toMatch(/secret|power|\?/);
       expect(init?.body).toBeUndefined();
     }

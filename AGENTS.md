@@ -48,10 +48,16 @@ what it supports: the plan, the data file or the preset. Commit a
 public-domain file only when it is small and the app needs it, with the
 basis for its status recorded; being on archive.org does not make a work
 public domain. One exception (plan 072): data the app serves that is
-generated from a CC BY source, such as `src/geo/server/places.tsv` from
-GeoNames, may be committed when a committed script rebuilds it from an
-archived, hash-pinned copy of the source, with a README beside it giving
-the source, the licence and what we changed. Copyrighted sources (such
+generated from an openly licensed source (CC BY, such as
+`src/geo/server/places.tsv` from GeoNames, or a permissive notice, such
+as SCOWL's for the gap hints' `src/app/enochian/translate/hints/table.json`
+in plan 081) may be committed when a committed script rebuilds it from a
+hash-pinned copy of the source, and a README beside it gives the source,
+the licence (with its notice in full where the licence asks for one) and
+what we changed. The script checks the SHA-256 before it uses the copy,
+and the README says where that exact file can be had: an archived copy
+where one exists, otherwise the project's own versioned release URL.
+Copyrighted sources (such
 as the Llewellyn editions of Regardie's *The Golden Dawn*) never enter
 the repository, not even as crops or extracted images; only facts taken
 from them, such as a temple layout, drawn with our own art. Material from

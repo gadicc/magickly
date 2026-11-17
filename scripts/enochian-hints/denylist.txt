@@ -1,0 +1,16 @@
+# Glosses never offered as a gap's hint (plan 081, S11), for what the
+# rules in glosses.ts can't catch: each is a meaning's note, a name or
+# a garbled entry that is still written in English words. One gloss a
+# line, as embedded (its `text`, the lookup's tokenised wording), then
+# `#` and why. Reviewed by hand; changing it changes the gloss hash.
+
+air name  # EXARP: a tablet's name, not a meaning
+earth name  # NANTA: a tablet's name, not a meaning
+fire name  # BITOM: a tablet's name, not a meaning
+water name  # HCOMA: a tablet's name, not a meaning
+formed named  # GAZAVAA: garbled ("a formed named")
+eyes need only to  # GE-OOEEON: a fragment
+in god of stretch forth and conquer  # MADZILODARP: a name
+kelly evil angel  # BELMAGEL: whose angel, not a meaning
+kelly good angel  # SUDSAMMA: whose angel, not a meaning
+to van earth  # ARCAOSGI: Dee's "vanne" (to winnow), read as "van"

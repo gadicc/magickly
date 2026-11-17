@@ -21,26 +21,31 @@ import {
   type TranslateState,
   useTranslateFragment,
 } from "./fragment";
+import type { Hint } from "./hints/format";
+import { useHints } from "./hints/load";
 import { LABELS } from "./labels";
 import { TRANSLATOR_LIMITATIONS } from "./limitations";
 import { Guess, Ours, ReadingLine } from "./lineParts";
 import { LINE_STYLES } from "./lineStyles";
 import { useTranslator } from "./load";
-import type {
-  EnochianToken,
-  FormOption,
-  FormToken,
-  KeyPlace,
-  Language,
-  Translator as Lookup,
-  Reading,
-  ReadToken,
-  ReadWord,
-  RuleId,
-  TileChip,
-  ToEnglish,
-  ToEnochian,
-  Translation,
+import {
+  type EnochianToken,
+  type FormOption,
+  type FormToken,
+  type GapToken,
+  glossOptions,
+  isContent,
+  type KeyPlace,
+  type Language,
+  type Translator as Lookup,
+  type Reading,
+  type ReadToken,
+  type ReadWord,
+  type RuleId,
+  type TileChip,
+  type ToEnglish,
+  type ToEnochian,
+  type Translation,
 } from "./lookup";
 import type { RuleNotes } from "./ruleNotes";
 import { firstWords, MAX_WORDS } from "./tokens";
@@ -233,6 +238,7 @@ const styles = {
     "&:hover, &:focus-visible": { textDecoration: "underline" },
   },
   "& .pop-source": { ml: 0.5 },
+  "& .tr-hint-note": { fontStyle: "italic" },
   "& .tr-reading + .tr-reading": {
     borderTop: 1,
     borderColor: "divider",
@@ -491,8 +497,73 @@ function FormButton({
   );
 }
 
+/** A gap's hint as shown: the gloss, and the forms that open. */
+interface ShownHint {
+  gloss: string;
+  options: readonly FormOption[];
+}
+
+/** Whether a gap could take a hint: one content word (plan 081, S11). */
+const hintable = (token: EnochianToken): token is GapToken =>
+  token.kind === "gap" && token.words.length === 1 && isContent(token.words[0]);
+
+/**
+ * A gap's hint (plan 081, S11): the table's gloss for its word, with the
+ * forms the lookup shows for that gloss that the table names; none when
+ * the table has no row for the word, or the lookup no longer has the
+ * gloss.
+ */
+function hintFor(
+  translator: Lookup,
+  hints: ReadonlyMap<string, Hint> | undefined,
+  token: EnochianToken,
+): ShownHint | undefined {
+  if (!hints || !hintable(token)) return undefined;
+  const hint = hints.get(token.words[0]);
+  if (!hint) return undefined;
+  const options = glossOptions(translator.lookup, hint.gloss).filter((option) =>
+    hint.forms.includes(option.form),
+  );
+  return options.length ? { gloss: hint.gloss, options } : undefined;
+}
+
+/**
+ * A gap's hint, beside it and never in its place: "related: RNAH
+ * ‘sunrise’", marked as a suggestion. A form opens its entry, as a
+ * nearest form does; the translation stays as it is.
+ */
+function HintNote({ hint }: { hint: ShownHint }) {
+  const { open } = React.useContext(Context);
+  return (
+    <span className="tr-hint">
+      {LABELS.gapHint.related}{" "}
+      {hint.options.map((option, at) => (
+        <React.Fragment key={option.form}>
+          {at > 0 && ", "}
+          <button
+            type="button"
+            className="tr-near"
+            onClick={() => open(openedOf(option))}
+          >
+            {option.form}
+          </button>
+        </React.Fragment>
+      ))}{" "}
+      {LABELS.gapHint.gloss(hint.gloss)}{" "}
+      <span className="tr-hint-note">{LABELS.gapHint.note}</span>
+    </span>
+  );
+}
+
 /** One item of English into Enochian: a form, a rule chip or a gap. */
-function EnochianTile({ token }: { token: EnochianToken }) {
+function EnochianTile({
+  token,
+  hint,
+}: {
+  token: EnochianToken;
+  /** A gap's hint, when the table has one for it. */
+  hint?: ShownHint;
+}) {
   const { open } = React.useContext(Context);
   const contraction = token.contraction && (
     <span>{LABELS.contraction(token.contraction)}</span>
@@ -515,7 +586,8 @@ function EnochianTile({ token }: { token: EnochianToken }) {
         <span className="tr-english">{token.english}</span>
         {(token.nearest.length > 0 ||
           token.chips.length > 0 ||
-          contraction) && (
+          contraction ||
+          hint) && (
           <span className="tr-meta">
             {token.nearest.length > 0 && <span>{LABELS.nearest}</span>}
             {token.nearest.map((option) => (
@@ -527,6 +599,7 @@ function EnochianTile({ token }: { token: EnochianToken }) {
               <ChipNote key={chipKey(chip)} chip={chip} />
             ))}
             {contraction}
+            {hint && <HintNote hint={hint} />}
           </span>
         )}
       </li>
@@ -653,7 +726,7 @@ function EnglishTile({ token }: { token: ReadToken }) {
 }
 
 /**
- * The lookup's limitations, all six (decision 20). The page shows them
+ * The lookup's limitations, all seven (decision 20). The page shows them
  * once: beside the notice when it reads English into Enochian, else after
  * the results.
  */
@@ -672,10 +745,19 @@ function Limitations() {
 
 /**
  * English into Enochian (decisions 5–12, 17): the notice with the
- * limitations beside it, then the tiles, chips and gaps.
+ * limitations beside it, then the tiles, chips and gaps, a gap with its
+ * hint when the table has one (plan 081, S11; the table is fetched with
+ * the first result, gap or none, so the fetch says nothing of the text).
  */
-function ToEnochianResult({ result }: { result: ToEnochian }) {
+function ToEnochianResult({
+  result,
+  translator,
+}: {
+  result: ToEnochian;
+  translator: Lookup;
+}) {
   const headingId = React.useId();
+  const hints = useHints(result);
   return (
     <section className="tr-result" aria-labelledby={headingId}>
       <h2 id={headingId}>{LABELS.resultsHeading("english")}</h2>
@@ -687,7 +769,11 @@ function ToEnochianResult({ result }: { result: ToEnochian }) {
       </div>
       <ol className="tr-tiles">
         {result.tokens.map((token) => (
-          <EnochianTile key={token.span.join("-")} token={token} />
+          <EnochianTile
+            key={token.span.join("-")}
+            token={token}
+            hint={hintFor(translator, hints, token)}
+          />
         ))}
       </ol>
     </section>
@@ -975,10 +1061,12 @@ export default function Translator({ notes }: { notes: RuleNotes }) {
         : (["enochian", "english"] as const)
       ).map((language) =>
         language === "english"
-          ? translation.toEnochian && (
+          ? translation.toEnochian &&
+            translator.translator && (
               <ToEnochianResult
                 key={language}
                 result={translation.toEnochian}
+                translator={translator.translator}
               />
             )
           : translation.toEnglish &&

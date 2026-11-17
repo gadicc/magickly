@@ -30,6 +30,7 @@ export type {
   ToEnglish,
 } from "./toEnglish.ts";
 export { lineText, readingGloss } from "./toEnglish.ts";
+export { glossOptions, isContent } from "./toEnochian.ts";
 
 /**
  * Where the page fetches the slim Keys table (`keys.json/route.ts`

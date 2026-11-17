@@ -1358,6 +1358,11 @@ msgstr "The places in the place search on the <0>planetary hours</0> and <1>geom
 
 #. js-lingui-explicit-id
 #: src/app/about/AboutPage.tsx
+msgid "The English words behind the related-word hints on the <0>Enochian translator</0>: from <1>SCOWL</1> (Spell Checking Oriented Word Lists), Copyright © 2000-2018 Kevin Atkinson and the others its notice names, used under that notice, which is given in full in the <2>hints' README</2>. We kept only the common words the translator has no Enochian for."
+msgstr "The English words behind the related-word hints on the <0>Enochian translator</0>: from <1>SCOWL</1> (Spell Checking Oriented Word Lists), Copyright © 2000-2018 Kevin Atkinson and the others its notice names, used under that notice, which is given in full in the <2>hints' README</2>. We kept only the common words the translator has no Enochian for."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
 msgid "Your location"
 msgstr "Your location"
 

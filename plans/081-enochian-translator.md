@@ -279,7 +279,8 @@ forms where any exist.
     reworded to stay true under this design (the review found the first
     two too strong; the third changed when possessives moved after their
     noun), which Gadi confirmed on 13 November 2026, its last item
-    reworded with stage 2 to say it of the lookup (S9, step 2E):
+    reworded with stage 2 to say it of the lookup (S9, step 2E),
+    and one added for the gap hints (S9, step 2F):
     - This translator looks words up; it doesn't understand sentences.
       Each word is a form from Dee's Keys or our dictionary, labelled
       with its source, or a gap. Grammar words follow our notes' rules,
@@ -297,6 +298,9 @@ forms where any exist.
     - The lookup runs in your browser, and your text stays in the
       page's address after the # sign, which isn't sent anywhere. Only an
       AI reading sends it, when you ask for one.
+    - A gap may show a related word. It is suggested by a machine from
+      how close the meanings are, it is never put into the translation,
+      and no one has reviewed it.
 21. **Figures, script-only** (changed after the spike). The page
     shows two, computed from the shipped code by a committed script,
     written to a small numbers-only file beside `bars.ts`, which a
@@ -1044,6 +1048,110 @@ Checked in headless Chromium with the route intercepted (CDP `Fetch`),
 at 390 and 1280 wide, light and dark. Not seen in a browser: parts
 landing one by one (the interception delivers the body whole; the
 jsdom tests stream them), and Safari.
+
+### 2F build notes (17 November 2026)
+
+The script is `scripts/enochian-hints/` (`pnpm enochian:hints`, and
+`pnpm enochian:hints:run` for the paid mode, through `loom env`); the
+table is `src/app/enochian/translate/hints/table.json`, with its README
+(SCOWL's source, SHA-256 and notice in full, what we changed, the run
+and the judging, how to rebuild); AGENTS.md's generated-data exception
+names this table alone, the served JSON carries a short `notice`
+naming SCOWL and pointing to the README, and the About page credits
+SCOWL (Kevin Atkinson) beside GeoNames.
+
+- **Words**: SCOWL 2020.12.07's twelve size-35 word lists (english,
+  american, british, british_z at 10, 20 and 35), a to z only: 40,202
+  words, of which the lookup gives a form for, folds, reads as grammar
+  or modernises 1,557, leaving 38,645. A word is kept only when the
+  lookup reads it alone as one content-word gap of the same word.
+- **Glosses**: the spike's (each tier-1 gloss in its commonest
+  tokenised wording, names and grammar-only glosses out, alike merged),
+  the hub words removed as forms, and, after the review, notes rather
+  than meanings left out: by wording (a question mark or "unk", a
+  numeral, characters other than letters, spaces, hyphens and
+  apostrophes, editorial words such as "name of", "also", "noun",
+  "shortened"), by a reviewed `denylist.txt`, and, at build time, any
+  gloss with a word outside SCOWL's lists to size 70: 1,366
+  candidates, 1,286 kept. Readers see the dictionary's own wording of
+  the meaning (or Dee's, for a gloss only the Keys have), not the
+  tokenised core that was embedded. Forms are the lookup's own for the
+  gloss, `glossOptions` in `toEnochian.ts`, at most three.
+- **The run** (Gadi's): 40,147 inputs in 628 requests, 343,253 tokens
+  reported, about $0.069 (the conservative estimate, one token per two
+  bytes, was $0.175 under the $0.25 cap; the run measured 5.0 bytes a
+  token). `run` checks the live price, refuses above the cap, and stops
+  before any batch that could take the tokens counted so far past it; a
+  reply with no usable token count is counted at its conservative
+  estimate. These are tested functions (`spend.ts`).
+- **The cache**: one JSON line per vector in
+  `.private/enochian-hints/vectors.jsonl`, keyed by the SHA-256 of the
+  model, revision, dimensions, normalisation and exact input, appended
+  after every batch. Cleaning the glosses only removed some, so every
+  rebuild since ran from the cache.
+- **Judging and the cut-off**: three judgings, in order, each by a
+  separate fresh model judge with the spike's rubric. (1) Seed 81 at
+  the spike's z ≥ 5.5, the first build (1,502 glosses, 7,174 words,
+  34,510 bytes gzipped): 68 good, 112 loose, 20 wrong (10%), failing;
+  `score` put the pass at 6.24, and its garbled glosses led to the
+  cleanup (its 195 unchanged verdicts then passed from 6.25). (2) Seed
+  82 at z ≥ 6.25 after the cleanup (3,650 words under 601 glosses): 53
+  good, 126 loose, 21 wrong (10.5%), failing; `score` put the pass at
+  6.669. (3) Seed 90 at z ≥ 7.0, held out: 111 good, 79 loose, 10 wrong
+  (95.0% good or loose, 5.0% wrong), passing; committed as
+  `hints/judged-z7-seed90.tsv`, and `table.test.ts` checks the table is
+  the one it was drawn from. Why 7.0: the first two samples each picked
+  a cut-off (6.24, 6.67), so neither tests its own; 7.0 was chosen from
+  both, and the third, drawn after choosing, is the held-out check. It
+  passed exactly at the 5% bar, so the margin is thin: a re-judging or
+  a dictionary change that alters the glosses should run it again. The
+  z population differs from the spike's (grammar and hub glosses
+  removed, and SCOWL's inflections among the words), which is why the
+  cut-off was judged here rather than taken from the spike. The shipped
+  table: 1,726 words under 439 glosses, 28,539 bytes served, 11,701
+  gzipped; the margin costs coverage, from 3,650 words at 6.25 to 1,726
+  at 7.0.
+- **Samples are never overwritten**: `build` names a sample by its seed
+  and cut-off and stops before writing anything when that file exists.
+  `score` names the lowest passing cut-off rounded only as far as keeps
+  the same judged hints, so its shares are those of the table built
+  there; `rescore` carries verdicts across a gloss change.
+- **The table**: per gloss, its wording, forms and words, one gloss to a
+  line (outside Biome's formatter); no scores. Its budget, 150 KB, is
+  measured on the compact JSON the route serves, gzipped at zlib's
+  default level. The gloss hash covers the recipe and every candidate
+  gloss's text, wording and forms; `table.test.ts` fails on a change,
+  naming the commands.
+- **Loading**: a force-static route, `/enochian/translate/hints.json`,
+  as the Keys table's, fetched once, with the first English-into-
+  Enochian result shown, gap or none (after the review; at first it was
+  fetched only for a hintable gap, which told the server the text had
+  one), with only the origin as Referer and nothing of the text. A
+  failed load shows no hint and no error, and the next result shown
+  tries again. Not in `public/` or a dynamically imported module: the
+  service worker precaches all of `public/` and every client chunk on
+  install (`@serwist/next` excludes only server files and top-level
+  JSON), and the table serves the readers of one page.
+- **The hint** sits in the gap tile's notes after the nearest forms:
+  "related:", the form(s) as buttons that open their entries, the gloss
+  in quotes, then "suggested by meaning, not reviewed". The tile stays
+  a gap ("no form"), the live summary still counts it as one, and
+  opening a hinted form changes nothing. Only a gap of one content word
+  takes a hint; a form the lookup no longer shows for the gloss is left
+  out, and a hint with none left is not shown.
+- **Page text**: the "gap" bullet gains "and sometimes a related word:
+  a machine's suggestion from meanings, never put in the translation";
+  the lookup's limitations gain a seventh (above).
+- **Weak hints left in the 7.0 table** (the review's scan of all 439
+  glosses): "not the fifth" (AGO) for "fifth", a note pointing the
+  wrong way; "sol" (AVE) for sole, soles, soled and soling, by
+  spelling; number words stretched (eight for eighty and eightieth,
+  nineteen for ninety, fourth for fourteenth; about 8 rows); "sons" for
+  grandsons and nephews; "speaking" showing the form "GO (LE)" for
+  "specking". They stay: the judged sample counted those it drew
+  ("soled" is in it), and dropping rows now would part the committed
+  sample from the table. Candidates for the denylist when the table is
+  next re-judged.
 
 ## The stage-1 review (Fable, 13 November 2026)
 

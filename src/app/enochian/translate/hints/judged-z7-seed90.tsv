@@ -1,0 +1,207 @@
+# Gap hints to judge (plan 081, S11): 200 drawn at random (seed 90) from the table at z >= 7.
+# Judge each hint as the meaning spike did, for the English word alone:
+#   good  - the gloss means the word (the same sense, or as near as a synonym);
+#   loose - related in meaning, a fair pointer, not the same word;
+#   wrong - anything else.
+# Write good, loose or wrong in the last column, then: pnpm enochian:hints score <this file>
+n	word	hint	z	verdict
+1	additionally	related: PILAH ‘moreover’	7.393905	good
+2	adoring	related: RSAM ‘admiration’	7.084809	loose
+3	adulation	related: RSAM ‘admiration’	7.457984	loose
+4	affirms	related: NOIB ‘affirmation’	8.258378	good
+5	aged	related: HOMIN ‘with age’	7.842718	loose
+6	ah	related: C ‘oh’	7.712972	good
+7	alert	related: SEBRA ‘warning’	7.396106	loose
+8	alleviated	related: BLIAR ‘ease’	7.719270	good
+9	amicable	related: ZORGE ‘friendly’	7.317314	good
+10	amid	related: NOTHOA, ZOMDV, ZOMD ‘in the midst’	9.975358	good
+11	amidst	related: NOTHOA, ZOMDV, ZOMD ‘in the midst’	10.844020	good
+12	angst	related: HOXMARCH ‘fear’	7.766434	loose
+13	announcing	related: ONIXDAR ‘Proclaiming’	7.420248	good
+14	anomaly	related: GOSA ‘strange’	7.081457	loose
+15	apparent	related: ZAMRAN, OR ‘appear’	7.026885	loose
+16	became	related: NOAN, INOAS, NOALN ‘become’	8.205947	good
+17	belief	related: GONO ‘faith’	7.136249	good
+18	bemoaning	related: EOPHAN, SER ‘lamentation’	7.765884	good
+19	bough	related: LILONON ‘branches’	7.154374	good
+20	braiding	related: OADO ‘weave’	7.185199	loose
+21	breathes	related: GIGIPAH ‘breath’	9.029941	good
+22	brimstone	related: SALBROX ‘sulphur’	7.284734	good
+23	cautioning	related: SEBRA ‘warning’	7.445544	good
+24	centralising	related: OVOARS ‘to the center’	7.040934	loose
+25	components	related: SAANIR ‘parts’	7.230784	good
+26	congregated	related: ALDON ‘gathered together’	7.672698	good
+27	constructed	related: ON ‘built’	7.875163	good
+28	corpse	related: TELOAH, TELOCH ‘death’	7.385595	loose
+29	counterattacking	related: A-BAI ‘attacking’	8.010564	loose
+30	couple	related: PALA, POLA ‘pair’	7.173158	good
+31	covert	related: ETHAMZA ‘hidden’	7.059212	good
+32	cubic	related: PS ‘cubed’	8.440714	loose
+33	decease	related: TELOAH, TELOCH ‘death’	8.098248	good
+34	decomposed	related: QTING ‘rotten’	7.107393	good
+35	decrease	related: PRDZAR ‘diminish’	7.446443	good
+36	dehydrating	related: ORSCOR ‘with dryness’	7.169105	loose
+37	depth	related: PIADPH ‘in the depths of’	7.805682	good
+38	divorced	related: SEBO ‘separation’	7.843723	loose
+39	divorcing	related: SEBO ‘separation’	7.714012	loose
+40	driest	related: ORSCOR ‘with dryness’	8.765342	loose
+41	drowsiness	related: BRGDA, BRGDO ‘sleep’	7.487857	loose
+42	dualism	related: OBZA ‘dual’	7.103475	loose
+43	dumbfounds	related: UNCHI, OUCHO ‘confound’	7.830172	good
+44	earthier	related: CAOSGO, CAOSGI ‘of the earth’	7.665223	loose
+45	easterly	related: RAAS, RA ‘east’	8.768008	good
+46	eating	related: IAL ‘to consume’	7.111212	good
+47	endings	related: UL, VLS, GALVAH ‘the ends’	8.499633	good
+48	enigma	related: CICLE, CICLES ‘the mysteries’	7.736982	good
+49	enjoyments	related: QUASAHI ‘pleasure’	7.040646	good
+50	enlarges	related: OVOF ‘magnify’	7.276009	good
+51	entirety	related: SAGA ‘entire’	8.163832	good
+52	equalised	related: PARACH ‘equal’	7.722894	loose
+53	equate	related: PARACH ‘equal’	7.226727	loose
+54	eradicated	related: FIFALZ, LRASD ‘to eliminate’	7.983200	good
+55	eulogise	related: ECRIN, GORS, PRES ‘praise’	7.141917	good
+56	evening	related: DOSIG ‘night’	7.428852	loose
+57	everlastings	related: GOHED ‘everlasting’	8.323523	wrong
+58	exalted	related: LANSH ‘in power exalted’	7.103609	good
+59	exterminate	related: FIFALZ, LRASD ‘to eliminate’	7.190999	good
+60	fairy	related: TOHCOTH ‘faeries’	7.770044	good
+61	fatality	related: TELOAH, TELOCH ‘death’	7.885816	good
+62	fervour	related: ZURAAH, ZURAH ‘fervently’	7.048922	good
+63	festoon	related: OBLOC, OBL ‘garland’	7.363394	good
+64	fiendishly	related: BABALON ‘wicked’	7.320015	loose
+65	finalised	related: RLU ‘completed’	7.023764	good
+66	flitted	related: ZILDAR ‘flew’	7.617765	loose
+67	flowerier	related: LORSLQ ‘flowers’	7.014776	loose
+68	forbears	related: GR ‘Ancestors’	10.129115	loose
+69	forewarn	related: SEBRA ‘warning’	7.566174	good
+70	forgiving	related: IEH ‘merciful’	7.640758	good
+71	friendliness	related: ZORGE ‘friendly’	8.893550	good
+72	funerals	related: SE, SER ‘mourning’	7.708747	loose
+73	gaiety	related: ARTH ‘gladness’	7.094000	good
+74	geraniums	related: LORSLQ ‘flowers’	7.262572	loose
+75	girders	related: LOH ‘beams’	7.047429	good
+76	gloriously	related: NAH ‘glorious’	8.033080	good
+77	grouched	related: HOLDO ‘groaned’	7.061238	loose
+78	haemorrhaged	related: CNILA ‘blood’	7.440561	loose
+79	halved	related: OBZA ‘half’	8.059376	loose
+80	halves	related: OBZA ‘half’	7.808961	good
+81	happiest	related: MOZ ‘joy’	7.057965	loose
+82	haste	related: ZURESK ‘Rushing’	8.078885	good
+83	humblest	related: ZURAAH, ZURAH ‘with humility’	9.576309	good
+84	hurried	related: ZURESK ‘Rushing’	8.312529	good
+85	hurrying	related: ZURESK ‘Rushing’	9.088092	good
+86	interminable	related: ALPOD ‘infinite’	7.235860	loose
+87	invocations	related: ARGEDCO ‘invoke’	8.047937	good
+88	jinxed	related: AMMA ‘cursed’	8.333131	good
+89	joyfully	related: MOZ ‘joy’	7.783265	good
+90	kid	related: PASHS ‘children’	7.219081	good
+91	laborers	related: CANAL ‘workers’	8.317689	good
+92	laboriously	related: VAUL ‘toil’	7.130417	loose
+93	lessen	related: PRDZAR ‘diminish’	7.204023	good
+94	likelihood	related: BAB ‘possibility’	7.714364	loose
+95	lineage	related: GR ‘Ancestors’	7.548479	loose
+96	loincloth	related: DAX, DAXIL ‘loins’	7.200048	wrong
+97	lowlier	related: OADRIAX ‘the lower’	8.455180	wrong
+98	males	related: OLLOG, CORDZIZ, MOLAP ‘men’	7.615834	good
+99	marvelling	related: SALD ‘of wonder’	7.060242	good
+100	mattress	related: TIANTA ‘a bed’	7.623393	loose
+101	memorises	related: PAPBOR ‘remember’	7.817693	loose
+102	menials	related: NOCO, CNOQOD, CNOQVODI ‘servant’	7.634518	good
+103	mentally	related: MANIN ‘in the mind’	7.499243	good
+104	meting	related: HOL ‘to measure’	7.189797	wrong
+105	mirror	related: ASEV ‘Reflected’	7.521287	loose
+106	mixture	related: CINXIR ‘mingled’	7.105695	loose
+107	momentous	related: OANIO ‘of a moment’	7.546007	wrong
+108	mortality	related: TELOAH, TELOCH ‘death’	8.413768	loose
+109	mossy	related: MOM ‘moss’	9.837647	good
+110	motivating	related: ONR ‘Motivation’	8.465161	good
+111	mysteriously	related: CICLE, CICLES ‘the mysteries’	7.643110	loose
+112	needier	related: UNIG ‘need’	7.569095	loose
+113	nightfall	related: DOSIG ‘night’	7.771319	loose
+114	ninety	related: AF ‘nineteen’	7.027169	wrong
+115	northeasterly	related: LUCAL ‘north’	7.081471	loose
+116	nuptial	related: ARISSO ‘the mystical marriage’	7.065044	loose
+117	oaths	related: SURZAS ‘swear’	7.692034	good
+118	obediently	related: ADNA, DARBS ‘obedience’	8.071030	good
+119	obituary	related: TELOAH, TELOCH ‘death’	7.979151	loose
+120	oddity	related: GOSA ‘strange’	7.818719	loose
+121	oddly	related: GOSA ‘strange’	8.514223	good
+122	older	related: HOMIL, HOMIN ‘age’	7.339216	loose
+123	outrunning	related: PARM, PARMGI ‘run’	7.628583	loose
+124	paediatrics	related: PASHS ‘children’	7.316162	loose
+125	pediatrics	related: PASHS ‘children’	7.803169	loose
+126	performance	related: FISIS ‘perform’	7.368630	good
+127	petticoats	related: UNALAH, UNALAB ‘skirts’	7.360757	loose
+128	pledge	related: ISRO, AISRO ‘promise’	7.328412	good
+129	possible	related: BAB ‘possibility’	9.321642	good
+130	potent	related: GMICALZ ‘a powerful’	7.288159	good
+131	prickles	related: NANBA, NN ‘thorns’	8.904062	good
+132	prospers	related: CACACOM ‘flourish’	7.814016	good
+133	puked	related: OXEX ‘vomit out’	9.025768	good
+134	rancid	related: QTING ‘rotten’	7.867460	good
+135	realms	related: LONDOH, ADOHI, A-C-LONDOH ‘kingdoms’	7.167500	good
+136	reappeared	related: ZAMRAN, OR ‘appear’	7.787051	loose
+137	reappears	related: ZAMRAN, OR ‘appear’	7.446524	loose
+138	rebinding	related: ALLAR ‘bind up’	7.294905	loose
+139	regurgitating	related: OXEX ‘vomit out’	8.558241	good
+140	reposes	related: VNDL, PAGE ‘rest’	7.676904	good
+141	resemblances	related: AZIAZIOR, T, TA ‘likeness’	7.656319	good
+142	restfullest	related: VNDL, PAGE ‘rest’	8.037735	loose
+143	resurrections	related: NACRO ‘renewal or resurrection’	8.876770	good
+144	reverberating	related: MATORB ‘echoing’	9.066900	good
+145	rider	related: OPHIDE ‘of riding’	7.650743	loose
+146	rocky	related: PATRALX ‘rock’	7.261073	good
+147	saddened	related: TIBIBP, EOPHAN ‘sorrow’	7.599427	loose
+148	saintliest	related: SOYGA ‘saintly’	8.399282	good
+149	salter	related: BALYE ‘salt’	7.126891	wrong
+150	sank	related: CARBAF ‘sink’	8.462310	good
+151	select	related: GER ‘choose’	7.013795	good
+152	shielding	related: AR ‘to protect’	7.592084	good
+153	sibling	related: ESIASCH ‘brothers’	7.557939	loose
+154	slumbered	related: BRGDA, BRGDO ‘sleep’	8.409577	good
+155	slumbers	related: BRGDA, BRGDO ‘sleep’	8.968216	good
+156	solaces	related: BLIORA, BLIOR, BLIAR ‘comfort’	7.275033	good
+157	solacing	related: BLIORA, BLIOR, BLIAR ‘comfort’	7.493084	good
+158	soled	related: AVE ‘sol’	7.505565	wrong
+159	soothes	related: BLIORA, BLIOR, BLIAR ‘comfort’	7.236303	good
+160	sorrier	related: TIBIBP, EOPHAN ‘sorrow’	7.618004	loose
+161	sorrowful	related: TIBIBP, EOPHAN ‘sorrow’	8.779285	good
+162	southeastern	related: BABAGE, BABAGEN ‘south’	7.484515	loose
+163	southerly	related: BABAGE, BABAGEN ‘south’	8.575568	good
+164	southerner	related: BABAGE, BABAGEN ‘south’	8.237095	loose
+165	southerns	related: BABAGE, BABAGEN ‘south’	8.039861	loose
+166	stoniest	related: ORRI ‘stone’	7.570344	loose
+167	strolls	related: INSI ‘walk’	8.266196	good
+168	substantially	related: BASP ‘substantial’	7.738657	good
+169	summoning	related: ARGEDCO ‘invoke’	7.330568	loose
+170	sunken	related: CARBAF ‘sink’	7.004259	good
+171	sunup	related: RNAH ‘sunrise’	8.755476	good
+172	telephoned	related: JUMD, UM ‘call’	8.071588	loose
+173	terrify	related: CIAOFI ‘to the terrour’	7.329204	loose
+174	terrorists	related: CIAOFI ‘terror’	7.726135	loose
+175	torrential	related: PANPIR, PANGEPI ‘pouring down’	7.378063	good
+176	transfusions	related: CNILA ‘of blood’	7.040852	loose
+177	triple	related: DAH ‘thrice’	7.054392	loose
+178	trod	related: INSI ‘to tread’	9.444847	good
+179	truthful	related: VOOAN, IA, LAIAD ‘truth’	7.847655	good
+180	unexplained	related: CICLE, CICLES ‘the mysteries’	8.138072	loose
+181	unfilled	related: AFFA ‘empty’	7.667604	good
+182	unification	related: PRAS ‘unite’	7.602737	good
+183	unionized	related: TOANT ‘union’	8.452104	wrong
+184	unlimited	related: ALPOD ‘infinite’	7.416922	good
+185	unusual	related: GOSA ‘strange’	8.300587	good
+186	vandalised	related: TONUG ‘deface’	7.663309	good
+187	vastness	related: MABETH ‘expanse’	7.195776	good
+188	villain	related: BABALON ‘evil’	7.782173	loose
+189	villainy	related: BABALON ‘evil’	7.811502	good
+190	violins	related: EFAFAFE ‘the Viols’	7.080784	loose
+191	virginity	related: PARADIZ ‘a virgin’	10.504024	loose
+192	warpaths	related: ZAR ‘paths’	7.701165	wrong
+193	wateriest	related: ZIN, ZLIDA ‘water’	7.083829	loose
+194	waxed	related: VGEG, VGEGI ‘wax strong’	7.935085	loose
+195	wealthiest	related: LAS ‘rich’	9.171105	good
+196	weekday	related: BASGIM ‘day’	7.109127	loose
+197	weird	related: GOSA ‘strange’	9.402845	good
+198	weirdo	related: GOSA ‘strange’	7.619268	loose
+199	westerly	related: SOBOLN ‘in the west’	7.721167	good
+200	youngsters	related: PASHS ‘children’	7.253499	good

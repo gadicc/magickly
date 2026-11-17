@@ -97,6 +97,15 @@ export const LABELS = {
   leftOut: "left out",
   gap: "no form",
   nearest: "nearest:",
+  /**
+   * A gap's hint (plan 081, S11): "related: RNAH ‘sunrise’", forms whose
+   * gloss is close in meaning, marked as a machine's suggestion.
+   */
+  gapHint: {
+    related: "related:",
+    gloss: (gloss: string) => `‘${gloss}’`,
+    note: "suggested by meaning, not reviewed",
+  },
   // Enochian into English.
   readingLine: "Reading",
   deeLine: "Dee’s own English",

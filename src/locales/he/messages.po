@@ -1358,6 +1358,11 @@ msgstr "המקומות בחיפוש המקומות בעמודי <0>השעות ה
 
 #. js-lingui-explicit-id
 #: src/app/about/AboutPage.tsx
+msgid "The English words behind the related-word hints on the <0>Enochian translator</0>: from <1>SCOWL</1> (Spell Checking Oriented Word Lists), Copyright © 2000-2018 Kevin Atkinson and the others its notice names, used under that notice, which is given in full in the <2>hints' README</2>. We kept only the common words the translator has no Enochian for."
+msgstr "המילים האנגליות שמאחורי הרמזים למילים קרובות ב<0>מתרגם החנוכית</0>: מתוך <1>SCOWL</1> (Spell Checking Oriented Word Lists), זכויות יוצרים © 2000-2018 Kevin Atkinson ושאר מי שההודעה שלו מונה, לפי תנאי אותה הודעה, המובאת במלואה ב<2>קובץ ה־README של הרמזים</2>. שמרנו רק את המילים הנפוצות שאין להן מקבילה חנוכית במתרגם."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
 msgid "Your location"
 msgstr "המיקום שלכם"
 
