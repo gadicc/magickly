@@ -381,10 +381,10 @@ describe("the build's crons", () => {
     expect(vercel.crons).toEqual(EXPECTED_CRONS);
   });
 
-  it("accepts the right entry", () => {
-    expect(checkBuiltCrons(config({ version: 3, crons: [cron] }))).toEqual([
-      cron,
-    ]);
+  it("accepts the right entries", () => {
+    expect(
+      checkBuiltCrons(config({ version: 3, crons: [...EXPECTED_CRONS] })),
+    ).toEqual(EXPECTED_CRONS);
   });
 
   it("fails on a missing file or a missing crons list", () => {
@@ -398,9 +398,10 @@ describe("the build's crons", () => {
 
   it("fails on a wrong path, schedule or extra entry", () => {
     for (const crons of [
-      [{ ...cron, path: "/api/cron/other" }],
-      [{ ...cron, schedule: "0 3 * * *" }],
-      [cron, cron],
+      [{ ...cron, path: "/api/cron/other" }, ...EXPECTED_CRONS.slice(1)],
+      [{ ...cron, schedule: "0 3 * * *" }, ...EXPECTED_CRONS.slice(1)],
+      [...EXPECTED_CRONS, cron],
+      [cron],
       [],
     ])
       expect(() => checkBuiltCrons(config({ crons }))).toThrow("expected");

@@ -1,8 +1,9 @@
 import { z } from "zod";
-import type { AnswerItem } from "./answer.ts";
+import type { ReadingItem } from "./item.ts";
 
 /**
- * Reading a model's reply. Every request asks the model to end its reply with
+ * Reading a model's reply (plan 077, and plan 081's reading, which moved
+ * this here from the experiment's scripts in step 2D). Every request asks the model to end its reply with
  * one fenced json block: forced tool calls don't combine with Anthropic's
  * thinking, and batch requests have no structured-output option. The last
  * such block is parsed and validated; anything else is a failure, recorded
@@ -55,7 +56,10 @@ const optionalText = z
 
 const BASES = ["attested", "derived", "coined", "unknown"] as const;
 
-/** One answer item, as `answer.ts` defines it; null optional fields allowed. */
+/**
+ * One answer item, as the experiment's `answer.ts` defines it (`ReplyItem`);
+ * null optional fields allowed.
+ */
 export const answerItemSchema = z.object({
   source: z.string(),
   target: z.string(),
@@ -111,15 +115,24 @@ export function mendAnswer(value: unknown): number {
   return mended;
 }
 
+/**
+ * One item of a reply: the reading's item and, in the experiment's task 2,
+ * the row it answers.
+ */
+export interface ReplyItem extends ReadingItem {
+  /** The row id the item answers ("K.R"), when the input gives row ids. */
+  row?: string;
+}
+
 /** A translation reply's items, with undefined fields left out. */
-export function parseAnswer(text: string): Parsed<AnswerItem[]> {
+export function parseAnswer(text: string): Parsed<ReplyItem[]> {
   const parsed = parseReply(text, answerSchema, mendAnswer);
   if (!parsed.ok) return parsed;
   return {
     ok: true,
     coercions: parsed.coercions ?? 0,
     value: parsed.value.items.map((item) => {
-      const out: AnswerItem = {
+      const out: ReplyItem = {
         source: item.source,
         target: item.target,
         basis: item.basis,

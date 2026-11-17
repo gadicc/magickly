@@ -106,6 +106,7 @@ export const LEGACY_IMPORT_REQUIRED_ARTIFACTS = [
   "src/db/schema/chatResearchMaintenance.ts",
   "src/db/schema/chatUsage.ts",
   "src/db/schema/discourse.ts",
+  "src/db/schema/enochianReadings.ts",
   "src/db/schema/ids.ts",
   "src/db/schema/index.ts",
   "src/db/schema/legacyFiles.ts",

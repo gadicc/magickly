@@ -14,6 +14,7 @@ import {
   sharesContentWord,
   stemEnglish,
 } from "../../src/app/enochian/translate/reading/normalise.ts";
+import { parseReply } from "../../src/app/enochian/translate/reading/reply.ts";
 import {
   type AnswerItem,
   type CheckContext,
@@ -48,7 +49,6 @@ import {
   shuffle,
 } from "./newtext.ts";
 import { GRAMMAR_HEAD } from "./prompt.ts";
-import { parseReply } from "./reply.ts";
 import type { KeyRowRecord } from "./testset.ts";
 import type { ModelRequest } from "./transport.ts";
 

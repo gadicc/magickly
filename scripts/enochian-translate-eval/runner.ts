@@ -10,6 +10,7 @@ import {
 } from "node:fs";
 import { dirname, join } from "node:path";
 import type { EnochianDictionary } from "magick-data/enochian/dictionary";
+import { parseAnswer } from "../../src/app/enochian/translate/reading/reply.ts";
 import type { AnswerItem, Task } from "./answer.ts";
 import { a1Scores, markHard } from "./baseline.ts";
 import { cipher } from "./cipher.ts";
@@ -78,7 +79,6 @@ import {
   type Side,
 } from "./probe.ts";
 import { type TranslateSpec, translateRequest } from "./prompt.ts";
-import { parseAnswer } from "./reply.ts";
 import {
   joinScores,
   type Report,

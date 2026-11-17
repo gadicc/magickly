@@ -1,11 +1,14 @@
 import type { EnochianDictionary } from "magick-data/enochian/dictionary";
-import type { EnochianKey } from "magick-data/enochian/keys";
 import {
   editDistance,
   foldVariants,
   meaningAgrees,
   normEnochian,
 } from "../../src/app/enochian/translate/reading/normalise.ts";
+import {
+  type KeyRowRecord,
+  rowsFromKeys,
+} from "../../src/app/enochian/translate/reading/prompt.ts";
 import { ENGLISH_HOMOGRAPHS } from "./cipher.ts";
 
 /**
@@ -23,22 +26,8 @@ import { ENGLISH_HOMOGRAPHS } from "./cipher.ts";
 /** The five Keys the smaller arms run on (plan 077, "Models and budget"). */
 export const FIXED_KEYS: readonly number[] = [3, 6, 9, 12, 18];
 
-/** Key 19's `{ordinal}` as the first Aethyr (LIL), the row as printed. */
-const FIRST_AETHYR = "first";
-
-/** A Key row as the experiment reads it. */
-export interface KeyRowRecord {
-  /** "K.R": the Key and the row, from 1, as the context names it. */
-  id: string;
-  key: number;
-  row: number;
-  /** Casaubon's word, as printed. */
-  word?: string;
-  /** The Golden Dawn's form (The Equinox I(8)), when shown as a word. */
-  gd?: string;
-  /** Dee's English; empty when the row has none. */
-  english: string;
-}
+/** A Key row as the experiment reads it: the reading's (`KeyRowRecord`). */
+export type { KeyRowRecord };
 
 /** How a removed headword met a held-out word. */
 export type RemovalRule = "same" | "contains" | "contained";
@@ -116,24 +105,7 @@ export interface SourceData {
   rows: KeyRowRecord[];
 }
 
-/** Every row of every Key, flattened; Key 19 as its first Aethyr. */
-export function rowsFromKeys(keys: readonly EnochianKey[]): KeyRowRecord[] {
-  return keys.flatMap((key) =>
-    key.rows.map((row, index) => {
-      const gd = row.readings.equinox1912no8;
-      const out: KeyRowRecord = {
-        id: `${key.key}.${index + 1}`,
-        key: key.key,
-        row: index + 1,
-        english: row.english.replaceAll("{ordinal}", FIRST_AETHYR).trim(),
-      };
-      const word = row.readings.casaubon1659?.word;
-      if (word) out.word = word;
-      if (gd?.word && (!gd.marker || gd.marker === "split")) out.gd = gd.word;
-      return out;
-    }),
-  );
-}
+export { rowsFromKeys };
 
 /** Whether a row is scored: Casaubon's word and Dee's English both there. */
 export function isScoreable(

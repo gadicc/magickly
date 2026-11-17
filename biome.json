@@ -69,6 +69,10 @@
       "assist": { "enabled": false }
     },
     {
+      "includes": ["src/app/enochian/translate/reading/grammar.generated.ts"],
+      "formatter": { "enabled": false }
+    },
+    {
       "includes": ["src/doc/blocks.js"],
       "linter": {
         "rules": {

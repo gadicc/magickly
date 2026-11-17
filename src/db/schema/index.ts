@@ -6,6 +6,7 @@ export * from "./chatResearchMaintenance";
 export * from "./chatResearchPolicy";
 export * from "./chatUsage";
 export * from "./discourse";
+export * from "./enochianReadings";
 export * from "./legacyFiles";
 export * from "./legacyIds";
 export * from "./legacyImportRuns";

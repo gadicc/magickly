@@ -5,6 +5,10 @@ import {
   type Translator,
 } from "../../src/app/enochian/translate/lookup.ts";
 import {
+  parseAnswer,
+  parseSentence,
+} from "../../src/app/enochian/translate/reading/reply.ts";
+import {
   englishLength,
   lookupGlosses,
   type SentenceVerdict,
@@ -13,7 +17,6 @@ import {
 } from "../../src/app/enochian/translate/reading/sentence.ts";
 import { type NewSpec, partRows, tasks12Dictionary } from "./newprompt.ts";
 import type { NewTextRow } from "./newtext.ts";
-import { parseAnswer, parseSentence } from "./reply.ts";
 import {
   type EvalData,
   failedRaw,

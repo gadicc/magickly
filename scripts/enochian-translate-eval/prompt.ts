@@ -1,5 +1,10 @@
 import type { EnochianDictionary } from "magick-data/enochian/dictionary";
 import { foldVariants } from "../../src/app/enochian/translate/reading/normalise.ts";
+import {
+  CONTEXT_HEAD,
+  GRAMMAR_HEAD,
+  INSTRUCTIONS,
+} from "../../src/app/enochian/translate/reading/prompt.ts";
 import type { Task } from "./answer.ts";
 import { serialiseContext, task1Input, task2Input } from "./context.ts";
 import type { Effort } from "./models.ts";
@@ -40,35 +45,13 @@ export interface TranslateSpec {
   effort: Effort;
 }
 
-/** The instructions every translation request starts with. */
-export const INSTRUCTIONS = `You translate between Enochian, the language of the nineteen Keys (Calls) that John Dee and Edward Kelley recorded, and English.
-
-Reference material may follow these instructions: a dictionary (one entry a line: the word, a tab, then its meanings, each with its source in brackets), the Keys with Dee's English row by row (one row a line: the row id "K.R", the Enochian word, Dee's English, and sometimes the Golden Dawn's spelling), and sometimes notes on grammar. It is your evidence.
-
-How to answer: work it through as you need to, then end your reply with one fenced code block marked json, holding an object with one field, "items": a list with one item per word you translate, in order. Write nothing after the block.
-
-Each item has these fields:
-- "source": the word you were given: the Enochian word when translating into English, or the English when translating into Enochian.
-- "target": your translation of it, as one reading. A phrase is fine where the word needs one, but not a list of alternatives; where you are unsure between readings, choose one. One Enochian word when translating into Enochian.
-- "basis": "attested", "derived", "coined" or "unknown" (below).
-- "ref": where the reference material gives the word (below).
-- "row": the row id the item answers, when the input gives row ids.
-- "token": the number of the input word the item answers, when the input numbers its words.
-
-The basis says how you know:
-- "attested": the reference material gives this word with this meaning. "ref" is required and must point to it.
-- "derived": you worked it out from words the material does give (a root, a related form, an ending), but the material does not give this word with this meaning. Put the entry or row you built on in "ref", if there is one.
-- "coined": the material gives no basis for it; it is your own form or reading.
-- "unknown": you can't tell. Put "unknown" as the target. This is a good answer when it is the truth.
-Never mark a guess as attested. Cite only what is in the material given here; when there is no material, nothing is attested.
-
-A "ref" is either a dictionary headword written exactly as the dictionary prints it, or a Key row written as its row id, the Key's number, a dot and the row's number (such as "4.12"). Put nothing else in "ref".`;
-
-/** The line the context starts with, so a reply can be traced to it. */
-export const CONTEXT_HEAD = "Reference material: our dictionary and the Keys.";
-
-/** The grammar notes' heading in an A3 prompt. */
-export const GRAMMAR_HEAD = "Reference material: notes on Enochian grammar.";
+// Plan 077's fixed texts live in the app beside the reading, which sends
+// them (plan 081, step 2D); the experiment imports them.
+export {
+  CONTEXT_HEAD,
+  GRAMMAR_HEAD,
+  INSTRUCTIONS,
+} from "../../src/app/enochian/translate/reading/prompt.ts";
 
 const TASK_TEXT: Record<Task, string> = {
   1: `Translate this Enochian text into English. Its words are numbered in square brackets. Give one item for each numbered word, in order, with the word as "source" and its number as "token".`,

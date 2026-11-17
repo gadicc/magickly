@@ -105,6 +105,15 @@ export interface ReadingInput {
   sentence?: string;
 }
 
+/**
+ * The check's version, part of the shared store's key (`readingStoreVersion`):
+ * a stored reading is this check's verdict on a reply, kept for a day. Bump it
+ * whenever a change here (or in what it reads: the lookup, `normalise.ts`,
+ * `sentence.ts`) can change a verdict, so no reading checked the old way is
+ * served after the change is deployed.
+ */
+export const CHECK_VERSION = 1;
+
 /** The most words of the model's English a row shows (S6). */
 export const MAX_ENGLISH_WORDS = 10;
 

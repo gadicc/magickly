@@ -2,7 +2,8 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "regions": ["lhr1"],
   "crons": [
-    { "path": "/api/cron/purge-deleted-rituals", "schedule": "17 3 * * *" }
+    { "path": "/api/cron/purge-deleted-rituals", "schedule": "17 3 * * *" },
+    { "path": "/api/cron/purge-readings", "schedule": "7 0 * * *" }
   ],
   "git": {
     "deploymentEnabled": {

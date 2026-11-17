@@ -6,6 +6,10 @@ import { fileURLToPath } from "node:url";
 import realDictionary from "magick-data/enochian/dictionary";
 import keys from "magick-data/enochian/keys";
 import { afterEach, describe, expect, it } from "vitest";
+import {
+  lastJsonBlock,
+  parseAnswer,
+} from "../../src/app/enochian/translate/reading/reply.ts";
 import { type AnswerItem, alignItems } from "./answer.ts";
 import { a1Scores, markHard } from "./baseline.ts";
 import { cipher } from "./cipher.ts";
@@ -54,7 +58,6 @@ import {
   stripGrammar,
   translateRequest,
 } from "./prompt.ts";
-import { lastJsonBlock, parseAnswer } from "./reply.ts";
 import {
   batchKey,
   calibrationPath,

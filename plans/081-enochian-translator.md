@@ -752,6 +752,190 @@ pass with only their imports changed, its prompts hash the same, and
   word checks in well under 100 ms. The lookup's own reading dominates:
   150 near-miss words take it about 110 ms, which S3 never admits.
 
+### 2D build notes (17 November 2026)
+
+The route is `POST /api/enochian/read` (`src/app/api/enochian/read`),
+its work in `src/app/enochian/translate/reading/respond.ts` with its
+dependencies injected (`dependencies.ts` holds the real ones, and a
+test builds them with fakes for the network), so the tests run it on
+PGlite with a fake model. Beside the checker now live what builds A3s's
+request (`prompt.ts`: instructions, context, task text, numbering,
+routing; `gateway.ts`: the gateway's options and its routing report;
+`reply.ts`: reply parsing, moved from the scripts), the admission and
+parts (`passage.ts`), the request and its version (`request.ts`),
+Terra's prices (`prices.ts`) and their daily check (`priceCheck.ts`),
+the store (`store.ts`), the ceiling and switch (`ledger.ts`), the
+allowance (`allowance.ts`), the client's bucket (`client.ts`) and the
+daily deletions (`purge.ts`). The experiment imports the first three;
+its 469 requests (plan 077's folds and arms, the new text's, the round
+trip's, A3s's) were hashed against the code before the move and match.
+`stage2b.test.ts` builds one passage both ways and compares
+instructions, context, grammar notes, the user message and routing byte
+for byte, and sends both through the AI SDK (faked) to hold the app's
+call settings to A3s's but for two named differences: the output cap
+(the part's, not the experiment's 32,000) and the Anthropic cache
+breakpoints, which OpenAI ignores. Decisions beyond the design (the
+first list as built, then the fixes after the adversarial review):
+
+- **The grammar notes** are `reading/grammar.generated.ts`, written by
+  `pnpm reading:grammar` from `grammar.md`; a test fails when the two
+  differ. Biome leaves the generated module's layout alone.
+- **The prompt version** hashes the model, the effort, the three system
+  messages, the task text and the routing: every byte but the passage.
+  **The store's key** is that version, the check's (`CHECK_VERSION` in
+  `check.ts`, to bump whenever a verdict could change) and the parts'
+  (`PARTS_VERSION` in `passage.ts`, for the layout, the parts and their
+  numbering), with the passage. Both constants are bumped by hand; a
+  test pins each to a SHA-256 of its module's source, so any change to
+  `check.ts` or `passage.ts` fails until someone bumps the constant (if
+  a stored reading could differ) and updates the pin.
+- **The passage as the prompt carries it** is one sentence a line,
+  single spaces, our words as typed (case kept, and a hyphen or
+  apostrophe inside one kept, as in Crowley's "ta-el-o") and words not
+  ours as their letters only; no other punctuation. A sentence ends at
+  `.`, `!`, `?`, `;`, `:` or a line break. The store keys on it, so
+  texts differing only in spacing or punctuation between words share a
+  reading. S3's "A to Z only" admits white space and
+  `. , ; : ! ? ' ’ ‘ " “ ” ( ) -` beside the letters; anything else
+  (digits, accents, other scripts) is refused. The 30-letter cap counts
+  letters only. A random test holds the layout a fixed point and every
+  word numbered once.
+- **Parts.** Over 75 words, two parts, broken at the sentence end
+  nearest the middle that leaves neither over 75, else between runs of
+  Dee's lines, else at the middle. Each part is laid out again on its
+  own and its words numbered from 1, as the checker reads it. A
+  retry pays `1 + ⌊words/100⌋` for the parts it reads (so a failed
+  second part of 75 words costs one unit again). After a part routed
+  other than asked, the next is not sent ("not read").
+- **The output cap** is 60 tokens a word of the part, but never under
+  2,000: reasoning (about 490 tokens a part in 2B), the json fields and
+  the sentence don't shrink with the passage, and 60 a word would cut a
+  2-word answer at 120 tokens, billed for nothing. The hold prices the
+  cap.
+- **The store's lease.** A request that reads holds its row (`claim`,
+  `pending_until`) for 330 s, past the function's 300 s, so a lease
+  outlives its request only if the request died. No sweep (each
+  request's, or the daily job's) deletes a row under a live lease. A row
+  with no part read is deleted when the request ends, so no passage is
+  kept without its reading. Each part is stored as it lands, its failed
+  parts' states once anything is stored. **"Read again"** over a
+  complete reading stores nothing until every part of the new one is
+  read, then replaces it whole (its day starting then); a new reading
+  that fails part way leaves the old one in place, served free to
+  others meanwhile, and discards the parts it did read, so trying
+  "Read again" once more pays for every part again.
+- **The switch** is a row of `enochian_reading_switch`
+  (`insert … values ('readings', true)` turns readings off; `off = false`
+  or no row leaves them on). It is read before the store, so when off
+  nothing is served, a stored reading included (it may be turned off for
+  what a reading says, not only for its cost), and again before each
+  part, so a second part isn't sent once it is off (the part's state is
+  `off`, its hold given back). A reading the switch stops before any
+  call (turned off after the route's look, or unreadable then: the
+  part's state is `failed`) gives its units back too, and its `done`
+  says 0 units.
+- **The ceiling, in order.** A read-only look first (would the reading's
+  worst cases fit today?), then the allowance, then the hold, taken
+  atomically for every part's worst case in one statement; so a reader
+  with no allowance left never holds any of the day's spending. When the
+  hold fails after the allowance was taken (another request took the
+  room meanwhile), the units are given back, no call having been made,
+  and the state is `ceiling`. Each part settles after its call to the
+  Gateway's reported cost, or keeps its hold. The worst case is the
+  request's characters at 1.8 a token (the experiment's figure) at the
+  dearer of the uncached and cache-write rates ($1.25 a million, since a
+  cold call writes the cache), plus the output cap at $5: about $0.10
+  for a 2-word part and $0.12 for a 75-word part with today's
+  132,600-character prompt. Spending is kept in millionths of a dollar a
+  UTC day (`enochian_reading_spend`).
+- **The client's bucket** is an HMAC-SHA-256 of the address (IPv4
+  whole, IPv6 cut to its /64, an IPv4-mapped one as IPv4) under
+  HKDF-SHA-256 of the auth secret (`BETTER_AUTH_SECRET`, through
+  `sqlAuthOptions`), salted with the purpose's label and keyed by the UTC
+  day, as `reading-client:<hex>` in `chat_daily_usage`; the address is
+  Vercel's `x-real-ip` (`ipAddress`), and a request without a usable one
+  shares `reading-client:none`. Rotating the auth secret resets the
+  day's buckets, nothing more.
+- **Units** come from `reserveDailyUsage`, chat's reservation taking
+  units; chat still reserves 1. A signed-out reading reserves the
+  client's bucket, then the pool, in one transaction (`neonFull`);
+  `returnDailyUsage` gives units back only for a reading stopped before
+  any call (the ceiling's hold failing after the reservation, or the
+  switch), every subject in one transaction, each counter row locked
+  (`for update`) before it is lowered or deleted, so concurrent refunds
+  never lose one. (PGlite runs transactions one at a time, so its test
+  shows refunds aren't lost, not the lock itself; that needs native
+  PostgreSQL.)
+- **Same origin** for the reading and both chat routes:
+  `Sec-Fetch-Site: same-origin`, or, from a browser without it, an
+  `Origin` naming the request's `Host` header (not its URL). Vercel's
+  docs give `X-Forwarded-Host` as identical to `Host`, so it is never
+  read (a client can send its own).
+- **The body** is read through a byte cap of 8 KB, whatever its
+  `Content-Length` says, and the requests are built inside the guarded
+  block, so a throw there gives the lease and holds back.
+- **States.** A refusal is one NDJSON line, `{type: "refused", state}`,
+  with a status: forbidden 403, invalid 400, not admitted 422 (with the
+  reason and the word count), busy 409, off 503, ceiling 503 (with
+  `resetAt`), allowance 429 (scope, units, left, limit, `resetAt`, and
+  `Retry-After`), unavailable 503 (the session or the database failed;
+  nothing was sent). A reading streams a `part` line for each part
+  (`read`, with the checked reading and whether it came from the store,
+  or `failed`, with `truncated`, `unreadable`, `routing`, `refused`,
+  `timeout`, `failed`, `not read` or `off`), then `done` (`read`,
+  `partial` or `failed`, and the units taken).
+- **The provider refusing** is the AI SDK's `content-filter` finish; an
+  answer cut at the cap is its `length` finish.
+- **Time.** `maxDuration` is 300 s and each call is aborted after 120 s.
+  The calls run in a promise kept alive with `after`, not tied to the
+  request, so they finish and are stored when the reader leaves.
+- **The log** has one `enochian-read {json}` line a part and a summary:
+  state codes, part and word counts, units, tokens, cost, time, the
+  model the response named and the Gateway's generation id, and for a
+  failed call its error's class and HTTP status, never its message (the
+  SDK's errors carry the request). The SDK's own error logging is off
+  for the call.
+- **The daily job** is a second cron route,
+  `/api/cron/purge-readings` at 00:07 UTC, with the ritual purge's
+  `CRON_SECRET` check. It deletes expired stored readings, spending rows
+  and every `chat_daily_usage` row (chat's too, recreated lazily) from
+  before the UTC day; then (S10) it reads the Gateway's public model
+  list (`https://ai-gateway.vercel.sh/v1/models`) and compares Terra's
+  listed input, output, cache-read and cache-write prices and its base
+  tier with `prices.ts` (each read as a number or a numeric string), answering 500 with an error in the log when
+  they differ or the list can't be read.
+- **Inventories that list every table or cron** were extended: the
+  legacy import's closed table list (the three tables, runtime-only and
+  empty, as chat's counters are) and its pinned schema files, and the
+  release check's expected crons. The chat-research upgrade test pinned
+  the journal's tail; it now pins its own batch (to `0026`).
+
+Not done in 2D: the card (2E).
+
+Release: migration `0027_enochian_readings` (three new tables, nothing
+changed) must be applied to production before this version is promoted,
+by the staged release workflow, as `0018_chat_daily_usage` was. No new
+deployment variable: the client key comes from `BETTER_AUTH_SECRET`,
+the cron from `CRON_SECRET`, the Gateway from the deployment's OIDC
+token. The new cron entry in `vercel.json` takes effect on promotion.
+
+What only a first live call (Gadi's) can settle:
+
+- the cap on a 2-word and a 5-word passage: that 2,000 tokens leaves
+  room for the reasoning, the items and the sentence (`stop`, not
+  `length`), and what each costs;
+- the Gateway's routing and cost metadata through `streamText`
+  (`finalProvider` "openai", `enabledZeroDataRetention` true, `cost`,
+  `generationId`) and that the spend row settles to the cost;
+- that the deployment's OIDC token still authorises the Gateway inside
+  `after()` once the reader has left, and the second part is stored;
+- that the NDJSON stream flushes each part as it lands, not all at the
+  end;
+- that `maxDuration` 300 is allowed on our Vercel plan, and that the
+  second cron registers there;
+- whether production sits behind another proxy, which would make every
+  client one `x-real-ip` and so one bucket of 10 units.
+
 ## The stage-1 review (Fable, 13 November 2026)
 
 The review prototyped the design against the data and plan 074's

@@ -4,6 +4,7 @@ import { pathToFileURL } from "node:url";
 /** The crons the production build must carry: the nightly purge (plan 065). */
 export const EXPECTED_CRONS = [
   { path: "/api/cron/purge-deleted-rituals", schedule: "17 3 * * *" },
+  { path: "/api/cron/purge-readings", schedule: "7 0 * * *" },
 ];
 
 /**

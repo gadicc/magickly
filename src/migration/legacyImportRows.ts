@@ -41,6 +41,10 @@ export const LEGACY_IMPORT_TABLES = {
   temple_forums: schema.templeForums,
   chat_daily_usage: schema.chatDailyUsage,
   site_search_usage: schema.siteSearchUsage,
+  // The AI reading's store, spending and switch (plan 081) are runtime-only.
+  enochian_readings: schema.enochianReadings,
+  enochian_reading_spend: schema.enochianReadingSpend,
+  enochian_reading_switch: schema.enochianReadingSwitch,
   // Runtime-only accounting must be empty; legacy import never invents or replaces spending evidence.
   chat_research_windows: schema.chatResearchWindows,
   chat_research_permits: schema.chatResearchPermits,
@@ -231,6 +235,9 @@ export function projectLegacyImportRows(
       temple_forums: [],
       chat_daily_usage: [],
       site_search_usage: [],
+      enochian_readings: [],
+      enochian_reading_spend: [],
+      enochian_reading_switch: [],
       chat_research_windows: [],
       chat_research_permits: [],
       chat_research_source_policies: [],

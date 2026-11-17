@@ -1,6 +1,10 @@
 import type { EnochianDictionary } from "magick-data/enochian/dictionary";
 import { normEnochian } from "../../src/app/enochian/translate/reading/normalise.ts";
 import {
+  dictionaryText,
+  keyRowText,
+} from "../../src/app/enochian/translate/reading/prompt.ts";
+import {
   type Cipher,
   encipherMeaning,
   cipher as fixedCipher,
@@ -47,6 +51,8 @@ export function serialiseDictionary(
   ),
   names: ReadonlySet<string> = letterNames(dictionary),
 ): string {
+  // Without the cipher, the reading's own text (the app sends it).
+  if (!using) return dictionaryText(dictionary);
   const lines = Object.entries(dictionary).map(([headword, entry]) => {
     const word = using ? using.encipher(headword) : headword;
     const text = entry.meanings
@@ -71,6 +77,7 @@ export function serialiseDictionary(
  * has an empty word column and its GD form.
  */
 export function serialiseRow(row: KeyRowRecord, using?: Cipher): string {
+  if (!using) return keyRowText(row);
   const word = (form?: string) => (form && using ? using.encipher(form) : form);
   const columns = [row.id, word(row.word) ?? "", row.english];
   if (row.gd) columns.push(`GD: ${word(row.gd)}`);
