@@ -1,5 +1,5 @@
 import type { EnochianDictionary } from "magick-data/enochian/dictionary";
-import { normEnochian } from "./normalise.ts";
+import { normEnochian } from "../../src/app/enochian/translate/reading/normalise.ts";
 
 /**
  * Arm A2c's letter substitution (plan 077, "Arms"): one fixed permutation

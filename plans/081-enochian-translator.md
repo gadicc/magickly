@@ -273,12 +273,13 @@ forms where any exist.
     so its page sends only the origin as Referer.
 20. **The limitations, per mode.** The lookup stage has its own list in
     `limitations.ts`, structured per mode so stage 2 adds its own
-    (that the text goes to Anthropic). This plan quotes it word for
-    word under a test, as plan 077 did; plan 077's list stays for its
-    own record. The list Gadi accepted, with three items reworded to
-    stay true under this design (the review found the first two too
-    strong; the third changed when possessives moved after their noun),
-    which Gadi confirmed on 13 November 2026:
+    (that the text goes to OpenAI through Vercel: S8). This plan quotes
+    it word for word under a test, as plan 077 did; plan 077's list
+    stays for its own record. The list Gadi accepted, with three items
+    reworded to stay true under this design (the review found the first
+    two too strong; the third changed when possessives moved after their
+    noun), which Gadi confirmed on 13 November 2026, its last item
+    reworded with stage 2 to say it of the lookup (S9, step 2E):
     - This translator looks words up; it doesn't understand sentences.
       Each word is a form from Dee's Keys or our dictionary, labelled
       with its source, or a gap. Grammar words follow our notes' rules,
@@ -293,8 +294,9 @@ forms where any exist.
     - Meanings and rules come from Dee, Laycock and Leitch, and some
       from later traditions (Schueler, the Golden Dawn). Each is
       labelled with its source.
-    - What you type isn't sent anywhere. The translation runs in your
-      browser.
+    - The lookup runs in your browser, and your text stays in the
+      page's address after the # sign, which isn't sent anywhere. Only an
+      AI reading sends it, when you ask for one.
 21. **Figures, script-only** (changed after the spike). The page
     shows two, computed from the shipped code by a committed script,
     written to a small numbers-only file beside `bars.ts`, which a
@@ -564,7 +566,8 @@ S9. **Decision 19 and the lookup's limitations.** The lookup still runs
     in the browser and its text stays in the fragment; its last
     limitation is reworded to say so of the lookup, and it gains one
     for the hints (machine-suggested from meanings, unreviewed). The
-    stale "goes to Anthropic" in `limitations.ts` and here is fixed.
+    stale "goes to Anthropic" in `limitations.ts` and here is fixed
+    (both done in 2E; the hints' item comes with them, in 2F).
 S10. **No text in logs.** Errors are caught and logged by class with
     counts, tokens, cost and latency only, never the text, the prompt
     or a hash of the text (the SDK's errors carry the whole request,
@@ -670,6 +673,377 @@ What 2B was to record:
   built from glosses passes. The rule stops a sentence about something
   else, not a wrong arrangement of the right words; the card's label,
   "the model's sentence, not checked", carries the rest.
+
+### 2C build notes (17 November 2026)
+
+The checker is `src/app/enochian/translate/reading/check.ts`
+(`checkReading`), pure and server-side, beside what moved there from
+plan 077's scripts: `normalise.ts`, S7's `sentence.ts`, and the item
+type and `parseRef` (`item.ts`). The experiment's scripts import them
+from the app; plan 077's checker (`checkItem`) is unchanged, its tests
+pass with only their imports changed, its prompts hash the same, and
+2B's reading measures recompute to the saved `summary` and per-call
+`rule`. The decisions S6 left open:
+
+- **A word is the lookup's token.** One row for each, numbered from 1
+  as the prompt will number them, so one of Crowley's spaced forms
+  ("das iod") is one word. An item with no token or one out of range is
+  dropped and counted, never shown; several on one word are a join.
+- **Confirmed** needs basis "attested" or "derived" (a coinage claims
+  no source, so it is never confirmed), a ref that resolves in our data,
+  and its English in that source's gloss. One item is accepted for a
+  word the lookup reads as one word (never one it reads only in parts:
+  "das iod" is DSI and OD, so one item citing Key 4.40 reads half of
+  it) when the lookup offers its row for that word, or its headword as
+  the word's only entry, or when it is the word whole in one of our
+  spellings: a fold, Crowley's whole form (never one of his spaced
+  parts, so TA is not Key 4.32's "ta el-o"), or Leitch's spelling of one
+  row. A Key word whose entries are its parts (TAGE opens TA and GE) is
+  read in parts: GE's "not, only" is not TAGE's. A headword is found by
+  the lookup's fold, so a ref with no dictionary entry (DSONF is only a
+  Key word) doesn't resolve. A row's gloss is its English; a
+  headword's, any one of its meanings. Key 19's slot is LIL's row, and
+  every Aethyr read there opens LIL's entry: another Aethyr is accepted
+  there only by the slot's row, checked against the lookup's gloss for
+  it ("in the second air" for ARN) and shown as that Aethyr, never by
+  LIL's headword.
+- **English in a gloss.** Every content word of the model's English
+  (stemmed, Dee's spellings folded, as plan 077 compares) is in one
+  gloss. A reading of grammar words only needs the gloss's words, or a
+  comma-separated piece's where the gloss itself is grammar words only:
+  "I" meets "I, my", but "of the" does not meet CAOSGO's "earth, of
+  the". A negation in the English (not, no, nor, never, none, neither,
+  "-n't") needs the same word in the gloss, since plan 077's normalising
+  takes "not" and "no" as grammar words ("not reign" would meet
+  "reign"); plan 077's own scoring is unchanged.
+- **Joins** are checked only as the lookup reads the word: one of its
+  readings in parts (a split, G27's shared letter included, a form
+  spanning rows, or a Key word's entries, TA + GE for TAGE), matched
+  part by part, each part resolving and
+  holding as above. Our spellings alone would rebuild nonsense from
+  one-letter headwords (L + D + S), so there is no free concatenation:
+  a known word whose parts aren't a reading of the lookup's is
+  unconfirmed. A word with more than 8 items is not checked
+  (unconfirmed, or the model's guess), its English still shown, cut.
+- **Known** means the lookup has any reading of the word. A reading of
+  one it hasn't is the model's guess, whatever its parts or refs.
+- **Sources** appear only on confirmed and unconfirmed rows, for refs
+  accepted for that very word (for a join, when its parts are the
+  lookup's reading), as our data names them: the dictionary's key (of
+  headwords that fold alike, the one the model wrote, else the first),
+  or the Key and row with Dee's word there (in Key 19's slot, the
+  Aethyr read). A guess or no reading has none.
+- **English.** Each item's target is made plain text once, before any
+  check: NFKC (fullwidth, mathematical and circled letters and
+  ligatures become plain letters, so "ｎｏｔ reign" is "not reign"),
+  controls and format characters removed. Every check and the row read
+  that same text. A row's English is its items' plain targets joined,
+  cut at 10 words (`cut`). "No reading" is no item, basis "unknown",
+  English with no words or only "unknown", or English with a link (a
+  scheme, "www.", an address with "@", or a dotted name ending in two
+  letters or more; "e.g." is no link): such a row shows no English at
+  all.
+- **The sentence.** S7's evidence is the rows' English as shown plus the
+  lookup's glosses (`tokenGlosses`, the passage read once). Beyond
+  `sentenceRule`, the checker withholds a sentence with a link, or
+  longer than 4 times the passage's words (at least 12): S7's "a few
+  times", from 2B's 1.96 at most. Shown, it is plain text; withheld, the
+  result has only the reason and S7's counts, no word of the model's
+  (the eval's measures keep `sentenceRule`'s full verdict).
+- **Cost.** The check is linear in the items and the passage: a passage
+  S3 admits (150 words, 10 of them a letter off ours) with 20 items a
+  word checks in well under 100 ms. The lookup's own reading dominates:
+  150 near-miss words take it about 110 ms, which S3 never admits.
+
+### 2D build notes (17 November 2026)
+
+The route is `POST /api/enochian/read` (`src/app/api/enochian/read`),
+its work in `src/app/enochian/translate/reading/respond.ts` with its
+dependencies injected (`dependencies.ts` holds the real ones, and a
+test builds them with fakes for the network), so the tests run it on
+PGlite with a fake model. Beside the checker now live what builds A3s's
+request (`prompt.ts`: instructions, context, task text, numbering,
+routing; `gateway.ts`: the gateway's options and its routing report;
+`reply.ts`: reply parsing, moved from the scripts), the admission and
+parts (`passage.ts`), the request and its version (`request.ts`),
+Terra's prices (`prices.ts`) and their daily check (`priceCheck.ts`),
+the store (`store.ts`), the ceiling and switch (`ledger.ts`), the
+allowance (`allowance.ts`), the client's bucket (`client.ts`) and the
+daily deletions (`purge.ts`). The experiment imports the first three;
+its 469 requests (plan 077's folds and arms, the new text's, the round
+trip's, A3s's) were hashed against the code before the move and match.
+`stage2b.test.ts` builds one passage both ways and compares
+instructions, context, grammar notes, the user message and routing byte
+for byte, and sends both through the AI SDK (faked) to hold the app's
+call settings to A3s's but for two named differences: the output cap
+(the part's, not the experiment's 32,000) and the Anthropic cache
+breakpoints, which OpenAI ignores. Decisions beyond the design (the
+first list as built, then the fixes after the adversarial review):
+
+- **The grammar notes** are `reading/grammar.generated.ts`, written by
+  `pnpm reading:grammar` from `grammar.md`; a test fails when the two
+  differ. Biome leaves the generated module's layout alone.
+- **The prompt version** hashes the model, the effort, the three system
+  messages, the task text and the routing: every byte but the passage.
+  **The store's key** is that version, the check's (`CHECK_VERSION` in
+  `check.ts`, to bump whenever a verdict could change) and the parts'
+  (`PARTS_VERSION` in `passage.ts`, for the layout, the parts and their
+  numbering), with the passage. Both constants are bumped by hand; a
+  test pins each to a SHA-256 of its module's source, so any change to
+  `check.ts` or `passage.ts` fails until someone bumps the constant (if
+  a stored reading could differ) and updates the pin.
+- **The passage as the prompt carries it** is one sentence a line,
+  single spaces, our words as typed (case kept, and a hyphen or
+  apostrophe inside one kept, as in Crowley's "ta-el-o") and words not
+  ours as their letters only; no other punctuation. A sentence ends at
+  `.`, `!`, `?`, `;`, `:` or a line break. The store keys on it, so
+  texts differing only in spacing or punctuation between words share a
+  reading. S3's "A to Z only" admits white space and
+  `. , ; : ! ? ' ’ ‘ " “ ” ( ) -` beside the letters; anything else
+  (digits, accents, other scripts) is refused. The 30-letter cap counts
+  letters only. A random test holds the layout a fixed point and every
+  word numbered once.
+- **Parts.** Over 75 words, two parts, broken at the sentence end
+  nearest the middle that leaves neither over 75, else between runs of
+  Dee's lines, else at the middle. Each part is laid out again on its
+  own and its words numbered from 1, as the checker reads it. A
+  retry pays `1 + ⌊words/100⌋` for the parts it reads (so a failed
+  second part of 75 words costs one unit again). After a part routed
+  other than asked, the next is not sent ("not read").
+- **The output cap** is 60 tokens a word of the part, but never under
+  2,000: reasoning (about 490 tokens a part in 2B), the json fields and
+  the sentence don't shrink with the passage, and 60 a word would cut a
+  2-word answer at 120 tokens, billed for nothing. The hold prices the
+  cap.
+- **The store's lease.** A request that reads holds its row (`claim`,
+  `pending_until`) for 330 s, past the function's 300 s, so a lease
+  outlives its request only if the request died. No sweep (each
+  request's, or the daily job's) deletes a row under a live lease. A row
+  with no part read is deleted when the request ends, so no passage is
+  kept without its reading. Each part is stored as it lands, its failed
+  parts' states once anything is stored. **"Read again"** over a
+  complete reading stores nothing until every part of the new one is
+  read, then replaces it whole (its day starting then); a new reading
+  that fails part way leaves the old one in place, served free to
+  others meanwhile, and discards the parts it did read, so trying
+  "Read again" once more pays for every part again.
+- **The switch** is a row of `enochian_reading_switch`
+  (`insert … values ('readings', true)` turns readings off; `off = false`
+  or no row leaves them on). It is read before the store, so when off
+  nothing is served, a stored reading included (it may be turned off for
+  what a reading says, not only for its cost), and again before each
+  part, so a second part isn't sent once it is off (the part's state is
+  `off`, its hold given back). A reading the switch stops before any
+  call (turned off after the route's look, or unreadable then: the
+  part's state is `failed`) gives its units back too, and its `done`
+  says 0 units.
+- **The ceiling, in order.** A read-only look first (would the reading's
+  worst cases fit today?), then the allowance, then the hold, taken
+  atomically for every part's worst case in one statement; so a reader
+  with no allowance left never holds any of the day's spending. When the
+  hold fails after the allowance was taken (another request took the
+  room meanwhile), the units are given back, no call having been made,
+  and the state is `ceiling`. Each part settles after its call to the
+  Gateway's reported cost, or keeps its hold. The worst case is the
+  request's characters at 1.8 a token (the experiment's figure) at the
+  dearer of the uncached and cache-write rates ($1.25 a million, since a
+  cold call writes the cache), plus the output cap at $5: about $0.10
+  for a 2-word part and $0.12 for a 75-word part with today's
+  132,600-character prompt. Spending is kept in millionths of a dollar a
+  UTC day (`enochian_reading_spend`).
+- **The client's bucket** is an HMAC-SHA-256 of the address (IPv4
+  whole, IPv6 cut to its /64, an IPv4-mapped one as IPv4) under
+  HKDF-SHA-256 of the auth secret (`BETTER_AUTH_SECRET`, through
+  `sqlAuthOptions`), salted with the purpose's label and keyed by the UTC
+  day, as `reading-client:<hex>` in `chat_daily_usage`; the address is
+  Vercel's `x-real-ip` (`ipAddress`), and a request without a usable one
+  shares `reading-client:none`. Rotating the auth secret resets the
+  day's buckets, nothing more.
+- **Units** come from `reserveDailyUsage`, chat's reservation taking
+  units; chat still reserves 1. A signed-out reading reserves the
+  client's bucket, then the pool, in one transaction (`neonFull`);
+  `returnDailyUsage` gives units back only for a reading stopped before
+  any call (the ceiling's hold failing after the reservation, or the
+  switch), every subject in one transaction, each counter row locked
+  (`for update`) before it is lowered or deleted, so concurrent refunds
+  never lose one. (PGlite runs transactions one at a time, so its test
+  shows refunds aren't lost, not the lock itself; that needs native
+  PostgreSQL.)
+- **Same origin** for the reading and both chat routes:
+  `Sec-Fetch-Site: same-origin`, or, from a browser without it, an
+  `Origin` naming the request's `Host` header (not its URL). Vercel's
+  docs give `X-Forwarded-Host` as identical to `Host`, so it is never
+  read (a client can send its own).
+- **The body** is read through a byte cap of 8 KB, whatever its
+  `Content-Length` says, and the requests are built inside the guarded
+  block, so a throw there gives the lease and holds back.
+- **States.** A refusal is one NDJSON line, `{type: "refused", state}`,
+  with a status: forbidden 403, invalid 400, not admitted 422 (with the
+  reason and the word count), busy 409, off 503, ceiling 503 (with
+  `resetAt`), allowance 429 (scope, units, left, limit, `resetAt`, and
+  `Retry-After`), unavailable 503 (the session or the database failed;
+  nothing was sent). A reading streams a `part` line for each part
+  (`read`, with the checked reading and whether it came from the store,
+  or `failed`, with `truncated`, `unreadable`, `routing`, `refused`,
+  `timeout`, `failed`, `not read` or `off`), then `done` (`read`,
+  `partial` or `failed`, and the units taken).
+- **The provider refusing** is the AI SDK's `content-filter` finish; an
+  answer cut at the cap is its `length` finish.
+- **Time.** `maxDuration` is 300 s and each call is aborted after 120 s.
+  The calls run in a promise kept alive with `after`, not tied to the
+  request, so they finish and are stored when the reader leaves.
+- **The log** has one `enochian-read {json}` line a part and a summary:
+  state codes, part and word counts, units, tokens, cost, time, the
+  model the response named and the Gateway's generation id, and for a
+  failed call its error's class and HTTP status, never its message (the
+  SDK's errors carry the request). The SDK's own error logging is off
+  for the call.
+- **The daily job** is a second cron route,
+  `/api/cron/purge-readings` at 00:07 UTC, with the ritual purge's
+  `CRON_SECRET` check. It deletes expired stored readings, spending rows
+  and every `chat_daily_usage` row (chat's too, recreated lazily) from
+  before the UTC day; then (S10) it reads the Gateway's public model
+  list (`https://ai-gateway.vercel.sh/v1/models`) and compares Terra's
+  listed input, output, cache-read and cache-write prices and its base
+  tier with `prices.ts` (each read as a number or a numeric string), answering 500 with an error in the log when
+  they differ or the list can't be read.
+- **Inventories that list every table or cron** were extended: the
+  legacy import's closed table list (the three tables, runtime-only and
+  empty, as chat's counters are) and its pinned schema files, and the
+  release check's expected crons. The chat-research upgrade test pinned
+  the journal's tail; it now pins its own batch (to `0026`).
+
+Not done in 2D: the card (2E).
+
+Release: migration `0027_enochian_readings` (three new tables, nothing
+changed) must be applied to production before this version is promoted,
+by the staged release workflow, as `0018_chat_daily_usage` was. No new
+deployment variable: the client key comes from `BETTER_AUTH_SECRET`,
+the cron from `CRON_SECRET`, the Gateway from the deployment's OIDC
+token. The new cron entry in `vercel.json` takes effect on promotion.
+
+What only a first live call (Gadi's) can settle:
+
+- the cap on a 2-word and a 5-word passage: that 2,000 tokens leaves
+  room for the reasoning, the items and the sentence (`stop`, not
+  `length`), and what each costs;
+- the Gateway's routing and cost metadata through `streamText`
+  (`finalProvider` "openai", `enabledZeroDataRetention` true, `cost`,
+  `generationId`) and that the spend row settles to the cost;
+- that the deployment's OIDC token still authorises the Gateway inside
+  `after()` once the reader has left, and the second part is stored;
+- that the NDJSON stream flushes each part as it lands, not all at the
+  end;
+- that `maxDuration` 300 is allowed on our Vercel plan, and that the
+  second cron registers there;
+- whether production sits behind another proxy, which would make every
+  client one `x-real-ip` and so one bucket of 10 units.
+
+### 2E build notes (17 November 2026)
+
+The offer and the card are `AiReading.tsx`, under the reading line of
+the Enochian-into-English result (also when a text is read both ways);
+the request is `readingRequest.ts`, a POST to `/api/enochian/read` with
+`{text, again}` in its body, read line by line as the NDJSON lands. The
+words are `LABELS.reading` in `labels.ts`. The chat allowances moved to
+`src/app/chat/limits.ts` and the client cap to `reading/limits.ts`
+(re-exported where they were), so the page can name them without
+bundling the database. Task 1's numbering (`numberedInput`) moved from
+`prompt.ts` to `reading/numbering.ts`, which `prompt.ts` re-exports, so
+the page's `readingParts` bundles no prompt text; `passage.ts` changed
+with it, so `PARTS_VERSION` is 2 and its pin updated (the layout is
+unchanged, and the A3s byte-for-byte test passes). `check.ts` is
+unchanged. Decisions beyond the design (the first list as built, then
+the review's fixes, folded in):
+
+- **The offer** runs `admitReading` on the text the lookup read (its
+  first 500 words) and shows the button only when it passes. What it
+  uses is shown once the session is known: "uses 1 of today's 100", or
+  "uses 1 of today's allowance shared by readers not signed in, at most
+  10 a day for each address". The button names that as its description. It can't
+  know a reading is already stored, so a reading served free from the
+  store is offered at its price; the card then says it used none.
+- **The card belongs to a passage**: keyed by the admitted passage, so a
+  new text brings the offer back, and leaving aborts the request (the
+  route's calls go on and are stored).
+- **The sentence**: the shown parts' sentences as one paragraph under
+  "The model's sentence, not checked"; a withheld one says so, naming
+  its part when there are two, with S7's reasons in plain words ("too
+  few of its words are in the word readings or our data", "it is far
+  longer than your text", "it holds a link", "the model gave none", "it
+  has no words of meaning to compare").
+- **The words**: one list for both parts, each row the reader's word,
+  the model's English (cut ones end "…"), the state as words
+  (confirmed, not confirmed, the model's guess, no reading; colour only
+  helps) and its sources ("Key 1.4 GOHO", "dictionary, OL", "Key 19.1,
+  the Aethyr LIL (1)"). No links: the tiles below still open entries. A
+  failed part shows in its words' place, with why ("Part 2 of 2: the
+  model took too long.").
+- **Retry** sends `again: false`, so the route serves the read parts
+  from its store and reads the rest; its cost is shown from the
+  client's own `readingParts` (one unit for a 60-word second part). It
+  is offered for the model's failures (truncated, unreadable, timeout,
+  failed) and for an answer that stopped arriving; not for the provider
+  refusing (likely to refuse again, at a cost), the switch, or a part
+  the gateway didn't route as asked and the part not sent after it
+  (resending repeats it): the card says the reading stopped because
+  the provider's privacy terms (OpenAI, keeping no copy) couldn't be
+  confirmed, and nothing more was sent. Busy and "unavailable" offer "Try again" at the reading's
+  full price. After a failed "Read again", a retry gets the old stored
+  reading back free, not a new one.
+- **"Read again"** says what it does beside the button ("a new reading,
+  which replaces this one, uses 1 of today's 100"); there is no second
+  confirmation.
+- **Refusals** in plain words, the reset time in the reader's clock
+  (24-hour, "02:00"): the reader's allowance (what it needs and what is
+  left), the address's 10 ("for each address not signed in (readers
+  sharing an address share them)"), the shared pool (spent, or too
+  little left for this reading, with "signed in, you have your own"),
+  the ceiling, off, busy, unavailable ("Something went wrong on our
+  side, so the reading didn't start. Nothing was sent.").
+- **Where the text went**, whenever a model call was made or units were
+  taken, every part failing included: "Your text went to OpenAI through
+  Vercel for this reading", or, after a routing failure, "through
+  Vercel …, which didn't confirm that it reached OpenAI with no copy
+  kept"; then "and our server keeps it and the reading for a day", or
+  "with no part read, our server keeps none of it" (the route keeps no
+  passage without a reading). Served wholly from the store, it says
+  nothing went to OpenAI. Then what it used ("It used 1 of today's
+  100", "of today's shared allowance", or none).
+- **The answer is checked before use** (`readingEvent`): an event of a
+  type the card doesn't know, a line that isn't JSON (one cut short), a
+  part outside 1 to its answer's parts (at most 8), a reading whose
+  words or sentence the card can't show, or a refusal without its
+  counts or time is passed over. An answer that ends without `done` or
+  a refusal, or isn't NDJSON (an HTML error page), ends as "The reading
+  stopped arriving", with a retry.
+- **Accessibility**: the card is a region named by its heading, which
+  takes the focus from the button it replaces. A hidden polite live
+  region, in the page empty from the start beside the offer or the
+  card, speaks one line as each part lands ("Part 1 of 2 read: 37 of
+  38 words confirmed."), a refusal, or a lost answer, not the whole
+  card. The state labels' contrast on the card (WCAG ratio; the card is
+  `action.hover` over the page, dark measured on `background.default`,
+  paper in brackets): light, confirmed in `success.dark` 7.2, not
+  confirmed and no reading in `text.secondary` 5.6, the model's guess
+  in `text.primary` on a 14% warning tint, bordered in `warning.main`,
+  13.3; dark, confirmed in `success.light` 7.5 (6.7), not confirmed and
+  no reading 7.0 (6.3), the guess in `warning.light` on the tint 6.6
+  (5.9). (As first built, the guess in `warning.dark` was 3.0 and
+  confirmed in `success.main` 4.7.)
+- **Limitations**: S8's five shown in the card under "What the AI
+  reading can't do"; the lookup's six stay where they were.
+- **Page text**: a paragraph under "Enochian into English" (a passage
+  can also be read with AI, each word checked, the sentence not, it can
+  be wrong, it uses the allowance), and "Your text stays with you" now
+  says it of the lookup and names the exception. The description gains
+  "or by an AI reading whose words are checked against them" (the
+  sentence isn't checked).
+
+Checked in headless Chromium with the route intercepted (CDP `Fetch`),
+at 390 and 1280 wide, light and dark. Not seen in a browser: parts
+landing one by one (the interception delivers the body whole; the
+jsdom tests stream them), and Safari.
 
 ## The stage-1 review (Fable, 13 November 2026)
 

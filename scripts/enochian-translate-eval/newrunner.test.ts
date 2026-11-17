@@ -12,12 +12,12 @@ import {
   ROUND_TRIP_KINDS,
   TRANSLATOR_BARS,
 } from "../../src/app/enochian/translate/bars.ts";
+import { parseRef } from "../../src/app/enochian/translate/reading/item.ts";
 import {
-  type AnswerItem,
-  checkContextFrom,
-  checkItem,
-  parseRef,
-} from "./answer.ts";
+  englishWords,
+  stemEnglish,
+} from "../../src/app/enochian/translate/reading/normalise.ts";
+import { type AnswerItem, checkContextFrom, checkItem } from "./answer.ts";
 import { a1Task3 } from "./baseline.ts";
 import { dictionary as fixtureDictionary, row } from "./fixtures.ts";
 import {
@@ -92,7 +92,6 @@ import {
   prng,
   withPlantedKnowns,
 } from "./newtext.ts";
-import { englishWords, stemEnglish } from "./normalise.ts";
 import { planSpecs, requestId } from "./prompt.ts";
 import {
   type EvalData,

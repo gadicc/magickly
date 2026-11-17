@@ -28,7 +28,7 @@ it("adds an unset preference to populated profiles, preserving names, identity a
       readFileSync("drizzle/meta/_journal.json", "utf8"),
     );
     const entry = journal.entries.find(
-      (row: { tag: string }) => row.tag === "0027_superb_king_bedlam",
+      (row: { tag: string }) => row.tag === "0028_ui_locale",
     );
     expect(entry).toBeTruthy();
     mkdirSync(join(folder, "meta"));

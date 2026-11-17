@@ -1,5 +1,5 @@
 {
-  "id": "60ea5c5d-1165-4301-9282-1f14c0276171",
+  "id": "97b9aa5b-9268-4ecb-887e-0d60b7ae0dfd",
   "prevId": "8849cd6c-8fa5-4a39-8f70-009ede8bbade",
   "version": "7",
   "dialect": "postgresql",
@@ -2191,6 +2191,152 @@
           "value": "length(\"temple_forums\".\"api_key_encrypted\") between 1 and 2048 and length(\"temple_forums\".\"api_key_hint\") <= 8"
         }
       },
+      "isRLSEnabled": false
+    },
+    "public.enochian_reading_spend": {
+      "name": "enochian_reading_spend",
+      "schema": "",
+      "columns": {
+        "day": {
+          "name": "day",
+          "type": "date",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "micro_usd": {
+          "name": "micro_usd",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "enochian_reading_spend_not_negative": {
+          "name": "enochian_reading_spend_not_negative",
+          "value": "\"enochian_reading_spend\".\"micro_usd\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.enochian_reading_switch": {
+      "name": "enochian_reading_switch",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "off": {
+          "name": "off",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "changed_at": {
+          "name": "changed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "enochian_reading_switch_one_row": {
+          "name": "enochian_reading_switch_one_row",
+          "value": "\"enochian_reading_switch\".\"id\" = 'readings'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.enochian_readings": {
+      "name": "enochian_readings",
+      "schema": "",
+      "columns": {
+        "version": {
+          "name": "version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "passage": {
+          "name": "passage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parts": {
+          "name": "parts",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "complete": {
+          "name": "complete",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "claim": {
+          "name": "claim",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pending_until": {
+          "name": "pending_until",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "enochian_readings_created_at": {
+          "name": "enochian_readings_created_at",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "enochian_readings_version_passage_pk": {
+          "name": "enochian_readings_version_passage_pk",
+          "columns": [
+            "version",
+            "passage"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.legacy_file_relocations": {
@@ -6232,12 +6378,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
-        },
-        "ui_locale": {
-          "name": "ui_locale",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {},
@@ -6259,12 +6399,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {
-        "user_profile_ui_locale_check": {
-          "name": "user_profile_ui_locale_check",
-          "value": "\"user_profile\".\"ui_locale\" in ('en', 'he')"
-        }
-      },
+      "checkConstraints": {},
       "isRLSEnabled": false
     }
   },

@@ -6,8 +6,37 @@ import dictionary from "magick-data/enochian/dictionary";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { buildKeysTable } from "../../src/app/enochian/translate/keysTable.ts";
 import { createTranslator } from "../../src/app/enochian/translate/lookup.ts";
+import { gatewayReadingModel } from "../../src/app/enochian/translate/reading/model.ts";
+import {
+  admitReading,
+  readingParts,
+} from "../../src/app/enochian/translate/reading/passage.ts";
+import {
+  TERRA_BASE_RATE_BELOW,
+  TERRA_MICRO_USD,
+} from "../../src/app/enochian/translate/reading/prices.ts";
+import {
+  parseAnswer,
+  parseSentence,
+} from "../../src/app/enochian/translate/reading/reply.ts";
+import {
+  buildReadingPrompt,
+  outputCap,
+  partRequest,
+} from "../../src/app/enochian/translate/reading/request.ts";
+import {
+  lookupGlosses,
+  SENTENCE_RULE_SHARE,
+  sentenceEvidence,
+  sentenceRule,
+} from "../../src/app/enochian/translate/reading/sentence.ts";
 import { evalData, newBarsCommand } from "./cli.ts";
-import { EXPERIMENT_CAP_USD, Ledger, NO_TOKENS } from "./ledger.ts";
+import {
+  EXPERIMENT_CAP_USD,
+  Ledger,
+  LISTED_PRICES,
+  NO_TOKENS,
+} from "./ledger.ts";
 import { MODELS } from "./models.ts";
 import {
   NEW_ARMS,
@@ -22,9 +51,9 @@ import {
   SENTENCE_INSTRUCTIONS,
 } from "./newprompt.ts";
 import { barGroup, cacheCheck } from "./newrunner.ts";
+import type { NewTextRow, NewTextSet } from "./newtext.ts";
 import { INSTRUCTIONS } from "./prompt.ts";
 import { passageText, readingMeasures } from "./reading.ts";
-import { parseAnswer, parseSentence } from "./reply.ts";
 import {
   type EvalData,
   execute,
@@ -38,13 +67,8 @@ import {
   writeJson,
 } from "./runner.ts";
 import {
-  lookupGlosses,
-  SENTENCE_RULE_SHARE,
-  sentenceEvidence,
-  sentenceRule,
-} from "./sentence.ts";
-import {
   aiGateway,
+  CACHE_BREAKPOINT,
   cachePrefix,
   type Gateway,
   gatewayOptions,
@@ -238,6 +262,164 @@ describe("a reply's sentence", () => {
       expect(parseSentence(text)).toBeUndefined();
     }
     expect(parseSentence("no block")).toBeUndefined();
+  });
+});
+
+describe("the app's reading request (plan 081, step 2D)", () => {
+  const translator = createTranslator(buildKeysTable(), dictionary);
+
+  it("keeps A3s's instructions byte for byte", () => {
+    expect(sha(SENTENCE_INSTRUCTIONS)).toBe(
+      "1f66bada73ca9b972a2eb0deb472619108e8e15b0efe16b7a83085bd6dfb4cc8",
+    );
+  });
+
+  /** One passage, as the app's request and as A3s's for the same words. */
+  function both() {
+    const text = "SONF VORSG, ZIR.\nMAD das iod IAD BALT";
+    const admitted = admitReading(translator, text);
+    if (!admitted.ok) throw new Error(admitted.reason);
+    const [part, ...more] = readingParts(translator, admitted.passage);
+    expect(more).toEqual([]);
+    const prompt = buildReadingPrompt(data);
+    const app = partRequest(prompt, part);
+
+    // The same words as a passage of the new text, without planted knowns.
+    const lines = part.text.split("\n").map((line) => line.split(" "));
+    // "das iod" is one word of the lookup's, as the app numbers it.
+    lines[1] = ["MAD", "das iod", "IAD", "BALT"];
+    const rows = lines.flatMap((words, s) =>
+      words.map(
+        (enochian, i): NewTextRow => ({
+          id: `S0${s + 1}.0${i + 1}`,
+          sentence: `S0${s + 1}`,
+          kind: "unchanged",
+          at: "1.1",
+          enochian,
+          english: "",
+          forms: [],
+        }),
+      ),
+    );
+    const newText = {
+      ...data.newText,
+      sentences: lines.map((_, s) => ({
+        id: `S0${s + 1}`,
+        passages: [],
+        rows: rows.filter((one) => one.sentence === `S0${s + 1}`),
+      })),
+      plantedKnowns: [],
+    } as NewTextSet;
+    const evalRequest = newRequest(
+      {
+        arm: "A3s",
+        task: 1,
+        subset: "all",
+        part: 1,
+        sentences: ["S01", "S02"],
+        model: terra,
+        effort: "medium",
+      },
+      { ...data, newText },
+    );
+    return { part, prompt, app, evalRequest };
+  }
+
+  it("is the request A3s builds for the same words", () => {
+    const { prompt, app, evalRequest } = both();
+    expect(app.prompt).toBe(evalRequest.prompt);
+    expect(
+      app.prompt.endsWith(
+        "[1] SONF [2] VORSG [3] ZIR\n[4] MAD [5] das iod [6] IAD [7] BALT",
+      ),
+    ).toBe(true);
+    expect(app.instructions).toEqual(evalRequest.instructions);
+    expect(sha(app.instructions[1])).toBe(sha(evalRequest.instructions[1]));
+    expect(sha(app.instructions[2])).toBe(sha(evalRequest.instructions[2]));
+    expect(prompt.routing).toEqual(evalRequest.routing);
+    expect([prompt.model, prompt.effort]).toEqual([
+      evalRequest.model,
+      evalRequest.effort,
+    ]);
+  });
+
+  it("sends A3s's call settings, but for two named differences", async () => {
+    const { part, prompt, app, evalRequest } = both();
+    const signal = new AbortController().signal;
+    metadata = {
+      gateway: {
+        routing: { finalProvider: "openai" },
+        enabledZeroDataRetention: true,
+      },
+    };
+    await aiGateway().generate(evalRequest, { signal });
+    await gatewayReadingModel({
+      model: prompt.model,
+      effort: prompt.effort,
+      routing: prompt.routing,
+      instructions: app.instructions,
+      prompt: app.prompt,
+      maxOutputTokens: app.maxOutputTokens,
+      signal,
+    });
+    expect(sent).toHaveLength(2);
+    const [tested, sending] = sent as Record<string, unknown>[];
+    // 1. The output cap: the part's, not the experiment's for every call.
+    expect(tested.maxOutputTokens).toBe(32_000);
+    expect(sending.maxOutputTokens).toBe(outputCap(part.words));
+    // 2. No Anthropic cache breakpoints, which OpenAI ignores.
+    const instructions = tested.instructions as {
+      content: string;
+      providerOptions?: unknown;
+    }[];
+    expect(instructions.map((one) => one.providerOptions)).toEqual([
+      undefined,
+      CACHE_BREAKPOINT,
+      CACHE_BREAKPOINT,
+    ]);
+    // And the app turns the SDK's own error logging off.
+    expect(typeof sending.onError).toBe("function");
+    expect(tested.onError).toBeUndefined();
+    // Everything else is the same.
+    const { onError: _onError, ...rest } = sending;
+    expect({ ...rest, maxOutputTokens: 32_000 }).toEqual({
+      ...tested,
+      instructions: instructions.map(({ providerOptions: _p, ...one }) => one),
+    });
+  });
+
+  it("is versioned by every byte of the prompt, the model and the routing", () => {
+    const prompt = buildReadingPrompt(data);
+    expect(prompt.version).toMatch(/^[0-9a-f]{64}$/);
+    expect(buildReadingPrompt(data).version).toBe(prompt.version);
+    const [first, ...rest] = Object.entries(data.dictionary);
+    const fixed = Object.fromEntries([
+      [first[0], { ...first[1], meanings: [...first[1].meanings].reverse() }],
+      ...rest,
+    ]);
+    expect(
+      buildReadingPrompt({ ...data, dictionary: { ...fixed, ZZZQ: first[1] } })
+        .version,
+    ).not.toBe(prompt.version);
+    expect(
+      buildReadingPrompt({ ...data, grammar: `${data.grammar}\nMore.` })
+        .version,
+    ).not.toBe(prompt.version);
+  });
+
+  it("holds the ceiling at the prices the experiment ran under", () => {
+    const listed = LISTED_PRICES[terra];
+    const micro = (usd: string) => Math.round(Number(usd) * 1e12) / 1e6;
+    expect(TERRA_MICRO_USD).toEqual({
+      input: micro(listed.input),
+      cacheWrite: micro(listed.input_cache_write ?? ""),
+      cacheRead: micro(listed.input_cache_read ?? ""),
+      output: micro(listed.output),
+    });
+    expect(listed.input_tiers?.[0].max).toBe(TERRA_BASE_RATE_BELOW);
+    // The whole prompt stays within the base rates.
+    const prompt = buildReadingPrompt(data);
+    expect(prompt.instructionChars / 1.8).toBeLessThan(TERRA_BASE_RATE_BELOW);
   });
 });
 

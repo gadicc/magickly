@@ -16,6 +16,7 @@ import { parseArgs } from "node:util";
 import dictionary from "magick-data/enochian/dictionary";
 import keys from "magick-data/enochian/keys";
 import { BARS_SETTLED } from "../../src/app/enochian/translate/bars.ts";
+import { normEnochian } from "../../src/app/enochian/translate/reading/normalise.ts";
 import {
   a1kNewText,
   a1NewText,
@@ -120,7 +121,6 @@ import {
   topUpOptions,
   withPlantedKnowns,
 } from "./newtext.ts";
-import { normEnochian } from "./normalise.ts";
 import {
   ARMS,
   planSpecs,

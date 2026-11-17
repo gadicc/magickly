@@ -33,10 +33,23 @@ describe("the lookup's limitations (plan 081, decision 20)", () => {
     expect(
       bullets(
         plan,
-        "which Gadi confirmed on 13 November 2026:",
+        "to say it of the lookup (S9, step 2E):",
         "21. **Figures, script-only**",
       ),
     ).toEqual(TRANSLATOR_LIMITATIONS.lookup.map(flat));
+  });
+});
+
+describe("the AI reading's limitations (plan 081, S8)", () => {
+  it("are quoted word for word in plan 081, in order", () => {
+    const plan = read("081-enochian-translator.md");
+    expect(
+      bullets(
+        plan,
+        "the third settled with the shared store):",
+        "S9. **Decision 19",
+      ),
+    ).toEqual(TRANSLATOR_LIMITATIONS.ai.map(flat));
   });
 });
 

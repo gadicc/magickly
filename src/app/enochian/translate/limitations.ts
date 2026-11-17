@@ -5,16 +5,18 @@
  */
 
 /**
- * How a translation is made: by lookup (stage 1). Stage 2's AI reading
- * will be `ai`, with its own list (that the text goes to Anthropic).
+ * How a translation is made: by lookup (stage 1), or by the AI reading of
+ * Enochian into English (stage 2), with its own list (that the text goes
+ * to OpenAI through Vercel).
  */
-export type TranslationMode = "lookup";
+export type TranslationMode = "lookup" | "ai";
 
 /**
  * The translator's limitations, per mode of translation (plan 081,
  * decision 20). The lookup's six hold for both directions, and the page
- * shows them once, whichever direction it reads in. Plan 081 quotes them
- * word for word, in this order.
+ * shows them once, whichever direction it reads in; the AI reading's five
+ * (S8) are shown with its card. Plan 081 quotes both lists word for word,
+ * in this order.
  */
 export const TRANSLATOR_LIMITATIONS: Readonly<
   Record<TranslationMode, readonly string[]>
@@ -25,7 +27,14 @@ export const TRANSLATOR_LIMITATIONS: Readonly<
     "Word order follows the English, except that possessives follow their noun, as Dee writes them; each change is shown. No one who reads Enochian has checked the results.",
     "Joined words are split by a rule from our notes. Each split is marked, and outside Dee's own text it may be wrong.",
     "Meanings and rules come from Dee, Laycock and Leitch, and some from later traditions (Schueler, the Golden Dawn). Each is labelled with its source.",
-    "What you type isn't sent anywhere. The translation runs in your browser.",
+    "The lookup runs in your browser, and your text stays in the page's address after the # sign, which isn't sent anywhere. Only an AI reading sends it, when you ask for one.",
+  ],
+  ai: [
+    "It is made by a language model (GPT-6.1 Terra) given our dictionary, Dee's Keys and our grammar notes; it can be wrong, and no one who reads Enochian has reviewed it.",
+    "Each word it reads is checked against our data and marked as confirmed, not confirmed, or the model's guess; its sentence is not checked.",
+    "Your text goes to OpenAI through Vercel to make the reading; Vercel keeps no copy, and OpenAI handles it under a zero-retention agreement. Our server keeps the text and its reading for a day, so anyone who reads the same text again gets it free, and deletes them within two days.",
+    "The provider may refuse some passages.",
+    "Each reading uses your daily allowance: one, plus one per 100 words.",
   ],
 };
 

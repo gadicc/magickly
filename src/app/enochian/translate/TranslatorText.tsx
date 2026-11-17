@@ -78,12 +78,20 @@ export default function TranslatorText() {
         screen or rising from the foot of the screen on a phone. A word found
         only in the Keys opens the places Dee uses it.
       </p>
+      <p>
+        A passage of two words or more can also be read with AI, if you ask: a
+        language model gives a sentence and reads each word, and each
+        word&apos;s reading is checked against our data and marked as confirmed
+        or not. The sentence isn&apos;t checked, and the reading can be wrong.
+        It uses your daily allowance, as the chat does.
+      </p>
       <H2>Your text stays with you</H2>
       <p>
-        The translation runs in your browser, and what you type isn&apos;t sent
+        The lookup runs in your browser, and what you type isn&apos;t sent
         anywhere. The page&apos;s address keeps your text after the # sign,
         which browsers never send to a website, so you can share a translation
-        by its link.
+        by its link. Only an AI reading sends your text, when you ask for one:
+        to our server and on to OpenAI, as the reading says.
       </p>
       <H2>Related</H2>
       <List>

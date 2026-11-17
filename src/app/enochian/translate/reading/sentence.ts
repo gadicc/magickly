@@ -1,13 +1,13 @@
-import type { Translator } from "../../src/app/enochian/translate/lookup.ts";
-import type { AnswerItem } from "./answer.ts";
+import type { ReadToken, Translator } from "../lookup.ts";
+import type { ReadingItem } from "./item.ts";
 import { contentStems, englishWords } from "./normalise.ts";
 
 /**
  * Plan 081's sentence rule (S7): the model's sentence is shown only when
  * most of its content words appear in the word readings or the lookup's
- * glosses; otherwise it is withheld, saying so. One place, so stage 2's
- * checker (2C) and card (2E) take it from here; it reads only
- * `normalise.ts`, which moves into the app with the checker.
+ * glosses; otherwise it is withheld, saying so. One place, so the
+ * reading's checker (`check.ts`, 2C), its card (2E) and step 2B's
+ * measures in the experiment's scripts take it from here.
  *
  * Words are compared as the checker compares English: lower-cased, Dee's
  * spellings folded, function words left out (`FUNCTION_WORDS`) and the
@@ -86,7 +86,7 @@ export function sentenceRule(
  * glosses for the passage (`lookupGlosses`).
  */
 export function sentenceEvidence(
-  items: readonly AnswerItem[],
+  items: readonly ReadingItem[],
   glosses: readonly string[],
 ): string[] {
   return [
@@ -107,9 +107,20 @@ export function lookupGlosses(
   translator: Translator,
   passage: string,
 ): string[] {
+  return tokenGlosses(translator, translator.toEnglish(passage).tokens);
+}
+
+/**
+ * `lookupGlosses` for a passage the lookup has already read, so a caller
+ * holding its tokens (the reading's checker) doesn't read it twice.
+ */
+export function tokenGlosses(
+  translator: Translator,
+  tokens: readonly ReadToken[],
+): string[] {
   const { source } = translator.lookup;
   const out: string[] = [];
-  for (const token of translator.toEnglish(passage).tokens)
+  for (const token of tokens)
     for (const reading of token.readings)
       for (const word of reading.words) {
         if (word.gloss) out.push(word.gloss);

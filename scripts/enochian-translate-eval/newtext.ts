@@ -13,7 +13,7 @@ import {
   normEnochian,
   sharesContentWord,
   stemEnglish,
-} from "./normalise.ts";
+} from "../../src/app/enochian/translate/reading/normalise.ts";
 import { englishKey } from "./score.ts";
 import { isScoreable, type KeyRowRecord, type SourceData } from "./testset.ts";
 

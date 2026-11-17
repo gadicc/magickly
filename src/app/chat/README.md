@@ -16,6 +16,15 @@ and 500 shared across all signed-out visitors. Regeneration consumes another
 submission. Counters reset lazily at midnight UTC and use one persistent row
 per user plus one anonymous row, without an in-memory or per-instance fallback.
 
+Both routes take only same-origin requests (`Sec-Fetch-Site: same-origin`, or
+an `Origin` naming the request's `Host` header; `src/lib/sameOrigin.ts`), so another
+site's page cannot spend a visitor's allowance; others get HTTP 403 before
+admission. The Enochian translator's AI reading (plan 081, `/api/enochian/read`)
+draws on the same counters, one unit plus one per 100 words a reading
+(`reserveDailyUsage`), and caps each signed-out client at 10 units a day of the
+anonymous pool. The daily `/api/cron/purge-readings` job deletes counter rows
+from before the current UTC day.
+
 Invalid input does not consume capacity. Once reserved, a submission remains
 counted if the caller stops or a provider fails, because it may already have
 incurred a charge. Session/database failures stop provider work. Exhausted

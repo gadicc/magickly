@@ -86,7 +86,7 @@ are disclosed on the landing page.
 
 ## Account preference
 
-Migration `0027_superb_king_bedlam` adds nullable `user_profile.ui_locale` with
+Migration `0028_ui_locale` adds nullable `user_profile.ui_locale` with
 an `en`/`he` check. It changes no auth table, session response or grants. Apply
 it through the existing reviewed release migration workflow before activation;
 implementation does not migrate any deployed database. The populated-profile

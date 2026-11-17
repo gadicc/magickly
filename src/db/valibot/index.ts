@@ -7,6 +7,7 @@ export * from "./generated/chatResearchMaintenance";
 export * from "./generated/chatResearchPolicy";
 export * from "./generated/chatUsage";
 export * from "./generated/discourse";
+export * from "./generated/enochianReadings";
 export * from "./generated/legacyFiles";
 export * from "./generated/legacyIds";
 export * from "./generated/legacyImportRuns";

@@ -2,6 +2,13 @@ import { readFileSync } from "node:fs";
 import dictionaryData from "magick-data/enochian/dictionary";
 import keys from "magick-data/enochian/keys";
 import { describe, expect, it } from "vitest";
+import {
+  englishWords,
+  FUNCTION_WORDS,
+  isFunctionOnly,
+  normEnochian,
+  stemEnglish,
+} from "../../src/app/enochian/translate/reading/normalise.ts";
 import { a1kNewText, a1NewText } from "./baseline.ts";
 import { serialiseDictionary } from "./context.ts";
 import { dictionary as fixtureDictionary, row } from "./fixtures.ts";
@@ -40,13 +47,6 @@ import {
   withPlantedKnowns,
   wordInfo,
 } from "./newtext.ts";
-import {
-  englishWords,
-  FUNCTION_WORDS,
-  isFunctionOnly,
-  normEnochian,
-  stemEnglish,
-} from "./normalise.ts";
 import { type KeyRowRecord, rowsFromKeys } from "./testset.ts";
 
 const SET_PATH = new URL("./data/newtext.json", import.meta.url);

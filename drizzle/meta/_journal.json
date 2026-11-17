@@ -194,8 +194,15 @@
     {
       "idx": 27,
       "version": "7",
-      "when": 1794909235466,
-      "tag": "0027_superb_king_bedlam",
+      "when": 1794905672330,
+      "tag": "0027_enochian_readings",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1794917660264,
+      "tag": "0028_ui_locale",
       "breakpoints": true
     }
   ]

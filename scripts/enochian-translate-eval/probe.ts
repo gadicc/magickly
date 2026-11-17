@@ -1,7 +1,13 @@
 import { z } from "zod";
+import {
+  englishAgrees,
+  normEnochian,
+} from "../../src/app/enochian/translate/reading/normalise.ts";
+import {
+  lastJsonBlock,
+  parseReply,
+} from "../../src/app/enochian/translate/reading/reply.ts";
 import { type Effort, shortName } from "./models.ts";
-import { englishAgrees, normEnochian } from "./normalise.ts";
-import { lastJsonBlock, parseReply } from "./reply.ts";
 import type { KeyRowRecord } from "./testset.ts";
 import type { ModelRequest } from "./transport.ts";
 

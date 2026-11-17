@@ -1,8 +1,4 @@
-import {
-  foldSpelling,
-  stem,
-  words,
-} from "../../src/app/enochian/dictionary/search.ts";
+import { foldSpelling, stem, words } from "../../dictionary/search.ts";
 
 /**
  * Normalising both sides of the translator experiment (plan 077): Enochian
@@ -13,6 +9,11 @@ import {
  * The English side reuses the dictionary search's `words` and `stem`
  * (plan 074, decision 5) so the experiment and the page agree on what a word
  * is.
+ *
+ * It lives in the app because the AI reading's checker (plan 081, S6,
+ * `check.ts`) compares English as plan 077's checker does; the experiment's
+ * scripts import it from here. Its rules are the experiment's, measured
+ * with them, so a change here changes plan 077's scores too.
  */
 
 /**

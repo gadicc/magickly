@@ -801,3 +801,21 @@ changed. The temporary docs capture only seeded the existing authorized local
 synthetic fixtures. Translated ritual activation and broader translation
 batches retain their separate dependencies. Existing Next patch advisories
 remain a release prerequisite, not an i18n regression.
+
+
+### Integration with newer main
+
+Main advanced to `b157b3c4` with the Enochian AI reading feature while this
+worktree was being implemented. Both branches originally generated migration
+0027. Preserve main's `0027_enochian_readings` SQL/snapshot/journal entry
+unchanged, and regenerate the unapplied app-profile change as
+`0028_ui_locale` against the combined schema. The SQL remains exactly the same
+two additive profile statements. The research upgrade rehearsal stays scoped
+to its original migration range; the populated-profile test now targets 0028.
+No database migration is applied by this integration.
+
+
+The Enochian/i18n integration passed the full local suite: 635 files passed,
+3 skipped; 12,367 tests passed, 18 skipped. Typechecking, formatting and the
+webpack production build also passed. Main's independently running Next patch
+update is kept separate; its uncommitted package files are not overwritten.

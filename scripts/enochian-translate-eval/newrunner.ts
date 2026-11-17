@@ -1,5 +1,6 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { parseAnswer } from "../../src/app/enochian/translate/reading/reply.ts";
 import type { AnswerItem } from "./answer.ts";
 import { a1kNewText, a1NewText, a1Task3 } from "./baseline.ts";
 import {
@@ -39,7 +40,6 @@ import {
   scoreNewText,
 } from "./newscore.ts";
 import { type NewTextSet, newTextRows } from "./newtext.ts";
-import { parseAnswer } from "./reply.ts";
 import {
   blockedAttempts,
   type EvalData,

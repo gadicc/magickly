@@ -1,5 +1,12 @@
 import type { EnochianDictionary } from "magick-data/enochian/dictionary";
 import {
+  editDistance,
+  englishWords,
+  meaningAgrees,
+  normEnochian,
+  stemEnglish,
+} from "../../src/app/enochian/translate/reading/normalise.ts";
+import {
   type AnswerItem,
   alignItems,
   type CheckOutcome,
@@ -9,13 +16,6 @@ import {
   type Task,
 } from "./answer.ts";
 import type { Cipher } from "./cipher.ts";
-import {
-  editDistance,
-  englishWords,
-  meaningAgrees,
-  normEnochian,
-  stemEnglish,
-} from "./normalise.ts";
 import {
   type Book,
   contextDictionary,
