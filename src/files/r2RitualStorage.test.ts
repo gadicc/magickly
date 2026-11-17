@@ -632,6 +632,10 @@ describe("bounded staging streams and provider failure cleanup", () => {
     });
   });
   it("retains an unknown late write for bounded same-operation reconciliation, with no deletion or overwrite", async () => {
+    // The store's deadline is a timer, so drive it explicitly: the first write
+    // times out when 30ms elapse, and the reconciling retry does not race a
+    // wall-clock 30ms budget on a loaded machine.
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
     const f = await fixture({ ioTimeoutMs: 30 });
     const actual = f.handle.getMockImplementation()!;
     const late = deferred<Awaited<ReturnType<typeof actual>>>();
@@ -644,8 +648,10 @@ describe("bounded staging streams and provider failure cleanup", () => {
     });
     const store = f.api.storage.canonicalStorage(f.claim, active());
     const pending = store.putObject(f.put);
+    const rejected = expect(pending).rejects.toMatchObject({ code: "TIMEOUT" });
     await stored.promise;
-    await expect(pending).rejects.toMatchObject({ code: "TIMEOUT" });
+    await vi.advanceTimersByTimeAsync(30);
+    await rejected;
     late.resolve(f.response(200, {}, Readable.from([])));
     await vi.waitFor(() => expect(f.objects.size).toBe(1));
     await expect(store.putObject(f.put)).resolves.toMatchObject({
