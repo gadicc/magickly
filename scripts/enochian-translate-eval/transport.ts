@@ -23,9 +23,34 @@ export interface ModelRequest {
   instructions: string[];
   /** The user message: the task and its input. */
   prompt: string;
+  /**
+   * Where the gateway may send it (plan 081's reading, S1): sent as
+   * `providerOptions.gateway`, and checked on every reply (`routingProblems`).
+   * Left out, the gateway routes as it likes, as every request before
+   * stage 2B did.
+   */
+  routing?: Routing;
 }
 
-/** A request's prompt, hashed, to tie saved output to the prompt it answers. */
+/**
+ * The gateway's routing options a request asks for, by the names
+ * `@ai-sdk/gateway`'s `GatewayProviderOptions` gives them (4.0.125:
+ * `only`, "provider slugs that are the only ones allowed", and
+ * `zeroDataRetention`, "providers with zero data retention agreements").
+ */
+export interface Routing {
+  /** The only providers the gateway may use ("openai"). */
+  only?: string[];
+  /** Only providers with zero data retention agreements with Vercel. */
+  zeroDataRetention?: boolean;
+}
+
+/**
+ * A request's prompt, hashed, to tie saved output to the prompt it answers:
+ * its model, effort, every byte of its messages and, when it has them, its
+ * routing options (plan 081, S1: the prompt version). A request without
+ * routing hashes as it always has, so earlier runs still rebuild.
+ */
 export function promptHash(request: ModelRequest): string {
   return createHash("sha256")
     .update(
@@ -34,6 +59,7 @@ export function promptHash(request: ModelRequest): string {
         request.effort,
         request.instructions,
         request.prompt,
+        ...(request.routing ? [request.routing] : []),
       ]),
     )
     .digest("hex");
@@ -63,7 +89,17 @@ export interface ModelResult {
   responseModel?: string;
   /** The AI SDK's warnings for the call, as given. */
   warnings?: unknown[];
+  /** How the gateway says it routed the call (`reportedRouting`). */
+  routing?: ReportedRouting;
   error?: string;
+}
+
+/** What a reply's gateway metadata says of its routing. */
+export interface ReportedRouting {
+  /** `providerMetadata.gateway.routing.finalProvider`: who answered. */
+  provider?: string;
+  /** `providerMetadata.gateway.enabledZeroDataRetention`. */
+  zeroDataRetention?: boolean;
 }
 
 /** A batch's serialisable reference (the AI SDK's `BatchReference`). */
@@ -231,6 +267,62 @@ function gatewayField(metadata: unknown, field: string): unknown {
 }
 
 /**
+ * The routing a reply's metadata reports (Vercel's AI Gateway docs, "Zero
+ * Data Retention" and "Provider filtering and ordering"):
+ * `gateway.routing.finalProvider` names the provider that served the call,
+ * and `gateway.enabledZeroDataRetention` is true when zero retention was
+ * enforced. A field the metadata lacks is left out, never guessed.
+ */
+export function reportedRouting(metadata: unknown): ReportedRouting {
+  const routing = gatewayField(metadata, "routing") as
+    | { finalProvider?: unknown }
+    | undefined;
+  const zdr = gatewayField(metadata, "enabledZeroDataRetention");
+  return {
+    ...(typeof routing?.finalProvider === "string"
+      ? { provider: routing.finalProvider }
+      : {}),
+    ...(typeof zdr === "boolean" ? { zeroDataRetention: zdr } : {}),
+  };
+}
+
+/**
+ * How a reply's routing falls short of what its request asked: zero
+ * retention asked and not reported as enforced, or a provider other than
+ * the ones allowed (or none named). Empty when it is as asked, or when
+ * nothing was asked.
+ */
+export function routingProblems(
+  asked: Routing | undefined,
+  reported: ReportedRouting | undefined,
+): string[] {
+  const out: string[] = [];
+  if (asked?.zeroDataRetention && reported?.zeroDataRetention !== true)
+    out.push(
+      `zero data retention asked, but the gateway reported enabledZeroDataRetention ${JSON.stringify(reported?.zeroDataRetention ?? null)}`,
+    );
+  if (asked?.only && !asked.only.includes(reported?.provider ?? ""))
+    out.push(
+      `only ${asked.only.join(", ")} allowed, but the gateway reported finalProvider ${JSON.stringify(reported?.provider ?? null)}`,
+    );
+  return out;
+}
+
+/**
+ * The gateway's options for a sync call: caching, as every call asks, and
+ * the request's routing options, if it has any.
+ */
+export function gatewayOptions(request: ModelRequest) {
+  return {
+    caching: "auto" as const,
+    ...(request.routing?.only ? { only: [...request.routing.only] } : {}),
+    ...(request.routing?.zeroDataRetention !== undefined
+      ? { zeroDataRetention: request.routing.zeroDataRetention }
+      : {}),
+  };
+}
+
+/**
  * An explicit prompt-cache breakpoint for Anthropic models, on a system
  * message (`providerOptions.anthropic.cacheControl`, passed through by the
  * gateway); other providers ignore it.
@@ -300,7 +392,7 @@ export function aiGateway(): Gateway {
           model: request.model,
           ...callSettings(request),
           maxRetries: 0,
-          providerOptions: { gateway: { caching: "auto" } },
+          providerOptions: { gateway: gatewayOptions(request) },
           ...(hooks.signal ? { abortSignal: hooks.signal } : {}),
         });
         let streamError: unknown;
@@ -332,6 +424,8 @@ export function aiGateway(): Gateway {
           responseModel: step.response?.modelId,
           warnings: [...(warnings ?? [])],
         };
+        if (request.routing)
+          out.routing = reportedRouting(step.providerMetadata);
         if (generationId) out.generationId = generationId;
         return out;
       } catch (error) {
@@ -339,6 +433,12 @@ export function aiGateway(): Gateway {
       }
     },
     async startBatch(requests, idempotencyKey) {
+      // Zero retention rejects batches (providers keep batch inputs), and
+      // a batch here carries no routing options: never send one quietly.
+      if (requests.some((one) => one.routing))
+        throw new Error(
+          "A request with routing options can't go by batch: run it by sync",
+        );
       const { experimental_startBatch } = await import("ai");
       const batch = await experimental_startBatch({
         requests: requests.map((request) => ({
@@ -426,12 +526,19 @@ export function aiGateway(): Gateway {
 /**
  * The prompt-cache prefix a request shares with others, if any: its model
  * and its system messages, when it has reference material (more than the
- * fixed instructions).
+ * fixed instructions), and its routing options when it has them (another
+ * route may reach another cache).
  */
 export function cachePrefix(request: ModelRequest): string | undefined {
   if (request.instructions.length < 2) return undefined;
   return createHash("sha256")
-    .update(JSON.stringify([request.model, request.instructions]))
+    .update(
+      JSON.stringify([
+        request.model,
+        request.instructions,
+        ...(request.routing ? [request.routing] : []),
+      ]),
+    )
     .digest("hex");
 }
 

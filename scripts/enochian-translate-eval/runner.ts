@@ -96,6 +96,9 @@ import {
   type ModelResult,
   promptChars,
   promptHash,
+  type ReportedRouting,
+  type Routing,
+  routingProblems,
   runSync,
   settingWarnings,
 } from "./transport.ts";
@@ -244,8 +247,20 @@ export interface RawResult {
    * effort setting may not have reached the model.
    */
   noReasoning?: boolean;
+  /**
+   * For a request with routing options: what it asked, what the gateway
+   * reported, and, when they differ, how (the reply is then failed).
+   */
+  routing?: ReplyRouting;
   attempt: number;
   at: string;
+}
+
+/** A routed reply's routing, as asked and as reported. */
+export interface ReplyRouting extends ReportedRouting {
+  asked: Routing;
+  /** How the reply's routing fell short of what was asked, if it did. */
+  failure?: string;
 }
 
 /**
@@ -704,6 +719,8 @@ interface Recorded {
   promptKind: string;
   /** The request's worst case, for booking a call whose cost isn't known. */
   worst: number;
+  /** Its routing options, checked on the reply. */
+  routing?: Routing;
 }
 
 /**
@@ -755,6 +772,9 @@ interface Hold {
  *   came in started with one);
  * - it came in a batch and reports no reasoning tokens, though every request
  *   here asks for reasoning.
+ * - its request asked for routing (zero retention, a provider) and the
+ *   gateway's metadata doesn't report it (`routingProblems`): logged loudly,
+ *   and `execute` launches no more calls.
  * A sync reply with no reasoning tokens, from a model expected to reason,
  * is kept (a model may choose not to think on an easy call) but flagged
  * `noReasoning` in its saved reply, with a warning in the log.
@@ -781,6 +801,16 @@ async function record(
     problems.push(`finish reason "${given.finishReason ?? "none"}"`);
   if (given.ok && transport === "batch" && given.tokens.reasoning === 0)
     problems.push(`no reasoning tokens at effort ${request.effort}`);
+  const misrouted =
+    given.ok && request.routing
+      ? routingProblems(request.routing, given.routing)
+      : [];
+  if (misrouted.length) {
+    problems.push(`routing not as asked: ${misrouted.join("; ")}`);
+    runtime.log(
+      `ROUTING NOT AS ASKED: ${request.id}: ${misrouted.join("; ")} (saved as failed)`,
+    );
+  }
   const noReasoning =
     given.ok &&
     transport === "sync" &&
@@ -826,6 +856,12 @@ async function record(
   };
   if (unknown) raw.unknown = true;
   if (noReasoning) raw.noReasoning = true;
+  if (request.routing)
+    raw.routing = {
+      asked: request.routing,
+      ...(given.routing ?? {}),
+      ...(misrouted.length ? { failure: misrouted.join("; ") } : {}),
+    };
   if (result.finishReason) raw.finishReason = result.finishReason;
   if (result.responseModel) raw.responseModel = result.responseModel;
   if (result.error) raw.error = result.error;
@@ -865,6 +901,7 @@ const recorded = (request: ModelRequest, worst: number): Recorded => ({
   chars: promptChars(request),
   promptKind: promptKind(request),
   worst,
+  ...(request.routing ? { routing: request.routing } : {}),
 });
 
 export interface ExecuteOptions {
@@ -896,6 +933,10 @@ export async function execute(
   options: ExecuteOptions,
 ): Promise<{ skipped: string[]; batches: BatchRecord[]; stopped?: string }> {
   const { requests, transport, budget, dir, run } = options;
+  if (transport === "batch" && requests.some((one) => one.routing))
+    throw new Error(
+      "Refused: requests with routing options run by sync only (zero data retention rejects batches)",
+    );
   const refused = runRefusal(runtime, requests, transport, budget);
   if (refused) throw new Error(`Refused: ${refused}`);
   if (!requests.length) return { skipped: [], batches: [] };
@@ -1008,6 +1049,15 @@ export async function execute(
         );
         if (raw.cost > hold.cost + 1e-9 && !stopped) {
           stopped = `${request.id} cost $${raw.cost.toFixed(4)}, more than its worst case $${hold.cost.toFixed(4)}: the projection is off, so no more calls are launched. Check the prices and calibration before going on.`;
+          runtime.log(`STOPPING: ${stopped}`);
+        }
+        // A routed call that came back routed otherwise, or failed with no
+        // reply (a refused route fails so): the route can't be trusted, so
+        // nothing more goes out on it. A reply that finished badly (cut
+        // off, blocked) is the model's, as for any request.
+        const noReply = !raw.ok && raw.finishReason === undefined;
+        if (request.routing && (raw.routing?.failure || noReply) && !stopped) {
+          stopped = `${request.id} asked for routing (${JSON.stringify(request.routing)}) and ${raw.routing?.failure ? `came back otherwise: ${raw.routing.failure}` : `failed: ${raw.error ?? "no reply"}`}; no more calls are launched. Check the routing before going on.`;
           runtime.log(`STOPPING: ${stopped}`);
         }
       },

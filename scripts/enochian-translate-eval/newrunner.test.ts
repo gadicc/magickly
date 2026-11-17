@@ -1850,7 +1850,7 @@ describe("the new text's bars", () => {
     const blocked = (inputs: Parameters<typeof measureNewTextBars>[0]) =>
       measureNewTextBars(inputs).bars.find((one) => one.id === "blocked");
     const early = blocked({ blocked: { calls: 3, blocked: 0 } });
-    expect(early?.unmeasurable).toBe("no Opus A3 run on the new text yet");
+    expect(early?.unmeasurable).toBe("no run of the arm on the new text yet");
     expect(early?.met).toBeUndefined();
     expect(
       blocked({ a3Task1: a3, blocked: { calls: 40, blocked: 2 } }),

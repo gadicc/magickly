@@ -64,10 +64,11 @@ import {
 } from "./models.ts";
 import { measureNewTextBars, type NewBarInputs } from "./newbars.ts";
 import {
-  NEW_ARMS,
+  type NewArm,
   type NewSpec,
   newRequest,
   planNewSpecs,
+  RUN_ARMS,
   SUBSETS,
   subsetSentences,
   type Task3Sentence,
@@ -126,6 +127,7 @@ import {
   type TranslateSpec,
   translateRequest,
 } from "./prompt.ts";
+import { type ReadingMeasures, readingMeasures } from "./reading.ts";
 import {
   a1JudgeCases,
   a1JudgedPath,
@@ -1253,7 +1255,7 @@ export async function runNew(
   if (more.length) throw new Error("--subset takes one subset");
   const specs = planNewSpecs(
     {
-      arms: listOf("arms", v.arms ?? "A0,A2,A3", NEW_ARMS),
+      arms: listOf("arms", v.arms ?? "A0,A2,A3", RUN_ARMS),
       tasks:
         set === "task3"
           ? [3]
@@ -1284,6 +1286,10 @@ export async function runNew(
       `--skip-held: ${planned.length - requests.length} of ${planned.length} requests are held by earlier runs (${check.held.map((one) => `${one.run}: ${one.ids.length}`).join("; ")}); sending the other ${requests.length}`,
     );
   const repeated = check.refusal;
+  if (transport === "batch" && requests.some((one) => one.routing))
+    throw new Error(
+      "A3s asks for zero data retention, which the gateway refuses by batch: run it with --transport sync",
+    );
   const runtime = await runtimeFor(out, [model], {
     prices: await pricesFor(out, [model], v),
     concurrency: concurrencyOf(v.concurrency),
@@ -1354,7 +1360,68 @@ function printNewRun(out: string, runId: string, data: EvalData) {
       `WARNING: ${flat.length} of ${result.manifest.requests.length} sync replies reported no reasoning tokens from a model asked to reason: ${flat.join(", ")}`,
     );
   printCallCosts(out, [runId]);
+  printReading(
+    readingMeasures(runDir(out, runId), result.manifest, data),
+    runDir(out, runId),
+  );
   console.log(`Written to ${runDir(out, runId)}`);
+}
+
+/**
+ * Plan 081 step 2B's measures of a run's A3s calls (`reading.ts`), offline,
+ * from the saved replies; nothing when the run has none.
+ */
+export function printReading(
+  measures: ReadingMeasures | undefined,
+  dir: string,
+) {
+  if (!measures?.calls.length) return;
+  const share = (x: number | undefined) => (x === undefined ? "–" : pct(x));
+  console.log("\nThe reading's prompt (A3s), call by call, in the order run:");
+  console.table(
+    measures.calls.map((one) => ({
+      call: one.id,
+      ok: one.ok ? "yes" : "no",
+      words: one.words,
+      "read from cache": share(one.cacheReadShare),
+      "output a word": one.outputPerWord.toFixed(1),
+      "reasoning a word": (one.reasoning / (one.words || 1)).toFixed(1),
+      "sentence words": one.sentenceWords,
+      "sentence / input": one.sentenceRatio.toFixed(2),
+      "S7 rule": one.rule.shown
+        ? `shown (${one.rule.supported}/${one.rule.contentWords})`
+        : `withheld: ${one.rule.withheld} (${one.rule.supported}/${one.rule.contentWords})`,
+      provider: one.routing?.provider ?? "–",
+      "zero retention":
+        one.routing?.zeroDataRetention === undefined
+          ? "–"
+          : one.routing.zeroDataRetention
+            ? "yes"
+            : "no",
+    })),
+  );
+  const s = measures.summary;
+  console.log(
+    [
+      `Calls ${s.calls}, replies ${s.ok}.`,
+      `Read from the cache: first call ${share(s.cache.first)}; later calls lowest ${share(s.cache.laterMin)}, mean ${share(s.cache.laterMean)}; all input ${pct(s.cache.pooled)}.`,
+      `Output tokens a word of input (reasoning and sentence included): ${s.output.perWord.toFixed(1)} pooled, ${s.output.maxPerWord.toFixed(1)} at most in one call; reasoning ${s.output.reasoningPerWord.toFixed(1)} a word.`,
+      `Sentences: ${s.sentence.given} of ${s.ok} replies; their length against the input's, ${s.sentence.ratio.toFixed(2)} pooled, ${s.sentence.maxRatio.toFixed(2)} at most.`,
+      `S7's sentence rule (most, over half, of its content words in the readings or the lookup's glosses): shown ${s.rule.shown}, withheld ${s.rule.withheld} of ${s.ok}${
+        Object.keys(s.rule.byReason).length
+          ? ` (${Object.entries(s.rule.byReason)
+              .map(([why, n]) => `${why} ${n}`)
+              .join(", ")})`
+          : ""
+      }.`,
+      `Routing: ${s.routing.asked} calls asked for it; zero retention reported on ${s.routing.zeroRetention}; provider ${
+        Object.entries(s.routing.providers)
+          .map(([name, n]) => `${name} ${n}`)
+          .join(", ") || "none reported"
+      }.${s.routing.failures.length ? ` NOT AS ASKED: ${s.routing.failures.join("; ")}` : ""}`,
+      `Written to ${join(dir, "reading-measures.json")}`,
+    ].join("\n"),
+  );
 }
 
 /**
@@ -1454,14 +1521,19 @@ function printAny(out: string, runId: string, probeRun?: string) {
       }),
     );
   }
-  if (manifest.kind === "cache-check")
-    return console.log(
+  if (manifest.kind === "cache-check") {
+    console.log(
       JSON.stringify(
         readJson(join(runDir(out, runId), "cache-check.json")),
         null,
         2,
       ),
     );
+    return printReading(
+      readingMeasures(runDir(out, runId), manifest, data),
+      runDir(out, runId),
+    );
+  }
   printRun(out, runId, data, probeRun);
 }
 
@@ -1475,7 +1547,8 @@ async function cacheCheckCommand(out: string, v: Values) {
   const model = modelId(v.model ?? "opus");
   const [effort, ...more] = efforts(v.effort ?? "medium");
   if (more.length) throw new Error("cache-check takes one --effort");
-  const requests = cacheCheckRequests(data, model, effort);
+  const arm = readingArmOf(v.arm);
+  const requests = cacheCheckRequests(data, model, effort, arm);
   const runtime = await runtimeFor(out, [model], {
     prices: await pricesFor(out, [model], v),
     concurrency: 1,
@@ -1485,7 +1558,10 @@ async function cacheCheckCommand(out: string, v: Values) {
   if (v["dry-run"]) return console.log("Dry run: no call made.");
   if (refused) throw new Error(`Refused: ${refused}`);
   requireGatewayKey();
-  const runId = newRunId(v.label ?? `cache-check-${shortName(model)}`);
+  const runId = newRunId(
+    v.label ??
+      `cache-check-${shortName(model)}${arm === "A3" ? "" : `-${arm}`}`,
+  );
   const dir = createRunDir(out, runId);
   writeJson(join(dir, "prices.json"), runtime.prices);
   writeJson(join(dir, "manifest.json"), {
@@ -1500,7 +1576,7 @@ async function cacheCheckCommand(out: string, v: Values) {
       manifestRequest(one, {
         newtext: planNewSpecs(
           {
-            arms: ["A3"],
+            arms: [arm],
             tasks: [1],
             subset: "all",
             model,
@@ -1530,20 +1606,48 @@ async function cacheCheckCommand(out: string, v: Values) {
       "gateway: cached": one.generation?.cachedTokens ?? "–",
       "gateway: written": one.generation?.cacheCreationTokens ?? "–",
       "gateway: cost": one.generation ? usd(one.generation.cost) : "–",
+      ...(one.routing
+        ? {
+            provider: one.routing.provider ?? "–",
+            "zero retention": one.routing.zeroDataRetention ? "yes" : "no",
+          }
+        : {}),
     })),
   );
   console.log(
-    result.reads
-      ? `The second call read ${pct(result.secondReadShare)} of its input from the cache: run by sync.`
-      : `The second call read ${pct(result.secondReadShare)} of its input from the cache: no cache reads, so per plan 077 the model runs by batch (--transport batch) where the gateway lists a batch price for it${runtime.prices[`${model}-batch`] ? "" : " (it lists none for this model: run by sync, uncached, and budget for it)"}.`,
+    result.stopped
+      ? `The check stopped before both calls finished, so it says nothing about the cache: ${result.stopped}`
+      : result.reads
+        ? `The second call read ${pct(result.secondReadShare)} of its input from the cache: run by sync.`
+        : arm === "A3s"
+          ? `The second call read ${pct(result.secondReadShare)} of its input from the cache: no cache reads, so every reading would be cold; plan 081's step 2B leaves zero retention against that cost to Gadi.`
+          : `The second call read ${pct(result.secondReadShare)} of its input from the cache: no cache reads, so per plan 077 the model runs by batch (--transport batch) where the gateway lists a batch price for it${runtime.prices[`${model}-batch`] ? "" : " (it lists none for this model: run by sync, uncached, and budget for it)"}.`,
   );
   console.log(`Written to ${join(dir, "cache-check.json")}`);
+  const manifest = readJson<Manifest>(join(dir, "manifest.json"));
+  if (manifest) printReading(readingMeasures(dir, manifest, data), dir);
 }
 
-/** The cache check's two calls: A3, task 1, the first two parts. */
-function cacheCheckRequests(data: EvalData, model: string, effort: Effort) {
+/**
+ * `--arm` for the commands that measure one task-1 arm (cache-check,
+ * newbars, budget --models): A3, plan 077's, or A3s, plan 081's reading
+ * prompt (step 2B).
+ */
+function readingArmOf(text: string | undefined): "A3" | "A3s" {
+  const [arm, ...more] = listOf("arm", text ?? "A3", ["A3", "A3s"] as const);
+  if (more.length) throw new Error("--arm takes one arm");
+  return arm;
+}
+
+/** The cache check's two calls: A3 (or A3s), task 1, the first two parts. */
+function cacheCheckRequests(
+  data: EvalData,
+  model: string,
+  effort: Effort,
+  arm: NewArm = "A3",
+) {
   return planNewSpecs(
-    { arms: ["A3"], tasks: [1], subset: "all", model, efforts: [effort] },
+    { arms: [arm], tasks: [1], subset: "all", model, efforts: [effort] },
     data,
   )
     .slice(0, 2)
@@ -1776,10 +1880,19 @@ function printTask3(report: Task3Report) {
 
 /** The new text's bars, from the runs named (all new-text runs by default). */
 export function newBarsCommand(out: string, v: Values) {
+  // The arm whose task 1 is measured: A3, or plan 081's A3s (step 2B),
+  // which has no task 2 and no task 3, so their bars stay unmeasured.
+  const arm = readingArmOf(v.arm);
+  if (arm !== "A3" && !v.model)
+    throw new Error(
+      "--arm A3s measures a model's reading prompt: name it with --model",
+    );
   // newbars.json is plan 077 round 1's record: never replaced by accident.
   const file = join(
     out,
-    v.model ? `newbars-${shortName(modelId(v.model))}.json` : "newbars.json",
+    v.model
+      ? `newbars-${shortName(modelId(v.model))}${arm === "A3" ? "" : `-${arm}`}.json`
+      : "newbars.json",
   );
   if (!v.model && existsSync(file) && !v.force)
     throw new Error(
@@ -1805,13 +1918,13 @@ export function newBarsCommand(out: string, v: Values) {
   });
   const groups = {
     a3Task1: barGroup(out, barRuns, {
-      arm: "A3",
+      arm,
       task: 1,
       model,
       effort: "medium",
     }),
     a3Task2: barGroup(out, barRuns, {
-      arm: "A3",
+      arm,
       task: 2,
       model,
       effort: "medium",
@@ -1824,7 +1937,10 @@ export function newBarsCommand(out: string, v: Values) {
     }),
   };
   for (const [name, one] of Object.entries(groups))
-    if (one) console.log(`${name}: runs ${one.runs.join(" + ")}`);
+    if (one)
+      console.log(
+        `${name.startsWith("a0") ? "A0" : arm} task ${name.at(-1)}: runs ${one.runs.join(" + ")}`,
+      );
   // A1k on the same sets as A3, each with its own judged rows.
   const a1k1 = a1kPooled(out, groups.a3Task1?.sets ?? [data]);
   const a1k2 = a1kPooled(out, groups.a3Task2?.sets ?? [data]);
@@ -1835,7 +1951,7 @@ export function newBarsCommand(out: string, v: Values) {
   });
   const a3Source = barSource(
     Object.keys(t3.sources),
-    `A3 ${shortName(model)} medium`,
+    `${arm} ${shortName(model)} medium`,
   );
   const blockedFrom = blockedRuns(
     runsOf(v.runs),
@@ -1881,11 +1997,11 @@ export function newBarsCommand(out: string, v: Values) {
     ),
   };
   console.log(
-    `task3: ${resolved.task3 ?? "none"}; blocked calls counted in: ${resolved.blocked.join(", ") || "none"}`,
+    `task3: ${resolved.task3 ?? "none"}; blocked calls counted in (every arm of the model): ${resolved.blocked.join(", ") || "none"}`,
   );
   const result = measureNewTextBars(inputs);
   console.log(
-    `The bars settled on ${BARS_SETTLED}${v.model ? `, for A3 on ${shortName(model)}` : ""}:`,
+    `The bars settled on ${BARS_SETTLED}${v.model ? `, for ${arm} on ${shortName(model)}` : ""}:`,
   );
   console.table(
     result.bars.map((one) => ({
@@ -1911,13 +2027,18 @@ export function newBarsCommand(out: string, v: Values) {
   const d = result.a3MinusA0Swapped;
   if (d)
     console.log(
-      `A3 − A0 on swapped rows: ${pct(d.a3.share)} − ${pct(d.a0.share)} = ${(100 * d.difference).toFixed(1)} points [${(100 * d.interval[0]).toFixed(1)} to ${(100 * d.interval[1]).toFixed(1)}]`,
+      `${arm} − A0 on swapped rows: ${pct(d.a3.share)} − ${pct(d.a0.share)} = ${(100 * d.difference).toFixed(1)} points [${(100 * d.interval[0]).toFixed(1)} to ${(100 * d.interval[1]).toFixed(1)}]`,
     );
   write(
     file,
     json({
       settled: BARS_SETTLED,
-      inputs: { runs, ...(v.model ? { model } : {}), resolved },
+      inputs: {
+        runs,
+        ...(v.model ? { model } : {}),
+        ...(arm === "A3" ? {} : { arm }),
+        resolved,
+      },
       ...result,
     }),
   );
@@ -2196,6 +2317,9 @@ async function modelsBudget(out: string, v: Values) {
   const models = modelsOf(v.models as string);
   const [subset, ...more] = listOf("subset", v.subset ?? "all", SUBSETS);
   if (more.length) throw new Error("--subset takes one subset");
+  const arm = readingArmOf(v.arm);
+  // A3s is task 1 only (plan 081, step 2B), with its own cache check.
+  const tasks = arm === "A3" ? ([1, 2] as const) : ([1] as const);
   const judges = [JUDGES.opus.model, JUDGES.gpt.model];
   const runtime = await runtimeFor(out, [...models, ...judges], {
     prices: await pricesFor(out, [...new Set([...models, ...judges])], v, true),
@@ -2224,18 +2348,18 @@ async function modelsBudget(out: string, v: Values) {
       "sync",
       runtime.calibration ?? {},
     );
-    const batch = requests.every(
-      (request) => runtime.prices[`${request.model}-batch`],
-    )
-      ? usd(
-          cacheProjection(
-            requests,
-            runtime.prices,
-            "batch",
-            runtime.calibration ?? {},
-          ).without,
-        )
-      : "none listed";
+    const batch = requests.some((request) => request.routing)
+      ? "sync only (routed)"
+      : requests.every((request) => runtime.prices[`${request.model}-batch`])
+        ? usd(
+            cacheProjection(
+              requests,
+              runtime.prices,
+              "batch",
+              runtime.calibration ?? {},
+            ).without,
+          )
+        : "none listed";
     withReads += one.withReads;
     without += one.without;
     rows.push({
@@ -2251,21 +2375,25 @@ async function modelsBudget(out: string, v: Values) {
   for (const model of models) {
     const requests = planNewSpecs(
       {
-        arms: ["A3"],
-        tasks: [1, 2],
+        arms: [arm],
+        tasks: [...tasks],
         subset,
         model,
         efforts: ["medium"],
       },
       data,
     ).map((spec) => newRequest(spec, data));
-    if (model !== MODELS.opus)
+    if (model !== MODELS.opus || arm !== "A3")
       add(
         model,
-        `cache check (${CACHING[model as keyof typeof CACHING] ?? "?"} caching)`,
-        cacheCheckRequests(data, model, "medium"),
+        `${arm === "A3" ? "" : `${arm} `}cache check (${CACHING[model as keyof typeof CACHING] ?? "?"} caching)`,
+        cacheCheckRequests(data, model, "medium", arm),
       );
-    add(model, `A3 tasks 1 and 2, ${subset}`, requests);
+    add(
+      model,
+      `${arm} ${arm === "A3" ? "tasks 1 and 2" : "task 1"}, ${subset}`,
+      requests,
+    );
     add(
       model,
       "judges, task 1 (as many rows as A1k's)",
@@ -2311,6 +2439,7 @@ const OPTIONS = {
   out: { type: "string", default: DEFAULT_OUT },
   keys: { type: "string" },
   arms: { type: "string" },
+  arm: { type: "string" },
   tasks: { type: "string" },
   books: { type: "string" },
   model: { type: "string" },
@@ -2379,17 +2508,22 @@ const USAGE = `usage: cli.ts <command> [options]
   budget [--offline | --prices FILE]       project every planned run's cost,
                                            with cache reads and without
   cache-check --budget USD [--model opus] [--effort medium] [--dry-run]
-                                           two A3 calls sharing a context:
-                                           does the second read the cache?
+      [--arm A3|A3s]                       two A3 (or A3s) calls sharing a
+                                           context: does the second read
+                                           the cache?
   run --set new --subset all|first30|repeat --model M --effort E
-      --arms A0,A2,A3 --tasks 1,2 --transport sync|batch --budget USD
+      --arms A0,A2,A3,A3s --tasks 1,2 --transport sync|batch --budget USD
       [--dry-run [--offline | --prices FILE]] [--newtext FILE]
       [--again | --skip-held]              M: ${Object.keys(MODELS).join(", ")};
                                            refused if an earlier run has
                                            some of the same requests:
                                            --skip-held sends only the rest
                                            (finishing a partial run),
-                                           --again repeats them all
+                                           --again repeats them all; A3s
+                                           (plan 081's reading prompt:
+                                           an English reading, zero retention, the
+                                           model's provider only) is task
+                                           1 by sync only
   run --set task3 --model M --effort E --arms A0,A2,A3 --budget USD
   roundtrip --budget USD [--runs RUN,…] [--model opus] [--dry-run]
                                            task 3's round trips (A1's and
@@ -2403,11 +2537,13 @@ const USAGE = `usage: cli.ts <command> [options]
                                            1's task3/report.json is kept:
                                            a dated file unless --force)
   budget --models stage2|M,… [--subset all|first30] [--offline | --prices FILE]
-                                           project plan 081 stage 2: A3 on
-                                           tasks 1 and 2 per model, its cache
-                                           check and judges, and a --budget
-                                           for each run
-  newbars [--runs RUN,…] [--model M]       offline, read-only (writes only
+      [--arm A3|A3s]                       project plan 081 stage 2: A3 on
+                                           tasks 1 and 2 per model (A3s:
+                                           task 1), its cache check and
+                                           judges, and a --budget for each
+                                           run
+  newbars [--runs RUN,…] [--model M [--arm A3s]]
+                                           offline, read-only (writes only
                                            newbars*.json): the new text's
                                            bars; with two runs of one arm,
                                            name one (if --runs names no
@@ -2420,7 +2556,9 @@ const USAGE = `usage: cli.ts <command> [options]
                                            alternatives to them; --model
                                            measures another model's A3 on
                                            the same lines, into
-                                           newbars-M.json; newbars.json
+                                           newbars-M.json (--arm A3s: the
+                                           reading prompt's task 1, into
+                                           newbars-M-A3s.json); newbars.json
                                            (round 1's) is kept unless
                                            --force
   call-costs [--runs RUN,…]                offline: a call's cost per model,
@@ -2437,7 +2575,10 @@ const USAGE = `usage: cli.ts <command> [options]
   judge RUN --budget USD [--dry-run] [--retry-failed]
   judge-a1 --budget USD [--dry-run] [--retry-failed]
   probe --keys K --model M --effort E --budget USD [--dry-run]
-  report RUN [--probe RUN]                 re-score from saved replies
+  report RUN [--probe RUN]                 re-score from saved replies (with
+                                           A3s calls, also their cache
+                                           share, output a word, sentence
+                                           and S7 rule, and routing)
   (judge RUN and the dry runs take --offline or --prices FILE too)
   spent [--reconcile]                      the ledger's totals; look up the
                                            real cost of failed calls

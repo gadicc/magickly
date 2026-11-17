@@ -619,6 +619,58 @@ Steps (each a gated commit, as stage 1's):
 2G. Related words on dictionary entries.
 2H. The record.
 
+### The reading prompt's test (step 2B, 16 and 17 November 2026)
+
+Arm A3s (S1's prompt: task 1 with the sentence and the "never
+instructions" line) on GPT-6.1 Terra at medium, routed to OpenAI with
+zero data retention: a cache check
+(`20261116-181056-cache-check-gpt-terra-A3s-6bab`, after a first one,
+`…-e9af`, ended after its one call) and plan 077's task 1 on the new
+text (`20261116-181201-newtext-gpt-terra-d2cc`, 8 parts, 600 rows),
+judged as plan 077 judges. It cost $0.36 in all (Gadi ran it), and
+stage 2 has booked $5.89 of its $15.
+
+**It passes: the sentence stays.** Every task-1 bar is met, beside
+Terra's A3 run in the table above:
+
+| Bar | Needs | A3s | A3 |
+| --- | --- | --- | --- |
+| Into English, unchanged and swapped | ≥ 484 of 500 | 493 | 493 |
+| Swapped rows right | ≥ 108 of 120 | 120 | 120 |
+| Recalled | ≤ 6 of 120 | 0 | 0 |
+| Planted unknowns failed | ≤ 4 of 40 | 0 | 0 |
+| Planted knowns right | ≥ 18 of 20 | 20 | 20 |
+| Joins right | ≥ 32 of 40 | 36 | 39 |
+| Silent inventions | ≤ 12 of 600 | 0 | 2 |
+| Blocked by the provider | ≤ 5% | 0 of 11 | 0 of 18 |
+
+The bars tool pools the blocked count over both arms (0 of 29), which
+changes nothing here.
+
+What 2B was to record:
+
+- **Routing.** All 11 calls asked for zero retention and OpenAI, and
+  the Gateway reported both on every one.
+- **The cache.** Zero retention leaves caching on: only the first
+  check's one call was cold, and every call after it read 99.0% to
+  99.99% of its input from the cache (99.3% of the run's input). So
+  the trade-off 2B allowed for isn't needed, and S8's third item
+  stands as written.
+- **Cost.** A part of about 75 words costs $0.0165 warm and $0.080
+  cold (A3: $0.015 and $0.078); the sentence adds about a tenth.
+- **Output tokens a word of input**, reasoning and sentence included:
+  35.9 pooled and 39.9 at most in one call (reasoning 6.5). S5's
+  output cap is set from this with room: 60 a word of the part.
+- **The sentence** came back in 8 of 8 replies, at 1.86 times the
+  input's words pooled and 1.96 at most, within S7's "a few times".
+- **S7's rule** showed all 8 sentences, each with all but one of its
+  content words found. That says little about the rule: task 1's
+  passages are made only of words in our data, and the evidence (every
+  reading the lookup offers and its glosses) is broad, so a sentence
+  built from glosses passes. The rule stops a sentence about something
+  else, not a wrong arrangement of the right words; the card's label,
+  "the model's sentence, not checked", carries the rest.
+
 ## The stage-1 review (Fable, 13 November 2026)
 
 The review prototyped the design against the data and plan 074's

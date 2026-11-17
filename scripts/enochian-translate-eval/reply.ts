@@ -70,7 +70,18 @@ export const answerItemSchema = z.object({
     .transform((one) => one ?? undefined),
 });
 
-export const answerSchema = z.object({ items: z.array(answerItemSchema) });
+/**
+ * A translation reply: its items and, from arm A3s's prompt on (plan 081,
+ * S1), the whole passage read as plain English, in one or more sentences
+ * (the "sentence" field, whatever its length). It is taken as it
+ * comes and read apart (`parseSentence`), so a reply with none, or with one
+ * that isn't a string, still gives its items: the bars score the items
+ * alone.
+ */
+export const answerSchema = z.object({
+  items: z.array(answerItemSchema),
+  sentence: z.unknown().optional(),
+});
 
 /**
  * Mends the slips a reply may make without changing what it says: a token
@@ -119,4 +130,18 @@ export function parseAnswer(text: string): Parsed<AnswerItem[]> {
       return out;
     }),
   };
+}
+
+/**
+ * A reply's sentence (arm A3s): the "sentence" field of its last json block,
+ * trimmed, when it is a non-empty string; otherwise none. Never fails a
+ * reply: its items are read by `parseAnswer` either way.
+ */
+export function parseSentence(text: string): string | undefined {
+  const parsed = parseReply(text, answerSchema, mendAnswer);
+  if (!parsed.ok) return undefined;
+  const sentence = parsed.value.sentence;
+  return typeof sentence === "string" && sentence.trim()
+    ? sentence.trim()
+    : undefined;
 }

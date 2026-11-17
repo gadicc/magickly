@@ -49,6 +49,7 @@ import {
   manifestRequest,
   promptKind,
   type RawResult,
+  type ReplyRouting,
   type Runtime,
   readJson,
   readRaw,
@@ -278,6 +279,8 @@ export interface CacheCheckCall {
   exact: boolean;
   /** What the gateway recorded for the generation, where it says. */
   generation?: GenerationInfo;
+  /** For a routed request (A3s): what it asked, what the gateway reported. */
+  routing?: ReplyRouting;
 }
 
 export interface CacheCheckResult {
@@ -286,6 +289,11 @@ export interface CacheCheckResult {
   secondReadShare: number;
   /** Whether the second call read the shared prefix from the cache. */
   reads: boolean;
+  /**
+   * Why the run stopped before both calls finished (a reply routed
+   * otherwise, say): then the cache has no verdict, whatever `reads` says.
+   */
+  stopped?: string;
 }
 
 /** The share of the second call's input it must read for the check to pass. */
@@ -310,7 +318,7 @@ export async function cacheCheck(
   const [a, b] = options.requests;
   if (JSON.stringify(a.instructions) !== JSON.stringify(b.instructions))
     throw new Error("The cache check's two calls must share their context");
-  await execute(
+  const { stopped } = await execute(
     { ...runtime, concurrency: 1 },
     {
       run: options.run,
@@ -338,6 +346,7 @@ export async function cacheCheck(
       cost: raw.cost,
       exact: raw.exact,
       ...(generation ? { generation } : {}),
+      ...(raw.routing ? { routing: raw.routing } : {}),
     });
   }
   const second = calls[1];
@@ -353,7 +362,8 @@ export async function cacheCheck(
   const result = {
     calls,
     secondReadShare,
-    reads: secondReadShare >= CACHE_READ_PASS,
+    reads: !stopped && secondReadShare >= CACHE_READ_PASS,
+    ...(stopped ? { stopped } : {}),
   };
   writeJson(join(options.dir, "cache-check.json"), result);
   return result;

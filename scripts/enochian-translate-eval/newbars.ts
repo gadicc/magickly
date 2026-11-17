@@ -201,7 +201,7 @@ export function measureNewTextBars(inputs: NewBarInputs): {
 } {
   const bar = (id: BarId) => barById(id);
   const bars: NewBarMeasure[] = [];
-  const t1 = waiting("A3 task 1", inputs.a3Task1);
+  const t1 = waiting("the arm's task 1", inputs.a3Task1);
   const a3t1 = t1 ? undefined : inputs.a3Task1;
 
   {
@@ -219,7 +219,7 @@ export function measureNewTextBars(inputs: NewBarInputs): {
     bars.push(
       inputs.a3Task2
         ? measure(b.id, b, inputs.a3Task2.unchangedAndSwapped.right, rule)
-        : missing(b.id, b, "no A3 task 2", rule),
+        : missing(b.id, b, "no task 2 for the arm", rule),
     );
   }
   const task1 = (id: BarId, pick: (r: NewTextReport) => Share) => {
@@ -238,7 +238,7 @@ export function measureNewTextBars(inputs: NewBarInputs): {
     bars.push(
       report
         ? measure(id, b, report.plant.plantFailures, rule)
-        : missing(id, b, `no A3 task ${task}`, rule),
+        : missing(id, b, `no task ${task} for the arm`, rule),
     );
   }
   {
@@ -289,14 +289,14 @@ export function measureNewTextBars(inputs: NewBarInputs): {
             share(report.all.silentInventions, report.all.rows),
             rule,
           )
-        : missing(id, silent, `no A3 task ${task}`, rule),
+        : missing(id, silent, `no task ${task} for the arm`, rule),
     );
   }
   const t3 = inputs.task3;
   const a1 = t3?.a1;
   // Both judged bars rest on the judges passing the controls.
   const t3why = !t3?.a3
-    ? "no task 3 for A3"
+    ? "no task 3 for the arm"
     : t3.controlsUnmeasurable
       ? t3.controlsUnmeasurable
       : t3.controlsWaiting
@@ -308,7 +308,7 @@ export function measureNewTextBars(inputs: NewBarInputs): {
     bars.push(
       t3?.a3
         ? measure(id, silent, share(t3.a3.silentInventions, t3.a3.items), rule)
-        : missing(id, silent, "no task 3 for A3", rule),
+        : missing(id, silent, "no task 3 for the arm", rule),
     );
   }
   {
@@ -352,16 +352,16 @@ export function measureNewTextBars(inputs: NewBarInputs): {
     bars.push(
       t3?.a3
         ? measure(b.id, b, t3.a3.attestedForms)
-        : missing(b.id, b, "no task 3 for A3"),
+        : missing(b.id, b, "no task 3 for the arm"),
     );
   }
   {
     const b = bar("blocked");
-    // Only once Opus A3 has translated the new text: before then, the few
+    // Only once the arm has translated the new text: before then, the few
     // calls made (a cache check, say) would pass it on nothing.
     bars.push(
       !inputs.a3Task1 && !inputs.a3Task2
-        ? missing(b.id, b, "no Opus A3 run on the new text yet")
+        ? missing(b.id, b, "no run of the arm on the new text yet")
         : inputs.blocked
           ? measure(
               b.id,
