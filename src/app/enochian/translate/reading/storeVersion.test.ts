@@ -28,12 +28,12 @@ describe("the store's version constants", () => {
     );
   });
 
-  it("are pinned to passage.ts's source", () => {
+  it("are pinned to passage.ts's and numbering.ts's source", () => {
     expect(
-      `${PARTS_VERSION} ${sha("./passage.ts")}`,
-      "passage.ts changed: bump PARTS_VERSION if the layout, parts or numbering could change, then update this pin",
+      `${PARTS_VERSION} ${sha("./passage.ts")} ${sha("./numbering.ts")}`,
+      "passage.ts or numbering.ts changed: bump PARTS_VERSION if the layout, parts or numbering could change, then update this pin",
     ).toBe(
-      "1 b1abe54963217f3bc08c1040a96429d578448c3cb08515ab1cd31fb0884998e2",
+      "2 4947732a18d58253177d14b9e75d011fd9353d7eea031d34178f03fea425283d 118b1990717a1774847dd492f7e0730a51fc140a4e977d5867b810fb1e7b9165",
     );
   });
 

@@ -1,5 +1,5 @@
 import type { ReadToken, Translator } from "../lookup.ts";
-import { numberedInput } from "./prompt.ts";
+import { numberedInput } from "./numbering.ts";
 
 /**
  * Which passages the AI reading takes (plan 081, S2 and S3), and how one is
@@ -32,7 +32,7 @@ export const PART_WORDS = 75;
  * (`readingStoreVersion`): bump it when either changes, since a stored
  * reading's parts and numbering follow it.
  */
-export const PARTS_VERSION = 1;
+export const PARTS_VERSION = 2;
 /** A reading costs one unit, plus one for each full this many words (S4). */
 export const WORDS_PER_EXTRA_UNIT = 100;
 

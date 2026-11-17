@@ -2,9 +2,9 @@ import { and, eq, lt, or, sql } from "drizzle-orm";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { db } from "@/db/neon";
 import { chatDailyUsage } from "@/db/schema/chatUsage";
+import { ANONYMOUS_DAILY_CHAT_LIMIT, USER_DAILY_CHAT_LIMIT } from "./limits";
 
-export const USER_DAILY_CHAT_LIMIT = 100;
-export const ANONYMOUS_DAILY_CHAT_LIMIT = 500;
+export { ANONYMOUS_DAILY_CHAT_LIMIT, USER_DAILY_CHAT_LIMIT };
 
 /** Admission reserves a submission before provider work; failures stay counted. */
 export interface ChatAdmission {

@@ -18,6 +18,11 @@ import { lookupRuleNotes } from "./ruleNotes.server";
 import { MAX_WORDS } from "./tokens";
 import Translator from "./translator";
 
+// The AI reading's offer reads the session; these tests never sign in.
+vi.mock("@/auth/client", () => ({
+  useSession: () => ({ data: null, isPending: false }),
+}));
+
 const PATH = "/enochian/translate";
 const TABLE = buildKeysTable();
 const notes = lookupRuleNotes();

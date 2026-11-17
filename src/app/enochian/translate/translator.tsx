@@ -14,6 +14,7 @@ import InTheKeys, { keysLink } from "../dictionary/InTheKeys";
 import Keypad from "../dictionary/Keypad";
 import { LABELS as DICTIONARY_LABELS } from "../dictionary/labels";
 import { useKeypadBox } from "../dictionary/useKeypadBox";
+import AiReading from "./AiReading";
 import {
   fragmentOf,
   readFragment,
@@ -31,6 +32,7 @@ import type {
   FormToken,
   KeyPlace,
   Language,
+  Translator as Lookup,
   Reading,
   ReadToken,
   ReadWord,
@@ -51,9 +53,11 @@ import { firstWords, MAX_WORDS } from "./tokens";
  * opens its word's entry beside the results on desktop, or in a sheet on
  * phones, as the dictionary does.
  *
- * Nothing leaves the browser: the lookup runs here, the text lives in the
- * URL's fragment, and the one request, for the Keys table, carries none
- * of it. The UI words come from `labels.ts`, out of site search's index.
+ * The lookup sends nothing: it runs here, the text lives in the URL's
+ * fragment, and its one request, for the Keys table, carries none of it.
+ * Only the AI reading sends the text, when the reader asks for one, in a
+ * request's body (`AiReading`, plan 081 stage 2). The UI words come from
+ * `labels.ts`, out of site search's index.
  */
 
 /** How long typing waits before the text is written to the URL. */
@@ -691,22 +695,29 @@ function ToEnochianResult({ result }: { result: ToEnochian }) {
 }
 
 /**
- * Enochian into English (decisions 13–17): the reading line, then each
- * word's tile, then the limitations unless the other direction shows them.
+ * Enochian into English (decisions 13–17): the reading line, the AI
+ * reading's offer or card (stage 2), then each word's tile, then the
+ * limitations unless the other direction shows them.
  */
 function ToEnglishResult({
   result,
   limitations,
+  translator,
+  text,
 }: {
   result: ToEnglish;
   /** Show the limitations after the tiles: no English→Enochian beside it. */
   limitations: boolean;
+  translator: Lookup;
+  /** The text the lookup read, which an AI reading sends. */
+  text: string;
 }) {
   const headingId = React.useId();
   return (
     <section className="tr-result" aria-labelledby={headingId}>
       <h2 id={headingId}>{LABELS.resultsHeading("enochian")}</h2>
       <ReadingLine line={result.line} />
+      <AiReading translator={translator} text={text} />
       <ol className="tr-tiles">
         {result.tokens.map((token) => (
           <EnglishTile key={token.span.join("-")} token={token} />
@@ -970,11 +981,14 @@ export default function Translator({ notes }: { notes: RuleNotes }) {
                 result={translation.toEnochian}
               />
             )
-          : translation.toEnglish && (
+          : translation.toEnglish &&
+            translator.translator && (
               <ToEnglishResult
                 key={language}
                 result={translation.toEnglish}
                 limitations={!translation.toEnochian}
+                translator={translator.translator}
+                text={read.text}
               />
             ),
       )}

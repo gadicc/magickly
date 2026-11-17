@@ -273,12 +273,13 @@ forms where any exist.
     so its page sends only the origin as Referer.
 20. **The limitations, per mode.** The lookup stage has its own list in
     `limitations.ts`, structured per mode so stage 2 adds its own
-    (that the text goes to Anthropic). This plan quotes it word for
-    word under a test, as plan 077 did; plan 077's list stays for its
-    own record. The list Gadi accepted, with three items reworded to
-    stay true under this design (the review found the first two too
-    strong; the third changed when possessives moved after their noun),
-    which Gadi confirmed on 13 November 2026:
+    (that the text goes to OpenAI through Vercel: S8). This plan quotes
+    it word for word under a test, as plan 077 did; plan 077's list
+    stays for its own record. The list Gadi accepted, with three items
+    reworded to stay true under this design (the review found the first
+    two too strong; the third changed when possessives moved after their
+    noun), which Gadi confirmed on 13 November 2026, its last item
+    reworded with stage 2 to say it of the lookup (S9, step 2E):
     - This translator looks words up; it doesn't understand sentences.
       Each word is a form from Dee's Keys or our dictionary, labelled
       with its source, or a gap. Grammar words follow our notes' rules,
@@ -293,8 +294,9 @@ forms where any exist.
     - Meanings and rules come from Dee, Laycock and Leitch, and some
       from later traditions (Schueler, the Golden Dawn). Each is
       labelled with its source.
-    - What you type isn't sent anywhere. The translation runs in your
-      browser.
+    - The lookup runs in your browser, and your text stays in the
+      page's address after the # sign, which isn't sent anywhere. Only an
+      AI reading sends it, when you ask for one.
 21. **Figures, script-only** (changed after the spike). The page
     shows two, computed from the shipped code by a committed script,
     written to a small numbers-only file beside `bars.ts`, which a
@@ -564,7 +566,8 @@ S9. **Decision 19 and the lookup's limitations.** The lookup still runs
     in the browser and its text stays in the fragment; its last
     limitation is reworded to say so of the lookup, and it gains one
     for the hints (machine-suggested from meanings, unreviewed). The
-    stale "goes to Anthropic" in `limitations.ts` and here is fixed.
+    stale "goes to Anthropic" in `limitations.ts` and here is fixed
+    (both done in 2E; the hints' item comes with them, in 2F).
 S10. **No text in logs.** Errors are caught and logged by class with
     counts, tokens, cost and latency only, never the text, the prompt
     or a hash of the text (the SDK's errors carry the whole request,
@@ -935,6 +938,112 @@ What only a first live call (Gadi's) can settle:
   second cron registers there;
 - whether production sits behind another proxy, which would make every
   client one `x-real-ip` and so one bucket of 10 units.
+
+### 2E build notes (17 November 2026)
+
+The offer and the card are `AiReading.tsx`, under the reading line of
+the Enochian-into-English result (also when a text is read both ways);
+the request is `readingRequest.ts`, a POST to `/api/enochian/read` with
+`{text, again}` in its body, read line by line as the NDJSON lands. The
+words are `LABELS.reading` in `labels.ts`. The chat allowances moved to
+`src/app/chat/limits.ts` and the client cap to `reading/limits.ts`
+(re-exported where they were), so the page can name them without
+bundling the database. Task 1's numbering (`numberedInput`) moved from
+`prompt.ts` to `reading/numbering.ts`, which `prompt.ts` re-exports, so
+the page's `readingParts` bundles no prompt text; `passage.ts` changed
+with it, so `PARTS_VERSION` is 2 and its pin updated (the layout is
+unchanged, and the A3s byte-for-byte test passes). `check.ts` is
+unchanged. Decisions beyond the design (the first list as built, then
+the review's fixes, folded in):
+
+- **The offer** runs `admitReading` on the text the lookup read (its
+  first 500 words) and shows the button only when it passes. What it
+  uses is shown once the session is known: "uses 1 of today's 100", or
+  "uses 1 of today's allowance shared by readers not signed in, at most
+  10 a day for each address". The button names that as its description. It can't
+  know a reading is already stored, so a reading served free from the
+  store is offered at its price; the card then says it used none.
+- **The card belongs to a passage**: keyed by the admitted passage, so a
+  new text brings the offer back, and leaving aborts the request (the
+  route's calls go on and are stored).
+- **The sentence**: the shown parts' sentences as one paragraph under
+  "The model's sentence, not checked"; a withheld one says so, naming
+  its part when there are two, with S7's reasons in plain words ("too
+  few of its words are in the word readings or our data", "it is far
+  longer than your text", "it holds a link", "the model gave none", "it
+  has no words of meaning to compare").
+- **The words**: one list for both parts, each row the reader's word,
+  the model's English (cut ones end "…"), the state as words
+  (confirmed, not confirmed, the model's guess, no reading; colour only
+  helps) and its sources ("Key 1.4 GOHO", "dictionary, OL", "Key 19.1,
+  the Aethyr LIL (1)"). No links: the tiles below still open entries. A
+  failed part shows in its words' place, with why ("Part 2 of 2: the
+  model took too long.").
+- **Retry** sends `again: false`, so the route serves the read parts
+  from its store and reads the rest; its cost is shown from the
+  client's own `readingParts` (one unit for a 60-word second part). It
+  is offered for the model's failures (truncated, unreadable, timeout,
+  failed) and for an answer that stopped arriving; not for the provider
+  refusing (likely to refuse again, at a cost), the switch, or a part
+  the gateway didn't route as asked and the part not sent after it
+  (resending repeats it): the card says the reading stopped because
+  the provider's privacy terms (OpenAI, keeping no copy) couldn't be
+  confirmed, and nothing more was sent. Busy and "unavailable" offer "Try again" at the reading's
+  full price. After a failed "Read again", a retry gets the old stored
+  reading back free, not a new one.
+- **"Read again"** says what it does beside the button ("a new reading,
+  which replaces this one, uses 1 of today's 100"); there is no second
+  confirmation.
+- **Refusals** in plain words, the reset time in the reader's clock
+  (24-hour, "02:00"): the reader's allowance (what it needs and what is
+  left), the address's 10 ("for each address not signed in (readers
+  sharing an address share them)"), the shared pool (spent, or too
+  little left for this reading, with "signed in, you have your own"),
+  the ceiling, off, busy, unavailable ("Something went wrong on our
+  side, so the reading didn't start. Nothing was sent.").
+- **Where the text went**, whenever a model call was made or units were
+  taken, every part failing included: "Your text went to OpenAI through
+  Vercel for this reading", or, after a routing failure, "through
+  Vercel …, which didn't confirm that it reached OpenAI with no copy
+  kept"; then "and our server keeps it and the reading for a day", or
+  "with no part read, our server keeps none of it" (the route keeps no
+  passage without a reading). Served wholly from the store, it says
+  nothing went to OpenAI. Then what it used ("It used 1 of today's
+  100", "of today's shared allowance", or none).
+- **The answer is checked before use** (`readingEvent`): an event of a
+  type the card doesn't know, a line that isn't JSON (one cut short), a
+  part outside 1 to its answer's parts (at most 8), a reading whose
+  words or sentence the card can't show, or a refusal without its
+  counts or time is passed over. An answer that ends without `done` or
+  a refusal, or isn't NDJSON (an HTML error page), ends as "The reading
+  stopped arriving", with a retry.
+- **Accessibility**: the card is a region named by its heading, which
+  takes the focus from the button it replaces. A hidden polite live
+  region, in the page empty from the start beside the offer or the
+  card, speaks one line as each part lands ("Part 1 of 2 read: 37 of
+  38 words confirmed."), a refusal, or a lost answer, not the whole
+  card. The state labels' contrast on the card (WCAG ratio; the card is
+  `action.hover` over the page, dark measured on `background.default`,
+  paper in brackets): light, confirmed in `success.dark` 7.2, not
+  confirmed and no reading in `text.secondary` 5.6, the model's guess
+  in `text.primary` on a 14% warning tint, bordered in `warning.main`,
+  13.3; dark, confirmed in `success.light` 7.5 (6.7), not confirmed and
+  no reading 7.0 (6.3), the guess in `warning.light` on the tint 6.6
+  (5.9). (As first built, the guess in `warning.dark` was 3.0 and
+  confirmed in `success.main` 4.7.)
+- **Limitations**: S8's five shown in the card under "What the AI
+  reading can't do"; the lookup's six stay where they were.
+- **Page text**: a paragraph under "Enochian into English" (a passage
+  can also be read with AI, each word checked, the sentence not, it can
+  be wrong, it uses the allowance), and "Your text stays with you" now
+  says it of the lookup and names the exception. The description gains
+  "or by an AI reading whose words are checked against them" (the
+  sentence isn't checked).
+
+Checked in headless Chromium with the route intercepted (CDP `Fetch`),
+at 390 and 1280 wide, light and dark. Not seen in a browser: parts
+landing one by one (the interception delivers the body whole; the
+jsdom tests stream them), and Safari.
 
 ## The stage-1 review (Fable, 13 November 2026)
 

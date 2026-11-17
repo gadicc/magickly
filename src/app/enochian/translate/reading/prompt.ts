@@ -192,16 +192,9 @@ export function readingContext(
 export const grammarMessage = (grammar: string) =>
   `${GRAMMAR_HEAD}\n\n${grammar.trim()}`;
 
-/**
- * Task 1's input: a sentence a line, its words numbered in square brackets
- * from 1, counting on through the passage (`[1] OL [2] SONF`).
- */
-export function numberedInput(lines: readonly (readonly string[])[]): string {
-  let n = 0;
-  return lines
-    .map((line) => line.map((word) => `[${++n}] ${word}`).join(" "))
-    .join("\n");
-}
+// Task 1's numbering lives apart, so the page can lay out parts without
+// bundling this module's prompt text.
+export { numberedInput } from "./numbering.ts";
 
 /** The user message for a passage: the task, a blank line, the input. */
 export const readingPrompt = (input: string) =>

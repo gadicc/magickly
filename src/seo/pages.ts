@@ -102,7 +102,8 @@ export const PUBLIC_PAGES = {
     title: "Enochian Translator",
     description:
       "Translate English into Enochian and Enochian into English by looking " +
-      "words up in Dee's Keys and our dictionary, each word with its source.",
+      "up Dee's Keys and our dictionary, or by an AI reading whose words " +
+      "are checked against them.",
   },
   "/enochian/tablets": {
     title: "Enochian Elemental Tablets",

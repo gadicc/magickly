@@ -8,6 +8,9 @@ import {
   usageSubject,
 } from "@/app/chat/usage";
 import type { ReadingDatabase } from "./database.ts";
+import { CLIENT_DAILY_UNITS } from "./limits.ts";
+
+export { CLIENT_DAILY_UNITS };
 
 /**
  * What a reading reserves from the daily allowance (plan 081, S4, and
@@ -18,9 +21,6 @@ import type { ReadingDatabase } from "./database.ts";
  * are counted or neither. A reservation is never given back: a failed call
  * may still have cost.
  */
-
-/** The most units of the anonymous pool one signed-out client may use a day. */
-export const CLIENT_DAILY_UNITS = 10;
 
 /** Whose allowance a refusal ran out of. */
 export type AllowanceScope = "user" | "anonymous" | "client";

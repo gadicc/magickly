@@ -139,6 +139,117 @@ export const LABELS = {
     toEnglish: (read: number, missing: number) =>
       `Enochian into English: ${count(read, "word", "words")} read${missing ? `, ${count(missing, "word", "words")} not in our data` : ""}.`,
   },
+  // The AI reading (plan 081, stage 2: S2, S7).
+  reading: {
+    offer: "Read with AI",
+    again: "Read again",
+    retry: "Try again",
+    retryFailed: "Try the failed part again",
+    /**
+     * What a request will use: of a signed-in reader's own allowance, or of
+     * the pool signed-out readers share, with the cap on one client.
+     */
+    uses: (units: number, signedIn: boolean, limit: number, cap: number) =>
+      signedIn
+        ? `uses ${units} of today’s ${limit}`
+        : `uses ${units} of today’s allowance shared by readers not signed in, at most ${cap} a day for each address`,
+    againNote: "a new reading, which replaces this one",
+    heading: "AI reading",
+    who: "GPT-6.1 Terra, each word checked against our data",
+    starting: "Reading with AI…",
+    readingPart: (part: number, parts: number) =>
+      parts > 1 ? `Reading part ${part} of ${parts}…` : "Reading…",
+    sentenceLabel: "The model’s sentence, not checked",
+    withheld: (reason: string, part?: number) =>
+      part === undefined
+        ? `The model’s sentence is withheld: ${reason}`
+        : `The model’s sentence for part ${part} is withheld: ${reason}`,
+    withheldReason: {
+      "no sentence": "the model gave none.",
+      "no content words": "it has no words of meaning to compare.",
+      "too few supported":
+        "too few of its words are in the word readings or our data.",
+      "too long": "it is far longer than your text.",
+      link: "it holds a link.",
+    } as Record<string, string>,
+    wordsLabel: "Each word",
+    state: {
+      confirmed: "confirmed",
+      unconfirmed: "not confirmed",
+      guess: "the model’s guess",
+      none: "no reading",
+    },
+    headword: (headword: string) => `dictionary, ${headword}`,
+    row: (key: number, row: number, word: string, aethyr?: number) =>
+      aethyr === undefined
+        ? `Key ${key}.${row} ${word}`
+        : `Key ${key}.${row}, the Aethyr ${word} (${aethyr})`,
+    /** A part with no reading, in its words' place. */
+    partFailed: (text: string, part: number, parts: number) =>
+      parts > 1 ? `Part ${part} of ${parts}: ${text}` : text,
+    failure: {
+      refused: "the provider refused to read this passage.",
+      truncated: "the model’s answer was cut off.",
+      unreadable: "the model’s answer couldn’t be read.",
+      routing:
+        "not shown, since the provider’s privacy terms couldn’t be confirmed.",
+      timeout: "the model took too long.",
+      failed: "the model failed.",
+      "not read": "not sent.",
+      off: "not sent: AI readings were turned off.",
+    } as Record<string, string>,
+    lost: "The reading stopped arriving.",
+    /** After a part the gateway didn't route as asked (S5): no retry. */
+    stoppedRouting:
+      "The reading stopped because the provider’s privacy terms (OpenAI, keeping no copy) couldn’t be confirmed, and nothing more was sent.",
+    refusal: {
+      busy: "This text is being read for someone else just now. Try again shortly.",
+      off: "AI readings are turned off for now.",
+      ceiling: (time: string) =>
+        `AI readings have stopped for everyone today: the day’s spending limit is reached. They start again at ${time}.`,
+      user: (units: number, left: number, limit: number, time: string) =>
+        `This reading needs ${units}, and you have ${left} of today’s ${limit} left. They renew at ${time}.`,
+      anonymous: (units: number, left: number, time: string) =>
+        `${
+          left > 0
+            ? `Too little is left of today’s allowance shared by readers not signed in: this reading needs ${units}, and ${left} ${left === 1 ? "is" : "are"} left.`
+            : "Readers not signed in have used today’s shared allowance."
+        } It renews at ${time}; signed in, you have your own.`,
+      client: (units: number, left: number, cap: number, time: string) =>
+        `This reading needs ${units}, and ${left} ${left === 1 ? "is" : "are"} left of the ${cap} a day for each address not signed in (readers sharing an address share them). They renew at ${time}.`,
+      unavailable:
+        "Something went wrong on our side, so the reading didn’t start. Nothing was sent.",
+      other: "This text can’t be read with AI.",
+    },
+    /**
+     * Where the text went and what the reading used (S7): to OpenAI, or
+     * through Vercel unconfirmed after a routing failure; kept with its
+     * reading, or not at all when no part was read (the route keeps no
+     * passage without a reading).
+     */
+    went: (kept: boolean, confirmed: boolean) =>
+      `${
+        confirmed
+          ? "Your text went to OpenAI through Vercel for this reading"
+          : "Your text went through Vercel for this reading, which didn’t confirm that it reached OpenAI with no copy kept"
+      }${
+        kept
+          ? ", and our server keeps it and the reading for a day."
+          : "; with no part read, our server keeps none of it."
+      }`,
+    fromStore:
+      "This text was read in the last day, so the reading came from our server and nothing went to OpenAI.",
+    used: (units: number, signedIn: boolean, limit: number) =>
+      units === 0
+        ? "It used none of your allowance."
+        : signedIn
+          ? `It used ${units} of today’s ${limit}.`
+          : `It used ${units} of today’s shared allowance.`,
+    limitationsHeading: "What the AI reading can’t do",
+    /** The card's live region: a few words as each part lands. */
+    announce: (part: number, parts: number, confirmed: number, words: number) =>
+      `${parts > 1 ? `Part ${part} of ${parts} read: ` : "AI reading: "}${confirmed} of ${count(words, "word", "words")} confirmed.`,
+  },
   // The figures (decision 21).
   figures: {
     heading: "How well it does",
