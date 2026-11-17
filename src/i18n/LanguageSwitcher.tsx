@@ -30,7 +30,7 @@ export default function LanguageSwitcher() {
     if (target && target !== pathname) window.location.assign(target);
   }
   return (
-    <Box sx={{ px: 2, py: 1 }}>
+    <Box sx={{ px: 2 }}>
       <FormControl fullWidth>
         <Select
           value={locale}
@@ -61,7 +61,7 @@ export default function LanguageSwitcher() {
             borderRadius: 0,
             "& .MuiOutlinedInput-notchedOutline": { border: 0 },
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": { border: 0 },
-            "& .MuiSelect-select": { py: 1.5, paddingInlineStart: 0 },
+            "& .MuiSelect-select": { py: 2, paddingInlineStart: 0 },
           }}
         >
           {UI_LOCALES.map((next) => (

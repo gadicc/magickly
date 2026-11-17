@@ -27,7 +27,7 @@ export default function ThemeSwitch() {
   const { t } = useUiLanguage();
   const { mode, setMode } = useColorScheme();
   return (
-    <Box sx={{ px: 2, pt: 1, pb: 2 }}>
+    <Box sx={{ px: 2, pb: 2 }}>
       <ToggleButtonGroup
         aria-label={t(/*i18n*/ "Theme")}
         color="primary"
