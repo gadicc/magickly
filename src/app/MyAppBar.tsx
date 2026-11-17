@@ -319,6 +319,7 @@ function MenuDrawer({
         handleDrawerToggle={handleDrawerToggle}
         drawerOpen={drawerOpen}
       />
+      <LanguageSwitcher />
       <ThemeSwitch />
     </>
   );
@@ -657,7 +658,6 @@ export default function ButtonAppBar() {
               }}
             >
               <SearchButton />
-              <LanguageSwitcher />
               <IconButton
                 color="inherit"
                 aria-label={t(/*i18n*/ "share")}

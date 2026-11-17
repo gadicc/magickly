@@ -834,3 +834,54 @@ and Turbopack production builds, and both production browser gates. Webpack
 also verified the real offline UUID fallback. The resolved frozen install
 passed supply-chain policy checks. Main's untracked ritual-localization plan
 is preserved, and the i18n branch/worktree are retained for follow-up work.
+
+
+## Follow-up: routine translations and drawer control
+
+User-approved follow-up after the initial local main review:
+
+- Move the language control into the drawer using its existing styling, with
+  native names and decorative emoji flags in the options. Explain unavailable
+  public editions and provide a Hebrew-home link; preserve in-place private
+  switching and draft protections.
+- Replace separately maintained Hebrew homepage/About bodies with shared public
+  components and complete Lingui messages. Add the Books index as the first
+  additional Hebrew route; the linked French source book retains its language.
+- Maintain first-party translations through extract → AI-assisted delta
+  translation → structural validation → compile. The developer can translate the
+  PO delta directly or invoke the configured gateway task; builds and CI make no
+  AI calls. Preserve reviewed translations, ICU controls and code-owned links.
+- Defer Hebrew search launch until everything intended for that launch is ready
+  and proven. Keep available routes noindex and exclude them from sitemap and
+  hreflang while the explicit SEO switch is false. English indexing is unchanged.
+  The final launch checklist is in `src/i18n/README.md`.
+
+Follow-up verification (2026-11-17), integrated with main through `edddb07e`:
+
+- Full suite: 652 files passed, 3 skipped; 12,638 tests passed, 18 skipped.
+  Initial sandbox-only subprocess/FIFO failures were resolved by running the
+  complete suite with its required local process/filesystem permissions.
+- `pnpm typecheck`, `pnpm check` (28 existing warnings), `pnpm i18n:check`,
+  `loom check` and `loom skills check` pass. Loom retains its existing optional
+  OIDC/skill recommendations. Catalog sync, missing/fuzzy rejection and ICU/tag
+  validation run without provider credentials in CI.
+- Both production builds pass. The real Chromium app gate passes 18
+  HTTP/worker checks on webpack and 16 on Turbopack, including mobile drawer
+  selection, same-document private switching, cross-root public navigation,
+  Hebrew Books/French source boundaries, noindex/sitemap/hreflang gating,
+  private/unsupported aliases and webpack's real offline UUID fallback.
+- All 19 required documentation screenshots were regenerated through the
+  installed helper and visually inspected; seven images changed. Synthetic
+  data only. The drawer and its coloured emoji options were also inspected in
+  the production browser captures under ignored `output/i18n/`.
+- The English homepage/About search prose is preserved. The extractor reads
+  only literal messages through the explicitly imported presentation adapter,
+  excludes runtime interpolation values and never follows its provider graph.
+- Runtime verification caught streamed Flight elements in rich-message props.
+  `UiRichText` normalizes them through React's public children API before
+  Lingui clones them; both real bundler/browser gates prove that boundary.
+- The coding agent translated the current 58-message Hebrew delta. Dry-run and
+  zero-candidate `i18n:update` complete successfully; a credentialed AI Gateway
+  translation request was not made. Future provider-backed runs require the
+  explicitly configured `I18N_TRANSLATION_MODEL` and normal gateway auth.
+- No deployment, remote push, database migration or Hebrew SEO launch was run.

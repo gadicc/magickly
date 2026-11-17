@@ -63,3 +63,30 @@ Hebrew that stands alone (single letters, names, short or large words) is
 set in Frank Ruhl Libre; longer running Hebrew in Noto Sans Hebrew; Noto
 Serif Hebrew is not used. Plan 079, decision 6, has the rule and where each
 font lives.
+
+## Interface and site-copy translations
+
+When adding or changing interface text or site-authored public prose:
+
+1. Mark complete messages for Lingui (`/*i18n*/` literals with `UiText`,
+   `UiRichText`, or the scoped translator). Include labels, alt text and metadata.
+   Keep whole sentences together and give interpolations meaningful names.
+2. Run `pnpm i18n:extract`. Translate new/changed Hebrew entries and review
+   existing fuzzy entries in `src/locales/he/messages.po`. The coding agent may
+   translate the delta directly; `pnpm i18n:translate` previews the delta without
+   calling a provider. `pnpm i18n:update` uses the explicitly configured
+   `I18N_TRANSLATION_MODEL` through Vercel AI Gateway. Never invent credentials or
+   send stored rituals, private content or outside source texts to this task.
+3. Run `pnpm i18n:check` and relevant tests. Commit reviewable PO sources with
+   the code. Generated catalogs remain ignored. Builds/CI never invoke AI.
+4. Reuse public page components across languages. Keep external source titles,
+   quotations, language-specific source data and stored rituals distinct from
+   interface translation. Add each genuinely translated public route to the
+   available-edition registry; do not create translated aliases for private/API
+   routes. Preserve English search extraction through the explicit presentation
+   adapter, without evaluating modules or following private imports.
+
+Hebrew SEO launch is intentionally deferred. Keep `LOCALIZED_SEO_ENABLED` false:
+localized routes stay usable but `noindex`, absent from sitemap/hreflang. Do not
+flip this during routine copy work. The final launch checklist lives in
+`src/i18n/README.md`.

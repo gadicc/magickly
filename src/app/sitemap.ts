@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { PUBLIC_TRANSLATIONS, publicAlternates } from "@/i18n/publications";
+import { indexableLocalizedPaths, publicAlternates } from "@/i18n/publications";
 import { GD_HALLS } from "@/render/contracts/gdHall";
 import { componentPages } from "@/seo/components";
 import { entityPages } from "@/seo/entities";
@@ -20,9 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       ...entityPages().map((page) => page.path),
       ...lenainPages().map((page) => page.path),
       ...componentPages().map((page) => page.path),
-      ...Object.values(PUBLIC_TRANSLATIONS).flatMap((translations) =>
-        Object.values(translations),
-      ),
+      ...indexableLocalizedPaths(),
     ].map((path) => ({
       url: path === "/" ? SITE_URL : SITE_URL + path,
       ...(publicAlternates(path)

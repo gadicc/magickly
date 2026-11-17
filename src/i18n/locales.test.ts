@@ -37,10 +37,10 @@ describe("locale policy", () => {
     expect(publicEdition("/about", "he")).toBe("/he/about");
     expect(publicEdition("/temples", "he")).toBeNull();
     expect(publicEdition("/doc/private-id", "he")).toBeNull();
-    expect(publicAlternates("/he/about")).toEqual({
-      en: "/about",
-      he: "/he/about",
-      "x-default": "/about",
-    });
+    expect(publicAlternates("/he/about")).toBeUndefined();
+    expect(publicEdition("/about?from=menu#credits", "he")).toBe(
+      "/he/about?from=menu#credits",
+    );
+    expect(publicEdition("/he/books", "en")).toBe("/books");
   });
 });

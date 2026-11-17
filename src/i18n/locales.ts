@@ -5,8 +5,8 @@ export const UI_LOCALES: readonly UiLocale[] = ["en", "he"];
 export const LOCALE_COOKIE = "magickly-ui-locale";
 
 export const LOCALE_INFO = {
-  en: { name: "English", direction: "ltr" },
-  he: { name: "עברית", direction: "rtl" },
+  en: { name: "English", direction: "ltr", flag: "🇺🇸" },
+  he: { name: "עברית", direction: "rtl", flag: "🇮🇱" },
 } as const;
 
 export function isUiLocale(value: unknown): value is UiLocale {

@@ -1,9 +1,9 @@
 # Interface languages and public editions
 
 Plan [086](../../plans/086-internationalization.md) records the decisions and
-independent review. English public URLs stay unchanged. The initial registered
-Hebrew pages are `/he` and `/he/about`; `publications.ts` is the closed list of
-available static editions. A UI catalog never publishes a translated ritual.
+independent review. English public URLs stay unchanged. The available
+Hebrew pages are `/he`, `/he/about` and `/he/books`; `publications.ts` is the
+closed list of available static editions. A UI catalog never publishes a translated ritual.
 
 ## Rendering boundaries
 
@@ -80,9 +80,18 @@ The initial catalog covers navigation and core sign-in, temple, editor and
 offline controls. Untranslated explanatory and advanced recovery copy remains
 explicitly English through `EnglishText`/`UiText` fallbacks. Translate complete
 sentences with ICU interpolation/plurals in later batches, rather than
-assembling translated sentence fragments. The public Hebrew prose is a
-separately authored edition in `pages/`; its English-only destination links
-are disclosed on the landing page.
+assembling translated sentence fragments. Public pages share their components and whole-message Lingui copy between
+English and Hebrew. `UiRichText` keeps links/formatting in code-owned React
+components; translations may reorder placeholders but cannot set their URLs or
+attributes. Streamed React elements are normalized through the public children
+API before Lingui clones them. `PublicLink` retains the selected language where a destination has an
+available edition, otherwise it keeps the original destination. Source works
+linked from the Books index retain their own language.
+
+The drawer contains the native-name language setting; decorative emoji flags
+appear in its choices. An unavailable public edition is disabled with an
+explanation and a link to the Hebrew homepage. Private language changes still
+preserve mounted editors and drafts.
 
 ## Account preference
 
@@ -114,8 +123,10 @@ redacted. Research URLs stay excluded even behind malformed/unknown prefixes.
 The worker puts prefixed private/API/SQL-reader requests ahead of generic
 caches, and never serves an English offline UUID fallback for a prefixed URL.
 
-Canonicals, reciprocal `hreflang`/`x-default`, localized metadata and sitemap
-entries advertise only actual published pages. `/en` aliases and locale-prefixed
+Hebrew routes currently carry `noindex, follow`, retain self-canonicals and
+localized sharing metadata, and are excluded from sitemap and language alternates.
+`LOCALIZED_SEO_ENABLED` in `publications.ts` gates search discovery independently
+of route availability. Existing English indexing stays enabled. `/en` aliases and locale-prefixed
 private/technical aliases return 404. No language/country-based public redirect
 is installed. Existing English search and embedding artifacts remain unchanged;
 no remote index or analytics provider configuration is changed.
@@ -124,3 +135,32 @@ no remote index or analytics provider configuration is changed.
 project supplies the public-edition resolver and publication/access/revision
 contract in plan 086. Connecting that resolver and publishing additional page
 translations are later bounded slices, not invented storage in this change.
+
+
+## Routine maintenance and final SEO launch
+
+Follow the translation workflow in `AGENTS.md` and
+`scripts/i18n/README.md`: extract, translate the delta, review, check, compile and
+verify the affected screens. CI runs `pnpm i18n:check` without AI credentials.
+The homepage, About and Books index are the initial shared-component batch;
+other public articles and advanced interface copy still need localization in
+later batches. A translated navigation shell never implies a translated source
+work or ritual.
+
+Search launch is the final, separately requested step, after the intended page
+batches are ready. Before enabling it:
+
+- Review Hebrew prose, navigation, title/description, alt text and phone/desktop
+  RTL views, including source-work language boundaries and unavailable links.
+- Pass extraction sync, translation validation, tests, typechecking, both builds
+  and real-browser switching/offline checks. Resolve remaining fallback copy on
+  every route intended for indexing.
+- Confirm each available route has accurate content, a self-canonical, reciprocal
+  language alternates and an English `x-default`; private and unsupported aliases
+  must still return 404/noindex.
+- Enable `LOCALIZED_SEO_ENABLED` only in that final change, update the explicit
+  SEO-gate tests/runtime assertions to verify the enabled behavior, and inspect
+  rendered metadata plus sitemap. Do not block crawling in robots.txt: crawlers
+  must be able to read the current noindex directive.
+- After the reviewed deployment, verify the deployed HTML and sitemap before
+  requesting search-engine discovery. No Search Console submission is automated.
