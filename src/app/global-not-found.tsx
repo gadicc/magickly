@@ -1,9 +1,4 @@
-import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
-import {
-  COLOR_SCHEME_ATTRIBUTE,
-  DEFAULT_COLOR_MODE,
-  noStorageColorSchemeScript,
-} from "@/colorScheme";
+import { noStorageColorSchemeScript } from "@/colorScheme";
 import "./errorDocument.css";
 
 export const metadata = {
@@ -21,10 +16,7 @@ export default function GlobalNotFound() {
       suppressHydrationWarning
     >
       <body>
-        <InitColorSchemeScript
-          attribute={COLOR_SCHEME_ATTRIBUTE}
-          defaultMode={DEFAULT_COLOR_MODE}
-        />
+        {/* Global documents also serve private research failures; use device theme without storage. */}
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: fixed app-owned theme fallback, no input
           dangerouslySetInnerHTML={{ __html: noStorageColorSchemeScript }}

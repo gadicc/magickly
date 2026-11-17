@@ -67,7 +67,7 @@
     "translate-eval:budget": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts budget",
     "translate-eval:call-costs": "node --import tsx scripts/enochian-translate-eval/cli.ts call-costs",
     "translator:figures": "pnpm data:build && node --import tsx scripts/enochian-translator-figures.ts",
-    "test:chat-research": "pnpm i18n:compile && vitest run src/chat-research src/app/chat/research scripts/chat-research tests/chat-research tests/authDatabase.test.ts",
+    "test:chat-research": "pnpm i18n:compile && vitest run src/chat-research src/app/chat/research 'src/app/(research)/chat/research' src/app/globalDocument.privacy.test.tsx scripts/chat-research tests/chat-research tests/authDatabase.test.ts",
     "test:local": "pnpm i18n:compile && pnpm data:build && pnpm search:build && loom test run --workers auto --cpu-mode exclude -- vitest run",
     "i18n:extract": "pnpm lingui extract --clean",
     "i18n:compile": "pnpm lingui compile",

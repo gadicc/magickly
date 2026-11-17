@@ -1,10 +1,5 @@
 "use client";
-import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
-import {
-  COLOR_SCHEME_ATTRIBUTE,
-  DEFAULT_COLOR_MODE,
-  noStorageColorSchemeScript,
-} from "@/colorScheme";
+import { noStorageColorSchemeScript } from "@/colorScheme";
 import "./errorDocument.css";
 
 /** A root failure must not reveal exception details or mount the ordinary shell. */
@@ -17,10 +12,7 @@ export default function GlobalError({ reset }: { reset: () => void }) {
       suppressHydrationWarning
     >
       <body>
-        <InitColorSchemeScript
-          attribute={COLOR_SCHEME_ATTRIBUTE}
-          defaultMode={DEFAULT_COLOR_MODE}
-        />
+        {/* Global documents also serve private research failures; use device theme without storage. */}
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: fixed app-owned theme fallback, no input
           dangerouslySetInnerHTML={{ __html: noStorageColorSchemeScript }}

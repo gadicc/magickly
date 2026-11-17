@@ -33,6 +33,8 @@ export default defineConfig({
       reporter: ["text", "html", "json-summary"],
       // Expand this list as domain logic is extracted from UI and persistence.
       include: [
+        "src/app/global-error.tsx",
+        "src/app/global-not-found.tsx",
         "src/chat-research/historyInput.ts",
         "src/chat-research/historyCandidate.ts",
         "src/chat-research/sqlAdmission.ts",
