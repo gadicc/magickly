@@ -70,17 +70,14 @@ it("labels the group and each choice", async () => {
   const html = renderToString(<App />);
   for (const label of ["Light", "System", "Dark"])
     expect(html).toContain(`>${label}</button>`);
-  // The visible caption names the group, so it is read once.
+  // The group stays named for assistive technology without a visible caption.
   const container = document.createElement("div");
   container.innerHTML = html;
   document.body.append(container);
   const group = within(container).getByRole("group", { name: "Theme" });
-  const caption = document.getElementById(
-    group.getAttribute("aria-labelledby") ?? "",
-  );
-  expect(caption?.textContent).toBe("Theme");
-  expect(caption?.hasAttribute("aria-hidden")).toBe(false);
-  expect(group.hasAttribute("aria-label")).toBe(false);
+  expect(group.getAttribute("aria-label")).toBe("Theme");
+  expect(group.hasAttribute("aria-labelledby")).toBe(false);
+  expect(within(container).queryByText("Theme")).toBeNull();
 });
 
 it("selects nothing until mounted, then the stored choice", async () => {

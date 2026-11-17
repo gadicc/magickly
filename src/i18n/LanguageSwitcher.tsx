@@ -60,6 +60,7 @@ export default function LanguageSwitcher() {
           sx={{
             borderRadius: 0,
             "& .MuiOutlinedInput-notchedOutline": { border: 0 },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": { border: 0 },
             "& .MuiSelect-select": { py: 1.5, paddingInlineStart: 0 },
           }}
         >

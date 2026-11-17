@@ -319,8 +319,11 @@ function MenuDrawer({
         handleDrawerToggle={handleDrawerToggle}
         drawerOpen={drawerOpen}
       />
-      <LanguageSwitcher />
-      <ThemeSwitch />
+      <Box sx={{ mt: "auto", flexShrink: 0 }}>
+        <Divider />
+        <LanguageSwitcher />
+        <ThemeSwitch />
+      </Box>
     </>
   );
 }

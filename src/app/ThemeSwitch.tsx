@@ -4,15 +4,8 @@ import {
   LightModeOutlined,
   SettingsBrightness,
 } from "@mui/icons-material";
-import {
-  Box,
-  Divider,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from "@mui/material";
+import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { useColorScheme } from "@mui/material/styles";
-import { useId } from "react";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
 
 type Mode = "light" | "system" | "dark";
@@ -33,48 +26,37 @@ const CHOICES: { value: Mode; label: string; Icon: typeof DarkModeOutlined }[] =
 export default function ThemeSwitch() {
   const { t } = useUiLanguage();
   const { mode, setMode } = useColorScheme();
-  const labelId = useId();
   return (
-    <Box sx={{ mt: "auto", flexShrink: 0 }}>
-      <Divider />
-      <Box sx={{ px: 2, pt: 1, pb: 2 }}>
-        <Typography
-          id={labelId}
-          variant="body2"
-          sx={{ mb: 1, color: "text.secondary" }}
-        >
-          {t(/*i18n*/ "Theme")}
-        </Typography>
-        <ToggleButtonGroup
-          aria-labelledby={labelId}
-          color="primary"
-          exclusive
-          fullWidth
-          size="small"
-          value={mode ?? null}
-          // An exclusive group reports null when the selected one is
-          // clicked again; a theme is always chosen, so that is ignored.
-          onChange={(_event, next: Mode | null) => {
-            if (next) setMode(next);
-          }}
-        >
-          {CHOICES.map(({ value, label, Icon }) => (
-            <ToggleButton
-              key={value}
-              value={value}
-              sx={{
-                flexDirection: "column",
-                gap: 0.25,
-                textTransform: "none",
-                lineHeight: 1.2,
-              }}
-            >
-              <Icon fontSize="small" />
-              {t(label)}
-            </ToggleButton>
-          ))}
-        </ToggleButtonGroup>
-      </Box>
+    <Box sx={{ px: 2, pt: 1, pb: 2 }}>
+      <ToggleButtonGroup
+        aria-label={t(/*i18n*/ "Theme")}
+        color="primary"
+        exclusive
+        fullWidth
+        size="small"
+        value={mode ?? null}
+        // An exclusive group reports null when the selected one is
+        // clicked again; a theme is always chosen, so that is ignored.
+        onChange={(_event, next: Mode | null) => {
+          if (next) setMode(next);
+        }}
+      >
+        {CHOICES.map(({ value, label, Icon }) => (
+          <ToggleButton
+            key={value}
+            value={value}
+            sx={{
+              flexDirection: "column",
+              gap: 0.25,
+              textTransform: "none",
+              lineHeight: 1.2,
+            }}
+          >
+            <Icon fontSize="small" />
+            {t(label)}
+          </ToggleButton>
+        ))}
+      </ToggleButtonGroup>
     </Box>
   );
 }
