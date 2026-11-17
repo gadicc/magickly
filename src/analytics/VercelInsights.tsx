@@ -27,7 +27,7 @@ const analyticsBeforeSend: AnalyticsBeforeSend = (event) => {
 };
 
 const speedInsightsBeforeSend: SpeedInsightsBeforeSend = (event) => {
-  const url = insightsUrl(event.url);
+  const url = insightsUrl(event.url, true);
   if (shownPrivatePage || !url || !isPublicPath(new URL(url).pathname))
     return null;
   return { ...event, url };
@@ -40,7 +40,9 @@ const speedInsightsBeforeSend: SpeedInsightsBeforeSend = (event) => {
  * compute a route that can keep a raw invite password.
  */
 export default function VercelInsights() {
-  const path = insightsPath(usePathname());
+  const pathname = usePathname() ?? "/";
+  const path = insightsPath(pathname);
+  const performancePath = insightsPath(pathname, true);
   const isPublic = isPublicPath(path);
 
   React.useEffect(() => {
@@ -58,7 +60,7 @@ export default function VercelInsights() {
       />
       <SpeedInsights
         framework="next"
-        route={path}
+        route={performancePath}
         beforeSend={speedInsightsBeforeSend}
       />
     </>

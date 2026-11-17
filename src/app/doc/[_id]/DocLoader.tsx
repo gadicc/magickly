@@ -6,6 +6,7 @@ import _neophyte from "@/doc/0=0.pug" with { type: "text" };
 import _zelator from "@/doc/1=10.pug" with { type: "text" };
 import _theoricus from "@/doc/2=9.pug" with { type: "text" };
 import { prepare } from "@/doc/prepare";
+import UiText from "@/i18n/UiText";
 import type { DocNode } from "@/schemas";
 import DocRender, { DocView } from "./DocRender";
 
@@ -31,7 +32,12 @@ function DocLoader({ id, prerender }: { id: string; prerender?: boolean }) {
   const doc = Object.hasOwn(docs, id)
     ? docs[id as keyof typeof docs]
     : undefined;
-  if (!doc) return <div>Ritual not found.</div>;
+  if (!doc)
+    return (
+      <div>
+        <UiText>{/*i18n*/ "Ritual not found."}</UiText>
+      </div>
+    );
 
   return prerender ? (
     <DocView doc={doc} searchParams={null} />

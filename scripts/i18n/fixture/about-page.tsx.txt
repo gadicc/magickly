@@ -1,0 +1,14 @@
+import { greeting } from "../../../messages";
+export const metadata = {
+  alternates: { canonical: "https://magick.ly/about" },
+};
+export default function Page() {
+  return (
+    <>
+      <h1>{greeting("en")}</h1>
+      <a id="private-link" href="/temples">
+        Private page
+      </a>
+    </>
+  );
+}

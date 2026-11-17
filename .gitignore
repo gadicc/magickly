@@ -60,3 +60,4 @@ tsconfig.tsbuildinfo
 
 # Public JSX prose extracted by search:build before tests/builds.
 /src/search/generated/
+src/locales/*/messages.js

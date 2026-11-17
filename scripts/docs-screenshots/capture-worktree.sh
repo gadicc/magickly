@@ -107,6 +107,7 @@ done
 port=$("$node" -e 'const s=require("node:net").createServer();s.listen(0,"127.0.0.1",()=>{console.log(s.address().port);s.close()})')
 origin="http://127.0.0.1:$port"
 secret=$(head -c 32 /dev/urandom | base64)
+sealing_key=$(head -c 32 /dev/urandom | base64)
 log=$(mktemp -t magickli-docs-capture.XXXXXX.log)
 
 # Replaces the calling (sub)shell with a command that has only the run's
@@ -121,6 +122,8 @@ clean() {
     export HOME PATH="$run_path" TERM="${TERM:-dumb}" \
       NODE_ENV=development NEXT_TELEMETRY_DISABLED=1 GEO_FIXTURE=1 \
       BETTER_AUTH_SECRET="$secret" \
+      LOOM_SECRETS_ENVIRONMENT=development \
+      LOOM_SECRETS_ACTIVE_KEY=1 LOOM_SECRETS_KEY_1="$sealing_key" \
       GOOGLE_CLIENT_ID=docs-capture-google-client \
       GOOGLE_CLIENT_SECRET=docs-capture-google-secret
     for key in "${!setting[@]}"; do export "$key=${setting[$key]}"; done

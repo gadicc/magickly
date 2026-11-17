@@ -1,0 +1,12 @@
+import { notFound } from "next/navigation";
+import { connection } from "next/server";
+export const metadata = { robots: { index: false } };
+export default async function Page({ params }) {
+  const { id, locale } = await params;
+  if (locale !== "he") notFound();
+  await connection();
+  await new Promise((resolve) => setTimeout(resolve, 50));
+  if (id === "unavailable") throw new Error("Synthetic lookup outage");
+  if (id !== "public") notFound();
+  return <h1>טקס לדוגמה</h1>;
+}

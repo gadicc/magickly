@@ -1,0 +1,4 @@
+export const metadata = { robots: { index: false } };
+export default function Page() {
+  return <h1 id="offline-shell">Anonymous offline shell</h1>;
+}

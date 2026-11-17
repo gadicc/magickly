@@ -3,6 +3,9 @@
 import { Alert, Button, Stack, TextField, Typography } from "@mui/material";
 import Link from "next/link";
 import { useActionState } from "react";
+import EnglishText from "@/i18n/EnglishText";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
+import UiText from "@/i18n/UiText";
 import { type ForumSettingsState, saveTempleForumAction } from "./actions";
 
 const initialState: ForumSettingsState = { status: "idle", message: "" };
@@ -30,6 +33,8 @@ export function ForumSettings({
     | null;
   canStoreKeys: boolean;
 }) {
+  const { t: translateUi } = useUiLanguage();
+
   const [state, action, pending] = useActionState(
     saveTempleForumAction,
     initialState,
@@ -39,17 +44,30 @@ export function ForumSettings({
   const kept = saved?.keyReadable ? saved : null;
   return (
     <Stack spacing={1} sx={{ mt: 4, alignItems: "flex-start", maxWidth: 640 }}>
-      <Typography variant="h6">Forum</Typography>
+      <Typography variant="h6">
+        <UiText message={/*i18n*/ "Forum"} />
+      </Typography>
       <Typography>
-        Connect this temple to its own{" "}
-        <a href="https://www.discourse.org/">Discourse</a> forum to give each
-        member the forum group, title and badge for their grade.{" "}
-        <Link href="/help/temples#forum">What the sync does</Link>.
+        <EnglishText>Connect this temple to its own</EnglishText>{" "}
+        <a href="https://www.discourse.org/">
+          <UiText message={/*i18n*/ "Discourse"} />
+        </a>{" "}
+        <EnglishText>
+          forum to give each member the forum group, title and badge for their
+          grade.
+        </EnglishText>{" "}
+        <Link href="/help/temples#forum">
+          <UiText message={/*i18n*/ "What the sync does"} />
+        </Link>
+        .
       </Typography>
       {!canStoreKeys ? (
         <Alert severity="info">
-          Forum connections are switched off on this server: it cannot protect
-          the keys at the moment.
+          <UiText
+            message={
+              /*i18n*/ "Forum connections are switched off on this server: it cannot protect the keys at the moment."
+            }
+          />
         </Alert>
       ) : (
         <form action={action} style={{ width: "100%" }}>
@@ -58,15 +76,17 @@ export function ForumSettings({
           <Stack spacing={2}>
             {saved && !kept ? (
               <Alert severity="warning">
-                The saved API key can no longer be read, so this forum is not
-                being synced. Enter the forum’s address, API username and key
-                again.
+                <UiText
+                  message={
+                    /*i18n*/ "The saved API key can no longer be read, so this forum is not being synced. Enter the forum’s address, API username and key again."
+                  }
+                />
               </Alert>
             ) : null}
             <TextField
               name="origin"
-              label="Forum address"
-              placeholder="https://forum.example.org"
+              label={translateUi(/*i18n*/ "Forum address")}
+              placeholder={translateUi(/*i18n*/ "https://forum.example.org")}
               size="small"
               required
               defaultValue={state.values?.origin ?? kept?.origin ?? ""}
@@ -74,17 +94,19 @@ export function ForumSettings({
             />
             <TextField
               name="apiUsername"
-              label="API username"
+              label={translateUi(/*i18n*/ "API username")}
               size="small"
               defaultValue={
                 state.values?.apiUsername ?? kept?.apiUsername ?? "system"
               }
-              helperText="The forum administrator the key acts as; usually system."
+              helperText={translateUi(
+                /*i18n*/ "The forum administrator the key acts as; usually system.",
+              )}
               slotProps={{ htmlInput: { maxLength: 60 } }}
             />
             <TextField
               name="apiKey"
-              label="API key"
+              label={translateUi(/*i18n*/ "API key")}
               type="password"
               size="small"
               autoComplete="new-password"
@@ -97,13 +119,19 @@ export function ForumSettings({
               slotProps={{ htmlInput: { maxLength: 512 } }}
             />
             <Typography variant="body2" color="textSecondary">
-              Syncing sends each member’s name, motto, grade and verified email
-              addresses to this forum, which creates an account for anyone it
-              does not already know. Only connect a forum you run.
+              <UiText
+                message={
+                  /*i18n*/ "Syncing sends each member’s name, motto, grade and verified email addresses to this forum, which creates an account for anyone it does not already know. Only connect a forum you run."
+                }
+              />
             </Typography>
             <Stack direction="row" spacing={1}>
               <Button type="submit" variant="outlined" disabled={pending}>
-                {saved ? "Update forum" : "Connect forum"}
+                <UiText
+                  message={
+                    saved ? /*i18n*/ "Update forum" : /*i18n*/ "Connect forum"
+                  }
+                />
               </Button>
               {saved ? (
                 <Button
@@ -122,7 +150,7 @@ export function ForumSettings({
                       event.preventDefault();
                   }}
                 >
-                  Disconnect
+                  <UiText message={/*i18n*/ "Disconnect"} />
                 </Button>
               ) : null}
             </Stack>

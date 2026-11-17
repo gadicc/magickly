@@ -15,6 +15,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { gdHallPug, parseHallSource, printHallSource } from "@/doc/gdHallPug";
 import { hallEditorJsonLd } from "@/seo/halls";
+import HallPage from "../../../(public)/gd/halls/editor/page";
 import HallPlayground, {
   canonicalSpellings,
   clipped,
@@ -27,7 +28,6 @@ import HallPlayground, {
 import { HALL_DRAFT_KEY, MAX_HALL_DRAFT } from "./hallDraft";
 import { entryOfSource } from "./hallHistory";
 import { readShareHash, shareFragment } from "./hallShare";
-import HallPage from "./page";
 
 const runtime = vi.hoisted(() => ({
   rasterizeSvg: vi.fn(),

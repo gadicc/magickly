@@ -11,7 +11,7 @@ import {
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { RitualRow } from "@/doc/ritualHalls";
-import HallsPage from "./page";
+import HallsPage from "../../(public)/gd/halls/page";
 import TempleHallTabs from "./TempleHallTabs";
 import type { RememberedTab } from "./templeHalls";
 

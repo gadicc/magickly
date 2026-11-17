@@ -60,7 +60,7 @@ const PRIVATE_KEYS = new Set(["admin", "deleted"]);
  * entries are drawer links, which these pages must not become.
  */
 const patternTitles: readonly [RegExp, PathnameValue][] = [
-  [/^\/doc\/[^/]+\/edit\/semantic\/?$/, "Ritual editor"],
+  [/^\/doc\/[^/]+\/edit\/semantic\/?$/, /*i18n*/ "Ritual editor"],
 ];
 
 function titleOf(value: Pathnames | PathnameValue) {
@@ -182,7 +182,7 @@ const FOOTER_SECTIONS = [
 const FOOTER_EXTRAS: Partial<
   Record<(typeof FOOTER_SECTIONS)[number], NavLink[]>
 > = {
-  "open-source": [{ title: "Source code", url: SITE_REPOSITORY }],
+  "open-source": [{ title: /*i18n*/ "Source code", url: SITE_REPOSITORY }],
 };
 
 /** Every public section and its pages, from `pathnames.ts`. */

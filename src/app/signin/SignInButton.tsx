@@ -3,6 +3,8 @@
 import { Alert, Button, Divider, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { authClient } from "@/auth/client";
+import EnglishText from "@/i18n/EnglishText";
+import UiText from "@/i18n/UiText";
 import { useLegacyRecoveryGate } from "../clientProviders";
 
 export default function SignInButton({
@@ -38,7 +40,11 @@ export default function SignInButton({
     <Stack spacing={2}>
       {failed && (
         <Alert severity="error">
-          We could not start sign-in. Check your connection and try again.
+          <UiText
+            message={
+              /*i18n*/ "We could not start sign-in. Check your connection and try again."
+            }
+          />
         </Alert>
       )}
       <Button
@@ -46,13 +52,24 @@ export default function SignInButton({
         onClick={signIn}
         disabled={pending || recovery.state !== "ready"}
       >
-        {pending ? "Opening Google…" : "Continue with Google"}
+        <UiText
+          message={
+            pending
+              ? /*i18n*/ "Opening Google…"
+              : /*i18n*/ "Continue with Google"
+          }
+        />
       </Button>
       {localTestLoginEnabled && (
         <>
-          <Divider>Local development</Divider>
+          <Divider>
+            <UiText message={/*i18n*/ "Local development"} />
+          </Divider>
           <Typography variant="body2">
-            Uses the fixed identities prepared by pnpm {localTestSeedCommand}.
+            <EnglishText>
+              Uses the fixed identities prepared by pnpm
+            </EnglishText>{" "}
+            {localTestSeedCommand}.
           </Typography>
           <form action="/api/dev/test-login" method="post">
             <input name="callbackURL" type="hidden" value={callbackURL} />
@@ -63,7 +80,7 @@ export default function SignInButton({
                 type="submit"
                 value="creator"
               >
-                Creator
+                <UiText message={/*i18n*/ "Creator"} />
               </Button>
               <Button
                 disabled={recovery.state !== "ready"}
@@ -71,7 +88,7 @@ export default function SignInButton({
                 type="submit"
                 value="reader"
               >
-                Reader
+                <UiText message={/*i18n*/ "Reader"} />
               </Button>
               {showLocalTestAdmin && (
                 <Button
@@ -80,7 +97,7 @@ export default function SignInButton({
                   type="submit"
                   value="admin"
                 >
-                  Test admin
+                  <UiText message={/*i18n*/ "Test admin"} />
                 </Button>
               )}
             </Stack>

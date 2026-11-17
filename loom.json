@@ -26,7 +26,7 @@
       "config": {
         "entrypoints": {
           "routeHandler": "src/app/api/auth/[...nextauth]/route.ts",
-          "signInPage": "src/app/signin/page.tsx"
+          "signInPage": "src/app/(private)/signin/page.tsx"
         },
         "modules": {
           "authClientModule": "src/auth/client.ts",
@@ -177,6 +177,24 @@
             }
           ]
         }
+      }
+    },
+    "lingui": {
+      "status": "active",
+      "activatedOn": "2026-11-17",
+      "config": {
+        "catalogMode": "precompile",
+        "configFile": "lingui.config.ts",
+        "generatedCatalogs": ["src/locales/*/messages.js"],
+        "tasks": {
+          "build": "build",
+          "compile": "i18n:compile",
+          "extract": "i18n:extract"
+        }
+      },
+      "managedTasks": {
+        "i18n:compile": "c1:1931ccc12a50db7301d21c4c97bad8d2201fbf5d297ea86616b9a1ff824c2b9c",
+        "i18n:extract": "c1:f8f6ea40ad9b389f5fb66c9f57ba5bb460735be01a116f94766e9dc60d9ece53"
       }
     }
   }

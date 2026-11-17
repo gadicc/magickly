@@ -13,6 +13,8 @@ import {
   parseRitualRouteIdentity,
   ritualRouteIdFromPath,
 } from "@/doc/ritualRouteIdentity";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
+import UiText from "@/i18n/UiText";
 import { getBrowserOfflineRuntime } from "@/offline/browserRuntime";
 import type { OfflineOperation } from "@/offline/lifecycle";
 import { refreshOfflineRitual } from "@/offline/ritualDownload";
@@ -69,6 +71,8 @@ export default function PrivateRitualReader({
   resolvedRitualId?: string | null;
   routeAlias?: string | null;
 }) {
+  const { t: translateUi } = useUiLanguage();
+
   const routerPathname = usePathname();
   const routeId = currentRouteId(routerPathname);
   const validRoute = parseRitualRouteIdentity(routeId) !== null;
@@ -272,21 +276,25 @@ export default function PrivateRitualReader({
   return (
     <Box sx={{ p: 2 }}>
       {visibleState.kind === "loading" ? (
-        <CircularProgress aria-label="Loading ritual" />
+        <CircularProgress aria-label={translateUi(/*i18n*/ "Loading ritual")} />
       ) : (
         <Alert severity="info">
-          {validRoute
-            ? "This ritual is unavailable on this device. Connect and retry to check access."
-            : "Open the original ritual link to use the offline reader."}
+          <UiText
+            message={
+              validRoute
+                ? /*i18n*/ "This ritual is unavailable on this device. Connect and retry to check access."
+                : /*i18n*/ "Open the original ritual link to use the offline reader."
+            }
+          />
         </Alert>
       )}
       {ritualId && (
         <Button sx={{ mt: 2 }} onClick={() => refreshRef.current()}>
-          Retry
+          <UiText message={/*i18n*/ "Retry"} />
         </Button>
       )}
       <Button sx={{ mt: 2, ml: ritualId ? 1 : 0 }} href="/offline/ritual">
-        Downloaded rituals
+        <UiText message={/*i18n*/ "Downloaded rituals"} />
       </Button>
     </Box>
   );

@@ -84,3 +84,30 @@ export class LockedRecoveryQueue {
     );
   }
 }
+
+/** Warn only while opaque recovery is not durable, including after an editor unmounts. */
+export function watchRecoveryDeparture(
+  queue: LockedRecoveryQueue,
+  target: EventTarget,
+): () => void {
+  let listening = false;
+  const unload = (event: Event) => {
+    if (!queue.state.pending) return;
+    event.preventDefault();
+    (event as BeforeUnloadEvent).returnValue = "";
+    void queue.retry();
+  };
+  const remove = queue.subscribe(({ pending }) => {
+    if (pending > 0 && !listening) {
+      listening = true;
+      target.addEventListener("beforeunload", unload);
+    } else if (pending === 0 && listening) {
+      listening = false;
+      target.removeEventListener("beforeunload", unload);
+    }
+  });
+  return () => {
+    remove();
+    target.removeEventListener("beforeunload", unload);
+  };
+}

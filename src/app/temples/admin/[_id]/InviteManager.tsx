@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { QRCode } from "react-qrcode";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
+import UiText from "@/i18n/UiText";
 import { updateTempleInviteAction } from "../../actions";
 
 export function InviteManager({
@@ -25,6 +27,8 @@ export function InviteManager({
   slug: string;
   joinPass: string | null;
 }) {
+  const { t: translateUi } = useUiLanguage();
+
   const [visible, setVisible] = useState(false);
   const [joinUrl, setJoinUrl] = useState("");
   const joinPath = joinPass
@@ -42,7 +46,7 @@ export function InviteManager({
         <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
           <TextField
             name="joinPass"
-            label="Join code"
+            label={translateUi(/*i18n*/ "Join code")}
             size="small"
             type={visible ? "text" : "password"}
             defaultValue={joinPass ?? ""}
@@ -56,12 +60,16 @@ export function InviteManager({
             {visible ? <VisibilityOff /> : <Visibility />}
           </IconButton>
           <Button type="submit" variant="outlined">
-            Save join code
+            <UiText message={/*i18n*/ "Save join code"} />
           </Button>
         </Stack>
       </form>
       <Typography variant="body2">
-        Clear the code and save to disable new invitations.
+        <UiText
+          message={
+            /*i18n*/ "Clear the code and save to disable new invitations."
+          }
+        />
       </Typography>
       {joinUrl ? (
         <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
@@ -74,7 +82,7 @@ export function InviteManager({
             </Typography>
             <IconButton
               type="button"
-              aria-label="Copy invitation link"
+              aria-label={translateUi(/*i18n*/ "Copy invitation link")}
               onClick={() => navigator.clipboard.writeText(joinUrl)}
             >
               <ContentCopy />
@@ -82,7 +90,11 @@ export function InviteManager({
           </div>
         </Stack>
       ) : (
-        <Typography>Set a join code to create an invitation link.</Typography>
+        <Typography>
+          <UiText
+            message={/*i18n*/ "Set a join code to create an invitation link."}
+          />
+        </Typography>
       )}
     </Stack>
   );

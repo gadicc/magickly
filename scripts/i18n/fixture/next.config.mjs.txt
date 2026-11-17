@@ -1,0 +1,19 @@
+export default {
+  distDir: process.env.I18N_PROOF_OUTPUT ?? ".next",
+  typescript: {
+    tsconfigPath: `tsconfig.${(process.env.I18N_PROOF_OUTPUT ?? ".next-webpack").replace(".next-", "")}.json`,
+  },
+  experimental: {
+    globalNotFound: true,
+    swcPlugins: [["@lingui/swc-plugin", {}]],
+  },
+  turbopack: { root: import.meta.dirname },
+  async rewrites() {
+    return [
+      {
+        source: "/doc/00000000-0000-7000-8000-000000000001",
+        destination: "/offline/ritual",
+      },
+    ];
+  },
+};

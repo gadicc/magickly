@@ -1,0 +1,8 @@
+import { cache } from "react";
+export const resolveReader = cache(async (id: string) => {
+  await new Promise((resolve) => setTimeout(resolve, 50));
+  if (id === "public") return { kind: "public" as const };
+  if (id === "deleted") return { kind: "deleted" as const };
+  if (id === "unavailable") return { kind: "unavailable" as const };
+  return { kind: "private" as const };
+});

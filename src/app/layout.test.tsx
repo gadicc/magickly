@@ -1,7 +1,10 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, expect, it, vi } from "vitest";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/",
+  useRouter: () => ({ refresh: () => {} }),
+}));
 const themes = vi.hoisted(() => [] as Record<string, unknown>[]);
 vi.mock("@mui/material/CssBaseline", () => ({ default: () => null }));
 vi.mock("@mui/material/styles", () => ({
@@ -51,7 +54,7 @@ vi.mock("./SiteChromeLoader", () => ({
   ),
 }));
 
-import RootLayout from "./layout";
+import RootLayout from "./Document";
 
 afterEach(() => {
   vi.unstubAllEnvs();

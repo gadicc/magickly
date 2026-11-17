@@ -2,6 +2,8 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
 import sitemap from "@/app/sitemap";
+import { localizedPath } from "@/i18n/locales";
+import { pageSourceForRoute } from "@/i18n/routePlacement";
 import {
   insightsPath,
   insightsUrl,
@@ -18,16 +20,35 @@ function pages(dir = APP): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) return pages(full);
-    return entry.name === "page.tsx" ? [relative(APP, full)] : [];
+    return entry.name === "page.tsx"
+      ? [
+          relative(APP, full)
+            .split("/")
+            .filter((part) => !/^\(.+\)$/.test(part))
+            .join("/"),
+        ]
+      : [];
   });
 }
 
 describe("insightsUrl", () => {
+  it("aggregates published translations while preserving per-language performance paths", () => {
+    expect(insightsUrl(at("/he/about?q=private#fragment"))).toBe(at("/about"));
+    expect(insightsUrl(at("/he/about?q=private#fragment"), true)).toBe(
+      at("/he/about"),
+    );
+    expect(insightsPath("/he/temples/join/slug/password")).toBe("/temples/*");
+    expect(insightsPath("/zz/doc/private-id")).toBe("/doc/*");
+    expect(insightsPath("/he/doc/private-id")).toBe("/doc/*");
+    expect(insightsPath("/he/gd/rituals")).toBe("/*");
+    expect(insightsUrl(at("/he/chat/research"))).toBeNull();
+    expect(insightsUrl(at("/zz/%63hat/research"))).toBeNull();
+  });
   it("reports every sitemap page by its own path", () => {
     for (const { url } of sitemap()) {
       const { origin, pathname } = new URL(url);
       expect(isPublicPath(pathname), pathname).toBe(true);
-      expect(insightsUrl(url)).toBe(origin + pathname);
+      expect(insightsUrl(url)).toBe(origin + localizedPath(pathname).path);
     }
   });
 
@@ -82,6 +103,7 @@ describe("the sections insightsUrl knows", () => {
       pages()
         .map((page) => page.split("/"))
         .filter((parts) => parts.length > 1)
+        .filter(([section]) => section !== "[locale]")
         .map(([section]) => section),
     );
     for (const section of sections)
@@ -109,9 +131,16 @@ describe("the sections insightsUrl knows", () => {
       "open-source/data/[table]/page.tsx",
     ]);
     for (const page of dynamic)
-      expect(readFileSync(join(APP, page), "utf8"), page).toMatch(
-        /export const dynamicParams = false;/,
-      );
+      expect(
+        readFileSync(
+          join(
+            APP,
+            pageSourceForRoute(`/${page.replace(/\/page\.tsx$/, "")}`) ?? page,
+          ),
+          "utf8",
+        ),
+        page,
+      ).toMatch(/export const dynamicParams = false;/);
   });
 });
 

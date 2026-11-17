@@ -82,7 +82,7 @@ async function publish(b: Browser, title: string) {
   await sleep(1500);
   await b.click("button", "Publish");
   await b.waitFor(
-    `document.body.textContent.includes('ublished for download')`,
+    `document.body.innerText.includes('ublished for download')`,
     60_000,
   );
 }
@@ -148,11 +148,11 @@ const shots: Shot[] = [
     persona: "creator",
     open: async (b) => {
       await b.goto(`${base}/gd/rituals`);
-      await b.waitFor(`document.body.textContent.includes('Create ritual')`);
+      await b.waitFor(`document.body.innerText.includes('Create ritual')`);
       await b.type(`${creationArea} input`, "Opening for new members");
       await b.click(".MuiTextField-root", "Visibility");
       await b.click(`[role="option"]`, "Example");
-      await b.waitFor(`document.body.textContent.includes('Min Grade')`);
+      await b.waitFor(`document.body.innerText.includes('Min Grade')`);
     },
     clip: `[document.querySelector(${text(creationArea)})]`,
     padding: 6,
@@ -170,7 +170,7 @@ const shots: Shot[] = [
       await sleep(400);
       await b.click("li", "Who can read this ritual");
       await b.waitFor(
-        `document.body.textContent.includes('can currently be read by')`,
+        `document.body.innerText.includes('can currently be read by')`,
       );
       await sleep(500);
     },
@@ -190,7 +190,7 @@ const shots: Shot[] = [
       await sleep(400);
       await b.click("li", "Delete ritual");
       // Framed without confirming: the sample stays live.
-      await b.waitFor(`document.body.textContent.includes('lose it now')`);
+      await b.waitFor(`document.body.innerText.includes('lose it now')`);
       await sleep(500);
     },
     clip: `[...document.querySelectorAll('.MuiDialog-paper')].filter((e) => e.textContent.includes('Delete “'))`,
@@ -203,7 +203,7 @@ const shots: Shot[] = [
     open: async (b) => {
       await b.goto(`${base}/gd/rituals/deleted`);
       await b.waitFor(
-        `document.body.textContent.includes('Retired opening (sample)')`,
+        `document.body.innerText.includes('Retired opening (sample)')`,
       );
     },
     // The app bar's title is an h1 with the same text: frame the page's own.
@@ -216,7 +216,7 @@ const shots: Shot[] = [
     open: async (b) => {
       await b.goto(`${base}/gd/rituals/deleted`);
       await b.waitFor(
-        `document.body.textContent.includes('Retired opening (sample)')`,
+        `document.body.innerText.includes('Retired opening (sample)')`,
       );
       await b.click("button", "Delete permanently");
       await b.waitFor(`!!document.querySelector('.MuiDialog-paper input')`);
@@ -234,7 +234,8 @@ const shots: Shot[] = [
     open: async (b) => {
       const path = await templeAdminPath(b);
       await b.goto(base + path);
-      await b.waitFor(`document.body.textContent.includes('Connect forum')`);
+      // Visible button text is CSS-uppercased; existing settings also use Update.
+      await b.waitFor(`!!document.querySelector('input[name="apiKey"]')`);
     },
     clip: `[...byTextAll('h6', 'Forum'), document.querySelector('input[name="apiKey"]').closest('form')]`,
   },
@@ -292,7 +293,7 @@ const shots: Shot[] = [
       const path = await ritualPath(b, "Neophyte 0=0");
       await b.goto(base + path);
       await b.waitFor(
-        `document.body.textContent.includes('Opening of the Hall of the Neophytes')`,
+        `document.body.innerText.includes('Opening of the Hall of the Neophytes')`,
       );
     },
   },

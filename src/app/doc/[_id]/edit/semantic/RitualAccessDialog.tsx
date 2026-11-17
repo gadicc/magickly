@@ -17,6 +17,9 @@ import {
 import * as React from "react";
 import { type RitualScope, sameScope } from "@/doc/access";
 import type { SqlRitualAccessSettings } from "@/doc/sqlScope";
+import EnglishText from "@/i18n/EnglishText";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
+import UiText from "@/i18n/UiText";
 import { changeRitualAccess, loadRitualAccess } from "./accessActions";
 
 function choiceOf(scope: RitualScope) {
@@ -50,6 +53,8 @@ export default function RitualAccessDialog({
   open: boolean;
   onClose: () => void;
 }) {
+  const { t: translateUi } = useUiLanguage();
+
   const [settings, setSettings] =
     React.useState<SqlRitualAccessSettings | null>(null);
   const [loading, setLoading] = React.useState(false);
@@ -180,27 +185,36 @@ export default function RitualAccessDialog({
       aria-labelledby="ritual-access-title"
     >
       <DialogTitle id="ritual-access-title">
-        Who can read this ritual
+        <UiText message={/*i18n*/ "Who can read this ritual"} />
       </DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ pt: 1 }}>
-          {loading && <Typography>Loading…</Typography>}
+          {loading && (
+            <Typography>
+              <UiText message={/*i18n*/ "Loading…"} />
+            </Typography>
+          )}
           {settings && (
             <>
               <Typography>
-                <strong>{settings.title}</strong> can currently be read by:{" "}
+                <strong>{settings.title}</strong>{" "}
+                <EnglishText>can currently be read by:</EnglishText>{" "}
                 {describe(settings)}
               </Typography>
               {!editable && (
                 <Alert severity="info">
-                  Only administrators of a temple or group can change this.
+                  <UiText
+                    message={
+                      /*i18n*/ "Only administrators of a temple or group can change this."
+                    }
+                  />
                 </Alert>
               )}
               {editable && (
                 <>
                   <TextField
                     select
-                    label="Readable by"
+                    label={translateUi(/*i18n*/ "Readable by")}
                     size="small"
                     value={choice}
                     onChange={(event) => {
@@ -222,7 +236,7 @@ export default function RitualAccessDialog({
                   </TextField>
                   {toTemple && (
                     <TextField
-                      label="Minimum grade"
+                      label={translateUi(/*i18n*/ "Minimum grade")}
                       size="small"
                       type="number"
                       value={minGrade}
@@ -240,8 +254,11 @@ export default function RitualAccessDialog({
                   )}
                   {widening && (
                     <Alert severity="warning">
-                      Everyone, including people who are not signed in, will be
-                      able to read this ritual, and search engines may list it.
+                      <EnglishText>
+                        Everyone, including people who are not signed in, will
+                        be able to read this ritual, and search engines may list
+                        it.
+                      </EnglishText>
                       <FormControlLabel
                         control={
                           <Checkbox
@@ -251,16 +268,18 @@ export default function RitualAccessDialog({
                             }
                           />
                         }
-                        label="I understand"
+                        label={translateUi(/*i18n*/ "I understand")}
                       />
                     </Alert>
                   )}
                   {!widening && !unchanged && scope && (
                     <Alert severity="info">
-                      Anyone who no longer qualifies loses access at once.
-                      Copies downloaded to their devices are deleted when those
-                      devices next check in with the server, or within 14 days
-                      at the latest.
+                      <EnglishText>
+                        Anyone who no longer qualifies loses access at once.
+                        Copies downloaded to their devices are deleted when
+                        those devices next check in with the server, or within
+                        14 days at the latest.
+                      </EnglishText>
                       {choice.startsWith("group:") &&
                         " The person who created the ritual keeps access to it whether or not they are in that group."}
                     </Alert>
@@ -273,7 +292,9 @@ export default function RitualAccessDialog({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={onClose}>
+          <UiText message={/*i18n*/ "Close"} />
+        </Button>
         {editable && (
           <Button
             variant="contained"
@@ -286,7 +307,7 @@ export default function RitualAccessDialog({
               (widening && !understood)
             }
           >
-            {saving ? "Saving…" : "Save"}
+            <UiText message={saving ? /*i18n*/ "Saving…" : /*i18n*/ "Save"} />
           </Button>
         )}
       </DialogActions>

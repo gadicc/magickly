@@ -1,0 +1,1432 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-11-17 11:51+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: he\n"
+
+#. js-lingui-explicit-id
+#: src/i18n/publicMetadata.ts
+msgid "Magick.ly: Open Source Magick Reference and Tools"
+msgstr "Magick.ly: מקורות וכלים ללימוד מאגיה בקוד פתוח"
+
+#. js-lingui-explicit-id
+#: src/i18n/publicMetadata.ts
+msgid "Free, open source reference and tools for Western esoteric study: Kabbalah, the Golden Dawn, Enochian magick, astrology, geomancy and flashcards."
+msgstr "מקורות וכלים חופשיים ללימוד המסורת האזוטרית המערבית: קבלה, השחר הזהוב, מאגיה חנוכית, אסטרולוגיה, גאומנטיה וכרטיסיות לימוד."
+
+#. js-lingui-explicit-id
+#: src/i18n/publicMetadata.ts
+msgid "About Magick.ly, an open source reference app for magickal study with MIT-licensed data and components. A reference, not an instruction app."
+msgstr "על Magick.ly: מקורות וכלים ללימוד מאגיה בקוד פתוח, מטרות המיזם, רישיונות השימוש, מקורות התמונות ופרטיות המיקום."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+#: src/app/doc/[_id]/edit/semantic/DeleteRitualDialog.tsx
+#: src/app/temples/ConfirmAction.tsx
+#: src/asyncConfirm.tsx
+msgid "Cancel"
+msgstr "ביטול"
+
+#. js-lingui-explicit-id
+#: src/asyncConfirm.tsx
+msgid "OK"
+msgstr "אישור"
+
+#. js-lingui-explicit-id
+#: src/search/SearchButton.tsx
+msgid "Search the site"
+msgstr "חיפוש באתר"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Close search"
+msgstr "סגירת החיפוש"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search pages and content"
+msgstr "חיפוש בעמודים ובתוכן"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "A name, a phrase, an idea…"
+msgstr "שם, ביטוי, רעיון…"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Finding related pages…"
+msgstr "מחפשים עמודים קשורים…"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search by meaning"
+msgstr "חיפוש לפי משמעות"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/PrivateRitualReader.tsx
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+#: src/i18n/AccountLocaleSync.tsx
+#: src/search/SearchDialog.tsx
+msgid "Retry"
+msgstr "ניסיון נוסף"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search results"
+msgstr "תוצאות חיפוש"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+#: src/i18n/publicMetadata.ts
+msgid "About"
+msgstr "אודות"
+
+#. js-lingui-explicit-id
+#: src/i18n/AccountLocaleSync.tsx
+msgid "This browser could not retain the language sync state. Keep this tab open and retry."
+msgstr "הדפדפן לא הצליח לשמור את מצב סנכרון השפה. השאירו את הלשונית פתוחה ונסו שוב."
+
+#. js-lingui-explicit-id
+#: src/i18n/AccountLocaleSync.tsx
+msgid "This browser’s language was changed, but your account preference has not been saved. Retry when online."
+msgstr "השפה בדפדפן השתנתה, אך העדפת השפה בחשבון טרם נשמרה. נסו שוב כשיש חיבור לרשת."
+
+#. js-lingui-explicit-id
+#: src/i18n/LanguageSwitcher.tsx
+msgid "Language"
+msgstr "שפה"
+
+#. js-lingui-explicit-id
+#: src/i18n/LanguageSwitcher.tsx
+msgid "The language could not be loaded. Try again."
+msgstr "לא הצלחנו לטעון את השפה. נסו שוב."
+
+#. js-lingui-explicit-id
+#: src/i18n/LocaleProvider.tsx
+msgid "The language changed in this tab, but this browser could not save the preference."
+msgstr "השפה השתנתה בלשונית הזאת, אך הדפדפן לא הצליח לשמור את ההעדפה."
+
+#. js-lingui-explicit-id
+#: src/doc/useRitualEditorLayout.ts
+msgid "Source"
+msgstr "מקור"
+
+#. js-lingui-explicit-id
+#: src/doc/useRitualEditorLayout.ts
+msgid "Split"
+msgstr "תצוגה מפוצלת"
+
+#. js-lingui-explicit-id
+#: src/doc/useRitualEditorLayout.ts
+msgid "Visual"
+msgstr "תצוגה חזותית"
+
+#. js-lingui-explicit-id
+#: src/doc/RitualSourceEditor.tsx
+msgid "Ritual semantic source"
+msgstr "מקור הטקס הסמנטי"
+
+#. js-lingui-explicit-id
+#: src/doc/SemanticPublication.tsx
+msgid "Publish current saved version"
+msgstr "פרסום הגרסה השמורה הנוכחית"
+
+#. js-lingui-explicit-id
+#: src/doc/SemanticPublication.tsx
+msgid "Publish saved version for download"
+msgstr "פרסום הגרסה השמורה להורדה"
+
+#. js-lingui-explicit-id
+#: src/doc/SemanticPublication.tsx
+msgid "Publish"
+msgstr "פרסום"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Magick.ly"
+msgstr "Magick.ly"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Admin"
+msgstr "ניהול"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Astrology"
+msgstr "אסטרולוגיה"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Moon Phases"
+msgstr "מופעי הירח"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Planetary Hours"
+msgstr "שעות פלנטריות"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Planets"
+msgstr "כוכבי הלכת"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Zodiac"
+msgstr "מזלות"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Books"
+msgstr "ספרים"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "La Science Cabalistique"
+msgstr "La Science Cabalistique"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Chat (MagickGPT)"
+msgstr "שיחה עם MagickGPT"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Enochian"
+msgstr "מאגיה חנוכית"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Enochian Dictionary"
+msgstr "מילון חנוכי"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Enochian Keys"
+msgstr "המפתחות החנוכיים"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Oration to God"
+msgstr "תפילה לאלוהים"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Enochian Tablets"
+msgstr "הלוחות החנוכיים"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Enochian Translator"
+msgstr "מתרגם חנוכית"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Golden Dawn"
+msgstr "השחר הזהוב"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Grades"
+msgstr "דרגות"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Temple Halls"
+msgstr "אולמות המקדש"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Hall Editor"
+msgstr "עורך האולמות"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Rituals"
+msgstr "טקסים"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/gd/rituals/deleted/page.tsx
+#: src/app/pathnames.ts
+msgid "Recently deleted"
+msgstr "נמחקו לאחרונה"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Sigils"
+msgstr "סיגילים"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Symbols"
+msgstr "סמלים"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Seven-Branched Candlestick"
+msgstr "מנורת שבעת הקנים"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Fylfot Cross"
+msgstr "צלב פילפוט"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Table of Shewbread"
+msgstr "שולחן לחם הפנים"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Geomancy"
+msgstr "גאומנטיה"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Geomancy Reading"
+msgstr "קריאה גאומנטית"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Geomantic Figures"
+msgstr "צורות גאומנטיות"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Kabbalah"
+msgstr "קבלה"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Shem HaMephorash"
+msgstr "שם המפורש"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "72 Angels"
+msgstr "72 מלאכים"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Tree of Life"
+msgstr "עץ החיים"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Open source"
+msgstr "קוד פתוח"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Data"
+msgstr "נתונים"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Components"
+msgstr "רכיבים"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Study"
+msgstr "לימוד"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
+#: src/app/pathnames.ts
+msgid "Temples"
+msgstr "מקדשים"
+
+#. js-lingui-explicit-id
+#: src/app/siteNav.ts
+msgid "Ritual editor"
+msgstr "עורך הטקסים"
+
+#. js-lingui-explicit-id
+#: src/app/siteNav.ts
+msgid "Source code"
+msgstr "קוד המקור"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "sign in"
+msgstr "כניסה לחשבון"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "Home"
+msgstr "בית"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "menu"
+msgstr "תפריט"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "share"
+msgstr "שיתוף"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "account of current user"
+msgstr "החשבון הנוכחי"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "Signing out…"
+msgstr "יוצאים מהחשבון…"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "Logout"
+msgstr "יציאה מהחשבון"
+
+#. js-lingui-explicit-id
+#: src/app/RouteNotFound.tsx
+msgid "Page not found"
+msgstr "העמוד לא נמצא"
+
+#. js-lingui-explicit-id
+#: src/app/RouteNotFound.tsx
+msgid "The page is unavailable or does not exist."
+msgstr "העמוד אינו זמין או שאינו קיים."
+
+#. js-lingui-explicit-id
+#: src/app/RouteNotFound.tsx
+msgid "Return home"
+msgstr "חזרה לעמוד הבית"
+
+#. js-lingui-explicit-id
+#: src/app/SiteFooter.tsx
+msgid "Temples guide"
+msgstr "מדריך למקדשים"
+
+#. js-lingui-explicit-id
+#: src/app/SiteFooter.tsx
+msgid "Ritual Pug guide"
+msgstr "מדריך לכתיבת טקסים ב־Pug"
+
+#. js-lingui-explicit-id
+#: src/app/SiteFooter.tsx
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Forum"
+msgstr "פורום"
+
+#. js-lingui-explicit-id
+#: src/app/SiteFooter.tsx
+msgid "Site"
+msgstr "האתר"
+
+#. js-lingui-explicit-id
+#: src/app/ThemeSwitch.tsx
+msgid "Light"
+msgstr "בהיר"
+
+#. js-lingui-explicit-id
+#: src/app/ThemeSwitch.tsx
+msgid "System"
+msgstr "מערכת"
+
+#. js-lingui-explicit-id
+#: src/app/ThemeSwitch.tsx
+msgid "Dark"
+msgstr "כהה"
+
+#. js-lingui-explicit-id
+#: src/app/ThemeSwitch.tsx
+msgid "Theme"
+msgstr "מראה"
+
+#. js-lingui-explicit-id
+#: src/app/clientProviders.tsx
+msgid "Retry recovery"
+msgstr "ניסיון שחזור נוסף"
+
+#. js-lingui-explicit-id
+#: src/app/clientProviders.tsx
+msgid "Old browser storage could not be verified. Public content and sign-out remain available, but sign-in stays locked until recovery succeeds."
+msgstr "לא הצלחנו לאמת את אחסון הדפדפן הישן. תוכן ציבורי ויציאה מהחשבון עדיין זמינים, אך הכניסה נשארת נעולה עד להשלמת השחזור."
+
+#. js-lingui-explicit-id
+#: src/app/clientProviders.tsx
+msgid "Checking this browser for offline work before allowing sign-in…"
+msgstr "בודקים אם יש עבודה שנשמרה בדפדפן ללא חיבור, לפני שמאפשרים כניסה לחשבון…"
+
+#. js-lingui-explicit-id
+#: src/app/temples/CreateTempleForm.tsx
+msgid "New temple name"
+msgstr "שם המקדש החדש"
+
+#. js-lingui-explicit-id
+#: src/app/temples/CreateTempleForm.tsx
+msgid "Creating…"
+msgstr "יוצרים…"
+
+#. js-lingui-explicit-id
+#: src/app/temples/CreateTempleForm.tsx
+msgid "Create temple"
+msgstr "יצירת מקדש"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/DiscourseSyncButton.tsx
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Discourse"
+msgstr "Discourse"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/DiscourseSyncButton.tsx
+msgid "Match each member to a forum account (creating one if needed), name it after their motto, and give it the forum group, title and badge for their grade. The page will show the result when the sync finishes."
+msgstr "התאמת כל חבר לחשבון בפורום, יצירת חשבון לפי הצורך, שימוש במוטו כשם והקצאת הקבוצה, התואר והתג המתאימים לדרגה. התוצאות יוצגו כאן בסיום הסנכרון."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/DiscourseSyncButton.tsx
+msgid "Synchronizing…"
+msgstr "מסנכרנים…"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/DiscourseSyncButton.tsx
+msgid "Synchronize with Discourse"
+msgstr "סנכרון עם Discourse"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/DiscourseSyncButton.tsx
+msgid "Discourse sync is running."
+msgstr "הסנכרון עם Discourse מתבצע כעת."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/DiscourseSyncButton.tsx
+msgid "Discourse sync results"
+msgstr "תוצאות הסנכרון עם Discourse"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "What the sync does"
+msgstr "מה הסנכרון עושה"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Forum connections are switched off on this server: it cannot protect the keys at the moment."
+msgstr "חיבורי הפורום כבויים בשרת הזה: כרגע הוא אינו יכול להגן על המפתחות."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "The saved API key can no longer be read, so this forum is not being synced. Enter the forum’s address, API username and key again."
+msgstr "אי אפשר עוד לקרוא את מפתח ה־API השמור, ולכן הפורום אינו מסונכרן. הזינו שוב את כתובת הפורום, שם משתמש ה־API והמפתח."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Forum address"
+msgstr "כתובת הפורום"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "https://forum.example.org"
+msgstr "https://forum.example.org"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "API username"
+msgstr "שם משתמש ל־API"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "The forum administrator the key acts as; usually system."
+msgstr "מנהל הפורום שהמפתח פועל בשמו; בדרך כלל system."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "API key"
+msgstr "מפתח API"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Syncing sends each member’s name, motto, grade and verified email addresses to this forum, which creates an account for anyone it does not already know. Only connect a forum you run."
+msgstr "הסנכרון שולח לפורום את השם, המוטו, הדרגה וכתובות הדוא״ל המאומתות של כל חבר. הפורום יוצר חשבון למי שעדיין אינו רשום בו. חברו רק פורום שאתם מנהלים."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Update forum"
+msgstr "עדכון הפורום"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Connect forum"
+msgstr "חיבור פורום"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Disconnect"
+msgstr "ניתוק"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Join code"
+msgstr "קוד הצטרפות"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Save join code"
+msgstr "שמירת קוד ההצטרפות"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Clear the code and save to disable new invitations."
+msgstr "כדי לבטל הזמנות חדשות, מחקו את הקוד ושמרו."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Copy invitation link"
+msgstr "העתקת קישור הזמנה"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Set a join code to create an invitation link."
+msgstr "הגדירו קוד הצטרפות כדי ליצור קישור הזמנה."
+
+#. js-lingui-explicit-id
+#: src/app/signin/SignInButton.tsx
+msgid "We could not start sign-in. Check your connection and try again."
+msgstr "לא הצלחנו להתחיל את הכניסה. בדקו את החיבור ונסו שוב."
+
+#. js-lingui-explicit-id
+#: src/app/signin/SignInButton.tsx
+msgid "Opening Google…"
+msgstr "פותחים את Google…"
+
+#. js-lingui-explicit-id
+#: src/app/signin/SignInButton.tsx
+msgid "Continue with Google"
+msgstr "המשך עם Google"
+
+#. js-lingui-explicit-id
+#: src/app/signin/SignInButton.tsx
+msgid "Local development"
+msgstr "פיתוח מקומי"
+
+#. js-lingui-explicit-id
+#: src/app/signin/SignInButton.tsx
+msgid "Creator"
+msgstr "יוצר"
+
+#. js-lingui-explicit-id
+#: src/app/signin/SignInButton.tsx
+msgid "Reader"
+msgstr "קורא"
+
+#. js-lingui-explicit-id
+#: src/app/signin/SignInButton.tsx
+msgid "Test admin"
+msgstr "מנהל בדיקה"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/PrivateRitualReader.tsx
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "Downloaded rituals"
+msgstr "טקסים שהורדו"
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "Loading downloaded rituals"
+msgstr "טוענים טקסים שהורדו"
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "Downloaded rituals are unavailable on this device."
+msgstr "הטקסים שהורדו אינם זמינים במכשיר הזה."
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "No verified offline account is active. Open a downloaded ritual once while signed in and online."
+msgstr "אין חשבון מאומת פעיל לקריאה ללא חיבור. פתחו טקס שהורד פעם אחת כשאתם מחוברים לחשבון ולרשת."
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "No unexpired ritual downloads were found."
+msgstr "לא נמצאו טקסים שהורדו ותוקפם טרם פג."
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "Halls on this device"
+msgstr "אולמות במכשיר הזה"
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "None of these rituals has a temple hall."
+msgstr "לאף אחד מהטקסים האלה אין אולם מקדש."
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "Every hall in the rituals downloaded here. Tap a hall to open it full screen, or a ritual’s name to read it."
+msgstr "כל האולמות בטקסים שהורדו לכאן. לחצו על אולם לפתיחה במסך מלא, או על שם טקס כדי לקרוא אותו."
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualCatalog.tsx
+msgid "East is at the top of every plan and North on the left."
+msgstr "מזרח נמצא בראש כל תרשים, וצפון משמאל."
+
+#. js-lingui-explicit-id
+#: src/app/offline/ritual/OfflineRitualEntry.tsx
+msgid "Loading offline rituals"
+msgstr "טוענים טקסים לקריאה ללא חיבור"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/DocLoader.tsx
+msgid "Ritual not found."
+msgstr "הטקס לא נמצא."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/DocRender.tsx
+msgid "decrease font size"
+msgstr "הקטנת הכתב"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/DocRender.tsx
+msgid "increase font size"
+msgstr "הגדלת הכתב"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/DocRender.tsx
+msgid "More Variables"
+msgstr "משתנים נוספים"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/HallPanZoom.tsx
+msgid "Pinch or Ctrl+scroll to zoom"
+msgstr "צביטה או Ctrl וגלילה לשינוי התקריב"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/HallPanZoom.tsx
+msgid "Zoom in"
+msgstr "התקרבות"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/HallPanZoom.tsx
+msgid "Zoom out"
+msgstr "התרחקות"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/HallPanZoom.tsx
+msgid "Reset zoom"
+msgstr "איפוס התקריב"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/HallViewer.tsx
+msgid "Halls in this ritual"
+msgstr "אולמות בטקס הזה"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+#: src/app/doc/[_id]/HallViewer.tsx
+msgid "Close"
+msgstr "סגירה"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/HallViewer.tsx
+msgid "Previous hall"
+msgstr "האולם הקודם"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/HallViewer.tsx
+msgid "Go to it in the ritual"
+msgstr "מעבר לאולם בטקס"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/HallViewer.tsx
+msgid "Next hall"
+msgstr "האולם הבא"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/PrivateRitualReader.tsx
+msgid "Loading ritual"
+msgstr "טוענים את הטקס"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/PrivateRitualReader.tsx
+msgid "This ritual is unavailable on this device. Connect and retry to check access."
+msgstr "הטקס אינו זמין במכשיר הזה. התחברו לרשת ונסו שוב כדי לבדוק גישה."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/PrivateRitualReader.tsx
+msgid "Open the original ritual link to use the offline reader."
+msgstr "פתחו את הקישור המקורי לטקס כדי לקרוא אותו ללא חיבור."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Loading ritual source..."
+msgstr "טוענים את מקור הטקס…"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Ritual source is locked or unavailable. Connect and retry with the authorized account."
+msgstr "מקור הטקס נעול או אינו זמין. התחברו לרשת ונסו שוב עם החשבון המורשה."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Ritual editor panes"
+msgstr "חלוניות עורך הטקסים"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Publishing saved version..."
+msgstr "מפרסמים את הגרסה השמורה…"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Retry publication"
+msgstr "ניסיון פרסום נוסף"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Preparing publication attempt..."
+msgstr "מכינים את ניסיון הפרסום…"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Start new publication attempt"
+msgstr "התחלת ניסיון פרסום חדש"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Retry keeps the exact retained save request and operation ID."
+msgstr "ניסיון נוסף משתמש בדיוק בבקשת השמירה ובמזהה הפעולה שנשמרו."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Preparing recovery..."
+msgstr "מכינים את השחזור…"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Download recovery"
+msgstr "הורדת השחזור"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Attach image"
+msgstr "צירוף תמונה"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Attached image source reference"
+msgstr "הפניה לתמונה המצורפת בקוד המקור"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Insert image"
+msgstr "הוספת תמונה"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/SqlDocEdit.tsx
+msgid "Ritual preview pane"
+msgstr "חלונית תצוגה מקדימה של הטקס"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/DeleteRitualDialog.tsx
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+msgid "Loading…"
+msgstr "טוענים…"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/DeleteRitualDialog.tsx
+msgid "Only a site administrator can delete a public ritual."
+msgstr "רק מנהל אתר יכול למחוק טקס ציבורי."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/DeleteRitualDialog.tsx
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Download draft"
+msgstr "הורדת טיוטה"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/DeleteRitualDialog.tsx
+msgid "Your unsaved changes stay on this device as a draft."
+msgstr "השינויים שלא נשמרו נשארים במכשיר הזה כטיוטה."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/DeleteRitualDialog.tsx
+msgid "Delete"
+msgstr "מחיקה"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+msgid "Who can read this ritual"
+msgstr "מי יכול לקרוא את הטקס"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+msgid "Only administrators of a temple or group can change this."
+msgstr "רק מנהלי מקדש או קבוצה יכולים לשנות זאת."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+msgid "Readable by"
+msgstr "מי רשאי לקרוא"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+msgid "Minimum grade"
+msgstr "דרגה מינימלית"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+msgid "I understand"
+msgstr "הבנתי"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Saving…"
+msgstr "שומרים…"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Save"
+msgstr "שמירה"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Who can read this ritual could not be loaded. Check your connection and try again."
+msgstr "לא הצלחנו לטעון את הרשאות הקריאה לטקס. בדקו את החיבור ונסו שוב."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Deleting this ritual could not be loaded. Check your connection and try again."
+msgstr "לא הצלחנו לטעון את אפשרויות מחיקת הטקס. בדקו את החיבור ונסו שוב."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "The pending save is confirmed, but local recovery changed. Download this draft before reloading."
+msgstr "השמירה הממתינה אושרה, אך השחזור המקומי השתנה. הורידו את הטיוטה לפני טעינה מחדש."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "The pending save is confirmed. Reload this page to open the current revision."
+msgstr "השמירה הממתינה אושרה. טענו מחדש את העמוד לפתיחת הגרסה הנוכחית."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Download recovered draft"
+msgstr "הורדת הטיוטה ששוחזרה"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "The local draft could not be loaded. Reload this page before editing."
+msgstr "לא הצלחנו לטעון את הטיוטה המקומית. טענו מחדש את העמוד לפני העריכה."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Verifying account and loading local draft…"
+msgstr "מאמתים את החשבון וטוענים את הטיוטה המקומית…"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Publishing…"
+msgstr "מפרסמים…"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Save not confirmed"
+msgstr "השמירה לא אושרה"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Unsaved changes"
+msgstr "שינויים שלא נשמרו"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Saved"
+msgstr "נשמר"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Untitled ritual"
+msgstr "טקס ללא שם"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Title"
+msgstr "כותרת"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Editor layout"
+msgstr "פריסת העורך"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Retry save"
+msgstr "ניסיון שמירה נוסף"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "More editor actions"
+msgstr "פעולות נוספות בעורך"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "View ritual"
+msgstr "צפייה בטקס"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Who can read this ritual…"
+msgstr "מי יכול לקרוא את הטקס…"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Delete ritual…"
+msgstr "מחיקת הטקס…"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Ritual Pug guide (opens in a new tab)"
+msgstr "מדריך לכתיבת טקסים ב־Pug (נפתח בלשונית חדשה)"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "This is a semantic conversion of the current Pug revision. Saving creates a new revision; the original source remains in history."
+msgstr "זוהי המרה סמנטית של גרסת ה־Pug הנוכחית. השמירה תיצור גרסה חדשה; המקור יישאר בהיסטוריה."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/semantic/page.tsx
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+#: src/app/doc/[_id]/edit/semantic/SemanticEditorShell.tsx
+msgid "Open Pug editor"
+msgstr "פתיחת עורך Pug"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Confirm pending save"
+msgstr "אישור השמירה הממתינה"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Discard local draft"
+msgstr "ויתור על הטיוטה המקומית"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "A save is pending. Retry it unchanged before making another edit."
+msgstr "יש שמירה ממתינה. נסו לשמור אותה שוב ללא שינוי לפני עריכה נוספת."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Semantic source panel"
+msgstr "חלונית מקור סמנטי"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "This older Ritual Text draft is being recovered. Correct or resolve its source changes to convert it to Pug. Pending saves must be confirmed first. Download the draft to keep its original recovery buffer before changing it. Ritual Text uses command lines and quoted text fragments."
+msgstr "משחזרים את טיוטת Ritual Text הישנה. תקנו או הכריעו את שינויי המקור כדי להמיר אותה ל־Pug. תחילה יש לאשר שמירות ממתינות. הורידו את הטיוטה לפני שינוי כדי לשמור את תוכן השחזור המקורי. Ritual Text משתמש בשורות פקודה ובקטעי טקסט במירכאות."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Ritual source"
+msgstr "מקור הטקס"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Pug uses indentation for blocks and #[…] for inline formatting. Valid edits update the visual panel as you type."
+msgstr "Pug משתמש בהזחה לבלוקים וב־#[…] לעיצוב בתוך השורה. שינויים תקינים מעדכנים את החלונית החזותית תוך כדי הקלדה."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Both panels changed. Apply source to replace visual changes, or discard source changes."
+msgstr "שתי החלוניות השתנו. החילו את המקור כדי להחליף את השינויים החזותיים, או ותרו על שינויי המקור."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Apply source"
+msgstr "החלת המקור"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Discard source changes"
+msgstr "ויתור על שינויי המקור"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+msgid "Visual editor panel"
+msgstr "חלונית העורך החזותי"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/SemanticEditorShell.tsx
+msgid "Loading ritual editor…"
+msgstr "טוענים את עורך הטקסים…"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/upload/page.tsx
+msgid "Attach an Image"
+msgstr "צירוף תמונה"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/upload/page.tsx
+msgid "Attach an image to a ritual"
+msgstr "צירוף תמונה לטקס"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/chat/train/page.tsx
+#: src/app/(private)/gd/rituals/deleted/page.tsx
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+#: src/app/(private)/temples/admin/page.tsx
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+#: src/app/(private)/temples/page.tsx
+#: src/app/(private)/upload/page.tsx
+msgid "Sign in"
+msgstr "כניסה לחשבון"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/upload/page.tsx
+msgid "Choose a ritual you currently edit. The image is stored privately and attached to that ritual; uploading it does not create a public file link."
+msgstr "בחרו טקס שאתם עורכים כעת. התמונה תישמר באופן פרטי ותצורף לטקס; העלאתה אינה יוצרת קישור ציבורי לקובץ."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/upload/page.tsx
+msgid "You do not currently have an editable ritual to attach an image to."
+msgstr "כרגע אין לכם טקס שניתן לערוך ולצרף אליו תמונה."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "My Temples"
+msgstr "המקדשים שלי"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "You are not currently a member of any temples."
+msgstr "כרגע אינכם חברים באף מקדש."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "admin"
+msgstr "מנהל"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Leave"
+msgstr "עזיבה"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Your temple membership is active."
+msgstr "החברות שלכם במקדש פעילה."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "You have left the temple."
+msgstr "עזבתם את המקדש."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Join an existing temple"
+msgstr "הצטרפות למקדש קיים"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Enter the slug and private join code supplied by that organization. You will review the temple name before membership is created."
+msgstr "הזינו את המזהה ואת קוד ההצטרפות הפרטי שקיבלתם מהארגון. תוכלו לבדוק את שם המקדש לפני יצירת החברות."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Temple slug"
+msgstr "מזהה המקדש"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Continue"
+msgstr "המשך"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
+#: src/app/(private)/temples/page.tsx
+msgid "Create a new temple"
+msgstr "יצירת מקדש חדש"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Creating a temple starts a new organization that you administer. It does not request membership in an existing organization."
+msgstr "יצירת מקדש פותחת ארגון חדש בניהולכם. היא אינה בקשת הצטרפות לארגון קיים."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Create or manage temples"
+msgstr "יצירה או ניהול של מקדשים"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
+#: src/app/(private)/temples/page.tsx
+msgid "What are temples, and what can I do as an administrator?"
+msgstr "מהם מקדשים, ומה אפשר לעשות כמנהל?"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+msgid "Join Temple"
+msgstr "הצטרפות למקדש"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+msgid "No temple matches that slug and join code."
+msgstr "לא נמצא מקדש התואם למזהה ולקוד ההצטרפות."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+msgid "The temple’s administrators will see your name and can change your grade and motto. If they connect a forum to the temple, syncing it sends your name, motto, grade and verified email addresses to that forum. You can leave at any time from My Temples."
+msgstr "מנהלי המקדש יראו את שמכם ויוכלו לשנות את הדרגה והמוטו שלכם. אם יחברו פורום למקדש, הסנכרון ישלח לפורום את שמכם, המוטו, הדרגה וכתובות הדוא״ל המאומתות שלכם. אפשר לעזוב בכל עת דרך ״המקדשים שלי״."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+msgid "Confirm and join"
+msgstr "אישור והצטרפות"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+msgid "Back to temples"
+msgstr "חזרה למקדשים"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
+msgid "Temple Administration"
+msgstr "ניהול מקדשים"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
+msgid "Temples you administer"
+msgstr "מקדשים בניהולכם"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
+msgid "You do not currently administer any temples."
+msgstr "כרגע אינכם מנהלים אף מקדש."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
+msgid "Your global administrator grant allows you to manage every temple."
+msgstr "הרשאת מנהל האתר מאפשרת לכם לנהל את כל המקדשים."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
+msgid "My Temples page"
+msgstr "עמוד המקדשים שלי"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Manage Temple"
+msgstr "ניהול מקדש"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "This temple was not found, or you cannot manage it."
+msgstr "המקדש לא נמצא, או שאין לכם הרשאה לנהל אותו."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Back to temple administration"
+msgstr "חזרה לניהול המקדשים"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "The member has been removed."
+msgstr "החבר הוסר."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Members"
+msgstr "חברים"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Grade"
+msgstr "דרגה"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Name or motto"
+msgstr "שם או מוטו"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Added"
+msgstr "נוסף בתאריך"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Edit"
+msgstr "עריכה"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Temple administrator"
+msgstr "מנהל מקדש"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Join information"
+msgstr "פרטי הצטרפות"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Temple Membership"
+msgstr "חברות במקדש"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "This membership was not found, or you cannot manage its temple."
+msgstr "החברות לא נמצאה, או שאין לכם הרשאה לנהל את המקדש שלה."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Edit Membership"
+msgstr "עריכת חברות"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Motto"
+msgstr "מוטו"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Golden Dawn grade, from 0 through 6."
+msgstr "דרגת השחר הזהוב, מ־0 עד 6."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Member since"
+msgstr "חבר מאז"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Optional. Clear the field if the date is unknown."
+msgstr "רשות. השאירו ריק אם התאריך אינו ידוע."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Save membership"
+msgstr "שמירת החברות"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Remove from temple"
+msgstr "הסרה מהמקדש"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "They can rejoin at grade 0 if they still have the join code. Change or clear it under Join information if you do not want that."
+msgstr "אפשר להצטרף מחדש בדרגה 0 באמצעות קוד ההצטרפות. אם אינכם מעוניינים בכך, שנו או מחקו אותו תחת פרטי ההצטרפות."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/study/info/[_id]/page.tsx
+msgid "Flashcard Progress"
+msgstr "התקדמות בכרטיסיות"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/study/[_id]/page.tsx
+msgid "Flashcards"
+msgstr "כרטיסיות"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/signin/page.tsx
+msgid "Sign In"
+msgstr "כניסה לחשבון"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/signin/page.tsx
+msgid "Sign in to Magickly"
+msgstr "כניסה ל־Magickly"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/signin/page.tsx
+msgid "Use the same Google account as before to find your temples, rituals and study progress."
+msgstr "השתמשו באותו חשבון Google כמו בעבר כדי למצוא את המקדשים, הטקסים וההתקדמות שלכם בלימוד."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/gd/rituals/deleted/page.tsx
+msgid "Deleted rituals you can restore. Nobody can read them meanwhile, and each is removed for good 30 days after it was deleted."
+msgstr "טקסים שנמחקו ואפשר לשחזר. איש אינו יכול לקרוא אותם בינתיים, וכל אחד מהם יוסר לצמיתות 30 יום לאחר מחיקתו."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/gd/rituals/deleted/page.tsx
+msgid "Back to rituals"
+msgstr "חזרה לטקסים"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/gd/rituals/deleted/page.tsx
+msgid "Every deleted ritual"
+msgstr "כל הטקסים שנמחקו"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/page.tsx
+msgid "Edit Ritual"
+msgstr "עריכת טקס"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/page.tsx
+msgid "Open ritual editor"
+msgstr "פתיחת עורך הטקסים"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/page.tsx
+msgid "Ritual source is unavailable."
+msgstr "מקור הטקס אינו זמין."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/semantic/page.tsx
+msgid "Edit ritual"
+msgstr "עריכת טקס"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/semantic/page.tsx
+msgid "Ritual is unavailable."
+msgstr "הטקס אינו זמין."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/semantic/page.tsx
+msgid "Ritual editing is unavailable."
+msgstr "עריכת הטקס אינה זמינה."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/semantic/page.tsx
+msgid "This semantic revision needs repair before editing."
+msgstr "יש לתקן את הגרסה הסמנטית הזאת לפני העריכה."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/semantic/page.tsx
+msgid "This ritual changed while opening the editor. Reload to use its current revision."
+msgstr "הטקס השתנה בזמן פתיחת העורך. טענו מחדש כדי להשתמש בגרסתו הנוכחית."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/doc/[_id]/edit/semantic/page.tsx
+msgid "This source format is not supported by the new editor."
+msgstr "תבנית המקור הזאת אינה נתמכת בעורך החדש."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/chat/train/page.tsx
+msgid "Chat Training"
+msgstr "אימון הצ׳אט"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/chat/train/page.tsx
+msgid "Chat training"
+msgstr "אימון הצ׳אט"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/admin/page.tsx
+msgid "Administration"
+msgstr "ניהול"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/admin/page.tsx
+msgid "Global administrator access is required."
+msgstr "נדרשת הרשאת מנהל אתר."

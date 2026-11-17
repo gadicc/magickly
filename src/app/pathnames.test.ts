@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { pageSourceForRoute } from "@/i18n/routePlacement";
 import { PUBLIC_PAGES } from "@/seo/pages";
 import pathnames, { type Pathnames } from "./pathnames";
 
@@ -35,7 +36,10 @@ describe("pathnames", () => {
   it("names only paths that have a page", () => {
     expect(
       paths(pathnames).filter(
-        (at) => !existsSync(path.join(appDir, at, "page.tsx")),
+        (at) =>
+          !existsSync(
+            path.join(appDir, pageSourceForRoute(at) ?? "missing-page"),
+          ),
       ),
     ).toEqual([]);
   });

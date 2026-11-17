@@ -1,4 +1,6 @@
 "use client";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
+import UiText from "@/i18n/UiText";
 
 /*
 WHERE?
@@ -181,6 +183,8 @@ function ZoomMenu({
   fontSize,
   setFontSize,
 }) {
+  const { t: translateUi } = useUiLanguage();
+
   return (
     <Popover
       open={Boolean(anchorEl)}
@@ -222,14 +226,14 @@ function ZoomMenu({
     >
       <Stack direction="row" spacing={0} sx={{ alignItems: "center" }}>
         <IconButton
-          aria-label="decrease font size"
+          aria-label={translateUi(/*i18n*/ "decrease font size")}
           onClick={() => setFontSize(fontSize - 5)}
         >
           <RemoveIcon />
         </IconButton>
         <span>{fontSize}%</span>
         <IconButton
-          aria-label="increase font size"
+          aria-label={translateUi(/*i18n*/ "increase font size")}
           onClick={() => setFontSize(fontSize + 5)}
         >
           <AddIcon />
@@ -571,7 +575,9 @@ export function DocView({
         <div>
           <ShowVars vars={alwaysVars} context={context} />
           <details>
-            <summary>More Variables</summary>
+            <summary>
+              <UiText>{/*i18n*/ "More Variables"}</UiText>
+            </summary>
             <br />
             <ShowVars vars={collapsableVars} context={context} />
           </details>
@@ -581,6 +587,11 @@ export function DocView({
 
         <div
           className="docBody"
+          // Legacy revisions have no content-locale field. Never infer it from
+          // interface preference; preserve physical diagram/read order until
+          // the translation resolver supplies an explicit content boundary.
+          lang=""
+          dir="ltr"
           style={
             {
               // fontFamily: "Frank Ruhl Libre, Roboto, Helvetica, Arial, sans-serif",

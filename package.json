@@ -10,18 +10,19 @@
     "data:build": "pnpm --filter magick-data data:build",
     "data:watch": "pnpm --filter magick-data data:watch",
     "data:check": "pnpm --filter magick-data data:check",
-    "dev": "node --import tsx scripts/dev.mts",
-    "dev:webpack": "node --import tsx scripts/dev.mts --webpack",
-    "build": "pnpm data:build && pnpm search:build && pnpm data:check && next build --webpack",
-    "check:turbopack": "pnpm data:build && pnpm search:build && pnpm data:check && SERWIST_SUPPRESS_TURBOPACK_WARNING=1 next build --turbopack",
+    "dev": "pnpm i18n:compile && node --import tsx scripts/dev.mts",
+    "dev:webpack": "pnpm i18n:compile && node --import tsx scripts/dev.mts --webpack",
+    "build": "pnpm i18n:compile && (pnpm data:build && pnpm search:build && pnpm data:check && next build --webpack)",
+    "check:turbopack": "pnpm i18n:compile && pnpm data:build && pnpm search:build && pnpm data:check && SERWIST_SUPPRESS_TURBOPACK_WARNING=1 next build --turbopack",
     "start": "next start",
     "check": "biome check .",
     "lint": "biome lint .",
     "format": "biome format --write .",
-    "typecheck": "pnpm data:build && pnpm search:build && next typegen && tsc --noEmit && pnpm --filter magick-data typecheck && pnpm --filter magick-components typecheck",
-    "test": "pnpm data:build && pnpm search:build && vitest run",
-    "test:watch": "pnpm data:build && pnpm search:build && vitest",
-    "test:coverage": "pnpm data:build && pnpm search:build && vitest run --coverage",
+    "typecheck": "pnpm i18n:compile && pnpm data:build && pnpm search:build && next typegen && tsc --noEmit && pnpm --filter magick-data typecheck && pnpm --filter magick-components typecheck",
+    "test": "pnpm i18n:compile && pnpm data:build && pnpm search:build && vitest run",
+    "test:watch": "pnpm i18n:compile && pnpm data:build && pnpm search:build && vitest",
+    "test:coverage": "pnpm i18n:compile && pnpm data:build && pnpm search:build && vitest run --coverage",
+    "i18n:proof": "node --import tsx scripts/i18n/proof.mts",
     "local-acceptance:seed": "loom env -- node --conditions=react-server --import tsx scripts/local-acceptance/seed.ts",
     "local-development:check": "pnpm exec loom db local check && pnpm local-development:verify-db && pnpm exec loom files local check",
     "local-development:verify-db": "loom env -- node --import tsx scripts/local-development/verify-db.ts",
@@ -65,8 +66,12 @@
     "translate-eval:budget": "pnpm data:build && node --import tsx scripts/enochian-translate-eval/cli.ts budget",
     "translate-eval:call-costs": "node --import tsx scripts/enochian-translate-eval/cli.ts call-costs",
     "translator:figures": "pnpm data:build && node --import tsx scripts/enochian-translator-figures.ts",
-    "test:chat-research": "vitest run src/chat-research src/app/chat/research scripts/chat-research tests/chat-research tests/authDatabase.test.ts",
-    "test:local": "pnpm data:build && pnpm search:build && loom test run --workers auto --cpu-mode exclude -- vitest run"
+    "test:chat-research": "pnpm i18n:compile && vitest run src/chat-research src/app/chat/research scripts/chat-research tests/chat-research tests/authDatabase.test.ts",
+    "test:local": "pnpm i18n:compile && pnpm data:build && pnpm search:build && loom test run --workers auto --cpu-mode exclude -- vitest run",
+    "i18n:extract": "pnpm lingui extract --clean",
+    "i18n:compile": "pnpm lingui compile",
+    "i18n:check": "pnpm lingui compile --strict",
+    "i18n:verify-app": "node --import tsx scripts/i18n/verify-app.mts"
   },
   "dependencies": {
     "@ai-sdk/react": "4.0.156",
@@ -153,7 +158,11 @@
     "valibot": "1.5.0",
     "xml-beautifier": "^0.5.0",
     "xmlchars": "2.2.0",
-    "zod": "^4.6.7"
+    "zod": "^4.6.7",
+    "@lingui/core": "6.12.0",
+    "@lingui/react": "6.12.0",
+    "@mui/stylis-plugin-rtl": "9.5.0",
+    "stylis": "4.4.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
@@ -183,7 +192,10 @@
     "typescript": "^6.0.3",
     "vite": "8.3.5",
     "vitest": "^5.0.5",
-    "webpack": "^5.112.2"
+    "webpack": "^5.112.2",
+    "@lingui/cli": "6.12.0",
+    "@lingui/format-po": "6.12.0",
+    "@lingui/swc-plugin": "6.7.1"
   },
   "browser": {},
   "packageManager": "pnpm@11.28.2"

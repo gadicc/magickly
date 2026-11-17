@@ -2,11 +2,16 @@
 import { Alert, Box, Button } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { heIL } from "@mui/x-date-pickers/locales";
+import UiText from "@/i18n/UiText";
+import "dayjs/locale/he";
 import React from "react";
 import { ConfirmDialog } from "@/asyncConfirm";
 import { sqlBrowserLifecycle } from "@/auth/browserLifecycle";
 import { useSession } from "@/auth/client";
 import { fenceLegacyNetworkForSql } from "@/db";
+import AccountLocaleSync from "@/i18n/AccountLocaleSync";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
 import serwistStuff from "@/serwistStuff";
 
 type RecoveryState = "checking" | "ready" | "failed";
@@ -53,6 +58,7 @@ export default function ClientProviders({
 }: {
   children: React.ReactNode;
 }) {
+  const { locale } = useUiLanguage();
   const [recoveryState, setRecoveryState] =
     React.useState<RecoveryState>("checking");
   const attempt = React.useRef(0);
@@ -89,9 +95,18 @@ export default function ClientProviders({
 
   return (
     <LegacyRecoveryContext.Provider value={context}>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <LocalizationProvider
+        dateAdapter={AdapterDayjs}
+        adapterLocale={locale}
+        localeText={
+          locale === "he"
+            ? heIL.components.MuiLocalizationProvider.defaultProps.localeText
+            : undefined
+        }
+      >
         {children}
         <SqlIdentityBridge ready={recoveryState === "ready"} />
+        <AccountLocaleSync ready={recoveryState === "ready"} />
         {recoveryState !== "ready" && (
           <Box
             // Prerendered pages carry this status; keep it out of search snippets.
@@ -110,14 +125,18 @@ export default function ClientProviders({
               action={
                 recoveryState === "failed" ? (
                   <Button color="inherit" onClick={recover} size="small">
-                    Retry recovery
+                    <UiText message={/*i18n*/ "Retry recovery"} />
                   </Button>
                 ) : undefined
               }
             >
-              {recoveryState === "failed"
-                ? "Old browser storage could not be verified. Public content and sign-out remain available, but sign-in stays locked until recovery succeeds."
-                : "Checking this browser for offline work before allowing sign-in…"}
+              <UiText
+                message={
+                  recoveryState === "failed"
+                    ? /*i18n*/ "Old browser storage could not be verified. Public content and sign-out remain available, but sign-in stays locked until recovery succeeds."
+                    : /*i18n*/ "Checking this browser for offline work before allowing sign-in…"
+                }
+              />
             </Alert>
           </Box>
         )}

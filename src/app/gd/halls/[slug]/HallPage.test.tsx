@@ -12,9 +12,12 @@ vi.mock("next/navigation", async (importActual) => ({
 
 import { GD_HALLS, gdHall, gdHallTitle } from "@/render/contracts/gdHall";
 import { hallFiles, hallJsonLd, hallMetadata } from "@/seo/halls";
+import Hall, {
+  generateMetadata,
+  generateStaticParams,
+} from "../../../(public)/gd/halls/[slug]/page";
 import HallPage from "./HallPage";
 import { BLANK, RAIL_MEDIA } from "./HallRail";
-import Hall, { generateMetadata, generateStaticParams } from "./page";
 
 const html = (slug: string) =>
   renderToString(<HallPage hall={gdHall(slug) as never} />);

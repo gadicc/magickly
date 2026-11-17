@@ -1,9 +1,9 @@
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import Planet from "./astrology/planet/[id]/page";
-import Grade from "./gd/grade/[id]/page";
-import PathPage from "./kabbalah/path/[id]/page";
-import SephirahPage from "./kabbalah/sephirah/[id]/page";
+import Planet from "./(public)/astrology/planet/[id]/page";
+import Grade from "./(public)/gd/grade/[id]/page";
+import PathPage from "./(public)/kabbalah/path/[id]/page";
+import SephirahPage from "./(public)/kabbalah/sephirah/[id]/page";
 
 // The planet page draws its spirit's sigil, which no route here is held to.
 vi.mock("magick-components/astrology/PlanetarySpirit", () => ({

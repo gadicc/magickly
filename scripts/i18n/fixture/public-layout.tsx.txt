@@ -1,0 +1,4 @@
+import Document from "../../Document";
+export default function Layout({ children }) {
+  return <Document>{children}</Document>;
+}

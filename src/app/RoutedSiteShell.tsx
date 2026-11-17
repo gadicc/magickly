@@ -11,6 +11,7 @@ import {
   DEFAULT_COLOR_MODE,
   noStorageColorSchemeScript,
 } from "@/colorScheme";
+import LocaleTheme from "@/i18n/LocaleTheme";
 import theme from "@/theme";
 import PrintInLight from "./PrintInLight";
 import SiteChromeLoader from "./SiteChromeLoader";
@@ -77,18 +78,12 @@ export default function RoutedSiteShell({ children }: { children: ReactNode }) {
         dangerouslySetInnerHTML={{ __html: noStorageColorSchemeScript }}
       />
       <StyledJsxRegistry>
-        <AppRouterCacheProvider key="site" options={{ enableCssLayer: true }}>
-          <ThemeProvider
-            theme={theme}
-            defaultMode={DEFAULT_COLOR_MODE}
-            disableTransitionOnChange
-          >
-            <CssBaseline />
-            <PrintInLight />
-            <ThemeColorMeta />
-            <SiteChromeLoader>{children}</SiteChromeLoader>
-          </ThemeProvider>
-        </AppRouterCacheProvider>
+        <LocaleTheme>
+          <CssBaseline />
+          <PrintInLight />
+          <ThemeColorMeta />
+          <SiteChromeLoader>{children}</SiteChromeLoader>
+        </LocaleTheme>
       </StyledJsxRegistry>
     </>
   );

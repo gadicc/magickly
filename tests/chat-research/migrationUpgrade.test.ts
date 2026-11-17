@@ -129,14 +129,16 @@ async function journalRows(client: Client) {
 it("upgrades exact populated old migrations with the installed migrator, preserves auth readiness and leaves research empty", async () => {
   expect(
     journal.entries
-      .slice(21)
+      .slice(21, 27)
       .filter(
         (entry: { tag: string }) => entry.tag !== "0025_chat_research_corpus",
       )
       .map((entry: { tag: string }) => entry.tag),
   ).toEqual(pending);
   expect(
-    journal.entries.slice(25).map((entry: { tag: string }) => entry.tag),
+    // This rehearsal isolates research's migrations; later app-profile changes
+    // have their own preservation test in i18n/preferenceMigration.test.ts.
+    journal.entries.slice(25, 27).map((entry: { tag: string }) => entry.tag),
   ).toEqual(["0025_chat_research_corpus", "0026_chat_research_window_guard"]);
   expect(readMigrationFiles({ migrationsFolder: before })).toHaveLength(20);
   const { client, db } = await fixture();

@@ -1,0 +1,27 @@
+import { pageSearchParams } from "@/lib/pageSearchParams";
+import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
+import { pageMetadata } from "@/seo/metadata";
+import ReadingText from "../../../geomancy/reading/ReadingText";
+import GeomancyReading from "../../../geomancy/reading/reading";
+import { readingFromSearchParams } from "../../../geomancy/reading/readingState";
+
+export const metadata = pageMetadata("/geomancy/reading");
+
+/**
+ * A shared link's reading is resolved on the server so the HTML carries the
+ * shared figures; the page itself never writes state back to the URL.
+ */
+export default async function GeomancyReadingPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const initial = readingFromSearchParams(pageSearchParams(await searchParams));
+  return (
+    <>
+      <PageBreadcrumbs path="/geomancy/reading" />
+      <GeomancyReading initial={initial} />
+      <ReadingText />
+    </>
+  );
+}

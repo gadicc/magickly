@@ -274,7 +274,16 @@ function TypedField({
   // field), unless the field is disabled.
   const flush = useRef(commit);
   flush.current = disabled ? () => false : commit;
-  useEffect(() => registerPendingEdit(() => flush.current()), []);
+  const dirty = useRef(false);
+  dirty.current = text !== shown;
+  useEffect(
+    () =>
+      registerPendingEdit(
+        () => flush.current(),
+        () => dirty.current,
+      ),
+    [],
+  );
   // A lock (a save, a source sync) disables the field without a blur in
   // Chromium, and takes the focus away: the typed value is kept while
   // locked, then written, as leaving the field would have.

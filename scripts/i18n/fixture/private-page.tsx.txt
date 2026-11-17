@@ -1,0 +1,3 @@
+export default function Page() {
+  return <h1>Private working screen</h1>;
+}

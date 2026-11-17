@@ -39,6 +39,9 @@ import React from "react";
 import ThemeSwitch from "@/app/ThemeSwitch";
 import { sqlBrowserLifecycle } from "@/auth/browserLifecycle";
 import { useSession } from "@/auth/client";
+import LanguageSwitcher from "@/i18n/LanguageSwitcher";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
+import { publicEdition } from "@/i18n/publications";
 import SearchButton from "@/search/SearchButton";
 import useHydrated from "@/ui/useHydrated";
 // import Link from "@/ui/Link";
@@ -62,6 +65,7 @@ function SignInButton({
   callbackURL: string;
   disabled: boolean;
 }) {
+  const { t } = useUiLanguage();
   const router = useRouter();
   // The link doesn't prefetch: Next would request its exact address, query
   // and all, so every new query on the page (a dictionary search, typed
@@ -85,7 +89,7 @@ function SignInButton({
   }, [disabled, router]);
   return (
     <IconButton
-      aria-label="sign in"
+      aria-label={t(/*i18n*/ "sign in")}
       component={Link}
       disabled={disabled}
       href={`/signin?callbackURL=${encodeURIComponent(callbackURL)}`}
@@ -191,6 +195,8 @@ function MenuLinks({
   handleDrawerToggle: () => void;
   drawerOpen: boolean;
 }) {
+  const { t, locale } = useUiLanguage();
+  const href = (path: string) => publicEdition(path, locale) ?? path;
   const [open, setOpen] = React.useState("");
   const prefetch = menuPrefetch(drawerOpen);
 
@@ -239,16 +245,16 @@ function MenuLinks({
               <ListItem key={key} disablePadding>
                 <ListItemButton
                   component={Link}
-                  href={key === "/" ? "/" : "/" + key}
+                  href={href(key === "/" ? "/" : "/" + key)}
                   prefetch={prefetch}
                 >
                   <ListItemText
                     primary={
                       value === "Magick.ly"
-                        ? "Home"
+                        ? t(/*i18n*/ "Home")
                         : typeof value === "string"
-                          ? value
-                          : value["/"]
+                          ? t(value)
+                          : t(value["/"])
                     }
                   />
                 </ListItemButton>
@@ -261,7 +267,7 @@ function MenuLinks({
                     setOpen(key === open ? "" : key);
                   }}
                 >
-                  <ListItemText primary={value["/"]} />
+                  <ListItemText primary={t(value["/"])} />
                   {open === key ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
                 <Collapse in={open === key} timeout="auto" unmountOnExit>
@@ -277,13 +283,15 @@ function MenuLinks({
                           key={key2}
                           sx={{ pl: 4 }}
                           component={Link}
-                          href={"/" + key + (key2 === "/" ? "" : "/" + key2)}
+                          href={href(
+                            "/" + key + (key2 === "/" ? "" : "/" + key2),
+                          )}
                           prefetch={prefetch}
                         >
                           <ListItemText
-                            primary={
-                              typeof value === "string" ? value : value["/"]
-                            }
+                            primary={t(
+                              typeof value === "string" ? value : value["/"],
+                            )}
                           />
                         </ListItemButton>
                       ))}
@@ -399,7 +407,11 @@ function NavMenu({
   sectionPages: NavLink[];
   nested: boolean;
 }) {
-  const trail = [{ title: "Home", url: "/" }, ...ancestors];
+  const { t, locale } = useUiLanguage();
+  const trail = [
+    { title: t(/*i18n*/ "Home"), url: publicEdition("/", locale) ?? "/" },
+    ...ancestors,
+  ];
   const level = trail.length;
   const prefetch = menuPrefetch(Boolean(anchorEl));
   return (
@@ -483,6 +495,7 @@ function NavMenu({
 const LONG_TITLE = 15;
 
 export default function ButtonAppBar() {
+  const { t } = useUiLanguage();
   const {
     pathname,
     title,
@@ -531,6 +544,7 @@ export default function ButtonAppBar() {
 
   async function handleSignOut() {
     if (signOutPending) return;
+    window.dispatchEvent(new Event("magickly:signout"));
     setSignOutPending(true);
     setSignOutError(null);
     const result = await sqlBrowserLifecycle.signOut();
@@ -569,7 +583,7 @@ export default function ButtonAppBar() {
             <IconButton
               edge="start"
               color="inherit"
-              aria-label="menu"
+              aria-label={t(/*i18n*/ "menu")}
               sx={{ mr: 0.5 }}
               onClick={handleDrawerToggle}
             >
@@ -643,13 +657,18 @@ export default function ButtonAppBar() {
               }}
             >
               <SearchButton />
-              <IconButton color="inherit" aria-label="share" onClick={share}>
+              <LanguageSwitcher />
+              <IconButton
+                color="inherit"
+                aria-label={t(/*i18n*/ "share")}
+                onClick={share}
+              >
                 <Share />
               </IconButton>
               {userId ? (
                 <span>
                   <IconButton
-                    aria-label="account of current user"
+                    aria-label={t(/*i18n*/ "account of current user")}
                     aria-controls="menu-appbar"
                     aria-haspopup="true"
                     onClick={handleUserMenu}
@@ -673,7 +692,9 @@ export default function ButtonAppBar() {
                     onClose={handleUserClose}
                   >
                     <MenuItem disabled={signOutPending} onClick={handleSignOut}>
-                      {signOutPending ? "Signing out…" : "Logout"}
+                      {signOutPending
+                        ? t(/*i18n*/ "Signing out…")
+                        : t(/*i18n*/ "Logout")}
                     </MenuItem>
                     {signOutError && (
                       <Typography

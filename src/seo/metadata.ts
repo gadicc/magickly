@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { publicAlternates } from "@/i18n/publications";
 import { socialCardImage } from "./cards";
 import { PUBLIC_PAGES, type PublicPath, type SeoPage } from "./pages";
 import { SITE_OPEN_GRAPH } from "./site";
@@ -12,7 +13,10 @@ export function seoMetadata(path: string, page: SeoPage): Metadata {
   return {
     title: page.absoluteTitle ? { absolute: page.title } : page.title,
     description: page.description,
-    alternates: { canonical: path },
+    alternates: {
+      canonical: path,
+      ...(publicAlternates(path) ? { languages: publicAlternates(path) } : {}),
+    },
     openGraph: {
       ...SITE_OPEN_GRAPH,
       url: path,

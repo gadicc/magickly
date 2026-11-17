@@ -145,7 +145,10 @@ export default async function (phase: string): Promise<NextConfig> {
       "/api/rituals/publication": [...ritualPublicationTraceFiles],
       "/api/rituals/publication/backfill": [...ritualPublicationTraceFiles],
     },
-    experimental: {},
+    experimental: {
+      globalNotFound: true,
+      swcPlugins: [["@lingui/swc-plugin", {}]],
+    },
     // `pnpm dev` runs on Turbopack; production builds still use webpack, so
     // keep these in step with the `webpack()` rules below. Ritual sources
     // need no rule here: Turbopack reads `with { type: "text" }` itself.

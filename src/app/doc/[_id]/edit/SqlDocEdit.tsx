@@ -30,7 +30,10 @@ import {
   type SqlRitualWriteRequest,
   type SqlRitualWriteResult,
 } from "@/doc/sqlWriteContract";
+import { useDraftDeparture } from "@/doc/useDraftDeparture";
 import { parseRitualFileLocator } from "@/files/ritualFileLocator";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
+import UiText from "@/i18n/UiText";
 import { createUuidV7 } from "@/lib/ids";
 import { getBrowserOfflineRuntime } from "@/offline/browserRuntime";
 import type { OfflineOperation } from "@/offline/lifecycle";
@@ -125,6 +128,8 @@ function samePublication(
 }
 
 export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
+  const { t: translateUi } = useUiLanguage();
+
   const [display, setDisplay] = React.useState<Display>({
     kind: "loading",
     ritualId,
@@ -147,6 +152,8 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
   const sourceRef = React.useRef<SourceSnapshot | null>(null);
   const titleRef = React.useRef("Ritual editor");
   const draftRef = React.useRef<OfflineDraft | null>(null);
+  const unpersistedDraft = React.useRef<OfflineDraft | null>(null);
+  const pendingDraftWrites = React.useRef(new Set<Promise<unknown>>());
   const pendingRef = React.useRef<Extract<
     SqlRitualWriteRequest,
     { kind: "save" }
@@ -257,10 +264,49 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
     async (captured: OfflineDraft) => {
       const runtime = runtimeRef.current;
       if (!runtime) throw new Error("Offline ritual storage is unavailable");
-      return preserveWithRuntime(runtime, captured);
+      const attempt = preserveWithRuntime(runtime, captured);
+      pendingDraftWrites.current.add(attempt);
+      try {
+        const result = await attempt;
+        if (unpersistedDraft.current === captured)
+          unpersistedDraft.current = null;
+        return result;
+      } finally {
+        pendingDraftWrites.current.delete(attempt);
+      }
     },
     [preserveWithRuntime],
   );
+
+  useDraftDeparture({
+    pending: () =>
+      Boolean(
+        unpersistedDraft.current ||
+          pendingDraftWrites.current.size ||
+          runtimeRef.current?.recovery.state.pending,
+      ),
+    flush: async () => {
+      clearTimeout(persistTimer.current);
+      await Promise.all([...pendingDraftWrites.current]);
+      const marker = unpersistedDraft.current;
+      const current = draftRef.current;
+      if (marker && current) {
+        await persist(current);
+        if (unpersistedDraft.current === marker)
+          unpersistedDraft.current = null;
+      }
+      const recovery = runtimeRef.current?.recovery;
+      if (recovery?.state.pending) {
+        await recovery.retry();
+        if (recovery.state.pending)
+          throw new Error("Local recovery could not be persisted.");
+      }
+    },
+    failed: () =>
+      setError(
+        "Local draft storage is unavailable. Keep this tab open and download recovery.",
+      ),
+  });
 
   const compile = React.useCallback((value: string) => {
     const currentGeneration = generation.current;
@@ -346,6 +392,7 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
       if (!current) return;
       if (scriptRef.current) scriptRef.current.value = value;
       const next = { ...current, source: value, updatedAtMs: Date.now() };
+      unpersistedDraft.current = next;
       updateDraft(next);
       clearTimeout(persistTimer.current);
       persistTimer.current = setTimeout(() => {
@@ -819,6 +866,7 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
             sourceRef.current = null;
             titleRef.current = "Ritual editor";
             draftRef.current = null;
+            unpersistedDraft.current = null;
             pendingRef.current = null;
             publicationRef.current = null;
             expiredPublicationRef.current = null;
@@ -1337,11 +1385,16 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
     return (
       <div style={{ padding: 16, height: "calc(100vh - 64px)" }}>
         {currentDisplay.kind === "loading" ? (
-          <div>Loading ritual source...</div>
+          <div>
+            <UiText message={/*i18n*/ "Loading ritual source..."} />
+          </div>
         ) : (
           <Alert severity="info">
-            Ritual source is locked or unavailable. Connect and retry with the
-            authorized account.
+            <UiText
+              message={
+                /*i18n*/ "Ritual source is locked or unavailable. Connect and retry with the authorized account."
+              }
+            />
           </Alert>
         )}
         {error && <Alert severity="warning">{error}</Alert>}
@@ -1351,7 +1404,8 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
   return (
     <div
       ref={rootRef}
-      aria-label="Ritual editor panes"
+      dir="ltr"
+      aria-label={translateUi(/*i18n*/ "Ritual editor panes")}
       style={{
         height: "calc(100vh - 64px)",
         maxWidth: "100%",
@@ -1378,7 +1432,13 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
       )}
       {publicationRef.current && (
         <Button onClick={() => void publish()} disabled={saving || publishing}>
-          {publishing ? "Publishing saved version..." : "Retry publication"}
+          <UiText
+            message={
+              publishing
+                ? /*i18n*/ "Publishing saved version..."
+                : /*i18n*/ "Retry publication"
+            }
+          />
         </Button>
       )}
       {renewalAvailable && (
@@ -1386,29 +1446,45 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
           onClick={() => void renewPublication()}
           disabled={saving || publishing}
         >
-          {publishing
-            ? "Preparing publication attempt..."
-            : "Start new publication attempt"}
+          <UiText
+            message={
+              publishing
+                ? /*i18n*/ "Preparing publication attempt..."
+                : /*i18n*/ "Start new publication attempt"
+            }
+          />
         </Button>
       )}
       {pendingRef.current && (
         <Alert severity="info">
-          Retry keeps the exact retained save request and operation ID.
+          <UiText
+            message={
+              /*i18n*/ "Retry keeps the exact retained save request and operation ID."
+            }
+          />
         </Alert>
       )}
       <Button onClick={() => void downloadRecovery()} disabled={exporting}>
-        {exporting ? "Preparing recovery..." : "Download recovery"}
+        <UiText
+          message={
+            exporting
+              ? /*i18n*/ "Preparing recovery..."
+              : /*i18n*/ "Download recovery"
+          }
+        />
       </Button>
-      <Button href="/upload">Attach image</Button>
+      <Button href="/upload">
+        <UiText message={/*i18n*/ "Attach image"} />
+      </Button>
       <TextField
         size="small"
-        label="Attached image source reference"
+        label={translateUi(/*i18n*/ "Attached image source reference")}
         value={assetLocator}
         disabled={saving}
         onChange={(event) => setAssetLocator(event.target.value)}
       />
       <Button onClick={insertAsset} disabled={saving || !assetLocator}>
-        Insert image
+        <UiText message={/*i18n*/ "Insert image"} />
       </Button>
       <Split style={{ width: "100%", minWidth: 0, overflow: "hidden" }}>
         <div
@@ -1440,7 +1516,7 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
         </div>
         <div
           ref={previewRef}
-          aria-label="Ritual preview pane"
+          aria-label={translateUi(/*i18n*/ "Ritual preview pane")}
           style={{
             width: "50%",
             minWidth: 100,

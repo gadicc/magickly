@@ -18,7 +18,8 @@ describe("sitemap", () => {
         entityPages().length +
         lenainPages().length +
         hallPages().length +
-        componentPages().length,
+        componentPages().length +
+        2,
     );
     expect(urls).toContain("https://magick.ly/open-source/components");
     expect(urls).toContain(
@@ -58,7 +59,9 @@ describe("sitemap", () => {
       expect(Object.keys(entry)).toEqual(
         /\/gd\/halls\/(?!editor$)[^/]+$/.test(entry.url)
           ? ["url", "images"]
-          : ["url"],
+          : /(?:https:\/\/magick\.ly(?:\/he)?(?:\/about)?)$/.test(entry.url)
+            ? ["url", "alternates"]
+            : ["url"],
       );
   });
 

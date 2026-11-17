@@ -18,6 +18,8 @@ import {
   type RitualRow,
   ritualHalls,
 } from "@/doc/ritualHalls";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
+import UiText from "@/i18n/UiText";
 import { getBrowserOfflineRuntime } from "@/offline/browserRuntime";
 import type { OfflineAccount } from "@/offline/lease";
 import type { OfflineOperation } from "@/offline/lifecycle";
@@ -65,6 +67,8 @@ const ONLINE_SETTLE_MS = 2_000;
  * without being reopened. Other tabs hear only of denials, once per round.
  */
 export default function OfflineRitualCatalog() {
+  const { t: translateUi } = useUiLanguage();
+
   const [items, setItems] = React.useState<Item[]>([]);
   // The `#halls` jump happens once per visit, not each time the list refills.
   const hallsScrolled = React.useRef(false);
@@ -308,27 +312,40 @@ export default function OfflineRitualCatalog() {
   return (
     <Box sx={{ p: 2 }}>
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        Downloaded rituals
+        <UiText message={/*i18n*/ "Downloaded rituals"} />
       </Typography>
       {status === "loading" && (
-        <CircularProgress aria-label="Loading downloaded rituals" />
+        <CircularProgress
+          aria-label={translateUi(/*i18n*/ "Loading downloaded rituals")}
+        />
       )}
       {status === "unavailable" && (
         <Alert severity="info">
-          Downloaded rituals are unavailable on this device.
+          <UiText
+            message={
+              /*i18n*/ "Downloaded rituals are unavailable on this device."
+            }
+          />
         </Alert>
       )}
       {status === "locked" && items.length === 0 && (
         <Alert severity="info">
-          No verified offline account is active. Open a downloaded ritual once
-          while signed in and online.
+          <UiText
+            message={
+              /*i18n*/ "No verified offline account is active. Open a downloaded ritual once while signed in and online."
+            }
+          />
         </Alert>
       )}
       {status === "ready" && items.length === 0 && (
-        <Alert severity="info">No unexpired ritual downloads were found.</Alert>
+        <Alert severity="info">
+          <UiText
+            message={/*i18n*/ "No unexpired ritual downloads were found."}
+          />
+        </Alert>
       )}
       {items.length > 0 && (
-        <List aria-label="Downloaded rituals">
+        <List aria-label={translateUi(/*i18n*/ "Downloaded rituals")}>
           {items.map((item) => (
             <ListItem key={item.id} disablePadding>
               <ListItemText
@@ -339,7 +356,7 @@ export default function OfflineRitualCatalog() {
         </List>
       )}
       <Button sx={{ mt: 2 }} onClick={() => window.location.reload()}>
-        Retry
+        <UiText message={/*i18n*/ "Retry"} />
       </Button>
       {items.length > 0 && (
         <DeviceHalls items={items} settled={settled} scrolled={hallsScrolled} />
@@ -401,19 +418,24 @@ function DeviceHalls({
       sx={{ mt: 4 }}
     >
       <Typography id="halls-heading" variant="h5" component="h2" sx={{ mb: 1 }}>
-        Halls on this device
+        <UiText message={/*i18n*/ "Halls on this device"} />
       </Typography>
       {withHalls.length === 0 ? (
         settled && (
           <Typography variant="body2">
-            None of these rituals has a temple hall.
+            <UiText
+              message={/*i18n*/ "None of these rituals has a temple hall."}
+            />
           </Typography>
         )
       ) : (
         <>
           <Typography variant="body2" sx={{ maxWidth: "40rem" }}>
-            Every hall in the rituals downloaded here. Tap a hall to open it
-            full screen, or a ritual’s name to read it.
+            <UiText
+              message={
+                /*i18n*/ "Every hall in the rituals downloaded here. Tap a hall to open it full screen, or a ritual’s name to read it."
+              }
+            />
           </Typography>
           <HallGroups
             rituals={withHalls}
@@ -422,7 +444,11 @@ function DeviceHalls({
             fullNavigation
           />
           <Typography variant="body2" color="textSecondary">
-            East is at the top of every plan and North on the left.
+            <UiText
+              message={
+                /*i18n*/ "East is at the top of every plan and North on the left."
+              }
+            />
           </Typography>
         </>
       )}

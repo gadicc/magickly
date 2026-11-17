@@ -1,0 +1,10 @@
+export const metadata = { robots: { index: false } };
+export default function Layout({ children }) {
+  return (
+    <html lang="en" dir="ltr">
+      <body>
+        <main data-research="true">{children}</main>
+      </body>
+    </html>
+  );
+}

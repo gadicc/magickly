@@ -7,7 +7,7 @@ import {
   noStorageColorSchemeScript,
 } from "@/colorScheme";
 import theme from "@/theme";
-import RootLayout from "./layout";
+import RootLayout from "./Document";
 
 /**
  * `<InitColorSchemeScript>` and `ThemeProvider` each default `attribute`
@@ -49,6 +49,7 @@ vi.mock("@mui/material/styles", async (importOriginal) => {
 vi.mock("next/navigation", () => ({
   useServerInsertedHTML: () => {},
   usePathname: () => "/",
+  useRouter: () => ({ refresh: () => {} }),
 }));
 vi.mock("@/db", () => ({}));
 vi.mock("@/analytics/VercelInsights", () => ({ default: () => null }));

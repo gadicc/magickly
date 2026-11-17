@@ -1,4 +1,5 @@
 "use client";
+import { heIL } from "@mui/material/locale";
 import { createTheme } from "@mui/material/styles";
 import { COLOR_SCHEME_ATTRIBUTE } from "@/colorScheme";
 import { robotoFontFamily } from "@/fonts/roboto";
@@ -60,7 +61,7 @@ const darkTokens: AppPaletteTokens = {
  * app bar's, for one) key on that name. Components never read
  * `palette.mode`: the server always renders light (plan 076, decision 3).
  */
-const theme = createTheme({
+const themeOptions: Parameters<typeof createTheme>[0] = {
   cssVariables: { colorSchemeSelector: COLOR_SCHEME_ATTRIBUTE },
   colorSchemes: {
     light: { palette: lightTokens },
@@ -99,6 +100,26 @@ const theme = createTheme({
       },
     },
   },
-});
+};
+
+const theme = createTheme(themeOptions);
+
+/** Running Hebrew uses Noto Sans Hebrew; short headings/labels use Frank Ruhl Libre (plan 079). */
+export const hebrewTheme = createTheme(
+  {
+    ...themeOptions,
+    direction: "rtl",
+    typography: {
+      fontFamily: `"Noto Sans Hebrew", ${robotoFontFamily}`,
+      ...Object.fromEntries(
+        ["h1", "h2", "h3", "h4", "h5", "h6", "button"].map((variant) => [
+          variant,
+          { fontFamily: `"Frank Ruhl Libre", ${robotoFontFamily}` },
+        ]),
+      ),
+    },
+  },
+  heIL,
+);
 
 export default theme;

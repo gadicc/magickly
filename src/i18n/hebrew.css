@@ -1,0 +1,16 @@
+@font-face {
+  font-family: "Noto Sans Hebrew";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/NotoSansHebrew-Regular.ttf") format("truetype");
+  unicode-range: U+0590-05FF, U+FB1D-FB4F;
+}
+
+html[lang="he"] body {
+  font-family: "Noto Sans Hebrew", Arial, sans-serif;
+}
+
+html[lang="he"] :is(h1, h2, h3, h4, h5, h6, button, label) {
+  font-family: "Frank Ruhl Libre", Arial, sans-serif;
+}

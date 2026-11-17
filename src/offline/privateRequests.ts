@@ -1,6 +1,7 @@
 import { NetworkOnly, type RuntimeCaching } from "serwist";
 import { isResearchPath } from "../chat-research/paths";
 import { isPublicRitualId } from "../doc/publicRituals";
+import { privacyPath } from "../i18n/locales";
 import { isUuidV7 } from "../lib/ids";
 
 /** Every response variant of these paths is private, including RSC prefetches. */
@@ -8,11 +9,16 @@ export function isPrivateRuntimeUrl(url: URL, origin: string): boolean {
   if (url.origin !== origin) return false;
   let path: string;
   try {
-    path = decodeURIComponent(url.pathname);
+    path = privacyPath(decodeURIComponent(url.pathname));
   } catch {
     return true;
   }
   if (isResearchPath(path)) return true;
+  if (
+    path !== decodeURIComponent(url.pathname) &&
+    /^\/(?:api|_next)(?:\/|$)/.test(path)
+  )
+    return true;
   if (path === "/_next/image") {
     const source = url.searchParams.get("url");
     if (!source) return false;
@@ -33,6 +39,9 @@ export function isPrivateRuntimeUrl(url: URL, origin: string): boolean {
     return !/^\/api\/(?:file2|render\/[^/]+|treeOfLife)\/?$/.test(path);
   }
   if (path === "/doc" || path.startsWith("/doc/")) {
+    // A prefixed public edition is request-time data. Even the bundled names
+    // cannot opt it into an English shell cache, nor into the UUID fallback.
+    if (path !== decodeURIComponent(url.pathname)) return true;
     const id = path.slice("/doc/".length).replace(/\/$/, "");
     return !isPublicRitualId(id);
   }

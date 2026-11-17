@@ -17,68 +17,68 @@ export interface Pathnames {
  * gets the section's breadcrumb and the page names itself.
  */
 const pathnames: Pathnames = {
-  "/": "Magick.ly",
-  about: "About",
-  admin: "Admin",
+  "/": /*i18n*/ "Magick.ly",
+  about: /*i18n*/ "About",
+  admin: /*i18n*/ "Admin",
   astrology: {
-    "/": "Astrology",
-    moon: "Moon Phases",
-    "planetary-hours": "Planetary Hours",
-    planets: "Planets",
-    zodiac: "Zodiac",
+    "/": /*i18n*/ "Astrology",
+    moon: /*i18n*/ "Moon Phases",
+    "planetary-hours": /*i18n*/ "Planetary Hours",
+    planets: /*i18n*/ "Planets",
+    zodiac: /*i18n*/ "Zodiac",
   },
   books: {
-    "/": "Books",
-    "la-science-cabalistique": "La Science Cabalistique",
+    "/": /*i18n*/ "Books",
+    "la-science-cabalistique": /*i18n*/ "La Science Cabalistique",
   },
-  chat: "Chat (MagickGPT)",
+  chat: /*i18n*/ "Chat (MagickGPT)",
   enochian: {
-    "/": "Enochian",
-    dictionary: "Enochian Dictionary",
-    keys: "Enochian Keys",
-    oration: "Oration to God",
-    tablets: "Enochian Tablets",
-    translate: "Enochian Translator",
+    "/": /*i18n*/ "Enochian",
+    dictionary: /*i18n*/ "Enochian Dictionary",
+    keys: /*i18n*/ "Enochian Keys",
+    oration: /*i18n*/ "Oration to God",
+    tablets: /*i18n*/ "Enochian Tablets",
+    translate: /*i18n*/ "Enochian Translator",
   },
   gd: {
-    "/": "Golden Dawn",
-    grades: "Grades",
+    "/": /*i18n*/ "Golden Dawn",
+    grades: /*i18n*/ "Grades",
     // A section, so each hall's page under it shows the trail.
-    halls: { "/": "Temple Halls", editor: "Hall Editor" },
-    rituals: { "/": "Rituals", deleted: "Recently deleted" },
-    sigils: "Sigils",
+    halls: { "/": /*i18n*/ "Temple Halls", editor: /*i18n*/ "Hall Editor" },
+    rituals: { "/": /*i18n*/ "Rituals", deleted: /*i18n*/ "Recently deleted" },
+    sigils: /*i18n*/ "Sigils",
     symbols: {
-      "/": "Symbols",
-      candlestick: "Seven-Branched Candlestick",
-      "fylfot-cross": "Fylfot Cross",
-      shewbread: "Table of Shewbread",
+      "/": /*i18n*/ "Symbols",
+      candlestick: /*i18n*/ "Seven-Branched Candlestick",
+      "fylfot-cross": /*i18n*/ "Fylfot Cross",
+      shewbread: /*i18n*/ "Table of Shewbread",
     },
   },
   geomancy: {
-    "/": "Geomancy",
-    reading: "Geomancy Reading",
-    reference: "Geomantic Figures",
+    "/": /*i18n*/ "Geomancy",
+    reading: /*i18n*/ "Geomancy Reading",
+    reference: /*i18n*/ "Geomantic Figures",
   },
   kabbalah: {
-    "/": "Kabbalah",
+    "/": /*i18n*/ "Kabbalah",
     yhvh: {
-      "/": "Shem HaMephorash",
-      "72angels": "72 Angels",
+      "/": /*i18n*/ "Shem HaMephorash",
+      "72angels": /*i18n*/ "72 Angels",
     },
-    tree: "Tree of Life",
+    tree: /*i18n*/ "Tree of Life",
   },
   // Data and Components are sections, so that a table's page and a
   // component's page below them name themselves, as an entity page does,
   // under "Open source › Data" and "Open source › Components".
   "open-source": {
-    "/": "Open source",
-    data: { "/": "Data" },
-    components: { "/": "Components" },
+    "/": /*i18n*/ "Open source",
+    data: { "/": /*i18n*/ "Data" },
+    components: { "/": /*i18n*/ "Components" },
   },
-  study: "Study", // TODO, from pages router
+  study: /*i18n*/ "Study", // TODO, from pages router
   temples: {
-    "/": "Temples",
-    admin: "Admin",
+    "/": /*i18n*/ "Temples",
+    admin: /*i18n*/ "Admin",
   },
 };
 

@@ -6,7 +6,7 @@ import {
   hrefsOf,
   textOf,
 } from "../../../../../tests/entityPage";
-import SephirahPage from "./page";
+import SephirahPage from "../../../(public)/kabbalah/sephirah/[id]/page";
 
 /**
  * The sephirah page, laid out from its row rather than dumped (plan 036).

@@ -18,6 +18,13 @@ describe("private service-worker response policy", () => {
     "/chat/research/%ZZ",
 
     "/api/session",
+    "/he/api/ui-locale",
+    "/he/doc/neophyte",
+    "/he/doc/private-id/edit",
+    "/zz/temples/join/example/secret",
+    "/he/he/temples/admin/123",
+    "/%68e/temples/join/example/secret",
+    "/he/chat/research",
     "/api/rituals?rsc=1",
     "/api/files/image.png",
     "/api/gongoPoll",

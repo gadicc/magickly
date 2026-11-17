@@ -6,8 +6,8 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { angelBySlug, angelSlug } from "@/lib/angelSlugs";
 import { expectEntityPage, textOf } from "../../../../../tests/entityPage";
+import AngelRoute from "../../../(public)/kabbalah/angel/[slug]/page";
 import AngelPage from "./Angel";
-import AngelRoute from "./page";
 
 /**
  * The angel page, moved onto the entity pages' shared pieces (plan 036).

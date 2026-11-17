@@ -31,6 +31,7 @@ import {
   WidgetType,
 } from "@uiw/react-codemirror";
 import React from "react";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
 import type { RitualSourceWarning } from "./gdHallDiagnostics";
 import {
   ritualPugHeaderId,
@@ -354,7 +355,7 @@ export default function RitualSourceEditor({
   dialect,
   onChange,
   disabled,
-  label = "Ritual semantic source",
+  label: inputLabel = /*i18n*/ "Ritual semantic source",
   onCompositionChange,
   diagnostic,
   fill = false,
@@ -404,6 +405,8 @@ export default function RitualSourceEditor({
    */
   onCursor?(at: { line: number; column: number }): void;
 }) {
+  const { t } = useUiLanguage();
+  const label = t(inputLabel);
   const [foldIds, setFoldIds] = React.useState(true);
   const host = React.useRef<HTMLDivElement>(null);
   const view = React.useRef<EditorView | null>(null);
@@ -489,6 +492,7 @@ export default function RitualSourceEditor({
           if (found.severity === "error") invalid = true;
         });
         return {
+          dir: "ltr",
           "aria-label": label,
           "aria-multiline": "true",
           "aria-invalid": invalid ? "true" : "false",
@@ -497,6 +501,7 @@ export default function RitualSourceEditor({
       }),
       EditorView.theme({
         "&": {
+          direction: "ltr",
           ...(fill
             ? { height: "100%" }
             : { minHeight: "25rem", maxHeight: "65vh" }),
