@@ -10,6 +10,7 @@ export const ENTITY_ROUTES = [
   // Concrete Hebrew publications are separately enumerated, never a blanket locale clone.
   "/[locale]",
   "/[locale]/about",
+  "/[locale]/books",
   "/kabbalah/angel/[slug]",
   "/books/la-science-cabalistique/[division]",
   "/astrology/planet/[id]",

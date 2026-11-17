@@ -237,7 +237,7 @@ describe("/open-source", () => {
       [...html.matchAll(/\sid="([^"]+)"/g)].map(([, id]) => id),
     );
     for (const file of [
-      "src/app/(public)/about/page.tsx",
+      "src/app/about/AboutPage.tsx",
       "src/app/gd/halls/[slug]/HallPage.tsx",
     ]) {
       const anchors = [

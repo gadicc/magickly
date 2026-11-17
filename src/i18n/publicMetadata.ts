@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { messages as hebrew } from "@/locales/he/messages.js";
 import { socialCardImage } from "@/seo/cards";
 import { seoMetadata } from "@/seo/metadata";
+import { LOCALIZED_SEO_ENABLED } from "./publications";
 
 /** Literal extraction sources; a test keeps these aligned with existing English SEO copy. */
 export const PUBLIC_METADATA_MESSAGES = {
@@ -12,6 +13,11 @@ export const PUBLIC_METADATA_MESSAGES = {
     description:
       /*i18n*/ "Free, open source reference and tools for Western esoteric study: Kabbalah, the Golden Dawn, Enochian magick, astrology, geomancy and flashcards.",
     absoluteTitle: true,
+  },
+  "/books": {
+    title: /*i18n*/ "Books",
+    description:
+      /*i18n*/ "Public-domain works of the Western esoteric tradition, read from their original scans and published in full with an editorial apparatus.",
   },
   "/about": {
     title: /*i18n*/ "About",
@@ -22,7 +28,7 @@ export const PUBLIC_METADATA_MESSAGES = {
 
 /** Reject unsupported editions before rendering metadata or looking up content. */
 export function localizedPageMetadata(
-  path: "/" | "/about",
+  path: keyof typeof PUBLIC_METADATA_MESSAGES,
   locale: string,
 ): Metadata {
   if (locale !== "he") notFound();
@@ -38,6 +44,9 @@ export function localizedPageMetadata(
       ...page,
       image: socialCardImage(path, page.title),
     }),
+    ...(!LOCALIZED_SEO_ENABLED
+      ? { robots: { index: false, follow: true } }
+      : {}),
     openGraph: {
       ...seoMetadata(path, {
         ...page,

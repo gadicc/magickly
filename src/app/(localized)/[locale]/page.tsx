@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import HebrewHome from "@/i18n/pages/HebrewHome";
+import HomePage from "@/app/HomePage";
 import { localizedPageMetadata } from "@/i18n/publicMetadata";
 
 export const dynamicParams = false;
@@ -19,5 +19,5 @@ export default async function Page({
   params: Promise<{ locale: string }>;
 }) {
   if ((await params).locale !== "he") notFound();
-  return <HebrewHome />;
+  return <HomePage locale="he" />;
 }

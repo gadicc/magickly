@@ -8,21 +8,6 @@ msgstr ""
 "Language: he\n"
 
 #. js-lingui-explicit-id
-#: src/i18n/publicMetadata.ts
-msgid "Magick.ly: Open Source Magick Reference and Tools"
-msgstr "Magick.ly: מקורות וכלים ללימוד מאגיה בקוד פתוח"
-
-#. js-lingui-explicit-id
-#: src/i18n/publicMetadata.ts
-msgid "Free, open source reference and tools for Western esoteric study: Kabbalah, the Golden Dawn, Enochian magick, astrology, geomancy and flashcards."
-msgstr "מקורות וכלים חופשיים ללימוד המסורת האזוטרית המערבית: קבלה, השחר הזהוב, מאגיה חנוכית, אסטרולוגיה, גאומנטיה וכרטיסיות לימוד."
-
-#. js-lingui-explicit-id
-#: src/i18n/publicMetadata.ts
-msgid "About Magick.ly, an open source reference app for magickal study with MIT-licensed data and components. A reference, not an instruction app."
-msgstr "על Magick.ly: מקורות וכלים ללימוד מאגיה בקוד פתוח, מטרות המיזם, רישיונות השימוש, מקורות התמונות ופרטיות המיקום."
-
-#. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
 #: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
 #: src/app/doc/[_id]/edit/semantic/DeleteRitualDialog.tsx
@@ -80,10 +65,37 @@ msgid "Search results"
 msgstr "תוצאות חיפוש"
 
 #. js-lingui-explicit-id
+#: src/i18n/publicMetadata.ts
+msgid "Magick.ly: Open Source Magick Reference and Tools"
+msgstr "Magick.ly: מקורות וכלים ללימוד מאגיה בקוד פתוח"
+
+#. js-lingui-explicit-id
+#: src/i18n/publicMetadata.ts
+msgid "Free, open source reference and tools for Western esoteric study: Kabbalah, the Golden Dawn, Enochian magick, astrology, geomancy and flashcards."
+msgstr "מקורות וכלים חופשיים ללימוד המסורת האזוטרית המערבית: קבלה, השחר הזהוב, מאגיה חנוכית, אסטרולוגיה, גאומנטיה וכרטיסיות לימוד."
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+#: src/i18n/publicMetadata.ts
+msgid "Books"
+msgstr "ספרים"
+
+#. js-lingui-explicit-id
+#: src/i18n/publicMetadata.ts
+msgid "Public-domain works of the Western esoteric tradition, read from their original scans and published in full with an editorial apparatus."
+msgstr "יצירות בנחלת הכלל מן המסורת האזוטרית המערבית, שנקראו מתוך סריקות המקור ומפורסמות במלואן עם הערות עריכה."
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 #: src/i18n/publicMetadata.ts
 msgid "About"
 msgstr "אודות"
+
+#. js-lingui-explicit-id
+#: src/i18n/publicMetadata.ts
+msgid "About Magick.ly, an open source reference app for magickal study with MIT-licensed data and components. A reference, not an instruction app."
+msgstr "על Magick.ly: מקורות וכלים ללימוד מאגיה בקוד פתוח, מטרות המיזם, רישיונות השימוש, מקורות התמונות ופרטיות המיקום."
 
 #. js-lingui-explicit-id
 #: src/i18n/AccountLocaleSync.tsx
@@ -99,6 +111,11 @@ msgstr "השפה בדפדפן השתנתה, אך העדפת השפה בחשבו�
 #: src/i18n/LanguageSwitcher.tsx
 msgid "Language"
 msgstr "שפה"
+
+#. js-lingui-explicit-id
+#: src/i18n/LanguageSwitcher.tsx
+msgid "This page isn’t available in Hebrew yet."
+msgstr "העמוד הזה עדיין אינו זמין בעברית."
 
 #. js-lingui-explicit-id
 #: src/i18n/LanguageSwitcher.tsx
@@ -151,11 +168,13 @@ msgid "Magick.ly"
 msgstr "Magick.ly"
 
 #. js-lingui-explicit-id
+#: src/app/HomePage.tsx
 #: src/app/pathnames.ts
 msgid "Admin"
 msgstr "ניהול"
 
 #. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Astrology"
 msgstr "אסטרולוגיה"
@@ -182,20 +201,17 @@ msgstr "מזלות"
 
 #. js-lingui-explicit-id
 #: src/app/pathnames.ts
-msgid "Books"
-msgstr "ספרים"
-
-#. js-lingui-explicit-id
-#: src/app/pathnames.ts
 msgid "La Science Cabalistique"
 msgstr "La Science Cabalistique"
 
 #. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Chat (MagickGPT)"
 msgstr "שיחה עם MagickGPT"
 
 #. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Enochian"
 msgstr "מאגיה חנוכית"
@@ -226,6 +242,7 @@ msgid "Enochian Translator"
 msgstr "מתרגם חנוכית"
 
 #. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Golden Dawn"
 msgstr "השחר הזהוב"
@@ -282,6 +299,7 @@ msgid "Table of Shewbread"
 msgstr "שולחן לחם הפנים"
 
 #. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Geomancy"
 msgstr "גאומנטיה"
@@ -297,6 +315,7 @@ msgid "Geomantic Figures"
 msgstr "צורות גאומנטיות"
 
 #. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Kabbalah"
 msgstr "קבלה"
@@ -317,6 +336,7 @@ msgid "Tree of Life"
 msgstr "עץ החיים"
 
 #. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Open source"
 msgstr "קוד פתוח"
@@ -332,12 +352,14 @@ msgid "Components"
 msgstr "רכיבים"
 
 #. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Study"
 msgstr "לימוד"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/page.tsx
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Temples"
 msgstr "מקדשים"
@@ -351,6 +373,141 @@ msgstr "עורך הטקסים"
 #: src/app/siteNav.ts
 msgid "Source code"
 msgstr "קוד המקור"
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "A reference for the Western esoteric tradition"
+msgstr "מקורות ללימוד המסורת האזוטרית המערבית"
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "Magick.ly is a free, open-source reference and set of tools for students of Hermetic magick, as the Golden Dawn taught it and as it grew from older sources. It is a reference, not a course: nothing here replaces a teacher or a good book."
+msgstr "Magick.ly הוא מאגר מקורות וכלים חופשי בקוד פתוח ללומדי מאגיה הרמטית, כפי שנלמדה במסדר השחר הזהוב והתפתחה ממקורות קדומים יותר. זהו מאגר עזר, ולא קורס: דבר כאן אינו תחליף למורה או לספר טוב."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "What's here"
+msgstr "מה יש כאן"
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>Kabbalah</1></0>: an <2>interactive Tree of Life</2>, where each Sephirah and path has its own page, and the <3>72 angels of the Shem HaMephorash</3>."
+msgstr "<0><1>קבלה</1></0>: <2>עץ חיים אינטראקטיבי</2>, עם עמוד לכל ספירה ונתיב, ו־<3>72 מלאכי השם המפורש</3>."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>Golden Dawn</1></0>: the <2>grades</2> from Neophyte 0=0 to Ipsissimus 10=1, floor plans of the <3>temple halls</3>, the grade <4>rituals</4>, a <5>Rose Cross sigil generator</5> and the <6>temple symbols</6>."
+msgstr "<0><1>השחר הזהוב</1></0>: <2>דרגות</2> מנאופיט 0=0 ועד איפסיסימוס 10=1, תרשימי <3>אולמות המקדש</3>, <4>טקסי</4> הדרגות, <5>מחולל סיגילים של צלב הוורד</5> ו־<6>סמלי המקדש</6>."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>Enochian</1></0>: John Dee and Edward Kelley's <2>Keys</2>, a searchable <3>dictionary</3>, the four elemental <4>tablets</4> and Dee's <5>Oration to God</5>."
+msgstr "<0><1>מאגיה חנוכית</1></0>: <2>המפתחות</2> של ג׳ון די ואדוארד קלי, <3>מילון</3> לחיפוש, ארבעת <4>לוחות</4> היסודות ו־<5>תפילתו של די לאלוהים</5>."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>Astrology</1></0>: <2>planetary hours</2> for where you are, <3>moon phases</3>, the <4>planets</4> and the <5>zodiac</5>."
+msgstr "<0><1>אסטרולוגיה</1></0>: <2>שעות פלנטריות</2> לפי מיקומכם, <3>מופעי הירח</3>, <4>כוכבי הלכת</4> ו־<5>המזלות</5>."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>Geomancy</1></0>: cast a <2>reading</2> and look up the <3>sixteen figures</3>."
+msgstr "<0><1>גאומנטיה</1></0>: ערכו <2>קריאה</2> ועיינו ב־<3>שש עשרה הדמויות</3>."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>Books</1></0>: public-domain works published in full, starting with Lazare Lenain's <2>La Science Cabalistique</2> of 1823."
+msgstr "<0><1>ספרים</1></0>: יצירות בנחלת הכלל המפורסמות במלואן, החל ב־<2>La Science Cabalistique</2> מאת לזאר לנן משנת 1823."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>Study</1></0>: spaced-repetition flashcards for Hebrew letters, planetary and zodiac signs, alchemy, Enochian and more."
+msgstr "<0><1>לימוד</1></0>: כרטיסיות בחזרות מרווחות ללימוד אותיות עבריות, סמלי כוכבי הלכת והמזלות, אלכימיה, חנוכית ועוד."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>MagickGPT</1></0>: ask an AI that answers from a library of magickal texts and cites its sources."
+msgstr "<0><1>MagickGPT</1></0>: שאלו בינה מלאכותית המשיבה מתוך ספרייה של טקסטים מאגיים ומציינת את מקורותיה."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>Open source</1></0>: the <2>data</2> behind the site, every table with its rows and fields, on npm as magick-data, and the <3>components</3> that draw the Tree of Life, the tablets and the sigils, each shown live with props to try, on npm as magick-components."
+msgstr "<0><1>קוד פתוח</1></0>: <2>הנתונים</2> שמאחורי האתר, כל טבלה על שורותיה ושדותיה, הזמינים ב־npm בשם magick-data, ו־<3>הרכיבים</3> המציירים את עץ החיים, הלוחות והסיגילים. כל רכיב מוצג בפעולה עם מאפיינים שאפשר לנסות, וזמין ב־npm בשם magick-components."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "For temples"
+msgstr "למקדשים"
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "A temple can keep its own rituals here, each readable by members of the right grade on any device. See <0>temples and private rituals</0>."
+msgstr "מקדש יכול לשמור כאן את הטקסים שלו, כך שכל טקס יהיה זמין לחברים בדרגה המתאימה מכל מכשיר. ראו <0>מקדשים וטקסים פרטיים</0>."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "Open source, open data"
+msgstr "קוד פתוח, נתונים פתוחים"
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "The app's code is on GitHub. Its data is free to reuse under CC BY 4.0, with credit, and the components that draw the Tree of Life, sigils, tablets and temple halls under MIT. See <0>Open source</0>."
+msgstr "קוד האפליקציה נמצא ב־GitHub. הנתונים חופשיים לשימוש חוזר ברישיון CC BY 4.0, עם מתן קרדיט, והרכיבים המציירים את עץ החיים, הסיגילים, הלוחות ואולמות המקדש זמינים ברישיון MIT. ראו <0>קוד פתוח</0>."
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "About Icon"
+msgstr "סמל עמוד האודות"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "Astrology Wheel"
+msgstr "גלגל אסטרולוגי"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "Android Magician"
+msgstr "קוסם אנדרואיד"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "Enochian Aethyrs"
+msgstr "האתירים החנוכיים"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "A shaman pokes holes in the sand"
+msgstr "שאמאן מסמן נקודות בחול"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "Kabbalistic Tree of Life"
+msgstr "עץ החיים הקבלי"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "Magick Journal"
+msgstr "יומן מאגי"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "Glowing Magical Journal"
+msgstr "יומן מאגי זוהר"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "The Tree of Life, an Enochian tablet and a Rose Cross sigil"
+msgstr "עץ החיים, לוח חנוכי וסיגיל צלב הוורד"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "Student Studying Magick"
+msgstr "תלמיד לומד מאגיה"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "A Magical Temple"
+msgstr "מקדש מאגי"
 
 #. js-lingui-explicit-id
 #: src/app/MyAppBar.tsx
@@ -1063,6 +1220,151 @@ msgstr "חלונית העורך החזותי"
 #: src/app/doc/[_id]/edit/semantic/SemanticEditorShell.tsx
 msgid "Loading ritual editor…"
 msgstr "טוענים את עורך הטקסים…"
+
+#. js-lingui-explicit-id
+#: src/app/books/BooksPage.tsx
+msgid "Public-domain works of the Western esoteric tradition, read from their original scans and published in full, with an editorial apparatus recording every place the reading departs from the page."
+msgstr "יצירות בנחלת הכלל מן המסורת האזוטרית המערבית, שנקראו מתוך סריקות המקור ומפורסמות במלואן, עם הערות עריכה המתעדות כל מקום שבו הנוסח חורג מן העמוד המודפס."
+
+#. js-lingui-explicit-id
+#: src/app/books/BooksPage.tsx
+msgid "<0>La Science Cabalistique</0> — Lazare Lenain, Amiens, 1823. The 72 angels of the Kabbalah, their attributes, seals and hours."
+msgstr "<0>La Science Cabalistique</0> — לזאר לנן, אמיין, 1823. שבעים ושניים מלאכי הקבלה, תכונותיהם, חותמיהם ושעותיהם."
+
+#. js-lingui-explicit-id
+#: src/app/books/BooksText.tsx
+msgid "About these editions"
+msgstr "על המהדורות האלה"
+
+#. js-lingui-explicit-id
+#: src/app/books/BooksText.tsx
+msgid "Each book is read page by page from a scan of the printed book, not from machine OCR. Where the original is wrong, a misprinted date, a misnumbered entry or a miscounted total, the text keeps the author's words and a note says what is wrong and what it should be. Every page marker links to the facsimile of its leaf. You can always check the reading against the page it was made from."
+msgstr "כל ספר נקרא עמוד אחר עמוד מתוך סריקה של הספר המודפס, ולא מתוך זיהוי תווים אוטומטי. כאשר יש במקור טעות בתאריך, במספור של ערך או בחישוב של סכום, הנוסח שומר על דברי המחבר והערה מסבירה מה שגוי ומה צריך להיות במקומו. כל סימון עמוד מקשר לתצלום הדף המקורי. תמיד אפשר לבדוק את הנוסח מול העמוד שממנו נקרא."
+
+#. js-lingui-explicit-id
+#: src/app/books/BooksText.tsx
+msgid "<0>La Science Cabalistique</0>, Lazare Lenain's book of 1823, was the first work in French on the 72 angels of the Kabbalah. It was printed in 500 copies and sold by the author from his reading room. It sets out the 72 genii of the Shem HaMephorash and the arithmetic of Lenain's four cabalistic tables. Each genius takes five degrees of the zodiac, five days of the year and twenty minutes of each day."
+msgstr "<0>La Science Cabalistique</0>, ספרו של לזאר לנן משנת 1823, היה החיבור הראשון בצרפתית על שבעים ושניים מלאכי הקבלה. הוא הודפס בחמש מאות עותקים ונמכר בידי המחבר בחדר הקריאה שלו. הספר מתאר את שבעים ושניים הגניוסים של השם המפורש ואת החישובים בארבע הטבלאות הקבליות של לנן. לכל גניוס מיוחסים חמש מעלות בגלגל המזלות, חמישה ימים בשנה ועשרים דקות בכל יום."
+
+#. js-lingui-explicit-id
+#: src/app/books/BooksText.tsx
+msgid "The edition is in French, chapter by chapter, from a later reissue with a preface by Papus. For the angels in English, see <0>the 72 angels</0>. Their names, dates and correspondences are translated from Lenain's French alone, and each angel has its own page, from <1>Vehuiah</1> to <2>Mumiah</2>. The <3>Shem HaMephorash</3> page explains the name they come from."
+msgstr "המהדורה מובאת בצרפתית, פרק אחר פרק, מתוך הדפסה מאוחרת הכוללת הקדמה מאת פאפוס. למידע על המלאכים באנגלית, ראו <0>72 המלאכים</0>. שמותיהם, תאריכיהם והקבלותיהם תורגמו אך ורק מצרפתית של לנן, ולכל מלאך עמוד משלו, מ־<1>והויה</1> ועד <2>מומיה</2>. עמוד <3>השם המפורש</3> מסביר את השם שממנו נגזרו."
+
+#. js-lingui-explicit-id
+#: src/app/books/BooksText.tsx
+msgid "Lenain died in 1877 and Papus in 1916, so both texts are in the public domain. This reading of them is CC BY 4.0."
+msgstr "לנן נפטר בשנת 1877 ופאפוס בשנת 1916, ולכן שני הטקסטים נמצאים בנחלת הכלל. נוסח הקריאה המובא כאן זמין ברישיון CC BY 4.0."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "<0>Magick.ly - the open source Magick app</0>"
+msgstr "<0>Magick.ly — אפליקציית מאגיה בקוד פתוח</0>"
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "This is primarily a reference app for all things magickal, to help me in my studies. Maybe it will help you too."
+msgstr "זוהי בעיקר אפליקציית עזר לעיון בנושאי מאגיה, שנועדה לסייע לי בלימודיי. אולי היא תעזור גם לכם."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "This is NOT an instruction app. By using this app you acknowledge that you will not attempt any ritual here without prior instruction either by a qualified teacher or self-study with an appropriate book. Attempting advanced magick without prior instruciton and training is dangerous and irreponsible."
+msgstr "זו אינה אפליקציה להדרכה מעשית. בשימוש באפליקציה אתם מאשרים שלא תנסו לבצע אף טקס המופיע כאן ללא הדרכה מוקדמת ממורה מוסמך או לימוד עצמי מספר מתאים. ניסיון לעסוק במאגיה מתקדמת ללא הדרכה ואימון מוקדמים הוא מסוכן וחסר אחריות."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "TODO - bibliography / starting points"
+msgstr "להשלמה — ביבליוגרפיה ונקודות פתיחה"
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "For questions, comments, feature requests, source code or to get involved, see <0>github.com/gadicc/magickly</0>."
+msgstr "לשאלות, הערות, בקשות לתכונות חדשות, קוד מקור או הצטרפות למיזם, ראו <0>github.com/gadicc/magickly</0>."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Design goals:"
+msgstr "מטרות העיצוב:"
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Open source: copyleft for the app, permissive for the data and components, so those can travel."
+msgstr "קוד פתוח: רישיון המחייב שיתוף שינויים באפליקציה, ורישיונות מתירניים לנתונים ולרכיבים, כדי שיוכלו לשמש גם במיזמים אחרים."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Publish useful magick <0>data</0> in JSON format with types."
+msgstr "פרסום <0>נתונים</0> שימושיים ללימוד מאגיה בפורמט JSON עם טיפוסים."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Publish useful magick <0>react components</0>."
+msgstr "פרסום <0>רכיבי React</0> שימושיים ללימוד מאגיה."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Images should be original, high quality vector images, and constructed procedurally (i.e. with iterative math vs human drawing), whenever possible."
+msgstr "ככל האפשר, האיורים יהיו מקוריים, וקטוריים ובאיכות גבוהה, וייווצרו באופן חישובי, כלומר באמצעות חישובים חוזרים במקום ציור ידני."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Licence"
+msgstr "רישיון"
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Copyright (c) 2020–2026 Gadi Cohen. The app is free software under the <0>GNU Affero General Public License</0>, version 3 or any later version. The data and the images the site draws are <1>CC BY 4.0</1>, with credit to Magick.ly, or for a drawing a component makes, to Magick.ly, drawn by magick-components (MIT). The code of the data and the components is MIT; <2>Open source</2> says what each covers."
+msgstr "זכויות יוצרים © 2020–2026 גדי כהן. האפליקציה היא תוכנה חופשית ברישיון <0>GNU Affero General Public License</0>, גרסה 3 או כל גרסה מאוחרת יותר. הנתונים והאיורים שהאתר מצייר זמינים ברישיון <1>CC BY 4.0</1>, עם קרדיט ל־Magick.ly, או במקרה של איור שרכיב מצייר: Magick.ly, drawn by magick-components (MIT). הקוד של הנתונים ושל הרכיבים זמין ברישיון MIT; בעמוד <2>קוד פתוח</2> מוסבר מה מכסה כל רישיון."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "The source of the version running here is <0>on GitHub</0>{version}."
+msgstr "קוד המקור של הגרסה הפועלת כאן נמצא <0>ב־GitHub</0>{version}."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Credits"
+msgstr "קרדיטים"
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Work by others that this app shows, with thanks:"
+msgstr "עבודות של אחרים המוצגות באפליקציה, בתודה:"
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "The planets photo on the <0>Astrology</0> page, also the link preview of the <1>planets</1> pages: <2>Planets2013.svg</2> by WP, from Wikimedia Commons, under <3>CC BY-SA 3.0</3>. We converted it to JPEG and crop it to fit; those changes are under the same licence."
+msgstr "תצלום כוכבי הלכת בעמוד <0>אסטרולוגיה</0>, המשמש גם לתצוגה המקדימה של עמודי <1>כוכבי הלכת</1>: <2>Planets2013.svg</2> מאת WP, מתוך Wikimedia Commons, ברישיון <3>CC BY-SA 3.0</3>. המרנו אותו ל־JPEG ואנו חותכים אותו להתאמה; השינויים האלה זמינים באותו רישיון."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "The robes photo on the <0>Golden Dawn rituals</0> page, also the link preview of the ritual pages: <1>Anxfisa Golden Dawn Robes.jpg</1> by Anxfisa, from Wikimedia Commons, under <2>CC BY-SA 3.0</2>. We crop it to fit, under the same licence."
+msgstr "תצלום הגלימות בעמוד <0>טקסי השחר הזהוב</0>, המשמש גם לתצוגה המקדימה של עמודי הטקסים: <1>Anxfisa Golden Dawn Robes.jpg</1> מאת Anxfisa, מתוך Wikimedia Commons, ברישיון <2>CC BY-SA 3.0</2>. אנו חותכים אותו להתאמה, באותו רישיון."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "The <0>Tree of Life</0> glyph is our own, drawn from measurements, and was inspired by <1>Tree of life bahir Hebrew.svg</1> by User:AnonMoos, which is public domain."
+msgstr "תרשים <0>עץ החיים</0> הוא איור מקורי שלנו המבוסס על מדידות, בהשראת <1>Tree of life bahir Hebrew.svg</1> מאת User:AnonMoos, הנמצא בנחלת הכלל."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "The Moon's drawing on the <0>Moon</0> and <1>planets</1> pages: its paths are adapted from <2>moon-phase</2>, Copyright © 2012, Regents of the University of California, under the <3>BSD 3-Clause License</3>, whose conditions and disclaimer are in the components' licence."
+msgstr "איור הירח בעמודי <0>הירח</0> ו־<1>כוכבי הלכת</1>: הנתיבים הותאמו מתוך <2>moon-phase</2>, זכויות יוצרים © 2012, Regents of the University of California, ברישיון <3>BSD 3-Clause License</3>, שתנאיו והסרת האחריות שלו מופיעים ברישיון הרכיבים."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "The places in the place search on the <0>planetary hours</0> and <1>geomancy reading</1> pages: from <2>GeoNames</2>, under <3>CC BY 4.0</3>. We modified the data, keeping only the towns of 15,000 people or more and the fields the search needs; those changes are under the same licence."
+msgstr "המקומות בחיפוש המקומות בעמודי <0>השעות הפלנטריות</0> ו־<1>הקריאה הגאומנטית</1>: מתוך <2>GeoNames</2>, ברישיון <3>CC BY 4.0</3>. שינינו את הנתונים ושמרנו רק יישובים עם 15,000 תושבים ומעלה ואת השדות הדרושים לחיפוש; השינויים זמינים באותו רישיון."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Your location"
+msgstr "המיקום שלכם"
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Our host, Vercel, works out your town from your IP address when your request reaches us; no other service is asked. A place you choose stays in your browser, though what you type in the place search is sent to our server to find the places that match."
+msgstr "ספקית האירוח שלנו, Vercel, מסיקה את היישוב שלכם מכתובת ה־IP כשהבקשה מגיעה אלינו; לא פונים לשירות אחר. מקום שתבחרו נשמר בדפדפן, אך הטקסט שאתם מקלידים בחיפוש המקומות נשלח לשרת שלנו כדי למצוא התאמות."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/upload/page.tsx

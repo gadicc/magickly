@@ -35,6 +35,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup
       - run: pnpm check
+      - run: pnpm i18n:check
       - run: pnpm typecheck
       # The package's published shape: built, packed, installed into a
       # fixture, type-checked and loaded (plan 052), keeping the tarball.

@@ -24,3 +24,14 @@ describe("public JSX prose extraction", () => {
     expect(decodeReferences("&#x110000; &mdash;")).toBe("&#x110000; \u2014");
   });
 });
+
+it("reads literal rich messages only through the explicitly imported presentation adapter", () => {
+  const source = `import Copy from "@/i18n/UiRichText";
+    export default () => <><Copy message={/*i18n*/ "Read <0>the book</0>."} components={{0: <a href="private-prop">ignored component children</a>}} />
+    <Other message={"not public prose"} /><Copy message={secret} /></>;`;
+  expect(jsxProse(source).text).toBe("Read the book .");
+  expect(
+    jsxProse(`export default () => <UiRichText message={"not imported"} />;`)
+      .text,
+  ).toBe("");
+});

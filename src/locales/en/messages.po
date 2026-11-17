@@ -8,21 +8,6 @@ msgstr ""
 "Language: en\n"
 
 #. js-lingui-explicit-id
-#: src/i18n/publicMetadata.ts
-msgid "Magick.ly: Open Source Magick Reference and Tools"
-msgstr "Magick.ly: Open Source Magick Reference and Tools"
-
-#. js-lingui-explicit-id
-#: src/i18n/publicMetadata.ts
-msgid "Free, open source reference and tools for Western esoteric study: Kabbalah, the Golden Dawn, Enochian magick, astrology, geomancy and flashcards."
-msgstr "Free, open source reference and tools for Western esoteric study: Kabbalah, the Golden Dawn, Enochian magick, astrology, geomancy and flashcards."
-
-#. js-lingui-explicit-id
-#: src/i18n/publicMetadata.ts
-msgid "About Magick.ly, an open source reference app for magickal study with MIT-licensed data and components. A reference, not an instruction app."
-msgstr "About Magick.ly, an open source reference app for magickal study with MIT-licensed data and components. A reference, not an instruction app."
-
-#. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
 #: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
 #: src/app/doc/[_id]/edit/semantic/DeleteRitualDialog.tsx
@@ -80,10 +65,37 @@ msgid "Search results"
 msgstr "Search results"
 
 #. js-lingui-explicit-id
+#: src/i18n/publicMetadata.ts
+msgid "Magick.ly: Open Source Magick Reference and Tools"
+msgstr "Magick.ly: Open Source Magick Reference and Tools"
+
+#. js-lingui-explicit-id
+#: src/i18n/publicMetadata.ts
+msgid "Free, open source reference and tools for Western esoteric study: Kabbalah, the Golden Dawn, Enochian magick, astrology, geomancy and flashcards."
+msgstr "Free, open source reference and tools for Western esoteric study: Kabbalah, the Golden Dawn, Enochian magick, astrology, geomancy and flashcards."
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+#: src/i18n/publicMetadata.ts
+msgid "Books"
+msgstr "Books"
+
+#. js-lingui-explicit-id
+#: src/i18n/publicMetadata.ts
+msgid "Public-domain works of the Western esoteric tradition, read from their original scans and published in full with an editorial apparatus."
+msgstr "Public-domain works of the Western esoteric tradition, read from their original scans and published in full with an editorial apparatus."
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 #: src/i18n/publicMetadata.ts
 msgid "About"
 msgstr "About"
+
+#. js-lingui-explicit-id
+#: src/i18n/publicMetadata.ts
+msgid "About Magick.ly, an open source reference app for magickal study with MIT-licensed data and components. A reference, not an instruction app."
+msgstr "About Magick.ly, an open source reference app for magickal study with MIT-licensed data and components. A reference, not an instruction app."
 
 #. js-lingui-explicit-id
 #: src/i18n/AccountLocaleSync.tsx
@@ -99,6 +111,11 @@ msgstr "This browser’s language was changed, but your account preference has n
 #: src/i18n/LanguageSwitcher.tsx
 msgid "Language"
 msgstr "Language"
+
+#. js-lingui-explicit-id
+#: src/i18n/LanguageSwitcher.tsx
+msgid "This page isn’t available in Hebrew yet."
+msgstr "This page isn’t available in Hebrew yet."
 
 #. js-lingui-explicit-id
 #: src/i18n/LanguageSwitcher.tsx
@@ -151,11 +168,13 @@ msgid "Magick.ly"
 msgstr "Magick.ly"
 
 #. js-lingui-explicit-id
+#: src/app/HomePage.tsx
 #: src/app/pathnames.ts
 msgid "Admin"
 msgstr "Admin"
 
 #. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Astrology"
 msgstr "Astrology"
@@ -182,20 +201,17 @@ msgstr "Zodiac"
 
 #. js-lingui-explicit-id
 #: src/app/pathnames.ts
-msgid "Books"
-msgstr "Books"
-
-#. js-lingui-explicit-id
-#: src/app/pathnames.ts
 msgid "La Science Cabalistique"
 msgstr "La Science Cabalistique"
 
 #. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Chat (MagickGPT)"
 msgstr "Chat (MagickGPT)"
 
 #. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Enochian"
 msgstr "Enochian"
@@ -226,6 +242,7 @@ msgid "Enochian Translator"
 msgstr "Enochian Translator"
 
 #. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Golden Dawn"
 msgstr "Golden Dawn"
@@ -282,6 +299,7 @@ msgid "Table of Shewbread"
 msgstr "Table of Shewbread"
 
 #. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Geomancy"
 msgstr "Geomancy"
@@ -297,6 +315,7 @@ msgid "Geomantic Figures"
 msgstr "Geomantic Figures"
 
 #. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Kabbalah"
 msgstr "Kabbalah"
@@ -317,6 +336,7 @@ msgid "Tree of Life"
 msgstr "Tree of Life"
 
 #. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Open source"
 msgstr "Open source"
@@ -332,12 +352,14 @@ msgid "Components"
 msgstr "Components"
 
 #. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Study"
 msgstr "Study"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/page.tsx
+#: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Temples"
 msgstr "Temples"
@@ -351,6 +373,141 @@ msgstr "Ritual editor"
 #: src/app/siteNav.ts
 msgid "Source code"
 msgstr "Source code"
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "A reference for the Western esoteric tradition"
+msgstr "A reference for the Western esoteric tradition"
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "Magick.ly is a free, open-source reference and set of tools for students of Hermetic magick, as the Golden Dawn taught it and as it grew from older sources. It is a reference, not a course: nothing here replaces a teacher or a good book."
+msgstr "Magick.ly is a free, open-source reference and set of tools for students of Hermetic magick, as the Golden Dawn taught it and as it grew from older sources. It is a reference, not a course: nothing here replaces a teacher or a good book."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "What's here"
+msgstr "What's here"
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>Kabbalah</1></0>: an <2>interactive Tree of Life</2>, where each Sephirah and path has its own page, and the <3>72 angels of the Shem HaMephorash</3>."
+msgstr "<0><1>Kabbalah</1></0>: an <2>interactive Tree of Life</2>, where each Sephirah and path has its own page, and the <3>72 angels of the Shem HaMephorash</3>."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>Golden Dawn</1></0>: the <2>grades</2> from Neophyte 0=0 to Ipsissimus 10=1, floor plans of the <3>temple halls</3>, the grade <4>rituals</4>, a <5>Rose Cross sigil generator</5> and the <6>temple symbols</6>."
+msgstr "<0><1>Golden Dawn</1></0>: the <2>grades</2> from Neophyte 0=0 to Ipsissimus 10=1, floor plans of the <3>temple halls</3>, the grade <4>rituals</4>, a <5>Rose Cross sigil generator</5> and the <6>temple symbols</6>."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>Enochian</1></0>: John Dee and Edward Kelley's <2>Keys</2>, a searchable <3>dictionary</3>, the four elemental <4>tablets</4> and Dee's <5>Oration to God</5>."
+msgstr "<0><1>Enochian</1></0>: John Dee and Edward Kelley's <2>Keys</2>, a searchable <3>dictionary</3>, the four elemental <4>tablets</4> and Dee's <5>Oration to God</5>."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>Astrology</1></0>: <2>planetary hours</2> for where you are, <3>moon phases</3>, the <4>planets</4> and the <5>zodiac</5>."
+msgstr "<0><1>Astrology</1></0>: <2>planetary hours</2> for where you are, <3>moon phases</3>, the <4>planets</4> and the <5>zodiac</5>."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>Geomancy</1></0>: cast a <2>reading</2> and look up the <3>sixteen figures</3>."
+msgstr "<0><1>Geomancy</1></0>: cast a <2>reading</2> and look up the <3>sixteen figures</3>."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>Books</1></0>: public-domain works published in full, starting with Lazare Lenain's <2>La Science Cabalistique</2> of 1823."
+msgstr "<0><1>Books</1></0>: public-domain works published in full, starting with Lazare Lenain's <2>La Science Cabalistique</2> of 1823."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>Study</1></0>: spaced-repetition flashcards for Hebrew letters, planetary and zodiac signs, alchemy, Enochian and more."
+msgstr "<0><1>Study</1></0>: spaced-repetition flashcards for Hebrew letters, planetary and zodiac signs, alchemy, Enochian and more."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>MagickGPT</1></0>: ask an AI that answers from a library of magickal texts and cites its sources."
+msgstr "<0><1>MagickGPT</1></0>: ask an AI that answers from a library of magickal texts and cites its sources."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "<0><1>Open source</1></0>: the <2>data</2> behind the site, every table with its rows and fields, on npm as magick-data, and the <3>components</3> that draw the Tree of Life, the tablets and the sigils, each shown live with props to try, on npm as magick-components."
+msgstr "<0><1>Open source</1></0>: the <2>data</2> behind the site, every table with its rows and fields, on npm as magick-data, and the <3>components</3> that draw the Tree of Life, the tablets and the sigils, each shown live with props to try, on npm as magick-components."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "For temples"
+msgstr "For temples"
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "A temple can keep its own rituals here, each readable by members of the right grade on any device. See <0>temples and private rituals</0>."
+msgstr "A temple can keep its own rituals here, each readable by members of the right grade on any device. See <0>temples and private rituals</0>."
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "Open source, open data"
+msgstr "Open source, open data"
+
+#. js-lingui-explicit-id
+#: src/app/HomeText.tsx
+msgid "The app's code is on GitHub. Its data is free to reuse under CC BY 4.0, with credit, and the components that draw the Tree of Life, sigils, tablets and temple halls under MIT. See <0>Open source</0>."
+msgstr "The app's code is on GitHub. Its data is free to reuse under CC BY 4.0, with credit, and the components that draw the Tree of Life, sigils, tablets and temple halls under MIT. See <0>Open source</0>."
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "About Icon"
+msgstr "About Icon"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "Astrology Wheel"
+msgstr "Astrology Wheel"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "Android Magician"
+msgstr "Android Magician"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "Enochian Aethyrs"
+msgstr "Enochian Aethyrs"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "A shaman pokes holes in the sand"
+msgstr "A shaman pokes holes in the sand"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "Kabbalistic Tree of Life"
+msgstr "Kabbalistic Tree of Life"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "Magick Journal"
+msgstr "Magick Journal"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "Glowing Magical Journal"
+msgstr "Glowing Magical Journal"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "The Tree of Life, an Enochian tablet and a Rose Cross sigil"
+msgstr "The Tree of Life, an Enochian tablet and a Rose Cross sigil"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "Student Studying Magick"
+msgstr "Student Studying Magick"
+
+#. js-lingui-explicit-id
+#: src/app/HomeTiles.tsx
+msgid "A Magical Temple"
+msgstr "A Magical Temple"
 
 #. js-lingui-explicit-id
 #: src/app/MyAppBar.tsx
@@ -1063,6 +1220,151 @@ msgstr "Visual editor panel"
 #: src/app/doc/[_id]/edit/semantic/SemanticEditorShell.tsx
 msgid "Loading ritual editor…"
 msgstr "Loading ritual editor…"
+
+#. js-lingui-explicit-id
+#: src/app/books/BooksPage.tsx
+msgid "Public-domain works of the Western esoteric tradition, read from their original scans and published in full, with an editorial apparatus recording every place the reading departs from the page."
+msgstr "Public-domain works of the Western esoteric tradition, read from their original scans and published in full, with an editorial apparatus recording every place the reading departs from the page."
+
+#. js-lingui-explicit-id
+#: src/app/books/BooksPage.tsx
+msgid "<0>La Science Cabalistique</0> — Lazare Lenain, Amiens, 1823. The 72 angels of the Kabbalah, their attributes, seals and hours."
+msgstr "<0>La Science Cabalistique</0> — Lazare Lenain, Amiens, 1823. The 72 angels of the Kabbalah, their attributes, seals and hours."
+
+#. js-lingui-explicit-id
+#: src/app/books/BooksText.tsx
+msgid "About these editions"
+msgstr "About these editions"
+
+#. js-lingui-explicit-id
+#: src/app/books/BooksText.tsx
+msgid "Each book is read page by page from a scan of the printed book, not from machine OCR. Where the original is wrong, a misprinted date, a misnumbered entry or a miscounted total, the text keeps the author's words and a note says what is wrong and what it should be. Every page marker links to the facsimile of its leaf. You can always check the reading against the page it was made from."
+msgstr "Each book is read page by page from a scan of the printed book, not from machine OCR. Where the original is wrong, a misprinted date, a misnumbered entry or a miscounted total, the text keeps the author's words and a note says what is wrong and what it should be. Every page marker links to the facsimile of its leaf. You can always check the reading against the page it was made from."
+
+#. js-lingui-explicit-id
+#: src/app/books/BooksText.tsx
+msgid "<0>La Science Cabalistique</0>, Lazare Lenain's book of 1823, was the first work in French on the 72 angels of the Kabbalah. It was printed in 500 copies and sold by the author from his reading room. It sets out the 72 genii of the Shem HaMephorash and the arithmetic of Lenain's four cabalistic tables. Each genius takes five degrees of the zodiac, five days of the year and twenty minutes of each day."
+msgstr "<0>La Science Cabalistique</0>, Lazare Lenain's book of 1823, was the first work in French on the 72 angels of the Kabbalah. It was printed in 500 copies and sold by the author from his reading room. It sets out the 72 genii of the Shem HaMephorash and the arithmetic of Lenain's four cabalistic tables. Each genius takes five degrees of the zodiac, five days of the year and twenty minutes of each day."
+
+#. js-lingui-explicit-id
+#: src/app/books/BooksText.tsx
+msgid "The edition is in French, chapter by chapter, from a later reissue with a preface by Papus. For the angels in English, see <0>the 72 angels</0>. Their names, dates and correspondences are translated from Lenain's French alone, and each angel has its own page, from <1>Vehuiah</1> to <2>Mumiah</2>. The <3>Shem HaMephorash</3> page explains the name they come from."
+msgstr "The edition is in French, chapter by chapter, from a later reissue with a preface by Papus. For the angels in English, see <0>the 72 angels</0>. Their names, dates and correspondences are translated from Lenain's French alone, and each angel has its own page, from <1>Vehuiah</1> to <2>Mumiah</2>. The <3>Shem HaMephorash</3> page explains the name they come from."
+
+#. js-lingui-explicit-id
+#: src/app/books/BooksText.tsx
+msgid "Lenain died in 1877 and Papus in 1916, so both texts are in the public domain. This reading of them is CC BY 4.0."
+msgstr "Lenain died in 1877 and Papus in 1916, so both texts are in the public domain. This reading of them is CC BY 4.0."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "<0>Magick.ly - the open source Magick app</0>"
+msgstr "<0>Magick.ly - the open source Magick app</0>"
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "This is primarily a reference app for all things magickal, to help me in my studies. Maybe it will help you too."
+msgstr "This is primarily a reference app for all things magickal, to help me in my studies. Maybe it will help you too."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "This is NOT an instruction app. By using this app you acknowledge that you will not attempt any ritual here without prior instruction either by a qualified teacher or self-study with an appropriate book. Attempting advanced magick without prior instruciton and training is dangerous and irreponsible."
+msgstr "This is NOT an instruction app. By using this app you acknowledge that you will not attempt any ritual here without prior instruction either by a qualified teacher or self-study with an appropriate book. Attempting advanced magick without prior instruciton and training is dangerous and irreponsible."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "TODO - bibliography / starting points"
+msgstr "TODO - bibliography / starting points"
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "For questions, comments, feature requests, source code or to get involved, see <0>github.com/gadicc/magickly</0>."
+msgstr "For questions, comments, feature requests, source code or to get involved, see <0>github.com/gadicc/magickly</0>."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Design goals:"
+msgstr "Design goals:"
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Open source: copyleft for the app, permissive for the data and components, so those can travel."
+msgstr "Open source: copyleft for the app, permissive for the data and components, so those can travel."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Publish useful magick <0>data</0> in JSON format with types."
+msgstr "Publish useful magick <0>data</0> in JSON format with types."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Publish useful magick <0>react components</0>."
+msgstr "Publish useful magick <0>react components</0>."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Images should be original, high quality vector images, and constructed procedurally (i.e. with iterative math vs human drawing), whenever possible."
+msgstr "Images should be original, high quality vector images, and constructed procedurally (i.e. with iterative math vs human drawing), whenever possible."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Licence"
+msgstr "Licence"
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Copyright (c) 2020–2026 Gadi Cohen. The app is free software under the <0>GNU Affero General Public License</0>, version 3 or any later version. The data and the images the site draws are <1>CC BY 4.0</1>, with credit to Magick.ly, or for a drawing a component makes, to Magick.ly, drawn by magick-components (MIT). The code of the data and the components is MIT; <2>Open source</2> says what each covers."
+msgstr "Copyright (c) 2020–2026 Gadi Cohen. The app is free software under the <0>GNU Affero General Public License</0>, version 3 or any later version. The data and the images the site draws are <1>CC BY 4.0</1>, with credit to Magick.ly, or for a drawing a component makes, to Magick.ly, drawn by magick-components (MIT). The code of the data and the components is MIT; <2>Open source</2> says what each covers."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "The source of the version running here is <0>on GitHub</0>{version}."
+msgstr "The source of the version running here is <0>on GitHub</0>{version}."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Credits"
+msgstr "Credits"
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Work by others that this app shows, with thanks:"
+msgstr "Work by others that this app shows, with thanks:"
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "The planets photo on the <0>Astrology</0> page, also the link preview of the <1>planets</1> pages: <2>Planets2013.svg</2> by WP, from Wikimedia Commons, under <3>CC BY-SA 3.0</3>. We converted it to JPEG and crop it to fit; those changes are under the same licence."
+msgstr "The planets photo on the <0>Astrology</0> page, also the link preview of the <1>planets</1> pages: <2>Planets2013.svg</2> by WP, from Wikimedia Commons, under <3>CC BY-SA 3.0</3>. We converted it to JPEG and crop it to fit; those changes are under the same licence."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "The robes photo on the <0>Golden Dawn rituals</0> page, also the link preview of the ritual pages: <1>Anxfisa Golden Dawn Robes.jpg</1> by Anxfisa, from Wikimedia Commons, under <2>CC BY-SA 3.0</2>. We crop it to fit, under the same licence."
+msgstr "The robes photo on the <0>Golden Dawn rituals</0> page, also the link preview of the ritual pages: <1>Anxfisa Golden Dawn Robes.jpg</1> by Anxfisa, from Wikimedia Commons, under <2>CC BY-SA 3.0</2>. We crop it to fit, under the same licence."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "The <0>Tree of Life</0> glyph is our own, drawn from measurements, and was inspired by <1>Tree of life bahir Hebrew.svg</1> by User:AnonMoos, which is public domain."
+msgstr "The <0>Tree of Life</0> glyph is our own, drawn from measurements, and was inspired by <1>Tree of life bahir Hebrew.svg</1> by User:AnonMoos, which is public domain."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "The Moon's drawing on the <0>Moon</0> and <1>planets</1> pages: its paths are adapted from <2>moon-phase</2>, Copyright © 2012, Regents of the University of California, under the <3>BSD 3-Clause License</3>, whose conditions and disclaimer are in the components' licence."
+msgstr "The Moon's drawing on the <0>Moon</0> and <1>planets</1> pages: its paths are adapted from <2>moon-phase</2>, Copyright © 2012, Regents of the University of California, under the <3>BSD 3-Clause License</3>, whose conditions and disclaimer are in the components' licence."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "The places in the place search on the <0>planetary hours</0> and <1>geomancy reading</1> pages: from <2>GeoNames</2>, under <3>CC BY 4.0</3>. We modified the data, keeping only the towns of 15,000 people or more and the fields the search needs; those changes are under the same licence."
+msgstr "The places in the place search on the <0>planetary hours</0> and <1>geomancy reading</1> pages: from <2>GeoNames</2>, under <3>CC BY 4.0</3>. We modified the data, keeping only the towns of 15,000 people or more and the fields the search needs; those changes are under the same licence."
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Your location"
+msgstr "Your location"
+
+#. js-lingui-explicit-id
+#: src/app/about/AboutPage.tsx
+msgid "Our host, Vercel, works out your town from your IP address when your request reaches us; no other service is asked. A place you choose stays in your browser, though what you type in the place search is sent to our server to find the places that match."
+msgstr "Our host, Vercel, works out your town from your IP address when your request reaches us; no other service is asked. A place you choose stays in your browser, though what you type in the place search is sent to our server to find the places that match."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/upload/page.tsx

@@ -17,6 +17,7 @@ export type DocumentRoot =
 export const ROUTE_PLACEMENT = {
   "/[locale]": "localized",
   "/[locale]/about": "localized",
+  "/[locale]/books": "localized",
   "/about": "public",
   "/admin": "private",
   "/astrology/moon": "public",

@@ -71,7 +71,9 @@
     "test:local": "pnpm i18n:compile && pnpm data:build && pnpm search:build && loom test run --workers auto --cpu-mode exclude -- vitest run",
     "i18n:extract": "pnpm lingui extract --clean",
     "i18n:compile": "pnpm lingui compile",
-    "i18n:check": "pnpm lingui compile --strict",
+    "i18n:check": "pnpm lingui check sync && pnpm lingui compile --strict && node --import tsx scripts/i18n/check.mts",
+    "i18n:translate": "loom env -- node --import tsx scripts/i18n/translate.mts",
+    "i18n:update": "pnpm i18n:extract && pnpm i18n:translate --write && pnpm i18n:check",
     "i18n:verify-app": "node --import tsx scripts/i18n/verify-app.mts"
   },
   "dependencies": {

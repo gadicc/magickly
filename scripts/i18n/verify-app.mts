@@ -82,6 +82,7 @@ try {
     ["/about", "he", 200, "en"],
     ["/he/about", "en", 200, "he"],
     ["/he", "en", 200, "he"],
+    ["/he/books", "en", 200, "he"],
     ["/temples", "he", 200, "he"],
     ["/offline/ritual", "he", 200, "en"],
     ["/doc/neophyte", "he", 200, "en"],
@@ -129,8 +130,12 @@ try {
     if (path === "/he/about") {
       assert(html.includes("https://magick.ly/he/about"), "canonical");
       assert(
-        html.includes('hrefLang="en"') || html.includes('hreflang="en"'),
-        "alternate",
+        /<meta name="robots" content="noindex, follow"/.test(html),
+        "Hebrew SEO remains gated",
+      );
+      assert(
+        !/<link[^>]+hreflang=/i.test(html),
+        "No language alternates before SEO launch",
       );
       assert(/[א-ת]/.test(html), "Hebrew content");
     }
@@ -141,6 +146,11 @@ try {
       cache: response.headers.get("cache-control"),
     });
   }
+  const sitemapXml = await (await fetch(origin + "/sitemap.xml")).text();
+  assert(
+    !/<loc>https:\/\/magick\.ly\/he(?:<|\/)/.test(sitemapXml),
+    "Hebrew sitemap remains gated",
+  );
   const cross = await fetch(origin + "/api/ui-locale", {
     method: "POST",
     headers: {
@@ -154,10 +164,19 @@ try {
   await browser.send("Page.addScriptToEvaluateOnNewDocument", {
     source: `window.__i18nErrors=[]; const before=console.error; console.error=(...args)=>{window.__i18nErrors.push(args.map(String).join(' '));before(...args)};`,
   });
+  await browser.viewport(390, 844, true);
   await browser.goto(origin + "/temples");
   await browser.evaluate(`window.__i18nDocumentToken='same-private-document'`);
-  await browser.click("button", "Language");
-  await browser.click('[role="menuitem"]', "עברית");
+  assert.equal(
+    await browser.evaluate(
+      `!!document.querySelector('header [role="combobox"]')`,
+    ),
+    false,
+    "No language control in mobile app bar",
+  );
+  await browser.click('button[aria-label="menu"]');
+  await browser.click('[role="combobox"]', "English");
+  await browser.click('[role="option"]', "עברית");
   await browser.waitFor(
     `document.documentElement.lang==='he' && document.documentElement.dir==='rtl'`,
   );
@@ -166,8 +185,28 @@ try {
     await browser.evaluate(`window.__i18nDocumentToken`),
     "same-private-document",
   );
+  assert(
+    await browser.evaluate(
+      `document.documentElement.scrollWidth <= innerWidth`,
+    ),
+    "Drawer mobile overflow",
+  );
+  writeFileSync(
+    `${root}/output/i18n/drawer-hebrew-mobile.webp`,
+    await browser.screenshot(),
+  );
+  await browser.goto(origin + "/he/books");
+  await browser.waitFor(`document.body.innerText.includes('על המהדורות האלה')`);
+  assert(
+    await browser.evaluate(
+      `!!document.querySelector('a[lang="fr"][dir="ltr"]')`,
+    ),
+    "French source title boundary",
+  );
   await browser.goto(origin + "/he/about");
-  await browser.waitFor(`document.body.innerText.includes('אודות Magick.ly')`);
+  await browser.waitFor(
+    `document.body.innerText.includes('אפליקציית מאגיה בקוד פתוח')`,
+  );
   assert.equal(await browser.evaluate(`document.documentElement.dir`), "rtl");
   await browser.viewport(1280, 900);
   writeFileSync(
@@ -196,12 +235,17 @@ try {
   await browser.send("Emulation.setEmulatedMedia", {
     features: [{ name: "prefers-color-scheme", value: "light" }],
   });
-  await browser.viewport(1280, 900);
+  await browser.viewport(390, 844, true);
   await browser.evaluate(
     `window.__i18nDocumentToken='localized-public-document'`,
   );
-  await browser.click("button", "שפה");
-  await browser.click('[role="menuitem"]', "English");
+  await browser.click('button[aria-label="תפריט"]');
+  await browser.click('[role="combobox"]', "עברית");
+  writeFileSync(
+    `${root}/output/i18n/drawer-language-options-mobile.webp`,
+    await browser.screenshot(),
+  );
+  await browser.click('[role="option"]', "English");
   await browser.waitFor(
     `location.pathname==='/about' && document.documentElement.lang==='en'`,
   );

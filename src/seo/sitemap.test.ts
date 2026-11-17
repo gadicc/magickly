@@ -3,6 +3,7 @@ import { resolveSitemap } from "next/dist/build/webpack/loaders/metadata/resolve
 import { describe, expect, it } from "vitest";
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
+import { indexableLocalizedPaths, publicAlternates } from "@/i18n/publications";
 import { componentPages } from "./components";
 import { entityPages } from "./entities";
 import { hallPages } from "./halls";
@@ -19,7 +20,7 @@ describe("sitemap", () => {
         lenainPages().length +
         hallPages().length +
         componentPages().length +
-        2,
+        indexableLocalizedPaths().length,
     );
     expect(urls).toContain("https://magick.ly/open-source/components");
     expect(urls).toContain(
@@ -59,7 +60,7 @@ describe("sitemap", () => {
       expect(Object.keys(entry)).toEqual(
         /\/gd\/halls\/(?!editor$)[^/]+$/.test(entry.url)
           ? ["url", "images"]
-          : /(?:https:\/\/magick\.ly(?:\/he)?(?:\/about)?)$/.test(entry.url)
+          : publicAlternates(new URL(entry.url).pathname)
             ? ["url", "alternates"]
             : ["url"],
       );

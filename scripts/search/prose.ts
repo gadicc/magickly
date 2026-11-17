@@ -50,7 +50,43 @@ export function jsxProse(source: string): {
   );
   const texts: string[] = [];
   const components = new Set<string>();
+  // Only our explicit presentation adapter exposes a literal message as prose.
+  // Never read arbitrary props or follow its client/provider graph.
+  const richTextImports = new Set(
+    file.statements.flatMap((statement) =>
+      ts.isImportDeclaration(statement) &&
+      ts.isStringLiteral(statement.moduleSpecifier) &&
+      statement.moduleSpecifier.text === "@/i18n/UiRichText" &&
+      statement.importClause?.name
+        ? [statement.importClause.name.text]
+        : [],
+    ),
+  );
   function visit(node: ts.Node) {
+    if (
+      ts.isJsxSelfClosingElement(node) &&
+      richTextImports.has(node.tagName.getText(file))
+    ) {
+      const message = node.attributes.properties.find(
+        (prop) =>
+          ts.isJsxAttribute(prop) && prop.name.getText(file) === "message",
+      );
+      if (
+        message &&
+        ts.isJsxAttribute(message) &&
+        message.initializer &&
+        ts.isJsxExpression(message.initializer) &&
+        message.initializer.expression &&
+        ts.isStringLiteral(message.initializer.expression)
+      ) {
+        texts.push(
+          message.initializer.expression.text
+            .replace(/<\/?[a-zA-Z0-9]+\s*\/?>/g, " ")
+            .replace(/\{[a-zA-Z_]\w*\}/g, ""),
+        );
+      }
+      return;
+    }
     if (ts.isJsxAttribute(node)) return;
     if (
       ts.isJsxElement(node) &&

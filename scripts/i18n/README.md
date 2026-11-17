@@ -41,3 +41,39 @@ Do not throw `notFound()` from a root layout: the fixture proved that its
 own not-found boundary cannot wrap its layout. Keep a safe document and reject
 unsupported locales, missing/private translations and deleted rituals inside
 the page boundary before streaming or content lookup.
+
+## Translation maintenance
+
+`translation.ts` reads/writes catalogs through the installed Lingui PO formatter.
+It selects only missing/fuzzy, non-obsolete messages and preserves existing
+translations and translator context. ICU compilation checks syntax; structural
+checks preserve variable names/types, select keys, exact-number plural selectors,
+offsets, and balanced React component placeholders. These checks cannot establish
+semantic translation quality; review the PO diff and relevant screens.
+
+```sh
+pnpm i18n:extract
+pnpm i18n:translate                 # dry run: counts only, no provider calls
+pnpm i18n:update                    # extract → translate --write → check
+```
+
+For the last command, configure `I18N_TRANSLATION_MODEL` with an explicitly chosen
+Vercel AI Gateway model ID and the normal gateway authentication through the
+project's environment. Alternatively pass `--model <id>` to
+`pnpm i18n:translate --write`. Do not put credentials in command arguments. The
+task uses `loom env`; framework dev/build still loads its own environment.
+The model is not silently selected or upgraded by this script.
+
+Translation runs in batches of 20, using the existing AI SDK's structured output.
+Any missing/duplicate result, malformed ICU, changed placeholder or failed batch
+aborts without writing. The complete locale is saved atomically after checking
+that the source catalog has not changed during the run. Errors omit provider
+request/credential details. Only committed first-party catalog messages and
+translator comments are sent; no database, stored document or runtime content is
+read. No AI calls run on page requests, builds, CI, or ordinary compilation.
+
+The coding agent can also translate the extracted delta directly in PO sources;
+`pnpm i18n:check` applies the same placeholder checks either way. It additionally
+uses Lingui's read-only extraction-sync check and strict compilation, so an
+unextracted source change or a missing translation fails CI. Unmarked copy still
+requires developer review; extraction cannot discover text it was never given.

@@ -8,7 +8,7 @@ vi.mock("@/auth/viewer", () => ({ getCurrentSqlViewer: viewer.get }));
 // Next imports SVGs as components; Vite as URLs.
 vi.mock("@/goldendawn-logo-squished.svg", () => ({ default: () => null }));
 
-const { default: Index } = await import("./page");
+const { default: Index } = await import("../HomePage");
 
 afterEach(() => {
   cleanup();
@@ -17,7 +17,7 @@ afterEach(() => {
 
 const page = async (admin = false) => {
   viewer.get.mockResolvedValue(admin ? { admin: true } : null);
-  return render(await Index());
+  return render(await Index({}));
 };
 
 /** The tiles' links, in order, before the text below them. */
