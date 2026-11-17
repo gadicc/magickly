@@ -89,10 +89,33 @@ export function tableAt(
   };
 }
 
-/** The table's bytes as the route serves it: compact JSON, and gzipped. */
-export function servedBytes(table: HintTable): { raw: number; gzip: number } {
+/** A table's bytes as its route serves it: compact JSON, and gzipped. */
+export function servedBytes(table: unknown): { raw: number; gzip: number } {
   const json = Buffer.from(JSON.stringify(table));
   return { raw: json.length, gzip: gzipSync(json).length };
+}
+
+/**
+ * A table built at `asked`, or at the lowest cut-off a step at a time
+ * above it whose served table fits `budget` gzipped bytes. `build`
+ * makes the table at a cut-off; `empty` says it holds nothing, past
+ * which raising the cut-off can't help.
+ */
+export function raiseToFit<T>(
+  asked: number,
+  build: (cutoff: number) => T,
+  empty: (table: T) => boolean,
+  budget = BUDGET_BYTES,
+  step = CUTOFF_STEP,
+): T {
+  for (let steps = 0; ; steps++) {
+    // Counted in steps, so the cut-off is 5.7, not 5.700000000000001.
+    const cutoff = Number((asked + steps * step).toFixed(6));
+    const table = build(cutoff);
+    if (servedBytes(table).gzip <= budget) return table;
+    if (empty(table))
+      throw new Error(`Even an empty table is over ${budget} bytes gzipped`);
+  }
 }
 
 /**
@@ -106,14 +129,13 @@ export function fitBudget(
   budget = BUDGET_BYTES,
   step = CUTOFF_STEP,
 ): HintTable {
-  for (let steps = 0; ; steps++) {
-    // Counted in steps, so the cut-off is 5.7, not 5.700000000000001.
-    const cutoff = Number((head.asked + steps * step).toFixed(6));
-    const table = tableAt(scored, glosses, cutoff, head);
-    if (servedBytes(table).gzip <= budget) return table;
-    if (!table.rows)
-      throw new Error(`Even an empty table is over ${budget} bytes gzipped`);
-  }
+  return raiseToFit(
+    head.asked,
+    (cutoff) => tableAt(scored, glosses, cutoff, head),
+    (table) => !table.rows,
+    budget,
+    step,
+  );
 }
 
 /** A hint as the page words it: "related: RNAH ‘sunrise’". */
@@ -149,6 +171,31 @@ export const sampleName = (seed: number, cutoff: number) =>
   `sample-seed${seed}-z${cutoff}.tsv`;
 
 /**
+ * `size` of `pool`, chosen at random from a fixed seed, so a rebuild of
+ * the same table draws the same sample; in the order of `keyOf`, which
+ * names each one uniquely.
+ */
+export function drawSample<T>(
+  pool: readonly T[],
+  keyOf: (one: T) => string,
+  size = SAMPLE_SIZE,
+  seed = SAMPLE_SEED,
+): T[] {
+  const sorted = [...pool].sort((a, b) => (keyOf(a) < keyOf(b) ? -1 : 1));
+  const next = random(seed);
+  // A partial Fisher-Yates shuffle: the first `size` places.
+  for (let at = 0; at < Math.min(size, sorted.length); at++) {
+    const pick = at + Math.floor(next() * (sorted.length - at));
+    [sorted[at], sorted[pick]] = [sorted[pick], sorted[at]];
+  }
+  return sorted.slice(0, size).sort((a, b) => {
+    const x = keyOf(a);
+    const y = keyOf(b);
+    return x < y ? -1 : x > y ? 1 : 0;
+  });
+}
+
+/**
  * `size` of the kept hints, chosen at random from a fixed seed, so a
  * rebuild of the same table draws the same sample; in word order.
  */
@@ -157,16 +204,7 @@ export function sampleHints(
   size = SAMPLE_SIZE,
   seed = SAMPLE_SEED,
 ): Scored[] {
-  const pool = [...kept].sort((a, b) => (a.word < b.word ? -1 : 1));
-  const next = random(seed);
-  // A partial Fisher-Yates shuffle: the first `size` places.
-  for (let at = 0; at < Math.min(size, pool.length); at++) {
-    const pick = at + Math.floor(next() * (pool.length - at));
-    [pool[at], pool[pick]] = [pool[pick], pool[at]];
-  }
-  return pool
-    .slice(0, size)
-    .sort((a, b) => (a.word < b.word ? -1 : a.word > b.word ? 1 : 0));
+  return drawSample(kept, (one) => one.word, size, seed);
 }
 
 /**
@@ -212,6 +250,7 @@ export type Verdict = "good" | "loose" | "wrong";
 
 /** One judged hint, read back from the judges' file. */
 export interface Judged {
+  /** The word hinted at, or, for related words, the entry. */
   word: string;
   z: number;
   verdict: Verdict;
@@ -228,18 +267,40 @@ const VERDICTS: Readonly<Record<string, Verdict>> = {
   w: "wrong",
 };
 
-/** The judged hints of a judges' file; unjudged lines are counted apart. */
+/**
+ * The judged hints of a judges' file; unjudged lines are counted apart.
+ * The first column after `n` names what was judged (a word, or an
+ * entry); the header line (`n` first) says which columns hold the hint
+ * ("hint" or "related"), the z-score and the verdict, and without one
+ * they are the gap hints' third, fourth and fifth.
+ */
 export function readVerdicts(text: string): {
   judged: Judged[];
   unjudged: number;
 } {
   const judged: Judged[] = [];
   let unjudged = 0;
+  let columns = { hint: 2, z: 3, verdict: 4 };
   for (const line of text.split(/\r?\n/)) {
-    if (!line.trim() || line.startsWith("#") || line.startsWith("n\t"))
+    if (line.startsWith("n\t")) {
+      const names = line.split("\t");
+      const at = (...these: string[]) =>
+        names.findIndex((name) => these.includes(name));
+      columns = {
+        hint: at("hint", "related"),
+        z: at("z"),
+        verdict: at("verdict"),
+      };
+      if (Object.values(columns).some((one) => one < 0))
+        throw new Error(`Can't read this header: ${line}`);
       continue;
+    }
+    if (!line.trim() || line.startsWith("#")) continue;
     const cells = line.split("\t");
-    const [, word, hint = "", z, said = ""] = cells;
+    const word = cells[1];
+    const hint = cells[columns.hint] ?? "";
+    const z = cells[columns.z];
+    const said = cells[columns.verdict] ?? "";
     const verdict = VERDICTS[said.trim().toLowerCase()];
     if (!said.trim()) {
       unjudged++;

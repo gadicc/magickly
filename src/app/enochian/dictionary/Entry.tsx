@@ -55,6 +55,21 @@ export const ENTRY_STYLES = {
   "& .entry-uses a": { color: "primary.main", fontWeight: 500 },
   "& .entry-quote": { fontSize: 14, color: "text.secondary" },
   "& .entry-quote b": { color: "text.primary", fontWeight: 500 },
+  "& .entry-related": { listStyle: "none", margin: 0, padding: 0 },
+  "& .entry-related li": { margin: "4px 0" },
+  // A form that opens its entry: a button, worded as the Keys' links are.
+  "& .entry-related-form": {
+    font: "inherit",
+    color: "primary.main",
+    fontWeight: 500,
+    background: "none",
+    border: 0,
+    padding: 0,
+    cursor: "pointer",
+    "&:hover, &:focus-visible": { textDecoration: "underline" },
+  },
+  // Focused when a related word opens its entry, for the keyboard's sake.
+  "& h2:focus:not(:focus-visible)": { outline: "none" },
 } as const;
 
 /** "ah (EMPM)" for each of a word's pronunciations. */
@@ -127,7 +142,9 @@ export default function Entry({
   return (
     <Box sx={ENTRY_STYLES}>
       <div className="entry-head">
-        <h2 id={headingId}>{word}</h2>
+        <h2 id={headingId} tabIndex={-1}>
+          {word}
+        </h2>
         <span className="entry-script" style={EnochianFont.style}>
           {word}
         </span>

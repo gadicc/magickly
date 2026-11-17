@@ -1122,6 +1122,37 @@ SCOWL (Kevin Atkinson) beside GeoNames.
   default level. The gloss hash covers the recipe and every candidate
   gloss's text, wording and forms; `table.test.ts` fails on a change,
   naming the commands.
+- **The shipped table, at z >= 6.75**: 472 entries, 664 items, in 373
+  rows, 18,598 bytes served, 7,116 gzipped. The two samples drawn at
+  6.0 before the number rule no longer match it and are kept, in
+  `.private/`, as they are.
+- **Judging and the cut-off**: three judgings, in order, each by a
+  separate fresh model judge with the spike's rubric (good, loose or
+  wrong, for the related word against the entry's meanings), shown no
+  z-scores (2F's judges saw them). (1) Seed 1 at z >= 6.0, the cut-off
+  chosen from the z distribution before drawing: 126 good, 65 loose, 9
+  wrong (95.5% good or loose, 4.5% wrong), passing. (2) Seed 2 at 6.0,
+  drawn to confirm the thin margin: 120 good, 65 loose, 15 wrong (92.5%,
+  7.5% wrong), failing; `score` put its pass at 6.557. Together, at
+  6.75: 216 rows, 3.7% wrong. (3) Then 6.75 was chosen from both, the
+  number rule added, the table rebuilt, and seed 3 drawn at 6.75 and
+  held out: 141 good, 55 loose, 4 wrong (98.0% good or loose, 2.0%
+  wrong), passing. It is committed as
+  `related/judged-z6.75-seed3.tsv`, and `related.test.ts` checks the
+  table is the one it was drawn from (each pair is the table's, and the
+  table redraws the same 200 with seed 3). Its wrong rows: CORS "such,
+  work" and VAUL "to work" (the judge's least certain), HCOMA "water
+  name, tablet of union" and TOANT "union", UGEG and NOAR "is become",
+  and UGEG "strong" and GOSA "strange". The cost of the margin is
+  coverage: 687 entries had related words at 6.0, 472 have them at
+  6.75.
+- **Weak rows the judgings noticed**, left in: "Son of Light" against
+  "Son of Son of Light" (loose); near-inflections whose form is a
+  prefix or an extension of the entry's own (about 160 of 1,201 at
+  6.0, judged good as inflections); and two likely data errors, LUIAHE
+  glossed both "a son of" and "a Song of honour" (a mis-split "Song"),
+  and GESCO carrying both "is not the fourth" and "but with the holy
+  Pentagram". Candidates for the dictionary's fixes.
 - **Loading**: a force-static route, `/enochian/translate/hints.json`,
   as the Keys table's, fetched once, with the first English-into-
   Enochian result shown, gap or none (after the review; at first it was
@@ -1152,6 +1183,115 @@ SCOWL (Kevin Atkinson) beside GeoNames.
   ("soled" is in it), and dropping rows now would part the committed
   sample from the table. Candidates for the denylist when the table is
   next re-judged.
+
+### 2G build notes (17 November 2026)
+
+Each dictionary entry gets "Related by meaning": up to three of our
+other glosses close in meaning to its own, with the forms that open
+their entries. The script is a mode of `scripts/enochian-hints/`
+(`related.ts`; `pnpm enochian:hints related build|sample|score`, no
+network, never embedding); the table is
+`src/app/enochian/dictionary/related/table.json`, with a README (what
+it is, the recipe, the judging, how to rebuild).
+
+- **The glosses** are the gap hints' after `englishOnly`, 1,286, not
+  the 1,366 candidates before it: the 80 it drops are garbled ("squar",
+  "sangef"), and here they would be shown to readers just as a hint's
+  are. So `build` reads SCOWL's archive as 2F's modes do, though none
+  of its words is in the table, which derives only from our glosses (no
+  outside licence; AGENTS.md unchanged). All 1,286 vectors were in the
+  cache; a missing one stops the build, naming the glosses.
+- **The relation**: each gloss's cosine to every other, z-scored
+  against its own cosines to all the others (itself left out), as 2F's
+  z but on this population. An entry's glosses are those whose lookup
+  forms include a form its headword folds to (the dictionary's meanings
+  and Dee's English alike). An entry ranks every other gloss by its
+  **best z from any of its own glosses** and keeps the best three at or
+  above the cut-off; its own glosses never, so never one whose forms
+  open it.
+- **Beyond the brief**: (1) Hub words (DE, CHIS, NONCF, Q, LAP, GEH,
+  BRINTS) get no related words of their own, as well as never being
+  shown. (2) A gloss shows only the forms that open a dictionary entry
+  of their own (a Keys form the dictionary lacks, or one the lookup
+  reads as parts, such as TAUIU, is left out), and each form once per
+  entry: a gloss's forms that a better related word already shows are
+  dropped, and a gloss left with none takes no place. Without this, 102
+  of 687 entries at z >= 6 repeated a form ("glory", "that the glory"
+  and "in the glory" all BUSDIR). Identical glosses were already one
+  gloss (no two candidates share a wording). (3) "Related by meaning"
+  comes after "In the Keys", the entry's own facts first and the
+  machine's suggestions last. Both load lazily, so Related waits until
+  "In the Keys" has its uses (or has failed) before it shows: "In the
+  Keys" never appears above it and pushes it down. Related appearing
+  still moves the Copy link row once. (4) Opening a related word focuses the new entry's
+  heading (now `tabIndex={-1}`), since the button that had focus goes
+  with the old entry. (5) The table also has a budget, the gap hints'
+  150 KB gzipped (raising the cut-off a tenth at a time); it is far
+  under. (6) Only the dictionary's entry shows related words; the
+  translator's entry view, which opens Keys rows rather than entries,
+  doesn't.
+- **The number rule** (after the first judging): the most regular
+  wrong verdicts were different numbers (AF "19" and EM "nine", NI
+  "28" and P "eight", NOGES "not the fourth" and AGO "not the fifth").
+  A related word is dropped, taking no place, when both it and the
+  entry's gloss it was matched by (the one its best z came from) name
+  numbers and share none (`numbersIn`, `differentNumbers` in
+  `related.ts`; sharing one keeps them, since "one" and "first" have
+  senses that aren't numbers: FALOD "the third arrives first" and "in
+  the third", DANPHA "the three are One" and "all one"): numerals, cardinal and ordinal words by value ("nine"
+  and "ninth" are both 9, "twenty eight" is 28) and simple fractions
+  ("half", "a quarter", "one fourth"; a quarter is not "fourth"). At z
+  >= 6 it drops 11, at 6.75 four (AF/EM, AGO/GESCO, GESCO/AGO,
+  GESCO/GED). It can't catch OBZA "half" and PALA "two", matched
+  through OBZA's "dual", which names no number, nor ES and DROES "at
+  any quarter", matched through ES's "a quarter", the same number.
+- **The first build, at z >= 6.0** (before the number rule): 1,132 entries have a gloss in the
+  set; 687 get related words, 1,201 items in all (328 entries one, 204
+  two, 155 three), in 558 rows,
+  28,393 bytes served, 10,797 gzipped. z of every ranked related word
+  (the best three per entry, 3,396): min 2.60, p10 3.87, p25 4.58,
+  median 5.46, p75 6.46, p90 7.35, p99 9.27, max 12.29; of each
+  entry's best: median 6.43. Kept at each cut-off: 5.0, 949 entries and
+  2,153 items; 5.5, 830 and 1,656; 6.0, 687 and 1,201; 6.5, 548 and
+  832; 7.0, 364 and 474; 7.5, 238 and 289; 8.0, 171 and 194.
+- **Why 6.0 to start**: it is near the median entry's best (6.43), so
+  about two entries in three keep a related word; a look at the 5 to 6
+  band found opposites (south for north, east for west) and notes, and
+  the 6 to 7 band mostly synonyms and fair pointers with a few wrong
+  ones. `score` can only raise a cut-off, so starting below the likely
+  pass (2F's was 7.0) gives the judging room.
+- **Sampling and scoring** reuse 2F's: the seeded draw (`drawSample`),
+  never overwriting a sample, the bar (at least 90% good or loose, at
+  most 5% wrong) and the lowest passing cut-off. The judges' file has
+  the entry, its meanings, the related form(s) and gloss, z and
+  verdict; `readVerdicts` now reads its columns from the header line
+  (2F's files read as before).
+- **The table**: rows `[wording, [forms]]` (a form as its entry's key,
+  or `[form, key]` where they differ), and `related`, each entry's key
+  to its rows, best first; no scores. Its gloss hash covers the recipe
+  and every candidate gloss's text, wording, forms, the forms that open
+  an entry and the entries it belongs to; `related.test.ts` fails on a
+  change, naming the commands.
+- **Loading**: a force-static route, `/enochian/dictionary/related.json`,
+  as "In the Keys" has, fetched once, the first time an entry is shown,
+  with only the origin as Referer (the page's address holds the search
+  in `?q=`). A failed load, or an entry without related words, shows
+  nothing. A related form is a button that opens its entry as a row
+  does (the same history and URL state). On a phone the sheet now has its
+  own scroll box, reset to the top when the word changes, so a word
+  opened from within it starts at its heading (a ref in the paper's
+  slot props would replace SwipeableDrawer's own paper ref, which
+  `mergeSlotProps` lets the outside props override).
+- **Found in passing**: "In the Keys" fetched its uses with the full
+  Referer, which holds the reader's `?q=` search; it now sends only
+  the origin, as the related words' fetch does, with a test.
+- **Page text**: one bullet in "About the dictionary": "and up to three
+  meanings a machine found close to the word's own, with the words that
+  carry them, a suggestion no one has reviewed" (the previous bullet lost its "and"). This changes site
+  search's catalogue, so its vectors need republishing.
+- **Lingui**: the dictionary's text isn't marked for Lingui yet, so the
+  new labels follow `labels.ts` and the page text `DictionaryText.tsx`
+  as they are, unmarked.
 
 ## The stage-1 review (Fable, 13 November 2026)
 

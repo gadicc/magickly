@@ -267,10 +267,10 @@ const checkedWords = (wordingOf: string) =>
  * "terrour" passes as "terror". Run at build time, since the lists come
  * from the archive; it only removes glosses, so it needs no new vectors.
  */
-export function englishOnly(
-  glosses: readonly HintGloss[],
+export function englishOnly<T extends HintGloss>(
+  glosses: readonly T[],
   english: ReadonlySet<string>,
-): HintGloss[] {
+): T[] {
   return glosses.filter((one) =>
     [
       ...checkedWords(one.text),

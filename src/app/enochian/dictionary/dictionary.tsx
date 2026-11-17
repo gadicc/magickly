@@ -15,6 +15,7 @@ import InTheKeys from "./InTheKeys";
 import Keypad from "./Keypad";
 import { LABELS } from "./labels";
 import PreviewShell, { PreviewBoundary } from "./PreviewShell";
+import Related from "./Related";
 import SourceName from "./SourceName";
 import {
   buildIndex,
@@ -484,6 +485,16 @@ export default function Dictionary({
     },
     [url.query, url.open, setQuery],
   );
+  // A related word opens its entry as a row does; the button it was
+  // goes with the old entry, so focus moves to the new one's heading.
+  const focusEntry = React.useRef(false);
+  const openRelated = React.useCallback(
+    (key: string) => {
+      focusEntry.current = true;
+      open(key);
+    },
+    [open],
+  );
   const choose = React.useCallback(
     (at: number) => {
       const option = options[at];
@@ -534,6 +545,7 @@ export default function Dictionary({
       headingId={headingId}
     >
       <InTheKeys word={word} />
+      <Related word={word} onOpen={openRelated} />
     </Entry>
   );
   const shown = entry && url.word ? entryOf(url.word) : null;
@@ -563,6 +575,10 @@ export default function Dictionary({
   // biome-ignore lint/correctness/useExhaustiveDependencies: on the word alone
   React.useEffect(() => {
     if (paneRef.current) paneRef.current.scrollTop = 0;
+    if (focusEntry.current) {
+      focusEntry.current = false;
+      document.getElementById(headingId)?.focus({ preventScroll: true });
+    }
   }, [url.word]);
 
   // Escape closes the desktop's entry from anywhere on the page, before
@@ -767,6 +783,7 @@ export default function Dictionary({
         open={!desktop && Boolean(shown)}
         onClose={close}
         headingId={headingId}
+        shown={lastShown.current}
       >
         {!desktop && lastShown.current && entryOf(lastShown.current)}
       </EntrySheet>

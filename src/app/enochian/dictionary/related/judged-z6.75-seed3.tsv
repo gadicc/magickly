@@ -1,0 +1,207 @@
+# Related words to judge (plan 081, S11, step 2G): 200 (entry, related word) pairs drawn at random (seed 3) from the table at z >= 6.75.
+# Judge each related word against the entry's meanings, as the meaning spike judged hints:
+#   good  - the related gloss means what the entry means (the same sense, or as near as a synonym);
+#   loose - related in meaning, a fair pointer for a reader of the entry, not the same meaning;
+#   wrong - anything else.
+# Write good, loose or wrong in the last column, then: pnpm enochian:hints related score <this file>
+n	entry	meanings	related	z	verdict
+1	ABRAMIG	prepared, are prepared	ABRAMG ‘i have prepared’	7.099880	good
+2	ADAPH	Unto (or From) the Lord of Hosts	GENA, GENILE, GENO ‘from the Lord of Hosts’	7.258885	good
+3	ADEPH	Unto (or From) the Lord of Hosts	GENA, GENILE, GENO ‘from the Lord of Hosts’	7.258885	good
+4	ADEPH	Unto (or From) the Lord of Hosts	NA ‘lord of hosts’	6.754930	good
+5	ADGMACH	much glory	BUSDIR, BUSD, BUZD ‘glory’	7.267498	good
+6	ALGLA	invoke the One	ARGEDCO ‘invoke’	7.436484	loose
+7	ALPOD	infinite	NAB ‘The Infinite God’	7.310749	loose
+8	ALPOD	infinite	FAXMAL ‘one with the infinite’	8.244138	loose
+9	ANBPHO	the Son of Son of Light (Mercury) gives the holy pentagram.	ANS ‘the Son of Son of Light is the holy pentagram’	7.020440	loose
+10	ANGELARD	thoughts, his thoughts	ANGE ‘within the thought’	7.425041	good
+11	ANS	the Son of Son of Light is the holy pentagram	ANBPHO ‘the Son of Son of Light gives the holy pentagram’	7.070392	loose
+12	APILA	eternal life, to live forever / liveth	GOHED ‘everlasting’	7.027609	loose
+13	APOPHRASZ	motion	RLU ‘is moving’	7.190835	good
+14	ARCHADS	spread amongst the third is the Daughter of Light	ARCHAS ‘the Daughter of Light is spread amongst the third’	6.751933	good
+15	AZIEN	hands, on whose hands	OZIEN ‘my hands’	8.712130	good
+16	BABAGE	South / south, in the south	BABAGEN ‘of the south’	9.372168	good
+17	BAEQUIB	righteousness	BALTOH, SAMVELG ‘righteous’	8.040939	good
+18	BAGHIE	fury	BAGIE ‘of fury’	8.829805	good
+19	BAHAL	to shout, to yell, to cry / cry aloud	SE ‘cry’	7.798040	good
+20	BAI	stooping, soaring down	A-BAI ‘to the stooping’	9.621552	good
+21	BALIT	the just / justice, the just	OIAD ‘of the just’	7.178569	good
+22	BALT	justice / justice / justice, of justice	BALTAN ‘in his justice’	7.330391	good
+23	BALTOH	righteous / righteousness, of righteousnes / righteousness, of	SAMVELG ‘to the righteous’	8.209459	good
+24	BLIARD	to be with comfort / comfort, with	BLIORS, BLIORT, BLIORB ‘of comfort’	7.272969	good
+25	BLIOR	comfort, continual comforters / comfort	BLIORS, BLIORT, BLIORB ‘of comfort’	7.493186	good
+26	BNG	guardian / guardian	BRANSG ‘guard’	7.750289	good
+27	BNG	guardian / guardian	VBRAH ‘guardian star’	8.421570	loose
+28	BOGPA	to govern / reigns	CABA, TABAORI, TABA ‘govern’	8.087231	good
+29	BRGDO	sleep	PAGE ‘to rest’	6.789360	loose
+30	BUTMONI	mouth, from their mouths	BUTMONA ‘of his mouth’	7.423895	good
+31	CAM	speaking	GOHO ‘to speak’	6.969499	good
+32	CAOSG	earth, the / earth, on the	CAOSGO, CAOSGI ‘of the earth’	7.483648	good
+33	CAOSGA	earth, the	PILD, CAOSG ‘on the earth’	7.345401	good
+34	CAOSGON	earth, to the earth	CAOSGO, CAOSGI ‘of the earth’	7.483648	good
+35	CAOSGON	earth, to the earth	PILD, CAOSG ‘on the earth’	7.345401	good
+36	CEM	of the nine; unto the nine; with the nine	EM ‘nine’	9.551012	good
+37	CICLE	mysteries, the	CICLES ‘of their mysteries’	8.685618	good
+38	CONST	thunders, the	AVAVAGO ‘thunders of increase’	7.029521	loose
+39	CORS	such, work	VAUL ‘to work’	7.703614	wrong
+40	CROODZI	beginning, 2nd beginning of the	IAOD ‘the beginning of’	8.061302	good
+41	DAMPLOZ	variety	DAMPH ‘various’	8.079466	good
+42	DAR	The Philosopher’s Stone	ORRI ‘stone’	6.874647	loose
+43	DLUGAM	given, p.t. "to give" / give, given	IDLUGAM ‘is given’	8.037206	good
+44	DODPAL	VEX, LET THEM VEX	DODSIH, DODSEH ‘vexation’	8.604349	good
+45	DODRMNI	VEX, VEXED	DODPAL ‘let them vex’	7.583949	good
+46	DODSEH	vexation	DODRMNI, DODPAL, DODS ‘vex’	8.255502	good
+47	DODSIH	VEX, VEXATION	DODPAL ‘let them vex’	7.583949	good
+48	DOOAIO	NAME, IN THE NAME OF (ALT.SP)	DOOAIN ‘his name’	6.922484	good
+49	DOOAIO	NAME, IN THE NAME OF (ALT.SP)	DOOIAP ‘In the name’	6.986645	good
+50	DOOIAP	NAME, IN THE NAME OF	DOOAIN ‘his name’	6.922484	good
+51	DRAMAH	the (third) East is in darkness	ORS ‘darkness’	6.917921	loose
+52	EF	VISIT US	DEF, F, ORLO ‘visit’	7.007128	good
+53	ELA	FIRST	ILI ‘in the first’	7.135274	good
+54	ELA	FIRST	L, LA ‘Of THE FIRST’	6.893298	good
+55	EOO	Archetypal man, makes or making man	OOE ‘makes man’	8.528598	good
+56	EOPHAN	sorrow / LAMENTATION, OF	TIBIBP ‘of sorrow’	8.346086	good
+57	ERM	ARK, WITH THE	IADNAH ‘the Ark of knowledge’	7.898264	loose
+58	FARGT	DWELLING PLACES, THE	PARADIAL ‘living dwellings’	6.814022	loose
+59	FIRE	WOE	OHA ‘in or with woe’	7.931850	good
+60	GAMLED	the watery loins of the Daughter of Light initiate the East	GAMPHEDAX, LESGAMPH ‘watery loins of the Daughter of Light’	7.797694	loose
+61	GAN	of the angel	MERIFRI, MURIFRI, OANR ‘angel’	7.148720	good
+62	GANEBUS	angelic	MERIFRI, MURIFRI, OANR ‘angel’	6.962303	good
+63	GAR	the Archangel of the East	LAX, RV ‘Angel of the East’	6.883245	loose
+64	GENO	from the Lord of Hosts	NA ‘lord of hosts’	7.833731	good
+65	GESCO	is not the fourth, but with the holy Pentagram...	GENSO, O ‘the Holy Pentagram’	8.316164	loose
+66	GEVAMNA	BEGINNING (?)	IAOD ‘the beginning of’	8.061302	good
+67	GEVAMNA	BEGINNING (?)	IAODAF ‘in the beginning’	8.107487	good
+68	GOHIA	SAY, WE SAY	GOHO ‘to say’	6.984646	good
+69	GOHOL	SAY, SAYING	GOHO ‘to say’	6.984646	good
+70	GOSA	strange	VGEG ‘become strange’	8.696958	good
+71	GOSA	strange	GOSAA ‘a stranger’	6.817790	loose
+72	GRAA	the Moon / MOON	GRAMFA ‘full moon’	7.364347	loose
+73	GRAA	the Moon / MOON	GRAD ‘moonlight’	6.751487	loose
+74	GRAD	moonlight	GRAA, GRAPAD ‘the Moon’	7.138245	loose
+75	GRAN	ELDERS, ?VAR ON 'URAN'	GRANSE ‘the cry of the Elders’	7.056902	loose
+76	GRAPAD	Moons (pl.)	GRAD ‘moonlight’	6.751487	loose
+77	HCOMA	WATER NAME, TABLET OF UNION	TOANT ‘union’	6.984209	wrong
+78	HOXMARCH	FEAR	HOXPOR ‘Bringing fear’	6.994051	loose
+79	HUBAR	LAMPS, WITH	HUBARO, HUBAIO ‘lamps’	8.252779	good
+80	IADNAH	knowledge / KNOWLEDGE, OF	OM, IXOMAXIP, OMAX ‘know’	6.960407	good
+81	IADNAMAD	KNOWLEDGE, UNDEFILED K.	OM, IXOMAXIP, OMAX ‘know’	6.960407	good
+82	IALPOR	FLAMING	IALPRG ‘and burning flame’	7.011182	good
+83	IALPOR	FLAMING	VEP ‘as a flame’	7.007873	good
+84	IAODAF	BEGINNING, IN THE	IAOD, A-CROODZI, CROODZI ‘beginning’	8.470990	good
+85	IEHUSOZ	MERCY, HIS MERCIES	IEH ‘merciful’	9.286203	good
+86	INOAS	BECOME, THEY ARE BECOME	NOAS ‘are become’	8.133549	good
+87	INOAS	BECOME, THEY ARE BECOME	NOASMI ‘let them become’	6.841392	good
+88	IXOMAXIP	KNOW, LET HER BE KNOWN	OM ‘to know’	7.800362	good
+89	IZAZAZ	have framed	IZAZAS ‘frame’	7.548505	good
+90	L	first / Ur (L) / OF THE FIRST / FIRST / ONE / THE FIRST / ALL ONE.	PALCE ‘All is in the One’	7.320578	loose
+91	LA	Of THE FIRST	ILI ‘in the first’	7.135274	good
+92	LAM	except the first	M ‘except’	6.856964	loose
+93	LANSH	POWER, IN POWER EXALTED	MICALZO ‘in power’	6.958341	good
+94	LAX	Abbreviation for Alt. Part in LIN; Angel of the East	DRUXARH ‘the Angel of the East is among the third’	6.775206	loose
+95	LE	phrase: ‘first,the Daughter of Light’	L, LA ‘Of THE FIRST’	6.893298	loose
+96	LED	first, the Daughter of Light to the East	ILI ‘in the first’	7.135274	loose
+97	LED	first, the Daughter of Light to the East	L, LA ‘Of THE FIRST’	6.893298	loose
+98	LEFE	first, the Daughter of Light appears	L, LA ‘Of THE FIRST’	6.893298	loose
+99	LEOZ	First, the Daughter of Light beholds the Son of Son of Light	ILI ‘in the first’	7.135274	loose
+100	LESCO	first, the Daughter of Light with 5	L, LA ‘Of THE FIRST’	6.893298	loose
+101	LI	FIRST - VAR ON 'ILI'	L, LA ‘Of THE FIRST’	6.893298	good
+102	LONSA	everyone / POWER	MICALZO ‘in power’	6.958341	good
+103	LONSHI	power / POWER, THE / POWER	MICALZO ‘in power’	6.958341	good
+104	LRL	‘first changing one’; God; movement; work / ‘first changing one’; God; movement; work	APOPHRASZ, ZNA ‘motion’	7.854186	good
+105	LRL	‘first changing one’; God; movement; work / ‘first changing one’; God; movement; work	VAUL ‘to work’	7.703614	good
+106	LUSD	feet / FEET, YOUR	LUSDA ‘their feet’	8.246569	good
+107	LUSD	feet / FEET, YOUR	LUSDAN ‘with feet’	7.715179	good
+108	LUSDA	FEET, THEIR	LASDI ‘my feet’	8.371025	good
+109	LUSDA	FEET, THEIR	LUSD ‘your feet’	8.230093	good
+110	M	Tal (M) / EXCEPT / OF (Schuler) / except, 9	LAM ‘except the first’	6.983508	loose
+111	MADRIAX	heaven, you heavens	PERIPSAX ‘with the heavens’	6.990017	good
+112	MAOFFAS	measure, not to be measured	HOLQ ‘it is measured’	7.061447	good
+113	MARUNE	the Son of Light joins the Daughter of Light	MARADON ‘the Son of Light unites with the Daughter of Light’	7.371479	good
+114	MAX	of the dissolution	PAL, X ‘dissolution’	9.690071	good
+115	MICAOLZ	mighty	CRUSCANSE ‘more mighty’	7.133037	good
+116	MOLAP	men / men, of	OLORA ‘of man’	7.794452	good
+117	MONASCI	name, the great name	DOOAIN ‘his name’	6.922484	good
+118	MONASCI	name, the great name	DOOIAP ‘In the name’	6.986645	good
+119	MOZ	joy / joy	MUZPA ‘These are with Joy’	6.861610	loose
+120	MUZPA	These are with Joy	MOZ ‘joy’	7.614058	loose
+121	NAD	the Holy Spirit	CONGAMPHLGH ‘the holy ghost’	7.128099	good
+122	NAPTA	SWORD, WITH TWO-EDGED SWORDS	NAPEA ‘two-edged sword’	9.663977	good
+123	NAPTA	SWORD, WITH TWO-EDGED SWORDS	NAPEAI ‘O you swords’	6.979889	good
+124	NN	root of ‘interiority: within, inside, self-hood', power, ‘my power', thorns, the 'Earth Name, Tablet of Union' (NANAEEL)	MICALZO ‘in power’	6.958341	good
+125	NOALN	BECOME, MAY BE	NOAR ‘is become’	6.999826	good
+126	NOASMI	BECOME, LET THEM BECOME	NOAR ‘is become’	6.999826	good
+127	NOASMI	BECOME, LET THEM BECOME	INOAS ‘they are become’	6.901755	good
+128	NOQOL	servants	CNOQUOL ‘o you servants’	7.843879	good
+129	OBELISON	PLEASANT DELIVERER	OBELISONG ‘as pleasant deliverers’	8.034540	good
+130	OBZa	one half, dual	PALA, POLA ‘two’	6.750346	loose
+131	OFAFAFE	VIAL, VAR ON EFAFAFE	EFAFAFE ‘the Viols’	8.817165	good
+132	OH	Root of OHIO; woe	OHA ‘in or with woe’	7.931850	good
+133	OHA	in or with woe	TIBIBP ‘of sorrow’	6.859522	loose
+134	OHA	in or with woe	OHIO, FIRE, OH ‘woe’	7.838725	good
+135	OL	to make, maker / I (poss. "The Maker"- see OLN, / IN THE 24TH PART / (NONE SHOWN) / 24 / MAKE, I MADE	OLN, CORD, ON ‘made’	6.970805	good
+136	OLANI	FOR TWO TIMES	OLAHO ‘for the second time’	8.013186	loose
+137	OLLAR	man	OLLOG, CORDZIZ, MOLAP ‘men’	6.842221	good
+138	OLLAR	man	OLORA ‘of man’	6.865087	good
+139	OLLOG	men / MEN	OLORA, CORDZIZ, OLLAR ‘man’	7.056388	good
+140	OLLOR	MAN	OLLOG, CORDZIZ, MOLAP ‘men’	6.842221	good
+141	OLN	MADE	OL ‘i made’	6.808872	good
+142	OMAOAS	NAMES, THEIR	DOOAIN ‘his name’	6.922484	good
+143	OMICAOLZ	MIGHTY, BE MIGHTY	CRUSCANSE ‘more mighty’	7.133037	good
+144	ONEDON	completion	RLU ‘completed’	7.267992	good
+145	ONIXDAR	Proclaiming	SABULAN ‘who proclaims’	8.677989	good
+146	ORA	third,the third	AD ‘in the third’	7.126347	good
+147	ORCANOR	the mighty manifest	ORDAN ‘manifest’	6.923192	loose
+148	ORLO	Initiation, Visitation; n.Initiate, visit; v.	ORNO ‘divine visitation’	6.791242	good
+149	ORSCA	BUILDINGS, THE	TROF ‘building’	6.978268	good
+150	ORSCOR	DRYNESS, WITH	GEMPH ‘without the water’	8.010724	loose
+151	OUCHO	CONFOUND, LET IT CONFOUND	URCH ‘confounding angels’	7.291756	loose
+152	OZIEN	HANDS, MY	ZIEN ‘of my hands’	7.757331	good
+153	OZONGON	WINDS, MANIFOLD	ZONG ‘of the winds’	9.451650	good
+154	PANPIR	pouring down	PAN ‘Fire pouring down’	6.933871	loose
+155	PHAMAH	GIVE, VAR ON 'PHAMA'	DLUGAR ‘to give’	7.191707	good
+156	PILZIN	FIRMAMENT OF WATERS	CALZ ‘above the firmaments’	7.311406	loose
+157	PIR	bright / HOLY ONES	LUCIFTIAN ‘brightness’	6.896131	good
+158	POILP	to be divided / DIVIDE, ARE DIVIDED	YRPOIL ‘division’	7.520805	good
+159	PRAC	dwelling in	FAONTS ‘to dwell in’	7.924733	good
+160	PRAGMA	dwell (?)	FAONTS ‘to dwell in’	7.422811	good
+161	PURGEL	FIRE OF FIRE / of fires	PRGE, BITOM, IALPIRGAH ‘fire’	6.784194	good
+162	QAA	creation / GARMENTS, YOUR / CREATION, OF YOUR	QAAN, QAAON ‘in your creation’	7.256298	good
+163	QAADAH	CREATOR, OF THE	OL ‘maker’	6.759563	good
+164	RACLIR	weeping	SE ‘cry’	7.300736	loose
+165	RIT	mercy / MERCY, OF	IEH ‘merciful’	9.286203	good
+166	RLU	'is moving’; completed; ending / ‘not moving’, ‘not-ing’ or ‘making into not (non-existence)’, destroying	ONEDON ‘completion’	7.432133	good
+167	SABULAN	who proclaims	ONIXDAR ‘Proclaiming’	8.507861	good
+168	SAMVELG	RIGHTEOUS, TO THE	BALTOH, BAEOVIB, BAEQUIB ‘righteousness’	8.204855	good
+169	SAPPOH	the mighty ogdoad	PAH ‘the Ogdoad’	8.873865	loose
+170	SER	MOURNING, LAMENTATION	TIBIBP ‘sorrow’	6.827832	loose
+171	T	is, as, like, likeness, equality, equilibrium / Gisa (T) / IT / ALSO	AZIAZIOR ‘in the likeness’	8.048700	good
+172	TA	is, as, like, likeness, equality, equilibrium / AS	AZIAZIOR ‘in the likeness’	8.048700	good
+173	TABAORD	GOVERN, LET HER BE GOVERNED	BOGPA, CABA ‘to govern’	8.057967	good
+174	TAFA	poison	FABOAN ‘with poison’	8.576269	good
+175	TELOAH	DEATH, VAR ON 'TELOCH'	TELOCH ‘of death’	8.856052	good
+176	TIBIBP	sorrow / SORROW, OF	EOPHAN ‘of lamentation’	7.173554	loose
+177	TOANT	love, union	PRAS ‘unite’	7.363177	good
+178	TOFGLO	THINGS, ALL	TOL ‘everything’	7.497965	good
+179	TOLTORN	CREATURES / CREATURE	HAMI ‘living creatures’	8.061032	good
+180	UGEAR	strength, the s. of men	VGEG, VRELP ‘strong’	7.258719	good
+181	UGEG	strong, grow / strong, waxes / strong, become	NOAR ‘is become’	6.999826	wrong
+182	UGEG	strong, grow / strong, waxes / strong, become	GOSA ‘strange’	8.426800	wrong
+183	UGEG	strong, grow / strong, waxes / strong, become	VGEAR, VMPLIF ‘strength’	6.954044	good
+184	UM	called, named, var on 'vmd'	DOOAIN ‘his name’	6.922484	loose
+185	UMPLIF	strength, our	VGEG, VRELP ‘strong’	7.258719	good
+186	UNALAB	skirt	VNAEM ‘nine skirts’	7.312384	loose
+187	UNPH	anger, wrath. var on 'vonph'?	NAX, GRONADOX ‘Wrath of God’	6.874373	loose
+188	VAOAN	truth / truth	LAIAD ‘secrets of truth’	7.111923	loose
+189	VLLA	the end of the beginning	UL, VLS, GALVAH ‘the ends’	6.750553	loose
+190	VOM	of everyone	LONSA ‘everyone’	8.020172	good
+191	VONPOVNPH	wrath in anger	VONPHO ‘of wrath’	8.343292	good
+192	VONPOVNPH	wrath in anger	VNPH ‘wrath’	9.281284	good
+193	VOOAN	truth	LAIAD ‘secrets of truth’	7.111923	loose
+194	VRELP	an adept, seer / seething, a strong	VGEAR, VMPLIF ‘strength’	6.954044	good
+195	VRELP	an adept, seer / seething, a strong	GIUI ‘stronger’	6.767154	good
+196	ZACAM	I MOVE YOU	ZACAR ‘move’	6.903503	good
+197	ZEN	sacrifice / EIGHTEENTH AETHYR	DOX ‘the sacrificial fire’	7.083545	loose
+198	ZIN	waters	ZLIDA ‘to water’	7.097025	loose
+199	ZIXLAY	TO STIR UP	LRING ‘stir up’	9.573367	good
+200	ZNRZA	SWORE	SURZAS ‘swear’	9.077520	good

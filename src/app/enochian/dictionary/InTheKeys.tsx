@@ -11,9 +11,13 @@ export const USES_URL = "/enochian/dictionary/keys.json";
 
 let loading: Promise<Record<string, KeyUse[]>> | undefined;
 
-/** The map of uses, fetched once per page load; a failure may be retried. */
-function loadUses() {
-  loading ??= fetch(USES_URL)
+/**
+ * The map of uses, fetched once per page load; a failure may be retried.
+ * The page's address holds the reader's search, so the request sends
+ * only the origin as its Referer.
+ */
+export function loadUses() {
+  loading ??= fetch(USES_URL, { referrerPolicy: "origin" })
     .then((response) => {
       if (!response.ok) throw new Error(`${USES_URL}: ${response.status}`);
       return response.json() as Promise<Record<string, KeyUse[]>>;
@@ -23,6 +27,11 @@ function loadUses() {
       throw error;
     });
   return loading;
+}
+
+/** Forgets the map of uses, so the next load fetches again (for tests). */
+export function forgetUses() {
+  loading = undefined;
 }
 
 /** The Keys page's anchor for a use: the Key (or Aethyr) and the word. */

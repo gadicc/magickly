@@ -49,6 +49,13 @@ export const LABELS = {
   quoteOpen: (before: string) => (before ? `“…${before} ` : "“"),
   quoteClose: (after: string) => (after ? ` ${after}…”` : "”"),
   moreUses: (count: number) => `and ${count} more`,
+  /**
+   * An entry's related words (plan 081, S11, step 2G): other words whose
+   * meanings a machine found close to this one's, marked as unreviewed.
+   */
+  related: "Related by meaning",
+  relatedGloss: (gloss: string) => `‘${gloss}’`,
+  relatedNote: "Suggested by a machine from the meanings, not reviewed.",
   // The translator's preview, for a query of three words or more (plan
   // 081, decision 3).
   preview: "As a sentence",

@@ -11,6 +11,7 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { GEMATRIA_NOTE } from "../gematria";
 import Dictionary from "./dictionary";
+import { USES_URL } from "./InTheKeys";
 
 const PATH = "/enochian/dictionary";
 
@@ -245,7 +246,15 @@ describe("In the Keys (plan 074, decision 9)", () => {
     expect(within(sheet).getByText("light,").tagName).toBe("B");
     fireEvent.click(within(sheet).getByRole("button", { name: "and 1 more" }));
     expect(within(sheet).getByRole("link", { name: "Key 3" })).toBeTruthy();
-    expect(fetch).toHaveBeenCalledTimes(1);
+    // Once for the uses (the entry's related words have their own), and
+    // with only the origin as Referer: the address holds the search.
+    const calls = fetch.mock.calls.filter(
+      ([url]: unknown[]) => url === USES_URL,
+    ) as unknown[][];
+    expect(calls).toHaveLength(1);
+    expect((calls[0][1] as RequestInit | undefined)?.referrerPolicy).toBe(
+      "origin",
+    );
     vi.unstubAllGlobals();
   });
 });

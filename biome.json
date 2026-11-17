@@ -25,6 +25,8 @@
       "!src/geo/server/*.tsv",
       "!src/app/enochian/translate/hints/table.json",
       "!src/app/enochian/translate/hints/*.tsv",
+      "!src/app/enochian/dictionary/related/table.json",
+      "!src/app/enochian/dictionary/related/*.tsv",
       "!vendor/**"
     ]
   },

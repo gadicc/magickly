@@ -50,8 +50,10 @@ export default function DictionaryText() {
           its gematria, where it has one: Gerald Schueler&apos;s numerical value
           of its letters, explained under Sources,
         </li>
+        <li>where the Keys use the word, with Dee&apos;s English around it,</li>
         <li>
-          and where the Keys use the word, with Dee&apos;s English around it.
+          and up to three meanings a machine found close to the word&apos;s own,
+          with the words that carry them, a suggestion no one has reviewed.
         </li>
       </List>
       <p>
