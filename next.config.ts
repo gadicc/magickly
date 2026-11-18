@@ -129,7 +129,8 @@ export default async function (phase: string): Promise<NextConfig> {
     // read by Turbopack (plan 052).
     transpilePackages: ["magick-data", "magick-components"],
     outputFileTracingIncludes: {
-      "/api/search": ["./public/search-vectors/*.bin"],
+      // The keyed vector artifact search:build assembles (plan 087).
+      "/api/search": ["./src/search/generated/search-vectors.bin"],
       // Read with fs by src/geo/server/places.ts, so not traced on its own.
       "/api/places": ["./src/geo/server/places.tsv"],
       // Read with fs by src/app/enochian/translate/ruleNotes.server.ts when

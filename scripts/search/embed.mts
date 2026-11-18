@@ -21,8 +21,10 @@ import {
   catalogueDigest,
   digest,
   embeddingCacheKey,
+  embeddingDocumentInput,
   embeddingRecords,
 } from "../../src/search/embeddings/records";
+import { publishRows } from "../../src/search/embeddings/rows";
 import type { SearchEmbeddingManifest } from "../../src/search/embeddings/store";
 import { createSearchEngine } from "../../src/search/engine";
 import { SEARCH_PROBES } from "./evaluation";
@@ -55,11 +57,7 @@ const maxEstimate = profiles.reduce((total, profile) => {
     throw new Error("Cannot verify model price");
   const bytes = records.reduce(
     (sum, record) =>
-      sum +
-      Buffer.byteLength(
-        embeddingInput(profile, "document", record.text, record.title),
-      ) +
-      256,
+      sum + Buffer.byteLength(embeddingDocumentInput(profile, record)) + 256,
     0,
   );
   return total + (bytes * 2 + 100_000) * price;
@@ -72,13 +70,9 @@ console.log(
 const report: unknown[] = [];
 for (const profile of profiles) {
   const started = performance.now();
+  // The shared recipe (records.ts), so these keys are the rows store.ts finds.
   const values = records.map((record) =>
-    embeddingInput(
-      profile,
-      "document",
-      record.text,
-      [record.title, record.section].filter(Boolean).join(" · "),
-    ),
+    embeddingDocumentInput(profile, record),
   );
   const vectors: number[][] = [];
   let tokens = 0;
@@ -192,6 +186,16 @@ for (const profile of profiles) {
     writeFileSync(
       resolve(root, "src/search/embeddings/manifest.json"),
       JSON.stringify(manifest, null, 2) + "\n",
+    );
+    // The committed rows (plan 087): the same bytes, one file per row.
+    const { written, pruned } = publishRows(
+      root,
+      profile,
+      values.map((value) => embeddingCacheKey(profile, value)),
+      bytes,
+    );
+    console.log(
+      `${profile.key}: wrote ${written} rows, pruned ${pruned.length}`,
     );
   }
   report.push({
