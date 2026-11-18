@@ -95,4 +95,51 @@ export interface SigilProfile {
    * neighbours' anchors and still be "passed through" (decision 2).
    */
   nooseTolerance: number;
+  /** Mark sizes for the renderer; `DEFAULT_SIGIL_MARKS` when not given. */
+  marks?: SigilMarkSizes;
+  /** Rule placement's settings; `DEFAULT_SIGIL_PLACEMENT` when not given. */
+  placement?: SigilPlacementSettings;
+}
+
+/**
+ * How big the renderer draws each mark, in sigil units, inside the figure
+ * grammar's ranges (plan 088, "Renderer"; the oracle's `FIGURE_GRAMMAR`).
+ */
+export interface SigilMarkSizes {
+  /** R1: the start circle's radius. */
+  startRadius: number;
+  /** R3: the widest a crook's cup is drawn, along the line. */
+  cupChord: number;
+  /** R3: the narrowest, when a short stroke must hold the wave. */
+  cupMinChord: number;
+  /** R3: how far a cup bulges from the line. */
+  cupDepth: number;
+  /** R4: the noose's radius. */
+  nooseRadius: number;
+  /** R5: the end bar's length. */
+  barLength: number;
+  /** Straight line a stroke keeps beside its marks, so its direction shows. */
+  minStraight: number;
+}
+
+/**
+ * Rule placement's settings (plan 088, "Placement: by rule, not by
+ * solver"), in sigil units.
+ */
+export interface SigilPlacementSettings {
+  /**
+   * How far a revisit sits beside its place's earlier visit, sideways
+   * from the stroke into it (F1).
+   */
+  revisitOffset: number;
+  /**
+   * The steps a vertex may move from its rule position when a check fails,
+   * tried in order, each in the directions placement lists; capped by the
+   * place's slack less `slackMargin`.
+   */
+  steps: readonly number[];
+  /** Kept between a moved vertex and the edge of its place's slack. */
+  slackMargin: number;
+  /** Candidate positions tried, over a whole word, before placement settles for the fewest failures. */
+  budget: number;
 }
