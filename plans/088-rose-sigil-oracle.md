@@ -118,6 +118,35 @@ His spellings are his own: 10 of the 72 differ from the triads of Exodus
 14:19–21 (#24, 33, 34, 38, 51, 59, 64, 68 have He for Cheth; #30 is ומאאל
 for אומאל; #66 ends יה for אל), and his figures follow his spellings.
 
+### S0: the annotations (18 November 2026)
+
+Two annotators (Opus 5.5 high and Fable 5.2 high), working apart, recorded
+every figure's marks per letter; the files stay in
+`~/Documents/Magick/RoseSigils/` (`annotation-A.json`, `annotation-B.json`,
+`annotation-reconciled.json`). They agree on every mark of all 72
+figures. What they found:
+
+- **He prints no rose.** Each page shows only the name's letters spaced
+  round a band, with the sigil drawn inside; letters are known by position.
+  Fitted (scale and shift) to one shared 22-place layout, his points come
+  out as the Golden Dawn rose, within about 0.1 of the outer radius of
+  their places (worst 0.22).
+- Start circle on the first letter and bar on the last in all 72; every
+  revisit (36, in 32 figures) is drawn beside the earlier visit, never on
+  it; every wave has two lobes per repeat except #43 (one arch); the two
+  triples are four lobes in a row; 13 beads in 12 figures.
+- His slips: from #53 on, Nun is drawn at Gimel's place (#53, 54, 57, 63,
+  66; earlier Nuns are in place), and #70 is drawn י מ ב י ה.
+
+Marks compared with the reference plan of each of his spellings (a
+preview of S3; placement is not compared): at a 1-unit tolerance 67 of
+72 agree, at 3 units 67, at 5 units 68, at 6 units 67. The five
+disagreements at 1 unit are all his conventions or slips: a bead for a
+revisit on a near-straight line (#7 אכאיה, #72 מומיה), two beads for a
+doubled letter on a straight pass (#26, decision 4), the one-arch wave
+(#43) and #70's order. A wider tolerance buys #72 and costs #65 דמביה, a
+bead on a 47° corner, so the comparison does not argue for widening it.
+
 ## What is wrong today (measured 18 November 2026, at `f5128585`)
 
 | Name | Ours | Expected |
