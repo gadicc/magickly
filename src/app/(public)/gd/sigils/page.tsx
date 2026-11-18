@@ -1,6 +1,7 @@
 import { pageSearchParams } from "@/lib/pageSearchParams";
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import { pageMetadata } from "@/seo/metadata";
+import SigilsText from "../../../gd/sigils/SigilsText";
 import { sigilFromSearchParams } from "../../../gd/sigils/sigilState";
 import Sigils from "../../../gd/sigils/sigils";
 
@@ -12,12 +13,15 @@ export default async function SigilsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const initial = sigilFromSearchParams(pageSearchParams(await searchParams));
   return (
     <>
       <PageBreadcrumbs path="/gd/sigils" />
-      <Sigils
-        initial={sigilFromSearchParams(pageSearchParams(await searchParams))}
-      />
+      {/* Keyed by the shared sigil, so a link to another one (the text's
+          examples) starts the generator afresh rather than keeping the
+          text typed so far. */}
+      <Sigils key={JSON.stringify(initial)} initial={initial} />
+      <SigilsText />
     </>
   );
 }

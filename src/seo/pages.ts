@@ -146,10 +146,11 @@ export const PUBLIC_PAGES = {
       "tablets, plus the private temple rituals you can read when signed in.",
   },
   "/gd/sigils": {
-    title: "Rose Cross Sigil Generator",
+    title: "Golden Dawn Sigil Generator: Rose Cross Sigils",
     description:
-      "Trace a sigil for a Hebrew name on the Golden Dawn Rose Cross, " +
-      "animated letter by letter and exportable as SVG or PNG.",
+      "Draw the Rose Cross sigil of any Hebrew name or angel by the Golden " +
+      "Dawn's own rules, as Regardie printed them. Animated, and exportable " +
+      "as SVG or PNG.",
   },
   "/gd/symbols": {
     title: "Golden Dawn Temple Symbols",

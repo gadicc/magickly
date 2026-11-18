@@ -1350,6 +1350,121 @@ msgid "Moved from its letter"
 msgstr "Moved from its letter"
 
 #. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "How a Rose Cross sigil is drawn"
+msgstr "How a Rose Cross sigil is drawn"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "The Golden Dawn drew the sigil of a name by tracing it through the letters of the Rose Cross. The rose at its centre carries the 22 letters of the Hebrew alphabet on three rings of petals: the three mother letters innermost, the seven double letters around them and the twelve single letters outside. Israel Regardie printed the Order's rules in <0>The Golden Dawn</0>, volume 4 (1940), with the sigils of Metatron, Elohim and the divine names of Binah drawn as examples. This generator follows those rules."
+msgstr "The Golden Dawn drew the sigil of a name by tracing it through the letters of the Rose Cross. The rose at its centre carries the 22 letters of the Hebrew alphabet on three rings of petals: the three mother letters innermost, the seven double letters around them and the twelve single letters outside. Israel Regardie printed the Order's rules in <0>The Golden Dawn</0>, volume 4 (1940), with the sigils of Metatron, Elohim and the divine names of Binah drawn as examples. This generator follows those rules."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "The rules"
+msgstr "The rules"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "A small circle marks the first letter."
+msgstr "A small circle marks the first letter."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "A straight line runs from each letter to the next, in order, to the end of the word. Each word of a name is a sigil of its own; this page draws them side by side, right to left."
+msgstr "A straight line runs from each letter to the next, in order, to the end of the word. Each word of a name is a sigil of its own; this page draws them side by side, right to left."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "Where a letter is doubled, as in the two Teths of Metatron, the line makes a crook or wave at that letter: one wave for each repeat, so a letter written three times has two."
+msgstr "Where a letter is doubled, as in the two Teths of Metatron, the line makes a crook or wave at that letter: one wave for each repeat, so a letter written three times has two."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "Where the line passes straight through a letter of the name, as Metatron's runs through Resh, a small loop beside the line marks the letter, so that the stop can be seen."
+msgstr "Where the line passes straight through a letter of the name, as Metatron's runs through Resh, a small loop beside the line marks the letter, so that the stop can be seen."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "A short bar across the line ends the sigil at the last letter."
+msgstr "A short bar across the line ends the sigil at the last letter."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "A final letter is traced at the place of its ordinary form, and anything else, such as vowel points, is left out."
+msgstr "A final letter is traced at the place of its ordinary form, and anything else, such as vowel points, is left out."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "What Regardie's figures show"
+msgstr "What Regardie's figures show"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "The text leaves some cases open, and the worked sigils settle them:"
+msgstr "The text leaves some cases open, and the worked sigils settle them:"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "A line that returns to a letter it has already visited, as YHVH returns to He, is drawn just beside the first visit, so the two strokes stay apart."
+msgstr "A line that returns to a letter it has already visited, as YHVH returns to He, is drawn just beside the first visit, so the two strokes stay apart."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "A line that crosses a letter which is not in the name gets no mark."
+msgstr "A line that crosses a letter which is not in the name gets no mark."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "A line that crosses a letter of the name on its way somewhere else gets no loop either: only a letter the line passes through between its own neighbours does."
+msgstr "A line that crosses a letter of the name on its way somewhere else gets no loop either: only a letter the line passes through between its own neighbours does."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "Lines cross the centre of the rose, and each other, freely."
+msgstr "Lines cross the centre of the rose, and each other, freely."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "How this generator draws them"
+msgstr "How this generator draws them"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "Regardie does not say how nearly straight a line must run to count as passing through a letter. The generator draws a loop only where the letter lies within one unit of the straight line between its neighbours, on a rose a hundred units across; any line bent more than that turns a visible corner instead."
+msgstr "Regardie does not say how nearly straight a line must run to count as passing through a letter. The generator draws a loop only where the letter lies within one unit of the straight line between its neighbours, on a rose a hundred units across; any line bent more than that turns a visible corner instead."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "Each letter's point is placed by these rules rather than adjusted by a numerical optimiser, so a name always gives the same sigil: on this page, in a downloaded image and in a shared link. Where a return or a mark would touch another line, the point moves within its letter's place until every mark stands clear. A long word can crowd the rose so that no such placement exists, and the page then says so."
+msgstr "Each letter's point is placed by these rules rather than adjusted by a numerical optimiser, so a name always gives the same sigil: on this page, in a downloaded image and in a shared link. Where a return or a mark would touch another line, the point moves within its letter's place until every mark stands clear. A long word can crowd the rose so that no such placement exists, and the page then says so."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "The rose has two arrangements of the double letters. The Golden Dawn's, as The Equinox printed it in 1910, is the default; Regardie's edition of 1939 exchanges Kaph and Tau. Regardie's own sigils in volume 4 are drawn on the Golden Dawn's arrangement."
+msgstr "The rose has two arrangements of the double letters. The Golden Dawn's, as The Equinox printed it in 1910, is the default; Regardie's edition of 1939 exchanges Kaph and Tau. Regardie's own sigils in volume 4 are drawn on the Golden Dawn's arrangement."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "Try <0>Metatron</0>, <1>Elohim</1>, <2>YHVH Elohim</2> or <3>Shabbathai</3>, or the names of the <4>72 angels</4>, such as <5>Vehuiah</5>."
+msgstr "Try <0>Metatron</0>, <1>Elohim</1>, <2>YHVH Elohim</2> or <3>Shabbathai</3>, or the names of the <4>72 angels</4>, such as <5>Vehuiah</5>."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "Sources"
+msgstr "Sources"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "Israel Regardie, <0>The Golden Dawn</0>, volume 4 (Aries Press, Chicago, 1940): the rules on <1>page 57</1>; Metatron and Elohim on <2>page 58</2>; the sigils of the names of Binah on <3>pages 59</3> and <4>60</4>. The scans are on archive.org; the book may still be in copyright, so its pages are linked rather than shown here."
+msgstr "Israel Regardie, <0>The Golden Dawn</0>, volume 4 (Aries Press, Chicago, 1940): the rules on <1>page 57</1>; Metatron and Elohim on <2>page 58</2>; the sigils of the names of Binah on <3>pages 59</3> and <4>60</4>. The scans are on archive.org; the book may still be in copyright, so its pages are linked rather than shown here."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "The rules, the figures' evidence and how the generator is tested against them, every pair and triple of letters included, are set out in <0>the project's design notes</0>."
+msgstr "The rules, the figures' evidence and how the generator is tested against them, every pair and triple of letters included, are set out in <0>the project's design notes</0>."
+
+#. js-lingui-explicit-id
 #: src/app/gd/sigils/sigils.tsx
 msgid "Sigil text"
 msgstr "Sigil text"

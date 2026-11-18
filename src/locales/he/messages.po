@@ -1350,6 +1350,121 @@ msgid "Moved from its letter"
 msgstr "הוזז ממקום האות"
 
 #. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "How a Rose Cross sigil is drawn"
+msgstr "כיצד משרטטים סיגיל של צלב הוורד"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "The Golden Dawn drew the sigil of a name by tracing it through the letters of the Rose Cross. The rose at its centre carries the 22 letters of the Hebrew alphabet on three rings of petals: the three mother letters innermost, the seven double letters around them and the twelve single letters outside. Israel Regardie printed the Order's rules in <0>The Golden Dawn</0>, volume 4 (1940), with the sigils of Metatron, Elohim and the divine names of Binah drawn as examples. This generator follows those rules."
+msgstr "השחר הזהוב שרטט סיגיל של שם בהתוויית קו דרך אותיות צלב הוורד. הוורד שבמרכזו נושא את 22 אותיות האלפבית העברי בשלוש טבעות של עלי כותרת: שלוש האמות בפנים, שבע הכפולות סביבן ושתים־עשרה הפשוטות מבחוץ. ישראל רגרדי פרסם את כללי המסדר ב־<0>The Golden Dawn</0>, כרך 4 (1940), ובהם הסיגילים של מטטרון, אלהים ושמות האל של בינה כדוגמאות. המחולל הזה הולך לפי הכללים האלה."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "The rules"
+msgstr "הכללים"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "A small circle marks the first letter."
+msgstr "עיגול קטן מסמן את האות הראשונה."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "A straight line runs from each letter to the next, in order, to the end of the word. Each word of a name is a sigil of its own; this page draws them side by side, right to left."
+msgstr "קו ישר עובר מכל אות לזו שאחריה, לפי הסדר, עד סוף המילה. כל מילה בשם היא סיגיל בפני עצמו; העמוד הזה משרטט אותם זה לצד זה, מימין לשמאל."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "Where a letter is doubled, as in the two Teths of Metatron, the line makes a crook or wave at that letter: one wave for each repeat, so a letter written three times has two."
+msgstr "כשאות מוכפלת, כמו שתי הטי״תים במטטרון, הקו יוצר עיקול או גל באותה אות: גל אחד לכל חזרה, כך שלאות שנכתבה שלוש פעמים יש שניים."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "Where the line passes straight through a letter of the name, as Metatron's runs through Resh, a small loop beside the line marks the letter, so that the stop can be seen."
+msgstr "כשהקו עובר בקו ישר דרך אות מאותיות השם, כמו הקו של מטטרון דרך הרי״ש, לולאה קטנה לצד הקו מסמנת את האות, כדי שהעצירה בה תיראה."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "A short bar across the line ends the sigil at the last letter."
+msgstr "קו סיום קצר לרוחב הקו חותם את הסיגיל באות האחרונה."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "A final letter is traced at the place of its ordinary form, and anything else, such as vowel points, is left out."
+msgstr "אות סופית מותווית במקומה של צורתה הרגילה, וכל השאר, כמו סימני ניקוד, מושמט."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "What Regardie's figures show"
+msgstr "מה מראים האיורים של רגרדי"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "The text leaves some cases open, and the worked sigils settle them:"
+msgstr "הטקסט משאיר כמה מקרים פתוחים, והסיגילים שבדוגמאות מכריעים בהם:"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "A line that returns to a letter it has already visited, as YHVH returns to He, is drawn just beside the first visit, so the two strokes stay apart."
+msgstr "קו שחוזר לאות שכבר עבר בה, כמו יהוה החוזר אל ה״א, משורטט ממש לצד הביקור הראשון, כך ששני הקווים נשארים נפרדים."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "A line that crosses a letter which is not in the name gets no mark."
+msgstr "קו שחוצה אות שאינה בשם אינו מקבל סימן."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "A line that crosses a letter of the name on its way somewhere else gets no loop either: only a letter the line passes through between its own neighbours does."
+msgstr "גם קו שחוצה אות מאותיות השם בדרכו למקום אחר אינו מקבל לולאה: רק אות שהקו עובר דרכה בין שכנותיה שלה מקבלת."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "Lines cross the centre of the rose, and each other, freely."
+msgstr "קווים חוצים את מרכז הוורד, וזה את זה, בחופשיות."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "How this generator draws them"
+msgstr "כיצד המחולל הזה משרטט אותם"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "Regardie does not say how nearly straight a line must run to count as passing through a letter. The generator draws a loop only where the letter lies within one unit of the straight line between its neighbours, on a rose a hundred units across; any line bent more than that turns a visible corner instead."
+msgstr "רגרדי אינו אומר עד כמה ישר צריך הקו להיות כדי להיחשב כעובר דרך אות. המחולל משרטט לולאה רק כשהאות נמצאת במרחק של עד יחידה אחת מהקו הישר שבין שכנותיה, על ורד שקוטרו מאה יחידות; קו שמתכופף יותר מזה יוצר במקום זאת פינה נראית לעין."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "Each letter's point is placed by these rules rather than adjusted by a numerical optimiser, so a name always gives the same sigil: on this page, in a downloaded image and in a shared link. Where a return or a mark would touch another line, the point moves within its letter's place until every mark stands clear. A long word can crowd the rose so that no such placement exists, and the page then says so."
+msgstr "הנקודה של כל אות ממוקמת לפי הכללים האלה ולא מכוונת בידי מיטוב מספרי, ולכן שם נותן תמיד את אותו סיגיל: בעמוד הזה, בתמונה שהורדה ובקישור ששותף. כשחזרה או סימן היו נוגעים בקו אחר, הנקודה זזה בתוך מקומה של האות עד שכל סימן עומד ברור. מילה ארוכה עלולה לצופף את הוורד עד שאין מיקום כזה, והעמוד אומר זאת."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "The rose has two arrangements of the double letters. The Golden Dawn's, as The Equinox printed it in 1910, is the default; Regardie's edition of 1939 exchanges Kaph and Tau. Regardie's own sigils in volume 4 are drawn on the Golden Dawn's arrangement."
+msgstr "לוורד יש שני סידורים של האותיות הכפולות. זה של השחר הזהוב, כפי ש־The Equinox הדפיס אותו ב־1910, הוא ברירת המחדל; המהדורה של רגרדי מ־1939 מחליפה בין כ״ף לתי״ו. הסיגילים של רגרדי עצמו בכרך 4 משורטטים על הסידור של השחר הזהוב."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "Try <0>Metatron</0>, <1>Elohim</1>, <2>YHVH Elohim</2> or <3>Shabbathai</3>, or the names of the <4>72 angels</4>, such as <5>Vehuiah</5>."
+msgstr "נסו את <0>מטטרון</0>, <1>אלהים</1>, <2>יהוה אלהים</2> או <3>שבתאי</3>, או את שמות <4>72 המלאכים</4>, כמו <5>והויה</5>."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "Sources"
+msgstr "מקורות"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "Israel Regardie, <0>The Golden Dawn</0>, volume 4 (Aries Press, Chicago, 1940): the rules on <1>page 57</1>; Metatron and Elohim on <2>page 58</2>; the sigils of the names of Binah on <3>pages 59</3> and <4>60</4>. The scans are on archive.org; the book may still be in copyright, so its pages are linked rather than shown here."
+msgstr "ישראל רגרדי, <0>The Golden Dawn</0>, כרך 4 (Aries Press, שיקגו, 1940): הכללים ב<1>עמוד 57</1>; מטטרון ואלהים ב<2>עמוד 58</2>; הסיגילים של שמות בינה ב<3>עמודים 59</3> ו־<4>60</4>. הסריקות נמצאות ב־archive.org; ייתכן שהספר עדיין מוגן בזכויות יוצרים, ולכן עמודיו מקושרים ולא מוצגים כאן."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
+msgid "The rules, the figures' evidence and how the generator is tested against them, every pair and triple of letters included, are set out in <0>the project's design notes</0>."
+msgstr "הכללים, העדות שבאיורים והאופן שבו המחולל נבדק מולם, כולל כל זוג ושלשה של אותיות, מפורטים ב<0>הערות התכנון של הפרויקט</0>."
+
+#. js-lingui-explicit-id
 #: src/app/gd/sigils/sigils.tsx
 msgid "Sigil text"
 msgstr "טקסט הסיגיל"
