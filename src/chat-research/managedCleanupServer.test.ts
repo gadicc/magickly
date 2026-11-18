@@ -6,6 +6,7 @@ import { managedCleanupEntryFixture } from "./managedCleanupEntry.fixture";
 import { RESEARCH_MANAGED_CLEANUP_PATH } from "./managedCleanupHttp";
 import {
   createManagedResearchCleanupServer as create,
+  createDeadlineBoundManagedResearchCleanupServer as createWithDeadline,
   handleManagedResearchCleanup,
   parseResearchManagedCleanupConnection as parse,
 } from "./managedCleanupServer";
@@ -352,3 +353,57 @@ it.each(["dedicated-bearer", "vercel-cron"] as const)(
     expect(m.run).not.toHaveBeenCalled();
   },
 );
+
+it("passes a trusted transport's original end unchanged to actual HTTP admission and the runner", async () => {
+  const f = managedCleanupEntryFixture();
+  vi.spyOn(performance, "now").mockReturnValue(1000);
+  const response = await createWithDeadline(f.env)(
+    request("Bearer " + f.token),
+    7500,
+  );
+  expect(response.status).toBe(200);
+  expect(m.run).toHaveBeenCalledOnce();
+  expect(m.run.mock.calls[0][2]).toBe(7500);
+});
+it.each([undefined, null, {}, Number.NaN, Infinity, -1, 1000])(
+  "refuses missing, invalid or exhausted trusted ends %j before any settings access",
+  async (end) => {
+    vi.spyOn(performance, "now").mockReturnValue(1000);
+    const env = new Proxy(
+      {},
+      {
+        get: () => {
+          throw Error("No setting may be read");
+        },
+      },
+    );
+    expect(
+      (await createWithDeadline(env)(request(), end as never)).status,
+    ).toBe(503);
+    expect(m.run).not.toHaveBeenCalled();
+  },
+);
+it("does not widen the40s core budget when a trusted transport supplies a later end", async () => {
+  const f = managedCleanupEntryFixture();
+  vi.spyOn(performance, "now").mockReturnValue(1000);
+  expect(
+    (await createWithDeadline(f.env)(request("Bearer " + f.token), 90000))
+      .status,
+  ).toBe(200);
+  expect(m.run.mock.calls[0][2]).toBe(41000);
+});
+it("a shortened config deadline cannot be renewed after private loading", async () => {
+  const f = managedCleanupEntryFixture(),
+    env = { ...f.env },
+    clock = vi.spyOn(performance, "now").mockReturnValue(1000);
+  Object.defineProperty(env, "MAGICKLI_MANAGED_CLEANUP_PRIVATE_JSON", {
+    get() {
+      clock.mockReturnValue(7500);
+      return f.raw;
+    },
+  });
+  expect(
+    (await createWithDeadline(env)(request("Bearer " + f.token), 7500)).status,
+  ).toBe(503);
+  expect(m.run).not.toHaveBeenCalled();
+});

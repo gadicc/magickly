@@ -134,3 +134,11 @@ separately adopted dedicated scheduler when that isolation is required.
 No hourly schedule, secret value, source/window/retention publication, credential
 custody, health write or service activation follows from this adapter. A release
 must adopt those operations separately and verify actual scheduler delivery.
+
+The standalone Node transport can use
+`createDeadlineBoundManagedResearchCleanupServer(env)` with its original absolute
+monotonic work end. That trusted-only entry can shorten the existing forty-second
+budget; it cannot renew it. The one-argument Next entry continues to ignore route
+context. Private configuration and native work inherit the shortened end, while
+physical settlement keeps its independent bound. The transport's abort timer is
+cooperative cancellation; it does not by itself prove connection closure.

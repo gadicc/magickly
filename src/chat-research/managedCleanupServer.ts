@@ -59,12 +59,19 @@ export function parseResearchManagedCleanupConnection(
   }
 }
 /** One argument only: framework route context must not become an operation deadline. No handler or authority cache. */
-export function createManagedResearchCleanupServer(
+function createManagedResearchCleanupServerWithEnd(
   env: Readonly<Record<string, string | undefined>>,
+  inheritedWorkDeadlineAt?: number,
 ) {
   return async (request: Request): Promise<Response> => {
-    const end = performance.now() + 40000;
+    const now = performance.now(),
+      end = Math.min(now + 40000, inheritedWorkDeadlineAt ?? Infinity);
     try {
+      if (
+        inheritedWorkDeadlineAt !== undefined &&
+        (!Number.isFinite(inheritedWorkDeadlineAt) || now >= end)
+      )
+        fail();
       const d = readResearchManagedCleanupDeployment(env);
       if (!d)
         return Response.json(
@@ -132,6 +139,24 @@ export function createManagedResearchCleanupServer(
       );
     }
   };
+}
+
+/** Framework-compatible one-argument entry; route context never becomes a deadline. */
+export function createManagedResearchCleanupServer(
+  env: Readonly<Record<string, string | undefined>>,
+) {
+  return createManagedResearchCleanupServerWithEnd(env);
+}
+
+/** Trusted transport only. Its original monotonic end may shorten, never renew, core work. */
+export function createDeadlineBoundManagedResearchCleanupServer(
+  env: Readonly<Record<string, string | undefined>>,
+) {
+  return (request: Request, deadlineAt: number): Promise<Response> =>
+    createManagedResearchCleanupServerWithEnd(
+      env,
+      Number.isFinite(deadlineAt) ? deadlineAt : Number.NaN,
+    )(request);
 }
 
 /** App-owned environment only; framework route context is intentionally ignored. */
