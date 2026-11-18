@@ -576,6 +576,112 @@ export const PLAN_TEMPLATES: readonly PlanTemplate[] = [
     ],
     why: "A return to the first letter beside its two crooks, then away: crook clearance",
   },
+  // Nooses in a row (second review, M1): two or more letters on one line,
+  // each passed straight through, so the whole run is one unbent line.
+  {
+    id: "noose-run-במכק",
+    text: "במכק",
+    version: "gd",
+    plan: [
+      [
+        v("ב", 0, 0, "start"),
+        v("מ", 0, 0, "noose"),
+        v("כ", 0, 0, "noose"),
+        v("ק", 0, 0, "end"),
+      ],
+    ],
+    why: "R4 twice in a row on the diameter Beth, Mem, Kaph, Qoph",
+  },
+  {
+    id: "noose-run-גשפו",
+    text: "גשפו",
+    version: "gd",
+    plan: [
+      [
+        v("ג", 0, 0, "start"),
+        v("ש", 0, 0, "noose"),
+        v("פ", 0, 0, "noose"),
+        v("ו", 0, 0, "end"),
+      ],
+    ],
+    why: "R4 twice in a row on the diameter Gimel, Shin, Peh, Vav",
+  },
+  {
+    id: "noose-run-במכקי",
+    text: "במכקי",
+    version: "gd",
+    plan: [
+      [
+        v("ב", 0, 0, "start"),
+        v("מ", 0, 0, "noose"),
+        v("כ", 0, 0, "noose"),
+        v("ק", 0, 0),
+        v("י", 0, 0, "end"),
+      ],
+    ],
+    why: "Two nooses in a row, then a corner at Qoph, which lies beyond Kaph",
+  },
+  {
+    id: "noose-run-ההאדלה",
+    text: "ההאדלה",
+    version: "gd",
+    plan: [
+      [
+        v("ה", 0, 1, "start", "crook"),
+        v("א", 0, 0, "noose"),
+        v("ד", 0, 0, "noose"),
+        v("ל", 0, 0),
+        v("ה", 1, 0, "end"),
+      ],
+    ],
+    why: "A crook, two nooses in a row down the vertical diameter, and a return up it to He",
+  },
+  {
+    id: "noose-run-בבמכק",
+    text: "בבמכק",
+    version: "gd",
+    plan: [
+      [
+        v("ב", 0, 1, "start", "crook"),
+        v("מ", 0, 0, "noose"),
+        v("כ", 0, 0, "noose"),
+        v("ק", 0, 0, "end"),
+      ],
+    ],
+    why: "A crook at the start of a run of nooses",
+  },
+  {
+    id: "noose-run-אבמכקש",
+    text: "אבמכקש",
+    version: "gd",
+    plan: [
+      [
+        v("א", 0, 0, "start"),
+        v("ב", 0, 0),
+        v("מ", 0, 0, "noose"),
+        v("כ", 0, 0, "noose"),
+        v("ק", 0, 0),
+        v("ש", 0, 0, "end"),
+      ],
+    ],
+    why: "Corners either side of a run of two nooses",
+  },
+  {
+    id: "noose-run-לגשפוה",
+    text: "לגשפוה",
+    version: "gd",
+    plan: [
+      [
+        v("ל", 0, 0, "start"),
+        v("ג", 0, 0),
+        v("ש", 0, 0, "noose"),
+        v("פ", 0, 0, "noose"),
+        v("ו", 0, 0),
+        v("ה", 0, 0, "end"),
+      ],
+    ],
+    why: "Corners either side of a run of two nooses on another diameter",
+  },
   ababaTemplate("פ", "ל"),
   ababaTemplate("ה", "ו"),
   ababaTemplate("ש", "מ"),

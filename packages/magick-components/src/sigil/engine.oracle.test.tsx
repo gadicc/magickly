@@ -22,6 +22,7 @@ import { kameaUnroundedAnchor, roseUnroundedAnchor } from "./oracle/anchors.ts";
 import {
   ababaTexts,
   CORPUS_ROSE_VERSIONS,
+  collinearRunTexts,
   DOMAIN_EDGE_TEXTS,
   randomRoseTexts,
   roseTexts,
@@ -200,6 +201,14 @@ describe("the engine against O2 and O3", () => {
         expectedFailures(version, texts),
       );
     }, 60_000);
+
+  it("draws every word of a collinear run, nooses in a row, on the gd rose", () => {
+    const texts = collinearRunTexts();
+    expect(texts).toHaveLength(3174);
+    expect(failing(texts.map((text) => ({ text, version: "gd" })))).toEqual(
+      expectedFailures("gd", texts),
+    );
+  }, 120_000);
 
   it("draws the kamea stubs, so nothing in it is the rose's", () => {
     for (const fixture of KAMEA_FIXTURES) {

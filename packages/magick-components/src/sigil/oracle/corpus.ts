@@ -182,3 +182,31 @@ export function ababaTexts(version: RoseVersionId): string[] {
     for (const b of letters) if (a !== b) texts.push(`${a}${b}${a}${b}${a}`);
   return texts;
 }
+
+/**
+ * The four letters on each of the gd rose's six diameters that pass
+ * through two inner-ring letters, in a line: any three in a row plan two
+ * nooses in a row, the case where nooses must be settled together.
+ */
+export const COLLINEAR_RUNS = [
+  "במכק",
+  "גשפו",
+  "האדל",
+  "ופשג",
+  "לדאה",
+  "קכמב",
+] as const;
+
+/**
+ * Every word of a collinear run with a letter before it, after it, both
+ * or neither (6 × 23 × 23 = 3,174 words of 4 to 6 letters), on the gd
+ * rose, whose order makes the runs straight.
+ */
+export function collinearRunTexts(): string[] {
+  const letters = roseRings("gd").flat();
+  const texts: string[] = [];
+  for (const run of COLLINEAR_RUNS)
+    for (const before of ["", ...letters])
+      for (const after of ["", ...letters]) texts.push(before + run + after);
+  return texts;
+}

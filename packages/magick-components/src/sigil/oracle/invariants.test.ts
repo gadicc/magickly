@@ -40,6 +40,16 @@ const cases = [
  * offset for revisits) breaks an invariant, and O2 is right to say so.
  */
 const NAIVE_BREAKS: Record<string, InvariantCheck[]> = {
+  // The simple drawer settles nooses one at a time, so a run of them bends
+  // (O2's "not on an unbent line"), and leaves a return up a run's line
+  // where it falls.
+  "noose-run-במכק": ["noose"],
+  "noose-run-גשפו": ["noose"],
+  "noose-run-במכקי": ["clearance", "noose"],
+  "noose-run-ההאדלה": ["clearance", "overlap"],
+  "noose-run-בבמכק": ["noose"],
+  "noose-run-אבמכקש": ["clearance", "noose", "overlap"],
+  "noose-run-לגשפוה": ["noose"],
   elohim: [
     "bar-clearance",
     "clearance",
