@@ -24,6 +24,8 @@ import React from "react";
 import { VersionNote, VersionSelect } from "@/drawings/DrawingVersion";
 import Ink from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
+import UiText from "@/i18n/UiText";
 import { parseComponentImageRequest } from "@/render/componentImageRequest";
 import { rectifySigilText } from "@/render/contracts/roseSigil";
 import DebugSigil from "./DebugSigil";
@@ -33,6 +35,7 @@ export default function Sigils({
 }: {
   initial: { text: string; rose: boolean; version: RoseVersionId };
 }) {
+  const { t } = useUiLanguage();
   const ref = React.useRef<SVGSVGElement>(null);
   const [sigilText, setSigilText] = React.useState(initial.text);
   const [showRose, setShowRose] = React.useState(initial.rose);
@@ -43,13 +46,18 @@ export default function Sigils({
 
   const rectified = rectifySigilText(sigilText);
 
+  // Whitespace separates words, each its own sigil (plan 088, R2).
   const charsValid = rectified
     .split("")
-    .map((letter) => ROSE_LETTERS.some((ring) => ring.includes(letter)));
+    .map(
+      (letter) =>
+        /\s/.test(letter) || ROSE_LETTERS.some((ring) => ring.includes(letter)),
+    );
   const isValid = charsValid.indexOf(false) === -1;
 
-  // Links only exist for text the server contract accepts; the text is the
-  // user's own, so the controls say so and nothing is written to the URL.
+  // Links only exist for text the server contract accepts, which collapses
+  // the whitespace between words; the text is the user's own, so the
+  // controls say so and nothing is written to the URL.
   const link = (() => {
     if (!isValid || !rectified) return undefined;
     try {
@@ -86,7 +94,7 @@ export default function Sigils({
           }}
         >
           <TextField
-            placeholder="Sigil text"
+            placeholder={t(/*i18n*/ "Sigil text")}
             size="small"
             value={sigilText}
             dir="rtl"
@@ -118,9 +126,16 @@ export default function Sigils({
             onChange={setVersion}
           />
         </Box>
+        <div>
+          <UiText
+            message={
+              /*i18n*/ "Separate words with spaces: each word is its own sigil, drawn right to left."
+            }
+          />
+        </div>
         {!isValid && (
           <div>
-            Invalid characters:{" "}
+            <UiText message={/*i18n*/ "Invalid characters:"} />{" "}
             {charsValid.map((valid, i) => (
               <span key={i} style={{ color: valid ? "" : "red" }}>
                 {sigilText[i]}
@@ -137,7 +152,7 @@ export default function Sigils({
                   onChange={() => setShowRose(!showRose)}
                 />
               }
-              label="Show Rose"
+              label={<UiText message={/*i18n*/ "Show Rose"} />}
             />
             <FormControlLabel
               control={
@@ -146,7 +161,7 @@ export default function Sigils({
                   onChange={() => setAnimate(!animate)}
                 />
               }
-              label="Animate"
+              label={<UiText message={/*i18n*/ "Animate"} />}
             />
             <FormControlLabel
               control={
@@ -155,18 +170,22 @@ export default function Sigils({
                   onChange={() => setShowKeys(!showKeys)}
                 />
               }
-              label="Show Keys"
+              label={<UiText message={/*i18n*/ "Show Keys"} />}
             />
             <FormControlLabel
               control={
                 <Checkbox checked={debug} onChange={() => setDebug(!debug)} />
               }
-              label="Debug"
+              label={<UiText message={/*i18n*/ "Debug"} />}
             />
           </Stack>
         </FormGroup>
 
-        {rectified != sigilText && <div>Rectified text: {rectified}</div>}
+        {rectified !== sigilText && (
+          <div>
+            <UiText message={/*i18n*/ "Rectified text:"} /> {rectified}
+          </div>
+        )}
 
         {showKeys && (
           <div style={{ direction: "rtl" }}>
@@ -205,7 +224,7 @@ export default function Sigils({
         </Ink>
         <ExportControls
           target={ref}
-          filename={`RoseSigil-${rectified}${version === DEFAULT_ROSE_VERSION ? "" : `-${version}`}`}
+          filename={`RoseSigil-${rectified.trim().split(/\s+/).join("-")}${version === DEFAULT_ROSE_VERSION ? "" : `-${version}`}`}
           link={link}
           share={share}
         />

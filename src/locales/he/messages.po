@@ -1295,6 +1295,101 @@ msgid "Loading offline rituals"
 msgstr "טוענים טקסים לקריאה ללא חיבור"
 
 #. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "circle"
+msgstr "עיגול"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "crook"
+msgstr "עיקול"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "noose"
+msgstr "לולאה"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "bar"
+msgstr "קו סיום"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "Word"
+msgstr "מילה"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "Vertex"
+msgstr "קודקוד"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "Letter"
+msgstr "אות"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "Visit"
+msgstr "ביקור"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "Crooks"
+msgstr "עיקולים"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "Marks"
+msgstr "סימנים"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "Moved"
+msgstr "הוזז"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "Sigil text"
+msgstr "טקסט הסיגיל"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "Separate words with spaces: each word is its own sigil, drawn right to left."
+msgstr "הפרידו בין מילים ברווחים: כל מילה היא סיגיל משלה, משורטט מימין לשמאל."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "Invalid characters:"
+msgstr "תווים לא חוקיים:"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "Show Rose"
+msgstr "הצגת הוורד"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "Animate"
+msgstr "הנפשה"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "Show Keys"
+msgstr "הצגת מקלדת"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "Debug"
+msgstr "ניפוי שגיאות"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "Rectified text:"
+msgstr "טקסט מתוקן:"
+
+#. js-lingui-explicit-id
 #: src/app/doc/[_id]/DocLoader.tsx
 msgid "Ritual not found."
 msgstr "הטקס לא נמצא."

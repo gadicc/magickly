@@ -1295,6 +1295,101 @@ msgid "Loading offline rituals"
 msgstr "Loading offline rituals"
 
 #. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "circle"
+msgstr "circle"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "crook"
+msgstr "crook"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "noose"
+msgstr "noose"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "bar"
+msgstr "bar"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "Word"
+msgstr "Word"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "Vertex"
+msgstr "Vertex"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "Letter"
+msgstr "Letter"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "Visit"
+msgstr "Visit"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "Crooks"
+msgstr "Crooks"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "Marks"
+msgstr "Marks"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/DebugSigil.tsx
+msgid "Moved"
+msgstr "Moved"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "Sigil text"
+msgstr "Sigil text"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "Separate words with spaces: each word is its own sigil, drawn right to left."
+msgstr "Separate words with spaces: each word is its own sigil, drawn right to left."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "Invalid characters:"
+msgstr "Invalid characters:"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "Show Rose"
+msgstr "Show Rose"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "Animate"
+msgstr "Animate"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "Show Keys"
+msgstr "Show Keys"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "Debug"
+msgstr "Debug"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "Rectified text:"
+msgstr "Rectified text:"
+
+#. js-lingui-explicit-id
 #: src/app/doc/[_id]/DocLoader.tsx
 msgid "Ritual not found."
 msgstr "Ritual not found."

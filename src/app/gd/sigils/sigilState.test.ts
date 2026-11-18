@@ -27,6 +27,12 @@ describe("shared sigil links", () => {
       ).toEqual({ text: "כתר", rose: true, version: "gd" });
   });
 
+  it("restores several words, as the image contract keeps them", () => {
+    expect(
+      sigilFromSearchParams(new URLSearchParams("text=יהוה  אלהים")),
+    ).toEqual({ text: "יהוה אלהימ", rose: true, version: "gd" });
+  });
+
   it("falls back to the page default for missing or invalid text", () => {
     for (const query of ["", "rose=false", "text=", "text=abc", "text=a&x=1"])
       expect(sigilFromSearchParams(new URLSearchParams(query))).toEqual({
