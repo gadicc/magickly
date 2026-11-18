@@ -290,7 +290,10 @@ tightened oracle's bar and crook checks need other vertices moved too.
   word's budget, every new word getting at least an eighth of a budget
   (ללהאל needs about 4%), and a word met again in the same text costs
   nothing; so a text is bounded by two budgets and an eighth for each
-  further word. Placed words are cached, frozen, 256 per layout and
+  further word. The floor is sized for the names: every one of the 72
+  draws clear in any position, but of the random 4–12-letter words that
+  draw clear alone, 74 of 356 do not when placed after two words that
+  spend their budgets; the engine flags them, so the page says so. Placed words are cached, frozen, 256 per layout and
   profile (by object identity, so a layout or profile must not change
   after first use) and keyed by the budget they were given, so a text
   draws the same figure cold or warm and a keystroke re-places only the
@@ -521,7 +524,7 @@ reference planner by an author who never saw `planSigil`, and the engine
 by a third agent barred from reading the reference until its own planner
 passed the hand fixtures; it then matched the reference on every text.
 
-- **Independent review (Opus 5.5 high)** of the engine at `be06d7f2`.
+- **Independent review (Opus 5.5 high)** of the engine at `1639e140`.
   High: the end bar ran into the start circle in seven of the 72 names
   (a word ending beside its start), and strokes could cross a crook or the
   bar, because neither placement nor O2 checked the bar or the cups
@@ -529,24 +532,24 @@ passed the hand fixtures; it then matched the reference on every text.
   placement cost grew quadratically (618 ms for 32 letters); the 1-ulp
   check nudged already-rounded anchors and could not fail; nothing tested
   words longer than five letters. The oracle was tightened first
-  (`c24f41b8`: bar, crook and loop clearance, nudges before rounding with
+  (`7970d525`: bar, crook and loop clearance, nudges before rounding with
   a rounding-margin check on every layout's anchors, a seeded random
   corpus), which put 628 figures on the known-failures list; the engine
-  round (`a22744bf`–`c54bcfe3`) brought that to 9, made checking
+  round (`b542a8d1`–`24ee4b26`) brought that to 9, made checking
   incremental with a work budget, and drew each subpath in order, which
   headless Chromium showed the single path had not (the dash restarts at
   every subpath).
 - **Final adversarial review (Fable 5.2 high)** of the branch at
-  `bd5077d5`. High: a noose drawn through the start circle (אבהאל) passed
+  `e196b4d8`. High: a noose drawn through the start circle (אבהאל) passed
   placement, O2 and O3. Medium: short words and A‑B‑A‑B‑A failing outside
   the corpus; the report hiding the known failures; the package's
   Provenance row rewritten under Gadi's old sign-off date. Low: per-word
   cost and caching, `FAR` unscaled, loose ends in the published API,
   stale coverage config, two i18n wordings, R7 not acted on, stale
   counts here, Vaughan figure numbers in this plan, and image pins not
-  tied to the image profile. All taken (`80e69757`–`cebccdcc`, and this
+  tied to the image profile. All taken (`76f0ab3a`–`4c6329af`, and this
   revision) except the Provenance date, left for Gadi to re-sign.
-- **Second Fable 5.2 (high) review** of the delta to `232a0a9a`. Nothing
+- **Second Fable 5.2 (high) review** of the delta to `0fe42697`. Nothing
   high; the earlier high fixed. Medium: two nooses in a row drew a bent
   line the engine reported clear (1,048 of 3,174 short words around the
   collinear runs failed the oracle silently); same-place clearance,
@@ -554,7 +557,7 @@ passed the hand fixtures; it then matched the reference on every text.
   text budget could leave a later word none (ללהאל drawn broken after two
   hard words). Low: the cache handed out its own objects, the image pins
   covered four drawings, comments and README stale, a margin in units
-  unscaled in the oracle, bare i18n ids. All taken (`a3e3721a`–`c54bde0f`
+  unscaled in the oracle, bare i18n ids. All taken (`490a73b6`–`5406621e`
   and this revision).
 
 Still unchecked: Safari and Firefox (headless Chromium only, for the
