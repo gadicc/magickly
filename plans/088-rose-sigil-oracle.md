@@ -333,8 +333,8 @@ the rest as recommended.
 1. **Placement by rule**, with the small candidate search above, replaces
    the optimiser on the drawing path.
 2. **Noose tolerance (R4): 1 unit, provisional.** A profile setting. At
-   about 1 unit only the eight names ending האל qualify, which matches the
-   one attested case (0.23 units); at 5 units מומיה, דמביה and יבמיה join,
+   about 1 unit only the seven names ending האל qualify, at Aleph, which
+   matches the one attested case (0.23 units); at 5 units מומיה, דמביה and יבמיה join,
    two of them 47° corners. Judged on S2's contact sheet, by us and then
    by Gadi, before it is final.
 3. **Runs of three or more**: one crook per adjacent pair (Vaughan's
