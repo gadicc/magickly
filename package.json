@@ -43,7 +43,7 @@
     "search:build": "node --import tsx scripts/search/buildProse.ts",
     "sources:mirror": "node --import tsx scripts/sources/mirror.mts",
     "search:compare": "pnpm data:build && pnpm search:build && loom env -- node --import tsx scripts/search/embed.mts compare",
-    "search:publish": "pnpm data:build && pnpm search:build && loom env -- node --import tsx scripts/search/embed.mts publish && pnpm search:build",
+    "search:publish": "pnpm data:build && pnpm search:build && loom env -- node --import tsx scripts/search/embed.mts publish",
     "search:browser": "node --import tsx scripts/search/browser.mts",
     "search:watch": "node --import tsx scripts/search/watch.mts",
     "reading:grammar": "node --import tsx scripts/enochian-reading/grammar.ts",

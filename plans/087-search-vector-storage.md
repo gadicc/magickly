@@ -330,7 +330,7 @@ found the row listing and pruning safe against path traversal.
 | --- | --- |
 | The S1 record and the row commit described the pre-rebase tree | This section and the row commit's message |
 | `search:publish` wrote the manifest before the rows | Rows first (`a4c9f0da`) |
-| `search:publish` left the artifact without the new rows | Rebuilds afterwards (`a4c9f0da`) |
+| `search:publish` left the artifact without the new rows | Rebuilds afterwards: `a4c9f0da` appended `&& pnpm search:build` to the task, which made pnpm hand the profile argument to that build instead of `embed.mts`, so every publish failed; the next commit moves the rebuild into `embed.mts` |
 | `/search/index` stays digest-only while the store can be null for a missing row | S2 (decision 3) |
 | An unknown profile or malformed row now stops `search:build`, and with it dev | Kept: it fails at build rather than in `/api/search`; S2 revisits for dev |
 | No tests for `buildProse`'s branches or the publish call site | S2 |

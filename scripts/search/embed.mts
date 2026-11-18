@@ -7,6 +7,7 @@ import {
 } from "node:fs";
 import { resolve } from "node:path";
 import { buildSearchCatalogue } from "../../src/search/catalogue";
+import { VECTOR_ARTIFACT } from "../../src/search/embeddings/artifact";
 import {
   EMBEDDING_PROFILES,
   embeddingInput,
@@ -24,7 +25,10 @@ import {
   embeddingDocumentInput,
   embeddingRecords,
 } from "../../src/search/embeddings/records";
-import { publishRows } from "../../src/search/embeddings/rows";
+import {
+  assembleVectorArtifact,
+  publishRows,
+} from "../../src/search/embeddings/rows";
 import type { SearchEmbeddingManifest } from "../../src/search/embeddings/store";
 import { createSearchEngine } from "../../src/search/engine";
 import { SEARCH_PROBES } from "./evaluation";
@@ -197,6 +201,15 @@ for (const profile of profiles) {
     writeFileSync(
       resolve(root, "src/search/embeddings/manifest.json"),
       JSON.stringify(manifest, null, 2) + "\n",
+    );
+    // Rebuild the ignored artifact search:build assembles, so /api/search
+    // sees the new rows without another build. Done here, not as a trailing
+    // `&& pnpm search:build` in package.json, where pnpm would append the
+    // profile argument to that last command instead of this script.
+    mkdirSync(resolve(root, "src/search/generated"), { recursive: true });
+    writeFileSync(
+      resolve(root, VECTOR_ARTIFACT),
+      assembleVectorArtifact(root, profile).bytes,
     );
   }
   report.push({
