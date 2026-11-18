@@ -158,11 +158,12 @@ to geometry:
 
 ```ts
 interface SigilLayout<Token> {
-  place(token: Token): PlaceId;          // ש → "shin"; on a kamea, 40 → cell (r, c)
-  anchor(place: PlaceId): Point;         // where a visit is drawn
+  place(token: Token): PlaceId | null;   // ש → "ש"; on a kamea, 40 → "r,c"; null: left out
+  anchor(place: PlaceId): Point;         // where a first visit is drawn
   slack(place: PlaceId): number;         // how far a visit may move and still read as this place
   placeAt(point: Point): PlaceId | null; // for read-back
-  unit: number;                          // scale for marks and offsets
+  unit: number;                          // layout coordinates per sigil unit (1 on the rose)
+  places: readonly PlaceId[];
 }
 ```
 
@@ -176,22 +177,40 @@ numbers, and the kamea profile starts from that.
 
 ### Plan: what each vertex says
 
-`planSigil(places, layout, profile)` returns one record per word and per
-vertex, with no drawing decisions left:
+`planSigil(text, layout, profile)` returns one record per word and per
+vertex, with no drawing decisions left. The types are in
+`packages/magick-components/src/sigil/types.ts`:
 
 ```ts
 interface SigilVertex {
   place: PlaceId;
-  visit: number;            // 0 for the first visit to this place, 1 for the next...
-  run: number;              // position in a run of the same place (0 = not repeated)
-  marks: Set<"start" | "crook" | "noose" | "end">;
+  visit: number;   // 0 for the word's first vertex at this place, 1 for the next...
+  crooks: number;  // letters merged into this vertex after the first
+  marks: readonly SigilMark[]; // "start" | "crook" | "noose" | "end", in that order
 }
-type SigilPlan = SigilVertex[][]; // one array per word
+type SigilPlan = readonly (readonly SigilVertex[])[]; // one array per word
 ```
 
-A vertex can carry several marks (start and crook; crook and noose; crook
-and end). `noose` is decided here, on the layout's anchors, never on moved
-points.
+The rules, exactly; the blind reference (O1) and `planSigil` are both
+written from this list:
+
+1. **Words.** Split the text on whitespace. Map each character of a word
+   with `layout.place`; a character with no place (on the rose: anything
+   but the 22 letters and the five final forms, which take their base
+   letter's place, F5) is dropped. A word left with no places is dropped.
+2. **Runs.** Consecutive equal places merge into one vertex, with
+   `crooks` = the run's length − 1 (decision 3).
+3. **Visits.** `visit` counts the earlier vertices of the same word at the
+   same place.
+4. **Marks.** `start` on the word's first vertex, `end` on its last
+   (decision 6; a one-vertex word has both), `crook` when `crooks` > 0.
+   `noose` on an interior vertex V with `crooks` = 0 whose neighbours P and
+   N are at different places, when V's anchor lies within
+   `nooseTolerance × unit` of the segment from P's anchor to N's anchor
+   and its foot on that line falls strictly between them (0 < t < 1).
+   Anchors are taken rounded to 0.001 and the comparison is `≤`. A
+   doubled letter on a straight pass gets its crook and no noose
+   (decision 4).
 
 ### Placement: by rule, not by solver
 
