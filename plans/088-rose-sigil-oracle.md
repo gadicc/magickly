@@ -371,7 +371,11 @@ the figure is placed by rule. `optimizeSigilPoints` and the
 `gd/roseSigilOptimizer` entry are removed with `nlopt-js` (decision 7),
 so the next release is 0.4.0. R2 is additive in the app: the page and the
 contract reject spaces today, so accepting them (with whitespace
-collapsed) changes no existing link.
+collapsed) changes no existing link. The contract keeps a text spelled as
+Hebrew writes it, a final form at the end of a word of two letters or
+more and nowhere else (מטטרון, not the folded מטטרונ it kept before), so
+the page shows a shared sigil as it was typed; a link in the old spelling
+still parses and draws the same sigil.
 
 ## The oracle
 
@@ -530,7 +534,7 @@ reference planner by an author who never saw `planSigil`, and the engine
 by a third agent barred from reading the reference until its own planner
 passed the hand fixtures; it then matched the reference on every text.
 
-- **Independent review (Opus 5.5 high)** of the engine at `1639e140`.
+- **Independent review (Opus 5.5 high)** of the engine at `f755764d`.
   High: the end bar ran into the start circle in seven of the 72 names
   (a word ending beside its start), and strokes could cross a crook or the
   bar, because neither placement nor O2 checked the bar or the cups
@@ -538,24 +542,24 @@ passed the hand fixtures; it then matched the reference on every text.
   placement cost grew quadratically (618 ms for 32 letters); the 1-ulp
   check nudged already-rounded anchors and could not fail; nothing tested
   words longer than five letters. The oracle was tightened first
-  (`7970d525`: bar, crook and loop clearance, nudges before rounding with
+  (`6d4699c9`: bar, crook and loop clearance, nudges before rounding with
   a rounding-margin check on every layout's anchors, a seeded random
   corpus), which put 628 figures on the known-failures list; the engine
-  round (`b542a8d1`–`24ee4b26`) brought that to 9, made checking
+  round (`ca793805`–`cf33775e`) brought that to 9, made checking
   incremental with a work budget, and drew each subpath in order, which
   headless Chromium showed the single path had not (the dash restarts at
   every subpath).
 - **Final adversarial review (Fable 5.2 high)** of the branch at
-  `e196b4d8`. High: a noose drawn through the start circle (אבהאל) passed
+  `3e7d9417`. High: a noose drawn through the start circle (אבהאל) passed
   placement, O2 and O3. Medium: short words and A‑B‑A‑B‑A failing outside
   the corpus; the report hiding the known failures; the package's
   Provenance row rewritten under Gadi's old sign-off date. Low: per-word
   cost and caching, `FAR` unscaled, loose ends in the published API,
   stale coverage config, two i18n wordings, R7 not acted on, stale
   counts here, Vaughan figure numbers in this plan, and image pins not
-  tied to the image profile. All taken (`76f0ab3a`–`4c6329af`, and this
+  tied to the image profile. All taken (`e00cc8a8`–`468f6f09`, and this
   revision) except the Provenance date, left for Gadi to re-sign.
-- **Second Fable 5.2 (high) review** of the delta to `0fe42697`. Nothing
+- **Second Fable 5.2 (high) review** of the delta to `4d1fb168`. Nothing
   high; the earlier high fixed. Medium: two nooses in a row drew a bent
   line the engine reported clear (1,048 of 3,174 short words around the
   collinear runs failed the oracle silently); same-place clearance,
@@ -563,7 +567,7 @@ passed the hand fixtures; it then matched the reference on every text.
   text budget could leave a later word none (ללהאל drawn broken after two
   hard words). Low: the cache handed out its own objects, the image pins
   covered four drawings, comments and README stale, a margin in units
-  unscaled in the oracle, bare i18n ids. All taken (`490a73b6`–`5406621e`
+  unscaled in the oracle, bare i18n ids. All taken (`152e49b0`–`a21a4f4c`
   and this revision).
 
 Still unchecked: Safari and Firefox (headless Chromium only, for the
