@@ -1,8 +1,8 @@
 {
   // The publish emit, into lib/ (plan 080, decision 7). `files` names the
   // entry points the published exports reach, and tsc follows their
-  // imports, so tests are never compiled; vendor.d.ts types lune and
-  // nlopt-js for the check and emits nothing.
+  // imports, so tests are never compiled; vendor.d.ts types lune for the
+  // check and emits nothing.
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": false,
@@ -35,7 +35,6 @@
     "src/gd/roseSigilGeometry.ts",
     "src/gd/roseSigilLayout.ts",
     "src/gd/RoseSigilImage.tsx",
-    "src/gd/roseSigilOptimizer.ts",
     "src/gd/SevenBranchedCandlestick.tsx",
     "src/gd/TableOfShewbread.tsx",
     "src/kabbalah/fieldPath.ts",

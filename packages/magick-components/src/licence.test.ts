@@ -64,14 +64,15 @@ describe("the package's source", () => {
   it("holds code, the hall's metrics and test snapshots, nothing else", () => {
     // Two Inkscape trees of unrecorded provenance sat here unused until
     // plan 080's "Before publishing"; an asset needs its source recorded
-    // before it joins the MIT package.
+    // before it joins the MIT package. Code kept out of the build for
+    // reference (`*.ts.old`, plan 088's retired optimiser) is code too.
     const src = fileURLToPath(new URL("../src/", import.meta.url));
     const others = readdirSync(src, { recursive: true, withFileTypes: true })
       .filter((entry) => entry.isFile())
       .map((entry) => relative(src, join(entry.parentPath, entry.name)))
       .filter(
         (file) =>
-          !/\.tsx?$/.test(file) &&
+          !/\.tsx?(\.old)?$/.test(file) &&
           !file.includes("/__snapshots__/") &&
           file !== "gd/hall/fontMetrics.json",
       );

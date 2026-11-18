@@ -40,8 +40,8 @@
     "packages/magick-data/dist",
     "packages/magick-data/lib",
     "packages/magick-components/lib",
-    // The package's types for lune and nlopt-js, for its strict check; the
-    // app reads lune untyped, as it always has.
+    // The package's types for lune, for its strict check; the app reads
+    // lune untyped, as it always has.
     "packages/magick-components/src/vendor.d.ts"
   ]
 }

@@ -1,6 +1,6 @@
 /**
- * Types for the two dependencies that ship none (plan 080, decision 7),
- * covering only what this package calls. Nothing exported names them, so
+ * Types for the dependency that ships none (plan 080, decision 7),
+ * covering only what this package calls. Nothing exported names it, so
  * a consumer's type check never reads this file.
  */
 
@@ -24,13 +24,4 @@ declare module "lune" {
   };
   const lune: { phase: typeof phase };
   export default lune;
-}
-
-declare module "nlopt-js" {
-  /**
-   * The Emscripten module; roseSigilGeometry types the part it uses where
-   * it loads it, after `ready` has attached the classes.
-   */
-  const nlopt: unknown;
-  export default nlopt;
 }

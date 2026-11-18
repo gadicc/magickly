@@ -1,13 +1,15 @@
 /**
  * Rose-cross sigil geometry shared by the interactive component and the server
- * renderer. Everything is deterministic for a given letter sequence, including
- * the layout optimisation (roseSigilOptimizer.ts), which is bounded by
- * evaluation count rather than time so both sides agree. Engines can still differ in the last bit of a
- * trig result, so every number written to SVG goes through `svgCoordinate`.
+ * renderer: the rose's letters and their places, and the old path rules
+ * that `RoseSigilImage`'s deprecated `points` prop still draws by.
+ * Everything is deterministic for a given letter sequence. Engines can
+ * still differ in the last bit of a trig result, so every number written
+ * to SVG goes through `svgCoordinate`.
  *
  * Internal to the package: `roseSigilGeometry.ts` is the entry, and
- * exports the letters and their places; the path and the optimiser's
- * objective are here for the drawing, the optimiser and their tests.
+ * exports the letters and their places; the old path is here for the
+ * drawing and its tests. The optimiser that once made the points, and its
+ * objective, are kept out of the build in `roseSigilOptimizer.ts.old`.
  */
 
 import { svgCoordinate } from "../svgCoordinate.ts";
@@ -66,9 +68,6 @@ export function roseVersion(version?: string): RoseVersionId {
 export function roseRings(version?: string): readonly (readonly string[])[] {
   return VERSION_RINGS[roseVersion(version)];
 }
-
-/** Evaluation cap for the layout optimiser; identical on every platform. */
-export const SIGIL_MAX_EVALUATIONS = 20_000;
 
 /** A point of the sigil's drawing, in its viewBox (−50 to 50 each way). */
 export interface SigilPoint {
@@ -259,18 +258,6 @@ export function largeArc(
   return d;
 }
 
-export function arrayToPoints(array: number[]) {
-  const points: SigilPoint[] = [];
-  for (let i = 0; i < array.length; i += 2) {
-    points.push({ x: array[i], y: array[i + 1] });
-  }
-  return points;
-}
-
-export function pointsToArray(points: SigilPoint[]) {
-  return points.map((p) => [p.x, p.y]).flat();
-}
-
 export function pathFromPoints({
   points,
   sigilTokens,
@@ -363,52 +350,6 @@ export function pathFromPoints({
   }
 
   return d;
-}
-
-export function objective(points: SigilPoint[], x: number[]) {
-  let score = 0;
-  const points2 = arrayToPoints(x);
-
-  // Angles between the points
-  for (let i = 1; i < points2.length - 1; i++) {
-    let angle = Math.abs(
-      toDegrees(
-        angleBetweenTwoPointsAndVertex(
-          points2[i - 1],
-          points2[i + 1],
-          points2[i],
-        ),
-      ),
-    );
-    if (angle > 180) angle -= 180;
-    // [REWARD] Wider angles are better, less overlap, clearer to see.
-    score += angle;
-  }
-
-  // Distance between computed points and their original centers
-  const MAX_DISTANCE_FROM_ORIGIN = 4.6;
-  for (let i = 0; i < points.length; i++) {
-    const distance = lengthBetweenTwoPoints(points[i], points2[i]);
-    // [PENALIZE] points that are too far away from their original center
-    if (distance > MAX_DISTANCE_FROM_ORIGIN) score -= 50 * distance;
-  }
-
-  // Reward based on distance between all points around same center
-  const repeatedPoints: Record<string, number[]> = {};
-  for (let i = 0; i < points2.length; i++) {
-    const pStr = points2[i].x.toFixed(2) + "," + points2[i].y.toFixed(2);
-    const rp = repeatedPoints[pStr] || (repeatedPoints[pStr] = []);
-    rp.push(i);
-  }
-  for (const indices of Object.values(repeatedPoints)) {
-    for (let i = 1; i < indices.length; i++) {
-      const idx = indices[i];
-      const d = lengthBetweenTwoPoints(points2[idx], points2[idx - 1]);
-      score += d / 9;
-    }
-  }
-
-  return score;
 }
 
 /** Each final form, with the letter it is on the rose. */

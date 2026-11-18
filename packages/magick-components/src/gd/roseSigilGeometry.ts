@@ -3,8 +3,8 @@
  * needs to check a text or to draw the sigil with `RoseSigilImage`. The
  * rose has versions (`ROSE_VERSIONS`), which place Kaph and Tau
  * differently; each function takes one, and draws the default's
- * (`DEFAULT_ROSE_VERSION`, the Golden Dawn's) without it. The layout
- * optimiser is `roseSigilOptimizer`.
+ * (`DEFAULT_ROSE_VERSION`, the Golden Dawn's) without it. The rose as the
+ * sigil engine's layout is `roseSigilLayout`.
  */
 export {
   DEFAULT_ROSE_VERSION,

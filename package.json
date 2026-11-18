@@ -135,7 +135,6 @@
     "mongodb": "6.2.0",
     "nanoid": "6.0.2",
     "next": "16.4.6",
-    "nlopt-js": "^0.1.1",
     "pdf-parse": "^1.1.1",
     "postgres": "^3.4.9",
     "qrcode": "^1.5.4",

@@ -197,9 +197,6 @@ importers:
       next:
         specifier: 16.4.6
         version: 16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@types/node@24.19.2)(babel-plugin-macros@3.1.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      nlopt-js:
-        specifier: ^0.1.1
-        version: 0.1.1
       pdf-parse:
         specifier: ^1.1.1
         version: 1.1.1(supports-color@8.1.1)
@@ -399,9 +396,6 @@ importers:
       magick-data:
         specifier: workspace:^
         version: link:../magick-data
-      nlopt-js:
-        specifier: ^0.1.1
-        version: 0.1.1
       react:
         specifier: ^19
         version: 19.3.1
@@ -4114,10 +4108,6 @@ packages:
     resolution: {integrity: sha512-NqADB8VjPFLM2V0VvHUewwwsw0ZWBaIdgo+ieHtK3hasLz4qeCRjYcqfB6AQrBggRKppKF8L52/VqdVsO47Dlw==}
     engines: {node: '>= 0.4'}
 
-  hashmap@2.4.0:
-    resolution: {integrity: sha512-Ngj48lhnxJdnBAEVbubKBJuN1elfVLZJs94ZixRi98X3GCU4v6pgj9qRkHt6H8WaVJ69Wv0r1GhtS7hvF9zCgg==}
-    deprecated: hashmap 3.x is backwards compatible for typical require() usage and much faster. See https://github.com/flesler/hashmap/blob/main/docs/backwards-compatibility.md
-
   hasown@2.0.2:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
@@ -4813,9 +4803,6 @@ packages:
         optional: true
       sass:
         optional: true
-
-  nlopt-js@0.1.1:
-    resolution: {integrity: sha512-WhTbQelM5zxM3epyZayfCh9722TDInOMcbcTFbnFiHNx8/JqfGKrPhFqnZNylIPUjA6PfBM/zQqLzSvXO9YHkw==}
 
   no-case@3.0.4:
     resolution: {integrity: sha512-fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==}
@@ -9388,8 +9375,6 @@ snapshots:
     dependencies:
       has-symbols: 1.1.0
 
-  hashmap@2.4.0: {}
-
   hasown@2.0.2:
     dependencies:
       function-bind: 1.1.2
@@ -10187,10 +10172,6 @@ snapshots:
       - '@babel/core'
       - '@types/node'
       - babel-plugin-macros
-
-  nlopt-js@0.1.1:
-    dependencies:
-      hashmap: 2.4.0
 
   no-case@3.0.4:
     dependencies:

@@ -5,9 +5,9 @@ import type { ComponentName } from "./components";
 
 /**
  * Each component the explorer draws live, loaded on its own page only: a
- * page imports one chunk, so `nlopt-js` loads on the sigil's page and
- * `astronomy-engine` on Mercury's, and nowhere else (plan 080, the note
- * under the stages). Each is still rendered on the server, so the page's
+ * page imports one chunk, so `astronomy-engine` loads on Mercury's page
+ * and nowhere else (plan 080, the note under the stages; the sigil's
+ * `nlopt-js` left with its optimiser, plan 088). Each is still rendered on the server, so the page's
  * HTML has the first example's drawing. A test holds each import to the
  * entry its example module names.
  */

@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { sigilFigure } from "../sigil/SigilImage.tsx";
 import { RoseSigilImage } from "./RoseSigilImage.tsx";
 import {
   DEFAULT_ROSE_VERSION,
@@ -13,7 +14,7 @@ import {
   sigilPoints,
 } from "./roseSigilGeometry.ts";
 import { pathFromPoints, roseLetters } from "./roseSigilInternals.ts";
-import { optimizeSigilPoints } from "./roseSigilOptimizer.ts";
+import { ROSE_SIGIL_PROFILE, roseSigilLayout } from "./roseSigilLayout.ts";
 
 const KAPH = "כ";
 const TAV = "ת";
@@ -25,6 +26,10 @@ const path = (text: string, version?: RoseVersionId) =>
     points: sigilPoints(text, version),
     sigilTokens: roseLetters(text),
   });
+
+/** Where rule placement draws each vertex of `text` on a version's rose. */
+const placed = (text: string, version: RoseVersionId) =>
+  sigilFigure(text, roseSigilLayout(version), ROSE_SIGIL_PROFILE).placed;
 
 /** Every word of one to three of the 22 letters. */
 function* words() {
@@ -86,7 +91,7 @@ describe("the rose's versions", () => {
     expect(path("מלך", "regardie1939")).not.toBe(path("מלך", "gd"));
   });
 
-  it("draw a name without Kaph or Tau identically, optimised too", async () => {
+  it("draw a name without Kaph or Tau identically, placed by rule too", () => {
     const name = "אדני";
     const draw = (version?: RoseVersionId, showRose = false) =>
       renderToStaticMarkup(
@@ -99,9 +104,14 @@ describe("the rose's versions", () => {
       );
     expect(draw("regardie1939")).toBe(draw("gd"));
     expect(draw("regardie1939")).toBe(draw());
+    expect(placed(name, "regardie1939")).toEqual(placed(name, "gd"));
     expect(
-      await optimizeSigilPoints(sigilPoints(name, "regardie1939")),
-    ).toEqual(await optimizeSigilPoints(sigilPoints(name, "gd")));
+      renderToStaticMarkup(
+        <RoseSigilImage text={name} showRose={false} version="regardie1939" />,
+      ),
+    ).toBe(
+      renderToStaticMarkup(<RoseSigilImage text={name} showRose={false} />),
+    );
     // With the rose behind it only the two letters' labels move.
     const labels = (html: string) =>
       [...html.matchAll(/<text x="([^"]*)" y="([^"]*)"[^>]*>(.)<\/text>/g)].map(
@@ -120,18 +130,12 @@ describe("the rose's versions", () => {
     );
   });
 
-  it("draw a name through Tau on its own rose", async () => {
+  it("draw a name through Tau on its own rose", () => {
     const name = "שבתאי";
-    const gd = await optimizeSigilPoints(sigilPoints(name, "gd"));
-    const regardie = await optimizeSigilPoints(
-      sigilPoints(name, "regardie1939"),
-    );
-    expect(regardie).not.toEqual(gd);
-    const draw = (version: RoseVersionId, points: typeof gd) =>
-      renderToStaticMarkup(
-        <RoseSigilImage text={name} version={version} points={points} />,
-      );
-    expect(draw("regardie1939", regardie)).not.toBe(draw("gd", gd));
+    expect(placed(name, "regardie1939")).not.toEqual(placed(name, "gd"));
+    const draw = (version: RoseVersionId) =>
+      renderToStaticMarkup(<RoseSigilImage text={name} version={version} />);
+    expect(draw("regardie1939")).not.toBe(draw("gd"));
   });
 
   it("draw the default's markup when no version is given", () => {

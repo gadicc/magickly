@@ -20,8 +20,7 @@ import styles from "./components.module.css";
 
 /**
  * The components drawn live on the index, on the server: none of them
- * loads `nlopt-js` or `astronomy-engine` (the note under plan 080's
- * stages). The Moon's widget is a client component, which brings only
+ * loads `astronomy-engine` (the note under plan 080's stages). The Moon's widget is a client component, which brings only
  * `lune`, as the Moon's drawing does.
  */
 // biome-ignore lint/suspicious/noExplicitAny: each takes its first example's props

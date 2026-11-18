@@ -34,10 +34,10 @@
  *    instead (stage G review, H1), and `--allow-unpublished-data` skips
  *    it after all, for a run that publishes that magick-data too
  *    (`registryFixture.mjs` has the rule);
- * 6. a Next app built with webpack and with Turbopack, first with every
- *    entry but the live rose sigil and no `fs` stub (nlopt must be out of
- *    reach), then with `RoseSigil` and the stub the README gives; each
- *    build's prerendered HTML is read for the server's drawings, among
+ * 6. a Next app built with webpack and with Turbopack, with every entry,
+ *    the live rose sigil in a client page among them, and no `fs` stub
+ *    (no dependency may need one); each build's prerendered HTML is read
+ *    for the server's drawings, among
  *    them a hall written as tags in a Server Component, which must be
  *    the hall a Client Component draws from those tags' data.
  *
@@ -221,9 +221,6 @@ const SERVER_DRAWINGS = [
     `<Moon phase={0.3} height={85} />`,
   ],
 ];
-
-/** The entries only the live rose sigil needs, which reach nlopt-js. */
-const NLOPT_ENTRIES = ["./gd/RoseSigil", "./gd/roseSigilOptimizer"];
 
 /** Runs a command and returns what it printed; a non-zero exit throws. */
 function run(command, args, options = {}) {
@@ -720,7 +717,6 @@ import { hallPreset } from "magick-components/gd/hall/presets";
 import RoseSigil from "magick-components/gd/RoseSigil";
 import { RoseSigilImage } from "magick-components/gd/RoseSigilImage";
 import { sigilPoints } from "magick-components/gd/roseSigilGeometry";
-import { optimizeSigilPoints } from "magick-components/gd/roseSigilOptimizer";
 import { ROSE_SIGIL_PROFILE, roseSigilLayout } from "magick-components/gd/roseSigilLayout";
 import { SigilImage } from "magick-components/sigil/SigilImage";
 import { planSigil, sigilWords } from "magick-components/sigil/planSigil";
@@ -760,7 +756,6 @@ const onCellClick = ({ id, row, column, expected }: FylfotCellClick) =>
   console.log(id, row, column, expected === FYLFOT_CELLS[row][column]);
 const hall: HallNode | undefined = hallPreset("neophyte")?.hall;
 const end: string | undefined = currentOrNextRetrograde(new Date())?.end.toISOString();
-export const points: Promise<{ x: number; y: number }[]> = optimizeSigilPoints(sigilPoints("אב"));
 const cells: Record<number, { x: number; y: number }> = { 1: { x: 0, y: 0 }, 7: { x: 10, y: 0 }, 3: { x: 0, y: 10 } };
 const square: SigilLayout<number> = {
   place: (n) => (n in cells ? String(n) : null),
@@ -965,12 +960,8 @@ export const page = (
       },
     );
 
-  // The Next app. Its server page imports every entry but the two that
-  // reach nlopt, and builds with no fs stub; the second round adds the live
-  // sigil, in a client page, and the stub.
-  const serverEntries = entries.filter(
-    (entry) => !NLOPT_ENTRIES.includes(entry),
-  );
+  // The Next app. Its server page imports every entry, and a client page
+  // draws the live sigil; it builds with no fs stub.
   write(
     join(fixture, "app", "layout.tsx"),
     `import "magick-components/fonts/gd-hall.css";
@@ -981,7 +972,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   );
   write(
     join(fixture, "app", "page.tsx"),
-    `${serverEntries
+    `${entries
       .map(
         (entry, i) =>
           `import * as entry${i} from "magick-components/${entry.slice(2)}";`,
@@ -992,7 +983,7 @@ import MoonWidget from "magick-components/astrology/MoonWidget";
 import MercuryWidget from "magick-components/astrology/MercuryWidget";
 import { ClientTree } from "./ClientTree";
 
-const loaded = [${serverEntries.map((_, i) => `entry${i}`).join(", ")}];
+const loaded = [${entries.map((_, i) => `entry${i}`).join(", ")}];
 
 export default function Page() {
   return (
@@ -1056,22 +1047,37 @@ export function ClientTree() {
     ),
   );
 
-  const nextConfig = (stub) => `import type { NextConfig } from "next";
+  write(
+    join(fixture, "next.config.ts"),
+    `import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   typescript: { ignoreBuildErrors: false },
-${
-  stub
-    ? `  // The README's stub for nlopt-js's fs, for both bundlers.
-  turbopack: { resolveAlias: { fs: { browser: "./empty.ts" } } },
-  webpack: (config, { isServer }) => {
-    if (!isServer) config.resolve.fallback = { ...config.resolve.fallback, fs: false };
-    return config;
-  },
-`
-    : ""
-}};
+};
 export default nextConfig;
-`;
+`,
+  );
+  write(
+    join(fixture, "app", "rose", "page.tsx"),
+    `import { Rose } from "./Rose";
+export default function Page() {
+  return <main><Rose /></main>;
+}
+`,
+  );
+  write(
+    join(fixture, "app", "rose", "Rose.tsx"),
+    `"use client";
+import RoseSigil from "magick-components/gd/RoseSigil";
+
+export function Rose() {
+  return (
+    <div id="client-rose">
+      <RoseSigil text="שלום" />
+    </div>
+  );
+}
+`,
+  );
 
   function build(bundler) {
     rmSync(join(fixture, ".next"), { recursive: true, force: true });
@@ -1097,10 +1103,13 @@ export default nextConfig;
 
   for (const bundler of ["webpack", "turbopack"])
     step(
-      `Next builds every entry but the live sigil with ${bundler}, no fs stub`,
+      `Next builds every entry and the live sigil with ${bundler}, no fs stub`,
       () => {
-        write(join(fixture, "next.config.ts"), nextConfig(false));
-        const html = build(bundler)("index");
+        const pages = build(bundler);
+        const rose = pages("rose");
+        assert(rose.includes('id="client-rose"'), "the sigil page renders");
+        assert(rose.includes('stroke="red"'), "with its path");
+        const html = pages("index");
         for (const marker of [
           'class="magick-tree-sephirot"',
           "תפארת",
@@ -1149,47 +1158,6 @@ export default nextConfig;
       },
     );
 
-  write(join(fixture, "empty.ts"), "export {};\n");
-  write(
-    join(fixture, "app", "rose", "page.tsx"),
-    `import { Rose } from "./Rose";
-export default function Page() {
-  return <main><Rose /></main>;
-}
-`,
-  );
-  write(
-    join(fixture, "app", "rose", "Rose.tsx"),
-    `"use client";
-import RoseSigil from "magick-components/gd/RoseSigil";
-import * as optimizer from "magick-components/gd/roseSigilOptimizer";
-
-export function Rose() {
-  return (
-    <div id="client-rose" data-optimizer={typeof optimizer.optimizeSigilPoints}>
-      <RoseSigil text="שלום" />
-    </div>
-  );
-}
-`,
-  );
-  for (const bundler of ["webpack", "turbopack"])
-    step(
-      `Next builds the live sigil with ${bundler} and the README's stub`,
-      () => {
-        write(join(fixture, "next.config.ts"), nextConfig(true));
-        const html = build(bundler);
-        assert(
-          html("rose").includes('id="client-rose"'),
-          "the sigil page renders",
-        );
-        assert(html("rose").includes('stroke="red"'), "with its path");
-        assert(
-          html("index").includes('class="magick-tree-sephirot"'),
-          "the Tree still renders",
-        );
-      },
-    );
   if (keepTarball)
     step(`keep the verified tarball at ${keepTarball}`, () => {
       mkdirSync(dirname(keepTarball), { recursive: true });

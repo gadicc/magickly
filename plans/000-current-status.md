@@ -159,6 +159,16 @@ Follow-ups are separate from the completed migration work:
   attributes), published the same way that day; the halls' Provenance
   row, which names `gd/hall/tags`, was signed again on 17 November
   ([plan 084](084-composable-jsx-halls.md)).
+- 18 November 2026: rose sigils drawn by rule (plan 088, stage S2), on
+  `gate/rose-sigil-oracle`, not merged: the package plans and places a
+  sigil by the Golden Dawn's rules and the oracle passes every figure of
+  its corpus; the page, the image route (under its own profile,
+  `magickli-rose-sigil-image-v1`) and the debug view draw with it, each
+  word its own sigil. The COBYLA optimiser is retired: its source is kept
+  as `roseSigilOptimizer.ts.old`, `gd/roseSigilOptimizer` and `nlopt-js`
+  are gone from the package and the app (a breaking change; the next
+  release is 0.4.0), and the engine is exported for the kamea
+  ([plan 088](088-rose-sigil-oracle.md)).
 - 13 November 2026: Dependabot alerts #362 (zod), #364 (glob) and #366
   (minimatch) fixed by a `@vercel/functions` bump and parent-scoped
   overrides of Serwist's exact zod and glob pins (glob 14 checked against
@@ -169,9 +179,10 @@ Follow-ups are separate from the completed migration work:
 
 - TODO: rate limiting for the public component image routes
   (`/api/render/*`, `/api/treeOfLife`). Each distinct query renders through
-  WASM on request, and `/api/render/rose-sigil` adds up to about 330 ms of CPU
-  for a 32-letter text, so the edge cache offers no protection against varied
-  requests. Nothing in the app rate-limits today; see
+  WASM on request, and `/api/render/rose-sigil`'s placement by rule takes
+  up to about 600 ms of CPU for a 32-letter word chosen to stress it
+  (18 November, plan 088), so the edge cache offers no protection against
+  varied requests. Nothing in the app rate-limits today; see
   [plan 027](027-component-exports.md#adversarial-review).
 - 10 November 2026: Bing Webmaster Tools has magick.ly (and the old
   magick.li); each production release tells IndexNow (Bing, Yandex and

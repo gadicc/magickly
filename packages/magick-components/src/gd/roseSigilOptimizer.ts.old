@@ -1,0 +1,202 @@
+/**
+ * KEPT FOR REFERENCE ONLY. NOT BUILT, TYPE-CHECKED, LINTED OR TESTED.
+ *
+ * The rose sigil's old layout optimiser, retired by plan 088 (decision 7):
+ * placement by rule (`../sigil/placeSigil.ts`) replaced it on the drawing
+ * path, and `nlopt-js` left the package and the app with it. It is kept,
+ * out of the build, so that the objective it maximised and the way it
+ * loaded nlopt's WASM can still be read; plan 088's "What is wrong today"
+ * measured what it did. Should a solver ever return, that plan lists its
+ * preconditions ("Placement: by rule, not by solver").
+ *
+ * The `.old` extension keeps it out of tsc's, Vitest's and Biome's globs
+ * (Biome ignores `*.old` explicitly), and no entry, build list or import
+ * names it. Its imports no longer resolve: `nlopt-js` is not installed.
+ * What only it used was moved here from `roseSigilInternals.ts` (the
+ * objective, the evaluation cap and the array conversions), with copies
+ * of the small geometry helpers it shares with the old path, which stay
+ * there; and the declaration of `nlopt-js` from `vendor.d.ts`.
+ *
+ * What follows is the module as it was, with those pieces appended.
+ */
+/**
+ * The rose sigil's layout optimiser, nlopt's COBYLA compiled to WASM
+ * (`nlopt-js`). It is a module of its own so that only what runs it, the
+ * live `RoseSigil` and a server renderer, brings nlopt into a bundle:
+ * `RoseSigilImage` and the geometry never import it (plan 080, decision 7).
+ * In a browser bundle nlopt's Emscripten glue asks for Node's `fs`, which
+ * the bundler must stub out; the README says how.
+ */
+import type { SigilPoint } from "./roseSigilInternals.ts";
+
+type NloptModule = {
+  ready: Promise<unknown>;
+  Algorithm: { LN_COBYLA: number };
+  Optimize: new (
+    algorithm: number,
+    dimensions: number,
+  ) => {
+    setMaxObjective(
+      objective: (x: number[]) => number,
+      tolerance: number,
+    ): void;
+    setMaxeval(count: number): void;
+    optimize(start: number[]): { x: number[] };
+  };
+  GC: { flush(): void };
+};
+type ProcessEvent = "unhandledRejection" | "uncaughtException";
+let nloptModule: Promise<NloptModule> | undefined;
+
+/**
+ * Loads the optimiser once per runtime. Its Emscripten glue registers
+ * process-wide abort handlers on load in Node, which would replace every
+ * later server diagnostic with a WASM abort message; remove exactly those.
+ */
+async function loadNlopt(): Promise<NloptModule> {
+  const node =
+    typeof process === "object" && typeof process.listeners === "function"
+      ? (process as NodeJS.EventEmitter)
+      : null;
+  const events: ProcessEvent[] = ["unhandledRejection", "uncaughtException"];
+  const before = new Map(
+    events.map((event) => [event, new Set(node?.listeners(event) ?? [])]),
+  );
+  // The bundler's namespace for this CommonJS module is a snapshot taken before
+  // `ready` attaches the classes, so always go through the live default export.
+  const nlopt = (await import("nlopt-js")).default as NloptModule;
+  await nlopt.ready;
+  if (node)
+    for (const event of events)
+      for (const listener of node.listeners(event))
+        if (!before.get(event)?.has(listener))
+          node.removeListener(event, listener as (...args: unknown[]) => void);
+  return nlopt;
+}
+
+/**
+ * Spreads the connecting path with COBYLA so repeated and collinear letters
+ * stay readable. Bounded by evaluations, never by wall-clock time, so the
+ * browser and the server converge on the same layout.
+ */
+export async function optimizeSigilPoints(
+  points: SigilPoint[],
+): Promise<SigilPoint[]> {
+  if (points.length === 0) return [];
+  let nlopt: NloptModule;
+  try {
+    nlopt = await (nloptModule ??= loadNlopt());
+  } catch (error) {
+    nloptModule = undefined;
+    throw error;
+  }
+  const opt = new nlopt.Optimize(nlopt.Algorithm.LN_COBYLA, 2 * points.length);
+  try {
+    opt.setMaxObjective(objective.bind(null, points), 1e-4);
+    opt.setMaxeval(SIGIL_MAX_EVALUATIONS);
+    const result = opt.optimize(pointsToArray(points));
+    return arrayToPoints(result.x);
+  } finally {
+    nlopt.GC.flush();
+  }
+}
+
+// ---------------------------------------------------------------------
+// Moved from roseSigilInternals.ts: what only the optimiser used.
+// ---------------------------------------------------------------------
+
+/** Evaluation cap for the layout optimiser; identical on every platform. */
+export const SIGIL_MAX_EVALUATIONS = 20_000;
+
+export function arrayToPoints(array: number[]) {
+  const points: SigilPoint[] = [];
+  for (let i = 0; i < array.length; i += 2) {
+    points.push({ x: array[i], y: array[i + 1] });
+  }
+  return points;
+}
+
+export function pointsToArray(points: SigilPoint[]) {
+  return points.map((p) => [p.x, p.y]).flat();
+}
+
+export function objective(points: SigilPoint[], x: number[]) {
+  let score = 0;
+  const points2 = arrayToPoints(x);
+
+  // Angles between the points
+  for (let i = 1; i < points2.length - 1; i++) {
+    let angle = Math.abs(
+      toDegrees(
+        angleBetweenTwoPointsAndVertex(
+          points2[i - 1],
+          points2[i + 1],
+          points2[i],
+        ),
+      ),
+    );
+    if (angle > 180) angle -= 180;
+    // [REWARD] Wider angles are better, less overlap, clearer to see.
+    score += angle;
+  }
+
+  // Distance between computed points and their original centers
+  const MAX_DISTANCE_FROM_ORIGIN = 4.6;
+  for (let i = 0; i < points.length; i++) {
+    const distance = lengthBetweenTwoPoints(points[i], points2[i]);
+    // [PENALIZE] points that are too far away from their original center
+    if (distance > MAX_DISTANCE_FROM_ORIGIN) score -= 50 * distance;
+  }
+
+  // Reward based on distance between all points around same center
+  const repeatedPoints: Record<string, number[]> = {};
+  for (let i = 0; i < points2.length; i++) {
+    const pStr = points2[i].x.toFixed(2) + "," + points2[i].y.toFixed(2);
+    const rp = repeatedPoints[pStr] || (repeatedPoints[pStr] = []);
+    rp.push(i);
+  }
+  for (const indices of Object.values(repeatedPoints)) {
+    for (let i = 1; i < indices.length; i++) {
+      const idx = indices[i];
+      const d = lengthBetweenTwoPoints(points2[idx], points2[idx - 1]);
+      score += d / 9;
+    }
+  }
+
+  return score;
+}
+
+// Copies of roseSigilInternals.ts's helpers, which the old path still uses.
+
+function toDegrees(radians: number) {
+  return (radians * 180) / Math.PI;
+}
+
+function lengthBetweenTwoPoints(p1: SigilPoint, p2: SigilPoint) {
+  return Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
+}
+
+// Subtract vertex from p1,p2 to normalize on x-axis and calc angle
+function angleBetweenTwoPointsAndVertex(
+  p1: SigilPoint,
+  p2: SigilPoint,
+  vertex: SigilPoint,
+) {
+  return (
+    Math.atan2(p2.y - vertex.y, p2.x - vertex.x) -
+    Math.atan2(p1.y - vertex.y, p1.x - vertex.x)
+  );
+}
+
+// ---------------------------------------------------------------------
+// Moved from vendor.d.ts: the declaration the package's check used.
+// ---------------------------------------------------------------------
+//
+// declare module "nlopt-js" {
+//   /**
+//    * The Emscripten module; roseSigilGeometry types the part it uses where
+//    * it loads it, after `ready` has attached the classes.
+//    */
+//   const nlopt: unknown;
+//   export default nlopt;
+// }

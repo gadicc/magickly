@@ -59,7 +59,6 @@
     "./gd/roseSigilGeometry": "./src/gd/roseSigilGeometry.ts",
     "./gd/roseSigilLayout": "./src/gd/roseSigilLayout.ts",
     "./gd/RoseSigilImage": "./src/gd/RoseSigilImage.tsx",
-    "./gd/roseSigilOptimizer": "./src/gd/roseSigilOptimizer.ts",
     "./gd/SevenBranchedCandlestick": "./src/gd/SevenBranchedCandlestick.tsx",
     "./gd/TableOfShewbread": "./src/gd/TableOfShewbread.tsx",
     "./kabbalah/fieldPath": "./src/kabbalah/fieldPath.ts",
@@ -152,10 +151,6 @@
         "types": "./lib/gd/RoseSigilImage.d.ts",
         "default": "./lib/gd/RoseSigilImage.js"
       },
-      "./gd/roseSigilOptimizer": {
-        "types": "./lib/gd/roseSigilOptimizer.d.ts",
-        "default": "./lib/gd/roseSigilOptimizer.js"
-      },
       "./gd/SevenBranchedCandlestick": {
         "types": "./lib/gd/SevenBranchedCandlestick.d.ts",
         "default": "./lib/gd/SevenBranchedCandlestick.js"
@@ -213,8 +208,7 @@
     "dot-prop": "^10.2.0",
     "lune": "^0.4.0",
     "luxon": "^3.7.2",
-    "magick-data": "workspace:^",
-    "nlopt-js": "^0.1.1"
+    "magick-data": "workspace:^"
   },
   "devDependencies": {
     "@types/luxon": "^3.7.6",
