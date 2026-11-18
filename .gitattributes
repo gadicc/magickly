@@ -1,0 +1,2 @@
+# Embedding rows (plan 087): raw float32, never text.
+*.f32 binary
