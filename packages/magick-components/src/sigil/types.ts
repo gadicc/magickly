@@ -28,7 +28,12 @@ export interface SigilLayout<Token = string> {
   anchor(place: PlaceId): Point;
   /** How far, in layout coordinates, a visit may move from its anchor and still read as that place. */
   slack(place: PlaceId): number;
-  /** The place a point reads as, or `null` if it is near none (for read-back). */
+  /**
+   * The place a point reads as, or `null` if it is near none. Planning,
+   * placement and drawing never call it; it is required because reading a
+   * figure back from its ink (plan 088's O3, the check that a sigil reads
+   * as its name) maps the vertices it finds to places with it.
+   */
   placeAt(point: Point): PlaceId | null;
   /**
    * Layout coordinates per sigil unit. The rose's rings are 10 units
@@ -109,8 +114,10 @@ export interface SigilProfile {
 }
 
 /**
- * How big the renderer draws each mark, in sigil units, inside the figure
- * grammar's ranges (plan 088, "Renderer"; the oracle's `FIGURE_GRAMMAR`).
+ * How big the renderer draws each mark, in sigil units, inside the ranges
+ * plan 088's O2 allows (start circle radius 1–2.5, cups 2–3.5 wide and 1–2
+ * deep, noose radius 1–2, bar 3–6 long), which keep marks legible at the
+ * smallest size a sigil is published.
  */
 export interface SigilMarkSizes {
   /** R1: the start circle's radius. */

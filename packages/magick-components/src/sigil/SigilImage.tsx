@@ -5,7 +5,7 @@ import {
   sigilSubpaths,
   sigilViewBox,
 } from "./ink.ts";
-import { placeSigil } from "./placeSigil.ts";
+import { type PlacementFailure, placeSigilWords } from "./placeSigil.ts";
 import { planSigil, sigilWords } from "./planSigil.ts";
 import type {
   PlacedWord,
@@ -19,6 +19,12 @@ import type {
 export interface SigilFigure {
   plan: SigilPlan;
   placed: PlacedWord[];
+  /**
+   * Per word, what its figure still fails of placement's checks (plan
+   * 088's figure grammar): empty when every mark stands clear. A word
+   * placement could not clear is drawn best effort and may be hard to read.
+   */
+  failures: (readonly PlacementFailure[])[];
   /**
    * Path data of every word's ink, a path per subpath in drawing order
    * (`sigilSubpaths`): each word's circle, strokes and marks, then its bar.
@@ -39,11 +45,13 @@ export function sigilFigure(
   profile: SigilProfile,
 ): SigilFigure {
   const plan = planSigil(sigilWords(text), layout, profile);
-  const placed = placeSigil(plan, layout, profile);
+  const words = placeSigilWords(plan, layout, profile);
+  const placed = words.map((w) => w.word);
   const frame = sigilFrame(layout);
   return {
     plan,
     placed,
+    failures: words.map((w) => w.failures),
     paths: sigilSubpaths(placed, layout, profile),
     frame,
     viewBox: sigilViewBox(frame, plan.length),

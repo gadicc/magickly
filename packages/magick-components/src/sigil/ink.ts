@@ -1,7 +1,7 @@
 /**
  * The sigil renderer (plan 088, "Renderer"): placed words to ink by the
- * oracle's figure grammar (`oracle/figure.ts`), as shapes for placement to
- * check and as SVG path data. Per word: a start circle on the first
+ * figure grammar plan 088's O2 and O3 hold a drawing to, as shapes for
+ * placement to check and as SVG path data. Per word: a start circle on the first
  * vertex, the first stroke leaving its rim; straight strokes vertex to
  * vertex; a crook as two cups per merged letter on the stroke into its
  * vertex (out of the first); a noose as a round loop tangent to the line

@@ -12,7 +12,7 @@
  * crook's cups and a noose's loop start on the renderer's default side
  * (`defaultSide`: the outside of the turn).
  *
- * The search. The figure is then checked as the oracle's O2 checks it
+ * The search. The figure is then checked as plan 088's O2 checks it
  * (`wordFailures`), and scored: one per failure plus how far it misses. A
  * round looks at every vertex the failures involve and every move each
  * has, in a fixed order: a crook or noose drawn on its other side; then,
@@ -98,8 +98,9 @@ export function placementOf(profile: SigilProfile): SigilPlacementSettings {
 
 /**
  * The figure grammar's limits that placement checks, in sigil units
- * (plan 088's O2; the oracle's `FIGURE_GRAMMAR`), with a margin where the
- * oracle's own tolerance would leave none.
+ * (plan 088's O2, whose limits are a stroke width or two at the smallest
+ * size a sigil is published), with a margin where O2's own tolerance
+ * would leave none.
  */
 const LIMITS = {
   /** Centre lines closer than this overlap. */
@@ -110,8 +111,12 @@ const LIMITS = {
   vertexClearance: 2,
   /** …and this far from a loop it does not belong to. */
   loopClearance: 1,
-  /** A stroke may pass another visit to one of its own places, but not touch it. */
-  samePlaceClearance: 1,
+  /**
+   * A stroke may pass another visit to one of its own places (Regardie's
+   * יהוה), but not run through it: half a stroke width, well clear of
+   * read-back's 0.05, at which a vertex on a line splits it.
+   */
+  samePlaceClearance: 0.5,
   /** No ink but the last stroke this near the bar (the grammar's 1 and a margin). */
   barClearance: 1.05,
   /** No ink but a crook's own this near its cups, on their side. */
@@ -134,7 +139,8 @@ export interface PlacementFailure {
     | "corner"
     | "crook"
     | "bar-clearance"
-    | "crook-clearance";
+    | "crook-clearance"
+    | "loop-clearance";
   vertices: number[];
   /** How far it misses, in units; 0 for a plain miss. */
   excess: number;
@@ -182,7 +188,7 @@ function elements(word: SigilWord, points: Point[], ink: WordInk): Element[] {
         b: points[i],
         c: points[i + 1],
       });
-  // Strokes as the oracle reads them: pieces through a noose, which are
+  // Strokes as O2 reads them: pieces through a noose, which are
   // collinear, are one line.
   for (const piece of ink.lines) {
     const prev = out[out.length - 1];
@@ -273,14 +279,14 @@ function pointsToSegment(points: readonly Point[], s: Segment): number {
  * or, where it crosses the wave's line between its ends, minus how far it
  * would have to move along that line to clear them.
  */
-function segmentToWave(s: Segment, w: InkWave): number {
+function segmentToWave(s: Segment, w: InkWave, unit: number): number {
   const chord = { a: w.from, b: w.to };
   const c = crossing(s, chord);
   if (c) return -Math.min(c.t, 1 - c.t) * dist(w.from, w.to);
   // The cups lie within their depth of their line: farther than that from
   // it, the segment's distance to them is at least the difference.
   const far = segmentDistance(s, chord) - w.depth;
-  if (far > FAR) return far;
+  if (far > FAR * unit) return far;
   return pointsToSegment(w.points, s);
 }
 
@@ -347,7 +353,7 @@ function single(e: Element, ctx: Context): PlacementFailure[] {
       if (c > LIMITS.cornerCos)
         out.push({
           check: "corner",
-          vertices: [e.i - 1, e.i, e.i + 1],
+          vertices: verticesOf(e, n),
           excess: (c - LIMITS.cornerCos) * 100,
         });
       break;
@@ -431,7 +437,7 @@ function pair(a: Element, b: Element, ctx: Context): PlacementFailure[] {
     if (w.stroke >= a.first && w.stroke < a.last) return out;
     // Measured from a stroke width along it, the stroke leaving the
     // vertex is exactly that far from the cups' end there, so it is held
-    // to the oracle's own limit rather than placement's margin.
+    // to O2's own limit rather than placement's margin.
     const fromVertex = dist(a.seg.a, w.to) === 0;
     const own = fromVertex ? trimmed(a.seg, skip, 0) : a.seg;
     const part = own && halfPlane(own, sideOf(w));
@@ -439,7 +445,7 @@ function pair(a: Element, b: Element, ctx: Context): PlacementFailure[] {
       fail(
         "crook-clearance",
         fromVertex ? LIMITS.ownClearance : LIMITS.crookClearance,
-        segmentToWave(part, w),
+        segmentToWave(part, w, unit),
       );
   } else if (a.kind === "line" && b.kind === "bar") {
     // The last stroke meets the bar square at its middle and only there.
@@ -449,6 +455,19 @@ function pair(a: Element, b: Element, ctx: Context): PlacementFailure[] {
       LIMITS.barClearance,
       signedSegmentDistance(a.seg, b.seg),
     );
+  } else if (a.kind === "loop" && b.kind === "loop") {
+    // No two loops touching: a noose through the start circle reads as one
+    // interlocked mark. Rings that cross count how far they overlap.
+    const d = dist(a.loop.center, b.loop.center);
+    const ra = a.loop.radius;
+    const rb = b.loop.radius;
+    const gap =
+      d >= ra + rb
+        ? d - ra - rb
+        : d <= Math.abs(ra - rb)
+          ? Math.abs(ra - rb) - d
+          : -Math.min(ra + rb - d, d - Math.abs(ra - rb));
+    fail("loop-clearance", LIMITS.loopClearance, gap);
   } else if (a.kind === "loop" && b.kind === "wave") {
     // The start circle whose rim the first stroke's crook leaves is its own.
     if (b.wave.vertex === 0 && a.loop.kind === "start") return out;
@@ -467,8 +486,8 @@ function pair(a: Element, b: Element, ctx: Context): PlacementFailure[] {
       [b.wave, a.wave],
     ]) {
       const side = sideOf(w);
-      let d = segmentToWave({ a: o.from, b: o.to }, w);
-      if (d > 0 && d - o.depth <= FAR)
+      let d = segmentToWave({ a: o.from, b: o.to }, w, unit);
+      if (d > 0 && d - o.depth <= FAR * unit)
         for (const q of o.points)
           if (side(q) >= 0)
             for (const p of w.points) d = Math.min(d, dist(p, q));
@@ -477,13 +496,17 @@ function pair(a: Element, b: Element, ctx: Context): PlacementFailure[] {
   } else if (a.kind === "wave" && b.kind === "bar") {
     // A crook at the last vertex ends where the bar crosses: its own.
     if (a.wave.vertex === n - 1) return out;
-    fail("bar-clearance", LIMITS.barClearance, segmentToWave(b.seg, a.wave));
+    fail(
+      "bar-clearance",
+      LIMITS.barClearance,
+      segmentToWave(b.seg, a.wave, unit),
+    );
     const part = halfPlane(b.seg, sideOf(a.wave));
     if (part)
       fail(
         "crook-clearance",
         LIMITS.crookClearance,
-        segmentToWave(part, a.wave),
+        segmentToWave(part, a.wave, unit),
       );
   }
   return out;
@@ -708,11 +731,24 @@ function rulePositions(
   offset: number,
   way: RevisitWay,
   center: Point,
+  lead: number,
 ): Point[] {
   const points: Point[] = [];
+  const revisited = new Set(
+    word.filter((v) => v.visit > 0).map((v) => v.place),
+  );
   word.forEach((v, i) => {
     if (v.visit === 0 || i === 0) {
-      points.push(anchors[i]);
+      // A place visited again may first be drawn ahead, towards where the
+      // line goes next, leaving room beside it for the returns; so may a
+      // first letter with crooks, whose cups then start further along.
+      const next = word[i + 1] ? anchors[i + 1] : anchors[i];
+      const ahead = revisited.has(v.place) || (i === 0 && v.crooks > 0);
+      points.push(
+        lead !== 0 && ahead && word[i + 1]
+          ? quantised(along(anchors[i], direction(anchors[i], next), lead))
+          : anchors[i],
+      );
       return;
     }
     // Beside the earlier visits, on the side away from the visits and the
@@ -738,149 +774,249 @@ function rulePositions(
   return points;
 }
 
+/** A word placed, with what its figure still fails of placement's checks. */
+export interface PlacedSigilWord {
+  word: PlacedWord;
+  /** Empty when every mark stands clear; otherwise the figure is drawn best effort. */
+  failures: readonly PlacementFailure[];
+  /** The checking work it took. */
+  work: number;
+}
+
+/** Placed words kept for reuse, by layout, profile and plan word. */
+const placedCache = new WeakMap<
+  SigilGeometry,
+  WeakMap<SigilProfile, Map<string, PlacedSigilWord>>
+>();
+/** Placed words kept per layout and profile, oldest dropped first. */
+const CACHE_SIZE = 256;
+
+/**
+ * A text's words placed (`placeSigil`), each with what its figure still
+ * fails. A word's placement depends only on its plan word, the layout and
+ * the profile, so placed words are kept (up to `CACHE_SIZE` per layout
+ * and profile) and a word met again, in the same text or the next
+ * keystroke's, is not placed again. A text's words share twice one
+ * word's `budget`, in order: each gets its full budget while that much is
+ * left, so a text of several hard words costs at most two hard words'
+ * time. What a word is given depends on the words before it alone, never
+ * on what the cache holds, so a text always draws the same figure.
+ */
+export function placeSigilWords(
+  plan: SigilPlan,
+  layout: SigilGeometry,
+  profile: SigilProfile,
+): PlacedSigilWord[] {
+  const settings = placementOf(profile);
+  let byProfile = placedCache.get(layout);
+  if (!byProfile) placedCache.set(layout, (byProfile = new WeakMap()));
+  let cache = byProfile.get(profile);
+  if (!cache) byProfile.set(profile, (cache = new Map()));
+  let left = 2 * settings.budget;
+  // A word with less than the whole budget left is placed afresh, the
+  // same way whatever the cache holds, so the figure depends on the text
+  // alone; one met again in the same text is not placed twice.
+  const short = new Map<string, PlacedSigilWord>();
+  return plan.map((word) => {
+    const key = JSON.stringify(word);
+    const budget = Math.min(settings.budget, left);
+    let result: PlacedSigilWord;
+    if (budget === settings.budget) {
+      const kept = cache.get(key);
+      if (kept) result = kept;
+      else {
+        result = placeWord(word, layout, profile, budget);
+        cache.set(key, result);
+        if (cache.size > CACHE_SIZE)
+          cache.delete(cache.keys().next().value as string);
+      }
+    } else {
+      const memo = `${budget} ${key}`;
+      result = short.get(memo) ?? placeWord(word, layout, profile, budget);
+      short.set(memo, result);
+    }
+    left = Math.max(0, left - result.work);
+    return result;
+  });
+}
+
 /**
  * The plan placed on `layout`: every vertex given the point it is drawn
  * at, quantised to 0.001, and every crook and noose the side it is drawn
  * on, by the rules and search in this module's comment. Deterministic,
- * and the same in every engine.
+ * and the same in every engine. `placeSigilWords` says, too, which words
+ * could not be placed with every mark clear.
  */
 export function placeSigil(
   plan: SigilPlan,
   layout: SigilGeometry,
   profile: SigilProfile,
 ): PlacedWord[] {
+  return placeSigilWords(plan, layout, profile).map((p) => p.word);
+}
+
+/** One word placed with up to `budget` units of checking work. */
+function placeWord(
+  word: SigilWord,
+  layout: SigilGeometry,
+  profile: SigilProfile,
+  budget: number,
+): PlacedSigilWord {
   const settings = placementOf(profile);
   const marks = marksOf(profile);
   const frame = sigilFrame(layout);
   const unit = layout.unit;
   const keep = (marks.minStraight + marks.nooseRadius) * unit;
   const least = 0.05 * unit;
-  return plan.map((word) => {
-    const n = word.length;
-    const anchors = word.map((v) => quantised(layout.anchor(v.place)));
-    const ctx: Context = { word, layout, frame, anchors, unit };
-    const noose = word.map((v) => v.marks.includes("noose"));
-    const settle = (pts: Point[]) => {
-      for (let i = 1; i < n - 1; i++)
-        if (noose[i])
-          pts[i] = nooseFoot(anchors[i], pts[i - 1], pts[i + 1], keep);
-    };
-    type Sides = (1 | -1 | undefined)[];
-    const placed = (pts: Point[], sds: Sides): PlacedVertex[] =>
-      word.map((v, i) => {
-        const side = sds[i];
-        return side ? { ...v, point: pts[i], side } : { ...v, point: pts[i] };
-      });
-    const build = (pts: Point[], sds: Sides) =>
-      elements(word, pts, wordInk(placed(pts, sds), unit, profile, frame));
-    let work = 0;
-    const spent = () => work >= settings.budget;
+  const n = word.length;
+  const anchors = word.map((v) => quantised(layout.anchor(v.place)));
+  const ctx: Context = { word, layout, frame, anchors, unit };
+  const noose = word.map((v) => v.marks.includes("noose"));
+  const settle = (pts: Point[]) => {
+    for (let i = 1; i < n - 1; i++)
+      if (noose[i])
+        pts[i] = nooseFoot(anchors[i], pts[i - 1], pts[i + 1], keep);
+  };
+  type Sides = (1 | -1 | undefined)[];
+  const placed = (pts: Point[], sds: Sides): PlacedVertex[] =>
+    word.map((v, i) => {
+      const side = sds[i];
+      return side ? { ...v, point: pts[i], side } : { ...v, point: pts[i] };
+    });
+  const build = (pts: Point[], sds: Sides) =>
+    elements(word, pts, wordInk(placed(pts, sds), unit, profile, frame));
+  let work = 0;
+  const spent = () => work >= budget;
 
-    /** The search from one start; its figure and what is left failing. */
-    const search = (offset: number, way: RevisitWay) => {
-      const points = rulePositions(word, anchors, offset, way, frame.center);
-      settle(points);
-      const sides: Sides = word.map((v, i) =>
-        v.crooks > 0 || noose[i] ? defaultSide(points, i, frame) : undefined,
-      );
-      const judgement = new Judgement(build(points, sides), ctx, work);
-      while (judgement.score > 0 && judgement.work < settings.budget) {
-        const involved = [
-          ...new Set(judgement.failures().flatMap((f) => f.vertices)),
-        ].sort((a, b) => a - b);
-        // Every move of every vertex involved is judged; the best is taken,
-        // the earliest on a tie, if it gains enough to be worth a round.
-        const round: {
-          best?: {
-            score: number;
-            adopt: () => void;
-            pts: Point[];
-            sds: Sides;
-          };
-        } = {};
-        const consider = (pts: Point[], sds: Sides) => {
-          const proposal = judgement.propose(build(pts, sds));
-          if (
-            proposal.score < judgement.score - MIN_GAIN &&
-            (!round.best || proposal.score < round.best.score)
-          )
-            round.best = { ...proposal, pts, sds };
+  /** The search from one start; its figure and what is left failing. */
+  const search = (points: Point[]) => {
+    settle(points);
+    const sides: Sides = word.map((v, i) =>
+      v.crooks > 0 || noose[i] ? defaultSide(points, i, frame) : undefined,
+    );
+    const judgement = new Judgement(build(points, sides), ctx, work);
+    while (judgement.score > 0 && judgement.work < budget) {
+      const involved = [
+        ...new Set(judgement.failures().flatMap((f) => f.vertices)),
+      ].sort((a, b) => a - b);
+      // Every move of every vertex involved is judged; the best is taken,
+      // the earliest on a tie, if it gains enough to be worth a round.
+      const round: {
+        best?: {
+          score: number;
+          adopt: () => void;
+          pts: Point[];
+          sds: Sides;
         };
-        for (const i of involved) {
-          if (judgement.work >= settings.budget) break;
-          const side = sides[i];
-          if (side) {
-            const flipped = [...sides];
-            flipped[i] = side > 0 ? -1 : 1;
-            consider(points, flipped);
-          }
-          if (noose[i]) continue;
-          const t =
-            i > 0
-              ? direction(points[i - 1], points[i])
-              : direction(
-                  points[0],
-                  points[1] ?? along(points[0], { x: 1, y: 0 }, 1),
-                );
-          const nn = normal(t);
-          const diagonal = (a: Point, b: Point) =>
-            scale({ x: a.x + b.x, y: a.y + b.y }, Math.SQRT1_2);
-          const back = scale(t, -1);
-          const directions = [
-            nn,
-            scale(nn, -1),
-            back,
-            t,
-            diagonal(nn, back),
-            diagonal(scale(nn, -1), back),
-            diagonal(nn, t),
-            diagonal(scale(nn, -1), t),
-          ];
-          const limit =
-            layout.slack(word[i].place) - settings.slackMargin * unit;
-          for (const step of settings.steps)
-            for (const d of directions) {
-              const moved = capped(
-                points[i],
-                d,
-                step * unit,
-                anchors[i],
-                limit,
-                least,
-              );
-              if (!moved) continue;
-              const candidate = [...points];
-              candidate[i] = moved;
-              settle(candidate);
-              consider(candidate, sides);
-            }
+      } = {};
+      const consider = (pts: Point[], sds: Sides) => {
+        const proposal = judgement.propose(build(pts, sds));
+        if (
+          proposal.score < judgement.score - MIN_GAIN &&
+          (!round.best || proposal.score < round.best.score)
+        )
+          round.best = { ...proposal, pts, sds };
+      };
+      for (const i of involved) {
+        if (judgement.work >= budget) break;
+        const side = sides[i];
+        if (side) {
+          const flipped = [...sides];
+          flipped[i] = side > 0 ? -1 : 1;
+          consider(points, flipped);
         }
-        const chosen = round.best;
-        if (!chosen) break;
-        chosen.adopt();
-        points.splice(0, n, ...chosen.pts);
-        sides.splice(0, n, ...chosen.sds);
+        if (noose[i]) continue;
+        const t =
+          i > 0
+            ? direction(points[i - 1], points[i])
+            : direction(
+                points[0],
+                points[1] ?? along(points[0], { x: 1, y: 0 }, 1),
+              );
+        const nn = normal(t);
+        const diagonal = (a: Point, b: Point) =>
+          scale({ x: a.x + b.x, y: a.y + b.y }, Math.SQRT1_2);
+        const back = scale(t, -1);
+        const directions = [
+          nn,
+          scale(nn, -1),
+          back,
+          t,
+          diagonal(nn, back),
+          diagonal(scale(nn, -1), back),
+          diagonal(nn, t),
+          diagonal(scale(nn, -1), t),
+        ];
+        const limit = layout.slack(word[i].place) - settings.slackMargin * unit;
+        for (const step of settings.steps)
+          for (const d of directions) {
+            const moved = capped(
+              points[i],
+              d,
+              step * unit,
+              anchors[i],
+              limit,
+              least,
+            );
+            if (!moved) continue;
+            const candidate = [...points];
+            candidate[i] = moved;
+            settle(candidate);
+            consider(candidate, sides);
+          }
       }
-      work = judgement.work;
-      return { points, sides, score: judgement.score };
+      const chosen = round.best;
+      if (!chosen) break;
+      chosen.adopt();
+      points.splice(0, n, ...chosen.pts);
+      sides.splice(0, n, ...chosen.sds);
+    }
+    work = judgement.work;
+    return {
+      points,
+      sides,
+      score: judgement.score,
+      failures: judgement.failures(),
     };
+  };
 
-    // Revisits beside their places by `revisitOffset`, on the roomier side,
-    // the other side and towards the centre, then the same at the slack's
-    // edge: the first start whose figure passes, else the one that fails
-    // least. A word without revisits has one start.
-    const edge =
-      Math.min(...word.map((v) => layout.slack(v.place))) -
-      settings.slackMargin * unit;
-    let best: ReturnType<typeof search> | undefined;
-    for (const offset of [settings.revisitOffset * unit, edge])
-      for (const way of ["beside", "other", "inward"] as const) {
-        if (best && (best.score === 0 || spent())) break;
-        const result = search(offset, way);
-        if (!best || result.score < best.score) best = result;
-        if (!word.some((v) => v.visit > 0)) break;
-      }
-    const chosen = best as ReturnType<typeof search>;
-    return placed(chosen.points, chosen.sides);
-  });
+  // Revisits beside their places by `revisitOffset`, on the roomier side,
+  // the other side and towards the centre; the same at the slack's edge;
+  // and then at the edge with each revisited place's first visit drawn
+  // ahead by the revisit offset. The first start whose figure passes is
+  // kept, else the one that fails least; a start that puts every vertex
+  // where an earlier one did is skipped.
+  const edge =
+    Math.min(...word.map((v) => layout.slack(v.place))) -
+    settings.slackMargin * unit;
+  const offset = settings.revisitOffset * unit;
+  const starts: [number, RevisitWay, number][] = [
+    [offset, "beside", 0],
+    [offset, "other", 0],
+    [offset, "inward", 0],
+    [edge, "beside", 0],
+    [edge, "other", 0],
+    [edge, "inward", 0],
+    [edge, "beside", offset],
+    [edge, "other", offset],
+    [edge, "beside", -offset],
+    [edge, "other", -offset],
+  ];
+  const tried = new Set<string>();
+  let best: ReturnType<typeof search> | undefined;
+  for (const [by, way, lead] of starts) {
+    if (best && (best.score === 0 || spent())) break;
+    const points = rulePositions(word, anchors, by, way, frame.center, lead);
+    const key = JSON.stringify(points);
+    if (tried.has(key)) continue;
+    tried.add(key);
+    const result = search(points);
+    if (!best || result.score < best.score) best = result;
+  }
+  const chosen = best as ReturnType<typeof search>;
+  return {
+    word: placed(chosen.points, chosen.sides),
+    failures: chosen.failures,
+    work,
+  };
 }

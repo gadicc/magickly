@@ -2,7 +2,7 @@
  * Plane geometry for placement and the renderer (plan 088). Only
  * `+ − × ÷ √` and comparisons: IEEE 754 rounds each of these exactly the
  * same in every engine, unlike trig, so a figure computed from quantised
- * inputs is the same figure in Node, Chromium and the oracle.
+ * inputs is the same figure in Node, Chromium and the tests.
  */
 
 import type { Point } from "./types.ts";
@@ -135,7 +135,7 @@ function nearInterval(
 
 /**
  * How long two strokes' centre lines run closer than `within`: the longer
- * of the stretch of each within `within` of the other, as the oracle's
+ * of the stretch of each within `within` of the other, as plan 088's O2
  * overlap check measures it.
  */
 export function overlapLength(a: Segment, b: Segment, within: number): number {
