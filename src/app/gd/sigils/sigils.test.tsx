@@ -90,9 +90,9 @@ describe("/gd/sigils' words and debug view", () => {
     expect(
       container.querySelector('svg[version="1.1"]')?.getAttribute("viewBox"),
     ).toBe("-150 -50 200 100");
-    // The link's text is the contract's: final forms and one space.
+    // The link's text is the contract's: Hebrew spelling, one space.
     expect(new URL(imageLink(), "https://x").searchParams.get("text")).toBe(
-      "יהוה אלהימ",
+      "יהוה אלהים",
     );
   });
 

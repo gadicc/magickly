@@ -34,7 +34,8 @@ import UiRichText from "@/i18n/UiRichText";
 import UiText from "@/i18n/UiText";
 import { parseComponentImageRequest } from "@/render/componentImageRequest";
 import {
-  rectifySigilText,
+  canonicalSigilText,
+  foldFinalForms,
   SIGIL_MAX_LETTERS,
 } from "@/render/contracts/roseSigil";
 import DebugSigil from "./DebugSigil";
@@ -53,10 +54,12 @@ export default function Sigils({
   const [showKeys, setShowKeys] = React.useState(false);
   const [debug, setDebug] = React.useState(false);
 
-  const rectified = rectifySigilText(sigilText);
+  // Final forms are traced at their ordinary letters' places (F5), so the
+  // text is checked with them folded and drawn as typed.
+  const folded = foldFinalForms(sigilText);
 
   // Whitespace separates words, each its own sigil (plan 088, R2).
-  const charsValid = rectified
+  const charsValid = folded
     .split("")
     .map(
       (letter) =>
@@ -65,11 +68,14 @@ export default function Sigils({
   // As many rose letters as the image contract takes: a longer text is
   // not drawn, which also bounds the work of placing it.
   const letterCount = charsValid.filter(
-    (valid, i) => valid && !/\s/.test(rectified[i]),
+    (valid, i) => valid && !/\s/.test(folded[i]),
   ).length;
   const tooLong = letterCount > SIGIL_MAX_LETTERS;
   const isValid = charsValid.indexOf(false) === -1 && !tooLong;
-  const drawn = isValid ? rectified : "";
+  const drawn = isValid ? sigilText : "";
+  // The text as links and file names carry it: words spelled with their
+  // final forms, as the image contract keeps them.
+  const canonical = (isValid && canonicalSigilText(sigilText)) || "";
 
   // Words beyond the tested domain are drawn best effort; the engine says
   // when a figure fails its own checks, and the page says so too. The
@@ -90,9 +96,9 @@ export default function Sigils({
   // the whitespace between words; the text is the user's own, so the
   // controls say so and nothing is written to the URL.
   const link = (() => {
-    if (!isValid || !rectified) return undefined;
+    if (!canonical) return undefined;
     try {
-      const params = new URLSearchParams({ text: rectified });
+      const params = new URLSearchParams({ text: canonical });
       if (!showRose) params.set("rose", "false");
       if (version !== DEFAULT_ROSE_VERSION) params.set("version", version);
       return {
@@ -164,8 +170,9 @@ export default function Sigils({
             }
           />
         </div>
-        {/* The two labels search has always read as the page's prose go
-            through UiRichText, the adapter it reads (src/search). */}
+        {/* "Invalid characters:", a label search has always read as the
+            page's prose, goes through UiRichText, the adapter it reads
+            (src/search). */}
         {tooLong && (
           <div>
             <UiText
@@ -224,12 +231,6 @@ export default function Sigils({
           </Stack>
         </FormGroup>
 
-        {rectified !== sigilText && (
-          <div>
-            <UiRichText message={/*i18n*/ "Rectified text:"} /> {rectified}
-          </div>
-        )}
-
         {showKeys && (
           <div style={{ direction: "rtl" }}>
             {"אבגדהוזחטיכךלמםנןסעפףצץקרשת←".split("").map((letter, i) => (
@@ -276,7 +277,7 @@ export default function Sigils({
         )}
         <ExportControls
           target={ref}
-          filename={`RoseSigil-${rectified.trim().split(/\s+/).join("-")}${version === DEFAULT_ROSE_VERSION ? "" : `-${version}`}`}
+          filename={`RoseSigil-${canonical.split(" ").join("-")}${version === DEFAULT_ROSE_VERSION ? "" : `-${version}`}`}
           link={link}
           share={share}
         />

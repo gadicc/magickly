@@ -5,7 +5,7 @@ describe("shared sigil links", () => {
   it("restores validated text and the rose setting", () => {
     expect(
       sigilFromSearchParams(new URLSearchParams("text=שלום&rose=false")),
-    ).toEqual({ text: "שלומ", rose: false, version: "gd" });
+    ).toEqual({ text: "שלום", rose: false, version: "gd" });
     expect(sigilFromSearchParams(new URLSearchParams("text=גדי"))).toEqual({
       text: "גדי",
       rose: true,
@@ -30,7 +30,7 @@ describe("shared sigil links", () => {
   it("restores several words, as the image contract keeps them", () => {
     expect(
       sigilFromSearchParams(new URLSearchParams("text=יהוה  אלהים")),
-    ).toEqual({ text: "יהוה אלהימ", rose: true, version: "gd" });
+    ).toEqual({ text: "יהוה אלהים", rose: true, version: "gd" });
   });
 
   it("falls back to the page default for missing or invalid text", () => {

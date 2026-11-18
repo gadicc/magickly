@@ -29,9 +29,31 @@ const FINAL_FORMS: Record<string, string> = {
   ץ: "צ",
 };
 
-/** The interactive page's normalisation: final letters become their medial forms. */
-export function rectifySigilText(text: string): string {
+/** Each letter with a final form, with that form. */
+const TO_FINAL: Record<string, string> = Object.fromEntries(
+  Object.entries(FINAL_FORMS).map(([final, medial]) => [medial, final]),
+);
+
+/**
+ * Final forms folded onto the letters the rose has (ך to כ and so on),
+ * for checking and drawing: a final letter is traced at its ordinary
+ * form's place.
+ */
+export function foldFinalForms(text: string): string {
   return text.replace(/[ךםןףץ]/g, (letter) => FINAL_FORMS[letter]);
+}
+
+/**
+ * A word as Hebrew spells it: a final form at its end and nowhere else,
+ * whichever form it was typed with. A one-letter word keeps its ordinary
+ * form.
+ */
+function spelledWord(word: string): string {
+  const folded = foldFinalForms(word);
+  const letters = [...folded];
+  const last = letters.at(-1) ?? "";
+  if (letters.length < 2 || !TO_FINAL[last]) return folded;
+  return letters.slice(0, -1).join("") + TO_FINAL[last];
 }
 
 /**
@@ -81,9 +103,9 @@ export const ROSE_IMAGE_VERSIONS = ["gd", "regardie1939"] as const;
 
 export interface RoseSigilProps extends ImageDimensions {
   /**
-   * Rectified rose letters, at least one and at most SIGIL_MAX_LETTERS in
-   * all, in words separated by single spaces (R2), with no space at
-   * either end.
+   * Rose letters, at least one and at most SIGIL_MAX_LETTERS in all,
+   * spelled with final forms at the ends of words (`canonicalSigilText`),
+   * in words separated by single spaces (R2), with no space at either end.
    */
   text: string;
   rose: boolean;
@@ -95,20 +117,23 @@ export interface RoseSigilProps extends ImageDimensions {
 }
 
 /**
- * A text as the contract keeps it: final forms rectified and whitespace
- * (JavaScript's `\s`, as the planner splits on) collapsed to single spaces
- * and trimmed, or `null` when it holds anything but rose letters and
+ * A text as the contract keeps it: whitespace (JavaScript's `\s`, as the
+ * planner splits on) collapsed to single spaces and trimmed, and each
+ * word spelled with a final form at its end and nowhere else, so that
+ * מטטרון and מטטרונ are one sigil and one link, shown as Hebrew writes it;
+ * or `null` when it holds anything but rose letters, their final forms and
  * whitespace, no letter, or more than SIGIL_MAX_LETTERS letters.
  */
 export function canonicalSigilText(raw: string): string | null {
-  const text = rectifySigilText(raw).trim().split(/\s+/).join(" ");
+  const words = foldFinalForms(raw).trim().split(/\s+/);
   let letters = 0;
-  for (const character of text) {
-    if (character === " ") continue;
+  for (const character of words.join("")) {
     if (!SIGIL_LETTERS.includes(character)) return null;
     letters++;
   }
-  return letters >= 1 && letters <= SIGIL_MAX_LETTERS ? text : null;
+  return letters >= 1 && letters <= SIGIL_MAX_LETTERS
+    ? words.map(spelledWord).join(" ")
+    : null;
 }
 
 /**

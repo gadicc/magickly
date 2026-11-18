@@ -1506,11 +1506,6 @@ msgstr "Debug"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/sigils.tsx
-msgid "Rectified text:"
-msgstr "Rectified text:"
-
-#. js-lingui-explicit-id
-#: src/app/gd/sigils/sigils.tsx
 msgid "This sigil could not be drawn so that every mark stands clear; it may be hard to read."
 msgstr "This sigil could not be drawn so that every mark stands clear; it may be hard to read."
 

@@ -23,8 +23,8 @@ import {
 } from "./index";
 import {
   canonicalSigilText,
+  foldFinalForms,
   ROSE_IMAGE_VERSIONS,
-  rectifySigilText,
   SIGIL_MAX_LETTERS,
   sigilRasterDefault,
   sigilViewBox,
@@ -193,8 +193,15 @@ describe("component image contracts", () => {
   });
 
   it("canonicalises sigil final letters and bounds the text", () => {
-    expect(rectifySigilText("שלום")).toBe("שלומ");
-    expect(parse("rose-sigil", "text=שלום").text).toBe("שלומ");
+    expect(foldFinalForms("מטטרון שלום")).toBe("מטטרונ שלומ");
+    // Spelled as Hebrew writes it, however it was typed: a final form at
+    // the end of a word of two letters or more, and nowhere else.
+    for (const typed of ["שלום", "שלומ", "שםלום"])
+      expect(parse("rose-sigil", `text=${typed}`).text).toBe(
+        typed === "שםלום" ? "שמלום" : "שלום",
+      );
+    expect(parse("rose-sigil", "text=מטטרונ  יהוה").text).toBe("מטטרון יהוה");
+    expect(parse("rose-sigil", "text=ץ ם").text).toBe("צ מ");
     expect(
       parse("rose-sigil", "text=" + "א".repeat(SIGIL_MAX_LETTERS)).text,
     ).toHaveLength(SIGIL_MAX_LETTERS);
@@ -226,14 +233,14 @@ describe("component image contracts", () => {
 
   it("takes several words, each its own sigil (plan 088, R2)", () => {
     // Any whitespace between words, collapsed to one space and trimmed.
-    expect(parse("rose-sigil", "text=יהוה  אלהים").text).toBe("יהוה אלהימ");
+    expect(parse("rose-sigil", "text=יהוה  אלהים").text).toBe("יהוה אלהים");
     expect(
       parse(
         "rose-sigil",
         `text=${encodeURIComponent(" יוד\tהא\nואו\u00a0הא ")}`,
       ).text,
     ).toBe("יוד הא ואו הא");
-    expect(canonicalSigilText("יהוה אלהים")).toBe("יהוה אלהימ");
+    expect(canonicalSigilText("יהוה אלהים")).toBe("יהוה אלהים");
     expect(canonicalSigilText("  ")).toBeNull();
     // The bound counts letters, not spaces.
     const many = Array(SIGIL_MAX_LETTERS).fill("א").join(" ");
@@ -243,10 +250,10 @@ describe("component image contracts", () => {
         slug: "rose-sigil",
         props: parse("rose-sigil", "text=יהוה  אלהים"),
       }).toString(),
-    ).toBe(new URLSearchParams({ text: "יהוה אלהימ" }).toString());
+    ).toBe(new URLSearchParams({ text: "יהוה אלהים" }).toString());
     expect(
       CONTRACTS["rose-sigil"].filename(parse("rose-sigil", "text=יהוה אלהים")),
-    ).toBe("rose-sigil-יהוה-אלהימ");
+    ).toBe("rose-sigil-יהוה-אלהים");
   });
 
   it("frames each word as the package draws it, right to left", () => {
