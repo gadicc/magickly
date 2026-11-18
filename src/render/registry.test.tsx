@@ -347,18 +347,20 @@ describe("component image registry", () => {
     ],
     // The rose sigil drawn by rule (plan 088): 13,454 bytes, 6edd6bd2…;
     // 707, ef44185a…; and 13,416, f0cee48b…, while COBYLA placed the
-    // points. Reviewed again as rasterised, with two words beside them.
+    // points. Reviewed again as rasterised, with two words beside them,
+    // and again when each word's bar became a path of its own (the same
+    // ink, so the draw-on can run in order).
     [
       "rose-sigil",
       "text=גדי",
-      12_570,
-      "7afa313a0e90c1317a91b6791443285b59ac671de8a7e2f629700000dd7b9501",
+      12_640,
+      "1d88b4f13ccfdecc093c69df7cc6bca8fa116220f44888f14a17eded3997d051",
     ],
     [
       "rose-sigil",
       "text=שלום&rose=false",
-      495,
-      "33210ea14ad97950493991b852199c2aeb5f5dd61113fa076d4887be758c536f",
+      565,
+      "ea40b3f05b58d8ebc825d38cbe85bffd37269807bcecf2f2a0b3c3d1f6056f58",
     ],
     // Shabbathai on Regardie's rose of 1939, through Tau where Kaph is on
     // the default rose (plan 080, "The rose's and the candlestick's
@@ -366,17 +368,17 @@ describe("component image registry", () => {
     [
       "rose-sigil",
       "text=שבתאי&version=regardie1939",
-      12_725,
-      "8f865a3ef15cf599b2dc6f60117c507cdc0e6d1f63269a075d3c0fba07cc3721",
+      12_795,
+      "ab82d970a69cb2ce9ae79a86bb74740e604fe105b1e06d8a3eff30bfb055d5c2",
     ],
     // Two words, two sigils, right to left (R2); 25,639 bytes, ab904163…,
     // before placement kept the bar and crooks clear of other ink.
-    // Reviewed as rasterised.
+    // Reviewed as rasterised, and again with the bars as their own paths.
     [
       "rose-sigil",
       "text=יהוה אלהים",
-      25_921,
-      "c295b1d3102db6f1f6ea7e31eee30184307affd5128cb141b545348655b20cc7",
+      26_089,
+      "5fa3648ec5ce8299b372cecd626e7bdab9e0ab155a5bf7b1dd6ee5e2f765979d",
     ],
   ] as const)(
     "pins the reviewed bytes of %s?%s so a silent font fallback fails",

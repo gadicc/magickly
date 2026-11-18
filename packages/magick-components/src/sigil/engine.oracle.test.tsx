@@ -206,7 +206,10 @@ describe("the engine against O2 and O3", () => {
     const rose = roseSigilLayout();
     const svg = draw("יהוה אלהים", rose);
     expect(svg).toContain('viewBox="-150 -50 200 100"');
-    expect(svg.match(/<path /g)).toHaveLength(1);
+    // In drawing order: each word's circle, strokes and marks, then its bar.
+    expect(
+      svg.match(/<path d="M [^"]*"><\/path>/g)?.map((p) => p.includes(" A ")),
+    ).toEqual([true, false, true, false]);
     const plan = planSigil(sigilWords("יהוה אלהים"), rose, ROSE_SIGIL_PROFILE);
     expect(judge(svg, plan, rose)).toEqual([]);
   });
@@ -224,7 +227,12 @@ describe("the engine's drawings, broken, are caught", () => {
   };
 
   it("without its bar", () => {
-    const svg = draw("מטטרון", rose).replace(/ M [-\d.,]+ L [-\d.,]+"/, '"');
+    // The bar is the last path, drawn after the word's other ink.
+    const svg = draw("מטטרון", rose).replace(
+      /<path d="M [-\d.,]+ L [-\d.,]+"><\/path>/,
+      "",
+    );
+    expect(svg).not.toBe(draw("מטטרון", rose));
     expect(caught(svg, plan("מטטרון"))).toEqual(["O2", "O3"]);
   });
 

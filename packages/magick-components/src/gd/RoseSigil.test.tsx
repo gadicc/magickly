@@ -12,19 +12,25 @@ afterEach(() => {
 });
 
 describe("RoseSigil", () => {
-  it("hydrates when the browser's trig results differ in the last bit", () => {
-    // The server and the browser both draw the figure placed by rule from
-    // anchors rounded to 0.001; `engine.oracle.test.tsx` nudges the anchors
-    // themselves by an ulp.
-    const render = () =>
-      renderToString(<RoseSigil text="אבג" showRose animate />);
-    const server = render();
+  it("hydrates when the browser's trig results differ in the last bit", async () => {
+    // The layout caches its anchors for the module's life, so the browser's
+    // side is drawn by fresh modules loaded under nudged trig: their
+    // letter centres, the rose's labels and the sigil's anchors all come
+    // from the nudged results, and must round to the server's figure.
+    const text = "אבגדהוזחטיכלמנסעפצקרשת יהוה";
+    const server = renderToString(<RoseSigil text={text} showRose animate />);
     const yod = letterPoint("י");
     const { cos, sin } = Math;
     vi.spyOn(Math, "cos").mockImplementation((x) => nudge(cos(x)));
     vi.spyOn(Math, "sin").mockImplementation((x) => nudge(sin(x)));
-    expect(letterPoint("י")).not.toEqual(yod);
-    expect(render()).toBe(server);
+    vi.resetModules();
+    const browser = await import("./RoseSigil.tsx");
+    const geometry = await import("./roseSigilGeometry.ts");
+    expect(geometry.letterPoint("י")).not.toEqual(yod);
+    const client = renderToString(
+      <browser.RoseSigil text={text} showRose animate />,
+    );
+    expect(client).toBe(server);
 
     // Node 25 wrote י's label at y="30.310889132455348", Chromium 152 at …344.
     expect(server).toContain('<text x="-17.5" y="30.311"');
@@ -41,8 +47,9 @@ describe("RoseSigil", () => {
     const html = renderToString(
       <RoseSigil text="דדדבבב" showRose={false} animate />,
     );
+    // The word's ink, then its bar.
     const paths = [...html.matchAll(/<path [^>]*\bd="([^"]*)"/g)];
-    expect(paths).toHaveLength(1);
+    expect(paths).toHaveLength(2);
     const [[, d]] = paths;
     expect(d).toMatch(/^M [-\d.]+,[-\d.]+ A 1.5,1.5 /);
     expect(d.match(/C /g)).toHaveLength(8);
@@ -57,7 +64,8 @@ describe("RoseSigil", () => {
     // The rose behind each word, the second moved into its region.
     expect(html.match(/<circle /g)).toHaveLength(8);
     expect(html).toContain('transform="translate(-100 0)"');
-    expect(html.match(/<path /g)).toHaveLength(1);
+    // Each word's ink and its bar, in the order they are drawn on.
+    expect(html.match(/<path /g)).toHaveLength(4);
   });
 
   it("draws any text: final forms as their base letters, the rest left out", () => {

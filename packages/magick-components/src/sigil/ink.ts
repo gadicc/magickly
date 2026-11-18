@@ -403,21 +403,34 @@ export function pathData(
 }
 
 /**
- * The path data of placed words on `layout`: every word's ink, word `i`
- * moved into its region, as one path so it can be drawn on.
+ * The path data of placed words on `layout`, word `i` moved into its
+ * region, one string per subpath in drawing order: each word's start
+ * circle, strokes and marks, then its bar. Browsers start a stroke's dash
+ * pattern afresh at every subpath, so a draw-on that runs in this order
+ * needs each its own path.
  */
+export function sigilSubpaths(
+  words: readonly PlacedWord[],
+  layout: SigilGeometry,
+  profile: SigilProfile,
+): string[] {
+  const frame = sigilFrame(layout);
+  return words.flatMap((word, i) => {
+    const offset = wordOffset(frame, i);
+    const subpaths: InkCommand[][] = [];
+    for (const c of wordInk(word, layout.unit, profile, frame).commands) {
+      if (c.type === "M") subpaths.push([]);
+      subpaths[subpaths.length - 1].push(c);
+    }
+    return subpaths.map((commands) => pathData(commands, offset));
+  });
+}
+
+/** The path data of placed words on `layout`, as one path. */
 export function sigilPathData(
   words: readonly PlacedWord[],
   layout: SigilGeometry,
   profile: SigilProfile,
 ): string {
-  const frame = sigilFrame(layout);
-  return words
-    .map((word, i) =>
-      pathData(
-        wordInk(word, layout.unit, profile, frame).commands,
-        wordOffset(frame, i),
-      ),
-    )
-    .join(" ");
+  return sigilSubpaths(words, layout, profile).join(" ");
 }

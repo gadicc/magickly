@@ -47,14 +47,19 @@ export interface RoseSigilImageProps {
    */
   points?: SigilPoint[];
   /**
-   * Draw-on animation class for the sigil's path, unique per instance
-   * because a `<style>` inside inline SVG is document-wide; server renders
-   * never animate.
+   * A name for the draw-on animation, unique per instance because a
+   * `<style>` inside inline SVG is document-wide: its keyframes, and a
+   * class of that name running them; server renders never animate.
    */
   animation?: string;
   /** The `<svg>`, for exporting the drawing. */
   ref?: React.Ref<SVGSVGElement>;
-  /** The sigil's path, which `RoseSigil` animates. */
+  /**
+   * The group of the sigil's paths, in drawing order, which `RoseSigil`
+   * draws on one after another.
+   */
+  inkRef?: React.Ref<SVGGElement>;
+  /** With the deprecated `points`, the connecting path. */
   pathRef?: React.Ref<SVGPathElement>;
 }
 
@@ -146,8 +151,8 @@ function anchorPath(
  * draw it with React's server build; `RoseSigil` adds the animation
  * around it. The sigil is planned and placed by rule on the rose
  * (`SigilImage`), each word its own sigil and the rose behind each; its
- * ink is one red path. With the deprecated `points` it is drawn through
- * them as it was before plan 088.
+ * ink is red paths in drawing order. With the deprecated `points` it is
+ * drawn through them as it was before plan 088.
  */
 export function RoseSigilImage({
   text,
@@ -157,6 +162,7 @@ export function RoseSigilImage({
   points,
   animation,
   ref,
+  inkRef,
   pathRef,
 }: RoseSigilImageProps) {
   if (points)
@@ -173,14 +179,16 @@ export function RoseSigilImage({
       />
     );
   const layout = roseSigilLayout(version);
-  const plan = debug ? sigilFigure(text, layout, ROSE_SIGIL_PROFILE).plan : [];
+  const figure = sigilFigure(text, layout, ROSE_SIGIL_PROFILE);
+  const plan = figure.plan;
   return (
     <SigilImage
       text={text}
       layout={layout}
       profile={ROSE_SIGIL_PROFILE}
+      figure={figure}
       ref={ref}
-      pathRef={pathRef}
+      inkRef={inkRef}
       backdrop={
         showRose || debug
           ? (offset, index) => {

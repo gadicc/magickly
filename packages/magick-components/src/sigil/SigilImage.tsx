@@ -2,7 +2,7 @@ import type React from "react";
 import {
   type SigilFrame,
   sigilFrame,
-  sigilPathData,
+  sigilSubpaths,
   sigilViewBox,
 } from "./ink.ts";
 import { placeSigil } from "./placeSigil.ts";
@@ -15,19 +15,22 @@ import type {
   SigilProfile,
 } from "./types.ts";
 
-/** A text's sigil worked out: its plan, its placed words and their path. */
+/** A text's sigil worked out: its plan, its placed words and their paths. */
 export interface SigilFigure {
   plan: SigilPlan;
   placed: PlacedWord[];
-  /** Path data of every word's ink, in one path. */
-  d: string;
+  /**
+   * Path data of every word's ink, a path per subpath in drawing order
+   * (`sigilSubpaths`): each word's circle, strokes and marks, then its bar.
+   */
+  paths: string[];
   frame: SigilFrame;
   viewBox: [number, number, number, number];
 }
 
 /**
  * `text` planned (`planSigil`), placed by rule (`placeSigil`) and drawn
- * (`sigilPathData`) on `layout` under `profile`. Pure and deterministic:
+ * (`sigilSubpaths`) on `layout` under `profile`. Pure and deterministic:
  * the same figure on the server and in every browser.
  */
 export function sigilFigure(
@@ -41,7 +44,7 @@ export function sigilFigure(
   return {
     plan,
     placed,
-    d: sigilPathData(placed, layout, profile),
+    paths: sigilSubpaths(placed, layout, profile),
     frame,
     viewBox: sigilViewBox(frame, plan.length),
   };
@@ -63,18 +66,26 @@ export interface SigilImageProps {
   backdrop?: (offset: Point, index: number) => React.ReactNode;
   /** Drawn before everything else (a `<style>`, say). */
   children?: React.ReactNode;
-  /** A class on the sigil's path (a draw-on animation). */
-  pathClassName?: string;
   /** The `<svg>`. */
   ref?: React.Ref<SVGSVGElement>;
-  /** The sigil's one path, for a draw-on animation. */
-  pathRef?: React.Ref<SVGPathElement>;
+  /**
+   * The group holding the sigil's paths, in drawing order (`SigilFigure`'s
+   * `paths`), for a draw-on animation.
+   */
+  inkRef?: React.Ref<SVGGElement>;
+  /**
+   * The figure already worked out by `sigilFigure` for this text, layout
+   * and profile, so a caller that needs it too (or keeps it between
+   * renders) does not place the sigil twice.
+   */
+  figure?: SigilFigure;
 }
 
 /**
  * A sigil drawn by rule on any layout, with no hooks, so a server renderer
- * draws it with React's server build. Its only ink is one stroked path,
- * the stroke `layout.unit` wide, so the figure grammar's sizes hold.
+ * draws it with React's server build. Its only ink is stroked paths in
+ * one group, a path per subpath in drawing order, the stroke
+ * `layout.unit` wide, so the figure grammar's sizes hold.
  */
 export function SigilImage({
   text,
@@ -83,11 +94,10 @@ export function SigilImage({
   stroke = "red",
   backdrop,
   children,
-  pathClassName,
   ref,
-  pathRef,
+  inkRef,
+  figure = sigilFigure(text, layout, profile),
 }: SigilImageProps) {
-  const figure = sigilFigure(text, layout, profile);
   const regions = Math.max(1, figure.plan.length);
   return (
     <svg
@@ -101,14 +111,13 @@ export function SigilImage({
         Array.from({ length: regions }, (_, i) =>
           backdrop({ x: -i * figure.frame.pitch, y: 0 }, i),
         )}
-      <path
-        stroke={stroke}
-        strokeWidth={layout.unit}
-        fill="none"
-        className={pathClassName}
-        ref={pathRef}
-        d={figure.d}
-      />
+      <g stroke={stroke} strokeWidth={layout.unit} fill="none" ref={inkRef}>
+        {figure.paths.map((d, i) => (
+          // Paths in drawing order, which a figure's text fixes.
+          // biome-ignore lint/suspicious/noArrayIndexKey: the order is the identity.
+          <path key={i} d={d} />
+        ))}
+      </g>
     </svg>
   );
 }

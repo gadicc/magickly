@@ -231,6 +231,7 @@ export default function DebugSigil({
         text={text}
         layout={layout}
         profile={ROSE_SIGIL_PROFILE}
+        figure={figure}
         ref={ref}
         backdrop={(offset, index) => (
           <g key={index} transform={`translate(${offset.x} ${offset.y})`}>
