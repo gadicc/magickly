@@ -3,7 +3,13 @@ import JSON5 from "json5";
 import { ANGEL_COUNT } from "magick-data/kabbalah/seventyTwoAngels/derived";
 import { writeEvidence } from "./evidence";
 import { published, readExtraction, type StoredExtraction } from "./extract";
-import { cropReadings, handReadings, hebrewReadings } from "./hebrew";
+import {
+  cropReadings,
+  type HebrewName,
+  handReadings,
+  hebrewNames,
+  hebrewReadings,
+} from "./hebrew";
 import { disagreements, hebrewProblems, shapeProblems } from "./validate";
 
 /**
@@ -98,23 +104,18 @@ function write(path: string, value: unknown) {
   console.log(`${path} — ${(bytes / 1024).toFixed(1)} kB`);
 }
 
-let agreedHebrew = new Map<number, string>();
-let byHand = new Map<number, { plain: string; pointed: string }>();
+let names = new Map<number, HebrewName>();
 
 /**
  * A name read by a person outranks one two machines happened to agree on, and
  * the data says which it was. The page's dots are kept apart from the letters:
  * `he` identifies the name, `hePointed` is what the reissue prints. For the
- * two names the reissue misprints, `he` is the 1823 printing's letters and
- * `hePointed` does not strip to it (see hebrewByHand.json5).
+ * names the reissue misprints, `he` is the 1823 printing's letters and
+ * `hePointed` does not strip to it (see `hebrewNames`).
  */
 function hebrewFor(no: number, en: string) {
-  const hand = byHand.get(no);
-  if (hand)
-    return { en, he: hand.plain, hePointed: hand.pointed, heSource: "hand" };
-  const agreed = agreedHebrew.get(no);
-  if (agreed) return { en, he: agreed, heSource: "corroborated" };
-  return { en };
+  const name = names.get(no);
+  return name ? { en, ...name } : { en };
 }
 
 function main() {
@@ -134,8 +135,8 @@ function main() {
     new Map(angels.map((angel) => [angel.no, angel.name.he])),
     crops,
   );
-  agreedHebrew = readings.agreed;
-  byHand = handReadings();
+  const byHand = handReadings();
+  names = hebrewNames(readings.agreed, byHand);
 
   // Shape no longer decides what ships — two readings agreeing does — but a
   // corroborated name of an unexpected shape is worth saying out loud.

@@ -284,7 +284,8 @@ What they settled, against the reissue:
 - **The reissue's own errors**, which the apparatus had laid at Lenain's door:
   18's and 71's presiding days, 53's and 62's degrees, the forty-sixth's
   ordinal ("36e"), the five revolutions ("260 jours"), the twelfth's damaged
-  "qui.l", and the Hebrew of 37 (אנואל for אניאל) and 68 (הבויה for חבויה).
+  "qui.l", and the Hebrew of 37 (אנואל for אניאל), 68 (הבויה for חבויה) and,
+  found later (below), 69 (ראחאל for ראהאל).
   The 1823 printing has the right value in each.
 - **Lenain's own**, confirmed: every other table disagreement is in 1823 too.
 - **The reissue correcting Lenain**: the sixth's Hebrew is ללחאל in 1823, ללהאל
@@ -296,6 +297,39 @@ What they settled, against the reissue:
   the sixty-second (Iahhel, blank on the reissue's), and has "Haiaiel" and
   "Les Brachmanes" where the reissue has "Haiuiel" and "Les Brahmanes". Rows 1
   to 56 are on no image found.
+
+The other forty-seven Hebrew names, the ones two machine readings of the
+reissue agreed on, were then read from the 1823 pages too (that printing only,
+no manuscript), and all seventy-two compared with their triads of the Shem
+HaMephorash, derived from Exodus 14:19–21. The verses are committed as
+consonantal text in `packages/magick-data/src/kabbalah/shemHaMephorash.ts`,
+citing Sefaria's "Miqra according to the Masorah", and a test holds every name
+to its triad and to ending יה or אל, so a new departure fails the build. What they found:
+
+- **One more reissue misprint**: the sixty-ninth is ראחאל in the reissue,
+  ראהאל (the triad ראה) in 1823, p. 92. As for 37 and 68, the data gives the
+  1823 letters and keeps the reissue's beside them; this is the first such
+  name a machine read rather than a person, so the rule that lets the name
+  differ from the reissue's letters now follows the witness's `reissue`
+  verdict, not the hand readings.
+- **Two slips of Lenain's the reissue corrected**: the twelfth is חהעיה in
+  1823 (p. 53), a clear het beside a clear he, where the reissue and the triad
+  have ההעיה; and the fifteenth is set backwards in 1823 (p. 54), לאירח, its
+  last letter what looks like a het where the reissue's הריאל and the triad
+  have he.
+- **Lenain's own spellings**, the same in both printings and so kept: 24
+  ההויה, 33 יהויה, 34 לההיה, 38 העמיה, 51 ההשיה, 59 הרהאל and 64 מהיאל have
+  he where the verse has het, and 30 ומאאל has the triad אומ's letters in
+  another order. Each now has a note saying what the verse gives.
+- **An ending of Lenain's**: the sixty-sixth, Manakel, is מנקאה in both
+  printings (1823, p. 91), ending אה where every other name he spells -el
+  ends אל and the tradition has מנקאל. It is kept, with a note, and the test
+  also holds every name to ending יה or אל, with 66 the one listed exception.
+
+Five stay open. For 1, 4, 5, 7 and 8 the 1823 scan seems to show het where the
+reissue and the verse have he, but at the scan's resolution this cannot be
+settled; a sharper image of pp. 46–51, from Amiens or Gallica, would settle it.
+Nothing is recorded for them until then.
 
 No copy with the plate opened was found: Gallica and HathiTrust refused
 automated access, and Papus's *La Cabbale* (1903) describes the book without
@@ -322,9 +356,8 @@ or their names of God, so rows 1 to 56 of those columns still rest on the entrie
   the per-genius routes' job, but it is worth stating plainly: the page has
   almost no indexable content.
 - `output/preview-refresh-*` holds 7.8 GB of stale build directories.
-- The 47 Hebrew names two machine readings agreed on were read from the
-  reissue only. Checking them against the 1823 printing, or deriving all 72
-  from Exodus 14:19–21, would catch any more like 37 and 68.
 - Gallica (BnF) and the Bibliothèque d'Amiens may hold a copy with the plate
-  opened; both need a person in a browser.
+  opened; both need a person in a browser. A sharper image of pp. 46–51 from
+  either would also settle the Hebrew of 1, 4, 5, 7 and 8 (see "Other
+  witnesses").
 

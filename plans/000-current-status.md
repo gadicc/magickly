@@ -823,15 +823,17 @@ Follow-ups are separate from the completed migration work:
 - The 72 angels of the Shem HaMephorash are complete as of 19 September:
   all seventy-two entries restored from the 1823 scan and translated, with the
   prose split by language and loaded only when a reader opens one. See
-  [plan 031](031-seventy-two-angels.md). TODO: the Hebrew names are absent,
-  because the scan cannot supply them and a wrong one passes every check we
-  have; they want deriving from Exodus 14:19-21, or a named source. TODO: the
+  [plan 031](031-seventy-two-angels.md). TODO: the
   twenty-second entry's name comes from the model rather than the scan, whose
   heading is gone. The disagreements between the entries and
   Lenain's own tables are now resolved per entry against the 1823 printing
   and a manuscript copy (18 November; [plan 033](033-lenain-edition.md#other-witnesses-18-november-2026)):
-  the scan is a reset reissue, and nine of its departures, two Hebrew names
-  among them, are the reissue's rather than Lenain's.
+  the scan is a reset reissue, and ten of its departures, three Hebrew names
+  (37, 68 and 69) among them, are the reissue's rather than Lenain's. All
+  seventy-two Hebrew names have since been read from the 1823 printing and
+  held to their triads from Exodus 14:19–21 by a test: eight are Lenain's own spellings and 66 his own ending
+  (מנקאה), each with a note. TODO: the
+  Hebrew of 1, 4, 5, 7 and 8 wants a sharper 1823 image than the scan.
 - TODO: the sigils the 72 angels page has promised since 2023. The plates in
   the public-domain scan would serve, but only the OCR sidecar is in the repo,
   not the PDF. Vaughan's blog images are his own work.

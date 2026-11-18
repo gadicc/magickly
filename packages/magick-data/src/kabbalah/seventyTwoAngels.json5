@@ -2593,7 +2593,8 @@
     no: 69,
     name: {
       en: 'Rochel',
-      he: 'ראחאל',
+      he: 'ראהאל',
+      hePointed: 'ראחאל',
       heSource: 'corroborated',
     },
     printedPages: [

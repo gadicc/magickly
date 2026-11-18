@@ -351,12 +351,15 @@ Markdown is generated from that. The PDF stays out of the repository;
 - **The duplicated OCR file.** `public/docs/…Google.txt` ships the book twice,
   at a cost of about 264 KB. Trimming it changes a linked public URL's contents,
   so it wants its own decision.
-- **The Hebrew names**, which are not in the data at all. Each is a triad of the
-  Shem HaMephorash plus יה or אל, so with Exodus 14:19–21 in the repo all 72
-  could be derived and checked rather than read off a scan that cannot supply
-  them. Two checks would guard a text entered from memory: each of those verses
-  has exactly 72 letters, and the 72 derived names should match the
-  romanisations the scan gave independently.
+- ~~**The Hebrew names**, which are not in the data at all. Each is a triad of
+  the Shem HaMephorash plus יה or אל, so with Exodus 14:19–21 in the repo all
+  72 could be derived and checked rather than read off a scan that cannot
+  supply them. Two checks would guard a text entered from memory: each of those
+  verses has exactly 72 letters, and the 72 derived names should match the
+  romanisations the scan gave independently.~~ Done; see plan 033, "Other
+  witnesses". The names were read from the scan and against the 1823
+  printing, and Exodus 14:19–21 is in the repository as a check on them: a
+  test holds each verse to 72 letters and each name to its triad and ending.
 - **The twenty-second's name.** Taken from the sequence Lenain, Agrippa and
   Kircher share, or left out. Its heading is gone and nothing in this scan
   decides it.

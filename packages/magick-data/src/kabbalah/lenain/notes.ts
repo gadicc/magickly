@@ -37,8 +37,21 @@ export interface Note {
   field: string;
   /** The leaf it concerns, as that leaf's anchor. */
   page?: string;
+  /**
+   * What the book prints, as it prints it. Empty where it prints nothing (an
+   * hour no printing gives), and where what it prints is not settled (a
+   * Hebrew name two readings could not agree on). For a Hebrew name the
+   * machines read, it is the bare letters: their marks were not trusted, so
+   * the reissue's dots are not recorded for those names.
+   */
   printed: string;
+  /**
+   * What this edition uses instead. Empty where it keeps what is printed
+   * ("kept as printed"), and, with `printed` empty too, where it gives nothing
+   * at all: a Hebrew name no reading settled.
+   */
   used: string;
+  /** Why, in a sentence a reader can check. */
   why: string;
   /** The other copies read at this place, the 1823 printing first. */
   witnesses?: NoteWitness[];

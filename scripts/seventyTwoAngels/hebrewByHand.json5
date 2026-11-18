@@ -18,7 +18,9 @@
 // page misprints the name, where the 1823 printing has the triads אני and
 // חבו. Those two rows say so: `reissue` is the reissue's bare letters, which
 // `pointed` must strip to, and `plain` is the 1823 printing's, which
-// witnesses.json5 must record. The build accepts the difference only there.
+// witnesses.json5 must record. The build accepts the difference only where
+// witnesses.json5 records a misprint; the third, the sixty-ninth, was read by
+// the machines and is not here (see `hebrewNames` in hebrew.ts).
 [
   { no: 6, plain: "ללהאל", pointed: "לׄלּׄהאׄלּׄ" },
   { no: 13, plain: "יזלאל", pointed: "יזּלּׄאׄלּ" },

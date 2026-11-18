@@ -19,9 +19,11 @@ import type { Links, Raw } from "../types.ts";
  * read it, and `hePointed` carries the page's marks where one did. Lenain dots
  * his Hebrew above the letters, which is what defeated the machine — a
  * reading that took the dots for vowel points returned four letters where the
- * page prints five. The page is the reissue's, which misprints the 37th and
- * the 68th; for those `he` is the 1823 printing's letters, and `hePointed`
- * does not strip to it. `printedPages` are the reissue's page numbers too.
+ * page prints five. The page is the reissue's, which misprints the 37th, the
+ * 68th and the 69th; for those `he` is the 1823 printing's letters, and
+ * `hePointed` is the reissue's and does not strip to it (for the 69th, which
+ * the machines read, it is bare letters). `printedPages` are the reissue's
+ * page numbers too.
  */
 type Angel = Raw<"seventyTwoAngel"> & Partial<Links<"*", "seventyTwoAngel">>;
 

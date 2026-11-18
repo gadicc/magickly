@@ -1574,6 +1574,7 @@ Le génie contraire domine l'indiscrétion et le mensonge ; il influe sur tous c
 
 **Editorial notes**
 
+- **genius 12, name.he** (reading) · ההעיה, kept as printed — Two readings of the scan agree on the reissue's letters. The 1823 printing has “חהעיה” (p. 53); the reissue corrected it. The 1823 page sets a clear het beside a clear he. The triad of the Shem HaMephorash is ההע, so the reissue's he is right and the 1823 het a slip. [1823 printing, p. 53](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA53)
 - **genius 12, psalm.la** (reading) · Ut qui.l Domine recessisti longè → quid — The italic d of "quid" has printed as a dot and a broken stroke, so the page reads "qui.l". At 500 dpi it is plainly damaged type rather than a spelling: the verse is Psalm 9:22, "Ut quid Domine recessisti longe". The reissue's resetting misprints this: the 1823 printing reads “Ut quid Domine recessisti longè” (p. 53). The manuscript copy Ms 5365 has the same (leaf n61). [1823 printing, p. 53](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA53) · [Ms 5365, leaf n61](https://archive.org/details/BIUSante_ms05365/page/n61/mode/1up)
 - **genius 13, name.he** (reading) · יזּלּׄאׄלּ → יזלאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 53). The manuscript copy Ms 5365 has the same (leaf n61). [1823 printing, p. 53](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA53) · [Ms 5365, leaf n61](https://archive.org/details/BIUSante_ms05365/page/n61/mode/1up)
 - **genius 13, presidingDays** (correction) · 1/4, 12/6, 23/8, 3/9, 14/1 → 1/4, 12/6, 23/8, 3/11, 14/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 54), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n62). [1823 printing, p. 54](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA54) · [Ms 5365, leaf n62](https://archive.org/details/BIUSante_ms05365/page/n62/mode/1up)
@@ -1604,6 +1605,7 @@ Le génie contraire domine la calomnie, les faux témoignages et les procédures
 **Editorial notes**
 
 - **genius 14, degrees** (correction) · 66-10 → 66-70 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 54), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 reads “66–70” (leaf n62), a copyist's variant. [1823 printing, p. 54](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA54) · [Ms 5365, leaf n62](https://archive.org/details/BIUSante_ms05365/page/n62/mode/1up)
+- **genius 15, name.he** (reading) · הריאל, kept as printed — Two readings of the scan agree on the reissue's letters. The 1823 printing has “לאירח” (p. 54); the reissue corrected it. The 1823 printing sets the name backwards. Its last letter, the reissue's first, is what looks like a het where the reissue and the verse have he. The triad of the Shem HaMephorash is הרי, in the reissue's order. [1823 printing, p. 54](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA54)
 
 </small>
 
@@ -1734,6 +1736,14 @@ Le génie contraire influe sur tout ce qui est nuisible à la végétation ; il 
 
 <small>
 
+**Editorial notes**
+
+- **genius 24, name.he** (reading) · ההויה, kept as printed — Two readings of the scan agree on the reissue's letters. The 1823 printing agrees (p. 60). The triad of the Shem HaMephorash, from Exodus 14:19–21, is חהו: the verse has het where both printings have he. [1823 printing, p. 60](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA60)
+
+</small>
+
+<small>
+
 <details><summary>Reading notes</summary>
 
 - The Hebrew letters for Hahiuiah's name (ההויה) are rendered as best as legible from the image; some strokes may be indistinct due to print quality.
@@ -1807,6 +1817,7 @@ Le génie contraire domine le fanatisme et l'hypocrisie; il influe sur tous ceux
 **Editorial notes**
 
 - **genius 30, decade** (correction) · 9 → 15 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 64), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n72). [1823 printing, p. 64](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA64) · [Ms 5365, leaf n72](https://archive.org/details/BIUSante_ms05365/page/n72/mode/1up)
+- **genius 30, name.he** (reading) · ומאאל, kept as printed — Two readings of the scan agree on the reissue's letters. The 1823 printing agrees (p. 64). The triad of the Shem HaMephorash, from Exodus 14:19–21, is אומ: both printings set its letters in another order. [1823 printing, p. 64](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA64)
 - **genius 30, presidingDays** (correction) · 28/4, 29/6, 9/9, 20/11, 31/1 → 18/4, 29/6, 9/9, 20/11, 31/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has “28 avril, 29 juin, 9 septembre, 20 novembre, 18 janvier” (p. 64). The manuscript copy Ms 5365 has the same (leaf n72). 28 avril is Lenain's slip, and the reissue keeps it; 18 janvier for the fifth day is his too, which the reissue corrected to the 31st the tables require. [1823 printing, p. 64](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA64) · [Ms 5365, leaf n72](https://archive.org/details/BIUSante_ms05365/page/n72/mode/1up)
 
 </small>
@@ -1846,6 +1857,14 @@ Le génie contraire domine toutes les mauvaises qualités du corps et de l'âme.
 
 <small>
 
+**Editorial notes**
+
+- **genius 33, name.he** (reading) · יהויה, kept as printed — Two readings of the scan agree on the reissue's letters. The 1823 printing agrees (p. 66). The triad of the Shem HaMephorash, from Exodus 14:19–21, is יחו: the verse has het where both printings have he. [1823 printing, p. 66](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA66)
+
+</small>
+
+<small>
+
 <details><summary>Reading notes</summary>
 
 - The Hebrew word for Iehuiah is printed as יהויה in the source, but the letter order and exact forms could not be fully verified against standard transliteration; transcribed as it appears on the page.
@@ -1868,7 +1887,7 @@ Le génie contraire domine la discorde; il provoque la guerre, les trahisons, et
 
 **Editorial notes**
 
-- **genius 34, name.he** (reading) · לּׄההיׄה → לההיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 67). The manuscript copy Ms 5365 has the same (leaf n75). [1823 printing, p. 67](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA67) · [Ms 5365, leaf n75](https://archive.org/details/BIUSante_ms05365/page/n75/mode/1up)
+- **genius 34, name.he** (reading) · לּׄההיׄה → לההיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 67). The manuscript copy Ms 5365 has the same (leaf n75). The triad of the Shem HaMephorash, from Exodus 14:19–21, is להח: the verse has het where both printings have he. [1823 printing, p. 67](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA67) · [Ms 5365, leaf n75](https://archive.org/details/BIUSante_ms05365/page/n75/mode/1up)
 
 </small>
 
@@ -1901,6 +1920,7 @@ Le génie contraire domine sur les esprits pervers; il influe sur les charlatans
 
 - **genius 37, name.he** (reading) · אׄנואלּ → אניאל — Two readings of the scan could not settle this name. The reissue's letters were read from the scan by Gadi Cohen, who reads Hebrew; the dots sit above the letters, not within them. The name given is not those letters but the 1823 printing's. The reissue's resetting misprints this: the 1823 printing reads “אניאל” (p. 69). The manuscript copy Ms 5365 has the same (leaf n77). The triad of the Shem HaMephorash is אני. [1823 printing, p. 69](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA69) · [Ms 5365, leaf n77](https://archive.org/details/BIUSante_ms05365/page/n77/mode/1up)
 - **genius 38, invocation** (correction) · 12:20 — Neither the 1823 printing (p. 71) nor the reissue gives an hour for this genius; the one used here is from Lenain's tables. The manuscript copy Ms 5365 gives none either (leaf n78). [1823 printing, p. 71](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA71) · [Ms 5365, leaf n78](https://archive.org/details/BIUSante_ms05365/page/n78/mode/1up)
+- **genius 38, name.he** (reading) · העמיה, kept as printed — Two readings of the scan agree on the reissue's letters. The 1823 printing agrees (p. 69). The triad of the Shem HaMephorash, from Exodus 14:19–21, is חעמ: the verse has het where both printings have he. [1823 printing, p. 69](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA69)
 
 </small>
 
@@ -2155,6 +2175,14 @@ Le génie contraire influe sur les chevaliers d'industrie, et sur tous ceux qui 
 
 <small>
 
+**Editorial notes**
+
+- **genius 51, name.he** (reading) · ההשיה, kept as printed — Two readings of the scan agree on the reissue's letters. The 1823 printing agrees (p. 80). The triad of the Shem HaMephorash, from Exodus 14:19–21, is החש: the verse has het where both printings have he. [1823 printing, p. 80](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA80)
+
+</small>
+
+<small>
+
 <details><summary>Reading notes</summary>
 
 - The Hebrew word for Hahasiah's attribute (ההשיה) may be imprecisely rendered due to image clarity; letters were transcribed as best as legible.
@@ -2260,7 +2288,7 @@ Le génie contraire domine sur les trahisons, cause la mésintelligence entre le
 
 **Editorial notes**
 
-- **genius 57, name.he** (reading) · נממיה → נממיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 85). The manuscript copy Ms 5365 has the same (leaf n91). [1823 printing, p. 85](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA85) · [Ms 5365, leaf n91](https://archive.org/details/BIUSante_ms05365/page/n91/mode/1up)
+- **genius 57, name.he** (reading) · נממיה, kept as printed — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 85). The manuscript copy Ms 5365 has the same (leaf n91). [1823 printing, p. 85](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA85) · [Ms 5365, leaf n91](https://archive.org/details/BIUSante_ms05365/page/n91/mode/1up)
 - **genius 58, name.he** (reading) · יׄיׄלּׄאׄלּׄ → יילאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 85). The manuscript copy Ms 5365 has the same (leaf n92). [1823 printing, p. 85](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA85) · [Ms 5365, leaf n92](https://archive.org/details/BIUSante_ms05365/page/n92/mode/1up)
 
 </small>
@@ -2281,6 +2309,14 @@ Le génie contraire domine sur les trahisons, cause la mésintelligence entre le
 L'on prononce les noms divins et le 3e. verset du psaume 6. (Et anima turbata est valde; sed tu Domine usque quo ?) Il sert contre les chagrins et guérit les maladies, principalement le mal des yeux (1). Ce génie domine sur le fer; il influe sur les armuriers, les serruriers, les couteliers, et tous ceux qui en font le commerce; il confond les méchants et les faux témoins. La personne qui est née sous cette influence se distinguera par sa bravoure et sa franchise, et elle sera passionnée pour Vénus.
 
 Le génie contraire domine la colère; il influe sur les méchants et les homicides.
+
+<small>
+
+**Editorial notes**
+
+- **genius 59, name.he** (reading) · הרהאל, kept as printed — Two readings of the scan agree on the reissue's letters. The 1823 printing agrees (p. 86). The triad of the Shem HaMephorash, from Exodus 14:19–21, is הרח: the verse has het where both printings have he. [1823 printing, p. 86](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA86)
+
+</small>
 
 59e. Harahel. הרהאל Son attribut (Dieu qui connaît toutes choses). Il correspond au saint nom de Dieu Ella, d'après la langue des Mésopotamiens. Son rayon commence depuis le 291e. degré de la sphère jusqu'au 295e., inclusivement, correspondant à la 30e. décade et au génie nommé Isrô, sous l'influence du Soleil. Il préside les jours suivants : 17 mai, 28 juillet, 8 octobre, 19 décembre, 1 mars. L'heure favorable commence depuis 7 heures 20 minutes jusqu'à 7 heures 40; il faut prononcer le nom du génie, avec ses attributs, et le 3e. verset du psaume 112 (A solis ortu usque ad occasum, laudabile nomen Domini.) Il sert contre la stérilité des femmes, et pour rendre les enfants soumis et respectueux envers leurs parents. Ce génie domine sur les trésors, les agents de change. les fonds publics, les archives, les bibliothèques, et tous les cabinets rares et précieux; il influe sur l'imprimerie, la librairie, et sur tous ceux qui en font le commerce. La personne qui est née sous cette influence <small id="p87">**[p. 87]**</small> aimera à s'instruire sur toutes les sciences en général; elle fera beaucoup d'affaires suivra les opérations de la bourse, spéculera avec avantage, et se distinguera par sa probité, ses talents et sa fortune.
 
@@ -2341,6 +2377,7 @@ Le génie contraire domine la folie et la prodigalité ; il influe sur tous ceux
 - **genius 64, choir** (correction) · le chœur des anges → Archangels — Lenain opens the ninth choir here and ends the eighth at the sixty-third, making one of seven and one of nine. His own first eight declarations fall on the first, ninth, seventeenth and so on — eight apiece — and Agrippa and Kircher have it so. The pattern is followed and the departure noted. The 1823 printing has the same (p. 90), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n96). [1823 printing, p. 90](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA90) · [Ms 5365, leaf n96](https://archive.org/details/BIUSante_ms05365/page/n96/mode/1up)
 - **genius 64, choir** (correction) · anges → Archangels — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 90), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n96). [1823 printing, p. 90](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA90) · [Ms 5365, leaf n96](https://archive.org/details/BIUSante_ms05365/page/n96/mode/1up)
 - **genius 64, degrees** (correction) · 316-220 → 316-320 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 89), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n96). [1823 printing, p. 89](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA89) · [Ms 5365, leaf n96](https://archive.org/details/BIUSante_ms05365/page/n96/mode/1up)
+- **genius 64, name.he** (reading) · מהיאל, kept as printed — Two readings of the scan agree on the reissue's letters. The 1823 printing agrees (p. 89). The triad of the Shem HaMephorash, from Exodus 14:19–21, is מחי: the verse has het where both printings have he. [1823 printing, p. 89](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA89)
 
 </small>
 
@@ -2382,6 +2419,7 @@ Le génie contraire influe sur toutes les mauvaises qualités physiques et moral
 
 **Editorial notes**
 
+- **genius 66, name.he** (reading) · מנקאה, kept as printed — Two readings of the scan agree on the reissue's letters. The 1823 printing agrees (p. 91). Both printings end the name אה, where every other name Lenain spells -el in roman ends אל; the tradition has מנקאל. [1823 printing, p. 91](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA91)
 - **genius 67, name.he** (reading) · אׄיעּאׄלּׄ → איעאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 91). The manuscript copy Ms 5365 has the same (leaf n98). [1823 printing, p. 91](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA91) · [Ms 5365, leaf n98](https://archive.org/details/BIUSante_ms05365/page/n98/mode/1up)
 
 </small>
@@ -2431,6 +2469,7 @@ Le génie contraire domine sur les procès, les testaments et les legs qui se fo
 
 **Editorial notes**
 
+- **genius 69, name.he** (reading) · ראחאל → ראהאל — Two readings of the scan agree on the reissue's letters. The name given is not those letters but the 1823 printing's. The reissue's resetting misprints this: the 1823 printing reads “ראהאל” (p. 92). The triad of the Shem HaMephorash is ראה. [1823 printing, p. 92](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA92)
 - **genius 70, name.he** (reading) · יׄבמיׄה → יבמיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 93). The manuscript copy Ms 5365 has the same (leaf n99). [1823 printing, p. 93](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA93) · [Ms 5365, leaf n99](https://archive.org/details/BIUSante_ms05365/page/n99/mode/1up)
 
 </small>

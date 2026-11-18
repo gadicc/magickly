@@ -1,10 +1,18 @@
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import JSON5 from "json5";
 import { describe, expect, it } from "vitest";
-import { apparatusSource, type Note, withWitnesses } from "./apparatus";
+import {
+  apparatusSource,
+  keptAsPrinted,
+  type Note,
+  unsettledName,
+  withWitnesses,
+  witnessedNames,
+} from "./apparatus";
 import { readEvidence } from "./evidence";
-import { handReadings } from "./hebrew";
+import { handReadings, hebrewNames, hebrewReadings } from "./hebrew";
 import { MARKDOWN_PATH, renderMarkdown } from "./renderPages";
 import { disagreements } from "./validate";
 import {
@@ -337,6 +345,241 @@ describe("the witness file", () => {
     expect(() => handReadings(hands({ plain: "אנואל" }), misprint)).toThrow(
       /gives no reissue letters/,
     );
+  });
+});
+
+describe("names the reissue misprints, whoever read them", () => {
+  const hand = (no: number, plain: string, pointed = plain) => ({
+    no,
+    plain,
+    pointed,
+  });
+
+  it("gives a machine-read misprint as the 1823 printing has it", () => {
+    const names = hebrewNames(
+      new Map([
+        [69, "ראחאל"],
+        [70, "יבמיה"],
+      ]),
+      new Map(),
+      new Map([[69, "ראהאל"]]),
+    );
+    expect(names.get(69)).toEqual({
+      he: "ראהאל",
+      hePointed: "ראחאל",
+      heSource: "corroborated",
+    });
+    // A name with no misprint recorded is the reissue's, and nothing more.
+    expect(names.get(70)).toEqual({ he: "יבמיה", heSource: "corroborated" });
+  });
+
+  it("lets only a recorded misprint differ from the reissue", () => {
+    const names = hebrewNames(new Map([[69, "ראחאל"]]), new Map(), new Map());
+    expect(names.get(69)?.he).toBe("ראחאל");
+    expect(names.get(69)?.hePointed).toBe(undefined);
+  });
+
+  it("stops on a misprint the reissue does not print", () => {
+    expect(() =>
+      hebrewNames(
+        new Map([[69, "ראהאל"]]),
+        new Map(),
+        new Map([[69, "ראהאל"]]),
+      ),
+    ).toThrow(/so it misprints nothing/);
+  });
+
+  it("holds the 1823 letters to the shape of a name", () => {
+    const misprint = (in1823: string) => () =>
+      hebrewNames(new Map([[69, "ראחאל"]]), new Map(), new Map([[69, in1823]]));
+    expect(misprint("ראהאאל")).toThrow(/ראהאאל is 6 letters, not 5/);
+    expect(misprint("ראהאה")).toThrow(/ראהאה does not end in יה or אל/);
+  });
+
+  it("stops on a misprint of a name no reading gives", () => {
+    expect(() =>
+      hebrewNames(new Map(), new Map(), new Map([[69, "ראהאל"]])),
+    ).toThrow(/Genius 69: a witness records a misprint/);
+  });
+
+  it("takes a person's reading over the machines'", () => {
+    const names = hebrewNames(
+      new Map([[57, "נמחיה"]]),
+      new Map([[57, hand(57, "נממיה")]]),
+      new Map(),
+    );
+    expect(names.get(57)).toEqual({
+      he: "נממיה",
+      hePointed: "נממיה",
+      heSource: "hand",
+    });
+  });
+
+  it("gives the committed 69th as the 1823 printing has it", () => {
+    const [entry] = readEvidence().filter((each) => each.no === 69);
+    const names = hebrewNames(new Map([[69, entry.nameHe]]));
+    expect(names.get(69)).toEqual({
+      he: "ראהאל",
+      hePointed: "ראחאל",
+      heSource: "corroborated",
+    });
+  });
+});
+
+describe("the committed names", () => {
+  it("are what hebrewNames makes of the committed readings", () => {
+    const evidence = readEvidence();
+    const { agreed } = hebrewReadings(
+      new Map(evidence.map((row) => [row.no, row.nameHe])),
+      new Map(
+        evidence.map((row) => [
+          row.no,
+          { hebrew: row.crop.he, legible: row.crop.legible },
+        ]),
+      ),
+    );
+    const names = hebrewNames(agreed);
+    const angels: { no: number; name: Record<string, string> }[] = JSON5.parse(
+      readFileSync(
+        "packages/magick-data/src/kabbalah/seventyTwoAngels.json5",
+        "utf8",
+      ),
+    );
+    expect(angels).toHaveLength(72);
+    for (const { no, name } of angels) {
+      const { en, ...hebrew } = name;
+      expect(hebrew, `genius ${no} (${en})`).toEqual(names.get(no) ?? {});
+    }
+  });
+});
+
+describe("notes for witnessed names", () => {
+  const corroborated = (he: string, hePointed?: string) => ({
+    he,
+    ...(hePointed ? { hePointed } : {}),
+    heSource: "corroborated" as const,
+  });
+  const nameRead = (no: number, verdict: WitnessReading["verdict"], at = 60) =>
+    reading({
+      no,
+      field: "name.he",
+      verdict,
+      print1823: { at, reads: "" },
+      ms5365: undefined,
+    });
+
+  it("makes a reading note for a witnessed name nothing else notes", () => {
+    const [made] = witnessedNames(
+      [nameRead(24, "agree")],
+      new Map([[24, corroborated("ההויה")]]),
+      [],
+    );
+    expect(made).toEqual({
+      no: 24,
+      kind: "reading",
+      field: "name.he",
+      printed: "ההויה",
+      used: "ההויה",
+      why: "Two readings of the scan agree on the reissue's letters.",
+    });
+  });
+
+  it("prints the reissue's letters and uses 1823's for a misprint", () => {
+    const [made] = witnessedNames(
+      [nameRead(69, "reissue", 92)],
+      new Map([[69, corroborated("ראהאל", "ראחאל")]]),
+      [],
+    );
+    expect(made.printed).toBe("ראחאל");
+    expect(made.used).toBe("ראהאל");
+    expect(made.why).toMatch(/not those letters but the 1823 printing's\.$/);
+  });
+
+  it("leaves a name that already has a note alone", () => {
+    const existing = note({
+      no: 34,
+      kind: "reading",
+      field: "name.he",
+      printed: "לּׄההיׄה",
+      used: "לההיה",
+    });
+    expect(
+      witnessedNames(
+        [nameRead(34, "agree")],
+        new Map([[34, corroborated("לההיה")]]),
+        [existing],
+      ),
+    ).toEqual([]);
+  });
+
+  it("stops on a witnessed name the edition does not give", () => {
+    expect(() =>
+      witnessedNames([nameRead(24, "agree")], new Map(), []),
+    ).toThrow(/24 name\.he: the edition gives no name/);
+  });
+
+  it("makes no note for any other field, which still has to match one", () => {
+    const days = reading({ no: 19 });
+    expect(witnessedNames([days], new Map(), [])).toEqual([]);
+    expect(() => withWitnesses([note()], [reading(), days], [])).toThrow(
+      /match no note: 19\|presidingDays/,
+    );
+  });
+});
+
+describe("names no reading settled", () => {
+  it("print and use nothing, so no renderer says “kept as printed”", () => {
+    const note = unsettledName(9, "Two readings of the scan differed.");
+    expect(note.printed).toBe("");
+    expect(note.used).toBe("");
+    expect(note.why).toMatch(/No name is given/);
+  });
+
+  it("never read “kept as printed” in the committed apparatus", () => {
+    const notes = JSON5.parse(
+      readFileSync(
+        "packages/magick-data/src/kabbalah/lenain/apparatus.json5",
+        "utf8",
+      ),
+    ) as Note[];
+    const keptYetUnnamed = notes.filter(
+      (each) => each.printed && !each.used && /No name is given/.test(each.why),
+    );
+    expect(keptYetUnnamed).toEqual([]);
+  });
+});
+
+describe("names kept as printed", () => {
+  const name = (printed: string, used: string) =>
+    note({ no: 24, kind: "reading", field: "name.he", printed, used });
+
+  it("empties `used` where the name is the printed one", () => {
+    expect(keptAsPrinted([name("ההויה", "ההויה")])[0].used).toBe("");
+  });
+
+  it("keeps a name that differs from what is printed, marks included", () => {
+    expect(keptAsPrinted([name("ראחאל", "ראהאל")])[0].used).toBe("ראהאל");
+    expect(keptAsPrinted([name("לּׄההיׄה", "לההיה")])[0].used).toBe("לההיה");
+  });
+
+  it("leaves every other field alone, an absent hour included", () => {
+    const same = note({ printed: "1/1", used: "1/1" });
+    const absent = note({ field: "invocation", printed: "", used: "2:20" });
+    expect(keptAsPrinted([same, absent])).toEqual([same, absent]);
+  });
+
+  it("is what the committed apparatus does, the 57th included", () => {
+    const notes = JSON5.parse(
+      readFileSync(
+        "packages/magick-data/src/kabbalah/lenain/apparatus.json5",
+        "utf8",
+      ),
+    ) as Note[];
+    const names = notes.filter((each) => each.field === "name.he");
+    expect(
+      names.filter((each) => each.used && each.used === each.printed),
+    ).toEqual([]);
+    expect(names.find((each) => each.no === 57)?.used).toBe("");
   });
 });
 

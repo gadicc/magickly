@@ -1358,7 +1358,7 @@ export const schemas = {
             v.pipe(
               v.string(),
               v.description(
-                "The Hebrew as the reissue this edition transcribes prints it, with its marks, on the twenty-five names a person read. For the 37th and the 68th the reissue misprints the name, so this does not strip to `he`.",
+                "The Hebrew as the reissue this edition transcribes prints it: with its marks on the twenty-five names a person read, and as bare letters on the 69th. For the 37th, the 68th and the 69th the reissue misprints the name, so this does not strip to `he`.",
               ),
             ),
           ),
@@ -1366,7 +1366,7 @@ export const schemas = {
             v.pipe(
               v.picklist(["hand", "corroborated"]),
               v.description(
-                "Where the Hebrew came from: `corroborated` where two machine readings of the scan agree (forty-seven names), `hand` where a person read it because they never would (twenty-five). For the 37th and the 68th, which the reissue misprints, `he` is the 1823 printing's letters instead.",
+                "Where the Hebrew came from: `corroborated` where two machine readings of the scan agree (forty-seven names), `hand` where a person read it because they never would (twenty-five). For the 37th, the 68th and the 69th, which the reissue misprints, `he` is the 1823 printing's letters instead.",
               ),
             ),
           ),

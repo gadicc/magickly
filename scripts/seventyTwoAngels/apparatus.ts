@@ -2,7 +2,13 @@ import { readFileSync, writeFileSync } from "node:fs";
 import JSON5 from "json5";
 import { bookPages } from "./bookPage";
 import { readEvidence } from "./evidence";
-import { handReadings, hebrewReadings } from "./hebrew";
+import {
+  type HebrewName,
+  handReadings,
+  hebrewLetters,
+  hebrewNames,
+  hebrewReadings,
+} from "./hebrew";
 import { plateEntries } from "./plateSource";
 import { disagreements } from "./validate";
 import {
@@ -57,9 +63,19 @@ export interface Note {
    * hang on, and nothing looked at `field` for a page.
    */
   page?: string;
-  /** What the book prints, as it prints it. */
+  /**
+   * What the book prints, as it prints it. Empty where it prints nothing (an
+   * hour no printing gives), and where what it prints is not settled (a
+   * Hebrew name two readings could not agree on). For a Hebrew name the
+   * machines read, it is the bare letters: their marks were not trusted (see
+   * hebrew.ts), so the reissue's dots are not recorded for those names.
+   */
   printed: string;
-  /** What this edition uses instead — empty where it uses nothing. */
+  /**
+   * What this edition uses instead. Empty where it keeps what is printed (the
+   * renderers then say "kept as printed"), and, with `printed` empty too,
+   * where it gives nothing at all: a Hebrew name no reading settled.
+   */
   used: string;
   /** Why, in a sentence a reader can check. */
   why: string;
@@ -120,10 +136,10 @@ function fromOrdinals(): Note[] {
     }));
 }
 
-/** Where two readings of the Hebrew cannot be made to agree. */
-function fromHebrew(): Note[] {
+/** The two machine readings of the Hebrew, compared from the evidence. */
+function readingsOfHebrew() {
   const evidence = readEvidence();
-  const { doubtful } = hebrewReadings(
+  return hebrewReadings(
     new Map(evidence.map((row) => [row.no, row.nameHe])),
     new Map(
       evidence.map((row) => [
@@ -132,7 +148,29 @@ function fromHebrew(): Note[] {
       ]),
     ),
   );
+}
 
+/**
+ * A Hebrew name no reading settled, and for which no name is given. Both
+ * `printed` and `used` are empty: an empty `used` beside a printed value
+ * would read "kept as printed", which is the opposite of what happened. The
+ * two readings are quoted in `why` instead.
+ */
+export function unsettledName(no: number, disagreed: string): Note {
+  return {
+    no,
+    kind: "reading",
+    field: "name.he",
+    printed: "",
+    used: "",
+    why: `${disagreed} No name is given rather than a guess between them.`,
+  };
+}
+
+/** Where two readings of the Hebrew cannot be made to agree. */
+function fromHebrew(
+  doubtful: ReturnType<typeof readingsOfHebrew>["doubtful"],
+): Note[] {
   const byHand = handReadings();
 
   // Every name a person read gets a note, whether or not the machines still
@@ -150,15 +188,7 @@ function fromHebrew(): Note[] {
           `${reading.page || "nothing"} from the whole page.`
         : "Two readings of the scan could not settle this name.";
 
-      if (!hand)
-        return {
-          no,
-          kind: "reading" as const,
-          field: "name.he",
-          printed: reading.crop || reading.page || "",
-          used: "",
-          why: `${disagreed} No name is given rather than a guess between them.`,
-        };
+      if (!hand) return unsettledName(no, disagreed);
 
       // A name the reissue misprints: the person read the reissue's letters,
       // and the name given is the 1823 printing's, which the witness note
@@ -206,6 +236,51 @@ function withLeaves(notes: Note[]): Note[] {
 const keyOf = (place: { no: number; field: string }) =>
   `${place.no}|${place.field}`;
 
+/** The reason a name two machine readings agreed on carries a note. */
+const AGREED_WHY = "Two readings of the scan agree on the reissue's letters.";
+
+/**
+ * A note for each Hebrew name a witness was read for and nothing else notes.
+ *
+ * Only a name a person read, or one the machines could not agree on, had a
+ * note, so the 1823 reading of a name the two machine readings agreed on had
+ * nowhere to go. This note says what the reissue prints and which name is
+ * used; the witness then adds what the 1823 printing has, and its remark what
+ * the verse has. Only Hebrew names are given a note this way: a witness
+ * reading for any other field that matches no note still stops the build
+ * (see `withWitnesses`).
+ */
+export function witnessedNames(
+  readings: WitnessReading[],
+  names: Map<number, HebrewName>,
+  notes: Note[],
+): Note[] {
+  const noted = new Set(notes.map(keyOf));
+  return readings
+    .filter((reading) => reading.field === "name.he")
+    .filter((reading) => !noted.has(keyOf(reading)))
+    .map((reading) => {
+      const name = names.get(reading.no);
+      if (!name)
+        throw new Error(
+          `Witness reading ${reading.no} name.he: the edition gives no name to note`,
+        );
+      const printed = name.hePointed ?? name.he;
+      return {
+        no: reading.no,
+        kind: "reading" as const,
+        field: "name.he",
+        printed,
+        used: name.he,
+        why:
+          hebrewLetters(printed) === name.he
+            ? AGREED_WHY
+            : `${AGREED_WHY} The name given is not those letters but the ` +
+              `1823 printing's.`,
+      };
+    });
+}
+
 /**
  * What the 1823 printing, and the manuscript copied from it, print where a
  * note turns on a value — and so whose slip the departure is.
@@ -251,16 +326,39 @@ export function withWitnesses(
   });
 }
 
+/**
+ * A Hebrew name used exactly as printed is said to be kept as printed: its
+ * `used` is emptied, so that the note reads "ההויה, kept as printed" rather
+ * than "ההויה → ההויה". It is done last, once every verdict has been held to
+ * the name used. A name printed with marks is not the same string as its
+ * letters, so it keeps both.
+ */
+export function keptAsPrinted(notes: Note[]): Note[] {
+  return notes.map((note) =>
+    note.field === "name.he" && note.used && note.used === note.printed
+      ? { ...note, used: "" }
+      : note,
+  );
+}
+
 /** The apparatus, built from the committed sources alone. */
 export function buildApparatus(): Note[] {
   const computed = [...fromOrdinals(), ...fromArithmetic()];
-  const hebrew = fromHebrew();
+  const { agreed, doubtful } = readingsOfHebrew();
+  const hebrew = fromHebrew(doubtful);
   // Every name a person read was looked up in 1823 too.
   const readByHand = hebrew.filter((note) => note.used);
-  return withWitnesses(
-    withLeaves([...handNotes(), ...computed, ...hebrew]),
-    readWitnesses().readings,
-    [...computed, ...readByHand],
+  const { readings } = readWitnesses();
+  const notes = [...handNotes(), ...computed, ...hebrew];
+  return keptAsPrinted(
+    withWitnesses(
+      withLeaves([
+        ...notes,
+        ...witnessedNames(readings, hebrewNames(agreed), notes),
+      ]),
+      readings,
+      [...computed, ...readByHand],
+    ),
   ).sort((a, b) => a.no - b.no || a.field.localeCompare(b.field));
 }
 

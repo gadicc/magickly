@@ -330,10 +330,11 @@ describe("the other witnesses", () => {
     }
   });
 
-  it("gives the two misprinted Hebrew names as 1823 prints them", () => {
+  it("gives the three misprinted Hebrew names as 1823 prints them", () => {
     for (const [no, printed, used] of [
       [37, "אנואל", "אניאל"],
       [68, "הבויה", "חבויה"],
+      [69, "ראחאל", "ראהאל"],
     ] as const) {
       const note = notes.find((n) => n.no === no && n.field === "name.he");
       expect(note?.printed.replace(/\p{Mark}/gu, ""), `genius ${no}`).toBe(

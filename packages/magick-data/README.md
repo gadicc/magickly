@@ -436,8 +436,8 @@ draws on any modern published translation of the work — the point of the
 exercise was a copyright-free rendering of the same public-domain material.
 
 The Hebrew names are given both as the page points them and as bare letters;
-for two, the thirty-seventh and the sixty-eighth, the reissue misprints the
-name and the bare letters follow the 1823 printing.
+for three, the thirty-seventh, the sixty-eighth and the sixty-ninth, the
+reissue misprints the name and the bare letters follow the 1823 printing.
 Forty-seven are there because two independent readings of the scan agree;
 twenty-five were read by a person who reads Hebrew, and each of those carries a
 note saying so. See

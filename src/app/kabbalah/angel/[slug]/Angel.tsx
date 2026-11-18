@@ -62,7 +62,7 @@ const formatter = new Intl.DateTimeFormat("en", {
 
 /**
  * A pointed name without its marks. Where that is not the name itself, the
- * reissue has misprinted it (the 37th and the 68th) and the name follows the
+ * reissue has misprinted it (the 37th, 68th and 69th) and the name follows the
  * 1823 printing, so the pointed form is the misprint's.
  */
 function lettersOf(pointed: string) {

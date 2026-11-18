@@ -321,13 +321,26 @@ export function hebrewReadings(
   return { agreed, doubtful };
 }
 
+/**
+ * Why a name given in place of the reissue's is not the shape of one of the
+ * seventy-two, or undefined: five letters, a triad and then יה or אל. Only a
+ * name this edition supplies is held to it; a name kept as the page prints it
+ * is the page's, whatever its shape.
+ */
+export function shapeProblem(letters: string): string | undefined {
+  if (letters.length !== 5) return `is ${letters.length} letters, not 5`;
+  if (!/(יה|אל)$/.test(letters)) return "does not end in יה or אל";
+  return undefined;
+}
+
 export interface HandReading {
   no: number;
   /** The consonantal name: five letters, a triad and then יה or אל. */
   plain: string;
   /**
-   * What the page prints, marks and all. For two names (37 and 68) it is the
-   * reissue's misprint, and `plain` is the 1823 printing's letters instead.
+   * What the page prints, marks and all. For a name the reissue misprints
+   * (37 and 68 among these) it is the misprint, and `plain` is the 1823
+   * printing's letters instead.
    */
   pointed: string;
   /**
@@ -350,8 +363,8 @@ export interface HandReading {
  * The one exception is a name the reissue misprints. There the row gives the
  * reissue's bare letters as `reissue`, the pointed form must strip to them,
  * and `plain` is the 1823 printing's letters — accepted only where
- * witnesses.json5 records that misprint with exactly those letters, and
- * required wherever it records one.
+ * witnesses.json5 records that misprint with exactly those letters (see
+ * `misprints`), and required wherever it records one.
  */
 export function handReadings(
   path = "scripts/seventyTwoAngels/hebrewByHand.json5",
@@ -359,14 +372,7 @@ export function handReadings(
 ): Map<number, HandReading> {
   const rows: HandReading[] = JSON5.parse(readFileSync(path, "utf8"));
   const byNo = new Map<number, HandReading>();
-  const misprinted = new Map(
-    readWitnesses(witnessesPath)
-      .readings.filter(
-        (reading) =>
-          reading.field === "name.he" && reading.verdict === "reissue",
-      )
-      .map((reading) => [reading.no, reading.print1823.reads]),
-  );
+  const misprinted = misprints(witnessesPath);
 
   for (const row of rows) {
     if (!Number.isInteger(row.no) || row.no < 1 || row.no > 72)
@@ -376,12 +382,8 @@ export function handReadings(
     if (byNo.has(row.no))
       throw new Error(`Two hand readings for genius ${row.no}`);
     const plain = hebrewLetters(row.plain);
-    if (plain.length !== 5)
-      throw new Error(
-        `Hand reading ${row.no} is ${plain.length} letters, not 5`,
-      );
-    if (!/(יה|אל)$/.test(plain))
-      throw new Error(`Hand reading ${row.no} does not end in יה or אל`);
+    const shape = shapeProblem(plain);
+    if (shape) throw new Error(`Hand reading ${row.no} ${shape}`);
     // What the page prints: the name itself, or the reissue's misprint of it.
     const printed = row.reissue === undefined ? plain : row.reissue;
     if (hebrewLetters(row.pointed) !== printed)
@@ -404,4 +406,83 @@ export function handReadings(
     byNo.set(row.no, row);
   }
   return byNo;
+}
+
+/**
+ * The names the reissue misprints, each with the 1823 printing's letters:
+ * every `reissue` verdict on a Hebrew name in witnesses.json5, and nothing
+ * else. These, and only these, may be given in letters the reissue does not
+ * print.
+ */
+export function misprints(witnessesPath = WITNESSES_PATH): Map<number, string> {
+  return new Map(
+    readWitnesses(witnessesPath)
+      .readings.filter(
+        (reading) =>
+          reading.field === "name.he" && reading.verdict === "reissue",
+      )
+      .map((reading) => [reading.no, reading.print1823.reads]),
+  );
+}
+
+/** The Hebrew name a genius is given, and what the reissue prints for it. */
+export interface HebrewName {
+  /** The letters that identify the name. */
+  he: string;
+  /**
+   * What the reissue prints, where it is kept beside `he`: a person's reading
+   * with its marks, or the bare letters of a misprint two machine readings
+   * agreed on. It strips to `he` except where the reissue misprints the name.
+   */
+  hePointed?: string;
+  /** A person read it, or two machine readings of the scan agreed on it. */
+  heSource: "hand" | "corroborated";
+}
+
+/**
+ * The Hebrew name each genius is given, from a person's reading where there
+ * is one and otherwise from two machine readings that agree.
+ *
+ * A name the reissue misprints is given as the 1823 printing has it, whoever
+ * read the reissue. `handReadings` checks a person's rows; for a name two
+ * machines agreed on, the agreed letters are the reissue's, kept as
+ * `hePointed`, and `he` is the 1823 printing's letters as witnesses.json5
+ * records them, held to the shape a hand-read name is (`shapeProblem`). A
+ * misprint recorded where the two readings already have the 1823 printing's
+ * letters, or for a name no reading gives, stops the build.
+ */
+export function hebrewNames(
+  agreed: Map<number, string>,
+  byHand: Map<number, HandReading> = handReadings(),
+  misprinted: Map<number, string> = misprints(),
+): Map<number, HebrewName> {
+  const names = new Map<number, HebrewName>();
+  for (const [no, hand] of byHand)
+    names.set(no, {
+      he: hand.plain,
+      hePointed: hand.pointed,
+      heSource: "hand",
+    });
+  for (const [no, letters] of agreed) {
+    if (names.has(no)) continue;
+    const in1823 = misprinted.get(no);
+    if (in1823 === undefined) {
+      names.set(no, { he: letters, heSource: "corroborated" });
+      continue;
+    }
+    if (in1823 === letters)
+      throw new Error(
+        `Genius ${no}: the reissue is read as ${letters}, which is what the 1823 printing has, so it misprints nothing`,
+      );
+    const shape = shapeProblem(hebrewLetters(in1823));
+    if (shape)
+      throw new Error(`Genius ${no}: the 1823 printing's ${in1823} ${shape}`);
+    names.set(no, { he: in1823, hePointed: letters, heSource: "corroborated" });
+  }
+  for (const no of misprinted.keys())
+    if (!names.has(no))
+      throw new Error(
+        `Genius ${no}: a witness records a misprint, but no reading of the reissue's letters agrees`,
+      );
+  return new Map([...names].sort(([a], [b]) => a - b));
 }

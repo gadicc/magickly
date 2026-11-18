@@ -349,9 +349,9 @@ function SevenyTwo() {
             letters or invents them. Forty-seven names are given here because
             two independent readings of the scan agree on them; the other
             twenty-five were read by a person who reads Hebrew. Each name is
-            given both as the page points it and as its bare letters. Two, the
-            thirty-seventh and the sixty-eighth, are misprinted in the reissue;
-            their bare letters follow the 1823 printing.
+            given both as the page points it and as its bare letters. Three, the
+            thirty-seventh, the sixty-eighth and the sixty-ninth, are misprinted
+            in the reissue; their bare letters follow the 1823 printing.
           </p>
           <p>
             The scan is not of the 1823 printing but of a later reissue, which
