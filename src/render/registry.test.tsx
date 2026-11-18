@@ -13,7 +13,6 @@ import { TreeOfLifeSvg } from "magick-components/kabbalah/TreeOfLife";
 import { sigilFigure } from "magick-components/sigil/SigilImage";
 import type { ReactElement } from "react";
 import { createRitualSvgValidator } from "@/files/validateRitualSvg";
-import { SEVENTY_TWO_NAMES } from "../../packages/magick-components/src/sigil/oracle/corpus";
 import { renderComponentImage } from "./componentImage";
 import { COMPONENT_IMAGE_SLUGS, CONTRACTS } from "./contracts";
 import { contractViewBox } from "./contracts/types";
@@ -418,11 +417,89 @@ describe("component image registry", () => {
   });
 
   // A digest of the drawing itself, by the same profile: the path data
-  // of the 72 names and a fixed list of texts that use every mark and
+  // of the 72 names (as reviewed) and a fixed list of texts that use every mark and
   // placement rule, on both roses. A change to the engine that moves any
   // of them, even one the four pinned images above do not show, must come
   // with a new profile. The list is written out here, not taken from the
   // oracle's templates, so adding a template never moves the digest.
+  // The 72 names as they stood when v1's drawings were reviewed (magick-data
+  // at 28a7f9f1), written out so that a correction to the data (#69 became
+  // ראהאל on 18 November) does not move the digest: an image is keyed by
+  // its own text, so only a change to the drawing should.
+  const ROSE_SIGIL_DIGEST_NAMES = [
+    "והויה",
+    "יליאל",
+    "סיטאל",
+    "עלמיה",
+    "מהשיה",
+    "ללהאל",
+    "אכאיה",
+    "כהתאל",
+    "הזיאל",
+    "אלדיה",
+    "לאויה",
+    "ההעיה",
+    "יזלאל",
+    "מבהאל",
+    "הריאל",
+    "הקמיה",
+    "לאויה",
+    "כליאל",
+    "לוויה",
+    "פהליה",
+    "נלכאל",
+    "יייאל",
+    "מלהאל",
+    "ההויה",
+    "נתהיה",
+    "האאיה",
+    "ירתאל",
+    "שאהיה",
+    "רייאל",
+    "ומאאל",
+    "לכבאל",
+    "ושריה",
+    "יהויה",
+    "לההיה",
+    "כוקיה",
+    "מנדאל",
+    "אניאל",
+    "העמיה",
+    "רהעאל",
+    "ייזאל",
+    "הההאל",
+    "מיכאל",
+    "ווליה",
+    "ילהיה",
+    "סאליה",
+    "עריאל",
+    "עשליה",
+    "מיהאל",
+    "והואל",
+    "דניאל",
+    "ההשיה",
+    "עממיה",
+    "ננאאל",
+    "ניתאל",
+    "מבהיה",
+    "פויאל",
+    "נממיה",
+    "יילאל",
+    "הרהאל",
+    "מצראל",
+    "ומבאל",
+    "יההאל",
+    "ענואל",
+    "מהיאל",
+    "דמביה",
+    "מנקאה",
+    "איעאל",
+    "חבויה",
+    "ראחאל",
+    "יבמיה",
+    "הייאל",
+    "מומיה",
+  ];
   const ROSE_SIGIL_DIGEST_TEXTS = [
     "מטטרון", // a crook and a noose (Regardie, p. 58)
     "יהוה אלהים", // two words; a revisit beside its first visit
@@ -447,10 +524,7 @@ describe("component image registry", () => {
 
   it("pins a digest of the rose sigil's drawings under its image profile", () => {
     const texts = [
-      ...new Set([
-        ...SEVENTY_TWO_NAMES.map((n) => n.text),
-        ...ROSE_SIGIL_DIGEST_TEXTS,
-      ]),
+      ...new Set([...ROSE_SIGIL_DIGEST_NAMES, ...ROSE_SIGIL_DIGEST_TEXTS]),
     ];
     const drawings = (["gd", "regardie1939"] as const).flatMap((version) =>
       texts.map(
